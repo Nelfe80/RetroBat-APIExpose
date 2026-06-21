@@ -32,6 +32,7 @@ cache/
 # APIExpose runtime state / user data
 events.ini
 license.ini
+git-push.bat
 /media/
 **/pending-scrapes.json
 **/bootstrap-placeholder-state.json
