@@ -30,6 +30,8 @@ cache/
 !RetroBat.Api.exe
 
 # APIExpose runtime state / user data
+events.ini
+license.ini
 /media/
 **/pending-scrapes.json
 **/bootstrap-placeholder-state.json

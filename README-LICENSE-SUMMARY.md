@@ -1,44 +1,41 @@
 # APIExpose License Summary
 
-This summary is provided for convenience only. The full license terms are described in the other Markdown files.
+This summary is provided for convenience. The full terms are in `PERSONAL-LICENSE.md` and `COMMERCIAL-LICENSE.md`.
 
-## RetroBat
+---
 
-RetroBat remains free software.
+## 🚀 Activation System (Trust-Based)
 
-APIExpose does not make RetroBat a paid product.
+To respect our users, no restrictive hardware lock or online activation DRM is implemented. Licensing operates on **honesty and a simple local file declaration**.
 
-## APIExpose
+To activate a license, create a file named `license.ini` at the root of the installation folder:
 
-APIExpose is an independent plugin and API layer.
-
-Personal and non-commercial use is allowed.
-
-Commercial redistribution requires a separate written license.
-
-## Personal use
-
-```text
-1 personal machine = 1 personal APIExpose license
+```ini
+[License]
+# Your unique license identifier
+LicenseId=APX-PRS-2026-000381
+# The name of the licensee / owner
+Licensee=Jean Dupont
 ```
 
-A user may have several machines, but each machine requires its own personal license.
+---
 
-## Commercial use
+## 👤 Personal Use
 
-```text
-1 commercial machine sold = 1 APIExpose reseller license
-```
+*   **Rule**: 1 personal machine = 1 personal license (`APX-PRS-YYYY-NNNNNN`).
+*   Each separate machine must have its own unique license ID configured in `license.ini`.
 
-Commercial use includes selling or distributing APIExpose as part of a paid product, machine, drive, card, pack, installation or support offer.
+---
 
-## Data files
+## 💼 Commercial Use
 
-XML files, `.MEM` files, mappings, RAM definitions, outputs, panels, profiles and metadata are part of the APIExpose Data Pack.
+*   **Rule**: 1 commercial machine sold = 1 reseller license (`APX-RSU-YYYY-NNNNNN`).
+*   Commercial use includes pre-installing, bundling, or selling APIExpose as part of any cabinet, mini-PC, hard drive, SD card, digital package, or support offer.
+*   Resellers must supply a unique `license.ini` with each machine sold.
 
-The Data Pack is also protected by a separate data license.
+---
 
-## Suggested license identifiers
+## 📄 License Identifiers
 
 ```text
 APX-PRS-YYYY-NNNNNN   Personal machine license
@@ -47,11 +44,3 @@ APX-RSB-YYYY-NNNNNN   Reseller batch license
 APX-CERT-YYYY-NNNNNN  Unit certificate attached to a batch
 APX-DEV-YYYY-NNNNNN   Developer/test license
 ```
-
-## Important
-
-A personal license is not a reseller license.
-
-A reseller may not copy a personal license to multiple machines.
-
-A reseller may not hide, remove or bypass APIExpose license information.

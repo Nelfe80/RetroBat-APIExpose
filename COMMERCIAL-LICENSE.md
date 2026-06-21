@@ -41,15 +41,27 @@ APX-RSB-2026-000042
 APX-CERT-2026-000018
 ```
 
-## License display
+## Activation de la licence revendeur (Dépôt du fichier)
 
-Every commercial copy of APIExpose must be able to display or expose:
+L'activation d'une copie commerciale s'effectue en déposant un fichier `license.ini` à la racine de l'installation de chaque plugin.
 
-- the license type;
-- the unique license identifier;
-- the reseller name or reseller identifier when applicable;
-- the commercial license status;
-- the notice that RetroBat is free software.
+### Fichier `license.ini` (Revendeur)
+
+```ini
+[License]
+LicenseId=APX-RSU-2026-000184
+Licensee=Nom du Revendeur / Entreprise
+```
+
+## Affichage de la licence (License display)
+
+Chaque copie commerciale d'APIExpose doit être capable d'afficher ou d'exposer :
+
+- le type de licence ;
+- l'identifiant unique de licence (`LicenseId`) ;
+- le nom du revendeur enregistré (`Licensee`) ;
+- le statut de la licence commerciale ;
+- la mention claire que RetroBat reste un logiciel libre et gratuit.
 
 ## No hiding or bypassing
 
