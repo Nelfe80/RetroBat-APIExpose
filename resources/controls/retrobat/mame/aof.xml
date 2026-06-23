@@ -1,0 +1,205 @@
+<?xml version='1.0' encoding='utf-8'?>
+<game name="aof" rom="aof">
+    <layouts>
+        <layout type="default" joystickcolor="Blue">
+            <button type="P1_LEFT" tag=":edge:joy:JOY1" mask="4" defvalue="4" slot="LEFT" color="Blue" function="P1_LEFT">
+                <mapping type="standard" name="JOY_left OR JOY_lsleft" />
+            </button>
+            <button type="P1_RIGHT" tag=":edge:joy:JOY1" mask="8" defvalue="8" slot="RIGHT" color="Blue" function="P1_RIGHT">
+                <mapping type="standard" name="JOY_right OR JOY_lsright" />
+            </button>
+            <button type="P1_UP" tag=":edge:joy:JOY1" mask="1" defvalue="1" slot="UP" color="Blue" function="P1_UP">
+                <mapping type="standard" name="JOY_up OR JOY_lsup" />
+            </button>
+            <button type="P1_DOWN" tag=":edge:joy:JOY1" mask="2" defvalue="2" slot="DOWN" color="Blue" function="P1_DOWN">
+                <mapping type="standard" name="JOY_down OR JOY_lsdown" />
+            </button>
+            <button type="P1_A" tag=":edge:joy:JOY1" mask="16" defvalue="16" slot="4" color="Red" function="P1_A">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_B" tag=":edge:joy:JOY1" mask="32" defvalue="32" slot="1" color="Yellow" function="P1_B">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_C" tag=":edge:joy:JOY1" mask="64" defvalue="64" slot="3" color="Green" function="P1_C">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+            <button type="P1_D" tag=":edge:joy:JOY1" mask="128" defvalue="128" slot="2" color="Blue" function="P1_D">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P2_LEFT" tag=":edge:joy:JOY2" mask="4" defvalue="4" slot="LEFT" color="Red" function="P2_LEFT">
+                <mapping type="standard" name="JOY_left OR JOY_lsleft" />
+            </button>
+            <button type="P2_RIGHT" tag=":edge:joy:JOY2" mask="8" defvalue="8" slot="RIGHT" color="Red" function="P2_RIGHT">
+                <mapping type="standard" name="JOY_right OR JOY_lsright" />
+            </button>
+            <button type="P2_UP" tag=":edge:joy:JOY2" mask="1" defvalue="1" slot="UP" color="Red" function="P2_UP">
+                <mapping type="standard" name="JOY_up OR JOY_lsup" />
+            </button>
+            <button type="P2_DOWN" tag=":edge:joy:JOY2" mask="2" defvalue="2" slot="DOWN" color="Red" function="P2_DOWN">
+                <mapping type="standard" name="JOY_down OR JOY_lsdown" />
+            </button>
+            <button type="P2_A" tag=":edge:joy:JOY2" mask="16" defvalue="16" slot="4" color="Red" function="P2_A">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P2_B" tag=":edge:joy:JOY2" mask="32" defvalue="32" slot="1" color="Yellow" function="P2_B">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P2_C" tag=":edge:joy:JOY2" mask="64" defvalue="64" slot="3" color="Green" function="P2_C">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+            <button type="P2_D" tag=":edge:joy:JOY2" mask="128" defvalue="128" slot="2" color="Blue" function="P2_D">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+        </layout>
+        <layout type="modern8" joystickcolor="Blue">
+            <button type="P1_LEFT" tag=":edge:joy:JOY1" mask="4" defvalue="4" slot="LEFT" color="Blue" function="P1_LEFT">
+                <mapping type="standard" name="JOY_left OR JOY_lsleft" />
+            </button>
+            <button type="P1_RIGHT" tag=":edge:joy:JOY1" mask="8" defvalue="8" slot="RIGHT" color="Blue" function="P1_RIGHT">
+                <mapping type="standard" name="JOY_right OR JOY_lsright" />
+            </button>
+            <button type="P1_UP" tag=":edge:joy:JOY1" mask="1" defvalue="1" slot="UP" color="Blue" function="P1_UP">
+                <mapping type="standard" name="JOY_up OR JOY_lsup" />
+            </button>
+            <button type="P1_DOWN" tag=":edge:joy:JOY1" mask="2" defvalue="2" slot="DOWN" color="Blue" function="P1_DOWN">
+                <mapping type="standard" name="JOY_down OR JOY_lsdown" />
+            </button>
+            <button type="P1_A" tag=":edge:joy:JOY1" mask="16" defvalue="16" slot="4" color="Red" function="P1_A">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_B" tag=":edge:joy:JOY1" mask="32" defvalue="32" slot="1" color="Yellow" function="P1_B">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P1_C" tag=":edge:joy:JOY1" mask="64" defvalue="64" slot="3" color="Green" function="P1_C">
+                <mapping type="standard" name="JOY_r1" />
+            </button>
+            <button type="P1_D" tag=":edge:joy:JOY1" mask="128" defvalue="128" slot="2" color="Blue" function="P1_D">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P2_LEFT" tag=":edge:joy:JOY2" mask="4" defvalue="4" slot="LEFT" color="Red" function="P2_LEFT">
+                <mapping type="standard" name="JOY_left OR JOY_lsleft" />
+            </button>
+            <button type="P2_RIGHT" tag=":edge:joy:JOY2" mask="8" defvalue="8" slot="RIGHT" color="Red" function="P2_RIGHT">
+                <mapping type="standard" name="JOY_right OR JOY_lsright" />
+            </button>
+            <button type="P2_UP" tag=":edge:joy:JOY2" mask="1" defvalue="1" slot="UP" color="Red" function="P2_UP">
+                <mapping type="standard" name="JOY_up OR JOY_lsup" />
+            </button>
+            <button type="P2_DOWN" tag=":edge:joy:JOY2" mask="2" defvalue="2" slot="DOWN" color="Red" function="P2_DOWN">
+                <mapping type="standard" name="JOY_down OR JOY_lsdown" />
+            </button>
+            <button type="P2_A" tag=":edge:joy:JOY2" mask="16" defvalue="16" slot="4" color="Red" function="P2_A">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P2_B" tag=":edge:joy:JOY2" mask="32" defvalue="32" slot="1" color="Yellow" function="P2_B">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P2_C" tag=":edge:joy:JOY2" mask="64" defvalue="64" slot="3" color="Green" function="P2_C">
+                <mapping type="standard" name="JOY_r1" />
+            </button>
+            <button type="P2_D" tag=":edge:joy:JOY2" mask="128" defvalue="128" slot="2" color="Blue" function="P2_D">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+        </layout>
+        <layout type="6alternative" joystickcolor="Blue">
+            <button type="P1_LEFT" tag=":edge:joy:JOY1" mask="4" defvalue="4" slot="LEFT" color="Blue" function="P1_LEFT">
+                <mapping type="standard" name="JOY_left OR JOY_lsleft" />
+            </button>
+            <button type="P1_RIGHT" tag=":edge:joy:JOY1" mask="8" defvalue="8" slot="RIGHT" color="Blue" function="P1_RIGHT">
+                <mapping type="standard" name="JOY_right OR JOY_lsright" />
+            </button>
+            <button type="P1_UP" tag=":edge:joy:JOY1" mask="1" defvalue="1" slot="UP" color="Blue" function="P1_UP">
+                <mapping type="standard" name="JOY_up OR JOY_lsup" />
+            </button>
+            <button type="P1_DOWN" tag=":edge:joy:JOY1" mask="2" defvalue="2" slot="DOWN" color="Blue" function="P1_DOWN">
+                <mapping type="standard" name="JOY_down OR JOY_lsdown" />
+            </button>
+            <button type="P1_A" tag=":edge:joy:JOY1" mask="16" defvalue="16" slot="4" color="Red" function="P1_A">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_B" tag=":edge:joy:JOY1" mask="32" defvalue="32" slot="1" color="Yellow" function="P1_B">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P1_C" tag=":edge:joy:JOY1" mask="64" defvalue="64" slot="3" color="Green" function="P1_C">
+                <mapping type="standard" name="JOY_l1" />
+            </button>
+            <button type="P1_D" tag=":edge:joy:JOY1" mask="128" defvalue="128" slot="2" color="Blue" function="P1_D">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P2_LEFT" tag=":edge:joy:JOY2" mask="4" defvalue="4" slot="LEFT" color="Red" function="P2_LEFT">
+                <mapping type="standard" name="JOY_left OR JOY_lsleft" />
+            </button>
+            <button type="P2_RIGHT" tag=":edge:joy:JOY2" mask="8" defvalue="8" slot="RIGHT" color="Red" function="P2_RIGHT">
+                <mapping type="standard" name="JOY_right OR JOY_lsright" />
+            </button>
+            <button type="P2_UP" tag=":edge:joy:JOY2" mask="1" defvalue="1" slot="UP" color="Red" function="P2_UP">
+                <mapping type="standard" name="JOY_up OR JOY_lsup" />
+            </button>
+            <button type="P2_DOWN" tag=":edge:joy:JOY2" mask="2" defvalue="2" slot="DOWN" color="Red" function="P2_DOWN">
+                <mapping type="standard" name="JOY_down OR JOY_lsdown" />
+            </button>
+            <button type="P2_A" tag=":edge:joy:JOY2" mask="16" defvalue="16" slot="4" color="Red" function="P2_A">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P2_B" tag=":edge:joy:JOY2" mask="32" defvalue="32" slot="1" color="Yellow" function="P2_B">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P2_C" tag=":edge:joy:JOY2" mask="64" defvalue="64" slot="3" color="Green" function="P2_C">
+                <mapping type="standard" name="JOY_l1" />
+            </button>
+            <button type="P2_D" tag=":edge:joy:JOY2" mask="128" defvalue="128" slot="2" color="Blue" function="P2_D">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+        </layout>
+        <layout type="8alternative" joystickcolor="Blue">
+            <button type="P1_LEFT" tag=":edge:joy:JOY1" mask="4" defvalue="4" slot="LEFT" color="Blue" function="P1_LEFT">
+                <mapping type="standard" name="JOY_left OR JOY_lsleft" />
+            </button>
+            <button type="P1_RIGHT" tag=":edge:joy:JOY1" mask="8" defvalue="8" slot="RIGHT" color="Blue" function="P1_RIGHT">
+                <mapping type="standard" name="JOY_right OR JOY_lsright" />
+            </button>
+            <button type="P1_UP" tag=":edge:joy:JOY1" mask="1" defvalue="1" slot="UP" color="Blue" function="P1_UP">
+                <mapping type="standard" name="JOY_up OR JOY_lsup" />
+            </button>
+            <button type="P1_DOWN" tag=":edge:joy:JOY1" mask="2" defvalue="2" slot="DOWN" color="Blue" function="P1_DOWN">
+                <mapping type="standard" name="JOY_down OR JOY_lsdown" />
+            </button>
+            <button type="P1_A" tag=":edge:joy:JOY1" mask="16" defvalue="16" slot="4" color="Red" function="P1_A">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_B" tag=":edge:joy:JOY1" mask="32" defvalue="32" slot="1" color="Yellow" function="P1_B">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+            <button type="P1_C" tag=":edge:joy:JOY1" mask="64" defvalue="64" slot="3" color="Green" function="P1_C">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_D" tag=":edge:joy:JOY1" mask="128" defvalue="128" slot="2" color="Blue" function="P1_D">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P2_LEFT" tag=":edge:joy:JOY2" mask="4" defvalue="4" slot="LEFT" color="Red" function="P2_LEFT">
+                <mapping type="standard" name="JOY_left OR JOY_lsleft" />
+            </button>
+            <button type="P2_RIGHT" tag=":edge:joy:JOY2" mask="8" defvalue="8" slot="RIGHT" color="Red" function="P2_RIGHT">
+                <mapping type="standard" name="JOY_right OR JOY_lsright" />
+            </button>
+            <button type="P2_UP" tag=":edge:joy:JOY2" mask="1" defvalue="1" slot="UP" color="Red" function="P2_UP">
+                <mapping type="standard" name="JOY_up OR JOY_lsup" />
+            </button>
+            <button type="P2_DOWN" tag=":edge:joy:JOY2" mask="2" defvalue="2" slot="DOWN" color="Red" function="P2_DOWN">
+                <mapping type="standard" name="JOY_down OR JOY_lsdown" />
+            </button>
+            <button type="P2_A" tag=":edge:joy:JOY2" mask="16" defvalue="16" slot="4" color="Red" function="P2_A">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P2_B" tag=":edge:joy:JOY2" mask="32" defvalue="32" slot="1" color="Yellow" function="P2_B">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+            <button type="P2_C" tag=":edge:joy:JOY2" mask="64" defvalue="64" slot="3" color="Green" function="P2_C">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P2_D" tag=":edge:joy:JOY2" mask="128" defvalue="128" slot="2" color="Blue" function="P2_D">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+        </layout>
+    </layouts>
+</game>

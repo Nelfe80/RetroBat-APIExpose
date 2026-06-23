@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<system name="bluemsx" emulator="bluemsx">
+  <input>
+    <group name="default" type="default">
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0">B</newseq>
+      </port>
+      <port type="P1_BUTTON4">
+        <newseq type="standard" button="Y" retropad_id="1">Y</newseq>
+      </port>
+      <port type="P1_BUTTON10">
+        <newseq type="standard" button="SELECT" retropad_id="2">SELECT</newseq>
+      </port>
+      <port type="P1_BUTTON9">
+        <newseq type="standard" button="START" retropad_id="3">START</newseq>
+      </port>
+      <port type="P1_JOYSTICK_UP">
+        <newseq type="standard" retropad_id="4">DPAD_UP</newseq>
+      </port>
+      <port type="P1_JOYSTICK_DOWN">
+        <newseq type="standard" retropad_id="5">DPAD_DOWN</newseq>
+      </port>
+      <port type="P1_JOYSTICK_LEFT">
+        <newseq type="standard" retropad_id="6">DPAD_LEFT</newseq>
+      </port>
+      <port type="P1_JOYSTICK_RIGHT">
+        <newseq type="standard" retropad_id="7">DPAD_RIGHT</newseq>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8">A</newseq>
+      </port>
+      <port type="P1_BUTTON3">
+        <newseq type="standard" button="X" retropad_id="9">X</newseq>
+      </port>
+      <port type="P1_BUTTON5">
+        <newseq type="standard" button="L1" retropad_id="10">L1</newseq>
+      </port>
+      <port type="P1_BUTTON6">
+        <newseq type="standard" button="R1" retropad_id="11">R1</newseq>
+      </port>
+      <port type="P1_BUTTON7">
+        <newseq type="standard" button="L2" retropad_id="12">L2</newseq>
+      </port>
+      <port type="P1_BUTTON8">
+        <newseq type="standard" button="R2" retropad_id="13">R2</newseq>
+      </port>
+    </group>
+  </input>
+</system>

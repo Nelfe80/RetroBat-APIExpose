@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<game name="apb" rom="apb">
+    <layouts>
+        <layout type="default" joystickcolor="Black">
+            <button type="P1_BUTTON2" tag=":IN0" mask="2" defvalue="2" slot="2" color="Red" function="BUTTON2">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+        </layout>
+        <layout type="modern8" joystickcolor="Black">
+            <button type="P1_BUTTON2" tag=":IN0" mask="2" defvalue="2" slot="2" color="Red" function="BUTTON2">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+        </layout>
+        <layout type="6alternative" joystickcolor="Black">
+            <button type="P1_BUTTON2" tag=":IN0" mask="2" defvalue="2" slot="2" color="Red" function="BUTTON2">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+        </layout>
+        <layout type="8alternative" joystickcolor="Black">
+            <button type="P1_BUTTON2" tag=":IN0" mask="2" defvalue="2" slot="2" color="Red" function="BUTTON2">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+        </layout>
+    </layouts>
+</game>

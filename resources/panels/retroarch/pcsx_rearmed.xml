@@ -1,0 +1,137 @@
+<?xml version="1.0" ?>
+<system name="psx" emulator="pcsx_rearmed">
+  <input>
+    <group name="standard">
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0" system_entry="Cross">Cross</newseq>
+      </port>
+      <port type="P1_BUTTON4">
+        <newseq type="standard" button="Y" retropad_id="1" system_entry="Square">Square</newseq>
+      </port>
+      <port type="P1_BUTTON10">
+        <newseq type="standard" button="SELECT" retropad_id="2" system_entry="Select">Select</newseq>
+      </port>
+      <port type="P1_BUTTON9">
+        <newseq type="standard" button="START" retropad_id="3" system_entry="Start">Start</newseq>
+      </port>
+      <port type="P1_JOYSTICK_UP">
+        <newseq type="standard" retropad_id="4" system_entry="D-Pad Up">D-Pad Up</newseq>
+      </port>
+      <port type="P1_JOYSTICK_DOWN">
+        <newseq type="standard" retropad_id="5" system_entry="D-Pad Down">D-Pad Down</newseq>
+      </port>
+      <port type="P1_JOYSTICK_LEFT">
+        <newseq type="standard" retropad_id="6" system_entry="D-Pad Left">D-Pad Left</newseq>
+      </port>
+      <port type="P1_JOYSTICK_RIGHT">
+        <newseq type="standard" retropad_id="7" system_entry="D-Pad Right">D-Pad Right</newseq>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8" system_entry="Circle">Circle</newseq>
+      </port>
+      <port type="P1_BUTTON3">
+        <newseq type="standard" button="X" retropad_id="9" system_entry="Triangle">Triangle</newseq>
+      </port>
+      <port type="P1_BUTTON5">
+        <newseq type="standard" button="L1" retropad_id="10" system_entry="L1">L1</newseq>
+      </port>
+      <port type="P1_BUTTON6">
+        <newseq type="standard" button="R1" retropad_id="11" system_entry="R1">R1</newseq>
+      </port>
+      <port type="P1_BUTTON7">
+        <newseq type="standard" button="L2" retropad_id="12" system_entry="L2">L2</newseq>
+      </port>
+      <port type="P1_BUTTON8">
+        <newseq type="standard" button="R2" retropad_id="13" system_entry="R2">R2</newseq>
+      </port>
+    </group>
+    <group name="analog">
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0" system_entry="Cross">Cross</newseq>
+      </port>
+      <port type="P1_BUTTON4">
+        <newseq type="standard" button="Y" retropad_id="1" system_entry="Square">Square</newseq>
+      </port>
+      <port type="P1_BUTTON10">
+        <newseq type="standard" button="SELECT" retropad_id="2" system_entry="Select">Select</newseq>
+      </port>
+      <port type="P1_BUTTON9">
+        <newseq type="standard" button="START" retropad_id="3" system_entry="Start">Start</newseq>
+      </port>
+      <port type="P1_JOYSTICK_UP">
+        <newseq type="standard" retropad_id="4" system_entry="D-Pad Up">D-Pad Up</newseq>
+      </port>
+      <port type="P1_JOYSTICK_DOWN">
+        <newseq type="standard" retropad_id="5" system_entry="D-Pad Down">D-Pad Down</newseq>
+      </port>
+      <port type="P1_JOYSTICK_LEFT">
+        <newseq type="standard" retropad_id="6" system_entry="D-Pad Left">D-Pad Left</newseq>
+      </port>
+      <port type="P1_JOYSTICK_RIGHT">
+        <newseq type="standard" retropad_id="7" system_entry="D-Pad Right">D-Pad Right</newseq>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8" system_entry="Circle">Circle</newseq>
+      </port>
+      <port type="P1_BUTTON3">
+        <newseq type="standard" button="X" retropad_id="9" system_entry="Triangle">Triangle</newseq>
+      </port>
+      <port type="P1_BUTTON5">
+        <newseq type="standard" button="L1" retropad_id="10" system_entry="L1">L1</newseq>
+      </port>
+      <port type="P1_BUTTON6">
+        <newseq type="standard" button="R1" retropad_id="11" system_entry="R1">R1</newseq>
+      </port>
+      <port type="P1_BUTTON7">
+        <newseq type="standard" button="L2" retropad_id="12" system_entry="L2">L2</newseq>
+      </port>
+      <port type="P1_BUTTON8">
+        <newseq type="standard" button="R2" retropad_id="13" system_entry="R2">R2</newseq>
+      </port>
+    </group>
+    <group name="negcon">
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0" system_entry="Analog Button I">Cross</newseq>
+      </port>
+      <port type="P1_BUTTON4">
+        <newseq type="standard" button="Y" retropad_id="1" system_entry="Analog Button II">Square</newseq>
+      </port>
+      <port type="P1_BUTTON10">
+        <newseq type="standard" button="SELECT" retropad_id="2">Select</newseq>
+      </port>
+      <port type="P1_BUTTON9">
+        <newseq type="standard" button="START" retropad_id="3" system_entry="Start">Start</newseq>
+      </port>
+      <port type="P1_JOYSTICK_UP">
+        <newseq type="standard" retropad_id="4" system_entry="D-Pad Up">D-Pad Up</newseq>
+      </port>
+      <port type="P1_JOYSTICK_DOWN">
+        <newseq type="standard" retropad_id="5" system_entry="D-Pad Down">D-Pad Down</newseq>
+      </port>
+      <port type="P1_JOYSTICK_LEFT">
+        <newseq type="standard" retropad_id="6" system_entry="D-Pad Left">D-Pad Left</newseq>
+      </port>
+      <port type="P1_JOYSTICK_RIGHT">
+        <newseq type="standard" retropad_id="7" system_entry="D-Pad Right">D-Pad Right</newseq>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8" system_entry="A">Circle</newseq>
+      </port>
+      <port type="P1_BUTTON3">
+        <newseq type="standard" button="X" retropad_id="9" system_entry="B">Triangle</newseq>
+      </port>
+      <port type="P1_BUTTON5">
+        <newseq type="standard" button="L1" retropad_id="10" system_entry="Left Shoulder Button (analog)">L1</newseq>
+      </port>
+      <port type="P1_BUTTON6">
+        <newseq type="standard" button="R1" retropad_id="11" system_entry="Right Shoulder Button (digital)">R1</newseq>
+      </port>
+      <port type="P1_BUTTON7">
+        <newseq type="standard" button="L2" retropad_id="12" system_entry="Analog Button II">L2</newseq>
+      </port>
+      <port type="P1_BUTTON8">
+        <newseq type="standard" button="R2" retropad_id="13" system_entry="Analog Button I">R2</newseq>
+      </port>
+    </group>
+  </input>
+</system>

@@ -1,0 +1,8 @@
+History.xml is intentionally not stored in this repository because the XML file is large and updated regularly.
+
+Download the current MAME History.xml from:
+https://www.arcade-history.com/index.php?page=download
+
+At the time of this change, the official download page lists History.xml 2.87a released on 2026-04-11.
+If APIExpose needs a local copy later, place the extracted file here:
+resources/history/history.xml

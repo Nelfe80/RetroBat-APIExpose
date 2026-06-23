@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<game name="280zzzap" rom="280zzzap">
+    <layouts>
+        <layout type="default" joystickcolor="Black" />
+        <layout type="modern8" joystickcolor="Black" />
+        <layout type="6alternative" joystickcolor="Black" />
+        <layout type="8alternative" joystickcolor="Black" />
+    </layouts>
+</game>

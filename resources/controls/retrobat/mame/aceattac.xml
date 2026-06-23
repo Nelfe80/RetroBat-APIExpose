@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<game name="aceattac" rom="aceattac">
+    <layouts>
+        <layout type="default" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":SERVICE" mask="64" defvalue="64" slot="1" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P2_BUTTON1" tag=":SERVICE" mask="128" defvalue="128" slot="1" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+        </layout>
+        <layout type="modern8" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":SERVICE" mask="64" defvalue="64" slot="1" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P2_BUTTON1" tag=":SERVICE" mask="128" defvalue="128" slot="1" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+        </layout>
+        <layout type="6alternative" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":SERVICE" mask="64" defvalue="64" slot="1" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P2_BUTTON1" tag=":SERVICE" mask="128" defvalue="128" slot="1" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+        </layout>
+        <layout type="8alternative" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":SERVICE" mask="64" defvalue="64" slot="1" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P2_BUTTON1" tag=":SERVICE" mask="128" defvalue="128" slot="1" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+        </layout>
+    </layouts>
+</game>

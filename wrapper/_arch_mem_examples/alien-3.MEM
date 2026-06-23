@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Alien 3",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "alien-3",
+    file = "alien-3.zip",
+    hashes = {
+      { hash = "f1dfb8cc6b1ee557c0435b1be01194b2", label = "Alien 3 (U).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        -- Stable gameplay lifecycle candidate.
+        { address=0X00A8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level changed" },
+      },
+    },
+
+    progression = {
+      stage = {
+        { address=0X00A8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level value" },
+      },
+    },
+
+    resources = {
+      health = {
+        { address=0X074A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy down" },
+        { address=0X074A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy up" },
+        { address=0X074A, type="u8", condition="change", action="RESOURCE_STATE", no_log=false, no_survey=false, desc="Energy state" },
+      },
+      lives = {
+        { address=0X07FE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives down" },
+        { address=0X07FE, type="u8", condition="change", action="RESOURCE_STATE", no_log=false, no_survey=false, desc="Lives state" },
+      },
+    },
+
+    inventory = {
+      items = {
+        { address=0X074B, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Machine gun ammo" },
+        { address=0X074C, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Grenade launcher ammo" },
+        { address=0X074D, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Flamethrower ammo" },
+        { address=0X074E, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Hand grenades" },
+        { address=0X0749, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=true, no_survey=false, desc="Machine gun heat state" },
+      },
+    },
+
+    combat = {
+      enemies = {
+        { address=0X03A6, type="u8", condition="decrease", action="BOSS_HIT", no_log=false, no_survey=false, desc="Guardian HP A down" },
+        { address=0X03A7, type="u8", condition="decrease", action="BOSS_HIT", no_log=false, no_survey=false, desc="Guardian HP B down" },
+        { address=0X03A6, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Guardian A defeated" },
+        { address=0X03A7, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Guardian B defeated" },
+      },
+    },
+
+    state = {
+      temporary = {
+        { address=0X03C8, type="u8", condition="eq", value=0X4A, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility flag active" },
+      },
+    },
+
+    system = {
+      timer = {
+        { address=0X0743, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time tens digit" },
+        { address=0X0744, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time ones digit" },
+      },
+    },
+  },
+}

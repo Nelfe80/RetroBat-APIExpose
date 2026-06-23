@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<system name="game_music_emu" emulator="game_music_emu">
+  <input>
+    <group name="Game Music Emu core inputs">
+      <port type="P1_BUTTON9">
+        <newseq type="standard" button="START" retropad_id="3" system_entry="Pause">Pause</newseq>
+      </port>
+      <port type="P1_BUTTON5">
+        <newseq type="standard" button="L1" retropad_id="10" system_entry="Previous Track">Previous Track</newseq>
+      </port>
+      <port type="P1_BUTTON6">
+        <newseq type="standard" button="R1" retropad_id="11" system_entry="Next Track">Next Track</newseq>
+      </port>
+    </group>
+  </input>
+</system>

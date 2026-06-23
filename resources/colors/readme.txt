@@ -1,0 +1,1 @@
+colors.ini from https://raw.githubusercontent.com/MrRobot-108/ledspicer-colors-ini/110bbff76ce07cf57647e48995f1f803cce58207/default_settings/ledspicer.ini

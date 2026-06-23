@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<game name="720" rom="720">
+    <layouts>
+        <layout type="default" joystickcolor="Black">
+            <button type="P1_BUTTON1" tag=":IN0" mask="128" defvalue="128" slot="1" color="Blue" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":IN0" mask="64" defvalue="64" slot="2" color="Blue" function="BUTTON2">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+        </layout>
+        <layout type="modern8" joystickcolor="Black">
+            <button type="P1_BUTTON1" tag=":IN0" mask="128" defvalue="128" slot="1" color="Blue" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":IN0" mask="64" defvalue="64" slot="2" color="Blue" function="BUTTON2">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+        </layout>
+        <layout type="6alternative" joystickcolor="Black">
+            <button type="P1_BUTTON1" tag=":IN0" mask="128" defvalue="128" slot="1" color="Blue" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":IN0" mask="64" defvalue="64" slot="2" color="Blue" function="BUTTON2">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+        </layout>
+        <layout type="8alternative" joystickcolor="Black">
+            <button type="P1_BUTTON1" tag=":IN0" mask="128" defvalue="128" slot="1" color="Blue" function="BUTTON1">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_BUTTON2" tag=":IN0" mask="64" defvalue="64" slot="2" color="Blue" function="BUTTON2">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+        </layout>
+    </layouts>
+</game>

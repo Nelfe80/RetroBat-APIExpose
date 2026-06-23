@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<system name="theodore" emulator="theodore">
+  <input>
+    <group name="default" type="default">
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0">B</newseq>
+      </port>
+      <port type="P1_BUTTON4">
+        <newseq type="standard" button="Y" retropad_id="1">Y</newseq>
+      </port>
+      <port type="P1_BUTTON10">
+        <newseq type="standard" button="SELECT" retropad_id="2">SELECT</newseq>
+      </port>
+      <port type="P1_BUTTON9">
+        <newseq type="standard" button="START" retropad_id="3">START</newseq>
+      </port>
+    </group>
+  </input>
+</system>

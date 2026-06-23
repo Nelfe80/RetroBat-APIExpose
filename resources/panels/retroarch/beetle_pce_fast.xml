@@ -1,0 +1,93 @@
+<?xml version="1.0" ?>
+<system name="beetle_pce_fast" emulator="beetle_pce_fast">
+  <input>
+    <group name="PCE Joypad 2-button">
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0" system_entry="II">II</newseq>
+      </port>
+      <port type="P1_BUTTON4">
+        <newseq type="standard" button="Y" retropad_id="1" system_entry="II Turbo On/Off">III</newseq>
+      </port>
+      <port type="P1_BUTTON10">
+        <newseq type="standard" button="SELECT" retropad_id="2" system_entry="Select">Select</newseq>
+      </port>
+      <port type="P1_BUTTON9">
+        <newseq type="standard" button="START" retropad_id="3" system_entry="Run">Run</newseq>
+      </port>
+      <port type="P1_JOYSTICK_UP">
+        <newseq type="standard" retropad_id="4" system_entry="D-Pad Up">D-Pad Up</newseq>
+      </port>
+      <port type="P1_JOYSTICK_DOWN">
+        <newseq type="standard" retropad_id="5" system_entry="D-Pad Down">D-Pad Down</newseq>
+      </port>
+      <port type="P1_JOYSTICK_LEFT">
+        <newseq type="standard" retropad_id="6" system_entry="D-Pad Left">D-Pad Left</newseq>
+      </port>
+      <port type="P1_JOYSTICK_RIGHT">
+        <newseq type="standard" retropad_id="7" system_entry="D-Pad Right">D-Pad Right</newseq>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8" system_entry="I">I</newseq>
+      </port>
+      <port type="P1_BUTTON3">
+        <newseq type="standard" button="X" retropad_id="9" system_entry="I Turbo On/Off">IV</newseq>
+      </port>
+      <port type="P1_BUTTON5">
+        <newseq type="standard" button="L1" retropad_id="10">V</newseq>
+      </port>
+      <port type="P1_BUTTON6">
+        <newseq type="standard" button="R1" retropad_id="11">VI</newseq>
+      </port>
+      <port type="P1_BUTTON7">
+        <newseq type="standard" button="L2" retropad_id="12" system_entry="Mode Switch">Mode Switch</newseq>
+      </port>
+      <port type="P1_BUTTON8">
+        <newseq type="standard" button="R2" retropad_id="13" system_entry="Alternate II Turbo On/Off">Alternate II Turbo On/Off</newseq>
+      </port>
+    </group>
+    <group name="PCE Joypad 6-button">
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0" system_entry="II">II</newseq>
+      </port>
+      <port type="P1_BUTTON4">
+        <newseq type="standard" button="Y" retropad_id="1" system_entry="III">III</newseq>
+      </port>
+      <port type="P1_BUTTON10">
+        <newseq type="standard" button="SELECT" retropad_id="2" system_entry="Select">Select</newseq>
+      </port>
+      <port type="P1_BUTTON9">
+        <newseq type="standard" button="START" retropad_id="3" system_entry="Run">Run</newseq>
+      </port>
+      <port type="P1_JOYSTICK_UP">
+        <newseq type="standard" retropad_id="4" system_entry="D-Pad Up">D-Pad Up</newseq>
+      </port>
+      <port type="P1_JOYSTICK_DOWN">
+        <newseq type="standard" retropad_id="5" system_entry="D-Pad Down">D-Pad Down</newseq>
+      </port>
+      <port type="P1_JOYSTICK_LEFT">
+        <newseq type="standard" retropad_id="6" system_entry="D-Pad Left">D-Pad Left</newseq>
+      </port>
+      <port type="P1_JOYSTICK_RIGHT">
+        <newseq type="standard" retropad_id="7" system_entry="D-Pad Right">D-Pad Right</newseq>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8" system_entry="I">I</newseq>
+      </port>
+      <port type="P1_BUTTON3">
+        <newseq type="standard" button="X" retropad_id="9" system_entry="IV">IV</newseq>
+      </port>
+      <port type="P1_BUTTON5">
+        <newseq type="standard" button="L1" retropad_id="10" system_entry="V">V</newseq>
+      </port>
+      <port type="P1_BUTTON6">
+        <newseq type="standard" button="R1" retropad_id="11" system_entry="VI">VI</newseq>
+      </port>
+      <port type="P1_BUTTON7">
+        <newseq type="standard" button="L2" retropad_id="12" system_entry="Mode Switch">Mode Switch</newseq>
+      </port>
+      <port type="P1_BUTTON8">
+        <newseq type="standard" button="R2" retropad_id="13"/>
+      </port>
+    </group>
+  </input>
+</system>

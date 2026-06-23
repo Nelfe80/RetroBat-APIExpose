@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='utf-8'?>
+<game name="daytona" rom="daytona">
+    <layouts>
+        <layout type="default" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":GEARS" mask="1" defvalue="0" slot="1" color="Cyan" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":GEARS" mask="2" defvalue="0" slot="2" color="Cyan" function="BUTTON2">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_BUTTON3" tag=":GEARS" mask="4" defvalue="0" slot="6" color="Cyan" function="BUTTON3">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+            <button type="P1_BUTTON4" tag=":GEARS" mask="8" defvalue="0" slot="8" color="Cyan" function="BUTTON4">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P1_BUTTON5" tag=":GEARS" mask="16" defvalue="0" slot="1" color="Cyan" function="BUTTON5">
+                <mapping type="standard" name="JOY_l1" />
+            </button>
+            <button type="P1_BUTTON6" tag=":IN0" mask="32" defvalue="32" slot="4" color="Red" function="BUTTON6">
+                <mapping type="standard" name="JOY_r1" />
+            </button>
+            <button type="P1_BUTTON7" tag=":IN0" mask="64" defvalue="64" slot="3" color="Blue" function="BUTTON7">
+                <mapping type="standard" name="JOY_l2trigger" />
+            </button>
+            <button type="P1_BUTTON8" tag=":IN0" mask="128" defvalue="128" slot="5" color="Yellow" function="BUTTON8">
+                <mapping type="standard" name="JOY_r2trigger" />
+            </button>
+        </layout>
+        <layout type="modern8" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":GEARS" mask="1" defvalue="0" slot="1" color="Cyan" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":GEARS" mask="2" defvalue="0" slot="2" color="Cyan" function="BUTTON2">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P1_BUTTON3" tag=":GEARS" mask="4" defvalue="0" slot="6" color="Cyan" function="BUTTON3">
+                <mapping type="standard" name="JOY_r1" />
+            </button>
+            <button type="P1_BUTTON4" tag=":GEARS" mask="8" defvalue="0" slot="8" color="Cyan" function="BUTTON4">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_BUTTON5" tag=":GEARS" mask="16" defvalue="0" slot="1" color="Cyan" function="BUTTON5">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+            <button type="P1_BUTTON6" tag=":IN0" mask="32" defvalue="32" slot="4" color="Red" function="BUTTON6">
+                <mapping type="standard" name="JOY_r2trigger" />
+            </button>
+            <button type="P1_BUTTON7" tag=":IN0" mask="64" defvalue="64" slot="3" color="Blue" function="BUTTON7">
+                <mapping type="standard" name="JOY_l1" />
+            </button>
+            <button type="P1_BUTTON8" tag=":IN0" mask="128" defvalue="128" slot="5" color="Yellow" function="BUTTON8">
+                <mapping type="standard" name="JOY_l2trigger" />
+            </button>
+        </layout>
+        <layout type="6alternative" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":GEARS" mask="1" defvalue="0" slot="1" color="Cyan" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":GEARS" mask="2" defvalue="0" slot="2" color="Cyan" function="BUTTON2">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P1_BUTTON3" tag=":GEARS" mask="4" defvalue="0" slot="6" color="Cyan" function="BUTTON3">
+                <mapping type="standard" name="JOY_l1" />
+            </button>
+            <button type="P1_BUTTON4" tag=":GEARS" mask="8" defvalue="0" slot="8" color="Cyan" function="BUTTON4">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_BUTTON5" tag=":GEARS" mask="16" defvalue="0" slot="1" color="Cyan" function="BUTTON5">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+            <button type="P1_BUTTON6" tag=":IN0" mask="32" defvalue="32" slot="4" color="Red" function="BUTTON6">
+                <mapping type="standard" name="JOY_r1" />
+            </button>
+        </layout>
+        <layout type="8alternative" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":GEARS" mask="1" defvalue="0" slot="1" color="Cyan" function="BUTTON1">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_BUTTON2" tag=":GEARS" mask="2" defvalue="0" slot="2" color="Cyan" function="BUTTON2">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+            <button type="P1_BUTTON3" tag=":GEARS" mask="4" defvalue="0" slot="6" color="Cyan" function="BUTTON3">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON4" tag=":GEARS" mask="8" defvalue="0" slot="8" color="Cyan" function="BUTTON4">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P1_BUTTON5" tag=":GEARS" mask="16" defvalue="0" slot="1" color="Cyan" function="BUTTON5">
+                <mapping type="standard" name="JOY_l1" />
+            </button>
+            <button type="P1_BUTTON6" tag=":IN0" mask="32" defvalue="32" slot="4" color="Red" function="BUTTON6">
+                <mapping type="standard" name="JOY_r1" />
+            </button>
+            <button type="P1_BUTTON7" tag=":IN0" mask="64" defvalue="64" slot="3" color="Blue" function="BUTTON7">
+                <mapping type="standard" name="JOY_l2trigger" />
+            </button>
+            <button type="P1_BUTTON8" tag=":IN0" mask="128" defvalue="128" slot="5" color="Yellow" function="BUTTON8">
+                <mapping type="standard" name="JOY_r2trigger" />
+            </button>
+        </layout>
+    </layouts>
+</game>

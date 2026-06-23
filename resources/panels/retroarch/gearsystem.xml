@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<system name="gamegear,mastersystem,sg1000" emulator="gearsystem">
+  <input>
+    <group name="SMS / GG Pad">
+      <port type="P1_JOYSTICK_UP">
+        <newseq type="standard" retropad_id="4" system_entry="Up">Up</newseq>
+      </port>
+      <port type="P1_JOYSTICK_DOWN">
+        <newseq type="standard" retropad_id="5" system_entry="Down">Down</newseq>
+      </port>
+      <port type="P1_JOYSTICK_LEFT">
+        <newseq type="standard" retropad_id="6" system_entry="Left">Left</newseq>
+      </port>
+      <port type="P1_JOYSTICK_RIGHT">
+        <newseq type="standard" retropad_id="7" system_entry="Right">Right</newseq>
+      </port>
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0" system_entry="1">1</newseq>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8" system_entry="2">2</newseq>
+      </port>
+      <port type="P1_BUTTON9">
+        <newseq type="standard" button="START" retropad_id="3" system_entry="Pause / Start">Pause / Start</newseq>
+      </port>
+    </group>
+  </input>
+</system>

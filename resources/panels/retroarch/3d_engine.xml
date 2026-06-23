@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<system name="3d_engine" emulator="3d_engine">
+  <input>
+    <group name="3D Engine core inputs">
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0" system_entry="Jump/Zoom-in">Jump/Zoom-in</newseq>
+      </port>
+      <port type="P1_JOYSTICK_UP">
+        <newseq type="standard" retropad_id="4" system_entry="Move forwards">Move forwards</newseq>
+      </port>
+      <port type="P1_JOYSTICK_DOWN">
+        <newseq type="standard" retropad_id="5" system_entry="Move backwards">Move backwards</newseq>
+      </port>
+      <port type="P1_JOYSTICK_LEFT">
+        <newseq type="standard" retropad_id="6" system_entry="Turn left">Turn left</newseq>
+      </port>
+      <port type="P1_JOYSTICK_RIGHT">
+        <newseq type="standard" retropad_id="7" system_entry="Turn right">Turn right</newseq>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8" system_entry="Zoom-out">Zoom-out</newseq>
+      </port>
+      <port type="P1_BUTTON5">
+        <newseq type="standard" button="L1" retropad_id="10" system_entry="Move left">Move left</newseq>
+      </port>
+      <port type="P1_BUTTON6">
+        <newseq type="standard" button="R1" retropad_id="11" system_entry="Move right">Move right</newseq>
+      </port>
+      <port type="P1_BUTTON7">
+        <newseq type="standard" button="L2" retropad_id="12" system_entry="Adjust lighting">Adjust lighting</newseq>
+      </port>
+      <port type="P1_BUTTON8">
+        <newseq type="standard" button="R2" retropad_id="13" system_entry="Adjust lighting">Adjust lighting</newseq>
+      </port>
+    </group>
+  </input>
+</system>

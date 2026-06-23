@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<system name="mr_boom" emulator="mr_boom">
+  <input>
+    <group name="Mr.Boom core inputs">
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0" system_entry="Drop Bomb/Join game">Drop Bomb/Join game</newseq>
+      </port>
+      <port type="P1_BUTTON10">
+        <newseq type="standard" button="SELECT" retropad_id="2" system_entry="Add a bomberman bot (while in the join game screen)">Add a bomberman bot (while in the join game screen)</newseq>
+      </port>
+      <port type="P1_BUTTON9">
+        <newseq type="standard" button="START" retropad_id="3" system_entry="Start game">Start game</newseq>
+      </port>
+      <port type="P1_JOYSTICK_UP">
+        <newseq type="standard" retropad_id="4" system_entry="Up/Push bomb">Up/Push bomb</newseq>
+      </port>
+      <port type="P1_JOYSTICK_DOWN">
+        <newseq type="standard" retropad_id="5" system_entry="Down/Push bomb">Down/Push bomb</newseq>
+      </port>
+      <port type="P1_JOYSTICK_LEFT">
+        <newseq type="standard" retropad_id="6" system_entry="Left/Push bomb">Left/Push bomb</newseq>
+      </port>
+      <port type="P1_JOYSTICK_RIGHT">
+        <newseq type="standard" retropad_id="7" system_entry="Right/Push bomb">Right/Push bomb</newseq>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8" system_entry="Detonate bomb (when you have the Remote control power)/Join game">Detonate bomb (when you have the Remote control power)/Join game</newseq>
+      </port>
+      <port type="P1_BUTTON3">
+        <newseq type="standard" button="X" retropad_id="9" system_entry="Jump (while riding a Kangaroo)/Join game)">Jump (while riding a Kangaroo)/Join game)</newseq>
+      </port>
+    </group>
+  </input>
+</system>

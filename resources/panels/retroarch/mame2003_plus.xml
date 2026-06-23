@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<system name="hbmame,hikaru,mame" emulator="mame2003_plus">
+  <input/>
+</system>

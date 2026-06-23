@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<system name="fds,nes" emulator="mesen">
+  <input>
+    <group name="Konami Hypershot">
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0" system_entry="Jump">Jump</newseq>
+      </port>
+      <port type="P1_BUTTON4">
+        <newseq type="standard" button="Y" retropad_id="1" system_entry="Run">Run</newseq>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8" system_entry="Turbo Jump">Turbo Jump</newseq>
+      </port>
+      <port type="P1_BUTTON3">
+        <newseq type="standard" button="X" retropad_id="9" system_entry="Turbo Run">Turbo Run</newseq>
+      </port>
+    </group>
+  </input>
+</system>

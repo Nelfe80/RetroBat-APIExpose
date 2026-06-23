@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<system name="xrick" emulator="xrick">
+  <input>
+    <group name="XRick core inputs">
+      <port type="P1_JOYSTICK_UP">
+        <newseq type="standard" retropad_id="4" system_entry="Jump">Jump</newseq>
+      </port>
+      <port type="P1_JOYSTICK_DOWN">
+        <newseq type="standard" retropad_id="5" system_entry="Crouch">Crouch</newseq>
+      </port>
+      <port type="P1_JOYSTICK_LEFT">
+        <newseq type="standard" retropad_id="6" system_entry="Left">Left</newseq>
+      </port>
+      <port type="P1_JOYSTICK_RIGHT">
+        <newseq type="standard" retropad_id="7" system_entry="Right">Right</newseq>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8" system_entry="Attack">Attack</newseq>
+      </port>
+    </group>
+  </input>
+</system>

@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<game name="aburner" rom="aburner">
+    <layouts>
+        <layout type="default" joystickcolor="Black">
+            <button type="P1_BUTTON1" tag=":mainpcb:IO1PORTA" mask="16" defvalue="16" slot="1" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":mainpcb:IO1PORTA" mask="32" defvalue="32" slot="2" color="Red" function="BUTTON2">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+        </layout>
+        <layout type="modern8" joystickcolor="Black">
+            <button type="P1_BUTTON1" tag=":mainpcb:IO1PORTA" mask="16" defvalue="16" slot="1" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":mainpcb:IO1PORTA" mask="32" defvalue="32" slot="2" color="Red" function="BUTTON2">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+        </layout>
+        <layout type="6alternative" joystickcolor="Black">
+            <button type="P1_BUTTON1" tag=":mainpcb:IO1PORTA" mask="16" defvalue="16" slot="1" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":mainpcb:IO1PORTA" mask="32" defvalue="32" slot="2" color="Red" function="BUTTON2">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+        </layout>
+        <layout type="8alternative" joystickcolor="Black">
+            <button type="P1_BUTTON1" tag=":mainpcb:IO1PORTA" mask="16" defvalue="16" slot="1" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_BUTTON2" tag=":mainpcb:IO1PORTA" mask="32" defvalue="32" slot="2" color="Red" function="BUTTON2">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+        </layout>
+    </layouts>
+</game>

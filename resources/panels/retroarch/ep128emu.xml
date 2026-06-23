@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<system name="ep128emu" emulator="ep128emu">
+  <input>
+    <group name="Default action for user 1" type="default">
+      <port type="P1_JOYSTICK_UP">
+        <newseq type="standard" retropad_id="4" system_entry="Respective directions for: &lt;br&gt; Enterprise, TVC: Internal joystick &lt;br&gt; CPC: External joystick 1 &lt;br&gt; ZX Spectrum: Kempston interface">Respective directions for: &lt;br&gt; Enterprise, TVC: Internal joystick &lt;br&gt; CPC: External joystick 1 &lt;br&gt; ZX Spectrum: Kempston interface</newseq>
+      </port>
+      <port type="P1_BUTTON3">
+        <newseq type="standard" button="X" retropad_id="9" system_entry="Enterprise, TVC: space (fire for internal joystick) &lt;br&gt; CPC: External joystick 1 fire &lt;br&gt; ZX Spectrum: Kempston joystick">Enterprise, TVC: space (fire for internal joystick) &lt;br&gt; CPC: External joystick 1 fire &lt;br&gt; ZX Spectrum: Kempston joystick</newseq>
+      </port>
+      <port type="P1_BUTTON4">
+        <newseq type="standard" button="Y" retropad_id="1" system_entry="Enter">Enter</newseq>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8" system_entry="CPC: External joystick 1 fire 2">CPC: External joystick 1 fire 2</newseq>
+      </port>
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0" system_entry="-">-</newseq>
+      </port>
+      <port type="P1_BUTTON10">
+        <newseq type="standard" button="SELECT" retropad_id="2" system_entry="-">-</newseq>
+      </port>
+      <port type="P1_BUTTON9">
+        <newseq type="standard" button="START" retropad_id="3" system_entry="-">-</newseq>
+      </port>
+      <port type="P1_BUTTON5">
+        <newseq type="standard" button="L1" retropad_id="10" system_entry="Key 0">Key 0</newseq>
+      </port>
+      <port type="P1_BUTTON6">
+        <newseq type="standard" button="R1" retropad_id="11" system_entry="Key 1">Key 1</newseq>
+      </port>
+      <port type="P1_BUTTON7">
+        <newseq type="standard" button="L2" retropad_id="12" system_entry="Key 2">Key 2</newseq>
+      </port>
+      <port type="P1_BUTTON8">
+        <newseq type="standard" button="R2" retropad_id="13" system_entry="Key 3">Key 3</newseq>
+      </port>
+    </group>
+    <group name="Recommended override &lt;br&gt; for content-specific configuration">
+      <port type="P1_JOYSTICK_UP">
+        <newseq type="standard" retropad_id="4"/>
+      </port>
+      <port type="P1_BUTTON3">
+        <newseq type="standard" button="X" retropad_id="9"/>
+      </port>
+      <port type="P1_BUTTON4">
+        <newseq type="standard" button="Y" retropad_id="1"/>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8" system_entry="In-game key required for secondary action">In-game key required for secondary action</newseq>
+      </port>
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0" system_entry="In-game key required for other action (if any)">In-game key required for other action (if any)</newseq>
+      </port>
+      <port type="P1_BUTTON10">
+        <newseq type="standard" button="SELECT" retropad_id="2" system_entry="In-game key required to select the supported input method (if any)">In-game key required to select the supported input method (if any)</newseq>
+      </port>
+      <port type="P1_BUTTON9">
+        <newseq type="standard" button="START" retropad_id="3" system_entry="In-game key required to start the game (if any)">In-game key required to start the game (if any)</newseq>
+      </port>
+      <port type="P1_BUTTON5">
+        <newseq type="standard" button="L1" retropad_id="10" system_entry="In-game key required for other action (if any)">In-game key required for other action (if any)</newseq>
+      </port>
+      <port type="P1_BUTTON6">
+        <newseq type="standard" button="R1" retropad_id="11" system_entry="In-game key required for other action (if any)">In-game key required for other action (if any)</newseq>
+      </port>
+      <port type="P1_BUTTON7">
+        <newseq type="standard" button="L2" retropad_id="12" system_entry="In-game key required for other action (if any)">In-game key required for other action (if any)</newseq>
+      </port>
+      <port type="P1_BUTTON8">
+        <newseq type="standard" button="R2" retropad_id="13" system_entry="In-game key required for other action (if any)">In-game key required for other action (if any)</newseq>
+      </port>
+    </group>
+  </input>
+</system>

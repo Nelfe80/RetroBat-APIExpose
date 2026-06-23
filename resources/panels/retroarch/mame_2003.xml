@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<system name="cps1,cps2,cps3,model3" emulator="mame_2003">
+  <input>
+    <group name="MAME 2003">
+      <port type="P1_BUTTON2">
+        <newseq type="standard" button="B" retropad_id="0" system_entry="Button 1/Right Stick Down/UI Cancel">Button 1/Right Stick Down/UI Cancel</newseq>
+      </port>
+      <port type="P1_BUTTON4">
+        <newseq type="standard" button="Y" retropad_id="1" system_entry="Button 2/Right Stick Left">Button 2/Right Stick Left</newseq>
+      </port>
+      <port type="P1_BUTTON10">
+        <newseq type="standard" button="SELECT" retropad_id="2" system_entry="Coin in">Coin in</newseq>
+      </port>
+      <port type="P1_BUTTON9">
+        <newseq type="standard" button="START" retropad_id="3" system_entry="Start">Start</newseq>
+      </port>
+      <port type="P1_BUTTON1">
+        <newseq type="standard" button="A" retropad_id="8" system_entry="Button 4/Right Stick Right/UI Select">Button 4/Right Stick Right/UI Select</newseq>
+      </port>
+      <port type="P1_BUTTON3">
+        <newseq type="standard" button="X" retropad_id="9" system_entry="Button 3/Right Stick Up">Button 3/Right Stick Up</newseq>
+      </port>
+      <port type="P1_BUTTON5">
+        <newseq type="standard" button="L1" retropad_id="10" system_entry="Button 5">Button 5</newseq>
+      </port>
+      <port type="P1_BUTTON6">
+        <newseq type="standard" button="R1" retropad_id="11" system_entry="Button 6">Button 6</newseq>
+      </port>
+      <port type="P1_BUTTON7">
+        <newseq type="standard" button="L2" retropad_id="12" system_entry="Button 7">Button 7</newseq>
+      </port>
+      <port type="P1_BUTTON8">
+        <newseq type="standard" button="R2" retropad_id="13" system_entry="Button 8/TAB Menu">Button 8/TAB Menu</newseq>
+      </port>
+    </group>
+  </input>
+</system>

@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Arch Rivals",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Sports"
+  },
+  rom = {
+    name = "arch-rivals",
+    file = "Arch Rivals - A Basketbrawl! (USA).nes",
+    hashes = {
+      { hash = "f2b2be3dfc30ee297fb62ee68fc56893", label = "Arch Rivals - A Basketbrawl! (USA).nes" }
+    }
+  },
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00FC, type="u8", condition="eq", action="TITLE_SCREEN", value=0X01, desc="Title Screen", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="GAME_START", value=0X00, desc="Game Time!", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="PLAYER_SELECT", value=0X04, desc="How Many Players?", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="CHARACTER_SELECT", value=0X06, desc="Choose Your Player", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="GAME_OVER", value=0X10, desc="End of Game", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="HIGHSCORE_ENTRY", value=0X11, desc="Game Statistics", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="HIGHSCORE_ENTRY", value=0X12, desc="Enter Initials", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="HIGHSCORE_ENTRY", value=0X1B, desc="Five Best Scores!", no_log=false, no_survey=false },
+        { address=0X002A, type="u8", condition="eq", action="PLAYER_COUNT_1", value=0X00, desc="One Player Selected", no_log=false, no_survey=false },
+        { address=0X002A, type="u8", condition="eq", action="PLAYER_COUNT_2", value=0X01, desc="Two Players Selected", no_log=false, no_survey=false },
+      }
+    },
+    progression = {
+      stage = {
+        { address=0X00FC, type="u8", condition="eq", action="STAGE_END", value=0X07, desc="End of 1st Period (alt)", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="STAGE_END", value=0X08, desc="End of 1st Period", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="STAGE_END", value=0X09, desc="End of 3rd Period", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="STAGE_END", value=0X0B, desc="Half Time!", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="STAGE_SPECIAL_EVENT", value=0X1A, desc="Sudden Death Overtime!", no_log=false, no_survey=false },
+        { address=0X05E6, type="u8", condition="eq", action="STAGE_START", value=0X00, desc="Quarter: 1st", no_log=false, no_survey=false },
+        { address=0X05E6, type="u8", condition="eq", action="STAGE_START", value=0X01, desc="Quarter: 2nd", no_log=false, no_survey=false },
+        { address=0X05E6, type="u8", condition="eq", action="STAGE_START", value=0X02, desc="Quarter: 3rd", no_log=false, no_survey=false },
+        { address=0X05E6, type="u8", condition="eq", action="STAGE_START", value=0X03, desc="Quarter: 4th", no_log=false, no_survey=false },
+        { address=0X05E6, type="u8", condition="eq", action="STAGE_SPECIAL_EVENT", value=0X04, desc="Quarter: Sudden Death Overtime!", no_log=false, no_survey=false },
+      },
+      zone = {
+        { address=0X05CE, type="u8", condition="eq", action="NEW_ZONE", value=0X00, desc="Matchup: Los Angeles vs Chicago", no_log=false, no_survey=false },
+        { address=0X05CE, type="u8", condition="eq", action="NEW_ZONE", value=0X01, desc="Matchup: Brawl State vs Natural High", no_log=false, no_survey=false },
+        { address=0X05CE, type="u8", condition="eq", action="NEW_ZONE", value=0X02, desc="Matchup: Natural High vs Los Angeles", no_log=false, no_survey=false },
+        { address=0X05CE, type="u8", condition="eq", action="NEW_ZONE", value=0X03, desc="Matchup: Brawl State vs Los Angeles", no_log=false, no_survey=false },
+        { address=0X05CE, type="u8", condition="eq", action="NEW_ZONE", value=0X04, desc="Matchup: Natural High vs Chicago", no_log=false, no_survey=false },
+        { address=0X05CE, type="u8", condition="eq", action="NEW_ZONE", value=0X05, desc="Matchup: Chicago vs Brawl State", no_log=false, no_survey=false },
+      }
+    },
+    scoring = {
+      collectibles = {
+        { address=0X00FC, type="u8", condition="eq", action="SCORING_GOAL", value=0X02, desc="Team Scored (Cheerleader blue)", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="SCORING_GOAL", value=0X03, desc="Team Scored (Grumpy Coach)", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="SCORING_GOAL", value=0X13, desc="Team Scored (Coach pointing)", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="SCORING_GOAL", value=0X1C, desc="Team Scored (Ref 1)", no_log=false, no_survey=false },
+        { address=0X00FC, type="u8", condition="eq", action="SCORING_GOAL", value=0X1D, desc="Team Scored (Ref 2)", no_log=false, no_survey=false },
+      }
+    },
+    state = {
+      temporary = {
+        { address=0X00AC, type="u8", condition="eq", action="CHARACTER_SELECTED", value=0X00, desc="Player 1: Tyrone", no_log=false, no_survey=false },
+        { address=0X00AC, type="u8", condition="eq", action="CHARACTER_SELECTED", value=0X01, desc="Player 1: Vinnie", no_log=false, no_survey=false },
+        { address=0X00AC, type="u8", condition="eq", action="CHARACTER_SELECTED", value=0X02, desc="Player 1: Hammer", no_log=false, no_survey=false },
+        { address=0X00AC, type="u8", condition="eq", action="CHARACTER_SELECTED", value=0X03, desc="Player 1: Moose", no_log=false, no_survey=false },
+        { address=0X00AC, type="u8", condition="eq", action="CHARACTER_SELECTED", value=0X04, desc="Player 1: Lewis", no_log=false, no_survey=false },
+        { address=0X00AC, type="u8", condition="eq", action="CHARACTER_SELECTED", value=0X05, desc="Player 1: Blade", no_log=false, no_survey=false },
+        { address=0X00AC, type="u8", condition="eq", action="CHARACTER_SELECTED", value=0X06, desc="Player 1: Mohawk", no_log=false, no_survey=false },
+        { address=0X00AC, type="u8", condition="eq", action="CHARACTER_SELECTED", value=0X07, desc="Player 1: Reggie", no_log=false, no_survey=false },
+      }
+    }
+  }
+}

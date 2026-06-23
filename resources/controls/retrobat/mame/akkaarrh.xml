@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='utf-8'?>
+<game name="akkaarrh" rom="akkaarrh">
+    <layouts>
+        <layout type="default" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":7080" mask="2" defvalue="2" slot="4" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":7080" mask="8" defvalue="8" slot="3" color="Yellow" function="BUTTON2">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_BUTTON3" tag=":7080" mask="1" defvalue="1" slot="1" color="Green" function="BUTTON3">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+        </layout>
+        <layout type="modern8" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":7080" mask="2" defvalue="2" slot="4" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":7080" mask="8" defvalue="8" slot="3" color="Yellow" function="BUTTON2">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P1_BUTTON3" tag=":7080" mask="1" defvalue="1" slot="1" color="Green" function="BUTTON3">
+                <mapping type="standard" name="JOY_r1" />
+            </button>
+        </layout>
+        <layout type="6alternative" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":7080" mask="2" defvalue="2" slot="4" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":7080" mask="8" defvalue="8" slot="3" color="Yellow" function="BUTTON2">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P1_BUTTON3" tag=":7080" mask="1" defvalue="1" slot="1" color="Green" function="BUTTON3">
+                <mapping type="standard" name="JOY_l1" />
+            </button>
+        </layout>
+        <layout type="8alternative" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":7080" mask="2" defvalue="2" slot="4" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_BUTTON2" tag=":7080" mask="8" defvalue="8" slot="3" color="Yellow" function="BUTTON2">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+            <button type="P1_BUTTON3" tag=":7080" mask="1" defvalue="1" slot="1" color="Green" function="BUTTON3">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+        </layout>
+    </layouts>
+</game>

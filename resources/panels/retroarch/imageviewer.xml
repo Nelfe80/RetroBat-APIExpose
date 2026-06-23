@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<system name="imageviewer" emulator="imageviewer">
+  <input>
+    <group name="Imageviewer core inputs">
+      <port type="P1_BUTTON4">
+        <newseq type="standard" button="Y" retropad_id="1" system_entry="Automatic slideshow - Go to the next image every 2 seconds">Automatic slideshow - Go to the next image every 2 seconds</newseq>
+      </port>
+      <port type="P1_JOYSTICK_UP">
+        <newseq type="standard" retropad_id="4" system_entry="Go forward 5 images">Go forward 5 images</newseq>
+      </port>
+      <port type="P1_JOYSTICK_DOWN">
+        <newseq type="standard" retropad_id="5" system_entry="Go backward 5 images">Go backward 5 images</newseq>
+      </port>
+      <port type="P1_JOYSTICK_LEFT">
+        <newseq type="standard" retropad_id="6" system_entry="Go backward 1 image">Go backward 1 image</newseq>
+      </port>
+      <port type="P1_JOYSTICK_RIGHT">
+        <newseq type="standard" retropad_id="7" system_entry="Go forward 1 image">Go forward 1 image</newseq>
+      </port>
+    </group>
+  </input>
+</system>

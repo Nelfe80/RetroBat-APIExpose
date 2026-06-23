@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='utf-8'?>
+<game name="airrace" rom="airrace">
+    <layouts>
+        <layout type="default" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":JOYSTICK" mask="256" defvalue="256" slot="4" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":JOYSTICK" mask="512" defvalue="512" slot="3" color="Yellow" function="BUTTON2">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_BUTTON3" tag=":JOYSTICK" mask="4096" defvalue="4096" slot="5" color="Green" function="BUTTON3">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+            <button type="P1_BUTTON4" tag=":JOYSTICK" mask="8192" defvalue="8192" slot="1" color="Blue" function="BUTTON4">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P1_BUTTON5" tag=":JOYSTICK" mask="16384" defvalue="16384" slot="2" color="White" function="BUTTON5">
+                <mapping type="standard" name="JOY_l1" />
+            </button>
+            <button type="P1_BUTTON6" tag=":JOYSTICK" mask="32768" defvalue="32768" slot="6" color="Orange" function="BUTTON6">
+                <mapping type="standard" name="JOY_r1" />
+            </button>
+        </layout>
+        <layout type="modern8" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":JOYSTICK" mask="256" defvalue="256" slot="4" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":JOYSTICK" mask="512" defvalue="512" slot="3" color="Yellow" function="BUTTON2">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P1_BUTTON3" tag=":JOYSTICK" mask="4096" defvalue="4096" slot="5" color="Green" function="BUTTON3">
+                <mapping type="standard" name="JOY_r1" />
+            </button>
+            <button type="P1_BUTTON4" tag=":JOYSTICK" mask="8192" defvalue="8192" slot="1" color="Blue" function="BUTTON4">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_BUTTON5" tag=":JOYSTICK" mask="16384" defvalue="16384" slot="2" color="White" function="BUTTON5">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+            <button type="P1_BUTTON6" tag=":JOYSTICK" mask="32768" defvalue="32768" slot="6" color="Orange" function="BUTTON6">
+                <mapping type="standard" name="JOY_r2trigger" />
+            </button>
+        </layout>
+        <layout type="6alternative" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":JOYSTICK" mask="256" defvalue="256" slot="4" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON2" tag=":JOYSTICK" mask="512" defvalue="512" slot="3" color="Yellow" function="BUTTON2">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P1_BUTTON3" tag=":JOYSTICK" mask="4096" defvalue="4096" slot="5" color="Green" function="BUTTON3">
+                <mapping type="standard" name="JOY_l1" />
+            </button>
+            <button type="P1_BUTTON4" tag=":JOYSTICK" mask="8192" defvalue="8192" slot="1" color="Blue" function="BUTTON4">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_BUTTON5" tag=":JOYSTICK" mask="16384" defvalue="16384" slot="2" color="White" function="BUTTON5">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+            <button type="P1_BUTTON6" tag=":JOYSTICK" mask="32768" defvalue="32768" slot="6" color="Orange" function="BUTTON6">
+                <mapping type="standard" name="JOY_r1" />
+            </button>
+        </layout>
+        <layout type="8alternative" joystickcolor="Blue">
+            <button type="P1_BUTTON1" tag=":JOYSTICK" mask="256" defvalue="256" slot="4" color="Red" function="BUTTON1">
+                <mapping type="standard" name="JOY_south" />
+            </button>
+            <button type="P1_BUTTON2" tag=":JOYSTICK" mask="512" defvalue="512" slot="3" color="Yellow" function="BUTTON2">
+                <mapping type="standard" name="JOY_east" />
+            </button>
+            <button type="P1_BUTTON3" tag=":JOYSTICK" mask="4096" defvalue="4096" slot="5" color="Green" function="BUTTON3">
+                <mapping type="standard" name="JOY_west" />
+            </button>
+            <button type="P1_BUTTON4" tag=":JOYSTICK" mask="8192" defvalue="8192" slot="1" color="Blue" function="BUTTON4">
+                <mapping type="standard" name="JOY_north" />
+            </button>
+            <button type="P1_BUTTON5" tag=":JOYSTICK" mask="16384" defvalue="16384" slot="2" color="White" function="BUTTON5">
+                <mapping type="standard" name="JOY_l1" />
+            </button>
+            <button type="P1_BUTTON6" tag=":JOYSTICK" mask="32768" defvalue="32768" slot="6" color="Orange" function="BUTTON6">
+                <mapping type="standard" name="JOY_r1" />
+            </button>
+        </layout>
+    </layouts>
+</game>
