@@ -97,7 +97,7 @@ public class EmulationStationWatcherProvider : IProvider
         };
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken = default)
+    public Task StartAsync(CancellationToken cancellationToken = default)
     {
         if (!Directory.Exists(_eventsIniDir))
         {
@@ -130,6 +130,21 @@ public class EmulationStationWatcherProvider : IProvider
         _lastMediaAllocationSettingsSignature = BuildMediaAllocationSettingsSignature(_settingsService.GetAllSettings());
         _lastMediaSelectionSignature = BuildMediaSelectionSignature(_lastScrapingSettings);
         SynchronizeLegacyScraperMediaSettings(_lastScrapingSettings);
+        _ = Task.Run(() => RunStartupGamelistMaintenanceAsync(_eventsIniPollCts.Token), CancellationToken.None);
+        return Task.CompletedTask;
+    }
+
+    private async Task RunStartupGamelistMaintenanceAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
         try
         {
             var syncedGameIds = await _gamelistSelectionSyncService.SyncEsGameIdsForAllSystemsAsync(cancellationToken);
@@ -398,6 +413,8 @@ public class EmulationStationWatcherProvider : IProvider
                     },
                     sequence,
                     perf);
+                await PublishFrontendEventAsync(eventType, eventName, args);
+                eventPublished = true;
 
                 _mediaRuntimeState.RecordGameSelectedSelection(systemId, path);
                 _mediaRuntimeState.ClearLiveAddGamesSuppressionOnGameSelected(systemId, path, name);
@@ -417,9 +434,17 @@ public class EmulationStationWatcherProvider : IProvider
                 }
                 
                 var systemDetails = detailsEnabled ? await FetchSystemDetailsAsync(systemId, bypassCache) : null;
+                if (!IsLatestFrontendEvent(sequence))
+                {
+                    return;
+                }
                 _context.Ui.SelectedSystem = systemDetails ?? new SystemDetails { Name = systemId };
                 
                 var gameDetails = detailsEnabled ? await FetchGameDetailsAsync(systemId, path, bypassCache) : null;
+                if (!IsLatestFrontendEvent(sequence))
+                {
+                    return;
+                }
                 var gameId = gameDetails?.Id ?? gameDetails?.Md5 ?? "";
                 
                 _context.Ui.Selected = new GameReference 
@@ -430,9 +455,6 @@ public class EmulationStationWatcherProvider : IProvider
                     GameId = gameId,
                     Details = gameDetails
                 };
-
-                await PublishFrontendEventAsync(eventType, eventName, args);
-                eventPublished = true;
 
                 var selectedGame = _context.Ui.Selected;
                 if (localProjectionOnGameSelected || options.QueueRemoteScrapeOnGameSelected)
@@ -584,7 +606,13 @@ public class EmulationStationWatcherProvider : IProvider
                         SystemId = sysId
                     },
                     sequence);
+                await PublishFrontendEventAsync(eventType, eventName, args);
+                eventPublished = true;
                 var systemDetails = await FetchSystemDetailsAsync(sysId);
+                if (!IsLatestFrontendEvent(sequence))
+                {
+                    return;
+                }
                 _context.Ui.SelectedSystem = systemDetails ?? new SystemDetails { Name = sysId };
                 _context.Ui.Selected = null;
             }
@@ -752,6 +780,9 @@ public class EmulationStationWatcherProvider : IProvider
             Payload = new { EventName = eventName, RawArgs = args, Context = _context.Ui }
         });
     }
+
+    private bool IsLatestFrontendEvent(long sequence)
+        => sequence == Volatile.Read(ref _frontendEventSequence);
 
     private async Task PublishRawFrontendEventAsync(
         string eventType,

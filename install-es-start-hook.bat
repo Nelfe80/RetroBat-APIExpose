@@ -7,10 +7,9 @@ rem This does not modify RetroBat's updatestores.bat.
 set "PLUGIN_DIR=%~dp0"
 for %%I in ("%PLUGIN_DIR%..\..") do set "RETROBAT_ROOT=%%~fI"
 
-set "SOURCE=%PLUGIN_DIR%scripts\APIExpose-start-wait.bat"
+set "SOURCE=%PLUGIN_DIR%.installer\scripts\start\APIExpose-start-wait.bat"
 set "TARGET_DIR=%RETROBAT_ROOT%\emulationstation\.emulationstation\scripts\start"
 set "TARGET=%TARGET_DIR%\APIExpose-start-wait.bat"
-set "RETROBAT_SCRIPT=%TARGET_DIR%\updatestores.bat"
 
 if not exist "%SOURCE%" (
   echo APIExpose hook source not found:

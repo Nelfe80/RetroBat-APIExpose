@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 using System.Xml.Linq;
 using RetroBat.Api.Media;
 using RetroBat.Domain.Events;
@@ -10,7 +11,8 @@ namespace RetroBat.Api.Infrastructure;
 
 public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, IDisposable
 {
-    private const string SystemLogoCacheVersion = "system-logo-cache-v3-theme-logo-variants";
+    private const string SystemLogoCacheVersion = "system-logo-cache-v4-png32-srgb";
+    private const int SelectionSnapshotDebounceMs = 35;
 
     private readonly IEventBus _eventBus;
     private readonly ApiContext _context;
@@ -24,6 +26,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         BaseAddress = new Uri("http://127.0.0.1:1234"),
         Timeout = TimeSpan.FromSeconds(2)
     };
+    private readonly object _latestSelectionLock = new();
+    private long _latestSelectionSequence;
     private IDisposable? _subscription;
 
     public PhysicalMediaWebSocketProjectionService(
@@ -65,13 +69,15 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
     {
         if (string.Equals(envelope.Type, "ui.system.selected.raw", StringComparison.OrdinalIgnoreCase))
         {
-            _ = PublishSystemSnapshotAsync(envelope);
+            var sequence = MarkLatestSelectionSequence(envelope);
+            _ = PublishSystemSnapshotAsync(envelope, sequence);
             return;
         }
 
         if (string.Equals(envelope.Type, "ui.game.selected.raw", StringComparison.OrdinalIgnoreCase))
         {
-            _ = PublishGameSnapshotsAsync(envelope, _context.Ui.Selected, "game-selected");
+            var sequence = MarkLatestSelectionSequence(envelope);
+            _ = PublishGameSnapshotsAsync(envelope, _context.Ui.Selected, "game-selected", sequence);
             return;
         }
 
@@ -87,16 +93,43 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         }
     }
 
-    private async Task PublishSystemSnapshotAsync(EventEnvelope trigger)
+    private async Task PublishSystemSnapshotAsync(EventEnvelope trigger, long selectionSequence)
     {
         var perf = Stopwatch.StartNew();
         try
         {
+            if (IsStaleSelectionSequence(selectionSequence))
+            {
+                _logger?.LogDebug(
+                    "stale system media snapshot skipped before work: sequence={Sequence}",
+                    selectionSequence);
+                return;
+            }
+
+            await DelayLatestSelectionSnapshotAsync(selectionSequence);
+
+            if (IsStaleSelectionSequence(selectionSequence))
+            {
+                _logger?.LogDebug(
+                    "stale system media snapshot skipped after debounce: sequence={Sequence}",
+                    selectionSequence);
+                return;
+            }
+
             var selectedSystem = _context.Ui.SelectedSystem;
             var frontendSystemId = _systemIdNormalizer.NormalizeFrontend(selectedSystem?.Name);
             var systemId = _systemIdNormalizer.Normalize(selectedSystem?.Name);
             if (string.IsNullOrWhiteSpace(systemId))
             {
+                return;
+            }
+
+            if (IsStaleSelectionSequence(selectionSequence))
+            {
+                _logger?.LogDebug(
+                    "stale system media snapshot skipped before publish: sequence={Sequence}, system={SystemId}",
+                    selectionSequence,
+                    systemId);
                 return;
             }
 
@@ -131,7 +164,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                 systemId,
                 (int)perf.Elapsed.TotalMilliseconds);
 
-            _ = GenerateSystemMediaAndPublishAsync(trigger, frontendSystemId, systemId, selectedSystem);
+            _ = GenerateSystemMediaAndPublishAsync(trigger, frontendSystemId, systemId, selectedSystem, selectionSequence);
         }
         catch (Exception ex)
         {
@@ -139,13 +172,37 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         }
     }
 
-    private async Task PublishGameSnapshotsAsync(EventEnvelope trigger, GameReference? selected, string state)
+    private async Task PublishGameSnapshotsAsync(
+        EventEnvelope trigger,
+        GameReference? selected,
+        string state,
+        long selectionSequence = 0)
     {
         var perf = Stopwatch.StartNew();
         try
         {
+            if (IsStaleSelectionSequence(selectionSequence))
+            {
+                _logger?.LogDebug(
+                    "stale game media snapshot skipped before work: state={State}, sequence={Sequence}",
+                    state,
+                    selectionSequence);
+                return;
+            }
+
             if (selected == null)
             {
+                return;
+            }
+
+            await DelayLatestSelectionSnapshotAsync(selectionSequence);
+
+            if (IsStaleSelectionSequence(selectionSequence))
+            {
+                _logger?.LogDebug(
+                    "stale game media snapshot skipped after debounce: state={State}, sequence={Sequence}",
+                    state,
+                    selectionSequence);
                 return;
             }
 
@@ -163,6 +220,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                 requestedSlug);
 
             var roots = ResolveGameRoots(systemId, gameSlug).ToList();
+            var fallbackSystemRoots = ResolveSystemRoots(systemId).ToList();
             var selection = new
             {
                 Scope = "game",
@@ -174,7 +232,18 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                 State = state
             };
 
-            var marquee = BuildMarqueeMedia(roots);
+            if (IsStaleSelectionSequence(selectionSequence))
+            {
+                _logger?.LogDebug(
+                    "stale game media snapshot skipped before publish: state={State}, sequence={Sequence}, system={SystemId}, game={GameSlug}",
+                    state,
+                    selectionSequence,
+                    systemId,
+                    gameSlug);
+                return;
+            }
+
+            var marquee = BuildGameMarqueeMedia(roots, fallbackSystemRoots);
             await _eventBus.PublishAsync(new EventEnvelope
             {
                 Type = "marquee.snapshot",
@@ -227,7 +296,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                 gameSlug,
                 (int)perf.Elapsed.TotalMilliseconds);
 
-            _ = GenerateGameMediaAndPublishAsync(trigger, selected, frontendSystemId, systemId, gameSlug, state);
+            _ = GenerateGameMediaAndPublishAsync(trigger, selected, frontendSystemId, systemId, gameSlug, state, selectionSequence);
         }
         catch (Exception ex)
         {
@@ -243,39 +312,79 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         var dmdAnimations = FindAssets(roots, "artwork", "marquee", "dmd*.gif")
             .OrderBy(asset => asset.FileName, StringComparer.OrdinalIgnoreCase)
             .ToList();
-        var generatedMarquee = FindAssets(roots, "artwork", "marquee", "generated-*.*")
-            .FirstOrDefault(asset => !asset.Stem.Contains("dmd", StringComparison.OrdinalIgnoreCase));
+        var generatedMarquee = FindFirstAsset(roots, "artwork", "marquee", "generated-system-marquee.*") ??
+            FindFirstAsset(roots, "artwork", "marquee", "generated-marquee.*");
 
         return new MarqueeMediaSnapshot(
             Marquee: FindFirstAsset(roots, "artwork", "marquee", "marquee.*"),
             GeneratedMarquee: generatedMarquee,
             ScreenMarquee: FindFirstAsset(roots, "artwork", "marquee", "screenmarquee.*"),
             ScreenMarqueeSmall: FindFirstAsset(roots, "artwork", "marquee", "screenmarquee-small.*"),
-            Dmd: new
-            {
-                Kind = "dmd",
-                Still = dmdStill,
-                Generated = dmdGenerated,
-                Animations = dmdAnimations
-            },
+            Dmd: new DmdMediaSnapshot(
+                Kind: "dmd",
+                Still: dmdStill,
+                Generated: dmdGenerated,
+                Animations: dmdAnimations),
             Topper: FindFirstAsset(roots, "artwork", "marquee", "topper.*"),
             Fanart: FindFirstAsset(roots, GameFanartSearches),
             Logo: FindFirstAsset(roots, GameLogoSearches));
+    }
+
+    private MarqueeMediaSnapshot BuildGameMarqueeMedia(
+        IReadOnlyList<string> gameRoots,
+        IReadOnlyList<string> fallbackSystemRoots)
+    {
+        var game = BuildMarqueeMedia(gameRoots);
+        var system = BuildMarqueeMedia(fallbackSystemRoots);
+        var gameDmd = (DmdMediaSnapshot)game.Dmd;
+        var systemDmd = (DmdMediaSnapshot)system.Dmd;
+
+        return new MarqueeMediaSnapshot(
+            Marquee: game.Marquee ?? system.Marquee,
+            GeneratedMarquee: game.GeneratedMarquee ?? system.GeneratedMarquee,
+            ScreenMarquee: game.ScreenMarquee ?? system.ScreenMarquee,
+            ScreenMarqueeSmall: game.ScreenMarqueeSmall ?? system.ScreenMarqueeSmall,
+            Dmd: HasDmdMedia(gameDmd) ? gameDmd : systemDmd,
+            Topper: game.Topper ?? system.Topper,
+            Fanart: game.Fanart ?? system.Fanart,
+            Logo: game.Logo ?? system.Logo);
+    }
+
+    private static bool HasDmdMedia(DmdMediaSnapshot dmd)
+    {
+        return dmd.Still != null ||
+            dmd.Generated != null ||
+            dmd.Animations.Count > 0;
     }
 
     private async Task GenerateSystemMediaAndPublishAsync(
         EventEnvelope trigger,
         string frontendSystemId,
         string systemId,
-        SystemDetails? selectedSystem)
+        SystemDetails? selectedSystem,
+        long selectionSequence)
     {
         var perf = Stopwatch.StartNew();
         try
         {
+            if (IsStaleSelectionSequence(selectionSequence))
+            {
+                return;
+            }
+
             var roots = ResolveSystemRoots(systemId).ToList();
             await EnsureSystemLogoCachedAsync(frontendSystemId, systemId, selectedSystem);
             await EnsureSystemMarqueeGeneratedAsync(frontendSystemId, systemId, selectedSystem, roots);
             await EnsureSystemDmdGeneratedAsync(frontendSystemId, systemId, selectedSystem, roots);
+
+            if (IsStaleSelectionSequence(selectionSequence))
+            {
+                _logger?.LogDebug(
+                    "stale generated system media update skipped: sequence={Sequence}, system={SystemId}",
+                    selectionSequence,
+                    systemId);
+                return;
+            }
 
             var selection = new
             {
@@ -324,13 +433,31 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         string frontendSystemId,
         string systemId,
         string gameSlug,
-        string state)
+        string state,
+        long selectionSequence)
     {
         var perf = Stopwatch.StartNew();
         try
         {
+            if (IsStaleSelectionSequence(selectionSequence))
+            {
+                return;
+            }
+
             var roots = ResolveGameRoots(systemId, gameSlug).ToList();
+            var fallbackSystemRoots = ResolveSystemRoots(systemId).ToList();
             await EnsureGameDmdGeneratedAsync(systemId, gameSlug, roots);
+
+            if (IsStaleSelectionSequence(selectionSequence))
+            {
+                _logger?.LogDebug(
+                    "stale generated game media update skipped: state={State}, sequence={Sequence}, system={SystemId}, game={GameSlug}",
+                    state,
+                    selectionSequence,
+                    systemId,
+                    gameSlug);
+                return;
+            }
 
             var selection = new
             {
@@ -352,7 +479,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                 {
                     Stream = "marquee",
                     Selection = selection,
-                    Media = BuildMarqueeMedia(roots),
+                    Media = BuildGameMarqueeMedia(roots, fallbackSystemRoots),
                     Generation = ResolveGameGenerationState(roots),
                     Latency = new
                     {
@@ -395,6 +522,11 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
     {
         return new
         {
+            Marquee = ResolveGenerationState(
+                ResolveProfile(_runtimeOptions.GetMarqueeManagerAutogenProfile()) != null &&
+                    _runtimeOptions.IsRemoteMarqueeScrapingEnabled(),
+                FindFirstAsset(roots, "artwork", "marquee", "marquee.*") != null,
+                FindFirstAsset(roots, "artwork", "marquee", "generated-marquee.*") != null),
             Dmd = ResolveGenerationState(
                 ResolveDmdProfile(_runtimeOptions.GetMarqueeManagerDmdAutogenProfile()) != null,
                 FindFirstAsset(roots, "artwork", "marquee", "dmd.png") != null,
@@ -520,7 +652,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                         "-composite",
                         "-colorspace", "sRGB",
                         "-type", "TrueColorAlpha",
-                        tempGradientPath
+                        Png32(tempGradientPath)
                     ],
                     cancellationToken);
                 finalBasePath = tempGradientPath;
@@ -543,7 +675,9 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     ")",
                     "-gravity", "Center",
                     "-composite",
-                    outputPath
+                    "-colorspace", "sRGB",
+                    "-type", "TrueColorAlpha",
+                    Png32(outputPath)
                 ],
                 cancellationToken);
         }
@@ -641,7 +775,9 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     ")",
                     "-gravity", "Center",
                     "-composite",
-                    outputPath
+                    "-colorspace", "sRGB",
+                    "-type", "TrueColorAlpha",
+                    Png32(outputPath)
                 ],
                 cancellationToken);
         }
@@ -732,7 +868,9 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     ")",
                     "-gravity", "Center",
                     "-composite",
-                    outputPath
+                    "-colorspace", "sRGB",
+                    "-type", "TrueColorAlpha",
+                    Png32(outputPath)
                 ],
                 cancellationToken);
         }
@@ -767,7 +905,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     "-extent", $"{width}x{height}",
                     "-colorspace", "sRGB",
                     "-type", "TrueColorAlpha",
-                    outputPath
+                    Png32(outputPath)
                 ],
                 cancellationToken);
             return;
@@ -780,7 +918,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                 "xc:black",
                 "-colorspace", "sRGB",
                 "-type", "TrueColorAlpha",
-                outputPath
+                Png32(outputPath)
             ],
             cancellationToken);
     }
@@ -1105,9 +1243,11 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             "fanart" => "fanart",
             "wheel" => "wheel",
             "ic" => "instruction-card",
-            "generated-system-dmd" => "dmd",
+            "generated-system-dmd" or "generated-dmd" => "dmd",
             _ when stem.StartsWith("dmd", StringComparison.OrdinalIgnoreCase) => "dmd-animation",
             _ when stem.StartsWith("ic-", StringComparison.OrdinalIgnoreCase) => "instruction-card",
+            _ when stem.StartsWith("generated-", StringComparison.OrdinalIgnoreCase) &&
+                stem.Contains("dmd", StringComparison.OrdinalIgnoreCase) => "dmd",
             _ when stem.StartsWith("generated-", StringComparison.OrdinalIgnoreCase) => "marquee",
             _ => stem
         };
@@ -1421,6 +1561,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         }
     }
 
+    private static string Png32(string path) => "png32:" + path;
+
     private static bool IsUnderRoot(string path, string root)
     {
         var fullPath = Path.GetFullPath(path);
@@ -1449,6 +1591,92 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         {
             yield return "path:" + game.GamePath.Trim().ToLowerInvariant();
         }
+    }
+
+    private long MarkLatestSelectionSequence(EventEnvelope envelope)
+    {
+        var sequence = ReadLongProperty(envelope.Payload, "Sequence");
+        lock (_latestSelectionLock)
+        {
+            if (sequence <= _latestSelectionSequence)
+            {
+                sequence = _latestSelectionSequence + 1;
+            }
+
+            _latestSelectionSequence = sequence;
+            return sequence;
+        }
+    }
+
+    private bool IsStaleSelectionSequence(long sequence)
+    {
+        if (sequence <= 0)
+        {
+            return false;
+        }
+
+        lock (_latestSelectionLock)
+        {
+            return sequence < _latestSelectionSequence;
+        }
+    }
+
+    private static async Task DelayLatestSelectionSnapshotAsync(long selectionSequence)
+    {
+        if (selectionSequence <= 0)
+        {
+            return;
+        }
+
+        await Task.Delay(SelectionSnapshotDebounceMs);
+    }
+
+    private static long ReadLongProperty(object? source, string propertyName)
+    {
+        var value = ReadProperty(source, propertyName);
+        return value switch
+        {
+            null => 0,
+            long number => number,
+            int number => number,
+            JsonElement { ValueKind: JsonValueKind.Number } element when element.TryGetInt64(out var number) => number,
+            JsonElement { ValueKind: JsonValueKind.String } element when long.TryParse(element.GetString(), out var number) => number,
+            string text when long.TryParse(text, out var number) => number,
+            _ => 0
+        };
+    }
+
+    private static object? ReadProperty(object? source, string propertyName)
+    {
+        if (source == null)
+        {
+            return null;
+        }
+
+        if (source is JsonElement element)
+        {
+            if (element.ValueKind != JsonValueKind.Object)
+            {
+                return null;
+            }
+
+            foreach (var property in element.EnumerateObject())
+            {
+                if (property.NameEquals(propertyName) ||
+                    property.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return property.Value;
+                }
+            }
+
+            return null;
+        }
+
+        return source
+            .GetType()
+            .GetProperties()
+            .FirstOrDefault(property => property.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase))
+            ?.GetValue(source);
     }
 
     private static readonly AssetSearch[] SystemFanartSearches =
@@ -1484,6 +1712,12 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
 
     private sealed record AssetSearch(string RelativeDirectory, string Pattern);
     private sealed record MarqueeAutogenProfile(int Width, int Height);
+    private sealed record DmdMediaSnapshot(
+        string Kind,
+        MediaStreamAsset? Still,
+        MediaStreamAsset? Generated,
+        IReadOnlyList<MediaStreamAsset> Animations);
+
     private sealed record MarqueeMediaSnapshot(
         MediaStreamAsset? Marquee,
         MediaStreamAsset? GeneratedMarquee,

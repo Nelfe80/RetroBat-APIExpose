@@ -282,55 +282,93 @@ public class ProviderHostedService : IHostedService
     private readonly IEnumerable<IProvider> _providers;
     private readonly ApiExposeRuntimeOptionsService _runtimeOptions;
     private readonly StartupReadinessState _startupReadiness;
+    private readonly ILogger<ProviderHostedService> _logger;
     private readonly List<IProvider> _startedProviders = new();
+    private readonly object _startedProvidersLock = new();
     
     public ProviderHostedService(
         IEnumerable<IProvider> providers,
         ApiExposeRuntimeOptionsService runtimeOptions,
-        StartupReadinessState startupReadiness)
+        StartupReadinessState startupReadiness,
+        ILogger<ProviderHostedService> logger)
     {
         _providers = providers;
         _runtimeOptions = runtimeOptions;
         _startupReadiness = startupReadiness;
+        _logger = logger;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        foreach (var provider in _providers)
+        var providers = _providers.Where(IsProviderEnabled).ToList();
+        foreach (var provider in providers.OfType<EmulationStationWatcherProvider>())
         {
-            if (provider is RetroArchWrapperProvider && !_runtimeOptions.IsRetroArchWrapperEnabled())
-            {
-                continue;
-            }
-
-            if (provider is RetroArchConsoleHiscoreProvider && !_runtimeOptions.IsConsoleHighScoreCaptureEnabled())
-            {
-                continue;
-            }
-
-            if (provider is MameOutputsProvider && !_runtimeOptions.IsMameOutputsEnabled())
-            {
-                continue;
-            }
-
-            if (provider is MameLuaIngameProvider && !_runtimeOptions.IsMameLuaIngameEnabled())
-            {
-                continue;
-            }
-
-            await provider.StartAsync(cancellationToken);
-            _startedProviders.Add(provider);
+            await StartProviderAsync(provider, cancellationToken);
         }
 
         _startupReadiness.MarkReady();
+
+        foreach (var provider in providers.Where(provider => provider is not EmulationStationWatcherProvider))
+        {
+            _ = Task.Run(() => StartProviderAsync(provider, cancellationToken), CancellationToken.None);
+        }
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        foreach (var provider in _startedProviders)
+        List<IProvider> providers;
+        lock (_startedProvidersLock)
+        {
+            providers = _startedProviders.ToList();
+        }
+
+        foreach (var provider in providers)
         {
             await provider.StopAsync(cancellationToken);
         }
+    }
+
+    private bool IsProviderEnabled(IProvider provider)
+    {
+        if (provider is RetroArchWrapperProvider && !_runtimeOptions.IsRetroArchWrapperEnabled())
+        {
+            return false;
+        }
+
+        if (provider is RetroArchConsoleHiscoreProvider && !_runtimeOptions.IsConsoleHighScoreCaptureEnabled())
+        {
+            return false;
+        }
+
+        if (provider is MameOutputsProvider && !_runtimeOptions.IsMameOutputsEnabled())
+        {
+            return false;
+        }
+
+        if (provider is MameLuaIngameProvider && !_runtimeOptions.IsMameLuaIngameEnabled())
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private async Task StartProviderAsync(IProvider provider, CancellationToken cancellationToken)
+    {
+        var startedAt = DateTime.UtcNow;
+        await provider.StartAsync(cancellationToken);
+        lock (_startedProvidersLock)
+        {
+            if (!_startedProviders.Contains(provider))
+            {
+                _startedProviders.Add(provider);
+            }
+        }
+
+        _logger.LogInformation(
+            "Provider started: {ProviderType}, elapsedMs={ElapsedMs}",
+            provider.GetType().Name,
+            (int)(DateTime.UtcNow - startedAt).TotalMilliseconds);
     }
 
 }

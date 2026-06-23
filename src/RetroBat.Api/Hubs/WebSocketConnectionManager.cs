@@ -8,8 +8,13 @@ namespace RetroBat.Api.Hubs;
 
 public class WebSocketConnectionManager
 {
+    private const int LatestWinsBroadcastDelayMs = 20;
+    private const int FrontendSelectionBroadcastDelayMs = 35;
     private readonly List<WebSocketSubscription> _sockets = new();
     private readonly SemaphoreSlim _lock = new(1, 1);
+    private readonly object _latestWinsLock = new();
+    private readonly Dictionary<string, PendingLatestBroadcast> _pendingLatestBroadcasts = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, DateTime> _latestWinsAcceptedTimestamps = new(StringComparer.OrdinalIgnoreCase);
     private string? _retainedPanelStateJson;
 
     public async Task AddSocketAsync(WebSocket socket)
@@ -59,6 +64,19 @@ public class WebSocketConnectionManager
     {
         var json = JsonSerializer.Serialize(message);
         RetainMessage(message, json);
+
+        if (message is EventEnvelope envelope &&
+            TryGetLatestWinsBroadcastKey(envelope, out var latestWinsKey))
+        {
+            QueueLatestWinsBroadcast(latestWinsKey, envelope, json);
+            return;
+        }
+
+        await BroadcastSerializedAsync(message, json);
+    }
+
+    private async Task BroadcastSerializedAsync<T>(T message, string json)
+    {
         var buffer = Encoding.UTF8.GetBytes(json);
         WebSocketSubscription[] sockets;
 
@@ -114,6 +132,95 @@ public class WebSocketConnectionManager
         {
             _lock.Release();
         }
+    }
+
+    private void QueueLatestWinsBroadcast(string key, EventEnvelope message, string json)
+    {
+        CancellationTokenSource? previousCts = null;
+        var cts = new CancellationTokenSource();
+        var pending = new PendingLatestBroadcast(message, json, cts);
+
+        lock (_latestWinsLock)
+        {
+            if (_latestWinsAcceptedTimestamps.TryGetValue(key, out var latestTs) &&
+                message.Ts < latestTs)
+            {
+                cts.Dispose();
+                return;
+            }
+
+            _latestWinsAcceptedTimestamps[key] = message.Ts;
+
+            if (_pendingLatestBroadcasts.TryGetValue(key, out var previous))
+            {
+                previousCts = previous.CancellationTokenSource;
+            }
+
+            _pendingLatestBroadcasts[key] = pending;
+        }
+
+        previousCts?.Cancel();
+        _ = Task.Run(() => FlushLatestWinsBroadcastAsync(key, pending), cts.Token);
+    }
+
+    private async Task FlushLatestWinsBroadcastAsync(string key, PendingLatestBroadcast pending)
+    {
+        try
+        {
+            await Task.Delay(ResolveLatestWinsBroadcastDelayMs(key), pending.CancellationTokenSource.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            pending.CancellationTokenSource.Dispose();
+            return;
+        }
+
+        lock (_latestWinsLock)
+        {
+            if (!_pendingLatestBroadcasts.TryGetValue(key, out var current) ||
+                !ReferenceEquals(current, pending) ||
+                pending.CancellationTokenSource.IsCancellationRequested)
+            {
+                return;
+            }
+
+            _pendingLatestBroadcasts.Remove(key);
+        }
+
+        try
+        {
+            await BroadcastSerializedAsync(pending.Message, pending.Json);
+        }
+        finally
+        {
+            pending.CancellationTokenSource.Dispose();
+        }
+    }
+
+    private static bool TryGetLatestWinsBroadcastKey(EventEnvelope envelope, out string key)
+    {
+        var type = (envelope.Type ?? string.Empty).Trim().ToLowerInvariant();
+        key = type switch
+        {
+            "ui.system.selected.raw" or "ui.game.selected.raw" => "frontend.selection.raw",
+            "ui.system.selected" or "ui.game.selected" => "frontend.selection",
+            "panel.state" => "panel.state",
+            "cpo.panel.config.selected" => "panel.config.selected",
+            "marquee.snapshot" or "marquee.snapshot.updated" => "marquee.snapshot",
+            "topper.snapshot" => "topper.snapshot",
+            "instruction-card.snapshot" => "instruction-card.snapshot",
+            "hiscore.updated" => "hiscore.updated",
+            _ => string.Empty
+        };
+
+        return !string.IsNullOrWhiteSpace(key);
+    }
+
+    private static int ResolveLatestWinsBroadcastDelayMs(string key)
+    {
+        return key.StartsWith("frontend.selection", StringComparison.OrdinalIgnoreCase)
+            ? FrontendSelectionBroadcastDelayMs
+            : LatestWinsBroadcastDelayMs;
     }
 
     private string? GetRetainedMessageForStream(string stream)
@@ -279,4 +386,5 @@ public class WebSocketConnectionManager
     }
 
     private sealed record WebSocketSubscription(WebSocket Socket, string Stream);
+    private sealed record PendingLatestBroadcast(EventEnvelope Message, string Json, CancellationTokenSource CancellationTokenSource);
 }

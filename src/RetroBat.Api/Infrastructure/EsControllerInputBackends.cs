@@ -69,6 +69,10 @@ public class DryRunEsControllerInputBackend : IEsControllerInputBackend
 public class KeyboardEsControllerInputBackend : IEsControllerInputBackend
 {
     private readonly IToastNotificationService _toastNotificationService;
+    private static readonly object MappingCacheLock = new();
+    private static DateTime _mappingCacheLastWriteUtc = DateTime.MinValue;
+    private static long _mappingCacheLength = -1;
+    private static Dictionary<string, string>? _mappingCache;
 
     private static readonly IReadOnlyDictionary<string, string> EsInputAliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
@@ -227,6 +231,26 @@ public class KeyboardEsControllerInputBackend : IEsControllerInputBackend
     {
         var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var path = Path.Combine(RetroBatPaths.EmulationStationConfigRoot, "es_input.cfg");
+        try
+        {
+            var info = new FileInfo(path);
+            var lastWriteUtc = info.Exists ? info.LastWriteTimeUtc : DateTime.MinValue;
+            var length = info.Exists ? info.Length : -1;
+            lock (MappingCacheLock)
+            {
+                if (_mappingCache is not null &&
+                    _mappingCacheLastWriteUtc == lastWriteUtc &&
+                    _mappingCacheLength == length)
+                {
+                    return new Dictionary<string, string>(_mappingCache, StringComparer.OrdinalIgnoreCase);
+                }
+            }
+        }
+        catch
+        {
+            // Cache is only an optimization; fall through to a normal read.
+        }
+
         if (!File.Exists(path))
         {
             return result;
@@ -259,6 +283,21 @@ public class KeyboardEsControllerInputBackend : IEsControllerInputBackend
         catch
         {
             return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        try
+        {
+            var info = new FileInfo(path);
+            lock (MappingCacheLock)
+            {
+                _mappingCache = new Dictionary<string, string>(result, StringComparer.OrdinalIgnoreCase);
+                _mappingCacheLastWriteUtc = info.Exists ? info.LastWriteTimeUtc : DateTime.MinValue;
+                _mappingCacheLength = info.Exists ? info.Length : -1;
+            }
+        }
+        catch
+        {
+            // Cache is only an optimization.
         }
 
         return result;

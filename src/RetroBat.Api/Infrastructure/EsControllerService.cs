@@ -1109,8 +1109,9 @@ public class EsControllerService
             return result;
         }
 
-        foreach (var input in inputs)
+        for (var index = 0; index < inputs.Count; index++)
         {
+            var input = inputs[index];
             cancellationToken.ThrowIfCancellationRequested();
             try
             {
@@ -1121,7 +1122,10 @@ public class EsControllerService
                 return Failure(action, "input_failed", ex.Message);
             }
 
-            await Task.Delay(Math.Clamp(gapMs, 20, 5000), cancellationToken);
+            if (index < inputs.Count - 1)
+            {
+                await Task.Delay(Math.Clamp(gapMs, 20, 5000), cancellationToken);
+            }
         }
 
         return result;

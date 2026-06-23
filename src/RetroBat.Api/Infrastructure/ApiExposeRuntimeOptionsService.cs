@@ -1474,10 +1474,6 @@ public sealed class ApiExposeRuntimeOptionsService
                 "global.apiexpose.game_events.retroarch_wrapper.enabled",
                 "global.apiexpose.retroarch_wrapper.enabled",
                 appOptions.GameEventsManager.RetroArchWrapperEnabled,
-                esSettings) &&
-            ResolveBool(
-                "global.apiexpose.retroarch_wrapper.deployment.enabled",
-                appOptions.RetroArchWrapperDeployment.Enabled,
                 esSettings);
     }
 
