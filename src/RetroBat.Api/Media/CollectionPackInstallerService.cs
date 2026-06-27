@@ -20,6 +20,7 @@ public sealed class CollectionPackInstallerService : IHostedService, IDisposable
     private const string CanonicalGameThemeLinkGeneratorVersion = "20260515-canonical-game-theme-link-v2";
     private const string CanonicalGameThemeLinkMarkerFileName = ".apiexpose-canonical-theme-link.json";
     private const string CanonicalGameThemeSourceMarkerFileName = ".apiexpose-canonical-theme-source.json";
+    private const string StartupFingerprintVersion = "collection-startup-v1";
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
     private static readonly JsonSerializerOptions JsonLineOptions = new();
     private static readonly HashSet<string> PackExtensions = new(StringComparer.OrdinalIgnoreCase) { ".zip", ".7z", ".rar" };
@@ -141,6 +142,33 @@ public sealed class CollectionPackInstallerService : IHostedService, IDisposable
     private async Task RunConfiguredImportAsync(string trigger, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
+        var startupFingerprint = ComputeStartupFingerprint();
+        if (string.Equals(trigger, "startup", StringComparison.OrdinalIgnoreCase) &&
+            string.IsNullOrWhiteSpace(_index.StartupFingerprint) &&
+            CanAdoptStartupFingerprint())
+        {
+            _index.StartupFingerprint = startupFingerprint;
+            SaveIndex();
+        }
+
+        if (string.Equals(trigger, "startup", StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(_index.StartupFingerprint, startupFingerprint, StringComparison.Ordinal))
+        {
+            _logger?.LogInformation(
+                "Collection Pack Installer startup skipped: packages and settings are unchanged.");
+            await StartupGamelistPreparationLog.AppendAsync(
+                "collection-pack-installer",
+                "cache-hit",
+                new
+                {
+                    trigger,
+                    fingerprint = startupFingerprint,
+                    elapsedMs = stopwatch.ElapsedMilliseconds
+                },
+                cancellationToken);
+            return;
+        }
+
         _familyIndex = BuildAndSaveFamilyIndex();
 
         var managerEnabled = _runtimeOptions.IsCollectionPackManagerEnabled();
@@ -177,6 +205,8 @@ public sealed class CollectionPackInstallerService : IHostedService, IDisposable
             _runtimeState.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(8));
         }
 
+        _index.StartupFingerprint = startupFingerprint;
+        SaveIndex();
         await StartupGamelistPreparationLog.AppendAsync(
             "collection-pack-installer",
             "completed",
@@ -2415,6 +2445,55 @@ public sealed class CollectionPackInstallerService : IHostedService, IDisposable
         return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(joined)));
     }
 
+    private string ComputeStartupFingerprint()
+    {
+        var values = new List<string>
+        {
+            StartupFingerprintVersion,
+            _lastSettingsSignature
+        };
+
+        foreach (var package in EnumerateCollectionPackages())
+        {
+            var info = new FileInfo(package.Path);
+            values.Add(string.Join(
+                "|",
+                package.Kind,
+                Path.GetFullPath(package.Path).ToLowerInvariant(),
+                info.Exists ? info.Length : -1,
+                info.Exists ? info.LastWriteTimeUtc.Ticks : 0));
+        }
+
+        return Convert.ToHexString(
+            SHA256.HashData(Encoding.UTF8.GetBytes(string.Join("\n", values))));
+    }
+
+    private bool CanAdoptStartupFingerprint()
+    {
+        var packages = EnumerateCollectionPackages().ToList();
+        if (packages.Count != _index.Packs.Count)
+        {
+            return false;
+        }
+
+        var indexed = _index.Packs.ToDictionary(
+            pack => Path.GetFullPath(pack.PackagePath),
+            StringComparer.OrdinalIgnoreCase);
+        foreach (var package in packages)
+        {
+            var fullPath = Path.GetFullPath(package.Path);
+            if (!indexed.TryGetValue(fullPath, out var entry) ||
+                !string.Equals(entry.ImporterVersion, ImporterVersion, StringComparison.Ordinal) ||
+                !File.Exists(fullPath) ||
+                File.GetLastWriteTimeUtc(fullPath) > _index.UpdatedAtUtc)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private static string NormalizeInstallerSettingValue(string key, string? value)
     {
         var normalized = (value ?? string.Empty).Trim().ToLowerInvariant();
@@ -2613,6 +2692,7 @@ public sealed class CollectionFamilyVariant
 public sealed class CollectionPackInstallerIndex
 {
     public DateTime UpdatedAtUtc { get; set; } = DateTime.UtcNow;
+    public string StartupFingerprint { get; set; } = string.Empty;
     public List<CollectionPackIndexEntry> Packs { get; set; } = new();
 }
 

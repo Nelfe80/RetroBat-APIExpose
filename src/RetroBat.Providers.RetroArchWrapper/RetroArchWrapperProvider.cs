@@ -195,12 +195,6 @@ public class RetroArchWrapperProvider : IProvider
 
         await _eventBus.PublishAsync(new EventEnvelope
         {
-            Type = "retroarch.wrapper.changed",
-            Payload = payload
-        });
-
-        await _eventBus.PublishAsync(new EventEnvelope
-        {
             Type = "retroarch.memory.changed",
             Payload = payload
         });

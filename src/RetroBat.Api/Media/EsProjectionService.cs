@@ -377,9 +377,30 @@ public class EsProjectionService
 
         return matches
             .Where(path => IsSupportedLegacyMediaExtension(path, kind))
+            .Where(path => !string.Equals(kind, MediaKinds.Marquee, StringComparison.OrdinalIgnoreCase) ||
+                IsTrueLegacyMarqueeCandidate(path))
             .OrderBy(ScoreCandidatePath)
             .ThenBy(path => path, StringComparer.OrdinalIgnoreCase)
             .FirstOrDefault();
+    }
+
+    private static bool IsTrueLegacyMarqueeCandidate(string path)
+    {
+        var stem = Path.GetFileNameWithoutExtension(path);
+        if (string.IsNullOrWhiteSpace(stem))
+        {
+            return false;
+        }
+
+        if (stem.StartsWith("generated-", StringComparison.OrdinalIgnoreCase) ||
+            stem.StartsWith("screenmarquee", StringComparison.OrdinalIgnoreCase) ||
+            stem.StartsWith("dmd", StringComparison.OrdinalIgnoreCase) ||
+            stem.StartsWith("topper", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public string GetCanonicalImportPath(string systemId, string gameSlug, string kind, string sourcePath)

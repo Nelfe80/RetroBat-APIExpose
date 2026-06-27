@@ -107,10 +107,15 @@ public sealed class MarqueeAutogenService
             return MarqueeAutogenResult.Skipped("missing-marquee-need");
         }
 
-        var cleanedFalseMarquee = await CleanupFalseConsoleMarqueeAsync(plan, marqueeNeed, cancellationToken);
-        if (HasUsableMarquee(plan, marqueeNeed))
+        var cleanedFalseMarquee = await CleanupFalseConsoleMarqueeAsync(plan, marqueeNeed, profile, cancellationToken);
+        if (HasUsableMarquee(plan, marqueeNeed, profile))
         {
             return MarqueeAutogenResult.Skipped(cleanedFalseMarquee ? "true-marquee-after-cleanup" : "true-marquee-present");
+        }
+
+        if (HasUsableGeneratedMarquee(plan, profile))
+        {
+            return MarqueeAutogenResult.Skipped("generated-marquee-present");
         }
 
         var fanartPath = ResolveExistingKindPath(plan, MediaKinds.Fanart);
@@ -153,7 +158,7 @@ public sealed class MarqueeAutogenService
                     "-extent", $"{profile.Width}x{profile.Height}",
                     "-colorspace", "sRGB",
                     "-type", "TrueColorAlpha",
-                    tempBasePath
+                    Png32(tempBasePath)
                 ],
                 cancellationToken);
 
@@ -178,7 +183,7 @@ public sealed class MarqueeAutogenService
                         "-composite",
                         "-colorspace", "sRGB",
                         "-type", "TrueColorAlpha",
-                        tempGradientPath
+                        Png32(tempGradientPath)
                     ],
                     cancellationToken);
                 finalBasePath = tempGradientPath;
@@ -214,40 +219,26 @@ public sealed class MarqueeAutogenService
                 "-gravity", layout.LogoGravity,
                 "-geometry", ResolveLogoGeometry(layout.LogoGravity, profile),
                 "-composite",
-                tempOutputPath
+                "-colorspace", "sRGB",
+                "-type", "TrueColorAlpha",
+                Png32(tempOutputPath)
             ]);
             await RunConvertAsync(convertPath, finalArguments, cancellationToken);
 
-            var importedPath = await _projectionService.ImportCanonicalAsync(
-                plan.SystemId,
-                plan.GameSlug,
-                marqueeNeed,
+            var generatedPath = await SaveGeneratedMarqueeAsync(
+                plan,
                 tempOutputPath,
-                cancellationToken,
-                plan.FrontendSystemId,
-                plan.GamePath,
-                plan.EsGameId,
-                notifyThemeHbScrape: false);
+                cancellationToken);
 
-            if (string.IsNullOrWhiteSpace(importedPath) || !File.Exists(importedPath))
+            if (string.IsNullOrWhiteSpace(generatedPath) || !File.Exists(generatedPath))
             {
                 await AuditAsync(plan, "import-failed", profile, fanartPath, logoPath, cancellationToken);
                 return MarqueeAutogenResult.Skipped("import-failed");
             }
 
-            marqueeNeed.WasImported = true;
-            marqueeNeed.WasContentChanged = true;
-            marqueeNeed.IsMissing = false;
-            marqueeNeed.ImportedPath = importedPath;
-            marqueeNeed.ExistingPath = importedPath;
-            if (!decision.ImportedKinds.Contains(MediaKinds.Marquee, StringComparer.OrdinalIgnoreCase))
-            {
-                decision.ImportedKinds.Add(MediaKinds.Marquee);
-            }
-
             decision.ImportedMediaCount++;
             decision.MediaContentChanged = true;
-            await AuditAsync(plan, "generated", profile, fanartPath, logoPath, cancellationToken, importedPath);
+            await AuditAsync(plan, "generated", profile, fanartPath, logoPath, cancellationToken, generatedPath);
             if (_runtimeOptions.ShouldNotifyMarqueeAutogen())
             {
                 await _notificationService.NotifyAsync(
@@ -255,7 +246,7 @@ public sealed class MarqueeAutogenService
                     cancellationToken);
             }
 
-            return MarqueeAutogenResult.Generated(importedPath, cleanedFalseMarquee);
+            return MarqueeAutogenResult.Generated(generatedPath, cleanedFalseMarquee);
         }
         catch (OperationCanceledException)
         {
@@ -282,13 +273,9 @@ public sealed class MarqueeAutogenService
     private async Task<bool> CleanupFalseConsoleMarqueeAsync(
         MediaProjectionPlan plan,
         MediaNeed marqueeNeed,
+        MarqueeAutogenProfile profile,
         CancellationToken cancellationToken)
     {
-        if (plan.IsArcadeLike)
-        {
-            return false;
-        }
-
         var candidates = ResolveCanonicalMarqueeCandidates(plan, marqueeNeed).ToList();
         if (candidates.Count == 0)
         {
@@ -296,12 +283,24 @@ public sealed class MarqueeAutogenService
         }
 
         var comparisonPaths = ResolveScreenMarqueeComparisonPaths(plan).ToList();
+        var generatedDmdPaths = ResolveGeneratedDmdComparisonPaths(plan).ToList();
         var cleaned = false;
         foreach (var candidate in candidates)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (!File.Exists(candidate) ||
-                !IsScreenMarqueeFallback(candidate, comparisonPaths))
+            if (!File.Exists(candidate))
+            {
+                continue;
+            }
+
+            var cleanupReason = IsScreenMarqueeFallback(candidate, comparisonPaths)
+                ? "screenmarquee-fallback"
+                : IsGeneratedDmdFallback(candidate, generatedDmdPaths)
+                    ? "generated-dmd-fallback"
+                : IsClearlyInvalidMarqueeCandidate(candidate, profile)
+                    ? "invalid-marquee-size"
+                    : string.Empty;
+            if (string.IsNullOrWhiteSpace(cleanupReason))
             {
                 continue;
             }
@@ -324,14 +323,14 @@ public sealed class MarqueeAutogenService
                 "marquee-autogen-cleanup",
                 "marquee",
                 "removed-false-console-marquee",
-                new { path = candidate },
+                new { path = candidate, reason = cleanupReason },
                 cancellationToken);
         }
 
         return cleaned;
     }
 
-    private bool HasUsableMarquee(MediaProjectionPlan plan, MediaNeed marqueeNeed)
+    private bool HasUsableMarquee(MediaProjectionPlan plan, MediaNeed marqueeNeed, MarqueeAutogenProfile profile)
     {
         var candidates = ResolveCanonicalMarqueeCandidates(plan, marqueeNeed).ToList();
         if (candidates.Count == 0)
@@ -339,7 +338,102 @@ public sealed class MarqueeAutogenService
             return false;
         }
 
-        return candidates.Any(File.Exists);
+        return candidates.Any(candidate => IsUsableMarqueeCandidate(candidate, profile));
+    }
+
+    private static bool HasUsableGeneratedMarquee(MediaProjectionPlan plan, MarqueeAutogenProfile profile)
+    {
+        var generatedPath = ResolveGeneratedMarqueePath(plan);
+        return IsUsableMarqueeCandidate(generatedPath, profile);
+    }
+
+    private static async Task<string> SaveGeneratedMarqueeAsync(
+        MediaProjectionPlan plan,
+        string sourcePath,
+        CancellationToken cancellationToken)
+    {
+        var generatedPath = ResolveGeneratedMarqueePath(plan);
+        var directory = Path.GetDirectoryName(generatedPath);
+        if (string.IsNullOrWhiteSpace(directory))
+        {
+            return string.Empty;
+        }
+
+        Directory.CreateDirectory(directory);
+        var tempPath = generatedPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            await using (var source = File.Open(sourcePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+            await using (var destination = File.Create(tempPath))
+            {
+                await source.CopyToAsync(destination, cancellationToken);
+            }
+
+            File.Move(tempPath, generatedPath, overwrite: true);
+            return generatedPath;
+        }
+        finally
+        {
+            TryDelete(tempPath);
+        }
+    }
+
+    private static string ResolveGeneratedMarqueePath(MediaProjectionPlan plan)
+    {
+        return Path.Combine(
+            RetroBatPaths.MediaSystemsRoot,
+            plan.SystemId,
+            "games",
+            plan.GameSlug,
+            "artwork",
+            "marquee",
+            "generated-marquee.png");
+    }
+
+    private static bool IsUsableMarqueeCandidate(string path, MarqueeAutogenProfile profile)
+    {
+        if (!File.Exists(path))
+        {
+            return false;
+        }
+
+        try
+        {
+            using var image = Image.FromFile(path);
+            var minWidth = (int)Math.Round(profile.Width * 0.50);
+            var minHeight = (int)Math.Round(profile.Height * 0.50);
+            if (image.Width < minWidth || image.Height < minHeight)
+            {
+                return false;
+            }
+
+            var aspect = image.Width / (double)Math.Max(1, image.Height);
+            return aspect >= 2.35 && aspect <= 10.0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static bool IsClearlyInvalidMarqueeCandidate(string path, MarqueeAutogenProfile profile)
+    {
+        if (!File.Exists(path))
+        {
+            return false;
+        }
+
+        try
+        {
+            using var image = Image.FromFile(path);
+            var minWidth = (int)Math.Round(profile.Width * 0.50);
+            var minHeight = (int)Math.Round(profile.Height * 0.50);
+            return image.Width < minWidth || image.Height < minHeight;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private IEnumerable<string> ResolveCanonicalMarqueeCandidates(MediaProjectionPlan plan, MediaNeed marqueeNeed)
@@ -381,7 +475,35 @@ public sealed class MarqueeAutogenService
         }
     }
 
+    private static IEnumerable<string> ResolveGeneratedDmdComparisonPaths(MediaProjectionPlan plan)
+    {
+        var marqueeDirectory = Path.Combine(
+            RetroBatPaths.MediaSystemsRoot,
+            plan.SystemId,
+            "games",
+            plan.GameSlug,
+            "artwork",
+            "marquee");
+        if (!Directory.Exists(marqueeDirectory))
+        {
+            yield break;
+        }
+
+        foreach (var pattern in new[] { "generated-dmd.*", "generated-system-dmd.*" })
+        {
+            foreach (var path in Directory.EnumerateFiles(marqueeDirectory, pattern, SearchOption.TopDirectoryOnly))
+            {
+                yield return path;
+            }
+        }
+    }
+
     private static bool IsScreenMarqueeFallback(string marqueePath, IReadOnlyList<string> comparisonPaths)
+    {
+        return comparisonPaths.Any(path => FilesHaveSameContent(marqueePath, path));
+    }
+
+    private static bool IsGeneratedDmdFallback(string marqueePath, IReadOnlyList<string> comparisonPaths)
     {
         return comparisonPaths.Any(path => FilesHaveSameContent(marqueePath, path));
     }
@@ -735,6 +857,8 @@ public sealed class MarqueeAutogenService
         }
     }
 
+    private static string Png32(string path) => "png32:" + path;
+
     private sealed record MarqueeAutogenProfile(string Name, int Width, int Height);
     private sealed record MarqueeLayout(string BackgroundGravity, string LogoGravity, double ZoneLuminance);
     private sealed record LayoutBand(string Gravity, Rectangle Bounds);
@@ -743,6 +867,8 @@ public sealed class MarqueeAutogenService
 
 public sealed record MarqueeAutogenResult(bool WasGenerated, string Status, string ImportedPath, bool CleanedFalseMarquee)
 {
+    public string GeneratedPath => ImportedPath;
+
     public static MarqueeAutogenResult Generated(string importedPath, bool cleanedFalseMarquee)
     {
         return new MarqueeAutogenResult(true, "generated", importedPath, cleanedFalseMarquee);

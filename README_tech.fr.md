@@ -18,18 +18,21 @@ README utilisateur : [README.md](README.md)
 
 Version technique anglaise : [README_tech.md](README_tech.md)
 
-Release courante : `1.0.0+20260618.002655`, publiee en runtime `win-x64`
-self-contained single-file dans `RetroBat.Api.exe`.
+Release courante : `1.0.0+20260626.221125`, publiee en runtime `win-x64`
+single-file framework-dependent. Elle utilise le runtime .NET 8 installe sur la
+machine RetroBat et evite d'embarquer le runtime complet dans
+`RetroBat.Api.exe`.
 
 Procedure release locale :
 
 ```powershell
 Get-Process RetroBat.Api -ErrorAction SilentlyContinue | Stop-Process -Force
-dotnet publish src\RetroBat.Api\RetroBat.Api.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true -o artifacts\release\api-singlefile-test
-Copy-Item -LiteralPath artifacts\release\api-singlefile-test\RetroBat.Api.exe -Destination .\RetroBat.Api.exe -Force
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\release-framework-dependent.ps1
 ```
 
-Toujours couper le process APIExpose avant de publier ou de remplacer l'exe racine.
+Toujours couper le process APIExpose avant de publier ou de remplacer le runtime
+racine. Le script publie d'abord hors arbre source pour eviter de re-inclure
+les anciens artefacts dans la release suivante.
 
 ## Demarrage
 

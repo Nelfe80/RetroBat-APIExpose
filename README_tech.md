@@ -16,8 +16,10 @@ User README: [README.md](README.md)
 
 French technical version: [README_tech.fr.md](README_tech.fr.md)
 
-Current release: `1.0.0+20260611.190754`, published as a self-contained
-single-file `win-x64` runtime at `RetroBat.Api.exe`.
+Current release: `1.0.0+20260626.221125`, published as a `win-x64`
+single-file framework-dependent runtime. It uses the .NET 8 runtime installed
+on the RetroBat machine instead of embedding the full runtime inside
+`RetroBat.Api.exe`.
 
 ## Startup
 

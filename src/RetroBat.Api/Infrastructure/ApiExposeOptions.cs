@@ -32,6 +32,7 @@ public class ApiExposeOptions
     public ScrapeQueueOverlayOptions ScrapeQueueOverlay { get; set; } = new();
     public LoggingOptions Logging { get; set; } = new();
     public TaxonomyOptions Taxonomy { get; set; } = new();
+    public RetroAchievementsOptions RetroAchievements { get; set; } = new();
 
     public class TestModeOptions
     {
@@ -189,6 +190,49 @@ public class ApiExposeOptions
         public bool MameLuaIngameMirrorToEmulatorPlugins { get; set; } = true;
         public bool ExportScoresOnGameEndEnabled { get; set; } = true;
         public int MaxHighScores { get; set; } = 10;
+    }
+
+    public class RetroAchievementsOptions
+    {
+        public bool Enabled { get; set; } = true;
+        public RetroAchievementsProxyOptions Proxy { get; set; } = new();
+        public RetroAchievementsApiOptions Api { get; set; } = new();
+        public RetroAchievementsCacheOptions Cache { get; set; } = new();
+        public RetroAchievementsSecurityOptions Security { get; set; } = new();
+    }
+
+    public class RetroAchievementsProxyOptions
+    {
+        public bool Enabled { get; set; } = true;
+        public string TargetHost { get; set; } = "https://retroachievements.org";
+        public string Route { get; set; } = "/dorequest.php";
+        public int TimeoutMs { get; set; } = 10000;
+        public bool EmitRequestEvents { get; set; } = true;
+        public bool EmitResponseEvents { get; set; } = true;
+    }
+
+    public class RetroAchievementsApiOptions
+    {
+        public bool Enabled { get; set; } = true;
+        public string BaseUrl { get; set; } = "https://retroachievements.org/API";
+        public string Username { get; set; } = string.Empty;
+        public string WebApiKey { get; set; } = string.Empty;
+        public int TimeoutMs { get; set; } = 10000;
+        public bool DownloadBadges { get; set; } = true;
+        public bool DownloadGameImages { get; set; } = true;
+        public bool DownloadUserImages { get; set; } = true;
+    }
+
+    public class RetroAchievementsCacheOptions
+    {
+        public bool Enabled { get; set; } = true;
+        public string RootPath { get; set; } = "media/retroachievements";
+    }
+
+    public class RetroAchievementsSecurityOptions
+    {
+        public bool PublishSensitiveValues { get; set; } = false;
+        public bool StoreRawRequests { get; set; } = false;
     }
 
     public class RomSetManagerOptions
@@ -354,6 +398,12 @@ public class ApiExposeOptions
     {
         public bool Enabled { get; set; } = true;
         public string Endpoint { get; set; } = "/ws";
+        public bool VisualAdaptiveThrottleEnabled { get; set; } = true;
+        public bool VisualStaleDropEnabled { get; set; } = true;
+        public int VisualMinIntervalFloorMs { get; set; } = 30;
+        public int VisualMinIntervalCeilingMs { get; set; } = 220;
+        public int VisualTargetAgeMs { get; set; } = 90;
+        public int VisualFinalFlushMs { get; set; } = 50;
     }
 
     public class ToastOptions

@@ -5,6 +5,9 @@
 		<text name="hiscoreline1" extra="true">
 			<text>#1 Nelfe 104</text>
 		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 Nelfe 54</text>
+		</text>
 		<!-- APIEXPOSE:HISCORE:END -->
 	</view>
 </theme>

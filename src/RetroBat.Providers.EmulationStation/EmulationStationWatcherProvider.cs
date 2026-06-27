@@ -20,9 +20,6 @@ public class EmulationStationWatcherProvider : IProvider
 {
     private const int EventsIniReadRetryCount = 4;
     private const int EventsIniReadRetryDelayMs = 5;
-    private const int EventsIniPollIntervalMs = 20;
-    private const int EventsIniSettleDelayMs = 25;
-    private const int EventsIniStableProbeDelayMs = 8;
     private const int GamelistReadRetryCount = 5;
     private const string EsSettingsReallocationProgressTaskId = "es-settings-reallocation";
     private static readonly TimeSpan VisibleMediaReallocationReloadDelay = TimeSpan.FromSeconds(4);
@@ -45,19 +42,13 @@ public class EmulationStationWatcherProvider : IProvider
     private readonly object _eventDedupLock = new();
     private readonly object _gameSelectedScrapeLock = new();
     private FileSystemWatcher? _watcher;
-    private CancellationTokenSource? _eventsIniPollCts;
-    private Task? _eventsIniPollTask;
-    private readonly object _eventsIniProcessLock = new();
-    private CancellationTokenSource? _eventsIniProcessCts;
+    private CancellationTokenSource? _providerCts;
     private IDisposable? _settingsSubscription;
     private readonly string _eventsIniPath = RetroBatPaths.EventsIniPath;
     private readonly string _eventsIniDir;
     private readonly HttpClient _httpClient;
     private static readonly TimeSpan EsApiRetryDelay = TimeSpan.FromMilliseconds(250);
     private string? _lastEventSignature;
-    private DateTime _lastEventsIniSeenWriteUtc = DateTime.MinValue;
-    private long _lastEventsIniSeenLength = -1;
-    private long _eventsIniSignalSequence;
     private string _lastMediaAllocationSettingsSignature = string.Empty;
     private string _lastMediaSelectionSignature = string.Empty;
     private long _gameSelectedScrapeSequence;
@@ -117,9 +108,9 @@ public class EmulationStationWatcherProvider : IProvider
         };
 
         _watcher.Changed += OnFileChanged;
-        MarkEventsIniSeen();
-        _eventsIniPollCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        _eventsIniPollTask = Task.Run(() => PollEventsIniAsync(_eventsIniPollCts.Token), CancellationToken.None);
+        _watcher.Created += OnFileChanged;
+        _watcher.Renamed += OnFileChanged;
+        _providerCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
         _settingsSubscription = _settingsChangeBus.Subscribe((_, token) => HandleSettingsChangedAsync(token));
         
@@ -130,7 +121,7 @@ public class EmulationStationWatcherProvider : IProvider
         _lastMediaAllocationSettingsSignature = BuildMediaAllocationSettingsSignature(_settingsService.GetAllSettings());
         _lastMediaSelectionSignature = BuildMediaSelectionSignature(_lastScrapingSettings);
         SynchronizeLegacyScraperMediaSettings(_lastScrapingSettings);
-        _ = Task.Run(() => RunStartupGamelistMaintenanceAsync(_eventsIniPollCts.Token), CancellationToken.None);
+        _ = Task.Run(() => RunStartupGamelistMaintenanceAsync(_providerCts.Token), CancellationToken.None);
         return Task.CompletedTask;
     }
 
@@ -183,129 +174,35 @@ public class EmulationStationWatcherProvider : IProvider
 
     private void OnFileChanged(object sender, FileSystemEventArgs e)
     {
-        if (e.ChangeType != WatcherChangeTypes.Changed) return;
-
-        ScheduleEventsIniProcessing();
-    }
-
-    private async Task PollEventsIniAsync(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
+        if (e.ChangeType is not (WatcherChangeTypes.Changed or WatcherChangeTypes.Created or WatcherChangeTypes.Renamed))
         {
-            try
-            {
-                if (HasEventsIniChangedSinceLastSeen())
-                {
-                    ScheduleEventsIniProcessing();
-                }
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-            {
-                _logger?.LogDebug(ex, "events.ini poll skipped during transient file access failure.");
-            }
-
-            try
-            {
-                await Task.Delay(EventsIniPollIntervalMs, cancellationToken);
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-        }
-    }
-
-    private bool HasEventsIniChangedSinceLastSeen()
-    {
-        var info = new FileInfo(_eventsIniPath);
-        if (!info.Exists)
-        {
-            return false;
+            return;
         }
 
-        if (info.LastWriteTimeUtc == _lastEventsIniSeenWriteUtc &&
-            info.Length == _lastEventsIniSeenLength)
-        {
-            return false;
-        }
-
-        _lastEventsIniSeenWriteUtc = info.LastWriteTimeUtc;
-        _lastEventsIniSeenLength = info.Length;
-        return true;
-    }
-
-    private void MarkEventsIniSeen()
-    {
-        try
-        {
-            var info = new FileInfo(_eventsIniPath);
-            if (!info.Exists)
-            {
-                return;
-            }
-
-            _lastEventsIniSeenWriteUtc = info.LastWriteTimeUtc;
-            _lastEventsIniSeenLength = info.Length;
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            _logger?.LogDebug(ex, "Unable to prime events.ini poll state.");
-        }
+        HandleEventsIniChanged();
     }
 
     private void HandleEventsIniChanged()
     {
-        ScheduleEventsIniProcessing();
-    }
-
-    private void ScheduleEventsIniProcessing()
-    {
-        var signalSequence = Interlocked.Increment(ref _eventsIniSignalSequence);
-        CancellationTokenSource cts;
-        lock (_eventsIniProcessLock)
-        {
-            _eventsIniProcessCts?.Cancel();
-            _eventsIniProcessCts?.Dispose();
-            _eventsIniProcessCts = new CancellationTokenSource();
-            cts = _eventsIniProcessCts;
-        }
-
-        _ = Task.Run(() => ProcessEventsIniAfterSettleAsync(signalSequence, cts.Token), CancellationToken.None);
-    }
-
-    private async Task ProcessEventsIniAfterSettleAsync(long signalSequence, CancellationToken cancellationToken)
-    {
         try
         {
-            await Task.Delay(EventsIniSettleDelayMs, cancellationToken);
-            if (signalSequence != Volatile.Read(ref _eventsIniSignalSequence))
+            if (!TryReadCompleteEventsIniEvent(
+                    _providerCts?.Token ?? CancellationToken.None,
+                    out var eventName,
+                    out var args))
             {
                 return;
             }
 
-            HandleEventsIniChangedNow(cancellationToken);
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            // A newer events.ini signal superseded this one.
-        }
-    }
-
-    private void HandleEventsIniChangedNow(CancellationToken cancellationToken)
-    {
-        try
-        {
-            var lines = ReadEventsIniLines(cancellationToken);
-            if (lines.Length == 0) return;
-
-            var evt = lines[0].Trim();
-            if (evt.StartsWith("event="))
+            if (ShouldSkipDuplicateEvent(eventName, args))
             {
-                var eventName = evt.Substring(6).Trim();
-                var sequence = Interlocked.Increment(ref _frontendEventSequence);
-                // Process on thread pool to not block watcher
-                _ = Task.Run(() => ProcessEventAsync(sequence, eventName, lines.Skip(1).Where(l => !string.IsNullOrWhiteSpace(l)).ToArray()));
+                _logger?.LogDebug("ES duplicate event ignored: {EventName}", eventName);
+                return;
             }
+
+            var sequence = Interlocked.Increment(ref _frontendEventSequence);
+            PublishEsEventRefresh(eventName, args, sequence);
+            _ = Task.Run(() => ProcessEventAsync(sequence, eventName, args), CancellationToken.None);
         }
         catch (IOException)
         {
@@ -317,14 +214,99 @@ public class EmulationStationWatcherProvider : IProvider
         }
     }
 
+    private void PublishEsEventRefresh(string sourceEventName, string[] args, long sequence)
+    {
+        var timestampUtc = DateTime.UtcNow;
+        _ = _eventBus.PublishAsync(new EventEnvelope
+        {
+            Type = "esevent.events_refresh",
+            Payload = new
+            {
+                EventName = "events_refresh",
+                Source = "events.ini",
+                SourceEventName = sourceEventName,
+                Sequence = sequence,
+                RawArgs = args,
+                TimestampUtc = timestampUtc,
+                PublishedAtUtc = timestampUtc
+            }
+        });
+    }
+
+    private bool TryReadCompleteEventsIniEvent(
+        CancellationToken cancellationToken,
+        out string eventName,
+        out string[] args)
+    {
+        eventName = string.Empty;
+        args = Array.Empty<string>();
+
+        var lines = ReadEventsIniLines(cancellationToken);
+        if (lines.Length == 0)
+        {
+            return false;
+        }
+
+        var firstLine = lines[0].Trim();
+        if (!firstLine.StartsWith("event=", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        eventName = firstLine[6..].Trim();
+        if (string.IsNullOrWhiteSpace(eventName))
+        {
+            return false;
+        }
+
+        args = lines
+            .Skip(1)
+            .Where(line => !string.IsNullOrWhiteSpace(line))
+            .ToArray();
+
+        return IsCompleteEventsIniPayload(eventName, args);
+    }
+
+    private bool IsCompleteEventsIniPayload(string eventName, string[] args)
+    {
+        if (string.Equals(eventName, "game-selected", StringComparison.OrdinalIgnoreCase))
+        {
+            return args.Length > 0 &&
+                TryParseArguments(args[0], out var parsed) &&
+                parsed.Count >= 2 &&
+                !string.IsNullOrWhiteSpace(parsed[0]) &&
+                !string.IsNullOrWhiteSpace(parsed[1]);
+        }
+
+        if (string.Equals(eventName, "system-selected", StringComparison.OrdinalIgnoreCase))
+        {
+            return args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]);
+        }
+
+        if (string.Equals(eventName, "game-start", StringComparison.OrdinalIgnoreCase))
+        {
+            return args.Length > 0 &&
+                TryParseArguments(args[0], out var parsed) &&
+                parsed.Count >= 1 &&
+                !string.IsNullOrWhiteSpace(parsed[0]);
+        }
+
+        if (string.Equals(eventName, "game-end", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return true;
+    }
+
     private string[] ReadEventsIniLines(CancellationToken cancellationToken)
     {
         for (var attempt = 1; attempt <= EventsIniReadRetryCount; attempt++)
         {
             try
             {
-                WaitForStableEventsIni(cancellationToken);
                 var before = ReadEventsIniSnapshot();
+                cancellationToken.ThrowIfCancellationRequested();
                 var lines = File.ReadAllLines(_eventsIniPath);
                 var after = ReadEventsIniSnapshot();
                 if (before == after)
@@ -336,25 +318,14 @@ public class EmulationStationWatcherProvider : IProvider
             {
                 Thread.Sleep(EventsIniReadRetryDelayMs);
             }
+
+            if (attempt < EventsIniReadRetryCount)
+            {
+                Thread.Sleep(EventsIniReadRetryDelayMs);
+            }
         }
 
         return File.ReadAllLines(_eventsIniPath);
-    }
-
-    private void WaitForStableEventsIni(CancellationToken cancellationToken)
-    {
-        for (var attempt = 1; attempt <= EventsIniReadRetryCount; attempt++)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var before = ReadEventsIniSnapshot();
-            Thread.Sleep(EventsIniStableProbeDelayMs);
-            cancellationToken.ThrowIfCancellationRequested();
-            var after = ReadEventsIniSnapshot();
-            if (before == after)
-            {
-                return;
-            }
-        }
     }
 
     private (DateTime LastWriteUtc, long Length) ReadEventsIniSnapshot()
@@ -365,12 +336,6 @@ public class EmulationStationWatcherProvider : IProvider
 
     private async Task ProcessEventAsync(long sequence, string eventName, string[] args)
     {
-        if (ShouldSkipDuplicateEvent(eventName, args))
-        {
-            _logger?.LogDebug("ES duplicate event ignored: {EventName}", eventName);
-            return;
-        }
-
         _logger?.LogInformation($"ES Event received: {eventName}");
         _mediaRuntimeState.SetLastFrontendEvent(eventName);
         var eventType = "ui.event";
@@ -1694,7 +1659,12 @@ public class EmulationStationWatcherProvider : IProvider
 
     private List<string> ParseArguments(string commandLine)
     {
-        var args = new List<string>();
+        return TryParseArguments(commandLine, out var args) ? args : new List<string>();
+    }
+
+    private static bool TryParseArguments(string commandLine, out List<string> args)
+    {
+        args = new List<string>();
         var currentArg = new System.Text.StringBuilder();
         bool inQuotes = false;
         
@@ -1725,7 +1695,7 @@ public class EmulationStationWatcherProvider : IProvider
             args.Add(currentArg.ToString());
         }
         
-        return args;
+        return !inQuotes;
     }
 
     private async Task<LaunchDetails?> TryReadLaunchDetailsAsync(string romPath)
@@ -2120,31 +2090,15 @@ public class EmulationStationWatcherProvider : IProvider
 
     public Task StopAsync(CancellationToken cancellationToken = default)
     {
-        _eventsIniPollCts?.Cancel();
-        try
-        {
-            _eventsIniPollTask?.Wait(TimeSpan.FromSeconds(2), cancellationToken);
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            throw;
-        }
-        catch
-        {
-            // Shutdown best effort; the poller observes cancellation and has no durable state.
-        }
-        _eventsIniPollCts?.Dispose();
-        lock (_eventsIniProcessLock)
-        {
-            _eventsIniProcessCts?.Cancel();
-            _eventsIniProcessCts?.Dispose();
-            _eventsIniProcessCts = null;
-        }
+        _providerCts?.Cancel();
+        _providerCts?.Dispose();
 
         if (_watcher != null)
         {
             _watcher.EnableRaisingEvents = false;
             _watcher.Changed -= OnFileChanged;
+            _watcher.Created -= OnFileChanged;
+            _watcher.Renamed -= OnFileChanged;
             _watcher.Dispose();
         }
         _settingsSubscription?.Dispose();

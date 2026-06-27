@@ -296,6 +296,7 @@ public sealed class CpoPanelWebSocketProjectionService : IHostedService, IDispos
         }
 
         var publishedAtUtc = DateTime.UtcNow;
+        var selectionKey = BuildSelectionKey(snapshot.SystemId, snapshot.Rom);
         var activeLayout = snapshot.Layouts.FirstOrDefault(layout =>
             string.Equals(layout.Id, snapshot.ActiveLayoutId, StringComparison.OrdinalIgnoreCase)) ??
             snapshot.Layouts.FirstOrDefault();
@@ -303,9 +304,11 @@ public sealed class CpoPanelWebSocketProjectionService : IHostedService, IDispos
 
         var payload = new
         {
+            SnapshotVersion = 2,
             Source = "resources/dynpanels",
             Trigger = envelope.Type,
             Sequence = sequence,
+            SelectionKey = selectionKey,
             ChangedKeys = changedKeys,
             PanelKey = panelKey,
             Emulator = launchConfig.Emulator,
@@ -329,6 +332,7 @@ public sealed class CpoPanelWebSocketProjectionService : IHostedService, IDispos
             {
                 Trigger = envelope.Type,
                 Sequence = sequence,
+                SelectionKey = selectionKey,
                 ReceivedAtUtc = receivedAtUtc,
                 PublishedAtUtc = publishedAtUtc,
                 AgeMs = receivedAtUtc.HasValue ? Math.Max(0, (int)(publishedAtUtc - receivedAtUtc.Value).TotalMilliseconds) : 0
@@ -370,6 +374,15 @@ public sealed class CpoPanelWebSocketProjectionService : IHostedService, IDispos
             panelFile.ToLowerInvariant(),
             activeLayoutId.ToLowerInvariant());
         return ComputeShortHash(keySource);
+    }
+
+    private static string BuildSelectionKey(string systemId, string rom)
+    {
+        var normalizedSystem = (systemId ?? string.Empty).Trim().ToLowerInvariant();
+        var normalizedRom = (rom ?? string.Empty).Trim().ToLowerInvariant();
+        return string.IsNullOrWhiteSpace(normalizedRom)
+            ? $"{normalizedSystem}|"
+            : $"{normalizedSystem}|{normalizedRom}";
     }
 
     private static string ComputeShortHash(string value)

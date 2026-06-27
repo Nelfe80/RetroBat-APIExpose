@@ -75,8 +75,7 @@ builder.Services.AddSwaggerGen(options =>
 var eventBus = new SimpleEventBus();
 builder.Services.AddSingleton<IEventBus>(eventBus);
 
-var wsManager = new WebSocketConnectionManager();
-builder.Services.AddSingleton(wsManager);
+builder.Services.AddSingleton<WebSocketConnectionManager>();
 builder.Services.AddSingleton<MediaRuntimeState>();
 builder.Services.AddSingleton<StartupOverlayService>();
 builder.Services.AddSingleton<IStartupOverlayService>(sp => sp.GetRequiredService<StartupOverlayService>());
@@ -148,6 +147,7 @@ builder.Services.AddSingleton<EsFeaturesMenuDeploymentService>();
 builder.Services.AddSingleton<ApiExposeRuntimeOptionsService>();
 builder.Services.AddSingleton<RetroArchWrapperDeploymentService>();
 builder.Services.AddSingleton<IIngameSourceArbitrationService, IngameSourceArbitrationService>();
+builder.Services.AddSingleton<RetroAchievementsService>();
 builder.Services.AddSingleton<StartupReadinessState>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<EsSettingsChangeBus>());
 if (!testModeRequested)
@@ -194,6 +194,8 @@ builder.Services.AddSingleton<IProvider, EsFlowEventLogProvider>();
 builder.Services.AddSingleton<IProvider, GameSessionEventLogProvider>();
 builder.Services.AddSingleton<IProvider, MameLuaIngameProvider>();
 builder.Services.AddSingleton<IProvider, MameOutputsProvider>();
+builder.Services.AddSingleton<IProvider, LiveScoreAggregatorProvider>();
+builder.Services.AddSingleton<IProvider, LiveTimerAggregatorProvider>();
 builder.Services.AddSingleton<EmulationStationWatcherProvider>();
 builder.Services.AddSingleton<IProvider>(sp => sp.GetRequiredService<EmulationStationWatcherProvider>());
 builder.Services.AddSingleton<IProvider, Hi2TxtProvider>();
@@ -203,6 +205,7 @@ builder.Services.AddSingleton<IProvider, RetroArchConsoleHiscoreProvider>();
 var app = builder.Build();
 
 // Setup internal event subscriber to broadcast via WebSockets
+var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
 eventBus.Subscribe<EventEnvelope>(evt => 
 {
     _ = wsManager.BroadcastAsync(evt);

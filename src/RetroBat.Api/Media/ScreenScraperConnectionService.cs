@@ -7,8 +7,6 @@ namespace RetroBat.Api.Media;
 public sealed class ScreenScraperConnectionService
 {
     private const string DefaultBaseUrl = "https://api.screenscraper.fr/api2";
-    private const string BundledDevId = "Nelfe";
-    private const string BundledDevPassword = "y8dI5PyYsyM";
     private const string BundledSoftName = "RetroBat-APIExpose-V1";
 
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
@@ -30,11 +28,11 @@ public sealed class ScreenScraperConnectionService
         var devId = FirstNonEmpty(
             Environment.GetEnvironmentVariable("APIEXPOSE_SCREENSCRAPER_DEV_ID"),
             scrapingOptions.ScreenScraperDevId,
-            scrapingOptions.UseBundledScreenScraperDeveloperCredentials ? BundledDevId : string.Empty);
+            scrapingOptions.UseBundledScreenScraperDeveloperCredentials ? EmbeddedSecretDefaults.ScreenScraperDevId : string.Empty);
         var devPassword = FirstNonEmpty(
             Environment.GetEnvironmentVariable("APIEXPOSE_SCREENSCRAPER_DEV_PASSWORD"),
             scrapingOptions.ScreenScraperDevPassword,
-            scrapingOptions.UseBundledScreenScraperDeveloperCredentials ? BundledDevPassword : string.Empty);
+            scrapingOptions.UseBundledScreenScraperDeveloperCredentials ? EmbeddedSecretDefaults.ScreenScraperDevPassword : string.Empty);
         var softName = FirstNonEmpty(
             Environment.GetEnvironmentVariable("APIEXPOSE_SCREENSCRAPER_SOFTNAME"),
             scrapingOptions.UseBundledScreenScraperDeveloperCredentials ? BundledSoftName : string.Empty,

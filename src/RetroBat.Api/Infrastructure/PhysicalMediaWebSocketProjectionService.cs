@@ -136,6 +136,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             var roots = ResolveSystemRoots(systemId).ToList();
             var selection = new
             {
+                Sequence = selectionSequence,
+                SelectionKey = BuildSelectionKey(systemId, string.Empty),
                 Scope = "system",
                 FrontendSystem = frontendSystemId,
                 System = systemId,
@@ -152,10 +154,14 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                 CorrelationId = trigger.CorrelationId,
                 Payload = new
                 {
+                    SnapshotVersion = 2,
+                    Sequence = selectionSequence,
+                    SelectionKey = selection.SelectionKey,
                     Stream = "marquee",
                     Selection = selection,
                     Media = BuildSystemMarqueeMedia(frontendSystemId, systemId, selectedSystem, roots),
-                    Generation = ResolveSystemGenerationState(roots)
+                    Generation = ResolveSystemGenerationState(roots),
+                    Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "projection")
                 }
             });
             _logger?.LogInformation(
@@ -223,6 +229,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             var fallbackSystemRoots = ResolveSystemRoots(systemId).ToList();
             var selection = new
             {
+                Sequence = selectionSequence,
+                SelectionKey = BuildSelectionKey(systemId, gameSlug),
                 Scope = "game",
                 FrontendSystem = frontendSystemId,
                 System = systemId,
@@ -251,10 +259,14 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                 CorrelationId = trigger.CorrelationId,
                 Payload = new
                 {
+                    SnapshotVersion = 2,
+                    Sequence = selectionSequence,
+                    SelectionKey = selection.SelectionKey,
                     Stream = "marquee",
                     Selection = selection,
                     Media = marquee,
-                    Generation = ResolveGameGenerationState(roots)
+                    Generation = ResolveGameGenerationState(roots),
+                    Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "projection")
                 }
             });
 
@@ -266,12 +278,16 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                 CorrelationId = trigger.CorrelationId,
                 Payload = new
                 {
+                    SnapshotVersion = 2,
+                    Sequence = selectionSequence,
+                    SelectionKey = selection.SelectionKey,
                     Stream = "topper",
                     Selection = selection,
                     Media = new
                     {
                         Topper = topper
-                    }
+                    },
+                    Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "projection")
                 }
             });
 
@@ -283,9 +299,13 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                 CorrelationId = trigger.CorrelationId,
                 Payload = new
                 {
+                    SnapshotVersion = 2,
+                    Sequence = selectionSequence,
+                    SelectionKey = selection.SelectionKey,
                     Stream = "instruction-card",
                     Selection = selection,
-                    Cards = cards
+                    Cards = cards,
+                    Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "projection")
                 }
             });
             _logger?.LogInformation(
@@ -388,6 +408,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
 
             var selection = new
             {
+                Sequence = selectionSequence,
+                SelectionKey = BuildSelectionKey(systemId, string.Empty),
                 Scope = "system",
                 FrontendSystem = frontendSystemId,
                 System = systemId,
@@ -404,15 +426,14 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                 CorrelationId = trigger.CorrelationId,
                 Payload = new
                 {
+                    SnapshotVersion = 2,
+                    Sequence = selectionSequence,
+                    SelectionKey = selection.SelectionKey,
                     Stream = "marquee",
                     Selection = selection,
                     Media = BuildSystemMarqueeMedia(frontendSystemId, systemId, selectedSystem, roots),
                     Generation = ResolveSystemGenerationState(roots),
-                    Latency = new
-                    {
-                        Source = "background-generation",
-                        ElapsedMs = (int)perf.Elapsed.TotalMilliseconds
-                    }
+                    Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "background-generation")
                 }
             });
 
@@ -461,6 +482,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
 
             var selection = new
             {
+                Sequence = selectionSequence,
+                SelectionKey = BuildSelectionKey(systemId, gameSlug),
                 Scope = "game",
                 FrontendSystem = frontendSystemId,
                 System = systemId,
@@ -477,15 +500,14 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                 CorrelationId = trigger.CorrelationId,
                 Payload = new
                 {
+                    SnapshotVersion = 2,
+                    Sequence = selectionSequence,
+                    SelectionKey = selection.SelectionKey,
                     Stream = "marquee",
                     Selection = selection,
                     Media = BuildGameMarqueeMedia(roots, fallbackSystemRoots),
                     Generation = ResolveGameGenerationState(roots),
-                    Latency = new
-                    {
-                        Source = "background-generation",
-                        ElapsedMs = (int)perf.Elapsed.TotalMilliseconds
-                    }
+                    Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "background-generation")
                 }
             });
 
@@ -1631,6 +1653,42 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         await Task.Delay(SelectionSnapshotDebounceMs);
     }
 
+    private static string BuildSelectionKey(string systemId, string gameSlug)
+    {
+        var normalizedSystem = (systemId ?? string.Empty).Trim().ToLowerInvariant();
+        var normalizedGame = (gameSlug ?? string.Empty).Trim().ToLowerInvariant();
+        return string.IsNullOrWhiteSpace(normalizedGame)
+            ? $"{normalizedSystem}|"
+            : $"{normalizedSystem}|{normalizedGame}";
+    }
+
+    private static DateTime ResolveReceivedAtUtc(EventEnvelope trigger)
+    {
+        return ReadDateTimeProperty(trigger.Payload, "ReceivedAtUtc") ?? NormalizeUtc(trigger.Ts);
+    }
+
+    private static object BuildSnapshotLatency(
+        EventEnvelope trigger,
+        long sequence,
+        string selectionKey,
+        DateTime receivedAtUtc,
+        DateTime publishedAtUtc,
+        Stopwatch perf,
+        string source)
+    {
+        return new
+        {
+            Source = source,
+            Trigger = trigger.Type,
+            Sequence = sequence,
+            SelectionKey = selectionKey,
+            ReceivedAtUtc = receivedAtUtc,
+            PublishedAtUtc = publishedAtUtc,
+            AgeMs = Math.Max(0, (int)(publishedAtUtc - receivedAtUtc).TotalMilliseconds),
+            ElapsedMs = (int)perf.Elapsed.TotalMilliseconds
+        };
+    }
+
     private static long ReadLongProperty(object? source, string propertyName)
     {
         var value = ReadProperty(source, propertyName);
@@ -1643,6 +1701,29 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             JsonElement { ValueKind: JsonValueKind.String } element when long.TryParse(element.GetString(), out var number) => number,
             string text when long.TryParse(text, out var number) => number,
             _ => 0
+        };
+    }
+
+    private static DateTime? ReadDateTimeProperty(object? source, string propertyName)
+    {
+        var value = ReadProperty(source, propertyName);
+        return value switch
+        {
+            DateTime date => NormalizeUtc(date),
+            DateTimeOffset date => date.UtcDateTime,
+            JsonElement { ValueKind: JsonValueKind.String } element when DateTime.TryParse(element.GetString(), out var date) => NormalizeUtc(date),
+            string text when DateTime.TryParse(text, out var date) => NormalizeUtc(date),
+            _ => null
+        };
+    }
+
+    private static DateTime NormalizeUtc(DateTime value)
+    {
+        return value.Kind switch
+        {
+            DateTimeKind.Utc => value,
+            DateTimeKind.Local => value.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
         };
     }
 

@@ -3,34 +3,52 @@
 	<view name="gamecarousel, detailed, grid">
 		<!-- APIEXPOSE:HISCORE:BEGIN -->
 		<text name="hiscoreline1" extra="true">
-			<text>#1 Nelfe 1770</text>
+			<text>#1 Nelfe 2140</text>
 		</text>
 		<text name="hiscoreline2" extra="true">
-			<text>#2 Nelfe 1330</text>
+			<text>#2 Nelfe 1770</text>
 		</text>
 		<text name="hiscoreline3" extra="true">
-			<text>#3 Nelfe 1290</text>
+			<text>#3 Nelfe 1440</text>
 		</text>
 		<text name="hiscoreline4" extra="true">
-			<text>#4 Nelfe 1180</text>
+			<text>#4 Nelfe 1330</text>
 		</text>
 		<text name="hiscoreline5" extra="true">
-			<text>#5 Nelfe 1160</text>
+			<text>#5 Nelfe 1290</text>
 		</text>
 		<text name="hiscoreline6" extra="true">
-			<text>#6 Nelfe 1150</text>
+			<text>#6 Nelfe 1180</text>
 		</text>
 		<text name="hiscoreline7" extra="true">
-			<text>#7 Nelfe 600</text>
+			<text>#7 Nelfe 1160</text>
 		</text>
 		<text name="hiscoreline8" extra="true">
-			<text>#8 Nelfe 232</text>
+			<text>#8 Nelfe 1150</text>
 		</text>
 		<text name="hiscoreline9" extra="true">
-			<text>#9 Nelfe 30</text>
+			<text>#9 Nelfe 1080</text>
 		</text>
 		<text name="hiscoreline10" extra="true">
-			<text>#10 Nelfe 20</text>
+			<text>#10 Nelfe 960</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 Nelfe 710</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 Nelfe 600</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 Nelfe 232</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 Nelfe 40</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 Nelfe 30</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 Nelfe 20</text>
 		</text>
 		<!-- APIEXPOSE:HISCORE:END -->
 	</view>

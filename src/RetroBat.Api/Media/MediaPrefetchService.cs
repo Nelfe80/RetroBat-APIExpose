@@ -266,7 +266,7 @@ public class MediaPrefetchService : IMediaPrefetchService
                     autogenGamelistUpdate.Changed ? "updated" : "unchanged",
                     new
                     {
-                        selectionMarqueeAutogenResult.ImportedPath,
+                        selectionMarqueeAutogenResult.GeneratedPath,
                         autogenGamelistUpdate.MediaContentChanged,
                         autogenGamelistUpdate.MetadataChanged,
                         afterRemoteDecision = true
@@ -284,7 +284,7 @@ public class MediaPrefetchService : IMediaPrefetchService
                     pendingAutogenUpdate.Changed ? "staged-extended" : "staged-extended-unchanged",
                     new
                     {
-                        selectionMarqueeAutogenResult.ImportedPath,
+                        selectionMarqueeAutogenResult.GeneratedPath,
                         pendingAutogenUpdate.MediaContentChanged,
                         pendingAutogenUpdate.MetadataChanged,
                         afterRemoteDecision = true

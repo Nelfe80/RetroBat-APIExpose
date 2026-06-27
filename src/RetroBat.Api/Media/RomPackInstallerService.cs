@@ -171,17 +171,6 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
         bool announceOnTheFly = true)
     {
         var onTheFly = _runtimeOptions.IsOnTheFlyRomInstallerEnabled();
-        if (onTheFly && announceOnTheFly)
-        {
-            ReportStartupProgress(0, 1, "on-the-fly actif: indexation sans extraction");
-            LogInstallerProgress("On-the-fly ROM Installer actif - indexation des packs sans installation des ROMs");
-            await EnsureParseGamelistOnlyAsync(cancellationToken);
-        }
-        else if (onTheFly)
-        {
-            await EnsureParseGamelistOnlyAsync(cancellationToken);
-        }
-
         if (!_runtimeOptions.IsRomPackInstallerEnabled() && !onTheFly)
         {
             ReportStartupProgress(1, 1, "inactif");
@@ -200,9 +189,31 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
 
         var packageSnapshot = BuildPackageDirectorySnapshot(PackageRoot);
         var settingsSignature = BuildEffectiveStartupSettingsSignature(onTheFly);
-        if (string.Equals(trigger, "startup", StringComparison.OrdinalIgnoreCase) &&
-            TrySkipStartupScanFromCache(packageSnapshot, settingsSignature, onTheFly, out var cacheSkipReason))
+        var cacheSkipReason = string.Empty;
+        var migratedLegacySignature = false;
+        var canSkipStartupScan = string.Equals(trigger, "startup", StringComparison.OrdinalIgnoreCase) &&
+            TrySkipStartupScanFromCache(packageSnapshot, settingsSignature, onTheFly, out cacheSkipReason);
+        if (!canSkipStartupScan &&
+            string.Equals(trigger, "startup", StringComparison.OrdinalIgnoreCase) &&
+            onTheFly &&
+            IsSettingEnabled(_lastInstallerSettings, "ParseGamelistOnly"))
         {
+            var legacySettingsSignature = BuildLegacyStartupSettingsSignature(onTheFly);
+            canSkipStartupScan = TrySkipStartupScanFromCache(
+                packageSnapshot,
+                legacySettingsSignature,
+                onTheFly,
+                out cacheSkipReason);
+            migratedLegacySignature = canSkipStartupScan;
+        }
+
+        if (canSkipStartupScan)
+        {
+            if (migratedLegacySignature)
+            {
+                SaveStartupScanState(packageSnapshot, settingsSignature, onTheFly);
+            }
+
             ReportStartupProgress(1, 1, "cache-hit");
             await AppendInstallerLogAsync(
                 "startup-scan-cache-hit",
@@ -227,6 +238,20 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
                 },
                 cancellationToken);
             return;
+        }
+
+        if (onTheFly)
+        {
+            if (announceOnTheFly)
+            {
+                ReportStartupProgress(0, 1, "on-the-fly actif: indexation sans extraction");
+                LogInstallerProgress("On-the-fly ROM Installer actif - indexation des packs sans installation des ROMs");
+            }
+
+            await EnsureParseGamelistOnlyAsync(cancellationToken);
+            _lastInstallerSettings = ReadInstallerSettings() ??
+                new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            settingsSignature = BuildEffectiveStartupSettingsSignature(onTheFly);
         }
 
         await AppendInstallerLogAsync("scan-enabled", new { trigger, onTheFly }, cancellationToken);
@@ -4455,6 +4480,20 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
         return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(builder.ToString())));
     }
 
+    private string BuildLegacyStartupSettingsSignature(bool onTheFly)
+    {
+        var legacySettings = _lastInstallerSettings
+            .Where(pair => !string.Equals(pair.Key, "ParseGamelistOnly", StringComparison.OrdinalIgnoreCase))
+            .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase);
+        var builder = new StringBuilder();
+        builder.Append("installer=").Append(_runtimeOptions.IsRomPackInstallerEnabled()).AppendLine();
+        builder.Append("onTheFly=").Append(onTheFly).AppendLine();
+        builder.Append("unzip=").Append(_runtimeOptions.ShouldUnzipRomPackInstallerRoms()).AppendLine();
+        builder.Append("esSettings=").Append(ComputeInstallerSettingsSignature(legacySettings, includeParseGamelistOnly: false)).AppendLine();
+        builder.Append("importer=").Append(ImporterVersion).AppendLine();
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(builder.ToString())));
+    }
+
     private static PackageDirectorySnapshot BuildPackageDirectorySnapshot(string packageRoot)
     {
         if (!Directory.Exists(packageRoot))
@@ -4487,11 +4526,17 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
         return new PackageDirectorySnapshot(packageRoot, true, fingerprint, packages.Length, packages);
     }
 
-    private static string ComputeInstallerSettingsSignature(IReadOnlyDictionary<string, string> values)
+    private static string ComputeInstallerSettingsSignature(
+        IReadOnlyDictionary<string, string> values,
+        bool includeParseGamelistOnly = true)
     {
+        var settingNames = includeParseGamelistOnly
+            ? InstallerSettingNames
+            : InstallerSettingNames.Where(name =>
+                !string.Equals(name, "ParseGamelistOnly", StringComparison.OrdinalIgnoreCase));
         var joined = string.Join(
             "\n",
-            InstallerSettingNames.Select(key => key + "=" + NormalizeInstallerSettingValue(values.GetValueOrDefault(key))));
+            settingNames.Select(key => key + "=" + NormalizeInstallerSettingValue(values.GetValueOrDefault(key))));
         return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(joined)));
     }
 
@@ -4514,7 +4559,8 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
         "global.apiexpose.romset.pack_installer.enabled",
         "global.apiexpose.romset.pack_installer.unzip_roms",
         "global.apiexpose.romset.pack_installer.on_the_fly.enabled",
-        "global.apiexpose.romset.pack_installer.on_the_fly.trigger"
+        "global.apiexpose.romset.pack_installer.on_the_fly.trigger",
+        "ParseGamelistOnly"
     ];
 
     private static bool IsInstallerSetting(string name)

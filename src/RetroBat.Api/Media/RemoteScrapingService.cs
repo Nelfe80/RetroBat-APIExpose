@@ -462,13 +462,8 @@ public sealed class RemoteScrapingService
             if (marqueeAutogenResult.WasGenerated)
             {
                 result.Status = "completed";
-                result.Message = "ScreenScraper data imported and missing marquee generated.";
+                result.Message = "ScreenScraper data imported and generated marquee fallback created.";
                 result.MediaContentChanged = true;
-                result.RequiresGamelistPersistence = true;
-                if (!result.ImportedKinds.Contains(MediaKinds.Marquee, StringComparer.OrdinalIgnoreCase))
-                {
-                    result.ImportedKinds.Add(MediaKinds.Marquee);
-                }
 
                 decision.Status = result.Status;
                 decision.Message = result.Message;

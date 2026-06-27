@@ -9,6 +9,8 @@ public sealed class PendingExtendedGamelistHostedService : IHostedService
 {
     private readonly GamelistUpdateService _gamelistUpdateService;
     private readonly ILogger<PendingExtendedGamelistHostedService>? _logger;
+    private CancellationTokenSource? _backgroundCts;
+    private Task? _backgroundTask;
 
     public PendingExtendedGamelistHostedService(
         GamelistUpdateService gamelistUpdateService,
@@ -18,7 +20,14 @@ public sealed class PendingExtendedGamelistHostedService : IHostedService
         _logger = logger;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        _backgroundCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        _backgroundTask = Task.Run(() => ApplyPendingExtendedGamelistsInBackgroundAsync(_backgroundCts.Token), CancellationToken.None);
+        return Task.CompletedTask;
+    }
+
+    private async Task ApplyPendingExtendedGamelistsInBackgroundAsync(CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
         try
@@ -34,7 +43,7 @@ public sealed class PendingExtendedGamelistHostedService : IHostedService
                     processedSystems = systems,
                     elapsedMs = stopwatch.ElapsedMilliseconds
                 },
-                cancellationToken);
+                CancellationToken.None);
             if (systems > 0)
             {
                 _logger?.LogInformation(
@@ -61,8 +70,22 @@ public sealed class PendingExtendedGamelistHostedService : IHostedService
         }
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
-        return Task.CompletedTask;
+        if (_backgroundCts != null)
+        {
+            await _backgroundCts.CancelAsync();
+        }
+
+        if (_backgroundTask != null)
+        {
+            try
+            {
+                await _backgroundTask.WaitAsync(TimeSpan.FromSeconds(2), cancellationToken);
+            }
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            {
+            }
+        }
     }
 }

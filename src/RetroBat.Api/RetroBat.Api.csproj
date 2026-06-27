@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="$(MSBuildProjectDirectory)\artifacts\**\*" />
+    <Content Remove="$(MSBuildProjectDirectory)\..\..\artifacts\**\*" />
+    <None Remove="$(MSBuildProjectDirectory)\artifacts\**\*" />
+    <None Remove="$(MSBuildProjectDirectory)\..\..\artifacts\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
