@@ -81,3 +81,7 @@ logs/
 
 # APIExpose Data Pack (protected by DATA-LICENSE.md, shipped via GitHub Releases)
 /resources/
+
+# MkDocs build output
+site/
+
