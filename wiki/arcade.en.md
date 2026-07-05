@@ -8,7 +8,7 @@ The `resources\dynpanels\` folder holds control-panel definitions: buttons, colo
 
 ## RAM definitions
 
-The `resources\ram\` folder holds per-game memory definitions (`.MEM` files): they detect game events in real time — score, lives, power-ups — straight from the game's RAM.
+The `resources\ram\` folder holds per-game memory definitions (`.MEM` files): they detect game events in real time — score, lives, power-ups — straight from the game's RAM. You can write your own: see [Creating .MEM files](mem.md).
 
 !!! note "The Data Pack"
     `dynpanels`, `ram`, gamelists and the other `resources\` data form the **APIExpose Data Pack**, the result of long curation work. It ships in the `full` release archive and is protected by its own license (`DATA-LICENSE.md`) — see [Licensing](licences.md).

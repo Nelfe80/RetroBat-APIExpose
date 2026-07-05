@@ -8,7 +8,7 @@ Le dossier `resources\dynpanels\` contient les définitions des panneaux de cont
 
 ## Les définitions RAM
 
-Le dossier `resources\ram\` contient les définitions mémoire des jeux (fichiers `.MEM`) : elles permettent de détecter en temps réel les événements d'une partie — score, vies, power-ups — directement dans la RAM du jeu.
+Le dossier `resources\ram\` contient les définitions mémoire des jeux (fichiers `.MEM`) : elles permettent de détecter en temps réel les événements d'une partie — score, vies, power-ups — directement dans la RAM du jeu. Vous pouvez écrire les vôtres : voir [Créer ses fichiers .MEM](mem.md).
 
 !!! note "Le Data Pack"
     `dynpanels`, `ram`, gamelists et autres données de `resources\` constituent l'**APIExpose Data Pack**, fruit d'un long travail de curation. Il est inclus dans l'archive `full` des releases et protégé par sa propre licence (`DATA-LICENSE.md`) — voir [Licences](licences.md).

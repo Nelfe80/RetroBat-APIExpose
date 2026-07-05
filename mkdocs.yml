@@ -53,6 +53,7 @@ plugins:
             Médias et scraping: Media and scraping
             ROMs et collections: ROMs and collections
             Arcade et panels: Arcade and panels
+            Créer ses fichiers .MEM: Creating .MEM files
             API locale: Local API
             Dépannage: Troubleshooting
             Licences: Licensing
@@ -75,6 +76,7 @@ nav:
   - Médias et scraping: medias.md
   - ROMs et collections: roms.md
   - Arcade et panels: arcade.md
+  - Créer ses fichiers .MEM: mem.md
   - API locale: api.md
   - Dépannage: depannage.md
   - Licences: licences.md
