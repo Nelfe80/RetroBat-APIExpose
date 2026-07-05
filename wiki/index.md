@@ -2,7 +2,7 @@
 
 **APIExpose** est le moteur qui donne des super-pouvoirs à votre installation RetroBat : médias automatiques, gamelists localisées, packs de ROMs, scraping intelligent, collections, données arcade et une API locale en temps réel dont se nourrissent les plugins [MarqueeManager](https://nelfe80.github.io/RetroBat-Marquee-Manager/) et [LedManager](https://nelfe80.github.io/RetroBat-Led-Manager/).
 
-![APIExpose pour RetroBat](assets/accueil.png)
+![APIExpose pour RetroBat](assets/accueil.jpg)
 
 ## Ce que fait APIExpose
 
@@ -18,8 +18,8 @@
 <div class="grid cards" markdown>
 
 - **[Premiers pas](premiers-pas.md)** — installer APIExpose et vérifier qu'il tourne.
+- **[Menus et options](menus.md)** — toutes les options APIExpose dans EmulationStation.
 - **[Médias et scraping](medias.md)** — vos médias prioritaires et le scraping automatique.
-- **[ROMs et collections](roms.md)** — importer des packs et nettoyer vos listes.
 - **[API locale](api.md)** — endpoints et flux temps réel pour outils et thèmes.
 
 </div>

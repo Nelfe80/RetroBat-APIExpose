@@ -49,6 +49,7 @@ plugins:
           nav_translations:
             Accueil: Home
             Premiers pas: Getting started
+            Menus et options: Menus and options
             Médias et scraping: Media and scraping
             ROMs et collections: ROMs and collections
             Arcade et panels: Arcade and panels
@@ -70,6 +71,7 @@ markdown_extensions:
 nav:
   - Accueil: index.md
   - Premiers pas: premiers-pas.md
+  - Menus et options: menus.md
   - Médias et scraping: medias.md
   - ROMs et collections: roms.md
   - Arcade et panels: arcade.md
