@@ -1,0 +1,16 @@
+RetroBat Wrapper (libretro proxy DLL)
+======================================
+
+File        : wrapper.dll
+Version     : 0.300.0.0
+Build date  : 2026-07-01
+SHA-256     : 2FBF719E1F466EE147530021C009349CBF2DC250B01354715A3970AC8566D257
+
+Verify on Windows (PowerShell):
+  Get-FileHash wrapper.dll -Algorithm SHA256
+
+The hash above must match the one published in the official documentation
+and release notes. If it does not match, do not use the DLL.
+
+The wrapper source code is private. The compiled DLL is distributed with
+APIExpose and covered by the APIExpose license scheme (see LICENSE.md).
