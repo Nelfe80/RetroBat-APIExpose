@@ -151,7 +151,18 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
             return;
         }
 
-        var slots = ReadDynpanelSlots(dynpanel.Value);
+        var buttonsPerPlayerSetting = ReadIntSetting("global.apiexpose.control_manager.buttons_per_player", 6);
+
+        // The ES "CONTROL PANEL" selector (per system, per game) picks a named
+        // system_template layout: e.g. snes.apiexpose_panel_snes = "6-Button:Score Master".
+        var selectedLayout = ResolvePanelLayoutSelection(systemId, Path.GetFileName(gamePath));
+        var slots = ReadTemplateLayoutSlots(dynpanel.Value, selectedLayout, buttonsPerPlayerSetting, out var layoutUsed);
+        if (slots.Count == 0)
+        {
+            slots = ReadDynpanelSlots(dynpanel.Value);
+            layoutUsed = "convention";
+        }
+
         if (slots.Count == 0)
         {
             _logger?.LogDebug("Remap export skipped for {System}: dynpanel has no slot mapping.", systemId);
@@ -165,15 +176,14 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
             return;
         }
 
-        var buttonsPerPlayer = ReadIntSetting("global.apiexpose.control_manager.buttons_per_player", 6);
         var playerCount = Math.Clamp(ReadIntSetting("global.apiexpose.control_manager.player_count", 2), 1, 8);
 
         var gameFileName = Path.GetFileNameWithoutExtension(gamePath);
         var targetDir = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "config", "remaps", coreFolder);
         var targetPath = Path.Combine(targetDir, gameFileName + ".rmp");
 
-        var body = BuildRmp(slots, buttonsPerPlayer, playerCount);
-        WriteGuarded(targetPath, body, systemId, gameFileName, reason);
+        var body = BuildRmp(slots, playerCount);
+        WriteGuarded(targetPath, body, systemId, gameFileName, $"{reason} layout={layoutUsed}");
     }
 
     private (string? Emulator, string? Core) ResolveEmulatorAndCore(string systemId)
@@ -282,6 +292,95 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
 
     private sealed record DynpanelSlot(int Slot, string LibretroButton, int RetropadId);
 
+    /// <summary>Reads the CONTROL PANEL selector: game override first, then system, empty = AUTO.</summary>
+    private string? ResolvePanelLayoutSelection(string systemId, string gameFileName)
+    {
+        var key = $"apiexpose_panel_{systemId.ToLowerInvariant()}";
+        var value = ReadStringSetting($"{systemId}[\"{gameFileName}\"].{key}")
+                    ?? ReadStringSetting($"{systemId}.{key}");
+        return string.IsNullOrWhiteSpace(value) || value.Equals("auto", StringComparison.OrdinalIgnoreCase)
+            ? null
+            : value;
+    }
+
+    /// <summary>
+    /// Reads the buttons of a system_template layout. `selectedLayout` comes from the
+    /// ES CONTROL PANEL selector; when null (AUTO) the layout matching the declared
+    /// cabinet button count is chosen (exact "N-Button", else first "N-Button:*",
+    /// else the largest layout that fits).
+    /// </summary>
+    private static IReadOnlyList<DynpanelSlot> ReadTemplateLayoutSlots(JsonElement root, string? selectedLayout, int buttonsPerPlayer, out string layoutUsed)
+    {
+        layoutUsed = selectedLayout ?? "auto";
+        if (!root.TryGetProperty("system_template", out var template) && !root.TryGetProperty("core_template", out template))
+        {
+            return Array.Empty<DynpanelSlot>();
+        }
+
+        if (!template.TryGetProperty("layouts", out var layouts) || layouts.ValueKind != JsonValueKind.Object)
+        {
+            return Array.Empty<DynpanelSlot>();
+        }
+
+        JsonElement layout = default;
+        var found = false;
+
+        if (selectedLayout is not null)
+        {
+            found = layouts.TryGetProperty(selectedLayout, out layout);
+        }
+
+        if (!found)
+        {
+            var names = layouts.EnumerateObject().Select(p => p.Name).ToArray();
+            var pick = names.FirstOrDefault(n => n.Equals($"{buttonsPerPlayer}-Button", StringComparison.OrdinalIgnoreCase))
+                       ?? names.FirstOrDefault(n => n.StartsWith($"{buttonsPerPlayer}-Button:", StringComparison.OrdinalIgnoreCase))
+                       ?? names.Where(n => LeadingCount(n) <= buttonsPerPlayer)
+                               .OrderByDescending(LeadingCount)
+                               .FirstOrDefault();
+            if (pick is null)
+            {
+                return Array.Empty<DynpanelSlot>();
+            }
+
+            layoutUsed = pick + " (auto)";
+            found = layouts.TryGetProperty(pick, out layout);
+        }
+
+        if (!found || !layout.TryGetProperty("buttons", out var buttons) || buttons.ValueKind != JsonValueKind.Object)
+        {
+            return Array.Empty<DynpanelSlot>();
+        }
+
+        var slots = new List<DynpanelSlot>();
+        foreach (var entry in buttons.EnumerateObject())
+        {
+            if (entry.Value.ValueKind != JsonValueKind.Object)
+            {
+                continue;
+            }
+
+            var rmpButton = entry.Value.TryGetProperty("rmp_button", out var rb) ? rb.GetString() : null;
+            var retropad = entry.Value.TryGetProperty("retropad_id", out var rp) && rp.TryGetInt32(out var id) ? id : -1;
+            var slot = entry.Value.TryGetProperty("panel_slot", out var ps) && ps.TryGetInt32(out var s)
+                ? s
+                : int.TryParse(entry.Name, out var n) ? n : -1;
+
+            if (!string.IsNullOrWhiteSpace(rmpButton) && retropad >= 0 && slot > 0)
+            {
+                slots.Add(new DynpanelSlot(slot, rmpButton!, retropad));
+            }
+        }
+
+        return slots.OrderBy(s => s.Slot).ToArray();
+
+        static int LeadingCount(string name)
+        {
+            var dash = name.IndexOf('-');
+            return dash > 0 && int.TryParse(name[..dash], out var count) ? count : 0;
+        }
+    }
+
     private static IReadOnlyList<DynpanelSlot> ReadDynpanelSlots(JsonElement root)
     {
         var slots = new List<DynpanelSlot>();
@@ -309,14 +408,14 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
         return slots.OrderBy(s => s.Slot).ToArray();
     }
 
-    private static string BuildRmp(IReadOnlyList<DynpanelSlot> slots, int buttonsPerPlayer, int playerCount)
+    private static string BuildRmp(IReadOnlyList<DynpanelSlot> slots, int playerCount)
     {
         var sb = new StringBuilder();
         for (var player = 1; player <= playerCount; player++)
         {
             sb.AppendLine($"input_libretro_device_p{player} = \"1\"");
             sb.AppendLine($"input_player{player}_analog_dpad_mode = \"0\"");
-            foreach (var slot in slots.Where(s => s.Slot <= Math.Max(1, buttonsPerPlayer)))
+            foreach (var slot in slots)
             {
                 sb.AppendLine($"input_player{player}_btn_{slot.LibretroButton} = \"{slot.RetropadId}\"");
             }
