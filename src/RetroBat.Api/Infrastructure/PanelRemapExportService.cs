@@ -401,15 +401,20 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
                 continue;
             }
 
-            var rmpButton = entry.Value.TryGetProperty("rmp_button", out var rb) ? rb.GetString() : null;
+            // Legacy-validated formula (LPEvents.py, confirmed on Score Master):
+            // the rmp line label comes from the CONTROLLER name of the layout button,
+            // the value from its retropad_id. The rmp_button field encodes the slot's
+            // physical libretro identity and must NOT be used as the label.
+            var controller = entry.Value.TryGetProperty("controller", out var ctl) ? ctl.GetString() : null;
+            var label = ControllerToRmpLabel(controller);
             var retropad = entry.Value.TryGetProperty("retropad_id", out var rp) && rp.TryGetInt32(out var id) ? id : -1;
             var slot = entry.Value.TryGetProperty("panel_slot", out var ps) && ps.TryGetInt32(out var s)
                 ? s
                 : int.TryParse(entry.Name, out var n) ? n : -1;
 
-            if (!string.IsNullOrWhiteSpace(rmpButton) && retropad >= 0 && slot > 0)
+            if (label is not null && retropad >= 0 && slot > 0)
             {
-                slots.Add(new DynpanelSlot(slot, rmpButton!, retropad));
+                slots.Add(new DynpanelSlot(slot, label, retropad));
             }
         }
 
@@ -420,6 +425,26 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
             var dash = name.IndexOf('-');
             return dash > 0 && int.TryParse(name[..dash], out var count) ? count : 0;
         }
+    }
+
+    private static string? ControllerToRmpLabel(string? controller)
+    {
+        return controller?.Trim().ToUpperInvariant() switch
+        {
+            "A" => "a",
+            "B" => "b",
+            "X" => "x",
+            "Y" => "y",
+            "PAGEUP" => "l",
+            "PAGEDOWN" => "r",
+            "L2" => "l2",
+            "R2" => "r2",
+            "L3" => "l3",
+            "R3" => "r3",
+            "START" => "start",
+            "SELECT" or "COIN" => "select",
+            _ => null
+        };
     }
 
     private static IReadOnlyList<DynpanelSlot> ReadDynpanelSlots(JsonElement root)
