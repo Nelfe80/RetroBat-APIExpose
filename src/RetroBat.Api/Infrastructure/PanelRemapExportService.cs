@@ -48,6 +48,25 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
 
     private bool Enabled => _configuration.GetValue("ApiExpose:PanelRemapExport:Enabled", false);
 
+    private static string TracePath => Path.Combine(RetroBatPaths.RuntimeLogRoot, "panel-remap.log");
+
+    /// <summary>File trace next to the other .log files: the API console is hidden,
+    /// so this is the only way for the user (and support) to see what was decided.</summary>
+    private void Trace(string message)
+    {
+        try
+        {
+            Directory.CreateDirectory(RetroBatPaths.RuntimeLogRoot);
+            File.AppendAllText(TracePath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}  {message}\n");
+        }
+        catch
+        {
+            // never let logging break the pipeline
+        }
+
+        _logger?.LogInformation("[panel-remap] {Message}", message);
+    }
+
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _subscription = _eventBus.Subscribe<EventEnvelope>(OnEvent);
@@ -85,9 +104,11 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
 
             if (selected is null || string.IsNullOrWhiteSpace(selected.SystemId) || string.IsNullOrWhiteSpace(selected.GamePath))
             {
+                Trace($"event={envelope.Type} but no game context (system={selected?.SystemId ?? "-"} game={selected?.GamePath ?? "-"}) -> nothing to do");
                 return;
             }
 
+            Trace($"event={envelope.Type} system={selected.SystemId} game={selected.GamePath}");
             lock (_generateLock)
             {
                 GenerateForGame(selected.SystemId!, selected.GamePath!, reason: isPanelSettingsChange ? "panel-settings-changed" : "game-selected");
@@ -95,6 +116,7 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
         }
         catch (Exception ex)
         {
+            Trace($"FAILED: {ex.Message}");
             _logger?.LogWarning(ex, "Panel remap export failed.");
         }
     }
@@ -124,15 +146,16 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
     private void GenerateForGame(string systemId, string gamePath, string reason)
     {
         var (emulator, core) = ResolveEmulatorAndCore(systemId);
+        Trace($"resolve {systemId}: emulator={emulator ?? "?"} core={core ?? "?"}");
         if (!string.Equals(emulator, "libretro", StringComparison.OrdinalIgnoreCase))
         {
-            _logger?.LogDebug("Remap export skipped for {System}: emulator {Emulator} (only libretro in this phase).", systemId, emulator ?? "?");
+            Trace($"skipped {systemId}: emulator '{emulator ?? "?"}' is not libretro (only libretro in this phase)");
             return;
         }
 
         if (string.IsNullOrWhiteSpace(core))
         {
-            _logger?.LogDebug("Remap export skipped for {System}: no core resolved.", systemId);
+            Trace($"skipped {systemId}: no core resolved");
             return;
         }
 
@@ -140,14 +163,14 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
         {
             // Doctrine: arcade via the shared MAME cfg only; a .rmp on the MAME core
             // would stack with it unpredictably.
-            _logger?.LogDebug("Remap export skipped for {System}: MAME core is cfg-driven by doctrine.", systemId);
+            Trace($"skipped {systemId}: MAME core is cfg-driven by doctrine");
             return;
         }
 
         var dynpanel = LoadDynpanel(systemId, RomNameFrom(gamePath));
         if (dynpanel is null)
         {
-            _logger?.LogDebug("Remap export skipped for {System}: no dynpanel data.", systemId);
+            Trace($"skipped {systemId}: no dynpanel data");
             return;
         }
 
@@ -165,14 +188,14 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
 
         if (slots.Count == 0)
         {
-            _logger?.LogDebug("Remap export skipped for {System}: dynpanel has no slot mapping.", systemId);
+            Trace($"skipped {systemId}: dynpanel has no slot mapping");
             return;
         }
 
         var coreFolder = ResolveRemapFolder(core);
         if (coreFolder is null)
         {
-            _logger?.LogDebug("Remap export skipped for {System}: no corename for core {Core}.", systemId, core);
+            Trace($"skipped {systemId}: no corename found in emulators/retroarch/info/{core}_libretro.info");
             return;
         }
 
@@ -461,13 +484,14 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
 
             if (!existingFirstLine.StartsWith(MarkerPrefix, StringComparison.Ordinal))
             {
-                _logger?.LogInformation("Remap export kept user file untouched: {Path}", targetPath);
+                Trace($"KEPT user file untouched (no marker): {targetPath}");
                 return;
             }
 
             if (existingFirstLine.Contains($"hash={hash}", StringComparison.Ordinal))
             {
-                return; // already up to date
+                Trace($"up to date, no rewrite: {targetPath}");
+                return;
             }
 
             try
@@ -482,7 +506,7 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
 
         Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
         File.WriteAllText(targetPath, content);
-        _logger?.LogInformation("Remap exported ({Reason}): system={System} game={Game} -> {Path}", reason, systemId, game, targetPath);
+        Trace($"WROTE ({reason}): {targetPath} [{body.Split('\n').Length} lines]");
     }
 
     private string? ReadStringSetting(string name)
