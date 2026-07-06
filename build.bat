@@ -35,7 +35,7 @@ if %ERRORLEVEL% equ 0 (
 echo.
 echo [1/2] Publication Release win-x64...
 echo.
-powershell -NoProfile -ExecutionPolicy Bypass -File "%RELEASE_SCRIPT%"
+powershell -NoProfile -ExecutionPolicy RemoteSigned -File "%RELEASE_SCRIPT%"
 
 if %ERRORLEVEL% neq 0 (
     echo.

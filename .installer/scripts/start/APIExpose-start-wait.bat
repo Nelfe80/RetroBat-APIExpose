@@ -6,44 +6,61 @@ rem This script is intended to be copied to:
 rem   emulationstation\.emulationstation\scripts\start\APIExpose-start-wait.bat
 rem EmulationStation runs the "start" event synchronously before its normal
 rem metadata/window/view initialization, so waiting here blocks ES startup.
+rem Pure batch + curl.exe (built into Windows 10+) on purpose: PowerShell
+rem one-liners doing web requests are flagged as Trojan:Win32/ClickFix.
 
 for %%I in ("%~dp0..\..\..\..\plugins\APIExpose") do set "PLUGIN_DIR=%%~fI"
 set "API_EXE=%PLUGIN_DIR%\RetroBat.Api.exe"
 set "LOG_DIR=%PLUGIN_DIR%\.log"
 set "LOG_FILE=%LOG_DIR%\es-start-hook.log"
+set "READY_URL=http://127.0.0.1:12345/api/v1/startup/ready"
+set "HEALTH_URL=http://127.0.0.1:12345/api/v1/health"
 
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%" >nul 2>&1
+echo %date% %time% ES start hook entered.>> "%LOG_FILE%"
 
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-"$ErrorActionPreference='SilentlyContinue'; ^
- $api='%API_EXE%'; ^
- $wd='%PLUGIN_DIR%'; ^
- $log='%LOG_FILE%'; ^
- function Log([string]$m){ $stamp=(Get-Date).ToString('yyyy-MM-dd HH:mm:ss.fff'); Add-Content -LiteralPath $log -Value ($stamp + ' ' + $m) -Encoding UTF8 }; ^
- Log 'ES start hook entered.'; ^
- if (-not (Test-Path -LiteralPath $api)) { Log ('ERROR missing API executable: ' + $api); exit 2 }; ^
- $ready=$false; ^
- try { $r=Invoke-RestMethod -Uri 'http://127.0.0.1:12345/api/v1/startup/ready' -TimeoutSec 2; if ($r.ready -eq $true) { $ready=$true } } catch { }; ^
- if (-not $ready) { ^
-   $healthy=$false; ^
-   try { $h=Invoke-RestMethod -Uri 'http://127.0.0.1:12345/api/v1/health' -TimeoutSec 2; if ($h.status) { $healthy=$true; Log ('API already running, health=' + $h.status) } } catch { }; ^
-   if (-not $healthy) { ^
-     $procs=Get-Process -Name 'RetroBat.Api' -ErrorAction SilentlyContinue; ^
-     foreach($p in $procs){ try { Log ('Stopping stale RetroBat.Api PID ' + $p.Id); Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue } catch { } }; ^
-     Start-Sleep -Milliseconds 500; ^
-     try { ^
-       Unblock-File -LiteralPath $api -ErrorAction SilentlyContinue; ^
-       $p=Start-Process -FilePath $api -ArgumentList @('--urls','http://127.0.0.1:12345') -WorkingDirectory $wd -WindowStyle Hidden -PassThru -ErrorAction Stop; ^
-       Log ('APIExpose started PID ' + $p.Id); ^
-     } catch { Log ('ERROR failed to start APIExpose: ' + $_.Exception.Message); exit 3 } ^
-   } ^
- }; ^
- $deadline=(Get-Date).AddMinutes(10); ^
- do { ^
-   try { $r=Invoke-RestMethod -Uri 'http://127.0.0.1:12345/api/v1/startup/ready' -TimeoutSec 2; if ($r.ready -eq $true) { Log 'APIExpose startup ready. ES can continue.'; exit 0 } } catch { }; ^
-   Start-Sleep -Milliseconds 500; ^
- } while ((Get-Date) -lt $deadline); ^
- Log 'ERROR timeout waiting for /api/v1/startup/ready'; ^
- exit 4"
+if not exist "%API_EXE%" (
+  echo %date% %time% ERROR missing API executable: %API_EXE%>> "%LOG_FILE%"
+  exit /b 2
+)
 
-exit /b %ERRORLEVEL%
+rem Already fully started?
+curl.exe -s -m 2 "%READY_URL%" 2>nul | findstr /C:"\"ready\":true" /C:"\"ready\": true" >nul
+if not errorlevel 1 (
+  echo %date% %time% APIExpose already ready.>> "%LOG_FILE%"
+  exit /b 0
+)
+
+rem Healthy but still starting? Then just wait below. Otherwise (re)start it.
+curl.exe -s -m 2 "%HEALTH_URL%" 2>nul | find /I "healthy" >nul
+if not errorlevel 1 (
+  echo %date% %time% API already running, waiting for readiness.>> "%LOG_FILE%"
+  goto waitready
+)
+
+rem Not answering: clear any stale process, then start fresh.
+tasklist /FI "IMAGENAME eq RetroBat.Api.exe" 2>nul | find /I "RetroBat.Api.exe" >nul
+if not errorlevel 1 (
+  echo %date% %time% Stopping stale RetroBat.Api process.>> "%LOG_FILE%"
+  taskkill /IM RetroBat.Api.exe /F >nul 2>&1
+  ping -n 2 127.0.0.1 >nul
+)
+
+start "APIExpose" /D "%PLUGIN_DIR%" /MIN "%API_EXE%" --urls http://127.0.0.1:12345
+echo %date% %time% APIExpose started.>> "%LOG_FILE%"
+
+:waitready
+rem Up to 10 minutes: 600 x (2s curl timeout max + 1s pause).
+set /a TRIES=600
+:waitloop
+curl.exe -s -m 2 "%READY_URL%" 2>nul | findstr /C:"\"ready\":true" /C:"\"ready\": true" >nul
+if not errorlevel 1 (
+  echo %date% %time% APIExpose startup ready. ES can continue.>> "%LOG_FILE%"
+  exit /b 0
+)
+ping -n 2 127.0.0.1 >nul
+set /a TRIES-=1
+if %TRIES% GTR 0 goto waitloop
+
+echo %date% %time% ERROR timeout waiting for startup/ready.>> "%LOG_FILE%"
+exit /b 4
