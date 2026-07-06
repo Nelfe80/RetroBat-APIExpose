@@ -22,6 +22,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 
+// --hide-console: the ES start hook launches the exe directly and lets it hide
+// its own window (PowerShell -WindowStyle Hidden tripped antivirus ClickFix
+// heuristics, and start /MIN alone leaves a visible window behind ES).
+if (args.Any(arg => string.Equals(arg, "--hide-console", StringComparison.OrdinalIgnoreCase)))
+{
+    RetroBat.Api.Infrastructure.ConsoleWindowNative.Hide();
+}
+
 var testModeRequested = args.Any(arg =>
     string.Equals(arg, "--test-mode", StringComparison.OrdinalIgnoreCase) ||
     string.Equals(arg, "/test-mode", StringComparison.OrdinalIgnoreCase) ||
@@ -30,7 +38,8 @@ var hostArgs = args
     .Where(arg =>
         !string.Equals(arg, "--test-mode", StringComparison.OrdinalIgnoreCase) &&
         !string.Equals(arg, "/test-mode", StringComparison.OrdinalIgnoreCase) &&
-        !string.Equals(arg, "test-mode", StringComparison.OrdinalIgnoreCase))
+        !string.Equals(arg, "test-mode", StringComparison.OrdinalIgnoreCase) &&
+        !string.Equals(arg, "--hide-console", StringComparison.OrdinalIgnoreCase))
     .ToArray();
 
 var builder = WebApplication.CreateBuilder(hostArgs);

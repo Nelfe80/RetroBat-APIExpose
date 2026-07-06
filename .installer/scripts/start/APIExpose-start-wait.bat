@@ -46,7 +46,7 @@ if not errorlevel 1 (
   ping -n 2 127.0.0.1 >nul
 )
 
-start "APIExpose" /D "%PLUGIN_DIR%" /MIN "%API_EXE%" --urls http://127.0.0.1:12345
+start "APIExpose" /D "%PLUGIN_DIR%" /MIN "%API_EXE%" --urls http://127.0.0.1:12345 --hide-console
 echo %date% %time% APIExpose started.>> "%LOG_FILE%"
 
 :waitready
