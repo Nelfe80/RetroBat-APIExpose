@@ -177,13 +177,31 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
         }
 
         var playerCount = Math.Clamp(ReadIntSetting("global.apiexpose.control_manager.player_count", 2), 1, 8);
-
-        var gameFileName = Path.GetFileNameWithoutExtension(gamePath);
         var targetDir = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "config", "remaps", coreFolder);
-        var targetPath = Path.Combine(targetDir, gameFileName + ".rmp");
-
         var body = BuildRmp(slots, playerCount);
-        WriteGuarded(targetPath, body, systemId, gameFileName, $"{reason} layout={layoutUsed}");
+
+        // RetroArch precedence: game > content-directory > core. The system panel is
+        // expressed as a CONTENT-DIRECTORY remap (named after the roms folder), which
+        // covers every game of the system and beats a generic <core>.rmp, without
+        // bleeding into other systems sharing the same core (e.g. Genesis Plus GX).
+        var contentDirName = Path.GetFileName(Path.GetDirectoryName(gamePath)?.TrimEnd('\\', '/') ?? systemId);
+        if (string.IsNullOrWhiteSpace(contentDirName))
+        {
+            contentDirName = systemId;
+        }
+
+        WriteGuarded(Path.Combine(targetDir, contentDirName + ".rmp"), body, systemId, contentDirName, $"{reason} scope=content-dir layout={layoutUsed}");
+
+        // A per-GAME remap is only written when the user made a game-specific choice
+        // (per-game CONTROL PANEL selector) or a per-game dynpanel exists: otherwise
+        // the content-dir remap is enough and we do not litter the remaps folder.
+        var gameFileName = Path.GetFileNameWithoutExtension(gamePath);
+        var hasGameSelector = ReadStringSetting($"{systemId}[\"{Path.GetFileName(gamePath)}\"].apiexpose_panel_{systemId.ToLowerInvariant()}") is not null;
+        var hasGameDynpanel = File.Exists(Path.Combine(RetroBatPaths.PluginRoot, "resources", "dynpanels", "games", RomNameFrom(gamePath) + ".json"));
+        if (hasGameSelector || hasGameDynpanel)
+        {
+            WriteGuarded(Path.Combine(targetDir, gameFileName + ".rmp"), body, systemId, gameFileName, $"{reason} scope=game layout={layoutUsed}");
+        }
     }
 
     private (string? Emulator, string? Core) ResolveEmulatorAndCore(string systemId)
