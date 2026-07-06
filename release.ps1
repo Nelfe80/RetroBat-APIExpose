@@ -30,6 +30,9 @@ $ex = @(
     "-x!$name\media", "-x!$name\package-installer", "-x!$name\projects-source",
     # Sources de curation (curator) : jamais dans le pack public, le runtime ne les lit pas.
     "-x!$name\resources\outputs", "-x!$name\resources\panels",
+    # Remaps RetroArch du core MAME : doctrine = cfg MAME uniquement (risque de
+    # double remap "en resonance" si un rmp coexiste avec le cfg partage).
+    "-x!$name\resources\controls\retroarch\mame",
     "-x!$name\docs", "-x!$name\src", "-x!$name\artifacts",
     "-x!$name\wiki", "-x!$name\mkdocs.yml", "-x!$name\site",
     "-x!$name\build.bat", "-x!$name\release.ps1",
