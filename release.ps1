@@ -33,6 +33,9 @@ $ex = @(
     # Remaps RetroArch du core MAME : doctrine = cfg MAME uniquement (risque de
     # double remap "en resonance" si un rmp coexiste avec le cfg partage).
     "-x!$name\resources\controls\retroarch\mame",
+    # Curator : savoir-faire prive, jamais distribue.
+    "-x!$name\panel_curator_ultimate.py", "-x!$name\panel_curator.ini", "-x!$name\profiles_db.py",
+    "-x!$name\state",
     "-x!$name\docs", "-x!$name\src", "-x!$name\artifacts",
     "-x!$name\wiki", "-x!$name\mkdocs.yml", "-x!$name\site",
     "-x!$name\build.bat", "-x!$name\release.ps1",
