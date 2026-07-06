@@ -176,6 +176,7 @@ if (!testModeRequested)
     builder.Services.AddHostedService<LocalizedGamelistCachePrebuildHostedService>();
     builder.Services.AddHostedService<ReloadGamesHostedService>();
     builder.Services.AddHostedService<EsFeaturesMenuDeploymentHostedService>();
+    builder.Services.AddHostedService<PanelRemapExportService>();
     builder.Services.AddHostedService<EmulationStationLifecycleHostedService>();
     builder.Services.AddHostedService<ApiExposeSettingsDefaultsHostedService>();
     builder.Services.AddHostedService<RomsMediaCanonicalMigrationHostedService>();
