@@ -88,3 +88,7 @@ site/
 # Runtime state (panel-remap ownership registry, etc.)
 /state/
 
+# Curator : savoir-faire prive, jamais dans le repo public (historique purge le 2026-07-06)
+panel_curator_ultimate.py
+panel_curator.ini
+
