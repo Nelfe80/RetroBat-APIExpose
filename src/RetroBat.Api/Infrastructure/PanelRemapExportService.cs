@@ -494,6 +494,8 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
     {
         var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(body)))[..16];
         var content = $"{MarkerPrefix} hash={hash}\n{body}";
+        var registry = LoadRegistry();
+        var registryKey = targetPath.ToLowerInvariant();
 
         if (File.Exists(targetPath))
         {
@@ -507,15 +509,21 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
                 existingFirstLine = "";
             }
 
-            if (!existingFirstLine.StartsWith(MarkerPrefix, StringComparison.Ordinal))
+            var hasMarker = existingFirstLine.StartsWith(MarkerPrefix, StringComparison.Ordinal);
+            var ownedPerRegistry = registry.TryGetValue(registryKey, out var lastWrittenHash);
+
+            // RetroArch rewrites remap files when saving from its menus and strips our
+            // comment marker. The registry remembers what we wrote, so a reformatted
+            // file is still recognized as ours; a file we never wrote stays sacred.
+            if (!hasMarker && !ownedPerRegistry)
             {
-                Trace($"KEPT user file untouched (no marker): {targetPath}");
+                Trace($"KEPT user file untouched (never written by us): {targetPath}");
                 return;
             }
 
-            if (existingFirstLine.Contains($"hash={hash}", StringComparison.Ordinal))
+            if (hash == lastWrittenHash || (hasMarker && existingFirstLine.Contains($"hash={hash}", StringComparison.Ordinal)))
             {
-                Trace($"up to date, no rewrite: {targetPath}");
+                Trace($"up to date (target content unchanged): {targetPath}");
                 return;
             }
 
@@ -531,7 +539,42 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
 
         Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
         File.WriteAllText(targetPath, content);
+        registry[registryKey] = hash;
+        SaveRegistry(registry);
         Trace($"WROTE ({reason}): {targetPath} [{body.Split('\n').Length} lines]");
+    }
+
+    private static string RegistryPath => Path.Combine(RetroBatPaths.PluginRoot, "state", "panel-remap-registry.json");
+
+    private Dictionary<string, string> LoadRegistry()
+    {
+        try
+        {
+            if (File.Exists(RegistryPath))
+            {
+                return JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(RegistryPath))
+                       ?? new Dictionary<string, string>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Trace($"registry unreadable, starting fresh: {ex.Message}");
+        }
+
+        return new Dictionary<string, string>();
+    }
+
+    private void SaveRegistry(Dictionary<string, string> registry)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(RegistryPath)!);
+            File.WriteAllText(RegistryPath, JsonSerializer.Serialize(registry, new JsonSerializerOptions { WriteIndented = true }));
+        }
+        catch (Exception ex)
+        {
+            Trace($"registry save failed: {ex.Message}");
+        }
     }
 
     private string? ReadStringSetting(string name)
