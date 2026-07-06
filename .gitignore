@@ -85,3 +85,6 @@ logs/
 # MkDocs build output
 site/
 
+# Runtime state (panel-remap ownership registry, etc.)
+/state/
+
