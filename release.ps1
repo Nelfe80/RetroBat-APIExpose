@@ -45,6 +45,9 @@ $ex = @(
 Set-Location $root
 $full   = Join-Path $out "$name-$ver-full.7z"
 $update = Join-Path $out "$name-$ver-update.7z"
+# 7z "a" met a jour une archive existante sans retirer les entrees exclues :
+# on repart toujours d'archives vierges.
+Remove-Item $full, $update -Force -Confirm:$false -ErrorAction SilentlyContinue
 Write-Host 'Construction full.7z (avec resources + tools, plusieurs minutes)...'
 & $sz a -t7z $full "$name\" @ex -mx=5 -bsp1 -bso0
 Write-Host 'Construction update.7z...'
@@ -52,7 +55,7 @@ Write-Host 'Construction update.7z...'
 
 # Controle anti-fuite : l'archive ne doit contenir ni .env, ni media, ni sources.
 $listing = & $sz l $full
-$leaks = $listing | Select-String '\.env|\\media\\|\\src\\|\\docs\\|package-installer|projects-source|\.git'
+$leaks = $listing | Select-String '\.env|\\media\\|\\src\\|\\docs\\|package-installer|projects-source|\.git|panel_curator|profiles_db'
 if ($leaks) { throw "FUITE DETECTEE dans l'archive : $($leaks[0])" }
 Write-Host 'Controle anti-fuite : OK'
 
