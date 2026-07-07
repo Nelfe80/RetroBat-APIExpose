@@ -106,6 +106,8 @@ Enfin, la publication vers les autres outils :
 
 ## COLLECTIONS PACK MANAGER
 
+Les packs de collections prêts à l'emploi (médias et familles de jeux) sont publiés sur [HyperBat Media](https://hyperbatmedia.github.io/-hyperbat-media/) par Christophe.
+
 | Option | Effet |
 |---|---|
 | `ENABLE COLLECTIONS PACK MANAGER` | Active l'installateur de packs de collections. |
@@ -115,6 +117,8 @@ Enfin, la publication vers les autres outils :
 | `ENABLE FOR THEMES` | Applique le thème système d'une collection aux jeux de ses familles sans thème dédié. |
 
 ## THEMES MANAGER
+
+Côté thèmes EmulationStation, voir [HyperBat](https://hyperbat.phenix-dev.com/) de phenix.
 
 | Option | Effet |
 |---|---|
