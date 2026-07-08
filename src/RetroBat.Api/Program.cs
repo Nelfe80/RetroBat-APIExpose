@@ -69,6 +69,12 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: true));
     });
+// Overlays and SDK pages (OBS Browser Source, file:// or local http origins) consume
+// this loopback-only API cross-origin; without CORS every browser fetch is blocked.
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -246,6 +252,7 @@ app.UseSwaggerUI();
 
 app.UseWebSockets();
 app.UseRouting();
+app.UseCors();
 
 app.Map("/ws", async context =>
 {
