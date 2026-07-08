@@ -1354,6 +1354,24 @@ public class EmulationStationWatcherProvider : IProvider
                 if (string.IsNullOrEmpty(details.Boxback)) details.Boxback = targetGame.Element("boxback")?.Value ?? "";
                 if (string.IsNullOrEmpty(details.Bezel)) details.Bezel = targetGame.Element("bezel")?.Value ?? "";
                 if (string.IsNullOrEmpty(details.Fanart)) details.Fanart = targetGame.Element("fanart")?.Value ?? "";
+
+                // APIExpose est la source média unique : quand la gamelist pointe vers le
+                // media store canonique (enrichi), on impose son URL /api/v1/media/... à la
+                // place de l'URL ES (simple reflet des médias poussés en live vers ES).
+                string CanonicalOr(string current, string tag)
+                {
+                    var canonical = ToApiMediaUrl(targetGame.Element(tag)?.Value, systemId);
+                    return string.IsNullOrEmpty(canonical) ? current : canonical;
+                }
+
+                details.Image = CanonicalOr(details.Image, "image");
+                details.Video = CanonicalOr(details.Video, "video");
+                details.Marquee = CanonicalOr(details.Marquee, "marquee");
+                details.Thumbnail = CanonicalOr(details.Thumbnail, "thumbnail");
+                details.Fanart = CanonicalOr(details.Fanart, "fanart");
+                details.Bezel = CanonicalOr(details.Bezel, "bezel");
+                details.Boxback = CanonicalOr(details.Boxback, "boxback");
+                details.Manual = CanonicalOr(details.Manual, "manual");
                 
                 // Consolidation générique pour tous les autres tags potentiels rajoutés manuellement ou par des thèmes/scrappeurs (non exhaustifs)
                 if (details.Extras == null) details.Extras = new Dictionary<string, string>();
@@ -1377,8 +1395,9 @@ public class EmulationStationWatcherProvider : IProvider
                         // On stocke la valeur principale du noeud
                         if (!string.IsNullOrEmpty(val))
                         {
-                            // On la met dans le dico Extras
-                            details.Extras[name] = val;
+                            // Les valeurs pointant vers le media store sont exposées en URL API.
+                            var canonical = ToApiMediaUrl(val, systemId);
+                            details.Extras[name] = string.IsNullOrEmpty(canonical) ? val : canonical;
                         }
 
                         // Et si le noeud a des attributs exotiques
@@ -1400,6 +1419,43 @@ public class EmulationStationWatcherProvider : IProvider
         catch (Exception ex)
         {
             _logger?.LogWarning($"Failed to consolidate gamelist.xml for {systemId}: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Convertit un chemin média de gamelist (relatif au dossier du système, ex.
+    /// "./../../plugins/APIExpose/media/systems/x/games/y/artwork/z.png") en URL
+    /// servable par APIExpose ("/api/v1/media/systems/x/games/y/artwork/z.png").
+    /// Retourne une chaîne vide si le chemin ne pointe pas dans le media store.
+    /// </summary>
+    private static string ToApiMediaUrl(string? rawPath, string systemId)
+    {
+        if (string.IsNullOrWhiteSpace(rawPath))
+        {
+            return string.Empty;
+        }
+
+        if (rawPath.StartsWith("/api/v1/media/", StringComparison.OrdinalIgnoreCase))
+        {
+            return rawPath;
+        }
+
+        try
+        {
+            var systemRoot = Path.Combine(RetroBatPaths.RomsRoot, systemId);
+            var full = Path.GetFullPath(Path.Combine(systemRoot, rawPath.Replace('/', Path.DirectorySeparatorChar)));
+            var mediaRoot = Path.GetFullPath(RetroBatPaths.MediaRoot)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            if (!full.StartsWith(mediaRoot, StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Empty;
+            }
+
+            return "/api/v1/media/" + full.Substring(mediaRoot.Length).Replace(Path.DirectorySeparatorChar, '/');
+        }
+        catch
+        {
+            return string.Empty;
         }
     }
 
