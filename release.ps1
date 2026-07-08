@@ -80,7 +80,12 @@ $($hashes -join "`n")
 "@
 $notesFile = Join-Path $out 'notes.md'
 $notes | Set-Content $notesFile -Encoding utf8
-$draftFlag = if ($Publish) { @() } else { @('--draft') }
-gh release create "v$ver" --repo Nelfe80/RetroBat-APIExpose --target main @draftFlag --title "APIExpose $ver" --notes-file $notesFile $full $update
+# Invocation via tableau splatte : evite les soucis de parsing des flags par PS 5.1.
+$ghArgs = @('release', 'create', "v$ver",
+    '--repo', 'Nelfe80/RetroBat-APIExpose', '--target', 'main',
+    '--title', "APIExpose $ver", '--notes-file', $notesFile)
+if (-not $Publish) { $ghArgs += '--draft' }
+$ghArgs += @($full, $update)
+& gh @ghArgs
 if ($LASTEXITCODE -ne 0) { throw "gh release create a echoue (exit $LASTEXITCODE)." }
 Write-Host "Release v$ver creee$(if (-not $Publish) { ' (draft, a publier sur GitHub)' })."
