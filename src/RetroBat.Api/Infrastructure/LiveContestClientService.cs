@@ -51,7 +51,7 @@ public sealed class LiveContestClientService : BackgroundService
     private long _seq;
     private long _startAtMs;
     private string _phase = "idle";
-    private string? _system, _slug, _resolvedRom, _lastError;
+    private string? _system, _slug, _resolvedRom, _lastError, _brief;
 
     public LiveContestClientService(
         IEventBus eventBus,
@@ -215,6 +215,7 @@ public sealed class LiveContestClientService : BackgroundService
         var status = root.TryGetProperty("status", out var st) ? st.GetString() ?? "" : "";
         _metricKind = Get(root, "objective", "metric", "kind") ?? "score";
         _metricSignal = Get(root, "objective", "metric", "signal");
+        _brief = Get(root, "brief");
         if (root.TryGetProperty("objective", out var objEl) &&
             objEl.TryGetProperty("metric", out var metEl) &&
             metEl.TryGetProperty("target", out var tgtEl) &&
@@ -420,8 +421,10 @@ public sealed class LiveContestClientService : BackgroundService
         _ready = true;
         _phase = "ready";
         _overlay.ShowCenter(T("Tiens-toi prêt !", "Get ready!"),
-            T("Le départ sera donné pour tout le monde en même temps — attends le décompte.",
-              "The start fires for everyone at once — wait for the countdown."), 0);
+            string.IsNullOrWhiteSpace(_brief)
+                ? T("Le départ sera donné pour tout le monde en même temps — attends le décompte.",
+                    "The start fires for everyone at once — wait for the countdown.")
+                : _brief!, 0);
     }
 
     /// <summary>Depart simultane : decompte 3-2-1 puis depause a startAt pile.</summary>

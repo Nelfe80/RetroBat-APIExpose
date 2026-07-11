@@ -293,7 +293,7 @@ public sealed class LiveContestOverlayService : IDisposable
                 _animGrow = false;
             }
 
-            _targetOpacity = center && text.Trim().Length <= 4 ? 0.85 : 0.62;
+            _targetOpacity = 0.9;
             Opacity = 0.1;
             _animStep = 0;
             _fadeTimer.Stop();
