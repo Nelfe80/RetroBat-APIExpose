@@ -93,6 +93,7 @@ builder.Services.AddSingleton<IEventBus>(eventBus);
 builder.Services.AddSingleton<WebSocketConnectionManager>();
 builder.Services.AddSingleton<MediaRuntimeState>();
 builder.Services.AddSingleton<StartupOverlayService>();
+builder.Services.AddSingleton<LiveContestOverlayService>();
 builder.Services.AddSingleton<IStartupOverlayService>(sp => sp.GetRequiredService<StartupOverlayService>());
 builder.Services.AddSingleton<ToastOverlayService>();
 builder.Services.AddSingleton<IToastNotificationService>(sp => sp.GetRequiredService<ToastOverlayService>());
