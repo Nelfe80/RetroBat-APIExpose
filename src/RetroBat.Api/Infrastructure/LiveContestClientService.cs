@@ -20,6 +20,11 @@ namespace RetroBat.Api.Infrastructure;
 /// </summary>
 public sealed class LiveContestClientService : BackgroundService
 {
+    private static readonly bool Fr =
+        System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "fr";
+
+    private static string T(string fr, string en) => Fr ? fr : en;
+
     private static readonly Uri EmulationStationBaseUri = new("http://127.0.0.1:1234");
     private const string RetroArchHost = "127.0.0.1";
     private const int RetroArchPort = 55355;
@@ -43,6 +48,7 @@ public sealed class LiveContestClientService : BackgroundService
     private long _seq;
     private long _startAtMs;
     private string _phase = "idle";
+    private string? _system, _slug, _resolvedRom, _lastError;
 
     public LiveContestClientService(
         IEventBus eventBus,
@@ -70,7 +76,11 @@ public sealed class LiveContestClientService : BackgroundService
                 phase = _phase,
                 value = _value,
                 ready = _ready,
-                started = _started
+                started = _started,
+                system = _system,
+                gameSlug = _slug,
+                resolvedRom = _resolvedRom,
+                lastError = _lastError
             };
         }
     }
@@ -87,7 +97,7 @@ public sealed class LiveContestClientService : BackgroundService
         }
 
         _logger.LogInformation("livecontest : inscription recue ({Platform})", platformBase);
-        _overlay.Show(null, "Inscription reçue !", "En attente de la préparation par le streamer…", 6000);
+        _overlay.Show(null, T("Inscription reçue !", "Enrolled!"), T("En attente de la préparation par le streamer…", "Waiting for the streamer to prep the round…"), 6000);
     }
 
     public void Withdraw()
@@ -188,6 +198,13 @@ public sealed class LiveContestClientService : BackgroundService
                 break;
 
             case "running" when !_started && _startAtMs > 0:
+                if (!_prepared)
+                {
+                    _prepared = true;
+                    _ = PrepareAsync(root, cancellationToken); // inscrit en retard
+                    break;
+                }
+
                 _started = true;
                 _ = CountdownAndGoAsync(cancellationToken);
                 break;
@@ -207,35 +224,51 @@ public sealed class LiveContestClientService : BackgroundService
     private async Task PrepareAsync(JsonElement contest, CancellationToken cancellationToken)
     {
         _phase = "preparing";
-        var system = Get(contest, "system");
-        var slug = Get(contest, "gameSlug");
-        var romPath = ResolveLocalRom(system, slug);
+        var system = _system = Get(contest, "system");
+        var slug = _slug = Get(contest, "gameSlug");
+        if (system is null || slug is null)
+        {
+            _phase = "no-game-info";
+            _lastError = "contest sans systeme/jeu (cree avant la v3) : recreez le contest";
+            _overlay.Show(null, T("Contest incomplet", "Incomplete contest"),
+                T("Le streamer doit recréer le contest (infos de jeu manquantes).", "The streamer must recreate the contest (missing game info)."), 0);
+            return;
+        }
+
+        var romPath = _resolvedRom = ResolveLocalRom(system, slug);
         if (romPath is null)
         {
             _phase = "rom-not-found";
-            _overlay.Show(null, "Jeu introuvable dans ta ludothèque",
-                (slug ?? "?") + " (" + (system ?? "?") + ") — lance-le toi-même puis appuie sur START.", 0);
+            _lastError = "aucun fichier ne matche « " + slug + " » dans roms\\" + system;
+            _overlay.Show(null, T("Jeu introuvable dans ta ludothèque", "Game not found in your library"),
+                slug + " (" + system + ") — " + T("lance-le toi-même puis appuie sur START.", "launch it yourself then press START."), 0);
         }
         else
         {
-            _overlay.Show(null, "Lancement du jeu…", slug ?? "", 0);
+            _overlay.Show(null, T("Lancement du jeu…", "Launching the game…"), slug, 0);
             try
             {
                 using var es = new HttpClient { BaseAddress = EmulationStationBaseUri };
                 using var content = new StringContent(romPath, Encoding.UTF8, "text/plain");
                 var res = await es.PostAsync("/launch", content, cancellationToken);
+                if (!res.IsSuccessStatusCode)
+                {
+                    _lastError = "launch ES HTTP " + (int)res.StatusCode;
+                }
+
                 _logger.LogInformation("livecontest : launch {Rom} -> {Status}", romPath, res.StatusCode);
             }
             catch (Exception e)
             {
+                _lastError = "launch ES injoignable : " + e.Message;
                 _logger.LogWarning(e, "livecontest : launch ES en echec");
             }
         }
 
         _waitingGamePlaying = true;
         _phase = "press-start";
-        _overlay.Show(null, "Appuie sur START !",
-            "Ta partie sera mise en pause, prête pour le départ…", 0);
+        _overlay.Show(null, T("Appuie sur START !", "Press START!"),
+            T("Ta partie sera mise en pause, prête pour le départ…", "Your run will be paused, ready for the countdown…"), 0);
     }
 
     /// <summary>Signal GAME_PLAYING : la vraie partie demarre -> pause + ready.</summary>
@@ -321,13 +354,28 @@ public sealed class LiveContestClientService : BackgroundService
 
         _ready = true;
         _phase = "ready";
-        _overlay.Show(null, "Prêt !",
-            "Le départ sera donné pour tout le monde en même temps…", 0);
+        _overlay.Show(null, T("Prêt !", "Ready!"),
+            T("Le départ sera donné pour tout le monde en même temps…", "The start will fire for everyone at once…"), 0);
     }
 
     /// <summary>Depart simultane : decompte 3-2-1 puis depause a startAt pile.</summary>
     private async Task CountdownAndGoAsync(CancellationToken cancellationToken)
     {
+        // detection reelle : RetroArch doit tourner AVEC un jeu charge,
+        // sinon pas de decompte (rien a depauser, ce serait mensonger)
+        var probe = await SendRetroArchAsync("GET_STATUS", expectResponse: true);
+        if (string.IsNullOrEmpty(probe) || probe.Contains("CONTENTLESS", StringComparison.Ordinal))
+        {
+            _phase = "game-not-running";
+            _lastError = string.IsNullOrEmpty(probe)
+                ? "RetroArch injoignable (jeu non lance ?)"
+                : "RetroArch sans jeu charge";
+            _overlay.Show(null, T("La manche est partie…", "The round has started…"),
+                T("Ton jeu n’était pas lancé : lance-le et joue, tes points comptent quand même !", "Your game was not running: launch it and play, your points still count!"), 8000);
+            _phase = "playing";
+            return;
+        }
+
         _phase = "countdown";
         for (var n = 3; n >= 1; n--)
         {
@@ -337,7 +385,7 @@ public sealed class LiveContestClientService : BackgroundService
                 await Task.Delay(TimeSpan.FromMilliseconds(wait), cancellationToken);
             }
 
-            _overlay.Show(null, n + "…", "Départ imminent…", 0);
+            _overlay.Show(null, n + "…", T("Départ imminent…", "Starting soon…"), 0);
         }
 
         var final = _startAtMs - DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -415,9 +463,9 @@ public sealed class LiveContestClientService : BackgroundService
 
         if (_started)
         {
-            _overlay.Show(null, "BRAVO !!!", "Score final : " + _value, 0);
+            _overlay.Show(null, T("BRAVO !!!", "WELL PLAYED!!!"), T("Score final : ", "Final score: ") + _value, 0);
             await Task.Delay(4000, cancellationToken);
-            _overlay.Show(null, "À toute sur Twitch !!!", "Le jeu va se fermer…", 4500);
+            _overlay.Show(null, T("À toute sur Twitch !!!", "See you on Twitch!!!"), T("Le jeu va se fermer…", "The game is about to close…"), 4500);
             await Task.Delay(4500, cancellationToken);
             await SendRetroArchAsync("QUIT", expectResponse: false);
         }
