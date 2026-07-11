@@ -103,7 +103,7 @@ public sealed class LiveContestClientService : BackgroundService
             }
 
             return !File.ReadAllText(esSettings).Contains(
-                "name=\"global.apiexpose.livecontest.enabled\" value=\"0\"",
+                "name=\"global.apiexpose.game_events.live_contest.enabled\" value=\"0\"",
                 StringComparison.Ordinal);
         }
         catch (Exception)
