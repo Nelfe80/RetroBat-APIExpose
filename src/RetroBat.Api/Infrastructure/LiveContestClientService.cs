@@ -45,6 +45,7 @@ public sealed class LiveContestClientService : BackgroundService
     private string? _metricKind, _metricSignal;
     private double _metricTarget;
     private bool _targetReached;
+    private bool _quitDone;
     private double _value;
     private double _lastSent = -1;
     private long _seq;
@@ -146,6 +147,7 @@ public sealed class LiveContestClientService : BackgroundService
         _prepared = _ready = _started = _finished = false;
         _waitingGamePlaying = false;
         _targetReached = false;
+        _quitDone = false;
         _metricTarget = 0;
         _value = 0;
         _lastSent = -1;
@@ -493,9 +495,18 @@ public sealed class LiveContestClientService : BackgroundService
         }
 
         _phase = "target-reached";
-        _overlay.Show(null, T("🏁 Objectif atteint !", "🏁 Target reached!"),
+        _overlay.ShowCenter(T("🏁 Objectif atteint !", "🏁 Target reached!"),
             T("Ton temps est enregistré — regarde le classement sur le stream !",
               "Your time is in — watch the stream for the standings!"), 0);
+
+        // le joueur a fini : on le sort du jeu tout de suite, le streamer
+        // peut prendre son temps pour clore le contest
+        await Task.Delay(4500);
+        _overlay.Show(null, T("À toute sur Twitch !!!", "See you on Twitch!!!"),
+            T("Le jeu va se fermer…", "The game is about to close…"), 4500);
+        await Task.Delay(4000);
+        await SendRetroArchAsync("QUIT", expectResponse: false);
+        _quitDone = true;
     }
 
     private async Task PushProgressAsync(Enrollment enrollment, CancellationToken cancellationToken)
@@ -549,7 +560,7 @@ public sealed class LiveContestClientService : BackgroundService
             _logger.LogWarning(e, "livecontest : submit final en echec");
         }
 
-        if (_started)
+        if (_started && !_quitDone)
         {
             _overlay.Show(null, T("BRAVO !!!", "WELL PLAYED!!!"), T("Score final : ", "Final score: ") + _value, 0);
             await Task.Delay(4000, cancellationToken);

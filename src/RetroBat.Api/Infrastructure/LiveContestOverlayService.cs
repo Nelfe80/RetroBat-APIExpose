@@ -93,9 +93,15 @@ public sealed class LiveContestOverlayService : IDisposable
         private readonly System.Windows.Forms.Timer _hideTimer;
         private readonly System.Windows.Forms.Timer _fadeTimer;
         private readonly Font _cornerFont = new("Segoe UI", 15f, FontStyle.Bold);
-        private readonly Font _centerFont = new("Segoe UI", 58f, FontStyle.Bold);
+        private readonly Font _centerPhraseFont = new("Segoe UI", 30f, FontStyle.Bold);
         private readonly Font _cornerSubFont = new("Segoe UI", 9f);
         private readonly Font _centerSubFont = new("Segoe UI", 11.5f);
+        // decompte « jeu moderne » : le chiffre grossit en apparaissant
+        private readonly Font[] _digitFonts = Enumerable.Range(0, 13)
+            .Select(i => new Font("Segoe UI", 72f + i * 10f, FontStyle.Bold))
+            .ToArray();
+        private int _animStep;
+        private bool _animGrow;
 
         public OverlayForm()
         {
@@ -166,18 +172,21 @@ public sealed class LiveContestOverlayService : IDisposable
             _hideTimer = new System.Windows.Forms.Timer();
             _hideTimer.Tick += (_, _) => Conceal();
 
-            // fondu enchaine : chaque message (re)apparait en ~200 ms
+            // fondu enchaine + grossissement : chaque message apparait en ~300 ms
             _fadeTimer = new System.Windows.Forms.Timer { Interval = 25 };
             _fadeTimer.Tick += (_, _) =>
             {
-                if (Opacity >= 0.97)
+                _animStep++;
+                Opacity = Math.Min(1, 0.25 + _animStep * 0.09);
+                if (_animGrow)
+                {
+                    _text.Font = _digitFonts[Math.Min(_digitFonts.Length - 1, _animStep)];
+                }
+
+                if (_animStep >= _digitFonts.Length - 1)
                 {
                     Opacity = 1;
                     _fadeTimer.Stop();
-                }
-                else
-                {
-                    Opacity += 0.14;
                 }
             };
         }
@@ -202,17 +211,20 @@ public sealed class LiveContestOverlayService : IDisposable
             var area = Screen.PrimaryScreen?.WorkingArea ?? new Rectangle(0, 0, 1920, 1080);
             if (center)
             {
-                Size = new Size(560, 250);
+                // chiffres/GO : enorme et anime ; phrases : police adaptee (rien de coupe)
+                var digit = text.Trim().Length <= 4;
+                Size = digit ? new Size(720, 460) : new Size(620, 270);
                 _brand.Location = new Point((Width - _brand.PreferredWidth) / 2, 16);
-                _text.Font = _centerFont;
+                _text.Font = digit ? _digitFonts[0] : _centerPhraseFont;
                 _text.TextAlign = ContentAlignment.MiddleCenter;
-                _text.SetBounds(10, 44, Width - 20, 130);
+                _text.SetBounds(10, 44, Width - 20, digit ? 340 : 150);
                 _sub.Font = _centerSubFont;
                 _sub.TextAlign = ContentAlignment.MiddleCenter;
-                _sub.SetBounds(10, 182, Width - 20, 52);
+                _sub.SetBounds(10, digit ? 392 : 200, Width - 20, 54);
                 Location = new Point(
                     area.Left + (area.Width - Width) / 2,
                     area.Top + (area.Height - Height) / 2);
+                _animGrow = digit;
             }
             else
             {
@@ -225,9 +237,11 @@ public sealed class LiveContestOverlayService : IDisposable
                 _sub.TextAlign = ContentAlignment.TopLeft;
                 _sub.SetBounds(14, 68, 352, 38); // deux lignes : plus de texte coupe
                 Location = new Point(area.Right - Width - 24, area.Bottom - Height - 24);
+                _animGrow = false;
             }
 
             Opacity = 0.25;
+            _animStep = 0;
             _fadeTimer.Stop();
             _fadeTimer.Start();
             if (!Visible)
