@@ -87,6 +87,31 @@ public sealed class LiveContestClientService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// Option RetroBat « ENABLE LIVE CONTEST » (menus ES -> es_settings) :
+    /// absente ou a 1 = actif ; a 0 = les inscriptions sont refusees.
+    /// </summary>
+    public bool IsLiveContestEnabled()
+    {
+        try
+        {
+            var esSettings = Path.Combine(RetroBatPaths.RetroBatRoot,
+                "emulationstation", ".emulationstation", "es_settings.cfg");
+            if (!File.Exists(esSettings))
+            {
+                return true;
+            }
+
+            return !File.ReadAllText(esSettings).Contains(
+                "name=\"global.apiexpose.livecontest.enabled\" value=\"0\"",
+                StringComparison.Ordinal);
+        }
+        catch (Exception)
+        {
+            return true;
+        }
+    }
+
     /// <summary>Inscription : le seul point d'entree venant du navigateur.</summary>
     public void Enroll(string playToken, string platformBase)
     {

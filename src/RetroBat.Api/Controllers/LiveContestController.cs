@@ -43,6 +43,12 @@ public class LiveContestController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult Enroll([FromBody] EnrollPayload payload)
     {
+        if (!_client.IsLiveContestEnabled())
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new { message = "Live Contest is disabled in the RetroBat options (Extended options)." });
+        }
+
         if (string.IsNullOrWhiteSpace(payload.PlayToken) || payload.PlayToken.Trim().Length < 16)
         {
             return BadRequest(new { message = "You must provide the playToken." });
