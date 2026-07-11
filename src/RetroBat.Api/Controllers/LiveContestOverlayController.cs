@@ -47,7 +47,15 @@ public class LiveContestOverlayController : ControllerBase
             return BadRequest(new { message = "You must provide the overlay text." });
         }
 
-        _overlay.Show(payload.Title, payload.Text.Trim(), payload.Sub, payload.DurationMs);
+        if (payload.Center)
+        {
+            _overlay.ShowCenter(payload.Text.Trim(), payload.Sub, payload.DurationMs);
+        }
+        else
+        {
+            _overlay.Show(payload.Title, payload.Text.Trim(), payload.Sub, payload.DurationMs);
+        }
+
         return Ok(new { status = "shown" });
     }
 
@@ -74,6 +82,9 @@ public class OverlayPayload
     /// <summary>Secondary line under the main text.</summary>
     /// <example>Premier a 10 anneaux</example>
     public string? Sub { get; set; }
+
+    /// <summary>Centered stage mode (big text) instead of the corner window.</summary>
+    public bool Center { get; set; }
 
     /// <summary>Auto-hide delay in milliseconds; 0 or null keeps it visible.</summary>
     /// <example>4000</example>

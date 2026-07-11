@@ -294,6 +294,7 @@ public sealed class LiveContestClientService : BackgroundService
         else
         {
             _overlay.Show(null, T("Lancement du jeu…", "Launching the game…"), slug, 0);
+            FocusProcess("emulationstation"); // sinon RetroArch demarre en arriere-plan
             try
             {
                 using var es = new HttpClient { BaseAddress = EmulationStationBaseUri };
@@ -313,6 +314,7 @@ public sealed class LiveContestClientService : BackgroundService
             }
         }
 
+        _ = FocusRetroArchWhenUpAsync();
         _waitingGamePlaying = true;
         _phase = "press-start";
         _overlay.Show(null, T("Appuie sur START !", "Press START!"),
@@ -415,8 +417,9 @@ public sealed class LiveContestClientService : BackgroundService
 
         _ready = true;
         _phase = "ready";
-        _overlay.Show(null, T("Prêt !", "Ready!"),
-            T("Le départ sera donné pour tout le monde en même temps…", "The start will fire for everyone at once…"), 0);
+        _overlay.ShowCenter(T("Tiens-toi prêt !", "Get ready!"),
+            T("Le départ sera donné pour tout le monde en même temps — attends le décompte.",
+              "The start fires for everyone at once — wait for the countdown."), 0);
     }
 
     /// <summary>Depart simultane : decompte 3-2-1 puis depause a startAt pile.</summary>
@@ -438,7 +441,7 @@ public sealed class LiveContestClientService : BackgroundService
         }
 
         _phase = "countdown";
-        for (var n = 3; n >= 1; n--)
+        for (var n = 5; n >= 1; n--)
         {
             var wait = _startAtMs - n * 1000 - DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             if (wait > 0)
@@ -446,7 +449,7 @@ public sealed class LiveContestClientService : BackgroundService
                 await Task.Delay(TimeSpan.FromMilliseconds(wait), cancellationToken);
             }
 
-            _overlay.Show(null, n + "…", T("Départ imminent…", "Starting soon…"), 0);
+            _overlay.ShowCenter(n.ToString(), T("Départ dans…", "Starting in…"), 0);
         }
 
         var final = _startAtMs - DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -469,7 +472,8 @@ public sealed class LiveContestClientService : BackgroundService
 
         FocusRetroArch();
         _phase = "playing";
-        _overlay.Show(null, "GO !!!", "", 5000);
+        // GO! puis la scene centrale disparait : place au jeu
+        _overlay.ShowCenter("GO !", "", 1800);
     }
 
     /// <summary>Objectif atteint (course) : l'instant d'arrivee est pousse
@@ -617,12 +621,16 @@ public sealed class LiveContestClientService : BackgroundService
         }
     }
 
-    /// <summary>Ramene RetroArch au premier plan (fenetre parfois en arriere-plan apres le launch ES).</summary>
-    private static void FocusRetroArch()
+    /// <summary>
+    /// Ramene une application au premier plan. ES doit avoir le focus AVANT
+    /// le launch (sinon RetroArch demarre en arriere-plan), puis RetroArch
+    /// des qu'il apparait et au GO.
+    /// </summary>
+    private static void FocusProcess(string processName)
     {
         try
         {
-            foreach (var process in System.Diagnostics.Process.GetProcessesByName("retroarch"))
+            foreach (var process in System.Diagnostics.Process.GetProcessesByName(processName))
             {
                 if (process.MainWindowHandle != IntPtr.Zero)
                 {
@@ -632,6 +640,23 @@ public sealed class LiveContestClientService : BackgroundService
             }
         }
         catch (Exception) { }
+    }
+
+    private static void FocusRetroArch() => FocusProcess("retroarch");
+
+    /// <summary>Focus RetroArch des que sa fenetre existe (boot apres launch).</summary>
+    private static async Task FocusRetroArchWhenUpAsync()
+    {
+        for (var i = 0; i < 30; i++)
+        {
+            await Task.Delay(2000);
+            if (System.Diagnostics.Process.GetProcessesByName("retroarch")
+                .Any(pr => pr.MainWindowHandle != IntPtr.Zero))
+            {
+                FocusRetroArch();
+                return;
+            }
+        }
     }
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
