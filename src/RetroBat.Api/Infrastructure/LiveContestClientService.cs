@@ -52,6 +52,7 @@ public sealed class LiveContestClientService : BackgroundService
     private long _startAtMs;
     private string _phase = "idle";
     private string? _system, _slug, _resolvedRom, _lastError, _brief;
+    private string _reportedPhase = "";
 
     public LiveContestClientService(
         IEventBus eventBus,
@@ -267,6 +268,32 @@ public sealed class LiveContestClientService : BackgroundService
         if (_started && !_finished && Math.Abs(_value - _lastSent) > 0.0001)
         {
             await PushProgressAsync(enrollment, cancellationToken);
+        }
+
+        if (_phase != _reportedPhase)
+        {
+            _reportedPhase = _phase;
+            _ = ReportPhaseAsync(enrollment, _phase, _lastError);
+        }
+    }
+
+    /// <summary>Le streamer voit la phase de chaque joueur (jeu introuvable...).</summary>
+    private async Task ReportPhaseAsync(Enrollment enrollment, string phase, string? detail)
+    {
+        try
+        {
+            using var http = _httpFactory.CreateClient();
+            using var request = new HttpRequestMessage(HttpMethod.Post,
+                enrollment.PlatformBase + "/play/phase");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", enrollment.PlayToken);
+            request.Content = new StringContent(
+                JsonSerializer.Serialize(new { phase, detail }),
+                Encoding.UTF8, "application/json");
+            await http.SendAsync(request, CancellationToken.None);
+        }
+        catch (Exception)
+        {
+            _reportedPhase = ""; // reessaiera au prochain changement/tick
         }
     }
 
