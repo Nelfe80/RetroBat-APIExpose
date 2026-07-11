@@ -87,16 +87,11 @@ public sealed class LiveContestOverlayService : IDisposable
             StartPosition = FormStartPosition.Manual;
             ShowInTaskbar = false;
             TopMost = true;
-            BackColor = Color.FromArgb(30, 30, 44);      // #1e1e2c
+            BackColor = Color.Black;
             Padding = new Padding(1);
             Size = new Size(380, 104);
 
-            var border = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(30, 30, 44),
-                Padding = new Padding(14, 10, 14, 10)
-            };
+
 
             PictureBox? icon = null;
             var iconPath = Path.Combine(AppContext.BaseDirectory, "media", "livecontest-icon.png");
@@ -151,10 +146,6 @@ public sealed class LiveContestOverlayService : IDisposable
             Controls.Add(_text);
             Controls.Add(_sub);
 
-            // fine bordure violette pour detacher la fenetre du jeu
-            BackColor = Color.FromArgb(139, 92, 246);
-            border.Location = new Point(1, 1);
-            border.Size = new Size(Width - 2, Height - 2);
 
             _hideTimer = new System.Windows.Forms.Timer();
             _hideTimer.Tick += (_, _) => Conceal();

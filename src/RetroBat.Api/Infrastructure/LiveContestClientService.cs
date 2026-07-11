@@ -97,7 +97,7 @@ public sealed class LiveContestClientService : BackgroundService
         }
 
         _logger.LogInformation("livecontest : inscription recue ({Platform})", platformBase);
-        _overlay.Show(null, T("Inscription reçue !", "Enrolled!"), T("En attente de la préparation par le streamer…", "Waiting for the streamer to prep the round…"), 6000);
+        _overlay.Show(null, T("Inscription reçue !", "Enrolled!"), T("Préparation de ton jeu…", "Getting your game ready…"), 6000);
     }
 
     public void Withdraw()
@@ -188,13 +188,15 @@ public sealed class LiveContestClientService : BackgroundService
 
         switch (status)
         {
-            case "open" or "test":
-                _phase = "waiting";
-                break;
-
-            case "locked" when !_prepared:
+            // des que le viewer a confirme, son jeu se lance : il appuie sur
+            // START, la pause tombe sur GAME_PLAYING — chacun se met pret a
+            // son rythme pendant que les inscriptions restent ouvertes
+            case "open" or "test" or "locked" when !_prepared:
                 _prepared = true;
                 _ = PrepareAsync(root, cancellationToken);
+                break;
+
+            case "open" or "test" or "locked":
                 break;
 
             case "running" when !_started && _startAtMs > 0:
