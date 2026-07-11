@@ -313,6 +313,7 @@ public sealed class LiveContestClientService : BackgroundService
         }
 
         DisablePauseNonactive();
+        ForceAutoEmulator(system); // meme emulateur (RetroArch) pour tous
         var romPath = _resolvedRom = ResolveLocalRom(system, slug);
         if (romPath is null)
         {
@@ -613,8 +614,7 @@ public sealed class LiveContestClientService : BackgroundService
     /// </summary>
     private void DisablePauseNonactive()
     {
-        var esSettings = Path.Combine(RetroBatPaths.RetroBatRoot,
-            "emulationstation", ".emulationstation", "es_settings.cfg");
+        var esSettings = EsSettingsPath;
         try
         {
             if (File.Exists(esSettings))
@@ -684,6 +684,61 @@ public sealed class LiveContestClientService : BackgroundService
     }
 
     private static void FocusRetroArch() => FocusProcess("retroarch");
+
+    private static string EsSettingsPath => Path.Combine(RetroBatPaths.RetroBatRoot,
+        "emulationstation", ".emulationstation", "es_settings.cfg");
+
+    /// <summary>Emulateur force dans es_settings pour ce systeme (null = AUTO).</summary>
+    public static string? EmulatorOverrideFor(string? system)
+    {
+        if (string.IsNullOrWhiteSpace(system) || !File.Exists(EsSettingsPath))
+        {
+            return null;
+        }
+
+        try
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(
+                File.ReadAllText(EsSettingsPath),
+                "<string name=\"" + System.Text.RegularExpressions.Regex.Escape(system) +
+                "\\.emulator\" value=\"([^\"]+)\" />");
+            return match.Success && match.Groups[1].Value.Length > 0 ? match.Groups[1].Value : null;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// EMULATOR: AUTO pour le systeme du contest — un override (emulateur
+    /// standalone) casserait le pilotage RetroArch et l'equite. L'entree
+    /// es_settings est retiree dynamiquement au moment de la preparation.
+    /// </summary>
+    private void ForceAutoEmulator(string? system)
+    {
+        if (string.IsNullOrWhiteSpace(system) || !File.Exists(EsSettingsPath))
+        {
+            return;
+        }
+
+        try
+        {
+            var xml = File.ReadAllText(EsSettingsPath);
+            var cleaned = System.Text.RegularExpressions.Regex.Replace(xml,
+                "\\s*<string name=\"" + System.Text.RegularExpressions.Regex.Escape(system) +
+                "\\.(emulator|core)\" value=\"[^\"]*\" />", "");
+            if (cleaned != xml)
+            {
+                File.WriteAllText(EsSettingsPath, cleaned);
+                _logger.LogInformation("livecontest : emulateur force en AUTO pour {System}", system);
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "livecontest : emulateur AUTO non applicable");
+        }
+    }
 
     /// <summary>Focus RetroArch des que sa fenetre existe (boot apres launch).</summary>
     private static async Task FocusRetroArchWhenUpAsync()

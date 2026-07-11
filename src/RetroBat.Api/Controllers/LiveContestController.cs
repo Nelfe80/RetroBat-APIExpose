@@ -67,6 +67,26 @@ public class LiveContestController : ControllerBase
         return Ok(new { status = "enrolled" });
     }
 
+    /// <summary>
+    /// Pre-flight check for the enrolment page: APIExpose reachable (implicit),
+    /// Live Contest option enabled, contest game present in the local library,
+    /// emulator override detected for the system.
+    /// </summary>
+    /// <response code="200">Check result.</response>
+    [HttpGet("check")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult Check([FromQuery] string? system, [FromQuery] string? slug)
+    {
+        var rom = LiveContestClientService.ResolveLocalRom(system, slug);
+        return Ok(new
+        {
+            enabled = _client.IsLiveContestEnabled(),
+            gameFound = rom is not null,
+            gameFile = rom is null ? null : Path.GetFileName(rom),
+            emulatorOverride = LiveContestClientService.EmulatorOverrideFor(system)
+        });
+    }
+
     /// <summary>Current Live Contest client state (phase, value, readiness).</summary>
     /// <response code="200">State returned.</response>
     [HttpGet("status")]
