@@ -98,6 +98,8 @@ public sealed class LiveContestClientService : BackgroundService
             SaveEnrollment();
         }
 
+        // option appliquee des que le Live Contest devient actif
+        DisablePauseNonactive();
         _logger.LogInformation("livecontest : inscription recue ({Platform})", platformBase);
         _overlay.Show(null, T("Inscription reçue !", "Enrolled!"), T("Préparation de ton jeu…", "Getting your game ready…"), 6000);
     }
@@ -130,6 +132,13 @@ public sealed class LiveContestClientService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var subscription = _eventBus.Subscribe<EventEnvelope>(OnBusEvent);
+        if (_enrollment is not null)
+        {
+            // Live Contest deja actif au demarrage d'APIExpose : l'option
+            // anti-pause est (re)appliquee dynamiquement
+            DisablePauseNonactive();
+        }
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -526,37 +535,60 @@ public sealed class LiveContestClientService : BackgroundService
 
     /// <summary>
     /// RetroBat/RetroArch pausent le jeu quand la fenetre perd le focus
-    /// (pause_nonactive) : incompatible avec le depart pilote. On corrige le
-    /// TEMPLATE RetroBat (retroarch.cfg est reecrit depuis lui a chaque
-    /// lancement) ET la config live.
+    /// (pause_nonactive) : incompatible avec le depart pilote. Le canal
+    /// DURABLE est es_settings.cfg (global.retroarch.pause_nonactive=false,
+    /// injecte par RetroBat dans retroarch.cfg a CHAQUE lancement — un
+    /// template, lui, peut etre reecrit). On corrige aussi la config live
+    /// pour un jeu deja lance.
     /// </summary>
     private void DisablePauseNonactive()
     {
-        foreach (var file in new[]
+        var esSettings = Path.Combine(RetroBatPaths.RetroBatRoot,
+            "emulationstation", ".emulationstation", "es_settings.cfg");
+        try
         {
-            Path.Combine(RetroBatPaths.RetroBatRoot, "system", "templates", "retroarch", "retroarch.cfg"),
-            Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "retroarch.cfg")
-        })
-        {
-            try
+            if (File.Exists(esSettings))
             {
-                if (!File.Exists(file))
+                var xml = File.ReadAllText(esSettings);
+                const string entry =
+                    "  <string name=\"global.retroarch.pause_nonactive\" value=\"false\" />";
+                if (xml.Contains("global.retroarch.pause_nonactive", StringComparison.Ordinal))
                 {
-                    continue;
+                    xml = System.Text.RegularExpressions.Regex.Replace(xml,
+                        "<string name=\"global\\.retroarch\\.pause_nonactive\" value=\"[^\"]*\" />",
+                        "<string name=\"global.retroarch.pause_nonactive\" value=\"false\" />");
+                }
+                else
+                {
+                    xml = xml.Replace("</config>", entry + "\n</config>");
                 }
 
-                var content = File.ReadAllText(file);
+                File.WriteAllText(esSettings, xml);
+                _logger.LogInformation("livecontest : global.retroarch.pause_nonactive=false (es_settings)");
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "livecontest : es_settings non modifiable");
+        }
+
+        // effet immediat si RetroArch a deja une config generee
+        var live = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "retroarch.cfg");
+        try
+        {
+            if (File.Exists(live))
+            {
+                var content = File.ReadAllText(live);
                 if (content.Contains("pause_nonactive = \"true\"", StringComparison.Ordinal))
                 {
-                    File.WriteAllText(file, content.Replace(
+                    File.WriteAllText(live, content.Replace(
                         "pause_nonactive = \"true\"", "pause_nonactive = \"false\""));
-                    _logger.LogInformation("livecontest : pause_nonactive desactive dans {File}", file);
                 }
             }
-            catch (Exception e)
-            {
-                _logger.LogWarning(e, "livecontest : pause_nonactive non modifiable ({File})", file);
-            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "livecontest : retroarch.cfg live non modifiable");
         }
     }
 
