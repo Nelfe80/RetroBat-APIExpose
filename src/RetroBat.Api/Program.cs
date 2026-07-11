@@ -94,6 +94,9 @@ builder.Services.AddSingleton<WebSocketConnectionManager>();
 builder.Services.AddSingleton<MediaRuntimeState>();
 builder.Services.AddSingleton<StartupOverlayService>();
 builder.Services.AddSingleton<LiveContestOverlayService>();
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<LiveContestClientService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<LiveContestClientService>());
 builder.Services.AddSingleton<IStartupOverlayService>(sp => sp.GetRequiredService<StartupOverlayService>());
 builder.Services.AddSingleton<ToastOverlayService>();
 builder.Services.AddSingleton<IToastNotificationService>(sp => sp.GetRequiredService<ToastOverlayService>());
@@ -253,6 +256,35 @@ app.UseSwaggerUI();
 
 app.UseWebSockets();
 app.UseRouting();
+// Garde d'origine : les commandes locales (lancement de jeux, RetroArch,
+// overlay) ne sont JAMAIS pilotables depuis un site web. Une requete
+// navigateur cross-origin est refusee sur ces routes ; l'inscription Live
+// Contest n'accepte que la plateforme officielle (et le local).
+app.Use(async (context, next) =>
+{
+    var origin = context.Request.Headers.Origin.ToString();
+    if (!string.IsNullOrEmpty(origin))
+    {
+        var path = context.Request.Path;
+        var isLoopback = Uri.TryCreate(origin, UriKind.Absolute, out var o) && o.IsLoopback;
+        var isPlatform = o is not null && o.Scheme == Uri.UriSchemeHttps &&
+                         (o.Host.Equals("nelfetech.com", StringComparison.OrdinalIgnoreCase) ||
+                          o.Host.EndsWith(".nelfetech.com", StringComparison.OrdinalIgnoreCase));
+        var blockedForWeb =
+            path.StartsWithSegments("/api/v1/commands") ||
+            path.StartsWithSegments("/api/v1/overlay");
+        var contestEnroll = path.StartsWithSegments("/api/v1/livecontest");
+        if ((blockedForWeb && !isLoopback) ||
+            (contestEnroll && !isLoopback && !isPlatform))
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return;
+        }
+    }
+
+    await next();
+});
+
 app.UseCors();
 
 app.Map("/ws", async context =>
