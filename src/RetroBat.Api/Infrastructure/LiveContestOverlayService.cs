@@ -90,6 +90,7 @@ public sealed class LiveContestOverlayService : IDisposable
         private readonly Label _brand;
         private readonly Label _text;
         private readonly Label _sub;
+        private readonly PictureBox? _bigIcon;
         private readonly System.Windows.Forms.Timer _hideTimer;
         private readonly System.Windows.Forms.Timer _fadeTimer;
         private readonly Font _cornerFont = new("Segoe UI", 15f, FontStyle.Bold);
@@ -102,6 +103,7 @@ public sealed class LiveContestOverlayService : IDisposable
             .ToArray();
         private int _animStep;
         private bool _animGrow;
+        private double _targetOpacity = 1;
 
         public OverlayForm()
         {
@@ -159,6 +161,20 @@ public sealed class LiveContestOverlayService : IDisposable
                 BackColor = Color.Transparent
             };
 
+            var bigIconPath = Path.Combine(AppContext.BaseDirectory, "media", "livecontest-icon-big.png");
+            if (File.Exists(bigIconPath))
+            {
+                _bigIcon = new PictureBox
+                {
+                    Image = Image.FromFile(bigIconPath),
+                    SizeMode = PictureBoxSizeMode.Zoom,
+                    Size = new Size(96, 96),
+                    Visible = false,
+                    BackColor = Color.Transparent
+                };
+                Controls.Add(_bigIcon);
+            }
+
             if (icon is not null)
             {
                 Controls.Add(icon);
@@ -172,24 +188,49 @@ public sealed class LiveContestOverlayService : IDisposable
             _hideTimer = new System.Windows.Forms.Timer();
             _hideTimer.Tick += (_, _) => Conceal();
 
-            // fondu enchaine + grossissement : chaque message apparait en ~300 ms
+            // chiffres : grossissement + fade-in puis fade-out avant le suivant ;
+            // phrases : simple fade-in
             _fadeTimer = new System.Windows.Forms.Timer { Interval = 25 };
             _fadeTimer.Tick += (_, _) =>
             {
                 _animStep++;
-                Opacity = Math.Min(1, 0.25 + _animStep * 0.09);
-                if (_animGrow)
+                if (_animStep <= 12)
                 {
-                    _text.Font = _digitFonts[Math.Min(_digitFonts.Length - 1, _animStep)];
-                }
+                    Opacity = Math.Min(_targetOpacity, 0.15 + _animStep * _targetOpacity * 0.08);
+                    if (_animGrow)
+                    {
+                        _text.Font = _digitFonts[Math.Min(_digitFonts.Length - 1, _animStep)];
+                    }
 
-                if (_animStep >= _digitFonts.Length - 1)
+                    if (_animStep == 12 && !_animGrow)
+                    {
+                        Opacity = _targetOpacity;
+                        _fadeTimer.Stop();
+                    }
+                }
+                else if (_animGrow && _animStep >= 27)
                 {
-                    Opacity = 1;
-                    _fadeTimer.Stop();
+                    // fade-out : le chiffre s'efface avant le suivant
+                    Opacity = Math.Max(0.05, _targetOpacity - (_animStep - 27) * 0.09);
+                    if (_animStep >= 38)
+                    {
+                        _fadeTimer.Stop();
+                    }
                 }
             };
         }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            // coins arrondis (Windows 11)
+            var preference = 2; // DWMWCP_ROUND
+            _ = DwmSetWindowAttribute(Handle, 33, ref preference, sizeof(int));
+        }
+
+        [System.Runtime.InteropServices.DllImport("dwmapi.dll")]
+        private static extern int DwmSetWindowAttribute(
+            IntPtr hwnd, int attribute, ref int value, int size);
 
         protected override bool ShowWithoutActivation => true;
 
@@ -213,14 +254,21 @@ public sealed class LiveContestOverlayService : IDisposable
             {
                 // chiffres/GO : enorme et anime ; phrases : police adaptee (rien de coupe)
                 var digit = text.Trim().Length <= 4;
-                Size = digit ? new Size(720, 460) : new Size(620, 270);
+                Size = digit ? new Size(780, 600) : new Size(700, 280);
                 _brand.Location = new Point((Width - _brand.PreferredWidth) / 2, 16);
                 _text.Font = digit ? _digitFonts[0] : _centerPhraseFont;
                 _text.TextAlign = ContentAlignment.MiddleCenter;
-                _text.SetBounds(10, 44, Width - 20, digit ? 340 : 150);
+                if (_bigIcon is not null)
+                {
+                    _bigIcon.Visible = !digit;
+                    _bigIcon.Location = new Point(34, (Height - 96) / 2 - 10);
+                }
+
+                var textLeft = digit || _bigIcon is null ? 10 : 146;
+                _text.SetBounds(textLeft, 40, Width - textLeft - 10, digit ? 490 : 150);
                 _sub.Font = _centerSubFont;
                 _sub.TextAlign = ContentAlignment.MiddleCenter;
-                _sub.SetBounds(10, digit ? 392 : 200, Width - 20, 54);
+                _sub.SetBounds(10, digit ? 538 : 200, Width - 20, 54);
                 Location = new Point(
                     area.Left + (area.Width - Width) / 2,
                     area.Top + (area.Height - Height) / 2);
@@ -237,10 +285,16 @@ public sealed class LiveContestOverlayService : IDisposable
                 _sub.TextAlign = ContentAlignment.TopLeft;
                 _sub.SetBounds(14, 68, 352, 38); // deux lignes : plus de texte coupe
                 Location = new Point(area.Right - Width - 24, area.Bottom - Height - 24);
+                if (_bigIcon is not null)
+                {
+                    _bigIcon.Visible = false;
+                }
+
                 _animGrow = false;
             }
 
-            Opacity = 0.25;
+            _targetOpacity = center && text.Trim().Length <= 4 ? 0.85 : 0.62;
+            Opacity = 0.1;
             _animStep = 0;
             _fadeTimer.Stop();
             _fadeTimer.Start();
