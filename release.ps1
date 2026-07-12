@@ -35,6 +35,11 @@ $ex = @(
     "-x!$name\resources\controls\retroarch\mame",
     # Curator : savoir-faire prive, jamais distribue.
     "-x!$name\panel_curator_ultimate.py", "-x!$name\panel_curator.ini", "-x!$name\profiles_db.py",
+    # mem-curator : les sorties de generation, rapports et chemins locaux
+    # restent hors pack (les outils eux-memes sont publics via le repo).
+    "-x!$name\tools\mem-curator\MEM_*", "-x!$name\tools\mem-curator\_test_MEM*",
+    "-x!$name\tools\mem-curator\.source-base.local",
+    "-x!$name\tools\mem-curator\baseline_*.json", "-x!$name\tools\mem-curator\staging*",
     "-x!$name\state",
     "-x!$name\docs", "-x!$name\src", "-x!$name\artifacts",
     "-x!$name\wiki", "-x!$name\mkdocs.yml", "-x!$name\site",
