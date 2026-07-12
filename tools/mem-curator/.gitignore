@@ -8,3 +8,5 @@ __pycache__/
 .source-base.local
 staging_run.log
 mame_apiexpose_ingame/
+staging2_*.json
+datapack_release*.log
