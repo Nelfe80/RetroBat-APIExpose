@@ -119,7 +119,7 @@ Canonical field order:
 | `no_survey` | no | both | Same effect as `no_log` in the wrapper; reserved for future on-demand reads. Omitted when false. |
 | `score_kind` / `score_mask` / `score_encoding` | no | APIExpose | Score semantics parsed from the `.MEM` by the live score aggregator (`/ws/score`). |
 | `timer_kind` / `timer_role` / `timer_direction` / `timer_unit` | no | APIExpose | Timer semantics parsed from the `.MEM` by the live timer aggregator (`/ws/timer`). |
-| `player` | no | reserved | Player index (LedManager routing, future use). |
+| `player` | no | both | Player index, emitted as `PLAYER:n` in the pipe (wrapper >= 0.320) and published in `/ws/ingame` payloads (LedManager `playerField` routing, per-player widgets). |
 | `desc` | yes | both | Short English description. No `address` word, no `=`, no double quotes, max 96 chars, last field. |
 
 The generator's default profile (`wrapper`) does not emit entries whose

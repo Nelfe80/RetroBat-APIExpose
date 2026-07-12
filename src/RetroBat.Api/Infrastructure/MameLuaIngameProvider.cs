@@ -247,7 +247,8 @@ public sealed class MameLuaIngameProvider : IProvider
                 RuntimeAddress = $"0x{rule.RuntimeAddress:X}",
                 RawValueHex = $"0x{value:X}",
                 color = rule.Color,
-                family = rule.Family
+                family = rule.Family,
+                player = rule.Player
             };
 
             await _eventBus.PublishAsync(new EventEnvelope
@@ -455,7 +456,8 @@ public sealed class MameLuaIngameProvider : IProvider
                 Min = TryParseLong(values.GetValueOrDefault("min"), out var min) ? min : null,
                 Max = TryParseLong(values.GetValueOrDefault("max"), out var max) ? max : null,
                 Value = TryParseLong(values.GetValueOrDefault("value"), out var exactValue) ? exactValue : null,
-                Mask = TryParseLong(values.GetValueOrDefault("mask"), out var mask) ? mask : null
+                Mask = TryParseLong(values.GetValueOrDefault("mask"), out var mask) ? mask : null,
+                Player = TryParseLong(values.GetValueOrDefault("player"), out var player) ? player : null
             });
         }
 
@@ -803,6 +805,7 @@ public sealed class MameLuaIngameProvider : IProvider
         public long? Max { get; init; }
         public long? Value { get; init; }
         public long? Mask { get; init; }
+        public long? Player { get; init; }
         public bool HasRange => Min.HasValue || Max.HasValue;
     }
 

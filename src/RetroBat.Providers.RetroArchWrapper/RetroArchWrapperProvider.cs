@@ -14,7 +14,7 @@ public class RetroArchWrapperProvider : IProvider
     public const string DefaultPipeName = "RetroBatArcadePipe";
 
     private static readonly Regex RuntimeRegex = new(
-        @"^\[(?<clock>\d{2}:\d{2}:\d{2}\.\d{3})\]\s+\[ADDR:(?<addr>[^\]]+)\]\s+\[VAL:(?<raw>[^\]]+)\]\s+\[UDP_OUT\]\s+(?:TYPE:)?(?<channel>[A-Z]+)\s*:\s*(?<name>[A-Z0-9_]+)\s+\|\s+SOURCE:(?<source>.*?)\s+\|\s+VALUE:(?<value>-?\d+)(?:\s+\|\s+RATE:(?<rate>-?\d+))?(?:\s+\|\s+FAMILY:(?<family>[A-Za-z0-9_.-]+))?(?:\s+\|\s+COLOR:(?<color>[A-Za-z0-9_-]+))?",
+        @"^\[(?<clock>\d{2}:\d{2}:\d{2}\.\d{3})\]\s+\[ADDR:(?<addr>[^\]]+)\]\s+\[VAL:(?<raw>[^\]]+)\]\s+\[UDP_OUT\]\s+(?:TYPE:)?(?<channel>[A-Z]+)\s*:\s*(?<name>[A-Z0-9_]+)\s+\|\s+SOURCE:(?<source>.*?)\s+\|\s+VALUE:(?<value>-?\d+)(?:\s+\|\s+RATE:(?<rate>-?\d+))?(?:\s+\|\s+FAMILY:(?<family>[A-Za-z0-9_.-]+))?(?:\s+\|\s+COLOR:(?<color>[A-Za-z0-9_-]+))?(?:\s+\|\s+PLAYER:(?<player>\d+))?",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private readonly IEventBus _eventBus;
@@ -226,7 +226,8 @@ public class RetroArchWrapperProvider : IProvider
                     parsed.Address,
                     parsed.RawValueHex,
                     family = parsed.Family,
-                    color = parsed.Color
+                    color = parsed.Color,
+                    player = parsed.Player
                 }
             });
         }
@@ -337,6 +338,7 @@ public class RetroArchWrapperProvider : IProvider
             Rate = rate,
             Family = match.Groups["family"].Value.Trim().ToLowerInvariant(),
             Color = match.Groups["color"].Value.Trim().ToLowerInvariant(),
+            Player = int.TryParse(match.Groups["player"].Value, out var parsedPlayer) ? parsedPlayer : null,
             RawLine = line,
             Ts = DateTime.UtcNow
         };
