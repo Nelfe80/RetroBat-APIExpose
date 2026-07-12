@@ -1,0 +1,10 @@
+MEM_*/
+_test_MEM/
+_test_MEM_logs/
+baseline_*.json
+staging_*.json
+*.log
+__pycache__/
+.source-base.local
+staging_run.log
+mame_apiexpose_ingame/

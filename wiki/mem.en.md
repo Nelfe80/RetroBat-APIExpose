@@ -155,8 +155,9 @@ The runtime automatically translates your families into universal commands: a `l
 
 ## Avoiding spam: `no_log` and `no_survey`
 
-- `no_log=true`: the event is tracked but does not write to logs — essential for `timer` and `player_state` which change constantly.
-- `no_survey=true`: the address is **not read at all** by default (reserved for tools that explicitly request it) — for verbose, low-priority payloads.
+- `no_log=true` or `no_survey=true`: the runtime **skips the entry at load time** — the address is not watched and costs nothing in game.
+- These entries are deliberately kept in the Data Pack files: to re-enable an address, flip its flag to `false` (or remove it — absence means `false`), no tooling required.
+- An automatic anti-spam guard protects the runtime anyway: a non-score event firing in a tight loop is permanently muted for the session.
 
 ## The golden rules for descriptions
 
@@ -167,12 +168,12 @@ English, short, gameplay-oriented, no trailing period, no address in the text:
 
 ## Checklist before sharing
 
-- [ ] The four blocks in order `game` → `rom` → `memory` → `events`
+- [ ] The three blocks in order `game` → `rom` → `events`
 - [ ] `game.system` = RetroBat folder name
-- [ ] Keys in lowercase `snake_case`, canonical families only
-- [ ] Variables = values; events = changes
-- [ ] `no_log` on values that change every frame
-- [ ] Tested in game: events show up on `ws://127.0.0.1:12345/ws/arcade`
+- [ ] Canonical families only (`flow.lifecycle`, `scoring.points`…), `desc` as the last field, without `=` or the word "address"
+- [ ] Recognized `condition`: `change`, `eq`, `neq`, `increase`, `decrease`, `bit_true`, `bit_false`
+- [ ] `no_log=true` on values that change every frame (re-enable by flipping to `false`)
+- [ ] Tested in game: events show up on `ws://127.0.0.1:12345/ws/ingame` (with their `family`, plus `color` for arcade score deltas)
 
 !!! question "In doubt?"
     The commented template is `resources\ram\<system>\template.MEM` when present, and the Data Pack files are all compliant examples. `.MEM` files are covered by the [DATA-LICENSE](licences.md) — your personal creations remain yours, community sharing is welcome.

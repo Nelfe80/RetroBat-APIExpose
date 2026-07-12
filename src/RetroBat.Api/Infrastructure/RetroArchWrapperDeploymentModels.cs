@@ -23,6 +23,8 @@ public class RetroArchWrapperDeploymentResult
     public int MissingRealCores { get; set; }
     public int PendingDeployments { get; set; }
     public int DeployedCores { get; set; }
+    public int StaleWrappers { get; set; }
+    public int RefreshedCores { get; set; }
     public List<RetroArchWrapperCoreStatus> Cores { get; set; } = new();
     public List<RetroArchWrapperDeploymentAction> Actions { get; set; } = new();
     public List<string> Warnings { get; set; } = new();
@@ -36,6 +38,7 @@ public class RetroArchWrapperCoreStatus
     public bool IsWrapper { get; set; }
     public bool HasRealCore { get; set; }
     public bool NeedsDeployment { get; set; }
+    public bool NeedsRefresh { get; set; }
     public long CoreBytes { get; set; }
     public long? RealCoreBytes { get; set; }
     public DateTime LastWriteTime { get; set; }

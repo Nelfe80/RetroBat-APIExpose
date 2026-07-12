@@ -155,8 +155,9 @@ Le runtime traduit automatiquement vos familles en commandes universelles : une 
 
 ## Éviter le spam : `no_log` et `no_survey`
 
-- `no_log=true` : l'événement est suivi mais n'écrit pas dans les logs — indispensable pour `timer` et `player_state` qui changent en permanence.
-- `no_survey=true` : l'adresse n'est **pas lue du tout** par défaut (réservée aux outils qui la demandent explicitement) — pour les payloads verbeux à faible priorité.
+- `no_log=true` ou `no_survey=true` : le runtime **ignore l'entrée dès le chargement** — l'adresse n'est pas surveillée et ne coûte rien en jeu.
+- Ces entrées restent volontairement dans les fichiers du Data Pack : pour réactiver une adresse, passez son flag à `false` (ou supprimez-le — l'absence vaut `false`), aucun outil n'est nécessaire.
+- Un anti-spam automatique protège de toute façon le runtime : un événement non-score qui se déclenche en boucle est coupé définitivement pour la session.
 
 ## Les règles d'or des descriptions
 
@@ -167,12 +168,12 @@ En anglais, courtes, orientées gameplay, sans point final, sans adresse dans le
 
 ## Checklist avant de partager
 
-- [ ] Les quatre blocs dans l'ordre `game` → `rom` → `memory` → `events`
+- [ ] Les trois blocs dans l'ordre `game` → `rom` → `events`
 - [ ] `game.system` = nom du dossier RetroBat
-- [ ] Clés en `snake_case` minuscules, familles canoniques uniquement
-- [ ] Variables = valeurs ; events = changements
-- [ ] `no_log` sur les valeurs qui changent à chaque frame
-- [ ] Testé en jeu : les événements apparaissent sur `ws://127.0.0.1:12345/ws/arcade`
+- [ ] Familles canoniques uniquement (`flow.lifecycle`, `scoring.points`…), `desc` en dernier champ, sans `=` ni le mot « address »
+- [ ] `condition` reconnue : `change`, `eq`, `neq`, `increase`, `decrease`, `bit_true`, `bit_false`
+- [ ] `no_log=true` sur les valeurs qui changent à chaque frame (réactivable en le passant à `false`)
+- [ ] Testé en jeu : les événements apparaissent sur `ws://127.0.0.1:12345/ws/ingame` (avec leur `family`, et `color` pour les deltas score arcade)
 
 !!! question "Un doute ?"
     Le modèle complet commenté est `resources\ram\<système>\template.MEM` quand il existe, et les fichiers du Data Pack sont autant d'exemples conformes. Les fichiers `.MEM` sont couverts par la [DATA-LICENSE](licences.md) — vos créations personnelles restent les vôtres, le partage communautaire est bienvenu.

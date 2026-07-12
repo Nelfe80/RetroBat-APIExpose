@@ -14,7 +14,7 @@ public class RetroArchWrapperProvider : IProvider
     public const string DefaultPipeName = "RetroBatArcadePipe";
 
     private static readonly Regex RuntimeRegex = new(
-        @"^\[(?<clock>\d{2}:\d{2}:\d{2}\.\d{3})\]\s+\[ADDR:(?<addr>[^\]]+)\]\s+\[VAL:(?<raw>[^\]]+)\]\s+\[UDP_OUT\]\s+(?:TYPE:)?(?<channel>[A-Z]+)\s*:\s*(?<name>[A-Z0-9_]+)\s+\|\s+SOURCE:(?<source>.*?)\s+\|\s+VALUE:(?<value>-?\d+)(?:\s+\|\s+RATE:(?<rate>-?\d+))?",
+        @"^\[(?<clock>\d{2}:\d{2}:\d{2}\.\d{3})\]\s+\[ADDR:(?<addr>[^\]]+)\]\s+\[VAL:(?<raw>[^\]]+)\]\s+\[UDP_OUT\]\s+(?:TYPE:)?(?<channel>[A-Z]+)\s*:\s*(?<name>[A-Z0-9_]+)\s+\|\s+SOURCE:(?<source>.*?)\s+\|\s+VALUE:(?<value>-?\d+)(?:\s+\|\s+RATE:(?<rate>-?\d+))?(?:\s+\|\s+FAMILY:(?<family>[A-Za-z0-9_.-]+))?(?:\s+\|\s+COLOR:(?<color>[A-Za-z0-9_-]+))?",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private readonly IEventBus _eventBus;
@@ -224,7 +224,9 @@ public class RetroArchWrapperProvider : IProvider
                     parsed.Value,
                     parsed.Rate,
                     parsed.Address,
-                    parsed.RawValueHex
+                    parsed.RawValueHex,
+                    family = parsed.Family,
+                    color = parsed.Color
                 }
             });
         }
@@ -333,6 +335,8 @@ public class RetroArchWrapperProvider : IProvider
             RawValueHex = match.Groups["raw"].Value.Trim(),
             Value = value,
             Rate = rate,
+            Family = match.Groups["family"].Value.Trim().ToLowerInvariant(),
+            Color = match.Groups["color"].Value.Trim().ToLowerInvariant(),
             RawLine = line,
             Ts = DateTime.UtcNow
         };

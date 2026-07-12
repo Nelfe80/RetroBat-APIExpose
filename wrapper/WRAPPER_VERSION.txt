@@ -2,11 +2,11 @@ RetroBat Wrapper (libretro proxy DLL)
 ======================================
 
 File        : wrapper.dll
-Version     : 0.300.0.0
-Build date  : 2026-07-01
+Version     : 0.310.0.0
+Build date  : 2026-07-12
 Signed      : yes - Authenticode, subject CN=nelfeTech (self-signed,
               timestamped via timestamp.digicert.com)
-SHA-256     : CF8AE6349750618AB47CFF0F70678AB5244836F3E233D27B3E6BBA4CF09ACF99
+SHA-256     : 3EA3902DDF679E5CB2C4A756A63B214DD304F5D618B501A1714520E933036BE6
 
 Verify on Windows (PowerShell):
   Get-FileHash wrapper.dll -Algorithm SHA256

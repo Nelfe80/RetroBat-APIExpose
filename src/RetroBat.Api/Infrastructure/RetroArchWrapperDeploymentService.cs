@@ -95,11 +95,12 @@ public class RetroArchWrapperDeploymentService
             return result;
         }
 
+        var wrapperReference = new FileInfo(wrapperPath);
         var coreFiles = GetTargetCoreFiles(coresPath, deploymentOptions);
         foreach (var coreFile in coreFiles)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var status = BuildCoreStatus(coreFile, realCoresPath);
+            var status = BuildCoreStatus(coreFile, realCoresPath, wrapperReference);
             result.Cores.Add(status);
         }
 
@@ -108,6 +109,7 @@ public class RetroArchWrapperDeploymentService
         result.RealCores = result.Cores.Count(core => !core.IsWrapper);
         result.MissingRealCores = result.Cores.Count(core => core.IsWrapper && !core.HasRealCore);
         result.PendingDeployments = result.Cores.Count(core => core.NeedsDeployment);
+        result.StaleWrappers = result.Cores.Count(core => core.NeedsRefresh);
 
         if (action.Equals("deploy", StringComparison.OrdinalIgnoreCase))
         {
@@ -115,6 +117,15 @@ public class RetroArchWrapperDeploymentService
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 DeployCore(wrapperPath, realCoresPath, backupRoot, dryRun, core, result);
+            }
+
+            // Un wrapper deja en place mais different du build de reference est
+            // simplement recopie (jamais deplace vers cores_real : c'est le vrai
+            // core qui s'y trouve). Corrige la derive de versions de la flotte.
+            foreach (var core in result.Cores.Where(core => core.NeedsRefresh))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                RefreshCore(wrapperPath, backupRoot, dryRun, core, result);
             }
         }
 
@@ -147,15 +158,18 @@ public class RetroArchWrapperDeploymentService
             .ToList();
     }
 
-    private static RetroArchWrapperCoreStatus BuildCoreStatus(FileInfo coreFile, string realCoresPath)
+    private static RetroArchWrapperCoreStatus BuildCoreStatus(FileInfo coreFile, string realCoresPath, FileInfo wrapperReference)
     {
         var isWrapper = IsWrapperFile(coreFile.FullName);
         var realCorePath = Path.Combine(realCoresPath, coreFile.Name);
         var realCore = new FileInfo(realCorePath);
         var hasRealCore = realCore.Exists;
+        var needsRefresh = isWrapper && hasRealCore && !FilesHaveSameContent(coreFile, wrapperReference);
 
         var reason = isWrapper
-            ? hasRealCore ? "Wrapper deployed and real core available." : "Wrapper deployed but real core is missing."
+            ? needsRefresh
+                ? "Wrapper deployed but outdated; it will be refreshed with the reference build."
+                : hasRealCore ? "Wrapper deployed and real core available." : "Wrapper deployed but real core is missing."
             : hasRealCore ? "Real core detected in cores; cores_real will be backed up and refreshed." : "Real core detected in cores; it will be moved to cores_real.";
 
         return new RetroArchWrapperCoreStatus
@@ -166,12 +180,71 @@ public class RetroArchWrapperDeploymentService
             IsWrapper = isWrapper,
             HasRealCore = hasRealCore,
             NeedsDeployment = !isWrapper,
+            NeedsRefresh = needsRefresh,
             CoreBytes = coreFile.Length,
             RealCoreBytes = hasRealCore ? realCore.Length : null,
             LastWriteTime = coreFile.LastWriteTime,
             RealLastWriteTime = hasRealCore ? realCore.LastWriteTime : null,
             Reason = reason
         };
+    }
+
+    private static bool FilesHaveSameContent(FileInfo left, FileInfo right)
+    {
+        if (!left.Exists || !right.Exists)
+        {
+            return false;
+        }
+
+        if (left.Length != right.Length)
+        {
+            return false;
+        }
+
+        using var md5 = System.Security.Cryptography.MD5.Create();
+        using var leftStream = left.OpenRead();
+        var leftHash = md5.ComputeHash(leftStream);
+        md5.Initialize();
+        using var rightStream = right.OpenRead();
+        var rightHash = md5.ComputeHash(rightStream);
+        return leftHash.AsSpan().SequenceEqual(rightHash);
+    }
+
+    private static void RefreshCore(
+        string wrapperPath,
+        string backupRoot,
+        bool dryRun,
+        RetroArchWrapperCoreStatus core,
+        RetroArchWrapperDeploymentResult result)
+    {
+        var backupPath = Path.Combine(backupRoot, DateTime.Now.ToString("yyyyMMdd-HHmmss"), core.CoreName);
+        result.Actions.Add(new RetroArchWrapperDeploymentAction
+        {
+            CoreName = core.CoreName,
+            Operation = "backup-stale-wrapper",
+            SourcePath = core.CorePath,
+            DestinationPath = backupPath,
+            Applied = !dryRun
+        });
+
+        result.Actions.Add(new RetroArchWrapperDeploymentAction
+        {
+            CoreName = core.CoreName,
+            Operation = "refresh-wrapper-in-cores",
+            SourcePath = wrapperPath,
+            DestinationPath = core.CorePath,
+            Applied = !dryRun
+        });
+
+        if (dryRun)
+        {
+            return;
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(backupPath)!);
+        File.Copy(core.CorePath, backupPath, overwrite: true);
+        File.Copy(wrapperPath, core.CorePath, overwrite: true);
+        result.RefreshedCores++;
     }
 
     private static void DeployCore(

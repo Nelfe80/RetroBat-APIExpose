@@ -268,8 +268,18 @@ public sealed class MameLuaIngameProvider : IProvider
 
     private static bool ShouldTrigger(MameLuaRule rule, long oldValue, long value, out long emittedValue, out long rate)
     {
+        // Aligne sur wrapper.cpp : le mask est applique a la valeur lue pour
+        // toutes les conditions (les conditions bit_* comparent sur le mask brut).
+        if (rule.Mask is long readMask && rule.Condition is not ("bit_true" or "bit_false"))
+        {
+            value &= readMask;
+            oldValue &= readMask;
+        }
+
         emittedValue = value;
         rate = value - oldValue;
+
+        var condition = rule.Condition.ToLowerInvariant();
 
         if (rule.HasRange)
         {
@@ -278,17 +288,24 @@ public sealed class MameLuaIngameProvider : IProvider
             rate = newComparable - oldComparable;
             emittedValue = newComparable;
 
-            if (rate <= 0)
+            var directionOk = condition switch
+            {
+                "decrease" => rate < 0,
+                "increase" => rate > 0,
+                _ => rate != 0
+            };
+            if (!directionOk)
             {
                 return false;
             }
 
-            if (rule.Min.HasValue && rate < rule.Min.Value)
+            var delta = Math.Abs(rate);
+            if (rule.Min.HasValue && delta < rule.Min.Value)
             {
                 return false;
             }
 
-            if (rule.Max.HasValue && rate > rule.Max.Value)
+            if (rule.Max.HasValue && delta > rule.Max.Value)
             {
                 return false;
             }
@@ -296,16 +313,17 @@ public sealed class MameLuaIngameProvider : IProvider
             return true;
         }
 
-        var condition = rule.Condition.ToLowerInvariant();
         return condition switch
         {
             "any" or "change" => value != oldValue,
             "increase" => value > oldValue,
             "decrease" => value < oldValue,
-            "eq" or "equal" or "equals" => rule.Value.HasValue && value == rule.Value.Value,
-            "ne" => rule.Value.HasValue && value != rule.Value.Value,
+            "eq" or "equal" or "equals" => rule.Value.HasValue && value == rule.Value.Value && oldValue != rule.Value.Value,
+            "neq" or "ne" or "not_equal" => rule.Value.HasValue && value != rule.Value.Value && value != oldValue,
             "gt" => rule.Value.HasValue && value > rule.Value.Value,
             "lt" => rule.Value.HasValue && value < rule.Value.Value,
+            "bit_true" => rule.Mask is long mask && (value & mask) == mask && (oldValue & mask) != mask,
+            "bit_false" => rule.Mask is long mask && (value & mask) == 0 && (oldValue & mask) != 0,
             _ => value != oldValue
         };
     }
@@ -371,6 +389,16 @@ public sealed class MameLuaIngameProvider : IProvider
         foreach (var rule in rules)
         {
             var runtimeAddress = ToMameRuntimeAddress(systemId, rule.Address, usesHighRamBank);
+            rule.RuntimeAddress = runtimeAddress;
+
+            // Les rules no_log/no_survey ne publient jamais : ne pas faire lire
+            // leur adresse au pont Lua a chaque frame (TargetId 0 = jamais evaluee).
+            if (rule.NoLog || rule.NoSurvey)
+            {
+                rule.TargetId = 0;
+                continue;
+            }
+
             var key = $"{runtimeAddress:X}|{rule.Type}";
             if (!targetMap.TryGetValue(key, out var targetId))
             {
@@ -380,7 +408,6 @@ public sealed class MameLuaIngameProvider : IProvider
             }
 
             rule.TargetId = targetId;
-            rule.RuntimeAddress = runtimeAddress;
         }
 
         return new MameLuaDefinition(
@@ -424,9 +451,11 @@ public sealed class MameLuaIngameProvider : IProvider
                 Family = entry.Family,
                 Color = GetString(values, "color"),
                 NoLog = TryParseBool(values.GetValueOrDefault("no_log"), out var noLog) && noLog,
+                NoSurvey = TryParseBool(values.GetValueOrDefault("no_survey"), out var noSurvey) && noSurvey,
                 Min = TryParseLong(values.GetValueOrDefault("min"), out var min) ? min : null,
                 Max = TryParseLong(values.GetValueOrDefault("max"), out var max) ? max : null,
-                Value = TryParseLong(values.GetValueOrDefault("value"), out var exactValue) ? exactValue : null
+                Value = TryParseLong(values.GetValueOrDefault("value"), out var exactValue) ? exactValue : null,
+                Mask = TryParseLong(values.GetValueOrDefault("mask"), out var mask) ? mask : null
             });
         }
 
@@ -769,9 +798,11 @@ public sealed class MameLuaIngameProvider : IProvider
         public string Family { get; init; } = string.Empty;
         public string Color { get; init; } = string.Empty;
         public bool NoLog { get; init; }
+        public bool NoSurvey { get; init; }
         public long? Min { get; init; }
         public long? Max { get; init; }
         public long? Value { get; init; }
+        public long? Mask { get; init; }
         public bool HasRange => Min.HasValue || Max.HasValue;
     }
 

@@ -109,6 +109,10 @@ public class RetroArchRuntimeSignal
     public int? Value { get; set; }
     /// <example>21</example>
     public int? Rate { get; set; }
+    /// <example>flow.lifecycle</example>
+    public string Family { get; set; } = string.Empty;
+    /// <example>orange</example>
+    public string Color { get; set; } = string.Empty;
     public string RawLine { get; set; } = string.Empty;
     /// <example>2026-04-28T21:00:00.123Z</example>
     public DateTime Ts { get; set; } = DateTime.UtcNow;
