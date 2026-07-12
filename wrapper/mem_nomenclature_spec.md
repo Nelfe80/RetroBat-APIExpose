@@ -122,8 +122,10 @@ Canonical field order:
 | `player` | no | both | Player index, emitted as `PLAYER:n` in the pipe (wrapper >= 0.320) and published in `/ws/ingame` payloads (LedManager `playerField` routing, per-player widgets). |
 | `desc` | yes | both | Short English description. No `address` word, no `=`, no double quotes, max 96 chars, last field. |
 
-The generator's default profile (`wrapper`) does not emit entries whose
-`no_log` or `no_survey` is true: both runtimes ignore them entirely.
+Inactive entries (`no_log`/`no_survey` true) are kept in the generated
+files with their explicit flags: the runtimes skip them at load time, and end
+users can re-enable an address by flipping the flag to `false`. The
+generator's `--drop-inactive` option produces the lean variant without them.
 
 ---
 
