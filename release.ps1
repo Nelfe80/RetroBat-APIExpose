@@ -38,7 +38,7 @@ $ex = @(
     # mem-curator : les sorties de generation, rapports et chemins locaux
     # restent hors pack (les outils eux-memes sont publics via le repo).
     "-x!$name\tools\mem-curator\MEM_*", "-x!$name\tools\mem-curator\_test_MEM*",
-    "-x!$name\tools\mem-curator\.source-base.local",
+    "-x!$name\tools\mem-curator\.source-base.local", "-x!$name\tools\mem-curator\.gitignore",
     "-x!$name\tools\mem-curator\baseline_*.json", "-x!$name\tools\mem-curator\staging*",
     "-x!$name\state",
     "-x!$name\docs", "-x!$name\src", "-x!$name\artifacts",
