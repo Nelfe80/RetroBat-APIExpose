@@ -232,7 +232,7 @@ suffixes built from labels.
   against `min`/`max` when present; score events bypass auto-mute.
 - **Output**: events are written to the `RetroBatArcadePipe` named pipe as
   `[hh:mm:ss.mmm] [ADDR:0x...] [VAL:0x..] [UDP_OUT] CHANNEL:ACTION |
-  SOURCE:desc | VALUE:n | RATE:n | FAMILY:category.subfamily[ | COLOR:color]`.
+  SOURCE:desc | VALUE:n | RATE:n | FAMILY:category.subfamily[ | COLOR:color][ | PLAYER:n]`.
   Channel is `STATE` for `NEW_LEVEL`/`GAME_STATE`/`*SCREEN*` actions, `SCORE`
   for score entries, `ACTION` otherwise. `FAMILY` carries the V11 family for
   effect routing (LedManager); `COLOR` is only present when the entry defines
