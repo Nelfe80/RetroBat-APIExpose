@@ -24,16 +24,15 @@ Par exemple `resources\ram\nes\super-mario-bros.MEM`. Le `<système>` est le **n
 !!! tip "Partez d'un existant"
     Le Data Pack contient déjà des milliers de `.MEM`. Ouvrez celui d'un jeu proche du vôtre : c'est le meilleur modèle de départ.
 
-## La structure : quatre blocs
+## La structure : trois blocs
 
-Un `.MEM` est une table Lua avec quatre sections, toujours dans cet ordre :
+Un `.MEM` est une table Lua avec trois sections, toujours dans cet ordre :
 
 ```lua
 return {
   game = { ... },      -- qui est ce jeu
   rom = { ... },       -- quelles ROMs correspondent
-  memory = { ... },    -- les variables observées
-  events = { ... }     -- les événements qui en découlent
+  events = { ... }     -- les événements surveillés en jeu
 }
 ```
 
@@ -52,7 +51,7 @@ game = {
 
 ```lua
 rom = {
-  name = "super_mario_bros",      -- snake_case, minuscules, sans extension
+  name = "super-mario-bros",      -- kebab-case minuscules = nom du fichier .MEM
   hashes = {
     { hash = "8e3630186e35d477231bf8fd50e54cdd",
       label = "Super Mario Bros. (World).nes",
@@ -61,40 +60,24 @@ rom = {
 }
 ```
 
-Les hashes permettent de reconnaître les variantes (régions, versions) sans dupliquer le fichier.
-
-### 3. `memory.variables` — ce qu'on observe
-
-Chaque variable décrit **une valeur**, jamais un changement :
-
-```lua
-memory = {
-  variables = {
-    lives = { address = 0x075A, type = "u8", desc = "Player lives" },
-    world = { address = 0x075F, type = "u8", desc = "Current world" }
-  }
-}
-```
-
-- ✅ `desc = "Player lives"` — décrit la valeur
-- ❌ `desc = "Player loses a life"` — ça, c'est un événement (bloc suivant)
+Les hashes permettent de reconnaître les variantes (régions, versions) sans dupliquer le fichier ; `alias.json` dans le dossier système fait le lien nom de ROM/hash → fichier `.MEM`.
 
 **Où trouver les adresses ?** Avec le cheat engine de RetroArch, un débogueur d'émulateur, ou les bases communautaires (Data Crystal, guides de romhacking). Les adresses des cheat codes existants sont souvent un excellent point de départ.
 
-### 4. `events` — ce qui déclenche les effets
+### 3. `events` — ce qui déclenche les effets
 
-Un événement = une adresse + un type + une **condition** + une description :
+Un événement = une adresse + un type + une **condition** + une **action** de la nomenclature + une description, rangé dans sa famille `categorie.sous_famille` :
 
 ```lua
 events = {
   resources = {
     lives = {
-      { address=0x075A, type="u8", condition="decrease", desc="Player loses a life" }
+      { address=0X75A, type="u8", condition="decrease", action="LOSE_LIFE", desc="Player loses a life" }
     }
   },
   scoring = {
-    score = {
-      { address=0x0840, type="u24be", condition="increase", desc="Score increased", is_score=true }
+    points = {
+      { address=0X840, type="u24be", condition="change", action="SCORE_STATE", desc="Score" }
     }
   }
 }
@@ -104,10 +87,12 @@ events = {
 
 | Type | Signification |
 |---|---|
-| `u8` / `s8` | 1 octet, non signé / signé — **le choix par défaut** |
+| `u8` | 1 octet — **le choix par défaut** |
 | `u16le` / `u16be` | 2 octets, little / big endian |
 | `u24le` / `u24be` | 3 octets (fréquent pour les scores) |
-| `u32le` / `u32be`, `s16*`, `s32*` | 4 octets et variantes signées |
+| `u32le` / `u32be` | 4 octets |
+
+Seuls ces sept types non signés sont reconnus par le runtime ; tout autre type est lu comme `u8`.
 
 Ne devinez pas l'endianness d'une valeur multi-octets : en cas de doute, restez en `u8`.
 

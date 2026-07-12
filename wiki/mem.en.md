@@ -24,16 +24,15 @@ For instance `resources\ram\nes\super-mario-bros.MEM`. `<system>` is the **Retro
 !!! tip "Start from an existing file"
     The Data Pack already contains thousands of `.MEM` files. Open one from a game close to yours: it is the best starting template.
 
-## The structure: four blocks
+## The structure: three blocks
 
-A `.MEM` is a Lua table with four sections, always in this order:
+A `.MEM` is a Lua table with three sections, always in this order:
 
 ```lua
 return {
   game = { ... },      -- which game this is
   rom = { ... },       -- which ROMs match
-  memory = { ... },    -- the observed variables
-  events = { ... }     -- the events derived from them
+  events = { ... }     -- the events watched in game
 }
 ```
 
@@ -52,7 +51,7 @@ game = {
 
 ```lua
 rom = {
-  name = "super_mario_bros",      -- snake_case, lowercase, no extension
+  name = "super-mario-bros",      -- lowercase kebab-case = the .MEM filename
   hashes = {
     { hash = "8e3630186e35d477231bf8fd50e54cdd",
       label = "Super Mario Bros. (World).nes",
@@ -61,40 +60,24 @@ rom = {
 }
 ```
 
-Hashes let APIExpose recognize variants (regions, versions) without duplicating the file.
-
-### 3. `memory.variables` — what we observe
-
-Each variable describes **a value**, never a change:
-
-```lua
-memory = {
-  variables = {
-    lives = { address = 0x075A, type = "u8", desc = "Player lives" },
-    world = { address = 0x075F, type = "u8", desc = "Current world" }
-  }
-}
-```
-
-- ✅ `desc = "Player lives"` — describes the value
-- ❌ `desc = "Player loses a life"` — that's an event (next block)
+Hashes let APIExpose recognize variants (regions, versions) without duplicating the file; `alias.json` in the system folder maps ROM names/hashes to the canonical `.MEM` file.
 
 **Where do addresses come from?** RetroArch's cheat engine, an emulator debugger, or community databases (Data Crystal, romhacking guides). Existing cheat-code addresses are often an excellent starting point.
 
-### 4. `events` — what triggers the effects
+### 3. `events` — what triggers the effects
 
-An event = an address + a type + a **condition** + a description:
+An event = an address + a type + a **condition** + a nomenclature **action** + a description, stored under its `category.subfamily` family:
 
 ```lua
 events = {
   resources = {
     lives = {
-      { address=0x075A, type="u8", condition="decrease", desc="Player loses a life" }
+      { address=0X75A, type="u8", condition="decrease", action="LOSE_LIFE", desc="Player loses a life" }
     }
   },
   scoring = {
-    score = {
-      { address=0x0840, type="u24be", condition="increase", desc="Score increased", is_score=true }
+    points = {
+      { address=0X840, type="u24be", condition="change", action="SCORE_STATE", desc="Score" }
     }
   }
 }
@@ -104,10 +87,12 @@ events = {
 
 | Type | Meaning |
 |---|---|
-| `u8` / `s8` | 1 byte, unsigned / signed — **the default choice** |
+| `u8` | 1 byte — **the default choice** |
 | `u16le` / `u16be` | 2 bytes, little / big endian |
 | `u24le` / `u24be` | 3 bytes (common for scores) |
-| `u32le` / `u32be`, `s16*`, `s32*` | 4 bytes and signed variants |
+| `u32le` / `u32be` | 4 bytes |
+
+Only these seven unsigned types are recognized by the runtime; anything else is read as `u8`.
 
 Do not guess the endianness of a multi-byte value: when in doubt, stay on `u8`.
 
