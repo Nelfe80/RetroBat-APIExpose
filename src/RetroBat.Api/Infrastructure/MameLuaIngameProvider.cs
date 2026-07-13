@@ -85,19 +85,27 @@ public sealed class MameLuaIngameProvider : IProvider
 
                 while (!token.IsCancellationRequested)
                 {
-                    using var client = await listener.AcceptTcpClientAsync(token);
-                    try
+                    // chaque client dans sa tache : une session ouverte ne doit
+                    // jamais bloquer l'accept (double instance MAME, sonde...)
+                    var client = await listener.AcceptTcpClientAsync(token);
+                    _ = Task.Run(async () =>
                     {
-                        await HandleClientAsync(client, token);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogDebug(ex, "MAME Lua ingame session ended; waiting for next connection.");
-                    }
+                        try
+                        {
+                            await HandleClientAsync(client, token);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogDebug(ex, "MAME Lua ingame session ended.");
+                        }
+                        finally
+                        {
+                            client.Dispose();
+                        }
+                    }, token);
                 }
             }
             catch (OperationCanceledException)
