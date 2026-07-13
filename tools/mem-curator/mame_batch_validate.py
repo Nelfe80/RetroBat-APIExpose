@@ -28,15 +28,20 @@ BRIDGE = ("127.0.0.1", 12347)
 
 COINSTART = os.path.join(HERE, "coinstart.lua")
 COINSTART_BODY = """-- insere un credit et demarre la partie (banc de validation .MEM)
-local coin_field, start_field, frame = nil, nil, 0
+local coin_field, start_field, fire_field, frame = nil, nil, nil, 0
 _G.coinstart_sub = emu.add_machine_frame_notifier(function()
     frame = frame + 1
     if not coin_field then
         pcall(function()
-            for _, port in pairs(manager.machine.ioport.ports) do
+            for pname, port in pairs(manager.machine.ioport.ports) do
+                -- jamais les DIP switches (Coin A de DSWB = monnayeuse, pas piece !)
+                local dip = pname:upper():find("DSW")
                 for fname, field in pairs(port.fields) do
-                    if not coin_field and fname:lower():find("coin") then coin_field = field end
-                    if not start_field and fname:lower():find("start") and fname:find("1") then start_field = field end
+                    if not dip then
+                        if not coin_field and fname:lower():find("^coin") then coin_field = field end
+                        if not start_field and fname:lower():find("start") and fname:find("1") then start_field = field end
+                        if not fire_field and fname:lower():find("button 1") then fire_field = field end
+                    end
                 end
             end
         end)
@@ -47,6 +52,11 @@ _G.coinstart_sub = emu.add_machine_frame_notifier(function()
     if start_field then
         if frame == 420 then start_field:set_value(1) end
         if frame == 435 then start_field:set_value(0) end
+    end
+    -- autofire : les scores ne parlent que si on tire (bouton 1 par salves)
+    if fire_field and frame > 500 then
+        if frame % 20 == 0 then fire_field:set_value(1) end
+        if frame % 20 == 10 then fire_field:set_value(0) end
     end
 end)
 """
