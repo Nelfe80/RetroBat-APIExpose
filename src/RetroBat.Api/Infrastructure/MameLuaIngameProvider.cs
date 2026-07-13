@@ -137,6 +137,7 @@ public sealed class MameLuaIngameProvider : IProvider
         var endpoint = client.Client.RemoteEndPoint?.ToString() ?? "unknown";
         MameLuaDefinition? definition = null;
         var previousValues = new Dictionary<int, long>();
+        var fired = new Dictionary<int, int>();
 
         try
         {
@@ -180,7 +181,7 @@ public sealed class MameLuaIngameProvider : IProvider
 
                     await writer.WriteLineAsync($"READY|{definition.Targets.Count}");
                     await PublishSessionStartedAsync(definition, gameName);
-                    UpdateSession(endpoint, definition, connected: true, lastRawLine: line);
+                    UpdateSession(endpoint, definition, connected: true, lastRawLine: line, fired: fired);
 
                     _logger.LogInformation(
                         "MAME Lua ingame session started: rom={Rom} resolved={ResolvedRom} watches={WatchCount} definition={DefinitionFile}",
@@ -198,7 +199,7 @@ public sealed class MameLuaIngameProvider : IProvider
                         continue;
                     }
 
-                    UpdateSession(endpoint, definition, connected: true, lastRawLine: line);
+                    UpdateSession(endpoint, definition, connected: true, lastRawLine: line, fired: fired);
                     if (!previousValues.TryGetValue(targetId, out var oldValue))
                     {
                         previousValues[targetId] = value;
@@ -211,6 +212,7 @@ public sealed class MameLuaIngameProvider : IProvider
                     }
 
                     previousValues[targetId] = value;
+                    fired[targetId] = fired.GetValueOrDefault(targetId) + 1;
                     await EvaluateTargetAsync(definition, targetId, oldValue, value);
                 }
                 else if (command.Equals("BYE", StringComparison.OrdinalIgnoreCase))
@@ -231,7 +233,7 @@ public sealed class MameLuaIngameProvider : IProvider
         {
             if (definition != null)
             {
-                UpdateSession(endpoint, definition, connected: false, lastRawLine: string.Empty);
+                UpdateSession(endpoint, definition, connected: false, lastRawLine: string.Empty, fired: fired);
                 await PublishSessionStoppedAsync(definition);
             }
         }
@@ -830,8 +832,16 @@ public sealed class MameLuaIngameProvider : IProvider
         });
     }
 
-    private void UpdateSession(string endpoint, MameLuaDefinition definition, bool connected, string lastRawLine)
+    private void UpdateSession(string endpoint, MameLuaDefinition definition, bool connected, string lastRawLine,
+        IReadOnlyDictionary<int, int>? fired = null)
     {
+        var byAddress = new Dictionary<string, int>();
+        foreach (var target in definition.Targets)
+        {
+            byAddress[$"0x{target.RuntimeAddress:X}|{target.Type}"] =
+                fired?.GetValueOrDefault(target.Id) ?? 0;
+        }
+
         lock (_stateLock)
         {
             _sessions[endpoint] = new MameLuaSessionSnapshot(
@@ -842,7 +852,30 @@ public sealed class MameLuaIngameProvider : IProvider
                 definition.DefinitionExists,
                 definition.Targets.Count,
                 DateTime.UtcNow,
-                lastRawLine);
+                lastRawLine,
+                byAddress);
+        }
+    }
+
+    /// <summary>Instantane des sessions pour /api/v1/mamelua/sessions (banc de validation).</summary>
+    public IReadOnlyList<object> SessionsSnapshot()
+    {
+        lock (_stateLock)
+        {
+            return _sessions.Values
+                .Select(s => (object)new
+                {
+                    s.Endpoint,
+                    s.Connected,
+                    s.Rom,
+                    s.DefinitionFile,
+                    s.DefinitionExists,
+                    s.WatchCount,
+                    s.LastMessageAt,
+                    firedByAddress = s.FiredByAddress,
+                    silentTargets = s.FiredByAddress.Count(kv => kv.Value == 0)
+                })
+                .ToList();
         }
     }
 
@@ -890,5 +923,6 @@ public sealed class MameLuaIngameProvider : IProvider
         bool DefinitionExists,
         int WatchCount,
         DateTime LastMessageAt,
-        string LastRawLine);
+        string LastRawLine,
+        IReadOnlyDictionary<string, int> FiredByAddress);
 }
