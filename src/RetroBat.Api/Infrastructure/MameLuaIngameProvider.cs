@@ -44,7 +44,7 @@ public sealed class MameLuaIngameProvider : IProvider
     {
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _workerTask = RunAsync(_cts.Token);
-        _logger.LogInformation("MameLuaIngameProvider connector started for 127.0.0.1:{Port}", GetPort());
+        _logger.LogInformation("MameLuaIngameProvider bridge starting on 127.0.0.1:{Port}", GetPort());
         return Task.CompletedTask;
     }
 
@@ -71,31 +71,52 @@ public sealed class MameLuaIngameProvider : IProvider
 
     private async Task RunAsync(CancellationToken token)
     {
+        // Le plugin Lua MAME (emu.file "socket.host:port") ne sait etre que
+        // CLIENT sortant : APIExpose doit donc tenir l'ecoute locale. Les deux
+        // bouts etaient clients jusqu'ici -> aucune session ne s'etablissait.
         while (!token.IsCancellationRequested)
         {
-            TcpClient? client = null;
+            TcpListener? listener = null;
             try
             {
-                client = new TcpClient();
-                await client.ConnectAsync(IPAddress.Loopback, GetPort(), token);
-                await HandleClientAsync(client, token);
+                listener = new TcpListener(IPAddress.Loopback, GetPort());
+                listener.Start();
+                _logger.LogInformation("MAME Lua ingame bridge listening on 127.0.0.1:{Port}", GetPort());
+
+                while (!token.IsCancellationRequested)
+                {
+                    using var client = await listener.AcceptTcpClientAsync(token);
+                    try
+                    {
+                        await HandleClientAsync(client, token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogDebug(ex, "MAME Lua ingame session ended; waiting for next connection.");
+                    }
+                }
             }
             catch (OperationCanceledException)
             {
                 break;
             }
-            catch (SocketException) when (!token.IsCancellationRequested)
+            catch (SocketException ex) when (!token.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(1), token);
+                _logger.LogWarning(ex, "MAME Lua ingame bridge cannot listen on {Port}; retrying.", GetPort());
+                await Task.Delay(TimeSpan.FromSeconds(5), token);
             }
             catch (Exception ex) when (!token.IsCancellationRequested)
             {
-                _logger.LogDebug(ex, "MAME Lua ingame connector failed; retrying.");
+                _logger.LogDebug(ex, "MAME Lua ingame bridge failed; retrying.");
                 await Task.Delay(TimeSpan.FromSeconds(1), token);
             }
             finally
             {
-                client?.Dispose();
+                listener?.Stop();
             }
         }
     }
@@ -365,7 +386,14 @@ public sealed class MameLuaIngameProvider : IProvider
             {
                 var loadedAliases = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(aliasFile))
                     ?? new Dictionary<string, string>();
-                var aliases = new Dictionary<string, string>(loadedAliases, StringComparer.OrdinalIgnoreCase);
+                // alias.json porte des variantes de casse volontaires : le
+                // constructeur insensible a la casse JETTE sur doublons,
+                // TryAdd (premiere occurrence gagne) est requis.
+                var aliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var pair in loadedAliases)
+                {
+                    aliases.TryAdd(pair.Key, pair.Value);
+                }
                 if (TryResolveAlias(aliases, rawRom, rom, out var alias))
                 {
                     rom = NormalizeAliasKey(alias);
@@ -637,17 +665,11 @@ public sealed class MameLuaIngameProvider : IProvider
             return logicalAddress;
         }
 
-        if (usesHighRamBank && logicalAddress is >= 0x0000 and <= 0xFFFF)
-        {
-            return 0xFF0000 + logicalAddress;
-        }
-
-        return logicalAddress switch
-        {
-            >= 0x0300 and <= 0x03FF => logicalAddress + 0xE000,
-            >= 0x2200 and <= 0x22FF => logicalAddress + 0xD000,
-            _ => logicalAddress
-        };
+        // Le rebasage se fait desormais dans le plugin Lua, contre la carte
+        // memoire REELLE de la machine (Neo-Geo 0x100000, CPS 0xFF0000...) :
+        // les heuristiques statiques ci-devant rebasaient a l'aveugle.
+        _ = usesHighRamBank;
+        return logicalAddress;
     }
 
     private static string NormalizeRom(string rom)
