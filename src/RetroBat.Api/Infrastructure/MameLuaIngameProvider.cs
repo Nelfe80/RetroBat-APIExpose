@@ -138,6 +138,7 @@ public sealed class MameLuaIngameProvider : IProvider
         MameLuaDefinition? definition = null;
         var previousValues = new Dictionary<int, long>();
         var fired = new Dictionary<int, int>();
+        var composedLast = new Dictionary<string, long>();
 
         try
         {
@@ -203,6 +204,7 @@ public sealed class MameLuaIngameProvider : IProvider
                     if (!previousValues.TryGetValue(targetId, out var oldValue))
                     {
                         previousValues[targetId] = value;
+                        await EvaluateCompositesAsync(definition, targetId, previousValues, composedLast, fired);
                         continue;
                     }
 
@@ -214,6 +216,7 @@ public sealed class MameLuaIngameProvider : IProvider
                     previousValues[targetId] = value;
                     fired[targetId] = fired.GetValueOrDefault(targetId) + 1;
                     await EvaluateTargetAsync(definition, targetId, oldValue, value);
+                    await EvaluateCompositesAsync(definition, targetId, previousValues, composedLast, fired);
                 }
                 else if (command.Equals("BYE", StringComparison.OrdinalIgnoreCase))
                 {
@@ -239,9 +242,109 @@ public sealed class MameLuaIngameProvider : IProvider
         }
     }
 
+    /// <summary>
+    /// Scores en tuiles (digits=N) : recompose la valeur decimale complete a
+    /// chaque octet recu ; une tuile illisible (transition, glyphe non
+    /// chiffre) invalide la lecture au lieu d'emettre un delta fantaisiste.
+    /// </summary>
+    private async Task EvaluateCompositesAsync(
+        MameLuaDefinition definition,
+        int changedTargetId,
+        Dictionary<int, long> previousValues,
+        Dictionary<string, long> composedLast,
+        Dictionary<int, int> fired)
+    {
+        foreach (var group in definition.Rules
+                     .Where(r => r.Digits > 1 && r.DigitTargetIds.Contains(changedTargetId))
+                     .GroupBy(r => r.CompositeKey))
+        {
+            var first = group.First();
+            long composed = 0;
+            var valid = true;
+            foreach (var id in first.DigitTargetIds)
+            {
+                if (!previousValues.TryGetValue(id, out var tile))
+                {
+                    valid = false;
+                    break;
+                }
+
+                long digit;
+                if (first.Blank is long blank && tile == blank)
+                {
+                    digit = 0;
+                }
+                else
+                {
+                    digit = tile - first.DigitZero;
+                    if (digit is < 0 or > 9)
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+
+                composed = composed * 10 + digit;
+            }
+
+            if (!valid)
+            {
+                composedLast.Remove(group.Key);
+                continue;
+            }
+
+            composed *= first.Scale;
+            if (!composedLast.TryGetValue(group.Key, out var old))
+            {
+                composedLast[group.Key] = composed;
+                continue;
+            }
+
+            if (composed == old)
+            {
+                continue;
+            }
+
+            composedLast[group.Key] = composed;
+            var delta = composed - old;
+            foreach (var rule in group)
+            {
+                if (rule.NoLog)
+                {
+                    continue;
+                }
+
+                var directionOk = rule.Condition.ToLowerInvariant() switch
+                {
+                    "decrease" => delta < 0,
+                    "increase" => delta > 0,
+                    _ => true
+                };
+                if (!directionOk)
+                {
+                    continue;
+                }
+
+                var magnitude = Math.Abs(delta);
+                if (rule.Min.HasValue && magnitude < rule.Min.Value)
+                {
+                    continue;
+                }
+
+                if (rule.Max.HasValue && magnitude > rule.Max.Value)
+                {
+                    continue;
+                }
+
+                fired[-1] = fired.GetValueOrDefault(-1) + 1;
+                await PublishRuleAsync(definition, rule, composed, delta);
+            }
+        }
+    }
+
     private async Task EvaluateTargetAsync(MameLuaDefinition definition, int targetId, long oldValue, long value)
     {
-        foreach (var rule in definition.Rules.Where(rule => rule.TargetId == targetId))
+        foreach (var rule in definition.Rules.Where(rule => rule.TargetId == targetId && rule.TargetId != 0))
         {
             var trigger = ShouldTrigger(rule, oldValue, value, out var emittedValue, out var rate);
             if (!trigger || rule.NoLog)
@@ -249,6 +352,13 @@ public sealed class MameLuaIngameProvider : IProvider
                 continue;
             }
 
+            await PublishRuleAsync(definition, rule, emittedValue, rate);
+        }
+    }
+
+    private async Task PublishRuleAsync(MameLuaDefinition definition, MameLuaRule rule, long emittedValue, long rate)
+    {
+        {
             var payload = new
             {
                 Source = "mame.lua",
@@ -263,7 +373,7 @@ public sealed class MameLuaIngameProvider : IProvider
                     SourceDescription = rule.Description,
                     Address = $"0x{rule.Address:X}",
                     RuntimeAddress = $"0x{rule.RuntimeAddress:X}",
-                    RawValueHex = $"0x{value:X}",
+                    RawValueHex = $"0x{emittedValue:X}",
                     Value = emittedValue,
                     Rate = rate,
                     Color = rule.Color,
@@ -276,7 +386,7 @@ public sealed class MameLuaIngameProvider : IProvider
                 Rate = rate,
                 Address = $"0x{rule.Address:X}",
                 RuntimeAddress = $"0x{rule.RuntimeAddress:X}",
-                RawValueHex = $"0x{value:X}",
+                RawValueHex = $"0x{emittedValue:X}",
                 color = rule.Color,
                 family = rule.Family,
                 player = rule.Player
@@ -438,6 +548,26 @@ public sealed class MameLuaIngameProvider : IProvider
                 continue;
             }
 
+            if (rule.Digits > 1)
+            {
+                // score en tuiles : un watch u8 par chiffre, evaluation composee
+                for (var i = 0; i < rule.Digits; i++)
+                {
+                    var dKey = $"{runtimeAddress + i:X}|u8";
+                    if (!targetMap.TryGetValue(dKey, out var dId))
+                    {
+                        dId = targets.Count + 1;
+                        targetMap[dKey] = dId;
+                        targets.Add(new MameLuaTarget(dId, rule.Address + i, runtimeAddress + i, "u8"));
+                    }
+
+                    rule.DigitTargetIds.Add(dId);
+                }
+
+                rule.TargetId = 0; // jamais evaluee en cible simple
+                continue;
+            }
+
             var key = $"{runtimeAddress:X}|{rule.Type}";
             if (!targetMap.TryGetValue(key, out var targetId))
             {
@@ -495,7 +625,11 @@ public sealed class MameLuaIngameProvider : IProvider
                 Max = TryParseLong(values.GetValueOrDefault("max"), out var max) ? max : null,
                 Value = TryParseLong(values.GetValueOrDefault("value"), out var exactValue) ? exactValue : null,
                 Mask = TryParseLong(values.GetValueOrDefault("mask"), out var mask) ? mask : null,
-                Player = TryParseLong(values.GetValueOrDefault("player"), out var player) ? player : null
+                Player = TryParseLong(values.GetValueOrDefault("player"), out var player) ? player : null,
+                Digits = TryParseLong(values.GetValueOrDefault("digits"), out var digits) ? (int)digits : 0,
+                DigitZero = TryParseLong(values.GetValueOrDefault("digit_zero"), out var dz) ? dz : 0x30,
+                Blank = TryParseLong(values.GetValueOrDefault("blank"), out var blank) ? blank : null,
+                Scale = TryParseLong(values.GetValueOrDefault("scale"), out var scale) && scale > 0 ? scale : 1
             });
         }
 
@@ -842,6 +976,11 @@ public sealed class MameLuaIngameProvider : IProvider
                 fired?.GetValueOrDefault(target.Id) ?? 0;
         }
 
+        if (definition.Rules.Any(r => r.Digits > 1))
+        {
+            byAddress["composite|score"] = fired?.GetValueOrDefault(-1) ?? 0;
+        }
+
         lock (_stateLock)
         {
             _sessions[endpoint] = new MameLuaSessionSnapshot(
@@ -911,6 +1050,15 @@ public sealed class MameLuaIngameProvider : IProvider
         public long? Mask { get; init; }
         public long? Player { get; init; }
         public bool HasRange => Min.HasValue || Max.HasValue;
+
+        /// <summary>Score affiche en tuiles : digits octets consecutifs,
+        /// chiffre = tuile - DigitZero, Blank = 0 ; valeur composee x Scale.</summary>
+        public int Digits { get; init; }
+        public long DigitZero { get; init; }
+        public long? Blank { get; init; }
+        public long Scale { get; init; } = 1;
+        public List<int> DigitTargetIds { get; } = [];
+        public string CompositeKey => $"{Address:X}*{Digits}";
     }
 
     private sealed record MameLuaEntryTable(string Table, string Family);
