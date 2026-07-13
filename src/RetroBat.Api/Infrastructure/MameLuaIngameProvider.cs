@@ -418,14 +418,14 @@ public sealed class MameLuaIngameProvider : IProvider
         var rules = File.Exists(definitionFile)
             ? ParseRules(File.ReadAllText(definitionFile))
             : new List<MameLuaRule>();
+        var banks = LoadBanks(systemId, rom);
 
         var targets = new List<MameLuaTarget>();
         var targetMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        var usesHighRamBank = rules.Any(rule => rule.Address is >= 0xFF0000 and <= 0xFFFFFF);
 
         foreach (var rule in rules)
         {
-            var runtimeAddress = ToMameRuntimeAddress(systemId, rule.Address, usesHighRamBank);
+            var runtimeAddress = ApplyBanks(banks, rule.Address);
             rule.RuntimeAddress = runtimeAddress;
 
             // Les rules no_log/no_survey ne publient jamais : ne pas faire lire
@@ -666,17 +666,58 @@ public sealed class MameLuaIngameProvider : IProvider
         return long.TryParse(raw, NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
     }
 
-    private static long ToMameRuntimeAddress(string systemId, long logicalAddress, bool usesHighRamBank)
+    /// <summary>
+    /// mame-banks.json (par systeme) : quand le blob RAM du wrapper concatene
+    /// plusieurs banques (1943 : work E000 + video D000 + F000), la table par
+    /// jeu traduit l'offset blob en adresse programme MAME. Sans table, le
+    /// plugin Lua rebase l'offset sur la RAM principale de la machine.
+    /// </summary>
+    private IReadOnlyList<(long From, long Size, long Base)> LoadBanks(string systemId, string rom)
     {
-        if (!systemId.Equals("arcade", StringComparison.OrdinalIgnoreCase))
+        var path = Path.Combine(RetroBatPaths.RamResourcesRoot, systemId, "mame-banks.json");
+        if (!File.Exists(path))
         {
-            return logicalAddress;
+            return [];
         }
 
-        // Le rebasage se fait desormais dans le plugin Lua, contre la carte
-        // memoire REELLE de la machine (Neo-Geo 0x100000, CPS 0xFF0000...) :
-        // les heuristiques statiques ci-devant rebasaient a l'aveugle.
-        _ = usesHighRamBank;
+        try
+        {
+            using var doc = JsonDocument.Parse(File.ReadAllText(path));
+            if (!doc.RootElement.TryGetProperty(rom, out var list) || list.ValueKind != JsonValueKind.Array)
+            {
+                return [];
+            }
+
+            var banks = new List<(long, long, long)>();
+            foreach (var entry in list.EnumerateArray())
+            {
+                if (TryParseLong(entry.GetProperty("from").GetString(), out var from) &&
+                    TryParseLong(entry.GetProperty("size").GetString(), out var size) &&
+                    TryParseLong(entry.GetProperty("base").GetString(), out var baseAddr))
+                {
+                    banks.Add((from, size, baseAddr));
+                }
+            }
+
+            return banks;
+        }
+        catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException)
+        {
+            _logger.LogWarning(ex, "mame-banks.json illisible pour {System}/{Rom}", systemId, rom);
+            return [];
+        }
+    }
+
+    private static long ApplyBanks(IReadOnlyList<(long From, long Size, long Base)> banks, long logicalAddress)
+    {
+        foreach (var (from, size, baseAddr) in banks)
+        {
+            if (logicalAddress >= from && logicalAddress < from + size)
+            {
+                return baseAddr + (logicalAddress - from);
+            }
+        }
+
         return logicalAddress;
     }
 
