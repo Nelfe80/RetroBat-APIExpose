@@ -63,15 +63,24 @@ def classify(name):
     return "other"
 
 
+MEM_LABEL = re.compile(r'label\s*=\s*"([a-z0-9_]{2,16})\.(?:7z|zip)', re.I)
+MEM_ROMNAME = re.compile(r'name\s*=\s*"([a-z0-9_]{2,16})"')
+
+
 def load_mems():
-    """slug -> adresses .MEM (hors commentaires)."""
+    """slug -> (adresses .MEM, noms de set declares par le fichier)."""
     mems = {}
     for f in os.listdir(ARCADE):
         if not f.endswith(".MEM"):
             continue
         text = io.open(os.path.join(ARCADE, f), encoding="utf-8", errors="replace").read()
         addrs = sorted({int(m, 16) for m in MEM_ADDR.findall(text)})
-        mems[f[:-4]] = addrs
+        # les labels de hash (wjammers.7z) donnent le nom de set exact
+        sets = {m.lower() for m in MEM_LABEL.findall(text)}
+        rom_block = re.search(r"rom\s*=\s*\{(.*?)\n\s*\}", text, re.S)
+        if rom_block:
+            sets.update(m.lower() for m in MEM_ROMNAME.findall(rom_block.group(1)))
+        mems[f[:-4]] = (addrs, sets)
     return mems
 
 
@@ -87,11 +96,39 @@ def load_alias():
     return by_slug
 
 
+def extract_ram_sections(text):
+    """Sections RAM d'un source FBNeo (conventions RamStart|AllRam -> RamEnd|MemEnd)."""
+    return re.findall(
+        r"(?:RamStart|AllRam)\s*=\s*Next;(.*?)(?:RamEnd|MemEnd)\s*=\s*Next;", text, re.S)
+
+
+def parse_banks(section):
+    banks = []
+    for line in section.splitlines():
+        m = BANK_LINE.match(line)
+        if m:
+            size = parse_size(m.group(2))
+            if size:
+                banks.append((m.group(1), size))
+    return banks
+
+
 def scan_fbneo(root):
     """set -> (fichier driver, banques ordonnees [(nom, taille)])."""
     by_set = {}
     multi_memindex = []
     for dirpath, _, files in os.walk(os.path.join(root, "src", "burn", "drv")):
+        # allocation partagee de la famille (ex. galaxian : gal_run.cpp) :
+        # utilisee par les d_*.cpp du dossier qui n'ont pas leur propre MemIndex
+        shared = []
+        for f in files:
+            if f.startswith("d_") or not f.endswith(".cpp"):
+                continue
+            for section in extract_ram_sections(
+                    io.open(os.path.join(dirpath, f), encoding="utf-8", errors="replace").read()):
+                banks = parse_banks(section)
+                if banks:
+                    shared.append((f, banks))
         for f in files:
             if not (f.startswith("d_") and f.endswith(".cpp")):
                 continue
@@ -100,21 +137,12 @@ def scan_fbneo(root):
             sets = set(BURNDRV.findall(text))
             if not sets:
                 continue
-            # sections RamStart -> RamEnd (une par MemIndex)
-            # conventions par auteur : RamStart|AllRam ... RamEnd|MemEnd
-            sections = re.findall(
-                r"(?:RamStart|AllRam)\s*=\s*Next;(.*?)(?:RamEnd|MemEnd)\s*=\s*Next;", text, re.S)
-            if not sections:
-                continue
+            sections = extract_ram_sections(text)
             if len(sections) > 1:
                 multi_memindex.append(f)
-            banks = []
-            for line in sections[0].splitlines():
-                m = BANK_LINE.match(line)
-                if m:
-                    size = parse_size(m.group(2))
-                    if size:
-                        banks.append((m.group(1), size))
+            banks = parse_banks(sections[0]) if sections else None
+            if not banks and len(shared) == 1:
+                banks = shared[0][1]
             if banks:
                 for s in sets:
                     by_set[s.lower()] = (f, banks)
@@ -160,33 +188,49 @@ def parse_mame_maps(path, cache={}):
     return cache[path]
 
 
+def merged_candidates(regions):
+    """Regions + fusions des contigues : FBNeo alloue souvent UN bloc la ou
+    MAME decoupe (pac-man : video+color+work = 0x4000-0x4FFF)."""
+    out = list(regions)
+    ordered = sorted(regions, key=lambda r: (r[0], r[1]))
+    for i in range(len(ordered)):
+        start, end, share = ordered[i]
+        names = [share] if share else []
+        for j in range(i + 1, len(ordered)):
+            nstart, nend, nshare = ordered[j]
+            if nstart != end + 1:
+                break
+            end = nend
+            if nshare:
+                names.append(nshare)
+            out.append((start, end, "+".join(names) if names else None))
+    return out
+
+
 def match_banks(banks, regions):
-    """Apparie chaque banque FBNeo a une region MAME (nom + taille exacte)."""
-    used = set()
+    """Apparie chaque banque FBNeo a une region MAME : taille EXACTE
+    obligatoire (un mauvais rebasage est pire que pas de table)."""
+    candidates = merged_candidates(regions)
+    used = []
     assigned = []
     for name, size in banks:
         cat = classify(name)
+        exact = [c for c in candidates
+                 if (c[1] - c[0] + 1) == size and
+                 not any(u[0] <= c[1] and c[0] <= u[1] for u in used)]
         best = None
-        for i, (start, end, share) in enumerate(regions):
-            if i in used or (end - start + 1) != size:
-                continue
-            rcat = classify(share) if share else "work"
-            if rcat == cat:
-                best = i
+        for c in exact:
+            rcat = classify(c[2].split("+")[0]) if c[2] else "work"
+            if rcat == cat or (cat == "work" and c[2] and "+" in c[2]):
+                best = c
                 break
-        if best is None and cat == "work":
-            # work ram anonyme : tolere une region .ram() sans share plus grande
-            for i, (start, end, share) in enumerate(regions):
-                if i in used or share is not None:
-                    continue
-                if (end - start + 1) >= size:
-                    best = i
-                    break
+        if best is None and cat == "work" and len(exact) == 1:
+            best = exact[0]  # une seule region de la bonne taille : sans ambiguite
         if best is not None:
-            used.add(best)
-            assigned.append((name, size, regions[best][0]))
+            used.append((best[0], best[1]))
+            assigned.append((name, size, best[0], best[2]))
         else:
-            assigned.append((name, size, None))
+            assigned.append((name, size, None, None))
     return assigned
 
 
@@ -214,11 +258,12 @@ def main():
                        "espace programme MAME (map .ram/.share). Ne pas editer a la main."}
     stats = defaultdict(list)
 
-    for slug, addrs in sorted(mems.items()):
+    for slug, (addrs, own_sets) in sorted(mems.items()):
         if not addrs:
             stats["sans-adresse"].append(slug)
             continue
-        sets = sorted(by_slug.get(slug, []), key=len)
+        # les sets declares par le .MEM (labels de hash) passent en premier
+        sets = sorted(own_sets, key=len) + sorted(by_slug.get(slug, set()) - own_sets, key=len)
         fb = next(((s, fbneo[s]) for s in sets if s in fbneo), None)
         if fb is None:
             stats["fbneo-introuvable"].append(slug)
@@ -234,7 +279,7 @@ def main():
         best_fn, best_assign, best_score = None, None, -1
         for fn, regions in maps.items():
             assign = match_banks(banks, regions)
-            score = sum(1 for _, _, base in assign if base is not None)
+            score = sum(1 for _, _, base, _ in assign if base is not None)
             if score > best_score:
                 best_fn, best_assign, best_score = fn, assign, score
         if not best_assign or best_score == 0:
@@ -244,26 +289,32 @@ def main():
         # validation : chaque adresse .MEM doit tomber dans une banque traduite
         table, offset = [], 0
         spans = []
-        for name, size, base in best_assign:
-            spans.append((offset, offset + size, base, name))
+        for name, size, base, share in best_assign:
+            spans.append((offset, offset + size, base, name, share))
             offset += size
-        unmapped = []
+        unmapped, absolute = [], []
         for a in addrs:
             hit = next((s for s in spans if s[0] <= a < s[1]), None)
             if hit is None:
-                if a >= blob_size:
-                    unmapped.append(a)  # hors blob : releve absolu ou autre core
+                # hors blob : adresse deja absolue (le plugin la laisse telle
+                # quelle si elle tombe dans une region RAM de la machine)
+                absolute.append(a)
             elif hit[2] is None:
                 unmapped.append(a)
 
-        for start, stop, base, name in spans:
-            if base is None:
-                continue
-            if not any(start <= a < stop for a in addrs):
-                continue  # n'emettre que les banques reellement utilisees
+        used_spans = [sp for sp in spans
+                      if sp[2] is not None and any(sp[0] <= a < sp[1] for a in addrs)]
+        # garde-fou : dans un fichier MAME multi-machines, un appariement
+        # purement anonyme peut viser la mauvaise machine -> quarantaine
+        if used_spans and len(maps) > 1 and all(sp[4] is None for sp in used_spans):
+            stats["ambigu-quarantaine"].append(slug)
+            used_spans = []
+        for start, stop, base, name, _ in used_spans:
             table.append({"from": f"0x{start:04X}", "size": f"0x{stop - start:04X}",
                           "base": f"0x{base:04X}", "bank": name})
 
+        if absolute and not unmapped and not table:
+            stats["adresses-absolues"].append(slug)
         if unmapped:
             stats["adresses-non-mappees"].append(
                 f"{slug} ({', '.join(f'0x{a:X}' for a in unmapped[:4])})")
