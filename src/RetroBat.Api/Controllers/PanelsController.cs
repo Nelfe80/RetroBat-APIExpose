@@ -329,6 +329,16 @@ public class PanelsController : ControllerBase
         return Ok(_mameCfgDeploy.Deploy(rom, offset, limit));
     }
 
+    /// <summary>
+    /// Current wiring of a game's deployed MAME cfg, expressed in physical panel
+    /// buttons (inverse cartography): { "P1_BUTTON1": [1, 2, 6, 8], … }.
+    /// </summary>
+    /// <response code="200">Wiring map; empty when the game has no deployed cfg.</response>
+    [HttpGet("controls/mamecfg/current")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult CurrentMameCfgWiring([FromQuery] string rom)
+        => Ok(new { rom, wiring = _mameCfgDeploy.CurrentWiring(rom) });
+
     private static string GetControlFileContentType(string fileName)
     {
         return Path.GetExtension(fileName).ToLowerInvariant() switch

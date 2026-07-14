@@ -129,6 +129,11 @@ public sealed class PanelDefinitionProjectionService
                 continue;
             }
 
+            // the physical peripheral the input belongs to (joystick, spinner,
+            // trackball, paddle…) — clients draw one node per device
+            var deviceType = ReadString(deviceNode, "type");
+            var deviceLabel = ReadString(deviceNode, "label");
+
             foreach (var inputEntry in deviceInputs)
             {
                 if (inputEntry.Value is not JsonObject inputObj)
@@ -142,6 +147,8 @@ public sealed class PanelDefinitionProjectionService
                     player: playerIndex,
                     sourceObj: inputObj,
                     slot: ReadSlotForLayout(inputObj, projection.ActiveLayoutId));
+                input.DeviceType = deviceType;
+                input.DeviceLabel = deviceLabel;
                 projection.ControlMap.Inputs.Add(input);
                 IndexInput(inputsByRef, input);
                 AddInputToSlot(projection, input.Slot, input);
@@ -274,7 +281,8 @@ public sealed class PanelDefinitionProjectionService
             MameInput = ReadString(sourceObj["mame"] as JsonObject, "input_id", "input", "type"),
             MameTag = ReadString(sourceObj["mame"] as JsonObject, "cfg_tag", "mame_tag", "tag"),
             MameMask = ReadString(sourceObj["mame"] as JsonObject, "mask_hex", "mask"),
-            MameDefValue = ReadString(sourceObj["mame"] as JsonObject, "defvalue_hex", "defvalue")
+            MameDefValue = ReadString(sourceObj["mame"] as JsonObject, "defvalue_hex", "defvalue"),
+            JoystickWay = ReadString(sourceObj["mame"] as JsonObject, "joystick_way")
         };
     }
 
@@ -334,7 +342,9 @@ public sealed class PanelDefinitionProjectionService
             Color = ReadString(sourceObj, "color"),
             OutputName = ReadString(sourceObj, "output_name", "name"),
             ValueType = ReadString(sourceObj, "value_type"),
-            InputRef = ReadString(sourceObj, "input_ref")
+            InputRef = ReadString(sourceObj, "input_ref"),
+            Group = ReadString(sourceObj, "group"),
+            Usage = ReadString(sourceObj, "usage")
         };
 
         foreach (var slot in ReadSlotsForLayout(sourceObj, activeLayoutId))
@@ -724,6 +734,16 @@ public sealed class PanelControlInputProjection
     public string MameTag { get; set; } = string.Empty;
     public string MameMask { get; set; } = string.Empty;
     public string MameDefValue { get; set; } = string.Empty;
+
+    /// <summary>Joystick granularity from the dynpanel mame block ("2", "4", "8",
+    /// "vertical2"…), so clients can draw the right number of anchors.</summary>
+    public string JoystickWay { get; set; } = string.Empty;
+
+    /// <summary>Physical peripheral carrying this input (joystick, spinner,
+    /// trackball, paddle, pedal…), from the dynpanel device list.</summary>
+    public string DeviceType { get; set; } = string.Empty;
+
+    public string DeviceLabel { get; set; } = string.Empty;
 }
 
 public sealed class PanelControlOutputProjection
@@ -738,6 +758,8 @@ public sealed class PanelControlOutputProjection
     public string OutputName { get; set; } = string.Empty;
     public string ValueType { get; set; } = string.Empty;
     public string InputRef { get; set; } = string.Empty;
+    public string Group { get; set; } = string.Empty;
+    public string Usage { get; set; } = string.Empty;
     public PanelResolvedInputRefProjection? ResolvedInputRef { get; set; }
     public List<int> Slots { get; set; } = [];
 }

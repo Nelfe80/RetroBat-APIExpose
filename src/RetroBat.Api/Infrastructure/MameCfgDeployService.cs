@@ -23,10 +23,14 @@ public sealed class MameCfgDeployService
     private static string TargetDir => Path.Combine(RetroBatPaths.RetroBatRoot, "saves", "mame", "cfg");
 
     /// <summary>RetroPad identity name → raw DirectInput index on the standard
-    /// encoder profile (raw N = MAME JOYCODE_BUTTON(N+1)).</summary>
+    /// encoder profile (raw N = MAME JOYCODE_BUTTON(N+1)).
+    /// Measured 2026-07-14 via MAME TAB (0-based display): physical B3 (identity y)
+    /// reads "Button 2" and B4 (x) reads "Button 3" — the DirectInput raw order
+    /// keeps x/y in their identity slots, unlike the SDL chain; only the shoulder
+    /// pairs swap (B6→BUTTON8, B8→BUTTON6, B5→BUTTON7, B7→BUTTON5).</summary>
     private static readonly IReadOnlyDictionary<string, int> StandardRawByIdentity = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
     {
-        ["b"] = 0, ["a"] = 1, ["x"] = 2, ["y"] = 3, ["l"] = 4, ["r"] = 5, ["l2"] = 6, ["r2"] = 7
+        ["b"] = 0, ["a"] = 1, ["y"] = 2, ["x"] = 3, ["l"] = 4, ["r"] = 5, ["l2"] = 6, ["r2"] = 7
     };
 
     private readonly IConfiguration _configuration;
@@ -101,6 +105,59 @@ public sealed class MameCfgDeployService
         {
             seq!.Value = TranslateJoycodes(seq.Value);
         }
+    }
+
+    /// <summary>
+    /// Current wiring of the DEPLOYED cfg, translated back to physical panel
+    /// buttons: P1_BUTTONn → the cabinet buttons whose JOYCODEs appear in the
+    /// port's standard sequence (inverse cartography). This is what really fires
+    /// in MAME today — the patch bay shows it as the default cables.
+    /// </summary>
+    public IReadOnlyDictionary<string, IReadOnlyList<int>> CurrentWiring(string rom)
+    {
+        var result = new Dictionary<string, IReadOnlyList<int>>(StringComparer.OrdinalIgnoreCase);
+        var path = Path.Combine(TargetDir, rom.Trim().ToLowerInvariant() + ".cfg");
+        if (!File.Exists(path))
+        {
+            return result;
+        }
+
+        try
+        {
+            var physicalByJoycode = JoycodeByPhysical.ToDictionary(pair => pair.Value, pair => pair.Key);
+            foreach (var port in XDocument.Load(path).Descendants("port"))
+            {
+                var type = (string?)port.Attribute("type");
+                if (type is null || !Regex.IsMatch(type, @"^P\d+_BUTTON\d+$"))
+                {
+                    continue;
+                }
+
+                var seq = port.Elements("newseq").FirstOrDefault(n => (string?)n.Attribute("type") == "standard");
+                if (seq is null)
+                {
+                    continue;
+                }
+
+                var slots = Regex.Matches(seq.Value, @"JOYCODE_\d+_BUTTON(\d+)")
+                    .Select(match => int.Parse(match.Groups[1].Value))
+                    .Where(physicalByJoycode.ContainsKey)
+                    .Select(button => physicalByJoycode[button])
+                    .Distinct()
+                    .OrderBy(slot => slot)
+                    .ToArray();
+                if (slots.Length > 0)
+                {
+                    result[type] = slots;
+                }
+            }
+        }
+        catch
+        {
+            // unreadable cfg: the caller falls back to the template defaults
+        }
+
+        return result;
     }
 
     public bool IsMameRunning()
@@ -186,11 +243,14 @@ public sealed class MameCfgDeployService
         var targetPath = Path.Combine(TargetDir, rom + ".cfg");
         try
         {
+            var inputPatches = LoadInputPatches(rom);
+
             if (!File.Exists(targetPath))
             {
                 Directory.CreateDirectory(TargetDir);
                 var fresh = XDocument.Load(packPath);
                 TranslatePackDocument(fresh);
+                ApplyInputPatches(fresh, inputPatches);
                 fresh.Save(targetPath);
                 return new Item(rom, "written", "deployed from pack");
             }
@@ -198,8 +258,9 @@ public sealed class MameCfgDeployService
             var pack = XDocument.Load(packPath);
             var packRaw = XDocument.Load(packPath);
             TranslatePackDocument(pack);
+            var forcedTypes = ApplyInputPatches(pack, inputPatches);
             var target = XDocument.Load(targetPath);
-            var changes = MergeInputPorts(pack, packRaw, target);
+            var changes = MergeInputPorts(pack, packRaw, target, forcedTypes);
             if (changes == 0)
             {
                 return new Item(rom, "up-to-date", "");
@@ -220,7 +281,113 @@ public sealed class MameCfgDeployService
     /// ports were added or updated. Existing manual sequences come first, the pack
     /// tokens are OR-appended; a cleared "NONE" sequence is replaced outright.
     /// </summary>
-    private static int MergeInputPorts(XDocument pack, XDocument packRaw, XDocument target)
+    /// <summary>
+    /// Input-channel patches from the LedManagerSetup patch bay
+    /// (LedManager\overrides\games\{arcade|mame}\rom.json, "inputs" section):
+    /// mame input id → panel buttons that trigger it (multi-allocation).
+    /// </summary>
+    private static Dictionary<string, List<int>> LoadInputPatches(string rom)
+    {
+        var patches = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var system in new[] { "arcade", "mame" })
+        {
+            var path = Path.GetFullPath(Path.Combine(RetroBatPaths.PluginRoot, "..", "LedManager", "overrides", "games", system, rom + ".json"));
+            if (!File.Exists(path))
+            {
+                continue;
+            }
+
+            try
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(path));
+                if (!doc.RootElement.TryGetProperty("inputs", out var inputs) || inputs.ValueKind != System.Text.Json.JsonValueKind.Object)
+                {
+                    continue;
+                }
+
+                foreach (var entry in inputs.EnumerateObject())
+                {
+                    if (entry.Value.TryGetProperty("slots", out var slots) && slots.ValueKind == System.Text.Json.JsonValueKind.Array)
+                    {
+                        var parsed = slots.EnumerateArray()
+                            .Where(s => s.TryGetInt32(out var v) && v >= 1)
+                            .Select(s => s.GetInt32())
+                            .ToList();
+                        if (parsed.Count > 0 && !patches.ContainsKey(entry.Name))
+                        {
+                            patches[entry.Name] = parsed;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // malformed override: ignored
+            }
+
+            break; // first existing file wins (same convention as the runtime store)
+        }
+
+        return patches;
+    }
+
+    /// <summary>
+    /// Rewrites the patched ports' sequences: pack KEYCODEs kept, JOYCODEs replaced
+    /// by the OR of every wired button (translated through the cabinet cartography).
+    /// Returns the port types whose content is now user-authoritative.
+    /// </summary>
+    private HashSet<string> ApplyInputPatches(XDocument pack, Dictionary<string, List<int>> patches)
+    {
+        var forced = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (patches.Count == 0)
+        {
+            return forced;
+        }
+
+        var input = pack.Root?.Element("system")?.Element("input");
+        if (input is null)
+        {
+            return forced;
+        }
+
+        foreach (var port in input.Elements("port"))
+        {
+            var type = (string?)port.Attribute("type");
+            if (type is null || !patches.TryGetValue(type, out var slots))
+            {
+                continue;
+            }
+
+            var seq = port.Element("newseq");
+            if (seq is null)
+            {
+                continue;
+            }
+
+            var tokens = SplitSeq(seq.Value);
+            var joyIndex = tokens.Select(t => Regex.Match(t, @"^JOYCODE_(\d+)_"))
+                .Where(m => m.Success)
+                .Select(m => m.Groups[1].Value)
+                .FirstOrDefault() ?? "1";
+
+            // game buttons: replace the joycodes with the wired buttons.
+            // directions/others (P1_LEFT…): KEEP the axis switches (the stick must
+            // keep working) and OR-append the wired buttons — curator semantics.
+            var isGameButton = Regex.IsMatch(type, @"^P\d+_BUTTON\d+$");
+            var kept = tokens.Where(t =>
+                !t.StartsWith("JOYCODE_", StringComparison.OrdinalIgnoreCase)
+                || (!isGameButton && !Regex.IsMatch(t, @"^JOYCODE_\d+_BUTTON\d+$")));
+            var joycodes = slots
+                .Where(s => JoycodeByPhysical.ContainsKey(s))
+                .Select(s => $"JOYCODE_{joyIndex}_BUTTON{JoycodeByPhysical[s]}");
+            seq.Value = string.Join(" OR ", kept.Concat(joycodes).Distinct(StringComparer.OrdinalIgnoreCase));
+            forced.Add(type);
+        }
+
+        return forced;
+    }
+
+    private static int MergeInputPorts(XDocument pack, XDocument packRaw, XDocument target, HashSet<string>? forcedTypes = null)
     {
         var packInput = pack.Root?.Element("system")?.Element("input");
         var packRawInput = packRaw.Root?.Element("system")?.Element("input");
@@ -274,6 +441,19 @@ public sealed class MameCfgDeployService
 
             var existingTokens = SplitSeq(existingSeq.Value);
             var translatedTokens = SplitSeq(packSeq.Value);
+
+            // Patch-bay multi-allocations are the user's LATEST intent: they replace
+            // whatever is deployed, bypassing every preservation rule below.
+            if (forcedTypes is not null && forcedTypes.Contains(type))
+            {
+                if (!TokensEqual(existingTokens, translatedTokens))
+                {
+                    existingSeq.Value = string.Join(" OR ", translatedTokens);
+                    changes++;
+                }
+
+                continue;
+            }
 
             // Self-recognition: a sequence identical to the RAW pack content is one
             // of our earlier deployments (before the cabinet translation existed) —
