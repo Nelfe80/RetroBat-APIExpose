@@ -48,6 +48,14 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
 
     private bool Enabled => _configuration.GetValue("ApiExpose:PanelRemapExport:Enabled", false);
 
+    /// <summary>
+    /// "manual" (default): browsing the gamelist costs nothing — remaps are pushed
+    /// through the deploy endpoints (LedManagerSetup "Contrôles"), and a CONTROL
+    /// PANEL selector change still regenerates immediately. "onSelection": legacy
+    /// behavior, regenerate at every game selection.
+    /// </summary>
+    private string Mode => _configuration.GetValue("ApiExpose:PanelRemapExport:Mode", "manual") ?? "manual";
+
     private static string TracePath => Path.Combine(RetroBatPaths.RuntimeLogRoot, "panel-remap.log");
 
     /// <summary>File trace next to the other .log files: the API console is hidden,
@@ -94,6 +102,11 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
         if (!isGameSelection && !isPanelSettingsChange)
         {
             return;
+        }
+
+        if (isGameSelection && !string.Equals(Mode, "onSelection", StringComparison.OrdinalIgnoreCase))
+        {
+            return; // manual mode: scrolling the gamelist must not trigger any work
         }
 
         try
@@ -179,10 +192,10 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
         // The ES "CONTROL PANEL" selector (per system, per game) picks a named
         // system_template layout: e.g. snes.apiexpose_panel_snes = "6-Button:Score Master".
         var selectedLayout = ResolvePanelLayoutSelection(systemId, Path.GetFileName(gamePath));
-        var slots = ReadTemplateLayoutSlots(dynpanel.Value, selectedLayout, buttonsPerPlayerSetting, out var layoutUsed);
+        var slots = new List<DynpanelSlot>(ReadTemplateLayoutSlots(dynpanel.Value, selectedLayout, buttonsPerPlayerSetting, CabinetButtons, out var layoutUsed));
         if (slots.Count == 0)
         {
-            slots = ReadDynpanelSlots(dynpanel.Value);
+            slots.AddRange(ReadDynpanelSlots(dynpanel.Value));
             layoutUsed = "convention";
         }
 
@@ -191,6 +204,8 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
             Trace($"skipped {systemId}: dynpanel has no slot mapping");
             return;
         }
+
+        ParkUnusedIdentities(slots);
 
         var coreFolder = ResolveRemapFolder(core);
         if (coreFolder is null)
@@ -224,6 +239,167 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
         if (hasGameSelector || hasGameDynpanel)
         {
             WriteGuarded(Path.Combine(targetDir, gameFileName + ".rmp"), body, systemId, gameFileName, $"{reason} scope=game layout={layoutUsed}");
+        }
+    }
+
+    /// <summary>
+    /// Cabinet buttons the layout does not use would still act as their native
+    /// RetroPad identity (e.g. our buttons 7/8 arrive as l/r and would ghost L/R on
+    /// a 6-button layout): park them on R3, dead for every template layout.
+    /// A dark LED must be a dead button.
+    /// </summary>
+    private void ParkUnusedIdentities(List<DynpanelSlot> slots)
+    {
+        var usedIdentities = slots.Select(s => s.LibretroButton).ToHashSet(StringComparer.Ordinal);
+        var parkedCount = 0;
+        foreach (var identity in CabinetButtons.Values.Distinct())
+        {
+            if (!usedIdentities.Contains(identity))
+            {
+                slots.Add(new DynpanelSlot(900 + parkedCount++, identity, 15));
+            }
+        }
+    }
+
+    public sealed record RemapDeployItem(string SystemId, string Status, string Detail);
+
+    public sealed record RemapDeployReport(int Total, int Written, int UpToDate, int Skipped, IReadOnlyList<RemapDeployItem> Items);
+
+    /// <summary>
+    /// Push deployment for the LedManagerSetup "Contrôles" view: regenerates the
+    /// content-directory remap of one system, or of every system that has a dynpanel.
+    /// Same pipeline and write guards as the event path.
+    /// </summary>
+    public RemapDeployReport DeployRemaps(string? systemId = null)
+    {
+        var systems = string.IsNullOrWhiteSpace(systemId)
+            ? ListDynpanelSystems()
+            : new[] { systemId.Trim().ToLowerInvariant() };
+
+        var items = new List<RemapDeployItem>();
+        lock (_generateLock)
+        {
+            foreach (var system in systems)
+            {
+                RemapDeployItem item;
+                try
+                {
+                    item = DeploySystemRemap(system);
+                }
+                catch (Exception ex)
+                {
+                    item = new RemapDeployItem(system, "failed", ex.Message);
+                }
+
+                Trace($"deploy {system}: {item.Status} ({item.Detail})");
+                items.Add(item);
+            }
+        }
+
+        var written = items.Count(i => i.Status == "written");
+        var upToDate = items.Count(i => i.Status == "up-to-date");
+        return new RemapDeployReport(items.Count, written, upToDate, items.Count - written - upToDate, items);
+    }
+
+    private static IReadOnlyList<string> ListDynpanelSystems()
+    {
+        var dir = Path.Combine(RetroBatPaths.DynPanelsRoot, "systems");
+        if (!Directory.Exists(dir))
+        {
+            return Array.Empty<string>();
+        }
+
+        return Directory.EnumerateFiles(dir, "*.json")
+            .Select(Path.GetFileNameWithoutExtension)
+            .Where(name => !string.IsNullOrEmpty(name))
+            .Select(name => name!.ToLowerInvariant())
+            .OrderBy(name => name, StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    /// <summary>System-level twin of GenerateForGame: no per-game selector, no
+    /// per-game rmp — just the content-directory remap of the system.</summary>
+    private RemapDeployItem DeploySystemRemap(string systemId)
+    {
+        var (emulator, core) = ResolveEmulatorAndCore(systemId);
+        if (!string.Equals(emulator, "libretro", StringComparison.OrdinalIgnoreCase))
+        {
+            return new RemapDeployItem(systemId, "skipped", $"emulator '{emulator ?? "?"}' is not libretro");
+        }
+
+        if (string.IsNullOrWhiteSpace(core))
+        {
+            return new RemapDeployItem(systemId, "skipped", "no core resolved");
+        }
+
+        if (core.Contains("mame", StringComparison.OrdinalIgnoreCase))
+        {
+            return new RemapDeployItem(systemId, "skipped", "MAME core is cfg-driven by doctrine");
+        }
+
+        var dynpanel = LoadDynpanel(systemId, "");
+        if (dynpanel is null)
+        {
+            return new RemapDeployItem(systemId, "skipped", "no dynpanel data");
+        }
+
+        var buttonsPerPlayer = ReadIntSetting("global.apiexpose.control_manager.buttons_per_player", 6);
+        var selectedLayout = ResolvePanelLayoutSelection(systemId, "");
+        var slots = new List<DynpanelSlot>(ReadTemplateLayoutSlots(dynpanel.Value, selectedLayout, buttonsPerPlayer, CabinetButtons, out var layoutUsed));
+        if (slots.Count == 0)
+        {
+            slots.AddRange(ReadDynpanelSlots(dynpanel.Value));
+            layoutUsed = "convention";
+        }
+
+        if (slots.Count == 0)
+        {
+            return new RemapDeployItem(systemId, "skipped", "dynpanel has no slot mapping");
+        }
+
+        ParkUnusedIdentities(slots);
+
+        var coreFolder = ResolveRemapFolder(core);
+        if (coreFolder is null)
+        {
+            return new RemapDeployItem(systemId, "skipped", $"no corename in {core}_libretro.info");
+        }
+
+        var playerCount = Math.Clamp(ReadIntSetting("global.apiexpose.control_manager.player_count", 2), 1, 8);
+        var targetDir = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "config", "remaps", coreFolder);
+        var body = BuildRmp(slots, playerCount);
+        var contentDirName = ReadSystemRomsFolder(systemId) ?? systemId;
+        var status = WriteGuarded(Path.Combine(targetDir, contentDirName + ".rmp"), body, systemId, contentDirName, $"deploy scope=content-dir layout={layoutUsed}");
+        return new RemapDeployItem(systemId, status, $"layout={layoutUsed} file={coreFolder}\\{contentDirName}.rmp");
+    }
+
+    /// <summary>Roms folder name of a system (es_systems.cfg &lt;path&gt;) — the name
+    /// RetroArch expects for a content-directory remap.</summary>
+    private string? ReadSystemRomsFolder(string systemId)
+    {
+        try
+        {
+            var path = Path.Combine(RetroBatPaths.RetroBatRoot, "emulationstation", ".emulationstation", "es_systems.cfg");
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+
+            var doc = XDocument.Load(path);
+            var system = doc.Root?.Elements("system")
+                .FirstOrDefault(s => string.Equals((string?)s.Element("name"), systemId, StringComparison.OrdinalIgnoreCase));
+            var romsPath = (string?)system?.Element("path");
+            if (string.IsNullOrWhiteSpace(romsPath))
+            {
+                return null;
+            }
+
+            var name = Path.GetFileName(romsPath.TrimEnd('\\', '/', ' '));
+            return string.IsNullOrWhiteSpace(name) ? null : name;
+        }
+        catch
+        {
+            return null;
         }
     }
 
@@ -333,6 +509,50 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
 
     private sealed record DynpanelSlot(int Slot, string LibretroButton, int RetropadId);
 
+    private static readonly IReadOnlyDictionary<int, string> DefaultCabinetButtons = new Dictionary<int, string>
+    {
+        [1] = "b",
+        [2] = "a",
+        [3] = "y",
+        [4] = "x",
+        [5] = "l2",
+        [6] = "r2",
+        [7] = "l",
+        [8] = "r"
+    };
+
+    private IReadOnlyDictionary<int, string>? _cabinetButtonsCache;
+
+    /// <summary>
+    /// Physical cartography of the cabinet: the RetroPad identity each panel button
+    /// reaches RetroArch as, measured end to end (wiring + encoder + SDL resolution +
+    /// launcher). The LED pipeline is anchored on the same `physical` numbers, so
+    /// lights and inputs stay in sync by construction. Overridable in appsettings.json
+    /// (ApiExpose:PanelRemapExport:CabinetButtons): if a RetroBat update changes the
+    /// controller chain again, adjust the map — no rebuild.
+    /// </summary>
+    private IReadOnlyDictionary<int, string> CabinetButtons
+    {
+        get
+        {
+            if (_cabinetButtonsCache is not null)
+            {
+                return _cabinetButtonsCache;
+            }
+
+            var configured = new Dictionary<int, string>();
+            foreach (var child in _configuration.GetSection("ApiExpose:PanelRemapExport:CabinetButtons").GetChildren())
+            {
+                if (int.TryParse(child.Key, out var number) && number > 0 && !string.IsNullOrWhiteSpace(child.Value))
+                {
+                    configured[number] = child.Value.Trim().ToLowerInvariant();
+                }
+            }
+
+            return _cabinetButtonsCache = configured.Count > 0 ? configured : DefaultCabinetButtons;
+        }
+    }
+
     /// <summary>Reads the CONTROL PANEL selector: game override first, then system, empty = AUTO.</summary>
     private string? ResolvePanelLayoutSelection(string systemId, string gameFileName)
     {
@@ -350,7 +570,7 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
     /// cabinet button count is chosen (exact "N-Button", else first "N-Button:*",
     /// else the largest layout that fits).
     /// </summary>
-    private static IReadOnlyList<DynpanelSlot> ReadTemplateLayoutSlots(JsonElement root, string? selectedLayout, int buttonsPerPlayer, out string layoutUsed)
+    private static IReadOnlyList<DynpanelSlot> ReadTemplateLayoutSlots(JsonElement root, string? selectedLayout, int buttonsPerPlayer, IReadOnlyDictionary<int, string> cabinetButtons, out string layoutUsed)
     {
         layoutUsed = selectedLayout ?? "auto";
         if (!root.TryGetProperty("system_template", out var template) && !root.TryGetProperty("core_template", out template))
@@ -401,18 +621,23 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
                 continue;
             }
 
-            // Legacy-validated formula (LPEvents.py, confirmed on Score Master):
-            // the rmp line label comes from the CONTROLLER name of the layout button,
-            // the value from its retropad_id. The rmp_button field encodes the slot's
-            // physical libretro identity and must NOT be used as the label.
-            var controller = entry.Value.TryGetProperty("controller", out var ctl) ? ctl.GetString() : null;
-            var label = ControllerToRmpLabel(controller);
+            // The rmp line remaps the CABINET button that carries the function: the
+            // layout's `physical` field — the LED pipeline lights that same button, so
+            // anchoring on it keeps lights and inputs in sync by construction.
+            // Label = the cabinet cartography's identity for that physical button;
+            // value = retropad_id, the id the core expects for the button's game
+            // function. Neither `controller` (ES name on the ORIGINAL accessory) nor
+            // `rmp_button` (keyed on panel_slot, the accessory position) describe the
+            // cabinet — both desynced LEDs from inputs (seen on snes Score Master).
             var retropad = entry.Value.TryGetProperty("retropad_id", out var rp) && rp.TryGetInt32(out var id) ? id : -1;
             var slot = entry.Value.TryGetProperty("panel_slot", out var ps) && ps.TryGetInt32(out var s)
                 ? s
                 : int.TryParse(entry.Name, out var n) ? n : -1;
+            var physical = entry.Value.TryGetProperty("physical", out var ph) && ph.TryGetInt32(out var p) && p > 0
+                ? p
+                : slot;
 
-            if (label is not null && retropad >= 0 && slot > 0)
+            if (cabinetButtons.TryGetValue(physical, out var label) && retropad >= 0 && slot > 0)
             {
                 slots.Add(new DynpanelSlot(slot, label, retropad));
             }
@@ -425,26 +650,6 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
             var dash = name.IndexOf('-');
             return dash > 0 && int.TryParse(name[..dash], out var count) ? count : 0;
         }
-    }
-
-    private static string? ControllerToRmpLabel(string? controller)
-    {
-        return controller?.Trim().ToUpperInvariant() switch
-        {
-            "A" => "a",
-            "B" => "b",
-            "X" => "x",
-            "Y" => "y",
-            "PAGEUP" => "l",
-            "PAGEDOWN" => "r",
-            "L2" => "l2",
-            "R2" => "r2",
-            "L3" => "l3",
-            "R3" => "r3",
-            "START" => "start",
-            "SELECT" or "COIN" => "select",
-            _ => null
-        };
     }
 
     private static IReadOnlyList<DynpanelSlot> ReadDynpanelSlots(JsonElement root)
@@ -490,7 +695,7 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
         return sb.ToString();
     }
 
-    private void WriteGuarded(string targetPath, string body, string systemId, string game, string reason)
+    private string WriteGuarded(string targetPath, string body, string systemId, string game, string reason)
     {
         var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(body)))[..16];
         var content = $"{MarkerPrefix} hash={hash}\n{body}";
@@ -518,13 +723,13 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
             if (!hasMarker && !ownedPerRegistry)
             {
                 Trace($"KEPT user file untouched (never written by us): {targetPath}");
-                return;
+                return "kept-user-file";
             }
 
             if (hash == lastWrittenHash || (hasMarker && existingFirstLine.Contains($"hash={hash}", StringComparison.Ordinal)))
             {
                 Trace($"up to date (target content unchanged): {targetPath}");
-                return;
+                return "up-to-date";
             }
 
             try
@@ -542,6 +747,7 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
         registry[registryKey] = hash;
         SaveRegistry(registry);
         Trace($"WROTE ({reason}): {targetPath} [{body.Split('\n').Length} lines]");
+        return "written";
     }
 
     private static string RegistryPath => Path.Combine(RetroBatPaths.PluginRoot, "state", "panel-remap-registry.json");
