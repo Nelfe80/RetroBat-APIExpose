@@ -15,17 +15,23 @@ public class PanelsController : ControllerBase
     private readonly ControlFilesCatalogService _controlFiles;
     private readonly PanelDefinitionProjectionService _panelProjection;
     private readonly IEventBus _eventBus;
+    private readonly PanelRemapExportService _remapExport;
+    private readonly MameCfgDeployService _mameCfgDeploy;
 
     public PanelsController(
         PanelsCatalogService panels,
         ControlFilesCatalogService controlFiles,
         PanelDefinitionProjectionService panelProjection,
-        IEventBus eventBus)
+        IEventBus eventBus,
+        PanelRemapExportService remapExport,
+        MameCfgDeployService mameCfgDeploy)
     {
         _panels = panels;
         _controlFiles = controlFiles;
         _panelProjection = panelProjection;
         _eventBus = eventBus;
+        _remapExport = remapExport;
+        _mameCfgDeploy = mameCfgDeploy;
     }
 
     /// <summary>
@@ -280,6 +286,47 @@ public class PanelsController : ControllerBase
             snapshot.Rom,
             snapshot.ActiveLayoutId
         });
+    }
+
+    /// <summary>
+    /// Regenerates the content-directory RetroArch remaps: one system, or every
+    /// system with a dynpanel when `system` is omitted.
+    /// </summary>
+    /// <remarks>
+    /// Push counterpart of the event-driven generation (LedManagerSetup "Contrôles").
+    /// Existing guards apply: marker + ownership registry, .bak before rewrite,
+    /// user files never touched.
+    /// </remarks>
+    /// <response code="200">Deployment report (written / up-to-date / skipped per system).</response>
+    [HttpPost("controls/remaps/deploy")]
+    [ProducesResponseType(typeof(PanelRemapExportService.RemapDeployReport), StatusCodes.Status200OK)]
+    public IActionResult DeployRemaps([FromQuery] string? system = null)
+    {
+        return Ok(_remapExport.DeployRemaps(system));
+    }
+
+    /// <summary>
+    /// Merge-deploys the curated MAME cfg pack: one rom, or the whole pack when
+    /// `rom` is omitted.
+    /// </summary>
+    /// <remarks>
+    /// Only the pack's input ports are merged; MAME state (counters, DIP, mixer) is
+    /// kept and manual binds are preserved with the pack forms OR-appended. Refused
+    /// while MAME runs (it rewrites every cfg at exit).
+    /// </remarks>
+    /// <response code="200">Deployment report (written / merged / up-to-date / failed).</response>
+    /// <response code="409">MAME is running.</response>
+    [HttpPost("controls/mamecfg/deploy")]
+    [ProducesResponseType(typeof(MameCfgDeployService.Report), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public IActionResult DeployMameCfg([FromQuery] string? rom = null, [FromQuery] int offset = 0, [FromQuery] int limit = 0)
+    {
+        if (_mameCfgDeploy.IsMameRunning())
+        {
+            return Conflict(new { message = "MAME is running: close it before deploying (it rewrites cfg files at exit)." });
+        }
+
+        return Ok(_mameCfgDeploy.Deploy(rom, offset, limit));
     }
 
     private static string GetControlFileContentType(string fileName)

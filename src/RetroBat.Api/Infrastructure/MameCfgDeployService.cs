@@ -1,0 +1,396 @@
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
+using RetroBat.Domain.Paths;
+
+namespace RetroBat.Api.Infrastructure;
+
+/// <summary>
+/// Push deployment of the curated MAME cfg pack (resources/controls/mame) into
+/// saves/mame/cfg. Never a blind copy: only the &lt;input&gt; ports present in the
+/// pack are merged into the deployed file — MAME state (counters, DIP, mixer) is
+/// kept, and the user's manual binds are preserved with the pack's JOYCODE forms
+/// OR-appended (KEYCODE_Z becomes "KEYCODE_Z OR JOYCODE_1_BUTTON1"). Callers must
+/// refuse to deploy while MAME runs: MAME rewrites every cfg at exit.
+/// </summary>
+public sealed class MameCfgDeployService
+{
+    public sealed record Item(string Rom, string Status, string Detail);
+
+    public sealed record Report(int Total, int Written, int Merged, int UpToDate, int Failed, IReadOnlyList<Item> Changes, int PackTotal, int Offset);
+
+    private static string PackDir => Path.Combine(RetroBatPaths.PluginRoot, "resources", "controls", "mame");
+
+    private static string TargetDir => Path.Combine(RetroBatPaths.RetroBatRoot, "saves", "mame", "cfg");
+
+    /// <summary>RetroPad identity name → raw DirectInput index on the standard
+    /// encoder profile (raw N = MAME JOYCODE_BUTTON(N+1)).</summary>
+    private static readonly IReadOnlyDictionary<string, int> StandardRawByIdentity = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["b"] = 0, ["a"] = 1, ["x"] = 2, ["y"] = 3, ["l"] = 4, ["r"] = 5, ["l2"] = 6, ["r2"] = 7
+    };
+
+    private readonly IConfiguration _configuration;
+    private readonly object _deployLock = new();
+    private IReadOnlyDictionary<int, int>? _joycodeByPhysicalCache;
+
+    public MameCfgDeployService(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
+    /// <summary>
+    /// physical button N → MAME JOYCODE button number, derived from the SAME
+    /// cabinet cartography as the RetroArch remaps (CabinetButtons in appsettings):
+    /// the pack's JOYCODE values are authored under the identity assumption
+    /// (slot N = BUTTONN), so deployment translates them to what the cabinet's
+    /// buttons really emit over DirectInput (e.g. B6 emits BUTTON8 on the
+    /// standard wiring, not BUTTON6).
+    /// </summary>
+    private IReadOnlyDictionary<int, int> JoycodeByPhysical
+    {
+        get
+        {
+            if (_joycodeByPhysicalCache is not null)
+            {
+                return _joycodeByPhysicalCache;
+            }
+
+            var map = new Dictionary<int, int>();
+            foreach (var child in _configuration.GetSection("ApiExpose:PanelRemapExport:CabinetButtons").GetChildren())
+            {
+                if (int.TryParse(child.Key, out var physical) && physical > 0
+                    && child.Value is { } identity && StandardRawByIdentity.TryGetValue(identity.Trim(), out var raw))
+                {
+                    map[physical] = raw + 1;
+                }
+            }
+
+            if (map.Count == 0)
+            {
+                // measured default cabinet: 1:b 2:a 3:y 4:x 5:l2 6:r2 7:l 8:r
+                map = new Dictionary<int, int> { [1] = 1, [2] = 2, [3] = 4, [4] = 3, [5] = 7, [6] = 8, [7] = 5, [8] = 6 };
+            }
+
+            return _joycodeByPhysicalCache = map;
+        }
+    }
+
+    /// <summary>Rewrites the pack's JOYCODE_x_BUTTONn tokens (n = physical slot,
+    /// identity-authored) into the button numbers the cabinet really emits.</summary>
+    private string TranslateJoycodes(string sequence)
+    {
+        return Regex.Replace(sequence, @"JOYCODE_(\d+)_BUTTON(\d+)", match =>
+        {
+            var physical = int.Parse(match.Groups[2].Value);
+            return JoycodeByPhysical.TryGetValue(physical, out var button)
+                ? $"JOYCODE_{match.Groups[1].Value}_BUTTON{button}"
+                : match.Value;
+        });
+    }
+
+    /// <summary>Applies TranslateJoycodes to every input sequence of a pack document.</summary>
+    private void TranslatePackDocument(XDocument pack)
+    {
+        var input = pack.Root?.Element("system")?.Element("input");
+        if (input is null)
+        {
+            return;
+        }
+
+        foreach (var seq in input.Elements("port").Select(p => p.Element("newseq")).Where(s => s is not null))
+        {
+            seq!.Value = TranslateJoycodes(seq.Value);
+        }
+    }
+
+    public bool IsMameRunning()
+    {
+        try
+        {
+            return System.Diagnostics.Process.GetProcesses()
+                .Any(p => p.ProcessName.StartsWith("mame", StringComparison.OrdinalIgnoreCase));
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Deploys one rom's cfg, or the pack when rom is null — optionally a slice of
+    /// it (offset/limit) so a client can chunk the run and show real progress.
+    /// </summary>
+    public Report Deploy(string? rom = null, int offset = 0, int limit = 0)
+    {
+        lock (_deployLock)
+        {
+            var packRoms = ListPackRoms();
+            IReadOnlyList<string> roms;
+            if (!string.IsNullOrWhiteSpace(rom))
+            {
+                roms = new[] { rom.Trim().ToLowerInvariant() };
+                offset = 0;
+            }
+            else
+            {
+                var slice = packRoms.Skip(Math.Max(0, offset));
+                if (limit > 0)
+                {
+                    slice = slice.Take(limit);
+                }
+
+                roms = slice.ToArray();
+            }
+
+            var items = new List<Item>();
+            foreach (var entry in roms)
+            {
+                items.Add(DeployRom(entry));
+            }
+
+            return new Report(
+                items.Count,
+                items.Count(i => i.Status == "written"),
+                items.Count(i => i.Status == "merged"),
+                items.Count(i => i.Status == "up-to-date"),
+                items.Count(i => i.Status is "failed" or "missing"),
+                items.Where(i => i.Status != "up-to-date").ToList(),
+                packRoms.Count,
+                Math.Max(0, offset));
+        }
+    }
+
+    private static IReadOnlyList<string> ListPackRoms()
+    {
+        if (!Directory.Exists(PackDir))
+        {
+            return Array.Empty<string>();
+        }
+
+        return Directory.EnumerateFiles(PackDir, "*.cfg")
+            .Select(Path.GetFileNameWithoutExtension)
+            .Where(name => !string.IsNullOrEmpty(name))
+            .Select(name => name!)
+            .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+    }
+
+    private Item DeployRom(string rom)
+    {
+        var packPath = Path.Combine(PackDir, rom + ".cfg");
+        if (!File.Exists(packPath))
+        {
+            return new Item(rom, "missing", "not in resources/controls/mame");
+        }
+
+        var targetPath = Path.Combine(TargetDir, rom + ".cfg");
+        try
+        {
+            if (!File.Exists(targetPath))
+            {
+                Directory.CreateDirectory(TargetDir);
+                var fresh = XDocument.Load(packPath);
+                TranslatePackDocument(fresh);
+                fresh.Save(targetPath);
+                return new Item(rom, "written", "deployed from pack");
+            }
+
+            var pack = XDocument.Load(packPath);
+            var packRaw = XDocument.Load(packPath);
+            TranslatePackDocument(pack);
+            var target = XDocument.Load(targetPath);
+            var changes = MergeInputPorts(pack, packRaw, target);
+            if (changes == 0)
+            {
+                return new Item(rom, "up-to-date", "");
+            }
+
+            File.Copy(targetPath, targetPath + ".bak", overwrite: true);
+            target.Save(targetPath);
+            return new Item(rom, "merged", $"{changes} port(s)");
+        }
+        catch (Exception ex)
+        {
+            return new Item(rom, "failed", ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Merges the pack's input ports into the deployed document. Returns how many
+    /// ports were added or updated. Existing manual sequences come first, the pack
+    /// tokens are OR-appended; a cleared "NONE" sequence is replaced outright.
+    /// </summary>
+    private static int MergeInputPorts(XDocument pack, XDocument packRaw, XDocument target)
+    {
+        var packInput = pack.Root?.Element("system")?.Element("input");
+        var packRawInput = packRaw.Root?.Element("system")?.Element("input");
+        var targetSystem = target.Root?.Element("system");
+        if (packInput is null || targetSystem is null)
+        {
+            return 0;
+        }
+
+        var targetInput = targetSystem.Element("input");
+        if (targetInput is null)
+        {
+            targetSystem.AddFirst(new XElement(packInput));
+            return packInput.Elements("port").Count();
+        }
+
+        var changes = 0;
+        foreach (var packPort in packInput.Elements("port"))
+        {
+            var type = (string?)packPort.Attribute("type");
+            if (string.IsNullOrWhiteSpace(type))
+            {
+                continue;
+            }
+
+            var tag = (string?)packPort.Attribute("tag");
+            var existing = targetInput.Elements("port").FirstOrDefault(p =>
+                string.Equals((string?)p.Attribute("type"), type, StringComparison.Ordinal) &&
+                string.Equals((string?)p.Attribute("tag"), tag, StringComparison.Ordinal));
+
+            if (existing is null)
+            {
+                targetInput.Add(new XElement(packPort));
+                changes++;
+                continue;
+            }
+
+            var packSeq = packPort.Element("newseq");
+            if (packSeq is null)
+            {
+                continue;
+            }
+
+            var existingSeq = existing.Element("newseq");
+            if (existingSeq is null)
+            {
+                existing.Add(new XElement(packSeq));
+                changes++;
+                continue;
+            }
+
+            var existingTokens = SplitSeq(existingSeq.Value);
+            var translatedTokens = SplitSeq(packSeq.Value);
+
+            // Self-recognition: a sequence identical to the RAW pack content is one
+            // of our earlier deployments (before the cabinet translation existed) —
+            // upgrade it outright to the translated form.
+            var rawSeq = FindSeq(packRawInput, tag, type);
+            if (rawSeq is not null && TokensEqual(existingTokens, SplitSeq(rawSeq)))
+            {
+                if (!TokensEqual(existingTokens, translatedTokens))
+                {
+                    existingSeq.Value = string.Join(" OR ", translatedTokens);
+                    changes++;
+                }
+
+                continue;
+            }
+
+            // A deliberate NONE (cleared by the user) stays dead, and a port already
+            // bound to any JOYCODE is panel-functional as the user arranged it: both
+            // are personal choices the deployment must respect. Only keyboard-only
+            // manual configs get the pack's panel forms OR-appended.
+            if (existingTokens.Count == 1 && existingTokens[0].Equals("NONE", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (existingTokens.Any(t => t.StartsWith("JOYCODE_", StringComparison.OrdinalIgnoreCase)))
+            {
+                continue;
+            }
+
+            var merged = existingTokens.ToList();
+            foreach (var token in translatedTokens)
+            {
+                if (!merged.Contains(token, StringComparer.OrdinalIgnoreCase))
+                {
+                    merged.Add(token);
+                }
+            }
+
+            if (merged.Count != existingTokens.Count)
+            {
+                existingSeq.Value = string.Join(" OR ", merged);
+                changes++;
+            }
+        }
+
+        changes += EnsureJoystickJoycodes(targetInput);
+        return changes;
+    }
+
+    /// <summary>
+    /// Reactivates the stick on direction ports that a manual keyboard-only
+    /// configuration overrode: a port like P1_JOYSTICK_LEFT bound to KEYCODE_LEFT
+    /// alone hides MAME's default joystick binding, so the panel stick goes dead.
+    /// The legacy axis form (JOYCODE_p_XAXIS_LEFT_SWITCH…) is OR-appended, the
+    /// keyboard binding is kept. Ports deliberately cleared (NONE) are respected.
+    /// </summary>
+    private static int EnsureJoystickJoycodes(XElement targetInput)
+    {
+        var changes = 0;
+        foreach (var port in targetInput.Elements("port"))
+        {
+            var type = (string?)port.Attribute("type");
+            if (string.IsNullOrWhiteSpace(type))
+            {
+                continue;
+            }
+
+            var match = Regex.Match(type, @"^P(\d+)_JOYSTICK_(UP|DOWN|LEFT|RIGHT)$", RegexOptions.IgnoreCase);
+            if (!match.Success)
+            {
+                continue;
+            }
+
+            var seq = port.Element("newseq");
+            if (seq is null)
+            {
+                continue;
+            }
+
+            var tokens = SplitSeq(seq.Value);
+            if (tokens.Count == 0
+                || tokens.Any(t => t.StartsWith("JOYCODE_", StringComparison.OrdinalIgnoreCase))
+                || (tokens.Count == 1 && tokens[0].Equals("NONE", StringComparison.OrdinalIgnoreCase)))
+            {
+                continue;
+            }
+
+            var player = match.Groups[1].Value;
+            var direction = match.Groups[2].Value.ToUpperInvariant();
+            var axis = direction is "LEFT" or "RIGHT" ? "XAXIS" : "YAXIS";
+            seq.Value = string.Join(" OR ", tokens.Append($"JOYCODE_{player}_{axis}_{direction}_SWITCH"));
+            changes++;
+        }
+
+        return changes;
+    }
+
+    private static string? FindSeq(XElement? input, string? tag, string type)
+    {
+        return input?.Elements("port")
+            .FirstOrDefault(p => string.Equals((string?)p.Attribute("type"), type, StringComparison.Ordinal)
+                                 && string.Equals((string?)p.Attribute("tag"), tag, StringComparison.Ordinal))
+            ?.Element("newseq")?.Value;
+    }
+
+    private static bool TokensEqual(IReadOnlyList<string> left, IReadOnlyList<string> right)
+    {
+        return left.Count == right.Count
+               && left.All(token => right.Contains(token, StringComparer.OrdinalIgnoreCase));
+    }
+
+    private static IReadOnlyList<string> SplitSeq(string value)
+    {
+        return Regex.Split(value, @"\s+OR\s+")
+            .Select(token => token.Trim())
+            .Where(token => token.Length > 0)
+            .ToArray();
+    }
+}

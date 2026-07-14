@@ -151,6 +151,8 @@ builder.Services.AddSingleton<ApiContext>();
 builder.Services.AddSingleton<PanelsCatalogService>();
 builder.Services.AddSingleton<ControlFilesCatalogService>();
 builder.Services.AddSingleton<PanelDefinitionProjectionService>();
+builder.Services.AddSingleton<PanelRemapExportService>();
+builder.Services.AddSingleton<MameCfgDeployService>();
 builder.Services.AddSingleton<DatasThemeExposeService>();
 builder.Services.AddSingleton<ApiExposeAppsettingsSyncService>();
 builder.Services.AddSingleton<IEsControllerInputBackend, DryRunEsControllerInputBackend>();
@@ -186,7 +188,7 @@ if (!testModeRequested)
     builder.Services.AddHostedService<LocalizedGamelistCachePrebuildHostedService>();
     builder.Services.AddHostedService<ReloadGamesHostedService>();
     builder.Services.AddHostedService<EsFeaturesMenuDeploymentHostedService>();
-    builder.Services.AddHostedService<PanelRemapExportService>();
+    builder.Services.AddHostedService(sp => sp.GetRequiredService<PanelRemapExportService>());
     builder.Services.AddHostedService<EmulationStationLifecycleHostedService>();
     builder.Services.AddHostedService<ApiExposeSettingsDefaultsHostedService>();
     builder.Services.AddHostedService<RomsMediaCanonicalMigrationHostedService>();
