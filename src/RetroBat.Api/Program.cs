@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RetroBat.Api.Infrastructure;
@@ -153,6 +153,7 @@ builder.Services.AddSingleton<ControlFilesCatalogService>();
 builder.Services.AddSingleton<PanelDefinitionProjectionService>();
 builder.Services.AddSingleton<PanelRemapExportService>();
 builder.Services.AddSingleton<MameCfgDeployService>();
+builder.Services.AddSingleton<FbneoRmpDeployService>();
 builder.Services.AddSingleton<DatasThemeExposeService>();
 builder.Services.AddSingleton<ApiExposeAppsettingsSyncService>();
 builder.Services.AddSingleton<IEsControllerInputBackend, DryRunEsControllerInputBackend>();

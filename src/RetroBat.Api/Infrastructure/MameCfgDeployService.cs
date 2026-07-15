@@ -160,6 +160,184 @@ public sealed class MameCfgDeployService
         return result;
     }
 
+    public sealed record RepairReport(string Rom, string Status, int Realigned, int Restored, int Removed, IReadOnlyList<string> Details);
+
+    /// <summary>
+    /// Repairs a deployed cfg against the INSTALLED MAME: boots the game headless
+    /// with the vendored dump_ports.lua (LedManager\tools\mame-repair) to read the
+    /// real port signatures, then realigns the cfg — wrong tag/mask/defvalue fixed,
+    /// ports MAME silently dropped restored from the translated pack (+ overrides),
+    /// user sequences kept, unknown ports removed. .bak written before saving.
+    /// </summary>
+    public RepairReport Repair(string rom)
+    {
+        rom = rom.Trim().ToLowerInvariant();
+        var details = new List<string>();
+        var mameExe = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "mame", "mame.exe");
+        var luaScript = Path.GetFullPath(Path.Combine(RetroBatPaths.PluginRoot, "..", "LedManager", "tools", "mame-repair", "dump_ports.lua"));
+        if (!File.Exists(mameExe))
+        {
+            return new RepairReport(rom, "failed", 0, 0, 0, new[] { "mame.exe introuvable (emulators\\mame)" });
+        }
+
+        if (!File.Exists(luaScript))
+        {
+            return new RepairReport(rom, "failed", 0, 0, 0, new[] { "dump_ports.lua introuvable (LedManager\\tools\\mame-repair)" });
+        }
+
+        // 1) ground truth: real port signatures of the installed MAME
+        var dumpPath = Path.Combine(Path.GetTempPath(), $"ledmanager_ports_{rom}.txt");
+        try
+        {
+            File.Delete(dumpPath);
+        }
+        catch
+        {
+            // stale dump: overwritten below anyway
+        }
+
+        var psi = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = mameExe,
+            Arguments = $"{rom} -rompath \"{Path.Combine(RetroBatPaths.RetroBatRoot, "roms", "mame")};{Path.Combine(RetroBatPaths.RetroBatRoot, "roms", "arcade")};{Path.Combine(RetroBatPaths.RetroBatRoot, "bios")}\" -autoboot_script \"{luaScript}\" -video none -sound none -skip_gameinfo",
+            WorkingDirectory = Path.GetDirectoryName(mameExe)!,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        psi.EnvironmentVariables["LEDMANAGER_PORTS_OUT"] = dumpPath;
+        using (var process = System.Diagnostics.Process.Start(psi))
+        {
+            if (process is null || !process.WaitForExit(90_000))
+            {
+                try
+                {
+                    process?.Kill(entireProcessTree: true);
+                }
+                catch
+                {
+                    // best effort
+                }
+
+                return new RepairReport(rom, "failed", 0, 0, 0, new[] { "MAME n'a pas termine le diagnostic (90 s)" });
+            }
+        }
+
+        if (!File.Exists(dumpPath))
+        {
+            return new RepairReport(rom, "failed", 0, 0, 0, new[] { "diagnostic vide : la rom demarre-t-elle dans MAME ?" });
+        }
+
+        var truth = new Dictionary<string, (string Tag, int Mask, int DefValue)>(StringComparer.OrdinalIgnoreCase);
+        foreach (var line in File.ReadLines(dumpPath))
+        {
+            var parts = line.Split('|');
+            if (parts.Length == 4 && int.TryParse(parts[2], out var mask) && int.TryParse(parts[3], out var defValue)
+                && !truth.ContainsKey(parts[1]))
+            {
+                truth[parts[1]] = (parts[0], mask, defValue);
+            }
+        }
+
+        if (truth.Count == 0)
+        {
+            return new RepairReport(rom, "failed", 0, 0, 0, new[] { "aucun port lu dans le diagnostic" });
+        }
+
+        // 2) desired sequences: current deployed seqs first (user), else the
+        // translated pack + patch-bay overrides
+        var targetPath = Path.Combine(TargetDir, rom + ".cfg");
+        var packPath = Path.Combine(PackDir, rom + ".cfg");
+        var desired = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        void Harvest(XDocument? doc, bool overwrite)
+        {
+            var input = doc?.Root?.Element("system")?.Element("input");
+            if (input is null)
+            {
+                return;
+            }
+
+            foreach (var port in input.Elements("port"))
+            {
+                var type = (string?)port.Attribute("type");
+                var seq = port.Elements("newseq").FirstOrDefault(n => (string?)n.Attribute("type") == "standard")?.Value?.Trim();
+                if (type is null || string.IsNullOrWhiteSpace(seq))
+                {
+                    continue;
+                }
+
+                if (overwrite || !desired.ContainsKey(type))
+                {
+                    desired[type] = seq!;
+                }
+            }
+        }
+
+        if (File.Exists(packPath))
+        {
+            var pack = XDocument.Load(packPath);
+            TranslatePackDocument(pack);
+            ApplyInputPatches(pack, LoadInputPatches(rom));
+            Harvest(pack, overwrite: false);
+        }
+
+        var current = File.Exists(targetPath) ? XDocument.Load(targetPath) : null;
+        Harvest(current, overwrite: true); // the user's live cfg wins
+
+        // 3) rebuild the input section on the TRUE signatures
+        var realigned = 0;
+        var restored = 0;
+        var removed = 0;
+        var newInput = new XElement("input");
+        foreach (var (type, seq) in desired.OrderBy(p => p.Key, StringComparer.OrdinalIgnoreCase))
+        {
+            if (!truth.TryGetValue(type, out var signature))
+            {
+                removed++;
+                details.Add($"{type} : inconnu de cette version de MAME — retire");
+                continue;
+            }
+
+            var existed = current?.Root?.Element("system")?.Element("input")?.Elements("port")
+                .Any(p => (string?)p.Attribute("type") == type
+                          && (string?)p.Attribute("tag") == signature.Tag
+                          && (string?)p.Attribute("mask") == signature.Mask.ToString()) == true;
+            if (existed)
+            {
+                realigned++; // identical signature: kept as-is
+            }
+            else
+            {
+                restored++;
+                details.Add($"{type} : signature realignee ({signature.Tag} mask {signature.Mask})");
+            }
+
+            newInput.Add(new XElement("port",
+                new XAttribute("tag", signature.Tag),
+                new XAttribute("type", type),
+                new XAttribute("mask", signature.Mask),
+                new XAttribute("defvalue", signature.DefValue),
+                new XElement("newseq", new XAttribute("type", "standard"), seq)));
+        }
+
+        if (newInput.Elements().Any())
+        {
+            var doc = current ?? new XDocument(new XElement("mameconfig", new XAttribute("version", "10"),
+                new XElement("system", new XAttribute("name", rom))));
+            var system = doc.Root!.Element("system")!;
+            system.Element("input")?.Remove();
+            system.AddFirst(newInput);
+            if (File.Exists(targetPath))
+            {
+                File.Copy(targetPath, targetPath + ".bak", overwrite: true);
+            }
+
+            Directory.CreateDirectory(TargetDir);
+            doc.Save(targetPath);
+        }
+
+        return new RepairReport(rom, restored + removed > 0 ? "repaired" : "up-to-date", realigned, restored, removed, details);
+    }
+
     public bool IsMameRunning()
     {
         try

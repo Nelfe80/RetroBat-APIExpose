@@ -282,7 +282,8 @@ public sealed class PanelDefinitionProjectionService
             MameTag = ReadString(sourceObj["mame"] as JsonObject, "cfg_tag", "mame_tag", "tag"),
             MameMask = ReadString(sourceObj["mame"] as JsonObject, "mask_hex", "mask"),
             MameDefValue = ReadString(sourceObj["mame"] as JsonObject, "defvalue_hex", "defvalue"),
-            JoystickWay = ReadString(sourceObj["mame"] as JsonObject, "joystick_way")
+            JoystickWay = ReadString(sourceObj["mame"] as JsonObject, "joystick_way"),
+            OutputRef = ReadString(sourceObj, "output")
         };
     }
 
@@ -744,6 +745,10 @@ public sealed class PanelControlInputProjection
     public string DeviceType { get; set; } = string.Empty;
 
     public string DeviceLabel { get; set; } = string.Empty;
+
+    /// <summary>Lamp this input drives (llander: start/select → lamp0, coin →
+    /// lamp1), from the dynpanel "output" field.</summary>
+    public string OutputRef { get; set; } = string.Empty;
 }
 
 public sealed class PanelControlOutputProjection

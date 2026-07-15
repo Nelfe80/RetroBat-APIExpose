@@ -17,6 +17,7 @@ public class PanelsController : ControllerBase
     private readonly IEventBus _eventBus;
     private readonly PanelRemapExportService _remapExport;
     private readonly MameCfgDeployService _mameCfgDeploy;
+    private readonly FbneoRmpDeployService _fbneoRmpDeploy;
 
     public PanelsController(
         PanelsCatalogService panels,
@@ -24,7 +25,8 @@ public class PanelsController : ControllerBase
         PanelDefinitionProjectionService panelProjection,
         IEventBus eventBus,
         PanelRemapExportService remapExport,
-        MameCfgDeployService mameCfgDeploy)
+        MameCfgDeployService mameCfgDeploy,
+        FbneoRmpDeployService fbneoRmpDeploy)
     {
         _panels = panels;
         _controlFiles = controlFiles;
@@ -32,6 +34,7 @@ public class PanelsController : ControllerBase
         _eventBus = eventBus;
         _remapExport = remapExport;
         _mameCfgDeploy = mameCfgDeploy;
+        _fbneoRmpDeploy = fbneoRmpDeploy;
     }
 
     /// <summary>
@@ -328,6 +331,36 @@ public class PanelsController : ControllerBase
 
         return Ok(_mameCfgDeploy.Deploy(rom, offset, limit));
     }
+
+    /// <summary>
+    /// Repairs a game's deployed MAME cfg against the INSTALLED MAME: real port
+    /// signatures read via a headless boot, wrong/lost ports realigned, user
+    /// sequences kept. Refused while MAME runs.
+    /// </summary>
+    /// <response code="200">Repair report.</response>
+    /// <response code="409">MAME is running.</response>
+    [HttpPost("controls/mamecfg/repair")]
+    [ProducesResponseType(typeof(MameCfgDeployService.RepairReport), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public IActionResult RepairMameCfg([FromQuery] string rom)
+    {
+        if (_mameCfgDeploy.IsMameRunning())
+        {
+            return Conflict(new { message = "MAME is running: close it before repairing." });
+        }
+
+        return Ok(_mameCfgDeploy.Repair(rom));
+    }
+
+    /// <summary>
+    /// Deploys the per-game FBNeo RetroArch remaps (one rom, or the whole pack).
+    /// User-modified files are kept.
+    /// </summary>
+    /// <response code="200">Deployment report.</response>
+    [HttpPost("controls/fbneormp/deploy")]
+    [ProducesResponseType(typeof(FbneoRmpDeployService.Report), StatusCodes.Status200OK)]
+    public IActionResult DeployFbneoRmp([FromQuery] string? rom = null, [FromQuery] int offset = 0, [FromQuery] int limit = 0)
+        => Ok(_fbneoRmpDeploy.Deploy(rom, offset, limit));
 
     /// <summary>
     /// Current wiring of a game's deployed MAME cfg, expressed in physical panel

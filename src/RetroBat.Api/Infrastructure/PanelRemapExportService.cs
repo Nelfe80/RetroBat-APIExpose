@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Xml.Linq;
@@ -637,6 +637,14 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
                 ? p
                 : slot;
 
+            // a template button without a function carries no action: parked on R3
+            // (LED off = dead button) whatever residual id the data may hold
+            var function = entry.Value.TryGetProperty("function", out var fn) ? fn.GetString() : null;
+            if (string.IsNullOrWhiteSpace(function) || function!.Equals("None", StringComparison.OrdinalIgnoreCase))
+            {
+                retropad = 15;
+            }
+
             if (cabinetButtons.TryGetValue(physical, out var label) && retropad >= 0 && slot > 0)
             {
                 slots.Add(new DynpanelSlot(slot, label, retropad));
@@ -677,6 +685,115 @@ public sealed class PanelRemapExportService : IHostedService, IDisposable
         }
 
         return slots.OrderBy(s => s.Slot).ToArray();
+    }
+
+    /// <summary>
+    /// Generates the PER-GAME FBNeo RetroArch remap from the game dynpanel and the
+    /// cabinet cartography: game button n placed on physical slot P becomes
+    /// btn_{carto[P]} = panel.slots[n].retropad_id (the id the core expects for
+    /// that game button under the retrobat_standard convention); unused identities
+    /// are parked on R3. Same guard rules as the system remaps (marker + hash);
+    /// a RetroArch boilerplate file without any btn line carries no user mapping
+    /// and is replaced.
+    /// </summary>
+    public string DeployFbneoGameRemap(string rom)
+    {
+        var gamePath = Path.Combine(RetroBatPaths.PluginRoot, "resources", "dynpanels", "games", rom + ".json");
+        if (!File.Exists(gamePath))
+        {
+            return "missing";
+        }
+
+        try
+        {
+            using var doc = JsonDocument.Parse(File.ReadAllText(gamePath));
+            var root = doc.RootElement;
+            if (!root.TryGetProperty("panel", out var panel) || !panel.TryGetProperty("slots", out var panelSlots)
+                || !root.TryGetProperty("players", out var players) || !players.TryGetProperty("1", out var player1)
+                || !player1.TryGetProperty("buttons", out var buttons) || buttons.ValueKind != JsonValueKind.Object)
+            {
+                return "missing";
+            }
+
+            var layoutId = $"{Math.Clamp(CabinetButtons.Count, 2, 8)}-Button";
+            JsonElement layoutButtons = default;
+            var hasLayoutButtons = player1.TryGetProperty("layouts", out var layouts)
+                && layouts.TryGetProperty(layoutId, out var layout)
+                && layout.TryGetProperty("buttons", out layoutButtons)
+                && layoutButtons.ValueKind == JsonValueKind.Object;
+
+            var slots = new List<DynpanelSlot>();
+            foreach (var button in buttons.EnumerateObject())
+            {
+                int? physical = null;
+                if (button.Value.TryGetProperty("layouts", out var buttonLayouts)
+                    && buttonLayouts.TryGetProperty(layoutId, out var buttonLayout)
+                    && buttonLayout.TryGetProperty("panel_slot", out var direct) && direct.ValueKind == JsonValueKind.Number)
+                {
+                    physical = direct.GetInt32();
+                }
+
+                if (physical is null && hasLayoutButtons && layoutButtons.TryGetProperty(button.Name, out var placed)
+                    && placed.TryGetProperty("panel_slot", out var indirect) && indirect.ValueKind == JsonValueKind.Number)
+                {
+                    physical = indirect.GetInt32();
+                }
+
+                if (physical is not { } slotNumber || !CabinetButtons.TryGetValue(slotNumber, out var identity))
+                {
+                    continue;
+                }
+
+                // purely data-driven: the id the core expects for game button n
+                // comes from the dynpanel convention (panel.slots[n].retropad_id) —
+                // family quirks belong to the DATA, never hardcoded here;
+                // "2#2" duplicates share their base button's id
+                var baseButton = button.Name.Split('#')[0];
+                if (!panelSlots.TryGetProperty(baseButton, out var template)
+                    || !template.TryGetProperty("retropad_id", out var idElement)
+                    || idElement.ValueKind != JsonValueKind.Number)
+                {
+                    continue;
+                }
+
+                slots.Add(new DynpanelSlot(slotNumber, identity, idElement.GetInt32()));
+            }
+
+            if (slots.Count == 0)
+            {
+                return "missing";
+            }
+
+            ParkUnusedIdentities(slots);
+            var body = BuildRmp(slots, playerCount: 2);
+            var targetDir = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "config", "remaps", "FinalBurn Neo");
+            Directory.CreateDirectory(targetDir);
+            var targetPath = Path.Combine(targetDir, rom + ".rmp");
+            if (File.Exists(targetPath) && !File.ReadLines(targetPath)
+                    .Any(l => l.StartsWith("input_player", StringComparison.OrdinalIgnoreCase) && l.Contains("_btn_")))
+            {
+                File.Delete(targetPath);
+            }
+
+            // a target identical to the curated pack is one of the legacy
+            // deployments in disguise: upgradable to the generated remap
+            var legacyPack = Path.Combine(RetroBatPaths.PluginRoot, "resources", "controls", "retroarch", "fbneo", rom + ".rmp");
+            if (File.Exists(targetPath) && File.Exists(legacyPack))
+            {
+                static string Norm(string text) => string.Join("\n",
+                    text.Replace("\r", "").Split('\n').Select(l => l.Trim()).Where(l => l.Length > 0));
+                if (Norm(File.ReadAllText(targetPath)) == Norm(File.ReadAllText(legacyPack)))
+                {
+                    File.Delete(targetPath);
+                }
+            }
+
+            return WriteGuarded(targetPath, body, "fbneo", rom, "per-game remap");
+        }
+        catch
+        {
+            return "failed";
+        }
     }
 
     private static string BuildRmp(IReadOnlyList<DynpanelSlot> slots, int playerCount)
