@@ -111,6 +111,7 @@ public class EmulationStationWatcherProvider : IProvider
         _watcher.Created += OnFileChanged;
         _watcher.Renamed += OnFileChanged;
         _providerCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        _ = Task.Run(() => RunEventsIniPollFallbackAsync(_providerCts.Token), CancellationToken.None);
 
         _settingsSubscription = _settingsChangeBus.Subscribe((_, token) => HandleSettingsChangedAsync(token));
         
@@ -172,6 +173,43 @@ public class EmulationStationWatcherProvider : IProvider
         }
     }
 
+    /// <summary>
+    /// FileSystemWatcher misses rename notifications on this busy directory
+    /// (measured: 6 of 10 spaced events.ini replaces lost) — a single missed
+    /// notification means a jump-to-game never updates the display. This cheap
+    /// mtime/size probe catches anything the watcher dropped; the duplicate
+    /// guard in HandleEventsIniChanged absorbs the overlap with FSW events.
+    /// </summary>
+    private async Task RunEventsIniPollFallbackAsync(CancellationToken cancellationToken)
+    {
+        var lastSnapshot = ReadEventsIniSnapshot();
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                await Task.Delay(150, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            try
+            {
+                var snapshot = ReadEventsIniSnapshot();
+                if (snapshot != lastSnapshot)
+                {
+                    lastSnapshot = snapshot;
+                    HandleEventsIniChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogDebug(ex, "events.ini poll fallback probe failed");
+            }
+        }
+    }
+
     private void OnFileChanged(object sender, FileSystemEventArgs e)
     {
         if (e.ChangeType is not (WatcherChangeTypes.Changed or WatcherChangeTypes.Created or WatcherChangeTypes.Renamed))
@@ -202,7 +240,7 @@ public class EmulationStationWatcherProvider : IProvider
 
             var sequence = Interlocked.Increment(ref _frontendEventSequence);
             PublishEsEventRefresh(eventName, args, sequence);
-            _ = Task.Run(() => ProcessEventAsync(sequence, eventName, args), CancellationToken.None);
+            DispatchEventThroughBurstGate(eventName, args, sequence);
         }
         catch (IOException)
         {
@@ -211,6 +249,121 @@ public class EmulationStationWatcherProvider : IProvider
         catch (Exception ex)
         {
             _logger?.LogError(ex, "Error processing events.ini");
+        }
+    }
+
+    private readonly object _selectionBurstLock = new();
+    private (string[] Args, long Sequence)? _pendingBurstSelection;
+    private DateTime _lastGameSelectedArrivalUtc = DateTime.MinValue;
+    private DateTime _lastBurstPublishUtc = DateTime.MinValue;
+    private CancellationTokenSource? _burstCloseCts;
+
+    /// <summary>
+    /// game-selected burst gate. ES's script queue emits one events.ini write per
+    /// hovered game and keeps draining AFTER the user stops; every write is a
+    /// fresh, distinct, monotone state, so downstream debounces never coalesce
+    /// them and the panel/marquee replay the whole journal. First selection after
+    /// a quiet period passes immediately; closer-spaced ones only park in a
+    /// latest-wins slot published once the stream stays quiet, with a periodic
+    /// sample so a long burst still tracks. Skipped intermediates never reach
+    /// ProcessEventAsync, which also removes their ES-API/prefetch side load
+    /// (the very load that slowed the queue drain down). Lifecycle events drop
+    /// the pending slot: a game start/end supersedes any queued selection.
+    /// </summary>
+    private void DispatchEventThroughBurstGate(string eventName, string[] args, long sequence)
+    {
+        var options = _options.CurrentValue;
+        var isGameSelected = string.Equals(eventName, "game-selected", StringComparison.OrdinalIgnoreCase);
+        if (!options.CoalesceSelectionBursts || !isGameSelected)
+        {
+            if (!isGameSelected)
+            {
+                CancelPendingBurstSelection();
+            }
+
+            _ = Task.Run(() => ProcessEventAsync(sequence, eventName, args), CancellationToken.None);
+            return;
+        }
+
+        var quiet = TimeSpan.FromMilliseconds(Math.Max(50, options.SelectionBurstQuietMs));
+        var progress = TimeSpan.FromMilliseconds(Math.Max(options.SelectionBurstQuietMs, options.SelectionBurstProgressMs));
+        lock (_selectionBurstLock)
+        {
+            var nowUtc = DateTime.UtcNow;
+            var sinceLastArrival = nowUtc - _lastGameSelectedArrivalUtc;
+            _lastGameSelectedArrivalUtc = nowUtc;
+
+            if (sinceLastArrival >= quiet)
+            {
+                // leading edge: a quiet gap means a deliberate selection
+                _lastBurstPublishUtc = nowUtc;
+                _pendingBurstSelection = null;
+                _burstCloseCts?.Cancel();
+                _burstCloseCts = null;
+                _ = Task.Run(() => ProcessEventAsync(sequence, "game-selected", args), CancellationToken.None);
+                return;
+            }
+
+            _pendingBurstSelection = (args, sequence);
+
+            if (nowUtc - _lastBurstPublishUtc >= progress)
+            {
+                // periodic sample: the display follows a long burst loosely
+                _lastBurstPublishUtc = nowUtc;
+                _pendingBurstSelection = null;
+                _ = Task.Run(() => ProcessEventAsync(sequence, "game-selected", args), CancellationToken.None);
+                return;
+            }
+
+            _burstCloseCts?.Cancel();
+            var closeCts = new CancellationTokenSource();
+            _burstCloseCts = closeCts;
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(quiet, closeCts.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
+
+                (string[] Args, long Sequence)? pending;
+                lock (_selectionBurstLock)
+                {
+                    if (closeCts.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
+                    pending = _pendingBurstSelection;
+                    _pendingBurstSelection = null;
+                    _lastBurstPublishUtc = DateTime.UtcNow;
+                    if (ReferenceEquals(_burstCloseCts, closeCts))
+                    {
+                        _burstCloseCts = null;
+                    }
+                }
+
+                if (pending is { } selection)
+                {
+                    _logger?.LogInformation(
+                        "game-selected burst closed: publishing latest selection sequence={Sequence}",
+                        selection.Sequence);
+                    await ProcessEventAsync(selection.Sequence, "game-selected", selection.Args);
+                }
+            }, CancellationToken.None);
+        }
+    }
+
+    private void CancelPendingBurstSelection()
+    {
+        lock (_selectionBurstLock)
+        {
+            _pendingBurstSelection = null;
+            _burstCloseCts?.Cancel();
+            _burstCloseCts = null;
         }
     }
 
@@ -388,6 +541,14 @@ public class EmulationStationWatcherProvider : IProvider
                         perf);
                     await PublishFrontendEventAsync(eventType, eventName, args);
                     eventPublished = true;
+                }
+
+                if (publishBeforeDetails && !IsLatestFrontendEvent(sequence))
+                {
+                    // a newer selection already arrived: skip enrichment and
+                    // scrape entirely, sparing the ES API during queue drains
+                    LogGameSelectedPerfIfNeeded(perf.Elapsed, systemId, path, options, detailsEnabled, bypassCache);
+                    return;
                 }
 
                 var suppressReason = string.Empty;
