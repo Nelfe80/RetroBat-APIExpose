@@ -307,7 +307,7 @@ public class EmulationStationWatcherProvider : IProvider
             {
                 var before = ReadEventsIniSnapshot();
                 cancellationToken.ThrowIfCancellationRequested();
-                var lines = File.ReadAllLines(_eventsIniPath);
+                var lines = EventsIniFile.ReadAllLines(_eventsIniPath);
                 var after = ReadEventsIniSnapshot();
                 if (before == after)
                 {
@@ -325,7 +325,7 @@ public class EmulationStationWatcherProvider : IProvider
             }
         }
 
-        return File.ReadAllLines(_eventsIniPath);
+        return EventsIniFile.ReadAllLines(_eventsIniPath);
     }
 
     private (DateTime LastWriteUtc, long Length) ReadEventsIniSnapshot()

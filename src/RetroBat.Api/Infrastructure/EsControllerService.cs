@@ -2195,7 +2195,7 @@ public class EsControllerService
 
         try
         {
-            var lines = File.ReadAllLines(RetroBatPaths.EventsIniPath)
+            var lines = EventsIniFile.ReadAllLines(RetroBatPaths.EventsIniPath)
                 .Select(line => line.Trim())
                 .Where(line => !string.IsNullOrWhiteSpace(line))
                 .ToArray();

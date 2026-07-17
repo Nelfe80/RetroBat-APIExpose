@@ -1704,7 +1704,7 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                 return false;
             }
 
-            var lines = File.ReadAllLines(RetroBatPaths.EventsIniPath);
+            var lines = EventsIniFile.ReadAllLines(RetroBatPaths.EventsIniPath);
             if (lines.Length < 2 ||
                 !string.Equals(lines[0].Trim(), "event=game-selected", StringComparison.OrdinalIgnoreCase))
             {
