@@ -372,49 +372,86 @@ public class EmulationStationWatcherProvider : IProvider
                 var localProjectionOnGameSelected = options.LocalProjectionOnGameSelected || options.PrefetchOnGameSelected;
                 var (scrapeSequence, scrapeCancellationToken) = BeginLatestGameSelectedScrape();
 
-                if ((localProjectionOnGameSelected || options.QueueRemoteScrapeOnGameSelected) &&
-                    _mediaRuntimeState.ShouldSuppressGameSelectedScrape(systemId, path, out var suppressReason))
+                var publishBeforeDetails = options.PublishSelectionBeforeDetails;
+                if (publishBeforeDetails)
                 {
+                    // marquee/panel only need system+rom to display: publish the
+                    // in-memory context NOW — the ES API calls below can take
+                    // seconds while ES reloads its gamelists, and the display
+                    // used to inherit that whole delay
+                    await PublishRawFrontendEventAsync(
+                        "ui.game.selected.raw",
+                        eventName,
+                        args,
+                        BuildFrontendGameSelection(_context.Ui.Selected, systemId),
+                        sequence,
+                        perf);
+                    await PublishFrontendEventAsync(eventType, eventName, args);
+                    eventPublished = true;
+                }
+
+                var suppressReason = string.Empty;
+                if ((localProjectionOnGameSelected || options.QueueRemoteScrapeOnGameSelected) &&
+                    _mediaRuntimeState.ShouldSuppressGameSelectedScrape(systemId, path, out suppressReason))
+                {
+                    // during the live refresh window only the enrichment/scrape is
+                    // skipped (ES is busy); the UI event above was already published
                     _logger?.LogInformation(
-                        "game-selected ignored during API live refresh suppression window: reason={Reason}, system={SystemId}, path={Path}",
+                        "game-selected {Scope} suppressed during API live refresh window: reason={Reason}, system={SystemId}, path={Path}",
+                        publishBeforeDetails ? "enrichment/scrape" : "event",
                         suppressReason,
                         systemId,
                         path);
                     LogGameSelectedPerfIfNeeded(perf.Elapsed, systemId, path, options, detailsEnabled, bypassCache);
                     return;
                 }
-                
+
                 var systemDetails = detailsEnabled ? await FetchSystemDetailsAsync(systemId, bypassCache) : null;
                 if (!IsLatestFrontendEvent(sequence))
                 {
                     return;
                 }
                 _context.Ui.SelectedSystem = systemDetails ?? new SystemDetails { Name = systemId };
-                
+
                 var gameDetails = detailsEnabled ? await FetchGameDetailsAsync(systemId, path, bypassCache) : null;
                 if (!IsLatestFrontendEvent(sequence))
                 {
                     return;
                 }
                 var gameId = gameDetails?.Id ?? gameDetails?.Md5 ?? "";
-                
-                _context.Ui.Selected = new GameReference 
-                { 
-                    SystemId = systemId, 
-                    GamePath = path, 
+
+                _context.Ui.Selected = new GameReference
+                {
+                    SystemId = systemId,
+                    GamePath = path,
                     GameName = name,
                     GameId = gameId,
                     Details = gameDetails
                 };
-                await PublishRawFrontendEventAsync(
-                    "ui.game.selected.raw",
-                    eventName,
-                    args,
-                    BuildFrontendGameSelection(_context.Ui.Selected, systemId),
-                    sequence,
-                    perf);
-                await PublishFrontendEventAsync(eventType, eventName, args);
-                eventPublished = true;
+                if (!publishBeforeDetails)
+                {
+                    await PublishRawFrontendEventAsync(
+                        "ui.game.selected.raw",
+                        eventName,
+                        args,
+                        BuildFrontendGameSelection(_context.Ui.Selected, systemId),
+                        sequence,
+                        perf);
+                    await PublishFrontendEventAsync(eventType, eventName, args);
+                    eventPublished = true;
+                }
+                else if (gameDetails != null)
+                {
+                    // enriched second pass: genre/year/developer feed the lighting
+                    // profiles; consumers coalesce so this never queues up behind
+                    await PublishRawFrontendEventAsync(
+                        "ui.game.selected.raw",
+                        eventName,
+                        args,
+                        BuildFrontendGameSelection(_context.Ui.Selected, systemId),
+                        sequence,
+                        perf);
+                }
 
                 var selectedGame = _context.Ui.Selected;
                 if (localProjectionOnGameSelected || options.QueueRemoteScrapeOnGameSelected)
