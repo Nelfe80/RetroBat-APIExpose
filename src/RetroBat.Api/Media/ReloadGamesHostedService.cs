@@ -164,6 +164,7 @@ public class ReloadGamesHostedService : BackgroundService
 
                         if (await TryRequestFrontendReloadGamesAsync(stoppingToken))
                         {
+                            _runtimeState.RecordEsUiRefreshPush();
                             _logger?.LogInformation("reloadgames appele avec succes apres aggregation des mises a jour.");
                             await RefreshTrackingLog.AppendAsync(
                                 "reloadgames",

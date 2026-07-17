@@ -818,6 +818,28 @@ public class MediaRuntimeState
         }
     }
 
+    private DateTime _lastEsUiRefreshPushUtc = DateTime.MinValue;
+
+    /// <summary>Records that APIExpose just pushed a UI refresh to EmulationStation
+    /// (live /addgames, /reloadgames). ES re-fires game-selected for every view it
+    /// refreshes shortly after — including stale cursors from non-visible views —
+    /// so selection consumers defer publication until that re-fire burst settles.</summary>
+    public void RecordEsUiRefreshPush()
+    {
+        lock (_lock)
+        {
+            _lastEsUiRefreshPushUtc = DateTime.UtcNow;
+        }
+    }
+
+    public bool IsWithinPostEsRefreshWindow(TimeSpan window)
+    {
+        lock (_lock)
+        {
+            return DateTime.UtcNow - _lastEsUiRefreshPushUtc <= window;
+        }
+    }
+
     public void MarkLiveAddGamesPushedForSelection(string systemId, string gamePath, bool videoException = false)
     {
         var selectionKey = BuildSelectionKey(systemId, gamePath);
@@ -828,6 +850,9 @@ public class MediaRuntimeState
 
         lock (_lock)
         {
+            // the ES push happened regardless of the bookkeeping below: always
+            // arm the post-refresh window so re-fired selections are deferred
+            _lastEsUiRefreshPushUtc = DateTime.UtcNow;
             if (!string.IsNullOrWhiteSpace(_currentGameSelectedKey) &&
                 !string.Equals(_currentGameSelectedKey, selectionKey, StringComparison.OrdinalIgnoreCase))
             {

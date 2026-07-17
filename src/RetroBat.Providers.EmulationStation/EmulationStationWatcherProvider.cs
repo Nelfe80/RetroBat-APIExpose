@@ -252,7 +252,10 @@ public class EmulationStationWatcherProvider : IProvider
         }
     }
 
+    private static readonly TimeSpan PostEsRefreshDeferWindow = TimeSpan.FromSeconds(4);
+    private const int RecentSelectionHistorySize = 48;
     private readonly object _selectionBurstLock = new();
+    private readonly List<string> _recentSelectionKeys = new();
     private (string[] Args, long Sequence)? _pendingBurstSelection;
     private DateTime _lastGameSelectedArrivalUtc = DateTime.MinValue;
     private DateTime _lastBurstPublishUtc = DateTime.MinValue;
@@ -287,13 +290,33 @@ public class EmulationStationWatcherProvider : IProvider
 
         var quiet = TimeSpan.FromMilliseconds(Math.Max(50, options.SelectionBurstQuietMs));
         var progress = TimeSpan.FromMilliseconds(Math.Max(options.SelectionBurstQuietMs, options.SelectionBurstProgressMs));
+
+        // after APIExpose pushes addgames/reloadgames, ES re-fires game-selected
+        // for every refreshed view — first the stale cursors of non-visible views,
+        // last the real one. Defer the leading edge inside that window so the
+        // ghost pair collapses to its final (correct) selection before publishing.
+        var deferLeadingEdge = _mediaRuntimeState.IsWithinPostEsRefreshWindow(PostEsRefreshDeferWindow);
+
+        var selectionKey = BuildBurstSelectionKey(args);
         lock (_selectionBurstLock)
         {
+            if (deferLeadingEdge && IsPostRefreshGhostSelection(selectionKey))
+            {
+                // recurrent stale cursor re-fired by a non-visible ES view (its
+                // dedup ate the matching visible-view re-fire): never display it
+                _logger?.LogInformation(
+                    "post-refresh ghost selection ignored: sequence={Sequence}, selection={SelectionKey}",
+                    sequence,
+                    selectionKey);
+                return;
+            }
+
+            RecordRecentSelectionKey(selectionKey);
             var nowUtc = DateTime.UtcNow;
             var sinceLastArrival = nowUtc - _lastGameSelectedArrivalUtc;
             _lastGameSelectedArrivalUtc = nowUtc;
 
-            if (sinceLastArrival >= quiet)
+            if (sinceLastArrival >= quiet && !deferLeadingEdge)
             {
                 // leading edge: a quiet gap means a deliberate selection
                 _lastBurstPublishUtc = nowUtc;
@@ -306,7 +329,7 @@ public class EmulationStationWatcherProvider : IProvider
 
             _pendingBurstSelection = (args, sequence);
 
-            if (nowUtc - _lastBurstPublishUtc >= progress)
+            if (!deferLeadingEdge && nowUtc - _lastBurstPublishUtc >= progress)
             {
                 // periodic sample: the display follows a long burst loosely
                 _lastBurstPublishUtc = nowUtc;
@@ -364,6 +387,59 @@ public class EmulationStationWatcherProvider : IProvider
             _pendingBurstSelection = null;
             _burstCloseCts?.Cancel();
             _burstCloseCts = null;
+        }
+    }
+
+    private string BuildBurstSelectionKey(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        ParseGameSelected(args[0], out var systemId, out var path, out _);
+        return string.IsNullOrWhiteSpace(path) ? string.Empty : $"{systemId}|{path}".ToLowerInvariant();
+    }
+
+    /// <summary>
+    /// A ghost is a selection that (a) arrives inside the post-ES-push window,
+    /// (b) differs from the current context selection, and (c) was already seen
+    /// in the recent selection history — the signature of a non-visible view's
+    /// stale cursor re-fired on refresh. A genuine cursor reveal (a game never
+    /// seen before) always passes; a first-time ghost passes once, then is
+    /// remembered and filtered on every later refresh cycle.
+    /// </summary>
+    private bool IsPostRefreshGhostSelection(string selectionKey)
+    {
+        if (string.IsNullOrWhiteSpace(selectionKey))
+        {
+            return false;
+        }
+
+        var current = _context.Ui.Selected;
+        var currentKey = current?.GamePath is { Length: > 0 }
+            ? $"{current.SystemId}|{current.GamePath}".ToLowerInvariant()
+            : string.Empty;
+        if (selectionKey.Equals(currentKey, StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        return _recentSelectionKeys.Contains(selectionKey);
+    }
+
+    private void RecordRecentSelectionKey(string selectionKey)
+    {
+        if (string.IsNullOrWhiteSpace(selectionKey))
+        {
+            return;
+        }
+
+        _recentSelectionKeys.Remove(selectionKey);
+        _recentSelectionKeys.Add(selectionKey);
+        if (_recentSelectionKeys.Count > RecentSelectionHistorySize)
+        {
+            _recentSelectionKeys.RemoveAt(0);
         }
     }
 
