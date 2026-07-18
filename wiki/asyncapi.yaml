@@ -30,8 +30,10 @@ channels:
   frontend:
     address: /ws/frontend
     description: >
-      Prefixes `ui.` — EmulationStation navigation and game lifecycle:
-      ui.system.selected, ui.game.selected, ui.game.started, ui.game.ended, ui.event.
+      Prefixes `ui.` — EmulationStation navigation and lifecycle:
+      ui.system.selected, ui.game.selected, ui.game.started, ui.game.ended,
+      ui.event, ui.frontend.started, ui.frontend.stopped (frontend process
+      lifecycle — replaces polling the emulationstation process).
     messages:
       envelope:
         $ref: '#/components/messages/envelope'

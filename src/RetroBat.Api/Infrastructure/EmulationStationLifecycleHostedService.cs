@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using RetroBat.Api.Media;
+using RetroBat.Domain.Events;
+using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Models;
 
 namespace RetroBat.Api.Infrastructure;
@@ -22,12 +24,14 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
     private int? _startupF5SentForProcessId;
 
     private readonly GamelistUpdateService _gamelistUpdateService;
+    private readonly IEventBus _eventBus;
 
     public EmulationStationLifecycleHostedService(
         EsFeaturesMenuDeploymentService esFeaturesMenuDeploymentService,
         EsControllerInputBackendProvider backendProvider,
         MediaRuntimeState runtimeState,
         GamelistUpdateService gamelistUpdateService,
+        IEventBus eventBus,
         IHostApplicationLifetime applicationLifetime,
         IOptionsMonitor<ApiExposeOptions> options,
         ILogger<EmulationStationLifecycleHostedService> logger)
@@ -36,9 +40,30 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
         _backendProvider = backendProvider;
         _runtimeState = runtimeState;
         _gamelistUpdateService = gamelistUpdateService;
+        _eventBus = eventBus;
         _applicationLifetime = applicationLifetime;
         _options = options;
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Publishes ui.frontend.started/stopped on the event bus (frontend WS
+    /// stream) so clients no longer need to poll the emulationstation process.
+    /// </summary>
+    private async Task PublishFrontendLifecycleAsync(string type, int? processId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _eventBus.PublishAsync(new EventEnvelope
+            {
+                Type = type,
+                Payload = new { ProcessId = processId }
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Frontend lifecycle event publication failed for {Type}.", type);
+        }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -46,7 +71,7 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
         while (!stoppingToken.IsCancellationRequested)
         {
             var options = _options.CurrentValue.EmulationStationLifecycle;
-            if (!options.Enabled || !options.StopApiWhenEmulationStationStops)
+            if (!options.Enabled)
             {
                 await DelayAsync(options.PollIntervalMilliseconds, stoppingToken);
                 continue;
@@ -65,6 +90,7 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
                     _currentEmulationStationProcessId = processId;
                     _startupF5ScheduledForProcessId = null;
                     _startupF5SentForProcessId = null;
+                    await PublishFrontendLifecycleAsync("ui.frontend.started", processId, stoppingToken);
                 }
 
                 _hasSeenEmulationStation = true;
@@ -81,10 +107,22 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
             }
 
             _missingSince ??= DateTimeOffset.Now;
-            _currentEmulationStationProcessId = null;
             _startupF5ScheduledForProcessId = null;
             _startupF5SentForProcessId = null;
             if (DateTimeOffset.Now - _missingSince.Value < TimeSpan.FromMilliseconds(Math.Max(0, options.ShutdownGraceMilliseconds)))
+            {
+                await DelayAsync(options.PollIntervalMilliseconds, stoppingToken);
+                continue;
+            }
+
+            // Grace elapsed: this is a real exit, not a transient enumeration miss.
+            if (_currentEmulationStationProcessId is not null)
+            {
+                await PublishFrontendLifecycleAsync("ui.frontend.stopped", _currentEmulationStationProcessId, stoppingToken);
+                _currentEmulationStationProcessId = null;
+            }
+
+            if (!options.StopApiWhenEmulationStationStops)
             {
                 await DelayAsync(options.PollIntervalMilliseconds, stoppingToken);
                 continue;
