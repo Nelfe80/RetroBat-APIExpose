@@ -1418,7 +1418,20 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                 var notification = ResolveLiveGameUpdateNotification(plan, notificationKind, gameElement, cancellationToken);
                 if (string.IsNullOrWhiteSpace(notification))
                 {
-                    notification = ResolveGameCardUpdatedMessage(plan);
+                    if (_options.CurrentValue.Scraping.HonestNotifications)
+                    {
+                        // no visible-change label to announce: a generic "card
+                        // updated" toast would be a lie — stay silent (activity
+                        // is still communicated by the scraping notifications)
+                        _logger?.LogDebug(
+                            "Live update toast suppressed for system={SystemId}, game={GameSlug}: no visible-change label.",
+                            plan.FrontendSystemId,
+                            plan.GameSlug);
+                    }
+                    else
+                    {
+                        notification = ResolveGameCardUpdatedMessage(plan);
+                    }
                 }
 
                 if (!string.IsNullOrWhiteSpace(notification))
@@ -2522,6 +2535,37 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
             return false;
         }
 
+        if (_options.CurrentValue.Scraping.RequireRenderDeltaForLivePush &&
+            !HasVisibleRenderDelta(plan, gameElement, allowCurrentVideoRefresh, allowLocalizedMetadataRefresh, cancellationToken))
+        {
+            // nothing ES actually renders would change (same media paths — the
+            // texture cache never reloads a same-path file — and no first text):
+            // skip the POST, keep the data dirty so it rides the next mutualized
+            // push or the exit merge instead
+            MarkLiveGamelistDirty(plan);
+            await MediaUpdateAuditLog.AppendAsync(
+                plan,
+                "live-addgames",
+                "gamelist",
+                "skipped-no-render-delta",
+                new
+                {
+                    visibleMedia = LiveVisibleMediaTags().Where(tag => !string.IsNullOrWhiteSpace(gameElement.Element(tag)?.Value)).ToArray(),
+                    currentVideoRefresh = allowCurrentVideoRefresh && HasLiveOfficialVideoMedia(gameElement),
+                    localizedMetadataRefresh = hasLocalizedMetadataRefreshContent,
+                    dirtyBatchCount = dirtyBatch.Count,
+                    relatedBatchCount = relatedBatch.Count
+                },
+                cancellationToken);
+            await RefreshTrackingLog.AppendAsync(
+                plan,
+                "addgames",
+                "skipped-no-render-delta",
+                new { dirtyBatchCount = dirtyBatch.Count, relatedBatchCount = relatedBatch.Count },
+                cancellationToken);
+            return false;
+        }
+
         var currentMediaSignature = BuildCurrentLiveMediaSignature(plan, gameElement);
         var currentMediaSignatureKey = BuildLiveAddGamesCurrentMediaSignatureKey(plan);
         if (!allowCurrentVideoRefresh &&
@@ -3545,6 +3589,56 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
             HasLocalizedMetadataRefreshDelta(plan, gameElement, existingGameNode))
         {
             return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// True when pushing this fragment can change something the ES view actually
+    /// renders: a visible media tag whose PATH differs from the current gamelist
+    /// node (a same-path file replacement never repaints — ES's texture cache has
+    /// no mtime check, audit-scrap.md §3.2), a fresh official video on the video
+    /// pass, or a FIRST localized description on a card that had none. Later text
+    /// updates travel silently with the next mutualized push instead.
+    /// </summary>
+    private static bool HasVisibleRenderDelta(
+        MediaProjectionPlan plan,
+        XElement gameElement,
+        bool allowCurrentVideoRefresh,
+        bool allowLocalizedMetadataRefresh,
+        CancellationToken cancellationToken)
+    {
+        var systemRoot = Path.Combine(RetroBatPaths.RomsRoot, plan.FrontendSystemId);
+        var relativeGamePath = ToGameRelativePath(plan.GamePath, systemRoot);
+        var existingGameNode = TryLoadExistingGameNode(plan.GamelistPath, relativeGamePath, cancellationToken);
+        if (existingGameNode == null)
+        {
+            // brand new card: everything the fragment carries is new on screen
+            return true;
+        }
+
+        foreach (var tagName in LiveVisibleMediaTags())
+        {
+            if (HasElementValueDelta(gameElement, existingGameNode, tagName))
+            {
+                return true;
+            }
+        }
+
+        if (allowCurrentVideoRefresh && HasElementValueDelta(gameElement, existingGameNode, "video"))
+        {
+            return true;
+        }
+
+        if (allowLocalizedMetadataRefresh)
+        {
+            var existingDesc = existingGameNode.Element("desc")?.Value?.Trim() ?? string.Empty;
+            var nextDesc = gameElement.Element("desc")?.Value?.Trim() ?? string.Empty;
+            if (existingDesc.Length == 0 && nextDesc.Length > 0)
+            {
+                return true;
+            }
         }
 
         return false;

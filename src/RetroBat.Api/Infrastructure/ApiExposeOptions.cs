@@ -71,6 +71,20 @@ public class ApiExposeOptions
         /// EmulationStation exits — the only moment ES cannot overwrite the file
         /// from its own memory. Complements the existing api-startup merge.</summary>
         public bool MergePendingOnEsExit { get; set; } = true;
+
+        /// <summary>Only POST a live addgames when the fragment changes something
+        /// ES actually renders: a visible media PATH, a fresh video, or a first
+        /// description. Same-path file replacements never repaint (ES texture
+        /// cache has no mtime check) and later text updates ride the next
+        /// mutualized push — pushing for those only rebuilds the ES view for
+        /// nothing. false restores the historical delta filter alone.</summary>
+        public bool RequireRenderDeltaForLivePush { get; set; } = true;
+
+        /// <summary>Suppress the generic "card updated" toast when APIExpose has
+        /// no visible-change label to announce; scraping activity notifications
+        /// keep telling the user something is happening. false restores the
+        /// historical generic fallback toast.</summary>
+        public bool HonestNotifications { get; set; } = true;
         public int LiveEsMediaPushDelayMs { get; set; } = 1200;
         public int LiveEsAddGamesMinIntervalMs { get; set; } = 1200;
         public bool TraceLiveAddGamesPayloads { get; set; } = false;
