@@ -358,7 +358,13 @@ public class PanelsController : ControllerBase
     /// Deploys the per-game FBNeo RetroArch remaps (one rom, or the whole pack).
     /// User-modified files are kept.
     /// </summary>
+    /// <remarks>
+    /// Non-functional in the current build; kept only so existing callers do
+    /// not break. Hidden from Swagger until FBNeo per-game generation works.
+    /// </remarks>
     /// <response code="200">Deployment report.</response>
+    [ApiExplorerSettings(IgnoreApi = true)]
+    [Obsolete("FBNeo per-game remap deployment is not functional in the current build.")]
     [HttpPost("controls/fbneormp/deploy")]
     [ProducesResponseType(typeof(FbneoRmpDeployService.Report), StatusCodes.Status200OK)]
     public IActionResult DeployFbneoRmp([FromQuery] string? rom = null, [FromQuery] int offset = 0, [FromQuery] int limit = 0)

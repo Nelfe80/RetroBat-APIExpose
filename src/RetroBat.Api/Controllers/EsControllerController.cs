@@ -105,8 +105,13 @@ public class EsControllerController : ControllerBase
     }
 
     /// <summary>
-    /// Moves EmulationStation to a system. It can optionally enter the system gamelist.
+    /// [EXPERIMENTAL] Moves EmulationStation to a system. It can optionally enter the system gamelist.
     /// </summary>
+    /// <remarks>
+    /// Not fully reliable yet: navigation can miss the target depending on the
+    /// active theme/view. For dependable movement, prefer step-by-step
+    /// <c>POST tap</c> / <c>POST combo</c> sequences.
+    /// </remarks>
     [HttpPost("goto-system")]
     public async Task<ActionResult<EsControllerActionResult>> GotoSystem(
         [FromBody] EsControllerGotoSystemRequest request,
@@ -117,8 +122,13 @@ public class EsControllerController : ControllerBase
     }
 
     /// <summary>
-    /// Moves EmulationStation to a game inside a system without launching it.
+    /// [EXPERIMENTAL] Moves EmulationStation to a game inside a system without launching it.
     /// </summary>
+    /// <remarks>
+    /// Not fully reliable yet: navigation can miss the target depending on the
+    /// active theme/view. For dependable movement, prefer step-by-step
+    /// <c>POST tap</c> / <c>POST combo</c> sequences.
+    /// </remarks>
     [HttpPost("goto-game")]
     public async Task<ActionResult<EsControllerActionResult>> GotoGame(
         [FromBody] EsControllerGotoGameRequest request,

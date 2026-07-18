@@ -65,6 +65,25 @@ $leaks = $listing | Select-String '\.env|\\media\\|\\src\\|\\docs\\|package-inst
 if ($leaks) { throw "FUITE DETECTEE dans l'archive : $($leaks[0])" }
 Write-Host 'Controle anti-fuite : OK'
 
+# Controle de contrat : le swagger doit se generer (une regression type schemaId
+# = 500 silencieux, voir 1.3.1) et il est publie comme artefact versionne.
+try {
+    $swagger = Invoke-WebRequest -UseBasicParsing 'http://127.0.0.1:12345/swagger/v1/swagger.json' -TimeoutSec 30
+} catch {
+    throw "swagger.json inaccessible ($($_.Exception.Message)) - l'API de la version a packager doit tourner."
+}
+if ($swagger.StatusCode -ne 200) { throw "swagger.json a retourne $($swagger.StatusCode)" }
+$swaggerFile = Join-Path $out 'swagger.json'
+[IO.File]::WriteAllText($swaggerFile, $swagger.Content, (New-Object System.Text.UTF8Encoding($false)))
+Write-Host 'Controle swagger : OK (200, artefact ecrit)'
+
+$asyncapiSource = Join-Path $PSScriptRoot 'wiki\asyncapi.yaml'
+$asyncapiFile = $null
+if (Test-Path $asyncapiSource) {
+    $asyncapiFile = Join-Path $out 'asyncapi.yaml'
+    Copy-Item $asyncapiSource $asyncapiFile -Force
+}
+
 $hashes = Get-FileHash "$out\*.7z" -Algorithm SHA256 | ForEach-Object { '{0}  {1}' -f $_.Hash, (Split-Path $_.Path -Leaf) }
 $hashes | Set-Content (Join-Path $out 'SHA256SUMS.txt') -Encoding ascii
 Write-Host ($hashes -join "`n")
@@ -91,7 +110,8 @@ $ghArgs = @('release', 'create', "v$ver",
     '--repo', 'Nelfe80/RetroBat-APIExpose', '--target', 'main',
     '--title', "APIExpose $ver", '--notes-file', $notesFile)
 if (-not $Publish) { $ghArgs += '--draft' }
-$ghArgs += @($full, $update)
+$ghArgs += @($full, $update, $swaggerFile)
+if ($asyncapiFile) { $ghArgs += $asyncapiFile }
 & gh @ghArgs
 if ($LASTEXITCODE -ne 0) { throw "gh release create a echoue (exit $LASTEXITCODE)." }
 Write-Host "Release v$ver creee$(if (-not $Publish) { ' (draft, a publier sur GitHub)' })."
