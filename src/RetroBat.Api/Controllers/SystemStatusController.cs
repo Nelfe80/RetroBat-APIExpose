@@ -11,7 +11,7 @@ namespace RetroBat.Api.Controllers;
 /// and the state of every manager gate. Start here when something looks off.
 /// </summary>
 [ApiController]
-[Tags("Système & santé")]
+[Tags("System & Health")]
 [Route("api/v1/status")]
 public sealed class SystemStatusController : ControllerBase
 {

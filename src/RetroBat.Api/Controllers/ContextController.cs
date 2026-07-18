@@ -4,7 +4,7 @@ using RetroBat.Domain.Models;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
-[Tags("Contexte & navigation")]
+[Tags("Context & Navigation")]
 [Route("api/v1/[controller]")]
 public class ContextController : ControllerBase
 {

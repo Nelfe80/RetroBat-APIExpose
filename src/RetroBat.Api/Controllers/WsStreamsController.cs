@@ -9,7 +9,7 @@ namespace RetroBat.Api.Controllers;
 /// connect.
 /// </summary>
 [ApiController]
-[Tags("Temps réel (WebSocket)")]
+[Tags("Real-time (WebSocket)")]
 [Route("api/v1/ws")]
 public sealed class WsStreamsController : ControllerBase
 {

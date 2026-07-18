@@ -5,7 +5,7 @@ using RetroBat.Providers.EmulationStation;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
-[Tags("Interne & Prototype")]
+[Tags("Internal & Prototype")]
 [Route("api/v1/[controller]")]
 public class MaintenanceController : ControllerBase
 {

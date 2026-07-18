@@ -11,8 +11,8 @@ public sealed class SwaggerTagOrderDocumentFilter : IDocumentFilter
 {
     private static readonly string[] OrderedTags =
     [
-        "Système & santé",
-        "Contexte & navigation",
+        "System & Health",
+        "Context & Navigation",
         "Local Media Manager",
         "Auto Scraping Manager",
         "Roms Manager",
@@ -20,10 +20,9 @@ public sealed class SwaggerTagOrderDocumentFilter : IDocumentFilter
         "Marquee Manager",
         "Themes & Collections",
         "Game Events",
-        "Live Contest",
         "Notifications & UI",
-        "Temps réel (WebSocket)",
-        "Interne & Prototype"
+        "Real-time (WebSocket)",
+        "Internal & Prototype"
     ];
 
     public void Apply(OpenApiDocument document, DocumentFilterContext context)

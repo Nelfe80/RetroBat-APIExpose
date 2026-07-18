@@ -85,14 +85,14 @@ builder.Services.AddSwaggerGen(options =>
         Title = "APIExpose — RetroBat Local API",
         Version = apiVersion,
         Description =
-            "API locale du plugin APIExpose pour RetroBat / EmulationStation.\n\n" +
-            "**Etat des services : `GET /api/v1/status`** (API, WebSocket, EmulationStation, managers).\n" +
-            "**Flux temps reel : `GET /api/v1/ws/streams`** puis `ws://127.0.0.1:12345/ws[/{stream}]`.\n\n" +
-            "Doctrine de contrat : JSON additif uniquement (aucun champ retire ni renomme) ; " +
-            "le payload /addgames vers EmulationStation est gele ; /reloadgames n'est jamais un " +
-            "rafraichissement automatique. Les groupes ci-dessous suivent la logique des managers " +
-            "du menu EmulationStation : un manager OFF eteint toutes les fonctions de sa branche.\n\n" +
-            "Documentation complete : https://nelfe80.github.io/RetroBat-APIExpose/"
+            "Local API of the APIExpose plugin for RetroBat / EmulationStation.\n\n" +
+            "**Service status: `GET /api/v1/status`** (API, WebSocket, EmulationStation, manager gates).\n" +
+            "**Real-time streams: `GET /api/v1/ws/streams`** then `ws://127.0.0.1:12345/ws[/{stream}]`.\n\n" +
+            "Contract policy: additive JSON only (no field is ever removed or renamed); the " +
+            "/addgames payload sent to EmulationStation is frozen; /reloadgames is never used as an " +
+            "automatic refresh. The groups below follow the manager logic of the EmulationStation " +
+            "menu: a manager switched OFF disables every feature of its branch.\n\n" +
+            "Full documentation: https://nelfe80.github.io/RetroBat-APIExpose/"
     });
 
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -110,6 +110,7 @@ builder.Services.AddSwaggerGen(options =>
         : type.Name);
 
     options.DocumentFilter<RetroBat.Api.Infrastructure.SwaggerTagOrderDocumentFilter>();
+    options.OperationFilter<RetroBat.Api.Infrastructure.SwaggerParameterExamplesOperationFilter>();
 });
 
 // Core Services

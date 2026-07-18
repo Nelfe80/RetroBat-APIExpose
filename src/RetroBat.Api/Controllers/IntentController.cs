@@ -6,7 +6,7 @@ namespace RetroBat.Api.Controllers;
 /// Prototype surface for future high-level remote intents.
 /// </summary>
 [ApiController]
-[Tags("Interne & Prototype")]
+[Tags("Internal & Prototype")]
 [Route("api/v1/[controller]")]
 public class IntentController : ControllerBase
 {

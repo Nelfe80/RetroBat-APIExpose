@@ -10,7 +10,7 @@ namespace RetroBat.Api.Controllers;
 /// assuree par <see cref="LiveContestClientService"/> en local.
 /// </summary>
 [ApiController]
-[Tags("Live Contest")]
+[ApiExplorerSettings(IgnoreApi = true)]
 [Route("api/v1/livecontest")]
 public class LiveContestController : ControllerBase
 {
@@ -90,6 +90,8 @@ public class LiveContestController : ControllerBase
 
     /// <summary>Current Live Contest client state (phase, value, readiness).</summary>
     /// <response code="200">State returned.</response>
+    [ApiExplorerSettings(IgnoreApi = false)]
+    [Tags("Game Events")]
     [HttpGet("status")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetStatus() => Ok(_client.Status());

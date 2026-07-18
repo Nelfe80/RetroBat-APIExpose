@@ -4,7 +4,7 @@ using RetroBat.Api.Infrastructure;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
-[Tags("Système & santé")]
+[Tags("System & Health")]
 [Route("api/v1/[controller]")]
 public class HealthController : ControllerBase
 {
@@ -17,7 +17,7 @@ public class HealthController : ControllerBase
 }
 
 [ApiController]
-[Tags("Système & santé")]
+[Tags("System & Health")]
 [Route("api/v1/[controller]")]
 public class VersionController : ControllerBase
 {

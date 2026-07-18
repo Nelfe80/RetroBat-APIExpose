@@ -5,7 +5,7 @@ using RetroBat.Api.Media;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
-[Tags("Système & santé")]
+[Tags("System & Health")]
 [Route("api/v1/startup")]
 public sealed class StartupController : ControllerBase
 {

@@ -5,7 +5,7 @@ using RetroBat.Domain.Interfaces;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
-[Tags("Interne & Prototype")]
+[Tags("Internal & Prototype")]
 [Route("api/v1/ingest/[controller]")]
 public class EsController : ControllerBase
 {
