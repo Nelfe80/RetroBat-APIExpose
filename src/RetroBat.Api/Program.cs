@@ -84,6 +84,13 @@ builder.Services.AddSwaggerGen(options =>
     {
         options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
     }
+
+    // Nested DTOs reuse short names across services (MameCfgDeployService.Report
+    // vs FbneoRmpDeployService.Report): the default schemaId (simple name)
+    // collides and the whole swagger.json generation returns 500.
+    options.CustomSchemaIds(type => type.IsNested && type.DeclaringType is not null
+        ? $"{type.DeclaringType.Name}{type.Name}"
+        : type.Name);
 });
 
 // Core Services
