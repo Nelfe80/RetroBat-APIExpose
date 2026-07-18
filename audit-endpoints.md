@@ -267,14 +267,21 @@ déjà la hiérarchie des managers. L'API adopte le même modèle mental :
 | Phase | Contenu | Bénéficiaire | Rollback |
 |---|---|---|---|
 | E1 | **FAIT (`ea658195`)** : tags managers ordonnés menu ES, `[Obsolete]` ×2, OpenApiInfo (doctrine + version + wiki), UI DocExpansion/duration, `GET /api/v1/status` (services : API, WS+clients, ES, gates managers), `GET /api/v1/ws/streams` (catalogue dérivé de la source de vérité du hub), exemples réels (tap/combo/goto/toast), **0 op sans doc / 98 paths**. Découverte annexe : le XML de doc était déployé périmé depuis le 4 juillet — le déploiement copie désormais exe + xml. Reste d'E1 : enums-as-strings (attention : change la sérialisation des réponses, à traiter comme évolution de contrat). | tous les devs | revert commit |
-| E2 | Typage des ~30 réponses anonymes restantes + exemples sur les autres POST complexes | SDK, intégrateurs | revert |
-| E3 | Quick wins GET : scraping/status enrichi (file+capacité addgames), rom-set-manager/ledger, gamelist/pending-extended, no-retry-cache, HEAD média | opérateur + RetroCreator | flags/revert |
-| E4 | Endpoints consommateurs : definition/content (.mem parsé+hash), capabilities réel, video/URLs dans snapshots, player dans mem.action, lifecycle frontend | RetroCreator, LedManager, MarqueeManager | additif → inoffensif |
-| E5 | Controller collections + marquee/autogen + populate + es-features audit/deploy + diagnostics | parité interne | revert |
+| E2 | **FAIT (`4a3ee914`, partiel assumé)** : DTO typés Context ×4, Health, Version, startup/ready (JSON inchangé, schémas complets) — réponses non typées 30 → 23 ; le reliquat est interne/prototype (Toasts, livecontest/status, Maintenance cache, mamelua, Panels/preview, Hub/Rules, dorequest) et sera typé opportunément. | SDK, intégrateurs | revert |
+| E3 | **FAIT (`a969b38a`)** : scraping/status enrichi (addGamesSupported, file, caches, pending), GET/DELETE no-retry-cache (419 entrées réelles à la livraison), GET/POST pending-extended (a permis de purger 3 fichiers débris du 26 juin), GET rom-set-manager/ledger, HEAD /media. | opérateur + RetroCreator | revert |
+| E4 | **FAIT (`80b0578d`, `72488940`, `71078c53`)** : definition/content (.MEM brut + SHA-256 serveur + signaux parsés, vérifié sur 16t), ui.frontend.started/stopped (grâce anti-faux-positifs), Media.Video + Url /api/v1/media dans les snapshots. Patchs consommateurs livrés : RetroCreator `521d3bf` (.MEM via API + HEAD), LedManager `19ed01c` (arrêt sur événement, poll en filet 5 s), MarqueeManager `b97d975` (vidéo du snapshot) — repli automatique partout. Player id : chaîne déjà complète (wrapper PLAYER → provider → LedEvent) — sujet de curation .MEM, pas d'API. | RetroCreator, LedManager, MarqueeManager | additif → inoffensif |
+| E5 | **FAIT (`4a3ee914`)** : CollectionsController (packs, families), POST marquee/autogen (jeu courant, 409 explicite sur verrou), DiagnosticsController (logs jsonl, whitelist), GET /api/v1/capabilities (détection réelle — remplace le hard-codé client). « populate » = alias documenté de POST gamelist/update-local scope=all (pas de doublon). es-features audit/deploy : différé (faible valeur). | parité interne | revert |
 | E6 | **FAIT (`560258f3`)** : release.ps1 vérifie swagger.json→200 (bloquant) et publie swagger.json + asyncapi.yaml en artefacts de release ; `wiki/asyncapi.yaml` (AsyncAPI 3.0, 17 canaux, enveloppe réelle capturée) ; pages wiki API FR/EN restructurées managers (status + ws/streams en tête). Aussi : fbneormp/deploy hors Swagger + Obsolete (route conservée, non fonctionnelle), goto-system/goto-game marqués EXPERIMENTAL (préférer tap/combo). E6 restant : vrai job CI (dotnet swagger tofile au build, hors release manuelle). | écosystème | revert |
 
 Chaque phase = commit dédié, JSON additif uniquement, payload addgames intouchable, reloadgames
 jamais automatisé.
+
+**Clôture (2026-07-19) — releases v1.3.4 puis v1.3.5 publiées** avec `swagger.json` (106 paths) et
+`asyncapi.yaml` en artefacts, wiki redéployé. Backlog résiduel, sans urgence : typage des 7 réponses
+internes restantes ; job CI `dotnet swagger tofile` au build (le contrôle n'existe qu'au packaging) ;
+fiabilisation `ui.system.selected` côté hooks ES (pour supprimer le poll 2 s de RetroCreator) ;
+curation `PLAYER` dans les définitions .MEM multi-joueurs ; enums-as-strings (évolution de contrat à
+planifier).
 
 ---
 
