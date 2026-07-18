@@ -266,9 +266,9 @@ déjà la hiérarchie des managers. L'API adopte le même modèle mental :
 
 | Phase | Contenu | Bénéficiaire | Rollback |
 |---|---|---|---|
-| E1 | Tags managers + `[Obsolete]` + étiquettes INT/PROTO + OpenApiInfo + enums-as-strings (présentation pure) | tous les devs | revert commit |
-| E2 | Doc + typage des 32/30 opérations + exemples payloads | SDK, intégrateurs | revert |
-| E3 | Quick wins GET : scraping/status enrichi (file+capacité), rom-set-manager/ledger, gamelist/pending-extended, no-retry-cache, /ws/streams, HEAD média | opérateur + RetroCreator | flags/revert |
+| E1 | **FAIT (`ea658195`)** : tags managers ordonnés menu ES, `[Obsolete]` ×2, OpenApiInfo (doctrine + version + wiki), UI DocExpansion/duration, `GET /api/v1/status` (services : API, WS+clients, ES, gates managers), `GET /api/v1/ws/streams` (catalogue dérivé de la source de vérité du hub), exemples réels (tap/combo/goto/toast), **0 op sans doc / 98 paths**. Découverte annexe : le XML de doc était déployé périmé depuis le 4 juillet — le déploiement copie désormais exe + xml. Reste d'E1 : enums-as-strings (attention : change la sérialisation des réponses, à traiter comme évolution de contrat). | tous les devs | revert commit |
+| E2 | Typage des ~30 réponses anonymes restantes + exemples sur les autres POST complexes | SDK, intégrateurs | revert |
+| E3 | Quick wins GET : scraping/status enrichi (file+capacité addgames), rom-set-manager/ledger, gamelist/pending-extended, no-retry-cache, HEAD média | opérateur + RetroCreator | flags/revert |
 | E4 | Endpoints consommateurs : definition/content (.mem parsé+hash), capabilities réel, video/URLs dans snapshots, player dans mem.action, lifecycle frontend | RetroCreator, LedManager, MarqueeManager | additif → inoffensif |
 | E5 | Controller collections + marquee/autogen + populate + es-features audit/deploy + diagnostics | parité interne | revert |
 | E6 | CI swagger + artefact release + wiki API restructurée (sommaire managers) | écosystème | — |
