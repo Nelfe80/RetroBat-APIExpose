@@ -271,7 +271,7 @@ déjà la hiérarchie des managers. L'API adopte le même modèle mental :
 | E3 | Quick wins GET : scraping/status enrichi (file+capacité addgames), rom-set-manager/ledger, gamelist/pending-extended, no-retry-cache, HEAD média | opérateur + RetroCreator | flags/revert |
 | E4 | Endpoints consommateurs : definition/content (.mem parsé+hash), capabilities réel, video/URLs dans snapshots, player dans mem.action, lifecycle frontend | RetroCreator, LedManager, MarqueeManager | additif → inoffensif |
 | E5 | Controller collections + marquee/autogen + populate + es-features audit/deploy + diagnostics | parité interne | revert |
-| E6 | CI swagger + artefact release + wiki API restructurée (sommaire managers) | écosystème | — |
+| E6 | **FAIT (`560258f3`)** : release.ps1 vérifie swagger.json→200 (bloquant) et publie swagger.json + asyncapi.yaml en artefacts de release ; `wiki/asyncapi.yaml` (AsyncAPI 3.0, 17 canaux, enveloppe réelle capturée) ; pages wiki API FR/EN restructurées managers (status + ws/streams en tête). Aussi : fbneormp/deploy hors Swagger + Obsolete (route conservée, non fonctionnelle), goto-system/goto-game marqués EXPERIMENTAL (préférer tap/combo). E6 restant : vrai job CI (dotnet swagger tofile au build, hors release manuelle). | écosystème | revert |
 
 Chaque phase = commit dédié, JSON additif uniquement, payload addgames intouchable, reloadgames
 jamais automatisé.
