@@ -1520,6 +1520,42 @@ public sealed class RemoteScrapingService
     // never-expire behavior). Synced from options on every remote evaluation.
     private static volatile int RemoteExactLocalNoRetryTtlDays = 14;
 
+    /// <summary>Read-only projection of the exact-local no-retry cache entries.</summary>
+    public static IReadOnlyList<ExactLocalNoRetryCacheEntrySnapshot> GetExactLocalNoRetrySnapshot()
+    {
+        EnsureRemoteExactLocalNoRetryCacheLoaded();
+        return RemoteExactLocalNoRetryEntries.Values
+            .OrderByDescending(entry => entry.LastCheckedAtUtc)
+            .Select(entry => new ExactLocalNoRetryCacheEntrySnapshot(
+                entry.SystemId,
+                entry.GameSlug,
+                entry.GamePath,
+                entry.Kinds.ToArray(),
+                entry.LastCheckedAtUtc,
+                entry.Status,
+                IsExpiredRemoteExactLocalNoRetryEntry(entry)))
+            .ToArray();
+    }
+
+    /// <summary>Clears the exact-local no-retry cache; returns the number of removed entries.</summary>
+    public static int ClearExactLocalNoRetryCache()
+    {
+        EnsureRemoteExactLocalNoRetryCacheLoaded();
+        var removed = RemoteExactLocalNoRetryEntries.Count;
+        RemoteExactLocalNoRetryEntries.Clear();
+        SaveRemoteExactLocalNoRetryCache();
+        return removed;
+    }
+
+    public sealed record ExactLocalNoRetryCacheEntrySnapshot(
+        string SystemId,
+        string GameSlug,
+        string GamePath,
+        IReadOnlyList<string> Kinds,
+        DateTime LastCheckedAtUtc,
+        string Status,
+        bool Expired);
+
     private static bool IsExpiredRemoteExactLocalNoRetryEntry(RemoteExactLocalNoRetryCacheEntry entry)
     {
         return RemoteExactLocalNoRetryTtlDays > 0 &&

@@ -21,6 +21,7 @@ public class MediaController : ControllerBase
     private readonly GamelistUpdateService _gamelistUpdateService;
     private readonly LocalScrapingPreviewService _localScrapingPreviewService;
     private readonly RemoteScrapingService _remoteScrapingService;
+    private readonly RemoteScrapeQueueService _remoteScrapeQueueService;
     private readonly MediaRuntimeState _mediaRuntimeState;
     private readonly GameListImpactWarningService _gameListImpactWarningService;
 
@@ -32,6 +33,7 @@ public class MediaController : ControllerBase
         GamelistUpdateService gamelistUpdateService,
         LocalScrapingPreviewService localScrapingPreviewService,
         RemoteScrapingService remoteScrapingService,
+        RemoteScrapeQueueService remoteScrapeQueueService,
         MediaRuntimeState mediaRuntimeState,
         GameListImpactWarningService gameListImpactWarningService)
     {
@@ -42,6 +44,7 @@ public class MediaController : ControllerBase
         _gamelistUpdateService = gamelistUpdateService;
         _localScrapingPreviewService = localScrapingPreviewService;
         _remoteScrapingService = remoteScrapingService;
+        _remoteScrapeQueueService = remoteScrapeQueueService;
         _mediaRuntimeState = mediaRuntimeState;
         _gameListImpactWarningService = gameListImpactWarningService;
     }
@@ -53,6 +56,7 @@ public class MediaController : ControllerBase
     /// This endpoint only serves local media. It does not trigger remote scraping.
     /// </remarks>
     [HttpGet("{*path}")]
+    [HttpHead("{*path}")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetMedia(string path)
@@ -135,6 +139,7 @@ public class MediaController : ControllerBase
     [ProducesResponseType(typeof(ScrapingStatusResponse), StatusCodes.Status200OK)]
     public ActionResult<ScrapingStatusResponse> GetScrapingStatus()
     {
+        var (queued, pendingPersistence, cooldowns) = _remoteScrapeQueueService.GetQueueSnapshot();
         return Ok(new ScrapingStatusResponse
         {
             RemoteScrapingEnabled = _remoteScrapingService.GetStatus().AutoScrapingEnabled,
@@ -144,9 +149,69 @@ public class MediaController : ControllerBase
             EsGameIdStrategy = "generated-locally",
             EsGameIdFormula = "MD5(absolute ES path using forward slashes)",
             Message = "Legacy remote scraping is archived. The new auto scraping workflow is local-first and provider-based. Live refresh uses /addgames with rating normalized as 0.0.",
+            AddGamesSupported = _mediaRuntimeState.AddGamesSupported,
+            Queue = new ScrapeQueueStatus
+            {
+                Queued = queued,
+                PendingGamelistPersistence = pendingPersistence,
+                NoChangeCooldowns = cooldowns
+            },
+            NoRetryCacheEntries = RemoteScrapingService.GetExactLocalNoRetrySnapshot().Count,
+            PendingExtendedGamelists = _gamelistUpdateService.GetPendingExtendedGamelistsSnapshot().Count,
             Remote = _remoteScrapingService.GetStatus()
         });
     }
+
+    /// <summary>
+    /// Lists the exact-local no-retry cache: games whose exact regional media
+    /// was missing remotely, cached to avoid asking ScreenScraper again before
+    /// the TTL expires.
+    /// </summary>
+    [Tags("Auto Scraping Manager")]
+    [HttpGet("scraping/no-retry-cache")]
+    [ProducesResponseType(typeof(IReadOnlyList<RemoteScrapingService.ExactLocalNoRetryCacheEntrySnapshot>), StatusCodes.Status200OK)]
+    public ActionResult<IReadOnlyList<RemoteScrapingService.ExactLocalNoRetryCacheEntrySnapshot>> GetNoRetryCache()
+        => Ok(RemoteScrapingService.GetExactLocalNoRetrySnapshot());
+
+    /// <summary>
+    /// Clears the exact-local no-retry cache so every game becomes retryable
+    /// immediately (useful when media were published on ScreenScraper after
+    /// the first attempt).
+    /// </summary>
+    [Tags("Auto Scraping Manager")]
+    [HttpDelete("scraping/no-retry-cache")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult ClearNoRetryCache()
+        => Ok(new { removed = RemoteScrapingService.ClearExactLocalNoRetryCache() });
+
+    /// <summary>
+    /// Lists the extended gamelists staged for merge (one per system). They are
+    /// normally merged when EmulationStation exits.
+    /// </summary>
+    [HttpGet("gamelist/pending-extended")]
+    [ProducesResponseType(typeof(IReadOnlyList<GamelistUpdateService.PendingExtendedGamelistSnapshot>), StatusCodes.Status200OK)]
+    public ActionResult<IReadOnlyList<GamelistUpdateService.PendingExtendedGamelistSnapshot>> GetPendingExtendedGamelists()
+        => Ok(_gamelistUpdateService.GetPendingExtendedGamelistsSnapshot());
+
+    /// <summary>
+    /// Merges the staged extended gamelists now instead of waiting for
+    /// EmulationStation to exit.
+    /// </summary>
+    /// <remarks>
+    /// While EmulationStation is running, its next full gamelist rewrite can
+    /// overwrite a merge done from here — prefer running this when
+    /// EmulationStation is closed (the automatic merge-on-exit does exactly that).
+    /// </remarks>
+    [HttpPost("gamelist/pending-extended/apply")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ApplyPendingExtendedGamelists(CancellationToken cancellationToken)
+        => Ok(new { appliedSystems = await _gamelistUpdateService.ApplyPendingExtendedGamelistsAsync("api-request", cancellationToken) });
+
+    /// <summary>Discards the staged extended gamelists without merging them.</summary>
+    [HttpPost("gamelist/pending-extended/discard")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> DiscardPendingExtendedGamelists(CancellationToken cancellationToken)
+        => Ok(new { discardedSystems = await _gamelistUpdateService.DiscardPendingExtendedGamelistsAsync("api-request", cancellationToken) });
 
     /// <summary>
     /// Previews the new local scraping engine decisions without writing files.

@@ -14,7 +14,34 @@ public class ScrapingStatusResponse
     public string EsGameIdStrategy { get; set; } = string.Empty;
     public string EsGameIdFormula { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
+
+    /// <summary>
+    /// null = not probed yet this session, true = this EmulationStation build
+    /// accepts live /addgames pushes, false = unsupported (degraded mode:
+    /// updates are merged when EmulationStation exits).
+    /// </summary>
+    public bool? AddGamesSupported { get; set; }
+
+    /// <summary>Live counters of the background scrape queue.</summary>
+    public ScrapeQueueStatus Queue { get; set; } = new();
+
+    /// <summary>Entries in the exact-local no-retry cache (see GET scraping/no-retry-cache).</summary>
+    public int NoRetryCacheEntries { get; set; }
+
+    /// <summary>Extended gamelists staged for merge (see GET gamelist/pending-extended).</summary>
+    public int PendingExtendedGamelists { get; set; }
+
     public object? Remote { get; set; }
+}
+
+public class ScrapeQueueStatus
+{
+    /// <example>3</example>
+    public int Queued { get; set; }
+    /// <example>1</example>
+    public int PendingGamelistPersistence { get; set; }
+    /// <example>12</example>
+    public int NoChangeCooldowns { get; set; }
 }
 
 public class MediaScrapeRequest

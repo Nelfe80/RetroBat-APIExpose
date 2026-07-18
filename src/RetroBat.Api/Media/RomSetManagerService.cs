@@ -2762,11 +2762,26 @@ public sealed class RomSetManagerService
     /// forever. The ledger survives that strip and lets the manager reclaim
     /// its orphans on the next run.
     /// </summary>
+    /// <summary>Read-only projection of the hidden-ownership ledger (system → path → original hidden flag).</summary>
+    public static IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>> GetHiddenLedgerSnapshot()
+        => RomSetHiddenLedger.Snapshot();
+
     private static class RomSetHiddenLedger
     {
         private static readonly object Sync = new();
         private static Dictionary<string, Dictionary<string, bool>>? _entries;
         private static bool _dirty;
+
+        public static IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>> Snapshot()
+        {
+            lock (Sync)
+            {
+                return EnsureLoaded().ToDictionary(
+                    pair => pair.Key,
+                    pair => (IReadOnlyDictionary<string, bool>)new Dictionary<string, bool>(pair.Value, StringComparer.OrdinalIgnoreCase),
+                    StringComparer.OrdinalIgnoreCase);
+            }
+        }
 
         private static string LedgerPath => Path.Combine(RetroBatPaths.MediaAliasesSharedRoot, "romset-hidden-ledger.json");
 

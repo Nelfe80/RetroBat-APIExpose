@@ -646,6 +646,30 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         }
     }
 
+    /// <summary>Staged extended gamelists awaiting merge (one file per system).</summary>
+    public IReadOnlyList<PendingExtendedGamelistSnapshot> GetPendingExtendedGamelistsSnapshot()
+    {
+        var root = GetPendingExtendedGamelistRoot();
+        if (!Directory.Exists(root))
+        {
+            return [];
+        }
+
+        return Directory.GetFiles(root, "*.xml")
+            .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+            .Select(path =>
+            {
+                var info = new FileInfo(path);
+                return new PendingExtendedGamelistSnapshot(
+                    Path.GetFileNameWithoutExtension(path),
+                    info.LastWriteTimeUtc,
+                    info.Length);
+            })
+            .ToArray();
+    }
+
+    public sealed record PendingExtendedGamelistSnapshot(string SystemId, DateTime StagedAtUtc, long SizeBytes);
+
     public Task<int> ApplyPendingExtendedGamelistsAsync(string reason, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();

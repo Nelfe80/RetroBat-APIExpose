@@ -41,6 +41,17 @@ public sealed class RomSetManagerController : ControllerBase
     }
 
     /// <summary>
+    /// Hidden-ownership ledger: every game the Roms Manager has hidden, per
+    /// system, with the original hidden flag it would restore. This registry
+    /// survives gamelist rewrites and is how orphaned hidden entries are
+    /// reclaimed.
+    /// </summary>
+    [HttpGet("ledger")]
+    [ProducesResponseType(typeof(IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>>), StatusCodes.Status200OK)]
+    public ActionResult<IReadOnlyDictionary<string, IReadOnlyDictionary<string, bool>>> GetLedger()
+        => Ok(RomSetManagerService.GetHiddenLedgerSnapshot());
+
+    /// <summary>
     /// Audits which gamelist entries would be hidden or restored by the ROM Set Manager.
     /// </summary>
     [HttpPost("audit")]

@@ -32,6 +32,15 @@ public sealed class RemoteScrapeQueueService : BackgroundService
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly ILogger<RemoteScrapeQueueService>? _logger;
 
+    /// <summary>Live counters of the background scrape queue.</summary>
+    public (int Queued, int PendingGamelistPersistence, int NoChangeCooldowns) GetQueueSnapshot()
+    {
+        lock (_lock)
+        {
+            return (_items.Count, _pendingGamelistPersistence.Count, _noChangeCooldowns.Count);
+        }
+    }
+
     public RemoteScrapeQueueService(
         ApiExposeRuntimeOptionsService runtimeOptions,
         ScreenScraperConnectionService connectionService,
