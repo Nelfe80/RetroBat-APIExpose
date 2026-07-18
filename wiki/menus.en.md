@@ -26,7 +26,7 @@ Scraping: local first, remote when needed, each media type toggled separately.
 
 | Option | Effect |
 |---|---|
-| `ENABLE AUTO SCRAPING MANAGER` | Enables local then remote scraping, with live game-view updates when a real change is found. *(off by default)* |
+| `ENABLE AUTO SCRAPING MANAGER` | Enables local then remote scraping, with live game-view updates when a real change is found. *(on by default)* |
 | `ENABLE SCREENSCRAPER` | Lets ScreenScraper fill the store when local scraping is not enough. |
 | `TRANSLATE DESCRIPTIONS` | Translates English descriptions when your language has no localized one. |
 | `ENABLE SCRAPING QUEUE` | Low-priority background scraping queue — it pauses during live scraping. |
@@ -37,8 +37,8 @@ Scraping: local first, remote when needed, each media type toggled separately.
 
 Each media type then has its own switch: `SCRAPE MARQUEES`, `SCREEN MARQUEES`, `SMALL SCREEN MARQUEES`, `STEAMGRID`, `MIX`, `MAPS`, `MANUALS`, `MAGAZINES`, `VIDEOS`, `NORMALIZED VIDEOS` and `BEZELS`.
 
-!!! note "Manuals and videos: off by default"
-    These files are large. Enable them only if disk space is not a concern. If a media type is chosen as a visible source (e.g. MARQUEE in `LOGO / MARQUEE`), its scraping stays priority even as plain enrichment.
+!!! note "Large files"
+    Videos are on by default; manuals, magazines and normalized videos stay opt-in. These files are larger than other media: turn them off if disk space is a concern. If a media type is chosen as a visible source (e.g. MARQUEE in `LOGO / MARQUEE`), its scraping stays priority even as plain enrichment.
 
 ## ROMS MANAGER
 
@@ -134,7 +134,7 @@ The APIExpose side that feeds marquees (the [MarqueeManager](https://nelfe80.git
 
 | Option | Choices | Effect |
 |---|---|---|
-| `ENABLE MARQUEE MANAGER` | on/off | Enables data management for marquee clients. *(off by default)* |
+| `ENABLE MARQUEE MANAGER` | on/off | Enables data management for marquee clients. *(on by default)* |
 | `PUSH MARQUEE DATA TO WS STREAM` | on/off | Streams marquee, logo, fanart and game context over WebSocket. |
 | `MARQUEE AUTOGEN` | NO, XL 1920×360, L 1280×400, M 920×360 | Generates a custom marquee (fanart + logo) when no real marquee exists. |
 | `SYSTEM MARQUEE BACKGROUND` | on/off | Generated system marquees use the theme fanart/background (otherwise black). |
@@ -172,4 +172,6 @@ Cross-cutting settings, deliberately last.
 | `SHOW API NOTIFICATIONS` | Native notifications through the ES notify API. |
 | `SHOW TOAST PROGRESS BARS` | Progress bars during long operations. |
 | `ENABLE SWAGGER` | Enables the Swagger UI at `http://127.0.0.1:12345/swagger/index.html`. |
-| `ENABLE WEBSOCKET STREAM` | Enables the real-time stream at `ws://127.0.0.1:12345/ws`. |
+
+!!! note "WebSocket stream always on"
+    The real-time stream `ws://127.0.0.1:12345/ws` no longer has a menu switch: turning it off silently broke marquee and LED clients. It can still be controlled in `appsettings.json` for debugging.

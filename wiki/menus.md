@@ -26,7 +26,7 @@ Le scraping : local d'abord, distant si besoin, chaque type de média activable 
 
 | Option | Effet |
 |---|---|
-| `ENABLE AUTO SCRAPING MANAGER` | Active le scraping local puis distant, avec mise à jour de la fiche en temps réel quand un vrai changement est trouvé. *(désactivé par défaut)* |
+| `ENABLE AUTO SCRAPING MANAGER` | Active le scraping local puis distant, avec mise à jour de la fiche en temps réel quand un vrai changement est trouvé. *(activé par défaut)* |
 | `ENABLE SCREENSCRAPER` | Autorise ScreenScraper à compléter le store quand le scraping local ne suffit pas. |
 | `TRANSLATE DESCRIPTIONS` | Traduit les descriptions anglaises quand votre langue n'a pas de description localisée. |
 | `ENABLE SCRAPING QUEUE` | File de scraping en tâche de fond, à basse priorité — elle se met en pause pendant le scraping live. |
@@ -37,8 +37,8 @@ Le scraping : local d'abord, distant si besoin, chaque type de média activable 
 
 Chaque type de média a ensuite son interrupteur : `SCRAPE MARQUEES`, `SCREEN MARQUEES`, `SMALL SCREEN MARQUEES`, `STEAMGRID`, `MIX`, `MAPS`, `MANUALS`, `MAGAZINES`, `VIDEOS`, `NORMALIZED VIDEOS` et `BEZELS`.
 
-!!! note "Manuels et vidéos : désactivés par défaut"
-    Ces fichiers sont volumineux. Activez-les seulement si l'espace disque n'est pas un souci. Si un média est choisi comme source visible (ex. MARQUEE dans `LOGO / MARQUEE`), son scraping reste prioritaire même comme simple enrichissement.
+!!! note "Fichiers volumineux"
+    Les vidéos sont activées par défaut ; manuels, magazines et vidéos normalisées restent des opt-in. Ces fichiers sont plus lourds que les autres médias : désactivez-les si l'espace disque est un souci. Si un média est choisi comme source visible (ex. MARQUEE dans `LOGO / MARQUEE`), son scraping reste prioritaire même comme simple enrichissement.
 
 ## ROMS MANAGER
 
@@ -134,7 +134,7 @@ La partie APIExpose qui alimente les marquees (le plugin [MarqueeManager](https:
 
 | Option | Choix | Effet |
 |---|---|---|
-| `ENABLE MARQUEE MANAGER` | on/off | Active la gestion des données pour clients marquee. *(désactivé par défaut)* |
+| `ENABLE MARQUEE MANAGER` | on/off | Active la gestion des données pour clients marquee. *(activé par défaut)* |
 | `PUSH MARQUEE DATA TO WS STREAM` | on/off | Diffuse marquee, logo, fanart et contexte de jeu par WebSocket. |
 | `MARQUEE AUTOGEN` | NO, XL 1920×360, L 1280×400, M 920×360 | Génère un marquee personnalisé (fanart + logo) quand aucun vrai marquee n'existe. |
 | `SYSTEM MARQUEE BACKGROUND` | on/off | Les marquees système générés utilisent le fanart/fond du thème (sinon fond noir). |
@@ -172,4 +172,6 @@ Les réglages transverses, volontairement en dernier.
 | `SHOW API NOTIFICATIONS` | Notifications natives via l'API notify d'ES. |
 | `SHOW TOAST PROGRESS BARS` | Barres de progression pendant les opérations longues. |
 | `ENABLE SWAGGER` | Active l'interface Swagger sur `http://127.0.0.1:12345/swagger/index.html`. |
-| `ENABLE WEBSOCKET STREAM` | Active le flux temps réel `ws://127.0.0.1:12345/ws`. |
+
+!!! note "Flux WebSocket toujours actif"
+    Le flux temps réel `ws://127.0.0.1:12345/ws` n'a plus d'interrupteur dans le menu : le couper cassait silencieusement les clients marquee et LED. Il reste pilotable dans `appsettings.json` pour le débogage.
