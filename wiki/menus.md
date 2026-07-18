@@ -5,6 +5,10 @@ Toutes les options APIExpose vivent **dans les menus d'EmulationStation**, sous 
 !!! tip "L'interrupteur général"
     `ENABLE API EXPOSE` active ou désactive l'ensemble des fonctions avancées du plugin. Tout le reste dépend de lui.
 
+Les interrupteurs forment une hiérarchie : chaque manager est la porte d'entrée de ses options, et une option n'agit que si toute sa branche est active.
+
+![Dépendances des options APIExpose](options-dependances.svg)
+
 ## LOCAL MEDIA MANAGER
 
 Le gestionnaire de médias local : quels médias sont liés dans vos gamelists et comment ils sont choisis.

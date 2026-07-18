@@ -5,6 +5,10 @@ Every APIExpose option lives **inside the EmulationStation menus**, under `EXTEN
 !!! tip "The master switch"
     `ENABLE API EXPOSE` enables or disables all the plugin's advanced features. Everything else depends on it.
 
+Switches form a hierarchy: each manager is the gateway to its options, and an option only takes effect when its whole branch is enabled.
+
+![APIExpose option dependencies](options-dependencies.en.svg)
+
 ## LOCAL MEDIA MANAGER
 
 The local media manager: which media get linked into your gamelists and how they are chosen.
