@@ -33,8 +33,9 @@ $ex = @(
     # Remaps RetroArch du core MAME : doctrine = cfg MAME uniquement (risque de
     # double remap "en resonance" si un rmp coexiste avec le cfg partage).
     "-x!$name\resources\controls\retroarch\mame",
-    # Curator : savoir-faire prive, jamais distribue.
-    "-x!$name\panel_curator_ultimate.py", "-x!$name\panel_curator.ini", "-x!$name\profiles_db.py",
+    # Curator : savoir-faire prive, jamais distribue (wildcard : les copies de
+    # travail comme panel_curator_ultimate_.py doivent aussi rester hors pack).
+    "-x!$name\panel_curator*", "-x!$name\profiles_db*",
     # mem-curator : les sorties de generation, rapports et chemins locaux
     # restent hors pack (les outils eux-memes sont publics via le repo).
     "-x!$name\tools\mem-curator\MEM_*", "-x!$name\tools\mem-curator\_test_MEM*",
