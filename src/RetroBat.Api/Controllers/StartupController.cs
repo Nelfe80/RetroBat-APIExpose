@@ -21,22 +21,24 @@ public sealed class StartupController : ControllerBase
     /// menus, watchers), 200 once everything is up.
     /// </summary>
     [HttpGet("ready")]
-    public IActionResult Ready()
+    [ProducesResponseType(typeof(StartupReadyResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(StartupReadyResponse), StatusCodes.Status503ServiceUnavailable)]
+    public ActionResult<StartupReadyResponse> Ready()
     {
         if (!_readiness.IsReady)
         {
-            return StatusCode(StatusCodes.Status503ServiceUnavailable, new
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new StartupReadyResponse
             {
-                status = "starting",
-                ready = false
+                Status = "starting",
+                Ready = false
             });
         }
 
-        return Ok(new
+        return Ok(new StartupReadyResponse
         {
-            status = "ready",
-            ready = true,
-            readyAtUtc = _readiness.ReadyAtUtc
+            Status = "ready",
+            Ready = true,
+            ReadyAtUtc = _readiness.ReadyAtUtc
         });
     }
 

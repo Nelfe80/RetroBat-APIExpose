@@ -3,6 +3,11 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using RetroBat.Api.Hubs;
 using RetroBat.Api.Infrastructure;
+using RetroBat.Domain.Interfaces;
+using RetroBat.Domain.Models;
+using RetroBat.Domain.Paths;
+using RetroBat.Providers.MameOutputs;
+using RetroBat.Providers.RetroArchWrapper;
 
 namespace RetroBat.Api.Controllers;
 
@@ -91,6 +96,87 @@ public sealed class SystemStatusController : ControllerBase
             return false;
         }
     }
+}
+
+/// <summary>
+/// Capability negotiation for API consumers: which data sources this install
+/// can actually provide, resolved from the live runtime (not hard-coded).
+/// </summary>
+[ApiController]
+[Tags("System & Health")]
+[Route("api/v1/capabilities")]
+public sealed class CapabilitiesController : ControllerBase
+{
+    private readonly ApiExposeRuntimeOptionsService _runtimeOptions;
+    private readonly MediaRuntimeState _runtimeState;
+    private readonly IEnumerable<IProvider> _providers;
+
+    public CapabilitiesController(
+        ApiExposeRuntimeOptionsService runtimeOptions,
+        MediaRuntimeState runtimeState,
+        IEnumerable<IProvider> providers)
+    {
+        _runtimeOptions = runtimeOptions;
+        _runtimeState = runtimeState;
+        _providers = providers;
+    }
+
+    /// <summary>
+    /// Effective capabilities of this install: registered event providers,
+    /// live /addgames support of the running EmulationStation build, and the
+    /// manager gates. Consumers should feature-detect here instead of
+    /// hard-coding assumptions.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(ApiCapabilitiesResponse), StatusCodes.Status200OK)]
+    public ActionResult<ApiCapabilitiesResponse> GetCapabilities()
+    {
+        return Ok(new ApiCapabilitiesResponse
+        {
+            ApiVersion = Assembly.GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown",
+            AddGamesSupported = _runtimeState.AddGamesSupported,
+            WebSocket = _runtimeOptions.IsWebSocketEnabled(),
+            ArcadeOutputs = _providers.OfType<MameOutputsProvider>().Any() && _runtimeOptions.IsMameOutputsEnabled(),
+            MemoryEvents = _providers.OfType<RetroArchWrapperProvider>().Any() && _runtimeOptions.IsRetroArchWrapperEnabled(),
+            MameLuaIngame = _runtimeOptions.IsMameLuaIngameEnabled(),
+            Hiscores = _runtimeOptions.IsConsoleHighScoreCaptureEnabled(),
+            DynPanels = Directory.Exists(RetroBatPaths.DynPanelsRoot),
+            AutoScraping = _runtimeOptions.IsAutoScrapingEnabled(),
+            RomsManager = _runtimeOptions.IsRomSetManagerEnabled(),
+            MarqueeManager = _runtimeOptions.IsMarqueeManagerEnabled()
+        });
+    }
+}
+
+/// <summary>Feature-detection payload for API consumers.</summary>
+public sealed class ApiCapabilitiesResponse
+{
+    /// <example>1.3.5+20260719.020000.abcdef12</example>
+    public string ApiVersion { get; set; } = string.Empty;
+    /// <summary>null = not probed yet this session; false = degraded mode (merge on ES exit).</summary>
+    public bool? AddGamesSupported { get; set; }
+    /// <example>true</example>
+    public bool WebSocket { get; set; }
+    /// <summary>MAME network outputs (lamps) are captured and streamed.</summary>
+    /// <example>true</example>
+    public bool ArcadeOutputs { get; set; }
+    /// <summary>RetroArch wrapper memory events (.MEM signals) are captured.</summary>
+    /// <example>true</example>
+    public bool MemoryEvents { get; set; }
+    /// <example>true</example>
+    public bool MameLuaIngame { get; set; }
+    /// <example>true</example>
+    public bool Hiscores { get; set; }
+    /// <summary>The DynPanels data pack is installed (control panel definitions).</summary>
+    /// <example>true</example>
+    public bool DynPanels { get; set; }
+    /// <example>true</example>
+    public bool AutoScraping { get; set; }
+    /// <example>true</example>
+    public bool RomsManager { get; set; }
+    /// <example>true</example>
+    public bool MarqueeManager { get; set; }
 }
 
 /// <summary>Aggregated service status.</summary>

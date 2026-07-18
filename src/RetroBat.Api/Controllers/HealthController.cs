@@ -10,9 +10,10 @@ public class HealthController : ControllerBase
 {
     /// <summary>Liveness probe: returns healthy plus the running version.</summary>
     [HttpGet]
-    public IActionResult Get()
+    [ProducesResponseType(typeof(HealthResponse), StatusCodes.Status200OK)]
+    public ActionResult<HealthResponse> Get()
     {
-        return Ok(new { status = "healthy", version = ApiExposeVersion.Current });
+        return Ok(new HealthResponse { Status = "healthy", Version = ApiExposeVersion.Current });
     }
 }
 
@@ -23,8 +24,9 @@ public class VersionController : ControllerBase
 {
     /// <summary>Version and product name of the local API.</summary>
     [HttpGet]
-    public IActionResult Get()
+    [ProducesResponseType(typeof(VersionResponse), StatusCodes.Status200OK)]
+    public ActionResult<VersionResponse> Get()
     {
-        return Ok(new { version = ApiExposeVersion.Current, name = "RetroBat Local API" });
+        return Ok(new VersionResponse { Version = ApiExposeVersion.Current, Name = "RetroBat Local API" });
     }
 }

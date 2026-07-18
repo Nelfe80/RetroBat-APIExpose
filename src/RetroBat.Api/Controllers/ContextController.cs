@@ -20,14 +20,15 @@ public class ContextController : ControllerBase
     /// in one call. Preferred entry point (the SDK uses this one).
     /// </summary>
     [HttpGet("state")]
-    public IActionResult GetState()
+    [ProducesResponseType(typeof(ContextStateResponse), StatusCodes.Status200OK)]
+    public ActionResult<ContextStateResponse> GetState()
     {
-        return Ok(new
+        return Ok(new ContextStateResponse
         {
-            state = _context.Ui.State,
-            selectedSystem = _context.Ui.SelectedSystem,
-            selectedGame = _context.Ui.Selected,
-            runningGame = _context.Ui.Running
+            State = _context.Ui.State,
+            SelectedSystem = _context.Ui.SelectedSystem,
+            SelectedGame = _context.Ui.Selected,
+            RunningGame = _context.Ui.Running
         });
     }
 
@@ -37,20 +38,23 @@ public class ContextController : ControllerBase
     /// Prefer <c>GET state</c> for new integrations.
     /// </summary>
     [HttpGet("current-game")]
-    public IActionResult GetCurrentGame()
+    [ProducesResponseType(typeof(CurrentGameResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<CurrentGameResponse> GetCurrentGame()
     {
         var game = _context.Ui.Running ?? _context.Ui.Selected;
         if (game == null)
             return NotFound(new { message = "No game selected or running" });
 
-        return Ok(new {
-            state = _context.Ui.State,
-            systemId = game.SystemId,
-            gameId = game.GameId,
-            path = game.GamePath,
-            name = game.GameName,
-            launch = game.Launch,
-            details = game.Details
+        return Ok(new CurrentGameResponse
+        {
+            State = _context.Ui.State,
+            SystemId = game.SystemId,
+            GameId = game.GameId,
+            Path = game.GamePath,
+            Name = game.GameName,
+            Launch = game.Launch,
+            Details = game.Details
         });
     }
 
@@ -59,15 +63,18 @@ public class ContextController : ControllerBase
     /// new integrations.
     /// </summary>
     [HttpGet("current-system")]
-    public IActionResult GetCurrentSystem()
+    [ProducesResponseType(typeof(CurrentSystemResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<CurrentSystemResponse> GetCurrentSystem()
     {
         var sys = _context.Ui.SelectedSystem;
         if (sys == null)
             return NotFound(new { message = "No system selected" });
 
-        return Ok(new {
-            state = _context.Ui.State,
-            system = sys
+        return Ok(new CurrentSystemResponse
+        {
+            State = _context.Ui.State,
+            System = sys
         });
     }
 
@@ -75,13 +82,15 @@ public class ContextController : ControllerBase
     /// Full context snapshot (schema version, node identity, UI state, time).
     /// </summary>
     [HttpGet]
-    public IActionResult Get()
+    [ProducesResponseType(typeof(ContextSnapshotResponse), StatusCodes.Status200OK)]
+    public ActionResult<ContextSnapshotResponse> Get()
     {
-        return Ok(new {
-            schemaVersion = _context.SchemaVersion,
-            node = _context.Node,
-            ui = _context.Ui,
-            time = new { utc = _context.UtcTime }
+        return Ok(new ContextSnapshotResponse
+        {
+            SchemaVersion = _context.SchemaVersion,
+            Node = _context.Node,
+            Ui = _context.Ui,
+            Time = new ContextTimeResponse { Utc = _context.UtcTime }
         });
     }
 }
