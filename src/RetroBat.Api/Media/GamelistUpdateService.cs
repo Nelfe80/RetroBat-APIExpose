@@ -2758,6 +2758,21 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                     content,
                     cancellationToken);
                 LastLiveEsAddGamesPostUtc = DateTimeOffset.UtcNow;
+
+                // arm the one-per-card gate BEFORE releasing the POST semaphore:
+                // a concurrent push used to slip between the Release below and
+                // the (former) post-success arming and POST the same card twice
+                if (response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NoContent)
+                {
+                    var videoExceptionArmed = allowCurrentVideoRefresh && HasLiveOfficialVideoMedia(gameElement);
+                    if (hasLiveVisibleSlotElement || videoExceptionArmed || hasLocalizedMetadataRefreshContent)
+                    {
+                        _runtimeState.MarkLiveAddGamesPushedForSelection(
+                            plan.FrontendSystemId,
+                            plan.GamePath,
+                            videoException: videoExceptionArmed);
+                    }
+                }
             }
             finally
             {
@@ -2821,14 +2836,9 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                 ClearPendingLiveMetadataRestores(plan, dirtyBatch);
                 var videoExceptionConsumed = allowCurrentVideoRefresh && HasLiveOfficialVideoMedia(gameElement);
                 var localizedMetadataRefreshConsumed = hasLocalizedMetadataRefreshContent;
+                // the one-per-card gate was already armed inside the POST
+                // semaphore (see above); only the audit fields are computed here
                 var consumesSelectionLiveRefresh = hasLiveVisibleSlotElement || videoExceptionConsumed || localizedMetadataRefreshConsumed;
-                if (consumesSelectionLiveRefresh)
-                {
-                    _runtimeState.MarkLiveAddGamesPushedForSelection(
-                        plan.FrontendSystemId,
-                        plan.GamePath,
-                        videoException: videoExceptionConsumed);
-                }
                 if (!string.IsNullOrWhiteSpace(currentMediaSignature))
                 {
                     LastLiveAddGamesCurrentMediaSignatures[currentMediaSignatureKey] = currentMediaSignature;
