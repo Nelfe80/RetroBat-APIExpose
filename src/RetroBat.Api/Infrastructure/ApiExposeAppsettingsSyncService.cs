@@ -184,8 +184,26 @@ public sealed class ApiExposeAppsettingsSyncService
 
             foreach (var change in applicable)
             {
-                if (!Mappings.TryGetValue(change.Key, out var mapping) ||
-                    !TryBuildJsonValue(mapping.Type, NormalizeSettingValue(change.Key, change.NewValue), out var value))
+                if (!Mappings.TryGetValue(change.Key, out var mapping))
+                {
+                    continue;
+                }
+
+                var normalized = NormalizeSettingValue(change.Key, change.NewValue);
+                JsonNode value;
+                if (string.IsNullOrWhiteSpace(normalized))
+                {
+                    // ES saves the default state of a switch/choice as an empty string
+                    // (preset "switchon" saves ON as "", plain "switch" saves OFF as "",
+                    // choices save AUTO as ""). Empty therefore means "shipped default",
+                    // never "false" - writing false here silently disabled default-on
+                    // features as soon as the user simply browsed the menus.
+                    if (!TryGetShippedDefault(mapping, out value))
+                    {
+                        continue;
+                    }
+                }
+                else if (!TryBuildJsonValue(mapping.Type, normalized, out value))
                 {
                     continue;
                 }
@@ -272,6 +290,37 @@ public sealed class ApiExposeAppsettingsSyncService
         return true;
     }
 
+    private static readonly Lazy<ApiExposeOptions> ShippedDefaults = new(() => new ApiExposeOptions());
+
+    private static bool TryGetShippedDefault(AppsettingsMapping mapping, out JsonNode value)
+    {
+        value = null!;
+        object? current = ShippedDefaults.Value;
+        // mapping.Path is ["ApiExpose", <PropertyName>...] and the segments match
+        // the option class property names.
+        for (var i = 1; i < mapping.Path.Count; i++)
+        {
+            var property = current?.GetType().GetProperty(
+                mapping.Path[i],
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+            if (property is null)
+            {
+                return false;
+            }
+
+            current = property.GetValue(current);
+        }
+
+        value = current switch
+        {
+            bool boolValue => JsonValue.Create(boolValue)!,
+            int intValue => JsonValue.Create(intValue)!,
+            string stringValue => JsonValue.Create(stringValue)!,
+            _ => null!
+        };
+        return value is not null;
+    }
+
     private static bool TryBuildJsonValue(AppsettingsValueType type, string rawValue, out JsonNode value)
     {
         value = null!;
@@ -347,7 +396,6 @@ public sealed class ApiExposeAppsettingsSyncService
             case "false":
             case "no":
             case "off":
-            case "":
                 result = false;
                 return true;
             default:
