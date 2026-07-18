@@ -5,6 +5,7 @@ using RetroBat.Api.Media;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Roms Manager")]
 [Route("api/v1/rom-packs")]
 public sealed class RomPacksController : ControllerBase
 {
@@ -15,6 +16,10 @@ public sealed class RomPacksController : ControllerBase
         _romPackInstaller = romPackInstaller;
     }
 
+    /// <summary>
+    /// Ensures the ROM about to launch is extracted from its pack (on-the-fly
+    /// installer). Body is the raw launcher arguments as text/plain.
+    /// </summary>
     [HttpPost("on-the-fly/ensure-launch-rom")]
     [Consumes("text/plain")]
     public async Task<ActionResult<OnTheFlyRomInstallResult>> EnsureLaunchRom(CancellationToken cancellationToken)
@@ -25,6 +30,7 @@ public sealed class RomPacksController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>Rescans the package-installer folder and rebuilds the ROM pack index.</summary>
     [HttpPost("rescan")]
     public async Task<ActionResult<RomPackInstallerIndex>> Rescan(CancellationToken cancellationToken)
     {

@@ -5,6 +5,7 @@ using RetroBat.Domain.Models;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Notifications & UI")]
 [Route("api/v1/[controller]")]
 public class ToastsController : ControllerBase
 {
@@ -19,6 +20,10 @@ public class ToastsController : ControllerBase
         _taskProgressService = taskProgressService;
     }
 
+    /// <summary>
+    /// Shows an APIExpose toast overlay above EmulationStation. Compat alias of
+    /// <c>POST /api/v1/toast-notifications</c> (prefer that route).
+    /// </summary>
     [HttpPost]
     public async Task<IActionResult> ShowToast([FromBody] ToastNotification notification, CancellationToken cancellationToken)
     {

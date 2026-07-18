@@ -5,6 +5,7 @@ using RetroBat.Api.Media;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Système & santé")]
 [Route("api/v1/startup")]
 public sealed class StartupController : ControllerBase
 {
@@ -15,6 +16,10 @@ public sealed class StartupController : ControllerBase
         _readiness = readiness;
     }
 
+    /// <summary>
+    /// Readiness probe: 503 while APIExpose is still preparing (gamelists,
+    /// menus, watchers), 200 once everything is up.
+    /// </summary>
     [HttpGet("ready")]
     public IActionResult Ready()
     {
@@ -35,6 +40,7 @@ public sealed class StartupController : ControllerBase
         });
     }
 
+    /// <summary>Diagnostics of the startup gamelist preparation (most recent entries first).</summary>
     [HttpGet("gamelists")]
     public IActionResult Gamelists([FromQuery] int recent = 25)
     {

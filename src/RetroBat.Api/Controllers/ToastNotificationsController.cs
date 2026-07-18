@@ -6,6 +6,7 @@ using RetroBat.Domain.Models;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Notifications & UI")]
 [Route("api/v1/toast-notifications")]
 public sealed class ToastNotificationsController : ControllerBase
 {

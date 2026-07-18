@@ -8,6 +8,7 @@ using System.Text.Json;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Control Panel Manager")]
 [Route("api/v1/[controller]")]
 public class PanelsController : ControllerBase
 {
@@ -268,6 +269,7 @@ public class PanelsController : ControllerBase
     /// </remarks>
     /// <response code="410">`.panels` export is deprecated.</response>
     /// <response code="404">No panel data could be resolved for the requested context.</response>
+    [Obsolete("Superseded by POST /api/v1/theme-datas/current/export.")]
     [HttpPost("current/export-theme-xml")]
     [ProducesResponseType(StatusCodes.Status410Gone)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

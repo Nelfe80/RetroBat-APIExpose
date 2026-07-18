@@ -602,27 +602,76 @@ public class WebSocketConnectionManager
             return !IsEsEventType(type);
         }
 
-        return stream switch
+        return StreamPrefixes.TryGetValue(stream, out var prefixes) && HasAnyPrefix(type, prefixes);
+    }
+
+    /// <summary>
+    /// Authoritative stream catalog: event-type prefixes delivered on each
+    /// /ws/{stream}. Also served by GET /api/v1/ws/streams — keep this the
+    /// single source of truth.
+    /// </summary>
+    public static readonly IReadOnlyDictionary<string, string[]> StreamPrefixes =
+        new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
         {
-            "frontend" => HasAnyPrefix(type, "ui."),
-            "esevent" => HasAnyPrefix(type, "esevent."),
-            "marquee" => HasAnyPrefix(type, "marquee."),
-            "topper" => HasAnyPrefix(type, "topper."),
-            "instruction-card" => HasAnyPrefix(type, "instruction-card."),
-            "screen" => HasAnyPrefix(type, "screen."),
-            "panel" => HasAnyPrefix(type, "panel.", "theme."),
-            "ingame" => HasAnyPrefix(type, "ingame.", "retroarch.", "wrapper."),
-            "arcade" => HasAnyPrefix(type, "arcade.", "mame.", "fbneo.", "outputs."),
-            "score" => HasAnyPrefix(type, "score.live."),
-            "timer" => HasAnyPrefix(type, "timer.live."),
-            "retroachievements" => HasAnyPrefix(type, "retroachievements."),
-            "hiscore" => HasAnyPrefix(type, "hiscore."),
-            "media" => HasAnyPrefix(type, "media."),
-            "roms" => HasAnyPrefix(type, "roms.", "rom-pack.", "romset."),
-            "system" => HasAnyPrefix(type, "startup.", "health.", "version.", "hub.", "config.", "maintenance.", "rules.", "notifications."),
-            "control" => HasAnyPrefix(type, "commands.", "intent.", "es-control."),
-            _ => false
+            ["frontend"] = ["ui."],
+            ["esevent"] = ["esevent."],
+            ["marquee"] = ["marquee."],
+            ["topper"] = ["topper."],
+            ["instruction-card"] = ["instruction-card."],
+            ["screen"] = ["screen."],
+            ["panel"] = ["panel.", "theme."],
+            ["ingame"] = ["ingame.", "retroarch.", "wrapper."],
+            ["arcade"] = ["arcade.", "mame.", "fbneo.", "outputs."],
+            ["score"] = ["score.live."],
+            ["timer"] = ["timer.live."],
+            ["retroachievements"] = ["retroachievements."],
+            ["hiscore"] = ["hiscore."],
+            ["media"] = ["media."],
+            ["roms"] = ["roms.", "rom-pack.", "romset."],
+            ["system"] = ["startup.", "health.", "version.", "hub.", "config.", "maintenance.", "rules.", "notifications."],
+            ["control"] = ["commands.", "intent.", "es-control."]
         };
+
+    /// <summary>
+    /// Event types replayed to a client right after it connects to the
+    /// matching stream (last known snapshot).
+    /// </summary>
+    public static readonly IReadOnlyDictionary<string, string[]> RetainedTypesByStream =
+        new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["panel"] = ["panel.state"],
+            ["score"] = ["score.live.changed"],
+            ["timer"] = ["timer.live.changed"],
+            ["retroachievements"] = ["retroachievements.catalog.updated", "retroachievements.session.updated"]
+        };
+
+    /// <summary>Accepted aliases for stream names (see NormalizeStream).</summary>
+    public static readonly IReadOnlyDictionary<string, string[]> StreamAliases =
+        new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["esevent"] = ["es-event", "es_event", "esevents", "es-events"],
+            ["instruction-card"] = ["instructioncard", "instruction_card", "instructions"],
+            ["score"] = ["scores"],
+            ["timer"] = ["timers"],
+            ["retroachievements"] = ["retroachievement", "cheevos"],
+            ["hiscore"] = ["highscore", "highscores", "hiscores"]
+        };
+
+    /// <summary>Snapshot of connected clients, total and per stream.</summary>
+    public (int Total, IReadOnlyDictionary<string, int> ByStream) GetConnectionSnapshot()
+    {
+        _lock.Wait();
+        try
+        {
+            var byStream = _sockets
+                .GroupBy(subscription => string.IsNullOrEmpty(subscription.Stream) ? "(global)" : subscription.Stream)
+                .ToDictionary(group => group.Key, group => group.Count(), StringComparer.OrdinalIgnoreCase);
+            return (_sockets.Count, byStream);
+        }
+        finally
+        {
+            _lock.Release();
+        }
     }
 
     private static bool HasAnyPrefix(string value, params string[] prefixes)

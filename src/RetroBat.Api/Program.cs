@@ -78,6 +78,23 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    var apiVersion = Assembly.GetExecutingAssembly()
+        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "dev";
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "APIExpose — RetroBat Local API",
+        Version = apiVersion,
+        Description =
+            "API locale du plugin APIExpose pour RetroBat / EmulationStation.\n\n" +
+            "**Etat des services : `GET /api/v1/status`** (API, WebSocket, EmulationStation, managers).\n" +
+            "**Flux temps reel : `GET /api/v1/ws/streams`** puis `ws://127.0.0.1:12345/ws[/{stream}]`.\n\n" +
+            "Doctrine de contrat : JSON additif uniquement (aucun champ retire ni renomme) ; " +
+            "le payload /addgames vers EmulationStation est gele ; /reloadgames n'est jamais un " +
+            "rafraichissement automatique. Les groupes ci-dessous suivent la logique des managers " +
+            "du menu EmulationStation : un manager OFF eteint toutes les fonctions de sa branche.\n\n" +
+            "Documentation complete : https://nelfe80.github.io/RetroBat-APIExpose/"
+    });
+
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     if (File.Exists(xmlPath))
@@ -91,6 +108,8 @@ builder.Services.AddSwaggerGen(options =>
     options.CustomSchemaIds(type => type.IsNested && type.DeclaringType is not null
         ? $"{type.DeclaringType.Name}{type.Name}"
         : type.Name);
+
+    options.DocumentFilter<RetroBat.Api.Infrastructure.SwaggerTagOrderDocumentFilter>();
 });
 
 // Core Services
@@ -262,7 +281,12 @@ app.Use(async (context, next) =>
 });
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(options =>
+{
+    options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+    options.DisplayRequestDuration();
+    options.DocumentTitle = "APIExpose — RetroBat Local API";
+});
 
 app.UseWebSockets();
 app.UseRouting();

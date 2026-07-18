@@ -6,6 +6,7 @@ namespace RetroBat.Api.Controllers;
 /// Prototype surface for future LIP/LAY rule compilation and routing.
 /// </summary>
 [ApiController]
+[Tags("Interne & Prototype")]
 [Route("api/v1/[controller]")]
 public class RulesController : ControllerBase
 {

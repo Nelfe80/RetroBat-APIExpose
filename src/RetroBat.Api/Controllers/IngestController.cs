@@ -5,6 +5,7 @@ using RetroBat.Domain.Interfaces;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Interne & Prototype")]
 [Route("api/v1/ingest/[controller]")]
 public class EsController : ControllerBase
 {
@@ -15,6 +16,10 @@ public class EsController : ControllerBase
         _eventBus = eventBus;
     }
 
+    /// <summary>
+    /// Internal ingestion of raw EmulationStation hook events into the event
+    /// bus (used by the ES scripts, not meant for external callers).
+    /// </summary>
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] EsEventPayload payload)
     {

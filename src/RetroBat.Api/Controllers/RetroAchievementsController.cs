@@ -5,6 +5,7 @@ using RetroBat.Api.Infrastructure;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Game Events")]
 [Route("api/retroachievements")]
 public sealed class RetroAchievementsController : ControllerBase
 {
@@ -80,6 +81,7 @@ public sealed class RetroAchievementsController : ControllerBase
 }
 
 [ApiController]
+[Tags("Game Events")]
 [Route("dorequest.php")]
 public sealed class RetroAchievementsProxyController : ControllerBase
 {

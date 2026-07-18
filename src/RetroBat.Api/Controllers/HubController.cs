@@ -6,6 +6,7 @@ namespace RetroBat.Api.Controllers;
 /// Prototype surface for the future multi-RetroBat hub.
 /// </summary>
 [ApiController]
+[Tags("Interne & Prototype")]
 [Route("api/v1/[controller]")]
 public class HubController : ControllerBase
 {

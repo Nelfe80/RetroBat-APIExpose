@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using RetroBat.Api.Infrastructure;
 using RetroBat.Api.Media;
 using RetroBat.Domain.Models;
@@ -7,6 +7,7 @@ using RetroBat.Domain.Services;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Roms Manager")]
 [Route("api/v1/rom-set-manager")]
 public sealed class RomSetManagerController : ControllerBase
 {

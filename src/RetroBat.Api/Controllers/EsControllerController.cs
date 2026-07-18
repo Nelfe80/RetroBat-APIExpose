@@ -4,6 +4,7 @@ using RetroBat.Api.Infrastructure;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Contexte & navigation")]
 [Route("api/v1/es/controller")]
 public class EsControllerController : ControllerBase
 {

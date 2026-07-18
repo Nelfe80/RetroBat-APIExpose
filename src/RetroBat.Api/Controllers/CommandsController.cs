@@ -9,6 +9,7 @@ using RetroBat.Domain.Paths;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Contexte & navigation")]
 [Route("api/v1/[controller]")]
 public class CommandsController : ControllerBase
 {

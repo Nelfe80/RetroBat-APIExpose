@@ -6,6 +6,7 @@ using RetroBat.Providers.RetroArchWrapper;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Game Events")]
 [Route("api/v1/[controller]")]
 public class OutputsController : ControllerBase
 {

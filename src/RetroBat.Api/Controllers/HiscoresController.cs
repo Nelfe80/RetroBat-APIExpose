@@ -6,6 +6,7 @@ using RetroBat.Domain.Models;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Game Events")]
 [Route("api/v1/[controller]")]
 public class HiscoresController : ControllerBase
 {
@@ -20,6 +21,10 @@ public class HiscoresController : ControllerBase
         _hiscoreService = hiscoreService;
     }
 
+    /// <summary>
+    /// Extracts the hiscore table of the current game (no parameters) or of a
+    /// target identified by MAME rom ids or file md5.
+    /// </summary>
     [HttpGet]
     public async Task<IActionResult> GetHiscore([FromQuery] string? ids, [FromQuery] string? md5)
     {

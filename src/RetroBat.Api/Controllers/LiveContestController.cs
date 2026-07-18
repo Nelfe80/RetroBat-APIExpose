@@ -10,6 +10,7 @@ namespace RetroBat.Api.Controllers;
 /// assuree par <see cref="LiveContestClientService"/> en local.
 /// </summary>
 [ApiController]
+[Tags("Live Contest")]
 [Route("api/v1/livecontest")]
 public class LiveContestController : ControllerBase
 {

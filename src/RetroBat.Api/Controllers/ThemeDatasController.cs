@@ -4,6 +4,7 @@ using RetroBat.Api.Infrastructure;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Themes & Collections")]
 [Route("api/v1/theme-datas")]
 public sealed class ThemeDatasController : ControllerBase
 {

@@ -8,6 +8,7 @@ using RetroBat.Domain.Models;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Local Media Manager")]
 [Route("api/v1/[controller]")]
 public class MediaController : ControllerBase
 {
@@ -79,6 +80,7 @@ public class MediaController : ControllerBase
     /// Use <c>POST /api/v1/Media/rescrape/local</c> or local gamelist generation instead.
     /// </remarks>
     [Obsolete("Remote scraping is archived. Use local resync or local gamelist generation.")]
+    [Tags("Auto Scraping Manager")]
     [HttpPost("rescrape/remote")]
     [ProducesResponseType(typeof(MediaMaintenanceResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
@@ -102,6 +104,7 @@ public class MediaController : ControllerBase
     /// This clears projected ES media for the target game, then regenerates projection and gamelist
     /// data from already available local canonical media. It does not queue remote scraping.
     /// </remarks>
+    [Tags("Auto Scraping Manager")]
     [HttpPost("rescrape/local")]
     [ProducesResponseType(typeof(MediaMaintenanceResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
@@ -127,6 +130,7 @@ public class MediaController : ControllerBase
     /// <c>MD5(path)</c> formula. Live refreshes use <c>/addgames</c> only; ratings are
     /// normalized to the EmulationStation ratio format, for example <c>0.4</c> for 2/5 stars.
     /// </remarks>
+    [Tags("Auto Scraping Manager")]
     [HttpGet("scraping/status")]
     [ProducesResponseType(typeof(ScrapingStatusResponse), StatusCodes.Status200OK)]
     public ActionResult<ScrapingStatusResponse> GetScrapingStatus()

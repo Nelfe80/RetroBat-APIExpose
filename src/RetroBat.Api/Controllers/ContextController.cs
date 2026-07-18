@@ -4,6 +4,7 @@ using RetroBat.Domain.Models;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Contexte & navigation")]
 [Route("api/v1/[controller]")]
 public class ContextController : ControllerBase
 {
@@ -14,6 +15,10 @@ public class ContextController : ControllerBase
         _context = context;
     }
 
+    /// <summary>
+    /// Consolidated UI state: selected system, selected game and running game
+    /// in one call. Preferred entry point (the SDK uses this one).
+    /// </summary>
     [HttpGet("state")]
     public IActionResult GetState()
     {
@@ -26,6 +31,11 @@ public class ContextController : ControllerBase
         });
     }
 
+    /// <summary>
+    /// Running game if any, otherwise the selected game. 404 when neither
+    /// exists (e.g. right after APIExpose restarts, before any ES selection).
+    /// Prefer <c>GET state</c> for new integrations.
+    /// </summary>
     [HttpGet("current-game")]
     public IActionResult GetCurrentGame()
     {
@@ -44,6 +54,10 @@ public class ContextController : ControllerBase
         });
     }
 
+    /// <summary>
+    /// Currently selected system, 404 when none. Prefer <c>GET state</c> for
+    /// new integrations.
+    /// </summary>
     [HttpGet("current-system")]
     public IActionResult GetCurrentSystem()
     {
@@ -57,6 +71,9 @@ public class ContextController : ControllerBase
         });
     }
 
+    /// <summary>
+    /// Full context snapshot (schema version, node identity, UI state, time).
+    /// </summary>
     [HttpGet]
     public IActionResult Get()
     {

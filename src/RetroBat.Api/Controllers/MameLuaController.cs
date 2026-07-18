@@ -10,6 +10,7 @@ namespace RetroBat.Api.Controllers;
 /// arcade (tools/mem-curator/mame_batch_validate.py).
 /// </summary>
 [ApiController]
+[Tags("Game Events")]
 [Route("api/v1/mamelua")]
 public class MameLuaController : ControllerBase
 {
@@ -20,6 +21,7 @@ public class MameLuaController : ControllerBase
         _provider = providers.OfType<MameLuaIngameProvider>().FirstOrDefault();
     }
 
+    /// <summary>Diagnostic snapshot of the MAME Lua ingame bridge sessions (501 when the provider is off).</summary>
     [HttpGet("sessions")]
     public IActionResult Sessions()
         => _provider is null

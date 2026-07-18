@@ -11,6 +11,7 @@ namespace RetroBat.Api.Controllers;
 /// name through the gateway instead of parsing roms/*/gamelist.xml themselves.
 /// </summary>
 [ApiController]
+[Tags("Roms Manager")]
 [Route("api/v1/[controller]")]
 public class GamelistsController : ControllerBase
 {

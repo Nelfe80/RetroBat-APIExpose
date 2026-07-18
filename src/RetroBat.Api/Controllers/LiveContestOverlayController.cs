@@ -9,6 +9,7 @@ namespace RetroBat.Api.Controllers;
 /// plateforme) : decompte, GO, bravo final avec le score.
 /// </summary>
 [ApiController]
+[Tags("Live Contest")]
 [Route("api/v1/overlay")]
 public class LiveContestOverlayController : ControllerBase
 {

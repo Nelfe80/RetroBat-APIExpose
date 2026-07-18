@@ -91,35 +91,59 @@ public class EsSelectionSnapshot
 
 public class EsControllerTapRequest
 {
+    /// <summary>Input to press: up, down, left, right, a, b, select, start...</summary>
+    /// <example>down</example>
     public string Input { get; set; } = string.Empty;
+    /// <example>1</example>
     public int Count { get; set; } = 1;
+    /// <example>70</example>
     public int HoldMs { get; set; } = 70;
+    /// <example>90</example>
     public int GapMs { get; set; } = 90;
 }
 
 public class EsControllerComboRequest
 {
+    /// <summary>Ordered inputs pressed one after the other.</summary>
+    /// <example>["down","down","a"]</example>
     public List<string> Inputs { get; set; } = new();
+    /// <example>70</example>
     public int HoldMs { get; set; } = 70;
+    /// <example>90</example>
     public int GapMs { get; set; } = 90;
 }
 
 public class EsControllerGotoSystemRequest
 {
+    /// <summary>Target system id as known by EmulationStation.</summary>
+    /// <example>snes</example>
     public string System { get; set; } = string.Empty;
+    /// <summary>Also enter the system's game list after reaching it.</summary>
+    /// <example>false</example>
     public bool Enter { get; set; }
+    /// <example>70</example>
     public int HoldMs { get; set; } = 70;
+    /// <example>90</example>
     public int GapMs { get; set; } = 90;
+    /// <example>2500</example>
     public int VerifyTimeoutMs { get; set; } = 2500;
 }
 
 public class EsControllerGotoGameRequest
 {
+    /// <example>snes</example>
     public string System { get; set; } = string.Empty;
+    /// <summary>Gamelist-relative ROM path; leave empty to match by name.</summary>
+    /// <example>./Super Mario World (USA).zip</example>
     public string GamePath { get; set; } = string.Empty;
+    /// <summary>Display name used when GamePath is empty.</summary>
+    /// <example>Super Mario World</example>
     public string GameName { get; set; } = string.Empty;
+    /// <example>70</example>
     public int HoldMs { get; set; } = 70;
+    /// <example>90</example>
     public int GapMs { get; set; } = 90;
+    /// <example>3500</example>
     public int VerifyTimeoutMs { get; set; } = 3500;
 }
 

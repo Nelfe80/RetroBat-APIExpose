@@ -4,9 +4,11 @@ using RetroBat.Api.Infrastructure;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Système & santé")]
 [Route("api/v1/[controller]")]
 public class HealthController : ControllerBase
 {
+    /// <summary>Liveness probe: returns healthy plus the running version.</summary>
     [HttpGet]
     public IActionResult Get()
     {
@@ -15,9 +17,11 @@ public class HealthController : ControllerBase
 }
 
 [ApiController]
+[Tags("Système & santé")]
 [Route("api/v1/[controller]")]
 public class VersionController : ControllerBase
 {
+    /// <summary>Version and product name of the local API.</summary>
     [HttpGet]
     public IActionResult Get()
     {

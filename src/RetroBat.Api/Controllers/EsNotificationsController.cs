@@ -4,6 +4,7 @@ using RetroBat.Domain.Interfaces;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Notifications & UI")]
 [Route("api/v1/es-notifications")]
 public sealed class EsNotificationsController : ControllerBase
 {

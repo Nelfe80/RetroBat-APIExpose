@@ -5,6 +5,7 @@ using RetroBat.Providers.EmulationStation;
 namespace RetroBat.Api.Controllers;
 
 [ApiController]
+[Tags("Interne & Prototype")]
 [Route("api/v1/[controller]")]
 public class MaintenanceController : ControllerBase
 {
@@ -22,6 +23,7 @@ public class MaintenanceController : ControllerBase
         _emulationStationWatcherProvider = emulationStationWatcherProvider;
     }
 
+    /// <summary>Audits the installer deployment without writing anything.</summary>
     [HttpGet("installer/audit")]
     public async Task<ActionResult<InstallerDeploymentResult>> AuditInstaller(CancellationToken cancellationToken)
     {
@@ -29,6 +31,7 @@ public class MaintenanceController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>Deploys the installer assets (set dryRun=true to preview).</summary>
     [HttpPost("installer/deploy")]
     public async Task<ActionResult<InstallerDeploymentResult>> DeployInstaller(
         [FromBody] InstallerDeployRequest? request,
@@ -38,6 +41,7 @@ public class MaintenanceController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>Audits the RetroArch wrapper deployment without writing anything.</summary>
     [HttpGet("retroarch-wrapper/audit")]
     public async Task<ActionResult<RetroArchWrapperDeploymentResult>> AuditRetroArchWrapper(CancellationToken cancellationToken)
     {
@@ -45,6 +49,7 @@ public class MaintenanceController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>Deploys the RetroArch wrapper (set dryRun=true to preview).</summary>
     [HttpPost("retroarch-wrapper/deploy")]
     public async Task<ActionResult<RetroArchWrapperDeploymentResult>> DeployRetroArchWrapper(
         [FromBody] RetroArchWrapperDeployRequest? request,
@@ -54,12 +59,14 @@ public class MaintenanceController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>Snapshot of the EmulationStation watcher caches (diagnostic).</summary>
     [HttpGet("emulationstation/cache")]
     public ActionResult<object> GetEmulationStationCache()
     {
         return Ok(_emulationStationWatcherProvider.GetCacheSnapshot());
     }
 
+    /// <summary>Clears the EmulationStation watcher caches (forces a cold re-read).</summary>
     [HttpPost("emulationstation/cache/clear")]
     public ActionResult<object> ClearEmulationStationCache()
     {
