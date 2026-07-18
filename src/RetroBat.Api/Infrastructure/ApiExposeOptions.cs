@@ -58,6 +58,19 @@ public class ApiExposeOptions
         public bool BootstrapDefaultPlaceholdersOnStartup { get; set; } = false;
         public bool LiveEsMetadataPushEnabled { get; set; } = true;
         public bool LiveEsMediaPushEnabled { get; set; } = false;
+
+        /// <summary>Recent EmulationStation builds reject the raw /addgames body
+        /// (upstream file-guard regression): every push answers 204 and the live
+        /// card refresh is a silent no-op. When enabled, two consecutive qualified
+        /// 204s mark the ES build as unsupported: pushes stop, the user gets one
+        /// toast per session, and scraped data reaches gamelist.xml through the
+        /// pending-extended merge instead. false disables detection entirely.</summary>
+        public bool DetectAddGamesSupport { get; set; } = true;
+
+        /// <summary>Merge pending extended gamelists into gamelist.xml when
+        /// EmulationStation exits — the only moment ES cannot overwrite the file
+        /// from its own memory. Complements the existing api-startup merge.</summary>
+        public bool MergePendingOnEsExit { get; set; } = true;
         public int LiveEsMediaPushDelayMs { get; set; } = 1200;
         public int LiveEsAddGamesMinIntervalMs { get; set; } = 1200;
         public bool TraceLiveAddGamesPayloads { get; set; } = false;

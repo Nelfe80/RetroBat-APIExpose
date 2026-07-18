@@ -573,7 +573,10 @@ public class MediaRuntimeState
             if (string.Equals(_lastFrontendEvent, "game-selected", StringComparison.OrdinalIgnoreCase) &&
                 !bypassLastGameSelected)
             {
-                retryAfter = TimeSpan.FromMilliseconds(500);
+                // while the user browses a gamelist this branch repeats forever:
+                // a long retry keeps the scheduler quiet instead of waking every
+                // 500 ms and flooding the refresh-tracking log
+                retryAfter = TimeSpan.FromSeconds(5);
                 return false;
             }
 
@@ -814,6 +817,56 @@ public class MediaRuntimeState
             }
 
             reason = string.Empty;
+            return false;
+        }
+    }
+
+    private bool? _addGamesSupported;
+    private int _consecutiveQualifiedAddGamesNoContent;
+
+    /// <summary>null = unknown, true = ES accepts raw /addgames bodies, false =
+    /// this ES build has the upstream file-guard regression (every push → 204).</summary>
+    public bool? AddGamesSupported
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _addGamesSupported;
+            }
+        }
+    }
+
+    public bool IsAddGamesUnsupported => AddGamesSupported == false;
+
+    /// <summary>Records ES's answer to a QUALIFIED live addgames push (a fragment
+    /// that passed every APIExpose delta/selection gate, targeting a game ES
+    /// itself listed). On a healthy ES such a push cannot answer 204; two
+    /// consecutive 204s therefore mean the build rejects raw /addgames bodies.
+    /// Returns true only on the call that flips the state to unsupported.</summary>
+    public bool RecordQualifiedAddGamesOutcome(bool noContent)
+    {
+        lock (_lock)
+        {
+            if (_addGamesSupported == false)
+            {
+                return false;
+            }
+
+            if (!noContent)
+            {
+                _addGamesSupported = true;
+                _consecutiveQualifiedAddGamesNoContent = 0;
+                return false;
+            }
+
+            _consecutiveQualifiedAddGamesNoContent++;
+            if (_consecutiveQualifiedAddGamesNoContent >= 2)
+            {
+                _addGamesSupported = false;
+                return true;
+            }
+
             return false;
         }
     }

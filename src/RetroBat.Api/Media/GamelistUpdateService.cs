@@ -1273,6 +1273,24 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
             return false;
         }
 
+        if (_options.CurrentValue.Scraping.DetectAddGamesSupport && _runtimeState.IsAddGamesUnsupported)
+        {
+            // this ES build rejects raw /addgames bodies (audit-scrap.md §8):
+            // pushing would only rebuild the ES view for nothing — the scraped
+            // data reaches gamelist.xml through the pending-extended merges
+            _logger?.LogDebug(
+                "Live ES game fragment skipped for system={SystemId}, game={GameSlug}: /addgames is unsupported by this EmulationStation build.",
+                plan.FrontendSystemId,
+                plan.GameSlug);
+            await RefreshTrackingLog.AppendAsync(
+                plan,
+                "addgames",
+                "skipped-unsupported-es",
+                new { stage = "before-build" },
+                cancellationToken);
+            return false;
+        }
+
         EnsurePlanEsGameId(plan);
         if (string.IsNullOrWhiteSpace(plan.EsGameId))
         {
@@ -1423,6 +1441,45 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
             },
             cancellationToken);
         return false;
+    }
+
+    /// <summary>
+    /// Feeds the /addgames capability detector (audit-scrap.md §8). A qualified
+    /// push that ES answers with 204 twice in a row means this ES build rejects
+    /// raw /addgames bodies (upstream file-guard regression): further pushes are
+    /// pointless, and the user gets one toast per session explaining why scraped
+    /// media will only appear on the next start.
+    /// </summary>
+    private async Task RecordAddGamesSupportOutcomeAsync(
+        MediaProjectionPlan plan,
+        bool noContent,
+        CancellationToken cancellationToken)
+    {
+        if (!_options.CurrentValue.Scraping.DetectAddGamesSupport)
+        {
+            return;
+        }
+
+        if (!_runtimeState.RecordQualifiedAddGamesOutcome(noContent))
+        {
+            return;
+        }
+
+        _logger?.LogWarning(
+            "Live /addgames marked unsupported for this EmulationStation build after two consecutive qualified 204 responses; live card refresh is disabled for this session.");
+        await RefreshTrackingLog.AppendAsync(
+            plan,
+            "addgames",
+            "unsupported-es-version",
+            new { reason = "two-consecutive-qualified-204" },
+            cancellationToken);
+        var language = _settingsService.GetScrapingSettings().Language;
+        var message = _interfaceTextService.Text("notification.live.addgames_unsupported", language);
+        if (!string.IsNullOrWhiteSpace(message) &&
+            !message.Equals("notification.live.addgames_unsupported", StringComparison.Ordinal))
+        {
+            await NotifyEsAsync(message, cancellationToken);
+        }
     }
 
     private bool ShouldNotifyLiveAddGamesUpdate(MediaProjectionPlan plan, XElement gameElement)
@@ -2703,11 +2760,13 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                         relatedBatchCount = relatedBatch.Count
                     },
                     cancellationToken);
+                await RecordAddGamesSupportOutcomeAsync(plan, noContent: true, cancellationToken);
                 return false;
             }
 
             if (response.IsSuccessStatusCode)
             {
+                await RecordAddGamesSupportOutcomeAsync(plan, noContent: false, cancellationToken);
                 _logger?.LogInformation(
                     "Live ES game fragment pushed for system={SystemId}, gameid={EsGameId}, visibleMedia={VisibleMedia}, dirtyBatchCount={DirtyBatchCount}.",
                     plan.FrontendSystemId,

@@ -21,10 +21,13 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
     private int? _startupF5ScheduledForProcessId;
     private int? _startupF5SentForProcessId;
 
+    private readonly GamelistUpdateService _gamelistUpdateService;
+
     public EmulationStationLifecycleHostedService(
         EsFeaturesMenuDeploymentService esFeaturesMenuDeploymentService,
         EsControllerInputBackendProvider backendProvider,
         MediaRuntimeState runtimeState,
+        GamelistUpdateService gamelistUpdateService,
         IHostApplicationLifetime applicationLifetime,
         IOptionsMonitor<ApiExposeOptions> options,
         ILogger<EmulationStationLifecycleHostedService> logger)
@@ -32,6 +35,7 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
         _esFeaturesMenuDeploymentService = esFeaturesMenuDeploymentService;
         _backendProvider = backendProvider;
         _runtimeState = runtimeState;
+        _gamelistUpdateService = gamelistUpdateService;
         _applicationLifetime = applicationLifetime;
         _options = options;
         _logger = logger;
@@ -102,6 +106,30 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
         CancellationToken cancellationToken)
     {
         _logger.LogInformation("EmulationStation exited; APIExpose is cleaning ES features and stopping.");
+
+        if (_options.CurrentValue.Scraping.MergePendingOnEsExit)
+        {
+            // ES is down: the only moment it cannot rewrite gamelist.xml from its
+            // own memory (audit-scrap.md §6.2) — merge the session's scraped data
+            // now so the next ES start reads the complete cards
+            try
+            {
+                var mergedSystems = await _gamelistUpdateService.ApplyPendingExtendedGamelistsAsync(
+                    "es-exit",
+                    cancellationToken);
+                if (mergedSystems > 0)
+                {
+                    _logger.LogInformation(
+                        "Pending extended gamelists merged after EmulationStation exit for {SystemCount} system(s).",
+                        mergedSystems);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Pending extended gamelist merge after EmulationStation exit failed.");
+            }
+        }
+
         if (options.RemoveEsFeaturesOnShutdown)
         {
             var result = await _esFeaturesMenuDeploymentService.RemoveAsync(dryRun: false, cancellationToken);
