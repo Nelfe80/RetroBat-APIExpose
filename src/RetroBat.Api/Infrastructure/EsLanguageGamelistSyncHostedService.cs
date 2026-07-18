@@ -144,7 +144,8 @@ public sealed class EsLanguageGamelistSyncHostedService : BackgroundService
         return (value ?? string.Empty).Trim().ToLowerInvariant() switch
         {
             "1" or "true" or "yes" or "on" => true,
-            "0" or "false" or "no" or "off" or "" => false,
+            "0" or "false" or "no" or "off" => false,
+            // empty = auto/default (ES saves the default switch state as "")
             _ => fallback
         };
     }

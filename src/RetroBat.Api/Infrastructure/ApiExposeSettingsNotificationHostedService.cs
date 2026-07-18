@@ -379,7 +379,7 @@ public sealed class ApiExposeSettingsNotificationHostedService : BackgroundServi
         IReadOnlyDictionary<string, string> labels,
         string language)
     {
-        if (!IsEnabledValue(change.PreviousValue) || !IsDisabledValue(change.NewValue))
+        if (!IsEnabledValue(change.Key, change.PreviousValue) || !IsDisabledValue(change.Key, change.NewValue))
         {
             return null;
         }
@@ -415,7 +415,7 @@ public sealed class ApiExposeSettingsNotificationHostedService : BackgroundServi
         IReadOnlyDictionary<string, string> labels,
         string language)
     {
-        if (!IsDisabledValue(change.PreviousValue) || !IsEnabledValue(change.NewValue) || !IsParentSwitch(change.Key))
+        if (!IsDisabledValue(change.Key, change.PreviousValue) || !IsEnabledValue(change.Key, change.NewValue) || !IsParentSwitch(change.Key))
         {
             return null;
         }
@@ -487,14 +487,28 @@ public sealed class ApiExposeSettingsNotificationHostedService : BackgroundServi
         }
     }
 
-    private static bool IsEnabledValue(string value)
+    private static bool IsEnabledValue(string key, string value)
     {
-        return NormalizeBoolLike(value) == "1";
+        var normalized = NormalizeBoolLike(value);
+        if (normalized.Length == 0)
+        {
+            // Empty means auto/default (ES switchauto and switchon both save it),
+            // never an explicit user choice.
+            return ApiExposeAppsettingsSyncService.TryGetShippedBoolDefault(key, out var shippedDefault) && shippedDefault;
+        }
+
+        return normalized == "1";
     }
 
-    private static bool IsDisabledValue(string value)
+    private static bool IsDisabledValue(string key, string value)
     {
-        return NormalizeBoolLike(value) == "0";
+        var normalized = NormalizeBoolLike(value);
+        if (normalized.Length == 0)
+        {
+            return ApiExposeAppsettingsSyncService.TryGetShippedBoolDefault(key, out var shippedDefault) && !shippedDefault;
+        }
+
+        return normalized == "0";
     }
 
     private static string NormalizeBoolLike(string value)
@@ -502,7 +516,7 @@ public sealed class ApiExposeSettingsNotificationHostedService : BackgroundServi
         return (value ?? string.Empty).Trim().ToLowerInvariant() switch
         {
             "1" or "true" or "yes" or "on" => "1",
-            "0" or "false" or "no" or "off" or "" => "0",
+            "0" or "false" or "no" or "off" => "0",
             var other => other
         };
     }

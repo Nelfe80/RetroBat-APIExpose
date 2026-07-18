@@ -178,6 +178,9 @@ public sealed class LocalMediaManagerActionHostedService : BackgroundService
             "FALSE" => "0",
             "no" => "0",
             "off" => "0",
+            // empty = default state of the action switch; without this a menu
+            // save rewriting "0" as "" would fire the populate action.
+            "" => "0",
             _ => normalized
         };
     }

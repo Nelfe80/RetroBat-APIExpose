@@ -292,6 +292,28 @@ public sealed class ApiExposeAppsettingsSyncService
 
     private static readonly Lazy<ApiExposeOptions> ShippedDefaults = new(() => new ApiExposeOptions());
 
+    /// <summary>
+    /// Shipped default for a mapped boolean ES key. Lets other consumers of
+    /// es_settings interpret an empty value with the platform semantics
+    /// (empty = auto = shipped default), matching RetroBat's own switchauto
+    /// convention.
+    /// </summary>
+    public static bool TryGetShippedBoolDefault(string esKey, out bool defaultValue)
+    {
+        defaultValue = false;
+        if (!Mappings.TryGetValue(esKey ?? string.Empty, out var mapping) ||
+            mapping.Type != AppsettingsValueType.Bool ||
+            !TryGetShippedDefault(mapping, out var node) ||
+            node is not JsonValue jsonValue ||
+            !jsonValue.TryGetValue(out bool parsed))
+        {
+            return false;
+        }
+
+        defaultValue = parsed;
+        return true;
+    }
+
     private static bool TryGetShippedDefault(AppsettingsMapping mapping, out JsonNode value)
     {
         value = null!;
