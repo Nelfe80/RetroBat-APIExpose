@@ -328,7 +328,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                 Animations: dmdAnimations),
             Topper: FindFirstAsset(roots, "artwork", "marquee", "topper.*"),
             Fanart: FindFirstAsset(roots, GameFanartSearches),
-            Logo: FindFirstAsset(roots, GameLogoSearches));
+            Logo: FindFirstAsset(roots, GameLogoSearches),
+            Video: FindAssets(roots, string.Empty, "video.*").FirstOrDefault());
     }
 
     private MarqueeMediaSnapshot BuildGameMarqueeMedia(
@@ -348,7 +349,10 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             Dmd: HasDmdMedia(gameDmd) ? gameDmd : systemDmd,
             Topper: game.Topper ?? system.Topper,
             Fanart: game.Fanart ?? system.Fanart,
-            Logo: game.Logo ?? system.Logo);
+            Logo: game.Logo ?? system.Logo,
+            // Game video only: falling back to the system video would loop an
+            // unrelated clip on every game of the system.
+            Video: game.Video);
     }
 
     private static bool HasDmdMedia(DmdMediaSnapshot dmd)
@@ -649,7 +653,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             media.Dmd,
             media.Topper,
             fanart,
-            logo);
+            logo,
+            media.Video);
     }
 
     private async Task EnsureSystemMarqueeGeneratedAsync(
@@ -1277,6 +1282,13 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     ? "emulationstation-theme"
                 : "local";
 
+        // Assets under the canonical media store are reachable over HTTP: give
+        // consumers a ready /api/v1/media URL so they no longer have to resolve
+        // the plugin folder on disk.
+        var url = relative.StartsWith("media/", StringComparison.OrdinalIgnoreCase)
+            ? "/api/v1/media/" + relative["media/".Length..]
+            : string.Empty;
+
         return new MediaStreamAsset(
             Kind: ResolveKind(path),
             Origin: origin,
@@ -1286,7 +1298,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             Extension: info.Extension.TrimStart('.').ToLowerInvariant(),
             Length: info.Length,
             LastWriteTimeUtc: info.LastWriteTimeUtc,
-            Url: string.Empty);
+            Url: url);
     }
 
     private static MediaStreamAsset CreateExternalAsset(string kind, string origin, string path, string url, string extension)
@@ -1864,7 +1876,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         object Dmd,
         MediaStreamAsset? Topper,
         MediaStreamAsset? Fanart,
-        MediaStreamAsset? Logo);
+        MediaStreamAsset? Logo,
+        MediaStreamAsset? Video);
 
     private sealed record PhysicalMediaSelectionSnapshot(
         long Sequence,
