@@ -90,15 +90,10 @@ public sealed class ApiExposeAppsettingsSyncService
             ["global.apiexpose.romset.mahjong_mode"] = String("RomSetManager", "MahjongMode"),
             ["global.apiexpose.romset.quiz_mode"] = String("RomSetManager", "QuizMode"),
             ["global.apiexpose.romset.non_games_mode"] = String("RomSetManager", "NonGamesMode"),
+            ["global.apiexpose.romset.unknown_roms_mode"] = String("RomSetManager", "UnknownRomsMode"),
             ["global.apiexpose.romset.arcade_diagnostics_mode"] = String("RomSetManager", "ArcadeDiagnosticsMode"),
-            ["global.apiexpose.romset.only_retroachievements"] = Bool("RomSetManager", "OnlyRetroAchievements"),
-            ["global.apiexpose.romset.show_clones"] = Bool("RomSetManager", "ShowClones"),
-            ["global.apiexpose.romset.show_prototypes"] = Bool("RomSetManager", "ShowPrototypes"),
-            ["global.apiexpose.romset.show_bootlegs_hacks"] = Bool("RomSetManager", "ShowBootlegsAndHacks"),
-            ["global.apiexpose.romset.show_adult"] = Bool("RomSetManager", "ShowAdult"),
-            ["global.apiexpose.romset.show_casino"] = Bool("RomSetManager", "ShowCasino"),
-            ["global.apiexpose.romset.show_mahjong"] = Bool("RomSetManager", "ShowMahjong"),
-            ["global.apiexpose.romset.show_non_games"] = Bool("RomSetManager", "ShowNonGames"),
+            // legacy show_* keys superseded by the *_mode choices were removed
+            // (audit-esmenu); only the three still read by the filter remain
             ["global.apiexpose.romset.show_non_arcade"] = Bool("RomSetManager", "ShowNonArcade"),
             ["global.apiexpose.romset.show_horizontal"] = Bool("RomSetManager", "ShowHorizontal"),
             ["global.apiexpose.romset.show_vertical"] = Bool("RomSetManager", "ShowVertical"),

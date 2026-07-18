@@ -51,7 +51,7 @@ public class ApiExposeOptions
         public string ScreenScraperDevPassword { get; set; } = string.Empty;
         public bool UseBundledScreenScraperDeveloperCredentials { get; set; } = true;
         public bool RemoteAfterLocalOnly { get; set; } = true;
-        public bool ExactLocalMediaScrapingEnabled { get; set; } = false;
+        public bool ExactLocalMediaScrapingEnabled { get; set; } = true;
         public bool RefreshCurrentGameAfterRemoteSuccess { get; set; } = true;
         public bool NotifyHeavyMediaScrapeEnabled { get; set; } = true;
         public bool ResumePendingScrapesOnStartup { get; set; } = false;
@@ -123,16 +123,18 @@ public class ApiExposeOptions
         public string TranslateLocallyModelStorePath { get; set; } = "tools/translateLocally/models";
         public bool ProjectedMediaIndexCacheEnabled { get; set; } = true;
         public bool ScreenScraperRawCacheEnabled { get; set; } = true;
+        // defaults aligned with appsettings.json (the shipped source of truth):
+        // a missing appsettings key must not silently flip a media kind on
         public bool MarqueeScrapingEnabled { get; set; } = true;
-        public bool ScreenMarqueeScrapingEnabled { get; set; } = true;
-        public bool ScreenMarqueeSmallScrapingEnabled { get; set; } = true;
-        public bool SteamGridScrapingEnabled { get; set; } = true;
-        public bool MixScrapingEnabled { get; set; } = true;
+        public bool ScreenMarqueeScrapingEnabled { get; set; } = false;
+        public bool ScreenMarqueeSmallScrapingEnabled { get; set; } = false;
+        public bool SteamGridScrapingEnabled { get; set; } = false;
+        public bool MixScrapingEnabled { get; set; } = false;
         public bool MapScrapingEnabled { get; set; } = false;
-        public bool ManualScrapingEnabled { get; set; } = true;
-        public bool MagazineScrapingEnabled { get; set; } = true;
+        public bool ManualScrapingEnabled { get; set; } = false;
+        public bool MagazineScrapingEnabled { get; set; } = false;
         public bool VideoScrapingEnabled { get; set; } = true;
-        public bool VideoNormalizedScrapingEnabled { get; set; } = true;
+        public bool VideoNormalizedScrapingEnabled { get; set; } = false;
         public bool ThemeHbScrapingEnabled { get; set; } = false;
         public bool BezelScrapingEnabled { get; set; } = true;
         public string BezelAspectRatio { get; set; } = "16-9";
@@ -278,42 +280,44 @@ public class ApiExposeOptions
 
     public class RomSetManagerOptions
     {
-        public bool Enabled { get; set; } = false;
+        // defaults aligned with appsettings.json (the shipped source of truth):
+        // a missing appsettings key must not silently change filter behavior
+        public bool Enabled { get; set; } = true;
         public string GroupsRootPath { get; set; } = "resources/gamelist/systems";
         public bool NeverHideFavorites { get; set; } = true;
-        public string Profile { get; set; } = "gamer";
-        public string RetroAchievementsMode { get; set; } = "no_filter";
+        public string Profile { get; set; } = "";
+        public string RetroAchievementsMode { get; set; } = "always_show";
         public string LanguageMode { get; set; } = "show_all";
         public string RegionMode { get; set; } = "show_all";
-        public string RomVersionMode { get; set; } = "stable";
-        public string OfficialGamesMode { get; set; } = "show";
-        public string ClonesMode { get; set; } = "hide";
-        public string PrototypesMode { get; set; } = "hide";
-        public string DemosMode { get; set; } = "show";
-        public string BetaAlphaMode { get; set; } = "show";
+        public string RomVersionMode { get; set; } = "auto";
+        public string OfficialGamesMode { get; set; } = "auto";
+        public string ClonesMode { get; set; } = "";
+        public string PrototypesMode { get; set; } = "";
+        public string DemosMode { get; set; } = "";
+        public string BetaAlphaMode { get; set; } = "";
         public string LocationTestsMode { get; set; } = "hide";
-        public string UsefulPatchesMode { get; set; } = "hide";
-        public string HacksModsMode { get; set; } = "show";
-        public string CheatsTrainersMode { get; set; } = "hide";
-        public string BootlegsPiratesMode { get; set; } = "hide";
-        public string UnlicensedMode { get; set; } = "show";
-        public string HomebrewsAftermarketMode { get; set; } = "show";
+        public string UsefulPatchesMode { get; set; } = "";
+        public string HacksModsMode { get; set; } = "";
+        public string CheatsTrainersMode { get; set; } = "";
+        public string BootlegsPiratesMode { get; set; } = "";
+        public string UnlicensedMode { get; set; } = "";
+        public string HomebrewsAftermarketMode { get; set; } = "";
         public string AdultMode { get; set; } = "hide";
         public string CasinoMode { get; set; } = "hide";
         public string MahjongMode { get; set; } = "hide";
         public string QuizMode { get; set; } = "hide";
-        public string NonGamesMode { get; set; } = "show";
+        public string NonGamesMode { get; set; } = "hide";
         public string UnknownRomsMode { get; set; } = "show";
         public string ArcadeDiagnosticsMode { get; set; } = "show";
         public bool OnlyRetroAchievements { get; set; } = false;
-        public bool ShowClones { get; set; } = true;
-        public bool ShowPrototypes { get; set; } = true;
-        public bool ShowBootlegsAndHacks { get; set; } = true;
-        public bool ShowAdult { get; set; } = true;
-        public bool ShowCasino { get; set; } = true;
-        public bool ShowMahjong { get; set; } = true;
+        public bool ShowClones { get; set; } = false;
+        public bool ShowPrototypes { get; set; } = false;
+        public bool ShowBootlegsAndHacks { get; set; } = false;
+        public bool ShowAdult { get; set; } = false;
+        public bool ShowCasino { get; set; } = false;
+        public bool ShowMahjong { get; set; } = false;
         public bool ShowNonGames { get; set; } = true;
-        public bool ShowNonArcade { get; set; } = true;
+        public bool ShowNonArcade { get; set; } = false;
         public bool ShowHorizontal { get; set; } = true;
         public bool ShowVertical { get; set; } = true;
         public string ScreenOrientation { get; set; } = "auto";
@@ -325,19 +329,19 @@ public class ApiExposeOptions
         public string CabinetControlsCompatibility { get; set; } = "auto";
         public string PlayerCount { get; set; } = "auto";
         public string ButtonCompatibility { get; set; } = "auto";
-        public string VariantMode { get; set; } = "display_only";
+        public string VariantMode { get; set; } = "hide_variants";
         public string RegionProfile { get; set; } = string.Empty;
         public string LanguageProfile { get; set; } = string.Empty;
         public string Translations { get; set; } = "prefer_if_language_match";
-        public string ArcadeHandling { get; set; } = "parent_clone_group";
+        public string ArcadeHandling { get; set; } = "disabled";
         public string OutputMode { get; set; } = "gamelist_hidden";
         public bool DebugReport { get; set; } = false;
         public bool ReloadGamesAfterApply { get; set; } = true;
-        public bool RomPackInstallerEnabled { get; set; } = false;
+        public bool RomPackInstallerEnabled { get; set; } = true;
         public bool RomPackInstallerUnzipRoms { get; set; } = false;
-        public bool OnTheFlyRomInstallerEnabled { get; set; } = false;
+        public bool OnTheFlyRomInstallerEnabled { get; set; } = true;
         public string OnTheFlyRomExtractionTrigger { get; set; } = "game_start";
-        public bool OnTheFlyRomResetAfterGameEndEnabled { get; set; } = false;
+        public bool OnTheFlyRomResetAfterGameEndEnabled { get; set; } = true;
         public int OnTheFlyRomResetAfterGameEndDelayMs { get; set; } = 12000;
     }
 

@@ -129,6 +129,7 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
             ("global.apiexpose.api.sync_gamelists_with_system_language", ToEsBool(options.ApiSettings.SyncGamelistsWithSystemLanguage)),
             ("global.apiexpose.scraping.auto_enabled", ToEsBool(options.Scraping.AutoScrapingEnabled)),
             ("global.apiexpose.scraping.screenscraper.enabled", ToEsBool(options.Scraping.ScreenScraperEnabled)),
+            ("global.apiexpose.scraping.description_translation.enabled", ToEsBool(options.Scraping.DescriptionTranslationEnabled)),
             ("global.apiexpose.scraping.queue.enabled", ToEsBool(options.Scraping.ScrapeQueueEnabled)),
             ("global.apiexpose.scraping.remote_after_local_only", ToEsBool(options.Scraping.RemoteAfterLocalOnly)),
             ("global.apiexpose.scraping.exact_local_media.enabled", ToEsBool(options.Scraping.ExactLocalMediaScrapingEnabled)),
@@ -193,8 +194,8 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
             ("global.apiexpose.romset.mahjong_mode", options.RomSetManager.MahjongMode),
             ("global.apiexpose.romset.quiz_mode", options.RomSetManager.QuizMode),
             ("global.apiexpose.romset.non_games_mode", options.RomSetManager.NonGamesMode),
+            ("global.apiexpose.romset.unknown_roms_mode", options.RomSetManager.UnknownRomsMode),
             ("global.apiexpose.romset.arcade_diagnostics_mode", options.RomSetManager.ArcadeDiagnosticsMode),
-            ("global.apiexpose.romset.only_retroachievements", ToEsBool(options.RomSetManager.OnlyRetroAchievements)),
             ("global.apiexpose.romset.variant_mode", options.RomSetManager.VariantMode),
             ("global.apiexpose.romset.translations", options.RomSetManager.Translations),
             ("global.apiexpose.romset.arcade_handling", options.RomSetManager.ArcadeHandling),
@@ -253,15 +254,10 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
 
         if (includeRomSetVisibilityDefaults)
         {
+            // legacy show_* keys superseded by the *_mode choices are no longer
+            // seeded (audit-esmenu); only the three still read by the filter are
             defaults.InsertRange(7, new[]
             {
-                ("global.apiexpose.romset.show_clones", ToEsBool(options.RomSetManager.ShowClones)),
-                ("global.apiexpose.romset.show_prototypes", ToEsBool(options.RomSetManager.ShowPrototypes)),
-                ("global.apiexpose.romset.show_bootlegs_hacks", ToEsBool(options.RomSetManager.ShowBootlegsAndHacks)),
-                ("global.apiexpose.romset.show_adult", ToEsBool(options.RomSetManager.ShowAdult)),
-                ("global.apiexpose.romset.show_casino", ToEsBool(options.RomSetManager.ShowCasino)),
-                ("global.apiexpose.romset.show_mahjong", ToEsBool(options.RomSetManager.ShowMahjong)),
-                ("global.apiexpose.romset.show_non_games", ToEsBool(options.RomSetManager.ShowNonGames)),
                 ("global.apiexpose.romset.show_non_arcade", ToEsBool(options.RomSetManager.ShowNonArcade)),
                 ("global.apiexpose.romset.show_horizontal", ToEsBool(options.RomSetManager.ShowHorizontal)),
                 ("global.apiexpose.romset.show_vertical", ToEsBool(options.RomSetManager.ShowVertical))
