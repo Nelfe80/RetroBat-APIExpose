@@ -34,6 +34,27 @@ public sealed record GamelistEntryUpdateResult(
     public bool ShouldPushLiveAddGames => MediaContentChanged;
 }
 
+// ============================================================================
+// FROZEN CONTRACT — live /addgames payloads (audit-scrap.md §5)
+//
+// EmulationStation ingests /addgames WITHOUT any internal locking: the HTTP
+// thread mutates the live FileData tree while the UI thread renders it, and a
+// posted lambda captures a raw SystemData*. Any payload that strays from the
+// proven shape widens that race window and can crash ES outright. Therefore:
+//   - the payload FORMAT and CONTENT rules below are frozen — scheduling
+//     changes (when/whether to push) are fine, payload changes are not;
+//   - every <path> must be relative to the system rom dir, exist on disk, and
+//     use an extension the system declares; only games ES already knows may be
+//     targeted (never create entries through /addgames);
+//   - /reloadgames must NEVER be called automatically: it tears down every
+//     view, shows a blocking splash, and loses the user's cursor and folder
+//     stack (audit-scrap.md §3.3). The startup F5 path is the only sanctioned
+//     full refresh.
+// Recent ES builds reject raw /addgames bodies entirely (upstream file-guard
+// regression — PRs RetroBat-Official/emulationstation#429 and
+// batocera-linux/batocera-emulationstation#2178); the capability detector in
+// this service turns pushes off for those builds.
+// ============================================================================
 public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
 {
     private const int BootstrapPlaceholderStateVersion = 3;

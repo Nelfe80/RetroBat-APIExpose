@@ -89,6 +89,12 @@ public class ApiExposeOptions
         public int LiveEsAddGamesMinIntervalMs { get; set; } = 1200;
         public bool TraceLiveAddGamesPayloads { get; set; } = false;
         public int RemoteTextNoChangeCooldownMinutes { get; set; } = 720;
+
+        /// <summary>TTL of the exact-local no-retry cache (media that exists
+        /// locally but not in the exact region): after this many days the remote
+        /// check is allowed again, so media published later on ScreenScraper
+        /// becomes reachable. 0 or less restores the historical never-expire.</summary>
+        public int RemoteExactLocalNoRetryTtlDays { get; set; } = 14;
         public string RemoteScrapePerformanceProfile { get; set; } = "auto";
         public int RemoteScrapeConcurrencyCap { get; set; } = 4;
         public int RemoteScrapeFallbackConcurrency { get; set; } = 1;

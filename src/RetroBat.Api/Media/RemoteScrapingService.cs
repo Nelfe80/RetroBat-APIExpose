@@ -84,6 +84,7 @@ public sealed class RemoteScrapingService
         cancellationToken.ThrowIfCancellationRequested();
 
         var options = _options.CurrentValue;
+        RemoteExactLocalNoRetryTtlDays = options.Scraping.RemoteExactLocalNoRetryTtlDays;
         var scraping = BuildRuntimeScrapingOptions(options.Scraping);
         var settings = _settingsService.GetScrapingSettings();
         var screenScraperConnection = _screenScraperConnectionService.Resolve();
@@ -1513,13 +1514,37 @@ public sealed class RemoteScrapingService
                 .OrderBy(kind => kind, StringComparer.OrdinalIgnoreCase)));
     }
 
+    // The exact-local no-retry cache historically never expired: media published
+    // later on ScreenScraper could never be retried. Entries older than the TTL
+    // are treated as absent and purged (TTL <= 0 restores the historical
+    // never-expire behavior). Synced from options on every remote evaluation.
+    private static volatile int RemoteExactLocalNoRetryTtlDays = 14;
+
+    private static bool IsExpiredRemoteExactLocalNoRetryEntry(RemoteExactLocalNoRetryCacheEntry entry)
+    {
+        return RemoteExactLocalNoRetryTtlDays > 0 &&
+            DateTime.UtcNow - entry.LastCheckedAtUtc > TimeSpan.FromDays(RemoteExactLocalNoRetryTtlDays);
+    }
+
     private static bool TryGetRemoteExactLocalNoRetry(
         MediaProjectionPlan plan,
         IReadOnlyList<string> kinds,
         out RemoteExactLocalNoRetryCacheEntry entry)
     {
         EnsureRemoteExactLocalNoRetryCacheLoaded();
-        return RemoteExactLocalNoRetryEntries.TryGetValue(BuildRemoteMediaNoChangeCacheKey(plan, kinds), out entry!);
+        if (RemoteExactLocalNoRetryEntries.TryGetValue(BuildRemoteMediaNoChangeCacheKey(plan, kinds), out entry!))
+        {
+            if (!IsExpiredRemoteExactLocalNoRetryEntry(entry))
+            {
+                return true;
+            }
+
+            RemoteExactLocalNoRetryEntries.TryRemove(entry.Key, out _);
+            SaveRemoteExactLocalNoRetryCache();
+        }
+
+        entry = null!;
+        return false;
     }
 
     private static bool TryGetRemoteExactLocalNoRetryForKind(
@@ -1531,7 +1556,13 @@ public sealed class RemoteScrapingService
         var normalizedKind = MediaKinds.Normalize(kind);
         if (RemoteExactLocalNoRetryEntries.TryGetValue(BuildRemoteMediaNoChangeCacheKey(plan, [normalizedKind]), out entry!))
         {
-            return true;
+            if (!IsExpiredRemoteExactLocalNoRetryEntry(entry))
+            {
+                return true;
+            }
+
+            RemoteExactLocalNoRetryEntries.TryRemove(entry.Key, out _);
+            SaveRemoteExactLocalNoRetryCache();
         }
 
         var frontendSystemId = NormalizeCacheToken(plan.FrontendSystemId);
@@ -1539,7 +1570,8 @@ public sealed class RemoteScrapingService
         entry = RemoteExactLocalNoRetryEntries.Values.FirstOrDefault(candidate =>
             string.Equals(NormalizeCacheToken(candidate.FrontendSystemId), frontendSystemId, StringComparison.OrdinalIgnoreCase) &&
             string.Equals(NormalizeCacheToken(candidate.GamePath), gamePath, StringComparison.OrdinalIgnoreCase) &&
-            candidate.Kinds.Contains(normalizedKind, StringComparer.OrdinalIgnoreCase))!;
+            candidate.Kinds.Contains(normalizedKind, StringComparer.OrdinalIgnoreCase) &&
+            !IsExpiredRemoteExactLocalNoRetryEntry(candidate))!;
         return entry != null;
     }
 
