@@ -2627,6 +2627,11 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
             gameNodes.Add(ToLiveAddGamesNode(BuildLiveGameElement(dirty.Plan, cancellationToken)));
         }
 
+        if (_options.CurrentValue.Scraping.IncludeRomsetTagsInLivePayload)
+        {
+            AppendRomsetOwnershipTags(plan, gameNodes, cancellationToken);
+        }
+
         var document = new XDocument(new XElement("gameList", gameNodes));
         var xml = document.ToString(SaveOptions.DisableFormatting);
 
@@ -3623,6 +3628,51 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         }
 
         return false;
+    }
+
+    private static readonly string[] RomsetOwnershipTags =
+    {
+        "apiexpose_romset_hidden",
+        "apiexpose_romset_reasons",
+        "apiexpose_romset_original_hidden"
+    };
+
+    /// <summary>
+    /// F3 (Super Mario World bug) : ES's fragment loadFromXML clears the game's
+    /// unknown XML elements, wiping the Roms Manager ownership tags while
+    /// hidden=true survives — the entry becomes an orphan the manager refuses to
+    /// touch. Carrying the existing tags inside the fragment lets ES reload them
+    /// instead; the payload format is otherwise untouched. Rollback dedicated:
+    /// Scraping:IncludeRomsetTagsInLivePayload=false.
+    /// </summary>
+    private static void AppendRomsetOwnershipTags(
+        MediaProjectionPlan plan,
+        List<XElement> gameNodes,
+        CancellationToken cancellationToken)
+    {
+        foreach (var node in gameNodes)
+        {
+            var nodePath = node.Element("path")?.Value?.Trim();
+            if (string.IsNullOrWhiteSpace(nodePath))
+            {
+                continue;
+            }
+
+            var existing = TryLoadExistingGameNode(plan.GamelistPath, nodePath, cancellationToken);
+            if (existing == null)
+            {
+                continue;
+            }
+
+            foreach (var tag in RomsetOwnershipTags)
+            {
+                var value = existing.Element(tag)?.Value;
+                if (!string.IsNullOrWhiteSpace(value) && node.Element(tag) == null)
+                {
+                    node.Add(new XElement(tag, value));
+                }
+            }
+        }
     }
 
     /// <summary>

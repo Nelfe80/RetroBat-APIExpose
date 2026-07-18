@@ -85,6 +85,14 @@ public class ApiExposeOptions
         /// keep telling the user something is happening. false restores the
         /// historical generic fallback toast.</summary>
         public bool HonestNotifications { get; set; } = true;
+
+        /// <summary>F3 (Super Mario World bug): ES's addgames ingestion clears a
+        /// game's unknown XML elements, wiping the Roms Manager ownership tags
+        /// while &lt;hidden&gt; survives — the entry becomes an orphan. Carrying
+        /// the existing apiexpose_romset_* tags inside the fragment lets ES
+        /// reload them instead. Dedicated rollback: set to false at the first
+        /// sign of addgames instability.</summary>
+        public bool IncludeRomsetTagsInLivePayload { get; set; } = true;
         public int LiveEsMediaPushDelayMs { get; set; } = 1200;
         public int LiveEsAddGamesMinIntervalMs { get; set; } = 1200;
         public bool TraceLiveAddGamesPayloads { get; set; } = false;

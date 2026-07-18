@@ -134,6 +134,8 @@ public sealed class RomSetManagerService
                 response.Warnings.AddRange(systemResult.Warnings);
             }
 
+            RomSetHiddenLedger.SaveIfDirty(_logger);
+
             if (options.DebugReport)
             {
                 response.DebugReportPath = WriteDebugReport(response);
@@ -211,6 +213,8 @@ public sealed class RomSetManagerService
                 response.GamesChanged += systemResult.GamesChanged;
                 response.Warnings.AddRange(systemResult.Warnings);
             }
+
+            RomSetHiddenLedger.SaveIfDirty(_logger);
 
             if (!request.DryRun && response.GamesChanged > 0 && request.ReloadGames)
             {
@@ -296,6 +300,21 @@ public sealed class RomSetManagerService
             var changed = false;
             var canWrite = !dryRun && (restore || IsMode(options.OutputMode, "gamelist_hidden"));
 
+            // paths this very run elected as variant winners: an orphaned hidden
+            // entry among them was provably hidden by us in a previous run (a
+            // user never hides the game the manager elects), so it is reclaimable
+            var electedVariantWinners = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var reasons in romSetPlan.ReasonsByPath.Values.Concat(romSetPlan.ReasonsByRom.Values))
+            {
+                foreach (var reason in reasons)
+                {
+                    if (reason.StartsWith("variant-selected:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        electedVariantWinners.Add(NormalizeGamePath(reason["variant-selected:".Length..]));
+                    }
+                }
+            }
+
             foreach (var game in games)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -315,6 +334,41 @@ public sealed class RomSetManagerService
 
                 result.GamesScanned++;
 
+                if (canWrite)
+                {
+                    if (IsApiHidden(game))
+                    {
+                        // keep the ledger in sync with every owned hide we see
+                        RomSetHiddenLedger.Set(
+                            systemId,
+                            pathKey,
+                            string.Equals(game.Element(ApiOriginalHiddenTag)?.Value, "true", StringComparison.OrdinalIgnoreCase));
+                    }
+                    else if (IsHidden(game))
+                    {
+                        var inLedger = RomSetHiddenLedger.TryGet(systemId, pathKey, out var ledgerOriginalHidden);
+                        var reclaimable = inLedger ||
+                            electedVariantWinners.Contains(pathKey) ||
+                            (romSetPlan.ReasonsByPath.TryGetValue(pathKey, out var orphanReasons) && orphanReasons.Count > 0);
+                        if (reclaimable)
+                        {
+                            // F2 : hidden entry stripped of its ownership tags by
+                            // ES's fragment ingestion but provably ours (ledger,
+                            // elected winner, or currently-decided hide) — re-tag
+                            // it so the branches below hide or restore it through
+                            // the normal flow
+                            SetElementValue(game, ApiHiddenTag, "true");
+                            SetElementValue(game, ApiReasonsTag, "reclaimed-orphan");
+                            if (game.Element(ApiOriginalHiddenTag) == null)
+                            {
+                                game.Add(new XElement(ApiOriginalHiddenTag, inLedger && ledgerOriginalHidden ? "true" : "false"));
+                            }
+
+                            changed = true;
+                        }
+                    }
+                }
+
                 if (restore)
                 {
                     if (IsApiHidden(game))
@@ -325,6 +379,7 @@ public sealed class RomSetManagerService
                         if (canWrite)
                         {
                             RestoreApiHidden(game);
+                            RomSetHiddenLedger.Remove(systemId, pathKey);
                             changed = true;
                             result.GamesChanged++;
                         }
@@ -348,6 +403,7 @@ public sealed class RomSetManagerService
                         if (canWrite)
                         {
                             RestoreApiHidden(game);
+                            RomSetHiddenLedger.Remove(systemId, pathKey);
                             changed = true;
                             result.GamesChanged++;
                         }
@@ -371,6 +427,7 @@ public sealed class RomSetManagerService
                         if (canWrite)
                         {
                             RestoreApiHidden(game);
+                            RomSetHiddenLedger.Remove(systemId, pathKey);
                             changed = true;
                             result.GamesChanged++;
                         }
@@ -397,6 +454,14 @@ public sealed class RomSetManagerService
                         result.GamesChanged++;
                     }
 
+                    if (canWrite && IsApiHidden(game))
+                    {
+                        RomSetHiddenLedger.Set(
+                            systemId,
+                            pathKey,
+                            string.Equals(game.Element(ApiOriginalHiddenTag)?.Value, "true", StringComparison.OrdinalIgnoreCase));
+                    }
+
                     continue;
                 }
 
@@ -408,6 +473,7 @@ public sealed class RomSetManagerService
                     if (canWrite)
                     {
                         RestoreApiHidden(game);
+                        RomSetHiddenLedger.Remove(systemId, pathKey);
                         changed = true;
                         result.GamesChanged++;
                     }
@@ -2685,6 +2751,111 @@ public sealed class RomSetManagerService
         }
 
         return ReadOptionalInt(nested, intField);
+    }
+
+    /// <summary>
+    /// F1 (bug Super Mario World) — ownership ledger of every game path this
+    /// manager hid, persisted OUTSIDE gamelist.xml. ES's addgames ingestion
+    /// clears a game's unknown XML elements (MetaData loadFromXML), stripping
+    /// the apiexpose_romset_* ownership tags while &lt;hidden&gt; survives: the
+    /// entry becomes an orphan the manager would otherwise refuse to touch
+    /// forever. The ledger survives that strip and lets the manager reclaim
+    /// its orphans on the next run.
+    /// </summary>
+    private static class RomSetHiddenLedger
+    {
+        private static readonly object Sync = new();
+        private static Dictionary<string, Dictionary<string, bool>>? _entries;
+        private static bool _dirty;
+
+        private static string LedgerPath => Path.Combine(RetroBatPaths.MediaAliasesSharedRoot, "romset-hidden-ledger.json");
+
+        private static Dictionary<string, Dictionary<string, bool>> EnsureLoaded()
+        {
+            if (_entries != null)
+            {
+                return _entries;
+            }
+
+            try
+            {
+                if (File.Exists(LedgerPath))
+                {
+                    _entries = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, bool>>>(
+                        File.ReadAllText(LedgerPath));
+                }
+            }
+            catch
+            {
+                _entries = null;
+            }
+
+            _entries ??= new Dictionary<string, Dictionary<string, bool>>(StringComparer.OrdinalIgnoreCase);
+            return _entries;
+        }
+
+        public static bool TryGet(string systemId, string pathKey, out bool originalHidden)
+        {
+            lock (Sync)
+            {
+                originalHidden = false;
+                return EnsureLoaded().TryGetValue(systemId, out var system) &&
+                    system.TryGetValue(pathKey, out originalHidden);
+            }
+        }
+
+        public static void Set(string systemId, string pathKey, bool originalHidden)
+        {
+            lock (Sync)
+            {
+                var entries = EnsureLoaded();
+                if (!entries.TryGetValue(systemId, out var system))
+                {
+                    entries[systemId] = system = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                }
+
+                if (!system.TryGetValue(pathKey, out var existing) || existing != originalHidden)
+                {
+                    system[pathKey] = originalHidden;
+                    _dirty = true;
+                }
+            }
+        }
+
+        public static void Remove(string systemId, string pathKey)
+        {
+            lock (Sync)
+            {
+                if (EnsureLoaded().TryGetValue(systemId, out var system) && system.Remove(pathKey))
+                {
+                    _dirty = true;
+                }
+            }
+        }
+
+        public static void SaveIfDirty(ILogger? logger)
+        {
+            lock (Sync)
+            {
+                if (!_dirty || _entries == null)
+                {
+                    return;
+                }
+
+                try
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(LedgerPath)!);
+                    File.WriteAllText(LedgerPath, System.Text.Json.JsonSerializer.Serialize(
+                        _entries,
+                        new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                    _dirty = false;
+                }
+                catch (Exception ex)
+                {
+                    logger?.LogWarning(ex, "Unable to persist the romset hidden ledger.");
+                }
+            }
+        }
     }
 
     private static bool ApplyApiHidden(XElement game, IReadOnlyList<string> reasons, bool claimExistingHidden)
