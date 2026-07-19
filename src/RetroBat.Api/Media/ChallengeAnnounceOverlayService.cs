@@ -511,17 +511,20 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
 
             var w = Width;
             var h = Height;
-            _logo.Bounds = new Rectangle(w / 4, (int)(h * 0.03), w / 2, (int)(h * 0.18));
-            _title.Bounds = new Rectangle(0, (int)(h * 0.06), w, (int)(h * 0.13));
-            _objective.Bounds = new Rectangle((int)(w * 0.05), (int)(h * 0.24), (int)(w * 0.9), (int)(h * 0.14));
-            _ready.Bounds = new Rectangle(0, (int)(h * 0.39), w, (int)(h * 0.09));
-            _timer.Bounds = new Rectangle(0, (int)(h * 0.48), w, (int)(h * 0.14));
-            // QR volontairement GRAND (on le scanne à plusieurs mètres), avec
-            // une vraie respiration au-dessus.
-            var qrSize = Math.Min((int)(h * 0.28), 340);
-            var qrTop = (int)(h * 0.66);
-            _qr.Bounds = new Rectangle((w - qrSize) / 2, qrTop, qrSize, qrSize);
-            _qrHint.Bounds = new Rectangle(0, Math.Min(h - (int)(h * 0.045) - 4, qrTop + qrSize + 6), w, (int)(h * 0.045));
+            // Haut : logo/titre + objectif, pleine largeur.
+            _logo.Bounds = new Rectangle(w / 4, (int)(h * 0.03), w / 2, (int)(h * 0.20));
+            _title.Bounds = new Rectangle(0, (int)(h * 0.06), w, (int)(h * 0.14));
+            _objective.Bounds = new Rectangle((int)(w * 0.05), (int)(h * 0.26), (int)(w * 0.9), (int)(h * 0.14));
+            // Bas en DEUX colonnes : QR GÉANT à gauche (on le scanne à
+            // plusieurs mètres), « Tenez-vous prêt ! » + chrono à droite —
+            // plus jamais l'un qui cache l'autre.
+            var qrSize = Math.Min((int)(h * 0.42), 440);
+            var qrLeft = (int)(w * 0.25) - qrSize / 2;
+            var qrTop = (int)(h * 0.46);
+            _qr.Bounds = new Rectangle(Math.Max(16, qrLeft), qrTop, qrSize, qrSize);
+            _qrHint.Bounds = new Rectangle(0, Math.Min(h - (int)(h * 0.05) - 4, qrTop + qrSize + 6), w / 2, (int)(h * 0.05));
+            _ready.Bounds = new Rectangle(w / 2, (int)(h * 0.46), w / 2, (int)(h * 0.10));
+            _timer.Bounds = new Rectangle(w / 2, (int)(h * 0.56), w / 2, (int)(h * 0.34));
             Invalidate();
         }
     }

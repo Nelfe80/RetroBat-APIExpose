@@ -37,7 +37,9 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
         _logger = logger;
     }
 
-    public sealed record BadgeState(bool Visible, string? ImageUrl, string? Label, string? Mode = "qr", string? Subtitle = null, string? Honors = null);
+    public sealed record BadgeState(
+        bool Visible, string? ImageUrl, string? Label, string? Mode = "qr",
+        string? Subtitle = null, string? Honors = null, DateTime? ChallengeEndsAtUtc = null);
 
     private BadgeState _state = new(false, null, null);
 
@@ -64,13 +66,13 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
     public async Task ApplyAsync(
         bool visible, string? imageUrl, string? label,
         string? mode = null, string? seed = null, int? colors = null, string? subtitle = null,
-        string? honors = null,
+        string? honors = null, DateTime? challengeEndsAtUtc = null,
         CancellationToken cancellationToken = default)
     {
         var playerMode = string.Equals(mode, "player", StringComparison.OrdinalIgnoreCase);
         if (!_options.CurrentValue.CabinetBadgeOverlay.Enabled)
         {
-            _state = new BadgeState(false, imageUrl, label, playerMode ? "player" : "qr", subtitle, honors);
+            _state = new BadgeState(false, imageUrl, label, playerMode ? "player" : "qr", subtitle, honors, challengeEndsAtUtc);
             return;
         }
 
@@ -87,7 +89,7 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
             }
         }
 
-        _state = new BadgeState(visible, imageUrl, label, playerMode ? "player" : "qr", subtitle, honors);
+        _state = new BadgeState(visible, imageUrl, label, playerMode ? "player" : "qr", subtitle, honors, challengeEndsAtUtc);
         EnsureUiThreadStarted(cancellationToken);
 
         Control? dispatcher;
@@ -121,7 +123,8 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
                 {
                     _form.SetPlayer(
                         seed ?? label ?? "player", Math.Clamp(colors ?? 1, 1, 6),
-                        label ?? string.Empty, honors ?? string.Empty, subtitle ?? string.Empty);
+                        label ?? string.Empty, honors ?? string.Empty, subtitle ?? string.Empty,
+                        challengeEndsAtUtc);
                     _currentImageUrl = null;
                 }
                 else
@@ -276,8 +279,11 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
         private readonly Label _label;
         private readonly Label _titleLabel;
         private readonly Label _subtitleLabel;
+        private readonly Label _challengeTimer;
         private readonly System.Windows.Forms.Timer _reassert;
+        private readonly System.Windows.Forms.Timer _challengeTick;
         private readonly string _qrTitle;
+        private DateTime? _challengeEndsAtUtc;
 
         [DllImport("user32.dll")]
         private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint flags);
@@ -349,8 +355,33 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
             };
             _titleLabel = titleLabel;
             _subtitleLabel = subtitleLabel;
+            // Cartouche chrono d'un challenge chronométré : temps restant,
+            // affiché AU-DESSUS de la plaque joueur.
+            _challengeTimer = new Label
+            {
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font("Segoe UI", 12.5f, FontStyle.Bold),
+                ForeColor = Color.FromArgb(255, 210, 87),
+                BackColor = dark,
+                Visible = false
+            };
+            _challengeTick = new System.Windows.Forms.Timer { Interval = 500 };
+            _challengeTick.Tick += (_, _) =>
+            {
+                if (!Visible || _challengeEndsAtUtc is null || !_challengeTimer.Visible)
+                {
+                    return;
+                }
+
+                var remain = _challengeEndsAtUtc.Value - DateTime.UtcNow;
+                _challengeTimer.Text = remain <= TimeSpan.Zero
+                    ? "⏱ Terminé !"
+                    : $"⏱ {(int)remain.TotalMinutes}:{remain.Seconds:00}";
+            };
+            _challengeTick.Start();
             Controls.Add(titleLabel);
             Controls.Add(subtitleLabel);
+            Controls.Add(_challengeTimer);
             Controls.Add(_picture);
             Controls.Add(_label);
         }
@@ -374,6 +405,8 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
             Size = new Size(300, 404);
             _titleLabel.Visible = true;
             _subtitleLabel.Visible = true;
+            _challengeTimer.Visible = false;
+            _challengeEndsAtUtc = null;
             _titleLabel.Text = _qrTitle;
             _subtitleLabel.Text = _qrTitle.Equals("Scan to play", StringComparison.OrdinalIgnoreCase)
                 ? string.Empty
@@ -387,8 +420,9 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
         }
 
         /// <summary>Plaque joueur DISCRETE : une seule ligne — avatar pixel a
-        /// gauche, pseudo + trophees, contest et rang s'il y en a un.</summary>
-        public void SetPlayer(string seed, int colors, string pseudo, string honors, string subtitle)
+        /// gauche, pseudo + trophees, contest et rang s'il y en a un. Avec un
+        /// challenge chronométré : cartouche ⏱ temps restant AU-DESSUS.</summary>
+        public void SetPlayer(string seed, int colors, string pseudo, string honors, string subtitle, DateTime? challengeEndsAtUtc = null)
         {
             var text = pseudo;
             if (honors.Length > 0)
@@ -401,15 +435,19 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
                 text += "  ·  " + subtitle;
             }
 
+            _challengeEndsAtUtc = challengeEndsAtUtc;
+            var timerBand = challengeEndsAtUtc is not null ? 26 : 0;
             var font = new Font("Segoe UI", 11.5f, FontStyle.Bold);
             var textWidth = TextRenderer.MeasureText(text, font).Width;
             var width = Math.Max(150, 52 + textWidth + 12);
-            Size = new Size(width, 44);
+            Size = new Size(width, 44 + timerBand);
             _titleLabel.Visible = false;
             _subtitleLabel.Visible = false;
-            _picture.Bounds = new Rectangle(4, 4, 36, 36);
+            _challengeTimer.Visible = timerBand > 0;
+            _challengeTimer.Bounds = new Rectangle(0, 0, width, timerBand);
+            _picture.Bounds = new Rectangle(4, timerBand + 4, 36, 36);
             _picture.BackColor = Color.FromArgb(12, 12, 18);
-            _label.Bounds = new Rectangle(48, 0, width - 52, 44);
+            _label.Bounds = new Rectangle(48, timerBand, width - 52, 44);
             _label.TextAlign = ContentAlignment.MiddleLeft;
             _label.Font = font;
             _label.Text = text;
@@ -485,8 +523,11 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
 
         public void PositionBottomRight(Screen screen)
         {
-            var area = screen.WorkingArea;
-            Location = new Point(area.Right - Width - 16, area.Bottom - Height - 16);
+            // La plaque joueur colle au bord bas (4 px) pour cacher le moins
+            // possible de jeu ; le grand QR de borne libre garde sa marge.
+            var margin = _titleLabel.Visible ? 16 : 4;
+            var area = screen.Bounds;
+            Location = new Point(area.Right - Width - margin, area.Bottom - Height - margin);
         }
     }
 }

@@ -86,6 +86,16 @@ public sealed class ChallengeAnnounceController : ControllerBase
                     "Ne touchez plus à rien !",
                     "Partie en pause — départ imminent, attendez le décompte", 0);
                 break;
+            case "finished":
+                // Course : objectif atteint, le temps est pris (même scène que
+                // Live Contest « target reached »).
+                _gameOverlay.ShowCenter("🏁 Objectif atteint !",
+                    "Votre temps est enregistré — regardez le classement !", 0);
+                break;
+            case "end":
+                _gameOverlay.ShowCenter("🏁 Challenge terminé !",
+                    request.Text ?? "Classement sur l'écran de la salle — merci d'avoir joué !", 8000);
+                break;
             default:
                 _gameOverlay.Hide();
                 break;
@@ -208,7 +218,7 @@ public sealed class ChallengeAnnounceController : ControllerBase
 
 public sealed record ChallengeGoRequest(DateTime? StartsAtUtc);
 
-public sealed record ChallengePhaseRequest(string? Phase);
+public sealed record ChallengePhaseRequest(string? Phase, string? Text = null);
 
 public sealed record ChallengeAnnounceRequest(
     bool? Visible,

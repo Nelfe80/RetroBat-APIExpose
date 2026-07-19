@@ -40,13 +40,16 @@ public sealed class CabinetBadgeController : ControllerBase
         await _overlay.ApplyAsync(
             request.Visible, request.ImageUrl, request.Label,
             request.Mode, request.Seed, request.Colors, request.Subtitle, request.Honors,
+            request.ChallengeEndsAtUtc,
             cancellationToken);
         return Ok(_overlay.GetState());
     }
 }
 
 /// <summary>Mode qr (borne libre) ou player (plaque joueur : avatar pixel
-/// dessine localement depuis seed+colors, pseudo, rang en sous-titre).</summary>
+/// dessine localement depuis seed+colors, pseudo, rang en sous-titre).
+/// ChallengeEndsAtUtc (additif) : challenge chronométré en cours — un petit
+/// cartouche au-dessus de la plaque décompte le temps restant.</summary>
 public sealed record CabinetBadgeRequest(
     bool Visible,
     string? ImageUrl,
@@ -55,4 +58,5 @@ public sealed record CabinetBadgeRequest(
     string? Seed = null,
     int? Colors = null,
     string? Subtitle = null,
-    string? Honors = null);
+    string? Honors = null,
+    DateTime? ChallengeEndsAtUtc = null);
