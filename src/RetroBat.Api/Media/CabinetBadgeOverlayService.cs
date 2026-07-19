@@ -106,7 +106,10 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
                     return;
                 }
 
-                _form ??= new BadgeForm(_options.CurrentValue.CabinetBadgeOverlay.Opacity);
+                _form ??= new BadgeForm(
+                    _options.CurrentValue.CabinetBadgeOverlay.Opacity,
+                    _options.CurrentValue.CabinetBadgeOverlay.Title,
+                    ResolveTargetScreen);
                 if (imageBytes is not null)
                 {
                     _form.SetImage(imageBytes);
@@ -114,7 +117,7 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
                 }
 
                 _form.SetLabel(label ?? string.Empty);
-                _form.PositionBottomRight(ResolveEmulationStationScreen() ?? Screen.PrimaryScreen!);
+                _form.PositionBottomRight(ResolveTargetScreen());
                 _form.Show();
             }
             catch (Exception ex)
@@ -193,6 +196,19 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
         }
     }
 
+    /// <summary>Écran cible : index configuré (marquee/topper…) ou, en
+    /// « auto », l'écran où tourne EmulationStation.</summary>
+    private Screen ResolveTargetScreen()
+    {
+        var configured = _options.CurrentValue.CabinetBadgeOverlay.Screen;
+        if (int.TryParse(configured, out var index) && index >= 0 && index < Screen.AllScreens.Length)
+        {
+            return Screen.AllScreens[index];
+        }
+
+        return ResolveEmulationStationScreen() ?? Screen.PrimaryScreen!;
+    }
+
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr FindWindowW(string? className, string? windowName);
 
@@ -240,30 +256,74 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
     {
         private readonly PictureBox _picture;
         private readonly Label _label;
+        private readonly System.Windows.Forms.Timer _reassert;
 
-        public BadgeForm(double opacity)
+        [DllImport("user32.dll")]
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint flags);
+
+        private static readonly IntPtr TopMostHandle = new(-1);
+        private const uint NoSizeNoActivate = 0x0001 /*NOSIZE*/ | 0x0010 /*NOACTIVATE*/ | 0x0040 /*SHOWWINDOW*/;
+
+        public BadgeForm(double opacity, string title, Func<Screen> resolveScreen)
         {
+            // EmulationStation repasse au-dessus a chaque (re)lancement : on
+            // reaffirme position + TopMost periodiquement, sans jamais voler
+            // le focus.
+            _reassert = new System.Windows.Forms.Timer { Interval = 3000 };
+            _reassert.Tick += (_, _) =>
+            {
+                if (!Visible)
+                {
+                    return;
+                }
+
+                PositionBottomRight(resolveScreen());
+                SetWindowPos(Handle, TopMostHandle, Location.X, Location.Y, 0, 0, NoSizeNoActivate);
+            };
+            _reassert.Start();
             FormBorderStyle = FormBorderStyle.None;
             StartPosition = FormStartPosition.Manual;
             ShowInTaskbar = false;
             TopMost = true;
             Opacity = Math.Clamp(opacity, 0.3, 1.0);
             BackColor = Color.White;
-            Size = new Size(150, 178);
+            Size = new Size(300, 404);
+            var titleLabel = new Label
+            {
+                Bounds = new Rectangle(0, 8, 300, 34),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font("Segoe UI", 17, FontStyle.Bold),
+                ForeColor = Color.FromArgb(20, 20, 30),
+                BackColor = Color.White,
+                Text = title
+            };
+            var subtitleLabel = new Label
+            {
+                Bounds = new Rectangle(0, 42, 300, 22),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font("Segoe UI", 10.5f),
+                ForeColor = Color.FromArgb(110, 110, 130),
+                BackColor = Color.White,
+                Text = title.Equals("Scan to play", StringComparison.OrdinalIgnoreCase)
+                    ? string.Empty
+                    : "Scan to play"
+            };
             _picture = new PictureBox
             {
                 SizeMode = PictureBoxSizeMode.Zoom,
-                Bounds = new Rectangle(5, 5, 140, 140),
+                Bounds = new Rectangle(10, 70, 280, 280),
                 BackColor = Color.White
             };
             _label = new Label
             {
-                Bounds = new Rectangle(0, 148, 150, 26),
+                Bounds = new Rectangle(0, 354, 300, 44),
                 TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Font = new Font("Segoe UI", 19, FontStyle.Bold),
                 ForeColor = Color.FromArgb(20, 20, 30),
                 BackColor = Color.White
             };
+            Controls.Add(titleLabel);
+            Controls.Add(subtitleLabel);
             Controls.Add(_picture);
             Controls.Add(_label);
         }

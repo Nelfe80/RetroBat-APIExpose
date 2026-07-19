@@ -430,6 +430,15 @@ public class ApiExposeOptions
     {
         public bool Enabled { get; set; }
         public double Opacity { get; set; } = 0.92d;
+
+        /// <summary>Écran cible : « auto » = l'écran d'EmulationStation ;
+        /// sinon l'index d'un écran (0, 1, 2…) pour viser un autre affichage
+        /// de la borne (marquee, topper…).</summary>
+        public string Screen { get; set; } = "auto";
+
+        /// <summary>Accroche au-dessus du QR, dans la langue de la salle
+        /// (« Scan to play » s'affiche toujours en dessous).</summary>
+        public string Title { get; set; } = "Scannez pour jouer";
     }
 
     public class StartupOverlayOptions
