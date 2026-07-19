@@ -297,6 +297,7 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
 
         private readonly System.Windows.Forms.Timer _reassert;
         private readonly System.Windows.Forms.Timer _countdown;
+        private readonly Form _backdrop;
         private readonly Label _title;
         private readonly Label _objective;
         private readonly Label _ready;
@@ -316,12 +317,27 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
             BackColor = Color.FromArgb(8, 8, 14);
             DoubleBuffered = true;
 
+            // Voile noir 70 % sur TOUT l'écran, derrière la fenêtre 80 % :
+            // l'interface RetroBat s'efface, le challenge prend la scène.
+            _backdrop = new Form
+            {
+                FormBorderStyle = FormBorderStyle.None,
+                StartPosition = FormStartPosition.Manual,
+                ShowInTaskbar = false,
+                TopMost = true,
+                BackColor = Color.Black,
+                Opacity = 0.7
+            };
+
             _reassert = new System.Windows.Forms.Timer { Interval = 3000 };
             _reassert.Tick += (_, _) =>
             {
                 if (Visible)
                 {
                     PositionCentered(resolveScreen());
+                    // Le voile d'abord, l'annonce ENSUITE : le dernier
+                    // réaffirmé reste au-dessus.
+                    SetWindowPos(_backdrop.Handle, TopMostHandle, _backdrop.Location.X, _backdrop.Location.Y, 0, 0, NoSizeNoActivate);
                     SetWindowPos(Handle, TopMostHandle, Location.X, Location.Y, 0, 0, NoSizeNoActivate);
                 }
             };
@@ -381,6 +397,22 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
 
         protected override bool ShowWithoutActivation => true;
 
+        protected override void OnVisibleChanged(EventArgs e)
+        {
+            base.OnVisibleChanged(e);
+            // Le voile suit l'annonce (montré dessous, caché avec elle).
+            if (Visible)
+            {
+                _backdrop.Show();
+                SetWindowPos(_backdrop.Handle, TopMostHandle, _backdrop.Location.X, _backdrop.Location.Y, 0, 0, NoSizeNoActivate);
+                SetWindowPos(Handle, TopMostHandle, Location.X, Location.Y, 0, 0, NoSizeNoActivate);
+            }
+            else
+            {
+                _backdrop.Hide();
+            }
+        }
+
         public void Configure(
             string gameName, string objective, DateTime? startsAtUtc,
             string? fanartPath, string? logoPath, byte[]? qrBytes)
@@ -432,23 +464,25 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
 
         public void PositionCentered(Screen screen)
         {
-            // 80 % de la surface de l'écran, centré.
+            // 80 % de la surface de l'écran, centré ; le voile couvre tout.
             var area = screen.Bounds;
             Size = new Size((int)(area.Width * 0.8), (int)(area.Height * 0.8));
             Location = new Point(area.X + (area.Width - Width) / 2, area.Y + (area.Height - Height) / 2);
+            _backdrop.Bounds = area;
 
             var w = Width;
             var h = Height;
-            _logo.Bounds = new Rectangle(w / 4, (int)(h * 0.03), w / 2, (int)(h * 0.20));
-            _title.Bounds = new Rectangle(0, (int)(h * 0.06), w, (int)(h * 0.14));
-            _objective.Bounds = new Rectangle((int)(w * 0.05), (int)(h * 0.26), (int)(w * 0.9), (int)(h * 0.15));
-            _ready.Bounds = new Rectangle(0, (int)(h * 0.42), w, (int)(h * 0.09));
-            _timer.Bounds = new Rectangle(0, (int)(h * 0.51), w, (int)(h * 0.15));
-            // QR volontairement GRAND : c'est lui qu'on scanne à plusieurs
-            // mètres pour prendre la borne.
-            var qrSize = Math.Min((int)(h * 0.30), 340);
-            _qr.Bounds = new Rectangle((w - qrSize) / 2, h - qrSize - (int)(h * 0.065), qrSize, qrSize);
-            _qrHint.Bounds = new Rectangle(0, h - (int)(h * 0.055), w, (int)(h * 0.045));
+            _logo.Bounds = new Rectangle(w / 4, (int)(h * 0.03), w / 2, (int)(h * 0.18));
+            _title.Bounds = new Rectangle(0, (int)(h * 0.06), w, (int)(h * 0.13));
+            _objective.Bounds = new Rectangle((int)(w * 0.05), (int)(h * 0.24), (int)(w * 0.9), (int)(h * 0.14));
+            _ready.Bounds = new Rectangle(0, (int)(h * 0.39), w, (int)(h * 0.09));
+            _timer.Bounds = new Rectangle(0, (int)(h * 0.48), w, (int)(h * 0.14));
+            // QR volontairement GRAND (on le scanne à plusieurs mètres), avec
+            // une vraie respiration au-dessus.
+            var qrSize = Math.Min((int)(h * 0.28), 340);
+            var qrTop = (int)(h * 0.66);
+            _qr.Bounds = new Rectangle((w - qrSize) / 2, qrTop, qrSize, qrSize);
+            _qrHint.Bounds = new Rectangle(0, Math.Min(h - (int)(h * 0.045) - 4, qrTop + qrSize + 6), w, (int)(h * 0.045));
             Invalidate();
         }
     }

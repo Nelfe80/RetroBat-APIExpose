@@ -1,4 +1,7 @@
+using System.Net.Sockets;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using RetroBat.Api.Infrastructure;
 using RetroBat.Api.Media;
 
 namespace RetroBat.Api.Controllers;
@@ -15,10 +18,13 @@ namespace RetroBat.Api.Controllers;
 public sealed class ChallengeAnnounceController : ControllerBase
 {
     private readonly ChallengeAnnounceOverlayService _overlay;
+    private readonly LiveContestOverlayService _gameOverlay;
 
-    public ChallengeAnnounceController(ChallengeAnnounceOverlayService overlay)
+    public ChallengeAnnounceController(
+        ChallengeAnnounceOverlayService overlay, LiveContestOverlayService gameOverlay)
     {
         _overlay = overlay;
+        _gameOverlay = gameOverlay;
     }
 
     /// <summary>État courant de l'annonce.</summary>
@@ -52,7 +58,81 @@ public sealed class ChallengeAnnounceController : ControllerBase
         await _overlay.ApplyAsync(false, null, null, null, null, null, cancellationToken);
         return Accepted(_overlay.GetState());
     }
+
+    /// <summary>
+    /// DÉPART façon Live Contest : décompte 5-4-3-2-1 dans le jeu (overlay
+    /// in-game centré) calé sur startsAtUtc, dépause à zéro pile, « GO ! ».
+    /// Poussé par le hub quand le gérant lance le challenge — tout le monde
+    /// part en même temps.
+    /// </summary>
+    /// <response code="202">Décompte engagé.</response>
+    [HttpPost("go")]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    public IActionResult Go([FromBody] ChallengeGoRequest request)
+    {
+        var startsAt = request.StartsAtUtc ?? DateTime.UtcNow.AddSeconds(6);
+        var overlay = _gameOverlay;
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                // Même détection honnête que Live Contest : sans jeu chargé,
+                // pas de décompte mensonger.
+                var probe = await SendRetroArchUdpAsync("GET_STATUS", expectResponse: true);
+                if (string.IsNullOrEmpty(probe) || probe.Contains("CONTENTLESS", StringComparison.Ordinal))
+                {
+                    return;
+                }
+
+                for (var n = 5; n >= 1; n--)
+                {
+                    var wait = startsAt.AddSeconds(-n) - DateTime.UtcNow;
+                    if (wait > TimeSpan.Zero)
+                    {
+                        await Task.Delay(wait);
+                    }
+
+                    overlay.ShowCenter(n.ToString(), "Départ dans…", 0);
+                }
+
+                var final = startsAt - DateTime.UtcNow;
+                if (final > TimeSpan.Zero)
+                {
+                    await Task.Delay(final);
+                }
+
+                var state = await SendRetroArchUdpAsync("GET_STATUS", expectResponse: true);
+                if (state.Contains("PAUSED", StringComparison.Ordinal))
+                {
+                    await SendRetroArchUdpAsync("PAUSE_TOGGLE", expectResponse: false);
+                }
+
+                overlay.ShowCenter("GO !", "", 1800);
+            }
+            catch (Exception)
+            {
+            }
+        });
+        return Accepted(new { startsAtUtc = startsAt });
+    }
+
+    private static async Task<string> SendRetroArchUdpAsync(string command, bool expectResponse)
+    {
+        using var udp = new UdpClient();
+        var bytes = Encoding.UTF8.GetBytes(command);
+        await udp.SendAsync(bytes, bytes.Length, "127.0.0.1", 55355);
+        if (!expectResponse)
+        {
+            return string.Empty;
+        }
+
+        var receive = udp.ReceiveAsync();
+        var done = await Task.WhenAny(receive, Task.Delay(1000));
+        return done == receive ? Encoding.UTF8.GetString((await receive).Buffer) : string.Empty;
+    }
 }
+
+public sealed record ChallengeGoRequest(DateTime? StartsAtUtc);
 
 public sealed record ChallengeAnnounceRequest(
     bool? Visible,
