@@ -16,6 +16,10 @@ Personal and non-commercial use is allowed.
 
 Commercial redistribution requires a separate written license.
 
+Builders selling cabinets to individuals can use the per-cabinet builder
+license (`BUILDER-LICENSE.md`): one purchased key = one sold machine, the end
+customer's use stays personal and free.
+
 ## Personal use
 
 ```text
