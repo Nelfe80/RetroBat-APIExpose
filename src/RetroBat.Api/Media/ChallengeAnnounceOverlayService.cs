@@ -411,7 +411,7 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
                 }
                 else
                 {
-                    _timer.Font = _pulseFonts[4];
+                    _timer.Font = _pulseFonts[2];
                     _timer.ForeColor = Color.White;
                 }
             };
@@ -532,8 +532,8 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
             var qrTop = (int)(h * 0.46);
             _qr.Bounds = new Rectangle(Math.Max(16, qrLeft), qrTop, qrSize, qrSize);
             _qrHint.Bounds = new Rectangle(0, Math.Min(h - (int)(h * 0.05) - 4, qrTop + qrSize + 6), w / 2, (int)(h * 0.05));
-            _ready.Bounds = new Rectangle(w / 2, (int)(h * 0.46), w / 2, (int)(h * 0.10));
-            _timer.Bounds = new Rectangle(w / 2, (int)(h * 0.56), w / 2, (int)(h * 0.34));
+            _ready.Bounds = new Rectangle(w / 2, (int)(h * 0.45), w / 2, (int)(h * 0.09));
+            _timer.Bounds = new Rectangle(w / 2, (int)(h * 0.54), w / 2, (int)(h * 0.32));
             Invalidate();
         }
     }
