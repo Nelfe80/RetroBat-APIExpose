@@ -371,7 +371,11 @@ app.Map("/ws/{stream}", async context =>
 
 app.MapControllers();
 
-app.Run("http://127.0.0.1:12345");
+// Écoute configurable (X-04) : loopback par défaut (borne solo, domicile) ;
+// une SALLE multi-bornes passe "Urls": "http://0.0.0.0:12345" dans
+// appsettings pour que le hub joigne la borne par le LAN — et active alors
+// Security:ApiKey (les requêtes non-loopback exigent X-Api-Key).
+app.Run(app.Configuration["Urls"] ?? "http://127.0.0.1:12345");
 
 static async Task HandleWebSocketAsync(HttpContext context, string stream)
 {
