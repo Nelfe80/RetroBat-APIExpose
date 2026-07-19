@@ -145,59 +145,103 @@ public class OutputsController : ControllerBase
         });
     }
 
-    private static readonly Regex MemFamilyRegex = new(@"^\s{4}([\w-]+)\s*=\s*\{", RegexOptions.Compiled);
-    private static readonly Regex MemResourceRegex = new(@"^\s{6}([\w-]+)\s*=\s*\{", RegexOptions.Compiled);
-    private static readonly Regex MemEntryRegex = new(
-        @"\{\s*address\s*=\s*(0[xX][0-9A-Fa-f]+)\s*,\s*type\s*=\s*""([^""]+)""\s*,\s*condition\s*=\s*""([^""]+)""\s*,\s*action\s*=\s*""([^""]+)""(?<tail>[^}]*)\}",
-        RegexOptions.Compiled);
-    private static readonly Regex MemTailFieldRegex = new(@"([\w_]+)\s*=\s*""([^""]*)""", RegexOptions.Compiled);
+    // Marche Lua superficielle — MÊMES règles que MarqueeManagerSetup /
+    // LedManagerSetup (MemSignalCatalog, héritées du MemSignalsParser de
+    // RetroCreator) : tables nommées = segments de famille (équilibre
+    // d'accolades), seuls les signaux de la section top-level `events`
+    // comptent, entrées no_log/no_survey mortes, IGNORE/UNKNOWN = bruit,
+    // action= ET les valeurs d'action_map sont des signaux.
+    private static readonly Regex MemTableOpenRegex = new(@"^\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*\{", RegexOptions.Compiled);
+    private static readonly Regex MemActionRegex = new(@"action\s*=\s*""([A-Z0-9_]+)""", RegexOptions.Compiled);
+    private static readonly Regex MemActionMapRegex = new(@"action_map\s*=\s*\{([^}]*)\}", RegexOptions.Compiled);
+    private static readonly Regex MemMapValueRegex = new(@"=\s*""([A-Z0-9_]+)""", RegexOptions.Compiled);
+    private static readonly Regex MemDescRegex = new(@"desc\s*=\s*""([^""]*)""", RegexOptions.Compiled);
+    private static readonly Regex MemAddressRegex = new(@"address\s*=\s*(0[xX][0-9A-Fa-f]+)", RegexOptions.Compiled);
+    private static readonly Regex MemTypeRegex = new(@"type\s*=\s*""([^""]+)""", RegexOptions.Compiled);
+    private static readonly Regex MemConditionRegex = new(@"condition\s*=\s*""([^""]+)""", RegexOptions.Compiled);
+    private static readonly Regex MemScoreKindRegex = new(@"score_kind\s*=\s*""([^""]*)""", RegexOptions.Compiled);
+
+    private static bool IsDeadMemEntry(string line)
+        => line.Contains("no_log=true", StringComparison.OrdinalIgnoreCase)
+           || line.Contains("no_log = true", StringComparison.OrdinalIgnoreCase)
+           || line.Contains("no_survey=true", StringComparison.OrdinalIgnoreCase)
+           || line.Contains("no_survey = true", StringComparison.OrdinalIgnoreCase);
 
     private static IReadOnlyList<RetroArchDefinitionSignal> ParseMemSignals(string content)
     {
         var signals = new List<RetroArchDefinitionSignal>();
-        var family = string.Empty;
-        var resource = string.Empty;
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var familyStack = new Stack<(string Name, int Depth)>();
+        var depth = 0;
+        var inEvents = false;
+        var eventsDepth = 0;
+
+        void Add(string action, string line)
+        {
+            if (action is "IGNORE" or "UNKNOWN" || !seen.Add(action))
+            {
+                return;
+            }
+
+            var path = familyStack.Reverse().Select(f => f.Name).ToArray();
+            signals.Add(new RetroArchDefinitionSignal
+            {
+                Family = path.Length > 0 ? path[0] : string.Empty,
+                Resource = path.Length > 1 ? string.Join('.', path.Skip(1)) : string.Empty,
+                Action = action,
+                Address = MemAddressRegex.Match(line) is { Success: true } a ? a.Groups[1].Value : string.Empty,
+                Type = MemTypeRegex.Match(line) is { Success: true } t ? t.Groups[1].Value : string.Empty,
+                Condition = MemConditionRegex.Match(line) is { Success: true } c ? c.Groups[1].Value : string.Empty,
+                ScoreKind = MemScoreKindRegex.Match(line) is { Success: true } k ? k.Groups[1].Value : null,
+                Description = MemDescRegex.Match(line) is { Success: true } d ? d.Groups[1].Value : null
+            });
+        }
+
         foreach (var line in content.Split('\n'))
         {
-            var familyMatch = MemFamilyRegex.Match(line);
-            if (familyMatch.Success)
+            var open = MemTableOpenRegex.Match(line);
+            if (open.Success)
             {
-                family = familyMatch.Groups[1].Value;
-                continue;
+                var name = open.Groups[1].Value;
+                // Seul le `events` TOP-LEVEL ouvre la section : certains jeux
+                // imbriquent une famille nommée events (flow.events) — elle
+                // doit s'empiler comme famille, pas réinitialiser la section.
+                if (name.Equals("events", StringComparison.OrdinalIgnoreCase) && !inEvents)
+                {
+                    inEvents = true;
+                    eventsDepth = depth;
+                }
+                else if (inEvents)
+                {
+                    familyStack.Push((name, depth));
+                }
             }
 
-            var resourceMatch = MemResourceRegex.Match(line);
-            if (resourceMatch.Success)
+            if (inEvents && !IsDeadMemEntry(line))
             {
-                resource = resourceMatch.Groups[1].Value;
-                continue;
-            }
-
-            foreach (Match entry in MemEntryRegex.Matches(line))
-            {
-                var signal = new RetroArchDefinitionSignal
+                foreach (Match m in MemActionRegex.Matches(line))
                 {
-                    Family = family,
-                    Resource = resource,
-                    Address = entry.Groups[1].Value,
-                    Type = entry.Groups[2].Value,
-                    Condition = entry.Groups[3].Value,
-                    Action = entry.Groups[4].Value
-                };
-                foreach (Match field in MemTailFieldRegex.Matches(entry.Groups["tail"].Value))
-                {
-                    switch (field.Groups[1].Value)
-                    {
-                        case "score_kind":
-                            signal.ScoreKind = field.Groups[2].Value;
-                            break;
-                        case "desc":
-                            signal.Description = field.Groups[2].Value;
-                            break;
-                    }
+                    Add(m.Groups[1].Value, line);
                 }
 
-                signals.Add(signal);
+                foreach (Match map in MemActionMapRegex.Matches(line))
+                {
+                    foreach (Match v in MemMapValueRegex.Matches(map.Groups[1].Value))
+                    {
+                        Add(v.Groups[1].Value, line);
+                    }
+                }
+            }
+
+            depth += line.Count(c => c == '{') - line.Count(c => c == '}');
+            while (familyStack.Count > 0 && depth <= familyStack.Peek().Depth)
+            {
+                familyStack.Pop();
+            }
+
+            if (inEvents && depth <= eventsDepth)
+            {
+                inEvents = false;
             }
         }
 

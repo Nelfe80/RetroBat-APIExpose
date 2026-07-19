@@ -116,6 +116,19 @@ public class RetroArchWrapperProvider : IProvider
             }
         }
 
+        // Repli catalogue (même logique que MarqueeManagerSetup/MemSignalCatalog) :
+        // clé tolérante à la ponctuation sur alias.json ET les basenames .MEM,
+        // puis nom débarrassé des tags de dump — « Sonic The Hedgehog (Europe) »
+        // trouve sonic-the-hedgehog.MEM même sans entrée d'alias.
+        foreach (var candidateSystemId in ResolveDefinitionSystemCandidates(systemId))
+        {
+            var scanned = ResolveByCatalogScan(rawRom, candidateSystemId);
+            if (scanned is not null)
+            {
+                return scanned;
+            }
+        }
+
         return fallback ?? new RetroArchDefinitionSnapshot
         {
             SystemId = systemId,
@@ -125,6 +138,82 @@ public class RetroArchWrapperProvider : IProvider
             AliasMatched = false,
             DefinitionExists = false
         };
+    }
+
+    private RetroArchDefinitionSnapshot? ResolveByCatalogScan(string rawRom, string systemId)
+    {
+        if (string.IsNullOrWhiteSpace(systemId) || string.IsNullOrWhiteSpace(rawRom))
+        {
+            return null;
+        }
+
+        var dir = Path.Combine(RetroBatPaths.RamResourcesRoot, systemId);
+        if (!Directory.Exists(dir))
+        {
+            return null;
+        }
+
+        static string Key(string value)
+            => new(value.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant).ToArray());
+
+        // Requêtes : nom brut puis nom coupé aux tags de dump "(...)"/"[...]".
+        var queries = new List<string> { rawRom };
+        var cut = rawRom.IndexOfAny(new[] { '(', '[' });
+        if (cut > 0)
+        {
+            queries.Add(rawRom[..cut].TrimEnd());
+        }
+
+        var index = new Dictionary<string, string>(StringComparer.Ordinal);
+        var aliasFile = Path.Combine(dir, "alias.json");
+        var aliasMatched = false;
+        if (File.Exists(aliasFile))
+        {
+            try
+            {
+                var aliases = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(aliasFile));
+                foreach (var pair in aliases ?? [])
+                {
+                    var key = Key(pair.Key);
+                    if (key.Length > 0)
+                    {
+                        index.TryAdd(key, Path.Combine(dir, pair.Value + ".MEM"));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning(ex, "Failed to read wrapper alias file {AliasFile}", aliasFile);
+            }
+        }
+
+        foreach (var file in Directory.EnumerateFiles(dir, "*.MEM"))
+        {
+            var key = Key(Path.GetFileNameWithoutExtension(file));
+            if (key.Length > 0)
+            {
+                index.TryAdd(key, file);
+            }
+        }
+
+        foreach (var query in queries)
+        {
+            var key = Key(query);
+            if (key.Length > 0 && index.TryGetValue(key, out var memPath) && File.Exists(memPath))
+            {
+                return new RetroArchDefinitionSnapshot
+                {
+                    SystemId = systemId,
+                    Rom = Path.GetFileNameWithoutExtension(memPath),
+                    DefinitionFile = memPath,
+                    AliasFile = File.Exists(aliasFile) ? aliasFile : string.Empty,
+                    AliasMatched = aliasMatched,
+                    DefinitionExists = true
+                };
+            }
+        }
+
+        return null;
     }
 
     private async Task RunAsync(CancellationToken cancellationToken)
