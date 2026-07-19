@@ -20,6 +20,10 @@ Builders selling cabinets to individuals can use the per-cabinet builder
 license (`BUILDER-LICENSE.md`): one purchased key = one sold machine, the end
 customer's use stays personal and free.
 
+Commercial venue operation (arcades, bars, events) is covered by the Fleet Hub
+licenses. Builder and venue licenses are available on the official site:
+https://www.nelfetech.com/salles.html
+
 ## Personal use
 
 ```text

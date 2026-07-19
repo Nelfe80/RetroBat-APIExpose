@@ -28,9 +28,10 @@ Dans le dépôt et dans chaque archive de release :
 - `PERSONAL-LICENSE.md` — l'usage personnel ;
 - `COMMERCIAL-LICENSE.md` — l'usage commercial et revendeur ;
 - `DATA-LICENSE.md` — le Data Pack ;
-- `NOTICE.md` — la notice pour les revendeurs.
+- `NOTICE.md` — la notice pour les revendeurs ;
+- `BUILDER-LICENSE.md` — la licence Builder par borne (revendeurs de bornes aux particuliers).
 
 Les outils tiers embarqués (ffmpeg, ImageMagick, translateLocally) restent sous leurs licences respectives.
 
 !!! question "Besoin d'une licence commerciale ?"
-    Ouvrez une issue sur le dépôt GitHub pour prendre contact.
+    Les licences par borne (revendeurs de bornes aux particuliers) et les licences d'exploitation en salle (Fleet Hub) s'achètent en ligne : [nelfetech.com/salles.html](https://www.nelfetech.com/salles.html). Pour les cas non couverts (redistribution numérique, marque blanche), ouvrez une issue sur le dépôt GitHub.

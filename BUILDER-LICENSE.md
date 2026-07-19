@@ -40,6 +40,12 @@ remains personal.
   agreement per `COMMERCIAL-LICENSE.md`.
 - Modifying or rebranding APIExpose or the Data Pack.
 
+## Purchase
+
+Builder license keys are sold on the official site:
+https://www.nelfetech.com/salles.html (one key per sold machine, instant
+delivery by email).
+
 ## Volume
 
 Volume discounts for builders are handled at purchase time; the per-machine

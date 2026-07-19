@@ -33,4 +33,4 @@ In the repository and in every release archive:
 Bundled third-party tools (ffmpeg, ImageMagick, translateLocally) remain under their respective licenses.
 
 !!! question "Need a commercial license?"
-    Open an issue on the GitHub repository to get in touch.
+    Per-cabinet builder licenses (resellers of cabinets to individuals) and venue licenses (Fleet Hub) are sold online: [nelfetech.com/salles.html](https://www.nelfetech.com/salles.html). For other cases (digital redistribution, white label), open an issue on the GitHub repository.
