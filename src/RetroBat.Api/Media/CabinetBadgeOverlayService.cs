@@ -37,7 +37,7 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
         _logger = logger;
     }
 
-    public sealed record BadgeState(bool Visible, string? ImageUrl, string? Label, string? Mode = "qr", string? Subtitle = null);
+    public sealed record BadgeState(bool Visible, string? ImageUrl, string? Label, string? Mode = "qr", string? Subtitle = null, string? Honors = null);
 
     private BadgeState _state = new(false, null, null);
 
@@ -70,7 +70,7 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
         var playerMode = string.Equals(mode, "player", StringComparison.OrdinalIgnoreCase);
         if (!_options.CurrentValue.CabinetBadgeOverlay.Enabled)
         {
-            _state = new BadgeState(false, imageUrl, label, playerMode ? "player" : "qr", subtitle);
+            _state = new BadgeState(false, imageUrl, label, playerMode ? "player" : "qr", subtitle, honors);
             return;
         }
 
@@ -87,7 +87,7 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
             }
         }
 
-        _state = new BadgeState(visible, imageUrl, label, playerMode ? "player" : "qr", subtitle);
+        _state = new BadgeState(visible, imageUrl, label, playerMode ? "player" : "qr", subtitle, honors);
         EnsureUiThreadStarted(cancellationToken);
 
         Control? dispatcher;
