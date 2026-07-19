@@ -39,7 +39,7 @@ public sealed class CabinetBadgeController : ControllerBase
     {
         await _overlay.ApplyAsync(
             request.Visible, request.ImageUrl, request.Label,
-            request.Mode, request.Seed, request.Colors, request.Subtitle,
+            request.Mode, request.Seed, request.Colors, request.Subtitle, request.Honors,
             cancellationToken);
         return Ok(_overlay.GetState());
     }
@@ -54,4 +54,5 @@ public sealed record CabinetBadgeRequest(
     string? Mode = null,
     string? Seed = null,
     int? Colors = null,
-    string? Subtitle = null);
+    string? Subtitle = null,
+    string? Honors = null);

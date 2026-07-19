@@ -64,6 +64,7 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
     public async Task ApplyAsync(
         bool visible, string? imageUrl, string? label,
         string? mode = null, string? seed = null, int? colors = null, string? subtitle = null,
+        string? honors = null,
         CancellationToken cancellationToken = default)
     {
         var playerMode = string.Equals(mode, "player", StringComparison.OrdinalIgnoreCase);
@@ -118,7 +119,9 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
                     ResolveTargetScreen);
                 if (playerMode)
                 {
-                    _form.SetPlayer(seed ?? label ?? "player", Math.Clamp(colors ?? 1, 1, 6), label ?? string.Empty, subtitle ?? string.Empty);
+                    _form.SetPlayer(
+                        seed ?? label ?? "player", Math.Clamp(colors ?? 1, 1, 6),
+                        label ?? string.Empty, honors ?? string.Empty, subtitle ?? string.Empty);
                     _currentImageUrl = null;
                 }
                 else
@@ -365,27 +368,53 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
 
         public void SetLabel(string label) => _label.Text = "\U0001F579 " + label;
 
-        /// <summary>Mode borne libre : accroche « scan » + numero de borne.</summary>
+        /// <summary>Mode borne libre : grande carte QR + accroche « scan ».</summary>
         public void SetQrMode(string cabinetLabel)
         {
+            Size = new Size(300, 404);
+            _titleLabel.Visible = true;
+            _subtitleLabel.Visible = true;
             _titleLabel.Text = _qrTitle;
             _subtitleLabel.Text = _qrTitle.Equals("Scan to play", StringComparison.OrdinalIgnoreCase)
                 ? string.Empty
                 : "Scan to play";
-            SetLabel(cabinetLabel);
+            _picture.Bounds = new Rectangle(10, 70, 280, 280);
             _picture.BackColor = Color.White;
+            _label.Bounds = new Rectangle(0, 354, 300, 44);
+            _label.TextAlign = ContentAlignment.MiddleCenter;
+            _label.Font = new Font("Segoe UI", 19, FontStyle.Bold);
+            SetLabel(cabinetLabel);
         }
 
-        /// <summary>Plaque joueur : avatar pixel dessine localement (meme
-        /// identicon deterministe que la plateforme), pseudo, rang.</summary>
-        public void SetPlayer(string seed, int colors, string pseudo, string subtitle)
+        /// <summary>Plaque joueur DISCRETE : une seule ligne — avatar pixel a
+        /// gauche, pseudo + trophees, contest et rang s'il y en a un.</summary>
+        public void SetPlayer(string seed, int colors, string pseudo, string honors, string subtitle)
         {
-            _titleLabel.Text = "EN JEU";
-            _subtitleLabel.Text = subtitle;
-            _label.Text = pseudo;
+            var text = pseudo;
+            if (honors.Length > 0)
+            {
+                text += "  " + honors;
+            }
+
+            if (subtitle.Length > 0)
+            {
+                text += "  ·  " + subtitle;
+            }
+
+            var font = new Font("Segoe UI", 11.5f, FontStyle.Bold);
+            var textWidth = TextRenderer.MeasureText(text, font).Width;
+            var width = Math.Max(150, 52 + textWidth + 12);
+            Size = new Size(width, 44);
+            _titleLabel.Visible = false;
+            _subtitleLabel.Visible = false;
+            _picture.Bounds = new Rectangle(4, 4, 36, 36);
             _picture.BackColor = Color.FromArgb(12, 12, 18);
+            _label.Bounds = new Rectangle(48, 0, width - 52, 44);
+            _label.TextAlign = ContentAlignment.MiddleLeft;
+            _label.Font = font;
+            _label.Text = text;
             var previous = _picture.Image;
-            _picture.Image = RenderIdenticon(seed, colors, 280);
+            _picture.Image = RenderIdenticon(seed, colors, 36);
             previous?.Dispose();
         }
 
