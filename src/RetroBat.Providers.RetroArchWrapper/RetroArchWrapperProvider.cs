@@ -96,6 +96,37 @@ public class RetroArchWrapperProvider : IProvider
 
     public RetroArchDefinitionSnapshot GetDefinitionSnapshot() => ResolveDefinition();
 
+    /// <summary>
+    /// Resolves a definition for an EXPLICIT system/rom pair with the exact
+    /// same logic as the current-context path: alias.json first, normalized
+    /// rom name, and arcade-like system fallback. This is what remote
+    /// consumers (tournament manager, Live Contest) must use — a naive
+    /// <c>&lt;system&gt;/&lt;rom&gt;.MEM</c> path never matches curated files.
+    /// </summary>
+    public RetroArchDefinitionSnapshot ResolveDefinitionFor(string rawRom, string systemId)
+    {
+        RetroArchDefinitionSnapshot? fallback = null;
+        foreach (var candidateSystemId in ResolveDefinitionSystemCandidates(systemId))
+        {
+            var candidate = ResolveDefinition(rawRom, candidateSystemId);
+            fallback ??= candidate;
+            if (candidate.DefinitionExists)
+            {
+                return candidate;
+            }
+        }
+
+        return fallback ?? new RetroArchDefinitionSnapshot
+        {
+            SystemId = systemId,
+            Rom = NormalizeRomName(rawRom),
+            DefinitionFile = string.Empty,
+            AliasFile = string.Empty,
+            AliasMatched = false,
+            DefinitionExists = false
+        };
+    }
+
     private async Task RunAsync(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)

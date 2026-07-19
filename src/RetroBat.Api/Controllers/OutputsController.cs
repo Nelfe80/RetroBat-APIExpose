@@ -108,28 +108,22 @@ public class OutputsController : ControllerBase
         [FromQuery] string? rom = null,
         CancellationToken cancellationToken = default)
     {
-        string systemId;
-        string romId;
-        string definitionFile;
-        if (!string.IsNullOrWhiteSpace(system) && !string.IsNullOrWhiteSpace(rom))
+        var provider = _providers.OfType<RetroArchWrapperProvider>().FirstOrDefault();
+        if (provider == null)
         {
-            systemId = system.Trim();
-            romId = rom.Trim();
-            definitionFile = Path.Combine(RetroBatPaths.RamResourcesRoot, systemId, romId + ".MEM");
+            return NotFound(new { message = "RetroArch wrapper provider not registered" });
         }
-        else
-        {
-            var provider = _providers.OfType<RetroArchWrapperProvider>().FirstOrDefault();
-            if (provider == null)
-            {
-                return NotFound(new { message = "RetroArch wrapper provider not registered" });
-            }
 
-            var snapshot = provider.GetDefinitionSnapshot();
-            systemId = snapshot.SystemId;
-            romId = snapshot.Rom;
-            definitionFile = snapshot.DefinitionFile;
-        }
+        // Cible explicite OU contexte courant : dans les deux cas la MÊME
+        // résolution que le runtime (alias.json, nom normalisé, repli arcade)
+        // — un chemin naïf <system>/<rom>.MEM ne trouve jamais les fichiers
+        // édités.
+        var snapshot = !string.IsNullOrWhiteSpace(system) && !string.IsNullOrWhiteSpace(rom)
+            ? provider.ResolveDefinitionFor(rom.Trim(), system.Trim())
+            : provider.GetDefinitionSnapshot();
+        var systemId = snapshot.SystemId;
+        var romId = snapshot.Rom;
+        var definitionFile = snapshot.DefinitionFile;
 
         if (string.IsNullOrWhiteSpace(definitionFile) || !System.IO.File.Exists(definitionFile))
         {

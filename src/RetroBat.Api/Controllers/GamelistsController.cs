@@ -22,9 +22,54 @@ public class GamelistsController : ControllerBase
         _gamelists = gamelists;
     }
 
-    public sealed record GamelistGameEntry(string Rom, string Name);
+    public sealed record GamelistGameEntry(string Rom, string Name, string Path = "");
 
     public sealed record GamelistGamesSnapshot(string SystemId, int Total, IReadOnlyList<GamelistGameEntry> Games);
+
+    public sealed record GamelistSystemEntry(string SystemId, int Games);
+
+    public sealed record GamelistSystemsSnapshot(int Total, IReadOnlyList<GamelistSystemEntry> Systems);
+
+    /// <summary>
+    /// Lists the systems that have an installed gamelist (roms/*/gamelist.xml).
+    /// </summary>
+    /// <remarks>
+    /// Feeds system → game pickers (tournament manager, Live Contest): pick the
+    /// system here, then its games via <c>GET /api/v1/Gamelists/{systemId}/games</c>.
+    /// </remarks>
+    /// <response code="200">Systems with an installed gamelist.</response>
+    [HttpGet]
+    [ProducesResponseType(typeof(GamelistSystemsSnapshot), StatusCodes.Status200OK)]
+    public IActionResult GetSystems()
+    {
+        var systems = new List<GamelistSystemEntry>();
+        if (Directory.Exists(RetroBatPaths.RomsRoot))
+        {
+            foreach (var directory in Directory.EnumerateDirectories(RetroBatPaths.RomsRoot))
+            {
+                var path = Path.Combine(directory, "gamelist.xml");
+                if (!System.IO.File.Exists(path))
+                {
+                    continue;
+                }
+
+                XDocument? doc;
+                lock (_gamelists.GetLock(path))
+                {
+                    doc = _gamelists.Load(path, LoadOptions.None);
+                }
+
+                var count = doc?.Root?.Elements("game").Count() ?? 0;
+                if (count > 0)
+                {
+                    systems.Add(new GamelistSystemEntry(Path.GetFileName(directory), count));
+                }
+            }
+        }
+
+        systems.Sort((a, b) => string.Compare(a.SystemId, b.SystemId, StringComparison.OrdinalIgnoreCase));
+        return Ok(new GamelistSystemsSnapshot(systems.Count, systems));
+    }
 
     /// <summary>
     /// Lists a system's installed games as EmulationStation displays them.
@@ -67,7 +112,8 @@ public class GamelistsController : ControllerBase
         var games = new List<GamelistGameEntry>();
         foreach (var game in doc.Root.Elements("game"))
         {
-            var rom = Path.GetFileNameWithoutExtension((string?)game.Element("path") ?? "");
+            var rawPath = ((string?)game.Element("path") ?? "").Trim();
+            var rom = Path.GetFileNameWithoutExtension(rawPath);
             var name = ((string?)game.Element("name") ?? "").Trim();
             if (rom.Length == 0 || !seen.Add(rom))
             {
@@ -81,7 +127,11 @@ public class GamelistsController : ControllerBase
                 continue;
             }
 
-            games.Add(new GamelistGameEntry(rom, name.Length > 0 ? name : rom));
+            // Chemin RetroBat-relatif prêt pour Commands/launch (additif) :
+            // "./foo.zip" du gamelist → "roms/<system>/foo.zip".
+            var fileName = Path.GetFileName(rawPath.Replace('\\', '/'));
+            var launchPath = fileName.Length > 0 ? $"roms/{systemId}/{fileName}" : "";
+            games.Add(new GamelistGameEntry(rom, name.Length > 0 ? name : rom, launchPath));
         }
 
         var total = games.Count;
