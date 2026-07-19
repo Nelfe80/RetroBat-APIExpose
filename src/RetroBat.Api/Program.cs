@@ -294,6 +294,37 @@ app.UseSwaggerUI(options =>
 
 app.UseWebSockets();
 app.UseRouting();
+
+// X-04 — cle API de la borne : facultative (vide = LAN de confiance, defaut
+// historique). Quand Security:ApiKey est renseignee, toute requete NON
+// loopback vers /api ou /ws doit presenter X-Api-Key (le hub la pose sur tous
+// ses appels via Hub:CabinetApiKey). Obligatoire avant toute exposition hors
+// LAN.
+var cabinetApiKey = app.Configuration["Security:ApiKey"] ?? string.Empty;
+if (cabinetApiKey.Length > 0)
+{
+    app.Use(async (context, next) =>
+    {
+        var remote = context.Connection.RemoteIpAddress;
+        var isLoopback = remote is null || System.Net.IPAddress.IsLoopback(remote);
+        var guarded = context.Request.Path.StartsWithSegments("/api") ||
+                      context.Request.Path.StartsWithSegments("/ws");
+        if (guarded && !isLoopback)
+        {
+            var provided = context.Request.Headers["X-Api-Key"].FirstOrDefault()
+                ?? context.Request.Query["apiKey"].FirstOrDefault();
+            if (!string.Equals(provided, cabinetApiKey, StringComparison.Ordinal))
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                await context.Response.WriteAsJsonAsync(new { error = "Cle API requise (en-tete X-Api-Key)." });
+                return;
+            }
+        }
+
+        await next();
+    });
+}
+
 // Garde d'origine : les commandes locales (lancement de jeux, RetroArch,
 // overlay) ne sont JAMAIS pilotables depuis un site web. Une requete
 // navigateur cross-origin est refusee sur ces routes ; l'inscription Live
