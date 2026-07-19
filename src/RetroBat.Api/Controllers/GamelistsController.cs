@@ -59,7 +59,11 @@ public class GamelistsController : ControllerBase
                     doc = _gamelists.Load(path, LoadOptions.None);
                 }
 
-                var count = doc?.Root?.Elements("game").Count() ?? 0;
+                // Seuls les jeux dont la rom existe encore sur disque comptent
+                // (même logique que les Setups) : un gamelist orphelin ne fait
+                // pas apparaître le système.
+                var count = doc?.Root?.Elements("game")
+                    .Count(game => RomExists(directory, (string?)game.Element("path"))) ?? 0;
                 if (count > 0)
                 {
                     systems.Add(new GamelistSystemEntry(Path.GetFileName(directory), count));
@@ -110,12 +114,13 @@ public class GamelistsController : ControllerBase
 
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var games = new List<GamelistGameEntry>();
+        var systemDir = Path.Combine(RetroBatPaths.RomsRoot, systemId);
         foreach (var game in doc.Root.Elements("game"))
         {
             var rawPath = ((string?)game.Element("path") ?? "").Trim();
             var rom = Path.GetFileNameWithoutExtension(rawPath);
             var name = ((string?)game.Element("name") ?? "").Trim();
-            if (rom.Length == 0 || !seen.Add(rom))
+            if (rom.Length == 0 || !seen.Add(rom) || !RomExists(systemDir, rawPath))
             {
                 continue;
             }
@@ -141,5 +146,27 @@ public class GamelistsController : ControllerBase
         }
 
         return Ok(new GamelistGamesSnapshot(systemId, total, games));
+    }
+
+    private static bool RomExists(string systemDir, string? rawPath)
+    {
+        var value = (rawPath ?? "").Trim().Replace('\\', '/');
+        if (value.Length == 0)
+        {
+            return false;
+        }
+
+        try
+        {
+            var full = Path.IsPathFullyQualified(value)
+                ? value
+                : Path.GetFullPath(Path.Combine(systemDir, value.TrimStart('.', '/')));
+            // Un « jeu » peut être un dossier (ps2, dossiers .m3u éclatés…).
+            return System.IO.File.Exists(full) || Directory.Exists(full);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 }
