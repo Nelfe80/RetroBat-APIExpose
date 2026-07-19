@@ -169,7 +169,17 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
                     return null;
                 }
 
-                var full = Path.GetFullPath(Path.Combine(systemDir, value.TrimStart('.', '/')));
+                // Ne retirer QUE le préfixe "./" : les chemins gamelist de
+                // RetroBat traversent en "./../../plugins/…" — un TrimStart
+                // aveugle des '.' et '/' détruirait la remontée.
+                if (value.StartsWith("./", StringComparison.Ordinal))
+                {
+                    value = value[2..];
+                }
+
+                var full = Path.IsPathFullyQualified(value)
+                    ? value
+                    : Path.GetFullPath(Path.Combine(systemDir, value));
                 return File.Exists(full) ? full : null;
             }
 
@@ -329,8 +339,12 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
                 if (remain.TotalSeconds <= 0)
                 {
                     _timer.Text = "GO !";
+                    // Le jeu est débloqué : le joueur entre en partie et
+                    // appuie sur START — le gérant lance le challenge quand
+                    // tout le monde est prêt.
+                    _ready.Text = "Appuyez sur START !";
                     // Filet de sécurité : l'annonce disparaît seule 20 s après
-                    // le lancement même si le hub ne la retire pas.
+                    // le déblocage même si le hub ne la retire pas.
                     if (remain.TotalSeconds < -20)
                     {
                         onExpired();
@@ -425,14 +439,16 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
 
             var w = Width;
             var h = Height;
-            _logo.Bounds = new Rectangle(w / 4, (int)(h * 0.04), w / 2, (int)(h * 0.22));
-            _title.Bounds = new Rectangle(0, (int)(h * 0.08), w, (int)(h * 0.14));
-            _objective.Bounds = new Rectangle((int)(w * 0.05), (int)(h * 0.30), (int)(w * 0.9), (int)(h * 0.16));
-            _ready.Bounds = new Rectangle(0, (int)(h * 0.47), w, (int)(h * 0.10));
-            _timer.Bounds = new Rectangle(0, (int)(h * 0.56), w, (int)(h * 0.22));
-            var qrSize = Math.Min((int)(h * 0.20), 200);
-            _qr.Bounds = new Rectangle((w - qrSize) / 2, h - qrSize - (int)(h * 0.075), qrSize, qrSize);
-            _qrHint.Bounds = new Rectangle(0, h - (int)(h * 0.065), w, (int)(h * 0.05));
+            _logo.Bounds = new Rectangle(w / 4, (int)(h * 0.03), w / 2, (int)(h * 0.20));
+            _title.Bounds = new Rectangle(0, (int)(h * 0.06), w, (int)(h * 0.14));
+            _objective.Bounds = new Rectangle((int)(w * 0.05), (int)(h * 0.26), (int)(w * 0.9), (int)(h * 0.15));
+            _ready.Bounds = new Rectangle(0, (int)(h * 0.42), w, (int)(h * 0.09));
+            _timer.Bounds = new Rectangle(0, (int)(h * 0.51), w, (int)(h * 0.15));
+            // QR volontairement GRAND : c'est lui qu'on scanne à plusieurs
+            // mètres pour prendre la borne.
+            var qrSize = Math.Min((int)(h * 0.30), 340);
+            _qr.Bounds = new Rectangle((w - qrSize) / 2, h - qrSize - (int)(h * 0.065), qrSize, qrSize);
+            _qrHint.Bounds = new Rectangle(0, h - (int)(h * 0.055), w, (int)(h * 0.045));
             Invalidate();
         }
     }
