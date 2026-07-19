@@ -21,6 +21,7 @@
 - **[Menus and options](menus.md)** — every APIExpose option inside EmulationStation.
 - **[Media and scraping](medias.md)** — your priority media and automatic scraping.
 - **[Local API](api.md)** — endpoints and real-time streams for tools and themes.
+- **[Role guides](https://nelfe80.github.io/NelfeTech-Guides/en/)** — players, streamers, venues, organizers, builders: the step-by-step journeys live on their own wiki.
 
 </div>
 
