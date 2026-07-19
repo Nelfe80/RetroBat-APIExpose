@@ -37,7 +37,7 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
         _logger = logger;
     }
 
-    public sealed record BadgeState(bool Visible, string? ImageUrl, string? Label);
+    public sealed record BadgeState(bool Visible, string? ImageUrl, string? Label, string? Mode = "qr", string? Subtitle = null);
 
     private BadgeState _state = new(false, null, null);
 
@@ -57,18 +57,24 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
         CloseUiThread();
     }
 
-    /// <summary>Shows, updates or hides the badge. Fetches the QR image when
-    /// the URL changes (typically the hub's checkin-qr endpoint).</summary>
-    public async Task ApplyAsync(bool visible, string? imageUrl, string? label, CancellationToken cancellationToken)
+    /// <summary>Shows, updates or hides the badge. Mode « qr » : image
+    /// telechargee (checkin-qr du hub). Mode « player » : plaque joueur —
+    /// avatar pixel DESSINE localement (seed+colors, meme algorithme que la
+    /// plateforme), pseudo en label, rang en sous-titre.</summary>
+    public async Task ApplyAsync(
+        bool visible, string? imageUrl, string? label,
+        string? mode = null, string? seed = null, int? colors = null, string? subtitle = null,
+        CancellationToken cancellationToken = default)
     {
+        var playerMode = string.Equals(mode, "player", StringComparison.OrdinalIgnoreCase);
         if (!_options.CurrentValue.CabinetBadgeOverlay.Enabled)
         {
-            _state = new BadgeState(false, imageUrl, label);
+            _state = new BadgeState(false, imageUrl, label, playerMode ? "player" : "qr", subtitle);
             return;
         }
 
         byte[]? imageBytes = null;
-        if (visible && !string.IsNullOrWhiteSpace(imageUrl) && imageUrl != _currentImageUrl)
+        if (visible && !playerMode && !string.IsNullOrWhiteSpace(imageUrl) && imageUrl != _currentImageUrl)
         {
             try
             {
@@ -80,7 +86,7 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
             }
         }
 
-        _state = new BadgeState(visible, imageUrl, label);
+        _state = new BadgeState(visible, imageUrl, label, playerMode ? "player" : "qr", subtitle);
         EnsureUiThreadStarted(cancellationToken);
 
         Control? dispatcher;
@@ -110,13 +116,22 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
                     _options.CurrentValue.CabinetBadgeOverlay.Opacity,
                     _options.CurrentValue.CabinetBadgeOverlay.Title,
                     ResolveTargetScreen);
-                if (imageBytes is not null)
+                if (playerMode)
                 {
-                    _form.SetImage(imageBytes);
-                    _currentImageUrl = imageUrl;
+                    _form.SetPlayer(seed ?? label ?? "player", Math.Clamp(colors ?? 1, 1, 6), label ?? string.Empty, subtitle ?? string.Empty);
+                    _currentImageUrl = null;
+                }
+                else
+                {
+                    if (imageBytes is not null)
+                    {
+                        _form.SetImage(imageBytes);
+                        _currentImageUrl = imageUrl;
+                    }
+
+                    _form.SetQrMode(label ?? string.Empty);
                 }
 
-                _form.SetLabel(label ?? string.Empty);
                 _form.PositionBottomRight(ResolveTargetScreen());
                 _form.Show();
             }
@@ -256,7 +271,10 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
     {
         private readonly PictureBox _picture;
         private readonly Label _label;
+        private readonly Label _titleLabel;
+        private readonly Label _subtitleLabel;
         private readonly System.Windows.Forms.Timer _reassert;
+        private readonly string _qrTitle;
 
         [DllImport("user32.dll")]
         private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint flags);
@@ -286,15 +304,19 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
             ShowInTaskbar = false;
             TopMost = true;
             Opacity = Math.Clamp(opacity, 0.3, 1.0);
-            BackColor = Color.White;
+            // Fond NOIR (discret sur l'ecran de la borne) — le blanc est
+            // reserve au QR lui-meme, indispensable au scan.
+            _qrTitle = title;
+            var dark = Color.FromArgb(12, 12, 18);
+            BackColor = dark;
             Size = new Size(300, 404);
             var titleLabel = new Label
             {
                 Bounds = new Rectangle(0, 8, 300, 34),
                 TextAlign = ContentAlignment.MiddleCenter,
                 Font = new Font("Segoe UI", 17, FontStyle.Bold),
-                ForeColor = Color.FromArgb(20, 20, 30),
-                BackColor = Color.White,
+                ForeColor = Color.White,
+                BackColor = dark,
                 Text = title
             };
             var subtitleLabel = new Label
@@ -302,8 +324,8 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
                 Bounds = new Rectangle(0, 42, 300, 22),
                 TextAlign = ContentAlignment.MiddleCenter,
                 Font = new Font("Segoe UI", 10.5f),
-                ForeColor = Color.FromArgb(110, 110, 130),
-                BackColor = Color.White,
+                ForeColor = Color.FromArgb(150, 150, 170),
+                BackColor = dark,
                 Text = title.Equals("Scan to play", StringComparison.OrdinalIgnoreCase)
                     ? string.Empty
                     : "Scan to play"
@@ -319,9 +341,11 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
                 Bounds = new Rectangle(0, 354, 300, 44),
                 TextAlign = ContentAlignment.MiddleCenter,
                 Font = new Font("Segoe UI", 19, FontStyle.Bold),
-                ForeColor = Color.FromArgb(20, 20, 30),
-                BackColor = Color.White
+                ForeColor = Color.White,
+                BackColor = dark
             };
+            _titleLabel = titleLabel;
+            _subtitleLabel = subtitleLabel;
             Controls.Add(titleLabel);
             Controls.Add(subtitleLabel);
             Controls.Add(_picture);
@@ -340,6 +364,95 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
         }
 
         public void SetLabel(string label) => _label.Text = "\U0001F579 " + label;
+
+        /// <summary>Mode borne libre : accroche « scan » + numero de borne.</summary>
+        public void SetQrMode(string cabinetLabel)
+        {
+            _titleLabel.Text = _qrTitle;
+            _subtitleLabel.Text = _qrTitle.Equals("Scan to play", StringComparison.OrdinalIgnoreCase)
+                ? string.Empty
+                : "Scan to play";
+            SetLabel(cabinetLabel);
+            _picture.BackColor = Color.White;
+        }
+
+        /// <summary>Plaque joueur : avatar pixel dessine localement (meme
+        /// identicon deterministe que la plateforme), pseudo, rang.</summary>
+        public void SetPlayer(string seed, int colors, string pseudo, string subtitle)
+        {
+            _titleLabel.Text = "EN JEU";
+            _subtitleLabel.Text = subtitle;
+            _label.Text = pseudo;
+            _picture.BackColor = Color.FromArgb(12, 12, 18);
+            var previous = _picture.Image;
+            _picture.Image = RenderIdenticon(seed, colors, 280);
+            previous?.Dispose();
+        }
+
+        /// <summary>Identicon 8x8 symetrique — portage GDI de l'algorithme SVG
+        /// de la plateforme (SHA-256, palette HSL par niveau de couleurs).</summary>
+        private static Bitmap RenderIdenticon(string seed, int colors, int size)
+        {
+            var hash = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(seed));
+            var baseHue = (hash[0] << 8 | hash[1]) % 360;
+            var palette = new Color[colors];
+            for (var index = 0; index < colors; index++)
+            {
+                palette[index] = FromHsl(
+                    (baseHue + index * (300 / colors) + hash[2] % 25) % 360,
+                    (62 + index * 4) / 100.0, (52 + index * 3) / 100.0);
+            }
+
+            var small = new Bitmap(8, 8);
+            using (var graphics = Graphics.FromImage(small))
+            {
+                graphics.Clear(Color.FromArgb(20, 20, 30));
+            }
+
+            for (var y = 0; y < 8; y++)
+            {
+                for (var x = 0; x < 4; x++)
+                {
+                    var bitIndex = y * 4 + x;
+                    if ((hash[3 + bitIndex / 8] >> (bitIndex % 8) & 1) == 0)
+                    {
+                        continue;
+                    }
+
+                    var color = palette[hash[(11 + bitIndex) % hash.Length] % palette.Length];
+                    small.SetPixel(x, y, color);
+                    small.SetPixel(7 - x, y, color);
+                }
+            }
+
+            var scaled = new Bitmap(size, size);
+            using (var graphics = Graphics.FromImage(scaled))
+            {
+                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                graphics.DrawImage(small, 0, 0, size, size);
+            }
+
+            small.Dispose();
+            return scaled;
+        }
+
+        private static Color FromHsl(double hue, double saturation, double lightness)
+        {
+            var c = (1 - Math.Abs(2 * lightness - 1)) * saturation;
+            var x = c * (1 - Math.Abs(hue / 60.0 % 2 - 1));
+            var m = lightness - c / 2;
+            var (r, g, b) = hue switch
+            {
+                < 60 => (c, x, 0.0),
+                < 120 => (x, c, 0.0),
+                < 180 => (0.0, c, x),
+                < 240 => (0.0, x, c),
+                < 300 => (x, 0.0, c),
+                _ => (c, 0.0, x)
+            };
+            return Color.FromArgb((int)((r + m) * 255), (int)((g + m) * 255), (int)((b + m) * 255));
+        }
 
         public void PositionBottomRight(Screen screen)
         {

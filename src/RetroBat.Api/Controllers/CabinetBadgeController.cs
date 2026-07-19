@@ -37,9 +37,21 @@ public sealed class CabinetBadgeController : ControllerBase
         [FromBody] CabinetBadgeRequest request,
         CancellationToken cancellationToken)
     {
-        await _overlay.ApplyAsync(request.Visible, request.ImageUrl, request.Label, cancellationToken);
+        await _overlay.ApplyAsync(
+            request.Visible, request.ImageUrl, request.Label,
+            request.Mode, request.Seed, request.Colors, request.Subtitle,
+            cancellationToken);
         return Ok(_overlay.GetState());
     }
 }
 
-public sealed record CabinetBadgeRequest(bool Visible, string? ImageUrl, string? Label);
+/// <summary>Mode qr (borne libre) ou player (plaque joueur : avatar pixel
+/// dessine localement depuis seed+colors, pseudo, rang en sous-titre).</summary>
+public sealed record CabinetBadgeRequest(
+    bool Visible,
+    string? ImageUrl,
+    string? Label,
+    string? Mode = null,
+    string? Seed = null,
+    int? Colors = null,
+    string? Subtitle = null);
