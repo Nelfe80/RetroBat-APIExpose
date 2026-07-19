@@ -60,6 +60,41 @@ public sealed class ChallengeAnnounceController : ControllerBase
     }
 
     /// <summary>
+    /// Consignes de challenge en HAUT de l'écran de jeu :
+    /// « press-start » = invite à commencer la partie (START) ;
+    /// « hold » = partie en pause, ne plus rien toucher ;
+    /// « clear » = retire le bandeau. Poussées par le hub au fil du flux.
+    /// </summary>
+    /// <response code="202">Bandeau appliqué.</response>
+    [HttpPost("phase")]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    public IActionResult Phase([FromBody] ChallengePhaseRequest request)
+    {
+        switch ((request.Phase ?? "").ToLowerInvariant())
+        {
+            case "press-start":
+                _gameOverlay.ShowTop("CHALLENGE",
+                    "Appuyez sur START pour commencer la partie",
+                    "Elle sera mise en pause automatiquement — prête pour le départ", 0);
+                // emulatorlauncher/ES peut rester DEVANT RetroArch après le
+                // lancement : on le remet au premier plan dès qu'il a une
+                // fenêtre (même filet que Live Contest).
+                _ = FocusRetroArchWhenUpAsync();
+                break;
+            case "hold":
+                _gameOverlay.ShowTop("CHALLENGE",
+                    "Ne touchez plus à rien !",
+                    "Partie en pause — départ imminent, attendez le décompte", 0);
+                break;
+            default:
+                _gameOverlay.Hide();
+                break;
+        }
+
+        return Accepted(new { phase = request.Phase });
+    }
+
+    /// <summary>
     /// DÉPART façon Live Contest : décompte 5-4-3-2-1 dans le jeu (overlay
     /// in-game centré) calé sur startsAtUtc, dépause à zéro pile, « GO ! ».
     /// Poussé par le hub quand le gérant lance le challenge — tout le monde
@@ -107,6 +142,7 @@ public sealed class ChallengeAnnounceController : ControllerBase
                     await SendRetroArchUdpAsync("PAUSE_TOGGLE", expectResponse: false);
                 }
 
+                FocusRetroArch();
                 overlay.ShowCenter("GO !", "", 1800);
             }
             catch (Exception)
@@ -114,6 +150,44 @@ public sealed class ChallengeAnnounceController : ControllerBase
             }
         });
         return Accepted(new { startsAtUtc = startsAt });
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    private static void FocusRetroArch()
+    {
+        try
+        {
+            foreach (var process in System.Diagnostics.Process.GetProcessesByName("retroarch"))
+            {
+                if (process.MainWindowHandle != IntPtr.Zero)
+                {
+                    ShowWindow(process.MainWindowHandle, 9); // SW_RESTORE
+                    SetForegroundWindow(process.MainWindowHandle);
+                }
+            }
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private static async Task FocusRetroArchWhenUpAsync()
+    {
+        for (var attempt = 0; attempt < 30; attempt++)
+        {
+            await Task.Delay(2000);
+            if (System.Diagnostics.Process.GetProcessesByName("retroarch")
+                .Any(process => process.MainWindowHandle != IntPtr.Zero))
+            {
+                FocusRetroArch();
+                return;
+            }
+        }
     }
 
     private static async Task<string> SendRetroArchUdpAsync(string command, bool expectResponse)
@@ -133,6 +207,8 @@ public sealed class ChallengeAnnounceController : ControllerBase
 }
 
 public sealed record ChallengeGoRequest(DateTime? StartsAtUtc);
+
+public sealed record ChallengePhaseRequest(string? Phase);
 
 public sealed record ChallengeAnnounceRequest(
     bool? Visible,

@@ -35,6 +35,15 @@ public sealed class LiveContestOverlayService : IDisposable
             "LIVE CONTEST", text, sub ?? "", durationMs, center: true));
     }
 
+    /// <summary>Bandeau HAUT d'écran (challenge de salle) : « Appuyez sur
+    /// START… », « Ne touchez plus à rien ! » — centré en haut du jeu.</summary>
+    public void ShowTop(string? title, string text, string? sub, int? durationMs)
+    {
+        EnsureForm();
+        _form!.BeginInvoke(() => _form.PresentTop(
+            string.IsNullOrWhiteSpace(title) ? "CHALLENGE" : title!, text, sub ?? "", durationMs));
+    }
+
     public void Hide()
     {
         var form = _form;
@@ -294,6 +303,47 @@ public sealed class LiveContestOverlayService : IDisposable
             }
 
             _targetOpacity = 0.9;
+            Opacity = 0.1;
+            _animStep = 0;
+            _fadeTimer.Stop();
+            _fadeTimer.Start();
+            if (!Visible)
+            {
+                Show();
+            }
+
+            _hideTimer.Stop();
+            if (durationMs is > 0)
+            {
+                _hideTimer.Interval = durationMs.Value;
+                _hideTimer.Start();
+            }
+        }
+
+        /// <summary>Bandeau haut-centre : consignes de challenge par-dessus le
+        /// jeu (le joueur les lit sans quitter l'écran des yeux).</summary>
+        public void PresentTop(string brand, string text, string sub, int? durationMs)
+        {
+            _brand.Text = brand.ToUpperInvariant();
+            _text.Text = text;
+            _sub.Text = sub;
+            var area = Screen.PrimaryScreen?.WorkingArea ?? new Rectangle(0, 0, 1920, 1080);
+            Size = new Size(680, 116);
+            _brand.Location = new Point((Width - _brand.PreferredWidth) / 2, 10);
+            _text.Font = _cornerFont;
+            _text.TextAlign = ContentAlignment.MiddleCenter;
+            _text.SetBounds(14, 30, Width - 28, 40);
+            _sub.Font = _cornerSubFont;
+            _sub.TextAlign = ContentAlignment.MiddleCenter;
+            _sub.SetBounds(14, 72, Width - 28, 34);
+            if (_bigIcon is not null)
+            {
+                _bigIcon.Visible = false;
+            }
+
+            Location = new Point(area.Left + (area.Width - Width) / 2, area.Top + 18);
+            _animGrow = false;
+            _targetOpacity = 0.92;
             Opacity = 0.1;
             _animStep = 0;
             _fadeTimer.Stop();

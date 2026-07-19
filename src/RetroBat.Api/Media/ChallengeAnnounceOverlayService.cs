@@ -307,6 +307,17 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
         private readonly Label _qrHint;
         private Image? _background;
         private DateTime? _startsAtUtc;
+        private int _pulseStep;
+
+        // 70 → 140 pt en ~10 pas de 40 ms : le chiffre « saute » à l'écran.
+        private static readonly Font[] _pulseFonts = Enumerable.Range(0, 11)
+            .Select(i => new Font("Segoe UI", 70f + i * 7f, FontStyle.Bold))
+            .ToArray();
+
+        private static Color Blend(Color from, Color to, double t) => Color.FromArgb(
+            (int)(from.R + (to.R - from.R) * t),
+            (int)(from.G + (to.G - from.G) * t),
+            (int)(from.B + (to.B - from.B) * t));
 
         public AnnounceForm(Func<Screen> resolveScreen, Action onExpired)
         {
@@ -343,7 +354,9 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
             };
             _reassert.Start();
 
-            _countdown = new System.Windows.Forms.Timer { Interval = 250 };
+            // Décompte animé : chiffre BLANC qui grossit avec un fondu
+            // d'apparition puis d'effacement à chaque seconde.
+            _countdown = new System.Windows.Forms.Timer { Interval = 40 };
             _countdown.Tick += (_, _) =>
             {
                 if (!Visible || _startsAtUtc is null)
@@ -352,25 +365,51 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
                 }
 
                 var remain = _startsAtUtc.Value - DateTime.UtcNow;
+                string text;
+                var pulse = false;
                 if (remain.TotalSeconds <= 0)
                 {
-                    _timer.Text = "GO !";
-                    // Le jeu est débloqué : le joueur entre en partie et
-                    // appuie sur START — le gérant lance le challenge quand
-                    // tout le monde est prêt.
+                    text = "GO !";
                     _ready.Text = "Appuyez sur START !";
                     // Filet de sécurité : l'annonce disparaît seule 20 s après
                     // le déblocage même si le hub ne la retire pas.
                     if (remain.TotalSeconds < -20)
                     {
                         onExpired();
+                        return;
                     }
+                }
+                else if (remain.TotalMinutes >= 1)
+                {
+                    text = $"{(int)remain.TotalMinutes}:{remain.Seconds:00}";
                 }
                 else
                 {
-                    _timer.Text = remain.TotalMinutes >= 1
-                        ? $"{(int)remain.TotalMinutes}:{remain.Seconds:00}"
-                        : remain.Seconds.ToString();
+                    text = Math.Ceiling(remain.TotalSeconds).ToString("0");
+                    pulse = true;
+                }
+
+                if (text != _timer.Text)
+                {
+                    _timer.Text = text;
+                    _pulseStep = 0;
+                }
+
+                _pulseStep++;
+                if (pulse || text == "GO !")
+                {
+                    // Grossit (70 → 140 pt) et fond : entrée franche, sortie douce.
+                    _timer.Font = _pulseFonts[Math.Min(_pulseFonts.Length - 1, _pulseStep)];
+                    _timer.ForeColor = _pulseStep <= 4
+                        ? Blend(Color.FromArgb(70, 70, 85), Color.White, _pulseStep / 4.0)
+                        : _pulseStep >= 16
+                            ? Blend(Color.White, Color.FromArgb(110, 110, 125), Math.Min(1.0, (_pulseStep - 16) / 8.0))
+                            : Color.White;
+                }
+                else
+                {
+                    _timer.Font = _pulseFonts[4];
+                    _timer.ForeColor = Color.White;
                 }
             };
             _countdown.Start();
@@ -379,7 +418,7 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
             _objective = MakeLabel(new Font("Segoe UI", 18, FontStyle.Bold), Color.FromArgb(255, 210, 87));
             _ready = MakeLabel(new Font("Segoe UI", 22, FontStyle.Bold), Color.White);
             _ready.Text = "Tenez-vous prêt !";
-            _timer = MakeLabel(new Font("Segoe UI", 64, FontStyle.Bold), Color.FromArgb(77, 163, 255));
+            _timer = MakeLabel(_pulseFonts[4], Color.White);
             _logo = new PictureBox { SizeMode = PictureBoxSizeMode.Zoom, BackColor = Color.Transparent };
             _qr = new PictureBox { SizeMode = PictureBoxSizeMode.Zoom, BackColor = Color.White };
             _qrHint = MakeLabel(new Font("Segoe UI", 12, FontStyle.Bold), Color.White);
