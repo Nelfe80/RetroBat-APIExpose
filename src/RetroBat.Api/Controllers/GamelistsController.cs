@@ -22,7 +22,7 @@ public class GamelistsController : ControllerBase
         _gamelists = gamelists;
     }
 
-    public sealed record GamelistGameEntry(string Rom, string Name, string Path = "");
+    public sealed record GamelistGameEntry(string Rom, string Name, string Path = "", bool Ra = false);
 
     public sealed record GamelistGamesSnapshot(string SystemId, int Total, IReadOnlyList<GamelistGameEntry> Games);
 
@@ -136,7 +136,10 @@ public class GamelistsController : ControllerBase
             // "./foo.zip" du gamelist → "roms/<system>/foo.zip".
             var fileName = Path.GetFileName(rawPath.Replace('\\', '/'));
             var launchPath = fileName.Length > 0 ? $"roms/{systemId}/{fileName}" : "";
-            games.Add(new GamelistGameEntry(rom, name.Length > 0 ? name : rom, launchPath));
+            // Dump compatible RetroAchievements (cheevosHash scrappé) : à
+            // privilégier quand plusieurs versions du même jeu existent.
+            var ra = ((string?)game.Element("cheevosHash") ?? "").Trim().Length > 0;
+            games.Add(new GamelistGameEntry(rom, name.Length > 0 ? name : rom, launchPath, ra));
         }
 
         var total = games.Count;
