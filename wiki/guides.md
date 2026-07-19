@@ -48,13 +48,18 @@ Vous exploitez des bornes commercialement (salle, bar, événementiel) : le Flee
 3. **Activez la clé** dans la console d'administration du hub (première saisie = activation ; fonctionne ensuite 14 jours sans internet).
 4. **Enrôlez vos bornes** : chaque borne RetroBat+APIExpose est ajoutée par son adresse locale, depuis la console d'administration.
 5. **Affichez le badge de borne** *(bornes sans caméra)* : activez `CabinetBadgeOverlay` dans la configuration APIExpose de la borne — le QR d'identification et le numéro s'affichent en bas à droite de l'écran, et disparaissent pendant qu'un joueur est connecté.
-6. **Branchez vos écrans** : leaderboard, mosaïque de flotte et écran tournoi sont des pages web plein écran servies par le hub.
+6. **Branchez vos écrans** : sur chaque affichage physique, ouvrez `screen.html?name=ecran-bar` (un nom par écran) — vous pilotez ensuite **depuis la console** ce que chaque écran montre (leaderboard, tournoi, scan…), et chacun garde son contenu tant que vous ne le changez pas.
 
 **Doctrine offline-first** : le hub écoute les bornes, il ne les commande pas. Sans réseau ni hub, chaque borne continue de fonctionner — la licence n'éteint jamais une borne.
 
 ## 🏆 Organisateur de tournois
 
-Depuis la console du hub (rôle animateur ou admin) :
+Depuis la console du hub (rôle animateur ou admin), deux formats :
+
+- **Sprint** : une manche armée — chaque borne joue une partie, la manche démarre seule quand toutes les bornes réservées sont sur le jeu.
+- **Session libre** : une fenêtre de 1 à 4 h sur les bornes réservées — les joueurs **se relaient** (chacun se badge, joue, laisse la place), et le **classement par joueur** s'alimente en direct sur l'écran tournoi. L'écran garde le podium affiché tant que vous ne le changez pas.
+
+Déroulé d'une manche sprint :
 
 1. **Créez une manche** : choisissez le jeu et la durée.
 2. Les joueurs **lancent le jeu sur leur borne** — la manche s'arme toute seule quand toutes les bornes sont prêtes ; une borne sur le mauvais jeu est signalée, jamais forcée.

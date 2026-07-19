@@ -48,13 +48,18 @@ You operate cabinets commercially (venue, bar, events): the Fleet Hub supervises
 3. **Activate the key** in the hub's admin console (first entry = activation; then works 14 days without internet).
 4. **Enroll your cabinets**: each RetroBat+APIExpose cabinet is added by its local address, from the admin console.
 5. **Show the cabinet badge** *(camera-less cabinets)*: enable `CabinetBadgeOverlay` in the cabinet's APIExpose configuration — the check-in QR and cabinet number appear at the bottom-right of the screen, and disappear while a player is checked in.
-6. **Plug in your screens**: leaderboard, fleet mosaic and tournament screen are full-screen web pages served by the hub.
+6. **Plug in your screens**: on each physical display, open `screen.html?name=bar-screen` (one name per display) — you then control **from the console** what every screen shows (leaderboard, tournament, scan…), and each one keeps its content until you change it.
 
 **Offline-first doctrine**: the hub listens to cabinets, it never commands them. Without network or hub, every cabinet keeps working — the license never turns a cabinet off.
 
 ## 🏆 Tournament organizer
 
-From the hub console (host or admin role):
+From the hub console (host or admin role), two formats:
+
+- **Sprint**: an armed round — each cabinet plays one game, the round starts by itself once every reserved cabinet is on the game.
+- **Open session**: a 1–4 h window on the reserved cabinets — players **take turns** (each one badges in, plays, hands over), and the **per-player ranking** feeds live on the tournament screen. The screen keeps the podium up until you change it.
+
+A sprint round goes like this:
 
 1. **Create a round**: pick the game and the duration.
 2. Players **launch the game on their cabinet** — the round arms itself when all cabinets are ready; a cabinet on the wrong game is flagged, never forced.
