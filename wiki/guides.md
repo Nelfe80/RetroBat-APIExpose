@@ -62,3 +62,13 @@ Depuis la console du hub (rôle animateur ou admin) :
 4. À l'expiration : **classement automatique** (les joueurs identifiés apparaissent avec leur pseudo), podium affiché, manche archivée dans l'historique.
 
 Pour un événement ponctuel, l'**Event pass** (30 jours, toutes bornes) évite de licencier la salle à l'année. En stream, l'édition Studio de [Retro Creator](https://nelfetech.com/retrocreator.html) ajoute Live Contest, scoreboard et podium d'animation.
+
+## ✅ Tester AVANT l'événement (indispensable)
+
+Un jeu n'est exploitable en tournoi ou en contest que si sa définition `.MEM` expose les **signaux indispensables** : une famille `scoring` (score live) ou `hiscore` (records) — sans elle, aucun score ne remontera jamais. Ne l'apprenez pas devant le public :
+
+1. **Vérifiez les signaux du jeu** : bouton « Vérifier les signaux » dans la console d'administration du hub (ou `GET /api/v1/tournaments/eligibility`). Le verdict liste score live / records / timer et l'empreinte de la définition.
+2. **Lancez une manche de test** : cochez « Manche de test » à la création. C'est le workflow complet — armement automatique, chrono, scores live, podium — mais **rien n'est enregistré ni publié** : ni dans l'historique de la salle, ni vers la plateforme.
+3. **Rejouez le geste des joueurs** : identification (badge ou téléphone), lancement du jeu, sortie — le même parcours que le jour J.
+
+Ce conseil vaut pour **les trois rôles** : gestionnaire de salle et organisateur de tournois (manche de test du hub), et streamer (la manche de test Live Contest de Retro Creator Studio fait la même chose côté viewers : chaque participant valide ses signaux avant l'ouverture).

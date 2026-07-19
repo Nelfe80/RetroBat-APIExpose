@@ -62,3 +62,13 @@ From the hub console (host or admin role):
 4. At expiry: **automatic ranking** (identified players appear with their nickname), podium displayed, round archived in history.
 
 For a one-off event, the **Event pass** (30 days, all cabinets) avoids licensing the venue year-round. On stream, the Studio edition of [Retro Creator](https://nelfetech.com/retrocreator.html) adds Live Contest, scoreboard and hosting podium.
+
+## ✅ Test BEFORE the event (essential)
+
+A game is only usable in a tournament or contest if its `.MEM` definition exposes the **indispensable signals**: a `scoring` family (live score) or `hiscore` one (records) — without it, no score will ever come up. Don't find out in front of your audience:
+
+1. **Check the game's signals**: "Check signals" button in the hub's admin console (or `GET /api/v1/tournaments/eligibility`). The verdict lists live score / records / timer and the definition's fingerprint.
+2. **Run a test round**: tick "Test round" at creation. It is the full workflow — automatic arming, timer, live scores, podium — but **nothing is recorded or published**: neither in the venue history nor to the platform.
+3. **Replay the players' gestures**: check-in (badge or phone), game launch, checkout — the exact day-of journey.
+
+This advice applies to **all three roles**: venue manager and tournament organizer (the hub's test round), and streamer (the Retro Creator Studio Live Contest test round does the same on the viewer side: every participant validates their signals before opening).
