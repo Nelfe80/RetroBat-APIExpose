@@ -41,7 +41,7 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
 
     public sealed record AnnounceState(
         bool Visible, string? GamePath, string? GameName, string? Objective,
-        DateTime? StartsAtUtc, string? QrImageUrl);
+        DateTime? StartsAtUtc, string? QrImageUrl, string? Conditions = null);
 
     private AnnounceState _state = new(false, null, null, null, null, null);
 
@@ -62,9 +62,10 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
 
     public async Task ApplyAsync(
         bool visible, string? gamePath, string? gameName, string? objective,
-        DateTime? startsAtUtc, string? qrImageUrl, CancellationToken cancellationToken = default)
+        DateTime? startsAtUtc, string? qrImageUrl, string? conditions = null,
+        CancellationToken cancellationToken = default)
     {
-        _state = new AnnounceState(visible, gamePath, gameName, objective, startsAtUtc, qrImageUrl);
+        _state = new AnnounceState(visible, gamePath, gameName, objective, startsAtUtc, qrImageUrl, conditions);
 
         byte[]? qrBytes = null;
         if (visible && !string.IsNullOrWhiteSpace(qrImageUrl))
@@ -111,6 +112,7 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
                 _form.Configure(
                     gameName ?? string.Empty,
                     objective ?? string.Empty,
+                    conditions ?? string.Empty,
                     startsAtUtc,
                     fanart, logo, qrBytes);
                 _form.PositionCentered(ResolveTargetScreen());
@@ -300,6 +302,7 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
         private readonly Form _backdrop;
         private readonly Label _title;
         private readonly Label _objective;
+        private readonly Label _conditions;
         private readonly Label _ready;
         private readonly Label _timer;
         private readonly PictureBox _logo;
@@ -415,7 +418,9 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
             _countdown.Start();
 
             _title = MakeLabel(new Font("Segoe UI", 26, FontStyle.Bold), Color.White);
-            _objective = MakeLabel(new Font("Segoe UI", 18, FontStyle.Bold), Color.FromArgb(255, 210, 87));
+            // L'OBJECTIF est la star de l'annonce : gros et doré.
+            _objective = MakeLabel(new Font("Segoe UI", 26, FontStyle.Bold), Color.FromArgb(255, 210, 87));
+            _conditions = MakeLabel(new Font("Segoe UI", 13.5f, FontStyle.Bold), Color.FromArgb(200, 200, 215));
             _ready = MakeLabel(new Font("Segoe UI", 22, FontStyle.Bold), Color.White);
             _ready.Text = "Tenez-vous prêt !";
             _timer = MakeLabel(_pulseFonts[4], Color.White);
@@ -423,7 +428,7 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
             _qr = new PictureBox { SizeMode = PictureBoxSizeMode.Zoom, BackColor = Color.White };
             _qrHint = MakeLabel(new Font("Segoe UI", 12, FontStyle.Bold), Color.White);
             _qrHint.Text = "📱 Scannez pour participer — vos scores à votre nom";
-            Controls.AddRange([_logo, _title, _objective, _ready, _timer, _qr, _qrHint]);
+            Controls.AddRange([_logo, _title, _objective, _conditions, _ready, _timer, _qr, _qrHint]);
         }
 
         private static Label MakeLabel(Font font, Color color) => new()
@@ -453,12 +458,14 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
         }
 
         public void Configure(
-            string gameName, string objective, DateTime? startsAtUtc,
+            string gameName, string objective, string conditions, DateTime? startsAtUtc,
             string? fanartPath, string? logoPath, byte[]? qrBytes)
         {
             _startsAtUtc = startsAtUtc;
             _title.Text = gameName;
             _objective.Text = objective;
+            // Conditions de participation TOUJOURS annoncées, sous l'objectif.
+            _conditions.Text = conditions.Length > 0 ? "🔒 " + conditions : "Ouvert à tous";
             _timer.Text = string.Empty;
 
             SwapImage(ref _background, fanartPath is null ? null : Image.FromFile(fanartPath));
@@ -511,10 +518,12 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
 
             var w = Width;
             var h = Height;
-            // Haut : logo/titre + objectif, pleine largeur.
-            _logo.Bounds = new Rectangle(w / 4, (int)(h * 0.03), w / 2, (int)(h * 0.20));
-            _title.Bounds = new Rectangle(0, (int)(h * 0.06), w, (int)(h * 0.14));
-            _objective.Bounds = new Rectangle((int)(w * 0.05), (int)(h * 0.26), (int)(w * 0.9), (int)(h * 0.14));
+            // Haut : logo/titre, puis l'OBJECTIF en gros et les conditions
+            // juste en dessous — pleine largeur.
+            _logo.Bounds = new Rectangle(w / 4, (int)(h * 0.03), w / 2, (int)(h * 0.18));
+            _title.Bounds = new Rectangle(0, (int)(h * 0.05), w, (int)(h * 0.13));
+            _objective.Bounds = new Rectangle((int)(w * 0.04), (int)(h * 0.23), (int)(w * 0.92), (int)(h * 0.14));
+            _conditions.Bounds = new Rectangle((int)(w * 0.05), (int)(h * 0.375), (int)(w * 0.9), (int)(h * 0.06));
             // Bas en DEUX colonnes : QR GÉANT à gauche (on le scanne à
             // plusieurs mètres), « Tenez-vous prêt ! » + chrono à droite —
             // plus jamais l'un qui cache l'autre.

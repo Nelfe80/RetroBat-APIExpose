@@ -46,6 +46,7 @@ public sealed class ChallengeAnnounceController : ControllerBase
             request.Objective,
             request.StartsAtUtc,
             request.QrImageUrl,
+            request.Conditions,
             cancellationToken);
         return Accepted(_overlay.GetState());
     }
@@ -55,7 +56,7 @@ public sealed class ChallengeAnnounceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     public async Task<IActionResult> Hide(CancellationToken cancellationToken)
     {
-        await _overlay.ApplyAsync(false, null, null, null, null, null, cancellationToken);
+        await _overlay.ApplyAsync(false, null, null, null, null, null, null, cancellationToken);
         return Accepted(_overlay.GetState());
     }
 
@@ -226,4 +227,5 @@ public sealed record ChallengeAnnounceRequest(
     string? GameName,
     string? Objective,
     DateTime? StartsAtUtc,
-    string? QrImageUrl);
+    string? QrImageUrl,
+    string? Conditions = null);
