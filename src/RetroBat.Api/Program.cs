@@ -127,6 +127,7 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<LiveContestClientS
 builder.Services.AddSingleton<IStartupOverlayService>(sp => sp.GetRequiredService<StartupOverlayService>());
 builder.Services.AddSingleton<ToastOverlayService>();
 builder.Services.AddSingleton<IToastNotificationService>(sp => sp.GetRequiredService<ToastOverlayService>());
+builder.Services.AddSingleton<RetroBat.Api.Infrastructure.CheevosSessionService>();
 builder.Services.AddSingleton<CabinetBadgeOverlayService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<CabinetBadgeOverlayService>());
 builder.Services.AddSingleton<EsNotifyDeduplicationService>();
