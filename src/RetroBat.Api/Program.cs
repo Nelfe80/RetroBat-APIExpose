@@ -127,6 +127,8 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<LiveContestClientS
 builder.Services.AddSingleton<IStartupOverlayService>(sp => sp.GetRequiredService<StartupOverlayService>());
 builder.Services.AddSingleton<ToastOverlayService>();
 builder.Services.AddSingleton<IToastNotificationService>(sp => sp.GetRequiredService<ToastOverlayService>());
+builder.Services.AddSingleton<CabinetBadgeOverlayService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<CabinetBadgeOverlayService>());
 builder.Services.AddSingleton<EsNotifyDeduplicationService>();
 builder.Services.AddSingleton<IEmulationStationNotificationService, EmulationStationNotificationService>();
 builder.Services.AddSingleton<GameListImpactWarningService>();

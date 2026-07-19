@@ -16,6 +16,7 @@ public class ApiExposeOptions
     public RomSetManagerOptions RomSetManager { get; set; } = new();
     public CollectionPackManagerOptions CollectionPackManager { get; set; } = new();
     public StartupOverlayOptions StartupOverlay { get; set; } = new();
+    public CabinetBadgeOverlayOptions CabinetBadgeOverlay { get; set; } = new();
     public SwaggerOptions Swagger { get; set; } = new();
     public WebSocketOptions WebSocket { get; set; } = new();
     public ToastOptions Toasts { get; set; } = new();
@@ -421,6 +422,14 @@ public class ApiExposeOptions
         public bool Enabled { get; set; } = true;
         public string Kind { get; set; } = string.Empty;
         public string Path { get; set; } = string.Empty;
+    }
+
+    /// <summary>Cabinet badge overlay (check-in QR + cabinet number over the
+    /// RetroBat screen, driven by the fleet hub). Venue opt-in.</summary>
+    public class CabinetBadgeOverlayOptions
+    {
+        public bool Enabled { get; set; }
+        public double Opacity { get; set; } = 0.92d;
     }
 
     public class StartupOverlayOptions
