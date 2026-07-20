@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
@@ -221,6 +222,135 @@ public class CommandsController : ControllerBase
         });
     }
 
+    /// <summary>
+    /// Closes the game currently running on this cabinet, whatever the emulator.
+    /// </summary>
+    /// <remarks>
+    /// A plain RetroArch <c>QUIT</c> only works for RetroArch cores with network
+    /// commands enabled — a standalone emulator (MAME, PCSX2, Dolphin…) never
+    /// hears it. This endpoint does both: a best-effort RetroArch QUIT (clean
+    /// SRAM/hiscore flush for RetroArch cores), then a graceful window close
+    /// (WM_CLOSE — MAME writes NVRAM) of every emulator process launched from
+    /// <c>{RetroBatRoot}\emulators\</c>, and finally a forced kill of any that
+    /// ignored the close request. EmulationStation regains the foreground on its
+    /// own once the emulator exits.
+    ///
+    /// Example:
+    ///
+    ///     POST /api/v1/commands/close-game
+    ///     { "graceMs": 2500, "forceKill": true }
+    /// </remarks>
+    /// <param name="payload">Optional grace delay and force-kill toggle.</param>
+    /// <response code="200">Result: which emulators were closed or killed.</response>
+    [HttpPost("close-game")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> CloseGame([FromBody] CloseGamePayload? payload)
+    {
+        var graceMs = Math.Clamp(payload?.GraceMs ?? 2500, 500, 15000);
+        var forceKill = payload?.ForceKill ?? true;
+        var steps = new List<object>();
+
+        // 1. RetroArch clean QUIT — flushes SRAM/hiscores for RetroArch cores;
+        //    silently useless (UDP to a closed port) for standalone emulators.
+        try
+        {
+            using var udp = new UdpClient();
+            var bytes = Encoding.UTF8.GetBytes("QUIT");
+            await udp.SendAsync(bytes, bytes.Length, RetroArchHost, RetroArchPort);
+            steps.Add(new { step = "retroarch-quit", ok = true });
+        }
+        catch (Exception ex)
+        {
+            steps.Add(new { step = "retroarch-quit", ok = false, error = ex.Message });
+        }
+
+        // 2. Emulators launched by RetroBat live under {root}\emulators\ —
+        //    WM_CLOSE lets them save (MAME writes NVRAM/cfg), then any that
+        //    ignore it are force-killed with their child tree.
+        var emulatorsRoot = Path.GetFullPath(Path.Combine(RetroBatPaths.RetroBatRoot, "emulators"))
+            .TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        var matched = new List<Process>();
+        foreach (var process in Process.GetProcesses())
+        {
+            try
+            {
+                var modulePath = process.MainModule?.FileName;
+                if (modulePath is not null &&
+                    modulePath.StartsWith(emulatorsRoot, StringComparison.OrdinalIgnoreCase))
+                {
+                    matched.Add(process);
+                }
+                else
+                {
+                    process.Dispose();
+                }
+            }
+            catch
+            {
+                // Protected/foreign-bitness processes cannot be inspected — never ours.
+                process.Dispose();
+            }
+        }
+
+        var closeRequested = new List<string>();
+        foreach (var process in matched)
+        {
+            try
+            {
+                if (process.MainWindowHandle != IntPtr.Zero)
+                {
+                    process.CloseMainWindow();
+                }
+
+                closeRequested.Add(process.ProcessName);
+            }
+            catch
+            {
+            }
+        }
+
+        steps.Add(new { step = "emulator-close", processes = closeRequested });
+
+        if (matched.Count > 0)
+        {
+            await Task.Delay(graceMs);
+        }
+
+        var killed = new List<string>();
+        foreach (var process in matched)
+        {
+            try
+            {
+                process.Refresh();
+                if (forceKill && !process.HasExited)
+                {
+                    process.Kill(entireProcessTree: true);
+                    killed.Add(process.ProcessName);
+                }
+            }
+            catch
+            {
+            }
+            finally
+            {
+                process.Dispose();
+            }
+        }
+
+        if (killed.Count > 0)
+        {
+            steps.Add(new { step = "emulator-kill", processes = killed });
+        }
+
+        return Ok(new
+        {
+            closed = closeRequested.Count > 0 || killed.Count > 0,
+            emulators = closeRequested,
+            killed,
+            steps
+        });
+    }
+
     private string ResolveRomPath(LaunchPayload payload)
     {
         if (!string.IsNullOrWhiteSpace(payload.RomPath))
@@ -266,6 +396,22 @@ public class LaunchPayload
     /// </summary>
     /// <example></example>
     public string Options { get; set; } = string.Empty;
+}
+
+public class CloseGamePayload
+{
+    /// <summary>
+    /// Delay (ms) between the graceful window close and the forced kill.
+    /// Clamped to [500, 15000]. Default 2500.
+    /// </summary>
+    /// <example>2500</example>
+    public int? GraceMs { get; set; }
+
+    /// <summary>
+    /// Force-kill emulators that ignore the graceful close. Default true.
+    /// </summary>
+    /// <example>true</example>
+    public bool? ForceKill { get; set; }
 }
 
 public class RetroArchCommandPayload
