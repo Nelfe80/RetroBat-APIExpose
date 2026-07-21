@@ -310,6 +310,104 @@ public sealed class RomCanonicalResolver
         return string.Empty;
     }
 
+    // ── capture de score disponible ? ────────────────────────────────────────
+
+    private sealed record ScoreIndex(Dictionary<string, string> AliasToSlug, HashSet<string> MemStems);
+
+    private readonly ConcurrentDictionary<string, Lazy<ScoreIndex>> _scoreIndexes =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Le score de ce jeu est-il CAPTURABLE sur cette machine ? Vrai
+    /// s'il existe une definition .MEM (resources/ram/&lt;system&gt;) pour ce
+    /// dump — cherchee par md5, hash RA, nom de fichier puis slug direct.
+    /// C'est ce drapeau qui permet a l'app joueur d'afficher « pas de record
+    /// possible » AVANT de lancer, au lieu de frustrer apres la partie.</summary>
+    public bool HasScoreDefinition(string systemId, string? romFileName, string? md5, string? cheevosHash)
+    {
+        if (string.IsNullOrWhiteSpace(systemId))
+        {
+            return false;
+        }
+
+        var index = _scoreIndexes.GetOrAdd(
+            systemId.Trim().ToLowerInvariant(),
+            key => new Lazy<ScoreIndex>(() => LoadScoreIndex(key), LazyThreadSafetyMode.ExecutionAndPublication)).Value;
+        if (index.MemStems.Count == 0)
+        {
+            return false;
+        }
+
+        // Les alias portent parfois une ponctuation que le nom de fichier n'a
+        // pas (« 'Nth' ») : tout se compare aussi en SLUG. Et le stem sans ses
+        // tags de dump (« (Europe) ») matche le .MEM directement.
+        var stem = Path.GetFileNameWithoutExtension((romFileName ?? "").Replace('\\', '/')).Trim();
+        var cut = stem.IndexOfAny(['(', '[']);
+        var stemNoTags = cut > 0 ? stem[..cut].TrimEnd() : stem;
+        foreach (var probe in new[] { md5, cheevosHash, stem, Slugify(stem), Slugify(stemNoTags) })
+        {
+            var key = (probe ?? "").Trim().ToLowerInvariant();
+            if (key.Length > 0 && index.AliasToSlug.TryGetValue(key, out var slug) &&
+                index.MemStems.Contains(slug))
+            {
+                return true;
+            }
+        }
+
+        // Repli : le slug du fichier (avec ou sans tags) EST un .MEM.
+        return (stem.Length > 0 && index.MemStems.Contains(Slugify(stem))) ||
+               (stemNoTags.Length > 0 && index.MemStems.Contains(Slugify(stemNoTags)));
+    }
+
+    private ScoreIndex LoadScoreIndex(string normalizedSystem)
+    {
+        var aliasToSlug = new Dictionary<string, string>(StringComparer.Ordinal);
+        var memStems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // Le dossier ram des jeux arcade s'appelle « arcade », quel que soit le
+        // systeme RetroBat (mame, fbneo…).
+        var folder = normalizedSystem is "mame" or "mame64" or "fbneo" or "fba" ? "arcade" : normalizedSystem;
+        var ramRoot = Path.Combine(RetroBatPaths.PluginRoot, "resources", "ram", folder);
+        if (!Directory.Exists(ramRoot))
+        {
+            return new ScoreIndex(aliasToSlug, memStems);
+        }
+
+        try
+        {
+            foreach (var file in Directory.EnumerateFiles(ramRoot, "*.MEM"))
+            {
+                memStems.Add(Path.GetFileNameWithoutExtension(file));
+            }
+
+            var aliasPath = Path.Combine(ramRoot, "alias.json");
+            if (File.Exists(aliasPath))
+            {
+                using var parsed = JsonDocument.Parse(File.ReadAllText(aliasPath));
+                foreach (var property in parsed.RootElement.EnumerateObject())
+                {
+                    var slug = property.Value.GetString();
+                    if (!string.IsNullOrWhiteSpace(slug))
+                    {
+                        aliasToSlug.TryAdd(property.Name.Trim().ToLowerInvariant(), slug.Trim());
+                        // Cle slugifiee AUSSI : la ponctuation des alias
+                        // (« 'Nth' ») differe des noms de fichiers.
+                        var slugKey = Slugify(property.Name);
+                        if (slugKey.Length > 0)
+                        {
+                            aliasToSlug.TryAdd(slugKey, slug.Trim());
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
+        {
+            _logger?.LogWarning(ex, "Index .MEM illisible pour {System}.", normalizedSystem);
+        }
+
+        return new ScoreIndex(aliasToSlug, memStems);
+    }
+
     /// <summary>Identites DAT d'une entree (fn/id/set + alias aka). Le nom
     /// d'affichage « n » n'indexe JAMAIS (doctrine : pas une identite).</summary>
     private static IEnumerable<string> ReadDatIdentities(JsonObject entry)

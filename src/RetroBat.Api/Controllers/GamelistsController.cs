@@ -30,7 +30,8 @@ public class GamelistsController : ControllerBase
     /// historiques — les consommateurs existants ne voient rien changer.</summary>
     public sealed record GamelistGameEntry(
         string Rom, string Name, string Path = "", bool Ra = false,
-        string Md5 = "", string GameKey = "", string GameName = "");
+        string Md5 = "", string GameKey = "", string GameName = "",
+        bool Scorable = false);
 
     public sealed record GamelistGamesSnapshot(string SystemId, int Total, IReadOnlyList<GamelistGameEntry> Games);
 
@@ -160,7 +161,8 @@ public class GamelistsController : ControllerBase
                 ?? _canonical.ResolveByRomName(systemId, fileName);
             games.Add(new GamelistGameEntry(
                 rom, name.Length > 0 ? name : rom, launchPath, ra,
-                md5, canonical?.GameKey ?? "", canonical?.Name ?? ""));
+                md5, canonical?.GameKey ?? "", canonical?.Name ?? "",
+                _canonical.HasScoreDefinition(systemId, fileName, md5, cheevosHash)));
         }
 
         var total = games.Count;
@@ -174,7 +176,7 @@ public class GamelistsController : ControllerBase
 
     public sealed record ResolveResponse(
         string System, string Hash, string GameKey, string GameName,
-        string CanonicalSystem, string Kind, string Source);
+        string CanonicalSystem, string Kind, string Source, bool Scorable = false);
 
     /// <summary>
     /// Resolves a ROM content hash to its canonical game identity.
@@ -211,11 +213,12 @@ public class GamelistsController : ControllerBase
         }
 
         var hash = (md5 ?? "").ToLowerInvariant();
+        var scorable = _canonical.HasScoreDefinition(system, rom, md5, null);
         return Ok(canonical is null
-            ? new ResolveResponse(system, hash, "", "", "", "", "none")
+            ? new ResolveResponse(system, hash, "", "", "", "", "none", scorable)
             : new ResolveResponse(
                 system, hash, canonical.GameKey, canonical.Name,
-                canonical.CanonicalSystem, canonical.Kind, source ?? canonical.Source));
+                canonical.CanonicalSystem, canonical.Kind, source ?? canonical.Source, scorable));
     }
 
     private static bool RomExists(string systemDir, string? rawPath)
