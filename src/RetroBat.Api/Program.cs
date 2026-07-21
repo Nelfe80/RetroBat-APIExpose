@@ -152,6 +152,7 @@ builder.Services.AddSingleton<EmulationStationSystemConfigService>();
 builder.Services.AddSingleton<InterfaceTextService>();
 builder.Services.AddSingleton<ApiExposeTaxonomyService>();
 builder.Services.AddSingleton<RomMetadataResolver>();
+builder.Services.AddSingleton<RomCanonicalResolver>();
 builder.Services.AddSingleton<SystemIdNormalizer>();
 builder.Services.AddSingleton<GameNameNormalizer>();
 builder.Services.AddSingleton<MediaSystemRules>();

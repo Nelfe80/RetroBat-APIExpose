@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using RetroBat.Api.Media;
 using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Paths;
 using System.Xml.Linq;
@@ -16,13 +17,20 @@ namespace RetroBat.Api.Controllers;
 public class GamelistsController : ControllerBase
 {
     private readonly IGamelistStore _gamelists;
+    private readonly RomCanonicalResolver _canonical;
 
-    public GamelistsController(IGamelistStore gamelists)
+    public GamelistsController(IGamelistStore gamelists, RomCanonicalResolver canonical)
     {
         _gamelists = gamelists;
+        _canonical = canonical;
     }
 
-    public sealed record GamelistGameEntry(string Rom, string Name, string Path = "", bool Ra = false);
+    /// <summary>Additif (doctrine contrat) : `md5` (du gamelist.xml) et
+    /// `gameKey`/`gameName` canoniques (résolus par hash) s'ajoutent aux champs
+    /// historiques — les consommateurs existants ne voient rien changer.</summary>
+    public sealed record GamelistGameEntry(
+        string Rom, string Name, string Path = "", bool Ra = false,
+        string Md5 = "", string GameKey = "", string GameName = "");
 
     public sealed record GamelistGamesSnapshot(string SystemId, int Total, IReadOnlyList<GamelistGameEntry> Games);
 
@@ -138,8 +146,16 @@ public class GamelistsController : ControllerBase
             var launchPath = fileName.Length > 0 ? $"roms/{systemId}/{fileName}" : "";
             // Dump compatible RetroAchievements (cheevosHash scrappé) : à
             // privilégier quand plusieurs versions du même jeu existent.
-            var ra = ((string?)game.Element("cheevosHash") ?? "").Trim().Length > 0;
-            games.Add(new GamelistGameEntry(rom, name.Length > 0 ? name : rom, launchPath, ra));
+            var cheevosHash = ((string?)game.Element("cheevosHash") ?? "").Trim();
+            var ra = cheevosHash.Length > 0;
+            // Identité CANONIQUE par le hash du contenu (doctrine : un jeu =
+            // système + ROM, jamais un nom). Le md5 vient du scrap ; le hash RA
+            // sert de second essai (dumps headered dont le md5 differe).
+            var md5 = ((string?)game.Element("md5") ?? "").Trim().ToLowerInvariant();
+            var canonical = _canonical.Resolve(systemId, md5) ?? _canonical.Resolve(systemId, cheevosHash);
+            games.Add(new GamelistGameEntry(
+                rom, name.Length > 0 ? name : rom, launchPath, ra,
+                md5, canonical?.GameKey ?? "", canonical?.Name ?? ""));
         }
 
         var total = games.Count;
@@ -149,6 +165,42 @@ public class GamelistsController : ControllerBase
         }
 
         return Ok(new GamelistGamesSnapshot(systemId, total, games));
+    }
+
+    public sealed record ResolveResponse(
+        string System, string Hash, string GameKey, string GameName,
+        string CanonicalSystem, string Kind, string Source);
+
+    /// <summary>
+    /// Resolves a ROM content hash to its canonical game identity.
+    /// </summary>
+    /// <remarks>
+    /// Fleet doctrine: a game is identified by <c>system + ROM content</c>,
+    /// never by a display name. The hash (md5/crc/sha1 or RetroAchievements
+    /// hash) is looked up in the consolidated ROM database
+    /// (<c>resources/gamelist</c>), then in the score-definition aliases
+    /// (<c>resources/ram/&lt;system&gt;/alias.json</c>). All dumps of the same
+    /// game (USA/Europe/rev) share one <c>gameKey</c>; hacks and trainers keep
+    /// their own identity.
+    /// </remarks>
+    /// <response code="200">Canonical identity (source=none when unknown).</response>
+    /// <response code="400">Missing system or hash.</response>
+    [HttpGet("resolve")]
+    [ProducesResponseType(typeof(ResolveResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public IActionResult ResolveHash([FromQuery] string system, [FromQuery] string md5)
+    {
+        if (string.IsNullOrWhiteSpace(system) || string.IsNullOrWhiteSpace(md5))
+        {
+            return BadRequest(new { message = "system and md5 are required." });
+        }
+
+        var canonical = _canonical.Resolve(system, md5);
+        return Ok(canonical is null
+            ? new ResolveResponse(system, md5.ToLowerInvariant(), "", "", "", "", "none")
+            : new ResolveResponse(
+                system, md5.ToLowerInvariant(), canonical.GameKey, canonical.Name,
+                canonical.CanonicalSystem, canonical.Kind, canonical.Source));
     }
 
     private static bool RomExists(string systemDir, string? rawPath)
