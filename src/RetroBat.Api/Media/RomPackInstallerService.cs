@@ -4828,6 +4828,29 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
     {
         try
         {
+            // Le md5 doit etre celui du CONTENU de la rom, pas de l'archive :
+            // c'est lui qui matche les referentiels (No-Intro, RetroAchievements,
+            // base consolidee resources/gamelist). Un .zip mono-rom est donc
+            // hashe sur son entree decompressee ; multi-entrees ou non-zip :
+            // le fichier tel quel.
+            if (path.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    using var archive = ZipFile.OpenRead(path);
+                    var entries = archive.Entries.Where(entry => entry.Length > 0).ToList();
+                    if (entries.Count == 1)
+                    {
+                        using var entryStream = entries[0].Open();
+                        return Convert.ToHexString(MD5.HashData(entryStream)).ToLowerInvariant();
+                    }
+                }
+                catch (InvalidDataException)
+                {
+                    // Pas une vraie archive zip : hash du fichier brut.
+                }
+            }
+
             using var stream = File.OpenRead(path);
             return Convert.ToHexString(MD5.HashData(stream)).ToLowerInvariant();
         }

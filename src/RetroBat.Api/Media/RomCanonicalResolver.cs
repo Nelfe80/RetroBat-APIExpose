@@ -37,7 +37,11 @@ public sealed class RomCanonicalResolver
         string Kind,
         string Source);
 
-    private readonly ConcurrentDictionary<string, Lazy<Dictionary<string, CanonicalGame>>> _dbIndexes =
+    private sealed record DbIndexes(
+        Dictionary<string, CanonicalGame> ByHash,
+        Dictionary<string, CanonicalGame> ByName);
+
+    private readonly ConcurrentDictionary<string, Lazy<DbIndexes>> _dbIndexes =
         new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, Lazy<Dictionary<string, string>>> _memIndexes =
         new(StringComparer.OrdinalIgnoreCase);
@@ -58,11 +62,8 @@ public sealed class RomCanonicalResolver
             return null;
         }
 
-        var db = _dbIndexes.GetOrAdd(
-            systemId.Trim().ToLowerInvariant(),
-            key => new Lazy<Dictionary<string, CanonicalGame>>(
-                () => LoadDbIndex(key), LazyThreadSafetyMode.ExecutionAndPublication)).Value;
-        if (db.TryGetValue(normalizedHash, out var canonical))
+        var db = GetIndexes(systemId);
+        if (db.ByHash.TryGetValue(normalizedHash, out var canonical))
         {
             return canonical;
         }
@@ -84,16 +85,38 @@ public sealed class RomCanonicalResolver
         return null;
     }
 
+    /// <summary>Fiche canonique par NOM DE FICHIER ROM (tags de dump inclus,
+    /// « Zool - Ninja of the Nth Dimension (Europe) ») — identite DAT du dump,
+    /// pas un nom d'affichage. C'est la couche qui garantit la couverture des
+    /// packs : les roms installees et la base viennent du meme ecosysteme, le
+    /// nom de fichier y est canonique. Null si inconnu.</summary>
+    public CanonicalGame? ResolveByRomName(string systemId, string? romFileName)
+    {
+        var stem = Path.GetFileNameWithoutExtension((romFileName ?? string.Empty).Replace('\\', '/')).Trim();
+        if (string.IsNullOrWhiteSpace(systemId) || stem.Length == 0)
+        {
+            return null;
+        }
+
+        return GetIndexes(systemId).ByName.TryGetValue(Slugify(stem), out var canonical) ? canonical : null;
+    }
+
+    private DbIndexes GetIndexes(string systemId) => _dbIndexes.GetOrAdd(
+        systemId.Trim().ToLowerInvariant(),
+        key => new Lazy<DbIndexes>(() => LoadIndexes(key), LazyThreadSafetyMode.ExecutionAndPublication)).Value;
+
     // ── couche 1 : base ROM consolidée ───────────────────────────────────────
 
-    private Dictionary<string, CanonicalGame> LoadDbIndex(string normalizedSystem)
+    private DbIndexes LoadIndexes(string normalizedSystem)
     {
-        var index = new Dictionary<string, CanonicalGame>(StringComparer.Ordinal);
+        var byHash = new Dictionary<string, CanonicalGame>(StringComparer.Ordinal);
+        var byName = new Dictionary<string, CanonicalGame>(StringComparer.Ordinal);
+        var indexes = new DbIndexes(byHash, byName);
         var groupsRoot = Path.Combine(RetroBatPaths.PluginRoot, "resources", "gamelist", "systems");
         var dataPath = ResolveDataFile(groupsRoot, normalizedSystem);
         if (string.IsNullOrWhiteSpace(dataPath))
         {
-            return index;
+            return indexes;
         }
 
         try
@@ -126,25 +149,49 @@ public sealed class RomCanonicalResolver
                     continue;
                 }
 
-                foreach (var hash in ReadHashes(entry))
+                // PONTAGE PAR HASH : la base contient des entrees dupliquees du
+                // meme dump avec des groupes DIFFERENTS (« Zool (Gremlin)
+                // (Europe) » grp=zool et « Zool - Ninja... (Europe) »
+                // grp=zool-ninja..., meme md5). Si un des hash de l'entree est
+                // deja indexe, SA fiche fait foi pour toute l'entree — un meme
+                // dump donne la meme cle, qu'on le resolve par hash ou par nom.
+                var hashes = ReadHashes(entry).ToList();
+                foreach (var hash in hashes)
                 {
-                    // Premier arrivé, premier servi : un hash identifie UN dump,
-                    // les collisions réelles sont inexistantes.
-                    index.TryAdd(hash, canonical);
+                    if (byHash.TryGetValue(hash, out var existing))
+                    {
+                        canonical = existing;
+                        break;
+                    }
+                }
+
+                foreach (var hash in hashes)
+                {
+                    byHash.TryAdd(hash, canonical);
+                }
+
+                foreach (var identity in ReadDatIdentities(entry))
+                {
+                    var slug = Slugify(identity);
+                    if (slug.Length > 0)
+                    {
+                        byName.TryAdd(slug, canonical);
+                    }
                 }
             }
 
             _logger?.LogInformation(
-                "Index canonique {System} : {Count} hash indexés depuis {Path}.",
-                normalizedSystem, index.Count, Path.GetFileName(dataPath));
+                "Index canonique {System} : {Hashes} hash, {Names} identites DAT ({Path}).",
+                normalizedSystem, byHash.Count, byName.Count, Path.GetFileName(dataPath));
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             _logger?.LogWarning(ex, "Index canonique illisible pour {System}.", normalizedSystem);
-            index.Clear();
+            byHash.Clear();
+            byName.Clear();
         }
 
-        return index;
+        return indexes;
     }
 
     private static CanonicalGame? BuildCanonical(JsonObject entry, string requestedSystem)
@@ -261,6 +308,40 @@ public sealed class RomCanonicalResolver
         }
 
         return string.Empty;
+    }
+
+    /// <summary>Identites DAT d'une entree (fn/id/set + alias aka). Le nom
+    /// d'affichage « n » n'indexe JAMAIS (doctrine : pas une identite).</summary>
+    private static IEnumerable<string> ReadDatIdentities(JsonObject entry)
+    {
+        foreach (var field in new[] { "fn", "id", "set" })
+        {
+            var value = ReadString(entry, field);
+            if (value.Length > 0)
+            {
+                yield return value;
+            }
+        }
+
+        if (entry.TryGetPropertyValue("aka", out var akaNode) && akaNode is JsonArray aliases)
+        {
+            foreach (var aliasNode in aliases)
+            {
+                if (aliasNode is not JsonObject alias)
+                {
+                    continue;
+                }
+
+                foreach (var field in new[] { "fn", "id", "set" })
+                {
+                    var value = ReadString(alias, field);
+                    if (value.Length > 0)
+                    {
+                        yield return value;
+                    }
+                }
+            }
+        }
     }
 
     // ── couche 2 : alias .MEM (md5 → slug de définition de score) ────────────

@@ -152,7 +152,12 @@ public class GamelistsController : ControllerBase
             // système + ROM, jamais un nom). Le md5 vient du scrap ; le hash RA
             // sert de second essai (dumps headered dont le md5 differe).
             var md5 = ((string?)game.Element("md5") ?? "").Trim().ToLowerInvariant();
-            var canonical = _canonical.Resolve(systemId, md5) ?? _canonical.Resolve(systemId, cheevosHash);
+            // Cascade : hash (contenu) → nom de FICHIER (identite DAT du dump,
+            // garantie par les packs — le md5 du gamelist est celui du fichier
+            // archive, pas de la rom decompressee, donc il ne suffit pas).
+            var canonical = _canonical.Resolve(systemId, md5)
+                ?? _canonical.Resolve(systemId, cheevosHash)
+                ?? _canonical.ResolveByRomName(systemId, fileName);
             games.Add(new GamelistGameEntry(
                 rom, name.Length > 0 ? name : rom, launchPath, ra,
                 md5, canonical?.GameKey ?? "", canonical?.Name ?? ""));
@@ -188,19 +193,29 @@ public class GamelistsController : ControllerBase
     [HttpGet("resolve")]
     [ProducesResponseType(typeof(ResolveResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public IActionResult ResolveHash([FromQuery] string system, [FromQuery] string md5)
+    public IActionResult ResolveHash([FromQuery] string system, [FromQuery] string? md5 = null, [FromQuery] string? rom = null)
     {
-        if (string.IsNullOrWhiteSpace(system) || string.IsNullOrWhiteSpace(md5))
+        if (string.IsNullOrWhiteSpace(system) ||
+            (string.IsNullOrWhiteSpace(md5) && string.IsNullOrWhiteSpace(rom)))
         {
-            return BadRequest(new { message = "system and md5 are required." });
+            return BadRequest(new { message = "system and md5 (or rom) are required." });
         }
 
+        // Cascade : hash du contenu, puis nom de FICHIER (identite DAT).
         var canonical = _canonical.Resolve(system, md5);
+        var source = canonical?.Source;
+        if (canonical is null && !string.IsNullOrWhiteSpace(rom))
+        {
+            canonical = _canonical.ResolveByRomName(system, rom);
+            source = canonical is null ? null : "rom-name";
+        }
+
+        var hash = (md5 ?? "").ToLowerInvariant();
         return Ok(canonical is null
-            ? new ResolveResponse(system, md5.ToLowerInvariant(), "", "", "", "", "none")
+            ? new ResolveResponse(system, hash, "", "", "", "", "none")
             : new ResolveResponse(
-                system, md5.ToLowerInvariant(), canonical.GameKey, canonical.Name,
-                canonical.CanonicalSystem, canonical.Kind, canonical.Source));
+                system, hash, canonical.GameKey, canonical.Name,
+                canonical.CanonicalSystem, canonical.Kind, source ?? canonical.Source));
     }
 
     private static bool RomExists(string systemDir, string? rawPath)
