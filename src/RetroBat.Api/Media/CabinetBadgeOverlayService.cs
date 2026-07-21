@@ -150,6 +150,9 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
 
                 _form.PositionBottomRight(ResolveTargetScreen());
                 _form.Show();
+                // Chaque affichage reaffirme le TopMost : le flag peut avoir
+                // ete perdu pendant que la fenetre etait cachee.
+                _form.TopMost = true;
             }
             catch (Exception ex)
             {
@@ -298,7 +301,13 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
         [DllImport("user32.dll")]
         private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint flags);
 
+        [DllImport("user32.dll")]
+        private static extern int GetWindowLong(IntPtr hWnd, int index);
+
         private static readonly IntPtr TopMostHandle = new(-1);
+        private static readonly IntPtr NoTopMostHandle = new(-2);
+        private const int GwlExstyle = -20;
+        private const int WsExTopmost = 0x0008;
         private const uint NoSizeNoActivate = 0x0001 /*NOSIZE*/ | 0x0010 /*NOACTIVATE*/ | 0x0040 /*SHOWWINDOW*/;
 
         public BadgeForm(double opacity, string title, Func<Screen> resolveScreen)
@@ -306,16 +315,39 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
             // EmulationStation repasse au-dessus a chaque (re)lancement : on
             // reaffirme position + TopMost periodiquement, sans jamais voler
             // le focus.
-            _reassert = new System.Windows.Forms.Timer { Interval = 3000 };
+            _reassert = new System.Windows.Forms.Timer { Interval = 2000 };
             _reassert.Tick += (_, _) =>
             {
-                if (!Visible)
+                // BLINDE : une exception ici (resolveScreen pendant un restart
+                // d'ES, ecran debranche…) tuait le timer — le badge perdait son
+                // TopMost a la premiere occasion et ne remontait JAMAIS
+                // (« il faut redemarrer ES pour le voir pop »).
+                try
                 {
-                    return;
-                }
+                    if (!Visible)
+                    {
+                        return;
+                    }
 
-                PositionBottomRight(resolveScreen());
-                SetWindowPos(Handle, TopMostHandle, Location.X, Location.Y, 0, 0, NoSizeNoActivate);
+                    PositionBottomRight(resolveScreen());
+
+                    // Le flag REEL (pas la propriete WinForms, qui repond sur
+                    // son cache) : quand Windows a retire WS_EX_TOPMOST, un
+                    // simple SetWindowPos(TOPMOST) est parfois refuse en
+                    // silence — la sequence documentee NOTOPMOST puis TOPMOST
+                    // le retablit.
+                    var exStyle = GetWindowLong(Handle, GwlExstyle);
+                    if ((exStyle & WsExTopmost) == 0)
+                    {
+                        SetWindowPos(Handle, NoTopMostHandle, Location.X, Location.Y, 0, 0, NoSizeNoActivate);
+                    }
+
+                    SetWindowPos(Handle, TopMostHandle, Location.X, Location.Y, 0, 0, NoSizeNoActivate);
+                }
+                catch (Exception)
+                {
+                    // On retentera au prochain tick — le timer ne meurt jamais.
+                }
             };
             _reassert.Start();
             FormBorderStyle = FormBorderStyle.None;
