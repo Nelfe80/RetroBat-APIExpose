@@ -168,16 +168,16 @@ public sealed class RomCanonicalResolver
         // Un hack/trainer/proto garde SA clé (id) : ses scores ne rejoignent
         // jamais le palmarès du jeu original. Un jeu normal prend la clé de
         // GROUPE : tous les dumps (USA/Europe/rev) sont LE même jeu.
-        var slug = kind.Equals("game", StringComparison.OrdinalIgnoreCase)
+        var slug = Slugify(kind.Equals("game", StringComparison.OrdinalIgnoreCase)
             ? (grp.Length > 0 ? grp : id)
-            : (id.Length > 0 ? id : grp);
+            : (id.Length > 0 ? id : grp));
         if (slug.Length == 0)
         {
             return null;
         }
 
         return new CanonicalGame(
-            $"{system}/{slug.ToLowerInvariant()}",
+            $"{system}/{slug}",
             Name: ReadString(entry, "n"),
             CanonicalSystem: system,
             Kind: kind.ToLowerInvariant(),
@@ -302,6 +302,22 @@ public sealed class RomCanonicalResolver
         }
 
         return index;
+    }
+
+    /// <summary>Normalise un identifiant de la base (« 64th._Street:_A_… ») en
+    /// slug sur — minuscules, alphanumerique et tirets — pour que la cle
+    /// traverse URL, SQL et attributs HTML sans surprise, dans le meme charset
+    /// que les cles de repli « systeme/slug-du-fichier ».</summary>
+    private static string Slugify(string value)
+    {
+        var slug = new string(value.Trim().ToLowerInvariant()
+            .Select(c => char.IsLetterOrDigit(c) ? c : '-').ToArray()).Trim('-');
+        while (slug.Contains("--"))
+        {
+            slug = slug.Replace("--", "-");
+        }
+
+        return slug;
     }
 
     private static string ReadString(JsonObject entry, string field)
