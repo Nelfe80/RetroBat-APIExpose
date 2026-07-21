@@ -132,6 +132,8 @@ builder.Services.AddSingleton<CabinetBadgeOverlayService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<CabinetBadgeOverlayService>());
 builder.Services.AddSingleton<ChallengeAnnounceOverlayService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<ChallengeAnnounceOverlayService>());
+builder.Services.AddSingleton<CabinetLockOverlayService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<CabinetLockOverlayService>());
 builder.Services.AddSingleton<EsNotifyDeduplicationService>();
 builder.Services.AddSingleton<IEmulationStationNotificationService, EmulationStationNotificationService>();
 builder.Services.AddSingleton<GameListImpactWarningService>();
