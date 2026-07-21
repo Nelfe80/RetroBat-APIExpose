@@ -89,7 +89,15 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
             }
         }
 
-        _state = new BadgeState(visible, imageUrl, label, playerMode ? "player" : "qr", subtitle, honors, challengeEndsAtUtc);
+        // En mode QR, « visible » n'est VRAI que si on a une image a montrer.
+        // Sinon (hub injoignable au moment du fetch — redemarrage), l'etat
+        // rapportait visible:true sans rien a l'ecran, et le hub, voyant l'etat
+        // conforme, ne re-poussait JAMAIS : le QR ne « popait » pas jusqu'au
+        // prochain changement. En rapportant visible:false, le hub re-pousse au
+        // poll suivant et le telechargement est retente jusqu'a reussite.
+        var displayable = playerMode || imageBytes is not null || _currentImageUrl is not null;
+        _state = new BadgeState(
+            visible && displayable, imageUrl, label, playerMode ? "player" : "qr", subtitle, honors, challengeEndsAtUtc);
         EnsureUiThreadStarted(cancellationToken);
 
         Control? dispatcher;
@@ -108,8 +116,10 @@ public sealed class CabinetBadgeOverlayService : BackgroundService
         {
             try
             {
-                if (!visible)
+                if (!visible || !displayable)
                 {
+                    // Rien d'affichable (image du QR pas encore obtenue) : on ne
+                    // montre pas un cadre vide.
                     _form?.Hide();
                     completion.TrySetResult();
                     return;
