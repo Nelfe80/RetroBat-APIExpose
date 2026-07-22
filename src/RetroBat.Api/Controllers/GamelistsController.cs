@@ -35,6 +35,13 @@ public class GamelistsController : ControllerBase
 
     public sealed record GamelistGamesSnapshot(string SystemId, int Total, IReadOnlyList<GamelistGameEntry> Games);
 
+    /// <summary>Fiche détaillée d'un jeu (médias en URLs /api/v1/media).</summary>
+    public sealed record GamelistGameDetail(
+        string Rom, string Name, string Path, string Desc, string Genre,
+        string Releasedate, string Developer, string Publisher, string Players, string Rating,
+        string Image, string Thumbnail, string Fanart, string Marquee, string Video,
+        string GameKey, bool Scorable);
+
     public sealed record GamelistSystemEntry(string SystemId, int Games);
 
     public sealed record GamelistSystemsSnapshot(int Total, IReadOnlyList<GamelistSystemEntry> Systems);
@@ -94,6 +101,81 @@ public class GamelistsController : ControllerBase
     /// </remarks>
     /// <response code="200">Installed games of the system.</response>
     /// <response code="404">The system has no readable gamelist.</response>
+    /// <summary>Fiche COMPLÈTE d'un jeu (description, genre, année, éditeur,
+    /// joueurs + médias en URLs /api/v1/media) — pour l'app joueur en salle
+    /// (fiche détaillée / mode Match). Match par nom de fichier ROM (sans
+    /// extension) ou nom d'affichage.</summary>
+    [HttpGet("{systemId}/game")]
+    [ProducesResponseType(typeof(GamelistGameDetail), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult GetGame(string systemId, [FromQuery] string rom)
+    {
+        if (string.IsNullOrWhiteSpace(systemId) || !string.Equals(Path.GetFileName(systemId), systemId, StringComparison.Ordinal) ||
+            string.IsNullOrWhiteSpace(rom))
+        {
+            return NotFound(new { message = "Invalid system id or rom." });
+        }
+
+        var path = Path.Combine(RetroBatPaths.RomsRoot, systemId, "gamelist.xml");
+        if (!System.IO.File.Exists(path))
+        {
+            return NotFound(new { message = $"No gamelist for system '{systemId}'." });
+        }
+
+        XDocument? doc;
+        lock (_gamelists.GetLock(path))
+        {
+            doc = _gamelists.Load(path, LoadOptions.None);
+        }
+
+        var wanted = Path.GetFileNameWithoutExtension(rom.Replace('\\', '/')).Trim();
+        var game = doc?.Root?.Elements("game").FirstOrDefault(g =>
+        {
+            var gp = Path.GetFileNameWithoutExtension(((string?)g.Element("path") ?? "").Replace('\\', '/')).Trim();
+            return gp.Equals(wanted, StringComparison.OrdinalIgnoreCase) ||
+                ((string?)g.Element("name") ?? "").Trim().Equals(rom.Trim(), StringComparison.OrdinalIgnoreCase);
+        });
+        if (game is null)
+        {
+            return NotFound(new { message = "Game not found." });
+        }
+
+        string Tag(string t) => ((string?)game.Element(t) ?? "").Trim();
+        var fileName = Path.GetFileName(((string?)game.Element("path") ?? "").Replace('\\', '/'));
+        var md5 = Tag("md5").ToLowerInvariant();
+        var cheevosHash = Tag("cheevosHash");
+        var canonical = _canonical.Resolve(systemId, md5)
+            ?? _canonical.Resolve(systemId, cheevosHash)
+            ?? _canonical.ResolveByRomName(systemId, fileName);
+
+        return Ok(new GamelistGameDetail(
+            Rom: Path.GetFileNameWithoutExtension(fileName),
+            Name: canonical?.Name is { Length: > 0 } cn ? cn : (Tag("name").Length > 0 ? Tag("name") : Path.GetFileNameWithoutExtension(fileName)),
+            Path: fileName.Length > 0 ? $"roms/{systemId}/{fileName}" : "",
+            Desc: Tag("desc"), Genre: Tag("genre"),
+            Releasedate: Tag("releasedate"), Developer: Tag("developer"),
+            Publisher: Tag("publisher"), Players: Tag("players"), Rating: Tag("rating"),
+            Image: MediaUrl(Tag("image")), Thumbnail: MediaUrl(Tag("thumbnail")),
+            Fanart: MediaUrl(Tag("fanart")), Marquee: MediaUrl(Tag("marquee")),
+            Video: MediaUrl(Tag("video")),
+            GameKey: canonical?.GameKey ?? "",
+            Scorable: _canonical.HasScoreDefinition(systemId, fileName, md5, cheevosHash)));
+    }
+
+    /// <summary>Chemin média du gamelist (« …/APIExpose/media/systems/… »)
+    /// → URL servie « /api/v1/media/systems/… ». Vide si pas de média.</summary>
+    private static string MediaUrl(string raw)
+    {
+        if (raw.Length == 0)
+        {
+            return "";
+        }
+
+        var normalized = raw.Replace('\\', '/');
+        var i = normalized.IndexOf("media/systems/", StringComparison.OrdinalIgnoreCase);
+        return i >= 0 ? "/api/v1/" + normalized[i..] : "";
+    }
+
     [HttpGet("{systemId}/games")]
     [ProducesResponseType(typeof(GamelistGamesSnapshot), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
