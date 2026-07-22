@@ -225,10 +225,27 @@ public sealed class RomCanonicalResolver
 
         return new CanonicalGame(
             $"{system}/{slug}",
-            Name: ReadString(entry, "n"),
+            Name: CleanDisplayName(ReadString(entry, "n")),
             CanonicalSystem: system,
             Kind: kind.ToLowerInvariant(),
             Source: "gamelist-db");
+    }
+
+    /// <summary>Nom d'AFFICHAGE : les qualificatifs de dump n'apparaissent
+    /// jamais à l'écran (« Sonic The Hedgehog Rev 0 » → « Sonic The
+    /// Hedgehog »). La clé canonique garde l'identité complète.</summary>
+    internal static string CleanDisplayName(string name)
+    {
+        name = name.Trim();
+        if (name.Length == 0)
+        {
+            return name;
+        }
+
+        name = System.Text.RegularExpressions.Regex.Replace(
+            name, @"\s*[\(\[]?\bRev(?:ision)?\.?\s*[0-9A-Z](?:\.[0-9]+)?[\)\]]?\s*$", "",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        return name.Trim();
     }
 
     private static IEnumerable<string> ReadHashes(JsonObject entry)

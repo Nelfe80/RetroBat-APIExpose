@@ -57,18 +57,69 @@ public sealed class ObsController : ControllerBase
 
     private static bool IsRunning() => Process.GetProcessesByName("obs64").Length > 0;
 
+    public sealed record GameScreen(int X, int Y, int Width, int Height);
+
     public sealed record ObsStatus(
         bool Installed, string? Path, bool Running,
-        bool WebSocketEnabled, int WebSocketPort);
+        bool WebSocketEnabled, int WebSocketPort, GameScreen? GameScreen = null);
 
-    /// <summary>OBS presence, run state and obs-websocket configuration.</summary>
+    /// <summary>OBS presence, run state, obs-websocket configuration — and the
+    /// bounds of the RETROBAT screen (les bornes ont souvent plusieurs écrans :
+    /// jeu, marquee, écran carte… — la capture doit viser le bon).</summary>
     [HttpGet("status")]
     [ProducesResponseType(typeof(ObsStatus), StatusCodes.Status200OK)]
     public ActionResult<ObsStatus> Status()
     {
         var obs = FindObs();
         var (enabled, port, _) = ReadWebSocketConfig();
-        return Ok(new ObsStatus(obs is not null, obs, IsRunning(), enabled, port));
+        return Ok(new ObsStatus(obs is not null, obs, IsRunning(), enabled, port, ResolveGameScreen()));
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+    private static extern IntPtr FindWindowW(string? className, string? windowName);
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool GetWindowRect(IntPtr hWnd, out NativeRect rect);
+
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    private struct NativeRect { public int Left, Top, Right, Bottom; }
+
+    /// <summary>Écran où tourne EmulationStation (même logique que le badge
+    /// QR) — celui que la diffusion doit capturer.</summary>
+    private static GameScreen? ResolveGameScreen()
+    {
+        try
+        {
+            var handle = FindWindowW(null, "EmulationStation");
+            if (handle == IntPtr.Zero)
+            {
+                foreach (var process in Process.GetProcesses())
+                {
+                    using (process)
+                    {
+                        if (!process.HasExited && process.MainWindowHandle != IntPtr.Zero &&
+                            process.ProcessName.Contains("emulationstation", StringComparison.OrdinalIgnoreCase))
+                        {
+                            handle = process.MainWindowHandle;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (handle == IntPtr.Zero || !GetWindowRect(handle, out var rect))
+            {
+                return null;
+            }
+
+            var screen = System.Windows.Forms.Screen.FromRectangle(
+                System.Drawing.Rectangle.FromLTRB(rect.Left, rect.Top, rect.Right, rect.Bottom));
+            return new GameScreen(screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     /// <summary>
