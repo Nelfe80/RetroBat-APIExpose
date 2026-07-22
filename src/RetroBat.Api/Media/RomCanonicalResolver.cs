@@ -376,7 +376,25 @@ public sealed class RomCanonicalResolver
         {
             foreach (var file in Directory.EnumerateFiles(ramRoot, "*.MEM"))
             {
-                memStems.Add(Path.GetFileNameWithoutExtension(file));
+                // Un .MEM SANS definition de score (events vides, ou lifecycle
+                // seulement — ex. Zool sur Game Boy) ne rend PAS le jeu
+                // scorable : le compter promettait un record impossible et
+                // frustrait apres la partie.
+                string content;
+                try
+                {
+                    content = File.ReadAllText(file);
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    continue;
+                }
+
+                if (content.Contains("SCORE_STATE", StringComparison.OrdinalIgnoreCase) ||
+                    content.Contains("is_score", StringComparison.OrdinalIgnoreCase))
+                {
+                    memStems.Add(Path.GetFileNameWithoutExtension(file));
+                }
             }
 
             var aliasPath = Path.Combine(ramRoot, "alias.json");

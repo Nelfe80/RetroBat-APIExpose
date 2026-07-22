@@ -212,7 +212,12 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         var scoreKind = ResolveMemoryScoreKind(definitionFile, address, payload, signal);
         var transform = ResolveScorePartTransform(definitionFile, address, description, value.Value, rawValueHex);
         var sourceKey = NormalizeMemoryScoreGroupKey(action, description, address);
-        var partKey = FirstNonEmpty(address, action, sourceKey);
+        // Cle de part par adresse NORMALISEE : deux entrees .MEM sur la meme
+        // adresse (« 0X52 » u16be et « 0X0052 » u8 dans asteroids) doivent
+        // occuper LA MEME part, pas s'additionner en double.
+        var partKey = TryParseAddress(address, out var numericPartAddress)
+            ? "0x" + numericPartAddress.ToString("x")
+            : FirstNonEmpty(address, action, sourceKey);
         var confidence = transform.Weight > 1 || description.Contains("score", StringComparison.OrdinalIgnoreCase)
             ? "high"
             : "medium";
@@ -587,6 +592,28 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         long value,
         string rawValueHex)
     {
+        // BCD place PAIR: one byte carries TWO decimal digits named by their places
+        // ("tens, units", "hundreds, thousands", "ten thousands, hundred thousands").
+        // The byte's weight is the LOWEST named place and its value the BCD pair —
+        // read binary with weight 1, Zool's displayed 6700 (0x67 at the
+        // hundreds/thousands byte) came out as 103.
+        if (TryResolvePlacePair(description, rawValueHex, value, out var placePair))
+        {
+            return placePair;
+        }
+
+        // 32-bit literal score split in two u16 halves ("upper 16" / "lower 16"):
+        // the halves must not be summed raw — the upper one weighs 65536.
+        if (Regex.IsMatch(description, @"\bupper\s*16\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            return new ScorePartTransform(value, 65536L, "u32-split");
+        }
+
+        if (Regex.IsMatch(description, @"\blower\s*16\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            return new ScorePartTransform(value, 1L, "u32-split");
+        }
+
         // A score flagged BCD (by RA note text or score_encoding) but stored as a plain/wide
         // value must be decimal-decoded from its nibbles, not read as binary. This is applied
         // on the weight and final paths below; the mask paths already decode per byte.
@@ -645,6 +672,51 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         var bcdValue = DecodeBcdByte(rawValueHex, value);
         var weight = Pow10((scoreRules.Count - index - 1) * 2);
         return new ScorePartTransform(bcdValue, weight, "bcd-pairs");
+    }
+
+    // Two place names for one byte, separated by a comma / "and" / slash — the DOFLinx
+    // vocabulary for BCD pairs. Anchored near the tail so prose merely mentioning
+    // magnitudes is not caught.
+    private static readonly Regex PlacePairRegex = new(
+        @"\b(?<m1>(?:ten|hundred)\s+(?:thousands?|millions?)|thousands?|millions?|hundreds?|tens?|ones?|units?)\s*(?:,|and|/)\s*(?<m2>(?:ten|hundred)\s+(?:thousands?|millions?)|thousands?|millions?|hundreds?|tens?|ones?|units?)(?:\s+(?:place|digit)s?)?\s*\)?\s*$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+    private static bool TryResolvePlacePair(
+        string description,
+        string rawValueHex,
+        long fallbackValue,
+        out ScorePartTransform transform)
+    {
+        transform = new ScorePartTransform(fallbackValue, 1, string.Empty);
+        var match = PlacePairRegex.Match(description);
+        if (!match.Success)
+        {
+            return false;
+        }
+
+        var weight = Math.Min(
+            PlaceWeight(match.Groups["m1"].Value),
+            PlaceWeight(match.Groups["m2"].Value));
+        transform = new ScorePartTransform(DecodeBcdByte(rawValueHex, fallbackValue), weight, "bcd-pair");
+        return true;
+    }
+
+    private static long PlaceWeight(string place)
+    {
+        var normalized = Regex.Replace(place.Trim().ToLowerInvariant(), @"\s+", " ");
+        long baseMagnitude = normalized.Contains("million") ? 1_000_000L
+            : normalized.Contains("thousand") ? 1_000L
+            : 0L;
+        if (baseMagnitude > 0)
+        {
+            if (normalized.StartsWith("ten ", StringComparison.Ordinal)) return baseMagnitude * 10L;
+            if (normalized.StartsWith("hundred ", StringComparison.Ordinal)) return baseMagnitude * 100L;
+            return baseMagnitude;
+        }
+
+        return normalized.StartsWith("hundred") ? 100L
+            : normalized.StartsWith("ten") ? 10L
+            : 1L;
     }
 
     private static bool IsBcdText(string description)
