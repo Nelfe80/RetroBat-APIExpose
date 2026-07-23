@@ -48,8 +48,8 @@ Source: "..\appsettings.json"; DestDir: "{app}"; Flags: onlyifdoesntexist uninsn
 Name: "{app}\state"; Flags: uninsneveruninstall
 
 [Run]
-Filename: "{app}\install-es-start-hook.bat"; WorkingDirectory: "{app}"; Description: "Démarrer APIExpose avec RetroBat (hook EmulationStation)"; Flags: postinstall skipifsilent
-Filename: "{app}\{#AppExe}"; WorkingDirectory: "{app}"; Description: "Démarrer APIExpose maintenant"; Flags: postinstall nowait skipifsilent unchecked
+Filename: "{app}\install-es-start-hook.bat"; WorkingDir: "{app}"; Description: "Démarrer APIExpose avec RetroBat (hook EmulationStation)"; Flags: postinstall skipifsilent
+Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"; Description: "Démarrer APIExpose maintenant"; Flags: postinstall nowait skipifsilent unchecked
 
 [UninstallRun]
 Filename: "taskkill"; Parameters: "/f /im {#AppExe}"; Flags: runhidden; RunOnceId: "StopApi"
