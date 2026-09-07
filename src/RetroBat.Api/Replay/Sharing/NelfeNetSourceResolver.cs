@@ -58,6 +58,9 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
             return false;
         }
 
+        // On CHOISIT à qui demander, au lieu de prendre l'ordre du fichier (CDC §47).
+        peers = await ClasserParMesureAsync(peers, manifest, ct).ConfigureAwait(false);
+
         // Le temps de la récupération, l'objet est « replicating » pour qui interroge l'API.
         using (_network.BeginFetch(sha))
         {
@@ -79,6 +82,130 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
 
         _logger.LogWarning("Replay : objet {Sha} introuvable auprès des {Count} pair(s) connus.", Short(sha), peers.Count);
         return false;
+    }
+
+
+    /// <summary>Budget total de la sonde. Au-delà on part avec ce qu'on sait : mieux vaut
+    /// commencer à télécharger que continuer à choisir.</summary>
+    private static readonly TimeSpan BudgetSonde = TimeSpan.FromSeconds(2);
+
+    /// <summary>Une sonde n'a pas à attendre aussi longtemps qu'un transfert : on veut
+    /// seulement savoir QUI répond et QUI détient l'objet.</summary>
+    private static readonly TimeSpan DelaiSonde = TimeSpan.FromMilliseconds(1500);
+
+    /// <summary>On interroge tout le monde à la fois, mais pas sans limite : une flotte de
+    /// deux cents bornes ne doit pas ouvrir deux cents connexions d'un coup.</summary>
+    private const int SondesSimultanees = 8;
+
+    /// <summary>
+    /// Classe les pairs par MESURE au lieu de suivre l'ordre du fichier (CDC §47).
+    ///
+    /// Trois gains, dans cet ordre d'importance. D'abord on ÉCARTE ceux qui n'ont pas
+    /// l'objet : un HEAD coûte quelques millisecondes là où un GET raté coûtait le budget
+    /// de transfert entier. Ensuite on préfère le RÉSEAU LOCAL, parce qu'une borne du même
+    /// foyer se sert sans traverser Internet. Enfin, à égalité, le plus rapide observé.
+    ///
+    /// La sonde est parallèle et bornée en nombre comme en durée. Si PERSONNE ne répond,
+    /// on rend la liste d'origine inchangée : un hébergeur qui refuse HEAD ne doit pas
+    /// devenir invisible, et le comportement d'avant reste le filet.
+    /// </summary>
+    private async Task<IReadOnlyList<ReplayPeer>> ClasserParMesureAsync(
+        IReadOnlyList<ReplayPeer> peers, ReplayManifest manifest, CancellationToken ct)
+    {
+        var candidats = peers.Where(p => !EnQuarantaine(p)).ToList();
+        if (candidats.Count <= 1) return peers;
+
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        budget.CancelAfter(BudgetSonde);
+
+        var mesures = new System.Collections.Concurrent.ConcurrentBag<(ReplayPeer Peer, long Ms)>();
+        using var portail = new SemaphoreSlim(SondesSimultanees);
+
+        var sondes = candidats.Select(async peer =>
+        {
+            try
+            {
+                await portail.WaitAsync(budget.Token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) { return; }
+
+            try
+            {
+                var chrono = System.Diagnostics.Stopwatch.StartNew();
+                if (await DetientObjetAsync(peer, manifest, budget.Token).ConfigureAwait(false))
+                {
+                    mesures.Add((peer, chrono.ElapsedMilliseconds));
+                }
+            }
+            catch { /* une sonde qui échoue est un pair qu'on n'a pas mesuré, rien de plus */ }
+            finally { portail.Release(); }
+        });
+
+        try { await Task.WhenAll(sondes).ConfigureAwait(false); }
+        catch (OperationCanceledException) { /* budget écoulé : on classe ce qu'on a */ }
+
+        if (mesures.IsEmpty) return peers;
+
+        var classes = mesures
+            .OrderByDescending(m => EstReseauLocal(m.Peer))
+            .ThenBy(m => m.Ms)
+            .Select(m => m.Peer)
+            .ToList();
+
+        // Ceux qu'on n'a pas pu mesurer restent joignables : on les met derrière, sans les
+        // jeter. Un pair muet au HEAD peut très bien servir un GET.
+        var mesures_set = classes.Select(p => p.BaseUrl).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        classes.AddRange(peers.Where(p => !mesures_set.Contains(p.BaseUrl)));
+
+        _logger.LogInformation(
+            "Replay : {Retenus}/{Total} pair(s) détiennent {Sha} ; premier = {Peer} ({Ms} ms{Lan}).",
+            mesures.Count, candidats.Count, Short(manifest.Object.Sha256), classes[0].Name,
+            mesures.OrderByDescending(m => EstReseauLocal(m.Peer)).ThenBy(m => m.Ms).First().Ms,
+            EstReseauLocal(classes[0]) ? ", réseau local" : "");
+
+        return classes;
+    }
+
+    /// <summary>Ce pair détient-il l'objet ? Un HEAD sur le hash suffit à le dire, sans
+    /// transférer un octet — c'est le même test d'existence que celui du semis.</summary>
+    private async Task<bool> DetientObjetAsync(ReplayPeer peer, ReplayManifest manifest, CancellationToken ct)
+    {
+        var sha = manifest.Object.Sha256;
+        var url = string.IsNullOrWhiteSpace(peer.UrlTemplate)
+            ? peer.BaseUrl.TrimEnd('/') + "/api/v1/object/" + sha
+            : peer.UrlTemplate.Replace("{sha}", sha, StringComparison.Ordinal);
+
+        using var request = new HttpRequestMessage(HttpMethod.Head, url);
+        if (!string.IsNullOrWhiteSpace(peer.ApiKey)) request.Headers.Add("X-Api-Key", peer.ApiKey);
+
+        var client = _httpFactory.CreateClient();
+        client.Timeout = Timeout.InfiniteTimeSpan;
+
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        cts.CancelAfter(DelaiSonde);
+        using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token)
+            .ConfigureAwait(false);
+        return response.IsSuccessStatusCode;
+    }
+
+    /// <summary>Adresse privée, loopback ou lien-local : cette borne est à portée de main.
+    /// Un nom d'hôte non résolu ici n'est pas « distant », il est seulement inconnu — et
+    /// c'est bien ainsi qu'on le traite, sans préjuger.</summary>
+    private static bool EstReseauLocal(ReplayPeer peer)
+    {
+        if (!Uri.TryCreate(peer.BaseUrl, UriKind.Absolute, out var uri)) return false;
+        if (uri.IsLoopback) return true;
+        if (!System.Net.IPAddress.TryParse(uri.Host, out var ip)) return false;
+
+        var o = ip.GetAddressBytes();
+        if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+        {
+            return o[0] == 10
+                || (o[0] == 172 && o[1] >= 16 && o[1] <= 31)
+                || (o[0] == 192 && o[1] == 168)
+                || (o[0] == 169 && o[1] == 254);
+        }
+        return ip.IsIPv6LinkLocal || ip.IsIPv6SiteLocal;
     }
 
     private async Task<bool> TryFetchAsync(ReplayPeer peer, ReplayManifest manifest, CancellationToken ct)
