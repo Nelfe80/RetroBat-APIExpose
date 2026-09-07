@@ -23,4 +23,13 @@
     <ProjectReference Include="..\..\src\RetroBat.Api\RetroBat.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Vecteur produit par l'implementation PHP de la plateforme (R9). Il est la pour prouver
+         que les deux langages canonicalisent PAREIL : si la signature ne verifie plus ici, c'est
+         que les deux cotes ont divergé, et aucune borne ne pourrait plus croire un evenement. -->
+    <None Update="social-events-vector.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

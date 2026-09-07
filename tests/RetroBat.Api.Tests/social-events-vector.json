@@ -1,0 +1,92 @@
+{
+    "issuer_public_key": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEqQpErfqDafh0uJ34MQFyOrDI9a2Q\nDlLxwYkxeNx7y59WbaTJ48wLfNwwiXLuetW9wS4b7ZzJky7rTEhLh6cMIw==\n-----END PUBLIC KEY-----\n",
+    "issuer_key_id": "c5fc9c76432a225954954627c7f7bdc04ceb2ff72c58d06e427fd34e2f9af226",
+    "events": [
+        {
+            "event_id": "0156170b6bcae4f0aaec88f5bf824009c0dd55d67cc7d4a18bfd3aa162804e53",
+            "body": {
+                "issuer_key_id": "c5fc9c76432a225954954627c7f7bdc04ceb2ff72c58d06e427fd34e2f9af226",
+                "kind": "reaction",
+                "schema": "nelfe.social.event.v1",
+                "target_id": "rp_test_r9",
+                "target_type": "replay",
+                "object_sha256": "abababababababababababababababababababababababababababababababab",
+                "actor": "11111111111111111111111111111111",
+                "frame": 100,
+                "issued_at": "2026-09-01T10:00:00Z",
+                "level": 1,
+                "reaction": "hype",
+                "session_seq": 1
+            },
+            "signature": "MEYCIQDx5P95dzbOqPDcxC0vdlfI-osBpkRp2bKpBxdsHZo8kAIhALryekH36yECjjDtKLNmXfBOiXlhGxYmptWnCnMM48v-"
+        },
+        {
+            "event_id": "381b9cbc83a9042bb463ea7c0254d3d2020eb02246511a34c5a5c4ccf1dd96a5",
+            "body": {
+                "issuer_key_id": "c5fc9c76432a225954954627c7f7bdc04ceb2ff72c58d06e427fd34e2f9af226",
+                "kind": "reaction",
+                "schema": "nelfe.social.event.v1",
+                "target_id": "rp_test_r9",
+                "target_type": "replay",
+                "object_sha256": "abababababababababababababababababababababababababababababababab",
+                "actor": "11111111111111111111111111111111",
+                "frame": 900,
+                "issued_at": "2026-09-02T10:00:00Z",
+                "level": 3,
+                "reaction": "wow",
+                "session_seq": 2
+            },
+            "signature": "MEQCICdUQdVrWrzbDBC5pV7shxLD0Kx3hjcwTTJ4OISCalkKAiAa6PXE2PWCJSlL1WSZBbLfw6rE1VcVu6Z4u0qf_IFONw"
+        },
+        {
+            "event_id": "00035a85d997577844ed6fc4189e0020357f050945e9eff678e547cacbfa9195",
+            "body": {
+                "issuer_key_id": "c5fc9c76432a225954954627c7f7bdc04ceb2ff72c58d06e427fd34e2f9af226",
+                "kind": "reaction",
+                "schema": "nelfe.social.event.v1",
+                "target_id": "rp_test_r9",
+                "target_type": "replay",
+                "object_sha256": "abababababababababababababababababababababababababababababababab",
+                "actor": "22222222222222222222222222222222",
+                "frame": 500,
+                "issued_at": "2026-09-02T11:00:00Z",
+                "level": 2,
+                "reaction": "respect",
+                "session_seq": 7
+            },
+            "signature": "MEQCIEKD71n3K2exBCVqSdaOaEz2BrUmD_Jf--bHMTP063qNAiBtacgGofMxK9TlcC5g0llDQiwneOBLbjNVBvKfoZ2niQ"
+        },
+        {
+            "event_id": "be1e9109d84352f81380d50c3631de7e97cb81e5ae4188731adbbf76d1e6373d",
+            "body": {
+                "issuer_key_id": "c5fc9c76432a225954954627c7f7bdc04ceb2ff72c58d06e427fd34e2f9af226",
+                "kind": "reaction",
+                "schema": "nelfe.social.event.v1",
+                "target_id": "rp_test_r9",
+                "target_type": "replay",
+                "object_sha256": "abababababababababababababababababababababababababababababababab",
+                "actor": "33333333333333333333333333333333",
+                "frame": 700,
+                "issued_at": "2026-09-02T12:00:00Z",
+                "level": 2,
+                "reaction": "rage",
+                "session_seq": 1
+            },
+            "signature": "MEQCIC5SGPvhpojLJ0mUnixh3ofDo-8AeaxZI1DqzcBDwBB9AiAYp2EJNntxe02J6Z8RFM_8tMR7MP9JCrzLxROT2sUdQA"
+        },
+        {
+            "event_id": "ce78812c5d620adcad0997559288cd2da678e68aa52d852a14b21b975e122d15",
+            "body": {
+                "issued_at": "2026-09-03T09:00:00Z",
+                "issuer_key_id": "c5fc9c76432a225954954627c7f7bdc04ceb2ff72c58d06e427fd34e2f9af226",
+                "kind": "moderation",
+                "reason": "abus",
+                "schema": "nelfe.social.event.v1",
+                "target_event_id": "be1e9109d84352f81380d50c3631de7e97cb81e5ae4188731adbbf76d1e6373d",
+                "target_id": "rp_test_r9",
+                "target_type": "replay"
+            },
+            "signature": "MEUCIFQDN6LsGWOcWMjE-Z4NdPSJHS3PlwOv2nQSc-sIDxRQAiEA1QdXxZrn9jknZTTJ44mNghId6yQHfLiaYEn_jopoUiY"
+        }
+    ]
+}

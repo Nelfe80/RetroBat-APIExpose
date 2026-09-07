@@ -22,6 +22,7 @@ public sealed class ReplayOverlayService : BackgroundService
 {
     private readonly ReplayPlaybackService _playback;
     private readonly ReplayStore _store;
+    private readonly RetroBat.Api.Replay.Social.ReplaySocialStore _social;
     private readonly ILogger<ReplayOverlayService> _logger;
 
     private readonly object _sync = new();
@@ -31,10 +32,11 @@ public sealed class ReplayOverlayService : BackgroundService
     private ReplayReactionSprites? _sprites; // créé sur le thread UI de la barre
 
     public ReplayOverlayService(ReplayPlaybackService playback, ReplayStore store,
-        ILogger<ReplayOverlayService> logger)
+        RetroBat.Api.Replay.Social.ReplaySocialStore social, ILogger<ReplayOverlayService> logger)
     {
         _playback = playback;
         _store = store;
+        _social = social;
         _logger = logger;
     }
 
@@ -68,7 +70,7 @@ public sealed class ReplayOverlayService : BackgroundService
 
             var context = new ApplicationContext();
             var sprites = new ReplayReactionSprites(_logger); // sur CE thread UI
-            var form = new ReplayOverlayForm(() => _playback.GetState(), id => _store.ReadReactions(id), sprites, _logger);
+            var form = new ReplayOverlayForm(() => _playback.GetState(), id => _social.Display(id, _store.ReadReactions(id)), sprites, _logger);
 
             lock (_sync) { _appContext = context; _form = form; _sprites = sprites; }
 

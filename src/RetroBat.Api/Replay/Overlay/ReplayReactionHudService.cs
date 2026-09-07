@@ -30,6 +30,7 @@ public sealed class ReplayReactionHudService : BackgroundService
     private readonly ReplayReactionService _reactions;
     private readonly ReplayPlaybackService _playback;
     private readonly ReplayStore _store;
+    private readonly RetroBat.Api.Replay.Social.ReplaySocialStore _social;
     private readonly ILogger<ReplayReactionHudService> _logger;
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly NelfePlayScoringSessionService? _session;
@@ -43,11 +44,12 @@ public sealed class ReplayReactionHudService : BackgroundService
     private IDisposable? _sub;
 
     public ReplayReactionHudService(IEventBus bus, ReplayReactionService reactions,
-        ReplayPlaybackService playback, ReplayStore store, ILogger<ReplayReactionHudService> logger,
+        ReplayPlaybackService playback, ReplayStore store,
+        RetroBat.Api.Replay.Social.ReplaySocialStore social, ILogger<ReplayReactionHudService> logger,
         IOptionsMonitor<ApiExposeOptions> options, NelfePlayScoringSessionService? session = null)
     {
-        _bus = bus; _reactions = reactions; _playback = playback; _store = store; _logger = logger;
-        _options = options; _session = session;
+        _bus = bus; _reactions = reactions; _playback = playback; _store = store; _social = social;
+        _logger = logger; _options = options; _session = session;
     }
 
     /// <summary>
@@ -105,7 +107,10 @@ public sealed class ReplayReactionHudService : BackgroundService
             var form = new HudForm(() => _reactions.GetCharge(), sprites,
                 () => _playback.GetState(),
                 () => _reactions.GetAvailability(),
-                id => _store.ReadReactions(id), Locale);
+                // R9 : le journal d'ici, PLUS les evenements signes recus d'ailleurs. C'est ce qui
+                // fait apparaitre les reactions des autres spectateurs pendant la lecture, sans
+                // qu'aucune d'elles n'ait a etre crue sur parole.
+                id => _social.Display(id, _store.ReadReactions(id)), Locale);
             lock (_sync) { _appContext = context; _dispatcher = dispatcher; _form = form; _sprites = sprites; }
             ready.Set();
             Application.Run(context);

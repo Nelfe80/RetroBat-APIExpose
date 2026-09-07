@@ -31,11 +31,12 @@ public sealed class ReplayStore : IReplayManifestStore, IReplayObjectStore, IRep
     };
 
     private readonly ILogger<ReplayStore> _logger;
-    private readonly string _root, _manifests, _meta, _objects, _index, _temp, _reactions;
+    private readonly string _root, _manifests, _meta, _objects, _index, _temp, _reactions, _social;
     private readonly object _reactLock = new();
 
     public string ActiveRecordingPath { get; }
     public string TempRoot => _temp;
+    public string SocialRoot => _social;
 
     public ReplayStore(ILogger<ReplayStore> logger)
     {
@@ -47,8 +48,12 @@ public sealed class ReplayStore : IReplayManifestStore, IReplayObjectStore, IRep
         _index = Path.Combine(_root, "index");
         _temp = Path.Combine(_root, "temp");
         _reactions = Path.Combine(_root, "reactions");
+        // Evenements sociaux SIGNES venus du reseau (R9). Separes du journal local des
+        // reactions : celui-ci est ce QUE CETTE BORNE a produit et peut remonter, celui-la est ce
+        // qu'elle a recu d'ailleurs et verifie. Les melanger ferait remonter les reactions d'autrui.
+        _social = Path.Combine(_root, "social");
         ActiveRecordingPath = Path.Combine(_root, "active-recording.json");
-        foreach (var d in new[] { _manifests, _meta, _objects, _index, _temp, _reactions })
+        foreach (var d in new[] { _manifests, _meta, _objects, _index, _temp, _reactions, _social })
             Directory.CreateDirectory(d);
     }
 

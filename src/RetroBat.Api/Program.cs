@@ -408,6 +408,13 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Repla
 // Recensement des copies : sans lui, durable et degraded restent des mots.
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayReactionUploader>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Sharing.ReplayReactionUploader>());
+// R9 : les reactions deviennent des evenements SIGNES, donc distribuables. La borne epingle la
+// cle de l'emetteur (une fois, chez la plateforme), puis accepte des evenements de n'importe quel
+// pair puisqu'elle sait a quelle empreinte ils doivent repondre.
+builder.Services.AddSingleton<RetroBat.Api.Replay.Social.SocialIssuerPin>();
+builder.Services.AddSingleton<RetroBat.Api.Replay.Social.ReplaySocialStore>();
+builder.Services.AddSingleton<RetroBat.Api.Replay.Social.ReplaySocialFeedService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Social.ReplaySocialFeedService>());
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayHoldingsReporter>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Sharing.ReplayHoldingsReporter>());
 builder.Services.AddHostedService<RetroBat.Api.Replay.Sharing.LanPeerResponderService>();
