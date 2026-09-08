@@ -411,6 +411,10 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Repla
 // R9 : les reactions deviennent des evenements SIGNES, donc distribuables. La borne epingle la
 // cle de l'emetteur (une fois, chez la plateforme), puis accepte des evenements de n'importe quel
 // pair puisqu'elle sait a quelle empreinte ils doivent repondre.
+// La photo du moment du record : prise PENDANT la partie, quand le score franchit le seuil du
+// top (a la fermeture il n'y a plus rien a photographier), montee seulement si le score est
+// publie. Une partie qui ne fait pas le top ne coute pas une seule capture.
+builder.Services.AddHostedService<RetroBat.Api.Infrastructure.ScoreShotService>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Social.SocialIssuerPin>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Social.ReplaySocialStore>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Social.ReplaySocialFeedService>();

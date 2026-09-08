@@ -36,6 +36,13 @@ public sealed class RetroArchReplayClient
     public Task HaltAsync(CancellationToken ct) => FireAsync("HALT_REPLAY", ct);
     public Task PlayAsync(CancellationToken ct) => FireAsync("PLAY_REPLAY", ct);
     public Task PauseToggleAsync(CancellationToken ct) => FireAsync("PAUSE_TOGGLE", ct);
+
+    /// <summary>
+    /// Photographie l'ecran. RetroArch ecrit le PNG dans son `screenshot_directory` et ne dit
+    /// RIEN en retour : c'est a l'appelant de retrouver le fichier apparu. Sert la capture du
+    /// moment du record, et plus tard la regeneration de cette meme image depuis un replay.
+    /// </summary>
+    public Task ScreenshotAsync(CancellationToken ct) => FireAsync("SCREENSHOT", ct);
     public Task NextCheckpointAsync(CancellationToken ct) => FireAsync("NEXT_REPLAY_CHECKPOINT", ct);
     public Task PrevCheckpointAsync(CancellationToken ct) => FireAsync("PREV_REPLAY_CHECKPOINT", ct);
 

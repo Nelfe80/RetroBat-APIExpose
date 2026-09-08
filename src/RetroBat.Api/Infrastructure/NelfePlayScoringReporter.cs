@@ -724,10 +724,50 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             MaybeShowClaimOverlay(passport, body);
             await NotifyVerdictAsync(passport, body, cancellationToken).ConfigureAwait(false);
             CaptureReplayLinkOnPublished(passport, body);
+            PublishVerdict(passport, body);
         }
         catch (Exception ex)
         {
             _logger?.LogWarning(ex, "Scoring : soumission impossible.");
+        }
+    }
+
+    /// <summary>
+    /// Annonce le verdict sur le bus, pour qui a quelque chose à faire APRÈS une soumission.
+    ///
+    /// Le premier client est la capture d'écran du record : elle est prise pendant la partie,
+    /// mais elle ne doit monter que si le score a été publié. Sans cet évènement il faudrait
+    /// surveiller le dossier `certified/`, c'est-à-dire deviner par le disque ce que le
+    /// rapporteur sait déjà.
+    ///
+    /// Additif et silencieux : personne n'est obligé de s'y abonner, et une exception ici ne doit
+    /// surtout pas remonter dans le chemin certifié.
+    /// </summary>
+    private void PublishVerdict(JsonObject passport, string responseBody)
+    {
+        try
+        {
+            var obj = JsonNode.Parse(responseBody) as JsonObject;
+            var scoreText = (string?)((passport["metric"] as JsonObject)?["value"]) ?? "0";
+            _ = long.TryParse(scoreText, out var score);
+            _ = _eventBus.PublishAsync(new EventEnvelope
+            {
+                Type = "scoring.verdict",
+                Payload = new
+                {
+                    SessionId = (string?)passport["session_id"] ?? "",
+                    RomGroup = (string?)((passport["game"] as JsonObject)?["rom_group"]) ?? "",
+                    SystemId = (string?)((passport["game"] as JsonObject)?["system_id"]) ?? "",
+                    Ruleset = (string?)((passport["game"] as JsonObject)?["ruleset"]) ?? "",
+                    Status = (string?)(obj?["status"] ?? obj?["verdict"]) ?? "",
+                    Score = score,
+                    Rank = (int?)(obj?["rank"]),
+                },
+            });
+        }
+        catch (Exception ex)
+        {
+            Trace($"verdict non publié sur le bus : {ex.Message}");
         }
     }
 
