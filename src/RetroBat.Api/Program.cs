@@ -415,6 +415,10 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Repla
 // top (a la fermeture il n'y a plus rien a photographier), montee seulement si le score est
 // publie. Une partie qui ne fait pas le top ne coute pas une seule capture.
 builder.Services.AddHostedService<RetroBat.Api.Infrastructure.ScoreShotService>();
+// Refaire l'image d'un record en REJOUANT son replay : reproductible, en definition d'origine,
+// et c'est la seule facon de rattraper les records deja publies. Jamais automatique : la
+// relecture prend l'ecran.
+builder.Services.AddSingleton<RetroBat.Api.Infrastructure.ScoreShotRegenerator>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Social.SocialIssuerPin>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Social.ReplaySocialStore>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Social.ReplaySocialFeedService>();

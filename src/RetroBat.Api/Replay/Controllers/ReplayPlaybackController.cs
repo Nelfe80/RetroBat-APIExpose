@@ -237,6 +237,47 @@ public sealed class ReplayPlaybackController : ControllerBase
         return Ok(new { peers = results, total = results.Count });
     }
 
+    /// <summary>
+    /// Les records de cette borne qui meritent une image, sans rien lancer. A regarder AVANT de
+    /// declencher la relecture : elle prend l'ecran, autant savoir ce qu'elle va faire.
+    /// </summary>
+    [HttpGet("shots/candidates")]
+    public IActionResult ShotCandidates(
+        [FromServices] RetroBat.Api.Infrastructure.ScoreShotRegenerator regenerateur)
+    {
+        if (!IsLocalCaller()) return NotFound();
+        var candidats = regenerateur.Candidats();
+        return Ok(new
+        {
+            total = candidats.Count,
+            candidates = candidats.Select(c => new
+            {
+                rom_group = c.RomGroup, ruleset = c.Ruleset, score = c.Score,
+                replay_id = c.ReplayId, session_id = c.SessionId, frame = c.TargetFrame,
+            }),
+        });
+    }
+
+    /// <summary>
+    /// Refait l'image des records en REJOUANT leurs replays, en definition d'origine.
+    ///
+    /// PREND L'ECRAN : RetroArch est lance pour de vrai, une fois par record. L'appel refuse de
+    /// demarrer si une lecture ou un emulateur tourne deja.
+    /// </summary>
+    [HttpPost("shots/regenerate")]
+    public async Task<IActionResult> RegenerateShots(
+        [FromServices] RetroBat.Api.Infrastructure.ScoreShotRegenerator regenerateur,
+        CancellationToken ct, [FromQuery] int limit = 5)
+    {
+        if (!IsLocalCaller()) return NotFound();
+        var r = await regenerateur.RunAsync(limit, ct);
+        return Ok(new
+        {
+            ran = r.Ran, candidates = r.Candidates, captured = r.Captured,
+            sent = r.Sent, reason = r.Reason, details = r.Details,
+        });
+    }
+
     /// <summary>Réactions horodatées d'un replay (JSONL rejouable). Sert l'affichage (étape suivante).</summary>
     [HttpGet("reactions")]
     public IActionResult Reactions([FromQuery(Name = "replay_id")] string? replayId)

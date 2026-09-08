@@ -184,6 +184,11 @@ public sealed class ReplayPlaybackService
             File.WriteAllText(sessionCfg, string.Join('\n', new[]
             {
                 "config_save_on_exit = \"false\"",
+                // Capture PIXEL PERFECT : « false » photographie le tampon du coeur, a la
+                // definition d'origine du jeu (384x224 sur CPS-1), au lieu de la sortie GPU
+                // mise a l'echelle avec shaders. C'est ce qui fait de l'image du record une
+                // image du JEU plutot qu'une image de cet ecran-la.
+                "video_gpu_screenshot = \"false\"",
                 "input_menu_toggle_btn = \"nul\"",
                 "input_exit_emulator_btn = \"nul\"",
                 "input_menu_toggle_gamepad_combo = \"0\"",
