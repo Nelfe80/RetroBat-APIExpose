@@ -12,9 +12,11 @@ namespace RetroBat.Api.Infrastructure;
 /// comme 19XX y tient en 384×224, couché sur le flanc, et c'est RetroArch qui le redresse à
 /// l'affichage. Photographier le tampon donne donc l'image à 90 degrés, score compris.
 ///
-/// Mesuré sur 19XX : l'avion du joueur apparaît à DROITE tirant vers la GAUCHE, là où le jeu le
-/// montre en BAS tirant vers le HAUT. Une rotation d'un quart de tour dans le sens des aiguilles
-/// remet la droite en bas, donc redresse l'image.
+/// Le sens se déduit du HUD, pas de la position de l'avion. Mesuré sur 19XX en photographiant
+/// quatre moments du replay : le bandeau de score est bien dans le tampon, et seule la rotation
+/// ANTI-horaire le remet en haut et à l'endroit. Dans l'autre sens il se retrouve en bas et
+/// renversé, ce qui donne une image ou le score est present sans etre lisible, et c'est
+/// exactement le defaut qu'on a publie au premier essai.
 ///
 /// On ne tourne QUE ce que le référentiel déclare vertical. Un jeu qu'il ne connaît pas est
 /// laissé tel quel : tourner au hasard serait pire que ne rien faire.
@@ -42,7 +44,7 @@ public static class ScoreShotImage
             // tourner le coucherait. Le cas se présentera avec un cœur qui oriente lui-même.
             if (image.Height > image.Width) return false;
 
-            image.RotateFlip(RotateFlipType.Rotate90FlipNone);   // un quart de tour horaire
+            image.RotateFlip(RotateFlipType.Rotate270FlipNone);   // un quart de tour ANTI-horaire
             using var sortie = new MemoryStream();
             image.Save(sortie, ImageFormat.Png);
             File.WriteAllBytes(chemin, sortie.ToArray());
