@@ -403,6 +403,9 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Repla
 // suivi il ne fait rien : on ne telecharge pas les parties d'inconnus sur le PC de quelqu'un
 // sans qu'il l'ait demande.
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayFollowStore>();
+// Ce que cette borne joue vraiment : la cible du PRECHARGEMENT. Les classements suivis disent
+// quoi conserver pour l'essaim, cette liste dit quoi avoir sous la main pour soi.
+builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayPlayedGamesStore>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayReplicationService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Sharing.ReplayReplicationService>());
 // Recensement des copies : sans lui, durable et degraded restent des mots.

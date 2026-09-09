@@ -42,6 +42,7 @@ public sealed class ReplayReplicationService : BackgroundService
     };
 
     private readonly ReplayFollowStore _follows;
+    private readonly ReplayPlayedGamesStore _joues;
     private readonly IReplayManifestStore _manifests;
     private readonly IReplayObjectStore _objects;
     private readonly IReplayMetadataStore _meta;
@@ -54,12 +55,13 @@ public sealed class ReplayReplicationService : BackgroundService
     private volatile bool _gameActive;
     private volatile bool _replayActive;
 
-    public ReplayReplicationService(ReplayFollowStore follows, IReplayManifestStore manifests,
+    public ReplayReplicationService(ReplayFollowStore follows, ReplayPlayedGamesStore joues,
+        IReplayManifestStore manifests,
         IReplayObjectStore objects, IReplayMetadataStore meta, IReplaySourceResolver source,
         IHttpClientFactory httpFactory, IConfiguration config, IEventBus bus,
         ILogger<ReplayReplicationService> logger)
     {
-        _follows = follows; _manifests = manifests; _objects = objects; _meta = meta;
+        _follows = follows; _joues = joues; _manifests = manifests; _objects = objects; _meta = meta;
         _source = source; _httpFactory = httpFactory; _config = config; _bus = bus; _logger = logger;
     }
 
@@ -85,25 +87,71 @@ public sealed class ReplayReplicationService : BackgroundService
         }
     }
 
+    /// <summary>Combien de replays on précharge par jeu joué. On regarde la tête d'un
+    /// classement, pas son milieu.</summary>
+    private const int TeteDeClassement = 3;
+
+    /// <summary>Le ruleset par défaut de la plateforme. Un jeu ouvert au scoring n'en a qu'un
+    /// dans les faits ; le jour où il y en aura plusieurs, c'est le suivi explicite qui
+    /// tranchera, pas le préchargement.</summary>
+    private const string RulesetParDefaut = "1cc";
+
+    /// <summary>
+    /// Ce que l'agent va chercher, et pourquoi.
+    ///
+    /// Deux sources, deux intentions. Les classements SUIVIS relèvent de la préservation : le
+    /// propriétaire a accepté d'héberger des replays pour que d'autres puissent les regarder, et
+    /// on les réplique en entier jusqu'au budget. Les jeux JOUÉS sur cette borne relèvent de la
+    /// latence : quelqu'un qui vient de finir une partie ira voir le record, et l'objet doit
+    /// déjà être là. On n'en prend que la tête.
+    ///
+    /// Le préchargement ne contourne aucun consentement : il vit sous le même interrupteur et le
+    /// même budget que la réplication. Il change QUELS objets sont choisis, jamais SI la machine
+    /// télécharge.
+    /// </summary>
+    private List<(ReplayFollow Follow, int Plafond, string Origine)> Cibles()
+    {
+        var sortie = new List<(ReplayFollow, int, string)>();
+        var vus = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var follow in _follows.Follows)
+        {
+            if (vus.Add(follow.RomGroup + "|" + follow.Ruleset))
+                sortie.Add((follow, int.MaxValue, "répliqué"));
+        }
+
+        foreach (var jeu in _joues.Games)
+        {
+            var follow = new ReplayFollow(jeu.RomGroup, RulesetParDefaut);
+            if (vus.Add(follow.RomGroup + "|" + follow.Ruleset))
+                sortie.Add((follow, TeteDeClassement, "préchargé"));
+        }
+
+        return sortie;
+    }
+
     /// <summary>Un passage, déclenchable à la demande pour le diagnostic.</summary>
     public async Task<ReplicationReport> TickAsync(CancellationToken ct)
     {
         if (!Enabled) return new ReplicationReport(false, 0, 0, "replication_disabled");
-        var follows = _follows.Follows;
-        if (follows.Count == 0) return new ReplicationReport(true, 0, 0, "no_followed_leaderboard");
+        var cibles = Cibles();
+        if (cibles.Count == 0) return new ReplicationReport(true, 0, 0, "no_followed_leaderboard");
         if (_gameActive || _replayActive) return new ReplicationReport(true, 0, 0, "busy");
 
         var (heldCount, heldBytes) = Budget();
         var recupere = 0;
         var examines = 0;
 
-        foreach (var follow in follows)
+        foreach (var (follow, plafond, origine) in cibles)
         {
             if (ct.IsCancellationRequested) break;
             var collection = await FetchCollectionAsync(follow, ct).ConfigureAwait(false);
             if (collection is null) continue;
 
-            foreach (var entry in collection.Entries)
+            // Un classement SUIVI se replique en entier : c'est de la preservation, et le
+            // budget dit ou s'arreter. Un jeu qu'on JOUE se precharge par la tete : personne ne
+            // regarde le quarante-septieme, et prendre plus mangerait le budget du reste.
+            foreach (var entry in collection.Entries.Take(plafond))
             {
                 if (ct.IsCancellationRequested) break;
                 examines++;
@@ -141,8 +189,8 @@ public sealed class ReplayReplicationService : BackgroundService
                     recupere++;
                     heldCount++;
                     heldBytes += manifest.Object.Size;
-                    _logger.LogInformation("Replay : {ReplayId} répliqué depuis le classement {Board} (rang {Rank}).",
-                        manifest.ReplayId, collection.LeaderboardId, entry.Rank);
+                    _logger.LogInformation("Replay : {ReplayId} {Origine} depuis le classement {Board} (rang {Rank}).",
+                        manifest.ReplayId, origine, collection.LeaderboardId, entry.Rank);
                 }
             }
         }
@@ -228,7 +276,26 @@ public sealed class ReplayReplicationService : BackgroundService
             case "replay.launching":
             case "replay.started": _replayActive = true; break;
             case "replay.finished": _replayActive = false; break;
+            case "scoring.listener.attestation": RetenirJeuJoue(e); break;
         }
+    }
+
+    /// <summary>
+    /// L'attestation dit a quel jeu on vient de jouer. C'est la seule source fiable du
+    /// rom_group cote borne : le chemin de la ROM ne le donne pas, et le resoudre depuis un nom
+    /// de fichier serait deviner.
+    /// </summary>
+    private void RetenirJeuJoue(EventEnvelope e)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(JsonSerializer.Serialize(e.Payload));
+            var racine = doc.RootElement;
+            string? Lire(string nom) => racine.TryGetProperty(nom, out var v)
+                && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
+            _joues.Remember(Lire("Rom"), Lire("SystemId"));
+        }
+        catch (Exception ex) { _logger.LogDebug(ex, "Replay : attestation illisible pour le prechargement."); }
     }
 
     private sealed record CollectionEntry(int Rank, string ReplayId, string ObjectSha256,
