@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json.Nodes;
 using RetroBat.Api.Infrastructure;
 using RetroBat.Domain.Paths;
 
@@ -34,15 +36,21 @@ public sealed class NetplayHostService
 
     private readonly NetplayRelayPicker _relais;
     private readonly NetplayLobbyClient _lobby;
+    private readonly NelfePlayDeviceStore _machine;
+    private readonly IHttpClientFactory _httpFactory;
     private readonly ILogger<NetplayHostService> _logger;
 
     public NetplayHostService(
         NetplayRelayPicker relais,
         NetplayLobbyClient lobby,
+        NelfePlayDeviceStore machine,
+        IHttpClientFactory httpFactory,
         ILogger<NetplayHostService> logger)
     {
         _relais = relais;
         _lobby = lobby;
+        _machine = machine;
+        _httpFactory = httpFactory;
         _logger = logger;
     }
 
@@ -61,30 +69,23 @@ public sealed class NetplayHostService
     }
 
     /// <summary>
-    /// Ce qu'il faut publier pour qu'on puisse rejoindre. Le mot de passe JOUEUR n'y figure que
-    /// si l'hote a autorise a jouer ; sinon on ne partage que celui des spectateurs.
-    /// </summary>
-    public sealed record Resultat(
-        Echec Echec,
-        string Relais,
-        string RelaisAdresse,
-        int RelaisPort,
-        string SessionRelais,
-        string MotDePasseSpectateur,
-        string? MotDePasseJoueur,
-        string Coeur,
-        string VersionCoeur,
-        string Crc);
-
-    /// <summary>
-    /// Lance ce jeu en hote et rend de quoi le rejoindre.
+    /// Lance ce jeu en hote.
     ///
-    /// <paramref name="autoriserAJouer"/> decide si le mot de passe JOUEUR sort. Les deux mots
-    /// de passe sont poses dans tous les cas : c'est RetroArch qui applique la difference, pas
-    /// notre interface. Ne pas publier celui des joueurs suffit donc a rendre la partie
+    /// EN DEUX TEMPS, et c'est deliberé. Ce qui se sait TOUT DE SUITE — le jeu est-il connu
+    /// d'ES, les reglages ont-ils pu etre poses, le lanceur a-t-il demarre — est rendu a
+    /// l'appelant, parce qu'une navigation de navigateur attend une reponse. L'identifiant de
+    /// session, lui, n'existe qu'apres le demarrage de RetroArch et le montage du tunnel : il
+    /// arrive une minute plus tard, et c'est la PLATEFORME qui l'apprend, pas l'appelant.
+    ///
+    /// Faire attendre la fenetre quatre-vingt-dix secondes pour lui rendre une valeur dont elle
+    /// n'a pas l'usage serait la bloquer pour rien.
+    ///
+    /// <paramref name="autoriserAJouer"/> decide si le mot de passe JOUEUR est rapporte. Les
+    /// deux sont poses sur la borne dans tous les cas : c'est RetroArch qui applique la
+    /// difference, pas notre interface. Ne pas le publier suffit donc a rendre la partie
     /// regardable sans etre jouable.
     /// </summary>
-    public async Task<Resultat> HebergerAsync(
+    public async Task<Echec> HebergerAsync(
         string cheminRom,
         string pseudoJoueur,
         bool autoriserAJouer,
@@ -95,7 +96,7 @@ public sealed class NetplayHostService
         {
             _logger.LogInformation("Netplay : {Rom} n'a jamais ete lance ici, rien a reprendre.",
                 Path.GetFileName(cheminRom));
-            return Rate(Echec.JamaisLance);
+            return Echec.JamaisLance;
         }
 
         var relais = await _relais.ChoisirAsync(ct).ConfigureAwait(false);
@@ -112,46 +113,115 @@ public sealed class NetplayHostService
 
         if (!NetplaySettings.Poser(reglages, _logger))
         {
-            return Rate(Echec.ReglagesRefuses);
+            return Echec.ReglagesRefuses;
         }
 
         if (!Lancer(resolution, cheminRom))
         {
-            return Rate(Echec.LancementRefuse);
+            return Echec.LancementRefuse;
         }
 
         // L'emulateur devant, sans attendre : la reponse HTTP n'a pas a patienter le temps
         // qu'un coeur charge sa ROM.
         _ = EmulatorForeground.FocusEmulatorWhenUpAsync();
 
-        var session = await _lobby.AttendreAsync(jeton, PatienceLobby, ct).ConfigureAwait(false);
-        if (session is null)
-        {
-            // La partie TOURNE — on ne la coupe pas — mais elle n'est pas partageable. C'est
-            // une information, pas une panne a masquer.
-            _logger.LogWarning("Netplay : partie lancee, mais aucune session au lobby (jeton {Jeton}).", jeton);
-            return Rate(Echec.PasDeSession);
-        }
+        // SECOND TEMPS, detache. On ne passe PAS le jeton d'annulation de la requete HTTP :
+        // elle sera terminee bien avant, et annuler ce travail avec elle laisserait une partie
+        // hebergee que personne ne pourrait rejoindre.
+        _ = Task.Run(
+            () => AttendreEtRapporterAsync(jeton, mdpSpectateur, autoriserAJouer ? mdpJoueur : ""),
+            CancellationToken.None);
 
-        _logger.LogInformation("Netplay : session {Session} sur {Relais}.", session.Id, session.RelayHote);
-
-        return new Resultat(
-            Echec.Aucun,
-            relais,
-            session.RelayHote,
-            session.RelayPort,
-            session.Id,
-            mdpSpectateur,
-            autoriserAJouer ? mdpJoueur : null,
-            // Le triplet que la poignee de main exige identique des deux cotes : l'invite peut
-            // ainsi verifier AVANT de lancer, au lieu d'echouer sans explication.
-            session.Coeur,
-            session.VersionCoeur,
-            session.Crc);
+        return Echec.Aucun;
     }
 
-    private static Resultat Rate(Echec echec)
-        => new(echec, "", "", 0, "", "", null, "", "", "");
+    /// <summary>
+    /// Attend que la session paraisse au lobby, puis la rapporte a la plateforme.
+    ///
+    /// Si elle ne parait jamais, la partie TOURNE quand meme — on ne la coupe pas. Elle n'est
+    /// simplement pas rejoignable, et le journal le dit : laisser croire que des spectateurs
+    /// peuvent venir serait pire que de jouer seul.
+    /// </summary>
+    private async Task AttendreEtRapporterAsync(
+        string jeton, string motDePasseSpectateur, string motDePasseJoueur)
+    {
+        try
+        {
+            var session = await _lobby.AttendreAsync(jeton, PatienceLobby).ConfigureAwait(false);
+            if (session is null)
+            {
+                _logger.LogWarning(
+                    "Netplay : partie lancee, mais aucune session au lobby (jeton {Jeton}).", jeton);
+                return;
+            }
+
+            _logger.LogInformation("Netplay : session {Session} sur {Relais}.", session.Id, session.RelayHote);
+            await RapporterAsync(session, motDePasseSpectateur, motDePasseJoueur, CancellationToken.None)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Netplay : attente de la session interrompue.");
+        }
+    }
+
+    /// <summary>
+    /// Rapporte la session a NelfePlay, authentifie comme MACHINE.
+    ///
+    /// La borne ne connait pas l'identifiant de session cote plateforme : le lien
+    /// machine -> compte suffit a retrouver l'annonce en cours. Un couplage de moins.
+    ///
+    /// Le mot de passe JOUEUR n'est envoye que si l'hote a autorise a jouer. Ce qui n'est pas
+    /// envoye ne peut pas fuiter d'une base ou d'un journal.
+    /// </summary>
+    private async Task RapporterAsync(
+        NetplayLobbyClient.Session session,
+        string motDePasseSpectateur,
+        string motDePasseJoueur,
+        CancellationToken ct)
+    {
+        var credential = _machine.GetCredential();
+        if (string.IsNullOrEmpty(credential))
+        {
+            _logger.LogInformation("Netplay : machine non appairee, session non rapportee.");
+            return;
+        }
+
+        try
+        {
+            var client = _httpFactory.CreateClient();
+            client.BaseAddress = new Uri(NelfePlayAgentService.BaseUrl.TrimEnd('/'));
+            client.Timeout = TimeSpan.FromSeconds(10);
+            client.DefaultRequestHeaders.Add("X-NelfePlay-Device", credential);
+
+            var corps = new JsonObject
+            {
+                ["relay"] = session.RelayHote,
+                ["port"] = session.RelayPort,
+                ["session"] = session.Id,
+                ["spectate_password"] = motDePasseSpectateur,
+                ["player_password"] = motDePasseJoueur,
+                ["core"] = session.Coeur,
+                ["core_version"] = session.VersionCoeur,
+                ["crc"] = session.Crc,
+            };
+            using var contenu = new StringContent(corps.ToJsonString(), Encoding.UTF8, "application/json");
+            using var reponse = await client
+                .PostAsync("/api/v1/agent/live/netplay", contenu, ct)
+                .ConfigureAwait(false);
+
+            if (!reponse.IsSuccessStatusCode)
+            {
+                // 409 = aucune annonce en cours : la partie a ete lancee sans « Diffuser en
+                // live ». Ce n'est pas une panne, c'est le cas normal quand on joue seul.
+                _logger.LogInformation("Netplay : session non rapportee (HTTP {Code}).", (int)reponse.StatusCode);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Netplay : remontee de la session impossible.");
+        }
+    }
 
     /// <summary>
     /// La commande d'ES, avec le netplay en plus.
