@@ -39,7 +39,31 @@ public static class EmulatorForeground
 
     /// <summary>Les émulateurs que RetroBat lance. Le premier trouvé avec une fenêtre gagne.</summary>
     private static readonly string[] Emulateurs =
-        ["retroarch", "mame", "mame64", "fbneo", "pcsx2", "dolphin", "duckstation-qt-x64", "ppsspp"];
+        ["retroarch", "mame", "mame64", "fbneo", "pcsx2", "dolphin", "duckstation", "ppsspp"];
+
+    /// <summary>
+    /// Les processus dont le nom COMMENCE par celui-ci.
+    ///
+    /// Le prefixe n'est pas une commodite, c'est la correction d'un vrai bug : RetroBat ne lance
+    /// pas « retroarch.exe » mais un binaire patche, dont le processus s'appelle
+    /// **`retroarch.patched.RETROBAT`** (mesure sur la borne). `GetProcessesByName` compare le
+    /// nom ENTIER : il ne trouvait donc rien, et le jeu restait derriere le navigateur — non pas
+    /// parce que Windows refusait le premier plan, mais parce qu'on ne cherchait pas la bonne
+    /// fenetre.
+    /// </summary>
+    private static IEnumerable<Process> Processus(string prefixe)
+    {
+        try
+        {
+            return Process.GetProcesses()
+                .Where(p => p.ProcessName.StartsWith(prefixe, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+        }
+        catch (Exception)
+        {
+            return [];
+        }
+    }
 
     /// <summary>Le menu. Il doit avoir le focus avant qu'on lui demande de lancer quoi que ce soit.</summary>
     public static bool FocusEmulationStation() => Focus("emulationstation");
@@ -52,7 +76,7 @@ public static class EmulatorForeground
     {
         try
         {
-            foreach (var process in Process.GetProcessesByName(processName))
+            foreach (var process in Processus(processName))
             {
                 if (process.MainWindowHandle != IntPtr.Zero && Imposer(process.MainWindowHandle))
                 {
@@ -72,7 +96,7 @@ public static class EmulatorForeground
     {
         try
         {
-            foreach (var process in Process.GetProcessesByName(processName))
+            foreach (var process in Processus(processName))
             {
                 if (process.MainWindowHandle != IntPtr.Zero)
                 {
