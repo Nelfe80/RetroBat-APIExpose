@@ -179,6 +179,10 @@ var eventBus = new SimpleEventBus();
 builder.Services.AddSingleton<IEventBus>(eventBus);
 
 builder.Services.AddSingleton<WebSocketConnectionManager>();
+// Netplay. Le choix du relais garde sa mesure une journee, d'ou le singleton.
+builder.Services.AddSingleton<RetroBat.Api.Netplay.NetplayRelayPicker>();
+builder.Services.AddSingleton<RetroBat.Api.Netplay.NetplayLobbyClient>();
+builder.Services.AddSingleton<RetroBat.Api.Netplay.NetplayHostService>();
 builder.Services.AddSingleton<MediaRuntimeState>();
 builder.Services.AddSingleton<StartupOverlayService>();
 builder.Services.AddSingleton<LiveContestOverlayService>();
