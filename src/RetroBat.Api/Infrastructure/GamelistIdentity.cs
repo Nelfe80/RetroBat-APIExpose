@@ -28,6 +28,10 @@ public static class GamelistIdentity
 
     /// <summary>Une gamelist pèse plusieurs dizaines de milliers de lignes : on ne la
     /// relit pas à chaque partie. La clé est (système, jeu).</summary>
+    /// <summary>Meme mecanique que Cache, pour l'orientation : le referentiel arcade fait
+    /// 55 000 lignes, on ne le relit pas a chaque capture.</summary>
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, string?> CacheOrientation = new();
+
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, string?> Cache =
         new(StringComparer.OrdinalIgnoreCase);
 
@@ -56,7 +60,7 @@ public static class GamelistIdentity
         string? trouve = null;
         foreach (var systeme in systemes)
         {
-            trouve = Chercher(Path.Combine(racine, systeme + "_lt.json"), slug, set);
+            trouve = Chercher(Path.Combine(racine, systeme + "_lt.json"), slug, set, PremierSha1);
             if (trouve is not null) break;
         }
 
@@ -65,12 +69,72 @@ public static class GamelistIdentity
     }
 
     /// <summary>
+    /// L'ORIENTATION declaree du jeu (« vertical » / « horizontal »), ou null si le referentiel
+    /// ne la porte pas.
+    ///
+    /// Elle sert a redresser une capture d'ecran. Le tampon d'un coeur est stocke NON TOURNE :
+    /// un shoot vertical comme 19XX y tient en 384x224 couche sur le flanc, et c'est ce que
+    /// photographie une capture « pixel perfect ». Sans cette information, l'image du record
+    /// sortirait a 90 degres, score compris.
+    /// </summary>
+    public static string? DeclaredOrientation(string? systemId, string? nomOuGroupe, string? setOuFichier = null)
+    {
+        var slug = Slugifier(nomOuGroupe);
+        var set = (setOuFichier ?? string.Empty).Trim();
+        if (slug.Length == 0 && set.Length == 0) return null;
+
+        var cle = (systemId ?? "") + "|" + slug + "|" + set;
+        if (CacheOrientation.TryGetValue(cle, out var connu)) return connu;
+
+        var racine = Path.Combine(AppContext.BaseDirectory, "resources", "gamelist", "systems");
+        var systemes = new List<string>();
+        if (!string.IsNullOrWhiteSpace(systemId)) systemes.Add(systemId.Trim());
+        foreach (var repli in ReplisArcade)
+        {
+            if (!systemes.Contains(repli, StringComparer.OrdinalIgnoreCase)) systemes.Add(repli);
+        }
+
+        string? trouve = null;
+        foreach (var systeme in systemes)
+        {
+            trouve = Chercher(Path.Combine(racine, systeme + "_lt.json"), slug, set, Orientation);
+            if (trouve is not null) break;
+        }
+
+        CacheOrientation[cle] = trouve;
+        return trouve;
+    }
+
+    /// <summary>Vrai seulement si le referentiel l'affirme. Un jeu inconnu est laisse tel quel :
+    /// tourner une image au hasard serait pire que ne rien faire.</summary>
+    public static bool EstVertical(string? systemId, string? nomOuGroupe, string? setOuFichier = null)
+        => string.Equals(DeclaredOrientation(systemId, nomOuGroupe, setOuFichier), "vertical",
+            StringComparison.OrdinalIgnoreCase);
+
+    private static string? PremierSha1(JsonElement root)
+    {
+        if (root.TryGetProperty("hsh", out var hsh) && hsh.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var entree in hsh.EnumerateArray())
+            {
+                if (entree.TryGetProperty("sha1", out var sha1) && sha1.GetString() is { Length: > 0 } valeur)
+                    return valeur.ToLowerInvariant();
+            }
+        }
+        return null;
+    }
+
+    private static string? Orientation(JsonElement root)
+        => root.TryGetProperty("ori", out var v) && v.GetString() is { Length: > 0 } o ? o : null;
+
+    /// <summary>
     /// Parcourt une gamelist JSONL. On accepte deux correspondances : le « grp » une fois
     /// slugifié, ou le set/id exact — ce dernier est plus sûr, mais tous les appelants ne
     /// l'ont pas sous la main. Un filtre bon marché sur le premier segment évite de parser
     /// 55 000 lignes de JSON pour rien.
     /// </summary>
-    private static string? Chercher(string chemin, string slug, string set)
+    private static string? Chercher(string chemin, string slug, string set,
+        Func<JsonElement, string?> extraire)
     {
         if (!File.Exists(chemin)) return null;
 
@@ -97,17 +161,7 @@ public static class GamelistIdentity
                 }
                 if (!correspond) continue;
 
-                if (root.TryGetProperty("hsh", out var hsh) && hsh.ValueKind == JsonValueKind.Array)
-                {
-                    foreach (var entree in hsh.EnumerateArray())
-                    {
-                        if (entree.TryGetProperty("sha1", out var sha1) && sha1.GetString() is { Length: > 0 } valeur)
-                        {
-                            return valeur.ToLowerInvariant();
-                        }
-                    }
-                }
-                return null; // le jeu est là mais sans sha1 : inutile de continuer ce fichier
+                return extraire(root); // le jeu est là : inutile de continuer ce fichier
             }
         }
         catch

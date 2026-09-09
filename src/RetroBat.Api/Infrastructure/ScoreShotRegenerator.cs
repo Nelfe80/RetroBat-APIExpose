@@ -52,64 +52,69 @@ public sealed class ScoreShotRegenerator
     }
 
     public sealed record Candidat(string SessionId, string ReplayId, string RomGroup, string Ruleset,
-        long Score, long TargetFrame);
+        string SystemId, long Score, long TargetFrame);
 
     public sealed record Rapport(bool Ran, int Candidates, int Captured, int Sent, string? Reason,
         IReadOnlyList<string> Details);
 
     /// <summary>
-    /// Les records de CETTE borne qui méritent une image : le meilleur de chaque classement,
-    /// et seulement s'il a gardé son replay.
+    /// Les records de CETTE borne qui méritent une image, d'après la plateforme.
     ///
-    /// On ne rejoue pas les 38 parties publiées pour en voir 34 refusées : la plateforme ne
-    /// conserve que l'image du meilleur, autant ne rejouer que celui-là. Le tri se fait ici sur
-    /// ce qu'on détient, la plateforme retranche ensuite ce qui n'est pas le meilleur du monde.
+    /// C'est elle qui doit le dire, et pas nous : le lien entre un record et son replay n'existe
+    /// que de son côté. Ici, le <c>session_id</c> d'un manifeste est une séance de LECTURE, pas
+    /// la séance de scoring, et rien ne rapproche les deux. C'est aussi elle qui sait quel score
+    /// est en tête de son classement, alors que la borne ne connaît que ses propres parties.
+    ///
+    /// Nous ne gardons de son avis que ce que nous détenons vraiment : un replay dont le
+    /// manifeste et l'objet manquent ne se rejoue pas, quoi qu'elle en dise.
     /// </summary>
-    public IReadOnlyList<Candidat> Candidats()
+    public async Task<IReadOnlyList<Candidat>> CandidatsAsync(CancellationToken ct)
     {
-        var dossier = Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "certified");
-        if (!Directory.Exists(dossier)) return Array.Empty<Candidat>();
+        var credential = _devices.GetCredential();
+        if (string.IsNullOrEmpty(credential)) return Array.Empty<Candidat>();
 
-        // Un manifeste par session : c'est le manifeste qui porte le lien, pas nous.
-        var parSession = new Dictionary<string, Replay.Models.ReplayManifest>(StringComparer.Ordinal);
-        foreach (var m in _store.ListManifests())
+        JsonElement racine;
+        try
         {
-            if (!string.IsNullOrEmpty(m.SessionId)) parSession[m.SessionId] = m;
+            var client = _httpFactory.CreateClient();
+            client.Timeout = TimeSpan.FromSeconds(15);
+            using var request = new HttpRequestMessage(HttpMethod.Get,
+                NelfePlayAgentService.BaseUrl.TrimEnd('/') + "/api/v1/agent/scores/shot-targets?limit=50");
+            request.Headers.Add("X-NelfePlay-Device", credential);
+            using var response = await client.SendAsync(request, ct).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode) return Array.Empty<Candidat>();
+            var corps = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+            using var doc = JsonDocument.Parse(corps);
+            if (!doc.RootElement.TryGetProperty("targets", out var cibles)) return Array.Empty<Candidat>();
+            racine = cibles.Clone();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Capture record : liste des records injoignable.");
+            return Array.Empty<Candidat>();
         }
 
-        var meilleurs = new Dictionary<string, Candidat>(StringComparer.OrdinalIgnoreCase);
-        foreach (var fichier in Directory.EnumerateFiles(dossier, "*.json"))
+        var manifests = _store.ListManifests().ToDictionary(m => m.ReplayId, StringComparer.Ordinal);
+        var sortie = new List<Candidat>();
+        foreach (var cible in racine.EnumerateArray())
         {
-            try
-            {
-                using var doc = JsonDocument.Parse(File.ReadAllText(fichier));
-                var racine = doc.RootElement;
-                if (Texte(racine, "verdict") != "published") continue;
-                if (!racine.TryGetProperty("passport", out var passeport)) continue;
+            var replayId = Texte(cible, "replay_id");
+            if (replayId.Length == 0 || !manifests.TryGetValue(replayId, out var manifest)) continue;
+            // Les octets sont-ils là ? On regarde le fichier, sans le rehacher : la vérification
+            // d'intégrité est le travail du lecteur, qui la fait déjà avant de lancer.
+            if (!File.Exists(_store.ObjectPath(manifest.Object.Sha256))) continue;
 
-                var sessionId = Texte(passeport, "session_id");
-                if (sessionId.Length == 0 || !parSession.TryGetValue(sessionId, out var manifest)) continue;
+            // Fin de la course, en retrait de la marge : l'instant du record.
+            var fin = manifest.Frames.RunEnd ?? manifest.Frames.ReplayEnd;
+            if (fin <= 0) continue;
 
-                var jeu = passeport.TryGetProperty("game", out var g) ? g : default;
-                var romGroup = Texte(jeu, "rom_group");
-                var ruleset = Texte(jeu, "ruleset");
-                if (romGroup.Length == 0) continue;
-
-                var score = Nombre(passeport.TryGetProperty("metric", out var mt) ? mt : default, "value");
-
-                // Fin de la course, en retrait de la marge : l'instant du record.
-                var fin = manifest.Frames.RunEnd ?? manifest.Frames.ReplayEnd;
-                if (fin <= 0) continue;
-                var cible = Math.Max(manifest.Frames.Start, fin - MargeFrames);
-
-                var cle = romGroup + "|" + ruleset;
-                if (!meilleurs.TryGetValue(cle, out var deja) || score > deja.Score)
-                    meilleurs[cle] = new Candidat(sessionId, manifest.ReplayId, romGroup, ruleset, score, cible);
-            }
-            catch (Exception ex) { _logger.LogDebug(ex, "Capture record : archive illisible {Fichier}.", fichier); }
+            sortie.Add(new Candidat(
+                Texte(cible, "session_id"), replayId,
+                Texte(cible, "rom_group"), Texte(cible, "ruleset"), Texte(cible, "system_id"),
+                Nombre(cible, "score"),
+                Math.Max(manifest.Frames.Start, fin - MargeFrames)));
         }
-
-        return meilleurs.Values.OrderByDescending(c => c.Score).ToList();
+        return sortie.OrderByDescending(c => c.Score).ToList();
     }
 
     /// <summary>Rejoue, photographie et envoie. Une seule à la fois, jamais pendant autre chose.</summary>
@@ -128,7 +133,7 @@ public sealed class ScoreShotRegenerator
             if (System.Diagnostics.Process.GetProcessesByName("retroarch").Length > 0)
                 return new Rapport(false, 0, 0, 0, "emulateur_en_cours", Array.Empty<string>());
 
-            var candidats = Candidats().Take(Math.Max(1, limit)).ToList();
+            var candidats = (await CandidatsAsync(ct).ConfigureAwait(false)).Take(Math.Max(1, limit)).ToList();
             var details = new List<string>();
             int captures = 0, envoyes = 0;
 
@@ -153,6 +158,13 @@ public sealed class ScoreShotRegenerator
         finally { _uneSeuleAlaFois.Release(); }
     }
 
+    /// <summary>
+    /// Combien de reculs on s'autorise quand l'image ne montre rien, et de combien. La fin d'une
+    /// course tombe souvent sur une transition ; cinq secondes en arriere suffisent en general a
+    /// retrouver du jeu a l'ecran.
+    /// </summary>
+    private const int EssaisMax = 4;
+
     private async Task<string?> PhotographierAsync(Candidat c, CancellationToken ct)
     {
         _logger.LogInformation("Capture record : relecture de {Rom} ({Score}) pour la frame {Frame}.",
@@ -173,32 +185,78 @@ public sealed class ScoreShotRegenerator
                 return null;
             }
 
-            // On vise la frame, puis on ATTEND de l'avoir atteinte : RetroArch rejoint le
-            // checkpoint le plus proche puis rejoue les entrées, donc l'arrivée n'est pas
-            // immédiate et photographier tout de suite donnerait une image d'ailleurs.
-            await _retroarch.SeekAsync(c.TargetFrame, ct).ConfigureAwait(false);
-            var arrive = await AttendreFrameAsync(c.TargetFrame, TimeSpan.FromSeconds(60), ct).ConfigureAwait(false);
-            if (!arrive)
-                _logger.LogInformation("Capture record : frame {Frame} pas confirmée, on photographie quand même.", c.TargetFrame);
-
-            // Geler l'image avant de la prendre : sans pause, la lecture continue de courir vers
-            // la fin, et `--eof-exit` referme RetroArch pendant l'écriture du PNG.
-            await _retroarch.PauseToggleAsync(ct).ConfigureAwait(false);
-            await Task.Delay(400, ct).ConfigureAwait(false);
-
-            var avant = DateTime.UtcNow.AddSeconds(-1);
-            await _retroarch.ScreenshotAsync(ct).ConfigureAwait(false);
-            var fichier = await AttendreFichierAsync(avant, ct).ConfigureAwait(false);
-            if (fichier is null)
+            // « playing » veut dire que RetroArch tient, pas que le replay défile. Un SEEK envoyé
+            // avant que le cœur n'ait vraiment pris la main est simplement perdu : c'est ce qui a
+            // produit une image d'un tout autre endroit de la partie au premier essai. On attend
+            // donc de VOIR la frame avancer avant de viser.
+            if (!await AttendreDefilementAsync(TimeSpan.FromSeconds(30), ct).ConfigureAwait(false))
             {
-                _logger.LogWarning("Capture record : aucun fichier produit pour {Rom}.", c.RomGroup);
+                _logger.LogWarning("Capture record : le replay ne défile pas pour {ReplayId}.", c.ReplayId);
                 return null;
             }
 
+            var recul = (long)Math.Max(60, _playback.GetState().NominalFps * 5);
             var destination = Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "scoreshots",
                 "regen-" + c.SessionId + ".png");
             Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-            File.Move(fichier, destination, overwrite: true);
+            var paused = false;
+
+            for (var essai = 0; essai < EssaisMax; essai++)
+            {
+                var vise = Math.Max(0, c.TargetFrame - essai * recul);
+
+                // On vise la frame, puis on ATTEND de l'avoir atteinte : RetroArch rejoint le
+                // checkpoint le plus proche puis rejoue les entrées, donc l'arrivée n'est pas
+                // immédiate et photographier tout de suite donnerait une image d'ailleurs.
+                if (paused) { await _retroarch.PauseToggleAsync(ct).ConfigureAwait(false); paused = false; }
+                var reponse = await _retroarch.SeekAsync(vise, ct).ConfigureAwait(false);
+                _logger.LogInformation("Capture record : SEEK {Frame} -> {Reponse}", vise,
+                    (reponse ?? "aucune réponse").Trim());
+
+                if (!await AttendreFrameAsync(vise, TimeSpan.FromSeconds(45), ct).ConfigureAwait(false))
+                {
+                    // On ne photographie PAS au hasard. Une image du mauvais moment publiée comme
+                    // « le record » est pire que pas d'image du tout : elle est fausse, et rien à
+                    // l'écran ne le dirait.
+                    _logger.LogWarning(
+                        "Capture record : frame {Frame} jamais atteinte pour {Rom} (observée : {Vue}). Rien n'est envoyé.",
+                        vise, c.RomGroup, _playback.GetState().Frame);
+                    return null;
+                }
+
+                // Geler l'image avant de la prendre : sans pause, la lecture continue de courir
+                // vers la fin, et `--eof-exit` referme RetroArch pendant l'écriture du PNG.
+                await _retroarch.PauseToggleAsync(ct).ConfigureAwait(false);
+                paused = true;
+                await Task.Delay(400, ct).ConfigureAwait(false);
+
+                var avant = DateTime.UtcNow.AddSeconds(-1);
+                await _retroarch.ScreenshotAsync(ct).ConfigureAwait(false);
+                var fichier = await AttendreFichierAsync(avant, ct).ConfigureAwait(false);
+                if (fichier is null)
+                {
+                    _logger.LogWarning("Capture record : aucun fichier produit pour {Rom}.", c.RomGroup);
+                    return null;
+                }
+
+                File.Move(fichier, destination, overwrite: true);
+                // Le tampon d'un coeur n'est pas oriente : un shoot vertical en sort couche.
+                if (OperatingSystem.IsWindows())
+                {
+                    ScoreShotImage.Redresser(destination, c.SystemId, c.RomGroup, _logger);
+                    // La toute fin d'une course tombe souvent sur un fondu ou une intro de boss.
+                    // Plutot que de publier un ecran vide, on recule de cinq secondes et on
+                    // recommence. Le dernier essai est garde tel quel : une image imparfaite vaut
+                    // mieux que pas d'image, et le choix reste rejouable a la main.
+                    if (!ScoreShotImage.MontreLeJeu(destination, _logger) && essai < EssaisMax - 1)
+                    {
+                        _logger.LogInformation("Capture record : {Rom}, on recule de {Recul} frames.",
+                            c.RomGroup, recul);
+                        continue;
+                    }
+                }
+                return destination;
+            }
             return destination;
         }
         finally
@@ -223,16 +281,48 @@ public sealed class ScoreShotRegenerator
         return false;
     }
 
-    private async Task<bool> AttendreFrameAsync(long cible, TimeSpan limite, CancellationToken ct)
+    /// <summary>Le replay DÉFILE-t-il ? Deux relevés croissants suffisent à le dire, et c'est ce
+    /// qui distingue « RetroArch est là » de « le cœur a pris la main ».</summary>
+    private async Task<bool> AttendreDefilementAsync(TimeSpan limite, CancellationToken ct)
     {
         var fin = DateTime.UtcNow + limite;
+        var precedente = -1L;
         while (DateTime.UtcNow < fin)
         {
             var e = _playback.GetState();
             if (e.State != "playing") return false;
+            if (e.Frame > 0 && precedente >= 0 && e.Frame > precedente) return true;
+            precedente = e.Frame;
+            await Task.Delay(400, ct).ConfigureAwait(false);
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Attend d'être arrivé. Deux façons d'y être : la frame tombe près de la cible, ou elle
+    /// CESSE DE BOUGER — près de la fin, RetroArch s'immobilise sur la dernière image du replay,
+    /// et c'est précisément celle qu'on veut.
+    /// </summary>
+    private async Task<bool> AttendreFrameAsync(long cible, TimeSpan limite, CancellationToken ct)
+    {
+        var fin = DateTime.UtcNow + limite;
+        var precedente = -1L;
+        var immobile = 0;
+        while (DateTime.UtcNow < fin)
+        {
+            var e = _playback.GetState();
+            if (e.State != "playing") return false;
+
             // À une demi-seconde près : la télémétrie ne rend pas chaque frame, et viser
             // l'égalité exacte attendrait indéfiniment.
             if (Math.Abs(e.Frame - cible) <= Math.Max(30, (long)(e.NominalFps / 2))) return true;
+
+            immobile = e.Frame == precedente ? immobile + 1 : 0;
+            precedente = e.Frame;
+            // Immobile depuis plus d'une seconde ET au-delà du checkpoint visé : la lecture est
+            // arrivée au bout, on y est.
+            if (immobile >= 4 && e.Frame >= cible - Math.Max(120, (long)e.NominalFps * 2)) return true;
+
             await Task.Delay(250, ct).ConfigureAwait(false);
         }
         return false;

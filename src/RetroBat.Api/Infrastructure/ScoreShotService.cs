@@ -216,6 +216,8 @@ public sealed class ScoreShotService : BackgroundService
             // pas y laisser une image par sommet. Si la fenêtre de deux secondes nous faisait
             // adopter une capture prise à la main au même instant, elle serait ici, pas perdue.
             File.Move(apparu, destination, overwrite: true);
+            // Meme raison que pour la regeneration : le tampon du coeur n'est pas oriente.
+            if (OperatingSystem.IsWindows()) ScoreShotImage.Redresser(destination, _systemId, _romGroup, _logger);
             lock (_gate) { _enAttente = destination; }
             _logger.LogInformation("Capture record : image gardée pour {Rom} à {Score}.",
                 _romGroup, _scorePhotographie.ToString("N0"));

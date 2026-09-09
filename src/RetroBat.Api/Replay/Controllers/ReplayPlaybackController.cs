@@ -242,11 +242,12 @@ public sealed class ReplayPlaybackController : ControllerBase
     /// declencher la relecture : elle prend l'ecran, autant savoir ce qu'elle va faire.
     /// </summary>
     [HttpGet("shots/candidates")]
-    public IActionResult ShotCandidates(
-        [FromServices] RetroBat.Api.Infrastructure.ScoreShotRegenerator regenerateur)
+    public async Task<IActionResult> ShotCandidates(
+        [FromServices] RetroBat.Api.Infrastructure.ScoreShotRegenerator regenerateur,
+        CancellationToken ct)
     {
         if (!IsLocalCaller()) return NotFound();
-        var candidats = regenerateur.Candidats();
+        var candidats = await regenerateur.CandidatsAsync(ct);
         return Ok(new
         {
             total = candidats.Count,
