@@ -167,6 +167,19 @@ public sealed class ReplayPlaybackController : ControllerBase
         return Ok(new { sent = r.Sent, count = r.Count, reason = r.Reason });
     }
 
+    /// <summary>
+    /// Diagnostic : force un passage du relais et rend son compte rendu. Deux gestes en un,
+    /// déposer ce qu'on nous demande et récupérer ce qu'on a demandé.
+    /// </summary>
+    [HttpPost("relay/tick")]
+    public async Task<IActionResult> RelayTick(
+        [FromServices] RetroBat.Api.Replay.Sharing.ReplayRelayService relais, CancellationToken ct)
+    {
+        if (!IsLocalCaller()) return NotFound();
+        var r = await relais.TickAsync(ct);
+        return Ok(new { ran = r.Ran, deposited = r.Deposited, collected = r.Collected, pending = r.Pending, reason = r.Reason });
+    }
+
     /// <summary>Diagnostic : force une déclaration de conservation et rend son compte rendu.</summary>
     [HttpPost("declare-holdings")]
     public async Task<IActionResult> DeclareHoldings(

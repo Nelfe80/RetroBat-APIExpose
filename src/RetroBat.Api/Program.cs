@@ -429,6 +429,10 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Repla
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayHoldingsReporter>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Sharing.ReplayHoldingsReporter>());
 builder.Services.AddHostedService<RetroBat.Api.Replay.Sharing.LanPeerResponderService>();
+// Le RELAIS (CDC v2.1 52) : le pont pour les bornes qui ne peuvent pas se joindre. Il doit etre
+// enregistre AVANT le resolveur, qui s'en sert comme dernier recours.
+builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayRelayService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Sharing.ReplayRelayService>());
 builder.Services.AddSingleton<RetroBat.Api.Replay.Playback.IReplaySourceResolver, RetroBat.Api.Replay.Sharing.NelfeNetSourceResolver>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplaySharePolicy>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Playback.ReplayPlaybackService>();

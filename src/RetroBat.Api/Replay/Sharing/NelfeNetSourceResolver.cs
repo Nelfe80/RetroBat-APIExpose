@@ -41,10 +41,14 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
     private readonly ILogger<NelfeNetSourceResolver> _logger;
 
     public NelfeNetSourceResolver(IReplayObjectStore objects, ReplayPeerDirectory peers,
-        ReplayNetworkStateService network, IHttpClientFactory httpFactory, ILogger<NelfeNetSourceResolver> logger)
+        ReplayNetworkStateService network, IHttpClientFactory httpFactory,
+        ReplayRelayService relais, ILogger<NelfeNetSourceResolver> logger)
     {
-        _objects = objects; _peers = peers; _network = network; _httpFactory = httpFactory; _logger = logger;
+        _objects = objects; _peers = peers; _network = network; _httpFactory = httpFactory;
+        _relais = relais; _logger = logger;
     }
+
+    private readonly ReplayRelayService _relais;
 
     public async Task<bool> EnsureObjectAvailableAsync(ReplayManifest manifest, CancellationToken ct)
     {
@@ -78,6 +82,21 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
                     return true;
                 }
             }
+        }
+
+        // DERNIER RECOURS : le relais (CDC v2.1 52). Aucun pair joignable ne l'a, mais un
+        // détenteur existe peut-être derriere un NAT résidentiel, invisible d'ici. On dépose une
+        // demande : lui la relèvera en sortant, et déposera les octets sur l'ancre.
+        //
+        // On ne bloque PAS en attendant. Le détenteur doit se réveiller, ce qui prend le temps
+        // que ça prend, et le reseau reste hors du chemin de réponse (86). La lecture échoue
+        // proprement, l'objet sera la au prochain essai.
+        if (await _relais.RequestAsync(sha, ct).ConfigureAwait(false))
+        {
+            _logger.LogInformation(
+                "Replay : objet {Sha} demandé au relais, aucun des {Count} pair(s) connus ne l'a.",
+                Short(sha), peers.Count);
+            return false;
         }
 
         _logger.LogWarning("Replay : objet {Sha} introuvable auprès des {Count} pair(s) connus.", Short(sha), peers.Count);
