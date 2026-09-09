@@ -221,6 +221,10 @@ public sealed class ReplayPlaybackService
         try { proc = Process.Start(psi)!; }
         catch (Exception ex) { _logger.LogWarning(ex, "Replay : lancement RetroArch échoué"); return Fail(ReplayErrorCode.RetroArchUnavailable); }
         lock (_gate) _process = proc;
+        // Une lecture demandee depuis le web part derriere le navigateur : c'est lui qui a le
+        // premier plan au moment ou RetroArch demarre. On le ramene devant des que sa fenetre
+        // existe - elle n'existe pas encore ici, le coeur charge sa ROM.
+        _ = RetroBat.Api.Infrastructure.EmulatorForeground.FocusEmulatorWhenUpAsync();
         _logger.LogInformation("Replay : lecture lancée {ReplayId} (core={Core}, rom={Rom}).", replayId, Path.GetFileName(coreDll), Path.GetFileName(resolved.RomPath));
         await Publish("replay.launching", new { replayId }).ConfigureAwait(false);
 

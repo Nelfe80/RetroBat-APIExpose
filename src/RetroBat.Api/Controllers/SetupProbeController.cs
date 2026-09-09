@@ -33,22 +33,6 @@ public sealed class SetupProbeController : ControllerBase
         _tokens = tokens;
     }
 
-    private static bool IsAllowedReturnHost(string host) =>
-        host.Equals("nelfeplay.com", StringComparison.OrdinalIgnoreCase)
-        || host.EndsWith(".nelfeplay.com", StringComparison.OrdinalIgnoreCase)
-        || host.Equals("nelfetech.com", StringComparison.OrdinalIgnoreCase)
-        || host.EndsWith(".nelfetech.com", StringComparison.OrdinalIgnoreCase);
-
-    // Base du retour = site autorisé, SANS query (on repart propre : les paramètres
-    // de résultat sont ajoutés ici, jamais accumulés).
-    private static string SafeReturnBase(string? url)
-    {
-        const string fallback = "https://nelfeplay.com/";
-        if (string.IsNullOrWhiteSpace(url) || !Uri.TryCreate(url, UriKind.Absolute, out var u)) return fallback;
-        if (u.Scheme != Uri.UriSchemeHttps || !IsAllowedReturnHost(u.Host)) return fallback;
-        return u.GetLeftPart(UriPartial.Path);
-    }
-
     // Sonde de PRÉSENCE pour le funnel (technique popup) : le site ouvre cette URL loopback
     // dans une popup (window.open = navigation, autorisée contrairement à fetch/LNA). Si
     // APIExpose répond, on REDIRIGE la popup vers <to>/apiexpose-ok (même origine que le site)
@@ -62,7 +46,7 @@ public sealed class SetupProbeController : ControllerBase
         // signal de présence sert aussi à /account (⚡ machine courante) sans autre aller-retour.
         // On JOINT un launch_token à usage unique : seule cette page nelfeplay.com le récupère
         // (signal scellé à son origine) et /replay/watch l'exige pour AUTO-lancer une lecture.
-        var origin = SafeOrigin(to);
+        var origin = NelfeReturnUrl.SafeOrigin(to);
         var status = await BuildStatusQueryAsync(ct).ConfigureAwait(false);
         return Redirect(origin + "/apiexpose-ok" + status + "&token=" + _tokens.Issue());
     }
@@ -82,20 +66,11 @@ public sealed class SetupProbeController : ControllerBase
         return q;
     }
 
-    // N'accepte qu'une ORIGINE https d'un hôte connu (anti open-redirect) ; défaut nelfeplay.com.
-    private static string SafeOrigin(string? url)
-    {
-        const string fallback = "https://nelfeplay.com";
-        if (string.IsNullOrWhiteSpace(url) || !Uri.TryCreate(url, UriKind.Absolute, out var u)) return fallback;
-        if (u.Scheme != Uri.UriSchemeHttps || !IsAllowedReturnHost(u.Host)) return fallback;
-        return u.GetLeftPart(UriPartial.Authority);
-    }
-
     [HttpGet("/setup-probe")]
     [ApiExplorerSettings(IgnoreApi = true)]
     public async Task<IActionResult> Probe([FromQuery(Name = "return")] string? returnUrl, CancellationToken ct)
     {
-        var ret = SafeReturnBase(returnUrl);
+        var ret = NelfeReturnUrl.SafeBase(returnUrl);
         return Redirect(ret + await BuildStatusQueryAsync(ct).ConfigureAwait(false));
     }
 
