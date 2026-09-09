@@ -168,6 +168,7 @@ public sealed class MameLuaIngameProvider : IProvider
             };
 
             await writer.WriteLineAsync("HELLO?");
+            lock (_sortieGate) { _sortie = writer; }
 
             while (!token.IsCancellationRequested && client.Connected)
             {
@@ -283,6 +284,11 @@ public sealed class MameLuaIngameProvider : IProvider
                     var flags = string.Join(", ", parts.Skip(1).Select(p => p.Trim()).Where(p => p.Length > 0));
                     _logger.LogInformation("MAME Lua anti-triche (rom={Rom}) : {Flags}", definition?.Rom ?? "?", flags);
                 }
+                else if (command.Equals("SNAPSHOT", StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger.LogInformation("MAME Lua : capture {Etat} (frame {Frame}).",
+                        parts.Length > 1 ? parts[1] : "?", parts.Length > 2 ? parts[2] : "?");
+                }
                 else if (command.Equals("BYE", StringComparison.OrdinalIgnoreCase))
                 {
                     break;
@@ -299,12 +305,48 @@ public sealed class MameLuaIngameProvider : IProvider
         }
         finally
         {
+            lock (_sortieGate) { _sortie = null; }
             if (definition != null)
             {
                 UpdateSession(endpoint, definition, connected: false, lastRawLine: string.Empty, fired: fired);
                 await PublishScoringSessionAsync(definition, scoringStart, sensitiveFastForward, sensitiveCoreOptions);
                 await PublishSessionStoppedAsync(definition);
             }
+        }
+    }
+
+    // Voie de commande vers le plugin. Elle n'existe que le temps d'une partie : hors partie il
+    // n'y a personne au bout, et c'est exactement ce que dit un envoi qui echoue.
+    private readonly object _sortieGate = new();
+    private System.IO.StreamWriter? _sortie;
+
+    /// <summary>Vrai si une partie MAME est en cours et joignable.</summary>
+    public bool EstConnecte
+    {
+        get { lock (_sortieGate) { return _sortie is not null; } }
+    }
+
+    /// <summary>
+    /// Demande a MAME de photographier l'ecran (parite avec RetroArch pour la capture du record).
+    ///
+    /// On passe par MAME plutot que par une capture de fenetre : son snapshot est pris dans le
+    /// tampon du jeu, donc a la definition d'origine et deja oriente pour un jeu vertical. Il
+    /// ecrit dans son snapshot_directory ; c'est l'appelant qui retrouve le fichier apparu.
+    /// </summary>
+    public async Task<bool> RequestSnapshotAsync(CancellationToken ct)
+    {
+        System.IO.StreamWriter? sortie;
+        lock (_sortieGate) { sortie = _sortie; }
+        if (sortie is null) return false;
+        try
+        {
+            await sortie.WriteLineAsync("SNAPSHOT".AsMemory(), ct).ConfigureAwait(false);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "MAME Lua : demande de capture impossible.");
+            return false;
         }
     }
 

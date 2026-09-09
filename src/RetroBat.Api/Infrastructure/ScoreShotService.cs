@@ -23,8 +23,11 @@ namespace RetroBat.Api.Infrastructure;
 /// Elle ne monte que si le serveur a PUBLIÉ le score, et elle est effacée sinon. Une partie qui ne
 /// donne rien ne laisse donc aucune trace sur le disque.
 ///
-/// RetroArch seulement pour l'instant. MAME standalone a son propre `snapshot()`, joignable par le
-/// pont Lua déjà déployé ; c'est la même parité que celle qui reste à faire pour l'anti-triche.
+/// Les DEUX émulateurs sont couverts : RetroArch par sa commande réseau `SCREENSHOT`, MAME
+/// standalone par `snapshot()` via le pont Lua. Dans les deux cas on demande à l'émulateur de se
+/// photographier LUI-MÊME plutôt que de capturer sa fenêtre : son tampon est à la définition
+/// d'origine du jeu, là où une capture de fenêtre rendrait ce que cet écran-là affiche, mis à
+/// l'échelle et filtré.
 /// </summary>
 public sealed class ScoreShotService : BackgroundService
 {
@@ -42,6 +45,7 @@ public sealed class ScoreShotService : BackgroundService
 
     private readonly IEventBus _bus;
     private readonly RetroArchReplayClient _retroarch;
+    private readonly MameLuaIngameProvider _mame;
     private readonly NelfePlayDeviceStore _devices;
     private readonly IHttpClientFactory _httpFactory;
     private readonly ILogger<ScoreShotService> _logger;
@@ -61,9 +65,10 @@ public sealed class ScoreShotService : BackgroundService
     private string? _enAttente;           // le fichier gardé pour cette partie
 
     public ScoreShotService(IEventBus bus, RetroArchReplayClient retroarch,
-        NelfePlayDeviceStore devices, IHttpClientFactory httpFactory, ILogger<ScoreShotService> logger)
+        MameLuaIngameProvider mame, NelfePlayDeviceStore devices, IHttpClientFactory httpFactory,
+        ILogger<ScoreShotService> logger)
     {
-        _bus = bus; _retroarch = retroarch; _devices = devices;
+        _bus = bus; _retroarch = retroarch; _mame = mame; _devices = devices;
         _httpFactory = httpFactory; _logger = logger;
     }
 
@@ -194,14 +199,29 @@ public sealed class ScoreShotService : BackgroundService
         if (photographier) await PhotographierAsync().ConfigureAwait(false);
     }
 
-    /// <summary>Envoie la commande, puis adopte le fichier qui vient d'apparaître.</summary>
+    /// <summary>
+    /// Demande la photo à QUI joue, puis adopte le fichier qui vient d'apparaître.
+    ///
+    /// Deux émulateurs, deux commandes, une seule règle : on demande à l'émulateur de se
+    /// photographier LUI-MÊME plutôt que de capturer sa fenêtre. Son tampon est à la définition
+    /// d'origine du jeu ; une capture de fenêtre rendrait ce que cet écran-là affiche, mis à
+    /// l'échelle et filtré, et dépendrait de l'affichage de la borne.
+    /// </summary>
     private async Task PhotographierAsync()
     {
         var avant = DateTime.UtcNow.AddSeconds(-1);   // marge d'horloge sur l'écriture du fichier
-        try { await _retroarch.ScreenshotAsync(CancellationToken.None).ConfigureAwait(false); }
+        var parMame = _mame.EstConnecte;
+        try
+        {
+            var envoye = parMame
+                ? await _mame.RequestSnapshotAsync(CancellationToken.None).ConfigureAwait(false)
+                : true;
+            if (!parMame) await _retroarch.ScreenshotAsync(CancellationToken.None).ConfigureAwait(false);
+            if (!envoye) { _logger.LogDebug("Capture record : MAME n'a pas pris la demande."); return; }
+        }
         catch (Exception ex) { _logger.LogDebug(ex, "Capture record : commande refusée."); return; }
 
-        var apparu = await AttendreFichierAsync(avant).ConfigureAwait(false);
+        var apparu = await AttendreFichierAsync(avant, parMame).ConfigureAwait(false);
         if (apparu is null)
         {
             _logger.LogDebug("Capture record : aucun fichier apparu (RetroArch absent ?).");
@@ -225,28 +245,54 @@ public sealed class ScoreShotService : BackgroundService
         catch (Exception ex) { _logger.LogWarning(ex, "Capture record : image non conservée."); }
     }
 
-    private static async Task<string?> AttendreFichierAsync(DateTime apres)
+    /// <summary>
+    /// Attend qu'un PNG apparaisse. On cherche dans les DEUX endroits possibles, et en
+    /// profondeur : RetroArch écrit à plat, MAME range par jeu (<c>snap/&lt;rom&gt;/0000.png</c>).
+    /// </summary>
+    private static async Task<string?> AttendreFichierAsync(DateTime apres, bool parMame)
     {
-        var dossier = DossierRetroArch();
-        if (dossier is null || !Directory.Exists(dossier)) return null;
+        var dossiers = parMame ? DossiersMame() : DossiersRetroArch();
+        if (dossiers.Count == 0) return null;
+        var portee = parMame ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
         var limite = DateTime.UtcNow + AttenteFichier;
         while (DateTime.UtcNow < limite)
         {
-            try
+            foreach (var dossier in dossiers)
             {
-                var candidat = new DirectoryInfo(dossier)
-                    .EnumerateFiles("*.png", SearchOption.TopDirectoryOnly)
-                    .Where(f => f.LastWriteTimeUtc >= apres)
-                    .OrderByDescending(f => f.LastWriteTimeUtc)
-                    .FirstOrDefault();
-                // Fichier encore en cours d'écriture : on le saute, il sera là au tour suivant.
-                if (candidat is not null && candidat.Length > 0 && Lisible(candidat.FullName))
-                    return candidat.FullName;
+                try
+                {
+                    var candidat = new DirectoryInfo(dossier)
+                        .EnumerateFiles("*.png", portee)
+                        .Where(f => f.LastWriteTimeUtc >= apres)
+                        .OrderByDescending(f => f.LastWriteTimeUtc)
+                        .FirstOrDefault();
+                    // Fichier encore en cours d'écriture : on le saute, il sera là au tour suivant.
+                    if (candidat is not null && candidat.Length > 0 && Lisible(candidat.FullName))
+                        return candidat.FullName;
+                }
+                catch { /* le dossier bouge sous nos pieds : on retente */ }
             }
-            catch { /* le dossier bouge sous nos pieds : on retente */ }
             await Task.Delay(150).ConfigureAwait(false);
         }
         return null;
+    }
+
+    /// <summary>Les dossiers où MAME peut avoir écrit. On ne devine pas : on regarde les deux
+    /// que RetroBat utilise, et le plus récent tranche.</summary>
+    private static List<string> DossiersMame()
+    {
+        var candidats = new[]
+        {
+            Path.Combine(RetroBatPaths.RetroBatRoot, "screenshots"),
+            Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "mame", "snap"),
+        };
+        return candidats.Where(Directory.Exists).ToList();
+    }
+
+    private static List<string> DossiersRetroArch()
+    {
+        var d = DossierRetroArch();
+        return d is not null ? new List<string> { d } : new List<string>();
     }
 
     private static bool Lisible(string chemin)

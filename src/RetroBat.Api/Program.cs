@@ -451,7 +451,10 @@ if (!testModeRequested)
 builder.Services.AddHostedService<ProviderHostedService>();
 builder.Services.AddSingleton<IProvider, EsFlowEventLogProvider>();
 builder.Services.AddSingleton<IProvider, GameSessionEventLogProvider>();
-builder.Services.AddSingleton<IProvider, MameLuaIngameProvider>();
+// Le pont MAME est aussi resolu par son type : la capture du record lui demande un snapshot,
+// et passer par la liste des IProvider pour retrouver celui-la serait fragile.
+builder.Services.AddSingleton<MameLuaIngameProvider>();
+builder.Services.AddSingleton<IProvider>(sp => sp.GetRequiredService<MameLuaIngameProvider>());
 builder.Services.AddSingleton<IProvider, MameOutputsProvider>();
 builder.Services.AddSingleton<IProvider>(sp => sp.GetRequiredService<IngameGameplayStateService>());
 builder.Services.AddSingleton<IProvider>(sp => sp.GetRequiredService<RetroAchievementsService>());
