@@ -32,6 +32,50 @@ public sealed class LiveCrowdModel
     private const int DureeHaute = 1800;
     private const int DureePlancher = 400;
 
+    /// <summary>
+    /// Le GABARIT d'un spectateur : trente-deux pixels de cote.
+    ///
+    /// C'est la taille des creatures uniques derivees du pseudo. Tout le reste de la geometrie
+    /// en decoule, et rien ici ne doit s'en ecarter sans recalculer la bande.
+    /// </summary>
+    public const int TailleSprite = 32;
+
+    /// <summary>
+    /// Le DIVISEUR de chaque rangee, de devant vers le fond. Des entiers, obligatoirement.
+    ///
+    /// A trente-deux pixels, AGRANDIR par un entier est exclu : 3x ferait quatre-vingt-seize
+    /// pixels de haut, soit huit pour cent de l'ecran pour la seule premiere rangee. Les seuls
+    /// ratios propres vont donc vers le BAS. Diviser par deux fait correspondre un pixel de
+    /// sortie a un bloc de deux par deux : le pixel reste carre, on perd du detail et c'est
+    /// exactement ce qu'on veut pour une rangee lointaine.
+    ///
+    /// Une echelle fractionnaire, elle, dedoublerait les traits et detruirait l'identite de la
+    /// creature, ce qui est l'inverse du but.
+    /// </summary>
+    public static readonly int[] Diviseurs = { 1, 2, 2 };
+
+    /// <summary>La taille rendue de chaque rangee : 32, 16, 16 pixels.</summary>
+    public static int TailleRangee(int rangee)
+        => TailleSprite / Diviseurs[Math.Clamp(rangee, 0, Diviseurs.Length - 1)];
+
+    /// <summary>
+    /// L'opacite de chaque rangee, de devant vers le fond.
+    ///
+    /// C'est elle qui porte la profondeur, puisque deux rangees partagent la meme taille.
+    /// </summary>
+    public static readonly int[] Opacites = { 255, 200, 150 };
+
+    /// <summary>Le recul vertical d'une rangee, en pixels d'ecran. Entier lui aussi.</summary>
+    public const int ReculParRangee = 8;
+
+    /// <summary>
+    /// La hauteur de la bande occupee par la foule : 48 pixels.
+    ///
+    /// Quatre pour cent d'un ecran de mille deux cents. La foule doit se lire sans manger la
+    /// partie : c'est un public au bord du champ, pas un bandeau.
+    /// </summary>
+    public static int HauteurBande => TailleSprite + ReculParRangee * (Rangees - 1);
+
     /// <summary>Duree de vol d'un emoji, et duree d'un saut.</summary>
     public const int DureeVol = 1400;
     public const int DureeSaut = 420;
@@ -46,6 +90,15 @@ public sealed class LiveCrowdModel
     private readonly List<Vol> _vols = new();
     private readonly List<Etiquette> _etiquettes = new();
     private readonly Dictionary<string, Saut> _sauts = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// Les reactions DEJA montrees, par identifiant.
+    ///
+    /// Sa propre reaction s'anime tout de suite, des la reponse de la plateforme ; le flux la
+    /// ramene ensuite au battement suivant. Sans cette memoire, on la verrait DEUX fois, a
+    /// deux secondes et demie d'ecart, et on croirait a un bug.
+    /// </summary>
+    private readonly HashSet<long> _vus = new();
 
     public sealed record Vol(string Famille, int Niveau, int Rangee, int Index, long Depuis);
     public sealed record Etiquette(string Texte, int Rangee, int Index, long Jusqua);
@@ -112,7 +165,27 @@ public sealed class LiveCrowdModel
     /// dans le saut. Pas le budget deja depense : celui qui a le plus parle sauterait le plus
     /// haut, ce qui est l'inverse du sens.
     /// </summary>
-    public static int HauteurSaut(int niveau) => 6 + Math.Clamp(niveau, 1, 3) * 4;
+    public static int HauteurSaut(int niveau) => 4 * Math.Clamp(niveau, 1, 3);
+
+    /// <summary>
+    /// Le dessin de REMPLACEMENT, en attendant les creatures : huit lignes de huit pixels.
+    ///
+    /// Une grille de huit se divise proprement dans trente-deux (facteur quatre) comme dans
+    /// seize (facteur deux), donc ce provisoire respecte deja la contrainte du pixel carre. Les
+    /// deux trous de la troisieme ligne sont les yeux : ils laissent voir le fond, ce qui donne
+    /// un regard sans deuxieme couleur.
+    /// </summary>
+    public static readonly byte[] Gabarit =
+    {
+        0b00100100,   // antennes
+        0b01111110,
+        0b11111111,
+        0b11011011,   // les yeux
+        0b11111111,
+        0b01111110,
+        0b01100110,   // les pattes
+        0b01100110,
+    };
 
     // ── L'etat ─────────────────────────────────────────────────────────────
 
@@ -127,7 +200,30 @@ public sealed class LiveCrowdModel
         }
     }
 
-    /// <summary>Une reaction : la silhouette saute, l'emoji s'envole, le nom parait.</summary>
+    /// <summary>
+    /// L'HORLOGE de la foule, et la seule.
+    ///
+    /// C'est exactement celle du HUD (`Environment.TickCount64`, millisecondes depuis le
+    /// demarrage), et elle doit le rester : le HUD compare les horodatages poses ici a la
+    /// sienne. Deux bases differentes se sont deja rencontrees, avec un ecart de mille sept
+    /// cents milliards de millisecondes, et le resultat etait silencieux plutot que bruyant.
+    /// Les emoji ne montaient pas, les silhouettes ne sautaient pas, et les pseudos ne
+    /// disparaissaient jamais. Rien ne plantait : tout etait simplement faux.
+    ///
+    /// L'horloge vit donc ICI, pour qu'aucun appelant n'ait a en choisir une.
+    /// </summary>
+    public static long Maintenant() => Environment.TickCount64;
+
+    /// <summary>Une reaction, horodatee par l'horloge de la foule.</summary>
+    public void Reagir(string acteur, string famille, int niveau, string nom)
+        => Reagir(acteur, famille, niveau, nom, Maintenant());
+
+    /// <summary>
+    /// Une reaction a un instant donne.
+    ///
+    /// Cette forme existe pour les TESTS, qui doivent pouvoir avancer le temps a la main.
+    /// Le code qui tourne appelle celle sans horodatage, ce qui rend l'erreur impossible.
+    /// </summary>
     public void Reagir(string acteur, string famille, int niveau, string nom, long maintenant)
     {
         if (string.IsNullOrEmpty(acteur) || string.IsNullOrEmpty(famille))
@@ -187,6 +283,31 @@ public sealed class LiveCrowdModel
         }
     }
 
+    /// <summary>
+    /// Note une reaction comme montree. Rend vrai si elle est NOUVELLE.
+    ///
+    /// Un identifiant nul ou negatif est toujours nouveau : c'est le cas d'une reaction qui
+    /// n'a pas d'identifiant de plateforme, et refuser de l'animer serait pire que de risquer
+    /// un doublon.
+    /// </summary>
+    public bool NoterVue(long id)
+    {
+        if (id <= 0)
+        {
+            return true;
+        }
+        lock (_gate)
+        {
+            // Au-dela d'un millier, on oublie les plus anciennes : le flux ne revient jamais
+            // en arriere, donc une reaction tres ancienne ne peut plus se presenter.
+            if (_vus.Count > 1000)
+            {
+                _vus.Clear();
+            }
+            return _vus.Add(id);
+        }
+    }
+
     /// <summary>Y a-t-il quelque chose a dessiner ? Sert a ne pas repeindre pour rien.</summary>
     public bool Anime
     {
@@ -209,6 +330,7 @@ public sealed class LiveCrowdModel
             _vols.Clear();
             _etiquettes.Clear();
             _sauts.Clear();
+            _vus.Clear();
         }
     }
 }

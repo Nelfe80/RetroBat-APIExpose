@@ -148,15 +148,24 @@ public sealed class LiveCrowdPoller : BackgroundService
         var premier = _curseur == 0;
         if (!premier && r.TryGetProperty("reactions", out var lr) && lr.ValueKind == JsonValueKind.Array)
         {
-            var maintenant = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             foreach (var x in lr.EnumerateArray())
             {
+                // Deja montree ? On ne la rejoue pas : sa propre reaction s'anime des la
+                // reponse de la plateforme, et le flux la ramene ensuite.
+                var id = x.TryGetProperty("id", out var xi) && xi.TryGetInt64(out var v) ? v : 0L;
+                if (!_foule.NoterVue(id))
+                {
+                    continue;
+                }
+
+                // SANS horodatage : c'est le modele qui pose l'heure, avec l'horloge que le
+                // HUD lira. En choisir une ici, c'etait la faute qui rendait les emoji
+                // invisibles sans que rien ne signale l'erreur.
                 _foule.Reagir(
                     Texte(x, "actor"),
                     Texte(x, "reaction"),
                     x.TryGetProperty("level", out var lv) && lv.TryGetInt32(out var niv) ? niv : 1,
-                    Texte(x, "name"),
-                    maintenant);
+                    Texte(x, "name"));
             }
         }
 

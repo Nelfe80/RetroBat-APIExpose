@@ -78,15 +78,37 @@ public sealed class LiveCrowdModelTests
     [Fact]
     public void Le_saut_suit_l_intensite_et_non_le_budget()
     {
-        // Trois crans, ceux de la jauge de charge. Mesure cote web : 10 / 14 / 18.
-        Assert.Equal(10, LiveCrowdModel.HauteurSaut(1));
-        Assert.Equal(14, LiveCrowdModel.HauteurSaut(2));
-        Assert.Equal(18, LiveCrowdModel.HauteurSaut(3));
+        // Trois crans, ceux de la jauge de charge. Rationalises pour un gabarit de 32 :
+        // 4 / 8 / 12 pixels, soit au plus trente-sept pour cent de la hauteur du sprite.
+        Assert.Equal(4, LiveCrowdModel.HauteurSaut(1));
+        Assert.Equal(8, LiveCrowdModel.HauteurSaut(2));
+        Assert.Equal(12, LiveCrowdModel.HauteurSaut(3));
 
         // Borne des deux cotes : une intensite absurde ne doit pas produire un saut absurde.
-        Assert.Equal(10, LiveCrowdModel.HauteurSaut(0));
-        Assert.Equal(10, LiveCrowdModel.HauteurSaut(-3));
-        Assert.Equal(18, LiveCrowdModel.HauteurSaut(99));
+        Assert.Equal(4, LiveCrowdModel.HauteurSaut(0));
+        Assert.Equal(4, LiveCrowdModel.HauteurSaut(-3));
+        Assert.Equal(12, LiveCrowdModel.HauteurSaut(99));
+    }
+
+    [Fact]
+    public void La_geometrie_reste_divisible_en_entiers()
+    {
+        // Le PIXEL CARRE est la contrainte : chaque taille de rangee doit etre un diviseur
+        // entier du gabarit, et le gabarit provisoire doit se diviser dans chaque taille.
+        Assert.Equal(32, LiveCrowdModel.TailleSprite);
+
+        foreach (var rangee in Enumerable.Range(0, LiveCrowdModel.Rangees))
+        {
+            var taille = LiveCrowdModel.TailleRangee(rangee);
+            Assert.True(taille > 0, "une rangee sans taille ne se dessine pas");
+            Assert.Equal(0, LiveCrowdModel.TailleSprite % taille);
+            // Le dessin provisoire fait huit lignes : son bloc doit tomber juste.
+            Assert.Equal(0, taille % LiveCrowdModel.Gabarit.Length);
+        }
+
+        // Et la bande doit rester discrete : quarante-huit pixels, quatre pour cent d'un
+        // ecran de mille deux cents. Une foule qui mange la partie n'est plus un public.
+        Assert.Equal(48, LiveCrowdModel.HauteurBande);
     }
 
     [Fact]
@@ -98,6 +120,43 @@ public sealed class LiveCrowdModelTests
         Assert.Equal(225, LiveCrowdModel.Teinte("ab"));
         Assert.Equal(132, LiveCrowdModel.Teinte("nelfe"));
         Assert.Equal(24, LiveCrowdModel.Teinte(new string('f', 32)));
+    }
+
+    [Fact]
+    public void L_horloge_de_la_foule_est_celle_du_temps_de_fonctionnement()
+    {
+        // Le HUD lit `Environment.TickCount64`. Si l'horloge de la foule s'en ecartait, plus
+        // aucun emoji ne serait dessine et aucun pseudo ne disparaitrait, SANS erreur pour le
+        // signaler. C'est arrive, et ce test est la pour que ca ne se reproduise pas.
+        var attendu = Environment.TickCount64;
+        var obtenu = LiveCrowdModel.Maintenant();
+        Assert.InRange(obtenu, attendu - 2000, attendu + 2000);
+
+        // Et surtout : PAS une horloge epoch. L'ecart entre les deux depasse mille sept cents
+        // milliards, donc ce controle grossier suffit a distinguer les deux bases.
+        Assert.True(obtenu < 1_000_000_000_000L,
+            "l'horloge de la foule ne doit pas etre une horloge epoch");
+    }
+
+    [Fact]
+    public void Une_reaction_horodatee_par_le_modele_est_visible_tout_de_suite()
+    {
+        var foule = new LiveCrowdModel();
+        var acteurs = Acteurs(4);
+        foule.Poser(acteurs, 4);
+
+        // La forme SANS horodatage, celle que le code qui tourne utilise.
+        foule.Reagir(acteurs[0], "hype", 2, "Nelfe80");
+
+        var etat = foule.Relever(LiveCrowdModel.Maintenant());
+        Assert.Single(etat.Vols);
+        Assert.Single(etat.Sauts);
+        Assert.Single(etat.Etiquettes);
+
+        // Et son age doit etre exploitable : c'est precisement ce qui etait negatif quand les
+        // deux horloges se rencontraient.
+        var age = LiveCrowdModel.Maintenant() - etat.Vols[0].Depuis;
+        Assert.InRange(age, 0, LiveCrowdModel.DureeVol);
     }
 
     [Fact]
@@ -120,7 +179,7 @@ public sealed class LiveCrowdModelTests
         Assert.Single(plein.Vols);
         Assert.Single(plein.Etiquettes);
         Assert.Single(plein.Sauts);
-        Assert.Equal(14, plein.Sauts[present].Hauteur);
+        Assert.Equal(8, plein.Sauts[present].Hauteur);
     }
 
     [Fact]

@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using RetroBat.Api.Infrastructure;
 
@@ -25,17 +26,20 @@ public sealed class LiveReactionUploader
     private readonly NelfePlayDeviceStore _machine;
     private readonly IHttpClientFactory _httpFactory;
     private readonly LiveSpectateState _seance;
+    private readonly LiveCrowdModel _foule;
     private readonly ILogger<LiveReactionUploader> _logger;
 
     public LiveReactionUploader(
         NelfePlayDeviceStore machine,
         IHttpClientFactory httpFactory,
         LiveSpectateState seance,
+        LiveCrowdModel foule,
         ILogger<LiveReactionUploader> logger)
     {
         _machine = machine;
         _httpFactory = httpFactory;
         _seance = seance;
+        _foule = foule;
         _logger = logger;
     }
 
@@ -87,6 +91,37 @@ public sealed class LiveReactionUploader
                 _logger.LogDebug(
                     "Direct : reaction refusee (HTTP {Code}).", (int) reponse.StatusCode);
                 return;
+            }
+
+            // ON ANIME TOUT DE SUITE. La reponse porte l'ACTEUR, que cette borne ne peut pas
+            // calculer elle-meme (c'est un pseudonyme derive au centre). Attendre le battement
+            // suivant ferait sauter sa propre silhouette deux secondes et demie apres le
+            // geste, ce qui se lit comme un bouton qui ne marche pas.
+            //
+            // L'identifiant est note pour que le flux ne rejoue pas la meme reaction.
+            try
+            {
+                using var doc = JsonDocument.Parse(
+                    await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
+                var r = doc.RootElement;
+                if (r.TryGetProperty("ok", out var ok) && ok.ValueKind == JsonValueKind.True)
+                {
+                    var id = r.TryGetProperty("id", out var i) && i.TryGetInt64(out var v) ? v : 0L;
+                    var acteur = r.TryGetProperty("actor", out var a) && a.ValueKind == JsonValueKind.String
+                        ? a.GetString() ?? "" : "";
+                    var nom = r.TryGetProperty("name", out var n) && n.ValueKind == JsonValueKind.String
+                        ? n.GetString() ?? "" : "";
+                    if (acteur.Length > 0 && _foule.NoterVue(id))
+                    {
+                        _foule.Reagir(acteur, famille, niveau, nom);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // La reaction est PARTIE : ne pas avoir su lire la reponse n'annule rien, on
+                // perd seulement l'animation immediate, que le battement suivant rattrapera.
+                _logger.LogDebug(ex, "Direct : reponse de reaction illisible.");
             }
 
             _logger.LogInformation("Direct : reaction {Famille} niveau {Niveau} remontee.", famille, niveau);

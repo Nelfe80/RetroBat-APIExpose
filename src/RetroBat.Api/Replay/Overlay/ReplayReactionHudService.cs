@@ -496,32 +496,65 @@ public sealed class ReplayReactionHudService : BackgroundService
         /// </summary>
         private void DrawCrowd(Graphics g, RetroBat.Api.Netplay.LiveCrowdModel.Instantane f, long now)
         {
-            const float largeurSil = 9f, hauteurSil = 12f;
-            var pas = _region.Width / (float) RetroBat.Api.Netplay.LiveCrowdModel.ParRangee;
-            var sol = _region.Height - 18f;
+            var sol = _region.Height - 14;
+
+            // Le pas est ADAPTATIF, calcule par rangee sur son effectif REEL.
+            //
+            // Avec un pas fixe d'un centieme de largeur, soixante spectateurs occupaient les
+            // soixante premiers pour cents de l'ecran et laissaient le reste vide : la foule
+            // paraissait tassee a gauche. En adaptant le pas, les presents s'etalent sur toute
+            // la largeur quel que soit leur nombre, et c'est la DENSITE qui devient la mesure
+            // au lieu de l'etendue. C'est aussi ce qui ressemble a un vrai public.
+            var effectifs = new int[RetroBat.Api.Netplay.LiveCrowdModel.Rangees];
+            foreach (var place in f.Places.Values)
+            {
+                if (place.Rangee >= 0 && place.Rangee < effectifs.Length)
+                {
+                    effectifs[place.Rangee]++;
+                }
+            }
+
+            float PasDe(int rangee)
+            {
+                var n = rangee >= 0 && rangee < effectifs.Length ? effectifs[rangee] : 0;
+                return _region.Width / (float) Math.Max(1, n);
+            }
+
+            // Chaque spectateur au CENTRE de sa case : la foule est donc centree, et le bord
+            // droit n'a pas une demi-case de vide de plus que le gauche.
+            float XDe(int rangee, int index, int taille)
+                => (index + 0.5f) * PasDe(rangee) - taille / 2f;
 
             // Les silhouettes, de l'arriere vers l'avant : les rangees de devant recouvrent.
             for (var rangee = RetroBat.Api.Netplay.LiveCrowdModel.Rangees - 1; rangee >= 0; rangee--)
             {
-                var echelle = 1f - rangee * 0.18f;
-                var alpha = (int) (255 * (1f - rangee * 0.28f));
-                var baseY = sol - rangee * (hauteurSil * 0.42f);
+                // TAILLE ENTIERE et RECUL ENTIER : c'est ce qui garde les pixels carres.
+                var taille = RetroBat.Api.Netplay.LiveCrowdModel.TailleRangee(rangee);
+                var alpha = RetroBat.Api.Netplay.LiveCrowdModel.Opacites[rangee];
+                var baseY = sol - rangee * RetroBat.Api.Netplay.LiveCrowdModel.ReculParRangee;
 
                 foreach (var (acteur, place) in f.Places)
                 {
                     if (place.Rangee != rangee) { continue; }
 
-                    var x = place.Index * pas + (rangee % 2 == 1 ? pas * 0.45f : 0f);
+                    var x = XDe(rangee, place.Index, taille)
+                        + (rangee % 2 == 1 ? PasDe(rangee) * 0.22f : 0f);
                     var saut = 0f;
                     if (f.Sauts.TryGetValue(acteur, out var s) && s.Fin > now)
                     {
                         var avancement = 1.0 - (s.Fin - now) / (double) RetroBat.Api.Netplay.LiveCrowdModel.DureeSaut;
-                        saut = (float) (Math.Sin(Math.Clamp(avancement, 0, 1) * Math.PI) * s.Hauteur);
+                        // Le saut est ARRONDI au pixel, et divise comme la rangee : une hauteur
+                        // fractionnaire ferait vibrer les bords du sprite d'une image a l'autre.
+                        var diviseur = RetroBat.Api.Netplay.LiveCrowdModel.Diviseurs[rangee];
+                        saut = (float) Math.Round(
+                            Math.Sin(Math.Clamp(avancement, 0, 1) * Math.PI) * s.Hauteur / diviseur);
                     }
 
                     var teinte = RetroBat.Api.Netplay.LiveCrowdModel.Teinte(acteur);
                     using var pinceau = new SolidBrush(DeTeinte(teinte, alpha));
-                    Silhouette(g, pinceau, x, baseY - hauteurSil * echelle - saut, echelle);
+                    // Coordonnees ARRONDIES : un sprite pose sur une demi-position se retrouve
+                    // interpole, et un pixel interpole n'est plus un pixel.
+                    Creature(g, pinceau, (int) Math.Round(x), (int) Math.Round(baseY - taille - saut), taille);
                 }
             }
 
@@ -533,8 +566,11 @@ public sealed class ReplayReactionHudService : BackgroundService
                 {
                     var age = (now - vol.Depuis) / (float) RetroBat.Api.Netplay.LiveCrowdModel.DureeVol;
                     if (age is < 0 or >= 1) { continue; }
-                    var x = vol.Index * pas + (vol.Rangee % 2 == 1 ? pas * 0.45f : 0f) + largeurSil / 2f;
-                    var y = sol - vol.Rangee * (hauteurSil * 0.42f) - hauteurSil - age * 90f;
+                    var tv = RetroBat.Api.Netplay.LiveCrowdModel.TailleRangee(vol.Rangee);
+                    var x = XDe(vol.Rangee, vol.Index, tv)
+                        + (vol.Rangee % 2 == 1 ? PasDe(vol.Rangee) * 0.22f : 0f) + tv / 2f;
+                    var y = sol - vol.Rangee * RetroBat.Api.Netplay.LiveCrowdModel.ReculParRangee
+                        - tv - age * 90f;
                     _sprites.Draw(g, vol.Famille, Math.Clamp(vol.Niveau - 1, 0, 2), x, y, 26f + vol.Niveau * 4f, 1f - age);
                 }
             }
@@ -547,21 +583,47 @@ public sealed class ReplayReactionHudService : BackgroundService
             foreach (var e in f.Etiquettes)
             {
                 var taille = g.MeasureString(e.Texte, police);
-                var x = e.Index * pas + (e.Rangee % 2 == 1 ? pas * 0.45f : 0f);
+                var te = RetroBat.Api.Netplay.LiveCrowdModel.TailleRangee(e.Rangee);
+                var x = XDe(e.Rangee, e.Index, te)
+                    + (e.Rangee % 2 == 1 ? PasDe(e.Rangee) * 0.22f : 0f) + te / 2f;
                 var cx = Math.Clamp(x, taille.Width / 2f + 4f, _region.Width - taille.Width / 2f - 4f);
-                var y = sol - e.Rangee * (hauteurSil * 0.42f) - hauteurSil - 30f;
+                var y = sol - e.Rangee * RetroBat.Api.Netplay.LiveCrowdModel.ReculParRangee
+                    - te - 24f;
                 FillRounded(g, plaque, cx - taille.Width / 2f - 5f, y, taille.Width + 10f, taille.Height + 2f, 6);
                 g.DrawString(e.Texte, police, encre, cx - taille.Width / 2f, y + 1f);
             }
         }
 
-        /// <summary>Une silhouette : tete, torse, deux jambes. Neuf pixels de large, pas un de plus.</summary>
-        private static void Silhouette(Graphics g, Brush pinceau, float x, float y, float p)
+        /// <summary>
+        /// Le spectateur, dessine dans un carre de `taille` pixels.
+        ///
+        /// PROVISOIRE : la grille de huit sur huit tient la place des creatures uniques
+        /// derivees du pseudo. Elle se divise proprement dans trente-deux comme dans seize,
+        /// donc ce provisoire respecte deja la contrainte du pixel carre.
+        ///
+        /// Tout est en entiers, positions comme tailles. Quand la creature arrivera, il
+        /// suffira de remplacer ce corps : la geometrie autour n'aura pas a changer.
+        /// </summary>
+        private static void Creature(Graphics g, Brush pinceau, int x, int y, int taille)
         {
-            g.FillRectangle(pinceau, x + 3 * p, y, 3 * p, 3 * p);          // tete
-            g.FillRectangle(pinceau, x + 2 * p, y + 3 * p, 5 * p, 5 * p);  // torse
-            g.FillRectangle(pinceau, x + 2 * p, y + 8 * p, 2 * p, 4 * p);  // jambe
-            g.FillRectangle(pinceau, x + 5 * p, y + 8 * p, 2 * p, 4 * p);  // jambe
+            var gabarit = RetroBat.Api.Netplay.LiveCrowdModel.Gabarit;
+            var bloc = taille / gabarit.Length;   // 4 a trente-deux pixels, 2 a seize
+            if (bloc < 1)
+            {
+                return;
+            }
+            for (var ligne = 0; ligne < gabarit.Length; ligne++)
+            {
+                var bits = gabarit[ligne];
+                for (var colonne = 0; colonne < 8; colonne++)
+                {
+                    if ((bits & (1 << (7 - colonne))) == 0)
+                    {
+                        continue;
+                    }
+                    g.FillRectangle(pinceau, x + colonne * bloc, y + ligne * bloc, bloc, bloc);
+                }
+            }
         }
 
         /// <summary>Une teinte en degres vers une couleur, saturation et clarte fixes.</summary>
@@ -790,6 +852,13 @@ public sealed class ReplayReactionHudService : BackgroundService
         private static float EaseOut(float t) => 1f - (float)Math.Pow(1 - t, 3);
         private static float EaseIn(float t) => t * t; // accélère (aspiration vers le centre)
         private static float Lerp(float a, float b, float t) => a + (b - a) * Math.Clamp(t, 0f, 1f);
+        /// <summary>
+        /// L'heure du HUD : millisecondes depuis le demarrage.
+        ///
+        /// La foule compare ses horodatages a CELLE-CI (voir `LiveCrowdModel.Maintenant`).
+        /// Changer de base ici sans changer la-bas rend les emoji invisibles et les pseudos
+        /// eternels, sans lever la moindre erreur.
+        /// </summary>
         private static long NowMs() => Environment.TickCount64;
 
         // ── layered window ──

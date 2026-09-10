@@ -232,6 +232,17 @@ public sealed class ReplayReactionService : IHostedService
         if (_direct.Actif && !string.Equals(st.Mode, "replay", StringComparison.Ordinal))
         {
             _ = _directUploader.EnvoyerAsync(family, level);
+
+            // ET ON PUBLIE L'ÉVÉNEMENT LOCAL. Sans lui, l'overlay ne jouait plus sa nuée
+            // d'emoji quand on réagit pendant un direct : j'avais coupé l'animation habituelle
+            // en routant la réaction vers la plateforme. Le HUD ne lit de cet objet que la
+            // famille, le niveau et l'accord, donc la cible peut rester vide.
+            _ = Publish(new ReplayReaction(
+                "", family, level, st.Frame,
+                DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), Lang(), chord,
+                string.IsNullOrWhiteSpace(_agent.Status.Pseudo) ? null : _agent.Status.Pseudo,
+                "", _sessionSeq));
+
             _logger.LogInformation(
                 "Direct réaction : {F} niveau {L}{Chord} (budget restant {B})",
                 family, level, chord ? " [accord]" : "", _budget);
