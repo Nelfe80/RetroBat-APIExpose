@@ -183,6 +183,7 @@ builder.Services.AddSingleton<WebSocketConnectionManager>();
 builder.Services.AddSingleton<RetroBat.Api.Netplay.NetplayRelayPicker>();
 builder.Services.AddSingleton<RetroBat.Api.Netplay.NetplayLobbyClient>();
 builder.Services.AddSingleton<RetroBat.Api.Netplay.NetplayHostService>();
+builder.Services.AddSingleton<RetroBat.Api.Netplay.NetplayGuestService>();
 builder.Services.AddSingleton<MediaRuntimeState>();
 builder.Services.AddSingleton<StartupOverlayService>();
 builder.Services.AddSingleton<LiveContestOverlayService>();

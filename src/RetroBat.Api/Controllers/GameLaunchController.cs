@@ -47,6 +47,7 @@ public sealed class GameLaunchController : ControllerBase
     private readonly ReplayLaunchTokenStore _tokens;
     private readonly IHttpClientFactory _httpFactory;
     private readonly RetroBat.Api.Netplay.NetplayHostService _hote;
+    private readonly RetroBat.Api.Netplay.NetplayGuestService _invite;
     private readonly NelfePlayAgentService _agent;
     private readonly ILogger<GameLaunchController> _logger;
 
@@ -56,6 +57,7 @@ public sealed class GameLaunchController : ControllerBase
         ReplayLaunchTokenStore tokens,
         IHttpClientFactory httpFactory,
         RetroBat.Api.Netplay.NetplayHostService hote,
+        RetroBat.Api.Netplay.NetplayGuestService invite,
         NelfePlayAgentService agent,
         ILogger<GameLaunchController> logger)
     {
@@ -64,8 +66,62 @@ public sealed class GameLaunchController : ControllerBase
         _tokens = tokens;
         _httpFactory = httpFactory;
         _hote = hote;
+        _invite = invite;
         _agent = agent;
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Rejoindre la partie de quelqu'un.
+    ///
+    /// L'URL ne porte QUE l'identifiant de session — jamais un mot de passe. La borne les
+    /// demande elle-meme a NelfePlay, authentifiee comme machine : dans une URL de navigateur
+    /// ils finiraient dans l'historique, dans les journaux du serveur et dans le referer.
+    ///
+    /// Meme garde que le lancement : un jeton a usage unique. Sans lui, un simple lien
+    /// ferait rejoindre une partie a qui le clique.
+    /// </summary>
+    [HttpGet("/nelfeplay/join")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<IActionResult> Join(
+        [FromQuery] string? session,
+        [FromQuery] string? token,
+        [FromQuery(Name = "to")] string? to,
+        CancellationToken ct)
+    {
+        var retour = NelfeReturnUrl.SafeBase(to);
+
+        if (!_tokens.Consume(token))
+        {
+            return Redirect(Retour(retour, "no_token", null));
+        }
+        if (string.IsNullOrWhiteSpace(session))
+        {
+            return Redirect(Retour(retour, "bad_request", null));
+        }
+
+        var echec = await _invite.RejoindreAsync(session, ct).ConfigureAwait(false);
+        return echec == RetroBat.Api.Netplay.NetplayGuestService.Echec.Aucun
+            ? Redirect(Retour(retour, null, null))
+            : Redirect(Retour(retour, RaisonInvite(echec), null));
+    }
+
+    /// <summary>
+    /// Le mot que le site lira. « Pas le meme dump » ne se corrige pas comme « jeu absent »,
+    /// et laisser les deux sous un meme « echec » ne dirait rien a personne.
+    /// </summary>
+    private static string RaisonInvite(RetroBat.Api.Netplay.NetplayGuestService.Echec echec)
+    {
+        return echec switch
+        {
+            RetroBat.Api.Netplay.NetplayGuestService.Echec.NonAppairee => "not_paired",
+            RetroBat.Api.Netplay.NetplayGuestService.Echec.SessionInconnue => "no_session",
+            RetroBat.Api.Netplay.NetplayGuestService.Echec.JeuAbsent => "not_installed",
+            RetroBat.Api.Netplay.NetplayGuestService.Echec.JamaisLance => "never_launched",
+            RetroBat.Api.Netplay.NetplayGuestService.Echec.DumpDifferent => "different_dump",
+            RetroBat.Api.Netplay.NetplayGuestService.Echec.CoeurDifferent => "different_core",
+            _ => "join_failed",
+        };
     }
 
     [HttpGet("/nelfeplay/launch")]
