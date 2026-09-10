@@ -49,6 +49,7 @@ public sealed class GameLaunchController : ControllerBase
     private readonly RetroBat.Api.Netplay.NetplayHostService _hote;
     private readonly RetroBat.Api.Netplay.NetplayGuestService _invite;
     private readonly NelfePlayAgentService _agent;
+    private readonly RetroBat.Api.Netplay.LiveSpectateState _spectate;
     private readonly ILogger<GameLaunchController> _logger;
 
     public GameLaunchController(
@@ -59,6 +60,7 @@ public sealed class GameLaunchController : ControllerBase
         RetroBat.Api.Netplay.NetplayHostService hote,
         RetroBat.Api.Netplay.NetplayGuestService invite,
         NelfePlayAgentService agent,
+        RetroBat.Api.Netplay.LiveSpectateState spectate,
         ILogger<GameLaunchController> logger)
     {
         _gamelists = gamelists;
@@ -68,6 +70,7 @@ public sealed class GameLaunchController : ControllerBase
         _hote = hote;
         _invite = invite;
         _agent = agent;
+        _spectate = spectate;
         _logger = logger;
     }
 
@@ -81,6 +84,46 @@ public sealed class GameLaunchController : ControllerBase
     /// Meme garde que le lancement : un jeton a usage unique. Sans lui, un simple lien
     /// ferait rejoindre une partie a qui le clique.
     /// </summary>
+    /// <summary>
+    /// SIMULATION : ouvre une seance de spectateur sur un direct, SANS lancer de netplay.
+    ///
+    /// A quoi ca sert : voir le rendu de la foule comme un spectateur le verrait, sans reunir
+    /// une seconde borne et une vraie audience. On fait semblant que le direct de cette borne
+    /// est une seance de spectateur ; l'overlay se comporte alors exactement comme chez un
+    /// spectateur, puisque c'est le meme etat qui le commande.
+    ///
+    /// Elle ne lance RIEN et ne touche a aucun reglage : elle pose un etat, et `?stop=1` le
+    /// retire. Le jeton de spectateur est obtenu par le chemin normal, authentifie comme
+    /// machine, donc rien n'est fabrique ici non plus.
+    /// </summary>
+    [HttpGet("/nelfeplay/dev/spectate")]
+    public async Task<IActionResult> DevSpectate(
+        [FromQuery] string? session, [FromQuery] int stop = 0, CancellationToken ct = default)
+    {
+        if (stop == 1)
+        {
+            _spectate.Fermer();
+            return Ok(new { ok = true, watching = false });
+        }
+
+        var id = (session ?? "").Trim().ToLowerInvariant();
+        if (!System.Text.RegularExpressions.Regex.IsMatch(id, "^[0-9a-f]{32}$"))
+        {
+            return BadRequest(new { ok = false, error = "bad_session" });
+        }
+
+        var jeton = await _invite.JetonSpectateurAsync(id, ct).ConfigureAwait(false);
+        if (string.IsNullOrEmpty(jeton))
+        {
+            // Sans jeton, l'etat resterait inactif : autant le dire plutot que de laisser
+            // croire que la simulation tourne.
+            return NotFound(new { ok = false, error = "no_session_or_not_paired" });
+        }
+
+        _spectate.Ouvrir(id, jeton, false);
+        return Ok(new { ok = true, watching = true, session = id });
+    }
+
     [HttpGet("/nelfeplay/join")]
     [ApiExplorerSettings(IgnoreApi = true)]
     public async Task<IActionResult> Join(

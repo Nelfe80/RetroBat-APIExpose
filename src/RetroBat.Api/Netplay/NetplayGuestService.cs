@@ -186,6 +186,23 @@ public sealed class NetplayGuestService
         }
     }
 
+    /// <summary>
+    /// Le jeton de spectateur pour un direct, sans rien lancer.
+    ///
+    /// Sert a la simulation d'overlay : on veut l'etat de seance, pas la partie. Le jeton
+    /// vient du chemin NORMAL, authentifie comme machine, donc rien n'est fabrique.
+    /// </summary>
+    public async Task<string> JetonSpectateurAsync(string sessionId, CancellationToken ct = default)
+    {
+        var credential = _machine.GetCredential();
+        if (string.IsNullOrEmpty(credential))
+        {
+            return "";
+        }
+        var infos = await DemanderAsync(sessionId, credential, ct).ConfigureAwait(false);
+        return infos?.Jeton ?? "";
+    }
+
     /// <summary>Ce que la plateforme nous accorde pour cette session.</summary>
     private readonly record struct Infos(
         string Jeu,
