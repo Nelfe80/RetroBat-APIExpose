@@ -46,6 +46,8 @@ public sealed class GameLaunchController : ControllerBase
     private readonly RomCanonicalResolver _canonical;
     private readonly ReplayLaunchTokenStore _tokens;
     private readonly IHttpClientFactory _httpFactory;
+    private readonly RetroBat.Api.Netplay.NetplayHostService _hote;
+    private readonly NelfePlayAgentService _agent;
     private readonly ILogger<GameLaunchController> _logger;
 
     public GameLaunchController(
@@ -53,12 +55,16 @@ public sealed class GameLaunchController : ControllerBase
         RomCanonicalResolver canonical,
         ReplayLaunchTokenStore tokens,
         IHttpClientFactory httpFactory,
+        RetroBat.Api.Netplay.NetplayHostService hote,
+        NelfePlayAgentService agent,
         ILogger<GameLaunchController> logger)
     {
         _gamelists = gamelists;
         _canonical = canonical;
         _tokens = tokens;
         _httpFactory = httpFactory;
+        _hote = hote;
+        _agent = agent;
         _logger = logger;
     }
 
@@ -69,6 +75,13 @@ public sealed class GameLaunchController : ControllerBase
         [FromQuery] string? game,
         [FromQuery] string? token,
         [FromQuery(Name = "to")] string? to,
+        // « Diffuser en live » : la partie est hebergee en netplay au lieu d'etre lancee
+        // ordinairement. Absent, rien ne change — c'est le cas de tous les lancements.
+        [FromQuery] string? share,
+        // L'hote autorise-t-il a prendre une manette ? Cela ne decide QUE si le mot de passe
+        // joueur est rapporte a la plateforme : les deux sont poses sur la borne, et c'est
+        // RetroArch qui applique la difference.
+        [FromQuery] string? play,
         CancellationToken ct)
     {
         var retour = NelfeReturnUrl.SafeBase(to);
@@ -88,6 +101,26 @@ public sealed class GameLaunchController : ControllerBase
             // Le jeu est au classement mais pas sur CETTE borne : ce n'est pas une panne,
             // c'est une information, et le site sait la dire.
             return Redirect(Retour(retour, "not_installed", null));
+        }
+
+        // DIFFUSION : on heberge, au lieu de passer par le lancement ordinaire d'ES. C'est le
+        // seul chemin possible — l'API HTTP d'EmulationStation ne prend qu'un chemin de ROM et
+        // ne sait pas demander un hebergement netplay.
+        if (share == "1")
+        {
+            var echec = await _hote.HebergerAsync(
+                rom,
+                _agent.Status.Pseudo ?? "",
+                play == "1",
+                ct).ConfigureAwait(false);
+
+            if (echec != RetroBat.Api.Netplay.NetplayHostService.Echec.Aucun)
+            {
+                // Chaque echec se DIT : le site saura quoi montrer plutot que de laisser
+                // croire a une diffusion qui n'a pas commence.
+                return Redirect(Retour(retour, RaisonDe(echec), null));
+            }
+            return Redirect(Retour(retour, null, game));
         }
 
         try
@@ -119,6 +152,18 @@ public sealed class GameLaunchController : ControllerBase
 
         return Redirect(Retour(retour, null, game));
     }
+
+    /// <summary>
+    /// Le mot que le site lira. Chaque cas a le sien : « ce jeu n'a jamais ete lance ici » ne
+    /// se corrige pas comme « le lanceur a refuse ».
+    /// </summary>
+    private static string RaisonDe(RetroBat.Api.Netplay.NetplayHostService.Echec echec) => echec switch
+    {
+        RetroBat.Api.Netplay.NetplayHostService.Echec.JamaisLance => "never_launched",
+        RetroBat.Api.Netplay.NetplayHostService.Echec.ReglagesRefuses => "settings_refused",
+        RetroBat.Api.Netplay.NetplayHostService.Echec.LancementRefuse => "launch_refused",
+        _ => "host_failed",
+    };
 
     private static string Retour(string racine, string? raison, string? jeu)
     {
