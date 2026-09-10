@@ -66,6 +66,36 @@ public static class EmulatorForeground
     }
 
     /// <summary>Le menu. Il doit avoir le focus avant qu'on lui demande de lancer quoi que ce soit.</summary>
+    /// <summary>
+    /// Un emulateur tourne-t-il ?
+    ///
+    /// Meme correspondance par PREFIXE que le reste de cette classe, et pour la meme raison :
+    /// RetroBat lance « retroarch.patched.RETROBAT », que la recherche par nom entier ne
+    /// trouve pas. Poser la question ici evite qu'un appelant reinvente ce piege.
+    /// </summary>
+    public static bool EmulateurTourne()
+    {
+        foreach (var nom in Emulateurs)
+        {
+            var trouves = Processus(nom).ToArray();
+            try
+            {
+                if (trouves.Length > 0)
+                {
+                    return true;
+                }
+            }
+            finally
+            {
+                foreach (var p in trouves)
+                {
+                    p.Dispose();
+                }
+            }
+        }
+        return false;
+    }
+
     public static bool FocusEmulationStation() => Focus("emulationstation");
 
     /// <summary>

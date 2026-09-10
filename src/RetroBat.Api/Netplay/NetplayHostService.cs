@@ -139,6 +139,12 @@ public sealed class NetplayHostService
                 jeton, mdpSpectateur, autoriserAJouer ? mdpJoueur : "", coeurLocal, empreinte),
             CancellationToken.None);
 
+        // TROISIEME TEMPS : le direct doit CESSER quand la partie cesse. Sans lui, l'annonce
+        // vit jusqu'a sa peremption et la fiche du joueur continue d'inviter a rejoindre une
+        // partie fermee. Constate en test, et c'est pire qu'une absence d'annonce : ca envoie
+        // quelqu'un se brancher sur rien.
+        _ = Task.Run(RetirerQuandLaPartieFinitAsync, CancellationToken.None);
+
         return Echec.Aucun;
     }
 
@@ -179,6 +185,88 @@ public sealed class NetplayHostService
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Netplay : attente de la session interrompue.");
+        }
+    }
+
+    /// <summary>
+    /// Attend la fin de la partie, puis retire l'annonce.
+    ///
+    /// Par SONDAGE et non par evenement : c'est ainsi que le module de replay constate deja
+    /// la fin d'une partie, et un second mecanisme pour la meme question ferait deux verites a
+    /// maintenir.
+    ///
+    /// On attend d'abord que l'emulateur PARAISSE. Il vient d'etre lance et peut ne pas encore
+    /// avoir de processus : conclure « deja fini » retirerait l'annonce dans la seconde.
+    /// </summary>
+    private async Task RetirerQuandLaPartieFinitAsync()
+    {
+        try
+        {
+            // Une minute pour paraitre. Au-dela, le lancement a echoue autrement, et il n'y a
+            // rien a retirer : c'est le navigateur qui annonce, et seulement sur confirmation.
+            var apparu = false;
+            var apparition = DateTime.UtcNow.AddSeconds(60);
+            while (!apparu && DateTime.UtcNow < apparition)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(2), CancellationToken.None).ConfigureAwait(false);
+                apparu = EmulatorForeground.EmulateurTourne();
+            }
+            if (!apparu)
+            {
+                _logger.LogInformation("Netplay : aucun emulateur apparu, pas d'annonce a retirer.");
+                return;
+            }
+
+            // La borne d'un joueur reste allumee : on ne guette pas indefiniment. Deux heures,
+            // c'est exactement la peremption de l'annonce, donc au-dela il n'y a plus rien a
+            // retirer de toute facon.
+            var limite = DateTime.UtcNow.AddHours(2);
+            while (DateTime.UtcNow < limite && EmulatorForeground.EmulateurTourne())
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5), CancellationToken.None).ConfigureAwait(false);
+            }
+
+            await RetirerAsync(CancellationToken.None).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Netplay : guet de la fin de partie interrompu.");
+        }
+    }
+
+    /// <summary>
+    /// Retire l'annonce, authentifie comme MACHINE.
+    ///
+    /// La borne ne connait pas l'identifiant de session cote plateforme : le lien
+    /// machine -> compte suffit, comme pour le rapport de la session netplay.
+    /// </summary>
+    private async Task RetirerAsync(CancellationToken ct)
+    {
+        var credential = _machine.GetCredential();
+        if (string.IsNullOrEmpty(credential))
+        {
+            return;
+        }
+        try
+        {
+            var client = _httpFactory.CreateClient();
+            client.BaseAddress = new Uri(NelfePlayAgentService.BaseUrl.TrimEnd('/'));
+            client.Timeout = TimeSpan.FromSeconds(10);
+            client.DefaultRequestHeaders.Add("X-NelfePlay-Device", credential);
+
+            using var contenu = new StringContent("{}", Encoding.UTF8, "application/json");
+            using var reponse = await client
+                .PostAsync("/api/v1/agent/live/withdraw", contenu, ct)
+                .ConfigureAwait(false);
+
+            _logger.LogInformation(
+                "Netplay : partie finie, annonce retiree (HTTP {Code}).", (int) reponse.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            // Un retrait manque n'est pas grave au point de meriter une alerte : la peremption
+            // de deux heures reste le filet. Mais il doit se LIRE, sinon on cherchera ailleurs.
+            _logger.LogWarning(ex, "Netplay : retrait de l'annonce en echec.");
         }
     }
 
