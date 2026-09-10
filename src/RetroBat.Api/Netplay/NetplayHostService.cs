@@ -128,8 +128,15 @@ public sealed class NetplayHostService
         // SECOND TEMPS, detache. On ne passe PAS le jeton d'annulation de la requete HTTP :
         // elle sera terminee bien avant, et annuler ce travail avec elle laisserait une partie
         // hebergee que personne ne pourrait rejoindre.
+        // On emporte le nom COURT du coeur et l'empreinte du contenu, calcules ICI. Le lobby
+        // publie, lui, le nom d'AFFICHAGE du coeur et son propre CRC : rapporter ces valeurs
+        // faisait comparer au client deux choses fabriquees differemment.
+        var coeurLocal = resolution.Coeur;
+        var empreinte = NetplayContent.Empreinte(cheminRom);
+
         _ = Task.Run(
-            () => AttendreEtRapporterAsync(jeton, mdpSpectateur, autoriserAJouer ? mdpJoueur : ""),
+            () => AttendreEtRapporterAsync(
+                jeton, mdpSpectateur, autoriserAJouer ? mdpJoueur : "", coeurLocal, empreinte),
             CancellationToken.None);
 
         return Echec.Aucun;
@@ -143,7 +150,11 @@ public sealed class NetplayHostService
     /// peuvent venir serait pire que de jouer seul.
     /// </summary>
     private async Task AttendreEtRapporterAsync(
-        string jeton, string motDePasseSpectateur, string motDePasseJoueur)
+        string jeton,
+        string motDePasseSpectateur,
+        string motDePasseJoueur,
+        string coeurLocal,
+        string empreinte)
     {
         try
         {
@@ -156,7 +167,13 @@ public sealed class NetplayHostService
             }
 
             _logger.LogInformation("Netplay : session {Session} sur {Relais}.", session.Id, session.RelayHote);
-            await RapporterAsync(session, motDePasseSpectateur, motDePasseJoueur, CancellationToken.None)
+            await RapporterAsync(
+                    session,
+                    motDePasseSpectateur,
+                    motDePasseJoueur,
+                    coeurLocal,
+                    empreinte,
+                    CancellationToken.None)
                 .ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -178,6 +195,8 @@ public sealed class NetplayHostService
         NetplayLobbyClient.Session session,
         string motDePasseSpectateur,
         string motDePasseJoueur,
+        string coeurLocal,
+        string empreinte,
         CancellationToken ct)
     {
         var credential = _machine.GetCredential();
@@ -201,9 +220,18 @@ public sealed class NetplayHostService
                 ["session"] = session.Id,
                 ["spectate_password"] = motDePasseSpectateur,
                 ["player_password"] = motDePasseJoueur,
-                ["core"] = session.Coeur,
+                // Le nom COURT du coeur (« fbneo »), celui de la ligne de lancement d'ES, et
+                // non celui que publie le lobby (« FinalBurn Neo »). Le client ne connait que
+                // le nom court, tire de sa propre ligne de lancement : comparer les deux
+                // conventions faisait refuser le MEME coeur, ce qui est arrive en test.
+                ["core"] = coeurLocal.Length > 0 ? coeurLocal : session.Coeur,
+                // La version reste celle du lobby : elle n'entre dans aucune comparaison, elle
+                // ne sert qu'a expliquer un refus.
                 ["core_version"] = session.VersionCoeur,
-                ["crc"] = session.Crc,
+                // L'empreinte du contenu calculee par NOTRE code, pour que le client compare
+                // deux valeurs produites de la meme facon. Le CRC du lobby est celui de
+                // RetroArch, obtenu autrement, donc incomparable au notre.
+                ["crc"] = empreinte.Length > 0 ? empreinte : session.Crc,
             };
             using var contenu = new StringContent(corps.ToJsonString(), Encoding.UTF8, "application/json");
             using var reponse = await client

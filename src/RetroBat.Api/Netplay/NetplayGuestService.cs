@@ -98,15 +98,28 @@ public sealed class NetplayGuestService
         // differents du meme jeu. Deux personnes qui possedent « Sonic » peuvent donc tres bien
         // ne pas pouvoir jouer ensemble — et il vaut mieux le dire ici que laisser la connexion
         // tomber sans explication.
-        if (infos.Value.Coeur.Length > 0
-            && !string.Equals(resolution.Coeur, infos.Value.Coeur, StringComparison.OrdinalIgnoreCase))
+        // On compare des noms COURTS de coeur (« fbneo »), ceux des lignes de lancement d'ES.
+        // Une borne restee sur une version anterieure rapporte encore le nom d'AFFICHAGE que
+        // publie le lobby (« FinalBurn Neo ») : les deux conventions ne se comparent pas, et le
+        // faire refusait le meme coeur. Dans ce cas on ne compare PAS, et le journal le dit :
+        // l'empreinte du contenu reste la garantie, et un coeur reellement different,
+        // RetroArch le refusera de lui-meme.
+        var coeurHote = infos.Value.Coeur;
+        if (coeurHote.Length > 0 && coeurHote.Contains(' '))
         {
             _logger.LogInformation(
-                "Netplay : coeur different (hote {Hote}, ici {Ici}).", infos.Value.Coeur, resolution.Coeur);
+                "Netplay : nom de coeur incomparable (hote {Hote}, ici {Ici}), on s'en remet a l'empreinte.",
+                coeurHote, resolution.Coeur);
+        }
+        else if (coeurHote.Length > 0
+            && !string.Equals(resolution.Coeur, coeurHote, StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogInformation(
+                "Netplay : coeur different (hote {Hote}, ici {Ici}).", coeurHote, resolution.Coeur);
             return Echec.CoeurDifferent;
         }
 
-        var crcLocal = ContenuCrc32(rom);
+        var crcLocal = NetplayContent.Empreinte(rom);
         if (infos.Value.Crc.Length > 0 && crcLocal.Length > 0
             && !string.Equals(crcLocal, infos.Value.Crc, StringComparison.OrdinalIgnoreCase))
         {
@@ -217,56 +230,6 @@ public sealed class NetplayGuestService
             }
         }
         return null;
-    }
-
-    /// <summary>
-    /// Le CRC32 du CONTENU, comme RetroArch le calcule : une archive est decompressee avant
-    /// d'etre hachee, sinon on comparerait des compressions et pas des jeux.
-    /// </summary>
-    private static string ContenuCrc32(string chemin)
-    {
-        try
-        {
-            if (chemin.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
-            {
-                using var archive = System.IO.Compression.ZipFile.OpenRead(chemin);
-                var entree = archive.Entries.FirstOrDefault(e => e.Length > 0);
-                // Le CRC32 est deja dans l'index du zip : inutile de decompresser pour l'obtenir.
-                return entree is null ? "" : entree.Crc32.ToString("X8");
-            }
-            using var flux = File.OpenRead(chemin);
-            return Crc32De(flux).ToString("X8");
-        }
-        catch (Exception)
-        {
-            return "";
-        }
-    }
-
-    private static uint Crc32De(Stream flux)
-    {
-        var table = new uint[256];
-        for (uint i = 0; i < 256; i++)
-        {
-            var c = i;
-            for (var k = 0; k < 8; k++)
-            {
-                c = (c & 1) != 0 ? 0xEDB88320u ^ (c >> 1) : c >> 1;
-            }
-            table[i] = c;
-        }
-
-        var crc = 0xFFFFFFFFu;
-        var tampon = new byte[64 * 1024];
-        int lu;
-        while ((lu = flux.Read(tampon, 0, tampon.Length)) > 0)
-        {
-            for (var i = 0; i < lu; i++)
-            {
-                crc = table[(crc ^ tampon[i]) & 0xFF] ^ (crc >> 8);
-            }
-        }
-        return crc ^ 0xFFFFFFFFu;
     }
 
     /// <summary>
