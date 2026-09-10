@@ -188,6 +188,9 @@ builder.Services.AddSingleton<RetroBat.Api.Netplay.NetplayGuestService>();
 // l'overlay pourraient viser deux seances differentes.
 builder.Services.AddSingleton<RetroBat.Api.Netplay.LiveSpectateState>();
 builder.Services.AddSingleton<RetroBat.Api.Netplay.LiveReactionUploader>();
+// La foule : un seul modele partage entre le sondeur qui l'alimente et le HUD qui la dessine.
+builder.Services.AddSingleton<RetroBat.Api.Netplay.LiveCrowdModel>();
+builder.Services.AddHostedService<RetroBat.Api.Netplay.LiveCrowdPoller>();
 builder.Services.AddSingleton<MediaRuntimeState>();
 builder.Services.AddSingleton<StartupOverlayService>();
 builder.Services.AddSingleton<LiveContestOverlayService>();

@@ -43,13 +43,20 @@ public sealed class ReplayReactionHudService : BackgroundService
     private ReplayReactionSprites? _sprites; // créé sur le thread UI du HUD (pas de partage cross-thread GDI+)
     private IDisposable? _sub;
 
+    private readonly RetroBat.Api.Netplay.LiveSpectateState _direct;
+    private readonly RetroBat.Api.Netplay.LiveCrowdModel _foule;
+
     public ReplayReactionHudService(IEventBus bus, ReplayReactionService reactions,
         ReplayPlaybackService playback, ReplayStore store,
         RetroBat.Api.Replay.Social.ReplaySocialStore social, ILogger<ReplayReactionHudService> logger,
-        IOptionsMonitor<ApiExposeOptions> options, NelfePlayScoringSessionService? session = null)
+        IOptionsMonitor<ApiExposeOptions> options,
+        RetroBat.Api.Netplay.LiveSpectateState direct,
+        RetroBat.Api.Netplay.LiveCrowdModel foule,
+        NelfePlayScoringSessionService? session = null)
     {
         _bus = bus; _reactions = reactions; _playback = playback; _store = store; _social = social;
         _logger = logger; _options = options; _session = session;
+        _direct = direct; _foule = foule;
     }
 
     /// <summary>
@@ -107,6 +114,11 @@ public sealed class ReplayReactionHudService : BackgroundService
             var form = new HudForm(() => _reactions.GetCharge(), sprites,
                 () => _playback.GetState(),
                 () => _reactions.GetAvailability(),
+                // La FOULE : « regarde-t-on un direct ? » et « qu'y a-t-il a dessiner ? ». Deux
+                // delegues plutot qu'une reference : la fenetre vit sur son propre thread UI, et
+                // ne doit rien detenir qu'elle pourrait lire a contretemps.
+                () => _direct.Actif,
+                maintenant => _foule.Relever(maintenant),
                 // R9 : le journal d'ici, PLUS les evenements signes recus d'ailleurs. C'est ce qui
                 // fait apparaitre les reactions des autres spectateurs pendant la lecture, sans
                 // qu'aucune d'elles n'ait a etre crue sur parole.
@@ -172,18 +184,24 @@ public sealed class ReplayReactionHudService : BackgroundService
         private Bitmap? _buffer;          // GDI+ dessine dedans (mémoire partagée avec le DIB)
         private IntPtr _memDc, _dib, _oldSel;
         private Rectangle _region;
+        private readonly Func<bool> _enDirect;
+        private readonly Func<long, RetroBat.Api.Netplay.LiveCrowdModel.Instantane> _foule;
 
         private sealed class Particle { public string Family = ""; public int Col; public string Emoji = ""; public Color Color; public int Level; public long Born; public double Angle; public float Radial; }
         private sealed class Label { public string Word = ""; public Color Color; public int Level; public long Born; }
 
         public HudForm(Func<ReplayReactionService.ChargeSnapshot> charge, ReplayReactionSprites? sprites,
             Func<ReplayPlaybackService.StateSnapshot> state, Func<ReplayReactionService.Availability> avail,
+            Func<bool> enDirect,
+            Func<long, RetroBat.Api.Netplay.LiveCrowdModel.Instantane> foule,
             Func<string, IReadOnlyList<ReplayReaction>> loadReactions, Func<string> locale)
         {
             _charge = charge;
             _sprites = sprites;
             _state = state;
             _avail = avail;
+            _enDirect = enDirect;
+            _foule = foule;
             _loadReactions = loadReactions;
             _locale = locale;
             FormBorderStyle = FormBorderStyle.None;
@@ -254,7 +272,12 @@ public sealed class ReplayReactionHudService : BackgroundService
                 var playing = string.Equals(st.Mode, "replay", StringComparison.Ordinal);
                 PumpBubble(st, playing);
 
-                var active = playing || charge.Active || _parts.Count > 0 || _labels.Count > 0;
+                // Pendant un DIRECT, la facade sert aussi : la legende doit se voir, et la foule
+                // avec elle. Sans ca le HUD ne paraissait que le temps d'une animation, donc la
+                // legende clignotait et la foule n'existait pas entre deux reactions.
+                var enDirect = SafeEnDirect();
+
+                var active = playing || enDirect || charge.Active || _parts.Count > 0 || _labels.Count > 0;
                 if (!active)
                 {
                     if (Visible) Hide();
@@ -269,10 +292,21 @@ public sealed class ReplayReactionHudService : BackgroundService
                 // On ne recompose donc à 25 fps QUE quand quelque chose BOUGE (nuée/mot/jauge/bulle) ;
                 // sinon 1 fps suffit (légende/attente quasi statiques) → RetroArch garde le GPU, fin
                 // du son haché. (Diagnostic borne i3-N305 : 2 overlays layered 25 fps = coupable.)
-                var animating = charge.Active || _parts.Count > 0 || _labels.Count > 0 || _activeBubble is not null;
+                // La foule ne compte comme animation que quand elle BOUGE (saut, vol, etiquette).
+                // Des silhouettes immobiles n'ont aucune raison de couter 25 images par seconde :
+                // c'est le compositing DWM d'une fenetre layered plein ecran qui coute, et il a
+                // deja hache le son sur une borne modeste.
+                var fouleInstantanee = enDirect ? SafeFoule(now) : null;
+                var fouleAnime = fouleInstantanee is not null
+                    && (fouleInstantanee.Vols.Count > 0
+                        || fouleInstantanee.Etiquettes.Count > 0
+                        || fouleInstantanee.Sauts.Count > 0);
+
+                var animating = charge.Active || _parts.Count > 0 || _labels.Count > 0
+                    || _activeBubble is not null || fouleAnime;
                 if (animating || now - _lastRenderMs >= 1000)
                 {
-                    RenderFrame(charge, now, playing);
+                    RenderFrame(charge, now, playing, fouleInstantanee);
                     PushLayered(_region.Location, _region.Size);
                     _lastRenderMs = now;
                 }
@@ -415,7 +449,19 @@ public sealed class ReplayReactionHudService : BackgroundService
             _memDc = _dib = _oldSel = IntPtr.Zero;
         }
 
-        private void RenderFrame(ReplayReactionService.ChargeSnapshot charge, long now, bool playing)
+        private bool SafeEnDirect()
+        {
+            try { return _enDirect(); } catch { return false; }
+        }
+
+        private RetroBat.Api.Netplay.LiveCrowdModel.Instantane? SafeFoule(long now)
+        {
+            try { return _foule(now); } catch { return null; }
+        }
+
+        private void RenderFrame(
+            ReplayReactionService.ChargeSnapshot charge, long now, bool playing,
+            RetroBat.Api.Netplay.LiveCrowdModel.Instantane? foule)
         {
             using var g = Graphics.FromImage(_buffer!);
             g.Clear(Color.Transparent);
@@ -426,12 +472,120 @@ public sealed class ReplayReactionHudService : BackgroundService
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
 
             var av = SafeAvail();
-            if (playing) DrawLegend(g, av);
+            // La foule EN PREMIER : elle est le fond de scene, tout le reste passe devant.
+            if (foule is not null) DrawCrowd(g, foule, now);
+            if (playing || foule is not null) DrawLegend(g, av);
             foreach (var p in _parts) DrawParticle(g, p, now);
             foreach (var l in _labels) DrawLabel(g, l, now);
             // Jauge de charge seulement s'il reste du budget (sinon la maintenir ne mène à rien).
             if (charge.Active && av.Budget > 0) DrawGauge(g, charge);
             if (playing) DrawBubble(g, now);
+        }
+
+        /// <summary>
+        /// La FOULE, en bas de l'ecran, comme sur le replay.
+        ///
+        /// Trois rangees de silhouettes pixel qui se chevauchent, comme un public vu de loin.
+        /// C'est le REMPLISSAGE qui est la metrique : on lit la taille de l'audience sans qu'un
+        /// chiffre soit ecrit. Les rangees du fond sont plus petites et plus sombres, ce qui
+        /// donne la profondeur.
+        ///
+        /// Le placement, la teinte, la duree des etiquettes et la hauteur des sauts viennent
+        /// tous de LiveCrowdModel, jumeau du module web : les deux doivent rendre les memes
+        /// nombres, sinon la meme foule se placerait autrement selon l'ecran.
+        /// </summary>
+        private void DrawCrowd(Graphics g, RetroBat.Api.Netplay.LiveCrowdModel.Instantane f, long now)
+        {
+            const float largeurSil = 9f, hauteurSil = 12f;
+            var pas = _region.Width / (float) RetroBat.Api.Netplay.LiveCrowdModel.ParRangee;
+            var sol = _region.Height - 18f;
+
+            // Les silhouettes, de l'arriere vers l'avant : les rangees de devant recouvrent.
+            for (var rangee = RetroBat.Api.Netplay.LiveCrowdModel.Rangees - 1; rangee >= 0; rangee--)
+            {
+                var echelle = 1f - rangee * 0.18f;
+                var alpha = (int) (255 * (1f - rangee * 0.28f));
+                var baseY = sol - rangee * (hauteurSil * 0.42f);
+
+                foreach (var (acteur, place) in f.Places)
+                {
+                    if (place.Rangee != rangee) { continue; }
+
+                    var x = place.Index * pas + (rangee % 2 == 1 ? pas * 0.45f : 0f);
+                    var saut = 0f;
+                    if (f.Sauts.TryGetValue(acteur, out var s) && s.Fin > now)
+                    {
+                        var avancement = 1.0 - (s.Fin - now) / (double) RetroBat.Api.Netplay.LiveCrowdModel.DureeSaut;
+                        saut = (float) (Math.Sin(Math.Clamp(avancement, 0, 1) * Math.PI) * s.Hauteur);
+                    }
+
+                    var teinte = RetroBat.Api.Netplay.LiveCrowdModel.Teinte(acteur);
+                    using var pinceau = new SolidBrush(DeTeinte(teinte, alpha));
+                    Silhouette(g, pinceau, x, baseY - hauteurSil * echelle - saut, echelle);
+                }
+            }
+
+            // Les emoji en vol, par la MEME planche de sprites que les particules : deux chemins
+            // de rendu pour le meme dessin finiraient par ne plus se ressembler.
+            if (_sprites is { Ok: true })
+            {
+                foreach (var vol in f.Vols)
+                {
+                    var age = (now - vol.Depuis) / (float) RetroBat.Api.Netplay.LiveCrowdModel.DureeVol;
+                    if (age is < 0 or >= 1) { continue; }
+                    var x = vol.Index * pas + (vol.Rangee % 2 == 1 ? pas * 0.45f : 0f) + largeurSil / 2f;
+                    var y = sol - vol.Rangee * (hauteurSil * 0.42f) - hauteurSil - age * 90f;
+                    _sprites.Draw(g, vol.Famille, Math.Clamp(vol.Niveau - 1, 0, 2), x, y, 26f + vol.Niveau * 4f, 1f - age);
+                }
+            }
+
+            // Les etiquettes par-dessus tout, sur une plaque sombre : sans elle, un pseudo clair
+            // sur une foule claire ne se lit pas.
+            using var police = new Font("Segoe UI", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
+            using var encre = new SolidBrush(Color.FromArgb(235, 232, 236, 246));
+            using var plaque = new SolidBrush(Color.FromArgb(200, 11, 16, 32));
+            foreach (var e in f.Etiquettes)
+            {
+                var taille = g.MeasureString(e.Texte, police);
+                var x = e.Index * pas + (e.Rangee % 2 == 1 ? pas * 0.45f : 0f);
+                var cx = Math.Clamp(x, taille.Width / 2f + 4f, _region.Width - taille.Width / 2f - 4f);
+                var y = sol - e.Rangee * (hauteurSil * 0.42f) - hauteurSil - 30f;
+                FillRounded(g, plaque, cx - taille.Width / 2f - 5f, y, taille.Width + 10f, taille.Height + 2f, 6);
+                g.DrawString(e.Texte, police, encre, cx - taille.Width / 2f, y + 1f);
+            }
+        }
+
+        /// <summary>Une silhouette : tete, torse, deux jambes. Neuf pixels de large, pas un de plus.</summary>
+        private static void Silhouette(Graphics g, Brush pinceau, float x, float y, float p)
+        {
+            g.FillRectangle(pinceau, x + 3 * p, y, 3 * p, 3 * p);          // tete
+            g.FillRectangle(pinceau, x + 2 * p, y + 3 * p, 5 * p, 5 * p);  // torse
+            g.FillRectangle(pinceau, x + 2 * p, y + 8 * p, 2 * p, 4 * p);  // jambe
+            g.FillRectangle(pinceau, x + 5 * p, y + 8 * p, 2 * p, 4 * p);  // jambe
+        }
+
+        /// <summary>Une teinte en degres vers une couleur, saturation et clarte fixes.</summary>
+        private static Color DeTeinte(int teinte, int alpha)
+        {
+            var h = (teinte % 360) / 60.0;
+            const double s = 0.62, l = 0.58;
+            var c = (1 - Math.Abs(2 * l - 1)) * s;
+            var x = c * (1 - Math.Abs(h % 2 - 1));
+            var m = l - c / 2;
+            var (r, v, b) = (int) h switch
+            {
+                0 => (c, x, 0.0),
+                1 => (x, c, 0.0),
+                2 => (0.0, c, x),
+                3 => (0.0, x, c),
+                4 => (x, 0.0, c),
+                _ => (c, 0.0, x),
+            };
+            return Color.FromArgb(
+                Math.Clamp(alpha, 0, 255),
+                (int) Math.Round((r + m) * 255),
+                (int) Math.Round((v + m) * 255),
+                (int) Math.Round((b + m) * 255));
         }
 
         private ReplayReactionService.Availability SafeAvail()
