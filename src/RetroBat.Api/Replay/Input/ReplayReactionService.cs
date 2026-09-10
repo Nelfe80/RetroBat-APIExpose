@@ -62,12 +62,18 @@ public sealed class ReplayReactionService : IHostedService
     private IDisposable? _sub;
 
     private readonly RetroBat.Api.Replay.Sharing.ReplayViewerSession _viewer;
+    private readonly RetroBat.Api.Netplay.LiveSpectateState _direct;
+    private readonly RetroBat.Api.Netplay.LiveReactionUploader _directUploader;
 
     public ReplayReactionService(IEventBus bus, ReplayPlaybackService playback, ReplayStore store,
         RetroBat.Api.Infrastructure.NelfePlayAgentService agent,
-        RetroBat.Api.Replay.Sharing.ReplayViewerSession viewer, ILogger<ReplayReactionService> logger)
+        RetroBat.Api.Replay.Sharing.ReplayViewerSession viewer,
+        RetroBat.Api.Netplay.LiveSpectateState direct,
+        RetroBat.Api.Netplay.LiveReactionUploader directUploader,
+        ILogger<ReplayReactionService> logger)
     {
         _bus = bus; _playback = playback; _store = store; _agent = agent; _viewer = viewer; _logger = logger;
+        _direct = direct; _directUploader = directUploader;
     }
 
     public Task StartAsync(CancellationToken ct) { _sub = _bus.Subscribe<EventEnvelope>(OnEvent); return Task.CompletedTask; }
@@ -140,8 +146,12 @@ public sealed class ReplayReactionService : IHostedService
         var id = identity.ToLowerInvariant();
         if (!Family.ContainsKey(id)) return; // uniquement les 8 boutons de réaction
 
+        // La facade sert pendant un REPLAY ou pendant un DIRECT. Le geste est le meme, seule
+        // la cible change : reserver les reactions au replay laissait la facade muette
+        // precisement au moment ou l'on veut s'exprimer, une partie en cours.
         var st = _playback.GetState();
-        if (!string.Equals(st.Mode, "replay", StringComparison.Ordinal))
+        var enReplay = string.Equals(st.Mode, "replay", StringComparison.Ordinal);
+        if (!enReplay && !_direct.Actif)
         {
             lock (_gate) { _down.Clear(); ResetGesture(); }
             return;
@@ -215,6 +225,19 @@ public sealed class ReplayReactionService : IHostedService
             _cooldownUntil = DateTime.UtcNow.AddMilliseconds(CooldownMs);
         }
 
+        // UN DIRECT prime sur un replay : si les deux étaient possibles, c'est la partie en
+        // cours qu'on regarde, pas un enregistrement. Elle part TOUT DE SUITE et ne passe pas
+        // par le journal local : une réaction de direct ne vaut que quelques secondes, et rien
+        // n'aurait à être rejoué plus tard.
+        if (_direct.Actif && !string.Equals(st.Mode, "replay", StringComparison.Ordinal))
+        {
+            _ = _directUploader.EnvoyerAsync(family, level);
+            _logger.LogInformation(
+                "Direct réaction : {F} niveau {L}{Chord} (budget restant {B})",
+                family, level, chord ? " [accord]" : "", _budget);
+            return;
+        }
+
         // PAS DE SPECTATEUR IDENTIFIÉ, PAS DE RÉACTION. Une réaction anonyme ne serait
         // attribuable à personne, donc ni décomptable d'un budget, ni agrégeable honnêtement.
         // Le jeton vient de la page nelfeplay.com qui a lancé la lecture ; il est opaque.
@@ -250,6 +273,28 @@ public sealed class ReplayReactionService : IHostedService
     /// </summary>
     private void EnsureBudget(ReplayPlaybackService.StateSnapshot st)
     {
+        // Pendant un DIRECT, la cible est la session et le spectateur est celui du jeton recu
+        // en rejoignant. Le journal local ne garde rien de ces reactions (elles ne se rejouent
+        // pas), donc le budget local est un simple garde-fou d'affichage : la verite est au
+        // centre, qui compte par COMPTE. Ici on evite surtout de laisser depenser des
+        // reactions qui seraient refusees, ce qui donnerait l'illusion d'avoir parle.
+        if (_direct.Actif && !string.Equals(st.Mode, "replay", StringComparison.Ordinal))
+        {
+            var (session, jeton, _) = _direct.Courant;
+            var cleDirect = "live:" + session + "|" + jeton;
+            if (string.Equals(_budgetKey, cleDirect, StringComparison.Ordinal))
+            {
+                return;
+            }
+            _budgetKey = cleDirect;
+            _budgetMax = ReactionsPerReplay;
+            _budget = ReactionsPerReplay;
+            _cooldownUntil = DateTime.MinValue;
+            _sessionSeq = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            _logger.LogDebug("Direct réactions : budget {B} pour la session {S}", _budget, session);
+            return;
+        }
+
         var viewer = _viewer.Current;
         var key = (st.ReplayId ?? string.Empty) + "|" + (viewer ?? string.Empty);
         if (string.Equals(_budgetKey, key, StringComparison.Ordinal)) return;

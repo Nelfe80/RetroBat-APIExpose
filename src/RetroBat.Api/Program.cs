@@ -184,6 +184,10 @@ builder.Services.AddSingleton<RetroBat.Api.Netplay.NetplayRelayPicker>();
 builder.Services.AddSingleton<RetroBat.Api.Netplay.NetplayLobbyClient>();
 builder.Services.AddSingleton<RetroBat.Api.Netplay.NetplayHostService>();
 builder.Services.AddSingleton<RetroBat.Api.Netplay.NetplayGuestService>();
+// « Je regarde le direct X » : un seul etat pour toute l'application, sinon la facade et
+// l'overlay pourraient viser deux seances differentes.
+builder.Services.AddSingleton<RetroBat.Api.Netplay.LiveSpectateState>();
+builder.Services.AddSingleton<RetroBat.Api.Netplay.LiveReactionUploader>();
 builder.Services.AddSingleton<MediaRuntimeState>();
 builder.Services.AddSingleton<StartupOverlayService>();
 builder.Services.AddSingleton<LiveContestOverlayService>();

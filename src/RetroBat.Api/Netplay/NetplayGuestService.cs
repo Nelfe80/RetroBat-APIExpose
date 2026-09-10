@@ -28,17 +28,20 @@ public sealed class NetplayGuestService
     private readonly NelfePlayDeviceStore _machine;
     private readonly IHttpClientFactory _httpFactory;
     private readonly RomCanonicalResolver _canonical;
+    private readonly LiveSpectateState _seance;
     private readonly ILogger<NetplayGuestService> _logger;
 
     public NetplayGuestService(
         NelfePlayDeviceStore machine,
         IHttpClientFactory httpFactory,
         RomCanonicalResolver canonical,
+        LiveSpectateState seance,
         ILogger<NetplayGuestService> logger)
     {
         _machine = machine;
         _httpFactory = httpFactory;
         _canonical = canonical;
+        _seance = seance;
         _logger = logger;
     }
 
@@ -128,7 +131,59 @@ public sealed class NetplayGuestService
             return Echec.DumpDifferent;
         }
 
-        return Lancer(resolution, rom, infos.Value) ? Echec.Aucun : Echec.LancementRefuse;
+        if (!Lancer(resolution, rom, infos.Value))
+        {
+            return Echec.LancementRefuse;
+        }
+
+        // La seance s'OUVRE seulement quand la partie est lancee. L'ouvrir avant laisserait la
+        // facade croire qu'il y a quelque chose a quoi reagir alors qu'aucun jeu ne tourne.
+        _seance.Ouvrir(infos.Value.Session, infos.Value.Jeton, infos.Value.PeutJouer);
+        _ = Task.Run(FermerQuandLaPartieFinitAsync, CancellationToken.None);
+        return Echec.Aucun;
+    }
+
+    /// <summary>
+    /// Ferme la seance quand la partie se ferme.
+    ///
+    /// Meme guet que le retrait d'annonce cote hote, et pour la meme raison : une seance qui
+    /// survit a la partie laisse la facade envoyer des reactions dans le vide, et le budget de
+    /// cinq se depenserait sur un direct qu'on ne regarde plus.
+    /// </summary>
+    private async Task FermerQuandLaPartieFinitAsync()
+    {
+        try
+        {
+            var apparu = false;
+            var apparition = DateTime.UtcNow.AddSeconds(60);
+            while (!apparu && DateTime.UtcNow < apparition)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(2), CancellationToken.None).ConfigureAwait(false);
+                apparu = EmulatorForeground.EmulateurTourne();
+            }
+            if (!apparu)
+            {
+                _seance.Fermer();
+                return;
+            }
+
+            var limite = DateTime.UtcNow.AddHours(4);
+            while (DateTime.UtcNow < limite && EmulatorForeground.EmulateurTourne())
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5), CancellationToken.None).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Netplay : guet de fin de seance interrompu.");
+        }
+        finally
+        {
+            // Dans TOUS les cas : une seance laissee ouverte par une exception serait pire que
+            // pas de seance du tout.
+            _seance.Fermer();
+            _logger.LogInformation("Netplay : seance de spectateur fermee.");
+        }
     }
 
     /// <summary>Ce que la plateforme nous accorde pour cette session.</summary>
@@ -141,7 +196,8 @@ public sealed class NetplayGuestService
         string MotDePasse,
         bool PeutJouer,
         string Coeur,
-        string Crc);
+        string Crc,
+        string Jeton);
 
     private async Task<Infos?> DemanderAsync(string sessionId, string credential, CancellationToken ct)
     {
@@ -164,6 +220,10 @@ public sealed class NetplayGuestService
                 await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
             var r = doc.RootElement;
 
+            // Le JETON DE SPECTATEUR, opaque : il rendra les reactions attribuables sans que
+            // cette borne manipule jamais une identite de compte.
+            var jeton = Texte(r, "viewer");
+
             var motJoueur = Texte(r, "player_password");
             var peutJouer = r.TryGetProperty("can_play", out var cp)
                 && cp.ValueKind == JsonValueKind.True
@@ -181,7 +241,8 @@ public sealed class NetplayGuestService
                 peutJouer ? motJoueur : Texte(r, "spectate_password"),
                 peutJouer,
                 Texte(r, "core"),
-                Texte(r, "crc"));
+                Texte(r, "crc"),
+                jeton);
         }
         catch (Exception ex)
         {
