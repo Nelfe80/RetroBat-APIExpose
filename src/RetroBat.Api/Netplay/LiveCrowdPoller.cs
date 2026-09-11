@@ -155,6 +155,13 @@ public sealed class LiveCrowdPoller : BackgroundService
         var total = r.TryGetProperty("total", out var t) && t.TryGetInt32(out var n) ? n : acteurs.Count;
         _foule.Poser(acteurs, total);
 
+        // Qui je suis dans cette foule : le pseudonyme de cette borne pour ce direct, que la
+        // plateforme seule connait. C'est lui que le panel pilote.
+        if (r.TryGetProperty("me", out var moi) && moi.ValueKind == JsonValueKind.Object)
+        {
+            _foule.DefinirMoi(Texte(moi, "actor"), Texte(moi, "name"));
+        }
+
         // Les places d'abord, les reactions ensuite : une reaction dont l'auteur n'a pas encore
         // de place ne se dessine pas, et l'ordre inverse en perdrait a chaque battement.
         var premier = _curseur == 0;

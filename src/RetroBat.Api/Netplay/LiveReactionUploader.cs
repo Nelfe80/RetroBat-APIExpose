@@ -111,6 +111,8 @@ public sealed class LiveReactionUploader
                         ? a.GetString() ?? "" : "";
                     var nom = r.TryGetProperty("name", out var n) && n.ValueKind == JsonValueKind.String
                         ? n.GetString() ?? "" : "";
+                    // La reponse dit qui je suis : c'est aussi ce que le panel pilote.
+                    _foule.DefinirMoi(acteur, nom);
                     if (acteur.Length > 0 && _foule.NoterVue(id))
                     {
                         _foule.Reagir(acteur, famille, niveau, nom);

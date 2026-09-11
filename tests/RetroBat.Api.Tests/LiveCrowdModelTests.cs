@@ -55,14 +55,33 @@ public sealed class LiveCrowdModelTests
     /// depuis un bord, donc une foule ne se remplit pas dans la milliseconde.
     /// </summary>
     private static LiveCrowdModel.Instantane Installer(LiveCrowdModel foule, long depuis, int combien)
+        => Installer(foule, depuis, combien, out _);
+
+    /// <summary>
+    /// Comme ci-dessus, et rend l'instant ou tout le monde est entre ET immobile. Une entree depuis
+    /// le bord oppose, a cent pixels par seconde, prend jusqu'a quinze secondes : une duree fixe
+    /// laissait parfois un avatar en pleine marche, et un test qui le pilotait lisait une position
+    /// qui n'etait deja plus la sienne.
+    /// </summary>
+    private static LiveCrowdModel.Instantane Installer(LiveCrowdModel foule, long depuis, int combien, out long fin)
     {
-        LiveCrowdModel.Instantane? etat = null;
-        var jusqua = depuis + combien * 500L + 6000L;
-        for (var t = depuis; t <= jusqua; t += 40)
+        var t = depuis;
+        var etat = foule.Relever(t, Largeur);
+        var attendus = Math.Min(combien, foule.CapaciteCourante);
+        var limite = depuis + combien * 500L + 6000L + 60000L;
+        while (t <= limite)
         {
+            t += 40;
             etat = foule.Relever(t, Largeur);
+            if (t >= depuis + combien * 500L + 6000L
+                && etat.Scene.Count(s => !s.Sortant) >= attendus
+                && etat.Scene.All(s => s.Image == 0 && !s.Sortant))
+            {
+                break;
+            }
         }
-        return etat!;
+        fin = t;
+        return etat;
     }
 
     [Fact]
@@ -464,5 +483,207 @@ public sealed class LiveCrowdModelTests
         var etat = foule.Relever(30000, Largeur);
         Assert.True(etat.Etiquettes.Count <= 8);
         Assert.Equal(9, etat.Vols.Count);
+    }
+
+    // ── Le spectateur pilote son avatar ───────────────────────────────────────
+    //
+    // On pilote un avatar IMMOBILE, juste apres son entree : plus tard, une flanerie l'aurait
+    // deja emmene ailleurs, et la position lue avant ne serait plus la sienne. Et on mesure
+    // avant la fin du repit de flanerie, pendant lequel il reste ou on l'a mis.
+
+    private static string MonActeur(LiveCrowdModel foule, string[] acteurs, int lequel = 0)
+    {
+        foule.DefinirMoi(acteurs[lequel], "Nelfe80");
+        return acteurs[lequel];
+    }
+
+    [Fact]
+    public void Sans_savoir_qui_je_suis_le_panel_ne_pilote_rien()
+    {
+        var foule = new LiveCrowdModel(7);
+        var acteurs = Acteurs(3);
+        Avatars(foule, acteurs);
+        foule.Poser(acteurs, 3, 1000);
+        Installer(foule, 1000, 3, out var calme);
+        var t0 = calme + 40;
+
+        Assert.False(foule.Piloter("right", t0));
+        Assert.Equal("", foule.Moi);
+
+        // Une direction qui n'en est pas une ne fait rien non plus, meme en sachant qui je suis.
+        MonActeur(foule, acteurs);
+        Assert.False(foule.Piloter("select", t0));
+        // Et quelqu'un que la presence ne compte pas ne se dessine pas n'importe ou.
+        foule.DefinirMoi("ffffffff" + new string('0', 24), "Fantome");
+        Assert.False(foule.Piloter("right", t0));
+    }
+
+    [Fact]
+    public void Un_pas_a_droite_fait_marcher_d_un_demi_sprite_puis_s_arreter()
+    {
+        var foule = new LiveCrowdModel(7);
+        var acteurs = Acteurs(3);
+        Avatars(foule, acteurs);
+        foule.Poser(acteurs, 3, 1000);
+        var avant = Installer(foule, 1000, 3, out var calme);
+        var t0 = calme + 40;
+        var moi = MonActeur(foule, acteurs);
+        var x0 = avant.Scene.Single(s => s.Acteur == moi).X;
+
+        Assert.True(foule.Piloter("right", t0));
+
+        // Il MARCHE : au moins un releve le montre en mouvement, tourne vers la droite.
+        var enMarche = false;
+        LiveCrowdModel.Instantane? fin = null;
+        Derouler(foule, t0, t0 + 3000, (etat, _) =>
+        {
+            var s = etat.Scene.Single(x => x.Acteur == moi);
+            if (s.Image != 0) { enMarche = true; Assert.Equal(LiveCrowdModel.Vue.Droite, s.Vue); }
+            fin = etat;
+        });
+        Assert.True(enMarche, "il n'a jamais marche");
+        Assert.Equal(x0 + LiveCrowdModel.PasPilote, fin!.Scene.Single(s => s.Acteur == moi).X);
+        Assert.Equal(0, fin.Scene.Single(s => s.Acteur == moi).Image);
+    }
+
+    [Fact]
+    public void Un_maintien_ajoute_les_pas_sans_a_coup_et_le_bord_arrete()
+    {
+        var foule = new LiveCrowdModel(7);
+        var acteurs = Acteurs(3);
+        Avatars(foule, acteurs);
+        foule.Poser(acteurs, 3, 1000);
+        var avant = Installer(foule, 1000, 3, out var calme);
+        var t0 = calme + 40;
+        var moi = MonActeur(foule, acteurs);
+        var x0 = avant.Scene.Single(s => s.Acteur == moi).X;
+
+        // Trois appuis rapproches, comme un maintien : la cible s'eloigne de trois pas, et
+        // l'avatar ne se teleporte pas, il avance pas a pas.
+        foule.Piloter("left", t0);
+        foule.Piloter("left", t0 + 220);
+        foule.Piloter("left", t0 + 440);
+        var maxSaut = 0;
+        var precedent = x0;
+        Derouler(foule, t0, t0 + 3800, (etat, _) =>
+        {
+            var x = etat.Scene.Single(s => s.Acteur == moi).X;
+            maxSaut = Math.Max(maxSaut, Math.Abs(precedent - x));
+            precedent = x;
+        });
+        Assert.Equal(Math.Max(0, x0 - 3 * LiveCrowdModel.PasPilote), precedent);
+        Assert.True(maxSaut < LiveCrowdModel.PasPilote, "un bond de " + maxSaut + " px entre deux releves");
+
+        // Cent pas a gauche : il atteint le bord et n'en sort jamais.
+        var t1 = t0 + 4000;
+        for (var i = 0; i < 100; i++) { foule.Piloter("left", t1 + i * 10); }
+        var minX = int.MaxValue;
+        Derouler(foule, t1, t1 + 30000, (etat, _) =>
+        {
+            var s = etat.Scene.Single(x => x.Acteur == moi);
+            Assert.True(s.X >= 0, "sorti par la gauche : " + s.X);
+            minX = Math.Min(minX, s.X);
+        });
+        Assert.Equal(0, minX);
+    }
+
+    [Fact]
+    public void Haut_recule_d_un_rang_bas_avance_et_les_bornes_tiennent()
+    {
+        var foule = new LiveCrowdModel(7);
+        var acteurs = Acteurs(3);
+        Avatars(foule, acteurs);
+        foule.Poser(acteurs, 3, 1000);
+        var avant = Installer(foule, 1000, 3, out var calme);
+        var t0 = calme + 40;
+        var moi = MonActeur(foule, acteurs);
+        var y0 = avant.Scene.Single(s => s.Acteur == moi).Y;
+
+        Assert.True(foule.Piloter("down", t0));
+        var bas = foule.Relever(t0, Largeur).Scene.Single(s => s.Acteur == moi);
+        Assert.Equal(Math.Min(LiveCrowdModel.Profondeur, y0 + 1), bas.Y);
+        // Un changement de rang ne fait pas marcher : c'est un placement.
+        Assert.Equal(0, bas.Image);
+
+        for (var i = 0; i < 20; i++) { foule.Piloter("up", t0 + 100 + i); }
+        Assert.Equal(0, foule.Relever(t0 + 200, Largeur).Scene.Single(s => s.Acteur == moi).Y);
+        for (var i = 0; i < 20; i++) { foule.Piloter("down", t0 + 300 + i); }
+        var scene = foule.Relever(t0 + 400, Largeur).Scene;
+        Assert.Equal(LiveCrowdModel.Profondeur, scene.Single(s => s.Acteur == moi).Y);
+
+        // Le rang ordonne le dessin, du fond vers le devant : tout ce qui est dessine apres moi
+        // est au moins aussi devant que moi.
+        var apresMoi = scene.SkipWhile(s => s.Acteur != moi).Skip(1);
+        Assert.All(apresMoi, s => Assert.Equal(LiveCrowdModel.Profondeur, s.Y));
+    }
+
+    [Fact]
+    public void Piloter_hors_scene_y_fait_entrer_par_un_bord_a_la_place_du_plus_silencieux()
+    {
+        var foule = new LiveCrowdModel(7);
+        var acteurs = Acteurs(100);
+        Avatars(foule, acteurs);
+        foule.Poser(acteurs, 100, 1000);
+        var plein = Installer(foule, 1000, LiveCrowdModel.CapaciteDepart, out var calme);
+        var t0 = calme + 40;
+        var dehors = acteurs.First(a => plein.Scene.All(s => s.Acteur != a));
+        foule.DefinirMoi(dehors, "Nelfe80");
+
+        Assert.True(foule.Piloter("right", t0));
+        var arrive = false;
+        Derouler(foule, t0, t0 + 20000, (etat, _) =>
+        {
+            var s = etat.Scene.FirstOrDefault(x => x.Acteur == dehors);
+            if (s is not null && !arrive)
+            {
+                arrive = true;
+                Assert.True(s.X <= -LiveCrowdModel.TailleSprite + 8 || s.X >= Largeur - 8, "entre a " + s.X + ", pas par un bord");
+            }
+            Assert.True(etat.Scene.Count(x => !x.Sortant) <= LiveCrowdModel.CapaciteDepart);
+        });
+        Assert.True(arrive, "il n'est jamais entre");
+    }
+
+    [Fact]
+    public void Piloter_pose_mon_nom_au_dessus_de_moi_une_seule_fois()
+    {
+        var foule = new LiveCrowdModel(7);
+        var acteurs = Acteurs(3);
+        Avatars(foule, acteurs);
+        foule.Poser(acteurs, 3, 1000);
+        Installer(foule, 1000, 3, out var calme);
+        var t0 = calme + 40;
+        var moi = MonActeur(foule, acteurs);
+
+        foule.Piloter("right", t0);
+        foule.Piloter("right", t0 + 220);
+        var etat = foule.Relever(t0 + 300, Largeur);
+        var e = Assert.Single(etat.Etiquettes);
+        Assert.Equal(moi, e.Acteur);
+        Assert.Equal("Nelfe80", e.Texte);
+    }
+
+    [Fact]
+    public void Un_avatar_pilote_n_est_pas_emmene_en_flanerie()
+    {
+        // Un seul en scene : la flanerie ne pourrait choisir que lui. Apres un pilotage, il reste
+        // ou son spectateur l'a mis pendant le repit.
+        var foule = new LiveCrowdModel(11);
+        var acteurs = Acteurs(1);
+        Avatars(foule, acteurs);
+        foule.Poser(acteurs, 1, 0);
+        Installer(foule, 0, 1, out var calme);
+        var t0 = calme + 40;
+        var moi = MonActeur(foule, acteurs);
+
+        foule.Piloter("right", t0);
+        LiveCrowdModel.Instantane? apres = null;
+        Derouler(foule, t0, t0 + 1500, (etat, _) => apres = etat);
+        var arrive = apres!.Scene.Single(s => s.Acteur == moi);
+        Assert.Equal(0, arrive.Image);
+        Derouler(foule, t0 + 1500, t0 + LiveCrowdModel.RepitPilote, (etat, t) =>
+        {
+            Assert.Equal(arrive.X, etat.Scene.Single(s => s.Acteur == moi).X);
+        });
     }
 }

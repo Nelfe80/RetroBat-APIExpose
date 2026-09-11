@@ -50,6 +50,16 @@ public sealed class LiveCrowdModel
     /// <summary>Qui a reagi il y a moins de huit secondes ne cede pas sa place.</summary>
     private const int ReactionProtegee = 8000;
 
+    /// <summary>
+    /// Un pas de PILOTAGE : la moitie d'un sprite. Un appui se voit sans traverser l'ecran, et
+    /// un maintien enchaine les pas en une marche continue.
+    /// </summary>
+    public const int PasPilote = 32;
+
+    /// <summary>Un avatar qu'on vient de piloter n'est pas emmene en flanerie pendant ce temps :
+    /// il irait la ou son spectateur n'a pas demande.</summary>
+    public const int RepitPilote = 4000;
+
     /// <summary>Un avatar inconnu se redemande au plus toutes les trente secondes.</summary>
     private const int RedemandeAvatar = 30000;
 
@@ -137,7 +147,7 @@ public sealed class LiveCrowdModel
         public int X, Cible, Y;
         public bool Place, Nouveau, AReplacer, Sortant, Supprime, FinDeFlanerie;
         public int? CentreVise;
-        public long ProchainPas, DerniereActivite, RegardJusqua, Arrivee;
+        public long ProchainPas, DerniereActivite, RegardJusqua, Arrivee, PiloteJusqua;
         public int Pas;
         public bool Marche => Place && X != Cible;
     }
@@ -169,6 +179,11 @@ public sealed class LiveCrowdModel
     // negatif, l'espacement paraissait toujours trop court, et plus personne n'entrait jamais.
     private long? _derniereEntree;
     private long _prochaineFlanerie = -1;
+
+    // Qui je suis dans cette foule : le pseudonyme que la plateforme donne a cette borne pour ce
+    // direct, et mon nom pour l'etiquette. Vides tant qu'elle ne l'a pas dit.
+    private string _moi = "";
+    private string _monNom = "";
     private uint _alea;
 
     public LiveCrowdModel() : this(0x2545F491u)
@@ -375,23 +390,7 @@ public sealed class LiveCrowdModel
                 Recomposer(maintenant);
             }
 
-            int? place = null;
-            var f = _scene.FirstOrDefault(x => x.Acteur == acteur && !x.Sortant);
-            if (f is null)
-            {
-                var enScene = _scene.Where(x => !x.Sortant).ToList();
-                if (enScene.Count >= _capacite && enScene.Count > 0)
-                {
-                    var cede = enScene
-                                   .Where(x => maintenant - x.DerniereActivite >= ReactionProtegee)
-                                   .OrderBy(x => x.DerniereActivite).ThenBy(x => x.Acteur, StringComparer.Ordinal)
-                                   .FirstOrDefault()
-                               ?? enScene.OrderBy(x => x.DerniereActivite).ThenBy(x => x.Acteur, StringComparer.Ordinal).First();
-                    place = cede.Place ? cede.X + TailleSprite / 2 : null;
-                    FaireSortir(cede, maintenant);
-                }
-                f = Ajouter(acteur, maintenant, place);
-            }
+            var f = EntrerEnScene(acteur, maintenant);
             f.DerniereActivite = maintenant;
 
             // NON AMORCES : le saut et le vol partent au premier releve du HUD, pas maintenant. Au
@@ -402,7 +401,7 @@ public sealed class LiveCrowdModel
 
             if (_vols.Count < PlafondVols)
             {
-                var centre = f.Place ? f.X + TailleSprite / 2 : place ?? _largeur / 2;
+                var centre = f.Place ? f.X + TailleSprite / 2 : f.CentreVise ?? _largeur / 2;
                 _vols.Add(new Vol(famille, niveau, Math.Clamp(centre, 16, Math.Max(16, _largeur - 16)), -1));
             }
 
@@ -418,6 +417,110 @@ public sealed class LiveCrowdModel
                 var texte = nom.Length > 12 ? nom[..12] : nom;
                 _etiquettes.Add(new Etiquette(texte, acteur, maintenant + duree));
             }
+        }
+    }
+
+    /// <summary>
+    /// Qui je suis dans cette foule. La plateforme le dit avec le flux (« me ») et le confirme a
+    /// chaque reaction : c'est un pseudonyme propre a ce direct, la borne ne peut pas le deviner.
+    /// </summary>
+    public void DefinirMoi(string acteur, string nom)
+    {
+        if (string.IsNullOrEmpty(acteur))
+        {
+            return;
+        }
+        lock (_gate)
+        {
+            _moi = acteur;
+            if (!string.IsNullOrWhiteSpace(nom))
+            {
+                _monNom = nom.Trim();
+            }
+        }
+    }
+
+    public string Moi
+    {
+        get { lock (_gate) { return _moi; } }
+    }
+
+    public bool Piloter(string direction) => Piloter(direction, Maintenant());
+
+    /// <summary>
+    /// Le spectateur pilote SON avatar : gauche et droite le font marcher d'un pas, haut et bas le
+    /// font changer de rang, donc de plan. Hors de scene, il y entre d'abord, comme qui reagit.
+    ///
+    /// Tout est LOCAL : rien ne part vers la plateforme ni vers les autres bornes. Chacune tient
+    /// sa propre scene, et la position n'a de sens que sur l'ecran qui la montre.
+    ///
+    /// Rend faux si la borne ne sait pas encore qui elle est, ou si la direction n'en est pas une.
+    /// </summary>
+    public bool Piloter(string direction, long maintenant)
+    {
+        var sens = direction switch
+        {
+            "left" => -1, "right" => 1, "up" => 0, "down" => 0, _ => int.MinValue,
+        };
+        if (sens == int.MinValue)
+        {
+            return false;
+        }
+        lock (_gate)
+        {
+            if (_moi.Length == 0 || !_presentsSet.Contains(_moi))
+            {
+                // Pas encore dans le dernier releve de presence : la plateforme ne m'a pas encore
+                // compte, et se dessiner soi-meme sans place serait n'importe ou.
+                return false;
+            }
+            if (_aRecomposer)
+            {
+                Recomposer(maintenant);
+            }
+
+            var f = EntrerEnScene(_moi, maintenant);
+            f.DerniereActivite = maintenant;
+            f.PiloteJusqua = maintenant + RepitPilote;
+            f.RegardJusqua = 0;
+
+            if (direction is "up" or "down")
+            {
+                // Le rang : les petits Y sont derriere. Monter, c'est reculer dans la foule.
+                f.Y = Math.Clamp(f.Y + (direction == "up" ? -1 : 1), 0, Profondeur);
+            }
+            else if (f.Place)
+            {
+                // Un pas de plus dans le sens demande, depuis la ou il va deja s'il marche : un
+                // maintien ajoute les pas au fur et a mesure, sans a-coup.
+                var depart = f.Marche ? f.Cible : f.X;
+                f.Cible = Math.Clamp(depart + sens * PasPilote, 0, Math.Max(0, _largeur - TailleSprite));
+                f.FinDeFlanerie = false;
+                if (!f.Marche || f.ProchainPas < maintenant - 1000)
+                {
+                    // Au depart d'une marche, le premier pas est pour maintenant : un « prochain
+                    // pas » date d'une flanerie d'il y a une minute ferait rattraper huit pas d'un
+                    // coup, et l'avatar se teleporterait.
+                    f.ProchainPas = maintenant;
+                }
+            }
+            // Sinon il est encore en train d'entrer : sa marche d'entree prime, le pas attendra.
+
+            // Mon nom au-dessus de moi, le temps de me trouver dans la rangee.
+            if (_monNom.Length > 0 && !_etiquettes.Any(e => e.Acteur == _moi))
+            {
+                var duree = DureeEtiquette(_etiquettes.Count);
+                if (duree > 0)
+                {
+                    if (_etiquettes.Count >= PlafondEtiquettes)
+                    {
+                        _etiquettes.RemoveAt(0);
+                    }
+                    var texte = _monNom.Length > 12 ? _monNom[..12] : _monNom;
+                    _etiquettes.Add(new Etiquette(texte, _moi, maintenant + duree));
+                }
+            }
+            return true;
         }
     }
 
@@ -491,6 +594,9 @@ public sealed class LiveCrowdModel
             _aRecomposer = false;
             _derniereEntree = null;
             _prochaineFlanerie = -1;
+            // Le pseudonyme est propre au direct : un autre direct, un autre moi.
+            _moi = "";
+            _monNom = "";
         }
     }
 
@@ -554,6 +660,32 @@ public sealed class LiveCrowdModel
 
         _scene.RemoveAll(f => f.Supprime);
         _aRecomposer = false;
+    }
+
+    /// <summary>
+    /// Fait entrer un acteur en scene s'il n'y est pas : a la place du plus silencieux quand il
+    /// n'y a plus de place. C'est qui s'exprime, ou qui se pilote, qu'on doit voir.
+    /// </summary>
+    private Figurant EntrerEnScene(string acteur, long maintenant)
+    {
+        var f = _scene.FirstOrDefault(x => x.Acteur == acteur && !x.Sortant);
+        if (f is not null)
+        {
+            return f;
+        }
+        int? place = null;
+        var enScene = _scene.Where(x => !x.Sortant).ToList();
+        if (enScene.Count >= _capacite && enScene.Count > 0)
+        {
+            var cede = enScene
+                           .Where(x => maintenant - x.DerniereActivite >= ReactionProtegee)
+                           .OrderBy(x => x.DerniereActivite).ThenBy(x => x.Acteur, StringComparer.Ordinal)
+                           .FirstOrDefault()
+                       ?? enScene.OrderBy(x => x.DerniereActivite).ThenBy(x => x.Acteur, StringComparer.Ordinal).First();
+            place = cede.Place ? cede.X + TailleSprite / 2 : null;
+            FaireSortir(cede, maintenant);
+        }
+        return Ajouter(acteur, maintenant, place);
     }
 
     private Figurant Ajouter(string acteur, long maintenant, int? centre)
@@ -776,7 +908,8 @@ public sealed class LiveCrowdModel
         }
 
         _prochaineFlanerie = maintenant + Tirer(FlanerieMin, FlanerieMax);
-        var candidats = _scene.Where(f => f.Place && !f.Sortant).ToList();
+        // Un avatar qu'on vient de piloter n'est pas candidat : il irait la ou personne n'a demande.
+        var candidats = _scene.Where(f => f.Place && !f.Sortant && f.PiloteJusqua <= maintenant).ToList();
         if (candidats.Count == 0)
         {
             return;

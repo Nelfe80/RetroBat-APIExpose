@@ -191,6 +191,9 @@ builder.Services.AddSingleton<RetroBat.Api.Netplay.LiveReactionUploader>();
 // La foule : un seul modele partage entre le sondeur qui l'alimente et le HUD qui la dessine.
 builder.Services.AddSingleton<RetroBat.Api.Netplay.LiveCrowdModel>();
 builder.Services.AddHostedService<RetroBat.Api.Netplay.LiveCrowdPoller>();
+// Le spectateur pilote son avatar dans la foule avec les directions du panel : local, et
+// seulement quand sa manette est libre (direct regarde sans droit de jouer).
+builder.Services.AddHostedService<RetroBat.Api.Netplay.LiveCrowdInputService>();
 builder.Services.AddSingleton<MediaRuntimeState>();
 builder.Services.AddSingleton<StartupOverlayService>();
 builder.Services.AddSingleton<LiveContestOverlayService>();
