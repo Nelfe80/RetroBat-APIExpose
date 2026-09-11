@@ -255,7 +255,16 @@ public sealed class NelfePlayPlayReporter : BackgroundService
             _pending.Dequeue();
         }
 
-        _pending.Enqueue(new PlayRecord(play.SystemId, play.GameName, md5, sha1, seconds));
+        // L'emulateur et le coeur, tels qu'EmulationStation les a lances. La
+        // plateforme s'en sert pour ne mettre en vitrine que ce qui tourne sous
+        // RetroArch (emulateur « libretro ») : le nom du systeme ne le dit pas,
+        // un jeu Model 3 est range sous « arcade » et tourne sous Supermodel.
+        // Rien sur la personne : c'est une propriete du jeu tel qu'installe.
+        var launch = _context.Ui.Running?.Launch;
+        var emulator = FirstNonEmpty(play.Emulator, launch?.Emulator);
+        var core = FirstNonEmpty(play.Core, launch?.Core);
+
+        _pending.Enqueue(new PlayRecord(play.SystemId, play.GameName, md5, sha1, seconds, emulator, core));
     }
 
     private async Task FlushAsync(CancellationToken cancellationToken)
@@ -523,6 +532,14 @@ public sealed class NelfePlayPlayReporter : BackgroundService
                     fields.Add(new KeyValuePair<string, string>("sha1", record.Sha1));
                 }
             }
+            if (!string.IsNullOrEmpty(record.Emulator))
+            {
+                fields.Add(new KeyValuePair<string, string>("emulator", record.Emulator));
+            }
+            if (!string.IsNullOrEmpty(record.Core))
+            {
+                fields.Add(new KeyValuePair<string, string>("core", record.Core));
+            }
 
             using var form = new FormUrlEncodedContent(fields);
             using var response = await client.PostAsync("/api/v1/agent/play", form, cancellationToken)
@@ -720,7 +737,14 @@ public sealed class NelfePlayPlayReporter : BackgroundService
         string? Core,
         Stopwatch Clock);
 
-    private sealed record PlayRecord(string? SystemId, string? GameName, string? Md5, string? Sha1, int Seconds);
+    private sealed record PlayRecord(
+        string? SystemId,
+        string? GameName,
+        string? Md5,
+        string? Sha1,
+        int Seconds,
+        string? Emulator = null,
+        string? Core = null);
 
     /// <summary>Ce qu'une machine a constate d'un titre Nelfe Play : sur quelle
     /// pile logicielle, et si le lancement a abouti.</summary>
