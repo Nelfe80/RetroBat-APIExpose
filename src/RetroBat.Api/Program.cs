@@ -379,6 +379,8 @@ builder.Services.AddHostedService<RetroArchLogMonitorService>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Runtime.RetroArchReplayClient>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Runtime.ReplayCoreTimingProbe>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Storage.ReplayStore>();
+// Le journal des gros balayages de fichiers : sans lui, GamelistIdentity lit en silence.
+builder.Services.AddHostedService<RetroBat.Api.Infrastructure.IoTraceBootstrap>();
 // Les planches d'avatar : un magasin a part, que seuls le recensement et le relais partagent
 // avec les replays. Fabrique explicite, le second constructeur ne sert qu'aux tests.
 builder.Services.AddSingleton(sp => new RetroBat.Api.Avatar.AvatarSheetStore(

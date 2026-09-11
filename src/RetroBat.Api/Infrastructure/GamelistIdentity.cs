@@ -141,10 +141,15 @@ public static class GamelistIdentity
         var tete = set.Length > 0 ? set : slug.Split('-')[0];
         if (tete.Length == 0) return null;
 
+        // Un balayage se DIT : ces bases font plusieurs mega-octets, et les lire pendant une partie
+        // se sent. Si ca revient souvent, c'est un cache qui manque, et la trace le montrera.
+        var chrono = System.Diagnostics.Stopwatch.StartNew();
+        var lues = 0L;
         try
         {
             foreach (var ligne in File.ReadLines(chemin))
             {
+                lues += ligne.Length + 1;
                 if (ligne.Length == 0 || ligne.IndexOf(tete, StringComparison.OrdinalIgnoreCase) < 0) continue;
 
                 using var doc = JsonDocument.Parse(ligne);
@@ -161,6 +166,7 @@ public static class GamelistIdentity
                 }
                 if (!correspond) continue;
 
+                IoTrace.Balayage(Journal, chemin, lues, chrono.ElapsedMilliseconds);
                 return extraire(root); // le jeu est là : inutile de continuer ce fichier
             }
         }
@@ -168,8 +174,16 @@ public static class GamelistIdentity
         {
             // Une gamelist illisible ne doit jamais faire échouer une partie.
         }
+        IoTrace.Balayage(Journal, chemin, lues, chrono.ElapsedMilliseconds);
         return null;
     }
+
+    /// <summary>
+    /// Le journal de cette classe statique, pose au demarrage. Sans lui, un balayage de plusieurs
+    /// mega-octets resterait invisible : les compteurs Windows disent le processus, jamais le
+    /// fichier ni l'appelant.
+    /// </summary>
+    public static ILogger? Journal { get; set; }
 
     private static bool Egal(JsonElement root, string propriete, string attendu)
         => root.TryGetProperty(propriete, out var v)

@@ -84,12 +84,16 @@ public sealed class ReplayStore : IReplayManifestStore, IReplayObjectStore, IRep
     // ── objets adressés par contenu ─────────────────────────────────────────
     public async Task<ReplayObjectRef> ImportObjectAsync(string sourcePath, CancellationToken ct)
     {
+        var chrono = System.Diagnostics.Stopwatch.StartNew();
         var (sha, size) = await HashFileAsync(sourcePath, ct).ConfigureAwait(false);
         var dir = Path.Combine(_objects, sha[..2]);
         Directory.CreateDirectory(dir);
         var dest = Path.Combine(dir, sha + ".replay");
         if (!File.Exists(dest) || new FileInfo(dest).Length != size)
             File.Copy(sourcePath, dest, overwrite: true); // dedup : si déjà présent et bonne taille, on garde
+        // Un import lit l'objet DEUX fois (hash puis copie) : sur dix-sept mega-octets, ca se sent
+        // pendant une partie. On le dit, avec qui l'a demande.
+        RetroBat.Api.Infrastructure.IoTrace.Balayage(_logger, sourcePath, size * 2, chrono.ElapsedMilliseconds);
         return new ReplayObjectRef(sha, size);
     }
 

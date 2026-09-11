@@ -22,6 +22,65 @@ public class RetroArchWrapperProvider : IProvider
     private readonly IIngameSourceArbitrationService _arbitration;
     private readonly ILogger<RetroArchWrapperProvider>? _logger;
     private readonly object _stateLock = new();
+
+    /// <summary>
+    /// L'index d'alias d'un systeme, charge UNE fois et garde tant que le fichier ne change pas.
+    ///
+    /// Avant : `ResolveDefinition` relisait et desserialisait alias.json A CHAQUE LIGNE recue du
+    /// wrapper, puis parcourait toutes les entrees en les normalisant une a une. Sur la Megadrive
+    /// ce fichier fait 1,7 Mo ; un anneau ramasse dans Sonic coutait donc une lecture de 1,7 Mo et
+    /// des dizaines de milliers d'allocations. Mesure sur borne pendant un direct : 6 Mo/s lus en
+    /// moyenne, pointes a 22 Mo/s, 60 Mo de memoire qui montaient et redescendaient en boucle, et
+    /// un jeu qui saccadait. Le profileur a designe cette methode et rien d'autre.
+    ///
+    /// La table normalisee est construite au chargement, ce qui rend la recherche tolerante en
+    /// O(1) au lieu d'un parcours complet ; la PREMIERE entree normalisee gagne, comme le faisait
+    /// le parcours. Le fichier est relu si sa date ou sa taille change : un alias depose par le
+    /// deploiement de flotte est pris en compte a la ligne suivante, sans redemarrage.
+    /// </summary>
+    private sealed record AliasIndex(
+        DateTime WriteUtc,
+        long Length,
+        Dictionary<string, string> Exact,
+        Dictionary<string, string> Normalized);
+
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, AliasIndex> _aliasIndexes =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    private AliasIndex? LoadAliasIndex(string aliasFile)
+    {
+        var info = new FileInfo(aliasFile);
+        if (!info.Exists)
+        {
+            _aliasIndexes.TryRemove(aliasFile, out _);
+            return null;
+        }
+        if (_aliasIndexes.TryGetValue(aliasFile, out var connu)
+            && connu.WriteUtc == info.LastWriteTimeUtc
+            && connu.Length == info.Length)
+        {
+            return connu;
+        }
+
+        var chrono = System.Diagnostics.Stopwatch.StartNew();
+        var exact = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(aliasFile))
+            ?? new Dictionary<string, string>();
+        var normalized = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var entry in exact)
+        {
+            var cle = NormalizeRomName(entry.Key);
+            if (cle.Length > 0 && !normalized.ContainsKey(cle))
+            {
+                normalized[cle] = entry.Value;
+            }
+        }
+        var index = new AliasIndex(info.LastWriteTimeUtc, info.Length, exact, normalized);
+        _aliasIndexes[aliasFile] = index;
+        _logger?.LogInformation(
+            "Index d'alias charge : {Fichier}, {Entrees} entrees en {Ms} ms.",
+            Path.GetFileName(Path.GetDirectoryName(aliasFile)) + "/" + info.Name, exact.Count, chrono.ElapsedMilliseconds);
+        return index;
+    }
     private readonly Dictionary<string, RetroArchRuntimeSignal> _signals = new(StringComparer.OrdinalIgnoreCase);
     private CancellationTokenSource? _cts;
     private Task? _workerTask;
@@ -572,25 +631,24 @@ public class RetroArchWrapperProvider : IProvider
             : Path.Combine(RetroBatPaths.RamResourcesRoot, systemId, "alias.json");
 
         var aliasMatched = false;
-        if (!string.IsNullOrWhiteSpace(aliasFile) && File.Exists(aliasFile))
+        if (!string.IsNullOrWhiteSpace(aliasFile))
         {
             try
             {
-                var aliases = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(aliasFile))
-                    ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-                if (!string.IsNullOrWhiteSpace(rawRom) && aliases.TryGetValue(rawRom, out var aliasTarget))
+                // L'index est en memoire : cette methode est appelee a chaque ligne du wrapper, et
+                // relire le fichier ici a deja fait saccader une partie (voir AliasIndex).
+                var aliases = LoadAliasIndex(aliasFile);
+                if (aliases is not null)
                 {
-                    normalizedRom = aliasTarget;
-                    aliasMatched = true;
-                }
-                else
-                {
-                    var aliasEntry = aliases.FirstOrDefault(entry =>
-                        string.Equals(NormalizeRomName(entry.Key), normalizedRom, StringComparison.OrdinalIgnoreCase));
-                    if (!string.IsNullOrWhiteSpace(aliasEntry.Value))
+                    if (!string.IsNullOrWhiteSpace(rawRom) && aliases.Exact.TryGetValue(rawRom, out var aliasTarget))
                     {
-                        normalizedRom = aliasEntry.Value;
+                        normalizedRom = aliasTarget;
+                        aliasMatched = true;
+                    }
+                    else if (aliases.Normalized.TryGetValue(normalizedRom, out var aliasNormalise)
+                             && !string.IsNullOrWhiteSpace(aliasNormalise))
+                    {
+                        normalizedRom = aliasNormalise;
                         aliasMatched = true;
                     }
                 }
