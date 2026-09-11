@@ -9,6 +9,7 @@ using RetroBat.Api.Replay.Input;
 using RetroBat.Api.Replay.Models;
 using RetroBat.Api.Replay.Playback;
 using RetroBat.Api.Replay.Storage;
+using Foule = RetroBat.Api.Netplay.LiveCrowdModel;
 using RetroBat.Domain.Events;
 using RetroBat.Domain.Interfaces;
 
@@ -45,6 +46,7 @@ public sealed class ReplayReactionHudService : BackgroundService
 
     private readonly RetroBat.Api.Netplay.LiveSpectateState _direct;
     private readonly RetroBat.Api.Netplay.LiveCrowdModel _foule;
+    private readonly RetroBat.Api.Avatar.AvatarSheetStore _avatars;
 
     public ReplayReactionHudService(IEventBus bus, ReplayReactionService reactions,
         ReplayPlaybackService playback, ReplayStore store,
@@ -52,11 +54,12 @@ public sealed class ReplayReactionHudService : BackgroundService
         IOptionsMonitor<ApiExposeOptions> options,
         RetroBat.Api.Netplay.LiveSpectateState direct,
         RetroBat.Api.Netplay.LiveCrowdModel foule,
+        RetroBat.Api.Avatar.AvatarSheetStore avatars,
         NelfePlayScoringSessionService? session = null)
     {
         _bus = bus; _reactions = reactions; _playback = playback; _store = store; _social = social;
         _logger = logger; _options = options; _session = session;
-        _direct = direct; _foule = foule;
+        _direct = direct; _foule = foule; _avatars = avatars;
     }
 
     /// <summary>
@@ -118,7 +121,12 @@ public sealed class ReplayReactionHudService : BackgroundService
                 // delegues plutot qu'une reference : la fenetre vit sur son propre thread UI, et
                 // ne doit rien detenir qu'elle pourrait lire a contretemps.
                 () => _direct.Actif,
-                maintenant => _foule.Relever(maintenant),
+                (maintenant, largeur) => _foule.Relever(maintenant, largeur),
+                combien => _foule.FixerCapacite(combien),
+                // La planche d'un avatar, par son empreinte : un chemin sur disque, ou rien tant
+                // qu'elle n'est pas arrivee. La fenetre la decode une fois et la garde.
+                sha => _avatars.Has(sha) ? _avatars.ObjectPath(sha) : null,
+                sha => _avatars.Utiliser(sha),
                 // R9 : le journal d'ici, PLUS les evenements signes recus d'ailleurs. C'est ce qui
                 // fait apparaitre les reactions des autres spectateurs pendant la lecture, sans
                 // qu'aucune d'elles n'ait a etre crue sur parole.
@@ -185,7 +193,17 @@ public sealed class ReplayReactionHudService : BackgroundService
         private IntPtr _memDc, _dib, _oldSel;
         private Rectangle _region;
         private readonly Func<bool> _enDirect;
-        private readonly Func<long, RetroBat.Api.Netplay.LiveCrowdModel.Instantane> _foule;
+        private readonly Func<long, int, Foule.Instantane> _foule;
+        private readonly Action<int> _capaciteFoule;
+        private readonly Func<string, string?> _cheminPlanche;
+        private readonly Action<string> _plancheUtilisee;
+        private readonly Dictionary<string, Planche> _planches = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, long> _planchesAbsentes = new(StringComparer.Ordinal);
+        private Bitmap? _coucheFoule;
+        private long _signatureFoule;
+        private double _coutComposition = -1, _intervalleFoule = -1;
+        private long _derniereFoule, _prochainReglageFoule;
+        private int _capaciteVoulue = Foule.CapaciteDepart;
 
         private sealed class Particle { public string Family = ""; public int Col; public string Emoji = ""; public Color Color; public int Level; public long Born; public double Angle; public float Radial; }
         private sealed class Label { public string Word = ""; public Color Color; public int Level; public long Born; }
@@ -193,7 +211,10 @@ public sealed class ReplayReactionHudService : BackgroundService
         public HudForm(Func<ReplayReactionService.ChargeSnapshot> charge, ReplayReactionSprites? sprites,
             Func<ReplayPlaybackService.StateSnapshot> state, Func<ReplayReactionService.Availability> avail,
             Func<bool> enDirect,
-            Func<long, RetroBat.Api.Netplay.LiveCrowdModel.Instantane> foule,
+            Func<long, int, Foule.Instantane> foule,
+            Action<int> capaciteFoule,
+            Func<string, string?> cheminPlanche,
+            Action<string> plancheUtilisee,
             Func<string, IReadOnlyList<ReplayReaction>> loadReactions, Func<string> locale)
         {
             _charge = charge;
@@ -202,6 +223,9 @@ public sealed class ReplayReactionHudService : BackgroundService
             _avail = avail;
             _enDirect = enDirect;
             _foule = foule;
+            _capaciteFoule = capaciteFoule;
+            _cheminPlanche = cheminPlanche;
+            _plancheUtilisee = plancheUtilisee;
             _loadReactions = loadReactions;
             _locale = locale;
             FormBorderStyle = FormBorderStyle.None;
@@ -297,10 +321,8 @@ public sealed class ReplayReactionHudService : BackgroundService
                 // c'est le compositing DWM d'une fenetre layered plein ecran qui coute, et il a
                 // deja hache le son sur une borne modeste.
                 var fouleInstantanee = enDirect ? SafeFoule(now) : null;
-                var fouleAnime = fouleInstantanee is not null
-                    && (fouleInstantanee.Vols.Count > 0
-                        || fouleInstantanee.Etiquettes.Count > 0
-                        || fouleInstantanee.Sauts.Count > 0);
+                // Quelqu'un marche ou saute, ou un emoji ou un nom est a l'ecran.
+                var fouleAnime = fouleInstantanee is { Bouge: true };
 
                 var animating = charge.Active || _parts.Count > 0 || _labels.Count > 0
                     || _activeBubble is not null || fouleAnime;
@@ -454,14 +476,16 @@ public sealed class ReplayReactionHudService : BackgroundService
             try { return _enDirect(); } catch { return false; }
         }
 
-        private RetroBat.Api.Netplay.LiveCrowdModel.Instantane? SafeFoule(long now)
+        private Foule.Instantane? SafeFoule(long now)
         {
-            try { return _foule(now); } catch { return null; }
+            // La scene raisonne en pixels de PLANCHE : sa largeur est celle de l'ecran divisee par
+            // l'agrandissement.
+            try { return _foule(now, Math.Max(1, _region.Width / EchelleFoule())); } catch { return null; }
         }
 
         private void RenderFrame(
             ReplayReactionService.ChargeSnapshot charge, long now, bool playing,
-            RetroBat.Api.Netplay.LiveCrowdModel.Instantane? foule)
+            Foule.Instantane? foule)
         {
             using var g = Graphics.FromImage(_buffer!);
             g.Clear(Color.Transparent);
@@ -482,132 +506,278 @@ public sealed class ReplayReactionHudService : BackgroundService
             if (playing) DrawBubble(g, now);
         }
 
-        /// <summary>
-        /// La FOULE, en bas de l'ecran, comme sur le replay.
-        ///
-        /// Trois rangees de silhouettes pixel qui se chevauchent, comme un public vu de loin.
-        /// C'est le REMPLISSAGE qui est la metrique : on lit la taille de l'audience sans qu'un
-        /// chiffre soit ecrit. Les rangees du fond sont plus petites et plus sombres, ce qui
-        /// donne la profondeur.
-        ///
-        /// Le placement, la teinte, la duree des etiquettes et la hauteur des sauts viennent
-        /// tous de LiveCrowdModel, jumeau du module web : les deux doivent rendre les memes
-        /// nombres, sinon la meme foule se placerait autrement selon l'ecran.
-        /// </summary>
-        private void DrawCrowd(Graphics g, RetroBat.Api.Netplay.LiveCrowdModel.Instantane f, long now)
+        /// <summary>Une planche d'avatar decodee, et son profil gauche retourne une fois pour toutes.</summary>
+        private sealed class Planche : IDisposable
         {
+            public required Bitmap Feuille;
+            public required Bitmap Gauche;
+            public long Usage;
+
+            public void Dispose()
+            {
+                Feuille.Dispose();
+                Gauche.Dispose();
+            }
+        }
+
+        /// <summary>Les planches decodees gardees en memoire : un peu plus que la scene la plus pleine.</summary>
+        private const int PlanchesGardees = 64;
+
+        /// <summary>
+        /// L'agrandissement des avatars : ENTIER, sinon le pixel n'est plus carre. 1 jusqu'a 1080 lignes,
+        /// 2 en 4K.
+        /// </summary>
+        private int EchelleFoule() => Math.Max(1, _region.Height / 1080);
+
+        /// <summary>
+        /// La FOULE, en bas de l'ecran, comme sur le replay : une rangee d'avatars.
+        ///
+        /// Toutes les positions viennent de LiveCrowdModel ; ici on ne fait que poser des pixels. Chaque
+        /// avatar est un morceau de sa planche (vue, image de marche), agrandi d'un facteur entier au
+        /// plus proche voisin, le profil gauche etant le droit retourne.
+        ///
+        /// La rangee est COMPOSEE dans une couche gardee d'une image a l'autre : tant que personne ne
+        /// bouge, on la recopie d'un bloc au lieu de redecouper vingt-quatre sprites. Emoji et noms
+        /// passent par-dessus a chaque image.
+        /// </summary>
+        private void DrawCrowd(Graphics g, Foule.Instantane f, long now)
+        {
+            var k = EchelleFoule();
+            var t = Foule.TailleSprite;
             var sol = _region.Height - 14;
+            // La bande : l'avatar, sa profondeur, et la place du plus haut saut.
+            var hauteurBande = (t + Foule.Profondeur + Foule.HauteurSaut(3) + 4) * k;
+            var hautBande = sol - hauteurBande;
 
-            // Le pas est ADAPTATIF, calcule par rangee sur son effectif REEL.
-            //
-            // Avec un pas fixe d'un centieme de largeur, soixante spectateurs occupaient les
-            // soixante premiers pour cents de l'ecran et laissaient le reste vide : la foule
-            // paraissait tassee a gauche. En adaptant le pas, les presents s'etalent sur toute
-            // la largeur quel que soit leur nombre, et c'est la DENSITE qui devient la mesure
-            // au lieu de l'etendue. C'est aussi ce qui ressemble a un vrai public.
-            var effectifs = new int[RetroBat.Api.Netplay.LiveCrowdModel.Rangees];
-            foreach (var place in f.Places.Values)
+            var signature = Signature(f);
+            if (_coucheFoule is null || _coucheFoule.Width != _region.Width || _coucheFoule.Height != hauteurBande
+                || signature != _signatureFoule)
             {
-                if (place.Rangee >= 0 && place.Rangee < effectifs.Length)
+                var debut = Stopwatch.GetTimestamp();
+                if (_coucheFoule is null || _coucheFoule.Width != _region.Width || _coucheFoule.Height != hauteurBande)
                 {
-                    effectifs[place.Rangee]++;
+                    _coucheFoule?.Dispose();
+                    _coucheFoule = new Bitmap(_region.Width, hauteurBande, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
                 }
-            }
-
-            float PasDe(int rangee)
-            {
-                var n = rangee >= 0 && rangee < effectifs.Length ? effectifs[rangee] : 0;
-                return _region.Width / (float) Math.Max(1, n);
-            }
-
-            // Chaque spectateur au CENTRE de sa case : la foule est donc centree, et le bord
-            // droit n'a pas une demi-case de vide de plus que le gauche.
-            float XDe(int rangee, int index, int taille)
-                => (index + 0.5f) * PasDe(rangee) - taille / 2f;
-
-            // Les silhouettes, de l'arriere vers l'avant : les rangees de devant recouvrent.
-            for (var rangee = RetroBat.Api.Netplay.LiveCrowdModel.Rangees - 1; rangee >= 0; rangee--)
-            {
-                // TAILLE ENTIERE et RECUL ENTIER : c'est ce qui garde les pixels carres.
-                var taille = RetroBat.Api.Netplay.LiveCrowdModel.TailleRangee(rangee);
-                var alpha = RetroBat.Api.Netplay.LiveCrowdModel.Opacites[rangee];
-                var baseY = sol - rangee * RetroBat.Api.Netplay.LiveCrowdModel.ReculParRangee;
-
-                foreach (var (acteur, place) in f.Places)
+                using (var c = Graphics.FromImage(_coucheFoule))
                 {
-                    if (place.Rangee != rangee) { continue; }
-
-                    var x = XDe(rangee, place.Index, taille)
-                        + (rangee % 2 == 1 ? PasDe(rangee) * 0.22f : 0f);
-                    var saut = 0f;
-                    if (f.Sauts.TryGetValue(acteur, out var s) && s.Fin > now)
+                    c.Clear(Color.Transparent);
+                    c.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    c.PixelOffsetMode = PixelOffsetMode.Half;
+                    c.SmoothingMode = SmoothingMode.None;
+                    c.CompositingQuality = CompositingQuality.HighSpeed;
+                    foreach (var s in f.Scene)
                     {
-                        var avancement = 1.0 - (s.Fin - now) / (double) RetroBat.Api.Netplay.LiveCrowdModel.DureeSaut;
-                        // Le saut est ARRONDI au pixel, et divise comme la rangee : une hauteur
-                        // fractionnaire ferait vibrer les bords du sprite d'une image a l'autre.
-                        var diviseur = RetroBat.Api.Netplay.LiveCrowdModel.Diviseurs[rangee];
-                        saut = (float) Math.Round(
-                            Math.Sin(Math.Clamp(avancement, 0, 1) * Math.PI) * s.Hauteur / diviseur);
+                        DessinerAvatar(c, s, s.X * k, HautAvatar(s, k, hauteurBande), k, now);
                     }
-
-                    var teinte = RetroBat.Api.Netplay.LiveCrowdModel.Teinte(acteur);
-                    using var pinceau = new SolidBrush(DeTeinte(teinte, alpha));
-                    // Coordonnees ARRONDIES : un sprite pose sur une demi-position se retrouve
-                    // interpole, et un pixel interpole n'est plus un pixel.
-                    Creature(g, pinceau, (int) Math.Round(x), (int) Math.Round(baseY - taille - saut), taille);
                 }
+                // Recalculee APRES : dessiner a pu decoder une planche, et la couche doit alors se refaire.
+                _signatureFoule = Signature(f);
+                MesurerComposition(debut);
             }
+            g.DrawImage(_coucheFoule, new Rectangle(0, hautBande, _coucheFoule.Width, _coucheFoule.Height),
+                0, 0, _coucheFoule.Width, _coucheFoule.Height, GraphicsUnit.Pixel);
 
-            // Les emoji en vol, par la MEME planche de sprites que les particules : deux chemins
-            // de rendu pour le meme dessin finiraient par ne plus se ressembler.
+            // Les emoji en vol, par la MEME planche de sprites que les particules.
             if (_sprites is { Ok: true })
             {
                 foreach (var vol in f.Vols)
                 {
-                    var age = (now - vol.Depuis) / (float) RetroBat.Api.Netplay.LiveCrowdModel.DureeVol;
+                    var age = (now - vol.Depuis) / (float) Foule.DureeVol;
                     if (age is < 0 or >= 1) { continue; }
-                    var tv = RetroBat.Api.Netplay.LiveCrowdModel.TailleRangee(vol.Rangee);
-                    var x = XDe(vol.Rangee, vol.Index, tv)
-                        + (vol.Rangee % 2 == 1 ? PasDe(vol.Rangee) * 0.22f : 0f) + tv / 2f;
-                    var y = sol - vol.Rangee * RetroBat.Api.Netplay.LiveCrowdModel.ReculParRangee
-                        - tv - age * 90f;
-                    _sprites.Draw(g, vol.Famille, Math.Clamp(vol.Niveau - 1, 0, 2), x, y, 26f + vol.Niveau * 4f, 1f - age);
+                    var y = hautBande + hauteurBande - (t + Foule.Profondeur) * k - age * 90f * k;
+                    _sprites.Draw(g, vol.Famille, Math.Clamp(vol.Niveau - 1, 0, 2), vol.X * k, y,
+                        (26f + vol.Niveau * 4f) * k, 1f - age);
                 }
             }
 
-            // Les etiquettes par-dessus tout, sur une plaque sombre : sans elle, un pseudo clair
-            // sur une foule claire ne se lit pas.
-            using var police = new Font("Segoe UI", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
-            using var encre = new SolidBrush(Color.FromArgb(235, 232, 236, 246));
-            using var plaque = new SolidBrush(Color.FromArgb(200, 11, 16, 32));
-            foreach (var e in f.Etiquettes)
+            // Les noms au-dessus de leur avatar, sur une plaque sombre : un pseudo clair sur une foule
+            // claire ne se lit pas.
+            if (f.Etiquettes.Count > 0)
             {
-                var taille = g.MeasureString(e.Texte, police);
-                var te = RetroBat.Api.Netplay.LiveCrowdModel.TailleRangee(e.Rangee);
-                var x = XDe(e.Rangee, e.Index, te)
-                    + (e.Rangee % 2 == 1 ? PasDe(e.Rangee) * 0.22f : 0f) + te / 2f;
-                var cx = Math.Clamp(x, taille.Width / 2f + 4f, _region.Width - taille.Width / 2f - 4f);
-                var y = sol - e.Rangee * RetroBat.Api.Netplay.LiveCrowdModel.ReculParRangee
-                    - te - 24f;
-                FillRounded(g, plaque, cx - taille.Width / 2f - 5f, y, taille.Width + 10f, taille.Height + 2f, 6);
-                g.DrawString(e.Texte, police, encre, cx - taille.Width / 2f, y + 1f);
+                using var police = new Font("Segoe UI", 12f * k, FontStyle.Bold, GraphicsUnit.Pixel);
+                using var encre = new SolidBrush(Color.FromArgb(235, 232, 236, 246));
+                using var plaque = new SolidBrush(Color.FromArgb(200, 11, 16, 32));
+                foreach (var e in f.Etiquettes)
+                {
+                    var s = f.Scene.FirstOrDefault(x => x.Acteur == e.Acteur);
+                    if (s is null) { continue; }
+                    var taille = g.MeasureString(e.Texte, police);
+                    var cx = Math.Clamp((s.X + t / 2f) * k, taille.Width / 2f + 4f, _region.Width - taille.Width / 2f - 4f);
+                    var y = hautBande + HautAvatar(s, k, hauteurBande) - taille.Height - 6f * k;
+                    FillRounded(g, plaque, cx - taille.Width / 2f - 5f, y, taille.Width + 10f, taille.Height + 2f, 6);
+                    g.DrawString(e.Texte, police, encre, cx - taille.Width / 2f, y + 1f);
+                }
+            }
+
+            MesurerCadence(now, f.Bouge);
+        }
+
+        /// <summary>Le haut d'un avatar dans la bande : plus pres (Y grand) = plus bas, souleve de sa hauteur.</summary>
+        private static int HautAvatar(Foule.Silhouette s, int k, int hauteurBande)
+            => hauteurBande - (Foule.TailleSprite + (Foule.Profondeur - s.Y) + s.Hauteur) * k;
+
+        private void DessinerAvatar(Graphics c, Foule.Silhouette s, int x, int y, int k, long now)
+        {
+            var t = Foule.TailleSprite;
+            var planche = s.Avatar?.Planche is { Length: 64 } sha ? PlancheDe(sha, now) : null;
+            if (planche is null)
+            {
+                // Pas encore de planche : la silhouette de remplacement, a la teinte de l'acteur.
+                using var pinceau = new SolidBrush(DeTeinte(Foule.Teinte(s.Acteur), 235));
+                Creature(c, pinceau, x, y, t * k);
+                return;
+            }
+
+            var dest = new Rectangle(x, y, t * k, t * k);
+            if (s.Vue == Foule.Vue.Gauche)
+            {
+                // Le profil gauche est la ligne droite retournee : l'image i y est rangee a l'envers.
+                c.DrawImage(planche.Gauche, dest, (4 - s.Image) * t, 0, t, t, GraphicsUnit.Pixel);
+                return;
+            }
+            var ligne = s.Vue switch { Foule.Vue.Dos => 1, Foule.Vue.Droite => 2, _ => 0 };
+            c.DrawImage(planche.Feuille, dest, s.Image * t, ligne * t, t, t, GraphicsUnit.Pixel);
+        }
+
+        /// <summary>
+        /// La planche decodee d'une empreinte, ou null si elle n'est pas (encore) sur la borne. Une
+        /// absence se retient cinq secondes : on ne retente pas le disque a chaque image.
+        /// </summary>
+        private Planche? PlancheDe(string sha, long now)
+        {
+            if (_planches.TryGetValue(sha, out var connue))
+            {
+                connue.Usage = now;
+                return connue;
+            }
+            if (_planchesAbsentes.TryGetValue(sha, out var quand) && now - quand < 5000)
+            {
+                return null;
+            }
+
+            string? chemin;
+            try { chemin = _cheminPlanche(sha); } catch { chemin = null; }
+            if (chemin is null)
+            {
+                _planchesAbsentes[sha] = now;
+                return null;
+            }
+
+            Planche nouvelle;
+            try
+            {
+                using var brute = new Bitmap(chemin);
+                if (brute.Width != 320 || brute.Height != 192)
+                {
+                    _planchesAbsentes[sha] = now;
+                    return null;
+                }
+                // En pixels, jamais en taille physique : un PNG qui porte une resolution serait
+                // sinon agrandi, et le pixel ne serait plus carre.
+                var feuille = new Bitmap(320, 192, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+                using (var gg = Graphics.FromImage(feuille))
+                {
+                    gg.CompositingMode = CompositingMode.SourceCopy;
+                    gg.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    gg.PixelOffsetMode = PixelOffsetMode.Half;
+                    gg.DrawImage(brute, new Rectangle(0, 0, 320, 192), 0, 0, 320, 192, GraphicsUnit.Pixel);
+                }
+                var gauche = feuille.Clone(new Rectangle(0, 128, 320, 64), System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+                gauche.RotateFlip(RotateFlipType.RotateNoneFlipX);
+                nouvelle = new Planche { Feuille = feuille, Gauche = gauche, Usage = now };
+            }
+            catch
+            {
+                _planchesAbsentes[sha] = now;
+                return null;
+            }
+
+            if (_planches.Count >= PlanchesGardees)
+            {
+                var vieille = _planches.OrderBy(e => e.Value.Usage).First();
+                vieille.Value.Dispose();
+                _planches.Remove(vieille.Key);
+            }
+            _planches[sha] = nouvelle;
+            _planchesAbsentes.Remove(sha);
+            try { _plancheUtilisee(sha); } catch { }
+            return nouvelle;
+        }
+
+        /// <summary>Tout ce qui change la couche : positions, vues, images, et l'arrivee d'une planche.</summary>
+        private long Signature(Foule.Instantane f)
+        {
+            unchecked
+            {
+                long h = 17 + _region.Width * 7L + _region.Height;
+                foreach (var s in f.Scene)
+                {
+                    h = h * 31 + Foule.Hachage(s.Acteur);
+                    h = h * 31 + s.X;
+                    h = h * 31 + s.Y;
+                    h = h * 31 + (int) s.Vue;
+                    h = h * 31 + s.Image;
+                    h = h * 31 + s.Hauteur;
+                    h = h * 31 + (s.Avatar?.Planche is { } sha && _planches.ContainsKey(sha) ? 1 : 0);
+                }
+                return h == 0 ? 1 : h;
             }
         }
 
         /// <summary>
-        /// Le spectateur, dessine dans un carre de `taille` pixels.
-        ///
-        /// PROVISOIRE : la grille de huit sur huit tient la place des creatures uniques
-        /// derivees du pseudo. Elle se divise proprement dans trente-deux comme dans seize,
-        /// donc ce provisoire respecte deja la contrainte du pixel carre.
-        ///
-        /// Tout est en entiers, positions comme tailles. Quand la creature arrivera, il
-        /// suffira de remplacer ce corps : la geometrie autour n'aura pas a changer.
+        /// Combien d'avatars la machine encaisse, mesure sur ce qui coute : recomposer la rangee, et la
+        /// cadence reelle quand la foule s'anime. Toutes les deux secondes, la scene gagne ou perd deux
+        /// places, entre huit et trente.
+        /// </summary>
+        private void MesurerComposition(long debut)
+        {
+            var ms = (Stopwatch.GetTimestamp() - debut) * 1000.0 / Stopwatch.Frequency;
+            _coutComposition = _coutComposition < 0 ? ms : _coutComposition * 0.8 + ms * 0.2;
+        }
+
+        private void MesurerCadence(long now, bool anime)
+        {
+            if (anime && _derniereFoule > 0 && now - _derniereFoule < 250)
+            {
+                var ecart = now - _derniereFoule;
+                _intervalleFoule = _intervalleFoule < 0 ? ecart : _intervalleFoule * 0.9 + ecart * 0.1;
+            }
+            _derniereFoule = now;
+
+            if (now < _prochainReglageFoule || _coutComposition < 0)
+            {
+                return;
+            }
+            _prochainReglageFoule = now + 2000;
+
+            // Vingt-cinq images par seconde, c'est quarante millisecondes : au-dela de soixante-dix, la
+            // machine ne suit plus.
+            var voulue = _capaciteVoulue;
+            if (_coutComposition > 8 || _intervalleFoule > 70)
+            {
+                voulue -= 2;
+            }
+            else if (_coutComposition < 3 && (_intervalleFoule < 0 || _intervalleFoule < 50))
+            {
+                voulue += 2;
+            }
+            voulue = Math.Clamp(voulue, Foule.CapaciteMin, Foule.CapaciteMax);
+            if (voulue != _capaciteVoulue)
+            {
+                _capaciteVoulue = voulue;
+                try { _capaciteFoule(voulue); } catch { }
+            }
+        }
+
+        /// <summary>
+        /// La silhouette de REMPLACEMENT, dessinee dans un carre de `taille` pixels, tant que la planche
+        /// n'est pas arrivee. Grille de huit : blocs de huit pixels dans un avatar de soixante-quatre.
         /// </summary>
         private static void Creature(Graphics g, Brush pinceau, int x, int y, int taille)
         {
-            var gabarit = RetroBat.Api.Netplay.LiveCrowdModel.Gabarit;
-            var bloc = taille / gabarit.Length;   // 4 a trente-deux pixels, 2 a seize
+            var gabarit = Foule.Gabarit;
+            var bloc = taille / gabarit.Length;
             if (bloc < 1)
             {
                 return;

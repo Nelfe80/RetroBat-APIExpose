@@ -31,22 +31,34 @@ public sealed class LiveCrowdPoller : BackgroundService
     private readonly IHttpClientFactory _httpFactory;
     private readonly LiveSpectateState _seance;
     private readonly LiveCrowdModel _foule;
+    private readonly RetroBat.Api.Avatar.AvatarSheetStore _planches;
+    private readonly RetroBat.Api.Replay.Sharing.ReplayRelayService _relais;
     private readonly ILogger<LiveCrowdPoller> _logger;
 
     private string _sessionSuivie = "";
     private long _curseur;
+
+    /// <summary>Les planches deja demandees au relais, et quand : on ne redemande qu'apres deux minutes.</summary>
+    private readonly Dictionary<string, long> _planchesDemandees = new(StringComparer.Ordinal);
+
+    /// <summary>Les planches deja notees au catalogue de la borne pendant ce direct.</summary>
+    private readonly HashSet<string> _planchesCataloguees = new(StringComparer.Ordinal);
 
     public LiveCrowdPoller(
         NelfePlayDeviceStore machine,
         IHttpClientFactory httpFactory,
         LiveSpectateState seance,
         LiveCrowdModel foule,
+        RetroBat.Api.Avatar.AvatarSheetStore planches,
+        RetroBat.Api.Replay.Sharing.ReplayRelayService relais,
         ILogger<LiveCrowdPoller> logger)
     {
         _machine = machine;
         _httpFactory = httpFactory;
         _seance = seance;
         _foule = foule;
+        _planches = planches;
+        _relais = relais;
         _logger = logger;
     }
 
@@ -172,6 +184,91 @@ public sealed class LiveCrowdPoller : BackgroundService
         if (r.TryGetProperty("cursor", out var c) && c.TryGetInt64(out var curseur) && curseur > _curseur)
         {
             _curseur = curseur;
+        }
+
+        await CompleterAvatarsAsync(client, session, jeton, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Les avatars de la scene.
+    ///
+    /// On ne demande que ceux qu'on DESSINE et qu'on ne connait pas encore : trois cents avatars pour
+    /// en montrer vingt-quatre serait du trafic pour rien. Puis on fait venir par le relais les
+    /// planches que la borne n'a pas. Une planche que personne n'a declaree retombe sur celle que la
+    /// borne a peut-etre deja pour ce joueur ; sinon le HUD dessine une silhouette en attendant.
+    /// </summary>
+    private async Task CompleterAvatarsAsync(HttpClient client, string session, string jeton, CancellationToken ct)
+    {
+        var maintenant = LiveCrowdModel.Maintenant();
+        var manquants = _foule.AvatarsManquants(60, maintenant);
+        if (manquants.Count > 0)
+        {
+            var corps = new JsonObject
+            {
+                ["viewer_token"] = jeton,
+                ["actors"] = new JsonArray(manquants.Select(a => (JsonNode?) JsonValue.Create(a)).ToArray()),
+            };
+            using var contenu = new StringContent(corps.ToJsonString(), Encoding.UTF8, "application/json");
+            using var reponse = await client
+                .PostAsync($"/api/v1/agent/live/{Uri.EscapeDataString(session)}/avatars", contenu, ct)
+                .ConfigureAwait(false);
+            if (reponse.IsSuccessStatusCode)
+            {
+                using var doc = JsonDocument.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
+                if (doc.RootElement.TryGetProperty("avatars", out var liste) && liste.ValueKind == JsonValueKind.Object)
+                {
+                    var avatars = new Dictionary<string, LiveCrowdModel.Avatar>(StringComparer.Ordinal);
+                    foreach (var p in liste.EnumerateObject())
+                    {
+                        var pseudo = Texte(p.Value, "pseudo");
+                        var famille = Texte(p.Value, "family");
+                        if (pseudo.Length == 0 || famille.Length == 0)
+                        {
+                            continue;
+                        }
+                        var variation = p.Value.TryGetProperty("variation", out var v) && v.TryGetInt32(out var vi) ? vi : 0;
+                        var planche = Texte(p.Value, "sheet");
+                        if (planche.Length == 0)
+                        {
+                            planche = _planches.Trouver(pseudo, famille, variation)?.Sha256 ?? "";
+                        }
+                        var generateur = Texte(p.Value, "generator");
+                        avatars[p.Name] = new LiveCrowdModel.Avatar(
+                            pseudo, famille, variation,
+                            RetroBat.Api.Avatar.AvatarSheetStore.EstSha(planche) ? planche : null,
+                            generateur.Length > 0 ? generateur : null);
+                    }
+                    _foule.PoserAvatars(avatars);
+                }
+            }
+        }
+
+        if (_planchesDemandees.Count > 2000)
+        {
+            _planchesDemandees.Clear();
+        }
+        foreach (var avatar in _foule.AvatarsEnScene())
+        {
+            if (avatar.Planche is not { } sha)
+            {
+                continue;
+            }
+            if (_planches.Has(sha))
+            {
+                // Notee au catalogue : au prochain direct, ce joueur aura sa planche meme si l'index
+                // tarde a repondre.
+                if (avatar.Generateur is { } g && _planchesCataloguees.Add(sha))
+                {
+                    _planches.Cataloguer(avatar.Pseudo, avatar.Famille, avatar.Variation, g, sha, verifiee: true);
+                }
+                continue;
+            }
+            if (_planchesDemandees.TryGetValue(sha, out var quand) && maintenant - quand < 120_000)
+            {
+                continue;
+            }
+            _planchesDemandees[sha] = maintenant;
+            await _relais.RequestAsync(sha, ct, "avatar").ConfigureAwait(false);
         }
     }
 
