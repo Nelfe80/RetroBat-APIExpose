@@ -379,6 +379,10 @@ builder.Services.AddHostedService<RetroArchLogMonitorService>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Runtime.RetroArchReplayClient>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Runtime.ReplayCoreTimingProbe>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Storage.ReplayStore>();
+// Les planches d'avatar : un magasin a part, que seuls le recensement et le relais partagent
+// avec les replays. Fabrique explicite, le second constructeur ne sert qu'aux tests.
+builder.Services.AddSingleton(sp => new RetroBat.Api.Avatar.AvatarSheetStore(
+    sp.GetRequiredService<ILogger<RetroBat.Api.Avatar.AvatarSheetStore>>()));
 builder.Services.AddSingleton<RetroBat.Api.Replay.Playback.ReplayLaunchTokenStore>();
 // Qui regarde : jeton opaque, jamais une identite de compte cote borne.
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayViewerSession>();

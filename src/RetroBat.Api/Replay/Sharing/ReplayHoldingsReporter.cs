@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using RetroBat.Api.Avatar;
 using RetroBat.Api.Replay.Storage;
 
 namespace RetroBat.Api.Replay.Sharing;
@@ -30,24 +31,35 @@ public sealed class ReplayHoldingsReporter : BackgroundService
     private readonly IReplayObjectStore _objects;
     private readonly IReplayMetadataStore _meta;
     private readonly ReplaySharePolicy _policy;
+    private readonly AvatarSheetStore _avatars;
     private readonly RetroBat.Api.Infrastructure.NelfePlayDeviceStore _devices;
     private readonly IHttpClientFactory _httpFactory;
     private readonly IConfiguration _config;
     private readonly ILogger<ReplayHoldingsReporter> _logger;
 
     public ReplayHoldingsReporter(IReplayManifestStore manifests, IReplayObjectStore objects,
-        IReplayMetadataStore meta, ReplaySharePolicy policy,
+        IReplayMetadataStore meta, ReplaySharePolicy policy, AvatarSheetStore avatars,
         RetroBat.Api.Infrastructure.NelfePlayDeviceStore devices, IHttpClientFactory httpFactory,
         IConfiguration config, ILogger<ReplayHoldingsReporter> logger)
     {
-        _manifests = manifests; _objects = objects; _meta = meta; _policy = policy;
+        _manifests = manifests; _objects = objects; _meta = meta; _policy = policy; _avatars = avatars;
         _devices = devices; _httpFactory = httpFactory; _config = config; _logger = logger;
     }
 
     /// <summary>Déclarer, c'est se signaler. On ne le fait pas sans que le partage ait été activé :
     /// une borne qui ne participe pas n'a aucune raison d'apparaître dans un recensement.</summary>
-    private bool Enabled => _config.GetValue("Replay:Share:Enabled", false)
-                            || _config.GetValue("Replay:Replication:Enabled", false);
+    private bool ReplaysParticipent => _config.GetValue("Replay:Share:Enabled", false)
+                                       || _config.GetValue("Replay:Replication:Enabled", false);
+
+    /// <summary>
+    /// Les planches d'avatar se partagent PAR DÉFAUT, et ce n'est pas la même décision que pour un
+    /// replay : une planche se fabrique à partir d'un pseudo et d'une famille déjà publics, elle est
+    /// faite pour être vue de tous les spectateurs, et sans détenteur déclaré aucune autre borne ne
+    /// peut la recevoir. `Avatar:Share:Enabled=false` la retire du recensement.
+    /// </summary>
+    private bool AvatarsPartages => _config.GetValue("Avatar:Share:Enabled", true);
+
+    private bool Enabled => ReplaysParticipent || AvatarsPartages;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -76,16 +88,29 @@ public sealed class ReplayHoldingsReporter : BackgroundService
 
         var partage = _policy.SharingEnabled;
         var objets = new List<object>();
-        foreach (var manifest in _manifests.ListManifests())
+        if (ReplaysParticipent)
         {
-            if (!File.Exists(_objects.ObjectPath(manifest.Object.Sha256))) continue;
-            var visibilite = _meta.GetMeta(manifest.ReplayId)?.Visibility ?? "private";
-            objets.Add(new
+            foreach (var manifest in _manifests.ListManifests())
             {
-                sha256 = manifest.Object.Sha256,
-                // Servable par CETTE borne, ce qui est une autre question que « conservée ».
-                shareable = partage && string.Equals(visibilite, "public", StringComparison.OrdinalIgnoreCase),
-            });
+                if (!File.Exists(_objects.ObjectPath(manifest.Object.Sha256))) continue;
+                var visibilite = _meta.GetMeta(manifest.ReplayId)?.Visibility ?? "private";
+                objets.Add(new
+                {
+                    sha256 = manifest.Object.Sha256,
+                    // Servable par CETTE borne, ce qui est une autre question que « conservée ».
+                    shareable = partage && string.Equals(visibilite, "public", StringComparison.OrdinalIgnoreCase),
+                });
+            }
+        }
+
+        // Les planches dans le MÊME envoi : la plateforme oublie tout ce qu'une borne ne déclare
+        // plus, et deux envois séparés s'effaceraient l'un l'autre à chaque passage.
+        if (AvatarsPartages)
+        {
+            foreach (var sha in _avatars.ADeclarer())
+            {
+                objets.Add(new { sha256 = sha, shareable = true });
+            }
         }
 
         try

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using RetroBat.Api.Avatar;
 using RetroBat.Api.Replay.Storage;
 using RetroBat.Domain.Events;
 using RetroBat.Domain.Interfaces;
@@ -32,6 +33,11 @@ namespace RetroBat.Api.Replay.Sharing;
 public sealed class ReplayRelayService : BackgroundService
 {
     private static readonly TimeSpan Cadence = TimeSpan.FromSeconds(60);
+
+    /// <summary>Pendant une partie, ou tant que des planches d'avatar sont attendues. Une foule se
+    /// remplit en quelques secondes : une planche arrivee apres la fin du direct n'a plus personne
+    /// a qui se montrer.</summary>
+    private static readonly TimeSpan CadenceAvatars = TimeSpan.FromSeconds(15);
     private static readonly TimeSpan PremierEssai = TimeSpan.FromSeconds(45);
 
     /// <summary>Au-delà, on cesse de réclamer : le pont d'en face a expiré depuis longtemps et
@@ -46,6 +52,7 @@ public sealed class ReplayRelayService : BackgroundService
     };
 
     private readonly ReplayStore _store;
+    private readonly AvatarSheetStore _avatars;
     private readonly ReplaySharePolicy _policy;
     private readonly RetroBat.Api.Infrastructure.NelfePlayDeviceStore _devices;
     private readonly IHttpClientFactory _httpFactory;
@@ -57,16 +64,18 @@ public sealed class ReplayRelayService : BackgroundService
     private volatile bool _gameActive;
     private volatile bool _replayActive;
 
-    public ReplayRelayService(ReplayStore store, ReplaySharePolicy policy,
+    public ReplayRelayService(ReplayStore store, AvatarSheetStore avatars, ReplaySharePolicy policy,
         RetroBat.Api.Infrastructure.NelfePlayDeviceStore devices, IHttpClientFactory httpFactory,
         IConfiguration config, IEventBus bus, ILogger<ReplayRelayService> logger)
     {
-        _store = store; _policy = policy; _devices = devices;
+        _store = store; _avatars = avatars; _policy = policy; _devices = devices;
         _httpFactory = httpFactory; _config = config; _bus = bus; _logger = logger;
     }
 
     public sealed record RelayState(long Since, IReadOnlyList<RelayPending> Pending);
-    public sealed record RelayPending(string Sha256, DateTime AskedUtc);
+    /// <summary>`Kind` vaut « avatar » pour une planche. Absent, c'est un replay : les états écrits
+    /// avant les planches se relisent donc tels quels.</summary>
+    public sealed record RelayPending(string Sha256, DateTime AskedUtc, string? Kind = null);
     public sealed record RelayReport(bool Ran, int Deposited, int Collected, int Pending, string? Reason);
 
     private string EtatPath => Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfenet", "relay.json");
@@ -85,7 +94,8 @@ public sealed class ReplayRelayService : BackgroundService
             catch (OperationCanceledException) { break; }
             catch (Exception ex) { _logger.LogDebug(ex, "Relais : passage en erreur."); }
 
-            try { await Task.Delay(Cadence, stoppingToken).ConfigureAwait(false); }
+            var delai = _gameActive || _replayActive || Etat().Pending.Any(EstAvatar) ? CadenceAvatars : Cadence;
+            try { await Task.Delay(delai, stoppingToken).ConfigureAwait(false); }
             catch (OperationCanceledException) { break; }
         }
     }
@@ -98,11 +108,15 @@ public sealed class ReplayRelayService : BackgroundService
 
         // Le relais se tait pendant une partie ou une lecture, comme la file de semis et l'agent
         // de réplication : la bande passante d'une borne appartient d'abord à qui joue dessus.
-        if (_gameActive || _replayActive) return new RelayReport(true, 0, 0, Etat().Pending.Count, "busy");
+        //
+        // SAUF pour les planches d'avatar, et c'est justement pendant une partie qu'elles servent :
+        // un spectateur regarde un direct, et c'est là que sa borne doit recevoir la foule et livrer
+        // sa propre planche. Quelques kilo-octets ne disputent rien à la partie.
+        var occupee = _gameActive || _replayActive;
 
-        var deposes = await DeposerAsync(credential, ct).ConfigureAwait(false);
-        var recuperes = await RecupererAsync(credential, ct).ConfigureAwait(false);
-        return new RelayReport(true, deposes, recuperes, Etat().Pending.Count, null);
+        var deposes = await DeposerAsync(credential, occupee, ct).ConfigureAwait(false);
+        var recuperes = await RecupererAsync(credential, occupee, ct).ConfigureAwait(false);
+        return new RelayReport(true, deposes, recuperes, Etat().Pending.Count, occupee ? "busy" : null);
     }
 
     /// <summary>
@@ -110,7 +124,7 @@ public sealed class ReplayRelayService : BackgroundService
     /// borne a déclarés partageables ; on revérifie quand même auprès de la politique de
     /// partage, parce qu'une déclaration date d'hier et qu'un réglage a pu changer depuis.
     /// </summary>
-    private async Task<int> DeposerAsync(string credential, CancellationToken ct)
+    private async Task<int> DeposerAsync(string credential, bool avatarsSeulement, CancellationToken ct)
     {
         var etat = Etat();
         var doc = await LireJsonAsync("/api/v1/agent/relay/inbox?limit=20&since=" + etat.Since, credential, ct)
@@ -120,6 +134,7 @@ public sealed class ReplayRelayService : BackgroundService
         var suivant = doc["next"]?.GetValue<long>() ?? etat.Since;
         var demandes = doc["requests"] as JsonArray ?? new JsonArray();
         var deposes = 0;
+        long? premiereLaissee = null;
 
         foreach (var demande in demandes)
         {
@@ -127,18 +142,36 @@ public sealed class ReplayRelayService : BackgroundService
             var sha = demande?["object_sha256"]?.GetValue<string>() ?? string.Empty;
             if (sha.Length != 64) continue;
 
-            var chemin = _store.ObjectPath(sha);
-            if (!File.Exists(chemin)) continue;
-            if (!_policy.Evaluate(sha).Allowed)
+            string chemin;
+            if (_avatars.Has(sha))
             {
-                _logger.LogInformation("Relais : dépôt refusé pour {Sha}, l'objet n'est plus partageable.", Court(sha));
-                continue;
+                if (!AvatarsPartages) continue;
+                chemin = _avatars.ObjectPath(sha);
+            }
+            else
+            {
+                if (avatarsSeulement)
+                {
+                    // Pendant une partie on ne sert que des planches. Une autre demande est LAISSÉE,
+                    // pas sautée : le curseur repartira d'elle, sinon ce replay ne serait jamais
+                    // redemandé à cette borne.
+                    premiereLaissee ??= demande?["id"]?.GetValue<long>() ?? etat.Since + 1;
+                    continue;
+                }
+                chemin = _store.ObjectPath(sha);
+                if (!File.Exists(chemin)) continue;
+                if (!_policy.Evaluate(sha).Allowed)
+                {
+                    _logger.LogInformation("Relais : dépôt refusé pour {Sha}, l'objet n'est plus partageable.", Court(sha));
+                    continue;
+                }
             }
 
             if (await DeposerUnAsync(credential, sha, chemin, ct).ConfigureAwait(false)) deposes++;
         }
 
-        Ecrire(etat with { Since = suivant });
+        if (premiereLaissee is long laissee) suivant = Math.Max(etat.Since, laissee - 1);
+        Modifier(e => e with { Since = suivant });
         if (deposes > 0) _logger.LogInformation("Relais : {Count} objet(s) déposé(s) pour des bornes injoignables.", deposes);
         return deposes;
     }
@@ -178,7 +211,7 @@ public sealed class ReplayRelayService : BackgroundService
     }
 
     /// <summary>Récupère ce qu'on avait demandé, si quelqu'un a déposé entre-temps.</summary>
-    private async Task<int> RecupererAsync(string credential, CancellationToken ct)
+    private async Task<int> RecupererAsync(string credential, bool avatarsSeulement, CancellationToken ct)
     {
         var etat = Etat();
         if (etat.Pending.Count == 0) return 0;
@@ -188,24 +221,29 @@ public sealed class ReplayRelayService : BackgroundService
 
         foreach (var demande in etat.Pending)
         {
-            if (ct.IsCancellationRequested) { restantes.Add(demande); continue; }
+            var avatar = EstAvatar(demande);
+            if (ct.IsCancellationRequested || (avatarsSeulement && !avatar)) { restantes.Add(demande); continue; }
 
-            if (File.Exists(_store.ObjectPath(demande.Sha256))) continue;   // arrivé par ailleurs
+            var dejaLa = avatar ? _avatars.Has(demande.Sha256) : File.Exists(_store.ObjectPath(demande.Sha256));
+            if (dejaLa) continue;   // arrivé par ailleurs
             if (DateTime.UtcNow - demande.AskedUtc > PatienceDemande)
             {
                 _logger.LogInformation("Relais : demande abandonnée pour {Sha}, personne n'a déposé.", Court(demande.Sha256));
                 continue;
             }
 
-            if (await RecupererUnAsync(credential, demande.Sha256, ct).ConfigureAwait(false)) recuperes++;
+            if (await RecupererUnAsync(credential, demande.Sha256, avatar, ct).ConfigureAwait(false)) recuperes++;
             else restantes.Add(demande);
         }
 
-        Ecrire(etat with { Pending = restantes });
+        // Réécrit en gardant les demandes ajoutées PENDANT ce passage : le relevé de la foule en dépose
+        // en continu, et les écraser les ferait attendre le passage suivant pour rien.
+        var vues = etat.Pending.Select(p => p.Sha256).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        Modifier(e => e with { Pending = restantes.Concat(e.Pending.Where(p => !vues.Contains(p.Sha256))).ToList() });
         return recuperes;
     }
 
-    private async Task<bool> RecupererUnAsync(string credential, string sha, CancellationToken ct)
+    private async Task<bool> RecupererUnAsync(string credential, string sha, bool avatar, CancellationToken ct)
     {
         var temporaire = Path.Combine(_store.TempRoot, "relay-" + sha + ".part");
         try
@@ -225,6 +263,20 @@ public sealed class ReplayRelayService : BackgroundService
             await using (var sortie = File.Create(temporaire))
             {
                 await response.Content.CopyToAsync(sortie, cts.Token).ConfigureAwait(false);
+            }
+
+            if (avatar)
+            {
+                // Le magasin des planches recalcule l'empreinte et refuse d'office des octets qui ne
+                // tombent pas dessus : rien n'est gardé sous un autre nom.
+                var planche = await _avatars.ImporterFichierAsync(temporaire, sha, ct).ConfigureAwait(false);
+                if (!planche.Ok)
+                {
+                    _logger.LogWarning("Relais : planche reçue pour {Attendu} écartée ({Raison}).", Court(sha), planche.Erreur);
+                    return false;
+                }
+                _logger.LogInformation("Relais : planche {Sha} récupérée.", Court(sha));
+                return true;
             }
 
             // L'import RECALCULE l'empreinte et range l'objet dessous. Des octets qui ne tombent
@@ -260,7 +312,7 @@ public sealed class ReplayRelayService : BackgroundService
     /// lecture qui a déclenché la demande n'attend pas, elle échoue proprement et l'objet sera
     /// là au prochain essai.
     /// </summary>
-    public async Task<bool> RequestAsync(string sha256, CancellationToken ct)
+    public async Task<bool> RequestAsync(string sha256, CancellationToken ct, string kind = "replay")
     {
         var sha = (sha256 ?? string.Empty).Trim().ToLowerInvariant();
         if (sha.Length != 64) return false;
@@ -296,9 +348,9 @@ public sealed class ReplayRelayService : BackgroundService
                 return false;
             }
 
-            var liste = etat.Pending.ToList();
-            liste.Add(new RelayPending(sha, DateTime.UtcNow));
-            Ecrire(etat with { Pending = liste });
+            Modifier(e => e.Pending.Any(p => string.Equals(p.Sha256, sha, StringComparison.OrdinalIgnoreCase))
+                ? e
+                : e with { Pending = e.Pending.Append(new RelayPending(sha, DateTime.UtcNow, kind)).ToList() });
             _logger.LogInformation("Relais : demande déposée pour {Sha} ({Detenteurs} détenteur(s) déclaré(s)).",
                 Court(sha), detenteurs);
             return true;
@@ -372,6 +424,22 @@ public sealed class ReplayRelayService : BackgroundService
             catch (Exception ex) { _logger.LogDebug(ex, "Relais : état non écrit."); }
         }
     }
+
+    /// <summary>Lit, change et réécrit l'état d'un seul tenant. Le relevé de la foule dépose des
+    /// demandes pendant qu'un passage tourne : relire puis écrire en deux fois en perdait.</summary>
+    private RelayState Modifier(Func<RelayState, RelayState> changement)
+    {
+        lock (_gate)
+        {
+            var nouveau = changement(Etat());
+            Ecrire(nouveau);
+            return nouveau;
+        }
+    }
+
+    private static bool EstAvatar(RelayPending p) => string.Equals(p.Kind, "avatar", StringComparison.Ordinal);
+
+    private bool AvatarsPartages => _config.GetValue("Avatar:Share:Enabled", true);
 
     private void OnBusEvent(EventEnvelope e)
     {
