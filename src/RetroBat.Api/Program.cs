@@ -385,6 +385,10 @@ builder.Services.AddHostedService<RetroBat.Api.Infrastructure.IoTraceBootstrap>(
 // avec les replays. Fabrique explicite, le second constructeur ne sert qu'aux tests.
 builder.Services.AddSingleton(sp => new RetroBat.Api.Avatar.AvatarSheetStore(
     sp.GetRequiredService<ILogger<RetroBat.Api.Avatar.AvatarSheetStore>>()));
+// La borne va CHERCHER les planches que la plateforme garde pour son compte : le joueur n'a
+// aucun geste a faire, et sa borne peut etre eteinte au moment ou il depose.
+builder.Services.AddSingleton<RetroBat.Api.Avatar.AvatarDepositCollector>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Avatar.AvatarDepositCollector>());
 builder.Services.AddSingleton<RetroBat.Api.Replay.Playback.ReplayLaunchTokenStore>();
 // Qui regarde : jeton opaque, jamais une identite de compte cote borne.
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayViewerSession>();

@@ -53,6 +53,20 @@ public sealed class LiveCrowdModel
     /// <summary>Un avatar inconnu se redemande au plus toutes les trente secondes.</summary>
     private const int RedemandeAvatar = 30000;
 
+    /// <summary>
+    /// Le temps qu'on laisse a une planche d'arriver avant de faire entrer son spectateur en
+    /// silhouette.
+    ///
+    /// Il attend HORS SCENE, donc invisible : on ne dessine personne sur place pour le
+    /// transformer ensuite, on le voit ARRIVER avec son avatar. Passe ce delai, il entre quand
+    /// meme : un spectateur qui n'a jamais genere d'avatar ne doit pas rester invisible.
+    /// </summary>
+    private const int AttenteAvatar = 12000;
+
+    /// <summary>Une entree a la fois, espacee : vingt-quatre arrivees d'un coup seraient une
+    /// bousculade, et on ne verrait justement plus personne arriver.</summary>
+    private const int EcartEntrees = 400;
+
     /// <summary>Pas plus de huit pas rattrapes d'un coup : apres une pause du HUD, personne ne se teleporte.</summary>
     private const int RattrapageMax = 8;
 
@@ -123,7 +137,7 @@ public sealed class LiveCrowdModel
         public int X, Cible, Y;
         public bool Place, Nouveau, AReplacer, Sortant, Supprime, FinDeFlanerie;
         public int? CentreVise;
-        public long ProchainPas, DerniereActivite, RegardJusqua;
+        public long ProchainPas, DerniereActivite, RegardJusqua, Arrivee;
         public int Pas;
         public bool Marche => Place && X != Cible;
     }
@@ -151,7 +165,9 @@ public sealed class LiveCrowdModel
     private int _capacite = CapaciteDepart;
     private int _largeur = 1920;
     private bool _aRecomposer;
-    private bool _premiereComposition = true;
+    // Null avant la premiere entree. Pas long.MinValue : `maintenant - long.MinValue` deborde en
+    // negatif, l'espacement paraissait toujours trop court, et plus personne n'entrait jamais.
+    private long? _derniereEntree;
     private long _prochaineFlanerie = -1;
     private uint _alea;
 
@@ -473,7 +489,7 @@ public sealed class LiveCrowdModel
             _sauts.Clear();
             _vus.Clear();
             _aRecomposer = false;
-            _premiereComposition = true;
+            _derniereEntree = null;
             _prochaineFlanerie = -1;
         }
     }
@@ -561,11 +577,12 @@ public sealed class LiveCrowdModel
             Graine = graine,
             Y = (int) (graine % (uint) (Profondeur + 1)),
             DerniereActivite = maintenant,
+            Arrivee = maintenant,
             CentreVise = centre,
             AReplacer = true,
-            // Avant le tout premier placement, la foule se POSE : vingt-quatre entrees en file au debut
-            // d'un direct seraient un defile, pas un public.
-            Nouveau = !_premiereComposition,
+            // TOUT LE MONDE entre par un bord, y compris au debut d'un direct : on ne dessine
+            // personne sur la scene.
+            Nouveau = true,
         };
         _scene.Add(f);
         return f;
@@ -659,39 +676,57 @@ public sealed class LiveCrowdModel
             return;
         }
 
-        if (_premiereComposition)
+        // Les deja places gardent leur place : un changement de capacite ou de largeur ne fait pas
+        // recommencer une entree.
+        foreach (var f in aPlacer.Where(f => f.Place).ToList())
         {
-            // Premier placement : repartis sur TOUTE la largeur, dans l'ordre trie, chacun decale de
-            // son propre ecart pour que l'espacement ne soit jamais regulier.
-            var initiaux = aPlacer.Where(f => !f.Place && !f.Nouveau)
-                .OrderBy(f => f.Acteur, StringComparer.Ordinal).ToList();
-            var pas = _largeur / (double) Math.Max(1, initiaux.Count);
-            var jeu = (int) (pas / 4);
-            for (var i = 0; i < initiaux.Count; i++)
-            {
-                var decalage = jeu == 0 ? 0 : (int) (initiaux[i].Graine % (uint) (2 * jeu + 1)) - jeu;
-                initiaux[i].CentreVise ??= (int) Math.Round((i + 0.5) * pas) + decalage;
-            }
-        }
-
-        foreach (var f in aPlacer)
-        {
-            var centre = f.CentreVise ?? CentreLibre(f);
-            var cible = Math.Clamp(centre - TailleSprite / 2, 0, Math.Max(0, _largeur - TailleSprite));
-            if (!f.Place)
-            {
-                // Un nouveau venu entre par le bord le plus proche de sa place.
-                f.X = !f.Nouveau ? cible : cible + TailleSprite / 2 < _largeur / 2 ? -TailleSprite : _largeur;
-                f.Place = true;
-            }
-            f.Cible = cible;
+            f.Cible = CibleDe(f);
             f.ProchainPas = maintenant;
             f.AReplacer = false;
             f.CentreVise = null;
         }
 
-        _premiereComposition = false;
+        // Les entrants, dans l'ordre d'arrivee, un a la fois : ceux qui attendent encore leur
+        // planche patientent hors scene, et on les voit arriver avec leur avatar.
+        foreach (var f in aPlacer.Where(f => !f.Place).OrderBy(f => f.Arrivee).ThenBy(f => f.Acteur, StringComparer.Ordinal))
+        {
+            if (_derniereEntree is { } derniere && maintenant - derniere < EcartEntrees)
+            {
+                break;
+            }
+            if (!PretAEntrer(f, maintenant))
+            {
+                continue;
+            }
+
+            var cible = CibleDe(f);
+            // Par le bord le plus proche de sa place : la moitie gauche entre par la gauche.
+            f.X = cible + TailleSprite / 2 < _largeur / 2 ? -TailleSprite : _largeur;
+            f.Place = true;
+            f.Cible = cible;
+            f.ProchainPas = maintenant;
+            f.AReplacer = false;
+            f.CentreVise = null;
+            _derniereEntree = maintenant;
+        }
     }
+
+    /// <summary>La place visee d'un figurant : celle qu'on lui a donnee, sinon le plus grand trou.</summary>
+    private int CibleDe(Figurant f)
+    {
+        var centre = f.CentreVise ?? CentreLibre(f);
+        return Math.Clamp(centre - TailleSprite / 2, 0, Math.Max(0, _largeur - TailleSprite));
+    }
+
+    /// <summary>
+    /// Sa planche est-elle la, ou a-t-on assez attendu ?
+    ///
+    /// Tant qu'elle n'est pas la, il reste hors scene : c'est ce qui evite de dessiner une
+    /// silhouette qui se transformerait sous les yeux du spectateur.
+    /// </summary>
+    private bool PretAEntrer(Figurant f, long maintenant)
+        => (_avatars.TryGetValue(f.Acteur, out var a) && a.Planche is { Length: 64 })
+           || maintenant - f.Arrivee >= AttenteAvatar;
 
     /// <summary>Le milieu du plus grand trou de la scene, decale de l'ecart propre a l'acteur.</summary>
     private int CentreLibre(Figurant nouveau)
