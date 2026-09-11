@@ -57,6 +57,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     // et on POST /api/v1/agent/scores/replay-link. Purement additif et best-effort :
     // un échec n'affecte ni le scoring ni l'enregistrement.
     private readonly RetroBat.Api.Replay.Storage.ReplayStore? _replayStore;   // pour estampiller score/rang sur la méta du replay
+    private readonly RetroBat.Api.Replay.Sharing.ReplaySeedQueue? _semis;
+    private readonly RetroBat.Api.Replay.Sharing.ReplaySeedService? _semeur;
     private string? _activeReplayId;
     private readonly Dictionary<string, (string sessionId, string visibility, long? score, int? rank, DateTime at)> _pendingScoreLink = new();
     private readonly Dictionary<string, (string sha256, DateTime at)> _finalizedReplay = new();
@@ -72,9 +74,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         NelfePlayScoringSessionService? scoringSession = null,
         IEmulationStationNotificationService? esNotify = null,
         RetroBat.Api.Replay.Storage.ReplayStore? replayStore = null,
-        ILogger<NelfePlayScoringReporter>? logger = null)
+        ILogger<NelfePlayScoringReporter>? logger = null,
+        RetroBat.Api.Replay.Sharing.ReplaySeedQueue? semis = null,
+        RetroBat.Api.Replay.Sharing.ReplaySeedService? semeur = null)
     {
         _replayStore = replayStore;
+        _semis = semis;
+        _semeur = semeur;
         _eventBus = eventBus;
         _httpFactory = httpFactory;
         _devices = devices;
@@ -1137,6 +1143,38 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
         StampReplayCard(replayId, score, rank);
         _ = RegisterReplayLinkAsync(sessionId, replayId, sha, visibility, CancellationToken.None);
+        if (string.Equals(visibility, "public", StringComparison.OrdinalIgnoreCase)) SemerReplayCertifie(replayId, sha);
+    }
+
+    /// <summary>
+    /// Un score certifie PUBLIC seme son replay vers l'amorce, sans geste.
+    ///
+    /// Jusqu'ici la liaison replay/score rendait le lien visible sur le site, mais la poussee vers
+    /// l'amorce ne partait que du geste explicite de publication. Le lien ne tenait donc que par la
+    /// borne d'origine : celle de 19xx a purge son magasin, et l'objet n'existait plus nulle part.
+    /// Un lien sur un score certifie promet une lecture, donc l'objet doit survivre a la borne.
+    ///
+    /// Le geste explicite reste pour les replays SANS score certifie. Meme file, meme reprise : rien
+    /// n'est pousse pendant une partie, et une extinction ne perd que la progression.
+    /// </summary>
+    private void SemerReplayCertifie(string replayId, string sha256)
+    {
+        if (_semis is null) return;
+        try
+        {
+            _semis.Enqueue(replayId, sha256);
+            var meta = _replayStore?.GetMeta(replayId);
+            if (meta is not null)
+                _replayStore!.SaveMeta(meta with { Visibility = "public", PublicationState = "mirrored" });
+            Trace($"SEMIS inscrit pour {replayId} (score certifie public)");
+            if (_semeur is not null)
+                _ = Task.Run(async () =>
+                {
+                    try { await _semeur.NudgeAsync(CancellationToken.None).ConfigureAwait(false); }
+                    catch (Exception ex) { _logger?.LogDebug(ex, "Semis : tentative immediate en echec, la file reprendra."); }
+                });
+        }
+        catch (Exception ex) { _logger?.LogDebug(ex, "Semis : inscription impossible pour {ReplayId}.", replayId); }
     }
 
     // Estampille la carte du replay (score + rang) sur la méta locale, pour l'overlay
