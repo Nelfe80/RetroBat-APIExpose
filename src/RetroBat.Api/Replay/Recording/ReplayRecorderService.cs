@@ -41,6 +41,27 @@ public sealed class ReplayRecorderService : BackgroundService
     private readonly IEventBus _bus;
     private readonly RetroBat.Api.Replay.Playback.ReplayPlaybackService _playback;
     private readonly ILogger<ReplayRecorderService> _logger;
+    private readonly IConfiguration _config;
+
+    /// <summary>
+    /// Le dernier START vu sur le panel. L'enregistrement ne demarre que si un START est recent :
+    /// sans cette regle, RetroArch chargeait le contenu et on enregistrait AUSSITOT, c'est-a-dire
+    /// l'ecran titre et la demo. Et apres un game over, RetroArch coupe son film et on en
+    /// relancait un autre sur la demo suivante : des replays d'attract mode par dizaines.
+    ///
+    /// La FENETRE existe a cause d'un ordre des choses : le START qui relance la partie apres un
+    /// game over est presse AVANT qu'on ait vu RetroArch couper le film (on sonde toutes les
+    /// 1,5 s). Un START des vingt dernieres secondes compte donc, meme anterieur a la coupure.
+    ///
+    /// Pourquoi START et pas la demo : tous les jeux n'en ont pas, et le START est resolu par la
+    /// cartographie de chaque borne, donc il vaut pour toutes les machines et tous les
+    /// emulateurs. `Replay:Record:RequireStart=false` rend l'ancien comportement a une machine
+    /// sans panel.
+    /// </summary>
+    private DateTime _dernierStartUtc = DateTime.MinValue;
+    private static readonly TimeSpan FenetreStart = TimeSpan.FromSeconds(20);
+    private string _attenteAnnoncee = "";
+    private IDisposable? _abonnement;
 
     private sealed class Recording
     {
@@ -65,13 +86,48 @@ public sealed class ReplayRecorderService : BackgroundService
     private Recording? _current;
 
     public ReplayRecorderService(RetroArchReplayClient ra, ReplayStore store, ReplayCoreTimingProbe timing,
-        IEventBus bus, RetroBat.Api.Replay.Playback.ReplayPlaybackService playback, ILogger<ReplayRecorderService> logger)
+        IEventBus bus, RetroBat.Api.Replay.Playback.ReplayPlaybackService playback, ILogger<ReplayRecorderService> logger,
+        IConfiguration config)
     {
         _ra = ra; _store = store; _timing = timing; _bus = bus; _playback = playback; _logger = logger;
+        _config = config;
+    }
+
+    private bool StartRequis => _config.GetValue("Replay:Record:RequireStart", true);
+
+    private void OnBusEvent(EventEnvelope e)
+    {
+        if (!string.Equals(e.Type, "panel.input.pressed", StringComparison.Ordinal)) return;
+        try
+        {
+            var el = System.Text.Json.JsonSerializer.SerializeToElement(e.Payload);
+            if (el.TryGetProperty("System", out var sys) && string.Equals(sys.GetString(), "START", StringComparison.Ordinal))
+                _dernierStartUtc = DateTime.UtcNow;
+        }
+        catch
+        {
+            // Un evenement illisible n'est pas un START.
+        }
+    }
+
+    /// <summary>Un START assez recent pour qu'on enregistre. Le dit une fois par attente.</summary>
+    private bool StartRecent(RaStatus status)
+    {
+        if (!StartRequis) return true;
+        if (DateTime.UtcNow - _dernierStartUtc <= FenetreStart) return true;
+        var cle = status.System + "/" + status.Game;
+        if (!string.Equals(_attenteAnnoncee, cle, StringComparison.Ordinal))
+        {
+            _attenteAnnoncee = cle;
+            _logger.LogInformation("Replay : {Game} charge, en attente d'un START pour enregistrer.", status.Game);
+        }
+        return false;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        try { _abonnement = _bus.Subscribe<EventEnvelope>(OnBusEvent); }
+        catch (Exception ex) { _logger.LogDebug(ex, "Replay recorder : abonnement au bus impossible, START jamais vu."); }
         await TryRecoverAsync(stoppingToken).ConfigureAwait(false);
         _logger.LogInformation("Replay recorder démarré (poll RetroArch {Ms} ms).", PollInterval.TotalMilliseconds);
 
@@ -97,9 +153,14 @@ public sealed class ReplayRecorderService : BackgroundService
 
         if (_current is null)
         {
-            // Démarrage : un jeu RetroArch est chargé, aucun replay actif, et on n'est pas en lecture.
-            if (status is { ContentLoaded: true } && active is { Active: false } && !_playback.IsBusy)
+            // Démarrage : un jeu RetroArch est chargé, aucun replay actif, on n'est pas en lecture,
+            // et le joueur vient d'appuyer sur START (sinon on enregistrerait la demo).
+            if (status is { ContentLoaded: true } && active is { Active: false } && !_playback.IsBusy
+                && StartRecent(status))
+            {
+                _attenteAnnoncee = "";
                 await StartAsync(status, ct).ConfigureAwait(false);
+            }
             return;
         }
 
