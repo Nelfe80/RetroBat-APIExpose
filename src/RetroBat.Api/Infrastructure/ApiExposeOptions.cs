@@ -85,6 +85,16 @@ public class ApiExposeOptions
         /// nothing. false restores the historical delta filter alone.</summary>
         public bool RequireRenderDeltaForLivePush { get; set; } = true;
 
+        /// <summary>
+        /// Ask ScreenScraper only for media its own catalogue lists for the game.
+        /// jeuInfos.php answers with what the site HAS; when a media type is absent
+        /// from that answer, building a URL for it anyway just spends a round-trip to
+        /// be told no. Measured over 63 attempts: the 47 speculative ones ALL failed,
+        /// the 16 catalogue-backed ones ALL succeeded - the catalogue is authoritative.
+        /// false restores the historical speculative fallback.
+        /// </summary>
+        public bool SkipMediaNotInCatalog { get; set; } = true;
+
         /// <summary>Suppress the generic "card updated" toast when APIExpose has
         /// no visible-change label to announce; scraping activity notifications
         /// keep telling the user something is happening. false restores the

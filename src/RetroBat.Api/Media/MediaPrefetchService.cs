@@ -132,11 +132,32 @@ public class MediaPrefetchService : IMediaPrefetchService
             };
         }
 
+        // Step timings between the projection and the push: resolving the media takes
+        // milliseconds, yet seconds went by before ES heard about them. Off unless Debug
+        // logging is enabled for this category: no timer runs and nothing is formatted, so
+        // the measurement costs the selection path nothing in production.
+        var timingEnabled = _logger?.IsEnabled(LogLevel.Debug) == true;
+        var prefetchWatch = timingEnabled ? System.Diagnostics.Stopwatch.StartNew() : null;
+        long lastStepMs = 0;
+        long StepMs()
+        {
+            if (prefetchWatch is null)
+            {
+                return 0;
+            }
+
+            var now = prefetchWatch.ElapsedMilliseconds;
+            var delta = now - lastStepMs;
+            lastStepMs = now;
+            return delta;
+        }
+
         var preparation = await PrepareLocalProjectionPlanCoreAsync(
             game,
             forceRemoteScrape,
             createUserVariantGuide,
             cancellationToken);
+        var prepareMs = StepMs();
         var plan = preparation.Plan;
         plan.SuppressImmediateGamelistUpdates = suppressImmediateGamelistUpdates;
         var systemId = preparation.SystemId;
@@ -145,6 +166,7 @@ public class MediaPrefetchService : IMediaPrefetchService
         var hadMissingLiveRefreshMediaAtSelection = preparation.HadMissingLiveRefreshMediaAtSelection;
         var scrapingSettings = _settingsService.GetScrapingSettings();
         var localVisibleMediaContentChanged = HasLocalLiveRefreshMediaContentChanged(plan, scrapingSettings.WheelStyle);
+        var contentCompareMs = StepMs();
         var gamelistUpdate = GamelistEntryUpdateResult.NoChange;
         var gamelistMetadataChanged = false;
         if (!suppressImmediateGamelistUpdates)
@@ -191,6 +213,7 @@ public class MediaPrefetchService : IMediaPrefetchService
                 },
                 cancellationToken);
         }
+        var gamelistWriteMs = StepMs();
         var mediaContentChanged = gamelistUpdate.MediaContentChanged || localVisibleMediaContentChanged;
         var staleEsMediaResolved = hadMissingLiveRefreshMediaAtSelection &&
             !mediaContentChanged &&
@@ -234,6 +257,39 @@ public class MediaPrefetchService : IMediaPrefetchService
                 gameSlug,
                 gamelistUpdate.Changed,
                 gamelistMetadataChanged);
+        }
+
+        // The player is staring at a BARE card and the media are already on disk.
+        // Deferring the push until after the remote decision made that card wait for a
+        // full ScreenScraper round-trip - measured at 20.6 s on airbustr, for a call
+        // that came back "no-change". Show what we already have, now. The push further
+        // down still runs afterwards, and only repaints if the remote really brought
+        // something: its own delta check settles that.
+        var slotChecksMs = StepMs();
+        var pushedLocalEarly = false;
+        if (visibleSlotResolved || staleEsMediaResolved)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            pushedLocalEarly = await _gamelistUpdateService.PushLiveGameUpdateToEsAsync(
+                plan,
+                cancellationToken,
+                LiveGameUpdateNotificationKind.LocalProjection,
+                allowLocalizedMetadataRefresh: gamelistMetadataChanged,
+                visibleMediaNewlyResolved: true);
+            var pushMs = StepMs();
+            if (prefetchWatch is not null)
+            {
+                _logger!.LogDebug(
+                    "PREFETCH TIMING game={GameSlug} pushed={Pushed} | prepare={PrepareMs}ms contentCompare={ContentMs}ms gamelistWrite={GamelistMs}ms slotChecks={SlotMs}ms push={PushMs}ms | total={TotalMs}ms",
+                    gameSlug,
+                    pushedLocalEarly,
+                    prepareMs,
+                    contentCompareMs,
+                    gamelistWriteMs,
+                    slotChecksMs,
+                    pushMs,
+                    prefetchWatch.ElapsedMilliseconds);
+            }
         }
 
         var remoteDecision = allowRemoteScrape
@@ -305,7 +361,13 @@ public class MediaPrefetchService : IMediaPrefetchService
                 plan,
                 cancellationToken,
                 LiveGameUpdateNotificationKind.LocalProjection,
-                allowLocalizedMetadataRefresh: gamelistMetadataChanged);
+                allowLocalizedMetadataRefresh: gamelistMetadataChanged,
+                // only WE still know the card was bare when the player landed on it:
+                // the gamelist on disk is already updated by the time the push
+                // resolves its notification. Not forced twice: if the early push
+                // above already filled the card, this pass must repaint only when the
+                // remote genuinely added something, which its delta check decides.
+                visibleMediaNewlyResolved: (visibleSlotResolved || staleEsMediaResolved) && !pushedLocalEarly);
             if (!livePushed)
             {
                 _logger?.LogDebug(

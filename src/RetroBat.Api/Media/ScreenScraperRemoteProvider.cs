@@ -540,12 +540,41 @@ public sealed class ScreenScraperRemoteProvider
             }
 
             var mediaUrl = catalog.FindMediaUrl(mediaType);
-            if (string.IsNullOrWhiteSpace(mediaUrl))
+            var fromCatalog = !string.IsNullOrWhiteSpace(mediaUrl);
+            if (!fromCatalog)
             {
+                // ScreenScraper's own catalogue does not list this media for this game.
+                // Asking anyway spends a round-trip to be told no: over 63 measured
+                // attempts, all 47 speculative ones failed and all 16 catalogue-backed
+                // ones succeeded. Skip, unless the cabinet asked for the old behaviour.
+                if (_options.CurrentValue.Scraping.SkipMediaNotInCatalog)
+                {
+                    await MediaUpdateAuditLog.AppendAsync(
+                        plan,
+                        "remote-scrape-media",
+                        kind,
+                        "skipped-not-in-catalog",
+                        new { tier, mediaType },
+                        cancellationToken);
+                    continue;
+                }
+
                 mediaUrl = BuildMediaDownloadUrl(connection, screenScraperSystemId, catalog.GameId, mediaType, kind);
             }
 
             var tempPath = await TryDownloadMediaAsync(mediaUrl, kind, cancellationToken);
+            if (_logger?.IsEnabled(LogLevel.Debug) == true)
+            {
+                // The measurement that settled the speculative-download question. Debug only,
+                // and guarded so nothing is boxed or formatted while that level is off.
+                _logger!.LogDebug(
+                    "MEDIA FETCH game={GameSlug} kind={Kind} mediaType={MediaType} fromCatalog={FromCatalog} hit={Hit}",
+                    plan.GameSlug,
+                    kind,
+                    mediaType,
+                    fromCatalog,
+                    !string.IsNullOrWhiteSpace(tempPath));
+            }
             if (string.IsNullOrWhiteSpace(tempPath))
             {
                 await MediaUpdateAuditLog.AppendAsync(
@@ -553,7 +582,7 @@ public sealed class ScreenScraperRemoteProvider
                     "remote-scrape-media",
                     kind,
                     "download-miss",
-                    new { tier, mediaType },
+                    new { tier, mediaType, fromCatalog },
                     cancellationToken);
                 continue;
             }

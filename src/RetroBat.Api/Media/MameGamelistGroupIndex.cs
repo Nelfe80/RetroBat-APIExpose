@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
@@ -81,6 +82,20 @@ public class MameGamelistGroupIndex
             return new SystemGroupLookup(exactIndex, shortTitleIndex, metadataByRelated);
         }
 
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        var cached = TryReadCachedIndex(path);
+        if (cached is not null)
+        {
+            _logger?.LogDebug(
+                "INDEX CACHE hit file={File} | load={LoadMs}ms | lookupKeys={LookupKeyCount}, shortTitleKeys={ShortTitleKeyCount}, metadataEntries={MetadataCount}",
+                Path.GetFileName(path),
+                watch.ElapsedMilliseconds,
+                cached.ExactByKey.Count,
+                cached.ShortTitleByKey.Count,
+                cached.MetadataByRelated.Count);
+            return cached;
+        }
+
         var groupCount = 0;
         var compactGroups = new Dictionary<string, SystemGroupAccumulator>(StringComparer.OrdinalIgnoreCase);
         foreach (var line in File.ReadLines(path))
@@ -144,6 +159,7 @@ public class MameGamelistGroupIndex
             }
         }
 
+        var parseMs = watch.ElapsedMilliseconds;
         foreach (var group in compactGroups.Values)
         {
             var related = group.Related
@@ -177,13 +193,20 @@ public class MameGamelistGroupIndex
             }
         }
 
-        _logger?.LogInformation(
-            "System gamelist group index loaded: file={File}, groups={GroupCount}, lookupKeys={LookupKeyCount}, shortTitleKeys={ShortTitleKeyCount}.",
-            path,
+        _logger?.LogDebug(
+            "INDEX TIMING file={File} | parse={ParseMs}ms buildKeys={BuildMs}ms total={TotalMs}ms | groups={GroupCount}, lookupKeys={LookupKeyCount}, shortTitleKeys={ShortTitleKeyCount}, sizeMB={SizeMb:N1}",
+            Path.GetFileName(path),
+            parseMs,
+            watch.ElapsedMilliseconds - parseMs,
+            watch.ElapsedMilliseconds,
             groupCount,
             exactIndex.Count,
-            shortTitleIndex.Count);
-        return new SystemGroupLookup(exactIndex, shortTitleIndex, metadataByRelated);
+            shortTitleIndex.Count,
+            new FileInfo(path).Length / 1048576.0);
+
+        var lookup = new SystemGroupLookup(exactIndex, shortTitleIndex, metadataByRelated);
+        WriteCachedIndex(path, lookup);
+        return lookup;
     }
 
     private string ResolveJsonlFile(string systemId)
@@ -463,6 +486,184 @@ public class MameGamelistGroupIndex
     private static string GetSystemGroupsRoot()
     {
         return Path.Combine(RetroBatPaths.PluginRoot, "resources", "gamelist", "systems");
+    }
+
+    // ----- built-index cache -----
+    //
+    // Building this index from the source costs ~21 s for fbneo (23 MB, 27 467 groups,
+    // 179 679 lookup keys), and it is built lazily - so the first card a player opens
+    // pays for it, once per API start. The result is a pure function of the source
+    // file, so it is written out and read back instead.
+    //
+    // Groups are stored ONCE and the keys point at them by number: the same group
+    // array is shared by every one of its keys, so writing it per key would inflate
+    // the file 179 679 / 27 467 times over.
+    //
+    // Lives under .cache/, which is excluded from the packs: it is a derived artifact,
+    // rebuilt on demand, never shipped.
+
+    private const string IndexCacheMagic = "APXGRPIDX1";
+
+    private static string GetIndexCacheRoot()
+        => Path.Combine(RetroBatPaths.PluginRoot, ".cache", "gamelist-index");
+
+    private static string BuildIndexCachePath(string sourcePath)
+        => Path.Combine(GetIndexCacheRoot(), Path.GetFileNameWithoutExtension(sourcePath) + ".idx");
+
+    private SystemGroupLookup? TryReadCachedIndex(string sourcePath)
+    {
+        var cachePath = BuildIndexCachePath(sourcePath);
+        if (!File.Exists(cachePath))
+        {
+            return null;
+        }
+
+        try
+        {
+            var source = new FileInfo(sourcePath);
+            using var stream = File.OpenRead(cachePath);
+            using var reader = new BinaryReader(stream, Encoding.UTF8);
+
+            if (reader.ReadString() != IndexCacheMagic ||
+                reader.ReadInt64() != source.Length ||
+                reader.ReadInt64() != source.LastWriteTimeUtc.Ticks)
+            {
+                return null; // the source moved on: rebuild
+            }
+
+            var groups = new string[reader.ReadInt32()][];
+            for (var i = 0; i < groups.Length; i++)
+            {
+                var members = new string[reader.ReadInt32()];
+                for (var m = 0; m < members.Length; m++)
+                {
+                    members[m] = reader.ReadString();
+                }
+
+                groups[i] = members;
+            }
+
+            Dictionary<string, string[]> ReadKeyMap()
+            {
+                var count = reader.ReadInt32();
+                var map = new Dictionary<string, string[]>(count, StringComparer.OrdinalIgnoreCase);
+                for (var i = 0; i < count; i++)
+                {
+                    var key = reader.ReadString();
+                    map[key] = groups[reader.ReadInt32()];
+                }
+
+                return map;
+            }
+
+            var exact = ReadKeyMap();
+            var shortTitle = ReadKeyMap();
+
+            var metadataCount = reader.ReadInt32();
+            var metadata = new Dictionary<string, CompactRomMetadata>(metadataCount, StringComparer.OrdinalIgnoreCase);
+            for (var i = 0; i < metadataCount; i++)
+            {
+                var key = reader.ReadString();
+                var regions = new string[reader.ReadInt32()];
+                for (var r = 0; r < regions.Length; r++)
+                {
+                    regions[r] = reader.ReadString();
+                }
+
+                var languages = new string[reader.ReadInt32()];
+                for (var l = 0; l < languages.Length; l++)
+                {
+                    languages[l] = reader.ReadString();
+                }
+
+                metadata[key] = new CompactRomMetadata(regions, languages);
+            }
+
+            return new SystemGroupLookup(exact, shortTitle, metadata);
+        }
+        catch (Exception ex)
+        {
+            // a truncated or stale-format cache is never fatal: rebuild from source
+            _logger?.LogDebug(ex, "Group index cache unusable for {Source}; rebuilding.", sourcePath);
+            return null;
+        }
+    }
+
+    private void WriteCachedIndex(string sourcePath, SystemGroupLookup lookup)
+    {
+        try
+        {
+            Directory.CreateDirectory(GetIndexCacheRoot());
+            var source = new FileInfo(sourcePath);
+            var cachePath = BuildIndexCachePath(sourcePath);
+            var tempPath = cachePath + ".tmp";
+
+            // group array instance → its number. The builder assigns the SAME array to
+            // every key of a group, so reference identity is the grouping we want.
+            var groupNumbers = new Dictionary<string[], int>(ReferenceEqualityComparer.Instance);
+            foreach (var group in lookup.ExactByKey.Values.Concat(lookup.ShortTitleByKey.Values))
+            {
+                if (!groupNumbers.ContainsKey(group))
+                {
+                    groupNumbers[group] = groupNumbers.Count;
+                }
+            }
+
+            using (var stream = File.Create(tempPath))
+            using (var writer = new BinaryWriter(stream, Encoding.UTF8))
+            {
+                writer.Write(IndexCacheMagic);
+                writer.Write(source.Length);
+                writer.Write(source.LastWriteTimeUtc.Ticks);
+
+                writer.Write(groupNumbers.Count);
+                foreach (var group in groupNumbers.OrderBy(pair => pair.Value).Select(pair => pair.Key))
+                {
+                    writer.Write(group.Length);
+                    foreach (var member in group)
+                    {
+                        writer.Write(member);
+                    }
+                }
+
+                void WriteKeyMap(Dictionary<string, string[]> map)
+                {
+                    writer.Write(map.Count);
+                    foreach (var pair in map)
+                    {
+                        writer.Write(pair.Key);
+                        writer.Write(groupNumbers[pair.Value]);
+                    }
+                }
+
+                WriteKeyMap(lookup.ExactByKey);
+                WriteKeyMap(lookup.ShortTitleByKey);
+
+                writer.Write(lookup.MetadataByRelated.Count);
+                foreach (var pair in lookup.MetadataByRelated)
+                {
+                    writer.Write(pair.Key);
+                    writer.Write(pair.Value.Regions.Count);
+                    foreach (var region in pair.Value.Regions)
+                    {
+                        writer.Write(region);
+                    }
+
+                    writer.Write(pair.Value.Languages.Count);
+                    foreach (var language in pair.Value.Languages)
+                    {
+                        writer.Write(language);
+                    }
+                }
+            }
+
+            File.Move(tempPath, cachePath, overwrite: true); // never a half-written cache
+        }
+        catch (Exception ex)
+        {
+            // failing to CACHE must never break the feature it accelerates
+            _logger?.LogDebug(ex, "Group index cache not written for {Source}.", sourcePath);
+        }
     }
 
     private static void AddCompactAliases(

@@ -1321,7 +1321,8 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         CancellationToken cancellationToken = default,
         LiveGameUpdateNotificationKind notificationKind = LiveGameUpdateNotificationKind.RemoteScrape,
         bool allowCurrentVideoRefresh = false,
-        bool allowLocalizedMetadataRefresh = false)
+        bool allowLocalizedMetadataRefresh = false,
+        bool visibleMediaNewlyResolved = false)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -1483,10 +1484,11 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                 includeDirtySameSystem: true,
                 allowCurrentVideoRefresh,
                 allowLocalizedMetadataRefresh,
+                visibleMediaNewlyResolved,
                 cancellationToken);
             if (pushed && ShouldNotifyLiveAddGamesUpdate(plan, gameElement))
             {
-                var notification = ResolveLiveGameUpdateNotification(plan, notificationKind, gameElement, cancellationToken);
+                var notification = ResolveLiveGameUpdateNotification(plan, notificationKind, gameElement, visibleMediaNewlyResolved, cancellationToken);
                 if (string.IsNullOrWhiteSpace(notification))
                 {
                     if (_options.CurrentValue.Scraping.HonestNotifications)
@@ -1988,13 +1990,14 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         MediaProjectionPlan plan,
         LiveGameUpdateNotificationKind notificationKind,
         XElement gameElement,
+        bool visibleMediaNewlyResolved,
         CancellationToken cancellationToken)
     {
         return notificationKind switch
         {
-            LiveGameUpdateNotificationKind.RemoteScrape => ResolveRemoteScrapeLiveUpdateMessage(plan, gameElement, cancellationToken),
+            LiveGameUpdateNotificationKind.RemoteScrape => ResolveRemoteScrapeLiveUpdateMessage(plan, gameElement, visibleMediaNewlyResolved, cancellationToken),
             LiveGameUpdateNotificationKind.RemoteVideoScrape => ResolveRemoteVideoScrapeLiveUpdateMessage(plan),
-            LiveGameUpdateNotificationKind.LocalProjection => ResolveLocalProjectionSuccessfulMessage(plan, gameElement, cancellationToken),
+            LiveGameUpdateNotificationKind.LocalProjection => ResolveLocalProjectionSuccessfulMessage(plan, gameElement, visibleMediaNewlyResolved, cancellationToken),
             _ => string.Empty
         };
     }
@@ -2013,10 +2016,12 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
     private string ResolveRemoteScrapeLiveUpdateMessage(
         MediaProjectionPlan plan,
         XElement gameElement,
+        bool visibleMediaNewlyResolved,
         CancellationToken cancellationToken)
     {
         var updatedLabels = ResolveLiveRefreshLabels(plan, gameElement, cancellationToken)
             .Concat(ResolveMediaRefreshLabels(plan, gameElement))
+            .Concat(ResolveAddedMediaLabels(gameElement, visibleMediaNewlyResolved))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .Take(4)
             .ToArray();
@@ -2034,6 +2039,40 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
             language,
             ("details", details),
             ("game", gameName));
+    }
+
+    /// <summary>
+    /// Names the visible media slots this push fills in, when the caller has
+    /// established that they were EMPTY at selection time.
+    ///
+    /// The two other label sources both miss that case: one compares text metadata,
+    /// the other only names media APIExpose imported or whose content it changed. A
+    /// Data Pack game already has its files on disk, so nothing is imported - yet the
+    /// card goes from bare to fully illustrated the moment we push, which is the most
+    /// visible change a player can see. It used to pass in silence because "nothing
+    /// downloaded" was read as "nothing visibly changed".
+    ///
+    /// The "was it empty?" question CANNOT be answered here by reading gamelist.xml:
+    /// the projection writes the entry to disk well before this push (measured: 41 s
+    /// on 1942), so by now the file already carries the media and the comparison
+    /// always comes back empty. Only the caller still holds the pre-projection state,
+    /// hence the flag.
+    /// </summary>
+    private IEnumerable<string> ResolveAddedMediaLabels(XElement gameElement, bool visibleMediaNewlyResolved)
+    {
+        if (!visibleMediaNewlyResolved)
+        {
+            yield break;
+        }
+
+        var language = _settingsService.GetScrapingSettings().Language;
+        foreach (var tag in LiveVisibleMediaTags())
+        {
+            if (!string.IsNullOrWhiteSpace(gameElement.Element(tag)?.Value))
+            {
+                yield return ResolveLiveRefreshLabel(tag, language);
+            }
+        }
     }
 
     private IEnumerable<string> ResolveLiveRefreshLabels(
@@ -2073,6 +2112,10 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
             "image" => "label.metadata.image",
             "thumbnail" => "label.metadata.thumbnail",
             "marquee" => "label.metadata.marquee",
+            // fanart and video have no label.metadata.* key of their own; the
+            // media catalogue already names them in every language
+            "fanart" => "label.media.fanart",
+            "video" => "label.media.video",
             "desc" => "label.metadata.desc",
             "releasedate" => "label.metadata.releasedate",
             "developer" => "label.metadata.developer",
@@ -2104,7 +2147,11 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
             ("game", gameName));
     }
 
-    private string ResolveLocalProjectionSuccessfulMessage(MediaProjectionPlan plan, XElement gameElement, CancellationToken cancellationToken)
+    private string ResolveLocalProjectionSuccessfulMessage(
+        MediaProjectionPlan plan,
+        XElement gameElement,
+        bool visibleMediaNewlyResolved,
+        CancellationToken cancellationToken)
     {
         var language = _settingsService.GetScrapingSettings().Language;
         var gameName = ResolveNotifyGameName(plan);
@@ -2113,6 +2160,7 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         // differs - including region and lang (UMK3 → "boîte 2D, région").
         var updatedLabels = ResolveLiveRefreshLabels(plan, gameElement, cancellationToken)
             .Concat(ResolveMediaRefreshLabels(plan, gameElement))
+            .Concat(ResolveAddedMediaLabels(gameElement, visibleMediaNewlyResolved))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .Take(4)
             .ToArray();
@@ -2642,6 +2690,7 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         bool includeDirtySameSystem,
         bool allowCurrentVideoRefresh,
         bool allowLocalizedMetadataRefresh,
+        bool visibleMediaNewlyResolved,
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(plan.EsGameId))
@@ -2711,8 +2760,29 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         var dirtyBatch = includeDirtySameSystem
             ? CollectDirtyLiveGamelistBatch(plan, cancellationToken)
             : new List<DirtyLiveGamelistPlan>();
-        var relatedBatch = CollectRelatedLiveGameElements(plan, cancellationToken);
-        if (!HasLiveGamelistRefreshDelta(plan, gameElement, dirtyBatch, allowCurrentVideoRefresh, allowLocalizedMetadataRefresh, cancellationToken))
+        // Sibling games ride along as a courtesy: one bad entry among them must never
+        // cost the CURRENT card its media. It did - a game whose name contains slashes
+        // threw out of here and unwound the whole push, so the selected card stayed
+        // bare with nothing to explain why.
+        List<XElement> relatedBatch;
+        try
+        {
+            relatedBatch = CollectRelatedLiveGameElements(plan, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            throw; // a real cancellation still stops the push
+        }
+        catch (Exception ex)
+        {
+            relatedBatch = new List<XElement>();
+            _logger?.LogWarning(
+                ex,
+                "Related games skipped for system={SystemId}, game={GameSlug}: the current card is pushed alone.",
+                plan.FrontendSystemId,
+                plan.GameSlug);
+        }
+        if (!HasLiveGamelistRefreshDelta(plan, gameElement, dirtyBatch, allowCurrentVideoRefresh, allowLocalizedMetadataRefresh, visibleMediaNewlyResolved, cancellationToken))
         {
             await MediaUpdateAuditLog.AppendAsync(
                 plan,
@@ -2747,7 +2817,7 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         }
 
         if (_options.CurrentValue.Scraping.RequireRenderDeltaForLivePush &&
-            !HasVisibleRenderDelta(plan, gameElement, allowCurrentVideoRefresh, allowLocalizedMetadataRefresh, cancellationToken))
+            !HasVisibleRenderDelta(plan, gameElement, allowCurrentVideoRefresh, allowLocalizedMetadataRefresh, visibleMediaNewlyResolved, cancellationToken))
         {
             // nothing ES actually renders would change (same media paths - the
             // texture cache never reloads a same-path file - and no first text):
@@ -3496,22 +3566,43 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
             return results;
         }
 
-        foreach (var extension in RelatedRomExtensions())
+        // A related-rom NAME is not a filename. Arcade names carry slashes routinely -
+        // "Aero Fighters (World / USA + Canada / Korea / Hong Kong)" - and the
+        // filesystem probes below read them as directory separators: the search
+        // pattern becomes "roms\fbneo\aero fighters (world \ usa + canada \ ..." and
+        // Directory.EnumerateFiles throws DirectoryNotFoundException. The name lookup
+        // in gamelist.xml, further down, compares normalised names and needs no path
+        // at all, so it still answers for these games.
+        if (relatedRom.IndexOfAny(Path.GetInvalidFileNameChars()) < 0)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            var candidate = Path.Combine(systemRoot, relatedRom + extension);
-            if (File.Exists(candidate) || Directory.Exists(candidate))
+            foreach (var extension in RelatedRomExtensions())
             {
-                AddRelatedRomPath(results, seen, candidate);
+                cancellationToken.ThrowIfCancellationRequested();
+                var candidate = Path.Combine(systemRoot, relatedRom + extension);
+                if (File.Exists(candidate) || Directory.Exists(candidate))
+                {
+                    AddRelatedRomPath(results, seen, candidate);
+                }
             }
-        }
 
-        if (Directory.Exists(systemRoot))
-        {
-            foreach (var directMatch in Directory.EnumerateFiles(systemRoot, relatedRom + ".*", SearchOption.TopDirectoryOnly)
-                .Where(IsLikelyGameFile))
+            if (Directory.Exists(systemRoot))
             {
-                AddRelatedRomPath(results, seen, directMatch);
+                try
+                {
+                    foreach (var directMatch in Directory.EnumerateFiles(systemRoot, relatedRom + ".*", SearchOption.TopDirectoryOnly)
+                        .Where(IsLikelyGameFile))
+                    {
+                        AddRelatedRomPath(results, seen, directMatch);
+                    }
+                }
+                catch (IOException)
+                {
+                    // unusable as a search pattern: the gamelist lookup still applies
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // unreadable folder: same
+                }
             }
         }
 
@@ -3784,8 +3875,20 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         IReadOnlyCollection<DirtyLiveGamelistPlan> dirtyBatch,
         bool allowCurrentVideoRefresh,
         bool allowLocalizedMetadataRefresh,
+        bool visibleMediaNewlyResolved,
         CancellationToken cancellationToken)
     {
+        // The card the player is looking at RIGHT NOW had empty slots when they
+        // landed on it. Every other test below compares the fragment to
+        // gamelist.xml - a file the projection has already rewritten with these
+        // very media - so they all conclude "nothing new" while ES still shows a
+        // bare card and has no reason to re-read the file. This is the only test
+        // that speaks about the screen rather than about the disk.
+        if (visibleMediaNewlyResolved && HasLiveVisibleMedia(gameElement))
+        {
+            return true;
+        }
+
         var systemRoot = Path.Combine(RetroBatPaths.RomsRoot, plan.FrontendSystemId);
         if (HasChangedVisibleMediaContent(plan, gameElement, systemRoot))
         {
@@ -3878,8 +3981,17 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         XElement gameElement,
         bool allowCurrentVideoRefresh,
         bool allowLocalizedMetadataRefresh,
+        bool visibleMediaNewlyResolved,
         CancellationToken cancellationToken)
     {
+        // Same blind spot as the gamelist delta: comparing to a file we just wrote
+        // cannot tell whether ES has drawn it. A card that was bare on arrival must
+        // be repainted, whatever the file now says.
+        if (visibleMediaNewlyResolved && HasLiveVisibleMedia(gameElement))
+        {
+            return true;
+        }
+
         var systemRoot = Path.Combine(RetroBatPaths.RomsRoot, plan.FrontendSystemId);
         var relativeGamePath = ToGameRelativePath(plan.GamePath, systemRoot);
         var existingGameNode = TryLoadExistingGameNode(plan.GamelistPath, relativeGamePath, cancellationToken);
