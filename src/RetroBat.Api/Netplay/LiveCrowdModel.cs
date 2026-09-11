@@ -97,12 +97,14 @@ public sealed class LiveCrowdModel
     /// </summary>
     public sealed record Silhouette(string Acteur, int X, int Y, Vue Vue, int Image, int Hauteur, bool Sortant, Avatar? Avatar);
 
-    /// <summary>Un emoji en vol, parti du centre de son lanceur.</summary>
+    /// <summary>Un emoji en vol, parti du centre de son lanceur. `Depuis` vaut -1 tant que le HUD ne l'a
+    /// pas encore vu : il part au premier releve.</summary>
     public sealed record Vol(string Famille, int Niveau, int X, long Depuis);
 
     /// <summary>Un nom affiche au-dessus de son avatar, qu'il suit s'il bouge.</summary>
     public sealed record Etiquette(string Texte, string Acteur, long Jusqua);
 
+    /// <summary>`Fin` vaut 0 tant que le HUD ne l'a pas encore vu : le saut part au premier releve.</summary>
     public sealed record Saut(long Fin, int Hauteur);
 
     /// <summary>Ce qu'il faut pour dessiner une image, pris sous verrou une seule fois. La scene est
@@ -376,12 +378,16 @@ public sealed class LiveCrowdModel
             }
             f.DerniereActivite = maintenant;
 
-            _sauts[acteur] = new Saut(maintenant + DureeSaut, HauteurSaut(niveau));
+            // NON AMORCES : le saut et le vol partent au premier releve du HUD, pas maintenant. Au
+            // repos, le HUD ne se reveille que toutes les 500 ms, et un saut dure 420 ms : amorce ici,
+            // il etait deja FINI quand le HUD le dessinait pour la premiere fois. Constate a l'ecran,
+            // les avatars ne sautaient jamais alors que l'emoji et le nom, plus longs, paraissaient.
+            _sauts[acteur] = new Saut(0, HauteurSaut(niveau));
 
             if (_vols.Count < PlafondVols)
             {
                 var centre = f.Place ? f.X + TailleSprite / 2 : place ?? _largeur / 2;
-                _vols.Add(new Vol(famille, niveau, Math.Clamp(centre, 16, Math.Max(16, _largeur - 16)), maintenant));
+                _vols.Add(new Vol(famille, niveau, Math.Clamp(centre, 16, Math.Max(16, _largeur - 16)), -1));
             }
 
             var duree = DureeEtiquette(_etiquettes.Count);
@@ -424,6 +430,7 @@ public sealed class LiveCrowdModel
         lock (_gate)
         {
             Avancer(maintenant, largeur);
+            Amorcer(maintenant);
 
             _vols.RemoveAll(v => maintenant - v.Depuis >= DureeVol);
             _etiquettes.RemoveAll(e => e.Jusqua <= maintenant || !_scene.Any(f => f.Place && f.Acteur == e.Acteur));
@@ -472,6 +479,22 @@ public sealed class LiveCrowdModel
     }
 
     // ── La mecanique, sous verrou ──────────────────────────────────────────
+
+    /// <summary>Ce qui attend d'etre vu part maintenant : c'est le premier releve qui donne l'heure.</summary>
+    private void Amorcer(long maintenant)
+    {
+        foreach (var (acteur, saut) in _sauts.Where(s => s.Value.Fin == 0).ToArray())
+        {
+            _sauts[acteur] = saut with { Fin = maintenant + DureeSaut };
+        }
+        for (var i = 0; i < _vols.Count; i++)
+        {
+            if (_vols[i].Depuis < 0)
+            {
+                _vols[i] = _vols[i] with { Depuis = maintenant };
+            }
+        }
+    }
 
     private bool BougeSansVerrou()
         => _scene.Any(f => f.Marche) || _vols.Count > 0 || _etiquettes.Count > 0 || _sauts.Count > 0;

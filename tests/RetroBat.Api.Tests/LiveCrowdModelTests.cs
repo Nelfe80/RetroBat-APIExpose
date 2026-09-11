@@ -180,6 +180,7 @@ public sealed class LiveCrowdModelTests
         // Un present en scene vient de reagir : il est protege, il ne cede pas sa place.
         var protege = avant.Scene[0].Acteur;
         foule.Reagir(protege, "wow", 1, "", 25000);
+        foule.Relever(25000, Largeur);   // le HUD la voit : son vol part, et sera fini a 30000
         var attendu = enScene.Where(a => a != protege).OrderBy(a => a, StringComparer.Ordinal).First();
 
         foule.Reagir(dehors, "hype", 3, "Nelfe80", 30000);
@@ -314,6 +315,8 @@ public sealed class LiveCrowdModelTests
         foule.Poser(acteurs, 2, 1000);
         foule.Reagir(acteurs[0], "wow", 1, "Vero", 1000);
         Assert.True(foule.Anime);
+        // Le premier releve amorce le saut et le vol : c'est de la que leur duree se compte.
+        foule.Relever(1000, Largeur);
 
         // TROIS durees, voulues : le saut est bref, l'emoji vole plus longtemps, et le nom reste le
         // plus longtemps. On doit pouvoir lire qui a reagi apres que son emoji a disparu.
@@ -327,6 +330,32 @@ public sealed class LiveCrowdModelTests
         Assert.Empty(apres.Etiquettes);
         Assert.False(apres.Bouge);
         Assert.False(foule.Anime);
+    }
+
+    [Fact]
+    public void Un_saut_part_au_premier_releve_et_non_a_l_arrivee_de_la_reaction()
+    {
+        // Au repos le HUD ne se reveille que toutes les 500 ms, et un saut dure 420 ms. Amorce a
+        // l'arrivee, un saut etait deja fini quand le HUD le dessinait pour la premiere fois : a
+        // l'ecran, personne ne sautait jamais alors que l'emoji et le nom paraissaient.
+        var foule = new LiveCrowdModel(7);
+        var acteurs = Acteurs(3);
+        foule.Poser(acteurs, 3, 1000);
+        foule.Relever(1000, Largeur);
+
+        foule.Reagir(acteurs[0], "hype", 1, "Nelfe80", 1000);
+
+        // Premier regard 480 ms plus tard : le saut COMMENCE, il n'est pas deja retombe.
+        var premier = foule.Relever(1480, Largeur);
+        Assert.True(premier.Bouge);
+        Assert.Single(premier.Vols);
+        Assert.Equal(1480, premier.Vols[0].Depuis);
+
+        var milieu = foule.Relever(1480 + LiveCrowdModel.DureeSaut / 2, Largeur);
+        Assert.Equal(LiveCrowdModel.HauteurSaut(1), milieu.Scene.Single(x => x.Acteur == acteurs[0]).Hauteur);
+
+        var fin = foule.Relever(1480 + LiveCrowdModel.DureeSaut + 1, Largeur);
+        Assert.Equal(0, fin.Scene.Single(x => x.Acteur == acteurs[0]).Hauteur);
     }
 
     [Fact]
