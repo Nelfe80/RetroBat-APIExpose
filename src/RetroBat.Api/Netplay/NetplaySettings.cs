@@ -107,6 +107,98 @@ public static class NetplaySettings
         return true;
     }
 
+    /// <summary>
+    /// Les cles qui font d'un lancement une partie netplay. Le lanceur les lit de `es_settings.cfg`
+    /// exactement comme de sa ligne de commande (voir NetplayLaunch). Elles ne doivent vivre que le
+    /// temps d'UN lancement.
+    /// </summary>
+    private static readonly string[] ClesDeLancement =
+    {
+        "global.netplaymode", "global.netplayip", "global.netplayport", "global.netplaysession", "global.netplaypass",
+    };
+
+    /// <summary>Pose le mode pour heberger : le reste (pseudo, mots de passe, relais) est deja pose par Poser.</summary>
+    public static bool PoserHebergement(ILogger? logger = null)
+        => Modifier(logger, racine =>
+        {
+            Ecrire(racine, "string", "global.netplaymode", "host");
+            foreach (var cle in ClesDeLancement.Skip(1))
+            {
+                Retirer(racine, cle);
+            }
+        });
+
+    /// <summary>Pose ce qu'il faut pour rejoindre : mode (client ou spectator), relais, port, session, mot de passe.</summary>
+    public static bool PoserRejoindre(string mode, string relais, int port, string session, string motDePasse, ILogger? logger = null)
+        => Modifier(logger, racine =>
+        {
+            Ecrire(racine, "string", "global.netplaymode", mode);
+            Ecrire(racine, "string", "global.netplayip", relais);
+            Ecrire(racine, "string", "global.netplayport", port.ToString());
+            Ecrire(racine, "string", "global.netplaysession", session);
+            Ecrire(racine, "string", "global.netplaypass", motDePasse);
+        });
+
+    /// <summary>
+    /// Efface les cles de lancement. Sans cet effacement, chaque partie suivante serait une partie
+    /// netplay. Idempotent : rien a effacer n'est pas une erreur.
+    /// </summary>
+    public static bool EffacerLancement(ILogger? logger = null)
+        => Modifier(logger, racine =>
+        {
+            foreach (var cle in ClesDeLancement)
+            {
+                Retirer(racine, cle);
+            }
+        }, copie: false);
+
+    /// <summary>Relit, modifie et reecrit le fichier d'un seul tenant, atomiquement.</summary>
+    private static bool Modifier(ILogger? logger, Action<XElement> changement, bool copie = true)
+    {
+        var chemin = Chemin;
+        XDocument doc;
+        try
+        {
+            doc = XDocument.Load(chemin);
+            if (doc.Root is null)
+            {
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger?.LogWarning(ex, "Netplay : es_settings.cfg illisible.");
+            return false;
+        }
+
+        changement(doc.Root);
+
+        try
+        {
+            if (copie)
+            {
+                File.Copy(chemin, chemin + ".nelfeplay.bak", overwrite: true);
+            }
+            var temporaire = chemin + "." + Guid.NewGuid().ToString("N")[..8] + ".tmp";
+            doc.Save(temporaire);
+            File.Move(temporaire, chemin, overwrite: true);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger?.LogWarning(ex, "Netplay : es_settings.cfg non reecrit.");
+            return false;
+        }
+    }
+
+    private static void Retirer(XElement racine, string nom)
+    {
+        foreach (var e in racine.Elements().Where(e => (string?) e.Attribute("name") == nom).ToList())
+        {
+            e.Remove();
+        }
+    }
+
     /// <summary>Restaure la copie de cote. Pour le jour ou l'on doute d'avoir bien fait.</summary>
     public static bool Restaurer()
     {

@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
@@ -111,12 +110,15 @@ public sealed class NetplayHostService
             relais,
             PortNetplay);
 
-        if (!NetplaySettings.Poser(reglages, _logger))
+        if (!NetplaySettings.Poser(reglages, _logger) || !NetplaySettings.PoserHebergement(_logger))
         {
             return Echec.ReglagesRefuses;
         }
 
-        if (!Lancer(resolution, cheminRom))
+        // Par ES de preference : lui seul cesse de dessiner pendant la partie (voir NetplayLaunch).
+        var lancement = await NetplayLaunch.LancerAsync(
+            cheminRom, Arguments(resolution, cheminRom), _httpFactory, _logger, ct).ConfigureAwait(false);
+        if (!lancement.Ok)
         {
             return Echec.LancementRefuse;
         }
@@ -340,21 +342,13 @@ public sealed class NetplayHostService
     }
 
     /// <summary>
-    /// La commande d'ES, avec le netplay en plus.
+    /// La commande d'ES, avec le netplay en plus : le REPLI quand ES ne repond pas.
     ///
     /// Les arguments de manette sont repris MOT POUR MOT : les recalculer perdrait le reglage du
     /// joueur. `-gameinfo` n'est pas repris — il pointe un temporaire qu'ES reecrit et supprime.
     /// </summary>
-    private bool Lancer(EsLaunchArguments.Resolution r, string cheminRom)
-    {
-        var exe = Path.Combine(RetroBatPaths.RetroBatRoot, "emulationstation", "emulatorLauncher.exe");
-        if (!File.Exists(exe))
-        {
-            _logger.LogWarning("Netplay : emulatorLauncher introuvable ({Chemin}).", exe);
-            return false;
-        }
-
-        var arguments = string.Join(' ', new[]
+    private static string Arguments(EsLaunchArguments.Resolution r, string cheminRom)
+        => string.Join(' ', new[]
         {
             r.Manettes,
             "-system", r.Systeme,
@@ -363,25 +357,6 @@ public sealed class NetplayHostService
             "-rom", Guillemets(cheminRom),
             "-netplaymode", "host",
         }.Where(x => x.Length > 0));
-
-        try
-        {
-            var psi = new ProcessStartInfo
-            {
-                FileName = exe,
-                Arguments = arguments,
-                WorkingDirectory = Path.GetDirectoryName(exe)!,
-                UseShellExecute = false,
-            };
-            Process.Start(psi);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Netplay : lancement refuse.");
-            return false;
-        }
-    }
 
     /// <summary>Un chemin contient des espaces : sans guillemets, le lanceur ne recoit qu'un morceau.</summary>
     private static string Guillemets(string valeur)

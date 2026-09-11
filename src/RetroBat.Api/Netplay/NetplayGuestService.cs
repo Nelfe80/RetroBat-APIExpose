@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Text.Json;
 using RetroBat.Api.Infrastructure;
@@ -131,10 +130,22 @@ public sealed class NetplayGuestService
             return Echec.DumpDifferent;
         }
 
-        if (!Lancer(resolution, rom, infos.Value))
+        // « spectator » et non « client » quand on n'a pas le droit de jouer : le mode dit
+        // l'intention, et le mot de passe la fait respecter. Les deux vont ensemble.
+        var mode = infos.Value.PeutJouer ? "client" : "spectator";
+        NetplaySettings.PoserRejoindre(
+            mode, infos.Value.Relais, infos.Value.Port, infos.Value.Session, infos.Value.MotDePasse, _logger);
+
+        // Par ES de preference : lui seul cesse de dessiner pendant la partie (voir NetplayLaunch).
+        var lancement = await NetplayLaunch.LancerAsync(
+            rom, Arguments(resolution, rom, mode, infos.Value), _httpFactory, _logger, ct).ConfigureAwait(false);
+        if (!lancement.Ok)
         {
             return Echec.LancementRefuse;
         }
+        // Un spectateur regarde : son ecran ne score rien, donc l'emulateur peut passer devant
+        // sans precaution particuliere.
+        _ = EmulatorForeground.FocusEmulatorWhenUpAsync();
 
         // La seance s'OUVRE seulement quand la partie est lancee. L'ouvrir avant laisserait la
         // facade croire qu'il y a quelque chose a quoi reagir alors qu'aucun jeu ne tourne.
@@ -310,23 +321,9 @@ public sealed class NetplayGuestService
         return null;
     }
 
-    /// <summary>
-    /// La commande d'ES, en mode client. Les arguments de manette sont repris mot pour mot :
-    /// les recalculer perdrait le reglage du joueur.
-    /// </summary>
-    private bool Lancer(EsLaunchArguments.Resolution r, string rom, Infos infos)
-    {
-        var exe = Path.Combine(RetroBatPaths.RetroBatRoot, "emulationstation", "emulatorLauncher.exe");
-        if (!File.Exists(exe))
-        {
-            return false;
-        }
-
-        // « spectator » et non « client » quand on n'a pas le droit de jouer : le mode dit
-        // l'intention, et le mot de passe la fait respecter. Les deux vont ensemble.
-        var mode = infos.PeutJouer ? "client" : "spectator";
-
-        var arguments = string.Join(' ', new[]
+    /// <summary>Les arguments du lanceur pour rejoindre : le REPLI quand ES ne repond pas.</summary>
+    private static string Arguments(EsLaunchArguments.Resolution r, string rom, string mode, Infos infos)
+        => string.Join(' ', new[]
         {
             r.Manettes,
             "-system", r.Systeme,
@@ -339,25 +336,4 @@ public sealed class NetplayGuestService
             "-netplaysession", '"' + infos.Session + '"',
             "-netplaypass", '"' + infos.MotDePasse + '"',
         }.Where(x => x.Length > 0));
-
-        try
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = exe,
-                Arguments = arguments,
-                WorkingDirectory = Path.GetDirectoryName(exe)!,
-                UseShellExecute = false,
-            });
-            // Un spectateur regarde : son ecran ne score rien, donc l'emulateur peut passer
-            // devant sans precaution particuliere.
-            _ = EmulatorForeground.FocusEmulatorWhenUpAsync();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Netplay : impossible de rejoindre.");
-            return false;
-        }
-    }
 }

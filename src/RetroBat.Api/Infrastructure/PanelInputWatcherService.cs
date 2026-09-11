@@ -159,7 +159,11 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
         // Pendant une lecture replay OU une session de jeu : pas de ré-énumération SDL (synchro
         // forcée) — le panel reste lu, mais on ne re-détecte pas un (dé)branchement improbable
         // pendant qu'on joue. Repris dès le retour au menu (game-end / fin de lecture).
-        if (_replayActive || _gameActive) return;
+        //
+        // ET quand un emulateur tourne sans qu'ES l'ait dit : une partie lancee par l'API (repli
+        // netplay) n'emet aucun game-start, et la re-init toutes les 5 s se voyait alors a
+        // l'ecran, un creux de cadence periodique mesure pendant un direct.
+        if (_replayActive || _gameActive || EmulatorForeground.EmulateurTourne()) return;
 
         // SDL_NumJoysticks ne reflète PAS le hotplug (même pompé sur le thread SDL) : seule
         // une ré-init du sous-système joystick (quit+init) ré-énumère vraiment les devices.
