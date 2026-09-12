@@ -32,12 +32,22 @@ public sealed class ReplayOverlayService : BackgroundService
     private ReplayReactionSprites? _sprites; // créé sur le thread UI de la barre
 
     public ReplayOverlayService(ReplayPlaybackService playback, ReplayStore store,
-        RetroBat.Api.Replay.Social.ReplaySocialStore social, ILogger<ReplayOverlayService> logger)
+        RetroBat.Api.Replay.Social.ReplaySocialStore social, ILogger<ReplayOverlayService> logger,
+        RetroBat.Api.Replay.Social.SocialIssuerPin pin)
     {
         _playback = playback;
         _store = store;
         _social = social;
         _logger = logger;
+        _pin = pin;
+    }
+
+    private readonly RetroBat.Api.Replay.Social.SocialIssuerPin _pin;
+
+    private RetroBat.Api.Replay.Social.SocialSummary? LireResume(string replayId)
+    {
+        var epingle = _pin.Current;
+        return epingle is null ? null : _social.ReadSummary(replayId, epingle.Spki, epingle.KeyId);
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -70,7 +80,7 @@ public sealed class ReplayOverlayService : BackgroundService
 
             var context = new ApplicationContext();
             var sprites = new ReplayReactionSprites(_logger); // sur CE thread UI
-            var form = new ReplayOverlayForm(() => _playback.GetState(), id => _social.Display(id, _store.ReadReactions(id)), sprites, _logger);
+            var form = new ReplayOverlayForm(() => _playback.GetState(), id => _social.Display(id, _store.ReadReactions(id)), sprites, _logger, LireResume);
 
             lock (_sync) { _appContext = context; _form = form; _sprites = sprites; }
 
@@ -145,6 +155,8 @@ public sealed class ReplayOverlayService : BackgroundService
         private bool _shownLogged;
 
         // courbe + marqueurs de réactions le long du replay
+        private readonly Func<string, RetroBat.Api.Replay.Social.SocialSummary?>? _lireResume;
+        private RetroBat.Api.Replay.Social.SocialSummary? _resume;
         private string? _curveReplayId;
         private IReadOnlyList<ReplayReaction> _curveReactions = Array.Empty<ReplayReaction>();
         private float[]? _curve;
@@ -156,9 +168,11 @@ public sealed class ReplayOverlayService : BackgroundService
         private long _displayFrame;   // position lissée du curseur
 
         public ReplayOverlayForm(Func<ReplayPlaybackService.StateSnapshot> snapshotProvider,
-            Func<string, IReadOnlyList<ReplayReaction>> loadReactions, ReplayReactionSprites sprites, ILogger logger)
+            Func<string, IReadOnlyList<ReplayReaction>> loadReactions, ReplayReactionSprites sprites, ILogger logger,
+            Func<string, RetroBat.Api.Replay.Social.SocialSummary?>? lireResume = null)
         {
             _snapshotProvider = snapshotProvider;
+            _lireResume = lireResume;
             _loadReactions = loadReactions;
             _sprites = sprites;
             _logger = logger;
@@ -191,12 +205,25 @@ public sealed class ReplayOverlayService : BackgroundService
                 _curveReplayId = _snapshot.ReplayId;
                 try { _curveReactions = _snapshot.ReplayId is null ? Array.Empty<ReplayReaction>() : _loadReactions(_snapshot.ReplayId); }
                 catch { _curveReactions = Array.Empty<ReplayReaction>(); }
+                try { _resume = _snapshot.ReplayId is null || _lireResume is null ? null : _lireResume(_snapshot.ReplayId); }
+                catch { _resume = null; }
                 _curve = null;
             }
             if (_curve is null && _snapshot.ReplayEndFrame is long end && end > 0)
             {
-                _curve = BuildCurve(_curveReactions, end);
-                _markers = ReplayReactionText.Clusterize(_curveReactions, end, 24);
+                // Le resume signe d'abord : sa chaleur compte TOUS les spectateurs, sans plafond, et ses
+                // moments forts grossissent avec le nombre de gens qui ont reagi ensemble. Sans resume
+                // (replay jamais commente, ou plateforme injoignable), les reactions locales font foi.
+                if (_resume is { } r && r.Chaleur.Count > 0)
+                {
+                    _curve = CurveFromSummary(r);
+                    _markers = MarkersFromSummary(r);
+                }
+                else
+                {
+                    _curve = BuildCurve(_curveReactions, end);
+                    _markers = ReplayReactionText.Clusterize(_curveReactions, end, 24);
+                }
             }
         }
 
@@ -227,6 +254,22 @@ public sealed class ReplayOverlayService : BackgroundService
             var pred = _baseFrame + _rate * Math.Min(now - _baseTime, capMs);
             _displayFrame = (long)Math.Clamp(pred, 0, end <= 0 ? pred : end);
         }
+
+        private static float[] CurveFromSummary(RetroBat.Api.Replay.Social.SocialSummary r)
+        {
+            var acc = r.Chaleur.Select(t => (float) t.Intensite).ToArray();
+            var max = acc.Length == 0 ? 0f : acc.Max();
+            if (max <= 0f) return acc;
+            for (var i = 0; i < acc.Length; i++) acc[i] /= max;
+            return acc;
+        }
+
+        /// <summary>Un marqueur par moment fort, dont la taille dit combien ont reagi ensemble.</summary>
+        private static IReadOnlyList<ReactionMarker> MarkersFromSummary(RetroBat.Api.Replay.Social.SocialSummary r)
+            => r.Moments
+                .Where(m => m.Reaction.Length > 0)
+                .Select(m => new ReactionMarker(m.Frame, m.Reaction, m.Reactions >= 5 ? 3 : m.Reactions >= 2 ? 2 : 1, ""))
+                .ToList();
 
         private static float[] BuildCurve(IReadOnlyList<ReplayReaction> reactions, long end)
         {

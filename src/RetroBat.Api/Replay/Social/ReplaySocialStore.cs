@@ -35,6 +35,47 @@ public sealed class ReplaySocialStore
     public string PathFor(string replayId)
         => Path.Combine(_store.SocialRoot, Assainir(replayId) + ".jsonl");
 
+    // Le RESUME signe, a cote du journal : l'enveloppe telle que recue (corps, signature, cle),
+    // pour pouvoir la reverifier a la lecture et ne jamais dessiner un resume forge.
+    private string SummaryPathFor(string replayId)
+        => Path.Combine(_store.SocialRoot, Assainir(replayId) + ".summary.json");
+
+    public void SaveSummary(string replayId, JsonObject enveloppe)
+    {
+        if (replayId.Length == 0) return;
+        lock (_gate)
+        {
+            try
+            {
+                Directory.CreateDirectory(_store.SocialRoot);
+                File.WriteAllText(SummaryPathFor(replayId), enveloppe.ToJsonString());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Replay social : resume non ecrit pour {ReplayId}.", replayId);
+            }
+        }
+    }
+
+    /// <summary>Le resume range, REVERIFIE avec la cle epinglee. Null s'il manque ou ne tient pas.</summary>
+    public SocialSummary? ReadSummary(string replayId, byte[] issuerSpkiDer, string expectedKeyId)
+    {
+        var chemin = SummaryPathFor(replayId);
+        if (replayId.Length == 0 || !File.Exists(chemin)) return null;
+        try
+        {
+            if (JsonNode.Parse(File.ReadAllText(chemin)) is not JsonObject enveloppe) return null;
+            var (resume, refus) = SocialSummary.Verifier(enveloppe, issuerSpkiDer, expectedKeyId);
+            if (resume is null) _logger.LogWarning("Replay social : resume range refuse ({Refus}) pour {ReplayId}.", refus, replayId);
+            return resume;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Replay social : resume illisible pour {ReplayId}.", replayId);
+            return null;
+        }
+    }
+
     /// <summary>Ajoute ce qui manque. Rend le nombre d'événements réellement nouveaux.</summary>
     public int Merge(string replayId, IEnumerable<SocialEvent> events)
     {

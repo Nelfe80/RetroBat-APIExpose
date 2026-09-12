@@ -55,11 +55,21 @@ public sealed class ReplayReactionHudService : BackgroundService
         RetroBat.Api.Netplay.LiveSpectateState direct,
         RetroBat.Api.Netplay.LiveCrowdModel foule,
         RetroBat.Api.Avatar.AvatarSheetStore avatars,
+        RetroBat.Api.Replay.Social.SocialIssuerPin pin,
         NelfePlayScoringSessionService? session = null)
     {
         _bus = bus; _reactions = reactions; _playback = playback; _store = store; _social = social;
         _logger = logger; _options = options; _session = session;
-        _direct = direct; _foule = foule; _avatars = avatars;
+        _direct = direct; _foule = foule; _avatars = avatars; _pin = pin;
+    }
+
+    private readonly RetroBat.Api.Replay.Social.SocialIssuerPin _pin;
+
+    /// <summary>Le resume signe d'un replay, reverifie a la lecture ; null sans cle epinglee ou sans resume.</summary>
+    private RetroBat.Api.Replay.Social.SocialSummary? LireResume(string replayId)
+    {
+        var epingle = _pin.Current;
+        return epingle is null ? null : _social.ReadSummary(replayId, epingle.Spki, epingle.KeyId);
     }
 
     /// <summary>
@@ -127,6 +137,7 @@ public sealed class ReplayReactionHudService : BackgroundService
                 // qu'elle n'est pas arrivee. La fenetre la decode une fois et la garde.
                 sha => _avatars.Has(sha) ? _avatars.ObjectPath(sha) : null,
                 sha => _avatars.Utiliser(sha),
+                LireResume,
                 // R9 : le journal d'ici, PLUS les evenements signes recus d'ailleurs. C'est ce qui
                 // fait apparaitre les reactions des autres spectateurs pendant la lecture, sans
                 // qu'aucune d'elles n'ait a etre crue sur parole.
@@ -196,6 +207,17 @@ public sealed class ReplayReactionHudService : BackgroundService
         private readonly Func<long, int, Foule.Instantane> _foule;
         private readonly Action<int> _capaciteFoule;
         private readonly Func<string, string?> _cheminPlanche;
+        private readonly Func<string, RetroBat.Api.Replay.Social.SocialSummary?> _lireResume;
+
+        // ── Le cameo : un performer vient reagir en personne, pile a la frame ─────
+        private readonly ReplayCameoModel _cameo = new();
+        private string? _cameoReplayId;
+        private ReplayCameoModel.Etat? _cameoEtat;
+        // La frame affichee, interpolee entre deux releves de la lecture : le releve arrive
+        // quelques fois par seconde, le saut doit partir a la frame, pas au releve suivant.
+        private long _frameRelevee = -1;
+        private long _frameReleveeA;
+        private double _fpsRelevee = 60;
         private readonly Action<string> _plancheUtilisee;
         private readonly Dictionary<string, Planche> _planches = new(StringComparer.Ordinal);
         private readonly Dictionary<string, long> _planchesAbsentes = new(StringComparer.Ordinal);
@@ -215,6 +237,7 @@ public sealed class ReplayReactionHudService : BackgroundService
             Action<int> capaciteFoule,
             Func<string, string?> cheminPlanche,
             Action<string> plancheUtilisee,
+            Func<string, RetroBat.Api.Replay.Social.SocialSummary?> lireResume,
             Func<string, IReadOnlyList<ReplayReaction>> loadReactions, Func<string> locale)
         {
             _charge = charge;
@@ -226,6 +249,7 @@ public sealed class ReplayReactionHudService : BackgroundService
             _capaciteFoule = capaciteFoule;
             _cheminPlanche = cheminPlanche;
             _plancheUtilisee = plancheUtilisee;
+            _lireResume = lireResume;
             _loadReactions = loadReactions;
             _locale = locale;
             FormBorderStyle = FormBorderStyle.None;
@@ -295,6 +319,7 @@ public sealed class ReplayReactionHudService : BackgroundService
                 var st = SafeState();
                 var playing = string.Equals(st.Mode, "replay", StringComparison.Ordinal);
                 PumpBubble(st, playing);
+                PumpCameo(st, playing, now);
 
                 // Pendant un DIRECT, la facade sert aussi : la legende doit se voir, et la foule
                 // avec elle. Sans ca le HUD ne paraissait que le temps d'une animation, donc la
@@ -325,7 +350,7 @@ public sealed class ReplayReactionHudService : BackgroundService
                 var fouleAnime = fouleInstantanee is { Bouge: true };
 
                 var animating = charge.Active || _parts.Count > 0 || _labels.Count > 0
-                    || _activeBubble is not null || fouleAnime;
+                    || _activeBubble is not null || fouleAnime || _cameoEtat is { Bouge: true };
                 if (animating || now - _lastRenderMs >= 1000)
                 {
                     RenderFrame(charge, now, playing, fouleInstantanee);
@@ -504,6 +529,131 @@ public sealed class ReplayReactionHudService : BackgroundService
             // Jauge de charge seulement s'il reste du budget (sinon la maintenir ne mène à rien).
             if (charge.Active && av.Budget > 0) DrawGauge(g, charge);
             if (playing) DrawBubble(g, now);
+            if (playing && _cameoEtat is { } cameo) DrawCameo(g, cameo, now);
+        }
+
+        /// <summary>
+        /// Fait avancer le cameo : charge les cameos du resume au changement de replay, interpole
+        /// la frame affichee, et demande au modele ce qu'il y a a dessiner.
+        /// </summary>
+        private void PumpCameo(ReplayPlaybackService.StateSnapshot st, bool playing, long now)
+        {
+            if (!playing || st.ReplayId is null)
+            {
+                if (_cameoReplayId is not null) { _cameo.Vider(); _cameoReplayId = null; _cameoEtat = null; _frameRelevee = -1; }
+                return;
+            }
+            if (!string.Equals(st.ReplayId, _cameoReplayId, StringComparison.Ordinal))
+            {
+                _cameoReplayId = st.ReplayId;
+                _frameRelevee = -1;
+                RetroBat.Api.Replay.Social.SocialSummary? resume = null;
+                try { resume = _lireResume(st.ReplayId); } catch { resume = null; }
+                _fpsRelevee = resume?.Fps ?? (st.NominalFps <= 0 ? 60 : st.NominalFps);
+                _cameo.Charger(resume?.Cameos ?? Array.Empty<RetroBat.Api.Replay.Social.SocialSummary.Cameo>(), _fpsRelevee);
+            }
+
+            // La frame interpolee : celle du dernier releve, plus ce que le temps a fait passer depuis.
+            if (st.Frame != _frameRelevee)
+            {
+                _frameRelevee = st.Frame;
+                _frameReleveeA = now;
+            }
+            var frame = st.Paused ? _frameRelevee : _frameRelevee + (long) ((now - _frameReleveeA) * _fpsRelevee / 1000.0);
+            _cameoEtat = _cameo.Relever(frame, st.Paused, now);
+        }
+
+        /// <summary>
+        /// Le cameo a l'ecran : l'avatar monte depuis le bandeau, a l'endroit de la timeline ou la
+        /// reaction a eu lieu ; son etiquette (couronnes, nom, rang) a cote ; le saut fait la
+        /// pirouette ; l'emoji monte, grossit et s'efface.
+        /// </summary>
+        private void DrawCameo(Graphics g, ReplayCameoModel.Etat e, long now)
+        {
+            var end = Math.Max(1L, _bubbleEnd);
+            var k = EchelleFoule();
+            var t = Foule.TailleSprite;
+            var taille = t * k;
+            var pad = BarSidePadding;
+            var cx = pad + (_region.Width - 2 * pad) * (float) Math.Clamp(e.Cameo.Frame / (double) end, 0, 1);
+            var sol = _region.Height - BarHeight;                       // il se tient sur le bandeau
+            var haut = sol - e.Montee * taille - e.Hauteur * k;          // le haut du sprite
+            var x = (int) Math.Round(Math.Clamp(cx - taille / 2f, 4, _region.Width - taille - 4));
+
+            // Rien ne se dessine sous le bandeau : il en SORT, il ne le traverse pas.
+            var clipAvant = g.Clip;
+            g.SetClip(new Rectangle(0, 0, _region.Width, sol));
+            try
+            {
+                var planche = e.Cameo.Avatar.Planche is { Length: 64 } sha ? PlancheDe(sha, now) : null;
+                var dest = new Rectangle(x, (int) Math.Round(haut), taille, taille);
+                if (planche is null)
+                {
+                    using var pinceau = new SolidBrush(DeTeinte(Foule.Teinte(e.Cameo.Poignee.Length > 0 ? e.Cameo.Poignee : e.Cameo.Nom), 235));
+                    Creature(g, pinceau, dest.X, dest.Y, taille);
+                }
+                else if (e.Vue == 3)
+                {
+                    g.DrawImage(planche.Gauche, dest, 4 * t, 0, t, t, GraphicsUnit.Pixel);
+                }
+                else
+                {
+                    g.DrawImage(planche.Feuille, dest, 0, e.Vue * t, t, t, GraphicsUnit.Pixel);
+                }
+            }
+            finally
+            {
+                g.Clip = clipAvant;
+            }
+            if (e.Montee < 0.35f) return;   // l'etiquette et l'emoji attendent qu'on voie la tete
+
+            // L'etiquette : les couronnes (une par premiere place, trois au plus), le nom, le rang.
+            var alpha = Math.Clamp((e.Montee - 0.35f) / 0.65f, 0f, 1f);
+            var a = (int) (255 * alpha);
+            using var nomF = new Font("Segoe UI", 16f, FontStyle.Bold, GraphicsUnit.Pixel);
+            using var rangF = new Font("Segoe UI Semibold", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            using var couronneF = new Font("Segoe UI Symbol", 15f, FontStyle.Regular, GraphicsUnit.Pixel);
+            var couronnes = e.Cameo.Premieres <= 0 ? "" : string.Concat(Enumerable.Repeat("\u265B", Math.Min(3, e.Cameo.Premieres)))
+                + (e.Cameo.Premieres > 3 ? "+" + (e.Cameo.Premieres - 3) : "");
+            var rang = e.Cameo.Rang > 0 ? "n\u00B0" + e.Cameo.Rang : "";
+            var wCouronnes = couronnes.Length == 0 ? 0f : g.MeasureString(couronnes, couronneF).Width + 4f;
+            var wNom = g.MeasureString(e.Cameo.Nom, nomF).Width;
+            var wRang = rang.Length == 0 ? 0f : g.MeasureString(rang, rangF).Width + 8f;
+            var largeur = 12f + wCouronnes + wNom + wRang + 12f;
+            const float hauteur = 30f;
+            // A droite de l'avatar, sauf s'il n'y a plus de place : alors a gauche.
+            var ex = x + taille + 8f;
+            if (ex + largeur > _region.Width - 6f) ex = x - 8f - largeur;
+            var ey = sol - taille * e.Montee - 2f;
+            using (var plaque = new SolidBrush(Color.FromArgb((int) (a * 0.88f), 11, 16, 32)))
+                FillRounded(g, plaque, ex, ey, largeur, hauteur, 8f);
+            using (var liseret = new SolidBrush(Color.FromArgb(a, 255, 200, 60)))
+                FillRounded(g, liseret, ex, ey, 4f, hauteur, 2f);
+            var tx = ex + 12f;
+            if (couronnes.Length > 0)
+            {
+                using var or = new SolidBrush(Color.FromArgb(a, 255, 200, 60));
+                g.DrawString(couronnes, couronneF, or, tx, ey + 6f);
+                tx += wCouronnes;
+            }
+            using (var encre = new SolidBrush(Color.FromArgb(a, 245, 247, 251)))
+                g.DrawString(e.Cameo.Nom, nomF, encre, tx, ey + 5f);
+            tx += wNom + 8f;
+            if (rang.Length > 0)
+            {
+                using var gris = new SolidBrush(Color.FromArgb(a, 170, 180, 200));
+                g.DrawString(rang, rangF, gris, tx, ey + 8f);
+            }
+
+            // L'emoji : il part du dessus de la tete, monte, grossit, et s'efface sur la fin.
+            if (e.Vol >= 0f && _sprites is { Ok: true })
+            {
+                var v = e.Vol;
+                var alphaVol = v < 0.6f ? 1f : 1f - (v - 0.6f) / 0.4f;
+                var tailleVol = 30f + 34f * v;
+                var cy = haut - 12f - v * ReplayCameoModel.MonteeVol * k;
+                _sprites.Draw(g, e.Cameo.Reaction, DesignBase + Math.Clamp(e.Cameo.Niveau - 1, 0, 2), cx, cy, tailleVol, alphaVol);
+            }
         }
 
         /// <summary>Une planche d'avatar decodee, et son profil gauche retourne une fois pour toutes.</summary>

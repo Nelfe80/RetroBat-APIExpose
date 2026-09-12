@@ -1,0 +1,596 @@
+{
+ "ok": true,
+ "schema": "nelfe.social.summary.v1",
+ "summary_id": "4446ab799bb499f7d1a349b6d84ef732ce920290e5782212b80210a0cdc5896d",
+ "body": {
+  "bins": 96,
+  "built_at": "2026-09-12T08:15:29Z",
+  "cameos": [
+   {
+    "avatar": {
+     "family": "platformer",
+     "generator": "atelier64-v7",
+     "palette": [],
+     "pseudo": "Nelfe80",
+     "sheet": "04e617548739ad3964af1abe5826231e50bb4467f92e3458620a7fe1bc3c9021",
+     "variation": 6666
+    },
+    "frame": 1030,
+    "handle": "cd0edd1cac6911f1",
+    "honors": {
+     "firsts": 2,
+     "podiums": 2,
+     "scores": 2
+    },
+    "level": 2,
+    "name": "Nelfe80",
+    "rank": 1,
+    "reaction": "wow"
+   },
+   {
+    "avatar": {
+     "family": "platformer",
+     "generator": "atelier64-v7",
+     "palette": [],
+     "pseudo": "Nelfe80",
+     "sheet": "04e617548739ad3964af1abe5826231e50bb4467f92e3458620a7fe1bc3c9021",
+     "variation": 6666
+    },
+    "frame": 1446,
+    "handle": "cd0edd1cac6911f1",
+    "honors": {
+     "firsts": 2,
+     "podiums": 2,
+     "scores": 2
+    },
+    "level": 1,
+    "name": "Nelfe80",
+    "rank": 1,
+    "reaction": "tension"
+   },
+   {
+    "avatar": {
+     "family": "platformer",
+     "generator": "atelier64-v7",
+     "palette": [],
+     "pseudo": "Nelfe80",
+     "sheet": "04e617548739ad3964af1abe5826231e50bb4467f92e3458620a7fe1bc3c9021",
+     "variation": 6666
+    },
+    "frame": 3502,
+    "handle": "cd0edd1cac6911f1",
+    "honors": {
+     "firsts": 2,
+     "podiums": 2,
+     "scores": 2
+    },
+    "level": 1,
+    "name": "Nelfe80",
+    "rank": 1,
+    "reaction": "wow"
+   }
+  ],
+  "fps_milli": 60000,
+  "heat": [
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    1,
+    2,
+    1
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    1,
+    1,
+    1
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    1,
+    1,
+    1
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0
+   ]
+  ],
+  "issuer_key_id": "bcd5ab3c8104cbda0a8367002a6afcd8a6cb1f1826fa5f8dedac67238151a184",
+  "moments": [
+   {
+    "a": 1,
+    "bin": 4,
+    "frame": 961,
+    "i": 2,
+    "n": 1,
+    "reaction": "wow"
+   },
+   {
+    "a": 1,
+    "bin": 6,
+    "frame": 1389,
+    "i": 1,
+    "n": 1,
+    "reaction": "tension"
+   },
+   {
+    "a": 1,
+    "bin": 16,
+    "frame": 3527,
+    "i": 1,
+    "n": 1,
+    "reaction": "wow"
+   }
+  ],
+  "object_sha256": "5e38cbb3b0d9ddd819ef47c44c889165971199718f177becff4b8274284964bf",
+  "replay_end": 20521,
+  "schema": "nelfe.social.summary.v1",
+  "target_id": "rp_06G67BPZ3V2Y2F0ZZVM3HCN7WW",
+  "target_type": "replay",
+  "totals": {
+   "reactions": 3,
+   "spectators": 1
+  }
+ },
+ "signature": "MEYCIQDDbS-eqPLr4ulN6uMiIH-B8kiHUyiWGOuPmuuxTKVSrwIhANEYcr_lPDTUCgcMKX7aqJggfVMV8ZKynsGz9LDliBbE",
+ "issuer_key_id": "bcd5ab3c8104cbda0a8367002a6afcd8a6cb1f1826fa5f8dedac67238151a184",
+ "issuer_public_key": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEGN5kF94xFnb/9HwS4RBA23LlDvht\nkfkp9ZnyY8XOOVrYiA0VYmCMSGSvQYSE2QCmTmMpvxVvmoLFHdUnzXyHlg==\n-----END PUBLIC KEY-----\n"
+}
