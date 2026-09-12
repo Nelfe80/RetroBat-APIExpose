@@ -48,20 +48,13 @@ public class RetroArchWrapperDeploymentService
         var result = new RetroArchWrapperDeploymentResult
         {
             Action = action,
-            Enabled = deploymentOptions.Enabled,
+            AutoDeploy = deploymentOptions.AutoDeploy,
             DryRun = dryRun,
             WrapperDllPath = wrapperPath,
             CoresPath = coresPath,
             RealCoresPath = realCoresPath,
             RetroArchRunning = IsRetroArchRunning()
         };
-
-        if (!deploymentOptions.Enabled && action.Equals("deploy", StringComparison.OrdinalIgnoreCase))
-        {
-            result.Warnings.Add("RetroArch wrapper deployment is disabled in appsettings.");
-            await WriteLogAsync(logPath, result, writeLog, cancellationToken);
-            return result;
-        }
 
         result.WrapperExists = File.Exists(wrapperPath);
         result.WrapperHasSignature = result.WrapperExists && IsWrapperFile(wrapperPath);
@@ -95,7 +88,9 @@ public class RetroArchWrapperDeploymentService
             return result;
         }
 
-        var wrapperReference = new FileInfo(wrapperPath);
+        // L'empreinte du build de reference, UNE fois : l'ancienne version la recalculait
+        // pour chacun des 157 cores.
+        var wrapperReference = new WrapperReference(new FileInfo(wrapperPath));
         var coreFiles = GetTargetCoreFiles(coresPath, deploymentOptions);
         foreach (var coreFile in coreFiles)
         {
@@ -158,13 +153,36 @@ public class RetroArchWrapperDeploymentService
             .ToList();
     }
 
-    private static RetroArchWrapperCoreStatus BuildCoreStatus(FileInfo coreFile, string realCoresPath, FileInfo wrapperReference)
+    /// <summary>
+    /// Le build de reference : son empreinte est calculee une fois, et sa taille borne ce
+    /// qu'on accepte de lire. Un wrapper fait quelques centaines de kilo-octets ; un vrai
+    /// core en fait des dizaines de mega-octets. Chercher la signature dans un fichier
+    /// quatre fois plus gros que la reference, c'est lire un vrai core pour rien, et c'est
+    /// ce qui coutait deux gigaoctets de lecture a chaque demarrage.
+    /// </summary>
+    private sealed class WrapperReference
     {
-        var isWrapper = IsWrapperFile(coreFile.FullName);
+        public WrapperReference(FileInfo file)
+        {
+            File = file;
+            MaxWrapperBytes = Math.Max(4 * file.Length, 4L * 1024 * 1024);
+            using var md5 = System.Security.Cryptography.MD5.Create();
+            using var stream = file.OpenRead();
+            Md5 = md5.ComputeHash(stream);
+        }
+
+        public FileInfo File { get; }
+        public long MaxWrapperBytes { get; }
+        public byte[] Md5 { get; }
+    }
+
+    private static RetroArchWrapperCoreStatus BuildCoreStatus(FileInfo coreFile, string realCoresPath, WrapperReference wrapperReference)
+    {
+        var isWrapper = coreFile.Length <= wrapperReference.MaxWrapperBytes && IsWrapperFile(coreFile.FullName);
         var realCorePath = Path.Combine(realCoresPath, coreFile.Name);
         var realCore = new FileInfo(realCorePath);
         var hasRealCore = realCore.Exists;
-        var needsRefresh = isWrapper && hasRealCore && !FilesHaveSameContent(coreFile, wrapperReference);
+        var needsRefresh = isWrapper && hasRealCore && !SameAsReference(coreFile, wrapperReference);
 
         var reason = isWrapper
             ? needsRefresh
@@ -189,25 +207,16 @@ public class RetroArchWrapperDeploymentService
         };
     }
 
-    private static bool FilesHaveSameContent(FileInfo left, FileInfo right)
+    private static bool SameAsReference(FileInfo core, WrapperReference reference)
     {
-        if (!left.Exists || !right.Exists)
-        {
-            return false;
-        }
-
-        if (left.Length != right.Length)
+        if (!core.Exists || core.Length != reference.File.Length)
         {
             return false;
         }
 
         using var md5 = System.Security.Cryptography.MD5.Create();
-        using var leftStream = left.OpenRead();
-        var leftHash = md5.ComputeHash(leftStream);
-        md5.Initialize();
-        using var rightStream = right.OpenRead();
-        var rightHash = md5.ComputeHash(rightStream);
-        return leftHash.AsSpan().SequenceEqual(rightHash);
+        using var stream = core.OpenRead();
+        return md5.ComputeHash(stream).AsSpan().SequenceEqual(reference.Md5);
     }
 
     private static void RefreshCore(

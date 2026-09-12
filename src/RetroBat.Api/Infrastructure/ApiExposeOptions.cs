@@ -713,7 +713,14 @@ public class ApiExposeOptions
 
     public class RetroArchWrapperDeploymentOptions
     {
-        public bool Enabled { get; set; } = false;
+        /// <summary>
+        /// Deployer le wrapper sur les cores au demarrage (et le rafraichir quand le build de
+        /// reference change). Vrai par defaut : c'est ce qui fait qu'une borne fraichement
+        /// installee lit ses jeux RetroArch sans qu'on y touche. L'ancienne clef `Enabled`
+        /// (fausse par defaut, et qui bloquait jusqu'au POST explicite) n'est plus lue :
+        /// les appsettings de la flotte qui la portent tombent sur ce defaut.
+        /// </summary>
+        public bool AutoDeploy { get; set; } = true;
         public string WrapperDllPath { get; set; } = "wrapper/wrapper.dll";
         public string CoresPath { get; set; } = "../../emulators/retroarch/cores";
         public string RealCoresPath { get; set; } = "../../emulators/retroarch/cores_real";
@@ -723,6 +730,9 @@ public class ApiExposeOptions
         public List<string> TargetCores { get; set; } = new();
         public bool SkipIfRetroArchRunning { get; set; } = true;
         public bool DryRunOnStartup { get; set; } = false;
+        /// <summary>Quand RetroArch tourne au demarrage, on reessaie a cet intervalle.</summary>
+        public int RetryIntervalSeconds { get; set; } = 60;
+        public int MaxRetries { get; set; } = 30;
     }
 
     public class EsControllerOptions

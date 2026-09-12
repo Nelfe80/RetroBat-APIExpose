@@ -8,7 +8,7 @@ public class RetroArchWrapperDeployRequest
 public class RetroArchWrapperDeploymentResult
 {
     public string Action { get; set; } = string.Empty;
-    public bool Enabled { get; set; }
+    public bool AutoDeploy { get; set; }
     public bool DryRun { get; set; }
     public bool RetroArchRunning { get; set; }
     public bool SkippedBecauseRetroArchRunning { get; set; }
