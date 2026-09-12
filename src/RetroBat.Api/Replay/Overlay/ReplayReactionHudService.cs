@@ -550,11 +550,14 @@ public sealed class ReplayReactionHudService : BackgroundService
             var av = SafeAvail();
             // La foule EN PREMIER : elle est le fond de scene, tout le reste passe devant.
             if (foule is not null) DrawCrowd(g, foule, now);
-            if (playing || foule is not null) DrawLegend(g, av);
+            // En mode REDUIT, l'ecran est au jeu : la legende des reactions disparait avec la barre.
+            // Ce qui raconte quelque chose (les cameos, les cartes, la nuee) reste.
+            var reduit = ReplayOverlayService.ReduiteVoulue;
+            if (!reduit && (playing || foule is not null)) DrawLegend(g, av);
             foreach (var p in _parts) DrawParticle(g, p, now);
             foreach (var l in _labels) DrawLabel(g, l, now);
             // Jauge de charge seulement s'il reste du budget (sinon la maintenir ne mène à rien).
-            if (charge.Active && av.Budget > 0) DrawGauge(g, charge);
+            if (!reduit && charge.Active && av.Budget > 0) DrawGauge(g, charge);
             if (playing) DrawBubble(g, now);
             if (playing && _cameoEtat is { } cameo) DrawCameo(g, cameo, now);
         }
