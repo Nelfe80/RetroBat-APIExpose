@@ -132,6 +132,18 @@ public sealed class LiveCrowdPoller : BackgroundService
         using var reponse = await client
             .PostAsync($"/api/v1/agent/live/{Uri.EscapeDataString(session)}/crowd", contenu, ct)
             .ConfigureAwait(false);
+        if (reponse.StatusCode == System.Net.HttpStatusCode.Gone)
+        {
+            // La plateforme ne connait plus ce direct : la seance se ferme d'elle-meme, la
+            // foule avec. C'est ce qui evite qu'une seance ouverte a la main (dev/spectate)
+            // ou survivant a la fin de l'hote reste a l'ecran jusqu'a ce qu'on y pense.
+            _logger.LogInformation("Direct {Session} : termine cote plateforme, seance de spectateur fermee.", session);
+            _seance.Fermer();
+            _sessionSuivie = "";
+            _curseur = 0;
+            _foule.Vider();
+            return;
+        }
         if (!reponse.IsSuccessStatusCode)
         {
             return;
