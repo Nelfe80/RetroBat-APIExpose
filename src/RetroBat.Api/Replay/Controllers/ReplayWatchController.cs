@@ -116,6 +116,11 @@ public sealed class ReplayWatchController : ControllerBase
          border:0; cursor:pointer; font-size:1rem; font-family:inherit; }
   .btn:hover { background:#6b45e6; }
   .muted { font-size:.85rem; color:#8a93a8; }
+  .bar { height:8px; margin:16px auto 6px; width:min(80%,320px); border-radius:6px; background:#1b2136; overflow:hidden; }
+  .bar > i { display:block; height:100%; width:0; background:#A98BFF; transition:width .3s linear; }
+  .bar.indet > i { width:30%; animation:g 1.2s ease-in-out infinite alternate; }
+  @keyframes g { from { margin-left:0 } to { margin-left:70% } }
+  @media (prefers-reduced-motion:reduce){ .bar.indet > i { animation:none; width:100%; opacity:.5 } }
 </style>
 </head>
 <body>
@@ -144,6 +149,75 @@ public sealed class ReplayWatchController : ControllerBase
     if (auto){ hint.hidden = false; setTimeout(function(){ location.href = RET; }, 3200); }
   }
 
+  // Un replay absent de la borne se TELECHARGE (pairs, puis miroir) : on le dit, avec ce qui
+  // reste, au lieu d'annoncer qu'il n'est pas disponible. La borne rend la main tout de suite
+  // (« replicating ») et on la suit par /replay/state.
+  var barre = null, jauge = null;
+  function progres(indetermine, fraction){
+    if (!barre){
+      barre = document.createElement('div'); barre.className = 'bar';
+      jauge = document.createElement('i'); barre.appendChild(jauge);
+      msg.parentNode.insertBefore(barre, msg.nextSibling);
+    }
+    barre.hidden = false;
+    barre.className = 'bar' + (indetermine ? ' indet' : '');
+    if (!indetermine){ jauge.style.width = Math.round(Math.max(0, Math.min(1, fraction)) * 100) + '%'; }
+  }
+  function mo(n){ return (n / 1048576).toFixed(n >= 10485760 ? 0 : 1).replace('.', ',') + ' Mo'; }
+  function duree(s){
+    s = Math.max(1, Math.round(s));
+    if (s < 60) return s + ' s';
+    return Math.floor(s / 60) + ' min ' + (s % 60 < 10 ? '0' : '') + (s % 60) + ' s';
+  }
+  var ERREURS = {
+    ReplayNotFound: ['🔎', 'Replay introuvable', 'Ni cette borne ni NelfePlay ne connaissent ce replay.'],
+    ReplayObjectUnavailable: ['📡', 'Téléchargement impossible', 'Aucune borne ni le miroir n’a pu fournir ce replay pour le moment. Réessaie dans un instant.'],
+    ReplayObjectCorrupt: ['⚠️', 'Replay altéré', 'Le fichier reçu ne correspond pas à l’empreinte attendue : il a été écarté.'],
+    RuntimeIncompatible: ['🕹️', 'Jeu ou cœur absent', 'Cette borne n’a pas le jeu ou le cœur qu’il faut pour rejouer ce record.'],
+    GameAlreadyRunning: ['⏳', 'Un jeu tourne', 'Quitte le jeu en cours sur la borne, puis relance le replay.'],
+    ReplayAlreadyRunning: ['⏳', 'Déjà en cours', 'Une lecture est déjà en cours sur la borne.']
+  };
+  function echec(code){
+    var e = ERREURS[code] || ['⚠️', 'Impossible de lancer', 'La borne a refusé la lecture' + (code ? ' (' + code + ')' : '') + '.'];
+    if (barre) barre.hidden = true;
+    show('err', e[0], e[1], e[2], false);
+  }
+  var suivis = 0;
+  function suivre(){
+    fetch('/api/v1/replay/state', { cache:'no-store' }).then(function(r){ return r.json(); }).then(function(s){
+      var st = s.state || '';
+      if (st === 'replicating'){
+        var f = s.fetch;
+        if (f && f.total > 0 && f.received > 0){
+          progres(false, f.received / f.total);
+          var reste = (f.eta_seconds != null) ? ', encore ' + duree(f.eta_seconds) : '';
+          title.textContent = 'Téléchargement du replay…';
+          msg.textContent = mo(f.received) + ' sur ' + mo(f.total) + reste
+            + (f.source ? ' · depuis ' + f.source : '');
+        } else {
+          progres(true, 0);
+          title.textContent = 'Recherche du replay…';
+          msg.textContent = 'La borne le demande aux bornes voisines, puis au miroir NelfePlay.';
+        }
+        setTimeout(suivre, 500);
+      } else if (st === 'resolving' || st === 'verifying' || st === 'preparing' || st === 'launching'){
+        progres(true, 0);
+        title.textContent = st === 'verifying' ? 'Vérification du replay…' : 'Lancement du replay…';
+        msg.textContent = st === 'verifying' ? 'Empreinte et taille contre le manifeste.' : 'Un instant, la borne prépare la lecture.';
+        setTimeout(suivre, 500);
+      } else if (st === 'playing' || st === 'paused' || st === 'finished'){
+        if (barre) barre.hidden = true;
+        show('ok','▶','Lecture sur la borne','Le replay se joue sur l’écran de la borne.', true);
+      } else if (st === 'error'){
+        echec(s.error || '');
+      } else {
+        // Idle : la lecture est passee sans qu'on la voie (replay tres court), ou a ete arretee.
+        if (++suivis < 6) { setTimeout(suivre, 500); }
+        else { if (barre) barre.hidden = true; show('ok','▶','Lecture sur la borne','Le replay se joue sur l’écran de la borne.', true); }
+      }
+    }).catch(function(){ setTimeout(suivre, 1000); });
+  }
+
   function play(){
     show('', '', 'Lancement du replay…', 'Un instant, la borne prépare la lecture.', false);
     card.className = 'card';
@@ -152,10 +226,10 @@ public sealed class ReplayWatchController : ControllerBase
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ replay_id: ID }), cache:'no-store'
     }).then(function(r){
-      if (r.status === 200) { show('ok','▶','Lecture sur la borne','Le replay se joue sur l’écran de la borne.', true); }
-      else if (r.status === 404) { show('err','🔎','Pas disponible ici','Ce replay n’est pas présent sur cette borne.', false); }
-      else if (r.status === 409) { show('err','⏳','Déjà en cours','Une lecture est déjà en cours sur la borne.', false); }
-      else { show('err','⚠️','Impossible de lancer','La borne a refusé la lecture (code ' + r.status + ').', false); }
+      if (r.status === 200) { back.hidden = true; suivre(); }
+      else if (r.status === 404) { echec('ReplayNotFound'); }
+      else if (r.status === 409) { echec('ReplayAlreadyRunning'); }
+      else { echec(''); }
     }).catch(function(){
       show('err','⚠️','Borne injoignable','Impossible de contacter APIExpose sur cette machine.', false);
     });

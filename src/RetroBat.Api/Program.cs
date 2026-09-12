@@ -460,6 +460,8 @@ builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayRelayService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Sharing.ReplayRelayService>());
 builder.Services.AddSingleton<RetroBat.Api.Replay.Playback.IReplaySourceResolver, RetroBat.Api.Replay.Sharing.NelfeNetSourceResolver>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplaySharePolicy>();
+// Le manifeste d'un replay que la borne n'a plus : la plateforme le garde pour tout replay seme.
+builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayManifestFetcher>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Playback.ReplayPlaybackService>();
 builder.Services.AddHostedService<RetroBat.Api.Replay.Recording.ReplayRecorderService>();
 builder.Services.AddHostedService<RetroBat.Api.Replay.Input.ReplayInputRouterService>();

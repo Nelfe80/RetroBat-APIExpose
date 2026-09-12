@@ -118,6 +118,16 @@ public sealed class ReplayPlaybackController : ControllerBase
             error = s.Error,
             nominal_fps = s.NominalFps,
             fps_source = s.FpsSource,   // core | measured | default — d'où vient la base de temps
+            // Le telechargement en cours, quand l'objet vient d'un pair ou du miroir : de quoi
+            // afficher une barre et le temps restant.
+            fetch = s.Fetch is null ? null : new
+            {
+                received = s.Fetch.Received,
+                total = s.Fetch.Total,
+                bytes_per_second = Math.Round(s.Fetch.BytesPerSecond),
+                eta_seconds = s.Fetch.EtaSeconds is { } eta ? Math.Round(eta) : (double?) null,
+                source = s.Fetch.Source,
+            },
             card = s.Card is null ? null : new
             {
                 game = s.Card.Game,

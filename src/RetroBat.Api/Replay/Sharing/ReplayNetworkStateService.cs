@@ -52,6 +52,18 @@ public sealed class ReplayNetworkStateService
     private readonly IReplayMetadataStore _meta;
     private readonly ReplaySharePolicy _policy;
     private readonly ConcurrentDictionary<string, byte> _fetching = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, Avancement> _avancements = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Ou en est un telechargement : de quoi dire combien il reste, et d'ou ca vient.</summary>
+    public sealed record FetchProgress(string Sha256, long Received, long Total, double BytesPerSecond,
+        double? EtaSeconds, string Source);
+
+    private sealed class Avancement
+    {
+        public long Recus, Total;
+        public string Source = "";
+        public DateTime Depuis = DateTime.UtcNow;
+    }
 
     public ReplayNetworkStateService(IReplayObjectStore objects, IReplayMetadataStore meta, ReplaySharePolicy policy)
     {
@@ -63,6 +75,45 @@ public sealed class ReplayNetworkStateService
     {
         _fetching.TryAdd(sha256, 0);
         return new FetchScope(this, sha256);
+    }
+
+    /// <summary>
+    /// Rapporte les octets recus d'une source. Le chronometre repart quand la source change :
+    /// un pair qui a echoue avant le miroir ne doit pas compter dans le debit du miroir.
+    /// </summary>
+    public void Report(string sha256, long received, long total, string source)
+    {
+        var a = _avancements.GetOrAdd(sha256, _ => new Avancement());
+        lock (a)
+        {
+            if (!string.Equals(a.Source, source, StringComparison.Ordinal))
+            {
+                a.Source = source;
+                a.Depuis = DateTime.UtcNow;
+            }
+            a.Recus = received;
+            a.Total = total;
+        }
+    }
+
+    /// <summary>La progression d'un telechargement en cours, ou null s'il n'y en a pas.</summary>
+    public FetchProgress? ProgressOf(string sha256)
+    {
+        if (!_fetching.ContainsKey(sha256) || !_avancements.TryGetValue(sha256, out var a))
+        {
+            return null;
+        }
+        lock (a)
+        {
+            var secondes = Math.Max(0.001, (DateTime.UtcNow - a.Depuis).TotalSeconds);
+            var debit = a.Recus / secondes;
+            // Pas d'estimation avant une seconde de mesure : un premier paquet donnerait un
+            // debit fantaisiste, donc un temps restant qui saute dans tous les sens.
+            double? reste = secondes >= 1 && debit > 0 && a.Total > a.Recus
+                ? (a.Total - a.Recus) / debit
+                : null;
+            return new FetchProgress(sha256, a.Recus, a.Total, debit, reste, a.Source);
+        }
     }
 
     public ReplayNetworkState Evaluate(string replayId, string objectSha256)
@@ -98,6 +149,10 @@ public sealed class ReplayNetworkStateService
         private readonly ReplayNetworkStateService _owner;
         private readonly string _sha;
         public FetchScope(ReplayNetworkStateService owner, string sha) { _owner = owner; _sha = sha; }
-        public void Dispose() => _owner._fetching.TryRemove(_sha, out _);
+        public void Dispose()
+        {
+            _owner._fetching.TryRemove(_sha, out _);
+            _owner._avancements.TryRemove(_sha, out _);
+        }
     }
 }

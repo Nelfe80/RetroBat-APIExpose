@@ -261,7 +261,9 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
             using var transferCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
             transferCts.CancelAfter(budget);
 
-            var written = await WriteCappedAsync(response, temp, manifest.Object.Size, transferCts.Token).ConfigureAwait(false);
+            _network.Report(sha, 0, manifest.Object.Size, peer.Name);
+            var written = await WriteCappedAsync(response, temp, manifest.Object.Size, transferCts.Token,
+                recus => _network.Report(sha, recus, manifest.Object.Size, peer.Name)).ConfigureAwait(false);
             if (written is null)
             {
                 _logger.LogWarning("Replay : pair {Peer} a envoyé plus que la taille annoncée pour {Sha} — abandonné.", peer.Name, Short(sha));
@@ -305,18 +307,26 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
 
     /// <summary>Écrit le corps sur disque en s'arrêtant net au-delà de la taille annoncée.
     /// Renvoie le nombre d'octets écrits, ou null si le pair a dépassé.</summary>
-    private static async Task<long?> WriteCappedAsync(HttpResponseMessage response, string destination, long maxBytes, CancellationToken ct)
+    private static async Task<long?> WriteCappedAsync(HttpResponseMessage response, string destination, long maxBytes,
+        CancellationToken ct, Action<long>? avancement = null)
     {
         await using var source = await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
         await using var target = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None);
         var buffer = new byte[81920];
         long total = 0;
+        long dernierRapport = 0;
         int read;
         while ((read = await source.ReadAsync(buffer, ct).ConfigureAwait(false)) > 0)
         {
             total += read;
             if (total > maxBytes) return null;
             await target.WriteAsync(buffer.AsMemory(0, read), ct).ConfigureAwait(false);
+            // Un rapport tous les 256 Ko : assez fin pour une barre, sans verrou a chaque paquet.
+            if (avancement is not null && total - dernierRapport >= 262144)
+            {
+                dernierRapport = total;
+                avancement(total);
+            }
         }
         return total;
     }

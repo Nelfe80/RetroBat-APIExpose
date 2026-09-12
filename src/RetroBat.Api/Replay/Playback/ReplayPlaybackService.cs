@@ -31,6 +31,8 @@ public sealed class ReplayPlaybackService
     private readonly RetroBat.Api.Infrastructure.NelfePlayAgentService _agent;   // pseudo appairé = joueur de la carte
     private readonly RetroBat.Api.Infrastructure.NelfePlayDeviceStore _devices;  // credential pour le backfill carte
     private readonly IHttpClientFactory _httpFactory;
+    private readonly RetroBat.Api.Replay.Sharing.ReplayManifestFetcher _manifestFetcher;
+    private readonly RetroBat.Api.Replay.Sharing.ReplayNetworkStateService _network;
     private readonly ILogger<ReplayPlaybackService> _logger;
 
     private readonly object _gate = new();
@@ -50,10 +52,13 @@ public sealed class ReplayPlaybackService
         IReplayMetadataStore meta, IReplaySourceResolver source, IReplayRuntimeResolver resolver,
         IEventBus bus, RetroBat.Api.Infrastructure.NelfePlayAgentService agent,
         RetroBat.Api.Infrastructure.NelfePlayDeviceStore devices, IHttpClientFactory httpFactory,
+        RetroBat.Api.Replay.Sharing.ReplayManifestFetcher manifestFetcher,
+        RetroBat.Api.Replay.Sharing.ReplayNetworkStateService network,
         ILogger<ReplayPlaybackService> logger)
     {
         _ra = ra; _manifests = manifests; _objects = objects; _meta = meta; _source = source; _resolver = resolver;
         _bus = bus; _agent = agent; _devices = devices; _httpFactory = httpFactory; _logger = logger;
+        _manifestFetcher = manifestFetcher; _network = network;
     }
 
     /// <summary>Vrai pendant qu'une lecture est en cours (le recorder s'abstient d'enregistrer).</summary>
@@ -67,7 +72,8 @@ public sealed class ReplayPlaybackService
     public sealed record PlayResult(bool Accepted, string State, ReplayErrorCode Error);
     public sealed record StateSnapshot(string Mode, string State, string? ReplayId, long Frame,
         long? RunStartFrame, long? RunEndFrame, long? ReplayEndFrame, bool Paused, string? Error,
-        double NominalFps, string? FpsSource, ReplayCard? Card);
+        double NominalFps, string? FpsSource, ReplayCard? Card,
+        RetroBat.Api.Replay.Sharing.ReplayNetworkStateService.FetchProgress? Fetch = null);
 
     /// <summary>Fiche « performance NelfePlay » de l'overlay (record sportif/esport). En R1
     /// seuls Game/System/Date sont réels ; Player/Score/Rank/Certified sont des emplacements
@@ -79,13 +85,26 @@ public sealed class ReplayPlaybackService
     {
         lock (_gate)
         {
-            var mode = _state is ReplayPlaybackState.Idle ? "none" : "replay";
+            // Le mode « replay » est celui qui montre l'overlay : il ne commence qu'au lancement de
+            // RetroArch. Avant (resolution, telechargement, verification), c'est EmulationStation
+            // qui est a l'ecran, et une barre par-dessus n'aurait rien a dire. Un echec non plus :
+            // l'ancienne regle (« tout sauf Idle ») posait la barre sur ES apres un refus, et rien
+            // ne la retirait jamais.
+            var mode = _state is ReplayPlaybackState.Launching or ReplayPlaybackState.Playing
+                or ReplayPlaybackState.Paused or ReplayPlaybackState.Stopping or ReplayPlaybackState.Finished
+                ? "replay" : "none";
+            var fetch = _state is ReplayPlaybackState.Replicating && _objetAttendu is { } sha
+                ? _network.ProgressOf(sha)
+                : null;
             return new StateSnapshot(mode, _state.ToString().ToLowerInvariant(), _replayId, _frame,
                 _runStart, _runEnd, _replayEnd, _paused,
                 _error == ReplayErrorCode.None ? null : _error.ToString(),
-                _nominalFps <= 0 ? 60 : _nominalFps, _fpsSource, _card);
+                _nominalFps <= 0 ? 60 : _nominalFps, _fpsSource, _card, fetch);
         }
     }
+
+    /// <summary>L'objet qu'on attend pendant un telechargement, pour en lire la progression.</summary>
+    private string? _objetAttendu;
 
     public async Task<PlayResult> PlayAsync(string replayId, CancellationToken ct)
     {
@@ -97,14 +116,53 @@ public sealed class ReplayPlaybackService
         }
 
         var manifest = _manifests.GetManifest(replayId);
-        if (manifest is null) return Fail(ReplayErrorCode.ReplayNotFound);
+        if (manifest is null)
+        {
+            // Pas de manifeste ici : la plateforme le garde pour tout replay seme au miroir. On le
+            // lui demande EN TACHE DE FOND, comme l'objet, et on rend la main dans l'etat
+            // « replicating » : la page de lancement suit la progression par /replay/state.
+            lock (_gate) { _state = ReplayPlaybackState.Replicating; _objetAttendu = null; }
+            _logger.LogInformation("Replay : manifeste absent pour {ReplayId}, demande a la plateforme.", replayId);
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var recu = await _manifestFetcher.FetchAsync(replayId, CancellationToken.None).ConfigureAwait(false);
+                    if (recu is null)
+                    {
+                        Fail(ReplayErrorCode.ReplayNotFound);
+                        return;
+                    }
+                    _manifests.SaveManifest(recu);
+                    if (_meta.GetMeta(replayId) is null)
+                    {
+                        _meta.SaveMeta(ReplayLocalMetadata.Fresh(replayId) with { CreatedByThisDevice = false });
+                    }
+                    await PreparerPuisLireAsync(replayId, recu, CancellationToken.None).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Replay : recuperation du manifeste de {ReplayId} echouee.", replayId);
+                    Fail(ReplayErrorCode.ReplayNotFound);
+                }
+            });
+            return new PlayResult(true, ReplayPlaybackState.Replicating.ToString().ToLowerInvariant(), ReplayErrorCode.None);
+        }
+        return await PreparerPuisLireAsync(replayId, manifest, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Le manifeste en main : la carte, puis l'objet (present, ou a aller chercher en tache de
+    /// fond), puis la lecture. Un seul chemin, que le manifeste ait ete local ou recu a l'instant.
+    /// </summary>
+    private async Task<PlayResult> PreparerPuisLireAsync(string replayId, ReplayManifest manifest, CancellationToken ct)
+    {
         var meta = _meta.GetMeta(replayId);
         ReplayCard? builtCard;
         lock (_gate) { _card = BuildCard(manifest, meta, _agent.Status.Pseudo); builtCard = _card; }
         // Backfill : replay estampillé AVANT la corrélation score → pas de score en méta.
         // On le récupère du serveur en tâche de fond ; la carte se rafraîchit via /state.
         if (builtCard is { Score: null }) { _ = BackfillCardAsync(replayId, ct); }
-        var hint = meta?.Launch;
         var objectPath = _objects.ObjectPath(manifest.Object.Sha256);
 
         // ── LE RÉSEAU NE DOIT JAMAIS ÊTRE DANS LE CHEMIN DE RÉPONSE ──────────────
@@ -114,11 +172,11 @@ public sealed class ReplayPlaybackService
         // retardée par un pair lent, ni même par un pair qui ne répond pas du tout : il n'est plus
         // sur le chemin. C'est structurel, ça ne dépend d'aucun réglage de délai.
         //
-        // Le client suit la progression par /replay/state, exactement comme il le fait déjà pour
-        // « launching ». Rien ne change pour lui.
+        // Le client suit la progression par /replay/state (octets recus, temps restant), exactement
+        // comme il le fait déjà pour « launching ».
         if (!File.Exists(objectPath))
         {
-            lock (_gate) _state = ReplayPlaybackState.Replicating;
+            lock (_gate) { _state = ReplayPlaybackState.Replicating; _objetAttendu = manifest.Object.Sha256; }
             _logger.LogInformation("Replay : objet absent pour {ReplayId}, récupération en tâche de fond.", replayId);
             _ = Task.Run(async () =>
             {
