@@ -218,6 +218,10 @@ public sealed class ReplayReactionHudService : BackgroundService
         private long _frameRelevee = -1;
         private long _frameReleveeA;
         private double _fpsRelevee = 60;
+        // Le resume arrive quelques secondes APRES le lancement (le flux social le demande a la
+        // plateforme au meme moment) : tant qu'il manque, on le relit toutes les deux secondes.
+        private bool _cameoResumeCharge;
+        private long _cameoProchainEssai;
         private readonly Action<string> _plancheUtilisee;
         private readonly Dictionary<string, Planche> _planches = new(StringComparer.Ordinal);
         private readonly Dictionary<string, long> _planchesAbsentes = new(StringComparer.Ordinal);
@@ -547,10 +551,22 @@ public sealed class ReplayReactionHudService : BackgroundService
             {
                 _cameoReplayId = st.ReplayId;
                 _frameRelevee = -1;
+                _cameoResumeCharge = false;
+                _cameoProchainEssai = 0;
+                _fpsRelevee = st.NominalFps <= 0 ? 60 : st.NominalFps;
+                _cameo.Vider();
+            }
+            if (!_cameoResumeCharge && now >= _cameoProchainEssai)
+            {
+                _cameoProchainEssai = now + 2000;
                 RetroBat.Api.Replay.Social.SocialSummary? resume = null;
                 try { resume = _lireResume(st.ReplayId); } catch { resume = null; }
-                _fpsRelevee = resume?.Fps ?? (st.NominalFps <= 0 ? 60 : st.NominalFps);
-                _cameo.Charger(resume?.Cameos ?? Array.Empty<RetroBat.Api.Replay.Social.SocialSummary.Cameo>(), _fpsRelevee);
+                if (resume is not null)
+                {
+                    _cameoResumeCharge = true;
+                    _fpsRelevee = resume.Fps;
+                    _cameo.Charger(resume.Cameos, _fpsRelevee);
+                }
             }
 
             // La frame interpolee : celle du dernier releve, plus ce que le temps a fait passer depuis.

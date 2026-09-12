@@ -157,6 +157,7 @@ public sealed class ReplayOverlayService : BackgroundService
         // courbe + marqueurs de réactions le long du replay
         private readonly Func<string, RetroBat.Api.Replay.Social.SocialSummary?>? _lireResume;
         private RetroBat.Api.Replay.Social.SocialSummary? _resume;
+        private DateTime _resumeProchainEssai = DateTime.MinValue;
         private string? _curveReplayId;
         private IReadOnlyList<ReplayReaction> _curveReactions = Array.Empty<ReplayReaction>();
         private float[]? _curve;
@@ -208,6 +209,14 @@ public sealed class ReplayOverlayService : BackgroundService
                 try { _resume = _snapshot.ReplayId is null || _lireResume is null ? null : _lireResume(_snapshot.ReplayId); }
                 catch { _resume = null; }
                 _curve = null;
+            }
+            // Le resume arrive quelques secondes apres le lancement : tant qu'il manque, on le relit
+            // toutes les deux secondes, et la courbe se refait avec lui.
+            if (_resume is null && _lireResume is not null && _snapshot.ReplayId is not null && DateTime.UtcNow >= _resumeProchainEssai)
+            {
+                _resumeProchainEssai = DateTime.UtcNow.AddSeconds(2);
+                try { _resume = _lireResume(_snapshot.ReplayId); } catch { _resume = null; }
+                if (_resume is not null) _curve = null;
             }
             if (_curve is null && _snapshot.ReplayEndFrame is long end && end > 0)
             {
