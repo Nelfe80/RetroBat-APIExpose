@@ -126,7 +126,7 @@ $autorises = @(
     'resources/scraping/', 'resources/iccards/', 'resources/colors/', 'resources/history/',
     'resources/command/', 'resources/locales/', 'tools/mem-explorer/',
     # Le verificateur de score (APIExposeOCR), construit depuis son propre depot et
-    # depose ici par APIExposeOCR	oolselease.ps1, comme mem-explorer.
+    # depose ici par APIExposeOCR\tools\release.ps1, comme mem-explorer.
     'tools/score-verifier/',
     'RetroBat.Api.exe', 'RetroBat.Api.deps.json', 'RetroBat.Api.runtimeconfig.json',
     'RetroBat.Api.xml', 'web.config', 'tools/listen_api_ws.README.md',
