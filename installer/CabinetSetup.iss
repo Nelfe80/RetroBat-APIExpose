@@ -49,7 +49,10 @@ french.SelectDirDesc=Choisissez le dossier plugins\APIExpose de VOTRE RetroBat (
 ; Les scripts .ps1/.py de tools/ sont de l'outillage interne (curation, exploitation,
 ; sondes) : ni le runtime ni l'utilisateur n'en a besoin, et ils ne sont pas publics.
 Source: "..\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; \
-    Excludes: "\src\*,\tests\*,\docs\*,\wiki\*,\media\*,\state\*,\artifacts\*,\dist\*,\installer\*,\.git\*,\.github\*,\.log\*,\.temp\*,\.cache\*,\.archive\*,\.versioning\*,\site\*,\package-installer\*,\projects-source\*,\resources\outputs\*,\resources\panels\*,\resources\controls\retroarch\mame\*,\resources\ra\*,\resources\ram\.user\*,\resources\history\history.db,\resources\colors\colors.ini,\resources\command\command.dat,\tools\mem-curator\*,\tools\libretro-probe\*,\.env,\events.ini,\appsettings.json,\mkdocs.yml,\build.bat,\release.ps1,\CabinetSetup.iss,\publish-tmp\*,\panel_curator*,\profiles_db*,*.log,*.pdb,*.g.cs,__pycache__\*,*.pyc,*.ps1,*.py,*.bak,ScreenScraper.html,\tools\ffmpeg\*,\tools\translateLocally\*.exe,\tools\translateLocally\models\*"
+    Excludes: "\src\*,\tests\*,\docs\*,\wiki\*,\media\*,\state\*,\artifacts\*,\dist\*,\installer\*,\.git\*,\.github\*,\.log\*,\.temp\*,\.cache\*,\.archive\*,\.versioning\*,\site\*,\package-installer\*,\projects-source\*,\resources\outputs\*,\resources\panels\*,\resources\controls\retroarch\mame\*,\resources\ra\*,\resources\ram\.user\*,\resources\history\history.db,\resources\colors\colors.ini,\resources\command\command.dat,\tools\mem-curator\*,\tools\libretro-probe\*,\.env,\wrapper\.env,\events.ini,\appsettings.json,\mkdocs.yml,\build.bat,\release.ps1,\CabinetSetup.iss,\publish-tmp\*,\panel_curator*,\profiles_db*,*.log,*.pdb,*.g.cs,__pycache__\*,*.pyc,*.ps1,*.py,*.bak,ScreenScraper.html,\tools\ffmpeg\*,\tools\translateLocally\*.exe,\tools\translateLocally\models\*"
+; L'etat de la borne n'est JAMAIS ecrase : ni appsettings.json (cle API, options), ni
+; wrapper\.env (drapeaux DISCOVERY et PERSO - PERSO=1 = test de .MEM perso en cours ;
+; APIExpose recree ce fichier au demarrage). Meme regle que l'archive .7z.
 ; La configuration de la borne n'est JAMAIS écrasée (clé API, options overlay)
 Source: "..\appsettings.json"; DestDir: "{app}"; Flags: onlyifdoesntexist uninsneveruninstall
 
