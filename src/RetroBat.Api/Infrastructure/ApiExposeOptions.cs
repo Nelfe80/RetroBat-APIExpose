@@ -39,6 +39,7 @@ public class ApiExposeOptions
     public RetroAchievementsOptions RetroAchievements { get; set; } = new();
     public CommunityRamOptions CommunityRam { get; set; } = new();
     public DataPackOptions DataPack { get; set; } = new();
+    public SelfUpdateOptions SelfUpdate { get; set; } = new();
 
     public class TestModeOptions
     {
@@ -710,6 +711,28 @@ public class ApiExposeOptions
         public bool SendF5AfterEsApiReady { get; set; } = true;
         public int F5AfterEsApiReadyDelayMilliseconds { get; set; } = 5000;
         public int F5AfterEsApiReadyHoldMilliseconds { get; set; } = 80;
+    }
+
+    /// <summary>
+    /// La mise a jour automatique d'APIExpose (voir <see cref="SelfUpdateService"/>).
+    /// Section de configuration : <c>ApiExpose:SelfUpdate</c>.
+    /// </summary>
+    public class SelfUpdateOptions
+    {
+        /// <summary>Prendre la derniere version publiee au lancement. Vrai par defaut.</summary>
+        public bool Enabled { get; set; } = true;
+
+        /// <summary>Le depot dont on lit les releases.</summary>
+        public string Repository { get; set; } = "Nelfe80/RetroBat-APIExpose";
+
+        /// <summary>Attente apres le demarrage : le watcher et les fournisseurs d'abord.</summary>
+        public int StartupDelaySeconds { get; set; } = 90;
+
+        /// <summary>
+        /// On regarde de nouveau toutes les N heures, parce qu'une borne peut rester allumee des
+        /// jours et parce qu'elle etait peut-etre occupee la fois d'avant. 0 = une seule fois.
+        /// </summary>
+        public int IntervalHours { get; set; } = 6;
     }
 
     public class RetroArchWrapperDeploymentOptions

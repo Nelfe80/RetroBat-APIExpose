@@ -210,6 +210,9 @@ builder.Services.AddHostedService<RetroBat.Api.Infrastructure.CommunityRamSyncSe
 // Data Pack OFFICIEL : pull fichier par fichier du depot RetroBat-DataPack (ram, dynpanels,
 // gamelist, controls, ...) et des bases par systeme de sa release « gamelist ». Ecrase
 // l'officiel, n'efface jamais. Singleton aussi : la maintenance le declenche a la demande.
+// La borne prend la derniere version publiee au lancement, quand rien ne tourne.
+builder.Services.AddSingleton<RetroBat.Api.Infrastructure.SelfUpdateService>();
+builder.Services.AddHostedService<RetroBat.Api.Infrastructure.SelfUpdateHostedService>();
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.DataPackSyncService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.DataPackSyncService>());
 // Releve d'audience : ce qui est joue et combien de temps, jamais par qui.

@@ -13,17 +13,40 @@ public class MaintenanceController : ControllerBase
     private readonly RetroArchWrapperDeploymentService _wrapperDeploymentService;
     private readonly EmulationStationWatcherProvider _emulationStationWatcherProvider;
     private readonly DataPackSyncService _dataPack;
+    private readonly SelfUpdateService _selfUpdate;
 
     public MaintenanceController(
         InstallerDeploymentService installerDeploymentService,
         RetroArchWrapperDeploymentService wrapperDeploymentService,
         EmulationStationWatcherProvider emulationStationWatcherProvider,
-        DataPackSyncService dataPack)
+        DataPackSyncService dataPack,
+        SelfUpdateService selfUpdate)
     {
         _installerDeploymentService = installerDeploymentService;
         _wrapperDeploymentService = wrapperDeploymentService;
         _emulationStationWatcherProvider = emulationStationWatcherProvider;
         _dataPack = dataPack;
+        _selfUpdate = selfUpdate;
+    }
+
+    /// <summary>Y a-t-il une version plus recente d'APIExpose ? Rien n'est telecharge.</summary>
+    [HttpGet("update/check")]
+    public async Task<ActionResult<SelfUpdateStatus>> CheckUpdate(CancellationToken cancellationToken)
+    {
+        var etat = await _selfUpdate.VerifierAsync(cancellationToken);
+        return Ok(etat);
+    }
+
+    /// <summary>
+    /// Prend la derniere version publiee : lance RetroBat.Api.Update.exe, qui arretera cette
+    /// API, la remplacera et la relancera. Refuse pendant un jeu ou un replay (le champ `busy`
+    /// dit pourquoi). `force=true` reapplique meme si la version est deja la.
+    /// </summary>
+    [HttpPost("update/apply")]
+    public async Task<ActionResult<SelfUpdateStatus>> ApplyUpdate([FromQuery] bool force, CancellationToken cancellationToken)
+    {
+        var etat = await _selfUpdate.AppliquerAsync(force, cancellationToken);
+        return Ok(etat);
     }
 
     /// <summary>Le bilan de la derniere synchronisation du Data Pack officiel.</summary>
