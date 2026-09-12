@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- RetroBat.Api.Update.exe : le petit programme, a la racine d'APIExpose, qui met
+       l'API a jour vers la derniere release publiee sans repasser par l'installeur.
+       Console pure, framework-dependent single-file comme RetroBat.Api.exe : le runtime
+       .NET 8 est deja la puisque l'API en a besoin. Aucune dependance a l'API elle-meme :
+       il doit pouvoir la remplacer, donc ne rien en charger. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>RetroBat.Api.Update</AssemblyName>
+    <RootNamespace>RetroBat.Api.Update</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Les archives de release sont des .7z (LZMA2) : SharpCompress les lit sans 7-Zip
+         installe sur la borne. -->
+    <PackageReference Include="SharpCompress" Version="0.48.0" />
+  </ItemGroup>
+
+</Project>

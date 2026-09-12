@@ -126,7 +126,9 @@ $autorises = @(
     'resources/scraping/', 'resources/iccards/', 'resources/colors/', 'resources/history/',
     'resources/command/', 'resources/locales/', 'tools/mem-explorer/',
     'RetroBat.Api.exe', 'RetroBat.Api.deps.json', 'RetroBat.Api.runtimeconfig.json',
-    'RetroBat.Api.xml', 'web.config', 'tools/listen_api_ws.README.md'
+    'RetroBat.Api.xml', 'web.config', 'tools/listen_api_ws.README.md',
+    # Le self-updater, a la racine comme l'API (voir src/RetroBat.Api.Update).
+    'RetroBat.Api.Update.exe'
 )
 $suivis = @{}
 Push-Location $PSScriptRoot
@@ -209,7 +211,10 @@ if (Test-Path $asyncapiSource) {
 }
 
 $hashes = Get-FileHash "$out\*.7z" -Algorithm SHA256 | ForEach-Object { '{0}  {1}' -f $_.Hash, (Split-Path $_.Path -Leaf) }
-$hashes | Set-Content (Join-Path $out 'SHA256SUMS.txt') -Encoding ascii
+# Joint a la release : c'est ce que RetroBat.Api.Update.exe lit pour verifier l'archive avant
+# de l'appliquer (les notes en repli). Sans empreinte publiee, l'updater n'applique rien.
+$sumsFile = Join-Path $out 'SHA256SUMS.txt'
+$hashes | Set-Content $sumsFile -Encoding ascii
 Write-Host ($hashes -join "`n")
 
 if ($PackageOnly) { Write-Host 'PackageOnly : archives pretes, pas de release.'; exit 0 }
@@ -221,6 +226,9 @@ Voir le wiki pour l'installation : https://nelfe80.github.io/RetroBat-APIExpose/
 |---|---|
 | ``$name-$ver-full.7z`` | Programme + tools + Data Pack complet (premiere installation) |
 | ``$name-$ver-update.7z`` | Programme seul (mise a jour) |
+| ``SHA256SUMS.txt`` | Empreintes, lues par ``RetroBat.Api.Update.exe`` |
+
+Mise a jour depuis la borne : lancer ``RetroBat.Api.Update.exe`` a la racine d'APIExpose.
 
 ### SHA-256
 ``````
@@ -234,7 +242,7 @@ $ghArgs = @('release', 'create', "v$ver",
     '--repo', 'Nelfe80/RetroBat-APIExpose', '--target', 'main',
     '--title', "APIExpose $ver", '--notes-file', $notesFile)
 if (-not $Publish) { $ghArgs += '--draft' }
-$ghArgs += @($full, $update, $swaggerFile)
+$ghArgs += @($full, $update, $swaggerFile, $sumsFile)
 if ($asyncapiFile) { $ghArgs += $asyncapiFile }
 & gh @ghArgs
 if ($LASTEXITCODE -ne 0) { throw "gh release create a echoue (exit $LASTEXITCODE)." }

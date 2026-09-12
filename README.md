@@ -15,6 +15,10 @@ Installation pas-à-pas, tous les menus et options expliqués, médias, packs de
 
 Vérification : `http://127.0.0.1:12345/api/v1/health` doit répondre `healthy`.
 
+## 🔄 Mise à jour
+
+Lancez **`RetroBat.Api.Update.exe`** à la racine de `RetroBat\plugins\APIExpose\` : il télécharge la dernière version publiée, vérifie son empreinte SHA-256, sauvegarde ce qu'il remplace, relance l'API et remet la sauvegarde si elle ne répond plus. Votre `appsettings.json`, `state\` et `resources\` ne sont jamais touchés. `--check` dit seulement s'il y a une mise à jour, `--yes` applique sans question.
+
 > ⚠️ APIExpose peut modifier gamelists, médias et réglages EmulationStation. **Sauvegardez votre dossier RetroBat** avant la première utilisation.
 
 ## 📄 Licences
@@ -37,6 +41,10 @@ Usage personnel et non commercial libre. Toute utilisation commerciale nécessit
 2. Start RetroBat: APIExpose starts automatically.
 
 Check: `http://127.0.0.1:12345/api/v1/health` should answer `healthy`.
+
+## 🔄 Update
+
+Run **`RetroBat.Api.Update.exe`** from `RetroBat\plugins\APIExpose\`: it downloads the latest published release, verifies its SHA-256, backs up what it replaces, restarts the API and restores the backup if the API stops answering. Your `appsettings.json`, `state\` and `resources\` are never touched. `--check` only reports whether an update exists, `--yes` applies without asking.
 
 > ⚠️ APIExpose can modify gamelists, media and EmulationStation settings. **Back up your RetroBat folder** before first use.
 

@@ -8,6 +8,9 @@ $ErrorActionPreference = "Stop"
 
 $PluginRoot = Split-Path -Parent $PSScriptRoot
 $ProjectPath = Join-Path $PluginRoot "src\RetroBat.Api\RetroBat.Api.csproj"
+# L'updater : un second exe a la racine, publie de la meme facon (single-file, framework-
+# dependent). Il ne depend pas de l'API, il doit pouvoir la remplacer.
+$UpdaterProjectPath = Join-Path $PluginRoot "src\RetroBat.Api.Update\RetroBat.Api.Update.csproj"
 $PropsPath = Join-Path $PluginRoot "Directory.Build.props"
 $ArtifactsRoot = Join-Path $PluginRoot "artifacts\release"
 $TempRoot = Join-Path ([System.IO.Path]::GetTempPath()) "APIExpose-publish"
@@ -46,6 +49,23 @@ dotnet publish $ProjectPath `
     /p:GenerateDocumentationFile=false `
     /p:IncludeNativeLibrariesForSelfExtract=true `
     -o $TempPublish
+
+if (Test-Path -LiteralPath $UpdaterProjectPath) {
+    $TempUpdater = Join-Path $TempRoot ($ReleaseName + "-update")
+    if (Test-Path -LiteralPath $TempUpdater) { cmd.exe /c "rmdir /s /q `"$TempUpdater`"" | Out-Null }
+    dotnet publish $UpdaterProjectPath `
+        -c $Configuration `
+        -r $Runtime `
+        --self-contained false `
+        /p:PublishSingleFile=true `
+        /p:PublishTrimmed=false `
+        /p:DebugType=none `
+        /p:DebugSymbols=false `
+        /p:IncludeNativeLibrariesForSelfExtract=true `
+        -o $TempUpdater
+    # Seul l'exe voyage : ses dependances sont dedans (single-file).
+    Copy-Item -LiteralPath (Join-Path $TempUpdater "RetroBat.Api.Update.exe") -Destination $TempPublish -Force
+}
 
 $PublishedWebConfig = Join-Path $TempPublish "web.config"
 if (Test-Path -LiteralPath $PublishedWebConfig) {

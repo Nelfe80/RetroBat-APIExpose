@@ -81,6 +81,7 @@ logs/
 
 # Root runtime binaries (shipped via GitHub Releases, not source control)
 /RetroBat.Api.exe
+/RetroBat.Api.Update.exe
 /RetroBat.Api.deps.json
 /RetroBat.Api.runtimeconfig.json
 /RetroBat.Api.xml
@@ -104,3 +105,4 @@ panel_curator.ini
 panel_curator_ultimate*
 publish-tmp/
 dist/
+/RetroBat.Api.Update.exe.old
