@@ -726,6 +726,8 @@ public class ApiExposeOptions
         public string RealCoresPath { get; set; } = "../../emulators/retroarch/cores_real";
         public string BackupPath { get; set; } = ".log/wrapper-deployment/backups";
         public string LogFilePath { get; set; } = ".log/wrapper-deployment.jsonl";
+        /// <summary>Ce que l'audit sait de chaque core (taille, date, empreinte) : il ne relit que ce qui a bouge.</summary>
+        public string CachePath { get; set; } = ".log/wrapper-deployment-cache.json";
         public bool WrapAllCores { get; set; } = true;
         public List<string> TargetCores { get; set; } = new();
         public bool SkipIfRetroArchRunning { get; set; } = true;

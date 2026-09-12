@@ -44,6 +44,7 @@ public class RetroArchWrapperDeploymentService
         var realCoresPath = ResolvePluginPath(deploymentOptions.RealCoresPath);
         var backupRoot = ResolvePluginPath(deploymentOptions.BackupPath);
         var logPath = ResolvePluginPath(deploymentOptions.LogFilePath);
+        var cachePath = ResolvePluginPath(deploymentOptions.CachePath);
 
         var result = new RetroArchWrapperDeploymentResult
         {
@@ -57,7 +58,7 @@ public class RetroArchWrapperDeploymentService
         };
 
         result.WrapperExists = File.Exists(wrapperPath);
-        result.WrapperHasSignature = result.WrapperExists && IsWrapperFile(wrapperPath);
+        result.WrapperHasSignature = result.WrapperExists && PorteLaSignature(wrapperPath);
 
         if (!result.WrapperExists)
         {
@@ -91,11 +92,12 @@ public class RetroArchWrapperDeploymentService
         // L'empreinte du build de reference, UNE fois : l'ancienne version la recalculait
         // pour chacun des 157 cores.
         var wrapperReference = new WrapperReference(new FileInfo(wrapperPath));
+        var cache = AuditCache.Charger(cachePath);
         var coreFiles = GetTargetCoreFiles(coresPath, deploymentOptions);
         foreach (var coreFile in coreFiles)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var status = BuildCoreStatus(coreFile, realCoresPath, wrapperReference);
+            var status = BuildCoreStatus(coreFile, realCoresPath, wrapperReference, cache);
             result.Cores.Add(status);
         }
 
@@ -124,8 +126,89 @@ public class RetroArchWrapperDeploymentService
             }
         }
 
+        // Apres les copies : ce qu'on vient d'ecrire est relu au prochain audit (sa date a
+        // change), et le cache ne garde que ce qui existe encore.
+        cache.Enregistrer(cachePath, result.Cores.Select(c => c.CoreName), _logger);
+
         await WriteLogAsync(logPath, result, writeLog, cancellationToken);
         return result;
+    }
+
+    /// <summary>
+    /// Ce que l'audit sait deja de chaque core : sa taille et sa date, et ce qu'on en a conclu
+    /// (wrapper ou pas, empreinte). Un fichier qui n'a pas bouge n'est pas relu. Mesure sur une
+    /// borne : l'audit sans rien a faire passait de 37 s (157 DLL lues deux fois, inspectees par
+    /// l'antivirus a chaque ouverture) a une enumeration.
+    /// </summary>
+    private sealed class AuditCache
+    {
+        public sealed class Entree
+        {
+            public long Length { get; set; }
+            public long LastWriteUtcTicks { get; set; }
+            public bool IsWrapper { get; set; }
+            public string? Md5 { get; set; }
+        }
+
+        private readonly Dictionary<string, Entree> _entrees;
+        private bool _modifie;
+
+        private AuditCache(Dictionary<string, Entree> entrees) => _entrees = entrees;
+
+        public static AuditCache Charger(string path)
+        {
+            try
+            {
+                if (File.Exists(path))
+                {
+                    var lu = JsonSerializer.Deserialize<Dictionary<string, Entree>>(File.ReadAllText(path));
+                    if (lu is not null) return new AuditCache(new Dictionary<string, Entree>(lu, StringComparer.OrdinalIgnoreCase));
+                }
+            }
+            catch
+            {
+                // Un cache illisible vaut un cache absent : on relit tout, une fois.
+            }
+            return new AuditCache(new Dictionary<string, Entree>(StringComparer.OrdinalIgnoreCase));
+        }
+
+        public Entree? Connue(FileInfo file)
+        {
+            return _entrees.TryGetValue(file.Name, out var e)
+                && e.Length == file.Length
+                && e.LastWriteUtcTicks == file.LastWriteTimeUtc.Ticks
+                ? e
+                : null;
+        }
+
+        public void Retenir(FileInfo file, bool isWrapper, byte[]? md5)
+        {
+            _entrees[file.Name] = new Entree
+            {
+                Length = file.Length,
+                LastWriteUtcTicks = file.LastWriteTimeUtc.Ticks,
+                IsWrapper = isWrapper,
+                Md5 = md5 is null ? null : Convert.ToHexString(md5),
+            };
+            _modifie = true;
+        }
+
+        public void Enregistrer(string path, IEnumerable<string> presents, ILogger logger)
+        {
+            var garder = new HashSet<string>(presents, StringComparer.OrdinalIgnoreCase);
+            var disparus = _entrees.Keys.Where(k => !garder.Contains(k)).ToList();
+            foreach (var k in disparus) _entrees.Remove(k);
+            if (!_modifie && disparus.Count == 0) return;
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+                File.WriteAllText(path, JsonSerializer.Serialize(_entrees));
+            }
+            catch (Exception ex)
+            {
+                logger.LogDebug(ex, "RetroArch wrapper audit cache not saved.");
+            }
+        }
     }
 
     private static IEnumerable<FileInfo> GetTargetCoreFiles(
@@ -176,13 +259,42 @@ public class RetroArchWrapperDeploymentService
         public byte[] Md5 { get; }
     }
 
-    private static RetroArchWrapperCoreStatus BuildCoreStatus(FileInfo coreFile, string realCoresPath, WrapperReference wrapperReference)
+    private static RetroArchWrapperCoreStatus BuildCoreStatus(
+        FileInfo coreFile, string realCoresPath, WrapperReference wrapperReference, AuditCache cache)
     {
-        var isWrapper = coreFile.Length <= wrapperReference.MaxWrapperBytes && IsWrapperFile(coreFile.FullName);
+        bool isWrapper;
+        byte[]? md5;
+        var connue = cache.Connue(coreFile);
+        if (connue is not null)
+        {
+            isWrapper = connue.IsWrapper;
+            md5 = connue.Md5 is null ? null : Convert.FromHexString(connue.Md5);
+        }
+        else if (coreFile.Length > wrapperReference.MaxWrapperBytes)
+        {
+            // Trop gros pour etre un wrapper : un vrai core, qu'on ne lit pas.
+            isWrapper = false;
+            md5 = null;
+            cache.Retenir(coreFile, false, null);
+        }
+        else
+        {
+            // UNE lecture : l'empreinte dit deja si c'est le build de reference ; sinon on
+            // cherche la signature dans ce qu'on vient de lire.
+            var contenu = File.ReadAllBytes(coreFile.FullName);
+            md5 = System.Security.Cryptography.MD5.HashData(contenu);
+            isWrapper = md5.AsSpan().SequenceEqual(wrapperReference.Md5)
+                || contenu.AsSpan().IndexOf(WrapperSignature) >= 0;
+            cache.Retenir(coreFile, isWrapper, md5);
+        }
+
         var realCorePath = Path.Combine(realCoresPath, coreFile.Name);
         var realCore = new FileInfo(realCorePath);
         var hasRealCore = realCore.Exists;
-        var needsRefresh = isWrapper && hasRealCore && !SameAsReference(coreFile, wrapperReference);
+        var estLaReference = md5 is not null
+            && coreFile.Length == wrapperReference.File.Length
+            && md5.AsSpan().SequenceEqual(wrapperReference.Md5);
+        var needsRefresh = isWrapper && hasRealCore && !estLaReference;
 
         var reason = isWrapper
             ? needsRefresh
@@ -205,18 +317,6 @@ public class RetroArchWrapperDeploymentService
             RealLastWriteTime = hasRealCore ? realCore.LastWriteTime : null,
             Reason = reason
         };
-    }
-
-    private static bool SameAsReference(FileInfo core, WrapperReference reference)
-    {
-        if (!core.Exists || core.Length != reference.File.Length)
-        {
-            return false;
-        }
-
-        using var md5 = System.Security.Cryptography.MD5.Create();
-        using var stream = core.OpenRead();
-        return md5.ComputeHash(stream).AsSpan().SequenceEqual(reference.Md5);
     }
 
     private static void RefreshCore(
@@ -338,12 +438,12 @@ public class RetroArchWrapperDeploymentService
         }
     }
 
-    private static bool IsWrapperFile(string path)
+    /// <summary>Le build de reference est-il bien un wrapper ? Lu une fois par audit.</summary>
+    private static bool PorteLaSignature(string path)
     {
         try
         {
-            var content = File.ReadAllBytes(path);
-            return content.AsSpan().IndexOf(WrapperSignature) >= 0;
+            return File.ReadAllBytes(path).AsSpan().IndexOf(WrapperSignature) >= 0;
         }
         catch
         {
