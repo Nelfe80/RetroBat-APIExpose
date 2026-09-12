@@ -115,14 +115,23 @@ public sealed class DataPackSyncService : BackgroundService
                 result.Errors.Add("gamelist : " + ex.Message);
                 _logger.LogWarning(ex, "Data Pack : la partie gamelist a echoue.");
             }
+            try
+            {
+                await SyncIccardsAsync(client, opt, state, result, ct);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                result.Errors.Add("iccards : " + ex.Message);
+                _logger.LogWarning(ex, "Data Pack : la partie cartes d'instructions a echoue.");
+            }
 
             state.LastSyncUtc = DateTime.UtcNow;
             SaveState(state);
             result.FinishedUtc = DateTime.UtcNow;
             Dernier = result;
             _logger.LogInformation(
-                "Data Pack : {Updated} fichier(s) mis a jour, {Added} ajoute(s), {Unchanged} inchange(s), {Systems} base(s) reprise(s) - {Repo}@{Sha}{Errors}.",
-                result.Updated, result.Added, result.Unchanged, result.SystemsUpdated, opt.Repository,
+                "Data Pack : {Updated} fichier(s) mis a jour, {Added} ajoute(s), {Unchanged} inchange(s), {Systems} base(s) reprise(s), {Cards} carte(s) posee(s) - {Repo}@{Sha}{Errors}.",
+                result.Updated, result.Added, result.Unchanged, result.SystemsUpdated, result.IccardsAdded + result.IccardsReplaced, opt.Repository,
                 Short(state.LastTreeSha ?? ""), result.Errors.Count == 0 ? "" : $", {result.Errors.Count} erreur(s)");
             return result;
         }
@@ -400,6 +409,167 @@ public sealed class DataPackSyncService : BackgroundService
         }
     }
 
+    // ── Les cartes d'instructions : la release « iccards » ────────────────────
+
+    /// <summary>
+    /// Le pack de cartes d'instructions (un zip de 887 cartes et leurs compagnons de placement)
+    /// s'installe dans media/systems/arcade/games/&lt;rom&gt;/artwork/ic/. Repris quand
+    /// l'empreinte publiee change, et pose avec la regle de install-iccards.bat, en mieux : une
+    /// carte ABSENTE est ajoutee ; une carte que le pack precedent avait posee et que personne
+    /// n'a touchee est remplacee ; une carte que le joueur a faite ou modifiee reste la sienne.
+    /// On sait laquelle est laquelle par l'empreinte du pack precedent (l'etat, ou a defaut le
+    /// zip encore present dans resources/iccards).
+    /// </summary>
+    private async Task SyncIccardsAsync(HttpClient client, DataPackOptions opt, SyncState state, DataPackSyncResult result, CancellationToken ct)
+    {
+        var repo = opt.Repository.Trim();
+        var tag = opt.IccardsReleaseTag.Trim();
+        if (repo.Length == 0 || tag.Length == 0) return;
+        var baseUrl = $"https://github.com/{repo}/releases/download/{Uri.EscapeDataString(tag)}/";
+
+        string manifeste;
+        try { manifeste = await client.GetStringAsync(baseUrl + "iccards-manifest.json", ct); }
+        catch (HttpRequestException ex)
+        {
+            result.Errors.Add("manifeste iccards : " + ex.Message);
+            return;
+        }
+        using var doc = JsonDocument.Parse(manifeste);
+        var r = doc.RootElement;
+        var sha = r.TryGetProperty("sha256", out var h) ? (h.GetString() ?? "").ToLowerInvariant() : "";
+        var asset = r.TryGetProperty("asset", out var a) ? a.GetString() ?? "" : "";
+        var version = r.TryGetProperty("version", out var v) ? v.GetString() ?? "" : "";
+        if (sha.Length != 64 || asset.Length == 0 || asset.Contains('/') || asset.Contains('\\') || asset.Contains("..")) return;
+        if (string.Equals(state.Iccards.Sha, sha, StringComparison.Ordinal))
+        {
+            result.IccardsUnchanged = true;
+            return;
+        }
+
+        var dossierPack = Path.Combine(RetroBatPaths.PluginRoot, "resources", "iccards");
+        var zipLocal = Path.Combine(dossierPack, "iccards-arcade.zip");
+        var racineMedia = Path.Combine(RetroBatPaths.MediaRoot, "systems", "arcade", "games");
+
+        // Ce que le pack PRECEDENT avait pose : l'etat, ou a defaut le zip encore la.
+        var ancien = new Dictionary<string, string>(state.Iccards.Files, StringComparer.OrdinalIgnoreCase);
+        if (ancien.Count == 0 && File.Exists(zipLocal))
+        {
+            try
+            {
+                using var vieux = ZipFile.OpenRead(zipLocal);
+                foreach (var e in vieux.Entries)
+                {
+                    if (e.FullName.EndsWith('/') || e.Length == 0 && e.Name.Length == 0) continue;
+                    await using var s = e.Open();
+                    ancien[e.FullName.Replace('\\', '/')] = Convert.ToHexString(await SHA256.HashDataAsync(s, ct)).ToLowerInvariant();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Data Pack : l'ancien pack de cartes est illisible, on ne remplacera rien d'existant.");
+                ancien.Clear();
+            }
+        }
+
+        Directory.CreateDirectory(TempRoot);
+        var archive = Path.Combine(TempRoot, asset);
+        // Le zip publie est peut-etre deja la (pose par l'installeur) : on ne le retelecharge pas,
+        // on ne fait que verifier ce qu'il a installe.
+        var dejaLa = File.Exists(zipLocal) && string.Equals(await Sha256Async(zipLocal, ct), sha, StringComparison.Ordinal);
+        if (dejaLa) archive = zipLocal;
+        _logger.LogInformation("Data Pack : pack de cartes d'instructions {Version} a {Action} ({Sha}).", version, dejaLa ? "verifier" : "reprendre", sha[..8]);
+        try
+        {
+            if (!dejaLa)
+            {
+                await TelechargerAsync(client, baseUrl + Uri.EscapeDataString(asset), archive, ct);
+                if (!string.Equals(await Sha256Async(archive, ct), sha, StringComparison.Ordinal))
+                {
+                    result.Errors.Add("iccards : empreinte du zip differente du manifeste, ignore");
+                    return;
+                }
+            }
+
+            var poses = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            int ajoutes = 0, remplaces = 0, gardes = 0, inchanges = 0;
+            using (var zip = ZipFile.OpenRead(archive))
+            {
+                foreach (var e in zip.Entries)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    var rel = e.FullName.Replace('\\', '/');
+                    if (rel.EndsWith('/') || e.Name.Length == 0) continue;
+                    if (!DataPackPaths.CheminRelatifSur(rel)) { result.Errors.Add($"iccards : chemin refuse {rel}"); continue; }
+
+                    string empreinte;
+                    await using (var s = e.Open())
+                    {
+                        empreinte = Convert.ToHexString(await SHA256.HashDataAsync(s, ct)).ToLowerInvariant();
+                    }
+                    poses[rel] = empreinte;
+
+                    var cible = Path.Combine(racineMedia, rel.Replace('/', Path.DirectorySeparatorChar));
+                    if (File.Exists(cible))
+                    {
+                        var locale = await Sha256Async(cible, ct);
+                        if (string.Equals(locale, empreinte, StringComparison.Ordinal)) { inchanges++; continue; }
+                        // Posee par l'ancien pack et jamais touchee : on remplace. Sinon c'est la sienne.
+                        if (!ancien.TryGetValue(rel, out var precedente) || !string.Equals(precedente, locale, StringComparison.Ordinal))
+                        {
+                            gardes++;
+                            continue;
+                        }
+                        remplaces++;
+                    }
+                    else
+                    {
+                        ajoutes++;
+                    }
+                    Directory.CreateDirectory(Path.GetDirectoryName(cible)!);
+                    var tmp = cible + ".datapack.tmp";
+                    await using (var s = e.Open())
+                    await using (var f = File.Create(tmp))
+                    {
+                        await s.CopyToAsync(f, ct);
+                    }
+                    File.Move(tmp, cible, overwrite: true);
+                }
+            }
+
+            // Le pack et son manifeste restent dans resources/iccards : install-iccards.bat et
+            // l'installeur y comptent, et c'est lui qui dira, la prochaine fois, ce qui etait a lui.
+            Directory.CreateDirectory(dossierPack);
+            if (!dejaLa) File.Move(archive, zipLocal, overwrite: true);
+            try
+            {
+                var localManifest = new Dictionary<string, object?>
+                {
+                    ["pack"] = "instruction-cards-arcade",
+                    ["version"] = version,
+                    ["source"] = r.TryGetProperty("source", out var src) ? src.GetString() : null,
+                    ["jeux"] = r.TryGetProperty("jeux", out var j) && j.TryGetInt32(out var nj) ? nj : (int?) null,
+                    ["cartes"] = r.TryGetProperty("cartes", out var c) && c.TryGetInt32(out var nc) ? nc : (int?) null,
+                    ["cible"] = "media/systems/arcade/games/<rom>/artwork/ic/<role>/",
+                };
+                await File.WriteAllTextAsync(Path.Combine(dossierPack, "manifest.json"),
+                    JsonSerializer.Serialize(localManifest, new JsonSerializerOptions { WriteIndented = true }), ct);
+            }
+            catch (Exception ex) { _logger.LogDebug(ex, "Data Pack : manifeste local des cartes non ecrit."); }
+
+            state.Iccards = new IccardsState { Sha = sha, Version = version, Files = poses };
+            result.IccardsAdded = ajoutes;
+            result.IccardsReplaced = remplaces;
+            result.IccardsKept = gardes;
+            _logger.LogInformation(
+                "Data Pack : cartes d'instructions {Version} : {Added} ajoutee(s), {Replaced} remplacee(s), {Kept} gardee(s) (les votres), {Same} deja a jour.",
+                version, ajoutes, remplaces, gardes, inchanges);
+        }
+        finally
+        {
+            try { if (!dejaLa && File.Exists(archive)) File.Delete(archive); } catch { }
+        }
+    }
+
     // ── Outils ────────────────────────────────────────────────────────────────
 
     private static async Task EcrireAtomiqueAsync(string cible, byte[] octets, CancellationToken ct)
@@ -482,6 +652,15 @@ public sealed class DataPackSyncService : BackgroundService
         public Dictionary<string, FileState> Files { get; set; } = new(StringComparer.Ordinal);
         /// <summary>Les bases par systeme : chemin -> sha256 applique, taille et date locales.</summary>
         public Dictionary<string, FileState> Systems { get; set; } = new(StringComparer.Ordinal);
+        /// <summary>Le pack de cartes d'instructions applique, et ce qu'il a pose (pour savoir quoi remplacer la prochaine fois).</summary>
+        public IccardsState Iccards { get; set; } = new();
+    }
+
+    private sealed class IccardsState
+    {
+        public string Sha { get; set; } = "";
+        public string Version { get; set; } = "";
+        public Dictionary<string, string> Files { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     }
 
     private sealed class FileState
@@ -513,6 +692,10 @@ public sealed class DataPackSyncResult
     public int Updated { get; set; }
     public int Unchanged { get; set; }
     public int SystemsUpdated { get; set; }
+    public bool IccardsUnchanged { get; set; }
+    public int IccardsAdded { get; set; }
+    public int IccardsReplaced { get; set; }
+    public int IccardsKept { get; set; }
     public List<string> Errors { get; } = new();
 }
 
@@ -534,6 +717,17 @@ public static class DataPackPaths
             if (s.Length == 0 || s == "." || s == ".." || s.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0) return false;
         }
         return dossiers.Contains(segments[0]);
+    }
+
+    /// <summary>Un chemin d'archive admis : relatif, sans remontee, sans caractere interdit.</summary>
+    public static bool CheminRelatifSur(string rel)
+    {
+        if (string.IsNullOrEmpty(rel) || rel.Length > 400 || rel.StartsWith('/') || Path.IsPathRooted(rel)) return false;
+        foreach (var s in rel.Split('/'))
+        {
+            if (s.Length == 0 || s == "." || s == ".." || s.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0) return false;
+        }
+        return true;
     }
 
     public static string Local(string path)

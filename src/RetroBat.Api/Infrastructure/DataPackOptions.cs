@@ -22,6 +22,12 @@ public class DataPackOptions
     /// </summary>
     public string GamelistReleaseTag { get; set; } = "gamelist";
 
+    /// <summary>
+    /// La release du meme depot qui porte le pack de cartes d'instructions (un zip de 887
+    /// cartes, une unite) et son manifeste d'empreinte.
+    /// </summary>
+    public string IccardsReleaseTag { get; set; } = "iccards";
+
     /// <summary>Intervalle entre deux synchronisations, en heures.</summary>
     public int IntervalHours { get; set; } = 24;
 

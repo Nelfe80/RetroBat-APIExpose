@@ -46,4 +46,16 @@ public class DataPackSyncTests
     [InlineData("", false)]
     public void Seuls_les_chemins_sous_un_dossier_autorise_passent(string chemin, bool attendu)
         => Assert.Equal(attendu, DataPackPaths.Autorise(chemin, Dossiers));
+
+    // Les entrees du zip des cartes : elles vont sous media/, il ne faut pas qu'elles en sortent.
+    [Theory]
+    [InlineData("1943/artwork/ic/ic-2.png", true)]
+    [InlineData("1943/artwork/ic/ic-2.json", true)]
+    [InlineData("../RetroBat.Api.exe", false)]
+    [InlineData("1943/../../x.png", false)]
+    [InlineData("/1943/ic.png", false)]
+    [InlineData("C:/x.png", false)]
+    [InlineData("", false)]
+    public void Une_entree_du_pack_de_cartes_reste_sous_sa_racine(string rel, bool attendu)
+        => Assert.Equal(attendu, DataPackPaths.CheminRelatifSur(rel));
 }
