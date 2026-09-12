@@ -167,6 +167,29 @@ public sealed class SocialEventTests
     }
 
     [Fact]
+    public void Sur_sa_propre_borne_seule_la_derniere_seance_s_affiche()
+    {
+        // En regardant a nouveau, le spectateur refait ses cinq : c'est la regle de la plateforme
+        // et des autres bornes. Le journal local garde tout (il se remonte), mais l'affichage
+        // n'en montre que la derniere seance, sinon cette borne verrait l'ancien lot ET le nouveau.
+        var locales = new List<ReplayReaction>
+        {
+            new("rp_test_r9", "wow", 2, 1030, 1_000, "fr", false, "Nelfe80", "jeton", SessionSeq: 100),
+            new("rp_test_r9", "tension", 1, 1446, 2_000, "fr", false, "Nelfe80", "jeton", SessionSeq: 100),
+            new("rp_test_r9", "laugh", 1, 400, 3_000, "fr", false, "Nelfe80", "jeton", SessionSeq: 200),
+        };
+
+        var derniere = ReplaySocialStore.DerniereSeance(locales);
+
+        var seule = Assert.Single(derniere);
+        Assert.Equal(400, seule.Frame);
+        // Sans seance (journaux anterieurs a la notion), tout reste.
+        var sans = locales.Select(r => r with { SessionSeq = 0 }).ToList();
+        Assert.Equal(3, ReplaySocialStore.DerniereSeance(sans).Count);
+        Assert.Empty(ReplaySocialStore.DerniereSeance(Array.Empty<ReplayReaction>()));
+    }
+
+    [Fact]
     public void Une_forme_invalide_est_refusee_avant_toute_crypto()
     {
         var corps = (JsonObject)Vecteur.Events[0].Body.DeepClone();

@@ -140,7 +140,22 @@ public sealed class ReplaySocialStore
     /// ce qui ne coûte rien ; compter la même réaction deux fois, si.
     /// </summary>
     public IReadOnlyList<ReplayReaction> Display(string replayId, IReadOnlyList<ReplayReaction> locales)
-        => Fusionner(locales, Converged(replayId));
+        => Fusionner(DerniereSeance(locales), Converged(replayId));
+
+    /// <summary>
+    /// La derniere seance de visionnage de CETTE borne, seulement.
+    ///
+    /// Le journal local est append-only et garde toutes les seances (c'est ce qui se remonte).
+    /// Mais a l'affichage, la regle est celle de la plateforme et des autres bornes : en
+    /// regardant a nouveau, le spectateur refait ses cinq, et le nouveau lot remplace l'ancien.
+    /// Sans ce filtre, sa propre borne lui montrait l'ancien ET le nouveau, seule au monde.
+    /// </summary>
+    public static IReadOnlyList<ReplayReaction> DerniereSeance(IReadOnlyList<ReplayReaction> locales)
+    {
+        if (locales.Count == 0) return locales;
+        var derniere = locales.Max(r => r.SessionSeq);
+        return locales.Where(r => r.SessionSeq == derniere).ToList();
+    }
 
     /// <summary>Meme raison : la regle de fusion se verifie sans disque ni reseau.</summary>
     public static IReadOnlyList<ReplayReaction> Fusionner(
