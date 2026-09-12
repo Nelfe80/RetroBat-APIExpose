@@ -14,8 +14,8 @@ namespace RetroBat.Api.Replay.Input;
 /// PAS pour éviter tout télescopage avec ses hotkeys) :
 ///   ▲ haut          = lecture / pause
 ///   ▼ bas           = retour au DÉBUT du run
-///   ◀ gauche  tap   = checkpoint PRÉCÉDENT      | tenu = recul rapide  (seek -5 s répété)
-///   ▶ droite  tap   = checkpoint SUIVANT        | tenu = avance rapide (seek +5 s répété)
+///   ◀ gauche  tap   = checkpoint PRÉCÉDENT      | tenu = recul rapide, dont le pas GRANDIT
+///   ▶ droite  tap   = checkpoint SUIVANT        | tenu = avance rapide, dont le pas GRANDIT
 ///   START (tenu)    = quitter la lecture
 ///   START (deux appuis rapides) = barre pleine / barre reduite a un filet
 /// Les 8 boutons de façade restent LIBRES pour les réactions.
@@ -28,8 +28,34 @@ public sealed class ReplayInputRouterService : IHostedService
     private const int QuitHoldMs = 700;
     private const int DoubleTapMs = 450;         // deux appuis brefs sur START a moins de ca = bascule de la barre
     private const int TapMaxMs = 300;            // ≤ 300 ms = TAP (checkpoint) ; au-delà = MAINTIEN (seek)
-    private const double FastSeekStepSeconds = 5;
     private const int FastSeekRepeatMs = 350;
+
+    /// <summary>
+    /// Le pas d'une direction MAINTENUE grandit avec la durée de l'appui : cinq secondes pour
+    /// retrouver un instant tout proche, quarante-cinq pour traverser un run d'une heure sans
+    /// s'user le pouce. Un pas fixe imposait de choisir entre les deux.
+    ///
+    /// Il grandit par PALIERS et non continûment : à chaque saut on voit où on en est, alors
+    /// qu'une accélération lisse donne une course qu'on ne sait plus arrêter au bon endroit.
+    /// </summary>
+    internal static readonly (int ApresMs, double Pas)[] PaliersDeSeek =
+    {
+        (0, 5),
+        (1500, 10),
+        (4000, 20),
+        (8000, 45),
+    };
+
+    /// <summary>Le pas à appliquer après <paramref name="tenuMs"/> de maintien.</summary>
+    internal static double PasDeSeek(long tenuMs)
+    {
+        var pas = PaliersDeSeek[0].Pas;
+        foreach (var (apres, valeur) in PaliersDeSeek)
+        {
+            if (tenuMs >= apres) pas = valeur;
+        }
+        return pas;
+    }
 
     private readonly IEventBus _bus;
     private readonly ReplayPlaybackService _playback;
@@ -106,8 +132,8 @@ public sealed class ReplayInputRouterService : IHostedService
         {
             case "up": Fire("pause", _playback.PauseToggleAsync); break;
             case "down": Fire("restart-run", _playback.RestartRunAsync); break;
-            case "left": BeginDirection("left", -FastSeekStepSeconds); break;
-            case "right": BeginDirection("right", +FastSeekStepSeconds); break;
+            case "left": BeginDirection("left", -1); break;
+            case "right": BeginDirection("right", +1); break;
         }
     }
 
@@ -118,7 +144,7 @@ public sealed class ReplayInputRouterService : IHostedService
 
     // ◀ / ▶ : on ARME au down. Si la direction est encore tenue après TapMaxMs, c'est un maintien
     // → seek répété. Sinon le relâché tombe avant, et EndDirection en fait un checkpoint.
-    private void BeginDirection(string dir, double stepSeconds)
+    private void BeginDirection(string dir, int sens)
     {
         DirectionHold hold;
         lock (_gate)
@@ -135,10 +161,20 @@ public sealed class ReplayInputRouterService : IHostedService
             {
                 await Task.Delay(TapMaxMs, ct).ConfigureAwait(false); // toujours tenu → maintien
                 lock (_gate) hold.Repeating = true;
-                _logger.LogDebug("Replay : {Dir} maintenu → seek répété {Step}s", dir, stepSeconds);
+                _logger.LogDebug("Replay : {Dir} maintenu → seek répété, pas croissant", dir);
+                // Le maintien se compte depuis l'ARMEMENT, pas depuis la première répétition :
+                // c'est la durée que le pouce a réellement passée sur la direction.
+                var depuis = Environment.TickCount64 - TapMaxMs;
+                var dernierPas = 0d;
                 while (!ct.IsCancellationRequested && _playback.IsBusy)
                 {
-                    await _playback.SeekRelativeAsync(stepSeconds, ct).ConfigureAwait(false);
+                    var pas = PasDeSeek(Environment.TickCount64 - depuis);
+                    if (pas != dernierPas)
+                    {
+                        dernierPas = pas;
+                        _logger.LogDebug("Replay : {Dir} maintenu → pas de {Pas} s", dir, pas);
+                    }
+                    await _playback.SeekRelativeAsync(sens * pas, ct).ConfigureAwait(false);
                     await Task.Delay(FastSeekRepeatMs, ct).ConfigureAwait(false);
                 }
             }
