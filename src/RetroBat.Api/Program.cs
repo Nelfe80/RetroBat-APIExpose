@@ -207,6 +207,11 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infra
 // Canal RAM communautaire : pull périodique des .MEM publiés sur RetroBat-RAM-Community
 // vers le dossier RAM local (lecture seule, n'écrase pas l'officiel). Réglages : ApiExpose:CommunityRam.
 builder.Services.AddHostedService<RetroBat.Api.Infrastructure.CommunityRamSyncService>();
+// Data Pack OFFICIEL : pull fichier par fichier du depot RetroBat-DataPack (ram, dynpanels,
+// gamelist, controls, ...) et des bases par systeme de sa release « gamelist ». Ecrase
+// l'officiel, n'efface jamais. Singleton aussi : la maintenance le declenche a la demande.
+builder.Services.AddSingleton<RetroBat.Api.Infrastructure.DataPackSyncService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.DataPackSyncService>());
 // Releve d'audience : ce qui est joue et combien de temps, jamais par qui.
 //
 // L'interrupteur est reel : une mesure qu'on ne peut pas eteindre n'est pas une

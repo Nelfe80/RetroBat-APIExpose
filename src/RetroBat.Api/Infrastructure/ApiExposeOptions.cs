@@ -38,6 +38,7 @@ public class ApiExposeOptions
     public TaxonomyOptions Taxonomy { get; set; } = new();
     public RetroAchievementsOptions RetroAchievements { get; set; } = new();
     public CommunityRamOptions CommunityRam { get; set; } = new();
+    public DataPackOptions DataPack { get; set; } = new();
 
     public class TestModeOptions
     {

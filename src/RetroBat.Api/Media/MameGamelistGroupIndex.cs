@@ -22,6 +22,16 @@ public class MameGamelistGroupIndex
         _groupsByRomByFile = new ConcurrentDictionary<string, Lazy<SystemGroupLookup>>(StringComparer.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Un fichier de base vient d'etre remplace (Data Pack) : l'index en memoire ne dit plus la
+    /// verite, on le lache ; la prochaine fiche le reconstruit, et le cache binaire, date sur
+    /// la source, se refait de lui-meme.
+    /// </summary>
+    public void Oublier(string jsonlFile)
+    {
+        _groupsByRomByFile.TryRemove(jsonlFile, out _);
+    }
+
     public IReadOnlyList<string> GetRelatedRoms(string systemId, string gamePath, string? gameSlug = null)
     {
         return GetRelatedRomEntries(systemId, gamePath, gameSlug)

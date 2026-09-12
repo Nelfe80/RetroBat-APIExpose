@@ -12,15 +12,37 @@ public class MaintenanceController : ControllerBase
     private readonly InstallerDeploymentService _installerDeploymentService;
     private readonly RetroArchWrapperDeploymentService _wrapperDeploymentService;
     private readonly EmulationStationWatcherProvider _emulationStationWatcherProvider;
+    private readonly DataPackSyncService _dataPack;
 
     public MaintenanceController(
         InstallerDeploymentService installerDeploymentService,
         RetroArchWrapperDeploymentService wrapperDeploymentService,
-        EmulationStationWatcherProvider emulationStationWatcherProvider)
+        EmulationStationWatcherProvider emulationStationWatcherProvider,
+        DataPackSyncService dataPack)
     {
         _installerDeploymentService = installerDeploymentService;
         _wrapperDeploymentService = wrapperDeploymentService;
         _emulationStationWatcherProvider = emulationStationWatcherProvider;
+        _dataPack = dataPack;
+    }
+
+    /// <summary>Le bilan de la derniere synchronisation du Data Pack officiel.</summary>
+    [HttpGet("datapack/status")]
+    public ActionResult<object> DataPackStatus()
+    {
+        return Ok(new { last = _dataPack.Dernier });
+    }
+
+    /// <summary>
+    /// Synchronise le Data Pack officiel maintenant (fichier par fichier depuis le depot,
+    /// bases par systeme depuis la release). C'est ce que RetroBat.Api.Update.exe appelle
+    /// apres avoir mis le programme a jour.
+    /// </summary>
+    [HttpPost("datapack/sync")]
+    public async Task<ActionResult<DataPackSyncResult>> DataPackSync(CancellationToken cancellationToken)
+    {
+        var result = await _dataPack.SyncNowAsync(cancellationToken);
+        return Ok(result);
     }
 
     /// <summary>Audits the installer deployment without writing anything.</summary>

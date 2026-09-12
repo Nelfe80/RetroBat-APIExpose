@@ -17,6 +17,13 @@ namespace RetroBat.Api.Update;
 ///   RetroBat.Api.Update.exe --force           reapplique meme si la version est deja la
 ///   RetroBat.Api.Update.exe --root D:\...     le dossier APIExpose (defaut : celui de cet exe)
 ///   RetroBat.Api.Update.exe --archive X.7z --sha256 HEX   applique une archive locale (test, borne hors ligne)
+///   RetroBat.Api.Update.exe --no-data         le programme seul, sans le Data Pack
+///   RetroBat.Api.Update.exe --data-only       le Data Pack seul (l'API doit tourner)
+///
+/// Le DATA PACK (.MEM, dynpanels, gamelists, controles...) ne voyage pas dans l'archive du
+/// programme : l'API le tire fichier par fichier depuis le depot RetroBat-DataPack. Dans la
+/// foulee d'une mise a jour, cet exe lui demande une synchronisation immediate et rapporte ce
+/// qu'elle a repris.
 ///
 /// Ce qu'il fait, dans l'ordre : lit la version installee sur RetroBat.Api.exe, demande a GitHub
 /// la derniere release, telecharge `APIExpose-X.Y.Z-update.7z`, VERIFIE son SHA-256 contre ce que
@@ -49,11 +56,16 @@ internal static class Program
         var options = Options.Lire(args);
         if (options is null)
         {
-            Console.Error.WriteLine("Usage : RetroBat.Api.Update.exe [--check] [--yes] [--force] [--root <dossier>] [--archive <7z> --sha256 <hex>] [--port <n>]");
+            Console.Error.WriteLine("Usage : RetroBat.Api.Update.exe [--check] [--yes] [--force] [--no-data | --data-only] [--root <dossier>] [--archive <7z> --sha256 <hex>] [--port <n>]");
             return 2;
         }
 
         var racine = options.Root ?? AppContext.BaseDirectory.TrimEnd('\\', '/');
+        if (options.DataOnly)
+        {
+            _journal = Path.Combine(racine, ".log", "update.log");
+            return await SynchroniserDataPackAsync(new HttpClient(), options.Port).ConfigureAwait(false) ? 0 : 2;
+        }
         var exeApi = Path.Combine(racine, ExeApi);
         if (!File.Exists(exeApi))
         {
@@ -137,12 +149,12 @@ internal static class Program
             }
         }
 
-        return await AppliquerAsync(http, racine, archive, release, installee, options.Port).ConfigureAwait(false);
+        return await AppliquerAsync(http, racine, archive, release, installee, options.Port, options.NoData).ConfigureAwait(false);
     }
 
     // ── Appliquer ────────────────────────────────────────────────────────────
 
-    private static async Task<int> AppliquerAsync(HttpClient http, string racine, string archive, Release release, Version? installee, int port)
+    private static async Task<int> AppliquerAsync(HttpClient http, string racine, string archive, Release release, Version? installee, int port, bool sansData)
     {
         var travail = Path.Combine(racine, ".temp", "update");
         var scene = Path.Combine(travail, "stage-" + release.Version);
@@ -236,6 +248,14 @@ internal static class Program
         try { Directory.Delete(scene, recursive: true); } catch { }
         try { if (archive.StartsWith(travail, StringComparison.OrdinalIgnoreCase)) File.Delete(archive); } catch { }
         Dire($"Mise a jour {installee} -> {release.Version} terminee.");
+        if (!sansData && tournait)
+        {
+            await SynchroniserDataPackAsync(http, port).ConfigureAwait(false);
+        }
+        else if (!sansData)
+        {
+            Dire("Data Pack : l'API ne tourne pas, elle synchronisera au prochain demarrage.");
+        }
         return 0;
     }
 
@@ -271,6 +291,40 @@ internal static class Program
         catch (Exception ex)
         {
             Dire("Sauvegarde impossible a remettre : " + ex.Message);
+            return false;
+        }
+    }
+
+    // ── Le Data Pack : par l'API, qui sait le faire ──────────────────────────
+
+    /// <summary>
+    /// Demande a l'API une synchronisation immediate du Data Pack et rapporte le bilan. C'est
+    /// elle qui a la logique (arbre du depot, empreintes, release gamelist) : la refaire ici
+    /// serait la faire deux fois.
+    /// </summary>
+    private static async Task<bool> SynchroniserDataPackAsync(HttpClient http, int port)
+    {
+        Dire("Data Pack : synchronisation…");
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(30));
+            using var r = await http.PostAsync($"http://127.0.0.1:{port}/api/v1/maintenance/datapack/sync", new StringContent(""), cts.Token).ConfigureAwait(false);
+            var corps = await r.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
+            if (!r.IsSuccessStatusCode)
+            {
+                Dire($"Data Pack : l'API repond {(int) r.StatusCode}.");
+                return false;
+            }
+            using var doc = JsonDocument.Parse(corps);
+            var e = doc.RootElement;
+            int Lire(string nom) => e.TryGetProperty(nom, out var v) && v.TryGetInt32(out var n) ? n : 0;
+            var erreurs = e.TryGetProperty("errors", out var le) && le.ValueKind == JsonValueKind.Array ? le.GetArrayLength() : 0;
+            Dire($"Data Pack : {Lire("updated")} mis a jour, {Lire("added")} ajoute(s), {Lire("systemsUpdated")} base(s) reprise(s), {Lire("unchanged")} inchange(s){(erreurs > 0 ? $", {erreurs} erreur(s)" : "")}.");
+            return erreurs == 0;
+        }
+        catch (Exception ex)
+        {
+            Dire("Data Pack : " + ex.Message);
             return false;
         }
     }
@@ -463,11 +517,11 @@ internal static class Program
     }
 }
 
-internal sealed record Options(bool Check, bool Yes, bool Force, string? Root, string? Archive, string? Sha256, int Port)
+internal sealed record Options(bool Check, bool Yes, bool Force, string? Root, string? Archive, string? Sha256, int Port, bool NoData, bool DataOnly)
 {
     public static Options? Lire(string[] args)
     {
-        bool check = false, yes = false, force = false;
+        bool check = false, yes = false, force = false, noData = false, dataOnly = false;
         string? root = null, archive = null, sha = null;
         var port = 12345;
         for (var i = 0; i < args.Length; i++)
@@ -477,6 +531,8 @@ internal sealed record Options(bool Check, bool Yes, bool Force, string? Root, s
                 case "--check": check = true; break;
                 case "--yes": case "-y": yes = true; break;
                 case "--force": force = true; break;
+                case "--no-data": noData = true; break;
+                case "--data-only": dataOnly = true; break;
                 case "--root": if (++i >= args.Length) return null; root = Path.GetFullPath(args[i]); break;
                 case "--archive": if (++i >= args.Length) return null; archive = Path.GetFullPath(args[i]); break;
                 case "--sha256": if (++i >= args.Length) return null; sha = args[i].Trim().ToLowerInvariant(); break;
@@ -485,7 +541,8 @@ internal sealed record Options(bool Check, bool Yes, bool Force, string? Root, s
             }
         }
         if (archive is not null && (sha is null || !Regex.IsMatch(sha, "^[0-9a-f]{64}$"))) return null;
-        return new Options(check, yes, force, root, archive, sha, port);
+        if (noData && dataOnly) return null;
+        return new Options(check, yes, force, root, archive, sha, port, noData, dataOnly);
     }
 }
 
