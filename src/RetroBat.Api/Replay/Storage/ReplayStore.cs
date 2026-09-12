@@ -180,6 +180,43 @@ public sealed class ReplayStore : IReplayManifestStore, IReplayObjectStore, IRep
         lock (_reactLock) File.AppendAllText(ReactionsPath(r.ReplayId), line + "\n");
     }
 
+    /// <summary>Les replays qui ont un journal de reactions ici, remontees ou non.</summary>
+    public IReadOnlyList<string> ReplaysWithReactions()
+    {
+        if (!Directory.Exists(_reactions)) return Array.Empty<string>();
+        return Directory.EnumerateFiles(_reactions, "*.jsonl")
+            .Select(f => Path.GetFileNameWithoutExtension(f))
+            .Where(id => !string.IsNullOrWhiteSpace(id))
+            .ToList();
+    }
+
+    // Les groupes (jeton de spectateur, seance) deja remontes a la plateforme : une ligne par
+    // groupe, a cote du journal. Le journal, lui, reste append-only et rejouable.
+    private string ReactionsSentPath(string replayId) => Path.Combine(_reactions, replayId + ".sent");
+
+    public IReadOnlySet<string> ReadReactionsSent(string replayId)
+    {
+        var path = ReactionsSentPath(replayId);
+        var set = new HashSet<string>(StringComparer.Ordinal);
+        if (!File.Exists(path)) return set;
+        try
+        {
+            foreach (var l in File.ReadAllLines(path))
+            {
+                if (!string.IsNullOrWhiteSpace(l)) set.Add(l.Trim());
+            }
+        }
+        catch (Exception ex) { _logger.LogWarning(ex, "Replay : marques de remontee illisibles {Path}", path); }
+        return set;
+    }
+
+    public void MarkReactionsSent(string replayId, string groupKey)
+    {
+        lock (_reactLock) File.AppendAllText(ReactionsSentPath(replayId), groupKey + "\n");
+    }
+
+    public static string ReactionGroupKey(string viewerToken, long sessionSeq) => viewerToken + "|" + sessionSeq;
+
     public IReadOnlyList<ReplayReaction> ReadReactions(string replayId)
     {
         var path = ReactionsPath(replayId);

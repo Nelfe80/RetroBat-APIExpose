@@ -48,6 +48,14 @@ public sealed class ReplayReactionUploader : BackgroundService
     {
         try { _bus.Subscribe<EventEnvelope>(OnBusEvent); } catch (Exception ex) { _logger.LogDebug(ex, "Replay : abonnement au bus impossible."); }
 
+        // Au demarrage, tout ce qui attend : des reactions faites avant un arret de l'API, ou
+        // avant que la fin de lecture ne porte l'identifiant du replay, ne doivent pas rester ici.
+        try
+        {
+            foreach (var replayId in _store.ReplaysWithReactions()) _aRemonter.Enqueue(replayId);
+        }
+        catch (Exception ex) { _logger.LogDebug(ex, "Replay : balayage des reactions en attente impossible."); }
+
         while (!stoppingToken.IsCancellationRequested)
         {
             while (_aRemonter.TryDequeue(out var replayId))
@@ -74,9 +82,13 @@ public sealed class ReplayReactionUploader : BackgroundService
         // pour le cas, rare mais possible, d'un replay regardé par deux personnes à la suite.
         // Groupé par spectateur ET par séance : chaque séance est un lot que la plateforme
         // pourra supplanter, jamais fusionner avec le précédent.
+        // Seulement ce qui n'est pas encore parti : la plateforme sait ignorer un doublon, mais
+        // renvoyer tout l'historique a chaque fin de lecture serait du trafic pour rien.
+        var dejaParties = _store.ReadReactionsSent(replayId);
         var parJeton = _store.ReadReactions(replayId)
             .Where(r => !string.IsNullOrWhiteSpace(r.ViewerToken))
             .GroupBy(r => (Token: r.ViewerToken!, Seq: r.SessionSeq))
+            .Where(g => !dejaParties.Contains(ReplayStore.ReactionGroupKey(g.Key.Token, g.Key.Seq)))
             .ToList();
 
         if (parJeton.Count == 0) return new UploadResult(false, 0, "no_identified_reaction");
@@ -113,6 +125,9 @@ public sealed class ReplayReactionUploader : BackgroundService
                     _logger.LogInformation("Replay : réactions refusées ({Code}) pour {ReplayId}.", (int)response.StatusCode, replayId);
                     continue;
                 }
+                // Acceptees ou ecartees par le budget, elles sont chez la plateforme : on ne les
+                // renverra plus. Un refus HTTP, lui, laisse le groupe pour la prochaine fois.
+                _store.MarkReactionsSent(replayId, ReplayStore.ReactionGroupKey(groupe.Key.Token, groupe.Key.Seq));
                 total += groupe.Count();
             }
             catch (Exception ex)

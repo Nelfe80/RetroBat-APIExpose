@@ -307,16 +307,19 @@ public sealed class ReplayPlaybackService
     public async Task StopAsync(CancellationToken ct)
     {
         Process? proc;
+        string? replayId;
         lock (_gate)
         {
             if (_state is ReplayPlaybackState.Idle) return;
-            _state = ReplayPlaybackState.Stopping; proc = _process;
+            _state = ReplayPlaybackState.Stopping; proc = _process; replayId = _replayId;
         }
         _monitorCts?.Cancel();
         await _ra.HaltAsync(ct).ConfigureAwait(false);
         try { if (proc is { HasExited: false }) proc.Kill(entireProcessTree: true); } catch { }
         lock (_gate) { _process = null; _replayId = null; _state = ReplayPlaybackState.Idle; _frame = 0; _card = null; }
-        await Publish("replay.finished", new { reason = "user" }).ConfigureAwait(false);
+        // AVEC l'identifiant : la remontee des reactions et le flux social le lisent dans cet
+        // evenement. Sans lui, aucune reaction ne quittait jamais la borne.
+        await Publish("replay.finished", new { replayId, reason = "user" }).ConfigureAwait(false);
     }
 
     // ── commandes de contrôle (appelées par le routeur panel R3 ou l'API) ──
@@ -445,14 +448,15 @@ public sealed class ReplayPlaybackService
     private void Finish(string reason)
     {
         Process? proc;
+        string? replayId;
         lock (_gate)
         {
             if (_state is ReplayPlaybackState.Idle) return;
-            proc = _process; _process = null; _state = ReplayPlaybackState.Finished; _paused = false;
+            proc = _process; _process = null; _state = ReplayPlaybackState.Finished; _paused = false; replayId = _replayId;
         }
         try { if (proc is { HasExited: false }) proc.Kill(entireProcessTree: true); } catch { }
         _logger.LogInformation("Replay : lecture terminée ({Reason}).", reason);
-        _ = Publish("replay.finished", new { reason });
+        _ = Publish("replay.finished", new { replayId, reason });
         lock (_gate) { if (_state is ReplayPlaybackState.Finished) { _state = ReplayPlaybackState.Idle; _replayId = null; _frame = 0; _card = null; } }
     }
 
