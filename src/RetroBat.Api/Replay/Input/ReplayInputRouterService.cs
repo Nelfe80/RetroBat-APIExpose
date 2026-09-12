@@ -17,6 +17,7 @@ namespace RetroBat.Api.Replay.Input;
 ///   ◀ gauche  tap   = checkpoint PRÉCÉDENT      | tenu = recul rapide  (seek -5 s répété)
 ///   ▶ droite  tap   = checkpoint SUIVANT        | tenu = avance rapide (seek +5 s répété)
 ///   START (tenu)    = quitter la lecture
+///   START (deux appuis rapides) = barre pleine / barre reduite a un filet
 /// Les 8 boutons de façade restent LIBRES pour les réactions.
 ///
 /// Les directions arrivent via le canal additif du watcher (System=DPAD, identités
@@ -25,6 +26,7 @@ namespace RetroBat.Api.Replay.Input;
 public sealed class ReplayInputRouterService : IHostedService
 {
     private const int QuitHoldMs = 700;
+    private const int DoubleTapMs = 450;         // deux appuis brefs sur START a moins de ca = bascule de la barre
     private const int TapMaxMs = 300;            // ≤ 300 ms = TAP (checkpoint) ; au-delà = MAINTIEN (seek)
     private const double FastSeekStepSeconds = 5;
     private const int FastSeekRepeatMs = 350;
@@ -45,6 +47,7 @@ public sealed class ReplayInputRouterService : IHostedService
     private readonly Dictionary<string, DirectionHold> _held = new(StringComparer.Ordinal);
     private IDisposable? _sub;
     private DateTime? _startDownAt;
+    private DateTime _dernierTapStart = DateTime.MinValue;
 
     public ReplayInputRouterService(IEventBus bus, ReplayPlaybackService playback,
         ILogger<ReplayInputRouterService> logger)
@@ -73,7 +76,18 @@ public sealed class ReplayInputRouterService : IHostedService
             else if (_startDownAt is DateTime t)
             {
                 _startDownAt = null;
-                if ((DateTime.UtcNow - t).TotalMilliseconds >= QuitHoldMs) Fire("quit", _playback.StopAsync);
+                var tenu = (DateTime.UtcNow - t).TotalMilliseconds;
+                if (tenu >= QuitHoldMs) { Fire("quit", _playback.StopAsync); return; }
+                // Un appui bref : le second, s'il suit de pres, bascule la barre. Le choix du
+                // spectateur, pas un minuteur.
+                var maintenant = DateTime.UtcNow;
+                if ((maintenant - _dernierTapStart).TotalMilliseconds <= DoubleTapMs)
+                {
+                    _dernierTapStart = DateTime.MinValue;
+                    RetroBat.Api.Replay.Overlay.ReplayOverlayService.BasculerReduite();
+                    _logger.LogDebug("Replay contrôle panel : barre {Mode}", RetroBat.Api.Replay.Overlay.ReplayOverlayService.ReduiteVoulue ? "réduite" : "pleine");
+                }
+                else _dernierTapStart = maintenant;
             }
             return;
         }

@@ -168,7 +168,9 @@ public sealed class ReplayReactionHudService : BackgroundService
         // On n'utilise QU'UN design (ses 3 colonnes = les 3 niveaux). 0 = gauche, 3 = lapin.
         private const int DesignBase = 0;
 
-        private const int BarHeight = 118;    // la barre d'info occupe le bas ; on pose la jauge au-dessus
+        // La barre d'info occupe le bas, et sa hauteur CHANGE (pleine, ou reduite a un filet) :
+        // on lit la sienne plutot que d'en supposer une.
+        private static int BarHeight => ReplayOverlayService.HauteurCourante;
         private const int ActiveTickMs = 40;  // 25 fps : uniquement pendant une animation (nuée/jauge/bulle)
         private const int IdleTickMs = 500;   // 2 fps : repos et lecture-sans-réaction (rien à animer)
         private const int PartLifeMs = 620;   // vie COURTE d'un sprite du tunnel (vagues répétées = dynamique)
@@ -222,6 +224,8 @@ public sealed class ReplayReactionHudService : BackgroundService
         // plateforme au meme moment) : tant qu'il manque, on le relit toutes les deux secondes.
         private bool _cameoResumeCharge;
         private long _cameoProchainEssai;
+        private readonly HashSet<long> _bullesJouees = new();
+        private long _bulleDerniereFrame = -1;
         private readonly Action<string> _plancheUtilisee;
         private readonly Dictionary<string, Planche> _planches = new(StringComparer.Ordinal);
         private readonly Dictionary<string, long> _planchesAbsentes = new(StringComparer.Ordinal);
@@ -393,6 +397,8 @@ public sealed class ReplayReactionHudService : BackgroundService
                 _bMarkers = Array.Empty<ReactionMarker>();
                 _bMarkersLoaded = false;
                 _activeBubble = null;
+                _bullesJouees.Clear();
+                _bulleDerniereFrame = -1;
             }
             var end = st.ReplayEndFrame ?? 0;
             // Latch : UNE seule lecture disque (ReadReactions JSONL) par replay — même si 0 réaction
@@ -407,15 +413,32 @@ public sealed class ReplayReactionHudService : BackgroundService
 
             var now = NowMs();
             var frame = st.Frame;
-            var window = Math.Max(1, end / 48);
-            ReactionMarker? near = null; var bestD = long.MaxValue;
-            foreach (var m in _bMarkers) { var d = Math.Abs(m.Frame - frame); if (d < window && d < bestD) { bestD = d; near = m; } }
+            var fps = st.NominalFps <= 0 ? 60 : st.NominalFps;
 
-            if (near is ReactionMarker nm &&
-                (_activeBubble is not ReactionMarker ab || (ab.Frame != nm.Frame && now - _bubbleShownMs > MinBubbleMs)))
+            // Une carte se montre UNE fois, quand la lecture PASSE la reaction. Avant : elle partait
+            // 3,5 s avant la reaction, vivait 2,6 s, et repartait tant que le marqueur restait
+            // « proche », donc trois ou quatre fois pour une seule reaction. Un retour en arriere
+            // dans la lecture remet en jeu ce qui est apres la frame.
+            if (frame < _bulleDerniereFrame - (long) (2 * fps)) _bullesJouees.RemoveWhere(f => f >= frame);
+            _bulleDerniereFrame = frame;
+            var fenetre = Math.Max(1L, (long) (1.5 * fps));
+            ReactionMarker? near = null;
+            foreach (var m in _bMarkers)
             {
-                // FIXE la bulle sur la frame du marqueur (elle ne bouge plus une fois affichée = lisible).
-                _activeBubble = nm; _bubbleShownMs = now; _bubbleFrame = nm.Frame;
+                if (frame < m.Frame || frame - m.Frame >= fenetre || _bullesJouees.Contains(m.Frame)) continue;
+                if (near is null || m.Frame < near.Value.Frame) near = m;
+            }
+
+            if (near is ReactionMarker nm)
+            {
+                _bullesJouees.Add(nm.Frame);
+                // Le personnage du performer vient dire cette reaction lui-meme : pas de carte en plus.
+                if (!_cameo.ADesCameoPres(nm.Frame, (long) (2 * fps))
+                    && (_activeBubble is null || now - _bubbleShownMs > MinBubbleMs))
+                {
+                    // FIXE la bulle sur la frame du marqueur (elle ne bouge plus une fois affichée = lisible).
+                    _activeBubble = nm; _bubbleShownMs = now; _bubbleFrame = nm.Frame;
+                }
             }
             if (_activeBubble is not null && now - _bubbleShownMs > BubbleLifeMs) _activeBubble = null;
 
@@ -659,6 +682,38 @@ public sealed class ReplayReactionHudService : BackgroundService
             {
                 using var gris = new SolidBrush(Color.FromArgb(a, 170, 180, 200));
                 g.DrawString(rang, rangF, gris, tx, ey + 8f);
+            }
+
+            // La BULLE : il dit le mot de sa reaction, comme s'il parlait, du saut jusqu'a la sortie.
+            // Elle nait d'un coup au depart du saut (un petit pop), du cote oppose a l'etiquette.
+            if (e.Phase is ReplayCameoModel.Phase.Saut or ReplayCameoModel.Phase.Repos or ReplayCameoModel.Phase.Sortie)
+            {
+                var (_, mot) = ReplayReactionText.Resolve(e.Cameo.Reaction, e.Cameo.Niveau, _locale());
+                if (mot.Length > 0)
+                {
+                    var pop = e.Vol < 0f ? 1f : Math.Clamp(e.Vol * ReplayCameoModel.VolMs / 150f, 0f, 1f);
+                    var echelle = 0.6f + 0.4f * pop;
+                    var ab = (int) (255 * alpha * pop);
+                    using var motF = new Font("Segoe UI", 17f * echelle, FontStyle.Bold, GraphicsUnit.Pixel);
+                    var mesure = g.MeasureString(mot, motF);
+                    var bw = mesure.Width + 22f * echelle;
+                    var bh = mesure.Height + 12f * echelle;
+                    var aDroite = ex >= x + taille;   // l'etiquette est a droite : la bulle va a gauche
+                    var bx = aDroite ? x - bw - 6f : x + taille + 6f;
+                    bx = Math.Clamp(bx, 6f, _region.Width - bw - 6f);
+                    var by = haut - bh - 4f;
+                    using (var fond = new SolidBrush(Color.FromArgb(ab, 250, 250, 255)))
+                        FillRounded(g, fond, bx, by, bw, bh, 10f);
+                    var couleur = ReplayReactionText.ColorOf(e.Cameo.Reaction);
+                    using (var bord = new Pen(Color.FromArgb(ab, couleur), 2f))
+                        g.DrawPath(bord, CheminArrondi(bx, by, bw, bh, 10f));
+                    // La queue, vers la tete.
+                    var qx = aDroite ? bx + bw - 10f : bx + 10f;
+                    using (var queue = new SolidBrush(Color.FromArgb(ab, 250, 250, 255)))
+                        g.FillPolygon(queue, new[] { new PointF(qx - 7f, by + bh - 1f), new PointF(qx + 7f, by + bh - 1f), new PointF(aDroite ? qx + 10f : qx - 10f, by + bh + 9f) });
+                    using (var encre = new SolidBrush(Color.FromArgb(ab, 18, 22, 40)))
+                        g.DrawString(mot, motF, encre, bx + 11f * echelle, by + 6f * echelle);
+                }
             }
 
             // L'emoji : il part du dessus de la tete, monte, grossit, et s'efface sur la fin.
@@ -1054,6 +1109,18 @@ public sealed class ReplayReactionHudService : BackgroundService
             using (var mat = new Matrix()) { mat.Translate(cx - bnd.X - bnd.Width / 2f, cy - bnd.Y - bnd.Height / 2f); path.Transform(mat); }
             using (var outline = new Pen(Color.FromArgb(235, 6, 12, 22), 5f) { LineJoin = LineJoin.Round }) g.DrawPath(outline, path);
             using (var fill = new SolidBrush(color)) g.FillPath(fill, path);
+        }
+
+        private static GraphicsPath CheminArrondi(float x, float y, float w, float h, float r)
+        {
+            var d = r * 2f;
+            var chemin = new GraphicsPath();
+            chemin.AddArc(x, y, d, d, 180, 90);
+            chemin.AddArc(x + w - d, y, d, d, 270, 90);
+            chemin.AddArc(x + w - d, y + h - d, d, d, 0, 90);
+            chemin.AddArc(x, y + h - d, d, d, 90, 90);
+            chemin.CloseFigure();
+            return chemin;
         }
 
         private static void FillRounded(Graphics g, Brush b, float x, float y, float w, float h, float r)

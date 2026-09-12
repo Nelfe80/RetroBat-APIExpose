@@ -68,6 +68,11 @@ public sealed class ReplayCameoModel
 
     public bool EnScene => _courant is not null;
 
+    /// <summary>Un cameo est-il prevu a cette frame, a la tolerance pres ? La petite carte de
+    /// reaction n'a rien a dire quand le personnage vient le dire lui-meme.</summary>
+    public bool ADesCameoPres(long frame, long tolerance)
+        => _cameos.Any(c => Math.Abs(c.Frame - frame) <= tolerance);
+
     /// <summary>
     /// L'etat a dessiner maintenant, ou null. `frame` est la frame affichee (interpolee par
     /// l'appelant), `paused` dit si elle avance.

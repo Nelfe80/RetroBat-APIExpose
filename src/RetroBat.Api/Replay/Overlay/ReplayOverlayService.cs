@@ -44,6 +44,21 @@ public sealed class ReplayOverlayService : BackgroundService
 
     private readonly RetroBat.Api.Replay.Social.SocialIssuerPin _pin;
 
+    /// <summary>
+    /// La barre est PLEINE (piste, temps, aides du panel, carte du record) ou REDUITE a un filet
+    /// (piste, chaleur, curseur, marqueurs), au CHOIX du spectateur : un double appui sur START
+    /// pendant la lecture bascule, et le choix tient jusqu'au prochain double appui (pas de
+    /// minuteur qui deciderait a sa place). Le HUD lit la hauteur courante pour poser ses bulles
+    /// et ses cameos.
+    /// </summary>
+    public const int HauteurPleine = 118;
+    public const int HauteurReduite = 24;
+    public static volatile int HauteurCourante = HauteurPleine;
+    public static volatile bool ReduiteVoulue;
+
+    /// <summary>Le double appui sur START : on bascule. Appelable de tout fil.</summary>
+    public static void BasculerReduite() => ReduiteVoulue = !ReduiteVoulue;
+
     private RetroBat.Api.Replay.Social.SocialSummary? LireResume(string replayId)
     {
         var epingle = _pin.Current;
@@ -122,7 +137,8 @@ public sealed class ReplayOverlayService : BackgroundService
     // ─────────────────────────────────────────────────────────────────────────────────────────
     private sealed class ReplayOverlayForm : Form
     {
-        private const int BarHeight = 118;
+        private const int BarHeight = HauteurPleine;
+        private bool _reduite;
         private const int SidePadding = 30;
         private const int TrackTop = 16;
         private const int TrackHeight = 8;
@@ -186,7 +202,7 @@ public sealed class ReplayOverlayService : BackgroundService
             Opacity = 0d;
             Size = new Size(800, BarHeight); // recalculé à l'affichage
 
-            _surface = new OverlaySurface(() => _snapshot, () => _curve, () => _markers, () => _displayFrame, _sprites) { Dock = DockStyle.Fill };
+            _surface = new OverlaySurface(() => _snapshot, () => _curve, () => _markers, () => _displayFrame, _sprites, () => _reduite) { Dock = DockStyle.Fill };
             Controls.Add(_surface);
 
             _timer = new System.Windows.Forms.Timer { Interval = 250 }; // ~4 fps : la barre est layered
@@ -310,6 +326,14 @@ public sealed class ReplayOverlayService : BackgroundService
             var active = string.Equals(_snapshot.Mode, "replay", StringComparison.Ordinal);
             if (active)
             {
+                var reduite = ReduiteVoulue;
+                if (reduite != _reduite)
+                {
+                    _reduite = reduite;
+                    HauteurCourante = reduite ? HauteurReduite : HauteurPleine;
+                    if (Visible) PlacerBarre();
+                }
+
                 _inactiveSince = null;
                 if (!Visible || Opacity <= 0d) ShowOverlay();
                 else ForceTopmostNoActivate(); // ré-affirme le premier plan à chaque tick (150 ms)
@@ -324,12 +348,23 @@ public sealed class ReplayOverlayService : BackgroundService
             }
         }
 
+        private void PlacerBarre()
+        {
+            var (screen, _) = ResolveGameScreenWithSource();
+            var area = screen?.Bounds ?? Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080);
+            var hauteur = _reduite ? HauteurReduite : HauteurPleine;
+            Size = new Size(area.Width, hauteur);
+            Location = new Point(area.Left, area.Bottom - hauteur);
+        }
+
         private void ShowOverlay()
         {
+            _reduite = ReduiteVoulue;
+            HauteurCourante = _reduite ? HauteurReduite : HauteurPleine;
             var (screen, src) = ResolveGameScreenWithSource();
             var area = screen?.Bounds ?? Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080);
-            Size = new Size(area.Width, BarHeight);
-            Location = new Point(area.Left, area.Bottom - BarHeight);
+            Size = new Size(area.Width, HauteurCourante);
+            Location = new Point(area.Left, area.Bottom - HauteurCourante);
             Opacity = 0.9d;
             if (!Visible) Show();
             ForceTopmostNoActivate();
@@ -416,12 +451,15 @@ public sealed class ReplayOverlayService : BackgroundService
             private readonly Func<ReplayPlaybackService.StateSnapshot> _get;
             private readonly Func<float[]?> _curve;
             private readonly Func<IReadOnlyList<ReactionMarker>> _markers;
+            private readonly Func<bool> _reduite;
             private readonly Func<long> _displayFrame;
             private readonly ReplayReactionSprites _sprites;
 
             public OverlaySurface(Func<ReplayPlaybackService.StateSnapshot> get, Func<float[]?> curve,
-                Func<IReadOnlyList<ReactionMarker>> markers, Func<long> displayFrame, ReplayReactionSprites sprites)
+                Func<IReadOnlyList<ReactionMarker>> markers, Func<long> displayFrame, ReplayReactionSprites sprites,
+                Func<bool>? reduite = null)
             {
+                _reduite = reduite ?? (() => false);
                 _get = get;
                 _curve = curve;
                 _markers = markers;
@@ -443,21 +481,29 @@ public sealed class ReplayOverlayService : BackgroundService
                 // liseré supérieur accent
                 using (var top = new Pen(AccentColor, 2f)) g.DrawLine(top, 0, 0, Width, 0);
 
+                if (_reduite())
+                {
+                    // Le filet : la piste, la chaleur, le curseur, les marqueurs. Rien qui se lise.
+                    DrawTimeline(g, s, 12, 5, 11f, 10f);
+                    return;
+                }
                 DrawTimeline(g, s);
                 DrawStateAndHints(g, s);
                 if (s.Card is not null) DrawRecordCard(g, s.Card);
             }
 
             private void DrawTimeline(Graphics g, ReplayPlaybackService.StateSnapshot s)
+                => DrawTimeline(g, s, TrackTop, TrackHeight, 20f, 13f);
+
+            private void DrawTimeline(Graphics g, ReplayPlaybackService.StateSnapshot s, int y, int hauteurPiste, float tailleMarqueur, float hauteurCourbe)
             {
                 var left = SidePadding;
                 var right = Width - SidePadding;
                 var w = Math.Max(1, right - left);
-                var y = TrackTop;
 
                 // piste
                 using (var track = new SolidBrush(TrackColor))
-                    FillRounded(g, track, new Rectangle(left, y, w, TrackHeight), TrackHeight / 2);
+                    FillRounded(g, track, new Rectangle(left, y, w, hauteurPiste), hauteurPiste / 2);
 
                 var end = s.ReplayEndFrame ?? 0;
                 if (end <= 0) return;
@@ -466,14 +512,14 @@ public sealed class ReplayOverlayService : BackgroundService
                 int X(long f) => left + (int)Math.Round(w * Norm(f));
 
                 // courbe de réactions (aire au-dessus de la piste)
-                DrawReactionCurve(g, left, w, y);
+                DrawReactionCurve(g, left, w, y, hauteurCourbe);
 
                 // segment de RUN (la partie « officielle » du replay)
                 if (s.RunStartFrame is long rs && s.RunEndFrame is long re && re > rs)
                 {
                     var x0 = X(rs); var x1 = X(re);
                     using var run = new SolidBrush(RunColor);
-                    FillRounded(g, run, new Rectangle(x0, y, Math.Max(2, x1 - x0), TrackHeight), TrackHeight / 2);
+                    FillRounded(g, run, new Rectangle(x0, y, Math.Max(2, x1 - x0), hauteurPiste), hauteurPiste / 2);
                 }
 
                 // ticks de checkpoint (intervalle 5 s — cf. replay_checkpoint_interval)
@@ -485,32 +531,31 @@ public sealed class ReplayOverlayService : BackgroundService
                     for (var f = stepFrames; f < end; f += stepFrames)
                     {
                         var x = X(f);
-                        g.DrawLine(tick, x, y - 2, x, y + TrackHeight + 2);
+                        g.DrawLine(tick, x, y - 2, x, y + hauteurPiste + 2);
                     }
                 }
 
                 // marqueurs de réactions majoritaires (petites icônes sur la timeline)
                 if (_sprites.Ok)
                 {
-                    var mmid = y + TrackHeight / 2;
+                    var mmid = y + hauteurPiste / 2;
                     foreach (var m in _markers())
-                        _sprites.Draw(g, m.Family, Math.Clamp(m.Level - 1, 0, 2), X(m.Frame), mmid, 20f, 1f);
+                        _sprites.Draw(g, m.Family, Math.Clamp(m.Level - 1, 0, 2), X(m.Frame), mmid, tailleMarqueur, 1f);
                 }
 
                 // curseur de lecture (position INTERPOLÉE pour un mouvement fluide)
                 var cx = X(Math.Clamp(_displayFrame(), 0, end));
                 using (var cur = new Pen(CursorColor, 2.5f))
-                    g.DrawLine(cur, cx, y - 5, cx, y + TrackHeight + 5);
+                    g.DrawLine(cur, cx, y - 5, cx, y + hauteurPiste + 5);
                 using (var knob = new SolidBrush(CursorColor))
-                    g.FillEllipse(knob, cx - 4, y + (TrackHeight / 2) - 4, 8, 8);
+                    g.FillEllipse(knob, cx - 4, y + (hauteurPiste / 2) - 4, 8, 8);
             }
 
             // Aire d'intensité des réactions, au-dessus de la piste (les données sont normalisées 0-1).
-            private void DrawReactionCurve(Graphics g, int left, int w, int trackTop)
+            private void DrawReactionCurve(Graphics g, int left, int w, int trackTop, float H = 13f)
             {
                 var curve = _curve();
                 if (curve is null || curve.Length < 2) return;
-                const float H = 13f;
                 var baseY = trackTop - 2f;
                 var pts = new PointF[curve.Length + 2];
                 pts[0] = new PointF(left, baseY);
