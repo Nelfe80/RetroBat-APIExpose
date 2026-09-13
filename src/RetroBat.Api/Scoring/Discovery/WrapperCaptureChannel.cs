@@ -139,7 +139,9 @@ public sealed class WrapperCaptureChannel : IEmulatorCaptureChannel, IAsyncDispo
         {
             try
             {
-                await _waitForWrapper.ConfigureAwait(false);
+                // Bornée pour la même raison que côté vérificateur : l'arrêt de la borne ne
+                // dépend pas d'une attente engagée sur un tuyau qu'on vient de fermer.
+                await Task.WhenAny(_waitForWrapper, Task.Delay(TimeSpan.FromSeconds(2))).ConfigureAwait(false);
             }
             catch
             {
