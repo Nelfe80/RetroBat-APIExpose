@@ -43,6 +43,7 @@ public class ApiExposeOptions
     public NelfePlayOptions NelfePlay { get; set; } = new();
     public DataPackOptions DataPack { get; set; } = new();
     public SelfUpdateOptions SelfUpdate { get; set; } = new();
+    public LeaderboardOptions Leaderboard { get; set; } = new();
 
     public class TestModeOptions
     {
@@ -714,6 +715,24 @@ public class ApiExposeOptions
         public bool SendF5AfterEsApiReady { get; set; } = true;
         public int F5AfterEsApiReadyDelayMilliseconds { get; set; } = 5000;
         public int F5AfterEsApiReadyHoldMilliseconds { get; set; } = 80;
+    }
+
+    /// <summary>
+    /// Le panneau de classement pose a gauche du menu de jeu d'EmulationStation
+    /// (voir <see cref="Leaderboard.LeaderboardInputService"/>).
+    /// Section de configuration : <c>ApiExpose:Leaderboard</c>.
+    /// </summary>
+    public class LeaderboardOptions
+    {
+        /// <summary>Ouvrir le panneau sur un appui long du bouton valider. Vrai par defaut.</summary>
+        public bool Enabled { get; set; } = true;
+
+        /// <summary>
+        /// Le seuil d'ouverture. Il doit rester SOUS celui d'EmulationStation pour que les deux
+        /// paraissent ensemble, et assez haut pour qu'un appui ordinaire (lancer le jeu) ne
+        /// l'atteigne jamais.
+        /// </summary>
+        public int LongPressMs { get; set; } = 600;
     }
 
     /// <summary>

@@ -210,6 +210,12 @@ builder.Services.AddHostedService<RetroBat.Api.Infrastructure.CommunityRamSyncSe
 // Data Pack OFFICIEL : pull fichier par fichier du depot RetroBat-DataPack (ram, dynpanels,
 // gamelist, controls, ...) et des bases par systeme de sa release « gamelist ». Ecrase
 // l'officiel, n'efface jamais. Singleton aussi : la maintenance le declenche a la demande.
+// Le panneau de classement, a gauche du menu de jeu d'EmulationStation. Il lit la charte du
+// theme actif et les glyphes de boutons d'ES : il ne les imite pas.
+builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardClient>();
+builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardOverlayService>();
+builder.Services.AddHostedService<RetroBat.Api.Leaderboard.LeaderboardInputService>();
+
 // La borne prend la derniere version publiee au lancement, quand rien ne tourne.
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.SelfUpdateService>();
 builder.Services.AddHostedService<RetroBat.Api.Infrastructure.SelfUpdateHostedService>();
