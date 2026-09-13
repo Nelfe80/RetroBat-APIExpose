@@ -200,6 +200,74 @@ public class DiscoveryTrackerTests
         Assert.False(evidence.IsCredible);
     }
 
+    // ── Quand la valeur n'est pas ecrite en chiffres ──────────────────────────
+
+    [Fact]
+    public void Une_valeur_jamais_vue_en_chiffres_fait_abandonner_la_partie()
+    {
+        // Vies en icones, energie en jauge, niveau en carte : aucune image ne contiendra
+        // jamais ce nombre. Zero candidat repete ne veut pas dire « mal reconnu », cela veut
+        // dire qu'aucune suite de chiffres de cette forme n'existe dans l'image.
+        var tracker = Tracker();
+        for (var i = 0; i < 6; i++)
+        {
+            tracker.Record(3, new VerificationOutcome(false, 0, 0, 0, Version));
+        }
+
+        Assert.True(tracker.LikelyNotShownAsDigits);
+        var evidence = tracker.Summarise();
+        Assert.True(evidence.LikelyNotShownAsDigits);
+        Assert.False(evidence.IsCredible);
+        Assert.Contains("pas affichee en chiffres", evidence.Verdict);
+    }
+
+    [Fact]
+    public void Quelques_images_sans_candidat_ne_suffisent_pas_a_conclure()
+    {
+        // Une transition d'ecran, un fondu, un score masque un instant : cela arrive.
+        var tracker = Tracker();
+        for (var i = 0; i < 5; i++)
+        {
+            tracker.Record(1200, new VerificationOutcome(false, 0, 0, 0, Version));
+        }
+
+        Assert.False(tracker.LikelyNotShownAsDigits);
+    }
+
+    [Fact]
+    public void Un_seul_candidat_retrouve_remet_le_compteur_a_zero()
+    {
+        // Le score etait cache derriere une animation, puis il revient : ce n'est pas un jeu
+        // qui n'affiche pas son score.
+        var tracker = Tracker();
+        for (var i = 0; i < 5; i++)
+        {
+            tracker.Record(1200, new VerificationOutcome(false, 0, 0, 0, Version));
+        }
+
+        tracker.Record(1200, new VerificationOutcome(false, 0, 0, 2, Version));
+
+        for (var i = 0; i < 5; i++)
+        {
+            tracker.Record(1200, new VerificationOutcome(false, 0, 0, 0, Version));
+        }
+
+        Assert.False(tracker.LikelyNotShownAsDigits);
+    }
+
+    [Fact]
+    public void Un_score_bien_reconnu_n_est_jamais_pris_pour_un_affichage_non_numerique()
+    {
+        var tracker = Tracker();
+        tracker.Record(1200, Good());
+        tracker.Record(4500, Good());
+        tracker.Record(40000, Good());
+
+        var evidence = tracker.Summarise();
+        Assert.False(evidence.LikelyNotShownAsDigits);
+        Assert.True(evidence.IsCredible);
+    }
+
     [Fact]
     public void Le_resume_ne_porte_aucune_image_et_passe_le_schema_d_enveloppe()
     {

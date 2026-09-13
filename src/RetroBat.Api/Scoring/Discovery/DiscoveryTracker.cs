@@ -21,6 +21,7 @@ public sealed record DiscoverySessionEvidence(
     double MinConfidence,
     double MeanRegionStability,
     int MaxCandidateCount,
+    bool LikelyNotShownAsDigits,
     string VerifierVersion,
     bool IsCredible,
     string Verdict);
@@ -54,6 +55,7 @@ public sealed class DiscoveryTracker
     private double _stabilitySum;
     private int _stabilitySamples;
     private int _maxCandidates;
+    private int _consecutiveWithoutCandidate;
     private string _verifierVersion = string.Empty;
 
     public DiscoveryTracker(ScoringDiscoveryOptions options)
@@ -68,6 +70,15 @@ public sealed class DiscoveryTracker
     public int DistinctValuesMatched => _distinctMatched.Count;
 
     /// <summary>
+    /// Assez de tentatives d'affilee sans le moindre candidat pour conclure que cette valeur
+    /// n'est pas affichee en chiffres : des vies en icones, une energie en jauge, un niveau
+    /// en carte. Continuer a capturer depenserait des images pour rien, et le coordinateur
+    /// desarme la partie sur ce signal. Le constat vaut d'etre remonte : il dit qu'il ne
+    /// s'est rien passe, et pourquoi.
+    /// </summary>
+    public bool LikelyNotShownAsDigits => _consecutiveWithoutCandidate >= _options.NoCandidateAttemptsBeforeGivingUp;
+
+    /// <summary>
     /// Une image a été examinée pour la valeur <paramref name="expectedValue"/>.
     ///
     /// Une reconnaissance ne compte que si elle tient les deux seuils. Une reconnaissance
@@ -78,6 +89,18 @@ public sealed class DiscoveryTracker
     {
         _attempts++;
         _maxCandidates = Math.Max(_maxCandidates, outcome.CandidateCount);
+
+        // Zero candidat ne veut pas dire « pas reconnu » : cela veut dire qu'aucune suite de
+        // chiffres de cette forme n'existe nulle part dans l'image. Repete, c'est le signe que
+        // la valeur n'est pas ecrite en chiffres du tout.
+        if (outcome.CandidateCount == 0)
+        {
+            _consecutiveWithoutCandidate++;
+        }
+        else
+        {
+            _consecutiveWithoutCandidate = 0;
+        }
         if (!string.IsNullOrEmpty(outcome.VerifierVersion))
         {
             _verifierVersion = outcome.VerifierVersion;
@@ -116,7 +139,9 @@ public sealed class DiscoveryTracker
             ? "aucune tentative"
             : credible
                 ? $"{_distinctMatched.Count} valeurs distinctes au meme endroit"
-                : $"{_distinctMatched.Count} valeur(s) distincte(s), il en faut {_options.MinDistinctValues}";
+                : LikelyNotShownAsDigits
+                    ? $"valeur probablement pas affichee en chiffres ({_consecutiveWithoutCandidate} tentatives sans candidat)"
+                    : $"{_distinctMatched.Count} valeur(s) distincte(s), il en faut {_options.MinDistinctValues}";
 
         return new DiscoverySessionEvidence(
             _attempts,
@@ -126,6 +151,7 @@ public sealed class DiscoveryTracker
             Math.Round(minConfidence, 4),
             Math.Round(meanStability, 4),
             _maxCandidates,
+            LikelyNotShownAsDigits,
             _verifierVersion,
             credible,
             verdict);
@@ -142,6 +168,7 @@ public sealed class DiscoveryTracker
         _stabilitySum = 0;
         _stabilitySamples = 0;
         _maxCandidates = 0;
+        _consecutiveWithoutCandidate = 0;
         _verifierVersion = string.Empty;
     }
 }

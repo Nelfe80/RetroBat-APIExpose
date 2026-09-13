@@ -77,4 +77,15 @@ public sealed class ScoringDiscoveryOptions
     /// pourrait coïncider avec n'importe quel compteur.
     /// </summary>
     public int MinDistinctValues { get; set; } = 3;
+
+    /// <summary>
+    /// Tentatives consécutives sans le moindre candidat au bout desquelles on cesse d'armer
+    /// pour cette partie : la valeur n'est probablement pas affichée en chiffres.
+    ///
+    /// Beaucoup de jeux montrent les vies par des icônes, l'énergie par une jauge, le niveau
+    /// par une carte. Aucune image ne contiendra jamais ces nombres, et continuer à capturer
+    /// ne ferait que dépenser des images pour rien. Deux rafales complètes suffisent à le
+    /// constater, et le constat est lui-même une information de qualification.
+    /// </summary>
+    public int NoCandidateAttemptsBeforeGivingUp { get; set; } = 6;
 }
