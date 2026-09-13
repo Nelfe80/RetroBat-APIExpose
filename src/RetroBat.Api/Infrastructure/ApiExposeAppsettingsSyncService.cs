@@ -157,7 +157,10 @@ public sealed class ApiExposeAppsettingsSyncService
             ["global.apiexpose.toast_notifications.enabled"] = Bool("Toasts", "Enabled"),
             ["global.apiexpose.api_notifications.enabled"] = Bool("ApiNotifications", "Enabled"),
             ["global.apiexpose.task_progress.enabled"] = Bool("TaskProgress", "Enabled"),
-            ["global.apiexpose.community_ram.prefer_perso"] = Bool("CommunityRam", "PreferPerso")
+            ["global.apiexpose.community_ram.prefer_perso"] = Bool("CommunityRam", "PreferPerso"),
+            // Decouverte silencieuse du scoring : l'interrupteur du joueur, allume par defaut,
+            // eteignable depuis le menu d'EmulationStation comme depuis appsettings.
+            ["global.apiexpose.nelfeplay.scoring_discovery"] = Bool("NelfePlay", "ScoringDiscovery", "Enabled")
         };
 
     private readonly ILogger<ApiExposeAppsettingsSyncService>? _logger;

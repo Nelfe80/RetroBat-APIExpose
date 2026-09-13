@@ -38,6 +38,9 @@ public class ApiExposeOptions
     public TaxonomyOptions Taxonomy { get; set; } = new();
     public RetroAchievementsOptions RetroAchievements { get; set; } = new();
     public CommunityRamOptions CommunityRam { get; set; } = new();
+
+    /// <summary>Ce que cette borne remonte a NelfePlay, et sous quelles conditions.</summary>
+    public NelfePlayOptions NelfePlay { get; set; } = new();
     public DataPackOptions DataPack { get; set; } = new();
     public SelfUpdateOptions SelfUpdate { get; set; } = new();
 
