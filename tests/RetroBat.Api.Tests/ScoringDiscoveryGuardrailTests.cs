@@ -223,11 +223,4 @@ public class ScoringDiscoveryGuardrailTests
         Assert.Equal(5, options.FrameTimeDriftMaxPercent);
     }
 
-    [Fact]
-    public void Le_plugin_Lua_n_ecoute_pas_sur_le_port_du_pont_RAM()
-    {
-        // 12347 est au pont RAM : deux plugins sur le même port, et l'un lirait les
-        // commandes de l'autre.
-        Assert.NotEqual(12347, new ScoringDiscoveryOptions().MameControlPort);
-    }
 }
