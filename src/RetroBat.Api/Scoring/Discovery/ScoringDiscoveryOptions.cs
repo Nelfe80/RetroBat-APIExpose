@@ -43,6 +43,19 @@ public sealed class ScoringDiscoveryOptions
     public int MameControlPort { get; set; } = 12348;
 
     /// <summary>
+    /// Port sur lequel le vérificateur reçoit les images de MAME.
+    ///
+    /// Le Lua de MAME ne sait ouvrir que des sockets, jamais un tuyau nommé : là où le wrapper
+    /// libretro dépose ses images sur un tuyau dont les droits ne nomment qu'un compte, le
+    /// plugin doit passer par la boucle locale, que tout processus de la machine peut joindre.
+    /// La protection n'est donc plus l'ACL mais le jeton : le vérificateur n'accepte des images
+    /// que sous le jeton de l'armement en cours, qu'APIExpose ne donne qu'au plugin qu'il vient
+    /// d'armer. C'est plus faible, c'est assumé, et c'est écrit ici pour que personne ne le
+    /// découvre en lisant le code.
+    /// </summary>
+    public int MameFramesPort { get; set; } = 12349;
+
+    /// <summary>
     /// Délai de stabilité du score avant d'armer, en millisecondes (OCR_STABLE_DELAY_MS).
     /// </summary>
     public int StableDelayMs { get; set; } = 300;
