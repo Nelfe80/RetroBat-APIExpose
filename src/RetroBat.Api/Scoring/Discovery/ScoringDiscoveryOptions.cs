@@ -61,4 +61,20 @@ public sealed class ScoringDiscoveryOptions
     /// pour la session (OCR_FRAME_TIME_DRIFT_MAX_PERCENT). La partie passe avant la mesure.
     /// </summary>
     public int FrameTimeDriftMaxPercent { get; set; } = 5;
+
+    /// <summary>Confiance minimale pour qu'une reconnaissance compte (OCR_MIN_CONFIDENCE).</summary>
+    public double MinConfidence { get; set; } = 0.98;
+
+    /// <summary>
+    /// Stabilité de région minimale (OCR_MIN_REGION_STABILITY) : le nombre doit se lire au
+    /// même endroit d'une fois sur l'autre, sinon ce n'est pas le même champ.
+    /// </summary>
+    public double MinRegionStability { get; set; } = 0.95;
+
+    /// <summary>
+    /// Valeurs distinctes qu'il faut avoir reconnues, au même endroit, pour qu'une partie
+    /// vaille comme preuve (§7.2.6). Deux ne prouvent rien : un score qui passe de 0 à 100
+    /// pourrait coïncider avec n'importe quel compteur.
+    /// </summary>
+    public int MinDistinctValues { get; set; } = 3;
 }
