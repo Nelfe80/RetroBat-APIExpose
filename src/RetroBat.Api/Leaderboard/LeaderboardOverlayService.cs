@@ -1187,16 +1187,16 @@ public sealed class LeaderboardOverlayService : IDisposable
         /// en focus, contour et texte en blanc (le fond bleu de la ligne porte deja la couleur
         /// de selection). Dessine a droite de xDroite, rend le nouveau bord gauche.
         /// </summary>
-        private float Bouton(Graphics g, EsMenuStyle s, Font police, float taille, string texte, float xDroite, float y, float hauteurLigne, bool enFocus, bool discret = false)
+        private float Bouton(Graphics g, EsMenuStyle s, Font police, float taille, string texte, float xDroite, float y, float hauteurLigne, bool enFocus, bool discret = false, float? padding = null)
         {
             // Un bouton DE LIGNE reste discret : il accompagne un score, il ne le domine pas.
-            // Le bouton de la barre du bas, lui, garde les mesures d'ES (TEXT_PADDING, largeur
-            // minimale de « DELETE »).
-            var padding = discret ? taille * 0.6f : Math.Max(12f, _largeurEcran * 0.014f);
+            // Les autres gardent la construction d'ES (TEXT_PADDING, largeur minimale de « DELETE »),
+            // a l'echelle de la taille demandee.
+            var marge = padding ?? (discret ? taille * 0.6f : Math.Max(12f, _largeurEcran * 0.014f));
             var largeurTexte = g.MeasureString(texte, police, PointF.Empty, StringFormat.GenericTypographic).Width;
-            var largeurMin = discret ? 0f : g.MeasureString("DELETE", police, PointF.Empty, StringFormat.GenericTypographic).Width + padding;
-            var largeur = Math.Max(largeurTexte + padding, largeurMin);
-            var hauteur = discret ? taille * 1.15f : taille * 1.5f;
+            var largeurMin = discret ? 0f : g.MeasureString("DELETE", police, PointF.Empty, StringFormat.GenericTypographic).Width + marge;
+            var largeur = Math.Max(largeurTexte + marge, largeurMin);
+            var hauteur = discret ? taille * 1.15f : taille * 1.4f;
             var zone = new RectangleF(xDroite - largeur, y + (hauteurLigne - hauteur) / 2f, largeur, hauteur);
             var couleur = enFocus ? Opaque(Teinte(s.SelectedTextColor)) : Opaque(Teinte(s.TextColor));
             var rayon = (float) Math.Clamp(s.ButtonCornerSize * _hauteurEcran / 1080d, 4, 24);
@@ -1238,16 +1238,21 @@ public sealed class LeaderboardOverlayService : IDisposable
 
             if (c.Defier.Length > 0)
             {
+                // Un cran plus petit que les boutons d'ES : le defi invite, il ne doit pas ecraser le
+                // classement qu'il surplombe.
                 var x = marge;
-                var touche = _service._glyphes?.Glyphe(c.GlypheDefier, (int) (taille * 1.2f), Teinte(s.HelpIconColor));
+                var tailleBouton = taille * 0.82f;
+                var touche = _service._glyphes?.Glyphe(c.GlypheDefier, (int) (taille * 1.05f), Teinte(s.HelpIconColor));
                 if (touche is not null)
                 {
                     g.DrawImage(touche, x, y + (hauteur - touche.Height) / 2f, touche.Width, touche.Height);
-                    x += touche.Width + taille * 0.35f;
+                    x += touche.Width + taille * 0.3f;
                 }
                 var texte = c.Defier.ToUpperInvariant();
-                var largeur = g.MeasureString(texte, police, PointF.Empty, StringFormat.GenericTypographic).Width + Math.Max(12f, _largeurEcran * 0.014f);
-                Bouton(g, s, police, taille, texte, x + largeur, y + (hauteur - taille * 1.5f) / 2f, taille * 1.5f, enFocus: true);
+                var largeur = Math.Max(
+                    g.MeasureString(texte, petite, PointF.Empty, StringFormat.GenericTypographic).Width,
+                    g.MeasureString("DELETE", petite, PointF.Empty, StringFormat.GenericTypographic).Width) + tailleBouton * 1.2f;
+                Bouton(g, s, petite, tailleBouton, texte, x + largeur, y + (hauteur - tailleBouton * 1.4f) / 2f, tailleBouton * 1.4f, enFocus: true, discret: false, padding: tailleBouton * 1.2f);
             }
 
             if (c.MaPlace.Length > 0)
