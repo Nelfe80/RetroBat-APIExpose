@@ -44,9 +44,14 @@ public class BiosFingerprintTests
             var roms = Directory.CreateDirectory(Path.Combine(racine, "roms", "neogeo")).FullName;
             var bios = Directory.CreateDirectory(Path.Combine(racine, "bios")).FullName;
             Directory.CreateDirectory(Path.Combine(bios, "fbneo"));
-            File.WriteAllText(Path.Combine(bios, "neogeo.zip"), "systeme");
             var jeu = Path.Combine(roms, "mslug.zip");
 
+            // Du moins prioritaire au plus prioritaire : bios/mame, bios, bios/fbneo, a cote de la ROM.
+            Directory.CreateDirectory(Path.Combine(bios, "mame"));
+            File.WriteAllText(Path.Combine(bios, "mame", "neogeo.zip"), "mame");
+            Assert.Equal(Path.Combine(bios, "mame", "neogeo.zip"), BiosFingerprintService.Trouver("neogeo.zip", jeu, bios));
+
+            File.WriteAllText(Path.Combine(bios, "neogeo.zip"), "systeme");
             Assert.Equal(Path.Combine(bios, "neogeo.zip"), BiosFingerprintService.Trouver("neogeo.zip", jeu, bios));
 
             File.WriteAllText(Path.Combine(bios, "fbneo", "neogeo.zip"), "fbneo");

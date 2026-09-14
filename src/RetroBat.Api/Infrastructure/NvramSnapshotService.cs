@@ -119,15 +119,31 @@ public sealed class NvramSnapshotService : IHostedService, IDisposable
         return entrees;
     }
 
-    /// <summary>Les NVRAM de ce jeu dans le dossier de sauvegarde de son systeme (coeur compris).</summary>
-    internal static IEnumerable<string> Chercher(string systeme, string rom)
+    /// <summary>
+    /// Les NVRAM de ce jeu : dans le dossier de sauvegarde de son systeme (coeur compris), et dans
+    /// celui de MAME autonome, qui range un DOSSIER par jeu (saves/mame/nvram/19xx/eeprom) quel que
+    /// soit le systeme du lancement. Joindre les deux ne coute rien : le profil limite chaque
+    /// epingle au coeur qui l'ecrit.
+    /// </summary>
+    internal static IEnumerable<string> Chercher(string systeme, string rom, string? racineSaves = null)
     {
-        if (systeme.Length == 0 || rom.Length == 0 || Path.GetFileName(systeme) != systeme) yield break;
-        var racine = Path.Combine(RetroBatPaths.SavesRoot, systeme);
-        if (!Directory.Exists(racine)) yield break;
-        foreach (var chemin in Directory.EnumerateFiles(racine, rom + ".*", SearchOption.AllDirectories))
+        var saves = racineSaves ?? RetroBatPaths.SavesRoot;
+        if (rom.Length == 0 || Path.GetFileName(rom) != rom) yield break;
+        if (systeme.Length > 0 && Path.GetFileName(systeme) == systeme)
         {
-            if (Extensions.Contains(Path.GetExtension(chemin), StringComparer.OrdinalIgnoreCase)) yield return chemin;
+            var racine = Path.Combine(saves, systeme);
+            if (Directory.Exists(racine))
+            {
+                foreach (var chemin in Directory.EnumerateFiles(racine, rom + ".*", SearchOption.AllDirectories))
+                {
+                    if (Extensions.Contains(Path.GetExtension(chemin), StringComparer.OrdinalIgnoreCase)) yield return chemin;
+                }
+            }
+        }
+        var mame = Path.Combine(saves, "mame", "nvram", rom);
+        if (Directory.Exists(mame))
+        {
+            foreach (var chemin in Directory.EnumerateFiles(mame, "*", SearchOption.TopDirectoryOnly)) yield return chemin;
         }
     }
 

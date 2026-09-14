@@ -854,6 +854,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     // cosmétique (audio, filtres vidéo, ratio, volumes…) est ignoré. Une clé d'un backend non
     // listé (DIP MAME « Difficulty »/« 1-1 »…) passe INCHANGÉE → les digests déjà épinglés (19xx)
     // ne bougent pas. Ajouter un core = une entrée ici (partagée par tous ses jeux).
+    // Une entrée finie par « * » garde toute une FAMILLE de clés (les DIP et les cheats de FBNeo
+    // portent le nom du jeu dans la clé).
     private static readonly Dictionary<string, HashSet<string>> CoreOptionsAllowlist = new()
     {
         ["genesis_plus_gx_"] = new(StringComparer.Ordinal)
@@ -865,10 +867,24 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             "genesis_plus_gx_no_sprite_limit", // rendu → peut changer le jeu
             "genesis_plus_gx_lock_on",         // cartouche lock-on (S&K…)
         },
+        // FBNeo : ce qui change la partie. Le reste (resolution, audio, frameskip, diagnostic) ne
+        // la change pas ; la difficulte des jeux sans DIP, elle, est tenue par l'epingle NVRAM.
+        ["fbneo-"] = new(StringComparer.Ordinal)
+        {
+            "fbneo-allow-patched-romsets",     // ROM patchee = autre jeu
+            "fbneo-cpu-speed-adjust",          // vitesse CPU → ralentissements
+            "fbneo-force-60hz",                // vitesse des jeux 50 Hz
+            "fbneo-socd",                      // gauche+droite simultanes
+            "fbneo-analog-speed",              // sensibilite des commandes analogiques
+            "fbneo-neogeo-mode",               // variante de BIOS (UniBIOS a un menu de triche)
+            "fbneo-memcard-mode",              // carte memoire Neo-Geo = reprise de partie
+            "fbneo-dipswitch-*",               // DIP switches du jeu : vies, difficulte
+            "fbneo-cheat-*",                   // cheats integres au coeur
+        },
     };
 
     // Réduit la chaîne canonique « clé=valeur;… » aux seuls réglages gameplay (voir ci-dessus).
-    private static string? FilterGameplayCoreOptions(string? raw)
+    internal static string? FilterGameplayCoreOptions(string? raw)
     {
         if (string.IsNullOrEmpty(raw)) return raw;
         var kept = new List<string>();
@@ -881,7 +897,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 if (key.StartsWith(kv.Key, StringComparison.Ordinal)) { allow = kv.Value; break; }
             if (allow is not null)
             {
-                if (allow.Contains(key)) kept.Add(pair);   // gameplay → gardé ; sinon cosmétique → écarté
+                if (allow.Contains(key) || allow.Any(a => a.EndsWith('*') && key.StartsWith(a[..^1], StringComparison.Ordinal)))
+                    kept.Add(pair);   // gameplay → gardé ; sinon cosmétique → écarté
             }
             else
             {

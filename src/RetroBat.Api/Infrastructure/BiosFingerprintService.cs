@@ -107,7 +107,8 @@ public sealed class BiosFingerprintService : IHostedService, IDisposable
 
     /// <summary>
     /// Le fichier que le coeur charge, dans son ordre de recherche : a cote de la ROM, puis
-    /// bios/fbneo, puis bios. Un nom qui descend hors de ces dossiers n'est jamais suivi.
+    /// bios/fbneo, puis bios, puis bios/mame (ou RetroBat range les BIOS de MAME). Un nom qui
+    /// descend hors de ces dossiers n'est jamais suivi.
     /// </summary>
     internal static string? Trouver(string nom, string? cheminDuJeu, string? racineBios = null)
     {
@@ -119,6 +120,7 @@ public sealed class BiosFingerprintService : IHostedService, IDisposable
         if (!string.IsNullOrEmpty(cheminDuJeu) && Path.GetDirectoryName(cheminDuJeu) is { Length: > 0 } dossierDuJeu) dossiers.Add(dossierDuJeu);
         dossiers.Add(Path.Combine(bios, "fbneo"));
         dossiers.Add(bios);
+        dossiers.Add(Path.Combine(bios, "mame"));
 
         foreach (var dossier in dossiers)
         {
