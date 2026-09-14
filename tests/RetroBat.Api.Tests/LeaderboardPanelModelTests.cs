@@ -294,3 +294,35 @@ public class ChallengeTargetTests
         Assert.Equal("BOB", cible!.Joueur);
     }
 }
+
+/// <summary>
+/// Le sens du classement vient du profil du jeu : un contre-la-montre se lit « plus bas = mieux ».
+/// Le cartouche ne doit alors rien « depasser » en cours de partie : le chronometre du joueur part
+/// de zero, et comparer en direct ferait tomber tout le classement des la premiere seconde.
+/// </summary>
+public class ChallengeDirectionTests
+{
+    private static RetroBat.Api.Leaderboard.LeaderboardClient.Ligne T(int rang, string joueur, long valeur, bool moi = false)
+        => new(rang, joueur, valeur, "", "", "", true, null, "", moi, "", "", PlusBasEstMieux: true);
+
+    [Fact]
+    public void Un_contre_la_montre_ne_se_depasse_pas_en_direct()
+    {
+        var classement = new[] { T(1, "ACE", 61000), T(2, "BOB", 65000), T(3, "CAT", 70000) };
+        var cible = (RetroBat.Api.Leaderboard.LeaderboardClient.Ligne?) classement[2];
+        Assert.False(RetroBat.Api.Leaderboard.ChallengeHudService.Avancer(classement, 1200, ref cible));   // 1,2 s ecoulee
+        Assert.Equal("CAT", cible!.Joueur);
+    }
+
+    [Fact]
+    public void Le_sens_est_lu_dans_la_reponse_de_la_plateforme()
+    {
+        const string json = """{"rows":[{"player":"ACE","value":61000,"better":"lower"},{"player":"BOB","value":65000,"better":"lower"}]}""";
+        var lignes = RetroBat.Api.Leaderboard.LeaderboardClient.Lire(json, "");
+        Assert.True(lignes[0].PlusBasEstMieux);
+        const string score = """{"rows":[{"player":"ACE","value":90000,"better":"higher"},{"player":"BOB","value":1}]}""";
+        var scores = RetroBat.Api.Leaderboard.LeaderboardClient.Lire(score, "");
+        Assert.False(scores[0].PlusBasEstMieux);
+        Assert.False(scores[1].PlusBasEstMieux);   // champ absent (ancienne plateforme) : un score
+    }
+}

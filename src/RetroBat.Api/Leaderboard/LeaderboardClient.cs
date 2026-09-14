@@ -35,7 +35,8 @@ public sealed class LeaderboardClient
         string Quand,
         bool CestMoi,
         string Monde = "",
-        string Poignee = "");   // la poignee publique du joueur : ce qui permet de le suivre
+        string Poignee = "",    // la poignee publique du joueur : ce qui permet de le suivre
+        bool PlusBasEstMieux = false);  // le sens du PROFIL du jeu : vrai pour un contre-la-montre
 
     /// <summary>Ce qu'une vue a a montrer, y compris son echec.</summary>
     public sealed record Resultat(IReadOnlyList<Ligne> Lignes, string Etat)
@@ -180,7 +181,8 @@ public sealed class LeaderboardClient
                     Texte("at"),
                     monPseudo.Length > 0 && string.Equals(joueur, monPseudo, StringComparison.OrdinalIgnoreCase),
                     Texte("world"),     // home | station | stream : le monde du record, comme sur le site
-                    Texte("handle")));
+                    Texte("handle"),
+                    string.Equals(Texte("better"), "lower", StringComparison.OrdinalIgnoreCase)));
             }
         }
         catch (JsonException)

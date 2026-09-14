@@ -1234,9 +1234,14 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         }
         var place = _textes.Format("leaderboard.my_place", langue, ("rank", moi.Rang), ("total", lignes.Count));
         var devant = lignes.FirstOrDefault(l => l.Rang == moi.Rang - 1);
-        if (devant is null || devant.Valeur <= moi.Valeur) return place;
-        var manque = (devant.Valeur - moi.Valeur).ToString("N0", System.Globalization.CultureInfo.CurrentCulture);
-        return place + "   " + _textes.Format("leaderboard.to_gain", langue, ("points", manque), ("rank", moi.Rang - 1));
+        if (devant is null) return place;
+        // Pour un score, il manque des points ; pour un temps, il faut en retirer.
+        var ecart = moi.PlusBasEstMieux ? moi.Valeur - devant.Valeur : devant.Valeur - moi.Valeur;
+        if (ecart <= 0) return place;
+        var manque = (moi.PlusBasEstMieux ? "-" : "") + ecart.ToString("N0", System.Globalization.CultureInfo.CurrentCulture);
+        return place + "   " + (moi.PlusBasEstMieux
+            ? _textes.Format("leaderboard.to_gain_time", langue, ("points", manque), ("rank", moi.Rang - 1))
+            : _textes.Format("leaderboard.to_gain", langue, ("points", manque), ("rank", moi.Rang - 1)));
     }
 
     private string Message(string etat, string langue) => etat switch

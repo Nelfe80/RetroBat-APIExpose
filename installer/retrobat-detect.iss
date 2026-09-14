@@ -57,9 +57,12 @@ end;
 procedure WarnIfNotRetroBat();
 begin
   if not AppParentIsRetroBat() then
-    MsgBox('Le dossier choisi ne semble pas etre dans un RetroBat :'#13#10
+    // SuppressibleMsgBox et non MsgBox : /SUPPRESSMSGBOXES ne supprime QUE celles-ci. Avec un
+    // MsgBox, une installation /VERYSILENT hors d'un RetroBat attendait un clic invisible, sans
+    // jamais copier un fichier (vecu en verifiant la 1.8.5).
+    SuppressibleMsgBox('Le dossier choisi ne semble pas etre dans un RetroBat :'#13#10
       + ExpandConstant('{app}') + #13#10 + #13#10
       + 'Un plugin doit etre installe dans <RetroBat>\plugins\. Sinon les listes de'#13#10
       + 'jeux et systemes resteront vides. Verifiez l''emplacement (l''installation continue).',
-      mbError, MB_OK);
+      mbError, MB_OK, IDOK);
 end;

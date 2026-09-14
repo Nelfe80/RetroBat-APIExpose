@@ -111,6 +111,11 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
     /// </summary>
     public static bool Avancer(IReadOnlyList<LeaderboardClient.Ligne> classement, long score, ref LeaderboardClient.Ligne? cible)
     {
+        // Un contre-la-montre ne se depasse pas EN COURS de partie : le chronometre du joueur
+        // monte, et etre sous le temps d'un autre a la 30e seconde ne veut rien dire - seul le
+        // temps FINAL compte. Comparer en direct ferait « depasser » tout le classement des le
+        // depart, a zero. La cible reste donc fixe ; le verdict dira le rang.
+        if (classement.Count > 0 && classement[0].PlusBasEstMieux) return false;
         var gagne = false;
         while (cible is not null && score > cible.Valeur)
         {
