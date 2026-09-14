@@ -285,6 +285,7 @@ builder.Services.AddSingleton(typeof(IRuntimeConfigSnapshotProvider<>), typeof(R
 builder.Services.AddSingleton<EmulationStationSettingsService>();
 builder.Services.AddSingleton<EmulationStationSystemConfigService>();
 builder.Services.AddSingleton<InterfaceTextService>();
+builder.Services.AddSingleton<RetroBat.Api.Infrastructure.CabinetLocale>();
 builder.Services.AddSingleton<ApiExposeTaxonomyService>();
 builder.Services.AddSingleton<RomMetadataResolver>();
 builder.Services.AddSingleton<RomCanonicalResolver>();

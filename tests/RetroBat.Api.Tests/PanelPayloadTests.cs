@@ -99,3 +99,33 @@ public class LeaderboardRowTests
         Assert.Equal("Nelfe Station Origin", lignes[1].Salle);
     }
 }
+
+/// <summary>
+/// La culture de la borne, pour ce qu'APIExpose dessine : la barre du replay formatait tout en
+/// fr-FR, sur toutes les bornes. Les codes arrivent au format des reglages ES (« fr_FR »).
+/// </summary>
+public class CabinetLocaleTests
+{
+    [Theory]
+    [InlineData("fr_FR", "fr-FR")]
+    [InlineData("en_US", "en-US")]
+    [InlineData("ja_JP", "ja-JP")]
+    [InlineData("pt_BR", "pt-BR")]
+    [InlineData("fr", "fr")]
+    public void Un_code_de_langue_es_donne_sa_culture(string langue, string attendue)
+        => Assert.Equal(attendue, RetroBat.Api.Infrastructure.CabinetLocale.CultureDe(langue).Name);
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("klingon_XX")]
+    public void Une_langue_inconnue_retombe_sur_l_anglais(string langue)
+        => Assert.StartsWith("en", RetroBat.Api.Infrastructure.CabinetLocale.CultureDe(langue).Name);
+
+    [Fact]
+    public void La_date_d_un_record_suit_la_culture()
+    {
+        var jour = new DateTime(2026, 9, 13);
+        Assert.Equal("13 Sep 2026", jour.ToString("dd MMM yyyy", RetroBat.Api.Infrastructure.CabinetLocale.CultureDe("en_US")));
+        Assert.StartsWith("13 sept", jour.ToString("dd MMM yyyy", RetroBat.Api.Infrastructure.CabinetLocale.CultureDe("fr_FR")));
+    }
+}

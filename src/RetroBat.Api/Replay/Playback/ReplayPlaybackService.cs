@@ -54,8 +54,10 @@ public sealed class ReplayPlaybackService
         RetroBat.Api.Infrastructure.NelfePlayDeviceStore devices, IHttpClientFactory httpFactory,
         RetroBat.Api.Replay.Sharing.ReplayManifestFetcher manifestFetcher,
         RetroBat.Api.Replay.Sharing.ReplayNetworkStateService network,
+        RetroBat.Api.Infrastructure.CabinetLocale locale,
         ILogger<ReplayPlaybackService> logger)
     {
+        _locale = locale;
         _ra = ra; _manifests = manifests; _objects = objects; _meta = meta; _source = source; _resolver = resolver;
         _bus = bus; _agent = agent; _devices = devices; _httpFactory = httpFactory; _logger = logger;
         _manifestFetcher = manifestFetcher; _network = network;
@@ -159,7 +161,9 @@ public sealed class ReplayPlaybackService
     {
         var meta = _meta.GetMeta(replayId);
         ReplayCard? builtCard;
-        lock (_gate) { _card = BuildCard(manifest, meta, _agent.Status.Pseudo); builtCard = _card; }
+        var culture = _locale.Culture;
+        var joueurParDefaut = _locale.Text("replay.card.player").ToUpper(culture);
+        lock (_gate) { _card = BuildCard(manifest, meta, _agent.Status.Pseudo, culture, joueurParDefaut); builtCard = _card; }
         // Backfill : replay estampillé AVANT la corrélation score → pas de score en méta.
         // On le récupère du serveur en tâche de fond ; la carte se rafraîchit via /state.
         if (builtCard is { Score: null }) { _ = BackfillCardAsync(replayId, ct); }
@@ -531,11 +535,17 @@ public sealed class ReplayPlaybackService
         }
     }
 
-    private static ReplayCard BuildCard(ReplayManifest m, ReplayLocalMetadata? meta, string? pseudo)
+    private readonly RetroBat.Api.Infrastructure.CabinetLocale _locale;
+
+    /// <summary>
+    /// La fiche du record. La date suit la culture de la borne (« 13 sept. 2026 » en francais,
+    /// « 13 Sep 2026 » en anglais) : elle etait figee en fr-FR, sur toutes les bornes.
+    /// </summary>
+    private static ReplayCard BuildCard(ReplayManifest m, ReplayLocalMetadata? meta, string? pseudo, CultureInfo culture, string joueurParDefaut)
     {
         var game = PrettifyGame(m.Game);
         var system = PrettifyWords(m.Game.SystemId);
-        var date = m.CreatedAt.ToLocalTime().ToString("dd MMM yyyy", Fr);
+        var date = m.CreatedAt.ToLocalTime().ToString("dd MMM yyyy", culture);
         // Joueur = pseudo de la borne appairée (l'auteur du record sur CETTE machine) ;
         // « JOUEUR » seulement si non appairé. Le rang reste à brancher sur le scoring ;
         // le score existe dans ScoreLink mais reste null tant que la corrélation n'y écrit
@@ -544,7 +554,7 @@ public sealed class ReplayPlaybackService
         // (le vrai record) ; sinon on retombe sur le pseudo appairé (player) et le
         // snapshot du manifeste (score). Le rang n'existe que via la méta.
         var player = !string.IsNullOrWhiteSpace(meta?.Player) ? meta!.Player!
-            : (string.IsNullOrWhiteSpace(pseudo) ? "JOUEUR" : pseudo!);
+            : (string.IsNullOrWhiteSpace(pseudo) ? joueurParDefaut : pseudo!);
         var score = meta?.ScoreValue ?? m.ScoreLink?.ScoreValueSnapshot;
         int? rank = meta?.Rank;
         var certified = string.Equals(meta?.PublicationState, "published", StringComparison.OrdinalIgnoreCase);

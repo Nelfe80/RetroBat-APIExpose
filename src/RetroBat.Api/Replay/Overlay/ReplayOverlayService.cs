@@ -33,8 +33,10 @@ public sealed class ReplayOverlayService : BackgroundService
 
     public ReplayOverlayService(ReplayPlaybackService playback, ReplayStore store,
         RetroBat.Api.Replay.Social.ReplaySocialStore social, ILogger<ReplayOverlayService> logger,
-        RetroBat.Api.Replay.Social.SocialIssuerPin pin)
+        RetroBat.Api.Replay.Social.SocialIssuerPin pin,
+        RetroBat.Api.Infrastructure.CabinetLocale locale)
     {
+        _locale = locale;
         _playback = playback;
         _store = store;
         _social = social;
@@ -43,6 +45,18 @@ public sealed class ReplayOverlayService : BackgroundService
     }
 
     private readonly RetroBat.Api.Replay.Social.SocialIssuerPin _pin;
+    private readonly RetroBat.Api.Infrastructure.CabinetLocale _locale;
+
+    /// <summary>Les libelles de la barre, dans la langue de la borne, en MAJUSCULES comme ES.</summary>
+    internal sealed record TextesDeLaBarre(string Lecture, string Deplacement, string Checkpoint, string Quitter, string Score, CultureInfo Culture);
+
+    private TextesDeLaBarre Textes()
+    {
+        var culture = _locale.Culture;
+        string T(string cle) => _locale.Text(cle).ToUpper(culture);
+        return new TextesDeLaBarre(T("replay.bar.play_pause"), T("replay.bar.rewind_forward"), T("replay.bar.checkpoint"),
+            T("replay.bar.quit"), T("replay.card.score"), culture);
+    }
 
     /// <summary>
     /// La barre est PLEINE (piste, temps, aides du panel, carte du record) ou REDUITE a un filet
@@ -95,7 +109,7 @@ public sealed class ReplayOverlayService : BackgroundService
 
             var context = new ApplicationContext();
             var sprites = new ReplayReactionSprites(_logger); // sur CE thread UI
-            var form = new ReplayOverlayForm(() => _playback.GetState(), id => _social.Display(id, _store.ReadReactions(id)), sprites, _logger, LireResume);
+            var form = new ReplayOverlayForm(() => _playback.GetState(), id => _social.Display(id, _store.ReadReactions(id)), sprites, _logger, LireResume, Textes);
 
             lock (_sync) { _appContext = context; _form = form; _sprites = sprites; }
 
@@ -184,10 +198,14 @@ public sealed class ReplayOverlayService : BackgroundService
         private double _rate;         // frames par ms
         private long _displayFrame;   // position lissée du curseur
 
+        private readonly Func<TextesDeLaBarre>? _textes;
+
         public ReplayOverlayForm(Func<ReplayPlaybackService.StateSnapshot> snapshotProvider,
             Func<string, IReadOnlyList<ReplayReaction>> loadReactions, ReplayReactionSprites sprites, ILogger logger,
-            Func<string, RetroBat.Api.Replay.Social.SocialSummary?>? lireResume = null)
+            Func<string, RetroBat.Api.Replay.Social.SocialSummary?>? lireResume = null,
+            Func<TextesDeLaBarre>? textes = null)
         {
+            _textes = textes;
             _snapshotProvider = snapshotProvider;
             _lireResume = lireResume;
             _loadReactions = loadReactions;
@@ -202,7 +220,7 @@ public sealed class ReplayOverlayService : BackgroundService
             Opacity = 0d;
             Size = new Size(800, BarHeight); // recalculé à l'affichage
 
-            _surface = new OverlaySurface(() => _snapshot, () => _curve, () => _markers, () => _displayFrame, _sprites, () => _reduite) { Dock = DockStyle.Fill };
+            _surface = new OverlaySurface(() => _snapshot, () => _curve, () => _markers, () => _displayFrame, _sprites, () => _reduite, _textes) { Dock = DockStyle.Fill };
             Controls.Add(_surface);
 
             _timer = new System.Windows.Forms.Timer { Interval = 250 }; // ~4 fps : la barre est layered
@@ -455,10 +473,21 @@ public sealed class ReplayOverlayService : BackgroundService
             private readonly Func<long> _displayFrame;
             private readonly ReplayReactionSprites _sprites;
 
+            private readonly Func<TextesDeLaBarre>? _textesDeLaBarre;
+
+            /// <summary>Les libelles localises ; le francais d'origine en repli si la locale manque.</summary>
+            private TextesDeLaBarre Libelles()
+            {
+                try { if (_textesDeLaBarre is not null) return _textesDeLaBarre(); }
+                catch (Exception) { }
+                return new TextesDeLaBarre("LECTURE / PAUSE", "RECUL / AVANCE", "CHECKPOINT", "QUITTER", "SCORE", CultureInfo.GetCultureInfo("fr-FR"));
+            }
+
             public OverlaySurface(Func<ReplayPlaybackService.StateSnapshot> get, Func<float[]?> curve,
                 Func<IReadOnlyList<ReactionMarker>> markers, Func<long> displayFrame, ReplayReactionSprites sprites,
-                Func<bool>? reduite = null)
+                Func<bool>? reduite = null, Func<TextesDeLaBarre>? textes = null)
             {
+                _textesDeLaBarre = textes;
                 _reduite = reduite ?? (() => false);
                 _get = get;
                 _curve = curve;
@@ -595,10 +624,11 @@ public sealed class ReplayOverlayService : BackgroundService
                 using (var sep = new Pen(TextDimColor)) g.DrawLine(sep, x - 15, RowTop + 4, x - 15, RowTop + GlyphSize - 4);
 
                 // rappels ES-style : glyphe de touche + libellé MAJUSCULE
-                x = DrawHint(g, x, mid, label, textBrush, Dir.Up, "LECTURE / PAUSE");
-                x = DrawHint(g, x, mid, label, textBrush, Dir.LeftRight, "RECUL / AVANCE");
-                x = DrawHint(g, x, mid, label, textBrush, Dir.Down, "CHECKPOINT");
-                DrawHintStart(g, x, mid, label, textBrush, "QUITTER");
+                var libelles = Libelles();
+                x = DrawHint(g, x, mid, label, textBrush, Dir.Up, libelles.Lecture);
+                x = DrawHint(g, x, mid, label, textBrush, Dir.LeftRight, libelles.Deplacement);
+                x = DrawHint(g, x, mid, label, textBrush, Dir.Down, libelles.Checkpoint);
+                DrawHintStart(g, x, mid, label, textBrush, libelles.Quitter);
             }
 
             /// <summary>Un rappel = glyphe de croix directionnelle (direction active en bleu) + libellé.</summary>
@@ -662,13 +692,14 @@ public sealed class ReplayOverlayService : BackgroundService
                 using var dim = new SolidBrush(TextDimColor);
                 using var gold = new SolidBrush(GoldColor);
 
-                var score = card.Score is long v ? v.ToString("N0", Fr) : "—";
+                var libelles = Libelles();
+                var score = card.Score is long v ? v.ToString("N0", libelles.Culture) : "—";
                 var rank = card.Rank is int r ? $"#{r}" : "#—";
 
                 // Ligne 1 (EN HAUT) = le SCORE, titre du record, en or + rang.
                 var line1 = new (string t, Font f, Brush b)[]
                 {
-                    ("SCORE ", labelFont, dim),
+                    (libelles.Score + " ", labelFont, dim),
                     (score, scoreFont, gold),
                     ("    ", rankFont, dim),
                     (rank, rankFont, white),
