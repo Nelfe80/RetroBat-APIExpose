@@ -56,7 +56,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     // (replay.finalized). On rapproche les deux — quel que soit l'ordre d'arrivée —
     // et on POST /api/v1/agent/scores/replay-link. Purement additif et best-effort :
     // un échec n'affecte ni le scoring ni l'enregistrement.
-    private readonly RetroBat.Api.Replay.Storage.ReplayStore? _replayStore;   // pour estampiller score/rang sur la méta du replay
+    private readonly RetroBat.Api.Replay.Storage.ReplayStore? _replayStore;
+    /// <summary>Les NVRAM du jeu (reglages des jeux sans DIP switches), jointes au passeport.</summary>
+    private readonly NvramSnapshotService? _nvram;   // pour estampiller score/rang sur la méta du replay
     private readonly RetroBat.Api.Replay.Sharing.ReplaySeedQueue? _semis;
     private readonly RetroBat.Api.Replay.Sharing.ReplaySeedService? _semeur;
     private string? _activeReplayId;
@@ -76,8 +78,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         RetroBat.Api.Replay.Storage.ReplayStore? replayStore = null,
         ILogger<NelfePlayScoringReporter>? logger = null,
         RetroBat.Api.Replay.Sharing.ReplaySeedQueue? semis = null,
-        RetroBat.Api.Replay.Sharing.ReplaySeedService? semeur = null)
+        RetroBat.Api.Replay.Sharing.ReplaySeedService? semeur = null,
+        NvramSnapshotService? nvram = null)
     {
+        _nvram = nvram;
         _replayStore = replayStore;
         _semis = semis;
         _semeur = semeur;
@@ -509,6 +513,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
         if (runPeak <= 0) runPeak = finalTotal.Value;   // filet : aucun segment exploitable
 
+        // Les NVRAM, lues APRES la fermeture de l'emulateur (voir NvramSnapshotService) : on les
+        // obtient avant de signer, puisqu'elles font partie du passeport.
+        JsonArray? nvram = null;
+        if (_nvram is not null)
+        {
+            try { nvram = await _nvram.PourLePasseportAsync(cancellationToken).ConfigureAwait(false); }
+            catch (Exception ex) { Trace($"NVRAM indisponible : {ex.Message}"); }
+        }
+
         using var deviceKey = CngDeviceKey.OpenOrCreate(ScoringKeyName);
         JsonObject passport;
         try
@@ -516,7 +529,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             passport = BuildPassport(
                 systemId, romGroup, sessionJson, ticket.Value, profile.Value,
                 deviceId!, deviceKey, listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion,
-                runPeak, bestRun);
+                runPeak, bestRun, nvram);
             var body = passport.DeepClone()!.AsObject();
             body.Remove("signature");
             passport["signature"] = deviceKey.SignB64Url(Jcs.CanonicalBytes(body));
@@ -533,7 +546,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private JsonObject BuildPassport(
         string systemId, string romGroup, string sessionJson, JsonElement ticket, JsonElement profile,
         string deviceId, CngDeviceKey deviceKey, string listenerSha, string? coreSha, string? memSha,
-        string? contentSha, string? contentMd5, string? contentSha1, string? wrapperVersion, long finalTotal, List<(long frame, long total)> trajectory)
+        string? contentSha, string? contentMd5, string? contentSha1, string? wrapperVersion, long finalTotal, List<(long frame, long total)> trajectory,
+        JsonArray? nvram = null)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
@@ -631,7 +645,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             ? new JsonObject { ["name"] = sessionPlayer.VenueName, ["city"] = sessionPlayer.VenueCity }
             : null;
 
-        return new JsonObject
+        var document = new JsonObject
         {
             ["protocol"] = 1,
             ["session_id"] = Guid.NewGuid().ToString(),
@@ -663,6 +677,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 ["core"] = Triple(coreSha), ["content"] = ContentArtifact(contentSha, contentMd5, contentSha1), ["mem"] = Triple(memSha),
                 ["core_options_digest"] = coreOptionsDigest,
                 ["bios"] = new JsonObject { ["mode"] = "none" },
+
             },
             ["process"] = new JsonObject
             {
@@ -690,6 +705,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             ["progression"] = new JsonObject { ["checkpoints"] = checkpoints, ["checkpoints_digest"] = checkpointsDigest },
             ["local_check"] = "pass",
         };
+        // Les NVRAM du jeu (EEPROM, RAM de sauvegarde) : jointes seulement quand le jeu en a, pour
+        // qu'un passeport sans NVRAM reste identique. Le profil dit ou sont les reglages.
+        if (nvram is { Count: > 0 }) document["artifacts"]!["nvram"] = nvram;
+        return document;
     }
 
     private async Task<JsonElement?> FetchProfileAsync(string credential, string systemId, string romGroup, CancellationToken cancellationToken)

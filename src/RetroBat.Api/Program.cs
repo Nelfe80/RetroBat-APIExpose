@@ -246,6 +246,8 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infra
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.NelfePlayScoringSessionService>();
 // Scoring certifié - enrôlement de la clé d'appareil, ticket de session, capture
 // attestation + score (soumission du passeport = étape 3c).
+builder.Services.AddSingleton<RetroBat.Api.Infrastructure.NvramSnapshotService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.NvramSnapshotService>());
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.NelfePlayScoringReporter>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.NelfePlayScoringReporter>());
 // Déchiffrement au lancement puis effacement : rien de clair ne survit à la partie.
