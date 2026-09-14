@@ -23,8 +23,8 @@ namespace RetroBat.Api.Infrastructure;
 /// </summary>
 public sealed class NvramSnapshotService : IHostedService, IDisposable
 {
-    /// <summary>Les extensions de NVRAM connues des coeurs arcade (FBNeo : .nv ; MAME : .nv, .nvram).</summary>
-    private static readonly string[] Extensions = [".nv", ".nvram", ".eeprom"];
+    /// <summary>Les extensions de NVRAM connues des coeurs arcade (FBNeo : .nv, et .fs pour la RAM de sauvegarde Neo-Geo ; MAME : .nv, .nvram).</summary>
+    private static readonly string[] Extensions = [".nv", ".nvram", ".eeprom", ".fs"];
 
     /// <summary>Au-dela, ce n'est plus une EEPROM de reglages : on ne l'embarque pas dans un passeport.</summary>
     private const int TailleMax = 65536;
