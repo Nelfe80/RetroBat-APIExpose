@@ -491,8 +491,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var profile = await FetchProfileAsync(credential!, systemId, romGroup, cancellationToken).ConfigureAwait(false);
         if (profile is null)
         {
-            Trace($"STOP: profil {romGroup} non ouvert (fetch null)");
-            return;
+            // Mode laboratoire (NelfeScoreLab) : on soumet quand meme. La plateforme refuse le score
+            // mais garde la tentative signee, sans laquelle aucun profil ne peut s'ouvrir.
+            if (RetroBat.Api.Scoring.ScoreLabLabMode.IsActive(DateTime.UtcNow, out var labo))
+            {
+                Trace($"profil {romGroup} non ouvert, soumission de laboratoire ({labo})");
+                profile = RetroBat.Api.Scoring.ScoreLabLabMode.PlaceholderProfile();
+            }
+            else
+            {
+                Trace($"STOP: profil {romGroup} non ouvert (fetch null)");
+                return;
+            }
         }
 
         // Ticket PARESSEUX : un seul, obtenu ici, uniquement parce qu'on va soumettre.
