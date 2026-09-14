@@ -187,7 +187,8 @@ public sealed class LeaderboardOverlayService : IDisposable
         string Attente = "",
         string AttenteTitre = "",
         string AttenteDetail = "",
-        IReadOnlySet<long>? ReplaysEnPreparation = null);
+        IReadOnlySet<long>? ReplaysEnPreparation = null,
+        IReadOnlyDictionary<string, int>? RangsPrecedents = null);
 
     private Contenu _contenu = new("", Array.Empty<string>(), 0, Array.Empty<LeaderboardClient.Ligne>(), 0, "", true, false,
         Array.Empty<Aide>(), Array.Empty<Aide>(), "", "", "", "", Array.Empty<string>(),
@@ -1028,7 +1029,29 @@ public sealed class LeaderboardOverlayService : IDisposable
                 // Le rang s'ecrit comme sur nelfeplay.com : la colonne « # ». Les trois
                 // premiers portent en plus leur ordinal, le meme mot que le podium du site.
                 var rang = "#" + l.Rang;
-                g.DrawString(rang, l.Rang <= 3 ? gras : police, pinceau, new RectangleF(x, y, largeurRang, hauteur), gauche);
+                var policeRang = l.Rang <= 3 ? gras : police;
+                g.DrawString(rang, policeRang, pinceau, new RectangleF(x, y, largeurRang, hauteur), gauche);
+
+                // Le mouvement depuis la derniere consultation : fleche BLEUE vers le haut quand le
+                // joueur est monte, ORANGE vers le bas quand il est descendu. Couleurs de sens, pas du
+                // theme : elles doivent se lire pareil quel que soit le colorset.
+                var mouvement = LeaderboardRankHistory.Mouvement(l, c.RangsPrecedents);
+                if (mouvement != 0)
+                {
+                    var cote = taille * 0.42f;
+                    var xFleche = x + g.MeasureString(rang, policeRang, PointF.Empty, StringFormat.GenericTypographic).Width + taille * 0.22f;
+                    var yMilieu = y + hauteur / 2f;
+                    var couleur = mouvement > 0
+                        ? (choisie ? Color.White : Color.FromArgb(255, 60, 140, 255))
+                        : Color.FromArgb(255, 245, 160, 50);
+                    using var encreFleche = new SolidBrush(couleur);
+                    var avant = g.SmoothingMode;
+                    g.SmoothingMode = SmoothingMode.AntiAlias;
+                    g.FillPolygon(encreFleche, mouvement > 0
+                        ? new[] { new PointF(xFleche + cote / 2f, yMilieu - cote * 0.55f), new PointF(xFleche + cote, yMilieu + cote * 0.45f), new PointF(xFleche, yMilieu + cote * 0.45f) }
+                        : new[] { new PointF(xFleche, yMilieu - cote * 0.45f), new PointF(xFleche + cote, yMilieu - cote * 0.45f), new PointF(xFleche + cote / 2f, yMilieu + cote * 0.55f) });
+                    g.SmoothingMode = avant;
+                }
                 x += largeurRang;
 
                 // L'etat de suivi, juste avant le pseudo : sur la ligne choisie il annonce ce

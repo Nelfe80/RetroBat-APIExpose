@@ -340,3 +340,33 @@ public class ChallengeDirectionTests
         Assert.False(scores[1].PlusBasEstMieux);   // champ absent (ancienne plateforme) : un score
     }
 }
+
+/// <summary>
+/// Les fleches de mouvement : la plateforme ne garde pas l'historique des rangs, la borne compare
+/// au rang vu a la consultation precedente. Un nouvel entrant ou une premiere consultation n'ont
+/// pas de fleche : on ne peut rien dire.
+/// </summary>
+public class LeaderboardRankMovementTests
+{
+    private static RetroBat.Api.Leaderboard.LeaderboardClient.Ligne L(int rang, string joueur, string monde = "home")
+        => new(rang, joueur, 1000, "", "", "", true, null, "", false, monde);
+
+    [Fact]
+    public void Monter_descendre_ou_rester()
+    {
+        var avant = new Dictionary<string, int> { ["ace|home"] = 3, ["bob|home"] = 1, ["cat|home"] = 2 };
+        Assert.Equal(2, RetroBat.Api.Leaderboard.LeaderboardRankHistory.Mouvement(L(1, "ACE"), avant));    // monte de 2
+        Assert.Equal(-1, RetroBat.Api.Leaderboard.LeaderboardRankHistory.Mouvement(L(2, "BOB"), avant));   // descend d'1
+        Assert.Equal(0, RetroBat.Api.Leaderboard.LeaderboardRankHistory.Mouvement(L(2, "CAT"), avant));    // inchange
+    }
+
+    [Fact]
+    public void Nouvel_entrant_premiere_consultation_ou_anonyme_sans_fleche()
+    {
+        var avant = new Dictionary<string, int> { ["ace|home"] = 1 };
+        Assert.Equal(0, RetroBat.Api.Leaderboard.LeaderboardRankHistory.Mouvement(L(1, "NEW"), avant));
+        Assert.Equal(0, RetroBat.Api.Leaderboard.LeaderboardRankHistory.Mouvement(L(1, "ACE"), new Dictionary<string, int>()));
+        Assert.Equal(0, RetroBat.Api.Leaderboard.LeaderboardRankHistory.Mouvement(L(1, ""), avant));
+        Assert.Equal(0, RetroBat.Api.Leaderboard.LeaderboardRankHistory.Mouvement(L(1, "ACE", "station"), avant));   // autre monde, autre ligne
+    }
+}

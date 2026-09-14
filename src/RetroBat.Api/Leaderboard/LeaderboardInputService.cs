@@ -55,6 +55,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     private readonly RetroBat.Api.Netplay.NetplayHostService _hote;
     private readonly ChallengeHudService _defi;
     private readonly Replay.Storage.ReplayStore _replays;
+    private readonly LeaderboardRankHistory _historique;
+    /// <summary>Les rangs de la consultation PRECEDENTE : fixes pendant toute l'ouverture du panneau.</summary>
+    private IReadOnlyDictionary<string, int> _rangsPrecedents = new Dictionary<string, int>();
     private IReadOnlySet<long> _replaysEnPreparation = new HashSet<long>();
     private readonly EsControllerService _es;
     private bool _seanceArmeeParLeDefi;
@@ -106,6 +109,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         RetroBat.Api.Netplay.NetplayHostService hote,
         ChallengeHudService defi,
         Replay.Storage.ReplayStore replays,
+        LeaderboardRankHistory historique,
         EsControllerService es,
         IEmulationStationNotificationService notifications,
         RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider wrapper,
@@ -117,6 +121,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         _hote = hote;
         _defi = defi;
         _replays = replays;
+        _historique = historique;
         _es = es;
         _notifications = notifications;
         _textes = textes;
@@ -634,6 +639,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         if (!relecture) _ = ChargerLesEvenementsAsync(ct);
         var pseudo = _agent.Status.Pseudo ?? "";
         var resultat = await _client.MondeAsync(_romGroup, pseudo, ct).ConfigureAwait(false);
+        if (!relecture)
+        {
+            // La reference des fleches : la consultation d'AVANT. On la fige pour toute cette
+            // ouverture, puis on retient ce qu'on voit maintenant pour la prochaine fois.
+            _rangsPrecedents = _historique.Lire(_romGroup);
+            if (resultat.Etat == LeaderboardClient.EtatOk) _historique.Enregistrer(_romGroup, resultat.Lignes);
+        }
         lock (_gate)
         {
             _monde = resultat.Lignes;
@@ -1139,7 +1151,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             evenements,
             _textes.Text("leaderboard.join", langue),
             Glyphe(SlotValider),
-            ReplaysEnPreparation: _replaysEnPreparation);
+            ReplaysEnPreparation: _replaysEnPreparation,
+            RangsPrecedents: _rangsPrecedents);
     }
 
     /// <summary>
