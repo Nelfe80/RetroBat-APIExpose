@@ -25,6 +25,8 @@ public sealed class LeaderboardPanelModel
     /// <summary>Les vues possibles, de la plus proche du joueur a la plus lointaine.</summary>
     public enum Vue
     {
+        /// <summary>Directs et contests en cours sur ce jeu : n'existe que s'il y en a.</summary>
+        LiveEtContest,
         MesRecords,
         CetteBorne,
         MaSalle,
@@ -50,6 +52,10 @@ public sealed class LeaderboardPanelModel
         Fermer,
         ChargerLaVue,
         AgirSurLaLigne,
+        /// <summary>Lancer le jeu pour battre le classement.</summary>
+        Defier,
+        /// <summary>Basculer le suivi du joueur de la ligne choisie.</summary>
+        BasculerLeSuivi,
     }
 
     private readonly List<Vue> _onglets = new();
@@ -70,6 +76,30 @@ public sealed class LeaderboardPanelModel
     /// Ouvre le panneau a cote du menu d'ES. Les vues disponibles se decident ICI, une fois, sur
     /// ce que la borne sait d'elle-meme.
     /// </summary>
+    /// <summary>
+    /// L'onglet LIVE & CONTEST existe-t-il ? Il se range APRES « Monde », contre la porte du menu
+    /// d'ES, et ses changements ne deplacent JAMAIS le curseur : un onglet qui surgit sous le
+    /// pouce du joueur lui volerait sa lecture. Rend vrai si la rangee d'onglets a change.
+    /// </summary>
+    public bool PoserLesEvenements(bool presents)
+    {
+        var avant = VueCourante;
+        var deja = _onglets.Contains(Vue.LiveEtContest);
+        if (presents == deja) return false;
+        if (presents)
+        {
+            _onglets.Add(Vue.LiveEtContest);
+        }
+        else
+        {
+            _onglets.Remove(Vue.LiveEtContest);
+            if (avant == Vue.LiveEtContest) { avant = Vue.Monde; _ligne = 0; }
+        }
+        var index = _onglets.IndexOf(avant);
+        _onglet = index >= 0 ? index : Math.Clamp(_onglet, 0, Math.Max(0, _onglets.Count - 1));
+        return true;
+    }
+
     public void Ouvrir(bool salleConnue, bool villeConnue, bool paysConnu, bool aDesRecords)
     {
         _onglets.Clear();
@@ -86,6 +116,12 @@ public sealed class LeaderboardPanelModel
         _ligne = 0;
         _lignes = 0;
         Etat = Foyer.MenuEs;
+    }
+
+    /// <summary>La main revient a ES, le panneau reste ouvert (chien de garde).</summary>
+    public void RendreLaMain()
+    {
+        if (Etat == Foyer.Panneau) Etat = Foyer.MenuEs;
     }
 
     public void Fermer()
@@ -170,6 +206,15 @@ public sealed class LeaderboardPanelModel
                     case EntreePanneau.Agir:
                         return _lignes == 0 ? Effet.Rien : Effet.AgirSurLaLigne;
 
+                    // Defier ne depend d'AUCUNE ligne : c'est le jeu qu'on defie, et l'action
+                    // reste offerte meme quand le classement est vide - c'est meme la qu'elle
+                    // a le plus de sens.
+                    case EntreePanneau.Defier:
+                        return Effet.Defier;
+
+                    case EntreePanneau.Suivre:
+                        return _lignes == 0 ? Effet.Rien : Effet.BasculerLeSuivi;
+
                     case EntreePanneau.Annuler:
                         // On rend la main ET on se ferme : « BACK » sort de notre panneau, il ne
                         // renvoie pas dans un menu ou le joueur ne pensait pas retourner.
@@ -190,6 +235,7 @@ public sealed class LeaderboardPanelModel
 }
 
 /// <summary>Ce que le panneau comprend. Traduit des slots de la borne par l'appelant.</summary>
+/// <summary>Ce que le joueur peut demander depuis le panneau, au-dela de la navigation.</summary>
 public enum EntreePanneau
 {
     Gauche,
@@ -200,4 +246,8 @@ public enum EntreePanneau
     PageBas,
     Agir,
     Annuler,
+    /// <summary>Defier le jeu : une action GLOBALE, pas liee a une ligne.</summary>
+    Defier,
+    /// <summary>Suivre ou ne plus suivre le joueur de la ligne choisie.</summary>
+    Suivre,
 }

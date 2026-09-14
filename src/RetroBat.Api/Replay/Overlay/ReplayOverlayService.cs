@@ -604,8 +604,20 @@ public sealed class ReplayOverlayService : BackgroundService
             /// <summary>Un rappel = glyphe de croix directionnelle (direction active en bleu) + libellé.</summary>
             private static int DrawHint(Graphics g, int x, int mid, Font label, Brush textBrush, Dir dir, string text)
             {
-                DrawDpad(g, new Rectangle(x, mid - GlyphSize / 2, GlyphSize, GlyphSize), dir);
-                x += GlyphSize + 12;
+                // Le pictogramme de la barre d'aide d'ES pour cette direction ; la croix vectorielle
+                // ne sert plus que de repli le temps que l'image soit prete.
+                var nom = dir switch { Dir.Up => "dpad_up", Dir.Down => "dpad_down", _ => "dpad_leftright" };
+                var image = RetroBat.Api.Leaderboard.EsButtonGlyphs.Aide(nom, GlyphSize);
+                if (image is not null)
+                {
+                    g.DrawImage(image, x, mid - image.Height / 2, image.Width, image.Height);
+                    x += image.Width + 12;
+                }
+                else
+                {
+                    DrawDpad(g, new Rectangle(x, mid - GlyphSize / 2, GlyphSize, GlyphSize), dir);
+                    x += GlyphSize + 12;
+                }
                 var sz = g.MeasureString(text, label);
                 g.DrawString(text, label, textBrush, x, mid - sz.Height / 2);
                 return x + (int)Math.Ceiling(sz.Width) + 30;
@@ -614,7 +626,17 @@ public sealed class ReplayOverlayService : BackgroundService
             /// <summary>Rappel « START (maintenir) » avec badge de touche.</summary>
             private static void DrawHintStart(Graphics g, int x, int mid, Font label, Brush textBrush, string text)
             {
-                var w = DrawStartBadge(g, x, mid);
+                var image = RetroBat.Api.Leaderboard.EsButtonGlyphs.Touche("start", GlyphSize);
+                int w;
+                if (image is not null)
+                {
+                    g.DrawImage(image, x, mid - image.Height / 2, image.Width, image.Height);
+                    w = image.Width;
+                }
+                else
+                {
+                    w = DrawStartBadge(g, x, mid);
+                }
                 x += w + 12;
                 g.DrawString(text, label, textBrush, x, mid - g.MeasureString(text, label).Height / 2);
             }

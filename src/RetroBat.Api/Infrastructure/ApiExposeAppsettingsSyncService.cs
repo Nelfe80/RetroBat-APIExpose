@@ -146,6 +146,8 @@ public sealed class ApiExposeAppsettingsSyncService
             ["global.apiexpose.collections_pack_manager.static_collections.enabled"] = Bool("CollectionPackManager", "StaticCollectionsEnabled"),
             ["global.apiexpose.collections_pack_manager.apply_collection_theme_to_games.enabled"] = Bool("CollectionPackManager", "ApplyCollectionThemeToGamesEnabled"),
             ["global.apiexpose.game_events_manager.enabled"] = Bool("GameEventsManager", "Enabled"),
+            ["global.apiexpose.challenge.share_live"] = Bool("Leaderboard", "ChallengeShareLive"),
+            ["global.apiexpose.challenge.join_policy"] = String("Leaderboard", "ChallengeJoinPolicy"),
             ["global.apiexpose.game_events.retroarch_wrapper.enabled"] = Bool("GameEventsManager", "RetroArchWrapperEnabled"),
             ["global.apiexpose.game_events.console_high_score_capture.enabled"] = Bool("GameEventsManager", "ConsoleHighScoreCaptureEnabled"),
             ["global.apiexpose.game_events.mame_outputs.enabled"] = Bool("GameEventsManager", "MameOutputsEnabled"),

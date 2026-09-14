@@ -728,6 +728,19 @@ public class ApiExposeOptions
         public bool Enabled { get; set; } = true;
 
         /// <summary>
+        /// Un defi lance depuis le panneau est-il diffuse comme un direct ? Faux par defaut : on
+        /// ne met pas une partie en ligne sans que le joueur l'ait choisi.
+        /// </summary>
+        public bool ChallengeShareLive { get; set; }
+
+        /// <summary>
+        /// Qui peut rejoindre un defi diffuse : « none » (personne, on regarde seulement),
+        /// « followed » (les joueurs que je suis), « everyone ». Memes valeurs que nelfeplay.com ;
+        /// toute autre valeur vaut « none ».
+        /// </summary>
+        public string ChallengeJoinPolicy { get; set; } = "none";
+
+        /// <summary>
         /// Le seuil d'ouverture. Il doit rester SOUS celui d'EmulationStation pour que les deux
         /// paraissent ensemble, et assez haut pour qu'un appui ordinaire (lancer le jeu) ne
         /// l'atteigne jamais.

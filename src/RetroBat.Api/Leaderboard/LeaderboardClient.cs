@@ -33,7 +33,9 @@ public sealed class LeaderboardClient
         bool Scelle,
         string? ReplayId,
         string Quand,
-        bool CestMoi);
+        bool CestMoi,
+        string Monde = "",
+        string Poignee = "");   // la poignee publique du joueur : ce qui permet de le suivre
 
     /// <summary>Ce qu'une vue a a montrer, y compris son echec.</summary>
     public sealed record Resultat(IReadOnlyList<Ligne> Lignes, string Etat)
@@ -161,7 +163,7 @@ public sealed class LeaderboardClient
                 string Texte(string nom) => r.TryGetProperty(nom, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : "";
                 var joueur = Texte("player");
                 var anonyme = r.TryGetProperty("anonymous", out var an) && an.ValueKind == JsonValueKind.True;
-                var valeur = r.TryGetProperty("value", out var va) && va.TryGetInt64(out var n) ? n : 0;
+                var valeur = r.TryGetProperty("value", out var va) && va.ValueKind == JsonValueKind.Number && va.TryGetInt64(out var n) ? n : 0;
                 var replay = r.TryGetProperty("replay", out var rp) && rp.ValueKind == JsonValueKind.Object
                     && rp.TryGetProperty("id", out var ri) && ri.ValueKind == JsonValueKind.String
                         ? ri.GetString()
@@ -176,7 +178,9 @@ public sealed class LeaderboardClient
                     r.TryGetProperty("sealed", out var sc) && sc.ValueKind == JsonValueKind.True,
                     replay,
                     Texte("at"),
-                    monPseudo.Length > 0 && string.Equals(joueur, monPseudo, StringComparison.OrdinalIgnoreCase)));
+                    monPseudo.Length > 0 && string.Equals(joueur, monPseudo, StringComparison.OrdinalIgnoreCase),
+                    Texte("world"),     // home | station | stream : le monde du record, comme sur le site
+                    Texte("handle")));
             }
         }
         catch (JsonException)

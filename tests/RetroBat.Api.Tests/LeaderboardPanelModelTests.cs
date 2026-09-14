@@ -203,3 +203,94 @@ public class LeaderboardPanelModelTests
         Assert.Equal(1, m.Ligne);
     }
 }
+
+/// <summary>
+/// L'onglet LIVE & CONTEST arrive APRES l'ouverture (les evenements se chargent en fond) : il ne
+/// doit jamais deplacer le curseur du joueur, et sa disparition ne doit pas le laisser sur un
+/// onglet qui n'existe plus.
+/// </summary>
+public class LeaderboardLiveTabTests
+{
+    [Fact]
+    public void L_onglet_live_apparait_sans_deplacer_le_curseur()
+    {
+        var m = new RetroBat.Api.Leaderboard.LeaderboardPanelModel();
+        m.Ouvrir(salleConnue: false, villeConnue: false, paysConnu: false, aDesRecords: true);
+        Assert.Equal(RetroBat.Api.Leaderboard.LeaderboardPanelModel.Vue.Monde, m.VueCourante);
+
+        Assert.True(m.PoserLesEvenements(true));
+        Assert.Equal(RetroBat.Api.Leaderboard.LeaderboardPanelModel.Vue.Monde, m.VueCourante);   // le curseur reste
+        Assert.Equal(RetroBat.Api.Leaderboard.LeaderboardPanelModel.Vue.LiveEtContest, m.Onglets[^1]);
+        Assert.False(m.SurLaPorte);                                                              // la porte a recule d'un cran
+        Assert.False(m.PoserLesEvenements(true));                                                // idempotent
+    }
+
+    [Fact]
+    public void Si_l_onglet_live_disparait_sous_le_curseur_on_revient_sur_monde()
+    {
+        var m = new RetroBat.Api.Leaderboard.LeaderboardPanelModel();
+        m.Ouvrir(false, false, false, true);
+        m.PoserLesEvenements(true);
+        m.Entree(RetroBat.Api.Leaderboard.EntreePanneau.Gauche);                                 // on entre (prendre le focus)
+        m.Entree(RetroBat.Api.Leaderboard.EntreePanneau.Droite);                                 // vers LIVE
+        Assert.Equal(RetroBat.Api.Leaderboard.LeaderboardPanelModel.Vue.LiveEtContest, m.VueCourante);
+
+        Assert.True(m.PoserLesEvenements(false));
+        Assert.Equal(RetroBat.Api.Leaderboard.LeaderboardPanelModel.Vue.Monde, m.VueCourante);
+        Assert.DoesNotContain(RetroBat.Api.Leaderboard.LeaderboardPanelModel.Vue.LiveEtContest, m.Onglets);
+    }
+}
+
+/// <summary>
+/// Les cibles du cartouche de defi. Logique pure, donc verifiee ici plutot qu'a l'ecran : la
+/// premiere cible est le joueur juste au-dessus de notre meilleur score (sinon la derniere place
+/// du top), nos propres lignes ne sont jamais une cible, et plusieurs joueurs peuvent tomber
+/// d'un seul coup de score.
+/// </summary>
+public class ChallengeTargetTests
+{
+    private static RetroBat.Api.Leaderboard.LeaderboardClient.Ligne L(int rang, string joueur, long valeur, bool moi = false)
+        => new(rang, joueur, valeur, "", "", "", true, null, "", moi);
+
+    [Fact]
+    public void La_cible_est_le_joueur_juste_au_dessus_de_mon_meilleur_score()
+    {
+        var classement = new[] { L(1, "ACE", 90000), L(2, "BOB", 50000), L(3, "MOI", 30000, true), L(4, "ZED", 10000) };
+        var cible = RetroBat.Api.Leaderboard.ChallengeHudService.CibleInitiale(classement);
+        Assert.Equal("BOB", cible!.Joueur);
+    }
+
+    [Fact]
+    public void Sans_score_a_moi_la_cible_est_la_derniere_place_du_top()
+    {
+        var classement = Enumerable.Range(1, 12).Select(r => L(r, "J" + r, 100000 - r * 1000)).ToArray();
+        var cible = RetroBat.Api.Leaderboard.ChallengeHudService.CibleInitiale(classement);
+        Assert.Equal(10, cible!.Rang);   // la 10e place : celle qu'il faut prendre pour entrer
+    }
+
+    [Fact]
+    public void En_tete_il_n_y_a_plus_de_cible()
+    {
+        var classement = new[] { L(1, "MOI", 90000, true), L(2, "BOB", 50000) };
+        Assert.Null(RetroBat.Api.Leaderboard.ChallengeHudService.CibleInitiale(classement));
+    }
+
+    [Fact]
+    public void Un_score_qui_depasse_deux_joueurs_avance_de_deux_rangs_en_sautant_mes_lignes()
+    {
+        var classement = new[] { L(1, "ACE", 90000), L(2, "MOI", 60000, true), L(3, "BOB", 50000), L(4, "CAT", 40000), L(5, "MOI", 30000, true) };
+        var cible = (RetroBat.Api.Leaderboard.LeaderboardClient.Ligne?) classement[3];   // CAT
+        var gagne = RetroBat.Api.Leaderboard.ChallengeHudService.Avancer(classement, 55000, ref cible);
+        Assert.True(gagne);
+        Assert.Equal("ACE", cible!.Joueur);   // CAT puis BOB depasses ; MOI (#2) n'est pas une cible
+    }
+
+    [Fact]
+    public void Un_score_insuffisant_ne_change_rien()
+    {
+        var classement = new[] { L(1, "ACE", 90000), L(2, "BOB", 50000) };
+        var cible = (RetroBat.Api.Leaderboard.LeaderboardClient.Ligne?) classement[1];
+        Assert.False(RetroBat.Api.Leaderboard.ChallengeHudService.Avancer(classement, 50000, ref cible));   // egaler ne suffit pas
+        Assert.Equal("BOB", cible!.Joueur);
+    }
+}

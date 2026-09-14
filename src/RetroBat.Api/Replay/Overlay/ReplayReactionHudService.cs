@@ -1067,8 +1067,19 @@ public sealed class ReplayReactionHudService : BackgroundService
             using var gold = new SolidBrush(Color.FromArgb((int)(245 * rowAlpha), 245, 200, 90));
 
             float total = statusW; // pastille de statut à gauche
+            // Les touches se DESSINENT comme dans la barre d'aide d'ES (pictogrammes du theme), et
+            // non en lettres : le joueur ne doit apprendre ses boutons qu'une fois. Tant qu'un
+            // pictogramme n'est pas pret, la lettre reste en repli.
+            const int touche = 30;
+            var images = new Image?[LegendItems.Length];
             var bw = new float[LegendItems.Length];
-            for (var i = 0; i < LegendItems.Length; i++) { bw[i] = g.MeasureString(LegendItems[i].Btn, btnF).Width; total += bw[i] + 6 + icon + gap; }
+            for (var i = 0; i < LegendItems.Length; i++)
+            {
+                var id = LegendItems[i].Btn.ToLowerInvariant();
+                images[i] = id.StartsWith('\u00d7') ? null : RetroBat.Api.Leaderboard.EsButtonGlyphs.Touche(id, touche);
+                bw[i] = images[i]?.Width ?? g.MeasureString(LegendItems[i].Btn, btnF).Width;
+                total += bw[i] + 6 + icon + gap;
+            }
             total -= gap;
 
             var rowH = icon + padY * 2;
@@ -1085,8 +1096,19 @@ public sealed class ReplayReactionHudService : BackgroundService
             for (var i = 0; i < LegendItems.Length; i++)
             {
                 var (btn, fam) = LegendItems[i];
-                var bh = g.MeasureString(btn, btnF);
-                g.DrawString(btn, btnF, gold, x, mid - bh.Height / 2f);
+                if (images[i] is { } image)
+                {
+                    using var attributs = new System.Drawing.Imaging.ImageAttributes();
+                    var matrice = new System.Drawing.Imaging.ColorMatrix { Matrix33 = rowAlpha };
+                    attributs.SetColorMatrix(matrice);
+                    g.DrawImage(image, new Rectangle((int) x, (int) (mid - image.Height / 2f), image.Width, image.Height),
+                        0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attributs);
+                }
+                else
+                {
+                    var bh = g.MeasureString(btn, btnF);
+                    g.DrawString(btn, btnF, gold, x, mid - bh.Height / 2f);
+                }
                 x += bw[i] + 6;
                 _sprites.Draw(g, fam, DesignBase, x + icon / 2f, mid, icon, rowAlpha);
                 x += icon + gap;

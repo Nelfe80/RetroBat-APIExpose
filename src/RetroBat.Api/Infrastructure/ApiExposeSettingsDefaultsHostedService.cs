@@ -164,6 +164,8 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
             ("global.apiexpose.marquee_manager.autogen_notify.enabled", ToEsBool(options.MarqueeManager.AutogenNotifyEnabled)),
             ("global.apiexpose.rom_set_manager.enabled", ToEsBool(options.RomSetManager.Enabled)),
             ("global.apiexpose.game_events_manager.enabled", ToEsBool(options.GameEventsManager.Enabled)),
+            ("global.apiexpose.challenge.share_live", ToEsBool(options.Leaderboard.ChallengeShareLive)),
+            ("global.apiexpose.challenge.join_policy", options.Leaderboard.ChallengeJoinPolicy),
             ("global.apiexpose.game_events.retroarch_wrapper.enabled", ToEsBool(options.GameEventsManager.RetroArchWrapperEnabled)),
             ("global.apiexpose.game_events.console_high_score_capture.enabled", ToEsBool(options.GameEventsManager.ConsoleHighScoreCaptureEnabled)),
             ("global.apiexpose.game_events.mame_lua_ingame.enabled", ToEsBool(options.GameEventsManager.MameLuaIngameEnabled)),

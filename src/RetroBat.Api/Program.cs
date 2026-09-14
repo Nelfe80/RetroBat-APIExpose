@@ -213,6 +213,9 @@ builder.Services.AddHostedService<RetroBat.Api.Infrastructure.CommunityRamSyncSe
 // Le panneau de classement, a gauche du menu de jeu d'EmulationStation. Il lit la charte du
 // theme actif et les glyphes de boutons d'ES : il ne les imite pas.
 builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardClient>();
+builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardSocialClient>();
+builder.Services.AddSingleton<RetroBat.Api.Leaderboard.ChallengeHudService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Leaderboard.ChallengeHudService>());
 builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardOverlayService>();
 builder.Services.AddHostedService<RetroBat.Api.Leaderboard.LeaderboardInputService>();
 
