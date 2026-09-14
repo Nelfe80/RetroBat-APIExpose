@@ -67,7 +67,14 @@ public sealed class LeaderboardClient
     }
 
     /// <summary>Combien de temps un classement deja lu reste bon. Un score ne tombe pas a la seconde.</summary>
-    public TimeSpan Fraicheur { get; init; } = TimeSpan.FromMinutes(2);
+    /// <summary>
+    /// 30 s, le Cache-Control de la plateforme. Deux minutes cachaient le replay d'un record tout
+    /// juste publie : il arrive sur la plateforme une minute ou deux APRES le score.
+    /// </summary>
+    public TimeSpan Fraicheur { get; init; } = TimeSpan.FromSeconds(30);
+
+    /// <summary>Oublie le classement en memoire : apres une partie, il a pu changer.</summary>
+    public void Oublier() => _cacheJusqua = DateTime.MinValue;
 
     /// <summary>
     /// Le classement complet d'un jeu (le mondial), depuis le cache s'il est frais. Le pseudo de

@@ -269,10 +269,24 @@ public class ChallengeTargetTests
     }
 
     [Fact]
-    public void En_tete_il_n_y_a_plus_de_cible()
+    public void En_tete_la_cible_est_son_propre_record()
     {
+        // Deja n°1 : sans cela, le joueur n'avait rien a battre et depasser son record ne
+        // changeait rien au cartouche (vu a l'ecran le 2026-09-14).
         var classement = new[] { L(1, "MOI", 90000, true), L(2, "BOB", 50000) };
-        Assert.Null(RetroBat.Api.Leaderboard.ChallengeHudService.CibleInitiale(classement));
+        var cible = RetroBat.Api.Leaderboard.ChallengeHudService.CibleInitiale(classement);
+        Assert.True(cible!.CestMoi);
+        Assert.Equal(90000, cible.Valeur);
+    }
+
+    [Fact]
+    public void Battre_son_propre_record_libere_la_cible()
+    {
+        var classement = new[] { L(1, "MOI", 27410, true), L(2, "BOB", 18100) };
+        var cible = RetroBat.Api.Leaderboard.ChallengeHudService.CibleInitiale(classement);
+        Assert.False(RetroBat.Api.Leaderboard.ChallengeHudService.Avancer(classement, 27410, ref cible));   // egaler ne suffit pas
+        Assert.True(RetroBat.Api.Leaderboard.ChallengeHudService.Avancer(classement, 29920, ref cible));    // nouveau record
+        Assert.Null(cible);
     }
 
     [Fact]

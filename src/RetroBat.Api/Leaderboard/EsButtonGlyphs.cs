@@ -53,6 +53,13 @@ public static class EsButtonGlyphs
         catch (Exception) { return null; }
     }
 
+    /// <summary>Une image dans SES couleurs (le sceau certifie garde son orange), sans teinte.</summary>
+    public static Image? TelQuel(string nom, int hauteur)
+    {
+        try { return Cache().Glyphe(nom, hauteur); }
+        catch (Exception) { return null; }
+    }
+
     /// <summary>Une icone d'aide par son nom (dpad_up, dpad_leftright, dpad_down, dpad_updown…).</summary>
     public static Image? Aide(string nom, int hauteur, Color? teinte = null)
     {

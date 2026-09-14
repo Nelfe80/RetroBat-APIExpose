@@ -1076,7 +1076,8 @@ public sealed class ReplayReactionHudService : BackgroundService
             for (var i = 0; i < LegendItems.Length; i++)
             {
                 var id = LegendItems[i].Btn.ToLowerInvariant();
-                images[i] = id.StartsWith('\u00d7') ? null : RetroBat.Api.Leaderboard.EsButtonGlyphs.Touche(id, touche);
+                // En BLANC : la couleur d'aide du theme (bleu) se lisait mal sur la bande sombre.
+                images[i] = id.StartsWith('\u00d7') ? null : RetroBat.Api.Leaderboard.EsButtonGlyphs.Touche(id, touche, Color.White);
                 bw[i] = images[i]?.Width ?? g.MeasureString(LegendItems[i].Btn, btnF).Width;
                 total += bw[i] + 6 + icon + gap;
             }

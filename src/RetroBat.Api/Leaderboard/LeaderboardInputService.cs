@@ -54,6 +54,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     private readonly RetroBat.Api.Netplay.NetplayGuestService _invite;
     private readonly RetroBat.Api.Netplay.NetplayHostService _hote;
     private readonly ChallengeHudService _defi;
+    private readonly Replay.Storage.ReplayStore _replays;
+    private IReadOnlySet<long> _replaysEnPreparation = new HashSet<long>();
     private readonly EsControllerService _es;
     private bool _seanceArmeeParLeDefi;
     private bool _directAnnonceParLeDefi;
@@ -103,6 +105,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         RetroBat.Api.Netplay.NetplayGuestService invite,
         RetroBat.Api.Netplay.NetplayHostService hote,
         ChallengeHudService defi,
+        Replay.Storage.ReplayStore replays,
         EsControllerService es,
         IEmulationStationNotificationService notifications,
         RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider wrapper,
@@ -113,6 +116,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         _invite = invite;
         _hote = hote;
         _defi = defi;
+        _replays = replays;
         _es = es;
         _notifications = notifications;
         _textes = textes;
@@ -197,6 +201,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             }
             if (string.Equals(e.Type, "ui.game.ended", StringComparison.Ordinal))
             {
+                // Une partie peut avoir change le classement : on ne ressert pas l'ancien.
+                _client.Oublier();
                 if (_seanceArmeeParLeDefi)
                 {
                     // Desarmer, sinon la partie suivante serait comptee pour le contest.
@@ -564,9 +570,68 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         });
     }
 
-    private async Task ChargerAsync(CancellationToken ct)
+    /// <summary>
+    /// Les scores de CE jeu dont cette borne a enregistre le replay. Une ligne a nous, sans
+    /// replay cote plateforme mais dont le score est ici, a un replay EN COURS D'ENVOI.
+    /// </summary>
+    private IReadOnlySet<long> ReplaysLocaux(string cheminDuJeu)
     {
-        _ = ChargerLesEvenementsAsync(ct);
+        var scores = new HashSet<long>();
+        if (cheminDuJeu.Length == 0) return scores;
+        var cible = Path.GetFullPath(cheminDuJeu.Replace('/', '\\'));
+        try
+        {
+            foreach (var manifeste in _replays.ListManifests())
+            {
+                var meta = _replays.GetMeta(manifeste.ReplayId);
+                if (meta is null || !meta.CreatedByThisDevice || meta.ScoreValue is not { } score) continue;
+                var rom = meta.Launch?.RomPath ?? "";
+                if (rom.Length == 0) continue;
+                if (string.Equals(Path.GetFullPath(rom), cible, StringComparison.OrdinalIgnoreCase)) scores.Add(score);
+            }
+        }
+        catch (Exception ex) { _logger.LogDebug(ex, "Classement : replays locaux illisibles."); }
+        return scores;
+    }
+
+    private CancellationTokenSource? _relecture;
+
+    /// <summary>
+    /// Tant qu'un replay enregistre ici n'est pas encore sur la plateforme, on relit le classement
+    /// toutes les 20 s : « REPLAY » passe du gris au bouton sans que le joueur ait a rouvrir.
+    /// </summary>
+    private void RelireTantQueLeReplayArrive()
+    {
+        _relecture?.Cancel();
+        var jeton = new CancellationTokenSource();
+        _relecture = jeton;
+        var jeu = _romGroup;
+        _ = Task.Run(async () =>
+        {
+            var limite = DateTime.UtcNow + TimeSpan.FromMinutes(10);
+            while (!jeton.IsCancellationRequested && DateTime.UtcNow < limite)
+            {
+                try { await Task.Delay(TimeSpan.FromSeconds(20), jeton.Token).ConfigureAwait(false); }
+                catch (OperationCanceledException) { return; }
+                if (_modele.Etat == LeaderboardPanelModel.Foyer.Ferme || !string.Equals(jeu, _romGroup, StringComparison.Ordinal)) return;
+                _client.Oublier();
+                await ChargerAsync(jeton.Token, relecture: true).ConfigureAwait(false);
+                if (!UnReplayEstEnAttente()) return;
+            }
+        });
+    }
+
+    private bool UnReplayEstEnAttente()
+    {
+        lock (_gate)
+        {
+            return _monde.Any(l => l.CestMoi && l.ReplayId is not { Length: > 0 } && _replaysEnPreparation.Contains(l.Valeur));
+        }
+    }
+
+    private async Task ChargerAsync(CancellationToken ct, bool relecture = false)
+    {
+        if (!relecture) _ = ChargerLesEvenementsAsync(ct);
         var pseudo = _agent.Status.Pseudo ?? "";
         var resultat = await _client.MondeAsync(_romGroup, pseudo, ct).ConfigureAwait(false);
         lock (_gate)
@@ -582,8 +647,15 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 _monPays = mienne.Pays;
             }
         }
+        try
+        {
+            var jeu = _context.Ui.Selected;
+            _replaysEnPreparation = ReplaysLocaux(jeu?.GamePath ?? "");
+        }
+        catch (Exception) { _replaysEnPreparation = new HashSet<long>(); }
         if (_modele.Etat == LeaderboardPanelModel.Foyer.Ferme) return;
         Rafraichir();
+        if (!relecture && UnReplayEstEnAttente()) RelireTantQueLeReplayArrive();
     }
 
     private void Appliquer(LeaderboardPanelModel.Effet effet)
@@ -667,9 +739,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         // Au-dessus de « Lancement de la partie » : c'est un DEFI, et voici l'objectif.
         var langue = Langue();
         var objectif = _defi.Objectif().Cible is { } cible
-            ? _textes.Format("leaderboard.challenge_goal", langue,
-                ("rank", cible.Rang), ("player", cible.Joueur),
-                ("score", cible.Valeur.ToString("N0", System.Globalization.CultureInfo.CurrentCulture)))
+            ? cible.CestMoi
+                ? _textes.Format("leaderboard.challenge_goal_own", langue,
+                    ("score", cible.Valeur.ToString("N0", System.Globalization.CultureInfo.CurrentCulture)))
+                : _textes.Format("leaderboard.challenge_goal", langue,
+                    ("rank", cible.Rang), ("player", cible.Joueur),
+                    ("score", cible.Valeur.ToString("N0", System.Globalization.CultureInfo.CurrentCulture)))
             : _textes.Text("leaderboard.challenge_goal_top", langue);
         _overlay.Attendre(_textes.Text("leaderboard.starting_game", langue), _textes.Text("leaderboard.challenge_title", langue), objectif);
 
@@ -1063,7 +1138,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             Glyphe(SlotDeLIdentite("x")),
             evenements,
             _textes.Text("leaderboard.join", langue),
-            Glyphe(SlotValider));
+            Glyphe(SlotValider),
+            ReplaysEnPreparation: _replaysEnPreparation);
     }
 
     /// <summary>

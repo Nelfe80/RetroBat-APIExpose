@@ -186,7 +186,8 @@ public sealed class LeaderboardOverlayService : IDisposable
         string GlypheRejoindre = "",
         string Attente = "",
         string AttenteTitre = "",
-        string AttenteDetail = "");
+        string AttenteDetail = "",
+        IReadOnlySet<long>? ReplaysEnPreparation = null);
 
     private Contenu _contenu = new("", Array.Empty<string>(), 0, Array.Empty<LeaderboardClient.Ligne>(), 0, "", true, false,
         Array.Empty<Aide>(), Array.Empty<Aide>(), "", "", "", "", Array.Empty<string>(),
@@ -395,6 +396,11 @@ public sealed class LeaderboardOverlayService : IDisposable
         private float _cameraOnglets;
         private int _largeurNormale;
         private int _imageAttente;
+        private int _imageSablier;
+
+        private static bool AUnReplayEnPreparation(Contenu c)
+            => c.ReplaysEnPreparation is { Count: > 0 } attente
+               && c.Lignes.Any(l => l.CestMoi && l.ReplayId is not { Length: > 0 } && attente.Contains(l.Valeur));
 
         public Panneau(LeaderboardOverlayService service)
         {
@@ -437,7 +443,13 @@ public sealed class LeaderboardOverlayService : IDisposable
                 if (!_service.Affiche) { Cacher(); return; }
                 if (!Visible) Show();
                 PasserDevant();
-                if (_service.Lire().Attente.Length > 0) Invalidate();
+                var contenu = _service.Lire();
+                // Le sablier tourne : attente d'un lancement, ou replay en cours d'envoi.
+                if (contenu.Attente.Length > 0 || AUnReplayEnPreparation(contenu))
+                {
+                    _imageSablier++;
+                    Invalidate();
+                }
             };
             _minuteur.Start();
         }
@@ -979,7 +991,23 @@ public sealed class LeaderboardOverlayService : IDisposable
                         }
                     }
                 }
-                else if (l.ReplayId is { Length: > 0 } && etiquette.Length > 0)
+                if (etiquette.Length > 0 && l.CestMoi && l.ReplayId is not { Length: > 0 }
+                    && c.ReplaysEnPreparation is { } enAttente && enAttente.Contains(l.Valeur))
+                {
+                    // Le replay est enregistre ICI mais pas encore sur la plateforme : « REPLAY » en
+                    // gris et le sablier d'ES qui tourne. Rien a lancer tant qu'il n'est pas arrive.
+                    var gris = Color.FromArgb(choisie ? 200 : 150, Teinte(s.TextColor));
+                    var sablier = _service._glyphes?.Glyphe("busy_" + (_imageSablier % 4), (int) (taille * 0.9f), gris);
+                    if (sablier is not null)
+                    {
+                        g.DrawImage(sablier, xDroite - sablier.Width, y + (hauteur - sablier.Height) / 2f, sablier.Width, sablier.Height);
+                        xDroite -= sablier.Width + taille * 0.3f;
+                    }
+                    using var encreGrise = new SolidBrush(gris);
+                    g.DrawString(etiquette, petite, encreGrise, new RectangleF(0, y, xDroite, hauteur), droite);
+                    xDroite -= g.MeasureString(etiquette, petite, PointF.Empty, StringFormat.GenericTypographic).Width + taille * 0.8f;
+                }
+                else if (!choisie && l.ReplayId is { Length: > 0 } && etiquette.Length > 0)
                 {
                     using var encreEtiquette = new SolidBrush(couleurGroupe);
                     g.DrawString(etiquette, petite, encreEtiquette, new RectangleF(0, y, xDroite, hauteur), droite);

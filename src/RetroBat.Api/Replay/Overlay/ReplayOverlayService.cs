@@ -48,14 +48,14 @@ public sealed class ReplayOverlayService : BackgroundService
     private readonly RetroBat.Api.Infrastructure.CabinetLocale _locale;
 
     /// <summary>Les libelles de la barre, dans la langue de la borne, en MAJUSCULES comme ES.</summary>
-    internal sealed record TextesDeLaBarre(string Lecture, string Deplacement, string Checkpoint, string Quitter, string Score, CultureInfo Culture);
+    internal sealed record TextesDeLaBarre(string Lecture, string Deplacement, string Checkpoint, string Quitter, string Score, CultureInfo Culture, string Maintenir = "(HOLD)");
 
     private TextesDeLaBarre Textes()
     {
         var culture = _locale.Culture;
         string T(string cle) => _locale.Text(cle).ToUpper(culture);
         return new TextesDeLaBarre(T("replay.bar.play_pause"), T("replay.bar.rewind_forward"), T("replay.bar.checkpoint"),
-            T("replay.bar.quit"), T("replay.card.score"), culture);
+            T("replay.bar.quit"), T("replay.card.score"), culture, T("replay.bar.hold"));
     }
 
     /// <summary>
@@ -480,7 +480,7 @@ public sealed class ReplayOverlayService : BackgroundService
             {
                 try { if (_textesDeLaBarre is not null) return _textesDeLaBarre(); }
                 catch (Exception) { }
-                return new TextesDeLaBarre("LECTURE / PAUSE", "RECUL / AVANCE", "CHECKPOINT", "QUITTER", "SCORE", CultureInfo.GetCultureInfo("fr-FR"));
+                return new TextesDeLaBarre("LECTURE / PAUSE", "RECUL / AVANCE", "CHECKPOINT", "QUITTER", "SCORE", CultureInfo.GetCultureInfo("fr-FR"), "(MAINTENIR)");
             }
 
             public OverlaySurface(Func<ReplayPlaybackService.StateSnapshot> get, Func<float[]?> curve,
@@ -628,7 +628,7 @@ public sealed class ReplayOverlayService : BackgroundService
                 x = DrawHint(g, x, mid, label, textBrush, Dir.Up, libelles.Lecture);
                 x = DrawHint(g, x, mid, label, textBrush, Dir.LeftRight, libelles.Deplacement);
                 x = DrawHint(g, x, mid, label, textBrush, Dir.Down, libelles.Checkpoint);
-                DrawHintStart(g, x, mid, label, textBrush, libelles.Quitter);
+                DrawHintStart(g, x, mid, label, textBrush, libelles.Maintenir + "  " + libelles.Quitter);
             }
 
             /// <summary>Un rappel = glyphe de croix directionnelle (direction active en bleu) + libellé.</summary>
@@ -697,9 +697,12 @@ public sealed class ReplayOverlayService : BackgroundService
                 var rank = card.Rank is int r ? $"#{r}" : "#—";
 
                 // Ligne 1 (EN HAUT) = le SCORE, titre du record, en or + rang.
+                // Une place reservee au sceau certifie, entre « SCORE » et le nombre qu'il certifie.
+                const string placeDuSceau = "      ";
                 var line1 = new (string t, Font f, Brush b)[]
                 {
                     (libelles.Score + " ", labelFont, dim),
+                    (card.Certified ? placeDuSceau : "", labelFont, dim),
                     (score, scoreFont, gold),
                     ("    ", rankFont, dim),
                     (rank, rankFont, white),
@@ -723,10 +726,9 @@ public sealed class ReplayOverlayService : BackgroundService
                 var textRight = logoBox.Left - 18f;
                 var textLeft = textRight - Math.Max(w1, w2);
 
-                // Badge « certifié » EN TÊTE (sceau de validation), à gauche du bloc texte.
-                const int badgeSize = 54;
-                var badgeBox = new Rectangle((int)(textLeft - 18 - badgeSize), midY - badgeSize / 2, badgeSize, badgeSize);
-                DrawVerifiedBadge(g, badgeBox, card.Certified);
+                // Le sceau « certifié » : PETIT et ORANGE, juste devant le score qu'il certifie. Le grand
+                // hexagone a gauche du bloc lisait comme un logo de plus, pas comme une preuve.
+                var sceau = card.Certified ? RetroBat.Api.Leaderboard.EsButtonGlyphs.TelQuel("nelfe-verified", 22) : null;
 
                 void DrawLine((string t, Font f, Brush b)[] parts, float width, float centerY)
                 {
@@ -739,6 +741,14 @@ public sealed class ReplayOverlayService : BackgroundService
                     }
                 }
                 DrawLine(line1, w1, midY - 12);
+                if (sceau is not null)
+                {
+                    // Dans la place reservee, juste devant le nombre : la ligne 1 est alignee a droite,
+                    // son debut vaut textRight - w1.
+                    var debutPlace = textRight - w1 + g.MeasureString(libelles.Score + " ", labelFont).Width;
+                    var largeurPlace = g.MeasureString(placeDuSceau, labelFont).Width;
+                    g.DrawImage(sceau, debutPlace + (largeurPlace - sceau.Width) / 2f, midY - 12 - sceau.Height / 2f, sceau.Width, sceau.Height);
+                }
                 DrawLine(line2, w2, midY + 16);
             }
 

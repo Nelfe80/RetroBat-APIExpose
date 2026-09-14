@@ -31,6 +31,15 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
     public const int TailleDuTop = 10;
 
     private readonly IEventBus _bus;
+    private readonly RetroBat.Api.Infrastructure.CabinetLocale? _locale;
+
+    /// <summary>« TON RECORD » et « NOUVEAU RECORD », dans la langue de la borne.</summary>
+    internal (string SonRecord, string NouveauRecord) Libelles()
+    {
+        var culture = _locale?.Culture ?? System.Globalization.CultureInfo.CurrentCulture;
+        string T(string cle, string repli) => (_locale?.Text(cle) is { Length: > 0 } t && t != cle ? t : repli).ToUpper(culture);
+        return (T("leaderboard.challenge_own_record", "Your record"), T("leaderboard.challenge_new_record", "New record"));
+    }
     private readonly ILogger<ChallengeHudService> _journal;
     private readonly object _verrou = new();
 
@@ -47,8 +56,9 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
     private long _score;
     private EsMenuStyle _style = new();
 
-    public ChallengeHudService(IEventBus bus, ILogger<ChallengeHudService> journal)
+    public ChallengeHudService(IEventBus bus, ILogger<ChallengeHudService> journal, RetroBat.Api.Infrastructure.CabinetLocale? locale = null)
     {
+        _locale = locale;
         _bus = bus;
         _journal = journal;
     }
@@ -98,7 +108,9 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
         var moi = tries.FirstOrDefault(l => l.CestMoi);
         if (moi is not null)
         {
-            return tries.LastOrDefault(l => l.Rang < moi.Rang && !l.CestMoi);
+            // Personne au-dessus : la cible est SON record. Sans cela, un joueur deja n°1 n'avait
+            // rien a battre, et depasser son propre record ne changeait rien au cartouche.
+            return tries.LastOrDefault(l => l.Rang < moi.Rang && !l.CestMoi) ?? moi;
         }
         var autres = tries.Where(l => !l.CestMoi).ToList();
         if (autres.Count == 0) return null;
@@ -411,14 +423,16 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
             {
                 var valeur = cible.Valeur.ToString("N0", System.Globalization.CultureInfo.CurrentCulture);
                 var largeurScore = g.MeasureString(valeur, policeScore, PointF.Empty, StringFormat.GenericTypographic).Width;
-                g.DrawString($"#{cible.Rang} {cible.Joueur.ToUpperInvariant()}", policeNom, grisNom,
+                g.DrawString(cible.CestMoi ? _service.Libelles().SonRecord : $"#{cible.Rang} {cible.Joueur.ToUpperInvariant()}", policeNom, grisNom,
                     new RectangleF(x, yCible, Math.Max(10, Width - x - largeurScore - marge * 1.5f), hCible), gauche);
                 g.DrawString(valeur, policeScore, blanc, new RectangleF(0, yCible, Width - marge, hCible), droite);
             }
             else
             {
-                // Plus personne au-dessus : le joueur est en tete.
-                g.DrawString("#1", policeScore, blanc, new RectangleF(x, yCible, Width - x - marge, hCible), gauche);
+                // Plus personne au-dessus : le joueur vient de prendre la tete, ou d'ameliorer son
+                // propre record. Sans rang gagne pendant la partie, il n'y avait simplement aucun score.
+                var texte = etat.RangGagne ? _service.Libelles().NouveauRecord : "#1";
+                g.DrawString(texte, etat.RangGagne ? policeNom : policeScore, blanc, new RectangleF(x, yCible, Width - x - marge, hCible), gauche);
             }
         }
 
