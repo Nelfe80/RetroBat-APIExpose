@@ -58,7 +58,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     // un échec n'affecte ni le scoring ni l'enregistrement.
     private readonly RetroBat.Api.Replay.Storage.ReplayStore? _replayStore;
     /// <summary>Les NVRAM du jeu (reglages des jeux sans DIP switches), jointes au passeport.</summary>
-    private readonly NvramSnapshotService? _nvram;   // pour estampiller score/rang sur la méta du replay
+    private readonly NvramSnapshotService? _nvram;
+    private readonly BiosFingerprintService? _bios;   // pour estampiller score/rang sur la méta du replay
     private readonly RetroBat.Api.Replay.Sharing.ReplaySeedQueue? _semis;
     private readonly RetroBat.Api.Replay.Sharing.ReplaySeedService? _semeur;
     private string? _activeReplayId;
@@ -79,9 +80,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         ILogger<NelfePlayScoringReporter>? logger = null,
         RetroBat.Api.Replay.Sharing.ReplaySeedQueue? semis = null,
         RetroBat.Api.Replay.Sharing.ReplaySeedService? semeur = null,
-        NvramSnapshotService? nvram = null)
+        NvramSnapshotService? nvram = null,
+        BiosFingerprintService? bios = null)
     {
         _nvram = nvram;
+        _bios = bios;
         _replayStore = replayStore;
         _semis = semis;
         _semeur = semeur;
@@ -522,6 +525,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             catch (Exception ex) { Trace($"NVRAM indisponible : {ex.Message}"); }
         }
 
+        // Les BIOS que le profil exige (none quand le jeu n'en utilise pas).
+        JsonObject? bios = null;
+        if (_bios is not null)
+        {
+            try { bios = _bios.PourLePasseport(profile.Value); }
+            catch (Exception ex) { Trace($"BIOS indisponible : {ex.Message}"); }
+        }
+
         using var deviceKey = CngDeviceKey.OpenOrCreate(ScoringKeyName);
         JsonObject passport;
         try
@@ -529,7 +540,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             passport = BuildPassport(
                 systemId, romGroup, sessionJson, ticket.Value, profile.Value,
                 deviceId!, deviceKey, listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion,
-                runPeak, bestRun, nvram);
+                runPeak, bestRun, nvram, bios);
             var body = passport.DeepClone()!.AsObject();
             body.Remove("signature");
             passport["signature"] = deviceKey.SignB64Url(Jcs.CanonicalBytes(body));
@@ -547,7 +558,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         string systemId, string romGroup, string sessionJson, JsonElement ticket, JsonElement profile,
         string deviceId, CngDeviceKey deviceKey, string listenerSha, string? coreSha, string? memSha,
         string? contentSha, string? contentMd5, string? contentSha1, string? wrapperVersion, long finalTotal, List<(long frame, long total)> trajectory,
-        JsonArray? nvram = null)
+        JsonArray? nvram = null, JsonObject? bios = null)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
@@ -676,7 +687,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 ["core"] = Triple(coreSha), ["content"] = ContentArtifact(contentSha, contentMd5, contentSha1), ["mem"] = Triple(memSha),
                 ["core_options_digest"] = coreOptionsDigest,
-                ["bios"] = new JsonObject { ["mode"] = "none" },
+                ["bios"] = bios ?? new JsonObject { ["mode"] = "none" },
 
             },
             ["process"] = new JsonObject

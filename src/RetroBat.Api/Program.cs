@@ -249,6 +249,8 @@ builder.Services.AddSingleton<RetroBat.Api.Infrastructure.NelfePlayScoringSessio
 // attestation + score (soumission du passeport = étape 3c).
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.NvramSnapshotService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.NvramSnapshotService>());
+builder.Services.AddSingleton<RetroBat.Api.Infrastructure.BiosFingerprintService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.BiosFingerprintService>());
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.NelfePlayScoringReporter>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.NelfePlayScoringReporter>());
 // Déchiffrement au lancement puis effacement : rien de clair ne survit à la partie.
