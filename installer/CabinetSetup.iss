@@ -61,7 +61,8 @@ Source: "..\appsettings.json"; DestDir: "{app}"; Flags: onlyifdoesntexist uninsn
 Name: "{app}\state"; Flags: uninsneveruninstall
 
 [Run]
-Filename: "{app}\install-es-start-hook.bat"; WorkingDir: "{app}"; Description: "Démarrer APIExpose avec RetroBat (hook EmulationStation)"; Flags: postinstall skipifsilent
+; Le hook EmulationStation n'est plus pose par install-es-start-hook.bat : lance ici avec
+; skipifsilent, il etait saute en /VERYSILENT et finissait sur une pause. [Code] le copie.
 Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"; Description: "Démarrer APIExpose maintenant"; Flags: postinstall nowait skipifsilent unchecked
 
 [UninstallRun]
@@ -70,9 +71,55 @@ Filename: "taskkill"; Parameters: "/f /im {#AppExe}"; Flags: runhidden; RunOnceI
 ; Detection/validation du RetroBat cible (DefaultDirName + avertissement si mauvais dossier).
 #include "retrobat-detect.iss"
 
+// Prerequis .NET 8 (ASP.NET Core + Desktop, x64) : detectes, telecharges et installes au besoin.
+// (Commentaire en // : apres l'include de retrobat-detect.iss, on est deja dans [Code].)
+#include "dotnet-runtime.iss"
+
 [Code]
+// Dossier des scripts de demarrage d'EmulationStation du RetroBat cible.
+function EsStartHookDir(): String;
+begin
+  Result := ExtractFilePath(RemoveBackslashUnlessRoot(ExtractFilePath(RemoveBackslashUnlessRoot(ExpandConstant('{app}')))))
+    + 'emulationstation\.emulationstation\scripts\start';
+end;
+
+// Le hook qui fait attendre EmulationStation au demarrage : pose par l'installeur lui-meme,
+// y compris en installation silencieuse, et jamais hors d'un RetroBat.
+procedure InstallEsStartHook();
+var
+  Source, Target: String;
+begin
+  if not AppParentIsRetroBat() then
+  begin
+    Log('Hook EmulationStation non pose : le dossier n''est pas dans un RetroBat.');
+    Exit;
+  end;
+  Source := ExpandConstant('{app}\.installer\scripts\start\APIExpose-start-wait.bat');
+  Target := EsStartHookDir() + '\APIExpose-start-wait.bat';
+  if not ForceDirectories(EsStartHookDir()) then
+    Log('Hook EmulationStation : dossier impossible a creer : ' + EsStartHookDir())
+  else if FileCopy(Source, Target, False) then
+    Log('Hook EmulationStation pose : ' + Target)
+  else
+    Log('Hook EmulationStation NON pose : copie impossible vers ' + Target);
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssInstall then
     WarnIfNotRetroBat();
+  if CurStep = ssPostInstall then
+    InstallEsStartHook();
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+var
+  Target: String;
+begin
+  if CurUninstallStep = usUninstall then
+  begin
+    Target := EsStartHookDir() + '\APIExpose-start-wait.bat';
+    if FileExists(Target) and DeleteFile(Target) then
+      Log('Hook EmulationStation retire : ' + Target);
+  end;
 end;
