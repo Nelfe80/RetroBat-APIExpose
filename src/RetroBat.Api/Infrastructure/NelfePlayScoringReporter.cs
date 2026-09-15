@@ -934,7 +934,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "profile.content_mismatch" => "ROM non reconnue",
         "profile.mem_mismatch" => "définition mémoire non reconnue",
         "profile.core_options_mismatch" => "réglages non conformes (usine requis)",
-        "profile.listener_unauthorized" => "wrapper non homologué",
+        "profile.listener_unauthorized" => "listener non homologué (wrapper ou plugin MAME)",
         "profile.not_open" => "classement fermé",
         "profile.mismatch" => "jeu ou règlement non concordant",
         "session.no_game_end" => "partie non terminée",

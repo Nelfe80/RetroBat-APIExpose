@@ -679,6 +679,29 @@ public sealed class MameLuaIngameProvider : IProvider
         return fallback ?? ResolveDefinition(rawRom, "arcade");
     }
 
+    // Meme arbitrage que le wrapper RetroArch : .contest\ (competition) toujours
+    // prioritaire, .user\ (perso) seulement si PERSO=1, sinon l'officiel. Un .MEM
+    // perso ne correspond a l'empreinte d'aucun profil : la partie se joue et
+    // s'affiche, elle reste hors classement.
+    private static string PickDefinitionFile(string systemId, string rom)
+    {
+        var ramRoot = RetroBatPaths.RamResourcesRoot;
+        var contest = Path.Combine(ramRoot, ".contest", systemId, rom + ".MEM");
+        if (File.Exists(contest))
+        {
+            return contest;
+        }
+        if (WrapperEnvFile.ReadFlag("PERSO") == "1")
+        {
+            var perso = Path.Combine(ramRoot, ".user", systemId, rom + ".MEM");
+            if (File.Exists(perso))
+            {
+                return perso;
+            }
+        }
+        return Path.Combine(ramRoot, systemId, rom + ".MEM");
+    }
+
     private MameLuaDefinition ResolveDefinition(string rawRom, string systemId)
     {
         var rom = NormalizeRom(rawRom);
@@ -711,7 +734,7 @@ public sealed class MameLuaIngameProvider : IProvider
             }
         }
 
-        var definitionFile = Path.Combine(RetroBatPaths.RamResourcesRoot, systemId, rom + ".MEM");
+        var definitionFile = PickDefinitionFile(systemId, rom);
         var rules = File.Exists(definitionFile)
             ? ParseRules(File.ReadAllText(definitionFile))
             : new List<MameLuaRule>();
@@ -1202,8 +1225,10 @@ public sealed class MameLuaIngameProvider : IProvider
         string? listenerSha = null, coreSha = null, contentSha1 = null;
         try
         {
-            var ramRoot = Path.GetDirectoryName(Path.GetDirectoryName(definition.DefinitionFile));   // .../resources/ram
-            if (ramRoot != null)
+            // La racine ram ne se deduit plus du .MEM : un .MEM .user\ ou .contest\ vit
+            // un niveau plus bas, et le listener mesure serait introuvable.
+            var ramRoot = Path.TrimEndingDirectorySeparator(RetroBatPaths.RamResourcesRoot);   // .../resources/ram
+            if (!string.IsNullOrEmpty(ramRoot))
             {
                 listenerSha = Sha(Path.Combine(ramRoot, "tools", "mame_apiexpose_ingame", "init.lua"));
                 var resourcesRoot = Path.GetDirectoryName(ramRoot);                                   // .../resources
