@@ -5,13 +5,13 @@ Installer APIExpose tient en un **installateur** : on télécharge, on lance, on
 ## Avant de commencer
 
 - une installation **RetroBat** fonctionnelle ;
-- le **[runtime .NET 8](https://dotnet.microsoft.com/download/dotnet/8.0)** ;
+- une connexion Internet si **.NET 8** n'est pas encore installé : l'installateur télécharge et installe lui-même ce qui manque (ASP.NET Core Runtime 8 et .NET Desktop Runtime 8), Windows vous demande simplement l'autorisation ;
 - une sauvegarde de votre dossier RetroBat si votre installation compte pour vous - APIExpose modifie gamelists et réglages.
 
 ## Installation
 
-1. Téléchargez **[`APIExpose-Cabinet-Setup.exe`](https://github.com/Nelfe80/RetroBat-APIExpose/releases/latest/download/APIExpose-Cabinet-Setup.exe)** depuis la page des releases - il contient le programme, les outils (ffmpeg, ImageMagick, translateLocally) et le Data Pack complet.
-2. Lancez l'installateur : il installe le plugin dans `RetroBat\plugins\` et enregistre le hook de démarrage EmulationStation - vous obtenez :
+1. Téléchargez **[`APIExpose-Cabinet-Setup.exe`](https://github.com/Nelfe80/RetroBat-APIExpose/releases/latest/download/APIExpose-Cabinet-Setup.exe)** depuis la page des releases - il contient le programme, les outils (ImageMagick, translateLocally) et le Data Pack complet.
+2. Lancez l'installateur : il vérifie .NET 8, installe le plugin dans `RetroBat\plugins\` et pose le hook de démarrage EmulationStation - vous obtenez :
 
     ```text
     RetroBat\plugins\APIExpose\
@@ -25,6 +25,8 @@ Installer APIExpose tient en un **installateur** : on télécharge, on lance, on
     ```text
     emulationstation\.emulationstation\scripts\start\APIExpose-start-wait.bat
     ```
+
+    Il fait patienter EmulationStation le temps qu'APIExpose soit prêt, deux minutes au plus, et pas du tout si APIExpose ne peut pas démarrer : RetroBat ne reste jamais bloqué. Ce qui s'est passé au dernier démarrage est écrit dans `plugins\APIExpose\.log\es-start-hook.log`.
 
 ## Vérifier que ça marche
 
@@ -62,6 +64,7 @@ COLLECTIONS PACK MANAGER
 |---|---|
 | Arrêter APIExpose | Double-clic sur `stop.bat` |
 | Retirer le lancement automatique | Double-clic sur `uninstall-es-start-hook.bat` |
+| Tout désinstaller | Paramètres Windows, Applications, « APIExpose (borne RetroBat) » : le hook est retiré aussi |
 
 Les fichiers restent dans `plugins\APIExpose` - relancer le hook réactive tout.
 

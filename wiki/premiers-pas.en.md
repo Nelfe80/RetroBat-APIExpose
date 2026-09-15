@@ -5,13 +5,13 @@ Installing APIExpose is a single **installer**: download, run, activate.
 ## Before you begin
 
 - a working **RetroBat** installation;
-- the **[.NET 8 runtime](https://dotnet.microsoft.com/download/dotnet/8.0)**;
+- an Internet connection if **.NET 8** is not installed yet: the installer downloads and installs whatever is missing (ASP.NET Core Runtime 8 and .NET Desktop Runtime 8) on its own, Windows simply asks for your permission;
 - a backup of your RetroBat folder if your installation matters to you - APIExpose modifies gamelists and settings.
 
 ## Installation
 
-1. Download **[`APIExpose-Cabinet-Setup.exe`](https://github.com/Nelfe80/RetroBat-APIExpose/releases/latest/download/APIExpose-Cabinet-Setup.exe)** from the releases page - it contains the program, the tools (ffmpeg, ImageMagick, translateLocally) and the full Data Pack.
-2. Run the installer: it installs the plugin into `RetroBat\plugins\` and registers the EmulationStation start hook - you get:
+1. Download **[`APIExpose-Cabinet-Setup.exe`](https://github.com/Nelfe80/RetroBat-APIExpose/releases/latest/download/APIExpose-Cabinet-Setup.exe)** from the releases page - it contains the program, the tools (ImageMagick, translateLocally) and the full Data Pack.
+2. Run the installer: it checks .NET 8, installs the plugin into `RetroBat\plugins\` and places the EmulationStation start hook - you get:
 
     ```text
     RetroBat\plugins\APIExpose\
@@ -25,6 +25,8 @@ Installing APIExpose is a single **installer**: download, run, activate.
     ```text
     emulationstation\.emulationstation\scripts\start\APIExpose-start-wait.bat
     ```
+
+    It makes EmulationStation wait until APIExpose is ready, two minutes at most, and not at all if APIExpose cannot start: RetroBat never stays stuck. What happened at the last startup is written to `plugins\APIExpose\.log\es-start-hook.log`.
 
 ## Check that it works
 
@@ -62,6 +64,7 @@ COLLECTIONS PACK MANAGER
 |---|---|
 | Stop APIExpose | Double-click `stop.bat` |
 | Remove the automatic startup | Double-click `uninstall-es-start-hook.bat` |
+| Uninstall everything | Windows Settings, Apps, "APIExpose (borne RetroBat)": the hook is removed too |
 
 Files stay in `plugins\APIExpose` - reinstalling the hook brings everything back.
 
