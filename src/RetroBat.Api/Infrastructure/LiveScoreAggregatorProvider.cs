@@ -627,10 +627,20 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         // value must be decimal-decoded from its nibbles, not read as binary. This is applied
         // on the weight and final paths below; the mask paths already decode per byte.
         var descBcd = IsBcdText(description);
+        // La regle du .MEM est lue AVANT le facteur : sinon un score declare
+        // score_encoding="bcd" et porteur d'un « (value * 10) » repartait en binaire, et la
+        // flotte publiait un nombre que l'ecran ne montre jamais (Metal Slug 3 : 8200 publie
+        // pour 5200 a l'ecran). Le texte de la description ne peut pas rester la seule voie.
+        var numeric = TryParseAddress(address, out var numericAddress);
+        var rule = numeric
+            ? GetScoreDefinition(definitionFile).Rules.FirstOrDefault(item => item.Address == numericAddress)
+            : null;
+        var isBcd = descBcd || (rule != null && rule.ScoreEncoding.Equals("bcd", StringComparison.OrdinalIgnoreCase));
+
         var explicitWeight = InferWeight(description);
         if (explicitWeight > 1)
         {
-            return MakeScorePart(value, explicitWeight, descBcd, rawValueHex);
+            return MakeScorePart(value, explicitWeight, isBcd, rawValueHex);
         }
 
         if (TryResolveScoreMask(description, rawValueHex, value, out var masked))
@@ -638,14 +648,12 @@ public sealed class LiveScoreAggregatorProvider : IProvider
             return masked;
         }
 
-        if (!TryParseAddress(address, out var numericAddress))
+        if (!numeric)
         {
-            return MakeScorePart(value, 1, descBcd, rawValueHex);
+            return MakeScorePart(value, 1, isBcd, rawValueHex);
         }
 
         var definition = GetScoreDefinition(definitionFile);
-        var rule = definition.Rules.FirstOrDefault(item => item.Address == numericAddress);
-        var isBcd = descBcd || (rule != null && rule.ScoreEncoding.Equals("bcd", StringComparison.OrdinalIgnoreCase));
         if (rule == null)
         {
             return MakeScorePart(value, 1, isBcd, rawValueHex);

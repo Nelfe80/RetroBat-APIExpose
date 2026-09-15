@@ -659,9 +659,10 @@ public class RetroArchWrapperProvider : IProvider
             }
         }
 
-        var definitionFile = string.IsNullOrWhiteSpace(systemId) || string.IsNullOrWhiteSpace(normalizedRom)
-            ? string.Empty
-            : Path.Combine(RetroBatPaths.RamResourcesRoot, systemId, normalizedRom + ".MEM");
+        // La couche en vigueur, pas l'officiel par principe : le wrapper charge .contest ou
+        // .user quand ils s'appliquent, et l'agregateur cherche la regle du score dans le
+        // fichier qu'on nomme ici.
+        var definitionFile = RamDefinitionLayers.PickDefinitionFile(systemId, normalizedRom);
 
         return new RetroArchDefinitionSnapshot
         {

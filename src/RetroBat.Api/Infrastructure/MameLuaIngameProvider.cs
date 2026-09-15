@@ -683,24 +683,8 @@ public sealed class MameLuaIngameProvider : IProvider
     // prioritaire, .user\ (perso) seulement si PERSO=1, sinon l'officiel. Un .MEM
     // perso ne correspond a l'empreinte d'aucun profil : la partie se joue et
     // s'affiche, elle reste hors classement.
-    private static string PickDefinitionFile(string systemId, string rom)
-    {
-        var ramRoot = RetroBatPaths.RamResourcesRoot;
-        var contest = Path.Combine(ramRoot, ".contest", systemId, rom + ".MEM");
-        if (File.Exists(contest))
-        {
-            return contest;
-        }
-        if (WrapperEnvFile.ReadFlag("PERSO") == "1")
-        {
-            var perso = Path.Combine(ramRoot, ".user", systemId, rom + ".MEM");
-            if (File.Exists(perso))
-            {
-                return perso;
-            }
-        }
-        return Path.Combine(ramRoot, systemId, rom + ".MEM");
-    }
+    private static string PickDefinitionFile(string systemId, string rom) =>
+        RamDefinitionLayers.PickDefinitionFile(systemId, rom);
 
     private MameLuaDefinition ResolveDefinition(string rawRom, string systemId)
     {
