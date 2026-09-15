@@ -42,12 +42,25 @@ public class RetroArchWrapperDeploymentHostedService : IHostedService
         return Task.CompletedTask;
     }
 
+    /// <summary>Cadence lente, une fois les reprises rapides epuisees.</summary>
+    public static readonly TimeSpan RepriseLente = TimeSpan.FromMinutes(5);
+
+    /// <summary>
+    /// L'attente avant la reprise suivante. Les <paramref name="maxRetries"/> premieres suivent
+    /// l'intervalle configure ; ensuite, on continue a une cadence lente au lieu d'abandonner.
+    /// Mesure du 15 septembre : abandonner apres 30 minutes laissait une borne ou l'on jouait
+    /// juste apres une mise a jour avec l'ancien wrapper jusqu'au prochain redemarrage de l'API,
+    /// parfois des jours, alors que la mise a jour avait bien pose le nouveau.
+    /// </summary>
+    public static TimeSpan DelaiAvantReprise(int essai, int maxRetries, TimeSpan intervalle) =>
+        essai < Math.Max(0, maxRetries) ? intervalle : (intervalle > RepriseLente ? intervalle : RepriseLente);
+
     private async Task DeployerAvecReprisesAsync(
         ApiExposeOptions.RetroArchWrapperDeploymentOptions options,
         CancellationToken ct)
     {
         var intervalle = TimeSpan.FromSeconds(Math.Max(5, options.RetryIntervalSeconds));
-        for (var essai = 0; essai <= Math.Max(0, options.MaxRetries); essai++)
+        for (var essai = 0; ; essai++)
         {
             try
             {
@@ -55,10 +68,21 @@ public class RetroArchWrapperDeploymentHostedService : IHostedService
                 var result = await _deploymentService.DeployAsync(options.DryRunOnStartup, ct).ConfigureAwait(false);
                 if (result.SkippedBecauseRetroArchRunning)
                 {
-                    _logger.LogInformation(
-                        "RetroArch wrapper startup deployment postponed (RetroArch is running); retry in {Seconds}s ({Attempt}/{Max}).",
-                        (int) intervalle.TotalSeconds, essai + 1, options.MaxRetries);
-                    await Task.Delay(intervalle, ct).ConfigureAwait(false);
+                    var attente = DelaiAvantReprise(essai, options.MaxRetries, intervalle);
+                    if (essai < options.MaxRetries)
+                    {
+                        _logger.LogInformation(
+                            "RetroArch wrapper startup deployment postponed (RetroArch is running); retry in {Seconds}s ({Attempt}/{Max}).",
+                            (int) attente.TotalSeconds, essai + 1, options.MaxRetries);
+                    }
+                    else if (essai == options.MaxRetries)
+                    {
+                        _logger.LogInformation(
+                            "RetroArch wrapper startup deployment still postponed (RetroArch keeps running); checking every {Minutes} min until it stops.",
+                            (int) attente.TotalMinutes);
+                    }
+
+                    await Task.Delay(attente, ct).ConfigureAwait(false);
                     continue;
                 }
 
@@ -84,7 +108,6 @@ public class RetroArchWrapperDeploymentHostedService : IHostedService
                 return;
             }
         }
-        _logger.LogWarning("RetroArch wrapper startup deployment gave up: RetroArch kept running.");
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
