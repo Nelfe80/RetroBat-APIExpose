@@ -143,10 +143,18 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
     }
 
     /// <summary>Le premier core usuel de ce systeme present sur le disque, cores_real d'abord
-    /// (sans le wrapper de scoring, inutile pour une relecture).</summary>
-    private static string? CoreStandardPourSysteme(string? systemId, string? systemFolder)
+    /// (sans le wrapper de scoring, inutile pour une relecture).
+    ///
+    /// La liste vient d'abord d'EmulationStation, qui declare pour chacun de ses systemes les
+    /// cores libretro dans son ordre de preference : c'est la table exhaustive de la machine, et
+    /// elle vieillit avec elle. La table interne ne sert que si ES ne dit rien de ce systeme.</summary>
+    private string? CoreStandardPourSysteme(string? systemId, string? systemFolder)
     {
-        foreach (var nom in CandidatsPourSysteme(systemId, systemFolder))
+        var declares = _romPaths.LibretroCoresFor(systemFolder);
+        if (declares.Count == 0) declares = _romPaths.LibretroCoresFor(systemId);
+        var candidats = declares.Count > 0 ? declares : CandidatsPourSysteme(systemId, systemFolder);
+
+        foreach (var nom in candidats)
         {
             var fichier = nom.EndsWith("_libretro.dll", StringComparison.OrdinalIgnoreCase) ? nom : nom + "_libretro.dll";
             foreach (var sub in new[] { "cores_real", "cores" })

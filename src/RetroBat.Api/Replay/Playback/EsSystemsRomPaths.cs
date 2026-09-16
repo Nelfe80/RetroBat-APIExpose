@@ -4,7 +4,8 @@ using RetroBat.Domain.Paths;
 namespace RetroBat.Api.Replay.Playback;
 
 /// <summary>
-/// Où vivent les ROMs d'un système, selon EmulationStation lui-même.
+/// Ce qu'EmulationStation déclare d'un système : où vivent ses ROMs, et quels cores libretro
+/// il lui connaît. Les deux réponses sortent du même fichier et du même cache.
 ///
 /// C'est ES qui décide, pas nous. Chaque machine est différente : un disque secondaire, un
 /// partage réseau, une arborescence héritée d'une installation précédente. `es_systems.cfg`
@@ -23,6 +24,7 @@ public sealed class EsSystemsRomPaths
     private readonly object _gate = new();
     private DateTime _stamp;
     private Dictionary<string, string> _byName = new(StringComparer.OrdinalIgnoreCase);
+    private Dictionary<string, IReadOnlyList<string>> _coresByName = new(StringComparer.OrdinalIgnoreCase);
 
     public EsSystemsRomPaths(ILogger<EsSystemsRomPaths> logger) => _logger = logger;
 
@@ -50,6 +52,29 @@ public sealed class EsSystemsRomPaths
         return null;
     }
 
+    /// <summary>
+    /// Les cores libretro qu'ES déclare pour ce système, dans SON ordre de préférence. C'est la
+    /// table de correspondance exhaustive de la machine (244 systèmes ici) : la maintenir chez
+    /// nous reviendrait à en tenir une seconde, qui vieillirait à part.
+    ///
+    /// Seuls les cores de l'émulateur « libretro » sont retenus : les autres émulateurs déclarés
+    /// (bizhawk, ares, mednafen) nomment leurs propres modules, qui ne sont pas des DLL libretro.
+    /// </summary>
+    public IReadOnlyList<string> LibretroCoresFor(string? systemName)
+    {
+        if (string.IsNullOrWhiteSpace(systemName)) return Array.Empty<string>();
+        Load();
+        var cores = _coresByName;
+
+        if (cores.TryGetValue(systemName, out var direct)) return direct;
+
+        var reduit = Reduce(systemName);
+        foreach (var (name, liste) in cores)
+            if (Reduce(name) == reduit) return liste;
+
+        return Array.Empty<string>();
+    }
+
     private static string Reduce(string s) => s.Replace("_", string.Empty).Replace("-", string.Empty).ToLowerInvariant();
 
     private Dictionary<string, string> Load()
@@ -63,15 +88,30 @@ public sealed class EsSystemsRomPaths
                 if (fi.LastWriteTimeUtc == _stamp) return _byName;
 
                 var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                var cores = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
                 foreach (var system in XDocument.Load(ConfigPath).Descendants("system"))
                 {
                     var name = system.Element("name")?.Value?.Trim();
+                    if (string.IsNullOrEmpty(name)) continue;
+
                     var declared = system.Element("path")?.Value?.Trim();
-                    if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(declared)) continue;
-                    var resolved = Resolve(declared);
-                    if (resolved is not null) map[name] = resolved;
+                    if (!string.IsNullOrEmpty(declared))
+                    {
+                        var resolved = Resolve(declared);
+                        if (resolved is not null) map[name] = resolved;
+                    }
+
+                    var libretro = system.Descendants("emulator")
+                        .Where(e => string.Equals((string?)e.Attribute("name"), "libretro", StringComparison.OrdinalIgnoreCase))
+                        .Descendants("core")
+                        .Select(c => c.Value.Trim())
+                        .Where(c => c.Length > 0)
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+                    if (libretro.Count > 0) cores[name] = libretro;
                 }
                 _byName = map;
+                _coresByName = cores;
                 _stamp = fi.LastWriteTimeUtc;
                 _logger.LogDebug("Replay : {Count} systèmes lus dans es_systems.cfg.", map.Count);
                 return _byName;
