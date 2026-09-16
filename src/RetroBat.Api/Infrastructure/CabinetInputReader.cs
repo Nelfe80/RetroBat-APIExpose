@@ -10,6 +10,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Xml.Linq;
 
 namespace RetroBat.Api.Infrastructure;
 
@@ -138,6 +139,9 @@ public sealed class CabinetInputReader : IDisposable
         public List<(int Hat, int Mask, string Direction)> HatDirections { get; } = new();
         public List<(int Button, string Direction)> ButtonDirections { get; } = new();
         public List<(int Axis, int Sign, string Direction)> AxisDirections { get; } = new();
+
+        /// <summary>D'ou vient le mappage : utile quand une manette ne repond pas.</summary>
+        public string MappingSource { get; set; } = "aucun";
     }
 
     /// <summary>SDL controller-name → RetroPad identity (fixed sdl2 face swap).</summary>
@@ -163,6 +167,7 @@ public sealed class CabinetInputReader : IDisposable
     private static bool _resolverInstalled;
     private readonly List<Device> _devices = new();
     private IReadOnlyList<string[]> _dbLines = Array.Empty<string[]>();
+    private string _retroBatRoot = string.Empty;
     private bool _initialized;
 
     // ---- lifecycle ---------------------------------------------------------
@@ -183,6 +188,7 @@ public sealed class CabinetInputReader : IDisposable
 
             _initialized = true;
 
+            _retroBatRoot = retroBatRoot;
             var db = Path.Combine(retroBatRoot, "system", "tools", "gamecontrollerdb.txt");
             _dbLines = LoadDb(db);
             return (true, $"{_dbLines.Count} mappages chargés depuis gamecontrollerdb.txt");
@@ -231,6 +237,11 @@ public sealed class CabinetInputReader : IDisposable
     /// <summary>The names of the devices actually kept, in player order - what the log
     /// has to show for "player 2 lit up" to ever be explainable.</summary>
     public IReadOnlyList<string> DeviceNames => _devices.Select(d => d.Name).ToList();
+
+    /// <summary>Les memes appareils, avec l'etage qui a resolu leur mappage. Pour le
+    /// journal : « 0 mapped device(s) » ne disait pas OU la resolution avait echoue.</summary>
+    public IReadOnlyList<string> DeviceMappings =>
+        _devices.Select(d => $"{d.Name} [{d.MappingSource}]").ToList();
 
     /// <summary>How many joysticks Windows currently shows, WITHOUT touching the ones
     /// already open. Asking this before reopening is what lets the watcher leave a
@@ -558,15 +569,51 @@ public sealed class CabinetInputReader : IDisposable
         return lines;
     }
 
-    /// <summary>Resolves RetroBat's mapping for this device's GUID onto raw buttons/axes.</summary>
+    /// <summary>
+    /// Resout le mappage de cet appareil, en trois etages.
+    ///
+    /// 1. GUID exact dans gamecontrollerdb.txt.
+    /// 2. Les 24 premiers caracteres du GUID (bus + identifiants constructeur et produit).
+    ///    Windows moderne suffixe le GUID selon le pilote (RawInput 7200, HIDAPI USB 6800,
+    ///    HIDAPI Bluetooth 6803) la ou la base finit par des zeros : la comparaison exacte
+    ///    echouait donc pour TOUTES les manettes du commerce, et le panneau restait muet.
+    /// 3. La configuration d'EmulationStation (es_input.cfg). Une manette absente de la base
+    ///    a forcement ete configuree la au moins une fois : c'est le cas des encodeurs
+    ///    d'arcade sans marque.
+    /// </summary>
     private void ApplyMapping(Device device)
     {
         var entry = _dbLines.FirstOrDefault(t => string.Equals(t[0], device.Guid, StringComparison.OrdinalIgnoreCase));
+        var source = "GUID exact";
+
+        if (entry is null && device.Guid.Length >= 24)
+        {
+            var prefixe = device.Guid[..24];
+            entry = _dbLines.FirstOrDefault(t => t[0].Length >= 24
+                && string.Equals(t[0][..24], prefixe, StringComparison.OrdinalIgnoreCase));
+            source = "constructeur+produit";
+        }
+
         if (entry is null)
         {
+            if (ApplyEmulationStationMapping(device))
+            {
+                device.MappingSource = "es_input.cfg";
+            }
+
             return; // unknown device: no identity resolved (caller warns)
         }
 
+        ApplyDbEntry(device, entry);
+        if (device.HasMapping)
+        {
+            device.MappingSource = source;
+        }
+    }
+
+    /// <summary>Applique les jetons d'une ligne de gamecontrollerdb.txt.</summary>
+    private static void ApplyDbEntry(Device device, string[] entry)
+    {
         foreach (var token in entry.Skip(2))
         {
             var colon = token.IndexOf(':');
@@ -612,6 +659,118 @@ public sealed class CabinetInputReader : IDisposable
                 device.AxisToIdentity.Add((index, sign, identity));
             }
             // 'h' (hat) inputs are dpad directions - not cabinet identities
+        }
+    }
+
+    /// <summary>Noms d'EmulationStation vers identites RetroPad. ES suit la convention SNES :
+    /// « b » est le bouton du BAS (valider), « a » celui de droite.</summary>
+    private static readonly IReadOnlyDictionary<string, string> EsToIdentity = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["b"] = "b", ["a"] = "a", ["y"] = "y", ["x"] = "x",
+        ["pageup"] = "l", ["pagedown"] = "r",
+        ["l2"] = "l2", ["r2"] = "r2", ["l3"] = "l3", ["r3"] = "r3",
+        ["select"] = "select", ["start"] = "start",
+    };
+
+    /// <summary>Directions d'EmulationStation (dpad et stick gauche) pour le transport Replay.</summary>
+    private static readonly IReadOnlyDictionary<string, string> EsToDirection = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["up"] = "up", ["down"] = "down", ["left"] = "left", ["right"] = "right",
+        ["joystick1up"] = "up", ["joystick1down"] = "down",
+        ["joystick1left"] = "left", ["joystick1right"] = "right",
+    };
+
+    /// <summary>
+    /// Dernier recours : la configuration que le joueur a faite dans EmulationStation. Un
+    /// encodeur d'arcade sans marque n'est dans aucune base SDL, mais il a ete configure la.
+    /// </summary>
+    private bool ApplyEmulationStationMapping(Device device)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(_retroBatRoot))
+            {
+                return false;
+            }
+
+            var chemin = Path.Combine(_retroBatRoot, "emulationstation", ".emulationstation", "es_input.cfg");
+            if (!File.Exists(chemin))
+            {
+                return false;
+            }
+
+            var configs = XDocument.Load(chemin).Root?
+                .Elements("inputConfig")
+                .Where(e => string.Equals((string?)e.Attribute("type"), "joystick", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            if (configs is null || configs.Count == 0)
+            {
+                return false;
+            }
+
+            // Le GUID d'abord, son prefixe ensuite (ES l'enregistre avec le suffixe de son
+            // propre pilote), le nom en dernier.
+            var config = configs.FirstOrDefault(e => string.Equals((string?)e.Attribute("deviceGUID"), device.Guid, StringComparison.OrdinalIgnoreCase))
+                ?? (device.Guid.Length >= 24
+                    ? configs.FirstOrDefault(e => ((string?)e.Attribute("deviceGUID") ?? string.Empty).Length >= 24
+                        && string.Equals(((string?)e.Attribute("deviceGUID"))![..24], device.Guid[..24], StringComparison.OrdinalIgnoreCase))
+                    : null)
+                ?? configs.FirstOrDefault(e => string.Equals((string?)e.Attribute("deviceName"), device.Name, StringComparison.OrdinalIgnoreCase));
+            if (config is null)
+            {
+                return false;
+            }
+
+            foreach (var input in config.Elements("input"))
+            {
+                var name = (string?)input.Attribute("name") ?? string.Empty;
+                var type = (string?)input.Attribute("type") ?? string.Empty;
+                if (!int.TryParse((string?)input.Attribute("id"), out var id))
+                {
+                    continue;
+                }
+                _ = int.TryParse((string?)input.Attribute("value"), out var value);
+
+                if (EsToIdentity.TryGetValue(name, out var identity))
+                {
+                    if (type.Equals("button", StringComparison.OrdinalIgnoreCase))
+                    {
+                        device.ButtonToIdentity[id] = identity;
+                    }
+                    else if (type.Equals("axis", StringComparison.OrdinalIgnoreCase))
+                    {
+                        device.AxisToIdentity.Add((id, Math.Sign(value), identity));
+                    }
+
+                    continue;
+                }
+
+                if (!EsToDirection.TryGetValue(name, out var direction))
+                {
+                    continue;
+                }
+
+                if (type.Equals("hat", StringComparison.OrdinalIgnoreCase))
+                {
+                    device.HatDirections.Add((id, value, direction));
+                }
+                else if (type.Equals("button", StringComparison.OrdinalIgnoreCase))
+                {
+                    device.ButtonDirections.Add((id, direction));
+                }
+                else if (type.Equals("axis", StringComparison.OrdinalIgnoreCase))
+                {
+                    device.AxisDirections.Add((id, Math.Sign(value), direction));
+                }
+            }
+
+            return device.HasMapping;
+        }
+        catch (Exception)
+        {
+            // Un es_input.cfg absent, tronque ou illisible ne doit pas empecher la lecture
+            // des autres manettes.
+            return false;
         }
     }
 

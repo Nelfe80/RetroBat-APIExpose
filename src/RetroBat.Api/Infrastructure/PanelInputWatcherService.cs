@@ -91,8 +91,10 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
             }
 
             var mapped = _reader.OpenControllers();
+            // Les noms portent l'etage qui a resolu le mappage : « 0 mapped device(s) » seul
+            // ne disait pas si la manette etait inconnue ou simplement mal appariee.
             _logger?.LogInformation("Panel input watcher started: {Message}, {Mapped} mapped device(s) [{Names}]",
-                message, mapped, string.Join(", ", _reader.DeviceNames));
+                message, mapped, string.Join(", ", _reader.DeviceMappings));
             _lastDeviceKey = mapped + "|" + string.Join(",", _reader.DeviceNames);
 
             // (device, identity) of everything currently down: the diff between two polls is

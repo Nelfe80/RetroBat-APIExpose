@@ -23,6 +23,42 @@ public sealed record ResolvedRuntime(string CoreDll, string RomPath, bool ExactC
 public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
 {
     private static readonly uint[] Crc32Table = BuildCrc32Table();
+
+    /// <summary>
+    /// Les cores RetroArch usuels de chaque systeme, du plus fidele au plus tolerant. Ils ne
+    /// servent qu'en DERNIER recours : un replay recu d'ailleurs porte l'empreinte du core de
+    /// la machine qui l'a enregistre, et une simple recompilation de ce core suffit a la faire
+    /// echouer. Refuser la lecture pour cela revenait a exiger la machine d'origine.
+    ///
+    /// Les cles sont NORMALISEES (lettres et chiffres seulement) et couvrent les deux vocabulaires
+    /// que portent les manifestes : l'identifiant de systeme (« mega_drive », « fb_alpha ») et le
+    /// dossier d'EmulationStation (« megadrive », « fbneo »). Mesure faite sur les manifestes de
+    /// la borne : les deux different, et chercher sur un seul ne trouvait rien.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, string[]> CoresStandardsParSysteme =
+        new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["megadrive"] = new[] { "genesis_plus_gx", "picodrive" },
+            ["genesis"] = new[] { "genesis_plus_gx", "picodrive" },
+            ["sega32x"] = new[] { "picodrive" },
+            ["segacd"] = new[] { "genesis_plus_gx", "picodrive" },
+            ["snes"] = new[] { "snes9x", "bsnes", "snes9x2010" },
+            ["nes"] = new[] { "fceumm", "nestopia", "mesen" },
+            ["mastersystem"] = new[] { "genesis_plus_gx", "gearsystem", "picodrive" },
+            ["gamegear"] = new[] { "genesis_plus_gx", "gearsystem" },
+            ["gb"] = new[] { "gambatte", "mgba" },
+            ["gbc"] = new[] { "gambatte", "mgba" },
+            ["gba"] = new[] { "mgba", "vba_next" },
+            ["fbneo"] = new[] { "fbneo" },
+            ["fbalpha"] = new[] { "fbneo" },
+            ["arcade"] = new[] { "fbneo", "mame2003_plus", "mame" },
+            ["mame"] = new[] { "mame", "mame2010", "mame2003_plus" },
+            ["neogeo"] = new[] { "fbneo", "geolith" },
+            ["pcengine"] = new[] { "mednafen_pce_fast", "mednafen_pce" },
+            ["psx"] = new[] { "swanstation", "pcsx_rearmed", "mednafen_psx_hw" },
+            ["n64"] = new[] { "mupen64plus_next", "parallel_n64" },
+        };
+
     private readonly EsSystemsRomPaths _romPaths;
     private readonly Storage.IReplayManifestStore _manifests;
     private readonly Storage.IReplayMetadataStore _meta;
@@ -50,6 +86,7 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
             return null;
         }
         if (!exact) _logger.LogInformation("Replay resolver : core NON identique à l'enregistrement pour {Id} — lecture best-effort (désync détecté par checkpoints).", manifest.ReplayId);
+        MemoriserLancement(manifest, core, rom);
         return new ResolvedRuntime(core, rom, exact);
     }
 
@@ -90,7 +127,98 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
             return apprenti;
         }
 
+        // Derniere chance : le core usuel du systeme, s'il est installe ici. Sans cet etage,
+        // une borne qui n'a JAMAIS enregistre de replay sur ce systeme n'avait rien a apprendre
+        // de ses propres enregistrements, et la lecture etait refusee alors que le core etait
+        // la, a cote.
+        var standard = CoreStandardPourSysteme(manifest.Game.SystemId, hint?.SystemFolder ?? manifest.Game.SystemFolder);
+        if (standard is not null)
+        {
+            _logger.LogInformation("Replay : core non identifie pour {Id}, repli sur le core usuel {Core} pour {System}.",
+                manifest.ReplayId, Path.GetFileName(standard), manifest.Game.SystemId);
+            return standard;
+        }
+
         return null;
+    }
+
+    /// <summary>Le premier core usuel de ce systeme present sur le disque, cores_real d'abord
+    /// (sans le wrapper de scoring, inutile pour une relecture).</summary>
+    private static string? CoreStandardPourSysteme(string? systemId, string? systemFolder)
+    {
+        foreach (var nom in CandidatsPourSysteme(systemId, systemFolder))
+        {
+            var fichier = nom.EndsWith("_libretro.dll", StringComparison.OrdinalIgnoreCase) ? nom : nom + "_libretro.dll";
+            foreach (var sub in new[] { "cores_real", "cores" })
+            {
+                var chemin = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", sub, fichier);
+                if (File.Exists(chemin))
+                {
+                    return chemin;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>Les cores usuels a essayer pour ce systeme, dans l'ordre, sans toucher au disque :
+    /// le dossier d'EmulationStation d'abord, l'identifiant de systeme ensuite.</summary>
+    internal static IReadOnlyList<string> CandidatsPourSysteme(string? systemId, string? systemFolder)
+    {
+        foreach (var cle in new[] { systemFolder, systemId })
+        {
+            var normalisee = Normaliser(cle);
+            if (normalisee is not null && CoresStandardsParSysteme.TryGetValue(normalisee, out var candidats))
+            {
+                return candidats;
+            }
+        }
+
+        return Array.Empty<string>();
+    }
+
+    /// <summary>« mega_drive », « Mega-Drive » et « megadrive » designent le meme systeme.</summary>
+    internal static string? Normaliser(string? valeur) => string.IsNullOrWhiteSpace(valeur)
+        ? null
+        : new string(valeur.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
+
+    /// <summary>
+    /// Garde le couple core + ROM trouve dans les metadonnees LOCALES, pour que la lecture
+    /// suivante du meme replay reparte du chemin rapide au lieu de re-scanner les cores et les
+    /// ROMs. Le manifeste, lui, n'est jamais touche : il decrit l'enregistrement, pas cette
+    /// machine. Un echec d'ecriture ne doit pas empecher la lecture.
+    /// </summary>
+    private void MemoriserLancement(ReplayManifest manifest, string core, string rom)
+    {
+        try
+        {
+            var courant = _meta.GetMeta(manifest.ReplayId);
+            if (courant?.Launch is not null
+                && string.Equals(courant.Launch.CoreDll, core, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(courant.Launch.RomPath, rom, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            var nom = Path.GetFileNameWithoutExtension(core);
+            if (nom.EndsWith("_libretro", StringComparison.OrdinalIgnoreCase))
+            {
+                nom = nom[..^"_libretro".Length];
+            }
+
+            var indice = new ReplayLaunchHint(
+                manifest.Game.SystemFolder ?? manifest.Game.SystemId ?? string.Empty, nom, core, rom);
+
+            // Un replay recu d'ailleurs n'a pas ete cree ici : ne pas le faire passer pour local.
+            _meta.SaveMeta(courant is not null
+                ? courant with { Launch = indice }
+                : ReplayLocalMetadata.Fresh(manifest.ReplayId, indice) with { CreatedByThisDevice = false });
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger.LogDebug(ex, "Replay : indice de lancement non memorise pour {Id}.", manifest.ReplayId);
+        }
     }
 
     /// <summary>
