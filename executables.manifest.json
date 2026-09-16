@@ -1,0 +1,22 @@
+[
+  {
+    "file": "RetroBat.Api.exe",
+    "arguments": "--self-test",
+    "timeoutSeconds": 30,
+    "expectedExitCode": 0,
+    "minimumVersion": "1.8.9"
+  },
+  {
+    "file": "RetroBat.Api.Update.exe",
+    "arguments": "--self-test --no-update",
+    "timeoutSeconds": 15,
+    "expectedExitCode": 0,
+    "minimumVersion": "1.8.9"
+  },
+  {
+    "file": "RetroBat.Api.Diagnostic.exe",
+    "arguments": "--self-test-child",
+    "timeoutSeconds": 15,
+    "expectedExitCode": 0
+  }
+]

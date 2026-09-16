@@ -82,6 +82,8 @@ logs/
 # Root runtime binaries (shipped via GitHub Releases, not source control)
 /RetroBat.Api.exe
 /RetroBat.Api.Update.exe
+# Construit par le depot prive APIExposeDiagnostic et depose ici a chaque compilation.
+/RetroBat.Api.Diagnostic.exe
 /RetroBat.Api.deps.json
 /RetroBat.Api.runtimeconfig.json
 /RetroBat.Api.xml

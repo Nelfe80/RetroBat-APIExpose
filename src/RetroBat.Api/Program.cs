@@ -34,18 +34,52 @@ var testModeRequested = args.Any(arg =>
     string.Equals(arg, "--test-mode", StringComparison.OrdinalIgnoreCase) ||
     string.Equals(arg, "/test-mode", StringComparison.OrdinalIgnoreCase) ||
     string.Equals(arg, "test-mode", StringComparison.OrdinalIgnoreCase));
-var hostArgs = args
-    .Where(arg =>
-        !string.Equals(arg, "--test-mode", StringComparison.OrdinalIgnoreCase) &&
-        !string.Equals(arg, "/test-mode", StringComparison.OrdinalIgnoreCase) &&
-        !string.Equals(arg, "test-mode", StringComparison.OrdinalIgnoreCase) &&
-        !string.Equals(arg, "--hide-console", StringComparison.OrdinalIgnoreCase))
-    .ToArray();
+
+// Diagnostic du demarrage (RetroBat.Api.Diagnostic.exe) :
+//   --diagnostic-mode               journal fatal dans la session de diagnostic, rien d'autre ne change ;
+//   --diagnostic-config "<fichier>" configuration chargee APRES appsettings.json (logs detailles) ;
+//   --self-test                     verifie ce qu'il faut pour demarrer, sans demarrer (code 0 si bon).
+// Ces arguments sont retires de ceux passes a ASP.NET, dont le lecteur de ligne de commande les
+// prendrait pour des cles de configuration.
+var diagnosticMode = args.Any(arg => string.Equals(arg, "--diagnostic-mode", StringComparison.OrdinalIgnoreCase));
+var selfTestRequested = args.Any(arg => string.Equals(arg, "--self-test", StringComparison.OrdinalIgnoreCase));
+string? diagnosticConfigPath = null;
+var hostArgList = new List<string>();
+for (var i = 0; i < args.Length; i++)
+{
+    var arg = args[i];
+    if (string.Equals(arg, "--diagnostic-config", StringComparison.OrdinalIgnoreCase))
+    {
+        if (i + 1 < args.Length) diagnosticConfigPath = Path.GetFullPath(args[++i]);
+        continue;
+    }
+    if (string.Equals(arg, "--test-mode", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(arg, "/test-mode", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(arg, "test-mode", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(arg, "--hide-console", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(arg, "--diagnostic-mode", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(arg, "--self-test", StringComparison.OrdinalIgnoreCase))
+    {
+        continue;
+    }
+    hostArgList.Add(arg);
+}
+var hostArgs = hostArgList.ToArray();
+
+// Le journal fatal est pret AVANT l'hote : une exception pendant CreateBuilder, Build ou Run
+// (Kestrel qui ne peut pas ecouter, un service qui echoue a demarrer) y laisse sa trace.
+RetroBat.Api.Infrastructure.StartupFatalLog.Configure(diagnosticMode || diagnosticConfigPath is not null, diagnosticConfigPath, args);
+RetroBat.Api.Infrastructure.StartupFatalLog.Register();
 
 var builder = WebApplication.CreateBuilder(hostArgs);
 
 builder.Configuration
     .AddJsonFile(Path.Combine(RetroBatPaths.PluginRoot, "appsettings.json"), optional: true, reloadOnChange: true);
+if (diagnosticConfigPath is not null)
+{
+    // En dernier : ses niveaux de logs et sa console l'emportent sur la configuration de la borne.
+    builder.Configuration.AddJsonFile(diagnosticConfigPath, optional: false, reloadOnChange: false);
+}
 
 if (testModeRequested)
 {
@@ -65,7 +99,8 @@ if (!consoleLoggingEnabled)
 // General runtime file log: APIExpose runs hidden (--hide-console) so console output
 // is lost. This captures every existing _logger.LogXxx into .log/apiexpose-runtime.log
 // so incidents like a black marquee after a media migration are diagnosable.
-if (logConfig.GetValue("FileEnabled", true))
+// Jamais en auto-test : le journal est vide au demarrage, et celui de l'API en service y passerait.
+if (logConfig.GetValue("FileEnabled", true) && !selfTestRequested)
 {
     var minLevel = Enum.TryParse<LogLevel>(logConfig.GetValue("MinimumLevel", "Information"), ignoreCase: true, out var parsed)
         ? parsed
@@ -76,10 +111,13 @@ if (logConfig.GetValue("FileEnabled", true))
 
     // let our own logs (down to the configured level) reach the file; keep the
     // framework's own chatter at Warning so the runtime log stays readable.
+    var frameworkLevel = Enum.TryParse<LogLevel>(logConfig.GetValue("FrameworkMinimumLevel", "Warning"), ignoreCase: true, out var parsedFramework)
+        ? parsedFramework
+        : LogLevel.Warning;
     builder.Logging.SetMinimumLevel(minLevel);
     builder.Logging.AddFilter("RetroBat", minLevel);
-    builder.Logging.AddFilter("Microsoft", LogLevel.Warning);
-    builder.Logging.AddFilter("System", LogLevel.Warning);
+    builder.Logging.AddFilter("Microsoft", frameworkLevel);
+    builder.Logging.AddFilter("System", frameworkLevel);
     builder.Logging.AddProvider(new RuntimeFileLoggerProvider(filePath, minLevel, resetOnStartup));
 }
 
@@ -524,6 +562,30 @@ builder.Services.AddSingleton<RetroArchWrapperProvider>();
 builder.Services.AddSingleton<IProvider>(sp => sp.GetRequiredService<RetroArchWrapperProvider>());
 builder.Services.AddSingleton<IProvider, RetroArchConsoleHiscoreProvider>();
 
+if (selfTestRequested)
+{
+    // Tout le conteneur est valide a la construction : un service impossible a creer fait
+    // echouer Build ici, sans qu'aucun service ne demarre.
+    builder.Host.UseDefaultServiceProvider(options =>
+    {
+        options.ValidateOnBuild = true;
+        options.ValidateScopes = true;
+    });
+    WebApplication selfTestApp;
+    try
+    {
+        selfTestApp = builder.Build();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("FAIL conteneur : " + ex.GetType().Name + " : " + ex.Message);
+        return 1;
+    }
+    var selfTestCode = RetroBat.Api.Infrastructure.ApiSelfTest.Run(selfTestApp);
+    await selfTestApp.DisposeAsync();
+    return selfTestCode;
+}
+
 var app = builder.Build();
 
 // Setup internal event subscriber to broadcast via WebSockets
@@ -824,6 +886,7 @@ app.MapControllers();
 // appsettings pour que le hub joigne la borne par le LAN - et active alors
 // Security:ApiKey (les requêtes non-loopback exigent X-Api-Key).
 app.Run(app.Configuration["Urls"] ?? "http://127.0.0.1:12345");
+return 0;
 
 static async Task HandleWebSocketAsync(HttpContext context, string stream)
 {

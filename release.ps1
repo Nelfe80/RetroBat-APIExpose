@@ -93,7 +93,9 @@ Remove-Item $full, $update -Force -Confirm:$false -ErrorAction SilentlyContinue
 Write-Host 'Construction full.7z (avec resources + tools, plusieurs minutes)...'
 & $sz a -t7z $full "$name\" @ex -mx=5 -bsp1 -bso0
 Write-Host 'Construction update.7z...'
-& $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" -mx=5 -bsp0 -bso0
+# L'outil de diagnostic (autonome, ~63 Mo) part avec full.7z et l'installeur, pas avec la mise a
+# jour : l'update.7z reste le programme seul, quelques Mo.
+& $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" "-x!$name\RetroBat.Api.Diagnostic.exe" -mx=5 -bsp0 -bso0
 
 # Controle anti-fuite : l'archive ne doit contenir ni .env, ni media, ni sources.
 $listing = & $sz l $full
@@ -131,7 +133,9 @@ $autorises = @(
     'RetroBat.Api.exe', 'RetroBat.Api.deps.json', 'RetroBat.Api.runtimeconfig.json',
     'RetroBat.Api.xml', 'web.config', 'tools/listen_api_ws.README.md',
     # Le self-updater, a la racine comme l'API (voir src/RetroBat.Api.Update).
-    'RetroBat.Api.Update.exe'
+    'RetroBat.Api.Update.exe',
+    # L'outil de diagnostic du demarrage, construit par le depot prive APIExposeDiagnostic.
+    'RetroBat.Api.Diagnostic.exe'
 )
 $suivis = @{}
 Push-Location $PSScriptRoot
@@ -168,6 +172,25 @@ if ($inconnus) {
     throw "FUITE POSSIBLE : $($inconnus.Count) fichier(s) ni versionne(s) ni autorise(s), dont $($inconnus[0])"
 }
 Write-Host "Controle liste blanche : OK ($($suivis.Count) versionnes + chemins autorises)"
+
+# Tout executable applicatif livre a la racine doit etre DECLARE dans executables.manifest.json,
+# avec son contrat d'auto-test : l'outil de diagnostic ne teste que ce que le manifeste nomme.
+$manifestePath = Join-Path $PSScriptRoot 'executables.manifest.json'
+if (-not (Test-Path -LiteralPath $manifestePath)) { throw "executables.manifest.json absent : il doit etre livre avec les executables." }
+$declares = @((Get-Content -LiteralPath $manifestePath -Raw -Encoding UTF8 | ConvertFrom-Json) | ForEach-Object { $_.file })
+$exesLivres = @()
+foreach ($ligne in (& $sz l -slt $full)) {
+    if ($ligne -like 'Path = *') {
+        $chemin = $ligne.Substring(7)
+        if ($chemin -match ('^' + [regex]::Escape("$name\") + '[^\\]+\.exe$')) { $exesLivres += (Split-Path $chemin -Leaf) }
+    }
+}
+if ($exesLivres.Count -eq 0) { throw "Controle du manifeste impossible : aucun executable lu dans l'archive." }
+$nonDeclares = @($exesLivres | Where-Object { $declares -notcontains $_ })
+if ($nonDeclares) { throw "Executable(s) livre(s) mais absent(s) de executables.manifest.json : $($nonDeclares -join ', ')" }
+$absents = @($declares | Where-Object { $exesLivres -notcontains $_ })
+if ($absents) { throw "Executable(s) declare(s) mais absent(s) de l'archive : $($absents -join ', ')" }
+Write-Host "Controle du manifeste des executables : OK ($($exesLivres -join ', '))"
 
 Write-Host 'Controle anti-fuite : OK'
 

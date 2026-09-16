@@ -64,6 +64,8 @@ Name: "{app}\state"; Flags: uninsneveruninstall
 ; Le hook EmulationStation n'est plus pose par install-es-start-hook.bat : lance ici avec
 ; skipifsilent, il etait saute en /VERYSILENT et finissait sur une pause. [Code] le copie.
 Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"; Description: "Démarrer APIExpose maintenant"; Flags: postinstall nowait skipifsilent unchecked
+; L'outil de diagnostic (depot APIExposeDiagnostic) : il dit pourquoi APIExpose ne demarre pas.
+Filename: "{app}\RetroBat.Api.Diagnostic.exe"; WorkingDir: "{app}"; Description: "Diagnostiquer le démarrage d'APIExpose"; Flags: postinstall nowait skipifsilent unchecked; Check: DiagnosticToolPresent
 
 [UninstallRun]
 Filename: "taskkill"; Parameters: "/f /im {#AppExe}"; Flags: runhidden; RunOnceId: "StopApi"
@@ -76,6 +78,12 @@ Filename: "taskkill"; Parameters: "/f /im {#AppExe}"; Flags: runhidden; RunOnceI
 #include "dotnet-runtime.iss"
 
 [Code]
+// La case « Diagnostiquer le demarrage » n'apparait que si l'outil a ete livre.
+function DiagnosticToolPresent(): Boolean;
+begin
+  Result := FileExists(ExpandConstant('{app}\RetroBat.Api.Diagnostic.exe'));
+end;
+
 // Dossier des scripts de demarrage d'EmulationStation du RetroBat cible.
 function EsStartHookDir(): String;
 begin

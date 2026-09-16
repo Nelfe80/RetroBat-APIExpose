@@ -19,6 +19,8 @@ namespace RetroBat.Api.Update;
 ///   RetroBat.Api.Update.exe --archive X.7z --sha256 HEX   applique une archive locale (test, borne hors ligne)
 ///   RetroBat.Api.Update.exe --no-data         le programme seul, sans le Data Pack
 ///   RetroBat.Api.Update.exe --data-only       le Data Pack seul (l'API doit tourner)
+///   RetroBat.Api.Update.exe --self-test --no-update   auto-test : demarrage, dependances, manifeste,
+///                                             fichier temporaire ; rien n'est telecharge ni remplace
 ///
 /// Le DATA PACK (.MEM, dynpanels, gamelists, controles...) ne voyage pas dans l'archive du
 /// programme : l'API le tire fichier par fichier depuis le depot RetroBat-DataPack. Dans la
@@ -51,16 +53,66 @@ internal static class Program
 
     private static string _journal = "";
 
+    /// <summary>
+    /// --self-test --no-update : ce qu'il faut pour mettre a jour, sans mettre a jour. Aucun acces
+    /// reseau, aucun processus arrete, aucun fichier du plugin ecrit.
+    /// </summary>
+    private static int AutoTest(string racine)
+    {
+        var echecs = 0;
+        void Ok(string quoi, string detail) => Console.WriteLine($"PASS {quoi} : {detail}");
+        void Ko(string quoi, string detail) { Console.WriteLine($"FAIL {quoi} : {detail}"); echecs++; }
+
+        try
+        {
+            var moi = typeof(Program).Assembly.GetName();
+            var archives = typeof(SevenZipArchive).Assembly.GetName();
+            Ok("demarrage", $"{moi.Name} {moi.Version}, {archives.Name} {archives.Version}");
+        }
+        catch (Exception ex) { Ko("dependances", ex.GetType().Name + " : " + ex.Message); }
+
+        var exeApi = Path.Combine(racine, ExeApi);
+        if (File.Exists(exeApi)) Ok("APIExpose", $"{exeApi} version {VersionInstallee(exeApi)?.ToString() ?? "illisible"}");
+        else Ko("APIExpose", "introuvable : " + exeApi);
+
+        var manifeste = Path.Combine(racine, "executables.manifest.json");
+        if (!File.Exists(manifeste))
+        {
+            Ok("manifeste", "absent (installation anterieure) : rien a lire");
+        }
+        else
+        {
+            try { Ok("manifeste", $"{AutoTestSupport.CompterExecutables(manifeste)} executable(s) declare(s)"); }
+            catch (Exception ex) { Ko("manifeste", ex.GetType().Name + " : " + ex.Message); }
+        }
+
+        try
+        {
+            var dossier = Path.Combine(Path.GetTempPath(), "APIExpose-Diagnostic");
+            Directory.CreateDirectory(dossier);
+            var fichier = Path.Combine(dossier, $"update-self-test-{Environment.ProcessId}.tmp");
+            File.WriteAllText(fichier, "self-test");
+            File.Delete(fichier);
+            Ok("fichier temporaire", dossier);
+        }
+        catch (Exception ex) { Ko("fichier temporaire", ex.GetType().Name + " : " + ex.Message); }
+
+        Console.WriteLine(echecs == 0 ? "self-test ok (aucune mise a jour)" : $"self-test : {echecs} echec(s) (aucune mise a jour)");
+        return echecs == 0 ? 0 : 1;
+    }
+
     private static async Task<int> Main(string[] args)
     {
         var options = Options.Lire(args);
         if (options is null)
         {
-            Console.Error.WriteLine("Usage : RetroBat.Api.Update.exe [--check] [--yes] [--force] [--no-data | --data-only] [--root <dossier>] [--archive <7z> --sha256 <hex>] [--port <n>]");
+            Console.Error.WriteLine("Usage : RetroBat.Api.Update.exe [--check] [--yes] [--force] [--no-data | --data-only] [--root <dossier>] [--archive <7z> --sha256 <hex>] [--port <n>] | --self-test --no-update");
             return 2;
         }
 
         var racine = options.Root ?? AppContext.BaseDirectory.TrimEnd('\\', '/');
+        // L'auto-test passe AVANT tout le reste : il ne nettoie rien, ne contacte rien, n'arrete rien.
+        if (options.SelfTest) return AutoTest(racine);
         if (options.DataOnly)
         {
             _journal = Path.Combine(racine, ".log", "update.log");
@@ -517,11 +569,32 @@ internal static class Program
     }
 }
 
+internal static class AutoTestSupport
+{
+    /// <summary>Le manifeste des executables d'APIExpose : chaque entree doit nommer un fichier, sans chemin.</summary>
+    public static int CompterExecutables(string chemin)
+    {
+        using var doc = JsonDocument.Parse(File.ReadAllText(chemin));
+        if (doc.RootElement.ValueKind != JsonValueKind.Array) throw new JsonException("tableau attendu");
+        var n = 0;
+        foreach (var e in doc.RootElement.EnumerateArray())
+        {
+            var fichier = e.TryGetProperty("file", out var f) ? f.GetString() : null;
+            if (string.IsNullOrWhiteSpace(fichier) || fichier.Contains('\\') || fichier.Contains('/')) throw new JsonException("entree sans nom de fichier valide");
+            n++;
+        }
+        return n;
+    }
+}
+
 internal sealed record Options(bool Check, bool Yes, bool Force, string? Root, string? Archive, string? Sha256, int Port, bool NoData, bool DataOnly)
 {
+    /// <summary>--self-test : verifier sans rien faire. --no-update l'accompagne et le confirme.</summary>
+    public bool SelfTest { get; init; }
+
     public static Options? Lire(string[] args)
     {
-        bool check = false, yes = false, force = false, noData = false, dataOnly = false;
+        bool check = false, yes = false, force = false, noData = false, dataOnly = false, selfTest = false, noUpdate = false;
         string? root = null, archive = null, sha = null;
         var port = 12345;
         for (var i = 0; i < args.Length; i++)
@@ -533,6 +606,8 @@ internal sealed record Options(bool Check, bool Yes, bool Force, string? Root, s
                 case "--force": force = true; break;
                 case "--no-data": noData = true; break;
                 case "--data-only": dataOnly = true; break;
+                case "--self-test": selfTest = true; break;
+                case "--no-update": noUpdate = true; break;
                 case "--root": if (++i >= args.Length) return null; root = Path.GetFullPath(args[i]); break;
                 case "--archive": if (++i >= args.Length) return null; archive = Path.GetFullPath(args[i]); break;
                 case "--sha256": if (++i >= args.Length) return null; sha = args[i].Trim().ToLowerInvariant(); break;
@@ -542,7 +617,9 @@ internal sealed record Options(bool Check, bool Yes, bool Force, string? Root, s
         }
         if (archive is not null && (sha is null || !Regex.IsMatch(sha, "^[0-9a-f]{64}$"))) return null;
         if (noData && dataOnly) return null;
-        return new Options(check, yes, force, root, archive, sha, port, noData, dataOnly);
+        // --no-update seul n'a pas de sens : il ne sert qu'a rendre l'auto-test explicite.
+        if (noUpdate && !selfTest) return null;
+        return new Options(check, yes, force, root, archive, sha, port, noData, dataOnly) { SelfTest = selfTest };
     }
 }
 
