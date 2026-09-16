@@ -98,7 +98,7 @@ begin
   Target := EsStartHookDir() + '\APIExpose-start-wait.bat';
   if not ForceDirectories(EsStartHookDir()) then
     Log('Hook EmulationStation : dossier impossible a creer : ' + EsStartHookDir())
-  else if FileCopy(Source, Target, False) then
+  else if CopyFile(Source, Target, False) then
     Log('Hook EmulationStation pose : ' + Target)
   else
     Log('Hook EmulationStation NON pose : copie impossible vers ' + Target);
