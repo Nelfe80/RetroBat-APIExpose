@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -150,6 +151,20 @@ public sealed class NelfePlayPlayReporter : BackgroundService
             if (string.Equals(envelope.Type, "ui.game.ended", StringComparison.OrdinalIgnoreCase))
             {
                 EndPlay();
+                return;
+            }
+
+            // Une lecture de replay CONFIRMEE : la partie defile. C'est le seul evenement qui
+            // fasse monter le compteur public du site ; un clic ou un telechargement n'en sont
+            // pas. Envoye tout de suite et une seule fois, sans file d'attente : une lecture
+            // d'hier signalee demain ne dirait plus rien de juste.
+            if (string.Equals(envelope.Type, "replay.playing", StringComparison.OrdinalIgnoreCase))
+            {
+                var replayId = ReadReplayId(envelope.Payload);
+                if (!string.IsNullOrEmpty(replayId))
+                {
+                    _ = ReportReplayPlayedAsync(replayId, CancellationToken.None);
+                }
             }
         }
         catch (Exception ex)
@@ -508,6 +523,59 @@ public sealed class NelfePlayPlayReporter : BackgroundService
             {
                 _pendingEnvironments.Dequeue();
             }
+        }
+    }
+
+    /// <summary>L'identifiant de replay porte par un evenement du bus : objet anonyme
+    /// { replayId } cote borne, ou JSON si l'evenement a transite par le reseau.</summary>
+    private static string? ReadReplayId(object? payload)
+    {
+        switch (payload)
+        {
+            case null:
+                return null;
+            case JsonElement element when element.ValueKind == JsonValueKind.Object
+                && element.TryGetProperty("replayId", out var id):
+                return id.GetString();
+            case JsonElement:
+                return null;
+        }
+
+        var property = payload.GetType().GetProperty("replayId")
+            ?? payload.GetType().GetProperty("ReplayId");
+        return property?.GetValue(payload) as string;
+    }
+
+    /// <summary>
+    /// Dit au site qu'une lecture a demarre sur cette machine.
+    ///
+    /// Le site ne compte qu'une lecture par machine, par replay et par jour : relancer dix
+    /// fois ne gonfle rien, et l'appel n'a donc pas a etre economise ici. Un echec est sans
+    /// suite - le compteur est une information, pas un engagement.
+    /// </summary>
+    private async Task ReportReplayPlayedAsync(string replayId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var credential = await ResolveCredentialAsync(cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrEmpty(credential))
+            {
+                return;
+            }
+
+            using var client = CreateClient();
+            client.DefaultRequestHeaders.Add("X-NelfePlay-Device", credential);
+            using var content = new StringContent(
+                JsonSerializer.Serialize(new { replay_id = replayId, @event = "started", source = "cabinet" }),
+                Encoding.UTF8,
+                "application/json");
+            using var response = await client.PostAsync("/api/v1/agent/replay-played", content, cancellationToken)
+                .ConfigureAwait(false);
+            _logger?.LogDebug("Replay play reported for {ReplayId}: {Status}", replayId, (int)response.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogDebug(ex, "Replay play report failed for {ReplayId}", replayId);
         }
     }
 

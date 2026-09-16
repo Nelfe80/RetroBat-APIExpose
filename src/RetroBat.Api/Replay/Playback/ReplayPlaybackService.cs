@@ -416,7 +416,17 @@ public sealed class ReplayPlaybackService
                 _paused = paused;
                 frame = _frame; end = _replayEnd ?? 0;
             }
-            if (nowActive && !started) { started = true; _logger.LogInformation("Replay {ReplayId} : lecture confirmée.", _replayId); }
+            if (nowActive && !started)
+            {
+                started = true;
+                _logger.LogInformation("Replay {ReplayId} : lecture confirmée.", _replayId);
+                // « playing », distinct de « started » : started dit que RetroArch tient, playing
+                // dit que la partie DÉFILE. C'est ce second moment que le compteur public de
+                // lectures attend (le reporter NelfePlay l'écoute) : un lancement qui échoue avant
+                // la première image n'est pas une lecture.
+                string? lu; lock (_gate) lu = _replayId;
+                _ = Publish("replay.playing", new { replayId = lu });
+            }
 
             // Réarme le figeage si on a rembobiné bien avant la fin (→ re-fige si on rejoue jusqu'au bout).
             if (endPauseSent && end > 0 && frame < end - EndPauseMargin - 90) endPauseSent = false;
