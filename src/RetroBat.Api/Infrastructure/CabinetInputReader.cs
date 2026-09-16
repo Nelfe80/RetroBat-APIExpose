@@ -241,7 +241,7 @@ public sealed class CabinetInputReader : IDisposable
     /// <summary>Les memes appareils, avec l'etage qui a resolu leur mappage. Pour le
     /// journal : « 0 mapped device(s) » ne disait pas OU la resolution avait echoue.</summary>
     public IReadOnlyList<string> DeviceMappings =>
-        _devices.Select(d => $"{d.Name} [{d.MappingSource}]").ToList();
+        _devices.Select(d => $"{d.Name} [{d.MappingSource}, GUID {d.Guid}]").ToList();
 
     /// <summary>How many joysticks Windows currently shows, WITHOUT touching the ones
     /// already open. Asking this before reopening is what lets the watcher leave a
@@ -583,16 +583,7 @@ public sealed class CabinetInputReader : IDisposable
     /// </summary>
     private void ApplyMapping(Device device)
     {
-        var entry = _dbLines.FirstOrDefault(t => string.Equals(t[0], device.Guid, StringComparison.OrdinalIgnoreCase));
-        var source = "GUID exact";
-
-        if (entry is null && device.Guid.Length >= 24)
-        {
-            var prefixe = device.Guid[..24];
-            entry = _dbLines.FirstOrDefault(t => t[0].Length >= 24
-                && string.Equals(t[0][..24], prefixe, StringComparison.OrdinalIgnoreCase));
-            source = "constructeur+produit";
-        }
+        var (entry, source) = FindDbEntry(_dbLines, device.Guid);
 
         if (entry is null)
         {
@@ -609,6 +600,53 @@ public sealed class CabinetInputReader : IDisposable
         {
             device.MappingSource = source;
         }
+    }
+
+    /// <summary>GUID que SDL 2.0.x donne a une manette ouverte par XInput : « xinput » en
+    /// hexadecimal, suivi du sous-type. Aucune de ces manettes ne porte de constructeur ni de
+    /// produit.</summary>
+    private const string XInputGuidPrefix = "78696e707574";
+
+    /// <summary>
+    /// La ligne de gamecontrollerdb.txt d'une manette, et l'etage qui l'a trouvee.
+    ///
+    /// 1. GUID exact ;
+    /// 2. XINPUT : le SDL de RetroArch (2.0.14) ouvre les manettes Xbox par XInput, avec un GUID
+    ///    qui vaut « xinput » en hexadecimal, sans constructeur ni produit. La base les range sous
+    ///    la cle litterale « xinput » : sans cet etage, aucune manette Xbox ouverte par XInput
+    ///    n'etait reconnue (une manette Xbox « ne remontait pas », constate le 2026-09-17) ;
+    /// 3. constructeur + produit (24 premiers caracteres) : le suffixe de pilote change d'une
+    ///    machine a l'autre (RawInput, HIDAPI) et la base n'en porte aucun.
+    /// </summary>
+    internal static (string[]? Entry, string Source) FindDbEntry(IReadOnlyList<string[]> db, string guid)
+    {
+        var entry = db.FirstOrDefault(t => string.Equals(t[0], guid, StringComparison.OrdinalIgnoreCase));
+        if (entry is not null)
+        {
+            return (entry, "GUID exact");
+        }
+
+        if (guid.StartsWith(XInputGuidPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            entry = db.FirstOrDefault(t => string.Equals(t[0], "xinput", StringComparison.OrdinalIgnoreCase));
+            if (entry is not null)
+            {
+                return (entry, "xinput");
+            }
+        }
+
+        if (guid.Length >= 24)
+        {
+            var prefixe = guid[..24];
+            entry = db.FirstOrDefault(t => t[0].Length >= 24
+                && string.Equals(t[0][..24], prefixe, StringComparison.OrdinalIgnoreCase));
+            if (entry is not null)
+            {
+                return (entry, "constructeur+produit");
+            }
+        }
+
+        return (null, "aucun");
     }
 
     /// <summary>Applique les jetons d'une ligne de gamecontrollerdb.txt.</summary>

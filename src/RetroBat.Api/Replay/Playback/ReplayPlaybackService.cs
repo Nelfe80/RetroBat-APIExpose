@@ -261,6 +261,18 @@ public sealed class ReplayPlaybackService
                 // en plus des succès pour un simple visionnage) et le rewind (inutile ici).
                 "cheevos_enable = \"false\"",
                 "rewind_enable = \"false\"",
+                // La PRESENTATION du dernier jeu lance. RetroBat reecrit retroarch.cfg a chaque
+                // lancement avec le decor, le cadrage et la rotation de CE jeu-la ; un replay
+                // lance ensuite en heritait (constate le 2026-09-17 : le decor d'un jeu vertical
+                // lance avant recouvrait le replay, rien n'etait visible). Le replay ne
+                // passe pas par le lanceur de RetroBat (qui ne sait pas lancer une lecture) : on
+                // repart donc d'une presentation neutre, celle que le coeur annonce.
+                "input_overlay_enable = \"false\"",
+                "aspect_ratio_index = \"22\"",
+                "video_aspect_ratio_auto = \"true\"",
+                "video_rotation = \"0\"",
+                "screen_orientation = \"0\"",
+                "video_allow_rotate = \"true\"",
                 // R3.2, mesuré : active_replay.frame avance d'UNE unité par frame vidéo du core
                 // (~59,9/s mesuré sur Genesis, qui annonce 59,92) — l'ancienne note « ~2x » était
                 // fausse. La lecture se fait donc à vitesse normale, sans override de cadence.
