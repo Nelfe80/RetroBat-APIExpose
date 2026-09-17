@@ -1179,6 +1179,7 @@ public sealed class MameLuaIngameProvider : IProvider
                 netplay = 0,
                 continues = 0,
                 core_options = coreOptions,   // Phase E : chaîne canonique des réglages (vide si non captés)
+                core_options_source = "mame_dip",   // des DIP switches, pas des options de cœur libretro
             };
             // Format attendu par le reporter (comme le wrapper) : { SystemId, Rom, Session=<JSON string> }.
             await _eventBus.PublishAsync(new EventEnvelope

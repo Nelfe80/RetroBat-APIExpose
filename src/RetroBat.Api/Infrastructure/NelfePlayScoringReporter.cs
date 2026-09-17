@@ -589,7 +589,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // canonique triée. Absent (backend pas encore câblé) → placeholder stable. Le vérifieur ne
         // contrôle le digest QUE si le profil épingle allowed_core_options_digest (opt-in additif).
         string? coreOptionsRaw = (string?)session["core_options"];
-        string? coreOptions = FilterGameplayCoreOptions(coreOptionsRaw);
+        bool mameDipSwitches = string.Equals((string?)session["core_options_source"], "mame_dip", StringComparison.Ordinal);
+        string? coreOptions = FilterGameplayCoreOptions(coreOptionsRaw, mameDipSwitches);
         string coreOptionsDigest = !string.IsNullOrEmpty(coreOptions)
             ? Crypto.Sha256Hex(coreOptions)
             : Crypto.Sha256Hex("core-options@default");
@@ -859,13 +860,22 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
     }
 
-    // Phase E : chaque core libretro a SES propres options (clés préfixées par le nom du core).
-    // Pour un core connu, on ne digère que l'allowlist des réglages qui AFFECTENT LE JEU ; le
-    // cosmétique (audio, filtres vidéo, ratio, volumes…) est ignoré. Une clé d'un backend non
-    // listé (DIP MAME « Difficulty »/« 1-1 »…) passe INCHANGÉE → les digests déjà épinglés (19xx)
-    // ne bougent pas. Ajouter un core = une entrée ici (partagée par tous ses jeux).
-    // Une entrée finie par « * » garde toute une FAMILLE de clés (les DIP et les cheats de FBNeo
-    // portent le nom du jeu dans la clé).
+    // Phase E : l'empreinte des reglages d'une partie certifiee.
+    //
+    // REGLE (decision du 2026-09-17) : un reglage d'AFFICHAGE ou de MANETTE ne compte JAMAIS.
+    // Resolution, format d'image, filtres, rotation, flip, zone morte, sensibilite analogique,
+    // resolution gauche+droite (SOCD), tir automatique, souris, pistolet : RetroBat les ecrit
+    // selon l'ecran et les manettes de chaque borne, et une borne d'usine serait refusee pour
+    // eux. Seul ce qui change la PARTIE entre dans l'empreinte : vitesse, materiel emule, ROM
+    // patchee, cheats, reprise de partie, DIP switches de jeu (vies, difficulte, bonus).
+    //
+    // Deux sources :
+    //   - les options d'un coeur libretro, lues par le wrapper : on ne garde QUE la liste du
+    //     coeur ci-dessous ; un coeur sans liste ne verse rien (avant le 2026-09-17 il versait
+    //     tout, affichage compris, et MAME sous RetroArch n'avait pas de liste) ;
+    //   - les DIP switches de MAME autonome, lus par le plugin Lua : tous gardes, sauf ceux dont
+    //     le nom dit monnayage, service, ecran ou commandes (NonGameplayDipWords).
+    // Une entree finie par « * » garde une FAMILLE de cles (FBNeo met le nom du jeu dans la cle).
     private static readonly Dictionary<string, HashSet<string>> CoreOptionsAllowlist = new()
     {
         ["genesis_plus_gx_"] = new(StringComparer.Ordinal)
@@ -874,28 +884,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             "genesis_plus_gx_vdp_mode",        // timing vidéo → vitesse
             "genesis_plus_gx_system_hw",       // matériel émulé
             "genesis_plus_gx_overclock",       // vitesse CPU → ralentissements
-            "genesis_plus_gx_no_sprite_limit", // rendu → peut changer le jeu
             "genesis_plus_gx_lock_on",         // cartouche lock-on (S&K…)
         },
-        // FBNeo : ce qui change la partie. Le reste (resolution, audio, frameskip, diagnostic) ne
-        // la change pas ; la difficulte des jeux sans DIP, elle, est tenue par l'epingle NVRAM.
         ["fbneo-"] = new(StringComparer.Ordinal)
         {
             "fbneo-allow-patched-romsets",     // ROM patchee = autre jeu
             "fbneo-cpu-speed-adjust",          // vitesse CPU → ralentissements
             "fbneo-force-60hz",                // vitesse des jeux 50 Hz
-            "fbneo-socd",                      // gauche+droite simultanes
-            "fbneo-analog-speed",              // sensibilite des commandes analogiques
             "fbneo-neogeo-mode",               // variante de BIOS (UniBIOS a un menu de triche)
             "fbneo-memcard-mode",              // carte memoire Neo-Geo = reprise de partie
             "fbneo-dipswitch-*",               // DIP switches du jeu : vies, difficulte
             "fbneo-cheat-*",                   // cheats integres au coeur
         },
-        // MAME sous RetroArch : sans cette liste, ses quarante options passaient TOUTES dans
-        // l'empreinte (resolution, format d'image, zone morte, pistolet, souris...), ecrites par
-        // RetroBat selon l'ecran et les manettes de chacun. 19xx refusait « reglages non
-        // conformes » une borne d'usine dont seul l'affichage differait (2026-09-17). Les DIP
-        // switches de MAME vivent dans ses cfg, que seul mame_read_config fait lire.
         ["mame_"] = new(StringComparer.Ordinal)
         {
             "mame_cheats_enable",              // cheats
@@ -903,12 +903,30 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             "mame_cpu_sound_overclock",        // idem, processeur son
             "mame_read_config",                // cfg de MAME : DIP switches, vies, difficulte
             "mame_auto_save",                  // reprise automatique d'une sauvegarde d'etat
-            "mame_current_turbo_button",       // tir automatique
         },
     };
 
-    // Réduit la chaîne canonique « clé=valeur;… » aux seuls réglages gameplay (voir ci-dessus).
-    internal static string? FilterGameplayCoreOptions(string? raw)
+    // Un DIP switch dont le nom contient l'un de ces mots ne change pas la partie : monnayage et
+    // service (une borne en free play n'est pas recalee), ecran et commandes (la regle ci-dessus).
+    // Meme liste cote plugin Lua, completee ici pour l'ecran et les commandes.
+    private static readonly string[] NonGameplayDipWords =
+    {
+        "coin", "free play", "free_play", "service", "test mode", "test_mode", "demo sound", "demo_sound",
+        "unused", "flip", "cabinet", "screen", "monitor", "control", "joystick", "trackball",
+    };
+
+    private static bool IsNonGameplayDip(string name)
+    {
+        var low = name.ToLowerInvariant();
+        return NonGameplayDipWords.Any(word => low.Contains(word, StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// Réduit la chaîne canonique « clé=valeur;… » aux seuls réglages qui changent la partie.
+    /// <paramref name="mameDipSwitches"/> : la chaîne vient du plugin Lua de MAME autonome (des
+    /// noms de DIP switches), pas des options d'un cœur libretro.
+    /// </summary>
+    internal static string? FilterGameplayCoreOptions(string? raw, bool mameDipSwitches = false)
     {
         if (string.IsNullOrEmpty(raw)) return raw;
         var kept = new List<string>();
@@ -916,18 +934,22 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             int eq = pair.IndexOf('=');
             string key = eq >= 0 ? pair.Substring(0, eq) : pair;
+            if (mameDipSwitches)
+            {
+                if (!IsNonGameplayDip(key)) kept.Add(pair);
+                continue;
+            }
+
             HashSet<string>? allow = null;
             foreach (var kv in CoreOptionsAllowlist)
                 if (key.StartsWith(kv.Key, StringComparison.Ordinal)) { allow = kv.Value; break; }
-            if (allow is not null)
-            {
-                if (allow.Contains(key) || allow.Any(a => a.EndsWith('*') && key.StartsWith(a[..^1], StringComparison.Ordinal)))
-                    kept.Add(pair);   // gameplay → gardé ; sinon cosmétique → écarté
-            }
-            else
-            {
-                kept.Add(pair);   // backend non filtré (DIP MAME…) → inchangé
-            }
+            if (allow is null) continue;   // coeur sans liste : aucun de ses reglages ne compte
+            if (!allow.Contains(key) && !allow.Any(a => a.EndsWith('*') && key.StartsWith(a[..^1], StringComparison.Ordinal)))
+                continue;
+            // fbneo-dipswitch-<jeu>-<nom> : le nom du DIP decide, comme sous MAME autonome.
+            if (key.StartsWith("fbneo-dipswitch-", StringComparison.Ordinal) && IsNonGameplayDip(key["fbneo-dipswitch-".Length..]))
+                continue;
+            kept.Add(pair);
         }
         kept.Sort(StringComparer.Ordinal);
         return string.Join(";", kept);

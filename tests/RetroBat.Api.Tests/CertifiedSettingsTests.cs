@@ -21,8 +21,30 @@ public class CertifiedSettingsTests
     public void FBNeo_ne_garde_que_les_reglages_de_jeu()
     {
         Assert.Equal(
-            "fbneo-allow-patched-romsets=disabled;fbneo-analog-speed=100%;fbneo-cpu-speed-adjust=100%;fbneo-force-60hz=disabled;fbneo-socd=3",
+            "fbneo-allow-patched-romsets=disabled;fbneo-cpu-speed-adjust=100%;fbneo-force-60hz=disabled",
             NelfePlayScoringReporter.FilterGameplayCoreOptions(Options19xx));
+    }
+
+    /// <summary>
+    /// REGLE du 2026-09-17 : un reglage d'affichage ou de manette ne compte jamais. SOCD et
+    /// sensibilite analogique sont des reglages de manette, RetroBat les ecrit selon la borne.
+    /// </summary>
+    [Fact]
+    public void FBNeo_manettes_et_affichage_ne_comptent_jamais()
+    {
+        var autreBorne = Options19xx.Replace("fbneo-socd=3", "fbneo-socd=0")
+            .Replace("fbneo-analog-speed=100%", "fbneo-analog-speed=150%")
+            .Replace("fbneo-vertical-mode=disabled", "fbneo-vertical-mode=enabled")
+            + ";fbneo-dipswitch-19xx-Flip_Screen=On;fbneo-dipswitch-19xx-Cabinet=Cocktail;fbneo-dipswitch-19xx-Controls=Joystick"
+            + ";fbneo-dipswitch-19xx-Free_Play=On;fbneo-dipswitch-19xx-Coin_A=1C_2C";
+        Assert.Equal(NelfePlayScoringReporter.FilterGameplayCoreOptions(Options19xx), NelfePlayScoringReporter.FilterGameplayCoreOptions(autreBorne));
+    }
+
+    [Fact]
+    public void Un_coeur_sans_liste_ne_verse_aucun_reglage()
+    {
+        Assert.Equal("", NelfePlayScoringReporter.FilterGameplayCoreOptions(
+            "mame2003-plus_frameskip=0;mame2003-plus_analog=digital;snes9x_aspect=4:3"));
     }
 
     [Fact]
@@ -55,7 +77,7 @@ public class CertifiedSettingsTests
     {
         Assert.Equal(
             "mame_auto_save=disabled;mame_cheats_enable=disabled;mame_cpu_overclock=default;mame_cpu_sound_overclock=default;"
-            + "mame_current_turbo_button=disabled;mame_read_config=disabled",
+            + "mame_read_config=disabled",
             NelfePlayScoringReporter.FilterGameplayCoreOptions(OptionsMameLibretro));
     }
 
@@ -66,7 +88,8 @@ public class CertifiedSettingsTests
             .Replace("mame_current_aspect_ratio=DAR", "mame_current_aspect_ratio=PAR")
             .Replace("mame_joystick_deadzone=0.15", "mame_joystick_deadzone=0.25")
             .Replace("mame_mouse_enable=enabled", "mame_mouse_enable=disabled")
-            .Replace("mame_lightgun_mode=lightgun", "mame_lightgun_mode=touchscreen");
+            .Replace("mame_lightgun_mode=lightgun", "mame_lightgun_mode=touchscreen")
+            .Replace("mame_current_turbo_button=disabled", "mame_current_turbo_button=button 1");
         Assert.Equal(NelfePlayScoringReporter.FilterGameplayCoreOptions(OptionsMameLibretro), NelfePlayScoringReporter.FilterGameplayCoreOptions(autreBorne));
     }
 
@@ -82,7 +105,27 @@ public class CertifiedSettingsTests
     [Fact]
     public void Les_DIP_MAME_passent_inchanges()
     {
-        Assert.Equal("1-1=1;Difficulty=Normal", NelfePlayScoringReporter.FilterGameplayCoreOptions("Difficulty=Normal;1-1=1"));
+        Assert.Equal("1-1=1;Difficulty=Normal", NelfePlayScoringReporter.FilterGameplayCoreOptions("Difficulty=Normal;1-1=1", mameDipSwitches: true));
+    }
+
+    /// <summary>
+    /// Les DIP de 19xx sous MAME autonome, tels que le plugin Lua les envoie (mesure du 2026-09-17) :
+    /// leur empreinte est celle deja epinglee au profil, elle ne doit pas bouger.
+    /// </summary>
+    [Fact]
+    public void Les_DIP_de_19xx_sous_MAME_gardent_leur_empreinte()
+    {
+        var dip = string.Join(";", new[] { 1, 2, 3 }.SelectMany(b => Enumerable.Range(1, 8).Select(i => $"{b}-{i}={1 << (i - 1)}")));
+        var filtre = NelfePlayScoringReporter.FilterGameplayCoreOptions(dip, mameDipSwitches: true)!;
+        var empreinte = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(filtre))).ToLowerInvariant();
+        Assert.Equal("ef69537722849c531110a6fe60d8783bc6b6a28d1b0c9fa6a9c0949b8ffe3fe2", empreinte);
+    }
+
+    [Fact]
+    public void Les_DIP_MAME_d_ecran_et_de_commandes_ne_comptent_jamais()
+    {
+        Assert.Equal("Difficulty=Normal", NelfePlayScoringReporter.FilterGameplayCoreOptions(
+            "Difficulty=Normal;Flip Screen=Off;Cabinet=Upright;Controls=Joystick;Coinage=1C_1C;Service Mode=Off", mameDipSwitches: true));
     }
 
     [Fact]
