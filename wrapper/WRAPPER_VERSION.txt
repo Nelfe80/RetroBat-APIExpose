@@ -6,7 +6,7 @@ Version     : 0.336.0.0
 Build date  : 2026-09-17
 Signed      : yes - Authenticode, subject CN=nelfeTech (self-signed,
               timestamped via timestamp.digicert.com)
-SHA-256     : 502E7FAAE1DED56AA7B87D4AB8574224177ECFF982992C515FD0094E68596F55
+SHA-256     : 90ADA50730443F8EA00F19F34E9361E60C849E8BC1AA5792B8F9E8B8E03BDBA2
 
 Verify on Windows (PowerShell):
   Get-FileHash wrapper.dll -Algorithm SHA256
