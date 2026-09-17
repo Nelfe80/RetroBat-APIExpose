@@ -81,10 +81,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         RetroBat.Api.Replay.Sharing.ReplaySeedQueue? semis = null,
         RetroBat.Api.Replay.Sharing.ReplaySeedService? semeur = null,
         NvramSnapshotService? nvram = null,
-        BiosFingerprintService? bios = null)
+        BiosFingerprintService? bios = null,
+        CertifiedSettingsService? certified = null)
     {
         _nvram = nvram;
         _bios = bios;
+        _certified = certified;
         _replayStore = replayStore;
         _semis = semis;
         _semeur = semeur;
@@ -355,6 +357,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return o;
     }
 
+    private readonly CertifiedSettingsService? _certified;
+
     private void CaptureAttestation(JsonElement root)
     {
         lock (_sync)
@@ -420,9 +424,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var certifiable = root.TryGetProperty("certifiable", out var c) && c.ValueKind == JsonValueKind.True;
             var reason = root.TryGetProperty("reason", out var r) ? r.GetString() ?? "" : "";
             var force = (GetString(attestation, "ForcedOptions") ?? "").Length > 0;
-            var message = certifiable
-                ? (force ? "🏆 Partie certifiable, réglages certifiés appliqués" : "🏆 Partie certifiable pour le classement")
-                : $"⚠️ Partie non certifiable — {ReasonToText(reason)}";
+            // Le frontend, que la plateforme ne voit pas : rembobinage, run-ahead, sauvegarde
+            // automatique font refuser le score a la fin. Le forcage les neutralise par jeu ;
+            // eteint, ou pris de court, il reste a prevenir avant que le joueur ne joue pour rien.
+            var dangers = _certified?.DangersFrontendActifs() ?? Array.Empty<string>();
+            string message;
+            if (!certifiable)
+                message = $"⚠️ Partie non certifiable — {ReasonToText(reason)}";
+            else if (dangers.Count > 0)
+                message = $"⚠️ Partie non certifiable — {string.Join(", ", dangers)} : à désactiver dans les options RetroBat de ce jeu";
+            else
+                message = force ? "🏆 Partie certifiable, réglages certifiés appliqués" : "🏆 Partie certifiable pour le classement";
             await _esNotify.NotifyAsync(message, ct).ConfigureAwait(false);
         }
         catch (Exception ex)

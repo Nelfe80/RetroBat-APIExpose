@@ -5,6 +5,7 @@ using RetroBat.Domain.Events;
 using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Models;
 using RetroBat.Domain.Paths;
+using System.Xml.Linq;
 using Microsoft.Extensions.Options;
 
 namespace RetroBat.Api.Infrastructure;
@@ -17,11 +18,16 @@ namespace RetroBat.Api.Infrastructure;
 /// la plateforme ne pouvait ni nommer le réglage fautif ni le corriger. Le profil publie
 /// désormais ses réglages en clair (<c>core_options_expected</c>) ; ce service les dépose dans
 /// <c>plugins\APIExpose\wrapper\certified.txt</c>, et le listener répond ces valeurs au cœur au
-/// chargement. Aucun fichier de configuration n'est réécrit : RetroBat réécrit les siens à chaque
-/// lancement, la course serait perdue d'avance.
+/// chargement. Les fichiers de RetroArch ne sont pas réécrits : RetroBat réécrit les siens à
+/// chaque lancement, la course serait perdue d'avance.
 ///
 /// Le fichier nomme la ROM à laquelle il s'applique et disparaît à la fin de la partie : rien ne
 /// se force sur un jeu que la borne n'a pas préparé.
+///
+/// Les fonctions du frontend qui font refuser un score (rembobinage, run-ahead, sauvegarde
+/// automatique) ne sont pas des options de cœur : elles se neutralisent par les réglages
+/// RetroBat du jeu, dans es_settings.cfg, dès la sélection dans le menu, pour que le lanceur les
+/// lise. Rien ne change pour les autres jeux ni pour les réglages globaux du joueur.
 /// </summary>
 public sealed class CertifiedSettingsService : IHostedService, IDisposable
 {
@@ -31,8 +37,14 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
     private readonly ApiContext _context;
     private readonly RomCanonicalResolver _canonical;
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
+    private readonly IEsSettingsStore _esSettings;
     private readonly ILogger<CertifiedSettingsService>? _logger;
     private IDisposable? _abonnement;
+    // Un jeu ouvert se reconnait a la selection dans le menu, ou l'on passe des dizaines de
+    // fois par minute : la reponse de la plateforme est gardee dix minutes par jeu.
+    private readonly Dictionary<string, (DateTime Jusqua, Dictionary<string, string>? Valeurs)> _cache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly object _verrou = new();
+    private string _dernierPrepare = "";
 
     public CertifiedSettingsService(
         IEventBus bus,
@@ -41,6 +53,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         ApiContext context,
         RomCanonicalResolver canonical,
         IOptionsMonitor<ApiExposeOptions> options,
+        IEsSettingsStore esSettings,
         ILogger<CertifiedSettingsService>? logger = null)
     {
         _bus = bus;
@@ -49,7 +62,104 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         _context = context;
         _canonical = canonical;
         _options = options;
+        _esSettings = esSettings;
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Les fonctions du frontend qui font refuser un score, et la cle RetroBat qui les commande,
+    /// par jeu : le lanceur lit `<systeme>["<rom>"].<cle>` dans es_settings.cfg avant chaque
+    /// lancement. Rewind vaut « auto » dans RetroBat, c'est-a-dire ALLUME pour presque tous les
+    /// coeurs : chaque nouveau joueur se faisait refuser pour rembobinage sans avoir rien
+    /// touche (testeur sur Sonic, 2026-09-17, deux parties perdues avant de trouver l'option).
+    /// </summary>
+    private static readonly (string Cle, string Valeur, string Nom)[] FonctionsFrontend =
+    {
+        ("rewind", "0", "rembobinage (Rewind)"),
+        ("runahead", "0", "run-ahead"),
+        ("autosave", "0", "sauvegarde d'état automatique"),
+    };
+
+    /// <summary>La cle par jeu du lanceur : `megadrive["Sonic The Hedgehog (USA, Europe).zip"].rewind`.</summary>
+    private static string ClePartie(string systemId, string romFile, string cle)
+        => systemId + "[\"" + romFile.Replace("=", "").Replace("#", "") + "\"]." + cle;
+
+    /// <summary>
+    /// Ce que le frontend a d'actif pour CE lancement et qui fera refuser le score. Lu dans le
+    /// retroarch.cfg que le lanceur vient d'ecrire, pas dans es_settings.cfg : c'est ce que
+    /// RetroArch a reellement charge. Une cle neutralisee apres le lancement ne vaut que pour le
+    /// suivant, et l'avant-partie doit dire la verite de celui-ci. Vide quand tout est neutre,
+    /// ou quand l'emulateur n'est pas RetroArch.
+    /// </summary>
+    public IReadOnlyList<string> DangersFrontendActifs()
+    {
+        var jeu = _context.Ui.Running ?? _context.Ui.Selected;
+        var emulateur = (jeu?.Launch?.Emulator ?? "").ToLowerInvariant();
+        var coeur = jeu?.Launch?.Core ?? "";
+        if (emulateur.Length > 0 && !emulateur.Contains("retroarch") && !emulateur.Contains("libretro") && coeur.Length == 0)
+            return Array.Empty<string>();
+        Dictionary<string, string> cfg;
+        try
+        {
+            cfg = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var ligne in File.ReadLines(RetroBatPaths.RetroArchConfigPath))
+            {
+                var eq = ligne.IndexOf('=');
+                if (eq <= 0) continue;
+                var cle = ligne[..eq].Trim();
+                var valeur = ligne[(eq + 1)..].Trim().Trim('"');
+                if (cle.Length > 0) cfg[cle] = valeur;
+            }
+        }
+        catch
+        {
+            return Array.Empty<string>();
+        }
+
+        static bool Vrai(Dictionary<string, string> c, string cle) => c.TryGetValue(cle, out var v) && v is "true" or "1";
+        var dangers = new List<string>();
+        if (Vrai(cfg, "rewind_enable")) dangers.Add(FonctionsFrontend[0].Nom);
+        if (Vrai(cfg, "run_ahead_enabled") || Vrai(cfg, "preemptive_frames_enable")) dangers.Add(FonctionsFrontend[1].Nom);
+        if (Vrai(cfg, "savestate_auto_load")) dangers.Add(FonctionsFrontend[2].Nom);
+        return dangers;
+    }
+
+    /// <summary>
+    /// Neutralise, pour CE jeu seulement, les fonctions du frontend qui feraient refuser le
+    /// score. Ecrit dans es_settings.cfg les cles par jeu que le lanceur lit au lancement ;
+    /// rien ne change pour les autres jeux ni pour les reglages globaux du joueur.
+    /// </summary>
+    private void NeutraliserFrontend(string systemId, string romFile)
+    {
+        try
+        {
+            var change = _esSettings.Update(document =>
+            {
+                var root = document.Root ?? throw new InvalidOperationException("es_settings.cfg sans racine.");
+                var modifie = false;
+                foreach (var (cle, valeur, _) in FonctionsFrontend)
+                {
+                    var nom = ClePartie(systemId, romFile, cle);
+                    var existant = root.Elements().FirstOrDefault(e => string.Equals(e.Attribute("name")?.Value, nom, StringComparison.OrdinalIgnoreCase));
+                    if (existant is not null)
+                    {
+                        if (string.Equals(existant.Attribute("value")?.Value, valeur, StringComparison.Ordinal)) continue;
+                        existant.SetAttributeValue("value", valeur);
+                        modifie = true;
+                        continue;
+                    }
+                    root.Add(new XText(Environment.NewLine + "  "));
+                    root.Add(new XElement("string", new XAttribute("name", nom), new XAttribute("value", valeur)));
+                    modifie = true;
+                }
+                return modifie;
+            });
+            if (change) _logger?.LogInformation("Reglages certifies : rewind, run-ahead et sauvegarde auto neutralises pour {Rom} ({Systeme}).", romFile, systemId);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Reglages certifies : es_settings.cfg non modifiable, le frontend garde ses reglages.");
+        }
     }
 
     /// <summary>Le fichier lu par le listener au chargement.</summary>
@@ -60,9 +170,11 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         _abonnement = _bus.Subscribe<EventEnvelope>(e =>
         {
             var type = e.Type?.ToLowerInvariant();
-            if (type == "ui.game.started.raw" || type == "ui.game.started")
+            // A la SELECTION deja : le lanceur lit es_settings.cfg au lancement, il faut que les
+            // cles par jeu y soient avant. Au demarrage aussi, pour un lancement venu d'ailleurs.
+            if (type == "ui.game.selected" || type == "ui.game.started.raw" || type == "ui.game.started")
             {
-                _ = PreparerAsync(CancellationToken.None);
+                _ = PreparerAsync(type == "ui.game.selected", CancellationToken.None);
             }
             else if (type == "ui.game.ended" || type == "ui.game.ended.raw")
             {
@@ -81,7 +193,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
 
     public void Dispose() => _abonnement?.Dispose();
 
-    private async Task PreparerAsync(CancellationToken ct)
+    private async Task PreparerAsync(bool selection, CancellationToken ct)
     {
         try
         {
@@ -91,7 +203,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
                 return;
             }
 
-            var jeu = _context.Ui.Running ?? _context.Ui.Selected;
+            var jeu = selection ? _context.Ui.Selected : (_context.Ui.Running ?? _context.Ui.Selected);
             var chemin = jeu?.GamePath;
             if (string.IsNullOrWhiteSpace(chemin))
             {
@@ -101,8 +213,16 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
 
             // Le profil d'un jeu d'arcade est depose sous « arcade », quel que soit le dossier
             // RetroBat (mame, fbneo...) : meme regle que le fournisseur wrapper a la soumission.
-            var systeme = SystemeDuProfil(jeu?.SystemId ?? string.Empty);
+            var systemeEs = jeu?.SystemId ?? string.Empty;
+            var systeme = SystemeDuProfil(systemeEs);
             var fichier = Path.GetFileName(chemin);
+            // Une selection qui ne change pas de jeu ne refait rien : le menu en emet beaucoup.
+            var empreinte = systemeEs + "|" + fichier;
+            lock (_verrou)
+            {
+                if (selection && _dernierPrepare == empreinte) return;
+                _dernierPrepare = empreinte;
+            }
             var romGroup = _canonical.ResolveScoreSlug(systeme, fichier, null, null);
             if (string.IsNullOrWhiteSpace(romGroup))
             {
@@ -110,11 +230,19 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
                 return;
             }
 
-            var attendus = await ValeursAttenduesAsync(systeme, romGroup!, ct).ConfigureAwait(false);
-            if (attendus is null || attendus.Count == 0)
+            var attendus = await ValeursAttenduesEnCacheAsync(systeme, romGroup!, ct).ConfigureAwait(false);
+            if (attendus is null)
             {
-                _logger?.LogInformation("Reglages certifies : {Rom} ({Systeme}) sans reglages publies, rien a forcer.", romGroup, systeme);
-                Effacer();
+                // Jeu non ouvert au scoring : rien a forcer, rien a neutraliser.
+                if (!selection) Effacer();
+                return;
+            }
+
+            // Jeu ouvert : les fonctions du frontend d'abord, elles se reglent avant le lancement.
+            NeutraliserFrontend(systemeEs, fichier);
+            if (attendus.Count == 0)
+            {
+                if (!selection) Effacer();
                 return;
             }
 
@@ -129,7 +257,25 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         }
     }
 
-    /// <summary>Les valeurs du profil ouvert, ou null s'il n'y en a pas (jeu non ouvert, borne sans compte).</summary>
+    private async Task<Dictionary<string, string>?> ValeursAttenduesEnCacheAsync(string systemId, string romGroup, CancellationToken ct)
+    {
+        var cle = systemId + "|" + romGroup;
+        lock (_verrou)
+        {
+            if (_cache.TryGetValue(cle, out var entree) && entree.Jusqua > DateTime.UtcNow) return entree.Valeurs;
+        }
+        var valeurs = await ValeursAttenduesAsync(systemId, romGroup, ct).ConfigureAwait(false);
+        lock (_verrou)
+        {
+            _cache[cle] = (DateTime.UtcNow.AddMinutes(10), valeurs);
+        }
+        return valeurs;
+    }
+
+    /// <summary>
+    /// Les valeurs du profil ouvert : null si le jeu n'est pas ouvert (ou borne sans compte),
+    /// un dictionnaire, vide au besoin, s'il l'est.
+    /// </summary>
     private async Task<Dictionary<string, string>?> ValeursAttenduesAsync(string systemId, string romGroup, CancellationToken ct)
     {
         var credential = ResolveCredential();
@@ -144,11 +290,10 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         using var response = await client.GetAsync(url, ct).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) return null;
         using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
-        if (!doc.RootElement.TryGetProperty("profile", out var profil)
-            || !profil.TryGetProperty("core_options_expected", out var attendus)
-            || attendus.ValueKind != JsonValueKind.Array)
+        if (!doc.RootElement.TryGetProperty("profile", out var profil)) return null;
+        if (!profil.TryGetProperty("core_options_expected", out var attendus) || attendus.ValueKind != JsonValueKind.Array)
         {
-            return null;
+            return new Dictionary<string, string>(StringComparer.Ordinal);
         }
 
         // Plusieurs entrées quand un profil sert plusieurs moteurs. Le cœur chargé n'est pas encore
