@@ -16,4 +16,12 @@ public sealed class NelfePlayOptions
 
     /// <summary>Decouverte silencieuse du scoring : voir <see cref="ScoringDiscoveryOptions"/>.</summary>
     public ScoringDiscoveryOptions ScoringDiscovery { get; set; } = new();
+
+    /// <summary>
+    /// Forcer la certification : avant un jeu ouvert au scoring, la borne applique les reglages
+    /// certifies publies par son profil (difficulte, vies, vitesse, cheats), au lieu de laisser le
+    /// joueur decouvrir a la fin de la partie que son score est refuse. Rien qui touche l'affichage
+    /// ni les manettes. A false, la borne se contente d'informer.
+    /// </summary>
+    public bool ForceCertifiedSettings { get; set; } = true;
 }

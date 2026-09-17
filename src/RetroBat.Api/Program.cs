@@ -289,6 +289,9 @@ builder.Services.AddSingleton<RetroBat.Api.Infrastructure.NvramSnapshotService>(
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.NvramSnapshotService>());
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.BiosFingerprintService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.BiosFingerprintService>());
+// Reglages certifies poses avant le chargement du jeu (option NelfePlay.ForceCertifiedSettings).
+builder.Services.AddSingleton<RetroBat.Api.Infrastructure.CertifiedSettingsService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.CertifiedSettingsService>());
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.NelfePlayScoringReporter>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.NelfePlayScoringReporter>());
 // Déchiffrement au lancement puis effacement : rien de clair ne survit à la partie.
