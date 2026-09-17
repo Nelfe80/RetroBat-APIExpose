@@ -1,6 +1,9 @@
 [Code]
-// dotnet-runtime.iss - PREREQUIS .NET 8 de RetroBat.Api.exe : ASP.NET Core Runtime 8 et
-// .NET Desktop Runtime 8, en x64 (l'exe est framework-dependent, serveur web + Windows Forms).
+// dotnet-runtime.iss - PREREQUIS .NET 8 de RetroBat.Api.exe : .NET Runtime 8, ASP.NET Core
+// Runtime 8 et .NET Desktop Runtime 8, en x64 (l'exe est framework-dependent, serveur web +
+// Windows Forms). Le .NET Runtime de base (Microsoft.NETCore.App) est verifie et installe pour
+// lui-meme, en premier : les deux autres paquets l'embarquent d'ordinaire, mais une machine ou
+// il manquait a ete vue chez un testeur (2026-09-17), et c'est lui que l'apphost reclame.
 //
 // IMPORTANT : commence DIRECTEMENT par [Code], uniquement des commentaires « // » (voir
 // retrobat-detect.iss). Les procedures d'evenement sont declarees par attributs <event(...)> :
@@ -19,7 +22,7 @@
 
 const
   DotNetMajorPrefix = '8.';
-  DotNetFxCount = 2;
+  DotNetFxCount = 3;
 
 var
   DotNetDownloadPage: TDownloadWizardPage;
@@ -27,6 +30,8 @@ var
 function DotNetFxName(Index: Integer): String;
 begin
   if Index = 0 then
+    Result := 'Microsoft.NETCore.App'
+  else if Index = 1 then
     Result := 'Microsoft.AspNetCore.App'
   else
     Result := 'Microsoft.WindowsDesktop.App';
@@ -35,6 +40,8 @@ end;
 function DotNetFxLabel(Index: Integer): String;
 begin
   if Index = 0 then
+    Result := '.NET Runtime 8 (x64)'
+  else if Index = 1 then
     Result := 'ASP.NET Core Runtime 8 (x64)'
   else
     Result := '.NET Desktop Runtime 8 (x64)';
@@ -43,6 +50,8 @@ end;
 function DotNetFxUrl(Index: Integer): String;
 begin
   if Index = 0 then
+    Result := 'https://aka.ms/dotnet/8.0/dotnet-runtime-win-x64.exe'
+  else if Index = 1 then
     Result := 'https://aka.ms/dotnet/8.0/aspnetcore-runtime-win-x64.exe'
   else
     Result := 'https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe';
@@ -51,6 +60,8 @@ end;
 function DotNetFxFileName(Index: Integer): String;
 begin
   if Index = 0 then
+    Result := 'dotnet-runtime-8-win-x64.exe'
+  else if Index = 1 then
     Result := 'aspnetcore-runtime-8-win-x64.exe'
   else
     Result := 'windowsdesktop-runtime-8-win-x64.exe';
