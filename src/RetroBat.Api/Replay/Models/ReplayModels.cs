@@ -26,7 +26,11 @@ public sealed record ReplayRuntime(
     string? CoreSha256,
     string? BiosSha256,
     string? CoreOptionsDigest,
-    string ReplayFormat);
+    string ReplayFormat,
+    // Le NOM du core libretro (« genesis_plus_gx »), portable : l'empreinte dit la version, le
+    // nom dit lequel. Sans lui, une empreinte fausse laissait la lecture deviner (2048 pour un
+    // replay de Sonic, 2026-09-17). Absent des manifestes anterieurs.
+    string? CoreName = null);
 
 public sealed record ReplayObjectRef(string Sha256, long Size);
 

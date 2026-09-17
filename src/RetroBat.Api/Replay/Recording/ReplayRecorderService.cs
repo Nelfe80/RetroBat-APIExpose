@@ -286,7 +286,8 @@ public sealed class ReplayRecorderService : BackgroundService
             CoreSha256: HashFileQuiet(hint?.CoreDll), // = version du core → format de savestate .bsv
             BiosSha256: null,                        // TODO : par-système, seulement quand un BIOS est requis
             CoreOptionsDigest: null,                 // TODO : sous-ensemble DÉTERMINISTE des core options (pas les options cosmétiques)
-            ReplayFormat: "bsv");
+            ReplayFormat: "bsv",
+            CoreName: string.IsNullOrEmpty(hint?.Core) ? null : hint!.Core);
 
         var (fps, fpsSource) = ResolveFps(rec);
         var frames = new ReplayFrames(

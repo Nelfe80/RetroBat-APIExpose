@@ -97,9 +97,39 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
         exact = false;
         if (hint is not null && !string.IsNullOrEmpty(hint.Core))
         {
+            // Un indice memorise n'est cru que s'il tient debout : le core qu'il nomme porte
+            // l'empreinte du manifeste, ou fait partie des cores connus du systeme. Une lecture
+            // passee avait memorise 2048 pour un replay de Sonic (2026-09-17), et chaque lecture
+            // suivante le reprenait comme exact.
             var real = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "cores_real", hint.Core + "_libretro.dll");
-            if (File.Exists(real)) { exact = true; return real; }
-            if (!string.IsNullOrEmpty(hint.CoreDll) && File.Exists(hint.CoreDll)) { exact = true; return hint.CoreDll; }
+            var chemin = File.Exists(real) ? real : (!string.IsNullOrEmpty(hint.CoreDll) && File.Exists(hint.CoreDll) ? hint.CoreDll : null);
+            if (chemin is not null)
+            {
+                var parEmpreinte = !string.IsNullOrWhiteSpace(manifest.Runtime.CoreSha256)
+                    && string.Equals(HashFileQuiet(chemin), manifest.Runtime.CoreSha256, StringComparison.OrdinalIgnoreCase);
+                var connus = _romPaths.LibretroCoresFor(hint.SystemFolder ?? manifest.Game.SystemFolder);
+                if (connus.Count == 0) connus = _romPaths.LibretroCoresFor(manifest.Game.SystemId);
+                var candidats = connus.Count > 0 ? connus : CandidatsPourSysteme(manifest.Game.SystemId, hint.SystemFolder ?? manifest.Game.SystemFolder);
+                var plausible = candidats.Any(c => string.Equals(c.Replace("_libretro.dll", "").Replace("_libretro", ""), hint.Core, StringComparison.OrdinalIgnoreCase));
+                if (parEmpreinte || plausible) { exact = parEmpreinte; return chemin; }
+                _logger.LogInformation("Replay : indice memorise ecarte pour {Id} ({Core} n'est ni le core du manifeste ni un core de {System}).",
+                    manifest.ReplayId, hint.Core, manifest.Game.SystemId);
+            }
+        }
+
+        // Le manifeste NOMME son core : c'est lui, exact si l'empreinte suit, best-effort sinon
+        // (une autre version du meme core rejoue presque toujours, les checkpoints disent le reste).
+        var nomme = manifest.Runtime.CoreName;
+        if (!string.IsNullOrWhiteSpace(nomme))
+        {
+            foreach (var sub in new[] { "cores_real", "cores" })
+            {
+                var chemin = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", sub, nomme + "_libretro.dll");
+                if (!File.Exists(chemin)) continue;
+                exact = !string.IsNullOrWhiteSpace(manifest.Runtime.CoreSha256)
+                    && string.Equals(HashFileQuiet(chemin), manifest.Runtime.CoreSha256, StringComparison.OrdinalIgnoreCase);
+                return chemin;
+            }
         }
 
         var wanted = manifest.Runtime.CoreSha256;
@@ -130,7 +160,7 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
         // replay n'est pas une soumission de score : mieux vaut le montrer avec un core proche
         // que de le refuser. Un desync eventuel se verra a l'ecran, et les checkpoints du .bsv
         // le signalent.
-        var apprenti = CoreDejaUtilisePour(manifest.Game.SystemId);
+        var apprenti = CoreDejaUtilisePour(manifest.Game.SystemId, hint?.SystemFolder ?? manifest.Game.SystemFolder);
         if (apprenti is not null)
         {
             _logger.LogInformation("Replay : core non identifie pour {Id}, repli sur {Core} deja employe ici pour {System}.",
@@ -245,14 +275,21 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
     /// enregistrements plutot que de le deviner : chacun porte le chemin du core reellement
     /// lance. Aucune table a maintenir, et la reponse colle a cette installation.
     /// </summary>
-    private string? CoreDejaUtilisePour(string? systemId)
+    private string? CoreDejaUtilisePour(string? systemId, string? systemFolder)
     {
         if (string.IsNullOrWhiteSpace(systemId)) return null;
+        // Seul un core que le systeme connait compte : une lecture passee qui s'etait trompee
+        // (2048 memorise pour la Megadrive) ne doit pas se propager aux replays voisins.
+        var connus = _romPaths.LibretroCoresFor(systemFolder);
+        if (connus.Count == 0) connus = _romPaths.LibretroCoresFor(systemId);
+        var candidats = connus.Count > 0 ? connus : CandidatsPourSysteme(systemId, systemFolder);
         foreach (var m in _manifests.ListManifests())
         {
             if (!string.Equals(m.Game.SystemId, systemId, StringComparison.OrdinalIgnoreCase)) continue;
             var dll = _meta.GetMeta(m.ReplayId)?.Launch?.CoreDll;
-            if (!string.IsNullOrWhiteSpace(dll) && File.Exists(dll)) return dll;
+            if (string.IsNullOrWhiteSpace(dll) || !File.Exists(dll)) continue;
+            var nom = Path.GetFileNameWithoutExtension(dll).Replace("_libretro", "");
+            if (candidats.Any(c => string.Equals(c.Replace("_libretro.dll", "").Replace("_libretro", ""), nom, StringComparison.OrdinalIgnoreCase))) return dll;
         }
         return null;
     }
