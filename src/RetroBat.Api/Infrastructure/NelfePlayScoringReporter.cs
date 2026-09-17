@@ -436,7 +436,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // Ce que le listener a vu des entrées et ce qu'il a forcé : lisible ici même quand la
             // partie ne donne lieu à aucun passeport (pas de score), pour le diagnostic.
             var vu = JsonNode.Parse(sessionJson)!.AsObject();
-            Trace($"entrées: impossible={(long?)vu["impossible_inputs"] ?? -1} appuis={(long?)vu["press_count"] ?? -1} forcé=[{(string?)vu["forced_options"] ?? ""}]");
+            Trace($"entrées: impossible={(long?)vu["impossible_inputs"] ?? -1} appuis={(long?)vu["press_count"] ?? -1} macro={(long?)vu["macro_repeats"] ?? -1} forcé=[{(string?)vu["forced_options"] ?? ""}]");
         }
         catch { }
 
@@ -600,6 +600,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         long pressSum = (long?)session["press_frames_sum"] ?? 0;
         long pressSq = (long?)session["press_frames_sq"] ?? 0;
         string forcedOptions = (string?)session["forced_options"] ?? "";
+        long macroRepeats = (long?)session["macro_repeats"] ?? 0;
+        long macroWindows = (long?)session["macro_windows"] ?? 0;
         // Phase E : réglages (DIP/vies/difficulté) capturés par le listener sous forme de chaîne
         // canonique triée. Absent (backend pas encore câblé) → placeholder stable. Le vérifieur ne
         // contrôle le digest QUE si le profil épingle allowed_core_options_digest (opt-in additif).
@@ -735,6 +737,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 ["netplay"] = netplay > 0, ["continues"] = continues,
                 ["impossible_inputs"] = impossibleInputs,
                 ["press_count"] = pressCount, ["press_frames_sum"] = pressSum, ["press_frames_sq"] = pressSq,
+                ["macro_repeats"] = macroRepeats, ["macro_windows"] = macroWindows,
             },
             ["metric"] = new JsonObject
             {
@@ -865,7 +868,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var message = status switch
             {
                 "published" => $"🏆 Score certifié : {score:N0} publié" + (rank is int r ? $" (#{r})" : ""),
-                "held" => $"⏳ Score {score:N0} en attente de vérification",
+                // Signalé : gardé sur le compte du joueur, jamais classé ni ancré. Il sait pourquoi.
+                "held" => $"⚠️ Score {score:N0} signalé, non classé — {ReasonToText(reason)}",
                 "refused" => $"❌ Score {score:N0} refusé — {ReasonToText(reason)}",
                 _ => $"⚠️ Score non transmis — {ReasonToText(reason)}",
             };
@@ -983,6 +987,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "runtime.cheat_detected" => "triche (cheat) détectée",
         "runtime.continue_forbidden" => "continue interdit pour ce record",
         "runtime.impossible_inputs" => "directions opposées simultanées (manette ou stick non conforme)",
+        "plausibility.macro_detected" => "séquence rejouée à l'identique (macro) : score signalé, non classé",
+        "plausibility.statistical_hold" => "score retenu pour vérification",
         "runtime.module_unauthorized" => "logiciel non homologué",
         "profile.core_mismatch" => "émulateur non reconnu",
         "profile.content_mismatch" => "ROM non reconnue",
