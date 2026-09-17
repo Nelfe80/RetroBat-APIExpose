@@ -247,6 +247,9 @@ public sealed class CabinetInputReader : IDisposable
     /// has to show for "player 2 lit up" to ever be explainable.</summary>
     public IReadOnlyList<string> DeviceNames => _devices.Select(d => d.Name).ToList();
 
+    /// <summary>Les appareils ouverts (GUID SDL, nom), dans l'ordre des index de Snapshot.</summary>
+    public IReadOnlyList<PlayerNumbering.Device> Devices => _devices.Select(d => new PlayerNumbering.Device(d.Guid, d.Name)).ToList();
+
     /// <summary>Les memes appareils, avec l'etage qui a resolu leur mappage. Pour le
     /// journal : « 0 mapped device(s) » ne disait pas OU la resolution avait echoue.</summary>
     public IReadOnlyList<string> DeviceMappings =>

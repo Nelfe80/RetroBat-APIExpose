@@ -30,6 +30,9 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
     private bool _pollFailed;
     private bool _firstPressLogged;
     private string _lastDeviceKey = "";
+    /// <summary>Le joueur de chaque appareil ouvert (index SDL -> joueur), voir <see cref="PlayerNumbering"/>.</summary>
+    private volatile int[] _players = Array.Empty<int>();
+    private string _lastPlayersKey = "";
     private const int RescanEveryTicks = 200; // ~5 s at 25 ms
     // SDL est lié au thread : le hotplug (add/remove) n'est vu QUE sur le thread qui a fait
     // SDL_Init, et seulement si on y pompe les événements. On possède donc SDL sur UN thread
@@ -96,6 +99,7 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
             _logger?.LogInformation("Panel input watcher started: {Message}, {Mapped} mapped device(s) [{Names}]",
                 message, mapped, string.Join(", ", _reader.DeviceMappings));
             _lastDeviceKey = mapped + "|" + string.Join(",", _reader.DeviceNames);
+            NumberPlayers(_reader);
 
             // (device, identity) of everything currently down: the diff between two polls is
             // what becomes a press and a release
@@ -172,17 +176,35 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
         // On le fait donc toutes les ~5 s sur CE thread dédié FIXE (énumération cohérente —
         // contrairement à Task.Run+await qui migrait le thread). On ne loggue que sur changement.
         var mapped = reader.ForceReenumerate();
+        NumberPlayers(reader);
         var key = mapped + "|" + string.Join(",", reader.DeviceNames);
         if (key == _lastDeviceKey) return;
         _lastDeviceKey = key;
         _logger?.LogInformation("Panel input re-scan: {Mapped} mapped [{Names}]",
-            mapped, string.Join(", ", reader.DeviceNames));
+            mapped, string.Join(", ", reader.DeviceMappings));
+    }
+
+    /// <summary>
+    /// Attribue les joueurs aux appareils ouverts : le panel d'abord, quel que soit l'ordre de
+    /// SDL. Journalise a chaque changement, pour qu'un « joueur 2 » inattendu s'explique.
+    /// </summary>
+    private void NumberPlayers(CabinetInputReader reader)
+    {
+        var devices = reader.Devices;
+        var players = PlayerNumbering.Assign(devices, PlayerNumbering.ReadPins());
+        _players = players;
+        var key = PlayerNumbering.Describe(devices, players);
+        if (key == _lastPlayersKey) return;
+        _lastPlayersKey = key;
+        if (devices.Count > 0) _logger?.LogInformation("Panel input players: {Players}", key);
     }
 
     private void Publish(string type, int device, string identity)
     {
-        // the device index is the player: pad 0 drives panel 1
-        var player = device + 1;
+        // Le joueur de cet appareil : le panel est toujours le joueur 1 (PlayerNumbering), et
+        // non « index SDL + 1 », qui mettait une manette Xbox devant le panel.
+        var players = _players;
+        var player = device < players.Length ? players[device] : device + 1;
         var slot = ResolveSlot(player, identity);
         var system = SystemInput(identity);
 
