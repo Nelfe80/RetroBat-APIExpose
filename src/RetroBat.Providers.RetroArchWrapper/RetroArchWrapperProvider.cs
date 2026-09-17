@@ -602,7 +602,23 @@ public class RetroArchWrapperProvider : IProvider
         var rawRom = Path.GetFileNameWithoutExtension(game?.GamePath ?? game?.GameName ?? string.Empty);
         RetroArchDefinitionSnapshot? fallback = null;
 
-        foreach (var candidateSystemId in ResolveDefinitionSystemCandidates(systemId))
+        // Le systeme du DOSSIER de la ROM passe avant celui du jeu en cours. MESURE du 2026-09-17 :
+        // EmulationStation nomme le systeme SELECTIONNE dans son menu, pas celui du jeu lance ; un
+        // jeu Super Nintendo lance par l'API pendant que le menu montrait l'arcade devenait « mame »,
+        // son MEM n'etait pas trouve et la partie signee partait sous « axelay-usa » au lieu
+        // d'« axelay ». Un jeu d'arcade ne change pas : son dossier (fbneo) comme « mame » menent au
+        // MEM du dossier arcade.
+        var systemeDuChemin = SystemFromRomPath(game?.GamePath);
+        var candidats = ResolveDefinitionSystemCandidates(systemeDuChemin)
+            .Concat(ResolveDefinitionSystemCandidates(systemId))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        if (systemeDuChemin != string.Empty)
+        {
+            systemId = systemeDuChemin;
+        }
+
+        foreach (var candidateSystemId in candidats)
         {
             var candidate = ResolveDefinition(rawRom, candidateSystemId);
             fallback ??= candidate;
@@ -807,7 +823,20 @@ public class RetroArchWrapperProvider : IProvider
             return game.Launch.System.Trim();
         }
 
-        var romPath = game.GamePath ?? string.Empty;
+        var depuisChemin = SystemFromRomPath(game.GamePath);
+        return depuisChemin != string.Empty ? depuisChemin : game.SystemId;
+    }
+
+    /// <summary>
+    /// The RetroBat system a ROM path lives in (<c>roms\snes\...</c> gives <c>snes</c>), or an empty
+    /// string outside the ROM tree.
+    /// </summary>
+    private static string SystemFromRomPath(string? romPath)
+    {
+        if (string.IsNullOrWhiteSpace(romPath))
+        {
+            return string.Empty;
+        }
         try
         {
             var romsRoot = Path.GetFullPath(RetroBatPaths.RomsRoot)
@@ -828,7 +857,7 @@ public class RetroArchWrapperProvider : IProvider
             // Ignore path inference errors and fall back to unknown.
         }
 
-        return game.SystemId;
+        return string.Empty;
     }
 
     private static string GetPipePath() => @"\\.\pipe\" + DefaultPipeName;
