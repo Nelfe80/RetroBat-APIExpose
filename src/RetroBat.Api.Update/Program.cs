@@ -422,11 +422,20 @@ internal static class Program
     {
         try
         {
-            Process.Start(new ProcessStartInfo(Path.Combine(racine, ExeApi))
+            // Comme le hook d'EmulationStation (start /MIN ... --hide-console) : l'API est un
+            // programme console, et lancee nue elle ouvrait sa fenetre noire en plein ecran
+            // devant EmulationStation le temps de demarrer. Reduite des le depart, elle cache
+            // elle-meme sa console ; la borne ne voit rien.
+            var info = new ProcessStartInfo(Path.Combine(racine, ExeApi))
             {
                 WorkingDirectory = racine,
                 UseShellExecute = true,
-            });
+                WindowStyle = ProcessWindowStyle.Minimized,
+            };
+            info.ArgumentList.Add("--urls");
+            info.ArgumentList.Add("http://127.0.0.1:12345");
+            info.ArgumentList.Add("--hide-console");
+            Process.Start(info);
             return true;
         }
         catch (Exception ex)
