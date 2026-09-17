@@ -585,6 +585,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         long fastForward = (long?)session["fast_forward"] ?? 0;
         long netplay = (long?)session["netplay"] ?? 0;
         long continues = (long?)session["continues"] ?? 0;
+        // Entrees (wrapper 0.336) : les images a directions opposees, et la statistique des durees
+        // d'appui. Absents avec un listener plus ancien : le verifieur compte 0.
+        long impossibleInputs = (long?)session["impossible_inputs"] ?? 0;
+        long pressCount = (long?)session["press_count"] ?? 0;
+        long pressSum = (long?)session["press_frames_sum"] ?? 0;
+        long pressSq = (long?)session["press_frames_sq"] ?? 0;
+        string forcedOptions = (string?)session["forced_options"] ?? "";
         // Phase E : réglages (DIP/vies/difficulté) capturés par le listener sous forme de chaîne
         // canonique triée. Absent (backend pas encore câblé) → placeholder stable. Le vérifieur ne
         // contrôle le digest QUE si le profil épingle allowed_core_options_digest (opt-in additif).
@@ -699,7 +706,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 ["core"] = Triple(coreSha), ["content"] = ContentArtifact(contentSha, contentMd5, contentSha1), ["mem"] = Triple(memSha),
                 ["core_options_digest"] = coreOptionsDigest,
                 ["bios"] = bios ?? new JsonObject { ["mode"] = "none" },
-
+                ["forced_options"] = forcedOptions,
             },
             ["process"] = new JsonObject
             {
@@ -718,6 +725,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 ["cheats"] = cheats > 0, ["save_state_loaded"] = saveStateLoads > 0, ["resets"] = resets,
                 ["rewind"] = rewind > 0, ["runahead"] = runahead > 0, ["fast_forward"] = fastForward > 0,
                 ["netplay"] = netplay > 0, ["continues"] = continues,
+                ["impossible_inputs"] = impossibleInputs,
+                ["press_count"] = pressCount, ["press_frames_sum"] = pressSum, ["press_frames_sq"] = pressSq,
             },
             ["metric"] = new JsonObject
             {
@@ -965,6 +974,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "runtime.save_state_detected" => "sauvegarde d'état détectée",
         "runtime.cheat_detected" => "triche (cheat) détectée",
         "runtime.continue_forbidden" => "continue interdit pour ce record",
+        "runtime.impossible_inputs" => "directions opposées simultanées (manette ou stick non conforme)",
         "runtime.module_unauthorized" => "logiciel non homologué",
         "profile.core_mismatch" => "émulateur non reconnu",
         "profile.content_mismatch" => "ROM non reconnue",

@@ -108,3 +108,4 @@ panel_curator_ultimate*
 publish-tmp/
 dist/
 /RetroBat.Api.Update.exe.old
+wrapper/certified.txt
