@@ -557,6 +557,8 @@ public class RetroArchWrapperProvider : IProvider
                     ContentSha256 = Get("content_sha256"),
                     ContentMd5 = Get("content_md5"),
                     WrapperVersion = Get("wrapper_version"),
+                    CoreOptions = Get("core_options"),
+                    ForcedOptions = Get("forced_options"),
                     SessionNonce = Get("session_nonce"),
                 }
             });

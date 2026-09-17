@@ -345,6 +345,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
     }
 
+    private static JsonObject Triple(string? h) => new() { ["start_sha256"] = h, ["loaded_sha256"] = h, ["end_sha256"] = h };
+
+    private static JsonObject ContentArtifact(string? sha, string? md5, string? sha1)
+    {
+        var o = Triple(sha);
+        if (md5 is not null) o["md5"] = md5;     // Voie A : md5 No-Intro de la ROM (consoles)
+        if (sha1 is not null) o["sha1"] = sha1;  // MAME : sha1 du set (gamelist), MAME vérifiant le romset
+        return o;
+    }
+
     private void CaptureAttestation(JsonElement root)
     {
         lock (_sync)
@@ -356,6 +366,68 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _contentMd5 = GetString(root, "ContentMd5");
             _contentSha1 = GetString(root, "ContentSha1");
             _wrapperVersion = GetString(root, "WrapperVersion");
+        }
+        _ = PreflightAsync(root, CancellationToken.None);
+    }
+
+    /// <summary>
+    /// Le verdict AVANT la partie. Tout ce que le profil impose aux artefacts est connu dès le
+    /// chargement ; la plateforme le juge avec le code du verdict final et la borne l'affiche
+    /// pendant que le joueur peut encore agir, au lieu de le laisser découvrir à la fin qu'il
+    /// jouait pour rien. Ce qui ne se voit qu'en jouant (cheats, rembobinage, entrées) reste
+    /// vérifié à la fin. Un jeu non ouvert n'affiche rien : pas de bruit hors scoring.
+    /// </summary>
+    private async Task PreflightAsync(JsonElement attestation, CancellationToken ct)
+    {
+        try
+        {
+            var systemId = GetString(attestation, "SystemId") ?? "";
+            var romGroup = GetString(attestation, "Rom") ?? "";
+            if (systemId.Length == 0 || romGroup.Length == 0 || _esNotify is null) return;
+            var credential = ResolveCredential();
+            if (string.IsNullOrEmpty(credential)) return;
+            var profile = await FetchProfileAsync(credential, systemId, romGroup, ct).ConfigureAwait(false);
+            if (profile is null) return;
+
+            var coreOptions = FilterGameplayCoreOptions(GetString(attestation, "CoreOptions"));
+            var digest = !string.IsNullOrEmpty(coreOptions) ? Crypto.Sha256Hex(coreOptions) : Crypto.Sha256Hex("core-options@default");
+            var contentSha1 = GetString(attestation, "ContentSha1") ?? GamelistIdentity.DeclaredSha1(systemId, romGroup);
+            var mesures = new JsonObject
+            {
+                ["system_id"] = systemId,
+                ["rom_group"] = romGroup,
+                ["artifacts"] = new JsonObject
+                {
+                    ["core"] = Triple(GetString(attestation, "CoreSha256")),
+                    ["content"] = ContentArtifact(GetString(attestation, "ContentSha256"), GetString(attestation, "ContentMd5"), contentSha1),
+                    ["mem"] = Triple(GetString(attestation, "MemSha256")),
+                    ["core_options_digest"] = digest,
+                    ["bios"] = _bios?.PourLePasseport(profile.Value) ?? new JsonObject { ["mode"] = "none" },
+                    ["forced_options"] = GetString(attestation, "ForcedOptions") ?? "",
+                },
+                ["listener"] = new JsonObject { ["loaded_sha256"] = GetString(attestation, "ListenerSha256") },
+            };
+
+            using var client = CreateClient(credential);
+            using var content = new StringContent(mesures.ToJsonString(), Encoding.UTF8, "application/json");
+            using var response = await client.PostAsync("/api/v1/agent/scores/preflight", content, ct).ConfigureAwait(false);
+            var corps = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+            Trace($"preflight HTTP {(int)response.StatusCode} - {corps}");
+            if (!response.IsSuccessStatusCode) return;
+            using var doc = JsonDocument.Parse(corps);
+            var root = doc.RootElement;
+            if (!root.TryGetProperty("open", out var open) || open.ValueKind != JsonValueKind.True) return;
+            var certifiable = root.TryGetProperty("certifiable", out var c) && c.ValueKind == JsonValueKind.True;
+            var reason = root.TryGetProperty("reason", out var r) ? r.GetString() ?? "" : "";
+            var force = (GetString(attestation, "ForcedOptions") ?? "").Length > 0;
+            var message = certifiable
+                ? (force ? "🏆 Partie certifiable, réglages certifiés appliqués" : "🏆 Partie certifiable pour le classement")
+                : $"⚠️ Partie non certifiable — {ReasonToText(reason)}";
+            await _esNotify.NotifyAsync(message, ct).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            Trace("preflight impossible : " + ex.Message);
         }
     }
 
@@ -660,15 +732,6 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             new JsonObject { ["role"] = "real_core", ["sha256"] = coreSha ?? listenerSha },
         };
         var modulesDigest = Crypto.Sha256Hex(Jcs.CanonicalBytes(modules));
-
-        JsonObject Triple(string? h) => new() { ["start_sha256"] = h, ["loaded_sha256"] = h, ["end_sha256"] = h };
-        JsonObject ContentArtifact(string? sha, string? md5, string? sha1)
-        {
-            var o = Triple(sha);
-            if (md5 is not null) o["md5"] = md5;     // Voie A : md5 No-Intro de la ROM (consoles)
-            if (sha1 is not null) o["sha1"] = sha1;  // MAME : sha1 du set (gamelist), MAME vérifiant le romset
-            return o;
-        }
 
         // MONDE de la partie : la session le porte.
         //  - STATION : joueur checké-in en salle par le hub → provenance salle (nom/ville).
