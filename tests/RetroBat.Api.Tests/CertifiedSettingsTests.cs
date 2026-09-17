@@ -41,6 +41,44 @@ public class CertifiedSettingsTests
         Assert.Equal("fbneo-cheat-1942-Infinite_lives=enabled;fbneo-dipswitch-1942-Difficulty=Hard", filtre);
     }
 
+    /// <summary>Les options du coeur MAME de RetroArch telles que RetroBat les ecrit sur la borne (2026-09-17).</summary>
+    private const string OptionsMameLibretro =
+        "mame_alternate_renderer=disabled;mame_altres=640x480;mame_auto_save=disabled;mame_autoloadfastforward=disabled;"
+        + "mame_boot_to_bios=disabled;mame_boot_to_osd=disabled;mame_buttons_profiles=disabled;mame_cheats_enable=disabled;"
+        + "mame_coin_limit=0;mame_cpu_overclock=default;mame_cpu_sound_overclock=default;mame_current_aspect_ratio=DAR;"
+        + "mame_current_frame_skip=0;mame_current_sample_rate=44100Hz;mame_current_turbo_button=disabled;mame_current_turbo_delay=medium;"
+        + "mame_joystick_deadzone=0.15;mame_lightgun_mode=lightgun;mame_mouse_enable=enabled;mame_read_config=disabled;"
+        + "mame_rotation_mode=internal;mame_thread_mode=enabled;mame_throttle=disabled";
+
+    [Fact]
+    public void MAME_RetroArch_ne_garde_que_les_reglages_de_jeu()
+    {
+        Assert.Equal(
+            "mame_auto_save=disabled;mame_cheats_enable=disabled;mame_cpu_overclock=default;mame_cpu_sound_overclock=default;"
+            + "mame_current_turbo_button=disabled;mame_read_config=disabled",
+            NelfePlayScoringReporter.FilterGameplayCoreOptions(OptionsMameLibretro));
+    }
+
+    [Fact]
+    public void MAME_RetroArch_ecran_et_manettes_ne_changent_rien()
+    {
+        var autreBorne = OptionsMameLibretro.Replace("mame_altres=640x480", "mame_altres=1920x1080")
+            .Replace("mame_current_aspect_ratio=DAR", "mame_current_aspect_ratio=PAR")
+            .Replace("mame_joystick_deadzone=0.15", "mame_joystick_deadzone=0.25")
+            .Replace("mame_mouse_enable=enabled", "mame_mouse_enable=disabled")
+            .Replace("mame_lightgun_mode=lightgun", "mame_lightgun_mode=touchscreen");
+        Assert.Equal(NelfePlayScoringReporter.FilterGameplayCoreOptions(OptionsMameLibretro), NelfePlayScoringReporter.FilterGameplayCoreOptions(autreBorne));
+    }
+
+    [Fact]
+    public void MAME_RetroArch_cheats_et_overclock_restent_controles()
+    {
+        Assert.NotEqual(NelfePlayScoringReporter.FilterGameplayCoreOptions(OptionsMameLibretro),
+            NelfePlayScoringReporter.FilterGameplayCoreOptions(OptionsMameLibretro.Replace("mame_cheats_enable=disabled", "mame_cheats_enable=enabled")));
+        Assert.NotEqual(NelfePlayScoringReporter.FilterGameplayCoreOptions(OptionsMameLibretro),
+            NelfePlayScoringReporter.FilterGameplayCoreOptions(OptionsMameLibretro.Replace("mame_cpu_overclock=default", "mame_cpu_overclock=150")));
+    }
+
     [Fact]
     public void Les_DIP_MAME_passent_inchanges()
     {

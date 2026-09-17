@@ -891,6 +891,20 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             "fbneo-dipswitch-*",               // DIP switches du jeu : vies, difficulte
             "fbneo-cheat-*",                   // cheats integres au coeur
         },
+        // MAME sous RetroArch : sans cette liste, ses quarante options passaient TOUTES dans
+        // l'empreinte (resolution, format d'image, zone morte, pistolet, souris...), ecrites par
+        // RetroBat selon l'ecran et les manettes de chacun. 19xx refusait « reglages non
+        // conformes » une borne d'usine dont seul l'affichage differait (2026-09-17). Les DIP
+        // switches de MAME vivent dans ses cfg, que seul mame_read_config fait lire.
+        ["mame_"] = new(StringComparer.Ordinal)
+        {
+            "mame_cheats_enable",              // cheats
+            "mame_cpu_overclock",              // vitesse CPU → ralentissements
+            "mame_cpu_sound_overclock",        // idem, processeur son
+            "mame_read_config",                // cfg de MAME : DIP switches, vies, difficulte
+            "mame_auto_save",                  // reprise automatique d'une sauvegarde d'etat
+            "mame_current_turbo_button",       // tir automatique
+        },
     };
 
     // Réduit la chaîne canonique « clé=valeur;… » aux seuls réglages gameplay (voir ci-dessus).
