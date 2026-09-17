@@ -431,6 +431,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var sessionJson = GetString(payload, "Session");
         Trace($"session reçue sys={systemId} rom={romGroup} sessionLen={sessionJson?.Length ?? -1}");
         if (sessionJson is null) return;
+        try
+        {
+            // Ce que le listener a vu des entrées et ce qu'il a forcé : lisible ici même quand la
+            // partie ne donne lieu à aucun passeport (pas de score), pour le diagnostic.
+            var vu = JsonNode.Parse(sessionJson)!.AsObject();
+            Trace($"entrées: impossible={(long?)vu["impossible_inputs"] ?? -1} appuis={(long?)vu["press_count"] ?? -1} forcé=[{(string?)vu["forced_options"] ?? ""}]");
+        }
+        catch { }
 
         // Appairé OU anonyme : le scoring accepte les deux (anonyme = score « anonyme »).
         var credential = ResolveCredential();

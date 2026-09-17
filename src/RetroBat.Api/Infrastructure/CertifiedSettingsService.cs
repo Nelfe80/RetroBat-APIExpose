@@ -5,6 +5,7 @@ using RetroBat.Domain.Events;
 using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Models;
 using RetroBat.Domain.Paths;
+using Microsoft.Extensions.Options;
 
 namespace RetroBat.Api.Infrastructure;
 
@@ -29,7 +30,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
     private readonly NelfePlayDeviceStore _devices;
     private readonly ApiContext _context;
     private readonly RomCanonicalResolver _canonical;
-    private readonly ApiExposeOptions _options;
+    private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly ILogger<CertifiedSettingsService>? _logger;
     private IDisposable? _abonnement;
 
@@ -39,7 +40,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         NelfePlayDeviceStore devices,
         ApiContext context,
         RomCanonicalResolver canonical,
-        ApiExposeOptions options,
+        IOptionsMonitor<ApiExposeOptions> options,
         ILogger<CertifiedSettingsService>? logger = null)
     {
         _bus = bus;
@@ -84,7 +85,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
     {
         try
         {
-            if (!_options.NelfePlay.ForceCertifiedSettings)
+            if (!_options.CurrentValue.NelfePlay.ForceCertifiedSettings)
             {
                 Effacer();
                 return;

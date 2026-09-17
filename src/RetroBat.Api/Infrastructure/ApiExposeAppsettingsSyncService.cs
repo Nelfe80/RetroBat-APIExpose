@@ -162,7 +162,10 @@ public sealed class ApiExposeAppsettingsSyncService
             ["global.apiexpose.community_ram.prefer_perso"] = Bool("CommunityRam", "PreferPerso"),
             // Decouverte silencieuse du scoring : l'interrupteur du joueur, allume par defaut,
             // eteignable depuis le menu d'EmulationStation comme depuis appsettings.
-            ["global.apiexpose.nelfeplay.scoring_discovery"] = Bool("NelfePlay", "ScoringDiscovery", "Enabled")
+            ["global.apiexpose.nelfeplay.scoring_discovery"] = Bool("NelfePlay", "ScoringDiscovery", "Enabled"),
+            // Forcer la certification : les reglages du profil appliques avant un jeu ouvert au
+            // scoring. Allume par defaut ; a OFF la borne se contente d'informer.
+            ["global.apiexpose.nelfeplay.force_certified_settings"] = Bool("NelfePlay", "ForceCertifiedSettings")
         };
 
     private readonly ILogger<ApiExposeAppsettingsSyncService>? _logger;
