@@ -360,7 +360,12 @@ public sealed class LeaderboardOverlayService : IDisposable
         {
             Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
             _forme = new Panneau(this);
-            Application.Run(_forme);
+            // La fenetre est creee ICI, cachee. Application.Run(forme) l'aurait MONTREE avant le
+            // premier tic du minuteur qui la cache : le panneau vide clignotait a chaque
+            // demarrage de l'API. Le handle suffit ; Show() viendra a la premiere ouverture.
+            _ = _forme.Handle;
+            _forme.FormClosed += (_, _) => Application.ExitThread();
+            Application.Run();
         }
         catch (Exception ex)
         {
