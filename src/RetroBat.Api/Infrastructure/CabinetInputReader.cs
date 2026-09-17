@@ -181,6 +181,15 @@ public sealed class CabinetInputReader : IDisposable
             // read joystick events without owning a focused SDL window (we are WPF)
             SDL_SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
+            // Une manette Xbox se lit par XInput, pas par RawInput. Le pilote RawInput de ce SDL
+            // (2.0.14) ouvre bien la manette (GUID en ...7200, boutons et chapeau declares) mais
+            // n'en livre JAMAIS un appui dans ce processus : il attend des messages WM_INPUT
+            // qu'aucune boucle de fenetre ne lui remet ici. Mesure du 2026-09-17 sur la borne :
+            // en RawInput, zero appui en 40 s de A et de dpad ; par XInput (GUID en ...7801),
+            // chaque appui vu. Le panel (DirectInput) n'est pas concerne, ES non plus : il a
+            // son propre SDL et sa propre boucle.
+            SDL_SetHint("SDL_JOYSTICK_RAWINPUT", "0");
+
             if (SDL_Init(InitFlags.Joystick) != 0)
             {
                 return (false, "SDL_Init a échoué.");
@@ -614,7 +623,10 @@ public sealed class CabinetInputReader : IDisposable
     /// 2. XINPUT : le SDL de RetroArch (2.0.14) ouvre les manettes Xbox par XInput, avec un GUID
     ///    qui vaut « xinput » en hexadecimal, sans constructeur ni produit. La base les range sous
     ///    la cle litterale « xinput » : sans cet etage, aucune manette Xbox ouverte par XInput
-    ///    n'etait reconnue (une manette Xbox « ne remontait pas », constate le 2026-09-17) ;
+    ///    n'etait reconnue (une manette Xbox « ne remontait pas », constate le 2026-09-17).
+    ///    Quand le SDL sait retrouver constructeur et produit, le GUID XInput est plutot
+    ///    « 030000005e0400008e02000000007801 » (« x » puis le sous-type en queue) : c'est
+    ///    l'etage 3 qui le resout ;
     /// 3. constructeur + produit (24 premiers caracteres) : le suffixe de pilote change d'une
     ///    machine a l'autre (RawInput, HIDAPI) et la base n'en porte aucun.
     /// </summary>
