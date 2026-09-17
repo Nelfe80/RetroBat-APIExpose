@@ -82,11 +82,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         RetroBat.Api.Replay.Sharing.ReplaySeedService? semeur = null,
         NvramSnapshotService? nvram = null,
         BiosFingerprintService? bios = null,
-        CertifiedSettingsService? certified = null)
+        CertifiedSettingsService? certified = null,
+        RetroBat.Api.Replay.Playback.ReplayPlaybackService? playback = null)
     {
         _nvram = nvram;
         _bios = bios;
         _certified = certified;
+        _playback = playback;
         _replayStore = replayStore;
         _semis = semis;
         _semeur = semeur;
@@ -293,6 +295,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private void HandleEvent(EventEnvelope envelope)
     {
         if (!Enabled) return;
+        // La lecture d'un replay n'est pas une partie : rien de ce qui arrive pendant qu'elle
+        // tourne (attestation, scores, session) ne doit ni prevenir le joueur ni soumettre quoi
+        // que ce soit. Le lecteur emploie le vrai core, sans wrapper ; ceci est le filet.
+        if (_playback?.IsBusy == true) return;
         try
         {
             switch (envelope.Type?.ToLowerInvariant())
@@ -358,6 +364,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     private readonly CertifiedSettingsService? _certified;
+    private readonly RetroBat.Api.Replay.Playback.ReplayPlaybackService? _playback;
 
     private void CaptureAttestation(JsonElement root)
     {
@@ -521,6 +528,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // partie ne donne lieu à aucun passeport (pas de score), pour le diagnostic.
             var vu = JsonNode.Parse(sessionJson)!.AsObject();
             Trace($"entrées: impossible={(long?)vu["impossible_inputs"] ?? -1} appuis={(long?)vu["press_count"] ?? -1} macro={(long?)vu["macro_repeats"] ?? -1} forcé=[{(string?)vu["forced_options"] ?? ""}]");
+            // Une partie sans le moindre appui n'est pas une partie : c'est la démo d'attract, ou
+            // un jeu lancé et laissé là. Sonic a marqué 200 points tout seul et les a fait publier
+            // sous le compte de la borne (2026-09-17). Le listener 0.336 compte les appuis ; un
+            // listener plus ancien ne dit rien (champ absent) et garde l'ancien comportement.
+            if (vu["press_count"] is not null && ((long?)vu["press_count"] ?? 0) == 0)
+            {
+                Trace("STOP: aucun appui du joueur pendant la session (démo ou jeu laissé là)");
+                return;
+            }
         }
         catch { }
 

@@ -105,13 +105,24 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
         var wanted = manifest.Runtime.CoreSha256;
         if (!string.IsNullOrWhiteSpace(wanted))
         {
-            foreach (var sub in new[] { "cores_real", "cores" })
+            // Dans cores/, chaque dll est le wrapper de scoring quand il est deploye : elles ont
+            // TOUTES la meme empreinte, et un manifeste enregistre avec cette empreinte faisait
+            // retenir la premiere de la liste (2048 pour un replay de Sonic, 2026-09-17). On ne
+            // cherche donc dans cores/ que sans cores_real/, et jamais une dll qui est le wrapper.
+            var coresReal = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "cores_real");
+            var wrapperSha = HashFileQuiet(Path.Combine(RetroBatPaths.RetroBatRoot, "plugins", "APIExpose", "wrapper", "wrapper.dll"));
+            if (!string.Equals(wanted, wrapperSha, StringComparison.OrdinalIgnoreCase))
             {
-                var root = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", sub);
-                if (!Directory.Exists(root)) continue;
-                foreach (var dll in Directory.EnumerateFiles(root, "*_libretro.dll"))
+                foreach (var sub in Directory.Exists(coresReal) ? new[] { "cores_real" } : new[] { "cores" })
                 {
-                    if (string.Equals(HashFileQuiet(dll), wanted, StringComparison.OrdinalIgnoreCase)) { exact = true; return dll; }
+                    var root = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", sub);
+                    if (!Directory.Exists(root)) continue;
+                    foreach (var dll in Directory.EnumerateFiles(root, "*_libretro.dll"))
+                    {
+                        var sha = HashFileQuiet(dll);
+                        if (string.Equals(sha, wrapperSha, StringComparison.OrdinalIgnoreCase)) continue;
+                        if (string.Equals(sha, wanted, StringComparison.OrdinalIgnoreCase)) { exact = true; return dll; }
+                    }
                 }
             }
         }

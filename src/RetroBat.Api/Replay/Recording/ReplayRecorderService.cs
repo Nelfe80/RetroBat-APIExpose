@@ -429,7 +429,14 @@ public sealed class ReplayRecorderService : BackgroundService
             var idx = name.LastIndexOf(".replay", StringComparison.OrdinalIgnoreCase);
             var gameBase = idx > 0 ? name[..idx] : name;
 
-            var coreDll = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "cores", core + "_libretro.dll");
+            // Le VRAI core, pas le wrapper de scoring qui le remplace dans cores/ : tous les
+            // wrappers ont la meme empreinte, et un manifeste qui la portait faisait choisir, a
+            // la lecture, le premier core de la liste (2048 pour un replay de Sonic, 2026-09-17).
+            var coreDll = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "cores_real", core + "_libretro.dll");
+            if (!File.Exists(coreDll))
+            {
+                coreDll = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "cores", core + "_libretro.dll");
+            }
             var romDir = Path.Combine(RetroBatPaths.RomsRoot, systemFolder);
             var romPath = "";
             if (Directory.Exists(romDir))

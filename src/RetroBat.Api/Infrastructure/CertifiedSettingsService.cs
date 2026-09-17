@@ -38,6 +38,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
     private readonly RomCanonicalResolver _canonical;
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly IEsSettingsStore _esSettings;
+    private readonly RetroBat.Api.Replay.Playback.ReplayPlaybackService? _playback;
     private readonly ILogger<CertifiedSettingsService>? _logger;
     private IDisposable? _abonnement;
     // Un jeu ouvert se reconnait a la selection dans le menu, ou l'on passe des dizaines de
@@ -54,8 +55,10 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         RomCanonicalResolver canonical,
         IOptionsMonitor<ApiExposeOptions> options,
         IEsSettingsStore esSettings,
-        ILogger<CertifiedSettingsService>? logger = null)
+        ILogger<CertifiedSettingsService>? logger = null,
+        RetroBat.Api.Replay.Playback.ReplayPlaybackService? playback = null)
     {
+        _playback = playback;
         _bus = bus;
         _httpFactory = httpFactory;
         _devices = devices;
@@ -202,6 +205,8 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
                 Effacer();
                 return;
             }
+            // La lecture d'un replay n'est pas une partie : rien a forcer, rien a neutraliser.
+            if (_playback?.IsBusy == true) return;
 
             var jeu = selection ? _context.Ui.Selected : (_context.Ui.Running ?? _context.Ui.Selected);
             var chemin = jeu?.GamePath;
