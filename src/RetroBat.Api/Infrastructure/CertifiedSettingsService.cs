@@ -93,16 +93,27 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
 
             var jeu = _context.Ui.Running ?? _context.Ui.Selected;
             var chemin = jeu?.GamePath;
-            if (string.IsNullOrWhiteSpace(chemin)) return;
+            if (string.IsNullOrWhiteSpace(chemin))
+            {
+                _logger?.LogInformation("Reglages certifies : aucun chemin de jeu au demarrage.");
+                return;
+            }
 
-            var systeme = jeu?.SystemId ?? string.Empty;
+            // Le profil d'un jeu d'arcade est depose sous « arcade », quel que soit le dossier
+            // RetroBat (mame, fbneo...) : meme regle que le fournisseur wrapper a la soumission.
+            var systeme = SystemeDuProfil(jeu?.SystemId ?? string.Empty);
             var fichier = Path.GetFileName(chemin);
             var romGroup = _canonical.ResolveScoreSlug(systeme, fichier, null, null);
-            if (string.IsNullOrWhiteSpace(romGroup)) return;
+            if (string.IsNullOrWhiteSpace(romGroup))
+            {
+                _logger?.LogInformation("Reglages certifies : {Fichier} ({Systeme}) sans groupe de score, rien a forcer.", fichier, systeme);
+                return;
+            }
 
             var attendus = await ValeursAttenduesAsync(systeme, romGroup!, ct).ConfigureAwait(false);
             if (attendus is null || attendus.Count == 0)
             {
+                _logger?.LogInformation("Reglages certifies : {Rom} ({Systeme}) sans reglages publies, rien a forcer.", romGroup, systeme);
                 Effacer();
                 return;
             }
@@ -159,6 +170,13 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         }
         foreach (var cle in ambigues) valeurs.Remove(cle);
         return valeurs;
+    }
+
+    private static string SystemeDuProfil(string systemId)
+    {
+        var s = systemId.Trim().ToLowerInvariant();
+        return s is "mame" or "mame64" or "fbneo" or "fba" or "neogeo" or "cps1" or "cps2" or "cps3" or "cave" or "atomiswave" or "naomi" or "naomi2"
+            ? "arcade" : s;
     }
 
     private static void Ecrire(string romBasename, Dictionary<string, string> valeurs)
