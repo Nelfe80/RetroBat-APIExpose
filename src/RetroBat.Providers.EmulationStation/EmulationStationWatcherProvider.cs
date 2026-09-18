@@ -741,6 +741,10 @@ public class EmulationStationWatcherProvider : IProvider
             if (args.Length > 0)
             {
                 var sysId = args[0].Trim();
+                // Ce que le carrousel montre : dans une collection, ce n'est pas le systeme du
+                // jeu, et c'est ce qui decide si un /addgames sera visible (voir
+                // MediaRuntimeState.IsViewDetachedFromSystem).
+                _mediaRuntimeState.MarkCarouselSystem(sysId);
                 _mediaRuntimeState.ClearPostLiveAddGamesFirstGamelistSelectionGuardForSystemChange(sysId);
                 _context.Ui.SelectedSystem = new SystemDetails { Name = sysId };
                 _context.Ui.Selected = null;

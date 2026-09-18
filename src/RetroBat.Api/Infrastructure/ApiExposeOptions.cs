@@ -107,6 +107,16 @@ public class ApiExposeOptions
         /// historical generic fallback toast.</summary>
         public bool HonestNotifications { get; set; } = true;
 
+        /// <summary>
+        /// Un /addgames ne redessine que la vue du systeme pousse : le handler d'ES appelle
+        /// onFileChanged sur la racine de ce systeme. Dans une collection, le joueur regarde
+        /// des CollectionFileData qui ne sont pas dans cet arbre, donc sa fiche reste figee
+        /// jusqu'a un rechargement complet. A true, APIExpose demande ce rechargement, mais
+        /// seulement quand la vue est detachee du systeme et que le fragment apportait un
+        /// media visible. false rend le comportement d'avant : la fiche attend le F5 du joueur.
+        /// </summary>
+        public bool ReloadGamesWhenViewDetached { get; set; } = true;
+
         /// <summary>F3 (Super Mario World bug): ES's addgames ingestion clears a
         /// game's unknown XML elements, wiping the Roms Manager ownership tags
         /// while &lt;hidden&gt; survives - the entry becomes an orphan. Carrying

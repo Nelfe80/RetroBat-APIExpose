@@ -60,10 +60,12 @@ public sealed class EsCollectionThemeAssets
         _stateRoot = stateRoot ?? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay");
     }
 
-    /// <summary>Le logo couleur, sa variante blanche et le fond, livres par le Data Pack.</summary>
-    public string LogoSource => Path.Combine(_sourceRoot, "nelfeplay-worldscoring.svg");
-
-    public string LogoBlancSource => Path.Combine(_sourceRoot, "nelfeplay-worldscoring-white.svg");
+    /// <summary>
+    /// Le logo et le fond, livres par le Data Pack. Le logo est un PNG : le visuel d'origine
+    /// tient en 59 Ko une fois recadre, ramene a 1000 px et reduit a 256 couleurs, et rend
+    /// exactement ce que le graphiste a dessine. Le rendu vectoriel s'en ecartait.
+    /// </summary>
+    public string LogoSource => Path.Combine(_sourceRoot, "nelfeplay-worldscoring.png");
 
     public string FondSource => Path.Combine(_sourceRoot, "nelfeplay-worldscoring-bg.jpg");
 
@@ -94,11 +96,10 @@ public sealed class EsCollectionThemeAssets
                      .OrderBy(chemin => chemin, StringComparer.OrdinalIgnoreCase))
         {
             change |= Declarer(theme, nom, declares);
-            // UNIQUEMENT le logo couleur. Carbon cherche « <nom>.svg » puis « <nom>-w.svg » et
-            // c'est le dernier trouve qui l'emporte : deposer la variante blanche ferait perdre
-            // la marque, or et violet, sur le fond sombre du theme. La variante monochrome reste
-            // livree par le Data Pack pour les surfaces qui en ont besoin.
-            change |= Deposer(theme, DossiersLogos, nom + ".svg", LogoSource, deposes, voulus);
+            // UN SEUL fichier de logo. Carbon essaie « <nom>.png », « <nom>.svg », puis les
+            // variantes « -w », et garde le dernier trouve : plusieurs fichiers deposes et
+            // c'est la variante blanche, ou le vectoriel, qui l'emporterait sur la marque.
+            change |= Deposer(theme, DossiersLogos, nom + ".png", LogoSource, deposes, voulus);
             change |= Deposer(theme, DossiersFonds, nom + ".jpg", FondSource, deposes, voulus);
         }
 

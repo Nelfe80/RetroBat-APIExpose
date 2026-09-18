@@ -3120,6 +3120,7 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                     dirtyBatch.Count + relatedBatch.Count);
                 ClearDirtyLiveGamelistBatch(dirtyBatch);
                 ClearPendingLiveMetadataRestores(plan, dirtyBatch);
+                RequestReloadWhenViewIsDetached(plan, hasLiveVisibleSlotElement);
                 var videoExceptionConsumed = allowCurrentVideoRefresh && HasLiveOfficialVideoMedia(gameElement);
                 var localizedMetadataRefreshConsumed = hasLocalizedMetadataRefreshContent;
                 // the one-per-card gate was already armed inside the POST
@@ -3223,6 +3224,37 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Un <c>/addgames</c> accepte par ES ne redessine QUE la vue du systeme pousse : son
+    /// handler appelle <c>onFileChanged</c> sur la racine de ce systeme. Quand le joueur est
+    /// dans une collection, il regarde des CollectionFileData qui ne sont pas dans cet arbre,
+    /// donc sa fiche ne bouge pas et il faut un rechargement complet.
+    ///
+    /// On ne le demande que dans ce cas precis, et seulement si le fragment apportait un media
+    /// visible : un rafraichissement de metadonnees ne justifie pas de recharger la liste sous
+    /// les pieds du joueur. Le canal reste celui de tout le monde, donc debounce, fenetre de
+    /// suppression, et retenue pendant les scrapes prioritaires.
+    /// </summary>
+    private void RequestReloadWhenViewIsDetached(MediaProjectionPlan plan, bool hasLiveVisibleSlotElement)
+    {
+        if (!hasLiveVisibleSlotElement ||
+            !_options.CurrentValue.Scraping.ReloadGamesWhenViewDetached ||
+            !_runtimeState.IsViewDetachedFromSystem(plan.FrontendSystemId))
+        {
+            return;
+        }
+
+        if (_runtimeState.TryRequestReloadGamesBypassingLastGameSelected(
+                TimeSpan.FromSeconds(1.5),
+                TimeSpan.FromSeconds(12)))
+        {
+            _logger?.LogInformation(
+                "reloadgames demande apres addgames pour system={SystemId}, game={GameSlug} : la vue affichee est detachee de ce systeme.",
+                plan.FrontendSystemId,
+                plan.GameSlug);
+        }
     }
 
     private async Task DelayBeforeLiveAddGamesPostAsync(CancellationToken cancellationToken)

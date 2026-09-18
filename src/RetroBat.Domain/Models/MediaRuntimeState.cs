@@ -27,6 +27,7 @@ public class MediaRuntimeState
     private int _activeLivePriorityScrapeCount;
     private bool _startupReloadGamesRequested;
     private string _lastFrontendEvent = string.Empty;
+    private string _carouselSystemId = string.Empty;
     private DateTime _lastGameSelectedAtUtc = DateTime.MinValue;
     private DateTime _reloadGamesBypassLastGameSelectedUntilUtc = DateTime.MinValue;
     private bool _reloadGamesAllowedDuringActiveScrape;
@@ -634,6 +635,39 @@ public class MediaRuntimeState
             }
 
             return new ReloadGamesStatus(true, true, true, _hasMediaChangesSinceLastReload, _activeBlockingScrapeCount, _activeBackgroundScrapeCount, _lastFrontendEvent, TimeSpan.Zero, _reloadGamesAllowedDuringActiveScrape, _reloadGamesRequestedByScrape);
+        }
+    }
+
+    /// <summary>
+    /// Le systeme que le carrousel affiche, tel qu'EmulationStation l'annonce sur
+    /// <c>system-selected</c>. Ce n'est pas toujours le systeme du jeu selectionne : dans une
+    /// collection, le carrousel dit « nelfeplay-scoring » pendant que le jeu vit sous fbneo.
+    /// </summary>
+    public void MarkCarouselSystem(string systemId)
+    {
+        lock (_lock)
+        {
+            _carouselSystemId = (systemId ?? string.Empty).Trim();
+        }
+    }
+
+    /// <summary>
+    /// Vrai quand la vue affichee n'est pas celle du systeme du fragment : collection
+    /// personnalisee, collection automatique, vue groupee.
+    ///
+    /// C'est le cas ou <c>/addgames</c> ne montre rien au joueur : le handler d'ES appelle
+    /// <c>onFileChanged</c> sur le dossier racine du systeme pousse, et une collection affiche
+    /// des CollectionFileData qui ne sont pas dans cet arbre. Seul un rechargement complet les
+    /// reconstruit. Mesure du 2026-09-18, source `HttpServerThread.cpp`.
+    /// </summary>
+    public bool IsViewDetachedFromSystem(string frontendSystemId)
+    {
+        var systeme = (frontendSystemId ?? string.Empty).Trim();
+        lock (_lock)
+        {
+            return systeme.Length > 0
+                && _carouselSystemId.Length > 0
+                && !string.Equals(_carouselSystemId, systeme, StringComparison.OrdinalIgnoreCase);
         }
     }
 
