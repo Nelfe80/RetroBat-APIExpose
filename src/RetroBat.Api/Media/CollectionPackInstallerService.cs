@@ -1601,35 +1601,10 @@ public sealed class CollectionPackInstallerService : IHostedService, IDisposable
         return changed;
     }
 
+    // Une seule implementation de l'upsert de liste ES, partagee avec EsCustomCollectionWriter :
+    // deux copies finiraient par divergir sur la casse ou les doublons.
     private static bool UpsertStringListSetting(XElement root, string key, string value)
-    {
-        var existing = root.Elements().FirstOrDefault(element =>
-            string.Equals(element.Attribute("name")?.Value, key, StringComparison.OrdinalIgnoreCase));
-        if (existing == null)
-        {
-            root.Add(new XText(Environment.NewLine + "  "));
-            root.Add(new XElement("string", new XAttribute("name", key), new XAttribute("value", value)));
-            return true;
-        }
-
-        existing.Name = "string";
-        var current = existing.Attribute("value")?.Value ?? string.Empty;
-        var values = current
-            .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .ToList();
-        var matchingExisting = values
-            .Where(existingValue => string.Equals(existingValue, value, StringComparison.OrdinalIgnoreCase))
-            .ToList();
-        if (matchingExisting.Count == 1 && string.Equals(matchingExisting[0], value, StringComparison.Ordinal))
-        {
-            return false;
-        }
-
-        values.RemoveAll(existingValue => string.Equals(existingValue, value, StringComparison.OrdinalIgnoreCase));
-        values.Add(value);
-        existing.SetAttributeValue("value", string.Join(",", values));
-        return true;
-    }
+        => EsCustomCollectionSettings.Upsert(root, key, value);
 
     private static bool UpsertBoolSetting(XElement root, string key, bool value)
     {

@@ -377,6 +377,8 @@ builder.Services.AddSingleton<LocalGamelistUpdateService>();
 builder.Services.AddSingleton<RomSetManagerService>();
 builder.Services.AddSingleton<RomPackInstallerService>();
 builder.Services.AddSingleton<CollectionPackInstallerService>();
+// Ecrit les collections ES dont APIExpose est proprietaire (collection World Scoring).
+builder.Services.AddSingleton<EsCustomCollectionWriter>();
 builder.Services.AddSingleton<IGamelistSelectionSyncService>(sp => sp.GetRequiredService<GamelistUpdateService>());
 builder.Services.AddSingleton<IMediaPrefetchService, MediaPrefetchService>();
 builder.Services.AddSingleton<ApiContext>();
