@@ -1153,9 +1153,10 @@ public class EmulationStationWatcherProvider : IProvider
                 {
                     var root = document.Root ?? throw new InvalidOperationException("es_settings.cfg root is missing.");
                     var changed = false;
-                    changed |= SetEsStringSetting(root, "ScrapperImageSrc", settings.ImageSource);
-                    changed |= SetEsStringSetting(root, "ScrapperLogoSrc", settings.LogoSource);
-                    changed |= SetEsStringSetting(root, "ScrapperThumbSrc", settings.ThumbSource);
+                    // Dans le vocabulaire d'ES (box-2D, wheel) : voir EmulationStationScraperVocabulary.
+                    changed |= SetEsStringSetting(root, "ScrapperImageSrc", EmulationStationScraperVocabulary.ToEmulationStation(EmulationStationScraperVocabulary.Slot.Image, settings.ImageSource));
+                    changed |= SetEsStringSetting(root, "ScrapperLogoSrc", EmulationStationScraperVocabulary.ToEmulationStation(EmulationStationScraperVocabulary.Slot.Logo, settings.LogoSource));
+                    changed |= SetEsStringSetting(root, "ScrapperThumbSrc", EmulationStationScraperVocabulary.ToEmulationStation(EmulationStationScraperVocabulary.Slot.Thumb, settings.ThumbSource));
                     changed |= SetEsStringSetting(root, "WheelStyle", settings.WheelStyle);
                     return changed;
                 }))
@@ -1176,7 +1177,7 @@ public class EmulationStationWatcherProvider : IProvider
         }
     }
 
-    private static bool SetEsStringSetting(XElement root, string key, string value)
+    private static bool SetEsStringSetting(XElement root, string key, string? value)
     {
         var normalizedValue = (value ?? string.Empty).Trim();
         if (string.IsNullOrWhiteSpace(normalizedValue))

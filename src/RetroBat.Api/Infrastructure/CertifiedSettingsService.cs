@@ -71,7 +71,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
 
     /// <summary>
     /// Les fonctions du frontend qui font refuser un score, et la cle RetroBat qui les commande,
-    /// par jeu : le lanceur lit `<systeme>["<rom>"].<cle>` dans es_settings.cfg avant chaque
+    /// par jeu : le lanceur lit <c>systeme["rom"].cle</c> dans es_settings.cfg avant chaque
     /// lancement. Rewind vaut « auto » dans RetroBat, c'est-a-dire ALLUME pour presque tous les
     /// coeurs : chaque nouveau joueur se faisait refuser pour rembobinage sans avoir rien
     /// touche (testeur sur Sonic, 2026-09-17, deux parties perdues avant de trouver l'option).

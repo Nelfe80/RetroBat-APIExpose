@@ -170,7 +170,8 @@ public class EmulationStationSettingsService
             return previousValue;
         }
 
-        return FirstValue(settings, legacyKeys) ?? defaultValue;
+        // Une installation qui n'avait qu'ES garde ses choix (box-2D -> box2d, wheel -> logo).
+        return EmulationStationScraperVocabulary.FromEmulationStation(FirstValue(settings, legacyKeys)) ?? defaultValue;
     }
 
     private static string? NormalizeLegacyThumbSource(string? value)

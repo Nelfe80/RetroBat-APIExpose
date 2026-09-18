@@ -1,6 +1,7 @@
 using System.Xml.Linq;
 using Microsoft.Extensions.Options;
 using RetroBat.Domain.Interfaces;
+using RetroBat.Domain.Services;
 
 namespace RetroBat.Api.Infrastructure;
 
@@ -278,10 +279,12 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
         XElement root,
         ApiExposeOptions.MediaAllocationOptions mediaAllocation)
     {
+        // Dans le vocabulaire d'ES (box-2D, wheel) : recopie tel quel, box2d et logo lui etaient
+        // inconnus et son menu affichait NONE. Sans equivalent, sa cle reste telle quelle.
         var changed = false;
-        changed |= SetStringSetting(root, "ScrapperImageSrc", mediaAllocation.ImageSource);
-        changed |= SetStringSetting(root, "ScrapperLogoSrc", mediaAllocation.LogoSource);
-        changed |= SetStringSetting(root, "ScrapperThumbSrc", NormalizeLegacyThumbSource(mediaAllocation.ThumbSource));
+        changed |= SetStringSetting(root, "ScrapperImageSrc", EmulationStationScraperVocabulary.ToEmulationStation(EmulationStationScraperVocabulary.Slot.Image, mediaAllocation.ImageSource));
+        changed |= SetStringSetting(root, "ScrapperLogoSrc", EmulationStationScraperVocabulary.ToEmulationStation(EmulationStationScraperVocabulary.Slot.Logo, mediaAllocation.LogoSource));
+        changed |= SetStringSetting(root, "ScrapperThumbSrc", EmulationStationScraperVocabulary.ToEmulationStation(EmulationStationScraperVocabulary.Slot.Thumb, NormalizeLegacyThumbSource(mediaAllocation.ThumbSource)));
         changed |= SetStringSetting(root, "WheelStyle", mediaAllocation.WheelStyle);
         return changed;
     }
