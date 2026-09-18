@@ -426,24 +426,59 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         await ChargerAsync(ct).ConfigureAwait(false);
     }
 
+    /// <summary>La derniere raison de refus deja ecrite, pour ne pas repeter la meme ligne.</summary>
+    private string _dernierRefus = "";
+
     /// <summary>Les conditions d'ouverture. Toutes doivent tenir : un panneau qui s'ouvre au mauvais moment se ferme mal.</summary>
     private bool PeutSOuvrir(out string systeme, out string nomDuJeu, out string cheminDuJeu)
     {
         cheminDuJeu = "";
         systeme = "";
         nomDuJeu = "";
-        if (_playback.IsBusy) return false;                                   // un replay se lit
-        if (EmulatorForeground.EmulateurTourne()) return false;               // un jeu tourne
-        if (!EsEstDevant()) return false;                                     // ES n'est pas devant
+        if (_playback.IsBusy) return Refus("une lecture de replay est en cours");
+        if (EmulatorForeground.EmulateurTourne()) return Refus("un jeu tourne");
+        if (!EsEstDevant()) return Refus("EmulationStation n'est pas la fenetre active");
 
         var ui = _context.Ui;
-        if (!string.Equals(ui.State, "browsing", StringComparison.OrdinalIgnoreCase)) return false;
+        if (!string.Equals(ui.State, "browsing", StringComparison.OrdinalIgnoreCase))
+        {
+            return Refus($"l'interface est en etat « {ui.State} » et non « browsing »");
+        }
+
         var jeu = ui.Selected;
-        if (jeu is null) return false;
+        if (jeu is null)
+        {
+            // Cas vu au retour d'un replay : ES reprend la main sur la meme fiche sans
+            // reemettre game-selected, et le dernier jeu connu a ete efface entre-temps.
+            return Refus("aucun jeu selectionne (carrousel des systemes, ou selection perdue)");
+        }
+
         systeme = jeu.SystemId ?? "";
         nomDuJeu = jeu.GameName ?? "";
         cheminDuJeu = jeu.GamePath ?? "";
-        return nomDuJeu.Length > 0;
+        if (nomDuJeu.Length == 0)
+        {
+            return Refus("le jeu selectionne n'a pas de nom");
+        }
+
+        _dernierRefus = "";
+        return true;
+    }
+
+    /// <summary>
+    /// Le refus se dit. Sans cette trace, un appui long sans effet ne laissait rien dans le
+    /// journal et il fallait deviner laquelle des cinq conditions avait bloque. La meme raison
+    /// repetee n'est ecrite qu'une fois : le lecteur d'entrees passe ici en boucle.
+    /// </summary>
+    private bool Refus(string raison)
+    {
+        if (!string.Equals(_dernierRefus, raison, StringComparison.Ordinal))
+        {
+            _dernierRefus = raison;
+            _logger.LogInformation("Classement : panneau non ouvert, {Raison}.", raison);
+        }
+
+        return false;
     }
 
     /// <summary>

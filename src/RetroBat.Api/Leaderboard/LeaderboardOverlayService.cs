@@ -4,6 +4,7 @@ using System.Drawing.Text;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using RetroBat.Api.Infrastructure;
+using RetroBat.Domain.Paths;
 
 namespace RetroBat.Api.Leaderboard;
 
@@ -664,25 +665,57 @@ public sealed class LeaderboardOverlayService : IDisposable
                 return;
             }
 
+            // Le logo de la marque, a la hauteur du titre et jamais plus large que les trois
+            // quarts du panneau : « WORLD SCORING » doit rester lisible sans deborder.
+            Image? LogoDeLaMarque(float hauteurTitre)
+            {
+                var chemin = Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", "nelfeplay-worldscoring.png");
+                if (!File.Exists(chemin))
+                {
+                    return null;
+                }
+
+                var hauteur = (int) Math.Round(hauteurTitre * 1.45f);
+                var image = _service._glyphes?.Glyphe(chemin, hauteur);
+                if (image is null)
+                {
+                    return null;
+                }
+
+                return image.Width <= Width * 0.75f
+                    ? image
+                    : _service._glyphes?.Glyphe(chemin, (int) Math.Round(hauteur * (Width * 0.75f) / image.Width));
+            }
+
             // Le titre : centre, gras, en majuscules, avec l'aeration d'ES (TITLE_VERT_PADDING).
             var hauteurTitre = tailleTitre * 1.5f;
             var y = _hauteurEcran * 0.0637f - hauteurTitre / 2f;
             using (var encre = new SolidBrush(Teinte(s.TitleColor)))
             using (var centre = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter })
             {
-                // Le logo NelfePlay puis le titre, centres ensemble : c'est la plateforme qui
-                // parle ici, a cote du jeu qu'ES presente.
-                var titre = c.Titre.ToUpperInvariant();
-                var largeurTitre = g.MeasureString(titre, policeTitre, PointF.Empty, StringFormat.GenericTypographic).Width;
-                var logo = _service._glyphes?.Glyphe("nelfeplay", (int) (tailleTitre * 1.15f));
-                var largeurLogo = logo is null ? 0 : logo.Width + tailleTitre * 0.45f;
-                var x = (Width - largeurTitre - largeurLogo) / 2f;
-                if (logo is not null)
+                // La marque World Scoring tient le titre a elle seule : c'est la plateforme qui
+                // parle ici, a cote du jeu qu'ES presente. Le mot « Classement » ne revient
+                // qu'en repli, si le logo n'est pas installe sur cette borne.
+                var marque = LogoDeLaMarque(hauteurTitre);
+                if (marque is not null)
                 {
-                    g.DrawImage(logo, x, y + (hauteurTitre - logo.Height) / 2f, logo.Width, logo.Height);
-                    x += largeurLogo;
+                    g.DrawImage(marque, (Width - marque.Width) / 2f, y + (hauteurTitre - marque.Height) / 2f,
+                        marque.Width, marque.Height);
                 }
-                g.DrawString(titre, policeTitre, encre, new RectangleF(x, y, largeurTitre + 4, hauteurTitre), centre);
+                else
+                {
+                    var titre = c.Titre.ToUpperInvariant();
+                    var largeurTitre = g.MeasureString(titre, policeTitre, PointF.Empty, StringFormat.GenericTypographic).Width;
+                    var logo = _service._glyphes?.Glyphe("nelfeplay", (int) (tailleTitre * 1.15f));
+                    var largeurLogo = logo is null ? 0 : logo.Width + tailleTitre * 0.45f;
+                    var x = (Width - largeurTitre - largeurLogo) / 2f;
+                    if (logo is not null)
+                    {
+                        g.DrawImage(logo, x, y + (hauteurTitre - logo.Height) / 2f, logo.Width, logo.Height);
+                        x += largeurLogo;
+                    }
+                    g.DrawString(titre, policeTitre, encre, new RectangleF(x, y, largeurTitre + 4, hauteurTitre), centre);
+                }
             }
             y = _hauteurEcran * 0.0637f * 2f - hauteurTitre / 2f;
             Bordure(g, s, y);
