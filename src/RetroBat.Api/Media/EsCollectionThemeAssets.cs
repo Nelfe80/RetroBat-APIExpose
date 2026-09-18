@@ -88,15 +88,29 @@ public sealed class EsCollectionThemeAssets
         var declares = new HashSet<string>(manifeste.Declarations, StringComparer.OrdinalIgnoreCase);
         var change = false;
 
+        var voulus = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var theme in Directory
                      .EnumerateDirectories(_themesRoot)
                      .OrderBy(chemin => chemin, StringComparer.OrdinalIgnoreCase))
         {
             change |= Declarer(theme, nom, declares);
-            change |= Deposer(theme, DossiersLogos, nom + ".svg", LogoSource, deposes);
-            // La variante blanche n'a de sens que la ou le theme la cherche (Carbon).
-            change |= Deposer(theme, [DossiersLogos[0]], nom + "-w.svg", LogoBlancSource, deposes);
-            change |= Deposer(theme, DossiersFonds, nom + ".jpg", FondSource, deposes);
+            // UNIQUEMENT le logo couleur. Carbon cherche « <nom>.svg » puis « <nom>-w.svg » et
+            // c'est le dernier trouve qui l'emporte : deposer la variante blanche ferait perdre
+            // la marque, or et violet, sur le fond sombre du theme. La variante monochrome reste
+            // livree par le Data Pack pour les surfaces qui en ont besoin.
+            change |= Deposer(theme, DossiersLogos, nom + ".svg", LogoSource, deposes, voulus);
+            change |= Deposer(theme, DossiersFonds, nom + ".jpg", FondSource, deposes, voulus);
+        }
+
+        // Un fichier qu'une version precedente deposait et qui n'est plus voulu s'en va, a
+        // condition d'etre reste tel que nous l'avions pose.
+        foreach (var obsolete in deposes.Keys.Where(chemin => !voulus.Contains(chemin)).ToList())
+        {
+            if (Retirer(deposes[obsolete]))
+            {
+                deposes.Remove(obsolete);
+                change = true;
+            }
         }
 
         if (change)
@@ -128,27 +142,7 @@ public sealed class EsCollectionThemeAssets
         var change = false;
         foreach (var fichier in manifeste.Files)
         {
-            try
-            {
-                if (!File.Exists(fichier.Path))
-                {
-                    continue;
-                }
-
-                if (!string.Equals(Empreinte(fichier.Path), fichier.Sha256, StringComparison.OrdinalIgnoreCase))
-                {
-                    // Quelqu'un l'a retouche depuis : c'est devenu son fichier.
-                    _logger?.LogInformation("Asset de collection modifie depuis son depot, laisse en place : {Chemin}", fichier.Path);
-                    continue;
-                }
-
-                File.Delete(fichier.Path);
-                change = true;
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-            {
-                _logger?.LogDebug(ex, "Asset de collection non supprime : {Chemin}", fichier.Path);
-            }
+            change |= Retirer(fichier);
         }
 
         foreach (var declaration in manifeste.Declarations)
@@ -168,6 +162,33 @@ public sealed class EsCollectionThemeAssets
         }
 
         return new EsCollectionAssetsResult(change, 0, 0);
+    }
+
+    /// <summary>Supprime un fichier que nous avons pose, sauf s'il a ete retouche depuis.</summary>
+    private bool Retirer(EsCollectionAssetFile fichier)
+    {
+        try
+        {
+            if (!File.Exists(fichier.Path))
+            {
+                return false;
+            }
+
+            if (!string.Equals(Empreinte(fichier.Path), fichier.Sha256, StringComparison.OrdinalIgnoreCase))
+            {
+                // Quelqu'un l'a retouche depuis : c'est devenu son fichier.
+                _logger?.LogInformation("Asset de collection modifie depuis son depot, laisse en place : {Chemin}", fichier.Path);
+                return false;
+            }
+
+            File.Delete(fichier.Path);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger?.LogDebug(ex, "Asset de collection non supprime : {Chemin}", fichier.Path);
+            return false;
+        }
     }
 
     /// <summary>
@@ -257,7 +278,8 @@ public sealed class EsCollectionThemeAssets
         IEnumerable<string[]> dossiersCandidats,
         string nomFichier,
         string source,
-        Dictionary<string, EsCollectionAssetFile> deposes)
+        Dictionary<string, EsCollectionAssetFile> deposes,
+        HashSet<string> voulus)
     {
         if (!File.Exists(source))
         {
@@ -284,11 +306,14 @@ public sealed class EsCollectionThemeAssets
                         return false;
                     }
 
+                    voulus.Add(cible);
                     if (string.Equals(Empreinte(cible), empreinteSource, StringComparison.OrdinalIgnoreCase))
                     {
                         return false;
                     }
                 }
+
+                voulus.Add(cible);
 
                 File.Copy(source, cible, overwrite: true);
                 deposes[cible] = new EsCollectionAssetFile { Path = cible, Sha256 = empreinteSource };

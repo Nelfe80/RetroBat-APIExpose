@@ -61,19 +61,63 @@ public class EsCollectionThemeAssetsTests : IDisposable
     }
 
     [Fact]
-    public void Depose_logo_variante_blanche_fond_et_declaration_sous_carbon()
+    public void Depose_le_logo_couleur_le_fond_et_la_declaration_sous_carbon()
     {
         var theme = ThemeCarbon();
 
         var resultat = Assets().Install(Nom);
 
         Assert.True(resultat.Changed);
-        Assert.Equal(3, resultat.Files);
+        Assert.Equal(2, resultat.Files);
         Assert.Equal(1, resultat.Declarations);
         Assert.Equal("<svg>couleur</svg>", File.ReadAllText(Path.Combine(theme, "art", "logos", "collections", Nom + ".svg")));
-        Assert.Equal("<svg>blanc</svg>", File.ReadAllText(Path.Combine(theme, "art", "logos", "collections", Nom + "-w.svg")));
         Assert.Equal("fond", File.ReadAllText(Path.Combine(theme, "art", "background", "collections", Nom + ".jpg")));
         Assert.Contains(Nom, File.ReadAllLines(Path.Combine(theme, "collections.info")));
+    }
+
+    /// <summary>
+    /// Carbon cherche « <nom>.svg » puis « <nom>-w.svg » et garde le dernier trouve : deposer la
+    /// variante blanche remplacerait la marque par une silhouette sur le fond sombre du theme.
+    /// </summary>
+    [Fact]
+    public void La_variante_blanche_n_est_jamais_deposee_dans_un_theme()
+    {
+        var theme = ThemeCarbon();
+
+        Assets().Install(Nom);
+
+        Assert.False(File.Exists(Path.Combine(theme, "art", "logos", "collections", Nom + "-w.svg")));
+    }
+
+    /// <summary>Un fichier qu'une version precedente deposait et qui n'est plus voulu s'en va.</summary>
+    [Fact]
+    public void Un_asset_devenu_obsolete_est_retire()
+    {
+        var theme = ThemeCarbon();
+        var assets = Assets();
+        assets.Install(Nom);
+        var obsolete = Path.Combine(theme, "art", "logos", "collections", Nom + "-w.svg");
+        File.Copy(Path.Combine(Source, "nelfeplay-worldscoring-white.svg"), obsolete);
+        var manifeste = assets.LireManifeste(Nom)!;
+        manifeste.Files.Add(new EsCollectionAssetFile
+        {
+            Path = obsolete,
+            Sha256 = Empreinte(obsolete),
+        });
+        File.WriteAllText(assets.ManifestePath(Nom),
+            System.Text.Json.JsonSerializer.Serialize(manifeste));
+
+        var resultat = assets.Install(Nom);
+
+        Assert.True(resultat.Changed);
+        Assert.False(File.Exists(obsolete));
+        Assert.True(File.Exists(Path.Combine(theme, "art", "logos", "collections", Nom + ".svg")));
+    }
+
+    private static string Empreinte(string chemin)
+    {
+        using var flux = File.OpenRead(chemin);
+        return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(flux)).ToLowerInvariant();
     }
 
     [Fact]
@@ -91,7 +135,7 @@ public class EsCollectionThemeAssetsTests : IDisposable
     }
 
     [Fact]
-    public void Un_theme_hyperbat_recoit_ses_chemins_a_lui_sans_variante_blanche()
+    public void Un_theme_hyperbat_recoit_ses_chemins_a_lui()
     {
         var theme = ThemeHyperBat();
 
@@ -111,7 +155,7 @@ public class EsCollectionThemeAssetsTests : IDisposable
         var resultat = Assets().Install(Nom);
 
         Assert.Equal(2, resultat.Declarations);
-        Assert.Equal(5, resultat.Files);
+        Assert.Equal(4, resultat.Files);
         Assert.True(File.Exists(Path.Combine(carbon, "art", "logos", "collections", Nom + ".svg")));
         Assert.True(File.Exists(Path.Combine(hyperbat, "_systemmedia", "_logosyst", "clearlogos", Nom + ".svg")));
     }
@@ -227,7 +271,7 @@ public class EsCollectionThemeAssetsTests : IDisposable
 
         Assert.NotNull(manifeste);
         Assert.Equal(Nom, manifeste!.Collection);
-        Assert.Equal(3, manifeste.Files.Count);
+        Assert.Equal(2, manifeste.Files.Count);
         Assert.All(manifeste.Files, fichier => Assert.Matches("^[0-9a-f]{64}$", fichier.Sha256));
         Assert.Single(manifeste.Declarations);
         Assert.EndsWith("collections.info", manifeste.Declarations[0]);
