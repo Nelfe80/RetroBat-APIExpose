@@ -28,7 +28,7 @@ namespace RetroBat.Api.Media;
 /// Index par système, chargé à la demande et mis en cache (même pattern que
 /// RomMetadataResolver - encaisse le mame.json de ~60 000 entrées).
 /// </summary>
-public sealed class RomCanonicalResolver
+public sealed class RomCanonicalResolver : IScoreSlugResolver
 {
     public sealed record CanonicalGame(
         string GameKey,
@@ -334,6 +334,38 @@ public sealed class RomCanonicalResolver
     private readonly ConcurrentDictionary<string, Lazy<ScoreIndex>> _scoreIndexes =
         new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Les dossiers roms de RetroBat qui alimentent le systeme de scoring « arcade » : la
+    /// chaine .MEM ne connait qu'un seul dossier arcade, quel que soit l'emulateur.
+    /// </summary>
+    public static readonly string[] ArcadeFrontendSystems = ["arcade", "fba", "fbneo", "mame", "mame64"];
+
+    /// <summary>
+    /// Le systeme CANONIQUE de scoring d'un dossier roms : « arcade » pour mame et FBNeo,
+    /// le dossier lui-meme sinon. C'est la seule table d'alias de plateformes du scoring ;
+    /// une seconde table finirait par diverger de la chaine .MEM.
+    /// </summary>
+    public static string CanonicalScoringSystem(string systemId)
+    {
+        var normalise = (systemId ?? string.Empty).Trim().ToLowerInvariant();
+        return ArcadeFrontendSystems.Contains(normalise, StringComparer.Ordinal) ? "arcade" : normalise;
+    }
+
+    /// <summary>
+    /// L'inverse : les dossiers roms ou chercher un jeu annonce sous ce systeme canonique.
+    /// Un jeu ouvert sous « arcade » peut etre installe sous mame comme sous fbneo.
+    /// </summary>
+    public static IReadOnlyList<string> FrontendSystemsFor(string canonicalSystemId)
+    {
+        var normalise = (canonicalSystemId ?? string.Empty).Trim().ToLowerInvariant();
+        return normalise switch
+        {
+            "" => [],
+            "arcade" => ArcadeFrontendSystems,
+            _ => [normalise],
+        };
+    }
+
     /// <summary>Le score de ce jeu est-il CAPTURABLE sur cette machine ? Vrai
     /// s'il existe une definition .MEM (resources/ram/&lt;system&gt;) pour ce
     /// dump - cherchee par md5, hash RA, nom de fichier puis slug direct.
@@ -394,9 +426,7 @@ public sealed class RomCanonicalResolver
         var aliasToSlug = new Dictionary<string, string>(StringComparer.Ordinal);
         var memStems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        // Le dossier ram des jeux arcade s'appelle « arcade », quel que soit le
-        // systeme RetroBat (mame, fbneo…).
-        var folder = normalizedSystem is "mame" or "mame64" or "fbneo" or "fba" ? "arcade" : normalizedSystem;
+        var folder = CanonicalScoringSystem(normalizedSystem);
         var ramRoot = Path.Combine(RetroBatPaths.PluginRoot, "resources", "ram", folder);
         if (!Directory.Exists(ramRoot))
         {

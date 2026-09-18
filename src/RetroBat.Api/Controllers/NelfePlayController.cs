@@ -22,19 +22,48 @@ public sealed class NelfePlayController : ControllerBase
     private readonly IHttpClientFactory _httpFactory;
     private readonly NelfePlayScoringSessionService _scoringSession;
     private readonly RetroBat.Domain.Models.ApiContext _context;
+    private readonly NelfePlayScoringCollectionSyncService _scoringCollection;
 
     public NelfePlayController(
         NelfePlayDeviceStore device,
         NelfePlayAgentService agent,
         IHttpClientFactory httpFactory,
         NelfePlayScoringSessionService scoringSession,
-        RetroBat.Domain.Models.ApiContext context)
+        RetroBat.Domain.Models.ApiContext context,
+        NelfePlayScoringCollectionSyncService scoringCollection)
     {
         _device = device;
         _agent = agent;
         _httpFactory = httpFactory;
         _scoringSession = scoringSession;
         _context = context;
+        _scoringCollection = scoringCollection;
+    }
+
+    /// <summary>
+    /// L'etat de la collection « NELFEPLAY WORLD SCORING » : le support doit pouvoir dire en
+    /// un coup d'oeil si elle est coupee, vide, a jour, perimee ou en erreur, sans lire un log.
+    /// <c>refresh=true</c> force une synchronisation immediate.
+    /// </summary>
+    [HttpGet("scoring-collection")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetScoringCollection([FromQuery] bool refresh = false, CancellationToken cancellationToken = default)
+    {
+        var statut = refresh
+            ? await _scoringCollection.SynchroniserAsync("api", cancellationToken)
+            : _scoringCollection.Status;
+        return Ok(new
+        {
+            enabled = statut.Enabled,
+            visible = statut.Visible,
+            state = statut.State,
+            remote_revision = statut.RemoteRevision,
+            remote_games = statut.RemoteGames,
+            local_ready_games = statut.LocalReadyGames,
+            last_success_utc = statut.LastSuccessUtc,
+            stale = statut.Stale,
+            last_error = statut.LastError,
+        });
     }
 
     /// <summary>

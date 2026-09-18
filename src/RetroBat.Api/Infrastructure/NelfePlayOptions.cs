@@ -11,6 +11,20 @@ namespace RetroBat.Api.Infrastructure;
 /// </summary>
 public sealed class NelfePlayOptions
 {
+    /// <summary>
+    /// Les surfaces NelfePlay de cette borne. A false, la collection « World Scoring » n'est
+    /// plus synchronisee ni affichee. Les consentements de releve ci-dessous restent
+    /// independants : afficher une collection n'allume aucune remontee, et l'eteindre ne
+    /// rallume rien.
+    /// </summary>
+    public bool Enabled { get; set; } = true;
+
+    /// <summary>
+    /// Afficher dans EmulationStation la collection des jeux ouverts au scoring mondial,
+    /// limitee a ceux que la borne possede et peut reellement mesurer.
+    /// </summary>
+    public bool ShowScoringCollection { get; set; } = true;
+
     /// <summary>Releve d'audience : ce qui est joue et combien de temps, jamais par qui.</summary>
     public bool PlayReportingEnabled { get; set; } = true;
 

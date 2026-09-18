@@ -379,6 +379,19 @@ builder.Services.AddSingleton<RomPackInstallerService>();
 builder.Services.AddSingleton<CollectionPackInstallerService>();
 // Ecrit les collections ES dont APIExpose est proprietaire (collection World Scoring).
 builder.Services.AddSingleton<EsCustomCollectionWriter>();
+builder.Services.AddSingleton<IScoreSlugResolver>(sp => sp.GetRequiredService<RomCanonicalResolver>());
+builder.Services.AddSingleton<InstalledGameCatalog>();
+builder.Services.AddSingleton<NelfePlayScoringCollectionSyncService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<NelfePlayScoringCollectionSyncService>());
+// Index public des jeux ouverts au scoring : court, lu souvent, jamais authentifie. Pas de
+// redirection suivie, et une reponse anormalement grosse est refusee plutot que chargee.
+builder.Services
+    .AddHttpClient(NelfePlayScoringCollectionSyncService.HttpClientName, client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(10);
+        client.MaxResponseContentBufferSize = 2 * 1024 * 1024;
+    })
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
 builder.Services.AddSingleton<IGamelistSelectionSyncService>(sp => sp.GetRequiredService<GamelistUpdateService>());
 builder.Services.AddSingleton<IMediaPrefetchService, MediaPrefetchService>();
 builder.Services.AddSingleton<ApiContext>();
