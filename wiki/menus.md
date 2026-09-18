@@ -160,6 +160,27 @@ Les événements en temps réel pendant le jeu - la matière première des score
 | `ENABLE ARCADE EVENT LISTENER` | Écoute les sorties arcade (lampes MAME…) des émulateurs compatibles. |
 | `EXPORT SCORE ON GAME-END` | Écrit le score capturé dans `.gameinfos` en fin de partie. |
 | `MAX HIGH SCORES` | 5, 10, 20 ou 50 lignes conservées par jeu *(défaut : 10)*. |
+| `SHOW WORLD SCORING COLLECTION` | Affiche la collection `NELFEPLAY WORLD SCORING` dans le carrousel *(défaut : activé)*. |
+
+!!! note "La collection NELFEPLAY WORLD SCORING"
+    Un jeu n'y entre que si les trois conditions sont réunies en même temps : un profil de scoring
+    est ouvert et non suspendu côté NelfePlay, vous possédez la ROM, et cette borne détient
+    exactement la définition de score que le profil exige. La troisième condition évite de vous
+    promettre un score qui serait refusé à la fin de la partie ; le jeu revient de lui-même quand
+    la définition officielle est à jour.
+
+    La borne télécharge un index public des jeux ouverts et fait le croisement chez elle : **aucune
+    liste de vos ROMs n'est envoyée**. Hors ligne, la dernière collection valide est conservée, une
+    panne n'est jamais prise pour une liste vide. En coupant l'option, le fichier de collection et
+    l'entrée du carrousel sont retirés, et vos autres collections ne sont pas touchées.
+
+    Pour diagnostiquer : `http://127.0.0.1:12345/api/v1/nelfeplay/scoring-collection` indique
+    `disabled`, `empty`, `ready`, `stale` ou `error`, avec le nombre de jeux distants et locaux.
+    Ajoutez `?refresh=true` pour forcer une synchronisation. Les journaux sont dans `.log`.
+
+    Votre thème doit connaître le nom de la collection pour lui donner sa propre tuile :
+    APIExpose l'ajoute à `collections.info` du thème et y dépose le logo et le fond. Un thème
+    qui ne gère pas les collections personnalisées garde un rendu générique.
 
 ## API SETTINGS
 

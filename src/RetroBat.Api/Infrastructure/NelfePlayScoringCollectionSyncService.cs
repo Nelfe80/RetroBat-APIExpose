@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using RetroBat.Api.Media;
+using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Models;
 using RetroBat.Domain.Paths;
 
@@ -41,7 +42,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly InstalledGameCatalog _catalog;
     private readonly EsCustomCollectionWriter _writer;
+    private readonly EsCollectionThemeAssets _assets;
     private readonly MediaRuntimeState _runtimeState;
+    private readonly IEsSettingsChangeBus? _settingsChangeBus;
     private readonly ILogger<NelfePlayScoringCollectionSyncService>? _logger;
     private readonly SemaphoreSlim _porte = new(1, 1);
     private readonly string _stateRoot;
@@ -49,13 +52,17 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
 
     private DateTime _dernierAppelUtc = DateTime.MinValue;
     private ScoringCollectionStatus _statut = ScoringCollectionStatus.Initial;
+    private IDisposable? _abonnementReglages;
+    private bool _derniereVisibilite = true;
 
     public NelfePlayScoringCollectionSyncService(
         IHttpClientFactory httpFactory,
         IOptionsMonitor<ApiExposeOptions> options,
         InstalledGameCatalog catalog,
         EsCustomCollectionWriter writer,
+        EsCollectionThemeAssets assets,
         MediaRuntimeState runtimeState,
+        IEsSettingsChangeBus? settingsChangeBus = null,
         ILogger<NelfePlayScoringCollectionSyncService>? logger = null,
         string? stateRoot = null,
         TimeSpan? minimumEntreDeuxAppels = null)
@@ -64,7 +71,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         _options = options;
         _catalog = catalog;
         _writer = writer;
+        _assets = assets;
         _runtimeState = runtimeState;
+        _settingsChangeBus = settingsChangeBus;
         _logger = logger;
         _stateRoot = stateRoot ?? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay");
         // Garde-fou du CDC : aucun appel a moins de 30 s d'intervalle.
@@ -81,6 +90,21 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _statut = LireEtat() is { } repris ? repris.EnStale() : ScoringCollectionStatus.Initial;
+        _derniereVisibilite = _options.CurrentValue.NelfePlay is { Enabled: true, ShowScoringCollection: true };
+        // Couper l'option depuis le menu d'EmulationStation doit faire disparaitre la collection
+        // tout de suite, pas au bout de cinq minutes.
+        _abonnementReglages = _settingsChangeBus?.Subscribe(async (_, token) =>
+        {
+            var visible = _options.CurrentValue.NelfePlay is { Enabled: true, ShowScoringCollection: true };
+            if (visible == _derniereVisibilite)
+            {
+                return;
+            }
+
+            _derniereVisibilite = visible;
+            await SynchroniserAsync("option", token);
+        });
+
         try
         {
             await Task.Delay(PremierDelai, stoppingToken);
@@ -92,6 +116,10 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         }
         catch (OperationCanceledException)
         {
+        }
+        finally
+        {
+            _abonnementReglages?.Dispose();
         }
     }
 
@@ -152,7 +180,15 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
 
             var chemins = Intersecter(manifeste, out var candidats);
             var resultat = _writer.Apply(CollectionName, chemins);
-            if (resultat.Changed)
+            // L'identite visuelle suit la collection : la declarer dans le theme est ce qui lui
+            // donne sa propre tuile au lieu de la ranger dans le fourre-tout « collections ».
+            var visuel = chemins.Count > 0 ? _assets.Install(CollectionName) : _assets.Remove(CollectionName);
+            if (visuel.Changed)
+            {
+                PhysicalMediaWebSocketProjectionService.InvalidateThemeArt();
+            }
+
+            if (resultat.Changed || visuel.Changed)
             {
                 _logger?.LogInformation(
                     "Collection World Scoring : {Entrees} entrees sur {Distants} jeux ouverts et {Candidats} candidats locaux, revision {Revision}",
@@ -196,6 +232,11 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     private ScoringCollectionStatus Desactiver(bool enabled, bool visible)
     {
         var resultat = _writer.Remove(CollectionName);
+        if (_assets.Remove(CollectionName).Changed)
+        {
+            PhysicalMediaWebSocketProjectionService.InvalidateThemeArt();
+        }
+
         if (resultat.Changed)
         {
             _logger?.LogInformation("Collection World Scoring retiree (option coupee)");

@@ -381,6 +381,7 @@ builder.Services.AddSingleton<CollectionPackInstallerService>();
 builder.Services.AddSingleton<EsCustomCollectionWriter>();
 builder.Services.AddSingleton<IScoreSlugResolver>(sp => sp.GetRequiredService<RomCanonicalResolver>());
 builder.Services.AddSingleton<InstalledGameCatalog>();
+builder.Services.AddSingleton<EsCollectionThemeAssets>();
 builder.Services.AddSingleton<NelfePlayScoringCollectionSyncService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<NelfePlayScoringCollectionSyncService>());
 // Index public des jeux ouverts au scoring : court, lu souvent, jamais authentifie. Pas de

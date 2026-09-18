@@ -160,6 +160,27 @@ Real-time in-game events - the raw material of live scores and LEDs.
 | `ENABLE ARCADE EVENT LISTENER` | Listens to arcade outputs (MAME lamps…) from compatible emulators. |
 | `EXPORT SCORE ON GAME-END` | Writes the captured score into `.gameinfos` at game end. |
 | `MAX HIGH SCORES` | 5, 10, 20 or 50 rows kept per game *(default: 10)*. |
+| `SHOW WORLD SCORING COLLECTION` | Shows the `NELFEPLAY WORLD SCORING` collection in the carousel *(default: on)*. |
+
+!!! note "The NELFEPLAY WORLD SCORING collection"
+    A game only enters it when the three conditions hold at the same time: a scoring profile is
+    open and not suspended on NelfePlay, you own the ROM, and this cabinet holds exactly the score
+    definition the profile requires. The third condition avoids promising a score that would be
+    refused at the end of the run; the game comes back on its own once the official definition is
+    up to date.
+
+    The cabinet downloads a public index of open games and does the matching locally: **no list of
+    your ROMs is ever sent**. Offline, the last valid collection is kept, and an outage is never
+    read as an empty list. Turning the option off removes the collection file and the carousel
+    entry, and leaves your other collections untouched.
+
+    To diagnose: `http://127.0.0.1:12345/api/v1/nelfeplay/scoring-collection` reports `disabled`,
+    `empty`, `ready`, `stale` or `error`, with the remote and local game counts. Add
+    `?refresh=true` to force a synchronisation. Logs live in `.log`.
+
+    Your theme must know the collection name to give it its own tile: APIExpose adds it to the
+    theme's `collections.info` and drops the logo and background there. A theme that does not
+    support custom collections keeps a generic rendering.
 
 ## API SETTINGS
 

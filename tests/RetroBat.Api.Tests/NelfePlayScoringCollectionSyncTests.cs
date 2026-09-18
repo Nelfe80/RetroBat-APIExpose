@@ -53,6 +53,8 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
             new FauxOptions(new ApiExposeOptions { NelfePlay = _nelfeplay }),
             new InstalledGameCatalog(resolveur, logger: null, romsRoot: Roms, ramRoot: Ram),
             Writer(),
+            new EsCollectionThemeAssets(logger: null, themesRoot: Path.Combine(_racine, "themes"),
+                sourceRoot: Path.Combine(_racine, "assets"), stateRoot: Etat),
             new MediaRuntimeState(),
             logger: null,
             stateRoot: Etat,

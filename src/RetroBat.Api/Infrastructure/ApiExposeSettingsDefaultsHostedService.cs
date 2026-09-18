@@ -252,7 +252,10 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
             ("global.apiexpose.api_notifications.enabled", ToEsBool(options.ApiNotifications.Enabled)),
             ("global.apiexpose.task_progress.enabled", ToEsBool(options.TaskProgress.Enabled)),
             ("global.apiexpose.swagger.enabled", ToEsBool(options.Swagger.Enabled)),
-            ("global.apiexpose.websocket.enabled", ToEsBool(options.WebSocket.Enabled))
+            ("global.apiexpose.websocket.enabled", ToEsBool(options.WebSocket.Enabled)),
+            // La collection « NELFEPLAY WORLD SCORING » : visible par defaut, et le joueur la
+            // coupe depuis le menu d'EmulationStation comme n'importe quelle autre option.
+            ("global.apiexpose.nelfeplay.show_scoring_collection", ToEsBool(options.NelfePlay.ShowScoringCollection))
         };
 
         if (includeRomSetVisibilityDefaults)

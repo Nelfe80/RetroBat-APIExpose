@@ -2315,19 +2315,40 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
     /// as an O(1) in-memory lookup built once from the theme-set roots - replaces the
     /// per-selection theme glob. Built lazily on first system fanart/logo resolution, cached
     /// for the process. See docs §27.</summary>
-    private static readonly Lazy<ThemeSystemArtIndex> _themeArt =
-        new(() => ThemeSystemArtIndex.Build(ResolveThemeSetRoots().ToList()));
+    private static readonly object _themeArtLock = new();
+    private static ThemeSystemArtIndex? _themeArtIndex;
+
+    private static ThemeSystemArtIndex ThemeArt
+    {
+        get
+        {
+            lock (_themeArtLock)
+            {
+                return _themeArtIndex ??= ThemeSystemArtIndex.Build(ResolveThemeSetRoots().ToList());
+            }
+        }
+    }
+
+    /// <summary>A appeler apres avoir depose un logo ou un fond dans un theme : sans cela,
+    /// l'index garderait en memoire l'absence du fichier jusqu'au prochain demarrage.</summary>
+    internal static void InvalidateThemeArt()
+    {
+        lock (_themeArtLock)
+        {
+            _themeArtIndex = null;
+        }
+    }
 
     private MediaStreamAsset? ResolveSystemFanartAsset(string frontendSystemId, string systemId, IReadOnlyList<string> roots)
     {
         return FindFirstAsset(roots, SystemFanartSearches)
-            ?? (_themeArt.Value.ResolveFanartPath(SystemFanartNames(frontendSystemId, systemId)) is { } path ? CreateAsset(path) : null);
+            ?? (ThemeArt.ResolveFanartPath(SystemFanartNames(frontendSystemId, systemId)) is { } path ? CreateAsset(path) : null);
     }
 
     private string? ResolveSystemFanartPath(string frontendSystemId, string systemId, IReadOnlyList<string> roots)
     {
         return FindFirstPhysicalPath(roots, SystemFanartSearches)
-            ?? _themeArt.Value.ResolveFanartPath(SystemFanartNames(frontendSystemId, systemId));
+            ?? ThemeArt.ResolveFanartPath(SystemFanartNames(frontendSystemId, systemId));
     }
 
     // The system logo the marquee SNAPSHOT carries must be a raster - MarqueeManager renders
@@ -2418,7 +2439,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
     {
         var userRoots = UserRootsOf(roots);
         return (userRoots.Count > 0 ? FindFirstPhysicalPath(userRoots, SystemLogoSearches) : null)
-            ?? _themeArt.Value.ResolveLogoPath(SystemLogoNames(frontendSystemId, systemId, selectedSystem), ResolveEsLanguage())
+            ?? ThemeArt.ResolveLogoPath(SystemLogoNames(frontendSystemId, systemId, selectedSystem), ResolveEsLanguage())
             ?? FindFirstPhysicalPath(roots, SystemLogoSearches);
     }
 
