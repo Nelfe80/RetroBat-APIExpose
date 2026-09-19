@@ -113,7 +113,19 @@ public class ApiExposeOptions
         /// des CollectionFileData qui ne sont pas dans cet arbre, donc sa fiche reste figee
         /// jusqu'a un rechargement complet. A true, APIExpose demande ce rechargement, mais
         /// seulement quand la vue est detachee du systeme et que le fragment apportait un
-        /// media visible. false rend le comportement d'avant : la fiche attend le F5 du joueur.
+        /// media visible.
+        ///
+        /// DOCTRINE (user, 2026-09-19) : dans une collection, le rechargement demande par l'API
+        /// est autorise, justement parce qu'un addgames n'y montre rien. Ailleurs, il reste
+        /// interdit en reaction a un scrap. Le garde-fou n'est donc pas de s'abstenir, mais de
+        /// ne demander qu'un rechargement par fenetre de 12 s, et seulement pour un fragment
+        /// qui portait un media visible.
+        ///
+        /// Ce qui reste a corriger est en amont : un addgames part encore quand ES a signale un
+        /// media manquant a la selection, meme si le fragment est identique a la gamelist -
+        /// mesure sur Sonic le 2026-09-19, 27 champs pousses, aucun different. Dans une
+        /// collection, ES signale ce manque a chaque jeu puisque sa fiche y est pauvre. Voir
+        /// AUDIT_REFRESH_SCRAP_ES_v1.md, points B et C.
         /// </summary>
         public bool ReloadGamesWhenViewDetached { get; set; } = true;
 

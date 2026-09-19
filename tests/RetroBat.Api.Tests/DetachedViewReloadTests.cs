@@ -84,4 +84,39 @@ public class DetachedViewReloadTests
         Assert.True(statut.Pending);
         Assert.True(statut.Ready);
     }
+
+    /// <summary>
+    /// Un rechargement demande par un geste technique n'annonce rien : le joueur n'a pas
+    /// commande d'operation, et un toast de progression lui ferait croire le contraire.
+    /// </summary>
+    [Fact]
+    public void Le_rechargement_dune_vue_detachee_est_silencieux()
+    {
+        var etat = new MediaRuntimeState();
+
+        etat.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.Zero, TimeSpan.FromSeconds(12), silencieux: true);
+
+        Assert.True(etat.ReloadGamesSilencieux);
+    }
+
+    [Fact]
+    public void Un_rechargement_ordinaire_garde_sa_barre_de_progression()
+    {
+        var etat = new MediaRuntimeState();
+
+        etat.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.Zero, TimeSpan.FromSeconds(12));
+
+        Assert.False(etat.ReloadGamesSilencieux);
+    }
+
+    [Fact]
+    public void Le_silence_ne_survit_pas_au_rechargement()
+    {
+        var etat = new MediaRuntimeState();
+        etat.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.Zero, TimeSpan.FromSeconds(12), silencieux: true);
+
+        etat.ConsumeReloadGamesPending();
+
+        Assert.False(etat.ReloadGamesSilencieux);
+    }
 }

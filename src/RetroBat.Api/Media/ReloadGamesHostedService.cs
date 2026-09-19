@@ -128,7 +128,9 @@ public class ReloadGamesHostedService : BackgroundService
                             continue;
                         }
 
-                        var suppressTaskProgress = ShouldSuppressStartupReloadProgress();
+                        // Un rechargement demande en silence (rafraichir une fiche dans une
+                        // collection) n'annonce rien : le joueur n'a pas commande d'operation.
+                        var suppressTaskProgress = ShouldSuppressStartupReloadProgress() || _runtimeState.ReloadGamesSilencieux;
                         if (!suppressTaskProgress)
                         {
                             _taskProgressService.Report(

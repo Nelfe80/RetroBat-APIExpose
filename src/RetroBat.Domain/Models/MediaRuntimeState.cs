@@ -28,6 +28,7 @@ public class MediaRuntimeState
     private bool _startupReloadGamesRequested;
     private string _lastFrontendEvent = string.Empty;
     private string _carouselSystemId = string.Empty;
+    private bool _reloadGamesSilencieux;
     private DateTime _lastGameSelectedAtUtc = DateTime.MinValue;
     private DateTime _reloadGamesBypassLastGameSelectedUntilUtc = DateTime.MinValue;
     private bool _reloadGamesAllowedDuringActiveScrape;
@@ -274,7 +275,21 @@ public class MediaRuntimeState
         }
     }
 
-    public bool TryRequestReloadGamesBypassingLastGameSelected(TimeSpan? debounce = null, TimeSpan? suppressIfReloadedWithin = null)
+    /// <summary>
+    /// Vrai quand le rechargement en attente a ete demande en silence : aucune barre de
+    /// progression, aucun toast. Un rechargement declenche par un geste technique (rafraichir
+    /// une fiche dans une collection) ne doit rien annoncer au joueur ; ceux qui suivent une
+    /// operation longue, si.
+    /// </summary>
+    public bool ReloadGamesSilencieux
+    {
+        get { lock (_lock) return _reloadGamesSilencieux; }
+    }
+
+    public bool TryRequestReloadGamesBypassingLastGameSelected(
+        TimeSpan? debounce = null,
+        TimeSpan? suppressIfReloadedWithin = null,
+        bool silencieux = false)
     {
         var effectiveDebounce = debounce ?? TimeSpan.FromSeconds(2);
         var effectiveSuppressWindow = suppressIfReloadedWithin ?? TimeSpan.FromSeconds(8);
@@ -296,6 +311,7 @@ public class MediaRuntimeState
             _reloadGamesDueAtUtc = nowUtc.Add(effectiveDebounce);
             _reloadGamesBypassLastGameSelectedUntilUtc = nowUtc.Add(ReloadGamesLastGameSelectedBypassWindow);
             _reloadGamesAllowedDuringActiveScrape = false;
+            _reloadGamesSilencieux = silencieux;
             return true;
         }
     }
@@ -308,6 +324,7 @@ public class MediaRuntimeState
             _reloadGamesPending = false;
             _reloadGamesAllowedDuringActiveScrape = false;
             _reloadGamesRequestedByScrape = false;
+            _reloadGamesSilencieux = false;
             return pending;
         }
     }

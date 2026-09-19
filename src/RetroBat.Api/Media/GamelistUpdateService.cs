@@ -3248,7 +3248,8 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
 
         if (_runtimeState.TryRequestReloadGamesBypassingLastGameSelected(
                 TimeSpan.FromSeconds(1.5),
-                TimeSpan.FromSeconds(12)))
+                TimeSpan.FromSeconds(12),
+                silencieux: true))
         {
             _logger?.LogInformation(
                 "reloadgames demande apres addgames pour system={SystemId}, game={GameSlug} : la vue affichee est detachee de ce systeme.",
