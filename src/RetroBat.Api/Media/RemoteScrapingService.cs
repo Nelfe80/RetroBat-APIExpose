@@ -420,6 +420,37 @@ public sealed class RemoteScrapingService
                 }
             }
 
+            // Le refus se retient PAR TYPE, meme quand la demande portait aussi du texte.
+            // Mesure du 2026-09-19 : la fiche de Sonic n'a plus que son logo a trouver, et
+            // ScreenScraper n'en a pas ; comme la demande n'etait pas « media seulement », rien
+            // n'etait memorise et chaque selection repartait pour 40 s d'attente.
+            var typesSansReponse = requestedMissingKinds
+                .Select(MediaKinds.Normalize)
+                .Where(kind => !string.IsNullOrWhiteSpace(kind))
+                .Where(kind => !result.ImportedKinds.Contains(kind, StringComparer.OrdinalIgnoreCase))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            // La reponse du service fait foi type par type : « le site a repondu et n'avait pas
+            // ce media » se retient, meme si d'autres types sont arrives dans la meme passe.
+            // Un echec technique (reseau, quota) ne se retient jamais.
+            if (!IsMediaOnlyRemoteCheck(plan, requestedMissingKinds) &&
+                typesSansReponse.Count > 0 &&
+                IsRemoteExactLocalNoRetryCacheableResult(result))
+            {
+                foreach (var kind in typesSansReponse)
+                {
+                    RememberRemoteMediaNoChange(plan, [kind]);
+                }
+
+                await MediaUpdateAuditLog.AppendAsync(
+                    plan,
+                    "remote-scrape-media-cooldown",
+                    "media",
+                    "remembered-per-kind",
+                    new { kinds = typesSansReponse, result.Status, reason = "demande mixte media et texte" },
+                    scrapeCancellationToken);
+            }
+
             if (IsMediaOnlyRemoteCheck(plan, requestedMissingKinds))
             {
                 if (IsRemoteMediaNoChangeCacheableResult(result))

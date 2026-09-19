@@ -221,6 +221,10 @@ public class MediaPrefetchService : IMediaPrefetchService
         var visibleSlotResolved = !mediaContentChanged &&
             hadMissingLiveRefreshMediaAtSelection &&
             HasVisibleSlotResolvedAfterSelection(plan, scrapingSettings.WheelStyle);
+        // Ce qui autorise le raccourci du delta de rendu : un emplacement REELLEMENT comble
+        // pendant cette selection. Sans lui, le fragment est compare a la gamelist comme
+        // n'importe quel autre, et un fragment identique ne part pas.
+        var visibleSlotFilledNow = HasVisibleSlotFilledDuringSelection(plan, scrapingSettings.WheelStyle);
         if (mediaContentChanged)
         {
             _logger?.LogDebug(
@@ -275,7 +279,7 @@ public class MediaPrefetchService : IMediaPrefetchService
                 cancellationToken,
                 LiveGameUpdateNotificationKind.LocalProjection,
                 allowLocalizedMetadataRefresh: gamelistMetadataChanged,
-                visibleMediaNewlyResolved: true);
+                visibleMediaNewlyResolved: visibleSlotFilledNow);
             var pushMs = StepMs();
             if (prefetchWatch is not null)
             {
@@ -367,7 +371,9 @@ public class MediaPrefetchService : IMediaPrefetchService
                 // resolves its notification. Not forced twice: if the early push
                 // above already filled the card, this pass must repaint only when the
                 // remote genuinely added something, which its delta check decides.
-                visibleMediaNewlyResolved: (visibleSlotResolved || staleEsMediaResolved) && !pushedLocalEarly);
+                // Et le raccourci ne vaut que pour un emplacement reellement comble
+                // pendant cette selection : voir HasVisibleSlotFilledDuringSelection.
+                visibleMediaNewlyResolved: visibleSlotFilledNow && !pushedLocalEarly);
             if (!livePushed)
             {
                 _logger?.LogDebug(
@@ -931,6 +937,24 @@ public class MediaPrefetchService : IMediaPrefetchService
     private static bool HasAnyMissingLiveRefreshMedia(MediaProjectionPlan plan, string wheelStyle)
     {
         return plan.Needs.Any(need => need.IsMissing && IsSelectedVisibleKind(plan, need.Kind, wheelStyle));
+    }
+
+    /// <summary>
+    /// Un emplacement visible qui n'avait AUCUN fichier a l'arrivee du joueur en a un
+    /// maintenant. C'est la seule mesure qui dit qu'il y a quelque chose de neuf a peindre.
+    ///
+    /// Mesure du 2026-09-19 : « il manquait un media visible a la selection » etait pris pour
+    /// cela, alors qu'un seul type introuvable chez ScreenScraper (le logo de Sonic) suffit a
+    /// le rendre vrai a chaque visite. La fiche etait complete, le fragment identique a la
+    /// gamelist, et le push partait quand meme.
+    /// </summary>
+    internal static bool HasVisibleSlotFilledDuringSelection(MediaProjectionPlan plan, string wheelStyle)
+    {
+        return plan.Needs.Any(need =>
+            IsSelectedVisibleKind(plan, need.Kind, wheelStyle) &&
+            string.IsNullOrWhiteSpace(need.InitialExistingPath) &&
+            ((!string.IsNullOrWhiteSpace(need.ProjectedPath) && File.Exists(need.ProjectedPath)) ||
+                (!string.IsNullOrWhiteSpace(need.ExistingPath) && File.Exists(need.ExistingPath))));
     }
 
     private static bool HasAnyProjectedLiveRefreshMediaAvailable(MediaProjectionPlan plan, string wheelStyle)
