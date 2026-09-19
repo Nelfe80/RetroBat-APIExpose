@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using RetroBat.Api.Media;
@@ -70,73 +71,92 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var options = _options.CurrentValue.EmulationStationLifecycle;
-            if (!options.Enabled)
+            // Une surveillance qui échoue se retente au tour suivant. Sans cette ceinture, la
+            // moindre exception ici arrête l'hôte entier (BackgroundServiceExceptionBehavior =
+            // StopHost) : l'API disparaît, et rien sur la borne ne dit pourquoi.
+            try
             {
-                await DelayAsync(options.PollIntervalMilliseconds, stoppingToken);
-                continue;
+                await UnTourAsync(stoppingToken);
             }
-
-            var isRunning = TryGetEmulationStationProcessId(out var processId);
-            if (isRunning)
-            {
-                if (!_hasSeenEmulationStation)
-                {
-                    _logger.LogInformation("EmulationStation lifecycle monitor is armed.");
-                }
-
-                if (_currentEmulationStationProcessId != processId)
-                {
-                    _currentEmulationStationProcessId = processId;
-                    _startupF5ScheduledForProcessId = null;
-                    _startupF5SentForProcessId = null;
-                    await PublishFrontendLifecycleAsync("ui.frontend.started", processId, stoppingToken);
-                }
-
-                _hasSeenEmulationStation = true;
-                _missingSince = null;
-                await TryScheduleStartupF5Async(processId, options, stoppingToken);
-                await DelayAsync(options.PollIntervalMilliseconds, stoppingToken);
-                continue;
-            }
-
-            if (!_hasSeenEmulationStation)
-            {
-                await DelayAsync(options.PollIntervalMilliseconds, stoppingToken);
-                continue;
-            }
-
-            _missingSince ??= DateTimeOffset.Now;
-            _startupF5ScheduledForProcessId = null;
-            _startupF5SentForProcessId = null;
-            if (DateTimeOffset.Now - _missingSince.Value < TimeSpan.FromMilliseconds(Math.Max(0, options.ShutdownGraceMilliseconds)))
-            {
-                await DelayAsync(options.PollIntervalMilliseconds, stoppingToken);
-                continue;
-            }
-
-            // Grace elapsed: this is a real exit, not a transient enumeration miss.
-            if (_currentEmulationStationProcessId is not null)
-            {
-                await PublishFrontendLifecycleAsync("ui.frontend.stopped", _currentEmulationStationProcessId, stoppingToken);
-                _currentEmulationStationProcessId = null;
-            }
-
-            if (!options.StopApiWhenEmulationStationStops)
-            {
-                await DelayAsync(options.PollIntervalMilliseconds, stoppingToken);
-                continue;
-            }
-
-            if (_shutdownStarted)
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
                 return;
             }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Surveillance du cycle de vie d'EmulationStation : tour en échec.");
+                await DelayAsync(_options.CurrentValue.EmulationStationLifecycle.PollIntervalMilliseconds, stoppingToken);
+            }
+        }
+    }
 
-            _shutdownStarted = true;
-            await ShutdownAfterEmulationStationExitAsync(options, stoppingToken);
+    private async Task UnTourAsync(CancellationToken stoppingToken)
+    {
+        var options = _options.CurrentValue.EmulationStationLifecycle;
+        if (!options.Enabled)
+        {
+            await DelayAsync(options.PollIntervalMilliseconds, stoppingToken);
             return;
         }
+
+        var isRunning = TryGetEmulationStationProcessId(out var processId);
+        if (isRunning)
+        {
+            if (!_hasSeenEmulationStation)
+            {
+                _logger.LogInformation("EmulationStation lifecycle monitor is armed.");
+            }
+
+            if (_currentEmulationStationProcessId != processId)
+            {
+                _currentEmulationStationProcessId = processId;
+                _startupF5ScheduledForProcessId = null;
+                _startupF5SentForProcessId = null;
+                await PublishFrontendLifecycleAsync("ui.frontend.started", processId, stoppingToken);
+            }
+
+            _hasSeenEmulationStation = true;
+            _missingSince = null;
+            await TryScheduleStartupF5Async(processId, options, stoppingToken);
+            await DelayAsync(options.PollIntervalMilliseconds, stoppingToken);
+            return;
+        }
+
+        if (!_hasSeenEmulationStation)
+        {
+            await DelayAsync(options.PollIntervalMilliseconds, stoppingToken);
+            return;
+        }
+
+        _missingSince ??= DateTimeOffset.Now;
+        _startupF5ScheduledForProcessId = null;
+        _startupF5SentForProcessId = null;
+        if (DateTimeOffset.Now - _missingSince.Value < TimeSpan.FromMilliseconds(Math.Max(0, options.ShutdownGraceMilliseconds)))
+        {
+            await DelayAsync(options.PollIntervalMilliseconds, stoppingToken);
+            return;
+        }
+
+        // Grace elapsed: this is a real exit, not a transient enumeration miss.
+        if (_currentEmulationStationProcessId is not null)
+        {
+            await PublishFrontendLifecycleAsync("ui.frontend.stopped", _currentEmulationStationProcessId, stoppingToken);
+            _currentEmulationStationProcessId = null;
+        }
+
+        if (!options.StopApiWhenEmulationStationStops)
+        {
+            await DelayAsync(options.PollIntervalMilliseconds, stoppingToken);
+            return;
+        }
+
+        if (_shutdownStarted)
+        {
+            return;
+        }
+
+        _shutdownStarted = true;
+        await ShutdownAfterEmulationStationExitAsync(options, stoppingToken);
     }
 
     private async Task ShutdownAfterEmulationStationExitAsync(
@@ -302,10 +322,22 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
         await Task.Delay(TimeSpan.FromMilliseconds(Math.Max(250, milliseconds)), cancellationToken);
     }
 
+    /// <summary>
+    /// Le processus EmulationStation le plus récent, s'il y en a un.
+    ///
+    /// PIÈGE MESURÉ (2026-09-17 23:44, 2026-09-19 07:30 et 09:29, trois morts de l'API sans
+    /// trace) : trier par <see cref="Process.StartTime"/> ouvre chaque processus, et l'ouverture
+    /// d'un EmulationStation qui vient de se fermer lève un <see cref="Win32Exception"/>
+    /// « Accès refusé ». Levée depuis le comparateur de tri, elle passait hors du try qui ne
+    /// couvrait que <c>HasExited</c>, remontait jusqu'à l'hôte, et l'hôte est configuré pour
+    /// S'ARRÊTER quand un service de fond laisse échapper une exception : fermer le frontend
+    /// pouvait donc éteindre l'API, silencieusement (journal normal, puis plus rien). La date de
+    /// démarrage se lit maintenant sans jamais échouer : un processus illisible passe en dernier.
+    /// </summary>
     private static bool TryGetEmulationStationProcessId(out int processId)
     {
         processId = 0;
-        foreach (var process in Process.GetProcessesByName("emulationstation").OrderByDescending(process => process.StartTime))
+        foreach (var process in Process.GetProcessesByName("emulationstation").OrderByDescending(DemarrageOuMinimum))
         {
             using (process)
             {
@@ -325,5 +357,22 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
         }
 
         return false;
+    }
+
+    private static DateTime DemarrageOuMinimum(Process process) => DemarrageOuMinimum(() => process.StartTime);
+
+    /// <summary>La date de démarrage d'un processus, ou le minimum quand elle ne se lit pas :
+    /// un processus qui vient de se fermer refuse qu'on l'ouvre, et cette lecture sert a TRIER,
+    /// pas a decider. Un tri ne doit jamais pouvoir arreter l'API.</summary>
+    internal static DateTime DemarrageOuMinimum(Func<DateTime> lecture)
+    {
+        try
+        {
+            return lecture();
+        }
+        catch (Exception ex) when (ex is Win32Exception or InvalidOperationException or NotSupportedException)
+        {
+            return DateTime.MinValue;
+        }
     }
 }
