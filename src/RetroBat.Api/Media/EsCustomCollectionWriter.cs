@@ -31,12 +31,14 @@ public sealed class EsCustomCollectionWriter
     private readonly ILogger<EsCustomCollectionWriter>? _logger;
     private readonly string _collectionsRoot;
     private readonly string _stateRoot;
+    private readonly string _esHomeRoot;
 
     public EsCustomCollectionWriter(
         IEsSettingsStore settingsStore,
         ILogger<EsCustomCollectionWriter>? logger = null,
         string? collectionsRoot = null,
-        string? stateRoot = null)
+        string? stateRoot = null,
+        string? esHomeRoot = null)
     {
         _settingsStore = settingsStore;
         _logger = logger;
@@ -44,6 +46,10 @@ public sealed class EsCustomCollectionWriter
             ?? Path.Combine(RetroBatPaths.EmulationStationConfigRoot, "collections");
         _stateRoot = stateRoot
             ?? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay");
+        // Le « ~ » qu'EmulationStation ecrit dans ses fichiers de collection est son home,
+        // le dossier qui contient .emulationstation.
+        _esHomeRoot = esHomeRoot
+            ?? (Path.GetDirectoryName(RetroBatPaths.EmulationStationConfigRoot) ?? RetroBatPaths.EmulationStationConfigRoot);
     }
 
     /// <summary>Le fichier de collection, tel qu'EmulationStation le cherche.</summary>
@@ -80,10 +86,14 @@ public sealed class EsCustomCollectionWriter
         var chemin = ConfigPath(nom);
         var fichierEcrit = false;
 
-        if (!File.Exists(chemin) ||
-            etat?.ContentSha256 is not { } connu ||
-            !string.Equals(connu, empreinte, StringComparison.OrdinalIgnoreCase) ||
-            !string.Equals(Sha256(File.ReadAllText(chemin)), empreinte, StringComparison.OrdinalIgnoreCase))
+        // EmulationStation reecrit une collection dans SON format (chemins « ./... » relatifs
+        // a sa racine ou « ~/... » a son home, fins de ligne LF) quand il la juge modifiee :
+        // saveCustomCollection, appele a la destruction de CollectionSystemManager si
+        // needsSave, c'est-a-dire apres un ajout, un retrait ou une suppression de jeu par le
+        // joueur (source RetroBat : es-app/src/CollectionSystemManager.cpp). Comparer les
+        // octets ferait alors reecrire le fichier, puis redemander un rechargement, pour un
+        // contenu identique. Seul l'ENSEMBLE des jeux compte.
+        if (!File.Exists(chemin) || !MemesJeux(chemin, lignes))
         {
             WriteAtomic(chemin, contenu);
             fichierEcrit = true;
@@ -92,14 +102,20 @@ public sealed class EsCustomCollectionWriter
         var reglagesModifies = _settingsStore.Update(document =>
             EsCustomCollectionSettings.Add(EnsureRoot(document), nom));
 
-        WriteState(nom, new EsCustomCollectionState
+        if (fichierEcrit || etat == null ||
+            !string.Equals(etat.ContentSha256, empreinte, StringComparison.OrdinalIgnoreCase) ||
+            etat.Games.Count != lignes.Count)
         {
-            Collection = nom,
-            ContentSha256 = empreinte,
-            GameCount = lignes.Count,
-            ListedInSettings = true,
-            WrittenAtUtc = DateTime.UtcNow,
-        });
+            WriteState(nom, new EsCustomCollectionState
+            {
+                Collection = nom,
+                ContentSha256 = empreinte,
+                GameCount = lignes.Count,
+                Games = lignes,
+                ListedInSettings = true,
+                WrittenAtUtc = DateTime.UtcNow,
+            });
+        }
 
         if (fichierEcrit || reglagesModifies)
         {
@@ -154,19 +170,78 @@ public sealed class EsCustomCollectionWriter
         return new EsCustomCollectionResult(fichierSupprime, reglagesModifies, 0);
     }
 
-    /// <summary>Vrai si le fichier present est bien celui qu'APIExpose a ecrit.</summary>
+    /// <summary>
+    /// Vrai si le fichier present porte les jeux qu'APIExpose y a mis, quel que soit le format
+    /// dans lequel EmulationStation l'a reecrit depuis.
+    /// </summary>
     public bool Owns(string collectionName)
     {
         var nom = NormalizeName(collectionName);
         var etat = ReadState(nom);
-        if (etat?.ContentSha256 is not { } empreinte)
+        if (etat == null)
         {
             return false;
         }
 
         var chemin = ConfigPath(nom);
-        return File.Exists(chemin) &&
-            string.Equals(Sha256(File.ReadAllText(chemin)), empreinte, StringComparison.OrdinalIgnoreCase);
+        return File.Exists(chemin) && MemesJeux(chemin, etat.Games);
+    }
+
+    /// <summary>Le fichier contient-il exactement ces jeux ? Format d'ES ou le notre, peu importe.</summary>
+    private bool MemesJeux(string chemin, IReadOnlyCollection<string> jeux)
+    {
+        var attendus = jeux.Select(Canonique).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        return LireJeux(chemin).SetEquals(attendus);
+    }
+
+    /// <summary>
+    /// Les jeux d'un fichier de collection, ramenes en chemins absolus comparables : « ~ »
+    /// resolu vers le home d'ES, un chemin relatif vers le dossier des collections,
+    /// separateurs et casse normalises. Lignes vides et commentaires ignores, comme ES.
+    /// </summary>
+    internal HashSet<string> LireJeux(string chemin)
+    {
+        var jeux = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        try
+        {
+            foreach (var brute in File.ReadAllLines(chemin))
+            {
+                var ligne = brute.Trim();
+                if (ligne.Length == 0 || ligne[0] == '#' || ligne[0] == '0')
+                {
+                    continue;
+                }
+
+                if (ligne.Length > 1 && ligne[0] == '~' && (ligne[1] == '/' || ligne[1] == '\\'))
+                {
+                    ligne = Path.Combine(_esHomeRoot, ligne[2..]);
+                }
+                else if (!Path.IsPathRooted(ligne.Replace('/', Path.DirectorySeparatorChar)))
+                {
+                    ligne = Path.Combine(_collectionsRoot, ligne);
+                }
+
+                jeux.Add(Canonique(ligne));
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger?.LogDebug(ex, "Collection illisible : {Chemin}", chemin);
+        }
+
+        return jeux;
+    }
+
+    private static string Canonique(string chemin)
+    {
+        try
+        {
+            return Path.GetFullPath(chemin.Replace('/', Path.DirectorySeparatorChar)).Replace('\\', '/');
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return chemin.Replace('\\', '/');
+        }
     }
 
     public EsCustomCollectionState? ReadState(string collectionName)
@@ -277,6 +352,10 @@ public sealed class EsCustomCollectionState
 
     [JsonPropertyName("game_count")]
     public int GameCount { get; set; }
+
+    /// <summary>Les jeux tels que nous les avons ecrits : la reference pour reconnaitre le fichier.</summary>
+    [JsonPropertyName("games")]
+    public List<string> Games { get; set; } = [];
 
     [JsonPropertyName("listed_in_settings")]
     public bool ListedInSettings { get; set; }

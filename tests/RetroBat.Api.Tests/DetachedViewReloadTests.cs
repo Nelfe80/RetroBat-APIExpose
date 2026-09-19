@@ -6,7 +6,9 @@ namespace RetroBat.Api.Tests;
 /// <summary>
 /// Un /addgames ne redessine que la vue du systeme pousse. Savoir si la vue affichee est
 /// detachee de ce systeme est donc ce qui decide si le joueur verra quelque chose, ou s'il
-/// faut un rechargement complet. Mesure du 2026-09-18 sur la source d'ES.
+/// faut un F5 clavier (ViewController::reloadAll, curseur conserve). Mesure du 2026-09-18
+/// sur la source d'ES. Les rechargements silencieux restent ceux, structurels, d'une
+/// collection qui apparait ou disparait.
 /// </summary>
 public class DetachedViewReloadTests
 {

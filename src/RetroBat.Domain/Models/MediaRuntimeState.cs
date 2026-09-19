@@ -604,6 +604,7 @@ public class MediaRuntimeState
             _reloadGamesAllowedDuringActiveScrape = false;
             requestedByScrape = _reloadGamesRequestedByScrape;
             _reloadGamesRequestedByScrape = false;
+            _reloadGamesSilencieux = false;
             _gamesChangedSinceLastReload.Clear();
             _lastReloadGamesAtUtc = nowUtc;
             retryAfter = TimeSpan.Zero;

@@ -174,10 +174,9 @@ public class ReloadGamesHostedService : BackgroundService
                                 new { requestedByScrape },
                                 stoppingToken);
                             _startupOverlayService.NotifyReloadSucceeded();
-                            if (!suppressTaskProgress)
-                            {
-                                _taskProgressService.Complete(ReloadProgressTaskId);
-                            }
+                            // Complete meme si l'on n'a rien annonce : une barre d'attente
+                            // posee plus tot doit disparaitre, pas rester orpheline.
+                            _taskProgressService.Complete(ReloadProgressTaskId);
 
                             await NotifyPendingVisibleMediaReallocationCompletionAsync(stoppingToken);
                             await NotifyPendingLanguageGamelistSyncCompletionAsync(stoppingToken);
@@ -1108,6 +1107,14 @@ public class ReloadGamesHostedService : BackgroundService
     private void ReportPendingReloadProgress(ReloadGamesStatus status, string blockReason)
     {
         if (status.RequestedByScrape)
+        {
+            return;
+        }
+
+        // Un rechargement silencieux n'affiche rien, pas meme son attente. Sans cela la barre
+        // « 0/1 » posee ici restait a l'ecran tant que le joueur navigue, puisque la retenue
+        // « dernier evenement game-selected » se represente indefiniment.
+        if (_runtimeState.ReloadGamesSilencieux)
         {
             return;
         }

@@ -110,24 +110,20 @@ public class ApiExposeOptions
         /// <summary>
         /// Un /addgames ne redessine que la vue du systeme pousse : le handler d'ES appelle
         /// onFileChanged sur la racine de ce systeme. Dans une collection, le joueur regarde
-        /// des CollectionFileData qui ne sont pas dans cet arbre, donc sa fiche reste figee
-        /// jusqu'a un rechargement complet. A true, APIExpose demande ce rechargement, mais
-        /// seulement quand la vue est detachee du systeme et que le fragment apportait un
-        /// media visible.
+        /// des CollectionFileData qui ne sont pas dans cet arbre, donc sa fiche reste figee.
         ///
-        /// DOCTRINE (user, 2026-09-19) : dans une collection, le rechargement demande par l'API
-        /// est autorise, justement parce qu'un addgames n'y montre rien. Ailleurs, il reste
-        /// interdit en reaction a un scrap. Le garde-fou n'est donc pas de s'abstenir, mais de
-        /// ne demander qu'un rechargement par fenetre de 12 s, et seulement pour un fragment
-        /// qui portait un media visible.
+        /// A true, APIExpose envoie un F5 CLAVIER apres un addgames accepte quand la vue est
+        /// detachee du systeme pousse et que le fragment apportait un media visible. Dans la
+        /// source d'ES, F5 mene a ViewController::reloadAll : les vues sont reconstruites a
+        /// partir des donnees en memoire et chaque curseur est sauve puis restaure. Ce n'est
+        /// PAS un /reloadgames, qui relit les gamelists, reconstruit les systemes et perd le
+        /// curseur ; celui-la reste interdit en reaction a un scrap (doctrine du projet).
         ///
-        /// Ce qui reste a corriger est en amont : un addgames part encore quand ES a signale un
-        /// media manquant a la selection, meme si le fragment est identique a la gamelist -
-        /// mesure sur Sonic le 2026-09-19, 27 champs pousses, aucun different. Dans une
-        /// collection, ES signale ce manque a chaque jeu puisque sa fiche y est pauvre. Voir
-        /// AUDIT_REFRESH_SCRAP_ES_v1.md, points B et C.
+        /// Un seul F5 par fenetre de 12 s, aucun avertissement a l'ecran, et rien si
+        /// EmulationStation n'est pas au premier plan. false rend le comportement d'avant : la
+        /// fiche attend le F5 du joueur.
         /// </summary>
-        public bool ReloadGamesWhenViewDetached { get; set; } = true;
+        public bool RefreshDetachedViewWithF5 { get; set; } = true;
 
         /// <summary>F3 (Super Mario World bug): ES's addgames ingestion clears a
         /// game's unknown XML elements, wiping the Roms Manager ownership tags

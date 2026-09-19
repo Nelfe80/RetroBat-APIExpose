@@ -438,6 +438,8 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
     private readonly MediaLocalizationResolver _mediaLocalizationResolver;
     private readonly RomMetadataResolver _romMetadataResolver;
     private readonly EsNotifyDeduplicationService _notifyDeduplication;
+    private readonly EsControllerInputBackendProvider? _inputBackends;
+    private DateTime _dernierF5VueDetacheeUtc = DateTime.MinValue;
     private readonly MediaSidecarStore _mediaSidecar;
     private readonly ApiExposeRuntimeOptionsService _runtimeOptions;
     private readonly ILogger<GamelistUpdateService>? _logger;
@@ -470,8 +472,10 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         EsNotifyDeduplicationService notifyDeduplication,
         MediaSidecarStore mediaSidecar,
         ApiExposeRuntimeOptionsService runtimeOptions,
-        ILogger<GamelistUpdateService>? logger = null)
+        ILogger<GamelistUpdateService>? logger = null,
+        EsControllerInputBackendProvider? inputBackends = null)
     {
+        _inputBackends = inputBackends;
         _settingsService = settingsService;
         _options = options;
         _systemIdNormalizer = systemIdNormalizer;
@@ -3120,7 +3124,7 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                     dirtyBatch.Count + relatedBatch.Count);
                 ClearDirtyLiveGamelistBatch(dirtyBatch);
                 ClearPendingLiveMetadataRestores(plan, dirtyBatch);
-                RequestReloadWhenViewIsDetached(plan, hasLiveVisibleSlotElement);
+                _ = RefreshDetachedViewByF5Async(plan, hasLiveVisibleSlotElement);
                 var videoExceptionConsumed = allowCurrentVideoRefresh && HasLiveOfficialVideoMedia(gameElement);
                 var localizedMetadataRefreshConsumed = hasLocalizedMetadataRefreshContent;
                 // the one-per-card gate was already armed inside the POST
@@ -3230,32 +3234,93 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
     /// Un <c>/addgames</c> accepte par ES ne redessine QUE la vue du systeme pousse : son
     /// handler appelle <c>onFileChanged</c> sur la racine de ce systeme. Quand le joueur est
     /// dans une collection, il regarde des CollectionFileData qui ne sont pas dans cet arbre,
-    /// donc sa fiche ne bouge pas et il faut un rechargement complet.
+    /// donc sa fiche ne bouge pas.
     ///
-    /// On ne le demande que dans ce cas precis, et seulement si le fragment apportait un media
-    /// visible : un rafraichissement de metadonnees ne justifie pas de recharger la liste sous
-    /// les pieds du joueur. Le canal reste celui de tout le monde, donc debounce, fenetre de
-    /// suppression, et retenue pendant les scrapes prioritaires.
+    /// Le geste juste est le F5 CLAVIER, pas <c>/reloadgames</c>. Dans la source d'ES, F5 mene
+    /// a <c>ViewController::reloadAll(window)</c> : les vues sont reconstruites a partir des
+    /// donnees en memoire, que l'addgames vient de mettre a jour, et chaque curseur est sauve
+    /// dans <c>cursorMap</c> puis restaure. <c>/reloadgames</c>, lui, mene a
+    /// <c>reloadAllGames</c> : relecture des gamelists, systemes reconstruits, curseur perdu,
+    /// game-selected fantomes. La doctrine du projet l'interdit en reaction a un scrap.
+    ///
+    /// Un seul F5 par fenetre, seulement pour un fragment qui apportait un media visible, et
+    /// le backend s'abstient si EmulationStation n'est pas au premier plan.
     /// </summary>
-    private void RequestReloadWhenViewIsDetached(MediaProjectionPlan plan, bool hasLiveVisibleSlotElement)
+    private async Task RefreshDetachedViewByF5Async(MediaProjectionPlan plan, bool hasLiveVisibleSlotElement)
     {
         if (!hasLiveVisibleSlotElement ||
-            !_options.CurrentValue.Scraping.ReloadGamesWhenViewDetached ||
+            _inputBackends == null ||
+            !_options.CurrentValue.Scraping.RefreshDetachedViewWithF5 ||
             !_runtimeState.IsViewDetachedFromSystem(plan.FrontendSystemId))
         {
             return;
         }
 
-        if (_runtimeState.TryRequestReloadGamesBypassingLastGameSelected(
-                TimeSpan.FromSeconds(1.5),
-                TimeSpan.FromSeconds(12),
-                silencieux: true))
+        var maintenant = DateTime.UtcNow;
+        if (maintenant - _dernierF5VueDetacheeUtc < TimeSpan.FromSeconds(12))
         {
+            return;
+        }
+
+        _dernierF5VueDetacheeUtc = maintenant;
+        try
+        {
+            // ES applique le fragment sur son thread d'interface : lui laisser le temps de le
+            // faire avant de redessiner, sinon le F5 repeint l'ancien etat.
+            await Task.Delay(TimeSpan.FromMilliseconds(800));
+            if (!_runtimeState.IsViewDetachedFromSystem(plan.FrontendSystemId))
+            {
+                return;
+            }
+
+            var options = SilentControllerOptions(_options.CurrentValue.EsController);
+            var backend = _inputBackends.Resolve(options.Backend);
+            await backend.SendInputAsync("f5", 80, options, CancellationToken.None);
+            // Le F5 fait reemettre game-selected a ES : le push qui suivrait serait un doublon.
+            _runtimeState.SuppressLiveAddGamesAfterThemeRefresh(plan.FrontendSystemId, plan.GameSlug);
             _logger?.LogInformation(
-                "reloadgames demande apres addgames pour system={SystemId}, game={GameSlug} : la vue affichee est detachee de ce systeme.",
+                "F5 envoye apres addgames pour system={SystemId}, game={GameSlug} : la vue affichee est detachee de ce systeme.",
                 plan.FrontendSystemId,
                 plan.GameSlug);
+            await RefreshTrackingLog.AppendAsync(
+                plan,
+                "f5",
+                "detached-view",
+                new { reason = "addgames-does-not-redraw-collections" },
+                CancellationToken.None);
         }
+        catch (Exception ex)
+        {
+            _logger?.LogDebug(ex, "F5 apres addgames non envoye pour system={SystemId}, game={GameSlug}.", plan.FrontendSystemId, plan.GameSlug);
+        }
+    }
+
+    /// <summary>Les options du controleur sans avertissement a l'ecran : ce F5 est un geste technique.</summary>
+    private static ApiExposeOptions.EsControllerOptions SilentControllerOptions(ApiExposeOptions.EsControllerOptions source)
+    {
+        return new ApiExposeOptions.EsControllerOptions
+        {
+            Enabled = source.Enabled,
+            Backend = source.Backend,
+            RequireEmulationStationForeground = true,
+            FocusEmulationStationBeforeInput = false,
+            ClickEmulationStationIfFocusFails = false,
+            RightClickWarningEnabled = false,
+            FocusWarningEnabled = false,
+            FocusWarningDurationMs = source.FocusWarningDurationMs,
+            RestoreSelectionAfterReloadGames = source.RestoreSelectionAfterReloadGames,
+            RestoreSelectionDelayMs = source.RestoreSelectionDelayMs,
+            GameNavigationForwardInput = source.GameNavigationForwardInput,
+            GameNavigationBackwardInput = source.GameNavigationBackwardInput,
+            GameNavigationPageInputsEnabled = source.GameNavigationPageInputsEnabled,
+            GameNavigationPageForwardInput = source.GameNavigationPageForwardInput,
+            GameNavigationPageBackwardInput = source.GameNavigationPageBackwardInput,
+            GameNavigationPageSize = source.GameNavigationPageSize,
+            EventsObservationMinDelayMs = source.EventsObservationMinDelayMs,
+            EventsObservationMaxDelayMs = source.EventsObservationMaxDelayMs,
+            EventsObservationSettleMs = source.EventsObservationSettleMs,
+            EventsObservationPollMs = source.EventsObservationPollMs
+        };
     }
 
     private async Task DelayBeforeLiveAddGamesPostAsync(CancellationToken cancellationToken)

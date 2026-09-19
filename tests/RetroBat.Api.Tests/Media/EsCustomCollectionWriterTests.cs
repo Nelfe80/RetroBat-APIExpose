@@ -19,7 +19,8 @@ public class EsCustomCollectionWriterTests : IDisposable
         _reglages,
         logger: null,
         collectionsRoot: Path.Combine(_racine, "collections"),
-        stateRoot: Path.Combine(_racine, "state"));
+        stateRoot: Path.Combine(_racine, "state"),
+        esHomeRoot: Path.Combine(_racine, "es-home"));
 
     public void Dispose()
     {
@@ -189,6 +190,56 @@ public class EsCustomCollectionWriterTests : IDisposable
     {
         Assert.False(Writer().Remove("nelfeplay-scoring").SettingsChanged);
         Assert.Null(_reglages.Valeur("CollectionSystemsCustom"));
+    }
+
+    /// <summary>
+    /// ES reecrit une collection dans son format quand le joueur y touche : chemins « ~/... »
+    /// relatifs a son home, fins de ligne LF. Les memes jeux dans un autre habit ne sont pas
+    /// un changement : reecrire, puis redemander un rechargement, serait du bruit.
+    /// </summary>
+    [Fact]
+    public void Un_fichier_reecrit_par_ES_avec_les_memes_jeux_n_est_pas_un_changement()
+    {
+        var writer = Writer();
+        var home = Path.Combine(_racine, "es-home");
+        var jeu = Path.GetFullPath(Path.Combine(home, "..", "roms", "fbneo", "19xx.zip"));
+        Directory.CreateDirectory(Path.GetDirectoryName(jeu)!);
+        File.WriteAllText(jeu, "rom");
+        writer.Apply("nelfeplay-scoring", new[] { jeu });
+
+        // ES a repasse par la : meme jeu, format « ~/../roms/... » et LF.
+        var formatEs = "~/../roms/fbneo/19xx.zip" + "\n";
+        File.WriteAllText(writer.ConfigPath("nelfeplay-scoring"), formatEs);
+
+        var resultat = writer.Apply("nelfeplay-scoring", new[] { jeu });
+
+        Assert.False(resultat.FileChanged);
+        Assert.False(resultat.Changed);
+        Assert.True(writer.Owns("nelfeplay-scoring"));
+        Assert.Equal(formatEs, File.ReadAllText(writer.ConfigPath("nelfeplay-scoring")));
+    }
+
+    [Fact]
+    public void Un_fichier_reecrit_par_ES_avec_un_jeu_en_moins_est_un_changement()
+    {
+        var writer = Writer();
+        writer.Apply("nelfeplay-scoring", new[] { "E:/a/1.zip", "E:/b/2.zip" });
+
+        File.WriteAllText(writer.ConfigPath("nelfeplay-scoring"), "E:/a/1.zip" + "\n");
+
+        Assert.True(writer.Apply("nelfeplay-scoring", new[] { "E:/a/1.zip", "E:/b/2.zip" }).FileChanged);
+    }
+
+    [Fact]
+    public void Les_lignes_vides_et_les_commentaires_du_fichier_sont_ignores()
+    {
+        var writer = Writer();
+        writer.Apply("nelfeplay-scoring", new[] { "E:/a/1.zip" });
+
+        var contenu = string.Join("\n", "# ecrit par ES", "", @"E:\a\1.zip", "", "");
+        File.WriteAllText(writer.ConfigPath("nelfeplay-scoring"), contenu);
+
+        Assert.False(writer.Apply("nelfeplay-scoring", new[] { "E:/a/1.zip" }).Changed);
     }
 
     /// <summary>es_settings.cfg en memoire : le vrai store ecrit un fichier que le test n'a pas a toucher.</summary>

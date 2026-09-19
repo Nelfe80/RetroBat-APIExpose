@@ -193,7 +193,10 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 _logger?.LogInformation(
                     "Collection World Scoring : {Entrees} entrees sur {Distants} jeux ouverts et {Candidats} candidats locaux, revision {Revision}",
                     chemins.Count, manifeste.Games.Count, candidats, manifeste.Revision);
-                _runtimeState.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(8));
+                // Une collection qui apparait, change ou disparait est un nouveau systeme pour ES :
+                // seul un rechargement des gamelists la fait exister. Silencieux : le joueur n'a
+                // rien commande.
+                _runtimeState.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(8), silencieux: true);
             }
 
             var maintenant = DateTime.UtcNow;
@@ -240,7 +243,10 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         if (resultat.Changed)
         {
             _logger?.LogInformation("Collection World Scoring retiree (option coupee)");
-            _runtimeState.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(8));
+            // Une collection qui apparait, change ou disparait est un nouveau systeme pour ES :
+                // seul un rechargement des gamelists la fait exister. Silencieux : le joueur n'a
+                // rien commande.
+                _runtimeState.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(8), silencieux: true);
         }
 
         try
