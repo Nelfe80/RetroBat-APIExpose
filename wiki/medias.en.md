@@ -36,6 +36,14 @@ APIExpose scrapes **locally first**, then queries ScreenScraper only when needed
 
 The current game's entry can update **without reloading the whole list**, but only on a real visible change: image, logo or thumbnail added/replaced, localized text in the right language, freshly scraped video. Raw metadata or wrong-language text does not trigger a live refresh.
 
+## An arcade game is scraped only once
+
+The same arcade game is often installed under several folders: `mame`, `fbneo`, `neogeo`, `cps2` and so on. Its media are the same, so APIExpose shares them: when a card looks for an image, it checks its own system's store first, then the stores of the other arcade systems. If it finds the file, it uses it where it already is, without downloading or copying it again.
+
+After a scrape, the reverse happens too: if the same game exists under another arcade folder, its card is prepared for it. It will show up the next time that system refreshes its display, with nothing reloaded and no flicker.
+
+Your own media still come first, and media scraped specifically for one system always win over another system's.
+
 ## Texts and languages
 
 APIExpose manages localized entry texts: description, genre, date, developer, publisher, players, language, region, family.

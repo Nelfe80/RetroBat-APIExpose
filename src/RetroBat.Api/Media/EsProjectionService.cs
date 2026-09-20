@@ -77,6 +77,15 @@ public class EsProjectionService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            // Media partage par un autre systeme d'arcade : l'importer ici le recopierait sous
+            // media/systems/<ce systeme>, c'est-a-dire exactement le doublon que le partage
+            // evite (mesure du 2026-09-19 : 13,8 Mo pour mslug entre arcade et neogeo, 23 des
+            // 24 fichiers octet pour octet identiques). La fiche le designe la ou il est.
+            if (!string.IsNullOrWhiteSpace(need.SharedFromSystemId))
+            {
+                continue;
+            }
+
             var sourcePath = ResolveSourcePath(plan.SystemId, plan.FrontendSystemId, need, plan.GameSlug);
             if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath))
             {

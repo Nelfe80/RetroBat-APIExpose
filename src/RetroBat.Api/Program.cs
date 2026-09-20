@@ -360,6 +360,9 @@ builder.Services.AddSingleton(new MediaSidecarStore(
 builder.Services.AddSingleton<IMediaDiscoveryInvalidator, MediaDiscoveryInvalidator>();
 builder.Services.AddSingleton<EsProjectionService>();
 builder.Services.AddSingleton<MameGamelistGroupIndex>();
+// Un jeu d'arcade est un jeu d'arcade : les dossiers roms d'arcade partagent leurs medias,
+// en lecture (ne pas rescraper ce qui est deja la) comme en ecriture (peupler leur addgames).
+builder.Services.AddSingleton<ArcadeMediaSharingService>();
 builder.Services.AddSingleton<LocalScrapingPreviewService>();
 builder.Services.AddSingleton<ScreenScraperConnectionService>();
 builder.Services.AddSingleton<ScreenScraperCapabilityService>();

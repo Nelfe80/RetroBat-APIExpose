@@ -1677,6 +1677,34 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         return true;
     }
 
+    /// <summary>L'identite d'une fiche telle que la gamelist d'un systeme la porte deja.</summary>
+    public sealed record GamelistEntryIdentity(
+        string EsGameId,
+        string DisplayName,
+        IReadOnlyList<string> Regions,
+        IReadOnlyList<string> Languages);
+
+    /// <summary>
+    /// Ce que la gamelist de CE systeme sait deja de ce jeu : son gameid, son nom, ses region
+    /// et langue. Sert a porter une entree vers un autre systeme sans lui inventer une
+    /// identite (le partage des medias d'arcade, <see cref="ArcadeMediaSharingService"/>).
+    /// Lecture seule ; une gamelist absente ou illisible rend une identite vide.
+    /// </summary>
+    public GamelistEntryIdentity ReadGamelistEntryIdentity(
+        string frontendSystemId,
+        string gamePath,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(frontendSystemId) || string.IsNullOrWhiteSpace(gamePath))
+        {
+            return new GamelistEntryIdentity(string.Empty, string.Empty, [], []);
+        }
+
+        var systemRoot = Path.Combine(RetroBatPaths.RomsRoot, frontendSystemId);
+        var info = ResolveRelatedRomGamelistInfo(systemRoot, gamePath, cancellationToken);
+        return new GamelistEntryIdentity(info.EsGameId, info.DisplayName, info.RomRegions, info.RomLanguages);
+    }
+
     public string GenerateEsGameIdForPath(string frontendSystemId, string gamePath)
     {
         if (string.IsNullOrWhiteSpace(frontendSystemId) || string.IsNullOrWhiteSpace(gamePath))
@@ -1984,7 +2012,8 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                     ProjectedPath = need.ProjectedPath,
                     WasImported = need.WasImported,
                     WasProjected = need.WasProjected,
-                    WasContentChanged = need.WasContentChanged
+                    WasContentChanged = need.WasContentChanged,
+                    SharedFromSystemId = need.SharedFromSystemId
                 })
                 .ToList()
         };
@@ -3640,7 +3669,8 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                     ProjectedPath = need.ProjectedPath,
                     WasImported = need.WasImported,
                     WasProjected = need.WasProjected,
-                    WasContentChanged = need.WasContentChanged
+                    WasContentChanged = need.WasContentChanged,
+                    SharedFromSystemId = need.SharedFromSystemId
                 })
                 .ToList()
         };
@@ -3800,6 +3830,17 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         return (value ?? string.Empty).Trim().ToLowerInvariant();
     }
 
+    /// <summary>
+    /// Combien de fiches en attente peuvent accompagner la fiche courante dans un meme
+    /// fragment. Les passagers etaient rares (un scrap differe, une fiche bloquee par une
+    /// partie) ; depuis que les systemes d'arcade se partagent leurs medias
+    /// (<see cref="ArcadeMediaSharingService"/>), un scrap de masse peut en mettre des
+    /// milliers en attente pour un meme dossier roms. Un fragment de cette taille ferait
+    /// repeupler toute la liste d'ES d'un coup. Les plus anciens partent d'abord, le reste
+    /// attend le rafraichissement suivant : rien n'est perdu, seulement etale.
+    /// </summary>
+    private const int MaxDirtyLiveGamelistPassengers = 24;
+
     private List<DirtyLiveGamelistPlan> CollectDirtyLiveGamelistBatch(MediaProjectionPlan currentPlan, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -3810,6 +3851,7 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                 string.Equals(dirty.FrontendSystemId, currentPlan.FrontendSystemId, StringComparison.OrdinalIgnoreCase) &&
                 !string.Equals(dirty.Key, currentKey, StringComparison.OrdinalIgnoreCase))
             .OrderBy(dirty => dirty.LastUpdatedUtc)
+            .Take(MaxDirtyLiveGamelistPassengers)
             .ToList();
     }
 

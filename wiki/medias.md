@@ -36,6 +36,14 @@ APIExpose scrape **localement d'abord**, puis interroge ScreenScraper seulement 
 
 La fiche du jeu courant peut se mettre à jour **sans recharger toute la liste**, mais seulement quand il y a un vrai changement visible : image, logo ou vignette ajoutés/remplacés, texte localisé dans la bonne langue, vidéo fraîchement scrapée. Les métadonnées brutes ou dans une mauvaise langue ne déclenchent pas de rafraîchissement.
 
+## Un jeu d'arcade n'est scrapé qu'une fois
+
+Le même jeu d'arcade est souvent installé sous plusieurs dossiers : `mame`, `fbneo`, `neogeo`, `cps2`… Ses médias sont les mêmes, alors APIExpose les partage : quand une fiche cherche une image, il regarde d'abord dans le store de son système, puis dans celui des autres systèmes d'arcade. S'il la trouve, il l'utilise là où elle est, sans la retélécharger ni la recopier.
+
+Après un scrap, l'inverse se produit aussi : si le même jeu est présent sous un autre dossier d'arcade, sa fiche est préparée pour lui. Elle se mettra à jour la prochaine fois que ce système rafraîchira son affichage, sans rien recharger ni faire clignoter l'interface.
+
+Vos médias gardent la priorité, et un média scrapé spécialement pour un système passe toujours devant celui d'un autre.
+
 ## Textes et langues
 
 APIExpose gère les textes localisés des fiches : description, genre, date, développeur, éditeur, joueurs, langue, région, famille.

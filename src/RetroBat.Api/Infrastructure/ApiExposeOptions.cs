@@ -125,6 +125,36 @@ public class ApiExposeOptions
         /// </summary>
         public bool RefreshDetachedViewWithF5 { get; set; } = true;
 
+        /// <summary>
+        /// Un jeu d'arcade est un jeu d'arcade : le meme dump vit sous plusieurs dossiers roms
+        /// et ses medias sont les memes. Le store canonique ne le savait que pour mame, fbneo,
+        /// fba et hbmame, parce que ScreenScraper leur donne le meme identifiant de systeme.
+        /// neogeo, cps1/2/3, naomi et les autres avaient donc chacun leur store, et le meme
+        /// jeu y etait retelecharge.
+        ///
+        /// A true, un media introuvable dans le store du systeme est cherche dans les stores
+        /// d'arcade freres avant de conclure qu'il manque. C'est un REPLI : le store du systeme
+        /// garde la priorite, donc un media scrape specifiquement pour lui n'est jamais masque.
+        /// Rien n'est copie ni deplace, la fiche pointe le fichier la ou il est.
+        ///
+        /// Mesure du 2026-09-19 sur les index de reference : 100 % des groupes de cps1/cps2/cps3
+        /// et 94,8 % de ceux de neogeo sont deja dans arcade_lt.json. A false, chaque systeme
+        /// rescrape pour son propre compte.
+        /// </summary>
+        public bool ShareArcadeMediaAcrossSystems { get; set; } = true;
+
+        /// <summary>
+        /// Le pendant en ecriture du partage ci-dessus. Apres un scrap, quand le meme dump est
+        /// installe sous d'autres dossiers d'arcade, leur entree est mise EN ATTENTE pour eux
+        /// (lot dirty en memoire et fichier d'attente hors de roms/), afin que leur fiche soit
+        /// juste sans attendre une visite.
+        ///
+        /// Aucune gamelist n'est ecrite, aucun /addgames n'est poste, aucun F5 ni reloadgames
+        /// n'est declenche : le lot dirty n'entre pas dans la decision de delta, donc l'entree
+        /// voyage avec un rafraichissement deja autorise et n'en provoque jamais un.
+        /// </summary>
+        public bool PropagateArcadeMediaAcrossSystems { get; set; } = true;
+
         /// <summary>F3 (Super Mario World bug): ES's addgames ingestion clears a
         /// game's unknown XML elements, wiping the Roms Manager ownership tags
         /// while &lt;hidden&gt; survives - the entry becomes an orphan. Carrying

@@ -38,6 +38,7 @@ public sealed class RemoteScrapingService
     private readonly MediaRuntimeState _runtimeState;
     private readonly IEmulationStationNotificationService _notificationService;
     private readonly InterfaceTextService _interfaceTextService;
+    private readonly ArcadeMediaSharingService? _arcadeMediaSharing;
     private readonly ILogger<RemoteScrapingService>? _logger;
 
     public RemoteScrapingService(
@@ -56,8 +57,10 @@ public sealed class RemoteScrapingService
         MediaRuntimeState runtimeState,
         IEmulationStationNotificationService notificationService,
         InterfaceTextService interfaceTextService,
-        ILogger<RemoteScrapingService>? logger = null)
+        ILogger<RemoteScrapingService>? logger = null,
+        ArcadeMediaSharingService? arcadeMediaSharing = null)
     {
+        _arcadeMediaSharing = arcadeMediaSharing;
         _options = options;
         _settingsService = settingsService;
         _runtimeOptions = runtimeOptions;
@@ -610,6 +613,14 @@ public sealed class RemoteScrapingService
                         },
                         scrapeCancellationToken);
                 }
+            }
+
+            if (result.RequiresGamelistPersistence && _arcadeMediaSharing != null)
+            {
+                // Le meme dump est peut-etre installe sous d'autres dossiers d'arcade : leur
+                // entree est mise en attente pour eux. Aucune gamelist ecrite, aucun addgames
+                // poste : cela PEUPLE le prochain rafraichissement de ces systemes.
+                await _arcadeMediaSharing.PropagateAsync(plan, scrapeCancellationToken);
             }
 
             if (result.TextUpdated || result.RequiresGamelistPersistence)

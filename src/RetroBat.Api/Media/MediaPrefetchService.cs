@@ -29,6 +29,7 @@ public class MediaPrefetchService : IMediaPrefetchService
     private readonly InterfaceTextService _interfaceTextService;
     private readonly MameGamelistGroupIndex _mameGamelistGroupIndex;
     private readonly ScreenScraperRawCacheMetadataService _rawCacheMetadataService;
+    private readonly ArcadeMediaSharingService? _arcadeMediaSharing;
     private readonly ILogger<MediaPrefetchService>? _logger;
 
     public MediaPrefetchService(
@@ -48,8 +49,10 @@ public class MediaPrefetchService : IMediaPrefetchService
         InterfaceTextService interfaceTextService,
         MameGamelistGroupIndex mameGamelistGroupIndex,
         ScreenScraperRawCacheMetadataService rawCacheMetadataService,
-        ILogger<MediaPrefetchService>? logger = null)
+        ILogger<MediaPrefetchService>? logger = null,
+        ArcadeMediaSharingService? arcadeMediaSharing = null)
     {
+        _arcadeMediaSharing = arcadeMediaSharing;
         _systemIdNormalizer = systemIdNormalizer;
         _gameNameNormalizer = gameNameNormalizer;
         _mediaAliasStore = mediaAliasStore;
@@ -523,6 +526,31 @@ public class MediaPrefetchService : IMediaPrefetchService
                         gameSlug,
                         need.Kind,
                         source);
+                }
+            }
+
+            // Dernier recours avant de declarer le media manquant : les autres systemes
+            // d'arcade. Le meme dump vit sous plusieurs dossiers roms et le store suivait
+            // l'identifiant de systeme de ScreenScraper, pas le jeu : neogeo retelechargeait
+            // ce que arcade avait deja.
+            if (string.IsNullOrWhiteSpace(source) && _arcadeMediaSharing != null)
+            {
+                var partage = _arcadeMediaSharing.ResolveSharedSource(
+                    frontendSystemId,
+                    systemId,
+                    game.GamePath,
+                    gameSlug,
+                    need.Kind);
+                if (partage != null)
+                {
+                    source = partage.Path;
+                    need.ExistingPath = partage.Path;
+                    // Le media existe : sans cela, la fiche serait declaree incomplete et
+                    // partirait en scrap distant pour ce que le disque porte deja.
+                    need.IsMissing = false;
+                    // Et il reste ou il est : l'import canonique le sauterait sinon vers le
+                    // store de ce systeme, ce qui recreerait le doublon.
+                    need.SharedFromSystemId = partage.SystemId;
                 }
             }
         }

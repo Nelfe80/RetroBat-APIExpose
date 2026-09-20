@@ -29,6 +29,7 @@ public sealed class RemoteScrapeQueueService : BackgroundService
     private readonly MediaRuntimeState _runtimeState;
     private readonly IEmulationStationNotificationService _notificationService;
     private readonly InterfaceTextService _interfaceTextService;
+    private readonly ArcadeMediaSharingService? _arcadeMediaSharing;
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly ILogger<RemoteScrapeQueueService>? _logger;
 
@@ -53,8 +54,10 @@ public sealed class RemoteScrapeQueueService : BackgroundService
         IEmulationStationNotificationService notificationService,
         InterfaceTextService interfaceTextService,
         IOptionsMonitor<ApiExposeOptions> options,
-        ILogger<RemoteScrapeQueueService>? logger = null)
+        ILogger<RemoteScrapeQueueService>? logger = null,
+        ArcadeMediaSharingService? arcadeMediaSharing = null)
     {
+        _arcadeMediaSharing = arcadeMediaSharing;
         _runtimeOptions = runtimeOptions;
         _connectionService = connectionService;
         _capabilityService = capabilityService;
@@ -344,6 +347,12 @@ public sealed class RemoteScrapeQueueService : BackgroundService
                 MarkPendingGamelistPersistence(item.Plan);
                 _gamelistUpdateService.MarkLiveGamelistDirty(item.Plan);
                 await _gamelistUpdateService.StageExtendedEntriesAsync(item.Plan, linkedCts.Token);
+                if (_arcadeMediaSharing != null)
+                {
+                    // Le meme dump sous d'autres dossiers d'arcade : on peuple leur addgames a
+                    // venir, sans ecrire de gamelist ni poster quoi que ce soit.
+                    await _arcadeMediaSharing.PropagateAsync(item.Plan, linkedCts.Token);
+                }
             }
 
             if (result.TextUpdated || result.RequiresGamelistPersistence)
@@ -619,7 +628,8 @@ public sealed class RemoteScrapeQueueService : BackgroundService
                     ProjectedPath = need.ProjectedPath,
                     WasImported = need.WasImported,
                     WasProjected = need.WasProjected,
-                    WasContentChanged = need.WasContentChanged
+                    WasContentChanged = need.WasContentChanged,
+                    SharedFromSystemId = need.SharedFromSystemId
                 })
                 .ToList()
         };

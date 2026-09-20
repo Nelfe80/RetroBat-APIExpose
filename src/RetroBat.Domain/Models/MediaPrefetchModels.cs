@@ -228,6 +228,14 @@ public class MediaNeed
     public bool WasImported { get; set; }
     public bool WasProjected { get; set; }
     public bool WasContentChanged { get; set; }
+
+    /// <summary>
+    /// Le store d'un AUTRE systeme d'arcade qui fournit ce media (« arcade » quand un jeu
+    /// neogeo reprend ce que mame et fbneo ont deja). Renseigne, il dit que le fichier ne doit
+    /// pas etre recopie dans le store du systeme courant : la fiche le designe la ou il est.
+    /// Vide dans tous les autres cas.
+    /// </summary>
+    public string SharedFromSystemId { get; set; } = string.Empty;
 }
 
 public class MediaProjectionPlan
