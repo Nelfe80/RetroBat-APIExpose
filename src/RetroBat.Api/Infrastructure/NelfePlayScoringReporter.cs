@@ -454,12 +454,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // eteint, ou pris de court, il reste a prevenir avant que le joueur ne joue pour rien.
             var dangers = _certified?.DangersFrontendActifs() ?? Array.Empty<string>();
             string message;
-            if (!certifiable)
-                message = $"⚠️ Partie non certifiable — {ReasonToText(reason)}";
+            // Un emulateur inconnu ne fait plus perdre la partie : le score sera garde et
+            // entrera au classement quand le build sera reconnu. On le dit AVANT, sinon le
+            // joueur croit jouer pour rien et s'arrete.
+            if (!certifiable && reason == "profile.core_mismatch")
+                message = "Émulateur pas encore reconnu : ton score sera gardé et classé dès qu'il le sera";
+            else if (!certifiable)
+                message = $"Partie non certifiable : {ReasonToText(reason)}";
             else if (dangers.Count > 0)
-                message = $"⚠️ Partie non certifiable — {string.Join(", ", dangers)} : à désactiver dans les options RetroBat de ce jeu";
+                message = $"Partie non certifiable : {string.Join(", ", dangers)}, à désactiver dans les options RetroBat de ce jeu";
             else
-                message = force ? "🏆 Partie certifiable, réglages certifiés appliqués" : "🏆 Partie certifiable pour le classement";
+                message = force ? "Partie certifiable, réglages certifiés appliqués" : "Partie certifiable pour le classement";
             await _esNotify.NotifyAsync(message, ct).ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -979,11 +984,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
             var message = status switch
             {
-                "published" => $"🏆 Score certifié : {score:N0} publié" + (rank is int r ? $" (#{r})" : ""),
+                "published" => $"Score certifié : {score:N0} publié" + (rank is int r ? $" (#{r})" : ""),
                 // Signalé : gardé sur le compte du joueur, jamais classé ni ancré. Il sait pourquoi.
-                "held" => $"⚠️ Score {score:N0} signalé, non classé — {ReasonToText(reason)}",
-                "refused" => $"❌ Score {score:N0} refusé — {ReasonToText(reason)}",
-                _ => $"⚠️ Score non transmis — {ReasonToText(reason)}",
+                "held" => $"Score {score:N0} signalé, non classé : {ReasonToText(reason)}",
+                // La quarantaine n'est PAS un refus : le score est garde avec son passeport
+                // signe et entrera au classement des que l'emulateur sera reconnu. Le dire
+                // ainsi change tout pour le joueur, qui a joue et qui garde quelque chose.
+                "quarantined" => $"Score {score:N0} enregistré, en attente : ton émulateur n'est pas encore reconnu",
+                "expired" => $"Score {score:N0} non classé : {ReasonToText(reason)}",
+                "refused" => $"Score {score:N0} refusé : {ReasonToText(reason)}",
+                _ => $"Score non transmis : {ReasonToText(reason)}",
             };
             await _esNotify.NotifyAsync(message, cancellationToken).ConfigureAwait(false);
         }
@@ -1103,6 +1113,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "plausibility.statistical_hold" => "score retenu pour vérification",
         "runtime.module_unauthorized" => "logiciel non homologué",
         "profile.core_mismatch" => "émulateur non reconnu",
+        "emulator.unknown" => "émulateur pas encore reconnu",
+        "emulator.never_recognised" => "émulateur jamais reconnu, attente close",
+        "emulator.profile_moved" => "le règlement du jeu a changé pendant l'attente",
+        "emulator.rejected" => "émulateur écarté",
         "profile.content_mismatch" => "ROM non reconnue",
         "profile.mem_mismatch" => "définition mémoire non reconnue",
         "profile.core_options_mismatch" => "réglages non conformes (usine requis)",
