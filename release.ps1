@@ -3,9 +3,11 @@
 #   .\release.ps1                # construit les archives + release DRAFT
 #   .\release.ps1 -Publish      # publie directement (sans draft)
 #   .\release.ps1 -PackageOnly  # construit seulement les archives
+#   .\release.ps1 -SansInstalleur  # publie sans l'installeur de borne (voir plus bas)
 param(
     [switch]$Publish,
-    [switch]$PackageOnly
+    [switch]$PackageOnly,
+    [switch]$SansInstalleur
 )
 $ErrorActionPreference = 'Stop'
 $sz = @('C:\Program Files\7-Zip\7z.exe','C:\Program Files (x86)\7-Zip\7z.exe') | Where-Object { Test-Path $_ } | Select-Object -First 1
@@ -245,6 +247,36 @@ Write-Host ($hashes -join "`n")
 
 if ($PackageOnly) { Write-Host 'PackageOnly : archives pretes, pas de release.'; exit 0 }
 
+# ── L'INSTALLEUR DE BORNE DOIT PARTIR AVEC LA RELEASE ───────────────────────────────────────
+# Il est compile a part (Inno Setup), pas par ce script, et c'est par lui que passe CHAQUE
+# nouveau joueur : la page /setup de nelfeplay.com telecharge la derniere release qui en porte
+# un. Publier sans lui casse cette page en silence, ce qui est arrive de 1.7.5 a 1.7.8 puis
+# avec la 1.8.15 (l'installeur avait ete compile quinze minutes APRES la publication).
+#
+# Deux verifications, parce qu'un installeur present peut etre un installeur perime :
+#   - sa version doit etre celle qu'on publie (le .iss porte la sienne, mise a jour a la main) ;
+#   - il doit etre plus recent que RetroBat.Api.exe, sinon il embarque le programme d'avant.
+$setup = Join-Path $PSScriptRoot 'dist\APIExpose-Cabinet-Setup.exe'
+$setupFile = $null
+if ($SansInstalleur) {
+    Write-Warning "Publication SANS installeur de borne : /setup servira la version precedente."
+} else {
+    $commande = '& "C:\Program Files\Inno Setup 7\ISCC.exe" installer\CabinetSetup.iss'
+    if (-not (Test-Path $setup)) {
+        throw "Installeur de borne absent ($setup).`nLe compiler puis relancer :`n    $commande`nSinon : .\release.ps1 -SansInstalleur"
+    }
+    $setupFile = Get-Item $setup
+    # Interpolation plutot que ?? : ce script doit rester lisible par Windows PowerShell 5.1.
+    $setupVer = "$($setupFile.VersionInfo.ProductVersion)".Trim()
+    if ($setupVer -ne $ver) {
+        throw "Installeur en version '$setupVer' alors qu'on publie '$ver'.`nMettre a jour #define AppVersion dans installer\CabinetSetup.iss, recompiler :`n    $commande"
+    }
+    if ($setupFile.LastWriteTime -lt (Get-Item $exe).LastWriteTime) {
+        throw "Installeur compile le $($setupFile.LastWriteTime) alors que RetroBat.Api.exe date du $((Get-Item $exe).LastWriteTime) : il embarque le programme d'avant.`nRecompiler :`n    $commande"
+    }
+    Write-Host ("Installeur de borne : OK ({0:N0} Mo, compile le {1})" -f ($setupFile.Length / 1MB), $setupFile.LastWriteTime)
+}
+
 $notes = @"
 Voir le wiki pour l'installation : https://nelfe80.github.io/RetroBat-APIExpose/
 
@@ -252,7 +284,8 @@ Voir le wiki pour l'installation : https://nelfe80.github.io/RetroBat-APIExpose/
 |---|---|
 | ``$name-$ver-full.7z`` | Programme + tools + Data Pack complet (premiere installation) |
 | ``$name-$ver-update.7z`` | Programme seul (mise a jour) |
-| ``SHA256SUMS.txt`` | Empreintes, lues par ``RetroBat.Api.Update.exe`` |
+| ``SHA256SUMS.txt`` | Empreintes, lues par ``RetroBat.Api.Update.exe`` |$(if ($setupFile) { "
+| ``APIExpose-Cabinet-Setup.exe`` | Installeur de borne (c'est ce que sert https://nelfeplay.com/download/apiexpose) |" })
 
 Mise a jour depuis la borne : lancer ``RetroBat.Api.Update.exe`` a la racine d'APIExpose.
 
@@ -270,6 +303,7 @@ $ghArgs = @('release', 'create', "v$ver",
 if (-not $Publish) { $ghArgs += '--draft' }
 $ghArgs += @($full, $update, $swaggerFile, $sumsFile)
 if ($asyncapiFile) { $ghArgs += $asyncapiFile }
+if ($setupFile) { $ghArgs += $setupFile.FullName }
 & gh @ghArgs
 if ($LASTEXITCODE -ne 0) { throw "gh release create a echoue (exit $LASTEXITCODE)." }
 Write-Host "Release v$ver creee$(if (-not $Publish) { ' (draft, a publier sur GitHub)' })."
