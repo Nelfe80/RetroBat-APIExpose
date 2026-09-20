@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -242,6 +242,54 @@ public sealed class EsCustomCollectionWriter
         {
             return chemin.Replace('\\', '/');
         }
+    }
+
+    /// <summary>
+    /// Reinscrit dans <c>CollectionSystemsCustom</c> toutes les collections qu'on gere.
+    ///
+    /// POURQUOI. EmulationStation lit ses reglages a son demarrage et les REECRIT depuis sa
+    /// memoire a sa fermeture. Notre inscription, faite pendant qu'il tourne, etait donc
+    /// effacee au moment ou il se ferme : la collection n'apparaissait jamais, et il fallait
+    /// aller la cocher a la main dans le menu des collections. Appelee APRES la sortie d'ES,
+    /// cette reinscription tombe dans la seule fenetre ou le fichier nous appartient, et la
+    /// collection est la au demarrage suivant.
+    /// </summary>
+    public int ReinscrireDansReglages()
+    {
+        if (!Directory.Exists(_stateRoot))
+        {
+            return 0;
+        }
+
+        var reinscrites = 0;
+        foreach (var fichier in Directory.EnumerateFiles(_stateRoot, "collection-*.json"))
+        {
+            EsCustomCollectionState? etat;
+            try
+            {
+                etat = JsonSerializer.Deserialize<EsCustomCollectionState>(File.ReadAllText(fichier), JsonOptions);
+            }
+            catch (Exception)
+            {
+                continue;   // un etat illisible ne doit pas empecher les autres
+            }
+
+            var nom = etat?.Collection;
+            if (string.IsNullOrWhiteSpace(nom) || etat?.ListedInSettings != true)
+            {
+                continue;
+            }
+
+            if (_settingsStore.Update(document => EsCustomCollectionSettings.Add(EnsureRoot(document), nom)))
+            {
+                reinscrites++;
+                _logger?.LogInformation(
+                    "Collection ES « {Collection} » reinscrite dans CollectionSystemsCustom apres la sortie d'EmulationStation.",
+                    nom);
+            }
+        }
+
+        return reinscrites;
     }
 
     public EsCustomCollectionState? ReadState(string collectionName)

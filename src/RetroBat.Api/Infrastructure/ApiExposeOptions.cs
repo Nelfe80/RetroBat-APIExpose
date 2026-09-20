@@ -1,4 +1,4 @@
-namespace RetroBat.Api.Infrastructure;
+﻿namespace RetroBat.Api.Infrastructure;
 
 public class ApiExposeOptions
 {
@@ -53,7 +53,7 @@ public class ApiExposeOptions
 
     public class ScrapingOptions
     {
-        public bool AutoScrapingEnabled { get; set; } = true;
+        public bool AutoScrapingEnabled { get; set; } = false;
         public string RemoteProvider { get; set; } = "screenscraper";
         public bool ScreenScraperEnabled { get; set; } = true;
         public bool ScrapeQueueEnabled { get; set; } = true;

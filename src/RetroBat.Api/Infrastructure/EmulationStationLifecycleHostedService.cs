@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using RetroBat.Api.Media;
@@ -25,6 +25,7 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
     private int? _startupF5SentForProcessId;
 
     private readonly GamelistUpdateService _gamelistUpdateService;
+    private readonly RetroBat.Api.Media.EsCustomCollectionWriter _esCustomCollectionWriter;
     private readonly IEventBus _eventBus;
 
     public EmulationStationLifecycleHostedService(
@@ -32,6 +33,7 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
         EsControllerInputBackendProvider backendProvider,
         MediaRuntimeState runtimeState,
         GamelistUpdateService gamelistUpdateService,
+        RetroBat.Api.Media.EsCustomCollectionWriter esCustomCollectionWriter,
         IEventBus eventBus,
         IHostApplicationLifetime applicationLifetime,
         IOptionsMonitor<ApiExposeOptions> options,
@@ -41,6 +43,7 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
         _backendProvider = backendProvider;
         _runtimeState = runtimeState;
         _gamelistUpdateService = gamelistUpdateService;
+        _esCustomCollectionWriter = esCustomCollectionWriter;
         _eventBus = eventBus;
         _applicationLifetime = applicationLifetime;
         _options = options;
@@ -200,6 +203,29 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
                 result.RemovedSystemPanelFeatureCount,
                 result.RemovedLocaleCount,
                 result.Warnings.Count);
+        }
+
+        // LA SEULE FENETRE OU es_settings.cfg NOUS APPARTIENT.
+        //
+        // EmulationStation lit ses reglages au demarrage et les REECRIT depuis sa memoire en se
+        // fermant. Une collection inscrite pendant qu'il tourne etait donc effacee a l'instant
+        // ou il partait : elle n'apparaissait jamais, et il fallait aller la cocher a la main
+        // dans le menu des collections (constate par l'utilisateur le 2026-09-20). Ici, ES a
+        // fini d'ecrire et nous ne sommes pas encore arretes : la reinscription tient, et la
+        // collection est la au demarrage suivant.
+        try
+        {
+            var reinscrites = _esCustomCollectionWriter.ReinscrireDansReglages();
+            if (reinscrites > 0)
+            {
+                _logger.LogInformation(
+                    "{Count} collection(s) ES reinscrite(s) apres la sortie d'EmulationStation.", reinscrites);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Ne jamais empecher l'arret pour une collection.
+            _logger.LogWarning(ex, "Reinscription des collections ES impossible apres la sortie d'EmulationStation.");
         }
 
         _applicationLifetime.StopApplication();
