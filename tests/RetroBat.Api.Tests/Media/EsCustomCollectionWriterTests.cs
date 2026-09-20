@@ -1,4 +1,4 @@
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using RetroBat.Api.Media;
 using RetroBat.Domain.Interfaces;
 using Xunit;
@@ -26,6 +26,39 @@ public class EsCustomCollectionWriterTests : IDisposable
     {
         try { Directory.Delete(_racine, recursive: true); } catch { }
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// EmulationStation reecrit ses reglages en se fermant, depuis sa memoire : l'inscription
+    /// faite pendant qu'il tournait disparait alors, et la collection n'apparait jamais. On la
+    /// repose apres sa sortie. Ce test prouve que la reinscription retrouve bien la collection
+    /// apres un effacement, et qu'elle ne se laisse pas abuser par les etats VOISINS ranges au
+    /// meme endroit (les assets de theme portent le meme nom de collection).
+    /// </summary>
+    [Fact]
+    public void Reinscrit_la_collection_apres_qu_es_a_reecrit_ses_reglages()
+    {
+        var writer = Writer();
+        writer.Apply("nelfeplay-scoring", new[] { @"E:\RetroBat\roms\fbneo\19xx.zip" });
+        Assert.Contains("nelfeplay-scoring", _reglages.Valeur("CollectionSystemsCustom"));
+
+        // Un etat voisin, qui porte le meme nom de collection mais n'est pas une inscription.
+        File.WriteAllText(
+            Path.Combine(_racine, "state", "collection-assets-nelfeplay-scoring.json"),
+            "{\"collection\": \"pas-une-collection\", \"files\": []}");
+
+        // EmulationStation se ferme et REECRIT le reglage depuis sa memoire : notre nom, ajoute
+        // pendant qu'il tournait, n'en fait pas partie et disparait donc.
+        _reglages.Reecrire("CollectionSystemsCustom", "Street Fighter,mario");
+        Assert.DoesNotContain("nelfeplay-scoring", _reglages.Valeur("CollectionSystemsCustom"));
+
+        var reinscrites = writer.ReinscrireDansReglages();
+
+        Assert.Equal(1, reinscrites);
+        Assert.Contains("nelfeplay-scoring", _reglages.Valeur("CollectionSystemsCustom"));
+        Assert.DoesNotContain("pas-une-collection", _reglages.Valeur("CollectionSystemsCustom"));
+        // Ce que le joueur avait coche lui-meme n'a pas bouge.
+        Assert.Contains("Street Fighter", _reglages.Valeur("CollectionSystemsCustom"));
     }
 
     [Fact]
@@ -254,6 +287,20 @@ public class EsCustomCollectionWriterTests : IDisposable
 
         public void Poser(string cle, string valeur) => _document.Root!.Add(
             new XElement("string", new XAttribute("name", cle), new XAttribute("value", valeur)));
+
+        /// <summary>Ce que fait EmulationStation en se fermant : il REPOSE la valeur telle qu'il
+        /// l'avait en memoire, ecrasant ce qui a ete ajoute pendant qu'il tournait.</summary>
+        public void Reecrire(string cle, string valeur)
+        {
+            foreach (var element in _document.Root!.Elements()
+                         .Where(e => string.Equals(e.Attribute("name")?.Value, cle, StringComparison.OrdinalIgnoreCase))
+                         .ToList())
+            {
+                element.Remove();
+            }
+
+            Poser(cle, valeur);
+        }
 
         public bool Update(Func<XDocument, bool> update, CancellationToken cancellationToken = default)
             => update(_document);
