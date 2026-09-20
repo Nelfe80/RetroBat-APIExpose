@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RetroBat.Api.Infrastructure;
+using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Models;
 using RetroBat.Domain.Paths;
 
@@ -44,6 +45,7 @@ public sealed class ArcadeMediaSharingService
     private readonly SystemIdNormalizer _systemIdNormalizer;
     private readonly MameGamelistGroupIndex _groupIndex;
     private readonly GamelistUpdateService _gamelistUpdateService;
+    private readonly ILocalizedTextStore _localizedTextStore;
     private readonly MediaRuntimeState _runtimeState;
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly ILogger<ArcadeMediaSharingService>? _logger;
@@ -60,10 +62,12 @@ public sealed class ArcadeMediaSharingService
         SystemIdNormalizer systemIdNormalizer,
         MameGamelistGroupIndex groupIndex,
         GamelistUpdateService gamelistUpdateService,
+        ILocalizedTextStore localizedTextStore,
         MediaRuntimeState runtimeState,
         IOptionsMonitor<ApiExposeOptions> options,
         ILogger<ArcadeMediaSharingService>? logger = null)
     {
+        _localizedTextStore = localizedTextStore;
         _projectionService = projectionService;
         _systemRules = systemRules;
         _systemIdNormalizer = systemIdNormalizer;
@@ -128,6 +132,94 @@ public sealed class ArcadeMediaSharingService
         }
 
         return null;
+    }
+
+    /// <summary>Les textes d'un jeu trouves chez un autre systeme d'arcade.</summary>
+    public sealed record SharedText(string SystemId, string Slug);
+
+    /// <summary>
+    /// La description, le genre, l'editeur de ce jeu, cherches dans les stores arcade FRERES.
+    /// Appele quand le store du systeme n'a pas encore de texte utilisable.
+    ///
+    /// Mesure du 2026-09-20 sur Three Wonders : ses textes etaient dans le store cps1 (Capcom,
+    /// Compilation, 1-2 joueurs, 1991), sa fiche mame affichait « Inconnu », et le scrap est
+    /// parti les chercher chez ScreenScraper pendant 30 s. Pire, l'unique addgames de la fiche
+    /// etait deja parti avec les seules images : le texte, arrive apres, ne pouvait plus entrer.
+    ///
+    /// Le scrap distant n'est PAS annule pour autant : le store du systeme reste vide, donc la
+    /// demande part toujours en fond et son resultat, plus cible, s'affichera a la visite
+    /// suivante. On montre vite ce qu'on a, on affine ensuite.
+    /// </summary>
+    public SharedText? ResolveSharedText(
+        string frontendSystemId,
+        string systemId,
+        string gamePath,
+        string gameSlug,
+        string requestedLanguage,
+        CancellationToken cancellationToken)
+    {
+        if (!_options.CurrentValue.Scraping.ShareArcadeMediaAcrossSystems ||
+            string.IsNullOrWhiteSpace(gameSlug) ||
+            !EstArcade(frontendSystemId, systemId))
+        {
+            return null;
+        }
+
+        var storeCourant = string.IsNullOrWhiteSpace(systemId) ? string.Empty : systemId.Trim().ToLowerInvariant();
+        foreach (var store in _storesArcade.Value)
+        {
+            if (string.Equals(store, storeCourant, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            foreach (var slug in SlugsAChercher(frontendSystemId, gamePath, gameSlug))
+            {
+                if (!ATexteUtilisable(store, slug, requestedLanguage, cancellationToken))
+                {
+                    continue;
+                }
+
+                _logger?.LogInformation(
+                    "Textes arcade partages depuis un autre systeme ; la fiche s'affiche sans attendre pour system={SystemId}, game={GameSlug}, store={Store}, slug={Slug}.",
+                    frontendSystemId,
+                    gameSlug,
+                    store,
+                    slug);
+                return new SharedText(store, slug);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Un texte n'est retenu que s'il porte vraiment quelque chose a lire, et dans la langue
+    /// demandee : ni repli sur une autre langue, ni repli sur l'anglais, exactement la regle du
+    /// store du systeme. Un fichier qui n'aurait que le nom du jeu ne vaut pas un partage.
+    /// </summary>
+    private bool ATexteUtilisable(string store, string slug, string requestedLanguage, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var bundle = _localizedTextStore.LoadPreferredBundleAsync(
+                    store,
+                    slug,
+                    requestedLanguage,
+                    cancellationToken,
+                    allowAnyLanguageFallback: false,
+                    allowEnglishFallback: false)
+                .GetAwaiter()
+                .GetResult();
+            return bundle != null &&
+                bundle.Fields.TryGetValue("desc", out var description) &&
+                !string.IsNullOrWhiteSpace(description);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogDebug(ex, "Texte partage illisible pour store={Store}, slug={Slug}.", store, slug);
+            return false;
+        }
     }
 
     /// <summary>
@@ -387,6 +479,7 @@ public sealed class ArcadeMediaSharingService
             FrontendSystemId = cible.FrontendSystemId,
             GameSlug = source.GameSlug,
             TextSourceGameSlug = source.TextSourceGameSlug,
+            TextSourceSystemId = source.TextSourceSystemId,
             DisplayName = string.IsNullOrWhiteSpace(identite.DisplayName) ? source.DisplayName : identite.DisplayName,
             GamePath = cible.GamePath,
             ProjectionBaseName = source.ProjectionBaseName,

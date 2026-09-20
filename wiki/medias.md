@@ -40,6 +40,8 @@ La fiche du jeu courant peut se mettre à jour **sans recharger toute la liste**
 
 Le même jeu d'arcade est souvent installé sous plusieurs dossiers : `mame`, `fbneo`, `neogeo`, `cps2`… Ses médias sont les mêmes, alors APIExpose les partage : quand une fiche cherche une image, il regarde d'abord dans le store de son système, puis dans celui des autres systèmes d'arcade. S'il la trouve, il l'utilise là où elle est, sans la retélécharger ni la recopier.
 
+Cela vaut aussi pour les textes : description, genre, éditeur, nombre de joueurs. Si un autre dossier d'arcade connaît déjà ce jeu, la fiche s'affiche complète tout de suite au lieu de montrer des « Inconnu » le temps d'aller chercher au loin. APIExpose continue quand même à demander la version propre à ce système, en arrière-plan : elle prendra la place à votre prochain passage.
+
 Après un scrap, l'inverse se produit aussi : si le même jeu est présent sous un autre dossier d'arcade, sa fiche est préparée pour lui. Elle se mettra à jour la prochaine fois que ce système rafraîchira son affichage, sans rien recharger ni faire clignoter l'interface.
 
 Vos médias gardent la priorité, et un média scrapé spécialement pour un système passe toujours devant celui d'un autre.

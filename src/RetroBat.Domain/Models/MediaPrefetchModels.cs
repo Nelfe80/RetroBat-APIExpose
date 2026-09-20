@@ -244,6 +244,17 @@ public class MediaProjectionPlan
     public string FrontendSystemId { get; set; } = string.Empty;
     public string GameSlug { get; set; } = string.Empty;
     public string TextSourceGameSlug { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Le store d'un AUTRE systeme d'arcade qui fournit les textes de cette fiche, quand le
+    /// sien n'en a pas encore (un jeu de mame dont la description vit sous cps1). Vide sinon,
+    /// et c'est alors <see cref="SystemId"/> qui sert.
+    ///
+    /// Ce repli ne remplace pas le scrap : il fait voir tout de suite ce qui est deja la, le
+    /// scrap continue en fond pour le texte propre au systeme, et ce dernier reprend la main
+    /// des la visite suivante.
+    /// </summary>
+    public string TextSourceSystemId { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
     public string GamePath { get; set; } = string.Empty;
     public string ProjectionBaseName { get; set; } = string.Empty;

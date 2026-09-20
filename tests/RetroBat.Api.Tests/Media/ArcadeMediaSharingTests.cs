@@ -284,6 +284,49 @@ public class ArcadeMediaSharingTests : IDisposable
         Assert.Equal(string.Empty, Assert.Single(clone.Needs).SharedFromSystemId);
     }
 
+    // ── les textes voyagent comme les images ────────────────────────────────────────────
+
+    /// <summary>
+    /// Three Wonders, 2026-09-20 : ses textes vivaient dans le store cps1, sa fiche mame
+    /// affichait « Inconnu », et le scrap est parti les chercher au loin. Le store retenu pour
+    /// lire les textes doit donc pouvoir etre celui d'un autre systeme d'arcade.
+    /// </summary>
+    [Fact]
+    public void Le_store_de_texte_d_un_autre_systeme_est_porte_par_le_plan()
+    {
+        var plan = Plan("mame", Path.Combine(_racine, "mame", "3wonders.zip"));
+        plan.TextSourceSystemId = "cps1";
+        plan.TextSourceGameSlug = "3wonders";
+
+        var clone = ArcadeMediaSharingService.ClonerVers(
+            plan,
+            new ArcadeMediaSharingService.Cible("cps1", Path.Combine(_racine, "cps1", "3wonders.zip")),
+            _racine,
+            Identite(),
+            "genere");
+
+        Assert.Equal("cps1", clone.TextSourceSystemId);
+        Assert.Equal("3wonders", clone.TextSourceGameSlug);
+    }
+
+    /// <summary>
+    /// Le partage ne fige rien : des que le scrap de fond a depose le texte propre au systeme,
+    /// le champ n'est plus renseigne et c'est le store du systeme qui sert de nouveau.
+    /// </summary>
+    [Fact]
+    public void Sans_texte_partage_le_store_du_systeme_reste_la_source()
+    {
+        var clone = ArcadeMediaSharingService.ClonerVers(
+            Plan("mame", Path.Combine(_racine, "mame", "3wonders.zip")),
+            new ArcadeMediaSharingService.Cible("cps1", Path.Combine(_racine, "cps1", "3wonders.zip")),
+            _racine,
+            Identite(),
+            "genere");
+
+        Assert.Equal(string.Empty, clone.TextSourceSystemId);
+        Assert.Equal("arcade", clone.SystemId);
+    }
+
     // ── ne pas repeupler a l'identique ──────────────────────────────────────────────────
 
     [Fact]

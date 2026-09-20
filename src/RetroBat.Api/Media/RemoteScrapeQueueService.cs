@@ -595,6 +595,7 @@ public sealed class RemoteScrapeQueueService : BackgroundService
             FrontendSystemId = source.FrontendSystemId,
             GameSlug = source.GameSlug,
             TextSourceGameSlug = source.TextSourceGameSlug,
+            TextSourceSystemId = source.TextSourceSystemId,
             DisplayName = source.DisplayName,
             GamePath = source.GamePath,
             ProjectionBaseName = source.ProjectionBaseName,

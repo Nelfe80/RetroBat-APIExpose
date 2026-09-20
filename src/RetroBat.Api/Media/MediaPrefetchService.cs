@@ -592,6 +592,27 @@ public class MediaPrefetchService : IMediaPrefetchService
                 cancellationToken);
         }
 
+        // Le store de CE systeme n'a pas de texte, mais un autre dossier d'arcade en a peut-etre
+        // un pour le meme jeu. On l'affiche tout de suite plutot que de laisser trois « Inconnu »
+        // le temps d'un aller-retour ScreenScraper (30 s mesurees sur Three Wonders le
+        // 2026-09-20). needsRemoteTextScrape n'est PAS remis a false : la demande part quand meme
+        // en fond, son resultat est plus cible, et il reprendra la main a la visite suivante.
+        if (needsRemoteTextScrape && _arcadeMediaSharing != null)
+        {
+            var partage = _arcadeMediaSharing.ResolveSharedText(
+                frontendSystemId,
+                systemId,
+                game.GamePath,
+                textLookupSlug,
+                requestedLanguage,
+                cancellationToken);
+            if (partage != null)
+            {
+                plan.TextSourceSystemId = partage.SystemId;
+                plan.TextSourceGameSlug = partage.Slug;
+            }
+        }
+
         plan.NeedsDescriptionScrape = needsRemoteTextScrape;
         await _projectionService.ApplyProjectionAsync(plan, cancellationToken);
 

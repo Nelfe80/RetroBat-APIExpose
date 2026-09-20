@@ -1225,7 +1225,7 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         ApplyGameIdentityElements(gameNode, plan);
         var projectedKindPaths = EmptyKindPaths();
         var kindPaths = BuildCanonicalKindPathsFromPlan(plan, systemRoot);
-        var preferredBundle = ResolvePreferredBundle(plan.SystemId, ResolveTextLookupSlug(plan), scrapingSettings.Language, cancellationToken);
+        var preferredBundle = ResolvePreferredBundle(ResolveTextLookupSystemId(plan), ResolveTextLookupSlug(plan), scrapingSettings.Language, cancellationToken);
 
         foreach (var need in plan.Needs)
         {
@@ -1979,6 +1979,7 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
             FrontendSystemId = source.FrontendSystemId,
             GameSlug = source.GameSlug,
             TextSourceGameSlug = source.TextSourceGameSlug,
+            TextSourceSystemId = source.TextSourceSystemId,
             DisplayName = source.DisplayName,
             GamePath = source.GamePath,
             ProjectionBaseName = source.ProjectionBaseName,
@@ -2363,7 +2364,7 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
             }
         }
 
-        var preferredBundle = ResolvePreferredBundle(plan.SystemId, ResolveTextLookupSlug(plan), scrapingSettings.Language, cancellationToken);
+        var preferredBundle = ResolvePreferredBundle(ResolveTextLookupSystemId(plan), ResolveTextLookupSlug(plan), scrapingSettings.Language, cancellationToken);
 
         SetLiveVisibleSlotElement(
             gameNode,
@@ -3642,6 +3643,7 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
             FrontendSystemId = source.FrontendSystemId,
             GameSlug = source.GameSlug,
             TextSourceGameSlug = source.TextSourceGameSlug,
+            TextSourceSystemId = source.TextSourceSystemId,
             DisplayName = relatedInfo.DisplayName,
             GamePath = relatedGamePath,
             ProjectionBaseName = source.ProjectionBaseName,
@@ -9099,6 +9101,19 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         return string.IsNullOrWhiteSpace(plan.TextSourceGameSlug)
             ? plan.GameSlug
             : plan.TextSourceGameSlug;
+    }
+
+    /// <summary>
+    /// Le store ou lire les textes : celui du systeme, ou celui d'un autre dossier d'arcade
+    /// quand il est le seul a en avoir (voir <see cref="ArcadeMediaSharingService"/>). Le texte
+    /// propre au systeme, quand le scrap l'aura ramene, reprend la main de lui-meme puisque ce
+    /// champ n'est alors plus renseigne.
+    /// </summary>
+    private static string ResolveTextLookupSystemId(MediaProjectionPlan plan)
+    {
+        return string.IsNullOrWhiteSpace(plan.TextSourceSystemId)
+            ? plan.SystemId
+            : plan.TextSourceSystemId;
     }
 
     private static void TryAddProjectedKind(

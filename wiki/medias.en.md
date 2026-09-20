@@ -40,6 +40,8 @@ The current game's entry can update **without reloading the whole list**, but on
 
 The same arcade game is often installed under several folders: `mame`, `fbneo`, `neogeo`, `cps2` and so on. Its media are the same, so APIExpose shares them: when a card looks for an image, it checks its own system's store first, then the stores of the other arcade systems. If it finds the file, it uses it where it already is, without downloading or copying it again.
 
+Texts are shared the same way: description, genre, publisher, number of players. If another arcade folder already knows the game, the card shows up complete straight away instead of displaying "Unknown" while data is fetched from afar. APIExpose still asks for this system's own version in the background, and it takes over on your next visit.
+
 After a scrape, the reverse happens too: if the same game exists under another arcade folder, its card is prepared for it. It will show up the next time that system refreshes its display, with nothing reloaded and no flicker.
 
 Your own media still come first, and media scraped specifically for one system always win over another system's.
