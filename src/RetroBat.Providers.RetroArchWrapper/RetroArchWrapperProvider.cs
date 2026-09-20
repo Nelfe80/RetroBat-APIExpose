@@ -557,6 +557,12 @@ public class RetroArchWrapperProvider : IProvider
                     ContentSha256 = Get("content_sha256"),
                     ContentMd5 = Get("content_md5"),
                     WrapperVersion = Get("wrapper_version"),
+                    // Ce que le coeur declare de lui-meme : sans ce couple, la plateforme voit
+                    // une empreinte opaque et ne peut que refuser un binaire qu'elle ne connait
+                    // pas. Avec lui, elle sait quelle version elle regarde et ou en verifier
+                    // l'origine chez l'editeur.
+                    CoreName = Get("core_name"),
+                    CoreVersion = Get("core_version"),
                     CoreOptions = Get("core_options"),
                     ForcedOptions = Get("forced_options"),
                     SessionNonce = Get("session_nonce"),

@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -40,6 +40,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     private string? _enrolledKeyId;
     private string? _listenerSha256, _coreSha256, _memSha256, _contentSha256, _contentMd5, _contentSha1, _wrapperVersion;
+    // Ce que le coeur declare de lui-meme : « FinalBurn Neo », « 0.289 (eb342748) ». Indice,
+    // jamais preuve - c'est l'empreinte qui tranche. Il dit QUELLE source verifier.
+    private string? _coreName, _coreVersion;
     private JsonElement? _ticket;
     private long _lastFrame;
     private long? _finalTotal;
@@ -345,6 +348,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         lock (_sync)
         {
             _listenerSha256 = _coreSha256 = _memSha256 = _contentSha256 = _contentMd5 = _contentSha1 = _wrapperVersion = null;
+            _coreName = _coreVersion = null;
             _ticket = null;
             _lastFrame = 0;
             _finalTotal = null;
@@ -354,6 +358,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     private static JsonObject Triple(string? h) => new() { ["start_sha256"] = h, ["loaded_sha256"] = h, ["end_sha256"] = h };
+
+    /// <summary>L'emulateur, avec ce qu'il declare etre. L'empreinte identifie le binaire ;
+    /// le nom et la version disent a la plateforme QUELLE source aller verifier chez l'editeur,
+    /// ce qu'une empreinte seule, opaque par construction, ne permet pas.</summary>
+    private static JsonObject CoreArtifact(string? sha, string? nom, string? version)
+    {
+        var o = Triple(sha);
+        if (!string.IsNullOrWhiteSpace(nom)) o["name"] = nom;
+        if (!string.IsNullOrWhiteSpace(version)) o["version"] = version;
+        return o;
+    }
 
     private static JsonObject ContentArtifact(string? sha, string? md5, string? sha1)
     {
@@ -377,6 +392,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _contentMd5 = GetString(root, "ContentMd5");
             _contentSha1 = GetString(root, "ContentSha1");
             _wrapperVersion = GetString(root, "WrapperVersion");
+            _coreName = GetString(root, "CoreName");
+            _coreVersion = GetString(root, "CoreVersion");
         }
         _ = PreflightAsync(root, CancellationToken.None);
     }
@@ -409,7 +426,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 ["rom_group"] = romGroup,
                 ["artifacts"] = new JsonObject
                 {
-                    ["core"] = Triple(GetString(attestation, "CoreSha256")),
+                    ["core"] = CoreArtifact(GetString(attestation, "CoreSha256"),
+                        GetString(attestation, "CoreName"), GetString(attestation, "CoreVersion")),
                     ["content"] = ContentArtifact(GetString(attestation, "ContentSha256"), GetString(attestation, "ContentMd5"), contentSha1),
                     ["mem"] = Triple(GetString(attestation, "MemSha256")),
                     ["core_options_digest"] = digest,
@@ -548,13 +566,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             return;
         }
 
-        string? listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion;
+        string? listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion;
         long? finalTotal;
         List<(long frame, long total)> trajectory;
         lock (_sync)
         {
             listenerSha = _listenerSha256; coreSha = _coreSha256; memSha = _memSha256;
             contentSha = _contentSha256; contentMd5 = _contentMd5; contentSha1 = _contentSha1; wrapperVersion = _wrapperVersion; finalTotal = _finalTotal;
+            coreName = _coreName; coreVersion = _coreVersion;
             trajectory = new List<(long, long)>(_trajectory);
         }
 
@@ -658,6 +677,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             passport = BuildPassport(
                 systemId, romGroup, sessionJson, ticket.Value, profile.Value,
                 deviceId!, deviceKey, listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion,
+                coreName, coreVersion,
                 runPeak, bestRun, nvram, bios);
             var body = passport.DeepClone()!.AsObject();
             body.Remove("signature");
@@ -675,7 +695,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private JsonObject BuildPassport(
         string systemId, string romGroup, string sessionJson, JsonElement ticket, JsonElement profile,
         string deviceId, CngDeviceKey deviceKey, string listenerSha, string? coreSha, string? memSha,
-        string? contentSha, string? contentMd5, string? contentSha1, string? wrapperVersion, long finalTotal, List<(long frame, long total)> trajectory,
+        string? contentSha, string? contentMd5, string? contentSha1, string? wrapperVersion,
+        string? coreName, string? coreVersion, long finalTotal, List<(long frame, long total)> trajectory,
         JsonArray? nvram = null, JsonObject? bios = null)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
@@ -804,7 +825,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             ["software"] = new JsonObject { ["modules"] = modules, ["modules_digest"] = modulesDigest },
             ["artifacts"] = new JsonObject
             {
-                ["core"] = Triple(coreSha), ["content"] = ContentArtifact(contentSha, contentMd5, contentSha1), ["mem"] = Triple(memSha),
+                ["core"] = CoreArtifact(coreSha, coreName, coreVersion), ["content"] = ContentArtifact(contentSha, contentMd5, contentSha1), ["mem"] = Triple(memSha),
                 ["core_options_digest"] = coreOptionsDigest,
                 ["bios"] = bios ?? new JsonObject { ["mode"] = "none" },
                 ["forced_options"] = forcedOptions,

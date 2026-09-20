@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -1131,7 +1131,7 @@ public sealed class MameLuaIngameProvider : IProvider
     {
         try
         {
-            var (listenerSha, coreSha, memSha, contentSha1) = ResolveMameIdentity(definition);
+            var (listenerSha, coreSha, memSha, contentSha1, coreVersion) = ResolveMameIdentity(definition);
             if (listenerSha is null)
             {
                 return;   // pas de listener mesurable -> pas d'attestation (le reporter n'insiste pas)
@@ -1146,6 +1146,11 @@ public sealed class MameLuaIngameProvider : IProvider
                     definition.Rom,
                     ListenerSha256 = listenerSha,
                     CoreSha256 = coreSha,
+                    // « mame_standalone » et non « mame » : ce n'est pas le meme binaire que le
+                    // coeur libretro du meme nom, et les confondre dans l'inventaire melangerait
+                    // deux moteurs qui ne se comportent pas pareil.
+                    CoreName = "mame_standalone",
+                    CoreVersion = coreVersion,
                     MemSha256 = memSha,
                     ContentSha256 = (string?)null,
                     ContentMd5 = (string?)null,
@@ -1201,13 +1206,13 @@ public sealed class MameLuaIngameProvider : IProvider
 
     // Voie A étendue à MAME. Chemins dérivés du .MEM (resources/ram/<sys>/<rom>.MEM) ;
     // repli gracieux si un fichier manque (le champ reste null, le profil le gère).
-    private (string? listener, string? core, string? mem, string? contentSha1) ResolveMameIdentity(MameLuaDefinition definition)
+    private (string? listener, string? core, string? mem, string? contentSha1, string? coreVersion) ResolveMameIdentity(MameLuaDefinition definition)
     {
         static string? Sha(string? path) =>
             (!string.IsNullOrEmpty(path) && File.Exists(path)) ? Crypto.Sha256Hex(File.ReadAllBytes(path)) : null;
 
         var memSha = Sha(definition.DefinitionFile);
-        string? listenerSha = null, coreSha = null, contentSha1 = null;
+        string? listenerSha = null, coreSha = null, contentSha1 = null, coreVersion = null;
         try
         {
             // La racine ram ne se deduit plus du .MEM : un .MEM .user\ ou .contest\ vit
@@ -1229,7 +1234,18 @@ public sealed class MameLuaIngameProvider : IProvider
                         foreach (var c in new[] { "mame64.exe", "mame.exe" })
                         {
                             var p = Path.Combine(retrobatRoot, "emulators", "mame", c);
-                            if (File.Exists(p)) { coreSha = Sha(p); break; }
+                            if (!File.Exists(p)) continue;
+                            coreSha = Sha(p);
+                            // La version DU BINAIRE MESURE, lue au meme instant : une empreinte
+                            // est opaque, elle ne dit pas quelle version elle designe. Sans elle,
+                            // un MAME inconnu ne peut que se faire refuser.
+                            try
+                            {
+                                var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo(p);
+                                coreVersion = (vi.ProductVersion ?? vi.FileVersion ?? "").Trim();
+                            }
+                            catch { }
+                            break;
                         }
                     }
                 }
@@ -1239,7 +1255,7 @@ public sealed class MameLuaIngameProvider : IProvider
         {
             _logger.LogDebug(ex, "MAME Lua : résolution d'identité partielle.");
         }
-        return (listenerSha, coreSha, memSha, contentSha1);
+        return (listenerSha, coreSha, memSha, contentSha1, coreVersion);
     }
 
     // Gamelist MAME = JSONL. Renvoie le sha1 du set == rom (= ROM programme principal, vérifié
