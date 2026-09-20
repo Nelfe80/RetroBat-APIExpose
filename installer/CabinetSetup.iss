@@ -54,7 +54,13 @@ Source: "..\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createalls
 ; wrapper\.env (drapeaux DISCOVERY et PERSO - PERSO=1 = test de .MEM perso en cours ;
 ; APIExpose recree ce fichier au demarrage). Meme regle que l'archive .7z.
 ; La configuration de la borne n'est JAMAIS écrasée (clé API, options overlay)
-Source: "..\appsettings.json"; DestDir: "{app}"; Flags: onlyifdoesntexist uninsneveruninstall
+; La configuration livree vient du DEPOT, pas de la machine qui compile. Le fichier a la
+; racine est celui de la borne de developpement : sa langue, ses collections, ses reglages
+; d'essai, et les reecritures du service de synchro. Le livrer revenait a installer la
+; configuration d'une machine particuliere chez tous ceux qui installent le plugin.
+; `appsettings.default.json` est produit par tools\build-default-settings.ps1, qui le tire de
+; HEAD : il ne peut donc pas deriver en silence.
+Source: "appsettings.default.json"; DestDir: "{app}"; DestName: "appsettings.json"; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
 ; état local (sessions RA, sauvegardes de config) - préservé à la désinstallation

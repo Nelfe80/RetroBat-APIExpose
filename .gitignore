@@ -21,6 +21,8 @@ tools/**
 # build.bat est versionne et APPELLE ce script : sans lui, un clone frais ne
 # peut pas construire de release. Il ne contient que des chemins relatifs.
 !tools/release-framework-dependent.ps1
+# Meme raison : l'installeur l'appelle pour produire la configuration livree depuis HEAD.
+!tools/build-default-settings.ps1
 !tools/**/
 !tools/**/README.txt
 
@@ -109,3 +111,6 @@ publish-tmp/
 dist/
 /RetroBat.Api.Update.exe.old
 wrapper/certified.txt
+
+# Produit par tools/build-default-settings.ps1 depuis HEAD : jamais edite a la main.
+installer/appsettings.default.json
