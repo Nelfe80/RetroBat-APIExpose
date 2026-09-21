@@ -33,6 +33,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly ClaimOverlayService? _claimOverlay;
     private readonly NelfePlayScoringSessionService? _scoringSession;
     private readonly IEmulationStationNotificationService? _esNotify;
+    /// <summary>La surimpression qui ne prend JAMAIS le focus (WS_EX_NOACTIVATE) : c'est
+    /// par la que passe tout ce qui s'affiche PENDANT une partie.</summary>
+    private readonly LiveContestOverlayService? _overlay;
     private readonly ILogger<NelfePlayScoringReporter>? _logger;
 
     private IDisposable? _subscription;
@@ -79,6 +82,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         ClaimOverlayService? claimOverlay = null,
         NelfePlayScoringSessionService? scoringSession = null,
         IEmulationStationNotificationService? esNotify = null,
+        LiveContestOverlayService? overlay = null,
         RetroBat.Api.Replay.Storage.ReplayStore? replayStore = null,
         ILogger<NelfePlayScoringReporter>? logger = null,
         RetroBat.Api.Replay.Sharing.ReplaySeedQueue? semis = null,
@@ -91,6 +95,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         _nvram = nvram;
         _bios = bios;
         _certified = certified;
+        _overlay = overlay;
         _playback = playback;
         _replayStore = replayStore;
         _semis = semis;
@@ -465,7 +470,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 message = $"Partie non certifiable : {string.Join(", ", dangers)}, à désactiver dans les options RetroBat de ce jeu";
             else
                 message = force ? "Partie certifiable, réglages certifiés appliqués" : "Partie certifiable pour le classement";
-            await _esNotify.NotifyAsync(message, ct).ConfigureAwait(false);
+            // LE PREVOL S'AFFICHE PENDANT QUE LE JEU TOURNE : il ne passe donc PAS par la
+            // notification d'EmulationStation, qui ramene ES au premier plan et sort le joueur
+            // de sa partie (vecu le 2026-09-21 : le testeur s'est retrouve sur l'ecran de
+            // selection en plein jeu). La surimpression, elle, est topmost et posee avec
+            // WS_EX_NOACTIVATE : elle s'affiche par-dessus sans jamais prendre le focus.
+            //
+            // Si elle n'est pas la, on ne dit RIEN plutot que d'ejecter : un avertissement qui
+            // interrompt la partie est pire que pas d'avertissement, et le joueur aura de toute
+            // facon le verdict a la fin, quand ES a repris la main.
+            if (_overlay is not null)
+            {
+                _overlay.ShowTop(null, message, null, 6000);
+            }
+            else
+            {
+                Trace("prevol non affiche : pas de surimpression disponible");
+            }
         }
         catch (Exception ex)
         {
