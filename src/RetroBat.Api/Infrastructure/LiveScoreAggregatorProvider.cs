@@ -211,6 +211,16 @@ public sealed class LiveScoreAggregatorProvider : IProvider
             ReadString(payload, "RawValueHex"));
         var scoreKind = ResolveMemoryScoreKind(definitionFile, address, payload, signal);
         var transform = ResolveScorePartTransform(definitionFile, address, description, value.Value, rawValueHex);
+        if (transform is null)
+        {
+            // Declare BCD, mais un quartet vaut A-F : ce n'est pas un score, c'est de la RAM
+            // qui n'a pas encore ete initialisee (MAME au demarrage). On n'en fait rien, la
+            // part garde sa derniere valeur lisible. Retomber sur la valeur binaire, comme
+            // avant, faisait entrer 0xF0C090 = 15 777 936 dans la trajectoire de Ms. Pac-Man
+            // pendant deux lectures, et « le meilleur run » retenait ce pic (2026-09-22).
+            _logger.LogDebug("Score part ignored: {Address} declared BCD but raw {Raw} has a non-decimal nibble.", address, rawValueHex);
+            return;
+        }
         var sourceKey = NormalizeMemoryScoreGroupKey(action, description, address);
         // Cle de part par adresse NORMALISEE : deux entrees .MEM sur la meme
         // adresse (« 0X52 » u16be et « 0X0052 » u8 dans asteroids) doivent
@@ -594,7 +604,7 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         return baseMagnitude;
     }
 
-    private ScorePartTransform ResolveScorePartTransform(
+    private ScorePartTransform? ResolveScorePartTransform(
         string definitionFile,
         string address,
         string description,
@@ -686,9 +696,13 @@ public sealed class LiveScoreAggregatorProvider : IProvider
             return MakeScorePart(value, 1, isBcd, rawValueHex);
         }
 
-        var bcdValue = DecodeBcdByte(rawValueHex, value);
+        var bcdValue = DecodeBcdByte(rawValueHex);
+        if (bcdValue is null)
+        {
+            return null;
+        }
         var weight = Pow10((scoreRules.Count - index - 1) * 2);
-        return new ScorePartTransform(bcdValue, weight, "bcd-pairs");
+        return new ScorePartTransform(bcdValue.Value, weight, "bcd-pairs");
     }
 
     // Two place names for one byte, separated by a comma / "and" / slash - the DOFLinx
@@ -702,7 +716,7 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         string description,
         string rawValueHex,
         long fallbackValue,
-        out ScorePartTransform transform)
+        out ScorePartTransform? transform)
     {
         transform = new ScorePartTransform(fallbackValue, 1, string.Empty);
         var match = PlacePairRegex.Match(description);
@@ -714,7 +728,8 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         var weight = Math.Min(
             PlaceWeight(match.Groups["m1"].Value),
             PlaceWeight(match.Groups["m2"].Value));
-        transform = new ScorePartTransform(DecodeBcdByte(rawValueHex, fallbackValue), weight, "bcd-pair");
+        var pair = DecodeBcdByte(rawValueHex);
+        transform = pair is null ? null : new ScorePartTransform(pair.Value, weight, "bcd-pair");
         return true;
     }
 
@@ -740,15 +755,21 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         => description.Contains("bcd", StringComparison.OrdinalIgnoreCase)
            || description.Contains("binary coded decimal", StringComparison.OrdinalIgnoreCase);
 
-    private static ScorePartTransform MakeScorePart(long value, long weight, bool isBcd, string rawValueHex)
-        => isBcd
-            ? new ScorePartTransform(DecodeBcdWide(rawValueHex, value), weight, "bcd")
-            : new ScorePartTransform(value, weight, weight > 1 ? "formula" : string.Empty);
+    private static ScorePartTransform? MakeScorePart(long value, long weight, bool isBcd, string rawValueHex)
+    {
+        if (!isBcd)
+        {
+            return new ScorePartTransform(value, weight, weight > 1 ? "formula" : string.Empty);
+        }
+        var bcd = DecodeBcdWide(rawValueHex);
+        return bcd is null ? null : new ScorePartTransform(bcd.Value, weight, "bcd");
+    }
 
     // Decodes a full multi-byte BCD value: each hex nibble is a decimal digit, so the hex
-    // string read as decimal is the value (0x000098 -> 98, 0x1234 -> 1234). Falls back to the
-    // binary value when any nibble is A-F (i.e. it is not valid BCD).
-    private static long DecodeBcdWide(string rawValueHex, long fallback)
+    // string read as decimal is the value (0x000098 -> 98, 0x1234 -> 1234). Null when any
+    // nibble is A-F: that is not BCD, and a binary fallback would turn uninitialised RAM
+    // into a score (0xF0C090 -> 15 777 936).
+    private static long? DecodeBcdWide(string rawValueHex)
     {
         var raw = rawValueHex.Trim();
         if (raw.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
@@ -761,7 +782,7 @@ public sealed class LiveScoreAggregatorProvider : IProvider
                raw.All(c => c is >= '0' and <= '9') &&
                long.TryParse(raw, NumberStyles.Integer, CultureInfo.InvariantCulture, out var bcd)
             ? bcd
-            : fallback;
+            : null;
     }
 
     private string ResolveMemoryScoreKind(string definitionFile, string address, object? payload, object? signal)
@@ -792,7 +813,7 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         string description,
         string rawValueHex,
         long fallbackValue,
-        out ScorePartTransform transform)
+        out ScorePartTransform? transform)
     {
         transform = new ScorePartTransform(fallbackValue, 1, string.Empty);
         // Positional digit mask: this byte holds one or more digits at a given place, the rest
@@ -816,7 +837,8 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         }
 
         var zeroesAfter = mask.Length - mask.LastIndexOf('X') - 1;
-        transform = new ScorePartTransform(DecodeBcdByte(rawValueHex, fallbackValue), Pow10(zeroesAfter), "score-mask");
+        var masked = DecodeBcdByte(rawValueHex);
+        transform = masked is null ? null : new ScorePartTransform(masked.Value, Pow10(zeroesAfter), "score-mask");
         return true;
     }
 
@@ -1085,7 +1107,9 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         return long.TryParse(raw, NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
     }
 
-    private static long DecodeBcdByte(string rawValueHex, long fallback)
+    // Le dernier octet lu en BCD (deux chiffres). Null quand un quartet vaut A-F : ce n'est
+    // pas un chiffre, et l'echantillon ne doit pas compter.
+    private static long? DecodeBcdByte(string rawValueHex)
     {
         var raw = rawValueHex.Trim();
         if (raw.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
@@ -1096,7 +1120,7 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         raw = raw.Trim();
         if (raw.Length == 0)
         {
-            return fallback;
+            return null;
         }
 
         if (raw.Length > 2)
@@ -1110,7 +1134,7 @@ public sealed class LiveScoreAggregatorProvider : IProvider
             return bcd;
         }
 
-        return fallback;
+        return null;
     }
 
     private static long Pow10(int exponent)
