@@ -2883,7 +2883,21 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
 
         var currentMediaSignature = BuildCurrentLiveMediaSignature(plan, gameElement);
         var currentMediaSignatureKey = BuildLiveAddGamesCurrentMediaSignatureKey(plan);
+        // Cette porte refuse un envoi qui montrerait EXACTEMENT les memes medias que le
+        // precedent. Elle avait son exception pour la video ; le texte n'y avait jamais ete
+        // prevu, et c'est ce qui bloquait encore la description arrivee apres coup.
+        //
+        // Mesure du 2026-09-21 sur wrally : envoi des images a 18:39:03, description anglaise
+        // ecrite a 18:39:17, fragment reconstruit a 18:39:19 avec le texte et le jeton de
+        // rattrapage accorde, puis refus ici parce que les medias, eux, n'avaient pas bouge.
+        // La fiche restait muette avec son texte a cote, sur le disque.
+        //
+        // Ouvrir pour le texte ne relache rien : allowLocalizedMetadataRefresh n'est vrai que
+        // lorsqu'un scrap vient de deposer du texte, le delta exige une PREMIERE description
+        // (HasLocalizedMetadataRefreshDelta), et le jeton de rattrapage n'autorise qu'un seul
+        // envoi supplementaire par fiche.
         if (!allowCurrentVideoRefresh &&
+            !allowLocalizedMetadataRefresh &&
             !string.IsNullOrWhiteSpace(currentMediaSignature) &&
             LastLiveAddGamesCurrentMediaSignatures.TryGetValue(currentMediaSignatureKey, out var previousMediaSignature) &&
             string.Equals(previousMediaSignature, currentMediaSignature, StringComparison.Ordinal))
