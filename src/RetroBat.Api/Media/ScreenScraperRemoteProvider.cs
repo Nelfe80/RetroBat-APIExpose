@@ -281,8 +281,16 @@ public sealed class ScreenScraperRemoteProvider
                 requiresGamelistPersistence = true;
             }
 
+            // Une fiche n'a qu'UN jeton de rattrapage (voir MediaRuntimeState). Le depenser
+            // ici pour le seul texte condamnerait la video qui arrive a l'etape suivante :
+            // quand elle est du meme voyage, le texte l'attend et les deux partent dans le
+            // meme fragment. Demande du user, 2026-09-21. Des medias essentiels neufs, eux,
+            // partent tout de suite : c'est ce que le joueur regarde.
+            var videoDuMemeVoyage = secondaryKinds.Contains(MediaKinds.Video, StringComparer.OrdinalIgnoreCase);
+            var texteSeul = essentialResult.ImportedMediaCount == 0 && textPersistResult.Updated;
             var essentialLivePushAllowed =
                 (essentialResult.ImportedMediaCount > 0 || textPersistResult.Updated) &&
+                !(texteSeul && videoDuMemeVoyage) &&
                 refreshCurrentGameAfterSuccess &&
                 IsCapturedSelectionStillCurrent(selectionToken, plan);
             if (essentialLivePushAllowed)
@@ -339,11 +347,14 @@ public sealed class ScreenScraperRemoteProvider
                 IsCapturedSelectionStillCurrent(selectionToken, plan);
             if (currentVideoLivePushAllowed)
             {
+                // Le fragment est reconstruit ici : en annoncant AUSSI le texte, la video et
+                // la premiere description voyagent ensemble et ne coutent qu'un seul envoi.
                 var videoLivePushed = await _gamelistUpdateService.PushLiveGameUpdateToEsAsync(
                     plan,
                     cancellationToken,
                     LiveGameUpdateNotificationKind.RemoteVideoScrape,
-                    allowCurrentVideoRefresh: true);
+                    allowCurrentVideoRefresh: true,
+                    allowLocalizedMetadataRefresh: textPersistResult.Updated && !livePushed);
                 livePushed = livePushed || videoLivePushed;
             }
 

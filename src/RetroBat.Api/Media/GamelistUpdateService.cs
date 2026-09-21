@@ -1400,7 +1400,7 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                 plan.FrontendSystemId,
                 plan.GamePath,
                 out var alreadyPushedReason,
-                allowVideoException: allowCurrentVideoRefresh))
+                allowLateContentException: allowCurrentVideoRefresh || allowLocalizedMetadataRefresh))
         {
             _logger?.LogInformation(
                 "Live ES game fragment skipped for system={SystemId}, game={GameSlug}: addgames already pushed for the current selected card.",
@@ -3034,7 +3034,7 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                         plan.FrontendSystemId,
                         plan.GamePath,
                         out var alreadyPushedReason,
-                        allowVideoException: allowCurrentVideoRefresh))
+                        allowLateContentException: allowCurrentVideoRefresh || allowLocalizedMetadataRefresh))
                 {
                     _logger?.LogInformation(
                         "Live ES addgames skipped before POST for system={SystemId}, game={GameSlug}: addgames already pushed for the current selected card.",
@@ -3087,10 +3087,12 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                     var videoExceptionArmed = allowCurrentVideoRefresh && HasLiveOfficialVideoMedia(gameElement);
                     if (hasLiveVisibleSlotElement || videoExceptionArmed || hasLocalizedMetadataRefreshContent)
                     {
+                        // Le jeton de rattrapage se deduit de l'etat : un envoi sur une fiche
+                        // deja servie EST le rattrapage, qu'il porte la video, la premiere
+                        // description, ou les deux.
                         _runtimeState.MarkLiveAddGamesPushedForSelection(
                             plan.FrontendSystemId,
-                            plan.GamePath,
-                            videoException: videoExceptionArmed);
+                            plan.GamePath);
                     }
                 }
             }

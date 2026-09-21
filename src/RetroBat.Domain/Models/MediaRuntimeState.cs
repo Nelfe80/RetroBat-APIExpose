@@ -65,7 +65,9 @@ public class MediaRuntimeState
     private long _currentGameSelectedSequence;
     private DateTime _currentGameSelectedAtUtc = DateTime.MinValue;
     private string _liveAddGamesPushedSelectionKey = string.Empty;
-    private string _liveVideoAddGamesPushedSelectionKey = string.Empty;
+    // Le jeton de RATTRAPAGE d'une fiche : un seul, qu'il serve a une video fraichement
+    // scrapee, a sa premiere description, ou aux deux dans le meme fragment.
+    private string _liveLateAddGamesPushedSelectionKey = string.Empty;
     private bool _liveAddGamesSelectionBounceActive;
     private string _postLiveAddGamesExpectedSelectionKey = string.Empty;
     private bool _postLiveAddGamesIgnoreFirstGamelistSelection;
@@ -830,7 +832,7 @@ public class MediaRuntimeState
         string systemId,
         string gamePath,
         out string reason,
-        bool allowVideoException = false)
+        bool allowLateContentException = false)
     {
         var selectionKey = BuildSelectionKey(systemId, gamePath);
         lock (_lock)
@@ -850,20 +852,24 @@ public class MediaRuntimeState
 
             if (string.Equals(_liveAddGamesPushedSelectionKey, selectionKey, StringComparison.OrdinalIgnoreCase))
             {
-                if (allowVideoException &&
-                    !string.Equals(_liveVideoAddGamesPushedSelectionKey, selectionKey, StringComparison.OrdinalIgnoreCase))
+                if (allowLateContentException &&
+                    !string.Equals(_liveLateAddGamesPushedSelectionKey, selectionKey, StringComparison.OrdinalIgnoreCase))
                 {
                     reason = string.Empty;
                     return false;
                 }
 
-                // Immutable workflow rule: one game-selected card can receive at most
-                // one live /addgames, except the explicitly approved video case:
-                // a freshly scraped video for the still-current card may consume one
-                // additional /addgames. Time-based spacing is a safety delay only and
-                // must never reset this selection gate.
-                reason = allowVideoException
-                    ? "already-pushed-current-selection-video"
+                // Regle du projet : une fiche consultee ne recoit qu'UN /addgames, avec une
+                // seule exception, le RATTRAPAGE de ce qui arrive apres coup. Le media local
+                // part en une seconde, le reseau met des dizaines de secondes : mesure du
+                // 2026-09-21 sur zaviga, la description anglaise arrivait 11 s apres le seul
+                // envoi de la fiche et se voyait refusee, alors qu'elle etait prete.
+                // Ce jeton vaut donc pour une video fraiche comme pour une premiere
+                // description, et il n'en existe qu'un : les deux voyagent ensemble quand
+                // elles arrivent dans la meme passe. Les delais d'espacement ne le rouvrent
+                // jamais.
+                reason = allowLateContentException
+                    ? "already-pushed-current-selection-late-content"
                     : "already-pushed-current-selection";
                 return true;
             }
@@ -945,7 +951,12 @@ public class MediaRuntimeState
         }
     }
 
-    public void MarkLiveAddGamesPushedForSelection(string systemId, string gamePath, bool videoException = false)
+    /// <summary>
+    /// Enregistre l'envoi fait a EmulationStation pour cette fiche. Le jeton de rattrapage se
+    /// deduit : si la fiche avait DEJA recu son envoi, celui-ci n'a pu passer que par
+    /// l'exception, donc il la consomme. Rien a declarer par l'appelant, rien a oublier.
+    /// </summary>
+    public void MarkLiveAddGamesPushedForSelection(string systemId, string gamePath)
     {
         var selectionKey = BuildSelectionKey(systemId, gamePath);
         if (string.IsNullOrWhiteSpace(selectionKey))
@@ -969,10 +980,11 @@ public class MediaRuntimeState
                 SetCurrentGameSelectedKey(selectionKey);
             }
 
+            var dejaPousse = string.Equals(_liveAddGamesPushedSelectionKey, selectionKey, StringComparison.OrdinalIgnoreCase);
             _liveAddGamesPushedSelectionKey = selectionKey;
-            if (videoException)
+            if (dejaPousse)
             {
-                _liveVideoAddGamesPushedSelectionKey = selectionKey;
+                _liveLateAddGamesPushedSelectionKey = selectionKey;
             }
 
             _liveAddGamesSelectionBounceActive = true;
@@ -1227,7 +1239,7 @@ public class MediaRuntimeState
         _currentGameSelectedSequence++;
         _currentGameSelectedAtUtc = DateTime.UtcNow;
         _liveAddGamesPushedSelectionKey = string.Empty;
-        _liveVideoAddGamesPushedSelectionKey = string.Empty;
+        _liveLateAddGamesPushedSelectionKey = string.Empty;
         _liveAddGamesSelectionBounceActive = false;
         ClearPostLiveAddGamesFirstGamelistGuard();
     }
@@ -1242,7 +1254,7 @@ public class MediaRuntimeState
         _currentGameSelectedKey = string.Empty;
         _currentGameSelectedAtUtc = DateTime.MinValue;
         _liveAddGamesPushedSelectionKey = string.Empty;
-        _liveVideoAddGamesPushedSelectionKey = string.Empty;
+        _liveLateAddGamesPushedSelectionKey = string.Empty;
         _liveAddGamesSelectionBounceActive = false;
         ClearPostLiveAddGamesFirstGamelistGuard();
     }
