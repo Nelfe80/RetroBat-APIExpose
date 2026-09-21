@@ -5,8 +5,24 @@ using RetroBat.Domain.Paths;
 
 namespace RetroBat.Api.Replay.Playback;
 
-/// <summary>Core + ROM résolus sur CETTE machine pour lancer un replay.</summary>
-public sealed record ResolvedRuntime(string CoreDll, string RomPath, bool ExactCore);
+/// <summary>
+/// Core + ROM résolus sur CETTE machine pour lancer un replay. <paramref name="Avertissement"/>
+/// est ce qu'on dit au joueur quand on lance SANS le fichier exact : la lecture part, mais elle
+/// peut dériver, et c'est à lui d'en juger.
+/// </summary>
+public sealed record ResolvedRuntime(string CoreDll, string RomPath, bool ExactCore, bool ExactRom = true, string? Avertissement = null);
+
+/// <summary>
+/// Ce que le résolveur a trouvé, ou POURQUOI il n'a rien trouvé. Le code dit quelle moitié
+/// manque (le cœur ou la ROM), le détail dit ce qu'on cherchait : un joueur à qui l'on répond
+/// « jeu ou cœur absent » ne sait pas quoi corriger, un joueur qui lit « empreinte 3a1f… absente
+/// de roms/megadrive » va chercher la bonne version de sa ROM (2026-09-21).
+/// </summary>
+public sealed record RuntimeResolution(ResolvedRuntime? Runtime, ReplayErrorCode Failure, string? Detail)
+{
+    public static RuntimeResolution Trouve(ResolvedRuntime runtime) => new(runtime, ReplayErrorCode.None, null);
+    public static RuntimeResolution Manque(ReplayErrorCode code, string detail) => new(null, code, detail);
+}
 
 /// <summary>
 /// Résout, sur CETTE machine, le core et la ROM d'un replay À PARTIR DU MANIFESTE (R5). But :
@@ -64,30 +80,40 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
     private readonly Storage.IReplayMetadataStore _meta;
     private readonly ILogger<ReplayRuntimeResolver> _logger;
 
+    private readonly Media.InstalledGameCatalog? _catalogue;
+
     public ReplayRuntimeResolver(EsSystemsRomPaths romPaths, Storage.IReplayManifestStore manifests,
-        Storage.IReplayMetadataStore meta, ILogger<ReplayRuntimeResolver> logger)
+        Storage.IReplayMetadataStore meta, ILogger<ReplayRuntimeResolver> logger,
+        Media.InstalledGameCatalog? catalogue = null)
     {
-        _romPaths = romPaths; _manifests = manifests; _meta = meta; _logger = logger;
+        _romPaths = romPaths; _manifests = manifests; _meta = meta; _logger = logger; _catalogue = catalogue;
     }
 
-    public ResolvedRuntime? Resolve(ReplayManifest manifest, ReplayLaunchHint? hint)
+    public RuntimeResolution Resolve(ReplayManifest manifest, ReplayLaunchHint? hint)
     {
         var core = ResolveCore(manifest, hint, out var exact);
         if (core is null)
         {
             _logger.LogWarning("Replay resolver : aucun core utilisable pour {Id} (runtime {Rt}, core_sha256 {Sha})",
                 manifest.ReplayId, manifest.Runtime.RuntimeId, Short(manifest.Runtime.CoreSha256));
-            return null;
+            var attendu = string.IsNullOrWhiteSpace(manifest.Runtime.CoreName)
+                ? "un cœur RetroArch pour " + (manifest.Game.SystemFolder ?? manifest.Game.SystemId)
+                : "le cœur " + manifest.Runtime.CoreName;
+            return RuntimeResolution.Manque(ReplayErrorCode.CoreNotFound,
+                "Ce record a été enregistré avec " + attendu + " : cette borne ne l'a pas parmi ses cores RetroArch.");
         }
-        var rom = ResolveRom(manifest, hint);
+        var rom = ResolveRom(manifest, hint, out var romExacte, out var pourquoi);
         if (rom is null)
         {
-            _logger.LogWarning("Replay resolver : ROM introuvable pour {Id} (crc32 {Crc})", manifest.ReplayId, manifest.Game.Crc32);
-            return null;
+            _logger.LogWarning("Replay resolver : ROM introuvable pour {Id} (crc32 {Crc}) : {Pourquoi}", manifest.ReplayId, manifest.Game.Crc32, pourquoi);
+            return RuntimeResolution.Manque(ReplayErrorCode.RomNotFound, pourquoi);
         }
         if (!exact) _logger.LogInformation("Replay resolver : core NON identique à l'enregistrement pour {Id} — lecture best-effort (désync détecté par checkpoints).", manifest.ReplayId);
-        MemoriserLancement(manifest, core, rom);
-        return new ResolvedRuntime(core, rom, exact);
+        if (!romExacte) _logger.LogInformation("Replay resolver : ROM NON identique à l'enregistrement pour {Id} ({Rom}) — lecture best-effort.", manifest.ReplayId, rom);
+        // On ne mémorise que le fichier exact : un dump approchant ne doit pas devenir le chemin
+        // rapide, sinon la ROM exacte copiée plus tard ne serait plus jamais cherchée.
+        if (romExacte) MemoriserLancement(manifest, core, rom);
+        return RuntimeResolution.Trouve(new ResolvedRuntime(core, rom, exact, romExacte, romExacte ? null : pourquoi));
     }
 
     // Core : hint local (rapide, en préférant cores_real sans wrapper scoring) → empreinte
@@ -294,72 +320,183 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
         return null;
     }
 
-    // ROM : hint local (rapide) → scan roms/<système> par crc32 de CONTENU (== celui de RetroArch,
-    // décompressé pour un .zip). Le DOSSIER système vient du hint local, sinon du MANIFESTE
-    // (`game.system_folder`, identifiant portable posé à l'enregistrement) → un replay reçu d'un
-    // peer, sans hint, reste résolvable. On ne scanne jamais globalement (coûteux).
-    private string? ResolveRom(ReplayManifest manifest, ReplayLaunchHint? hint)
+    // ROM : hint local (rapide) → le FICHIER EXACT dans le dossier ES du système → un AUTRE DUMP
+    // du même jeu (même groupe de scoring, sinon même nom), en prévenant → rien.
+    //
+    // Le fichier exact se reconnaît à l'empreinte que RetroArch a annoncée à l'enregistrement,
+    // et RetroArch ne la calcule pas partout pareil : pour une console il extrait la ROM du zip
+    // et hache ce contenu (= le CRC que l'archive stocke pour cette entrée) ; pour l'arcade,
+    // dont le core charge le zip par chemin, il hache le ZIP ENTIER. On accepte donc l'une ou
+    // l'autre, plus le SHA-256 du fichier que le manifeste porte aussi. Avant le 2026-09-21 on
+    // ne hachait que la première entrée du zip : aucun replay d'arcade ne se rejouait ailleurs
+    // que sur la borne qui l'avait enregistré.
+    //
+    // Le DOSSIER système vient du hint local, sinon du MANIFESTE (`game.system_folder`,
+    // identifiant portable) → un replay reçu d'un peer, sans hint, reste résolvable. C'EST ES QUI
+    // DECIDE où vivent les ROMs (second disque, partage réseau) : on ne suppose jamais roms/<x>.
+    // Le second résultat dit au joueur CE QU'ON CHERCHAIT, pour qu'il puisse agir.
+    private string? ResolveRom(ReplayManifest manifest, ReplayLaunchHint? hint, out bool exacte, out string pourquoi)
     {
+        exacte = true;
+        pourquoi = string.Empty;
         if (hint is not null && !string.IsNullOrEmpty(hint.RomPath) && File.Exists(hint.RomPath)) return hint.RomPath;
 
-        var crc = manifest.Game.Crc32;
-        if (string.IsNullOrWhiteSpace(crc)) return null;
-
-        // C'EST ES QUI DECIDE ou vivent les ROMs, pas nous. Chaque machine est differente :
-        // second disque, partage reseau, arborescence heritee. Supposer « roms/<systeme> »
-        // marcherait sur une installation par defaut et echouerait chez tous les autres, en
-        // faisant passer une ROM simplement rangee ailleurs pour un replay incompatible.
+        var crc = (manifest.Game.Crc32 ?? string.Empty).Trim().ToLowerInvariant();
+        var sha = (manifest.Runtime.RomSha256 ?? string.Empty).Trim().ToLowerInvariant();
+        var systeme = hint?.SystemFolder ?? manifest.Game.SystemFolder ?? manifest.Game.SystemId;
         var romDir = _romPaths.DirectoryFor(hint?.SystemFolder ?? manifest.Game.SystemFolder)
                      ?? _romPaths.DirectoryFor(manifest.Game.SystemId);
-        if (romDir is null || !Directory.Exists(romDir))
+        var fichiers = romDir is not null && Directory.Exists(romDir) ? ListerRoms(romDir) : new List<string>();
+        if (fichiers.Count == 0)
         {
-            _logger.LogWarning("Replay : aucun dossier de ROMs declare par ES pour {System}.",
-                hint?.SystemFolder ?? manifest.Game.SystemFolder ?? manifest.Game.SystemId);
-            return null;
+            _logger.LogWarning("Replay : aucun dossier de ROMs utilisable pour {System} ({Dir}).", systeme, romDir ?? "non déclaré");
         }
 
-        foreach (var f in Directory.EnumerateFiles(romDir))
+        // 1. Le fichier exact. Les fichiers qui portent le nom du jeu passent en premier : c'est
+        //    presque toujours l'un d'eux, et on évite de hacher tout un dossier d'arcade pour rien.
+        //    Les autres ne sont hachés que s'ils restent raisonnables (un .iso de 700 Mo n'est pas
+        //    un candidat sérieux pour un replay de borne).
+        var nomAttendu = NomDuJeu(manifest.Game.GameId);
+        var parNom = fichiers.Where(f => MemeNom(f, nomAttendu)).ToList();
+        if (crc.Length > 0 || sha.Length > 0)
         {
-            var ext = Path.GetExtension(f).ToLowerInvariant();
-            if (ext is ".txt" or ".xml" or ".dat" or ".jpg" or ".png" or ".srm" or ".state" or ".cfg") continue;
-            if (string.Equals(ContentCrc32(f), crc, StringComparison.OrdinalIgnoreCase)) return f;
+            foreach (var f in parNom) { if (PorteEmpreinte(f, crc, sha, limiteOctets: 0)) return f; }
+            foreach (var f in fichiers) { if (!parNom.Contains(f) && PorteEmpreinte(f, crc, sha, limiteOctets: 256L * 1024 * 1024)) return f; }
         }
+
+        // 2. Le même jeu, autrement : d'abord par son identité de scoring (système + contenu, tous
+        //    dossiers frontend confondus), sinon par son nom. On lance, et on dit pourquoi ça
+        //    peut dériver : c'est au joueur de juger, pas à la borne de refuser.
+        var autre = DumpDuMemeGroupe(manifest) ?? parNom.FirstOrDefault() ?? fichiers.FirstOrDefault(f => MemeTitre(f, nomAttendu));
+        if (autre is not null)
+        {
+            exacte = false;
+            pourquoi = "Cette borne n'a pas le fichier exact sur lequel ce record a été joué"
+                + (crc.Length > 0 ? " (empreinte " + crc + ")" : string.Empty)
+                + " : la lecture part sur " + Path.GetFileName(autre) + ". Si le jeu diffère (région, révision), le replay peut dériver.";
+            return autre;
+        }
+
+        pourquoi = fichiers.Count == 0
+            ? "EmulationStation ne déclare aucun dossier de ROMs pour « " + systeme + " » sur cette borne, ou il est vide."
+            : "Cette borne n'a pas ce jeu" + (nomAttendu.Length > 0 ? " (« " + nomAttendu + " »)" : string.Empty)
+              + " parmi les " + fichiers.Count + " fichiers de " + romDir + ", ni sous aucun autre dossier du même système.";
         return null;
     }
 
-    // crc32 du CONTENU : pour un .zip, l'entrée ROM décompressée (comme RetroArch) ; sinon le fichier.
-    private static string? ContentCrc32(string path)
+    private static readonly HashSet<string> ExtensionsIgnorees = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".txt", ".xml", ".dat", ".jpg", ".jpeg", ".png", ".gif", ".mp4", ".srm", ".state", ".cfg",
+        ".sav", ".ini", ".nfo", ".pdf", ".db", ".bak", ".log", ".json", ".md", ".html",
+    };
+
+    // Sous-dossiers compris : les joueurs rangent leurs ROMs par lettre ou par genre.
+    private List<string> ListerRoms(string romDir)
     {
         try
         {
-            if (path.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
-            {
-                using var archive = ZipFile.OpenRead(path);
-                ZipArchiveEntry? entry = null;
-                foreach (var e in archive.Entries)
-                {
-                    if (e.Length > 0 && !e.FullName.EndsWith('/')) { entry = e; break; }
-                }
-                if (entry is null) return null;
-                using var s = entry.Open();
-                return Crc32Stream(s);
-            }
-            using var fs = File.OpenRead(path);
-            return Crc32Stream(fs);
+            return Directory.EnumerateFiles(romDir, "*", SearchOption.AllDirectories)
+                .Where(f => !ExtensionsIgnorees.Contains(Path.GetExtension(f)))
+                .Where(f => !f.Contains(Path.DirectorySeparatorChar + "media" + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+                .ToList();
         }
-        catch { return null; }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger.LogDebug(ex, "Replay : dossier de ROMs illisible : {Dir}", romDir);
+            return new List<string>();
+        }
     }
 
-    private static string Crc32Stream(Stream s)
+    // Le manifeste identifie le jeu comme « <système>/<nom-du-fichier-en-slug> ».
+    private static string NomDuJeu(string? gameId)
+    {
+        if (string.IsNullOrWhiteSpace(gameId)) return string.Empty;
+        var i = gameId.IndexOf('/');
+        return (i >= 0 ? gameId[(i + 1)..] : gameId).Trim();
+    }
+
+    private static string Slug(string s)
+    {
+        var sb = new System.Text.StringBuilder(s.Length);
+        foreach (var ch in s.Trim().ToLowerInvariant()) sb.Append(char.IsLetterOrDigit(ch) ? ch : '-');
+        var slug = sb.ToString();
+        while (slug.Contains("--")) slug = slug.Replace("--", "-");
+        return slug.Trim('-');
+    }
+
+    internal static bool MemeNom(string fichier, string nomAttendu)
+        => nomAttendu.Length > 0 && string.Equals(Slug(Path.GetFileNameWithoutExtension(fichier)), nomAttendu, StringComparison.Ordinal);
+
+    // Même titre, autre édition : « Sonic The Hedgehog (Japan) » pour « sonic-the-hedgehog-usa-europe ».
+    // Le titre est ce qui précède la première parenthèse ou le premier crochet ; trop court, il
+    // ne prouve rien (« 1942 » vaut, « a » non).
+    internal static bool MemeTitre(string fichier, string nomAttendu)
+    {
+        if (nomAttendu.Length == 0) return false;
+        var nom = Path.GetFileNameWithoutExtension(fichier);
+        var coupe = nom.IndexOfAny(new[] { '(', '[' });
+        var titre = Slug(coupe > 0 ? nom[..coupe] : nom);
+        return titre.Length >= 4 && (nomAttendu == titre || nomAttendu.StartsWith(titre + "-", StringComparison.Ordinal));
+    }
+
+    private string? DumpDuMemeGroupe(ReplayManifest manifest)
+    {
+        var groupe = manifest.Game.RomGroup;
+        if (_catalogue is null || string.IsNullOrWhiteSpace(groupe)) return null;
+        try
+        {
+            var canonique = Media.RomCanonicalResolver.CanonicalScoringSystem(manifest.Game.SystemFolder ?? manifest.Game.SystemId);
+            var dump = _catalogue.DumpsOf(canonique, groupe).FirstOrDefault(j => File.Exists(j.AbsolutePath));
+            if (dump is not null) _logger.LogInformation("Replay : {Id} rejoué sur un autre dump du groupe {Groupe} : {Rom}.", manifest.ReplayId, groupe, dump.AbsolutePath);
+            return dump?.AbsolutePath;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Replay : inventaire du groupe {Groupe} impossible.", groupe);
+            return null;
+        }
+    }
+
+    // Le fichier porte-t-il l'empreinte attendue ? Pour un zip, les CRC de ses entrées se lisent
+    // dans l'en-tête sans rien décompresser (c'est ce que RetroArch annonce pour une console) ;
+    // le fichier entier n'est lu qu'ensuite (ce que RetroArch annonce pour l'arcade), et
+    // seulement s'il reste sous la limite : 0 = pas de limite.
+    internal static bool PorteEmpreinte(string path, string crc, string sha, long limiteOctets)
+    {
+        try
+        {
+            if (crc.Length > 0 && path.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+            {
+                using var archive = ZipFile.OpenRead(path);
+                foreach (var e in archive.Entries)
+                {
+                    if (e.Length > 0 && e.Crc32.ToString("x8", System.Globalization.CultureInfo.InvariantCulture) == crc) return true;
+                }
+            }
+            var taille = new FileInfo(path).Length;
+            if (limiteOctets > 0 && taille > limiteOctets) return false;
+            using var fs = File.OpenRead(path);
+            var (crcFichier, shaFichier) = Empreintes(fs, calculerSha: sha.Length > 0);
+            return (crc.Length > 0 && crcFichier == crc) || (sha.Length > 0 && shaFichier == sha);
+        }
+        catch { return false; }
+    }
+
+    // Une seule lecture pour les deux empreintes.
+    private static (string Crc32, string? Sha256) Empreintes(Stream s, bool calculerSha)
     {
         var crc = 0xFFFFFFFFu;
+        using var sha = calculerSha ? IncrementalHash.CreateHash(HashAlgorithmName.SHA256) : null;
         var buf = new byte[81920];
         int r;
         while ((r = s.Read(buf, 0, buf.Length)) > 0)
         {
             for (var i = 0; i < r; i++) { crc = (crc >> 8) ^ Crc32Table[(crc ^ buf[i]) & 0xFF]; }
+            sha?.AppendData(buf, 0, r);
         }
-        return (crc ^ 0xFFFFFFFFu).ToString("x8", System.Globalization.CultureInfo.InvariantCulture);
+        var crcHex = (crc ^ 0xFFFFFFFFu).ToString("x8", System.Globalization.CultureInfo.InvariantCulture);
+        return (crcHex, sha is null ? null : Convert.ToHexString(sha.GetHashAndReset()).ToLowerInvariant());
     }
 
     private static string? HashFileQuiet(string path)

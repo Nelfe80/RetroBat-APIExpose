@@ -9,7 +9,8 @@ namespace RetroBat.Api.Replay.Playback;
 /// </summary>
 public interface IReplayRuntimeResolver
 {
-    ResolvedRuntime? Resolve(ReplayManifest manifest, ReplayLaunchHint? hint);
+    /// <summary>Jamais null : quand rien n'est trouvé, le résultat dit quelle moitié manque et pourquoi.</summary>
+    RuntimeResolution Resolve(ReplayManifest manifest, ReplayLaunchHint? hint);
 }
 
 /// <summary>

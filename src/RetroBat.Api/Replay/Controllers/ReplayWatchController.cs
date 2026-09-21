@@ -111,6 +111,8 @@ public sealed class ReplayWatchController : ControllerBase
   @media (prefers-reduced-motion:reduce){ .spin{ animation:none; } }
   .ok .spin, .err .spin, .confirm .spin { display:none; }
   .badge { font-size:2.2rem; margin:6px 0; }
+  .detail { font-size:.9rem; color:#8a93a8; margin-top:10px; line-height:1.45; }
+  .detail { font-size:.9rem; color:#8a93a8; margin-top:10px; line-height:1.45; }
   .btn { display:inline-block; margin-top:18px; padding:11px 20px; border-radius:12px;
          text-decoration:none; font-weight:600; color:#fff; background:#5B34D6;
          border:0; cursor:pointer; font-size:1rem; font-family:inherit; }
@@ -173,14 +175,19 @@ public sealed class ReplayWatchController : ControllerBase
     ReplayNotFound: ['🔎', 'Replay introuvable', 'Ni cette borne ni NelfePlay ne connaissent ce replay.'],
     ReplayObjectUnavailable: ['📡', 'Téléchargement impossible', 'Aucune borne ni le miroir n’a pu fournir ce replay pour le moment. Réessaie dans un instant.'],
     ReplayObjectCorrupt: ['⚠️', 'Replay altéré', 'Le fichier reçu ne correspond pas à l’empreinte attendue : il a été écarté.'],
+    RomNotFound: ['💾', 'Pas la même ROM', 'Un replay rejoue les mêmes touches aux mêmes images : il lui faut exactement le fichier sur lequel le record a été joué, pas seulement le même jeu.'],
+    CoreNotFound: ['🕹️', 'Cœur RetroArch absent', 'Cette borne n’a pas le cœur avec lequel ce record a été enregistré.'],
     RuntimeIncompatible: ['🕹️', 'Jeu ou cœur absent', 'Cette borne n’a pas le jeu ou le cœur qu’il faut pour rejouer ce record.'],
     GameAlreadyRunning: ['⏳', 'Un jeu tourne', 'Quitte le jeu en cours sur la borne, puis relance le replay.'],
     ReplayAlreadyRunning: ['⏳', 'Déjà en cours', 'Une lecture est déjà en cours sur la borne.']
   };
-  function echec(code){
+  function echec(code, detail){
     var e = ERREURS[code] || ['⚠️', 'Impossible de lancer', 'La borne a refusé la lecture' + (code ? ' (' + code + ')' : '') + '.'];
     if (barre) barre.hidden = true;
     show('err', e[0], e[1], e[2], false);
+    // Le détail vient de la borne : quel dossier, quelle empreinte, quel cœur. C'est lui qui
+    // permet d'agir, la phrase générique ne fait que nommer la cause.
+    if (detail){ var d = document.createElement('p'); d.className = 'detail'; d.textContent = detail; msg.appendChild(d); }
   }
   var suivis = 0;
   function suivre(){
@@ -207,9 +214,12 @@ public sealed class ReplayWatchController : ControllerBase
         setTimeout(suivre, 500);
       } else if (st === 'playing' || st === 'paused' || st === 'finished'){
         if (barre) barre.hidden = true;
-        show('ok','▶','Lecture sur la borne','Le replay se joue sur l’écran de la borne.', true);
+        var avert = s.warning || '';
+        // Lancé sans le fichier exact : on le dit, et on laisse le temps de le lire.
+        show('ok','▶','Lecture sur la borne','Le replay se joue sur l’écran de la borne.', !avert);
+        if (avert){ var w = document.createElement('p'); w.className = 'detail'; w.textContent = avert; msg.appendChild(w); back.hidden = false; }
       } else if (st === 'error'){
-        echec(s.error || '');
+        echec(s.error || '', s.error_detail || s.errorDetail || '');
       } else {
         // Idle : la lecture est passee sans qu'on la voie (replay tres court), ou a ete arretee.
         if (++suivis < 6) { setTimeout(suivre, 500); }

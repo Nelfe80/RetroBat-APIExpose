@@ -42,6 +42,7 @@ public sealed class ReplayRecorderService : BackgroundService
     private readonly RetroBat.Api.Replay.Playback.ReplayPlaybackService _playback;
     private readonly ILogger<ReplayRecorderService> _logger;
     private readonly IConfiguration _config;
+    private readonly RetroBat.Api.Media.InstalledGameCatalog? _catalogue;
 
     /// <summary>
     /// Le dernier START vu sur le panel. L'enregistrement ne demarre que si un START est recent :
@@ -87,10 +88,10 @@ public sealed class ReplayRecorderService : BackgroundService
 
     public ReplayRecorderService(RetroArchReplayClient ra, ReplayStore store, ReplayCoreTimingProbe timing,
         IEventBus bus, RetroBat.Api.Replay.Playback.ReplayPlaybackService playback, ILogger<ReplayRecorderService> logger,
-        IConfiguration config)
+        IConfiguration config, RetroBat.Api.Media.InstalledGameCatalog? catalogue = null)
     {
         _ra = ra; _store = store; _timing = timing; _bus = bus; _playback = playback; _logger = logger;
-        _config = config;
+        _config = config; _catalogue = catalogue;
     }
 
     private bool StartRequis => _config.GetValue("Replay:Record:RequireStart", true);
@@ -268,7 +269,10 @@ public sealed class ReplayRecorderService : BackgroundService
         var game = new ReplayGame(
             GameId: $"{Slug(rec.System)}/{Slug(rec.Game)}",
             SystemId: rec.System,
-            RomGroup: null,
+            // L'identite du JEU au sens du scoring (systeme + contenu, jamais un nom). Avec elle,
+            // une borne qui n'a pas ce fichier-la mais un autre dump du meme jeu peut quand meme
+            // rejouer, en prevenant. Sans elle (pas de .MEM), il ne reste que l'empreinte.
+            RomGroup: RomGroupDe(hint),
             Ruleset: null,
             Crc32: rec.Crc32,
             // Dossier système frontend (« megadrive ») : identifiant PORTABLE (pas un chemin local),
@@ -508,6 +512,13 @@ public sealed class ReplayRecorderService : BackgroundService
         try { await _bus.PublishAsync(new EventEnvelope { Type = type, Payload = payload }).ConfigureAwait(false); }
         catch (Exception ex) { _logger.LogDebug(ex, "Replay : publication event {Type} échouée", type); }
         _ = ct;
+    }
+
+    private string? RomGroupDe(ReplayLaunchHint? hint)
+    {
+        if (_catalogue is null || hint is null || string.IsNullOrEmpty(hint.RomPath)) return null;
+        try { return _catalogue.RomGroupOf(hint.SystemFolder, hint.RomPath); }
+        catch (Exception ex) { _logger.LogDebug(ex, "Replay : groupe du jeu non resolu pour {Rom}.", hint.RomPath); return null; }
     }
 
     private static string Slug(string s)

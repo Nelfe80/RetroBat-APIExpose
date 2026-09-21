@@ -191,6 +191,76 @@ public sealed class InstalledGameCatalog
         }
     }
 
+    /// <summary>
+    /// Le groupe de scoring d'UN fichier installe, resolu comme la collection le resout (md5
+    /// et hash de la gamelist quand elle le connait, alias du .MEM, nom). Null quand aucune
+    /// definition ne le connait. Sert au replay : le manifeste emporte l'identite du JEU, pas
+    /// seulement l'empreinte d'un fichier, pour qu'une autre borne retrouve son propre dump.
+    /// </summary>
+    public string? RomGroupOf(string frontendSystemId, string absolutePath)
+    {
+        if (string.IsNullOrWhiteSpace(frontendSystemId) || string.IsNullOrWhiteSpace(absolutePath))
+        {
+            return null;
+        }
+
+        string? md5 = null, cheevos = null;
+        // La gamelist vit a la racine du systeme : celle du dossier du fichier d'abord (ROM
+        // rangee a la racine), puis celle du dossier roms standard (ROM dans un sous-dossier).
+        foreach (var racine in new[] { Path.GetDirectoryName(absolutePath), Path.Combine(_romsRoot, frontendSystemId) })
+        {
+            if (string.IsNullOrEmpty(racine))
+            {
+                continue;
+            }
+
+            var gamelist = Path.Combine(racine, "gamelist.xml");
+            if (!File.Exists(gamelist))
+            {
+                continue;
+            }
+
+            foreach (var noeud in ReadGamelist(gamelist))
+            {
+                var brut = noeud.Element("path")?.Value?.Trim();
+                if (string.IsNullOrWhiteSpace(brut))
+                {
+                    continue;
+                }
+
+                if (string.Equals(ResolveAbsolutePath(racine, brut), absolutePath, StringComparison.OrdinalIgnoreCase))
+                {
+                    md5 = Text(noeud, "md5");
+                    cheevos = Text(noeud, "cheevosHash") ?? Text(noeud, "hash");
+                    break;
+                }
+            }
+
+            if (md5 is not null || cheevos is not null)
+            {
+                break;
+            }
+        }
+
+        return _canonical.ResolveScoreSlug(frontendSystemId, Path.GetFileName(absolutePath), md5, cheevos);
+    }
+
+    /// <summary>
+    /// Les dumps installes d'un groupe, tous dossiers frontend du systeme canonique confondus
+    /// (un jeu d'arcade vit sous mame comme sous fbneo). Vide quand la borne n'a pas ce jeu.
+    /// </summary>
+    public IReadOnlyList<InstalledGame> DumpsOf(string canonicalSystemId, string romGroup)
+    {
+        if (string.IsNullOrWhiteSpace(canonicalSystemId) || string.IsNullOrWhiteSpace(romGroup))
+        {
+            return [];
+        }
+
+        return Enumerate([canonicalSystemId])
+            .Where(jeu => string.Equals(jeu.RomGroup, romGroup.Trim(), StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
     private static IEnumerable<XElement> ReadGamelist(string path)
     {
         try

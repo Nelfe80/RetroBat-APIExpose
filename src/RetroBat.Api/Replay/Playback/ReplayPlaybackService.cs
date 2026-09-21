@@ -44,6 +44,11 @@ public sealed class ReplayPlaybackService
     private string? _fpsSource;
     private bool _paused;
     private ReplayErrorCode _error = ReplayErrorCode.None;
+    // Ce que le joueur peut corriger, en clair : quelle ROM, quel dossier, quel cœur. Le code
+    // seul (« RomNotFound ») ne dit pas laquelle des trente versions d'un jeu on attendait.
+    private string? _errorDetail;
+    // Ce qu'on a lancé sans garantie (un autre dump du même jeu) : la page le dit, la lecture part.
+    private string? _warning;
     private ReplayCard? _card;
     private Process? _process;
     private CancellationTokenSource? _monitorCts;
@@ -75,7 +80,8 @@ public sealed class ReplayPlaybackService
     public sealed record StateSnapshot(string Mode, string State, string? ReplayId, long Frame,
         long? RunStartFrame, long? RunEndFrame, long? ReplayEndFrame, bool Paused, string? Error,
         double NominalFps, string? FpsSource, ReplayCard? Card,
-        RetroBat.Api.Replay.Sharing.ReplayNetworkStateService.FetchProgress? Fetch = null);
+        RetroBat.Api.Replay.Sharing.ReplayNetworkStateService.FetchProgress? Fetch = null,
+        string? ErrorDetail = null, string? Warning = null);
 
     /// <summary>Fiche « performance NelfePlay » de l'overlay (record sportif/esport). En R1
     /// seuls Game/System/Date sont réels ; Player/Score/Rank/Certified sont des emplacements
@@ -101,7 +107,8 @@ public sealed class ReplayPlaybackService
             return new StateSnapshot(mode, _state.ToString().ToLowerInvariant(), _replayId, _frame,
                 _runStart, _runEnd, _replayEnd, _paused,
                 _error == ReplayErrorCode.None ? null : _error.ToString(),
-                _nominalFps <= 0 ? 60 : _nominalFps, _fpsSource, _card, fetch);
+                _nominalFps <= 0 ? 60 : _nominalFps, _fpsSource, _card, fetch,
+                _error == ReplayErrorCode.None ? null : _errorDetail, _warning);
         }
     }
 
@@ -113,7 +120,7 @@ public sealed class ReplayPlaybackService
         lock (_gate)
         {
             if (IsBusy) return new PlayResult(false, _state.ToString().ToLowerInvariant(), ReplayErrorCode.ReplayAlreadyRunning);
-            _state = ReplayPlaybackState.Resolving; _replayId = replayId; _error = ReplayErrorCode.None;
+            _state = ReplayPlaybackState.Resolving; _replayId = replayId; _error = ReplayErrorCode.None; _errorDetail = null; _warning = null;
             _frame = 0; _paused = false; _card = null;
         }
 
@@ -228,9 +235,11 @@ public sealed class ReplayPlaybackService
         // R5 : le hint local n'est qu'un ACCÉLÉRATEUR — le résolveur retrouve core+ROM depuis le
         // MANIFESTE (core par empreinte core_sha256, ROM par crc32 de contenu), pour qu'un replay
         // SANS hint (reçu d'un peer) reste jouable. Politique souple : jamais bloqué sur la version.
-        var resolved = _resolver.Resolve(manifest, hint);
-        if (resolved is null) return Fail(ReplayErrorCode.RuntimeIncompatible);
+        var resolution = _resolver.Resolve(manifest, hint);
+        if (resolution.Runtime is null) return Fail(resolution.Failure, resolution.Detail);
+        var resolved = resolution.Runtime;
         var coreDll = resolved.CoreDll;
+        lock (_gate) { _warning = resolved.Avertissement; }
 
         // ── pas de jeu déjà en cours (on lance notre propre RetroArch) ──
         var status = await _ra.GetStatusAsync(ct).ConfigureAwait(false);
@@ -486,10 +495,10 @@ public sealed class ReplayPlaybackService
         lock (_gate) { if (_state is ReplayPlaybackState.Finished) { _state = ReplayPlaybackState.Idle; _replayId = null; _frame = 0; _card = null; } }
     }
 
-    private PlayResult Fail(ReplayErrorCode code)
+    private PlayResult Fail(ReplayErrorCode code, string? detail = null)
     {
-        lock (_gate) { _state = ReplayPlaybackState.Error; _error = code; }
-        _logger.LogWarning("Replay : lecture refusée/échouée : {Code}", code);
+        lock (_gate) { _state = ReplayPlaybackState.Error; _error = code; _errorDetail = detail; }
+        _logger.LogWarning("Replay : lecture refusée/échouée : {Code} {Detail}", code, detail ?? string.Empty);
         return new PlayResult(false, "error", code);
     }
 
