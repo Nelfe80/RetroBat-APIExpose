@@ -481,7 +481,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // facon le verdict a la fin, quand ES a repris la main.
             if (_overlay is not null)
             {
-                _overlay.ShowTop(null, message, null, 6000);
+                _overlay.ShowTop("SCORING", message, null, 6000);
             }
             else
             {
