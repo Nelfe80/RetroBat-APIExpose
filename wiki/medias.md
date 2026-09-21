@@ -32,7 +32,9 @@ Si aucun média système local n'existe, APIExpose cherche dans le thème Emulat
 
 ## Le scraping automatique
 
-APIExpose scrape **localement d'abord**, puis interroge ScreenScraper seulement si nécessaire. Le pilotage se fait dans le menu ES `AUTO SCRAPING MANAGER`.
+Le scraping automatique est **éteint à l'installation**. Tant qu'il l'est, APIExpose n'interroge aucun service distant et se contente des médias déjà présents sur la machine. Vous l'allumez quand vous le voulez, dans le menu ES `AUTO SCRAPING MANAGER`.
+
+Une fois allumé, APIExpose scrape **localement d'abord**, puis interroge ScreenScraper seulement si nécessaire. Il travaille sur le jeu que vous venez de sélectionner, et reprend son retard pendant les moments creux.
 
 La fiche du jeu courant peut se mettre à jour **sans recharger toute la liste**, mais seulement quand il y a un vrai changement visible : image, logo ou vignette ajoutés/remplacés, texte localisé dans la bonne langue, vidéo fraîchement scrapée. Les métadonnées brutes ou dans une mauvaise langue ne déclenchent pas de rafraîchissement.
 

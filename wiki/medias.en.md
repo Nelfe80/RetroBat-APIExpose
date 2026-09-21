@@ -32,7 +32,9 @@ If no local system media exists, APIExpose looks in the current EmulationStation
 
 ## Automatic scraping
 
-APIExpose scrapes **locally first**, then queries ScreenScraper only when needed. Everything is driven from the ES menu `AUTO SCRAPING MANAGER`.
+Automatic scraping is **off after installation**. While it is off, APIExpose queries no remote service and works only with the media already on the machine. You turn it on whenever you want, from the ES menu `AUTO SCRAPING MANAGER`.
+
+Once on, APIExpose scrapes **locally first**, then queries ScreenScraper only when needed. It works on the game you just selected, and catches up during idle moments.
 
 The current game's entry can update **without reloading the whole list**, but only on a real visible change: image, logo or thumbnail added/replaced, localized text in the right language, freshly scraped video. Raw metadata or wrong-language text does not trigger a live refresh.
 
