@@ -120,3 +120,80 @@ public class LateContentAddGamesTests
         Assert.Equal("not-current-selection", raison);
     }
 }
+
+/// <summary>
+/// Quand le texte attend la video, et quand il ne l'attend pas.
+///
+/// Le jeton de rattrapage est unique : depense pour le seul texte, il condamnerait la video qui
+/// arrive juste apres dans la meme passe de scrap. Le texte l'attend donc, et les deux partent
+/// dans le meme fragment. Precision du user (2026-09-21) : si la video est DEJA sur le disque,
+/// il n'y a rien a attendre, le texte prend le rattrapage sans delai.
+///
+/// Piege verifie dans le code : un type peut etre redemande au scraper alors que le fichier
+/// existe (exactLocalMissingKinds redemande un media herite pour obtenir l'exact). La liste des
+/// types demandes ne prouve donc rien ; seul le fichier compte.
+/// </summary>
+public class LateContentVideoWaitTests : IDisposable
+{
+    private readonly string _dossier = Path.Combine(Path.GetTempPath(), "late-" + Guid.NewGuid().ToString("N")[..8]);
+
+    public LateContentVideoWaitTests() => Directory.CreateDirectory(_dossier);
+
+    public void Dispose()
+    {
+        try { Directory.Delete(_dossier, recursive: true); } catch { }
+        GC.SuppressFinalize(this);
+    }
+
+    private string Fichier(string nom)
+    {
+        var chemin = Path.Combine(_dossier, nom);
+        File.WriteAllText(chemin, nom);
+        return chemin;
+    }
+
+    /// <summary>La regle telle que le provider la calcule, sur le seul critere du fichier.</summary>
+    private static bool VideoDejaPresente(MediaProjectionPlan plan)
+        => plan.Needs.Any(need =>
+            string.Equals(MediaKinds.Normalize(need.Kind), MediaKinds.Video, StringComparison.OrdinalIgnoreCase) &&
+            ((!string.IsNullOrWhiteSpace(need.ExistingPath) && File.Exists(need.ExistingPath)) ||
+                (!string.IsNullOrWhiteSpace(need.ImportedPath) && File.Exists(need.ImportedPath))));
+
+    private static MediaProjectionPlan Plan(params MediaNeed[] besoins)
+        => new() { SystemId = "arcade", FrontendSystemId = "fbneo", GameSlug = "zaviga", Needs = besoins.ToList() };
+
+    [Fact]
+    public void Une_video_sur_le_disque_est_vue_comme_presente()
+    {
+        var plan = Plan(new MediaNeed { Kind = MediaKinds.Video, ExistingPath = Fichier("video.mp4") });
+
+        Assert.True(VideoDejaPresente(plan));
+    }
+
+    [Fact]
+    public void Une_video_annoncee_mais_absente_du_disque_ne_compte_pas()
+    {
+        var plan = Plan(new MediaNeed
+        {
+            Kind = MediaKinds.Video,
+            ExistingPath = Path.Combine(_dossier, "jamais-ecrit.mp4")
+        });
+
+        Assert.False(VideoDejaPresente(plan));
+    }
+
+    [Fact]
+    public void Sans_besoin_video_rien_n_est_presume_present()
+    {
+        Assert.False(VideoDejaPresente(Plan(new MediaNeed { Kind = MediaKinds.Image, ExistingPath = Fichier("image.png") })));
+        Assert.False(VideoDejaPresente(Plan()));
+    }
+
+    [Fact]
+    public void Une_video_tout_juste_importee_compte_aussi()
+    {
+        var plan = Plan(new MediaNeed { Kind = MediaKinds.Video, ImportedPath = Fichier("importee.mp4") });
+
+        Assert.True(VideoDejaPresente(plan));
+    }
+}

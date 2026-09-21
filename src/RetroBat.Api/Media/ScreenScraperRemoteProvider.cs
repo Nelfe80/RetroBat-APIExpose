@@ -286,7 +286,19 @@ public sealed class ScreenScraperRemoteProvider
             // quand elle est du meme voyage, le texte l'attend et les deux partent dans le
             // meme fragment. Demande du user, 2026-09-21. Des medias essentiels neufs, eux,
             // partent tout de suite : c'est ce que le joueur regarde.
-            var videoDuMemeVoyage = secondaryKinds.Contains(MediaKinds.Video, StringComparer.OrdinalIgnoreCase);
+            //
+            // Mais si la video est DEJA sur le disque, il n'y a rien a attendre : le texte
+            // prend le rattrapage sans delai (precision du user). Le type peut etre redemande
+            // au scraper alors que le fichier existe (exactLocalMissingKinds redemande un
+            // media herite pour obtenir l'exact), donc la seule preuve qui compte est le
+            // fichier lui-meme, pas la liste des types demandes.
+            var videoDejaPresente = plan.Needs.Any(need =>
+                string.Equals(MediaKinds.Normalize(need.Kind), MediaKinds.Video, StringComparison.OrdinalIgnoreCase) &&
+                ((!string.IsNullOrWhiteSpace(need.ExistingPath) && File.Exists(need.ExistingPath)) ||
+                    (!string.IsNullOrWhiteSpace(need.ImportedPath) && File.Exists(need.ImportedPath))));
+            var videoDuMemeVoyage =
+                secondaryKinds.Contains(MediaKinds.Video, StringComparer.OrdinalIgnoreCase) &&
+                !videoDejaPresente;
             var texteSeul = essentialResult.ImportedMediaCount == 0 && textPersistResult.Updated;
             var essentialLivePushAllowed =
                 (essentialResult.ImportedMediaCount > 0 || textPersistResult.Updated) &&
