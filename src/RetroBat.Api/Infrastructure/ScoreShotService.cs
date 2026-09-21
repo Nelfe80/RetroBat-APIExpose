@@ -14,14 +14,20 @@ namespace RetroBat.Api.Infrastructure;
 /// soumission part sur la fin de session, donc plus tard encore. L'image doit donc être prise
 /// PENDANT la partie, ce qui pose la question du moment.
 ///
-/// Le moment retenu : quand le score franchit le seuil d'entrée dans le TOP du jeu. La plateforme
-/// répond ce seuil en un appel au début de la partie. La quasi-totalité des parties ne le
-/// franchissent jamais et ne coûtent donc pas une seule capture ; celles qui le franchissent sont
-/// exactement celles qui méritent une image.
+/// Le moment retenu : quand le score DÉPASSE LE RECORD du jeu. La plateforme répond ce record en
+/// un appel au début de la partie. La quasi-totalité des parties ne le dépassent jamais et ne
+/// coûtent donc pas une seule capture ; celle qui le dépasse est exactement celle qui mérite une
+/// image, et c'est l'instant où il tombe qu'on photographie.
 ///
-/// Ce qui reste en mémoire : une seule image, la plus récente, remplacée à chaque nouveau sommet.
-/// Elle ne monte que si le serveur a PUBLIÉ le score, et elle est effacée sinon. Une partie qui ne
-/// donne rien ne laisse donc aucune trace sur le disque.
+/// UNE photo par partie, pas une par sommet. La première version armait la capture à l'entrée
+/// dans le top 10 puis reprenait une photo toutes les vingt secondes tant que le score montait :
+/// un bon joueur voyait RetroArch annoncer « capture enregistrée » pendant toute sa partie
+/// (retour de la flotte, 2026-09-21). L'image montre donc l'écran au moment où le record est
+/// battu, pas le score final : c'est un prix accepté pour ne plus déranger le jeu.
+///
+/// Ce qui reste en mémoire : cette seule image. Elle ne monte que si le serveur a PUBLIÉ le
+/// score, et elle est effacée sinon. Une partie qui ne donne rien ne laisse donc aucune trace
+/// sur le disque.
 ///
 /// Les DEUX émulateurs sont couverts : RetroArch par sa commande réseau `SCREENSHOT`, MAME
 /// standalone par `snapshot()` via le pont Lua. Dans les deux cas on demande à l'émulateur de se
@@ -31,13 +37,9 @@ namespace RetroBat.Api.Infrastructure;
 /// </summary>
 public sealed class ScoreShotService : BackgroundService
 {
-    /// <summary>Combien de places au classement comptent comme « le top ». Franchir la dixième
-    /// place est le premier moment où une partie devient intéressante à montrer.</summary>
-    private const int TailleDuTop = 10;
-
-    /// <summary>Entre deux photos. Un score qui monte vite en déclencherait des dizaines ; on veut
-    /// la dernière, pas toutes.</summary>
-    private static readonly TimeSpan EntreDeuxPhotos = TimeSpan.FromSeconds(20);
+    /// <summary>La place à dépasser : la première. Le seuil demandé à la plateforme est donc le
+    /// record du jeu, et non l'entrée dans un top.</summary>
+    private const int TailleDuTop = 1;
 
     /// <summary>RetroArch écrit son PNG sans rien répondre : on attend de voir le fichier
     /// apparaître, brièvement.</summary>
@@ -59,9 +61,8 @@ public sealed class ScoreShotService : BackgroundService
     private long? _seuil;                 // null = le tableau n'est pas plein, tout entre
     private bool _seuilConnu;
     private bool _plusPetitEstMeilleur;
-    private bool _arme;                   // le seuil a été franchi au moins une fois
+    private bool _arme;                   // le record est tombé : la photo de cette partie est prise
     private long _scorePhotographie;
-    private DateTime _dernierePhoto = DateTime.MinValue;
     private string? _enAttente;           // le fichier gardé pour cette partie
 
     public ScoreShotService(IEventBus bus, RetroArchReplayClient retroarch,
@@ -151,7 +152,7 @@ public sealed class ScoreShotService : BackgroundService
                 _seuil = seuil; _plusPetitEstMeilleur = bas; _seuilConnu = true;
             }
             _logger.LogInformation(
-                "Capture record : {Rom} entre dans le top {Top} {Condition}.",
+                "Capture record : {Rom} bat le record (top {Top}) {Condition}.",
                 rom, TailleDuTop,
                 seuil is null ? "sans condition (classement incomplet)"
                     : (bas ? "sous " : "au-dessus de ") + seuil.Value.ToString("N0"));
@@ -174,26 +175,16 @@ public sealed class ScoreShotService : BackgroundService
         {
             if (!_seuilConnu || _romGroup.Length == 0) return;
 
-            if (!_arme)
-            {
-                // Franchir le seuil : le moment où cette partie devient intéressante.
-                _arme = _seuil is null
-                    ? total > 0
-                    : (_plusPetitEstMeilleur ? total <= _seuil.Value : total >= _seuil.Value);
-                if (!_arme) return;
-                _logger.LogInformation("Capture record : {Rom} entre dans le top à {Score}.", _romGroup, total.ToString("N0"));
-            }
-
-            // Une fois armé, on suit le score : c'est la DERNIÈRE photo qui compte, donc on
-            // n'en reprend une que si le score s'est réellement amélioré depuis la précédente.
-            var mieux = _enAttente is null
-                || (_plusPetitEstMeilleur ? total < _scorePhotographie : total > _scorePhotographie);
-            photographier = mieux && DateTime.UtcNow - _dernierePhoto >= EntreDeuxPhotos;
-            if (photographier)
-            {
-                _dernierePhoto = DateTime.UtcNow;
-                _scorePhotographie = total;
-            }
+            // Une seule photo par partie : celle de l'instant où le record tombe. Un record
+            // déjà battu dans cette partie ne se rephotographie pas, quoi que fasse le score.
+            if (_arme) return;
+            _arme = _seuil is null
+                ? total > 0
+                : (_plusPetitEstMeilleur ? total < _seuil.Value : total > _seuil.Value);
+            if (!_arme) return;
+            _scorePhotographie = total;
+            photographier = true;
+            _logger.LogInformation("Capture record : {Rom} dépasse le record à {Score}.", _romGroup, total.ToString("N0"));
         }
 
         if (photographier) await PhotographierAsync().ConfigureAwait(false);
@@ -385,7 +376,7 @@ public sealed class ScoreShotService : BackgroundService
         {
             fichier = _enAttente;
             _enAttente = null;
-            _arme = false; _scorePhotographie = 0; _dernierePhoto = DateTime.MinValue;
+            _arme = false; _scorePhotographie = 0;
         }
         if (fichier is null) return;
         try { File.Delete(fichier); } catch { /* elle repartira au prochain remplacement */ }
