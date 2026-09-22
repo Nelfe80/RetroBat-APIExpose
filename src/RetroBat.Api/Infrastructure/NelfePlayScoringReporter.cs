@@ -1250,6 +1250,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "emulator.rejected" => "émulateur écarté",
         "settings.unknown" => "réglages en attente de conformité",
         "metric.spike" => "lecture isolée : le score ne suit pas la partie, à vérifier",
+        "metric.single_sample" => "une seule lecture du score sur toute la partie : mets APIExpose à jour",
         "profile.content_mismatch" => "ROM non reconnue",
         "profile.mem_mismatch" => "définition mémoire non reconnue",
         "profile.core_options_mismatch" => "réglages en attente de conformité",
