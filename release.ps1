@@ -32,6 +32,11 @@ $ex = @(
     "-x!$name\media", "-x!$name\package-installer", "-x!$name\projects-source",
     # Sources de curation (curator) : jamais dans le pack public, le runtime ne les lit pas.
     "-x!$name\resources\outputs", "-x!$name\resources\panels",
+    # Cache des gamelists traduites : GENERE par l'API sur chaque borne (LocalizedGamelistCache,
+    # PrebuildOnStartup), avec ses sauvegardes. Le livrer, c'est installer le cache d'une
+    # borne chez toutes les autres, qui le reconstruisent de toute facon (239 fichiers,
+    # 44 Mo, partis dans les paquets jusqu'a la 1.8.20 inclus).
+    "-x!$name\resources\gamelist\localized",
     # Remaps RetroArch du core MAME : doctrine = cfg MAME uniquement (risque de
     # double remap "en resonance" si un rmp coexiste avec le cfg partage).
     "-x!$name\resources\controls\retroarch\mame",
@@ -105,7 +110,7 @@ $listing = & $sz l $full
 # tools\*.py, resources\ra et ScreenScraper.html sont passes au travers. Il couvre
 # desormais ce que les exclusions ci-dessus retirent, pour que les deux listes se
 # contredisent bruyamment si l'une d'elles derive.
-$leaks = $listing | Select-String '\.env|\.bak|\.ps1$|\.py$|\\media\\|\\src\\|\\tests\\|\\docs\\|\\dist\\|package-installer|projects-source|\.git|panel_curator|profiles_db|\\resources\\ra\\|\\resources\\ram\\\.user\\|ScreenScraper\.html|\\tools\\(ffmpeg|imagemagick|translateLocally|mem-curator|libretro-probe)\\'
+$leaks = $listing | Select-String '\.env|\.bak|\.ps1$|\.py$|\\media\\|\\src\\|\\tests\\|\\docs\\|\\dist\\|package-installer|projects-source|\.git|panel_curator|profiles_db|\\resources\\ra\\|\\resources\\ram\\\.user\\|\\resources\\gamelist\\localized\\|ScreenScraper\.html|\\tools\\(ffmpeg|imagemagick|translateLocally|mem-curator|libretro-probe)\\'
 if ($leaks) { throw "FUITE DETECTEE dans l'archive : $($leaks[0])" }
 # La cle API de la borne ne doit JAMAIS etre committee/distribuee : le defaut reste vide
 # (chaque borne genere la sienne au 1er run). On bloque si une valeur traine.
