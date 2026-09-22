@@ -568,7 +568,36 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             prev = pt.total;
         }
         if (cur.Count > 0 && (best is null || cur[^1].total > bestPeak)) best = cur;
+
+        // UN SEGMENT D'UNE SEULE LECTURE N'EST PAS UNE PARTIE. Un score sportif progresse : il
+        // arrive par une suite de lectures, pas d'un coup, seul entre deux chutes. La RAM de
+        // MAME au demarrage, elle, donne une lecture isolee avant que le jeu n'ecrive son
+        // score - et quand elle est BCD-valide (0x906030 -> 906 030 sur Ms. Pac-Man le
+        // 2026-09-22), rien d'autre ne la distingue d'un score. On prend donc le meilleur
+        // segment qui compte AU MOINS DEUX lectures ; un segment isole ne gagne que s'il n'y a
+        // rien d'autre (partie tres courte, ou une seule lecture dans toute la trajectoire).
+        if (best is { Count: 1 })
+        {
+            var mieux = Segments(traj).Where(seg => seg.Count >= 2).OrderByDescending(seg => seg[^1].total).FirstOrDefault();
+            if (mieux is { Count: >= 2 }) best = mieux;
+        }
         return best ?? traj;
+    }
+
+    /// <summary>Les segments monotones de la trajectoire, dans l'ordre.</summary>
+    private static List<List<(long frame, long total)>> Segments(List<(long frame, long total)> traj)
+    {
+        var sortie = new List<List<(long frame, long total)>>();
+        var cur = new List<(long frame, long total)>();
+        long prev = long.MinValue;
+        foreach (var pt in traj)
+        {
+            if (pt.total < prev && cur.Count > 0) { sortie.Add(cur); cur = new List<(long frame, long total)>(); }
+            cur.Add(pt);
+            prev = pt.total;
+        }
+        if (cur.Count > 0) sortie.Add(cur);
+        return sortie;
     }
 
     private void CaptureTotal(JsonElement root)
@@ -734,7 +763,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 systemId, romGroup, sessionJson, ticket.Value, profile.Value,
                 deviceId!, deviceKey, listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion,
                 coreName, coreVersion,
-                runPeak, bestRun, trajectory.Count, nvram, bios);
+                runPeak, bestRun, trajectory, nvram, bios);
             var body = passport.DeepClone()!.AsObject();
             body.Remove("signature");
             passport["signature"] = deviceKey.SignB64Url(Jcs.CanonicalBytes(body));
@@ -766,7 +795,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         string deviceId, CngDeviceKey deviceKey, string listenerSha, string? coreSha, string? memSha,
         string? contentSha, string? contentMd5, string? contentSha1, string? wrapperVersion,
         string? coreName, string? coreVersion, long finalTotal, List<(long frame, long total)> trajectory,
-        int totalSamples = 0, JsonArray? nvram = null, JsonObject? bios = null)
+        List<(long frame, long total)>? toutesLesLectures = null, JsonArray? nvram = null, JsonObject? bios = null)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
@@ -840,6 +869,24 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             checkpoints.Add(new JsonObject { ["monotonic_ms"] = endMs, ["frame"] = frameCount, ["metric"] = finalTotal.ToString(), ["event"] = "game_end" });
         }
         var checkpointsDigest = Crypto.Sha256Hex(Jcs.CanonicalBytes(checkpoints));
+
+        // TOUTES LES LECTURES DE LA PARTIE, a cote des checkpoints (qui ne portent que le run
+        // retenu et doivent rester croissants). Elles sont signees comme le reste, et c'est
+        // avec elles que la plateforme peut RETROUVER le bon score quand la borne s'est
+        // trompee de segment - au lieu d'ecarter la partie, ce qui punirait le joueur. Vecu le
+        // 2026-09-22 : la RAM de MAME avant le demarrage donne 906 030, lecture isolee retenue
+        // comme run ; la vraie partie, elle, est dans ces lectures.
+        var lectures = new JsonArray();
+        var brut = toutesLesLectures ?? trajectory;
+        var pasLecture = brut.Count > 128 ? (brut.Count / 128) + 1 : 1;
+        for (var i = 0; i < brut.Count; i += pasLecture)
+        {
+            lectures.Add(brut[i].total);
+        }
+        if (brut.Count > 0 && (brut.Count - 1) % pasLecture != 0)
+        {
+            lectures.Add(brut[^1].total);   // la derniere lecture compte toujours
+        }
 
         // Empreintes gated par le profil (listener/core/mem) = attestation. Les modules
         // détaillés (frontend/apiexpose/launcher/hook) + process + content ROM restent à
@@ -934,11 +981,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 // partie en a produit des dizaines (Ms. Pac-Man, 906 030 sur 117 lectures,
                 // 2026-09-22). Corrige a la source depuis la 1.8.22 ; ces nombres sont la pour
                 // que le serveur n'ait plus a faire confiance a la version de la borne.
-                ["samples"] = totalSamples,
+                ["samples"] = toutesLesLectures?.Count ?? trajectory.Count,
                 ["run_samples"] = trajectory.Count,
                 ["max_step"] = PlusGrandPas(trajectory),
             },
-            ["progression"] = new JsonObject { ["checkpoints"] = checkpoints, ["checkpoints_digest"] = checkpointsDigest },
+            ["progression"] = new JsonObject
+            {
+                ["checkpoints"] = checkpoints,
+                ["checkpoints_digest"] = checkpointsDigest,
+                ["samples"] = lectures,
+            },
             ["local_check"] = "pass",
         };
         // Les NVRAM du jeu (EEPROM, RAM de sauvegarde) : jointes seulement quand le jeu en a, pour

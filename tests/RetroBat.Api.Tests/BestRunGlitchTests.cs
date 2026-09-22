@@ -38,6 +38,24 @@ public sealed class BestRunGlitchTests
     }
 
     [Fact]
+    public void Une_lecture_parasite_en_TETE_de_partie_ne_devient_pas_le_run()
+    {
+        // Ms. Pac-Man sous MAME, 2026-09-22 : la RAM avant le demarrage du jeu donne 906 030
+        // (BCD valide), puis la vraie partie monte de 0 a 2 600.
+        var run = NelfePlayScoringReporter.SelectBestRun(Traj(906030, 0, 10, 200, 1400, 2600));
+        Assert.Equal(2600, run[^1].total);
+        Assert.DoesNotContain(run, p => p.total == 906030);
+    }
+
+    [Fact]
+    public void Un_segment_isole_gagne_quand_il_n_y_a_rien_d_autre()
+    {
+        // Une seule lecture dans toute la partie : on n'a rien de mieux a proposer.
+        var run = NelfePlayScoringReporter.SelectBestRun(Traj(4200));
+        Assert.Equal(4200, run[^1].total);
+    }
+
+    [Fact]
     public void Un_pic_final_sans_lecture_apres_ne_peut_pas_etre_tranche()
     {
         // Rien ne suit le pic : on ne peut pas savoir, la regle ne s'applique pas.
