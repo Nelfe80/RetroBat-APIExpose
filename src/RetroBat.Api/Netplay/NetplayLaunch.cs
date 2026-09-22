@@ -85,28 +85,32 @@ public static class NetplayLaunch
     /// <summary>Lance emulatorLauncher avec ces arguments, sans passer par ES. Public : le
     /// lancement a moteur impose (commands/launch) s'en sert aussi.</summary>
     public static bool LancerDirectement(string arguments, ILogger logger)
+        => DemarrerDirectement(arguments, logger) is not null;
+
+    /// <summary>Comme LancerDirectement, mais rend le processus du lanceur : il vit tant que
+    /// l'emulateur tourne, ce qui permet de savoir quand la partie finit.</summary>
+    public static Process? DemarrerDirectement(string arguments, ILogger logger)
     {
         var exe = Path.Combine(RetroBatPaths.RetroBatRoot, "emulationstation", "emulatorLauncher.exe");
         if (!File.Exists(exe))
         {
             logger.LogWarning("Netplay : emulatorLauncher introuvable ({Chemin}).", exe);
-            return false;
+            return null;
         }
         try
         {
-            Process.Start(new ProcessStartInfo
+            return Process.Start(new ProcessStartInfo
             {
                 FileName = exe,
                 Arguments = arguments,
                 WorkingDirectory = Path.GetDirectoryName(exe)!,
                 UseShellExecute = false,
             });
-            return true;
         }
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Netplay : lancement refuse.");
-            return false;
+            return null;
         }
     }
 

@@ -19,11 +19,13 @@ public class CommandsController : ControllerBase
     private const int RetroArchPort = 55355;
     private readonly ApiContext _context;
     private readonly ILogger<CommandsController> _logger;
+    private readonly RetroBat.Domain.Interfaces.IEventBus _bus;
 
-    public CommandsController(ApiContext context, ILogger<CommandsController> logger)
+    public CommandsController(ApiContext context, ILogger<CommandsController> logger, RetroBat.Domain.Interfaces.IEventBus bus)
     {
         _context = context;
         _logger = logger;
+        _bus = bus;
     }
 
     /// <summary>
@@ -93,10 +95,50 @@ public class CommandsController : ControllerBase
                 string.IsNullOrWhiteSpace(payload.Core) ? string.Empty : payload.Core.Trim(),
                 "-rom", '"' + romPath.Replace("\"", "") + '"',
             }.Where(x => x.Length > 0));
-            if (!RetroBat.Api.Netplay.NetplayLaunch.LancerDirectement(arguments, _logger))
+            var lanceur = RetroBat.Api.Netplay.NetplayLaunch.DemarrerDirectement(arguments, _logger);
+            if (lanceur is null)
             {
                 return StatusCode(StatusCodes.Status502BadGateway, new { message = "emulatorLauncher could not be started.", romPath });
             }
+            // SANS EMULATIONSTATION, PERSONNE NE DIT QUEL JEU TOURNE. Le contexte « jeu en cours »
+            // vient d'ordinaire du hook game-start d'ES ; sans lui, le wrapper resout sa
+            // definition sur le jeu SELECTIONNE dans le menu, ou sur rien, et aucun score
+            // n'est lu (labo du 2026-09-22 : 0 evenement sur FBNeo lance en direct). On pose
+            // donc le jeu nous-memes, on annonce son debut, et sa fin quand le lanceur rend la
+            // main - il vit tant que l'emulateur tourne.
+            var jeu = new GameReference
+            {
+                SystemId = systeme,
+                GamePath = romPath,
+                GameName = Path.GetFileNameWithoutExtension(romPath),
+            };
+            _context.Ui.Running = jeu;
+            _context.Ui.State = "playing";
+            _ = _bus.PublishAsync(new RetroBat.Domain.Events.EventEnvelope
+            {
+                Type = "ui.game.started",
+                Payload = new { Source = "commands.launch", SystemId = systeme, GamePath = romPath, GameName = jeu.GameName, Direct = true },
+            });
+            var bus = _bus;
+            var contexte = _context;
+            _ = Task.Run(async () =>
+            {
+                try { await lanceur.WaitForExitAsync().ConfigureAwait(false); } catch { /* le lanceur a deja disparu */ }
+                if (ReferenceEquals(contexte.Ui.Running, jeu))
+                {
+                    contexte.Ui.Running = null;
+                    contexte.Ui.State = "browsing";
+                }
+                try
+                {
+                    await bus.PublishAsync(new RetroBat.Domain.Events.EventEnvelope
+                    {
+                        Type = "ui.game.ended",
+                        Payload = new { Source = "commands.launch", SystemId = systeme, GamePath = romPath, GameName = jeu.GameName, Direct = true },
+                    }).ConfigureAwait(false);
+                }
+                catch { /* rien a faire de plus */ }
+            });
             _ = RetroBat.Api.Infrastructure.EmulatorForeground.FocusEmulatorWhenUpAsync();
             return Accepted(new
             {
