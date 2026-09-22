@@ -66,6 +66,9 @@ public class RetroArchWrapperDeploymentHostedService : IHostedService
             {
                 if (ct.IsCancellationRequested) return;
                 var result = await _deploymentService.DeployAsync(options.DryRunOnStartup, ct).ConfigureAwait(false);
+                // Ce que la borne dira d'elle-meme a la plateforme : une borne dont le wrapper
+                // n'enveloppe aucun coeur ne mesurera aucun score, et personne ne le voyait.
+                CabinetState.NoterWrapper(result);
                 if (result.SkippedBecauseRetroArchRunning)
                 {
                     var attente = DelaiAvantReprise(essai, options.MaxRetries, intervalle);

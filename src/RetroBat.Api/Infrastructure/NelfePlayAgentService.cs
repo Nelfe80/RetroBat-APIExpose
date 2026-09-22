@@ -548,6 +548,14 @@ public sealed class NelfePlayAgentService : BackgroundService
         {
             client.DefaultRequestHeaders.Add("X-Nelfeplay-Label", MachineLabel);
         }
+        // Meme esprit que le nom : la borne DIT ce qu'elle est, la plateforme l'affiche. La
+        // version repond a « est-il a jour ? » et l'etat du wrapper a « cette borne mesure-t-elle
+        // quelque chose ? » - deux questions qu'on ne pouvait poser qu'au joueur jusqu'ici.
+        if (!string.IsNullOrEmpty(CabinetState.Version))
+        {
+            client.DefaultRequestHeaders.Add("X-Nelfeplay-Version", CabinetState.Version);
+        }
+        client.DefaultRequestHeaders.Add("X-Nelfeplay-Wrapper", CabinetState.Wrapper);
 
         return client;
     }

@@ -941,7 +941,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 ["loaded_sha256"] = listenerSha, ["end_sha256"] = listenerSha,
                 ["certification"] = "listener-homologation",
             },
-            ["software"] = new JsonObject { ["modules"] = modules, ["modules_digest"] = modulesDigest },
+            ["software"] = new JsonObject
+            {
+                ["modules"] = modules,
+                ["modules_digest"] = modulesDigest,
+                // Avec quoi cette partie a ete mesuree : sans cela, une anomalie de mesure ne
+                // peut pas etre rattachee a une version, et on ne sait pas qui doit mettre a jour.
+                ["apiexpose"] = CabinetState.Version,
+                ["wrapper_state"] = CabinetState.Wrapper,
+            },
             ["artifacts"] = new JsonObject
             {
                 ["core"] = CoreArtifact(coreSha, coreName, coreVersion), ["content"] = ContentArtifact(contentSha, contentMd5, contentSha1), ["mem"] = Triple(memSha),
