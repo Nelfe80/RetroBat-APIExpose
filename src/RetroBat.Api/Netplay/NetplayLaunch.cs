@@ -82,7 +82,9 @@ public static class NetplayLaunch
         }
     }
 
-    private static bool LancerDirectement(string arguments, ILogger logger)
+    /// <summary>Lance emulatorLauncher avec ces arguments, sans passer par ES. Public : le
+    /// lancement a moteur impose (commands/launch) s'en sert aussi.</summary>
+    public static bool LancerDirectement(string arguments, ILogger logger)
     {
         var exe = Path.Combine(RetroBatPaths.RetroBatRoot, "emulationstation", "emulatorLauncher.exe");
         if (!File.Exists(exe))

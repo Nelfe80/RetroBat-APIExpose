@@ -18,10 +18,12 @@ public class CommandsController : ControllerBase
     private const string RetroArchHost = "127.0.0.1";
     private const int RetroArchPort = 55355;
     private readonly ApiContext _context;
+    private readonly ILogger<CommandsController> _logger;
 
-    public CommandsController(ApiContext context)
+    public CommandsController(ApiContext context, ILogger<CommandsController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     /// <summary>
@@ -69,6 +71,42 @@ public class CommandsController : ControllerBase
             {
                 message = "ROM file not found.",
                 romPath
+            });
+        }
+
+        // MOTEUR IMPOSE : l'API HTTP d'EmulationStation ne prend qu'un chemin de ROM, et c'est ES
+        // qui choisit l'emulateur. Quand l'appelant impose un emulateur (le labo, qui qualifie
+        // une definition sur FBNeo, MAME RetroArch ET MAME standalone), on lance nous-memes
+        // emulatorLauncher avec -emulator/-core, en reprenant mot pour mot les arguments de
+        // manette du dernier lancement d'ES, comme le fait le netplay quand ES ne repond pas.
+        if (!string.IsNullOrWhiteSpace(payload.Emulator))
+        {
+            var systeme = string.IsNullOrWhiteSpace(payload.System)
+                ? Path.GetFileName(Path.GetDirectoryName(romPath) ?? string.Empty)
+                : payload.System.Trim();
+            var arguments = string.Join(' ', new[]
+            {
+                RetroBat.Api.Netplay.EsLaunchArguments.ManettesDuDernierLancement(),
+                "-system", systeme,
+                "-emulator", payload.Emulator.Trim(),
+                string.IsNullOrWhiteSpace(payload.Core) ? string.Empty : "-core",
+                string.IsNullOrWhiteSpace(payload.Core) ? string.Empty : payload.Core.Trim(),
+                "-rom", '"' + romPath.Replace("\"", "") + '"',
+            }.Where(x => x.Length > 0));
+            if (!RetroBat.Api.Netplay.NetplayLaunch.LancerDirectement(arguments, _logger))
+            {
+                return StatusCode(StatusCodes.Status502BadGateway, new { message = "emulatorLauncher could not be started.", romPath });
+            }
+            _ = RetroBat.Api.Infrastructure.EmulatorForeground.FocusEmulatorWhenUpAsync();
+            return Accepted(new
+            {
+                status = "launching",
+                gameId = payload.GameId,
+                romPath,
+                direct = true,
+                system = systeme,
+                emulator = payload.Emulator.Trim(),
+                core = payload.Core?.Trim() ?? string.Empty,
             });
         }
 
@@ -396,6 +434,22 @@ public class LaunchPayload
     /// </summary>
     /// <example></example>
     public string Options { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Optional: force the emulator instead of letting EmulationStation choose (e.g. "libretro",
+    /// "mame64"). The game is then started through emulatorLauncher directly, with the controller
+    /// arguments of the last EmulationStation launch.
+    /// </summary>
+    /// <example>libretro</example>
+    public string Emulator { get; set; } = string.Empty;
+
+    /// <summary>Optional, with Emulator: the libretro core ("fbneo", "mame").</summary>
+    /// <example>mame</example>
+    public string Core { get; set; } = string.Empty;
+
+    /// <summary>Optional, with Emulator: the system name passed to the launcher (defaults to the ROM folder name).</summary>
+    /// <example>mame</example>
+    public string System { get; set; } = string.Empty;
 }
 
 public class CloseGamePayload

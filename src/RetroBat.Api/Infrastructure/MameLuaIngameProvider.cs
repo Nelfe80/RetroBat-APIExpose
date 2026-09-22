@@ -289,6 +289,21 @@ public sealed class MameLuaIngameProvider : IProvider
                     _logger.LogInformation("MAME Lua : capture {Etat} (frame {Frame}).",
                         parts.Length > 1 ? parts[1] : "?", parts.Length > 2 ? parts[2] : "?");
                 }
+                else if (command.Equals("INPUTS", StringComparison.OrdinalIgnoreCase))
+                {
+                    // La liste des champs d'entree de la machine, demandee par INPUTS? : c'est
+                    // ce que le labo consulte pour savoir comment s'appellent Start et le bouton 1.
+                    var noms = parts.Length > 1
+                        ? parts[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                        : Array.Empty<string>();
+                    lock (_sortieGate) { _champs = noms; }
+                    _attenteChamps?.TrySetResult(noms);
+                }
+                else if (command.Equals("INPUT", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (parts.Length > 2 && (parts[2] == "absent" || parts[2] == "err"))
+                        _logger.LogInformation("MAME Lua : entree {Champ} {Etat}.", parts[1], parts[2]);
+                }
                 else if (command.Equals("BYE", StringComparison.OrdinalIgnoreCase))
                 {
                     break;
@@ -324,6 +339,48 @@ public sealed class MameLuaIngameProvider : IProvider
     public bool EstConnecte
     {
         get { lock (_sortieGate) { return _sortie is not null; } }
+    }
+
+    // ── Entrees injectees : le labo pilote MAME comme il pilote RetroArch ─────────────────
+    //
+    // RetroArch a une manette reseau, MAME n'en a pas ; le plugin force un champ d'entree par
+    // son nom MAME (INPUT|<nom>|1) et le rend au joueur (INPUT|<nom>|0). INPUTS? donne les noms.
+    private string[] _champs = Array.Empty<string>();
+    private TaskCompletionSource<string[]>? _attenteChamps;
+
+    private async Task<bool> EnvoyerAsync(string ligne, CancellationToken ct)
+    {
+        System.IO.StreamWriter? sortie;
+        lock (_sortieGate) { sortie = _sortie; }
+        if (sortie is null) return false;
+        try
+        {
+            await sortie.WriteLineAsync(ligne.AsMemory(), ct).ConfigureAwait(false);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "MAME Lua : envoi impossible ({Ligne}).", ligne);
+            return false;
+        }
+    }
+
+    /// <summary>Force (ou rend) un champ d'entree de la machine, designe par son nom MAME.</summary>
+    public Task<bool> RequestInputAsync(string champ, bool presse, CancellationToken ct)
+        => EnvoyerAsync("INPUT|" + champ.Replace('|', ' ') + "|" + (presse ? "1" : "0"), ct);
+
+    /// <summary>Rend tous les champs forces a la machine.</summary>
+    public Task<bool> RequestReleaseAsync(CancellationToken ct) => EnvoyerAsync("RELEASE", ct);
+
+    /// <summary>Les noms des champs d'entree de la machine en cours (vide si MAME ne repond pas).</summary>
+    public async Task<string[]> RequestInputsAsync(TimeSpan patience, CancellationToken ct)
+    {
+        var attente = new TaskCompletionSource<string[]>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _attenteChamps = attente;
+        if (!await EnvoyerAsync("INPUTS?", ct).ConfigureAwait(false)) return Array.Empty<string>();
+        var fini = await Task.WhenAny(attente.Task, Task.Delay(patience, ct)).ConfigureAwait(false);
+        if (fini == attente.Task) return attente.Task.Result;
+        lock (_sortieGate) { return _champs; }
     }
 
     /// <summary>
