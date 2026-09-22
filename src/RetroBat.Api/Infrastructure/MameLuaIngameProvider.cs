@@ -46,12 +46,66 @@ public sealed class MameLuaIngameProvider : IProvider
     {
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _workerTask = RunAsync(_cts.Token);
+        try { _wrapperSubscription = _eventBus.Subscribe<EventEnvelope>(OnBusEvent); }
+        catch (Exception ex) { _logger.LogDebug(ex, "MAME Lua : abonnement au bus impossible."); }
         _logger.LogInformation("MameLuaIngameProvider bridge starting on 127.0.0.1:{Port}", GetPort());
         return Task.CompletedTask;
     }
 
+    // ── Le coeur libretro MAME charge AUSSI ce plugin ─────────────────────────────────────
+    //
+    // Mesure du 2026-09-22 (labo, Altered Beast sous le coeur libretro MAME) : RetroArch tourne,
+    // le wrapper atteste « MAME 0.2xx » puis le plugin Lua, charge par le coeur depuis
+    // bios\mame\plugins, se connecte au pont et prend la main sur les scores (le wrapper ne
+    // lit aucune RAM de ce coeur). Le passeport nommait alors mame.exe 0.286 - un binaire qui
+    // ne tournait pas - et le profil aurait epingle le mauvais moteur. Quand RetroArch tourne
+    // et qu'un wrapper vient d'attester, l'identite du moteur est celle du coeur libretro ;
+    // le listener reste le plugin, c'est lui qui mesure.
+    private IDisposable? _wrapperSubscription;
+    private readonly object _wrapperGate = new();
+    private (string? Sha, string? Name, string? Version, DateTime At) _dernierCoeurWrapper;
+
+    private void OnBusEvent(EventEnvelope e)
+    {
+        if (!string.Equals(e.Type, "scoring.listener.attestation", StringComparison.Ordinal)) return;
+        try
+        {
+            var el = JsonSerializer.SerializeToElement(e.Payload);
+            if (!el.TryGetProperty("Source", out var src) || !string.Equals(src.GetString(), "retroarch.wrapper.pipe", StringComparison.Ordinal)) return;
+            string? Lire(string nom) => el.TryGetProperty(nom, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
+            lock (_wrapperGate)
+            {
+                _dernierCoeurWrapper = (Lire("CoreSha256"), Lire("CoreName"), Lire("CoreVersion"), DateTime.UtcNow);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "MAME Lua : attestation du wrapper illisible.");
+        }
+    }
+
+    /// <summary>Le coeur libretro qui heberge ce plugin, si c'est le cas : RetroArch tourne et
+    /// son wrapper vient d'attester ; null quand c'est MAME standalone qui tourne.</summary>
+    private (string Sha, string Name, string Version)? CoeurLibretroHote()
+    {
+        try
+        {
+            if (System.Diagnostics.Process.GetProcessesByName("retroarch").Length == 0) return null;
+            if (System.Diagnostics.Process.GetProcessesByName("mame").Length > 0
+                || System.Diagnostics.Process.GetProcessesByName("mame64").Length > 0) return null;
+        }
+        catch { return null; }
+        lock (_wrapperGate)
+        {
+            var (sha, nom, version, at) = _dernierCoeurWrapper;
+            if (string.IsNullOrEmpty(sha) || DateTime.UtcNow - at > TimeSpan.FromMinutes(3)) return null;
+            return (sha!, nom ?? "MAME", version ?? "");
+        }
+    }
+
     public async Task StopAsync(CancellationToken cancellationToken = default)
     {
+        try { _wrapperSubscription?.Dispose(); } catch { }
         if (_cts != null)
         {
             _cts.Cancel();
@@ -1182,7 +1236,7 @@ public sealed class MameLuaIngameProvider : IProvider
     // qui les émet par pipe). Identité = Voie A étendue à MAME (content = md5 gamelist
     // MAME, core = mame64.exe, listener = plugin Lua, mem = .MEM). RESTE : un profil
     // engine=mame_standalone + l'homologation du SHA du plugin + la VALIDATION en jeu.
-    private const string MameLuaListenerVersion = "mame-lua-0.2.0";
+    private const string MameLuaListenerVersion = "mame-lua-0.3.0";
 
     private async Task PublishScoringAttestationAsync(MameLuaDefinition definition)
     {
@@ -1192,6 +1246,16 @@ public sealed class MameLuaIngameProvider : IProvider
             if (listenerSha is null)
             {
                 return;   // pas de listener mesurable -> pas d'attestation (le reporter n'insiste pas)
+            }
+            var coreName = "mame_standalone";
+            var hote = CoeurLibretroHote();
+            if (hote is { } libretro)
+            {
+                coreSha = libretro.Sha;
+                coreName = libretro.Name;
+                coreVersion = libretro.Version;
+                _logger.LogInformation("MAME Lua : plugin heberge par le coeur libretro {Nom} {Version} ({Sha}) ; c'est lui que le passeport nomme.",
+                    coreName, coreVersion, coreSha.Length >= 12 ? coreSha[..12] : coreSha);
             }
             await _eventBus.PublishAsync(new EventEnvelope
             {
@@ -1206,7 +1270,7 @@ public sealed class MameLuaIngameProvider : IProvider
                     // « mame_standalone » et non « mame » : ce n'est pas le meme binaire que le
                     // coeur libretro du meme nom, et les confondre dans l'inventaire melangerait
                     // deux moteurs qui ne se comportent pas pareil.
-                    CoreName = "mame_standalone",
+                    CoreName = coreName,
                     CoreVersion = coreVersion,
                     MemSha256 = memSha,
                     ContentSha256 = (string?)null,
