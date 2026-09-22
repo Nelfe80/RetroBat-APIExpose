@@ -67,26 +67,14 @@ begin
     Result := 'windowsdesktop-runtime-8-win-x64.exe';
 end;
 
-function DotNetFxInRegistry(const Fx: String): Boolean;
-var
-  Names: TArrayOfString;
-  I: Integer;
-begin
-  Result := False;
-  if RegGetValueNames(HKLM32, 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedfx\' + Fx, Names) then
-    for I := 0 to GetArrayLength(Names) - 1 do
-      if Pos(DotNetMajorPrefix, Names[I]) = 1 then
-        Result := True;
-end;
-
-function DotNetFxOnDisk(const Fx: String): Boolean;
+function DotNetFxInFolder(const Root, Fx: String): Boolean;
 var
   FindRec: TFindRec;
 begin
   Result := False;
-  if not IsWin64 then
+  if Root = '' then
     Exit;
-  if FindFirst(ExpandConstant('{commonpf64}\dotnet\shared\') + Fx + '\' + DotNetMajorPrefix + '*', FindRec) then
+  if FindFirst(Root + '\shared\' + Fx + '\' + DotNetMajorPrefix + '*', FindRec) then
   begin
     try
       repeat
@@ -99,9 +87,28 @@ begin
   end;
 end;
 
+function DotNetFxOnDisk(const Fx: String): Boolean;
+begin
+  Result := False;
+  if not IsWin64 then
+    Exit;
+  Result := DotNetFxInFolder(ExpandConstant('{commonpf64}\dotnet'), Fx);
+  if not Result then
+    Result := DotNetFxInFolder(GetEnv('DOTNET_ROOT'), Fx);
+end;
+
+// LE REGISTRE N'EST PAS UNE PREUVE, LES FICHIERS OUI.
+//
+// Une machine declarait ASP.NET Core 8.0.31 et Desktop 8.0.30 au registre : l'installeur
+// concluait « present », n'installait rien, et RetroBat.Api.exe refusait de demarrer avec
+// « You must install or update .NET ». Le joueur a du aller chercher le runtime a la main
+// (2026-09-22). Le registre dit ce qu'un installeur a DECLARE un jour ; les dossiers disent ce
+// qui est la maintenant. On exige donc les fichiers. Au pire on repose un runtime deja present,
+// ce que l'installeur de Microsoft regle en quelques secondes ; au mieux on evite une borne qui
+// ne demarre pas et un joueur qui abandonne.
 function DotNetFxPresent(Index: Integer): Boolean;
 begin
-  Result := DotNetFxInRegistry(DotNetFxName(Index)) or DotNetFxOnDisk(DotNetFxName(Index));
+  Result := DotNetFxOnDisk(DotNetFxName(Index));
 end;
 
 function DotNetAllPresent(): Boolean;
