@@ -35,6 +35,14 @@ public class RetroArchWrapperDeploymentHostedService : IHostedService
         var options = _options.Value.RetroArchWrapperDeployment;
         if (!options.AutoDeploy || !_runtimeOptions.IsRetroArchWrapperEnabled())
         {
+            // Sans deploiement automatique, personne ne dirait ce que vaut le wrapper : on
+            // AUDITE quand meme, une fois, pour que la borne puisse l'annoncer. Un audit ne
+            // touche a rien, il regarde.
+            _ = Task.Run(async () =>
+            {
+                try { CabinetState.NoterWrapper(await _deploymentService.AuditAsync(_arret.Token).ConfigureAwait(false)); }
+                catch (Exception ex) { _logger.LogDebug(ex, "RetroArch wrapper : audit d'etat impossible."); }
+            }, CancellationToken.None);
             return Task.CompletedTask;
         }
 
