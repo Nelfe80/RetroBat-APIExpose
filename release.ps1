@@ -37,6 +37,9 @@ $ex = @(
     # borne chez toutes les autres, qui le reconstruisent de toute facon (239 fichiers,
     # 44 Mo, partis dans les paquets jusqu'a la 1.8.20 inclus).
     "-x!$name\resources\gamelist\localized",
+    # Etat de la borne ecrit par l'API avant chaque lancement (les reglages certifies forces
+    # pour le jeu en cours) : gitignore, et pas plus a livrer que wrapper\.env.
+    "-x!$name\wrapper\certified.txt",
     # Remaps RetroArch du core MAME : doctrine = cfg MAME uniquement (risque de
     # double remap "en resonance" si un rmp coexiste avec le cfg partage).
     "-x!$name\resources\controls\retroarch\mame",
@@ -110,7 +113,7 @@ $listing = & $sz l $full
 # tools\*.py, resources\ra et ScreenScraper.html sont passes au travers. Il couvre
 # desormais ce que les exclusions ci-dessus retirent, pour que les deux listes se
 # contredisent bruyamment si l'une d'elles derive.
-$leaks = $listing | Select-String '\.env|\.bak|\.ps1$|\.py$|\\media\\|\\src\\|\\tests\\|\\docs\\|\\dist\\|package-installer|projects-source|\.git|panel_curator|profiles_db|\\resources\\ra\\|\\resources\\ram\\\.user\\|\\resources\\gamelist\\localized\\|ScreenScraper\.html|\\tools\\(ffmpeg|imagemagick|translateLocally|mem-curator|libretro-probe)\\'
+$leaks = $listing | Select-String '\.env|\.bak|\.ps1$|\.py$|\\media\\|\\src\\|\\tests\\|\\docs\\|\\dist\\|package-installer|projects-source|\.git|panel_curator|profiles_db|\\resources\\ra\\|\\resources\\ram\\\.user\\|\\resources\\gamelist\\localized\\|\\wrapper\\certified\.txt|ScreenScraper\.html|\\tools\\(ffmpeg|imagemagick|translateLocally|mem-curator|libretro-probe)\\'
 if ($leaks) { throw "FUITE DETECTEE dans l'archive : $($leaks[0])" }
 # La cle API de la borne ne doit JAMAIS etre committee/distribuee : le defaut reste vide
 # (chaque borne genere la sienne au 1er run). On bloque si une valeur traine.
