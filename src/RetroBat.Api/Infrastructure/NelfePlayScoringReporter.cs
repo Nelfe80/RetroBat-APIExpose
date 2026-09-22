@@ -464,6 +464,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // joueur croit jouer pour rien et s'arrete.
             if (!certifiable && reason == "profile.core_mismatch")
                 message = "Émulateur pas encore reconnu : ton score sera gardé et classé dès qu'il le sera";
+            // Meme regle pour les reglages (decision user 2026-09-22) : des reglages que la
+            // plateforme ne connait pas encore ne font pas perdre la partie, ils attendent
+            // leur quorum. « Non conformes (usine requis) » disait au joueur qu'il avait
+            // triche, alors qu'il jouait le plus souvent avec les reglages de tout le monde.
+            else if (!certifiable && reason == "profile.core_options_mismatch")
+                message = "Réglages en attente de conformité : ton score sera gardé et classé dès qu'ils seront reconnus";
             else if (!certifiable)
                 message = $"Partie non certifiable : {ReasonToText(reason)}";
             else if (dangers.Count > 0)
@@ -1011,7 +1017,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 // La quarantaine n'est PAS un refus : le score est garde avec son passeport
                 // signe et entrera au classement des que l'emulateur sera reconnu. Le dire
                 // ainsi change tout pour le joueur, qui a joue et qui garde quelque chose.
-                "quarantined" => $"Score {score:N0} enregistré, en attente : ton émulateur n'est pas encore reconnu",
+                "quarantined" => reason == "settings.unknown"
+                    ? $"Score {score:N0} enregistré, en attente de conformité des réglages"
+                    : $"Score {score:N0} enregistré, en attente : ton émulateur n'est pas encore reconnu",
                 "expired" => $"Score {score:N0} non classé : {ReasonToText(reason)}",
                 "refused" => $"Score {score:N0} refusé : {ReasonToText(reason)}",
                 _ => $"Score non transmis : {ReasonToText(reason)}",
@@ -1138,9 +1146,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "emulator.never_recognised" => "émulateur jamais reconnu, attente close",
         "emulator.profile_moved" => "le règlement du jeu a changé pendant l'attente",
         "emulator.rejected" => "émulateur écarté",
+        "settings.unknown" => "réglages en attente de conformité",
         "profile.content_mismatch" => "ROM non reconnue",
         "profile.mem_mismatch" => "définition mémoire non reconnue",
-        "profile.core_options_mismatch" => "réglages non conformes (usine requis)",
+        "profile.core_options_mismatch" => "réglages en attente de conformité",
         "profile.listener_unauthorized" => "listener non homologué (wrapper ou plugin MAME)",
         "profile.not_open" => "classement fermé",
         "profile.mismatch" => "jeu ou règlement non concordant",
