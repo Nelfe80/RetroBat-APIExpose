@@ -871,6 +871,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 ["venue"] = contextVenue,
                 ["channel"] = sessionPlayer?.Channel,
                 ["contest_id"] = sessionPlayer?.ContestId,
+                // Partie de LABORATOIRE (drapeau de NelfeScoreLab) : signee et verifiee comme les
+                // autres, jamais classee. Un essai a publie 906 030 sur Ms. Pac-Man (2026-09-22).
+                ["lab"] = RetroBat.Api.Scoring.ScoreLabLabMode.IsActive(DateTime.UtcNow, out _) ? true : null,
             },
             ["listener"] = new JsonObject
             {
