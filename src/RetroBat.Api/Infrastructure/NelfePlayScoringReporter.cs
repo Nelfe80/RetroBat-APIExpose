@@ -734,7 +734,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 systemId, romGroup, sessionJson, ticket.Value, profile.Value,
                 deviceId!, deviceKey, listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion,
                 coreName, coreVersion,
-                runPeak, bestRun, nvram, bios);
+                runPeak, bestRun, trajectory.Count, nvram, bios);
             var body = passport.DeepClone()!.AsObject();
             body.Remove("signature");
             passport["signature"] = deviceKey.SignB64Url(Jcs.CanonicalBytes(body));
@@ -748,12 +748,25 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         await SubmitAsync(credential!, passport, cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>Le plus grand ecart entre deux lectures consecutives du run retenu : un saut
+    /// isole se voit la, sans rien savoir du jeu.</summary>
+    private static long PlusGrandPas(List<(long frame, long total)> run)
+    {
+        long max = 0;
+        for (var i = 1; i < run.Count; i++)
+        {
+            var pas = run[i].total - run[i - 1].total;
+            if (pas > max) max = pas;
+        }
+        return max;
+    }
+
     private JsonObject BuildPassport(
         string systemId, string romGroup, string sessionJson, JsonElement ticket, JsonElement profile,
         string deviceId, CngDeviceKey deviceKey, string listenerSha, string? coreSha, string? memSha,
         string? contentSha, string? contentMd5, string? contentSha1, string? wrapperVersion,
         string? coreName, string? coreVersion, long finalTotal, List<(long frame, long total)> trajectory,
-        JsonArray? nvram = null, JsonObject? bios = null)
+        int totalSamples = 0, JsonArray? nvram = null, JsonObject? bios = null)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
@@ -914,6 +927,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 ["type"] = "score", ["unit"] = "points", ["value"] = finalTotal.ToString(),
                 ["ranking_direction"] = direction, ["result_source"] = resultSource,
+                // LA FORME DE LA TRAJECTOIRE, SIGNEE AVEC LE RESTE. Sans elle, la plateforme ne
+                // voit qu'un nombre et ne peut juger d'une anomalie qu'en le comparant aux autres
+                // scores, ce qui punirait un bon joueur. Avec elle, elle reconnait la signature
+                // d'une lecture parasite : un score retenu sur UNE SEULE lecture alors que la
+                // partie en a produit des dizaines (Ms. Pac-Man, 906 030 sur 117 lectures,
+                // 2026-09-22). Corrige a la source depuis la 1.8.22 ; ces nombres sont la pour
+                // que le serveur n'ait plus a faire confiance a la version de la borne.
+                ["samples"] = totalSamples,
+                ["run_samples"] = trajectory.Count,
+                ["max_step"] = PlusGrandPas(trajectory),
             },
             ["progression"] = new JsonObject { ["checkpoints"] = checkpoints, ["checkpoints_digest"] = checkpointsDigest },
             ["local_check"] = "pass",
@@ -1174,6 +1197,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "emulator.profile_moved" => "le règlement du jeu a changé pendant l'attente",
         "emulator.rejected" => "émulateur écarté",
         "settings.unknown" => "réglages en attente de conformité",
+        "metric.spike" => "lecture isolée : le score ne suit pas la partie, à vérifier",
         "profile.content_mismatch" => "ROM non reconnue",
         "profile.mem_mismatch" => "définition mémoire non reconnue",
         "profile.core_options_mismatch" => "réglages en attente de conformité",
