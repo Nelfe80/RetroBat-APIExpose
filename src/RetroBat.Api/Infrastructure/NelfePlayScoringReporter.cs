@@ -525,7 +525,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     // nouveau run) et renvoie le sous-segment MONOTONE du MEILLEUR run (pic le plus haut).
     // Robuste : ne dépend PAS des frames (le score seul suffit). Un seul run croissant →
     // toute la trajectoire. C'est ce qui fait qu'un super score n'est jamais perdu.
-    private static List<(long frame, long total)> SelectBestRun(List<(long frame, long total)> traj)
+    // Une chute qui REPREND là où le score en était avant les dernières lectures n'est pas une
+    // nouvelle partie : c'est une lecture parasite (RAM en cours d'écriture, texte de l'attract
+    // passé par l'adresse du score). Ms. Pac-Man sous MAME, 2026-09-22 : 430 → 906030 → 440 ; le
+    // pic isolé, BCD valide, devenait le « meilleur run » et partait au classement. On retire
+    // au plus deux lectures de queue quand la valeur qui suit continue d'avant elles.
+    private const int MaxGlitchTail = 2;
+
+    internal static List<(long frame, long total)> SelectBestRun(List<(long frame, long total)> traj)
     {
         if (traj.Count == 0) return traj;
         List<(long frame, long total)>? best = null;
@@ -534,8 +541,25 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         long prev = long.MinValue;
         foreach (var pt in traj)
         {
-            if (pt.total < prev)   // chute → fin du run précédent (segment monotone)
+            if (pt.total < prev)   // chute : parasite de queue, ou fin du run précédent
             {
+                // k lectures de queue sont parasites si la valeur qui suit reprend au niveau
+                // d'avant elles (egalite admise pour une seule lecture : le score n'a pas
+                // bouge pendant le parasite) et s'il reste au moins deux lectures au run :
+                // une chute au tout premier point est une nouvelle partie, pas un parasite.
+                var parasite = 0;
+                for (var k = 1; k <= MaxGlitchTail && cur.Count - k >= 2; k++)
+                {
+                    var avant = cur[cur.Count - 1 - k].total;
+                    if (k == 1 ? pt.total >= avant : pt.total > avant) { parasite = k; break; }
+                }
+                if (parasite > 0)
+                {
+                    cur.RemoveRange(cur.Count - parasite, parasite);
+                    cur.Add(pt);
+                    prev = pt.total;
+                    continue;
+                }
                 long peak = cur.Count > 0 ? cur[^1].total : long.MinValue;
                 if (peak > bestPeak) { bestPeak = peak; best = new List<(long frame, long total)>(cur); }
                 cur.Clear();
