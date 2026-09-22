@@ -118,13 +118,28 @@ public sealed class CollectionPackInstallerService : IHostedService, IDisposable
         _logger = logger;
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         _index = LoadIndex();
         _lastInstallerSettings = ReadInstallerSettings();
         _lastSettingsSignature = ComputeInstallerSettingsSignature(_lastInstallerSettings);
         _settingsSubscription = _settingsChangeBus.Subscribe((_, token) => HandleInstallerSettingsChangedAsync(token));
-        return RunConfiguredImportAsync("startup", cancellationToken);
+        // CE SERVICE NE DOIT PAS POUVOIR TUER L'API. Il parcourt les dossiers du joueur, qui
+        // contiennent ce que le joueur y met : un dossier refuse par Windows a suffi a arreter
+        // l'hote au demarrage, et avec lui le scoring, le marquee et tout le reste (2026-09-22).
+        // Une collection non montee est un desagrement ; une borne muette est une panne.
+        try
+        {
+            await RunConfiguredImportAsync("startup", cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;   // l'arret demande reste un arret demande
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Collections : import au demarrage abandonne ; l'API continue sans lui.");
+        }
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -1641,9 +1656,7 @@ public sealed class CollectionPackInstallerService : IHostedService, IDisposable
         }
 
         var names = new List<string> { collectionName };
-        foreach (var gamelist in Directory.Exists(RetroBatPaths.RomsRoot)
-                     ? Directory.EnumerateFiles(RetroBatPaths.RomsRoot, "gamelist.xml", SearchOption.AllDirectories)
-                     : Enumerable.Empty<string>())
+        foreach (var gamelist in GamelistsDesRoms())
         {
             try
             {
@@ -1688,12 +1701,70 @@ public sealed class CollectionPackInstallerService : IHostedService, IDisposable
         return [trimmed.ToUpperInvariant()];
     }
 
+    /// <summary>
+    /// Les gamelist.xml de l'arborescence des ROMs, en passant les dossiers qu'on ne peut pas
+    /// lire.
+    ///
+    /// UN SEUL DOSSIER ILLISIBLE EMPECHAIT APIEXPOSE DE DEMARRER. Vecu le 2026-09-22 sur la
+    /// borne d'un joueur : `D:\RetroBat\roms\- DISCK 2-3-4-5 -` refusait l'acces (droits
+    /// Windows), `Directory.EnumerateFiles(..., AllDirectories)` levait
+    /// UnauthorizedAccessException au milieu du parcours, et comme ce parcours a lieu au
+    /// demarrage d'un service hote, l'exception remontait jusqu'a l'hote : plus d'API du tout,
+    /// donc plus de scoring, plus de marquee, plus rien - pour un dossier de ROMs mal range.
+    ///
+    /// Le parcours descend donc dossier par dossier : ce qu'on ne peut pas ouvrir est ignore,
+    /// et le reste de la borne fonctionne. Un dossier illisible n'est pas une panne, c'est un
+    /// dossier de moins.
+    /// </summary>
+    private static IEnumerable<string> GamelistsDesRoms()
+    {
+        var racine = RetroBatPaths.RomsRoot;
+        if (!Directory.Exists(racine))
+        {
+            yield break;
+        }
+
+        var aVisiter = new Stack<string>();
+        aVisiter.Push(racine);
+        while (aVisiter.Count > 0)
+        {
+            var dossier = aVisiter.Pop();
+            string[] fichiers;
+            try
+            {
+                fichiers = Directory.GetFiles(dossier, "gamelist.xml");
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
+            {
+                continue;   // dossier refuse ou volume absent : on passe au suivant
+            }
+
+            foreach (var fichier in fichiers)
+            {
+                yield return fichier;
+            }
+
+            try
+            {
+                foreach (var sous in Directory.GetDirectories(dossier))
+                {
+                    aVisiter.Push(sous);
+                }
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
+            {
+                // Le dossier s'est ouvert mais ne se parcourt pas : ses fichiers ont ete lus,
+                // ses sous-dossiers resteront inconnus. Rien de plus a faire ici.
+            }
+        }
+    }
+
     private Dictionary<string, CollectionFamilyIndexEntry> BuildAndSaveFamilyIndex()
     {
         var variantsByNormalizedKey = new Dictionary<string, Dictionary<string, CollectionFamilyVariant>>(StringComparer.OrdinalIgnoreCase);
         if (Directory.Exists(RetroBatPaths.RomsRoot))
         {
-            foreach (var gamelist in Directory.EnumerateFiles(RetroBatPaths.RomsRoot, "gamelist.xml", SearchOption.AllDirectories))
+            foreach (var gamelist in GamelistsDesRoms())
             {
                 try
                 {
@@ -1936,7 +2007,7 @@ public sealed class CollectionPackInstallerService : IHostedService, IDisposable
             return paths.ToList();
         }
 
-        foreach (var gamelist in Directory.EnumerateFiles(RetroBatPaths.RomsRoot, "gamelist.xml", SearchOption.AllDirectories))
+        foreach (var gamelist in GamelistsDesRoms())
         {
             try
             {
@@ -1977,7 +2048,7 @@ public sealed class CollectionPackInstallerService : IHostedService, IDisposable
             return [];
         }
 
-        foreach (var gamelist in Directory.EnumerateFiles(RetroBatPaths.RomsRoot, "gamelist.xml", SearchOption.AllDirectories))
+        foreach (var gamelist in GamelistsDesRoms())
         {
             try
             {
