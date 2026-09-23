@@ -287,6 +287,20 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 if (court && _modele.Etat == LeaderboardPanelModel.Foyer.Panneau)
                 {
                     Appliquer(_modele.Entree(EntreePanneau.Agir));
+                    return;
+                }
+
+                // ES A LA MAIN ET LE JOUEUR VALIDE : le panneau s'efface.
+                //
+                // Dans cet etat, notre fenetre est affichee a cote du menu mais c'est ES qui
+                // navigue. Valider y ouvre une fenetre d'ES - les options avancees du jeu, par
+                // exemple - et notre panneau, qui est topmost, la recouvre : le joueur se
+                // retrouve devant un menu invisible (signale le 2026-09-23). Ce que le joueur
+                // vient de demander passe devant ce que nous montrons.
+                if (court && _modele.Etat == LeaderboardPanelModel.Foyer.MenuEs)
+                {
+                    _logger.LogInformation("Classement : validation dans le menu d'ES, le panneau s'efface.");
+                    Fermer();
                 }
                 return;
             }
@@ -431,6 +445,24 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// <summary>La derniere raison de refus deja ecrite, pour ne pas repeter la meme ligne.</summary>
     private string _dernierRefus = "";
 
+    /// <summary>
+    /// Le dernier jeu que l'interface a annonce comme selectionne.
+    ///
+    /// ES efface sa selection au retour d'un jeu ou d'un replay sans la reannoncer : ce
+    /// souvenir est ce qui permet de rouvrir le panneau sur la fiche que le joueur a sous les
+    /// yeux, au lieu de lui demander de bouger d'un cran pour rien.
+    /// </summary>
+    private RetroBat.Domain.Models.GameReference? _dernierJeu;
+
+    /// <summary>
+    /// Le systeme du CARROUSEL au moment ou ce jeu a ete vu, qui n'est pas le systeme du jeu.
+    ///
+    /// Dans une collection - « NELFEPLAY WORLD SCORING » en est une - le carrousel affiche le
+    /// nom de la collection tandis que le jeu garde le sien, « arcade ». Comparer les deux
+    /// aurait fait echouer la reprise precisement la ou le joueur passe son temps.
+    /// </summary>
+    private string _dernierCarrousel = "";
+
     /// <summary>Qui sait quels jeux sont ouverts au scoring sur cette borne.</summary>
     private readonly Infrastructure.NelfePlayScoringCollectionSyncService? _collection;
 
@@ -453,9 +485,31 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         var jeu = ui.Selected;
         if (jeu is null)
         {
-            // Cas vu au retour d'un replay : ES reprend la main sur la meme fiche sans
-            // reemettre game-selected, et le dernier jeu connu a ete efface entre-temps.
-            return Refus("aucun jeu selectionne (carrousel des systemes, ou selection perdue)");
+            // LA SELECTION SE PERD AU RETOUR D'UN JEU OU D'UN REPLAY.
+            //
+            // ES emet alors `system-selected`, qui efface la selection, et ne reemet pas
+            // `game-selected` puisque la fiche affichee n'a pas change. Le joueur, lui, voit
+            // toujours son jeu : un appui long ne faisait donc rien, et il fallait bouger d'un
+            // cran puis revenir pour que le panneau consente a s'ouvrir (signale le 2026-09-23).
+            //
+            // On retient donc la derniere selection connue et on la reprend, a condition que le
+            // carrousel soit reste sur le MEME systeme : changer de systeme est un vrai
+            // changement de contexte, et ressortir un jeu d'un autre systeme serait faux.
+            if (_dernierJeu is null
+                || !string.Equals(_dernierCarrousel, ui.SelectedSystem?.Name ?? "", StringComparison.OrdinalIgnoreCase))
+            {
+                return Refus("aucun jeu selectionne (carrousel des systemes, ou selection perdue)");
+            }
+
+            jeu = _dernierJeu;
+            _logger.LogInformation(
+                "Classement : selection effacee par ES, reprise du dernier jeu connu ({Jeu}).",
+                jeu.GameName);
+        }
+        else
+        {
+            _dernierJeu = jeu;
+            _dernierCarrousel = ui.SelectedSystem?.Name ?? "";
         }
 
         systeme = jeu.SystemId ?? "";
