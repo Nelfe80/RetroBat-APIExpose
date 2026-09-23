@@ -56,6 +56,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     private DateTime _dernierAppelUtc = DateTime.MinValue;
     /// <summary>Les chemins retenus au dernier passage, pour repondre sans relire le disque.</summary>
     private HashSet<string>? _ouverts;
+    /// <summary>Le coeur que la borne chargera pour chaque jeu retenu : « double-dragon » → « fbneo ».</summary>
+    private readonly Dictionary<string, string> _coeursParJeu = new(StringComparer.OrdinalIgnoreCase);
     private ScoringCollectionStatus _statut = ScoringCollectionStatus.Initial;
     private IDisposable? _abonnementReglages;
     private bool _derniereVisibilite = true;
@@ -189,6 +191,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
 
             var chemins = Intersecter(manifeste, out var candidats);
             _ouverts = chemins.Select(Normaliser).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            // La borne dit a la plateforme avec quoi elle lancera ces jeux : la fiche d'un jeu
+            // peut alors repondre « votre borne lancera FBNeo » au lieu de rester generale.
+            CabinetState.NoterCoeurs(_coeursParJeu);
             var resultat = _writer.Apply(CollectionName, chemins);
             // L'identite visuelle suit la collection : la declarer dans le theme est ce qui lui
             // donne sa propre tuile au lieu de la ranger dans le fourre-tout « collections ».
@@ -325,6 +330,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         var empreintes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var precedents = LireCollectionPrecedente();
         var retenus = new List<string>();
+        _coeursParJeu.Clear();
 
         foreach (var jeu in manifeste.Games)
         {
@@ -358,6 +364,13 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             if (choisi is { Length: > 0 })
             {
                 retenus.Add(choisi);
+                var retenu = candidats.FirstOrDefault(candidat =>
+                    string.Equals(candidat.AbsolutePath, choisi, StringComparison.OrdinalIgnoreCase));
+                var coeur = retenu == null ? null : Lancement(retenu.FrontendSystemId)?.Core;
+                if (!string.IsNullOrWhiteSpace(coeur))
+                {
+                    _coeursParJeu[jeu.RomGroup] = coeur;
+                }
             }
         }
 

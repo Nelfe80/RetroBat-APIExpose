@@ -556,6 +556,12 @@ public sealed class NelfePlayAgentService : BackgroundService
             client.DefaultRequestHeaders.Add("X-Nelfeplay-Version", CabinetState.Version);
         }
         client.DefaultRequestHeaders.Add("X-Nelfeplay-Wrapper", CabinetState.Wrapper);
+        // Et avec quel coeur elle lancera chaque jeu ouvert : « double-dragon=fbneo,… ». Vide
+        // tant que la collection World Scoring n'a pas tourne, et l'en-tete est alors omis.
+        if (!string.IsNullOrEmpty(CabinetState.Coeurs))
+        {
+            client.DefaultRequestHeaders.Add("X-Nelfeplay-Cores", CabinetState.Coeurs);
+        }
 
         return client;
     }
