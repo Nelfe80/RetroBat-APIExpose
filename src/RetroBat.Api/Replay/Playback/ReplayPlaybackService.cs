@@ -420,7 +420,31 @@ public sealed class ReplayPlaybackService
         {
             Process? proc; lock (_gate) proc = _process;
             // Fin PRIMAIRE = process fermé (l'utilisateur a quitté, ou joué au-delà du point de pause → --eof-exit).
-            if (proc is null || proc.HasExited) { Finish("process terminé"); return; }
+            if (proc is null || proc.HasExited)
+            {
+                // A-T-ON VU LA FIN, OU LA LECTURE S'EST-ELLE ARRETEE AVANT ?
+                //
+                // RetroArch sort de lui-meme a la fin du journal d'entrees (--eof-exit) : nous
+                // ne coupons rien. Mais il en sort AUSSI quand la lecture deraille, et les deux
+                // se ressemblaient dans le journal. Un replay enregistre sur une autre version
+                // du coeur finit par diverger, et le joueur voyait sa lecture disparaitre sans
+                // explication (MAME 0.289 rejoue sur 0.287, 2026-09-23).
+                //
+                // La frame atteinte face a la frame attendue les separe, et c'est la seule
+                // mesure dont on dispose ici.
+                long vue, attendue;
+                lock (_gate) { vue = _frame; attendue = _replayEnd ?? 0; }
+                var avantLaFin = started && attendue > 0 && vue < attendue - EndPauseMargin - 60;
+                if (avantLaFin)
+                {
+                    _logger.LogWarning(
+                        "Replay {ReplayId} : RetroArch a quitté à la frame {Vue} sur {Attendue} — lecture interrompue avant la fin.",
+                        _replayId, vue, attendue);
+                }
+
+                Finish(avantLaFin ? "interrompu avant la fin" : "process terminé");
+                return;
+            }
 
             var active = await _ra.GetActiveReplayAsync(ct).ConfigureAwait(false);
             var status = await _ra.GetStatusAsync(ct).ConfigureAwait(false);
