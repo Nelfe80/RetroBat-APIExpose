@@ -458,6 +458,30 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // automatique font refuser le score a la fin. Le forcage les neutralise par jeu ;
             // eteint, ou pris de court, il reste a prevenir avant que le joueur ne joue pour rien.
             var dangers = _certified?.DangersFrontendActifs() ?? Array.Empty<string>();
+            // RIEN NE SERA MESURE, ET LE JOUEUR DOIT L'APPRENDRE MAINTENANT.
+            //
+            // Le wrapper enveloppe les coeurs de RetroArch ; sans lui, aucune lecture de score
+            // ne remonte. Un joueur a joue toute une soiree sans qu'un seul score n'arrive
+            // (2026-09-22) : ses replays etaient la, donc RetroArch tournait, mais rien n'etait
+            // mesure. Il a fallu trois allers-retours pour le decouvrir.
+            //
+            // C'est un etat LOCAL, connu sans reseau : il se dit ici, avec le prevol, et non
+            // par le canal de la plateforme. Une alerte qui depend du lien pour annoncer que la
+            // mesure est morte arriverait trop tard, et parfois jamais.
+            var wrapper = CabinetState.Wrapper;
+            if (wrapper is "none:0" or "missing")
+            {
+                _overlay?.ShowTop(
+                    "SCORING",
+                    "Aucun score ne sera mesuré",
+                    wrapper == "missing"
+                        ? "le module de mesure est absent de cette borne"
+                        : "le module de mesure n'enveloppe aucun émulateur",
+                    8000);
+                Trace($"prévol : wrapper {wrapper}, rien ne sera mesuré");
+
+                return;   // le reste du prevol parlerait de certification : il n'y a rien a certifier
+            }
             // LE BANDEAU A DEUX LIGNES, ET LE PREVOL N'EN UTILISAIT QU'UNE.
             //
             // Mesure du 2026-09-23 : la premiere ligne du bandeau haut fait 652 pixels utiles
