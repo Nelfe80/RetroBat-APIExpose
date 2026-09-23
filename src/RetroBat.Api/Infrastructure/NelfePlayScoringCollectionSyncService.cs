@@ -52,6 +52,16 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     private readonly SemaphoreSlim _porte = new(1, 1);
     private readonly string _stateRoot;
     private readonly TimeSpan _minimumEntreDeuxAppels;
+    /// <summary>
+    /// « Un emulateur tourne-t-il ? », injectable pour que le test n'interroge pas la machine.
+    ///
+    /// Cette question se posait directement a Windows, si bien que TOUTE la suite de ce service
+    /// echouait des qu'un emulateur tournait sur le poste : la synchro sortait par son statut
+    /// initial, qui vaut « error », et douze tests attendaient « empty » (vecu le 2026-09-23,
+    /// une partie ouverte pendant le banc). Un test qui depend de ce qui tourne a cote ne garde
+    /// plus rien.
+    /// </summary>
+    private readonly Func<bool> _emulateurTourne;
 
     private DateTime _dernierAppelUtc = DateTime.MinValue;
     /// <summary>Les chemins retenus au dernier passage, pour repondre sans relire le disque.</summary>
@@ -74,7 +84,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         IEsSettingsChangeBus? settingsChangeBus = null,
         ILogger<NelfePlayScoringCollectionSyncService>? logger = null,
         string? stateRoot = null,
-        TimeSpan? minimumEntreDeuxAppels = null)
+        TimeSpan? minimumEntreDeuxAppels = null,
+        Func<bool>? emulateurTourne = null)
     {
         _httpFactory = httpFactory;
         _options = options;
@@ -89,6 +100,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         _stateRoot = stateRoot ?? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay");
         // Garde-fou du CDC : aucun appel a moins de 30 s d'intervalle.
         _minimumEntreDeuxAppels = minimumEntreDeuxAppels ?? TimeSpan.FromSeconds(30);
+        _emulateurTourne = emulateurTourne ?? EmulatorForeground.EmulateurTourne;
     }
 
     /// <summary>Le dernier etat connu, tel que l'endpoint de statut le publie.</summary>
@@ -154,7 +166,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             }
 
             // Pendant une partie, rien ne doit bouger devant le joueur : le reload ES attendra.
-            if (EmulatorForeground.EmulateurTourne())
+            if (_emulateurTourne())
             {
                 return _statut;
             }

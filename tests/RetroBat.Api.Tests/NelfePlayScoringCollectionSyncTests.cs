@@ -58,7 +58,9 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
             new MediaRuntimeState(),
             logger: null,
             stateRoot: Etat,
-            minimumEntreDeuxAppels: TimeSpan.Zero);
+            minimumEntreDeuxAppels: TimeSpan.Zero,
+            // Le test ne demande pas a Windows ce qui tourne : il le decide.
+            emulateurTourne: () => false);
 
     private string PoserRom(string systeme, string nom)
     {
