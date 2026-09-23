@@ -108,16 +108,47 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
             _logger.LogWarning("Replay resolver : ROM introuvable pour {Id} (crc32 {Crc}) : {Pourquoi}", manifest.ReplayId, manifest.Game.Crc32, pourquoi);
             return RuntimeResolution.Manque(ReplayErrorCode.RomNotFound, pourquoi);
         }
-        if (!exact) _logger.LogInformation("Replay resolver : core NON identique à l'enregistrement pour {Id} — lecture best-effort (désync détecté par checkpoints).", manifest.ReplayId);
+        string? avertissement = null;
+        if (!exact)
+        {
+            // ON NOMME LES DEUX COTES. « core non identique » ne disait pas lequel, et il a
+            // fallu remonter aux versions a la main pour comprendre qu'un replay MAME 0.289 se
+            // rejouait sur un MAME 0.287 (2026-09-23) : vingt secondes de lecture, puis retour
+            // a EmulationStation sans un mot.
+            var version = VersionDuFichier(core);
+            var nom = string.IsNullOrWhiteSpace(manifest.Runtime.CoreName) ? "ce cœur" : manifest.Runtime.CoreName;
+            avertissement = "Ce record a été enregistré avec une autre version de " + nom
+                + (version.Length > 0 ? " : cette borne a la " + version : "")
+                + ". La lecture peut s'interrompre avant la fin.";
+            _logger.LogInformation(
+                "Replay resolver : core NON identique à l'enregistrement pour {Id} — {Core} local en version {Version}, lecture best-effort.",
+                manifest.ReplayId, Path.GetFileName(core), version.Length > 0 ? version : "inconnue");
+        }
         if (!romExacte) _logger.LogInformation("Replay resolver : ROM NON identique à l'enregistrement pour {Id} ({Rom}) — lecture best-effort.", manifest.ReplayId, rom);
         // On ne mémorise que le fichier exact : un dump approchant ne doit pas devenir le chemin
         // rapide, sinon la ROM exacte copiée plus tard ne serait plus jamais cherchée.
         if (romExacte) MemoriserLancement(manifest, core, rom);
-        return RuntimeResolution.Trouve(new ResolvedRuntime(core, rom, exact, romExacte, romExacte ? null : pourquoi));
+        // UN SEUL AVERTISSEMENT REMONTE, et la ROM passe devant : quand le dump n'est pas
+        // celui de l'enregistrement, c'est la cause la plus concrete et la plus reparable.
+        return RuntimeResolution.Trouve(new ResolvedRuntime(
+            core, rom, exact, romExacte, romExacte ? avertissement : pourquoi));
     }
 
     // Core : hint local (rapide, en préférant cores_real sans wrapper scoring) → empreinte
     // core_sha256 (scan cores_real puis cores) → null. Jamais de refus sur la version.
+    /// <summary>La version que porte une dll de coeur, vide si elle ne se lit pas.</summary>
+    private static string VersionDuFichier(string chemin)
+    {
+        try
+        {
+            return (System.Diagnostics.FileVersionInfo.GetVersionInfo(chemin).ProductVersion ?? "").Trim();
+        }
+        catch (Exception)
+        {
+            return "";
+        }
+    }
+
     private string? ResolveCore(ReplayManifest manifest, ReplayLaunchHint? hint, out bool exact)
     {
         exact = false;
