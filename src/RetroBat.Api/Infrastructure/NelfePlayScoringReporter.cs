@@ -458,24 +458,51 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // automatique font refuser le score a la fin. Le forcage les neutralise par jeu ;
             // eteint, ou pris de court, il reste a prevenir avant que le joueur ne joue pour rien.
             var dangers = _certified?.DangersFrontendActifs() ?? Array.Empty<string>();
-            string message;
+            // LE BANDEAU A DEUX LIGNES, ET LE PREVOL N'EN UTILISAIT QU'UNE.
+            //
+            // Mesure du 2026-09-23 : la premiere ligne du bandeau haut fait 652 pixels utiles
+            // en Segoe UI 15 gras, soit une cinquantaine de caracteres. Trois messages la
+            // depassaient largement - « Reglages en attente de conformite : ton score sera
+            // garde et classe des qu'ils seront reconnus » demandait 890 pixels - et le joueur
+            // n'en lisait donc que le debut, en perdant justement la partie rassurante.
+            //
+            // Le titre tient ce qui doit etre lu d'un coup d'oeil, le detail passe sur la
+            // seconde ligne, en 9 points : elle absorbe meme quatre anomalies cumulees.
+            string titre;
+            string? detail;
             // Un emulateur inconnu ne fait plus perdre la partie : le score sera garde et
             // entrera au classement quand le build sera reconnu. On le dit AVANT, sinon le
             // joueur croit jouer pour rien et s'arrete.
             if (!certifiable && reason == "profile.core_mismatch")
-                message = "Émulateur pas encore reconnu : ton score sera gardé et classé dès qu'il le sera";
+            {
+                titre = "Émulateur pas encore reconnu";
+                detail = "ton score sera gardé et classé dès qu'il le sera";
+            }
             // Meme regle pour les reglages (decision user 2026-09-22) : des reglages que la
             // plateforme ne connait pas encore ne font pas perdre la partie, ils attendent
             // leur quorum. « Non conformes (usine requis) » disait au joueur qu'il avait
             // triche, alors qu'il jouait le plus souvent avec les reglages de tout le monde.
             else if (!certifiable && reason == "profile.core_options_mismatch")
-                message = "Réglages en attente de conformité : ton score sera gardé et classé dès qu'ils seront reconnus";
+            {
+                titre = "Réglages en attente";
+                detail = "ton score sera gardé et classé dès qu'ils seront reconnus";
+            }
             else if (!certifiable)
-                message = $"Partie non certifiable : {ReasonToText(reason)}";
+            {
+                titre = "Partie non certifiable";
+                detail = ReasonToText(reason);
+            }
             else if (dangers.Count > 0)
-                message = $"Partie non certifiable : {string.Join(", ", dangers)}, à désactiver dans les options RetroBat de ce jeu";
+            {
+                titre = "Partie non certifiable";
+                detail = string.Join(", ", dangers) + ", à désactiver dans les options RetroBat de ce jeu";
+            }
             else
-                message = force ? "Partie certifiable, réglages certifiés appliqués" : "Partie certifiable pour le classement";
+            {
+                titre = "Partie certifiable";
+                detail = force ? "réglages certifiés appliqués" : "pour le classement";
+            }
+            Trace("prévol : " + (detail is { Length: > 0 } ? titre + " : " + detail : titre));
             // LE PREVOL S'AFFICHE PENDANT QUE LE JEU TOURNE : il ne passe donc PAS par la
             // notification d'EmulationStation, qui ramene ES au premier plan et sort le joueur
             // de sa partie (vecu le 2026-09-21 : le testeur s'est retrouve sur l'ecran de
@@ -487,7 +514,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // facon le verdict a la fin, quand ES a repris la main.
             if (_overlay is not null)
             {
-                _overlay.ShowTop("SCORING", message, null, 6000);
+                _overlay.ShowTop("SCORING", titre, detail, 6000);
             }
             else
             {
