@@ -390,6 +390,35 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
     }
 
     [Fact]
+    public async Task Un_chemin_relatif_ne_dit_rien()
+    {
+        // ES donne d'ordinaire un chemin absolu. S'il en donnait un relatif, le resoudre
+        // depuis le dossier de l'API designerait un fichier inexistant et le panneau ne
+        // s'ouvrirait plus nulle part : mieux vaut ne pas savoir.
+        PoserRom("fbneo", "19xx.zip");
+        PoserMem("arcade", "19xx", MemContenu);
+        var http = new FauxHttp(Index("sha256:aa", Jeu("arcade", "19xx", MemEmpreinte)));
+        var service = Service(http, new FauxResolveur { ["19xx.zip"] = "19xx" });
+        await service.SynchroniserAsync("test", CancellationToken.None);
+
+        Assert.Null(service.EstOuvertAuScoring("roms/fbneo/19xx.zip"));
+    }
+
+    [Fact]
+    public async Task Un_detour_dans_le_chemin_ne_change_rien()
+    {
+        var rom = PoserRom("fbneo", "19xx.zip");
+        PoserMem("arcade", "19xx", MemContenu);
+        var http = new FauxHttp(Index("sha256:aa", Jeu("arcade", "19xx", MemEmpreinte)));
+        var service = Service(http, new FauxResolveur { ["19xx.zip"] = "19xx" });
+        await service.SynchroniserAsync("test", CancellationToken.None);
+
+        var detour = Path.Combine(Roms, "fbneo", "..", "fbneo", "19xx.zip");
+        Assert.True(service.EstOuvertAuScoring(detour));
+        Assert.True(service.EstOuvertAuScoring(rom));
+    }
+
+    [Fact]
     public void Un_chemin_vide_ne_dit_rien()
     {
         var service = Service(new FauxHttp(Index("sha256:aa")), new FauxResolveur());

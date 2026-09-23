@@ -270,11 +270,41 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             .Select(Normaliser)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        return ouverts.Count == 0 ? null : ouverts.Contains(Normaliser(cheminDuJeu));
+        if (ouverts.Count == 0)
+        {
+            return null;
+        }
+
+        // UN CHEMIN RELATIF NE SE COMPARE A RIEN. EmulationStation donne d'ordinaire un chemin
+        // absolu, mais s'il en donnait un relatif, le resoudre depuis le dossier de l'API
+        // designerait un fichier qui n'existe pas - et le panneau ne s'ouvrirait plus nulle
+        // part. On prefere ne pas savoir : meme regle qu'une borne sans liste.
+        var cible = Normaliser(cheminDuJeu);
+        return Path.IsPathRooted(cible) ? ouverts.Contains(cible) : null;
     }
 
-    /// <summary>Un chemin comparable : meme separateur, sans espaces autour.</summary>
-    private static string Normaliser(string chemin) => chemin.Trim().Replace('\\', '/');
+    /// <summary>
+    /// Un chemin comparable : separateurs unifies, sans espaces autour, et ramene a sa forme
+    /// complete quand on le peut - « roms/fbneo/../fbneo/19xx.zip » et « roms/fbneo/19xx.zip »
+    /// designent le meme fichier.
+    /// </summary>
+    private static string Normaliser(string chemin)
+    {
+        var propre = chemin.Trim().Replace('\\', '/');
+        if (!Path.IsPathRooted(propre))
+        {
+            return propre;
+        }
+
+        try
+        {
+            return Path.GetFullPath(propre).Replace('\\', '/');
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return propre;
+        }
+    }
 
     private ScoringCollectionStatus Desactiver(bool enabled, bool visible)
     {
