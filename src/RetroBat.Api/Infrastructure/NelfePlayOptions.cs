@@ -28,6 +28,18 @@ public sealed class NelfePlayOptions
     /// <summary>Releve d'audience : ce qui est joue et combien de temps, jamais par qui.</summary>
     public bool PlayReportingEnabled { get; set; } = true;
 
+    /// <summary>
+    /// CE QUI A LE DROIT DE PARAITRE PAR-DESSUS UN JEU EN COURS.
+    ///
+    /// Ce reglage ne concerne QUE l'affichage en jeu : il ne coupe ni les notifications au menu
+    /// d'EmulationStation, ni le push, ni la liste du compte sur le site. Une famille sous le
+    /// seuil arrive au menu, pas par-dessus la partie.
+    ///
+    /// Le defaut laisse passer ce qui concerne le score du joueur assis, et rien d'autre. Une
+    /// borne d'exposition ou un stream se regle sur `Off`.
+    /// </summary>
+    public InGameMessageLevel InGameMessageLevel { get; set; } = InGameMessageLevel.Score;
+
     /// <summary>Decouverte silencieuse du scoring : voir <see cref="ScoringDiscoveryOptions"/>.</summary>
     public ScoringDiscoveryOptions ScoringDiscovery { get; set; } = new();
 

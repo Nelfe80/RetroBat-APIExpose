@@ -47,6 +47,11 @@ public sealed class NelfePlayAgentService : BackgroundService
     private readonly IHttpClientFactory _httpFactory;
     private readonly ILogger<NelfePlayAgentService> _logger;
     private readonly RetroBat.Domain.Models.ApiContext _context;
+    /// <summary>Qui decide du canal de remise d'un message. Absent, rien n'est remis.</summary>
+    private readonly NelfePlayMessageRouter? _routeur;
+    /// <summary>D'ou vient la langue de la borne. Absent, on annonce l'anglais.</summary>
+    private readonly RetroBat.Domain.Services.EmulationStationSettingsService? _reglages;
+    private string _langue = "";
     private readonly string _packageRoot =
         Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "packages");
 
@@ -54,12 +59,16 @@ public sealed class NelfePlayAgentService : BackgroundService
         NelfePlayDeviceStore device,
         IHttpClientFactory httpFactory,
         ILogger<NelfePlayAgentService> logger,
-        RetroBat.Domain.Models.ApiContext context)
+        RetroBat.Domain.Models.ApiContext context,
+        NelfePlayMessageRouter? routeur = null,
+        RetroBat.Domain.Services.EmulationStationSettingsService? reglages = null)
     {
+        _reglages = reglages;
         _device = device;
         _httpFactory = httpFactory;
         _logger = logger;
         _context = context;
+        _routeur = routeur;
     }
 
     /// <summary>Adresse du service Nelfe Play (surchargeable pour les tests).</summary>
@@ -192,6 +201,8 @@ public sealed class NelfePlayAgentService : BackgroundService
         {
             return;
         }
+
+        await RemettreLesMessagesAsync(client, payload, cancellationToken).ConfigureAwait(false);
 
         var installed = 0;
         foreach (var intent in payload.Intents ?? [])
@@ -562,6 +573,13 @@ public sealed class NelfePlayAgentService : BackgroundService
         {
             client.DefaultRequestHeaders.Add("X-Nelfeplay-Cores", CabinetState.Coeurs);
         }
+        // SA LANGUE. La plateforme compose ses messages avec : sans cela il faudrait publier une
+        // release pour livrer le texte de chaque nouveau message, et le catalogue ne pourrait
+        // plus grandir sans nous.
+        if (!string.IsNullOrEmpty(Langue))
+        {
+            client.DefaultRequestHeaders.Add("X-Nelfeplay-Locale", Langue);
+        }
 
         return client;
     }
@@ -602,6 +620,33 @@ public sealed class NelfePlayAgentService : BackgroundService
         public string? DeviceId { get; set; }
     }
 
+    /// <summary>
+    /// La langue de cette borne, telle qu'EmulationStation la connait, resolue comme le fait
+    /// deja le panneau de classement. Repli sur l'anglais : mieux vaut un message lisible par
+    /// beaucoup qu'aucun message.
+    /// </summary>
+    private string Langue
+    {
+        get
+        {
+            if (_langue.Length > 0)
+            {
+                return _langue;
+            }
+
+            try
+            {
+                _langue = _reglages?.GetScrapingSettings().Language ?? "en";
+            }
+            catch (Exception)
+            {
+                _langue = "en";
+            }
+
+            return _langue = _langue.Length > 0 ? _langue : "en";
+        }
+    }
+
     private sealed class WorkResponse
     {
         public bool Ok { get; set; }
@@ -613,6 +658,63 @@ public sealed class NelfePlayAgentService : BackgroundService
         /// <summary>Recovery « share datas » : le serveur reconstruit sa base et
         /// demande à la flotte de re-verser ses records auto-conservés.</summary>
         public bool Contribute { get; set; }
+
+        /// <summary>Ce que la plateforme a a dire a cette borne, deja traduit.</summary>
+        public List<WorkMessage>? Messages { get; set; }
+    }
+
+    /// <summary>Un message de la plateforme : son identifiant, son niveau, son texte.</summary>
+    private sealed class WorkMessage
+    {
+        public string? Id { get; set; }
+        public string? Kind { get; set; }
+        public string? Level { get; set; }
+        public string? Text { get; set; }
+        public int Ttl { get; set; }
+    }
+
+    /// <summary>
+    /// Range les messages recus, tente de les remettre, et acquitte CE QUI A ETE AFFICHE.
+    ///
+    /// Seuls les messages effectivement affiches sont acquittes : un message garde en attente
+    /// doit revenir au releve suivant, sinon une borne eteinte au mauvais moment le perdrait.
+    /// </summary>
+    private async Task RemettreLesMessagesAsync(HttpClient client, WorkResponse payload, CancellationToken ct)
+    {
+        if (_routeur is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var recus = (payload.Messages ?? [])
+                .Where(m => !string.IsNullOrWhiteSpace(m.Id) && !string.IsNullOrWhiteSpace(m.Text))
+                .Select(m => new NelfePlayMessageRouter.Message(
+                    m.Id!, m.Kind ?? "", m.Level ?? "", m.Text!, m.Ttl > 0 ? m.Ttl : 3600))
+                .ToList();
+            _routeur.Recevoir(recus);
+
+            var remis = _routeur.Remettre();
+            if (remis.Count == 0)
+            {
+                return;
+            }
+
+            using var contenu = JsonContent.Create(new { ids = remis });
+            using var reponse = await client.PostAsync("/api/v1/agent/messages/ack", contenu, ct).ConfigureAwait(false);
+            if (!reponse.IsSuccessStatusCode)
+            {
+                // L'acquittement a echoue : le serveur representera ces messages, et le routeur
+                // les a deja retires de sa file. Ils seront donc reaffiches une fois. Mieux vaut
+                // un doublon qu'un message perdu.
+                _logger.LogDebug("Nelfe Play : acquittement des messages refuse (HTTP {Code})", (int)reponse.StatusCode);
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogDebug(ex, "Nelfe Play : remise des messages impossible");
+        }
     }
 
     private sealed class WorkIntent

@@ -385,6 +385,9 @@ builder.Services.AddSingleton<EsCustomCollectionWriter>();
 builder.Services.AddSingleton<IScoreSlugResolver>(sp => sp.GetRequiredService<RomCanonicalResolver>());
 builder.Services.AddSingleton<InstalledGameCatalog>();
 builder.Services.AddSingleton<EsCollectionThemeAssets>();
+// Le routeur des messages de la plateforme : c'est lui qui choisit entre notification ES et
+// surimpression, selon ce que le joueur fait a cet instant.
+builder.Services.AddSingleton<NelfePlayMessageRouter>();
 builder.Services.AddSingleton<NelfePlayScoringCollectionSyncService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<NelfePlayScoringCollectionSyncService>());
 // Index public des jeux ouverts au scoring : court, lu souvent, jamais authentifie. Pas de
