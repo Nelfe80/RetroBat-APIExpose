@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using RetroBat.Api.Media;
+using RetroBat.Domain.Events;
 using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Models;
 using RetroBat.Domain.Paths;
@@ -48,6 +49,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     private readonly EmulationStationSettingsService? _reglages;
     private readonly EmulationStationSystemConfigService? _systemes;
     private readonly IEsSettingsChangeBus? _settingsChangeBus;
+    /// <summary>Le bus d'evenements, pour rattraper la synchronisation a la fin d'une partie.</summary>
+    private readonly IEventBus? _bus;
+    private IDisposable? _abonnementBus;
     private readonly ILogger<NelfePlayScoringCollectionSyncService>? _logger;
     private readonly SemaphoreSlim _porte = new(1, 1);
     private readonly string _stateRoot;
@@ -82,6 +86,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         EmulationStationSettingsService? reglages = null,
         EmulationStationSystemConfigService? systemes = null,
         IEsSettingsChangeBus? settingsChangeBus = null,
+        IEventBus? bus = null,
         ILogger<NelfePlayScoringCollectionSyncService>? logger = null,
         string? stateRoot = null,
         TimeSpan? minimumEntreDeuxAppels = null,
@@ -96,6 +101,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         _reglages = reglages;
         _systemes = systemes;
         _settingsChangeBus = settingsChangeBus;
+        _bus = bus;
         _logger = logger;
         _stateRoot = stateRoot ?? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay");
         // Garde-fou du CDC : aucun appel a moins de 30 s d'intervalle.
@@ -128,6 +134,42 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             await SynchroniserAsync("option", token);
         });
 
+        // RATTRAPAGE A LA FIN D'UNE PARTIE.
+        //
+        // La synchronisation ne fait RIEN tant qu'un emulateur tourne, et c'est voulu : recharger
+        // les gamelists sous le nez d'un joueur serait pire que d'attendre. Mais si le tic de
+        // cinq minutes tombe toujours pendant une partie, l'etat ne se rafraichit jamais : une
+        // borne vue le 2026-09-23 etait restee perimee deux heures, parce que son joueur
+        // enchainait les parties.
+        //
+        // On ne change donc pas la regle, on ajoute le moment qui lui manquait : juste apres la
+        // partie, quand plus personne ne joue.
+        _abonnementBus = _bus?.Subscribe<EventEnvelope>(e =>
+        {
+            if (!string.Equals(e.Type, "ui.game.ended", StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    // Le temps que l'emulateur soit vraiment parti : sans ce delai, la passe
+                    // repartirait aussitot par la porte « un emulateur tourne ».
+                    await Task.Delay(TimeSpan.FromSeconds(8), stoppingToken).ConfigureAwait(false);
+                    await SynchroniserAsync("fin de partie", stoppingToken).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogDebug(ex, "Collection World Scoring : rattrapage de fin de partie en echec");
+                }
+            }, stoppingToken);
+        });
+
         try
         {
             await Task.Delay(PremierDelai, stoppingToken);
@@ -143,6 +185,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         finally
         {
             _abonnementReglages?.Dispose();
+            _abonnementBus?.Dispose();
         }
     }
 
@@ -235,6 +278,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 CollectionSha256 = _writer.ReadState(CollectionName)?.ContentSha256,
                 RemoteGames = manifeste.Games.Count,
                 LocalReadyGames = chemins.Count,
+                Missing = [.. _manques],
                 LastSuccessUtc = maintenant,
                 LastAttemptUtc = maintenant,
                 LastError = null,
@@ -373,12 +417,19 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         var precedents = LireCollectionPrecedente();
         var retenus = new List<string>();
         _coeursParJeu.Clear();
+        // POURQUOI CHAQUE JEU MANQUANT MANQUE.
+        //
+        // « 2 jeux sur 6 » ne dit pas lesquels ni pourquoi, et la raison n'existait qu'en
+        // journal de debogage : un exploitant voyait le chiffre sans pouvoir agir (2026-09-23).
+        // Trois conditions, trois manques possibles, et ils appellent trois gestes differents.
+        var manques = new List<string>();
 
         foreach (var jeu in manifeste.Games)
         {
             var cle = jeu.SystemId + "/" + jeu.RomGroup;
             if (!parGroupe.TryGetValue(cle, out var candidats) || candidats.Count == 0)
             {
+                manques.Add(jeu.RomGroup + " : ROM absente");
                 continue;
             }
 
@@ -391,6 +442,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             if (locale.Length == 0)
             {
                 _logger?.LogDebug("World Scoring : {Cle} sans definition officielle locale", cle);
+                manques.Add(jeu.RomGroup + " : définition de score absente");
                 continue;
             }
 
@@ -399,6 +451,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 // La borne a bien un .MEM, mais pas celui qu'exige le profil : le score
                 // serait refuse. Le jeu revient des que le Data Pack est a jour.
                 _logger?.LogDebug("World Scoring : {Cle} en definition non homologuee", cle);
+                manques.Add(jeu.RomGroup + " : définition non homologuée (Data Pack à mettre à jour)");
                 continue;
             }
 
@@ -416,8 +469,13 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             }
         }
 
+        _manques = manques;
+
         return retenus;
     }
+
+    /// <summary>Pourquoi chaque jeu ouvert n'est pas dans la collection de cette borne.</summary>
+    private IReadOnlyList<string> _manques = [];
 
     /// <summary>
     /// Ce que CETTE borne lancerait pour ce systeme d'EmulationStation : son reglage
@@ -674,7 +732,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             etat.LocalReadyGames,
             etat.LastSuccessUtc,
             stale,
-            etat.LastError);
+            etat.LastError,
+            etat.Missing);
     }
 
     private void EcrireJson<T>(string chemin, T valeur)
@@ -767,6 +826,10 @@ public sealed record ScoringCollectionState
     [JsonPropertyName("remote_etag")]
     public string? RemoteEtag { get; init; }
 
+    /// <summary>Pourquoi chaque jeu ouvert n'entre pas ici : « 19xx : ROM absente ».</summary>
+    [JsonPropertyName("missing")]
+    public IReadOnlyList<string> Missing { get; init; } = [];
+
     [JsonPropertyName("collection_sha256")]
     public string? CollectionSha256 { get; init; }
 
@@ -799,7 +862,9 @@ public sealed record ScoringCollectionStatus(
     int LocalReadyGames,
     DateTime? LastSuccessUtc,
     bool Stale,
-    string? LastError)
+    string? LastError,
+    /// <summary>Pourquoi chaque jeu ouvert n'est pas dans la collection de cette borne.</summary>
+    IReadOnlyList<string>? Missing = null)
 {
     public static ScoringCollectionStatus Initial => new(true, true, "error", null, 0, 0, null, false, null);
 }
@@ -809,5 +874,5 @@ internal static class ScoringCollectionStateExtensions
 {
     public static ScoringCollectionStatus EnStale(this ScoringCollectionState etat)
         => new(true, true, etat.LastSuccessUtc == null ? "error" : "stale", etat.RemoteRevision,
-            etat.RemoteGames, etat.LocalReadyGames, etat.LastSuccessUtc, true, etat.LastError);
+            etat.RemoteGames, etat.LocalReadyGames, etat.LastSuccessUtc, true, etat.LastError, etat.Missing);
 }

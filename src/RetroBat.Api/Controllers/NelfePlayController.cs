@@ -60,6 +60,9 @@ public sealed class NelfePlayController : ControllerBase
             remote_revision = statut.RemoteRevision,
             remote_games = statut.RemoteGames,
             local_ready_games = statut.LocalReadyGames,
+            // Pourquoi chaque jeu ouvert n'est pas la : « 19xx : ROM absente ». Sans cette
+            // liste, « 2 sur 6 » ne dit ni lesquels ni quoi faire.
+            missing = statut.Missing ?? [],
             last_success_utc = statut.LastSuccessUtc,
             stale = statut.Stale,
             last_error = statut.LastError,
