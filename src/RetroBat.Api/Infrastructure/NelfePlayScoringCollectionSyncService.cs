@@ -7,6 +7,7 @@ using RetroBat.Api.Media;
 using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Models;
 using RetroBat.Domain.Paths;
+using RetroBat.Domain.Services;
 
 namespace RetroBat.Api.Infrastructure;
 
@@ -44,6 +45,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     private readonly EsCustomCollectionWriter _writer;
     private readonly EsCollectionThemeAssets _assets;
     private readonly MediaRuntimeState _runtimeState;
+    private readonly EmulationStationSettingsService? _reglages;
+    private readonly EmulationStationSystemConfigService? _systemes;
     private readonly IEsSettingsChangeBus? _settingsChangeBus;
     private readonly ILogger<NelfePlayScoringCollectionSyncService>? _logger;
     private readonly SemaphoreSlim _porte = new(1, 1);
@@ -51,6 +54,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     private readonly TimeSpan _minimumEntreDeuxAppels;
 
     private DateTime _dernierAppelUtc = DateTime.MinValue;
+    /// <summary>Les chemins retenus au dernier passage, pour repondre sans relire le disque.</summary>
+    private HashSet<string>? _ouverts;
     private ScoringCollectionStatus _statut = ScoringCollectionStatus.Initial;
     private IDisposable? _abonnementReglages;
     private bool _derniereVisibilite = true;
@@ -62,6 +67,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         EsCustomCollectionWriter writer,
         EsCollectionThemeAssets assets,
         MediaRuntimeState runtimeState,
+        EmulationStationSettingsService? reglages = null,
+        EmulationStationSystemConfigService? systemes = null,
         IEsSettingsChangeBus? settingsChangeBus = null,
         ILogger<NelfePlayScoringCollectionSyncService>? logger = null,
         string? stateRoot = null,
@@ -73,6 +80,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         _writer = writer;
         _assets = assets;
         _runtimeState = runtimeState;
+        _reglages = reglages;
+        _systemes = systemes;
         _settingsChangeBus = settingsChangeBus;
         _logger = logger;
         _stateRoot = stateRoot ?? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay");
@@ -179,6 +188,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             }
 
             var chemins = Intersecter(manifeste, out var candidats);
+            _ouverts = chemins.Select(Normaliser).ToHashSet(StringComparer.OrdinalIgnoreCase);
             var resultat = _writer.Apply(CollectionName, chemins);
             // L'identite visuelle suit la collection : la declarer dans le theme est ce qui lui
             // donne sa propre tuile au lieu de la ranger dans le fourre-tout « collections ».
@@ -232,8 +242,38 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// Ce jeu est-il OUVERT AU SCORING sur cette borne ? C'est-a-dire : un profil est ouvert
+    /// pour lui, la borne en a le dump, et sa definition locale porte l'empreinte homologuee.
+    /// La reponse est la collection elle-meme, qui est exactement cette intersection.
+    ///
+    /// Rend null quand la borne n'a AUCUNE liste - collection eteinte, ou index jamais
+    /// telecharge. On ne sait alors pas, et ne pas savoir ne doit pas tout fermer : mieux vaut
+    /// le comportement d'avant qu'un panneau qui ne s'ouvre nulle part apres un demarrage hors
+    /// ligne.
+    /// </summary>
+    public bool? EstOuvertAuScoring(string cheminDuJeu)
+    {
+        if (string.IsNullOrWhiteSpace(cheminDuJeu))
+        {
+            return null;
+        }
+
+        // Le disque garde la liste entre deux demarrages : sans cette relecture, le panneau
+        // s'ouvrirait partout pendant les premieres secondes qui suivent un lancement.
+        var ouverts = _ouverts ??= LireCollectionPrecedente()
+            .Select(Normaliser)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return ouverts.Count == 0 ? null : ouverts.Contains(Normaliser(cheminDuJeu));
+    }
+
+    /// <summary>Un chemin comparable : meme separateur, sans espaces autour.</summary>
+    private static string Normaliser(string chemin) => chemin.Trim().Replace('\\', '/');
+
     private ScoringCollectionStatus Desactiver(bool enabled, bool visible)
     {
+        _ouverts = null;
         var resultat = _writer.Remove(CollectionName);
         if (_assets.Remove(CollectionName).Changed)
         {
@@ -314,7 +354,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 continue;
             }
 
-            var choisi = Choisir(candidats, jeu, precedents);
+            var choisi = Choisir(candidats, jeu, precedents, Lancement);
             if (choisi is { Length: > 0 })
             {
                 retenus.Add(choisi);
@@ -325,11 +365,86 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     }
 
     /// <summary>
+    /// Ce que CETTE borne lancerait pour ce systeme d'EmulationStation : son reglage
+    /// `&lt;systeme&gt;.emulator` / `.core` s'il en a un, sinon le premier coeur declare dans
+    /// son es_systems.cfg. Null quand les services ne sont pas la (tests).
+    /// </summary>
+    private EmulationStationLaunchConfig? Lancement(string systemeFrontal)
+    {
+        if (_systemes == null || _reglages == null || string.IsNullOrWhiteSpace(systemeFrontal))
+        {
+            return null;
+        }
+
+        try
+        {
+            return _systemes.ResolveLaunchConfig(systemeFrontal, _reglages.GetAllSettings());
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Une configuration illisible ne doit pas vider la collection : sans rang, tous les
+            // dumps redeviennent egaux et le tri d'avant tranche.
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// CE QUI SE REJOUE PASSE DEVANT. Un score mesure hors RetroArch est un vrai score, mais il
+    /// n'aura jamais de replay : l'enregistrement se pilote par les commandes reseau de
+    /// RetroArch, et MAME autonome ne les a pas. Quand la borne possede le meme jeu sous
+    /// plusieurs systemes, la collection prend donc celui qui se lancera sous RetroArch, et
+    /// FBNeo avant MAME pour l'arcade (regle user 2026-09-23).
+    ///
+    /// 0 : libretro FBNeo — 1 : un autre coeur libretro (MAME sous RetroArch, Genesis Plus GX)
+    /// — 2 : un emulateur autonome, qui ne rend pas de replay.
+    /// </summary>
+    internal static int RangDeLancement(EmulationStationLaunchConfig? lancement)
+    {
+        if (lancement == null || string.IsNullOrWhiteSpace(lancement.Emulator))
+        {
+            return 1;   // on ne sait pas : ni favori ni penalise
+        }
+
+        if (!string.Equals(lancement.Emulator, "libretro", StringComparison.OrdinalIgnoreCase))
+        {
+            return 2;
+        }
+
+        var coeur = lancement.Core ?? string.Empty;
+        return coeur.StartsWith("fbneo", StringComparison.OrdinalIgnoreCase)
+            || coeur.StartsWith("fbalpha", StringComparison.OrdinalIgnoreCase)
+            ? 0
+            : 1;
+    }
+
+    /// <summary>
     /// Plusieurs dumps du meme jeu peuvent etre installes : on garde le chemin deja choisi, ou
     /// celui dont le hash est reconnu par le profil, sinon le plus proche du groupe.
+    ///
+    /// Avant tout cela vient le RANG DE LANCEMENT : entre un dump qui se rejouera et un dump
+    /// qui ne se rejouera pas, il n'y a pas d'hesitation a avoir, et cela vaut aussi contre un
+    /// choix deja pose - une borne epinglee sur MAME autonome passe a FBNeo d'elle-meme.
     /// </summary>
-    internal static string? Choisir(List<InstalledGame> candidats, OpenGame jeu, HashSet<string> precedents)
+    internal static string? Choisir(
+        List<InstalledGame> candidats,
+        OpenGame jeu,
+        HashSet<string> precedents,
+        Func<string, EmulationStationLaunchConfig?>? lancement = null)
     {
+        if (candidats.Count == 0)
+        {
+            return null;
+        }
+
+        if (lancement != null)
+        {
+            var rangs = candidats.ToDictionary(
+                candidat => candidat,
+                candidat => RangDeLancement(lancement(candidat.FrontendSystemId)));
+            var meilleur = rangs.Values.Min();
+            candidats = candidats.Where(candidat => rangs[candidat] == meilleur).ToList();
+        }
+
         var dejaChoisi = candidats.FirstOrDefault(candidat =>
             precedents.Contains(candidat.AbsolutePath.Replace('\\', '/')));
         if (dejaChoisi != null)

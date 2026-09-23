@@ -113,8 +113,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         EsControllerService es,
         IEmulationStationNotificationService notifications,
         RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider wrapper,
-        ILogger<LeaderboardInputService> logger)
+        ILogger<LeaderboardInputService> logger,
+        Infrastructure.NelfePlayScoringCollectionSyncService? collection = null)
     {
+        _collection = collection;
         _wrapper = wrapper;
         _social = social;
         _invite = invite;
@@ -429,6 +431,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// <summary>La derniere raison de refus deja ecrite, pour ne pas repeter la meme ligne.</summary>
     private string _dernierRefus = "";
 
+    /// <summary>Qui sait quels jeux sont ouverts au scoring sur cette borne.</summary>
+    private readonly Infrastructure.NelfePlayScoringCollectionSyncService? _collection;
+
     /// <summary>Les conditions d'ouverture. Toutes doivent tenir : un panneau qui s'ouvre au mauvais moment se ferme mal.</summary>
     private bool PeutSOuvrir(out string systeme, out string nomDuJeu, out string cheminDuJeu)
     {
@@ -459,6 +464,15 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         if (nomDuJeu.Length == 0)
         {
             return Refus("le jeu selectionne n'a pas de nom");
+        }
+
+        // LE PANNEAU EST CELUI DU SCORING MONDIAL : il n'a rien a dire d'un jeu qui n'y est pas
+        // ouvert (demande user 2026-09-23). L'ouvrir ailleurs montrait un classement vide et
+        // laissait croire a une panne. La liste est la collection World Scoring elle-meme ;
+        // quand la borne n'en a aucune, on ne restreint pas - voir EstOuvertAuScoring.
+        if (_collection?.EstOuvertAuScoring(cheminDuJeu) == false)
+        {
+            return Refus("ce jeu n'est pas ouvert au scoring mondial");
         }
 
         _dernierRefus = "";

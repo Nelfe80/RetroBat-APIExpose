@@ -358,6 +358,129 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
             NelfePlayScoringCollectionSyncService.Choisir(candidats, jeu, []));
     }
 
+    // ── le panneau ES ne s'ouvre que sur un jeu ouvert ────────────────────
+
+    [Fact]
+    public async Task Un_jeu_de_la_collection_est_ouvert_au_scoring()
+    {
+        var rom = PoserRom("fbneo", "19xx.zip");
+        PoserMem("arcade", "19xx", MemContenu);
+        var http = new FauxHttp(Index("sha256:aa", Jeu("arcade", "19xx", MemEmpreinte)));
+        var service = Service(http, new FauxResolveur { ["19xx.zip"] = "19xx" });
+        await service.SynchroniserAsync("test", CancellationToken.None);
+
+        Assert.True(service.EstOuvertAuScoring(rom));
+        // Le separateur du chemin ne doit pas changer la reponse : ES en donne un, la
+        // collection en ecrit un autre.
+        Assert.True(service.EstOuvertAuScoring(rom.Replace('/', '\\')));
+        Assert.False(service.EstOuvertAuScoring(Path.Combine(Roms, "fbneo", "autre.zip")));
+    }
+
+    [Fact]
+    public async Task Sans_aucune_liste_on_ne_restreint_rien()
+    {
+        // Ne pas savoir n'est pas savoir que non : un panneau qui ne s'ouvre nulle part apres
+        // un demarrage hors ligne serait pris pour une panne.
+        PoserMem("arcade", "19xx", MemContenu);
+        var http = new FauxHttp(Index("sha256:aa", Jeu("arcade", "19xx", MemEmpreinte)));
+        var service = Service(http, new FauxResolveur());
+        await service.SynchroniserAsync("test", CancellationToken.None);
+
+        Assert.Null(service.EstOuvertAuScoring(Path.Combine(Roms, "fbneo", "19xx.zip")));
+    }
+
+    [Fact]
+    public void Un_chemin_vide_ne_dit_rien()
+    {
+        var service = Service(new FauxHttp(Index("sha256:aa")), new FauxResolveur());
+        Assert.Null(service.EstOuvertAuScoring(""));
+    }
+    // ── priorite de lancement : ce qui se rejoue passe devant ────────────────
+
+    [Fact]
+    public void Le_dump_qui_se_lance_sous_FBNeo_passe_devant_MAME_autonome()
+    {
+        var jeu = new OpenGame { SystemId = "arcade", RomGroup = "double-dragon", MemSha256 = MemEmpreinte };
+        var candidats = new List<InstalledGame>
+        {
+            InstalleArcade("mame", "E:/roms/mame/ddragon.zip"),
+            InstalleArcade("fbneo", "E:/roms/fbneo/ddragon.zip"),
+        };
+
+        Assert.Equal("E:/roms/fbneo/ddragon.zip", NelfePlayScoringCollectionSyncService.Choisir(
+            candidats, jeu, [], Lance(("fbneo", "libretro", "fbneo"), ("mame", "mame64", ""))));
+    }
+
+    [Fact]
+    public void Entre_deux_MAME_celui_de_RetroArch_est_pris()
+    {
+        // Sans FBNeo installe, MAME sous RetroArch reste preferable au binaire autonome :
+        // lui seul rend un replay.
+        var jeu = new OpenGame { SystemId = "arcade", RomGroup = "double-dragon", MemSha256 = MemEmpreinte };
+        var candidats = new List<InstalledGame>
+        {
+            InstalleArcade("mame-seul", "E:/roms/mame-seul/ddragon.zip"),
+            InstalleArcade("mame", "E:/roms/mame/ddragon.zip"),
+        };
+
+        Assert.Equal("E:/roms/mame/ddragon.zip", NelfePlayScoringCollectionSyncService.Choisir(
+            candidats, jeu, [], Lance(("mame", "libretro", "mame"), ("mame-seul", "mame64", ""))));
+    }
+
+    [Fact]
+    public void La_priorite_deplace_un_choix_deja_pose()
+    {
+        // Une borne epinglee sur MAME autonome ne doit pas y rester : le replay manquerait a
+        // chacun de ses records.
+        var jeu = new OpenGame { SystemId = "arcade", RomGroup = "double-dragon", MemSha256 = MemEmpreinte };
+        var candidats = new List<InstalledGame>
+        {
+            InstalleArcade("mame", "E:/roms/mame/ddragon.zip"),
+            InstalleArcade("fbneo", "E:/roms/fbneo/ddragon.zip"),
+        };
+        var precedent = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "E:/roms/mame/ddragon.zip" };
+
+        Assert.Equal("E:/roms/fbneo/ddragon.zip", NelfePlayScoringCollectionSyncService.Choisir(
+            candidats, jeu, precedent, Lance(("fbneo", "libretro", "fbneo"), ("mame", "mame64", ""))));
+    }
+
+    [Fact]
+    public void A_rang_egal_le_choix_deja_pose_reste()
+    {
+        var jeu = new OpenGame { SystemId = "arcade", RomGroup = "double-dragon", MemSha256 = MemEmpreinte };
+        var candidats = new List<InstalledGame>
+        {
+            InstalleArcade("fbneo", "E:/roms/fbneo/ddragona.zip"),
+            InstalleArcade("fbneo", "E:/roms/fbneo/ddragon.zip"),
+        };
+        var precedent = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "E:/roms/fbneo/ddragona.zip" };
+
+        Assert.Equal("E:/roms/fbneo/ddragona.zip", NelfePlayScoringCollectionSyncService.Choisir(
+            candidats, jeu, precedent, Lance(("fbneo", "libretro", "fbneo"))));
+    }
+
+    [Theory]
+    [InlineData("libretro", "fbneo", 0)]
+    [InlineData("libretro", "fbalpha2012_cps2", 0)]
+    [InlineData("libretro", "mame", 1)]
+    // UN COEUR DE CONSOLE N'EST PAS PENALISE : la regle vise le replay, pas FBNeo en soi.
+    // Genesis Plus GX enregistre aussi bien, il vaut donc le rang d'un coeur libretro ordinaire.
+    [InlineData("libretro", "genesis_plus_gx", 1)]
+    [InlineData("mame64", "", 2)]
+    [InlineData("raine", "", 2)]
+    public void Le_rang_de_lancement_dit_ce_qui_se_rejoue(string emulateur, string coeur, int attendu)
+    {
+        Assert.Equal(attendu, NelfePlayScoringCollectionSyncService.RangDeLancement(
+            new EmulationStationLaunchConfig("arcade", emulateur, coeur)));
+    }
+
+    [Fact]
+    public void Sans_configuration_lisible_aucun_dump_n_est_favorise()
+    {
+        // Rang neutre : le tri d'avant (hash reconnu, puis nom) tranche seul.
+        Assert.Equal(1, NelfePlayScoringCollectionSyncService.RangDeLancement(null));
+    }
+
     // ── contrat de l'index ───────────────────────────────────────────────────
 
     [Fact]
@@ -421,6 +544,27 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
     private static InstalledGame Installe(string chemin, string? md5) => new(
         "megadrive", "megadrive", "sonic-the-hedgehog", chemin,
         Path.GetFileNameWithoutExtension(chemin), md5, null, true, null);
+
+    /// <summary>Le meme jeu d'arcade, range sous un systeme d'EmulationStation donne.</summary>
+    private static InstalledGame InstalleArcade(string systemeFrontal, string chemin) => new(
+        systemeFrontal, "arcade", "double-dragon", chemin,
+        Path.GetFileNameWithoutExtension(chemin), null, null, true, null);
+
+    /// <summary>Ce que la borne lancerait : « fbneo » sous RetroArch, « mame » standalone…</summary>
+    private static Func<string, EmulationStationLaunchConfig?> Lance(
+        params (string Systeme, string Emulateur, string Coeur)[] regles)
+        => systeme =>
+        {
+            foreach (var (nom, emulateur, coeur) in regles)
+            {
+                if (string.Equals(nom, systeme, StringComparison.OrdinalIgnoreCase))
+                {
+                    return new EmulationStationLaunchConfig(systeme, emulateur, coeur);
+                }
+            }
+
+            return null;
+        };
 
     // ── doublures ────────────────────────────────────────────────────────────
 
