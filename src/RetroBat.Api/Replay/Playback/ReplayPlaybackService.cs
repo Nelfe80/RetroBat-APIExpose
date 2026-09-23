@@ -19,6 +19,18 @@ namespace RetroBat.Api.Replay.Playback;
 /// </summary>
 public sealed class ReplayPlaybackService
 {
+    /// <summary>
+    /// LE BANDEAU QUI DIT CE QUI SE PASSE, par-dessus l'écran.
+    ///
+    /// Un replay se télécharge, se résout, puis se lance : sans un mot, le joueur voit un écran
+    /// gris puis une lecture qui s'arrête, et n'a aucun moyen de comprendre (signalé le
+    /// 2026-09-23). La barre de lecture ne sait pas porter de message ; celle-ci, déjà utilisée
+    /// par le prévol du scoring, s'affiche par-dessus RetroArch sans lui prendre le focus.
+    ///
+    /// Facultative : sans elle, la lecture se déroule comme avant, en silence.
+    /// </summary>
+    private readonly RetroBat.Api.Infrastructure.LiveContestOverlayService? _bandeau;
+
     private readonly RetroArchReplayClient _ra;
     // R7 : le lecteur ne connaît QUE des rôles. Il ignore si le replay est né ici ou est arrivé
     // d'une autre borne — c'est la condition pour que NelfeNet se branche sans le rouvrir.
@@ -60,8 +72,10 @@ public sealed class ReplayPlaybackService
         RetroBat.Api.Replay.Sharing.ReplayManifestFetcher manifestFetcher,
         RetroBat.Api.Replay.Sharing.ReplayNetworkStateService network,
         RetroBat.Api.Infrastructure.CabinetLocale locale,
-        ILogger<ReplayPlaybackService> logger)
+        ILogger<ReplayPlaybackService> logger,
+        RetroBat.Api.Infrastructure.LiveContestOverlayService? bandeau = null)
     {
+        _bandeau = bandeau;
         _locale = locale;
         _ra = ra; _manifests = manifests; _objects = objects; _meta = meta; _source = source; _resolver = resolver;
         _bus = bus; _agent = agent; _devices = devices; _httpFactory = httpFactory; _logger = logger;
@@ -189,6 +203,10 @@ public sealed class ReplayPlaybackService
         {
             lock (_gate) { _state = ReplayPlaybackState.Replicating; _objetAttendu = manifest.Object.Sha256; }
             _logger.LogInformation("Replay : objet absent pour {ReplayId}, récupération en tâche de fond.", replayId);
+            // LE TELECHARGEMENT SE VOIT. Trente-sept megaoctets sur une borne modeste, cela fait
+            // de longues secondes d'ecran gris : sans un mot, le joueur croit que rien ne se
+            // passe et relance (signale le 2026-09-23).
+            _ = SuivreLeTelechargementAsync(manifest.Object.Sha256, CancellationToken.None);
             _ = Task.Run(async () =>
             {
                 try
@@ -237,6 +255,16 @@ public sealed class ReplayPlaybackService
         // SANS hint (reçu d'un peer) reste jouable. Politique souple : jamais bloqué sur la version.
         var resolution = _resolver.Resolve(manifest, hint);
         if (resolution.Runtime is null) return Fail(resolution.Failure, resolution.Detail);
+
+        // CE QUI VA SE LIRE QUAND MEME, MAIS QUI PEUT MAL FINIR.
+        //
+        // Le joueur doit l'apprendre AVANT que l'image disparaisse, pas apres. Le bandeau tient
+        // huit secondes : le temps que RetroArch charge son coeur, donc le temps ou le joueur
+        // regarde un ecran gris en se demandant ce qui se passe.
+        if (resolution.Runtime.Avertissement is { Length: > 0 } avertissement)
+        {
+            _bandeau?.ShowTop("REPLAY", "Lecture incertaine", avertissement, 8000);
+        }
         var resolved = resolution.Runtime;
         var coreDll = resolved.CoreDll;
         lock (_gate) { _warning = resolved.Avertissement; }
@@ -408,6 +436,58 @@ public sealed class ReplayPlaybackService
         _monitorCts = new CancellationTokenSource();
         var ct = _monitorCts.Token;
         _ = Task.Run(() => MonitorLoopAsync(ct), ct);
+    }
+
+    /// <summary>
+    /// Annonce l'avancement du telechargement, tant qu'il dure.
+    ///
+    /// Le bandeau se reecrit toutes les deux secondes : assez pour voir bouger un pourcentage,
+    /// assez peu pour ne pas clignoter. Il s'arrete des que l'objet est la ou que la lecture a
+    /// quitte l'etat de replication - un message de telechargement qui survivrait au
+    /// telechargement serait pire que pas de message.
+    /// </summary>
+    private async Task SuivreLeTelechargementAsync(string sha, CancellationToken ct)
+    {
+        if (_bandeau is null)
+        {
+            return;
+        }
+
+        try
+        {
+            for (var i = 0; i < 900; i++)
+            {
+                bool encore;
+                lock (_gate) { encore = _state == ReplayPlaybackState.Replicating; }
+                if (!encore)
+                {
+                    return;
+                }
+
+                var p = _network.ProgressOf(sha);
+                if (p is not null && p.Total > 0)
+                {
+                    var pourcent = (int)Math.Clamp(100.0 * p.Received / p.Total, 0, 100);
+                    var reste = p.EtaSeconds is { } eta && eta > 1 && eta < 3600
+                        ? $"encore {Math.Round(eta)} s"
+                        : $"{p.Received / (1024 * 1024)} Mo sur {p.Total / (1024 * 1024)}";
+                    _bandeau.ShowTop("REPLAY", $"Téléchargement {pourcent} %", reste, 2500);
+                }
+                else
+                {
+                    _bandeau.ShowTop("REPLAY", "Téléchargement du replay…", null, 2500);
+                }
+
+                await Task.Delay(2000, ct).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Replay : suivi du téléchargement interrompu.");
+        }
     }
 
     private const long EndPauseMargin = 130; // on fige un peu AVANT la vraie fin (jamais l'EOF → pas de fermeture/boucle)
