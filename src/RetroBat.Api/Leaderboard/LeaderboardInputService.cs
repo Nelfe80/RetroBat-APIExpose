@@ -371,6 +371,26 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     _modele.RendreLaMain();
                     Appliquer(LeaderboardPanelModel.Effet.RendreLeFocus);
                 }
+
+                // LE PANNEAU NE SURVIT PAS A LA PERTE DU PREMIER PLAN.
+                //
+                // Deux defauts n'en faisaient qu'un. Notre fenetre est topmost : laissee ouverte,
+                // elle reste par-dessus l'application suivante. Et `RendreLaMain` fait passer le
+                // modele de « Panneau » a « MenuEs », jamais a « Ferme » -- or le chien de garde
+                // n'ouvre QUE depuis « Ferme ». Le panneau devenait donc definitivement sourd a
+                // l'appui long, sans une ligne de journal, puisque `OuvrirAsync` n'etait meme plus
+                // appele. Mesure sur borne le 2026-09-24 : ouvert a 16:59:44, plus une seule
+                // ouverture jusqu'a 18:06, et aucun refus enregistre.
+                //
+                // L'invariant qui manquait : l'etat du modele ne survit pas a la visibilite de la
+                // fenetre. Ni ES ni nous au premier plan, donc le joueur est parti ailleurs.
+                if (_modele.Etat != LeaderboardPanelModel.Foyer.Ferme
+                    && !EsEstDevant()
+                    && !_overlay.EstAuPremierPlan())
+                {
+                    _logger.LogInformation("Classement : le premier plan est parti ailleurs, le panneau se ferme.");
+                    Fermer();
+                }
             }
             catch (OperationCanceledException) { return; }
             catch (Exception ex)
@@ -1255,7 +1275,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             _textes.Text("leaderboard.join", langue),
             Glyphe(SlotValider),
             ReplaysEnPreparation: _replaysEnPreparation,
-            RangsPrecedents: _rangsPrecedents);
+            RangsPrecedents: _rangsPrecedents,
+            // Le pseudo vient de NOTRE ligne du classement : c'est la seule source locale, et
+            // elle est juste. Hors classement, on ne montre rien plutot que d'inventer -- « ma
+            // place » dit deja « non classe » juste au-dessus.
+            Pseudo: lignes.FirstOrDefault(l => l.CestMoi)?.Joueur ?? "");
     }
 
     /// <summary>

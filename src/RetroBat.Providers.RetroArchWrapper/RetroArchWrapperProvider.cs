@@ -418,6 +418,25 @@ public class RetroArchWrapperProvider : IProvider
                         definition.SystemId,
                         definition.Rom,
                         line.Trim());
+
+                    // LE PROCES-VERBAL NE SERT PAS QU'AU JOURNAL.
+                    //
+                    // Sa premiere ligne dit si le coeur expose quoi que ce soit de lisible
+                    // (« Core=... system_ram=... memory_map_blocks=... »). La borne s'en sert pour
+                    // apprendre, une fois pour toutes, quels coeurs savent mesurer : un joueur a
+                    // perdu quatre parties sous mame2003_plus le 24 septembre 2026 sans que rien
+                    // ne le previenne. Le provider ne juge pas -- il publie, et c'est l'API qui
+                    // tient la liste.
+                    _ = _eventBus.PublishAsync(new EventEnvelope
+                    {
+                        Type = "wrapper.diagnostic",
+                        Payload = new
+                        {
+                            definition.SystemId,
+                            definition.Rom,
+                            Line = line.Trim(),
+                        },
+                    });
                 }
                 return;
             }

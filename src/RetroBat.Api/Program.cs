@@ -388,6 +388,11 @@ builder.Services.AddSingleton<EsCollectionThemeAssets>();
 // Le routeur des messages de la plateforme : c'est lui qui choisit entre notification ES et
 // surimpression, selon ce que le joueur fait a cet instant.
 builder.Services.AddSingleton<NelfePlayMessageRouter>();
+// CE QUE CHAQUE COEUR SAIT LIRE. Une entree par coeur, apprise au premier lancement : un joueur
+// a perdu quatre parties sous mame2003_plus sans que rien ne le previenne (24 septembre 2026).
+builder.Services.AddSingleton(sp => new RetroBat.Api.Infrastructure.CoreMemoryCapability(
+    System.IO.Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay"),
+    sp.GetService<ILogger<RetroBat.Api.Infrastructure.CoreMemoryCapability>>()));
 builder.Services.AddSingleton<NelfePlayScoringCollectionSyncService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<NelfePlayScoringCollectionSyncService>());
 // Index public des jeux ouverts au scoring : court, lu souvent, jamais authentifie. Pas de
@@ -619,6 +624,12 @@ eventBus.Subscribe<EventEnvelope>(evt =>
 {
     _ = wsManager.BroadcastAsync(evt);
 });
+
+// La liste des coeurs ecoute les proces-verbaux du wrapper : elle se remplit toute seule, une
+// ligne par coeur, la premiere fois qu'on le voit tourner.
+app.Services.GetRequiredService<RetroBat.Api.Infrastructure.CoreMemoryCapability>().Ecouter(
+    eventBus,
+    app.Services.GetService<RetroBat.Api.Infrastructure.LiveContestOverlayService>());
 
 app.Use(async (context, next) =>
 {

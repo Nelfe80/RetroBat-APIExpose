@@ -189,7 +189,9 @@ public sealed class LeaderboardOverlayService : IDisposable
         string AttenteTitre = "",
         string AttenteDetail = "",
         IReadOnlySet<long>? ReplaysEnPreparation = null,
-        IReadOnlyDictionary<string, int>? RangsPrecedents = null);
+        IReadOnlyDictionary<string, int>? RangsPrecedents = null,
+        /// <summary>Le pseudo du joueur de cette borne, affiche en bas a droite. Vide : rien.</summary>
+        string Pseudo = "");
 
     private Contenu _contenu = new("", Array.Empty<string>(), 0, Array.Empty<LeaderboardClient.Ligne>(), 0, "", true, false,
         Array.Empty<Aide>(), Array.Empty<Aide>(), "", "", "", "", Array.Empty<string>(),
@@ -312,6 +314,26 @@ public sealed class LeaderboardOverlayService : IDisposable
         return false;
     }
 
+    /// <summary>
+    /// Le panneau est-il la fenetre active ?
+    ///
+    /// Sert a le fermer quand le joueur est parti ailleurs : notre fenetre est topmost, elle
+    /// resterait sinon par-dessus l'application suivante, et l'etat du modele ne reviendrait
+    /// jamais a « ferme » -- ce qui rendait l'appui long definitivement sourd (borne du
+    /// 2026-09-24 : panneau ouvert a 16:59:44, plus une seule ouverture jusqu'a 18:06).
+    /// </summary>
+    public bool EstAuPremierPlan()
+    {
+        var h = _handle;
+        return h != IntPtr.Zero && GetForegroundWindow() == h;
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
+    /// <summary>Le handle de la fenetre, retenu a sa creation.</summary>
+    private IntPtr _handle;
+
     public bool TropLongSilence()
     {
         if (!ANousLaMain) return false;
@@ -364,7 +386,9 @@ public sealed class LeaderboardOverlayService : IDisposable
             // La fenetre est creee ICI, cachee. Application.Run(forme) l'aurait MONTREE avant le
             // premier tic du minuteur qui la cache : le panneau vide clignotait a chaque
             // demarrage de l'API. Le handle suffit ; Show() viendra a la premiere ouverture.
-            _ = _forme.Handle;
+            // Le handle est retenu ici, sur le fil de la fenetre : le relire depuis le chien de
+            // garde forcerait une creation ou leverait selon l'etat de la forme.
+            _handle = _forme.Handle;
             _forme.FormClosed += (_, _) => Application.ExitThread();
             Application.Run();
         }
@@ -675,7 +699,9 @@ public sealed class LeaderboardOverlayService : IDisposable
                     return null;
                 }
 
-                var hauteur = (int) Math.Round(hauteurTitre * 1.45f);
+                // Un cran plus grand qu'avant (1,45) : la marque tient le titre a elle seule, et
+                // la garde de largeur ci-dessous l'empeche de deborder sur un panneau etroit.
+                var hauteur = (int) Math.Round(hauteurTitre * 1.75f);
                 var image = _service._glyphes?.Glyphe(chemin, hauteur);
                 if (image is null)
                 {
@@ -1325,6 +1351,31 @@ public sealed class LeaderboardOverlayService : IDisposable
                 var mot = aide.Mot.ToUpperInvariant();
                 g.DrawString(mot, police, encre, new RectangleF(x, y, Width, hauteur), centre);
                 x += g.MeasureString(mot, police, PointF.Empty, StringFormat.GenericTypographic).Width + taille * 1.2f;
+            }
+
+            // LE JOUEUR DE CETTE BORNE, au bout de la ligne d'aide.
+            //
+            // Le panneau montre un classement mondial sans jamais dire AU NOM DE QUI il parle :
+            // devant une borne partagee, on ne sait pas quel compte y est lie. Le pseudo se pose
+            // donc la, a droite, sur la rangee qui reste libre -- « ma place » occupe deja celle
+            // du dessus.
+            if (c.Pseudo.Length > 0)
+            {
+                var marge = _largeurEcran * 0.012f;
+                using var pale = new SolidBrush(Teinte(s.GroupColor));
+                using var droite = new StringFormat(StringFormat.GenericTypographic)
+                {
+                    Alignment = StringAlignment.Far,
+                    LineAlignment = StringAlignment.Center,
+                    Trimming = StringTrimming.EllipsisCharacter,
+                };
+                // Jamais par-dessus l'aide : on ne dessine que si la place restante suffit.
+                var largeur = Width - marge - x;
+                if (largeur > taille * 4f)
+                {
+                    g.DrawString(c.Pseudo.ToUpperInvariant(), police, pale,
+                        new RectangleF(x, y, largeur, hauteur), droite);
+                }
             }
         }
 
