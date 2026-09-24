@@ -616,6 +616,10 @@ if (selfTestRequested)
     return selfTestCode;
 }
 
+// UN SERVICE QUI TOMBE NE DOIT PAS EMPORTER L'API. Pose ICI, quand les 39 services hebergees
+// sont tous enregistres : au-dela, la liste ne bouge plus. Voir HostedServiceGuard.
+builder.Services.ProtegerLesServicesHeberges();
+
 var app = builder.Build();
 
 // Setup internal event subscriber to broadcast via WebSockets
@@ -1039,7 +1043,24 @@ public class ProviderHostedService : IHostedService
     private async Task StartProviderAsync(IProvider provider, CancellationToken cancellationToken)
     {
         var startedAt = DateTime.UtcNow;
-        await provider.StartAsync(cancellationToken);
+        try
+        {
+            await provider.StartAsync(cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // CELUI D'EMULATIONSTATION EST ATTENDU DANS LE StartAsync DE L'HOTE, donc son echec
+            // remontait jusqu'a lui et arretait le processus. Les autres partent detaches, et leur
+            // exception etait simplement perdue -- on ne savait meme pas qu'ils n'avaient pas
+            // demarre. Dans les deux cas on nomme le fautif et la borne continue.
+            _logger.LogError(ex, "Provider {ProviderType} n'a pas demarre ; l'API continue sans lui.",
+                provider.GetType().Name);
+            return;
+        }
         lock (_startedProvidersLock)
         {
             if (!_startedProviders.Contains(provider))
