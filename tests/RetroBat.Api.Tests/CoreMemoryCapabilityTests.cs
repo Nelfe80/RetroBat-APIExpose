@@ -95,4 +95,47 @@ public class CoreMemoryCapabilityTests : IDisposable
     {
         Assert.Null(Neuf().Connu("jamais_lance"));
     }
+
+    [Fact]
+    public void Le_nom_d_affichage_rejoint_le_fichier_par_la_fiche_de_RetroArch()
+    {
+        // Les deux bouts ne parlaient pas la meme langue : le wrapper nomme le FICHIER
+        // (mame2003_plus_libretro), l'attestation nomme le coeur (MAME 2003-Plus). RetroArch pose
+        // lui-meme la table de jointure a cote de chaque .dll, et son champ `corename` vaut mot
+        // pour mot ce que l'attestation annonce -- verifie sur les trois coeurs vus en production.
+        var info = Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.RetroBatRoot,
+            "emulators", "retroarch", "info", "mame2003_plus_libretro.info");
+        if (!File.Exists(info))
+        {
+            return;   // pas de RetroArch installe ici : rien a verifier
+        }
+
+        var liste = Neuf();
+        liste.Observer("Core=mame2003_plus_libretro arcade=YES system_ram=NULL system_ram_size=0 memory_map_blocks=0");
+
+        var connu = liste.ConnuParNomAffiche("MAME 2003-Plus");
+        Assert.NotNull(connu);
+        Assert.False(connu!.Measures);
+    }
+
+    [Fact]
+    public void Un_nom_d_affichage_inconnu_ne_conclut_rien()
+    {
+        Assert.Null(Neuf().ConnuParNomAffiche("Un Coeur Qui N Existe Pas"));
+        Assert.Null(Neuf().ConnuParNomAffiche(""));
+    }
+
+    [Fact]
+    public void Un_coeur_installe_mais_jamais_lance_ne_conclut_rien()
+    {
+        // La fiche existe, mais on ne l'a jamais vu tourner : on ne suppose pas.
+        var info = Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.RetroBatRoot,
+            "emulators", "retroarch", "info", "fbneo_libretro.info");
+        if (!File.Exists(info))
+        {
+            return;
+        }
+
+        Assert.Null(Neuf().ConnuParNomAffiche("FinalBurn Neo"));
+    }
 }

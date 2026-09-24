@@ -167,6 +167,97 @@ public sealed class CoreMemoryCapability
         return verdict;
     }
 
+    /// <summary>
+    /// CE QU'ON SAIT D'UN CŒUR DÉSIGNÉ PAR SON NOM D'AFFICHAGE, celui que porte l'attestation.
+    ///
+    /// Les deux bouts ne parlaient pas la même langue : le procès-verbal du wrapper nomme le
+    /// FICHIER (<c>mame2003_plus_libretro</c>), l'attestation nomme le cœur tel qu'il se présente
+    /// (<c>MAME 2003-Plus</c>). Il n'y avait donc aucun moyen de prévenir AVANT la partie.
+    ///
+    /// La table de jointure n'est pas à écrire : RetroArch la pose lui-même. Chaque cœur installé
+    /// a sa fiche <c>emulators/retroarch/info/&lt;fichier&gt;.info</c>, qui porte
+    /// <c>corename = "..."</c>, et ce champ vaut mot pour mot ce que l'attestation annonce —
+    /// vérifié sur les trois cœurs vus en production le 24 septembre 2026. Elle se met à jour avec
+    /// RetroArch, sans que personne n'ait à l'entretenir.
+    ///
+    /// Un même <c>corename</c> peut couvrir plusieurs fichiers : sur 291 fiches, un seul cas, les
+    /// quatre variantes de rendu de Mupen64Plus-Next. On ne conclut alors que si les verdicts
+    /// connus s'accordent.
+    /// </summary>
+    public Verdict? ConnuParNomAffiche(string nomAffiche)
+    {
+        if (string.IsNullOrWhiteSpace(nomAffiche))
+        {
+            return null;
+        }
+
+        var fichiers = Fiches().GetValueOrDefault(nomAffiche.Trim());
+        if (fichiers is null || fichiers.Count == 0)
+        {
+            return null;
+        }
+
+        var connus = fichiers.Select(Connu).OfType<Verdict>().ToList();
+        if (connus.Count == 0)
+        {
+            return null;
+        }
+
+        // Des variantes qui ne disent pas la même chose : on se tait plutôt que de choisir.
+        return connus.Select(v => v.Measures).Distinct().Count() == 1 ? connus[0] : null;
+    }
+
+    /// <summary>Les fiches de RetroArch, lues une fois : nom d'affichage -&gt; fichiers de cœur.</summary>
+    private Dictionary<string, List<string>> Fiches()
+    {
+        lock (_sync)
+        {
+            if (_fiches is not null)
+            {
+                return _fiches;
+            }
+
+            _fiches = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                var dossier = Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "info");
+                if (Directory.Exists(dossier))
+                {
+                    foreach (var f in Directory.EnumerateFiles(dossier, "*_libretro.info"))
+                    {
+                        var m = Corename.Match(File.ReadAllText(f));
+                        if (!m.Success)
+                        {
+                            continue;
+                        }
+
+                        var nom = m.Groups["nom"].Value.Trim();
+                        if (nom.Length == 0)
+                        {
+                            continue;
+                        }
+
+                        (_fiches.TryGetValue(nom, out var liste) ? liste : _fiches[nom] = [])
+                            .Add(Path.GetFileNameWithoutExtension(f));
+                    }
+                }
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // Sans les fiches, on ne prévient pas d'avance : c'est une perte de confort, pas
+                // une panne. Le bandeau de la première image reste, lui.
+                _logger?.LogDebug(ex, "Cœurs : fiches de RetroArch illisibles.");
+            }
+
+            return _fiches;
+        }
+    }
+
+    private static readonly Regex Corename = new(
+        @"^corename\s*=\s*""(?<nom>[^""]*)""", RegexOptions.Compiled | RegexOptions.Multiline);
+
+    private Dictionary<string, List<string>>? _fiches;
+
     /// <summary>Ce qu'on sait de ce cœur, ou null si on ne l'a jamais vu tourner.</summary>
     public Verdict? Connu(string coeur)
     {

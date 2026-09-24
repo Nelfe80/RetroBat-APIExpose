@@ -36,6 +36,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>La surimpression qui ne prend JAMAIS le focus (WS_EX_NOACTIVATE) : c'est
     /// par la que passe tout ce qui s'affiche PENDANT une partie.</summary>
     private readonly LiveContestOverlayService? _overlay;
+    /// <summary>Ce que la borne sait des coeurs : lesquels exposent de quoi mesurer.</summary>
+    private readonly CoreMemoryCapability? _coeurs;
     private readonly ILogger<NelfePlayScoringReporter>? _logger;
 
     private IDisposable? _subscription;
@@ -90,12 +92,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         NvramSnapshotService? nvram = null,
         BiosFingerprintService? bios = null,
         CertifiedSettingsService? certified = null,
+        CoreMemoryCapability? coeurs = null,
         RetroBat.Api.Replay.Playback.ReplayPlaybackService? playback = null)
     {
         _nvram = nvram;
         _bios = bios;
         _certified = certified;
         _overlay = overlay;
+        _coeurs = coeurs;
         _playback = playback;
         _replayStore = replayStore;
         _semis = semis;
@@ -481,6 +485,29 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 Trace($"prévol : wrapper {wrapper}, rien ne sera mesuré");
 
                 return;   // le reste du prevol parlerait de certification : il n'y a rien a certifier
+            }
+
+            // CE CŒUR-LA N'EXPOSE PAS SA MEMOIRE, ET ON LE SAIT DEJA.
+            //
+            // Le wrapper peut etre en place et enveloppe correctement : s'il n'a rien a lire, il
+            // se tait image apres image. Un joueur a lance Altered Beast quatre fois sous
+            // mame2003_plus le 24 septembre 2026, avec quatre « Partie certifiable » et zero
+            // session, avant de comprendre tout seul en deplacant sa ROM vers roms/fbneo.
+            //
+            // La borne retient ce qu'elle a vu, coeur par coeur, et la fiche que RetroArch pose a
+            // cote de chaque .dll relie le nom du coeur a son fichier. Elle peut donc prevenir
+            // AVANT la partie, et non plus seulement a la premiere image.
+            var coeur = GetString(attestation, "CoreName") ?? string.Empty;
+            if (_coeurs?.ConnuParNomAffiche(coeur) is { Measures: false })
+            {
+                _overlay?.ShowTop(
+                    "SCORING",
+                    "Aucun score ne sera mesuré",
+                    "le cœur « " + coeur + " » n'expose pas sa mémoire",
+                    8000);
+                Trace($"prévol : {coeur} est connu pour ne rien exposer, rien ne sera mesuré");
+
+                return;
             }
             // LE BANDEAU A DEUX LIGNES, ET LE PREVOL N'EN UTILISAIT QU'UNE.
             //
