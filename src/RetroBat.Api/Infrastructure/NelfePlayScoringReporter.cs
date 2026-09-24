@@ -63,6 +63,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     // soumet QUE le meilleur run (segment monotone). Un super score n'est plus perdu si on
     // rejoue, et le wrapper n'est PAS touché ni sollicité par event (0 surcoût en jeu).
     private readonly List<(long frame, long total)> _trajectory = new();
+    /// <summary>
+    /// Les pertes et gains de vie de la partie, avec leur valeur : c'est eux qui disent OU le run
+    /// s'est termine. Voir FinsDeRun -- le decoupage ne connaissait que les chutes de score, et un
+    /// continue d'arcade conserve le score.
+    /// </summary>
+    private readonly List<EvenementDeVie> _vies = new();
 
     // ── Lien replay ↔ score (funnel « ▷ REPLAY » de /rankings) ───────────────
     // Le reporter connaît le session_id (il le génère) et le verdict ; le recorder
@@ -370,6 +376,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 case "retroarch.state":
                     CaptureState(ToJson(envelope.Payload));
                     break;
+                case "retroarch.memory.changed":
+                case "ingame.memory.changed":
+                    CaptureVie(ToJson(envelope.Payload));
+                    break;
                 case "score.live.changed":
                     CaptureTotal(ToJson(envelope.Payload));
                     break;
@@ -401,6 +411,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _finalTotal = null;
             _inDemo = false;
             _trajectory.Clear();
+            _vies.Clear();
         }
     }
 
@@ -653,14 +664,60 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private const int MaxGlitchTail = 2;
 
     internal static List<(long frame, long total)> SelectBestRun(List<(long frame, long total)> traj)
+        => SelectBestRun(traj, []);
+
+    /// <param name="finsDeRun">
+    /// Les frames ou les vies du joueur mesure ont atteint zero. On y coupe, EN PLUS des chutes de
+    /// score, et c'est ce qui manquait au 1CC : un continue d'arcade conserve le score, donc la
+    /// courbe ne retombe jamais et la partie entiere passait pour un seul run. Voir FinsDeRun.
+    /// </param>
+    internal static List<(long frame, long total)> SelectBestRun(
+        List<(long frame, long total)> traj, IReadOnlyList<long> finsDeRun)
     {
         if (traj.Count == 0) return traj;
         List<(long frame, long total)>? best = null;
         long bestPeak = long.MinValue;
         var cur = new List<(long frame, long total)>();
         long prev = long.MinValue;
+        // La derniere vie perdue ferme le run : ce qui suit appartient a un autre run, continue
+        // ou nouvelle partie. On ne cherche PAS a reconnaitre le continue -- crédit au demarrage,
+        // entree d'un second joueur, free play, 1-up : aucune de ces distinctions n'est fiable.
+        var fins = finsDeRun is { Count: > 0 } ? new HashSet<long>(finsDeRun) : null;
+        var coupeApres = false;
+        // UN SEGMENT QUI SUIT UN CONTINUE NE CONCOURT PAS, et c'est tout l'enjeu.
+        //
+        // Apres un continue, le score est REPORTE : le joueur repart de ses 5000 points et monte a
+        // 12000. Le second segment affiche donc 12000 sans les avoir gagnes -- comparer les
+        // sommets absolus rendrait au continue exactement ce qu'on veut lui retirer.
+        //
+        // Une vraie nouvelle partie, elle, remet le score a zero : sa chute est vue par le
+        // decoupage ordinaire et les deux tentatives se comparent alors honnetement.
+        var reporte = false;
         foreach (var pt in traj)
         {
+            if (coupeApres)
+            {
+                coupeApres = false;
+                long peakFin = cur.Count > 0 ? cur[^1].total : long.MinValue;
+                if (!reporte && peakFin > bestPeak)
+                {
+                    bestPeak = peakFin;
+                    best = new List<(long frame, long total)>(cur);
+                }
+
+                // Le score a-t-il ete remis a zero ? Sinon, ce qui suit herite du run precedent.
+                reporte = peakFin != long.MinValue && pt.total >= peakFin;
+                cur.Clear();
+                prev = long.MinValue;
+            }
+
+            // La lecture de la frame ou la derniere vie tombe appartient encore au run : c'est le
+            // score AVEC lequel le joueur a perdu. On coupe apres elle.
+            if (fins is not null && fins.Contains(pt.frame))
+            {
+                coupeApres = true;
+            }
+
             if (pt.total < prev)   // chute : parasite de queue, ou fin du run précédent
             {
                 // k lectures de queue sont parasites si la valeur qui suit reprend au niveau
@@ -681,13 +738,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     continue;
                 }
                 long peak = cur.Count > 0 ? cur[^1].total : long.MinValue;
-                if (peak > bestPeak) { bestPeak = peak; best = new List<(long frame, long total)>(cur); }
+                if (!reporte && peak > bestPeak) { bestPeak = peak; best = new List<(long frame, long total)>(cur); }
+                // Une chute de score est une remise a zero : la tentative qui suit est a elle.
+                reporte = false;
                 cur.Clear();
             }
             cur.Add(pt);
             prev = pt.total;
         }
-        if (cur.Count > 0 && (best is null || cur[^1].total > bestPeak)) best = cur;
+        if (cur.Count > 0 && !reporte && (best is null || cur[^1].total > bestPeak)) best = cur;
+        // Rien retenu alors qu'on a joue : tous les segments heritaient d'un continue. On rend le
+        // premier, qui est le seul dont le score soit vraiment le sien.
+        if (best is null && cur.Count > 0) best = cur;
 
         // UN SEGMENT D'UNE SEULE LECTURE N'EST PAS UNE PARTIE. Un score sportif progresse : il
         // arrive par une suite de lectures, pas d'un coup, seul entre deux chutes. La RAM de
@@ -718,6 +780,69 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
         if (cur.Count > 0) sortie.Add(cur);
         return sortie;
+    }
+
+    /// <summary>
+    /// Une perte ou un gain de vie, avec SA VALEUR. Le joueur vient du signal pour le wrapper, de
+    /// la racine pour le pont Lua de MAME : les deux ponts ne le rangent pas au meme endroit.
+    /// </summary>
+    private void CaptureVie(JsonElement root)
+    {
+        if (!root.TryGetProperty("signal", out var signal) && !root.TryGetProperty("Signal", out signal))
+        {
+            return;
+        }
+
+        var nom = (GetString(signal, "Name") ?? "").Trim();
+        var perte = nom.Equals("LOSE_LIFE", StringComparison.OrdinalIgnoreCase);
+        if (!perte && !nom.Equals("GAIN_LIFE", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        var adresse = (GetString(signal, "Address") ?? "").Trim();
+        if (adresse.Length == 0)
+        {
+            return;
+        }
+
+        lock (_sync)
+        {
+            if (_inDemo) return;   // une demo n'est pas une partie
+            _vies.Add(new EvenementDeVie(
+                Normaliser(adresse),
+                perte,
+                Entier(signal, "Value"),
+                Entier(signal, "Frame") ?? _lastFrame,
+                Entier(signal, "Player") ?? Entier(root, "player") ?? 1));
+            if (_vies.Count > MaxTrajectory) _vies.RemoveAt(0);
+        }
+    }
+
+    /// <summary>Le pont MAME ecrit 0x604, le wrapper 0X0604 : la meme ligne doit se reconnaitre.</summary>
+    private static string Normaliser(string adresse)
+    {
+        var t = adresse.Trim();
+        if (t.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) t = t[2..];
+        t = t.TrimStart('0');
+        return "0x" + (t.Length == 0 ? "0" : t.ToUpperInvariant());
+    }
+
+    private static int? Entier(JsonElement el, string nom)
+    {
+        if (el.ValueKind != JsonValueKind.Object) return null;
+        foreach (var p in el.EnumerateObject())
+        {
+            if (!string.Equals(p.Name, nom, StringComparison.OrdinalIgnoreCase)) continue;
+            return p.Value.ValueKind switch
+            {
+                JsonValueKind.Number when p.Value.TryGetInt32(out var n) => n,
+                JsonValueKind.String when int.TryParse(p.Value.GetString(), out var n) => n,
+                _ => null,
+            };
+        }
+
+        return null;
     }
 
     private void CaptureTotal(JsonElement root)
@@ -778,12 +903,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         string? listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion;
         long? finalTotal;
         List<(long frame, long total)> trajectory;
+        List<EvenementDeVie> vies;
         lock (_sync)
         {
             listenerSha = _listenerSha256; coreSha = _coreSha256; memSha = _memSha256;
             contentSha = _contentSha256; contentMd5 = _contentMd5; contentSha1 = _contentSha1; wrapperVersion = _wrapperVersion; finalTotal = _finalTotal;
             coreName = _coreName; coreVersion = _coreVersion;
             trajectory = new List<(long, long)>(_trajectory);
+            vies = new List<EvenementDeVie>(_vies);
         }
 
         // ARCADE : l'identite du contenu n'est pas mesurable depuis le fichier.
@@ -811,7 +938,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // de score (un score qui retombe = le joueur a relancé une partie) et on garde le
         // segment monotone au pic le plus haut. Un super score n'est donc jamais perdu par un
         // mauvais run qui suit. Calculé tôt + tracé pour valider même hors chemin certifié.
-        var bestRun = SelectBestRun(trajectory);
+        var finsDeRun = FinsDeRun.Calculer(vies);
+        if (finsDeRun.Count > 0)
+        {
+            Trace($"fins de run (vies a zero) : {string.Join(", ", finsDeRun)}");
+        }
+
+        var bestRun = SelectBestRun(trajectory, finsDeRun);
         long runPeak = bestRun.Count > 0 ? bestRun[^1].total : (finalTotal ?? 0);
         Trace($"segmentation : meilleur run {bestRun.Count}/{trajectory.Count} pts, pic={runPeak} (total global {finalTotal})");
 

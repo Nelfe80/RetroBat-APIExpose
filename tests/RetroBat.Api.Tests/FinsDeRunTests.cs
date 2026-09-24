@@ -1,0 +1,175 @@
+using RetroBat.Api.Infrastructure;
+using Xunit;
+
+namespace RetroBat.Api.Tests;
+
+/// <summary>
+/// Un joueur a vu certifier en 1CC un score obtenu AVEC un continue, sur 19xx et sur Altered
+/// Beast. Le découpage ne connaissait que les chutes de score, et un continue d'arcade conserve le
+/// score : rien ne se coupait. Les suites de valeurs ci-dessous sont celles mesurées sur borne le
+/// 24 septembre 2026.
+/// </summary>
+public class FinsDeRunTests
+{
+    private static EvenementDeVie Perte(string a, int? v, long frame, int joueur = 1)
+        => new(a, true, v, frame, joueur);
+
+    private static EvenementDeVie Gain(string a, int v, long frame, int joueur = 1)
+        => new(a, false, v, frame, joueur);
+
+    [Fact]
+    public void Le_run_se_termine_a_la_derniere_vie_perdue()
+    {
+        // Ms. Pac-Man, compteur interne : 3 vies, trois morts, la dernière à la frame 5961.
+        var fins = FinsDeRun.Calculer(
+        [
+            Perte("0x614", 2, 3672),
+            Perte("0x614", 1, 4663),
+            Perte("0x614", 0, 5961),
+        ]);
+
+        Assert.Equal([5961L], fins);
+    }
+
+    [Fact]
+    public void Le_compteur_AFFICHE_ne_tronque_pas_la_derniere_vie()
+    {
+        // LE PIEGE. Sur Ms. Pac-Man l'affiche tombe a zero alors qu'il reste une vie a jouer :
+        // couper la volerait au joueur le score de sa derniere vie. L'interne descend d'un pas de
+        // plus, donc c'est lui qu'on retient -- la meme regle que l'audit 1LC.
+        var fins = FinsDeRun.Calculer(
+        [
+            Perte("0x615", 1, 3672), Perte("0x614", 2, 3672),
+            Perte("0x615", 0, 4663), Perte("0x614", 1, 4663),
+            Perte("0x614", 0, 5961),
+        ]);
+
+        Assert.Equal([5961L], fins);
+    }
+
+    [Fact]
+    public void Un_continue_ouvre_un_second_run()
+    {
+        // 19xx : une vie, mort a la frame 900, continue, mort a nouveau a 2400. Deux fins, donc
+        // deux runs -- c'est ce qui manquait pour que 1CC veuille dire quelque chose.
+        var fins = FinsDeRun.Calculer(
+        [
+            Gain("0xFF82EC", 1, 100),
+            Perte("0xFF82EC", 0, 900),
+            Gain("0xFF82EC", 1, 1500),
+            Perte("0xFF82EC", 0, 2400),
+        ]);
+
+        Assert.Equal([900L, 2400L], fins);
+    }
+
+    [Fact]
+    public void Une_jauge_d_energie_ne_borne_aucun_run()
+    {
+        // Altered Beast : 29 declenchements en une partie, par pas de quatre. Prise pour un
+        // compteur de vies, elle aurait coupe le run a la premiere barre perdue.
+        var fins = FinsDeRun.Calculer(
+        [
+            Perte("0x4B", 44, 100), Perte("0x4B", 40, 120), Perte("0x4B", 36, 140),
+            Perte("0x4B", 4, 300), Perte("0x4B", 0, 320),
+        ]);
+
+        Assert.Empty(fins);
+    }
+
+    [Fact]
+    public void Un_drapeau_ne_borne_aucun_run()
+    {
+        // « Dead » garde sa valeur : 10, 10 sur Ms. Pac-Man ; 0, 0 sur Double Dragon.
+        Assert.Empty(FinsDeRun.Calculer([Perte("0x604", 10, 100), Perte("0x604", 10, 200)]));
+        Assert.Empty(FinsDeRun.Calculer([Perte("0x3C1", 0, 100), Perte("0x3C1", 0, 200)]));
+    }
+
+    [Fact]
+    public void Un_reglage_DIP_ne_borne_aucun_run()
+    {
+        // 1942 : une valeur isolee, aucune suite.
+        Assert.Empty(FinsDeRun.Calculer([Perte("0x181", 0, 500)]));
+    }
+
+    [Fact]
+    public void Les_vies_d_un_autre_joueur_ne_bornent_pas_ce_run()
+    {
+        var fins = FinsDeRun.Calculer(
+        [
+            Perte("0x3EA", 1, 100), Perte("0x3EA", 0, 900),
+            Perte("0x448", 1, 200, joueur: 2), Perte("0x448", 0, 400, joueur: 2),
+        ]);
+
+        Assert.Equal([900L], fins);
+    }
+
+    [Fact]
+    public void Un_1up_ne_termine_rien_et_ne_casse_pas_le_compte()
+    {
+        // La vie gagnee remonte le compteur sans qu'aucune mort n'ait eu lieu : elle n'ouvre pas
+        // de run, et la descente reprend ensuite normalement.
+        var fins = FinsDeRun.Calculer(
+        [
+            Perte("0x614", 2, 100),
+            Gain("0x614", 3, 500),
+            Perte("0x614", 2, 900), Perte("0x614", 1, 1200), Perte("0x614", 0, 1500),
+        ]);
+
+        Assert.Equal([1500L], fins);
+    }
+
+    [Fact]
+    public void Sans_compteur_credible_on_ne_coupe_rien()
+    {
+        // Mieux vaut ne pas decouper que decouper au hasard : un run tronque a tort vole un
+        // record, et c'est pire que de laisser passer un continue.
+        Assert.Empty(FinsDeRun.Calculer([]));
+        Assert.Empty(FinsDeRun.Calculer([Perte("0x1", null, 100), Perte("0x1", null, 200)]));
+    }
+
+    [Fact]
+    public void Une_partie_sans_mort_n_a_aucune_fin_de_run()
+    {
+        Assert.Empty(FinsDeRun.Calculer([Gain("0x614", 3, 100), Gain("0x614", 4, 800)]));
+    }
+    // ── Le decoupage lui-meme : c'est lui qui decide du score certifie ──
+
+    private static List<(long frame, long total)> Traj(params (long, long)[] pts) => [.. pts];
+
+    [Fact]
+    public void Le_score_certifie_s_arrete_a_la_derniere_vie_perdue()
+    {
+        // LE CAS SIGNALE. Le joueur monte a 5000, perd sa derniere vie, continue, et monte a
+        // 12000. Le score conserve par le continue faisait passer les deux pour un seul run :
+        // 12000 etait certifie 1CC. Le run s'arrete desormais a 5000.
+        var meilleur = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(
+            Traj((100, 1000), (200, 3000), (300, 5000), (400, 8000), (500, 12000)),
+            [300L]);
+
+        Assert.Equal(5000, meilleur[^1].total);
+    }
+
+    [Fact]
+    public void Sans_fin_de_run_le_decoupage_ne_change_pas()
+    {
+        // La regression a ne pas commettre : tous les jeux dont les vies ne sont pas lisibles
+        // doivent continuer a se comporter exactement comme avant.
+        var traj = Traj((100, 1000), (200, 3000), (300, 5000));
+        Assert.Equal(
+            RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(traj),
+            RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(traj, []));
+    }
+
+    [Fact]
+    public void Le_meilleur_des_deux_runs_est_retenu()
+    {
+        // Le premier run vaut mieux que le second : on garde le premier. « Le meilleur run,
+        // jamais le dernier » -- un mauvais essai qui suit ne doit pas voler le record.
+        var meilleur = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(
+            Traj((100, 9000), (200, 9000), (300, 2000), (400, 4000)),
+            [200L]);
+
+        Assert.Equal(9000, meilleur[^1].total);
+    }
+}
