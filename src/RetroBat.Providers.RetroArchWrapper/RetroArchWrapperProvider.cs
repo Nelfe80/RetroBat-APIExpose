@@ -427,16 +427,26 @@ public class RetroArchWrapperProvider : IProvider
                     // perdu quatre parties sous mame2003_plus le 24 septembre 2026 sans que rien
                     // ne le previenne. Le provider ne juge pas -- il publie, et c'est l'API qui
                     // tient la liste.
-                    _ = _eventBus.PublishAsync(new EventEnvelope
+                    //
+                    // SAUF QUAND LE PONT LUA MESURE A NOTRE PLACE, et c'est tout sauf un detail.
+                    // Sous le coeur libretro MAME courant, le wrapper atteste puis ne lit AUCUNE
+                    // RAM : le plugin Lua, charge par le coeur, prend la main sur les scores
+                    // (mesure du 2026-09-22). Son « system_ram=NULL » ne dit donc rien de la
+                    // capacite a mesurer ce jeu -- publier ce verdict ferait annoncer « aucun
+                    // score ne sera mesure » sur le SEUL coeur MAME qui fonctionne.
+                    if (!_arbitration.ShouldSuppressRetroArchWrapper(definition.SystemId, definition.Rom, definition.DefinitionFile))
                     {
-                        Type = "wrapper.diagnostic",
-                        Payload = new
+                        _ = _eventBus.PublishAsync(new EventEnvelope
                         {
-                            definition.SystemId,
-                            definition.Rom,
-                            Line = line.Trim(),
-                        },
-                    });
+                            Type = "wrapper.diagnostic",
+                            Payload = new
+                            {
+                                definition.SystemId,
+                                definition.Rom,
+                                Line = line.Trim(),
+                            },
+                        });
+                    }
                 }
                 return;
             }

@@ -38,6 +38,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly LiveContestOverlayService? _overlay;
     /// <summary>Ce que la borne sait des coeurs : lesquels exposent de quoi mesurer.</summary>
     private readonly CoreMemoryCapability? _coeurs;
+    /// <summary>Le prevol a-t-il promis une partie certifiable ? Confronte a la fin de partie.</summary>
+    private bool _prevolCertifiable;
+    /// <summary>Quand la promesse a ete faite : une partie de quinze secondes n'en est pas une.</summary>
+    private DateTime? _prevolAt;
+    /// <summary>Une session est-elle arrivee pour cette partie ?</summary>
+    private bool _sessionRecue;
     private readonly ILogger<NelfePlayScoringReporter>? _logger;
 
     private IDisposable? _subscription;
@@ -322,6 +328,38 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     // de réclamation restée à l'écran.
                     _claimOverlay?.HideNow();
                     ResetSession();
+                    _prevolCertifiable = false;
+                    _sessionRecue = false;
+                    break;
+                case "ui.game.ended":
+                    // RIEN N'EST REMONTE, ET LE JOUEUR DOIT L'APPRENDRE.
+                    //
+                    // Le prevol promet « Partie certifiable », puis la partie se termine et il ne
+                    // se passe rien : ni message, ni score. C'est ce qu'un joueur a vu quatre fois
+                    // de suite le 24 septembre 2026 avant de comprendre tout seul.
+                    //
+                    // Ce controle-ci ne depend d'AUCUN chemin de mesure. Le wrapper libretro et le
+                    // pont Lua de MAME echouent differemment -- le premier se tait faute de RAM
+                    // exposee, le second lit des adresses sans jamais former de score -- et une
+                    // detection propre a l'un ne voit pas l'autre. Ici on ne constate qu'une
+                    // chose, vraie dans les deux cas : on a promis, et rien n'est venu.
+                    if (_prevolCertifiable && !_sessionRecue
+                        && _prevolAt is { } promesse && DateTime.UtcNow - promesse >= TimeSpan.FromSeconds(90))
+                    {
+                        _overlay?.ShowTop(
+                            "SCORING",
+                            "Aucun score n'a été mesuré",
+                            "la partie annoncée certifiable n'a rien remonté",
+                            9000);
+                        Trace("fin de partie : prevol certifiable mais AUCUNE session recue");
+                        _logger?.LogWarning(
+                            "Scoring : partie annoncee certifiable terminee sans aucune session. "
+                            + "Le coeur employe n'expose probablement rien a lire.");
+                    }
+
+                    _prevolCertifiable = false;
+                    _prevolAt = null;
+                    _sessionRecue = false;
                     break;
                 case "scoring.listener.attestation":
                     CaptureAttestation(ToJson(envelope.Payload));
@@ -553,6 +591,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 titre = "Partie certifiable";
                 detail = force ? "réglages certifiés appliqués" : "pour le classement";
             }
+            // On retient la PROMESSE, et QUAND elle a ete faite : c'est elle qu'on confrontera a
+            // la fin de la partie, et sa date dit si le joueur a eu le temps de jouer.
+            _prevolCertifiable = certifiable && dangers.Count == 0;
+            _prevolAt = DateTime.UtcNow;
             Trace("prévol : " + (detail is { Length: > 0 } ? titre + " : " + detail : titre));
             // LE PREVOL S'AFFICHE PENDANT QUE LE JEU TOURNE : il ne passe donc PAS par la
             // notification d'EmulationStation, qui ramene ES au premier plan et sort le joueur
@@ -702,6 +744,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var romGroup = GetString(payload, "Rom") ?? "";
         var sessionJson = GetString(payload, "Session");
         Trace($"session reçue sys={systemId} rom={romGroup} sessionLen={sessionJson?.Length ?? -1}");
+        // Une session est arrivee. Elle ne vaut PAS quittance a elle seule : celles d'Altered
+        // Beast sous MAME arrivaient vides, sans le moindre score. C'est le chemin de soumission
+        // qui decidera, un peu plus bas, s'il y avait quelque chose a mesurer.
+        _sessionRecue = true;
         if (sessionJson is null) return;
         try
         {
@@ -775,6 +821,42 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (listenerSha is null || finalTotal is null)
         {
             Trace("STOP: pas de score/attestation");
+
+            // LE JOUEUR A ENTENDU « CERTIFIABLE », ET RIEN N'EST VENU.
+            //
+            // Le bon critere n'est pas « aucune session » -- ma premiere version testait cela et ne
+            // se declenchait jamais. Mesure du 24 septembre 2026, deux lancements d'Altered Beast :
+            // une session ARRIVE bien (sessionLen=255) mais elle est VIDE, finalTotal absent,
+            // trajPts=0. Ce qui manque n'est pas la session, c'est le SCORE.
+            //
+            // Ici on le sait de facon certaine et quel que soit le chemin de mesure : le wrapper
+            // libretro et le pont Lua de MAME echouent differemment, mais tous deux aboutissent a
+            // cette ligne.
+            //
+            // MAIS SEULEMENT SI LE JOUEUR A JOUE. Deux essais du 24 septembre 2026 ont dure 18 et
+            // 16 secondes : le jeu lance puis quitte aussitot. Il n'y avait aucun score a mesurer,
+            // et annoncer « aucun score n'a ete mesure » a qui vient de quitter apres un coup
+            // d'oeil, c'est crier au loup -- au bout de trois fois, plus personne ne lit les
+            // bandeaux, y compris celui qui compte.
+            //
+            // Le seuil porte sur la duree depuis la promesse du prevol. Une minute et demie : on
+            // ne fait pas de score en dessous, et un coeur muet, lui, se laisse decouvrir aussi
+            // bien a la deuxieme minute qu'a la premiere.
+            var joue = _prevolAt is { } debut && DateTime.UtcNow - debut >= TimeSpan.FromSeconds(90);
+            if (_prevolCertifiable && joue)
+            {
+                _overlay?.ShowTop(
+                    "SCORING",
+                    "Aucun score n'a été mesuré",
+                    "la partie annoncée certifiable n'a rien remonté",
+                    9000);
+                _logger?.LogWarning(
+                    "Scoring : partie annoncee certifiable terminee sans aucun score mesure "
+                    + "(listener={Listener}, total={Total}). Le coeur employe n'expose probablement rien a lire.",
+                    listenerSha is not null, finalTotal);
+                _prevolCertifiable = false;
+            }
+
             return;
         }
 

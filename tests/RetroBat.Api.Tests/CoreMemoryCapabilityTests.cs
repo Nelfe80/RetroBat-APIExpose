@@ -138,4 +138,21 @@ public class CoreMemoryCapabilityTests : IDisposable
 
         Assert.Null(Neuf().ConnuParNomAffiche("FinalBurn Neo"));
     }
+    [Fact]
+    public void Le_pont_Lua_rehabilite_un_coeur_que_le_wrapper_croyait_muet()
+    {
+        // Mesure du 24 septembre 2026, 23:18-23:19. Le wrapper enveloppe aussi le coeur libretro
+        // MAME et publie « system_ram=NULL » -- c'est vrai, il n'en lit rien. Mais c'est le plugin
+        // Lua, charge par ce coeur, qui mesure. Pris pour argent comptant, le verdict du wrapper a
+        // fait annoncer « rien ne sera mesure » sur le SEUL coeur MAME qui fonctionne.
+        //
+        // Une garde au moment du proces-verbal ne suffit pas : quatorze secondes separent les deux
+        // annonces. C'est la prise en main du pont, certaine, qui corrige le verdict.
+        var liste = Neuf();
+        liste.Observer("Core=mame_libretro arcade=YES system_ram=NULL system_ram_size=2048 memory_map_blocks=0");
+        Assert.False(liste.Connu("mame_libretro")!.Measures);
+
+        liste.Observer("Core=mame_libretro arcade=YES system_ram=OK system_ram_size=1 memory_map_blocks=0");
+        Assert.True(liste.Connu("mame_libretro")!.Measures);
+    }
 }

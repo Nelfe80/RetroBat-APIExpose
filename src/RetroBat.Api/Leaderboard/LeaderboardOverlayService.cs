@@ -725,7 +725,10 @@ public sealed class LeaderboardOverlayService : IDisposable
                 var marque = LogoDeLaMarque(hauteurTitre);
                 if (marque is not null)
                 {
-                    g.DrawImage(marque, (Width - marque.Width) / 2f, y + (hauteurTitre - marque.Height) / 2f,
+                    // Un peu plus haut que le centre de la bande : agrandi, le logo descendait
+                    // vers la premiere ligne du classement et la serrait.
+                    g.DrawImage(marque, (Width - marque.Width) / 2f,
+                        y + (hauteurTitre - marque.Height) / 2f - hauteurTitre * 0.22f,
                         marque.Width, marque.Height);
                 }
                 else

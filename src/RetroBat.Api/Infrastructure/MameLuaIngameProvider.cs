@@ -84,6 +84,14 @@ public sealed class MameLuaIngameProvider : IProvider
         }
     }
 
+    /// <summary>
+    /// Le nom de FICHIER du coeur, seule clé que la liste des coeurs connaisse : elle apprend par
+    /// les proces-verbaux du wrapper, qui nomment `mame_libretro`, quand le passeport annonce
+    /// « MAME 0.287 ». Le plugin Lua n'etant charge que par le coeur MAME courant, c'est lui.
+    /// </summary>
+    private static string FichierDuCoeur(string nomAffiche)
+        => nomAffiche.StartsWith("MAME", StringComparison.OrdinalIgnoreCase) ? "mame_libretro" : nomAffiche;
+
     /// <summary>Le coeur libretro qui heberge ce plugin, si c'est le cas : RetroArch tourne et
     /// son wrapper vient d'attester ; null quand c'est MAME standalone qui tourne.</summary>
     private (string Sha, string Name, string Version)? CoeurLibretroHote()
@@ -1256,6 +1264,28 @@ public sealed class MameLuaIngameProvider : IProvider
                 coreVersion = libretro.Version;
                 _logger.LogInformation("MAME Lua : plugin heberge par le coeur libretro {Nom} {Version} ({Sha}) ; c'est lui que le passeport nomme.",
                     coreName, coreVersion, coreSha.Length >= 12 ? coreSha[..12] : coreSha);
+
+                // CE COEUR MESURE, ET IL FAUT LE DIRE FORT.
+                //
+                // Le wrapper enveloppe aussi ce coeur et publie son propre proces-verbal :
+                // « system_ram=NULL », parce qu'il ne lit effectivement rien de MAME. Pris pour
+                // argent comptant, ce verdict fait annoncer « aucun score ne sera mesure » sur le
+                // SEUL coeur MAME qui fonctionne -- c'est arrive le 24 septembre 2026 a 23:19.
+                //
+                // Une garde au moment du proces-verbal ne suffit pas : le wrapper parle a 23:18:55
+                // et le pont Lua ne prend la main qu'a 23:19:09. Quatorze secondes pendant
+                // lesquelles l'arbitrage repond, a juste titre, « rien ne supprime le wrapper ».
+                // C'est donc ICI, quand la prise en main est CERTAINE, que le verdict se corrige.
+                await _eventBus.PublishAsync(new EventEnvelope
+                {
+                    Type = "wrapper.diagnostic",
+                    Payload = new
+                    {
+                        SystemId = "arcade",
+                        Rom = string.Empty,
+                        Line = $"Core={FichierDuCoeur(coreName)} arcade=YES system_ram=OK system_ram_size=1 memory_map_blocks=0",
+                    },
+                });
             }
             await _eventBus.PublishAsync(new EventEnvelope
             {

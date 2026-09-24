@@ -1276,10 +1276,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             Glyphe(SlotValider),
             ReplaysEnPreparation: _replaysEnPreparation,
             RangsPrecedents: _rangsPrecedents,
-            // Le pseudo vient de NOTRE ligne du classement : c'est la seule source locale, et
-            // elle est juste. Hors classement, on ne montre rien plutot que d'inventer -- « ma
-            // place » dit deja « non classe » juste au-dessus.
-            Pseudo: lignes.FirstOrDefault(l => l.CestMoi)?.Joueur ?? "");
+            // LE PSEUDO VIENT DU COMPTE APPAIRE, PAS DU CLASSEMENT.
+            //
+            // Premiere version : je le prenais sur NOTRE ligne du classement. Il ne s'affichait
+            // donc que si le joueur figurait deja dans le tableau -- c'est-a-dire jamais, au
+            // moment ou on en a le plus besoin. Le contexte porte le pseudo du compte depuis
+            // l'appairage, quel que soit le classement.
+            Pseudo: _context.PlayerPseudo ?? "");
     }
 
     /// <summary>
