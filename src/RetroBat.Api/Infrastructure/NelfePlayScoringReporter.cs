@@ -63,6 +63,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     // soumet QUE le meilleur run (segment monotone). Un super score n'est plus perdu si on
     // rejoue, et le wrapper n'est PAS touché ni sollicité par event (0 surcoût en jeu).
     private readonly List<(long frame, long total)> _trajectory = new();
+
+    // LA FENÊTRE DE JEU (2026-09-25). Une lecture de score ne compte que si elle tombe entre un
+    // START et le GAME OVER qui suit, dès lors qu'un START a été vu dans la session. Tout le reste
+    // est de l'attract : la démo avant la partie, et la démo qui REPREND après le game over dans la
+    // même session, laquelle aurait pu battre le joueur et partir à son nom. Les lignes de démo des
+    // .MEM ne suffisent pas : celle de Metal Slug 3 ne s'allume jamais pendant la démo, et un
+    // réglage mal étiqueté DEMO_MODE s'allumait, lui, à des moments arbitraires (mesuré en direct).
+    // Sans aucun START vu (clavier, machine sans panneau), rien ne change : comportement d'avant.
+    private readonly List<bool> _horsJeu = new();   // parallèle à _trajectory
+    private bool _startVu;
+    private bool _enJeu;
     /// <summary>
     /// Les pertes et gains de vie de la partie, avec leur valeur : c'est eux qui disent OU le run
     /// s'est termine. Voir FinsDeRun -- le decoupage ne connaissait que les chutes de score, et un
@@ -426,6 +437,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _finalTotal = null;
             _inDemo = false;
             _trajectory.Clear();
+            _horsJeu.Clear();
+            _startVu = false;
+            _enJeu = false;
             _vies.Clear();
         }
     }
@@ -671,7 +685,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     {
         if (!root.TryGetProperty("signal", out var signal) && !root.TryGetProperty("Signal", out signal)) return;
         var nom = (GetString(signal, "Name") ?? "").Trim().ToUpperInvariant();
-        if (nom is "DEMO_MODE" or "GAME_PLAYING") AppliquerEtat(nom);
+        if (nom is "DEMO_MODE" or "GAME_PLAYING" or "GAME_OVER") AppliquerEtat(nom);
     }
 
     private void AppliquerEtat(string action)
@@ -679,8 +693,36 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (action.Length == 0) return;
         lock (_sync)
         {
-            _inDemo = EtatDemoApres(_inDemo, action);
+            (_inDemo, _enJeu) = EtatsApres(_inDemo, _enJeu, action);
         }
+    }
+
+    /// <summary>
+    /// L'effet d'un état du cycle de vie sur (démo, en jeu).
+    ///
+    /// Pendant une partie ouverte par START, un DEMO_MODE est un FAUX signal : sur Metal Slug 3, un
+    /// réglage mal étiqueté (« Soft Dip - toggle demo sound ») s'allumait en plein jeu, et la
+    /// partie du joueur passait pour de la démo (1 900 joués, 0 retenu, 2026-09-25). Un GAME_OVER
+    /// ferme la partie : ce qui suit est de l'attract jusqu'au prochain START.
+    /// </summary>
+    internal static (bool Demo, bool EnJeu) EtatsApres(bool demo, bool enJeu, string action)
+    {
+        if (!(enJeu && action.Contains("DEMO", StringComparison.Ordinal))) demo = EtatDemoApres(demo, action);
+        if (action.Contains("GAME_OVER", StringComparison.Ordinal)) enJeu = false;
+        return (demo, enJeu);
+    }
+
+    /// <summary>Les lectures prises EN JEU, c'est-à-dire entre un START et le GAME OVER qui suit.</summary>
+    internal static List<(long frame, long total)> FiltrerEnJeu(
+        IReadOnlyList<(long frame, long total)> trajectoire, IReadOnlyList<bool> horsJeu)
+    {
+        var gardes = new List<(long frame, long total)>(trajectoire.Count);
+        for (var i = 0; i < trajectoire.Count; i++)
+        {
+            if (i < horsJeu.Count && horsJeu[i]) continue;
+            gardes.Add(trajectoire[i]);
+        }
+        return gardes;
     }
 
     /// <summary>
@@ -708,7 +750,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private void SortirDeDemo()
     {
-        lock (_sync) { _inDemo = false; }
+        // Un START ouvre la partie : fin de la démo, et début de la fenêtre de jeu.
+        lock (_sync) { _inDemo = false; _startVu = true; _enJeu = true; }
     }
 
     private void CaptureStart(JsonElement root)
@@ -930,7 +973,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             if (_trajectory.Count == 0 || _trajectory[^1].total != total)
             {
                 _trajectory.Add((_lastFrame, total));
-                if (_trajectory.Count > MaxTrajectory) _trajectory.RemoveAt(0);
+                _horsJeu.Add(!_enJeu);
+                if (_trajectory.Count > MaxTrajectory) { _trajectory.RemoveAt(0); _horsJeu.RemoveAt(0); }
             }
         }
     }
@@ -985,6 +1029,20 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             coreName = _coreName; coreVersion = _coreVersion;
             trajectory = new List<(long, long)>(_trajectory);
             vies = new List<EvenementDeVie>(_vies);
+
+            // La fenêtre de jeu : un START a été vu, donc on sait ce qui est joué. Ce qui ne l'est
+            // pas (démo avant la partie, attract après le game over) sort de la trajectoire.
+            if (_startVu)
+            {
+                var gardes = FiltrerEnJeu(_trajectory, _horsJeu);
+                if (gardes.Count != trajectory.Count)
+                {
+                    Trace($"fenetre de jeu : {trajectory.Count - gardes.Count} lecture(s) hors jeu ecartee(s) (demo, attract)");
+                }
+                trajectory = gardes;
+                // Rien de joué : pas de filet sur le dernier total, qui serait celui de l'attract.
+                if (trajectory.Count == 0) finalTotal = null;
+            }
         }
 
         // ARCADE : l'identite du contenu n'est pas mesurable depuis le fichier.
