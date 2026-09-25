@@ -97,11 +97,13 @@ public class RetroArchWrapperDeploymentService
         foreach (var coreFile in coreFiles)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var status = BuildCoreStatus(coreFile, realCoresPath, wrapperReference, cache);
+            var status = BuildCoreStatus(
+                coreFile, realCoresPath, wrapperReference, cache, deploymentOptions.ExcludedCores);
             result.Cores.Add(status);
         }
 
         result.CheckedCores = result.Cores.Count;
+        result.ExcludedCores = result.Cores.Count(core => core.Excluded);
         result.WrappedCores = result.Cores.Count(core => core.IsWrapper);
         result.RealCores = result.Cores.Count(core => !core.IsWrapper);
         result.MissingRealCores = result.Cores.Count(core => core.IsWrapper && !core.HasRealCore);
@@ -110,6 +112,15 @@ public class RetroArchWrapperDeploymentService
 
         if (action.Equals("deploy", StringComparison.OrdinalIgnoreCase))
         {
+            // Les exclusions d'abord : un coeur mis hors du wrapper doit retrouver le vrai
+            // binaire avant qu'on ne touche aux autres, pour qu'un arret en cours de route ne
+            // laisse pas en place un shim qu'on vient de decider de retirer.
+            foreach (var core in result.Cores.Where(core => core.NeedsRestore))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                RestoreCore(backupRoot, dryRun, core, result);
+            }
+
             foreach (var core in result.Cores.Where(core => core.NeedsDeployment))
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -259,8 +270,51 @@ public class RetroArchWrapperDeploymentService
         public byte[] Md5 { get; }
     }
 
+    /// <summary>
+    /// Ce cœur est-il mis hors du wrapper par la configuration ? On compare sur le nom, avec ou
+    /// sans le « .dll » : c'est « mame_libretro » qu'on écrit dans les appsettings, pas un chemin.
+    /// </summary>
+    internal static bool EstExclu(string coreFileName, IEnumerable<string> exclus)
+    {
+        var nu = Path.GetFileNameWithoutExtension(coreFileName);
+        foreach (var brut in exclus)
+        {
+            if (string.IsNullOrWhiteSpace(brut))
+            {
+                continue;
+            }
+
+            var nom = Path.GetFileNameWithoutExtension(brut.Trim());
+            if (string.Equals(nom, nu, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Ce qu'il faut faire de ce cœur, en une règle lisible.
+    ///
+    /// Un cœur EXCLU ne reçoit rien et n'est jamais rafraîchi. S'il porte déjà le shim et que le
+    /// vrai binaire est dans <c>cores_real</c>, il est REMIS EN PLACE : exclure sans défaire ne
+    /// changerait rien sur une borne déjà déployée, ce qui est le cas de toutes.
+    /// </summary>
+    internal static (bool Restore, bool Deploy, bool Refresh) Arbitrer(
+        bool exclu, bool isWrapper, bool hasRealCore, bool estLaReference)
+    {
+        if (exclu)
+        {
+            return (isWrapper && hasRealCore, false, false);
+        }
+
+        return (false, !isWrapper, isWrapper && hasRealCore && !estLaReference);
+    }
+
     private static RetroArchWrapperCoreStatus BuildCoreStatus(
-        FileInfo coreFile, string realCoresPath, WrapperReference wrapperReference, AuditCache cache)
+        FileInfo coreFile, string realCoresPath, WrapperReference wrapperReference, AuditCache cache,
+        IEnumerable<string>? exclus = null)
     {
         bool isWrapper;
         byte[]? md5;
@@ -294,13 +348,20 @@ public class RetroArchWrapperDeploymentService
         var estLaReference = md5 is not null
             && coreFile.Length == wrapperReference.File.Length
             && md5.AsSpan().SequenceEqual(wrapperReference.Md5);
-        var needsRefresh = isWrapper && hasRealCore && !estLaReference;
+        var exclu = exclus is not null && EstExclu(coreFile.Name, exclus);
+        var (needsRestore, needsDeployment, needsRefresh) = Arbitrer(exclu, isWrapper, hasRealCore, estLaReference);
 
-        var reason = isWrapper
-            ? needsRefresh
-                ? "Wrapper deployed but outdated; it will be refreshed with the reference build."
-                : hasRealCore ? "Wrapper deployed and real core available." : "Wrapper deployed but real core is missing."
-            : hasRealCore ? "Real core detected in cores; cores_real will be backed up and refreshed." : "Real core detected in cores; it will be moved to cores_real.";
+        var reason = exclu
+            ? needsRestore
+                ? "Core excluded from wrapping; the real core will be put back in cores."
+                : isWrapper
+                    ? "Core excluded from wrapping but the real core is missing from cores_real: nothing to put back."
+                    : "Core excluded from wrapping; already the real core."
+            : isWrapper
+                ? needsRefresh
+                    ? "Wrapper deployed but outdated; it will be refreshed with the reference build."
+                    : hasRealCore ? "Wrapper deployed and real core available." : "Wrapper deployed but real core is missing."
+                : hasRealCore ? "Real core detected in cores; cores_real will be backed up and refreshed." : "Real core detected in cores; it will be moved to cores_real.";
 
         return new RetroArchWrapperCoreStatus
         {
@@ -309,7 +370,9 @@ public class RetroArchWrapperDeploymentService
             RealCorePath = realCorePath,
             IsWrapper = isWrapper,
             HasRealCore = hasRealCore,
-            NeedsDeployment = !isWrapper,
+            Excluded = exclu,
+            NeedsRestore = needsRestore,
+            NeedsDeployment = needsDeployment,
             NeedsRefresh = needsRefresh,
             CoreBytes = coreFile.Length,
             RealCoreBytes = hasRealCore ? realCore.Length : null,
@@ -317,6 +380,51 @@ public class RetroArchWrapperDeploymentService
             RealLastWriteTime = hasRealCore ? realCore.LastWriteTime : null,
             Reason = reason
         };
+    }
+
+    /// <summary>
+    /// Remet le vrai cœur à sa place dans <c>cores/</c>, pour un cœur que la configuration met
+    /// hors du wrapper. Le shim est sauvegardé d'abord, comme une dépose l'est : on ne détruit
+    /// jamais ce qu'on remplace sans en garder une copie datée.
+    ///
+    /// La copie de <c>cores_real/</c> est LAISSÉE en place. Elle ne gêne rien, et si le cœur sort
+    /// un jour de la liste d'exclusion, le déploiement la retrouve.
+    /// </summary>
+    private static void RestoreCore(
+        string backupRoot,
+        bool dryRun,
+        RetroArchWrapperCoreStatus core,
+        RetroArchWrapperDeploymentResult result)
+    {
+        var backupPath = Path.Combine(backupRoot, DateTime.Now.ToString("yyyyMMdd-HHmmss"), core.CoreName);
+        result.Actions.Add(new RetroArchWrapperDeploymentAction
+        {
+            CoreName = core.CoreName,
+            Operation = "backup-wrapper-before-restore",
+            SourcePath = core.CorePath,
+            DestinationPath = backupPath,
+            Applied = !dryRun
+        });
+
+        result.Actions.Add(new RetroArchWrapperDeploymentAction
+        {
+            CoreName = core.CoreName,
+            Operation = "restore-real-core-to-cores",
+            SourcePath = core.RealCorePath,
+            DestinationPath = core.CorePath,
+            BackupPath = backupPath,
+            Applied = !dryRun
+        });
+
+        if (dryRun)
+        {
+            return;
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(backupPath)!);
+        File.Copy(core.CorePath, backupPath, overwrite: true);
+        File.Copy(core.RealCorePath, core.CorePath, overwrite: true);
+        result.RestoredCores++;
     }
 
     private static void RefreshCore(

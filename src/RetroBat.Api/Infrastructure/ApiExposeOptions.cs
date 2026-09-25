@@ -837,6 +837,19 @@ public class ApiExposeOptions
         public string CachePath { get; set; } = ".log/wrapper-deployment-cache.json";
         public bool WrapAllCores { get; set; } = true;
         public List<string> TargetCores { get; set; } = new();
+
+        /// <summary>
+        /// Les cœurs qu'on NE shime PAS, avec ou sans le « .dll ».
+        ///
+        /// Envelopper un cœur n'est gratuit que si le wrapper y mesure quelque chose. Sous le
+        /// cœur libretro MAME, ce n'est pas lui qui mesure mais le plugin Lua, et il le dit
+        /// lui-même : « aucune RAM lisible ! system_ram=NULL ». Le garder dans la chaîne ajoute
+        /// donc un habitant de plus au processus de RetroArch pour zéro lecture.
+        ///
+        /// Un cœur nommé ici est aussi REMIS EN PLACE s'il porte déjà le shim : exclure sans
+        /// défaire ne servirait à rien sur une borne déjà déployée.
+        /// </summary>
+        public List<string> ExcludedCores { get; set; } = new();
         public bool SkipIfRetroArchRunning { get; set; } = true;
         public bool DryRunOnStartup { get; set; } = false;
         /// <summary>Quand RetroArch tourne au demarrage, on reessaie a cet intervalle.</summary>

@@ -25,6 +25,10 @@ public class RetroArchWrapperDeploymentResult
     public int DeployedCores { get; set; }
     public int StaleWrappers { get; set; }
     public int RefreshedCores { get; set; }
+    /// <summary>Combien de cœurs la configuration met hors du wrapper.</summary>
+    public int ExcludedCores { get; set; }
+    /// <summary>Combien portaient encore le shim et viennent d'être remis en place.</summary>
+    public int RestoredCores { get; set; }
     public List<RetroArchWrapperCoreStatus> Cores { get; set; } = new();
     public List<RetroArchWrapperDeploymentAction> Actions { get; set; } = new();
     public List<string> Warnings { get; set; } = new();
@@ -39,6 +43,10 @@ public class RetroArchWrapperCoreStatus
     public bool HasRealCore { get; set; }
     public bool NeedsDeployment { get; set; }
     public bool NeedsRefresh { get; set; }
+    /// <summary>La configuration met ce cœur hors du wrapper.</summary>
+    public bool Excluded { get; set; }
+    /// <summary>Exclu ET portant encore le shim : le vrai cœur doit reprendre sa place.</summary>
+    public bool NeedsRestore { get; set; }
     public long CoreBytes { get; set; }
     public long? RealCoreBytes { get; set; }
     public DateTime LastWriteTime { get; set; }
