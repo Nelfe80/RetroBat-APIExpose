@@ -62,4 +62,17 @@ public class ApiMediaUrlNeedTests
 
         Assert.Equal("./images/19xx-box.png", MediaNeedEvaluator.ReadSlotValue(details, MediaKinds.BoxFront));
     }
+    [Fact]
+    public void La_roue_wheel_hd_se_reconnait_dans_l_emplacement_visible()
+    {
+        // Logo regle sur « wheel-hd », style acier : la roue choisie est dans <marquee>.
+        var details = new GameDetails
+        {
+            Marquee = "/api/v1/media/systems/arcade/games/19xx/ui/wheels/wheel-steel.png"
+        };
+        details.Extras["wheel"] = "/api/v1/media/systems/arcade/games/19xx/ui/wheels/wheel.png";
+
+        Assert.Equal(details.Marquee, MediaNeedEvaluator.ReadSlotValue(details, MediaKinds.WheelSteel));
+        Assert.Equal("", MediaNeedEvaluator.ReadSlotValue(details, MediaKinds.WheelCarbon));
+    }
 }

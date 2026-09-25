@@ -283,8 +283,12 @@ public class MediaNeedEvaluator
             MediaKinds.Wheel => details?.Extras.GetValueOrDefault("wheel")
                 ?? details?.Extras.GetValueOrDefault("logo")
                 ?? string.Empty,
-            MediaKinds.WheelCarbon => details?.Extras.GetValueOrDefault("wheel-carbon") ?? string.Empty,
-            MediaKinds.WheelSteel => details?.Extras.GetValueOrDefault("wheel-steel") ?? string.Empty,
+            MediaKinds.WheelCarbon => details?.Extras.GetValueOrDefault("wheel-carbon")
+                ?? VisibleWheelOfStyle(details, "wheel-carbon")
+                ?? string.Empty,
+            MediaKinds.WheelSteel => details?.Extras.GetValueOrDefault("wheel-steel")
+                ?? VisibleWheelOfStyle(details, "wheel-steel")
+                ?? string.Empty,
             // ES uses <marquee> as the visible logo slot, so it may point to wheel/logo.
             // Do not reuse it as proof of a real ScreenScraper marquee asset.
             MediaKinds.Marquee => string.Empty,
@@ -320,6 +324,24 @@ public class MediaNeedEvaluator
             MediaKinds.ThemeHb => details?.Extras.GetValueOrDefault("themehb") ?? string.Empty,
             _ => string.Empty
         };
+    }
+
+    /// <summary>
+    /// Logo regle sur « wheel-hd » : la gamelist n'a pas de balise par style, la roue choisie
+    /// est dans &lt;marquee&gt; (l'emplacement visible) ou &lt;wheel&gt;. On la reconnait a son nom.
+    /// </summary>
+    private static string? VisibleWheelOfStyle(GameDetails? details, string style)
+    {
+        foreach (var value in new[] { details?.Marquee, details?.Extras.GetValueOrDefault("wheel") })
+        {
+            if (!string.IsNullOrWhiteSpace(value) &&
+                Path.GetFileNameWithoutExtension(value.Trim()).EndsWith(style, StringComparison.OrdinalIgnoreCase))
+            {
+                return value;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
