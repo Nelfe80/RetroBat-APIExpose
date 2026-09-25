@@ -96,6 +96,81 @@ public sealed class ReplayRecorderService : BackgroundService
 
     private bool StartRequis => _config.GetValue("Replay:Record:RequireStart", true);
 
+    /// <summary>
+    /// Les cœurs sous lesquels on N'ENREGISTRE PAS, séparés par des virgules. Vide = aucun.
+    ///
+    /// RetroArch 1.22.2 (la dernière stable, celle que livre RetroBat) plante dès l'ouverture d'un
+    /// enregistrement sous le cœur libretro MAME : son encodeur de points de contrôle écrit le
+    /// dernier bloc de l'état sur 16 Ko entiers, lus au-delà de la fin du tampon. Sur un gros état
+    /// (Altered Beast), la lecture tombe dans une page non mappée : 0xC0000005 dans memcpy, au
+    /// START, à chaque partie. Prouvé par sept vidages le 25 septembre 2026, et corrigé en amont par
+    /// le commit 8a8cc448b du 24 juin 2026 (« Fix replay seek while recording v2 »), absent de la
+    /// 1.22.2. Une nocturne l'a tenu : deux replays de 5,7 et 9,4 Mo, aucun plantage.
+    ///
+    /// On ne trie pas par version : les nocturnes s'annoncent elles aussi « 1.22.2 ». Le jour où
+    /// RetroBat livre un RetroArch corrigé, `Replay:Record:SansEnregistrement` vide lève la porte.
+    /// </summary>
+    private string CoeursSansEnregistrement => _config["Replay:Record:SansEnregistrement"] ?? "mame_libretro";
+    private string _porteAnnoncee = "";
+
+    /// <summary>
+    /// Le cœur d'après le dossier de sauvegarde que RetroBat pose au lancement :
+    /// <c>…\saves\mame\libretro.mame</c> donne « mame ». null si le chemin ne suit pas la forme.
+    /// </summary>
+    internal static string? CoeurDuDossier(string? dossier)
+    {
+        if (string.IsNullOrWhiteSpace(dossier)) return null;
+        foreach (var segment in dossier.Trim().TrimEnd('\\', '/').Split('\\', '/').Reverse())
+        {
+            if (segment.StartsWith("libretro.", StringComparison.OrdinalIgnoreCase) && segment.Length > "libretro.".Length)
+                return segment["libretro.".Length..].ToLowerInvariant();
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Ce cœur est-il dans la liste ? On compare le nom NU : « mame_libretro », « mame » et
+    /// « libretro.mame » désignent le même, et « mame2003_plus » reste un autre cœur.
+    /// </summary>
+    internal static bool EstSansEnregistrement(string? coeur, string? liste)
+    {
+        if (string.IsNullOrWhiteSpace(coeur) || string.IsNullOrWhiteSpace(liste)) return false;
+        static string Nu(string n)
+        {
+            var t = n.Trim().ToLowerInvariant();
+            if (t.StartsWith("libretro.", StringComparison.Ordinal)) t = t["libretro.".Length..];
+            if (t.EndsWith("_libretro.dll", StringComparison.Ordinal)) t = t[..^"_libretro.dll".Length];
+            if (t.EndsWith("_libretro", StringComparison.Ordinal)) t = t[..^"_libretro".Length];
+            return t;
+        }
+        var cible = Nu(coeur);
+        return liste.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Any(e => Nu(e) == cible);
+    }
+
+    /// <summary>
+    /// Vrai si l'on doit renoncer à enregistrer CE jeu sous CE cœur. Interroge RetroArch une fois,
+    /// juste avant d'enregistrer ; sans réponse on ne bloque rien, la porte ne vise qu'un plantage
+    /// identifié.
+    /// </summary>
+    private async Task<bool> CoeurSansEnregistrementAsync(RaStatus status, CancellationToken ct)
+    {
+        var liste = CoeursSansEnregistrement;
+        if (string.IsNullOrWhiteSpace(liste)) return false;
+        var coeur = CoeurDuDossier(await _ra.GetSavestateDirectoryAsync(ct).ConfigureAwait(false));
+        if (!EstSansEnregistrement(coeur, liste)) return false;
+
+        var cle = coeur + "|" + status.Game;
+        if (!string.Equals(_porteAnnoncee, cle, StringComparison.Ordinal))
+        {
+            _porteAnnoncee = cle;
+            _logger.LogInformation(
+                "Replay : pas d'enregistrement de {Game} sous le coeur {Coeur}. RetroArch 1.22.2 plante en encodant l'etat de ce coeur (corrige en amont, commit 8a8cc448b). Reglage Replay:Record:SansEnregistrement.",
+                status.Game, coeur);
+        }
+        return true;
+    }
+
     private void OnBusEvent(EventEnvelope e)
     {
         if (!string.Equals(e.Type, "panel.input.pressed", StringComparison.Ordinal)) return;
@@ -160,6 +235,17 @@ public sealed class ReplayRecorderService : BackgroundService
                 && StartRecent(status))
             {
                 _attenteAnnoncee = "";
+                // Le cœur est vérifié AU DERNIER MOMENT, pas à chaque sondage : une requête de plus
+                // par partie, et la porte suit le cœur même si le joueur en change entre deux jeux.
+                if (await CoeurSansEnregistrementAsync(status, ct).ConfigureAwait(false))
+                {
+                    // Le START est consommé : sans cela on reposerait la question à chaque sondage
+                    // de la fenêtre de vingt secondes. Et l'attente est marquée comme annoncée, sinon
+                    // le journal dirait « en attente d'un START » juste après qu'on en a vu un.
+                    _dernierStartUtc = DateTime.MinValue;
+                    _attenteAnnoncee = status.System + "/" + status.Game;
+                    return;
+                }
                 await StartAsync(status, ct).ConfigureAwait(false);
             }
             return;

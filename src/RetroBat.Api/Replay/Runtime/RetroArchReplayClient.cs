@@ -86,6 +86,21 @@ public sealed class RetroArchReplayClient
 
     public Task<string?> GetVersionAsync(CancellationToken ct) => QueryAsync("VERSION", ct);
 
+    /// <summary>
+    /// Le dossier de sauvegarde en vigueur. RetroBat y pose le CŒUR EXACT à chaque lancement
+    /// (<c>saves\mame\libretro.mame</c>, <c>saves\mame\libretro.mame2003_plus</c>), là où
+    /// GET_STATUS ne rend que le systemid du .info, commun à tous les cœurs MAME (« mame »).
+    /// null si RetroArch ne répond pas.
+    /// </summary>
+    public async Task<string?> GetSavestateDirectoryAsync(CancellationToken ct)
+    {
+        var r = await QueryAsync("GET_CONFIG_PARAM savestate_directory", ct).ConfigureAwait(false);
+        if (r is null) return null;
+        const string prefix = "GET_CONFIG_PARAM savestate_directory ";
+        var s = r.Trim();
+        return s.StartsWith(prefix, StringComparison.Ordinal) ? s[prefix.Length..].Trim() : null;
+    }
+
     private async Task FireAsync(string cmd, CancellationToken ct)
     {
         try
