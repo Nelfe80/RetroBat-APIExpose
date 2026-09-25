@@ -1146,10 +1146,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var finsDeRun = FinsDeRun.Calculer(vies);
         if (finsDeRun.Count > 0)
         {
-            Trace($"fins de run (vies a zero) : {string.Join(", ", finsDeRun)}");
+            Trace($"fins de run (vies a zero) : {string.Join(", ", finsDeRun)} - relevees, NON appliquees");
         }
 
-        var bestRun = SelectBestRun(trajectory, finsDeRun);
+        // LA COUPURE 1CC EST RELEVEE, PAS APPLIQUEE (2026-09-25). Tant que les lectures restaient a
+        // la trame 0 elle ne coupait jamais rien ; des qu'elles ont eu leur vraie trame, elle a
+        // tronque une partie de 19xx sans continue a 14 700 au lieu de 26 500. Le compteur que le
+        // .MEM de 19xx appelle « lives » est l'ENERGIE de l'avion : il tombe a zero a chaque vie
+        // perdue, pas a la fin du credit. Elle reviendra quand chaque profil designera son vrai
+        // compteur de vies ; d'ici la, aucune partie n'est tronquee a tort.
+        var bestRun = SelectBestRun(trajectory, []);
         long runPeak = bestRun.Count > 0 ? bestRun[^1].total : (finalTotal ?? 0);
         Trace($"segmentation : meilleur run {bestRun.Count}/{trajectory.Count} pts, pic={runPeak} (total global {finalTotal})");
 
