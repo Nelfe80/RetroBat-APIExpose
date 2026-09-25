@@ -37,7 +37,7 @@ public sealed class ReplayObjectController : ControllerBase
     /// <summary>Sert l'objet adressé par ce SHA-256, s'il est enregistré, public et partageable.</summary>
     [HttpGet("{sha256}")]
     [HttpHead("{sha256}")]
-    public IActionResult Get(string sha256)
+    public async Task<IActionResult> Get(string sha256, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(sha256) || !Sha256Hex.IsMatch(sha256))
             return BadRequest(new { ok = false, error = new { code = "OBJECT_ID_INVALID" } });
@@ -52,7 +52,10 @@ public sealed class ReplayObjectController : ControllerBase
 
         // ETag = le hash : un pair qui l'a déjà n'a aucune raison de le retélécharger, et
         // l'identité du contenu est vérifiable avant même d'avoir lu le corps.
-        return PhysicalFile(_objects.ObjectPath(sha), "application/octet-stream",
+        // Compresse au repos : un pair recoit le BRUT, que toutes les versions savent lire.
+        var brut = await _objects.EnsureRawAsync(sha, ct).ConfigureAwait(false);
+        if (brut is null) return NotFound(new { ok = false, error = new { code = "OBJECT_UNAVAILABLE" } });
+        return PhysicalFile(brut, "application/octet-stream",
             lastModified: null, entityTag: new EntityTagHeaderValue('"' + sha + '"'), enableRangeProcessing: true);
     }
 }

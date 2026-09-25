@@ -158,8 +158,10 @@ public sealed class ReplayRelayService : BackgroundService
                     premiereLaissee ??= demande?["id"]?.GetValue<long>() ?? etat.Since + 1;
                     continue;
                 }
-                chemin = _store.ObjectPath(sha);
-                if (!File.Exists(chemin)) continue;
+                // Compresse au repos : le brut est materialise, c'est lui qui part au relais.
+                var brut = await _store.EnsureRawAsync(sha, ct).ConfigureAwait(false);
+                if (brut is null) continue;
+                chemin = brut;
                 if (!_policy.Evaluate(sha).Allowed)
                 {
                     _logger.LogInformation("Relais : dépôt refusé pour {Sha}, l'objet n'est plus partageable.", Court(sha));
@@ -224,7 +226,7 @@ public sealed class ReplayRelayService : BackgroundService
             var avatar = EstAvatar(demande);
             if (ct.IsCancellationRequested || (avatarsSeulement && !avatar)) { restantes.Add(demande); continue; }
 
-            var dejaLa = avatar ? _avatars.Has(demande.Sha256) : File.Exists(_store.ObjectPath(demande.Sha256));
+            var dejaLa = avatar ? _avatars.Has(demande.Sha256) : _store.HasObject(demande.Sha256);
             if (dejaLa) continue;   // arrivé par ailleurs
             if (DateTime.UtcNow - demande.AskedUtc > PatienceDemande)
             {
@@ -287,7 +289,7 @@ public sealed class ReplayRelayService : BackgroundService
             {
                 _logger.LogWarning("Relais : octets reçus pour {Attendu} mais mesurés {Obtenu}. Écartés.",
                     Court(sha), Court(obj.Sha256));
-                try { File.Delete(_store.ObjectPath(obj.Sha256)); } catch { }
+                _store.DeleteObject(obj.Sha256);
                 return false;
             }
 

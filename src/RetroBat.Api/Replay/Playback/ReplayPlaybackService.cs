@@ -199,7 +199,7 @@ public sealed class ReplayPlaybackService
         //
         // Le client suit la progression par /replay/state (octets recus, temps restant), exactement
         // comme il le fait déjà pour « launching ».
-        if (!File.Exists(objectPath))
+        if (!_objects.HasObject(manifest.Object.Sha256))
         {
             lock (_gate) { _state = ReplayPlaybackState.Replicating; _objetAttendu = manifest.Object.Sha256; }
             _logger.LogInformation("Replay : objet absent pour {ReplayId}, récupération en tâche de fond.", replayId);

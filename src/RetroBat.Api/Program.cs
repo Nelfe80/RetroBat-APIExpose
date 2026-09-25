@@ -555,6 +555,8 @@ builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplaySharePolicy>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayManifestFetcher>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Playback.ReplayPlaybackService>();
 builder.Services.AddHostedService<RetroBat.Api.Replay.Recording.ReplayRecorderService>();
+// Le magasin de replays se recompresse au repos, RetroArch ferme : 1 a 2 % de la taille brute.
+builder.Services.AddHostedService<RetroBat.Api.Replay.Storage.ReplayCompactionService>();
 builder.Services.AddHostedService<RetroBat.Api.Replay.Input.ReplayInputRouterService>();
 // ReplayReactionService = singleton PARTAGÉ (hosted service + injecté dans le HUD pour GetCharge).
 builder.Services.AddSingleton<RetroBat.Api.Replay.Input.ReplayReactionService>();

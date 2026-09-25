@@ -102,7 +102,7 @@ public sealed class ScoreShotRegenerator
             if (replayId.Length == 0 || !manifests.TryGetValue(replayId, out var manifest)) continue;
             // Les octets sont-ils là ? On regarde le fichier, sans le rehacher : la vérification
             // d'intégrité est le travail du lecteur, qui la fait déjà avant de lancer.
-            if (!File.Exists(_store.ObjectPath(manifest.Object.Sha256))) continue;
+            if (!_store.HasObject(manifest.Object.Sha256)) continue;
 
             // Fin de la course, en retrait de la marge : l'instant du record.
             var fin = manifest.Frames.RunEnd ?? manifest.Frames.ReplayEnd;

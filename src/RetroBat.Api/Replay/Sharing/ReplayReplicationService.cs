@@ -157,7 +157,7 @@ public sealed class ReplayReplicationService : BackgroundService
                 examines++;
 
                 // Déjà là : rien à faire, et surtout rien à retélécharger.
-                if (File.Exists(_objects.ObjectPath(entry.ObjectSha256))) continue;
+                if (_objects.HasObject(entry.ObjectSha256)) continue;
 
                 if (heldCount + 1 > MaxObjects)
                 {
@@ -206,8 +206,7 @@ public sealed class ReplayReplicationService : BackgroundService
         long bytes = 0;
         foreach (var m in _manifests.ListManifests())
         {
-            var path = _objects.ObjectPath(m.Object.Sha256);
-            if (!File.Exists(path)) continue;
+            if (!_objects.HasObject(m.Object.Sha256)) continue;
             count++;
             bytes += m.Object.Size;
         }

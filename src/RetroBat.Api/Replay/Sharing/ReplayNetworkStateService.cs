@@ -120,7 +120,7 @@ public sealed class ReplayNetworkStateService
     {
         if (_fetching.ContainsKey(objectSha256)) return ReplayNetworkState.Replicating;
 
-        if (!File.Exists(_objects.ObjectPath(objectSha256))) return ReplayNetworkState.Unavailable;
+        if (!_objects.HasObject(objectSha256)) return ReplayNetworkState.Unavailable;
 
         var meta = _meta.GetMeta(replayId);
         if (meta?.Pinned == true) return ReplayNetworkState.Pinned;

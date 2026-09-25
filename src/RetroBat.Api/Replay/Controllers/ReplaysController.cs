@@ -61,7 +61,7 @@ public sealed class ReplaysController : ControllerBase
                     object_sha256 = e.ObjectSha256,
                     visibility = meta?.Visibility ?? "private",
                     // « manifeste connu » et « objet réellement là » sont DEUX choses (CDC §86).
-                    local_available = System.IO.File.Exists(_store.ObjectPath(e.ObjectSha256)),
+                    local_available = _store.HasObject(e.ObjectSha256),
                     network_state = ReplayNetworkStateService.Wire(_network.Evaluate(e.ReplayId, e.ObjectSha256)),
                     pinned = meta?.Pinned ?? false,
                     score_ref = meta?.ScoreRef,
@@ -83,7 +83,7 @@ public sealed class ReplaysController : ControllerBase
         {
             manifest = m,
             metadata = _store.GetMeta(id),
-            local_available = System.IO.File.Exists(_store.ObjectPath(m.Object.Sha256)),
+            local_available = _store.HasObject(m.Object.Sha256),
             network_state = ReplayNetworkStateService.Wire(_network.Evaluate(id, m.Object.Sha256)),
         });
     }

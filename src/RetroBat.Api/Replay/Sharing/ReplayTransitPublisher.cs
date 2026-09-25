@@ -83,8 +83,9 @@ public sealed class ReplayTransitPublisher
         var manifest = _manifests.GetManifest(replayId);
         if (manifest is null) return new PublishResult(false, "REPLAY_NOT_FOUND");
 
-        var objectPath = _objects.ObjectPath(manifest.Object.Sha256);
-        if (!File.Exists(objectPath)) return new PublishResult(false, "REPLAY_OBJECT_UNAVAILABLE");
+        // Compresse au repos : on materialise le brut, c'est lui qu'on compresse pour l'envoi.
+        var objectPath = await _objects.EnsureRawAsync(manifest.Object.Sha256, ct).ConfigureAwait(false);
+        if (objectPath is null) return new PublishResult(false, "REPLAY_OBJECT_UNAVAILABLE");
 
         var credential = _devices.GetCredential();
         if (string.IsNullOrWhiteSpace(credential)) return new PublishResult(false, "DEVICE_NOT_PAIRED");

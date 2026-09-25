@@ -92,7 +92,7 @@ public sealed class ReplayHoldingsReporter : BackgroundService
         {
             foreach (var manifest in _manifests.ListManifests())
             {
-                if (!File.Exists(_objects.ObjectPath(manifest.Object.Sha256))) continue;
+                if (!_objects.HasObject(manifest.Object.Sha256)) continue;
                 var visibilite = _meta.GetMeta(manifest.ReplayId)?.Visibility ?? "private";
                 objets.Add(new
                 {

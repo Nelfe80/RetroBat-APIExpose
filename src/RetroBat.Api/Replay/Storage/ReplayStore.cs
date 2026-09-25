@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using RetroBat.Api.Replay.Models;
@@ -39,9 +39,15 @@ public sealed class ReplayStore : IReplayManifestStore, IReplayObjectStore, IRep
     public string SocialRoot => _social;
 
     public ReplayStore(ILogger<ReplayStore> logger)
+        : this(logger, Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfenet", "replay"))
+    {
+    }
+
+    /// <summary>Racine explicite : pour les tests, qui ne doivent jamais toucher au vrai magasin.</summary>
+    internal ReplayStore(ILogger<ReplayStore> logger, string root)
     {
         _logger = logger;
-        _root = Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfenet", "replay");
+        _root = root;
         _manifests = Path.Combine(_root, "manifests");
         _meta = Path.Combine(_root, "meta");
         _objects = Path.Combine(_root, "objects", "sha256");
@@ -99,6 +105,124 @@ public sealed class ReplayStore : IReplayManifestStore, IReplayObjectStore, IRep
 
     public string ObjectPath(string sha256) => Path.Combine(_objects, sha256[..2], sha256 + ".replay");
 
+    // ── compression AU REPOS (2026-09-25) ───────────────────────────────────
+    //
+    // Les joueurs se plaignaient de la place des replays : le magasin grossit a chaque START et
+    // rien ne l'elaguait. Un replay de RetroArch 1.22.2 tient en 1 a 2 % de sa taille une fois
+    // compresse (mesure sur tout le magasin de la borne de dev : 27 replays, 89 Mo). L'objet dort
+    // donc en <sha>.replay.gz ; le brut n'est MATERIALISE que pour etre lu, puis recompresse par le
+    // compacteur quand RetroArch ne tourne plus. ObjectPath reste le chemin du brut.
+
+    public string ObjectPathGz(string sha256) => ObjectPath(sha256) + ReplayCompression.Suffixe;
+
+    public bool HasObject(string sha256) => File.Exists(ObjectPath(sha256)) || File.Exists(ObjectPathGz(sha256));
+
+    private readonly SemaphoreSlim _materialisation = new(1, 1);
+
+    /// <summary>Plafond d'un brut materialise : aucun replay n'en approche, une archive qui le
+    /// depasse n'est pas un replay.</summary>
+    private const long PlafondBrut = 2L * 1024 * 1024 * 1024;
+
+    public async Task<string?> EnsureRawAsync(string sha256, CancellationToken ct)
+    {
+        var brut = ObjectPath(sha256);
+        if (File.Exists(brut)) return brut;
+        var gz = ObjectPathGz(sha256);
+        if (!File.Exists(gz)) return null;
+
+        await _materialisation.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            if (File.Exists(brut)) return brut;   // un autre appel vient de le faire
+            Directory.CreateDirectory(_temp);
+            var tmp = Path.Combine(_temp, $"materialise-{sha256}.part");
+            var ecrits = await ReplayCompression.DecompresserPlafonneAsync(gz, tmp, PlafondBrut, ct).ConfigureAwait(false);
+            var (sha, _) = ecrits is null ? ("", 0L) : await HashFileAsync(tmp, ct).ConfigureAwait(false);
+            if (!string.Equals(sha, sha256, StringComparison.OrdinalIgnoreCase))
+            {
+                DeleteQuiet(tmp);
+                _logger.LogWarning("Replay : la forme compressee de {Sha} ne redonne pas son empreinte, objet ignore.", sha256[..8]);
+                return null;
+            }
+            File.Move(tmp, brut, overwrite: true);
+            return brut;
+        }
+        finally
+        {
+            _materialisation.Release();
+        }
+    }
+
+    public void DeleteObject(string sha256)
+    {
+        DeleteQuiet(ObjectPath(sha256));
+        DeleteQuiet(ObjectPathGz(sha256));
+    }
+
+    /// <summary>
+    /// Recompresse les objets bruts du magasin, au plus <paramref name="max"/> par passage. Un brut
+    /// n'est SUPPRIME qu'apres avoir verifie que sa forme compressee redonne exactement son
+    /// empreinte ; un brut deja accompagne de sa forme compressee (materialise pour une lecture)
+    /// est simplement retire. Un fichier en cours d'utilisation ne se supprime pas sous Windows :
+    /// il reste, et le passage suivant le reprendra. A n'appeler que RetroArch ferme.
+    /// </summary>
+    public async Task<(int Compresses, int Retires, long Avant, long Apres)> CompacterAsync(int max, CancellationToken ct)
+    {
+        int compresses = 0, retires = 0;
+        long avant = 0, apres = 0;
+        if (!Directory.Exists(_objects)) return (0, 0, 0, 0);
+
+        foreach (var brut in Directory.EnumerateFiles(_objects, "*.replay", SearchOption.AllDirectories))
+        {
+            if (compresses >= max) break;
+            ct.ThrowIfCancellationRequested();
+            var sha = Path.GetFileNameWithoutExtension(brut);
+            if (sha.Length != 64) continue;
+            var gz = brut + ReplayCompression.Suffixe;
+            try
+            {
+                if (File.Exists(gz))
+                {
+                    File.Delete(brut);   // brut materialise pour une lecture : la forme compressee suffit
+                    retires++;
+                    continue;
+                }
+
+                var taille = new FileInfo(brut).Length;
+                var tmp = gz + ".part";
+                await ReplayCompression.CompresserAsync(brut, tmp, ct).ConfigureAwait(false);
+
+                // L'aller-retour AVANT de supprimer quoi que ce soit : la forme compressee doit
+                // redonner l'empreinte qui nomme le fichier.
+                var verif = Path.Combine(_temp, $"compact-{sha}.part");
+                Directory.CreateDirectory(_temp);
+                var ecrits = await ReplayCompression.DecompresserPlafonneAsync(tmp, verif, taille, ct).ConfigureAwait(false);
+                var (relu, _) = ecrits == taille ? await HashFileAsync(verif, ct).ConfigureAwait(false) : ("", 0L);
+                DeleteQuiet(verif);
+                if (!string.Equals(relu, sha, StringComparison.OrdinalIgnoreCase))
+                {
+                    DeleteQuiet(tmp);
+                    _logger.LogWarning("Replay : {Sha} ne se relit pas a l'identique une fois compresse, il reste brut.", sha[..8]);
+                    continue;
+                }
+
+                File.Move(tmp, gz, overwrite: true);
+                File.Delete(brut);
+                compresses++;
+                avant += taille;
+                apres += new FileInfo(gz).Length;
+            }
+            catch (IOException)
+            {
+                // En cours de lecture (un pair le telecharge) : on reessaiera au prochain passage.
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+        }
+        return (compresses, retires, avant, apres);
+    }
+
     public static async Task<(string sha, long size)> HashFileAsync(string path, CancellationToken ct)
     {
         using var sha = SHA256.Create();
@@ -114,7 +238,9 @@ public sealed class ReplayStore : IReplayManifestStore, IReplayObjectStore, IRep
     {
         try
         {
-            var path = ObjectPath(obj.Sha256);
+            // Compresse au repos : on materialise le brut, c'est lui qui va etre lu.
+            var path = await EnsureRawAsync(obj.Sha256, ct).ConfigureAwait(false);
+            if (path is null) return false;
             var fi = new FileInfo(path);
             if (!fi.Exists || fi.Length != obj.Size) return false;
             var (sha, _) = await HashFileAsync(path, ct).ConfigureAwait(false);

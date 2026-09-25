@@ -53,7 +53,7 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
     public async Task<bool> EnsureObjectAvailableAsync(ReplayManifest manifest, CancellationToken ct)
     {
         var sha = manifest.Object.Sha256;
-        if (File.Exists(_objects.ObjectPath(sha))) return true;
+        if (_objects.HasObject(sha)) return true;
 
         var peers = await _peers.PeersAsync(ct).ConfigureAwait(false);
         if (peers.Count == 0)
@@ -330,7 +330,7 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
 
             await _objects.ImportObjectAsync(temp, transferCts.Token).ConfigureAwait(false);
             _logger.LogInformation("Replay : objet {Sha} récupéré auprès de {Peer} ({Size} octets) et vérifié.", Short(sha), peer.Name, written);
-            return File.Exists(_objects.ObjectPath(sha));
+            return _objects.HasObject(sha);
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {

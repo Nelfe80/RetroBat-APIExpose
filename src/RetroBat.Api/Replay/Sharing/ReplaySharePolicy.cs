@@ -60,7 +60,7 @@ public sealed class ReplaySharePolicy
         if (!string.Equals(visibility, "public", StringComparison.OrdinalIgnoreCase))
             return new ShareDecision(false, entry.ReplayId, "visibility_" + visibility.ToLowerInvariant());
 
-        if (!File.Exists(_objects.ObjectPath(sha256)))
+        if (!_objects.HasObject(sha256))
             return new ShareDecision(false, entry.ReplayId, "object_missing");
 
         _logger.LogDebug("Replay share : objet {Sha} servable ({ReplayId}).", Short(sha256), entry.ReplayId);

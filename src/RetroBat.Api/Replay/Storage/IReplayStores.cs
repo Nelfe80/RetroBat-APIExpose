@@ -38,6 +38,22 @@ public interface IReplayObjectStore
 
     /// <summary>R6 : l'objet présent correspond-il VRAIMENT au manifeste (taille + SHA-256) ?</summary>
     Task<bool> VerifyObjectAsync(ReplayObjectRef obj, CancellationToken ct);
+
+    /// <summary>
+    /// L'objet est-il détenu, brut OU compressé au repos ? C'est la question à poser pour savoir
+    /// si un replay est disponible : <see cref="ObjectPath"/> n'existe plus forcément sur le disque.
+    /// </summary>
+    bool HasObject(string sha256);
+
+    /// <summary>
+    /// Le chemin du BRUT, matérialisé depuis la forme compressée si besoin, vérifié contre son
+    /// empreinte. À appeler avant toute LECTURE du contenu (RetroArch, pair, relais, capture).
+    /// null si l'objet n'est pas détenu ou si sa forme compressée ne redonne pas l'empreinte.
+    /// </summary>
+    Task<string?> EnsureRawAsync(string sha256, CancellationToken ct);
+
+    /// <summary>Supprime l'objet sous ses deux formes.</summary>
+    void DeleteObject(string sha256);
 }
 
 /// <summary>Métadonnées LOCALES et mutables (jamais dans le manifeste) : hint de lancement,
