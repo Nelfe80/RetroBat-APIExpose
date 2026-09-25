@@ -203,12 +203,24 @@ public class FinsDeRunTests
     {
         // LE CAS SIGNALE. Le joueur monte a 5000, perd sa derniere vie, continue, et monte a
         // 12000. Le score conserve par le continue faisait passer les deux pour un seul run :
-        // 12000 etait certifie 1CC. Le run s'arrete desormais a 5000.
+        // 12000 etait certifie 1CC. Le run s'arrete desormais a 5000, au continue (trame 350).
         var meilleur = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(
             Traj((100, 1000), (200, 3000), (300, 5000), (400, 8000), (500, 12000)),
-            [300L]);
+            [350L]);
 
         Assert.Equal(5000, meilleur[^1].total);
+    }
+
+    [Fact]
+    public void La_lecture_faite_a_la_trame_du_continue_appartient_au_nouveau_credit()
+    {
+        // 19xx, 2026-09-25 22:51 : 36 500, puis 36 801 lu a la trame MEME du continue (Capcom ajoute
+        // son +1 de continue a cet instant). 36 801 avait ete certifie ; le 1CC est 36 500.
+        var meilleur = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(
+            Traj((4000, 30000), (4901, 36500), (5308, 36801), (5600, 42501)),
+            [5308L]);
+
+        Assert.Equal(36500, meilleur[^1].total);
     }
 
     [Fact]

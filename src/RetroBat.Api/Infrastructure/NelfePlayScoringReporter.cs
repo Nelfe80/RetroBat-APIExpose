@@ -878,11 +878,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var reporte = false;
         foreach (var pt in traj)
         {
-            // Une derniere vie est tombee apres la lecture precedente (ou pile dessus) et avant
-            // celle-ci : la lecture precedente est le score AVEC lequel le joueur a perdu, et
-            // celle-ci ouvre un autre run.
+            // Un continue est tombe apres la lecture precedente et au plus tard sur celle-ci : la
+            // lecture precedente est le dernier score du premier credit, et celle-ci ouvre un autre
+            // run. Une lecture PILE sur la trame du continue appartient au nouveau credit : Capcom
+            // y ajoute son +1 de continue (19xx, 2026-09-25 : 36 500 puis 36 801 a la trame meme
+            // du continue, et 36 801 avait ete certifie).
             var coupe = fins is not null && framePrecedente is long fp && cur.Count > 0
-                && fins.Any(f => f >= fp && f < pt.frame);
+                && fins.Any(f => f > fp && f <= pt.frame);
             framePrecedente = pt.frame;
 
             if (coupe)

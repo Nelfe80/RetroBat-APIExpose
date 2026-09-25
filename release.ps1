@@ -103,9 +103,11 @@ Remove-Item $full, $update -Force -Confirm:$false -ErrorAction SilentlyContinue
 Write-Host 'Construction full.7z (avec resources + tools, plusieurs minutes)...'
 & $sz a -t7z $full "$name\" @ex -mx=5 -bsp1 -bso0
 Write-Host 'Construction update.7z...'
-# L'outil de diagnostic (autonome, ~63 Mo) part avec full.7z et l'installeur, pas avec la mise a
-# jour : l'update.7z reste le programme seul, quelques Mo.
-& $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" "-x!$name\RetroBat.Api.Diagnostic.exe" -mx=5 -bsp0 -bso0
+# L'outil de diagnostic (autonome, ~63 Mo) part AUSSI avec la mise a jour (decision user
+# 2026-09-25) : ses onglets Parties et Scoring et son envoi au support servent a tous les joueurs,
+# et un joueur a jour par le self-updater ne l'aurait jamais recu. Les ressources (.MEM, gamelists,
+# plugin Lua) n'y sont pas : elles arrivent par le Data Pack.
+& $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" -mx=5 -bsp0 -bso0
 
 # Controle anti-fuite : l'archive ne doit contenir ni .env, ni media, ni sources.
 $listing = & $sz l $full
