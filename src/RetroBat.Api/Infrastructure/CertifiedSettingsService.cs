@@ -137,32 +137,48 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
     /// score. Ecrit dans es_settings.cfg les cles par jeu que le lanceur lit au lancement ;
     /// rien ne change pour les autres jeux ni pour les reglages globaux du joueur.
     /// </summary>
-    private void NeutraliserFrontend(string systemId, string romFile)
+    private void NeutraliserFrontend(string systemId, string romFile) => NeutraliserPlusieurs([(systemId, romFile)]);
+
+    /// <summary>
+    /// Les memes cles pour plusieurs jeux, en une seule ecriture d'es_settings.cfg.
+    /// </summary>
+    private void NeutraliserPlusieurs(IReadOnlyList<(string Systeme, string Fichier)> jeux)
     {
+        if (jeux.Count == 0) return;
         try
         {
-            var change = _esSettings.Update(document =>
+            var modifies = new List<string>();
+            _esSettings.Update(document =>
             {
                 var root = document.Root ?? throw new InvalidOperationException("es_settings.cfg sans racine.");
                 var modifie = false;
-                foreach (var (cle, valeur, _) in FonctionsFrontend)
+                foreach (var (systemId, romFile) in jeux)
                 {
-                    var nom = ClePartie(systemId, romFile, cle);
-                    var existant = root.Elements().FirstOrDefault(e => string.Equals(e.Attribute("name")?.Value, nom, StringComparison.OrdinalIgnoreCase));
-                    if (existant is not null)
+                    var celuiCi = false;
+                    foreach (var (cle, valeur, _) in FonctionsFrontend)
                     {
-                        if (string.Equals(existant.Attribute("value")?.Value, valeur, StringComparison.Ordinal)) continue;
-                        existant.SetAttributeValue("value", valeur);
-                        modifie = true;
-                        continue;
+                        var nom = ClePartie(systemId, romFile, cle);
+                        var existant = root.Elements().FirstOrDefault(e => string.Equals(e.Attribute("name")?.Value, nom, StringComparison.OrdinalIgnoreCase));
+                        if (existant is not null)
+                        {
+                            if (string.Equals(existant.Attribute("value")?.Value, valeur, StringComparison.Ordinal)) continue;
+                            existant.SetAttributeValue("value", valeur);
+                            celuiCi = true;
+                            continue;
+                        }
+                        root.Add(new XText(Environment.NewLine + "  "));
+                        root.Add(new XElement("string", new XAttribute("name", nom), new XAttribute("value", valeur)));
+                        celuiCi = true;
                     }
-                    root.Add(new XText(Environment.NewLine + "  "));
-                    root.Add(new XElement("string", new XAttribute("name", nom), new XAttribute("value", valeur)));
-                    modifie = true;
+                    if (celuiCi) modifies.Add(romFile + " (" + systemId + ")");
+                    modifie |= celuiCi;
                 }
                 return modifie;
             });
-            if (change) _logger?.LogInformation("Reglages certifies : rewind, run-ahead et sauvegarde auto neutralises pour {Rom} ({Systeme}).", romFile, systemId);
+            if (modifies.Count > 0)
+            {
+                _logger?.LogInformation("Reglages certifies : rewind, run-ahead et sauvegarde auto neutralises pour {Jeux}.", string.Join(", ", modifies));
+            }
         }
         catch (Exception ex)
         {
@@ -170,11 +186,62 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         }
     }
 
+    /// <summary>
+    /// LES JEUX DE LA COLLECTION WORLD SCORING, NEUTRALISES DES LE DEMARRAGE (2026-09-25).
+    ///
+    /// Les cles par jeu n'etaient posees qu'a la SELECTION dans le menu. FreshOne a lance Sonic
+    /// 18 secondes apres le demarrage de son API, sans l'avoir selectionne depuis : le rembobinage
+    /// etait actif, l'avant-partie l'a dit, et 56 minutes de jeu ont ete refusees. EmulationStation
+    /// peut aussi effacer des cles ajoutees pendant qu'il tourne, en resauvegardant ses reglages.
+    ///
+    /// Au demarrage de l'API, avant qu'EmulationStation ne s'ouvre (son hook de demarrage attend
+    /// l'API), chaque jeu de la collection recoit ses cles : ES les lit en demarrant et les garde.
+    /// Refait apres chaque partie, pour les jeux entres dans la collection entre-temps. La liste
+    /// vient du fichier de collection deja sur le disque : aucun appel reseau.
+    /// </summary>
+    private void NeutraliserLaCollection()
+    {
+        if (!_options.CurrentValue.NelfePlay.ForceCertifiedSettings) return;
+        var collection = Path.Combine(RetroBatPaths.EmulationStationConfigRoot, "collections",
+            "custom-" + NelfePlayScoringCollectionSyncService.CollectionName + ".cfg");
+        NeutraliserPlusieurs(JeuxDeLaCollection(collection, RetroBatPaths.RomsRoot,
+            Path.GetDirectoryName(RetroBatPaths.EmulationStationConfigRoot) ?? RetroBatPaths.EmulationStationConfigRoot));
+    }
+
+    /// <summary>
+    /// Les jeux d'un fichier de collection d'EmulationStation : (systeme, fichier), le systeme etant
+    /// le dossier de la ROM sous roms/. Un « ~ » designe le home d'EmulationStation.
+    /// </summary>
+    internal static IReadOnlyList<(string Systeme, string Fichier)> JeuxDeLaCollection(string cheminCollection, string racineRoms, string homeEs)
+    {
+        var jeux = new List<(string, string)>();
+        if (!File.Exists(cheminCollection)) return jeux;
+        foreach (var brute in File.ReadLines(cheminCollection))
+        {
+            var ligne = brute.Trim();
+            if (ligne.Length == 0) continue;
+            try
+            {
+                var chemin = ligne.StartsWith('~') ? Path.GetFullPath(homeEs + ligne[1..]) : Path.GetFullPath(ligne);
+                var morceaux = Path.GetRelativePath(racineRoms, chemin).Replace('\\', '/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+                if (morceaux.Length < 2 || morceaux[0] == ".." || Path.IsPathRooted(morceaux[0])) continue;
+                jeux.Add((morceaux[0], Path.GetFileName(chemin)));
+            }
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+            {
+                // Une ligne illisible ne prive pas les autres jeux de leurs cles.
+            }
+        }
+        return jeux;
+    }
+
     /// <summary>Le fichier lu par le listener au chargement.</summary>
     public static string FilePath => Path.Combine(RetroBatPaths.RetroBatRoot, "plugins", "APIExpose", "wrapper", "certified.txt");
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
+        // Avant l'ouverture d'EmulationStation, qui attend l'API : voir NeutraliserLaCollection.
+        NeutraliserLaCollection();
         _abonnement = _bus.Subscribe<EventEnvelope>(e =>
         {
             var type = e.Type?.ToLowerInvariant();
@@ -187,6 +254,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             else if (type == "ui.game.ended" || type == "ui.game.ended.raw")
             {
                 Effacer();
+                NeutraliserLaCollection();
             }
         });
         return Task.CompletedTask;

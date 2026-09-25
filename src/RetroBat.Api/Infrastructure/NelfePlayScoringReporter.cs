@@ -391,6 +391,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 case "ingame.memory.changed":
                 {
                     var charge = ToJson(envelope.Payload);
+                    CaptureTrameMemoire(charge);
                     CaptureVie(charge);
                     // Les ETATS du pont Lua de MAME arrivent ici, et seulement ici : le wrapper les
                     // projette en plus sur retroarch.state, le pont Lua non. Sans cette ligne, un
@@ -660,6 +661,41 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             Trace("preflight impossible : " + ex.Message);
         }
+    }
+
+    /// <summary>
+    /// LA TRAME DES LECTURES DE SCORE SUIT AUSSI LES EVENEMENTS MEMOIRE (2026-09-25).
+    ///
+    /// Elle ne venait que de retroarch.score, que le wrapper n'emet que pour les lignes de score de
+    /// l'ancien format : avec les .MEM actuels, le score arrive par retroarch.memory.changed. Toutes les
+    /// lectures restaient a la trame 0, et la coupure 1CC a la derniere vie perdue ne tombait jamais
+    /// entre deux lectures : une partie de 19xx continuee a ete certifiee AVEC les points gagnes apres
+    /// le continue. Le wrapper porte la trame dans chaque signal memoire ; le pont Lua de MAME, non,
+    /// et rien ne change pour lui.
+    /// </summary>
+    private void CaptureTrameMemoire(JsonElement root)
+    {
+        if (TrameDuSignal(root) is not { } trame) return;
+        lock (_sync) { if (!_inDemo) _lastFrame = trame; }
+    }
+
+    /// <summary>La trame d'un evenement memoire, ou null quand le pont n'en transmet pas.</summary>
+    internal static long? TrameDuSignal(JsonElement root)
+    {
+        if (root.ValueKind != JsonValueKind.Object) return null;
+        if (!root.TryGetProperty("signal", out var signal) && !root.TryGetProperty("Signal", out signal)) return null;
+        if (signal.ValueKind != JsonValueKind.Object) return null;
+        foreach (var p in signal.EnumerateObject())
+        {
+            if (!string.Equals(p.Name, "Frame", StringComparison.OrdinalIgnoreCase)) continue;
+            return p.Value.ValueKind switch
+            {
+                JsonValueKind.Number when p.Value.TryGetInt64(out var n) && n > 0 => n,
+                JsonValueKind.String when long.TryParse(p.Value.GetString(), out var n) && n > 0 => n,
+                _ => null,
+            };
+        }
+        return null;
     }
 
     private void CaptureFrame(JsonElement root)
