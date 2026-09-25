@@ -1,4 +1,4 @@
-using RetroBat.Api.Infrastructure;
+﻿using RetroBat.Api.Infrastructure;
 using Xunit;
 
 namespace RetroBat.Api.Tests;
@@ -18,9 +18,10 @@ public class FinsDeRunTests
         => new(a, false, v, frame, joueur);
 
     [Fact]
-    public void Le_run_se_termine_a_la_derniere_vie_perdue()
+    public void Sans_continue_rien_ne_se_coupe()
     {
-        // Ms. Pac-Man, compteur interne : 3 vies, trois morts, la dernière à la frame 5961.
+        // Ms. Pac-Man, compteur interne : 3 vies, trois morts, la dernière à la frame 5961, et
+        // aucun nouveau crédit. La partie entière est le run.
         var fins = FinsDeRun.Calculer(
         [
             Perte("0x614", 2, 3672),
@@ -28,7 +29,63 @@ public class FinsDeRunTests
             Perte("0x614", 0, 5961),
         ]);
 
-        Assert.Equal([5961L], fins);
+        Assert.Empty(fins);
+    }
+
+    [Fact]
+    public void Dix_neuf_xx_mesure_la_coupe_tombe_au_continue_derniere_vie_comprise()
+    {
+        // 19xx, sonde du 2026-09-25 21:17 : le compteur compte les vies EN RÉSERVE. 2 → 1 (1re mort),
+        // 1 → 0 (2e mort : la DERNIÈRE vie commence), puis 2 au continue. Couper à zéro certifiait
+        // 5 300 ; le 1CC juste est 8 700, la fin de la dernière vie.
+        var fins = FinsDeRun.Calculer(
+        [
+            Perte("0xFF82EC", 1, 2100),
+            Perte("0xFF82EC", 0, 2348),
+            Perte("0xFF82EC", 2, 3400),
+        ]);
+        Assert.Equal([3400L], fins);
+
+        var traj = new List<(long frame, long total)>
+        {
+            (1500, 100), (2000, 4900), (2300, 5300), (2360, 5400), (2365, 8100), (2500, 8700),
+            (3402, 10901), (3600, 13301),
+        };
+        Assert.Equal(8700, NelfePlayScoringReporter.SelectBestRun(traj, fins)[^1].total);
+    }
+
+    [Fact]
+    public void Dix_neuf_xx_sans_continue_la_partie_entiere_compte()
+    {
+        // La partie de 26 500 : deux morts lues, la troisième ne fait plus bouger la réserve, et
+        // aucun crédit ensuite. Rien ne se coupe.
+        Assert.Empty(FinsDeRun.Calculer([Perte("0xFF82EC", 1, 2845), Perte("0xFF82EC", 0, 3400)]));
+    }
+
+    [Fact]
+    public void Altered_Beast_mesure_le_drapeau_de_boss_n_est_pas_un_compteur_de_vies()
+    {
+        // Sonde du 2026-09-25 21:14 : le bloc des vies d'Altered Beast range aussi « FLAG BOSS DEATH »
+        // (0x315D), qui descend 14 fois d'un cran mais remonte sans cesse. Les vraies vies (0xFFE018)
+        // font 2, 1, 0 puis, au continue, remontent a 2. C'est leur continue qui doit couper.
+        var boss = new[] { 1, 2, 1, 2, 3, 4, 5, 4, 3, 2, 1, 3, 2, 3, 1, 2, 3, 2, 1, 0, 2, 4, 6 };
+        var evenements = new List<EvenementDeVie>();
+        for (var i = 0; i < boss.Length; i++) evenements.Add(Perte("0x315D", boss[i], 100 + i * 10));
+        evenements.Add(Perte("0xFFE018", 1, 400));
+        evenements.Add(Perte("0xFFE018", 0, 500));
+        evenements.Add(Gain("0xFFE018", 2, 900));
+
+        Assert.Equal([900L], FinsDeRun.Calculer(evenements.OrderBy(e => e.Frame).ToList()));
+    }
+
+    [Fact]
+    public void Un_1up_sur_la_derniere_vie_n_est_pas_un_continue()
+    {
+        // Parti de 2 : un extend sur la dernière vie ne remonte qu'à 1, sous le niveau du départ.
+        Assert.Empty(FinsDeRun.Calculer(
+        [
+            Perte("0xFF82EC", 1, 100), Perte("0xFF82EC", 0, 200), Gain("0xFF82EC", 1, 300),
+        ]));
     }
 
     [Fact]
@@ -44,7 +101,8 @@ public class FinsDeRunTests
             Perte("0x614", 0, 5961),
         ]);
 
-        Assert.Equal([5961L], fins);
+        // Aucun continue : aucune coupe, et surtout pas sur le compteur affiché.
+        Assert.Empty(fins);
     }
 
     [Fact]
@@ -60,7 +118,8 @@ public class FinsDeRunTests
             Perte("0xFF82EC", 0, 2400),
         ]);
 
-        Assert.Equal([900L, 2400L], fins);
+        // La coupe tombe au continue (1500) ; la seconde mort n'est suivie d'aucun crédit.
+        Assert.Equal([1500L], fins);
     }
 
     [Fact]
@@ -97,11 +156,11 @@ public class FinsDeRunTests
     {
         var fins = FinsDeRun.Calculer(
         [
-            Perte("0x3EA", 1, 100), Perte("0x3EA", 0, 900),
-            Perte("0x448", 1, 200, joueur: 2), Perte("0x448", 0, 400, joueur: 2),
+            Perte("0x3EA", 1, 100), Perte("0x3EA", 0, 900), Gain("0x3EA", 2, 1000),
+            Perte("0x448", 1, 200, joueur: 2), Perte("0x448", 0, 400, joueur: 2), Gain("0x448", 2, 450, joueur: 2),
         ]);
 
-        Assert.Equal([900L], fins);
+        Assert.Equal([1000L], fins);
     }
 
     [Fact]
@@ -114,9 +173,11 @@ public class FinsDeRunTests
             Perte("0x614", 2, 100),
             Gain("0x614", 3, 500),
             Perte("0x614", 2, 900), Perte("0x614", 1, 1200), Perte("0x614", 0, 1500),
+            Gain("0x614", 3, 2000),
         ]);
 
-        Assert.Equal([1500L], fins);
+        // Le 1-up d'avant zéro ne coupe rien ; le continue d'après zéro coupe, à son moment.
+        Assert.Equal([2000L], fins);
     }
 
     [Fact]

@@ -17,9 +17,15 @@ public readonly record struct EvenementDeVie(string Address, bool Perte, int? Va
 /// aussi, une borne en free play n'en consomme aucun, et un 1-up remonte les vies comme le ferait
 /// un continue. Aucune de ces distinctions n'est fiable.
 ///
-/// On borne le run par sa vraie fin : <b>les vies du joueur mesuré atteignent zéro</b>. Ce qui
-/// vient après appartient à un autre run, quelle qu'en soit la raison. C'est littéralement ce que
-/// 1CC désigne — le score au moment où la dernière vie a été perdue.
+/// ON COUPE AU CONTINUE, PAS À ZÉRO (2026-09-25, mesuré sur 19xx). Zéro ne dit pas la même chose
+/// d'un jeu à l'autre : dernière mort sur le compteur interne de Ms. Pac-Man, mais « plus de vie en
+/// RÉSERVE, la dernière se joue » sur 19xx. Couper à zéro y retirait la dernière vie : 5 300
+/// certifiés pour un 1CC de 8 700, et 14 700 pour une partie sans aucun continue.
+///
+/// Ce qui marque le continue, dans les deux cas, c'est que les vies REMONTENT après zéro, au moins
+/// au niveau du départ (sur 19xx : 2 → 1 → 0, puis 2 au continue). Un 1-up sur la dernière vie ne
+/// remonte que d'un cran : il ne coupe pas. On coupe donc à la remontée, et la dernière vie jouée
+/// avec le premier crédit compte. Sans continue, rien ne se coupe : la partie entière est le run.
 ///
 /// QUEL COMPTEUR. Le même que celui de l'audit 1LC, et pour la même raison : un bloc `lives` en
 /// déclare plusieurs, et ils ne disent pas tous la même chose. Sur Ms. Pac-Man le compteur
@@ -55,14 +61,20 @@ public static class FinsDeRun
             (parAdresse.TryGetValue(e.Address, out var l) ? l : parAdresse[e.Address] = []).Add(e);
         }
 
+        // LE COMPTEUR QUI DESCEND LE PLUS ET REMONTE LE MOINS. Un vrai compteur de vies ne remonte
+        // qu'a un 1-up ou a un continue. Mesure sur Altered Beast le 2026-09-25 : « FLAG BOSS DEATH »,
+        // range dans le bloc des vies, descendait 14 fois d'un cran mais remontait 20 fois ; les vies
+        // (0xFFE018 : 2, 1, 0) descendaient 2 fois et ne remontaient jamais. Au seul nombre de
+        // descentes, le drapeau l'emportait et aurait coupe la partie n'importe ou.
         List<long>? meilleures = null;
-        var meilleurPas = 0;
+        var meilleurScore = 0;
         foreach (var (_, suite) in parAdresse.OrderBy(kv => kv.Key, StringComparer.Ordinal))
         {
-            var (pas, zeros) = Descente(suite);
-            if (pas > meilleurPas)
+            var (pas, remontees, zeros) = Descente(suite);
+            var score = pas - remontees;
+            if (pas > 0 && score > meilleurScore)
             {
-                meilleurPas = pas;
+                meilleurScore = score;
                 meilleures = zeros;
             }
         }
@@ -71,18 +83,21 @@ public static class FinsDeRun
     }
 
     /// <summary>
-    /// Ce que vaut une adresse : combien de pas de UN elle descend, et à quelles frames elle
-    /// touche zéro.
+    /// Ce que vaut une adresse : combien de pas de UN elle descend, et à quelles frames ses vies
+    /// sont REMONTÉES après zéro au niveau du départ (un continue).
     ///
     /// Un compteur de vies descend de un en un. Une jauge d'énergie descend aussi, mais de quatre
     /// en quatre ; un drapeau garde sa valeur ; un réglage n'a qu'une valeur isolée. Mesures du
     /// 24 septembre 2026, dix lignes sur cinq jeux.
     /// </summary>
-    private static (int Pas, List<long> Zeros) Descente(List<EvenementDeVie> suite)
+    private static (int Pas, int Remontees, List<long> Zeros) Descente(List<EvenementDeVie> suite)
     {
         var pas = 0;
+        var remontees = 0;
         var zeros = new List<long>();
         int? precedente = null;
+        var depart = 0;        // le plus haut niveau vu avant de toucher zéro : les vies du départ
+        var aZero = false;     // le compteur a touché zéro ; on attend de voir s'il remonte
         foreach (var e in suite)
         {
             if (e.Value is not { } v)
@@ -90,19 +105,32 @@ public static class FinsDeRun
                 continue;   // sans valeur, rien à conclure de cette lecture
             }
 
+            // Une perte lue « v » vient de v + 1 : c'est ce qui révèle le départ quand la première
+            // lecture est déjà une mort (19xx : 1, donc parti de 2).
+            if (!aZero) depart = Math.Max(depart, e.Perte ? v + 1 : v);
+
             if (precedente is { } avant && e.Perte && v == avant - 1)
             {
                 pas++;
-                if (v == 0)
-                {
-                    // La dernière vie vient de tomber : le run s'arrête ICI.
-                    zeros.Add(e.Frame);
-                }
+                if (v == 0) aZero = true;
+            }
+            else if (aZero && precedente == 0 && v >= Math.Max(1, depart))
+            {
+                // Les vies REMONTENT au niveau du départ : un nouveau crédit. Le run du premier
+                // s'arrête ICI, dernière vie comprise. C'est ce qu'un vrai compteur de vies fait au
+                // continue : cette remontée-là ne le rend pas suspect.
+                zeros.Add(e.Frame);
+                aZero = false;
+                depart = v;
+            }
+            else if (precedente is { } avantR && v > avantR)
+            {
+                remontees++;   // un 1-up, ou un compteur qui n'est pas celui des vies
             }
 
             precedente = v;
         }
 
-        return (pas, zeros);
+        return (pas, remontees, zeros);
     }
 }
