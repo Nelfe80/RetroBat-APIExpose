@@ -1,4 +1,4 @@
-using RetroBat.Api.Replay.Models;
+﻿using RetroBat.Api.Replay.Models;
 using RetroBat.Api.Replay.Storage;
 
 namespace RetroBat.Api.Replay.Sharing;
@@ -103,8 +103,8 @@ public sealed class ReplayTransitPublisher
             // changer un octet et de casser l'identité que ce document porte.
             var manifestJson = await File.ReadAllTextAsync(manifestPath, cts.Token).ConfigureAwait(false);
 
-            // Compressé au départ : un replay de RetroArch 1.22.2 tient en 1 à 2 % de sa taille, et
-            // le transit refuse au-delà de 2 Mo. L'empreinte envoyée reste celle du BRUT.
+            // Compressé au départ : un replay de RetroArch 1.22.2 tient en 1 à 2 % de sa taille.
+            // L'empreinte envoyée reste celle du BRUT.
             if (ReplayCompression.Active(_config))
             {
                 Directory.CreateDirectory(_objects.TempRoot);

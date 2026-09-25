@@ -8,8 +8,8 @@ namespace RetroBat.Api.Replay.Storage;
 /// Mesuré le 25 septembre 2026 sur le magasin de cette borne : un replay de RetroArch 1.22.2 se
 /// compresse à 1 ou 2 % de sa taille. RetroArch écrit ses points de contrôle toutes les cinq
 /// secondes sans les compresser, et ce qu'il écrit est aux deux tiers des octets nuls. Un Ms.
-/// Pac-Man sous MAME pesait 37 Mo pour moins de 400 Ko d'information, et ne pouvait même pas
-/// monter : le transit refuse au-delà de 2 Mo (limite PHP par défaut).
+/// Pac-Man sous MAME pesait 37 Mo pour moins de 300 Ko d'information. (Le transit accepte
+/// jusqu'à 64 Mo : `.user.ini` du site, relevé depuis les 2 Mo par défaut de PHP.)
 ///
 /// L'IDENTITÉ NE CHANGE PAS. Le SHA-256 reste celui du fichier BRUT, celui que RetroArch lit ; le
 /// magasin local garde le brut. On compresse au départ, on décompresse à l'arrivée, et c'est le
