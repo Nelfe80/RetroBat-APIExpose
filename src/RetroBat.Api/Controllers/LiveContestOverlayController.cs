@@ -48,7 +48,11 @@ public class LiveContestOverlayController : ControllerBase
             return BadRequest(new { message = "You must provide the overlay text." });
         }
 
-        if (payload.Center)
+        if (payload.Top)
+        {
+            _overlay.ShowTop(payload.Title, payload.Text.Trim(), payload.Sub, payload.DurationMs);
+        }
+        else if (payload.Center)
         {
             _overlay.ShowCenter(payload.Text.Trim(), payload.Sub, payload.DurationMs);
         }
@@ -86,6 +90,9 @@ public class OverlayPayload
 
     /// <summary>Centered stage mode (big text) instead of the corner window.</summary>
     public bool Center { get; set; }
+
+    /// <summary>Top banner mode: the centered band at the top of the screen, drawn with the active EmulationStation theme (menu colors and fonts).</summary>
+    public bool Top { get; set; }
 
     /// <summary>Auto-hide delay in milliseconds; 0 or null keeps it visible.</summary>
     /// <example>4000</example>

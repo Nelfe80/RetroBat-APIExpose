@@ -14,6 +14,8 @@ public sealed class LiveContestOverlayService : IDisposable
 {
     private readonly object _gate = new();
     private OverlayForm? _form;
+    // Le bandeau du haut, dessine aux couleurs des menus d'ES (voir EsBanniereForm).
+    private RetroBat.Api.Leaderboard.EsBanniereForm? _banniere;
     private Thread? _uiThread;
 
     public void Show(string? title, string text, string? sub, int? durationMs)
@@ -40,8 +42,18 @@ public sealed class LiveContestOverlayService : IDisposable
     public void ShowTop(string? title, string text, string? sub, int? durationMs)
     {
         EnsureForm();
-        _form!.BeginInvoke(() => _form.PresentTop(
-            string.IsNullOrWhiteSpace(title) ? "CHALLENGE" : title!, text, sub ?? "", durationMs));
+        _form!.BeginInvoke(() =>
+        {
+            var marque = string.IsNullOrWhiteSpace(title) ? "CHALLENGE" : title!;
+            if (_banniere is { IsDisposed: false } banniere)
+            {
+                banniere.Presenter(marque, text, sub ?? "", durationMs);
+            }
+            else
+            {
+                _form.PresentTop(marque, text, sub ?? "", durationMs);   // repli : l'ancien bandeau
+            }
+        });
     }
 
     public void Hide()
@@ -49,7 +61,11 @@ public sealed class LiveContestOverlayService : IDisposable
         var form = _form;
         if (form is { IsHandleCreated: true })
         {
-            form.BeginInvoke(form.Conceal);
+            form.BeginInvoke(() =>
+            {
+                form.Conceal();
+                _banniere?.Masquer();
+            });
         }
     }
 
@@ -68,6 +84,15 @@ public sealed class LiveContestOverlayService : IDisposable
                 _form = new OverlayForm();
                 // cree le handle sans afficher la fenetre
                 _ = _form.Handle;
+                try
+                {
+                    _banniere = new RetroBat.Api.Leaderboard.EsBanniereForm();
+                    _ = _banniere.Handle;
+                }
+                catch (Exception)
+                {
+                    _banniere = null;   // sans charte lisible, l'ancien bandeau prend le relais
+                }
                 ready.Set();
                 Application.Run();
             })
