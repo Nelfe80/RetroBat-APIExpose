@@ -170,51 +170,7 @@ public class MediaNeedEvaluator
     private MediaNeed BuildNeed(MediaPrefetchRequest request, string systemId, string frontendSystemId, string gameSlug, string kind, string folderName)
     {
         var projectionBaseName = BuildProjectionBaseName(request);
-        var existing = kind switch
-        {
-            MediaKinds.Image => request.Details?.Image ?? string.Empty,
-            MediaKinds.Thumbnail => request.Details?.Thumbnail ?? string.Empty,
-            MediaKinds.Logo => request.Details?.Extras.GetValueOrDefault("logo")
-                ?? request.Details?.Extras.GetValueOrDefault("wheel")
-                ?? string.Empty,
-            MediaKinds.Wheel => request.Details?.Extras.GetValueOrDefault("wheel")
-                ?? request.Details?.Extras.GetValueOrDefault("logo")
-                ?? string.Empty,
-            MediaKinds.WheelCarbon => request.Details?.Extras.GetValueOrDefault("wheel-carbon") ?? string.Empty,
-            MediaKinds.WheelSteel => request.Details?.Extras.GetValueOrDefault("wheel-steel") ?? string.Empty,
-            // ES uses <marquee> as the visible logo slot, so it may point to wheel/logo.
-            // Do not reuse it as proof of a real ScreenScraper marquee asset.
-            MediaKinds.Marquee => string.Empty,
-            MediaKinds.ScreenMarquee => request.Details?.Extras.GetValueOrDefault("screenmarquee") ?? string.Empty,
-            MediaKinds.ScreenMarqueeSmall => request.Details?.Extras.GetValueOrDefault("screenmarqueesmall") ?? string.Empty,
-            MediaKinds.SteamGrid => request.Details?.Extras.GetValueOrDefault("steamgrid") ?? string.Empty,
-            MediaKinds.MixRbv1 => request.Details?.Extras.GetValueOrDefault("mixrbv1") ?? string.Empty,
-            MediaKinds.MixRbv2 => request.Details?.Extras.GetValueOrDefault("mixrbv2")
-                ?? request.Details?.Extras.GetValueOrDefault("mix")
-                ?? string.Empty,
-            MediaKinds.BoxFront => request.Details?.Extras.GetValueOrDefault("box-2D") ?? string.Empty,
-            MediaKinds.BoxSide => request.Details?.Extras.GetValueOrDefault("box-2D-side") ?? string.Empty,
-            MediaKinds.BoxTexture => request.Details?.Extras.GetValueOrDefault("box-texture") ?? string.Empty,
-            MediaKinds.Box3d => request.Details?.Extras.GetValueOrDefault("box-3D") ?? string.Empty,
-            MediaKinds.Cartridge => request.Details?.Extras.GetValueOrDefault("cartridge")
-                ?? request.Details?.Extras.GetValueOrDefault("support-2D")
-                ?? string.Empty,
-            MediaKinds.Label => request.Details?.Extras.GetValueOrDefault("label")
-                ?? request.Details?.Extras.GetValueOrDefault("support-texture")
-                ?? string.Empty,
-            MediaKinds.Fanart => request.Details?.Fanart ?? string.Empty,
-            MediaKinds.Flyer => request.Details?.Extras.GetValueOrDefault("flyer") ?? string.Empty,
-            MediaKinds.Figurine => request.Details?.Extras.GetValueOrDefault("figurine") ?? string.Empty,
-            MediaKinds.Bezel => request.Details?.Bezel ?? string.Empty,
-            MediaKinds.BoxBack => request.Details?.Boxback ?? string.Empty,
-            MediaKinds.Map => request.Details?.Map ?? request.Details?.Extras.GetValueOrDefault("map") ?? string.Empty,
-            MediaKinds.Manual => request.Details?.Manual ?? string.Empty,
-            MediaKinds.Magazine => request.Details?.Extras.GetValueOrDefault("magazine") ?? string.Empty,
-            MediaKinds.Video => request.Details?.Video ?? string.Empty,
-            MediaKinds.VideoNormalized => request.Details?.Extras.GetValueOrDefault("video-normalized") ?? string.Empty,
-            MediaKinds.ThemeHb => request.Details?.Extras.GetValueOrDefault("themehb") ?? string.Empty,
-            _ => string.Empty
-        };
+        var existing = ReadSlotValue(request.Details, kind);
 
         existing = ToGamelistMediaPath(frontendSystemId, existing);
 
@@ -308,6 +264,62 @@ public class MediaNeedEvaluator
         return !string.IsNullOrWhiteSpace(resolved) &&
             File.Exists(resolved) &&
             IsZipArchive(resolved);
+    }
+
+    /// <summary>
+    /// Ce que la fiche porte deja pour ce type de media. La boite 2D vit dans la balise
+    /// &lt;boxart&gt; des gamelists (ES, Data Pack) : ne lire que « box-2D », une cle que
+    /// personne n'ecrit, faisait passer la vignette « boite 2D » pour vide a chaque visite.
+    /// </summary>
+    internal static string ReadSlotValue(GameDetails? details, string kind)
+    {
+        return kind switch
+        {
+            MediaKinds.Image => details?.Image ?? string.Empty,
+            MediaKinds.Thumbnail => details?.Thumbnail ?? string.Empty,
+            MediaKinds.Logo => details?.Extras.GetValueOrDefault("logo")
+                ?? details?.Extras.GetValueOrDefault("wheel")
+                ?? string.Empty,
+            MediaKinds.Wheel => details?.Extras.GetValueOrDefault("wheel")
+                ?? details?.Extras.GetValueOrDefault("logo")
+                ?? string.Empty,
+            MediaKinds.WheelCarbon => details?.Extras.GetValueOrDefault("wheel-carbon") ?? string.Empty,
+            MediaKinds.WheelSteel => details?.Extras.GetValueOrDefault("wheel-steel") ?? string.Empty,
+            // ES uses <marquee> as the visible logo slot, so it may point to wheel/logo.
+            // Do not reuse it as proof of a real ScreenScraper marquee asset.
+            MediaKinds.Marquee => string.Empty,
+            MediaKinds.ScreenMarquee => details?.Extras.GetValueOrDefault("screenmarquee") ?? string.Empty,
+            MediaKinds.ScreenMarqueeSmall => details?.Extras.GetValueOrDefault("screenmarqueesmall") ?? string.Empty,
+            MediaKinds.SteamGrid => details?.Extras.GetValueOrDefault("steamgrid") ?? string.Empty,
+            MediaKinds.MixRbv1 => details?.Extras.GetValueOrDefault("mixrbv1") ?? string.Empty,
+            MediaKinds.MixRbv2 => details?.Extras.GetValueOrDefault("mixrbv2")
+                ?? details?.Extras.GetValueOrDefault("mix")
+                ?? string.Empty,
+            MediaKinds.BoxFront => details?.Extras.GetValueOrDefault("box-2D")
+                ?? details?.Extras.GetValueOrDefault("boxart")
+                ?? string.Empty,
+            MediaKinds.BoxSide => details?.Extras.GetValueOrDefault("box-2D-side") ?? string.Empty,
+            MediaKinds.BoxTexture => details?.Extras.GetValueOrDefault("box-texture") ?? string.Empty,
+            MediaKinds.Box3d => details?.Extras.GetValueOrDefault("box-3D") ?? string.Empty,
+            MediaKinds.Cartridge => details?.Extras.GetValueOrDefault("cartridge")
+                ?? details?.Extras.GetValueOrDefault("support-2D")
+                ?? string.Empty,
+            MediaKinds.Label => details?.Extras.GetValueOrDefault("label")
+                ?? details?.Extras.GetValueOrDefault("support-texture")
+                ?? string.Empty,
+            MediaKinds.Fanart => details?.Fanart ?? string.Empty,
+            MediaKinds.Flyer => details?.Extras.GetValueOrDefault("flyer") ?? string.Empty,
+            MediaKinds.Figurine => details?.Extras.GetValueOrDefault("figurine") ?? string.Empty,
+            MediaKinds.Bezel => details?.Bezel ?? string.Empty,
+            MediaKinds.BoxBack => details?.Boxback ?? string.Empty,
+            MediaKinds.Map => details?.Map ?? details?.Extras.GetValueOrDefault("map") ?? string.Empty,
+            MediaKinds.Manual => details?.Manual ?? string.Empty,
+            MediaKinds.Magazine => details?.Extras.GetValueOrDefault("magazine") ?? string.Empty,
+            MediaKinds.Video => details?.Video ?? string.Empty,
+            MediaKinds.VideoNormalized => details?.Extras.GetValueOrDefault("video-normalized") ?? string.Empty,
+            MediaKinds.ThemeHb => details?.Extras.GetValueOrDefault("themehb") ?? string.Empty,
+            _ => string.Empty
+        };
     }
 
     /// <summary>

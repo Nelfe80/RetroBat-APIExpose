@@ -1,5 +1,6 @@
 using System.IO;
 using RetroBat.Api.Media;
+using RetroBat.Domain.Models;
 using RetroBat.Domain.Paths;
 using Xunit;
 
@@ -39,5 +40,26 @@ public class ApiMediaUrlNeedTests
     public void Les_autres_valeurs_passent_telles_quelles(string valeur)
     {
         Assert.Equal(valeur, MediaNeedEvaluator.ToGamelistMediaPath("fbneo", valeur));
+    }
+    [Fact]
+    public void La_boite_2D_se_lit_dans_la_balise_boxart()
+    {
+        // Vignette reglee sur « boite 2D » : ES et le Data Pack la rangent sous <boxart>.
+        var details = new GameDetails();
+        details.Extras["boxart"] = "/api/v1/media/systems/arcade/games/19xx/artwork/box/front.png";
+
+        Assert.Equal(
+            "/api/v1/media/systems/arcade/games/19xx/artwork/box/front.png",
+            MediaNeedEvaluator.ReadSlotValue(details, MediaKinds.BoxFront));
+    }
+
+    [Fact]
+    public void La_cle_box_2D_garde_la_priorite()
+    {
+        var details = new GameDetails();
+        details.Extras["box-2D"] = "./images/19xx-box.png";
+        details.Extras["boxart"] = "./images/autre.png";
+
+        Assert.Equal("./images/19xx-box.png", MediaNeedEvaluator.ReadSlotValue(details, MediaKinds.BoxFront));
     }
 }
