@@ -682,8 +682,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // La derniere vie perdue ferme le run : ce qui suit appartient a un autre run, continue
         // ou nouvelle partie. On ne cherche PAS a reconnaitre le continue -- crédit au demarrage,
         // entree d'un second joueur, free play, 1-up : aucune de ces distinctions n'est fiable.
-        var fins = finsDeRun is { Count: > 0 } ? new HashSet<long>(finsDeRun) : null;
-        var coupeApres = false;
+        //
+        // OU TOMBE LA COUPE. La mort a SA trame (le wrapper la transmet) ; les lectures de score ont
+        // la leur, celle du dernier changement de score. Elles ne coincident presque jamais : exiger
+        // l'egalite (premiere version, 2026-09-24) ne coupait donc quasiment rien en vrai, et les
+        // tests passaient parce qu'on leur donnait des trames qui coincidaient. La mort tombe
+        // ENTRE deux lectures : on coupe avant la premiere lecture posterieure a la mort.
+        //
+        // Sur le pont Lua de MAME aucune trame ne circule, tout vaut 0 : aucune mort ne tombe
+        // « entre » deux lectures de meme trame, donc rien n'est coupe et le decoupage ordinaire
+        // s'applique, comme avant.
+        var fins = finsDeRun is { Count: > 0 } ? finsDeRun.OrderBy(f => f).ToArray() : null;
+        long? framePrecedente = null;
         // UN SEGMENT QUI SUIT UN CONTINUE NE CONCOURT PAS, et c'est tout l'enjeu.
         //
         // Apres un continue, le score est REPORTE : le joueur repart de ses 5000 points et monte a
@@ -695,9 +705,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var reporte = false;
         foreach (var pt in traj)
         {
-            if (coupeApres)
+            // Une derniere vie est tombee apres la lecture precedente (ou pile dessus) et avant
+            // celle-ci : la lecture precedente est le score AVEC lequel le joueur a perdu, et
+            // celle-ci ouvre un autre run.
+            var coupe = fins is not null && framePrecedente is long fp && cur.Count > 0
+                && fins.Any(f => f >= fp && f < pt.frame);
+            framePrecedente = pt.frame;
+
+            if (coupe)
             {
-                coupeApres = false;
                 long peakFin = cur.Count > 0 ? cur[^1].total : long.MinValue;
                 if (!reporte && peakFin > bestPeak)
                 {
@@ -709,13 +725,6 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 reporte = peakFin != long.MinValue && pt.total >= peakFin;
                 cur.Clear();
                 prev = long.MinValue;
-            }
-
-            // La lecture de la frame ou la derniere vie tombe appartient encore au run : c'est le
-            // score AVEC lequel le joueur a perdu. On coupe apres elle.
-            if (fins is not null && fins.Contains(pt.frame))
-            {
-                coupeApres = true;
             }
 
             if (pt.total < prev)   // chute : parasite de queue, ou fin du run précédent

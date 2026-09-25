@@ -172,4 +172,78 @@ public class FinsDeRunTests
 
         Assert.Equal(9000, meilleur[^1].total);
     }
+
+    // ── Les trames REELLES : la mort ne tombe presque jamais sur une lecture de score ──
+
+    [Fact]
+    public void La_mort_entre_deux_lectures_coupe_quand_meme()
+    {
+        // LE CAS DE PRODUCTION, que la premiere version ratait. Le wrapper transmet la trame de la
+        // mort (455) ; les lectures de score portent celle du dernier changement de score (400,
+        // 600). Elles ne coincident pas. La premiere version exigeait l'egalite et ne coupait
+        // donc rien : le 12000 du continue etait certifie 1CC comme avant le correctif.
+        var meilleur = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(
+            Traj((100, 1000), (250, 3000), (400, 5000), (600, 8000), (700, 12000)),
+            [455L]);
+
+        Assert.Equal(5000, meilleur[^1].total);
+    }
+
+    [Fact]
+    public void Sur_le_pont_Lua_tout_a_la_trame_zero_ne_coupe_rien()
+    {
+        // MAME autonome : aucun evenement de trame ne circule, lectures et morts valent toutes 0.
+        // Aucune mort ne tombe « entre » deux lectures de meme trame : le decoupage ordinaire
+        // s'applique, comme avant la 1.9.0, et le score final est garde.
+        var meilleur = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(
+            Traj((0, 100), (0, 800), (0, 2500), (0, 7300)),
+            [0L, 0L, 0L]);
+
+        Assert.Equal(7300, meilleur[^1].total);
+        Assert.Equal(4, meilleur.Count);
+    }
+
+    [Fact]
+    public void Sur_le_pont_Lua_une_nouvelle_partie_se_voit_toujours_a_la_chute()
+    {
+        var meilleur = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(
+            Traj((0, 100), (0, 900), (0, 4200), (0, 20), (0, 1500)),
+            [0L, 0L]);
+
+        Assert.Equal(4200, meilleur[^1].total);
+    }
+
+    [Fact]
+    public void Une_mort_apres_la_derniere_lecture_ne_change_rien()
+    {
+        // Game over final : la partie s'arrete, il n'y a rien apres a separer.
+        var meilleur = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(
+            Traj((100, 1000), (200, 3000), (300, 5000)),
+            [950L]);
+
+        Assert.Equal(5000, meilleur[^1].total);
+    }
+
+    [Fact]
+    public void Une_mort_avant_toute_lecture_ne_change_rien()
+    {
+        // Une vie perdue pendant l'attract ou avant le premier point : aucun run a fermer.
+        var meilleur = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(
+            Traj((100, 1000), (200, 3000), (300, 5000)),
+            [40L]);
+
+        Assert.Equal(5000, meilleur[^1].total);
+    }
+
+    [Fact]
+    public void Deux_continues_trois_runs_seul_le_premier_compte()
+    {
+        // 19xx a une vie : mort a 480, continue, mort a 910, continue. Le score reporte monte a
+        // chaque fois ; seuls les points gagnes avant la premiere mort sont a lui.
+        var meilleur = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(
+            Traj((100, 2000), (300, 6000), (450, 9000), (600, 12000), (800, 20000), (1000, 26000)),
+            [480L, 910L]);
+
+        Assert.Equal(9000, meilleur[^1].total);
+    }
 }
