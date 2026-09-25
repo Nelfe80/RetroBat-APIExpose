@@ -216,6 +216,8 @@ public class MediaNeedEvaluator
             _ => string.Empty
         };
 
+        existing = ToGamelistMediaPath(frontendSystemId, existing);
+
         if (string.Equals(kind, MediaKinds.Image, StringComparison.OrdinalIgnoreCase) &&
             IsImagePlaceholder(existing, projectionBaseName))
         {
@@ -306,6 +308,45 @@ public class MediaNeedEvaluator
         return !string.IsNullOrWhiteSpace(resolved) &&
             File.Exists(resolved) &&
             IsZipArchive(resolved);
+    }
+
+    /// <summary>
+    /// Le watcher ES expose les medias du store canonique en URL « /api/v1/media/... » pour
+    /// les clients REST. Ici on juge le disque : lue comme un chemin, l'URL tombait sur
+    /// « E:\api\v1\media\... », chaque media du store passait pour absent a chaque visite,
+    /// et la fiche etait repoussee a ES avec « Medias locaux appliques » (jeux du Data Pack,
+    /// donc toute la collection World Scoring). On revient au chemin que porte la gamelist.
+    /// Vide si l'URL sort du store.
+    /// </summary>
+    internal static string ToGamelistMediaPath(string frontendSystemId, string? value)
+    {
+        const string ApiMediaPrefix = "/api/v1/media/";
+        var raw = value ?? string.Empty;
+        if (!raw.StartsWith(ApiMediaPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            return raw;
+        }
+
+        try
+        {
+            var mediaRoot = Path.GetFullPath(RetroBatPaths.MediaRoot)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            var relative = raw[ApiMediaPrefix.Length..].Replace('/', Path.DirectorySeparatorChar);
+            var full = Path.GetFullPath(Path.Combine(mediaRoot, relative));
+            if (!full.StartsWith(mediaRoot, StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Empty;
+            }
+
+            var fromSystem = Path.GetRelativePath(Path.Combine(RetroBatPaths.RomsRoot, frontendSystemId), full);
+            return Path.IsPathRooted(fromSystem)
+                ? fromSystem
+                : "./" + fromSystem.Replace(Path.DirectorySeparatorChar, '/');
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return string.Empty;
+        }
     }
 
     private static bool ExistingMediaPathExists(string frontendSystemId, string? path)
