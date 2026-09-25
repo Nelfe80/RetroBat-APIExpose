@@ -39,7 +39,7 @@ public sealed class LiveContestOverlayService : IDisposable
 
     /// <summary>Bandeau HAUT d'écran (challenge de salle) : « Appuyez sur
     /// START… », « Ne touchez plus à rien ! » - centré en haut du jeu.</summary>
-    public void ShowTop(string? title, string text, string? sub, int? durationMs)
+    public void ShowTop(string? title, string text, string? sub, int? durationMs, bool alerte = false)
     {
         EnsureForm();
         _form!.BeginInvoke(() =>
@@ -47,7 +47,7 @@ public sealed class LiveContestOverlayService : IDisposable
             var marque = string.IsNullOrWhiteSpace(title) ? "CHALLENGE" : title!;
             if (_banniere is { IsDisposed: false } banniere)
             {
-                banniere.Presenter(marque, text, sub ?? "", durationMs);
+                banniere.Presenter(marque, text, sub ?? "", durationMs, alerte);
             }
             else
             {

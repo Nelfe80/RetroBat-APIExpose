@@ -126,9 +126,9 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
 
         static bool Vrai(Dictionary<string, string> c, string cle) => c.TryGetValue(cle, out var v) && v is "true" or "1";
         var dangers = new List<string>();
-        if (Vrai(cfg, "rewind_enable")) dangers.Add(FonctionsFrontend[0].Nom);
-        if (Vrai(cfg, "run_ahead_enabled") || Vrai(cfg, "preemptive_frames_enable")) dangers.Add(FonctionsFrontend[1].Nom);
-        if (Vrai(cfg, "savestate_auto_load")) dangers.Add(FonctionsFrontend[2].Nom);
+        if (Vrai(cfg, "rewind_enable")) dangers.Add(FonctionsFrontend[0].Cle);
+        if (Vrai(cfg, "run_ahead_enabled") || Vrai(cfg, "preemptive_frames_enable")) dangers.Add(FonctionsFrontend[1].Cle);
+        if (Vrai(cfg, "savestate_auto_load")) dangers.Add(FonctionsFrontend[2].Cle);
         return dangers;
     }
 

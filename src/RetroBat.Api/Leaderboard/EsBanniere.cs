@@ -38,6 +38,7 @@ internal sealed class EsBanniereForm : Form
     private string _marque = "";
     private string _titre = "";
     private string _detail = "";
+    private bool _alerte;
     private float _hauteurEcran = 1080f;
     private int _pas;
 
@@ -82,8 +83,9 @@ internal sealed class EsBanniereForm : Form
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int value, int size);
 
     /// <summary>Montre le bandeau en haut de l'ecran, centre, pour la duree donnee.</summary>
-    public void Presenter(string marque, string titre, string detail, int? dureeMs)
+    public void Presenter(string marque, string titre, string detail, int? dureeMs, bool alerte = false)
     {
+        _alerte = alerte;
         _style = EsMenuStyle.Lire();
         ChargerLesPolices(_style);
         if (_glyphes is null)
@@ -98,7 +100,7 @@ internal sealed class EsBanniereForm : Form
         var ecran = Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080);
         _hauteurEcran = ecran.Height;
         var largeur = (int) Math.Clamp(ecran.Width * 0.46f, 560f, 1100f);
-        var (hGroupe, hTitre, tPetit) = (Taille(_style.GroupFontSize) * 1.9f, Taille(_style.TitleFontSize) * 1.55f, Taille(_style.SmallFontSize));
+        var (hGroupe, hTitre, tPetit) = (Taille(_style.GroupFontSize) * 1.9f, TailleTitre() * 1.5f, Taille(_style.SmallFontSize));
         var lignesDetail = 0;
         if (_detail.Length > 0)
         {
@@ -135,6 +137,14 @@ internal sealed class EsBanniereForm : Form
     private float Marge => Math.Max(12f, _hauteurEcran * 0.018f);
 
     private float Taille(double fraction) => (float) Math.Max(10, fraction * _hauteurEcran);
+
+    /// <summary>Le titre, un cran sous la police de titre d'ES : il annonce, il ne crie pas (demande user).</summary>
+    private float TailleTitre() => Taille(_style.TitleFontSize) * 0.78f;
+
+    // L'ALERTE EN ORANGE (demande user 2026-09-26) : une partie qui ne sera pas classee ne doit
+    // pas se lire avec la couleur d'une selection ordinaire.
+    private static readonly Color OrangeDebut = Color.FromArgb(230, 126, 34);
+    private static readonly Color OrangeFin = Color.FromArgb(140, 62, 0);
 
     protected override void OnPaint(PaintEventArgs e)
     {
@@ -178,15 +188,16 @@ internal sealed class EsBanniereForm : Form
         }
 
         // Le titre sur la barre de selection d'ES : ce qu'on lit d'un coup d'oeil.
-        var tTitre = Taille(s.TitleFontSize);
-        var hTitre = tTitre * 1.55f;
+        var tTitre = TailleTitre();
+        var hTitre = tTitre * 1.5f;
         var bande = new RectangleF(0, hGroupe, Width, hTitre);
-        using (var selection = new LinearGradientBrush(new RectangleF(0, hGroupe, Width + 1, hTitre), Teinte(s.SelectorColor), Teinte(s.SelectorColorEnd), LinearGradientMode.Horizontal))
+        using (var selection = new LinearGradientBrush(new RectangleF(0, hGroupe, Width + 1, hTitre),
+                   _alerte ? OrangeDebut : Teinte(s.SelectorColor), _alerte ? OrangeFin : Teinte(s.SelectorColorEnd), LinearGradientMode.Horizontal))
         {
             g.FillRectangle(selection, bande);
         }
         using (var policeTitre = Police(s.TitleFontPath, tTitre, FontStyle.Bold))
-        using (var encre = new SolidBrush(Teinte(s.SelectedTextColor)))
+        using (var encre = new SolidBrush(_alerte ? Color.White : Teinte(s.SelectedTextColor)))
         using (var centre = new StringFormat(StringFormat.GenericTypographic)
         { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter, FormatFlags = StringFormatFlags.NoWrap })
         {

@@ -90,6 +90,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly RetroBat.Api.Replay.Storage.ReplayStore? _replayStore;
     /// <summary>Les NVRAM du jeu (reglages des jeux sans DIP switches), jointes au passeport.</summary>
     private readonly NvramSnapshotService? _nvram;
+    private readonly RetroBat.Domain.Interfaces.IEsSettingsStore? _esSettings;
     private readonly BiosFingerprintService? _bios;   // pour estampiller score/rang sur la méta du replay
     private readonly RetroBat.Api.Replay.Sharing.ReplaySeedQueue? _semis;
     private readonly RetroBat.Api.Replay.Sharing.ReplaySeedService? _semeur;
@@ -116,8 +117,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         BiosFingerprintService? bios = null,
         CertifiedSettingsService? certified = null,
         CoreMemoryCapability? coeurs = null,
-        RetroBat.Api.Replay.Playback.ReplayPlaybackService? playback = null)
+        RetroBat.Api.Replay.Playback.ReplayPlaybackService? playback = null,
+        RetroBat.Domain.Interfaces.IEsSettingsStore? esSettings = null)
     {
+        _esSettings = esSettings;
         _nvram = nvram;
         _bios = bios;
         _certified = certified;
@@ -365,9 +368,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     {
                         _overlay?.ShowTop(
                             "SCORING",
-                            "Aucun score n'a été mesuré",
-                            "la partie annoncée certifiable n'a rien remonté",
-                            9000);
+                            Texte("scoring_none_measured"),
+                            Texte("scoring_none_measured_sub"),
+                            9000,
+                            alerte: true);
                         Trace("fin de partie : prevol certifiable mais AUCUNE session recue");
                         _logger?.LogWarning(
                             "Scoring : partie annoncee certifiable terminee sans aucune session. "
@@ -558,11 +562,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 _overlay?.ShowTop(
                     "SCORING",
-                    "Aucun score ne sera mesuré",
-                    wrapper == "missing"
-                        ? "le module de mesure est absent de cette borne"
-                        : "le module de mesure n'enveloppe aucun émulateur",
-                    8000);
+                    Texte("scoring_nothing_measured"),
+                    Texte(wrapper == "missing" ? "scoring_module_missing" : "scoring_module_idle"),
+                    8000,
+                    alerte: true);
                 Trace($"prévol : wrapper {wrapper}, rien ne sera mesuré");
 
                 return;   // le reste du prevol parlerait de certification : il n'y a rien a certifier
@@ -583,9 +586,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 _overlay?.ShowTop(
                     "SCORING",
-                    "Aucun score ne sera mesuré",
-                    "le cœur « " + coeur + " » n'expose pas sa mémoire",
-                    8000);
+                    Texte("scoring_nothing_measured"),
+                    string.Format(Texte("scoring_core_blind"), coeur),
+                    8000,
+                    alerte: true);
                 Trace($"prévol : {coeur} est connu pour ne rien exposer, rien ne sera mesuré");
 
                 return;
@@ -627,7 +631,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             else if (dangers.Count > 0)
             {
                 titre = "Partie non certifiable";
-                detail = string.Join(", ", dangers) + ", à désactiver dans les options RetroBat de ce jeu";
+                detail = string.Join(", ", dangers.Select(d => CabinetAnnounceText.Get("scoring_danger_" + d, "fr"))) + ", à désactiver dans les options RetroBat de ce jeu";
             }
             else
             {
@@ -650,7 +654,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // facon le verdict a la fin, quand ES a repris la main.
             if (_overlay is not null)
             {
-                _overlay.ShowTop("SCORING", titre, detail, 6000);
+                // Le JOURNAL garde le francais (l'outil de diagnostic le lit) ; l'ECRAN parle la langue
+                // du joueur, et passe en orange quand la partie ne sera pas classee.
+                var (titreAffiche, detailAffiche) = AnnonceLocalisee(Langue(), certifiable, reason, dangers, force);
+                _overlay.ShowTop("SCORING", titreAffiche, detailAffiche, 6000, alerte: !(certifiable && dangers.Count == 0));
             }
             else
             {
@@ -1187,9 +1194,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 _overlay?.ShowTop(
                     "SCORING",
-                    "Aucun score n'a été mesuré",
-                    "la partie annoncée certifiable n'a rien remonté",
-                    9000);
+                    Texte("scoring_none_measured"),
+                    Texte("scoring_none_measured_sub"),
+                    9000,
+                    alerte: true);
                 _logger?.LogWarning(
                     "Scoring : partie annoncee certifiable terminee sans aucun score mesure "
                     + "(listener={Listener}, total={Total}). Le coeur employe n'expose probablement rien a lire.",
@@ -1738,6 +1746,43 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     // Codes d'échec du vérifieur → texte joueur (FR). Voir CoreVerifier / regles-de-score.
+    /// <summary>La langue de l'ecran : celle du joueur identifie, sinon celle d'EmulationStation, sinon l'anglais.</summary>
+    private string Langue()
+    {
+        string? es = null;
+        try
+        {
+            if (_esSettings is not null && _esSettings.ReadAllSettings().TryGetValue("Language", out var langue)) es = langue;
+        }
+        catch (Exception)
+        {
+            // Des reglages illisibles : la langue du joueur, sinon l'anglais.
+        }
+        return CabinetAnnounceText.Resolve(_scoringSession?.Get()?.Locale, es);
+    }
+
+    private string Texte(string cle) => CabinetAnnounceText.Get(cle, Langue());
+
+    /// <summary>
+    /// L'annonce au lancement dans la langue donnee. En francais, elle redonne mot pour mot ce que
+    /// le journal ecrit.
+    /// </summary>
+    internal static (string Titre, string Detail) AnnonceLocalisee(string langue, bool certifiable, string reason, IReadOnlyList<string> dangers, bool force)
+    {
+        string T(string cle) => CabinetAnnounceText.Get(cle, langue);
+        if (!certifiable && reason == "profile.core_mismatch") return (T("scoring_emulator_pending"), T("scoring_emulator_pending_sub"));
+        if (!certifiable && reason == "profile.core_options_mismatch") return (T("scoring_settings_pending"), T("scoring_settings_pending_sub"));
+        if (!certifiable)
+        {
+            return (T("scoring_not_certifiable"), CabinetAnnounceText.Find("reason_" + reason.Replace('.', '_'), langue) ?? ReasonToText(reason));
+        }
+        if (dangers.Count > 0)
+        {
+            return (T("scoring_not_certifiable"), string.Format(T("scoring_frontend_off"), string.Join(", ", dangers.Select(d => T("scoring_danger_" + d)))));
+        }
+        return (T("scoring_certifiable"), T(force ? "scoring_forced" : "scoring_for_ranking"));
+    }
+
     private static string ReasonToText(string reason) => reason switch
     {
         "" => "accepté",

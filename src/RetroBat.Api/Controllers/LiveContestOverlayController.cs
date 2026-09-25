@@ -50,7 +50,7 @@ public class LiveContestOverlayController : ControllerBase
 
         if (payload.Top)
         {
-            _overlay.ShowTop(payload.Title, payload.Text.Trim(), payload.Sub, payload.DurationMs);
+            _overlay.ShowTop(payload.Title, payload.Text.Trim(), payload.Sub, payload.DurationMs, payload.Alert);
         }
         else if (payload.Center)
         {
@@ -93,6 +93,9 @@ public class OverlayPayload
 
     /// <summary>Top banner mode: the centered band at the top of the screen, drawn with the active EmulationStation theme (menu colors and fonts).</summary>
     public bool Top { get; set; }
+
+    /// <summary>Top banner only: warning tone (orange band), for a run that will not be ranked.</summary>
+    public bool Alert { get; set; }
 
     /// <summary>Auto-hide delay in milliseconds; 0 or null keeps it visible.</summary>
     /// <example>4000</example>
