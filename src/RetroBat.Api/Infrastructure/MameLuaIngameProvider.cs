@@ -428,8 +428,23 @@ public sealed class MameLuaIngameProvider : IProvider
     }
 
     /// <summary>Force (ou rend) un champ d'entree de la machine, designe par son nom MAME.</summary>
-    public Task<bool> RequestInputAsync(string champ, bool presse, CancellationToken ct)
-        => EnvoyerAsync("INPUT|" + champ.Replace('|', ' ') + "|" + (presse ? "1" : "0"), ct);
+    public async Task<bool> RequestInputAsync(string champ, bool presse, CancellationToken ct)
+    {
+        var ok = await EnvoyerAsync("INPUT|" + champ.Replace('|', ' ') + "|" + (presse ? "1" : "0"), ct).ConfigureAwait(false);
+
+        // Un START force par le labo fait SORTIR DE LA DEMO, comme un START du panneau : sans cela
+        // le rapporteur de scoring, qui ne voit pas ces entrees injectees, resterait en mode demo
+        // apres l'attract que le labo observe, et ne mesurerait pas la partie qui suit.
+        if (ok && presse && champ.Contains("start", StringComparison.OrdinalIgnoreCase))
+        {
+            await _eventBus.PublishAsync(new EventEnvelope
+            {
+                Type = "scoring.lab.start",
+                Payload = new { Champ = champ },
+            }).ConfigureAwait(false);
+        }
+        return ok;
+    }
 
     /// <summary>Rend tous les champs forces a la machine.</summary>
     public Task<bool> RequestReleaseAsync(CancellationToken ct) => EnvoyerAsync("RELEASE", ct);

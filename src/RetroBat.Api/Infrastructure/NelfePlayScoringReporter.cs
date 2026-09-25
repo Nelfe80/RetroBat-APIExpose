@@ -378,7 +378,22 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     break;
                 case "retroarch.memory.changed":
                 case "ingame.memory.changed":
-                    CaptureVie(ToJson(envelope.Payload));
+                {
+                    var charge = ToJson(envelope.Payload);
+                    CaptureVie(charge);
+                    // Les ETATS du pont Lua de MAME arrivent ici, et seulement ici : le wrapper les
+                    // projette en plus sur retroarch.state, le pont Lua non. Sans cette ligne, un
+                    // DEMO_MODE sous MAME n'atteignait jamais la detection de la demo, et le score
+                    // de l'attract pouvait partir a la place de celui du joueur (Metal Slug 3,
+                    // 2026-09-25 : 17 700 de demo retenus pour 1 700 joues).
+                    CaptureEtatSignal(charge);
+                    break;
+                }
+                case "panel.input.pressed":
+                    CaptureStart(ToJson(envelope.Payload));
+                    break;
+                case "scoring.lab.start":
+                    SortirDeDemo();
                     break;
                 case "score.live.changed":
                     CaptureTotal(ToJson(envelope.Payload));
@@ -644,12 +659,62 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private void CaptureState(JsonElement root)
     {
         var action = (GetString(root, "actionType") ?? GetString(root, "ActionType") ?? "").ToUpperInvariant();
+        AppliquerEtat(action);
+    }
+
+    /// <summary>
+    /// L'état porté par un signal mémoire (pont Lua de MAME, ou wrapper). Le pont Lua range TOUS
+    /// ses signaux dans le canal ACTION, états compris : on ne peut pas filtrer par canal. On ne
+    /// réagit donc qu'aux deux jetons EXACTS du cycle de vie, jamais à un nom qui les contiendrait.
+    /// </summary>
+    private void CaptureEtatSignal(JsonElement root)
+    {
+        if (!root.TryGetProperty("signal", out var signal) && !root.TryGetProperty("Signal", out signal)) return;
+        var nom = (GetString(signal, "Name") ?? "").Trim().ToUpperInvariant();
+        if (nom is "DEMO_MODE" or "GAME_PLAYING") AppliquerEtat(nom);
+    }
+
+    private void AppliquerEtat(string action)
+    {
         if (action.Length == 0) return;
         lock (_sync)
         {
-            if (action.Contains("DEMO")) _inDemo = true;
-            else if (action.Contains("PLAYING") || action.Contains("GAME_PLAY")) _inDemo = false;
+            _inDemo = EtatDemoApres(_inDemo, action);
         }
+    }
+
+    /// <summary>
+    /// La démo commence sur un état DEMO ; elle ne finit que sur un état « en jeu ». Beaucoup de
+    /// .MEM n'en déclarent aucun (Metal Slug 3, Altered Beast, 19xx...) : sans autre signal, une
+    /// démo vue une fois laissait toute la suite marquée démo, et la vraie partie ne comptait pas.
+    /// D'où <see cref="SortirDeDemo"/> sur START.
+    /// </summary>
+    internal static bool EtatDemoApres(bool enDemo, string action)
+    {
+        if (action.Contains("DEMO", StringComparison.Ordinal)) return true;
+        if (action.Contains("PLAYING", StringComparison.Ordinal) || action.Contains("GAME_PLAY", StringComparison.Ordinal)) return false;
+        return enDemo;
+    }
+
+    /// <summary>
+    /// UN START FAIT SORTIR DE LA DÉMO. Le joueur vient de lancer une partie : c'est le signal que
+    /// l'enregistreur de replay emploie déjà, résolu par la cartographie de chaque borne, donc
+    /// valable sur toutes les machines, et qui ne dépend d'aucune ligne de .MEM. Le START forcé par
+    /// le labo à travers le pont MAME compte aussi (scoring.lab.start).
+    ///
+    /// Limite connue : sur une borne à pièces, un START pressé pendant la démo SANS crédit la fait
+    /// sortir de la démo alors que l'attract continue. La démo suivante la ré-arme, et le score
+    /// retenu reste le meilleur run. À affiner avec le crédit quand on en aura le signal.
+    /// </summary>
+    private void SortirDeDemo()
+    {
+        lock (_sync) { _inDemo = false; }
+    }
+
+    private void CaptureStart(JsonElement root)
+    {
+        var systeme = GetString(root, "System") ?? GetString(root, "system") ?? "";
+        if (string.Equals(systeme, "START", StringComparison.OrdinalIgnoreCase)) SortirDeDemo();
     }
 
     // Phase D : découpe la trajectoire aux CHUTES de score (le score qui retombe = un

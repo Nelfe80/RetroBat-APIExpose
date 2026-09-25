@@ -613,6 +613,19 @@ public class RetroArchWrapperProvider : IProvider
         {
             using var _ = JsonDocument.Parse(json); // valide le JSON avant publication
             var definition = ResolveDefinition();
+
+            // UNE SEULE SESSION PAR PARTIE. Sous le cœur libretro MAME, le pont Lua mesure et le
+            // wrapper tourne aussi : leurs deux sessions de fin arrivaient ensemble, et une partie
+            // pouvait être soumise deux fois (Metal Slug 3, 2026-09-25). Le pont Lua l'emporte,
+            // comme il l'emporte déjà pour les signaux.
+            if (_arbitration.ShouldSuppressRetroArchWrapperSession(definition.SystemId, definition.Rom, definition.DefinitionFile))
+            {
+                _logger?.LogInformation(
+                    "Scoring : session du wrapper ECARTEE pour {SystemId}/{Rom}, le pont MAME Lua mesure ce jeu.",
+                    definition.SystemId, definition.Rom);
+                return;
+            }
+
             await _eventBus.PublishAsync(new EventEnvelope
             {
                 Type = "scoring.listener.session",

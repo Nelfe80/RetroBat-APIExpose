@@ -20,6 +20,25 @@ public sealed class IngameSourceArbitrationService : IIngameSourceArbitrationSer
         }
     }
 
+    /// <summary>Fenêtre pendant laquelle une session Lua qui vient de finir écarte encore la session de fin du wrapper.</summary>
+    internal static readonly TimeSpan FenetreFinLua = TimeSpan.FromMinutes(1);
+    private DateTime _derniereFinLuaUtc = DateTime.MinValue;
+    private MameLuaSession? _derniereSessionLua;
+
+    public bool ShouldSuppressRetroArchWrapperSession(string systemId, string rom, string definitionFile)
+    {
+        if (ShouldSuppressRetroArchWrapper(systemId, rom, definitionFile)) return true;
+        lock (_lock)
+        {
+            if (_derniereSessionLua is null || DateTime.UtcNow - _derniereFinLuaUtc > FenetreFinLua) return false;
+            // Après la fin, on ne vise que LE MÊME JEU (même .MEM ou même ROM), jamais toute
+            // l'arcade : une partie FBNeo courte lancée juste après ne doit pas perdre sa session.
+            var s = _derniereSessionLua;
+            return Matches(s.DefinitionFile, NormalizePath(definitionFile))
+                || Matches(s.Rom, NormalizeRom(rom));
+        }
+    }
+
     public void MarkMameLuaSessionStopped(string systemId, string rom, string definitionFile)
     {
         var normalizedSystem = NormalizeSystem(systemId);
@@ -28,6 +47,8 @@ public sealed class IngameSourceArbitrationService : IIngameSourceArbitrationSer
 
         lock (_lock)
         {
+            _derniereSessionLua = new MameLuaSession(normalizedSystem, normalizedRom, normalizedDefinition);
+            _derniereFinLuaUtc = DateTime.UtcNow;
             var keys = _mameLuaSessions
                 .Where(entry =>
                     Matches(entry.Value.SystemId, normalizedSystem) ||
