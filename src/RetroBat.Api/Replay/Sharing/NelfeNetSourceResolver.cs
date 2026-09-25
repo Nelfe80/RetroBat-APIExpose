@@ -189,22 +189,33 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
     /// transférer un octet — c'est le même test d'existence que celui du semis.</summary>
     private async Task<bool> DetientObjetAsync(ReplayPeer peer, ReplayManifest manifest, CancellationToken ct)
     {
-        var sha = manifest.Object.Sha256;
-        var url = string.IsNullOrWhiteSpace(peer.UrlTemplate)
-            ? peer.BaseUrl.TrimEnd('/') + "/api/v1/object/" + sha
-            : peer.UrlTemplate.Replace("{sha}", sha, StringComparison.Ordinal);
-
-        using var request = new HttpRequestMessage(HttpMethod.Head, url);
-        if (!string.IsNullOrWhiteSpace(peer.ApiKey)) request.Headers.Add("X-Api-Key", peer.ApiKey);
-
         var client = _httpFactory.CreateClient();
         client.Timeout = Timeout.InfiniteTimeSpan;
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         cts.CancelAfter(DelaiSonde);
-        using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token)
-            .ConfigureAwait(false);
-        return response.IsSuccessStatusCode;
+        foreach (var (url, _) in Adresses(peer, manifest.Object.Sha256))
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Head, url);
+            if (!string.IsNullOrWhiteSpace(peer.ApiKey)) request.Headers.Add("X-Api-Key", peer.ApiKey);
+            using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token)
+                .ConfigureAwait(false);
+            if (response.IsSuccessStatusCode) return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Où demander l'objet, dans l'ordre. Une borne expose une route d'API et sert le BRUT de son
+    /// magasin. Une amorce statique expose des fichiers : la forme compressée d'abord
+    /// (<c>&lt;sha&gt;.replay.gz</c>, les envois depuis la 1.9.1), puis la brute (les anciens).
+    /// </summary>
+    internal static IReadOnlyList<(string Url, bool Compresse)> Adresses(ReplayPeer peer, string sha)
+    {
+        if (string.IsNullOrWhiteSpace(peer.UrlTemplate))
+            return [(peer.BaseUrl.TrimEnd('/') + "/api/v1/object/" + sha, false)];
+        var brute = peer.UrlTemplate.Replace("{sha}", sha, StringComparison.Ordinal);
+        return [(ReplayCompression.UrlCompressee(brute), true), (brute, false)];
     }
 
     /// <summary>Adresse privée, loopback ou lien-local : cette borne est à portée de main.
@@ -231,26 +242,31 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
     {
         var sha = manifest.Object.Sha256;
         var temp = Path.Combine(_objects.TempRoot, $"fetch-{sha}.part");
+        var tempGz = temp + ReplayCompression.Suffixe;
+        HttpResponseMessage? response = null;
         try
         {
-            // Une borne expose une route d'API ; une amorce statique expose une URL de fichier.
-            // Le gabarit permet aux deux de passer par le MEME client de transfert.
-            var url = string.IsNullOrWhiteSpace(peer.UrlTemplate)
-                ? peer.BaseUrl.TrimEnd('/') + "/api/v1/object/" + sha
-                : peer.UrlTemplate.Replace("{sha}", sha, StringComparison.Ordinal);
-            using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            if (!string.IsNullOrWhiteSpace(peer.ApiKey)) request.Headers.Add("X-Api-Key", peer.ApiKey);
-
             var client = _httpFactory.CreateClient();
             client.Timeout = Timeout.InfiniteTimeSpan; // c'est le CTS qui borne, pour couvrir aussi la lecture du corps
 
-            // 1) Répond-il ? Délai COURT : quatre secondes suffisent à le savoir.
-            using var connectCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            connectCts.CancelAfter(ConnectTimeout);
-            using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, connectCts.Token).ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode)
+            // 1) Répond-il, et sous quelle forme ? Délai COURT : quatre secondes suffisent à le
+            // savoir. Une amorce donne d'abord la forme compressée, puis la brute (Adresses).
+            var compresse = false;
+            var dernierCode = 0;
+            foreach (var (url, gz) in Adresses(peer, sha))
             {
-                _logger.LogInformation("Replay : pair {Peer} n'a pas l'objet {Sha} (HTTP {Code}).", peer.Name, Short(sha), (int)response.StatusCode);
+                using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                if (!string.IsNullOrWhiteSpace(peer.ApiKey)) request.Headers.Add("X-Api-Key", peer.ApiKey);
+                using var connectCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+                connectCts.CancelAfter(ConnectTimeout);
+                var essai = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, connectCts.Token).ConfigureAwait(false);
+                if (essai.IsSuccessStatusCode) { response = essai; compresse = gz; break; }
+                dernierCode = (int)essai.StatusCode;
+                essai.Dispose();
+            }
+            if (response is null)
+            {
+                _logger.LogInformation("Replay : pair {Peer} n'a pas l'objet {Sha} (HTTP {Code}).", peer.Name, Short(sha), dernierCode);
                 return false;
             }
 
@@ -261,13 +277,42 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
             using var transferCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
             transferCts.CancelAfter(budget);
 
-            _network.Report(sha, 0, manifest.Object.Size, peer.Name);
-            var written = await WriteCappedAsync(response, temp, manifest.Object.Size, transferCts.Token,
-                recus => _network.Report(sha, recus, manifest.Object.Size, peer.Name)).ConfigureAwait(false);
-            if (written is null)
+            long? written;
+            if (compresse)
             {
-                _logger.LogWarning("Replay : pair {Peer} a envoyé plus que la taille annoncée pour {Sha} — abandonné.", peer.Name, Short(sha));
-                return false;
+                // La forme compressée ne peut pas dépasser le brut de plus que l'enveloppe gzip :
+                // au-delà, c'est autre chose qu'on nous envoie.
+                var total = response.Content.Headers.ContentLength ?? manifest.Object.Size;
+                var plafondGz = manifest.Object.Size + manifest.Object.Size / 100 + 4096;
+                _network.Report(sha, 0, total, peer.Name);
+                var recu = await WriteCappedAsync(response, tempGz, plafondGz, transferCts.Token,
+                    recus => _network.Report(sha, recus, total, peer.Name)).ConfigureAwait(false);
+                if (recu is null || !ReplayCompression.EstGzip(tempGz))
+                {
+                    _logger.LogWarning("Replay : pair {Peer} a envoyé autre chose qu'une archive gzip pour {Sha} — rejeté.", peer.Name, Short(sha));
+                    return false;
+                }
+
+                // Décompression PLAFONNÉE à la taille annoncée : une archive qui gonfle au-delà est
+                // rejetée avant d'avoir rempli le disque. La vérification qui suit porte sur le BRUT.
+                written = await ReplayCompression.DecompresserPlafonneAsync(tempGz, temp, manifest.Object.Size, transferCts.Token)
+                    .ConfigureAwait(false);
+                if (written is null)
+                {
+                    _logger.LogWarning("Replay : l'archive de {Peer} dépasse la taille annoncée pour {Sha} — rejetée.", peer.Name, Short(sha));
+                    return false;
+                }
+            }
+            else
+            {
+                _network.Report(sha, 0, manifest.Object.Size, peer.Name);
+                written = await WriteCappedAsync(response, temp, manifest.Object.Size, transferCts.Token,
+                    recus => _network.Report(sha, recus, manifest.Object.Size, peer.Name)).ConfigureAwait(false);
+                if (written is null)
+                {
+                    _logger.LogWarning("Replay : pair {Peer} a envoyé plus que la taille annoncée pour {Sha} — abandonné.", peer.Name, Short(sha));
+                    return false;
+                }
             }
 
             if (written != manifest.Object.Size)
@@ -301,7 +346,9 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
         }
         finally
         {
+            response?.Dispose();
             try { if (File.Exists(temp)) File.Delete(temp); } catch { /* best effort */ }
+            try { if (File.Exists(tempGz)) File.Delete(tempGz); } catch { /* best effort */ }
         }
     }
 

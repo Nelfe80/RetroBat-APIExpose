@@ -61,9 +61,15 @@ public sealed class ReplayTransitPublisher
             cts.CancelAfter(TimeSpan.FromSeconds(20));
             var client = _httpFactory.CreateClient();
             client.Timeout = Timeout.InfiniteTimeSpan;
-            using var req = new HttpRequestMessage(HttpMethod.Head, template.Replace("{sha}", sha256, StringComparison.Ordinal));
-            using var res = await client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cts.Token).ConfigureAwait(false);
-            return res.IsSuccessStatusCode;
+            // La forme compressée d'abord (les envois récents), puis la brute (les anciens).
+            var brute = template.Replace("{sha}", sha256, StringComparison.Ordinal);
+            foreach (var url in new[] { ReplayCompression.UrlCompressee(brute), brute })
+            {
+                using var req = new HttpRequestMessage(HttpMethod.Head, url);
+                using var res = await client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cts.Token).ConfigureAwait(false);
+                if (res.IsSuccessStatusCode) return true;
+            }
+            return false;
         }
         catch (Exception ex)
         {
@@ -86,6 +92,7 @@ public sealed class ReplayTransitPublisher
         var manifestPath = _manifests.ManifestPath(replayId);
         if (!File.Exists(manifestPath)) return new PublishResult(false, "REPLAY_MANIFEST_INVALID");
 
+        string? compresse = null;
         try
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
@@ -95,31 +102,37 @@ public sealed class ReplayTransitPublisher
             // changer un octet et de casser l'identité que ce document porte.
             var manifestJson = await File.ReadAllTextAsync(manifestPath, cts.Token).ConfigureAwait(false);
 
-            using var content = new MultipartFormDataContent
+            // Compressé au départ : un replay de RetroArch 1.22.2 tient en 1 à 2 % de sa taille, et
+            // le transit refuse au-delà de 2 Mo. L'empreinte envoyée reste celle du BRUT.
+            if (ReplayCompression.Active(_config))
             {
-                { new StringContent(manifestJson), "manifest" },
-                { new StringContent(replayId), "replay_id" },
-                { new StringContent(manifest.Object.Sha256), "object_sha256" },
-            };
-            await using var stream = File.OpenRead(objectPath);
-            var file = new StreamContent(stream);
-            file.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
-            content.Add(file, "object", manifest.Object.Sha256 + ".replay");
+                Directory.CreateDirectory(_objects.TempRoot);
+                compresse = Path.Combine(_objects.TempRoot, $"publish-{manifest.Object.Sha256}.replay.gz");
+                var taille = await ReplayCompression.CompresserAsync(objectPath, compresse, cts.Token).ConfigureAwait(false);
+                _logger.LogInformation("Replay : {ReplayId} compressé pour l'envoi, {Brut} -> {Gz} octets.",
+                    replayId, manifest.Object.Size, taille);
+            }
 
-            var client = _httpFactory.CreateClient();
-            client.Timeout = Timeout.InfiniteTimeSpan;
-            using var request = new HttpRequestMessage(HttpMethod.Post, TransitBase() + PublishPath) { Content = content };
-            request.Headers.Add("X-NelfePlay-Device", credential);
+            var (ok, code, corps) = await EnvoyerAsync(manifestJson, replayId, manifest.Object.Sha256,
+                compresse ?? objectPath, compresse is not null, credential, cts.Token).ConfigureAwait(false);
 
-            using var response = await client.SendAsync(request, cts.Token).ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode)
+            // UN SERVEUR QUI NE CONNAÎT PAS ENCORE LA COMPRESSION hache le fichier reçu tel quel,
+            // trouve l'empreinte du compressé et refuse. On renvoie alors le brut, une fois : la
+            // borne mise à jour avant le site ne perd pas sa publication.
+            if (!ok && compresse is not null && corps.Contains("object_hash_mismatch", StringComparison.Ordinal))
             {
-                var body = await response.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
-                _logger.LogWarning("Replay : publication refusée par le transit ({Code}) : {Body}", (int)response.StatusCode, Trim(body));
+                _logger.LogInformation("Replay : le transit ne lit pas encore les objets compressés, envoi du brut.");
+                (ok, code, corps) = await EnvoyerAsync(manifestJson, replayId, manifest.Object.Sha256,
+                    objectPath, false, credential, cts.Token).ConfigureAwait(false);
+            }
+
+            if (!ok)
+            {
+                _logger.LogWarning("Replay : publication refusée par le transit ({Code}) : {Body}", code, Trim(corps));
                 return new PublishResult(false, "TRANSIT_REFUSED");
             }
 
-            _logger.LogInformation("Replay : {ReplayId} poussé au transit ({Size} octets).", replayId, manifest.Object.Size);
+            _logger.LogInformation("Replay : {ReplayId} poussé au transit ({Size} octets bruts).", replayId, manifest.Object.Size);
             return new PublishResult(true);
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
@@ -131,6 +144,41 @@ public sealed class ReplayTransitPublisher
             _logger.LogWarning(ex, "Replay : poussée vers le transit impossible.");
             return new PublishResult(false, "TRANSIT_UNAVAILABLE");
         }
+        finally
+        {
+            if (compresse is not null)
+            {
+                try { File.Delete(compresse); } catch (IOException) { /* temporaire : le prochain envoi l'ecrase */ }
+            }
+        }
+    }
+
+    /// <summary>Un envoi au transit : l'objet (brut ou compressé), son manifeste et son empreinte BRUTE.</summary>
+    private async Task<(bool Ok, int Code, string Corps)> EnvoyerAsync(string manifestJson, string replayId,
+        string sha256, string fichier, bool compresse, string credential, CancellationToken ct)
+    {
+        using var content = new MultipartFormDataContent
+        {
+            { new StringContent(manifestJson), "manifest" },
+            { new StringContent(replayId), "replay_id" },
+            { new StringContent(sha256), "object_sha256" },
+        };
+        if (compresse) content.Add(new StringContent(ReplayCompression.Encodage), "object_encoding");
+
+        await using var stream = File.OpenRead(fichier);
+        var file = new StreamContent(stream);
+        file.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+            compresse ? "application/gzip" : "application/octet-stream");
+        content.Add(file, "object", sha256 + ".replay" + (compresse ? ReplayCompression.Suffixe : ""));
+
+        var client = _httpFactory.CreateClient();
+        client.Timeout = Timeout.InfiniteTimeSpan;
+        using var request = new HttpRequestMessage(HttpMethod.Post, TransitBase() + PublishPath) { Content = content };
+        request.Headers.Add("X-NelfePlay-Device", credential);
+
+        using var response = await client.SendAsync(request, ct).ConfigureAwait(false);
+        var corps = response.IsSuccessStatusCode ? "" : await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+        return (response.IsSuccessStatusCode, (int)response.StatusCode, corps);
     }
 
     public async Task<PublishResult> UnpublishAsync(string replayId, CancellationToken ct)
