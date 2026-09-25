@@ -60,7 +60,12 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
             stateRoot: Etat,
             minimumEntreDeuxAppels: TimeSpan.Zero,
             // Le test ne demande pas a Windows ce qui tourne : il le decide.
-            emulateurTourne: () => false);
+            emulateurTourne: () => false,
+            // Les fichiers de test ne sont pas de vraies ROM : le contenu y est reconnu, sauf
+            // dans les tests qui portent justement sur cette reconnaissance.
+            contenuConfirme: (candidat, jeu) => _confirme(candidat, jeu));
+
+    private Func<InstalledGame, OpenGame, bool> _confirme = (_, _) => true;
 
     private string PoserRom(string systeme, string nom)
     {
@@ -132,6 +137,23 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
         var http = new FauxHttp(Index("sha256:aa", Jeu("arcade", "19xx", MemEmpreinte)));
 
         var statut = await Service(http, new FauxResolveur { ["19xx.zip"] = "19xx" })
+            .SynchroniserAsync("test", CancellationToken.None);
+
+        Assert.Equal("empty", statut.State);
+        Assert.Empty(Collection());
+    }
+
+    [Fact]
+    public async Task Une_ROM_au_contenu_non_confirme_n_entre_pas()
+    {
+        // Double Dragon, 2026-09-25 : le Double Dragon Neo-Geo porte le meme nom que celui de
+        // Technos, ouvert au scoring. Meme nom, meme .MEM homologue : c'est le contenu qui tranche.
+        PoserRom("fbneo", "doubledr.zip");
+        PoserMem("arcade", "double-dragon", MemContenu);
+        _confirme = (candidat, _) => !candidat.AbsolutePath.EndsWith("doubledr.zip", StringComparison.OrdinalIgnoreCase);
+        var http = new FauxHttp(Index("sha256:aa", Jeu("arcade", "double-dragon", MemEmpreinte)));
+
+        var statut = await Service(http, new FauxResolveur { ["doubledr.zip"] = "double-dragon" })
             .SynchroniserAsync("test", CancellationToken.None);
 
         Assert.Equal("empty", statut.State);

@@ -585,6 +585,9 @@ public class RetroArchWrapperProvider : IProvider
                     MemSha256 = Get("mem_sha256"),
                     ContentSha256 = Get("content_sha256"),
                     ContentMd5 = Get("content_md5"),
+                    // Le SET lance (« ddragon », « doubledr ») : pour l'arcade, c'est lui qui dit
+                    // quel jeu tourne. Le nom du groupe ne le dit pas, deux jeux peuvent le partager.
+                    ContentSet = SetDuJeuEnCours(),
                     WrapperVersion = Get("wrapper_version"),
                     // Ce que le coeur declare de lui-meme : sans ce couple, la plateforme voit
                     // une empreinte opaque et ne peut que refuser un binaire qu'elle ne connait
@@ -643,6 +646,12 @@ public class RetroArchWrapperProvider : IProvider
         {
             _logger?.LogDebug(ex, "Scoring : session JSON illisible : {Json}", json);
         }
+    }
+
+    private string SetDuJeuEnCours()
+    {
+        var game = _context.Ui.Running ?? _context.Ui.Selected;
+        return Path.GetFileNameWithoutExtension(game?.GamePath ?? string.Empty);
     }
 
     private RetroArchDefinitionSnapshot ResolveDefinition()

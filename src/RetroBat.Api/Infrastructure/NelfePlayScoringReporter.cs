@@ -50,7 +50,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly object _sync = new();
 
     private string? _enrolledKeyId;
-    private string? _listenerSha256, _coreSha256, _memSha256, _contentSha256, _contentMd5, _contentSha1, _wrapperVersion;
+    private string? _listenerSha256, _coreSha256, _memSha256, _contentSha256, _contentMd5, _contentSha1, _contentSet, _wrapperVersion;
     // Ce que le coeur declare de lui-meme : « FinalBurn Neo », « 0.289 (eb342748) ». Indice,
     // jamais preuve - c'est l'empreinte qui tranche. Il dit QUELLE source verifier.
     private string? _coreName, _coreVersion;
@@ -430,7 +430,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     {
         lock (_sync)
         {
-            _listenerSha256 = _coreSha256 = _memSha256 = _contentSha256 = _contentMd5 = _contentSha1 = _wrapperVersion = null;
+            _listenerSha256 = _coreSha256 = _memSha256 = _contentSha256 = _contentMd5 = _contentSha1 = _contentSet = _wrapperVersion = null;
             _coreName = _coreVersion = null;
             _ticket = null;
             _lastFrame = 0;
@@ -478,6 +478,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _contentSha256 = GetString(root, "ContentSha256");
             _contentMd5 = GetString(root, "ContentMd5");
             _contentSha1 = GetString(root, "ContentSha1");
+            _contentSet = GetString(root, "ContentSet");
             _wrapperVersion = GetString(root, "WrapperVersion");
             _coreName = GetString(root, "CoreName");
             _coreVersion = GetString(root, "CoreVersion");
@@ -506,7 +507,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
             var coreOptions = FilterGameplayCoreOptions(GetString(attestation, "CoreOptions"));
             var digest = !string.IsNullOrEmpty(coreOptions) ? Crypto.Sha256Hex(coreOptions) : Crypto.Sha256Hex("core-options@default");
-            var contentSha1 = GetString(attestation, "ContentSha1") ?? GamelistIdentity.DeclaredSha1(systemId, romGroup);
+            var contentSha1 = GetString(attestation, "ContentSha1")
+                ?? GamelistIdentity.DeclaredSha1(systemId, romGroup, SetArcade(systemId, GetString(attestation, "ContentSet")));
             var mesures = new JsonObject
             {
                 ["system_id"] = systemId,
@@ -724,6 +726,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
         return gardes;
     }
+
+    /// <summary>
+    /// Le set lance compte pour l'ARCADE seulement : c'est lui qui distingue deux jeux au meme nom
+    /// (ddragon, le Double Dragon de Technos ouvert au scoring, et doubledr, celui de la Neo-Geo).
+    /// Sans lui, l'identite etait lue par le nom du groupe, et le Double Dragon Neo-Geo s'annoncait
+    /// « certifiable » avec le sha1 de celui de Technos (2026-09-25). Une console garde sa recherche
+    /// par nom : son contenu est mesure sur le fichier.
+    /// </summary>
+    internal static string? SetArcade(string? systemId, string? set)
+        => string.Equals(systemId, "arcade", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(set)
+            ? set.Trim()
+            : null;
 
     /// <summary>
     /// Personne n'a joué tant que le score n'est jamais monté. Metal Slug 3 sous MAME, 2026-09-25 :
@@ -1033,14 +1047,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             return;
         }
 
-        string? listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion;
+        string? listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, contentSet, wrapperVersion, coreName, coreVersion;
         long? finalTotal;
         List<(long frame, long total)> trajectory;
         List<EvenementDeVie> vies;
         lock (_sync)
         {
             listenerSha = _listenerSha256; coreSha = _coreSha256; memSha = _memSha256;
-            contentSha = _contentSha256; contentMd5 = _contentMd5; contentSha1 = _contentSha1; wrapperVersion = _wrapperVersion; finalTotal = _finalTotal;
+            contentSha = _contentSha256; contentMd5 = _contentMd5; contentSha1 = _contentSha1; contentSet = _contentSet; wrapperVersion = _wrapperVersion; finalTotal = _finalTotal;
             coreName = _coreName; coreVersion = _coreVersion;
             trajectory = new List<(long, long)>(_trajectory);
             vies = new List<EvenementDeVie>(_vies);
@@ -1085,7 +1099,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // wrapper a reellement mesure (md5, sha256).
         if (string.IsNullOrEmpty(contentSha1) && !string.IsNullOrEmpty(romGroup))
         {
-            contentSha1 = GamelistIdentity.DeclaredSha1(systemId, romGroup);
+            contentSha1 = GamelistIdentity.DeclaredSha1(systemId, romGroup, SetArcade(systemId, contentSet));
             Trace($"identite declaree : sha1={(contentSha1 is null ? "introuvable" : contentSha1)} (sys={systemId} rom={romGroup})");
         }
 

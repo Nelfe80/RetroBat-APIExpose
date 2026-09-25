@@ -1,5 +1,8 @@
+using System.Collections.Concurrent;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
@@ -66,6 +69,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// plus rien.
     /// </summary>
     private readonly Func<bool> _emulateurTourne;
+    private readonly Func<InstalledGame, OpenGame, bool> _contenuConfirme;
 
     private DateTime _dernierAppelUtc = DateTime.MinValue;
     /// <summary>Les chemins retenus au dernier passage, pour repondre sans relire le disque.</summary>
@@ -90,7 +94,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         ILogger<NelfePlayScoringCollectionSyncService>? logger = null,
         string? stateRoot = null,
         TimeSpan? minimumEntreDeuxAppels = null,
-        Func<bool>? emulateurTourne = null)
+        Func<bool>? emulateurTourne = null,
+        Func<InstalledGame, OpenGame, bool>? contenuConfirme = null)
     {
         _httpFactory = httpFactory;
         _options = options;
@@ -107,6 +112,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         // Garde-fou du CDC : aucun appel a moins de 30 s d'intervalle.
         _minimumEntreDeuxAppels = minimumEntreDeuxAppels ?? TimeSpan.FromSeconds(30);
         _emulateurTourne = emulateurTourne ?? EmulatorForeground.EmulateurTourne;
+        _contenuConfirme = contenuConfirme
+            ?? ((candidat, jeu) => ContenuConfirme(candidat, jeu, GamelistIdentity.DeclaredSha1, Md5DuContenu));
     }
 
     /// <summary>Le dernier etat connu, tel que l'endpoint de statut le publie.</summary>
@@ -455,7 +462,25 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 continue;
             }
 
-            var choisi = Choisir(candidats, jeu, precedents, Lancement);
+            // LE CONTENU D'ABORD, LE CHOIX ENSUITE.
+            //
+            // Les candidats sont regroupes par NOM, et deux jeux peuvent porter le meme : le Double
+            // Dragon Neo-Geo (doubledr, un jeu de combat de 1995) et celui de Technos (ddragon, le
+            // beat'em up ouvert au scoring) donnent tous deux « double-dragon ». Le hash ne servait
+            // qu'a CLASSER les candidats : sans dump reconnu, le plus proche du groupe entrait quand
+            // meme, et un fichier deja choisi restait choisi. Un joueur a vu « Partie certifiable »
+            // sur un Double Dragon, et rien n'est parti (2026-09-25).
+            //
+            // Un fichier n'est desormais candidat que si son contenu est CONFIRME. La collection se
+            // reconstruit ainsi d'elle-meme a chaque passe : ce qui n'est pas confirme en sort.
+            var confirmes = candidats.Where(candidat => _contenuConfirme(candidat, jeu)).ToList();
+            if (confirmes.Count == 0)
+            {
+                manques.Add(jeu.RomGroup + " : ROM non reconnue (ce n'est pas la version classée)");
+                continue;
+            }
+
+            var choisi = Choisir(confirmes, jeu, precedents, Lancement);
             if (choisi is { Length: > 0 })
             {
                 retenus.Add(choisi);
@@ -532,7 +557,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
 
     /// <summary>
     /// Plusieurs dumps du meme jeu peuvent etre installes : on garde le chemin deja choisi, ou
-    /// celui dont le hash est reconnu par le profil, sinon le plus proche du groupe.
+    /// celui dont le hash est reconnu par le profil, sinon le plus proche du groupe. Ne recoit
+    /// que des candidats au contenu CONFIRME (voir <see cref="ContenuConfirme"/>) : ce classement
+    /// departage des dumps valables, il ne fait plus entrer un jeu.
     ///
     /// Avant tout cela vient le RANG DE LANCEMENT : entre un dump qui se rejouera et un dump
     /// qui ne se rejouera pas, il n'y a pas d'hesitation a avoir, et cela vaut aussi contre un
@@ -580,6 +607,91 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             .ThenBy(candidat => candidat.AbsolutePath, StringComparer.OrdinalIgnoreCase)
             .First()
             .AbsolutePath;
+    }
+
+    /// <summary>
+    /// Le contenu de ce fichier est-il celui que le profil a homologue ?
+    ///
+    /// - Un md5 ou un hash RetroAchievements egal a ceux du profil suffit (consoles, et zip
+    ///   d'arcade identique a celui du profil).
+    /// - ARCADE : le md5 d'un zip ne prouve rien, il change avec l'outil qui l'a fabrique (trois
+    ///   md5 differents pour 1942 chez six joueurs classes). La preuve est le SET : son sha1 declare
+    ///   au referentiel doit etre celui du profil, et l'emulateur verifie lui-meme le contenu du set
+    ///   contre sa base au chargement. ddragon porte le sha1 de Double Dragon, doubledr celui du
+    ///   BIOS Neo-Geo : le second n'entre jamais, meme sous le meme nom.
+    /// - Une console sans hash dans sa gamelist (jeu jamais scrape) : la borne calcule le md5 du
+    ///   fichier, ou du fichier unique d'un zip, plutot que de l'exclure a tort.
+    /// </summary>
+    internal static bool ContenuConfirme(
+        InstalledGame candidat,
+        OpenGame jeu,
+        Func<string?, string?, string?, string?> sha1DuSet,
+        Func<string, string?> md5DuContenu)
+    {
+        var hashes = jeu.ContentHashes;
+        if (hashes is null) return false;
+        var sha1s = new HashSet<string>((hashes.Sha1 ?? []).Where(h => h.Length > 0), StringComparer.OrdinalIgnoreCase);
+        var connus = new HashSet<string>(
+            (hashes.Md5 ?? []).Concat(hashes.Sha1 ?? []).Concat(hashes.Sha256 ?? []).Where(h => h.Length > 0),
+            StringComparer.OrdinalIgnoreCase);
+        if (connus.Count == 0) return false;
+
+        if (candidat.Md5 is { Length: > 0 } md5 && connus.Contains(md5)) return true;
+        if (candidat.CheevosHash is { Length: > 0 } ra && connus.Contains(ra)) return true;
+
+        if (string.Equals(candidat.CanonicalSystemId, "arcade", StringComparison.OrdinalIgnoreCase))
+        {
+            var set = Path.GetFileNameWithoutExtension(candidat.AbsolutePath);
+            var sha1 = set.Length == 0 ? null : sha1DuSet(candidat.CanonicalSystemId, jeu.RomGroup, set);
+            return sha1 is { Length: > 0 } && sha1s.Contains(sha1);
+        }
+
+        var calcule = md5DuContenu(candidat.AbsolutePath);
+        return calcule is { Length: > 0 } && connus.Contains(calcule);
+    }
+
+    /// <summary>Au-dela, ce n'est plus une cartouche : on ne lit pas un disque entier pour une collection.</summary>
+    private const long PlafondMd5 = 64L * 1024 * 1024;
+
+    private static readonly ConcurrentDictionary<string, string?> Md5Calcules = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Le md5 du CONTENU : celui du fichier, ou du fichier unique d'un zip (une cartouche zippee a le
+    /// md5 de sa ROM, pas celui de son emballage). Garde en memoire tant que le fichier ne change pas.
+    /// </summary>
+    internal static string? Md5DuContenu(string chemin)
+    {
+        try
+        {
+            var info = new FileInfo(chemin);
+            if (!info.Exists || info.Length > PlafondMd5) return null;
+            var cle = info.FullName + "|" + info.Length + "|" + info.LastWriteTimeUtc.Ticks;
+            if (Md5Calcules.TryGetValue(cle, out var connu)) return connu;
+
+            string? md5 = null;
+            if (string.Equals(info.Extension, ".zip", StringComparison.OrdinalIgnoreCase))
+            {
+                using var zip = ZipFile.OpenRead(info.FullName);
+                var fichiers = zip.Entries.Where(entree => entree.Length > 0).ToList();
+                if (fichiers.Count == 1 && fichiers[0].Length <= PlafondMd5)
+                {
+                    using var flux = fichiers[0].Open();
+                    md5 = Convert.ToHexString(MD5.HashData(flux)).ToLowerInvariant();
+                }
+            }
+            else
+            {
+                using var flux = File.OpenRead(info.FullName);
+                md5 = Convert.ToHexString(MD5.HashData(flux)).ToLowerInvariant();
+            }
+
+            Md5Calcules[cle] = md5;
+            return md5;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
+        {
+            return null;
+        }
     }
 
     private HashSet<string> LireCollectionPrecedente()
