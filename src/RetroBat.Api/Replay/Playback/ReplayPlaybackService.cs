@@ -278,11 +278,27 @@ public sealed class ReplayPlaybackService
         //    lieu d'aller à notre routeur). config_save_on_exit=false => AUCUNE persistance :
         //    la config normale de l'utilisateur reste intacte. Appliqué via --appendconfig. ──
         var sessionCfg = Path.Combine(_objects.TempRoot, "replay-session.cfg");
+        // UN REPLAY NE TOUCHE PAS AUX SAUVEGARDES DU JOUEUR (2026-09-25). La lecture heritait du
+        // dossier de sauvegarde du dernier jeu lance : elle a ecrit une EEPROM vierge de 19xx dans
+        // saves/fbneo, qui a fait refuser les parties suivantes, et elle pouvait remplacer la vraie
+        // par l'etat de la partie rejouee. Elle ecrit desormais dans un dossier jetable, vide a chaque
+        // lecture.
+        var sauvegardesReplay = Path.Combine(_objects.TempRoot, "replay-saves");
+        try
+        {
+            if (Directory.Exists(sauvegardesReplay)) Directory.Delete(sauvegardesReplay, recursive: true);
+            Directory.CreateDirectory(sauvegardesReplay);
+        }
+        catch (Exception ex) { _logger.LogWarning(ex, "Replay : dossier de sauvegarde jetable non prepare"); }
         try
         {
             File.WriteAllText(sessionCfg, string.Join('\n', new[]
             {
                 "config_save_on_exit = \"false\"",
+                "savefile_directory = \"" + sauvegardesReplay.Replace("\"", "") + "\"",
+                "sort_savefiles_enable = \"false\"",
+                "sort_savefiles_by_content_enable = \"false\"",
+                "savefiles_in_content_dir = \"false\"",
                 // Capture PIXEL PERFECT : « false » photographie le tampon du coeur, a la
                 // definition d'origine du jeu (384x224 sur CPS-1), au lieu de la sortie GPU
                 // mise a l'echelle avec shaders. C'est ce qui fait de l'image du record une

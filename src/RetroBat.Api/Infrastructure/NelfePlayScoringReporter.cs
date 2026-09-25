@@ -1205,7 +1205,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         JsonArray? nvram = null;
         if (_nvram is not null)
         {
-            try { nvram = await _nvram.PourLePasseportAsync(cancellationToken).ConfigureAwait(false); }
+            try { nvram = await _nvram.PourLePasseportAsync(NvramSnapshotService.EpinglesDuProfil(profile), cancellationToken).ConfigureAwait(false); }
             catch (Exception ex) { Trace($"NVRAM indisponible : {ex.Message}"); }
         }
 

@@ -39,6 +39,9 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly IEsSettingsStore _esSettings;
     private readonly RetroBat.Api.Replay.Playback.ReplayPlaybackService? _playback;
+    private readonly NvramSnapshotService? _nvram;
+    // Les NVRAM epinglees par profil (« fbneo/19xx.nv »), apprises avec les reglages attendus.
+    private readonly Dictionary<string, IReadOnlyList<string>> _epingles = new(StringComparer.OrdinalIgnoreCase);
     private readonly ILogger<CertifiedSettingsService>? _logger;
     private IDisposable? _abonnement;
     // Un jeu ouvert se reconnait a la selection dans le menu, ou l'on passe des dizaines de
@@ -56,9 +59,11 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         IOptionsMonitor<ApiExposeOptions> options,
         IEsSettingsStore esSettings,
         ILogger<CertifiedSettingsService>? logger = null,
-        RetroBat.Api.Replay.Playback.ReplayPlaybackService? playback = null)
+        RetroBat.Api.Replay.Playback.ReplayPlaybackService? playback = null,
+        NvramSnapshotService? nvram = null)
     {
         _playback = playback;
+        _nvram = nvram;
         _bus = bus;
         _httpFactory = httpFactory;
         _devices = devices;
@@ -245,6 +250,15 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
 
             // Jeu ouvert : les fonctions du frontend d'abord, elles se reglent avant le lancement.
             NeutraliserFrontend(systemeEs, fichier);
+            // Puis la NVRAM que le profil epingle, A LA SELECTION seulement : au lancement, la
+            // capture du depart est deja partie, et l'effacer apres coup ferait mentir le passeport.
+            // Apres chaque partie certifiee, le passeport l'efface aussi (NvramSnapshotService).
+            IReadOnlyList<string>? epingles;
+            lock (_verrou) _epingles.TryGetValue(systeme + "|" + romGroup, out epingles);
+            if (selection && epingles is { Count: > 0 } && _nvram is not null)
+            {
+                _nvram.EffacerEpinglees(systemeEs, Path.GetFileNameWithoutExtension(chemin), epingles);
+            }
             if (attendus.Count == 0)
             {
                 if (!selection) Effacer();
@@ -296,6 +310,8 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         if (!response.IsSuccessStatusCode) return null;
         using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
         if (!doc.RootElement.TryGetProperty("profile", out var profil)) return null;
+        var epingles = NvramSnapshotService.EpinglesDuProfil(profil);
+        lock (_verrou) _epingles[systemId + "|" + romGroup] = epingles;
         if (!profil.TryGetProperty("core_options_expected", out var attendus) || attendus.ValueKind != JsonValueKind.Array)
         {
             return new Dictionary<string, string>(StringComparer.Ordinal);
