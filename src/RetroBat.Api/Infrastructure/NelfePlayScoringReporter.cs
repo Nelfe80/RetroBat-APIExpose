@@ -726,6 +726,21 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     /// <summary>
+    /// Personne n'a joué tant que le score n'est jamais monté. Metal Slug 3 sous MAME, 2026-09-25 :
+    /// la machine lit 63 au démarrage puis se réinitialise d'elle-même une quinzaine de secondes
+    /// après le lancement. Le pont Lua refermait là une session de 63 points, à CHAQUE lancement,
+    /// qui serait partie au classement une fois le jeu ouvert au scoring.
+    /// </summary>
+    internal static bool ScoreAMonte(IReadOnlyList<(long frame, long total)> trajectoire)
+    {
+        for (var i = 1; i < trajectoire.Count; i++)
+        {
+            if (trajectoire[i].total > trajectoire[i - 1].total) return true;
+        }
+        return false;
+    }
+
+    /// <summary>
     /// La démo commence sur un état DEMO ; elle ne finit que sur un état « en jeu ». Beaucoup de
     /// .MEM n'en déclarent aucun (Metal Slug 3, Altered Beast, 19xx...) : sans autre signal, une
     /// démo vue une fois laissait toute la suite marquée démo, et la vraie partie ne comptait pas.
@@ -1043,6 +1058,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 // Rien de joué : pas de filet sur le dernier total, qui serait celui de l'attract.
                 if (trajectory.Count == 0) finalTotal = null;
             }
+        }
+
+        // Un score qui n'est jamais monté : personne n'a joué (lecture de démarrage, reset de la
+        // machine, coup d'oeil au titre). On s'arrête sans rien soumettre ni rien annoncer.
+        if (finalTotal is not null && !ScoreAMonte(trajectory))
+        {
+            Trace($"STOP: le score n'est jamais monte ({trajectory.Count} lecture(s), dernier total {finalTotal}) : personne n'a joue");
+            return;
         }
 
         // ARCADE : l'identite du contenu n'est pas mesurable depuis le fichier.
