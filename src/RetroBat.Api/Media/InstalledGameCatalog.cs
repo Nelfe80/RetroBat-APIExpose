@@ -119,7 +119,11 @@ public sealed class InstalledGameCatalog
                     noeud.Element("name")?.Value?.Trim(),
                     Text(noeud, "md5"),
                     Text(noeud, "cheevosHash") ?? Text(noeud, "hash"),
-                    fromGamelist: true));
+                    fromGamelist: true,
+                    // Le choix d'emulateur fait POUR CE JEU dans EmulationStation : c'est une
+                    // metadonnee de la fiche, pas un reglage d'es_settings.
+                    emulateur: Text(noeud, "emulator"),
+                    coeur: Text(noeud, "core")));
             }
         }
 
@@ -143,7 +147,9 @@ public sealed class InstalledGameCatalog
         string? displayName,
         string? md5,
         string? cheevosHash,
-        bool fromGamelist)
+        bool fromGamelist,
+        string? emulateur = null,
+        string? coeur = null)
     {
         var fichier = Path.GetFileName(absolutePath);
         var groupe = _canonical.ResolveScoreSlug(frontendSystemId, fichier, md5, cheevosHash);
@@ -156,7 +162,9 @@ public sealed class InstalledGameCatalog
             Normalize(md5),
             Normalize(cheevosHash),
             fromGamelist,
-            groupe is { Length: > 0 } ? OfficialDefinitionPath(canonicalSystemId, groupe) : null);
+            groupe is { Length: > 0 } ? OfficialDefinitionPath(canonicalSystemId, groupe) : null,
+            string.IsNullOrWhiteSpace(emulateur) ? null : emulateur.Trim(),
+            string.IsNullOrWhiteSpace(coeur) ? null : coeur.Trim());
     }
 
     /// <summary>
@@ -363,7 +371,9 @@ public sealed record InstalledGame(
     string? Md5,
     string? CheevosHash,
     bool FromGamelist,
-    string? OfficialDefinitionPath)
+    string? OfficialDefinitionPath,
+    string? Emulator = null,
+    string? Core = null)
 {
     public bool ScorableLocal => RomGroup.Length > 0;
 }

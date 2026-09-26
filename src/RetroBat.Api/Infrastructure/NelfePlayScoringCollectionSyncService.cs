@@ -487,7 +487,18 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 continue;
             }
 
-            var choisi = Choisir(confirmes, jeu, precedents, Lancement);
+            // CE QUI SE MESURE, ET RIEN D'AUTRE. Un dump reconnu lance par un coeur qui ne lit rien
+            // (MAME 2003-Plus choisi en automatique pour 19xx, 2026-09-26) promettait une partie
+            // classee et n'envoyait aucun score.
+            var mesurables = confirmes.Where(candidat => Observabilite(candidat).Observable).ToList();
+            if (mesurables.Count == 0)
+            {
+                var raison = Observabilite(confirmes[0]).Raison ?? "cœur non mesurable";
+                manques.Add($"{jeu.RomGroup} : {raison} (choisir « libretro : mame », « MAME autonome » ou FBNeo pour le système {confirmes[0].FrontendSystemId})");
+                continue;
+            }
+
+            var choisi = Choisir(mesurables, jeu, precedents, Lancement);
             if (choisi is { Length: > 0 })
             {
                 retenus.Add(choisi);
@@ -558,6 +569,32 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
 
     /// <summary>Pourquoi chaque jeu ouvert n'est pas dans la collection de cette borne.</summary>
     private IReadOnlyList<string> _manques = [];
+
+    /// <summary>
+    /// Le coeur qui lancera ce fichier mesure-t-il ? Le choix du jeu passe devant celui du systeme.
+    /// Sans services (tests), on ne retire rien.
+    /// </summary>
+    private CoeursObservables.Verdict Observabilite(InstalledGame candidat)
+    {
+        if (_systemes == null || _reglages == null)
+        {
+            return new CoeursObservables.Verdict(true, null);
+        }
+
+        try
+        {
+            var (lancement, coeurChoisi) = _systemes.ResolveGameLaunchConfig(
+                candidat.FrontendSystemId,
+                candidat.Emulator,
+                candidat.Core,
+                _reglages.GetAllSettings());
+            return CoeursObservables.Juger(lancement, coeurChoisi, _systemes.GetEmulatorCores(candidat.FrontendSystemId));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return new CoeursObservables.Verdict(true, null);
+        }
+    }
 
     /// <summary>
     /// Ce que CETTE borne lancerait pour ce systeme d'EmulationStation : son reglage

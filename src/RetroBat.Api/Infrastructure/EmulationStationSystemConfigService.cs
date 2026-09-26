@@ -62,6 +62,49 @@ public sealed class EmulationStationSystemConfigService
             string.IsNullOrWhiteSpace(core) ? selected?.Core ?? string.Empty : core);
     }
 
+    /// <summary>
+    /// Le lancement d'UN jeu. Le choix fait pour lui dans EmulationStation (metadonnees
+    /// &lt;emulator&gt; et &lt;core&gt; de sa fiche) passe devant celui du systeme. CoeurChoisi dit si
+    /// un coeur est designe quelque part : sinon, en automatique, RetroBat choisit lui-meme, jeu par
+    /// jeu, parmi les coeurs MAME.
+    /// </summary>
+    public (EmulationStationLaunchConfig Lancement, bool CoeurChoisi) ResolveGameLaunchConfig(
+        string systemId,
+        string? emulateurDuJeu,
+        string? coeurDuJeu,
+        IReadOnlyDictionary<string, string> esSettings)
+    {
+        var (reglages, coeurChoisi) = ReglagesDuJeu(systemId, emulateurDuJeu, coeurDuJeu, esSettings);
+        return (ResolveLaunchConfig(systemId, reglages), coeurChoisi);
+    }
+
+    /// <summary>
+    /// Les reglages du systeme, recouverts par le choix du jeu. Un « auto » du jeu laisse celui du systeme.
+    /// </summary>
+    internal static (IReadOnlyDictionary<string, string> Reglages, bool CoeurChoisi) ReglagesDuJeu(
+        string systemId,
+        string? emulateurDuJeu,
+        string? coeurDuJeu,
+        IReadOnlyDictionary<string, string> esSettings)
+    {
+        var systeme = Normalize(systemId);
+        var fusion = new Dictionary<string, string>(esSettings, StringComparer.OrdinalIgnoreCase);
+        var emulateur = NormalizeAuto(emulateurDuJeu ?? string.Empty);
+        var coeur = NormalizeAuto(coeurDuJeu ?? string.Empty);
+        if (emulateur.Length > 0)
+        {
+            fusion[$"{systeme}.emulator"] = emulateur;
+        }
+
+        if (coeur.Length > 0)
+        {
+            fusion[$"{systeme}.core"] = coeur;
+        }
+
+        var coeurChoisi = NormalizeAuto(ReadSetting(fusion, $"{systeme}.core")).Length > 0;
+        return (fusion, coeurChoisi);
+    }
+
     private IReadOnlyDictionary<string, IReadOnlyList<EmulationStationSystemEmulatorCore>> ReadAll()
     {
         var path = Path.Combine(RetroBatPaths.EmulationStationConfigRoot, "es_systems.cfg");

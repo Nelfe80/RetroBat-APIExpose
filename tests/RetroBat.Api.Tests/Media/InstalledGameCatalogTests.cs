@@ -219,6 +219,21 @@ public class InstalledGameCatalogTests : IDisposable
         Assert.Empty(RomCanonicalResolver.FrontendSystemsFor(""));
     }
 
+    [Fact]
+    public void Le_choix_d_emulateur_de_la_fiche_est_lu()
+    {
+        // 2026-09-26 : « libretro : mame » choisi pour 19xx dans ES est une metadonnee de la fiche,
+        // pas un reglage d'es_settings. La liste blanche des coeurs mesurables doit la voir.
+        PoserRom("mame", "19xx.zip");
+        PoserGamelist("mame", "<gameList><game><path>./19xx.zip</path><name>19XX</name><emulator>libretro</emulator><core>mame</core></game></gameList>");
+        var resolveur = new FauxResolveur { ["19xx.zip"] = "19xx-the-war-against-destiny" };
+
+        var jeu = Assert.Single(Catalogue(resolveur).Enumerate(new[] { "arcade" }), j => j.FrontendSystemId == "mame");
+
+        Assert.Equal("libretro", jeu.Emulator);
+        Assert.Equal("mame", jeu.Core);
+    }
+
     /// <summary>Le referentiel .MEM en memoire : le vrai lit resources/ram, hors de portee d'un test.</summary>
     private sealed class FauxResolveur : IScoreSlugResolver
     {
