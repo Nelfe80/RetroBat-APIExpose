@@ -25,6 +25,15 @@ public sealed class StartupController : ControllerBase
     [ProducesResponseType(typeof(StartupReadyResponse), StatusCodes.Status503ServiceUnavailable)]
     public ActionResult<StartupReadyResponse> Ready()
     {
+        if (_readiness.ArretEnCours)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new StartupReadyResponse
+            {
+                Status = "stopping",
+                Ready = false
+            });
+        }
+
         if (!_readiness.IsReady)
         {
             return StatusCode(StatusCodes.Status503ServiceUnavailable, new StartupReadyResponse

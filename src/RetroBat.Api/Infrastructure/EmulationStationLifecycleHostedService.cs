@@ -14,6 +14,7 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
     private readonly EsControllerInputBackendProvider _backendProvider;
     private readonly MediaRuntimeState _runtimeState;
     private readonly IHostApplicationLifetime _applicationLifetime;
+    private readonly StartupReadinessState? _readiness;
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly ILogger<EmulationStationLifecycleHostedService> _logger;
     private readonly HttpClient _httpClient = new() { BaseAddress = new Uri("http://127.0.0.1:1234"), Timeout = TimeSpan.FromSeconds(2) };
@@ -37,8 +38,10 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
         IEventBus eventBus,
         IHostApplicationLifetime applicationLifetime,
         IOptionsMonitor<ApiExposeOptions> options,
-        ILogger<EmulationStationLifecycleHostedService> logger)
+        ILogger<EmulationStationLifecycleHostedService> logger,
+        StartupReadinessState? readiness = null)
     {
+        _readiness = readiness;
         _esFeaturesMenuDeploymentService = esFeaturesMenuDeploymentService;
         _backendProvider = backendProvider;
         _runtimeState = runtimeState;
@@ -167,6 +170,9 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
         CancellationToken cancellationToken)
     {
         _logger.LogInformation("EmulationStation exited; APIExpose is cleaning ES features and stopping.");
+        // Des maintenant, plus « prete » : un ES qui redemarre pendant le nettoyage (qui peut durer
+        // plus d'une demi-minute) remplacera cette API au lieu de la croire en service.
+        _readiness?.MarquerArret();
 
         if (_options.CurrentValue.Scraping.MergePendingOnEsExit)
         {
