@@ -395,6 +395,9 @@ builder.Services.AddSingleton(sp => new RetroBat.Api.Infrastructure.CoreMemoryCa
     sp.GetService<ILogger<RetroBat.Api.Infrastructure.CoreMemoryCapability>>()));
 builder.Services.AddSingleton<NelfePlayScoringCollectionSyncService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<NelfePlayScoringCollectionSyncService>());
+// Dans World Scoring, notre coeur fonctionnel ; dans le systeme du jeu, le choix de confort du joueur.
+builder.Services.AddSingleton<RetroBat.Api.Infrastructure.WorldScoringLancementService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.WorldScoringLancementService>());
 // Index public des jeux ouverts au scoring : court, lu souvent, jamais authentifie. Pas de
 // redirection suivie, et une reponse anormalement grosse est refusee plutot que chargee.
 builder.Services

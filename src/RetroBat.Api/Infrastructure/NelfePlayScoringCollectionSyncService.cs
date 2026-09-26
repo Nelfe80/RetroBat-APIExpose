@@ -489,12 +489,13 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
 
             // CE QUI SE MESURE, ET RIEN D'AUTRE. Un dump reconnu lance par un coeur qui ne lit rien
             // (MAME 2003-Plus choisi en automatique pour 19xx, 2026-09-26) promettait une partie
-            // classee et n'envoyait aucun score.
-            var mesurables = confirmes.Where(candidat => Observabilite(candidat).Observable).ToList();
+            // classee et n'envoyait aucun score. Depuis, World Scoring impose son coeur fonctionnel
+            // quand le lancement du joueur ne mesure pas (WorldScoringLancementService) : n'est
+            // ecarte que le jeu dont le systeme ne declare aucun coeur qui mesure.
+            var mesurables = confirmes.Where(candidat => Observabilite(candidat).Observable || Imposable(candidat)).ToList();
             if (mesurables.Count == 0)
             {
-                var raison = Observabilite(confirmes[0]).Raison ?? "cœur non mesurable";
-                manques.Add($"{jeu.RomGroup} : {raison} (choisir « libretro : mame », « MAME autonome » ou FBNeo pour le système {confirmes[0].FrontendSystemId})");
+                manques.Add($"{jeu.RomGroup} : aucun cœur qui mesure n'est déclaré pour le système {confirmes[0].FrontendSystemId}");
                 continue;
             }
 
@@ -569,6 +570,11 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
 
     /// <summary>Pourquoi chaque jeu ouvert n'est pas dans la collection de cette borne.</summary>
     private IReadOnlyList<string> _manques = [];
+
+    /// <summary>Un coeur qui mesure peut-il etre impose a ce jeu dans World Scoring ?</summary>
+    private bool Imposable(InstalledGame candidat)
+        => _systemes == null ||
+           CoeursObservables.MeilleurLancement(_systemes.GetEmulatorCores(candidat.FrontendSystemId)) is not null;
 
     /// <summary>
     /// Le coeur qui lancera ce fichier mesure-t-il ? Le choix du jeu passe devant celui du systeme.

@@ -62,6 +62,29 @@ public static class CoeursObservables
         return new Verdict(true, null);
     }
 
+    /// <summary>
+    /// NOTRE COEUR FONCTIONNEL pour un systeme, celui que World Scoring impose quel que soit le choix
+    /// de confort du joueur : FBNeo s'il est declare (le replay et la mesure y sont les plus surs),
+    /// sinon MAME recent, sinon, hors arcade, le premier coeur libretro. Null : rien a imposer.
+    /// </summary>
+    public static (string Emulator, string Core)? MeilleurLancement(IReadOnlyList<EmulationStationSystemEmulatorCore> coeursDuSysteme)
+    {
+        static bool Libretro(EmulationStationSystemEmulatorCore entree) =>
+            entree.Emulator.Equals("libretro", StringComparison.OrdinalIgnoreCase);
+
+        foreach (var voulu in new[] { "fbneo", "mame" })
+        {
+            if (coeursDuSysteme.Any(entree => Libretro(entree) && entree.Core.Equals(voulu, StringComparison.OrdinalIgnoreCase)))
+            {
+                return ("libretro", voulu);
+            }
+        }
+
+        var autre = coeursDuSysteme.FirstOrDefault(entree =>
+            Libretro(entree) && entree.Core.Length > 0 && !EstCoeurArcade(entree.Core));
+        return autre is null ? null : ("libretro", autre.Core);
+    }
+
     private static bool EstCoeurMame(string coeur) => coeur.StartsWith("mame", StringComparison.OrdinalIgnoreCase);
 
     private static bool EstCoeurArcade(string coeur) =>
