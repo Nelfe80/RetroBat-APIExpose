@@ -105,6 +105,41 @@ public static class GamelistIdentity
         return trouve;
     }
 
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, string?> CacheNom = new();
+
+    /// <summary>
+    /// Le NOM declare du jeu (« 19XX: The War Against Destiny »), ou null. Sert a inscrire dans sa
+    /// gamelist un jeu qu'EmulationStation ne connait pas encore : un set d'arcade s'y appellerait
+    /// sinon « 19xx », le nom de son fichier.
+    /// </summary>
+    public static string? DeclaredName(string? systemId, string? nomOuGroupe, string? setOuFichier = null)
+    {
+        var slug = Slugifier(nomOuGroupe);
+        var set = (setOuFichier ?? string.Empty).Trim();
+        if (slug.Length == 0 && set.Length == 0) return null;
+
+        var cle = (systemId ?? "") + "|" + slug + "|" + set;
+        if (CacheNom.TryGetValue(cle, out var connu)) return connu;
+
+        var racine = Path.Combine(AppContext.BaseDirectory, "resources", "gamelist", "systems");
+        var systemes = new List<string>();
+        if (!string.IsNullOrWhiteSpace(systemId)) systemes.Add(systemId.Trim());
+        foreach (var repli in ReplisArcade)
+        {
+            if (!systemes.Contains(repli, StringComparer.OrdinalIgnoreCase)) systemes.Add(repli);
+        }
+
+        string? trouve = null;
+        foreach (var systeme in systemes)
+        {
+            trouve = Chercher(Path.Combine(racine, systeme + "_lt.json"), slug, set, Nom);
+            if (trouve is not null) break;
+        }
+
+        CacheNom[cle] = trouve;
+        return trouve;
+    }
+
     /// <summary>Vrai seulement si le referentiel l'affirme. Un jeu inconnu est laisse tel quel :
     /// tourner une image au hasard serait pire que ne rien faire.</summary>
     public static bool EstVertical(string? systemId, string? nomOuGroupe, string? setOuFichier = null)
@@ -126,6 +161,9 @@ public static class GamelistIdentity
 
     private static string? Orientation(JsonElement root)
         => root.TryGetProperty("ori", out var v) && v.GetString() is { Length: > 0 } o ? o : null;
+
+    private static string? Nom(JsonElement root)
+        => root.TryGetProperty("n", out var v) && v.ValueKind == JsonValueKind.String && v.GetString() is { Length: > 0 } n ? n.Trim() : null;
 
     /// <summary>
     /// Parcourt une gamelist JSONL. On accepte deux correspondances : le « grp » une fois

@@ -8029,6 +8029,78 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         };
     }
 
+    /// <summary>
+    /// Inscrit dans la gamelist du systeme des jeux presents sur le disque qu'elle ne liste pas.
+    ///
+    /// Quand es_settings porte ParseGamelistOnly=true, EmulationStation ne lit plus les dossiers
+    /// de ROMs : un jeu que le joueur vient d'ajouter n'existe pas pour lui tant qu'aucune gamelist
+    /// ne le nomme. La collection World Scoring le listait bien, mais ES n'affiche dans une
+    /// collection que les jeux qu'il a charges : le jeu restait invisible (2026-09-26). Une entree
+    /// minimale (chemin + nom) suffit ; la selection du jeu la completera ensuite.
+    /// </summary>
+    /// <returns>Le nombre d'entrees ajoutees.</returns>
+    public int DeclarerJeuxAbsents(
+        string frontendSystemId,
+        IReadOnlyList<(string CheminAbsolu, string Nom)> jeux,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(frontendSystemId) || jeux.Count == 0)
+        {
+            return 0;
+        }
+
+        var systemRoot = Path.Combine(RetroBatPaths.RomsRoot, frontendSystemId);
+        var gamelistPath = Path.Combine(systemRoot, "gamelist.xml");
+        lock (GetGamelistLock(gamelistPath))
+        {
+            var document = TryLoadOrCreateGamelistDocument(gamelistPath, cancellationToken, "jeux World Scoring absents de la gamelist");
+            if (document?.Root == null)
+            {
+                return 0;
+            }
+
+            var ajoutes = AjouterEntreesAbsentes(document.Root, systemRoot, jeux);
+            if (ajoutes == 0)
+            {
+                return 0;
+            }
+
+            return SaveGamelistDocument(document, gamelistPath, cancellationToken) ? ajoutes : 0;
+        }
+    }
+
+    /// <summary>
+    /// Ajoute a la racine d'une gamelist une entree (chemin relatif + nom) pour chaque jeu qu'elle
+    /// ne nomme pas encore. Un fichier hors du dossier du systeme n'est jamais inscrit.
+    /// </summary>
+    internal static int AjouterEntreesAbsentes(
+        XElement root,
+        string systemRoot,
+        IReadOnlyList<(string CheminAbsolu, string Nom)> jeux)
+    {
+        var connus = root.Elements("game")
+            .Select(game => NormalizeForCompare(game.Element("path")?.Value))
+            .ToHashSet(StringComparer.Ordinal);
+        var ajoutes = 0;
+        foreach (var (cheminAbsolu, nom) in jeux)
+        {
+            var relatif = "./" + Path.GetRelativePath(systemRoot, cheminAbsolu).Replace(Path.DirectorySeparatorChar, '/');
+            if (relatif.StartsWith("./..", StringComparison.Ordinal) ||
+                Path.IsPathRooted(relatif[2..]) ||
+                !connus.Add(NormalizeForCompare(relatif)))
+            {
+                continue;
+            }
+
+            root.Add(new XElement("game",
+                new XElement("path", relatif),
+                new XElement("name", string.IsNullOrWhiteSpace(nom) ? Path.GetFileNameWithoutExtension(cheminAbsolu) : nom.Trim())));
+            ajoutes++;
+        }
+
+        return ajoutes;
+    }
+
     private static XElement FindOrCreateGameNode(XElement root, string relativeGamePath)
     {
         var normalizedTarget = NormalizeForCompare(relativeGamePath);

@@ -46,6 +46,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     private readonly IHttpClientFactory _httpFactory;
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly InstalledGameCatalog _catalog;
+    private readonly GamelistUpdateService? _gamelists;
+    /// <summary>Les jeux retenus que leur gamelist ne liste pas : ES ne les connait peut-etre pas.</summary>
+    private List<(InstalledGame Jeu, string RomGroup)> _aDeclarer = [];
     private readonly EsCustomCollectionWriter _writer;
     private readonly EsCollectionThemeAssets _assets;
     private readonly MediaRuntimeState _runtimeState;
@@ -95,8 +98,10 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         string? stateRoot = null,
         TimeSpan? minimumEntreDeuxAppels = null,
         Func<bool>? emulateurTourne = null,
-        Func<InstalledGame, OpenGame, bool>? contenuConfirme = null)
+        Func<InstalledGame, OpenGame, bool>? contenuConfirme = null,
+        GamelistUpdateService? gamelists = null)
     {
+        _gamelists = gamelists;
         _httpFactory = httpFactory;
         _options = options;
         _catalog = catalog;
@@ -252,6 +257,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             }
 
             var chemins = Intersecter(manifeste, out var candidats);
+            var inscrits = InscrireLesJeuxInconnusDEs();
             _ouverts = chemins.Select(Normaliser).ToHashSet(StringComparer.OrdinalIgnoreCase);
             // La borne dit a la plateforme avec quoi elle lancera ces jeux : la fiche d'un jeu
             // peut alors repondre « votre borne lancera FBNeo » au lieu de rester generale.
@@ -265,7 +271,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 PhysicalMediaWebSocketProjectionService.InvalidateThemeArt();
             }
 
-            if (resultat.Changed || visuel.Changed)
+            if (resultat.Changed || visuel.Changed || inscrits > 0)
             {
                 _logger?.LogInformation(
                     "Collection World Scoring : {Entrees} entrees sur {Distants} jeux ouverts et {Candidats} candidats locaux, revision {Revision}",
@@ -423,6 +429,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         var empreintes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var precedents = LireCollectionPrecedente();
         var retenus = new List<string>();
+        var aDeclarer = new List<(InstalledGame Jeu, string RomGroup)>();
         _coeursParJeu.Clear();
         // POURQUOI CHAQUE JEU MANQUANT MANQUE.
         //
@@ -486,6 +493,10 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 retenus.Add(choisi);
                 var retenu = candidats.FirstOrDefault(candidat =>
                     string.Equals(candidat.AbsolutePath, choisi, StringComparison.OrdinalIgnoreCase));
+                if (retenu is { FromGamelist: false })
+                {
+                    aDeclarer.Add((retenu, jeu.RomGroup));
+                }
                 var coeur = retenu == null ? null : Lancement(retenu.FrontendSystemId)?.Core;
                 if (!string.IsNullOrWhiteSpace(coeur))
                 {
@@ -495,8 +506,54 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         }
 
         _manques = manques;
+        _aDeclarer = aDeclarer;
 
         return retenus;
+    }
+
+    /// <summary>
+    /// UN JEU DE LA COLLECTION DOIT EXISTER POUR EMULATIONSTATION.
+    ///
+    /// ES n'affiche dans une collection que les jeux qu'il a charges dans leur systeme. Avec
+    /// ParseGamelistOnly=true dans es_settings, il ne lit plus les dossiers de ROMs : un jeu que le
+    /// joueur vient d'ajouter manquait a World Scoring alors que notre fichier le listait, et ne
+    /// revenait qu'en remettant un es_settings par defaut (rapport testeur, 2026-09-26). La
+    /// collection ne depend plus de ce reglage : un jeu retenu que sa gamelist ne nomme pas y est
+    /// inscrit, et le rechargement qui suit le fait connaitre a ES.
+    /// </summary>
+    private int InscrireLesJeuxInconnusDEs()
+    {
+        if (_gamelists == null || _aDeclarer.Count == 0)
+        {
+            return 0;
+        }
+
+        var total = 0;
+        foreach (var systeme in _aDeclarer.GroupBy(entree => entree.Jeu.FrontendSystemId, StringComparer.OrdinalIgnoreCase))
+        {
+            var jeux = systeme
+                .Select(entree => (entree.Jeu.AbsolutePath,
+                    GamelistIdentity.DeclaredName(systeme.Key, entree.RomGroup, Path.GetFileNameWithoutExtension(entree.Jeu.AbsolutePath))
+                        ?? entree.Jeu.DisplayName))
+                .ToList();
+            try
+            {
+                total += _gamelists.DeclarerJeuxAbsents(systeme.Key, jeux);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Xml.XmlException)
+            {
+                _logger?.LogWarning(ex, "Collection World Scoring : gamelist de {Systeme} non completee", systeme.Key);
+            }
+        }
+
+        if (total > 0)
+        {
+            _logger?.LogInformation(
+                "Collection World Scoring : {Nombre} jeu(x) inscrit(s) dans leur gamelist pour qu'EmulationStation les charge",
+                total);
+        }
+
+        return total;
     }
 
     /// <summary>Pourquoi chaque jeu ouvert n'est pas dans la collection de cette borne.</summary>
