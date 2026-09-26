@@ -31,7 +31,7 @@ public class CoeursObservablesTests
     [InlineData("libretro", "mame2003_plus", false)]
     [InlineData("libretro", "mame2016", false)]
     [InlineData("libretro", "fbalpha2012", false)]
-    [InlineData("groovymame", "", false)]
+    [InlineData("groovymame", "", true)]
     [InlineData("fbneo", "arcade", false)]
     public void Un_coeur_designe_est_juge_sur_la_liste_blanche(string emulateur, string coeur, bool attendu)
         => Assert.Equal(attendu, Juger(emulateur, coeur, choisi: true, SystemeMame).Observable);

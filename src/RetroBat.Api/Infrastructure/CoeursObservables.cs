@@ -10,13 +10,14 @@ namespace RetroBat.Api.Infrastructure;
 /// propose donc plus que ce qui a ete verifie :
 /// - FBNeo sous RetroArch : le wrapper lit sa memoire ;
 /// - MAME recent sous RetroArch et MAME autonome : le plugin Lua mesure.
-/// Les autres coeurs d'arcade (anciens MAME, FBAlpha, groovymame, FBNeo autonome) n'entrent pas.
+/// Les autres coeurs d'arcade (anciens MAME, FBAlpha, FBNeo autonome) n'entrent pas.
 /// Hors arcade, on ne juge pas ici : c'est le wrapper qui mesure les coeurs libretro de console.
 /// </summary>
 public static class CoeursObservables
 {
     private static readonly HashSet<string> CoeursArcadeMesures = new(StringComparer.OrdinalIgnoreCase) { "fbneo", "mame" };
-    private static readonly HashSet<string> EmulateursAutonomesMesures = new(StringComparer.OrdinalIgnoreCase) { "mame64" };
+    // groovymame est MAME autonome, aligne sur lui (precision user 2026-09-27) : meme plugin Lua.
+    private static readonly HashSet<string> EmulateursAutonomesMesures = new(StringComparer.OrdinalIgnoreCase) { "mame64", "groovymame" };
 
     public sealed record Verdict(bool Observable, string? Raison);
 
