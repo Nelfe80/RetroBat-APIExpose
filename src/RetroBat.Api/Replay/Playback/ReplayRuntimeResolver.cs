@@ -81,13 +81,22 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
     private readonly ILogger<ReplayRuntimeResolver> _logger;
 
     private readonly Media.InstalledGameCatalog? _catalogue;
+    private readonly Infrastructure.CabinetLocale? _locale;
 
     public ReplayRuntimeResolver(EsSystemsRomPaths romPaths, Storage.IReplayManifestStore manifests,
         Storage.IReplayMetadataStore meta, ILogger<ReplayRuntimeResolver> logger,
-        Media.InstalledGameCatalog? catalogue = null)
+        Media.InstalledGameCatalog? catalogue = null,
+        Infrastructure.CabinetLocale? locale = null)
     {
         _romPaths = romPaths; _manifests = manifests; _meta = meta; _logger = logger; _catalogue = catalogue;
+        _locale = locale;
     }
+
+    /// <summary>
+    /// L'avertissement s'affiche dans le bandeau et dans l'etat de lecture : dans la langue de la
+    /// borne. Sans langue connue, le francais d'origine.
+    /// </summary>
+    private string Texte(string cle) => Infrastructure.CabinetAnnounceText.Get(cle, _locale?.Langue ?? "fr");
 
     public RuntimeResolution Resolve(ReplayManifest manifest, ReplayLaunchHint? hint)
     {
@@ -116,10 +125,10 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
             // rejouait sur un MAME 0.287 (2026-09-23) : vingt secondes de lecture, puis retour
             // a EmulationStation sans un mot.
             var version = VersionDuFichier(core);
-            var nom = string.IsNullOrWhiteSpace(manifest.Runtime.CoreName) ? "ce cœur" : manifest.Runtime.CoreName;
-            avertissement = "Ce record a été enregistré avec une autre version de " + nom
-                + (version.Length > 0 ? " : cette borne a la " + version : "")
-                + ". La lecture peut s'interrompre avant la fin.";
+            var nom = string.IsNullOrWhiteSpace(manifest.Runtime.CoreName) ? Texte("replay_this_core") : manifest.Runtime.CoreName;
+            avertissement = version.Length > 0
+                ? string.Format(Texte("replay_core_other_local"), nom, version)
+                : string.Format(Texte("replay_core_other"), nom);
             _logger.LogInformation(
                 "Replay resolver : core NON identique à l'enregistrement pour {Id} — {Core} local en version {Version}, lecture best-effort.",
                 manifest.ReplayId, Path.GetFileName(core), version.Length > 0 ? version : "inconnue");
@@ -402,9 +411,9 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
         if (autre is not null)
         {
             exacte = false;
-            pourquoi = "Cette borne n'a pas le fichier exact sur lequel ce record a été joué"
-                + (crc.Length > 0 ? " (empreinte " + crc + ")" : string.Empty)
-                + " : la lecture part sur " + Path.GetFileName(autre) + ". Si le jeu diffère (région, révision), le replay peut dériver.";
+            pourquoi = crc.Length > 0
+                ? string.Format(Texte("replay_rom_other_crc"), Path.GetFileName(autre), crc)
+                : string.Format(Texte("replay_rom_other"), Path.GetFileName(autre));
             return autre;
         }
 

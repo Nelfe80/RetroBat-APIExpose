@@ -45,6 +45,7 @@ public sealed class CoreMemoryCapability
     private readonly ILogger<CoreMemoryCapability>? _logger;
     private IDisposable? _abonnement;
     private LiveContestOverlayService? _bandeau;
+    private CabinetLocale? _locale;
     /// <summary>Le dernier coeur annonce muet : on ne repete pas le bandeau a chaque partie.</summary>
     private string? _dernierMuet;
 
@@ -59,9 +60,10 @@ public sealed class CoreMemoryCapability
     /// Ecoute les proces-verbaux que le wrapper publie a chaque lancement. Le provider ne juge
     /// pas : il publie sa ligne, et la liste se remplit ici.
     /// </summary>
-    public void Ecouter(IEventBus bus, LiveContestOverlayService? bandeau = null)
+    public void Ecouter(IEventBus bus, LiveContestOverlayService? bandeau = null, CabinetLocale? locale = null)
     {
         _bandeau = bandeau;
+        _locale = locale;
         _abonnement?.Dispose();
         _abonnement = bus.Subscribe<EventEnvelope>(e =>
         {
@@ -89,11 +91,14 @@ public sealed class CoreMemoryCapability
             if (verdict is { Measures: false } && _dernierMuet != verdict.Core)
             {
                 _dernierMuet = verdict.Core;
+                // Dans la langue de la borne, et en orange comme les autres « aucun score ».
+                var langue = _locale?.Langue ?? "fr";
                 _bandeau?.ShowTop(
                     "SCORING",
-                    "Aucun score ne sera mesuré",
-                    "ce cœur n'expose pas sa mémoire : " + verdict.Core,
-                    8000);
+                    CabinetAnnounceText.Get("scoring_nothing_measured", langue),
+                    string.Format(CabinetAnnounceText.Get("scoring_core_blind", langue), verdict.Core),
+                    8000,
+                    alerte: true);
             }
             else if (verdict is { Measures: true })
             {

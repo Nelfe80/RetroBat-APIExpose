@@ -65,6 +65,9 @@ public sealed class ReplayPlaybackService
     private Process? _process;
     private CancellationTokenSource? _monitorCts;
 
+    /// <summary>Un texte du bandeau dans la langue de la borne.</summary>
+    private string Texte(string cle) => RetroBat.Api.Infrastructure.CabinetAnnounceText.Get(cle, _locale.Langue);
+
     public ReplayPlaybackService(RetroArchReplayClient ra, IReplayManifestStore manifests, IReplayObjectStore objects,
         IReplayMetadataStore meta, IReplaySourceResolver source, IReplayRuntimeResolver resolver,
         IEventBus bus, RetroBat.Api.Infrastructure.NelfePlayAgentService agent,
@@ -263,7 +266,7 @@ public sealed class ReplayPlaybackService
         // regarde un ecran gris en se demandant ce qui se passe.
         if (resolution.Runtime.Avertissement is { Length: > 0 } avertissement)
         {
-            _bandeau?.ShowTop("REPLAY", "Lecture incertaine", avertissement, 8000);
+            _bandeau?.ShowTop("REPLAY", Texte("replay_uncertain"), avertissement, 8000);
         }
         var resolved = resolution.Runtime;
         var coreDll = resolved.CoreDll;
@@ -485,13 +488,13 @@ public sealed class ReplayPlaybackService
                 {
                     var pourcent = (int)Math.Clamp(100.0 * p.Received / p.Total, 0, 100);
                     var reste = p.EtaSeconds is { } eta && eta > 1 && eta < 3600
-                        ? $"encore {Math.Round(eta)} s"
-                        : $"{p.Received / (1024 * 1024)} Mo sur {p.Total / (1024 * 1024)}";
-                    _bandeau.ShowTop("REPLAY", $"Téléchargement {pourcent} %", reste, 2500);
+                        ? string.Format(Texte("replay_download_eta"), Math.Round(eta))
+                        : string.Format(Texte("replay_download_size"), p.Received / (1024 * 1024), p.Total / (1024 * 1024));
+                    _bandeau.ShowTop("REPLAY", string.Format(Texte("replay_download_percent"), pourcent), reste, 2500);
                 }
                 else
                 {
-                    _bandeau.ShowTop("REPLAY", "Téléchargement du replay…", null, 2500);
+                    _bandeau.ShowTop("REPLAY", Texte("replay_downloading"), null, 2500);
                 }
 
                 await Task.Delay(2000, ct).ConfigureAwait(false);

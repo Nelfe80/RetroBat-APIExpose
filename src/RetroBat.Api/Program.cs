@@ -635,7 +635,8 @@ eventBus.Subscribe<EventEnvelope>(evt =>
 // ligne par coeur, la premiere fois qu'on le voit tourner.
 app.Services.GetRequiredService<RetroBat.Api.Infrastructure.CoreMemoryCapability>().Ecouter(
     eventBus,
-    app.Services.GetService<RetroBat.Api.Infrastructure.LiveContestOverlayService>());
+    app.Services.GetService<RetroBat.Api.Infrastructure.LiveContestOverlayService>(),
+    app.Services.GetService<RetroBat.Api.Infrastructure.CabinetLocale>());
 
 app.Use(async (context, next) =>
 {
