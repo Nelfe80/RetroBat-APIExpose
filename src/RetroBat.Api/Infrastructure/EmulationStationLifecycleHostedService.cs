@@ -15,6 +15,7 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
     private readonly MediaRuntimeState _runtimeState;
     private readonly IHostApplicationLifetime _applicationLifetime;
     private readonly StartupReadinessState? _readiness;
+    private readonly RetroBat.Api.Media.RomPackInstallerService? _romPackInstaller;
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly ILogger<EmulationStationLifecycleHostedService> _logger;
     private readonly HttpClient _httpClient = new() { BaseAddress = new Uri("http://127.0.0.1:1234"), Timeout = TimeSpan.FromSeconds(2) };
@@ -39,9 +40,11 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
         IHostApplicationLifetime applicationLifetime,
         IOptionsMonitor<ApiExposeOptions> options,
         ILogger<EmulationStationLifecycleHostedService> logger,
-        StartupReadinessState? readiness = null)
+        StartupReadinessState? readiness = null,
+        RetroBat.Api.Media.RomPackInstallerService? romPackInstaller = null)
     {
         _readiness = readiness;
+        _romPackInstaller = romPackInstaller;
         _esFeaturesMenuDeploymentService = esFeaturesMenuDeploymentService;
         _backendProvider = backendProvider;
         _runtimeState = runtimeState;
@@ -232,6 +235,17 @@ public sealed class EmulationStationLifecycleHostedService : BackgroundService
         {
             // Ne jamais empecher l'arret pour une collection.
             _logger.LogWarning(ex, "Reinscription des collections ES impossible apres la sortie d'EmulationStation.");
+        }
+
+        // Meme fenetre, meme raison : ParseGamelistOnly remis a false pendant qu'ES tournait peut
+        // avoir ete reecrit a true par sa sortie.
+        try
+        {
+            _romPackInstaller?.RelacherParseGamelistOnlyApresSortieEs();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "ParseGamelistOnly non relache apres la sortie d'EmulationStation.");
         }
 
         _applicationLifetime.StopApplication();

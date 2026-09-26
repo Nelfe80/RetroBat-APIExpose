@@ -176,7 +176,7 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
         var avecPacks = ContientDesPacks(PackageRoot);
         if (!onTheFly || !avecPacks)
         {
-            RelacherParseGamelistOnlySiForce(cancellationToken);
+            RelacherParseGamelistOnlySiForce(cancellationToken, esArrete: !EmulationStationTourne());
         }
 
         if (!_runtimeOptions.IsRomPackInstallerEnabled() && !onTheFly)
@@ -1953,7 +1953,42 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
     /// force, ou sur une borne d'avant cette trace (le reglage n'y venait que de nous). Remis a true
     /// ensuite, c'est un choix de l'utilisateur, et on n'y touche plus.
     /// </summary>
-    private void RelacherParseGamelistOnlySiForce(CancellationToken cancellationToken)
+    /// <summary>
+    /// Appelee juste apres la sortie d'EmulationStation, seule fenetre ou es_settings nous appartient :
+    /// ES le reecrit depuis sa memoire en se fermant, et une valeur posee pendant qu'il tournait peut
+    /// y etre remise. Ce qui est ecrit ici tient jusqu'au prochain demarrage.
+    /// </summary>
+    public void RelacherParseGamelistOnlyApresSortieEs()
+    {
+        if (_runtimeOptions.IsOnTheFlyRomInstallerEnabled() && ContientDesPacks(PackageRoot))
+        {
+            return;
+        }
+
+        RelacherParseGamelistOnlySiForce(CancellationToken.None, esArrete: true);
+    }
+
+    private static bool EmulationStationTourne()
+    {
+        try
+        {
+            var processus = System.Diagnostics.Process.GetProcessesByName("emulationstation");
+            var tourne = processus.Length > 0;
+            foreach (var p in processus)
+            {
+                p.Dispose();
+            }
+
+            return tourne;
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception)
+        {
+            // Dans le doute, ES tourne : on ecrit sans noter la tache faite.
+            return true;
+        }
+    }
+
+    private void RelacherParseGamelistOnlySiForce(CancellationToken cancellationToken, bool esArrete)
     {
         if (DecisionRelacheParseGamelistOnly(LireEtatParseGamelistOnly()) == false)
         {
@@ -1974,7 +2009,13 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
             return true;
         }, cancellationToken);
 
-        EcrireEtatParseGamelistOnly("relache");
+        // Note « fait » seulement ES arrete : pendant qu'il tourne, il pourrait remettre true en
+        // partant, et la tache ne serait plus jamais refaite.
+        if (esArrete)
+        {
+            EcrireEtatParseGamelistOnly("relache");
+        }
+
         if (relache)
         {
             _logger?.LogInformation(
