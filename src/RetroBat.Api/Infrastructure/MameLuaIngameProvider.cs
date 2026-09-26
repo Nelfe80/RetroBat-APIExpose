@@ -384,6 +384,16 @@ public sealed class MameLuaIngameProvider : IProvider
             if (definition != null)
             {
                 UpdateSession(endpoint, definition, connected: false, lastRawLine: string.Empty, fired: fired);
+                // CE QUE LE PONT A VU, ADRESSE PAR ADRESSE. Une partie de 19xx sous libretro MAME a
+                // remonte ses vies mais aucun score (2026-09-26), et rien ne disait si l'adresse du
+                // score avait seulement change : une ligne par session suffit a le savoir.
+                _logger.LogInformation(
+                    "MAME Lua lectures (rom={Rom}) : {Lectures}",
+                    definition.Rom,
+                    string.Join(", ", definition.Targets.Select(cible =>
+                        $"0x{cible.Address:X} {cible.Type} " + (previousValues.TryGetValue(cible.Id, out var derniere)
+                            ? $"{fired.GetValueOrDefault(cible.Id)} changement(s), derniere 0x{derniere:X}"
+                            : "jamais lue"))));
                 await PublishScoringSessionAsync(definition, scoringStart, sensitiveFastForward, sensitiveCoreOptions);
                 await PublishSessionStoppedAsync(definition);
             }

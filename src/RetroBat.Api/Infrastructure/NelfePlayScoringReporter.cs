@@ -56,6 +56,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private string? _coreName, _coreVersion;
     private JsonElement? _ticket;
     private long _lastFrame;
+    /// <summary>Les lectures de score recues pendant la session, et celles ecartees en demo : sans
+    /// elles, « pas de score » ne disait pas s'il n'en etait venu aucune ou si toutes avaient ete ecartees.</summary>
+    private int _scoresRecus;
+    private int _scoresEnDemo;
     private long? _finalTotal;
     private bool _inDemo;   // attract mode : le jeu se joue seul → on ignore le score
     // Phase D (segmentation en RUNS, 100% APIExpose) : la trajectoire des scores suffit —
@@ -441,6 +445,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _lastFrame = 0;
             _finalTotal = null;
             _inDemo = false;
+            _scoresRecus = _scoresEnDemo = 0;
             _trajectory.Clear();
             _horsJeu.Clear();
             _startVu = false;
@@ -1041,7 +1046,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (!root.TryGetProperty("Score", out var s) || !s.TryGetInt64(out var total)) return;
         lock (_sync)
         {
-            if (_inDemo) return;   // score de démo → jamais certifié
+            _scoresRecus++;
+            if (_inDemo) { _scoresEnDemo++; return; }   // score de démo → jamais certifié
             _finalTotal = total;
             // Le total agrégé à la frame courante : la trajectoire vérifiable du score.
             if (_trajectory.Count == 0 || _trajectory[^1].total != total)
@@ -1164,7 +1170,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
         // Rien à certifier sans score ni attestation : on s'arrête AVANT de consommer
         // quoi que ce soit (démo, navigation, jeu non joué).
-        Trace($"état: listener={listenerSha is not null} core={coreSha is not null} content={contentSha is not null} finalTotal={finalTotal} trajPts={trajectory.Count} inDemo={_inDemo}");
+        Trace($"état: listener={listenerSha is not null} core={coreSha is not null} content={contentSha is not null} finalTotal={finalTotal} trajPts={trajectory.Count} inDemo={_inDemo} scoresRecus={_scoresRecus} dontDemo={_scoresEnDemo}");
         if (listenerSha is null || finalTotal is null)
         {
             Trace("STOP: pas de score/attestation");

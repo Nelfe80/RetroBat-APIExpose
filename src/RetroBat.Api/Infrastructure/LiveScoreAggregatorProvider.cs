@@ -218,7 +218,14 @@ public sealed class LiveScoreAggregatorProvider : IProvider
             // part garde sa derniere valeur lisible. Retomber sur la valeur binaire, comme
             // avant, faisait entrer 0xF0C090 = 15 777 936 dans la trajectoire de Ms. Pac-Man
             // pendant deux lectures, et « le meilleur run » retenait ce pic (2026-09-22).
-            _logger.LogDebug("Score part ignored: {Address} declared BCD but raw {Raw} has a non-decimal nibble.", address, rawValueHex);
+            // Une fois par adresse au niveau normal : sans cela, un score que l'on ecarte ainsi a
+            // chaque lecture ne laissait aucune trace, et la partie finissait « sans score ».
+            bool premiere;
+            lock (_sync) { premiere = _bcdIllisiblesSignales.Add(systemId + "|" + rom + "|" + address); }
+            if (premiere)
+            {
+                _logger.LogInformation("Score part ignored: {Rom} {Address} declared BCD but raw {Raw} has a non-decimal nibble.", rom, address, rawValueHex);
+            }
             return;
         }
         var sourceKey = NormalizeMemoryScoreGroupKey(action, description, address);
@@ -905,6 +912,7 @@ public sealed class LiveScoreAggregatorProvider : IProvider
     }
 
     private readonly HashSet<string> _overlapsLogged = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _bcdIllisiblesSignales = new(StringComparer.OrdinalIgnoreCase);
 
     private void WarnOverlap(string definitionFile, ScorePartState dropped, ScorePartState kept)
     {
