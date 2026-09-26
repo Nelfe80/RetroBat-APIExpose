@@ -291,9 +291,7 @@ public sealed class MameLuaIngameProvider : IProvider
                 }
                 else if (command.Equals("VALUE", StringComparison.OrdinalIgnoreCase) && definition != null)
                 {
-                    if (parts.Length < 3 ||
-                        !int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var targetId) ||
-                        !long.TryParse(parts[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out var value))
+                    if (!TryParseValueLine(parts, out var targetId, out var value, out var trame))
                     {
                         continue;
                     }
@@ -305,8 +303,8 @@ public sealed class MameLuaIngameProvider : IProvider
                         LogInitialState(definition, targetId, value);
                         // Un etat deja etabli au moment ou l'on s'attache doit se dire :
                         // le personnage que le joueur tient deja, le drapeau deja leve.
-                        await EvaluateTargetAsync(definition, targetId, value, value, initialized: false);
-                        await EvaluateCompositesAsync(definition, targetId, previousValues, composedLast, fired);
+                        await EvaluateTargetAsync(definition, targetId, value, value, initialized: false, trame);
+                        await EvaluateCompositesAsync(definition, targetId, previousValues, composedLast, fired, trame);
                         continue;
                     }
 
@@ -317,8 +315,8 @@ public sealed class MameLuaIngameProvider : IProvider
 
                     previousValues[targetId] = value;
                     fired[targetId] = fired.GetValueOrDefault(targetId) + 1;
-                    await EvaluateTargetAsync(definition, targetId, oldValue, value, initialized: true);
-                    await EvaluateCompositesAsync(definition, targetId, previousValues, composedLast, fired);
+                    await EvaluateTargetAsync(definition, targetId, oldValue, value, initialized: true, trame);
+                    await EvaluateCompositesAsync(definition, targetId, previousValues, composedLast, fired, trame);
                 }
                 else if (command.Equals("SETTINGS", StringComparison.OrdinalIgnoreCase))
                 {
@@ -494,7 +492,8 @@ public sealed class MameLuaIngameProvider : IProvider
         int changedTargetId,
         Dictionary<int, long> previousValues,
         Dictionary<string, long> composedLast,
-        Dictionary<int, int> fired)
+        Dictionary<int, int> fired,
+        long? trame = null)
     {
         foreach (var group in definition.Rules
                      .Where(r => r.Digits > 1 && r.DigitTargetIds.Contains(changedTargetId))
@@ -579,7 +578,7 @@ public sealed class MameLuaIngameProvider : IProvider
                 }
 
                 fired[-1] = fired.GetValueOrDefault(-1) + 1;
-                await PublishRuleAsync(definition, rule, composed, delta);
+                await PublishRuleAsync(definition, rule, composed, delta, trame);
             }
         }
     }
@@ -614,7 +613,7 @@ public sealed class MameLuaIngameProvider : IProvider
             string.Join(", ", naming.Select(r => $"0x{r.Value:X}={r.Description}")));
     }
 
-    private async Task EvaluateTargetAsync(MameLuaDefinition definition, int targetId, long oldValue, long value, bool initialized)
+    private async Task EvaluateTargetAsync(MameLuaDefinition definition, int targetId, long oldValue, long value, bool initialized, long? trame = null)
     {
         // An address that names what the player holds moves a handful of times per game:
         // following it costs nothing and shows whether the byte lives at all.
@@ -634,11 +633,39 @@ public sealed class MameLuaIngameProvider : IProvider
                 continue;
             }
 
-            await PublishRuleAsync(definition, rule, emittedValue, rate);
+            await PublishRuleAsync(definition, rule, emittedValue, rate, trame);
         }
     }
 
-    private async Task PublishRuleAsync(MameLuaDefinition definition, MameLuaRule rule, long emittedValue, long rate)
+    /// <summary>
+    /// « VALUE|id|valeur » et, depuis le plugin 0.3.2, « VALUE|id|valeur|trame ». La trame emulee
+    /// date le signal comme le wrapper date les siens : sans elle, la coupure 1CC ne savait pas
+    /// quand les vies remontaient au continue et n'agissait pas sous MAME. Un plugin plus ancien
+    /// n'envoie que trois champs : trame nulle, le rapporteur garde alors la derniere connue.
+    /// </summary>
+    internal static bool TryParseValueLine(string[] parts, out int targetId, out long value, out long? trame)
+    {
+        trame = null;
+        value = 0;
+        targetId = 0;
+        if (parts.Length < 3 ||
+            !int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out targetId) ||
+            !long.TryParse(parts[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
+        {
+            return false;
+        }
+
+        if (parts.Length > 3 &&
+            long.TryParse(parts[3], NumberStyles.Integer, CultureInfo.InvariantCulture, out var lue) &&
+            lue > 0)
+        {
+            trame = lue;
+        }
+
+        return true;
+    }
+
+    private async Task PublishRuleAsync(MameLuaDefinition definition, MameLuaRule rule, long emittedValue, long rate, long? trame = null)
     {
         {
             var payload = new
@@ -660,6 +687,7 @@ public sealed class MameLuaIngameProvider : IProvider
                     Rate = rate,
                     Color = rule.Color,
                     Family = rule.Family,
+                    Frame = trame,
                     Ts = DateTime.UtcNow
                 },
                 actionType = rule.Action,
