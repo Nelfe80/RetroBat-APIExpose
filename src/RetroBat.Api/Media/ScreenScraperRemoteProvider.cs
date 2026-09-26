@@ -2948,7 +2948,16 @@ public sealed class ScreenScraperRemoteProvider
             AddTextField(fields, "family", FamilyByLanguage.TryGetValue(normalizedLanguage, out var family) ? family : string.Empty);
             AddTextField(fields, "region", Region);
             AddTextField(fields, "rating", Rating);
-            fields["lang"] = ResolveRomLanguageField();
+            // Une langue de ROM que ScreenScraper ne connait pas n'est pas « aucune langue » : la cle
+            // vide effacait la langue de la gamelist, que la selection suivante remettait. Ce
+            // va-et-vient comptait comme une mise a jour du texte, et la file redemandait le jeu a
+            // ScreenScraper a CHAQUE visite (19xx, 2026-09-26).
+            var romLanguages = ResolveRomLanguageField();
+            if (romLanguages.Length > 0)
+            {
+                fields["lang"] = romLanguages;
+            }
+
             AddTextField(fields, "source", "screenscraper");
             return fields;
         }

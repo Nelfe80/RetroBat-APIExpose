@@ -349,7 +349,7 @@ public sealed class ScreenScraperRawCacheMetadataService
         }
     }
 
-    private static Dictionary<string, string> BuildFields(JsonElement game, string systemId, string language)
+    internal static Dictionary<string, string> BuildFields(JsonElement game, string systemId, string language)
     {
         var fields = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         AddField(fields, "name", ReadGameName(game), language);
@@ -367,7 +367,14 @@ public sealed class ScreenScraperRawCacheMetadataService
         AddField(fields, "crc32", ReadString(rom, "romcrc", "crc", "crc32"), language);
         AddField(fields, "gameid", ReadString(game, "id", "idjeu", "ss_id"), language);
         AddField(fields, "system", systemId, language);
-        fields["lang"] = ReadRomLanguageField(game, rom);
+        // Meme regle que le scrap en direct : une langue de ROM inconnue n'efface pas celle de la
+        // gamelist (voir ScreenScraperRemoteProvider, BuildFieldsForLanguage).
+        var romLanguages = ReadRomLanguageField(game, rom);
+        if (romLanguages.Length > 0)
+        {
+            fields["lang"] = romLanguages;
+        }
+
         AddField(fields, "source", "screenscraper", language);
         return fields;
     }

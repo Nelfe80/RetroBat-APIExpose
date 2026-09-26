@@ -16,7 +16,8 @@ public sealed class RemoteScrapeQueueService : BackgroundService
     private readonly object _lock = new();
     private readonly Dictionary<string, RemoteScrapeQueueWorkItem> _items = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, MediaProjectionPlan> _pendingGamelistPersistence = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, DateTime> _noChangeCooldowns = new(StringComparer.OrdinalIgnoreCase);
+    private readonly RemoteScrapeNoChangeCooldowns _noChangeCooldowns = new(
+        Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.RuntimeLogRoot, "remote-queue-nochange-cache.json"));
     private readonly Stack<string> _lifo = new();
     private readonly SemaphoreSlim _signal = new(0);
     private readonly ApiExposeRuntimeOptionsService _runtimeOptions;
@@ -513,18 +514,7 @@ public sealed class RemoteScrapeQueueService : BackgroundService
     {
         lock (_lock)
         {
-            if (!_noChangeCooldowns.TryGetValue(key, out var expiresAtUtc))
-            {
-                return false;
-            }
-
-            if (expiresAtUtc > DateTime.UtcNow)
-            {
-                return true;
-            }
-
-            _noChangeCooldowns.Remove(key);
-            return false;
+            return _noChangeCooldowns.IsActive(key, DateTime.UtcNow);
         }
     }
 
@@ -532,7 +522,7 @@ public sealed class RemoteScrapeQueueService : BackgroundService
     {
         lock (_lock)
         {
-            _noChangeCooldowns[key] = DateTime.UtcNow.Add(RemoteMediaNoChangeCooldown);
+            _noChangeCooldowns.Remember(key, DateTime.UtcNow.Add(RemoteMediaNoChangeCooldown));
         }
     }
 
@@ -540,7 +530,7 @@ public sealed class RemoteScrapeQueueService : BackgroundService
     {
         lock (_lock)
         {
-            _noChangeCooldowns.Remove(key);
+            _noChangeCooldowns.Forget(key);
         }
     }
 
