@@ -171,6 +171,14 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
         bool announceOnTheFly = true)
     {
         var onTheFly = _runtimeOptions.IsOnTheFlyRomInstallerEnabled();
+        // ParseGamelistOnly n'est utile qu'a l'installation a la volee DE PACKS. Sans pack, il ne
+        // fait qu'empecher EmulationStation de voir les jeux que le joueur ajoute (2026-09-26).
+        var avecPacks = ContientDesPacks(PackageRoot);
+        if (!onTheFly || !avecPacks)
+        {
+            RelacherParseGamelistOnlySiForce(cancellationToken);
+        }
+
         if (!_runtimeOptions.IsRomPackInstallerEnabled() && !onTheFly)
         {
             ReportStartupProgress(1, 1, "inactif");
@@ -240,7 +248,7 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
             return;
         }
 
-        if (onTheFly)
+        if (onTheFly && avecPacks)
         {
             if (announceOnTheFly)
             {
@@ -1910,11 +1918,104 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
 
         if (changed)
         {
+            EcrireEtatParseGamelistOnly("force");
             ReportStartupProgress(0, 1, "ParseGamelistOnly active");
             LogInstallerProgress("ParseGamelistOnly active pour On-the-fly ROM Installer");
         }
 
         return Task.CompletedTask;
+    }
+
+    private static string ParseGamelistOnlyStatePath =>
+        Path.Combine(RetroBatPaths.MediaAliasesSharedRoot, "parse-gamelist-only-state.json");
+
+    /// <summary>Un pack a installer dans package-installer : la seule raison de ParseGamelistOnly.</summary>
+    internal static bool ContientDesPacks(string dossier)
+    {
+        try
+        {
+            return Directory.Exists(dossier) &&
+                Directory.EnumerateFiles(dossier, "*.*", SearchOption.TopDirectoryOnly)
+                    .Any(chemin => PackExtensions.Contains(Path.GetExtension(chemin)));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Rend a EmulationStation la lecture de ses dossiers de ROMs quand c'est nous qui l'avions coupee.
+    ///
+    /// Ce module posait ParseGamelistOnly=true au demarrage, pack ou pas, et ne le retirait jamais :
+    /// ES ne voyait plus un jeu ajoute a la main tant qu'aucune gamelist ne le nommait, et World
+    /// Scoring non plus (rapport testeur, 2026-09-26). On le relache UNE fois : quand nous l'avons
+    /// force, ou sur une borne d'avant cette trace (le reglage n'y venait que de nous). Remis a true
+    /// ensuite, c'est un choix de l'utilisateur, et on n'y touche plus.
+    /// </summary>
+    private void RelacherParseGamelistOnlySiForce(CancellationToken cancellationToken)
+    {
+        if (DecisionRelacheParseGamelistOnly(LireEtatParseGamelistOnly()) == false)
+        {
+            return;
+        }
+
+        var relache = _settingsStore.Update(document =>
+        {
+            var existing = document.Root?.Elements().FirstOrDefault(element =>
+                string.Equals(element.Attribute("name")?.Value, "ParseGamelistOnly", StringComparison.OrdinalIgnoreCase));
+            if (existing == null ||
+                !string.Equals(existing.Attribute("value")?.Value, "true", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            existing.SetAttributeValue("value", "false");
+            return true;
+        }, cancellationToken);
+
+        EcrireEtatParseGamelistOnly("relache");
+        if (relache)
+        {
+            _logger?.LogInformation(
+                "ParseGamelistOnly remis a false : aucun pack a installer, EmulationStation relit ses dossiers de ROMs.");
+        }
+    }
+
+    /// <summary>Relacher ? Oui si nous l'avons force ou sans trace (borne d'avant), non si c'est deja fait.</summary>
+    internal static bool DecisionRelacheParseGamelistOnly(string? etat)
+        => !string.Equals(etat, "relache", StringComparison.OrdinalIgnoreCase);
+
+    private static string? LireEtatParseGamelistOnly()
+    {
+        try
+        {
+            if (!File.Exists(ParseGamelistOnlyStatePath))
+            {
+                return null;
+            }
+
+            using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(ParseGamelistOnlyStatePath));
+            return doc.RootElement.TryGetProperty("etat", out var etat) ? etat.GetString() : null;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Text.Json.JsonException)
+        {
+            return null;
+        }
+    }
+
+    private static void EcrireEtatParseGamelistOnly(string etat)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(ParseGamelistOnlyStatePath)!);
+            File.WriteAllText(ParseGamelistOnlyStatePath,
+                System.Text.Json.JsonSerializer.Serialize(new { etat, at = DateTime.UtcNow }));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Sans trace, la prochaine passe relachera encore une fois : sans consequence.
+        }
     }
 
     private static async Task ExtractArchiveAsync(string archivePath, string destinationDirectory, CancellationToken cancellationToken)
