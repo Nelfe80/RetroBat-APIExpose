@@ -39,6 +39,7 @@ public sealed class DataPackSyncService : BackgroundService
     private readonly IHttpClientFactory _httpFactory;
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly MameGamelistGroupIndex _gamelistIndex;
+    private readonly MameLuaIngamePluginDeploymentHostedService? _pluginMame;
     private readonly ILogger<DataPackSyncService> _logger;
     private readonly SemaphoreSlim _unSeul = new(1, 1);
 
@@ -46,13 +47,19 @@ public sealed class DataPackSyncService : BackgroundService
         IHttpClientFactory httpFactory,
         IOptionsMonitor<ApiExposeOptions> options,
         MameGamelistGroupIndex gamelistIndex,
-        ILogger<DataPackSyncService> logger)
+        ILogger<DataPackSyncService> logger,
+        MameLuaIngamePluginDeploymentHostedService? pluginMame = null)
     {
         _httpFactory = httpFactory;
         _options = options;
         _gamelistIndex = gamelistIndex;
         _logger = logger;
+        _pluginMame = pluginMame;
     }
+
+    /// <summary>Le pont MAME change : un fichier du Data Pack sous ram/tools/mame_apiexpose_ingame.</summary>
+    internal static bool TouchePluginMame(IEnumerable<string> chemins) =>
+        chemins.Any(c => c.StartsWith("ram/tools/mame_apiexpose_ingame/", StringComparison.OrdinalIgnoreCase));
 
     private static string StatePath => Path.Combine(RetroBatPaths.RuntimeLogRoot, "datapack-sync.json");
     private static string TempRoot => Path.Combine(RetroBatPaths.RuntimeTempRoot, "datapack");
@@ -284,6 +291,12 @@ public sealed class DataPackSyncService : BackgroundService
         foreach (var t in touches.Where(t => t.StartsWith("gamelist/", StringComparison.OrdinalIgnoreCase)))
         {
             _gamelistIndex.Oublier(DataPackPaths.Local(t));
+        }
+
+        // Un nouveau pont MAME vient d'arriver : il part tout de suite dans les dossiers de MAME.
+        if (TouchePluginMame(touches))
+        {
+            _pluginMame?.Deployer("data-pack");
         }
     }
 

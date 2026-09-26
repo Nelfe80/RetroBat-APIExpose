@@ -23,11 +23,24 @@ public sealed class MameLuaIngamePluginDeploymentHostedService : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
+        Deployer("demarrage");
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Pose le plugin dans les dossiers de MAME. Au demarrage, et aussi quand la synchro du Data
+    /// Pack vient d'en poser une nouvelle version : sans ce second passage, le plugin tire 120 s
+    /// apres le demarrage n'atteignait MAME qu'au redemarrage SUIVANT de l'API (pont 0.3.2,
+    /// 2026-09-26). MAME lit le fichier a son lancement : le remplacer pendant une partie ne la
+    /// derange pas, la suivante prend le nouveau.
+    /// </summary>
+    public void Deployer(string raison)
+    {
         var options = _options.CurrentValue.GameEventsManager;
         if (!_runtimeOptions.IsMameLuaIngameEnabled() ||
             !options.MameLuaIngamePluginDeploymentEnabled)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         try
@@ -46,14 +59,12 @@ public sealed class MameLuaIngamePluginDeploymentHostedService : IHostedService
                 EnsurePluginEnabled(RetroBatPaths.MamePluginIniPath);
             }
 
-            _logger.LogInformation("MAME Lua ingame plugin deployed and enabled as {PluginName}", PluginName);
+            _logger.LogInformation("MAME Lua ingame plugin deployed and enabled as {PluginName} ({Raison})", PluginName, raison);
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Unable to deploy MAME Lua ingame plugin.");
         }
-
-        return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

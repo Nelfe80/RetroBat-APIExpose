@@ -457,7 +457,8 @@ if (!testModeRequested)
     builder.Services.AddHostedService<EsLanguageGamelistSyncHostedService>();
     builder.Services.AddHostedService<InstallerDeploymentHostedService>();
     builder.Services.AddHostedService<RetroArchWrapperDeploymentHostedService>();
-    builder.Services.AddHostedService<MameLuaIngamePluginDeploymentHostedService>();
+    builder.Services.AddSingleton<MameLuaIngamePluginDeploymentHostedService>();
+    builder.Services.AddHostedService(sp => sp.GetRequiredService<MameLuaIngamePluginDeploymentHostedService>());
     builder.Services.AddHostedService<RomSetManagerSettingsWatcherHostedService>();
     builder.Services.AddHostedService<DatasThemeExposeSettingsWatcherHostedService>();
     builder.Services.AddHostedService<PersoMemFlagSyncHostedService>();

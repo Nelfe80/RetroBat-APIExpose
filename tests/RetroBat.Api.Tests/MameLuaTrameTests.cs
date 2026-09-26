@@ -54,4 +54,12 @@ public class MameLuaTrameTests
         Assert.Equal(5308L, NelfePlayScoringReporter.TrameDuSignal(avec));
         Assert.Null(NelfePlayScoringReporter.TrameDuSignal(sans));
     }
+    [Fact]
+    public void Un_nouveau_pont_dans_le_data_pack_est_redeploye()
+    {
+        // Sans redeploiement, le plugin tire 120 s apres le demarrage n'atteignait MAME qu'au
+        // redemarrage suivant de l'API.
+        Assert.True(DataPackSyncService.TouchePluginMame(new[] { "ram/arcade/19xx.MEM", "ram/tools/mame_apiexpose_ingame/init.lua" }));
+        Assert.False(DataPackSyncService.TouchePluginMame(new[] { "ram/arcade/19xx.MEM", "gamelist/fbneo.xml" }));
+    }
 }
