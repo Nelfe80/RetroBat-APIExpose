@@ -60,6 +60,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// elles, « pas de score » ne disait pas s'il n'en etait venu aucune ou si toutes avaient ete ecartees.</summary>
     private int _scoresRecus;
     private int _scoresEnDemo;
+    /// <summary>
+    /// LE CHIFFRE DES CREDITS (2026-09-27) : 19xx et Metal Slug 3 ecrivent les continues dans le
+    /// dernier chiffre du score. La plateforme le dit dans la reponse d'annonce ; au premier +1, le
+    /// joueur apprend que seul son score d'avant le continue sera certifie. La partie n'est jamais
+    /// coupee (regle user 2026-09-27).
+    /// </summary>
+    private bool _chiffreCredits;
+    private long? _dernierPropre;
+    private long? _derniereLecture;
+    private long? _avantContinue;
     private long? _finalTotal;
     private bool _inDemo;   // attract mode : le jeu se joue seul → on ignore le score
     // Phase D (segmentation en RUNS, 100% APIExpose) : la trajectoire des scores suffit —
@@ -446,6 +456,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _finalTotal = null;
             _inDemo = false;
             _scoresRecus = _scoresEnDemo = 0;
+            _chiffreCredits = false;
+            _dernierPropre = _derniereLecture = _avantContinue = null;
             _trajectory.Clear();
             _horsJeu.Clear();
             _startVu = false;
@@ -580,6 +592,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var root = doc.RootElement;
             if (!root.TryGetProperty("open", out var open) || open.ValueKind != JsonValueKind.True) return;
             var certifiable = root.TryGetProperty("certifiable", out var c) && c.ValueKind == JsonValueKind.True;
+            var chiffreCredits = root.TryGetProperty("credit_digit", out var cd) && cd.ValueKind == JsonValueKind.True;
+            lock (_sync) { _chiffreCredits = chiffreCredits; }
             var reason = root.TryGetProperty("reason", out var r) ? r.GetString() ?? "" : "";
             var force = (GetString(attestation, "ForcedOptions") ?? "").Length > 0;
             // Le frontend, que la plateforme ne voit pas : rembobinage, run-ahead, sauvegarde
@@ -1097,6 +1111,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private void CaptureTotal(JsonElement root)
     {
         if (!root.TryGetProperty("Score", out var s) || !s.TryGetInt64(out var total)) return;
+        long? continueAnnonce = null;
         lock (_sync)
         {
             _scoresRecus++;
@@ -1109,7 +1124,81 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 _horsJeu.Add(!_enJeu);
                 if (_trajectory.Count > MaxTrajectory) { _trajectory.RemoveAt(0); _horsJeu.RemoveAt(0); }
             }
+
+            // Le premier +1 d'un jeu a chiffre des credits : c'est le continue.
+            if (_chiffreCredits && _avantContinue is null && (!_startVu || _enJeu))
+            {
+                if (EstUnContinue(_dernierPropre, _derniereLecture, total))
+                {
+                    _avantContinue = _dernierPropre;
+                    continueAnnonce = _dernierPropre;
+                }
+                else if (total % 10 == 0 && total > 0 && (_dernierPropre is null || total > _dernierPropre))
+                {
+                    _dernierPropre = total;
+                }
+
+                _derniereLecture = total;
+            }
         }
+
+        if (continueAnnonce is { } avant)
+        {
+            AnnoncerContinue(avant);
+        }
+    }
+
+    /// <summary>
+    /// Le continue d'un jeu a chiffre des credits : une lecture qui MONTE sans finir par 0, apres
+    /// une premiere lecture propre (les lectures parasites du debut, 63 sur Metal Slug 3, ne
+    /// comptent pas). Meme regle que la plateforme (ScoringRepository::avantLePremierContinue).
+    /// </summary>
+    internal static bool EstUnContinue(long? dernierPropre, long? derniereLecture, long total)
+        => total % 10 != 0 && dernierPropre is not null && derniereLecture is not null && total > derniereLecture;
+
+    /// <summary>
+    /// Le joueur vient de continuer : il le sait tout de suite, et il sait quel score est certifie.
+    /// Un bandeau d'information, pas une alerte : la partie continue, rien n'est refuse.
+    /// </summary>
+    private void AnnoncerContinue(long avant)
+    {
+        var langue = Langue();
+        _overlay?.ShowTop(
+            "SCORING",
+            string.Format(CabinetAnnounceText.Get("scoring_continue_title", langue), ScoreAffiche(avant, langue)),
+            CabinetAnnounceText.Get("scoring_continue_sub", langue),
+            8000);
+        Trace($"continue detecte (chiffre des credits) : score certifie {avant}, la partie continue");
+    }
+
+    /// <summary>Un score lisible sur l'ecran : espaces en francais, points en espagnol, virgules sinon.</summary>
+    internal static string ScoreAffiche(long score, string langue)
+    {
+        var separateur = langue switch { "fr" => " ", "es" => ".", _ => "," };
+        var format = new System.Globalization.NumberFormatInfo { NumberGroupSeparator = separateur };
+        return score.ToString("#,0", format);
+    }
+
+    /// <summary>
+    /// La trajectoire jusqu'au premier continue d'un jeu a chiffre des credits, entiere sans continue.
+    /// </summary>
+    internal static List<(long frame, long total)> AvantLePremierContinue(IReadOnlyList<(long frame, long total)> trajectoire)
+    {
+        long? propre = null;
+        long? precedente = null;
+        for (var i = 0; i < trajectoire.Count; i++)
+        {
+            var total = trajectoire[i].total;
+            if (EstUnContinue(propre, precedente, total))
+            {
+                return trajectoire.Take(i).ToList();
+            }
+
+            if (total % 10 == 0 && total > 0 && (propre is null || total > propre)) propre = total;
+            precedente = total;
+        }
+
+        return trajectoire.ToList();
     }
 
     // ── Fin de partie : assembler + signer + soumettre ───────────────────────
@@ -1155,6 +1244,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         long? finalTotal;
         List<(long frame, long total)> trajectory;
         List<EvenementDeVie> vies;
+        bool chiffreCredits;
         lock (_sync)
         {
             listenerSha = _listenerSha256; coreSha = _coreSha256; memSha = _memSha256;
@@ -1162,6 +1252,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             coreName = _coreName; coreVersion = _coreVersion;
             trajectory = new List<(long, long)>(_trajectory);
             vies = new List<EvenementDeVie>(_vies);
+            chiffreCredits = _chiffreCredits;
 
             // La fenêtre de jeu : un START a été vu, donc on sait ce qui est joué. Ce qui ne l'est
             // pas (démo avant la partie, attract après le game over) sort de la trajectoire.
@@ -1211,6 +1302,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // de score (un score qui retombe = le joueur a relancé une partie) et on garde le
         // segment monotone au pic le plus haut. Un super score n'est donc jamais perdu par un
         // mauvais run qui suit. Calculé tôt + tracé pour valider même hors chemin certifié.
+        // Chiffre des credits : on soumet la partie jusqu'au premier continue. La plateforme refait le
+        // meme calcul sur les lectures signees ; le faire ici garde le passeport coherent avec l'annonce.
+        if (chiffreCredits)
+        {
+            var avant = AvantLePremierContinue(trajectory);
+            if (avant.Count < trajectory.Count)
+            {
+                Trace($"chiffre des credits : {trajectory.Count - avant.Count} lecture(s) apres le premier continue ecartee(s), score certifie {(avant.Count > 0 ? avant[^1].total : 0)}");
+                trajectory = avant;
+            }
+        }
+
         var finsDeRun = FinsDeRun.Calculer(vies);
         if (finsDeRun.Count > 0)
         {

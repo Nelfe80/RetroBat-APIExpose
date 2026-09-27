@@ -138,6 +138,8 @@ public static class CabinetAnnounceText
             ["replay_core_other_local"] = "Ce record a été enregistré avec une autre version de {0} : cette borne a la {1}. La lecture peut s'interrompre avant la fin.",
             ["replay_rom_other"] = "Cette borne n'a pas le fichier exact sur lequel ce record a été joué : la lecture part sur {0}. Si le jeu diffère (région, révision), le replay peut dériver.",
             ["replay_rom_other_crc"] = "Cette borne n'a pas le fichier exact sur lequel ce record a été joué (empreinte {1}) : la lecture part sur {0}. Si le jeu diffère (région, révision), le replay peut dériver.",
+            ["scoring_continue_title"] = "Continue : ton score certifié reste {0}",
+            ["scoring_continue_sub"] = "la partie continue, mais la suite ne compte plus pour le classement",
         },
         ["en"] = new()
         {
@@ -191,6 +193,8 @@ public static class CabinetAnnounceText
             ["replay_core_other_local"] = "This record was made with another version of {0}: this cabinet has {1}. Playback may stop before the end.",
             ["replay_rom_other"] = "This cabinet does not have the exact file this record was played on: playback uses {0}. If the game differs (region, revision), the replay may drift.",
             ["replay_rom_other_crc"] = "This cabinet does not have the exact file this record was played on (checksum {1}): playback uses {0}. If the game differs (region, revision), the replay may drift.",
+            ["scoring_continue_title"] = "Continue: your certified score stays at {0}",
+            ["scoring_continue_sub"] = "keep playing, but what follows no longer counts for the ranking",
         },
         ["es"] = new()
         {
@@ -244,6 +248,8 @@ public static class CabinetAnnounceText
             ["replay_core_other_local"] = "Este récord se grabó con otra versión de {0}: esta máquina tiene la {1}. La reproducción puede detenerse antes del final.",
             ["replay_rom_other"] = "Esta máquina no tiene el archivo exacto con el que se jugó este récord: la reproducción usa {0}. Si el juego difiere (región, revisión), la repetición puede desviarse.",
             ["replay_rom_other_crc"] = "Esta máquina no tiene el archivo exacto con el que se jugó este récord (huella {1}): la reproducción usa {0}. Si el juego difiere (región, revisión), la repetición puede desviarse.",
+            ["scoring_continue_title"] = "Continuación: tu puntuación certificada se queda en {0}",
+            ["scoring_continue_sub"] = "la partida sigue, pero lo que venga ya no cuenta para la clasificación",
         },
         ["ja"] = new()
         {
@@ -297,6 +303,8 @@ public static class CabinetAnnounceText
             ["replay_core_other_local"] = "この記録は別のバージョンの {0} で作成されました（この筐体は {1}）。最後まで再生できない場合があります。",
             ["replay_rom_other"] = "この筐体には記録時と同じファイルがありません。{0} で再生します。ゲームが異なる場合（地域、リビジョン）、リプレイがずれることがあります。",
             ["replay_rom_other_crc"] = "この筐体には記録時と同じファイル（チェックサム {1}）がありません。{0} で再生します。ゲームが異なる場合（地域、リビジョン）、リプレイがずれることがあります。",
+            ["scoring_continue_title"] = "コンティニュー：認定スコアは {0} のまま",
+            ["scoring_continue_sub"] = "プレイは続けられますが、この先はランキングに数えられません",
         },
         ["zh"] = new()
         {
@@ -350,6 +358,8 @@ public static class CabinetAnnounceText
             ["replay_core_other_local"] = "此记录是用另一个版本的 {0} 录制的：本机为 {1}。回放可能在结束前中断。",
             ["replay_rom_other"] = "本机没有录制此记录时使用的同一文件：将使用 {0} 回放。如果游戏不同（地区、版本），回放可能出现偏差。",
             ["replay_rom_other_crc"] = "本机没有录制此记录时使用的同一文件（校验值 {1}）：将使用 {0} 回放。如果游戏不同（地区、版本），回放可能出现偏差。",
+            ["scoring_continue_title"] = "续关：认证分数保持为 {0}",
+            ["scoring_continue_sub"] = "游戏继续，但之后的得分不再计入排行榜",
         },
         ["ko"] = new()
         {
@@ -403,6 +413,8 @@ public static class CabinetAnnounceText
             ["replay_core_other_local"] = "이 기록은 다른 버전의 {0}(으)로 만들어졌습니다. 이 기기는 {1}입니다. 재생이 끝나기 전에 멈출 수 있습니다.",
             ["replay_rom_other"] = "이 기기에는 기록 당시와 같은 파일이 없습니다. {0}(으)로 재생합니다. 게임이 다르면(지역, 리비전) 리플레이가 어긋날 수 있습니다.",
             ["replay_rom_other_crc"] = "이 기기에는 기록 당시와 같은 파일(체크섬 {1})이 없습니다. {0}(으)로 재생합니다. 게임이 다르면(지역, 리비전) 리플레이가 어긋날 수 있습니다.",
+            ["scoring_continue_title"] = "이어하기: 인증 점수는 {0}(으)로 유지됩니다",
+            ["scoring_continue_sub"] = "게임은 계속되지만 이후 점수는 순위에 반영되지 않습니다",
         },
     };
 }
