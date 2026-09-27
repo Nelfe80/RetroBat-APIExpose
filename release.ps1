@@ -100,8 +100,18 @@ $ex = @(
     "-x!$name\resources\ram\.user",
     # Page de diagnostic ScreenScraper : outil local, jamais distribue. Recursive : elle
     # vit sous resources\scraping, pas a la racine.
-    '-xr!ScreenScraper.html'
+    '-xr!ScreenScraper.html',
+    # La configuration de CETTE borne ne part jamais : c'est celle du depot qui est livree
+    # (voir plus bas). Elle portait l'auto-scrap active, la langue et les reglages d'essai de la
+    # machine qui publie, et quiconque installait depuis le full.7z les recevait (2026-09-27).
+    "-x!$name\appsettings.json"
 )
+
+# LA CONFIGURATION LIVREE EST CELLE DU DEPOT, comme pour l'installeur : relue et commitee,
+# jamais celle de la borne qui publie. build-default-settings la tire de HEAD.
+& (Join-Path $PSScriptRoot 'tools\build-default-settings.ps1')
+$configDepot = Join-Path $PSScriptRoot 'installer\appsettings.default.json'
+if (-not (Test-Path -LiteralPath $configDepot)) { throw "Configuration du depot absente : $configDepot" }
 
 Set-Location $root
 $full   = Join-Path $out "$name-$ver-full.7z"
@@ -122,6 +132,20 @@ Write-Host 'Construction update.7z...'
 # plugin Lua) n'y sont pas : elles arrivent par le Data Pack.
 & $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" -mx=5 -bsp0 -bso0
 
+# La configuration du depot, sous le nom que le programme lit. L'updater ne l'ecrase jamais sur
+# une borne qui a deja la sienne ; elle ne sert qu'a une premiere installation.
+$scene = Join-Path $out 'scene-config'
+Remove-Item $scene -Recurse -Force -Confirm:$false -ErrorAction SilentlyContinue
+New-Item -ItemType Directory -Force (Join-Path $scene $name) | Out-Null
+Copy-Item -LiteralPath $configDepot -Destination (Join-Path $scene "$name\appsettings.json")
+Push-Location $scene
+try {
+    foreach ($archive in @($full, $update)) {
+        if (Test-Path -LiteralPath $archive) { & $sz a -t7z $archive "$name\appsettings.json" -bsp0 -bso0 }
+    }
+} finally { Pop-Location }
+Remove-Item $scene -Recurse -Force -Confirm:$false -ErrorAction SilentlyContinue
+
 # Controle anti-fuite : l'archive ne doit contenir ni .env, ni media, ni sources. En mode rapide,
 # les memes controles portent sur l'update.7z, la seule archive publiee.
 $controlee = if ($Rapide) { $update } else { $full }
@@ -134,7 +158,7 @@ $leaks = $listing | Select-String '\.env|\.bak|\.ps1$|\.py$|\\media\\|\\src\\|\\
 if ($leaks) { throw "FUITE DETECTEE dans l'archive : $($leaks[0])" }
 # La cle API de la borne ne doit JAMAIS etre committee/distribuee : le defaut reste vide
 # (chaque borne genere la sienne au 1er run). On bloque si une valeur traine.
-$appsettingsPath = Join-Path $PSScriptRoot 'appsettings.json'
+$appsettingsPath = $configDepot
 if (Test-Path $appsettingsPath) {
     $apiKeyLeak = Select-String -Path $appsettingsPath -Pattern '"ApiKey"\s*:\s*"[^"]+"'
     if ($apiKeyLeak) { throw "FUITE : une cle API est presente dans appsettings.json (doit rester vide)." }
