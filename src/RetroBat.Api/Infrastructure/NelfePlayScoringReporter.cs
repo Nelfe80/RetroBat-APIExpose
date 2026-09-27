@@ -70,6 +70,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private long? _dernierPropre;
     private long? _derniereLecture;
     private long? _avantContinue;
+    /// <summary>
+    /// La fin de la partie certifiee a ete dite au replay (scoring.run.ended) : une fois par partie.
+    /// L'enregistrement s'arrete la, pour que le replay montre ce que le score certifie, sans les
+    /// continues (demande user 2026-09-27).
+    /// </summary>
+    private bool _finDeRunPubliee;
+    /// <summary>Les continues deja vus sur les vies (FinsSurLesVies), et le jeton du candidat en attente.</summary>
+    private int _finsVues;
+    private int _candidatContinue;
     private long? _finalTotal;
     private bool _inDemo;   // attract mode : le jeu se joue seul → on ignore le score
     // Phase D (segmentation en RUNS, 100% APIExpose) : la trajectoire des scores suffit —
@@ -460,6 +469,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _scoresRecus = _scoresEnDemo = 0;
             _chiffreCredits = false;
             _dernierPropre = _derniereLecture = _avantContinue = null;
+            _finDeRunPubliee = false;
+            _finsVues = 0;
+            _candidatContinue++;
             _trajectory.Clear();
             _horsJeu.Clear();
             _startVu = false;
@@ -1088,6 +1100,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             return;
         }
 
+        int jeton;
         lock (_sync)
         {
             if (_inDemo) return;   // une demo n'est pas une partie
@@ -1098,7 +1111,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 Entier(signal, "Frame") ?? _lastFrame,
                 Entier(signal, "Player") ?? Entier(root, "player") ?? 1));
             if (_vies.Count > MaxTrajectory) _vies.RemoveAt(0);
+            var fins = FinsSurLesVies(_vies);
+            if (fins <= _finsVues) return;
+            _finsVues = fins;
+            if (_finDeRunPubliee) return;
+            jeton = ++_candidatContinue;
         }
+
+        _ = ConfirmerContinueAsync(jeton);
     }
 
     /// <summary>Le pont MAME ecrit 0x604, le wrapper 0X0604 : la meme ligne doit se reconnaitre.</summary>
@@ -1131,11 +1151,29 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     {
         if (!root.TryGetProperty("Score", out var s) || !s.TryGetInt64(out var total)) return;
         long? continueAnnonce = null;
+        var nouvellePartie = false;
         lock (_sync)
         {
             _scoresRecus++;
             if (_inDemo) { _scoresEnDemo++; return; }   // score de démo → jamais certifié
+            var precedent = _finalTotal;
             _finalTotal = total;
+
+            // LE SCORE RETOMBE : une nouvelle partie commence. Un continue garde le score, une
+            // nouvelle partie le remet a zero : c'est ce qui les distingue. Un continue en attente
+            // de confirmation n'en etait pas un, et si la partie d'avant a ete close par un
+            // continue, tout se rearme pour celle-ci (bandeau, fin de partie, replay).
+            if (precedent is { } avantChute && total < avantChute)
+            {
+                _candidatContinue++;
+                if (_finDeRunPubliee)
+                {
+                    _finDeRunPubliee = false;
+                    _avantContinue = null;
+                    _dernierPropre = null;
+                    nouvellePartie = true;
+                }
+            }
             // Le total agrégé à la frame courante : la trajectoire vérifiable du score.
             if (_trajectory.Count == 0 || _trajectory[^1].total != total)
             {
@@ -1161,10 +1199,76 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
         }
 
+        if (nouvellePartie)
+        {
+            Trace($"nouvelle partie (le score retombe a {total}) : replay rearme");
+            _ = _eventBus.PublishAsync(new EventEnvelope { Type = "scoring.run.reset", Payload = new { Score = total } });
+        }
+
         if (continueAnnonce is { } avant)
         {
             AnnoncerContinue(avant);
+            PublierFinDeRun("chiffre des credits");
         }
+    }
+
+    /// <summary>
+    /// Dit au replay que la partie certifiee est finie : l'enregistrement s'arrete au continue.
+    /// Une seule fois par partie, et seulement pour une partie NelfePlay.
+    /// </summary>
+    private void PublierFinDeRun(string source)
+    {
+        long frame;
+        lock (_sync)
+        {
+            if (_finDeRunPubliee) return;
+            _finDeRunPubliee = true;
+            frame = _lastFrame;
+        }
+
+        if (!PartieNelfePlay()) return;
+        Trace($"fin de la partie certifiee ({source}, frame {frame}) : arret du replay");
+        _ = _eventBus.PublishAsync(new EventEnvelope
+        {
+            Type = "scoring.run.ended",
+            Payload = new { Raison = "continue", Source = source, Frame = frame },
+        });
+    }
+
+    /// <summary>
+    /// Les remontees de vies apres zero lues EN DIRECT, seulement quand la decision ne peut plus
+    /// changer. FinsDeRun choisit en fin de partie le compteur le plus complet parmi ceux qui ont
+    /// parle ; tant qu'un seul compteur a parle, il n'y a rien a choisir. Avec plusieurs compteurs
+    /// (un drapeau de boss range dans le bloc des vies, sur Altered Beast), rien : on ne coupe pas
+    /// en direct, le replay va au bout comme avant.
+    /// </summary>
+    internal static int FinsSurLesVies(IReadOnlyList<EvenementDeVie> vies, int joueur = 1)
+    {
+        var adresses = vies
+            .Where(v => v.Player <= 0 || v.Player == joueur)
+            .Select(v => v.Address)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Count();
+        return adresses == 1 ? FinsDeRun.Calculer(vies, joueur).Count : 0;
+    }
+
+    /// <summary>Le delai qui separe un continue (le score reste) d'une nouvelle partie (il retombe).</summary>
+    internal static readonly TimeSpan ConfirmationContinue = TimeSpan.FromSeconds(6);
+
+    /// <summary>
+    /// Les vies sont remontees apres zero : continue, ou nouvelle partie apres un game over ? Les
+    /// vies ne le disent pas (FinsDeRun ne cherche pas a le savoir), le score si : il retombe a une
+    /// nouvelle partie. On attend donc un peu ; si rien n'est retombe, c'etait un continue.
+    /// </summary>
+    private async Task ConfirmerContinueAsync(int jeton)
+    {
+        await Task.Delay(ConfirmationContinue).ConfigureAwait(false);
+        lock (_sync)
+        {
+            if (jeton != _candidatContinue) return;   // le score est retombe, ou la partie a change
+        }
+
+        PublierFinDeRun("vies remontees apres zero");
     }
 
     /// <summary>
@@ -1199,25 +1303,45 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     /// <summary>
-    /// La trajectoire jusqu'au premier continue d'un jeu a chiffre des credits, entiere sans continue.
+    /// La trajectoire sans ce qui suit un continue, d'un jeu a chiffre des credits : de chaque
+    /// continue jusqu'a la partie suivante (le score qui retombe), rien ne compte. Une nouvelle
+    /// partie jouee ensuite dans la meme session concourt normalement. Entiere sans continue.
     /// </summary>
-    internal static List<(long frame, long total)> AvantLePremierContinue(IReadOnlyList<(long frame, long total)> trajectoire)
+    internal static List<(long frame, long total)> SansLesContinues(IReadOnlyList<(long frame, long total)> trajectoire)
     {
+        var gardees = new List<(long frame, long total)>(trajectoire.Count);
         long? propre = null;
         long? precedente = null;
-        for (var i = 0; i < trajectoire.Count; i++)
+        var apresContinue = false;
+        foreach (var point in trajectoire)
         {
-            var total = trajectoire[i].total;
-            if (EstUnContinue(propre, precedente, total))
+            var total = point.total;
+            if (apresContinue)
             {
-                return trajectoire.Take(i).ToList();
+                if (precedente is { } p && total < p)
+                {
+                    apresContinue = false;   // le score retombe : une nouvelle partie
+                    propre = null;
+                }
+                else
+                {
+                    precedente = total;
+                    continue;
+                }
+            }
+            else if (EstUnContinue(propre, precedente, total))
+            {
+                apresContinue = true;
+                precedente = total;
+                continue;
             }
 
+            gardees.Add(point);
             if (total % 10 == 0 && total > 0 && (propre is null || total > propre)) propre = total;
             precedente = total;
         }
 
-        return trajectoire.ToList();
+        return gardees;
     }
 
     // ── Fin de partie : assembler + signer + soumettre ───────────────────────
@@ -1330,11 +1454,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // meme calcul sur les lectures signees ; le faire ici garde le passeport coherent avec l'annonce.
         if (chiffreCredits)
         {
-            var avant = AvantLePremierContinue(trajectory);
-            if (avant.Count < trajectory.Count)
+            var sans = SansLesContinues(trajectory);
+            if (sans.Count < trajectory.Count)
             {
-                Trace($"chiffre des credits : {trajectory.Count - avant.Count} lecture(s) apres le premier continue ecartee(s), score certifie {(avant.Count > 0 ? avant[^1].total : 0)}");
-                trajectory = avant;
+                Trace($"chiffre des credits : {trajectory.Count - sans.Count} lecture(s) de continue ecartee(s)");
+                trajectory = sans;
             }
         }
 

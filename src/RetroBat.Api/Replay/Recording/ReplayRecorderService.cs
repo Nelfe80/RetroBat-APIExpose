@@ -179,8 +179,32 @@ public sealed class ReplayRecorderService : BackgroundService
         return true;
     }
 
+    /// <summary>
+    /// LE REPLAY S'ARRETE AU CONTINUE (demande user 2026-09-27). Le score certifie s'arrete avant
+    /// le continue ; le replay le suivait jusqu'au bout de la partie et montrait des continues que
+    /// le classement n'admet pas. Le rapporteur dit la fin de la partie certifiee
+    /// (scoring.run.ended) ; on arrete alors l'enregistrement, et on n'en relance aucun avant le
+    /// lancement suivant.
+    /// </summary>
+    private volatile bool _runTermine;
+
     private void OnBusEvent(EventEnvelope e)
     {
+        if (string.Equals(e.Type, "scoring.run.ended", StringComparison.Ordinal))
+        {
+            _runTermine = true;
+            return;
+        }
+
+        // Une nouvelle partie (lancement, ou score qui retombe dans la meme session) : on peut de
+        // nouveau enregistrer, au prochain START.
+        if (string.Equals(e.Type, "ui.game.started", StringComparison.Ordinal)
+            || string.Equals(e.Type, "scoring.run.reset", StringComparison.Ordinal))
+        {
+            _runTermine = false;
+            return;
+        }
+
         if (!string.Equals(e.Type, "panel.input.pressed", StringComparison.Ordinal)) return;
         try
         {
@@ -241,6 +265,12 @@ public sealed class ReplayRecorderService : BackgroundService
             // et le joueur vient d'appuyer sur START (sinon on enregistrerait la demo).
             // Hors NelfePlay, on ne guette meme pas le START : le journal le dit une fois par jeu,
             // au lieu d'annoncer une attente qui n'aboutira jamais.
+            // La partie certifiee est finie (continue) : la suite se joue sans replay.
+            if (_runTermine)
+            {
+                return;
+            }
+
             if (status is { ContentLoaded: true } && _partie is { EstNelfePlay: false } && !_playback.IsBusy)
             {
                 var cle = "hors:" + status.System + "/" + status.Game;
@@ -270,6 +300,13 @@ public sealed class ReplayRecorderService : BackgroundService
                 }
                 await StartAsync(status, ct).ConfigureAwait(false);
             }
+            return;
+        }
+
+        if (_runTermine)
+        {
+            _logger.LogInformation("Replay : {ReplayId} arrete au continue, la suite de la partie ne compte pas.", _current.ReplayId);
+            await FinalizeAsync(_current, recovered: false, ct).ConfigureAwait(false);
             return;
         }
 
