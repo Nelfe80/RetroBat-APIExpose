@@ -48,6 +48,34 @@ public class ControllerMappingCascadeTests
         Assert.Equal("constructeur+produit", source);
     }
 
+    [Theory]
+    [InlineData("03000000790000007c18000000007801")]   // Pro Fight, stick arcade XInput absent de la base
+    [InlineData("030000005e0400008e02000000007801")]   // manette Xbox 360 par XInput
+    public void Une_manette_ouverte_par_xinput_prend_la_ligne_xinput(string guid)
+    {
+        var (ligne, source) = CabinetInputReader.FindDbEntry(Base, guid);
+
+        Assert.Equal("xinput", ligne![0]);
+        Assert.Equal("xinput", source);
+    }
+
+    [Theory]
+    [InlineData("03000000790000007c18000000007200", false)]   // le meme stick vu par RawInput (ES)
+    [InlineData("030000004c050000cc09000000006800", false)]   // HIDAPI
+    [InlineData("03000000790000000600000000000000", false)]   // DirectInput
+    [InlineData("03000000790000007c18000000007801", true)]
+    public void Seul_le_marqueur_x_designe_xinput(string guid, bool attendu)
+        => Assert.Equal(attendu, CabinetInputReader.OuvertParXInput(guid));
+
+    [Theory]
+    [InlineData("a", "b")]   // le bouton du bas, qui valide
+    [InlineData("b", "a")]
+    [InlineData("x", "x")]
+    [InlineData("y", "y")]
+    [InlineData("start", "start")]
+    public void Es_input_nomme_les_boutons_comme_la_base(string nomEs, string identite)
+        => Assert.Equal(identite, CabinetInputReader.IdentiteDuNomEs(nomEs));
+
     [Fact]
     public void Une_manette_inconnue_ne_trouve_rien()
     {

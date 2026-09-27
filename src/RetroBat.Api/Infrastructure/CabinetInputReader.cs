@@ -620,6 +620,18 @@ public sealed class CabinetInputReader : IDisposable
     private const string XInputGuidPrefix = "78696e707574";
 
     /// <summary>
+    /// Une manette ouverte par XInput dont le SDL a retrouve constructeur et produit : son GUID
+    /// porte « x » (0x78) en 15e octet, puis le sous-type (« ...7801 »). XInput impose la meme
+    /// disposition a toutes (A=0, B=1, X=2, Y=3, START=7), quel que soit l'appareil : la ligne
+    /// « xinput » de la base vaut donc pour elle, et une ligne trouvee par constructeur et
+    /// produit, ecrite pour DirectInput, la numeroterait faux. C'est le cas des sticks arcade
+    /// XInput absents de la base : un Pro Fight (0079:187c) tombait sur es_input.cfg
+    /// (2026-09-27) et son bouton de validation n'ouvrait pas le panneau de classement.
+    /// </summary>
+    internal static bool OuvertParXInput(string guid)
+        => guid.Length == 32 && string.Equals(guid.Substring(28, 2), "78", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
     /// La ligne de gamecontrollerdb.txt d'une manette, et l'etage qui l'a trouvee.
     ///
     /// 1. GUID exact ;
@@ -628,8 +640,8 @@ public sealed class CabinetInputReader : IDisposable
     ///    la cle litterale « xinput » : sans cet etage, aucune manette Xbox ouverte par XInput
     ///    n'etait reconnue (une manette Xbox « ne remontait pas », constate le 2026-09-17).
     ///    Quand le SDL sait retrouver constructeur et produit, le GUID XInput est plutot
-    ///    « 030000005e0400008e02000000007801 » (« x » puis le sous-type en queue) : c'est
-    ///    l'etage 3 qui le resout ;
+    ///    « 030000005e0400008e02000000007801 » (« x » puis le sous-type en queue) : meme
+    ///    disposition, meme ligne (voir OuvertParXInput) ;
     /// 3. constructeur + produit (24 premiers caracteres) : le suffixe de pilote change d'une
     ///    machine a l'autre (RawInput, HIDAPI) et la base n'en porte aucun.
     /// </summary>
@@ -641,7 +653,7 @@ public sealed class CabinetInputReader : IDisposable
             return (entry, "GUID exact");
         }
 
-        if (guid.StartsWith(XInputGuidPrefix, StringComparison.OrdinalIgnoreCase))
+        if (guid.StartsWith(XInputGuidPrefix, StringComparison.OrdinalIgnoreCase) || OuvertParXInput(guid))
         {
             entry = db.FirstOrDefault(t => string.Equals(t[0], "xinput", StringComparison.OrdinalIgnoreCase));
             if (entry is not null)
@@ -715,15 +727,25 @@ public sealed class CabinetInputReader : IDisposable
         }
     }
 
-    /// <summary>Noms d'EmulationStation vers identites RetroPad. ES suit la convention SNES :
-    /// « b » est le bouton du BAS (valider), « a » celui de droite.</summary>
+    /// <summary>
+    /// Noms d'EmulationStation vers identites RetroPad. Dans RetroBat, « a » est le bouton du
+    /// BAS, celui qui valide, « b » celui de droite, « x » celui du haut, « y » celui de gauche :
+    /// c'est ce que portent toutes les manettes Xbox et PlayStation de es_input.cfg (a = bouton 0).
+    /// Le bouton du bas est l'identite RetroPad « b », comme par gamecontrollerdb (FaceSwap) :
+    /// les deux chemins doivent nommer pareil le meme bouton, sinon le slot « valider » change
+    /// avec la source du mappage. La table disait « convention SNES » (a et b inverses) et une
+    /// manette resolue par es_input.cfg validait sur le mauvais bouton.
+    /// </summary>
     private static readonly IReadOnlyDictionary<string, string> EsToIdentity = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
-        ["b"] = "b", ["a"] = "a", ["y"] = "y", ["x"] = "x",
+        ["a"] = "b", ["b"] = "a", ["x"] = "x", ["y"] = "y",
         ["pageup"] = "l", ["pagedown"] = "r",
         ["l2"] = "l2", ["r2"] = "r2", ["l3"] = "l3", ["r3"] = "r3",
         ["select"] = "select", ["start"] = "start",
     };
+
+    /// <summary>L'identite RetroPad d'un nom d'EmulationStation, null s'il n'en porte aucune.</summary>
+    internal static string? IdentiteDuNomEs(string nom) => EsToIdentity.TryGetValue(nom, out var identite) ? identite : null;
 
     /// <summary>Directions d'EmulationStation (dpad et stick gauche) pour le transport Replay.</summary>
     private static readonly IReadOnlyDictionary<string, string> EsToDirection = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
