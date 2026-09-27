@@ -63,3 +63,42 @@ public sealed class BestRunGlitchTests
         Assert.Equal(906030, run[^1].total);
     }
 }
+
+/// <summary>
+/// Plusieurs parties dans la meme session, sans quitter le jeu. Double Dragon n'a qu'une vie :
+/// chaque nouvelle partie remet le score a zero puis redonne la vie, et cette vie qui remonte
+/// apres zero ressemble a un continue. La meilleure des parties doit concourir (2026-09-27).
+/// </summary>
+public sealed class PlusieursPartiesTests
+{
+    [Fact]
+    public void La_meilleure_de_trois_parties_a_une_vie_est_retenue()
+    {
+        // Partie 1 : 1 200. Remise a zero (lecture 0), puis la vie de la partie 2 (trame 450).
+        // Partie 2 : 900. Remise a zero, vie de la partie 3 (trame 750). Partie 3 : 2 500.
+        var traj = new List<(long frame, long total)>
+        {
+            (100, 100), (200, 500), (300, 1200),
+            (400, 0), (500, 300), (600, 900),
+            (700, 0), (800, 400), (900, 1500), (1000, 2500),
+        };
+
+        var run = NelfePlayScoringReporter.SelectBestRun(traj, new long[] { 450, 750 });
+
+        Assert.Equal(2500, run[^1].total);
+    }
+
+    [Fact]
+    public void Une_partie_continuee_reste_ecartee()
+    {
+        // 19xx : le continue garde le score (1 200 puis 1 300), la suite ne concourt pas.
+        var traj = new List<(long frame, long total)>
+        {
+            (100, 500), (200, 1200), (300, 1300), (400, 5000),
+        };
+
+        var run = NelfePlayScoringReporter.SelectBestRun(traj, new long[] { 250 });
+
+        Assert.Equal(1200, run[^1].total);
+    }
+}

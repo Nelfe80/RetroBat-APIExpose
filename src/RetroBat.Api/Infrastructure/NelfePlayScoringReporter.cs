@@ -986,6 +986,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // Une vraie nouvelle partie, elle, remet le score a zero : sa chute est vue par le
         // decoupage ordinaire et les deux tentatives se comparent alors honnetement.
         var reporte = false;
+        // Le segment en cours a ete ouvert par une chute du score : une nouvelle partie.
+        var ouvertParChute = false;
         foreach (var pt in traj)
         {
             // Un continue est tombe apres la lecture precedente et au plus tard sur celle-ci : la
@@ -1007,7 +1009,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 }
 
                 // Le score a-t-il ete remis a zero ? Sinon, ce qui suit herite du run precedent.
-                reporte = peakFin != long.MinValue && pt.total >= peakFin;
+                //
+                // LE DEPART D'UNE NOUVELLE PARTIE N'EST PAS UN CONTINUE. Une nouvelle partie remet
+                // le score a zero PUIS donne ses vies : la chute a deja ouvert le segment, et les
+                // vies qui remontent ensuite sont celles du depart. Comparer au 0 de la remise a
+                // zero faisait passer chaque nouvelle partie pour une partie continuee : Double
+                // Dragon (une seule vie), trois parties d'affilee, seule la premiere concourait et
+                // c'est elle qui a ete soumise, pas la meilleure (signale le 2026-09-27).
+                var departDePartie = ouvertParChute && cur.All(p => p.total == cur[0].total);
+                reporte = !departDePartie && peakFin != long.MinValue && peakFin > 0 && pt.total >= peakFin;
+                ouvertParChute = false;
                 cur.Clear();
                 prev = long.MinValue;
             }
@@ -1036,6 +1047,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 // Une chute de score est une remise a zero : la tentative qui suit est a elle.
                 reporte = false;
                 cur.Clear();
+                cur.Add(pt);
+                prev = pt.total;
+                ouvertParChute = true;
+                continue;
             }
             cur.Add(pt);
             prev = pt.total;
