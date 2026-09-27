@@ -39,7 +39,7 @@ public static class EmulatorForeground
 
     /// <summary>Les émulateurs que RetroBat lance. Le premier trouvé avec une fenêtre gagne.</summary>
     private static readonly string[] Emulateurs =
-        ["retroarch", "mame", "mame64", "fbneo", "pcsx2", "dolphin", "duckstation", "ppsspp"];
+        ["retroarch", "mame", "mame64", "groovymame", "fbneo", "pcsx2", "dolphin", "duckstation", "ppsspp"];
 
     /// <summary>
     /// Les processus dont le nom COMMENCE par celui-ci.

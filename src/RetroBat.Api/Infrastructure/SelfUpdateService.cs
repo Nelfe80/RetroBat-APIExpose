@@ -73,6 +73,13 @@ public sealed class SelfUpdateService
     {
         if (_playback.IsBusy) return "un replay est en lecture";
         if (EmulatorForeground.EmulateurTourne()) return "un jeu est en cours";
+        // Le lanceur de RetroBat vit toute la partie, quel que soit l'emulateur : il couvre ceux
+        // que la liste ne nomme pas, et le moment ou l'emulateur n'a pas encore demarre.
+        if (Process.GetProcessesByName("emulatorLauncher") is { Length: > 0 } lanceurs)
+        {
+            foreach (var p in lanceurs) p.Dispose();
+            return "un jeu est en cours";
+        }
         return "";
     }
 

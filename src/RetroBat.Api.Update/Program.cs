@@ -206,8 +206,74 @@ internal static class Program
 
     // ── Appliquer ────────────────────────────────────────────────────────────
 
+    /// <summary>
+    /// Les processus d'une partie : le lanceur de RetroBat, qui vit toute la partie quel que soit
+    /// l'emulateur, et les emulateurs eux-memes (par prefixe, comme le fait l'API).
+    /// </summary>
+    private static readonly string[] ProcessusDePartie =
+        ["emulatorlauncher", "retroarch", "mame", "groovymame", "fbneo", "pcsx2", "dolphin", "duckstation", "ppsspp"];
+
+    private static bool PartieEnCours()
+    {
+        foreach (var p in Process.GetProcesses())
+        {
+            try
+            {
+                var nom = p.ProcessName.ToLowerInvariant();
+                if (ProcessusDePartie.Any(j => nom.StartsWith(j, StringComparison.Ordinal))) return true;
+            }
+            catch (InvalidOperationException)
+            {
+                // le processus vient de se terminer
+            }
+            finally { p.Dispose(); }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// JAMAIS PENDANT UNE PARTIE. Arreter l'API perd le score en cours (le passeport s'assemble a
+    /// la fin) et coupe le replay. L'API ne lance cette mise a jour que borne libre, mais le
+    /// telechargement laisse le temps a une partie de commencer, et un lancement a la main peut
+    /// tomber n'importe quand. On attend donc la fin de la partie, puis encore une minute : c'est
+    /// a ce moment que l'API envoie le score qui vient d'etre fait.
+    /// </summary>
+    private static async Task<bool> AttendreLaFinDeLaPartieAsync(TimeSpan patience)
+    {
+        var fin = DateTime.UtcNow + patience;
+        var annonce = false;
+        var libreDepuis = PartieEnCours() ? (DateTime?)null : DateTime.UtcNow - TimeSpan.FromMinutes(1);
+        while (DateTime.UtcNow < fin)
+        {
+            if (PartieEnCours())
+            {
+                libreDepuis = null;
+                if (!annonce)
+                {
+                    Dire("Une partie est en cours : la mise a jour attend qu'elle se termine.");
+                    annonce = true;
+                }
+            }
+            else
+            {
+                libreDepuis ??= DateTime.UtcNow;
+                if (DateTime.UtcNow - libreDepuis >= TimeSpan.FromMinutes(1)) return true;
+            }
+
+            await Task.Delay(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
+        }
+
+        return false;
+    }
+
     private static async Task<int> AppliquerAsync(HttpClient http, string racine, string archive, Release release, Version? installee, int port, bool sansData)
     {
+        if (!await AttendreLaFinDeLaPartieAsync(TimeSpan.FromHours(4)).ConfigureAwait(false))
+        {
+            Dire("La borne joue depuis plus de quatre heures : mise a jour abandonnee, elle sera reprise au prochain lancement.");
+            return 3;
+        }
+
         var travail = Path.Combine(racine, ".temp", "update");
         var scene = Path.Combine(travail, "stage-" + release.Version);
         if (Directory.Exists(scene)) Directory.Delete(scene, recursive: true);
