@@ -8,7 +8,7 @@
 ; ─────────────────────────────────────────────────────────────────────────────
 
 #define AppName "APIExpose (borne RetroBat)"
-#define AppVersion "1.9.4"
+#define AppVersion "1.9.7"
 #define AppExe "RetroBat.Api.exe"
 
 [Setup]
@@ -20,6 +20,11 @@ AppPublisherURL=https://www.nelfetech.com
 ; La cible est le dossier plugins du RetroBat de la borne. DefaultDirName est resolu
 ; par [Code] (retrobat-detect.iss) : RetroBat detecte sur les lecteurs, sinon C:\RetroBat.
 DefaultDirName={code:GetPluginInstallDir|APIExpose}
+; PLUSIEURS RETROBAT SUR UN MEME PC (demande user 2026-09-27) : une page propose chacun de ceux
+; trouves, et la page de dossier reste accessible par « Un autre dossier ». Par defaut, Inno
+; Setup masque la page de dossier lors d'une mise a jour et reinstalle au meme endroit sans rien
+; demander : c'est ce que DisableDirPage=no empeche (la page de choix decide de la montrer).
+DisableDirPage=no
 DirExistsWarning=no
 AppendDefaultDirName=no
 PrivilegesRequired=lowest
@@ -37,6 +42,20 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Messages]
 french.SelectDirDesc=Choisissez le dossier plugins\APIExpose de VOTRE RetroBat (ex. D:\RetroBat\plugins\APIExpose).
+
+[CustomMessages]
+french.RetroBatPageCaption=Choix du RetroBat
+french.RetroBatPageDescription=Dans quel RetroBat installer APIExpose ?
+french.RetroBatPageSubCaption=Plusieurs RetroBat peuvent cohabiter sur un même PC. APIExpose s'installe dans le dossier plugins de celui que vous choisissez.
+french.RetroBatLatest=dernier RetroBat lancé
+french.RetroBatHasApi=APIExpose %1 déjà installé
+french.RetroBatOther=Un autre dossier (à choisir à l'étape suivante)
+english.RetroBatPageCaption=Choose your RetroBat
+english.RetroBatPageDescription=Which RetroBat should APIExpose be installed into?
+english.RetroBatPageSubCaption=Several RetroBat installations can live on the same PC. APIExpose is installed in the plugins folder of the one you choose.
+english.RetroBatLatest=last RetroBat launched
+english.RetroBatHasApi=APIExpose %1 already installed
+english.RetroBatOther=Another folder (chosen on the next step)
 
 [Files]
 ; APIExpose COMPLET (= contenu de full.7z) : moteur + .installer (hooks ES) +
@@ -136,4 +155,115 @@ begin
     if FileExists(Target) and DeleteFile(Target) then
       Log('Hook EmulationStation retire : ' + Target);
   end;
+end;
+
+// ── LE CHOIX DU RETROBAT ─────────────────────────────────────────────────────────────────────
+// Beaucoup de joueurs ont plusieurs RetroBat. La page liste ceux que retrobat-detect.iss trouve,
+// avec ce qu'on sait de chacun (dernier lance, APIExpose deja installe et sa version), et une
+// derniere option pour un dossier quelconque. En installation silencieuse elle n'apparait pas :
+// /DIR= decide, sinon l'installation precedente, sinon le RetroBat prefere (DefaultDirName).
+var
+  RetroBatPage: TInputOptionWizardPage;
+  RetroBatRoots: TArrayOfString;
+
+// La version d'APIExpose deja installee dans ce RetroBat (« 1.9.7 »), « ? » si illisible, vide si absente.
+function ApiExposeInstalledVersion(Root: String): String;
+var
+  Exe: String;
+begin
+  Result := '';
+  Exe := AddBackslash(Root) + 'plugins\APIExpose\RetroBat.Api.exe';
+  if not FileExists(Exe) then
+    Exit;
+  if not GetVersionNumbersString(Exe, Result) then
+    Result := '?'
+  else if (Length(Result) > 2) and (Copy(Result, Length(Result) - 1, 2) = '.0') then
+    Result := Copy(Result, 1, Length(Result) - 2);
+end;
+
+function RetroBatLabel(Root, Latest: String): String;
+var
+  Notes, Version: String;
+begin
+  Notes := '';
+  if (Latest <> '') and (CompareText(Root, Latest) = 0) then
+    Notes := CustomMessage('RetroBatLatest');
+  Version := ApiExposeInstalledVersion(Root);
+  if Version <> '' then
+  begin
+    if Notes <> '' then
+      Notes := Notes + ', ';
+    Notes := Notes + FmtMessage(CustomMessage('RetroBatHasApi'), [Version]);
+  end;
+  Result := Root;
+  if Notes <> '' then
+    Result := Result + '   (' + Notes + ')';
+end;
+
+<event('InitializeWizard')>
+procedure RetroBatInitializeWizard;
+var
+  I, Choix: Integer;
+  Latest, Precedent: String;
+begin
+  RetroBatRoots := DetectRetroBatRoots();
+  Latest := LatestKnownRetroBatRoot();
+  // Une mise a jour : le RetroBat de l'installation precedente est propose, meme s'il vit a un
+  // endroit que le scan ne parcourt pas, et il est coche par defaut.
+  Precedent := '';
+  if WizardForm.PrevAppDir <> '' then
+  begin
+    Precedent := RemoveBackslashUnlessRoot(ExtractFilePath(RemoveBackslashUnlessRoot(
+      ExtractFilePath(RemoveBackslashUnlessRoot(WizardForm.PrevAppDir)))));
+    AddRetroBatRoot(RetroBatRoots, Precedent);
+  end;
+  for I := 0 to GetArrayLength(RetroBatRoots) - 1 do
+    Log('RetroBat trouve : ' + RetroBatLabel(RetroBatRoots[I], Latest));
+  if GetArrayLength(RetroBatRoots) = 0 then
+  begin
+    Log('Aucun RetroBat trouve : page de dossier seule.');
+    Exit;
+  end;
+
+  RetroBatPage := CreateInputOptionPage(wpWelcome, CustomMessage('RetroBatPageCaption'),
+    CustomMessage('RetroBatPageDescription'), CustomMessage('RetroBatPageSubCaption'), True, False);
+  Choix := 0;
+  for I := 0 to GetArrayLength(RetroBatRoots) - 1 do
+  begin
+    RetroBatPage.Add(RetroBatLabel(RetroBatRoots[I], Latest));
+    if (Precedent <> '') and (CompareText(RetroBatRoots[I], Precedent) = 0) then
+      Choix := I;
+  end;
+  RetroBatPage.Add(CustomMessage('RetroBatOther'));
+  RetroBatPage.SelectedValueIndex := Choix;
+end;
+
+// Vrai quand la page de choix designe un RetroBat trouve (et non « un autre dossier »).
+function RetroBatChoisi(): Boolean;
+begin
+  Result := (RetroBatPage <> nil) and (RetroBatPage.SelectedValueIndex >= 0)
+    and (RetroBatPage.SelectedValueIndex < GetArrayLength(RetroBatRoots));
+end;
+
+<event('NextButtonClick')>
+function RetroBatNextButtonClick(CurPageID: Integer): Boolean;
+begin
+  Result := True;
+  // EN SILENCIEUX, JAMAIS : Inno appelle ce « Suivant » meme pour les pages qu'il n'affiche pas,
+  // et le choix par defaut ecrasait /DIR= (essai du 2026-09-27 : installe dans E:\RetroBat au
+  // lieu du dossier demande). /DIR=, l'installation precedente ou DefaultDirName decident seuls.
+  if WizardSilent() then
+    Exit;
+  if (RetroBatPage <> nil) and (CurPageID = RetroBatPage.ID) and RetroBatChoisi() then
+  begin
+    WizardForm.DirEdit.Text := AddBackslash(RetroBatRoots[RetroBatPage.SelectedValueIndex]) + 'plugins\APIExpose';
+    Log('RetroBat choisi : ' + WizardForm.DirEdit.Text);
+  end;
+end;
+
+// La page de dossier ne sert que pour « un autre dossier », ou quand aucun RetroBat n'a ete trouve.
+<event('ShouldSkipPage')>
+function RetroBatShouldSkipPage(PageID: Integer): Boolean;
+begin
+  Result := (PageID = wpSelectDir) and RetroBatChoisi();
 end;

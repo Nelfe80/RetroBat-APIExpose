@@ -81,13 +81,44 @@ Le script reste en **batch pur avec `curl.exe`** : une commande PowerShell qui f
 
 Le hook n'est posé que par l'installeur. La mise à jour automatique (`RetroBat.Api.Update.exe`) remplace le fichier source dans `.installer`, pas la copie d'EmulationStation. `install-es-start-hook.bat` et `uninstall-es-start-hook.bat` restent disponibles pour une remise en place manuelle.
 
+## Choix du RetroBat (`retrobat-detect.iss` + page de `CabinetSetup.iss`)
+
+Beaucoup de joueurs ont plusieurs RetroBat sur le même PC. L'installeur les cherche tous, puis
+affiche une page « Choix du RetroBat » qui en propose un par ligne, avec ce qu'on sait de chacun :
+« dernier RetroBat lancé », « APIExpose x.y.z déjà installé ». La dernière option, « Un autre
+dossier », ouvre la page de dossier habituelle. Choisir un RetroBat de la liste saute cette page.
+
+Où l'installeur cherche :
+
+- `HKCU\Software\RetroBat\LatestKnownInstallPath`, que RetroBat tient lui-même : c'est le RetroBat
+  préféré, proposé en tête ;
+- le RetroBat de l'installation précédente d'APIExpose, coché par défaut lors d'une mise à jour ;
+- sur chaque disque local ou amovible (jamais un lecteur réseau ou optique, qui ferait attendre) :
+  `X:\RetroBat`, tout dossier de premier niveau, et un niveau plus bas sous les dossiers de jeux
+  (Games, Jeux, Emulation, Emulators, Emulateurs, Emu, Retrogaming, Retro, Arcade, *RetroBat*).
+
+Un dossier compte comme RetroBat s'il porte `retrobat.exe` ou `emulationstation\emulationstation.exe`.
+
+`DisableDirPage=no` est voulu : par défaut, Inno Setup masque la page de dossier lors d'une mise à
+jour et réinstalle au même endroit sans rien demander.
+
+EN SILENCIEUX, LA PAGE NE DÉCIDE RIEN. Inno appelle `NextButtonClick` même pour les pages qu'il
+n'affiche pas : sans le garde `WizardSilent()`, le choix par défaut écrasait `/DIR=` (vécu le
+2026-09-27 : une installation de test est partie dans le vrai `E:\RetroBat` au lieu de la fausse
+arborescence). En silencieux, c'est `/DIR=`, sinon l'installation précédente, sinon le RetroBat
+préféré (`DefaultDirName`).
+
+Les lignes `RetroBat trouve :` et `RetroBat choisi :` du journal (`/LOG`) disent ce qui a été vu.
+Une installation silencieuse les écrit aussi : c'est ainsi qu'on vérifie la détection sans
+afficher la page.
+
 ## Modifier puis vérifier
 
 ### 1. Contrôle rapide du code (quelques secondes)
 
 Compiler un installeur minuscule qui reprend le `[Code]` réel, sans le dossier complet : une erreur Pascal apparaît tout de suite, au lieu de la fin d'une compilation de douze minutes. Générer un `.iss` temporaire avec un `[Setup]` minimal (AppId différent de celui d'APIExpose), un `[Files]` qui ne contient que `.installer\scripts\start\APIExpose-start-wait.bat` (destination `{app}\.installer\scripts\start`), puis la fin de `CabinetSetup.iss` à partir de `#include "retrobat-detect.iss"`, avec des chemins d'include absolus. Le compiler avec `ISCC.exe /Q`.
 
-Ce petit installeur sert aussi au test de comportement : l'installer en silencieux dans une fausse arborescence RetroBat avec `/LOG`, lire les lignes `.NET 8 :` et `Hook EmulationStation pose`, vérifier que la copie du hook est identique à la source, lancer `unins000.exe /VERYSILENT` et vérifier que le hook a disparu. Retirer ensuite la fausse arborescence et l'entrée `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\{<AppId>}_is1` de ce test.
+Ce petit installeur sert aussi au test de comportement : l'installer en silencieux dans une fausse arborescence RetroBat avec `/LOG`, lire les lignes `.NET 8 :` et `Hook EmulationStation pose`, vérifier que la copie du hook est identique à la source, lancer `unins000.exe /VERYSILENT` et vérifier que le hook a disparu. Toujours passer `/DIR=` vers la fausse arborescence, et vérifier après coup que le vrai RetroBat n'a rien reçu (`git status` d'APIExpose, aucun `unins000.exe` à sa racine) ; ne JAMAIS lancer un désinstalleur de test posé dans le vrai RetroBat : il retirerait le hook d'EmulationStation. Retirer ensuite la fausse arborescence et l'entrée `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\{<AppId>}_is1` de ce test.
 
 ### 2. Compilation réelle
 
