@@ -475,6 +475,40 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return o;
     }
 
+    /// <summary>Le plus long qu'on attende le proces-verbal d'un coeur jamais vu avant d'annoncer.</summary>
+    private static readonly TimeSpan AttenteVerdictCoeur = TimeSpan.FromSeconds(8);
+
+    /// <summary>
+    /// Le verdict de la liste blanche pour les fichiers d'un nom de coeur : vrai ou faux quand ce
+    /// sont tous des coeurs d'arcade qui disent la meme chose, null sinon (hors arcade, inconnu).
+    /// </summary>
+    internal static bool? VerdictArcade(IReadOnlyList<string> fichiers)
+    {
+        if (fichiers.Count == 0 || fichiers.Any(fichier => CoeursObservables.CoeurArcadeMesure(fichier) is null))
+        {
+            return null;
+        }
+
+        var verdicts = fichiers.Select(fichier => CoeursObservables.CoeurArcadeMesure(fichier)!.Value).Distinct().ToList();
+        return verdicts.Count == 1 ? verdicts[0] : null;
+    }
+
+    private async Task<CoreMemoryCapability.Verdict?> AttendreVerdictDuCoeurAsync(string coeur, CancellationToken ct)
+    {
+        var limite = DateTime.UtcNow + AttenteVerdictCoeur;
+        while (DateTime.UtcNow < limite)
+        {
+            if (_coeurs?.ConnuParNomAffiche(coeur) is { } verdict)
+            {
+                return verdict;
+            }
+
+            await Task.Delay(250, ct).ConfigureAwait(false);
+        }
+
+        return null;
+    }
+
     private readonly CertifiedSettingsService? _certified;
     private readonly RetroBat.Api.Replay.Playback.ReplayPlaybackService? _playback;
 
@@ -587,7 +621,24 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // cote de chaque .dll relie le nom du coeur a son fichier. Elle peut donc prevenir
             // AVANT la partie, et non plus seulement a la premiere image.
             var coeur = GetString(attestation, "CoreName") ?? string.Empty;
-            if (_coeurs?.ConnuParNomAffiche(coeur) is { Measures: false })
+            // LA LISTE BLANCHE PARLE AVANT L'EXPERIENCE (2026-09-27). Au tout premier lancement d'un
+            // coeur, la borne ne savait rien de lui : « certifiable » en bleu, puis « aucun score »
+            // en orange quatre secondes plus tard (19xx sous MAME 2003-Plus, 2026-09-26). Pour
+            // l'arcade, la liste blanche tranche d'emblee, dans les deux sens : un vieux MAME ne
+            // mesure pas, et MAME recent mesure meme si le wrapper, qui ne le lit pas, l'a note
+            // aveugle (c'est le plugin Lua qui mesure).
+            var verdictArcade = VerdictArcade(_coeurs?.FichiersParNomAffiche(coeur) ?? Array.Empty<string>());
+            var aveugle = verdictArcade == false
+                || (verdictArcade is null && _coeurs?.ConnuParNomAffiche(coeur) is { Measures: false });
+            // Hors arcade, un coeur jamais vu : son proces-verbal arrive quelques secondes apres
+            // l'attestation (4,2 s mesurees). On l'attend plutot que d'annoncer a l'aveugle.
+            if (!aveugle && verdictArcade is null && _coeurs is not null
+                && _coeurs.FichiersParNomAffiche(coeur).Count > 0 && _coeurs.ConnuParNomAffiche(coeur) is null)
+            {
+                aveugle = await AttendreVerdictDuCoeurAsync(coeur, ct).ConfigureAwait(false) is { Measures: false };
+            }
+
+            if (aveugle)
             {
                 _overlay?.ShowTop(
                     "SCORING",
@@ -595,7 +646,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     string.Format(Texte("scoring_core_blind"), coeur),
                     8000,
                     alerte: true);
-                Trace($"prévol : {coeur} est connu pour ne rien exposer, rien ne sera mesuré");
+                Trace(verdictArcade == false
+                    ? $"prévol : {coeur} n'est pas dans la liste blanche des cœurs qui mesurent, rien ne sera mesuré"
+                    : $"prévol : {coeur} est connu pour ne rien exposer, rien ne sera mesuré");
 
                 return;
             }

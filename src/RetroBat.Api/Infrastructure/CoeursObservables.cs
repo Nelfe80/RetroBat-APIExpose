@@ -85,6 +85,13 @@ public static class CoeursObservables
         return autre is null ? null : ("libretro", autre.Core);
     }
 
+    /// <summary>
+    /// Un coeur libretro d'arcade, designe par son fichier, mesure-t-il ? Null hors arcade : ce
+    /// n'est pas la liste blanche qui en juge.
+    /// </summary>
+    public static bool? CoeurArcadeMesure(string coeur)
+        => EstCoeurArcade(coeur) ? CoeursArcadeMesures.Contains(coeur) : null;
+
     private static bool EstCoeurMame(string coeur) => coeur.StartsWith("mame", StringComparison.OrdinalIgnoreCase);
 
     private static bool EstCoeurArcade(string coeur) =>

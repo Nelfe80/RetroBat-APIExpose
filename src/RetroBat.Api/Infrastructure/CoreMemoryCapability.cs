@@ -212,6 +212,22 @@ public sealed class CoreMemoryCapability
         return connus.Select(v => v.Measures).Distinct().Count() == 1 ? connus[0] : null;
     }
 
+    /// <summary>
+    /// Les coeurs (fichier sans « _libretro ») qui portent ce nom d'affichage : « MAME 2003-Plus »
+    /// -&gt; mame2003_plus. Vide quand aucune fiche de RetroArch ne le nomme (MAME autonome).
+    /// </summary>
+    public IReadOnlyList<string> FichiersParNomAffiche(string nomAffiche)
+    {
+        if (string.IsNullOrWhiteSpace(nomAffiche))
+        {
+            return Array.Empty<string>();
+        }
+
+        return (Fiches().GetValueOrDefault(nomAffiche.Trim()) ?? new List<string>())
+            .Select(fichier => fichier.EndsWith("_libretro", StringComparison.OrdinalIgnoreCase) ? fichier[..^"_libretro".Length] : fichier)
+            .ToList();
+    }
+
     /// <summary>Les fiches de RetroArch, lues une fois : nom d'affichage -&gt; fichiers de cœur.</summary>
     private Dictionary<string, List<string>> Fiches()
     {
