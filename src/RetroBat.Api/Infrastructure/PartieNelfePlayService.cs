@@ -21,6 +21,12 @@ namespace RetroBat.Api.Infrastructure;
 ///
 /// Le verdict vaut jusqu'au lancement suivant : la session du listener arrive en fin de partie,
 /// parfois apres le game-end.
+///
+/// CARROUSEL INCONNU. ES n'annonce le carrousel que lorsqu'il change, et n'a pas de route pour le
+/// demander. Une API qui redemarre pendant qu'ES est deja dans la collection (mise a jour
+/// automatique au lancement, ES qui rouvre sur World Scoring) ne le connait donc pas. On juge
+/// alors le jeu lui-meme : s'il est dans la collection World Scoring, la partie est NelfePlay.
+/// Ne pas savoir ne doit pas faire perdre un record.
 /// </summary>
 public sealed class PartieNelfePlayService : IHostedService, IDisposable
 {
@@ -32,17 +38,22 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable
 
     private readonly IEventBus _bus;
     private readonly MediaRuntimeState _media;
+    private readonly ApiContext? _contexte;
+    private readonly NelfePlayScoringCollectionSyncService? _collection;
     private readonly ILogger<PartieNelfePlayService>? _logger;
     private readonly object _verrou = new();
     private IDisposable? _abonnement;
     private (string Origine, DateTime At)? _annonce;
     private string? _origine;
 
-    public PartieNelfePlayService(IEventBus bus, MediaRuntimeState media, ILogger<PartieNelfePlayService>? logger = null)
+    public PartieNelfePlayService(IEventBus bus, MediaRuntimeState media, ILogger<PartieNelfePlayService>? logger = null,
+        ApiContext? contexte = null, NelfePlayScoringCollectionSyncService? collection = null)
     {
         _bus = bus;
         _media = media;
         _logger = logger;
+        _contexte = contexte;
+        _collection = collection;
     }
 
     /// <summary>La partie en cours, ou la derniere, est-elle une partie NelfePlay ?</summary>
@@ -78,15 +89,23 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable
         }
     }
 
-    /// <summary>L'origine d'une partie NelfePlay, ou null pour une partie du joueur.</summary>
-    internal static string? Juger(string? carrousel, string? annonce)
+    /// <summary>
+    /// L'origine d'une partie NelfePlay, ou null pour une partie du joueur. `dansLaCollection` ne
+    /// sert que si le carrousel est inconnu.
+    /// </summary>
+    internal static string? Juger(string? carrousel, string? annonce, bool? dansLaCollection = null)
     {
         if (!string.IsNullOrWhiteSpace(annonce))
         {
             return annonce;
         }
 
-        return string.Equals(carrousel?.Trim(), NelfePlayScoringCollectionSyncService.CollectionName, StringComparison.OrdinalIgnoreCase)
+        if (string.IsNullOrWhiteSpace(carrousel))
+        {
+            return dansLaCollection == true ? "collection (carrousel inconnu)" : null;
+        }
+
+        return string.Equals(carrousel.Trim(), NelfePlayScoringCollectionSyncService.CollectionName, StringComparison.OrdinalIgnoreCase)
             ? "collection"
             : null;
     }
@@ -113,12 +132,18 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable
         }
 
         var carrousel = _media.CarouselSystemId;
+        bool? dansLaCollection = null;
+        if (carrousel.Length == 0 && _contexte?.Ui.Running?.GamePath is { Length: > 0 } chemin)
+        {
+            dansLaCollection = _collection?.EstOuvertAuScoring(chemin);
+        }
+
         string? origine;
         lock (_verrou)
         {
             var annonce = _annonce is { } a && DateTime.UtcNow - a.At <= ValiditeAnnonce ? a.Origine : null;
             _annonce = null;
-            origine = Juger(carrousel, annonce);
+            origine = Juger(carrousel, annonce, dansLaCollection);
             _origine = origine;
         }
 

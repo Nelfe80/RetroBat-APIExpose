@@ -33,6 +33,15 @@ public sealed class PartieNelfePlayTests
     public void Le_carrousel_ou_une_fonction_NelfePlay_decide(string? carrousel, string? annonce, string? attendu)
         => Assert.Equal(attendu, PartieNelfePlayService.Juger(carrousel, annonce));
 
+    [Theory]
+    [InlineData("", true, "collection (carrousel inconnu)")]
+    [InlineData(null, true, "collection (carrousel inconnu)")]
+    [InlineData("", false, null)]
+    [InlineData("", null, null)]
+    [InlineData("mame", true, null)]   // le carrousel est connu : c'est lui qui decide
+    public void Carrousel_inconnu_on_juge_le_jeu(string? carrousel, bool? dansLaCollection, string? attendu)
+        => Assert.Equal(attendu, PartieNelfePlayService.Juger(carrousel, null, dansLaCollection));
+
     [Fact]
     public async Task Un_jeu_lance_depuis_la_collection_est_une_partie_NelfePlay()
     {
