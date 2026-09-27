@@ -46,6 +46,7 @@ public sealed class CoreMemoryCapability
     private IDisposable? _abonnement;
     private LiveContestOverlayService? _bandeau;
     private CabinetLocale? _locale;
+    private PartieNelfePlayService? _partie;
     /// <summary>Le dernier coeur annonce muet : on ne repete pas le bandeau a chaque partie.</summary>
     private string? _dernierMuet;
 
@@ -60,10 +61,12 @@ public sealed class CoreMemoryCapability
     /// Ecoute les proces-verbaux que le wrapper publie a chaque lancement. Le provider ne juge
     /// pas : il publie sa ligne, et la liste se remplit ici.
     /// </summary>
-    public void Ecouter(IEventBus bus, LiveContestOverlayService? bandeau = null, CabinetLocale? locale = null)
+    public void Ecouter(IEventBus bus, LiveContestOverlayService? bandeau = null, CabinetLocale? locale = null,
+        PartieNelfePlayService? partie = null)
     {
         _bandeau = bandeau;
         _locale = locale;
+        _partie = partie;
         _abonnement?.Dispose();
         _abonnement = bus.Subscribe<EventEnvelope>(e =>
         {
@@ -88,7 +91,10 @@ public sealed class CoreMemoryCapability
             // exactement ce qui s'est produit quatre fois de suite le 24 septembre 2026.
             //
             // L'etat est LOCAL : il se dit sans reseau, comme l'alerte du wrapper absent.
-            if (verdict is { Measures: false } && _dernierMuet != verdict.Core)
+            //
+            // Seulement pour une partie NelfePlay (regle user 2026-09-27) : hors NelfePlay il n'y a
+            // pas de scoring, donc rien a annoncer. Le coeur est releve quand meme, ci-dessus.
+            if (verdict is { Measures: false } && _dernierMuet != verdict.Core && _partie is not { EstNelfePlay: false })
             {
                 _dernierMuet = verdict.Core;
                 // Dans la langue de la borne, et en orange comme les autres « aucun score ».

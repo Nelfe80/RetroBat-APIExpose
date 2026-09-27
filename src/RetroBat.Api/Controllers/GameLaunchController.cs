@@ -52,6 +52,9 @@ public sealed class GameLaunchController : ControllerBase
     private readonly RetroBat.Api.Netplay.LiveSpectateState _spectate;
     private readonly ILogger<GameLaunchController> _logger;
 
+    /// <summary>Ce que le site lance est une partie NelfePlay, quel que soit le carrousel d'ES.</summary>
+    private readonly PartieNelfePlayService? _partie;
+
     public GameLaunchController(
         IGamelistStore gamelists,
         RomCanonicalResolver canonical,
@@ -61,8 +64,10 @@ public sealed class GameLaunchController : ControllerBase
         RetroBat.Api.Netplay.NetplayGuestService invite,
         NelfePlayAgentService agent,
         RetroBat.Api.Netplay.LiveSpectateState spectate,
-        ILogger<GameLaunchController> logger)
+        ILogger<GameLaunchController> logger,
+        PartieNelfePlayService? partie = null)
     {
+        _partie = partie;
         _gamelists = gamelists;
         _canonical = canonical;
         _tokens = tokens;
@@ -143,6 +148,7 @@ public sealed class GameLaunchController : ControllerBase
             return Redirect(Retour(retour, "bad_request", null));
         }
 
+        _partie?.AnnoncerLancement("site");
         var echec = await _invite.RejoindreAsync(session, ct).ConfigureAwait(false);
         return echec == RetroBat.Api.Netplay.NetplayGuestService.Echec.Aucun
             ? Redirect(Retour(retour, null, null))
@@ -201,6 +207,8 @@ public sealed class GameLaunchController : ControllerBase
             // c'est une information, et le site sait la dire.
             return Redirect(Retour(retour, "not_installed", null));
         }
+
+        _partie?.AnnoncerLancement("site");
 
         // DIFFUSION : on heberge, au lieu de passer par le lancement ordinaire d'ES. C'est le
         // seul chemin possible — l'API HTTP d'EmulationStation ne prend qu'un chemin de ROM et

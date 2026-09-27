@@ -114,9 +114,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         IEmulationStationNotificationService notifications,
         RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider wrapper,
         ILogger<LeaderboardInputService> logger,
-        Infrastructure.NelfePlayScoringCollectionSyncService? collection = null)
+        Infrastructure.NelfePlayScoringCollectionSyncService? collection = null,
+        Infrastructure.PartieNelfePlayService? partie = null)
     {
         _collection = collection;
+        _partie = partie;
         _wrapper = wrapper;
         _social = social;
         _invite = invite;
@@ -485,6 +487,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
 
     /// <summary>Qui sait quels jeux sont ouverts au scoring sur cette borne.</summary>
     private readonly Infrastructure.NelfePlayScoringCollectionSyncService? _collection;
+    private readonly Infrastructure.PartieNelfePlayService? _partie;
 
     /// <summary>Les conditions d'ouverture. Toutes doivent tenir : un panneau qui s'ouvre au mauvais moment se ferme mal.</summary>
     private bool PeutSOuvrir(out string systeme, out string nomDuJeu, out string cheminDuJeu)
@@ -911,6 +914,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 client.BaseAddress = new Uri("http://127.0.0.1:1234");
                 client.Timeout = TimeSpan.FromSeconds(10);
                 using var corps = new StringContent(chemin, System.Text.Encoding.UTF8, "text/plain");
+                // Un defi est une partie NelfePlay, meme lance depuis le systeme du jeu.
+                _partie?.AnnoncerLancement("defi");
                 using var reponse = await client.PostAsync("/launch", corps).ConfigureAwait(false);
                 if (!reponse.IsSuccessStatusCode)
                 {

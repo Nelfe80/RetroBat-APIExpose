@@ -132,9 +132,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         CertifiedSettingsService? certified = null,
         CoreMemoryCapability? coeurs = null,
         RetroBat.Api.Replay.Playback.ReplayPlaybackService? playback = null,
-        RetroBat.Domain.Interfaces.IEsSettingsStore? esSettings = null)
+        RetroBat.Domain.Interfaces.IEsSettingsStore? esSettings = null,
+        PartieNelfePlayService? partie = null)
     {
         _esSettings = esSettings;
+        _partie = partie;
         _nvram = nvram;
         _bios = bios;
         _certified = certified;
@@ -524,6 +526,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly CertifiedSettingsService? _certified;
     private readonly RetroBat.Api.Replay.Playback.ReplayPlaybackService? _playback;
 
+    /// <summary>
+    /// PAS DE SCORING HORS NELFEPLAY (regle user 2026-09-27). Un jeu lance depuis son systeme garde
+    /// son propre comportement : ni annonce au lancement, ni score soumis. Seules comptent les
+    /// parties lancees depuis la collection World Scoring ou par une fonction NelfePlay (voir
+    /// PartieNelfePlayService), et celles du labo, qui ne sont jamais classees.
+    /// </summary>
+    private readonly PartieNelfePlayService? _partie;
+
+    private bool PartieNelfePlay()
+        => _partie is not { EstNelfePlay: false }
+           || RetroBat.Api.Scoring.ScoreLabLabMode.IsActive(DateTime.UtcNow, out _);
+
     private void CaptureAttestation(JsonElement root)
     {
         lock (_sync)
@@ -556,6 +570,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var systemId = GetString(attestation, "SystemId") ?? "";
             var romGroup = GetString(attestation, "Rom") ?? "";
             if (systemId.Length == 0 || romGroup.Length == 0 || _esNotify is null) return;
+            if (!PartieNelfePlay())
+            {
+                Trace($"prevol : {systemId}/{romGroup} lance hors NelfePlay, ni annonce ni scoring");
+                return;
+            }
             var credential = ResolveCredential();
             if (string.IsNullOrEmpty(credential)) return;
             var profile = await FetchProfileAsync(credential, systemId, romGroup, ct).ConfigureAwait(false);
@@ -1214,6 +1233,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // qui decidera, un peu plus bas, s'il y avait quelque chose a mesurer.
         _sessionRecue = true;
         if (sessionJson is null) return;
+        if (!PartieNelfePlay())
+        {
+            Trace("STOP: partie lancee hors NelfePlay (ni collection World Scoring, ni fonction NelfePlay)");
+            return;
+        }
         try
         {
             // Ce que le listener a vu des entrées et ce qu'il a forcé : lisible ici même quand la

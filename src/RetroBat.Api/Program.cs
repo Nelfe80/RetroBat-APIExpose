@@ -396,6 +396,8 @@ builder.Services.AddSingleton(sp => new RetroBat.Api.Infrastructure.CoreMemoryCa
 builder.Services.AddSingleton<NelfePlayScoringCollectionSyncService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<NelfePlayScoringCollectionSyncService>());
 // Dans World Scoring, notre coeur fonctionnel ; dans le systeme du jeu, le choix de confort du joueur.
+builder.Services.AddSingleton<RetroBat.Api.Infrastructure.PartieNelfePlayService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.PartieNelfePlayService>());
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.WorldScoringLancementService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.WorldScoringLancementService>());
 // Index public des jeux ouverts au scoring : court, lu souvent, jamais authentifie. Pas de
@@ -640,7 +642,8 @@ eventBus.Subscribe<EventEnvelope>(evt =>
 app.Services.GetRequiredService<RetroBat.Api.Infrastructure.CoreMemoryCapability>().Ecouter(
     eventBus,
     app.Services.GetService<RetroBat.Api.Infrastructure.LiveContestOverlayService>(),
-    app.Services.GetService<RetroBat.Api.Infrastructure.CabinetLocale>());
+    app.Services.GetService<RetroBat.Api.Infrastructure.CabinetLocale>(),
+    app.Services.GetService<RetroBat.Api.Infrastructure.PartieNelfePlayService>());
 
 app.Use(async (context, next) =>
 {

@@ -57,14 +57,18 @@ public sealed class LiveContestClientService : BackgroundService
     private readonly NelfePlayScoringSessionService _scoringSession;
     private readonly NelfePlayAgentService _agent;
 
+    private readonly PartieNelfePlayService? _partie;
+
     public LiveContestClientService(
         IEventBus eventBus,
         LiveContestOverlayService overlay,
         IHttpClientFactory httpFactory,
         NelfePlayScoringSessionService scoringSession,
         NelfePlayAgentService agent,
-        ILogger<LiveContestClientService> logger)
+        ILogger<LiveContestClientService> logger,
+        PartieNelfePlayService? partie = null)
     {
+        _partie = partie;
         _eventBus = eventBus;
         _overlay = overlay;
         _httpFactory = httpFactory;
@@ -361,6 +365,8 @@ public sealed class LiveContestClientService : BackgroundService
             {
                 using var es = new HttpClient { BaseAddress = EmulationStationBaseUri };
                 using var content = new StringContent(romPath, Encoding.UTF8, "text/plain");
+                // Une partie de concours est une partie NelfePlay, d'ou que le carrousel la lance.
+                _partie?.AnnoncerLancement("concours");
                 var res = await es.PostAsync("/launch", content, cancellationToken);
                 if (!res.IsSuccessStatusCode)
                 {

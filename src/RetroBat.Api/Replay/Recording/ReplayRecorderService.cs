@@ -88,11 +88,19 @@ public sealed class ReplayRecorderService : BackgroundService
 
     public ReplayRecorderService(RetroArchReplayClient ra, ReplayStore store, ReplayCoreTimingProbe timing,
         IEventBus bus, RetroBat.Api.Replay.Playback.ReplayPlaybackService playback, ILogger<ReplayRecorderService> logger,
-        IConfiguration config, RetroBat.Api.Media.InstalledGameCatalog? catalogue = null)
+        IConfiguration config, RetroBat.Api.Media.InstalledGameCatalog? catalogue = null,
+        RetroBat.Api.Infrastructure.PartieNelfePlayService? partie = null)
     {
         _ra = ra; _store = store; _timing = timing; _bus = bus; _playback = playback; _logger = logger;
-        _config = config; _catalogue = catalogue;
+        _config = config; _catalogue = catalogue; _partie = partie;
     }
+
+    /// <summary>
+    /// SEULE UNE PARTIE NELFEPLAY S'ENREGISTRE (regle user 2026-09-27). Jusque-la, toute partie
+    /// RetroArch l'etait des le START, meme un jeu lance pour le plaisir depuis son systeme : un
+    /// testeur l'a vu. Hors NelfePlay, le jeu garde le comportement que le joueur a regle.
+    /// </summary>
+    private readonly RetroBat.Api.Infrastructure.PartieNelfePlayService? _partie;
 
     private bool StartRequis => _config.GetValue("Replay:Record:RequireStart", true);
 
@@ -231,6 +239,20 @@ public sealed class ReplayRecorderService : BackgroundService
         {
             // Démarrage : un jeu RetroArch est chargé, aucun replay actif, on n'est pas en lecture,
             // et le joueur vient d'appuyer sur START (sinon on enregistrerait la demo).
+            // Hors NelfePlay, on ne guette meme pas le START : le journal le dit une fois par jeu,
+            // au lieu d'annoncer une attente qui n'aboutira jamais.
+            if (status is { ContentLoaded: true } && _partie is { EstNelfePlay: false } && !_playback.IsBusy)
+            {
+                var cle = "hors:" + status.System + "/" + status.Game;
+                if (!string.Equals(_attenteAnnoncee, cle, StringComparison.Ordinal))
+                {
+                    _attenteAnnoncee = cle;
+                    _logger.LogInformation("Replay : {Game} n'est pas une partie NelfePlay, pas d'enregistrement.", status.Game);
+                }
+
+                return;
+            }
+
             if (status is { ContentLoaded: true } && active is { Active: false } && !_playback.IsBusy
                 && StartRecent(status))
             {

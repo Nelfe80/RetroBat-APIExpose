@@ -671,6 +671,18 @@ public class MediaRuntimeState
         }
     }
 
+    /// <summary>Le systeme ou la collection que le carrousel montre, vide tant qu'ES n'en a annonce aucun.</summary>
+    public string CarouselSystemId
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _carouselSystemId;
+            }
+        }
+    }
+
     /// <summary>
     /// Vrai quand la vue affichee n'est pas celle du systeme du fragment : collection
     /// personnalisee, collection automatique, vue groupee.

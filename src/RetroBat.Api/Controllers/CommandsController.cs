@@ -21,11 +21,18 @@ public class CommandsController : ControllerBase
     private readonly ILogger<CommandsController> _logger;
     private readonly RetroBat.Domain.Interfaces.IEventBus _bus;
 
-    public CommandsController(ApiContext context, ILogger<CommandsController> logger, RetroBat.Domain.Interfaces.IEventBus bus)
+    private readonly RetroBat.Api.Infrastructure.NelfePlayScoringCollectionSyncService? _collection;
+    private readonly RetroBat.Api.Infrastructure.PartieNelfePlayService? _partie;
+
+    public CommandsController(ApiContext context, ILogger<CommandsController> logger, RetroBat.Domain.Interfaces.IEventBus bus,
+        RetroBat.Api.Infrastructure.NelfePlayScoringCollectionSyncService? collection = null,
+        RetroBat.Api.Infrastructure.PartieNelfePlayService? partie = null)
     {
         _context = context;
         _logger = logger;
         _bus = bus;
+        _collection = collection;
+        _partie = partie;
     }
 
     /// <summary>
@@ -74,6 +81,14 @@ public class CommandsController : ControllerBase
                 message = "ROM file not found.",
                 romPath
             });
+        }
+
+        // LANCE PAR L'API, SANS CARROUSEL : c'est ainsi que lancent le HubManager (tournois,
+        // envois de la salle) et LiveContest. La partie compte pour NelfePlay si le jeu est dans
+        // la collection World Scoring de la borne ; sinon elle garde le comportement du joueur.
+        if (_collection?.EstOuvertAuScoring(romPath) == true)
+        {
+            _partie?.AnnoncerLancement("api");
         }
 
         // MOTEUR IMPOSE : l'API HTTP d'EmulationStation ne prend qu'un chemin de ROM, et c'est ES
