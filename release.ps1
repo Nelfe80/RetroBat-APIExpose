@@ -4,10 +4,19 @@
 #   .\release.ps1 -Publish      # publie directement (sans draft)
 #   .\release.ps1 -PackageOnly  # construit seulement les archives
 #   .\release.ps1 -SansInstalleur  # publie sans l'installeur de borne (voir plus bas)
+#   .\release.ps1 -Rapide -Publish  # programme seul (update.7z) : les bornes a jour en deux minutes
+#
+# QUAND PRENDRE LE MODE RAPIDE (regle user 2026-09-27) : des qu'on n'a modifie que le programme
+# (src, wrapper, .installer). Les bornes ne lisent que -update.7z et SHA256SUMS.txt de la derniere
+# release ; le full.7z (Data Pack complet, 250 Mo) et l'installeur ne servent qu'aux premieres
+# installations, et coutaient a eux seuls 15 a 40 minutes par release. Le site sert l'installeur
+# de la derniere release COMPLETE, qui se met a jour tout seul au premier lancement. Release
+# complete quand l'installeur change (installer\) ou quand son Data Pack a trop vieilli.
 param(
     [switch]$Publish,
     [switch]$PackageOnly,
-    [switch]$SansInstalleur
+    [switch]$SansInstalleur,
+    [switch]$Rapide
 )
 $ErrorActionPreference = 'Stop'
 $sz = @('C:\Program Files\7-Zip\7z.exe','C:\Program Files (x86)\7-Zip\7z.exe') | Where-Object { Test-Path $_ } | Select-Object -First 1
@@ -100,8 +109,12 @@ $update = Join-Path $out "$name-$ver-update.7z"
 # 7z "a" met a jour une archive existante sans retirer les entrees exclues :
 # on repart toujours d'archives vierges.
 Remove-Item $full, $update -Force -Confirm:$false -ErrorAction SilentlyContinue
-Write-Host 'Construction full.7z (avec resources + tools, plusieurs minutes)...'
-& $sz a -t7z $full "$name\" @ex -mx=5 -bsp1 -bso0
+if ($Rapide) {
+    Write-Host 'Mode rapide : pas de full.7z, le programme seul.'
+} else {
+    Write-Host 'Construction full.7z (avec resources + tools, plusieurs minutes)...'
+    & $sz a -t7z $full "$name\" @ex -mx=5 -bsp1 -bso0
+}
 Write-Host 'Construction update.7z...'
 # L'outil de diagnostic (autonome, ~63 Mo) part AUSSI avec la mise a jour (decision user
 # 2026-09-25) : ses onglets Parties et Scoring et son envoi au support servent a tous les joueurs,
@@ -109,8 +122,10 @@ Write-Host 'Construction update.7z...'
 # plugin Lua) n'y sont pas : elles arrivent par le Data Pack.
 & $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" -mx=5 -bsp0 -bso0
 
-# Controle anti-fuite : l'archive ne doit contenir ni .env, ni media, ni sources.
-$listing = & $sz l $full
+# Controle anti-fuite : l'archive ne doit contenir ni .env, ni media, ni sources. En mode rapide,
+# les memes controles portent sur l'update.7z, la seule archive publiee.
+$controlee = if ($Rapide) { $update } else { $full }
+$listing = & $sz l $controlee
 # Le controle ne cherchait que les familles connues a l'epoque : tout tools\*.ps1 et
 # tools\*.py, resources\ra et ScreenScraper.html sont passes au travers. Il couvre
 # desormais ce que les exclusions ci-dessus retirent, pour que les deux listes se
@@ -161,7 +176,7 @@ if ($suivis.Count -eq 0) { throw "Controle liste blanche impossible : aucun fich
 # un contre-exemple immediat.
 $inconnus = @()
 $candidat = $null
-foreach ($ligne in (& $sz l -slt $full)) {
+foreach ($ligne in (& $sz l -slt $controlee)) {
     if ($ligne -like 'Path = *') {
         $chemin = $ligne.Substring(7)
         $candidat = $null
@@ -191,7 +206,7 @@ $manifestePath = Join-Path $PSScriptRoot 'executables.manifest.json'
 if (-not (Test-Path -LiteralPath $manifestePath)) { throw "executables.manifest.json absent : il doit etre livre avec les executables." }
 $declares = @((Get-Content -LiteralPath $manifestePath -Raw -Encoding UTF8 | ConvertFrom-Json) | ForEach-Object { $_.file })
 $exesLivres = @()
-foreach ($ligne in (& $sz l -slt $full)) {
+foreach ($ligne in (& $sz l -slt $controlee)) {
     if ($ligne -like 'Path = *') {
         $chemin = $ligne.Substring(7)
         if ($chemin -match ('^' + [regex]::Escape("$name\") + '[^\\]+\.exe$')) { $exesLivres += (Split-Path $chemin -Leaf) }
@@ -268,7 +283,31 @@ if ($PackageOnly) { Write-Host 'PackageOnly : archives pretes, pas de release.';
 #   - il doit etre plus recent que RetroBat.Api.exe, sinon il embarque le programme d'avant.
 $setup = Join-Path $PSScriptRoot 'dist\APIExpose-Cabinet-Setup.exe'
 $setupFile = $null
-if ($SansInstalleur) {
+if ($Rapide) {
+    # La derniere release COMPLETE : c'est son installeur que /setup sert, et c'est vers elle que
+    # les notes renvoient une premiere installation.
+    $releases = (& gh api 'repos/Nelfe80/RetroBat-APIExpose/releases?per_page=30') | Out-String | ConvertFrom-Json
+    $complete = $releases | Where-Object {
+        -not $_.draft -and ($_.assets | Where-Object { $_.name -eq 'APIExpose-Cabinet-Setup.exe' })
+    } | Select-Object -First 1
+    if (-not $complete) { throw "Aucune release complete (avec installeur) trouvee : faire une release complete." }
+    $tagComplete = $complete.tag_name
+    Write-Warning "Mode rapide : ni full.7z ni installeur. /setup sert l'installeur de $tagComplete, qui se met a jour seul."
+    # L'installeur a-t-il change depuis ? Le numero de version du .iss ne compte pas. Le tag est
+    # cree par GitHub a la publication : on le rapatrie avant de comparer.
+    & git -C $PSScriptRoot fetch --quiet --tags origin
+    & git -C $PSScriptRoot rev-parse --verify --quiet "$tagComplete^{commit}" | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "Tag $tagComplete introuvable localement : l'installeur n'a pas pu etre compare."
+    } else {
+        $diffInstalleur = @(& git -C $PSScriptRoot diff -U0 $tagComplete HEAD -- installer) | Where-Object {
+            $_ -match '^[+-]' -and $_ -notmatch '^(\+\+\+|---)' -and $_ -notmatch '#define AppVersion'
+        }
+        if ($diffInstalleur) {
+            Write-Warning "L'installeur a change depuis $tagComplete ($($diffInstalleur.Count) ligne(s)) : seule une release complete le livrera."
+        }
+    }
+} elseif ($SansInstalleur) {
     Write-Warning "Publication SANS installeur de borne : /setup servira la version precedente."
 } else {
     $commande = '& "C:\Program Files\Inno Setup 7\ISCC.exe" installer\CabinetSetup.iss'
@@ -292,12 +331,15 @@ Voir le wiki pour l'installation : https://nelfe80.github.io/RetroBat-APIExpose/
 
 | Archive | Contenu |
 |---|---|
-| ``$name-$ver-full.7z`` | Programme + tools + Data Pack complet (premiere installation) |
-| ``$name-$ver-update.7z`` | Programme seul (mise a jour) |
+$(if (-not $Rapide) { "| ``$name-$ver-full.7z`` | Programme + tools + Data Pack complet (premiere installation) |
+" })| ``$name-$ver-update.7z`` | Programme seul (mise a jour) |
 | ``SHA256SUMS.txt`` | Empreintes, lues par ``RetroBat.Api.Update.exe`` |$(if ($setupFile) { "
 | ``APIExpose-Cabinet-Setup.exe`` | Installeur de borne (c'est ce que sert https://nelfeplay.com/download/apiexpose) |" })
 
 Mise a jour depuis la borne : lancer ``RetroBat.Api.Update.exe`` a la racine d'APIExpose.
+$(if ($Rapide) { "
+Release rapide (programme seul). Premiere installation : l'installeur ou le full.7z de [$tagComplete](https://github.com/Nelfe80/RetroBat-APIExpose/releases/tag/$tagComplete), qui se met a jour seul au premier lancement.
+" })
 
 ### SHA-256
 ``````
@@ -311,7 +353,8 @@ $ghArgs = @('release', 'create', "v$ver",
     '--repo', 'Nelfe80/RetroBat-APIExpose', '--target', 'main',
     '--title', "APIExpose $ver", '--notes-file', $notesFile)
 if (-not $Publish) { $ghArgs += '--draft' }
-$ghArgs += @($full, $update, $swaggerFile, $sumsFile)
+if (-not $Rapide) { $ghArgs += $full }
+$ghArgs += @($update, $swaggerFile, $sumsFile)
 if ($asyncapiFile) { $ghArgs += $asyncapiFile }
 if ($setupFile) { $ghArgs += $setupFile.FullName }
 & gh @ghArgs
