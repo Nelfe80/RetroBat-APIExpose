@@ -1130,6 +1130,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             if (fins <= _finsVues) return;
             _finsVues = fins;
             if (_finDeRunPubliee) return;
+            if (!ContinueAProteger(_finalTotal)) return;
             jeton = ++_candidatContinue;
         }
 
@@ -1266,6 +1267,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             .Count();
         return adresses == 1 ? FinsDeRun.Calculer(vies, joueur).Count : 0;
     }
+
+    /// <summary>
+    /// UN CONTINUE AVANT LE PREMIER POINT N'EN EST PAS UN. Au debut d'une partie, un seul compteur
+    /// de vies a encore parle, et son initialisation peut dessiner 2, 1, 0 puis 2 : Double Dragon
+    /// arretait ainsi son replay des que le personnage sortait du garage (Another Kif, 2026-09-28).
+    /// Un continue au score nul n'a de toute facon rien a proteger. La remontee est comptee (elle ne
+    /// ressortira pas plus tard), mais n'arrete rien.
+    /// </summary>
+    internal static bool ContinueAProteger(long? scoreCourant) => scoreCourant is > 0;
 
     /// <summary>Le delai qui separe un continue (le score reste) d'une nouvelle partie (il retombe).</summary>
     internal static readonly TimeSpan ConfirmationContinue = TimeSpan.FromSeconds(6);
