@@ -112,6 +112,29 @@ Les lignes `RetroBat trouve :` et `RetroBat choisi :` du journal (`/LOG`) disent
 Une installation silencieuse les écrit aussi : c'est ainsi qu'on vérifie la détection sans
 afficher la page.
 
+## Profil de médias (page « Les médias de ce RetroBat »)
+
+Après le choix du RetroBat, une page demande comment APIExpose doit traiter les médias :
+
+- **RetroBat neuf** : APIExpose s'occupe des médias. Auto-scrap actif, PRESERVE CUSTOM MEDIA coupé.
+- **RetroBat déjà configuré** : les médias du joueur sont à lui. Auto-scrap coupé, PRESERVE CUSTOM
+  MEDIA actif (un média choisi par le joueur n'est jamais remplacé).
+- **Garder mes réglages actuels** : rien ne change. Coché d'office quand APIExpose est déjà installé
+  dans ce RetroBat.
+
+La suggestion vient de `RetroBatMediaPerso` (`retrobat-detect.iss`) : dans les gamelists du
+RetroBat, les `<image>`, `<thumbnail>`, `<video>` et `<marquee>` qui ne pointent pas vers
+`plugins/APIExpose/media`. À partir de 10, le RetroBat est « déjà configuré ». La liste des RetroBat
+affiche aussi « médias déjà en place ». Le joueur garde toujours le choix.
+
+L'installeur ne touche pas aux réglages : EmulationStation réécrit `es_settings.cfg` de mémoire en
+quittant. Il dépose `{app}\state\install-profile.json`, que l'API applique une seule fois au
+démarrage (`InstallProfileHostedService`, avant les valeurs par défaut qui recopient
+`appsettings.json` vers ES), puis archive en `install-profile.applied-<date>.json`.
+
+En silencieux, aucun profil n'est déposé, sauf avec `/MEDIAPROFILE=neuf` ou `/MEDIAPROFILE=configure` :
+une mise à jour silencieuse ne change jamais les réglages du joueur.
+
 ## Modifier puis vérifier
 
 ### 1. Contrôle rapide du code (quelques secondes)
