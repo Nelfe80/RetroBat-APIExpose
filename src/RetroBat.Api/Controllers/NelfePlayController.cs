@@ -223,6 +223,7 @@ public sealed class NelfePlayController : ControllerBase
     public async Task<IActionResult> RecordsMe(
         [FromQuery(Name = "rom_group")] string? romGroup,
         [FromQuery] string? ruleset,
+        [FromQuery] string? system,
         CancellationToken cancellationToken)
     {
         var identifyUrl = $"http://127.0.0.1:12345/link";
@@ -239,7 +240,8 @@ public sealed class NelfePlayController : ControllerBase
             client.BaseAddress = new Uri(NelfePlayAgentService.BaseUrl.TrimEnd('/'));
             client.DefaultRequestHeaders.Add("X-Nelfeplay-Device", credential);
             var url = $"/api/v1/agent/scores/my-rank?rom_group={Uri.EscapeDataString(romGroup)}"
-                    + $"&ruleset={Uri.EscapeDataString(string.IsNullOrEmpty(ruleset) ? "1cc" : ruleset)}";
+                    + $"&ruleset={Uri.EscapeDataString(string.IsNullOrEmpty(ruleset) ? "1cc" : ruleset)}"
+                    + ParametreSysteme(system);
             using var response = await client.GetAsync(url, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
@@ -278,7 +280,10 @@ public sealed class NelfePlayController : ControllerBase
         CancellationToken cancellationToken)
     {
         var identifyUrl = "http://127.0.0.1:12345/link";
-        var romGroup = RomGroupSlug(_context.Ui.Running ?? _context.Ui.Selected);
+        var jeuCourant = _context.Ui.Running ?? _context.Ui.Selected;
+        var romGroup = RomGroupSlug(jeuCourant);
+        // La machine du jeu : un jeu = systeme + contenu, et deux Tetris ont deux classements.
+        var systeme = jeuCourant?.SystemId ?? string.Empty;
         if (string.IsNullOrEmpty(romGroup))
         {
             return Ok(new { present = false, paired = _device.IsPaired, identify_url = identifyUrl });
@@ -291,7 +296,8 @@ public sealed class NelfePlayController : ControllerBase
             var client = _httpFactory.CreateClient();
             client.BaseAddress = new Uri(NelfePlayAgentService.BaseUrl.TrimEnd('/'));
             var url = $"/api/v1/scores/leaderboard?rom_group={Uri.EscapeDataString(romGroup)}"
-                    + $"&ruleset={Uri.EscapeDataString(rule)}&limit={n}";
+                    + $"&ruleset={Uri.EscapeDataString(rule)}&limit={n}"
+                    + ParametreSysteme(systeme);
             using var response = await client.GetAsync(url, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
@@ -307,7 +313,7 @@ public sealed class NelfePlayController : ControllerBase
             var hasBoard = board.ValueKind == JsonValueKind.Array && board.GetArrayLength() > 0;
             // "Ta position" sous le classement : même bloc que records/me, en une seule
             // requête (null si non appairé/anonyme sans score, ou pas encore classé).
-            var me = await FetchMyRankAsync(romGroup, rule, cancellationToken);
+            var me = await FetchMyRankAsync(romGroup, rule, systeme, cancellationToken);
             return Ok(new
             {
                 present = hasBoard,
@@ -328,7 +334,7 @@ public sealed class NelfePlayController : ControllerBase
     /// <summary>Meilleur rang du joueur courant (appairé ?? anonyme) pour ce jeu, ou null
     /// s'il n'y a pas de credential ou pas encore de score classé. Sert le bloc « me » du
     /// classement mondial ET reste la brique de records/me.</summary>
-    private async Task<object?> FetchMyRankAsync(string romGroup, string ruleset, CancellationToken cancellationToken)
+    private async Task<object?> FetchMyRankAsync(string romGroup, string ruleset, string system, CancellationToken cancellationToken)
     {
         var credential = ResolveCredential();
         if (string.IsNullOrEmpty(credential) || string.IsNullOrEmpty(romGroup)) return null;
@@ -338,7 +344,8 @@ public sealed class NelfePlayController : ControllerBase
             client.BaseAddress = new Uri(NelfePlayAgentService.BaseUrl.TrimEnd('/'));
             client.DefaultRequestHeaders.Add("X-Nelfeplay-Device", credential);
             var url = $"/api/v1/agent/scores/my-rank?rom_group={Uri.EscapeDataString(romGroup)}"
-                    + $"&ruleset={Uri.EscapeDataString(string.IsNullOrEmpty(ruleset) ? "1cc" : ruleset)}";
+                    + $"&ruleset={Uri.EscapeDataString(string.IsNullOrEmpty(ruleset) ? "1cc" : ruleset)}"
+                    + ParametreSysteme(system);
             using var response = await client.GetAsync(url, cancellationToken);
             if (!response.IsSuccessStatusCode) return null;
 
@@ -359,6 +366,24 @@ public sealed class NelfePlayController : ControllerBase
         {
             return null;
         }
+    }
+
+    /// <summary>
+    /// Le parametre « system » des appels de classement : la machine CANONIQUE du jeu (« arcade »
+    /// pour mame, fbneo...). Rien quand la machine n'est pas celle d'un jeu : une collection
+    /// d'ES (World Scoring comprise) n'est pas une machine, et la plateforme choisit alors
+    /// elle-meme celle ouverte le plus recemment.
+    /// </summary>
+    internal static string ParametreSysteme(string? systemId)
+    {
+        var systeme = RetroBat.Api.Media.RomCanonicalResolver.CanonicalScoringSystem(systemId ?? string.Empty);
+        if (systeme.Length == 0
+            || string.Equals(systeme, RetroBat.Api.Infrastructure.NelfePlayScoringCollectionSyncService.CollectionName, StringComparison.OrdinalIgnoreCase)
+            || systeme.Contains("collection", StringComparison.OrdinalIgnoreCase))
+        {
+            return string.Empty;
+        }
+        return "&system=" + Uri.EscapeDataString(systeme);
     }
 
     /// <summary>rom_group du classement (= slug du jeu, région retirée) : "Sonic The

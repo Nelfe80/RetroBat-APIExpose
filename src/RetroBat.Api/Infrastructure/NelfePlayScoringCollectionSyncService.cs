@@ -33,6 +33,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
 
     private static readonly TimeSpan PremierDelai = TimeSpan.FromSeconds(45);
     private static readonly TimeSpan Periode = TimeSpan.FromSeconds(300);
+
+    /// <summary>L'ecart minimal entre deux rattrapages du Data Pack declenches par la collection.</summary>
+    internal static readonly TimeSpan RattrapageDataPackMinimum = TimeSpan.FromMinutes(15);
     private static readonly JsonSerializerOptions JsonLecture = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -73,6 +76,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// </summary>
     private readonly Func<bool> _emulateurTourne;
     private readonly Func<InstalledGame, OpenGame, bool> _contenuConfirme;
+    private readonly DataPackSyncService? _dataPack;
+    private DateTime _dernierRattrapageUtc = DateTime.MinValue;
+    private int _definitionsPerimees;
 
     private DateTime _dernierAppelUtc = DateTime.MinValue;
     /// <summary>Les chemins retenus au dernier passage, pour repondre sans relire le disque.</summary>
@@ -99,9 +105,11 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         TimeSpan? minimumEntreDeuxAppels = null,
         Func<bool>? emulateurTourne = null,
         Func<InstalledGame, OpenGame, bool>? contenuConfirme = null,
-        GamelistUpdateService? gamelists = null)
+        GamelistUpdateService? gamelists = null,
+        DataPackSyncService? dataPack = null)
     {
         _gamelists = gamelists;
+        _dataPack = dataPack;
         _httpFactory = httpFactory;
         _options = options;
         _catalog = catalog;
@@ -257,6 +265,11 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             }
 
             var chemins = Intersecter(manifeste, out var candidats);
+            if (await RattraperLeDataPackAsync(declencheur, cancellationToken))
+            {
+                chemins = Intersecter(manifeste, out candidats);
+            }
+
             var inscrits = InscrireLesJeuxInconnusDEs();
             _ouverts = chemins.Select(Normaliser).ToHashSet(StringComparer.OrdinalIgnoreCase);
             // La borne dit a la plateforme avec quoi elle lancera ces jeux : la fiche d'un jeu
@@ -315,6 +328,55 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             _porte.Release();
         }
     }
+
+    /// <summary>
+    /// UNE DEFINITION PERIMEE SE RATTRAPE TOUT DE SUITE (2026-09-28).
+    ///
+    /// Un .MEM corrige part dans le Data Pack avec un nouveau profil qui epingle sa nouvelle
+    /// empreinte. Or une borne ne relit le Data Pack qu'a son demarrage, puis toutes les 24 h :
+    /// entre les deux, sa copie n'a plus l'empreinte exigee. 1942 est ainsi sorti de la collection
+    /// d'un joueur en pleine soiree, avec « memoire non certifiable » au lancement, juste apres
+    /// la correction de son score a huit chiffres.
+    ///
+    /// La passe qui constate l'ecart demande donc le Data Pack tout de suite, puis refait
+    /// l'intersection AVANT d'ecrire la collection : le jeu n'en sort pas. Au plus une fois par
+    /// quart d'heure, pour qu'un profil depose avant son .MEM ne fasse pas marteler le depot.
+    /// </summary>
+    private async Task<bool> RattraperLeDataPackAsync(string declencheur, CancellationToken cancellationToken)
+    {
+        if (_definitionsPerimees == 0 || _dataPack is null || !_options.CurrentValue.DataPack.Enabled)
+        {
+            return false;
+        }
+
+        var maintenant = DateTime.UtcNow;
+        if (!RattrapageAutorise(_dernierRattrapageUtc, maintenant))
+        {
+            return false;
+        }
+
+        _dernierRattrapageUtc = maintenant;
+        _logger?.LogInformation(
+            "Collection World Scoring : {Nombre} definition(s) sans l'empreinte du profil, synchronisation du Data Pack ({Declencheur})",
+            _definitionsPerimees, declencheur);
+        try
+        {
+            var bilan = await _dataPack.SyncNowAsync(cancellationToken);
+            return bilan.Added + bilan.Updated > 0;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Collection World Scoring : rattrapage du Data Pack en echec");
+            return false;
+        }
+    }
+
+    internal static bool RattrapageAutorise(DateTime dernierUtc, DateTime maintenantUtc)
+        => maintenantUtc - dernierUtc >= RattrapageDataPackMinimum;
 
     /// <summary>
     /// Ce jeu est-il OUVERT AU SCORING sur cette borne ? C'est-a-dire : un profil est ouvert
@@ -427,6 +489,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             .ToDictionary(groupe => groupe.Key, groupe => groupe.ToList(), StringComparer.OrdinalIgnoreCase);
 
         var empreintes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var perimees = 0;
         var precedents = LireCollectionPrecedente();
         var retenus = new List<string>();
         var aDeclarer = new List<(InstalledGame Jeu, string RomGroup)>();
@@ -463,8 +526,10 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             if (!string.Equals(locale, jeu.MemSha256, StringComparison.OrdinalIgnoreCase))
             {
                 // La borne a bien un .MEM, mais pas celui qu'exige le profil : le score
-                // serait refuse. Le jeu revient des que le Data Pack est a jour.
+                // serait refuse. Le jeu revient des que le Data Pack est a jour, et la passe
+                // le met a jour elle-meme (RattraperLeDataPackAsync).
                 _logger?.LogDebug("World Scoring : {Cle} en definition non homologuee", cle);
+                perimees++;
                 manques.Add(jeu.RomGroup + " : définition non homologuée (Data Pack à mettre à jour)");
                 continue;
             }
@@ -519,6 +584,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
 
         _manques = manques;
         _aDeclarer = aDeclarer;
+        _definitionsPerimees = perimees;
 
         return retenus;
     }

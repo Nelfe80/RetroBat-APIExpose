@@ -700,3 +700,34 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
         public Task WaitForStableFileAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 }
+
+/// <summary>Le rattrapage du Data Pack quand un .MEM n'a plus l'empreinte du profil.</summary>
+public sealed class RattrapageDataPackTests
+{
+    [Fact]
+    public void Le_premier_rattrapage_est_permis()
+        => Assert.True(NelfePlayScoringCollectionSyncService.RattrapageAutorise(DateTime.MinValue, DateTime.UtcNow));
+
+    [Fact]
+    public void Pas_deux_rattrapages_dans_le_quart_d_heure()
+    {
+        var t0 = new DateTime(2026, 9, 28, 21, 0, 0, DateTimeKind.Utc);
+        Assert.False(NelfePlayScoringCollectionSyncService.RattrapageAutorise(t0, t0.AddMinutes(5)));
+        Assert.True(NelfePlayScoringCollectionSyncService.RattrapageAutorise(t0, t0.AddMinutes(15)));
+    }
+}
+
+/// <summary>La machine transmise aux appels de classement.</summary>
+public sealed class ParametreSystemeTests
+{
+    [Theory]
+    [InlineData("mame", "&system=arcade")]
+    [InlineData("fbneo", "&system=arcade")]
+    [InlineData("gb", "&system=gb")]
+    [InlineData("megadrive", "&system=megadrive")]
+    [InlineData("nelfeplay-scoring", "")]
+    [InlineData("", "")]
+    [InlineData(null, "")]
+    public void La_machine_canonique_ou_rien(string? systeme, string attendu)
+        => Assert.Equal(attendu, RetroBat.Api.Controllers.NelfePlayController.ParametreSysteme(systeme));
+}
