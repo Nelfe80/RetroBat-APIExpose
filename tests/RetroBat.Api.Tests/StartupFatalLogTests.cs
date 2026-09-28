@@ -58,3 +58,32 @@ public class StartupFatalLogTests
         Assert.All(doc.RootElement.EnumerateArray(), e => Assert.InRange(e.GetProperty("timeoutSeconds").GetInt32(), 1, 600));
     }
 }
+
+/// <summary>
+/// La session qui a plante ne s'efface plus au redemarrage : c'etait la seule trace
+/// (2026-09-27).
+/// </summary>
+public sealed class JournalDesSessionsTests
+{
+    [Fact]
+    public void Le_journal_de_la_session_precedente_est_garde()
+    {
+        var dossier = Path.Combine(Path.GetTempPath(), "apiexpose-sessions-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dossier);
+        try
+        {
+            var journal = Path.Combine(dossier, "apiexpose-runtime.log");
+            File.WriteAllText(journal, "session A");
+            new RetroBat.Api.Infrastructure.RuntimeFileLoggerProvider(journal, Microsoft.Extensions.Logging.LogLevel.Information, true).Dispose();
+            File.WriteAllText(journal, "session B");
+            new RetroBat.Api.Infrastructure.RuntimeFileLoggerProvider(journal, Microsoft.Extensions.Logging.LogLevel.Information, true).Dispose();
+
+            Assert.Equal("session B", File.ReadAllText(RetroBat.Api.Infrastructure.RuntimeFileLoggerProvider.SessionPath(journal, 1)));
+            Assert.Equal("session A", File.ReadAllText(RetroBat.Api.Infrastructure.RuntimeFileLoggerProvider.SessionPath(journal, 2)));
+        }
+        finally
+        {
+            try { Directory.Delete(dossier, true); } catch { }
+        }
+    }
+}

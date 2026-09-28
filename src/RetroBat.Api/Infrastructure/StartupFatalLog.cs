@@ -81,6 +81,17 @@ public static class StartupFatalLog
         }
     }
 
+    private static string SafeStartTime()
+    {
+        try
+        {
+            using var p = Process.GetCurrentProcess();
+            var depuis = DateTime.Now - p.StartTime;
+            return $"{p.StartTime:yyyy-MM-dd HH:mm:ss} (il y a {(int) depuis.TotalMinutes} min)";
+        }
+        catch { return "(inconnu)"; }
+    }
+
     internal static string Format(string kind, Exception? exception, string? fallbackText)
     {
         var sb = new StringBuilder();
@@ -89,6 +100,9 @@ public static class StartupFatalLog
         sb.AppendLine($"Evenement   : {kind}");
         sb.AppendLine($"Version     : {SafeVersion()}");
         sb.AppendLine($"PID         : {Environment.ProcessId}");
+        // Au bout de combien de temps, et sur quel fil : un fil d'overlay (WPF) designe un panneau.
+        sb.AppendLine($"Lancee le   : {SafeStartTime()}");
+        sb.AppendLine($"Fil         : {Thread.CurrentThread.ManagedThreadId} {Thread.CurrentThread.Name ?? "(sans nom)"}");
         sb.AppendLine($"Arguments   : {string.Join(" ", _arguments.Select(Quote))}");
         sb.AppendLine($"Exe         : {Environment.ProcessPath}");
         sb.AppendLine($"Dossier exe : {AppContext.BaseDirectory}");

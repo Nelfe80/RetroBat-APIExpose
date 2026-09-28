@@ -54,11 +54,31 @@ public sealed class RuntimeFileLoggerProvider : ILoggerProvider
 
     internal void Enqueue(string line) => _channel.Writer.TryWrite(line);
 
+    /// <summary>Les sessions precedentes gardees au demarrage : « .session-1 » est la derniere.</summary>
+    internal const int SessionsGardees = 3;
+
+    /// <summary>Le journal d'une session precedente : 1 = la derniere avant celle-ci.</summary>
+    public static string SessionPath(string path, int rang) => $"{path}.session-{rang}";
+
+    /// <summary>
+    /// LA SESSION QUI A PLANTE N'EST PLUS EFFACEE. Le demarrage vidait le journal : une API qui
+    /// plante puis redemarre perdait la seule trace de ce qui s'etait passe (FreshOne, 2026-09-27 :
+    /// 45 minutes sans API, rien pour dire pourquoi). Le journal de la session precedente passe en
+    /// « .session-1 », les plus anciennes glissent, la plus vieille part. Les tranches de taille
+    /// (« .1 », « .2 ») d'une session ne sont pas gardees : c'est la fin qui compte.
+    /// </summary>
     private void TryReset()
     {
         try
         {
-            if (File.Exists(_path)) File.Delete(_path);
+            var plusVieille = SessionPath(_path, SessionsGardees);
+            if (File.Exists(plusVieille)) File.Delete(plusVieille);
+            for (var i = SessionsGardees - 1; i >= 1; i--)
+            {
+                var de = SessionPath(_path, i);
+                if (File.Exists(de)) File.Move(de, SessionPath(_path, i + 1), overwrite: true);
+            }
+            if (File.Exists(_path)) File.Move(_path, SessionPath(_path, 1), overwrite: true);
             for (var i = 1; i < KeepFiles; i++)
             {
                 var rolled = $"{_path}.{i}";
