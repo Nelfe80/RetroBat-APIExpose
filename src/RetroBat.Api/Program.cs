@@ -455,6 +455,8 @@ if (!testModeRequested)
     builder.Services.AddHostedService<EsFeaturesMenuDeploymentHostedService>();
     builder.Services.AddHostedService(sp => sp.GetRequiredService<PanelRemapExportService>());
     builder.Services.AddHostedService<EmulationStationLifecycleHostedService>();
+    // Le profil de medias choisi a l'installation, AVANT les valeurs par defaut qui le recopient vers ES.
+    builder.Services.AddHostedService<InstallProfileHostedService>();
     builder.Services.AddHostedService<ApiExposeSettingsDefaultsHostedService>();
     builder.Services.AddHostedService<RomsMediaCanonicalMigrationHostedService>();
     builder.Services.AddHostedService<ApiExposeSettingsNotificationHostedService>();

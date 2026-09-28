@@ -1084,15 +1084,15 @@ public sealed class ApiExposeRuntimeOptionsService
 
     /// <summary>LOT 5 - whether gamelist media writes go through the FillMissing allocation policy
     /// (never overwrite a user binding). es_settings key
-    /// <c>global.apiexpose.media_allocation.write_policy_enabled</c> overrides appsettings; OFF by
-    /// default so a fresh install keeps the legacy overwrite behaviour.</summary>
+    /// <c>global.apiexpose.media_allocation.write_policy_enabled</c> overrides appsettings; ON by
+    /// default since 2026-09-28 (« PRESERVE CUSTOM MEDIA »).</summary>
     public bool IsMediaWritePolicyEnabled()
     {
         var appOptions = _options.CurrentValue;
         var esSettings = ReadEsSettings();
         return ResolveBool(
             "global.apiexpose.media_allocation.write_policy_enabled",
-            appOptions.MediaAllocation?.WritePolicyEnabled ?? false,
+            appOptions.MediaAllocation?.WritePolicyEnabled ?? true,
             esSettings);
     }
 

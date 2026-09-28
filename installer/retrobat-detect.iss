@@ -110,6 +110,49 @@ begin
   end;
 end;
 
+// Des medias deja en place, qui ne viennent pas d'APIExpose ? On compte, dans les gamelists du
+// RetroBat, les images, vignettes, videos et marquees, moins celles qui pointent vers le magasin
+// d'APIExpose (plugins/APIExpose/media). A partir de 10, le RetroBat est « deja configure » : le
+// joueur ou RetroBat les a scrapes, ils sont a lui. On s'arrete des le seuil atteint, et on saute
+// les gamelists geantes (plus de 30 Mo) : l'installeur ne doit pas se faire attendre.
+function RetroBatMediaPerso(Root: String): Boolean;
+var
+  Rec: TFindRec;
+  Chemin: String;
+  Brut: AnsiString;
+  Texte: String;
+  Taille, Medias, Api, Perso: Integer;
+begin
+  Result := False;
+  Perso := 0;
+  if not FindFirst(AddBackslash(Root) + 'roms\*', Rec) then
+    Exit;
+  try
+    repeat
+      if ((Rec.Attributes and FILE_ATTRIBUTE_DIRECTORY) <> 0) and (Rec.Name <> '.') and (Rec.Name <> '..') then
+      begin
+        Chemin := AddBackslash(Root) + 'roms\' + Rec.Name + '\gamelist.xml';
+        if FileSize(Chemin, Taille) and (Taille < 30 * 1024 * 1024) and LoadStringFromFile(Chemin, Brut) then
+        begin
+          Texte := String(Brut);
+          Medias := StringChangeEx(Texte, '<image>', '', True) + StringChangeEx(Texte, '<thumbnail>', '', True)
+            + StringChangeEx(Texte, '<video>', '', True) + StringChangeEx(Texte, '<marquee>', '', True);
+          Api := StringChangeEx(Texte, '/APIExpose/media/', '', True) + StringChangeEx(Texte, '\APIExpose\media\', '', True);
+          if Medias > Api then
+            Perso := Perso + Medias - Api;
+          if Perso >= 10 then
+          begin
+            Result := True;
+            Exit;
+          end;
+        end;
+      end;
+    until not FindNext(Rec);
+  finally
+    FindClose(Rec);
+  end;
+end;
+
 // Le RetroBat prefere : le dernier connu de RetroBat, sinon le premier trouve, sinon vide.
 function DetectRetroBatRoot(): String;
 var

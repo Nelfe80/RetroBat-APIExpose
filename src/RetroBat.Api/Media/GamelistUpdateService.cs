@@ -2564,8 +2564,8 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         }
     }
 
-    // LOT 5 (2/2) - gate reads (es_settings-aware, so the ES menu toggle drives it). OFF by default:
-    // the whole write path keeps its legacy overwrite.
+    // LOT 5 (2/2) - gate reads (es_settings-aware, so the ES menu toggle drives it). ON by default
+    // since 2026-09-28: a media the player set is never overwritten. OFF keeps the legacy overwrite.
     private bool MediaWritePolicyEnabled => _runtimeOptions.IsMediaWritePolicyEnabled();
 
     private MediaWritePolicy ResolveMediaWritePolicy()

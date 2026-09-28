@@ -288,9 +288,12 @@ public class ApiExposeOptions
         public string WritePolicy { get; set; } = "fill_missing";
 
         /// <summary>LOT 5 (2/2) - route gamelist media writes through <see cref="WritePolicy"/> and the
-        /// ownership sidecar. OFF by default: writes keep their legacy overwrite behavior until a
-        /// cabinet canary validates that user bindings survive a re-scrape.</summary>
-        public bool WritePolicyEnabled { get; set; } = false;
+        /// ownership sidecar : « PRESERVE CUSTOM MEDIA » dans le menu d'ES. ACTIF PAR DEFAUT depuis
+        /// le 2026-09-28 (decision user) : le gestionnaire de medias ne remplace jamais un media que
+        /// le joueur a choisi. Une valeur explicite (menu d'ES ou appsettings) garde le dessus ; sans
+        /// elle, les bornes existantes passent aussi en mode protege. Un media pose avant par APIExpose,
+        /// que le registre de propriete ne connait pas, est traite comme celui du joueur : garde.</summary>
+        public bool WritePolicyEnabled { get; set; } = true;
     }
 
     /// <summary>

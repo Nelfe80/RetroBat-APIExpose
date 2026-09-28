@@ -23,6 +23,8 @@ public sealed class ApiExposeAppsettingsSyncService
             ["global.apiexpose.media_allocation.region_mode"] = String("MediaAllocation", "MediaRegionMode"),
             ["global.apiexpose.media_allocation.logo_region_mode"] = String("MediaAllocation", "LogoRegionMode"),
             ["global.apiexpose.media_allocation.user_region"] = String("MediaAllocation", "UserRegion"),
+            // PRESERVE CUSTOM MEDIA : le menu d'ES et le profil choisi a l'installation l'ecrivent ici.
+            ["global.apiexpose.media_allocation.write_policy_enabled"] = Bool("MediaAllocation", "WritePolicyEnabled"),
             ["global.apiexpose.api.region_profile"] = String("ApiSettings", "RegionProfile"),
             ["global.apiexpose.api.language_profile"] = String("ApiSettings", "LanguageProfile"),
             ["global.apiexpose.api.repair_gamelists_on_startup"] = Bool("ApiSettings", "RepairGamelistsOnStartup"),

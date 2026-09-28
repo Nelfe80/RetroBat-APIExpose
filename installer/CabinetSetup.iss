@@ -56,6 +56,22 @@ english.RetroBatPageSubCaption=Several RetroBat installations can live on the sa
 english.RetroBatLatest=last RetroBat launched
 english.RetroBatHasApi=APIExpose %1 already installed
 english.RetroBatOther=Another folder (chosen on the next step)
+french.RetroBatMediaPersoNote=médias déjà en place
+english.RetroBatMediaPersoNote=media already in place
+french.MediaPageCaption=Les médias de ce RetroBat
+french.MediaPageDescription=Comment APIExpose doit-il traiter les jaquettes, logos et vidéos de vos jeux ?
+french.MediaPageSubCaption=Vous pourrez changer d'avis plus tard dans le menu APIExpose d'EmulationStation (AUTO SCRAPING, PRESERVE CUSTOM MEDIA).
+french.MediaNeuf=RetroBat neuf : APIExpose s'occupe des médias (scraping automatique activé ; les médias peuvent être remplacés par leur version de référence)
+french.MediaConfigure=RetroBat déjà configuré : mes médias sont à moi (scraping automatique coupé ; APIExpose ne remplace jamais un média que j'ai choisi)
+french.MediaGarder=Garder mes réglages actuels d'APIExpose
+french.MediaSuggestion=Suggestion d'après ce RetroBat : %1
+english.MediaPageCaption=Media for this RetroBat
+english.MediaPageDescription=How should APIExpose handle your games' box art, logos and videos?
+english.MediaPageSubCaption=You can change your mind later in APIExpose's EmulationStation menu (AUTO SCRAPING, PRESERVE CUSTOM MEDIA).
+english.MediaNeuf=New RetroBat: APIExpose manages the media (automatic scraping on; media may be replaced by their reference version)
+english.MediaConfigure=Already configured RetroBat: my media are mine (automatic scraping off; APIExpose never replaces a media I chose)
+english.MediaGarder=Keep my current APIExpose settings
+english.MediaSuggestion=Suggested from this RetroBat: %1
 
 [Files]
 ; APIExpose COMPLET (= contenu de full.7z) : moteur + .installer (hooks ES) +
@@ -165,6 +181,8 @@ end;
 var
   RetroBatPage: TInputOptionWizardPage;
   RetroBatRoots: TArrayOfString;
+  MediaPage: TInputOptionWizardPage;
+  MediaRacineSuggeree: String;
 
 // La version d'APIExpose deja installee dans ce RetroBat (« 1.9.7 »), « ? » si illisible, vide si absente.
 function ApiExposeInstalledVersion(Root: String): String;
@@ -188,6 +206,12 @@ begin
   Notes := '';
   if (Latest <> '') and (CompareText(Root, Latest) = 0) then
     Notes := CustomMessage('RetroBatLatest');
+  if RetroBatMediaPerso(Root) then
+  begin
+    if Notes <> '' then
+      Notes := Notes + ', ';
+    Notes := Notes + CustomMessage('RetroBatMediaPersoNote');
+  end;
   Version := ApiExposeInstalledVersion(Root);
   if Version <> '' then
   begin
@@ -236,6 +260,104 @@ begin
   end;
   RetroBatPage.Add(CustomMessage('RetroBatOther'));
   RetroBatPage.SelectedValueIndex := Choix;
+end;
+
+// ── LES MEDIAS DE CE RETROBAT (demande user 2026-09-28) ──────────────────────────────────────
+// Neuf : APIExpose s'occupe des medias (auto-scrap actif, PRESERVE CUSTOM MEDIA coupe). Deja
+// configure : les medias du joueur sont a lui (l'inverse). Garder : une mise a jour ne change rien.
+// La page suggere d'apres le RetroBat choisi et laisse le choix. L'installeur ne touche pas aux
+// reglages : il depose state\install-profile.json, que l'API applique une fois (ES reecrit
+// es_settings.cfg de memoire en quittant).
+<event('InitializeWizard')>
+procedure MediaInitializeWizard;
+begin
+  MediaPage := CreateInputOptionPage(wpSelectDir, CustomMessage('MediaPageCaption'),
+    CustomMessage('MediaPageDescription'), CustomMessage('MediaPageSubCaption'), True, False);
+  MediaPage.Add(CustomMessage('MediaNeuf'));
+  MediaPage.Add(CustomMessage('MediaConfigure'));
+  MediaPage.Add(CustomMessage('MediaGarder'));
+  MediaPage.SelectedValueIndex := 0;
+  MediaRacineSuggeree := '';
+end;
+
+// Le RetroBat du dossier choisi : le grand-parent de <RetroBat>\plugins\APIExpose.
+function RacineDuDossierChoisi(): String;
+begin
+  Result := RemoveBackslashUnlessRoot(ExtractFilePath(RemoveBackslashUnlessRoot(
+    ExtractFilePath(RemoveBackslashUnlessRoot(WizardForm.DirEdit.Text)))));
+end;
+
+// La suggestion, refaite seulement quand le RetroBat change : un choix du joueur n'est pas ecrase
+// s'il revient sur la page.
+<event('CurPageChanged')>
+procedure MediaCurPageChanged(CurPageID: Integer);
+var
+  Racine: String;
+  Choix: Integer;
+begin
+  if (MediaPage = nil) or (CurPageID <> MediaPage.ID) then
+    Exit;
+  Racine := RacineDuDossierChoisi();
+  if CompareText(Racine, MediaRacineSuggeree) = 0 then
+    Exit;
+  MediaRacineSuggeree := Racine;
+  if ApiExposeInstalledVersion(Racine) <> '' then
+    Choix := 2
+  else if RetroBatMediaPerso(Racine) then
+    Choix := 1
+  else
+    Choix := 0;
+  MediaPage.SelectedValueIndex := Choix;
+  MediaPage.SubCaptionLabel.Caption := CustomMessage('MediaPageSubCaption') + #13#10#13#10
+    + FmtMessage(CustomMessage('MediaSuggestion'), [MediaPage.CheckListBox.ItemCaption[Choix]]);
+  Log('Medias : suggestion « ' + IntToStr(Choix) + ' » pour ' + Racine);
+end;
+
+// Le profil a deposer : neuf, configure, ou vide (garder). En silencieux, seulement si /MEDIAPROFILE=
+// le demande : une mise a jour silencieuse ne change jamais les reglages du joueur.
+function ProfilMedias(): String;
+begin
+  Result := '';
+  if WizardSilent() then
+  begin
+    Result := Lowercase(Trim(ExpandConstant('{param:MEDIAPROFILE|}')));
+    if (Result <> 'neuf') and (Result <> 'configure') then
+      Result := '';
+    Exit;
+  end;
+  if MediaPage = nil then
+    Exit;
+  case MediaPage.SelectedValueIndex of
+    0: Result := 'neuf';
+    1: Result := 'configure';
+  end;
+end;
+
+procedure EcrireProfilMedias();
+var
+  Profil, Chemin: String;
+begin
+  Profil := ProfilMedias();
+  if Profil = '' then
+  begin
+    Log('Medias : reglages gardes tels quels.');
+    Exit;
+  end;
+  Chemin := ExpandConstant('{app}\state\install-profile.json');
+  ForceDirectories(ExtractFilePath(Chemin));
+  if SaveStringToFile(Chemin, '{"media_profile":"' + Profil + '","source":"installer","written_at":"'
+    + GetDateTimeString('yyyy-mm-dd hh:nn:ss', '-', ':') + '"}', False) then
+    Log('Medias : profil « ' + Profil + ' » depose pour l''API : ' + Chemin)
+  else
+    Log('Medias : profil NON depose : ' + Chemin);
+end;
+
+// Apres la copie des fichiers : {app}\state existe (section [Dirs]).
+<event('CurStepChanged')>
+procedure MediaCurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssPostInstall then
+    EcrireProfilMedias();
 end;
 
 // Vrai quand la page de choix designe un RetroBat trouve (et non « un autre dossier »).
