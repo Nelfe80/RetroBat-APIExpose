@@ -118,6 +118,15 @@ public sealed class CabinetInputReader : IDisposable
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)]
     private static extern IntPtr SDL_JoystickName(IntPtr joystick);
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct SdlVersion
+    {
+        public byte Major, Minor, Patch;
+    }
+
+    [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)]
+    private static extern void SDL_GetVersion(out SdlVersion version);
+
     // ---- model -------------------------------------------------------------
 
     /// <summary>Result of one measurement: the RetroPad identity emitted, the device
@@ -176,7 +185,8 @@ public sealed class CabinetInputReader : IDisposable
     {
         try
         {
-            InstallResolver(Path.Combine(retroBatRoot, "emulators", "retroarch", "SDL2.dll"));
+            var sdl = ResoudreSdl(retroBatRoot);
+            InstallResolver(sdl.Chemin);
 
             // read joystick events without owning a focused SDL window (we are WPF)
             SDL_SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
@@ -189,6 +199,12 @@ public sealed class CabinetInputReader : IDisposable
             // chaque appui vu. Le panel (DirectInput) n'est pas concerne, ES non plus : il a
             // son propre SDL et sa propre boucle.
             SDL_SetHint("SDL_JOYSTICK_RAWINPUT", "0");
+            // Le SDL d'EmulationStation (2.32) ouvre les manettes Xbox par Windows.Gaming.Input ou
+            // par HIDAPI, avec une autre numerotation des boutons (START n'y est plus le 7). On les
+            // garde en XInput, comme avec le SDL 2.0.14 de RetroArch qu'on employait avant.
+            SDL_SetHint("SDL_JOYSTICK_WGI", "0");
+            SDL_SetHint("SDL_JOYSTICK_HIDAPI_XBOX", "0");
+            SDL_SetHint("SDL_JOYSTICK_HIDAPI_XBOX_ONE", "0");
 
             if (SDL_Init(InitFlags.Joystick) != 0)
             {
@@ -200,7 +216,17 @@ public sealed class CabinetInputReader : IDisposable
             _retroBatRoot = retroBatRoot;
             var db = Path.Combine(retroBatRoot, "system", "tools", "gamecontrollerdb.txt");
             _dbLines = LoadDb(db);
-            return (true, $"{_dbLines.Count} mappages chargés depuis gamecontrollerdb.txt");
+            var version = "?";
+            try
+            {
+                SDL_GetVersion(out var v);
+                version = $"{v.Major}.{v.Minor}.{v.Patch}";
+            }
+            catch (Exception)
+            {
+                // Une vieille DLL sans cette fonction : on lit quand meme les manettes.
+            }
+            return (true, $"{_dbLines.Count} mappages chargés depuis gamecontrollerdb.txt, SDL {version} ({sdl.Origine})");
         }
         catch (Exception ex)
         {
@@ -235,7 +261,7 @@ public sealed class CabinetInputReader : IDisposable
                 continue;
             }
 
-            var device = new Device { Handle = handle, Guid = GuidString(handle), Name = name };
+            var device = new Device { Handle = handle, Guid = SansCrc(GuidString(handle)), Name = name };
             ApplyMapping(device);
             _devices.Add(device);
         }
@@ -575,10 +601,68 @@ public sealed class CabinetInputReader : IDisposable
                 continue;
             }
 
+            tokens[0] = SansCrc(tokens[0]);
             lines.Add(tokens);
         }
 
         return lines;
+    }
+
+    /// <summary>
+    /// Le GUID sans sa somme de controle. Depuis SDL 2.0.16, les octets 2 et 3 portent un CRC du nom
+    /// de la manette ; gamecontrollerdb.txt, es_input.cfg et les epingles de joueur ne l'ont pas
+    /// (0000). SDL l'ignore lui-meme pour chercher un mappage : on fait pareil, a la source, pour que
+    /// toutes les comparaisons voient le meme format qu'avec l'ancien SDL. Seulement sur un GUID de
+    /// la forme « bus (2 octets, dont le second est nul) + CRC » : « xinput » ecrit en hexadecimal
+    /// n'en est pas un.
+    /// </summary>
+    internal static string SansCrc(string guid)
+    {
+        if (guid.Length != 32 || !string.Equals(guid.Substring(2, 2), "00", StringComparison.Ordinal))
+        {
+            return guid;
+        }
+
+        return guid[..4] + "0000" + guid[8..];
+    }
+
+    /// <summary>
+    /// LE SDL D'EMULATIONSTATION, PAS CELUI DE RETROARCH (decision user 2026-09-28). RetroArch livre
+    /// un SDL 2.0.14 de 2020 : manette Xbox muette en RawInput, GUID differents de ceux d'ES. ES a un
+    /// SDL recent (2.32.8), deja present sur chaque borne : on l'emprunte, et la lecture des
+    /// manettes suit les mises a jour d'ES. On charge une COPIE, dans state\native : charger le
+    /// fichier d'ES le verrouillerait tant que l'API tourne, et une mise a jour de RetroBat ne
+    /// pourrait plus le remplacer. La copie est refaite quand le fichier d'ES change. Sans SDL d'ES,
+    /// on retombe sur celui de RetroArch.
+    /// </summary>
+    internal static (string Chemin, string Origine) ResoudreSdl(string retroBatRoot, string? dossierCopie = null)
+    {
+        var es = Path.Combine(retroBatRoot, "emulationstation", "SDL2.dll");
+        if (!File.Exists(es))
+        {
+            return (Path.Combine(retroBatRoot, "emulators", "retroarch", "SDL2.dll"), "RetroArch");
+        }
+
+        try
+        {
+            var dossier = dossierCopie ?? Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, "state", "native");
+            Directory.CreateDirectory(dossier);
+            var copie = Path.Combine(dossier, "SDL2.dll");
+            var source = new FileInfo(es);
+            var cible = new FileInfo(copie);
+            if (!cible.Exists || cible.Length != source.Length || cible.LastWriteTimeUtc != source.LastWriteTimeUtc)
+            {
+                File.Copy(es, copie, overwrite: true);
+                File.SetLastWriteTimeUtc(copie, source.LastWriteTimeUtc);
+            }
+
+            return (copie, "EmulationStation");
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Copie impossible (une autre API l'a deja chargee, droits) : le fichier d'ES lui-meme.
+            return (es, "EmulationStation, sans copie");
+        }
     }
 
     /// <summary>

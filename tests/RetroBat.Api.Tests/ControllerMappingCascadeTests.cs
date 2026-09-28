@@ -84,3 +84,47 @@ public class ControllerMappingCascadeTests
         Assert.Null(ligne);
     }
 }
+
+/// <summary>
+/// Le SDL d'EmulationStation (2.32) remplace celui de RetroArch (2.0.14) : GUID avec CRC, copie
+/// locale de la DLL (2026-09-28).
+/// </summary>
+public class SdlEmulationStationTests
+{
+    [Theory]
+    [InlineData("0300a1b2790000007c18000000007801", "03000000790000007c18000000007801")]
+    [InlineData("050012ef4c050000cc09000000006803", "050000004c050000cc09000000006803")]
+    [InlineData("03000000790000000600000000000000", "03000000790000000600000000000000")]
+    [InlineData("78696e70757401000000000000000000", "78696e70757401000000000000000000")]   // « xinput »
+    public void La_somme_de_controle_ne_compte_pas(string guid, string attendu)
+        => Assert.Equal(attendu, CabinetInputReader.SansCrc(guid));
+
+    [Fact]
+    public void Le_sdl_d_emulationstation_est_copie_puis_charge()
+    {
+        var racine = Path.Combine(Path.GetTempPath(), "rb-sdl-" + Guid.NewGuid().ToString("N"));
+        var copies = Path.Combine(racine, "copie");
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(racine, "emulationstation"));
+            File.WriteAllText(Path.Combine(racine, "emulationstation", "SDL2.dll"), "sdl d'es");
+            var (chemin, origine) = CabinetInputReader.ResoudreSdl(racine, copies);
+            Assert.Equal(Path.Combine(copies, "SDL2.dll"), chemin);
+            Assert.Equal("EmulationStation", origine);
+            Assert.Equal("sdl d'es", File.ReadAllText(chemin));
+        }
+        finally
+        {
+            try { Directory.Delete(racine, true); } catch { }
+        }
+    }
+
+    [Fact]
+    public void Sans_sdl_d_emulationstation_on_garde_celui_de_retroarch()
+    {
+        var racine = Path.Combine(Path.GetTempPath(), "rb-sdl-" + Guid.NewGuid().ToString("N"));
+        var (chemin, origine) = CabinetInputReader.ResoudreSdl(racine, Path.Combine(racine, "copie"));
+        Assert.Equal(Path.Combine(racine, "emulators", "retroarch", "SDL2.dll"), chemin);
+        Assert.Equal("RetroArch", origine);
+    }
+}
