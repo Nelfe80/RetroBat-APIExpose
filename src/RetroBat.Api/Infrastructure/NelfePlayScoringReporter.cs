@@ -104,6 +104,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private readonly List<EvenementDeVie> _vies = new();
 
+    /// <summary>
+    /// Le mode et la difficulte en vigueur (lignes GAME_MODE et GAME_DIFFICULTY du .MEM), et leur
+    /// instantane a chaque lecture de score, parallele a _trajectory : c'est ce qui dit dans quel
+    /// mode le run retenu a ete joue. Voir ModesDeJeu.
+    /// </summary>
+    private RetroBat.Api.Scoring.ContexteDeJeu _contexte = RetroBat.Api.Scoring.ContexteDeJeu.Vide;
+    private readonly List<RetroBat.Api.Scoring.ContexteDeJeu> _contextes = new();
+
     // ── Lien replay ↔ score (funnel « ▷ REPLAY » de /rankings) ───────────────
     // Le reporter connaît le session_id (il le génère) et le verdict ; le recorder
     // publie l'id du replay actif (replay.recording.started) puis son sha au finalize
@@ -422,6 +430,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     var charge = ToJson(envelope.Payload);
                     CaptureTrameMemoire(charge);
                     CaptureVie(charge);
+                    CaptureModeEtDifficulte(charge);
                     // Les ETATS du pont Lua de MAME arrivent ici, et seulement ici : le wrapper les
                     // projette en plus sur retroarch.state, le pont Lua non. Sans cette ligne, un
                     // DEMO_MODE sous MAME n'atteignait jamais la detection de la demo, et le score
@@ -477,6 +486,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _startVu = false;
             _enJeu = false;
             _vies.Clear();
+            _contexte = RetroBat.Api.Scoring.ContexteDeJeu.Vide;
+            _contextes.Clear();
         }
     }
 
@@ -1137,6 +1148,37 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         _ = ConfirmerContinueAsync(jeton);
     }
 
+    /// <summary>
+    /// Le mode et la difficulte choisis. Pris en demo comme en jeu : c'est la valeur en vigueur au
+    /// debut du run retenu qui compte (ModesDeJeu.ContexteDuRun), et le menu ou le joueur choisit
+    /// se trouve souvent entre deux demos.
+    /// </summary>
+    private void CaptureModeEtDifficulte(JsonElement root)
+    {
+        if (!root.TryGetProperty("signal", out var signal) && !root.TryGetProperty("Signal", out signal)) return;
+        var nom = (GetString(signal, "Name") ?? "").Trim().ToUpperInvariant();
+        var mode = nom == RetroBat.Api.Scoring.ModesDeJeu.SignalMode;
+        if (!mode && nom != RetroBat.Api.Scoring.ModesDeJeu.SignalDifficulte) return;
+        if (Entier(signal, "Value") is not { } valeur) return;
+        string trace;
+        lock (_sync)
+        {
+            if (mode)
+            {
+                _contexte = _contexte.AvecMode(valeur);
+                trace = $"mode de jeu : {valeur} (0x{valeur:X2})";
+            }
+            else
+            {
+                var adresse = (GetString(signal, "Address") ?? "").Trim();
+                if (adresse.Length == 0) return;
+                _contexte = _contexte.AvecDifficulte(adresse, valeur);
+                trace = $"difficulte : {RetroBat.Api.Scoring.ModesDeJeu.Adresse(adresse)} = {valeur}";
+            }
+        }
+        Trace(trace);
+    }
+
     /// <summary>Le pont MAME ecrit 0x604, le wrapper 0X0604 : la meme ligne doit se reconnaitre.</summary>
     private static string Normaliser(string adresse)
     {
@@ -1195,7 +1237,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 _trajectory.Add((_lastFrame, total));
                 _horsJeu.Add(!_enJeu);
-                if (_trajectory.Count > MaxTrajectory) { _trajectory.RemoveAt(0); _horsJeu.RemoveAt(0); }
+                _contextes.Add(_contexte);
+                if (_trajectory.Count > MaxTrajectory) { _trajectory.RemoveAt(0); _horsJeu.RemoveAt(0); _contextes.RemoveAt(0); }
             }
 
             // Le premier +1 d'un jeu a chiffre des credits : c'est le continue.
@@ -1416,10 +1459,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         string? listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, contentSet, wrapperVersion, coreName, coreVersion;
         long? finalTotal;
         List<(long frame, long total)> trajectory;
+        List<(long frame, long total)> lecturesBrutes;
+        List<RetroBat.Api.Scoring.ContexteDeJeu> contextes;
+        RetroBat.Api.Scoring.ContexteDeJeu contexteCourant;
         List<EvenementDeVie> vies;
         bool chiffreCredits;
         lock (_sync)
         {
+            lecturesBrutes = new List<(long, long)>(_trajectory);
+            contextes = new List<RetroBat.Api.Scoring.ContexteDeJeu>(_contextes);
+            contexteCourant = _contexte;
             listenerSha = _listenerSha256; coreSha = _coreSha256; memSha = _memSha256;
             contentSha = _contentSha256; contentMd5 = _contentMd5; contentSha1 = _contentSha1; contentSet = _contentSet; wrapperVersion = _wrapperVersion; finalTotal = _finalTotal;
             coreName = _coreName; coreVersion = _coreVersion;
@@ -1496,6 +1545,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var bestRun = SelectBestRun(trajectory, finsDeRun);
         long runPeak = bestRun.Count > 0 ? bestRun[^1].total : (finalTotal ?? 0);
         Trace($"segmentation : meilleur run {bestRun.Count}/{trajectory.Count} pts, pic={runPeak} (total global {finalTotal})");
+        var contexteRun = RetroBat.Api.Scoring.ModesDeJeu.ContexteDuRun(lecturesBrutes, contextes, bestRun, contexteCourant);
+        if (contexteRun.Mode is not null || contexteRun.Difficulte.Count > 0)
+        {
+            Trace($"contexte du run : mode={(contexteRun.Mode?.ToString() ?? "non mesure")} difficulte=[{string.Join(", ", contexteRun.Difficulte.Select(p => p.Key + "=" + p.Value))}]");
+        }
 
         // Rien à certifier sans score ni attestation : on s'arrête AVANT de consommer
         // quoi que ce soit (démo, navigation, jeu non joué).
@@ -1543,19 +1597,24 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             return;
         }
 
-        var profile = await FetchProfileAsync(credential!, systemId, romGroup, cancellationToken).ConfigureAwait(false);
+        // Le profil du MODE joue : un jeu a modes a un classement par mode (ModesDeJeu).
+        var profils = await FetchProfilesAsync(credential!, systemId, romGroup, cancellationToken).ConfigureAwait(false);
+        var profile = RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil(profils, contexteRun.Mode);
         if (profile is null)
         {
+            var pourquoi = profils.Count == 0
+                ? $"profil {romGroup} non ouvert"
+                : $"mode {(contexteRun.Mode?.ToString() ?? "non mesure")} de {romGroup} sans classement ouvert";
             // Mode laboratoire (NelfeScoreLab) : on soumet quand meme. La plateforme refuse le score
             // mais garde la tentative signee, sans laquelle aucun profil ne peut s'ouvrir.
             if (RetroBat.Api.Scoring.ScoreLabLabMode.IsActive(DateTime.UtcNow, out var labo))
             {
-                Trace($"profil {romGroup} non ouvert, soumission de laboratoire ({labo})");
+                Trace($"{pourquoi}, soumission de laboratoire ({labo})");
                 profile = RetroBat.Api.Scoring.ScoreLabLabMode.PlaceholderProfile();
             }
             else
             {
-                Trace($"STOP: profil {romGroup} non ouvert (fetch null)");
+                Trace($"STOP: {pourquoi}");
                 return;
             }
         }
@@ -1606,7 +1665,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 systemId, romGroup, sessionJson, ticket.Value, profile.Value,
                 deviceId!, deviceKey, listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion,
                 coreName, coreVersion,
-                runPeak, bestRun, trajectory, nvram, bios);
+                runPeak, bestRun, trajectory, nvram, bios, contexteRun);
             var body = passport.DeepClone()!.AsObject();
             body.Remove("signature");
             passport["signature"] = deviceKey.SignB64Url(Jcs.CanonicalBytes(body));
@@ -1638,7 +1697,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         string deviceId, CngDeviceKey deviceKey, string listenerSha, string? coreSha, string? memSha,
         string? contentSha, string? contentMd5, string? contentSha1, string? wrapperVersion,
         string? coreName, string? coreVersion, long finalTotal, List<(long frame, long total)> trajectory,
-        List<(long frame, long total)>? toutesLesLectures = null, JsonArray? nvram = null, JsonObject? bios = null)
+        List<(long frame, long total)>? toutesLesLectures = null, JsonArray? nvram = null, JsonObject? bios = null,
+        RetroBat.Api.Scoring.ContexteDeJeu? contexte = null)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
@@ -1755,17 +1815,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             ? new JsonObject { ["name"] = sessionPlayer.VenueName, ["city"] = sessionPlayer.VenueCity }
             : null;
 
+        // Le mode et la difficulte du run (ModesDeJeu) : absents pour un jeu qui n'en declare pas.
+        var jeu = new JsonObject
+        {
+            ["system_id"] = systemId, ["rom_group"] = romGroup, ["engine"] = engine,
+            ["ruleset"] = ruleset, ["profile_version"] = profileVersion,
+            ["manifest_commit"] = manifestCommit, ["profile_document_sha256"] = profileDocSha,
+        };
+        var ctx = contexte ?? RetroBat.Api.Scoring.ContexteDeJeu.Vide;
+        if (RetroBat.Api.Scoring.ModesDeJeu.ModePourLePasseport(profile, ctx) is { } modeJoue) jeu["mode"] = modeJoue;
+        if (RetroBat.Api.Scoring.ModesDeJeu.DifficultePourLePasseport(profile, ctx) is { } difficulte) jeu["difficulty"] = difficulte;
+
         var document = new JsonObject
         {
             ["protocol"] = 1,
             ["session_id"] = Guid.NewGuid().ToString(),
             ["ticket"] = JsonNode.Parse(ticket.GetRawText()),
-            ["game"] = new JsonObject
-            {
-                ["system_id"] = systemId, ["rom_group"] = romGroup, ["engine"] = engine,
-                ["ruleset"] = ruleset, ["profile_version"] = profileVersion,
-                ["manifest_commit"] = manifestCommit, ["profile_document_sha256"] = profileDocSha,
-            },
+            ["game"] = jeu,
             ["device"] = new JsonObject { ["device_id"] = deviceId, ["key_id"] = deviceKey.KeyId, ["key_type"] = "ecdsa_p256" },
             ["identity"] = new JsonObject { ["player_ref"] = null, ["session_player_id"] = sessionPlayer?.PlayerCode },
             ["context"] = new JsonObject
@@ -1850,28 +1916,47 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return document;
     }
 
+    /// <summary>Le profil par defaut du jeu (celui du mode de demarrage) : le prevol n'a pas besoin de plus.</summary>
     private async Task<JsonElement?> FetchProfileAsync(string credential, string systemId, string romGroup, CancellationToken cancellationToken)
     {
+        var profils = await FetchProfilesAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false);
+        return profils.Count > 0 ? profils[0] : null;
+    }
+
+    /// <summary>
+    /// Les profils ouverts du jeu, celui par defaut en tete. Un jeu a modes en a un par mode ; une
+    /// plateforme d'avant les modes ne renvoie que « profile ».
+    /// </summary>
+    private async Task<List<JsonElement>> FetchProfilesAsync(string credential, string systemId, string romGroup, CancellationToken cancellationToken)
+    {
+        var sortie = new List<JsonElement>();
         try
         {
             using var client = CreateClient(credential);
             var url = $"/api/v1/agent/scores/profile?system_id={Uri.EscapeDataString(systemId)}&rom_group={Uri.EscapeDataString(romGroup)}";
             using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode) return null;
+            if (!response.IsSuccessStatusCode) return sortie;
             var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             using var doc = JsonDocument.Parse(body);
-            if (doc.RootElement.TryGetProperty("open", out var open) && open.ValueKind == JsonValueKind.True
-                && doc.RootElement.TryGetProperty("profile", out var profile))
+            var racine = doc.RootElement;
+            if (!racine.TryGetProperty("open", out var open) || open.ValueKind != JsonValueKind.True) return sortie;
+            if (racine.TryGetProperty("profiles", out var liste) && liste.ValueKind == JsonValueKind.Array)
             {
-                return profile.Clone();
+                foreach (var p in liste.EnumerateArray())
+                {
+                    if (p.ValueKind == JsonValueKind.Object) sortie.Add(p.Clone());
+                }
             }
-            return null;
+            if (sortie.Count == 0 && racine.TryGetProperty("profile", out var profile) && profile.ValueKind == JsonValueKind.Object)
+            {
+                sortie.Add(profile.Clone());
+            }
         }
         catch (Exception ex)
         {
             _logger?.LogDebug(ex, "Scoring : résolution du profil impossible.");
-            return null;
         }
+        return sortie;
     }
 
     private async Task SubmitAsync(string credential, JsonObject passport, CancellationToken cancellationToken)
@@ -2144,6 +2229,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "profile.core_options_mismatch" => "réglages en attente de conformité",
         "profile.listener_unauthorized" => "listener non homologué (wrapper ou plugin MAME)",
         "profile.not_open" => "classement fermé",
+        "game.mode_unmeasured" => "mode de jeu non mesuré : mets APIExpose à jour",
+        "game.mode_mismatch" => "mode de jeu différent de ce classement",
+        "game.difficulty_unmeasured" => "difficulté non mesurée",
+        "game.difficulty_not_allowed" => "difficulté non autorisée pour ce classement",
         "profile.mismatch" => "jeu ou règlement non concordant",
         "session.no_game_end" => "partie non terminée",
         "session.ticket_expired" => "session expirée",
