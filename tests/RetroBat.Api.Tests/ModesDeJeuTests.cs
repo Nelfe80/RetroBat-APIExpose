@@ -112,6 +112,26 @@ public class ModesDeJeuTests
     }
 
     [Fact]
+    public void Chaque_mode_joue_forme_son_groupe_et_le_zero_du_demarrage_va_au_mode_par_defaut()
+    {
+        // Tetris, 2026-09-29 : A, puis B, puis A. Le 0 lu au lancement n'a pas de mode mesure.
+        var a = ContexteDeJeu.Vide.AvecMode(55);
+        var b = ContexteDeJeu.Vide.AvecMode(119);
+        var contextes = new List<ContexteDeJeu> { ContexteDeJeu.Vide, a, a, b, b, a, a };
+        Assert.Equal(new int?[] { 55, 119 }, ModesDeJeu.ModesJoues(contextes, 55));
+        var filtreA = new FiltreDeMode(55, 55);
+        Assert.Equal(5, contextes.Count(filtreA.Garde));
+        Assert.Equal(2, contextes.Count(new FiltreDeMode(119, 55).Garde));
+    }
+
+    [Fact]
+    public void Un_jeu_sans_modes_ne_forme_qu_un_groupe()
+    {
+        var contextes = new List<ContexteDeJeu> { ContexteDeJeu.Vide, ContexteDeJeu.Vide };
+        Assert.Single(ModesDeJeu.ModesJoues(contextes, null));
+    }
+
+    [Fact]
     public void Sans_pic_retrouve_le_contexte_courant()
     {
         var courant = ContexteDeJeu.Vide.AvecMode(55);

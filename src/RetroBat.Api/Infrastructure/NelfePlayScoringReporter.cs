@@ -844,12 +844,26 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     {
         if (!root.TryGetProperty("signal", out var signal) && !root.TryGetProperty("Signal", out signal)) return;
         var nom = (GetString(signal, "Name") ?? "").Trim().ToUpperInvariant();
-        if (nom is "DEMO_MODE" or "GAME_PLAYING" or "GAME_OVER") AppliquerEtat(nom);
+        if (nom is "DEMO_MODE" or "GAME_PLAYING" or "GAME_OVER" or JeuCommence) AppliquerEtat(nom);
     }
+
+    /// <summary>
+    /// UNE PARTIE HUMAINE COMMENCE, dit le .MEM (2026-09-29). La fenetre de jeu ne se rouvrait
+    /// qu'a un appui sur START ; Tetris se lance aussi par le bouton A, et ses parties d'apres le
+    /// premier game over partaient « hors jeu ». Un .MEM qui sait reconnaitre le debut d'une
+    /// partie jouee (un ecran que la demo ne traverse jamais) le declare par cette action, qui
+    /// vaut un appui sur START.
+    /// </summary>
+    private const string JeuCommence = "GAME_START";
 
     private void AppliquerEtat(string action)
     {
         if (action.Length == 0) return;
+        if (action == JeuCommence)
+        {
+            SortirDeDemo();
+            return;
+        }
         lock (_sync)
         {
             (_inDemo, _enJeu) = EtatsApres(_inDemo, _enJeu, action);
@@ -1456,6 +1470,41 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             return;
         }
 
+        // UN JEU A MODES : UN PASSEPORT PAR MODE JOUE (2026-09-29). Trois parties de Tetris, A puis
+        // B puis A : une seule etait soumise, la meilleure toutes confondues, et le type B se
+        // perdait. Chaque mode a son classement, chacun recoit le meilleur run joue dans ce mode.
+        // Un jeu sans modes ne forme qu'un groupe : rien ne change pour lui.
+        List<RetroBat.Api.Scoring.ContexteDeJeu> tous;
+        lock (_sync) tous = new List<RetroBat.Api.Scoring.ContexteDeJeu>(_contextes);
+        if (tous.Any(c => c.Mode is not null))
+        {
+            var profils = await FetchProfilesAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false);
+            var parDefaut = RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil(profils, null) is { } defaut
+                ? RetroBat.Api.Scoring.ModesDeJeu.ModeDuProfil(defaut)
+                : null;
+            var modes = RetroBat.Api.Scoring.ModesDeJeu.ModesJoues(tous, parDefaut);
+            if (modes.Count > 1)
+            {
+                foreach (var mode in modes)
+                {
+                    Trace($"mode {(mode?.ToString() ?? "non mesure")} : ses parties seules");
+                    await SoumettreAsync(systemId, romGroup, sessionJson, credential,
+                        new RetroBat.Api.Scoring.FiltreDeMode(mode, parDefaut), cancellationToken).ConfigureAwait(false);
+                }
+                return;
+            }
+        }
+
+        await SoumettreAsync(systemId, romGroup, sessionJson, credential, null, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Le passeport d'une session, ou d'un de ses modes (<paramref name="filtre"/>) : seules les
+    /// lectures prises dans ce mode comptent, et le profil est celui de ce mode.
+    /// </summary>
+    private async Task SoumettreAsync(string systemId, string romGroup, string sessionJson, string credential,
+        RetroBat.Api.Scoring.FiltreDeMode? filtre, CancellationToken cancellationToken)
+    {
         string? listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, contentSet, wrapperVersion, coreName, coreVersion;
         long? finalTotal;
         List<(long frame, long total)> trajectory;
@@ -1466,13 +1515,20 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         bool chiffreCredits;
         lock (_sync)
         {
-            lecturesBrutes = new List<(long, long)>(_trajectory);
-            contextes = new List<RetroBat.Api.Scoring.ContexteDeJeu>(_contextes);
+            // Le mode retenu : seulement les lectures prises dans ce mode, avec leur fenetre de jeu
+            // et leur contexte. Sans filtre, toutes.
+            var retenues = Enumerable.Range(0, _trajectory.Count)
+                .Where(i => filtre is null || filtre.Garde(i < _contextes.Count ? _contextes[i] : RetroBat.Api.Scoring.ContexteDeJeu.Vide))
+                .ToList();
+            lecturesBrutes = retenues.Select(i => _trajectory[i]).ToList();
+            var horsJeu = retenues.Select(i => i < _horsJeu.Count && _horsJeu[i]).ToList();
+            contextes = retenues.Select(i => i < _contextes.Count ? _contextes[i] : RetroBat.Api.Scoring.ContexteDeJeu.Vide).ToList();
             contexteCourant = _contexte;
             listenerSha = _listenerSha256; coreSha = _coreSha256; memSha = _memSha256;
-            contentSha = _contentSha256; contentMd5 = _contentMd5; contentSha1 = _contentSha1; contentSet = _contentSet; wrapperVersion = _wrapperVersion; finalTotal = _finalTotal;
+            contentSha = _contentSha256; contentMd5 = _contentMd5; contentSha1 = _contentSha1; contentSet = _contentSet; wrapperVersion = _wrapperVersion;
+            finalTotal = filtre is null ? _finalTotal : (lecturesBrutes.Count > 0 ? lecturesBrutes[^1].total : null);
             coreName = _coreName; coreVersion = _coreVersion;
-            trajectory = new List<(long, long)>(_trajectory);
+            trajectory = new List<(long, long)>(lecturesBrutes);
             vies = new List<EvenementDeVie>(_vies);
             chiffreCredits = _chiffreCredits;
 
@@ -1480,7 +1536,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // pas (démo avant la partie, attract après le game over) sort de la trajectoire.
             if (_startVu)
             {
-                var gardes = FiltrerEnJeu(_trajectory, _horsJeu);
+                var gardes = FiltrerEnJeu(lecturesBrutes, horsJeu);
                 if (gardes.Count != trajectory.Count)
                 {
                     Trace($"fenetre de jeu : {trajectory.Count - gardes.Count} lecture(s) hors jeu ecartee(s) (demo, attract)");
@@ -1579,7 +1635,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // ne fait pas de score en dessous, et un coeur muet, lui, se laisse decouvrir aussi
             // bien a la deuxieme minute qu'a la premiere.
             var joue = _prevolAt is { } debut && DateTime.UtcNow - debut >= TimeSpan.FromSeconds(90);
-            if (_prevolCertifiable && joue)
+            if (_prevolCertifiable && joue && filtre is null)
             {
                 _overlay?.ShowTop(
                     "SCORING",

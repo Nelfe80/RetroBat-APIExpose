@@ -35,8 +35,24 @@ public sealed record ContexteDeJeu(int? Mode, IReadOnlyDictionary<string, int> D
     }
 }
 
+/// <summary>
+/// Les lectures d'un seul mode : celles prises pendant qu'il etait en vigueur. Une lecture sans
+/// mode mesure appartient au mode de demarrage (<paramref name="ParDefaut"/>).
+/// </summary>
+public sealed record FiltreDeMode(int? Mode, int? ParDefaut)
+{
+    public bool Garde(ContexteDeJeu contexte) => (contexte.Mode ?? ParDefaut) == Mode;
+}
+
 public static class ModesDeJeu
 {
+    /// <summary>
+    /// Les modes joues dans une session, dans l'ordre ou ils apparaissent. Une lecture sans mode
+    /// mesure compte pour le mode de demarrage : le 0 lu au lancement ne fait pas un mode a part.
+    /// </summary>
+    public static List<int?> ModesJoues(IReadOnlyList<ContexteDeJeu> contextes, int? parDefaut)
+        => contextes.Select(c => c.Mode ?? parDefaut).Distinct().ToList();
+
     public const string SignalMode = "GAME_MODE";
     public const string SignalDifficulte = "GAME_DIFFICULTY";
 
