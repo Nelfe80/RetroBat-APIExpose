@@ -46,6 +46,12 @@ $ex = @(
     # borne chez toutes les autres, qui le reconstruisent de toute facon (239 fichiers,
     # 44 Mo, partis dans les paquets jusqu'a la 1.8.20 inclus).
     "-x!$name\resources\gamelist\localized",
+    # Le proprietaire de chaque media (MediaSidecarStore) : ECRIT par l'API sur chaque borne,
+    # comme le cache ci-dessus. Livre, il installait chez tout le monde les medias « geres »
+    # de la borne qui fabrique la release (1.9.9, quatre systemes, vu le 2026-09-29).
+    "-x!$name\resources\gamelist\media-sidecar",
+    # Les sauvegardes faites a la main avant une operation (mame-banks.json.avant-nuit).
+    "-xr!*.avant-*",
     # Etat de la borne ecrit par l'API avant chaque lancement (les reglages certifies forces
     # pour le jeu en cours) : gitignore, et pas plus a livrer que wrapper\.env.
     "-x!$name\wrapper\certified.txt",
@@ -154,7 +160,7 @@ $listing = & $sz l $controlee
 # tools\*.py, resources\ra et ScreenScraper.html sont passes au travers. Il couvre
 # desormais ce que les exclusions ci-dessus retirent, pour que les deux listes se
 # contredisent bruyamment si l'une d'elles derive.
-$leaks = $listing | Select-String '\.env|\.bak|\.ps1$|\.py$|\\media\\|\\src\\|\\tests\\|\\docs\\|\\dist\\|package-installer|projects-source|\.git|panel_curator|profiles_db|\\resources\\ra\\|\\resources\\ram\\\.user\\|\\resources\\gamelist\\localized\\|\\wrapper\\certified\.txt|ScreenScraper\.html|\\tools\\(ffmpeg|imagemagick|translateLocally|mem-curator|libretro-probe)\\'
+$leaks = $listing | Select-String '\.env|\.bak|\.ps1$|\.py$|\\media\\|\\src\\|\\tests\\|\\docs\\|\\dist\\|package-installer|projects-source|\.git|panel_curator|profiles_db|\\resources\\ra\\|\\resources\\ram\\\.user\\|\\resources\\gamelist\\localized\\|\\resources\\gamelist\\media-sidecar\\|\.avant-|\\wrapper\\certified\.txt|ScreenScraper\.html|\\tools\\(ffmpeg|imagemagick|translateLocally|mem-curator|libretro-probe)\\'
 if ($leaks) { throw "FUITE DETECTEE dans l'archive : $($leaks[0])" }
 # La cle API de la borne ne doit JAMAIS etre committee/distribuee : le defaut reste vide
 # (chaque borne genere la sienne au 1er run). On bloque si une valeur traine.
