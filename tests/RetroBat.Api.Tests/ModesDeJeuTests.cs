@@ -99,6 +99,19 @@ public class ModesDeJeuTests
     }
 
     [Fact]
+    public void Le_zero_du_demarrage_precede_le_menu()
+    {
+        // Tetris, 2026-09-29 : le 0 est lu au demarrage, le niveau se choisit ensuite, puis les
+        // points arrivent. Le contexte du run est celui de la premiere montee.
+        var choisi = ContexteDeJeu.Vide.AvecMode(119).AvecDifficulte("0xFFC3", 5);
+        var lectures = new List<(long, long)> { (0, 0), (10, 19), (20, 68) };
+        var contextes = new List<ContexteDeJeu> { ContexteDeJeu.Vide, choisi, choisi };
+        var ctx = ModesDeJeu.ContexteDuRun(lectures, contextes, lectures, ContexteDeJeu.Vide);
+        Assert.Equal(119, ctx.Mode);
+        Assert.Equal(5, ctx.Difficulte["0xFFC3"]);
+    }
+
+    [Fact]
     public void Sans_pic_retrouve_le_contexte_courant()
     {
         var courant = ContexteDeJeu.Vide.AvecMode(55);

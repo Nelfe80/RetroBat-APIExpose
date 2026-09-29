@@ -128,6 +128,11 @@ public static class ModesDeJeu
     /// puis on remonte tant que le score ne retombe pas : la ou il retombe, une autre partie
     /// commencait. Le debut compte, et pas le pic : un jeu peut reutiliser l'octet du niveau choisi
     /// pour le niveau en cours. Sans pic retrouve, le contexte courant.
+    ///
+    /// LE DEBUT, C'EST LA PREMIERE MONTEE DU SCORE, PAS SA PREMIERE LECTURE. Une lecture ne
+    /// s'inscrit que quand le score CHANGE : le 0 d'une premiere partie est celui lu au demarrage
+    /// du jeu, AVANT le menu ou le joueur choisit son mode et son niveau. Mesure du 2026-09-29 sur
+    /// Tetris : le 0 a 20:38:56, le niveau choisi a 20:39:05, les premiers points a 20:39:15.
     /// </summary>
     public static ContexteDeJeu ContexteDuRun(
         IReadOnlyList<(long frame, long total)> lectures,
@@ -143,7 +148,8 @@ public static class ModesDeJeu
             if (lectures[k] == pic) { i = k; break; }
         }
         if (i < 0) return courant;
+        var sommet = i;
         while (i > 0 && lectures[i - 1].total <= lectures[i].total) i--;
-        return contextes[i];
+        return contextes[i < sommet ? i + 1 : i];
     }
 }
