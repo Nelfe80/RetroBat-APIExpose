@@ -56,7 +56,7 @@ public sealed class StartupOverlayService : IHostedService, IDisposable, IStartu
         }
 
         var ready = new ManualResetEventSlim(false);
-        _uiThread = new Thread(() =>
+        _uiThread = new Thread(() => OverlayUiGuard.Run("StartupOverlayService", ready, () =>
         {
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
@@ -104,7 +104,7 @@ public sealed class StartupOverlayService : IHostedService, IDisposable, IStartu
             {
                 _form = null;
             }
-        })
+        }))
         {
             IsBackground = true,
             Name = "APIExpose.StartupOverlay",

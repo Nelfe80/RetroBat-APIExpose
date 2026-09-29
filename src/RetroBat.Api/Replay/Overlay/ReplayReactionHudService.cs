@@ -118,7 +118,7 @@ public sealed class ReplayReactionHudService : BackgroundService
     {
         lock (_sync) { if (_uiThread != null) return; }
         var ready = new ManualResetEventSlim(false);
-        var thread = new Thread(() =>
+        var thread = new Thread(() => OverlayUiGuard.Run("ReplayReactionHudService", ready, () =>
         {
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             var context = new ApplicationContext();
@@ -146,7 +146,7 @@ public sealed class ReplayReactionHudService : BackgroundService
             ready.Set();
             Application.Run(context);
             lock (_sync) { _form?.Dispose(); _form = null; _dispatcher?.Dispose(); _dispatcher = null; _appContext = null; _sprites?.Dispose(); _sprites = null; }
-        })
+        }))
         { IsBackground = true, Name = "APIExpose.ReplayReactionHud" };
         thread.SetApartmentState(ApartmentState.STA);
         thread.Start();

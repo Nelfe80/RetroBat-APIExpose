@@ -247,7 +247,7 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
         }
 
         var ready = new ManualResetEventSlim(false);
-        var thread = new Thread(() =>
+        var thread = new Thread(() => OverlayUiGuard.Run("ChallengeAnnounceOverlayService", ready, () =>
         {
             var context = new ApplicationContext();
             var dispatcher = new Control();
@@ -267,7 +267,7 @@ public sealed class ChallengeAnnounceOverlayService : BackgroundService
                 _applicationContext = null;
                 _form = null;
             }
-        })
+        }))
         {
             IsBackground = true,
             Name = "APIExpose.ChallengeAnnounceOverlay"

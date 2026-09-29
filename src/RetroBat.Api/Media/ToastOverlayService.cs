@@ -94,7 +94,7 @@ public sealed class ToastOverlayService : BackgroundService, IToastNotificationS
         }
 
         var ready = new ManualResetEventSlim(false);
-        var thread = new Thread(() =>
+        var thread = new Thread(() => OverlayUiGuard.Run("ToastOverlayService", ready, () =>
         {
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
@@ -120,7 +120,7 @@ public sealed class ToastOverlayService : BackgroundService, IToastNotificationS
                 _applicationContext = null;
                 _activeToasts.Clear();
             }
-        })
+        }))
         {
             IsBackground = true,
             Name = "APIExpose.ToastOverlay"

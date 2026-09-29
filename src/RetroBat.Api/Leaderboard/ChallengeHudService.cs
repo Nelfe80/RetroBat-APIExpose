@@ -7,6 +7,8 @@ using System.Text.Json;
 using RetroBat.Domain.Events;
 using RetroBat.Domain.Interfaces;
 
+using RetroBat.Api.Infrastructure;
+
 namespace RetroBat.Api.Leaderboard;
 
 /// <summary>
@@ -211,7 +213,7 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
         var ecran = fenetre != IntPtr.Zero ? Screen.FromHandle(fenetre).Bounds : (Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080));
         if (_fil is null)
         {
-            _fil = new Thread(() =>
+            _fil = new Thread(() => OverlayUiGuard.Run("ChallengeHudService", () =>
             {
                 try
                 {
@@ -219,7 +221,7 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
                     Application.Run(_forme);
                 }
                 catch (Exception ex) { _journal.LogWarning(ex, "Defi : le cartouche s'est arrete."); }
-            }) { IsBackground = true, Name = "challenge-hud" };
+            })) { IsBackground = true, Name = "challenge-hud" };
             _fil.SetApartmentState(ApartmentState.STA);
             _fil.Start();
         }

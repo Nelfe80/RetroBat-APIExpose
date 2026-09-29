@@ -8,6 +8,8 @@ using RetroBat.Api.Replay.Models;
 using RetroBat.Api.Replay.Playback;
 using RetroBat.Api.Replay.Storage;
 
+using RetroBat.Api.Infrastructure;
+
 namespace RetroBat.Api.Replay.Overlay;
 
 /// <summary>
@@ -101,7 +103,7 @@ public sealed class ReplayOverlayService : BackgroundService
         lock (_sync) { if (_uiThread != null) return; }
 
         var ready = new ManualResetEventSlim(false);
-        var thread = new Thread(() =>
+        var thread = new Thread(() => OverlayUiGuard.Run("ReplayOverlayService", ready, () =>
         {
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
@@ -124,7 +126,7 @@ public sealed class ReplayOverlayService : BackgroundService
                 _sprites?.Dispose();
                 _sprites = null;
             }
-        })
+        }))
         {
             IsBackground = true,
             Name = "APIExpose.ReplayOverlay"

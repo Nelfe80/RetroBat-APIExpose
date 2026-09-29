@@ -17,11 +17,12 @@ public sealed class LiveContestOverlayService : IDisposable
     // Le bandeau du haut, dessine aux couleurs des menus d'ES (voir EsBanniereForm).
     private RetroBat.Api.Leaderboard.EsBanniereForm? _banniere;
     private Thread? _uiThread;
+    private DateTime _echecA = DateTime.MinValue;
+    private ManualResetEventSlim? _creation;
 
     public void Show(string? title, string text, string? sub, int? durationMs)
     {
-        EnsureForm();
-        _form!.BeginInvoke(() => _form.Present(
+        Poster(form => form.Present(
             string.IsNullOrWhiteSpace(title) ? "LIVE CONTEST" : title!,
             text, sub ?? "", durationMs, center: false));
     }
@@ -32,8 +33,7 @@ public sealed class LiveContestOverlayService : IDisposable
     /// </summary>
     public void ShowCenter(string text, string? sub, int? durationMs)
     {
-        EnsureForm();
-        _form!.BeginInvoke(() => _form.Present(
+        Poster(form => form.Present(
             "LIVE CONTEST", text, sub ?? "", durationMs, center: true));
     }
 
@@ -41,8 +41,7 @@ public sealed class LiveContestOverlayService : IDisposable
     /// START… », « Ne touchez plus à rien ! » - centré en haut du jeu.</summary>
     public void ShowTop(string? title, string text, string? sub, int? durationMs, bool alerte = false)
     {
-        EnsureForm();
-        _form!.BeginInvoke(() =>
+        Poster(form =>
         {
             var marque = string.IsNullOrWhiteSpace(title) ? "CHALLENGE" : title!;
             if (_banniere is { IsDisposed: false } banniere)
@@ -51,67 +50,142 @@ public sealed class LiveContestOverlayService : IDisposable
             }
             else
             {
-                _form.PresentTop(marque, text, sub ?? "", durationMs);   // repli : l'ancien bandeau
+                form.PresentTop(marque, text, sub ?? "", durationMs);   // repli : l'ancien bandeau
             }
         });
     }
 
     public void Hide()
     {
-        var form = _form;
-        if (form is { IsHandleCreated: true })
+        OverlayForm? form;
+        lock (_gate) form = _form;
+        if (form is { IsHandleCreated: true, IsDisposed: false })
         {
-            form.BeginInvoke(() =>
+            Envoyer(form, f =>
             {
-                form.Conceal();
+                f.Conceal();
                 _banniere?.Masquer();
             });
         }
     }
 
-    private void EnsureForm()
+    /// <summary>
+    /// UN BANDEAU QUI NE PEUT PAS S'AFFICHER SE TAIT (2026-09-29). Ce service etait celui qui
+    /// tombait chez un joueur dont l'API avait epuise ses objets fenetre : la fenetre n'etait pas
+    /// creee, et l'appel suivant l'utilisait quand meme. Desormais une fenetre sans handle n'est
+    /// jamais utilisee, et l'envoi vers elle ne peut pas lever chez l'appelant (le reporter du
+    /// scoring, qui n'a pas a mourir parce qu'un bandeau manque).
+    /// </summary>
+    private void Poster(Action<OverlayForm> action)
     {
+        var form = FormPrete();
+        if (form is not null)
+        {
+            Envoyer(form, action);
+        }
+    }
+
+    private static void Envoyer(OverlayForm form, Action<OverlayForm> action)
+    {
+        try
+        {
+            form.BeginInvoke(() => action(form));
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ObjectDisposedException or System.ComponentModel.Win32Exception)
+        {
+            OverlayUiGuard.Signaler("LiveContestOverlayService, envoi", ex);
+        }
+    }
+
+    /// <summary>
+    /// La fenetre, prete (handle cree) ; null si elle ne peut pas l'etre. Apres un echec, on ne
+    /// retente qu'au bout de 30 s : quand le quota d'objets fenetre est plein, chaque essai en
+    /// consommerait encore, pour rien.
+    /// </summary>
+    private OverlayForm? FormPrete()
+    {
+        ManualResetEventSlim attente;
         lock (_gate)
         {
-            if (_form is { IsDisposed: false })
+            if (_form is { IsDisposed: false, IsHandleCreated: true } prete)
             {
-                return;
+                return prete;
             }
 
-            using var ready = new ManualResetEventSlim();
-            _uiThread = new Thread(() =>
+            // Une creation deja en cours : on l'attend avec elle, jamais une seconde fenetre.
+            if (_creation is null)
             {
-                _form = new OverlayForm();
-                // cree le handle sans afficher la fenetre
-                _ = _form.Handle;
-                try
+                if (DateTime.UtcNow - _echecA < TimeSpan.FromSeconds(30))
                 {
-                    _banniere = new RetroBat.Api.Leaderboard.EsBanniereForm();
-                    _ = _banniere.Handle;
+                    return null;
                 }
-                catch (Exception)
-                {
-                    _banniere = null;   // sans charte lisible, l'ancien bandeau prend le relais
-                }
-                ready.Set();
-                Application.Run();
-            })
-            {
-                IsBackground = true,
-                Name = "livecontest-overlay"
-            };
-            _uiThread.SetApartmentState(ApartmentState.STA);
-            _uiThread.Start();
-            ready.Wait(TimeSpan.FromSeconds(5));
+
+                _form = null;
+                _creation = Creer();
+            }
+
+            attente = _creation;
         }
+
+        // Hors du verrou : le fil le prend pour publier la fenetre.
+        attente.Wait(TimeSpan.FromSeconds(5));
+        lock (_gate)
+        {
+            if (ReferenceEquals(_creation, attente))
+            {
+                _creation = null;
+            }
+
+            if (_form is { IsDisposed: false, IsHandleCreated: true } creee)
+            {
+                return creee;
+            }
+
+            _echecA = DateTime.UtcNow;
+            return null;
+        }
+    }
+
+    /// <summary>Le fil de la fenetre ; appele sous le verrou.</summary>
+    private ManualResetEventSlim Creer()
+    {
+        // Pas de « using » : si la creation traine au-dela de l'attente, le fil signalera plus
+        // tard sur un objet encore vivant.
+        var ready = new ManualResetEventSlim();
+        _uiThread = new Thread(() => OverlayUiGuard.Run("LiveContestOverlayService", ready, () =>
+        {
+            var form = new OverlayForm();
+            // cree le handle sans afficher la fenetre
+            _ = form.Handle;
+            try
+            {
+                _banniere = new RetroBat.Api.Leaderboard.EsBanniereForm();
+                _ = _banniere.Handle;
+            }
+            catch (Exception)
+            {
+                _banniere = null;   // sans charte lisible, l'ancien bandeau prend le relais
+            }
+            lock (_gate) _form = form;
+            ready.Set();
+            Application.Run();
+        }))
+        {
+            IsBackground = true,
+            Name = "livecontest-overlay"
+        };
+        _uiThread.SetApartmentState(ApartmentState.STA);
+        _uiThread.Start();
+        return ready;
     }
 
     public void Dispose()
     {
-        var form = _form;
-        if (form is { IsHandleCreated: true })
+        OverlayForm? form;
+        lock (_gate) form = _form;
+        if (form is { IsHandleCreated: true, IsDisposed: false })
         {
-            form.BeginInvoke(() => { form.Close(); Application.ExitThread(); });
+            Envoyer(form, f => { f.Close(); Application.ExitThread(); });
         }
     }
 

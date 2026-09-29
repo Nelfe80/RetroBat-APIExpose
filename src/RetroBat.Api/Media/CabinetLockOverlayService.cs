@@ -218,7 +218,7 @@ public sealed class CabinetLockOverlayService : BackgroundService
         }
 
         var ready = new ManualResetEventSlim(false);
-        var thread = new Thread(() =>
+        var thread = new Thread(() => OverlayUiGuard.Run("CabinetLockOverlayService", ready, () =>
         {
             var context = new ApplicationContext();
             var dispatcher = new Control();
@@ -238,7 +238,7 @@ public sealed class CabinetLockOverlayService : BackgroundService
                 _applicationContext = null;
                 _form = null;
             }
-        })
+        }))
         {
             IsBackground = true,
             Name = "APIExpose.CabinetLockOverlay"

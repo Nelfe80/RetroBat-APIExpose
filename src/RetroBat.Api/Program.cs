@@ -70,6 +70,8 @@ var hostArgs = hostArgList.ToArray();
 // (Kestrel qui ne peut pas ecouter, un service qui echoue a demarrer) y laisse sa trace.
 RetroBat.Api.Infrastructure.StartupFatalLog.Configure(diagnosticMode || diagnosticConfigPath is not null, diagnosticConfigPath, args);
 RetroBat.Api.Infrastructure.StartupFatalLog.Register();
+// Avant toute fenetre : une surimpression qui echoue ne doit jamais faire tomber l'API.
+RetroBat.Api.Infrastructure.OverlayUiGuard.Installer();
 
 var builder = WebApplication.CreateBuilder(hostArgs);
 
@@ -261,6 +263,8 @@ builder.Services.AddHostedService<RetroBat.Api.Leaderboard.LeaderboardInputServi
 // La borne prend la derniere version publiee au lancement, quand rien ne tourne.
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.SelfUpdateService>();
 builder.Services.AddHostedService<RetroBat.Api.Infrastructure.SelfUpdateHostedService>();
+// Combien d'objets fenetre et graphiques l'API tient : la trace d'une fuite, dans le journal.
+builder.Services.AddHostedService<RetroBat.Api.Infrastructure.GuiResourceMonitorService>();
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.DataPackSyncService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.DataPackSyncService>());
 // Releve d'audience : ce qui est joue et combien de temps, jamais par qui.
@@ -631,6 +635,8 @@ if (selfTestRequested)
 builder.Services.ProtegerLesServicesHeberges();
 
 var app = builder.Build();
+RetroBat.Api.Infrastructure.OverlayUiGuard.Journal(
+    app.Services.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>().CreateLogger("RetroBat.Api.Infrastructure.OverlayUiGuard"));
 
 // Setup internal event subscriber to broadcast via WebSockets
 var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();

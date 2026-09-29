@@ -119,7 +119,7 @@ public sealed class TaskProgressOverlayService : BackgroundService, ITaskProgres
         }
 
         var ready = new ManualResetEventSlim(false);
-        var thread = new Thread(() =>
+        var thread = new Thread(() => OverlayUiGuard.Run("TaskProgressOverlayService", ready, () =>
         {
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
@@ -148,7 +148,7 @@ public sealed class TaskProgressOverlayService : BackgroundService, ITaskProgres
                 _dispatcher = null;
                 _applicationContext = null;
             }
-        })
+        }))
         {
             IsBackground = true,
             Name = "APIExpose.TaskProgressOverlay"
