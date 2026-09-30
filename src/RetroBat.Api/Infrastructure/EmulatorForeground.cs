@@ -203,23 +203,53 @@ public static class EmulatorForeground
         return false;
     }
 
-    /// <summary>Vrai si une fenêtre de ce processus existe, qu'elle soit devant ou non.</summary>
-    private static bool AUneFenetre(string processName)
+    /// <summary>
+    /// Le premier emulateur de la liste qui a une fenetre, devant ou non, en UN parcours des
+    /// processus ; null s'il n'y en a pas encore.
+    ///
+    /// L'attente de la fenetre au lancement en faisait un par nom d'emulateur, soit neuf toutes les
+    /// 600 ms pendant tout le chargement du jeu : le plus gros du processeur de l'API a ce moment,
+    /// presque tout en temps systeme (mesure sur la borne le 2026-09-30).
+    /// </summary>
+    private static string? EmulateurAvecFenetre()
     {
+        Process[] tous;
         try
         {
-            foreach (var process in Processus(processName))
-            {
-                if (process.MainWindowHandle != IntPtr.Zero)
-                {
-                    return true;
-                }
-            }
+            tous = Process.GetProcesses();
         }
         catch (Exception)
         {
+            return null;
         }
-        return false;
+
+        var meilleur = -1;
+        foreach (var p in tous)
+        {
+            try
+            {
+                var nom = p.ProcessName;
+                for (var i = 0; i < Emulateurs.Length && (meilleur < 0 || i < meilleur); i++)
+                {
+                    // La fenetre n'est demandee qu'a un emulateur : c'est elle qui coute.
+                    if (nom.StartsWith(Emulateurs[i], StringComparison.OrdinalIgnoreCase) && p.MainWindowHandle != IntPtr.Zero)
+                    {
+                        meilleur = i;
+                        break;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Un processus termine entre-temps n'a plus de nom : on passe.
+            }
+            finally
+            {
+                p.Dispose();
+            }
+        }
+
+        return meilleur < 0 ? null : Emulateurs[meilleur];
     }
 
     /// <summary>
@@ -242,15 +272,7 @@ public static class EmulatorForeground
                 return;
             }
 
-            foreach (var nom in Emulateurs)
-            {
-                if (!AUneFenetre(nom))
-                {
-                    continue;
-                }
-                vu = nom;
-                break;
-            }
+            vu = EmulateurAvecFenetre();
             if (vu is not null)
             {
                 break;

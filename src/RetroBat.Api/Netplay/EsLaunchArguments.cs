@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using RetroBat.Domain.Paths;
 
@@ -65,31 +66,20 @@ public static class EsLaunchArguments
             return null;
         }
 
+        // La DERNIERE occurrence gagne : on lit chaque journal depuis la fin, et les journaux du
+        // plus recent au plus ancien, donc la premiere ligne qui repond fait foi.
         foreach (var journal in Journaux())
         {
-            var contenu = Lire(journal);
-            if (contenu is null)
-            {
-                continue;
-            }
-
-            // Dans un journal donne, la DERNIERE occurrence gagne ; les journaux sont parcourus
-            // du plus recent au plus ancien, donc le premier qui repond fait foi.
-            Resolution? trouvee = null;
-            foreach (var ligne in Lancements(contenu))
+            foreach (var ligne in LancementsDepuisLaFin(journal))
             {
                 if (string.Equals(NomDeFichier(Valeur(ligne, "rom")), fichier, StringComparison.OrdinalIgnoreCase))
                 {
-                    trouvee = new Resolution(
+                    return new Resolution(
                         Valeur(ligne, "system"),
                         Valeur(ligne, "emulator"),
                         Valeur(ligne, "core"),
                         ManettesDe(ligne));
                 }
-            }
-            if (trouvee is not null)
-            {
-                return trouvee;
             }
         }
         return null;
@@ -105,12 +95,10 @@ public static class EsLaunchArguments
     {
         foreach (var journal in Journaux())
         {
-            var contenu = Lire(journal);
-            if (contenu is null)
-            {
-                continue;
-            }
-            var manettes = DernieresManettes(contenu);
+            // Le dernier lancement du journal, et lui seul : un journal dont le dernier lancement
+            // n'a pas de manette passe la main au suivant, comme avant.
+            var dernier = LancementsDepuisLaFin(journal).FirstOrDefault();
+            var manettes = dernier is null ? string.Empty : ManettesDe(dernier);
             if (manettes.Length > 0)
             {
                 return manettes;
@@ -176,19 +164,94 @@ public static class EsLaunchArguments
         }
     }
 
-    private static string? Lire(string chemin)
+    /// <summary>
+    /// Les lignes de lancement d'un journal, de la DERNIERE a la premiere, lues par la fin.
+    ///
+    /// Le journal d'ES grossit sans fin (23 Mo sur une borne le 2026-09-30). Chaque lancement
+    /// direct le lisait en entier et le decoupait en lignes pour n'en garder que la derniere :
+    /// une demi-seconde et des dizaines de Mo a chaque partie, de plus en plus avec le temps. On
+    /// lit par blocs depuis la fin, et l'appelant s'arrete a la premiere ligne qui lui repond.
+    /// Un saut de ligne est un octet 0x0A en UTF-8, jamais un morceau d'un autre caractere : on
+    /// peut couper le fichier en blocs d'octets sans casser une ligne.
+    /// </summary>
+    internal static IEnumerable<string> LancementsDepuisLaFin(string chemin, int bloc = 64 * 1024)
+    {
+        using var flux = Ouvrir(chemin);
+        if (flux is null)
+        {
+            yield break;
+        }
+
+        var position = flux.Length;
+        var reste = Array.Empty<byte>();   // le debut d'une ligne, coupe par le bloc precedent
+        var tampon = new byte[bloc];
+        while (position > 0)
+        {
+            var taille = (int)Math.Min(bloc, position);
+            position -= taille;
+            if (!LireBloc(flux, position, tampon, taille))
+            {
+                yield break;   // le journal a tourne pendant la lecture : on s'en tient a ce qu'on a lu
+            }
+
+            var morceau = new byte[taille + reste.Length];
+            Buffer.BlockCopy(tampon, 0, morceau, 0, taille);
+            Buffer.BlockCopy(reste, 0, morceau, taille, reste.Length);
+            var fin = morceau.Length;
+            for (var i = morceau.Length - 1; i >= 0; i--)
+            {
+                if (morceau[i] != (byte)'\n')
+                {
+                    continue;
+                }
+                var ligne = Encoding.UTF8.GetString(morceau, i + 1, fin - i - 1);
+                if (EstUnLancement(ligne))
+                {
+                    yield return ligne.Trim();
+                }
+                fin = i;
+            }
+            reste = morceau[..fin];
+        }
+
+        if (reste.Length > 0)
+        {
+            var premiere = Encoding.UTF8.GetString(reste);
+            if (EstUnLancement(premiere))
+            {
+                yield return premiere.Trim();
+            }
+        }
+    }
+
+    private static bool EstUnLancement(string ligne)
+        => ligne.Contains("emulatorLauncher.exe", StringComparison.OrdinalIgnoreCase);
+
+    private static FileStream? Ouvrir(string chemin)
     {
         try
         {
             // ES ecrit dedans en continu : lecture PARTAGEE, sinon on echoue exactement quand la
             // borne est vivante.
-            using var flux = new FileStream(chemin, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using var lecteur = new StreamReader(flux);
-            return lecteur.ReadToEnd();
+            return new FileStream(chemin, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
         }
         catch (Exception)
         {
             return null;
+        }
+    }
+
+    private static bool LireBloc(FileStream flux, long position, byte[] tampon, int taille)
+    {
+        try
+        {
+            flux.Position = position;
+            flux.ReadExactly(tampon, 0, taille);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
         }
     }
 
