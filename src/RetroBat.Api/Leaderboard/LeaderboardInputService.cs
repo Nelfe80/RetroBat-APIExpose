@@ -890,8 +890,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             {
                 if (reglages.ChallengeShareLive && await DiffuserLeDefiAsync(chemin, reglages.ChallengeJoinPolicy).ConfigureAwait(false))
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(45)).ConfigureAwait(false);
-                    if (_overlay.EnAttente && !EmulatorForeground.EmulateurTourne()) Fermer();
+                    await AttendreLeJeuPuisSEffacerAsync("defi en direct").ConfigureAwait(false);
                     return;
                 }
                 EmulatorForeground.FocusEmulationStation();
@@ -909,10 +908,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     Fermer();
                     return;
                 }
-                // Le filet : si aucun jeu ne demarre, la boite d'attente ne reste pas a l'ecran.
-                // Le depart du jeu, lui, ferme le panneau par `ui.game.started`.
-                await Task.Delay(TimeSpan.FromSeconds(45)).ConfigureAwait(false);
-                if (_overlay.EnAttente && !EmulatorForeground.EmulateurTourne()) Fermer();
+                // Le depart du jeu ferme le panneau par `ui.game.started` ; le filet fait le reste.
+                await AttendreLeJeuPuisSEffacerAsync("defi").ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -957,8 +954,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     Fermer();
                     return;
                 }
-                await Task.Delay(TimeSpan.FromSeconds(45)).ConfigureAwait(false);
-                if (_overlay.EnAttente && !EmulatorForeground.EmulateurTourne()) Fermer();
+                await AttendreLeJeuPuisSEffacerAsync("direct rejoint").ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -1134,6 +1130,41 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 Fermer();
             }
         });
+    }
+
+    /// <summary>
+    /// LE JEU EST LA, LA BOITE S'EN VA. La boite « Lancement de la partie » ne se fermait que sur
+    /// `ui.game.started` ; son filet, 45 s plus tard, ne la fermait que si AUCUN emulateur ne
+    /// tournait. Un jeu lance sans que l'evenement arrive laissait donc la boite au premier plan,
+    /// par-dessus la partie, pour toujours (signale le 2026-09-30 sur un defi). On guette
+    /// l'emulateur : des qu'il est la, la boite s'efface, evenement ou pas. Sans emulateur au bout
+    /// de 60 s, on ferme tout, comme avant.
+    /// </summary>
+    private async Task AttendreLeJeuPuisSEffacerAsync(string quoi)
+    {
+        var limite = DateTime.UtcNow + TimeSpan.FromSeconds(60);
+        while (DateTime.UtcNow < limite && _overlay.EnAttente)
+        {
+            if (EmulatorForeground.EmulateurTourne())
+            {
+                // La fenetre suit son processus, et `ui.game.started` a pu fermer entre-temps.
+                await Task.Delay(1500).ConfigureAwait(false);
+                if (_overlay.EnAttente)
+                {
+                    _modele.Fermer();
+                    _overlay.FermerPourLeJeu();
+                    _logger.LogInformation("Classement : {Quoi}, le jeu est la sans « partie commencee » d'ES : la boite d'attente s'efface.", quoi);
+                }
+                return;
+            }
+            await Task.Delay(500).ConfigureAwait(false);
+        }
+
+        if (_overlay.EnAttente)
+        {
+            _logger.LogWarning("Classement : {Quoi}, aucun jeu apres 60 s : la boite d'attente se ferme.", quoi);
+            Fermer();
+        }
     }
 
     /// <summary>La boite d'attente reste jusqu'a ce que l'emulateur soit la, puis on s'efface.</summary>

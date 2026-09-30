@@ -844,7 +844,22 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // Si elle n'est pas la, on ne dit RIEN plutot que d'ejecter : un avertissement qui
             // interrompt la partie est pire que pas d'avertissement, et le joueur aura de toute
             // facon le verdict a la fin, quand ES a repris la main.
-            if (_overlay is not null)
+            // UN LANCEMENT, UN PREVOL A L'ECRAN. Sous le coeur MAME de RetroArch, le wrapper PUIS le pont
+            // Lua attestent la meme partie, a 16 s d'ecart : deux prevols, deux « Partie certifiable »
+            // (2026-09-30). Meme jeu, meme verdict, moins d'une minute apres : on ne le redit pas.
+            var clePrevol = $"{systemId}/{romGroup}|{titre}|{detail}";
+            bool dejaDit;
+            lock (_sync)
+            {
+                dejaDit = clePrevol == _dernierPrevolAffiche && DateTime.UtcNow - _dernierPrevolAfficheA < TimeSpan.FromSeconds(60);
+                _dernierPrevolAffiche = clePrevol;
+                _dernierPrevolAfficheA = DateTime.UtcNow;
+            }
+            if (dejaDit)
+            {
+                Trace("prevol identique au precedent, deja affiche : rien de plus a l'ecran");
+            }
+            else if (_overlay is not null)
             {
                 // Le JOURNAL garde le francais (l'outil de diagnostic le lit) ; l'ECRAN parle la langue
                 // du joueur, et passe en orange quand la partie ne sera pas classee.
@@ -1703,6 +1718,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     private DateTime _dernierBandeauDeCoupe = DateTime.MinValue;
+    private string _dernierPrevolAffiche = "";
+    private DateTime _dernierPrevolAfficheA = DateTime.MinValue;
 
     /// <summary>
     /// UN CONTINUE, UN BANDEAU. 19xx a deux temoins du meme continue : le chiffre des credits de
