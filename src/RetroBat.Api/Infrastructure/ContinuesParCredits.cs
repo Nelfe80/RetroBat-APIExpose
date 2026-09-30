@@ -31,13 +31,25 @@ public readonly record struct DepartDeJoueur(int Player, long Frame);
 /// joueur joue pour le 1CC ; qu'un joueur le rejoigne, et la partie passe en 1CC MULTI, pour lui
 /// comme pour les autres. La borne ne voit que les START de son propre panel : un crédit consommé
 /// sans aucun START local vient d'un joueur distant. C'est une arrivée, pas un continue.
+///
+/// C'EST CUMULATIF (décision user du 2026-09-30) : le score fait seul avant l'arrivée reste un
+/// 1CC, et il est bien qu'il soit certifié si le joueur ne l'avait jamais atteint ; la suite
+/// bascule en 1CC MULTI. L'arrivée ferme donc le 1CC solo comme un continue le ferme, sans en
+/// être un.
 /// </summary>
 public static class ContinuesParCredits
 {
     /// <summary>L'écart toléré entre le START d'un joueur et le crédit qu'il consomme : 3 s.</summary>
     public const long FenetreArrivee = 180;
 
-    public sealed record Bilan(IReadOnlyList<long> Coupes, bool PlusieursJoueurs);
+    public sealed record Bilan(IReadOnlyList<long> Coupes, bool PlusieursJoueurs)
+    {
+        /// <summary>Les crédits consommés par l'arrivée d'un joueur.</summary>
+        public IReadOnlyList<long> Arrivees { get; init; } = [];
+
+        /// <summary>Ce qui ferme le 1CC solo : un continue, ou l'arrivée d'un joueur.</summary>
+        public IReadOnlyList<long> FinsDuSolo => Coupes.Concat(Arrivees).OrderBy(f => f).ToList();
+    }
 
     public static Bilan Calculer(
         IReadOnlyList<EvenementDeCredit> credits,
@@ -45,6 +57,7 @@ public static class ContinuesParCredits
         bool ouverteAuxJoueurs = false)
     {
         var coupes = new List<long>();
+        var arrivees = new List<long>();
         var plusieurs = false;
         var partieCommencee = false;
         int? precedent = null;
@@ -56,10 +69,12 @@ public static class ContinuesParCredits
                 {
                     case Debit.ArriveeDUnJoueur:
                         plusieurs = true;
+                        arrivees.Add(credit.Frame);
                         partieCommencee = true;   // depart a deux : le joueur 1 est parti aussi
                         break;
                     case Debit.ArriveeDistante:
                         plusieurs = true;         // le joueur de cette borne n'a peut-etre pas commence
+                        arrivees.Add(credit.Frame);
                         break;
                     case Debit.Continue:
                         coupes.Add(credit.Frame);
@@ -73,7 +88,7 @@ public static class ContinuesParCredits
             precedent = credit.Value;
         }
 
-        return new Bilan(coupes, plusieurs);
+        return new Bilan(coupes, plusieurs) { Arrivees = arrivees };
     }
 
     public enum Debit

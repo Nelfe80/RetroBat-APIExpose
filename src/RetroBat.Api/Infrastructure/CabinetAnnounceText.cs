@@ -151,6 +151,8 @@ public static class CabinetAnnounceText
             ["scoring_uncertified_sub"] = "pour une partie certifiée, quitte et relance le jeu",
             ["scoring_multiplayer_title"] = "Partie à plusieurs : hors classement solo",
             ["scoring_multiplayer_sub"] = "l'arrivée d'un joueur ne compte pas comme un continue",
+            ["scoring_joined_title"] = "Un joueur te rejoint : ton score solo certifié reste {0}",
+            ["scoring_joined_sub"] = "la suite se joue à plusieurs, hors classement solo",
         },
         ["en"] = new()
         {
@@ -217,6 +219,8 @@ public static class CabinetAnnounceText
             ["scoring_uncertified_sub"] = "for a certified game, quit and relaunch it",
             ["scoring_multiplayer_title"] = "Multiplayer game: outside the solo ranking",
             ["scoring_multiplayer_sub"] = "a player joining does not count as a continue",
+            ["scoring_joined_title"] = "A player joined you: your certified solo score stays at {0}",
+            ["scoring_joined_sub"] = "the rest is played together, outside the solo ranking",
         },
         ["es"] = new()
         {
@@ -283,6 +287,8 @@ public static class CabinetAnnounceText
             ["scoring_uncertified_sub"] = "para una partida certificada, sal y vuelve a lanzar el juego",
             ["scoring_multiplayer_title"] = "Partida a varios: fuera de la clasificación individual",
             ["scoring_multiplayer_sub"] = "la llegada de un jugador no cuenta como continuación",
+            ["scoring_joined_title"] = "Un jugador se ha unido: tu puntuación individual certificada se queda en {0}",
+            ["scoring_joined_sub"] = "lo que sigue se juega a varios, fuera de la clasificación individual",
         },
         ["ja"] = new()
         {
@@ -349,6 +355,8 @@ public static class CabinetAnnounceText
             ["scoring_uncertified_sub"] = "認定プレイにはゲームを終了して再起動してください",
             ["scoring_multiplayer_title"] = "複数人プレイ：ソロランキング対象外",
             ["scoring_multiplayer_sub"] = "プレイヤーの参加はコンティニューとして扱われません",
+            ["scoring_joined_title"] = "プレイヤーが参加：ソロの認定スコアは {0} のまま",
+            ["scoring_joined_sub"] = "この先は複数人プレイとなり、ソロランキングの対象外です",
         },
         ["zh"] = new()
         {
@@ -415,6 +423,8 @@ public static class CabinetAnnounceText
             ["scoring_uncertified_sub"] = "如需认证游戏，请退出并重新启动游戏",
             ["scoring_multiplayer_title"] = "多人游戏：不计入单人排行",
             ["scoring_multiplayer_sub"] = "玩家加入不算作续关",
+            ["scoring_joined_title"] = "有玩家加入：你的单人认证分数保持为 {0}",
+            ["scoring_joined_sub"] = "之后为多人游戏，不计入单人排行",
         },
         ["ko"] = new()
         {

@@ -1072,7 +1072,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         await Task.Delay(ConfirmationContinue).ConfigureAwait(false);
         BandeauDeCredit bandeau;
         ContinuesParCredits.Debit nature;
-        var premiereCoupe = false;
+        var premiereFin = false;
         DateTime debut;
         lock (_sync) { debut = _debutSessionUtc; }
         var ouverte = RetroBat.Api.Netplay.NetplayHostService.OuverteAuxJoueursDepuis(debut - FenetreHebergement);
@@ -1088,14 +1088,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 _departAuCredit = true;
             }
 
-            if (nature == ContinuesParCredits.Debit.Continue)
+            // Un continue ou l'arrivee d'un joueur ferme le 1CC solo : la premiere fois seulement.
+            var arrivee = nature is ContinuesParCredits.Debit.ArriveeDUnJoueur or ContinuesParCredits.Debit.ArriveeDistante;
+            if (nature == ContinuesParCredits.Debit.Continue || arrivee)
             {
-                premiereCoupe = !_closeParCredit;
+                premiereFin = !_closeParCredit;
                 _closeParCredit = true;
             }
 
-            var arrivee = nature is ContinuesParCredits.Debit.ArriveeDUnJoueur or ContinuesParCredits.Debit.ArriveeDistante;
-            bandeau = QuelBandeau(nature == ContinuesParCredits.Debit.Depart, arrivee, premiereCoupe, _partieADeuxAnnoncee);
+            bandeau = QuelBandeau(nature == ContinuesParCredits.Debit.Depart, arrivee, premiereFin, _partieADeuxAnnoncee, scoreAvant > 0);
             if (arrivee) _partieADeuxAnnoncee = true;
         }
 
@@ -1112,9 +1113,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             case BandeauDeCredit.PartieAPlusieurs:
                 AnnoncerCredit("scoring_multiplayer", "un joueur arrive, partie hors classement solo");
                 break;
+            case BandeauDeCredit.JoueurRejoint:
+                AnnoncerRejoint(scoreAvant);
+                break;
         }
 
-        if (premiereCoupe) PublierFinDeRun("credit consomme");
+        // Le replay montre la partie certifiee : il s'arrete ou finit le 1CC solo.
+        if (bandeau is BandeauDeCredit.ScoreCertifie or BandeauDeCredit.JoueurRejoint)
+        {
+            PublierFinDeRun(bandeau == BandeauDeCredit.JoueurRejoint ? "arrivee d'un joueur" : "credit consomme");
+        }
     }
 
     internal enum BandeauDeCredit
@@ -1127,14 +1135,33 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         NonCertifiable,
         /// <summary>L'arrivee d'un joueur 2 : hors classement solo, sans etre un continue.</summary>
         PartieAPlusieurs,
+        /// <summary>L'arrivee d'un joueur apres un score fait seul : ce score reste un 1CC.</summary>
+        JoueurRejoint,
     }
 
     /// <summary>Le bandeau d'un credit consomme, selon ce qu'il ouvre.</summary>
-    internal static BandeauDeCredit QuelBandeau(bool depart, bool arrivee, bool premiereCoupe, bool dejaADeux)
+    internal static BandeauDeCredit QuelBandeau(bool depart, bool arrivee, bool premiereFin, bool dejaADeux, bool scoreSolo)
     {
-        if (arrivee) return dejaADeux ? BandeauDeCredit.Aucun : BandeauDeCredit.PartieAPlusieurs;
+        if (arrivee)
+        {
+            if (dejaADeux) return BandeauDeCredit.Aucun;
+            return premiereFin && scoreSolo ? BandeauDeCredit.JoueurRejoint : BandeauDeCredit.PartieAPlusieurs;
+        }
+
         if (depart) return BandeauDeCredit.Aucun;
-        return premiereCoupe && !dejaADeux ? BandeauDeCredit.ScoreCertifie : BandeauDeCredit.NonCertifiable;
+        return premiereFin && !dejaADeux ? BandeauDeCredit.ScoreCertifie : BandeauDeCredit.NonCertifiable;
+    }
+
+    /// <summary>Un joueur arrive : le score fait seul jusque-la reste un 1CC, et le joueur le voit.</summary>
+    private void AnnoncerRejoint(long avant)
+    {
+        var langue = Langue();
+        _overlay?.ShowTop(
+            "SCORING",
+            string.Format(CabinetAnnounceText.Get("scoring_joined_title", langue), ScoreAffiche(avant, langue)),
+            CabinetAnnounceText.Get("scoring_joined_sub", langue),
+            8000);
+        Trace($"bandeau : un joueur arrive, score solo certifie {avant}, la suite a plusieurs");
     }
 
     /// <summary>Un bandeau d'information sans score : la partie continue, rien n'est refuse.</summary>
@@ -1778,15 +1805,29 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // fait foi, et la plateforme ne doit pas pouvoir y retrouver un « meilleur » segment.
         var ouverteAuxJoueurs = RetroBat.Api.Netplay.NetplayHostService.OuverteAuxJoueursPendant(sessionJson);
         var bilanCredits = ContinuesParCredits.Calculer(credits, departs, ouverteAuxJoueurs);
-        var finsDeRun = bilanCredits.Coupes;
+        // Un continue ou l'arrivee d'un joueur ferme le 1CC solo : on garde ce qui a ete fait seul
+        // avant (cumulatif, decision user du 2026-09-30), la suite ne part pas.
+        var finsDeRun = bilanCredits.FinsDuSolo;
+        if (bilanCredits.Coupes.Count > 0)
+        {
+            Trace($"continues (credit consomme apres le depart) : {string.Join(", ", bilanCredits.Coupes)}");
+        }
+        if (bilanCredits.Arrivees.Count > 0)
+        {
+            Trace($"arrivee d'un joueur (frame {bilanCredits.Arrivees[0]}) : le score fait seul jusque-la reste un 1CC, la suite passe a plusieurs");
+        }
         if (finsDeRun.Count > 0)
         {
-            Trace($"continues (credit consomme apres le depart) : {string.Join(", ", finsDeRun)}");
             var avantContinue = ContinuesParCredits.AvantLePremierContinue(trajectory, finsDeRun);
             if (avantContinue.Count < trajectory.Count)
             {
-                Trace($"credit consomme : {trajectory.Count - avantContinue.Count} lecture(s) apres le premier continue ecartee(s)");
+                Trace($"fin du 1CC solo : {trajectory.Count - avantContinue.Count} lecture(s) ecartee(s) apres elle");
                 trajectory = avantContinue;
+            }
+            if (!ScoreAMonte(trajectory))
+            {
+                Trace("STOP: rien de marque seul avant la fin du 1CC solo (depart a deux, ou continue sans point)");
+                return;
             }
         }
         var anciennesFins = FinsDeRun.Calculer(vies);
@@ -1795,16 +1836,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             Trace($"information : l'ancienne regle des vies aurait coupe a {string.Join(", ", anciennesFins)} (plus appliquee)");
         }
         // Ouverte aux joueurs et restee seule : un 1CC (decision user du 2026-09-30). Qu'un joueur
-        // la rejoigne se lit au credit qu'il consomme. Sans ligne de credits, on ne le verrait pas :
-        // la partie ouverte reste alors hors classement solo, comme avant.
-        var partieADeux = bilanCredits.PlusieursJoueurs || (ouverteAuxJoueurs && credits.Count == 0);
+        // la rejoigne se lit au credit qu'il consomme, et la trajectoire s'arrete deja la. Sans
+        // ligne de credits, on ne le verrait pas : la partie ouverte reste alors hors classement
+        // solo, comme avant.
+        var partieADeux = ouverteAuxJoueurs && credits.Count == 0;
         if (partieADeux)
         {
-            Trace(bilanCredits.PlusieursJoueurs
-                ? "partie a plusieurs (un joueur est arrive) : hors classement solo"
-                : "partie ouverte aux joueurs sans ligne de credits : on ne verrait pas un joueur arriver, hors classement solo");
+            Trace("partie ouverte aux joueurs sans ligne de credits : on ne verrait pas un joueur arriver, hors classement solo");
         }
-        else if (ouverteAuxJoueurs)
+        else if (ouverteAuxJoueurs && bilanCredits.Arrivees.Count == 0)
         {
             Trace("partie ouverte aux joueurs, restee seule : 1CC");
         }

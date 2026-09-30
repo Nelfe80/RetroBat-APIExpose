@@ -115,17 +115,40 @@ public class ContinuesParCreditsTests
     }
 
     [Theory]
-    [InlineData(true, false, false, false, "Aucun")]           // depart solo : la partie compte
-    [InlineData(false, false, true, false, "ScoreCertifie")]   // premier continue : le score certifie
-    [InlineData(false, false, false, false, "NonCertifiable")] // chaque credit suivant, a chaque START
-    [InlineData(true, true, false, false, "PartieAPlusieurs")] // depart a deux
-    [InlineData(false, true, false, false, "PartieAPlusieurs")] // joueur 2 en cours de partie : pas un continue
-    [InlineData(false, true, false, true, "Aucun")]            // joueur 3 : le 1CC MULTI le permettra aussi
-    [InlineData(false, false, true, true, "NonCertifiable")]   // continue d'une partie a deux : pas de score certifie
+    [InlineData(true, false, false, false, true, "Aucun")]             // depart solo : la partie compte
+    [InlineData(false, false, true, false, true, "ScoreCertifie")]     // premier continue : le score certifie
+    [InlineData(false, false, false, false, true, "NonCertifiable")]   // chaque credit suivant, a chaque START
+    [InlineData(true, true, true, false, false, "PartieAPlusieurs")]   // depart a deux : rien de fait seul
+    [InlineData(false, true, true, false, true, "JoueurRejoint")]      // joueur 2 apres un score seul : il reste un 1CC
+    [InlineData(false, true, false, false, true, "PartieAPlusieurs")]  // joueur 2 apres un continue : le solo etait deja clos
+    [InlineData(false, true, false, true, true, "Aucun")]              // joueur 3 : le 1CC MULTI le permettra aussi
+    [InlineData(false, false, false, true, true, "NonCertifiable")]    // continue d'une partie a plusieurs
     public void Chaque_start_qui_consomme_un_credit_dit_ce_que_vaut_la_partie(
-        bool depart, bool arrivee, bool premiereCoupe, bool dejaADeux, string attendu)
+        bool depart, bool arrivee, bool premiereFin, bool dejaADeux, bool scoreSolo, string attendu)
     {
-        Assert.Equal(attendu, NelfePlayScoringReporter.QuelBandeau(depart, arrivee, premiereCoupe, dejaADeux).ToString());
+        Assert.Equal(attendu, NelfePlayScoringReporter.QuelBandeau(depart, arrivee, premiereFin, dejaADeux, scoreSolo).ToString());
+    }
+
+    [Fact]
+    public void C_est_cumulatif_le_score_fait_seul_avant_l_arrivee_reste_un_1CC()
+    {
+        // Decision user du 2026-09-30 : 30 000 seul, un joueur rejoint, 55 000 a deux.
+        var credits = new List<EvenementDeCredit> { new(2, 10), new(1, 100), new(0, 2000) };
+        var departs = new List<DepartDeJoueur> { new(1, 95), new(2, 1998) };
+        var lectures = Lectures((50, 0), (1500, 30000), (2500, 41000), (4000, 55000));
+        var bilan = ContinuesParCredits.Calculer(credits, departs);
+        Assert.Empty(bilan.Coupes);
+        Assert.Equal(new long[] { 2000 }, bilan.Arrivees);
+        Assert.Equal(30000, ContinuesParCredits.AvantLePremierContinue(lectures, bilan.FinsDuSolo)[^1].Item2);
+    }
+
+    [Fact]
+    public void Le_solo_se_ferme_au_premier_des_deux_continue_ou_arrivee()
+    {
+        var credits = new List<EvenementDeCredit> { new(3, 10), new(2, 100), new(1, 1500), new(0, 2000) };
+        var departs = new List<DepartDeJoueur> { new(1, 95), new(1, 1498), new(2, 1998) };
+        var bilan = ContinuesParCredits.Calculer(credits, departs);
+        Assert.Equal(new long[] { 1500, 2000 }, bilan.FinsDuSolo);
     }
 
     [Fact]
@@ -147,6 +170,7 @@ public class ContinuesParCreditsTests
         var bilan = ContinuesParCredits.Calculer(credits, departs, ouverteAuxJoueurs: true);
         Assert.Empty(bilan.Coupes);
         Assert.True(bilan.PlusieursJoueurs);
+        Assert.Equal(new long[] { 2000 }, bilan.Arrivees);
     }
 
     [Fact]
