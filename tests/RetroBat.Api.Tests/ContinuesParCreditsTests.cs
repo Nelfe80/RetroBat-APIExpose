@@ -200,4 +200,15 @@ public class ContinuesParCreditsTests
         var departs = new List<DepartDeJoueur> { new(1, 95) };
         Assert.Equal(new long[] { 2000 }, ContinuesParCredits.Calculer(credits, departs).Coupes);
     }
+
+    [Theory]
+    [InlineData("{\"Score\":1500,\"Player\":1}", 1)]
+    [InlineData("{\"Score\":1500,\"Player\":2}", 2)]
+    [InlineData("{\"Score\":1500}", 1)]            // lignes sans joueur : le joueur 1
+    [InlineData("{\"Score\":1500,\"Player\":9}", 1)]
+    public void Le_score_d_un_autre_joueur_se_reconnait(string json, int attendu)
+    {
+        using var doc = System.Text.Json.JsonDocument.Parse(json);
+        Assert.Equal(attendu, NelfePlayScoringReporter.JoueurDuScore(doc.RootElement));
+    }
 }

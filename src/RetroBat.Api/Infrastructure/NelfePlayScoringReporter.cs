@@ -527,6 +527,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _finDeRunPubliee = false;
             _jetonDeSession++;
             _departAuCredit = _closeParCredit = _partieADeuxAnnoncee = false;
+            _scoresAutresJoueurs.Clear();
             _invite = RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun;
             _debutSessionUtc = DateTime.UtcNow;
             _replayDuSolo = null;
@@ -1446,9 +1447,26 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return null;
     }
 
+    /// <summary>
+    /// LE SCORE D'UN AUTRE JOUEUR NE SE MELE PAS A CELUI DU JOUEUR 1. L'agregateur publie un score
+    /// par joueur (ligne `player=2` du .MEM) ; la trajectoire certifiee est celle du joueur 1, et y
+    /// verser les valeurs du joueur 2 dessinait des baisses et des remontees qui ne sont a personne.
+    /// Ils sont gardes a part pour le 1CC MULTI (charte de la partie certifiee, 2026-09-30).
+    /// </summary>
+    internal static int JoueurDuScore(JsonElement root)
+        => root.TryGetProperty("Player", out var p) && p.TryGetInt32(out var joueur) && joueur is >= 1 and <= 4 ? joueur : 1;
+
+    private readonly Dictionary<int, long> _scoresAutresJoueurs = new();
+
     private void CaptureTotal(JsonElement root)
     {
         if (!root.TryGetProperty("Score", out var s) || !s.TryGetInt64(out var total)) return;
+        var joueurDuScore = JoueurDuScore(root);
+        if (joueurDuScore != 1)
+        {
+            lock (_sync) { _scoresAutresJoueurs[joueurDuScore] = total; }
+            return;
+        }
         long? continueAnnonce = null;
         var nouvellePartie = false;
         lock (_sync)
