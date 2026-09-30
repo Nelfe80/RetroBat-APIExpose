@@ -90,9 +90,15 @@ public sealed record ReplayLocalMetadata(
     // reporter (#2) quand le score est publié. Null tant que non renseigné.
     string? Player = null,
     long? ScoreValue = null,
-    int? Rank = null)
+    int? Rank = null,
+    // La categorie de la partie enregistree quand ce n'est pas le 1CC solo : « 1cc-multi » pour
+    // la suite d'une partie qu'un joueur a rejointe (charte de la partie certifiee, 2026-09-30).
+    string? Categorie = null)
 {
     public const string SchemaId = "nelfe.replay.local-meta.v1";
+
+    /// <summary>La partie a plusieurs, apres l'arrivee d'un joueur.</summary>
+    public const string CategorieMulti = "1cc-multi";
 
     public static ReplayLocalMetadata Fresh(string replayId, ReplayLaunchHint? launch = null) => new(
         SchemaId, replayId, "private", false, null, null, "local", DateTime.UtcNow, true, launch);

@@ -74,6 +74,8 @@ public sealed class ReplayRecorderService : BackgroundService
         public DateTime StartedAtUtc;
         public long LastFrame;
         public required string RetroArchVersion;
+        /// <summary>« 1cc-multi » pour la partie a plusieurs ; null pour le 1CC solo.</summary>
+        public string? Categorie;
 
         // R3.2 — cadence du core. Annoncée par le core au chargement (exacte) si le log la donne…
         public double? CoreFps;
@@ -188,11 +190,47 @@ public sealed class ReplayRecorderService : BackgroundService
     /// </summary>
     private volatile bool _runTermine;
 
+    /// <summary>
+    /// QUAND LE REPLAY 1CC S'ARRETE A L'ARRIVEE D'UN JOUEUR, CELUI DU 1CC MULTI COMMENCE (demande
+    /// user 2026-09-30). Le rapporteur l'annonce (scoring.run.multi) : relancer apres avoir scelle
+    /// le replay solo, ou marquer celui en cours quand rien n'a ete fait seul (depart a deux).
+    /// </summary>
+    private volatile bool _relanceMulti;
+    private volatile string? _categorieSuivante;
+
     private void OnBusEvent(EventEnvelope e)
     {
         if (string.Equals(e.Type, "scoring.run.ended", StringComparison.Ordinal))
         {
             _runTermine = true;
+            return;
+        }
+
+        if (string.Equals(e.Type, "scoring.run.multi", StringComparison.Ordinal))
+        {
+            var relancer = false;
+            try
+            {
+                var el = System.Text.Json.JsonSerializer.SerializeToElement(e.Payload);
+                relancer = el.TryGetProperty("Relancer", out var r) && r.ValueKind == System.Text.Json.JsonValueKind.True;
+            }
+            catch
+            {
+                // Illisible : on marque la partie en cours, sans rien relancer.
+            }
+
+            if (relancer)
+            {
+                _relanceMulti = true;
+            }
+            else if (_current is { } enCours)
+            {
+                enCours.Categorie = ReplayLocalMetadata.CategorieMulti;
+            }
+            else
+            {
+                _categorieSuivante = ReplayLocalMetadata.CategorieMulti;
+            }
             return;
         }
 
@@ -202,6 +240,11 @@ public sealed class ReplayRecorderService : BackgroundService
             || string.Equals(e.Type, "scoring.run.reset", StringComparison.Ordinal))
         {
             _runTermine = false;
+            if (string.Equals(e.Type, "ui.game.started", StringComparison.Ordinal))
+            {
+                _relanceMulti = false;
+                _categorieSuivante = null;
+            }
             return;
         }
 
@@ -265,10 +308,17 @@ public sealed class ReplayRecorderService : BackgroundService
             // et le joueur vient d'appuyer sur START (sinon on enregistrerait la demo).
             // Hors NelfePlay, on ne guette meme pas le START : le journal le dit une fois par jeu,
             // au lieu d'annoncer une attente qui n'aboutira jamais.
-            // La partie certifiee est finie (continue) : la suite se joue sans replay.
+            // La partie certifiee est finie (continue) : la suite se joue sans replay. Sauf si elle
+            // a ete close par l'arrivee d'un joueur : la suite est le 1CC MULTI, on l'enregistre
+            // tout de suite, sans attendre un START (celui de l'invite n'est vu que sur sa borne).
             if (_runTermine)
             {
-                return;
+                if (!_relanceMulti) return;
+                _relanceMulti = false;
+                _runTermine = false;
+                _categorieSuivante = ReplayLocalMetadata.CategorieMulti;
+                _dernierStartUtc = DateTime.UtcNow;
+                _logger.LogInformation("Replay : un joueur a rejoint la partie, le replay du 1CC MULTI commence.");
             }
 
             if (status is { ContentLoaded: true } && _partie is { EstNelfePlay: false } && !_playback.IsBusy)
@@ -351,7 +401,9 @@ public sealed class ReplayRecorderService : BackgroundService
             StartedAtUtc = DateTime.UtcNow,
             LastFrame = check.Frame,
             RetroArchVersion = version.Trim(),
+            Categorie = _categorieSuivante,
         };
+        _categorieSuivante = null;
         rec.CoreFps = ProbeCoreFps(rec.Crc32, rec.Game);
         rec.LastSampleUtc = DateTime.UtcNow;
         _current = rec;
@@ -360,8 +412,8 @@ public sealed class ReplayRecorderService : BackgroundService
             "nelfe.replay.active-recording.v1", rec.ReplayId, rec.SessionId, rec.System, rec.Game,
             rec.Crc32, rec.StartedAtUtc, rec.RetroArchVersion));
 
-        _logger.LogInformation("Replay : enregistrement démarré {ReplayId} ({System}/{Game}).",
-            rec.ReplayId, rec.System, rec.Game);
+        _logger.LogInformation("Replay : enregistrement démarré {ReplayId} ({System}/{Game}{Categorie}).",
+            rec.ReplayId, rec.System, rec.Game, rec.Categorie is null ? "" : ", " + rec.Categorie);
         // Objet anonyme (propriétés) et non `rec` (champs) : le payload doit rester
         // sérialisable pour les abonnés qui le lisent en JSON (ex. le reporter, qui
         // retient l'id du replay actif pour le lien replay↔score).
@@ -395,7 +447,7 @@ public sealed class ReplayRecorderService : BackgroundService
             var hint = BuildLaunchHint(file);
             var manifest = BuildManifest(rec, obj, hint);
             _store.SaveManifest(manifest);
-            _store.SaveMeta(ReplayLocalMetadata.Fresh(rec.ReplayId, hint));
+            _store.SaveMeta(ReplayLocalMetadata.Fresh(rec.ReplayId, hint) with { Categorie = rec.Categorie });
             _store.RebuildIndex();
             _store.DeleteQuiet(_store.ActiveRecordingPath);
 

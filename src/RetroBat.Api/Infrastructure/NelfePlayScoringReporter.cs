@@ -165,6 +165,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly RetroBat.Api.Replay.Sharing.ReplaySeedQueue? _semis;
     private readonly RetroBat.Api.Replay.Sharing.ReplaySeedService? _semeur;
     private string? _activeReplayId;
+    /// <summary>
+    /// Le replay du 1CC solo, fige a l'arrivee d'un joueur : celui du 1CC MULTI commence ensuite et
+    /// devient le replay actif, mais le score solo garde le sien.
+    /// </summary>
+    private string? _replayDuSolo;
     private readonly Dictionary<string, (string sessionId, string visibility, long? score, int? rank, DateTime at)> _pendingScoreLink = new();
     private readonly Dictionary<string, (string sha256, DateTime at)> _finalizedReplay = new();
     private static readonly TimeSpan ReplayLinkTtl = TimeSpan.FromMinutes(20);
@@ -524,6 +529,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _departAuCredit = _closeParCredit = _partieADeuxAnnoncee = false;
             _invite = RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun;
             _debutSessionUtc = DateTime.UtcNow;
+            _replayDuSolo = null;
             _trajectory.Clear();
             _horsJeu.Clear();
             _startVu = false;
@@ -653,6 +659,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 {
                     lock (_sync) { _partieADeuxAnnoncee = true; }
                     AnnoncerCredit("scoring_multiplayer", "partie rejointe en joueur : a plusieurs, hors classement solo");
+                    // Son replay est celui du 1CC MULTI des le depart (dit ici, apres ui.game.started,
+                    // qui remet la categorie a zero cote enregistreur).
+                    PublierPartieMulti(relancer: false);
                 }
                 else
                 {
@@ -1073,6 +1082,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         BandeauDeCredit bandeau;
         ContinuesParCredits.Debit nature;
         var premiereFin = false;
+        var multi = false;
         DateTime debut;
         lock (_sync) { debut = _debutSessionUtc; }
         var ouverte = RetroBat.Api.Netplay.NetplayHostService.OuverteAuxJoueursDepuis(debut - FenetreHebergement);
@@ -1098,6 +1108,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
             bandeau = QuelBandeau(nature == ContinuesParCredits.Debit.Depart, arrivee, premiereFin, _partieADeuxAnnoncee, scoreAvant > 0);
             if (arrivee) _partieADeuxAnnoncee = true;
+            if (bandeau == BandeauDeCredit.JoueurRejoint) _replayDuSolo = _activeReplayId;
+            multi = arrivee && premiereFin;
         }
 
         Trace($"credit consomme a la frame {frame} : {nature}{(ouverte ? " (partie ouverte aux joueurs)" : "")}");
@@ -1123,6 +1135,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             PublierFinDeRun(bandeau == BandeauDeCredit.JoueurRejoint ? "arrivee d'un joueur" : "credit consomme");
         }
+
+        // Et celui du 1CC MULTI commence : relance apres le replay solo, ou le replay en cours
+        // devient le sien quand rien n'a ete fait seul (depart a deux).
+        if (multi) PublierPartieMulti(relancer: bandeau == BandeauDeCredit.JoueurRejoint);
     }
 
     internal enum BandeauDeCredit
@@ -1516,6 +1532,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             Type = "scoring.run.ended",
             Payload = new { Raison = "continue", Source = source, Frame = frame },
+        });
+    }
+
+    /// <summary>
+    /// Dit au replay que la suite de la partie est le 1CC MULTI (demande user 2026-09-30) : un
+    /// nouvel enregistrement apres celui du 1CC solo, ou celui en cours s'il n'y a pas eu de solo.
+    /// </summary>
+    private void PublierPartieMulti(bool relancer)
+    {
+        if (!PartieNelfePlay()) return;
+        Trace(relancer
+            ? "partie a plusieurs : le replay du 1CC MULTI commence apres celui du 1CC solo"
+            : "partie a plusieurs des le depart : le replay en cours est celui du 1CC MULTI");
+        _ = _eventBus.PublishAsync(new EventEnvelope
+        {
+            Type = "scoring.run.multi",
+            Payload = new { Relancer = relancer, Frame = _lastFrame },
         });
     }
 
@@ -2778,7 +2811,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             string? replayId;
             lock (_sync)
             {
-                replayId = _activeReplayId;
+                replayId = _replayDuSolo ?? _activeReplayId;
                 if (string.IsNullOrEmpty(replayId)) return;
                 PruneReplayLinks();
                 _pendingScoreLink[replayId!] = (sessionId!, "public", score, rank, DateTime.UtcNow);
