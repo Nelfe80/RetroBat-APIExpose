@@ -127,4 +127,53 @@ public class ContinuesParCreditsTests
     {
         Assert.Equal(attendu, NelfePlayScoringReporter.QuelBandeau(depart, arrivee, premiereCoupe, dejaADeux).ToString());
     }
+
+    [Fact]
+    public void Ouverte_aux_joueurs_et_restee_seule_c_est_un_1CC()
+    {
+        var credits = new List<EvenementDeCredit> { new(1, 10), new(0, 100) };
+        var departs = new List<DepartDeJoueur> { new(1, 95) };
+        var bilan = ContinuesParCredits.Calculer(credits, departs, ouverteAuxJoueurs: true);
+        Assert.Empty(bilan.Coupes);
+        Assert.False(bilan.PlusieursJoueurs);
+    }
+
+    [Fact]
+    public void Un_joueur_distant_qui_rejoint_n_est_pas_un_continue()
+    {
+        // Netplay : l'hote ne voit que son panel. Le START du joueur 2 est sur l'autre borne.
+        var credits = new List<EvenementDeCredit> { new(2, 10), new(1, 100), new(0, 2000) };
+        var departs = new List<DepartDeJoueur> { new(1, 95) };
+        var bilan = ContinuesParCredits.Calculer(credits, departs, ouverteAuxJoueurs: true);
+        Assert.Empty(bilan.Coupes);
+        Assert.True(bilan.PlusieursJoueurs);
+    }
+
+    [Fact]
+    public void Le_continue_de_l_hote_reste_un_continue_en_partie_ouverte()
+    {
+        var credits = new List<EvenementDeCredit> { new(2, 10), new(1, 100), new(0, 3000) };
+        var departs = new List<DepartDeJoueur> { new(1, 95), new(1, 2998) };
+        var bilan = ContinuesParCredits.Calculer(credits, departs, ouverteAuxJoueurs: true);
+        Assert.Equal(new long[] { 3000 }, bilan.Coupes);
+        Assert.False(bilan.PlusieursJoueurs);
+    }
+
+    [Fact]
+    public void Le_joueur_distant_parti_avant_l_hote_ne_fait_pas_du_depart_de_l_hote_un_continue()
+    {
+        var credits = new List<EvenementDeCredit> { new(2, 10), new(1, 100), new(0, 602) };
+        var departs = new List<DepartDeJoueur> { new(1, 600) };
+        var bilan = ContinuesParCredits.Calculer(credits, departs, ouverteAuxJoueurs: true);
+        Assert.Empty(bilan.Coupes);
+        Assert.True(bilan.PlusieursJoueurs);
+    }
+
+    [Fact]
+    public void Hors_netplay_un_credit_sans_start_vu_reste_un_continue()
+    {
+        var credits = new List<EvenementDeCredit> { new(2, 10), new(1, 100), new(0, 2000) };
+        var departs = new List<DepartDeJoueur> { new(1, 95) };
+        Assert.Equal(new long[] { 2000 }, ContinuesParCredits.Calculer(credits, departs).Coupes);
+    }
 }

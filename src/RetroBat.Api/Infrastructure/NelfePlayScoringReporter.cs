@@ -91,6 +91,26 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private bool _closeParCredit;
     /// <summary>L'arrivee d'un joueur 2 a deja ete dite : la partie est hors classement solo.</summary>
     private bool _partieADeuxAnnoncee;
+    /// <summary>
+    /// Cette borne a rejoint la partie d'un autre (netplay) : ce qu'elle lit est la partie de
+    /// l'hote. Elle ne soumet rien et ne s'attribue aucun bandeau de l'hote ; en joueuse, elle dit
+    /// seulement que la partie est a plusieurs.
+    /// </summary>
+    private RetroBat.Api.Netplay.NetplayGuestService.Role _invite;
+
+    /// <summary>Le debut de la partie en cours, pour savoir si elle a ete ouverte aux joueurs.</summary>
+    private DateTime _debutSessionUtc = DateTime.UtcNow;
+
+    /// <summary>Le role pris au « Rejoindre » : trois minutes pour que le jeu demarre.</summary>
+    private static readonly TimeSpan FenetreRejointe = TimeSpan.FromMinutes(3);
+
+    private void PrendreRoleInvite()
+    {
+        var role = RetroBat.Api.Netplay.NetplayGuestService.PrendreRejointe(FenetreRejointe);
+        if (role == RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun) return;
+        lock (_sync) { _invite = role; }
+        Trace($"partie rejointe en netplay ({role}) : la partie de l'hote, rien a soumettre ici");
+    }
     private long? _finalTotal;
     private bool _inDemo;   // attract mode : le jeu se joue seul → on ignore le score
     // Phase D (segmentation en RUNS, 100% APIExpose) : la trajectoire des scores suffit —
@@ -400,6 +420,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     // de réclamation restée à l'écran.
                     _claimOverlay?.HideNow();
                     ResetSession();
+                    PrendreRoleInvite();
                     _prevolCertifiable = false;
                     _sessionRecue = false;
                     break;
@@ -501,6 +522,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _finDeRunPubliee = false;
             _jetonDeSession++;
             _departAuCredit = _closeParCredit = _partieADeuxAnnoncee = false;
+            _invite = RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun;
+            _debutSessionUtc = DateTime.UtcNow;
             _trajectory.Clear();
             _horsJeu.Clear();
             _startVu = false;
@@ -618,6 +641,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             if (!PartieNelfePlay())
             {
                 Trace($"prevol : {systemId}/{romGroup} lance hors NelfePlay, ni annonce ni scoring");
+                return;
+            }
+            // Si le jeu a demarre sans passer par ES, le role n'a pas encore ete repris.
+            PrendreRoleInvite();
+            RetroBat.Api.Netplay.NetplayGuestService.Role invite;
+            lock (_sync) { invite = _invite; }
+            if (invite != RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun)
+            {
+                if (invite == RetroBat.Api.Netplay.NetplayGuestService.Role.Joueur)
+                {
+                    lock (_sync) { _partieADeuxAnnoncee = true; }
+                    AnnoncerCredit("scoring_multiplayer", "partie rejointe en joueur : a plusieurs, hors classement solo");
+                }
+                else
+                {
+                    Trace("prevol : spectateur, rien a annoncer");
+                }
                 return;
             }
             var credential = ResolveCredential();
@@ -1004,23 +1044,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var frame = Entier(signal, "Frame") ?? _lastFrame;
         int session;
         long scoreAvant;
-        bool depart;
         lock (_sync)
         {
             var avant = _credits.Count > 0 ? _credits[^1].Value : (int?)null;
             _credits.Add(new EvenementDeCredit(valeur, frame));
             if (_credits.Count > MaxTrajectory) _credits.RemoveAt(0);
             if (avant is null || valeur >= avant) return;   // premiere lecture, ou pieces ajoutees
-            depart = !_departAuCredit;
-            _departAuCredit = true;
             scoreAvant = _finalTotal ?? 0;
             session = _jetonDeSession;
         }
 
-        Trace(depart
-            ? $"depart de la partie (credit consomme, frame {frame})"
-            : $"credit consomme apres le depart (score {scoreAvant}, frame {frame}) : continue, sauf arrivee d'un joueur 2");
-        _ = ConfirmerCreditAsync(session, depart, scoreAvant, frame);
+        Trace($"credit consomme (score {scoreAvant}, frame {frame}) : depart, continue ou arrivee d'un joueur, tranche dans 3,5 s");
+        _ = ConfirmerCreditAsync(session, scoreAvant, frame);
     }
 
     /// <summary>
@@ -1032,24 +1067,39 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// classement solo, une fois (joueur 2, au depart compris) ; les joueurs suivants, rien. On
     /// attend 3,5 s pour voir arriver ce joueur (ContinuesParCredits.FenetreArrivee).
     /// </summary>
-    private async Task ConfirmerCreditAsync(int session, bool depart, long scoreAvant, long frame)
+    private async Task ConfirmerCreditAsync(int session, long scoreAvant, long frame)
     {
         await Task.Delay(ConfirmationContinue).ConfigureAwait(false);
         BandeauDeCredit bandeau;
+        ContinuesParCredits.Debit nature;
         var premiereCoupe = false;
+        DateTime debut;
+        lock (_sync) { debut = _debutSessionUtc; }
+        var ouverte = RetroBat.Api.Netplay.NetplayHostService.OuverteAuxJoueursDepuis(debut - FenetreHebergement);
         lock (_sync)
         {
             if (session != _jetonDeSession) return;   // une autre session a commence
-            var arrivee = _departs.Any(d => d.Player >= 2 && Math.Abs(d.Frame - frame) <= ContinuesParCredits.FenetreArrivee);
-            if (!arrivee && !depart)
+            if (_invite != RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun) return;   // la partie de l'hote
+            // Les confirmations passent dans l'ordre des credits (meme delai pour toutes) : chacune
+            // voit ce que les precedentes ont tranche.
+            nature = ContinuesParCredits.Nature(frame, _departAuCredit, _departs, ouverte);
+            if (nature is ContinuesParCredits.Debit.Depart or ContinuesParCredits.Debit.ArriveeDUnJoueur)
+            {
+                _departAuCredit = true;
+            }
+
+            if (nature == ContinuesParCredits.Debit.Continue)
             {
                 premiereCoupe = !_closeParCredit;
                 _closeParCredit = true;
             }
 
-            bandeau = QuelBandeau(depart, arrivee, premiereCoupe, _partieADeuxAnnoncee);
+            var arrivee = nature is ContinuesParCredits.Debit.ArriveeDUnJoueur or ContinuesParCredits.Debit.ArriveeDistante;
+            bandeau = QuelBandeau(nature == ContinuesParCredits.Debit.Depart, arrivee, premiereCoupe, _partieADeuxAnnoncee);
             if (arrivee) _partieADeuxAnnoncee = true;
         }
+
+        Trace($"credit consomme a la frame {frame} : {nature}{(ouverte ? " (partie ouverte aux joueurs)" : "")}");
 
         switch (bandeau)
         {
@@ -1412,7 +1462,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _ = _eventBus.PublishAsync(new EventEnvelope { Type = "scoring.run.reset", Payload = new { Score = total } });
         }
 
-        if (continueAnnonce is { } avant)
+        if (continueAnnonce is { } avant && _invite == RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun)
         {
             AnnoncerContinue(avant);
             PublierFinDeRun("chiffre des credits");
@@ -1465,6 +1515,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// ne voyait pas le bandeau (labo Double Dragon du 2026-09-30, sortie 5,5 s apres).
     /// </summary>
     internal static readonly TimeSpan ConfirmationContinue = TimeSpan.FromSeconds(3.5);
+
+    /// <summary>Un hebergement lance jusqu'a cinq minutes avant la partie la concerne encore.</summary>
+    private static readonly TimeSpan FenetreHebergement = TimeSpan.FromMinutes(5);
 
 
     /// <summary>
@@ -1557,6 +1610,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (!PartieNelfePlay())
         {
             Trace("STOP: partie lancee hors NelfePlay (ni collection World Scoring, ni fonction NelfePlay)");
+            return;
+        }
+        RetroBat.Api.Netplay.NetplayGuestService.Role roleInvite;
+        lock (_sync) { roleInvite = _invite; }
+        if (roleInvite != RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun)
+        {
+            // Le score lu ici est celui du joueur 1, sur la borne de l'hote. Le soumettre sous le
+            // nom de cette borne donnait a un spectateur, ou a l'invite, le 1CC de l'hote.
+            Trace($"STOP: partie rejointe en netplay ({roleInvite}) : le score est celui de l'hote, rien a soumettre");
             return;
         }
         try
@@ -1714,7 +1776,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // LE CREDIT FAIT FOI (charte de la partie certifiee) : on ne coupe plus sur les vies. Rien de
         // ce qui suit le premier continue ne concourt, ni ne part dans le passeport : la session
         // fait foi, et la plateforme ne doit pas pouvoir y retrouver un « meilleur » segment.
-        var bilanCredits = ContinuesParCredits.Calculer(credits, departs);
+        var ouverteAuxJoueurs = RetroBat.Api.Netplay.NetplayHostService.OuverteAuxJoueursPendant(sessionJson);
+        var bilanCredits = ContinuesParCredits.Calculer(credits, departs, ouverteAuxJoueurs);
         var finsDeRun = bilanCredits.Coupes;
         if (finsDeRun.Count > 0)
         {
@@ -1731,10 +1794,19 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             Trace($"information : l'ancienne regle des vies aurait coupe a {string.Join(", ", anciennesFins)} (plus appliquee)");
         }
-        var partieADeux = bilanCredits.PlusieursJoueurs || RetroBat.Api.Netplay.NetplayHostService.OuverteAuxJoueursPendant(sessionJson);
+        // Ouverte aux joueurs et restee seule : un 1CC (decision user du 2026-09-30). Qu'un joueur
+        // la rejoigne se lit au credit qu'il consomme. Sans ligne de credits, on ne le verrait pas :
+        // la partie ouverte reste alors hors classement solo, comme avant.
+        var partieADeux = bilanCredits.PlusieursJoueurs || (ouverteAuxJoueurs && credits.Count == 0);
         if (partieADeux)
         {
-            Trace("partie a plusieurs (joueur 2 arrive, ou netplay ouvert aux joueurs) : hors classement solo");
+            Trace(bilanCredits.PlusieursJoueurs
+                ? "partie a plusieurs (un joueur est arrive) : hors classement solo"
+                : "partie ouverte aux joueurs sans ligne de credits : on ne verrait pas un joueur arriver, hors classement solo");
+        }
+        else if (ouverteAuxJoueurs)
+        {
+            Trace("partie ouverte aux joueurs, restee seule : 1CC");
         }
 
         var bestRun = SelectBestRun(trajectory, finsDeRun);

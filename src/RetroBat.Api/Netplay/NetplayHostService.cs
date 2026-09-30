@@ -95,6 +95,10 @@ public sealed class NetplayHostService
     /// Vrai si un hebergement ouvert aux joueurs a ete lance pour cette session : dans les cinq
     /// minutes qui precedent son debut, ou pendant qu'elle se jouait.
     /// </summary>
+    /// <summary>Vrai si un hebergement ouvert aux joueurs a ete lance depuis cette date.</summary>
+    public static bool OuverteAuxJoueursDepuis(DateTime depuis)
+        => _ouverteAuxJoueurs is { } ouverte && ouverte >= depuis;
+
     public static bool OuverteAuxJoueursPendant(string? sessionJson)
     {
         if (_ouverteAuxJoueurs is not { } ouverte) return false;

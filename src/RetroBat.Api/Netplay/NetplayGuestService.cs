@@ -63,6 +63,42 @@ public sealed class NetplayGuestService
         LancementRefuse,
     }
 
+    /// <summary>Ce que fait cette borne dans la partie qu'elle a rejointe.</summary>
+    public enum Role
+    {
+        Aucun,
+        Spectateur,
+        Joueur,
+    }
+
+    private static readonly object VerrouRejointe = new();
+    private static (DateTime Quand, Role Role)? _rejointe;
+
+    /// <summary>
+    /// LA BORNE QUI REJOINT NE JOUE PAS SA PROPRE PARTIE (charte de la partie certifiee,
+    /// 2026-09-30). Son emulateur lit la meme memoire que celui de l'hote : sans ce marqueur, le
+    /// reporter soumettait le score du joueur 1 sous le nom du spectateur, ou de l'invite, comme
+    /// un 1CC solo. Pose AVANT le lancement (le jeu peut demarrer avant que le lancement rende la
+    /// main), repris une seule fois par le reporter au debut de la partie.
+    /// </summary>
+    public static Role PrendreRejointe(TimeSpan fenetre)
+    {
+        lock (VerrouRejointe)
+        {
+            if (_rejointe is not { } r) return Role.Aucun;
+            _rejointe = null;
+            return DateTime.UtcNow - r.Quand <= fenetre ? r.Role : Role.Aucun;
+        }
+    }
+
+    private static void MarquerRejointe(Role role)
+    {
+        lock (VerrouRejointe)
+        {
+            _rejointe = role == Role.Aucun ? null : (DateTime.UtcNow, role);
+        }
+    }
+
     /// <summary>
     /// Rejoint la session. Spectateur par defaut ; joueur seulement si la plateforme a donne le
     /// mot de passe correspondant, ce qu'elle ne fait que si l'hote l'a autorise.
@@ -137,10 +173,12 @@ public sealed class NetplayGuestService
             mode, infos.Value.Relais, infos.Value.Port, infos.Value.Session, infos.Value.MotDePasse, _logger);
 
         // Par ES de preference : lui seul cesse de dessiner pendant la partie (voir NetplayLaunch).
+        MarquerRejointe(infos.Value.PeutJouer ? Role.Joueur : Role.Spectateur);
         var lancement = await NetplayLaunch.LancerAsync(
             rom, Arguments(resolution, rom, mode, infos.Value), _httpFactory, _logger, ct).ConfigureAwait(false);
         if (!lancement.Ok)
         {
+            MarquerRejointe(Role.Aucun);
             return Echec.LancementRefuse;
         }
         // Un spectateur regarde : son ecran ne score rien, donc l'emulateur peut passer devant

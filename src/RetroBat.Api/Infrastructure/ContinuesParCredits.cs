@@ -26,6 +26,11 @@ public readonly record struct DepartDeJoueur(int Player, long Frame);
 /// reconnue laisse un score avant la partie, et y voir un continue ferait certifier la démo.
 ///
 /// Sans ligne CREDITS au .MEM, rien ne coupe : le doute profite au joueur.
+///
+/// PARTIE OUVERTE AUX JOUEURS EN NETPLAY (décision user du 2026-09-30) : seul au départ, le
+/// joueur joue pour le 1CC ; qu'un joueur le rejoigne, et la partie passe en 1CC MULTI, pour lui
+/// comme pour les autres. La borne ne voit que les START de son propre panel : un crédit consommé
+/// sans aucun START local vient d'un joueur distant. C'est une arrivée, pas un continue.
 /// </summary>
 public static class ContinuesParCredits
 {
@@ -36,7 +41,8 @@ public static class ContinuesParCredits
 
     public static Bilan Calculer(
         IReadOnlyList<EvenementDeCredit> credits,
-        IReadOnlyList<DepartDeJoueur> departs)
+        IReadOnlyList<DepartDeJoueur> departs,
+        bool ouverteAuxJoueurs = false)
     {
         var coupes = new List<long>();
         var plusieurs = false;
@@ -46,17 +52,22 @@ public static class ContinuesParCredits
         {
             if (precedent is { } avant && credit.Value < avant)
             {
-                switch (Nature(credit.Frame, partieCommencee, departs))
+                switch (Nature(credit.Frame, partieCommencee, departs, ouverteAuxJoueurs))
                 {
                     case Debit.ArriveeDUnJoueur:
                         plusieurs = true;
+                        partieCommencee = true;   // depart a deux : le joueur 1 est parti aussi
+                        break;
+                    case Debit.ArriveeDistante:
+                        plusieurs = true;         // le joueur de cette borne n'a peut-etre pas commence
                         break;
                     case Debit.Continue:
                         coupes.Add(credit.Frame);
                         break;
+                    default:
+                        partieCommencee = true;
+                        break;
                 }
-
-                partieCommencee = true;
             }
 
             precedent = credit.Value;
@@ -70,18 +81,27 @@ public static class ContinuesParCredits
         /// <summary>Le départ de la partie.</summary>
         Depart,
         Continue,
+        /// <summary>Un START de joueur 2 ou plus sur cette borne, au moment du crédit.</summary>
         ArriveeDUnJoueur,
+        /// <summary>Partie ouverte en netplay, crédit consommé sans aucun START local.</summary>
+        ArriveeDistante,
     }
 
     /// <summary>Ce que vaut un crédit consommé à cette frame.</summary>
     public static Debit Nature(
         long frame,
         bool partieCommencee,
-        IReadOnlyList<DepartDeJoueur> departs)
+        IReadOnlyList<DepartDeJoueur> departs,
+        bool ouverteAuxJoueurs = false)
     {
         if (departs.Any(d => d.Player >= 2 && Math.Abs(d.Frame - frame) <= FenetreArrivee))
         {
             return Debit.ArriveeDUnJoueur;
+        }
+
+        if (ouverteAuxJoueurs && !departs.Any(d => Math.Abs(d.Frame - frame) <= FenetreArrivee))
+        {
+            return Debit.ArriveeDistante;
         }
 
         return partieCommencee ? Debit.Continue : Debit.Depart;
