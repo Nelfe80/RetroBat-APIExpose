@@ -5,7 +5,7 @@ namespace RetroBat.Api.Tests;
 
 /// <summary>
 /// Les jeux de la collection World Scoring recoivent leurs cles par jeu (rembobinage, run-ahead,
-/// sauvegarde auto) des le demarrage de l'API, avant l'ouverture d'EmulationStation. FreshOne a
+/// sauvegarde auto) des le demarrage de l'API, avant l'ouverture d'EmulationStation. Un testeur a
 /// lance Sonic 18 s apres le demarrage de son API, sans selection prealable : le rembobinage etait
 /// actif et 56 minutes de jeu ont ete refusees (2026-09-25).
 /// </summary>

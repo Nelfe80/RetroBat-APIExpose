@@ -62,7 +62,7 @@ public sealed class RuntimeFileLoggerProvider : ILoggerProvider
 
     /// <summary>
     /// LA SESSION QUI A PLANTE N'EST PLUS EFFACEE. Le demarrage vidait le journal : une API qui
-    /// plante puis redemarre perdait la seule trace de ce qui s'etait passe (FreshOne, 2026-09-27 :
+    /// plante puis redemarre perdait la seule trace de ce qui s'etait passe (rapport de testeur, 2026-09-27 :
     /// 45 minutes sans API, rien pour dire pourquoi). Le journal de la session precedente passe en
     /// « .session-1 », les plus anciennes glissent, la plus vieille part. Les tranches de taille
     /// (« .1 », « .2 ») d'une session ne sont pas gardees : c'est la fin qui compte.

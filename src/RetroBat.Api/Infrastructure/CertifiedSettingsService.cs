@@ -189,7 +189,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
     /// <summary>
     /// LES JEUX DE LA COLLECTION WORLD SCORING, NEUTRALISES DES LE DEMARRAGE (2026-09-25).
     ///
-    /// Les cles par jeu n'etaient posees qu'a la SELECTION dans le menu. FreshOne a lance Sonic
+    /// Les cles par jeu n'etaient posees qu'a la SELECTION dans le menu. un testeur a lance Sonic
     /// 18 secondes apres le demarrage de son API, sans l'avoir selectionne depuis : le rembobinage
     /// etait actif, l'avant-partie l'a dit, et 56 minutes de jeu ont ete refusees. EmulationStation
     /// peut aussi effacer des cles ajoutees pendant qu'il tourne, en resauvegardant ses reglages.
