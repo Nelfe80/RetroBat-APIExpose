@@ -488,6 +488,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 case "panel.input.pressed":
                     CaptureStart(ToJson(envelope.Payload));
                     break;
+                case "wrapper.watch.muted":
+                    CaptureSurveillanceCoupee(ToJson(envelope.Payload));
+                    break;
                 case "scoring.lab.start":
                     SortirDeDemo();
                     break;
@@ -528,6 +531,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _jetonDeSession++;
             _departAuCredit = _closeParCredit = _partieADeuxAnnoncee = false;
             _scoresAutresJoueurs.Clear();
+            _creditsMuets = null;
             _invite = RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun;
             _debutSessionUtc = DateTime.UtcNow;
             _replayDuSolo = null;
@@ -1458,6 +1462,32 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     private readonly Dictionary<int, long> _scoresAutresJoueurs = new();
 
+    /// <summary>La frame ou le wrapper a coupe la ligne des credits : les continues ne se voient plus.</summary>
+    private long? _creditsMuets;
+
+    /// <summary>
+    /// LA LIGNE DES CREDITS COUPEE PAR LE WRAPPER : plus aucun continue ne se voit. Le wrapper fait
+    /// taire une ligne hors score qui change huit fois de suite a moins de 20 images d'ecart, et
+    /// neuf pieces enchainees suffisent (charte de la partie certifiee, 2026-09-30). Le 1CC s'arrete
+    /// la : ce qui a ete joue avant reste certifie, la suite ne l'est plus, et le joueur le sait tout
+    /// de suite. Le plus souvent, c'est avant meme le depart : il relance, rien n'est perdu.
+    /// </summary>
+    private void CaptureSurveillanceCoupee(JsonElement root)
+    {
+        var evenement = GetString(root, "Evenement") ?? "";
+        if (!evenement.Equals("credits", StringComparison.OrdinalIgnoreCase)) return;
+        long frame;
+        lock (_sync)
+        {
+            if (_creditsMuets is not null || _invite != RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun) return;
+            _creditsMuets = frame = _lastFrame;
+        }
+
+        Trace($"la ligne des credits a ete coupee par le wrapper (changements trop rapides, frame {frame}) : les continues ne se voient plus, fin du 1CC");
+        AnnoncerCredit("scoring_credits_muted", "credits illisibles, partie non certifiable");
+        PublierFinDeRun("credits illisibles");
+    }
+
     private void CaptureTotal(JsonElement root)
     {
         if (!root.TryGetProperty("Score", out var s) || !s.TryGetInt64(out var total)) return;
@@ -1859,6 +1889,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // Un continue ou l'arrivee d'un joueur ferme le 1CC solo : on garde ce qui a ete fait seul
         // avant (cumulatif, decision user du 2026-09-30), la suite ne part pas.
         var finsDeRun = bilanCredits.FinsDuSolo;
+        long? creditsMuets;
+        lock (_sync) { creditsMuets = _creditsMuets; }
+        if (creditsMuets is { } muets)
+        {
+            Trace($"la ligne des credits a ete coupee a la frame {muets} : le 1CC s'arrete la");
+            finsDeRun = finsDeRun.Append(muets).OrderBy(f => f).ToList();
+        }
         if (bilanCredits.Coupes.Count > 0)
         {
             Trace($"continues (credit consomme apres le depart) : {string.Join(", ", bilanCredits.Coupes)}");

@@ -15,7 +15,7 @@ public class ContinuesParCreditsTests
     [Fact]
     public void Double_Dragon_une_vie_bonus_ne_coupe_plus_rien()
     {
-        // Speedbull, 2026-09-29 : un seul credit (1 -> 0 au depart), 41 520 au premier credit.
+        // Partie du 2026-09-29 : un seul credit (1 -> 0 au depart), 41 520 au premier credit.
         var credits = new List<EvenementDeCredit> { new(1, 10), new(0, 100) };
         var bilan = ContinuesParCredits.Calculer(credits, []);
         Assert.Empty(bilan.Coupes);
@@ -210,5 +210,17 @@ public class ContinuesParCreditsTests
     {
         using var doc = System.Text.Json.JsonDocument.Parse(json);
         Assert.Equal(attendu, NelfePlayScoringReporter.JoueurDuScore(doc.RootElement));
+    }
+
+    [Fact]
+    public void La_ligne_des_credits_coupee_par_le_wrapper_se_reconnait()
+    {
+        var ligne = "[11:02:03.456] [ADDR:0x000021] [VAL:0x09] [DEBUG WRAPPER] WARNING: AUTO-MUTE DEFINITIF pour [resources.credits] (Credits) ! Signature de boucle infinie detectee. Blocage permanent.";
+        var coupee = RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider.LigneCoupee(ligne);
+        Assert.NotNull(coupee);
+        Assert.Equal("resources", coupee.Value.Categorie);
+        Assert.Equal("credits", coupee.Value.Evenement);
+        Assert.Equal("Credits", coupee.Value.Nom);
+        Assert.Null(RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider.LigneCoupee("[DEBUG WRAPPER] Core=fbneo system_ram=65536"));
     }
 }

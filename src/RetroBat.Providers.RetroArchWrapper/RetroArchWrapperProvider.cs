@@ -354,6 +354,30 @@ public class RetroArchWrapperProvider : IProvider
         "[WRAPPER WARN]",
     };
 
+    /// <summary>
+    /// La surveillance que le wrapper vient de couper pour de bon (« AUTO-MUTE DEFINITIF pour
+    /// [categorie.evenement] (nom) ») : une ligne hors score qui change huit fois de suite a moins
+    /// de 20 images d'ecart. Null pour toute autre ligne.
+    /// </summary>
+    public static (string Categorie, string Evenement, string Nom)? LigneCoupee(string line)
+    {
+        const string marqueur = "AUTO-MUTE DEFINITIF pour [";
+        var i = line.IndexOf(marqueur, StringComparison.Ordinal);
+        if (i < 0) return null;
+        var debut = i + marqueur.Length;
+        var fin = line.IndexOf(']', debut);
+        if (fin < 0) return null;
+        var cle = line[debut..fin];
+        var point = cle.IndexOf('.');
+        var categorie = point < 0 ? cle : cle[..point];
+        var evenement = point < 0 ? "" : cle[(point + 1)..];
+        var nom = "";
+        var ouvre = line.IndexOf('(', fin);
+        var ferme = ouvre < 0 ? -1 : line.IndexOf(')', ouvre);
+        if (ouvre >= 0 && ferme > ouvre) nom = line[(ouvre + 1)..ferme];
+        return (categorie, evenement, nom);
+    }
+
     private static bool EstUnDiagnosticDuWrapper(string line)
     {
         foreach (var marqueur in MarqueursDeDiagnostic)
@@ -396,6 +420,26 @@ public class RetroArchWrapperProvider : IProvider
             {
                 _signals[parsed.Key] = parsed;
             }
+        }
+
+        // UNE SURVEILLANCE COUPEE NE DIT PLUS RIEN, ET LE SCORING DOIT LE SAVOIR. Le wrapper coupe
+        // pour de bon une ligne hors score qui change trop vite ; celle des credits se coupe a coups
+        // de pieces rapides, et un continue passerait alors sans coupe (charte de la partie
+        // certifiee, 2026-09-30). On le publie : c'est le rapporteur qui en tire la consequence.
+        if (parsed == null && LigneCoupee(line) is { } coupee)
+        {
+            _ = _eventBus.PublishAsync(new EventEnvelope
+            {
+                Type = "wrapper.watch.muted",
+                Payload = new
+                {
+                    definition.SystemId,
+                    definition.Rom,
+                    coupee.Categorie,
+                    coupee.Evenement,
+                    coupee.Nom,
+                },
+            });
         }
 
         if (parsed == null)
