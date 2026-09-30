@@ -2686,7 +2686,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private async Task<JsonElement?> FetchProfileAsync(string credential, string systemId, string romGroup, CancellationToken cancellationToken)
     {
         var profils = await FetchProfilesAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false);
-        return profils.Count > 0 ? profils[0] : null;
+        // Le profil d'une partie seule : jamais le 1CC MULTI, meme s'il venait en tete.
+        var seules = RetroBat.Api.Scoring.ModesDeJeu.SansLeMulti(profils);
+        return seules.Count > 0 ? seules[0] : null;
     }
 
     /// <summary>

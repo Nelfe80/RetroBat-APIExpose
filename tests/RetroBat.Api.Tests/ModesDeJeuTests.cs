@@ -49,6 +49,15 @@ public class ModesDeJeuTests
     }
 
     [Fact]
+    public void Une_partie_seule_ne_prend_jamais_le_profil_du_1cc_multi()
+    {
+        var multi = Profil("""{"ruleset":"1cc-multi","min_api_version":"1.9.14"}""");
+
+        Assert.Equal("1cc", Regle(ModesDeJeu.ChoisirProfil([multi, SansModes], null)));
+        Assert.Null(ModesDeJeu.ChoisirProfil([multi], null));
+    }
+
+    [Fact]
     public void Un_jeu_sans_modes_garde_son_profil_quoi_que_dise_la_memoire()
     {
         Assert.Equal("1cc", Regle(ModesDeJeu.ChoisirProfil([SansModes], null)));

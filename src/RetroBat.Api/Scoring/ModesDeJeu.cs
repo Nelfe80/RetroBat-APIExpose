@@ -84,6 +84,9 @@ public static class ModesDeJeu
     /// </summary>
     public static JsonElement? ChoisirProfil(IReadOnlyList<JsonElement> profils, int? modeJoue)
     {
+        // Le 1CC MULTI n'est jamais le classement d'une partie seule : il a sa propre soumission
+        // (NelfePlayScoringReporter.SoumettreMultiAsync). La plateforme le met deja en dernier.
+        profils = SansLeMulti(profils);
         if (profils.Count == 0) return null;
         var aModes = profils.Where(p => ModeDuProfil(p) is not null).ToList();
         if (aModes.Count == 0) return profils[0];
@@ -101,6 +104,12 @@ public static class ModesDeJeu
         }
         return null;
     }
+
+    /// <summary>Les profils des parties seules : tous sauf la categorie 1CC MULTI.</summary>
+    public static List<JsonElement> SansLeMulti(IReadOnlyList<JsonElement> profils)
+        => profils.Where(p => !(p.ValueKind == JsonValueKind.Object
+            && p.TryGetProperty("ruleset", out var r) && r.ValueKind == JsonValueKind.String
+            && r.GetString() == "1cc-multi")).ToList();
 
     /// <summary>
     /// Le mode d'une partie : celui que le profil couvre (la plateforme verifie qu'il a ete joue).
