@@ -73,6 +73,16 @@ public sealed class NetplayGuestService
 
     private static readonly object VerrouRejointe = new();
     private static (DateTime Quand, Role Role)? _rejointe;
+    private static int? _place;
+
+    /// <summary>
+    /// La place de joueur que la plateforme a donnee a cette borne pour la partie rejointe (2 a 4 ;
+    /// l'hote tient la 1), ou null en spectateur. Le 1CC MULTI certifie le joueur de cette place.
+    /// </summary>
+    public static int? PlaceDeJoueur
+    {
+        get { lock (VerrouRejointe) { return _place; } }
+    }
 
     /// <summary>
     /// LA BORNE QUI REJOINT NE JOUE PAS SA PROPRE PARTIE (charte de la partie certifiee,
@@ -166,6 +176,15 @@ public sealed class NetplayGuestService
             return Echec.DumpDifferent;
         }
 
+        // Sans place de joueur (une autre attend encore sa confirmation, ou tout est pris), la
+        // plateforme n'a pas donne le mot de passe joueur : on regarde, et le journal dit pourquoi.
+        if (!infos.Value.PeutJouer && infos.Value.EtatPlace is "wait" or "full")
+        {
+            _logger.LogInformation(
+                "Netplay : pas de place de joueur ({Etat}), la borne rejoint en spectateur.",
+                infos.Value.EtatPlace == "wait" ? "une place attend encore son joueur" : "toutes les places sont prises");
+        }
+
         // « spectator » et non « client » quand on n'a pas le droit de jouer : le mode dit
         // l'intention, et le mot de passe la fait respecter. Les deux vont ensemble.
         var mode = infos.Value.PeutJouer ? "client" : "spectator";
@@ -174,6 +193,7 @@ public sealed class NetplayGuestService
 
         // Par ES de preference : lui seul cesse de dessiner pendant la partie (voir NetplayLaunch).
         MarquerRejointe(infos.Value.PeutJouer ? Role.Joueur : Role.Spectateur);
+        lock (VerrouRejointe) { _place = infos.Value.PeutJouer ? infos.Value.Place : null; }
         var lancement = await NetplayLaunch.LancerAsync(
             rom, Arguments(resolution, rom, mode, infos.Value), _httpFactory, _logger, ct).ConfigureAwait(false);
         if (!lancement.Ok)
@@ -188,7 +208,8 @@ public sealed class NetplayGuestService
         // La seance s'OUVRE seulement quand la partie est lancee. L'ouvrir avant laisserait la
         // facade croire qu'il y a quelque chose a quoi reagir alors qu'aucun jeu ne tourne.
         _seance.Ouvrir(infos.Value.Session, infos.Value.Jeton, infos.Value.PeutJouer);
-        _ = Task.Run(FermerQuandLaPartieFinitAsync, CancellationToken.None);
+        var place = infos.Value.PeutJouer ? infos.Value.Place : null;
+        _ = Task.Run(() => FermerQuandLaPartieFinitAsync(sessionId, credential, place), CancellationToken.None);
         return Echec.Aucun;
     }
 
@@ -199,7 +220,7 @@ public sealed class NetplayGuestService
     /// survit a la partie laisse la facade envoyer des reactions dans le vide, et le budget de
     /// cinq se depenserait sur un direct qu'on ne regarde plus.
     /// </summary>
-    private async Task FermerQuandLaPartieFinitAsync()
+    private async Task FermerQuandLaPartieFinitAsync(string sessionId, string credential, int? place)
     {
         try
         {
@@ -216,6 +237,14 @@ public sealed class NetplayGuestService
                 return;
             }
 
+            // LA PARTIE TOURNE : la place est confirmee, et la plateforme peut donner la suivante.
+            // RetroArch numerote les joueurs dans l'ordre ou ils passent en joueur ; confirmer
+            // avant, c'etait risquer qu'un second invite passe devant.
+            if (place is not null)
+            {
+                await PlaceAsync(sessionId, credential, "confirm").ConfigureAwait(false);
+            }
+
             var limite = DateTime.UtcNow.AddHours(4);
             while (DateTime.UtcNow < limite && EmulatorForeground.EmulateurTourne())
             {
@@ -229,9 +258,36 @@ public sealed class NetplayGuestService
         finally
         {
             // Dans TOUS les cas : une seance laissee ouverte par une exception serait pire que
-            // pas de seance du tout.
+            // pas de seance du tout. La place de joueur se libere avec.
             _seance.Fermer();
+            if (place is not null)
+            {
+                await PlaceAsync(sessionId, credential, "release").ConfigureAwait(false);
+                lock (VerrouRejointe) { _place = null; }
+            }
             _logger.LogInformation("Netplay : seance de spectateur fermee.");
+        }
+    }
+
+    /// <summary>Confirme (« confirm ») ou libere (« release ») la place de joueur de cette borne.</summary>
+    private async Task PlaceAsync(string sessionId, string credential, string geste)
+    {
+        try
+        {
+            var client = _httpFactory.CreateClient();
+            client.BaseAddress = new Uri(NelfePlayAgentService.BaseUrl.TrimEnd('/'));
+            client.Timeout = TimeSpan.FromSeconds(10);
+            client.DefaultRequestHeaders.Add("X-NelfePlay-Device", credential);
+            using var reponse = await client
+                .PostAsync($"/api/v1/agent/live/{Uri.EscapeDataString(sessionId)}/seat/{geste}", new StringContent(""))
+                .ConfigureAwait(false);
+            _logger.LogInformation("Netplay : place de joueur, {Geste} : HTTP {Code}.", geste, (int)reponse.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            // Une place non confirmee se libere seule au bout de 90 s ; une place non liberee, a la
+            // fin de la seance. Rien a rattraper ici.
+            _logger.LogWarning(ex, "Netplay : place de joueur, {Geste} impossible.", geste);
         }
     }
 
@@ -263,7 +319,9 @@ public sealed class NetplayGuestService
         bool PeutJouer,
         string Coeur,
         string Crc,
-        string Jeton);
+        string Jeton,
+        int? Place,
+        string EtatPlace);
 
     private async Task<Infos?> DemanderAsync(string sessionId, string credential, CancellationToken ct)
     {
@@ -294,6 +352,8 @@ public sealed class NetplayGuestService
             var peutJouer = r.TryGetProperty("can_play", out var cp)
                 && cp.ValueKind == JsonValueKind.True
                 && motJoueur.Length > 0;
+            // La place de joueur (1CC MULTI) : reservee par la plateforme quand la borne rejoint.
+            int? place = peutJouer && r.TryGetProperty("seat", out var s) && s.TryGetInt32(out var n) && n >= 2 ? n : null;
 
             return new Infos(
                 Texte(r, "game"),
@@ -308,7 +368,9 @@ public sealed class NetplayGuestService
                 peutJouer,
                 Texte(r, "core"),
                 Texte(r, "crc"),
-                jeton);
+                jeton,
+                place,
+                Texte(r, "seat_state"));
         }
         catch (Exception ex)
         {

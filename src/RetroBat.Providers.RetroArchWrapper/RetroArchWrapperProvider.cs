@@ -387,6 +387,31 @@ public class RetroArchWrapperProvider : IProvider
         return false;
     }
 
+    /// <summary>
+    /// Les appuis par port d'une ligne « [LISTENER PORTS] {"ms":..,"presses":[a,b,c,d]} », ou null si
+    /// elle est illisible. Toujours quatre valeurs, dans l'ordre des ports.
+    /// </summary>
+    public static int[]? LignePorts(string json)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(json.Trim());
+            if (!doc.RootElement.TryGetProperty("presses", out var p) || p.ValueKind != JsonValueKind.Array) return null;
+            var appuis = new int[4];
+            var i = 0;
+            foreach (var v in p.EnumerateArray())
+            {
+                if (i >= 4 || !v.TryGetInt32(out var n) || n < 0) return null;
+                appuis[i++] = n;
+            }
+            return i == 4 ? appuis : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
     private async Task ProcessLineAsync(string line, CancellationToken cancellationToken)
     {
         // ── Attestation du listener (scoring certifié) ──────────────────────────
@@ -406,6 +431,23 @@ public class RetroArchWrapperProvider : IProvider
         if (sessionAt >= 0)
         {
             await PublishListenerSessionAsync(line[(sessionAt + sessionMarker.Length)..].Trim());
+            return;
+        }
+
+        // Les appuis de chaque port, une fois par seconde et seulement a plusieurs joueurs (wrapper
+        // 0.340, 1CC MULTI) : la borne y retrouve SON port en les rapprochant de son panel.
+        const string portsMarker = "[LISTENER PORTS] ";
+        var portsAt = line.IndexOf(portsMarker, StringComparison.Ordinal);
+        if (portsAt >= 0)
+        {
+            if (LignePorts(line[(portsAt + portsMarker.Length)..]) is { } appuis)
+            {
+                await _eventBus.PublishAsync(new EventEnvelope
+                {
+                    Type = "wrapper.ports",
+                    Payload = new { Presses = appuis },
+                });
+            }
             return;
         }
 
