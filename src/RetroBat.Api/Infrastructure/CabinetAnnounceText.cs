@@ -145,6 +145,8 @@ public static class CabinetAnnounceText
             ["replay_rom_other_crc"] = "Cette borne n'a pas le fichier exact sur lequel ce record a été joué (empreinte {1}) : la lecture part sur {0}. Si le jeu diffère (région, révision), le replay peut dériver.",
             ["scoring_continue_title"] = "Continue : ton score certifié reste {0}",
             ["scoring_continue_sub"] = "la partie continue, mais la suite ne compte plus pour le classement",
+            ["scoring_credit_title"] = "Crédit consommé : ton score certifié reste {0}",
+            ["scoring_credit_sub"] = "la suite ne compte plus ; pour une nouvelle partie classée, quitte et relance le jeu",
         },
         ["en"] = new()
         {
@@ -205,6 +207,8 @@ public static class CabinetAnnounceText
             ["replay_rom_other_crc"] = "This cabinet does not have the exact file this record was played on (checksum {1}): playback uses {0}. If the game differs (region, revision), the replay may drift.",
             ["scoring_continue_title"] = "Continue: your certified score stays at {0}",
             ["scoring_continue_sub"] = "keep playing, but what follows no longer counts for the ranking",
+            ["scoring_credit_title"] = "Credit used: your certified score stays at {0}",
+            ["scoring_credit_sub"] = "what follows no longer counts; for a new ranked game, quit and relaunch it",
         },
         ["es"] = new()
         {
@@ -265,6 +269,8 @@ public static class CabinetAnnounceText
             ["replay_rom_other_crc"] = "Esta máquina no tiene el archivo exacto con el que se jugó este récord (huella {1}): la reproducción usa {0}. Si el juego difiere (región, revisión), la repetición puede desviarse.",
             ["scoring_continue_title"] = "Continuación: tu puntuación certificada se queda en {0}",
             ["scoring_continue_sub"] = "la partida sigue, pero lo que venga ya no cuenta para la clasificación",
+            ["scoring_credit_title"] = "Crédito consumido: tu puntuación certificada se queda en {0}",
+            ["scoring_credit_sub"] = "lo que sigue ya no cuenta; para una nueva partida clasificada, sal y vuelve a lanzar el juego",
         },
         ["ja"] = new()
         {
@@ -325,6 +331,8 @@ public static class CabinetAnnounceText
             ["replay_rom_other_crc"] = "この筐体には記録時と同じファイル（チェックサム {1}）がありません。{0} で再生します。ゲームが異なる場合（地域、リビジョン）、リプレイがずれることがあります。",
             ["scoring_continue_title"] = "コンティニュー：認定スコアは {0} のまま",
             ["scoring_continue_sub"] = "プレイは続けられますが、この先はランキングに数えられません",
+            ["scoring_credit_title"] = "クレジット使用：認定スコアは {0} のまま",
+            ["scoring_credit_sub"] = "この先はランキングに数えられません。ランキング対象の新しいプレイは、ゲームを終了して再起動してください",
         },
         ["zh"] = new()
         {
@@ -385,6 +393,8 @@ public static class CabinetAnnounceText
             ["replay_rom_other_crc"] = "本机没有录制此记录时使用的同一文件（校验值 {1}）：将使用 {0} 回放。如果游戏不同（地区、版本），回放可能出现偏差。",
             ["scoring_continue_title"] = "续关：认证分数保持为 {0}",
             ["scoring_continue_sub"] = "游戏继续，但之后的得分不再计入排行榜",
+            ["scoring_credit_title"] = "已使用投币：认证分数保持为 {0}",
+            ["scoring_credit_sub"] = "之后的得分不再计入排行榜；如需新的排行游戏，请退出并重新启动游戏",
         },
         ["ko"] = new()
         {

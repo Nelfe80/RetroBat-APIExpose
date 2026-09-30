@@ -72,13 +72,6 @@ public sealed class ChiffreDesCreditsTests
     }
 
     [Theory]
-    [InlineData(null, false)]
-    [InlineData(0L, false)]
-    [InlineData(1500L, true)]
-    public void Pas_de_continue_avant_le_premier_point(long? score, bool attendu)
-        => Assert.Equal(attendu, NelfePlayScoringReporter.ContinueAProteger(score));
-
-    [Theory]
     [InlineData(29700L, 29700L, 30001L, true)]
     [InlineData(29700L, 29700L, 29800L, false)]
     [InlineData(null, 63L, 65L, false)]

@@ -80,8 +80,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// continues (demande user 2026-09-27).
     /// </summary>
     private bool _finDeRunPubliee;
-    /// <summary>Le jeton du continue candidat en attente : une chute du score l'annule.</summary>
+    /// <summary>Le jeton du continue candidat en attente : une nouvelle session l'annule.</summary>
     private int _candidatContinue;
+    /// <summary>Le premier credit consomme de la session, le depart, a ete vu.</summary>
+    private bool _departAuCredit;
+    /// <summary>
+    /// Un credit consomme apres le depart a clos la partie certifiee : la session fait foi, rien de
+    /// ce qui suit ne concourt, meme quand le jeu remet le score a zero (Double Dragon).
+    /// </summary>
+    private bool _closeParCredit;
     private long? _finalTotal;
     private bool _inDemo;   // attract mode : le jeu se joue seul → on ignore le score
     // Phase D (segmentation en RUNS, 100% APIExpose) : la trajectoire des scores suffit —
@@ -491,6 +498,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _dernierPropre = _derniereLecture = _avantContinue = null;
             _finDeRunPubliee = false;
             _candidatContinue++;
+            _departAuCredit = _closeParCredit = false;
             _trajectory.Clear();
             _horsJeu.Clear();
             _startVu = false;
@@ -980,10 +988,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     /// <summary>
-    /// Le compteur de credits. Un credit consomme en pleine partie, score non nul, est un continue
-    /// si le score ne retombe pas dans les secondes qui suivent (une nouvelle partie le remet a
-    /// zero) et si aucun joueur 2 n'arrive au meme moment. Le joueur l'apprend tout de suite, et le
-    /// replay s'arrete la. La decision de la soumission se refait en fin de session, sur tout.
+    /// Le compteur de credits. Le premier credit consomme de la session est le depart ; tout credit
+    /// consomme ensuite est un continue, sauf si un joueur 2 arrive au meme moment
+    /// (ContinuesParCredits). Le joueur l'apprend tout de suite, et le replay s'arrete la. La
+    /// decision de la soumission se refait en fin de session, sur tout.
     /// </summary>
     private void CaptureCredits(JsonElement root)
     {
@@ -1000,13 +1008,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _credits.Add(new EvenementDeCredit(valeur, frame));
             if (_credits.Count > MaxTrajectory) _credits.RemoveAt(0);
             if (avant is null || valeur >= avant) return;   // premiere lecture, ou pieces ajoutees
-            if (_inDemo || _finDeRunPubliee) return;
+            var depart = !_departAuCredit;
+            _departAuCredit = true;
+            if (depart || _finDeRunPubliee) return;           // le depart, ou partie deja close
             scoreAvant = _finalTotal ?? 0;
-            if (!ContinueAProteger(scoreAvant)) return;       // depart d'une partie, ou rien a proteger
             jeton = ++_candidatContinue;
         }
 
-        Trace($"credit consomme en partie (score {scoreAvant}, frame {frame}) : continue si le score ne retombe pas");
+        Trace($"credit consomme apres le depart (score {scoreAvant}, frame {frame}) : continue, sauf arrivee d'un joueur 2");
         _ = ConfirmerContinueParCreditAsync(jeton, scoreAvant, frame);
     }
 
@@ -1015,14 +1024,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         await Task.Delay(ConfirmationContinue).ConfigureAwait(false);
         lock (_sync)
         {
-            if (jeton != _candidatContinue) return;   // le score est retombe : une nouvelle partie
+            if (jeton != _candidatContinue) return;   // une autre session a commence
             if (_departs.Any(d => d.Player >= 2 && Math.Abs(d.Frame - frame) <= ContinuesParCredits.FenetreArrivee))
             {
                 return;   // un joueur 2 est arrive : la partie sort du classement, rien a annoncer ici
             }
+
+            _closeParCredit = true;
         }
 
-        AnnoncerContinue(scoreAvant);
+        AnnoncerContinue(scoreAvant, parCredit: true);
         PublierFinDeRun("credit consomme");
     }
 
@@ -1292,14 +1303,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var precedent = _finalTotal;
             _finalTotal = total;
 
-            // LE SCORE RETOMBE : une nouvelle partie commence. Un continue garde le score, une
-            // nouvelle partie le remet a zero : c'est ce qui les distingue. Un continue en attente
-            // de confirmation n'en etait pas un, et si la partie d'avant a ete close par un
-            // continue, tout se rearme pour celle-ci (bandeau, fin de partie, replay).
+            // LE SCORE RETOMBE : une nouvelle partie commence, pour un jeu a chiffre des credits
+            // (le continue y garde le score). Si la partie d'avant a ete close par ce chiffre, tout
+            // se rearme pour celle-ci (bandeau, fin de partie, replay). Une partie close par un
+            // CREDIT ne se rearme pas : la session fait foi, et Double Dragon remet le score a zero
+            // au continue meme (labo du 2026-09-30).
             if (precedent is { } avantChute && total < avantChute)
             {
-                _candidatContinue++;
-                if (_finDeRunPubliee)
+                if (_finDeRunPubliee && !_closeParCredit)
                 {
                     _finDeRunPubliee = false;
                     _avantContinue = null;
@@ -1387,16 +1398,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     /// <summary>
-    /// UN CONTINUE AVANT LE PREMIER POINT N'EN EST PAS UN. Au debut d'une partie, un seul compteur
-    /// de vies a encore parle, et son initialisation peut dessiner 2, 1, 0 puis 2 : Double Dragon
-    /// arretait ainsi son replay des que le personnage sortait du garage (Another Kif, 2026-09-28).
-    /// Un continue au score nul n'a de toute facon rien a proteger. La remontee est comptee (elle ne
-    /// ressortira pas plus tard), mais n'arrete rien.
+    /// Le temps de voir arriver un joueur 2 (ContinuesParCredits.FenetreArrivee, 3 s) avant de dire
+    /// le continue. Plus court que les 6 s d'avant : un joueur qui quitte juste apres son continue
+    /// ne voyait pas le bandeau (labo Double Dragon du 2026-09-30, sortie 5,5 s apres).
     /// </summary>
-    internal static bool ContinueAProteger(long? scoreCourant) => scoreCourant is > 0;
-
-    /// <summary>Le delai qui separe un continue (le score reste) d'une nouvelle partie (il retombe).</summary>
-    internal static readonly TimeSpan ConfirmationContinue = TimeSpan.FromSeconds(6);
+    internal static readonly TimeSpan ConfirmationContinue = TimeSpan.FromSeconds(3.5);
 
 
     /// <summary>
@@ -1411,15 +1417,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// Le joueur vient de continuer : il le sait tout de suite, et il sait quel score est certifie.
     /// Un bandeau d'information, pas une alerte : la partie continue, rien n'est refuse.
     /// </summary>
-    private void AnnoncerContinue(long avant)
+    private void AnnoncerContinue(long avant, bool parCredit = false)
     {
         var langue = Langue();
+        var cle = parCredit ? "scoring_credit" : "scoring_continue";
         _overlay?.ShowTop(
             "SCORING",
-            string.Format(CabinetAnnounceText.Get("scoring_continue_title", langue), ScoreAffiche(avant, langue)),
-            CabinetAnnounceText.Get("scoring_continue_sub", langue),
+            string.Format(CabinetAnnounceText.Get(cle + "_title", langue), ScoreAffiche(avant, langue)),
+            CabinetAnnounceText.Get(cle + "_sub", langue),
             8000);
-        Trace($"continue detecte (chiffre des credits) : score certifie {avant}, la partie continue");
+        Trace($"continue detecte ({(parCredit ? "credit consomme" : "chiffre des credits")}) : score certifie {avant}, la partie continue");
     }
 
     /// <summary>Un score lisible sur l'ecran : espaces en francais, points en espagnol, virgules sinon.</summary>
@@ -1642,12 +1649,20 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
         }
 
-        // LE CREDIT FAIT FOI (charte de la partie certifiee) : on ne coupe plus sur les vies.
-        var bilanCredits = ContinuesParCredits.Calculer(credits, lecturesBrutes, departs);
+        // LE CREDIT FAIT FOI (charte de la partie certifiee) : on ne coupe plus sur les vies. Rien de
+        // ce qui suit le premier continue ne concourt, ni ne part dans le passeport : la session
+        // fait foi, et la plateforme ne doit pas pouvoir y retrouver un « meilleur » segment.
+        var bilanCredits = ContinuesParCredits.Calculer(credits, departs);
         var finsDeRun = bilanCredits.Coupes;
         if (finsDeRun.Count > 0)
         {
-            Trace($"continues (credit consomme, score garde) : {string.Join(", ", finsDeRun)}");
+            Trace($"continues (credit consomme apres le depart) : {string.Join(", ", finsDeRun)}");
+            var avantContinue = ContinuesParCredits.AvantLePremierContinue(trajectory, finsDeRun);
+            if (avantContinue.Count < trajectory.Count)
+            {
+                Trace($"credit consomme : {trajectory.Count - avantContinue.Count} lecture(s) apres le premier continue ecartee(s)");
+                trajectory = avantContinue;
+            }
         }
         var anciennesFins = FinsDeRun.Calculer(vies);
         if (anciennesFins.Count > 0)
