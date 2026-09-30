@@ -144,8 +144,8 @@ public sealed class LeaderboardOverlayService : IDisposable
     {
         try
         {
-            var es = Process.GetProcessesByName("emulationstation").FirstOrDefault();
-            if (es?.MainWindowHandle is { } h && h != IntPtr.Zero) return Screen.FromHandle(h).Bounds.Height;
+            var h = EmulatorForeground.FenetreDEmulationStation();
+            if (h != IntPtr.Zero) return Screen.FromHandle(h).Bounds.Height;
         }
         catch (Exception) { }
         return Screen.PrimaryScreen?.Bounds.Height ?? 1080;
@@ -515,6 +515,12 @@ public sealed class LeaderboardOverlayService : IDisposable
                 if (!Visible) Show();
                 PasserDevant();
                 Invalidate();
+                // Ce qui separe « ouvert » de « VISIBLE » : l'attente du fil de la fenetre, ou le
+                // premier dessin. Mesure pour trancher (2026-09-30).
+                if (_service._depuisLAppui is { } chrono)
+                {
+                    _service._logger.LogInformation("Classement : fenetre montree {Ms} ms apres l'appui.", chrono.ElapsedMilliseconds);
+                }
             });
         }
 
@@ -623,8 +629,8 @@ public sealed class LeaderboardOverlayService : IDisposable
             var ecran = Screen.PrimaryScreen;
             try
             {
-                var es = Process.GetProcessesByName("emulationstation").FirstOrDefault();
-                if (es?.MainWindowHandle is { } h && h != IntPtr.Zero) ecran = Screen.FromHandle(h);
+                var h = EmulatorForeground.FenetreDEmulationStation();
+                if (h != IntPtr.Zero) ecran = Screen.FromHandle(h);
             }
             catch { }
             var b = ecran?.Bounds ?? new Rectangle(0, 0, 1920, 1080);

@@ -53,16 +53,28 @@ public static class EmulatorForeground
     /// </summary>
     private static IEnumerable<Process> Processus(string prefixe)
     {
+        // Les processus ecartes sont liberes tout de suite : sur une borne, ils sont pres de
+        // trois cents a chaque parcours, et chacun tient un handle jusqu'au ramasse-miettes.
+        Process[] tous;
         try
         {
-            return Process.GetProcesses()
-                .Where(p => p.ProcessName.StartsWith(prefixe, StringComparison.OrdinalIgnoreCase))
-                .ToArray();
+            tous = Process.GetProcesses();
         }
         catch (Exception)
         {
             return [];
         }
+
+        var gardes = new List<Process>();
+        foreach (var p in tous)
+        {
+            var garder = false;
+            try { garder = p.ProcessName.StartsWith(prefixe, StringComparison.OrdinalIgnoreCase); }
+            catch (Exception) { }
+            if (garder) gardes.Add(p); else p.Dispose();
+        }
+
+        return gardes;
     }
 
     /// <summary>Le menu. Il doit avoir le focus avant qu'on lui demande de lancer quoi que ce soit.</summary>
@@ -73,28 +85,98 @@ public static class EmulatorForeground
     /// RetroBat lance « retroarch.patched.RETROBAT », que la recherche par nom entier ne
     /// trouve pas. Poser la question ici evite qu'un appelant reinvente ce piege.
     /// </summary>
+    /// <summary>
+    /// UN SEUL PARCOURS DES PROCESSUS. On en faisait un par nom d'emulateur, soit neuf a chaque
+    /// question : mesure sur la borne le 2026-09-30, 289 processus, 7 ms le parcours, pres de
+    /// 320 ms les neuf. Le panneau de classement le payait avant de s'ouvrir (216 a 1 150 ms
+    /// d'« conditions »), et la surveillance du panel toutes les 5 s pendant une partie lancee
+    /// hors d'ES.
+    /// </summary>
     public static bool EmulateurTourne()
     {
-        foreach (var nom in Emulateurs)
+        Process[] tous;
+        try
         {
-            var trouves = Processus(nom).ToArray();
+            tous = Process.GetProcesses();
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+
+        var trouve = false;
+        foreach (var p in tous)
+        {
             try
             {
-                if (trouves.Length > 0)
+                if (!trouve)
                 {
-                    return true;
+                    var nom = p.ProcessName;
+                    foreach (var emulateur in Emulateurs)
+                    {
+                        if (nom.StartsWith(emulateur, StringComparison.OrdinalIgnoreCase))
+                        {
+                            trouve = true;
+                            break;
+                        }
+                    }
                 }
+            }
+            catch (Exception)
+            {
+                // Un processus termine entre-temps n'a plus de nom : on passe.
             }
             finally
             {
-                foreach (var p in trouves)
-                {
-                    p.Dispose();
-                }
+                p.Dispose();
             }
         }
-        return false;
+
+        return trouve;
     }
+
+    /// <summary>
+    /// La fenetre de premier plan appartient-elle a ce processus ? Sans rien enumerer : on part de
+    /// la fenetre devant et on lit le nom de SON processus.
+    /// </summary>
+    public static bool DevantEst(string prefixe)
+    {
+        try
+        {
+            var devant = GetForegroundWindow();
+            if (devant == IntPtr.Zero) return false;
+            GetWindowThreadProcessId(devant, out var pid);
+            if (pid == 0) return false;
+            using var p = Process.GetProcessById((int) pid);
+            return p.ProcessName.StartsWith(prefixe, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// La fenetre d'EmulationStation, par son titre ; a defaut, par son processus. Sert a trouver
+    /// l'ecran qui la porte sans parcourir tous les processus a chaque ouverture du panneau.
+    /// </summary>
+    public static IntPtr FenetreDEmulationStation()
+    {
+        var h = FindWindowW(null, "EmulationStation");
+        if (h != IntPtr.Zero) return h;
+        foreach (var p in Processus("emulationstation"))
+        {
+            using (p)
+            {
+                if (h == IntPtr.Zero && p.MainWindowHandle != IntPtr.Zero) h = p.MainWindowHandle;
+            }
+        }
+
+        return h;
+    }
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern IntPtr FindWindowW(string? className, string? windowName);
 
     public static bool FocusEmulationStation() => Focus("emulationstation");
 

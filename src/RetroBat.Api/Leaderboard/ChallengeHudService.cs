@@ -241,22 +241,32 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
 
     private static IntPtr FenetreDuJeu()
     {
-        foreach (var nom in new[] { "retroarch", "mame", "fbneo" })
+        // Un seul parcours des processus, par ordre de preference (voir EmulateurTourne).
+        var noms = new[] { "retroarch", "mame", "fbneo" };
+        var meilleur = IntPtr.Zero;
+        var rang = noms.Length;
+        Process[] tous;
+        try { tous = Process.GetProcesses(); }
+        catch (Exception) { return IntPtr.Zero; }
+        foreach (var p in tous)
         {
-            foreach (var p in Process.GetProcesses())
+            try
             {
-                try
+                var nom = p.ProcessName;
+                for (var i = 0; i < rang; i++)
                 {
-                    if (p.ProcessName.StartsWith(nom, StringComparison.OrdinalIgnoreCase) && p.MainWindowHandle != IntPtr.Zero)
+                    if (nom.StartsWith(noms[i], StringComparison.OrdinalIgnoreCase) && p.MainWindowHandle != IntPtr.Zero)
                     {
-                        return p.MainWindowHandle;
+                        meilleur = p.MainWindowHandle;
+                        rang = i;
+                        break;
                     }
                 }
-                catch (Exception) { }
-                finally { p.Dispose(); }
             }
+            catch (Exception) { }
+            finally { p.Dispose(); }
         }
-        return IntPtr.Zero;
+        return meilleur;
     }
 
     /// <summary>La cible du defi arme, pour annoncer l'objectif avant le lancement.</summary>

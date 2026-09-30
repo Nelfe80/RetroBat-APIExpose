@@ -576,25 +576,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// EmulationStation est-il la fenetre active ? Le panneau ne s'invite pas par-dessus autre
     /// chose : si le joueur est dans une autre application, l'appui long ne nous regarde pas.
     /// </summary>
-    private static bool EsEstDevant()
-    {
-        try
-        {
-            var devant = GetForegroundWindow();
-            foreach (var p in Process.GetProcessesByName("emulationstation"))
-            {
-                using (p)
-                {
-                    if (p.MainWindowHandle == devant) return true;
-                }
-            }
-        }
-        catch (Exception)
-        {
-            // Pas de fenetre lisible : on s'abstient plutot que d'ouvrir au mauvais moment.
-        }
-        return false;
-    }
+    /// <summary>
+    /// EmulationStation a-t-il le premier plan ? On lit le processus de la fenetre devant, sans
+    /// parcourir tous les processus (voir EmulatorForeground.EmulateurTourne).
+    /// </summary>
+    private static bool EsEstDevant() => EmulatorForeground.DevantEst("emulationstation");
 
     [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
 
@@ -1390,10 +1376,38 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             {
                 var jeu = _context.Ui.Selected;
                 if (jeu is null) return;
-                CleDuJeu(jeu.GamePath ?? "", jeu.SystemId ?? "", jeu.GameName ?? "");
+                var cle = CleDuJeu(jeu.GamePath ?? "", jeu.SystemId ?? "", jeu.GameName ?? "");
+                _ = PrechargerAsync(jeu.GamePath ?? "", cle);
             }
             catch (Exception ex) { _logger.LogDebug(ex, "Classement : cle du jeu non preparee."); }
         });
+    }
+
+    private int _prechargement;
+
+    /// <summary>
+    /// LE CLASSEMENT EST LA AVANT L'APPUI LONG. On s'arrete sur un jeu ouvert au scoring : apres
+    /// 400 ms sans changer de jeu, on demande son classement ; le client le garde 30 s, et le
+    /// panneau s'ouvre avec ses lignes au lieu d'attendre le site (120 a 210 ms mesures le
+    /// 2026-09-30, bien plus a l'heure d'un pic). Seulement les jeux de la collection World
+    /// Scoring : ceux-la seuls ont un panneau.
+    /// </summary>
+    private async Task PrechargerAsync(string cheminDuJeu, string cle)
+    {
+        try
+        {
+            if (cle.Length == 0 || !_options.CurrentValue.Leaderboard.Enabled) return;
+            if (_collection?.EstOuvertAuScoring(cheminDuJeu) != true) return;
+            var jeton = Interlocked.Increment(ref _prechargement);
+            await Task.Delay(400).ConfigureAwait(false);
+            if (jeton != Volatile.Read(ref _prechargement)) return;   // le joueur a continue de defiler
+            if (_modele.Etat != LeaderboardPanelModel.Foyer.Ferme) return;
+            await _client.MondeAsync(cle, _agent.Status.Pseudo ?? "", CancellationToken.None).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Classement : prechargement abandonne.");
+        }
     }
 
     private string CalculerLaCle(string cheminDuJeu, string systeme, string nomDuJeu)
