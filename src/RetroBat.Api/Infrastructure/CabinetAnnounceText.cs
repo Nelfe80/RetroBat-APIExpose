@@ -146,7 +146,11 @@ public static class CabinetAnnounceText
             ["scoring_continue_title"] = "Continue : ton score certifié reste {0}",
             ["scoring_continue_sub"] = "la partie continue, mais la suite ne compte plus pour le classement",
             ["scoring_credit_title"] = "Crédit consommé : ton score certifié reste {0}",
-            ["scoring_credit_sub"] = "la suite ne compte plus ; pour une nouvelle partie classée, quitte et relance le jeu",
+            ["scoring_credit_sub"] = "la partie qui vient n'est pas certifiable : quitte et relance le jeu pour une partie certifiée",
+            ["scoring_uncertified_title"] = "Partie non certifiable",
+            ["scoring_uncertified_sub"] = "pour une partie certifiée, quitte et relance le jeu",
+            ["scoring_multiplayer_title"] = "Partie à plusieurs : hors classement solo",
+            ["scoring_multiplayer_sub"] = "l'arrivée d'un joueur ne compte pas comme un continue",
         },
         ["en"] = new()
         {
@@ -208,7 +212,11 @@ public static class CabinetAnnounceText
             ["scoring_continue_title"] = "Continue: your certified score stays at {0}",
             ["scoring_continue_sub"] = "keep playing, but what follows no longer counts for the ranking",
             ["scoring_credit_title"] = "Credit used: your certified score stays at {0}",
-            ["scoring_credit_sub"] = "what follows no longer counts; for a new ranked game, quit and relaunch it",
+            ["scoring_credit_sub"] = "the game ahead is not certifiable: quit and relaunch it for a certified game",
+            ["scoring_uncertified_title"] = "Game not certifiable",
+            ["scoring_uncertified_sub"] = "for a certified game, quit and relaunch it",
+            ["scoring_multiplayer_title"] = "Multiplayer game: outside the solo ranking",
+            ["scoring_multiplayer_sub"] = "a player joining does not count as a continue",
         },
         ["es"] = new()
         {
@@ -270,7 +278,11 @@ public static class CabinetAnnounceText
             ["scoring_continue_title"] = "Continuación: tu puntuación certificada se queda en {0}",
             ["scoring_continue_sub"] = "la partida sigue, pero lo que venga ya no cuenta para la clasificación",
             ["scoring_credit_title"] = "Crédito consumido: tu puntuación certificada se queda en {0}",
-            ["scoring_credit_sub"] = "lo que sigue ya no cuenta; para una nueva partida clasificada, sal y vuelve a lanzar el juego",
+            ["scoring_credit_sub"] = "la partida que viene no es certificable: sal y vuelve a lanzar el juego para una partida certificada",
+            ["scoring_uncertified_title"] = "Partida no certificable",
+            ["scoring_uncertified_sub"] = "para una partida certificada, sal y vuelve a lanzar el juego",
+            ["scoring_multiplayer_title"] = "Partida a varios: fuera de la clasificación individual",
+            ["scoring_multiplayer_sub"] = "la llegada de un jugador no cuenta como continuación",
         },
         ["ja"] = new()
         {
@@ -332,7 +344,11 @@ public static class CabinetAnnounceText
             ["scoring_continue_title"] = "コンティニュー：認定スコアは {0} のまま",
             ["scoring_continue_sub"] = "プレイは続けられますが、この先はランキングに数えられません",
             ["scoring_credit_title"] = "クレジット使用：認定スコアは {0} のまま",
-            ["scoring_credit_sub"] = "この先はランキングに数えられません。ランキング対象の新しいプレイは、ゲームを終了して再起動してください",
+            ["scoring_credit_sub"] = "この先のプレイは認定対象外です。認定プレイにはゲームを終了して再起動してください",
+            ["scoring_uncertified_title"] = "認定対象外のプレイ",
+            ["scoring_uncertified_sub"] = "認定プレイにはゲームを終了して再起動してください",
+            ["scoring_multiplayer_title"] = "複数人プレイ：ソロランキング対象外",
+            ["scoring_multiplayer_sub"] = "プレイヤーの参加はコンティニューとして扱われません",
         },
         ["zh"] = new()
         {
@@ -394,7 +410,11 @@ public static class CabinetAnnounceText
             ["scoring_continue_title"] = "续关：认证分数保持为 {0}",
             ["scoring_continue_sub"] = "游戏继续，但之后的得分不再计入排行榜",
             ["scoring_credit_title"] = "已使用投币：认证分数保持为 {0}",
-            ["scoring_credit_sub"] = "之后的得分不再计入排行榜；如需新的排行游戏，请退出并重新启动游戏",
+            ["scoring_credit_sub"] = "接下来的游戏无法认证：如需认证游戏，请退出并重新启动游戏",
+            ["scoring_uncertified_title"] = "本局无法认证",
+            ["scoring_uncertified_sub"] = "如需认证游戏，请退出并重新启动游戏",
+            ["scoring_multiplayer_title"] = "多人游戏：不计入单人排行",
+            ["scoring_multiplayer_sub"] = "玩家加入不算作续关",
         },
         ["ko"] = new()
         {

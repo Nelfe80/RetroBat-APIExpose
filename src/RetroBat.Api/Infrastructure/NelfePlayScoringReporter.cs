@@ -80,8 +80,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// continues (demande user 2026-09-27).
     /// </summary>
     private bool _finDeRunPubliee;
-    /// <summary>Le jeton du continue candidat en attente : une nouvelle session l'annule.</summary>
-    private int _candidatContinue;
+    /// <summary>Le jeton de la session : un bandeau de credit en attente d'une autre session se tait.</summary>
+    private int _jetonDeSession;
     /// <summary>Le premier credit consomme de la session, le depart, a ete vu.</summary>
     private bool _departAuCredit;
     /// <summary>
@@ -89,6 +89,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// ce qui suit ne concourt, meme quand le jeu remet le score a zero (Double Dragon).
     /// </summary>
     private bool _closeParCredit;
+    /// <summary>L'arrivee d'un joueur 2 a deja ete dite : la partie est hors classement solo.</summary>
+    private bool _partieADeuxAnnoncee;
     private long? _finalTotal;
     private bool _inDemo;   // attract mode : le jeu se joue seul → on ignore le score
     // Phase D (segmentation en RUNS, 100% APIExpose) : la trajectoire des scores suffit —
@@ -497,8 +499,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _chiffreCredits = false;
             _dernierPropre = _derniereLecture = _avantContinue = null;
             _finDeRunPubliee = false;
-            _candidatContinue++;
-            _departAuCredit = _closeParCredit = false;
+            _jetonDeSession++;
+            _departAuCredit = _closeParCredit = _partieADeuxAnnoncee = false;
             _trajectory.Clear();
             _horsJeu.Clear();
             _startVu = false;
@@ -990,8 +992,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>
     /// Le compteur de credits. Le premier credit consomme de la session est le depart ; tout credit
     /// consomme ensuite est un continue, sauf si un joueur 2 arrive au meme moment
-    /// (ContinuesParCredits). Le joueur l'apprend tout de suite, et le replay s'arrete la. La
-    /// decision de la soumission se refait en fin de session, sur tout.
+    /// (ContinuesParCredits). Le joueur l'apprend a chaque fois, et le replay s'arrete au premier.
+    /// La decision de la soumission se refait en fin de session, sur tout.
     /// </summary>
     private void CaptureCredits(JsonElement root)
     {
@@ -1000,41 +1002,101 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (!nom.Equals("CREDITS", StringComparison.OrdinalIgnoreCase)) return;
         if (Entier(signal, "Value") is not { } valeur) return;
         var frame = Entier(signal, "Frame") ?? _lastFrame;
-        int jeton;
+        int session;
         long scoreAvant;
+        bool depart;
         lock (_sync)
         {
             var avant = _credits.Count > 0 ? _credits[^1].Value : (int?)null;
             _credits.Add(new EvenementDeCredit(valeur, frame));
             if (_credits.Count > MaxTrajectory) _credits.RemoveAt(0);
             if (avant is null || valeur >= avant) return;   // premiere lecture, ou pieces ajoutees
-            var depart = !_departAuCredit;
+            depart = !_departAuCredit;
             _departAuCredit = true;
-            if (depart || _finDeRunPubliee) return;           // le depart, ou partie deja close
             scoreAvant = _finalTotal ?? 0;
-            jeton = ++_candidatContinue;
+            session = _jetonDeSession;
         }
 
-        Trace($"credit consomme apres le depart (score {scoreAvant}, frame {frame}) : continue, sauf arrivee d'un joueur 2");
-        _ = ConfirmerContinueParCreditAsync(jeton, scoreAvant, frame);
+        Trace(depart
+            ? $"depart de la partie (credit consomme, frame {frame})"
+            : $"credit consomme apres le depart (score {scoreAvant}, frame {frame}) : continue, sauf arrivee d'un joueur 2");
+        _ = ConfirmerCreditAsync(session, depart, scoreAvant, frame);
     }
 
-    private async Task ConfirmerContinueParCreditAsync(int jeton, long scoreAvant, long frame)
+    /// <summary>
+    /// A CHAQUE START QUI CONSOMME UN CREDIT, LE JOUEUR SAIT SI LA PARTIE QUI VIENT COMPTE (decision
+    /// user du 2026-09-30). Le premier continue dit le score certifie ; chaque credit consomme
+    /// ensuite redit que la partie n'est pas certifiable, et qu'il faut quitter puis relancer le jeu
+    /// pour une partie certifiee. L'ARRIVEE D'UN JOUEUR N'EST PAS UN CONTINUE : c'est le seul debit
+    /// que le 1CC MULTI permettra en plus du depart. Son bandeau dit seulement que la partie sort du
+    /// classement solo, une fois (joueur 2, au depart compris) ; les joueurs suivants, rien. On
+    /// attend 3,5 s pour voir arriver ce joueur (ContinuesParCredits.FenetreArrivee).
+    /// </summary>
+    private async Task ConfirmerCreditAsync(int session, bool depart, long scoreAvant, long frame)
     {
         await Task.Delay(ConfirmationContinue).ConfigureAwait(false);
+        BandeauDeCredit bandeau;
+        var premiereCoupe = false;
         lock (_sync)
         {
-            if (jeton != _candidatContinue) return;   // une autre session a commence
-            if (_departs.Any(d => d.Player >= 2 && Math.Abs(d.Frame - frame) <= ContinuesParCredits.FenetreArrivee))
+            if (session != _jetonDeSession) return;   // une autre session a commence
+            var arrivee = _departs.Any(d => d.Player >= 2 && Math.Abs(d.Frame - frame) <= ContinuesParCredits.FenetreArrivee);
+            if (!arrivee && !depart)
             {
-                return;   // un joueur 2 est arrive : la partie sort du classement, rien a annoncer ici
+                premiereCoupe = !_closeParCredit;
+                _closeParCredit = true;
             }
 
-            _closeParCredit = true;
+            bandeau = QuelBandeau(depart, arrivee, premiereCoupe, _partieADeuxAnnoncee);
+            if (arrivee) _partieADeuxAnnoncee = true;
         }
 
-        AnnoncerContinue(scoreAvant, parCredit: true);
-        PublierFinDeRun("credit consomme");
+        switch (bandeau)
+        {
+            case BandeauDeCredit.ScoreCertifie:
+                AnnoncerContinue(scoreAvant, parCredit: true);
+                break;
+            case BandeauDeCredit.NonCertifiable:
+                AnnoncerCredit("scoring_uncertified", "partie non certifiable");
+                break;
+            case BandeauDeCredit.PartieAPlusieurs:
+                AnnoncerCredit("scoring_multiplayer", "un joueur arrive, partie hors classement solo");
+                break;
+        }
+
+        if (premiereCoupe) PublierFinDeRun("credit consomme");
+    }
+
+    internal enum BandeauDeCredit
+    {
+        /// <summary>Le depart d'une partie solo : elle compte, rien a dire.</summary>
+        Aucun,
+        /// <summary>Le premier continue : le score certifie, et la suite qui ne compte plus.</summary>
+        ScoreCertifie,
+        /// <summary>Tout credit consomme ensuite : la partie qui vient n'est pas certifiable.</summary>
+        NonCertifiable,
+        /// <summary>L'arrivee d'un joueur 2 : hors classement solo, sans etre un continue.</summary>
+        PartieAPlusieurs,
+    }
+
+    /// <summary>Le bandeau d'un credit consomme, selon ce qu'il ouvre.</summary>
+    internal static BandeauDeCredit QuelBandeau(bool depart, bool arrivee, bool premiereCoupe, bool dejaADeux)
+    {
+        if (arrivee) return dejaADeux ? BandeauDeCredit.Aucun : BandeauDeCredit.PartieAPlusieurs;
+        if (depart) return BandeauDeCredit.Aucun;
+        return premiereCoupe && !dejaADeux ? BandeauDeCredit.ScoreCertifie : BandeauDeCredit.NonCertifiable;
+    }
+
+    /// <summary>Un bandeau d'information sans score : la partie continue, rien n'est refuse.</summary>
+    private void AnnoncerCredit(string cle, string trace)
+    {
+        var langue = Langue();
+        _overlay?.ShowTop(
+            "SCORING",
+            CabinetAnnounceText.Get(cle + "_title", langue),
+            CabinetAnnounceText.Get(cle + "_sub", langue),
+            8000);
+        Trace($"bandeau : {trace}");
     }
 
     // Phase D : découpe la trajectoire aux CHUTES de score (le score qui retombe = un
@@ -1399,7 +1461,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     /// <summary>
     /// Le temps de voir arriver un joueur 2 (ContinuesParCredits.FenetreArrivee, 3 s) avant de dire
-    /// le continue. Plus court que les 6 s d'avant : un joueur qui quitte juste apres son continue
+    /// ce que vaut un credit consomme. Plus court que les 6 s d'avant : un joueur qui quitte juste apres son continue
     /// ne voyait pas le bandeau (labo Double Dragon du 2026-09-30, sortie 5,5 s apres).
     /// </summary>
     internal static readonly TimeSpan ConfirmationContinue = TimeSpan.FromSeconds(3.5);

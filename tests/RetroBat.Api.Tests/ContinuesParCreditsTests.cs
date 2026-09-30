@@ -113,4 +113,18 @@ public class ContinuesParCreditsTests
         var lectures = Lectures((0, 0), (0, 1500), (0, 3000));
         Assert.Equal(3, ContinuesParCredits.AvantLePremierContinue(lectures, [0]).Count);
     }
+
+    [Theory]
+    [InlineData(true, false, false, false, "Aucun")]           // depart solo : la partie compte
+    [InlineData(false, false, true, false, "ScoreCertifie")]   // premier continue : le score certifie
+    [InlineData(false, false, false, false, "NonCertifiable")] // chaque credit suivant, a chaque START
+    [InlineData(true, true, false, false, "PartieAPlusieurs")] // depart a deux
+    [InlineData(false, true, false, false, "PartieAPlusieurs")] // joueur 2 en cours de partie : pas un continue
+    [InlineData(false, true, false, true, "Aucun")]            // joueur 3 : le 1CC MULTI le permettra aussi
+    [InlineData(false, false, true, true, "NonCertifiable")]   // continue d'une partie a deux : pas de score certifie
+    public void Chaque_start_qui_consomme_un_credit_dit_ce_que_vaut_la_partie(
+        bool depart, bool arrivee, bool premiereCoupe, bool dejaADeux, string attendu)
+    {
+        Assert.Equal(attendu, NelfePlayScoringReporter.QuelBandeau(depart, arrivee, premiereCoupe, dejaADeux).ToString());
+    }
 }
