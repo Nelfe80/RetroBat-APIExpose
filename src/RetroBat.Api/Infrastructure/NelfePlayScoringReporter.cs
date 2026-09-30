@@ -700,6 +700,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     ["forced_options"] = GetString(attestation, "ForcedOptions") ?? "",
                 },
                 ["listener"] = new JsonObject { ["loaded_sha256"] = GetString(attestation, "ListenerSha256") },
+                // Un profil peut exiger une version minimale d'APIExpose : le verdict d'avant partie
+                // la compare a celle-ci (sinon a celle du dernier releve de la borne).
+                ["software"] = new JsonObject { ["apiexpose"] = CabinetState.Version },
             };
 
             using var client = CreateClient(credential);
@@ -2736,6 +2739,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "profile.listener_unauthorized" => "listener non homologué (wrapper ou plugin MAME)",
         "profile.not_open" => "classement fermé",
         "game.mode_unmeasured" => "mode de jeu non mesuré : mets APIExpose à jour",
+        "profile.api_outdated" => "version d'APIExpose trop ancienne pour ce classement : mets APIExpose à jour",
         "game.mode_mismatch" => "mode de jeu différent de ce classement",
         "game.difficulty_unmeasured" => "difficulté non mesurée",
         "game.difficulty_not_allowed" => "difficulté non autorisée pour ce classement",

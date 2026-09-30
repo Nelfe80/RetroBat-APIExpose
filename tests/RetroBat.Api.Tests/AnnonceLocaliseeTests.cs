@@ -32,6 +32,15 @@ public class AnnonceLocaliseeTests
     }
 
     [Fact]
+    public void Une_borne_trop_ancienne_pour_le_profil_est_invitee_a_se_mettre_a_jour()
+    {
+        Assert.Equal(("Partie non certifiable", "version d'APIExpose trop ancienne pour ce classement : mets APIExpose à jour"),
+            NelfePlayScoringReporter.AnnonceLocalisee("fr", false, "profile.api_outdated", [], force: false));
+        Assert.Equal("APIExpose version too old for this ranking: update APIExpose",
+            NelfePlayScoringReporter.AnnonceLocalisee("en", false, "profile.api_outdated", [], force: false).Detail);
+    }
+
+    [Fact]
     public void Un_motif_sans_traduction_garde_le_texte_francais_plutot_que_rien()
     {
         var (_, detail) = NelfePlayScoringReporter.AnnonceLocalisee("es", false, "timing.incoherent", [], force: false);
