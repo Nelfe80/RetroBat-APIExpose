@@ -84,6 +84,34 @@ public sealed class NetplayHostService
     /// difference, pas notre interface. Ne pas le publier suffit donc a rendre la partie
     /// regardable sans etre jouable.
     /// </summary>
+    /// <summary>
+    /// Le dernier hebergement ouvert aux JOUEURS (pas seulement aux spectateurs). Une partie ouverte
+    /// a un second joueur n'entre pas au classement solo (charte de la partie certifiee) : le
+    /// reporter le demande a la fin de la session.
+    /// </summary>
+    private static DateTime? _ouverteAuxJoueurs;
+
+    /// <summary>
+    /// Vrai si un hebergement ouvert aux joueurs a ete lance pour cette session : dans les cinq
+    /// minutes qui precedent son debut, ou pendant qu'elle se jouait.
+    /// </summary>
+    public static bool OuverteAuxJoueursPendant(string? sessionJson)
+    {
+        if (_ouverteAuxJoueurs is not { } ouverte) return false;
+        long duree = 0;
+        try
+        {
+            duree = (long?)(System.Text.Json.Nodes.JsonNode.Parse(sessionJson ?? "{}")?["monotonic_ms"]) ?? 0;
+        }
+        catch
+        {
+            // Une session illisible ne dit rien de sa duree : on prend l'heure de fin seule.
+        }
+        var fin = DateTime.UtcNow;
+        var debut = fin - TimeSpan.FromMilliseconds(duree);
+        return ouverte >= debut - TimeSpan.FromMinutes(5) && ouverte <= fin;
+    }
+
     public async Task<Echec> HebergerAsync(
         string cheminRom,
         string pseudoJoueur,
@@ -121,6 +149,11 @@ public sealed class NetplayHostService
         if (!lancement.Ok)
         {
             return Echec.LancementRefuse;
+        }
+
+        if (autoriserAJouer)
+        {
+            _ouverteAuxJoueurs = DateTime.UtcNow;
         }
 
         // L'emulateur devant, sans attendre : la reponse HTTP n'a pas a patienter le temps

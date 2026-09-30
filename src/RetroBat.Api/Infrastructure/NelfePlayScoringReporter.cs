@@ -25,7 +25,11 @@ namespace RetroBat.Api.Infrastructure;
 public sealed class NelfePlayScoringReporter : BackgroundService
 {
     public const string ScoringKeyName = "Nelfe.Scoring.Device";
-    private const int MaxTrajectory = 512;
+    // AUCUNE LECTURE NE SE PERD (charte, principe 4). A 512, les plus anciennes lectures d'une longue
+    // session etaient effacees : 711 lectures sur 19xx, 1 280 sur Metal Slug 3 chez un joueur
+    // (2026-09-29), et une premiere partie meilleure pouvait disparaitre au profit d'une plus faible.
+    // Cent mille lectures tiennent en deux megaoctets et couvrent des heures de jeu.
+    private const int MaxTrajectory = 100_000;
 
     private readonly IEventBus _eventBus;
     private readonly IHttpClientFactory _httpFactory;
@@ -76,8 +80,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// continues (demande user 2026-09-27).
     /// </summary>
     private bool _finDeRunPubliee;
-    /// <summary>Les continues deja vus sur les vies (FinsSurLesVies), et le jeton du candidat en attente.</summary>
-    private int _finsVues;
+    /// <summary>Le jeton du continue candidat en attente : une chute du score l'annule.</summary>
     private int _candidatContinue;
     private long? _finalTotal;
     private bool _inDemo;   // attract mode : le jeu se joue seul → on ignore le score
@@ -111,6 +114,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private RetroBat.Api.Scoring.ContexteDeJeu _contexte = RetroBat.Api.Scoring.ContexteDeJeu.Vide;
     private readonly List<RetroBat.Api.Scoring.ContexteDeJeu> _contextes = new();
+
+    /// <summary>
+    /// Le compteur de credits (action CREDITS du .MEM) et les START de chaque joueur : c'est avec
+    /// eux que se reconnait un continue (ContinuesParCredits), plus avec les vies.
+    /// </summary>
+    private readonly List<EvenementDeCredit> _credits = new();
+    private readonly List<DepartDeJoueur> _departs = new();
 
     // ── Lien replay ↔ score (funnel « ▷ REPLAY » de /rankings) ───────────────
     // Le reporter connaît le session_id (il le génère) et le verdict ; le recorder
@@ -431,6 +441,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     CaptureTrameMemoire(charge);
                     CaptureVie(charge);
                     CaptureModeEtDifficulte(charge);
+                    CaptureCredits(charge);
                     // Les ETATS du pont Lua de MAME arrivent ici, et seulement ici : le wrapper les
                     // projette en plus sur retroarch.state, le pont Lua non. Sans cette ligne, un
                     // DEMO_MODE sous MAME n'atteignait jamais la detection de la demo, et le score
@@ -479,7 +490,6 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _chiffreCredits = false;
             _dernierPropre = _derniereLecture = _avantContinue = null;
             _finDeRunPubliee = false;
-            _finsVues = 0;
             _candidatContinue++;
             _trajectory.Clear();
             _horsJeu.Clear();
@@ -488,6 +498,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _vies.Clear();
             _contexte = RetroBat.Api.Scoring.ContexteDeJeu.Vide;
             _contextes.Clear();
+            _credits.Clear();
+            _departs.Clear();
         }
     }
 
@@ -957,7 +969,61 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private void CaptureStart(JsonElement root)
     {
         var systeme = GetString(root, "System") ?? GetString(root, "system") ?? "";
-        if (string.Equals(systeme, "START", StringComparison.OrdinalIgnoreCase)) SortirDeDemo();
+        if (!string.Equals(systeme, "START", StringComparison.OrdinalIgnoreCase)) return;
+        var joueur = Entier(root, "Player") ?? Entier(root, "player") ?? 1;
+        lock (_sync)
+        {
+            _departs.Add(new DepartDeJoueur(joueur, _lastFrame));
+            if (_departs.Count > MaxTrajectory) _departs.RemoveAt(0);
+        }
+        SortirDeDemo();
+    }
+
+    /// <summary>
+    /// Le compteur de credits. Un credit consomme en pleine partie, score non nul, est un continue
+    /// si le score ne retombe pas dans les secondes qui suivent (une nouvelle partie le remet a
+    /// zero) et si aucun joueur 2 n'arrive au meme moment. Le joueur l'apprend tout de suite, et le
+    /// replay s'arrete la. La decision de la soumission se refait en fin de session, sur tout.
+    /// </summary>
+    private void CaptureCredits(JsonElement root)
+    {
+        if (!root.TryGetProperty("signal", out var signal) && !root.TryGetProperty("Signal", out signal)) return;
+        var nom = (GetString(signal, "Name") ?? "").Trim();
+        if (!nom.Equals("CREDITS", StringComparison.OrdinalIgnoreCase)) return;
+        if (Entier(signal, "Value") is not { } valeur) return;
+        var frame = Entier(signal, "Frame") ?? _lastFrame;
+        int jeton;
+        long scoreAvant;
+        lock (_sync)
+        {
+            var avant = _credits.Count > 0 ? _credits[^1].Value : (int?)null;
+            _credits.Add(new EvenementDeCredit(valeur, frame));
+            if (_credits.Count > MaxTrajectory) _credits.RemoveAt(0);
+            if (avant is null || valeur >= avant) return;   // premiere lecture, ou pieces ajoutees
+            if (_inDemo || _finDeRunPubliee) return;
+            scoreAvant = _finalTotal ?? 0;
+            if (!ContinueAProteger(scoreAvant)) return;       // depart d'une partie, ou rien a proteger
+            jeton = ++_candidatContinue;
+        }
+
+        Trace($"credit consomme en partie (score {scoreAvant}, frame {frame}) : continue si le score ne retombe pas");
+        _ = ConfirmerContinueParCreditAsync(jeton, scoreAvant, frame);
+    }
+
+    private async Task ConfirmerContinueParCreditAsync(int jeton, long scoreAvant, long frame)
+    {
+        await Task.Delay(ConfirmationContinue).ConfigureAwait(false);
+        lock (_sync)
+        {
+            if (jeton != _candidatContinue) return;   // le score est retombe : une nouvelle partie
+            if (_departs.Any(d => d.Player >= 2 && Math.Abs(d.Frame - frame) <= ContinuesParCredits.FenetreArrivee))
+            {
+                return;   // un joueur 2 est arrive : la partie sort du classement, rien a annoncer ici
+            }
+        }
+
+        AnnoncerContinue(scoreAvant);
+        PublierFinDeRun("credit consomme");
     }
 
     // Phase D : découpe la trajectoire aux CHUTES de score (le score qui retombe = un
@@ -997,9 +1063,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // tests passaient parce qu'on leur donnait des trames qui coincidaient. La mort tombe
         // ENTRE deux lectures : on coupe avant la premiere lecture posterieure a la mort.
         //
-        // Sur le pont Lua de MAME aucune trame ne circule, tout vaut 0 : aucune mort ne tombe
-        // « entre » deux lectures de meme trame, donc rien n'est coupe et le decoupage ordinaire
-        // s'applique, comme avant.
+        // Le pont Lua de MAME porte la frame de chaque lecture depuis mame-lua-0.3.2 : la coupe y
+        // tombe comme sous RetroArch. Des lectures toutes a la frame 0 (pont plus ancien) ne
+        // laissent rien tomber « entre » deux lectures : rien n'est coupe.
         var fins = finsDeRun is { Count: > 0 } ? finsDeRun.OrderBy(f => f).ToArray() : null;
         long? framePrecedente = null;
         // UN SEGMENT QUI SUIT UN CONTINUE NE CONCOURT PAS, et c'est tout l'enjeu.
@@ -1140,7 +1206,6 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             return;
         }
 
-        int jeton;
         lock (_sync)
         {
             if (_inDemo) return;   // une demo n'est pas une partie
@@ -1151,15 +1216,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 Entier(signal, "Frame") ?? _lastFrame,
                 Entier(signal, "Player") ?? Entier(root, "player") ?? 1));
             if (_vies.Count > MaxTrajectory) _vies.RemoveAt(0);
-            var fins = FinsSurLesVies(_vies);
-            if (fins <= _finsVues) return;
-            _finsVues = fins;
-            if (_finDeRunPubliee) return;
-            if (!ContinueAProteger(_finalTotal)) return;
-            jeton = ++_candidatContinue;
+            // LES VIES NE COUPENT PLUS UN 1CC (charte, decision du 2026-09-30) : une vie bonus
+            // passait pour un continue (Double Dragon coupe a 29 960 pour 41 520 au premier credit).
+            // Elles restent relevees, pour le 1LC et pour le diagnostic.
+            return;
         }
-
-        _ = ConfirmerContinueAsync(jeton);
     }
 
     /// <summary>
@@ -1337,21 +1398,6 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>Le delai qui separe un continue (le score reste) d'une nouvelle partie (il retombe).</summary>
     internal static readonly TimeSpan ConfirmationContinue = TimeSpan.FromSeconds(6);
 
-    /// <summary>
-    /// Les vies sont remontees apres zero : continue, ou nouvelle partie apres un game over ? Les
-    /// vies ne le disent pas (FinsDeRun ne cherche pas a le savoir), le score si : il retombe a une
-    /// nouvelle partie. On attend donc un peu ; si rien n'est retombe, c'etait un continue.
-    /// </summary>
-    private async Task ConfirmerContinueAsync(int jeton)
-    {
-        await Task.Delay(ConfirmationContinue).ConfigureAwait(false);
-        lock (_sync)
-        {
-            if (jeton != _candidatContinue) return;   // le score est retombe, ou la partie a change
-        }
-
-        PublierFinDeRun("vies remontees apres zero");
-    }
 
     /// <summary>
     /// Le continue d'un jeu a chiffre des credits : une lecture qui MONTE sans finir par 0, apres
@@ -1512,9 +1558,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         List<RetroBat.Api.Scoring.ContexteDeJeu> contextes;
         RetroBat.Api.Scoring.ContexteDeJeu contexteCourant;
         List<EvenementDeVie> vies;
+        List<EvenementDeCredit> credits;
+        List<DepartDeJoueur> departs;
         bool chiffreCredits;
         lock (_sync)
         {
+            credits = new List<EvenementDeCredit>(_credits);
+            departs = new List<DepartDeJoueur>(_departs);
             // Le mode retenu : seulement les lectures prises dans ce mode, avec leur fenetre de jeu
             // et leur contexte. Sans filtre, toutes.
             var retenues = Enumerable.Range(0, _trajectory.Count)
@@ -1592,10 +1642,22 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
         }
 
-        var finsDeRun = FinsDeRun.Calculer(vies);
+        // LE CREDIT FAIT FOI (charte de la partie certifiee) : on ne coupe plus sur les vies.
+        var bilanCredits = ContinuesParCredits.Calculer(credits, lecturesBrutes, departs);
+        var finsDeRun = bilanCredits.Coupes;
         if (finsDeRun.Count > 0)
         {
-            Trace($"fins de run (continue : vies remontees) : {string.Join(", ", finsDeRun)}");
+            Trace($"continues (credit consomme, score garde) : {string.Join(", ", finsDeRun)}");
+        }
+        var anciennesFins = FinsDeRun.Calculer(vies);
+        if (anciennesFins.Count > 0)
+        {
+            Trace($"information : l'ancienne regle des vies aurait coupe a {string.Join(", ", anciennesFins)} (plus appliquee)");
+        }
+        var partieADeux = bilanCredits.PlusieursJoueurs || RetroBat.Api.Netplay.NetplayHostService.OuverteAuxJoueursPendant(sessionJson);
+        if (partieADeux)
+        {
+            Trace("partie a plusieurs (joueur 2 arrive, ou netplay ouvert aux joueurs) : hors classement solo");
         }
 
         var bestRun = SelectBestRun(trajectory, finsDeRun);
@@ -1721,7 +1783,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 systemId, romGroup, sessionJson, ticket.Value, profile.Value,
                 deviceId!, deviceKey, listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion,
                 coreName, coreVersion,
-                runPeak, bestRun, trajectory, nvram, bios, contexteRun);
+                runPeak, bestRun, trajectory, nvram, bios, contexteRun, partieADeux ? 2 : 1);
             var body = passport.DeepClone()!.AsObject();
             body.Remove("signature");
             passport["signature"] = deviceKey.SignB64Url(Jcs.CanonicalBytes(body));
@@ -1754,7 +1816,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         string? contentSha, string? contentMd5, string? contentSha1, string? wrapperVersion,
         string? coreName, string? coreVersion, long finalTotal, List<(long frame, long total)> trajectory,
         List<(long frame, long total)>? toutesLesLectures = null, JsonArray? nvram = null, JsonObject? bios = null,
-        RetroBat.Api.Scoring.ContexteDeJeu? contexte = null)
+        RetroBat.Api.Scoring.ContexteDeJeu? contexte = null, int joueurs = 1)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
@@ -1880,6 +1942,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         };
         var ctx = contexte ?? RetroBat.Api.Scoring.ContexteDeJeu.Vide;
         if (RetroBat.Api.Scoring.ModesDeJeu.ModePourLePasseport(profile, ctx) is { } modeJoue) jeu["mode"] = modeJoue;
+        // Une partie a plusieurs n'entre pas au classement solo (charte, decision du 2026-09-30).
+        if (joueurs > 1) jeu["players"] = joueurs;
         if (RetroBat.Api.Scoring.ModesDeJeu.DifficultePourLePasseport(profile, ctx) is { } difficulte) jeu["difficulty"] = difficulte;
 
         var document = new JsonObject
@@ -2289,6 +2353,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "game.mode_mismatch" => "mode de jeu différent de ce classement",
         "game.difficulty_unmeasured" => "difficulté non mesurée",
         "game.difficulty_not_allowed" => "difficulté non autorisée pour ce classement",
+        "game.multiplayer" => "partie à plusieurs : pas de classement solo",
         "profile.mismatch" => "jeu ou règlement non concordant",
         "session.no_game_end" => "partie non terminée",
         "session.ticket_expired" => "session expirée",
