@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
+using System.Security.Cryptography;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
 using RetroBat.Domain.Paths;
@@ -23,6 +25,11 @@ namespace RetroBat.Api.Infrastructure;
 ///
 /// Le lancement est DETACHE : l'updater doit survivre a l'arret de l'API, puisque c'est lui qui
 /// l'arrete.
+///
+/// LES OUTILS HORS ARCHIVE (2026-10-01) : l'outil de diagnostic ne voyage plus dans l'update.7z,
+/// dont il faisait presque tout le poids. Chaque release porte `outils.json` et ce service ne
+/// telecharge que l'outil qui differe du sien, sans arreter l'API (voir
+/// <see cref="MettreLesOutilsAJourAsync"/>).
 /// </summary>
 [SupportedOSPlatform("windows")]
 public sealed class SelfUpdateService
@@ -32,6 +39,15 @@ public sealed class SelfUpdateService
     private readonly Replay.Playback.ReplayPlaybackService _playback;
     private readonly ILogger<SelfUpdateService> _logger;
     private int _enCours;
+
+    /// <summary>
+    /// Les SEULS fichiers qu'un outils.json peut faire ecrire : il dit ou prendre un outil, il ne
+    /// choisit pas ce qu'il remplace. L'API et l'updater passent par l'update.7z.
+    /// </summary>
+    internal static readonly string[] OutilsHorsArchive = ["RetroBat.Api.Diagnostic.exe"];
+
+    /// <summary>Plafond d'un outil : l'outil de diagnostic pese ~66 Mo.</summary>
+    private const long TailleMaxOutil = 512L * 1024 * 1024;
 
     public SelfUpdateService(
         IOptionsMonitor<ApiExposeOptions> options,
@@ -104,6 +120,7 @@ public sealed class SelfUpdateService
             using var doc = JsonDocument.Parse(corps);
             var tag = doc.RootElement.TryGetProperty("tag_name", out var t) ? t.GetString() ?? "" : "";
             etat.Latest = LireVersion(tag)?.ToString();
+            etat.ToolsManifestUrl = AdresseDesOutils(doc.RootElement);
         }
         catch (Exception ex)
         {
@@ -165,7 +182,190 @@ public sealed class SelfUpdateService
         }
         return etat;
     }
+
+    // ── Les outils hors archive ──────────────────────────────────────────────
+
+    /// <summary>L'adresse de l'actif outils.json d'une release lue sur l'API GitHub, ou null.</summary>
+    internal static string? AdresseDesOutils(JsonElement release)
+    {
+        if (!release.TryGetProperty("assets", out var actifs) || actifs.ValueKind != JsonValueKind.Array) return null;
+        foreach (var actif in actifs.EnumerateArray())
+        {
+            if (actif.TryGetProperty("name", out var nom) && nom.GetString() == "outils.json"
+                && actif.TryGetProperty("browser_download_url", out var url))
+            {
+                return url.GetString();
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Ce qu'on retient d'un outils.json : les outils nommes par <see cref="OutilsHorsArchive"/>,
+    /// avec une empreinte SHA-256 et une adresse dans les releases du depot. Le reste est ignore.
+    /// </summary>
+    internal static List<OutilPublie> LireOutils(string json, string depot)
+    {
+        var retenus = new List<OutilPublie>();
+        using var doc = JsonDocument.Parse(json);
+        if (!doc.RootElement.TryGetProperty("outils", out var liste) || liste.ValueKind != JsonValueKind.Array) return retenus;
+        var prefixe = $"https://github.com/{depot}/releases/download/";
+        foreach (var o in liste.EnumerateArray())
+        {
+            if (o.ValueKind != JsonValueKind.Object) continue;
+            string Texte(string cle) => o.TryGetProperty(cle, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : "";
+            var fichier = OutilsHorsArchive.FirstOrDefault(connu => string.Equals(connu, Texte("fichier"), StringComparison.OrdinalIgnoreCase));
+            var sha = Texte("sha256").ToLowerInvariant();
+            var url = Texte("url");
+            var taille = o.TryGetProperty("taille", out var t) && t.ValueKind == JsonValueKind.Number && t.TryGetInt64(out var n) ? n : 0;
+            if (fichier is null
+                || !Regex.IsMatch(sha, "^[0-9a-f]{64}$")
+                || !url.StartsWith(prefixe, StringComparison.OrdinalIgnoreCase)
+                || taille <= 0 || taille > TailleMaxOutil)
+            {
+                continue;
+            }
+            retenus.Add(new OutilPublie(fichier, Texte("version"), sha, taille, url));
+        }
+        return retenus;
+    }
+
+    /// <summary>
+    /// Met a jour les outils qui voyagent hors de l'update.7z (l'outil de diagnostic) : lit
+    /// outils.json, et ne telecharge que l'outil que la borne n'a pas, ou dans une version plus
+    /// ancienne (<see cref="AMettreAJour"/>). L'API ne s'arrete pas : ces outils ne sont pas
+    /// charges par elle. Jamais pendant une partie ni un replay ; un outil OUVERT est renomme en
+    /// .old et le suivant sera le nouveau. Une erreur n'empeche rien : on repasse au prochain tour.
+    /// </summary>
+    public async Task MettreLesOutilsAJourAsync(string urlOutils, CancellationToken ct)
+    {
+        var depot = _options.CurrentValue.SelfUpdate.Repository;
+        using var client = _httpFactory.CreateClient();
+        client.Timeout = TimeSpan.FromMinutes(10);
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("APIExpose-SelfUpdate");
+        List<OutilPublie> outils;
+        try
+        {
+            outils = LireOutils(await client.GetStringAsync(urlOutils, ct).ConfigureAwait(false), depot);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogDebug(ex, "Outils : outils.json illisible.");
+            return;
+        }
+
+        foreach (var outil in outils)
+        {
+            var cible = Path.Combine(RetroBatPaths.PluginRoot, outil.Fichier);
+            try { File.Delete(cible + ".old"); } catch { }
+            if (!AMettreAJour(VersionLocale(cible), outil.Version)) continue;
+            var occupe = Occupe();
+            if (occupe.Length > 0)
+            {
+                _logger.LogInformation("Outil {Outil} {Version} remis a plus tard : {Raison}.", outil.Fichier, outil.Version, occupe);
+                return;
+            }
+
+            var partiel = Path.Combine(RetroBatPaths.PluginRoot, ".temp", "outils", outil.Fichier + ".part");
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(partiel)!);
+                await TelechargerAsync(client, outil, partiel, ct).ConfigureAwait(false);
+                Poser(partiel, cible);
+                _logger.LogInformation("Outil {Outil} mis a jour : {Version}.", outil.Fichier, outil.Version);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Outil {Outil} {Version} pas mis a jour : {Erreur}", outil.Fichier, outil.Version, ex.Message);
+            }
+            finally
+            {
+                try { File.Delete(partiel); } catch { }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Faut-il prendre l'outil publie ? Oui s'il manque ici (<paramref name="versionLocale"/> nulle),
+    /// s'il est illisible, ou si le sien est plus ancien. JAMAIS pour redescendre : la borne de
+    /// developpement garde l'outil qu'elle vient de construire, et release.ps1 refuse de publier un
+    /// outil change sans version plus haute.
+    /// </summary>
+    internal static bool AMettreAJour(string? versionLocale, string versionPubliee)
+    {
+        var publiee = LireVersion(versionPubliee);
+        if (publiee is null) return false;
+        var locale = versionLocale is null ? null : LireVersion(versionLocale);
+        return locale is null || locale < publiee;
+    }
+
+    /// <summary>La version de l'outil de la borne : null s'il n'y est pas, vide s'il est illisible.</summary>
+    private static string? VersionLocale(string chemin)
+    {
+        if (!File.Exists(chemin)) return null;
+        try
+        {
+            var info = FileVersionInfo.GetVersionInfo(chemin);
+            return info.ProductVersion ?? info.FileVersion ?? "";
+        }
+        catch
+        {
+            return "";
+        }
+    }
+
+    /// <summary>Telecharge l'outil et VERIFIE sa taille et son empreinte : rien n'est pose sans.</summary>
+    private static async Task TelechargerAsync(HttpClient client, OutilPublie outil, string partiel, CancellationToken ct)
+    {
+        using var reponse = await client.GetAsync(outil.Url, HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
+        reponse.EnsureSuccessStatusCode();
+        using var sha = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        long recu = 0;
+        await using (var source = await reponse.Content.ReadAsStreamAsync(ct).ConfigureAwait(false))
+        await using (var fichier = File.Create(partiel))
+        {
+            var tampon = new byte[81920];
+            int lu;
+            while ((lu = await source.ReadAsync(tampon, ct).ConfigureAwait(false)) > 0)
+            {
+                recu += lu;
+                if (recu > outil.Taille) throw new InvalidDataException($"plus gros que les {outil.Taille} octets annonces");
+                sha.AppendData(tampon, 0, lu);
+                await fichier.WriteAsync(tampon.AsMemory(0, lu), ct).ConfigureAwait(false);
+            }
+        }
+        if (recu != outil.Taille) throw new InvalidDataException($"{recu} octets recus au lieu de {outil.Taille}");
+        var empreinte = Convert.ToHexString(sha.GetHashAndReset()).ToLowerInvariant();
+        if (empreinte != outil.Sha256) throw new InvalidDataException($"empreinte {empreinte[..12]} au lieu de {outil.Sha256[..12]}");
+    }
+
+    /// <summary>
+    /// Met le nouvel outil a sa place. Un exe OUVERT ne s'ecrase pas mais se renomme : l'ancien
+    /// part en .old (efface au tour suivant), l'instance ouverte continue, la suivante sera la neuve.
+    /// </summary>
+    internal static void Poser(string nouveau, string cible)
+    {
+        try
+        {
+            File.Move(nouveau, cible, overwrite: true);
+            return;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+        var vieux = cible + ".old";
+        if (File.Exists(vieux)) File.Delete(vieux);
+        File.Move(cible, vieux);
+        File.Move(nouveau, cible);
+    }
 }
+
+/// <summary>Un outil hors archive, tel que la release le publie dans outils.json.</summary>
+public sealed record OutilPublie(string Fichier, string Version, string Sha256, long Taille, string Url);
 
 /// <summary>L'etat d'une verification de mise a jour.</summary>
 public sealed class SelfUpdateStatus
@@ -178,4 +378,7 @@ public sealed class SelfUpdateStatus
     public string Busy { get; set; } = "";
     public bool Started { get; set; }
     public string? Error { get; set; }
+    /// <summary>L'actif outils.json de la derniere release, s'il y en a un (usage interne).</summary>
+    [JsonIgnore]
+    public string? ToolsManifestUrl { get; set; }
 }

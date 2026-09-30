@@ -132,11 +132,17 @@ if ($Rapide) {
     & $sz a -t7z $full "$name\" @ex -mx=5 -bsp1 -bso0
 }
 Write-Host 'Construction update.7z...'
-# L'outil de diagnostic (autonome, ~63 Mo) part AUSSI avec la mise a jour (decision user
-# 2026-09-25) : ses onglets Parties et Scoring et son envoi au support servent a tous les joueurs,
-# et un joueur a jour par le self-updater ne l'aurait jamais recu. Les ressources (.MEM, gamelists,
-# plugin Lua) n'y sont pas : elles arrivent par le Data Pack.
-& $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" -mx=5 -bsp0 -bso0
+# LES OUTILS HORS ARCHIVE. L'outil de diagnostic (autonome, ~66 Mo) est parti avec chaque mise a
+# jour de la 1.9.2 a la 1.9.15 (decision user 2026-09-25 : un joueur a jour par le self-updater ne
+# l'aurait jamais recu). Il en faisait 62 Mo sur 62, et chaque borne le retelechargeait a chaque
+# version, change ou pas. Depuis le 2026-10-01 (decision user) il voyage A PART : joint a la
+# release seulement quand il a change, et outils.json (plus bas) dit a l'API de la borne ou le
+# prendre ; elle ne telecharge que ce qui differe du sien (SelfUpdateService). Il reste dans le
+# full.7z et l'installeur. Les ressources (.MEM, gamelists, plugin Lua) n'y sont pas non plus :
+# elles arrivent par le Data Pack.
+$outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe')
+$exclusOutils = @($outilsHorsArchive | ForEach-Object { "-x!$name\$_" })
+& $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" @exclusOutils -mx=5 -bsp0 -bso0
 
 # La configuration du depot, sous le nom que le programme lit. L'updater ne l'ecrase jamais sur
 # une borne qui a deja la sienne ; elle ne sert qu'a une premiere installation.
@@ -245,7 +251,9 @@ foreach ($ligne in (& $sz l -slt $controlee)) {
 if ($exesLivres.Count -eq 0) { throw "Controle du manifeste impossible : aucun executable lu dans l'archive." }
 $nonDeclares = @($exesLivres | Where-Object { $declares -notcontains $_ })
 if ($nonDeclares) { throw "Executable(s) livre(s) mais absent(s) de executables.manifest.json : $($nonDeclares -join ', ')" }
-$absents = @($declares | Where-Object { $exesLivres -notcontains $_ })
+# En mode rapide on controle l'update.7z : les outils hors archive y manquent par construction.
+$horsArchive = if ($Rapide) { $outilsHorsArchive } else { @() }
+$absents = @($declares | Where-Object { $exesLivres -notcontains $_ -and $horsArchive -notcontains $_ })
 if ($absents) { throw "Executable(s) declare(s) mais absent(s) de l'archive : $($absents -join ', ')" }
 Write-Host "Controle du manifeste des executables : OK ($($exesLivres -join ', '))"
 
@@ -293,14 +301,70 @@ if (Test-Path $asyncapiSource) {
     }
 }
 
-$hashes = Get-FileHash "$out\*.7z" -Algorithm SHA256 | ForEach-Object { '{0}  {1}' -f $_.Hash, (Split-Path $_.Path -Leaf) }
+# outils.json : pour chaque outil hors archive, sa version, son empreinte et l'adresse ou le
+# prendre. L'exe n'est joint a CETTE release que s'il a change : sinon l'adresse est celle de la
+# release qui le porte deja (GitHub publie l'empreinte de chaque actif, champ `digest`). Une borne
+# qui saute des versions le trouve donc toujours, puisqu'elle ne lit que la derniere release.
+$releasesPubliees = @((& gh api 'repos/Nelfe80/RetroBat-APIExpose/releases?per_page=50') | Out-String | ConvertFrom-Json |
+    ForEach-Object { $_ } | Where-Object { -not $_.draft })
+if ($releasesPubliees.Count -eq 0) { throw "Releases illisibles (gh api) : outils.json ne peut pas etre construit." }
+# Ce que la derniere release publiait : un outil CHANGE doit y monter de version, sinon les bornes
+# qui ont deja ce numero ne le prendraient pas (l'API ne redescend jamais et ne compare que les
+# versions, pour qu'une borne de developpement garde l'outil qu'elle vient de construire).
+$outilsPrecedents = @()
+$actifPrecedent = @($releasesPubliees[0].assets | Where-Object { $_.name -eq 'outils.json' }) | Select-Object -First 1
+if ($actifPrecedent) {
+    $outilsPrecedents = @((Invoke-RestMethod -UseBasicParsing $actifPrecedent.browser_download_url -TimeoutSec 60).outils)
+}
+$outils = New-Object System.Collections.ArrayList
+$outilsJoints = @()
+foreach ($nomOutil in $outilsHorsArchive) {
+    $cheminOutil = Join-Path $PSScriptRoot $nomOutil
+    if (-not (Test-Path -LiteralPath $cheminOutil)) {
+        throw "$nomOutil absent de la racine : il ne serait ni dans l'archive ni dans outils.json."
+    }
+    $fichierOutil = Get-Item -LiteralPath $cheminOutil
+    $shaOutil = (Get-FileHash -LiteralPath $cheminOutil -Algorithm SHA256).Hash.ToLowerInvariant()
+    $deja = $releasesPubliees | ForEach-Object { $_.assets } |
+        Where-Object { $_.name -eq $nomOutil -and $_.digest -eq "sha256:$shaOutil" } | Select-Object -First 1
+    if ($deja) {
+        $urlOutil = $deja.browser_download_url
+        Write-Host "Outil $nomOutil inchange : deja publie ($urlOutil)."
+    } else {
+        $versionOutil = [version](("$($fichierOutil.VersionInfo.ProductVersion)" -split '\+')[0])
+        $precedent = $outilsPrecedents | Where-Object { $_.fichier -eq $nomOutil } | Select-Object -First 1
+        if ($precedent -and $versionOutil -le [version](($precedent.version -split '\+')[0])) {
+            throw "$nomOutil a change mais reste en $versionOutil (publie : $($precedent.version)) : monter sa version, sinon les bornes ne le prendront pas."
+        }
+        $urlOutil = "https://github.com/Nelfe80/RetroBat-APIExpose/releases/download/v$ver/$nomOutil"
+        $outilsJoints += $cheminOutil
+        Write-Host ("Outil $nomOutil nouveau : joint a cette release ({0:N0} Mo)." -f ($fichierOutil.Length / 1MB))
+    }
+    [void]$outils.Add([pscustomobject]@{
+        fichier = $nomOutil
+        version = "$($fichierOutil.VersionInfo.ProductVersion)".Trim()
+        sha256  = $shaOutil
+        taille  = $fichierOutil.Length
+        url     = $urlOutil
+    })
+}
+$outilsFile = Join-Path $out 'outils.json'
+[IO.File]::WriteAllText($outilsFile, ([pscustomobject]@{ outils = @($outils) } | ConvertTo-Json -Depth 4),
+    (New-Object System.Text.UTF8Encoding($false)))
+
+$hashes = @(Get-FileHash "$out\*.7z" -Algorithm SHA256 | ForEach-Object { '{0}  {1}' -f $_.Hash, (Split-Path $_.Path -Leaf) })
+$hashes += @($outilsJoints | ForEach-Object { '{0}  {1}' -f (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash, (Split-Path $_ -Leaf) })
 # Joint a la release : c'est ce que RetroBat.Api.Update.exe lit pour verifier l'archive avant
 # de l'appliquer (les notes en repli). Sans empreinte publiee, l'updater n'applique rien.
 $sumsFile = Join-Path $out 'SHA256SUMS.txt'
 $hashes | Set-Content $sumsFile -Encoding ascii
 Write-Host ($hashes -join "`n")
 
-if ($PackageOnly) { Write-Host 'PackageOnly : archives pretes, pas de release.'; exit 0 }
+if ($PackageOnly) {
+    Write-Host 'PackageOnly : archives pretes, pas de release. A joindre aussi : outils.json'
+    foreach ($joint in $outilsJoints) { Write-Host "  et $joint (nouvelle version)" }
+    exit 0
+}
 
 # ── L'INSTALLEUR DE BORNE DOIT PARTIR AVEC LA RELEASE ───────────────────────────────────────
 # Il est compile a part (Inno Setup), pas par ce script, et c'est par lui que passe CHAQUE
@@ -363,7 +427,9 @@ Voir le wiki pour l'installation : https://nelfe80.github.io/RetroBat-APIExpose/
 |---|---|
 $(if (-not $Rapide) { "| ``$name-$ver-full.7z`` | Programme + tools + Data Pack complet (premiere installation) |
 " })| ``$name-$ver-update.7z`` | Programme seul (mise a jour) |
-| ``SHA256SUMS.txt`` | Empreintes, lues par ``RetroBat.Api.Update.exe`` |$(if ($setupFile) { "
+| ``SHA256SUMS.txt`` | Empreintes, lues par ``RetroBat.Api.Update.exe`` |
+| ``outils.json`` | Outils hors archive (outil de diagnostic) : version, empreinte, adresse. L'API de la borne ne telecharge que ce qui a change |$(foreach ($joint in $outilsJoints) { "
+| ``$(Split-Path $joint -Leaf)`` | Nouvelle version de l'outil |" })$(if ($setupFile) { "
 | ``APIExpose-Cabinet-Setup.exe`` | Installeur de borne (c'est ce que sert https://nelfeplay.com/download/apiexpose) |" })
 
 Mise a jour depuis la borne : lancer ``RetroBat.Api.Update.exe`` a la racine d'APIExpose.
@@ -384,7 +450,8 @@ $ghArgs = @('release', 'create', "v$ver",
     '--title', "APIExpose $ver", '--notes-file', $notesFile)
 if (-not $Publish) { $ghArgs += '--draft' }
 if (-not $Rapide) { $ghArgs += $full }
-$ghArgs += @($update, $swaggerFile, $sumsFile)
+$ghArgs += @($update, $swaggerFile, $sumsFile, $outilsFile)
+$ghArgs += $outilsJoints
 if ($asyncapiFile) { $ghArgs += $asyncapiFile }
 if ($setupFile) { $ghArgs += $setupFile.FullName }
 & gh @ghArgs
