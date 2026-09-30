@@ -108,9 +108,24 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     {
         var role = RetroBat.Api.Netplay.NetplayGuestService.PrendreRejointe(FenetreRejointe);
         if (role == RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun) return;
-        lock (_sync) { _invite = role; }
-        Trace($"partie rejointe en netplay ({role}) : la partie de l'hote, rien a soumettre ici");
+        // La place et la seance, prises MAINTENANT : la place se libere quand l'emulateur se ferme,
+        // parfois avant que la fin de la partie arrive ici.
+        var place = role == RetroBat.Api.Netplay.NetplayGuestService.Role.Joueur
+            ? RetroBat.Api.Netplay.NetplayGuestService.PlaceDeJoueur
+            : null;
+        var seance = place is null ? null : RetroBat.Api.Netplay.NetplayGuestService.SeanceDeLaPlace;
+        lock (_sync) { _invite = role; _placeInvite = place; _seanceInvite = seance; }
+        Trace(place is { } p
+            ? $"partie rejointe en netplay en joueur, place {p} : pas de 1CC solo, le 1CC MULTI du joueur {p}"
+            : $"partie rejointe en netplay ({role}) : la partie de l'hote, rien a soumettre ici");
     }
+    private int? _placeInvite;
+    private string? _seanceInvite;
+
+    // 1CC MULTI (2026-09-30) : le port de manette de cette borne, retrouve a ses appuis, et la
+    // trajectoire du score de chaque autre joueur (celle de sa place, pour la borne invitee).
+    private readonly RetroBat.Api.Scoring.PortLocal _portLocal = new();
+    private readonly Dictionary<int, List<(long frame, long total)>> _trajectoiresAutres = new();
     private long? _finalTotal;
     private bool _inDemo;   // attract mode : le jeu se joue seul → on ignore le score
     // Phase D (segmentation en RUNS, 100% APIExpose) : la trajectoire des scores suffit —
@@ -489,6 +504,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 case "panel.input.pressed":
                     CaptureStart(ToJson(envelope.Payload));
                     break;
+                case "wrapper.ports":
+                    CapturePorts(ToJson(envelope.Payload));
+                    break;
                 case "wrapper.watch.muted":
                     CaptureSurveillanceCoupee(ToJson(envelope.Payload));
                     break;
@@ -532,6 +550,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _jetonDeSession++;
             _departAuCredit = _closeParCredit = _partieADeuxAnnoncee = false;
             _scoresAutresJoueurs.Clear();
+            _trajectoiresAutres.Clear();
+            _placeInvite = null;
+            _seanceInvite = null;
             _creditsMuets = null;
             _continuesConsole.Clear();
             _invite = RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun;
@@ -1050,8 +1071,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         lock (_sync) { _inDemo = false; _startVu = true; _enJeu = true; }
     }
 
+    /// <summary>Une seconde d'appuis par port, du wrapper (0.340) : de quoi retrouver le port local.</summary>
+    private void CapturePorts(JsonElement root)
+    {
+        if (!root.TryGetProperty("Presses", out var p) || p.ValueKind != JsonValueKind.Array) return;
+        var appuis = p.EnumerateArray().Select(v => v.TryGetInt32(out var n) ? n : 0).ToArray();
+        if (appuis.Length > 0) _portLocal.SecondeDuWrapper(appuis);
+    }
+
     private void CaptureStart(JsonElement root)
     {
+        if ((Entier(root, "Player") ?? Entier(root, "player") ?? 1) == 1) _portLocal.AppuiDuPanel();
         var systeme = GetString(root, "System") ?? GetString(root, "system") ?? "";
         if (!string.Equals(systeme, "START", StringComparison.OrdinalIgnoreCase)) return;
         var joueur = Entier(root, "Player") ?? Entier(root, "player") ?? 1;
@@ -1544,7 +1574,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         long frame;
         lock (_sync)
         {
-            if (_creditsMuets is not null || _invite != RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun) return;
+            if (_creditsMuets is not null || _invite == RetroBat.Api.Netplay.NetplayGuestService.Role.Spectateur) return;
             _creditsMuets = frame = _lastFrame;
         }
 
@@ -1559,7 +1589,19 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var joueurDuScore = JoueurDuScore(root);
         if (joueurDuScore != 1)
         {
-            lock (_sync) { _scoresAutresJoueurs[joueurDuScore] = total; }
+            lock (_sync)
+            {
+                _scoresAutresJoueurs[joueurDuScore] = total;
+                if (!_trajectoiresAutres.TryGetValue(joueurDuScore, out var lectures))
+                {
+                    _trajectoiresAutres[joueurDuScore] = lectures = new List<(long, long)>();
+                }
+                if (lectures.Count == 0 || lectures[^1].total != total)
+                {
+                    lectures.Add((_lastFrame, total));
+                    if (lectures.Count > MaxTrajectory) lectures.RemoveAt(0);
+                }
+            }
             return;
         }
         long? continueAnnonce = null;
@@ -1814,7 +1856,22 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             return;
         }
         RetroBat.Api.Netplay.NetplayGuestService.Role roleInvite;
-        lock (_sync) { roleInvite = _invite; }
+        int? placeInvite;
+        string? seanceInvite;
+        lock (_sync) { roleInvite = _invite; placeInvite = _placeInvite; seanceInvite = _seanceInvite; }
+        if (roleInvite == RetroBat.Api.Netplay.NetplayGuestService.Role.Joueur && placeInvite is { } place)
+        {
+            // L'INVITE JOUEUR N'A PAS DE 1CC SOLO : il a rejoint une partie commencee. Il a son 1CC
+            // MULTI, celui du joueur de sa place (decision user du 2026-09-30).
+            var credentialInvite = ResolveCredential();
+            if (string.IsNullOrEmpty(credentialInvite))
+            {
+                Trace("STOP: pas de credential (ni appairé ni anonyme)");
+                return;
+            }
+            await SoumettreMultiAsync(systemId, romGroup, sessionJson, credentialInvite, place, seanceInvite, cancellationToken).ConfigureAwait(false);
+            return;
+        }
         if (roleInvite != RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun)
         {
             // Le score lu ici est celui du joueur 1, sur la borne de l'hote. Le soumettre sous le
@@ -1869,12 +1926,207 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     await SoumettreAsync(systemId, romGroup, sessionJson, credential,
                         new RetroBat.Api.Scoring.FiltreDeMode(mode, parDefaut), cancellationToken).ConfigureAwait(false);
                 }
+                await SoumettreMultiSiOuverteAsync(systemId, romGroup, sessionJson, credential, cancellationToken).ConfigureAwait(false);
                 return;
             }
         }
 
         await SoumettreAsync(systemId, romGroup, sessionJson, credential, null, cancellationToken).ConfigureAwait(false);
+        await SoumettreMultiSiOuverteAsync(systemId, romGroup, sessionJson, credential, cancellationToken).ConfigureAwait(false);
     }
+
+    /// <summary>
+    /// L'HOTE D'UNE PARTIE OUVERTE AUX JOUEURS : en plus de son 1CC solo (le score fait seul avant
+    /// l'arrivee des autres), son 1CC MULTI, sur tout son credit (decision user du 2026-09-30).
+    /// </summary>
+    private async Task SoumettreMultiSiOuverteAsync(string systemId, string romGroup, string sessionJson, string credential, CancellationToken ct)
+    {
+        if (!RetroBat.Api.Netplay.NetplayHostService.OuverteAuxJoueursPendant(sessionJson)) return;
+        await SoumettreMultiAsync(systemId, romGroup, sessionJson, credential, 1, null, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Le proces-verbal vu depuis un autre port : les compteurs d'entrees de la racine (ceux que le
+    /// passeport lit) remplaces par ceux de ce port (wrapper 0.340). Null si ce port n'a recu aucun
+    /// appui, ou si le wrapper ne les detaille pas.
+    /// </summary>
+    internal static string? SessionDuPort(string sessionJson, int port)
+    {
+        var session = JsonNode.Parse(sessionJson)?.AsObject();
+        if (session?["ports"] is not JsonArray ports) return null;
+        var entree = ports.OfType<JsonObject>().FirstOrDefault(p => (int?)p["port"] == port);
+        if (entree is null) return null;
+        foreach (var cle in new[] { "impossible_inputs", "press_count", "press_frames_sum", "press_frames_sq", "macro_repeats", "macro_windows" })
+        {
+            session[cle] = entree[cle]?.DeepClone() ?? 0;
+        }
+        return session.ToJsonString();
+    }
+
+    /// <summary>Les joueurs qui ont appuye pendant la partie, d'apres le wrapper (0.340) ; 0 s'il ne le dit pas.</summary>
+    internal static int JoueursActifs(string sessionJson)
+    {
+        var session = JsonNode.Parse(sessionJson)?.AsObject();
+        if (session?["ports"] is not JsonArray ports) return 0;
+        return ports.OfType<JsonObject>().Count(p => ((long?)p["press_count"] ?? 0) > 0 || ((long?)p["impossible_inputs"] ?? 0) > 0);
+    }
+
+    /// <summary>
+    /// LE 1CC MULTI D'UN JOUEUR (2026-09-30, docs/14 du site). Chaque borne certifie SON joueur : la
+    /// place 1 pour l'hote, celle que la plateforme lui a donnee pour l'invite. Son score court de son
+    /// depart a son propre continue ; le credit consomme par un autre joueur, sans START de ce panel,
+    /// ne coupe rien ici. Le port de la borne, retrouve a ses appuis, doit etre celui de sa place.
+    /// </summary>
+    private async Task SoumettreMultiAsync(string systemId, string romGroup, string sessionJson, string credential,
+        int place, string? seance, CancellationToken cancellationToken)
+    {
+        var port = place - 1;
+        var joueurs = JoueursActifs(sessionJson);
+        if (joueurs < 2)
+        {
+            Trace($"1CC MULTI : STOP, {(joueurs == 0 ? "le wrapper ne detaille pas les ports (avant 0.340)" : "un seul joueur a appuye")}");
+            return;
+        }
+        var sessionDuJoueur = SessionDuPort(sessionJson, port);
+        if (sessionDuJoueur is null)
+        {
+            Trace($"1CC MULTI : STOP, le port {port} (place {place}) n'a recu aucun appui");
+            return;
+        }
+        var estime = _portLocal.Estimer();
+        if (estime is { } portVu && portVu != port)
+        {
+            Trace($"1CC MULTI : STOP, les appuis de ce panel suivent le port {portVu}, pas celui de la place {place} ({port})");
+            return;
+        }
+        Trace($"1CC MULTI : place {place}, port {port} {(estime is null ? "(non tranche aux appuis, la place fait foi)" : "confirme aux appuis")}, {joueurs} joueurs");
+
+        string? listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, contentSet, wrapperVersion, coreName, coreVersion;
+        List<(long frame, long total)> trajectory;
+        List<EvenementDeCredit> credits;
+        List<DepartDeJoueur> departs;
+        List<EvenementDeCredit> continuesConsole;
+        long? creditsMuets;
+        lock (_sync)
+        {
+            credits = new List<EvenementDeCredit>(_credits);
+            departs = new List<DepartDeJoueur>(_departs);
+            continuesConsole = new List<EvenementDeCredit>(_continuesConsole);
+            creditsMuets = _creditsMuets;
+            listenerSha = _listenerSha256; coreSha = _coreSha256; memSha = _memSha256;
+            contentSha = _contentSha256; contentMd5 = _contentMd5; contentSha1 = _contentSha1; contentSet = _contentSet; wrapperVersion = _wrapperVersion;
+            coreName = _coreName; coreVersion = _coreVersion;
+            if (place == 1)
+            {
+                var brutes = new List<(long, long)>(_trajectory);
+                var horsJeu = new List<bool>(_horsJeu);
+                trajectory = _startVu ? FiltrerEnJeu(brutes, horsJeu) : brutes;
+            }
+            else
+            {
+                trajectory = _trajectoiresAutres.TryGetValue(place, out var lectures) ? new List<(long, long)>(lectures) : [];
+            }
+        }
+        if (creditsMuets is not null)
+        {
+            Trace("1CC MULTI : STOP, la ligne des credits a ete coupee : les continues ne se voient plus");
+            return;
+        }
+
+        // Une partie a plusieurs bornes : un credit consomme sans START de ce panel revient a un
+        // autre joueur (son arrivee, ou son continue) et ne coupe rien ici.
+        var bilan = ContinuesParCredits.Calculer(credits, departs, ouverteAuxJoueurs: true);
+        if (place > 1)
+        {
+            // L'invite part au premier credit consomme avec un START de son panel : son score ne
+            // compte qu'a partir de la (la place a pu servir a un autre avant lui).
+            if (bilan.Depart is not { } depart)
+            {
+                Trace("1CC MULTI : STOP, le depart de ce joueur n'a pas ete vu (aucun credit consomme avec un START de ce panel)");
+                return;
+            }
+            trajectory = trajectory.Where(l => l.frame >= depart).ToList();
+        }
+        var coupes = bilan.Coupes.Concat(ContinuesParCompteur.Coupes(continuesConsole)).OrderBy(f => f).ToList();
+        if (coupes.Count > 0)
+        {
+            Trace($"1CC MULTI : continue de ce joueur a la frame {coupes[0]}");
+            trajectory = ContinuesParCredits.AvantLePremierContinue(trajectory, coupes);
+        }
+        if (!ScoreAMonte(trajectory))
+        {
+            Trace("1CC MULTI : STOP, le score de ce joueur n'a jamais monte");
+            return;
+        }
+        var bestRun = SelectBestRun(trajectory, coupes);
+        var runPeak = bestRun.Count > 0 ? bestRun[^1].total : trajectory[^1].total;
+        if (listenerSha is null)
+        {
+            Trace("1CC MULTI : STOP, pas d'attestation");
+            return;
+        }
+        if (string.IsNullOrEmpty(contentSha1) && !string.IsNullOrEmpty(romGroup))
+        {
+            contentSha1 = GamelistIdentity.DeclaredSha1(systemId, romGroup, SetArcade(systemId, contentSet));
+        }
+
+        var profils = await FetchProfilesAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false);
+        JsonElement? profile = profils.Where(p => p.TryGetProperty("ruleset", out var r) && r.GetString() == CategorieMulti)
+            .Select(p => (JsonElement?)p).FirstOrDefault();
+        if (profile is null)
+        {
+            Trace($"1CC MULTI : STOP, pas de classement {CategorieMulti} ouvert pour {romGroup} (score du joueur {place} : {runPeak})");
+            return;
+        }
+
+        await RequestTicketAsync(cancellationToken).ConfigureAwait(false);
+        JsonElement? ticket;
+        lock (_sync) { ticket = _ticket; }
+        var deviceId = ticket is { } t && t.TryGetProperty("device_id", out var did) ? did.GetString() : null;
+        if (ticket is null || string.IsNullOrEmpty(deviceId))
+        {
+            Trace("1CC MULTI : STOP, ticket indisponible");
+            return;
+        }
+
+        JsonArray? nvram = null;
+        if (_nvram is not null)
+        {
+            try { nvram = await _nvram.PourLePasseportAsync(NvramSnapshotService.EpinglesDuProfil(profile), cancellationToken).ConfigureAwait(false); }
+            catch (Exception ex) { Trace($"NVRAM indisponible : {ex.Message}"); }
+        }
+        JsonObject? bios = null;
+        if (_bios is not null)
+        {
+            try { bios = _bios.PourLePasseport(profile.Value); }
+            catch (Exception ex) { Trace($"BIOS indisponible : {ex.Message}"); }
+        }
+
+        using var deviceKey = CngDeviceKey.OpenOrCreate(ScoringKeyName);
+        JsonObject passport;
+        try
+        {
+            (string, long)? coupe = coupes.Count > 0 ? (FinDuSolo.Continue, coupes[0]) : null;
+            passport = BuildPassport(
+                systemId, romGroup, sessionDuJoueur, ticket.Value, profile.Value,
+                deviceId!, deviceKey, listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion,
+                coreName, coreVersion,
+                runPeak, bestRun, trajectory, nvram, bios, null, joueurs, coupe, place, seance);
+            var body = passport.DeepClone()!.AsObject();
+            body.Remove("signature");
+            passport["signature"] = deviceKey.SignB64Url(Jcs.CanonicalBytes(body));
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Scoring : assemblage du passeport 1CC MULTI impossible.");
+            return;
+        }
+        Trace($"1CC MULTI : soumission du joueur {place}, {runPeak} points");
+        await SubmitAsync(credential, passport, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>La categorie (ruleset) des parties a plusieurs, chacun sur son credit.</summary>
+    public const string CategorieMulti = "1cc-multi";
 
     /// <summary>
     /// Le passeport d'une session, ou d'un de ses modes (<paramref name="filtre"/>) : seules les
@@ -2202,7 +2454,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         string? contentSha, string? contentMd5, string? contentSha1, string? wrapperVersion,
         string? coreName, string? coreVersion, long finalTotal, List<(long frame, long total)> trajectory,
         List<(long frame, long total)>? toutesLesLectures = null, JsonArray? nvram = null, JsonObject? bios = null,
-        RetroBat.Api.Scoring.ContexteDeJeu? contexte = null, int joueurs = 1, (string Raison, long Frame)? finDuSolo = null)
+        RetroBat.Api.Scoring.ContexteDeJeu? contexte = null, int joueurs = 1, (string Raison, long Frame)? finDuSolo = null,
+        int? place = null, string? seance = null)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
@@ -2334,6 +2587,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // Ce qui a ferme le 1CC solo (continue, arrivee d'un joueur...) : garde et signe, jamais
         // affiche (decision user du 2026-09-30). Absent quand rien n'a coupe la partie.
         if (finDuSolo is { } fin) jeu["cut"] = new JsonObject { ["reason"] = fin.Raison, ["frame"] = fin.Frame };
+        // 1CC MULTI : la place du joueur certifie (1 pour l'hote, 2 a 4 pour les invites) et le direct
+        // ou elle a ete attribuee. La plateforme les confronte a ses places.
+        if (place is { } siege) jeu["seat"] = siege;
+        if (!string.IsNullOrEmpty(seance)) jeu["netplay_session"] = seance;
 
         var document = new JsonObject
         {

@@ -12,7 +12,7 @@ public class PortsDuWrapperTests
     [Fact]
     public void Les_appuis_de_chaque_port_se_lisent_dans_l_ordre()
     {
-        Assert.Equal([3, 5, 0, 0], RetroArchWrapperProvider.LignePorts("{\"ms\":61234,\"presses\":[3,5,0,0]}\n"));
+        Assert.Equal([3, 5, 0, 0], RetroArchWrapperProvider.LignePorts("{\"ms\":61234,\"presses\":[3,5,0,0]}\n")!);
     }
 
     [Theory]

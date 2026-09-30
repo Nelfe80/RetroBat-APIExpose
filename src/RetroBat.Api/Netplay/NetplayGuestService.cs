@@ -74,6 +74,13 @@ public sealed class NetplayGuestService
     private static readonly object VerrouRejointe = new();
     private static (DateTime Quand, Role Role)? _rejointe;
     private static int? _place;
+    private static string? _seancePlace;
+
+    /// <summary>La seance (identifiant du direct) ou cette borne tient sa place de joueur, ou null.</summary>
+    public static string? SeanceDeLaPlace
+    {
+        get { lock (VerrouRejointe) { return _seancePlace; } }
+    }
 
     /// <summary>
     /// La place de joueur que la plateforme a donnee a cette borne pour la partie rejointe (2 a 4 ;
@@ -193,7 +200,11 @@ public sealed class NetplayGuestService
 
         // Par ES de preference : lui seul cesse de dessiner pendant la partie (voir NetplayLaunch).
         MarquerRejointe(infos.Value.PeutJouer ? Role.Joueur : Role.Spectateur);
-        lock (VerrouRejointe) { _place = infos.Value.PeutJouer ? infos.Value.Place : null; }
+        lock (VerrouRejointe)
+        {
+            _place = infos.Value.PeutJouer ? infos.Value.Place : null;
+            _seancePlace = _place is null ? null : sessionId;
+        }
         var lancement = await NetplayLaunch.LancerAsync(
             rom, Arguments(resolution, rom, mode, infos.Value), _httpFactory, _logger, ct).ConfigureAwait(false);
         if (!lancement.Ok)
@@ -263,7 +274,7 @@ public sealed class NetplayGuestService
             if (place is not null)
             {
                 await PlaceAsync(sessionId, credential, "release").ConfigureAwait(false);
-                lock (VerrouRejointe) { _place = null; }
+                lock (VerrouRejointe) { _place = null; _seancePlace = null; }
             }
             _logger.LogInformation("Netplay : seance de spectateur fermee.");
         }

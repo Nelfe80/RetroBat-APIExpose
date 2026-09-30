@@ -49,6 +49,13 @@ public static class ContinuesParCredits
 
         /// <summary>Ce qui ferme le 1CC solo : un continue, ou l'arrivée d'un joueur.</summary>
         public IReadOnlyList<long> FinsDuSolo => Coupes.Concat(Arrivees).OrderBy(f => f).ToList();
+
+        /// <summary>
+        /// Le crédit du départ de CETTE borne, s'il a été vu. En netplay, la borne invitée rejoint
+        /// une partie commencée : son joueur part au premier crédit consommé avec un START de son
+        /// panel, et son score ne compte qu'à partir de là (1CC MULTI).
+        /// </summary>
+        public long? Depart { get; init; }
     }
 
     public static Bilan Calculer(
@@ -60,6 +67,7 @@ public static class ContinuesParCredits
         var arrivees = new List<long>();
         var plusieurs = false;
         var partieCommencee = false;
+        long? depart = null;
         int? precedent = null;
         foreach (var credit in credits.OrderBy(c => c.Frame))
         {
@@ -81,6 +89,7 @@ public static class ContinuesParCredits
                         break;
                     default:
                         partieCommencee = true;
+                        depart ??= credit.Frame;
                         break;
                 }
             }
@@ -88,7 +97,7 @@ public static class ContinuesParCredits
             precedent = credit.Value;
         }
 
-        return new Bilan(coupes, plusieurs) { Arrivees = arrivees };
+        return new Bilan(coupes, plusieurs) { Arrivees = arrivees, Depart = depart };
     }
 
     public enum Debit
