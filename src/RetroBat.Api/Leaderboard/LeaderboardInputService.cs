@@ -356,6 +356,16 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             {
                 await Task.Delay(80, ct).ConfigureAwait(false);
 
+                // Un appui long vu alors que le panneau se croit deja ouvert ne s'ouvre pas : on le
+                // dit, sinon « rien ne s'affiche » ne laisse aucune trace (2026-09-30).
+                if (_validerDepuis is { } tenu
+                    && _modele.Etat != LeaderboardPanelModel.Foyer.Ferme
+                    && (DateTime.UtcNow - tenu).TotalMilliseconds >= Math.Max(200, _options.CurrentValue.Leaderboard.LongPressMs))
+                {
+                    _validerDepuis = null;
+                    _logger.LogInformation("Classement : appui long ignore, le panneau est deja ouvert (etat {Etat}).", _modele.Etat);
+                }
+
                 if (_validerDepuis is { } depuis
                     && _modele.Etat == LeaderboardPanelModel.Foyer.Ferme
                     && (DateTime.UtcNow - depuis).TotalMilliseconds >= Math.Max(200, _options.CurrentValue.Leaderboard.LongPressMs))

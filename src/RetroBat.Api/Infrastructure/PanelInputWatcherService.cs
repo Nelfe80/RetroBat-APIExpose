@@ -113,7 +113,17 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
                     // fait voir un branchement/débranchement — impossible depuis un autre thread.
                     _reader!.Pump();
 
-                    if (++_ticks % RescanEveryTicks == 0) RescanIfChanged();
+                    // PAS DE REENUMERATION SOUS LE DOIGT DU JOUEUR. Pendant qu'elle se fait,
+                    // l'instantane est vide : un bouton tenu parait relache puis de nouveau appuye,
+                    // et l'appui long du panneau de classement repartait de zero (un essai sur huit
+                    // environ ne l'ouvrait pas, 2026-09-30). On attend qu'aucun bouton ne soit tenu
+                    // et que le joueur ait laisse le panel une seconde et demie.
+                    if (++_ticks % RescanEveryTicks == 0
+                        && held.Count == 0
+                        && DateTime.UtcNow - _dernierChangement > TimeSpan.FromSeconds(1.5))
+                    {
+                        RescanIfChanged();
+                    }
 
                     // Boutons cabinet (canal historique) + directions (canal additif dpad/stick).
                     var now = _reader!.Snapshot()
@@ -124,11 +134,13 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
                     foreach (var down in now.Where(x => !held.Contains(x)))
                     {
                         Publish("panel.input.pressed", down.Device, down.Identity);
+                        _dernierChangement = DateTime.UtcNow;
                     }
 
                     foreach (var up in held.Where(x => !now.Contains(x)).ToList())
                     {
                         Publish("panel.input.released", up.Device, up.Identity);
+                        _dernierChangement = DateTime.UtcNow;
                     }
 
                     held = now;
@@ -158,6 +170,9 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
     /// cabinet whose panel stops answering must be able to show, from the log alone,
     /// whether the device disappeared or the presses did.
     /// </summary>
+    /// <summary>Le dernier appui ou relachement vu sur le panel.</summary>
+    private DateTime _dernierChangement = DateTime.MinValue;
+
     private void RescanIfChanged()
     {
         var reader = _reader;
