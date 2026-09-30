@@ -13,6 +13,17 @@ public class JsonMediaAliasStore : IMediaAliasStore
     private static readonly TimeSpan FileIoRetryDelay = TimeSpan.FromMilliseconds(100);
     private readonly SemaphoreSlim _gate = new(1, 1);
 
+    /// <summary>
+    /// Les index deja lus, avec la date et la taille du fichier au moment de la lecture. Lu et
+    /// ecrit sous <see cref="_gate"/> seulement : c'est lui qui rend le partage sur.
+    ///
+    /// Sans ce cache, CHAQUE recherche relisait et deserialisait le fichier entier : 2,3 Mo pour
+    /// media-hashes.json, a chaque media d'un jeu. Au demarrage, le prefetch des medias y passait
+    /// une vingtaine de secondes de processeur (mesure sur la borne le 2026-09-30).
+    /// </summary>
+    private readonly Dictionary<string, (DateTime Ecrit, long Taille, MediaAliasIndex Index)> _indexes =
+        new(StringComparer.OrdinalIgnoreCase);
+
     public async Task<string> ResolveGameSlugAsync(string systemId, IEnumerable<string> aliasKeys, string fallbackSlug, CancellationToken cancellationToken = default)
     {
         var normalizedKeys = NormalizeKeys(aliasKeys);
@@ -193,22 +204,59 @@ public class JsonMediaAliasStore : IMediaAliasStore
         return canonicalPath;
     }
 
-    private static async Task<MediaAliasIndex> LoadIndexAsync(string filePath, CancellationToken cancellationToken)
+    /// <summary>A appeler sous <see cref="_gate"/>. Un fichier change sur le disque est relu.</summary>
+    private async Task<MediaAliasIndex> LoadIndexAsync(string filePath, CancellationToken cancellationToken)
     {
-        if (!File.Exists(filePath))
+        var info = new FileInfo(filePath);
+        if (!info.Exists)
         {
+            _indexes.Remove(filePath);
             return new MediaAliasIndex();
         }
 
-        return await ExecuteWithFileRetryAsync(async () =>
+        if (_indexes.TryGetValue(filePath, out var connu) && connu.Ecrit == info.LastWriteTimeUtc && connu.Taille == info.Length)
+        {
+            return connu.Index;
+        }
+
+        var index = await ExecuteWithFileRetryAsync(async () =>
         {
             await using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            var index = await JsonSerializer.DeserializeAsync<MediaAliasIndex>(stream, JsonOptions, cancellationToken);
-            return index ?? new MediaAliasIndex();
+            var lu = await JsonSerializer.DeserializeAsync<MediaAliasIndex>(stream, JsonOptions, cancellationToken);
+            return lu ?? new MediaAliasIndex();
         }, cancellationToken);
+        _indexes[filePath] = (info.LastWriteTimeUtc, info.Length, index);
+        return index;
     }
 
-    private static async Task SaveIndexAsync(string filePath, MediaAliasIndex index, CancellationToken cancellationToken)
+    /// <summary>
+    /// A appeler sous <see cref="_gate"/>. L'index ecrit devient celui du cache ; une ecriture
+    /// ratee le retire, pour ne jamais garder en memoire une modification qui n'est pas sur le disque.
+    /// </summary>
+    private async Task SaveIndexAsync(string filePath, MediaAliasIndex index, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await EcrireIndexAsync(filePath, index, cancellationToken);
+        }
+        catch
+        {
+            _indexes.Remove(filePath);
+            throw;
+        }
+
+        var info = new FileInfo(filePath);
+        if (info.Exists)
+        {
+            _indexes[filePath] = (info.LastWriteTimeUtc, info.Length, index);
+        }
+        else
+        {
+            _indexes.Remove(filePath);
+        }
+    }
+
+    private static async Task EcrireIndexAsync(string filePath, MediaAliasIndex index, CancellationToken cancellationToken)
     {
         var directory = Path.GetDirectoryName(filePath);
         if (!string.IsNullOrWhiteSpace(directory))

@@ -6,6 +6,21 @@ public sealed class ApiExposeTaxonomyService
 {
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
 
+    /// <summary>
+    /// Les tables de regions et de langues, construites UNE fois par configuration (la reference
+    /// de Taxonomy change quand appsettings est recharge). Avant, chaque region ou langue a
+    /// resoudre reconstruisait la liste et renormalisait chaque nom : l'index des ROM le faisait
+    /// pour chacune de ses entrees, 17 s de processeur au demarrage (mesure du 2026-09-30).
+    /// </summary>
+    private volatile Tables? _tables;
+
+    private sealed record Tables(
+        object Source,
+        IReadOnlyList<RegionDefinition> Regions,
+        IReadOnlyList<LanguageDefinition> Languages,
+        Dictionary<string, RegionDefinition> RegionParNom,
+        Dictionary<string, LanguageDefinition> LangueParNom);
+
     public ApiExposeTaxonomyService(IOptionsMonitor<ApiExposeOptions> options)
     {
         _options = options;
@@ -187,12 +202,7 @@ public sealed class ApiExposeTaxonomyService
             return null;
         }
 
-        return Regions().FirstOrDefault(region =>
-            string.Equals(NormalizeKey(region.Key), normalized, StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(NormalizeKey(region.Label), normalized, StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(NormalizeKey(region.RomValue), normalized, StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(NormalizeKey(region.ScreenScraperCode), normalized, StringComparison.OrdinalIgnoreCase) ||
-            region.Aliases.Any(alias => string.Equals(NormalizeKey(alias), normalized, StringComparison.OrdinalIgnoreCase)));
+        return Courantes().RegionParNom.TryGetValue(normalized, out var region) ? region : null;
     }
 
     private LanguageDefinition? ResolveLanguage(string value)
@@ -203,14 +213,58 @@ public sealed class ApiExposeTaxonomyService
             return null;
         }
 
-        return Languages().FirstOrDefault(language =>
-            string.Equals(NormalizeKey(language.Key), normalized, StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(NormalizeKey(language.Label), normalized, StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(NormalizeKey(language.Code), normalized, StringComparison.OrdinalIgnoreCase) ||
-            language.Aliases.Any(alias => string.Equals(NormalizeKey(alias).Replace("_", "-", StringComparison.Ordinal), normalized, StringComparison.OrdinalIgnoreCase)));
+        return Courantes().LangueParNom.TryGetValue(normalized, out var language) ? language : null;
     }
 
-    private IReadOnlyList<RegionDefinition> Regions()
+    private IReadOnlyList<RegionDefinition> Regions() => Courantes().Regions;
+
+    private IReadOnlyList<LanguageDefinition> Languages() => Courantes().Languages;
+
+    /// <summary>
+    /// Les tables de la configuration en vigueur. La recherche par nom garde EXACTEMENT la regle
+    /// d'avant : le premier element de la liste dont un nom normalise est egal a la valeur
+    /// normalisee (TryAdd garde le premier), sans distinction de casse. Pour les langues, les alias
+    /// passent aussi « _ » en « - », comme la valeur cherchee ; la cle, le libelle et le code non.
+    /// </summary>
+    private Tables Courantes()
+    {
+        var source = _options.CurrentValue.Taxonomy;
+        var tables = _tables;
+        if (tables is not null && ReferenceEquals(tables.Source, source))
+        {
+            return tables;
+        }
+
+        var regions = ConstruireRegions();
+        var langues = ConstruireLangues();
+        var regionParNom = new Dictionary<string, RegionDefinition>(StringComparer.OrdinalIgnoreCase);
+        foreach (var region in regions)
+        {
+            foreach (var nom in new[] { region.Key, region.Label, region.RomValue, region.ScreenScraperCode }.Concat(region.Aliases))
+            {
+                regionParNom.TryAdd(NormalizeKey(nom), region);
+            }
+        }
+
+        var langueParNom = new Dictionary<string, LanguageDefinition>(StringComparer.OrdinalIgnoreCase);
+        foreach (var langue in langues)
+        {
+            foreach (var nom in new[] { langue.Key, langue.Label, langue.Code })
+            {
+                langueParNom.TryAdd(NormalizeKey(nom), langue);
+            }
+            foreach (var alias in langue.Aliases)
+            {
+                langueParNom.TryAdd(NormalizeKey(alias).Replace("_", "-", StringComparison.Ordinal), langue);
+            }
+        }
+
+        tables = new Tables(source, regions, langues, regionParNom, langueParNom);
+        _tables = tables;
+        return tables;
+    }
+
+    private IReadOnlyList<RegionDefinition> ConstruireRegions()
     {
         var configured = _options.CurrentValue.Taxonomy.Regions
             .Where(region => !string.IsNullOrWhiteSpace(region.Key))
@@ -225,7 +279,7 @@ public sealed class ApiExposeTaxonomyService
         return configured.Count > 0 ? configured : DefaultRegions;
     }
 
-    private IReadOnlyList<LanguageDefinition> Languages()
+    private IReadOnlyList<LanguageDefinition> ConstruireLangues()
     {
         var configured = _options.CurrentValue.Taxonomy.Languages
             .Where(language => !string.IsNullOrWhiteSpace(language.Key))
