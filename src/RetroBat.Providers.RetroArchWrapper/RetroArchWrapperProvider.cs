@@ -454,7 +454,11 @@ public class RetroArchWrapperProvider : IProvider
                 // Le wrapper repete son constat d'echec a chaque seconde tant que la partie dure.
                 // Le dire une fois suffit a diagnostiquer ; le repeter cinquante fois noie le
                 // journal. On ne reparle donc que si le constat CHANGE.
-                var cle = definition.SystemId + "/" + definition.Rom + "|" + line.Trim();
+                // Le wrapper met l'heure en tete de ligne : sans la retirer, chaque repetition du
+                // meme constat passait pour nouvelle, et « aucune RAM lisible » s'ecrivait chaque
+                // seconde de toute partie sous le coeur MAME (2026-09-30).
+                var constat = System.Text.RegularExpressions.Regex.Replace(line.Trim(), @"^\[\d{2}:\d{2}:\d{2}\.\d{3}\]\s*", "");
+                var cle = definition.SystemId + "/" + definition.Rom + "|" + constat;
                 if (Interlocked.Exchange(ref _lastDiagnosticKey, cle) != cle)
                 {
                     _logger?.LogInformation(

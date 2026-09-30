@@ -1178,24 +1178,28 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>Un joueur arrive : le score fait seul jusque-la reste un 1CC, et le joueur le voit.</summary>
     private void AnnoncerRejoint(long avant)
     {
+        if (!PremierBandeauDeCoupe()) return;
         var langue = Langue();
         _overlay?.ShowTop(
             "SCORING",
             string.Format(CabinetAnnounceText.Get("scoring_joined_title", langue), ScoreAffiche(avant, langue)),
             CabinetAnnounceText.Get("scoring_joined_sub", langue),
-            8000);
+            8000,
+            alerte: true);
         Trace($"bandeau : un joueur arrive, score solo certifie {avant}, la suite a plusieurs");
     }
 
     /// <summary>Un bandeau d'information sans score : la partie continue, rien n'est refuse.</summary>
     private void AnnoncerCredit(string cle, string trace)
     {
+        if (!PremierBandeauDeCoupe()) return;
         var langue = Langue();
         _overlay?.ShowTop(
             "SCORING",
             CabinetAnnounceText.Get(cle + "_title", langue),
             CabinetAnnounceText.Get(cle + "_sub", langue),
-            8000);
+            8000,
+            alerte: true);
         Trace($"bandeau : {trace}");
     }
 
@@ -1598,6 +1602,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
         if (continueAnnonce is { } avant && _invite == RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun)
         {
+            lock (_sync) { _closeParCredit = true; }
             AnnoncerContinue(avant);
             PublierFinDeRun("chiffre des credits");
         }
@@ -1685,14 +1690,39 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private void AnnoncerContinue(long avant, bool parCredit = false)
     {
+        if (!PremierBandeauDeCoupe()) return;
         var langue = Langue();
         var cle = parCredit ? "scoring_credit" : "scoring_continue";
         _overlay?.ShowTop(
             "SCORING",
             string.Format(CabinetAnnounceText.Get(cle + "_title", langue), ScoreAffiche(avant, langue)),
             CabinetAnnounceText.Get(cle + "_sub", langue),
-            8000);
+            8000,
+            alerte: true);
         Trace($"continue detecte ({(parCredit ? "credit consomme" : "chiffre des credits")}) : score certifie {avant}, la partie continue");
+    }
+
+    private DateTime _dernierBandeauDeCoupe = DateTime.MinValue;
+
+    /// <summary>
+    /// UN CONTINUE, UN BANDEAU. 19xx a deux temoins du meme continue : le chiffre des credits de
+    /// Capcom et la ligne CREDITS. Les deux parlaient, a deux secondes d'ecart (2026-09-30). Un
+    /// bandeau de coupe dans les 10 s qui suivent un autre est le meme evenement : il se tait.
+    /// </summary>
+    private bool PremierBandeauDeCoupe()
+    {
+        lock (_sync)
+        {
+            var maintenant = DateTime.UtcNow;
+            if (maintenant - _dernierBandeauDeCoupe < TimeSpan.FromSeconds(10))
+            {
+                Trace("bandeau de coupe deja montre il y a moins de 10 s : meme continue, rien de plus");
+                return false;
+            }
+
+            _dernierBandeauDeCoupe = maintenant;
+            return true;
+        }
     }
 
     /// <summary>Un score lisible sur l'ecran : espaces en francais, points en espagnol, virgules sinon.</summary>
