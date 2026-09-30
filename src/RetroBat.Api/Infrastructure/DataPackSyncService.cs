@@ -259,7 +259,11 @@ public sealed class DataPackSyncService : BackgroundService
             try
             {
                 var escaped = string.Join('/', f.Path.Split('/').Select(Uri.EscapeDataString));
-                var octets = await client.GetByteArrayAsync($"https://raw.githubusercontent.com/{repo}/{branch}/{escaped}", ct);
+                // LE FICHIER DU COMMIT LU, pas celui de la branche : raw.githubusercontent.com garde
+                // une branche en cache quelques minutes, et une synchronisation lancee juste apres une
+                // publication recevait l'ancien fichier (rejete ci-dessous, a reprendre plus tard).
+                // L'adresse d'un commit ne change jamais de contenu.
+                var octets = await client.GetByteArrayAsync($"https://raw.githubusercontent.com/{repo}/{sha}/{escaped}", ct);
                 if (!string.Equals(DataPackPaths.GitBlobSha1(octets), f.Sha, StringComparison.Ordinal))
                 {
                     // Ce n'est pas ce que l'arbre annonce (CDN en retard, ou pire) : on ne pose pas.

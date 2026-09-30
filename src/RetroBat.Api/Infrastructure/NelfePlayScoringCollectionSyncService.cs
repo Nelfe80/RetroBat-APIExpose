@@ -34,8 +34,26 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     private static readonly TimeSpan PremierDelai = TimeSpan.FromSeconds(45);
     private static readonly TimeSpan Periode = TimeSpan.FromSeconds(300);
 
-    /// <summary>L'ecart minimal entre deux rattrapages du Data Pack declenches par la collection.</summary>
-    internal static readonly TimeSpan RattrapageDataPackMinimum = TimeSpan.FromMinutes(15);
+    /// <summary>
+    /// L'ecart minimal entre deux rattrapages du Data Pack declenches par la collection : en pratique
+    /// un par passe (toutes les 5 min), tant qu'un .MEM est en retard.
+    /// Quinze minutes laissaient une promotion (profil depose, puis .MEM publie) sortir des jeux de
+    /// la collection pendant un quart d'heure (2026-09-30). Une synchronisation dont le depot n'a
+    /// pas bouge ne coute qu'un appel a GitHub.
+    /// </summary>
+    internal static readonly TimeSpan RattrapageDataPackMinimum = TimeSpan.FromMinutes(4);
+
+    /// <summary>
+    /// LE DELAI DE GRACE D'UN .MEM EN RETARD. Quand le profil d'un jeu epingle un .MEM que la borne
+    /// n'a pas encore, c'est presque toujours que le Data Pack le publie dans la minute : le jeu reste
+    /// dans la collection ce temps-la, au lieu d'en sortir puis d'y revenir sous les yeux du joueur.
+    /// Au-dela, il sort : son score serait refuse.
+    /// </summary>
+    internal static readonly TimeSpan GraceDefinitionEnRetard = TimeSpan.FromMinutes(30);
+
+    /// <summary>Depuis quand chaque jeu a un .MEM en retard sur son profil (cle systeme/jeu).</summary>
+    private readonly Dictionary<string, DateTime> _enRetardDepuis = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Func<DateTime> _horloge;
     private static readonly JsonSerializerOptions JsonLecture = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -106,8 +124,10 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         Func<bool>? emulateurTourne = null,
         Func<InstalledGame, OpenGame, bool>? contenuConfirme = null,
         GamelistUpdateService? gamelists = null,
-        DataPackSyncService? dataPack = null)
+        DataPackSyncService? dataPack = null,
+        Func<DateTime>? horloge = null)
     {
+        _horloge = horloge ?? (() => DateTime.UtcNow);
         _gamelists = gamelists;
         _dataPack = dataPack;
         _httpFactory = httpFactory;
@@ -378,6 +398,10 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     internal static bool RattrapageAutorise(DateTime dernierUtc, DateTime maintenantUtc)
         => maintenantUtc - dernierUtc >= RattrapageDataPackMinimum;
 
+    /// <summary>Vrai tant que le .MEM d'un jeu est en retard depuis moins que le delai de grace.</summary>
+    internal static bool EnGrace(DateTime depuisUtc, DateTime maintenantUtc)
+        => maintenantUtc - depuisUtc < GraceDefinitionEnRetard;
+
     /// <summary>
     /// Ce jeu est-il OUVERT AU SCORING sur cette borne ? C'est-a-dire : un profil est ouvert
     /// pour lui, la borne en a le dump, et sa definition locale porte l'empreinte homologuee.
@@ -526,12 +550,21 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             if (!string.Equals(locale, jeu.MemSha256, StringComparison.OrdinalIgnoreCase))
             {
                 // La borne a bien un .MEM, mais pas celui qu'exige le profil : le score
-                // serait refuse. Le jeu revient des que le Data Pack est a jour, et la passe
-                // le met a jour elle-meme (RattraperLeDataPackAsync).
+                // serait refuse. La passe met le Data Pack a jour elle-meme
+                // (RattraperLeDataPackAsync) ; pendant le delai de grace, le jeu reste.
                 _logger?.LogDebug("World Scoring : {Cle} en definition non homologuee", cle);
                 perimees++;
-                manques.Add(jeu.RomGroup + " : définition non homologuée (Data Pack à mettre à jour)");
-                continue;
+                var depuis = _enRetardDepuis.TryGetValue(cle, out var vu) ? vu : (_enRetardDepuis[cle] = _horloge());
+                if (!EnGrace(depuis, _horloge()))
+                {
+                    manques.Add(jeu.RomGroup + " : définition non homologuée (Data Pack à mettre à jour)");
+                    continue;
+                }
+                manques.Add(jeu.RomGroup + " : définition en cours de mise à jour par le Data Pack (le jeu reste dans la collection)");
+            }
+            else
+            {
+                _enRetardDepuis.Remove(cle);
             }
 
             // LE CONTENU D'ABORD, LE CHOIX ENSUITE.

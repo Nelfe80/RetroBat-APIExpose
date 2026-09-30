@@ -63,9 +63,11 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
             emulateurTourne: () => false,
             // Les fichiers de test ne sont pas de vraies ROM : le contenu y est reconnu, sauf
             // dans les tests qui portent justement sur cette reconnaissance.
-            contenuConfirme: (candidat, jeu) => _confirme(candidat, jeu));
+            contenuConfirme: (candidat, jeu) => _confirme(candidat, jeu),
+            horloge: () => _maintenant);
 
     private Func<InstalledGame, OpenGame, bool> _confirme = (_, _) => true;
+    private DateTime _maintenant = new(2026, 9, 30, 23, 20, 0, DateTimeKind.Utc);
 
     private string PoserRom(string systeme, string nom)
     {
@@ -130,16 +132,22 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
     }
 
     [Fact]
-    public async Task Une_definition_locale_non_homologuee_exclut_le_jeu()
+    public async Task Une_definition_locale_non_homologuee_exclut_le_jeu_apres_le_delai_de_grace()
     {
+        // 2026-09-30 : un profil depose quelques minutes avant la publication de son .MEM sortait le
+        // jeu de la collection. Il reste le temps que le Data Pack arrive, puis sort s'il n'est pas venu.
         PoserRom("fbneo", "19xx.zip");
         PoserMem("arcade", "19xx", "UNE AUTRE DEFINITION");
         var http = new FauxHttp(Index("sha256:aa", Jeu("arcade", "19xx", MemEmpreinte)));
+        var service = Service(http, new FauxResolveur { ["19xx.zip"] = "19xx" });
 
-        var statut = await Service(http, new FauxResolveur { ["19xx.zip"] = "19xx" })
-            .SynchroniserAsync("test", CancellationToken.None);
+        var pendant = await service.SynchroniserAsync("test", CancellationToken.None);
+        Assert.Equal("ready", pendant.State);
+        Assert.Single(Collection());
 
-        Assert.Equal("empty", statut.State);
+        _maintenant = _maintenant.AddMinutes(31);
+        var apres = await service.SynchroniserAsync("test", CancellationToken.None);
+        Assert.Equal("empty", apres.State);
         Assert.Empty(Collection());
     }
 
@@ -709,11 +717,11 @@ public sealed class RattrapageDataPackTests
         => Assert.True(NelfePlayScoringCollectionSyncService.RattrapageAutorise(DateTime.MinValue, DateTime.UtcNow));
 
     [Fact]
-    public void Pas_deux_rattrapages_dans_le_quart_d_heure()
+    public void Un_rattrapage_par_passe_au_plus()
     {
         var t0 = new DateTime(2026, 9, 28, 21, 0, 0, DateTimeKind.Utc);
-        Assert.False(NelfePlayScoringCollectionSyncService.RattrapageAutorise(t0, t0.AddMinutes(5)));
-        Assert.True(NelfePlayScoringCollectionSyncService.RattrapageAutorise(t0, t0.AddMinutes(15)));
+        Assert.False(NelfePlayScoringCollectionSyncService.RattrapageAutorise(t0, t0.AddMinutes(3)));
+        Assert.True(NelfePlayScoringCollectionSyncService.RattrapageAutorise(t0, t0.AddMinutes(5)));
     }
 }
 
