@@ -147,3 +147,74 @@ public static class ContinuesParCredits
         return trajectoire.ToList();
     }
 }
+
+/// <summary>
+/// LE COMPTEUR DE CONTINUES D'UN JEU CONSOLE (action CONTINUES du .MEM, decision user du
+/// 2026-09-30). Sur console il n'y a pas de credit : le jeu compte lui-meme les continues qui
+/// restent. Toute baisse de ce compteur pendant la session est un continue, comme un credit
+/// consomme apres le depart en arcade. Sonic 1, verifie sous MAME : a l'ecran de continue, START
+/// remet le score a zero, redonne trois vies et retire un continue au compteur.
+///
+/// Une nouvelle partie remet aussi le compteur a zero : refuser le continue puis relancer une
+/// partie sans quitter le jeu se lit donc comme un continue. C'est la regle de l'arcade (la session
+/// fait foi) : le bandeau dit de quitter puis relancer le jeu pour une partie certifiee.
+/// </summary>
+public static class ContinuesParCompteur
+{
+    /// <summary>Les frames ou le compteur de continues a baisse.</summary>
+    public static IReadOnlyList<long> Coupes(IReadOnlyList<EvenementDeCredit> compteur)
+    {
+        var coupes = new List<long>();
+        int? precedent = null;
+        foreach (var e in compteur.OrderBy(c => c.Frame))
+        {
+            if (precedent is { } avant && e.Value < avant) coupes.Add(e.Frame);
+            precedent = e.Value;
+        }
+
+        return coupes;
+    }
+
+    /// <summary>
+    /// Le score d'avant le continue : la derniere lecture STRICTEMENT anterieure a sa frame. Sonic
+    /// remet le score a zero a l'image meme du continue, et une lecture pile sur cette frame
+    /// appartient deja a la suite.
+    /// </summary>
+    public static long ScoreAvant(IReadOnlyList<(long frame, long total)> lectures, long frame)
+    {
+        long score = 0;
+        foreach (var (f, total) in lectures)
+        {
+            if (f >= frame) break;
+            score = total;
+        }
+
+        return score;
+    }
+}
+
+/// <summary>
+/// CE QUI A FERME LE 1CC SOLO, garde dans le passeport signe sans etre affiche (decision user du
+/// 2026-09-30) : la premiere des fins, avec sa raison et sa frame.
+/// </summary>
+public static class FinDuSolo
+{
+    public const string Continue = "continue";
+    public const string JoueurRejoint = "player_joined";
+    public const string CreditsIllisibles = "credits_unreadable";
+    public const string ContinueConsole = "continue_counter";
+
+    public static (string Raison, long Frame)? Premiere(params (string Raison, IEnumerable<long> Frames)[] sources)
+    {
+        (string Raison, long Frame)? premiere = null;
+        foreach (var (raison, frames) in sources)
+        {
+            foreach (var frame in frames)
+            {
+                if (premiere is null || frame < premiere.Value.Frame) premiere = (raison, frame);
+            }
+        }
+
+        return premiere;
+    }
+}

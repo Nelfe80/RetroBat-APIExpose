@@ -477,6 +477,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     CaptureVie(charge);
                     CaptureModeEtDifficulte(charge);
                     CaptureCredits(charge);
+                    CaptureContinuesConsole(charge);
                     // Les ETATS du pont Lua de MAME arrivent ici, et seulement ici : le wrapper les
                     // projette en plus sur retroarch.state, le pont Lua non. Sans cette ligne, un
                     // DEMO_MODE sous MAME n'atteignait jamais la detection de la demo, et le score
@@ -532,6 +533,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _departAuCredit = _closeParCredit = _partieADeuxAnnoncee = false;
             _scoresAutresJoueurs.Clear();
             _creditsMuets = null;
+            _continuesConsole.Clear();
             _invite = RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun;
             _debutSessionUtc = DateTime.UtcNow;
             _replayDuSolo = null;
@@ -1465,6 +1467,47 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>La frame ou le wrapper a coupe la ligne des credits : les continues ne se voient plus.</summary>
     private long? _creditsMuets;
 
+    /// <summary>Le compteur de continues d'un jeu console (action CONTINUES), au fil de la session.</summary>
+    private readonly List<EvenementDeCredit> _continuesConsole = new();
+
+    /// <summary>
+    /// UN CONTINUE CONSOLE : le compteur de continues du jeu baisse (ContinuesParCompteur). Le premier
+    /// dit le score certifie et arrete le replay ; les suivants redisent que la partie n'est plus
+    /// certifiable. Pas d'attente ici : sur console, aucun joueur 2 n'arrive par un credit.
+    /// </summary>
+    private void CaptureContinuesConsole(JsonElement root)
+    {
+        if (!root.TryGetProperty("signal", out var signal) && !root.TryGetProperty("Signal", out signal)) return;
+        var nom = (GetString(signal, "Name") ?? "").Trim();
+        if (!nom.Equals("CONTINUES", StringComparison.OrdinalIgnoreCase)) return;
+        if (Entier(signal, "Value") is not { } valeur) return;
+        var frame = Entier(signal, "Frame") ?? _lastFrame;
+        bool premiere;
+        long scoreAvant;
+        lock (_sync)
+        {
+            var avant = _continuesConsole.Count > 0 ? _continuesConsole[^1].Value : (int?)null;
+            _continuesConsole.Add(new EvenementDeCredit(valeur, frame));
+            if (_continuesConsole.Count > MaxTrajectory) _continuesConsole.RemoveAt(0);
+            if (avant is null || valeur >= avant) return;   // premiere lecture, ou continue gagne
+            if (_invite != RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun) return;
+            premiere = !_closeParCredit;
+            _closeParCredit = true;
+            scoreAvant = ContinuesParCompteur.ScoreAvant(_trajectory, frame);
+        }
+
+        Trace($"continue console (compteur {valeur}, frame {frame}) : score certifie {scoreAvant}");
+        if (premiere)
+        {
+            AnnoncerContinue(scoreAvant);
+            PublierFinDeRun("continue (compteur du jeu)");
+        }
+        else
+        {
+            AnnoncerCredit("scoring_uncertified", "partie non certifiable (continue console)");
+        }
+    }
+
     /// <summary>
     /// LA LIGNE DES CREDITS COUPEE PAR LE WRAPPER : plus aucun continue ne se voit. Le wrapper fait
     /// taire une ligne hors score qui change huit fois de suite a moins de 20 images d'ecart, et
@@ -1890,7 +1933,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // avant (cumulatif, decision user du 2026-09-30), la suite ne part pas.
         var finsDeRun = bilanCredits.FinsDuSolo;
         long? creditsMuets;
-        lock (_sync) { creditsMuets = _creditsMuets; }
+        List<EvenementDeCredit> continuesConsole;
+        lock (_sync)
+        {
+            creditsMuets = _creditsMuets;
+            continuesConsole = new List<EvenementDeCredit>(_continuesConsole);
+        }
+        var coupesConsole = ContinuesParCompteur.Coupes(continuesConsole);
+        if (coupesConsole.Count > 0)
+        {
+            Trace($"continues console (compteur du jeu) : {string.Join(", ", coupesConsole)}");
+            finsDeRun = finsDeRun.Concat(coupesConsole).OrderBy(f => f).ToList();
+        }
+        var finDuSolo = FinDuSolo.Premiere(
+            (FinDuSolo.Continue, bilanCredits.Coupes),
+            (FinDuSolo.JoueurRejoint, bilanCredits.Arrivees),
+            (FinDuSolo.ContinueConsole, coupesConsole),
+            (FinDuSolo.CreditsIllisibles, creditsMuets is { } coupeMuette ? new[] { coupeMuette } : Array.Empty<long>()));
         if (creditsMuets is { } muets)
         {
             Trace($"la ligne des credits a ete coupee a la frame {muets} : le 1CC s'arrete la");
@@ -2060,7 +2119,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 systemId, romGroup, sessionJson, ticket.Value, profile.Value,
                 deviceId!, deviceKey, listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion,
                 coreName, coreVersion,
-                runPeak, bestRun, trajectory, nvram, bios, contexteRun, partieADeux ? 2 : 1);
+                runPeak, bestRun, trajectory, nvram, bios, contexteRun, partieADeux ? 2 : 1, finDuSolo);
             var body = passport.DeepClone()!.AsObject();
             body.Remove("signature");
             passport["signature"] = deviceKey.SignB64Url(Jcs.CanonicalBytes(body));
@@ -2093,7 +2152,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         string? contentSha, string? contentMd5, string? contentSha1, string? wrapperVersion,
         string? coreName, string? coreVersion, long finalTotal, List<(long frame, long total)> trajectory,
         List<(long frame, long total)>? toutesLesLectures = null, JsonArray? nvram = null, JsonObject? bios = null,
-        RetroBat.Api.Scoring.ContexteDeJeu? contexte = null, int joueurs = 1)
+        RetroBat.Api.Scoring.ContexteDeJeu? contexte = null, int joueurs = 1, (string Raison, long Frame)? finDuSolo = null)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
@@ -2222,6 +2281,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // Une partie a plusieurs n'entre pas au classement solo (charte, decision du 2026-09-30).
         if (joueurs > 1) jeu["players"] = joueurs;
         if (RetroBat.Api.Scoring.ModesDeJeu.DifficultePourLePasseport(profile, ctx) is { } difficulte) jeu["difficulty"] = difficulte;
+        // Ce qui a ferme le 1CC solo (continue, arrivee d'un joueur...) : garde et signe, jamais
+        // affiche (decision user du 2026-09-30). Absent quand rien n'a coupe la partie.
+        if (finDuSolo is { } fin) jeu["cut"] = new JsonObject { ["reason"] = fin.Raison, ["frame"] = fin.Frame };
 
         var document = new JsonObject
         {

@@ -223,4 +223,35 @@ public class ContinuesParCreditsTests
         Assert.Equal("Credits", coupee.Value.Nom);
         Assert.Null(RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider.LigneCoupee("[DEBUG WRAPPER] Core=fbneo system_ram=65536"));
     }
+
+    [Fact]
+    public void Sonic_un_continue_retire_un_au_compteur_et_remet_le_score_a_zero()
+    {
+        // Verifie sous MAME le 2026-09-30 : 1 continue, game over, START a l'ecran de continue :
+        // compteur 1 -> 0, score 10 000 -> 0 a la meme image.
+        var compteur = new List<EvenementDeCredit> { new(0, 50), new(1, 900), new(0, 2640) };
+        var lectures = Lectures((100, 0), (1500, 10000), (2640, 0), (3000, 500));
+        var coupes = ContinuesParCompteur.Coupes(compteur);
+        Assert.Equal(new long[] { 2640 }, coupes);
+        Assert.Equal(10000, ContinuesParCompteur.ScoreAvant(lectures, 2640));
+        Assert.Equal(10000, ContinuesParCredits.AvantLePremierContinue(lectures, coupes)[^1].Item2);
+    }
+
+    [Fact]
+    public void Un_continue_gagne_ne_coupe_rien()
+    {
+        var compteur = new List<EvenementDeCredit> { new(0, 50), new(1, 900), new(2, 1800) };
+        Assert.Empty(ContinuesParCompteur.Coupes(compteur));
+    }
+
+    [Fact]
+    public void La_raison_de_la_coupe_est_la_premiere_des_fins()
+    {
+        var fin = FinDuSolo.Premiere(
+            (FinDuSolo.Continue, new long[] { 4000, 6000 }),
+            (FinDuSolo.JoueurRejoint, new long[] { 2500 }),
+            (FinDuSolo.CreditsIllisibles, Array.Empty<long>()));
+        Assert.Equal((FinDuSolo.JoueurRejoint, 2500L), fin);
+        Assert.Null(FinDuSolo.Premiere((FinDuSolo.Continue, Array.Empty<long>())));
+    }
 }
