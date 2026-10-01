@@ -1,9 +1,11 @@
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using RetroBat.Api.Infrastructure;
 using RetroBat.Domain.Paths;
+using RetroBat.Domain.Services;
 
 namespace RetroBat.Api.Netplay;
 
@@ -12,8 +14,8 @@ namespace RetroBat.Api.Netplay;
 ///
 /// Chaque piece a ete prouvee separement ; celle-ci les enchaine :
 ///
-///   1. ce qu'ES a RESOLU pour ce jeu (emulateur, coeur, manettes) — relu dans son journal,
-///      jamais recalcule ;
+///   1. ce qu'ES a RESOLU pour ce jeu (emulateur, coeur, manettes) — relu dans son journal ;
+///      un jeu absent du journal se reconstitue comme ES le ferait (voir ReconstituerAsync) ;
 ///   2. le relais le plus proche — MESURE, pas deduit de la geographie ;
 ///   3. les reglages d'hebergement — poses dans es_settings.cfg, avec copie de cote ;
 ///   4. le lancement — la commande d'ES, plus `-netplaymode host` ;
@@ -37,6 +39,8 @@ public sealed class NetplayHostService
     private readonly NetplayLobbyClient _lobby;
     private readonly NelfePlayDeviceStore _machine;
     private readonly IHttpClientFactory _httpFactory;
+    private readonly EmulationStationSystemConfigService _systemes;
+    private readonly EmulationStationSettingsService _reglages;
     private readonly ILogger<NetplayHostService> _logger;
 
     public NetplayHostService(
@@ -44,12 +48,16 @@ public sealed class NetplayHostService
         NetplayLobbyClient lobby,
         NelfePlayDeviceStore machine,
         IHttpClientFactory httpFactory,
+        EmulationStationSystemConfigService systemes,
+        EmulationStationSettingsService reglages,
         ILogger<NetplayHostService> logger)
     {
         _relais = relais;
         _lobby = lobby;
         _machine = machine;
         _httpFactory = httpFactory;
+        _systemes = systemes;
+        _reglages = reglages;
         _logger = logger;
     }
 
@@ -122,7 +130,8 @@ public sealed class NetplayHostService
         bool autoriserAJouer,
         CancellationToken ct = default)
     {
-        var resolution = EsLaunchArguments.PourRom(cheminRom);
+        var resolution = EsLaunchArguments.PourRom(cheminRom)
+            ?? await ReconstituerAsync(cheminRom, ct).ConfigureAwait(false);
         if (resolution is null)
         {
             _logger.LogInformation("Netplay : {Rom} n'a jamais ete lance ici, rien a reprendre.",
@@ -384,6 +393,110 @@ public sealed class NetplayHostService
     /// Les arguments de manette sont repris MOT POUR MOT : les recalculer perdrait le reglage du
     /// joueur. `-gameinfo` n'est pas repris — il pointe un temporaire qu'ES reecrit et supprime.
     /// </summary>
+    /// <summary>
+    /// Le lancement d'un jeu absent des journaux d'ES, reconstitue comme ES le ferait.
+    ///
+    /// Le journal ne garde que les cinq derniers demarrages d'ES : un jeu qui n'y a pas ete lance
+    /// depuis ne pouvait pas etre heberge, et le defi partait sans direct ni message (Metal Slug 3,
+    /// 2026-10-01, sur une borne ou il avait deja ete joue). On refait donc ce qu'ES decide : le
+    /// systeme est le dossier de la ROM, l'emulateur et le coeur viennent de la fiche du jeu, puis
+    /// des reglages du systeme, puis de son defaut ; les manettes sont celles du dernier lancement.
+    /// C'est la meme resolution que celle de la collection World Scoring.
+    /// </summary>
+    private async Task<EsLaunchArguments.Resolution?> ReconstituerAsync(string cheminRom, CancellationToken ct)
+    {
+        var systeme = SystemeDuChemin(cheminRom, RetroBatPaths.RomsRoot);
+        if (systeme.Length == 0)
+        {
+            return null;
+        }
+
+        var (emulateurDuJeu, coeurDuJeu) = await FicheDuJeuAsync(systeme, cheminRom, ct).ConfigureAwait(false);
+        var (lancement, _) = _systemes.ResolveGameLaunchConfig(systeme, emulateurDuJeu, coeurDuJeu, _reglages.GetAllSettings());
+        if (lancement.Emulator.Length == 0)
+        {
+            return null;
+        }
+
+        _logger.LogInformation(
+            "Netplay : {Rom} absent du journal d'ES, lancement reconstitue ({Systeme}, {Emulateur}, {Coeur}).",
+            Path.GetFileName(cheminRom), systeme, lancement.Emulator, lancement.Core.Length > 0 ? lancement.Core : "-");
+        return new EsLaunchArguments.Resolution(
+            systeme, lancement.Emulator, lancement.Core, EsLaunchArguments.ManettesDuDernierLancement());
+    }
+
+    /// <summary>
+    /// Le systeme d'une ROM : le premier dossier sous roms. Vide si la ROM est ailleurs, ou posee a
+    /// la racine de roms : sans systeme, ES ne saurait pas la lancer non plus.
+    /// </summary>
+    internal static string SystemeDuChemin(string cheminRom, string racineRoms)
+    {
+        if (string.IsNullOrWhiteSpace(cheminRom) || string.IsNullOrWhiteSpace(racineRoms))
+        {
+            return string.Empty;
+        }
+
+        var relatif = Path.GetRelativePath(Path.GetFullPath(racineRoms), Path.GetFullPath(cheminRom.Trim('"')));
+        if (relatif.StartsWith("..", StringComparison.Ordinal) || Path.IsPathRooted(relatif))
+        {
+            return string.Empty;
+        }
+
+        var morceaux = relatif.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+        return morceaux.Length >= 2 ? morceaux[0] : string.Empty;
+    }
+
+    /// <summary>
+    /// L'emulateur et le coeur choisis pour ce jeu dans sa fiche ES. ES absent ou fiche introuvable :
+    /// rien, et le choix du systeme s'applique.
+    /// </summary>
+    private async Task<(string? Emulateur, string? Coeur)> FicheDuJeuAsync(string systeme, string cheminRom, CancellationToken ct)
+    {
+        try
+        {
+            using var client = _httpFactory.CreateClient();
+            client.BaseAddress = new Uri("http://127.0.0.1:1234");
+            client.Timeout = TimeSpan.FromSeconds(10);
+            using var reponse = await client.GetAsync($"/systems/{Uri.EscapeDataString(systeme)}/games", ct).ConfigureAwait(false);
+            if (!reponse.IsSuccessStatusCode)
+            {
+                return (null, null);
+            }
+
+            using var doc = JsonDocument.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
+            return FicheDans(doc.RootElement, cheminRom);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            return (null, null);
+        }
+    }
+
+    /// <summary>La fiche d'une ROM dans la liste des jeux d'un systeme, telle qu'ES la rend.</summary>
+    internal static (string? Emulateur, string? Coeur) FicheDans(JsonElement jeux, string cheminRom)
+    {
+        if (jeux.ValueKind != JsonValueKind.Array)
+        {
+            return (null, null);
+        }
+
+        var fichier = Path.GetFileName(cheminRom.Trim('"').Replace('/', Path.DirectorySeparatorChar));
+        foreach (var jeu in jeux.EnumerateArray())
+        {
+            var chemin = jeu.TryGetProperty("path", out var p) && p.ValueKind == JsonValueKind.String ? p.GetString() : null;
+            if (string.IsNullOrWhiteSpace(chemin)
+                || !string.Equals(Path.GetFileName(chemin.Replace('/', Path.DirectorySeparatorChar)), fichier, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            string? Texte(string nom) => jeu.TryGetProperty(nom, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
+            return (Texte("emulator"), Texte("core"));
+        }
+
+        return (null, null);
+    }
+
     private static string Arguments(EsLaunchArguments.Resolution r, string cheminRom)
         => string.Join(' ', new[]
         {
