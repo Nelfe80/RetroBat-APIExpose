@@ -898,13 +898,17 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         {
             try
             {
+                // Le menu de jeu d'ES se ferme AVANT tout lancement, diffuse ou non : le defi
+                // diffuse lance lui aussi par `/launch` (NetplayLaunch), et sous le menu ES
+                // acceptait la demande sans jamais lancer (2026-10-01, defi bloque sur
+                // « Lancement de la partie », emulateur jamais apparu).
+                await FermerLeMenuEsAsync().ConfigureAwait(false);
                 if (reglages.ChallengeShareLive && await DiffuserLeDefiAsync(chemin, reglages.ChallengeJoinPolicy).ConfigureAwait(false))
                 {
                     await AttendreLeJeuPuisSEffacerAsync("defi en direct").ConfigureAwait(false);
                     return;
                 }
                 EmulatorForeground.FocusEmulationStation();
-                await FermerLeMenuEsAsync().ConfigureAwait(false);
                 using var client = _httpFactory.CreateClient();
                 client.BaseAddress = new Uri("http://127.0.0.1:1234");
                 client.Timeout = TimeSpan.FromSeconds(10);
@@ -957,6 +961,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         {
             try
             {
+                // Meme raison que pour un defi : l'invite lance par `/launch`, qui attend sous le menu.
+                await FermerLeMenuEsAsync().ConfigureAwait(false);
                 var echec = await _invite.RejoindreAsync(direct.Session).ConfigureAwait(false);
                 if (echec != RetroBat.Api.Netplay.NetplayGuestService.Echec.Aucun)
                 {
