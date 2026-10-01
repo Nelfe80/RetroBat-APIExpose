@@ -66,9 +66,10 @@ public sealed class LiveCrowdPoller : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var (session, jeton, _) = _seance.Courant;
+            var (session, jeton, joueur) = _seance.Courant;
 
-            if (session.Length == 0 || jeton.Length == 0)
+            // Un invite qui JOUE n'est pas dans la foule des spectateurs : il est a la manette.
+            if (session.Length == 0 || jeton.Length == 0 || joueur)
             {
                 // Personne ne regarde de direct : on se repose, et on vide ce qui restait pour
                 // qu'une foule d'hier ne reparaisse pas au prochain direct.

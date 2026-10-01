@@ -71,4 +71,20 @@ public sealed class LiveSpectateState
             }
         }
     }
+
+    /// <summary>
+    /// On REGARDE le direct, sans y jouer. Les reactions, leur facade et la foule n'existent que
+    /// la (demande user 2026-10-02) : un invite qui joue est a la place de l'hote, et ses boutons
+    /// de jeu ne doivent pas partir en reactions.
+    /// </summary>
+    public bool Spectateur
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _session.Length > 0 && _viewer.Length > 0 && !_peutJouer;
+            }
+        }
+    }
 }

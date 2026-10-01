@@ -156,6 +156,11 @@ public static class CabinetAnnounceText
             ["scoring_multiplayer_sub"] = "l'arrivée d'un joueur ne compte pas comme un continue",
             ["scoring_joined_title"] = "Un joueur te rejoint : ton score solo certifié reste {0}",
             ["scoring_joined_sub"] = "la suite se joue à plusieurs, hors classement solo",
+            ["netplay_player_title"] = "Tu rejoins {0} en JOUEUR",
+            ["netplay_player_sub"] = "ta manette pilote ta place dans sa partie",
+            ["netplay_spectator_title"] = "Tu regardes {0} en SPECTATEUR",
+            ["netplay_spectator_sub"] = "tes boutons envoient des réactions",
+            ["netplay_this_live"] = "ce direct",
         },
         ["en"] = new()
         {
@@ -227,6 +232,11 @@ public static class CabinetAnnounceText
             ["scoring_multiplayer_sub"] = "a player joining does not count as a continue",
             ["scoring_joined_title"] = "A player joined you: your certified solo score stays at {0}",
             ["scoring_joined_sub"] = "the rest is played together, outside the solo ranking",
+            ["netplay_player_title"] = "You join {0} as a PLAYER",
+            ["netplay_player_sub"] = "your controller drives your seat in their game",
+            ["netplay_spectator_title"] = "You watch {0} as a SPECTATOR",
+            ["netplay_spectator_sub"] = "your buttons send reactions",
+            ["netplay_this_live"] = "this live",
         },
         ["es"] = new()
         {
@@ -298,6 +308,11 @@ public static class CabinetAnnounceText
             ["scoring_multiplayer_sub"] = "la llegada de un jugador no cuenta como continuación",
             ["scoring_joined_title"] = "Un jugador se ha unido: tu puntuación individual certificada se queda en {0}",
             ["scoring_joined_sub"] = "lo que sigue se juega a varios, fuera de la clasificación individual",
+            ["netplay_player_title"] = "Te unes a {0} como JUGADOR",
+            ["netplay_player_sub"] = "tu mando controla tu puesto en su partida",
+            ["netplay_spectator_title"] = "Miras a {0} como ESPECTADOR",
+            ["netplay_spectator_sub"] = "tus botones envían reacciones",
+            ["netplay_this_live"] = "este directo",
         },
         ["ja"] = new()
         {
@@ -369,6 +384,11 @@ public static class CabinetAnnounceText
             ["scoring_multiplayer_sub"] = "プレイヤーの参加はコンティニューとして扱われません",
             ["scoring_joined_title"] = "プレイヤーが参加：ソロの認定スコアは {0} のまま",
             ["scoring_joined_sub"] = "この先は複数人プレイとなり、ソロランキングの対象外です",
+            ["netplay_player_title"] = "{0} のゲームに プレイヤー として参加",
+            ["netplay_player_sub"] = "コントローラーで自分の席を操作します",
+            ["netplay_spectator_title"] = "{0} のゲームを 観戦 中",
+            ["netplay_spectator_sub"] = "ボタンでリアクションを送れます",
+            ["netplay_this_live"] = "このライブ",
         },
         ["zh"] = new()
         {
@@ -440,6 +460,11 @@ public static class CabinetAnnounceText
             ["scoring_multiplayer_sub"] = "玩家加入不算作续关",
             ["scoring_joined_title"] = "有玩家加入：你的单人认证分数保持为 {0}",
             ["scoring_joined_sub"] = "之后为多人游戏，不计入单人排行",
+            ["netplay_player_title"] = "你以玩家身份加入 {0}",
+            ["netplay_player_sub"] = "你的手柄控制你在对方游戏中的位置",
+            ["netplay_spectator_title"] = "你正在观看 {0}",
+            ["netplay_spectator_sub"] = "按键可发送反应",
+            ["netplay_this_live"] = "这场直播",
         },
         ["ko"] = new()
         {
@@ -501,6 +526,11 @@ public static class CabinetAnnounceText
             ["replay_rom_other_crc"] = "이 기기에는 기록 당시와 같은 파일(체크섬 {1})이 없습니다. {0}(으)로 재생합니다. 게임이 다르면(지역, 리비전) 리플레이가 어긋날 수 있습니다.",
             ["scoring_continue_title"] = "이어하기: 인증 점수는 {0}(으)로 유지됩니다",
             ["scoring_continue_sub"] = "게임은 계속되지만 이후 점수는 순위에 반영되지 않습니다",
+            ["netplay_player_title"] = "{0}님의 게임에 플레이어로 참가합니다",
+            ["netplay_player_sub"] = "컨트롤러로 상대 게임의 내 자리를 조작합니다",
+            ["netplay_spectator_title"] = "{0}님의 게임을 관전합니다",
+            ["netplay_spectator_sub"] = "버튼으로 반응을 보냅니다",
+            ["netplay_this_live"] = "이 라이브",
         },
     };
 }

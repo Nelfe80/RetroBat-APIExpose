@@ -788,6 +788,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         }
         catch (Exception) { _replaysEnPreparation = new HashSet<long>(); }
         if (_modele.Etat == LeaderboardPanelModel.Foyer.Ferme) return;
+        bool cetteBorneDistincte;
+        lock (_gate)
+        {
+            cetteBorneDistincte = !LeaderboardClient.Tailler(_monde, LeaderboardPanelModel.Vue.CetteBorne, _maVille, _monPays, _maSalle)
+                .SequenceEqual(LeaderboardClient.Tailler(_monde, LeaderboardPanelModel.Vue.MesRecords, _maVille, _monPays, _maSalle));
+        }
+        _modele.PoserCetteBorne(cetteBorneDistincte);
         Rafraichir();
         if (!relecture && UnReplayEstEnAttente()) RelireTantQueLeReplayArrive();
     }
@@ -963,7 +970,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             {
                 // Meme raison que pour un defi : l'invite lance par `/launch`, qui attend sous le menu.
                 await FermerLeMenuEsAsync().ConfigureAwait(false);
-                var echec = await _invite.RejoindreAsync(direct.Session).ConfigureAwait(false);
+                var echec = await _invite.RejoindreAsync(direct.Session, hote: direct.Pseudo.Length > 0 ? direct.Pseudo : direct.Poignee).ConfigureAwait(false);
                 if (echec != RetroBat.Api.Netplay.NetplayGuestService.Echec.Aucun)
                 {
                     _logger.LogWarning("Classement : impossible de rejoindre ({Raison}).", echec);

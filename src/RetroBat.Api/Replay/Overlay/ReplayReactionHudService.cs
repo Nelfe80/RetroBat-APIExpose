@@ -130,7 +130,7 @@ public sealed class ReplayReactionHudService : BackgroundService
                 // La FOULE : « regarde-t-on un direct ? » et « qu'y a-t-il a dessiner ? ». Deux
                 // delegues plutot qu'une reference : la fenetre vit sur son propre thread UI, et
                 // ne doit rien detenir qu'elle pourrait lire a contretemps.
-                () => _direct.Actif,
+                () => _direct.Spectateur,
                 (maintenant, largeur) => _foule.Relever(maintenant, largeur),
                 combien => _foule.FixerCapacite(combien),
                 // La planche d'un avatar, par son empreinte : un chemin sur disque, ou rien tant

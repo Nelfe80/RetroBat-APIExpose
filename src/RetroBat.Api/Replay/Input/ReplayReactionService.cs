@@ -151,7 +151,7 @@ public sealed class ReplayReactionService : IHostedService
         // precisement au moment ou l'on veut s'exprimer, une partie en cours.
         var st = _playback.GetState();
         var enReplay = string.Equals(st.Mode, "replay", StringComparison.Ordinal);
-        if (!enReplay && !_direct.Actif)
+        if (!enReplay && !_direct.Spectateur)
         {
             lock (_gate) { _down.Clear(); ResetGesture(); }
             return;
@@ -229,7 +229,7 @@ public sealed class ReplayReactionService : IHostedService
         // cours qu'on regarde, pas un enregistrement. Elle part TOUT DE SUITE et ne passe pas
         // par le journal local : une réaction de direct ne vaut que quelques secondes, et rien
         // n'aurait à être rejoué plus tard.
-        if (_direct.Actif && !string.Equals(st.Mode, "replay", StringComparison.Ordinal))
+        if (_direct.Spectateur && !string.Equals(st.Mode, "replay", StringComparison.Ordinal))
         {
             _ = _directUploader.EnvoyerAsync(family, level);
 
@@ -289,7 +289,7 @@ public sealed class ReplayReactionService : IHostedService
         // pas), donc le budget local est un simple garde-fou d'affichage : la verite est au
         // centre, qui compte par COMPTE. Ici on evite surtout de laisser depenser des
         // reactions qui seraient refusees, ce qui donnerait l'illusion d'avoir parle.
-        if (_direct.Actif && !string.Equals(st.Mode, "replay", StringComparison.Ordinal))
+        if (_direct.Spectateur && !string.Equals(st.Mode, "replay", StringComparison.Ordinal))
         {
             var (session, jeton, _) = _direct.Courant;
             var cleDirect = "live:" + session + "|" + jeton;

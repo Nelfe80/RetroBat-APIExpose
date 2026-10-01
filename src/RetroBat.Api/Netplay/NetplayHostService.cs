@@ -130,8 +130,7 @@ public sealed class NetplayHostService
         bool autoriserAJouer,
         CancellationToken ct = default)
     {
-        var resolution = EsLaunchArguments.PourRom(cheminRom)
-            ?? await ReconstituerAsync(cheminRom, ct).ConfigureAwait(false);
+        var resolution = await ResoudreLancementAsync(cheminRom, ct).ConfigureAwait(false);
         if (resolution is null)
         {
             _logger.LogInformation("Netplay : {Rom} n'a jamais ete lance ici, rien a reprendre.",
@@ -393,6 +392,14 @@ public sealed class NetplayHostService
     /// Les arguments de manette sont repris MOT POUR MOT : les recalculer perdrait le reglage du
     /// joueur. `-gameinfo` n'est pas repris — il pointe un temporaire qu'ES reecrit et supprime.
     /// </summary>
+    /// <summary>
+    /// Ce qu'il faut pour lancer ce jeu comme ES : relu dans son journal, sinon reconstitue. Sert a
+    /// l'hote et a l'invite, qui avait le meme defaut (« jamais lance ici » sur une borne dont ES
+    /// n'ecrit pas ses lancements).
+    /// </summary>
+    public async Task<EsLaunchArguments.Resolution?> ResoudreLancementAsync(string cheminRom, CancellationToken ct = default)
+        => EsLaunchArguments.PourRom(cheminRom) ?? await ReconstituerAsync(cheminRom, ct).ConfigureAwait(false);
+
     /// <summary>
     /// Le lancement d'un jeu absent des journaux d'ES, reconstitue comme ES le ferait.
     ///

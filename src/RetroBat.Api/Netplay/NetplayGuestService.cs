@@ -28,6 +28,9 @@ public sealed class NetplayGuestService
     private readonly IHttpClientFactory _httpFactory;
     private readonly RomCanonicalResolver _canonical;
     private readonly LiveSpectateState _seance;
+    private readonly NetplayHostService _hote;
+    private readonly LiveContestOverlayService? _bandeau;
+    private readonly RetroBat.Domain.Interfaces.IEsSettingsStore? _esSettings;
     private readonly ILogger<NetplayGuestService> _logger;
 
     public NetplayGuestService(
@@ -35,12 +38,18 @@ public sealed class NetplayGuestService
         IHttpClientFactory httpFactory,
         RomCanonicalResolver canonical,
         LiveSpectateState seance,
-        ILogger<NetplayGuestService> logger)
+        NetplayHostService hote,
+        ILogger<NetplayGuestService> logger,
+        LiveContestOverlayService? bandeau = null,
+        RetroBat.Domain.Interfaces.IEsSettingsStore? esSettings = null)
     {
         _machine = machine;
         _httpFactory = httpFactory;
         _canonical = canonical;
         _seance = seance;
+        _hote = hote;
+        _bandeau = bandeau;
+        _esSettings = esSettings;
         _logger = logger;
     }
 
@@ -120,7 +129,7 @@ public sealed class NetplayGuestService
     /// Rejoint la session. Spectateur par defaut ; joueur seulement si la plateforme a donne le
     /// mot de passe correspondant, ce qu'elle ne fait que si l'hote l'a autorise.
     /// </summary>
-    public async Task<Echec> RejoindreAsync(string sessionId, CancellationToken ct = default)
+    public async Task<Echec> RejoindreAsync(string sessionId, CancellationToken ct = default, string hote = "")
     {
         var credential = _machine.GetCredential();
         if (string.IsNullOrEmpty(credential))
@@ -140,7 +149,7 @@ public sealed class NetplayGuestService
             return Echec.JeuAbsent;
         }
 
-        var resolution = EsLaunchArguments.PourRom(rom);
+        var resolution = await _hote.ResoudreLancementAsync(rom, ct).ConfigureAwait(false);
         if (resolution is null)
         {
             return Echec.JamaisLance;
@@ -220,8 +229,37 @@ public sealed class NetplayGuestService
         // facade croire qu'il y a quelque chose a quoi reagir alors qu'aucun jeu ne tourne.
         _seance.Ouvrir(infos.Value.Session, infos.Value.Jeton, infos.Value.PeutJouer);
         var place = infos.Value.PeutJouer ? infos.Value.Place : null;
-        _ = Task.Run(() => FermerQuandLaPartieFinitAsync(sessionId, credential, place), CancellationToken.None);
+        var joueur = infos.Value.PeutJouer;
+        _ = Task.Run(() => FermerQuandLaPartieFinitAsync(sessionId, credential, place, joueur, hote), CancellationToken.None);
         return Echec.Aucun;
+    }
+
+    /// <summary>
+    /// Dit a l'arrivee ce qu'on fait dans la partie : on JOUE, ou on REGARDE, et chez qui (demande
+    /// user 2026-10-02). Sans lui, rien ne distinguait les deux a l'ecran ; un joueur se croyait
+    /// spectateur, ou l'inverse.
+    /// </summary>
+    private void AnnoncerLArrivee(bool joueur, string hote)
+    {
+        if (_bandeau is null) return;
+        string? es = null;
+        try
+        {
+            if (_esSettings is not null && _esSettings.ReadAllSettings().TryGetValue("Language", out var langue)) es = langue;
+        }
+        catch (Exception)
+        {
+            // Des reglages illisibles : l'anglais.
+        }
+        var code = CabinetAnnounceText.Resolve(null, es);
+        var qui = hote.Trim().Length > 0 ? hote.Trim() : CabinetAnnounceText.Get("netplay_this_live", code);
+        var cle = joueur ? "netplay_player" : "netplay_spectator";
+        _bandeau.ShowTop(
+            "NETPLAY",
+            string.Format(System.Globalization.CultureInfo.InvariantCulture, CabinetAnnounceText.Get(cle + "_title", code), qui),
+            CabinetAnnounceText.Get(cle + "_sub", code),
+            7000);
+        _logger.LogInformation("Netplay : arrivee annoncee ({Role} chez {Hote}).", joueur ? "joueur" : "spectateur", qui);
     }
 
     /// <summary>
@@ -231,7 +269,7 @@ public sealed class NetplayGuestService
     /// survit a la partie laisse la facade envoyer des reactions dans le vide, et le budget de
     /// cinq se depenserait sur un direct qu'on ne regarde plus.
     /// </summary>
-    private async Task FermerQuandLaPartieFinitAsync(string sessionId, string credential, int? place)
+    private async Task FermerQuandLaPartieFinitAsync(string sessionId, string credential, int? place, bool joueur, string hote)
     {
         try
         {
@@ -247,6 +285,13 @@ public sealed class NetplayGuestService
                 _seance.Fermer();
                 return;
             }
+
+            // L'image du jeu d'abord, le bandeau ensuite : pose trop tot, il passerait sous l'emulateur.
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(TimeSpan.FromSeconds(4), CancellationToken.None).ConfigureAwait(false);
+                AnnoncerLArrivee(joueur, hote);
+            });
 
             // LA PARTIE TOURNE : la place est confirmee, et la plateforme peut donner la suivante.
             // RetroArch numerote les joueurs dans l'ordre ou ils passent en joueur ; confirmer

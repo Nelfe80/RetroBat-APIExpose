@@ -37,3 +37,43 @@ public sealed class NetplayHostReconstitutionTests
         Assert.Equal(((string?)null, (string?)null), NetplayHostService.FicheDans(doc.RootElement, @"E:\RetroBat\roms\fbneo\absent.zip"));
     }
 }
+
+/// <summary>
+/// Les reactions sont celles d'un SPECTATEUR (2026-10-02) : un invite qui joue ne voit pas la
+/// facade et ses boutons de jeu ne partent pas en reactions.
+/// </summary>
+public sealed class LiveSpectateStateTests
+{
+    [Fact]
+    public void Un_joueur_n_est_pas_spectateur()
+    {
+        var etat = new LiveSpectateState();
+        etat.Ouvrir("session", "jeton", peutJouer: true);
+        Assert.True(etat.Actif);
+        Assert.False(etat.Spectateur);
+
+        etat.Ouvrir("session", "jeton", peutJouer: false);
+        Assert.True(etat.Spectateur);
+
+        etat.Fermer();
+        Assert.False(etat.Actif);
+        Assert.False(etat.Spectateur);
+    }
+
+    [Theory]
+    [InlineData("fr")]
+    [InlineData("en")]
+    [InlineData("es")]
+    [InlineData("ja")]
+    [InlineData("zh")]
+    [InlineData("ko")]
+    public void Le_bandeau_d_arrivee_existe_dans_chaque_langue(string langue)
+    {
+        foreach (var cle in new[] { "netplay_player_title", "netplay_player_sub", "netplay_spectator_title", "netplay_spectator_sub", "netplay_this_live" })
+        {
+            var texte = RetroBat.Api.Infrastructure.CabinetAnnounceText.Get(cle, langue);
+            Assert.NotEqual(cle, texte);
+            if (cle.EndsWith("_title", StringComparison.Ordinal)) Assert.Contains("{0}", texte);
+        }
+    }
+}
