@@ -45,8 +45,37 @@ public class LeaderboardPanelModelTests
     {
         var m = Ouvert();
         Assert.Equal(
+            new[] { Vue.MesRecords, Vue.MaSalle, Vue.MaVille, Vue.MonPays, Vue.Monde },
+            m.Onglets.ToArray());
+        Assert.True(m.PoserCetteBorne(true));
+        Assert.Equal(
             new[] { Vue.MesRecords, Vue.CetteBorne, Vue.MaSalle, Vue.MaVille, Vue.MonPays, Vue.Monde },
             m.Onglets.ToArray());
+    }
+
+    [Fact]
+    public void Cette_borne_n_existe_que_si_elle_differe_de_mes_records()
+    {
+        var m = Ouvert(salle: false, ville: false, pays: false);
+        Assert.False(m.PoserCetteBorne(false));                   // identique : rien ne change
+        Assert.DoesNotContain(Vue.CetteBorne, m.Onglets);
+
+        Assert.True(m.PoserCetteBorne(true));                     // differente : elle parait
+        Assert.Equal(Vue.Monde, m.VueCourante);                    // sans deplacer le curseur
+
+        m.Entree(EntreePanneau.Gauche);                           // on entre
+        m.Entree(EntreePanneau.Gauche);                           // vers THIS CABINET
+        Assert.Equal(Vue.CetteBorne, m.VueCourante);
+        Assert.True(m.PoserCetteBorne(false));                    // elle redevient identique
+        Assert.Equal(Vue.MesRecords, m.VueCourante);               // le joueur retombe sur ses records
+    }
+
+    [Fact]
+    public void Sans_mes_records_cette_borne_reste()
+    {
+        var m = Ouvert(salle: false, ville: false, pays: false, records: false);
+        Assert.False(m.PoserCetteBorne(false));
+        Assert.Equal(new[] { Vue.CetteBorne, Vue.Monde }, m.Onglets.ToArray());
     }
 
     [Fact]
@@ -226,13 +255,29 @@ public class LeaderboardLiveTabTests
     }
 
     [Fact]
+    public void Avec_des_directs_on_entre_sur_live_et_contest()
+    {
+        var m = new RetroBat.Api.Leaderboard.LeaderboardPanelModel();
+        m.Ouvrir(false, false, false, true);
+        m.PoserLesLignes(5);
+        m.PoserLesEvenements(true);
+        Assert.Equal(RetroBat.Api.Leaderboard.LeaderboardPanelModel.Vue.Monde, m.VueCourante);  // a cote du menu, rien ne bouge
+        Assert.Equal(RetroBat.Api.Leaderboard.LeaderboardPanelModel.Effet.PrendreLeFocus,
+            m.Entree(RetroBat.Api.Leaderboard.EntreePanneau.Gauche));
+        Assert.Equal(RetroBat.Api.Leaderboard.LeaderboardPanelModel.Vue.LiveEtContest, m.VueCourante);
+        Assert.True(m.SurLaPorte);                                                               // droite rend la main a ES
+        Assert.Equal(RetroBat.Api.Leaderboard.LeaderboardPanelModel.Effet.ChargerLaVue,
+            m.Entree(RetroBat.Api.Leaderboard.EntreePanneau.Gauche));                            // gauche : le monde
+        Assert.Equal(RetroBat.Api.Leaderboard.LeaderboardPanelModel.Vue.Monde, m.VueCourante);
+    }
+
+    [Fact]
     public void Si_l_onglet_live_disparait_sous_le_curseur_on_revient_sur_monde()
     {
         var m = new RetroBat.Api.Leaderboard.LeaderboardPanelModel();
         m.Ouvrir(false, false, false, true);
         m.PoserLesEvenements(true);
-        m.Entree(RetroBat.Api.Leaderboard.EntreePanneau.Gauche);                                 // on entre (prendre le focus)
-        m.Entree(RetroBat.Api.Leaderboard.EntreePanneau.Droite);                                 // vers LIVE
+        m.Entree(RetroBat.Api.Leaderboard.EntreePanneau.Gauche);                                 // on entre, sur LIVE
         Assert.Equal(RetroBat.Api.Leaderboard.LeaderboardPanelModel.Vue.LiveEtContest, m.VueCourante);
 
         Assert.True(m.PoserLesEvenements(false));

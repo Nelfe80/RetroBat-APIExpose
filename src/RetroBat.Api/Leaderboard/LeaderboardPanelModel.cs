@@ -100,11 +100,38 @@ public sealed class LeaderboardPanelModel
         return true;
     }
 
+    /// <summary>
+    /// THIS CABINET n'existe que s'il montre autre chose que MY RECORDS (demande user 2026-10-02) :
+    /// deux onglets identiques se traversent pour rien. Aujourd'hui les deux vues prennent les
+    /// memes lignes (celles du joueur de cette borne), donc THIS CABINET reste cache ; il reparait
+    /// seul le jour ou sa liste differe. Se range juste apres MY RECORDS, sans deplacer le curseur.
+    /// Rend vrai si la rangee d'onglets a change.
+    /// </summary>
+    public bool PoserCetteBorne(bool distincte)
+    {
+        if (!_onglets.Contains(Vue.MesRecords)) return false;   // seule vue du joueur : elle reste
+        var avant = VueCourante;
+        var deja = _onglets.Contains(Vue.CetteBorne);
+        if (distincte == deja) return false;
+        if (distincte)
+        {
+            _onglets.Insert(_onglets.IndexOf(Vue.MesRecords) + 1, Vue.CetteBorne);
+        }
+        else
+        {
+            _onglets.Remove(Vue.CetteBorne);
+            if (avant == Vue.CetteBorne) { avant = Vue.MesRecords; _ligne = 0; }
+        }
+        var index = _onglets.IndexOf(avant);
+        _onglet = index >= 0 ? index : Math.Clamp(_onglet, 0, Math.Max(0, _onglets.Count - 1));
+        return true;
+    }
+
     public void Ouvrir(bool salleConnue, bool villeConnue, bool paysConnu, bool aDesRecords)
     {
         _onglets.Clear();
-        if (aDesRecords) _onglets.Add(Vue.MesRecords);
-        _onglets.Add(Vue.CetteBorne);
+        // Avec MY RECORDS, THIS CABINET attend de prouver qu'il montre autre chose (PoserCetteBorne).
+        _onglets.Add(aDesRecords ? Vue.MesRecords : Vue.CetteBorne);
         if (salleConnue) _onglets.Add(Vue.MaSalle);
         if (villeConnue) _onglets.Add(Vue.MaVille);
         if (paysConnu) _onglets.Add(Vue.MonPays);
@@ -157,6 +184,15 @@ public sealed class LeaderboardPanelModel
                 if (entree == EntreePanneau.Gauche)
                 {
                     Etat = Foyer.Panneau;
+                    // Des directs ou des contests sur ce jeu : on entre DESSUS (demande user
+                    // 2026-10-02). L'onglet touche la porte, et le joueur n'avait pas encore la
+                    // main : rien ne lui est vole sous le pouce.
+                    var live = _onglets.IndexOf(Vue.LiveEtContest);
+                    if (live >= 0 && _onglet != live)
+                    {
+                        _onglet = live;
+                        _ligne = 0;
+                    }
                     return Effet.PrendreLeFocus;
                 }
                 // Annuler pendant que ES a la main : c'est SON menu qui se referme, donc nous aussi.
