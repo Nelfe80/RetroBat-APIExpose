@@ -1054,11 +1054,26 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private const string JeuCommence = "GAME_START";
 
+    /// <summary>
+    /// LE DEPART DE LA PARTIE, LU DANS LA MEMOIRE DU JEU (2026-10-02) : un credit consomme, ou
+    /// l'action GAME_START du .MEM. L'enregistreur de replay ne partait que sur le START lu par le
+    /// lecteur de manettes de l'API ; une borne jouee au clavier, ou dont la manette n'est pas lue,
+    /// n'enregistrait plus rien alors que son score partait (theJim : un replay sur vingt-cinq
+    /// parties). Le credit consomme tombe au START meme ; l'enregistreur le prend comme tel.
+    /// </summary>
+    private void AnnoncerLeDepart(string source)
+        => _ = _eventBus.PublishAsync(new EventEnvelope
+        {
+            Type = "scoring.partie.depart",
+            Payload = new { Source = source },
+        });
+
     private void AppliquerEtat(string action)
     {
         if (action.Length == 0) return;
         if (action == JeuCommence)
         {
+            AnnoncerLeDepart("GAME_START");
             SortirDeDemo();
             return;
         }
@@ -1216,6 +1231,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             scoreAvant = _finalTotal ?? 0;
             session = _jetonDeSession;
         }
+        AnnoncerLeDepart("credit consomme");
 
         Trace($"credit consomme (score {scoreAvant}, frame {frame}) : depart, continue ou arrivee d'un joueur, tranche dans 3,5 s");
         _ = ConfirmerCreditAsync(session, scoreAvant, frame);

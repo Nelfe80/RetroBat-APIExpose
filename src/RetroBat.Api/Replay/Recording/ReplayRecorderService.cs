@@ -248,6 +248,29 @@ public sealed class ReplayRecorderService : BackgroundService
             return;
         }
 
+        // LE DEPART LU DANS LA MEMOIRE DU JEU (credit consomme, GAME_START du .MEM) vaut un START :
+        // une borne jouee au clavier, ou dont la manette n'est pas lue par l'API, n'enregistrait
+        // plus rien (theJim, 2026-10-02 : « en attente d'un START », puis plus rien).
+        if (string.Equals(e.Type, "scoring.partie.depart", StringComparison.Ordinal))
+        {
+            _dernierStartUtc = DateTime.UtcNow;
+            if (_current is null)
+            {
+                var source = "memoire du jeu";
+                try
+                {
+                    var el = System.Text.Json.JsonSerializer.SerializeToElement(e.Payload);
+                    if (el.TryGetProperty("Source", out var s) && s.GetString() is { Length: > 0 } lue) source = lue;
+                }
+                catch
+                {
+                    // La source n'est qu'un mot pour le journal.
+                }
+                _logger.LogInformation("Replay : depart de la partie lu dans la memoire du jeu ({Source}), vaut un START.", source);
+            }
+            return;
+        }
+
         if (!string.Equals(e.Type, "panel.input.pressed", StringComparison.Ordinal)) return;
         try
         {
