@@ -31,6 +31,7 @@ public sealed class NetplayGuestService
     private readonly NetplayHostService _hote;
     private readonly LiveContestOverlayService? _bandeau;
     private readonly RetroBat.Domain.Interfaces.IEsSettingsStore? _esSettings;
+    private readonly RetroBat.Domain.Interfaces.IEventBus? _eventBus;
     private readonly ILogger<NetplayGuestService> _logger;
 
     public NetplayGuestService(
@@ -41,7 +42,8 @@ public sealed class NetplayGuestService
         NetplayHostService hote,
         ILogger<NetplayGuestService> logger,
         LiveContestOverlayService? bandeau = null,
-        RetroBat.Domain.Interfaces.IEsSettingsStore? esSettings = null)
+        RetroBat.Domain.Interfaces.IEsSettingsStore? esSettings = null,
+        RetroBat.Domain.Interfaces.IEventBus? eventBus = null)
     {
         _machine = machine;
         _httpFactory = httpFactory;
@@ -50,6 +52,7 @@ public sealed class NetplayGuestService
         _hote = hote;
         _bandeau = bandeau;
         _esSettings = esSettings;
+        _eventBus = eventBus;
         _logger = logger;
     }
 
@@ -231,14 +234,13 @@ public sealed class NetplayGuestService
         // sans precaution particuliere.
         _ = EmulatorForeground.FocusEmulatorWhenUpAsync();
 
-        // RetroArch demande le mot de passe A L'ECRAN, quoi que dise sa configuration : la borne le
-        // tape a la place du joueur des que RetroArch a joint le relais (RetroArchMotDePasse).
-        var aSaisir = infos.Value;
-        if (aSaisir.MotDePasse.Length > 0)
-        {
-            _ = Task.Run(() => RetroArchMotDePasse.SaisirAsync(aSaisir.Relais, aSaisir.Port, aSaisir.MotDePasse, _logger),
-                CancellationToken.None);
-        }
+        // La partie suivie depuis sa connexion au relais (RetroArchInvite) : RetroArch demande le mot
+        // de passe A L'ECRAN, la borne le tape a la place du joueur ; et quand l'hote part, la
+        // partie en ligne est finie, la borne le dit et ferme le jeu.
+        var suivie = infos.Value;
+        _ = Task.Run(() => RetroArchInvite.SuivreAsync(suivie.Relais, suivie.Port, suivie.MotDePasse,
+                () => HotePartiAsync(hote), _logger),
+            CancellationToken.None);
 
         // La seance s'OUVRE seulement quand la partie est lancee. L'ouvrir avant laisserait la
         // facade croire qu'il y a quelque chose a quoi reagir alors qu'aucun jeu ne tourne.
@@ -257,6 +259,19 @@ public sealed class NetplayGuestService
     private void AnnoncerLArrivee(bool joueur, string hote)
     {
         if (_bandeau is null) return;
+        var code = LangueDeLaBorne();
+        var qui = hote.Trim().Length > 0 ? hote.Trim() : CabinetAnnounceText.Get("netplay_this_live", code);
+        var cle = joueur ? "netplay_player" : "netplay_spectator";
+        _bandeau.ShowTop(
+            "NETPLAY",
+            string.Format(System.Globalization.CultureInfo.InvariantCulture, CabinetAnnounceText.Get(cle + "_title", code), qui),
+            CabinetAnnounceText.Get(cle + "_sub", code),
+            7000);
+        _logger.LogInformation("Netplay : arrivee annoncee ({Role} chez {Hote}).", joueur ? "joueur" : "spectateur", qui);
+    }
+
+    private string LangueDeLaBorne()
+    {
         string? es = null;
         try
         {
@@ -266,15 +281,39 @@ public sealed class NetplayGuestService
         {
             // Des reglages illisibles : l'anglais.
         }
-        var code = CabinetAnnounceText.Resolve(null, es);
-        var qui = hote.Trim().Length > 0 ? hote.Trim() : CabinetAnnounceText.Get("netplay_this_live", code);
-        var cle = joueur ? "netplay_player" : "netplay_spectator";
-        _bandeau.ShowTop(
-            "NETPLAY",
-            string.Format(System.Globalization.CultureInfo.InvariantCulture, CabinetAnnounceText.Get(cle + "_title", code), qui),
-            CabinetAnnounceText.Get(cle + "_sub", code),
-            7000);
-        _logger.LogInformation("Netplay : arrivee annoncee ({Role} chez {Hote}).", joueur ? "joueur" : "spectateur", qui);
+        return CabinetAnnounceText.Resolve(null, es);
+    }
+
+    /// <summary>
+    /// L'HOTE EST PARTI (2026-10-02) : sa partie fermee, RetroArch continuait le jeu en local chez
+    /// l'invite, le personnage de l'hote immobile. La partie en ligne est finie : le joueur le lit,
+    /// son score s'arrete la (le rapporteur coupe la trajectoire de sa place), et le jeu se ferme.
+    /// </summary>
+    private async Task HotePartiAsync(string hote)
+    {
+        if (_eventBus is not null)
+        {
+            await _eventBus.PublishAsync(new RetroBat.Domain.Events.EventEnvelope
+            {
+                Type = "netplay.guest.host_left",
+                Payload = new { Hote = hote },
+            }).ConfigureAwait(false);
+        }
+        if (_bandeau is not null)
+        {
+            var code = LangueDeLaBorne();
+            var qui = hote.Trim().Length > 0 ? hote.Trim() : CabinetAnnounceText.Get("netplay_the_host", code);
+            _bandeau.ShowTop(
+                "NETPLAY",
+                string.Format(System.Globalization.CultureInfo.InvariantCulture, CabinetAnnounceText.Get("netplay_host_left_title", code), qui),
+                CabinetAnnounceText.Get("netplay_host_left_sub", code),
+                9000);
+        }
+        // RetroArch met une dizaine de secondes a sortir d'une partie dont l'hote est parti
+        // (mesure du 2026-10-02) : la fermeture part tout de suite, le bandeau la couvre.
+        await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+        await RetroArchInvite.FermerAsync().ConfigureAwait(false);
+        _logger.LogInformation("Netplay : l'hote ({Hote}) est parti, la partie de l'invite est fermee.", hote);
     }
 
     /// <summary>

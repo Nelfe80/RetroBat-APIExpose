@@ -543,6 +543,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 case "scoring.lab.start":
                     SortirDeDemo();
                     break;
+                case "netplay.guest.host_left":
+                    lock (_sync) { _hotePartiFrame ??= _lastFrame; }
+                    Trace($"l'hote a quitte la partie (frame {_lastFrame}) : la place de cette borne s'arrete la");
+                    break;
                 case "score.live.changed":
                     CaptureTotal(ToJson(envelope.Payload));
                     break;
@@ -587,6 +591,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _placeInvite = null;
             _seanceInvite = null;
             _creditsMuets = null;
+            _hotePartiFrame = null;
             _continuesConsole.Clear();
             _definitionChargee = null;
             _invite = RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun;
@@ -1621,6 +1626,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>La frame ou le wrapper a coupe la ligne des credits : les continues ne se voient plus.</summary>
     private long? _creditsMuets;
 
+    /// <summary>La frame ou l'hote a quitte la partie rejointe : la place de l'invite s'arrete la.</summary>
+    private long? _hotePartiFrame;
+
     /// <summary>Les lignes CONTINUES du .MEM (compteur console, etat d'un joueur Neo-Geo), au fil de la session.</summary>
     private readonly List<LectureDeContinues> _continuesConsole = new();
 
@@ -2170,11 +2178,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         List<DepartDeJoueur> departs;
         List<LectureDeContinues> continuesConsole;
         long? creditsMuets;
+        long? hoteParti;
         lock (_sync)
         {
             credits = new List<EvenementDeCredit>(_credits);
             departs = new List<DepartDeJoueur>(_departs);
             continuesConsole = new List<LectureDeContinues>(_continuesConsole);
+            hoteParti = _hotePartiFrame;
             creditsMuets = _creditsMuets;
             listenerSha = _listenerSha256; coreSha = _coreSha256; memSha = _memSha256;
             contentSha = _contentSha256; contentMd5 = _contentMd5; contentSha1 = _contentSha1; contentSet = _contentSet; wrapperVersion = _wrapperVersion;
@@ -2210,6 +2220,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 return;
             }
             trajectory = trajectory.Where(l => l.frame >= depart).ToList();
+            // L'hote parti, RetroArch continuait en local : ce qui suit n'est plus la partie en ligne.
+            if (hoteParti is { } fin)
+            {
+                trajectory = trajectory.Where(l => l.frame <= fin).ToList();
+                Trace($"1CC MULTI : l'hote est parti a la frame {fin}, la place s'arrete la");
+            }
         }
         // Ses continues seulement : ceux d'un autre joueur, lus sur sa propre ligne, ne coupent rien.
         var coupesDuCompteur = ContinuesParCompteur.CoupesDeLaPlace(continuesConsole, place);

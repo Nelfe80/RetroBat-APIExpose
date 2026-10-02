@@ -161,6 +161,9 @@ public static class CabinetAnnounceText
             ["netplay_spectator_title"] = "Tu regardes {0} en SPECTATEUR",
             ["netplay_spectator_sub"] = "tes boutons envoient des réactions",
             ["netplay_this_live"] = "ce direct",
+            ["netplay_host_left_title"] = "{0} a quitté la partie",
+            ["netplay_host_left_sub"] = "la partie en ligne est finie, le jeu se ferme",
+            ["netplay_the_host"] = "L'hôte",
         },
         ["en"] = new()
         {
@@ -237,6 +240,9 @@ public static class CabinetAnnounceText
             ["netplay_spectator_title"] = "You watch {0} as a SPECTATOR",
             ["netplay_spectator_sub"] = "your buttons send reactions",
             ["netplay_this_live"] = "this live",
+            ["netplay_host_left_title"] = "{0} left the game",
+            ["netplay_host_left_sub"] = "the online game is over, closing the game",
+            ["netplay_the_host"] = "The host",
         },
         ["es"] = new()
         {
@@ -313,6 +319,9 @@ public static class CabinetAnnounceText
             ["netplay_spectator_title"] = "Miras a {0} como ESPECTADOR",
             ["netplay_spectator_sub"] = "tus botones envían reacciones",
             ["netplay_this_live"] = "este directo",
+            ["netplay_host_left_title"] = "{0} ha salido de la partida",
+            ["netplay_host_left_sub"] = "la partida en línea ha terminado, el juego se cierra",
+            ["netplay_the_host"] = "El anfitrión",
         },
         ["ja"] = new()
         {
@@ -389,6 +398,9 @@ public static class CabinetAnnounceText
             ["netplay_spectator_title"] = "{0} のゲームを 観戦 中",
             ["netplay_spectator_sub"] = "ボタンでリアクションを送れます",
             ["netplay_this_live"] = "このライブ",
+            ["netplay_host_left_title"] = "{0} がゲームを終了しました",
+            ["netplay_host_left_sub"] = "オンライン対戦は終了しました。ゲームを閉じます",
+            ["netplay_the_host"] = "ホスト",
         },
         ["zh"] = new()
         {
@@ -465,6 +477,9 @@ public static class CabinetAnnounceText
             ["netplay_spectator_title"] = "你正在观看 {0}",
             ["netplay_spectator_sub"] = "按键可发送反应",
             ["netplay_this_live"] = "这场直播",
+            ["netplay_host_left_title"] = "{0} 已退出游戏",
+            ["netplay_host_left_sub"] = "在线对局已结束，游戏即将关闭",
+            ["netplay_the_host"] = "主机",
         },
         ["ko"] = new()
         {
@@ -531,6 +546,9 @@ public static class CabinetAnnounceText
             ["netplay_spectator_title"] = "{0}님의 게임을 관전합니다",
             ["netplay_spectator_sub"] = "버튼으로 반응을 보냅니다",
             ["netplay_this_live"] = "이 라이브",
+            ["netplay_host_left_title"] = "{0} 님이 게임을 나갔습니다",
+            ["netplay_host_left_sub"] = "온라인 게임이 끝났습니다. 게임을 종료합니다",
+            ["netplay_the_host"] = "호스트",
         },
     };
 }
