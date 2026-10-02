@@ -87,6 +87,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// <summary>La regle des onglets ordinaires (« 1cc », sinon la premiere ouverte) ; vide : toutes.</summary>
     private string _reglePrincipale = "";
 
+    /// <summary>Les parties de cette borne (passeports gardes), pour MES RECORDS.</summary>
+    private readonly LocalPlaysIndex _partiesLocales = new();
+
+    /// <summary>Les lignes de MES RECORDS : les parties du joueur courant sur ce jeu, la meilleure en haut.</summary>
+    private IReadOnlyList<LeaderboardClient.Ligne> _mesParties = Array.Empty<LeaderboardClient.Ligne>();
+
     /// <summary>Les onglets des AUTRES regles du jeu (1CC MULTI, 1LC) et la regle de chacun.</summary>
     private IReadOnlyList<(LeaderboardPanelModel.Vue Vue, string Regle)> _ongletsDeRegle = Array.Empty<(LeaderboardPanelModel.Vue, string)>();
 
@@ -478,6 +484,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             _etatDuMonde = "";
             _autresMondes = new();
             _rangsDesAutres = new();
+            _mesParties = Array.Empty<LeaderboardClient.Ligne>();
         }
         _menuEsOuvert = false;
         _menuEsConnu = false;
@@ -843,6 +850,43 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         return scores;
     }
 
+    /// <summary>
+    /// Les replays enregistres par cette borne sur ce jeu, pour MES RECORDS : leur fin, leur duree
+    /// (images / cadence du core) et le score que le rapporteur leur a attache a la publication.
+    /// </summary>
+    private IReadOnlyList<LocalPlaysIndex.ReplayLocal> ReplaysDeCeJeu(string cheminDuJeu)
+    {
+        var replays = new List<LocalPlaysIndex.ReplayLocal>();
+        var cible = cheminDuJeu.Length > 0 ? Path.GetFullPath(cheminDuJeu.Replace('/', '\\')) : "";
+        try
+        {
+            foreach (var manifeste in _replays.ListManifests())
+            {
+                var meta = _replays.GetMeta(manifeste.ReplayId);
+                if (meta is null || !meta.CreatedByThisDevice) continue;
+                var rom = meta.Launch?.RomPath ?? "";
+                var memeJeu = string.Equals(manifeste.Game.RomGroup, _romGroup, StringComparison.OrdinalIgnoreCase)
+                    || (cible.Length > 0 && rom.Length > 0 && string.Equals(Path.GetFullPath(rom), cible, StringComparison.OrdinalIgnoreCase));
+                if (!memeJeu) continue;
+                var images = Math.Max(0, manifeste.Frames.ReplayEnd - manifeste.Frames.Start);
+                var duree = manifeste.Frames.NominalFps > 0 ? TimeSpan.FromSeconds(images / manifeste.Frames.NominalFps) : TimeSpan.Zero;
+                var fin = manifeste.CreatedAt.Kind == DateTimeKind.Local ? manifeste.CreatedAt.ToUniversalTime() : DateTime.SpecifyKind(manifeste.CreatedAt, DateTimeKind.Utc);
+                replays.Add(new LocalPlaysIndex.ReplayLocal(manifeste.ReplayId, fin, duree, meta.ScoreValue));
+            }
+        }
+        catch (Exception ex) { _logger.LogDebug(ex, "Classement : replays locaux illisibles."); }
+        return replays;
+    }
+
+    /// <summary>La date d'une partie, a l'heure de la borne, comme la langue de la borne l'ecrit.</summary>
+    private static string DateDeLaPartie(DateTime utc, string langue)
+    {
+        System.Globalization.CultureInfo culture;
+        try { culture = System.Globalization.CultureInfo.GetCultureInfo(langue); }
+        catch (System.Globalization.CultureNotFoundException) { culture = System.Globalization.CultureInfo.InvariantCulture; }
+        return DateTime.SpecifyKind(utc, DateTimeKind.Utc).ToLocalTime().ToString("g", culture);
+    }
+
     private CancellationTokenSource? _relecture;
 
     /// <summary>
@@ -906,11 +950,29 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             }
         }
 
+        // MES RECORDS : les parties de CETTE borne, lues sur le disque (2026-10-03).
+        IReadOnlyList<LeaderboardClient.Ligne> mesParties;
+        try
+        {
+            string chemin;
+            try { chemin = _context.Ui.Selected?.GamePath ?? ""; }
+            catch (Exception) { chemin = ""; }
+            var langue = Langue();
+            mesParties = LocalPlaysIndex.MesParties(_partiesLocales.Toutes(), _romGroup, _reglePrincipale,
+                _session.Get()?.PlayerCode ?? "", ReplaysDeCeJeu(chemin), utc => DateDeLaPartie(utc, langue));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Classement : parties locales illisibles.");
+            mesParties = Array.Empty<LeaderboardClient.Ligne>();
+        }
+
         lock (_gate)
         {
             _monde = resultat.Lignes;
             _etatDuMonde = resultat.Etat;
             _autresMondes = autres;
+            _mesParties = mesParties;
             if (!relecture) _rangsDesAutres = rangsDesAutres;
             // On apprend sa ville et son pays de SA PROPRE ligne : la borne ne les connait pas
             // autrement, et un onglet qu'on ne peut pas remplir ne doit pas exister.
@@ -1419,6 +1481,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         lock (_gate)
         {
             if (_modele.VueCourante == LeaderboardPanelModel.Vue.LiveEtContest) return Array.Empty<LeaderboardClient.Ligne>();
+            if (_modele.VueCourante == LeaderboardPanelModel.Vue.MesRecords) return _mesParties;
             if (RegleDeLaVue(_modele.VueCourante) is not null)
             {
                 return _autresMondes.TryGetValue(_modele.VueCourante, out var autre) ? autre.Lignes : Array.Empty<LeaderboardClient.Ligne>();
@@ -1437,16 +1500,26 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         _modele.PoserLesLignes(surLeLive ? evenements!.Count : lignes.Count);
         string etat;
         IReadOnlyDictionary<string, int> rangsPrecedents;
+        IReadOnlyList<LeaderboardClient.Ligne> lignesDeMaPlace;
         lock (_gate)
         {
             var vue = _modele.VueCourante;
-            var etatDeLaVue = RegleDeLaVue(vue) is null ? _etatDuMonde
+            var mesRecords = vue == LeaderboardPanelModel.Vue.MesRecords;
+            // MES RECORDS n'attend que le chargement : ses lignes sont sur le disque, et une liste
+            // vide doit le DIRE plutot que laisser un panneau muet.
+            var etatDeLaVue = mesRecords ? (_etatDuMonde.Length == 0 ? "" : _mesParties.Count > 0 ? LeaderboardClient.EtatOk : LeaderboardClient.EtatAucunScore)
+                : RegleDeLaVue(vue) is null ? _etatDuMonde
                 : _autresMondes.TryGetValue(vue, out var autre) ? autre.Etat : "";
             etat = etatDeLaVue.Length == 0
                 ? ""
                 : lignes.Count > 0 ? LeaderboardClient.EtatOk : etatDeLaVue;
-            rangsPrecedents = RegleDeLaVue(vue) is null ? _rangsPrecedents
+            // Pas de fleches de mouvement sur ses propres parties : leur rang est leur ordre.
+            rangsPrecedents = mesRecords ? new Dictionary<string, int>()
+                : RegleDeLaVue(vue) is null ? _rangsPrecedents
                 : _rangsDesAutres.TryGetValue(vue, out var rangs) ? rangs : new Dictionary<string, int>();
+            // « Ma place » reste celle du MONDE sur MES RECORDS : la place parmi ses propres
+            // parties ne dirait rien.
+            lignesDeMaPlace = mesRecords ? _monde : lignes;
         }
         var langue = Langue();
         var chezNous = _modele.Etat == LeaderboardPanelModel.Foyer.Panneau;
@@ -1475,7 +1548,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 _textes.Text("leaderboard.podium.third", langue),
             },
             _textes.Text("leaderboard.challenge", langue),
-            MaPlace(lignes, langue),
+            MaPlace(lignesDeMaPlace, langue),
             _textes.Text("leaderboard.follow", langue),
             _textes.Text("leaderboard.following", langue),
             ligne?.Poignee is { Length: > 0 } p && _social.Suit(p),

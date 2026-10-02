@@ -42,21 +42,24 @@ public sealed class LeaderboardRulesTabsTests
     }
 
     [Fact]
-    public void L_onglet_1cc_multi_suit_monde_et_l_on_entre_sur_monde()
+    public void L_onglet_1cc_multi_precede_monde_et_l_on_entre_sur_monde()
     {
+        // « [1CC MULTI] MONDE [1CC] » (decision user 2026-10-03) : Monde reste contre la porte.
         var m = new LeaderboardPanelModel();
         m.Ouvrir(salleConnue: true, villeConnue: false, paysConnu: false, aDesRecords: true);
         Assert.True(m.PoserLesRegles(new[] { Vue.MondeMulti }));
         m.PoserLesLignes(5);
-        Assert.Equal(new[] { Vue.MesRecords, Vue.MaSalle, Vue.Monde, Vue.MondeMulti }, m.Onglets);
+        Assert.Equal(new[] { Vue.MesRecords, Vue.MaSalle, Vue.MondeMulti, Vue.Monde }, m.Onglets);
         Assert.Equal(Vue.Monde, m.VueCourante);
-        Assert.False(m.SurLaPorte);
+        Assert.True(m.SurLaPorte);
 
         Assert.Equal(Effet.PrendreLeFocus, m.Entree(EntreePanneau.Gauche));
         Assert.Equal(Vue.Monde, m.VueCourante);   // prendre la main ne change pas de vue
-        Assert.Equal(Effet.ChargerLaVue, m.Entree(EntreePanneau.Droite));
+        Assert.Equal(Effet.ChargerLaVue, m.Entree(EntreePanneau.Gauche));
         Assert.Equal(Vue.MondeMulti, m.VueCourante);
-        Assert.True(m.SurLaPorte);
+        Assert.False(m.SurLaPorte);
+        Assert.Equal(Effet.ChargerLaVue, m.Entree(EntreePanneau.Droite));
+        Assert.Equal(Vue.Monde, m.VueCourante);
         Assert.Equal(Effet.RendreLeFocus, m.Entree(EntreePanneau.Droite));
     }
 
@@ -67,11 +70,11 @@ public sealed class LeaderboardRulesTabsTests
         m.Ouvrir(false, false, false, true);
         m.PoserLesEvenements(true);
         m.PoserLesRegles(new[] { Vue.MondeMulti });
-        Assert.Equal(new[] { Vue.MesRecords, Vue.Monde, Vue.MondeMulti, Vue.LiveEtContest }, m.Onglets);
+        Assert.Equal(new[] { Vue.MesRecords, Vue.MondeMulti, Vue.Monde, Vue.LiveEtContest }, m.Onglets);
         Assert.Equal(Vue.Monde, m.VueCourante);
         m.PoserLesEvenements(false);
         Assert.Equal(Vue.Monde, m.VueCourante);
-        Assert.Equal(new[] { Vue.MesRecords, Vue.Monde, Vue.MondeMulti }, m.Onglets);
+        Assert.Equal(new[] { Vue.MesRecords, Vue.MondeMulti, Vue.Monde }, m.Onglets);
     }
 
     [Fact]
@@ -84,12 +87,12 @@ public sealed class LeaderboardRulesTabsTests
 
         // Le classement se vide pendant qu'on le regarde : on retombe sur Monde.
         m.PoserLesRegles(new[] { Vue.MondeMulti, Vue.Monde1lc });
-        Assert.Equal(new[] { Vue.MesRecords, Vue.Monde, Vue.MondeMulti, Vue.Monde1lc }, m.Onglets);
+        Assert.Equal(new[] { Vue.MesRecords, Vue.Monde1lc, Vue.MondeMulti, Vue.Monde }, m.Onglets);
         m.Entree(EntreePanneau.Gauche);
-        m.Entree(EntreePanneau.Droite);
+        m.Entree(EntreePanneau.Gauche);
         Assert.Equal(Vue.MondeMulti, m.VueCourante);
         Assert.True(m.PoserLesRegles(new[] { Vue.Monde1lc }));
-        Assert.Equal(new[] { Vue.MesRecords, Vue.Monde, Vue.Monde1lc }, m.Onglets);
+        Assert.Equal(new[] { Vue.MesRecords, Vue.Monde1lc, Vue.Monde }, m.Onglets);
         Assert.Equal(Vue.Monde, m.VueCourante);
     }
 

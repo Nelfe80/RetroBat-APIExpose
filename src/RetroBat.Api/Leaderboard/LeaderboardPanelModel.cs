@@ -34,7 +34,7 @@ public sealed class LeaderboardPanelModel
         MonPays,
         Monde,
         /// <summary>
-        /// Le classement mondial d'une AUTRE regle ouverte du jeu, juste apres « Monde » : son
+        /// Le classement mondial d'une AUTRE regle ouverte du jeu, a cote de « Monde » : son
         /// pendant, qui n'a pas besoin de redire « monde » (decision user 2026-10-02). Le panneau
         /// melangeait les regles : un score 1CC MULTI se classait au milieu des scores solo.
         /// </summary>
@@ -138,13 +138,14 @@ public sealed class LeaderboardPanelModel
     /// <summary>
     /// Les onglets des autres regles du jeu (1CC MULTI, 1LC) n'existent que si leur classement a
     /// des scores (demande user 2026-10-03) : un onglet vide se traverse pour rien. Ils se rangent
-    /// juste apres « Monde », dans cet ordre, sans deplacer le curseur. Rend vrai si la rangee
-    /// d'onglets a change.
+    /// juste AVANT « Monde » (« [1CC MULTI] MONDE [1CC] », decision user 2026-10-03) : Monde reste
+    /// contre la porte. Le curseur ne bouge pas. Rend vrai si la rangee d'onglets a change.
     /// </summary>
     public bool PoserLesRegles(IReadOnlyCollection<Vue> presentes)
     {
         if (!_onglets.Contains(Vue.Monde)) return false;
-        var ordre = new[] { Vue.MondeMulti, Vue.Monde1lc };
+        // De gauche a droite, juste avant Monde.
+        var ordre = new[] { Vue.Monde1lc, Vue.MondeMulti };
         if (ordre.All(v => presentes.Contains(v) == _onglets.Contains(v))) return false;
 
         var avant = VueCourante;
@@ -154,12 +155,9 @@ public sealed class LeaderboardPanelModel
             _onglets.Remove(vue);
             if (avant == vue) { avant = Vue.Monde; _ligne = 0; }
         }
-        var position = _onglets.IndexOf(Vue.Monde) + 1;
         foreach (var vue in ordre)
         {
-            if (!presentes.Contains(vue)) continue;
-            if (!_onglets.Contains(vue)) _onglets.Insert(position, vue);
-            position = _onglets.IndexOf(vue) + 1;
+            if (presentes.Contains(vue) && !_onglets.Contains(vue)) _onglets.Insert(_onglets.IndexOf(Vue.Monde), vue);
         }
         var index = _onglets.IndexOf(avant);
         _onglet = index >= 0 ? index : Math.Clamp(_onglet, 0, Math.Max(0, _onglets.Count - 1));
@@ -177,8 +175,8 @@ public sealed class LeaderboardPanelModel
         _onglets.Add(Vue.Monde);
 
         // On entre sur « Monde », la regle principale du jeu, contre la porte. Chaque pas vers la
-        // gauche resserre ensuite vers le joueur ; les autres regles du jeu viendront a sa droite
-        // si elles ont un classement (PoserLesRegles).
+        // gauche resserre ensuite vers le joueur ; les autres regles du jeu viendront juste a sa
+        // gauche si elles ont un classement (PoserLesRegles).
         _onglet = _onglets.IndexOf(Vue.Monde);
         _ligne = 0;
         _lignes = 0;
