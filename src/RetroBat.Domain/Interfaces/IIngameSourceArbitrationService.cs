@@ -8,6 +8,9 @@ public interface IIngameSourceArbitrationService
 
     bool ShouldSuppressRetroArchWrapper(string systemId, string rom, string definitionFile);
 
+    /// <summary>Une session du pont Lua de MAME est ouverte : le .MEM mesure le jeu lance.</summary>
+    bool MameLuaMesure { get; }
+
     /// <summary>
     /// La session de FIN du wrapper doit-elle être écartée ? Oui quand le pont Lua de MAME mesure
     /// ce jeu, et encore une minute après la fin de sa session : les deux sessions de fin partent

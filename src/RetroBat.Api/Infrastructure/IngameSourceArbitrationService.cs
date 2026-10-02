@@ -64,6 +64,17 @@ public sealed class IngameSourceArbitrationService : IIngameSourceArbitrationSer
         }
     }
 
+    public bool MameLuaMesure
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _mameLuaSessions.Count > 0;
+            }
+        }
+    }
+
     public bool ShouldSuppressRetroArchWrapper(string systemId, string rom, string definitionFile)
     {
         var normalizedSystem = NormalizeSystem(systemId);

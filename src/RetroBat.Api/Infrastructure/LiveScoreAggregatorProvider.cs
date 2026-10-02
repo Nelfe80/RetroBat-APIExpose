@@ -37,16 +37,21 @@ public sealed class LiveScoreAggregatorProvider : IProvider
 
     private readonly IEventBus _eventBus;
     private readonly ILogger<LiveScoreAggregatorProvider> _logger;
+    private readonly RetroBat.Domain.Interfaces.IIngameSourceArbitrationService? _arbitration;
     private readonly object _sync = new();
     private readonly Dictionary<string, ScoreAccumulator> _scores = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, int> _currentPlayers = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, ScoreDefinition> _scoreDefinitions = new(StringComparer.OrdinalIgnoreCase);
     private IDisposable? _subscription;
 
-    public LiveScoreAggregatorProvider(IEventBus eventBus, ILogger<LiveScoreAggregatorProvider> logger)
+    public LiveScoreAggregatorProvider(
+        IEventBus eventBus,
+        ILogger<LiveScoreAggregatorProvider> logger,
+        RetroBat.Domain.Interfaces.IIngameSourceArbitrationService? arbitration = null)
     {
         _eventBus = eventBus;
         _logger = logger;
+        _arbitration = arbitration;
     }
 
     public Task StartAsync(CancellationToken cancellationToken = default)
@@ -280,6 +285,15 @@ public sealed class LiveScoreAggregatorProvider : IProvider
             return;
         }
 
+        // LE .MEM FAIT FOI QUAND LE PONT LUA MESURE LE JEU (2026-10-02). Les sorties de MAME ne
+        // disent pas toutes un score : sur la Neo-Geo MVS, digit1 a digit4 sont les afficheurs LED
+        // des credits. Lues comme un score, elles se melaient a celui du joueur 1 de Metal Slug 3
+        // sous MAME autonome (501 a l'ecran, 79 publie).
+        if (_arbitration?.MameLuaMesure == true)
+        {
+            return;
+        }
+
         foreach (var signal in EnumerateSignals(payload))
         {
             var key = ReadString(signal, "Key");
@@ -290,6 +304,14 @@ public sealed class LiveScoreAggregatorProvider : IProvider
 
             var value = ReadLong(signal, "Value");
             if (!value.HasValue)
+            {
+                continue;
+            }
+
+            // Une sortie « digit » qui ne vaut pas 0 a 9 porte un motif 7 segments, pas un chiffre
+            // (0x3F = « 0 », 0x7D = « 6 ») : jamais un score. Le « 63 au demarrage » de Metal Slug 3
+            // sous MAME (2026-09-25) etait le « 0 » des credits.
+            if (InferOutputDigitWeight(key).HasValue && value.Value is < 0 or > 9)
             {
                 continue;
             }
