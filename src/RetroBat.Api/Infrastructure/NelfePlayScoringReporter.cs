@@ -1214,7 +1214,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     ///
     /// Limite connue : sur une borne à pièces, un START pressé pendant la démo SANS crédit la fait
     /// sortir de la démo alors que l'attract continue. La démo suivante la ré-arme, et le score
-    /// retenu reste le meilleur run. À affiner avec le crédit quand on en aura le signal.
+    /// retenu reste le meilleur run.
+    ///
+    /// UN CREDIT CONSOMME FAIT AUSSI SORTIR DE LA DEMO (2026-10-02). Sans START lu au panel (borne
+    /// jouee au clavier, manette non lue, manette reseau du labo) ni GAME_START dans le .MEM, toute
+    /// la partie restait marquee demo et aucun score ne partait : Double Dragon au labo, 24 scores
+    /// recus, 24 comptes en demo. Le credit ne se consomme qu'au depart d'une vraie partie.
     /// </summary>
     private void SortirDeDemo()
     {
@@ -1274,6 +1279,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             session = _jetonDeSession;
         }
         AnnoncerLeDepart("credit consomme");
+        SortirDeDemo();
 
         Trace($"credit consomme (score {scoreAvant}, frame {frame}) : depart, continue ou arrivee d'un joueur, tranche dans 3,5 s");
         _ = ConfirmerCreditAsync(session, scoreAvant, frame);
