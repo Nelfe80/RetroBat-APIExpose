@@ -158,6 +158,27 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private volatile bool _panelLu;
 
+    /// <summary>Le systeme du jeu charge (attestation du pont) : mastersystem, arcade...</summary>
+    private string _systemeDuJeu = "";
+
+    /// <summary>
+    /// LES CONSOLES DONT LA MANETTE N'A PAS DE START (2026-10-02) : la Master System et la SG-1000
+    /// lancent la partie au bouton 1 ou 2, et le START du panel y met le jeu en pause. Le replay
+    /// n'y partait donc jamais. Un appui sur ces boutons y vaut un START pour l'enregistreur, une
+    /// fois par partie. Pas pour la fenetre de jeu du scoring : un bouton presse pendant la demo
+    /// ramene au titre, il ne commence pas la partie.
+    /// </summary>
+    internal static readonly HashSet<string> SystemesSansStart = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "mastersystem", "sg1000",
+    };
+
+    /// <summary>Un appui qui lance la partie sur une console sans START : le bouton 1 ou 2.</summary>
+    internal static bool LanceLaPartieSansStart(string systeme, string identite)
+        => SystemesSansStart.Contains(systeme)
+           && (string.Equals(identite, "a", StringComparison.OrdinalIgnoreCase)
+               || string.Equals(identite, "b", StringComparison.OrdinalIgnoreCase));
+
     /// <summary>
     /// LE SCORE AU DEPART DE LA PARTIE (2026-10-02), avec la frame du depart. Le pont ne dit un
     /// score que quand il change : la derniere valeur lue avant le START est celle que le jeu
@@ -618,6 +639,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _dernierTotalVu = null;
             _scoreAuDepart = null;
             _departAnnonce = false;
+            _systemeDuJeu = "";
             _vies.Clear();
             _contexte = RetroBat.Api.Scoring.ContexteDeJeu.Vide;
             _contextes.Clear();
@@ -746,6 +768,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _wrapperVersion = GetString(root, "WrapperVersion");
             _coreName = GetString(root, "CoreName");
             _coreVersion = GetString(root, "CoreVersion");
+            _systemeDuJeu = GetString(root, "SystemId") ?? "";
         }
         _ = PreflightAsync(root, CancellationToken.None);
     }
@@ -1213,7 +1236,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         _panelLu = true;
         if ((Entier(root, "Player") ?? Entier(root, "player") ?? 1) == 1) _portLocal.AppuiDuPanel();
         var systeme = GetString(root, "System") ?? GetString(root, "system") ?? "";
-        if (!string.Equals(systeme, "START", StringComparison.OrdinalIgnoreCase)) return;
+        if (!string.Equals(systeme, "START", StringComparison.OrdinalIgnoreCase))
+        {
+            bool aDire;
+            lock (_sync) { aDire = !_departAnnonce && LanceLaPartieSansStart(_systemeDuJeu, GetString(root, "Identity") ?? ""); }
+            if (aDire) AnnoncerLeDepart("bouton 1/2, console sans START");
+            return;
+        }
         var joueur = Entier(root, "Player") ?? Entier(root, "player") ?? 1;
         lock (_sync)
         {

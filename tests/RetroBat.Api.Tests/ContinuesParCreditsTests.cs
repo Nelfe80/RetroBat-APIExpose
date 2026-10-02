@@ -364,4 +364,14 @@ public class ContinuesParCreditsTests
         var sonic = Lectures((100, 0), (1500, 10000), (2640, 0));
         Assert.Equal(10000, ContinuesParCompteur.MeilleurAvant(sonic, new List<bool> { false, false, false }, 2640));
     }
+
+    [Fact]
+    public void Une_console_sans_start_part_au_bouton_1_ou_2()
+    {
+        Assert.True(NelfePlayScoringReporter.LanceLaPartieSansStart("mastersystem", "b"));
+        Assert.True(NelfePlayScoringReporter.LanceLaPartieSansStart("sg1000", "a"));
+        Assert.False(NelfePlayScoringReporter.LanceLaPartieSansStart("mastersystem", "start"));
+        Assert.False(NelfePlayScoringReporter.LanceLaPartieSansStart("megadrive", "a"));
+        Assert.False(NelfePlayScoringReporter.LanceLaPartieSansStart("arcade", "b"));
+    }
 }
