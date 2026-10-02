@@ -144,6 +144,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly List<bool> _horsJeu = new();   // parallèle à _trajectory
     private bool _startVu;
     private bool _enJeu;
+
+    /// <summary>La derniere valeur du score du joueur 1 recue, demo comprise.</summary>
+    private long? _dernierTotalVu;
+
+    /// <summary>
+    /// LE SCORE AU DEPART DE LA PARTIE (2026-10-02), avec la frame du depart. Le pont ne dit un
+    /// score que quand il change : la derniere valeur lue avant le START est celle que le jeu
+    /// avait au depart. Sans elle, une partie qui marque d'un coup avant son premier continue
+    /// n'avait qu'une lecture et passait pour un score qui n'a jamais monte (Metal Slug 3 au
+    /// labo : 0 lu au demarrage, ecarte comme hors jeu, puis 500 et le continue).
+    /// </summary>
+    private (long Frame, long Total)? _scoreAuDepart;
     /// <summary>
     /// Les pertes et gains de vie de la partie, avec leur valeur : c'est eux qui disent OU le run
     /// s'est termine. Voir FinsDeRun -- le decoupage ne connaissait que les chutes de score, et un
@@ -588,6 +600,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _horsJeu.Clear();
             _startVu = false;
             _enJeu = false;
+            _dernierTotalVu = null;
+            _scoreAuDepart = null;
             _vies.Clear();
             _contexte = RetroBat.Api.Scoring.ContexteDeJeu.Vide;
             _contextes.Clear();
@@ -1095,6 +1109,20 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// après le lancement. Le pont Lua refermait là une session de 63 points, à CHAQUE lancement,
     /// qui serait partie au classement une fois le jeu ouvert au scoring.
     /// </summary>
+    /// <summary>
+    /// La partie commence au score qu'avait le jeu au depart, s'il est connu et qu'aucune lecture
+    /// en jeu ne le redit deja.
+    /// </summary>
+    internal static List<(long frame, long total)> AvecLeScoreAuDepart(
+        List<(long frame, long total)> trajectoire, (long Frame, long Total)? depart)
+    {
+        if (depart is not { } d || trajectoire.Count == 0) return trajectoire;
+        if (trajectoire[0].frame < d.Frame || trajectoire[0].total == d.Total) return trajectoire;
+        var avec = new List<(long frame, long total)>(trajectoire.Count + 1) { (d.Frame, d.Total) };
+        avec.AddRange(trajectoire);
+        return avec;
+    }
+
     internal static bool ScoreAMonte(IReadOnlyList<(long frame, long total)> trajectoire)
     {
         for (var i = 1; i < trajectoire.Count; i++)
@@ -1130,7 +1158,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private void SortirDeDemo()
     {
         // Un START ouvre la partie : fin de la démo, et début de la fenêtre de jeu.
-        lock (_sync) { _inDemo = false; _startVu = true; _enJeu = true; }
+        lock (_sync)
+        {
+            if (!_enJeu && _scoreAuDepart is null && _dernierTotalVu is { } auDepart) _scoreAuDepart = (_lastFrame, auDepart);
+            _inDemo = false; _startVu = true; _enJeu = true;
+        }
     }
 
     /// <summary>Une seconde d'appuis par port, du wrapper (0.340) : de quoi retrouver le port local.</summary>
@@ -1739,6 +1771,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         lock (_sync)
         {
             _scoresRecus++;
+            _dernierTotalVu = total;
             if (_inDemo) { _scoresEnDemo++; return; }   // score de démo → jamais certifié
             var precedent = _finalTotal;
             _finalTotal = total;
@@ -2311,6 +2344,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 trajectory = gardes;
                 // Rien de joué : pas de filet sur le dernier total, qui serait celui de l'attract.
                 if (trajectory.Count == 0) finalTotal = null;
+                // Le score au depart ouvre la partie (sans filtre de mode : son mode n'est pas connu).
+                if (filtre is null) trajectory = AvecLeScoreAuDepart(trajectory, _scoreAuDepart);
             }
         }
 

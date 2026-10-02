@@ -338,6 +338,30 @@ public class RetroArchWrapperProvider : IProvider
     /// <summary>Dernier constat de diagnostic annonce, pour ne pas le repeter a chaque seconde.</summary>
     private string? _lastDiagnosticKey;
 
+    /// <summary>
+    /// LE COEUR DU JEU EN COURS HEBERGE LE PONT LUA DE MAME (2026-10-02). Sous le coeur libretro
+    /// MAME, c'est le plugin Lua qui mesure ; le wrapper lit une RAM repliee sur 2048 octets qui
+    /// n'est pas celle du jeu. Ses signaux n'etaient ecartes qu'une fois la session Lua declaree,
+    /// une quinzaine de secondes apres le chargement : une lecture de ce bloc pouvait passer pour
+    /// l'arrivee d'un joueur 2 ou pour un continue. On les ecarte des que le proces-verbal du
+    /// wrapper nomme ce coeur, jusqu'au jeu suivant.
+    /// </summary>
+    private volatile bool _pontLuaDuCoeur;
+
+    private static readonly System.Text.RegularExpressions.Regex CoeurDuProcesVerbal =
+        new(@"\bCore=([A-Za-z0-9_.\-]+)", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    /// <summary>
+    /// Le coeur nomme par le proces-verbal du wrapper heberge-t-il le pont Lua de MAME ? Null quand
+    /// la ligne ne nomme pas de coeur.
+    /// </summary>
+    public static bool? CoeurAvecPontLua(string line)
+    {
+        var m = CoeurDuProcesVerbal.Match(line);
+        if (!m.Success) return null;
+        return string.Equals(m.Groups[1].Value, "mame_libretro", StringComparison.OrdinalIgnoreCase);
+    }
+
     /// <summary>Surveillances deja annoncees comme ayant parle (jeu + cle du signal).</summary>
     private readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte> _signauxAnnonces = new(StringComparer.Ordinal);
 
@@ -493,6 +517,8 @@ public class RetroArchWrapperProvider : IProvider
             // la monter en Information ne bruite pas le journal.
             if (EstUnDiagnosticDuWrapper(line))
             {
+                if (CoeurAvecPontLua(line) is { } pontLua) _pontLuaDuCoeur = pontLua;
+
                 // Le wrapper repete son constat d'echec a chaque seconde tant que la partie dure.
                 // Le dire une fois suffit a diagnostiquer ; le repeter cinquante fois noie le
                 // journal. On ne reparle donc que si le constat CHANGE.
@@ -549,7 +575,8 @@ public class RetroArchWrapperProvider : IProvider
             return;
         }
 
-        if (_arbitration.ShouldSuppressRetroArchWrapper(definition.SystemId, definition.Rom, definition.DefinitionFile))
+        var pontLuaDuCoeur = _pontLuaDuCoeur;
+        if (pontLuaDuCoeur || _arbitration.ShouldSuppressRetroArchWrapper(definition.SystemId, definition.Rom, definition.DefinitionFile))
         {
             // ÉCARTER DES SIGNAUX EN SILENCE EST LE PIRE DES COMPORTEMENTS : le scoring parait
             // simplement ne pas marcher, sans erreur ni trace, et on cherche la cause partout
@@ -557,11 +584,21 @@ public class RetroArchWrapperProvider : IProvider
             var cle = definition.SystemId + "/" + definition.Rom;
             if (Interlocked.Exchange(ref _lastSuppressionKey, cle) != cle)
             {
-                _logger?.LogInformation(
-                    "Signaux du wrapper RetroArch ECARTES pour {SystemId}/{Rom} : une session MAME Lua est consideree active. "
-                    + "Si MAME n'est plus lance, cette session ne s'est pas refermee et le scoring restera muet sous RetroArch.",
-                    definition.SystemId,
-                    definition.Rom);
+                if (pontLuaDuCoeur)
+                {
+                    _logger?.LogInformation(
+                        "Signaux du wrapper RetroArch ECARTES pour {SystemId}/{Rom} : le coeur libretro MAME heberge le pont Lua, c'est lui qui mesure ce jeu.",
+                        definition.SystemId,
+                        definition.Rom);
+                }
+                else
+                {
+                    _logger?.LogInformation(
+                        "Signaux du wrapper RetroArch ECARTES pour {SystemId}/{Rom} : une session MAME Lua est consideree active. "
+                        + "Si MAME n'est plus lance, cette session ne s'est pas refermee et le scoring restera muet sous RetroArch.",
+                        definition.SystemId,
+                        definition.Rom);
+                }
             }
 
             _logger?.LogDebug(

@@ -319,4 +319,34 @@ public class ContinuesParCreditsTests
             "{ address=0X10ED20, type=\"u32be\", action=\"SCORE_STATE\", player=2 },"));
         Assert.False(NelfePlayScoringReporter.VoitArriverLesJoueurs(null));
     }
+
+    [Fact]
+    public void Le_score_au_depart_ouvre_la_partie()
+    {
+        // Metal Slug 3 au labo MAME64 (2026-10-02) : 0 lu au demarrage puis ecarte comme hors jeu,
+        // 500 d'un coup, puis le continue. Une seule lecture : « jamais monte », la partie tombait.
+        var enJeu = new List<(long frame, long total)> { (9000, 500) };
+        var avec = NelfePlayScoringReporter.AvecLeScoreAuDepart(enJeu, (700, 0));
+        Assert.Equal(new (long, long)[] { (700, 0), (9000, 500) }, avec);
+        Assert.True(NelfePlayScoringReporter.ScoreAMonte(avec));
+        Assert.False(NelfePlayScoringReporter.ScoreAMonte(enJeu));
+
+        // Deja dit par une lecture en jeu, ou inconnu : rien ne change.
+        var remisAZero = new List<(long frame, long total)> { (800, 0), (9000, 500) };
+        Assert.Same(remisAZero, NelfePlayScoringReporter.AvecLeScoreAuDepart(remisAZero, (700, 0)));
+        Assert.Same(enJeu, NelfePlayScoringReporter.AvecLeScoreAuDepart(enJeu, null));
+    }
+
+    [Fact]
+    public void Le_coeur_libretro_mame_heberge_le_pont_lua()
+    {
+        Assert.True(RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider.CoeurAvecPontLua(
+            "[10:59:11.853] [DEBUG WRAPPER] Core=mame_libretro arcade=YES system_ram=OK system_ram_size=2048 memory_map_blocks=0"));
+        Assert.False(RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider.CoeurAvecPontLua(
+            "[DEBUG WRAPPER] Core=fbneo_libretro arcade=YES system_ram=OK system_ram_size=65536"));
+        Assert.False(RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider.CoeurAvecPontLua(
+            "[DEBUG WRAPPER] Core=mame2003_plus_libretro arcade=YES system_ram=NULL"));
+        Assert.Null(RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider.CoeurAvecPontLua(
+            "[DEBUG WRAPPER] MEMORY_ID SYSTEM_RAM id=2 ptr=OK size=2048"));
+    }
 }
