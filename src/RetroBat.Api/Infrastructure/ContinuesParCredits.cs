@@ -3,6 +3,12 @@ namespace RetroBat.Api.Infrastructure;
 /// <summary>Une lecture du compteur de crédits (action CREDITS du .MEM), avec sa frame.</summary>
 public readonly record struct EvenementDeCredit(int Value, long Frame);
 
+/// <summary>
+/// Une lecture d'une ligne CONTINUES du .MEM, avec la place qu'elle compte (son `player=`) ; 0 quand
+/// la ligne ne dit pas de joueur.
+/// </summary>
+public readonly record struct LectureDeContinues(int Player, int Value, long Frame);
+
 /// <summary>Un appui sur START, avec le joueur qui l'a fait et la frame du moment.</summary>
 public readonly record struct DepartDeJoueur(int Player, long Frame);
 
@@ -182,6 +188,47 @@ public static class ContinuesParCompteur
         }
 
         return coupes;
+    }
+
+    /// <summary>
+    /// UNE LIGNE PAR JOUEUR (Neo-Geo, 2026-10-02). Le BIOS tient l'etat de chaque joueur dans
+    /// PLAYER_MOD1/2 (1 en jeu, 2 ecran de continue, 3 game over) : une ligne CONTINUES par joueur,
+    /// avec son `player=`. Une baisse est le continue de CE joueur : celui du joueur 2 n'arrete pas
+    /// le 1CC du joueur 1. Une ligne sans joueur compte pour toutes les places, comme avant.
+    /// </summary>
+    public static IReadOnlyList<long> CoupesDeLaPlace(IReadOnlyList<LectureDeContinues> lectures, int place)
+        => lectures
+            .Where(l => l.Player == 0 || l.Player == place)
+            .GroupBy(l => l.Player)
+            .SelectMany(ligne => Coupes(ligne.Select(l => new EvenementDeCredit(l.Value, l.Frame)).ToList()))
+            .OrderBy(f => f)
+            .ToList();
+
+    /// <summary>
+    /// L'ARRIVEE D'UN JOUEUR 2 OU PLUS : la premiere lecture de sa ligne. Le wrapper (et le pont
+    /// MAME) ne disent une ligne que quand elle change, et ses bornes `min`/`max`, l'ecart permis
+    /// entre deux lectures, ecartent le bruit du demarrage (55, AA, FD sur Metal Slug 3). La ligne
+    /// du joueur 2 parle donc pour la premiere fois quand il entre dans la partie (0 vers 1).
+    /// </summary>
+    public static IReadOnlyList<long> Arrivees(IReadOnlyList<LectureDeContinues> lectures)
+        => lectures
+            .Where(l => l.Player >= 2)
+            .GroupBy(l => l.Player)
+            .Select(ligne => ligne.Min(l => l.Frame))
+            .OrderBy(f => f)
+            .ToList();
+
+    /// <summary>Le depart d'un joueur 2 ou plus, lu sur sa propre ligne : son arrivee.</summary>
+    public static long? DepartDe(IReadOnlyList<LectureDeContinues> lectures, int place)
+    {
+        if (place < 2) return null;
+        long? depart = null;
+        foreach (var l in lectures)
+        {
+            if (l.Player == place && (depart is null || l.Frame < depart)) depart = l.Frame;
+        }
+
+        return depart;
     }
 
     /// <summary>

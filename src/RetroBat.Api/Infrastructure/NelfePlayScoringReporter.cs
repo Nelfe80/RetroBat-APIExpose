@@ -509,6 +509,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     CaptureVie(charge);
                     CaptureModeEtDifficulte(charge);
                     CaptureCredits(charge);
+                    CaptureDefinitionChargee(charge);
                     CaptureContinuesConsole(charge);
                     // Les ETATS du pont Lua de MAME arrivent ici, et seulement ici : le wrapper les
                     // projette en plus sur retroarch.state, le pont Lua non. Sans cette ligne, un
@@ -575,6 +576,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _seanceInvite = null;
             _creditsMuets = null;
             _continuesConsole.Clear();
+            _definitionChargee = null;
             _invite = RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun;
             _debutSessionUtc = DateTime.UtcNow;
             _replayDuSolo = null;
@@ -591,6 +593,42 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _contextes.Clear();
             _credits.Clear();
             _departs.Clear();
+        }
+    }
+
+    /// <summary>
+    /// Le .MEM charge voit-il arriver un joueur 2 ? Une ligne CONTINUES vivante qui porte player=2
+    /// ou plus le dit (Neo-Geo : PLAYER_MOD2, 2026-10-02).
+    /// </summary>
+    internal static bool VoitArriverLesJoueurs(string? mem)
+    {
+        if (string.IsNullOrEmpty(mem)) return false;
+        foreach (var brute in mem.Split('\n'))
+        {
+            var ligne = brute.Split("--", 2)[0];
+            if (!LigneContinues.IsMatch(ligne) || LigneMorte.IsMatch(ligne)) continue;
+            var joueur = JoueurDeLaLigne.Match(ligne);
+            if (joueur.Success && int.TryParse(joueur.Groups[1].Value, out var n) && n >= 2) return true;
+        }
+
+        return false;
+    }
+
+    private static readonly System.Text.RegularExpressions.Regex LigneContinues =
+        new(@"action\s*=\s*[""']CONTINUES[""']", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+    private static readonly System.Text.RegularExpressions.Regex LigneMorte =
+        new(@"no_(log|survey)\s*=\s*true", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+    private static readonly System.Text.RegularExpressions.Regex JoueurDeLaLigne =
+        new(@"\bplayer\s*=\s*(\d+)");
+
+    private string? LireMem(string? chemin)
+    {
+        if (string.IsNullOrEmpty(chemin)) return null;
+        try { return File.Exists(chemin) ? File.ReadAllText(chemin) : null; }
+        catch (Exception ex)
+        {
+            Trace($".MEM illisible ({ex.Message}) : on ne sait pas s'il voit arriver un joueur");
+            return null;
         }
     }
 
@@ -1192,7 +1230,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
 
         Trace($"credit consomme a la frame {frame} : {nature}{(ouverte ? " (partie ouverte aux joueurs)" : "")}");
+        AppliquerBandeau(bandeau, scoreAvant, multi);
+    }
 
+    /// <summary>
+    /// Ce que le joueur voit d'un credit consomme ou d'une arrivee, et ce qu'en font les replays :
+    /// celui du 1CC solo s'arrete, celui du 1CC MULTI commence.
+    /// </summary>
+    private void AppliquerBandeau(BandeauDeCredit bandeau, long scoreAvant, bool multi)
+    {
         switch (bandeau)
         {
             case BandeauDeCredit.ScoreCertifie:
@@ -1543,13 +1589,28 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>La frame ou le wrapper a coupe la ligne des credits : les continues ne se voient plus.</summary>
     private long? _creditsMuets;
 
-    /// <summary>Le compteur de continues d'un jeu console (action CONTINUES), au fil de la session.</summary>
-    private readonly List<EvenementDeCredit> _continuesConsole = new();
+    /// <summary>Les lignes CONTINUES du .MEM (compteur console, etat d'un joueur Neo-Geo), au fil de la session.</summary>
+    private readonly List<LectureDeContinues> _continuesConsole = new();
+
+    /// <summary>Le .MEM en vigueur pour la partie, tel que le pont le nomme (.contest, .user ou officiel).</summary>
+    private string? _definitionChargee;
+
+    private void CaptureDefinitionChargee(JsonElement root)
+    {
+        var chemin = GetString(root, "DefinitionFile");
+        if (string.IsNullOrEmpty(chemin) || string.Equals(chemin, _definitionChargee, StringComparison.Ordinal)) return;
+        lock (_sync) { _definitionChargee = chemin; }
+    }
 
     /// <summary>
     /// UN CONTINUE CONSOLE : le compteur de continues du jeu baisse (ContinuesParCompteur). Le premier
     /// dit le score certifie et arrete le replay ; les suivants redisent que la partie n'est plus
-    /// certifiable. Pas d'attente ici : sur console, aucun joueur 2 n'arrive par un credit.
+    /// certifiable. Pas d'attente ici : le compteur dit lui-meme a quel joueur il est.
+    ///
+    /// UNE LIGNE PAR JOUEUR (Neo-Geo, 2026-10-02) : la ligne qui porte player=2 ou plus est celle
+    /// d'un autre joueur. Sa premiere lecture est son arrivee, qui ferme le 1CC solo comme un credit
+    /// consomme avec son START ; ses baisses sont SES continues : ils ne coupent rien ici, ils
+    /// arretent son 1CC MULTI, compte en fin de partie.
     /// </summary>
     private void CaptureContinuesConsole(JsonElement root)
     {
@@ -1558,18 +1619,63 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (!nom.Equals("CONTINUES", StringComparison.OrdinalIgnoreCase)) return;
         if (Entier(signal, "Value") is not { } valeur) return;
         var frame = Entier(signal, "Frame") ?? _lastFrame;
-        bool premiere;
+        var joueur = Entier(signal, "Player") ?? Entier(root, "player") ?? 0;
+        if (joueur is < 0 or > 4) joueur = 0;
+        var premiere = false;
+        var arrivee = false;
+        var multi = false;
+        var bandeau = BandeauDeCredit.Aucun;
         long scoreAvant;
         lock (_sync)
         {
-            var avant = _continuesConsole.Count > 0 ? _continuesConsole[^1].Value : (int?)null;
-            _continuesConsole.Add(new EvenementDeCredit(valeur, frame));
+            int? avant = null;
+            for (var i = _continuesConsole.Count - 1; i >= 0; i--)
+            {
+                if (_continuesConsole[i].Player != joueur) continue;
+                avant = _continuesConsole[i].Value;
+                break;
+            }
+            _continuesConsole.Add(new LectureDeContinues(joueur, valeur, frame));
             if (_continuesConsole.Count > MaxTrajectory) _continuesConsole.RemoveAt(0);
-            if (avant is null || valeur >= avant) return;   // premiere lecture, ou continue gagne
             if (_invite != RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun) return;
-            premiere = !_closeParCredit;
-            _closeParCredit = true;
-            scoreAvant = ContinuesParCompteur.ScoreAvant(_trajectory, frame);
+            if (joueur >= 2)
+            {
+                if (avant is not null)
+                {
+                    if (valeur >= avant) return;
+                    scoreAvant = 0;   // le continue d'un autre joueur : rien a couper ici
+                }
+                else
+                {
+                    arrivee = true;
+                    scoreAvant = ContinuesParCompteur.ScoreAvant(_trajectory, frame);
+                    premiere = !_closeParCredit;
+                    _closeParCredit = true;
+                    bandeau = QuelBandeau(depart: false, arrivee: true, premiere, _partieADeuxAnnoncee, scoreAvant > 0);
+                    _partieADeuxAnnoncee = true;
+                    if (bandeau == BandeauDeCredit.JoueurRejoint) _replayDuSolo = _activeReplayId;
+                    multi = premiere;
+                }
+            }
+            else
+            {
+                if (avant is null || valeur >= avant) return;   // premiere lecture, ou continue gagne
+                premiere = !_closeParCredit;
+                _closeParCredit = true;
+                scoreAvant = ContinuesParCompteur.ScoreAvant(_trajectory, frame);
+            }
+        }
+
+        if (joueur >= 2)
+        {
+            if (!arrivee)
+            {
+                Trace($"continue du joueur {joueur} (etat {valeur}, frame {frame}) : son 1CC MULTI s'arrete la, rien ne change pour le joueur 1");
+                return;
+            }
+            Trace($"arrivee du joueur {joueur} (sa ligne CONTINUES parle, frame {frame}) : score fait seul {scoreAvant}, la suite a plusieurs");
+            AppliquerBandeau(bandeau, scoreAvant, multi);
+            return;
         }
 
         Trace($"continue console (compteur {valeur}, frame {frame}) : score certifie {scoreAvant}");
@@ -2029,13 +2135,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         List<(long frame, long total)> trajectory;
         List<EvenementDeCredit> credits;
         List<DepartDeJoueur> departs;
-        List<EvenementDeCredit> continuesConsole;
+        List<LectureDeContinues> continuesConsole;
         long? creditsMuets;
         lock (_sync)
         {
             credits = new List<EvenementDeCredit>(_credits);
             departs = new List<DepartDeJoueur>(_departs);
-            continuesConsole = new List<EvenementDeCredit>(_continuesConsole);
+            continuesConsole = new List<LectureDeContinues>(_continuesConsole);
             creditsMuets = _creditsMuets;
             listenerSha = _listenerSha256; coreSha = _coreSha256; memSha = _memSha256;
             contentSha = _contentSha256; contentMd5 = _contentMd5; contentSha1 = _contentSha1; contentSet = _contentSet; wrapperVersion = _wrapperVersion;
@@ -2062,16 +2168,19 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var bilan = ContinuesParCredits.Calculer(credits, departs, ouverteAuxJoueurs: true);
         if (place > 1)
         {
-            // L'invite part au premier credit consomme avec un START de son panel : son score ne
-            // compte qu'a partir de la (la place a pu servir a un autre avant lui).
-            if (bilan.Depart is not { } depart)
+            // L'invite part a la premiere lecture de sa ligne CONTINUES (Neo-Geo : son PLAYER_MOD
+            // passe a 1), sinon au premier credit consomme avec un START de son panel : son score
+            // ne compte qu'a partir de la (la place a pu servir a un autre avant lui).
+            if ((ContinuesParCompteur.DepartDe(continuesConsole, place) ?? bilan.Depart) is not { } depart)
             {
-                Trace("1CC MULTI : STOP, le depart de ce joueur n'a pas ete vu (aucun credit consomme avec un START de ce panel)");
+                Trace("1CC MULTI : STOP, le depart de ce joueur n'a pas ete vu (ni sa ligne CONTINUES, ni un credit consomme avec un START de ce panel)");
                 return;
             }
             trajectory = trajectory.Where(l => l.frame >= depart).ToList();
         }
-        var coupes = bilan.Coupes.Concat(ContinuesParCompteur.Coupes(continuesConsole)).OrderBy(f => f).ToList();
+        // Ses continues seulement : ceux d'un autre joueur, lus sur sa propre ligne, ne coupent rien.
+        var coupesDuCompteur = ContinuesParCompteur.CoupesDeLaPlace(continuesConsole, place);
+        var coupes = bilan.Coupes.Concat(coupesDuCompteur).OrderBy(f => f).ToList();
         if (coupes.Count > 0)
         {
             Trace($"1CC MULTI : continue de ce joueur a la frame {coupes[0]}");
@@ -2130,7 +2239,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         JsonObject passport;
         try
         {
-            (string, long)? coupe = coupes.Count > 0 ? (FinDuSolo.Continue, coupes[0]) : null;
+            var coupe = FinDuSolo.Premiere((FinDuSolo.Continue, bilan.Coupes), (FinDuSolo.ContinueConsole, coupesDuCompteur));
             passport = BuildPassport(
                 systemId, romGroup, sessionDuJoueur, ticket.Value, profile.Value,
                 deviceId!, deviceKey, listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion,
@@ -2259,21 +2368,32 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // avant (cumulatif, decision user du 2026-09-30), la suite ne part pas.
         var finsDeRun = bilanCredits.FinsDuSolo;
         long? creditsMuets;
-        List<EvenementDeCredit> continuesConsole;
+        List<LectureDeContinues> continuesConsole;
+        string? definitionChargee;
         lock (_sync)
         {
             creditsMuets = _creditsMuets;
-            continuesConsole = new List<EvenementDeCredit>(_continuesConsole);
+            continuesConsole = new List<LectureDeContinues>(_continuesConsole);
+            definitionChargee = _definitionChargee;
         }
-        var coupesConsole = ContinuesParCompteur.Coupes(continuesConsole);
+        var coupesConsole = ContinuesParCompteur.CoupesDeLaPlace(continuesConsole, 1);
         if (coupesConsole.Count > 0)
         {
             Trace($"continues console (compteur du jeu) : {string.Join(", ", coupesConsole)}");
             finsDeRun = finsDeRun.Concat(coupesConsole).OrderBy(f => f).ToList();
         }
+        // L'arrivee d'un joueur lue sur sa ligne CONTINUES (Neo-Geo) ferme le 1CC solo comme
+        // celle qu'un credit consomme avec son START fait voir.
+        var arriveesConsole = ContinuesParCompteur.Arrivees(continuesConsole);
+        if (arriveesConsole.Count > 0)
+        {
+            Trace($"arrivee d'un joueur sur sa ligne CONTINUES (frame {arriveesConsole[0]}) : le score fait seul jusque-la reste un 1CC");
+            finsDeRun = finsDeRun.Concat(arriveesConsole).OrderBy(f => f).ToList();
+        }
+        var arrivees = bilanCredits.Arrivees.Concat(arriveesConsole).ToList();
         var finDuSolo = FinDuSolo.Premiere(
             (FinDuSolo.Continue, bilanCredits.Coupes),
-            (FinDuSolo.JoueurRejoint, bilanCredits.Arrivees),
+            (FinDuSolo.JoueurRejoint, arrivees),
             (FinDuSolo.ContinueConsole, coupesConsole),
             (FinDuSolo.CreditsIllisibles, creditsMuets is { } coupeMuette ? new[] { coupeMuette } : Array.Empty<long>()));
         if (creditsMuets is { } muets)
@@ -2312,12 +2432,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // la rejoigne se lit au credit qu'il consomme, et la trajectoire s'arrete deja la. Sans
         // ligne de credits, on ne le verrait pas : la partie ouverte reste alors hors classement
         // solo, comme avant.
-        var partieADeux = ouverteAuxJoueurs && credits.Count == 0;
+        // Une ligne CONTINUES de joueur 2 au .MEM fait voir l'arrivee sans ligne de credits.
+        var partieADeux = ouverteAuxJoueurs && credits.Count == 0 && !VoitArriverLesJoueurs(LireMem(definitionChargee));
         if (partieADeux)
         {
-            Trace("partie ouverte aux joueurs sans ligne de credits : on ne verrait pas un joueur arriver, hors classement solo");
+            Trace("partie ouverte aux joueurs sans ligne de credits ni ligne CONTINUES de joueur 2 : on ne verrait pas un joueur arriver, hors classement solo");
         }
-        else if (ouverteAuxJoueurs && bilanCredits.Arrivees.Count == 0)
+        else if (ouverteAuxJoueurs && arrivees.Count == 0)
         {
             Trace("partie ouverte aux joueurs, restee seule : 1CC");
         }

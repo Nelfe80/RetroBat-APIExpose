@@ -254,4 +254,69 @@ public class ContinuesParCreditsTests
         Assert.Equal((FinDuSolo.JoueurRejoint, 2500L), fin);
         Assert.Null(FinDuSolo.Premiere((FinDuSolo.Continue, Array.Empty<long>())));
     }
+
+    // NEO-GEO, UNE LIGNE PAR JOUEUR (2026-10-02). PLAYER_MOD1/2 du BIOS : 1 en jeu, 2 ecran de
+    // continue, 3 game over. Avec min=1 max=2 (ecart entre deux lectures), le wrapper tait le bruit
+    // du demarrage (55, AA, FD) et le retour au titre (3 vers 0) : il reste 1, 2, 1 au continue, et
+    // 3 puis 1 a la partie relancee. Sequence relevee sous MAME sur Metal Slug 3 (sonde du jour).
+
+    [Fact]
+    public void Neo_Geo_le_continue_du_joueur_2_ne_coupe_pas_le_joueur_1()
+    {
+        var lectures = new List<LectureDeContinues>
+        {
+            new(1, 1, 2402),                                  // depart du joueur 1
+            new(2, 1, 3000),                                  // arrivee du joueur 2
+            new(2, 2, 5000), new(2, 1, 5600),                 // continue du joueur 2
+            new(1, 2, 6897), new(1, 1, 7400),                 // continue du joueur 1
+        };
+        Assert.Equal(new long[] { 7400 }, ContinuesParCompteur.CoupesDeLaPlace(lectures, 1));
+        Assert.Equal(new long[] { 5600 }, ContinuesParCompteur.CoupesDeLaPlace(lectures, 2));
+        Assert.Equal(new long[] { 3000 }, ContinuesParCompteur.Arrivees(lectures));
+        Assert.Equal(3000, ContinuesParCompteur.DepartDe(lectures, 2));
+        Assert.Null(ContinuesParCompteur.DepartDe(lectures, 1));
+        Assert.Null(ContinuesParCompteur.DepartDe(lectures, 3));
+    }
+
+    [Fact]
+    public void Neo_Geo_une_partie_relancee_apres_le_game_over_est_un_continue()
+    {
+        // Sonde Metal Slug 3 : 1 a 2402, ecran de continue a 6897, game over a 8177, titre a 8924
+        // (tu par max=2), nouvelle partie a 9003. La session fait foi.
+        var lectures = new List<LectureDeContinues> { new(1, 1, 2402), new(1, 2, 6897), new(1, 3, 8177), new(1, 1, 9003) };
+        Assert.Equal(new long[] { 9003 }, ContinuesParCompteur.CoupesDeLaPlace(lectures, 1));
+        Assert.Empty(ContinuesParCompteur.Arrivees(lectures));
+    }
+
+    [Fact]
+    public void Une_ligne_sans_joueur_compte_pour_toutes_les_places()
+    {
+        var lectures = new List<LectureDeContinues> { new(0, 3, 100), new(0, 2, 900), new(2, 1, 400) };
+        Assert.Equal(new long[] { 900 }, ContinuesParCompteur.CoupesDeLaPlace(lectures, 1));
+        Assert.Equal(new long[] { 900 }, ContinuesParCompteur.CoupesDeLaPlace(lectures, 2));
+        Assert.Equal(new long[] { 400 }, ContinuesParCompteur.Arrivees(lectures));
+    }
+
+    [Fact]
+    public void Le_mem_dit_s_il_voit_arriver_un_joueur()
+    {
+        const string ms3 = """
+            events = {
+              flow = {
+                { address=0X10FDB6, type="u8", condition="change", min=1, max=2, action="CONTINUES", player=1, desc="P1 state" },
+                { address=0X10FDB7, type="u8", condition="change", min=1, max=2, action="CONTINUES", player=2, desc="P2 state" },
+              },
+            }
+            """;
+        Assert.True(NelfePlayScoringReporter.VoitArriverLesJoueurs(ms3));
+        Assert.False(NelfePlayScoringReporter.VoitArriverLesJoueurs(
+            "{ address=0X10FDB6, type=\"u8\", condition=\"change\", action=\"CONTINUES\", player=1 },"));
+        Assert.False(NelfePlayScoringReporter.VoitArriverLesJoueurs(
+            "-- { address=0X10FDB7, action=\"CONTINUES\", player=2 },"));
+        Assert.False(NelfePlayScoringReporter.VoitArriverLesJoueurs(
+            "{ address=0X10FDB7, action=\"CONTINUES\", player=2, no_log=true },"));
+        Assert.False(NelfePlayScoringReporter.VoitArriverLesJoueurs(
+            "{ address=0X10ED20, type=\"u32be\", action=\"SCORE_STATE\", player=2 },"));
+        Assert.False(NelfePlayScoringReporter.VoitArriverLesJoueurs(null));
+    }
 }
