@@ -45,22 +45,39 @@ public sealed class ReplayRecorderService : BackgroundService
     private readonly RetroBat.Api.Media.InstalledGameCatalog? _catalogue;
 
     /// <summary>
-    /// Le dernier START vu sur le panel. L'enregistrement ne demarre que si un START est recent :
-    /// sans cette regle, RetroArch chargeait le contenu et on enregistrait AUSSITOT, c'est-a-dire
-    /// l'ecran titre et la demo. Et apres un game over, RetroArch coupe son film et on en
-    /// relancait un autre sur la demo suivante : des replays d'attract mode par dizaines.
+    /// POURQUOI ON ATTEND UN DEPART (2026-09-11) : en enregistrant des le chargement, on gardait
+    /// l'ecran titre et la demo. Le « film coupe par RetroArch au game over » invoque alors etait
+    /// en fait notre propre detection de fin, qui prenait un sondage sans reponse pour un arret
+    /// (corrige le 2026-10-02). `Replay:Record:RequireStart=false` enregistre des le chargement,
+    /// pour une machine sans panel.
     ///
-    /// La FENETRE existe a cause d'un ordre des choses : le START qui relance la partie apres un
-    /// game over est presse AVANT qu'on ait vu RetroArch couper le film (on sonde toutes les
-    /// 1,5 s). Un START des vingt dernieres secondes compte donc, meme anterieur a la coupure.
+    /// LE DEPART DE LA PARTIE (2026-10-02, plan valide par le user). L'enregistrement part sur le
+    /// premier signal : n'importe quel bouton du panel, presse une fois le jeu charge (l'appui qui
+    /// l'a lance depuis ES n'en est pas un) ; un credit consomme ou GAME_START (memoire du jeu) ;
+    /// en filet, le score qui monte. Un bouton ne vaut que pour le PREMIER enregistrement du jeu :
+    /// ensuite le joueur peut se promener dans les options, seuls credit, GAME_START et score
+    /// rearment. Le START seul ne suffisait pas : clavier, manette non lue, Master System.
     ///
-    /// Pourquoi START et pas la demo : tous les jeux n'en ont pas, et le START est resolu par la
-    /// cartographie de chaque borne, donc il vaut pour toutes les machines et tous les
-    /// emulateurs. `Replay:Record:RequireStart=false` rend l'ancien comportement a une machine
-    /// sans panel.
+    /// PAS DE FENETRE DE TEMPS. Un depart reste EN ATTENTE, rattache au jeu charge, jusqu'a ce que
+    /// RetroArch puisse enregistrer ; il ne s'annule que si le jeu change ou qu'un autre est lance.
+    /// La fenetre de vingt secondes d'avant laissait compter un START de dix-neuf secondes et
+    /// perdait celui de vingt et une.
     /// </summary>
-    private DateTime _dernierStartUtc = DateTime.MinValue;
-    private static readonly TimeSpan FenetreStart = TimeSpan.FromSeconds(20);
+    private volatile bool _departEnAttente;
+    private string _sourceDuDepart = "";
+    private string _contenuVu = "";
+    private bool _dejaEnregistre;
+
+    /// <summary>Le score a baisse apres avoir monte : nouvelle partie ou remise a zero (rapporteur).</summary>
+    private volatile bool _arretParBaisse;
+
+    /// <summary>
+    /// UNE FIN SE CONFIRME. Un sondage sans reponse etait pris pour la fin de l'enregistrement : le
+    /// replay etait finalise en pleine partie (le « film coupe au game over » du 2026-09-11, que
+    /// RetroArch ne fait pas). Deux reponses explicites, ou six secondes sans reponse.
+    /// </summary>
+    private int _finsVues;
+    private int _sansReponse;
     private string _attenteAnnoncee = "";
     private IDisposable? _abonnement;
 
@@ -235,7 +252,7 @@ public sealed class ReplayRecorderService : BackgroundService
         }
 
         // Une nouvelle partie (lancement, ou score qui retombe dans la meme session) : on peut de
-        // nouveau enregistrer, au prochain START.
+        // nouveau enregistrer, au prochain depart.
         if (string.Equals(e.Type, "ui.game.started", StringComparison.Ordinal)
             || string.Equals(e.Type, "scoring.run.reset", StringComparison.Ordinal))
         {
@@ -244,6 +261,9 @@ public sealed class ReplayRecorderService : BackgroundService
             {
                 _relanceMulti = false;
                 _categorieSuivante = null;
+                _contenuVu = "";
+                _dejaEnregistre = false;
+                _departEnAttente = false;
             }
             return;
         }
@@ -253,47 +273,50 @@ public sealed class ReplayRecorderService : BackgroundService
         // plus rien (theJim, 2026-10-02 : « en attente d'un START », puis plus rien).
         if (string.Equals(e.Type, "scoring.partie.depart", StringComparison.Ordinal))
         {
-            _dernierStartUtc = DateTime.UtcNow;
-            if (_current is null)
+            var source = "memoire du jeu";
+            try
             {
-                var source = "memoire du jeu";
-                try
-                {
-                    var el = System.Text.Json.JsonSerializer.SerializeToElement(e.Payload);
-                    if (el.TryGetProperty("Source", out var s) && s.GetString() is { Length: > 0 } lue) source = lue;
-                }
-                catch
-                {
-                    // La source n'est qu'un mot pour le journal.
-                }
-                _logger.LogInformation("Replay : depart de la partie lu dans la memoire du jeu ({Source}), vaut un START.", source);
+                var el = System.Text.Json.JsonSerializer.SerializeToElement(e.Payload);
+                if (el.TryGetProperty("Source", out var s) && s.GetString() is { Length: > 0 } lue) source = lue;
             }
+            catch
+            {
+                // La source n'est qu'un mot pour le journal.
+            }
+            _sourceDuDepart = source;
+            _departEnAttente = true;
             return;
         }
 
-        if (!string.Equals(e.Type, "panel.input.pressed", StringComparison.Ordinal)) return;
-        try
+        if (string.Equals(e.Type, "scoring.replay.stop", StringComparison.Ordinal))
         {
-            var el = System.Text.Json.JsonSerializer.SerializeToElement(e.Payload);
-            if (el.TryGetProperty("System", out var sys) && string.Equals(sys.GetString(), "START", StringComparison.Ordinal))
-                _dernierStartUtc = DateTime.UtcNow;
+            _arretParBaisse = true;
+            return;
         }
-        catch
+
+        // N'importe quel bouton du panel, le jeu charge : le depart du premier enregistrement du jeu.
+        if (string.Equals(e.Type, "panel.input.pressed", StringComparison.Ordinal)
+            && _contenuVu.Length > 0 && !_dejaEnregistre && _current is null && !_departEnAttente)
         {
-            // Un evenement illisible n'est pas un START.
+            _sourceDuDepart = "bouton du panel";
+            _departEnAttente = true;
         }
     }
 
     /// <summary>Un START assez recent pour qu'on enregistre. Le dit une fois par attente.</summary>
     private bool StartRecent(RaStatus status)
     {
-        if (!StartRequis) return true;
-        if (DateTime.UtcNow - _dernierStartUtc <= FenetreStart) return true;
+        if (!StartRequis)
+        {
+            _sourceDuDepart = "chargement du jeu";
+            return true;
+        }
+        if (_departEnAttente) return true;
         var cle = status.System + "/" + status.Game;
         if (!string.Equals(_attenteAnnoncee, cle, StringComparison.Ordinal))
         {
             _attenteAnnoncee = cle;
-            _logger.LogInformation("Replay : {Game} charge, en attente d'un START pour enregistrer.", status.Game);
+            _logger.LogInformation("Replay : {Game} charge, en attente du depart de la partie (bouton, credit, GAME_START ou score).", status.Game);
         }
         return false;
     }
@@ -325,6 +348,19 @@ public sealed class ReplayRecorderService : BackgroundService
         var status = await _ra.GetStatusAsync(ct).ConfigureAwait(false);
         var active = await _ra.GetActiveReplayAsync(ct).ConfigureAwait(false);
 
+        if (status is { ContentLoaded: true })
+        {
+            var contenu = status.System + "/" + status.Game;
+            if (!string.Equals(_contenuVu, contenu, StringComparison.Ordinal))
+            {
+                // Un AUTRE jeu que celui qu'on suivait : son depart ne vaut pas pour celui-ci. Le
+                // premier jeu vu apres un lancement garde le sien (il ne peut venir que de lui).
+                if (_contenuVu.Length > 0) _departEnAttente = false;
+                _contenuVu = contenu;
+                _dejaEnregistre = false;
+            }
+        }
+
         if (_current is null)
         {
             // Démarrage : un jeu RetroArch est chargé, aucun replay actif, on n'est pas en lecture,
@@ -340,7 +376,8 @@ public sealed class ReplayRecorderService : BackgroundService
                 _relanceMulti = false;
                 _runTermine = false;
                 _categorieSuivante = ReplayLocalMetadata.CategorieMulti;
-                _dernierStartUtc = DateTime.UtcNow;
+                _sourceDuDepart = "un joueur rejoint";
+                _departEnAttente = true;
                 _logger.LogInformation("Replay : un joueur a rejoint la partie, le replay du 1CC MULTI commence.");
             }
 
@@ -364,10 +401,10 @@ public sealed class ReplayRecorderService : BackgroundService
                 // par partie, et la porte suit le cœur même si le joueur en change entre deux jeux.
                 if (await CoeurSansEnregistrementAsync(status, ct).ConfigureAwait(false))
                 {
-                    // Le START est consommé : sans cela on reposerait la question à chaque sondage
-                    // de la fenêtre de vingt secondes. Et l'attente est marquée comme annoncée, sinon
-                    // le journal dirait « en attente d'un START » juste après qu'on en a vu un.
-                    _dernierStartUtc = DateTime.MinValue;
+                    // Le départ est consommé : sans cela on reposerait la question à chaque sondage.
+                    // Et l'attente est marquée comme annoncée, sinon le journal dirait « en attente
+                    // du départ » juste après qu'on en a vu un.
+                    _departEnAttente = false;
                     _attenteAnnoncee = status.System + "/" + status.Game;
                     return;
                 }
@@ -383,6 +420,14 @@ public sealed class ReplayRecorderService : BackgroundService
             return;
         }
 
+        if (_arretParBaisse)
+        {
+            _arretParBaisse = false;
+            _logger.LogInformation("Replay : {ReplayId} arrete, le score a baisse (nouvelle partie ou remise a zero).", _current.ReplayId);
+            await FinalizeAsync(_current, recovered: false, ct).ConfigureAwait(false);
+            return;
+        }
+
         // En cours d'enregistrement : suivre la dernière frame connue.
         if (active is { Recording: true })
         {
@@ -390,14 +435,24 @@ public sealed class ReplayRecorderService : BackgroundService
             _current.LastFrame = active.Frame;
         }
 
-        // Fin : RetroArch fermé, jeu changé, ou l'enregistrement s'est arrêté.
-        var ended = status is null
-            || !status.ContentLoaded
-            || !string.Equals(status.Game, _current.Game, StringComparison.Ordinal)
-            || active is not { Recording: true };
+        // Fin : RetroArch fermé, jeu changé, ou l'enregistrement s'est arrêté. Confirmée : deux
+        // réponses explicites, ou six secondes sans réponse (un sondage perdu n'est pas une fin).
+        var fin = (status is { } s && (!s.ContentLoaded || !string.Equals(s.Game, _current.Game, StringComparison.Ordinal)))
+                  || active is { Recording: false };
+        if (fin) { _finsVues++; _sansReponse = 0; }
+        else if (status is null || active is null) { _sansReponse++; }
+        else { _finsVues = 0; _sansReponse = 0; }
 
-        if (ended)
+        if (_finsVues >= 2 || _sansReponse >= 4)
+        {
+            _logger.LogInformation(_finsVues >= 2
+                    ? "Replay : {ReplayId} termine (jeu ferme ou change, ou RetroArch ne l'enregistre plus)."
+                    : "Replay : {ReplayId} termine (RetroArch ne repond plus).",
+                _current.ReplayId);
+            _finsVues = 0;
+            _sansReponse = 0;
             await FinalizeAsync(_current, recovered: false, ct).ConfigureAwait(false);
+        }
     }
 
     private async Task StartAsync(RaStatus status, CancellationToken ct)
@@ -435,8 +490,17 @@ public sealed class ReplayRecorderService : BackgroundService
             "nelfe.replay.active-recording.v1", rec.ReplayId, rec.SessionId, rec.System, rec.Game,
             rec.Crc32, rec.StartedAtUtc, rec.RetroArchVersion));
 
-        _logger.LogInformation("Replay : enregistrement démarré {ReplayId} ({System}/{Game}{Categorie}).",
-            rec.ReplayId, rec.System, rec.Game, rec.Categorie is null ? "" : ", " + rec.Categorie);
+        _logger.LogInformation("Replay : enregistrement démarré {ReplayId} ({System}/{Game}{Categorie}), départ : {Source}.",
+            rec.ReplayId, rec.System, rec.Game, rec.Categorie is null ? "" : ", " + rec.Categorie,
+            _sourceDuDepart.Length > 0 ? _sourceDuDepart : "START");
+        // Le depart est consomme : il ne relancera pas un enregistrement apres un arret. Et ce jeu a
+        // eu le sien : un bouton ne rearme plus.
+        _departEnAttente = false;
+        _sourceDuDepart = "";
+        _dejaEnregistre = true;
+        _finsVues = 0;
+        _sansReponse = 0;
+        _arretParBaisse = false;
         // Objet anonyme (propriétés) et non `rec` (champs) : le payload doit rester
         // sérialisable pour les abonnés qui le lisent en JSON (ex. le reporter, qui
         // retient l'id du replay actif pour le lien replay↔score).

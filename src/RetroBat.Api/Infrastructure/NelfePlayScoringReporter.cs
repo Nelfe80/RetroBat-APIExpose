@@ -148,8 +148,21 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>La derniere valeur du score du joueur 1 recue, demo comprise.</summary>
     private long? _dernierTotalVu;
 
-    /// <summary>Le depart de la partie a ete dit (START du panel, credit, GAME_START ou score).</summary>
-    private bool _departAnnonce;
+    /// <summary>
+    /// LE SCORE PILOTE LE REPLAY (2026-10-02, plan valide par le user) : un enregistrement en cours
+    /// s'arrete quand le score baisse apres avoir monte (nouvelle partie, remise a zero) ; en
+    /// filet, le score qui monte rearme, sur une borne dont l'API ne lit aucun appui, trois fois
+    /// par partie au plus (une demo sans fin ne remplit pas le magasin).
+    /// </summary>
+    private bool _enregistrementEnCours;
+    private bool _monteeDansLEnregistrement;
+    private bool _attenteMontee = true;
+    private int _departsParScore;
+    private const int MaxDepartsParScore = 3;
+
+    /// <summary>Les enregistrements de la partie, en frames du rapporteur : le replay du meilleur run.</summary>
+    private readonly List<(string Id, long Debut, long? Fin)> _enregistrements = new();
+    private List<(string Id, long Debut, long? Fin)> _enregistrementsDeLaPartie = new();
 
     /// <summary>
     /// Le lecteur de manettes de l'API a lu au moins un appui depuis son demarrage : il voit le
@@ -161,23 +174,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>Le systeme du jeu charge (attestation du pont) : mastersystem, arcade...</summary>
     private string _systemeDuJeu = "";
 
-    /// <summary>
-    /// LES CONSOLES DONT LA MANETTE N'A PAS DE START (2026-10-02) : la Master System et la SG-1000
-    /// lancent la partie au bouton 1 ou 2, et le START du panel y met le jeu en pause. Le replay
-    /// n'y partait donc jamais. Un appui sur ces boutons y vaut un START pour l'enregistreur, une
-    /// fois par partie. Pas pour la fenetre de jeu du scoring : un bouton presse pendant la demo
-    /// ramene au titre, il ne commence pas la partie.
-    /// </summary>
-    internal static readonly HashSet<string> SystemesSansStart = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "mastersystem", "sg1000",
-    };
 
-    /// <summary>Un appui qui lance la partie sur une console sans START : le bouton 1 ou 2.</summary>
-    internal static bool LanceLaPartieSansStart(string systeme, string identite)
-        => SystemesSansStart.Contains(systeme)
-           && (string.Equals(identite, "a", StringComparison.OrdinalIgnoreCase)
-               || string.Equals(identite, "b", StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
     /// LE SCORE AU DEPART DE LA PARTIE (2026-10-02), avec la frame du depart. Le pont ne dit un
@@ -584,7 +581,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 case "scoring.listener.session":
                     // Le replay de CETTE partie, fige a la fin de session : le verdict revient apres,
                     // parfois quand le jeu suivant a deja demarre et remis le replay actif a zero.
-                    lock (_sync) { _replayDeLaPartie = _replayDuSolo ?? _activeReplayId; }
+                    lock (_sync)
+                    {
+                        _replayDeLaPartie = _replayDuSolo ?? _activeReplayId;
+                        _enregistrementsDeLaPartie = new List<(string Id, long Debut, long? Fin)>(_enregistrements);
+                    }
                     _ = OnSessionAsync(ToJson(envelope.Payload), CancellationToken.None);
                     break;
                 case "replay.recording.started":
@@ -638,8 +639,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _enJeu = false;
             _dernierTotalVu = null;
             _scoreAuDepart = null;
-            _departAnnonce = false;
             _systemeDuJeu = "";
+            _enregistrementEnCours = false;
+            _monteeDansLEnregistrement = false;
+            _attenteMontee = true;
+            _departsParScore = 0;
+            _enregistrements.Clear();
             _vies.Clear();
             _contexte = RetroBat.Api.Scoring.ContexteDeJeu.Vide;
             _contextes.Clear();
@@ -1097,7 +1102,6 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private void AnnoncerLeDepart(string source)
     {
-        lock (_sync) { _departAnnonce = true; }
         _ = _eventBus.PublishAsync(new EventEnvelope
         {
             Type = "scoring.partie.depart",
@@ -1219,7 +1223,6 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             if (!_enJeu && _scoreAuDepart is null && _dernierTotalVu is { } auDepart) _scoreAuDepart = (_lastFrame, auDepart);
             _inDemo = false; _startVu = true; _enJeu = true;
-            _departAnnonce = true;
         }
     }
 
@@ -1236,13 +1239,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         _panelLu = true;
         if ((Entier(root, "Player") ?? Entier(root, "player") ?? 1) == 1) _portLocal.AppuiDuPanel();
         var systeme = GetString(root, "System") ?? GetString(root, "system") ?? "";
-        if (!string.Equals(systeme, "START", StringComparison.OrdinalIgnoreCase))
-        {
-            bool aDire;
-            lock (_sync) { aDire = !_departAnnonce && LanceLaPartieSansStart(_systemeDuJeu, GetString(root, "Identity") ?? ""); }
-            if (aDire) AnnoncerLeDepart("bouton 1/2, console sans START");
-            return;
-        }
+        if (!string.Equals(systeme, "START", StringComparison.OrdinalIgnoreCase)) return;
         var joueur = Entier(root, "Player") ?? Entier(root, "player") ?? 1;
         lock (_sync)
         {
@@ -1838,6 +1835,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         long? continueAnnonce = null;
         var nouvellePartie = false;
         var departParLeScore = false;
+        var arretParBaisse = false;
         lock (_sync)
         {
             _scoresRecus++;
@@ -1846,14 +1844,32 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var precedent = _finalTotal;
             _finalTotal = total;
 
-            // EN DERNIER RECOURS, LE SCORE QUI MONTE DIT QUE LA PARTIE A COMMENCE (2026-10-02), sur une
-            // borne dont l'API n'a jamais lu un appui :
-            // ni START lu au panel, ni credit consomme, ni GAME_START. Une fois par partie, hors
-            // demo. Le replay part alors en retard, mais il part.
-            if (!_departAnnonce && !_panelLu && precedent is { } avantMontee && total > avantMontee)
+            // LE SCORE PILOTE LE REPLAY (voir _enregistrementEnCours). Hors demo : on est passe au-dela
+            // du retour anticipe des scores de demo.
+            if (precedent is { } avantScore)
             {
-                _departAnnonce = true;
-                departParLeScore = true;
+                if (total > avantScore)
+                {
+                    if (_enregistrementEnCours)
+                    {
+                        _monteeDansLEnregistrement = true;
+                    }
+                    else if (_attenteMontee && !_panelLu && _departsParScore < MaxDepartsParScore)
+                    {
+                        _attenteMontee = false;
+                        _departsParScore++;
+                        departParLeScore = true;
+                    }
+                }
+                else if (total < avantScore)
+                {
+                    if (_enregistrementEnCours && _monteeDansLEnregistrement)
+                    {
+                        arretParBaisse = true;
+                        _monteeDansLEnregistrement = false;
+                    }
+                    _attenteMontee = true;
+                }
             }
 
             // LE SCORE RETOMBE : une nouvelle partie commence, pour un jeu a chiffre des credits
@@ -1896,7 +1912,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 _derniereLecture = total;
             }
         }
-        if (departParLeScore) AnnoncerLeDepart("debut de score");
+        if (departParLeScore) AnnoncerLeDepart("score qui monte");
+        if (arretParBaisse)
+        {
+            Trace($"le score a baisse ({total}) apres avoir monte : fin de l'enregistrement en cours");
+            _ = _eventBus.PublishAsync(new EventEnvelope { Type = "scoring.replay.stop", Payload = new { Raison = "baisse du score" } });
+        }
 
         if (nouvellePartie)
         {
@@ -2568,6 +2589,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
 
         var bestRun = SelectBestRun(trajectory, finsDeRun);
+        // LE REPLAY DU MEILLEUR RUN (2026-10-02) : une partie peut en avoir plusieurs (arret a la
+        // baisse du score, rearmement). Le score certifie se rattache a celui qui le contient.
+        List<(string Id, long Debut, long? Fin)> enregistrements;
+        lock (_sync) { enregistrements = new List<(string Id, long Debut, long? Fin)>(_enregistrementsDeLaPartie); }
+        if (ReplayDuMeilleurRun(enregistrements, bestRun) is { } replayDuRun)
+        {
+            lock (_sync) { _replayDuMeilleurRun = replayDuRun; }
+            if (enregistrements.Count > 1) Trace($"replay du meilleur run : {replayDuRun} ({enregistrements.Count} enregistrements dans la partie)");
+        }
         long runPeak = bestRun.Count > 0 ? bestRun[^1].total : (finalTotal ?? 0);
         Trace($"segmentation : meilleur run {bestRun.Count}/{trajectory.Count} pts, pic={runPeak} (total global {finalTotal})");
         var contexteRun = RetroBat.Api.Scoring.ModesDeJeu.ContexteDuRun(lecturesBrutes, contextes, bestRun, contexteCourant);
@@ -3468,7 +3498,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     {
         var id = GetString(payload, "ReplayId");
         if (string.IsNullOrEmpty(id)) return;
-        lock (_sync) { _activeReplayId = id; }
+        lock (_sync)
+        {
+            _activeReplayId = id;
+            _enregistrementEnCours = true;
+            _monteeDansLEnregistrement = false;
+            _attenteMontee = false;
+            _enregistrements.Add((id!, _lastFrame, null));
+            if (_enregistrements.Count > 20) _enregistrements.RemoveAt(0);
+        }
     }
 
     // Replay finalisé (objet scellé) : on retient son sha puis on tente le
@@ -3478,12 +3516,43 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var id = GetString(payload, "ReplayId");
         var sha = GetString(payload, "Sha256");
         if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(sha)) return;
-        lock (_sync) { PruneReplayLinks(); _finalizedReplay[id!] = (sha!, DateTime.UtcNow); SauverLesLiens(); }
+        lock (_sync)
+        {
+            if (string.Equals(id, _activeReplayId, StringComparison.Ordinal)) _enregistrementEnCours = false;
+            for (var i = 0; i < _enregistrements.Count; i++)
+            {
+                if (string.Equals(_enregistrements[i].Id, id, StringComparison.Ordinal) && _enregistrements[i].Fin is null)
+                {
+                    _enregistrements[i] = (_enregistrements[i].Id, _enregistrements[i].Debut, _lastFrame);
+                }
+            }
+            PruneReplayLinks(); _finalizedReplay[id!] = (sha!, DateTime.UtcNow); SauverLesLiens();
+        }
         TryRegisterReplayLink(id!);
     }
 
     // Score PUBLIÉ : le record est public → son replay le devient aussi (il s'affiche
     // sur le classement). On rattache le score au replay ACTIF (celui de cette partie).
+    /// <summary>Le replay du meilleur run du passeport solo, choisi a la soumission.</summary>
+    private string? _replayDuMeilleurRun;
+
+    /// <summary>
+    /// L'enregistrement qui contient le pic du run (le run est monotone : son pic est sa derniere
+    /// lecture). Le dernier qui le couvre, s'il y en a plusieurs ; null si aucun.
+    /// </summary>
+    internal static string? ReplayDuMeilleurRun(IReadOnlyList<(string Id, long Debut, long? Fin)> enregistrements,
+        IReadOnlyList<(long frame, long total)> run)
+    {
+        if (run.Count == 0) return null;
+        var pic = run[^1].frame;
+        string? choisi = null;
+        foreach (var e in enregistrements)
+        {
+            if (e.Debut <= pic && (e.Fin is null || pic <= e.Fin)) choisi = e.Id;
+        }
+        return choisi;
+    }
+
     private void CaptureReplayLinkOnPublished(JsonObject passport, string responseBody)
     {
         try
@@ -3505,9 +3574,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             int? rank = (verdict?["rank"] is JsonValue rv && rv.TryGetValue<int>(out var rk)) ? rk : (int?)null;
 
             string? replayId;
+            var multi = string.Equals((string?)(passport["game"] as JsonObject)?["ruleset"], CategorieMulti, StringComparison.Ordinal);
             lock (_sync)
             {
-                replayId = _replayDeLaPartie;
+                // Le solo prend le replay de son meilleur run ; le 1CC MULTI garde celui de la partie.
+                replayId = multi ? _replayDeLaPartie : (_replayDuMeilleurRun ?? _replayDeLaPartie);
+                if (!multi) _replayDuMeilleurRun = null;
                 if (string.IsNullOrEmpty(replayId)) return;
                 PruneReplayLinks();
                 _pendingScoreLink[replayId!] = (sessionId!, "public", score, rank, DateTime.UtcNow);

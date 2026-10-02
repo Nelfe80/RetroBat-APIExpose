@@ -366,12 +366,19 @@ public class ContinuesParCreditsTests
     }
 
     [Fact]
-    public void Une_console_sans_start_part_au_bouton_1_ou_2()
+    public void Le_score_se_rattache_au_replay_de_son_meilleur_run()
     {
-        Assert.True(NelfePlayScoringReporter.LanceLaPartieSansStart("mastersystem", "b"));
-        Assert.True(NelfePlayScoringReporter.LanceLaPartieSansStart("sg1000", "a"));
-        Assert.False(NelfePlayScoringReporter.LanceLaPartieSansStart("mastersystem", "start"));
-        Assert.False(NelfePlayScoringReporter.LanceLaPartieSansStart("megadrive", "a"));
-        Assert.False(NelfePlayScoringReporter.LanceLaPartieSansStart("arcade", "b"));
+        // Une demo enregistree par le filet (frames 100-900), puis la vraie partie (1000-, en cours).
+        var enregistrements = new List<(string Id, long Debut, long? Fin)> { ("rp_demo", 100, 900), ("rp_partie", 1000, null) };
+        var run = Lectures((1200, 0), (3000, 4500), (5200, 12300));
+        Assert.Equal("rp_partie", NelfePlayScoringReporter.ReplayDuMeilleurRun(enregistrements, run));
+
+        // Le pic avant l'arret a la baisse du score : le premier enregistrement.
+        var premier = Lectures((150, 0), (800, 2600));
+        Assert.Equal("rp_demo", NelfePlayScoringReporter.ReplayDuMeilleurRun(enregistrements, premier));
+
+        // Entre deux enregistrements, ou sans run : aucun.
+        Assert.Null(NelfePlayScoringReporter.ReplayDuMeilleurRun(enregistrements, Lectures((950, 300))));
+        Assert.Null(NelfePlayScoringReporter.ReplayDuMeilleurRun(enregistrements, Lectures()));
     }
 }
