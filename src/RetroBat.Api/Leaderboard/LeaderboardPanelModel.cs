@@ -135,7 +135,38 @@ public sealed class LeaderboardPanelModel
         return true;
     }
 
-    public void Ouvrir(bool salleConnue, bool villeConnue, bool paysConnu, bool aDesRecords, bool multi = false, bool unLc = false)
+    /// <summary>
+    /// Les onglets des autres regles du jeu (1CC MULTI, 1LC) n'existent que si leur classement a
+    /// des scores (demande user 2026-10-03) : un onglet vide se traverse pour rien. Ils se rangent
+    /// juste apres « Monde », dans cet ordre, sans deplacer le curseur. Rend vrai si la rangee
+    /// d'onglets a change.
+    /// </summary>
+    public bool PoserLesRegles(IReadOnlyCollection<Vue> presentes)
+    {
+        if (!_onglets.Contains(Vue.Monde)) return false;
+        var ordre = new[] { Vue.MondeMulti, Vue.Monde1lc };
+        if (ordre.All(v => presentes.Contains(v) == _onglets.Contains(v))) return false;
+
+        var avant = VueCourante;
+        foreach (var vue in ordre)
+        {
+            if (presentes.Contains(vue) || !_onglets.Contains(vue)) continue;
+            _onglets.Remove(vue);
+            if (avant == vue) { avant = Vue.Monde; _ligne = 0; }
+        }
+        var position = _onglets.IndexOf(Vue.Monde) + 1;
+        foreach (var vue in ordre)
+        {
+            if (!presentes.Contains(vue)) continue;
+            if (!_onglets.Contains(vue)) _onglets.Insert(position, vue);
+            position = _onglets.IndexOf(vue) + 1;
+        }
+        var index = _onglets.IndexOf(avant);
+        _onglet = index >= 0 ? index : Math.Clamp(_onglet, 0, Math.Max(0, _onglets.Count - 1));
+        return true;
+    }
+
+    public void Ouvrir(bool salleConnue, bool villeConnue, bool paysConnu, bool aDesRecords)
     {
         _onglets.Clear();
         // Avec MY RECORDS, THIS CABINET attend de prouver qu'il montre autre chose (PoserCetteBorne).
@@ -144,12 +175,10 @@ public sealed class LeaderboardPanelModel
         if (villeConnue) _onglets.Add(Vue.MaVille);
         if (paysConnu) _onglets.Add(Vue.MonPays);
         _onglets.Add(Vue.Monde);
-        if (multi) _onglets.Add(Vue.MondeMulti);
-        if (unLc) _onglets.Add(Vue.Monde1lc);
 
-        // On entre sur « Monde », la regle principale du jeu : sans autre regle, c'est le dernier
-        // onglet, celui qui touche la porte. Chaque pas vers la gauche resserre ensuite vers le
-        // joueur ; vers la droite, les autres regles du jeu.
+        // On entre sur « Monde », la regle principale du jeu, contre la porte. Chaque pas vers la
+        // gauche resserre ensuite vers le joueur ; les autres regles du jeu viendront a sa droite
+        // si elles ont un classement (PoserLesRegles).
         _onglet = _onglets.IndexOf(Vue.Monde);
         _ligne = 0;
         _lignes = 0;

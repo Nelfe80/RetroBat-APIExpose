@@ -481,9 +481,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         }
         _menuEsOuvert = false;
         _menuEsConnu = false;
-        _modele.Ouvrir(salleConnue: _maSalle.Length > 0, villeConnue: _maVille.Length > 0, paysConnu: false, aDesRecords: true,
-            multi: _ongletsDeRegle.Any(o => o.Vue == LeaderboardPanelModel.Vue.MondeMulti),
-            unLc: _ongletsDeRegle.Any(o => o.Vue == LeaderboardPanelModel.Vue.Monde1lc));
+        _modele.Ouvrir(salleConnue: _maSalle.Length > 0, villeConnue: _maVille.Length > 0, paysConnu: false, aDesRecords: true);
         _ = Task.Run(async () =>
         {
             await _social.RafraichirLesSuivisAsync().ConfigureAwait(false);
@@ -937,6 +935,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 .SequenceEqual(LeaderboardClient.Tailler(_monde, LeaderboardPanelModel.Vue.MesRecords, _maVille, _monPays, _maSalle));
         }
         _modele.PoserCetteBorne(cetteBorneDistincte);
+        // L'onglet d'une autre regle n'existe que si son classement a des scores.
+        _modele.PoserLesRegles(autres.Where(a => a.Value.Lignes.Count > 0).Select(a => a.Key).ToList());
         Rafraichir();
         if (!relecture && UnReplayEstEnAttente()) RelireTantQueLeReplayArrive();
     }
@@ -1528,13 +1528,14 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
 
     /// <summary>
     /// La pastille d'un onglet : la regle, dans un petit cadre arrondi (demande user 2026-10-02).
-    /// « Monde » porte celle de la regle principale, seulement quand le jeu en a d'autres ; un jeu
-    /// a une seule regle garde ses onglets d'avant.
+    /// « Monde » porte celle de la regle principale, seulement quand un onglet d'une autre regle
+    /// est affiche ; sinon le panneau garde ses onglets d'avant.
     /// </summary>
     private string PastilleDeLOnglet(LeaderboardPanelModel.Vue vue)
     {
         if (RegleDeLaVue(vue) is { } regle) return LibelleDeRegle(regle);
-        if (vue == LeaderboardPanelModel.Vue.Monde && _ongletsDeRegle.Count > 0 && _reglePrincipale.Length > 0) return LibelleDeRegle(_reglePrincipale);
+        if (vue == LeaderboardPanelModel.Vue.Monde && _reglePrincipale.Length > 0
+            && _modele.Onglets.Any(v => RegleDeLaVue(v) is not null)) return LibelleDeRegle(_reglePrincipale);
         return "";
     }
 

@@ -45,7 +45,8 @@ public sealed class LeaderboardRulesTabsTests
     public void L_onglet_1cc_multi_suit_monde_et_l_on_entre_sur_monde()
     {
         var m = new LeaderboardPanelModel();
-        m.Ouvrir(salleConnue: true, villeConnue: false, paysConnu: false, aDesRecords: true, multi: true);
+        m.Ouvrir(salleConnue: true, villeConnue: false, paysConnu: false, aDesRecords: true);
+        Assert.True(m.PoserLesRegles(new[] { Vue.MondeMulti }));
         m.PoserLesLignes(5);
         Assert.Equal(new[] { Vue.MesRecords, Vue.MaSalle, Vue.Monde, Vue.MondeMulti }, m.Onglets);
         Assert.Equal(Vue.Monde, m.VueCourante);
@@ -63,13 +64,33 @@ public sealed class LeaderboardRulesTabsTests
     public void Live_et_contest_reste_contre_la_porte()
     {
         var m = new LeaderboardPanelModel();
-        m.Ouvrir(false, false, false, true, multi: true);
+        m.Ouvrir(false, false, false, true);
         m.PoserLesEvenements(true);
+        m.PoserLesRegles(new[] { Vue.MondeMulti });
         Assert.Equal(new[] { Vue.MesRecords, Vue.Monde, Vue.MondeMulti, Vue.LiveEtContest }, m.Onglets);
         Assert.Equal(Vue.Monde, m.VueCourante);
         m.PoserLesEvenements(false);
         Assert.Equal(Vue.Monde, m.VueCourante);
         Assert.Equal(new[] { Vue.MesRecords, Vue.Monde, Vue.MondeMulti }, m.Onglets);
+    }
+
+    [Fact]
+    public void Sans_classement_1cc_multi_pas_d_onglet()
+    {
+        var m = new LeaderboardPanelModel();
+        m.Ouvrir(false, false, false, true);
+        Assert.False(m.PoserLesRegles(Array.Empty<Vue>()));
+        Assert.Equal(new[] { Vue.MesRecords, Vue.Monde }, m.Onglets);
+
+        // Le classement se vide pendant qu'on le regarde : on retombe sur Monde.
+        m.PoserLesRegles(new[] { Vue.MondeMulti, Vue.Monde1lc });
+        Assert.Equal(new[] { Vue.MesRecords, Vue.Monde, Vue.MondeMulti, Vue.Monde1lc }, m.Onglets);
+        m.Entree(EntreePanneau.Gauche);
+        m.Entree(EntreePanneau.Droite);
+        Assert.Equal(Vue.MondeMulti, m.VueCourante);
+        Assert.True(m.PoserLesRegles(new[] { Vue.Monde1lc }));
+        Assert.Equal(new[] { Vue.MesRecords, Vue.Monde, Vue.Monde1lc }, m.Onglets);
+        Assert.Equal(Vue.Monde, m.VueCourante);
     }
 
     [Fact]
