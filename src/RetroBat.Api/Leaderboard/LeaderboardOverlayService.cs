@@ -153,7 +153,9 @@ public sealed class LeaderboardOverlayService : IDisposable
     public bool ANousLaMain { get; private set; }
 
     /// <summary>Une ligne de l'onglet LIVE & CONTEST : quoi, qui, ou, et ce qu'on peut faire.</summary>
-    public sealed record Evenement(string Etiquette, string Qui, string Detail, bool EnDirect);
+    /// <summary>Une ligne de LIVE & CONTEST. <c>Actions</c> : ce que les boutons font sur CETTE ligne
+    /// (JOIN et WATCH sur un direct), dessine quand elle est choisie ; null = le bouton de toujours.</summary>
+    public sealed record Evenement(string Etiquette, string Qui, string Detail, bool EnDirect, IReadOnlyList<Aide>? Actions = null);
 
     /// <summary>Un glyphe d'ES et son mot, deja traduit : une consigne d'aide ou une action.</summary>
     public sealed record Aide(string Glyphe, string Mot);
@@ -191,7 +193,9 @@ public sealed class LeaderboardOverlayService : IDisposable
         IReadOnlySet<long>? ReplaysEnPreparation = null,
         IReadOnlyDictionary<string, int>? RangsPrecedents = null,
         /// <summary>Le pseudo du joueur de cette borne, affiche en bas a droite. Vide : rien.</summary>
-        string Pseudo = "");
+        string Pseudo = "",
+        /// <summary>Le defi que le bouton lance (« 1CC », « 1CC LIVE », « 1CC MULTI »), a cote de CHALLENGE.</summary>
+        string DefierMode = "");
 
     private Contenu _contenu = new("", Array.Empty<string>(), 0, Array.Empty<LeaderboardClient.Ligne>(), 0, "", true, false,
         Array.Empty<Aide>(), Array.Empty<Aide>(), "", "", "", "", Array.Empty<string>(),
@@ -1213,7 +1217,23 @@ public sealed class LeaderboardOverlayService : IDisposable
                 using var pinceau = new SolidBrush(encre);
 
                 var xDroite = Width - marge;
-                if (choisie && c.Rejoindre.Length > 0)
+                if (choisie && e.Actions is { Count: > 0 } actions)
+                {
+                    // De droite a gauche, dans l'ordre inverse : la premiere action se lit en premier.
+                    for (var a = actions.Count - 1; a >= 0; a--)
+                    {
+                        xDroite = Bouton(g, s, petite, taille * 0.8f, actions[a].Mot.ToUpperInvariant(), xDroite, y, hauteur, enFocus: true, discret: true);
+                        var glyphe = actions[a].Glyphe.Length > 0 ? _service._glyphes?.Glyphe(actions[a].Glyphe, (int) (taille * 1.1f), encre) : null;
+                        if (glyphe is not null)
+                        {
+                            xDroite -= taille * 0.35f;
+                            g.DrawImage(glyphe, xDroite - glyphe.Width, y + (hauteur - glyphe.Height) / 2f, glyphe.Width, glyphe.Height);
+                            xDroite -= glyphe.Width;
+                        }
+                        xDroite -= taille * 0.8f;
+                    }
+                }
+                else if (choisie && c.Rejoindre.Length > 0)
                 {
                     xDroite = Bouton(g, s, petite, taille * 0.8f, c.Rejoindre.ToUpperInvariant(), xDroite, y, hauteur, enFocus: true, discret: true);
                     var touche = c.GlypheRejoindre.Length > 0 ? _service._glyphes?.Glyphe(c.GlypheRejoindre, (int) (taille * 1.1f), encre) : null;
@@ -1326,6 +1346,13 @@ public sealed class LeaderboardOverlayService : IDisposable
                     g.MeasureString(texte, petite, PointF.Empty, StringFormat.GenericTypographic).Width,
                     g.MeasureString("DELETE", petite, PointF.Empty, StringFormat.GenericTypographic).Width) + tailleBouton * 1.2f;
                 Bouton(g, s, petite, tailleBouton, texte, x + largeur, y + (hauteur - tailleBouton * 1.4f) / 2f, tailleBouton * 1.4f, enFocus: true, discret: false, padding: tailleBouton * 1.2f);
+                // Le defi que ce bouton lance, d'apres les reglages du joueur : 1CC, 1CC LIVE, 1CC MULTI.
+                if (c.DefierMode.Length > 0)
+                {
+                    using var encreMode = new SolidBrush(Teinte(s.SelectorColor));
+                    using var aGauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center };
+                    g.DrawString(c.DefierMode.ToUpperInvariant(), petite, encreMode, new RectangleF(x + largeur + taille * 0.6f, y, Width, hauteur), aGauche);
+                }
             }
 
             if (c.MaPlace.Length > 0)

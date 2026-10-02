@@ -129,7 +129,7 @@ public sealed class NetplayGuestService
     /// Rejoint la session. Spectateur par defaut ; joueur seulement si la plateforme a donne le
     /// mot de passe correspondant, ce qu'elle ne fait que si l'hote l'a autorise.
     /// </summary>
-    public async Task<Echec> RejoindreAsync(string sessionId, CancellationToken ct = default, string hote = "")
+    public async Task<Echec> RejoindreAsync(string sessionId, CancellationToken ct = default, string hote = "", bool regarderSeulement = false)
     {
         var credential = _machine.GetCredential();
         if (string.IsNullOrEmpty(credential))
@@ -137,10 +137,16 @@ public sealed class NetplayGuestService
             return Echec.NonAppairee;
         }
 
-        var infos = await DemanderAsync(sessionId, credential, ct).ConfigureAwait(false);
+        // WATCH (2026-10-02) : la plateforme ne reserve pas de place et ne livre pas le mot de passe
+        // joueur ; la borne rejoint en spectateur, meme si elle aurait pu jouer.
+        var infos = await DemanderAsync(sessionId, credential, ct, regarderSeulement).ConfigureAwait(false);
         if (infos is null)
         {
             return Echec.SessionInconnue;
+        }
+        if (regarderSeulement && infos.Value.PeutJouer)
+        {
+            infos = infos.Value with { PeutJouer = false, MotDePasse = infos.Value.MotDePasseSpectateur, Place = null };
         }
 
         var rom = TrouverRom(infos.Value.Systeme, infos.Value.Jeu);
@@ -377,9 +383,10 @@ public sealed class NetplayGuestService
         string Crc,
         string Jeton,
         int? Place,
-        string EtatPlace);
+        string EtatPlace,
+        string MotDePasseSpectateur);
 
-    private async Task<Infos?> DemanderAsync(string sessionId, string credential, CancellationToken ct)
+    private async Task<Infos?> DemanderAsync(string sessionId, string credential, CancellationToken ct, bool regarder = false)
     {
         try
         {
@@ -389,7 +396,7 @@ public sealed class NetplayGuestService
             client.DefaultRequestHeaders.Add("X-NelfePlay-Device", credential);
 
             using var reponse = await client
-                .GetAsync($"/api/v1/agent/live/{Uri.EscapeDataString(sessionId)}/join", ct)
+                .GetAsync($"/api/v1/agent/live/{Uri.EscapeDataString(sessionId)}/join" + (regarder ? "?watch=1" : ""), ct)
                 .ConfigureAwait(false);
             if (!reponse.IsSuccessStatusCode)
             {
@@ -426,7 +433,8 @@ public sealed class NetplayGuestService
                 Texte(r, "crc"),
                 jeton,
                 place,
-                Texte(r, "seat_state"));
+                Texte(r, "seat_state"),
+                Texte(r, "spectate_password"));
         }
         catch (Exception ex)
         {

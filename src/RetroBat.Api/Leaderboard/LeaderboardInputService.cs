@@ -440,6 +440,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         _jeuAffiche = nomDuJeu;
         _systemeAffiche = systeme;
         if (_romGroup.Length == 0) return;
+        _reglesDuJeu = _collection?.ReglesOuvertes(_romGroup) ?? Array.Empty<string>();
 
         var session = _session.Get();
         _maSalle = session?.VenueName ?? "";
@@ -632,6 +633,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     }
 
     private IReadOnlyList<LeaderboardSocialClient.Direct> _directs = Array.Empty<LeaderboardSocialClient.Direct>();
+    /// <summary>Peut-on jouer dans chaque direct, et la place : consulte sans rien reserver.</summary>
+    private Dictionary<string, LeaderboardSocialClient.EtatDuDirect?> _etatsDesDirects = new(StringComparer.Ordinal);
+    /// <summary>Les regles ouvertes du jeu affiche (« 1cc », « 1cc-multi »...), relues a l'ouverture.</summary>
+    private IReadOnlyList<string> _reglesDuJeu = Array.Empty<string>();
     private IReadOnlyList<LeaderboardSocialClient.Contest> _contests = Array.Empty<LeaderboardSocialClient.Contest>();
 
     /// <summary>Les directs et contests du jeu affiche. L'onglet n'existe que s'il y en a.</summary>
@@ -641,10 +646,17 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         var directs = await _social.DirectsDuJeuAsync(jeu, ct).ConfigureAwait(false);
         var contests = await _social.ContestsDuJeuAsync(jeu, _jeuAffiche, ct).ConfigureAwait(false);
         if (!string.Equals(jeu, _romGroup, StringComparison.Ordinal)) return;   // le joueur a change de jeu
+        // Peut-on JOUER dans chaque direct ? Consulte sans rien reserver : la ligne dit JOIN ou WATCH.
+        var etats = new Dictionary<string, LeaderboardSocialClient.EtatDuDirect?>(StringComparer.Ordinal);
+        foreach (var d in directs.Where(d => !string.Equals(d.Type, "react", StringComparison.Ordinal)))
+        {
+            etats[d.Session] = await _social.EtatDuDirectAsync(d.Session, ct).ConfigureAwait(false);
+        }
         lock (_gate)
         {
             _directs = directs;
             _contests = contests;
+            _etatsDesDirects = etats;
         }
         if (_modele.Etat == LeaderboardPanelModel.Foyer.Ferme) return;
         if (_modele.PoserLesEvenements(directs.Count + contests.Count > 0))
@@ -662,7 +674,19 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             var lignes = new List<LeaderboardOverlayService.Evenement>();
             foreach (var d in _directs)
             {
-                lignes.Add(new(_textes.Text("leaderboard.live", langue), d.Pseudo.Length > 0 ? d.Pseudo : d.Poignee, NomDuSysteme(d.Systeme), true));
+                var (joignable, raison) = Joignabilite(d);
+                var detail = NomDuSysteme(d.Systeme);
+                if (raison.Length > 0) detail = detail.Length > 0 ? detail + " · " + Texte(raison, langue) : Texte(raison, langue);
+                IReadOnlyList<LeaderboardOverlayService.Aide> actions = string.Equals(d.Type, "react", StringComparison.Ordinal)
+                    ? Array.Empty<LeaderboardOverlayService.Aide>()
+                    : joignable
+                        ? new[]
+                        {
+                            new LeaderboardOverlayService.Aide(Glyphe(SlotValider), Texte("leaderboard.join", langue)),
+                            new LeaderboardOverlayService.Aide(Glyphe(SlotDeLIdentite("x")), Texte("leaderboard.watch", langue)),
+                        }
+                        : new[] { new LeaderboardOverlayService.Aide(Glyphe(SlotValider), Texte("leaderboard.watch", langue)) };
+                lignes.Add(new(_textes.Text("leaderboard.live", langue), d.Pseudo.Length > 0 ? d.Pseudo : d.Poignee, detail, true, actions));
             }
             foreach (var c in _contests)
             {
@@ -670,6 +694,81 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             }
             return lignes;
         }
+    }
+
+    /// <summary>
+    /// Peut-on JOUER dans ce direct, et sinon pourquoi (cle de texte). Sans reponse de la plateforme,
+    /// on propose JOIN comme avant : c'est elle qui tranche au moment de rejoindre, et un refus fait
+    /// rejoindre en spectateur avec le bandeau d'arrivee.
+    /// </summary>
+    private (bool Joignable, string Raison) Joignabilite(LeaderboardSocialClient.Direct d)
+    {
+        if (string.Equals(d.Type, "react", StringComparison.Ordinal)) return (false, "leaderboard.live.no_netplay");
+        LeaderboardSocialClient.EtatDuDirect? etat;
+        lock (_gate) etat = _etatsDesDirects.TryGetValue(d.Session, out var e) ? e : null;
+        if (etat is null) return (true, "");
+        if (etat.PeutJouer && etat.Place is "free" or "reserved" or "playing") return (true, "");
+        if (etat.PeutJouer && etat.Place == "wait") return (false, "leaderboard.live.wait");
+        if (etat.PeutJouer && etat.Place == "full") return (false, "leaderboard.live.full");
+        if (etat.PeutJouer) return (true, "");
+        return string.Equals(d.Type, "followers", StringComparison.Ordinal)
+            ? (false, "leaderboard.live.followers")
+            : (false, "leaderboard.live.watch_only");
+    }
+
+    /// <summary>
+    /// Un texte du panneau, avec son repli anglais : les textes voyagent par le Data Pack, qui peut
+    /// arriver apres le programme, et une cle manquante s'afficherait telle quelle.
+    /// </summary>
+    private string Texte(string cle, string langue)
+    {
+        var texte = _textes.Text(cle, langue);
+        if (!string.Equals(texte, cle, StringComparison.Ordinal)) return texte;
+        return cle switch
+        {
+            "leaderboard.watch" => "Watch",
+            "leaderboard.join" => "Join",
+            "leaderboard.live.full" => "Full",
+            "leaderboard.live.wait" => "Seat pending",
+            "leaderboard.live.followers" => "Followed players only",
+            "leaderboard.live.watch_only" => "Watch only",
+            "leaderboard.live.no_netplay" => "Reactions only",
+            _ => cle,
+        };
+    }
+
+    /// <summary>Le defi que le bouton CHALLENGE lance (demande user 2026-10-02).</summary>
+    internal enum ModeDuDefi { Prive, Live, Multi }
+
+    /// <summary>
+    /// D'apres les reglages du joueur : sans partage en direct, un 1CC prive ; en direct, 1CC LIVE si
+    /// personne ne rejoint, 1CC MULTI si ses suivis ou tout le monde peuvent jouer. Le MULTI n'existe
+    /// que si le jeu a un classement 1CC MULTI : sinon un joueur arrive fermerait le 1CC solo pour un
+    /// score qui ne compte nulle part. Sur l'onglet LIVE & CONTEST, le defi est toujours en direct.
+    /// </summary>
+    internal static ModeDuDefi ModeDuDefiPour(bool surLeLive, bool partageLive, string politique, bool jeuMulti)
+    {
+        if (!surLeLive && !partageLive) return ModeDuDefi.Prive;
+        return politique is "followed" or "everyone" && jeuMulti ? ModeDuDefi.Multi : ModeDuDefi.Live;
+    }
+
+    private ModeDuDefi ModeCourant()
+    {
+        var reglages = _options.CurrentValue.Leaderboard;
+        return ModeDuDefiPour(_modele.VueCourante == LeaderboardPanelModel.Vue.LiveEtContest,
+            reglages.ChallengeShareLive, reglages.ChallengeJoinPolicy ?? "none", _reglesDuJeu.Contains("1cc-multi"));
+    }
+
+    /// <summary>Le libelle du mode : la regle du jeu (1CC, ou 1LC pour un jeu ouvert en 1LC), puis LIVE ou MULTI.</summary>
+    internal static string LibelleDuMode(ModeDuDefi mode, IReadOnlyList<string> regles)
+    {
+        var regle = regles.Contains("1lc") && !regles.Contains("1cc") ? "1LC" : "1CC";
+        return mode switch
+        {
+            ModeDuDefi.Live => regle + " LIVE",
+            ModeDuDefi.Multi => regle + " MULTI",
+            _ => regle,
+        };
     }
 
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> NomsDeSystemes = new(StringComparer.OrdinalIgnoreCase);
@@ -832,7 +931,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 break;
 
             case LeaderboardPanelModel.Effet.BasculerLeSuivi:
-                BasculerLeSuivi();
+                // Sur LIVE & CONTEST, X ne suit personne : il REGARDE le direct de la ligne.
+                if (_modele.VueCourante == LeaderboardPanelModel.Vue.LiveEtContest) Rejoindre(regarder: true);
+                else BasculerLeSuivi();
                 break;
 
             case LeaderboardPanelModel.Effet.AgirSurLaLigne:
@@ -901,6 +1002,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         if (contest is not null) ArmerLaSeanceDuContest(contest);
 
         var reglages = _options.CurrentValue.Leaderboard;
+        // Le mode se decide a l'APPUI : l'onglet compte (LIVE & CONTEST = toujours en direct). Un
+        // contest garde les reglages du joueur : c'est LiveContest qui le diffuse, pas nous.
+        var mode = contest is null
+            ? ModeCourant()
+            : ModeDuDefiPour(false, reglages.ChallengeShareLive, reglages.ChallengeJoinPolicy ?? "none", _reglesDuJeu.Contains("1cc-multi"));
+        _logger.LogInformation("Classement : defi {Mode} ({Libelle}).", mode, LibelleDuMode(mode, _reglesDuJeu));
         _ = Task.Run(async () =>
         {
             try
@@ -910,7 +1017,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 // acceptait la demande sans jamais lancer (2026-10-01, defi bloque sur
                 // « Lancement de la partie », emulateur jamais apparu).
                 await FermerLeMenuEsAsync().ConfigureAwait(false);
-                if (reglages.ChallengeShareLive && await DiffuserLeDefiAsync(chemin, reglages.ChallengeJoinPolicy).ConfigureAwait(false))
+                if (mode != ModeDuDefi.Prive
+                    && await DiffuserLeDefiAsync(chemin, mode == ModeDuDefi.Multi ? reglages.ChallengeJoinPolicy : "none").ConfigureAwait(false))
                 {
                     await AttendreLeJeuPuisSEffacerAsync("defi en direct").ConfigureAwait(false);
                     return;
@@ -945,7 +1053,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// le site : la plateforme dit ce que l'hote autorise (jouer, ou seulement regarder). Un
     /// CONTEST lance le jeu, comme « Defier ».
     /// </summary>
-    private void Rejoindre()
+    private void Rejoindre(bool regarder)
     {
         LeaderboardSocialClient.Direct? direct;
         LeaderboardSocialClient.Contest? contest;
@@ -956,13 +1064,17 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         }
         if (contest is not null)
         {
+            if (regarder) return;   // X sur un contest : rien a regarder
             _logger.LogInformation("Classement : contest {Contest} rejoint sur {Jeu}.", contest.Id, _jeuAffiche);
             Defier(contest);
             return;
         }
         if (direct is null) return;
+        if (string.Equals(direct.Type, "react", StringComparison.Ordinal)) return;   // pas de netplay : rien a rejoindre
+        // A sur une ligne ou l'on ne peut pas jouer : on regarde, un appui fait toujours quelque chose.
+        if (!regarder && !Joignabilite(direct).Joignable) regarder = true;
 
-        _logger.LogInformation("Classement : rejoindre le direct de {Joueur} ({Session}).", direct.Pseudo, direct.Session);
+        _logger.LogInformation("Classement : {Geste} le direct de {Joueur} ({Session}).", regarder ? "regarder" : "rejoindre en joueur", direct.Pseudo, direct.Session);
         _overlay.Attendre(_textes.Text("leaderboard.starting_game", Langue()));
         _ = Task.Run(async () =>
         {
@@ -970,7 +1082,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             {
                 // Meme raison que pour un defi : l'invite lance par `/launch`, qui attend sous le menu.
                 await FermerLeMenuEsAsync().ConfigureAwait(false);
-                var echec = await _invite.RejoindreAsync(direct.Session, hote: direct.Pseudo.Length > 0 ? direct.Pseudo : direct.Poignee).ConfigureAwait(false);
+                var echec = await _invite.RejoindreAsync(direct.Session, hote: direct.Pseudo.Length > 0 ? direct.Pseudo : direct.Poignee, regarderSeulement: regarder).ConfigureAwait(false);
                 if (echec != RetroBat.Api.Netplay.NetplayGuestService.Echec.Aucun)
                 {
                     _logger.LogWarning("Classement : impossible de rejoindre ({Raison}).", echec);
@@ -1116,7 +1228,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     {
         if (_modele.VueCourante == LeaderboardPanelModel.Vue.LiveEtContest)
         {
-            Rejoindre();
+            Rejoindre(regarder: false);
             return;
         }
         var ligne = LignesDeLaVue().ElementAtOrDefault(_modele.Ligne);
@@ -1327,7 +1439,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // donc que si le joueur figurait deja dans le tableau -- c'est-a-dire jamais, au
             // moment ou on en a le plus besoin. Le contexte porte le pseudo du compte depuis
             // l'appairage, quel que soit le classement.
-            Pseudo: _context.PlayerPseudo ?? "");
+            Pseudo: _context.PlayerPseudo ?? "",
+            DefierMode: LibelleDuMode(ModeCourant(), _reglesDuJeu));
     }
 
     /// <summary>

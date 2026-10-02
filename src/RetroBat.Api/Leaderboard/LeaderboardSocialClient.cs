@@ -131,6 +131,30 @@ public sealed class LeaderboardSocialClient
     public Task<IReadOnlyList<Direct>> DirectsDuJeuAsync(string jeu, CancellationToken ct = default)
         => DirectsAsync("live/for-game?game=" + Uri.EscapeDataString(jeu), "lives", ct);
 
+    /// <summary>Ce qu'il en est pour CE compte dans un direct : peut-il jouer, et la place.</summary>
+    public sealed record EtatDuDirect(bool PeutJouer, string Place);
+
+    /// <summary>
+    /// Consulte un direct SANS rien reserver ni recevoir de mot de passe (?peek=1, site 2026-10-02) :
+    /// de quoi afficher JOIN ou WATCH sur la ligne. Null si la plateforme ne repond pas.
+    /// </summary>
+    public async Task<EtatDuDirect?> EtatDuDirectAsync(string session, CancellationToken ct = default)
+    {
+        var doc = await LireAsync("live/" + Uri.EscapeDataString(session) + "/join?peek=1", ct).ConfigureAwait(false);
+        if (doc is null) return null;
+        try
+        {
+            var r = doc.RootElement;
+            var peutJouer = r.TryGetProperty("can_play", out var c) && c.ValueKind == JsonValueKind.True;
+            var place = r.TryGetProperty("seat_state", out var s) && s.ValueKind == JsonValueKind.String ? s.GetString() ?? "" : "";
+            return new EtatDuDirect(peutJouer, place);
+        }
+        finally
+        {
+            doc.Dispose();
+        }
+    }
+
     /// <summary>Les directs des joueurs que ce compte suit.</summary>
     public Task<IReadOnlyList<Direct>> DirectsSuivisAsync(CancellationToken ct = default)
         => DirectsAsync("live/following", "live", ct);

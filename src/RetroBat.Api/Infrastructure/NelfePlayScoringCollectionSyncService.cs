@@ -412,6 +412,27 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// le comportement d'avant qu'un panneau qui ne s'ouvre nulle part apres un demarrage hors
     /// ligne.
     /// </summary>
+    /// <summary>
+    /// Les regles ouvertes d'un jeu (« 1cc », « 1cc-multi », « 1lc »...), lues dans le dernier index
+    /// des jeux ouverts garde sur disque ; vide si le jeu n'y est pas. Le panneau de classement s'en
+    /// sert : le libelle du defi suit la regle du jeu, et le 1CC MULTI n'est propose que la ou il a
+    /// un classement.
+    /// </summary>
+    public IReadOnlyList<string> ReglesOuvertes(string romGroup)
+    {
+        if (string.IsNullOrWhiteSpace(romGroup)) return [];
+        try
+        {
+            var manifeste = LireManifeste();
+            var jeu = manifeste?.Games?.FirstOrDefault(g => string.Equals(g.RomGroup, romGroup, StringComparison.OrdinalIgnoreCase));
+            return jeu is null ? [] : jeu.Rulesets.Select(r => r.Id).Where(id => id.Length > 0).ToList();
+        }
+        catch (Exception)
+        {
+            return [];
+        }
+    }
+
     public bool? EstOuvertAuScoring(string cheminDuJeu)
     {
         if (string.IsNullOrWhiteSpace(cheminDuJeu))
