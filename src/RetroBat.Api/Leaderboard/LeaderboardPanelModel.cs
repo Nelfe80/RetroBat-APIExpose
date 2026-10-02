@@ -33,6 +33,14 @@ public sealed class LeaderboardPanelModel
         MaVille,
         MonPays,
         Monde,
+        /// <summary>
+        /// Le classement mondial d'une AUTRE regle ouverte du jeu, juste apres « Monde » : son
+        /// pendant, qui n'a pas besoin de redire « monde » (decision user 2026-10-02). Le panneau
+        /// melangeait les regles : un score 1CC MULTI se classait au milieu des scores solo.
+        /// </summary>
+        MondeMulti,
+        /// <summary>Idem pour le 1LC, quand la regle principale du jeu est le 1CC.</summary>
+        Monde1lc,
     }
 
     /// <summary>Qui tient la manette. Le panneau ne s'affiche pas quand il est ferme.</summary>
@@ -127,7 +135,7 @@ public sealed class LeaderboardPanelModel
         return true;
     }
 
-    public void Ouvrir(bool salleConnue, bool villeConnue, bool paysConnu, bool aDesRecords)
+    public void Ouvrir(bool salleConnue, bool villeConnue, bool paysConnu, bool aDesRecords, bool multi = false, bool unLc = false)
     {
         _onglets.Clear();
         // Avec MY RECORDS, THIS CABINET attend de prouver qu'il montre autre chose (PoserCetteBorne).
@@ -136,10 +144,13 @@ public sealed class LeaderboardPanelModel
         if (villeConnue) _onglets.Add(Vue.MaVille);
         if (paysConnu) _onglets.Add(Vue.MonPays);
         _onglets.Add(Vue.Monde);
+        if (multi) _onglets.Add(Vue.MondeMulti);
+        if (unLc) _onglets.Add(Vue.Monde1lc);
 
-        // On entre sur le dernier onglet : celui qui touche la porte. Chaque pas vers la gauche
-        // resserre ensuite vers le joueur.
-        _onglet = _onglets.Count - 1;
+        // On entre sur « Monde », la regle principale du jeu : sans autre regle, c'est le dernier
+        // onglet, celui qui touche la porte. Chaque pas vers la gauche resserre ensuite vers le
+        // joueur ; vers la droite, les autres regles du jeu.
+        _onglet = _onglets.IndexOf(Vue.Monde);
         _ligne = 0;
         _lignes = 0;
         Etat = Foyer.MenuEs;

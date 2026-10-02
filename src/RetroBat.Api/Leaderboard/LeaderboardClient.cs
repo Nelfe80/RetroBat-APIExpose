@@ -55,10 +55,8 @@ public sealed class LeaderboardClient
     private readonly ILogger<LeaderboardClient> _logger;
     private readonly SemaphoreSlim _porte = new(1, 1);
 
-    private string _jeuEnCache = "";
-    private DateTime _cacheJusqua = DateTime.MinValue;
-    private IReadOnlyList<Ligne> _cache = Array.Empty<Ligne>();
-    private string _etatEnCache = EtatAucunScore;
+    /// <summary>Un classement deja lu par jeu ET par regle : les onglets d'un jeu en lisent plusieurs.</summary>
+    private readonly Dictionary<string, (DateTime Jusqua, IReadOnlyList<Ligne> Lignes, string Etat)> _caches = new(StringComparer.OrdinalIgnoreCase);
 
     public LeaderboardClient(IHttpClientFactory httpFactory, ILogger<LeaderboardClient> logger)
     {
@@ -74,37 +72,53 @@ public sealed class LeaderboardClient
     public TimeSpan Fraicheur { get; init; } = TimeSpan.FromSeconds(30);
 
     /// <summary>Oublie le classement en memoire : apres une partie, il a pu changer.</summary>
-    public void Oublier() => _cacheJusqua = DateTime.MinValue;
+    public void Oublier()
+    {
+        lock (_caches) _caches.Clear();
+    }
+
+    /// <summary>
+    /// La regle des onglets ordinaires d'un jeu : le 1CC s'il est ouvert, sinon sa premiere regle.
+    /// Vide quand la borne ne connait pas ses regles : on demande alors tout, comme avant.
+    /// </summary>
+    public static string ReglePrincipale(IReadOnlyList<string> regles)
+        => regles.Contains("1cc", StringComparer.OrdinalIgnoreCase) ? "1cc" : regles.FirstOrDefault() ?? "";
 
     /// <summary>
     /// Le classement complet d'un jeu (le mondial), depuis le cache s'il est frais. Le pseudo de
     /// la borne sert a reconnaitre SA ligne, celle qu'on met en avant.
     /// </summary>
-    public async Task<Resultat> MondeAsync(string romGroup, string monPseudo, CancellationToken ct)
+    public async Task<Resultat> MondeAsync(string romGroup, string monPseudo, CancellationToken ct, string regle = "")
     {
         if (string.IsNullOrWhiteSpace(romGroup)) return Resultat.Vide(EtatAucunScore);
 
         await _porte.WaitAsync(ct).ConfigureAwait(false);
         try
         {
-            if (string.Equals(_jeuEnCache, romGroup, StringComparison.OrdinalIgnoreCase) && DateTime.UtcNow < _cacheJusqua)
+            var cle = romGroup + "|" + regle;
+            lock (_caches)
             {
-                return new Resultat(_cache, _etatEnCache);
+                if (_caches.TryGetValue(cle, out var deja) && DateTime.UtcNow < deja.Jusqua)
+                {
+                    return new Resultat(deja.Lignes, deja.Etat);
+                }
             }
 
+            // LA REGLE EST DEMANDEE (2026-10-02). Sans elle, la plateforme rend le meilleur score
+            // de chaque joueur dans CHAQUE regle : un 1CC MULTI se classait parmi les scores solo,
+            // et le meme joueur apparaissait deux fois.
             var url = $"{NelfePlayAgentService.BaseUrl.TrimEnd('/')}/api/v1/scores/board"
-                + $"?game={Uri.EscapeDataString(romGroup)}&limit={Profondeur}";
+                + $"?game={Uri.EscapeDataString(romGroup)}&limit={Profondeur}"
+                + (regle.Length > 0 ? $"&ruleset={Uri.EscapeDataString(regle)}" : "");
             try
             {
                 using var client = _httpFactory.CreateClient();
                 client.Timeout = TimeSpan.FromSeconds(6);
                 var corps = await client.GetStringAsync(url, ct).ConfigureAwait(false);
                 var lignes = Lire(corps, monPseudo);
-                _jeuEnCache = romGroup;
-                _cache = lignes;
-                _etatEnCache = lignes.Count == 0 ? EtatAucunScore : EtatOk;
-                _cacheJusqua = DateTime.UtcNow + Fraicheur;
-                return new Resultat(_cache, _etatEnCache);
+                var etat = lignes.Count == 0 ? EtatAucunScore : EtatOk;
+                lock (_caches) _caches[cle] = (DateTime.UtcNow + Fraicheur, lignes, etat);
+                return new Resultat(lignes, etat);
             }
             catch (OperationCanceledException)
             {

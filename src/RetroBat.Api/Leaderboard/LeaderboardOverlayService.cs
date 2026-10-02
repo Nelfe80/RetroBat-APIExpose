@@ -195,7 +195,9 @@ public sealed class LeaderboardOverlayService : IDisposable
         /// <summary>Le pseudo du joueur de cette borne, affiche en bas a droite. Vide : rien.</summary>
         string Pseudo = "",
         /// <summary>Le defi que le bouton lance (« 1CC », « 1CC LIVE », « 1CC MULTI »), a cote de CHALLENGE.</summary>
-        string DefierMode = "");
+        string DefierMode = "",
+        /// <summary>La regle de chaque onglet, dans un petit cadre arrondi (« 1CC », « 1CC MULTI ») ; vide : aucune.</summary>
+        IReadOnlyList<string>? Pastilles = null);
 
     private Contenu _contenu = new("", Array.Empty<string>(), 0, Array.Empty<LeaderboardClient.Ligne>(), 0, "", true, false,
         Array.Empty<Aide>(), Array.Empty<Aide>(), "", "", "", "", Array.Empty<string>(),
@@ -886,9 +888,28 @@ public sealed class LeaderboardOverlayService : IDisposable
             var separateur = Teinte(s.SeparatorColor);
             using var centre = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
 
+            // LA REGLE DE L'ONGLET, dans un petit cadre arrondi comme les boutons de ligne
+            // (2026-10-02) : « MONDE [1CC] », puis « [1CC MULTI] » a cote. Un onglet peut n'avoir
+            // que sa pastille.
+            var pastilles = c.Pastilles ?? Array.Empty<string>();
+            using var policePastille = new Font(police.FontFamily, police.Size * 0.72f, FontStyle.Bold, police.Unit);
+            using var aGauche = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Center };
+            var ecartPastille = taille * 0.4f;
+            var margePastille = taille * 0.42f;
+            var hauteurPastille = taille * 1.05f;
+            var rayonPastille = Math.Min(hauteurPastille / 2f, (float) Math.Clamp(s.ButtonCornerSize * _hauteurEcran / 1080d, 4, 24));
+            var largeursNoms = c.Onglets.Select(n => n.Length == 0 ? 0f : g.MeasureString(n.ToUpperInvariant(), police, PointF.Empty, StringFormat.GenericTypographic).Width).ToArray();
+            var largeursPastilles = Enumerable.Range(0, c.Onglets.Count)
+                .Select(i => i < pastilles.Count && pastilles[i].Length > 0
+                    ? g.MeasureString(pastilles[i], policePastille, PointF.Empty, StringFormat.GenericTypographic).Width + 2 * margePastille
+                    : 0f)
+                .ToArray();
+
             // Les largeurs d'abord, pour placer la camera : l'onglet courant doit etre visible
             // en entier, et on ne laisse pas de vide a gauche si tout tient.
-            var largeurs = c.Onglets.Select(n => g.MeasureString(n.ToUpperInvariant(), police, PointF.Empty, StringFormat.GenericTypographic).Width + 2 * margeOnglet).ToArray();
+            var largeurs = Enumerable.Range(0, c.Onglets.Count)
+                .Select(i => largeursNoms[i] + (largeursNoms[i] > 0 && largeursPastilles[i] > 0 ? ecartPastille : 0f) + largeursPastilles[i] + 2 * margeOnglet)
+                .ToArray();
             var total = largeurs.Sum();
             var debutCourant = largeurs.Take(c.OngletCourant).Sum();
             var finCourant = debutCourant + (c.OngletCourant < largeurs.Length ? largeurs[c.OngletCourant] : 0);
@@ -917,7 +938,26 @@ public sealed class LeaderboardOverlayService : IDisposable
                 }
                 using (var encre = new SolidBrush(actif ? couleurChoisi : couleurTexte))
                 {
-                    g.DrawString(nom, police, encre, new RectangleF(x, y, largeur, hauteur), centre);
+                    if (largeursPastilles[i] <= 0)
+                    {
+                        g.DrawString(nom, police, encre, new RectangleF(x, y, largeur, hauteur), centre);
+                    }
+                    else
+                    {
+                        var xContenu = x + margeOnglet;
+                        if (largeursNoms[i] > 0)
+                        {
+                            g.DrawString(nom, police, encre, new RectangleF(xContenu, y, largeursNoms[i] + 1f, hauteur), aGauche);
+                            xContenu += largeursNoms[i] + ecartPastille;
+                        }
+                        var zone = new RectangleF(xContenu, y + (hauteur - hauteurPastille) / 2f, largeursPastilles[i], hauteurPastille);
+                        using (var chemin = Arrondi(zone, rayonPastille))
+                        using (var trait = new Pen(encre.Color, Math.Max(1.2f, _hauteurEcran / 900f)))
+                        {
+                            g.DrawPath(trait, chemin);
+                        }
+                        g.DrawString(pastilles[i], policePastille, encre, zone, centre);
+                    }
                 }
                 Aplat(g, separateur, new RectangleF(x, y, 1f, hauteur));
                 x += largeur;

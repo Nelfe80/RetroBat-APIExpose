@@ -83,6 +83,16 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     private System.Diagnostics.Stopwatch? _depuisLAppui;
     private IReadOnlyList<LeaderboardClient.Ligne> _monde = Array.Empty<LeaderboardClient.Ligne>();
     private string _etatDuMonde = LeaderboardClient.EtatAucunScore;
+
+    /// <summary>La regle des onglets ordinaires (« 1cc », sinon la premiere ouverte) ; vide : toutes.</summary>
+    private string _reglePrincipale = "";
+
+    /// <summary>Les onglets des AUTRES regles du jeu (1CC MULTI, 1LC) et la regle de chacun.</summary>
+    private IReadOnlyList<(LeaderboardPanelModel.Vue Vue, string Regle)> _ongletsDeRegle = Array.Empty<(LeaderboardPanelModel.Vue, string)>();
+
+    /// <summary>Le classement mondial de chacune de ces regles, et les rangs de la consultation d'avant.</summary>
+    private Dictionary<LeaderboardPanelModel.Vue, (IReadOnlyList<LeaderboardClient.Ligne> Lignes, string Etat)> _autresMondes = new();
+    private Dictionary<LeaderboardPanelModel.Vue, IReadOnlyDictionary<string, int>> _rangsDesAutres = new();
     private string _jeuAffiche = "";
     private string _systemeAffiche = "";
     private string _romGroup = "";
@@ -450,6 +460,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         _systemeAffiche = systeme;
         if (_romGroup.Length == 0) return;
         _reglesDuJeu = _collection?.ReglesOuvertes(_romGroup) ?? Array.Empty<string>();
+        _reglePrincipale = LeaderboardClient.ReglePrincipale(_reglesDuJeu);
+        _ongletsDeRegle = OngletsDeRegle(_reglesDuJeu, _reglePrincipale);
 
         var session = _session.Get();
         _maSalle = session?.VenueName ?? "";
@@ -464,10 +476,14 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         {
             _monde = Array.Empty<LeaderboardClient.Ligne>();
             _etatDuMonde = "";
+            _autresMondes = new();
+            _rangsDesAutres = new();
         }
         _menuEsOuvert = false;
         _menuEsConnu = false;
-        _modele.Ouvrir(salleConnue: _maSalle.Length > 0, villeConnue: _maVille.Length > 0, paysConnu: false, aDesRecords: true);
+        _modele.Ouvrir(salleConnue: _maSalle.Length > 0, villeConnue: _maVille.Length > 0, paysConnu: false, aDesRecords: true,
+            multi: _ongletsDeRegle.Any(o => o.Vue == LeaderboardPanelModel.Vue.MondeMulti),
+            unLc: _ongletsDeRegle.Any(o => o.Vue == LeaderboardPanelModel.Vue.Monde1lc));
         _ = Task.Run(async () =>
         {
             await _social.RafraichirLesSuivisAsync().ConfigureAwait(false);
@@ -868,7 +884,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     {
         if (!relecture) _ = ChargerLesEvenementsAsync(ct);
         var pseudo = _agent.Status.Pseudo ?? "";
-        var resultat = await _client.MondeAsync(_romGroup, pseudo, ct).ConfigureAwait(false);
+        var resultat = await _client.MondeAsync(_romGroup, pseudo, ct, _reglePrincipale).ConfigureAwait(false);
         if (!relecture)
         {
             // La reference des fleches : la consultation d'AVANT. On la fige pour toute cette
@@ -876,10 +892,28 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             _rangsPrecedents = _historique.Lire(_romGroup);
             if (resultat.Etat == LeaderboardClient.EtatOk) _historique.Enregistrer(_romGroup, resultat.Lignes);
         }
+
+        // Les autres regles du jeu, chacune son classement et son historique de rangs.
+        var autres = new Dictionary<LeaderboardPanelModel.Vue, (IReadOnlyList<LeaderboardClient.Ligne> Lignes, string Etat)>();
+        var rangsDesAutres = new Dictionary<LeaderboardPanelModel.Vue, IReadOnlyDictionary<string, int>>();
+        foreach (var (vue, regle) in _ongletsDeRegle)
+        {
+            var r = await _client.MondeAsync(_romGroup, pseudo, ct, regle).ConfigureAwait(false);
+            autres[vue] = (r.Lignes, r.Etat);
+            var cleHistorique = _romGroup + "#" + regle;
+            if (!relecture)
+            {
+                rangsDesAutres[vue] = _historique.Lire(cleHistorique);
+                if (r.Etat == LeaderboardClient.EtatOk) _historique.Enregistrer(cleHistorique, r.Lignes);
+            }
+        }
+
         lock (_gate)
         {
             _monde = resultat.Lignes;
             _etatDuMonde = resultat.Etat;
+            _autresMondes = autres;
+            if (!relecture) _rangsDesAutres = rangsDesAutres;
             // On apprend sa ville et son pays de SA PROPRE ligne : la borne ne les connait pas
             // autrement, et un onglet qu'on ne peut pas remplir ne doit pas exister.
             var mienne = _monde.FirstOrDefault(l => l.CestMoi);
@@ -1385,6 +1419,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         lock (_gate)
         {
             if (_modele.VueCourante == LeaderboardPanelModel.Vue.LiveEtContest) return Array.Empty<LeaderboardClient.Ligne>();
+            if (RegleDeLaVue(_modele.VueCourante) is not null)
+            {
+                return _autresMondes.TryGetValue(_modele.VueCourante, out var autre) ? autre.Lignes : Array.Empty<LeaderboardClient.Ligne>();
+            }
             return LeaderboardClient.Tailler(_monde, _modele.VueCourante, _maVille, _monPays, _maSalle);
         }
     }
@@ -1398,18 +1436,24 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         var evenements = surLeLive ? Evenements(Langue()) : null;
         _modele.PoserLesLignes(surLeLive ? evenements!.Count : lignes.Count);
         string etat;
+        IReadOnlyDictionary<string, int> rangsPrecedents;
         lock (_gate)
         {
-            etat = _etatDuMonde.Length == 0
+            var vue = _modele.VueCourante;
+            var etatDeLaVue = RegleDeLaVue(vue) is null ? _etatDuMonde
+                : _autresMondes.TryGetValue(vue, out var autre) ? autre.Etat : "";
+            etat = etatDeLaVue.Length == 0
                 ? ""
-                : lignes.Count > 0 ? LeaderboardClient.EtatOk : _etatDuMonde;
+                : lignes.Count > 0 ? LeaderboardClient.EtatOk : etatDeLaVue;
+            rangsPrecedents = RegleDeLaVue(vue) is null ? _rangsPrecedents
+                : _rangsDesAutres.TryGetValue(vue, out var rangs) ? rangs : new Dictionary<string, int>();
         }
         var langue = Langue();
         var chezNous = _modele.Etat == LeaderboardPanelModel.Foyer.Panneau;
         var ligne = lignes.Count > 0 ? lignes[Math.Clamp(_modele.Ligne, 0, lignes.Count - 1)] : null;
         return new LeaderboardOverlayService.Contenu(
             _jeuAffiche,
-            _modele.Onglets.Select(v => _textes.Text(Cle(v), langue)).ToList(),
+            _modele.Onglets.Select(v => RegleDeLaVue(v) is null ? _textes.Text(Cle(v), langue) : "").ToList(),
             _modele.IndexOnglet,
             lignes,
             _modele.Ligne,
@@ -1441,7 +1485,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             _textes.Text("leaderboard.join", langue),
             Glyphe(SlotValider),
             ReplaysEnPreparation: _replaysEnPreparation,
-            RangsPrecedents: _rangsPrecedents,
+            RangsPrecedents: rangsPrecedents,
             // LE PSEUDO VIENT DU COMPTE APPAIRE, PAS DU CLASSEMENT.
             //
             // Premiere version : je le prenais sur NOTRE ligne du classement. Il ne s'affichait
@@ -1449,7 +1493,49 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // moment ou on en a le plus besoin. Le contexte porte le pseudo du compte depuis
             // l'appairage, quel que soit le classement.
             Pseudo: _context.PlayerPseudo ?? "",
-            DefierMode: LibelleDuMode(ModeCourant(), _reglesDuJeu));
+            DefierMode: LibelleDuMode(ModeCourant(), _reglesDuJeu),
+            Pastilles: _modele.Onglets.Select(PastilleDeLOnglet).ToList());
+    }
+
+    /// <summary>
+    /// UN ONGLET PAR AUTRE REGLE DU JEU (2026-10-02), juste apres « Monde » : 1CC MULTI, puis 1LC
+    /// quand la regle principale est le 1CC. Pur : il se teste sans panneau.
+    /// </summary>
+    internal static IReadOnlyList<(LeaderboardPanelModel.Vue Vue, string Regle)> OngletsDeRegle(IReadOnlyList<string> regles, string principale)
+    {
+        var onglets = new List<(LeaderboardPanelModel.Vue, string)>();
+        foreach (var vue in new[] { LeaderboardPanelModel.Vue.MondeMulti, LeaderboardPanelModel.Vue.Monde1lc })
+        {
+            var regle = RegleDeLaVue(vue)!;
+            if (regles.Contains(regle, StringComparer.OrdinalIgnoreCase) && !string.Equals(regle, principale, StringComparison.OrdinalIgnoreCase))
+            {
+                onglets.Add((vue, regle));
+            }
+        }
+        return onglets;
+    }
+
+    /// <summary>La regle d'un onglet de regle ; null pour les onglets ordinaires.</summary>
+    internal static string? RegleDeLaVue(LeaderboardPanelModel.Vue vue) => vue switch
+    {
+        LeaderboardPanelModel.Vue.MondeMulti => "1cc-multi",
+        LeaderboardPanelModel.Vue.Monde1lc => "1lc",
+        _ => null,
+    };
+
+    /// <summary>Le code d'une regle tel qu'on l'ecrit partout : « 1CC MULTI ». Jamais traduit.</summary>
+    internal static string LibelleDeRegle(string regle) => regle.Replace('-', ' ').ToUpperInvariant();
+
+    /// <summary>
+    /// La pastille d'un onglet : la regle, dans un petit cadre arrondi (demande user 2026-10-02).
+    /// « Monde » porte celle de la regle principale, seulement quand le jeu en a d'autres ; un jeu
+    /// a une seule regle garde ses onglets d'avant.
+    /// </summary>
+    private string PastilleDeLOnglet(LeaderboardPanelModel.Vue vue)
+    {
+        if (RegleDeLaVue(vue) is { } regle) return LibelleDeRegle(regle);
+        if (vue == LeaderboardPanelModel.Vue.Monde && _ongletsDeRegle.Count > 0 && _reglePrincipale.Length > 0) return LibelleDeRegle(_reglePrincipale);
+        return "";
     }
 
     /// <summary>
@@ -1578,7 +1664,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             await Task.Delay(400).ConfigureAwait(false);
             if (jeton != Volatile.Read(ref _prechargement)) return;   // le joueur a continue de defiler
             if (_modele.Etat != LeaderboardPanelModel.Foyer.Ferme) return;
-            await _client.MondeAsync(cle, _agent.Status.Pseudo ?? "", CancellationToken.None).ConfigureAwait(false);
+            await _client.MondeAsync(cle, _agent.Status.Pseudo ?? "", CancellationToken.None,
+                LeaderboardClient.ReglePrincipale(_collection?.ReglesOuvertes(cle) ?? Array.Empty<string>())).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
