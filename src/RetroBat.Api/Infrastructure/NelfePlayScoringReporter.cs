@@ -148,6 +148,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>La derniere valeur du score du joueur 1 recue, demo comprise.</summary>
     private long? _dernierTotalVu;
 
+    /// <summary>Le depart de la partie a ete dit (START du panel, credit, GAME_START ou score).</summary>
+    private bool _departAnnonce;
+
+    /// <summary>
+    /// Le lecteur de manettes de l'API a lu au moins un appui depuis son demarrage : il voit le
+    /// START, le score n'a pas a le remplacer (sur une borne lue, un joueur qui laisse tourner la
+    /// demo d'un jeu sans credits la ferait enregistrer).
+    /// </summary>
+    private volatile bool _panelLu;
+
     /// <summary>
     /// LE SCORE AU DEPART DE LA PARTIE (2026-10-02), avec la frame du depart. Le pont ne dit un
     /// score que quand il change : la derniere valeur lue avant le START est celle que le jeu
@@ -607,6 +617,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _enJeu = false;
             _dernierTotalVu = null;
             _scoreAuDepart = null;
+            _departAnnonce = false;
             _vies.Clear();
             _contexte = RetroBat.Api.Scoring.ContexteDeJeu.Vide;
             _contextes.Clear();
@@ -1062,11 +1073,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// parties). Le credit consomme tombe au START meme ; l'enregistreur le prend comme tel.
     /// </summary>
     private void AnnoncerLeDepart(string source)
-        => _ = _eventBus.PublishAsync(new EventEnvelope
+    {
+        lock (_sync) { _departAnnonce = true; }
+        _ = _eventBus.PublishAsync(new EventEnvelope
         {
             Type = "scoring.partie.depart",
             Payload = new { Source = source },
         });
+    }
 
     private void AppliquerEtat(string action)
     {
@@ -1182,6 +1196,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             if (!_enJeu && _scoreAuDepart is null && _dernierTotalVu is { } auDepart) _scoreAuDepart = (_lastFrame, auDepart);
             _inDemo = false; _startVu = true; _enJeu = true;
+            _departAnnonce = true;
         }
     }
 
@@ -1195,6 +1210,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     private void CaptureStart(JsonElement root)
     {
+        _panelLu = true;
         if ((Entier(root, "Player") ?? Entier(root, "player") ?? 1) == 1) _portLocal.AppuiDuPanel();
         var systeme = GetString(root, "System") ?? GetString(root, "system") ?? "";
         if (!string.Equals(systeme, "START", StringComparison.OrdinalIgnoreCase)) return;
@@ -1792,6 +1808,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
         long? continueAnnonce = null;
         var nouvellePartie = false;
+        var departParLeScore = false;
         lock (_sync)
         {
             _scoresRecus++;
@@ -1799,6 +1816,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             if (_inDemo) { _scoresEnDemo++; return; }   // score de démo → jamais certifié
             var precedent = _finalTotal;
             _finalTotal = total;
+
+            // EN DERNIER RECOURS, LE SCORE QUI MONTE DIT QUE LA PARTIE A COMMENCE (2026-10-02), sur une
+            // borne dont l'API n'a jamais lu un appui :
+            // ni START lu au panel, ni credit consomme, ni GAME_START. Une fois par partie, hors
+            // demo. Le replay part alors en retard, mais il part.
+            if (!_departAnnonce && !_panelLu && precedent is { } avantMontee && total > avantMontee)
+            {
+                _departAnnonce = true;
+                departParLeScore = true;
+            }
 
             // LE SCORE RETOMBE : une nouvelle partie commence, pour un jeu a chiffre des credits
             // (le continue y garde le score). Si la partie d'avant a ete close par ce chiffre, tout
@@ -1840,6 +1867,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 _derniereLecture = total;
             }
         }
+        if (departParLeScore) AnnoncerLeDepart("debut de score");
 
         if (nouvellePartie)
         {
