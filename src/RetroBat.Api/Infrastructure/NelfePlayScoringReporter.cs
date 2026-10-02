@@ -187,7 +187,20 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private string? _replayDuSolo;
     private readonly Dictionary<string, (string sessionId, string visibility, long? score, int? rank, DateTime at)> _pendingScoreLink = new();
     private readonly Dictionary<string, (string sha256, DateTime at)> _finalizedReplay = new();
-    private static readonly TimeSpan ReplayLinkTtl = TimeSpan.FromMinutes(20);
+    /// <summary>
+    /// PLUS DE LIMITE DE 20 MINUTES (decision user 2026-10-02). Le score publie (a la sortie du jeu)
+    /// et le replay scelle (au continue, ou a la fin) devaient se rejoindre en vingt minutes, en
+    /// memoire : un joueur qui continuait apres un continue, ou une API relancee entre les deux,
+    /// et le record partait sans replay, jamais publie. Les rapprochements vivent maintenant sur
+    /// disque jusqu'a la reponse du serveur ; sept jours ne servent qu'au menage.
+    /// </summary>
+    private static readonly TimeSpan ReplayLinkTtl = TimeSpan.FromDays(7);
+    /// <summary>Les liens en cours d'envoi : un seul envoi a la fois par replay.</summary>
+    private readonly HashSet<string> _liensEnCours = new(StringComparer.Ordinal);
+    /// <summary>Le replay de la partie dont la session vient d'arriver, fige a cet instant.</summary>
+    private string? _replayDeLaPartie;
+    private static string CheminDesLiens => Path.Combine(
+        RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, "state", "nelfeplay", "replay-links.json");
 
     public static bool Enabled { get; set; } = true;
 
@@ -237,6 +250,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         try
         {
             await EnsureEnrolledAsync(stoppingToken).ConfigureAwait(false);
+            // Les rapprochements d'avant le redemarrage reprennent ou ils en etaient.
+            lock (_sync) { ChargerLesLiens(); }
+            RessayerLesLiens();
 
             // La mesure du score est ÉVÉNEMENTIELLE (pipe → HandleEvent). En fond, un
             // battement calme vérifie l'état recovery « share datas » : si le serveur
@@ -249,6 +265,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 await Task.Delay(delay, stoppingToken).ConfigureAwait(false);
                 await RecoveryCheckAsync(stoppingToken).ConfigureAwait(false);
                 await ClaimCheckAsync(stoppingToken).ConfigureAwait(false);
+                RessayerLesLiens();
                 delay = TimeSpan.FromSeconds(180);
             }
         }
@@ -517,6 +534,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     CaptureTotal(ToJson(envelope.Payload));
                     break;
                 case "scoring.listener.session":
+                    // Le replay de CETTE partie, fige a la fin de session : le verdict revient apres,
+                    // parfois quand le jeu suivant a deja demarre et remis le replay actif a zero.
+                    lock (_sync) { _replayDeLaPartie = _replayDuSolo ?? _activeReplayId; }
                     _ = OnSessionAsync(ToJson(envelope.Payload), CancellationToken.None);
                     break;
                 case "replay.recording.started":
@@ -558,6 +578,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _invite = RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun;
             _debutSessionUtc = DateTime.UtcNow;
             _replayDuSolo = null;
+            // Le replay actif est celui de CETTE partie : il repart a zero au lancement (avant tout
+            // START, donc avant l'enregistrement). Sans quoi, la limite de temps partie, un score
+            // sans replay recupererait celui d'une partie precedente.
+            _activeReplayId = null;
             _trajectory.Clear();
             _horsJeu.Clear();
             _startVu = false;
@@ -3209,7 +3233,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var id = GetString(payload, "ReplayId");
         var sha = GetString(payload, "Sha256");
         if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(sha)) return;
-        lock (_sync) { PruneReplayLinks(); _finalizedReplay[id!] = (sha!, DateTime.UtcNow); }
+        lock (_sync) { PruneReplayLinks(); _finalizedReplay[id!] = (sha!, DateTime.UtcNow); SauverLesLiens(); }
         TryRegisterReplayLink(id!);
     }
 
@@ -3238,10 +3262,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             string? replayId;
             lock (_sync)
             {
-                replayId = _replayDuSolo ?? _activeReplayId;
+                replayId = _replayDeLaPartie;
                 if (string.IsNullOrEmpty(replayId)) return;
                 PruneReplayLinks();
                 _pendingScoreLink[replayId!] = (sessionId!, "public", score, rank, DateTime.UtcNow);
+                SauverLesLiens();
             }
             TryRegisterReplayLink(replayId!);
         }
@@ -3251,23 +3276,103 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
     }
 
-    // Rapprochement : quand le score publié ET le replay finalisé sont là pour le même
-    // id, on enregistre UNE fois puis on purge les deux entrées.
+    // Rapprochement : quand le score publié ET le replay finalisé sont là pour le même id, on
+    // enregistre le lien. Les deux entrees ne partent qu'a la REPONSE du serveur : une coupure
+    // reseau ou un arret de l'API laisse le lien sur disque, et il repart au tour suivant.
     private void TryRegisterReplayLink(string replayId)
     {
         string sessionId, visibility, sha;
         long? score; int? rank;
         lock (_sync)
         {
+            if (_liensEnCours.Contains(replayId)) return;
             if (!_pendingScoreLink.TryGetValue(replayId, out var p)) return;
             if (!_finalizedReplay.TryGetValue(replayId, out var f)) return;
             sessionId = p.sessionId; visibility = p.visibility; score = p.score; rank = p.rank; sha = f.sha256;
-            _pendingScoreLink.Remove(replayId);
-            _finalizedReplay.Remove(replayId);
+            _liensEnCours.Add(replayId);
         }
         StampReplayCard(replayId, score, rank);
-        _ = RegisterReplayLinkAsync(sessionId, replayId, sha, visibility, CancellationToken.None);
+        // Le semis est idempotent (la file ignore un replay deja inscrit) : il part tout de suite.
         if (string.Equals(visibility, "public", StringComparison.OrdinalIgnoreCase)) SemerReplayCertifie(replayId, sha);
+        _ = Task.Run(async () =>
+        {
+            var termine = await RegisterReplayLinkAsync(sessionId, replayId, sha, visibility, CancellationToken.None).ConfigureAwait(false);
+            lock (_sync)
+            {
+                _liensEnCours.Remove(replayId);
+                if (termine)
+                {
+                    _pendingScoreLink.Remove(replayId);
+                    _finalizedReplay.Remove(replayId);
+                    SauverLesLiens();
+                }
+            }
+        });
+    }
+
+    /// <summary>Retente les liens complets restes en attente (redemarrage, reseau coupe).</summary>
+    private void RessayerLesLiens()
+    {
+        List<string> complets;
+        lock (_sync)
+        {
+            complets = _pendingScoreLink.Keys
+                .Where(id => _finalizedReplay.ContainsKey(id) && !_liensEnCours.Contains(id))
+                .ToList();
+        }
+        foreach (var id in complets) TryRegisterReplayLink(id);
+    }
+
+    private sealed record LienEnAttente(
+        string ReplayId, string? SessionId, string? Visibility, long? Score, int? Rank, DateTime? ScoreAt,
+        string? Sha256, DateTime? FinalizedAt);
+
+    /// <summary>Appele sous _sync. Ecrit les rapprochements en attente, d'un bloc (fichier temporaire puis remplacement).</summary>
+    private void SauverLesLiens()
+    {
+        try
+        {
+            var liens = _pendingScoreLink.Keys.Union(_finalizedReplay.Keys).Select(id =>
+            {
+                var p = _pendingScoreLink.TryGetValue(id, out var x) ? x : ((string, string, long?, int?, DateTime)?)null;
+                var f = _finalizedReplay.TryGetValue(id, out var y) ? y : ((string, DateTime)?)null;
+                return new LienEnAttente(id, p?.Item1, p?.Item2, p?.Item3, p?.Item4, p?.Item5, f?.Item1, f?.Item2);
+            }).ToList();
+            var chemin = CheminDesLiens;
+            Directory.CreateDirectory(Path.GetDirectoryName(chemin)!);
+            var temporaire = chemin + ".tmp";
+            File.WriteAllText(temporaire, JsonSerializer.Serialize(liens), new UTF8Encoding(false));
+            File.Move(temporaire, chemin, overwrite: true);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogDebug(ex, "Replay-link : rapprochements non ecrits sur disque.");
+        }
+    }
+
+    /// <summary>Appele sous _sync. Relit les rapprochements d'avant le redemarrage.</summary>
+    private void ChargerLesLiens()
+    {
+        try
+        {
+            var chemin = CheminDesLiens;
+            if (!File.Exists(chemin)) return;
+            var liens = JsonSerializer.Deserialize<List<LienEnAttente>>(File.ReadAllText(chemin)) ?? new();
+            foreach (var l in liens)
+            {
+                if (string.IsNullOrEmpty(l.ReplayId)) continue;
+                if (!string.IsNullOrEmpty(l.SessionId) && l.ScoreAt is { } quand)
+                    _pendingScoreLink[l.ReplayId] = (l.SessionId!, l.Visibility ?? "public", l.Score, l.Rank, quand);
+                if (!string.IsNullOrEmpty(l.Sha256) && l.FinalizedAt is { } scelle)
+                    _finalizedReplay[l.ReplayId] = (l.Sha256!, scelle);
+            }
+            PruneReplayLinks();
+            if (liens.Count > 0) Trace($"REPLAY-LINK {liens.Count} rapprochement(s) repris du disque");
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogDebug(ex, "Replay-link : rapprochements illisibles sur disque.");
+        }
     }
 
     /// <summary>
@@ -3315,8 +3420,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         catch (Exception ex) { _logger?.LogDebug(ex, "Replay-link : estampillage carte impossible."); }
     }
 
-    // Appelé sous _sync : oublie les rapprochements jamais complétés (partie sans score
-    // publié, ou replay jamais finalisé).
+    // Appelé sous _sync : oublie les rapprochements jamais complétés au bout de sept jours
+    // (partie sans score publié, ou replay jamais finalisé).
     private void PruneReplayLinks()
     {
         var now = DateTime.UtcNow;
@@ -3328,11 +3433,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         foreach (var k in stale) _finalizedReplay.Remove(k);
     }
 
-    private async Task RegisterReplayLinkAsync(
+    /// <summary>
+    /// Envoie le lien. Rend vrai quand le serveur a REPONDU (lien pose, ou refus definitif :
+    /// score inconnu, pas a cette borne), faux s'il faut retenter (reseau, serveur indisponible).
+    /// </summary>
+    private async Task<bool> RegisterReplayLinkAsync(
         string sessionId, string replayId, string sha256, string visibility, CancellationToken cancellationToken)
     {
         var credential = ResolveCredential();
-        if (string.IsNullOrEmpty(credential)) return;
+        if (string.IsNullOrEmpty(credential)) return false;
         try
         {
             using var client = CreateClient(credential);
@@ -3348,10 +3457,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var respBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             Trace($"REPLAY-LINK HTTP {(int)response.StatusCode} - {respBody}");
             _logger?.LogInformation("Replay-link : {Status} - {Body}", (int)response.StatusCode, respBody);
+            return response.IsSuccessStatusCode || (int)response.StatusCode is >= 400 and < 500 and not 408 and not 429;
         }
         catch (Exception ex)
         {
-            _logger?.LogDebug(ex, "Replay-link : enregistrement impossible (best-effort).");
+            _logger?.LogDebug(ex, "Replay-link : envoi impossible, nouvel essai plus tard.");
+            return false;
         }
     }
 
