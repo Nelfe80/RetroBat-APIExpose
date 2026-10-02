@@ -1680,7 +1680,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 else
                 {
                     arrivee = true;
-                    scoreAvant = ContinuesParCompteur.ScoreAvant(_trajectory, frame);
+                    scoreAvant = ContinuesParCompteur.MeilleurAvant(_trajectory, _horsJeu, frame);
                     premiere = !_closeParCredit;
                     _closeParCredit = true;
                     bandeau = QuelBandeau(depart: false, arrivee: true, premiere, _partieADeuxAnnoncee, scoreAvant > 0);
@@ -1694,7 +1694,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 if (avant is null || valeur >= avant) return;   // premiere lecture, ou continue gagne
                 premiere = !_closeParCredit;
                 _closeParCredit = true;
-                scoreAvant = ContinuesParCompteur.ScoreAvant(_trajectory, frame);
+                scoreAvant = ContinuesParCompteur.MeilleurAvant(_trajectory, _horsJeu, frame);
             }
         }
 

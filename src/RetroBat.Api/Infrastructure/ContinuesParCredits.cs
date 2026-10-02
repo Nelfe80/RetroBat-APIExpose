@@ -232,6 +232,26 @@ public static class ContinuesParCompteur
     }
 
     /// <summary>
+    /// LE SCORE CERTIFIE AU CONTINUE : le meilleur score EN JEU avant lui. Une partie relancee apres
+    /// le game over passe par l'ecran titre, ou le jeu remet le score a zero : la derniere lecture
+    /// valait 0 et le bandeau annoncait « score certifie 0 » (Metal Slug 3 au labo du 2026-10-02,
+    /// 16 200 marques). Le passeport retient le meilleur run d'avant la coupure : le meme chiffre.
+    /// Sans lecture en jeu, la derniere lecture d'avant.
+    /// </summary>
+    public static long MeilleurAvant(IReadOnlyList<(long frame, long total)> lectures, IReadOnlyList<bool> horsJeu, long frame)
+    {
+        long? meilleur = null;
+        for (var i = 0; i < lectures.Count; i++)
+        {
+            if (lectures[i].frame >= frame) break;
+            if (i < horsJeu.Count && horsJeu[i]) continue;
+            if (meilleur is null || lectures[i].total > meilleur) meilleur = lectures[i].total;
+        }
+
+        return meilleur ?? ScoreAvant(lectures, frame);
+    }
+
+    /// <summary>
     /// Le score d'avant le continue : la derniere lecture STRICTEMENT anterieure a sa frame. Sonic
     /// remet le score a zero a l'image meme du continue, et une lecture pile sur cette frame
     /// appartient deja a la suite.

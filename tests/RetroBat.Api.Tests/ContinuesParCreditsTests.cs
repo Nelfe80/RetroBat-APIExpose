@@ -349,4 +349,19 @@ public class ContinuesParCreditsTests
         Assert.Null(RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider.CoeurAvecPontLua(
             "[DEBUG WRAPPER] MEMORY_ID SYSTEM_RAM id=2 ptr=OK size=2048"));
     }
+
+    [Fact]
+    public void Le_score_certifie_a_la_partie_relancee_est_le_meilleur_en_jeu()
+    {
+        // Metal Slug 3, labo FBNeo du 2026-10-02 : 16 200 marques, game over, ecran titre (score
+        // remis a 0, hors jeu), puis la partie relancee a la frame 10 555 : un continue.
+        var lectures = Lectures((900, 0), (5000, 3900), (8000, 16200), (9600, 0));
+        var horsJeu = new List<bool> { false, false, false, true };
+        Assert.Equal(0, ContinuesParCompteur.ScoreAvant(lectures, 10555));
+        Assert.Equal(16200, ContinuesParCompteur.MeilleurAvant(lectures, horsJeu, 10555));
+
+        // Sonic : START remet le score a zero a l'image meme du continue, toujours 10 000.
+        var sonic = Lectures((100, 0), (1500, 10000), (2640, 0));
+        Assert.Equal(10000, ContinuesParCompteur.MeilleurAvant(sonic, new List<bool> { false, false, false }, 2640));
+    }
 }
