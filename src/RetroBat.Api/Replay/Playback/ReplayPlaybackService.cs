@@ -149,6 +149,7 @@ public sealed class ReplayPlaybackService
             // « replicating » : la page de lancement suit la progression par /replay/state.
             lock (_gate) { _state = ReplayPlaybackState.Replicating; _objetAttendu = null; }
             _logger.LogInformation("Replay : manifeste absent pour {ReplayId}, demande a la plateforme.", replayId);
+            AnnoncerLaRecherche();
             _ = Task.Run(async () =>
             {
                 try
@@ -157,6 +158,7 @@ public sealed class ReplayPlaybackService
                     if (recu is null)
                     {
                         Fail(ReplayErrorCode.ReplayNotFound);
+                        AnnoncerLEchec("replay_unavailable", "replay_unavailable_sub");
                         return;
                     }
                     _manifests.SaveManifest(recu);
@@ -170,6 +172,7 @@ public sealed class ReplayPlaybackService
                 {
                     _logger.LogWarning(ex, "Replay : recuperation du manifeste de {ReplayId} echouee.", replayId);
                     Fail(ReplayErrorCode.ReplayNotFound);
+                    AnnoncerLEchec("replay_unavailable", "replay_unavailable_sub");
                 }
             });
             return new PlayResult(true, ReplayPlaybackState.Replicating.ToString().ToLowerInvariant(), ReplayErrorCode.None);
@@ -214,15 +217,26 @@ public sealed class ReplayPlaybackService
             {
                 try
                 {
-                    if (await _source.EnsureObjectAvailableAsync(manifest, CancellationToken.None).ConfigureAwait(false))
-                        await ContinueAfterFetchAsync(replayId, manifest, meta, CancellationToken.None).ConfigureAwait(false);
-                    else
-                        Fail(ReplayErrorCode.ReplayObjectUnavailable);
+                    switch (await _source.FindObjectAsync(manifest, CancellationToken.None).ConfigureAwait(false))
+                    {
+                        case ReplayObjectSearch.Present:
+                            await ContinueAfterFetchAsync(replayId, manifest, meta, CancellationToken.None).ConfigureAwait(false);
+                            break;
+                        case ReplayObjectSearch.DemandeAuDetenteur:
+                            Fail(ReplayErrorCode.ReplayObjectUnavailable);
+                            AnnoncerLEchec("replay_requested", "replay_requested_sub");
+                            break;
+                        default:
+                            Fail(ReplayErrorCode.ReplayObjectUnavailable);
+                            AnnoncerLEchec("replay_unavailable", "replay_unavailable_sub");
+                            break;
+                    }
                 }
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex, "Replay : récupération de fond échouée pour {ReplayId}.", replayId);
                     Fail(ReplayErrorCode.ReplayObjectUnavailable);
+                    AnnoncerLEchec("replay_unavailable", "replay_unavailable_sub");
                 }
             });
             return new PlayResult(true, ReplayPlaybackState.Replicating.ToString().ToLowerInvariant(), ReplayErrorCode.None);
@@ -494,7 +508,9 @@ public sealed class ReplayPlaybackService
                 }
                 else
                 {
-                    _bandeau.ShowTop("REPLAY", Texte("replay_downloading"), null, 2500);
+                    // Rien recu encore : la borne cherche qui l'a (un voisin, une borne en ligne,
+                    // le miroir), ce qui n'est pas encore telecharger.
+                    _bandeau.ShowTop("REPLAY", Texte("replay_searching"), Texte("replay_searching_sub"), 2500);
                 }
 
                 await Task.Delay(2000, ct).ConfigureAwait(false);
@@ -620,10 +636,28 @@ public sealed class ReplayPlaybackService
 
     private PlayResult Fail(ReplayErrorCode code, string? detail = null)
     {
-        lock (_gate) { _state = ReplayPlaybackState.Error; _error = code; _errorDetail = detail; }
+        string? replayId;
+        lock (_gate) { _state = ReplayPlaybackState.Error; _error = code; _errorDetail = detail; replayId = _replayId; }
         _logger.LogWarning("Replay : lecture refusée/échouée : {Code} {Detail}", code, detail ?? string.Empty);
+        // Qui attend la lecture (le panneau de classement) l'apprend tout de suite, au lieu de
+        // garder sa boite « lancement » jusqu'a son filet de 45 s.
+        _ = Publish("replay.failed", new { ReplayId = replayId, Code = code.ToString() });
+        // Le jeu ou son coeur manquent : le joueur le lit, c'est ici qu'il peut agir.
+        if (code == ReplayErrorCode.RomNotFound) AnnoncerLEchec("replay_rom_missing", "replay_rom_missing_sub");
+        else if (code is ReplayErrorCode.CoreNotFound or ReplayErrorCode.RuntimeIncompatible) AnnoncerLEchec("replay_core_missing", "replay_core_missing_sub");
         return new PlayResult(false, "error", code);
     }
+
+    /// <summary>
+    /// ON CHERCHE LE REPLAY (demande user du 2026-10-02) : il n'est pas sur cette borne, il faut le
+    /// trouver avant de le telecharger. Sans un mot, le joueur croyait que rien ne se passait.
+    /// </summary>
+    private void AnnoncerLaRecherche()
+        => _bandeau?.ShowTop("REPLAY", Texte("replay_searching"), Texte("replay_searching_sub"), 4000);
+
+    /// <summary>La lecture n'aura pas lieu, et le joueur sait pourquoi.</summary>
+    private void AnnoncerLEchec(string titre, string sousTitre)
+        => _bandeau?.ShowTop("REPLAY", Texte(titre), Texte(sousTitre), 9000, alerte: true);
 
     private async Task Publish(string type, object payload)
     {

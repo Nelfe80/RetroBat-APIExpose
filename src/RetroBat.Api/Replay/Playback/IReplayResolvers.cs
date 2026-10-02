@@ -26,4 +26,21 @@ public interface IReplaySourceResolver
     /// récupérer d'un pair, en vérifiant taille et hash avant de le ranger. L'intégrité est
     /// revérifiée juste après par le lecteur (R6), qui ne fait confiance à personne.</summary>
     Task<bool> EnsureObjectAvailableAsync(ReplayManifest manifest, CancellationToken ct);
+
+    /// <summary>
+    /// La meme recherche, avec ce qu'elle a donne : le joueur doit savoir si le replay arrive, s'il
+    /// a ete demande a la borne qui le garde, ou si personne ne l'a.
+    /// </summary>
+    Task<ReplayObjectSearch> FindObjectAsync(ReplayManifest manifest, CancellationToken ct);
+}
+
+/// <summary>Ce qu'a donne la recherche d'un objet replay.</summary>
+public enum ReplayObjectSearch
+{
+    /// <summary>L'objet est ici (deja la, ou recupere a l'instant).</summary>
+    Present,
+    /// <summary>Aucun pair ne l'a : la demande est deposee au relais, son detenteur la relevera.</summary>
+    DemandeAuDetenteur,
+    /// <summary>Personne ne l'a, et la demande n'a pas pu etre deposee.</summary>
+    Introuvable,
 }

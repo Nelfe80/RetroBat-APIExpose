@@ -51,15 +51,18 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
     private readonly ReplayRelayService _relais;
 
     public async Task<bool> EnsureObjectAvailableAsync(ReplayManifest manifest, CancellationToken ct)
+        => await FindObjectAsync(manifest, ct).ConfigureAwait(false) == ReplayObjectSearch.Present;
+
+    public async Task<ReplayObjectSearch> FindObjectAsync(ReplayManifest manifest, CancellationToken ct)
     {
         var sha = manifest.Object.Sha256;
-        if (_objects.HasObject(sha)) return true;
+        if (_objects.HasObject(sha)) return ReplayObjectSearch.Present;
 
         var peers = await _peers.PeersAsync(ct).ConfigureAwait(false);
         if (peers.Count == 0)
         {
             _logger.LogInformation("Replay : objet {Sha} absent et aucun pair configuré.", Short(sha));
-            return false;
+            return ReplayObjectSearch.Introuvable;
         }
 
         // On CHOISIT à qui demander, au lieu de prendre l'ordre du fichier (CDC §47).
@@ -70,7 +73,7 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
         {
             foreach (var peer in peers)
             {
-                if (ct.IsCancellationRequested) return false;
+                if (ct.IsCancellationRequested) return ReplayObjectSearch.Introuvable;
                 if (EnQuarantaine(peer))
                 {
                     _logger.LogDebug("Replay : pair {Peer} écarté, échec récent.", peer.Name);
@@ -79,7 +82,7 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
                 if (await TryFetchAsync(peer, manifest, ct).ConfigureAwait(false))
                 {
                     _peers.RememberWorking(peer); // pair récent : retrouvable même annuaire coupé
-                    return true;
+                    return ReplayObjectSearch.Present;
                 }
             }
         }
@@ -96,11 +99,11 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
             _logger.LogInformation(
                 "Replay : objet {Sha} demandé au relais, aucun des {Count} pair(s) connus ne l'a.",
                 Short(sha), peers.Count);
-            return false;
+            return ReplayObjectSearch.DemandeAuDetenteur;
         }
 
         _logger.LogWarning("Replay : objet {Sha} introuvable auprès des {Count} pair(s) connus.", Short(sha), peers.Count);
-        return false;
+        return ReplayObjectSearch.Introuvable;
     }
 
 

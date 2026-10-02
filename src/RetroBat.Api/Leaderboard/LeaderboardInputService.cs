@@ -243,6 +243,15 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 _ = RendreEsApresLeReplayAsync();
                 return;
             }
+            // La lecture n'aura pas lieu : le bandeau du lecteur dit pourquoi, la boite « lancement »
+            // n'a plus rien a attendre (elle restait 45 s, sans un mot).
+            if (string.Equals(e.Type, "replay.failed", StringComparison.Ordinal) && _replayLance.Length > 0)
+            {
+                _logger.LogInformation("Classement : la lecture du replay {Replay} n'aura pas lieu, le panneau se ferme.", _replayLance);
+                _replayLance = "";
+                Fermer();
+                return;
+            }
 
             var appuye = string.Equals(e.Type, "panel.input.pressed", StringComparison.Ordinal);
             var relache = string.Equals(e.Type, "panel.input.released", StringComparison.Ordinal);
