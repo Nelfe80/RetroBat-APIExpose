@@ -231,6 +231,15 @@ public sealed class NetplayGuestService
         // sans precaution particuliere.
         _ = EmulatorForeground.FocusEmulatorWhenUpAsync();
 
+        // RetroArch demande le mot de passe A L'ECRAN, quoi que dise sa configuration : la borne le
+        // tape a la place du joueur des que RetroArch a joint le relais (RetroArchMotDePasse).
+        var aSaisir = infos.Value;
+        if (aSaisir.MotDePasse.Length > 0)
+        {
+            _ = Task.Run(() => RetroArchMotDePasse.SaisirAsync(aSaisir.Relais, aSaisir.Port, aSaisir.MotDePasse, _logger),
+                CancellationToken.None);
+        }
+
         // La seance s'OUVRE seulement quand la partie est lancee. L'ouvrir avant laisserait la
         // facade croire qu'il y a quelque chose a quoi reagir alors qu'aucun jeu ne tourne.
         _seance.Ouvrir(infos.Value.Session, infos.Value.Jeton, infos.Value.PeutJouer);
