@@ -220,6 +220,26 @@ public sealed class NetplayHostService
             }
 
             _logger.LogInformation("Netplay : session {Session} sur {Relais}.", session.Id, session.RelayHote);
+
+            // LE MOT DE PASSE QUE RETROARCH APPLIQUE, pas celui qu'on a voulu poser (2026-10-02).
+            // ES reecrit es_settings.cfg avec les valeurs qu'il a en memoire : celles qu'on pose
+            // pour l'hebergement (global.netplay.password, des reglages qu'ES connait) peuvent etre
+            // remplacees par les anciennes avant que le lanceur ne les lise. L'hote hebergeait alors
+            // avec un ancien mot de passe et annoncait le nouveau : l'invite restait sur la demande
+            // de mot de passe. Le lanceur ecrit dans retroarch.cfg ce qu'il a lu ; c'est ce que
+            // RetroArch applique, donc ce qu'on annonce.
+            var (joueurReel, spectateurReel) = LireMotsDePasse(LireConfigRetroArch());
+            if (joueurReel is not null && motDePasseJoueur.Length > 0 && !string.Equals(joueurReel, motDePasseJoueur, StringComparison.Ordinal))
+            {
+                _logger.LogWarning("Netplay : RetroArch heberge avec un autre mot de passe joueur que celui pose (es_settings reecrit par ES) : on annonce celui de RetroArch.");
+                motDePasseJoueur = joueurReel;
+            }
+            if (spectateurReel is not null && !string.Equals(spectateurReel, motDePasseSpectateur, StringComparison.Ordinal))
+            {
+                _logger.LogWarning("Netplay : RetroArch heberge avec un autre mot de passe spectateur que celui pose : on annonce celui de RetroArch.");
+                motDePasseSpectateur = spectateurReel;
+            }
+
             await RapporterAsync(
                     session,
                     motDePasseSpectateur,
@@ -502,6 +522,37 @@ public sealed class NetplayHostService
         }
 
         return (null, null);
+    }
+
+    /// <summary>retroarch.cfg tel que le lanceur l'a ecrit pour cette partie, ou rien.</summary>
+    private string LireConfigRetroArch()
+    {
+        try
+        {
+            var chemin = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "retroarch.cfg");
+            return File.Exists(chemin) ? File.ReadAllText(chemin) : string.Empty;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Netplay : retroarch.cfg illisible, on annonce les mots de passe poses.");
+            return string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// Les mots de passe netplay d'un retroarch.cfg : joueurs, spectateurs. Null quand la cle
+    /// manque ; une valeur vide est une valeur (pas de mot de passe).
+    /// </summary>
+    internal static (string? Joueur, string? Spectateur) LireMotsDePasse(string config)
+    {
+        string? Valeur(string cle)
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(config,
+                "^" + System.Text.RegularExpressions.Regex.Escape(cle) + "\\s*=\\s*\"([^\"]*)\"",
+                System.Text.RegularExpressions.RegexOptions.Multiline);
+            return m.Success ? m.Groups[1].Value : null;
+        }
+        return (Valeur("netplay_password"), Valeur("netplay_spectate_password"));
     }
 
     private static string Arguments(EsLaunchArguments.Resolution r, string cheminRom)

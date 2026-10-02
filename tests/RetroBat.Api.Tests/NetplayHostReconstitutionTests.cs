@@ -77,3 +77,34 @@ public sealed class LiveSpectateStateTests
         }
     }
 }
+
+/// <summary>
+/// L'hote annonce le mot de passe que RetroArch applique (2026-10-02) : ES pouvait remettre un
+/// ancien mot de passe dans es_settings avant le lancement, et l'invite restait bloque.
+/// </summary>
+public sealed class NetplayMotsDePasseTests
+{
+    [Fact]
+    public void Les_mots_de_passe_se_lisent_dans_retroarch_cfg()
+    {
+        var cfg = "netplay_nickname = \"NELFE\"\nnetplay_password = \"ab12cd34\"\nnetplay_public_announce = \"true\"\nnetplay_spectate_password = \"\"\n";
+        var (joueur, spectateur) = NetplayHostService.LireMotsDePasse(cfg);
+        Assert.Equal("ab12cd34", joueur);
+        Assert.Equal("", spectateur);
+    }
+
+    [Fact]
+    public void Une_cle_absente_reste_inconnue()
+    {
+        var (joueur, spectateur) = NetplayHostService.LireMotsDePasse("video_driver = \"gl\"\n");
+        Assert.Null(joueur);
+        Assert.Null(spectateur);
+    }
+
+    [Fact]
+    public void Une_cle_voisine_ne_se_confond_pas()
+    {
+        var (joueur, _) = NetplayHostService.LireMotsDePasse("netplay_password_old = \"x\"\nnetplay_password = \"bon\"\n");
+        Assert.Equal("bon", joueur);
+    }
+}
