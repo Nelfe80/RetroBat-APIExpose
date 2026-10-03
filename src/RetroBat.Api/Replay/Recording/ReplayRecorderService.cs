@@ -112,6 +112,57 @@ public sealed class ReplayRecorderService : BackgroundService
     {
         _ra = ra; _store = store; _timing = timing; _bus = bus; _playback = playback; _logger = logger;
         _config = config; _catalogue = catalogue; _partie = partie;
+        _garde = new GardeDesPlantages(Path.Combine(Path.GetDirectoryName(store.ActiveRecordingPath) ?? ".", "sans-enregistrement.json"));
+    }
+
+    /// <summary>
+    /// Les jeux dont l'enregistrement a fait planter RetroArch sur cette borne : on ne les enregistre
+    /// plus, pour ne plus perdre la partie (voir <see cref="GardeDesPlantages"/>).
+    /// </summary>
+    private readonly GardeDesPlantages _garde;
+    private string _renoncementAnnonce = "";
+
+    /// <summary>
+    /// L'empreinte de RetroArch : sa version et son executable. Les nocturnes s'annoncent elles aussi
+    /// « 1.22.2 » ; l'executable, lui, change a chaque mise a jour.
+    /// </summary>
+    private static string EmpreinteDeRetroArch(string? version)
+    {
+        // « unknown » : ce que StartAsync retient quand RetroArch ne dit pas sa version.
+        var nom = string.IsNullOrWhiteSpace(version) || version.Trim() == "unknown" ? "?" : version.Trim();
+        try
+        {
+            var exe = new FileInfo(Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "retroarch.exe"));
+            if (exe.Exists) return $"{nom}+{exe.Length}+{exe.LastWriteTimeUtc:yyyyMMddHHmmss}";
+        }
+        catch (Exception)
+        {
+            // Sans l'executable, la version seule.
+        }
+        return nom;
+    }
+
+    private string CleDuJeu(RaStatus status, string? version)
+        => GardeDesPlantages.Cle(status.System, status.Game, status.Crc32, _garde.CoeurEnCours, EmpreinteDeRetroArch(version));
+
+    /// <summary>
+    /// Vrai si l'on renonce a enregistrer ce jeu : son coeur est dans la liste, ou RetroArch y a deja
+    /// plante pendant un enregistrement sur cette borne. Dit une fois par jeu.
+    /// </summary>
+    private async Task<bool> RenoncerAEnregistrerAsync(RaStatus status, CancellationToken ct)
+    {
+        if (await CoeurSansEnregistrementAsync(status, ct).ConfigureAwait(false)) return true;
+
+        var cle = CleDuJeu(status, await _ra.GetVersionAsync(ct).ConfigureAwait(false));
+        if (_garde.RenoncementPour(cle) is not { } renoncement) return false;
+        if (!string.Equals(_renoncementAnnonce, cle, StringComparison.Ordinal))
+        {
+            _renoncementAnnonce = cle;
+            _logger.LogInformation(
+                "Replay : pas d'enregistrement de {Game}. RetroArch a plante pendant son enregistrement le {Le:yyyy-MM-dd HH:mm} (coeur {Coeur}, RetroArch {RetroArch}) ; la partie compte toujours. Pour reessayer, supprimer {Fichier}.",
+                status.Game, renoncement.Le.ToLocalTime(), renoncement.Coeur, renoncement.RetroArch, _garde.Chemin);
+        }
+        return true;
     }
 
     /// <summary>
@@ -217,6 +268,24 @@ public sealed class ReplayRecorderService : BackgroundService
 
     private void OnBusEvent(EventEnvelope e)
     {
+        // Le garde-fou suit chaque jeu : son ecoute, sa fin de partie, sa fin vue par ES.
+        switch (e.Type)
+        {
+            case "ui.game.started":
+                _garde.JeuLance();
+                break;
+            case "ui.game.ended":
+                _garde.JeuTermine();
+                break;
+            case "scoring.listener.session":
+                _garde.FinDePartieRecue();
+                break;
+            case "scoring.listener.attestation":
+                try { _garde.EcouteVue(GardeDesPlantages.CoeurDeLAttestation(System.Text.Json.JsonSerializer.SerializeToElement(e.Payload))); }
+                catch { _garde.EcouteVue("?"); }
+                break;
+        }
+
         if (string.Equals(e.Type, "scoring.run.ended", StringComparison.Ordinal))
         {
             _runTermine = true;
@@ -345,6 +414,13 @@ public sealed class ReplayRecorderService : BackgroundService
 
     private async Task TickAsync(CancellationToken ct)
     {
+        if (_garde.Juger() is { } renoncement)
+        {
+            _logger.LogWarning(
+                "Replay : RetroArch s'est arrete sans fin de partie pendant que {Jeu} s'enregistrait (coeur {Coeur}, RetroArch {RetroArch}). Ce jeu ne s'enregistrera plus sur cette borne tant que RetroArch et ce coeur restent dans ces versions, pour ne plus perdre de partie. Pour reessayer, supprimer {Fichier}.",
+                renoncement.Jeu, renoncement.Coeur, renoncement.RetroArch, _garde.Chemin);
+        }
+
         var status = await _ra.GetStatusAsync(ct).ConfigureAwait(false);
         var active = await _ra.GetActiveReplayAsync(ct).ConfigureAwait(false);
 
@@ -399,7 +475,7 @@ public sealed class ReplayRecorderService : BackgroundService
                 _attenteAnnoncee = "";
                 // Le cœur est vérifié AU DERNIER MOMENT, pas à chaque sondage : une requête de plus
                 // par partie, et la porte suit le cœur même si le joueur en change entre deux jeux.
-                if (await CoeurSansEnregistrementAsync(status, ct).ConfigureAwait(false))
+                if (await RenoncerAEnregistrerAsync(status, ct).ConfigureAwait(false))
                 {
                     // Le départ est consommé : sans cela on reposerait la question à chaque sondage.
                     // Et l'attente est marquée comme annoncée, sinon le journal dirait « en attente
@@ -482,6 +558,7 @@ public sealed class ReplayRecorderService : BackgroundService
             Categorie = _categorieSuivante,
         };
         _categorieSuivante = null;
+        _garde.EnregistrementLance(CleDuJeu(status, version), status.Game, EmpreinteDeRetroArch(version));
         rec.CoreFps = ProbeCoreFps(rec.Crc32, rec.Game);
         rec.LastSampleUtc = DateTime.UtcNow;
         _current = rec;

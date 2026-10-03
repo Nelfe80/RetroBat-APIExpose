@@ -238,6 +238,15 @@ builder.Services.AddSingleton<MediaRuntimeState>();
 builder.Services.AddSingleton<StartupOverlayService>();
 builder.Services.AddSingleton<LiveContestOverlayService>();
 builder.Services.AddHttpClient();
+// LES REPONSES JSON DE NELFEPLAY.COM ARRIVENT COMPRESSEES (2026-10-03). La borne ne demandait pas
+// gzip : un classement de 200 lignes pesait 8,9 Ko au lieu de 2 Ko, et de meme chaque prevol,
+// profil et verdict. Seulement sur ces deux clients : le client par defaut telecharge aussi des
+// replays en .gz qu'il doit recevoir tels quels, et un serveur peut les annoncer en Content-Encoding.
+foreach (var clientCompresse in new[] { RetroBat.Api.Leaderboard.LeaderboardClient.HttpClientName, nameof(NelfePlayScoringReporter) })
+{
+    builder.Services.AddHttpClient(clientCompresse)
+        .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AutomaticDecompression = System.Net.DecompressionMethods.All });
+}
 builder.Services.AddSingleton<LiveContestClientService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<LiveContestClientService>());
 // Agent Nelfe Play : la borne va chercher les jeux acquis par le joueur.

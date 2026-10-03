@@ -160,6 +160,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private int _departsParScore;
     private const int MaxDepartsParScore = 3;
 
+    /// <summary>
+    /// Montee et baisse se jugent contre le score d'AVANT la salve de signaux en cours, et la baisse
+    /// qui arrete le replay se confirme a la salve suivante (2026-10-03, 1942 chez un testeur : un
+    /// total de passage, 190 entre 90 et 100, coupait le replay). Voir <see cref="RetroBat.Api.Scoring.SalvesDeScore"/>.
+    /// </summary>
+    private RetroBat.Api.Scoring.SalvesDeScore _salves = new();
+    private readonly RetroBat.Api.Scoring.ArretALaBaisse _baisse = new();
+
     /// <summary>Les enregistrements de la partie, en frames du rapporteur : le replay du meilleur run.</summary>
     private readonly List<(string Id, long Debut, long? Fin)> _enregistrements = new();
     private List<(string Id, long Debut, long? Fin)> _enregistrementsDeLaPartie = new();
@@ -644,6 +652,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _monteeDansLEnregistrement = false;
             _attenteMontee = true;
             _departsParScore = 0;
+            _salves = new RetroBat.Api.Scoring.SalvesDeScore();
+            _baisse.Oublier();
             _enregistrements.Clear();
             _vies.Clear();
             _contexte = RetroBat.Api.Scoring.ContexteDeJeu.Vide;
@@ -1849,10 +1859,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             if (_inDemo) { _scoresEnDemo++; return; }   // score de démo → jamais certifié
             var precedent = _finalTotal;
             _finalTotal = total;
+            // Le score d'avant la salve en cours : les totaux de passage d'une meme image (un chiffre
+            // ecrit avant l'autre) ne font ni montee ni baisse.
+            var (reference, nouvelleSalve) = _salves.Lire(precedent, DateTime.UtcNow);
 
             // LE SCORE PILOTE LE REPLAY (voir _enregistrementEnCours). Hors demo : on est passe au-dela
             // du retour anticipe des scores de demo.
-            if (precedent is { } avantScore)
+            if (reference is { } avantScore)
             {
                 if (total > avantScore)
                 {
@@ -1869,13 +1882,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 }
                 else if (total < avantScore)
                 {
-                    if (_enregistrementEnCours && _monteeDansLEnregistrement)
-                    {
-                        arretParBaisse = true;
-                        _monteeDansLEnregistrement = false;
-                    }
                     _attenteMontee = true;
                 }
+            }
+
+            if (_baisse.Lire(total, reference, nouvelleSalve, _enregistrementEnCours, _monteeDansLEnregistrement))
+            {
+                arretParBaisse = true;
+                _monteeDansLEnregistrement = false;
             }
 
             // LE SCORE RETOMBE : une nouvelle partie commence, pour un jeu a chiffre des credits
@@ -1883,7 +1897,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // se rearme pour celle-ci (bandeau, fin de partie, replay). Une partie close par un
             // CREDIT ne se rearme pas : la session fait foi, et Double Dragon remet le score a zero
             // au continue meme (labo du 2026-09-30).
-            if (precedent is { } avantChute && total < avantChute)
+            if (reference is { } avantChute && total < avantChute)
             {
                 if (_finDeRunPubliee && !_closeParCredit)
                 {
@@ -1921,7 +1935,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (departParLeScore) AnnoncerLeDepart("score qui monte");
         if (arretParBaisse)
         {
-            Trace($"le score a baisse ({total}) apres avoir monte : fin de l'enregistrement en cours");
+            Trace($"le score a baisse apres avoir monte, et reste bas ({total}) : fin de l'enregistrement en cours");
             _ = _eventBus.PublishAsync(new EventEnvelope { Type = "scoring.replay.stop", Payload = new { Raison = "baisse du score" } });
         }
 
@@ -3577,6 +3591,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _enregistrementEnCours = true;
             _monteeDansLEnregistrement = false;
             _attenteMontee = false;
+            _baisse.Oublier();
             _enregistrements.Add((id!, _lastFrame, null));
             if (_enregistrements.Count > 20) _enregistrements.RemoveAt(0);
         }

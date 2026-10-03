@@ -54,6 +54,9 @@ public sealed class LeaderboardClient
     /// <summary>Profondeur du classement demande : de quoi tailler les vues locales.</summary>
     private const int Profondeur = 200;
 
+    /// <summary>Le client HTTP du classement, qui demande des reponses compressees (Program.cs).</summary>
+    public const string HttpClientName = "nelfeplay-classement";
+
     private readonly IHttpClientFactory _httpFactory;
     private readonly ILogger<LeaderboardClient> _logger;
     private readonly SemaphoreSlim _porte = new(1, 1);
@@ -121,7 +124,7 @@ public sealed class LeaderboardClient
                 + (regle.Length > 0 ? $"&ruleset={Uri.EscapeDataString(regle)}" : "");
             try
             {
-                using var client = _httpFactory.CreateClient();
+                using var client = _httpFactory.CreateClient(HttpClientName);
                 client.Timeout = TimeSpan.FromSeconds(6);
                 var corps = await client.GetStringAsync(url, ct).ConfigureAwait(false);
                 var lignes = Lire(corps, monPseudo);
