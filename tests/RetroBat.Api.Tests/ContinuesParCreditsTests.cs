@@ -381,4 +381,15 @@ public class ContinuesParCreditsTests
         Assert.Null(NelfePlayScoringReporter.ReplayDuMeilleurRun(enregistrements, Lectures((950, 300))));
         Assert.Null(NelfePlayScoringReporter.ReplayDuMeilleurRun(enregistrements, Lectures()));
     }
+
+    [Fact]
+    public void Une_reponse_de_profil_se_lit_ouverte_fermee_ou_illisible()
+    {
+        var ouverte = NelfePlayScoringReporter.ProfilsDuCorps(
+            "{\"ok\":true,\"open\":true,\"profile\":{\"ruleset\":\"1cc\"},\"profiles\":[{\"ruleset\":\"1cc\"},{\"ruleset\":\"1cc-multi\"}]}");
+        Assert.Equal(2, ouverte!.Count);
+        Assert.Empty(NelfePlayScoringReporter.ProfilsDuCorps("{\"ok\":true,\"open\":false}")!);
+        Assert.Null(NelfePlayScoringReporter.ProfilsDuCorps("<html>503</html>"));   // une page n'est pas une reponse
+        Assert.Single(NelfePlayScoringReporter.ProfilsDuCorps("{\"open\":true,\"profile\":{\"ruleset\":\"1cc\"}}")!);
+    }
 }

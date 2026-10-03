@@ -3000,18 +3000,63 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// Les profils ouverts du jeu, celui par defaut en tete. Un jeu a modes en a un par mode ; une
     /// plateforme d'avant les modes ne renvoie que « profile ».
     /// </summary>
+    /// <summary>
+    /// LES PROFILS D'UN JEU, GARDES SUR DISQUE (2026-10-03). Chaque reponse du site (jeu ouvert ou
+    /// non) se garde dans state/nelfeplay/profils ; quand le site ne repond pas, la borne relit la
+    /// derniere. Avant, une panne rendait une liste vide : la partie passait pour « non ouverte »
+    /// et son score etait perdu. C'est la premiere brique de la file d'envoi (CDC infra, piste B) :
+    /// a l'envoi, c'est le serveur qui juge, avec les memes controles qu'en ligne.
+    /// </summary>
     private async Task<List<JsonElement>> FetchProfilesAsync(string credential, string systemId, string romGroup, CancellationToken cancellationToken)
     {
-        var sortie = new List<JsonElement>();
+        var copie = CheminDuProfil(systemId, romGroup);
         try
         {
             using var client = CreateClient(credential);
             var url = $"/api/v1/agent/scores/profile?system_id={Uri.EscapeDataString(systemId)}&rom_group={Uri.EscapeDataString(romGroup)}";
             using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode) return sortie;
-            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            if (response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                if (ProfilsDuCorps(body) is { } profils)
+                {
+                    GarderLeProfil(copie, body);
+                    return profils;
+                }
+            }
+            Trace($"profil {systemId}/{romGroup} : le site repond {(int)response.StatusCode}, lecture de la copie gardee");
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogDebug(ex, "Scoring : résolution du profil impossible.");
+            Trace($"profil {systemId}/{romGroup} : site injoignable ({ex.GetType().Name}), lecture de la copie gardee");
+        }
+        try
+        {
+            if (File.Exists(copie) && ProfilsDuCorps(await File.ReadAllTextAsync(copie, cancellationToken).ConfigureAwait(false)) is { } gardes)
+            {
+                return gardes;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogDebug(ex, "Scoring : copie du profil illisible.");
+        }
+        return new List<JsonElement>();
+    }
+
+    /// <summary>
+    /// Les profils d'une reponse du site : vide pour un jeu non ouvert, null pour un corps
+    /// illisible (ce n'est pas une reponse : on ne la garde pas).
+    /// </summary>
+    internal static List<JsonElement>? ProfilsDuCorps(string body)
+    {
+        try
+        {
             using var doc = JsonDocument.Parse(body);
             var racine = doc.RootElement;
+            if (racine.ValueKind != JsonValueKind.Object) return null;
+            var sortie = new List<JsonElement>();
             if (!racine.TryGetProperty("open", out var open) || open.ValueKind != JsonValueKind.True) return sortie;
             if (racine.TryGetProperty("profiles", out var liste) && liste.ValueKind == JsonValueKind.Array)
             {
@@ -3024,12 +3069,34 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 sortie.Add(profile.Clone());
             }
+            return sortie;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
+    private static string CheminDuProfil(string systemId, string romGroup)
+    {
+        var cle = (systemId + "|" + romGroup).ToLowerInvariant();
+        var nom = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(cle)))[..32].ToLowerInvariant();
+        return System.IO.Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "profils", nom + ".json");
+    }
+
+    private void GarderLeProfil(string chemin, string body)
+    {
+        try
+        {
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(chemin)!);
+            var temporaire = chemin + ".tmp";
+            File.WriteAllText(temporaire, body, new UTF8Encoding(false));
+            File.Move(temporaire, chemin, overwrite: true);
         }
         catch (Exception ex)
         {
-            _logger?.LogDebug(ex, "Scoring : résolution du profil impossible.");
+            _logger?.LogDebug(ex, "Scoring : copie du profil non ecrite.");
         }
-        return sortie;
     }
 
     private async Task SubmitAsync(string credential, JsonObject passport, CancellationToken cancellationToken)
