@@ -1,5 +1,8 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using RetroBat.Api.Infrastructure;
+using RetroBat.Domain.Paths;
 
 namespace RetroBat.Api.Leaderboard;
 
@@ -54,6 +57,12 @@ public sealed class LeaderboardClient
     private readonly IHttpClientFactory _httpFactory;
     private readonly ILogger<LeaderboardClient> _logger;
     private readonly SemaphoreSlim _porte = new(1, 1);
+
+    /// <summary>
+    /// Ou se gardent les derniers classements recus, un fichier par jeu et par regle : le panneau
+    /// les montre des l'ouverture, meme juste apres un redemarrage de l'API.
+    /// </summary>
+    public string DossierDisque { get; init; } = Path.Combine(RetroBatPaths.PluginRoot, "state", "leaderboard", "derniers");
 
     /// <summary>Un classement deja lu par jeu ET par regle : les onglets d'un jeu en lisent plusieurs.</summary>
     private readonly Dictionary<string, (DateTime Jusqua, IReadOnlyList<Ligne> Lignes, string Etat)> _caches = new(StringComparer.OrdinalIgnoreCase);
@@ -118,6 +127,7 @@ public sealed class LeaderboardClient
                 var lignes = Lire(corps, monPseudo);
                 var etat = lignes.Count == 0 ? EtatAucunScore : EtatOk;
                 lock (_caches) _caches[cle] = (DateTime.UtcNow + Fraicheur, lignes, etat);
+                Garder(cle, lignes, etat);
                 return new Resultat(lignes, etat);
             }
             catch (OperationCanceledException)
@@ -127,9 +137,13 @@ public sealed class LeaderboardClient
             catch (Exception ex)
             {
                 // Hors ligne : on le DIT, on ne montre pas un classement vide qui ferait croire
-                // que personne n'a jamais joue.
+                // que personne n'a jamais joue. Le dernier classement connu vaut mieux qu'un
+                // panneau vide : il reste affiche (2026-10-03).
                 _logger.LogDebug(ex, "Classement : {Jeu} injoignable.", romGroup);
-                return Resultat.Vide(EtatHorsLigne);
+                var connu = DernierConnu(romGroup, regle);
+                return connu is { Lignes.Count: > 0 }
+                    ? new Resultat(connu.Lignes, EtatHorsLigne)
+                    : Resultat.Vide(EtatHorsLigne);
             }
         }
         finally
@@ -137,6 +151,54 @@ public sealed class LeaderboardClient
             _porte.Release();
         }
     }
+
+    /// <summary>
+    /// LE DERNIER CLASSEMENT CONNU, meme perime (2026-10-03). Le panneau le montre aussitot ouvert
+    /// et le remplace quand le classement frais arrive : il n'est plus jamais vide pendant un
+    /// chargement. La memoire d'abord, puis le disque, qui survit a un redemarrage de l'API.
+    /// Null s'il n'y en a jamais eu.
+    /// </summary>
+    public Resultat? DernierConnu(string romGroup, string regle = "")
+    {
+        if (string.IsNullOrWhiteSpace(romGroup)) return null;
+        var cle = romGroup + "|" + regle;
+        lock (_caches)
+        {
+            if (_caches.TryGetValue(cle, out var deja)) return new Resultat(deja.Lignes, deja.Etat);
+        }
+        try
+        {
+            var fichier = Path.Combine(DossierDisque, NomDeFichier(cle));
+            if (!File.Exists(fichier)) return null;
+            var copie = JsonSerializer.Deserialize<CopieDisque>(File.ReadAllText(fichier));
+            return copie?.Lignes is null ? null : new Resultat(copie.Lignes, copie.Etat ?? EtatOk);
+        }
+        catch (Exception)
+        {
+            return null;   // une copie illisible vaut l'absence de copie
+        }
+    }
+
+    private sealed record CopieDisque(DateTime Le, string? Etat, List<Ligne>? Lignes);
+
+    private void Garder(string cle, IReadOnlyList<Ligne> lignes, string etat)
+    {
+        try
+        {
+            Directory.CreateDirectory(DossierDisque);
+            var fichier = Path.Combine(DossierDisque, NomDeFichier(cle));
+            var temporaire = fichier + ".tmp";
+            File.WriteAllText(temporaire, JsonSerializer.Serialize(new CopieDisque(DateTime.UtcNow, etat, lignes.ToList())));
+            File.Move(temporaire, fichier, overwrite: true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Classement : copie sur disque impossible.");
+        }
+    }
+
+    private static string NomDeFichier(string cle)
+        => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(cle.ToLowerInvariant())))[..32].ToLowerInvariant() + ".json";
 
     /// <summary>
     /// La vue demandee, taillee dans le classement mondial. Pure : elle se teste sans reseau.

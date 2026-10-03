@@ -489,6 +489,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         _menuEsOuvert = false;
         _menuEsConnu = false;
         _modele.Ouvrir(salleConnue: _maSalle.Length > 0, villeConnue: _maVille.Length > 0, paysConnu: false, aDesRecords: true);
+        MontrerLeDernierConnu();
         _ = Task.Run(async () =>
         {
             await _social.RafraichirLesSuivisAsync().ConfigureAwait(false);
@@ -850,6 +851,25 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         return scores;
     }
 
+    /// <summary>MES RECORDS : les parties de CETTE borne, lues sur le disque (2026-10-03).</summary>
+    private IReadOnlyList<LeaderboardClient.Ligne> MesPartiesLocales()
+    {
+        try
+        {
+            string chemin;
+            try { chemin = _context.Ui.Selected?.GamePath ?? ""; }
+            catch (Exception) { chemin = ""; }
+            var langue = Langue();
+            return LocalPlaysIndex.MesParties(_partiesLocales.Toutes(), _romGroup, _reglePrincipale,
+                _session.Get()?.PlayerCode ?? "", ReplaysDeCeJeu(chemin), utc => DateDeLaPartie(utc, langue));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Classement : parties locales illisibles.");
+            return Array.Empty<LeaderboardClient.Ligne>();
+        }
+    }
+
     /// <summary>
     /// Les replays enregistres par cette borne sur ce jeu, pour MES RECORDS : leur fin, leur duree
     /// (images / cadence du core) et le score que le rapporteur leur a attache a la publication.
@@ -922,9 +942,51 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         }
     }
 
+    /// <summary>
+    /// LE DERNIER CLASSEMENT CONNU S'AFFICHE DES L'OUVERTURE (2026-10-03) : le classement frais le
+    /// remplace a son arrivee. Avant, le panneau s'ouvrait vide (« chargement ») le temps de
+    /// l'aller-retour au site, et restait vide apres un redemarrage de l'API ou sans reseau. Les
+    /// onglets des autres regles, de la ville et du pays arrivent avec lui.
+    /// </summary>
+    private void MontrerLeDernierConnu()
+    {
+        try
+        {
+            if (_client.DernierConnu(_romGroup, _reglePrincipale) is not { Lignes.Count: > 0 } connu) return;
+            string ville, pays;
+            lock (_gate)
+            {
+                _monde = connu.Lignes;
+                _etatDuMonde = LeaderboardClient.EtatOk;
+                var mienne = _monde.FirstOrDefault(l => l.CestMoi);
+                if (mienne is not null)
+                {
+                    if (_maVille.Length == 0) _maVille = mienne.Ville;
+                    _monPays = mienne.Pays;
+                }
+                foreach (var (vue, regle) in _ongletsDeRegle)
+                {
+                    if (_client.DernierConnu(_romGroup, regle) is { Lignes.Count: > 0 } autre) _autresMondes[vue] = (autre.Lignes, LeaderboardClient.EtatOk);
+                }
+                ville = _maVille;
+                pays = _monPays;
+            }
+            _modele.PoserLesLieux(ville.Length > 0, pays.Length > 0);
+            _modele.PoserLesRegles(_autresMondes.Keys.ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Classement : dernier classement connu illisible.");
+        }
+    }
+
     private async Task ChargerAsync(CancellationToken ct, bool relecture = false)
     {
         if (!relecture) _ = ChargerLesEvenementsAsync(ct);
+        // MES RECORDS ne depend que du disque : il s'affiche sans attendre le reseau.
+        var mesParties = MesPartiesLocales();
+        lock (_gate) { _mesParties = mesParties; }
+        if (!relecture && _modele.Etat != LeaderboardPanelModel.Foyer.Ferme) Rafraichir();
         var pseudo = _agent.Status.Pseudo ?? "";
         var resultat = await _client.MondeAsync(_romGroup, pseudo, ct, _reglePrincipale).ConfigureAwait(false);
         if (!relecture)
@@ -950,29 +1012,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             }
         }
 
-        // MES RECORDS : les parties de CETTE borne, lues sur le disque (2026-10-03).
-        IReadOnlyList<LeaderboardClient.Ligne> mesParties;
-        try
-        {
-            string chemin;
-            try { chemin = _context.Ui.Selected?.GamePath ?? ""; }
-            catch (Exception) { chemin = ""; }
-            var langue = Langue();
-            mesParties = LocalPlaysIndex.MesParties(_partiesLocales.Toutes(), _romGroup, _reglePrincipale,
-                _session.Get()?.PlayerCode ?? "", ReplaysDeCeJeu(chemin), utc => DateDeLaPartie(utc, langue));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogDebug(ex, "Classement : parties locales illisibles.");
-            mesParties = Array.Empty<LeaderboardClient.Ligne>();
-        }
-
         lock (_gate)
         {
             _monde = resultat.Lignes;
             _etatDuMonde = resultat.Etat;
             _autresMondes = autres;
-            _mesParties = mesParties;
             if (!relecture) _rangsDesAutres = rangsDesAutres;
             // On apprend sa ville et son pays de SA PROPRE ligne : la borne ne les connait pas
             // autrement, et un onglet qu'on ne peut pas remplir ne doit pas exister.
@@ -997,6 +1041,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 .SequenceEqual(LeaderboardClient.Tailler(_monde, LeaderboardPanelModel.Vue.MesRecords, _maVille, _monPays, _maSalle));
         }
         _modele.PoserCetteBorne(cetteBorneDistincte);
+        // Ville et pays se lisent sur la ligne du joueur : leurs onglets arrivent avec elle.
+        string ville, pays;
+        lock (_gate) { ville = _maVille; pays = _monPays; }
+        _modele.PoserLesLieux(ville.Length > 0, pays.Length > 0);
         // L'onglet d'une autre regle n'existe que si son classement a des scores.
         _modele.PoserLesRegles(autres.Where(a => a.Value.Lignes.Count > 0).Select(a => a.Key).ToList());
         Rafraichir();
@@ -1507,7 +1555,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             var mesRecords = vue == LeaderboardPanelModel.Vue.MesRecords;
             // MES RECORDS n'attend que le chargement : ses lignes sont sur le disque, et une liste
             // vide doit le DIRE plutot que laisser un panneau muet.
-            var etatDeLaVue = mesRecords ? (_etatDuMonde.Length == 0 ? "" : _mesParties.Count > 0 ? LeaderboardClient.EtatOk : LeaderboardClient.EtatAucunScore)
+            var etatDeLaVue = mesRecords ? (_mesParties.Count > 0 ? LeaderboardClient.EtatOk : _etatDuMonde.Length == 0 ? "" : LeaderboardClient.EtatAucunScore)
                 : RegleDeLaVue(vue) is null ? _etatDuMonde
                 : _autresMondes.TryGetValue(vue, out var autre) ? autre.Etat : "";
             etat = etatDeLaVue.Length == 0

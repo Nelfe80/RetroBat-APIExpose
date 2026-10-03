@@ -164,6 +164,44 @@ public sealed class LeaderboardPanelModel
         return true;
     }
 
+    /// <summary>
+    /// MA VILLE et MON PAYS se decident APRES le chargement (2026-10-03) : la borne ne connait sa
+    /// ville et son pays que par sa propre ligne du classement. Poses seulement a l'ouverture, ils
+    /// n'apparaissaient jamais (le pays) ou rarement (la ville, quand la salle ne la donnait pas).
+    /// Ils se rangent avant les classements du monde, la ville avant le pays, sans deplacer le
+    /// curseur. Une fois connus, ils restent. Rend vrai si la rangee d'onglets a change.
+    /// </summary>
+    public bool PoserLesLieux(bool villeConnue, bool paysConnu)
+    {
+        if (!_onglets.Contains(Vue.Monde)) return false;
+        var avant = VueCourante;
+        var change = false;
+        if (villeConnue && !_onglets.Contains(Vue.MaVille))
+        {
+            var pays = _onglets.IndexOf(Vue.MonPays);
+            _onglets.Insert(pays >= 0 ? pays : PositionAvantLeMonde(), Vue.MaVille);
+            change = true;
+        }
+        if (paysConnu && !_onglets.Contains(Vue.MonPays))
+        {
+            _onglets.Insert(PositionAvantLeMonde(), Vue.MonPays);
+            change = true;
+        }
+        if (!change) return false;
+        _onglet = Math.Max(0, _onglets.IndexOf(avant));
+        return true;
+    }
+
+    /// <summary>La place juste avant le premier classement mondial (une autre regle, ou Monde).</summary>
+    private int PositionAvantLeMonde()
+    {
+        for (var i = 0; i < _onglets.Count; i++)
+        {
+            if (_onglets[i] is Vue.Monde or Vue.MondeMulti or Vue.Monde1lc) return i;
+        }
+        return _onglets.Count;
+    }
+
     public void Ouvrir(bool salleConnue, bool villeConnue, bool paysConnu, bool aDesRecords)
     {
         _onglets.Clear();

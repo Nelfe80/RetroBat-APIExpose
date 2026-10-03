@@ -97,6 +97,26 @@ public sealed class LeaderboardRulesTabsTests
     }
 
     [Fact]
+    public void Ville_et_pays_arrivent_apres_chargement_sans_deplacer_le_curseur()
+    {
+        var m = new LeaderboardPanelModel();
+        m.Ouvrir(salleConnue: true, villeConnue: false, paysConnu: false, aDesRecords: true);
+        m.PoserLesRegles(new[] { Vue.MondeMulti });
+        Assert.Equal(Vue.Monde, m.VueCourante);
+
+        Assert.True(m.PoserLesLieux(villeConnue: false, paysConnu: true));
+        Assert.Equal(new[] { Vue.MesRecords, Vue.MaSalle, Vue.MonPays, Vue.MondeMulti, Vue.Monde }, m.Onglets);
+        Assert.Equal(Vue.Monde, m.VueCourante);
+
+        // La ville arrive plus tard : elle se range quand meme avant le pays.
+        Assert.True(m.PoserLesLieux(villeConnue: true, paysConnu: true));
+        Assert.Equal(new[] { Vue.MesRecords, Vue.MaSalle, Vue.MaVille, Vue.MonPays, Vue.MondeMulti, Vue.Monde }, m.Onglets);
+        Assert.Equal(Vue.Monde, m.VueCourante);
+
+        Assert.False(m.PoserLesLieux(villeConnue: true, paysConnu: true));
+    }
+
+    [Fact]
     public void Un_jeu_a_une_regle_garde_ses_onglets()
     {
         var m = new LeaderboardPanelModel();
