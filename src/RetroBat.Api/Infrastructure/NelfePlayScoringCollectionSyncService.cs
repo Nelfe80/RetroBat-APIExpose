@@ -418,6 +418,23 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// sert : le libelle du defi suit la regle du jeu, et le 1CC MULTI n'est propose que la ou il a
     /// un classement.
     /// </summary>
+    /// <summary>Les systemes des jeux ouverts au scoring, lus dans le dernier index garde sur disque.</summary>
+    public IReadOnlyList<string> SystemesOuverts()
+    {
+        try
+        {
+            return LireManifeste()?.Games?
+                .Select(jeu => jeu.SystemId)
+                .Where(systeme => !string.IsNullOrWhiteSpace(systeme))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList() ?? [];
+        }
+        catch (Exception)
+        {
+            return [];
+        }
+    }
+
     public IReadOnlyList<string> ReglesOuvertes(string romGroup)
     {
         if (string.IsNullOrWhiteSpace(romGroup)) return [];

@@ -197,7 +197,9 @@ public sealed class LeaderboardOverlayService : IDisposable
         /// <summary>Le defi que le bouton lance (« 1CC », « 1CC LIVE », « 1CC MULTI »), a cote de CHALLENGE.</summary>
         string DefierMode = "",
         /// <summary>La regle de chaque onglet, dans un petit cadre arrondi (« 1CC », « 1CC MULTI ») ; vide : aucune.</summary>
-        IReadOnlyList<string>? Pastilles = null);
+        IReadOnlyList<string>? Pastilles = null,
+        /// <summary>Ni surtitre PODIUM, ni coupe, ni rang en gras : les parties du joueur (MES RECORDS).</summary>
+        bool SansPodium = false);
 
     private Contenu _contenu = new("", Array.Empty<string>(), 0, Array.Empty<LeaderboardClient.Ligne>(), 0, "", true, false,
         Array.Empty<Aide>(), Array.Empty<Aide>(), "", "", "", "", Array.Empty<string>(),
@@ -1134,7 +1136,7 @@ public sealed class LeaderboardOverlayService : IDisposable
 
                 // A gauche : la coupe du vainqueur, le rang, le joueur, son origine.
                 var x = marge;
-                if (l.Rang == 1 && _service._policeSymboles is { } coupe)
+                if (l.Rang == 1 && !c.SansPodium && _service._policeSymboles is { } coupe)
                 {
                     // La coupe de la premiere place, par la police d'icones d'ES (FontAwesome).
                     using var policeCoupe = new Font(coupe, taille * 0.95f, FontStyle.Regular, GraphicsUnit.Pixel);
@@ -1146,7 +1148,7 @@ public sealed class LeaderboardOverlayService : IDisposable
                 // Le rang s'ecrit comme sur nelfeplay.com : la colonne « # ». Les trois
                 // premiers portent en plus leur ordinal, le meme mot que le podium du site.
                 var rang = "#" + l.Rang;
-                var policeRang = l.Rang <= 3 ? gras : police;
+                var policeRang = l.Rang <= 3 && !c.SansPodium ? gras : police;
                 g.DrawString(rang, policeRang, pinceau, new RectangleF(x, y, largeurRang, hauteur), gauche);
 
                 // Le mouvement depuis la derniere consultation : fleche BLEUE vers le haut quand le
@@ -1307,7 +1309,7 @@ public sealed class LeaderboardOverlayService : IDisposable
         /// <summary>Le surtitre qui precede la ligne i : PODIUM avant le rang 1, CLASSEMENT avant le 4e.</summary>
         private static string Surtitre(Contenu c, int i)
         {
-            if (i < 0 || i >= c.Lignes.Count) return "";
+            if (i < 0 || i >= c.Lignes.Count || c.SansPodium) return "";
             var rang = c.Lignes[i].Rang;
             if (i == 0 && rang <= 3) return c.SurtitrePodium;
             if (rang == 4 || (i == 0 && rang > 3)) return c.SurtitreClassement;

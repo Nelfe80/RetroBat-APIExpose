@@ -104,6 +104,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     private string _romGroup = "";
     private string _maVille = "";
     private string _monPays = "";
+
+    /// <summary>
+    /// MA VILLE et MON PAYS ne s'affichent pas pour le moment (decision user 2026-10-03). Tout
+    /// reste en place (PoserLesLieux, filtres) : les remettre, c'est passer ce reglage a vrai.
+    /// </summary>
+    private static readonly bool LieuxAffiches = false;
     private string _maSalle = "";
 
     public LeaderboardInputService(
@@ -178,6 +184,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 var style = EsMenuStyle.Lire(_logger);
                 _style = style;
                 _overlay.Prechauffer(style);
+                PrechaufferLesSystemes();
                 PreparerLaCle();
                 // Le dictionnaire d'interface (16 langues) se charge maintenant, pas au moment
                 // ou le joueur attend son classement.
@@ -488,7 +495,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         }
         _menuEsOuvert = false;
         _menuEsConnu = false;
-        _modele.Ouvrir(salleConnue: _maSalle.Length > 0, villeConnue: _maVille.Length > 0, paysConnu: false, aDesRecords: true);
+        _modele.Ouvrir(salleConnue: _maSalle.Length > 0, villeConnue: LieuxAffiches && _maVille.Length > 0, paysConnu: false, aDesRecords: true);
         MontrerLeDernierConnu();
         _ = Task.Run(async () =>
         {
@@ -971,7 +978,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 ville = _maVille;
                 pays = _monPays;
             }
-            _modele.PoserLesLieux(ville.Length > 0, pays.Length > 0);
+            if (LieuxAffiches) _modele.PoserLesLieux(ville.Length > 0, pays.Length > 0);
             _modele.PoserLesRegles(_autresMondes.Keys.ToList());
         }
         catch (Exception ex)
@@ -1044,7 +1051,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         // Ville et pays se lisent sur la ligne du joueur : leurs onglets arrivent avec elle.
         string ville, pays;
         lock (_gate) { ville = _maVille; pays = _monPays; }
-        _modele.PoserLesLieux(ville.Length > 0, pays.Length > 0);
+        if (LieuxAffiches) _modele.PoserLesLieux(ville.Length > 0, pays.Length > 0);
         // L'onglet d'une autre regle n'existe que si son classement a des scores.
         _modele.PoserLesRegles(autres.Where(a => a.Value.Lignes.Count > 0).Select(a => a.Key).ToList());
         Rafraichir();
@@ -1615,6 +1622,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // l'appairage, quel que soit le classement.
             Pseudo: _context.PlayerPseudo ?? "",
             DefierMode: LibelleDuMode(ModeCourant(), _reglesDuJeu),
+            // Ses propres parties ne forment pas un podium (decision user 2026-10-03).
+            SansPodium: _modele.VueCourante == LeaderboardPanelModel.Vue.MesRecords,
             Pastilles: _modele.Onglets.Select(PastilleDeLOnglet).ToList());
     }
 
@@ -1749,6 +1758,21 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         var cle = CalculerLaCle(cheminDuJeu, systeme, nomDuJeu);
         _clesConnues[memoire] = cle;
         return cle;
+    }
+
+    /// <summary>
+    /// L'INDEX DES ALIAS DE CHAQUE SYSTEME DE LA COLLECTION, CHARGE AU DEMARRAGE (2026-10-03). La
+    /// cle d'un jeu passe par l'alias.json de son systeme ; le premier jeu d'un systeme payait son
+    /// chargement au moment de l'appui long (1,6 s pour Sonic sur Mega Drive). On le paie ici, en
+    /// arriere-plan, une fois par systeme ouvert au scoring.
+    /// </summary>
+    private void PrechaufferLesSystemes()
+    {
+        foreach (var systeme in _collection?.SystemesOuverts() ?? Array.Empty<string>())
+        {
+            try { _ = _wrapper.ResolveDefinitionFor("__prechauffage__", systeme); }
+            catch (Exception ex) { _logger.LogDebug(ex, "Classement : index des alias de {Systeme} non prechauffe.", systeme); }
+        }
     }
 
     /// <summary>Prepare la cle du jeu choisi, en arriere-plan, sans bloquer personne.</summary>
