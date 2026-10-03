@@ -2331,7 +2331,11 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         }
 
         var familySlug = _gameNameNormalizer.NormalizeGameSlug(null, plan.ProjectionBaseName);
-        var mediaIndex = _localMediaIndexService.Build([canonicalSystemId], cancellationToken);
+        // Seulement les medias de CE jeu, de sa famille et des jeux apparentes (clones, parents) :
+        // l'index complet du systeme coutait plusieurs secondes de disque a chaque envoi (2026-10-03).
+        var nomsDuJeu = new List<string?> { plan.GameSlug, familySlug };
+        nomsDuJeu.AddRange(BuildRelatedCanonicalMediaSlugs(plan.FrontendSystemId, plan.GamePath, plan.GameSlug, familySlug));
+        var mediaIndex = _localMediaIndexService.BuildForGames(canonicalSystemId, nomsDuJeu, cancellationToken);
         var kindPaths = BuildCanonicalKindPathsFromMediaIndex(
             mediaIndex,
             canonicalSystemId,

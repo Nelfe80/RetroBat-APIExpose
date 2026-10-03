@@ -1149,7 +1149,10 @@ public sealed class RemoteScrapingService
             return [];
         }
 
-        var mediaIndex = _localMediaIndexService.Build([plan.SystemId]);
+        // Seulement les medias de CE jeu et de sa famille : l'index complet du systeme coutait
+        // 7,5 s de disque a chaque selection en arcade (2026-10-03).
+        var mediaIndex = _localMediaIndexService.BuildForGames(plan.SystemId,
+            [NormalizeSlug(plan.GameSlug), NormalizeSlug(plan.ProjectionBaseName), plan.GameSlug, plan.ProjectionBaseName]);
         var exactMissing = new List<string>();
         foreach (var kind in selectedDisplayKinds.OrderBy(kind => kind, StringComparer.OrdinalIgnoreCase))
         {

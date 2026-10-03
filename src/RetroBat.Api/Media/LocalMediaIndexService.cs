@@ -100,6 +100,115 @@ public partial class LocalMediaIndexService
         return new LocalMediaIndex(scannedFiles, candidates);
     }
 
+    /// <summary>
+    /// L'INDEX DES SEULS JEUX DEMANDES (2026-10-03). Build() parcourt tous les medias d'un
+    /// systeme : 26 597 fichiers en arcade, 7,5 s d'attente disque mesurees a chaque selection
+    /// de jeu, pour regarder un seul jeu. Les medias d'un jeu vivent dans games/&lt;dossier&gt;
+    /// (le dossier donne son nom au candidat, et sa famille), ou hors de games/ sous un nom
+    /// &lt;jeu&gt;-&lt;region&gt;-&lt;type&gt; (quelques fichiers par systeme). On ne parcourt donc
+    /// que les dossiers de jeu dont le nom ou la famille est l'un des noms demandes, plus tout
+    /// ce qui est hors de games/. Pour ces noms, le resultat est celui de Build() : un media
+    /// range dans le dossier d'un autre jeu est attribue a cet autre jeu.
+    /// </summary>
+    public LocalMediaIndex BuildForGames(string systemId, IEnumerable<string?> slugs, CancellationToken cancellationToken = default)
+        => BuildForGames(systemId, slugs,
+            [(RetroBatPaths.MediaUserSystemsRoot, "media/user", 0), (RetroBatPaths.MediaSystemsRoot, "media", 1)],
+            cancellationToken);
+
+    internal LocalMediaIndex BuildForGames(
+        string systemId,
+        IEnumerable<string?> slugs,
+        IReadOnlyList<(string Root, string SourceRoot, int Priority)> racines,
+        CancellationToken cancellationToken = default)
+    {
+        var candidates = new List<LocalMediaIndexCandidate>();
+        var scannedFiles = 0;
+        var systeme = _systemIdNormalizer.Normalize(systemId);
+        if (string.IsNullOrWhiteSpace(systeme))
+        {
+            return new LocalMediaIndex(0, candidates);
+        }
+
+        // Les noms tels que demandes ET normalises : le filtre doit couvrir au moins ce que la
+        // comparaison exacte des appelants retiendra.
+        var noms = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var slug in slugs)
+        {
+            if (string.IsNullOrWhiteSpace(slug)) continue;
+            noms.Add(slug.Trim());
+            noms.Add(NormalizeSlug(slug));
+            noms.Add(NormalizeSlug(Path.GetFileNameWithoutExtension(slug)));
+        }
+        noms.Remove(string.Empty);
+
+        void Lire(string root, string sourceRoot, int priority, string dossier, SearchOption profondeur)
+        {
+            foreach (var path in Directory.EnumerateFiles(dossier, "*.*", profondeur))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (!IsSupportedMediaExtension(path))
+                {
+                    continue;
+                }
+
+                scannedFiles++;
+                if (TryParseMediaCandidateFromRelativePath(Path.GetRelativePath(root, path), sourceRoot, priority, out var candidate, path))
+                {
+                    candidates.Add(candidate);
+                }
+            }
+        }
+
+        foreach (var (root, sourceRoot, priority) in racines)
+        {
+            var systemRoot = Path.Combine(root, systeme);
+            if (!Directory.Exists(systemRoot))
+            {
+                continue;
+            }
+
+            Lire(root, sourceRoot, priority, systemRoot, SearchOption.TopDirectoryOnly);
+            foreach (var dossier in Directory.EnumerateDirectories(systemRoot, "*", SearchOption.TopDirectoryOnly))
+            {
+                if (!string.Equals(Path.GetFileName(dossier), "games", StringComparison.OrdinalIgnoreCase))
+                {
+                    Lire(root, sourceRoot, priority, dossier, SearchOption.AllDirectories);
+                    continue;
+                }
+
+                Lire(root, sourceRoot, priority, dossier, SearchOption.TopDirectoryOnly);
+                foreach (var jeu in Directory.EnumerateDirectories(dossier, "*", SearchOption.TopDirectoryOnly))
+                {
+                    var slugDuDossier = NormalizeSlug(Path.GetFileName(jeu));
+                    if (noms.Contains(slugDuDossier) || noms.Contains(BuildFamilySlug(slugDuDossier)))
+                    {
+                        Lire(root, sourceRoot, priority, jeu, SearchOption.AllDirectories);
+                    }
+                }
+            }
+        }
+
+        return new LocalMediaIndex(scannedFiles, candidates);
+    }
+
+    internal LocalMediaIndex Build(
+        IEnumerable<string>? systemIds,
+        IReadOnlyList<(string Root, string SourceRoot, int Priority)> racines,
+        CancellationToken cancellationToken = default)
+    {
+        var requestedSystems = systemIds?
+            .Select(_systemIdNormalizer.Normalize)
+            .Where(systemId => !string.IsNullOrWhiteSpace(systemId))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var candidates = new List<LocalMediaIndexCandidate>();
+        var scannedFiles = 0;
+        foreach (var (root, sourceRoot, priority) in racines)
+        {
+            ScanRoot(root, sourceRoot, priority, requestedSystems, candidates, ref scannedFiles, cancellationToken);
+        }
+        return new LocalMediaIndex(scannedFiles, candidates);
+    }
+
     public string? ResolveActiveSourcePath(string systemId, string gameSlug, string kind)
     {
         return ActiveIndex.Value?.ResolveExact(systemId, gameSlug, kind)?.Path;
