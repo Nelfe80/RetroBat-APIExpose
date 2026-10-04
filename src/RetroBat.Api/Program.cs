@@ -238,6 +238,9 @@ builder.Services.AddSingleton<MediaRuntimeState>();
 builder.Services.AddSingleton<StartupOverlayService>();
 builder.Services.AddSingleton<LiveContestOverlayService>();
 builder.Services.AddHttpClient();
+// La liaison avec NelfePlay, notee a chaque echange quel que soit le service (pastille du panneau).
+builder.Services.ConfigureHttpClientDefaults(client =>
+    client.AddHttpMessageHandler(() => new RetroBat.Api.Infrastructure.LiaisonNelfePlayHandler()));
 // LES REPONSES JSON DE NELFEPLAY.COM ARRIVENT COMPRESSEES (2026-10-03). La borne ne demandait pas
 // gzip : un classement de 200 lignes pesait 8,9 Ko au lieu de 2 Ko, et de meme chaque prevol,
 // profil et verdict. Seulement sur ces deux clients : le client par defaut telecharge aussi des

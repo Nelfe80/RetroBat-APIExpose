@@ -194,6 +194,8 @@ public sealed class LeaderboardOverlayService : IDisposable
         IReadOnlyDictionary<string, int>? RangsPrecedents = null,
         /// <summary>Le pseudo du joueur de cette borne, affiche en bas a droite. Vide : rien.</summary>
         string Pseudo = "",
+        /// <summary>La liaison avec NelfePlay : pastille verte devant le pseudo, rouge sans liaison.</summary>
+        bool EnLigne = false,
         /// <summary>Le defi que le bouton lance (« 1CC », « 1CC LIVE », « 1CC MULTI »), a cote de CHALLENGE.</summary>
         string DefierMode = "",
         /// <summary>La regle de chaque onglet, dans un petit cadre arrondi (« 1CC », « 1CC MULTI ») ; vide : aucune.</summary>
@@ -1512,8 +1514,19 @@ public sealed class LeaderboardOverlayService : IDisposable
                 var largeur = Width - marge - x;
                 if (largeur > taille * 4f)
                 {
-                    g.DrawString(Couper(g, c.Pseudo.ToUpperInvariant(), police, largeur), police, pale,
-                        new RectangleF(x, y, largeur, hauteur), droite);
+                    // LA PASTILLE DE LIAISON (2026-10-04), devant le pseudo : verte quand le dernier
+                    // echange avec NelfePlay a abouti, rouge sinon. Le joueur voit d'un coup d'oeil
+                    // si le classement est frais et si ses scores partent.
+                    var diametre = taille * 0.5f;
+                    var ecart = taille * 0.4f;
+                    var texte = Couper(g, c.Pseudo.ToUpperInvariant(), police, largeur - diametre - ecart);
+                    g.DrawString(texte, police, pale, new RectangleF(x, y, largeur, hauteur), droite);
+                    var mesure = g.MeasureString(texte, police, PointF.Empty, StringFormat.GenericTypographic).Width;
+                    var lissage = g.SmoothingMode;
+                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                    using var pastille = new SolidBrush(c.EnLigne ? Color.FromArgb(63, 185, 80) : Color.FromArgb(229, 83, 75));
+                    g.FillEllipse(pastille, x + largeur - mesure - ecart - diametre, y + (hauteur - diametre) / 2f, diametre, diametre);
+                    g.SmoothingMode = lissage;
                 }
             }
         }

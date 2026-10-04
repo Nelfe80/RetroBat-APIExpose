@@ -83,6 +83,13 @@ public sealed class NelfePlayAgentService : BackgroundService
     private string LabelPath => Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "label.txt");
 
     /// <summary>
+    /// LE DERNIER PSEUDO CONNU DU COMPTE (2026-10-04). Le pseudo n'arrivait qu'avec un releve reussi :
+    /// une API redemarree sans site ne savait plus au nom de qui la borne joue, et le panneau du
+    /// classement n'affichait plus le joueur. Il est garde ici et repris au demarrage.
+    /// </summary>
+    private string PseudoPath => Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "pseudo.txt");
+
+    /// <summary>
     /// Nom de CETTE machine, tel qu'il apparaitra dans le compte Nelfe Play.
     ///
     /// Une seule regle pour les deux mondes : le poste local est proprietaire
@@ -139,6 +146,7 @@ public sealed class NelfePlayAgentService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        RetablirLePseudo();
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -162,6 +170,44 @@ public sealed class NelfePlayAgentService : BackgroundService
         }
     }
 
+    /// <summary>Le pseudo garde, repris tant qu'aucun releve n'a reussi (machine appairee seulement).</summary>
+    private void RetablirLePseudo()
+    {
+        try
+        {
+            if (!_device.IsPaired || !string.IsNullOrWhiteSpace(Status.Pseudo) || !File.Exists(PseudoPath)) return;
+            var garde = File.ReadAllText(PseudoPath).Trim();
+            if (garde.Length == 0) return;
+            Status = Status with { Pseudo = garde };
+            if (string.IsNullOrWhiteSpace(_context.PlayerPseudo)) _context.PlayerPseudo = garde;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+    }
+
+    /// <summary>Garde le pseudo du compte ; vide ou machine desappairee : l'efface.</summary>
+    private void GarderLePseudo(string? pseudo)
+    {
+        try
+        {
+            var nouveau = (pseudo ?? string.Empty).Trim();
+            if (nouveau.Length == 0)
+            {
+                if (File.Exists(PseudoPath)) File.Delete(PseudoPath);
+                return;
+            }
+
+            if (File.Exists(PseudoPath) && File.ReadAllText(PseudoPath).Trim() == nouveau) return;
+            Directory.CreateDirectory(Path.GetDirectoryName(PseudoPath)!);
+            File.WriteAllText(PseudoPath, nouveau);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger.LogDebug(ex, "Nelfe Play : pseudo non garde sur le disque.");
+        }
+    }
+
     /// <summary>Releve immediat (appele aussi juste apres un appairage).</summary>
     public async Task PollAsync(CancellationToken cancellationToken)
     {
@@ -181,6 +227,7 @@ public sealed class NelfePlayAgentService : BackgroundService
             // clairement qu'il faut re-appairer.
             _logger.LogWarning("Nelfe Play : cette machine n'est plus autorisee, appairage efface.");
             _device.Forget();
+            GarderLePseudo(null);
             Status = new AgentStatus
             {
                 Paired = false,
@@ -242,6 +289,7 @@ public sealed class NelfePlayAgentService : BackgroundService
         // Propagate the paired account pseudo to the shared context so local scores
         // (console leaderboard) are attributed to the cabinet's NelfePlay identity.
         _context.PlayerPseudo = payload.Pseudo;
+        GarderLePseudo(payload.Pseudo);
 
         if (installed > 0)
         {

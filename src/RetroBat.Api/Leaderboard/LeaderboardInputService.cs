@@ -1650,6 +1650,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // moment ou on en a le plus besoin. Le contexte porte le pseudo du compte depuis
             // l'appairage, quel que soit le classement.
             Pseudo: _context.PlayerPseudo ?? "",
+            EnLigne: RetroBat.Api.Infrastructure.LiaisonNelfePlay.EnLigne,
             DefierMode: LibelleDuMode(ModeCourant(), _reglesDuJeu),
             // Ses propres parties ne forment pas un podium (decision user 2026-10-03).
             SansPodium: _modele.VueCourante == LeaderboardPanelModel.Vue.MesRecords,
