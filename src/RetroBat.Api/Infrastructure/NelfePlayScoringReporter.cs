@@ -505,6 +505,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     // Une nouvelle partie retire aussitôt une éventuelle surimpression
                     // de réclamation restée à l'écran.
                     _claimOverlay?.HideNow();
+                    Interlocked.Increment(ref _lancement);
                     ResetSession();
                     PrendreRoleInvite();
                     _prevolCertifiable = false;
@@ -1046,14 +1047,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // facon le verdict a la fin, quand ES a repris la main.
             // UN LANCEMENT, UN PREVOL A L'ECRAN. Sous le coeur MAME de RetroArch, le wrapper PUIS le pont
             // Lua attestent la meme partie, a 16 s d'ecart : deux prevols, deux « Partie certifiable »
-            // (2026-09-30). Meme jeu, meme verdict, moins d'une minute apres : on ne le redit pas.
-            var clePrevol = $"{systemId}/{romGroup}|{titre}|{detail}";
+            // (2026-09-30). Le second ne se redit pas, MAIS SEULEMENT DANS LE MEME LANCEMENT, et sans
+            // aucune duree : la cle portait le jeu et le verdict avec une fenetre d'une minute, et un
+            // joueur qui relancait 1942 aussitot (1CC rate tot, on quitte, on relance) n'avait plus de
+            // bandeau des sa deuxieme partie (2026-10-05).
+            var clePrevol = CleDuPrevol(Interlocked.Read(ref _lancement), systemId, romGroup, titre, detail);
             bool dejaDit;
             lock (_sync)
             {
-                dejaDit = clePrevol == _dernierPrevolAffiche && DateTime.UtcNow - _dernierPrevolAfficheA < TimeSpan.FromSeconds(60);
+                dejaDit = PrevolDejaDit(clePrevol, _dernierPrevolAffiche);
                 _dernierPrevolAffiche = clePrevol;
-                _dernierPrevolAfficheA = DateTime.UtcNow;
             }
             if (dejaDit)
             {
@@ -2139,7 +2142,19 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     private DateTime _dernierBandeauDeCoupe = DateTime.MinValue;
     private string _dernierPrevolAffiche = "";
-    private DateTime _dernierPrevolAfficheA = DateTime.MinValue;
+    // Compte les lancements (ui.game.started) : le bandeau du prevol ne se tait que dans le meme.
+    private long _lancement;
+
+    /// <summary>La cle d'un prevol affiche : le lancement, le jeu et ce que dit le bandeau.</summary>
+    internal static string CleDuPrevol(long lancement, string systemId, string romGroup, string titre, string? detail)
+        => $"{lancement}|{systemId}/{romGroup}|{titre}|{detail}";
+
+    /// <summary>
+    /// Ce bandeau a-t-il deja ete montre pour CE lancement ? Aucune duree (regle user 2026-10-05) :
+    /// le second attesteur d'une partie (pont Lua apres le wrapper) se tait, et chaque nouveau
+    /// lancement a son bandeau, aussi vite qu'il suive le precedent.
+    /// </summary>
+    internal static bool PrevolDejaDit(string cle, string derniereCle) => cle == derniereCle;
 
     /// <summary>
     /// UN CONTINUE, UN BANDEAU. 19xx a deux temoins du meme continue : le chiffre des credits de
