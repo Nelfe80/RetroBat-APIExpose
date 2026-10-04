@@ -145,10 +145,19 @@ public sealed class EsFeaturesMenuDeploymentService
                 result.Warnings.Add($"es_features.cfg not found: {featuresPath}");
             }
 
-            // Les anciennes traductions, recopiees dans les .po de RetroBat : retirees elles aussi.
+            // Les anciennes traductions, recopiees dans les .po de RetroBat : retirees elles aussi. Un
+            // echec ici n'empeche pas d'ecrire notre fichier.
             if (options.LocaleDeploymentEnabled)
             {
-                await RemoveLocaleBlocksAsync(localeTargetRoot, backupRoot, options, dryRun, result, cancellationToken);
+                try
+                {
+                    await RemoveLocaleBlocksAsync(localeTargetRoot, backupRoot, options, dryRun, result, cancellationToken);
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    result.Warnings.Add(ex.Message);
+                    _logger.LogWarning(ex, "ES features : anciennes traductions non retirees des .po de RetroBat, nouvel essai au prochain demarrage.");
+                }
             }
 
             // 2. NOTRE FICHIER, es_features_apiexpose.cfg, a cote de es_features.cfg.
@@ -383,8 +392,12 @@ public sealed class EsFeaturesMenuDeploymentService
 
         Directory.CreateDirectory(backupRoot);
         var safeName = Regex.Replace(Path.GetFileName(targetPath), @"[^A-Za-z0-9_.-]+", "_");
-        var backupPath = Path.Combine(backupRoot, $"{safeName}.{DateTime.Now:yyyyMMdd-HHmmss}{suffix}");
-        File.Copy(targetPath, backupPath, overwrite: false);
+        // La LANGUE dans le nom : tous les .po s'appellent es-features.po, et deux langues traitees
+        // dans la meme seconde donnaient le meme nom ; la copie echouait et arretait tout
+        // (« ...already exists », vu chez un testeur et sur la borne de dev le 2026-10-04).
+        var dossier = Regex.Replace(new DirectoryInfo(Path.GetDirectoryName(targetPath) ?? string.Empty).Name, @"[^A-Za-z0-9_.-]+", "_");
+        var backupPath = Path.Combine(backupRoot, $"{dossier}.{safeName}.{DateTime.Now:yyyyMMdd-HHmmss-fff}{suffix}");
+        File.Copy(targetPath, backupPath, overwrite: true);
         EnforceBackupRetention(backupRoot, options.BackupRetentionCount);
     }
 
