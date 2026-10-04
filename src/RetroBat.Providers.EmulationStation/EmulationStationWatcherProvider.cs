@@ -144,7 +144,6 @@ public class EmulationStationWatcherProvider : IProvider
         _lastScrapingSettings = _settingsService.GetScrapingSettings();
         _lastMediaAllocationSettingsSignature = BuildMediaAllocationSettingsSignature(_settingsService.GetAllSettings());
         _lastMediaSelectionSignature = BuildMediaSelectionSignature(_lastScrapingSettings);
-        SynchronizeLegacyScraperMediaSettings(_lastScrapingSettings);
         _ = Task.Run(() => RunStartupGamelistMaintenanceAsync(_providerCts.Token), CancellationToken.None);
         return Task.CompletedTask;
     }
@@ -1087,7 +1086,6 @@ public class EmulationStationWatcherProvider : IProvider
             var settings = _settingsService.GetScrapingSettings();
             var signature = BuildMediaAllocationSettingsSignature(rawSettings);
             var mediaSelectionSignature = BuildMediaSelectionSignature(settings);
-            SynchronizeLegacyScraperMediaSettings(settings);
             if (string.Equals(signature, _lastMediaAllocationSettingsSignature, StringComparison.Ordinal))
             {
                 return;
@@ -1147,65 +1145,6 @@ public class EmulationStationWatcherProvider : IProvider
         {
             _logger?.LogWarning(ex, "Echec du traitement de changement de es_settings.cfg.");
         }
-    }
-
-    private void SynchronizeLegacyScraperMediaSettings(EmulationStationScrapingSettings settings)
-    {
-        try
-        {
-            if (_settingsStore.Update(document =>
-                {
-                    var root = document.Root ?? throw new InvalidOperationException("es_settings.cfg root is missing.");
-                    var changed = false;
-                    // Dans le vocabulaire d'ES (box-2D, wheel) : voir EmulationStationScraperVocabulary.
-                    changed |= SetEsStringSetting(root, "ScrapperImageSrc", EmulationStationScraperVocabulary.ToEmulationStation(EmulationStationScraperVocabulary.Slot.Image, settings.ImageSource));
-                    changed |= SetEsStringSetting(root, "ScrapperLogoSrc", EmulationStationScraperVocabulary.ToEmulationStation(EmulationStationScraperVocabulary.Slot.Logo, settings.LogoSource));
-                    changed |= SetEsStringSetting(root, "ScrapperThumbSrc", EmulationStationScraperVocabulary.ToEmulationStation(EmulationStationScraperVocabulary.Slot.Thumb, settings.ThumbSource));
-                    changed |= SetEsStringSetting(root, "WheelStyle", settings.WheelStyle);
-                    return changed;
-                }))
-            {
-                ClearEsSettingsDependentCaches("legacy scraper media settings synchronized");
-                _settingsService.Invalidate();
-                _logger?.LogInformation(
-                    "Legacy ES scraper media settings synchronized from APIExpose allocation: image={ImageSource}, logo={LogoSource}, thumb={ThumbSource}, wheelStyle={WheelStyle}",
-                    settings.ImageSource,
-                    settings.LogoSource,
-                    settings.ThumbSource,
-                    settings.WheelStyle);
-            }
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Xml.XmlException or InvalidOperationException)
-        {
-            _logger?.LogWarning(ex, "Impossible de synchroniser les options scraper ES depuis les preferences media APIExpose.");
-        }
-    }
-
-    private static bool SetEsStringSetting(XElement root, string key, string? value)
-    {
-        var normalizedValue = (value ?? string.Empty).Trim();
-        if (string.IsNullOrWhiteSpace(normalizedValue))
-        {
-            return false;
-        }
-
-        var existing = root.Elements()
-            .FirstOrDefault(element => string.Equals(element.Attribute("name")?.Value, key, StringComparison.OrdinalIgnoreCase));
-        if (existing != null)
-        {
-            var current = existing.Attribute("value")?.Value ?? string.Empty;
-            if (string.Equals(current, normalizedValue, StringComparison.Ordinal))
-            {
-                return false;
-            }
-
-            existing.SetAttributeValue("value", normalizedValue);
-            return true;
-        }
-
-        root.Add(new XText(Environment.NewLine + "  "));
-        root.Add(new XElement("string", new XAttribute("name", key), new XAttribute("value", normalizedValue)));
-        return true;
     }
 
     private bool ShouldSkipDuplicateEvent(string eventName, string[] args)

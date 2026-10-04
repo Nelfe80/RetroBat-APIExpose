@@ -1,42 +1,15 @@
-using RetroBat.Domain.Services;
 using Xunit;
 using static RetroBat.Domain.Services.EmulationStationScraperVocabulary;
 
 namespace RetroBat.Api.Tests;
 
 /// <summary>
-/// Les clés natives d'ES (ScrapperImageSrc, ScrapperLogoSrc, ScrapperThumbSrc) reçoivent le
-/// vocabulaire d'ES, pas celui d'APIExpose : recopiés tels quels, box2d et logo faisaient
-/// afficher NONE à son menu (testeur, 2026-09-17).
+/// Les choix du scraper intégré d'ES, repris dans le vocabulaire d'APIExpose quand APIExpose n'a
+/// pas encore les siens. APIExpose lit ces clés natives et ne les écrit jamais (règle du
+/// 2026-10-04 : elles sont au joueur).
 /// </summary>
 public class EmulationStationScraperVocabularyTests
 {
-    [Theory]
-    [InlineData(Slot.Image, "sstitle", "sstitle")]
-    [InlineData(Slot.Image, "mix", "mixrbv2")]
-    [InlineData(Slot.Image, "box2d", "box-2D")]
-    [InlineData(Slot.Logo, "logo", "wheel")]
-    [InlineData(Slot.Logo, "wheel-hd", "wheel-hd")]
-    [InlineData(Slot.Logo, "marquee", "marquee")]
-    [InlineData(Slot.Thumb, "box2d", "box-2D")]
-    [InlineData(Slot.Thumb, "BOX3D", "box-3D")]
-    public void ToEmulationStation_TraduitLesChoixQuEsConnait(Slot slot, string apiExpose, string attendu)
-    {
-        Assert.Equal(attendu, ToEmulationStation(slot, apiExpose));
-    }
-
-    [Theory]
-    [InlineData(Slot.Logo, "screenmarquee")]
-    [InlineData(Slot.Logo, "figurine")]
-    [InlineData(Slot.Thumb, "ss")]
-    [InlineData(Slot.Thumb, "cartridge")]
-    [InlineData(Slot.Image, "")]
-    [InlineData(Slot.Image, null)]
-    public void ToEmulationStation_SansEquivalent_LaisseLaCleDEsTelleQuelle(Slot slot, string? apiExpose)
-    {
-        Assert.Null(ToEmulationStation(slot, apiExpose));
-    }
-
     [Theory]
     [InlineData("box-2D", "box2d")]
     [InlineData("box-3D", "box3d")]

@@ -87,7 +87,9 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
                 updated = true;
             }
 
-            updated |= SynchronizeLegacyScraperMediaSettings(root, options.MediaAllocation);
+            // Plus rien dans les options natives de RetroBat (ScrapperImageSrc, ScrapperLogoSrc,
+            // ScrapperThumbSrc) : elles sont au joueur. Les recopier depuis la repartition des medias
+            // d'APIExpose remettait ses choix de scrap a chaque lancement (signale le 2026-10-04).
             updated |= NormalizeRomSetNoAutoSettings(root, options.RomSetManager);
             if (updated)
             {
@@ -278,20 +280,6 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
         return key.StartsWith("global.apiexpose.", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static bool SynchronizeLegacyScraperMediaSettings(
-        XElement root,
-        ApiExposeOptions.MediaAllocationOptions mediaAllocation)
-    {
-        // Dans le vocabulaire d'ES (box-2D, wheel) : recopie tel quel, box2d et logo lui etaient
-        // inconnus et son menu affichait NONE. Sans equivalent, sa cle reste telle quelle.
-        var changed = false;
-        changed |= SetStringSetting(root, "ScrapperImageSrc", EmulationStationScraperVocabulary.ToEmulationStation(EmulationStationScraperVocabulary.Slot.Image, mediaAllocation.ImageSource));
-        changed |= SetStringSetting(root, "ScrapperLogoSrc", EmulationStationScraperVocabulary.ToEmulationStation(EmulationStationScraperVocabulary.Slot.Logo, mediaAllocation.LogoSource));
-        changed |= SetStringSetting(root, "ScrapperThumbSrc", EmulationStationScraperVocabulary.ToEmulationStation(EmulationStationScraperVocabulary.Slot.Thumb, NormalizeLegacyThumbSource(mediaAllocation.ThumbSource)));
-        changed |= SetStringSetting(root, "WheelStyle", mediaAllocation.WheelStyle);
-        return changed;
-    }
-
     private static bool NormalizeRomSetNoAutoSettings(
         XElement root,
         ApiExposeOptions.RomSetManagerOptions romSetManager)
@@ -354,33 +342,6 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
             normalized.Equals("thumb", StringComparison.OrdinalIgnoreCase)
             ? "ss"
             : normalized;
-    }
-
-    private static bool SetStringSetting(XElement root, string key, string? value)
-    {
-        var normalizedValue = (value ?? string.Empty).Trim();
-        if (string.IsNullOrWhiteSpace(normalizedValue))
-        {
-            return false;
-        }
-
-        var existing = root.Elements()
-            .FirstOrDefault(element => string.Equals(element.Attribute("name")?.Value, key, StringComparison.OrdinalIgnoreCase));
-        if (existing != null)
-        {
-            var current = existing.Attribute("value")?.Value ?? string.Empty;
-            if (string.Equals(current, normalizedValue, StringComparison.Ordinal))
-            {
-                return false;
-            }
-
-            existing.SetAttributeValue("value", normalizedValue);
-            return true;
-        }
-
-        root.Add(new XText(Environment.NewLine + "  "));
-        root.Add(new XElement("string", new XAttribute("name", key), new XAttribute("value", normalizedValue)));
-        return true;
     }
 
     private static string? FirstExistingValue(XElement root, params string[] keys)
