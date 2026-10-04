@@ -170,6 +170,10 @@ begin
     Target := EsStartHookDir() + '\APIExpose-start-wait.bat';
     if FileExists(Target) and DeleteFile(Target) then
       Log('Hook EmulationStation retire : ' + Target);
+    // Les options d'APIExpose dans le menu d'ES vivent dans leur propre fichier (depuis la 1.9.26).
+    Target := ExtractFileDir(ExtractFileDir(ExpandConstant('{app}'))) + '\emulationstation\.emulationstation\es_features_apiexpose.cfg';
+    if FileExists(Target) and DeleteFile(Target) then
+      Log('Options APIExpose retirees du menu d''EmulationStation : ' + Target);
   end;
 end;
 

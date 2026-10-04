@@ -19,15 +19,49 @@ public sealed class EsFeaturesMenuDeploymentService
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly EmulationStationSystemConfigService _systemConfig;
     private readonly ILogger<EsFeaturesMenuDeploymentService> _logger;
+    private readonly RetroBat.Domain.Interfaces.IEsSettingsStore? _settings;
 
     public EsFeaturesMenuDeploymentService(
         IOptionsMonitor<ApiExposeOptions> options,
         EmulationStationSystemConfigService systemConfig,
-        ILogger<EsFeaturesMenuDeploymentService> logger)
+        ILogger<EsFeaturesMenuDeploymentService> logger,
+        RetroBat.Domain.Interfaces.IEsSettingsStore? settings = null)
     {
         _options = options;
         _systemConfig = systemConfig;
         _logger = logger;
+        _settings = settings;
+    }
+
+    /// <summary>La langue d'ES (« Language » d'es_settings.cfg), vide si inconnue.</summary>
+    public string LangueDES()
+    {
+        try
+        {
+            return _settings is not null && _settings.ReadAllSettings().TryGetValue("Language", out var langue) ? langue ?? string.Empty : string.Empty;
+        }
+        catch (Exception)
+        {
+            return string.Empty;
+        }
+    }
+
+    /// <summary>Nos traductions pour cette langue : resources/config-ESmenus/locales/&lt;langue&gt;/es-features.po.</summary>
+    private static Dictionary<string, string> Traductions(string racine, string langue)
+    {
+        try
+        {
+            if (!Directory.Exists(racine)) return new Dictionary<string, string>();
+            var dossiers = Directory.EnumerateDirectories(racine).Select(Path.GetFileName).OfType<string>();
+            var dossier = EsFeaturesAnnexe.DossierDeLangue(dossiers, langue);
+            if (dossier is null) return new Dictionary<string, string>();
+            var po = Path.Combine(racine, dossier, "es-features.po");
+            return File.Exists(po) ? EsFeaturesAnnexe.LirePo(File.ReadAllText(po)) : new Dictionary<string, string>();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return new Dictionary<string, string>();
+        }
     }
 
     public async Task<EsFeaturesMenuDeploymentResult> DeployAsync(bool dryRun, CancellationToken cancellationToken = default)
@@ -59,28 +93,65 @@ public sealed class EsFeaturesMenuDeploymentService
                 return result;
             }
 
-            if (!File.Exists(featuresPath))
+            // 1. LE FICHIER DE RETROBAT : on n'y ajoute plus rien (2026-10-04). On retire ce que les
+            // versions precedentes y avaient mis ; une fois fait, ce passage ne change plus rien.
+            XElement? copieRetroBat = null;
+            if (File.Exists(featuresPath))
+            {
+                var document = XDocument.Load(featuresPath, LoadOptions.PreserveWhitespace);
+                var root = document.Root;
+                if (root == null || !string.Equals(root.Name.LocalName, "features", StringComparison.OrdinalIgnoreCase))
+                {
+                    result.Warnings.Add("es_features.cfg root element is not <features>.");
+                }
+                else
+                {
+                    if (root.Element("sharedFeatures") is { } anciennesOptions)
+                    {
+                        result.RemovedSharedFeatureCount = RemoveApiExposeSharedFeatureDefinitions(anciennesOptions);
+                    }
+                    if (root.Element("globalFeatures") is { } anciennesPlaces)
+                    {
+                        result.RemovedGlobalFeatureCount = RemoveApiExposeGlobalMenuEntries(anciennesPlaces);
+                    }
+                    result.RemovedSystemPanelFeatureCount = RemoveApiExposePanelSystemFeatures(root);
+
+                    var cleanedXml = SerializeDocument(document);
+                    var currentXml = await File.ReadAllTextAsync(featuresPath, cancellationToken);
+                    result.Changed = !string.Equals(NormalizeLineEndings(currentXml), NormalizeLineEndings(cleanedXml), StringComparison.Ordinal);
+                    if (result.Changed && !dryRun)
+                    {
+                        if (options.BackupEnabled)
+                        {
+                            Directory.CreateDirectory(backupRoot);
+                            var backupPath = Path.Combine(backupRoot, $"es_features.cfg.{DateTime.Now:yyyyMMdd-HHmmss-fff}.nettoyage.bak");
+                            File.Copy(featuresPath, backupPath, overwrite: true);
+                            result.BackupPath = backupPath;
+                            EnforceBackupRetention(backupRoot, options.BackupRetentionCount);
+                        }
+
+                        var tempPath = featuresPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+                        await File.WriteAllTextAsync(tempPath, cleanedXml, cancellationToken);
+                        File.Replace(tempPath, featuresPath, null, ignoreMetadataErrors: true);
+                        _logger.LogInformation("ES features : anciens ajouts d'APIExpose retires de es_features.cfg (ils vivent desormais dans {Annexe}).", EsFeaturesAnnexe.NomDuFichier);
+                    }
+
+                    // La copie propre sert a placer les options du panel comme avant.
+                    copieRetroBat = new XElement(root);
+                }
+            }
+            else
             {
                 result.Warnings.Add($"es_features.cfg not found: {featuresPath}");
-                return result;
             }
 
-            var document = XDocument.Load(featuresPath, LoadOptions.PreserveWhitespace);
-            var root = document.Root;
-            if (root == null || !string.Equals(root.Name.LocalName, "features", StringComparison.OrdinalIgnoreCase))
+            // Les anciennes traductions, recopiees dans les .po de RetroBat : retirees elles aussi.
+            if (options.LocaleDeploymentEnabled)
             {
-                result.Warnings.Add("es_features.cfg root element is not <features>.");
-                return result;
+                await RemoveLocaleBlocksAsync(localeTargetRoot, backupRoot, options, dryRun, result, cancellationToken);
             }
 
-            var sharedFeatures = root.Element("sharedFeatures");
-            var globalFeatures = root.Element("globalFeatures");
-            if (sharedFeatures == null || globalFeatures == null)
-            {
-                result.Warnings.Add("es_features.cfg must contain <sharedFeatures> and <globalFeatures>.");
-                return result;
-            }
-
+            // 2. NOTRE FICHIER, es_features_apiexpose.cfg, a cote de es_features.cfg.
             var fragment = LoadFragment(sourceFragmentPath, result);
             var features = fragment.Features.Count > 0
                 ? fragment.Features
@@ -88,44 +159,39 @@ public sealed class EsFeaturesMenuDeploymentService
             var sharedFeatureEntries = fragment.SharedFeatures.Count > 0
                 ? fragment.SharedFeatures
                 : new List<XElement> { CreateDefaultSharedFeature() };
+            if (copieRetroBat is not null)
+            {
+                result.InstalledSystemPanelFeatureCount = AppendApiExposePanelSystemFeatures(copieRetroBat, _systemConfig);
+            }
 
-            result.RemovedSharedFeatureCount = RemoveApiExposeSharedFeatureDefinitions(sharedFeatures);
-            result.RemovedGlobalFeatureCount = RemoveApiExposeGlobalMenuEntries(globalFeatures);
-            result.RemovedSystemPanelFeatureCount = RemoveApiExposePanelSystemFeatures(root);
+            var langue = LangueDES();
+            var traductions = options.LocaleDeploymentEnabled ? Traductions(localeSourceRoot, langue) : new Dictionary<string, string>();
+            var annexe = EsFeaturesAnnexe.Construire(
+                features.Select(NormalizeFeatureElement),
+                sharedFeatureEntries.Select(NormalizeSharedFeatureElement),
+                copieRetroBat,
+                IsApiExposePanelValue,
+                traductions);
+            var annexeXml = EsFeaturesAnnexe.Serialiser(annexe);
+            var annexePath = Path.Combine(Path.GetDirectoryName(featuresPath) ?? RetroBatPaths.EmulationStationConfigRoot, EsFeaturesAnnexe.NomDuFichier);
+            var annexeActuelle = File.Exists(annexePath) ? await File.ReadAllTextAsync(annexePath, cancellationToken) : null;
+            var annexeChangee = !string.Equals(annexeActuelle, annexeXml, StringComparison.Ordinal);
+            if (annexeChangee && !dryRun)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(annexePath)!);
+                var tempAnnexe = annexePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+                await File.WriteAllTextAsync(tempAnnexe, annexeXml, new UTF8Encoding(false), cancellationToken);
+                File.Move(tempAnnexe, annexePath, overwrite: true);
+                _logger.LogInformation("ES features : {Annexe} ecrit ({Options} options, {Panels} options de panel, langue {Langue}).",
+                    EsFeaturesAnnexe.NomDuFichier, features.Count, result.InstalledSystemPanelFeatureCount, string.IsNullOrEmpty(langue) ? "?" : langue);
+            }
 
-            AppendSharedFeatureBlock(sharedFeatures, features);
-            AppendGlobalFeatureBlock(globalFeatures, sharedFeatureEntries);
-            result.InstalledSystemPanelFeatureCount = AppendApiExposePanelSystemFeatures(root, _systemConfig);
+            result.Changed |= annexeChangee;
+            result.LocaleChanged |= annexeChangee && traductions.Count > 0;
             result.Installed = true;
             result.InstalledFeatureCount = features.Count;
             result.InstalledMenuEntryCount = sharedFeatureEntries.Count;
-
-            var updatedXml = SerializeDocument(document);
-            var currentXml = await File.ReadAllTextAsync(featuresPath, cancellationToken);
-            result.Changed = !string.Equals(NormalizeLineEndings(currentXml), NormalizeLineEndings(updatedXml), StringComparison.Ordinal);
-
-            if (result.Changed && !dryRun)
-            {
-                if (options.BackupEnabled)
-                {
-                    Directory.CreateDirectory(backupRoot);
-                    var backupPath = Path.Combine(
-                        backupRoot,
-                        $"es_features.cfg.{DateTime.Now:yyyyMMdd-HHmmss}.bak");
-                    File.Copy(featuresPath, backupPath, overwrite: false);
-                    result.BackupPath = backupPath;
-                    EnforceBackupRetention(backupRoot, options.BackupRetentionCount);
-                }
-
-                var tempPath = featuresPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
-                await File.WriteAllTextAsync(tempPath, updatedXml, cancellationToken);
-                File.Replace(tempPath, featuresPath, null, ignoreMetadataErrors: true);
-            }
-
-            if (options.LocaleDeploymentEnabled)
-            {
-                await DeployLocaleBlocksAsync(localeSourceRoot, localeTargetRoot, backupRoot, options, dryRun, result, cancellationToken);
-            }
+            result.InstalledLocaleCount = traductions.Count > 0 ? 1 : 0;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Xml.XmlException or InvalidOperationException)
         {
@@ -234,66 +300,6 @@ public sealed class EsFeaturesMenuDeploymentService
         return result;
     }
 
-    private static async Task DeployLocaleBlocksAsync(
-        string sourceRoot,
-        string targetRoot,
-        string backupRoot,
-        ApiExposeOptions.EsFeaturesMenuOptions options,
-        bool dryRun,
-        EsFeaturesMenuDeploymentResult result,
-        CancellationToken cancellationToken)
-    {
-        if (!Directory.Exists(sourceRoot))
-        {
-            result.Warnings.Add($"ES features locale source root not found: {sourceRoot}");
-            return;
-        }
-
-        foreach (var sourcePath in Directory.EnumerateFiles(sourceRoot, "es-features.po", SearchOption.AllDirectories))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var language = new DirectoryInfo(Path.GetDirectoryName(sourcePath) ?? string.Empty).Name;
-            if (string.IsNullOrWhiteSpace(language))
-            {
-                continue;
-            }
-
-            var sourceBody = await File.ReadAllTextAsync(sourcePath, cancellationToken);
-            var localeBlock = BuildApiExposeLocaleBlock(sourceBody);
-            if (string.IsNullOrWhiteSpace(localeBlock))
-            {
-                continue;
-            }
-
-            var targetPath = Path.Combine(targetRoot, language, "es-features.po");
-            var current = File.Exists(targetPath)
-                ? await File.ReadAllTextAsync(targetPath, cancellationToken)
-                : CreatePoHeader(language);
-            var updated = AppendApiExposeLocaleBlock(RemoveApiExposeLocaleBlock(current), localeBlock);
-
-            result.InstalledLocaleCount++;
-            if (string.Equals(NormalizeLineEndings(current), NormalizeLineEndings(updated), StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            result.LocaleChanged = true;
-            if (dryRun)
-            {
-                continue;
-            }
-
-            Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
-            if (File.Exists(targetPath))
-            {
-                BackupFile(targetPath, backupRoot, $".{language}.locale.bak", options);
-            }
-
-            await File.WriteAllTextAsync(targetPath, updated, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), cancellationToken);
-        }
-    }
-
     private static async Task RemoveLocaleBlocksAsync(
         string targetRoot,
         string backupRoot,
@@ -330,48 +336,9 @@ public sealed class EsFeaturesMenuDeploymentService
         }
     }
 
-    private static string BuildApiExposeLocaleBlock(string sourceBody)
-    {
-        var body = RemoveApiExposeLocaleBlock(sourceBody).Trim();
-        if (string.IsNullOrWhiteSpace(body))
-        {
-            return string.Empty;
-        }
-
-        return string.Join(
-            Environment.NewLine,
-            ApiExposeLocaleBeginMarker,
-            body,
-            ApiExposeLocaleEndMarker,
-            string.Empty);
-    }
-
-    private static string AppendApiExposeLocaleBlock(string poContent, string localeBlock)
-    {
-        var trimmed = poContent.TrimEnd();
-        return string.IsNullOrWhiteSpace(trimmed)
-            ? localeBlock
-            : trimmed + Environment.NewLine + Environment.NewLine + localeBlock;
-    }
-
     private static string RemoveApiExposeLocaleBlock(string poContent)
     {
         return ApiExposeLocaleBlockRegex.Replace(poContent ?? string.Empty, Environment.NewLine).TrimEnd() + Environment.NewLine;
-    }
-
-    private static string CreatePoHeader(string language)
-    {
-        return string.Join(
-            Environment.NewLine,
-            "msgid \"\"",
-            "msgstr \"\"",
-            "\"Project-Id-Version: APIExpose es_features\\n\"",
-            "\"Report-Msgid-Bugs-To: \\n\"",
-            "\"MIME-Version: 1.0\\n\"",
-            "\"Content-Type: text/plain; charset=UTF-8\\n\"",
-            "\"Content-Transfer-Encoding: 8bit\\n\"",
-            $"\"Language: {language}\\n\"",
-            string.Empty);
     }
 
     public void PrepareLogFilesOnStartup()
