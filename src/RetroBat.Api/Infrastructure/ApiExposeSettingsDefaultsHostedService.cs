@@ -91,6 +91,10 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
             // ScrapperThumbSrc) : elles sont au joueur. Les recopier depuis la repartition des medias
             // d'APIExpose remettait ses choix de scrap a chaque lancement (signale le 2026-10-04).
             updated |= NormalizeRomSetNoAutoSettings(root, options.RomSetManager);
+            // MIGRATE ROMS MEDIA TO STORE : un interrupteur a la demande, lu au demarrage suivant et sans
+            // equivalent dans appsettings.json. Pose a OFF seulement s'il manque (il s'affichait AUTO) :
+            // le recopier a chaque demarrage le remettrait a OFF avant que la migration le lise.
+            updated |= AjouterSiAbsente(root, "global.apiexpose.media_migration.enabled", "0");
             if (updated)
             {
                 root.Add(new XText(Environment.NewLine));
@@ -117,6 +121,9 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
         {
             ("global.apiexpose.enabled", ToEsBool(options.Enabled)),
             ("global.apiexpose.local_media_manager.enabled", ToEsBool(options.LocalMediaManager.Enabled)),
+            // Ecrit comme les autres : sans valeur dans es_settings, son interrupteur (switchauto)
+            // s'affichait AUTO alors qu'il est actif par defaut (2026-10-04).
+            ("global.apiexpose.media_allocation.write_policy_enabled", ToEsBool(options.MediaAllocation.WritePolicyEnabled)),
             ("global.apiexpose.local_media_manager.populate_all_requested", ToEsBool(options.LocalMediaManager.PopulateAllGamelistsRequested)),
             ("global.apiexpose.local_media_manager.remove_roms_media_after_canonical_migration", ToEsBool(options.LocalMediaManager.RemoveRomsMediaAfterCanonicalMigration)),
             ("global.apiexpose.media_allocation.image_source", options.MediaAllocation.ImageSource),
@@ -273,6 +280,18 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
         }
 
         return defaults;
+    }
+
+    private static bool AjouterSiAbsente(XElement root, string key, string value)
+    {
+        if (HasSetting(root, key))
+        {
+            return false;
+        }
+
+        root.Add(new XText(Environment.NewLine + "  "));
+        root.Add(new XElement("string", new XAttribute("name", key), new XAttribute("value", value)));
+        return true;
     }
 
     private static bool ShouldSynchronizeFromAppsettings(string key)
