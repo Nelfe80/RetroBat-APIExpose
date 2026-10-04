@@ -58,7 +58,6 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     // Ce que le coeur declare de lui-meme : « FinalBurn Neo », « 0.289 (eb342748) ». Indice,
     // jamais preuve - c'est l'empreinte qui tranche. Il dit QUELLE source verifier.
     private string? _coreName, _coreVersion;
-    private JsonElement? _ticket;
     private long _lastFrame;
     /// <summary>Les lectures de score recues pendant la session, et celles ecartees en demo : sans
     /// elles, « pas de score » ne disait pas s'il n'en etait venu aucune ou si toutes avaient ete ecartees.</summary>
@@ -301,6 +300,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // Les rapprochements d'avant le redemarrage reprennent ou ils en etaient.
             lock (_sync) { ChargerLesLiens(); }
             RessayerLesLiens();
+            // Les parties gardees sur la borne repartent d'elles-memes (piste B).
+            _ = Task.Run(() => BoucleDesBrouillonsAsync(stoppingToken), CancellationToken.None);
 
             // La mesure du score est ÉVÉNEMENTIELLE (pipe → HandleEvent). En fond, un
             // battement calme vérifie l'état recovery « share datas » : si le serveur
@@ -616,7 +617,6 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             _listenerSha256 = _coreSha256 = _memSha256 = _contentSha256 = _contentMd5 = _contentSha1 = _contentSet = _wrapperVersion = null;
             _coreName = _coreVersion = null;
-            _ticket = null;
             _lastFrame = 0;
             _finalTotal = null;
             _inDemo = false;
@@ -829,8 +829,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
             var credential = ResolveCredential();
             if (string.IsNullOrEmpty(credential)) return;
-            var profile = await FetchProfileAsync(credential, systemId, romGroup, ct).ConfigureAwait(false);
-            if (profile is null) return;
+            var (profilsDuJeu, profilsDuSite) = await ProfilsAsync(credential, systemId, romGroup, ct).ConfigureAwait(false);
+            // Le profil d'une partie seule : jamais le 1CC MULTI, meme s'il venait en tete.
+            var seules = RetroBat.Api.Scoring.ModesDeJeu.SansLeMulti(profilsDuJeu);
+            JsonElement? profile = seules.Count > 0 ? seules[0] : null;
+            if (profile is null)
+            {
+                // Site muet et jeu jamais vu : on ne sait pas dire « certifiable », mais la partie sera
+                // gardee sur la borne. Le joueur doit l'apprendre avant de jouer.
+                if (!profilsDuSite) AnnoncerHorsLigne(systemId, romGroup);
+                return;
+            }
 
             var coreOptions = FilterGameplayCoreOptions(GetString(attestation, "CoreOptions"));
             var digest = !string.IsNullOrEmpty(coreOptions) ? Crypto.Sha256Hex(coreOptions) : Crypto.Sha256Hex("core-options@default");
@@ -856,13 +865,49 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 ["software"] = new JsonObject { ["apiexpose"] = CabinetState.Version },
             };
 
-            using var client = CreateClient(credential);
-            using var content = new StringContent(mesures.ToJsonString(), Encoding.UTF8, "application/json");
-            using var response = await client.PostAsync("/api/v1/agent/scores/preflight", content, ct).ConfigureAwait(false);
-            var corps = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-            Trace($"preflight HTTP {(int)response.StatusCode} - {corps}");
-            if (!response.IsSuccessStatusCode) return;
-            using var doc = JsonDocument.Parse(corps);
+            // LE PREVOL HORS LIGNE (piste B, 2026-10-04). Chaque verdict du site est garde pour CETTE
+            // configuration (coeur, .MEM, reglages, ROM, version) ; site muet, la borne reprend le
+            // dernier, chiffre des credits compris, dont depend la coupure du 1CC. Sans verdict garde,
+            // le joueur apprend que NelfePlay est injoignable et que son score partira au retour.
+            var cleDuPrevol = Crypto.Sha256Hex(Jcs.CanonicalBytes(mesures));
+            string? corps = null;
+            var horsLigne = false;
+            try
+            {
+                using var client = CreateClient(credential);
+                using var content = new StringContent(mesures.ToJsonString(), Encoding.UTF8, "application/json");
+                using var response = await client.PostAsync("/api/v1/agent/scores/preflight", content, ct).ConfigureAwait(false);
+                corps = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+                Trace($"preflight HTTP {(int)response.StatusCode} - {corps}");
+                if (RetroBat.Api.Scoring.BrouillonDeScore.Classer((int)response.StatusCode, corps) == RetroBat.Api.Scoring.IssueDEnvoi.ARetenter)
+                {
+                    horsLigne = true;
+                }
+                else if (!response.IsSuccessStatusCode)
+                {
+                    return;
+                }
+                else
+                {
+                    GarderLePrevol(cleDuPrevol, corps);
+                }
+            }
+            catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+            {
+                Trace($"preflight : site injoignable ({ex.GetType().Name})");
+                horsLigne = true;
+            }
+            if (horsLigne)
+            {
+                corps = PrevolGarde(cleDuPrevol);
+                if (corps is null)
+                {
+                    AnnoncerHorsLigne(systemId, romGroup);
+                    return;
+                }
+                Trace("preflight : site injoignable, verdict garde pour cette configuration");
+            }
+            using var doc = JsonDocument.Parse(corps!);
             var root = doc.RootElement;
             if (!root.TryGetProperty("open", out var open) || open.ValueKind != JsonValueKind.True) return;
             var certifiable = root.TryGetProperty("certifiable", out var c) && c.ValueKind == JsonValueKind.True;
@@ -984,6 +1029,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 titre = "Partie certifiable";
                 detail = force ? "réglages certifiés appliqués" : "pour le classement";
             }
+            if (horsLigne && certifiable && dangers.Count == 0) detail = "hors ligne, score envoyé au retour de NelfePlay";
             // On retient la PROMESSE, et QUAND elle a ete faite : c'est elle qu'on confrontera a
             // la fin de la partie, et sa date dit si le joueur a eu le temps de jouer.
             _prevolCertifiable = certifiable && dangers.Count == 0;
@@ -1018,6 +1064,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 // Le JOURNAL garde le francais (l'outil de diagnostic le lit) ; l'ECRAN parle la langue
                 // du joueur, et passe en orange quand la partie ne sera pas classee.
                 var (titreAffiche, detailAffiche) = AnnonceLocalisee(Langue(), certifiable, reason, dangers, force);
+                if (horsLigne && certifiable && dangers.Count == 0) detailAffiche = Texte("scoring_offline_certifiable_sub");
                 _overlay.ShowTop("SCORING", titreAffiche, detailAffiche, 6000, alerte: !(certifiable && dangers.Count == 0));
             }
             else
@@ -1028,6 +1075,49 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         catch (Exception ex)
         {
             Trace("preflight impossible : " + ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Site muet et rien de garde pour cette configuration : la partie se joue, son brouillon partira
+    /// au retour du site. On le promet au joueur, et c'est cette promesse qu'on tiendra a la fin.
+    /// </summary>
+    private void AnnoncerHorsLigne(string systemId, string romGroup)
+    {
+        _prevolCertifiable = true;
+        _prevolAt = DateTime.UtcNow;
+        Trace($"prévol : NelfePlay injoignable, {systemId}/{romGroup} se joue normalement, score gardé sur la borne");
+        _overlay?.ShowTop("SCORING", Texte("scoring_offline"), Texte("scoring_offline_sub"), 6000, alerte: false);
+    }
+
+    private static string CheminDuPrevol(string cle)
+        => System.IO.Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "prevols", cle + ".json");
+
+    private void GarderLePrevol(string cle, string corps)
+    {
+        try
+        {
+            var chemin = CheminDuPrevol(cle);
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(chemin)!);
+            File.WriteAllText(chemin + ".tmp", corps, new UTF8Encoding(false));
+            File.Move(chemin + ".tmp", chemin, overwrite: true);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogDebug(ex, "Scoring : prevol non garde.");
+        }
+    }
+
+    private static string? PrevolGarde(string cle)
+    {
+        try
+        {
+            var chemin = CheminDuPrevol(cle);
+            return File.Exists(chemin) ? File.ReadAllText(chemin) : null;
+        }
+        catch (Exception)
+        {
+            return null;
         }
     }
 
@@ -2130,6 +2220,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var romGroup = GetString(payload, "Rom") ?? "";
         var sessionJson = GetString(payload, "Session");
         Trace($"session reçue sys={systemId} rom={romGroup} sessionLen={sessionJson?.Length ?? -1}");
+        lock (_sync) _finDeLaSession = DateTime.UtcNow;
         // Une session est arrivee. Elle ne vaut PAS quittance a elle seule : celles d'Altered
         // Beast sous MAME arrivaient vides, sans le moindre score. C'est le chemin de soumission
         // qui decidera, un peu plus bas, s'il y avait quelque chose a mesurer.
@@ -2366,22 +2457,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             contentSha1 = GamelistIdentity.DeclaredSha1(systemId, romGroup, SetArcade(systemId, contentSet));
         }
 
-        var profils = await FetchProfilesAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false);
+        var (profils, profilsDuSite) = await ProfilsAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false);
         JsonElement? profile = profils.Where(p => p.TryGetProperty("ruleset", out var r) && r.GetString() == CategorieMulti)
             .Select(p => (JsonElement?)p).FirstOrDefault();
-        if (profile is null)
+        if (profile is null && profilsDuSite)
         {
             Trace($"1CC MULTI : STOP, pas de classement {CategorieMulti} ouvert pour {romGroup} (score du joueur {place} : {runPeak})");
-            return;
-        }
-
-        await RequestTicketAsync(cancellationToken).ConfigureAwait(false);
-        JsonElement? ticket;
-        lock (_sync) { ticket = _ticket; }
-        var deviceId = ticket is { } t && t.TryGetProperty("device_id", out var did) ? did.GetString() : null;
-        if (ticket is null || string.IsNullOrEmpty(deviceId))
-        {
-            Trace("1CC MULTI : STOP, ticket indisponible");
             return;
         }
 
@@ -2392,33 +2473,21 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             catch (Exception ex) { Trace($"NVRAM indisponible : {ex.Message}"); }
         }
         JsonObject? bios = null;
-        if (_bios is not null)
+        if (_bios is not null && profile is { } profilConnu)
         {
-            try { bios = _bios.PourLePasseport(profile.Value); }
+            try { bios = _bios.PourLePasseport(profilConnu); }
             catch (Exception ex) { Trace($"BIOS indisponible : {ex.Message}"); }
         }
 
-        using var deviceKey = CngDeviceKey.OpenOrCreate(ScoringKeyName);
-        JsonObject passport;
-        try
-        {
-            var coupe = FinDuSolo.Premiere((FinDuSolo.Continue, bilan.Coupes), (FinDuSolo.ContinueConsole, coupesDuCompteur));
-            passport = BuildPassport(
-                systemId, romGroup, sessionDuJoueur, ticket.Value, profile.Value,
-                deviceId!, deviceKey, listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion,
-                coreName, coreVersion,
-                runPeak, bestRun, trajectory, nvram, bios, null, joueurs, coupe, place, seance);
-            var body = passport.DeepClone()!.AsObject();
-            body.Remove("signature");
-            passport["signature"] = deviceKey.SignB64Url(Jcs.CanonicalBytes(body));
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogWarning(ex, "Scoring : assemblage du passeport 1CC MULTI impossible.");
-            return;
-        }
-        Trace($"1CC MULTI : soumission du joueur {place}, {runPeak} points");
-        await SubmitAsync(credential, passport, cancellationToken).ConfigureAwait(false);
+        // Le 1CC MULTI garde le replay de la partie entiere.
+        string? replay;
+        lock (_sync) replay = _replayDeLaPartie;
+        var coupe = FinDuSolo.Premiere((FinDuSolo.Continue, bilan.Coupes), (FinDuSolo.ContinueConsole, coupesDuCompteur));
+        Trace($"1CC MULTI : partie du joueur {place}, {runPeak} points");
+        var brouillon = NouveauBrouillon("multi", systemId, romGroup, sessionDuJoueur, listenerSha, coreSha, memSha,
+            contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, runPeak, bestRun, trajectory,
+            nvram, bios, null, joueurs, coupe, place, seance, replay, CategorieMulti);
+        await PoserEtEnvoyerAsync(brouillon, runPeak, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>La categorie (ruleset) des parties a plusieurs, chacun sur son credit.</summary>
@@ -2672,8 +2741,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             return;
         }
 
-        // Le profil du MODE joue : un jeu a modes a un classement par mode (ModesDeJeu).
-        var profils = await FetchProfilesAsync(credential!, systemId, romGroup, cancellationToken).ConfigureAwait(false);
+        // Le profil du MODE joue : un jeu a modes a un classement par mode (ModesDeJeu). Il dit aussi les
+        // NVRAM et les BIOS a joindre ; site muet, la copie gardee sur le disque le dit a sa place.
+        var (profils, profilsDuSite) = await ProfilsAsync(credential!, systemId, romGroup, cancellationToken).ConfigureAwait(false);
         var profile = RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil(profils, contexteRun.Mode);
         if (profile is null)
         {
@@ -2687,36 +2757,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 Trace($"{pourquoi}, soumission de laboratoire ({labo})");
                 profile = RetroBat.Api.Scoring.ScoreLabLabMode.PlaceholderProfile();
             }
-            else
+            else if (profilsDuSite)
             {
                 Trace($"STOP: {pourquoi}");
                 return;
             }
+            else
+            {
+                // Site muet et aucune copie : la partie est gardee quand meme (le jeu est dans la
+                // collection World Scoring), sans epingles de NVRAM ni BIOS. Le site jugera.
+                Trace($"{pourquoi} : site injoignable et aucune copie gardee, brouillon sans profil");
+            }
         }
-
-        // Ticket PARESSEUX : un seul, obtenu ici, uniquement parce qu'on va soumettre.
-        await RequestTicketAsync(cancellationToken).ConfigureAwait(false);
-        JsonElement? ticket;
-        lock (_sync) { ticket = _ticket; }
-        if (ticket is null)
-        {
-            Trace("STOP: ticket indisponible");
-            return;
-        }
-        // L'identité de l'appareil vient du ticket (résolue par le serveur : appairé ou
-        // anonyme) - l'agent n'a pas besoin de la connaître lui-même.
-        var deviceId = ticket.Value.TryGetProperty("device_id", out var did) ? did.GetString() : null;
-        if (string.IsNullOrEmpty(deviceId))
-        {
-            Trace("STOP: ticket sans device_id");
-            return;
-        }
-        Trace($"assemblage du passeport (device={deviceId})…");
 
         if (runPeak <= 0) runPeak = finalTotal.Value;   // filet : aucun segment exploitable
 
-        // Les NVRAM, lues APRES la fermeture de l'emulateur (voir NvramSnapshotService) : on les
-        // obtient avant de signer, puisqu'elles font partie du passeport.
+        // Les NVRAM, lues APRES la fermeture de l'emulateur (voir NvramSnapshotService) : elles font
+        // partie de la mesure, donc du brouillon.
         JsonArray? nvram = null;
         if (_nvram is not null)
         {
@@ -2726,32 +2783,22 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
         // Les BIOS que le profil exige (none quand le jeu n'en utilise pas).
         JsonObject? bios = null;
-        if (_bios is not null)
+        if (_bios is not null && profile is { } profilConnu)
         {
-            try { bios = _bios.PourLePasseport(profile.Value); }
+            try { bios = _bios.PourLePasseport(profilConnu); }
             catch (Exception ex) { Trace($"BIOS indisponible : {ex.Message}"); }
         }
 
-        using var deviceKey = CngDeviceKey.OpenOrCreate(ScoringKeyName);
-        JsonObject passport;
-        try
-        {
-            passport = BuildPassport(
-                systemId, romGroup, sessionJson, ticket.Value, profile.Value,
-                deviceId!, deviceKey, listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion,
-                coreName, coreVersion,
-                runPeak, bestRun, trajectory, nvram, bios, contexteRun, partieADeux ? 2 : 1, finDuSolo);
-            var body = passport.DeepClone()!.AsObject();
-            body.Remove("signature");
-            passport["signature"] = deviceKey.SignB64Url(Jcs.CanonicalBytes(body));
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogWarning(ex, "Scoring : assemblage du passeport impossible.");
-            return;
-        }
+        // Le replay du meilleur run part avec le brouillon : le lien score-replay ne dependra plus de
+        // la partie en cours au moment du verdict, qui peut arriver bien plus tard.
+        string? replay;
+        lock (_sync) { replay = _replayDuMeilleurRun ?? _replayDeLaPartie; _replayDuMeilleurRun = null; }
 
-        await SubmitAsync(credential!, passport, cancellationToken).ConfigureAwait(false);
+        var brouillon = NouveauBrouillon("solo", systemId, romGroup, sessionJson, listenerSha, coreSha, memSha,
+            contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, runPeak, bestRun, trajectory,
+            nvram, bios, contexteRun, partieADeux ? 2 : 1, finDuSolo, null, null, replay,
+            profile is { } profilChoisi && profilChoisi.TryGetProperty("ruleset", out var regleChoisie) ? regleChoisie.GetString() : null);
+        await PoserEtEnvoyerAsync(brouillon, runPeak, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>Le plus grand ecart entre deux lectures consecutives du run retenu : un saut
@@ -2774,7 +2821,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         string? coreName, string? coreVersion, long finalTotal, List<(long frame, long total)> trajectory,
         List<(long frame, long total)>? toutesLesLectures = null, JsonArray? nvram = null, JsonObject? bios = null,
         RetroBat.Api.Scoring.ContexteDeJeu? contexte = null, int joueurs = 1, (string Raison, long Frame)? finDuSolo = null,
-        int? place = null, string? seance = null)
+        int? place = null, string? seance = null,
+        string? sessionId = null, DateTime? finUtc = null,
+        (NelfePlayScoringSessionService.SessionPlayer? Joueur, bool Fige)? joueurFige = null,
+        bool? labo = null, string? versionApi = null, string? etatWrapper = null)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
@@ -2884,7 +2934,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         //  - HOME    : aucune session (machine perso / borne libre).
         // Le record est attribué au code joueur (RGPC) de la session. Champs ADDITIFS et
         // SIGNÉS (JCS re-trie ; un vérifieur qui les ignore reste valide).
-        var sessionPlayer = _scoringSession?.Get();
+        var sessionPlayer = joueurFige is { } fige ? fige.Joueur : _scoringSession?.Get();
         var world = sessionPlayer?.World ?? "home";
         JsonObject? contextVenue = sessionPlayer is not null
             && (sessionPlayer.VenueName is not null || sessionPlayer.VenueCity is not null)
@@ -2911,10 +2961,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (place is { } siege) jeu["seat"] = siege;
         if (!string.IsNullOrEmpty(seance)) jeu["netplay_session"] = seance;
 
+        // L'heure de fin est celle de la PARTIE (brouillon), pas celle de l'assemblage : un brouillon
+        // envoye au retour du site garde sa date.
+        var finDeLaPartie = finUtc ?? DateTime.UtcNow;
         var document = new JsonObject
         {
             ["protocol"] = 1,
-            ["session_id"] = Guid.NewGuid().ToString(),
+            ["session_id"] = sessionId ?? Guid.NewGuid().ToString(),
             ["ticket"] = JsonNode.Parse(ticket.GetRawText()),
             ["game"] = jeu,
             ["device"] = new JsonObject { ["device_id"] = deviceId, ["key_id"] = deviceKey.KeyId, ["key_type"] = "ecdsa_p256" },
@@ -2927,7 +2980,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 ["contest_id"] = sessionPlayer?.ContestId,
                 // Partie de LABORATOIRE (drapeau de NelfeScoreLab) : signee et verifiee comme les
                 // autres, jamais classee. Un essai a publie 906 030 sur Ms. Pac-Man (2026-09-22).
-                ["lab"] = RetroBat.Api.Scoring.ScoreLabLabMode.IsActive(DateTime.UtcNow, out _) ? true : null,
+                ["lab"] = (labo ?? RetroBat.Api.Scoring.ScoreLabLabMode.IsActive(DateTime.UtcNow, out _)) ? true : null,
             },
             ["listener"] = new JsonObject
             {
@@ -2941,8 +2994,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 ["modules_digest"] = modulesDigest,
                 // Avec quoi cette partie a ete mesuree : sans cela, une anomalie de mesure ne
                 // peut pas etre rattachee a une version, et on ne sait pas qui doit mettre a jour.
-                ["apiexpose"] = CabinetState.Version,
-                ["wrapper_state"] = CabinetState.Wrapper,
+                ["apiexpose"] = versionApi ?? CabinetState.Version,
+                ["wrapper_state"] = etatWrapper ?? CabinetState.Wrapper,
             },
             ["artifacts"] = new JsonObject
             {
@@ -2959,8 +3012,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             },
             ["timing"] = new JsonObject
             {
-                ["started_at"] = DateTime.UtcNow.AddMilliseconds(-monotonicMs).ToString("yyyy-MM-ddTHH:mm:ssZ"),
-                ["ended_at"] = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                ["started_at"] = finDeLaPartie.AddMilliseconds(-monotonicMs).ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                ["ended_at"] = finDeLaPartie.ToString("yyyy-MM-ddTHH:mm:ssZ"),
                 ["monotonic_ms"] = monotonicMs, ["frame_count"] = frameCount,
             },
             ["sensitive"] = new JsonObject
@@ -3022,6 +3075,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// a l'envoi, c'est le serveur qui juge, avec les memes controles qu'en ligne.
     /// </summary>
     private async Task<List<JsonElement>> FetchProfilesAsync(string credential, string systemId, string romGroup, CancellationToken cancellationToken)
+        => (await ProfilsAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false)).Profils;
+
+    /// <summary>
+    /// Les profils du jeu, et s'ils viennent du SITE. Une liste vide du site dit « pas ouvert » ;
+    /// une liste vide faute de site et de copie ne dit rien (piste B : le brouillon attend).
+    /// </summary>
+    private async Task<(List<JsonElement> Profils, bool DuSite)> ProfilsAsync(string credential, string systemId, string romGroup, CancellationToken cancellationToken)
     {
         var copie = CheminDuProfil(systemId, romGroup);
         try
@@ -3035,7 +3095,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 if (ProfilsDuCorps(body) is { } profils)
                 {
                     GarderLeProfil(copie, body);
-                    return profils;
+                    return (profils, true);
                 }
             }
             Trace($"profil {systemId}/{romGroup} : le site repond {(int)response.StatusCode}, lecture de la copie gardee");
@@ -3049,14 +3109,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             if (File.Exists(copie) && ProfilsDuCorps(await File.ReadAllTextAsync(copie, cancellationToken).ConfigureAwait(false)) is { } gardes)
             {
-                return gardes;
+                return (gardes, false);
             }
         }
         catch (Exception ex)
         {
             _logger?.LogDebug(ex, "Scoring : copie du profil illisible.");
         }
-        return new List<JsonElement>();
+        return (new List<JsonElement>(), false);
     }
 
     /// <summary>
@@ -3113,7 +3173,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
     }
 
-    private async Task SubmitAsync(string credential, JsonObject passport, CancellationToken cancellationToken)
+    /// <summary>
+    /// Envoie un passeport et dit ce que vaut la reponse (piste B, 2026-10-04). Seul un verdict
+    /// definitif est range, annonce et rattache a son replay ; sans reponse, en 5xx, 429 ou sur
+    /// une page HTML, la partie reste en file. Avant, une reponse 503 etait rangee comme verdict
+    /// et une coupure perdait la partie. <paramref name="annoncer"/> : la partie vient de finir ;
+    /// faux pour un envoi differe, qui s'annonce en groupe (voir EnvoyerLesBrouillonsAsync).
+    /// </summary>
+    private async Task<(RetroBat.Api.Scoring.IssueDEnvoi Issue, string? Statut, int? Rang)> SubmitAsync(
+        string credential, JsonObject passport, string? replayId, bool annoncer, CancellationToken cancellationToken)
     {
         try
         {
@@ -3121,17 +3189,70 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             using var content = new StringContent(passport.ToJsonString(), Encoding.UTF8, "application/json");
             using var response = await client.PostAsync("/api/v1/agent/scores/submissions", content, cancellationToken).ConfigureAwait(false);
             var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            Trace($"VERDICT HTTP {(int)response.StatusCode} - {body}");
-            _logger?.LogInformation("Scoring : verdict serveur {Status} - {Body}", (int)response.StatusCode, body);
+            var statutHttp = (int)response.StatusCode;
+            // L'outil de diagnostic rattache « VERDICT HTTP » a la partie qu'il lit : un verdict
+            // differe porte un autre libelle pour ne pas tomber sur la partie d'apres.
+            Trace($"{(annoncer ? "VERDICT HTTP" : "VERDICT DIFFERE HTTP")} {statutHttp} - {body}");
+            if (RetroBat.Api.Scoring.BrouillonDeScore.Classer(statutHttp, body) == RetroBat.Api.Scoring.IssueDEnvoi.ARetenter)
+            {
+                _logger?.LogInformation("Scoring : pas de verdict du site (HTTP {Status}), la partie reste en file.", statutHttp);
+                return (RetroBat.Api.Scoring.IssueDEnvoi.ARetenter, null, null);
+            }
+
+            // Un renvoi apres une reponse perdue revient en « duplicate » avec le verdict d'origine :
+            // c'est lui qui compte, pour le classement local comme pour le lien du replay.
+            body = VerdictDOrigine(body);
+            _logger?.LogInformation("Scoring : verdict serveur {Status} - {Body}", statutHttp, body);
             PersistCertified(passport, body);
-            MaybeShowClaimOverlay(passport, body);
-            await NotifyVerdictAsync(passport, body, cancellationToken).ConfigureAwait(false);
-            CaptureReplayLinkOnPublished(passport, body);
+            if (annoncer)
+            {
+                MaybeShowClaimOverlay(passport, body);
+                await NotifyVerdictAsync(passport, body, cancellationToken).ConfigureAwait(false);
+            }
+            CaptureReplayLinkOnPublished(passport, body, replayId);
             PublishVerdict(passport, body);
+
+            string? statut = null;
+            int? rang = null;
+            try
+            {
+                var verdict = JsonNode.Parse(body) as JsonObject;
+                statut = (string?)(verdict?["status"] ?? verdict?["verdict"]);
+                rang = verdict?["rank"] is JsonValue r && r.TryGetValue<int>(out var rk) ? rk : null;
+            }
+            catch (JsonException) { }
+            return (RetroBat.Api.Scoring.IssueDEnvoi.Definitif, statut, rang);
         }
         catch (Exception ex)
         {
-            _logger?.LogWarning(ex, "Scoring : soumission impossible.");
+            _logger?.LogWarning(ex, "Scoring : soumission impossible, la partie reste en file.");
+            Trace($"envoi impossible ({ex.GetType().Name}) : la partie reste en file");
+            return (RetroBat.Api.Scoring.IssueDEnvoi.ARetenter, null, null);
+        }
+    }
+
+    /// <summary>
+    /// Le verdict d'origine d'un doublon : « duplicate » accompagne de original_status et
+    /// original_reason (site, 2026-10-03) devient ce verdict-la, rang compris. Sinon, inchange.
+    /// </summary>
+    internal static string VerdictDOrigine(string body)
+    {
+        try
+        {
+            if (JsonNode.Parse(body) is not JsonObject verdict) return body;
+            if ((string?)verdict["status"] != "duplicate" || verdict["original_status"] is not JsonValue origine
+                || !origine.TryGetValue<string>(out var statut) || string.IsNullOrEmpty(statut))
+            {
+                return body;
+            }
+            verdict["status"] = statut;
+            verdict["reason"] = (string?)verdict["original_reason"] ?? "";
+            verdict["duplicate"] = true;
+            return verdict.ToJsonString();
+        }
+        catch (JsonException)
+        {
+            return body;
         }
     }
 
@@ -3513,28 +3634,6 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
     }
 
-    private async Task RequestTicketAsync(CancellationToken cancellationToken)
-    {
-        var credential = ResolveCredential();
-        if (string.IsNullOrEmpty(credential)) return;
-        await EnsureEnrolledAsync(cancellationToken).ConfigureAwait(false);
-        try
-        {
-            using var client = CreateClient(credential);
-            using var response = await client.PostAsync("/api/v1/agent/scores/ticket", content: null, cancellationToken).ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode) return;
-            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            using var doc = JsonDocument.Parse(body);
-            if (doc.RootElement.TryGetProperty("ticket", out var ticket))
-            {
-                lock (_sync) { _ticket = ticket.Clone(); }
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogDebug(ex, "Scoring : demande de ticket impossible.");
-        }
-    }
 
     // Le secret à présenter : celui de l'appareil APPAIRÉ, sinon celui de l'install
     // ANONYME (déjà enregistrée par NelfePlayPlayReporter dans anonymous.json).
@@ -3575,6 +3674,343 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 $"{DateTime.Now:HH:mm:ss.fff} {msg}\n");
         }
         catch { }
+    }
+
+    // ── Brouillons scelles et file d'envoi (piste B, 2026-10-04) ─────────────────
+
+    /// <summary>
+    /// Les parties mesurees, signees, en attente de leur verdict (voir BrouillonDeScore). Un seul
+    /// envoi a la fois : la fin d'une partie et la boucle de fond ne se croisent pas.
+    /// </summary>
+    private readonly RetroBat.Api.Scoring.FileDesBrouillons _brouillons =
+        new(System.IO.Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "brouillons"));
+    private readonly SemaphoreSlim _envoi = new(1, 1);
+
+    /// <summary>La vraie fin de la partie : l'arrivee de sa session, pas l'assemblage du passeport.</summary>
+    private DateTime _finDeLaSession = DateTime.UtcNow;
+
+    private static JsonArray Points(IEnumerable<(long frame, long total)> points)
+        => new(points.Select(p => (JsonNode?)new JsonArray(JsonValue.Create(p.frame), JsonValue.Create(p.total))).ToArray());
+
+    private static List<(long frame, long total)> LirePoints(JsonNode? noeud)
+        => noeud is JsonArray tableau
+            ? tableau.OfType<JsonArray>().Where(p => p.Count >= 2).Select(p => ((long)p[0]!, (long)p[1]!)).ToList()
+            : new List<(long frame, long total)>();
+
+    /// <summary>
+    /// Le brouillon d'une partie : tout ce que le passeport tirera de la mesure, fige a la fin de la
+    /// partie. Le reseau (profil, ticket) et la signature du passeport viendront a l'envoi.
+    /// </summary>
+    private JsonObject NouveauBrouillon(
+        string genre, string systemId, string romGroup, string sessionJson,
+        string listenerSha, string? coreSha, string? memSha, string? contentSha, string? contentMd5, string? contentSha1,
+        string? wrapperVersion, string? coreName, string? coreVersion, long pic,
+        List<(long frame, long total)> run, List<(long frame, long total)> lectures, JsonArray? nvram, JsonObject? bios,
+        RetroBat.Api.Scoring.ContexteDeJeu? contexte, int joueurs, (string Raison, long Frame)? finDuSolo,
+        int? place, string? seance, string? replay, string? regle)
+    {
+        DateTime fin;
+        lock (_sync) fin = _finDeLaSession;
+        var joueur = _scoringSession?.Get();
+        var difficulte = new JsonObject();
+        foreach (var (cle, valeur) in contexte?.Difficulte ?? new Dictionary<string, int>()) difficulte[cle] = valeur;
+        return new JsonObject
+        {
+            ["schema"] = RetroBat.Api.Scoring.BrouillonDeScore.Schema,
+            ["id"] = Guid.NewGuid().ToString(),
+            ["genre"] = genre,
+            // La regle du profil choisi a la fin de la partie, pour MES RECORDS ; l'envoi rechoisit.
+            ["regle"] = regle,
+            ["fin_le"] = fin.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+            ["cree_le"] = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+            ["systeme"] = systemId,
+            ["rom_group"] = romGroup,
+            ["session"] = sessionJson,
+            ["listener"] = listenerSha,
+            ["coeur"] = coreSha,
+            ["mem"] = memSha,
+            ["contenu"] = new JsonObject { ["sha256"] = contentSha, ["md5"] = contentMd5, ["sha1"] = contentSha1 },
+            ["wrapper"] = wrapperVersion,
+            ["coeur_nom"] = coreName,
+            ["coeur_version"] = coreVersion,
+            ["pic"] = pic,
+            ["run"] = Points(run),
+            ["lectures"] = Points(lectures),
+            ["nvram"] = nvram?.DeepClone(),
+            ["bios"] = bios?.DeepClone(),
+            ["mode"] = contexte?.Mode,
+            ["difficulte"] = difficulte,
+            ["joueurs"] = joueurs,
+            ["fin_du_solo"] = finDuSolo is { } coupe ? new JsonObject { ["raison"] = coupe.Raison, ["frame"] = coupe.Frame } : null,
+            ["place"] = place,
+            ["seance"] = seance,
+            ["joueur_de_session"] = joueur is null ? null : new JsonObject
+            {
+                ["code"] = joueur.PlayerCode, ["monde"] = joueur.World, ["salle"] = joueur.VenueName, ["ville"] = joueur.VenueCity,
+                ["chaine"] = joueur.Channel, ["contest"] = joueur.ContestId, ["langue"] = joueur.Locale,
+            },
+            ["labo"] = RetroBat.Api.Scoring.ScoreLabLabMode.IsActive(fin, out _),
+            ["replay"] = replay,
+            ["apiexpose"] = CabinetState.Version,
+            ["etat_wrapper"] = CabinetState.Wrapper,
+        };
+    }
+
+    /// <summary>
+    /// Signe le brouillon, le pose sur le disque et l'envoie tout de suite. En ligne, rien ne change
+    /// pour le joueur : verdict et annonce arrivent comme avant. Site muet : le brouillon reste, la
+    /// boucle de fond le renverra, et le joueur l'apprend.
+    /// </summary>
+    private async Task PoserEtEnvoyerAsync(JsonObject brouillon, long score, CancellationToken ct)
+    {
+        try
+        {
+            using var cle = CngDeviceKey.OpenOrCreate(ScoringKeyName);
+            RetroBat.Api.Scoring.BrouillonDeScore.Signer(brouillon, cle.KeyId, cle.SignB64Url);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Scoring : brouillon impossible a signer.");
+            Trace("STOP: brouillon impossible a signer : " + ex.Message);
+            return;
+        }
+
+        var id = (string)brouillon["id"]!;
+        var pose = _brouillons.Poser(brouillon);
+        Trace(pose
+            ? $"brouillon {id} pose : {score} points, fin de partie {(string?)brouillon["fin_le"]}"
+            : $"brouillon {id} : le disque refuse le fichier, envoi direct sans filet");
+
+        await _envoi.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            var (issue, _, _) = await EnvoyerUnBrouillonAsync(id, brouillon, annoncer: true, ct).ConfigureAwait(false);
+            if (issue == RetroBat.Api.Scoring.IssueDEnvoi.Definitif)
+            {
+                if (pose) _brouillons.Retirer(id);
+                return;
+            }
+
+            if (!pose)
+            {
+                Trace($"STOP: brouillon {id} ni envoye ni pose : score perdu");
+                return;
+            }
+
+            var delai = _brouillons.Reporter(id);
+            Trace($"brouillon {id} garde sur la borne, nouvel essai dans {delai.TotalSeconds:0} s");
+            if (_esNotify is not null)
+            {
+                try { await _esNotify.NotifyAsync(string.Format(Texte("scoring_kept_offline"), ScoreAffiche(score, Langue())), ct).ConfigureAwait(false); }
+                catch (Exception ex) { _logger?.LogDebug(ex, "Scoring : annonce du brouillon garde impossible."); }
+            }
+        }
+        finally
+        {
+            _envoi.Release();
+        }
+    }
+
+    /// <summary>
+    /// La boucle de fond : les brouillons restes en file repartent, du plus ancien au plus recent,
+    /// chacun a son heure. Jamais pendant une partie (le reseau du joueur, et une annonce qui
+    /// ramenerait ES devant). Au retour du site, une seule annonce pour tous les envois.
+    /// </summary>
+    private async Task BoucleDesBrouillonsAsync(CancellationToken ct)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(15), ct).ConfigureAwait(false);
+            while (!ct.IsCancellationRequested)
+            {
+                try
+                {
+                    await EnvoyerLesBrouillonsAsync(ct).ConfigureAwait(false);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    _logger?.LogDebug(ex, "Scoring : tour de la file des brouillons en echec.");
+                }
+                await Task.Delay(TimeSpan.FromSeconds(20), ct).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    private async Task EnvoyerLesBrouillonsAsync(CancellationToken ct)
+    {
+        var attente = _brouillons.EnAttente();
+        if (attente.Count == 0 || !attente.Any(b => _brouillons.EstDu(b.Id))) return;
+        if (EmulatorForeground.EmulateurTourne()) return;
+
+        await _envoi.WaitAsync(ct).ConfigureAwait(false);
+        var envoyes = 0;
+        int? meilleurRang = null;
+        try
+        {
+            foreach (var (id, brouillon) in _brouillons.EnAttente())
+            {
+                if (!_brouillons.EstDu(id)) continue;
+                if (EmulatorForeground.EmulateurTourne()) break;   // une partie commence : on reprendra apres
+                var (issue, statut, rang) = await EnvoyerUnBrouillonAsync(id, brouillon, annoncer: false, ct).ConfigureAwait(false);
+                if (issue == RetroBat.Api.Scoring.IssueDEnvoi.Definitif)
+                {
+                    _brouillons.Retirer(id);
+                    if (statut is not null) envoyes++;
+                    if (rang is { } r && (meilleurRang is null || r < meilleurRang)) meilleurRang = r;
+                    continue;
+                }
+
+                var delai = _brouillons.Reporter(id);
+                Trace($"brouillon {id} : site toujours muet, nouvel essai dans {delai.TotalSeconds:0} s");
+                break;   // le site ne repond pas : inutile d'essayer les suivants maintenant
+            }
+        }
+        finally
+        {
+            _envoi.Release();
+        }
+
+        if (envoyes > 0 && _esNotify is not null)
+        {
+            var message = meilleurRang is { } meilleur
+                ? string.Format(Texte("scoring_deferred_sent_rank"), envoyes, meilleur)
+                : string.Format(Texte("scoring_deferred_sent"), envoyes);
+            Trace($"file des brouillons : {envoyes} partie(s) envoyee(s) au retour du site" + (meilleurRang is { } m ? $", meilleur rang {m}" : ""));
+            try { await _esNotify.NotifyAsync(message, ct).ConfigureAwait(false); }
+            catch (Exception ex) { _logger?.LogDebug(ex, "Scoring : annonce des envois differes impossible."); }
+        }
+    }
+
+    /// <summary>
+    /// Un brouillon vers son verdict : verification de sa signature, profil, ticket, passeport signe,
+    /// envoi. Rend l'issue, le statut du verdict et le rang quand il y en a un.
+    /// </summary>
+    private async Task<(RetroBat.Api.Scoring.IssueDEnvoi Issue, string? Statut, int? Rang)> EnvoyerUnBrouillonAsync(
+        string id, JsonObject brouillon, bool annoncer, CancellationToken ct)
+    {
+        const RetroBat.Api.Scoring.IssueDEnvoi Retenter = RetroBat.Api.Scoring.IssueDEnvoi.ARetenter;
+        using var cle = CngDeviceKey.OpenOrCreate(ScoringKeyName);
+        if (!RetroBat.Api.Scoring.BrouillonDeScore.Verifier(brouillon, cle.SpkiDer))
+        {
+            Trace($"brouillon {id} : signature invalide (fichier modifie ou autre cle), mis de cote sans envoi");
+            _logger?.LogWarning("Scoring : brouillon {Id} modifie ou signe par une autre cle, ecarte.", id);
+            _brouillons.Ecarter(id, "refuses");
+            return (RetroBat.Api.Scoring.IssueDEnvoi.Definitif, null, null);
+        }
+
+        var credential = ResolveCredential();
+        if (string.IsNullOrEmpty(credential))
+        {
+            Trace($"brouillon {id} : pas de credential, nouvel essai plus tard");
+            return (Retenter, null, null);
+        }
+
+        var systemId = (string?)brouillon["systeme"] ?? "";
+        var romGroup = (string?)brouillon["rom_group"] ?? "";
+        var multi = (string?)brouillon["genre"] == "multi";
+        var mode = (int?)brouillon["mode"];
+        var (profils, duSite) = await ProfilsAsync(credential, systemId, romGroup, ct).ConfigureAwait(false);
+        JsonElement? profile = multi
+            ? profils.Where(p => p.TryGetProperty("ruleset", out var r) && r.GetString() == CategorieMulti).Select(p => (JsonElement?)p).FirstOrDefault()
+            : RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil(profils, mode);
+        if (profile is null)
+        {
+            if ((bool?)brouillon["labo"] == true)
+            {
+                profile = RetroBat.Api.Scoring.ScoreLabLabMode.PlaceholderProfile();
+            }
+            else if (duSite)
+            {
+                Trace($"brouillon {id} : plus aucun classement ouvert pour {romGroup}{(multi ? " " + CategorieMulti : "")}, retire sans envoi");
+                return (RetroBat.Api.Scoring.IssueDEnvoi.Definitif, null, null);
+            }
+            else
+            {
+                Trace($"brouillon {id} : profil de {romGroup} inconnu et site injoignable, nouvel essai plus tard");
+                return (Retenter, null, null);
+            }
+        }
+
+        var ticket = await TicketAsync(credential, ct).ConfigureAwait(false);
+        var deviceId = ticket is { } t && t.TryGetProperty("device_id", out var did) ? did.GetString() : null;
+        if (ticket is null || string.IsNullOrEmpty(deviceId))
+        {
+            Trace($"brouillon {id} : ticket indisponible, nouvel essai plus tard");
+            return (Retenter, null, null);
+        }
+
+        JsonObject passport;
+        try
+        {
+            var difficulte = new Dictionary<string, int>(StringComparer.Ordinal);
+            if (brouillon["difficulte"] is JsonObject d)
+            {
+                foreach (var (k, v) in d) if (v is JsonValue jv && jv.TryGetValue<int>(out var n)) difficulte[k] = n;
+            }
+            var contexte = multi ? null : new RetroBat.Api.Scoring.ContexteDeJeu(mode, difficulte);
+            (string Raison, long Frame)? finDuSolo = brouillon["fin_du_solo"] is JsonObject f
+                ? ((string?)f["raison"] ?? "", (long?)f["frame"] ?? 0)
+                : null;
+            NelfePlayScoringSessionService.SessionPlayer? joueur = brouillon["joueur_de_session"] is JsonObject j
+                ? new NelfePlayScoringSessionService.SessionPlayer((string?)j["code"] ?? "", (string?)j["monde"] ?? "home",
+                    (string?)j["salle"], (string?)j["ville"], (string?)j["chaine"], (string?)j["contest"], (string?)j["langue"])
+                : null;
+            var contenu = brouillon["contenu"] as JsonObject;
+            var fin = DateTime.Parse((string)brouillon["fin_le"]!, System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.AdjustToUniversal | System.Globalization.DateTimeStyles.AssumeUniversal);
+
+            passport = BuildPassport(
+                systemId, romGroup, (string?)brouillon["session"] ?? "{}", ticket.Value, profile.Value,
+                deviceId!, cle, (string?)brouillon["listener"] ?? "", (string?)brouillon["coeur"], (string?)brouillon["mem"],
+                (string?)contenu?["sha256"], (string?)contenu?["md5"], (string?)contenu?["sha1"], (string?)brouillon["wrapper"],
+                (string?)brouillon["coeur_nom"], (string?)brouillon["coeur_version"],
+                (long?)brouillon["pic"] ?? 0, LirePoints(brouillon["run"]), LirePoints(brouillon["lectures"]),
+                brouillon["nvram"]?.DeepClone() as JsonArray, brouillon["bios"]?.DeepClone() as JsonObject,
+                contexte, (int?)brouillon["joueurs"] ?? 1, finDuSolo, (int?)brouillon["place"], (string?)brouillon["seance"],
+                sessionId: id, finUtc: fin, joueurFige: (joueur, true), labo: (bool?)brouillon["labo"] == true,
+                versionApi: (string?)brouillon["apiexpose"], etatWrapper: (string?)brouillon["etat_wrapper"]);
+            var corps = passport.DeepClone()!.AsObject();
+            corps.Remove("signature");
+            passport["signature"] = cle.SignB64Url(Jcs.CanonicalBytes(corps));
+        }
+        catch (Exception ex)
+        {
+            // Un brouillon qu'on ne sait pas assembler ne s'assemblera pas mieux plus tard.
+            _logger?.LogWarning(ex, "Scoring : assemblage du passeport du brouillon {Id} impossible.", id);
+            Trace($"brouillon {id} : assemblage impossible ({ex.Message}), mis de cote");
+            _brouillons.Ecarter(id, "refuses");
+            return (RetroBat.Api.Scoring.IssueDEnvoi.Definitif, null, null);
+        }
+
+        var essais = _brouillons.Essais(id);
+        Trace($"brouillon {id} : envoi{(essais > 0 ? $" (essai {essais + 1})" : "")}, {(string?)brouillon["genre"]} {romGroup} {(long?)brouillon["pic"]} points");
+        return await SubmitAsync(credential, passport, (string?)brouillon["replay"], annoncer, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>Un ticket de soumission, ou null quand le site ne le donne pas maintenant.</summary>
+    private async Task<JsonElement?> TicketAsync(string credential, CancellationToken cancellationToken)
+    {
+        await EnsureEnrolledAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            using var client = CreateClient(credential);
+            using var response = await client.PostAsync("/api/v1/agent/scores/ticket", content: null, cancellationToken).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
+            {
+                Trace($"ticket : HTTP {(int)response.StatusCode}");
+                return null;
+            }
+            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            using var doc = JsonDocument.Parse(body);
+            return doc.RootElement.TryGetProperty("ticket", out var ticket) ? ticket.Clone() : null;
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogDebug(ex, "Scoring : demande de ticket impossible.");
+            Trace($"ticket : site injoignable ({ex.GetType().Name})");
+            return null;
+        }
     }
 
     // ── Lien replay ↔ score ──────────────────────────────────────────────────
@@ -3641,7 +4077,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return choisi;
     }
 
-    private void CaptureReplayLinkOnPublished(JsonObject passport, string responseBody)
+    private void CaptureReplayLinkOnPublished(JsonObject passport, string responseBody, string? replayId)
     {
         try
         {
@@ -3661,14 +4097,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
             int? rank = (verdict?["rank"] is JsonValue rv && rv.TryGetValue<int>(out var rk)) ? rk : (int?)null;
 
-            string? replayId;
-            var multi = string.Equals((string?)(passport["game"] as JsonObject)?["ruleset"], CategorieMulti, StringComparison.Ordinal);
+            // Le replay vient du brouillon : celui du meilleur run pour le solo, celui de la partie
+            // pour le 1CC MULTI, choisi a la fin de la partie et non plus au moment du verdict.
+            if (string.IsNullOrEmpty(replayId)) return;
             lock (_sync)
             {
-                // Le solo prend le replay de son meilleur run ; le 1CC MULTI garde celui de la partie.
-                replayId = multi ? _replayDeLaPartie : (_replayDuMeilleurRun ?? _replayDeLaPartie);
-                if (!multi) _replayDuMeilleurRun = null;
-                if (string.IsNullOrEmpty(replayId)) return;
                 PruneReplayLinks();
                 _pendingScoreLink[replayId!] = (sessionId!, "public", score, rank, DateTime.UtcNow);
                 SauverLesLiens();

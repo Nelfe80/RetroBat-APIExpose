@@ -34,13 +34,18 @@ public sealed class LocalPlaysIndex
     public sealed record ReplayLocal(string ReplayId, DateTime FinUtc, TimeSpan Duree, long? Score);
 
     private readonly string _dossier;
+    private readonly string _brouillons;
     private readonly object _verrou = new();
     private readonly Dictionary<string, (DateTime Ecrit, Partie? Partie)> _resumes = new(StringComparer.OrdinalIgnoreCase);
 
     public LocalPlaysIndex(string? dossier = null)
     {
         _dossier = dossier ?? Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "certified");
+        _brouillons = Path.Combine(Path.GetDirectoryName(_dossier) ?? _dossier, "brouillons");
     }
+
+    /// <summary>Le verdict d'une partie gardee sur la borne, pas encore envoyee (piste B).</summary>
+    public const string EnAttente = "pending";
 
     /// <summary>Toutes les parties lisibles du dossier. Ne relit que les fichiers nouveaux ou modifies.</summary>
     public IReadOnlyList<Partie> Toutes()
@@ -63,7 +68,64 @@ public sealed class LocalPlaysIndex
                 _resumes[fichier] = (ecrit, partie);
             }
             foreach (var parti in _resumes.Keys.Where(k => !vus.Contains(k)).ToList()) _resumes.Remove(parti);
-            return _resumes.Values.Select(v => v.Partie).OfType<Partie>().ToList();
+            var parties = _resumes.Values.Select(v => v.Partie).OfType<Partie>().ToList();
+
+            // LES PARTIES EN ATTENTE D'ENVOI (piste B, 2026-10-04) : le site muet, la partie est
+            // gardee en brouillon. Elle apparait tout de suite, marquee, avec son replay local. Une
+            // fois jugee, elle passe dans certified sous le meme identifiant.
+            var jugees = new HashSet<string>(parties.Select(p => p.SessionId), StringComparer.OrdinalIgnoreCase);
+            if (Directory.Exists(_brouillons))
+            {
+                foreach (var fichier in Directory.EnumerateFiles(_brouillons, "*.json"))
+                {
+                    Partie? brouillon;
+                    try { brouillon = LireBrouillon(File.ReadAllText(fichier)); }
+                    catch (IOException) { continue; }
+                    catch (UnauthorizedAccessException) { continue; }
+                    if (brouillon is not null && !jugees.Contains(brouillon.SessionId)) parties.Add(brouillon);
+                }
+            }
+            return parties;
+        }
+    }
+
+    /// <summary>Le resume d'un brouillon en attente d'envoi ; null s'il est illisible.</summary>
+    internal static Partie? LireBrouillon(string json)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            var b = doc.RootElement;
+            static string Texte(JsonElement e, string nom)
+                => e.ValueKind == JsonValueKind.Object && e.TryGetProperty(nom, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : "";
+            if (b.ValueKind != JsonValueKind.Object || Texte(b, "id").Length == 0 || Texte(b, "rom_group").Length == 0) return null;
+            if (!b.TryGetProperty("pic", out var pic) || !pic.TryGetInt64(out var score)) return null;
+            if (!DateTime.TryParse(Texte(b, "fin_le"), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var fin)) return null;
+            var duree = 0L;
+            try
+            {
+                using var session = JsonDocument.Parse(Texte(b, "session") is { Length: > 0 } s ? s : "{}");
+                if (session.RootElement.TryGetProperty("monotonic_ms", out var ms) && ms.TryGetInt64(out var n)) duree = n;
+            }
+            catch (JsonException) { }
+            var joueur = b.TryGetProperty("joueur_de_session", out var j) && j.ValueKind == JsonValueKind.Object ? j : default;
+            var labo = b.TryGetProperty("labo", out var l) && l.ValueKind == JsonValueKind.True;
+            return new Partie(
+                Texte(b, "id"),
+                Texte(b, "rom_group"),
+                Texte(b, "regle"),
+                score,
+                false,
+                fin.AddMilliseconds(-duree),
+                fin,
+                EnAttente,
+                Texte(joueur, "monde") is { Length: > 0 } monde ? monde : "home",
+                Texte(joueur, "code"),
+                labo);
+        }
+        catch (JsonException)
+        {
+            return null;
         }
     }
 
@@ -157,12 +219,15 @@ public sealed class LocalPlaysIndex
         string regle,
         string joueurDeSession,
         IReadOnlyList<ReplayLocal> replays,
-        Func<DateTime, string> date)
+        Func<DateTime, string> date,
+        string motEnAttente = "")
     {
         var choisies = parties
             .Where(Retenue)
             .Where(p => string.Equals(p.RomGroup, romGroup, StringComparison.OrdinalIgnoreCase))
-            .Where(p => regle.Length == 0 || string.Equals(p.Regle, regle, StringComparison.OrdinalIgnoreCase))
+            // Un brouillon sans profil connu a la fin de sa partie n'a pas de regle : il se montre partout.
+            .Where(p => regle.Length == 0 || string.Equals(p.Regle, regle, StringComparison.OrdinalIgnoreCase)
+                        || (p.Verdict == EnAttente && p.Regle.Length == 0))
             .Where(p => string.Equals(p.JoueurDeSession.Trim(), (joueurDeSession ?? "").Trim(), StringComparison.OrdinalIgnoreCase))
             .ToList();
         var plusBas = choisies.Count > 0 && choisies.All(p => p.PlusBasEstMieux);
@@ -171,7 +236,8 @@ public sealed class LocalPlaysIndex
             .ToList();
         return rangees.Select((p, i) => new LeaderboardClient.Ligne(
             Rang: i + 1,
-            Joueur: date(p.DebutUtc),
+            // Une partie gardee sur la borne le dit a cote de sa date.
+            Joueur: p.Verdict == EnAttente && motEnAttente.Length > 0 ? $"{date(p.DebutUtc)} ({motEnAttente})" : date(p.DebutUtc),
             Valeur: p.Score,
             Ville: "",
             Pays: "",
