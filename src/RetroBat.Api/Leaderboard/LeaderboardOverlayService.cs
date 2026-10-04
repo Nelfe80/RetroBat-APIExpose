@@ -423,6 +423,23 @@ public sealed class LeaderboardOverlayService : IDisposable
         _polices.Dispose();
     }
 
+    /// <summary>
+    /// Le texte coupe pour tenir dans la largeur, termine par trois points (2026-10-04). GDI+
+    /// coupait sur « … », que la police du theme n'a pas : chargee en police privee, elle n'a
+    /// aucun repli, et le caractere sortait en carres (« LORENZOLA » suivi de trois cases).
+    /// </summary>
+    internal static string Couper(Graphics g, string texte, Font police, float largeur)
+    {
+        float Mesure(string t) => g.MeasureString(t, police, PointF.Empty, StringFormat.GenericTypographic).Width;
+        if (texte.Length == 0 || Mesure(texte) <= largeur) return texte;
+        for (var n = texte.Length - 1; n > 0; n--)
+        {
+            var coupe = texte[..n].TrimEnd() + "...";
+            if (Mesure(coupe) <= largeur) return coupe;
+        }
+        return "...";
+    }
+
     // ── La fenetre ───────────────────────────────────────────────────────────
 
     private sealed class Panneau : Form
@@ -731,7 +748,7 @@ public sealed class LeaderboardOverlayService : IDisposable
             var hauteurTitre = tailleTitre * 1.5f;
             var y = _hauteurEcran * 0.0637f - hauteurTitre / 2f;
             using (var encre = new SolidBrush(Teinte(s.TitleColor)))
-            using (var centre = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter })
+            using (var centre = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.Character })
             {
                 // La marque World Scoring tient le titre a elle seule : c'est la plateforme qui
                 // parle ici, a cote du jeu qu'ES presente. Le mot « Classement » ne revient
@@ -1043,7 +1060,7 @@ public sealed class LeaderboardOverlayService : IDisposable
             var couleurChoisi = Teinte(s.SelectedTextColor);
             var couleurMoi = Teinte(s.TitleColor);
             var couleurGroupe = Teinte(s.GroupColor);
-            using var gauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter, FormatFlags = StringFormatFlags.NoWrap };
+            using var gauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.Character, FormatFlags = StringFormatFlags.NoWrap };
             using var droite = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Far, LineAlignment = StringAlignment.Center };
 
             // Ce que chaque ligne occupe, surtitre compris, pour faire defiler juste.
@@ -1060,6 +1077,56 @@ public sealed class LeaderboardOverlayService : IDisposable
             var hauteurIcone = (int) (taille * 0.9f);            // 1,25 x la hauteur de lettre
             var etiquette = c.EtiquetteReplay.ToUpperInvariant();
             var premiereLigne = premier;
+
+            // LES COLONNES (2026-10-04). Chaque ligne placait ses elements a la suite, selon sa
+            // propre place : la touche de la ligne choisie poussait FOLLOWING, ses boutons
+            // rognaient le pseudo (coupe sur un « … » que la police du theme n'a pas : trois
+            // carres), la maison suivait chaque pseudo et le sceau chaque score. Les largeurs se
+            // mesurent une fois sur les lignes visibles, et chaque colonne commence au meme x.
+            var finVisible = Math.Min(c.Lignes.Count, premier + (int) Math.Ceiling(Math.Max(0f, bas - y) / hauteur) + 1);
+            var largeurScore = 0f;
+            var largeurNomMax = 0f;
+            var sceauVisible = false;
+            var suiviVisible = false;
+            var mondeVisible = false;
+            for (var i = premier; i < finVisible; i++)
+            {
+                var l = c.Lignes[i];
+                largeurScore = Math.Max(largeurScore, g.MeasureString(l.Valeur.ToString("N0", System.Globalization.CultureInfo.CurrentCulture), gras, PointF.Empty, StringFormat.GenericTypographic).Width);
+                largeurNomMax = Math.Max(largeurNomMax, g.MeasureString((l.Joueur.Length > 0 ? l.Joueur : "?").ToUpperInvariant(), police, PointF.Empty, StringFormat.GenericTypographic).Width + 2);
+                sceauVisible |= l.Scelle;
+                suiviVisible |= l.Poignee.Length > 0;
+                mondeVisible |= l.Monde is "station" or "stream" or "home";
+            }
+
+            // A droite : le score (aligne a droite), le sceau, puis la colonne REPLAY / boutons.
+            var sceau = sceauVisible ? _service._glyphes?.Glyphe("nelfe-verified", (int) (taille * 1.0f)) : null;
+            var xScore = Width - marge;
+            var xSceau = xScore - largeurScore - taille * 0.5f;
+            var xReplay = xSceau - (sceau is null ? 0f : sceau.Width + taille * 0.5f) - taille * 0.7f;
+
+            // La colonne REPLAY prend la largeur de son contenu le plus large : l'etiquette, le
+            // sablier d'un replay en preparation, ou les boutons de la ligne choisie.
+            var largeurReplay = 0f;
+            for (var i = premier; i < finVisible; i++)
+            {
+                var choisie = i == c.LigneCourante && c.NousAvonsLaMain;
+                largeurReplay = Math.Max(largeurReplay, xReplay - GroupeReplay(c.Lignes[i], choisie, xReplay, 0f, Color.Empty, dessiner: false));
+            }
+
+            // A gauche : la coupe, le rang, la touche et l'etat de suivi, puis le pseudo et son monde.
+            var xRang = marge + hauteurIcone + 10f;
+            var xSuivi = xRang + largeurRang;
+            var touche = suiviVisible && c.GlypheSuivre.Length > 0 ? _service._glyphes?.Glyphe(c.GlypheSuivre, (int) (taille * 0.9f), Teinte(s.SelectedTextColor)) : null;
+            var largeurTouche = touche is null ? 0f : touche.Width + taille * 0.2f;
+            var largeurSuivi = !suiviVisible ? 0f : largeurTouche + taille * 0.5f + new[] { c.SuivreMot, c.SuiviMot }
+                .Select(mot => mot.Length == 0 ? 0f : g.MeasureString(mot.ToUpperInvariant(), petite, PointF.Empty, StringFormat.GenericTypographic).Width)
+                .Max();
+            var xNom = xSuivi + largeurSuivi;
+            var largeurMonde = mondeVisible ? taille * 0.6f + taille * 1.1f : 0f;
+            var placeDuNom = xReplay - largeurReplay - taille * 0.6f - largeurMonde - xNom;
+            var largeurNom = Math.Max(10f, Math.Min(largeurNomMax, placeDuNom));
+            var xMonde = xNom + largeurNom + taille * 0.6f;
 
             for (var i = premier; i < c.Lignes.Count; i++)
             {
@@ -1080,33 +1147,101 @@ public sealed class LeaderboardOverlayService : IDisposable
                 var encre = choisie ? couleurChoisi : (l.CestMoi ? couleurMoi : couleurTexte);
                 using var pinceau = new SolidBrush(encre);
 
-                // A droite : le score, le sceau s'il y a lieu, puis les boutons de la ligne choisie.
                 // Le score en GRAS : c'est la donnee que l'oeil cherche en premier.
                 var valeur = l.Valeur.ToString("N0", System.Globalization.CultureInfo.CurrentCulture);
-                var xDroite = Width - marge;
-                g.DrawString(valeur, gras, pinceau, new RectangleF(0, y, xDroite, hauteur), droite);
-                xDroite -= g.MeasureString(valeur, gras, PointF.Empty, StringFormat.GenericTypographic).Width + taille * 0.5f;
-                if (l.Scelle)
+                g.DrawString(valeur, gras, pinceau, new RectangleF(0, y, xScore, hauteur), droite);
+                if (l.Scelle && sceau is not null)
                 {
-                    var sceau = _service._glyphes?.Glyphe("nelfe-verified", (int) (taille * 1.0f));
-                    if (sceau is not null)
+                    g.DrawImage(sceau, xSceau - sceau.Width, y + (hauteur - sceau.Height) / 2f, sceau.Width, sceau.Height);
+                }
+                GroupeReplay(l, choisie, xReplay, y, encre, dessiner: true);
+
+                // La coupe de la premiere place, par la police d'icones d'ES (FontAwesome).
+                if (l.Rang == 1 && !c.SansPodium && _service._policeSymboles is { } coupe)
+                {
+                    using var policeCoupe = new Font(coupe, taille * 0.95f, FontStyle.Regular, GraphicsUnit.Pixel);
+                    using var encreCoupe = new SolidBrush(choisie ? couleurChoisi : Teinte(s.TitleColor));
+                    g.DrawString("\uF091", policeCoupe, encreCoupe, new RectangleF(marge, y, hauteurIcone * 1.6f, hauteur), gauche);
+                }
+
+                // Le rang s'ecrit comme sur nelfeplay.com : la colonne « # ». Les trois
+                // premiers portent en plus leur ordinal, le meme mot que le podium du site.
+                var rang = "#" + l.Rang;
+                var policeRang = l.Rang <= 3 && !c.SansPodium ? gras : police;
+                g.DrawString(rang, policeRang, pinceau, new RectangleF(xRang, y, largeurRang, hauteur), gauche);
+
+                // Le mouvement depuis la derniere consultation : fleche BLEUE vers le haut quand le
+                // joueur est monte, ORANGE vers le bas quand il est descendu. Couleurs de sens, pas du
+                // theme : elles doivent se lire pareil quel que soit le colorset.
+                var mouvement = LeaderboardRankHistory.Mouvement(l, c.RangsPrecedents);
+                if (mouvement != 0)
+                {
+                    var cote = taille * 0.42f;
+                    var xFleche = xRang + g.MeasureString(rang, policeRang, PointF.Empty, StringFormat.GenericTypographic).Width + taille * 0.22f;
+                    var yMilieu = y + hauteur / 2f;
+                    var couleur = mouvement > 0
+                        ? (choisie ? Color.White : Color.FromArgb(255, 60, 140, 255))
+                        : Color.FromArgb(255, 245, 160, 50);
+                    using var encreFleche = new SolidBrush(couleur);
+                    var avant = g.SmoothingMode;
+                    g.SmoothingMode = SmoothingMode.AntiAlias;
+                    g.FillPolygon(encreFleche, mouvement > 0
+                        ? new[] { new PointF(xFleche + cote / 2f, yMilieu - cote * 0.55f), new PointF(xFleche + cote, yMilieu + cote * 0.45f), new PointF(xFleche, yMilieu + cote * 0.45f) }
+                        : new[] { new PointF(xFleche, yMilieu - cote * 0.45f), new PointF(xFleche + cote, yMilieu - cote * 0.45f), new PointF(xFleche + cote / 2f, yMilieu + cote * 0.55f) });
+                    g.SmoothingMode = avant;
+                }
+
+                // L'etat de suivi, dans sa colonne : sur la ligne choisie il annonce ce que fait la
+                // touche (dessinee dans sa place reservee), sur les autres il rappelle qui l'on suit.
+                if (l.Poignee.Length > 0)
+                {
+                    var etiquetteSuivi = (choisie
+                        ? (c.SuitLaLigne ? c.SuiviMot : c.SuivreMot)
+                        : (_service._suivis.Contains(l.Poignee) ? c.SuiviMot : "")).ToUpperInvariant();
+                    if (etiquetteSuivi.Length > 0)
                     {
-                        g.DrawImage(sceau, xDroite - sceau.Width, y + (hauteur - sceau.Height) / 2f, sceau.Width, sceau.Height);
-                        xDroite -= sceau.Width + taille * 0.5f;
+                        if (choisie && touche is not null)
+                        {
+                            g.DrawImage(touche, xSuivi, y + (hauteur - touche.Height) / 2f, touche.Width, touche.Height);
+                        }
+                        using var encreSuivi = new SolidBrush(choisie ? couleurChoisi : couleurGroupe);
+                        g.DrawString(etiquetteSuivi, petite, encreSuivi, new RectangleF(xSuivi + largeurTouche, y, largeurSuivi, hauteur), gauche);
                     }
                 }
-                xDroite -= taille * 0.7f;
 
+                // Le pseudo en CAPITALES, comme les entrees d'ES, coupe par trois points s'il deborde.
+                var nom = Couper(g, (l.Joueur.Length > 0 ? l.Joueur : "?").ToUpperInvariant(), police, largeurNom);
+                g.DrawString(nom, police, pinceau, new RectangleF(xNom, y, largeurNom + 2, hauteur), gauche);
+
+                // Le monde du record, par la police FontAwesome d'ES : maison, immeuble (salle
+                // verifiee) ou trophee (contest). Un pictogramme que le joueur lit sans legende.
+                var monde = l.Monde switch { "station" => "\uF1AD", "stream" => "\uF091", "home" => "\uF015", _ => "" };
+                if (monde.Length > 0 && _service._policeSymboles is { } symboles)
+                {
+                    using var policeSymboles = new Font(symboles, taille * 0.8f, FontStyle.Regular, GraphicsUnit.Pixel);
+                    using var encreMonde = new SolidBrush(choisie ? couleurChoisi : couleurTexte);
+                    g.DrawString(monde, policeSymboles, encreMonde, new RectangleF(xMonde, y, taille * 1.2f, hauteur), gauche);
+                }
+
+                y += hauteur;
+            }
+
+            // La colonne REPLAY d'une ligne, alignee a droite sur xDroite : les boutons de la ligne
+            // choisie, sinon l'etiquette REPLAY, ou REPLAY en gris avec le sablier quand le replay
+            // de cette borne n'est pas encore sur la plateforme. Mesure (dessiner = false) ou
+            // dessine ; rend le bord gauche.
+            float GroupeReplay(LeaderboardClient.Ligne l, bool choisie, float xDroite, float yLigne, Color encre, bool dessiner)
+            {
                 if (choisie)
                 {
                     foreach (var action in c.ActionsDeLaLigne)
                     {
-                        xDroite = Bouton(g, s, petite, taille * 0.8f, action.Mot.ToUpperInvariant(), xDroite, y, hauteur, enFocus: true, discret: true);
-                        var icone = _service._glyphes?.Glyphe(action.Glyphe, (int) (taille * 1.2f), choisie ? encre : Teinte(s.HelpIconColor));
+                        xDroite = Bouton(g, s, petite, taille * 0.8f, action.Mot.ToUpperInvariant(), xDroite, yLigne, hauteur, enFocus: true, discret: true, dessiner: dessiner);
+                        var icone = _service._glyphes?.Glyphe(action.Glyphe, (int) (taille * 1.2f), dessiner ? encre : Teinte(s.SelectedTextColor));
                         if (icone is not null)
                         {
                             xDroite -= taille * 0.35f;
-                            g.DrawImage(icone, xDroite - icone.Width, y + (hauteur - icone.Height) / 2f, icone.Width, icone.Height);
+                            if (dessiner) g.DrawImage(icone, xDroite - icone.Width, yLigne + (hauteur - icone.Height) / 2f, icone.Width, icone.Height);
                             xDroite -= icone.Width + taille * 0.8f;
                         }
                     }
@@ -1120,101 +1255,26 @@ public sealed class LeaderboardOverlayService : IDisposable
                     var sablier = _service._glyphes?.Glyphe("busy_" + (_imageSablier % 4), (int) (taille * 0.9f), gris);
                     if (sablier is not null)
                     {
-                        g.DrawImage(sablier, xDroite - sablier.Width, y + (hauteur - sablier.Height) / 2f, sablier.Width, sablier.Height);
+                        if (dessiner) g.DrawImage(sablier, xDroite - sablier.Width, yLigne + (hauteur - sablier.Height) / 2f, sablier.Width, sablier.Height);
                         xDroite -= sablier.Width + taille * 0.3f;
                     }
-                    using var encreGrise = new SolidBrush(gris);
-                    g.DrawString(etiquette, petite, encreGrise, new RectangleF(0, y, xDroite, hauteur), droite);
+                    if (dessiner)
+                    {
+                        using var encreGrise = new SolidBrush(gris);
+                        g.DrawString(etiquette, petite, encreGrise, new RectangleF(0, yLigne, xDroite, hauteur), droite);
+                    }
                     xDroite -= g.MeasureString(etiquette, petite, PointF.Empty, StringFormat.GenericTypographic).Width + taille * 0.8f;
                 }
                 else if (!choisie && l.ReplayId is { Length: > 0 } && etiquette.Length > 0)
                 {
-                    using var encreEtiquette = new SolidBrush(couleurGroupe);
-                    g.DrawString(etiquette, petite, encreEtiquette, new RectangleF(0, y, xDroite, hauteur), droite);
+                    if (dessiner)
+                    {
+                        using var encreEtiquette = new SolidBrush(couleurGroupe);
+                        g.DrawString(etiquette, petite, encreEtiquette, new RectangleF(0, yLigne, xDroite, hauteur), droite);
+                    }
                     xDroite -= g.MeasureString(etiquette, petite, PointF.Empty, StringFormat.GenericTypographic).Width + taille * 0.8f;
                 }
-
-                // A gauche : la coupe du vainqueur, le rang, le joueur, son origine.
-                var x = marge;
-                if (l.Rang == 1 && !c.SansPodium && _service._policeSymboles is { } coupe)
-                {
-                    // La coupe de la premiere place, par la police d'icones d'ES (FontAwesome).
-                    using var policeCoupe = new Font(coupe, taille * 0.95f, FontStyle.Regular, GraphicsUnit.Pixel);
-                    using var encreCoupe = new SolidBrush(choisie ? couleurChoisi : Teinte(s.TitleColor));
-                    g.DrawString("\uF091", policeCoupe, encreCoupe, new RectangleF(x, y, hauteurIcone * 1.6f, hauteur), gauche);
-                }
-                x += hauteurIcone + 10f;
-
-                // Le rang s'ecrit comme sur nelfeplay.com : la colonne « # ». Les trois
-                // premiers portent en plus leur ordinal, le meme mot que le podium du site.
-                var rang = "#" + l.Rang;
-                var policeRang = l.Rang <= 3 && !c.SansPodium ? gras : police;
-                g.DrawString(rang, policeRang, pinceau, new RectangleF(x, y, largeurRang, hauteur), gauche);
-
-                // Le mouvement depuis la derniere consultation : fleche BLEUE vers le haut quand le
-                // joueur est monte, ORANGE vers le bas quand il est descendu. Couleurs de sens, pas du
-                // theme : elles doivent se lire pareil quel que soit le colorset.
-                var mouvement = LeaderboardRankHistory.Mouvement(l, c.RangsPrecedents);
-                if (mouvement != 0)
-                {
-                    var cote = taille * 0.42f;
-                    var xFleche = x + g.MeasureString(rang, policeRang, PointF.Empty, StringFormat.GenericTypographic).Width + taille * 0.22f;
-                    var yMilieu = y + hauteur / 2f;
-                    var couleur = mouvement > 0
-                        ? (choisie ? Color.White : Color.FromArgb(255, 60, 140, 255))
-                        : Color.FromArgb(255, 245, 160, 50);
-                    using var encreFleche = new SolidBrush(couleur);
-                    var avant = g.SmoothingMode;
-                    g.SmoothingMode = SmoothingMode.AntiAlias;
-                    g.FillPolygon(encreFleche, mouvement > 0
-                        ? new[] { new PointF(xFleche + cote / 2f, yMilieu - cote * 0.55f), new PointF(xFleche + cote, yMilieu + cote * 0.45f), new PointF(xFleche, yMilieu + cote * 0.45f) }
-                        : new[] { new PointF(xFleche, yMilieu - cote * 0.45f), new PointF(xFleche + cote, yMilieu - cote * 0.45f), new PointF(xFleche + cote / 2f, yMilieu + cote * 0.55f) });
-                    g.SmoothingMode = avant;
-                }
-                x += largeurRang;
-
-                // L'etat de suivi, juste avant le pseudo : sur la ligne choisie il annonce ce
-                // que fait la touche, sur les autres il rappelle qui l'on suit deja.
-                if (l.Poignee.Length > 0)
-                {
-                    var suivi = choisie ? (c.SuitLaLigne ? c.SuiviMot : c.SuivreMot) : (c.SuitLaLigne && false ? c.SuiviMot : "");
-                    var etiquetteSuivi = (choisie ? suivi : (_service._suivis.Contains(l.Poignee) ? c.SuiviMot : "")).ToUpperInvariant();
-                    if (etiquetteSuivi.Length > 0)
-                    {
-                        using var encreSuivi = new SolidBrush(choisie ? couleurChoisi : couleurGroupe);
-                        var largeurSuivi = g.MeasureString(etiquetteSuivi, petite, PointF.Empty, StringFormat.GenericTypographic).Width;
-                        if (choisie && c.GlypheSuivre.Length > 0)
-                        {
-                            var touche = _service._glyphes?.Glyphe(c.GlypheSuivre, (int) (taille * 0.9f), couleurChoisi);
-                            if (touche is not null)
-                            {
-                                g.DrawImage(touche, x, y + (hauteur - touche.Height) / 2f, touche.Width, touche.Height);
-                                x += touche.Width + taille * 0.2f;
-                            }
-                        }
-                        g.DrawString(etiquetteSuivi, petite, encreSuivi, new RectangleF(x, y, largeurSuivi + 4, hauteur), gauche);
-                        x += largeurSuivi + taille * 0.5f;
-                    }
-                }
-
-                // Le pseudo en CAPITALES, comme les entrees d'ES.
-                var nom = (l.Joueur.Length > 0 ? l.Joueur : "?").ToUpperInvariant();
-                var largeurNom = Math.Min(g.MeasureString(nom, police, PointF.Empty, StringFormat.GenericTypographic).Width + 2, Math.Max(10, xDroite - x));
-                g.DrawString(nom, police, pinceau, new RectangleF(x, y, largeurNom, hauteur), gauche);
-                x += largeurNom + taille * 0.6f;
-
-                // Le monde du record, par la police FontAwesome d'ES : maison, immeuble (salle
-                // verifiee) ou trophee (contest). Un pictogramme que le joueur lit sans legende.
-                var monde = l.Monde switch { "station" => "\uF1AD", "stream" => "\uF091", "home" => "\uF015", _ => "" };
-                if (monde.Length > 0 && _service._policeSymboles is { } symboles && xDroite - x > taille * 2)
-                {
-                    using var policeSymboles = new Font(symboles, taille * 0.8f, FontStyle.Regular, GraphicsUnit.Pixel);
-                    using var encreMonde = new SolidBrush(choisie ? couleurChoisi : couleurTexte);
-                    g.DrawString(monde, policeSymboles, encreMonde, new RectangleF(x, y, taille * 1.2f, hauteur), gauche);
-                    x += taille * 1.1f;
-                }
-
-                y += hauteur;
+                return xDroite;
             }
 
             // La barre de defilement : elle dit qu'il y a plus de scores que l'ecran n'en
@@ -1246,7 +1306,7 @@ public sealed class LeaderboardOverlayService : IDisposable
             var marge = Math.Max(12f, _largeurEcran * 0.014f);
             var place = Math.Max(1, (int) ((bas - y) / hauteur));
             var premier = Math.Clamp(c.LigneCourante - place + 1, 0, Math.Max(0, evenements.Count - place));
-            using var gauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter, FormatFlags = StringFormatFlags.NoWrap };
+            using var gauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.Character, FormatFlags = StringFormatFlags.NoWrap };
             using var droite = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Far, LineAlignment = StringAlignment.Center };
             var largeurEtiquette = Math.Min(Width * 0.34f, evenements.Max(e => g.MeasureString(e.Etiquette.ToUpperInvariant(), gras, PointF.Empty, StringFormat.GenericTypographic).Width) + taille);
 
@@ -1294,7 +1354,7 @@ public sealed class LeaderboardOverlayService : IDisposable
                     g.DrawString(e.Etiquette.ToUpperInvariant(), gras, encreEtiquette, new RectangleF(marge, y, largeurEtiquette, hauteur), gauche);
                 }
                 var x = marge + largeurEtiquette;
-                var qui = e.Qui.ToUpperInvariant();
+                var qui = Couper(g, e.Qui.ToUpperInvariant(), police, Math.Max(10, xDroite - x) - 2);
                 var largeurQui = Math.Min(g.MeasureString(qui, police, PointF.Empty, StringFormat.GenericTypographic).Width + 2, Math.Max(10, xDroite - x));
                 g.DrawString(qui, police, pinceau, new RectangleF(x, y, largeurQui, hauteur), gauche);
                 x += largeurQui + taille * 0.6f;
@@ -1322,7 +1382,7 @@ public sealed class LeaderboardOverlayService : IDisposable
         /// en focus, contour et texte en blanc (le fond bleu de la ligne porte deja la couleur
         /// de selection). Dessine a droite de xDroite, rend le nouveau bord gauche.
         /// </summary>
-        private float Bouton(Graphics g, EsMenuStyle s, Font police, float taille, string texte, float xDroite, float y, float hauteurLigne, bool enFocus, bool discret = false, float? padding = null)
+        private float Bouton(Graphics g, EsMenuStyle s, Font police, float taille, string texte, float xDroite, float y, float hauteurLigne, bool enFocus, bool discret = false, float? padding = null, bool dessiner = true)
         {
             // Un bouton DE LIGNE reste discret : il accompagne un score, il ne le domine pas.
             // Les autres gardent la construction d'ES (TEXT_PADDING, largeur minimale de « DELETE »),
@@ -1331,6 +1391,7 @@ public sealed class LeaderboardOverlayService : IDisposable
             var largeurTexte = g.MeasureString(texte, police, PointF.Empty, StringFormat.GenericTypographic).Width;
             var largeurMin = discret ? 0f : g.MeasureString("DELETE", police, PointF.Empty, StringFormat.GenericTypographic).Width + marge;
             var largeur = Math.Max(largeurTexte + marge, largeurMin);
+            if (!dessiner) return xDroite - largeur;
             var hauteur = discret ? taille * 1.15f : taille * 1.4f;
             var zone = new RectangleF(xDroite - largeur, y + (hauteurLigne - hauteur) / 2f, largeur, hauteur);
             var couleur = enFocus ? Opaque(Teinte(s.SelectedTextColor)) : Opaque(Teinte(s.TextColor));
@@ -1445,13 +1506,13 @@ public sealed class LeaderboardOverlayService : IDisposable
                 {
                     Alignment = StringAlignment.Far,
                     LineAlignment = StringAlignment.Center,
-                    Trimming = StringTrimming.EllipsisCharacter,
+                    Trimming = StringTrimming.Character,
                 };
                 // Jamais par-dessus l'aide : on ne dessine que si la place restante suffit.
                 var largeur = Width - marge - x;
                 if (largeur > taille * 4f)
                 {
-                    g.DrawString(c.Pseudo.ToUpperInvariant(), police, pale,
+                    g.DrawString(Couper(g, c.Pseudo.ToUpperInvariant(), police, largeur), police, pale,
                         new RectangleF(x, y, largeur, hauteur), droite);
                 }
             }

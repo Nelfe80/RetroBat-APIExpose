@@ -567,16 +567,26 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // On retient donc la derniere selection connue et on la reprend, a condition que le
             // carrousel soit reste sur le MEME systeme : changer de systeme est un vrai
             // changement de contexte, et ressortir un jeu d'un autre systeme serait faux.
-            if (_dernierJeu is null
+            if (_dernierJeu is null && JeuDEventsIni() is { } relais)
+            {
+                // AU DEMARRAGE DE L'API (2026-10-04) : aucun evenement d'ES encore recu, mais ES a
+                // ecrit le jeu choisi dans events.ini. Le joueur qui n'avait pas bouge depuis le
+                // lancement de l'API faisait un appui long sans effet.
+                jeu = relais;
+                _logger.LogInformation("Classement : aucun evenement d'ES depuis le demarrage, jeu repris d'events.ini ({Jeu}).", jeu.GameName);
+            }
+            else if (_dernierJeu is null
                 || !string.Equals(_dernierCarrousel, ui.SelectedSystem?.Name ?? "", StringComparison.OrdinalIgnoreCase))
             {
                 return Refus("aucun jeu selectionne (carrousel des systemes, ou selection perdue)");
             }
-
-            jeu = _dernierJeu;
-            _logger.LogInformation(
-                "Classement : selection effacee par ES, reprise du dernier jeu connu ({Jeu}).",
-                jeu.GameName);
+            else
+            {
+                jeu = _dernierJeu;
+                _logger.LogInformation(
+                    "Classement : selection effacee par ES, reprise du dernier jeu connu ({Jeu}).",
+                    jeu.GameName);
+            }
         }
         else
         {
@@ -630,6 +640,24 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// parcourir tous les processus (voir EmulatorForeground.EmulateurTourne).
     /// </summary>
     private static bool EsEstDevant() => EmulatorForeground.DevantEst("emulationstation");
+
+    /// <summary>
+    /// Le jeu choisi qu'ES a ecrit dans events.ini depuis son propre demarrage ; null sinon. Ne
+    /// sert que tant que l'API n'a recu aucune selection (voir PeutSOuvrir).
+    /// </summary>
+    private static GameReference? JeuDEventsIni()
+    {
+        DateTime? demarrageEs = null;
+        foreach (var p in System.Diagnostics.Process.GetProcessesByName("emulationstation"))
+        {
+            try { demarrageEs = p.StartTime.ToUniversalTime(); } catch (Exception) { }
+            p.Dispose();
+        }
+        if (demarrageEs is not { } depuis) return null;
+        return RetroBat.Domain.Paths.EventsIniFile.TryReadGameSelected(RetroBat.Domain.Paths.RetroBatPaths.EventsIniPath, depuis, out var systeme, out var chemin, out var nom)
+            ? new GameReference { SystemId = systeme, GamePath = chemin, GameName = nom }
+            : null;
+    }
 
     [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
 

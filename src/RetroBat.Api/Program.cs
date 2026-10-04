@@ -268,6 +268,10 @@ builder.Services.AddSingleton<RetroBat.Api.Leaderboard.ChallengeHudService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Leaderboard.ChallengeHudService>());
 builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardOverlayService>();
 builder.Services.AddHostedService<RetroBat.Api.Leaderboard.LeaderboardInputService>();
+// LE LECTEUR DE MANETTES DEMARRE AVEC LE PANNEAU (2026-10-04). Les services demarrent l'un apres
+// l'autre ; place apres les deploiements de fichiers, il ne lisait le panel que onze secondes
+// apres le lancement de l'API, et l'appui long restait sans effet. Il ne depend que du bus.
+builder.Services.AddHostedService<PanelInputWatcherService>();
 
 // La borne prend la derniere version publiee au lancement, quand rien ne tourne.
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.SelfUpdateService>();
@@ -485,7 +489,6 @@ if (!testModeRequested)
 }
 builder.Services.AddHostedService<CpoPanelWebSocketProjectionService>();
 // presses resolved to panel slots, for the wiring check
-builder.Services.AddHostedService<PanelInputWatcherService>();
 builder.Services.AddHostedService<RetroAchievementsRuntimeProjectionService>();
 builder.Services.AddHostedService<RetroAchievementsLeaderboardInferenceService>();
 builder.Services.AddHostedService<RetroArchLogMonitorService>();
