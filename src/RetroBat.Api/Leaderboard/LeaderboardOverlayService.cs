@@ -457,8 +457,10 @@ public sealed class LeaderboardOverlayService : IDisposable
         private int _imageSablier;
 
         private static bool AUnReplayEnPreparation(Contenu c)
-            => c.ReplaysEnPreparation is { Count: > 0 } attente
-               && c.Lignes.Any(l => l.CestMoi && l.ReplayId is not { Length: > 0 } && attente.Contains(l.Valeur));
+            => (c.ReplaysEnPreparation is { Count: > 0 } attente
+                && c.Lignes.Any(l => l.CestMoi && l.ReplayId is not { Length: > 0 } && attente.Contains(l.Valeur)))
+               // MES RECORDS : le sablier d'une partie pas encore envoyee tourne aussi.
+               || c.Lignes.Any(l => l.EnAttente);
 
         public Panneau(LeaderboardOverlayService service)
         {
@@ -1089,6 +1091,7 @@ public sealed class LeaderboardOverlayService : IDisposable
             var largeurScore = 0f;
             var largeurNomMax = 0f;
             var sceauVisible = false;
+            var attenteVisible = false;
             var suiviVisible = false;
             var mondeVisible = false;
             for (var i = premier; i < finVisible; i++)
@@ -1097,15 +1100,19 @@ public sealed class LeaderboardOverlayService : IDisposable
                 largeurScore = Math.Max(largeurScore, g.MeasureString(l.Valeur.ToString("N0", System.Globalization.CultureInfo.CurrentCulture), gras, PointF.Empty, StringFormat.GenericTypographic).Width);
                 largeurNomMax = Math.Max(largeurNomMax, g.MeasureString((l.Joueur.Length > 0 ? l.Joueur : "?").ToUpperInvariant(), police, PointF.Empty, StringFormat.GenericTypographic).Width + 2);
                 sceauVisible |= l.Scelle;
+                attenteVisible |= l.EnAttente;
                 suiviVisible |= l.Poignee.Length > 0;
                 mondeVisible |= l.Monde is "station" or "stream" or "home";
             }
 
             // A droite : le score (aligne a droite), le sceau, puis la colonne REPLAY / boutons.
             var sceau = sceauVisible ? _service._glyphes?.Glyphe("nelfe-verified", (int) (taille * 1.0f)) : null;
+            // Le sablier d'une partie gardee sur la borne prend la place du sceau (MES RECORDS).
+            var tailleSablier = (int) (taille * 0.9f);
+            var largeurMarque = Math.Max(sceau?.Width ?? 0, attenteVisible ? tailleSablier : 0);
             var xScore = Width - marge;
             var xSceau = xScore - largeurScore - taille * 0.5f;
-            var xReplay = xSceau - (sceau is null ? 0f : sceau.Width + taille * 0.5f) - taille * 0.7f;
+            var xReplay = xSceau - (largeurMarque == 0 ? 0f : largeurMarque + taille * 0.5f) - taille * 0.7f;
 
             // La colonne REPLAY prend la largeur de son contenu le plus large : l'etiquette, le
             // sablier d'un replay en preparation, ou les boutons de la ligne choisie.
@@ -1155,6 +1162,16 @@ public sealed class LeaderboardOverlayService : IDisposable
                 if (l.Scelle && sceau is not null)
                 {
                     g.DrawImage(sceau, xSceau - sceau.Width, y + (hauteur - sceau.Height) / 2f, sceau.Width, sceau.Height);
+                }
+                else if (l.EnAttente)
+                {
+                    // Partie gardee sur la borne, pas encore envoyee : le sablier d'ES, qui tourne.
+                    var gris = Color.FromArgb(choisie ? 200 : 150, Teinte(s.TextColor));
+                    var sablier = _service._glyphes?.Glyphe("busy_" + (_imageSablier % 4), tailleSablier, gris);
+                    if (sablier is not null)
+                    {
+                        g.DrawImage(sablier, xSceau - sablier.Width, y + (hauteur - sablier.Height) / 2f, sablier.Width, sablier.Height);
+                    }
                 }
                 GroupeReplay(l, choisie, xReplay, y, encre, dessiner: true);
 

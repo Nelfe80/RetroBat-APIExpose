@@ -39,7 +39,8 @@ public sealed class LeaderboardClient
         bool CestMoi,
         string Monde = "",
         string Poignee = "",    // la poignee publique du joueur : ce qui permet de le suivre
-        bool PlusBasEstMieux = false);  // le sens du PROFIL du jeu : vrai pour un contre-la-montre
+        bool PlusBasEstMieux = false,   // le sens du PROFIL du jeu : vrai pour un contre-la-montre
+        bool EnAttente = false);        // MES RECORDS : partie gardee sur la borne, pas encore envoyee (sablier)
 
     /// <summary>Ce qu'une vue a a montrer, y compris son echec.</summary>
     public sealed record Resultat(IReadOnlyList<Ligne> Lignes, string Etat)

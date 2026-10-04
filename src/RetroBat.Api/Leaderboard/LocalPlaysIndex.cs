@@ -219,8 +219,7 @@ public sealed class LocalPlaysIndex
         string regle,
         string joueurDeSession,
         IReadOnlyList<ReplayLocal> replays,
-        Func<DateTime, string> date,
-        string motEnAttente = "")
+        Func<DateTime, string> date)
     {
         var choisies = parties
             .Where(Retenue)
@@ -236,8 +235,8 @@ public sealed class LocalPlaysIndex
             .ToList();
         return rangees.Select((p, i) => new LeaderboardClient.Ligne(
             Rang: i + 1,
-            // Une partie gardee sur la borne le dit a cote de sa date.
-            Joueur: p.Verdict == EnAttente && motEnAttente.Length > 0 ? $"{date(p.DebutUtc)} ({motEnAttente})" : date(p.DebutUtc),
+            // Une partie gardee sur la borne le dit par un sablier, dans la colonne du sceau.
+            Joueur: date(p.DebutUtc),
             Valeur: p.Score,
             Ville: "",
             Pays: "",
@@ -248,6 +247,7 @@ public sealed class LocalPlaysIndex
             CestMoi: true,
             Monde: p.Monde,
             Poignee: "",
-            PlusBasEstMieux: plusBas)).ToList();
+            PlusBasEstMieux: plusBas,
+            EnAttente: p.Verdict == EnAttente)).ToList();
     }
 }

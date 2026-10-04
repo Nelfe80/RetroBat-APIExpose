@@ -5,7 +5,7 @@ namespace RetroBat.Api.Tests;
 
 /// <summary>
 /// MES RECORDS montre tout de suite une partie gardee sur la borne (piste B, 2026-10-04), marquee
-/// « en attente d'envoi » ; une fois jugee, c'est sa version du dossier certified qui compte.
+/// d'un sablier ; une fois jugee, c'est sa version du dossier certified qui compte.
 /// </summary>
 public sealed class MesRecordsBrouillonsTests : IDisposable
 {
@@ -39,7 +39,7 @@ public sealed class MesRecordsBrouillonsTests : IDisposable
 
     private IReadOnlyList<LeaderboardClient.Ligne> Lignes()
         => LocalPlaysIndex.MesParties(new LocalPlaysIndex(Certifies).Toutes(), "1942", "1cc", "",
-            Array.Empty<LocalPlaysIndex.ReplayLocal>(), utc => utc.ToString("dd/MM HH:mm"), "en attente d'envoi");
+            Array.Empty<LocalPlaysIndex.ReplayLocal>(), utc => utc.ToString("dd/MM HH:mm"));
 
     [Fact]
     public void Une_partie_gardee_sur_la_borne_apparait_tout_de_suite()
@@ -50,8 +50,10 @@ public sealed class MesRecordsBrouillonsTests : IDisposable
         var lignes = Lignes();
 
         Assert.Equal(new long[] { 45000, 30000 }, lignes.Select(l => l.Valeur));
-        Assert.EndsWith("(en attente d'envoi)", lignes[0].Joueur);
-        Assert.DoesNotContain("attente", lignes[1].Joueur);
+        // L'attente se dit par le sablier : la ligne porte la date seule.
+        Assert.True(lignes[0].EnAttente);
+        Assert.False(lignes[1].EnAttente);
+        Assert.Equal("04/10 09:28", lignes[0].Joueur);
     }
 
     [Fact]
