@@ -322,6 +322,7 @@ public sealed class RemoteScrapingService
             await AuditDecisionAsync(plan, decision, scrapeCancellationToken);
             if (!decision.ExactLocalOnly &&
                 !IsThemeHbOnlyScrape(decision) &&
+                !EstSilencieux(decision) &&
                 selectionStillCurrent)
             {
                 await NotifyRemoteScrapeStartedAsync(decision, scrapeCancellationToken);
@@ -530,7 +531,7 @@ public sealed class RemoteScrapingService
             }
             else if (isCurrentGame && string.Equals(decision.Status, "provider-error", StringComparison.OrdinalIgnoreCase))
             {
-                if (!decision.ExactLocalOnly)
+                if (!decision.ExactLocalOnly && !EstSilencieux(decision))
                 {
                     await NotifyRemoteScrapeFailedAsync(decision, scrapeCancellationToken);
                 }
@@ -548,7 +549,7 @@ public sealed class RemoteScrapingService
                 !heavyMediaNotificationSent &&
                 string.Equals(decision.Status, "completed", StringComparison.OrdinalIgnoreCase))
             {
-                if (!decision.ExactLocalOnly || decision.ImportedMediaCount > 0)
+                if ((!decision.ExactLocalOnly || decision.ImportedMediaCount > 0) && !EstSilencieux(decision))
                 {
                     await NotifyRemoteScrapeSucceededAsync(decision, scrapeCancellationToken);
                 }
@@ -954,6 +955,15 @@ public sealed class RemoteScrapingService
             decision.ImportedMediaCount == 0 &&
             !string.Equals(decision.Status, "cancelled", StringComparison.OrdinalIgnoreCase);
     }
+
+    /// <summary>
+    /// UN SCRAP « FL » NE NOTIFIE RIEN (regle user 2026-10-04). Tous les medias du jeu sont deja locaux,
+    /// seuls les textes sont cherches : rien que le joueur verrait changer sans que la fiche se
+    /// rafraichisse d'elle-meme. Des joueurs voyaient « Scraping (FL) : 1942 » a chaque lancement de
+    /// RetroBat et croyaient l'auto-scrap actif malgre eux.
+    /// </summary>
+    internal static bool EstSilencieux(RemoteScrapeDecision decision)
+        => string.Equals(decision.WorkflowMode, "FL", StringComparison.OrdinalIgnoreCase);
 
     private static bool IsThemeHbOnlyScrape(RemoteScrapeDecision decision)
     {
