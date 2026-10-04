@@ -834,6 +834,18 @@ public class ApiExposeOptions
         public string WrapperDllPath { get; set; } = "wrapper/wrapper.dll";
         public string CoresPath { get; set; } = "../../emulators/retroarch/cores";
         public string RealCoresPath { get; set; } = "../../emulators/retroarch/cores_real";
+
+        /// <summary>
+        /// Ou vit le wrapper. « auto » (defaut) : « core_proxy » si le lanceur de RetroBat installe
+        /// sait passer retroarch/core_proxy/ a RetroArch, sinon « cores_real ».
+        /// « core_proxy » : le vrai coeur reste dans cores/, ou RetroBat le met a jour, et le wrapper
+        /// vit dans core_proxy/. « cores_real » : l'ancien montage, wrapper dans cores/ et vrai coeur
+        /// dans cores_real/ (ce qui empeche RetroBat de mettre les coeurs a jour).
+        /// </summary>
+        public string Layout { get; set; } = "auto";
+        public string CoreProxyPath { get; set; } = "../../emulators/retroarch/core_proxy";
+        /// <summary>Le lanceur de RetroBat, lu pour savoir s'il gere core_proxy.</summary>
+        public string EmulatorLauncherPath { get; set; } = "../../emulationstation/emulatorLauncher.exe";
         public string BackupPath { get; set; } = ".log/wrapper-deployment/backups";
         public string LogFilePath { get; set; } = ".log/wrapper-deployment.jsonl";
         /// <summary>Ce que l'audit sait de chaque core (taille, date, empreinte) : il ne relit que ce qui a bouge.</summary>

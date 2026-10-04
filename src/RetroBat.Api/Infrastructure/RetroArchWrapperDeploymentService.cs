@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
@@ -10,6 +11,13 @@ public class RetroArchWrapperDeploymentService
 {
     private static readonly byte[] WrapperSignature = Encoding.ASCII.GetBytes("RETROBAT_ARCADE_WRAPPER_V1_DO_NOT_DELETE");
     private static readonly JsonSerializerOptions LogJsonOptions = new() { WriteIndented = false };
+
+    /// <summary>L'ancien montage : le wrapper dans cores/, le vrai coeur dans cores_real/.</summary>
+    public const string MontageCoresReal = "cores_real";
+    /// <summary>Le montage propose par RetroBat : le vrai coeur reste dans cores/, le wrapper vit dans core_proxy/.</summary>
+    public const string MontageCoreProxy = "core_proxy";
+    // Ce que porte un lanceur qui sait passer core_proxy a RetroArch : une chaine .NET, donc en UTF-16.
+    private static readonly byte[] MarqueCoreProxy = Encoding.Unicode.GetBytes("core_proxy");
 
     private readonly IOptions<ApiExposeOptions> _options;
     private readonly ILogger<RetroArchWrapperDeploymentService> _logger;
@@ -45,9 +53,14 @@ public class RetroArchWrapperDeploymentService
         var backupRoot = ResolvePluginPath(deploymentOptions.BackupPath);
         var logPath = ResolvePluginPath(deploymentOptions.LogFilePath);
         var cachePath = ResolvePluginPath(deploymentOptions.CachePath);
+        var coreProxyPath = ResolvePluginPath(deploymentOptions.CoreProxyPath);
+        var lanceurGere = LanceurGereCoreProxy(ResolvePluginPath(deploymentOptions.EmulatorLauncherPath));
 
         var result = new RetroArchWrapperDeploymentResult
         {
+            Layout = ChoisirMontage(deploymentOptions.Layout, lanceurGere),
+            LauncherSupportsCoreProxy = lanceurGere,
+            CoreProxyPath = coreProxyPath,
             Action = action,
             AutoDeploy = deploymentOptions.AutoDeploy,
             DryRun = dryRun,
@@ -93,6 +106,16 @@ public class RetroArchWrapperDeploymentService
         // pour chacun des 157 cores.
         var wrapperReference = new WrapperReference(new FileInfo(wrapperPath));
         var cache = AuditCache.Charger(cachePath);
+
+        if (result.Layout == MontageCoreProxy)
+        {
+            ExecuterEnCoreProxy(action, dryRun, wrapperPath, coresPath, realCoresPath, coreProxyPath, backupRoot,
+                wrapperReference, cache, deploymentOptions, result, cancellationToken);
+            cache.Enregistrer(cachePath, result.Cores.Select(c => c.CoreName), _logger);
+            await WriteLogAsync(logPath, result, writeLog, cancellationToken);
+            return result;
+        }
+
         var coreFiles = GetTargetCoreFiles(coresPath, deploymentOptions);
         foreach (var coreFile in coreFiles)
         {
@@ -135,6 +158,10 @@ public class RetroArchWrapperDeploymentService
                 cancellationToken.ThrowIfCancellationRequested();
                 RefreshCore(wrapperPath, backupRoot, dryRun, core, result);
             }
+
+            // Un core_proxy/ laisse la (lanceur revenu a une version qui ne le lit pas, ou ancien
+            // montage force) n'a plus de lecteur : on le retire, une fois les coeurs remis.
+            RetirerCoreProxy(coreProxyPath, dryRun, result);
         }
 
         // Apres les copies : ce qu'on vient d'ecrire est relu au prochain audit (sa date a
@@ -274,10 +301,13 @@ public class RetroArchWrapperDeploymentService
     /// Ce cœur est-il mis hors du wrapper par la configuration ? On compare sur le nom, avec ou
     /// sans le « .dll » : c'est « mame_libretro » qu'on écrit dans les appsettings, pas un chemin.
     /// </summary>
-    internal static bool EstExclu(string coreFileName, IEnumerable<string> exclus)
+    internal static bool EstExclu(string coreFileName, IEnumerable<string> exclus) => EstNomme(coreFileName, exclus);
+
+    /// <summary>Ce coeur figure-t-il dans cette liste de noms, avec ou sans le « .dll » ?</summary>
+    internal static bool EstNomme(string coreFileName, IEnumerable<string> noms)
     {
         var nu = Path.GetFileNameWithoutExtension(coreFileName);
-        foreach (var brut in exclus)
+        foreach (var brut in noms)
         {
             if (string.IsNullOrWhiteSpace(brut))
             {
@@ -312,9 +342,8 @@ public class RetroArchWrapperDeploymentService
         return (false, !isWrapper, isWrapper && hasRealCore && !estLaReference);
     }
 
-    private static RetroArchWrapperCoreStatus BuildCoreStatus(
-        FileInfo coreFile, string realCoresPath, WrapperReference wrapperReference, AuditCache cache,
-        IEnumerable<string>? exclus = null)
+    /// <summary>Ce fichier de cores/ est-il un wrapper ? Lu au plus une fois par version du fichier.</summary>
+    private static (bool IsWrapper, byte[]? Md5) Inspecter(FileInfo coreFile, WrapperReference wrapperReference, AuditCache cache)
     {
         bool isWrapper;
         byte[]? md5;
@@ -342,6 +371,14 @@ public class RetroArchWrapperDeploymentService
             cache.Retenir(coreFile, isWrapper, md5);
         }
 
+        return (isWrapper, md5);
+    }
+
+    private static RetroArchWrapperCoreStatus BuildCoreStatus(
+        FileInfo coreFile, string realCoresPath, WrapperReference wrapperReference, AuditCache cache,
+        IEnumerable<string>? exclus = null)
+    {
+        var (isWrapper, md5) = Inspecter(coreFile, wrapperReference, cache);
         var realCorePath = Path.Combine(realCoresPath, coreFile.Name);
         var realCore = new FileInfo(realCorePath);
         var hasRealCore = realCore.Exists;
@@ -522,6 +559,321 @@ public class RetroArchWrapperDeploymentService
         result.DeployedCores++;
     }
 
+    // ── Montage core_proxy (2026-10-04) ──────────────────────────────────────────────────────
+    // Propose par l'equipe RetroBat : le vrai coeur reste dans cores/, ou RetroBat le verifie et le
+    // met a jour, et un lanceur qui le sait passe a RetroArch core_proxy/<coeur>_libretro.dll quand
+    // ce fichier existe. Le wrapper (0.341 et suivants) y trouve son vrai coeur dans cores/. Avec un
+    // lanceur qui l'ignore, on garde l'ancien montage. Un seul wrapper : chaque entree de
+    // core_proxy/ est un lien vers le meme fichier (une copie sur un disque sans liens, exFAT).
+
+    private sealed record LanceurConnu(string Chemin, long Taille, DateTime Date, bool Gere);
+    private static LanceurConnu? _lanceurConnu;
+
+    /// <summary>Le montage a appliquer : celui que force la configuration, sinon d'apres le lanceur.</summary>
+    internal static string ChoisirMontage(string? option, bool lanceurGere)
+    {
+        var choix = (option ?? string.Empty).Trim();
+        if (string.Equals(choix, MontageCoreProxy, StringComparison.OrdinalIgnoreCase)) return MontageCoreProxy;
+        if (string.Equals(choix, MontageCoresReal, StringComparison.OrdinalIgnoreCase)) return MontageCoresReal;
+        return lanceurGere ? MontageCoreProxy : MontageCoresReal;
+    }
+
+    /// <summary>
+    /// Le lanceur installe passe-t-il core_proxy a RetroArch ? Il porte alors la chaine
+    /// « core_proxy » dans son exe. Lu une fois par version du fichier (quelques Mo).
+    /// </summary>
+    internal static bool LanceurGereCoreProxy(string chemin)
+    {
+        try
+        {
+            var fichier = new FileInfo(chemin);
+            if (!fichier.Exists) return false;
+            var connu = _lanceurConnu;
+            if (connu is not null && connu.Chemin == fichier.FullName && connu.Taille == fichier.Length
+                && connu.Date == fichier.LastWriteTimeUtc)
+            {
+                return connu.Gere;
+            }
+
+            var gere = PorteLaMarqueCoreProxy(File.ReadAllBytes(fichier.FullName));
+            _lanceurConnu = new LanceurConnu(fichier.FullName, fichier.Length, fichier.LastWriteTimeUtc, gere);
+            return gere;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
+
+    internal static bool PorteLaMarqueCoreProxy(ReadOnlySpan<byte> exe) => exe.IndexOf(MarqueCoreProxy) >= 0;
+
+    /// <summary>Ce qu'il faut faire d'un coeur dans le montage core_proxy.</summary>
+    /// <param name="RemettreLeVrai">cores_real/ vers cores/ : le fichier de cores/ manque, ou c'est un wrapper.</param>
+    /// <param name="RetirerLAncien">cores/ porte deja le vrai coeur (RetroBat l'a mis a jour) : la copie de cores_real/ est perimee.</param>
+    /// <param name="Orphelin">Un wrapper dans cores/ et aucun vrai coeur nulle part : on n'y touche pas.</param>
+    /// <param name="VraiDansCores">Une fois fait, cores/ porte le vrai coeur.</param>
+    internal sealed record PlanCoreProxy(
+        bool RemettreLeVrai, bool RetirerLAncien, bool Orphelin, bool VraiDansCores,
+        bool VeutProxy, bool EcrireProxy, bool RetirerProxy);
+
+    internal static PlanCoreProxy ArbitrerCoreProxy(
+        bool dansCores, bool estWrapper, bool dansCoresReal, bool cible, bool exclu, bool proxyExiste, bool proxyAJour)
+    {
+        var remettre = dansCoresReal && (!dansCores || estWrapper);
+        var retirer = dansCoresReal && dansCores && !estWrapper;
+        var orphelin = dansCores && estWrapper && !dansCoresReal;
+        var vrai = remettre || (dansCores && !estWrapper);
+        var veut = vrai && cible && !exclu;
+        return new PlanCoreProxy(remettre, retirer, orphelin, vrai, veut, veut && !proxyAJour, !veut && proxyExiste);
+    }
+
+    private static void ExecuterEnCoreProxy(
+        string action, bool dryRun, string wrapperPath, string coresPath, string realCoresPath, string coreProxyPath,
+        string backupRoot, WrapperReference reference, AuditCache cache,
+        ApiExposeOptions.RetroArchWrapperDeploymentOptions options, RetroArchWrapperDeploymentResult result,
+        CancellationToken cancellationToken)
+    {
+        var deployer = action.Equals("deploy", StringComparison.OrdinalIgnoreCase);
+        // Tout ce que cores_real/ contient revient : le dossier est abandonne dans ce montage.
+        var noms = Directory.EnumerateFiles(coresPath, "*.dll", SearchOption.TopDirectoryOnly)
+            .Concat(Directory.Exists(realCoresPath)
+                ? Directory.EnumerateFiles(realCoresPath, "*.dll", SearchOption.TopDirectoryOnly)
+                : Enumerable.Empty<string>())
+            .Select(Path.GetFileName).OfType<string>()
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(nom => nom, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        var horodatage = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+        string? source = null;   // le wrapper, une fois dans core_proxy/ : chaque entree en devient un lien
+
+        try
+        {
+            foreach (var nom in noms)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var corePath = Path.Combine(coresPath, nom);
+                var realPath = Path.Combine(realCoresPath, nom);
+                var proxyPath = Path.Combine(coreProxyPath, nom);
+                var coreFile = new FileInfo(corePath);
+                var estWrapper = coreFile.Exists && Inspecter(coreFile, reference, cache).IsWrapper;
+                var proxy = new FileInfo(proxyPath);
+                // Un lien ou une copie du wrapper de reference en a la taille et la date : rien a relire.
+                // La date a deux secondes pres : FAT32 et exFAT arrondissent celle d'une copie.
+                var proxyAJour = proxy.Exists && proxy.Length == reference.File.Length
+                    && Math.Abs((proxy.LastWriteTimeUtc - reference.File.LastWriteTimeUtc).TotalSeconds) < 2;
+                var exclu = EstExclu(nom, options.ExcludedCores);
+                var cible = options.WrapAllCores || EstNomme(nom, options.TargetCores);
+                var plan = ArbitrerCoreProxy(coreFile.Exists, estWrapper, File.Exists(realPath), cible, exclu, proxy.Exists, proxyAJour);
+
+                if (plan.Orphelin)
+                {
+                    result.Warnings.Add($"{nom}: the wrapper is in cores but the real core is nowhere; left as is.");
+                }
+
+                var vraiEnPlace = plan.VraiDansCores;
+                if (deployer)
+                {
+                    if (plan.RemettreLeVrai)
+                    {
+                        // Meme disque : un renommage, instantane quelle que soit la taille du coeur.
+                        vraiEnPlace = Agir(result, nom, "move-real-core-back-to-cores", realPath, corePath, dryRun,
+                            () => File.Move(realPath, corePath, overwrite: true));
+                        if (vraiEnPlace && !dryRun) result.RealCoresMovedBack++;
+                    }
+                    else if (plan.RetirerLAncien)
+                    {
+                        var archive = Path.Combine(backupRoot, horodatage, "cores_real", nom);
+                        if (Agir(result, nom, "retire-old-real-core", realPath, archive, dryRun, () =>
+                            {
+                                Directory.CreateDirectory(Path.GetDirectoryName(archive)!);
+                                File.Move(realPath, archive, overwrite: true);
+                            }) && !dryRun)
+                        {
+                            result.StaleRealCoresRetired++;
+                        }
+                    }
+
+                    if (plan.EcrireProxy && vraiEnPlace)
+                    {
+                        var ecrit = Agir(result, nom, "link-wrapper-in-core-proxy", wrapperPath, proxyPath, dryRun, () =>
+                        {
+                            source ??= PreparerSource(wrapperPath, coreProxyPath);
+                            EcrireEntree(source, proxyPath);
+                        });
+                        if (ecrit && !dryRun)
+                        {
+                            result.ProxyEntriesWritten++;
+                            proxyAJour = true;
+                        }
+                    }
+                    else if (plan.RetirerProxy)
+                    {
+                        if (Agir(result, nom, "remove-core-proxy-entry", proxyPath, string.Empty, dryRun,
+                                () => File.Delete(proxyPath)) && !dryRun)
+                        {
+                            result.ProxyEntriesRemoved++;
+                        }
+                    }
+                }
+
+                var enveloppe = plan.VeutProxy && proxyAJour;
+                result.Cores.Add(new RetroArchWrapperCoreStatus
+                {
+                    CoreName = nom,
+                    CorePath = proxyPath,
+                    RealCorePath = corePath,
+                    IsWrapper = enveloppe,
+                    HasRealCore = plan.VraiDansCores,
+                    Excluded = exclu,
+                    NeedsDeployment = plan.RemettreLeVrai || plan.RetirerLAncien || plan.EcrireProxy || plan.RetirerProxy,
+                    NeedsRefresh = plan.EcrireProxy && proxy.Exists,
+                    CoreBytes = proxy.Exists ? proxy.Length : 0,
+                    RealCoreBytes = coreFile.Exists && !estWrapper ? coreFile.Length : null,
+                    LastWriteTime = proxy.Exists ? proxy.LastWriteTime : default,
+                    RealLastWriteTime = coreFile.Exists && !estWrapper ? coreFile.LastWriteTime : null,
+                    Reason = plan.Orphelin ? "Wrapper in cores but the real core is missing from cores_real: left as is."
+                        : exclu ? "Core excluded from wrapping; RetroArch loads it from cores."
+                        : !cible ? "Not a target core; RetroArch loads it from cores."
+                        : enveloppe ? "Real core in cores, wrapper in core_proxy."
+                        : "Real core in cores; the wrapper will be linked in core_proxy."
+                });
+            }
+
+            if (deployer && Directory.Exists(coreProxyPath))
+            {
+                // Les entrees d'un coeur qui n'existe plus, et les restes d'un passage interrompu.
+                foreach (var fichier in Directory.EnumerateFiles(coreProxyPath).ToList())
+                {
+                    var nom = Path.GetFileName(fichier);
+                    var enTrop = (EstUnResteDeSource(nom) && !string.Equals(fichier, source, StringComparison.OrdinalIgnoreCase))
+                        || (nom.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) && !noms.Contains(nom, StringComparer.OrdinalIgnoreCase));
+                    if (enTrop && Agir(result, nom, "remove-core-proxy-entry", fichier, string.Empty, dryRun,
+                            () => File.Delete(fichier)) && !dryRun)
+                    {
+                        result.ProxyEntriesRemoved++;
+                    }
+                }
+            }
+        }
+        finally
+        {
+            // Les liens gardent le fichier : le nom de passage peut partir.
+            if (source is not null)
+            {
+                try { File.Delete(source); }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+            }
+        }
+
+        if (deployer && !dryRun)
+        {
+            SupprimerSiVide(realCoresPath);
+            SupprimerSiVide(coreProxyPath);
+        }
+
+        result.CheckedCores = result.Cores.Count;
+        result.ExcludedCores = result.Cores.Count(core => core.Excluded);
+        result.WrappedCores = result.Cores.Count(core => core.IsWrapper);
+        result.RealCores = result.Cores.Count(core => !core.IsWrapper);
+        result.MissingRealCores = result.Cores.Count(core => !core.HasRealCore);
+        result.PendingDeployments = result.Cores.Count(core => core.NeedsDeployment);
+        result.StaleWrappers = result.Cores.Count(core => core.NeedsRefresh);
+        result.DeployedCores = result.ProxyEntriesWritten;
+    }
+
+    /// <summary>
+    /// L'ancien montage : un core_proxy/ laisse la (le lanceur ne le lit plus, ou la configuration
+    /// force l'ancien montage) n'a plus de lecteur, il est retire.
+    /// </summary>
+    private static void RetirerCoreProxy(string coreProxyPath, bool dryRun, RetroArchWrapperDeploymentResult result)
+    {
+        if (!Directory.Exists(coreProxyPath)) return;
+        foreach (var fichier in Directory.EnumerateFiles(coreProxyPath).ToList())
+        {
+            var nom = Path.GetFileName(fichier);
+            if (!nom.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) && !EstUnResteDeSource(nom)) continue;
+            if (Agir(result, nom, "remove-core-proxy-entry", fichier, string.Empty, dryRun, () => File.Delete(fichier)) && !dryRun)
+            {
+                result.ProxyEntriesRemoved++;
+            }
+        }
+
+        if (!dryRun) SupprimerSiVide(coreProxyPath);
+    }
+
+    /// <summary>Note l'operation, et l'applique hors simulation. Faux si elle a echoue (fichier pris, droits).</summary>
+    private static bool Agir(
+        RetroArchWrapperDeploymentResult result, string nom, string operation, string source, string destination,
+        bool dryRun, Action faire)
+    {
+        var trace = new RetroArchWrapperDeploymentAction
+        {
+            CoreName = nom,
+            Operation = operation,
+            SourcePath = source,
+            DestinationPath = destination
+        };
+        result.Actions.Add(trace);
+        if (dryRun) return true;
+        try
+        {
+            faire();
+            trace.Applied = true;
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            result.Warnings.Add($"{nom}: {operation} failed ({ex.Message}).");
+            return false;
+        }
+    }
+
+    private const string PrefixeSource = ".wrapper-";
+
+    private static bool EstUnResteDeSource(string nom) =>
+        nom.StartsWith(PrefixeSource, StringComparison.OrdinalIgnoreCase) && nom.EndsWith(".tmp", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Le wrapper copie une fois dans core_proxy/ : chaque entree en sera un lien.</summary>
+    private static string PreparerSource(string wrapperPath, string coreProxyPath)
+    {
+        Directory.CreateDirectory(coreProxyPath);
+        var source = Path.Combine(coreProxyPath, PrefixeSource + Guid.NewGuid().ToString("N") + ".tmp");
+        // File.Copy garde la date du wrapper de reference : c'est elle qui dit qu'une entree est a jour.
+        File.Copy(wrapperPath, source, overwrite: true);
+        return source;
+    }
+
+    /// <summary>
+    /// Une entree de core_proxy/ : un lien vers le wrapper, sans copie, ou une copie sur un disque qui
+    /// ne connait pas les liens (FAT32, exFAT). L'ancienne entree part d'abord.
+    /// </summary>
+    private static void EcrireEntree(string source, string entree)
+    {
+        if (File.Exists(entree)) File.Delete(entree);
+        if (!CreateHardLink(entree, source, IntPtr.Zero))
+        {
+            File.Copy(source, entree, overwrite: false);
+        }
+    }
+
+    private static void SupprimerSiVide(string dossier)
+    {
+        try
+        {
+            if (Directory.Exists(dossier) && !Directory.EnumerateFileSystemEntries(dossier).Any())
+            {
+                Directory.Delete(dossier);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+    }
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
+
     private static string ResolvePluginPath(string configuredPath)
     {
         if (string.IsNullOrWhiteSpace(configuredPath))
@@ -577,6 +929,7 @@ public class RetroArchWrapperDeploymentService
             {
                 ts = DateTimeOffset.Now,
                 result.Action,
+                result.Layout,
                 result.DryRun,
                 result.CheckedCores,
                 result.PendingDeployments,

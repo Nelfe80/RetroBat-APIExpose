@@ -98,7 +98,8 @@ public class RetroArchWrapperDeploymentHostedService : IHostedService
                 }
 
                 _logger.LogInformation(
-                    "RetroArch wrapper startup deployment completed. Checked={CheckedCores}, Pending={PendingDeployments}, Deployed={DeployedCores}, Stale={StaleWrappers}, Refreshed={RefreshedCores}, DryRun={DryRun}",
+                    "RetroArch wrapper startup deployment completed. Layout={Layout}, Checked={CheckedCores}, Pending={PendingDeployments}, Deployed={DeployedCores}, Stale={StaleWrappers}, Refreshed={RefreshedCores}, DryRun={DryRun}",
+                    result.Layout,
                     result.CheckedCores,
                     result.PendingDeployments,
                     result.DeployedCores,

@@ -15,6 +15,17 @@ public class RetroArchWrapperDeploymentResult
     public string WrapperDllPath { get; set; } = string.Empty;
     public string CoresPath { get; set; } = string.Empty;
     public string RealCoresPath { get; set; } = string.Empty;
+    /// <summary>« cores_real » (wrapper dans cores/) ou « core_proxy » (vrai coeur dans cores/, wrapper dans core_proxy/).</summary>
+    public string Layout { get; set; } = string.Empty;
+    /// <summary>Le lanceur de RetroBat installe passe-t-il core_proxy a RetroArch ?</summary>
+    public bool LauncherSupportsCoreProxy { get; set; }
+    public string CoreProxyPath { get; set; } = string.Empty;
+    /// <summary>Vrais coeurs revenus de cores_real/ dans cores/.</summary>
+    public int RealCoresMovedBack { get; set; }
+    /// <summary>Copies de cores_real/ perimees (cores/ portait deja le vrai coeur), mises en sauvegarde.</summary>
+    public int StaleRealCoresRetired { get; set; }
+    public int ProxyEntriesWritten { get; set; }
+    public int ProxyEntriesRemoved { get; set; }
     public bool WrapperExists { get; set; }
     public bool WrapperHasSignature { get; set; }
     public int CheckedCores { get; set; }

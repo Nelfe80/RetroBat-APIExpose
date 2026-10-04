@@ -174,6 +174,11 @@ begin
     Target := ExtractFileDir(ExtractFileDir(ExpandConstant('{app}'))) + '\emulationstation\.emulationstation\es_features_apiexpose.cfg';
     if FileExists(Target) and DeleteFile(Target) then
       Log('Options APIExpose retirees du menu d''EmulationStation : ' + Target);
+    // Le wrapper du montage core_proxy : sans ce dossier, le lanceur de RetroBat charge les vrais
+    // coeurs de cores\ comme d'origine.
+    Target := ExtractFileDir(ExtractFileDir(ExpandConstant('{app}'))) + '\emulators\retroarch\core_proxy';
+    if DirExists(Target) and DelTree(Target, True, True, True) then
+      Log('Wrapper retire du lanceur (core_proxy) : ' + Target);
   end;
 end;
 

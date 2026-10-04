@@ -203,13 +203,14 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
         {
             // Dans cores/, chaque dll est le wrapper de scoring quand il est deploye : elles ont
             // TOUTES la meme empreinte, et un manifeste enregistre avec cette empreinte faisait
-            // retenir la premiere de la liste (2048 pour un replay de Sonic, 2026-09-17). On ne
-            // cherche donc dans cores/ que sans cores_real/, et jamais une dll qui est le wrapper.
-            var coresReal = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "cores_real");
+            // retenir la premiere de la liste (2048 pour un replay de Sonic, 2026-09-17). Jamais une
+            // dll qui est le wrapper, donc. cores_real/ d'abord (ancien montage), puis cores/, ou vit
+            // le vrai coeur dans le montage core_proxy (2026-10-04) : un cores_real/ reste la ne doit
+            // pas cacher cores/.
             var wrapperSha = HashFileQuiet(Path.Combine(RetroBatPaths.RetroBatRoot, "plugins", "APIExpose", "wrapper", "wrapper.dll"));
             if (!string.Equals(wanted, wrapperSha, StringComparison.OrdinalIgnoreCase))
             {
-                foreach (var sub in Directory.Exists(coresReal) ? new[] { "cores_real" } : new[] { "cores" })
+                foreach (var sub in new[] { "cores_real", "cores" })
                 {
                     var root = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", sub);
                     if (!Directory.Exists(root)) continue;
