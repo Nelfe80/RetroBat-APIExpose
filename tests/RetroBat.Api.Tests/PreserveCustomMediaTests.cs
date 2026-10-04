@@ -22,15 +22,23 @@ public sealed class PreserveCustomMediaTests
 public sealed class ProfilInstallationTests
 {
     [Theory]
-    [InlineData("neuf", true, false)]
-    [InlineData("NEUF", true, false)]
-    [InlineData("configure", false, true)]
-    public void Un_profil_donne_ses_deux_reglages(string profil, bool autoScrap, bool preserve)
+    [InlineData("neuf", true, false, true)]
+    [InlineData("NEUF", true, false, true)]
+    [InlineData("configure", false, true, false)]
+    public void Un_profil_donne_ses_trois_reglages(string profil, bool autoScrap, bool preserve, bool gestionnaire)
     {
         var r = InstallProfileHostedService.Reglages(profil);
         Assert.NotNull(r);
         Assert.Equal(autoScrap, r!.Value.AutoScrap);
         Assert.Equal(preserve, r.Value.Preserve);
+        Assert.Equal(gestionnaire, r.Value.Gestionnaire);
+    }
+
+    [Fact]
+    public void Le_gestionnaire_de_medias_est_coupe_par_defaut()
+    {
+        // Decision user 2026-10-05 : APIExpose ne touche aux gamelists que si le joueur le demande.
+        Assert.False(new ApiExposeOptions().LocalMediaManager.Enabled);
     }
 
     [Theory]

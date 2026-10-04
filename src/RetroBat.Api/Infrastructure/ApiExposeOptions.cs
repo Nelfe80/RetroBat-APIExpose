@@ -243,7 +243,11 @@ public class ApiExposeOptions
 
     public class LocalMediaManagerOptions
     {
-        public bool Enabled { get; set; } = true;
+        /// <summary>
+        /// Coupe par defaut (decision user 2026-10-05) : APIExpose ne touche aux gamelists du joueur que
+        /// s'il le demande. Le profil d'installation « neuf » l'active ; l'auto-scrap en depend.
+        /// </summary>
+        public bool Enabled { get; set; } = false;
         public bool PopulateAllGamelistsRequested { get; set; }
 
         /// <summary>DÉPRÉCIÉ (LOT 1) - la décision « supprimer les copies roms/ après migration »

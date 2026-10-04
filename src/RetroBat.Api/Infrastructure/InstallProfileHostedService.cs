@@ -11,8 +11,10 @@ namespace RetroBat.Api.Infrastructure;
 ///
 /// L'installeur demande si le RetroBat est neuf ou deja configure, en suggerant la reponse d'apres
 /// ses gamelists, et laisse le joueur choisir :
-///   - neuf : APIExpose s'occupe des medias, auto-scrap actif, PRESERVE CUSTOM MEDIA coupe ;
-///   - configure : les medias du joueur sont a lui, auto-scrap coupe, PRESERVE CUSTOM MEDIA actif ;
+///   - neuf : APIExpose s'occupe des medias : LOCAL MEDIA MANAGER et auto-scrap actifs (l'auto-scrap
+///     depend du gestionnaire, coupe par defaut depuis le 2026-10-05), PRESERVE CUSTOM MEDIA coupe ;
+///   - configure : les medias du joueur sont a lui : LOCAL MEDIA MANAGER et auto-scrap coupes,
+///     PRESERVE CUSTOM MEDIA actif ;
 ///   - garder : rien ne change (mise a jour d'une installation existante).
 ///
 /// L'installeur ne touche pas lui-meme aux reglages : ES reecrit es_settings.cfg de memoire en
@@ -25,6 +27,7 @@ public sealed class InstallProfileHostedService : IHostedService
     public const string FileName = "install-profile.json";
     private const string CleAutoScrap = "global.apiexpose.scraping.auto_enabled";
     private const string ClePreserve = "global.apiexpose.media_allocation.write_policy_enabled";
+    private const string CleGestionnaire = "global.apiexpose.local_media_manager.enabled";
 
     private readonly ApiExposeAppsettingsSyncService _appsettings;
     private readonly IEsSettingsStore _esSettings;
@@ -46,11 +49,14 @@ public sealed class InstallProfileHostedService : IHostedService
         _dossierEtat = dossierEtat ?? Path.Combine(RetroBatPaths.PluginRoot, "state");
     }
 
-    /// <summary>Les reglages d'un profil : (auto-scrap, preserve custom media), ou null pour « garder ».</summary>
-    internal static (bool AutoScrap, bool Preserve)? Reglages(string? profil) => (profil ?? string.Empty).Trim().ToLowerInvariant() switch
+    /// <summary>
+    /// Les reglages d'un profil : (auto-scrap, preserve custom media, local media manager), ou null
+    /// pour « garder ».
+    /// </summary>
+    internal static (bool AutoScrap, bool Preserve, bool Gestionnaire)? Reglages(string? profil) => (profil ?? string.Empty).Trim().ToLowerInvariant() switch
     {
-        "neuf" or "new" => (true, false),
-        "configure" or "configured" => (false, true),
+        "neuf" or "new" => (true, false, true),
+        "configure" or "configured" => (false, true, false),
         _ => null,
     };
 
@@ -82,12 +88,14 @@ public sealed class InstallProfileHostedService : IHostedService
         {
             var auto = r.AutoScrap ? "1" : "0";
             var preserve = r.Preserve ? "1" : "0";
+            var gestionnaire = r.Gestionnaire ? "1" : "0";
             // appsettings.json fait foi au demarrage (le service des valeurs par defaut le recopie
             // vers ES) ; ES est ecrit aussi, pour que le menu le montre sans attendre.
             _appsettings.ApplyEsSettingsChanges(new[]
             {
                 new ApiExposeSettingChange(CleAutoScrap, string.Empty, auto),
                 new ApiExposeSettingChange(ClePreserve, string.Empty, preserve),
+                new ApiExposeSettingChange(CleGestionnaire, string.Empty, gestionnaire),
             });
             try
             {
@@ -95,7 +103,7 @@ public sealed class InstallProfileHostedService : IHostedService
                 {
                     var root = document.Root;
                     if (root is null) return false;
-                    return Ecrire(root, CleAutoScrap, auto) | Ecrire(root, ClePreserve, preserve);
+                    return Ecrire(root, CleAutoScrap, auto) | Ecrire(root, ClePreserve, preserve) | Ecrire(root, CleGestionnaire, gestionnaire);
                 }, cancellationToken);
             }
             catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException)
@@ -107,12 +115,13 @@ public sealed class InstallProfileHostedService : IHostedService
             for (var i = 0; i < 20 && !cancellationToken.IsCancellationRequested; i++)
             {
                 var o = _options.CurrentValue;
-                if (o.Scraping.AutoScrapingEnabled == r.AutoScrap && o.MediaAllocation.WritePolicyEnabled == r.Preserve) break;
+                if (o.Scraping.AutoScrapingEnabled == r.AutoScrap && o.MediaAllocation.WritePolicyEnabled == r.Preserve
+                    && o.LocalMediaManager.Enabled == r.Gestionnaire) break;
                 await Task.Delay(250, cancellationToken).ConfigureAwait(false);
             }
 
-            _logger?.LogInformation("Profil d'installation « {Profil} » applique : auto-scrap {Auto}, PRESERVE CUSTOM MEDIA {Preserve}.",
-                profil, r.AutoScrap ? "actif" : "coupe", r.Preserve ? "actif" : "coupe");
+            _logger?.LogInformation("Profil d'installation « {Profil} » applique : LOCAL MEDIA MANAGER {Gestionnaire}, auto-scrap {Auto}, PRESERVE CUSTOM MEDIA {Preserve}.",
+                profil, r.Gestionnaire ? "actif" : "coupe", r.AutoScrap ? "actif" : "coupe", r.Preserve ? "actif" : "coupe");
         }
         else
         {
