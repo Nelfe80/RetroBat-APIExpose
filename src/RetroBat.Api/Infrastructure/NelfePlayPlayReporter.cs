@@ -614,9 +614,12 @@ public sealed class NelfePlayPlayReporter : BackgroundService
                 .ConfigureAwait(false);
 
             // 401 : le secret anonyme ne vaut plus rien (base remise a zero,
-            // par exemple). On l'oublie pour en redemander un au prochain tour.
+            // par exemple). On en redemande un au prochain tour, mais on GARDE l'ancien de cote :
+            // si la base a ete restauree d'avant l'inscription de la borne, les parties jouees
+            // sous lui repartent sous lui pendant l'episode de recuperation (2026-10-05).
             if ((int)response.StatusCode == 401 && credential == _anonymousCredential)
             {
+                MettreDeCote(credential);
                 _anonymousCredential = null;
                 TryDeleteState();
             }
@@ -757,6 +760,39 @@ public sealed class NelfePlayPlayReporter : BackgroundService
             // Sans fichier, l'installation se reinscrira au prochain demarrage :
             // elle comptera comme nouvelle, ce qui est un defaut acceptable pour
             // une mesure d'audience.
+        }
+    }
+
+    private static readonly string AnciensPath =
+        Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "anonymous-anciens.json");
+
+    /// <summary>Les secrets anonymes que le site a oublies, du plus recent au plus ancien.</summary>
+    public static IReadOnlyList<string> AnciensSecrets()
+    {
+        try
+        {
+            return File.Exists(AnciensPath)
+                ? JsonSerializer.Deserialize<List<string>>(File.ReadAllText(AnciensPath)) ?? new List<string>()
+                : new List<string>();
+        }
+        catch
+        {
+            return new List<string>();
+        }
+    }
+
+    private static void MettreDeCote(string? credential)
+    {
+        if (string.IsNullOrEmpty(credential)) return;
+        try
+        {
+            var anciens = AnciensSecrets().Where(s => s != credential).Prepend(credential).Take(10).ToList();
+            Directory.CreateDirectory(Path.GetDirectoryName(AnciensPath)!);
+            File.WriteAllText(AnciensPath, JsonSerializer.Serialize(anciens));
+        }
+        catch
+        {
+            // Sans lui, seules les parties de la fenetre perdue jouees sous ce secret ne repartiront pas.
         }
     }
 

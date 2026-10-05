@@ -325,16 +325,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>
     /// Battement recovery : interroge l'état « share datas » (endpoint public, sans SQL)
     /// et, s'il est armé, re-verse les records auto-conservés. On n'agit JAMAIS
-    /// spontanément - uniquement quand l'admin a explicitement armé une reconstruction.
+    /// spontanément - uniquement quand le site a armé une reconstruction (le script de
+    /// restauration le fait seul). Voir RecuperationDesParties.
     /// </summary>
     private async Task RecoveryCheckAsync(CancellationToken cancellationToken)
     {
         if (!Enabled) return;
-        var credential = ResolveCredential();
-        if (string.IsNullOrEmpty(credential)) return;
         try
         {
-            using var client = CreateClient(credential);
+            // Le statut est public : pas besoin d'un secret valide pour le lire, et c'est
+            // justement quand la base restauree ne connait plus la borne qu'il compte.
+            using var client = CreateClient(ResolveCredential() ?? "");
             using var response = await client.GetAsync("/api/v1/scores/recovery-status", cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode) return;
             var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
@@ -342,18 +343,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var contribute = (bool?)root?["contribute"] ?? false;
             if (!contribute) return;
 
-            // NOUVEL ÉPISODE : une époque inédite (nouvel armement admin) → on RÉ-ARME les
-            // records déjà versés (*.sent → *.json) pour qu'une NOUVELLE récupération les
-            // re-verse aussi. Le .sent ne vaut donc que POUR l'épisode courant. L'époque est
+            // NOUVEL ÉPISODE : une époque inédite (nouvel armement) → on RÉ-ARME les records
+            // déjà versés DE LA FENÊTRE (*.sent → *.json) pour que cette récupération les
+            // re-verse. Le .sent ne vaut donc que POUR l'épisode courant. L'époque est
             // persistée pour survivre à un redémarrage au milieu d'un même épisode.
             var epoch = (string?)root?["epoch"] ?? "";
+            var fenetre = RecuperationDesParties.LireLaFenetre(root);
             if (!string.IsNullOrEmpty(epoch) && epoch != ReadLastEpoch())
             {
-                RearmSentFiles(CertifiedDir());
+                RearmSentFiles(CertifiedDir(), fenetre);
+                // La base restauree a pu perdre la cle de l'appareil : on la reinscrit.
+                _enrolledKeyId = null;
+                await EnsureEnrolledAsync(cancellationToken).ConfigureAwait(false);
                 WriteLastEpoch(epoch);
+                Trace($"recovery : nouvel episode {epoch}, fenetre {fenetre.Depuis:u} -> {fenetre.Jusqua:u}");
             }
 
-            await ContributeCertifiedAsync(client, cancellationToken).ConfigureAwait(false);
+            await ContributeCertifiedAsync(epoch, fenetre, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -441,43 +447,190 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         catch { /* best-effort : au pire on ré-arme une fois de trop, sans dommage (idempotent) */ }
     }
 
-    /// <summary>Ré-arme les records d'un épisode précédent : *.sent → *.json.</summary>
-    private void RearmSentFiles(string dir)
+    /// <summary>Ré-arme les records de la fenêtre d'un nouvel épisode : *.sent → *.json.</summary>
+    private void RearmSentFiles(string dir, RecuperationDesParties.Fenetre fenetre)
     {
         if (!System.IO.Directory.Exists(dir)) return;
         var n = 0;
         foreach (var sent in System.IO.Directory.EnumerateFiles(dir, "*.sent"))
         {
-            try { System.IO.File.Move(sent, sent[..^5], overwrite: true); n++; } catch { /* ignore */ }
+            try
+            {
+                if (JsonNode.Parse(System.IO.File.ReadAllText(sent)) is not JsonObject record) continue;
+                if (!fenetre.Contient(RecuperationDesParties.HeureDuRecord(record))) continue;
+                System.IO.File.Move(sent, sent[..^5], overwrite: true);
+                n++;
+            }
+            catch { /* ignore */ }
         }
         if (n > 0) Trace($"recovery : {n} record(s) ré-armé(s) (nouvel épisode).");
     }
 
+    /// <summary>Les records gardés sur la borne, envoyés ou non.</summary>
+    private static IEnumerable<JsonObject> LesRecords()
+    {
+        var dir = CertifiedDir();
+        if (!System.IO.Directory.Exists(dir)) yield break;
+        foreach (var path in System.IO.Directory.EnumerateFiles(dir, "*.*")
+            .Where(p => p.EndsWith(".json", StringComparison.OrdinalIgnoreCase) || p.EndsWith(".sent", StringComparison.OrdinalIgnoreCase)))
+        {
+            JsonObject? record = null;
+            try { record = JsonNode.Parse(System.IO.File.ReadAllText(path)) as JsonObject; } catch { /* illisible */ }
+            if (record is not null) yield return record;
+        }
+    }
+
+    /// <summary>
+    /// Les secrets de la borne : celui d'aujourd'hui, puis les secrets anonymes que le site a
+    /// oubliés (NelfePlayPlayReporter les met de côté au lieu de les effacer). Une partie jouée
+    /// sous un ancien secret ne repart que sous lui.
+    /// </summary>
+    private List<string> SecretsConnus()
+    {
+        var secrets = new List<string>();
+        var actuel = ResolveCredential();
+        if (!string.IsNullOrEmpty(actuel)) secrets.Add(actuel);
+        foreach (var ancien in NelfePlayPlayReporter.AnciensSecrets())
+            if (!secrets.Contains(ancien)) secrets.Add(ancien);
+        return secrets;
+    }
+
+    /// <summary>Les preuves d'identité refusées pour de bon, par secret et par épisode : on ne les rejoue pas.</summary>
+    private readonly HashSet<string> _reconnaissancesRefusees = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// La borne se fait reconnaître d'une base qui l'a perdue : un de ses passeports (ticket de la
+    /// plateforme pour cet appareil) et une preuve fraîche signée par la clé de l'appareil.
+    /// </summary>
+    private async Task<bool> SeFaireReconnaitreAsync(string secret, string deviceId, string epoch, CancellationToken cancellationToken)
+    {
+        var refus = secret + "|" + epoch + "|" + deviceId;
+        if (_reconnaissancesRefusees.Contains(refus)) return false;
+        var passeport = RecuperationDesParties.PasseportDeLAppareil(LesRecords(), deviceId);
+        if (passeport is null)
+        {
+            Trace($"recovery : aucun passeport pour se faire reconnaitre comme {deviceId}");
+            _reconnaissancesRefusees.Add(refus);
+            return false;
+        }
+        try
+        {
+            using var cle = CngDeviceKey.OpenOrCreate(ScoringKeyName);
+            var corps = new JsonObject
+            {
+                ["key_pem"] = cle.PublicKeyPem,
+                ["passport"] = passeport.DeepClone(),
+                ["proof"] = cle.SignB64Url(RecuperationDesParties.MessageDePreuve(deviceId, RecuperationDesParties.Sha256Hex(secret), epoch)),
+            };
+            using var client = CreateClient(secret);
+            using var content = new StringContent(corps.ToJsonString(), Encoding.UTF8, "application/json");
+            using var response = await client.PostAsync("/api/v1/agent/recovery/reidentify", content, cancellationToken).ConfigureAwait(false);
+            var reponse = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            Trace($"recovery : reidentification de {deviceId} HTTP {(int)response.StatusCode} - {reponse}");
+            if (response.IsSuccessStatusCode)
+            {
+                _logger?.LogInformation("Scoring : borne reconnue par le site restauré ({DeviceId}).", deviceId);
+                return true;
+            }
+            if ((int)response.StatusCode is 409 or 422) _reconnaissancesRefusees.Add(refus);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Trace($"recovery : reidentification impossible : {ex.Message}");
+            return false;
+        }
+    }
+
+    private async Task<RecuperationDesParties.Issue> RenvoyerAsync(string secret, string corps, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var client = CreateClient(secret);
+            using var content = new StringContent(corps, new UTF8Encoding(false), "application/json");
+            using var response = await client.PostAsync("/api/v1/agent/scores/contribute", content, cancellationToken).ConfigureAwait(false);
+            var reponse = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            var issue = RecuperationDesParties.Classer((int)response.StatusCode, reponse);
+            if (issue != RecuperationDesParties.Issue.Fait) Trace($"recovery : renvoi HTTP {(int)response.StatusCode} {issue} - {reponse}");
+            return issue;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            Trace($"recovery : renvoi impossible : {ex.Message}");
+            return RecuperationDesParties.Issue.ARetenter;
+        }
+    }
+
     /// <summary>
     /// Re-verse les passeports auto-conservés dans certified/ vers le serveur en
-    /// reconstruction. Chaque record REPASSE le pipeline vérifié (signature + règles) et
-    /// est idempotent (déjà présent = duplicate). On marque le fichier .sent après envoi
-    /// pour ne pas le renvoyer ; un échec transport le laisse pour le prochain battement.
+    /// reconstruction, ceux de la fenêtre seulement. Chaque record REPASSE le pipeline vérifié
+    /// (signature + règles) et est idempotent (déjà présent = duplicate). Il n'est marqué .sent
+    /// que sur un VRAI verdict : jusqu'au 2026-10-05, un refus « clé inconnue » de la base
+    /// restaurée le marquait aussi, et la partie était perdue pour l'épisode. Une clé inconnue
+    /// se réinscrit, une borne inconnue se fait reconnaître, puis la partie repart.
     /// </summary>
-    private async Task ContributeCertifiedAsync(HttpClient client, CancellationToken cancellationToken)
+    private async Task ContributeCertifiedAsync(string epoch, RecuperationDesParties.Fenetre fenetre, CancellationToken cancellationToken)
     {
         var dir = CertifiedDir();
         if (!System.IO.Directory.Exists(dir)) return;
+        var secrets = SecretsConnus();
+        if (secrets.Count == 0) return;
 
         var sent = 0;
-        foreach (var path in System.IO.Directory.EnumerateFiles(dir, "*.json"))
+        var clesReinscrites = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var path in System.IO.Directory.EnumerateFiles(dir, "*.json").ToList())
         {
             cancellationToken.ThrowIfCancellationRequested();
             string body;
-            try { body = await System.IO.File.ReadAllTextAsync(path, cancellationToken).ConfigureAwait(false); }
-            catch { continue; }
-
-            using var content = new StringContent(body, new UTF8Encoding(false), "application/json");
-            using var response = await client.PostAsync("/api/v1/agent/scores/contribute", content, cancellationToken).ConfigureAwait(false);
-            if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Conflict)
+            JsonObject? record;
+            try
             {
-                try { System.IO.File.Move(path, path + ".sent", overwrite: true); } catch { /* on retentera */ }
-                sent++;
+                body = await System.IO.File.ReadAllTextAsync(path, cancellationToken).ConfigureAwait(false);
+                record = JsonNode.Parse(body) as JsonObject;
+            }
+            catch { continue; }
+            if (record is null || !fenetre.Contient(RecuperationDesParties.HeureDuRecord(record))) continue;
+            var deviceId = (string?)record["passport"]?["device"]?["device_id"];
+
+            // Le secret d'aujourd'hui d'abord, puis les anciens : la partie repart sous le sien.
+            var issue = RecuperationDesParties.Issue.ARetenter;
+            string? secretRetenu = null;
+            var autreIdentitePartout = true;
+            foreach (var secret in secrets)
+            {
+                issue = await RenvoyerAsync(secret, body, cancellationToken).ConfigureAwait(false);
+                if (issue == RecuperationDesParties.Issue.BorneInconnue && !string.IsNullOrEmpty(deviceId)
+                    && await SeFaireReconnaitreAsync(secret, deviceId!, epoch, cancellationToken).ConfigureAwait(false))
+                {
+                    issue = await RenvoyerAsync(secret, body, cancellationToken).ConfigureAwait(false);
+                }
+                if (issue == RecuperationDesParties.Issue.CleInconnue && clesReinscrites.Add(secret))
+                {
+                    await InscrireLaCleAsync(secret, cancellationToken).ConfigureAwait(false);
+                    issue = await RenvoyerAsync(secret, body, cancellationToken).ConfigureAwait(false);
+                }
+                if (issue != RecuperationDesParties.Issue.AutreIdentite) autreIdentitePartout = false;
+                if (issue is RecuperationDesParties.Issue.Fait or RecuperationDesParties.Issue.ARetenter)
+                {
+                    secretRetenu = secret;
+                    break;
+                }
+            }
+
+            // Le site peine : on s'arrête là, le prochain battement reprendra.
+            if (issue == RecuperationDesParties.Issue.ARetenter) break;
+            if (issue != RecuperationDesParties.Issue.Fait && !autreIdentitePartout) continue;
+            if (autreIdentitePartout)
+                Trace($"recovery : {System.IO.Path.GetFileName(path)} n'appartient a aucune identite de cette borne");
+
+            try { System.IO.File.Move(path, path + ".sent", overwrite: true); } catch { /* on retentera */ }
+            sent++;
+            if (secretRetenu is not null && record["replay_link"] is JsonObject lien)
+            {
+                // Le lien replay de la partie, perdu avec la base : on le redéclare.
+                await RegisterReplayLinkAsync((string?)record["session_id"] ?? "", (string?)lien["replay_id"] ?? "",
+                    (string?)lien["object_sha256"] ?? "", (string?)lien["visibility"] ?? "private", cancellationToken, secretRetenu)
+                    .ConfigureAwait(false);
             }
         }
 
@@ -3210,6 +3363,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             Trace($"{(annoncer ? "VERDICT HTTP" : "VERDICT DIFFERE HTTP")} {statutHttp} - {body}");
             if (RetroBat.Api.Scoring.BrouillonDeScore.Classer(statutHttp, body) == RetroBat.Api.Scoring.IssueDEnvoi.ARetenter)
             {
+                // Le site ne connait pas la cle (base restauree d'avant son inscription) : on la
+                // reinscrit, et la partie repartira au prochain essai de la file.
+                if (body.Contains("session.device_unknown", StringComparison.Ordinal)) _enrolledKeyId = null;
                 _logger?.LogInformation("Scoring : pas de verdict du site (HTTP {Status}), la partie reste en file.", statutHttp);
                 return (RetroBat.Api.Scoring.IssueDEnvoi.ARetenter, null, null);
             }
@@ -3632,12 +3788,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             using var deviceKey = CngDeviceKey.OpenOrCreate(ScoringKeyName);
             if (_enrolledKeyId == deviceKey.KeyId) return;
-
-            using var client = CreateClient(credential);
-            using var content = new StringContent(deviceKey.PublicKeyPem, Encoding.ASCII, "application/x-pem-file");
-            using var response = await client.PostAsync("/api/v1/agent/scores/enroll-key", content, cancellationToken).ConfigureAwait(false);
-            Trace($"enroll HTTP {(int)response.StatusCode} key_id={deviceKey.KeyId}");
-            if (response.IsSuccessStatusCode)
+            if (await InscrireLaCleAsync(credential, cancellationToken).ConfigureAwait(false))
             {
                 _enrolledKeyId = deviceKey.KeyId;
                 _logger?.LogInformation("Scoring : clé d'appareil enrôlée (key_id {KeyId}).", deviceKey.KeyId);
@@ -3646,6 +3797,25 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         catch (Exception ex)
         {
             _logger?.LogDebug(ex, "Scoring : enrôlement impossible.");
+        }
+    }
+
+    /// <summary>Inscrit la clé de l'appareil auprès du site, sous ce secret.</summary>
+    private async Task<bool> InscrireLaCleAsync(string credential, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var deviceKey = CngDeviceKey.OpenOrCreate(ScoringKeyName);
+            using var client = CreateClient(credential);
+            using var content = new StringContent(deviceKey.PublicKeyPem, Encoding.ASCII, "application/x-pem-file");
+            using var response = await client.PostAsync("/api/v1/agent/scores/enroll-key", content, cancellationToken).ConfigureAwait(false);
+            Trace($"enroll HTTP {(int)response.StatusCode} key_id={deviceKey.KeyId}");
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogDebug(ex, "Scoring : enrôlement impossible.");
+            return false;
         }
     }
 
@@ -3675,7 +3845,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var client = _httpFactory.CreateClient(nameof(NelfePlayScoringReporter));
         client.BaseAddress = new Uri(NelfePlayAgentService.BaseUrl.TrimEnd('/'));
         client.Timeout = TimeSpan.FromSeconds(10);
-        client.DefaultRequestHeaders.Add("X-NelfePlay-Device", credential);
+        if (!string.IsNullOrEmpty(credential)) client.DefaultRequestHeaders.Add("X-NelfePlay-Device", credential);
         return client;
     }
 
@@ -4291,9 +4461,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// score inconnu, pas a cette borne), faux s'il faut retenter (reseau, serveur indisponible).
     /// </summary>
     private async Task<bool> RegisterReplayLinkAsync(
-        string sessionId, string replayId, string sha256, string visibility, CancellationToken cancellationToken)
+        string sessionId, string replayId, string sha256, string visibility, CancellationToken cancellationToken,
+        string? secret = null)
     {
-        var credential = ResolveCredential();
+        var credential = secret ?? ResolveCredential();
         if (string.IsNullOrEmpty(credential)) return false;
         try
         {
@@ -4310,6 +4481,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var respBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             Trace($"REPLAY-LINK HTTP {(int)response.StatusCode} - {respBody}");
             _logger?.LogInformation("Replay-link : {Status} - {Body}", (int)response.StatusCode, respBody);
+            if (response.IsSuccessStatusCode) NoterLeLienDansLeRecord(sessionId, body);
             return response.IsSuccessStatusCode || (int)response.StatusCode is >= 400 and < 500 and not 408 and not 429;
         }
         catch (Exception ex)
@@ -4317,6 +4489,24 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _logger?.LogDebug(ex, "Replay-link : envoi impossible, nouvel essai plus tard.");
             return false;
         }
+    }
+
+    /// <summary>
+    /// Garde le lien replay dans le record de la partie (certified/) : si la base du site est
+    /// restaurée d'avant ce lien, l'épisode de récupération le redéclare avec la partie.
+    /// </summary>
+    private static void NoterLeLienDansLeRecord(string sessionId, JsonObject lien)
+    {
+        try
+        {
+            var chemin = System.IO.Path.Combine(CertifiedDir(), sessionId + ".json");
+            if (!System.IO.File.Exists(chemin)) chemin += ".sent";
+            if (!System.IO.File.Exists(chemin)) return;
+            if (JsonNode.Parse(System.IO.File.ReadAllText(chemin)) is not JsonObject record) return;
+            record["replay_link"] = lien.DeepClone();
+            System.IO.File.WriteAllText(chemin, record.ToJsonString(), new UTF8Encoding(false));
+        }
+        catch { /* le lien est pose sur le site ; seul son double local manque */ }
     }
 
     private static JsonElement ToJson(object? payload)

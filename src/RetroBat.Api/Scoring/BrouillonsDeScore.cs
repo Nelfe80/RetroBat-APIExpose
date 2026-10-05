@@ -67,8 +67,25 @@ public static class BrouillonDeScore
         }
 
         if (!json) return IssueDEnvoi.ARetenter;
+        // Un refus qui parle de la borne et pas de la partie : le site ne connait pas (encore) la
+        // cle de l'appareil, ou n'a pas pu ecrire. La borne reinscrit sa cle et retente.
+        if (statut is >= 200 and < 300 && RefusSansJugement(corps!)) return IssueDEnvoi.ARetenter;
         if (statut is >= 200 and < 300) return IssueDEnvoi.Definitif;
         return statut is 400 or 409 or 422 ? IssueDEnvoi.Definitif : IssueDEnvoi.ARetenter;
+    }
+
+    /// <summary>Les refus qui ne jugent pas la partie : cle de l'appareil inconnue, ecriture ratee.</summary>
+    private static bool RefusSansJugement(string corps)
+    {
+        try
+        {
+            if (JsonNode.Parse(corps) is not JsonObject json || (string?)json["status"] != "refused") return false;
+            return (string?)json["reason"] is "session.device_unknown" or "server.unavailable" or "submission.write_failed";
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
     }
 }
 
