@@ -127,6 +127,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly Dictionary<int, List<(long frame, long total)>> _trajectoiresAutres = new();
     private long? _finalTotal;
     private bool _inDemo;   // attract mode : le jeu se joue seul → on ignore le score
+    /// <summary>Le dernier appui du joueur : panel lu par l'API, ou entrees vues par le wrapper.</summary>
+    private DateTime _dernierAppuiUtc = DateTime.MinValue;
+    /// <summary>
+    /// Un DEMO_MODE recu en pleine partie, pas encore cru : son heure et l'image ou il est arrive. Les
+    /// lectures prises depuis restent dans la trajectoire ; s'il se confirme, elles en sortent.
+    /// </summary>
+    private (DateTime Depuis, long Frame)? _demoEnSuspens;
+    /// <summary>Un GAME_OVER depuis le dernier depart : la demo qui suit est vraie, on ne la discute pas.</summary>
+    private bool _gameOverVu;
+    /// <summary>Les signaux de demo ignores dans la session (journal de la session).</summary>
+    private int _demosIgnorees;
     // Phase D (segmentation en RUNS, 100% APIExpose) : la trajectoire des scores suffit —
     // on la découpe aux CHUTES de score (un score qui retombe = partie relancée) et on ne
     // soumet QUE le meilleur run (segment monotone). Un super score n'est plus perdu si on
@@ -774,6 +785,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _lastFrame = 0;
             _finalTotal = null;
             _inDemo = false;
+            _demoEnSuspens = null;
+            _gameOverVu = false;
+            _demosIgnorees = 0;
             _scoresRecus = _scoresEnDemo = 0;
             _chiffreCredits = false;
             _dernierPropre = _derniereLecture = _avantContinue = null;
@@ -1374,10 +1388,96 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             SortirDeDemo();
             return;
         }
+        double? appuiIlYA = null;
         lock (_sync)
         {
-            (_inDemo, _enJeu) = EtatsApres(_inDemo, _enJeu, action);
+            var maintenant = DateTime.UtcNow;
+            if (action.Contains("DEMO", StringComparison.Ordinal)
+                && DemoDouteuse(_enJeu, _inDemo, _gameOverVu, _dernierAppuiUtc, maintenant))
+            {
+                // Le joueur appuyait il y a un instant : on attend de voir s'il continue.
+                if (_demoEnSuspens is null)
+                {
+                    _demoEnSuspens = (maintenant, _lastFrame);
+                    appuiIlYA = (maintenant - _dernierAppuiUtc).TotalSeconds;
+                }
+            }
+            else
+            {
+                (_inDemo, _enJeu) = EtatsApres(_inDemo, _enJeu, action);
+                if (action.Contains("GAME_OVER", StringComparison.Ordinal)) { _gameOverVu = true; _demoEnSuspens = null; }
+            }
         }
+        if (appuiIlYA is { } s)
+            Trace($"signal {action} en pleine partie (dernier appui il y a {s:0.0} s) : en attente des appuis qui suivent");
+    }
+
+    /// <summary>
+    /// UN SIGNAL DE DEMO EN PLEINE PARTIE EST IGNORE QUAND LE JOUEUR APPUIE AVANT ET APRES (regle user
+    /// 2026-10-06). Une demo se joue seule : personne n'appuie. Le .MEM d'Altered Beast declarait
+    /// DEMO_MODE sur l'octet du niveau (« Gameplay Stage 2 ») : chez un joueur dont l'API ne voyait ni
+    /// le START ni le credit, tout ce qui suivait le niveau 1 partait en demo (theJim, 15 parties
+    /// perdues et 17 coupees vers 108 000 en deux jours). Le signal n'est donc cru que si le joueur ne
+    /// touche plus a rien dans les AppuiApresDemo qui suivent ; un appui dans ce delai le refute. Apres
+    /// un depart vu (START, credit, GAME_START), un DEMO_MODE etait deja ignore : ce garde-fou couvre
+    /// la borne qui ne voit pas ce depart.
+    /// </summary>
+    internal static readonly TimeSpan AppuiAvantDemo = TimeSpan.FromSeconds(20);
+    internal static readonly TimeSpan AppuiApresDemo = TimeSpan.FromSeconds(15);
+
+    /// <summary>
+    /// Le signal de demo est-il a mettre en doute ? Pas en jeu ouvert (il y est deja ignore), pas en
+    /// demo deja, pas apres un GAME_OVER (la demo qui suit est vraie), et un appui recent.
+    /// </summary>
+    internal static bool DemoDouteuse(bool enJeu, bool dejaEnDemo, bool gameOverVu, DateTime dernierAppui, DateTime maintenant)
+        => !enJeu && !dejaEnDemo && !gameOverVu && maintenant - dernierAppui <= AppuiAvantDemo;
+
+    /// <summary>Un appui a cette heure refute-t-il la demo en suspens depuis cette heure-la ?</summary>
+    internal static bool DemoRefutee(DateTime depuis, DateTime appui)
+        => appui >= depuis && appui - depuis <= AppuiApresDemo;
+
+    /// <summary>La demo en suspens se confirme-t-elle : aucun appui depuis, et le delai ecoule ?</summary>
+    internal static bool DemoConfirmee(DateTime depuis, DateTime dernierAppui, DateTime maintenant)
+        => dernierAppui < depuis && maintenant - depuis > AppuiApresDemo;
+
+    /// <summary>Un appui du joueur, de quelque source que ce soit.</summary>
+    private void NoterAppui()
+    {
+        var refutee = false;
+        lock (_sync)
+        {
+            var maintenant = DateTime.UtcNow;
+            _dernierAppuiUtc = maintenant;
+            if (_demoEnSuspens is { } s && DemoRefutee(s.Depuis, maintenant))
+            {
+                _demoEnSuspens = null;
+                _demosIgnorees++;
+                refutee = true;
+            }
+        }
+        if (refutee) Trace("signal de demo ignore : le joueur appuie avant et apres, la partie continue");
+    }
+
+    /// <summary>
+    /// Appele sous _sync. La demo en suspens qui se confirme : on entre en demo, et les lectures prises
+    /// depuis le signal sortent de la trajectoire (une demo n'est jamais certifiee).
+    /// </summary>
+    private int ConfirmerLaDemoSiSilence(DateTime maintenant)
+    {
+        if (_demoEnSuspens is not { } s || !DemoConfirmee(s.Depuis, _dernierAppuiUtc, maintenant)) return -1;
+        _demoEnSuspens = null;
+        _inDemo = true;
+        var retirees = 0;
+        while (_trajectory.Count > 0 && _trajectory[^1].frame >= s.Frame)
+        {
+            _trajectory.RemoveAt(_trajectory.Count - 1);
+            _horsJeu.RemoveAt(_horsJeu.Count - 1);
+            _contextes.RemoveAt(_contextes.Count - 1);
+            retirees++;
+        }
+        _scoresEnDemo += retirees;
+        _finalTotal = _trajectory.Count > 0 ? _trajectory[^1].total : null;
+        return retirees;
     }
 
     /// <summary>
@@ -1484,6 +1584,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             if (!_enJeu && _scoreAuDepart is null && _dernierTotalVu is { } auDepart) _scoreAuDepart = (_lastFrame, auDepart);
             _inDemo = false; _startVu = true; _enJeu = true;
+            _gameOverVu = false;
+            _demoEnSuspens = null;
         }
     }
 
@@ -1493,15 +1595,22 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (!root.TryGetProperty("Presses", out var p) || p.ValueKind != JsonValueKind.Array) return;
         var appuis = p.EnumerateArray().Select(v => v.TryGetInt32(out var n) ? n : 0).ToArray();
         if (appuis.Length > 0) _portLocal.SecondeDuWrapper(appuis);
+        // Le wrapper voit les entrees que RetroArch donne au jeu : clavier compris, manette non lue
+        // par l'API comprise.
+        if (appuis.Any(n => n > 0)) NoterAppui();
     }
 
     private void CaptureStart(JsonElement root)
     {
         _panelLu = true;
         if ((Entier(root, "Player") ?? Entier(root, "player") ?? 1) == 1) _portLocal.AppuiDuPanel();
+        NoterAppui();
         var systeme = GetString(root, "System") ?? GetString(root, "system") ?? "";
         if (!string.Equals(systeme, "START", StringComparison.OrdinalIgnoreCase)) return;
         var joueur = Entier(root, "Player") ?? Entier(root, "player") ?? 1;
+        // Le START lu au panel ouvre la partie : le dire au journal, c'est ce qui manquait pour voir
+        // qu'une borne ne le lisait plus (theJim, depuis le 2026-09-30, sans que rien ne le montre).
+        Trace($"START lu au panel (joueur {joueur})");
         lock (_sync)
         {
             _departs.Add(new DepartDeJoueur(joueur, _lastFrame));
@@ -2102,6 +2211,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             _scoresRecus++;
             _dernierTotalVu = total;
+            // Rare, et une ligne de journal : sous le verrou, c'est sans consequence.
+            var demoConfirmee = ConfirmerLaDemoSiSilence(DateTime.UtcNow);
+            if (demoConfirmee >= 0) Trace($"signal de demo confirme : plus d'appui depuis, {demoConfirmee} lecture(s) ecartee(s)");
             if (_inDemo) { _scoresEnDemo++; return; }   // score de démo → jamais certifié
             var precedent = _finalTotal;
             _finalTotal = total;
@@ -2388,7 +2500,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var romGroup = GetString(payload, "Rom") ?? "";
         var sessionJson = GetString(payload, "Session");
         Trace($"session reçue sys={systemId} rom={romGroup} sessionLen={sessionJson?.Length ?? -1}");
-        lock (_sync) _finDeLaSession = DateTime.UtcNow;
+        int demoAuBilan;
+        lock (_sync)
+        {
+            _finDeLaSession = DateTime.UtcNow;
+            demoAuBilan = ConfirmerLaDemoSiSilence(_finDeLaSession);
+        }
+        if (demoAuBilan >= 0) Trace($"signal de demo confirme en fin de session : {demoAuBilan} lecture(s) ecartee(s)");
         // Une session est arrivee. Elle ne vaut PAS quittance a elle seule : celles d'Altered
         // Beast sous MAME arrivaient vides, sans le moindre score. C'est le chemin de soumission
         // qui decidera, un peu plus bas, s'il y avait quelque chose a mesurer.
@@ -2865,7 +2983,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
         // Rien à certifier sans score ni attestation : on s'arrête AVANT de consommer
         // quoi que ce soit (démo, navigation, jeu non joué).
-        Trace($"état: listener={listenerSha is not null} core={coreSha is not null} content={contentSha is not null} finalTotal={finalTotal} trajPts={trajectory.Count} inDemo={_inDemo} scoresRecus={_scoresRecus} dontDemo={_scoresEnDemo}");
+        Trace($"état: listener={listenerSha is not null} core={coreSha is not null} content={contentSha is not null} finalTotal={finalTotal} trajPts={trajectory.Count} inDemo={_inDemo} scoresRecus={_scoresRecus} dontDemo={_scoresEnDemo} demosIgnorees={_demosIgnorees}");
         if (listenerSha is null || finalTotal is null)
         {
             Trace("STOP: pas de score/attestation");
