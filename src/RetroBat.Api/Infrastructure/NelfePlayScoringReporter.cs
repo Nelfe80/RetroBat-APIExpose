@@ -3827,7 +3827,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "runtime.cheat_detected" => "triche (cheat) détectée",
         "runtime.continue_forbidden" => "continue interdit pour ce record",
         "runtime.impossible_inputs" => "directions opposées simultanées (manette ou stick non conforme)",
-        "plausibility.macro_detected" => "séquence rejouée à l'identique (macro) : score signalé, non classé",
+        // Le bandeau dit deja « signale, non classe » : le motif ne le redit pas (2026-10-06).
+        "plausibility.macro_detected" => "séquence rejouée à l'identique (macro)",
         "plausibility.statistical_hold" => "score retenu pour vérification",
         "runtime.module_unauthorized" => "logiciel non homologué",
         "profile.core_mismatch" => "émulateur non reconnu",
