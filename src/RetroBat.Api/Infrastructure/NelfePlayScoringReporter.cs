@@ -1367,7 +1367,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// LE DEPART DE LA PARTIE, LU DANS LA MEMOIRE DU JEU (2026-10-02) : un credit consomme, ou
     /// l'action GAME_START du .MEM. L'enregistreur de replay ne partait que sur le START lu par le
     /// lecteur de manettes de l'API ; une borne jouee au clavier, ou dont la manette n'est pas lue,
-    /// n'enregistrait plus rien alors que son score partait (theJim : un replay sur vingt-cinq
+    /// n'enregistrait plus rien alors que son score partait (player : un replay sur vingt-cinq
     /// parties). Le credit consomme tombe au START meme ; l'enregistreur le prend comme tel.
     /// </summary>
     private void AnnoncerLeDepart(string source)
@@ -1416,7 +1416,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// UN SIGNAL DE DEMO EN PLEINE PARTIE EST IGNORE QUAND LE JOUEUR APPUIE AVANT ET APRES (regle user
     /// 2026-10-06). Une demo se joue seule : personne n'appuie. Le .MEM d'Altered Beast declarait
     /// DEMO_MODE sur l'octet du niveau (« Gameplay Stage 2 ») : chez un joueur dont l'API ne voyait ni
-    /// le START ni le credit, tout ce qui suivait le niveau 1 partait en demo (theJim, 15 parties
+    /// le START ni le credit, tout ce qui suivait le niveau 1 partait en demo (player, 15 parties
     /// perdues et 17 coupees vers 108 000 en deux jours). Le signal n'est donc cru que si le joueur ne
     /// touche plus a rien dans les AppuiApresDemo qui suivent ; un appui dans ce delai le refute. Apres
     /// un depart vu (START, credit, GAME_START), un DEMO_MODE etait deja ignore : ce garde-fou couvre
@@ -1609,7 +1609,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (!string.Equals(systeme, "START", StringComparison.OrdinalIgnoreCase)) return;
         var joueur = Entier(root, "Player") ?? Entier(root, "player") ?? 1;
         // Le START lu au panel ouvre la partie : le dire au journal, c'est ce qui manquait pour voir
-        // qu'une borne ne le lisait plus (theJim, depuis le 2026-09-30, sans que rien ne le montre).
+        // qu'une borne ne le lisait plus (player, depuis le 2026-09-30, sans que rien ne le montre).
         Trace($"START lu au panel (joueur {joueur})");
         lock (_sync)
         {

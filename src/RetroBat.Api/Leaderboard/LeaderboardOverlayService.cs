@@ -428,7 +428,7 @@ public sealed class LeaderboardOverlayService : IDisposable
     /// <summary>
     /// Le texte coupe pour tenir dans la largeur, termine par trois points (2026-10-04). GDI+
     /// coupait sur « … », que la police du theme n'a pas : chargee en police privee, elle n'a
-    /// aucun repli, et le caractere sortait en carres (« LORENZOLA » suivi de trois cases).
+    /// aucun repli, et le caractere sortait en carres (« PLAYER » suivi de trois cases).
     /// </summary>
     internal static string Couper(Graphics g, string texte, Font police, float largeur)
     {

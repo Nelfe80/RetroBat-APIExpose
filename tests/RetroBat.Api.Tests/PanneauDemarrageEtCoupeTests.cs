@@ -27,14 +27,14 @@ public sealed class PanneauDemarrageEtCoupeTests : IDisposable
         using var police = new Font(FontFamily.GenericSansSerif, 20f, GraphicsUnit.Pixel);
         float Mesure(string t) => g.MeasureString(t, police, PointF.Empty, StringFormat.GenericTypographic).Width;
 
-        var largeur = Mesure("LORENZOLA");
-        var coupe = LeaderboardOverlayService.Couper(g, "LORENZOLAMAS", police, largeur);
+        var largeur = Mesure("PLAYERPLA");
+        var coupe = LeaderboardOverlayService.Couper(g, "PLAYERPLAYER", police, largeur);
 
         Assert.EndsWith("...", coupe);
-        Assert.StartsWith("LORENZ", coupe);
+        Assert.StartsWith("PLAYER", coupe);
         Assert.DoesNotContain('\u2026', coupe);
         Assert.True(Mesure(coupe) <= largeur);
-        Assert.Equal("THEJIM", LeaderboardOverlayService.Couper(g, "THEJIM", police, largeur));
+        Assert.Equal("PLAYER", LeaderboardOverlayService.Couper(g, "PLAYER", police, largeur));
     }
 
     [Fact]

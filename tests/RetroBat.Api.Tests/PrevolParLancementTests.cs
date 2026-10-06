@@ -6,7 +6,7 @@ namespace RetroBat.Api.Tests;
 /// <summary>
 /// Le bandeau « Partie certifiable » : un par lancement, sans aucune duree (regle user 2026-10-05).
 /// Sous MAME, le wrapper puis le pont Lua attestent la meme partie : le second bandeau se tait. Une
-/// partie RELANCEE a toujours le sien (Lorenzo : plus de bandeau des la deuxieme partie).
+/// partie RELANCEE a toujours le sien (player : plus de bandeau des la deuxieme partie).
 /// </summary>
 public class PrevolParLancementTests
 {

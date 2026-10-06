@@ -339,7 +339,7 @@ public sealed class ReplayRecorderService : BackgroundService
 
         // LE DEPART LU DANS LA MEMOIRE DU JEU (credit consomme, GAME_START du .MEM) vaut un START :
         // une borne jouee au clavier, ou dont la manette n'est pas lue par l'API, n'enregistrait
-        // plus rien (theJim, 2026-10-02 : « en attente d'un START », puis plus rien).
+        // plus rien (player, 2026-10-02 : « en attente d'un START », puis plus rien).
         if (string.Equals(e.Type, "scoring.partie.depart", StringComparison.Ordinal))
         {
             var source = "memoire du jeu";
