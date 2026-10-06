@@ -49,6 +49,36 @@ public class AnnonceLocaliseeTests
     }
 
     [Fact]
+    public void Les_reglages_du_jeu_remis_d_usine_sont_nommes()
+    {
+        // Decision user 2026-10-07 : sous FBNeo on force, et le bandeau dit ce qui a ete remis d'usine.
+        var remis = NelfePlayScoringReporter.ReglagesDuJeuRemisDUsine(
+            "fbneo-allow-patched-romsets=disabled;fbneo-dipswitch-altbeast-Energy_Meter=3;fbneo-dipswitch-altbeast-Lives=3");
+        Assert.Equal(new[] { "Energy Meter", "Lives" }, remis);
+        Assert.Equal(("Partie certifiable", "réglages du jeu remis d'usine : Energy Meter, Lives"),
+            NelfePlayScoringReporter.AnnonceLocalisee("fr", true, "", [], force: true, remis));
+        Assert.Equal("game settings reset to factory: Energy Meter, Lives",
+            NelfePlayScoringReporter.AnnonceLocalisee("en", true, "", [], force: true, remis).Detail);
+    }
+
+    [Fact]
+    public void Une_option_de_l_emulateur_seule_garde_le_texte_d_avant()
+    {
+        Assert.Empty(NelfePlayScoringReporter.ReglagesDuJeuRemisDUsine("fbneo-allow-patched-romsets=disabled"));
+        Assert.Empty(NelfePlayScoringReporter.ReglagesDuJeuRemisDUsine(null));
+        Assert.Equal(("Partie certifiable", "réglages certifiés appliqués"),
+            NelfePlayScoringReporter.AnnonceLocalisee("fr", true, "", [], force: true,
+                NelfePlayScoringReporter.ReglagesDuJeuRemisDUsine("fbneo-allow-patched-romsets=disabled")));
+    }
+
+    [Fact]
+    public void Une_option_dangereuse_passe_avant_les_reglages_remis_d_usine()
+    {
+        Assert.Equal("Partie non certifiable",
+            NelfePlayScoringReporter.AnnonceLocalisee("fr", true, "", ["rewind"], force: true, ["Lives"]).Titre);
+    }
+
+    [Fact]
     public void Plusieurs_options_dangereuses_se_listent_dans_la_langue()
     {
         var (_, detail) = NelfePlayScoringReporter.AnnonceLocalisee("en", true, "", ["rewind", "runahead"], force: false);

@@ -1083,6 +1083,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             lock (_sync) { _chiffreCredits = chiffreCredits; }
             var reason = root.TryGetProperty("reason", out var r) ? r.GetString() ?? "" : "";
             var force = (GetString(attestation, "ForcedOptions") ?? "").Length > 0;
+            // Les reglages du JEU que le forcage a remis d'usine (DIP), nommes au joueur : il les avait
+            // changes, il doit savoir qu'ils ne comptent pas (decision user 2026-10-07).
+            var remisDUsine = ReglagesDuJeuRemisDUsine(GetString(attestation, "ForcedOptions"));
             // Le frontend, que la plateforme ne voit pas : rembobinage, run-ahead, sauvegarde
             // automatique font refuser le score a la fin. Le forcage les neutralise par jeu ;
             // eteint, ou pris de court, il reste a prevenir avant que le joueur ne joue pour rien.
@@ -1195,7 +1198,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             else
             {
                 titre = "Partie certifiable";
-                detail = force ? "réglages certifiés appliqués" : "pour le classement";
+                detail = remisDUsine.Count > 0 ? "réglages du jeu remis d'usine : " + string.Join(", ", remisDUsine)
+                    : force ? "réglages certifiés appliqués" : "pour le classement";
             }
             if (horsLigne && certifiable && dangers.Count == 0) detail = "hors ligne, score envoyé au retour de NelfePlay";
             // On retient la PROMESSE, et QUAND elle a ete faite : c'est elle qu'on confrontera a
@@ -1233,7 +1237,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 // Le JOURNAL garde le francais (l'outil de diagnostic le lit) ; l'ECRAN parle la langue
                 // du joueur, et passe en orange quand la partie ne sera pas classee.
-                var (titreAffiche, detailAffiche) = AnnonceLocalisee(Langue(), certifiable, reason, dangers, force);
+                var (titreAffiche, detailAffiche) = AnnonceLocalisee(Langue(), certifiable, reason, dangers, force, remisDUsine);
                 if (horsLigne && certifiable && dangers.Count == 0) detailAffiche = Texte("scoring_offline_certifiable_sub");
                 _overlay.ShowTop("SCORING", titreAffiche, detailAffiche, 6000, alerte: !(certifiable && dangers.Count == 0));
             }
@@ -3801,7 +3805,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// L'annonce au lancement dans la langue donnee. En francais, elle redonne mot pour mot ce que
     /// le journal ecrit.
     /// </summary>
-    internal static (string Titre, string Detail) AnnonceLocalisee(string langue, bool certifiable, string reason, IReadOnlyList<string> dangers, bool force)
+    internal static (string Titre, string Detail) AnnonceLocalisee(string langue, bool certifiable, string reason, IReadOnlyList<string> dangers, bool force,
+        IReadOnlyList<string>? remisDUsine = null)
     {
         string T(string cle) => CabinetAnnounceText.Get(cle, langue);
         if (!certifiable && reason == "profile.core_mismatch") return (T("scoring_emulator_pending"), T("scoring_emulator_pending_sub"));
@@ -3814,7 +3819,35 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             return (T("scoring_not_certifiable"), string.Format(T("scoring_frontend_off"), string.Join(", ", dangers.Select(d => T("scoring_danger_" + d)))));
         }
+        if (remisDUsine is { Count: > 0 })
+        {
+            return (T("scoring_certifiable"), string.Format(T("scoring_factory_reset"), string.Join(", ", remisDUsine)));
+        }
         return (T("scoring_certifiable"), T(force ? "scoring_forced" : "scoring_for_ranking"));
+    }
+
+    /// <summary>
+    /// Les REGLAGES DU JEU que le forcage a remis d'usine (2026-10-07) : les DIP switches de la liste
+    /// « cle=valeur;... » du wrapper, par leur nom (« fbneo-dipswitch-altbeast-Energy_Meter » donne
+    /// « Energy Meter »). Les options de l'emulateur (vitesse, ROM patchees) n'y sont pas : le joueur
+    /// ne les a pas choisies pour ce jeu.
+    /// </summary>
+    internal static IReadOnlyList<string> ReglagesDuJeuRemisDUsine(string? forcees)
+    {
+        const string Dip = "-dipswitch-";
+        var noms = new List<string>();
+        foreach (var paire in (forcees ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var cle = paire.Split('=', 2)[0];
+            var i = cle.IndexOf(Dip, StringComparison.OrdinalIgnoreCase);
+            if (i < 0) continue;
+            // « fbneo-dipswitch-<jeu>-<Nom> » : le nom suit le tiret qui ferme le nom du jeu.
+            var reste = cle[(i + Dip.Length)..];
+            var tiret = reste.IndexOf('-');
+            var nom = (tiret >= 0 ? reste[(tiret + 1)..] : reste).Replace('_', ' ').Trim();
+            if (nom.Length > 0 && !noms.Contains(nom)) noms.Add(nom);
+        }
+        return noms;
     }
 
     private static string ReasonToText(string reason) => reason switch
