@@ -25,12 +25,36 @@ public sealed class LeaderboardRulesTabsTests
     [Fact]
     public void Chaque_autre_regle_a_son_onglet()
     {
-        Assert.Equal(new[] { Vue.MondeMulti },
-            LeaderboardInputService.OngletsDeRegle(new[] { "1cc", "1cc-multi" }, "1cc").Select(o => o.Vue));
-        Assert.Equal(new[] { Vue.MondeMulti, Vue.Monde1lc },
-            LeaderboardInputService.OngletsDeRegle(new[] { "1cc", "1lc", "1cc-multi" }, "1cc").Select(o => o.Vue));
+        // Une place par regle, de gauche a droite : le 1LC, puis le 1CC MULTI contre Monde.
+        Assert.Equal(new[] { (Vue.AutreRegle1, "1cc-multi") },
+            LeaderboardInputService.OngletsDeRegle(new[] { "1cc", "1cc-multi" }, "1cc"));
+        Assert.Equal(new[] { (Vue.AutreRegle1, "1lc"), (Vue.AutreRegle2, "1cc-multi") },
+            LeaderboardInputService.OngletsDeRegle(new[] { "1cc", "1lc", "1cc-multi" }, "1cc"));
         Assert.Empty(LeaderboardInputService.OngletsDeRegle(new[] { "1cc" }, "1cc"));
         Assert.Empty(LeaderboardInputService.OngletsDeRegle(new[] { "1lc" }, "1lc"));   // le 1LC est deja la regle des onglets
+    }
+
+    [Fact]
+    public void Les_modes_ont_leurs_onglets_ranges_par_famille()
+    {
+        // Bubble Bobble (2026-10-06), dans l'ordre de l'index de la plateforme. De gauche a droite :
+        // les modes du 1CC MULTI puis lui, puis les modes du 1CC, contre Monde qui est le 1CC.
+        var regles = new[] { "1cc", "1cc-multi", "1cc-multi-original", "1cc-multi-power-up", "1cc-multi-super",
+            "1cc-original", "1cc-power-up", "1cc-super" };
+        var onglets = LeaderboardInputService.OngletsDeRegle(regles, "1cc");
+        Assert.Equal(new[] { "1cc-multi-original", "1cc-multi-power-up", "1cc-multi-super", "1cc-multi",
+            "1cc-original", "1cc-power-up", "1cc-super" }, onglets.Select(o => o.Regle));
+        Assert.Equal(LeaderboardPanelModel.PlacesDeRegle.Take(7), onglets.Select(o => o.Vue));
+    }
+
+    [Fact]
+    public void Plus_de_regles_que_de_places_on_garde_les_plus_proches_de_monde()
+    {
+        var regles = new[] { "1cc" }.Concat(Enumerable.Range(1, 10).Select(i => "1cc-mode" + i)).ToArray();
+        var onglets = LeaderboardInputService.OngletsDeRegle(regles, "1cc");
+        Assert.Equal(LeaderboardPanelModel.PlacesDeRegle, onglets.Select(o => o.Vue));
+        Assert.Equal("1cc-mode3", onglets[0].Regle);
+        Assert.Equal("1cc-mode10", onglets[^1].Regle);
     }
 
     [Fact]
@@ -42,21 +66,42 @@ public sealed class LeaderboardRulesTabsTests
     }
 
     [Fact]
+    public void Un_mode_ne_garde_que_ses_initiales()
+    {
+        // Demande user 2026-10-06 : « 1CC-PU » pour power-up, pour tenir dans la rangee d'onglets.
+        Assert.Equal("1CC-PU", LeaderboardInputService.LibelleDeRegle("1cc-power-up"));
+        Assert.Equal("1CC-O", LeaderboardInputService.LibelleDeRegle("1cc-original"));
+        Assert.Equal("1CC-S", LeaderboardInputService.LibelleDeRegle("1cc-super"));
+        Assert.Equal("1CC MULTI-PU", LeaderboardInputService.LibelleDeRegle("1cc-multi-power-up"));
+        Assert.Equal("1CC MULTI-S", LeaderboardInputService.LibelleDeRegle("1cc-multi-super"));
+        Assert.Equal("1LC-PU", LeaderboardInputService.LibelleDeRegle("1lc-power-up"));
+    }
+
+    [Fact]
+    public void Deux_modes_aux_memes_initiales_gardent_leur_nom()
+    {
+        var regles = new[] { "1cc", "1cc-super", "1cc-speed", "1cc-power-up" };
+        Assert.Equal("1CC-SUPER", LeaderboardInputService.LibelleDeRegle("1cc-super", regles));
+        Assert.Equal("1CC-SPEED", LeaderboardInputService.LibelleDeRegle("1cc-speed", regles));
+        Assert.Equal("1CC-PU", LeaderboardInputService.LibelleDeRegle("1cc-power-up", regles));
+    }
+
+    [Fact]
     public void L_onglet_1cc_multi_precede_monde_et_l_on_entre_sur_monde()
     {
         // « [1CC MULTI] MONDE [1CC] » (decision user 2026-10-03) : Monde reste contre la porte.
         var m = new LeaderboardPanelModel();
         m.Ouvrir(salleConnue: true, villeConnue: false, paysConnu: false, aDesRecords: true);
-        Assert.True(m.PoserLesRegles(new[] { Vue.MondeMulti }));
+        Assert.True(m.PoserLesRegles(new[] { Vue.AutreRegle1 }));
         m.PoserLesLignes(5);
-        Assert.Equal(new[] { Vue.MesRecords, Vue.MaSalle, Vue.MondeMulti, Vue.Monde }, m.Onglets);
+        Assert.Equal(new[] { Vue.MesRecords, Vue.MaSalle, Vue.AutreRegle1, Vue.Monde }, m.Onglets);
         Assert.Equal(Vue.Monde, m.VueCourante);
         Assert.True(m.SurLaPorte);
 
         Assert.Equal(Effet.PrendreLeFocus, m.Entree(EntreePanneau.Gauche));
         Assert.Equal(Vue.Monde, m.VueCourante);   // prendre la main ne change pas de vue
         Assert.Equal(Effet.ChargerLaVue, m.Entree(EntreePanneau.Gauche));
-        Assert.Equal(Vue.MondeMulti, m.VueCourante);
+        Assert.Equal(Vue.AutreRegle1, m.VueCourante);
         Assert.False(m.SurLaPorte);
         Assert.Equal(Effet.ChargerLaVue, m.Entree(EntreePanneau.Droite));
         Assert.Equal(Vue.Monde, m.VueCourante);
@@ -69,12 +114,12 @@ public sealed class LeaderboardRulesTabsTests
         var m = new LeaderboardPanelModel();
         m.Ouvrir(false, false, false, true);
         m.PoserLesEvenements(true);
-        m.PoserLesRegles(new[] { Vue.MondeMulti });
-        Assert.Equal(new[] { Vue.MesRecords, Vue.MondeMulti, Vue.Monde, Vue.LiveEtContest }, m.Onglets);
+        m.PoserLesRegles(new[] { Vue.AutreRegle1 });
+        Assert.Equal(new[] { Vue.MesRecords, Vue.AutreRegle1, Vue.Monde, Vue.LiveEtContest }, m.Onglets);
         Assert.Equal(Vue.Monde, m.VueCourante);
         m.PoserLesEvenements(false);
         Assert.Equal(Vue.Monde, m.VueCourante);
-        Assert.Equal(new[] { Vue.MesRecords, Vue.MondeMulti, Vue.Monde }, m.Onglets);
+        Assert.Equal(new[] { Vue.MesRecords, Vue.AutreRegle1, Vue.Monde }, m.Onglets);
     }
 
     [Fact]
@@ -85,14 +130,29 @@ public sealed class LeaderboardRulesTabsTests
         Assert.False(m.PoserLesRegles(Array.Empty<Vue>()));
         Assert.Equal(new[] { Vue.MesRecords, Vue.Monde }, m.Onglets);
 
-        // Le classement se vide pendant qu'on le regarde : on retombe sur Monde.
-        m.PoserLesRegles(new[] { Vue.MondeMulti, Vue.Monde1lc });
-        Assert.Equal(new[] { Vue.MesRecords, Vue.Monde1lc, Vue.MondeMulti, Vue.Monde }, m.Onglets);
+        // Le classement se vide pendant qu'on le regarde : on retombe sur Monde. (1LC en premiere
+        // place, 1CC MULTI en deuxieme, comme OngletsDeRegle les donne.)
+        m.PoserLesRegles(new[] { Vue.AutreRegle2, Vue.AutreRegle1 });
+        Assert.Equal(new[] { Vue.MesRecords, Vue.AutreRegle1, Vue.AutreRegle2, Vue.Monde }, m.Onglets);
         m.Entree(EntreePanneau.Gauche);
         m.Entree(EntreePanneau.Gauche);
-        Assert.Equal(Vue.MondeMulti, m.VueCourante);
-        Assert.True(m.PoserLesRegles(new[] { Vue.Monde1lc }));
-        Assert.Equal(new[] { Vue.MesRecords, Vue.Monde1lc, Vue.Monde }, m.Onglets);
+        Assert.Equal(Vue.AutreRegle2, m.VueCourante);
+        Assert.True(m.PoserLesRegles(new[] { Vue.AutreRegle1 }));
+        Assert.Equal(new[] { Vue.MesRecords, Vue.AutreRegle1, Vue.Monde }, m.Onglets);
+        Assert.Equal(Vue.Monde, m.VueCourante);
+    }
+
+    [Fact]
+    public void Une_regle_arrivee_apres_sa_voisine_se_range_a_sa_place()
+    {
+        // Les classements des modes arrivent dans le desordre : la rangee garde l'ordre des places.
+        // Inseree d'office contre Monde, la premiere place se serait rangee apres la troisieme.
+        var m = new LeaderboardPanelModel();
+        m.Ouvrir(false, false, false, true);
+        m.PoserLesRegles(new[] { Vue.AutreRegle3 });
+        m.PoserLesRegles(new[] { Vue.AutreRegle3, Vue.AutreRegle1 });
+        Assert.True(m.PoserLesRegles(new[] { Vue.AutreRegle3, Vue.AutreRegle1, Vue.AutreRegle2 }));
+        Assert.Equal(new[] { Vue.MesRecords, Vue.AutreRegle1, Vue.AutreRegle2, Vue.AutreRegle3, Vue.Monde }, m.Onglets);
         Assert.Equal(Vue.Monde, m.VueCourante);
     }
 
@@ -101,16 +161,16 @@ public sealed class LeaderboardRulesTabsTests
     {
         var m = new LeaderboardPanelModel();
         m.Ouvrir(salleConnue: true, villeConnue: false, paysConnu: false, aDesRecords: true);
-        m.PoserLesRegles(new[] { Vue.MondeMulti });
+        m.PoserLesRegles(new[] { Vue.AutreRegle1 });
         Assert.Equal(Vue.Monde, m.VueCourante);
 
         Assert.True(m.PoserLesLieux(villeConnue: false, paysConnu: true));
-        Assert.Equal(new[] { Vue.MesRecords, Vue.MaSalle, Vue.MonPays, Vue.MondeMulti, Vue.Monde }, m.Onglets);
+        Assert.Equal(new[] { Vue.MesRecords, Vue.MaSalle, Vue.MonPays, Vue.AutreRegle1, Vue.Monde }, m.Onglets);
         Assert.Equal(Vue.Monde, m.VueCourante);
 
         // La ville arrive plus tard : elle se range quand meme avant le pays.
         Assert.True(m.PoserLesLieux(villeConnue: true, paysConnu: true));
-        Assert.Equal(new[] { Vue.MesRecords, Vue.MaSalle, Vue.MaVille, Vue.MonPays, Vue.MondeMulti, Vue.Monde }, m.Onglets);
+        Assert.Equal(new[] { Vue.MesRecords, Vue.MaSalle, Vue.MaVille, Vue.MonPays, Vue.AutreRegle1, Vue.Monde }, m.Onglets);
         Assert.Equal(Vue.Monde, m.VueCourante);
 
         Assert.False(m.PoserLesLieux(villeConnue: true, paysConnu: true));

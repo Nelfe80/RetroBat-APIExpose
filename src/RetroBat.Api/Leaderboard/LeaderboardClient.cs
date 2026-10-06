@@ -60,7 +60,13 @@ public sealed class LeaderboardClient
 
     private readonly IHttpClientFactory _httpFactory;
     private readonly ILogger<LeaderboardClient> _logger;
-    private readonly SemaphoreSlim _porte = new(1, 1);
+
+    /// <summary>
+    /// Une porte PAR CLASSEMENT (jeu et regle) : deux demandes du meme attendent la premiere et
+    /// lisent son cache, des classements differents se lisent en meme temps (2026-10-06 : Bubble
+    /// Bobble en a huit, et une porte unique les faisait passer un par un).
+    /// </summary>
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, SemaphoreSlim> _portes = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Ou se gardent les derniers classements recus, un fichier par jeu et par regle : le panneau
@@ -105,10 +111,11 @@ public sealed class LeaderboardClient
     {
         if (string.IsNullOrWhiteSpace(romGroup)) return Resultat.Vide(EtatAucunScore);
 
-        await _porte.WaitAsync(ct).ConfigureAwait(false);
+        var cle = romGroup + "|" + regle;
+        var porte = _portes.GetOrAdd(cle, _ => new SemaphoreSlim(1, 1));
+        await porte.WaitAsync(ct).ConfigureAwait(false);
         try
         {
-            var cle = romGroup + "|" + regle;
             lock (_caches)
             {
                 if (_caches.TryGetValue(cle, out var deja) && DateTime.UtcNow < deja.Jusqua)
@@ -152,7 +159,7 @@ public sealed class LeaderboardClient
         }
         finally
         {
-            _porte.Release();
+            porte.Release();
         }
     }
 

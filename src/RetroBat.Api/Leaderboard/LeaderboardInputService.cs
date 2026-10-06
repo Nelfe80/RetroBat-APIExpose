@@ -93,7 +93,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// <summary>Les lignes de MES RECORDS : les parties du joueur courant sur ce jeu, la meilleure en haut.</summary>
     private IReadOnlyList<LeaderboardClient.Ligne> _mesParties = Array.Empty<LeaderboardClient.Ligne>();
 
-    /// <summary>Les onglets des AUTRES regles du jeu (1CC MULTI, 1LC) et la regle de chacun.</summary>
+    /// <summary>Les onglets des AUTRES regles du jeu (1CC MULTI, 1LC, les modes) et la regle de chacun.</summary>
     private IReadOnlyList<(LeaderboardPanelModel.Vue Vue, string Regle)> _ongletsDeRegle = Array.Empty<(LeaderboardPanelModel.Vue, string)>();
 
     /// <summary>Le classement mondial de chacune de ces regles, et les rangs de la consultation d'avant.</summary>
@@ -1023,7 +1023,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         lock (_gate) { _mesParties = mesParties; }
         if (!relecture && _modele.Etat != LeaderboardPanelModel.Foyer.Ferme) Rafraichir();
         var pseudo = _agent.Status.Pseudo ?? "";
-        var resultat = await _client.MondeAsync(_romGroup, pseudo, ct, _reglePrincipale).ConfigureAwait(false);
+        // TOUS LES CLASSEMENTS DU JEU A LA FOIS (2026-10-06) : Bubble Bobble en a huit (ses modes),
+        // et les lire l'un apres l'autre faisait attendre le panneau la somme des allers-retours.
+        var onglets = _ongletsDeRegle;
+        var principal = _client.MondeAsync(_romGroup, pseudo, ct, _reglePrincipale);
+        var lectures = onglets.Select(o => _client.MondeAsync(_romGroup, pseudo, ct, o.Regle)).ToList();
+        await Task.WhenAll(lectures.Prepend(principal)).ConfigureAwait(false);
+        var resultat = await principal.ConfigureAwait(false);
         if (!relecture)
         {
             // La reference des fleches : la consultation d'AVANT. On la fige pour toute cette
@@ -1035,9 +1041,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         // Les autres regles du jeu, chacune son classement et son historique de rangs.
         var autres = new Dictionary<LeaderboardPanelModel.Vue, (IReadOnlyList<LeaderboardClient.Ligne> Lignes, string Etat)>();
         var rangsDesAutres = new Dictionary<LeaderboardPanelModel.Vue, IReadOnlyDictionary<string, int>>();
-        foreach (var (vue, regle) in _ongletsDeRegle)
+        for (var i = 0; i < onglets.Count; i++)
         {
-            var r = await _client.MondeAsync(_romGroup, pseudo, ct, regle).ConfigureAwait(false);
+            var (vue, regle) = onglets[i];
+            var r = await lectures[i].ConfigureAwait(false);
             autres[vue] = (r.Lignes, r.Etat);
             var cleHistorique = _romGroup + "#" + regle;
             if (!relecture)
@@ -1565,7 +1572,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         {
             if (_modele.VueCourante == LeaderboardPanelModel.Vue.LiveEtContest) return Array.Empty<LeaderboardClient.Ligne>();
             if (_modele.VueCourante == LeaderboardPanelModel.Vue.MesRecords) return _mesParties;
-            if (RegleDeLaVue(_modele.VueCourante) is not null)
+            if (LeaderboardPanelModel.EstUneRegle(_modele.VueCourante))
             {
                 return _autresMondes.TryGetValue(_modele.VueCourante, out var autre) ? autre.Lignes : Array.Empty<LeaderboardClient.Ligne>();
             }
@@ -1591,14 +1598,14 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // MES RECORDS n'attend que le chargement : ses lignes sont sur le disque, et une liste
             // vide doit le DIRE plutot que laisser un panneau muet.
             var etatDeLaVue = mesRecords ? (_mesParties.Count > 0 ? LeaderboardClient.EtatOk : _etatDuMonde.Length == 0 ? "" : LeaderboardClient.EtatAucunScore)
-                : RegleDeLaVue(vue) is null ? _etatDuMonde
+                : !LeaderboardPanelModel.EstUneRegle(vue) ? _etatDuMonde
                 : _autresMondes.TryGetValue(vue, out var autre) ? autre.Etat : "";
             etat = etatDeLaVue.Length == 0
                 ? ""
                 : lignes.Count > 0 ? LeaderboardClient.EtatOk : etatDeLaVue;
             // Pas de fleches de mouvement sur ses propres parties : leur rang est leur ordre.
             rangsPrecedents = mesRecords ? new Dictionary<string, int>()
-                : RegleDeLaVue(vue) is null ? _rangsPrecedents
+                : !LeaderboardPanelModel.EstUneRegle(vue) ? _rangsPrecedents
                 : _rangsDesAutres.TryGetValue(vue, out var rangs) ? rangs : new Dictionary<string, int>();
             // « Ma place » reste celle du MONDE sur MES RECORDS : la place parmi ses propres
             // parties ne dirait rien.
@@ -1609,7 +1616,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         var ligne = lignes.Count > 0 ? lignes[Math.Clamp(_modele.Ligne, 0, lignes.Count - 1)] : null;
         return new LeaderboardOverlayService.Contenu(
             _jeuAffiche,
-            _modele.Onglets.Select(v => RegleDeLaVue(v) is null ? _textes.Text(Cle(v), langue) : "").ToList(),
+            _modele.Onglets.Select(v => LeaderboardPanelModel.EstUneRegle(v) ? "" : _textes.Text(Cle(v), langue)).ToList(),
             _modele.IndexOnglet,
             lignes,
             _modele.Ligne,
@@ -1657,33 +1664,89 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     }
 
     /// <summary>
-    /// UN ONGLET PAR AUTRE REGLE DU JEU (2026-10-02), juste apres « Monde » : 1CC MULTI, puis 1LC
-    /// quand la regle principale est le 1CC. Pur : il se teste sans panneau.
+    /// UN ONGLET PAR AUTRE REGLE DU JEU (2026-10-02), juste avant « Monde » : 1CC MULTI, 1LC, et
+    /// depuis le 2026-10-06 les MODES (1CC-PU, 1CC MULTI-S...). Rangees par famille, de gauche a
+    /// droite : 1LC, le 1CC MULTI (ses modes, puis lui), puis les modes de la regle principale,
+    /// contre Monde qui est leur famille. Chacune prend une place de la rangee dans cet ordre ;
+    /// plus de regles que de places, on garde les plus proches de Monde. Pur : il se teste sans
+    /// panneau.
     /// </summary>
     internal static IReadOnlyList<(LeaderboardPanelModel.Vue Vue, string Regle)> OngletsDeRegle(IReadOnlyList<string> regles, string principale)
     {
-        var onglets = new List<(LeaderboardPanelModel.Vue, string)>();
-        foreach (var vue in new[] { LeaderboardPanelModel.Vue.MondeMulti, LeaderboardPanelModel.Vue.Monde1lc })
-        {
-            var regle = RegleDeLaVue(vue)!;
-            if (regles.Contains(regle, StringComparer.OrdinalIgnoreCase) && !string.Equals(regle, principale, StringComparison.OrdinalIgnoreCase))
-            {
-                onglets.Add((vue, regle));
-            }
-        }
-        return onglets;
+        var famillePrincipale = FamilleEtMode(principale).Famille;
+        var autres = regles
+            .Where(r => r.Length > 0 && !string.Equals(r, principale, StringComparison.OrdinalIgnoreCase))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Select((regle, ordre) => (Regle: regle, Ordre: ordre, Lue: FamilleEtMode(regle)))
+            .OrderBy(x => x.Lue.Famille == famillePrincipale ? int.MaxValue : RangDeFamille(x.Lue.Famille))
+            .ThenBy(x => x.Lue.Mode.Length == 0 ? 1 : 0)
+            .ThenBy(x => x.Ordre)
+            .Select(x => x.Regle)
+            .ToList();
+        var places = LeaderboardPanelModel.PlacesDeRegle;
+        return autres.Skip(Math.Max(0, autres.Count - places.Count))
+            .Select((regle, i) => (places[i], regle))
+            .ToList();
     }
 
-    /// <summary>La regle d'un onglet de regle ; null pour les onglets ordinaires.</summary>
-    internal static string? RegleDeLaVue(LeaderboardPanelModel.Vue vue) => vue switch
+    /// <summary>Les familles de regles, la plus longue d'abord : « 1cc-multi-super » est un 1CC MULTI.</summary>
+    private static readonly string[] Familles = { "1cc-multi", "1cc", "1lc" };
+
+    /// <summary>
+    /// La famille et le mode d'une regle : « 1cc-multi-power-up » donne (1cc-multi, power-up),
+    /// « 1cc » donne (1cc, vide). Une regle inconnue est sa propre famille, sans mode.
+    /// </summary>
+    internal static (string Famille, string Mode) FamilleEtMode(string regle)
     {
-        LeaderboardPanelModel.Vue.MondeMulti => "1cc-multi",
-        LeaderboardPanelModel.Vue.Monde1lc => "1lc",
-        _ => null,
+        var r = regle.Trim().ToLowerInvariant();
+        foreach (var famille in Familles)
+        {
+            if (r == famille) return (famille, "");
+            if (r.StartsWith(famille + "-", StringComparison.Ordinal)) return (famille, r[(famille.Length + 1)..]);
+        }
+        return (r, "");
+    }
+
+    /// <summary>Le rang d'une famille dans la rangee, de gauche a droite (la principale va contre Monde).</summary>
+    private static int RangDeFamille(string famille) => famille switch
+    {
+        "1lc" => 1,
+        "1cc-multi" => 2,
+        "1cc" => 3,
+        _ => 0,
     };
 
-    /// <summary>Le code d'une regle tel qu'on l'ecrit partout : « 1CC MULTI ». Jamais traduit.</summary>
-    internal static string LibelleDeRegle(string regle) => regle.Replace('-', ' ').ToUpperInvariant();
+    /// <summary>La regle d'un onglet de regle ; null pour les onglets ordinaires.</summary>
+    private string? RegleDeLaVue(LeaderboardPanelModel.Vue vue)
+    {
+        foreach (var (place, regle) in _ongletsDeRegle)
+        {
+            if (place == vue) return regle;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Le code d'une regle tel qu'on l'ecrit partout : « 1CC MULTI ». Jamais traduit. UN MODE NE
+    /// GARDE QUE SES INITIALES (demande user 2026-10-06), pour tenir dans la rangee : 1cc-power-up
+    /// s'ecrit « 1CC-PU », 1cc-multi-super « 1CC MULTI-S ». Deux modes du jeu aux memes initiales
+    /// gardent chacun leur nom entier : deux pastilles pareilles ne diraient plus rien.
+    /// </summary>
+    internal static string LibelleDeRegle(string regle, IReadOnlyList<string>? reglesDuJeu = null)
+    {
+        var (famille, mode) = FamilleEtMode(regle);
+        var libelle = famille.Replace('-', ' ').ToUpperInvariant();
+        if (mode.Length == 0) return libelle;
+        var initiales = Initiales(mode);
+        var ambigu = (reglesDuJeu ?? Array.Empty<string>())
+            .Select(r => FamilleEtMode(r).Mode)
+            .Any(m => m.Length > 0 && m != mode && Initiales(m) == initiales);
+        return libelle + "-" + (ambigu ? mode.ToUpperInvariant() : initiales);
+    }
+
+    /// <summary>« power-up » donne « PU » : la premiere lettre de chaque mot.</summary>
+    private static string Initiales(string mode)
+        => string.Concat(mode.Split('-', StringSplitOptions.RemoveEmptyEntries).Select(mot => char.ToUpperInvariant(mot[0])));
 
     /// <summary>
     /// La pastille d'un onglet : la regle, dans un petit cadre arrondi (demande user 2026-10-02).
@@ -1692,9 +1755,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// </summary>
     private string PastilleDeLOnglet(LeaderboardPanelModel.Vue vue)
     {
-        if (RegleDeLaVue(vue) is { } regle) return LibelleDeRegle(regle);
+        if (RegleDeLaVue(vue) is { } regle) return LibelleDeRegle(regle, _reglesDuJeu);
         if (vue == LeaderboardPanelModel.Vue.Monde && _reglePrincipale.Length > 0
-            && _modele.Onglets.Any(v => RegleDeLaVue(v) is not null)) return LibelleDeRegle(_reglePrincipale);
+            && _modele.Onglets.Any(LeaderboardPanelModel.EstUneRegle)) return LibelleDeRegle(_reglePrincipale, _reglesDuJeu);
         return "";
     }
 

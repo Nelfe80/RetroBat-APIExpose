@@ -37,11 +37,29 @@ public sealed class LeaderboardPanelModel
         /// Le classement mondial d'une AUTRE regle ouverte du jeu, a cote de « Monde » : son
         /// pendant, qui n'a pas besoin de redire « monde » (decision user 2026-10-02). Le panneau
         /// melangeait les regles : un score 1CC MULTI se classait au milieu des scores solo.
+        /// LES MODES AUSSI (2026-10-06) : Bubble Bobble a huit classements (1CC, 1CC-PU, 1CC
+        /// MULTI-S...). Ce sont donc des PLACES, numerotees de gauche a droite dans la rangee ; le
+        /// service dit la regle de chacune (LeaderboardInputService.OngletsDeRegle).
         /// </summary>
-        MondeMulti,
-        /// <summary>Idem pour le 1LC, quand la regle principale du jeu est le 1CC.</summary>
-        Monde1lc,
+        AutreRegle1,
+        AutreRegle2,
+        AutreRegle3,
+        AutreRegle4,
+        AutreRegle5,
+        AutreRegle6,
+        AutreRegle7,
+        AutreRegle8,
     }
+
+    /// <summary>Les places des autres regles du jeu, de gauche a droite.</summary>
+    public static readonly IReadOnlyList<Vue> PlacesDeRegle = new[]
+    {
+        Vue.AutreRegle1, Vue.AutreRegle2, Vue.AutreRegle3, Vue.AutreRegle4,
+        Vue.AutreRegle5, Vue.AutreRegle6, Vue.AutreRegle7, Vue.AutreRegle8,
+    };
+
+    /// <summary>Vrai pour l'onglet d'une autre regle du jeu (1CC MULTI, 1LC, un mode...).</summary>
+    public static bool EstUneRegle(Vue vue) => vue is >= Vue.AutreRegle1 and <= Vue.AutreRegle8;
 
     /// <summary>Qui tient la manette. Le panneau ne s'affiche pas quand il est ferme.</summary>
     public enum Foyer
@@ -136,28 +154,32 @@ public sealed class LeaderboardPanelModel
     }
 
     /// <summary>
-    /// Les onglets des autres regles du jeu (1CC MULTI, 1LC) n'existent que si leur classement a
-    /// des scores (demande user 2026-10-03) : un onglet vide se traverse pour rien. Ils se rangent
-    /// juste AVANT « Monde » (« [1CC MULTI] MONDE [1CC] », decision user 2026-10-03) : Monde reste
-    /// contre la porte. Le curseur ne bouge pas. Rend vrai si la rangee d'onglets a change.
+    /// Les onglets des autres regles du jeu (1CC MULTI, 1LC, les modes) n'existent que si leur
+    /// classement a des scores (demande user 2026-10-03, redite pour les modes le 2026-10-06) : un
+    /// onglet vide se traverse pour rien. Ils se rangent juste AVANT « Monde » (« [1CC MULTI]
+    /// MONDE [1CC] », decision user 2026-10-03) : Monde reste contre la porte. Le curseur ne bouge
+    /// pas. Rend vrai si la rangee d'onglets a change.
     /// </summary>
     public bool PoserLesRegles(IReadOnlyCollection<Vue> presentes)
     {
         if (!_onglets.Contains(Vue.Monde)) return false;
-        // De gauche a droite, juste avant Monde.
-        var ordre = new[] { Vue.Monde1lc, Vue.MondeMulti };
-        if (ordre.All(v => presentes.Contains(v) == _onglets.Contains(v))) return false;
+        if (PlacesDeRegle.All(v => presentes.Contains(v) == _onglets.Contains(v))) return false;
 
         var avant = VueCourante;
-        foreach (var vue in ordre)
+        foreach (var vue in PlacesDeRegle)
         {
             if (presentes.Contains(vue) || !_onglets.Contains(vue)) continue;
             _onglets.Remove(vue);
             if (avant == vue) { avant = Vue.Monde; _ligne = 0; }
         }
-        foreach (var vue in ordre)
+        foreach (var vue in PlacesDeRegle)
         {
-            if (presentes.Contains(vue) && !_onglets.Contains(vue)) _onglets.Insert(_onglets.IndexOf(Vue.Monde), vue);
+            if (!presentes.Contains(vue) || _onglets.Contains(vue)) continue;
+            // A sa place parmi celles deja la : avant la premiere qui la suit, sinon contre Monde.
+            // (Inseree d'office contre Monde, une regle arrivee apres sa voisine de droite se
+            // rangeait a l'envers.)
+            var suivante = _onglets.FindIndex(o => EstUneRegle(o) && o > vue);
+            _onglets.Insert(suivante >= 0 ? suivante : _onglets.IndexOf(Vue.Monde), vue);
         }
         var index = _onglets.IndexOf(avant);
         _onglet = index >= 0 ? index : Math.Clamp(_onglet, 0, Math.Max(0, _onglets.Count - 1));
@@ -197,7 +219,7 @@ public sealed class LeaderboardPanelModel
     {
         for (var i = 0; i < _onglets.Count; i++)
         {
-            if (_onglets[i] is Vue.Monde or Vue.MondeMulti or Vue.Monde1lc) return i;
+            if (_onglets[i] == Vue.Monde || EstUneRegle(_onglets[i])) return i;
         }
         return _onglets.Count;
     }
