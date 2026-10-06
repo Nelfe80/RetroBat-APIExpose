@@ -2001,8 +2001,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             if (mode)
             {
+                // L'octet lu, et sa valeur par adresse : un jeu a drapeaux se relit en fin de partie
+                // avec ses profils (ModesDeJeu.ModesParDrapeaux).
+                var adresse = (GetString(signal, "Address") ?? "").Trim();
+                if (adresse.Length > 0) _contexte = _contexte.AvecDrapeau(adresse, valeur);
                 _contexte = _contexte.AvecMode(valeur);
-                trace = $"mode de jeu : {valeur} (0x{valeur:X2})";
+                trace = adresse.Length > 0
+                    ? $"mode de jeu : {RetroBat.Api.Scoring.ModesDeJeu.Adresse(adresse)} = {valeur} (0x{valeur:X2})"
+                    : $"mode de jeu : {valeur} (0x{valeur:X2})";
             }
             else
             {
@@ -2567,6 +2573,27 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             return;
         }
 
+        // LES MODES PAR DRAPEAUX (2026-10-06) : Bubble Bobble dit son mode par trois octets 0/1. Les
+        // profils du jeu disent les drapeaux de chaque mode ; chaque lecture est relue avec eux avant
+        // tout decoupage. Une combinaison sans classement ne se soumet pas.
+        bool aDesDrapeaux;
+        lock (_sync) aDesDrapeaux = _contextes.Any(c => c.Drapeaux.Count > 0);
+        if (aDesDrapeaux)
+        {
+            var modesParDrapeaux = RetroBat.Api.Scoring.ModesDeJeu.ModesParDrapeaux(
+                await FetchProfilesAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false));
+            if (modesParDrapeaux.Count > 0)
+            {
+                lock (_sync)
+                {
+                    for (var i = 0; i < _contextes.Count; i++)
+                        _contextes[i] = RetroBat.Api.Scoring.ModesDeJeu.Resoudre(_contextes[i], modesParDrapeaux);
+                    _contexte = RetroBat.Api.Scoring.ModesDeJeu.Resoudre(_contexte, modesParDrapeaux);
+                }
+                Trace($"modes par drapeaux : {modesParDrapeaux.Count} classement(s), lectures relues");
+            }
+        }
+
         // UN JEU A MODES : UN PASSEPORT PAR MODE JOUE (2026-09-29). Trois parties de Tetris, A puis
         // B puis A : une seule etait soumise, la meilleure toutes confondues, et le type B se
         // perdait. Chaque mode a son classement, chacun recoit le meilleur run joue dans ce mode.
@@ -2744,11 +2771,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
 
         var (profils, profilsDuSite) = await ProfilsAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false);
-        JsonElement? profile = profils.Where(p => p.TryGetProperty("ruleset", out var r) && r.GetString() == CategorieMulti)
-            .Select(p => (JsonElement?)p).FirstOrDefault();
+        // LE MODE DE LA PARTIE A PLUSIEURS (2026-10-06) : un jeu a modes peut avoir un 1CC MULTI par
+        // mode (1cc-multi-super...). Le mode vaut pour toute la machine : celui des lectures du joueur 1
+        // au debut du run retenu.
+        var contexteMulti = ContexteDepuis(bestRun.Count > 0 ? bestRun[0].frame : (trajectory.Count > 0 ? trajectory[0].frame : 0));
+        JsonElement? profile = RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfilMulti(profils, contexteMulti.Mode);
         if (profile is null && profilsDuSite)
         {
-            Trace($"1CC MULTI : STOP, pas de classement {CategorieMulti} ouvert pour {romGroup} (score du joueur {place} : {runPeak})");
+            Trace($"1CC MULTI : STOP, pas de classement {CategorieMulti} ouvert pour {romGroup}"
+                + $"{(contexteMulti.Mode is { } m ? $" en mode {m}" : "")} (score du joueur {place} : {runPeak})");
             return;
         }
 
@@ -2770,14 +2801,33 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         lock (_sync) replay = _replayDeLaPartie;
         var coupe = FinDuSolo.Premiere((FinDuSolo.Continue, bilan.Coupes), (FinDuSolo.ContinueConsole, coupesDuCompteur));
         Trace($"1CC MULTI : partie du joueur {place}, {runPeak} points");
+        var regleMulti = profile is { } choisi && choisi.TryGetProperty("ruleset", out var rg) && rg.ValueKind == JsonValueKind.String
+            ? rg.GetString() ?? CategorieMulti
+            : CategorieMulti;
         var brouillon = NouveauBrouillon("multi", systemId, romGroup, sessionDuJoueur, listenerSha, coreSha, memSha,
             contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, runPeak, bestRun, trajectory,
-            nvram, bios, null, joueurs, coupe, place, seance, replay, CategorieMulti);
+            nvram, bios, contexteMulti, joueurs, coupe, place, seance, replay, regleMulti);
         await PoserEtEnvoyerAsync(brouillon, runPeak, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>La categorie (ruleset) des parties a plusieurs, chacun sur son credit.</summary>
     public const string CategorieMulti = "1cc-multi";
+
+    /// <summary>
+    /// Le contexte de jeu (le mode) de la premiere lecture du joueur 1 prise a partir de cette image ;
+    /// a defaut, le contexte courant. Les modes de Bubble Bobble valent pour toute la machine.
+    /// </summary>
+    private RetroBat.Api.Scoring.ContexteDeJeu ContexteDepuis(long frame)
+    {
+        lock (_sync)
+        {
+            for (var i = 0; i < _trajectory.Count && i < _contextes.Count; i++)
+            {
+                if (_trajectory[i].frame >= frame) return _contextes[i];
+            }
+            return _contexte;
+        }
+    }
 
     /// <summary>
     /// Le passeport d'une session, ou d'un de ses modes (<paramref name="filtre"/>) : seules les
@@ -4215,7 +4265,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var mode = (int?)brouillon["mode"];
         var (profils, duSite) = await ProfilsAsync(credential, systemId, romGroup, ct).ConfigureAwait(false);
         JsonElement? profile = multi
-            ? profils.Where(p => p.TryGetProperty("ruleset", out var r) && r.GetString() == CategorieMulti).Select(p => (JsonElement?)p).FirstOrDefault()
+            ? RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfilMulti(profils, mode)
             : RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil(profils, mode);
         if (profile is null)
         {

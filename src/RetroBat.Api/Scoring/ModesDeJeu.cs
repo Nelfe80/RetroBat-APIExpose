@@ -24,7 +24,22 @@ public sealed record ContexteDeJeu(int? Mode, IReadOnlyDictionary<string, int> D
 {
     public static readonly ContexteDeJeu Vide = new(null, new Dictionary<string, int>());
 
+    /// <summary>
+    /// La valeur de chaque octet GAME_MODE, par adresse. Un jeu a un seul octet de mode (Tetris)
+    /// n'en a pas besoin ; un jeu dont le mode tient a plusieurs drapeaux (Bubble Bobble) se relit
+    /// avec les profils, qui disent les drapeaux de chaque mode (voir ModesParDrapeaux).
+    /// </summary>
+    public IReadOnlyDictionary<string, int> Drapeaux { get; init; } = new Dictionary<string, int>();
+
     public ContexteDeJeu AvecMode(int valeur) => Mode == valeur ? this : this with { Mode = valeur };
+
+    public ContexteDeJeu AvecDrapeau(string adresse, int valeur)
+    {
+        var cle = ModesDeJeu.Adresse(adresse);
+        if (Drapeaux.TryGetValue(cle, out var avant) && avant == valeur) return this;
+        var copie = new Dictionary<string, int>(Drapeaux, StringComparer.Ordinal) { [cle] = valeur };
+        return this with { Drapeaux = copie };
+    }
 
     public ContexteDeJeu AvecDifficulte(string adresse, int valeur)
     {
@@ -105,11 +120,94 @@ public static class ModesDeJeu
         return null;
     }
 
-    /// <summary>Les profils des parties seules : tous sauf la categorie 1CC MULTI.</summary>
+    /// <summary>
+    /// UN MODE DIT PAR PLUSIEURS DRAPEAUX (2026-10-06). Bubble Bobble a trois codes d'ecran titre,
+    /// chacun leve son propre octet : Original (0xE5D1), Power-Up (0xE5D2), Super (0xE5DB). La valeur
+    /// lue d'un drapeau (1) ne dit pas lequel ; le profil d'un tel mode declare donc la valeur de
+    /// chaque drapeau, `mode.flags` : {"0xE5D1": 0, "0xE5D2": 1, "0xE5DB": 0} pour Power-Up.
+    /// </summary>
+    public sealed record ModeParDrapeaux(int Valeur, IReadOnlyDictionary<string, int> Drapeaux);
+
+    /// <summary>Le mode d'une combinaison de drapeaux qu'aucun profil ne couvre : pas de classement.</summary>
+    public const int SansClassement = -1;
+
+    /// <summary>Les modes que les profils definissent par des drapeaux. Vide pour un jeu a un seul octet.</summary>
+    public static List<ModeParDrapeaux> ModesParDrapeaux(IEnumerable<JsonElement> profils)
+    {
+        var modes = new List<ModeParDrapeaux>();
+        foreach (var profil in profils)
+        {
+            if (profil.ValueKind != JsonValueKind.Object
+                || !profil.TryGetProperty("mode", out var m) || m.ValueKind != JsonValueKind.Object
+                || !m.TryGetProperty("value", out var v) || !v.TryGetInt32(out var valeur)
+                || !m.TryGetProperty("flags", out var f) || f.ValueKind != JsonValueKind.Object) continue;
+            var drapeaux = new Dictionary<string, int>(StringComparer.Ordinal);
+            foreach (var d in f.EnumerateObject())
+            {
+                if (d.Value.TryGetInt32(out var x)) drapeaux[Adresse(d.Name)] = x;
+            }
+            if (drapeaux.Count > 0 && modes.All(e => e.Valeur != valeur)) modes.Add(new ModeParDrapeaux(valeur, drapeaux));
+        }
+        return modes;
+    }
+
+    /// <summary>
+    /// Le mode que disent les drapeaux mesures : celui dont chaque drapeau a la valeur lue. Un drapeau
+    /// jamais signale vaut 0, sa valeur au demarrage (le wrapper ne dit rien d'un octet qui ne bouge
+    /// pas). Un drapeau leve que le mode ne connait pas l'exclut. Aucun mode : SansClassement.
+    /// </summary>
+    public static int ModeDesDrapeaux(IReadOnlyList<ModeParDrapeaux> modes, IReadOnlyDictionary<string, int> mesures)
+    {
+        foreach (var mode in modes)
+        {
+            var conforme = mode.Drapeaux.All(d => (mesures.TryGetValue(d.Key, out var v) ? v : 0) == d.Value)
+                && mesures.All(m => mode.Drapeaux.ContainsKey(m.Key) || m.Value == 0);
+            if (conforme) return mode.Valeur;
+        }
+        return SansClassement;
+    }
+
+    /// <summary>Le contexte relu avec les modes par drapeaux ; inchange sans eux, ou sans drapeau mesure.</summary>
+    public static ContexteDeJeu Resoudre(ContexteDeJeu contexte, IReadOnlyList<ModeParDrapeaux> modes)
+        => modes.Count == 0 || contexte.Drapeaux.Count == 0
+            ? contexte
+            : contexte with { Mode = ModeDesDrapeaux(modes, contexte.Drapeaux) };
+
+    /// <summary>Les profils des parties seules : tous sauf la categorie 1CC MULTI et ses modes.</summary>
     public static List<JsonElement> SansLeMulti(IReadOnlyList<JsonElement> profils)
-        => profils.Where(p => !(p.ValueKind == JsonValueKind.Object
-            && p.TryGetProperty("ruleset", out var r) && r.ValueKind == JsonValueKind.String
-            && r.GetString() == "1cc-multi")).ToList();
+        => profils.Where(p => !EstMulti(Regle(p))).ToList();
+
+    /// <summary>
+    /// LA CATEGORIE 1CC MULTI ET SES MODES (2026-10-06) : 1cc-multi, et 1cc-multi-super,
+    /// 1cc-multi-power-up... quand un jeu a des modes qui se cumulent avec le multi (Bubble Bobble).
+    /// </summary>
+    public static bool EstMulti(string? regle)
+        => regle is { } r && (r == "1cc-multi" || r.StartsWith("1cc-multi-", StringComparison.Ordinal));
+
+    private static string? Regle(JsonElement profil)
+        => profil.ValueKind == JsonValueKind.Object
+           && profil.TryGetProperty("ruleset", out var r) && r.ValueKind == JsonValueKind.String
+            ? r.GetString()
+            : null;
+
+    /// <summary>
+    /// Le profil 1CC MULTI d'une partie a plusieurs. Un seul, sans mode : celui-la, quel que soit le
+    /// mode (comme avant). Des multis a modes : celui du mode joue ; sans signal, celui du mode de
+    /// demarrage du jeu. Null quand le mode joue n'a pas de 1CC MULTI : rien a soumettre.
+    /// </summary>
+    public static JsonElement? ChoisirProfilMulti(IReadOnlyList<JsonElement> profils, int? modeJoue)
+    {
+        var multis = profils.Where(p => EstMulti(Regle(p))).ToList();
+        if (multis.Count == 0) return null;
+        var aModes = multis.Where(p => ModeDuProfil(p) is not null).ToList();
+        if (aModes.Count == 0) return multis[0];
+        var mode = modeJoue ?? (ChoisirProfil(profils, null) is { } solo ? ModeDuProfil(solo) : null);
+        foreach (var p in aModes)
+        {
+            if (ModeDuProfil(p) == mode) return p;
+        }
+        return null;
+    }
 
     /// <summary>
     /// Le mode d'une partie : celui que le profil couvre (la plateforme verifie qu'il a ete joue).
