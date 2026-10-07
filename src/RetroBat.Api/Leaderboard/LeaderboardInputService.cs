@@ -1616,7 +1616,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         var ligne = lignes.Count > 0 ? lignes[Math.Clamp(_modele.Ligne, 0, lignes.Count - 1)] : null;
         return new LeaderboardOverlayService.Contenu(
             _jeuAffiche,
-            _modele.Onglets.Select(v => LeaderboardPanelModel.EstUneRegle(v) ? "" : _textes.Text(Cle(v), langue)).ToList(),
+            NomsDesOnglets(_modele.Onglets, v => _textes.Text(Cle(v), langue)),
             _modele.IndexOnglet,
             lignes,
             _modele.Ligne,
@@ -1732,6 +1732,19 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// s'ecrit « 1CC-PU », 1cc-multi-super « 1CC MULTI-S ». Deux modes du jeu aux memes initiales
     /// gardent chacun leur nom entier : deux pastilles pareilles ne diraient plus rien.
     /// </summary>
+    /// <summary>
+    /// Le nom de chaque onglet. Un onglet de regle n'a que sa pastille ; AU-DELA DE DEUX MODES
+    /// AFFICHES (la pastille de Monde comprise), Monde ne garde lui aussi que la sienne (« 1CC ») :
+    /// son nom « WORLD » prenait la place qui manquait a la rangee (demande user 2026-10-07).
+    /// </summary>
+    internal static IReadOnlyList<string> NomsDesOnglets(IReadOnlyList<LeaderboardPanelModel.Vue> onglets, Func<LeaderboardPanelModel.Vue, string> nom)
+    {
+        var modesAffiches = onglets.Count(LeaderboardPanelModel.EstUneRegle) + 1;
+        return onglets
+            .Select(v => LeaderboardPanelModel.EstUneRegle(v) || (v == LeaderboardPanelModel.Vue.Monde && modesAffiches > 2) ? "" : nom(v))
+            .ToList();
+    }
+
     internal static string LibelleDeRegle(string regle, IReadOnlyList<string>? reglesDuJeu = null)
     {
         var (famille, mode) = FamilleEtMode(regle);

@@ -58,6 +58,20 @@ public sealed class LeaderboardRulesTabsTests
     }
 
     [Fact]
+    public void Au_dela_de_deux_modes_Monde_ne_garde_que_sa_pastille()
+    {
+        // Demande user 2026-10-07 : « [1CC-O] [1CC-PU] [1CC] » plutot que « [1CC-O] [1CC-PU] WORLD [1CC] ».
+        string Nom(Vue v) => v == Vue.Monde ? "WORLD" : v.ToString();
+        Assert.Equal(new[] { "MesRecords", "", "", "" },
+            LeaderboardInputService.NomsDesOnglets(new[] { Vue.MesRecords, Vue.AutreRegle1, Vue.AutreRegle2, Vue.Monde }, Nom));
+        // Deux modes (1CC MULTI et le 1CC de Monde) : Monde garde son nom.
+        Assert.Equal(new[] { "MesRecords", "", "WORLD" },
+            LeaderboardInputService.NomsDesOnglets(new[] { Vue.MesRecords, Vue.AutreRegle1, Vue.Monde }, Nom));
+        Assert.Equal(new[] { "MesRecords", "WORLD", "LiveEtContest" },
+            LeaderboardInputService.NomsDesOnglets(new[] { Vue.MesRecords, Vue.Monde, Vue.LiveEtContest }, Nom));
+    }
+
+    [Fact]
     public void La_pastille_ecrit_la_regle_comme_partout()
     {
         Assert.Equal("1CC MULTI", LeaderboardInputService.LibelleDeRegle("1cc-multi"));
