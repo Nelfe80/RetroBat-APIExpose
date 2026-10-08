@@ -236,16 +236,34 @@ public sealed class ReplayReplicationService : BackgroundService
         }
     }
 
+    /// <summary>Où lire le manifeste, dans l'ordre : toutes les sources que la collection donne
+    /// (GitHub puis GitLab, 2026-10-08), ou la seule d'une collection plus ancienne.</summary>
+    internal static IReadOnlyList<string> AdressesDuManifeste(IReadOnlyList<string>? toutes, string? une)
+    {
+        var adresses = (toutes ?? []).Where(u => !string.IsNullOrWhiteSpace(u)).Distinct(StringComparer.Ordinal).ToList();
+        if (adresses.Count == 0 && !string.IsNullOrWhiteSpace(une)) adresses.Add(une);
+        return adresses;
+    }
+
     private async Task<ReplayManifest?> FetchManifestAsync(CollectionEntry entry, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(entry.ManifestUrl)) return null;
+        foreach (var url in AdressesDuManifeste(entry.ManifestUrls, entry.ManifestUrl))
+        {
+            var manifest = await FetchManifestFromAsync(entry, url, ct).ConfigureAwait(false);
+            if (manifest is not null) return manifest;
+        }
+        return null;
+    }
+
+    private async Task<ReplayManifest?> FetchManifestFromAsync(CollectionEntry entry, string url, CancellationToken ct)
+    {
         try
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
             cts.CancelAfter(TimeSpan.FromSeconds(30));
             var client = _httpFactory.CreateClient();
             client.Timeout = Timeout.InfiniteTimeSpan;
-            var body = await client.GetStringAsync(entry.ManifestUrl, cts.Token).ConfigureAwait(false);
+            var body = await client.GetStringAsync(url, cts.Token).ConfigureAwait(false);
             var manifest = JsonSerializer.Deserialize<ReplayManifest>(body, Json);
 
             // On ne croit pas le manifeste sur parole : il doit désigner l'objet annoncé par la
@@ -261,7 +279,7 @@ public sealed class ReplayReplicationService : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogDebug(ex, "Replay : manifeste {ReplayId} non récupéré.", entry.ReplayId);
+            _logger.LogDebug(ex, "Replay : manifeste {ReplayId} non récupéré à {Url}.", entry.ReplayId, url);
             return null;
         }
     }
@@ -298,7 +316,8 @@ public sealed class ReplayReplicationService : BackgroundService
     }
 
     private sealed record CollectionEntry(int Rank, string ReplayId, string ObjectSha256,
-        string? ObjectUrl, string? ManifestUrl);
+        string? ObjectUrl, string? ManifestUrl,
+        IReadOnlyList<string>? ObjectUrls = null, IReadOnlyList<string>? ManifestUrls = null);
 
     private sealed record CollectionDoc(string Schema, string LeaderboardId, long Generation,
         int Count, IReadOnlyList<CollectionEntry> Entries);

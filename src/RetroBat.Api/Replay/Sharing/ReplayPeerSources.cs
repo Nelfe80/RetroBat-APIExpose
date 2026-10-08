@@ -174,6 +174,14 @@ public sealed class MirrorPeerSource : IReplayPeerSource
     /// <summary>Marqueur reconnu par l'annuaire pour reléguer ces entrées en fin de liste.</summary>
     public const string SourceTag = "miroir";
 
+    /// <summary>
+    /// LA SECONDE SOURCE (2026-10-08) : le serveur NelfePlay pose les mêmes replays sur GitLab que
+    /// sur l'amorce GitHub, à plat et nommés par leur empreinte. Une borne y va quand GitHub ne
+    /// répond pas. Remplaçable par <c>Replay:Share:MirrorFallbackUrlTemplates</c>, coupé par
+    /// <c>Replay:Share:MirrorFallbackEnabled = false</c>.
+    /// </summary>
+    public const string GitLabTemplate = "https://gitlab.com/Nelfe80/NelfeNet-Replays/-/raw/main/objects/{sha}.replay";
+
     private readonly IConfiguration _config;
     public MirrorPeerSource(IConfiguration config) => _config = config;
 
@@ -186,16 +194,24 @@ public sealed class MirrorPeerSource : IReplayPeerSource
             return Task.FromResult<IReadOnlyList<ReplayPeer>>(Array.Empty<ReplayPeer>());
 
         // AUCUN repli sur la plateforme : elle n'est jamais une source d'objets. Sans gabarit
-        // configure, il n'y a pas d'amorce, point.
-        var template = _config["Replay:Share:MirrorUrlTemplate"];
-        if (string.IsNullOrWhiteSpace(template) || !template.Contains("{sha}", StringComparison.Ordinal))
-            return Task.FromResult<IReadOnlyList<ReplayPeer>>(Array.Empty<ReplayPeer>());
-
-        var label = Uri.TryCreate(template, UriKind.Absolute, out var u) ? u.Host : "amorce";
-        return Task.FromResult<IReadOnlyList<ReplayPeer>>(new[]
+        // configure, il n'y a pas d'amorce, point. L'ordre est celui d'essai : GitHub, puis GitLab.
+        var gabarits = new List<string>();
+        var principal = _config["Replay:Share:MirrorUrlTemplate"];
+        if (!string.IsNullOrWhiteSpace(principal)) gabarits.Add(principal);
+        if (_config.GetValue("Replay:Share:MirrorFallbackEnabled", true))
         {
-            new ReplayPeer("amorce " + label, template, ApiKey: null, Source: SourceTag, UrlTemplate: template),
-        });
+            var secours = _config.GetSection("Replay:Share:MirrorFallbackUrlTemplates").Get<string[]>();
+            gabarits.AddRange(secours is { Length: > 0 } ? secours : [GitLabTemplate]);
+        }
+
+        var pairs = new List<ReplayPeer>();
+        foreach (var template in gabarits.Distinct(StringComparer.Ordinal))
+        {
+            if (string.IsNullOrWhiteSpace(template) || !template.Contains("{sha}", StringComparison.Ordinal)) continue;
+            var label = Uri.TryCreate(template, UriKind.Absolute, out var u) ? u.Host : "amorce";
+            pairs.Add(new ReplayPeer("amorce " + label, template, ApiKey: null, Source: SourceTag, UrlTemplate: template));
+        }
+        return Task.FromResult<IReadOnlyList<ReplayPeer>>(pairs);
     }
 }
 
