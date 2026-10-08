@@ -8,7 +8,7 @@
 ; ─────────────────────────────────────────────────────────────────────────────
 
 #define AppName "APIExpose (borne RetroBat)"
-#define AppVersion "1.9.32"
+#define AppVersion "1.9.33"
 #define AppExe "RetroBat.Api.exe"
 
 [Setup]
