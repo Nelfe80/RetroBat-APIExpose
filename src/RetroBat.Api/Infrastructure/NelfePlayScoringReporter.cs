@@ -34,6 +34,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly IEventBus _eventBus;
     private readonly IHttpClientFactory _httpFactory;
     private readonly NelfePlayDeviceStore _devices;
+    /// <summary>La carte du reseau (CDC infra §15.4) : les cles qui signent les verdicts, les relais.</summary>
+    private readonly RetroBat.Api.Reseau.ServiceDeCarte? _cartes;
+    /// <summary>Les relais, quand la borne ne joint pas le central (CDC infra §15.5).</summary>
+    private readonly RetroBat.Api.Reseau.ClientDeRelais? _relais;
+    /// <summary>
+    /// Le ticket pris au lancement de la partie (CDC infra §15.6) : si le central tombe pendant la partie, le
+    /// passeport peut quand meme etre complet, et un relais le garder. Un par lancement, pris par le premier
+    /// brouillon.
+    /// </summary>
+    private JsonNode? _ticketDuLancement;
     private readonly ClaimOverlayService? _claimOverlay;
     private readonly NelfePlayScoringSessionService? _scoringSession;
     private readonly IEmulationStationNotificationService? _esNotify;
@@ -280,8 +290,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         CoreMemoryCapability? coeurs = null,
         RetroBat.Api.Replay.Playback.ReplayPlaybackService? playback = null,
         RetroBat.Domain.Interfaces.IEsSettingsStore? esSettings = null,
-        PartieNelfePlayService? partie = null)
+        PartieNelfePlayService? partie = null,
+        RetroBat.Api.Reseau.ServiceDeCarte? cartes = null,
+        RetroBat.Api.Reseau.ClientDeRelais? relais = null)
     {
+        _cartes = cartes;
+        _relais = relais;
         _esSettings = esSettings;
         _partie = partie;
         _nvram = nvram;
@@ -997,6 +1011,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
             var credential = ResolveCredential();
             if (string.IsNullOrEmpty(credential)) return;
+            _ = PrendreLeTicketDuLancementAsync(credential);
             var (profilsDuJeu, profilsDuSite) = await ProfilsAsync(credential, systemId, romGroup, ct).ConfigureAwait(false);
             // Le profil d'une partie seule : jamais le 1CC MULTI, meme s'il venait en tete.
             var seules = RetroBat.Api.Scoring.ModesDeJeu.SansLeMulti(profilsDuJeu);
@@ -3426,19 +3441,22 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var copie = CheminDuProfil(systemId, romGroup);
         try
         {
-            using var client = CreateClient(credential);
-            var url = $"/api/v1/agent/scores/profile?system_id={Uri.EscapeDataString(systemId)}&rom_group={Uri.EscapeDataString(romGroup)}";
-            using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
-            if (response.IsSuccessStatusCode)
+            var query = $"system_id={Uri.EscapeDataString(systemId)}&rom_group={Uri.EscapeDataString(romGroup)}";
+            var appel = await AppelerLeCentralAsync(HttpMethod.Get, "scores/profile", query, null, null, credential,
+                garder: false, resume: null, cancellationToken).ConfigureAwait(false);
+            if (appel is { } reponse)
             {
-                var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                if (ProfilsDuCorps(body) is { } profils)
+                if (reponse.Statut is >= 200 and < 300 && ProfilsDuCorps(reponse.Corps) is { } profils)
                 {
-                    GarderLeProfil(copie, body);
+                    GarderLeProfil(copie, reponse.Corps);
                     return (profils, true);
                 }
+                Trace($"profil {systemId}/{romGroup} : le site repond {reponse.Statut}{reponse.Voie}, lecture de la copie gardee");
             }
-            Trace($"profil {systemId}/{romGroup} : le site repond {(int)response.StatusCode}, lecture de la copie gardee");
+            else
+            {
+                Trace($"profil {systemId}/{romGroup} : site injoignable, lecture de la copie gardee");
+            }
         }
         catch (Exception ex)
         {
@@ -3525,11 +3543,29 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     {
         try
         {
-            using var client = CreateClient(credential);
-            using var content = new StringContent(passport.ToJsonString(), Encoding.UTF8, "application/json");
-            using var response = await client.PostAsync("/api/v1/agent/scores/submissions", content, cancellationToken).ConfigureAwait(false);
-            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            var statutHttp = (int)response.StatusCode;
+            var corps = passport.ToJsonString();
+            var sessionId = (string?)passport["session_id"] ?? "";
+            var deviceId = (string?)(passport["device"] as JsonObject)?["device_id"] ?? "";
+            // Ce qu'un relais peut lire s'il garde la partie : le jeu, le score, l'heure. Pas le joueur.
+            var resume = new JsonObject
+            {
+                ["session_id"] = sessionId,
+                ["system_id"] = (string?)(passport["game"] as JsonObject)?["system_id"],
+                ["rom_group"] = (string?)(passport["game"] as JsonObject)?["rom_group"],
+                ["ruleset"] = (string?)(passport["game"] as JsonObject)?["ruleset"],
+                ["score"] = (string?)(passport["metric"] as JsonObject)?["value"],
+                ["ended_at"] = (string?)(passport["timing"] as JsonObject)?["ended_at"],
+            };
+            var appel = await AppelerLeCentralAsync(HttpMethod.Post, "scores/submissions", null, corps, "application/json",
+                credential, garder: true, resume, cancellationToken, partie: sessionId).ConfigureAwait(false);
+            if (appel is not { } reponse)
+            {
+                Trace("envoi : ni le site ni un relais n'ont rendu de verdict : la partie reste en file");
+                return (RetroBat.Api.Scoring.IssueDEnvoi.ARetenter, null, null);
+            }
+            var body = reponse.Corps;
+            var statutHttp = reponse.Statut;
+            if (reponse.Voie.Length > 0) Trace($"verdict venu{reponse.Voie}");
             // L'outil de diagnostic rattache « VERDICT HTTP » a la partie qu'il lit : un verdict
             // differe porte un autre libelle pour ne pas tomber sur la partie d'apres.
             Trace($"{(annoncer ? "VERDICT HTTP" : "VERDICT DIFFERE HTTP")} {statutHttp} - {body}");
@@ -3540,6 +3576,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 if (body.Contains("session.device_unknown", StringComparison.Ordinal)) _enrolledKeyId = null;
                 _logger?.LogInformation("Scoring : pas de verdict du site (HTTP {Status}), la partie reste en file.", statutHttp);
                 return (RetroBat.Api.Scoring.IssueDEnvoi.ARetenter, null, null);
+            }
+
+            // PAS DE VERDICT SIGNE, PAS DE VERDICT (CDC infra §15.3, 2026-10-08) : la partie ne quitte la file
+            // qu'a un verdict signe par une cle de la carte, pour sa session, son appareil et ses octets.
+            if (statutHttp is >= 200 and < 300)
+            {
+                var lecture = RetroBat.Api.Reseau.VerdictSigne.Verifier(body, ClesDeVerdict(), sessionId, deviceId, Encoding.UTF8.GetBytes(corps));
+                if (!lecture.Valide)
+                {
+                    Trace($"verdict NON RETENU ({lecture.Raison}) : la partie reste en file");
+                    _logger?.LogWarning("Scoring : verdict sans signature valable ({Raison}), la partie reste en file.", lecture.Raison);
+                    // Une cle de verdict changee arrive avec une carte plus recente.
+                    if (lecture.Raison.StartsWith("cle_inconnue", StringComparison.Ordinal) && _cartes is not null)
+                        _ = _cartes.RafraichirAsync(CancellationToken.None);
+                    return (RetroBat.Api.Scoring.IssueDEnvoi.ARetenter, null, null);
+                }
+                body = RetroBat.Api.Reseau.VerdictSigne.AvecLesChampsSignes(body, lecture.Contenu!);
             }
 
             // Un renvoi apres une reponse perdue revient en « duplicate » avec le verdict d'origine :
@@ -4008,11 +4061,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         try
         {
             using var deviceKey = CngDeviceKey.OpenOrCreate(ScoringKeyName);
-            using var client = CreateClient(credential);
-            using var content = new StringContent(deviceKey.PublicKeyPem, Encoding.ASCII, "application/x-pem-file");
-            using var response = await client.PostAsync("/api/v1/agent/scores/enroll-key", content, cancellationToken).ConfigureAwait(false);
-            Trace($"enroll HTTP {(int)response.StatusCode} key_id={deviceKey.KeyId}");
-            return response.IsSuccessStatusCode;
+            var appel = await AppelerLeCentralAsync(HttpMethod.Post, "scores/enroll-key", null, deviceKey.PublicKeyPem,
+                "application/x-pem-file", credential, garder: false, resume: null, cancellationToken).ConfigureAwait(false);
+            Trace($"enroll HTTP {(appel is { } r ? r.Statut.ToString() + r.Voie : "-")} key_id={deviceKey.KeyId}");
+            return appel is { Statut: >= 200 and < 300 };
         }
         catch (Exception ex)
         {
@@ -4040,6 +4092,130 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
         catch { }
         return null;
+    }
+
+    /// <summary>Une reponse du central : statut, corps, et le relais qui l'a apportee (vide en direct).</summary>
+    private readonly record struct ReponseDuCentral(int Statut, string Corps, string Voie);
+
+    /// <summary>
+    /// UNE REQUETE DE L'AGENT AU CENTRAL, EN DIRECT OU PAR UN RELAIS (CDC infra §15.5, 2026-10-08). En direct
+    /// d'abord. Si le central ne repond pas lui-meme (pas de connexion, delai depasse, 502 ou 504 d'un
+    /// intermediaire, page qui n'est pas de lui), par les noeuds « relay » de la carte, dans une enveloppe scellee
+    /// que seul le central ouvre. Un passeport (garder) part aussi aux relais sur un 503 : ils le gardent et le
+    /// feront suivre au retour du central ; leurs recus signes se rangent a cote du brouillon. Null : personne
+    /// n'a rendu de reponse du central.
+    /// </summary>
+    private async Task<ReponseDuCentral?> AppelerLeCentralAsync(HttpMethod methode, string chemin, string? query, string? corps,
+        string? typeDeCorps, string credential, bool garder, JsonObject? resume, CancellationToken ct, string? partie = null)
+    {
+        int? statutDirect = null;
+        var corpsDirect = "";
+        try
+        {
+            using var client = CreateClient(credential);
+            using var requete = new HttpRequestMessage(methode, "/api/v1/agent/" + chemin + (string.IsNullOrEmpty(query) ? "" : "?" + query));
+            if (corps is not null) requete.Content = new StringContent(corps, Encoding.UTF8, typeDeCorps ?? "application/json");
+            using var reponse = await client.SendAsync(requete, ct).ConfigureAwait(false);
+            corpsDirect = await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+            statutDirect = (int)reponse.StatusCode;
+            if (!CentralMuet(statutDirect.Value, corpsDirect) && !(garder && statutDirect == 503))
+                return new ReponseDuCentral(statutDirect.Value, corpsDirect, "");
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException && !ct.IsCancellationRequested)
+        {
+            Trace($"{chemin} : central injoignable en direct ({ex.GetType().Name})");
+        }
+
+        if (_relais is null || !_relais.Disponible)
+            return statutDirect is { } seul ? new ReponseDuCentral(seul, corpsDirect, "") : null;
+
+        var issue = await _relais.EnvoyerAsync(methode.Method, chemin, query, corps, credential, null, garder, resume, ct).ConfigureAwait(false);
+        if (issue.Reponse is { } relayee)
+        {
+            // Le central a repondu, par un detour : la liaison avec NelfePlay tient (pastille du panneau).
+            if (relayee.Statut < 500) LiaisonNelfePlay.Noter(true);
+            Trace($"{chemin} : reponse du central par le relais {relayee.Noeud} (HTTP {relayee.Statut})");
+            return new ReponseDuCentral(relayee.Statut, relayee.Corps, " par " + relayee.Noeud);
+        }
+        if (issue.Recus.Count > 0 && partie is not null) GarderLesRecus(partie, issue.Recus);
+        Trace($"{chemin} : aucun relais n'a rendu de reponse du central ({issue.Detail})");
+        return statutDirect is { } direct ? new ReponseDuCentral(direct, corpsDirect, "") : null;
+    }
+
+    /// <summary>Le central ne repond pas lui-meme : 502 ou 504 d'un intermediaire, ou une erreur qui n'est pas du JSON.</summary>
+    internal static bool CentralMuet(int statut, string? corps)
+    {
+        if (statut is 502 or 504) return true;
+        if (statut < 500) return false;
+        try
+        {
+            return string.IsNullOrWhiteSpace(corps) || JsonNode.Parse(corps) is not JsonObject;
+        }
+        catch (JsonException)
+        {
+            return true;
+        }
+    }
+
+    /// <summary>Les cles qui signent les verdicts : celles de la carte en vigueur, ou de la carte livree.</summary>
+    private IReadOnlyCollection<RetroBat.Api.Reseau.ClePublique> ClesDeVerdict()
+        => (IReadOnlyCollection<RetroBat.Api.Reseau.ClePublique>?)_cartes?.ClesDeVerdict ?? RetroBat.Api.Reseau.CarteDuReseau.ParDefaut.ClesDeVerdict;
+
+    /// <summary>Les recus des relais qui gardent une partie, a cote de son brouillon (brouillons/recus).</summary>
+    private void GarderLesRecus(string partie, IReadOnlyList<RetroBat.Api.Reseau.ClientDeRelais.Recu> recus)
+    {
+        try
+        {
+            var fichier = _brouillons.FichierDesRecus(partie);
+            var liste = File.Exists(fichier) && JsonNode.Parse(File.ReadAllText(fichier)) is JsonArray deja ? deja : new JsonArray();
+            foreach (var recu in recus)
+            {
+                liste.Add(new JsonObject
+                {
+                    ["node"] = recu.Noeud, ["host"] = recu.Hote, ["id"] = recu.Id, ["sha256"] = recu.Sha256,
+                    ["received_at"] = recu.RecuLe, ["receipt"] = JsonNode.Parse(recu.Enveloppe),
+                });
+            }
+            Directory.CreateDirectory(Path.GetDirectoryName(fichier)!);
+            File.WriteAllText(fichier + ".tmp", liste.ToJsonString());
+            File.Move(fichier + ".tmp", fichier, overwrite: true);
+            Trace($"partie {partie} gardee par {string.Join(", ", recus.Select(r => r.Noeud))} (recus signes)");
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
+        {
+            _logger?.LogDebug(ex, "Scoring : recus des relais non ecrits.");
+        }
+    }
+
+    /// <summary>Le ticket du lancement vaut-il pour une partie finie a cette heure ? Il doit expirer apres elle.</summary>
+    internal static bool TicketValablePour(JsonNode? ticket, DateTime finUtc)
+    {
+        var expire = (string?)(ticket as JsonObject)?["expires_at"];
+        return expire is not null
+            && DateTime.TryParse(expire, System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.AdjustToUniversal | System.Globalization.DateTimeStyles.AssumeUniversal, out var fin)
+            && fin >= finUtc;
+    }
+
+    /// <summary>
+    /// Le ticket de la partie, pris au lancement (CDC infra §15.6) : sans lui, une partie finie central tombe ne
+    /// ferait qu'un brouillon ; avec lui, un passeport complet qu'un relais peut garder. Le central injoignable au
+    /// lancement, on garde celui d'avant s'il vaut encore.
+    /// </summary>
+    private async Task PrendreLeTicketDuLancementAsync(string credential)
+    {
+        try
+        {
+            if (await TicketAsync(credential, CancellationToken.None).ConfigureAwait(false) is { } ticket)
+            {
+                var noeud = JsonNode.Parse(ticket.GetRawText());
+                lock (_sync) _ticketDuLancement = noeud;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogDebug(ex, "Scoring : ticket du lancement indisponible.");
+        }
     }
 
     private HttpClient CreateClient(string credential)
@@ -4097,7 +4273,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         int? place, string? seance, string? replay, string? regle)
     {
         DateTime fin;
-        lock (_sync) fin = _finDeLaSession;
+        JsonNode? ticketDuLancement;
+        lock (_sync)
+        {
+            fin = _finDeLaSession;
+            ticketDuLancement = _ticketDuLancement;
+            _ticketDuLancement = null;
+        }
         var joueur = _scoringSession?.Get();
         var difficulte = new JsonObject();
         foreach (var (cle, valeur) in contexte?.Difficulte ?? new Dictionary<string, int>()) difficulte[cle] = valeur;
@@ -4140,6 +4322,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             ["replay"] = replay,
             ["apiexpose"] = CabinetState.Version,
             ["etat_wrapper"] = CabinetState.Wrapper,
+            ["ticket_du_lancement"] = TicketValablePour(ticketDuLancement, fin) ? ticketDuLancement : null,
         };
     }
 
@@ -4320,6 +4503,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
 
         var ticket = await TicketAsync(credential, ct).ConfigureAwait(false);
+        // Le site muet : le ticket pris au lancement fait un passeport complet, qu'un relais pourra garder.
+        if (ticket is null && brouillon["ticket_du_lancement"] is JsonObject secours
+            && DateTime.TryParse((string?)brouillon["fin_le"], System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.AdjustToUniversal | System.Globalization.DateTimeStyles.AssumeUniversal, out var finDuBrouillon)
+            && TicketValablePour(secours, finDuBrouillon))
+        {
+            using var copieDuTicket = JsonDocument.Parse(secours.ToJsonString());
+            ticket = copieDuTicket.RootElement.Clone();
+            Trace($"brouillon {id} : site muet, passeport fait avec le ticket pris au lancement");
+        }
         var deviceId = ticket is { } t && t.TryGetProperty("device_id", out var did) ? did.GetString() : null;
         if (ticket is null || string.IsNullOrEmpty(deviceId))
         {
@@ -4381,15 +4574,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         await EnsureEnrolledAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            using var client = CreateClient(credential);
-            using var response = await client.PostAsync("/api/v1/agent/scores/ticket", content: null, cancellationToken).ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode)
+            var appel = await AppelerLeCentralAsync(HttpMethod.Post, "scores/ticket", null, null, null, credential,
+                garder: false, resume: null, cancellationToken).ConfigureAwait(false);
+            if (appel is not { } reponse || reponse.Statut is < 200 or >= 300)
             {
-                Trace($"ticket : HTTP {(int)response.StatusCode}");
+                Trace(appel is { } r ? $"ticket : HTTP {r.Statut}{r.Voie}" : "ticket : site injoignable");
                 return null;
             }
-            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            using var doc = JsonDocument.Parse(body);
+            using var doc = JsonDocument.Parse(reponse.Corps);
             return doc.RootElement.TryGetProperty("ticket", out var ticket) ? ticket.Clone() : null;
         }
         catch (Exception ex)

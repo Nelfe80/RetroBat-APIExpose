@@ -312,6 +312,11 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infra
 // Reglages certifies poses avant le chargement du jeu (option NelfePlay.ForceCertifiedSettings).
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.CertifiedSettingsService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.CertifiedSettingsService>());
+// Les fondations du reseau (CDC infra §15) : la carte signee (cles de verdict, relais) et les relais, par ou
+// passent les requetes de la borne quand elle ne joint pas le central.
+builder.Services.AddSingleton<RetroBat.Api.Reseau.ServiceDeCarte>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Reseau.ServiceDeCarte>());
+builder.Services.AddSingleton<RetroBat.Api.Reseau.ClientDeRelais>();
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.NelfePlayScoringReporter>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.NelfePlayScoringReporter>());
 // Déchiffrement au lancement puis effacement : rien de clair ne survit à la partie.

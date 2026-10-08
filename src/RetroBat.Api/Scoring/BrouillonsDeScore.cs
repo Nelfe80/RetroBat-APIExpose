@@ -177,12 +177,19 @@ public sealed class FileDesBrouillons
             .Select(b => (b.Id, b.Brouillon)).ToList();
     }
 
-    /// <summary>Le brouillon a eu son verdict : il quitte la file.</summary>
+    /// <summary>Le brouillon a eu son verdict : il quitte la file, avec les recus des relais qui le gardaient.</summary>
     public void Retirer(string id)
     {
         try { File.Delete(Chemin(id)); } catch (Exception) { }
+        try { File.Delete(FichierDesRecus(id)); } catch (Exception) { }
         lock (_verrou) _essais.Remove(id);
     }
+
+    /// <summary>
+    /// Les recus signes des relais qui gardent la partie (CDC infra §15.6), dans un sous-dossier : la file ne lit
+    /// que les brouillons du dossier lui-meme.
+    /// </summary>
+    public string FichierDesRecus(string id) => Path.Combine(Dossier, "recus", id + ".json");
 
     /// <summary>Met le brouillon de cote (modifie, illisible) dans un sous-dossier, pour l'enquete.</summary>
     public void Ecarter(string id, string sousDossier)
