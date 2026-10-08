@@ -42,11 +42,14 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
 
     public NelfeNetSourceResolver(IReplayObjectStore objects, ReplayPeerDirectory peers,
         ReplayNetworkStateService network, IHttpClientFactory httpFactory,
-        ReplayRelayService relais, ILogger<NelfeNetSourceResolver> logger)
+        ReplayRelayService relais, ILogger<NelfeNetSourceResolver> logger, NodePeerSource? noeuds = null)
     {
         _objects = objects; _peers = peers; _network = network; _httpFactory = httpFactory;
-        _relais = relais; _logger = logger;
+        _relais = relais; _logger = logger; _noeuds = noeuds;
     }
+
+    /// <summary>Les noeuds « replay » de la carte : un replay ne se demande qu'a ceux a qui il revient.</summary>
+    private readonly NodePeerSource? _noeuds;
 
     private readonly ReplayRelayService _relais;
 
@@ -59,6 +62,7 @@ public sealed class NelfeNetSourceResolver : IReplaySourceResolver
         if (_objects.HasObject(sha)) return ReplayObjectSearch.Present;
 
         var peers = await _peers.PeersAsync(ct).ConfigureAwait(false);
+        if (_noeuds is not null) peers = _noeuds.Filtrer(peers, sha);
         if (peers.Count == 0)
         {
             _logger.LogInformation("Replay : objet {Sha} absent et aucun pair configuré.", Short(sha));

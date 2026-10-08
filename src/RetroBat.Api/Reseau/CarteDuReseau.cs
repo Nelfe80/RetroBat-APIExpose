@@ -60,13 +60,15 @@ public sealed class CarteDuReseau
     private static readonly Regex AdresseValide = new(@"\Ahttps?://[A-Za-z0-9.-]+(?::[0-9]{1,5})?\z", RegexOptions.CultureInvariant);
 
     private CarteDuReseau(long version, string emiseLe, string urlDuCentral, ClePublique? cleDeScellement,
-        IReadOnlyList<ClePublique> clesDeVerdict, int copies, IReadOnlyList<NoeudDuReseau> noeuds, string? enveloppe)
+        IReadOnlyList<ClePublique> clesDeVerdict, IReadOnlyList<ClePublique> clesSociales, int copies,
+        IReadOnlyList<NoeudDuReseau> noeuds, string? enveloppe)
     {
         Version = version;
         EmiseLe = emiseLe;
         UrlDuCentral = urlDuCentral;
         CleDeScellement = cleDeScellement;
         ClesDeVerdict = clesDeVerdict;
+        ClesSociales = clesSociales;
         Copies = copies;
         Noeuds = noeuds;
         Enveloppe = enveloppe;
@@ -77,6 +79,13 @@ public sealed class CarteDuReseau
     public string UrlDuCentral { get; }
     public ClePublique? CleDeScellement { get; }
     public IReadOnlyList<ClePublique> ClesDeVerdict { get; }
+
+    /// <summary>
+    /// Les cles qui relisent les evenements sociaux (CDC infra §15.10) : celles des verdicts, plus les cles
+    /// d'emetteur retirees. Un evenement garde la signature de son jour ; une cle retiree ne signe plus rien de
+    /// neuf, elle ne sert qu'a relire.
+    /// </summary>
+    public IReadOnlyList<ClePublique> ClesSociales { get; }
     public int Copies { get; }
     public IReadOnlyList<NoeudDuReseau> Noeuds { get; }
 
@@ -91,6 +100,7 @@ public sealed class CarteDuReseau
     /// <summary>La carte livree avec la borne : le central seul, avec ses cles du moment.</summary>
     public static CarteDuReseau ParDefaut { get; } = new(
         0, "", "https://nelfeplay.com", ClePublique.DepuisPem(CleDeScellementPem),
+        [ClePublique.DepuisPem(CleDeLEmetteurPem) ?? throw new InvalidOperationException("Cle de l'emetteur illisible.")],
         [ClePublique.DepuisPem(CleDeLEmetteurPem) ?? throw new InvalidOperationException("Cle de l'emetteur illisible.")],
         2, [], null);
 
@@ -118,6 +128,10 @@ public sealed class CarteDuReseau
                 .Select(n => n is JsonValue jv && jv.TryGetValue<string>(out var pem) ? ClePublique.DepuisPem(pem) : null)
                 .OfType<ClePublique>().ToList();
             if (verdicts.Count == 0) return null;
+            // Les cles sociales : la liste de la carte, sinon celles des verdicts ; celles des verdicts y sont toujours.
+            var sociales = (central["social_keys"] as JsonArray ?? [])
+                .Select(n => n is JsonValue jv && jv.TryGetValue<string>(out var pem) ? ClePublique.DepuisPem(pem) : null)
+                .OfType<ClePublique>().Concat(verdicts).GroupBy(c => c.KeyId).Select(g => g.First()).ToList();
             var scellement = ClePublique.DepuisPem((string?)central["seal_key"]);
             if (scellement is not null && scellement.KeyId != (string?)central["seal_key_id"]) scellement = null;
             var copies = (carte["replay"] as JsonObject)?["copies"] is JsonValue c && c.TryGetValue<int>(out var n) ? Math.Clamp(n, 1, 5) : 2;
@@ -141,7 +155,7 @@ public sealed class CarteDuReseau
                     (string?)noeud["region"] ?? "", (string?)noeud["country"] ?? "", (string?)noeud["host"] ?? "", poids));
             }
 
-            return new CarteDuReseau(version, (string?)carte["issued_at"] ?? "", url, scellement, verdicts, copies, noeuds, enveloppe);
+            return new CarteDuReseau(version, (string?)carte["issued_at"] ?? "", url, scellement, verdicts, sociales, copies, noeuds, enveloppe);
         }
         catch (Exception e) when (e is InvalidOperationException or FormatException)
         {

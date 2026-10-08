@@ -57,6 +57,30 @@ public sealed class ReplaySocialStore
         }
     }
 
+    /// <summary>
+    /// Le resume range, REVERIFIE avec la cle qu'il nomme : l'epinglee, ou une cle d'emetteur de la carte signee
+    /// (un resume signe apres un changement de cle se relit sans rien effacer). Null s'il manque ou ne tient pas.
+    /// </summary>
+    public SocialSummary? ReadSummary(string replayId, SocialIssuerPin pin)
+    {
+        var chemin = SummaryPathFor(replayId);
+        if (replayId.Length == 0 || !File.Exists(chemin)) return null;
+        try
+        {
+            if (JsonNode.Parse(File.ReadAllText(chemin)) is not JsonObject enveloppe) return null;
+            var cle = pin.Pour((string?)(enveloppe["body"] as JsonObject)?["issuer_key_id"]);
+            if (cle is null) return null;
+            var (resume, refus) = SocialSummary.Verifier(enveloppe, cle.Spki, cle.KeyId);
+            if (resume is null) _logger.LogWarning("Replay social : resume range refuse ({Refus}) pour {ReplayId}.", refus, replayId);
+            return resume;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Replay social : resume illisible pour {ReplayId}.", replayId);
+            return null;
+        }
+    }
+
     /// <summary>Le resume range, REVERIFIE avec la cle epinglee. Null s'il manque ou ne tient pas.</summary>
     public SocialSummary? ReadSummary(string replayId, byte[] issuerSpkiDer, string expectedKeyId)
     {

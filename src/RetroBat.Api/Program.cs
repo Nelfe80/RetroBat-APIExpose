@@ -539,6 +539,12 @@ builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.IReplayPeerSource>(sp 
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.IReplayPeerSource>(sp => sp.GetRequiredService<RetroBat.Api.Replay.Sharing.LanPeerSource>());
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.IReplayPeerSource>(sp => sp.GetRequiredService<RetroBat.Api.Replay.Sharing.AnchorPeerSource>());
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.IReplayPeerSource>(sp => sp.GetRequiredService<RetroBat.Api.Replay.Sharing.PlatformPeerSource>());
+// Les noeuds « replay » de la carte du reseau (CDC infra §15.7) : ou chercher un replay public, et ou
+// deposer ceux de cette borne.
+builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.NodePeerSource>();
+builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.IReplayPeerSource>(sp => sp.GetRequiredService<RetroBat.Api.Replay.Sharing.NodePeerSource>());
+builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayNodeDepositService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Sharing.ReplayNodeDepositService>());
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.MirrorPeerSource>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.IReplayPeerSource>(sp => sp.GetRequiredService<RetroBat.Api.Replay.Sharing.MirrorPeerSource>());
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayPeerDirectory>();

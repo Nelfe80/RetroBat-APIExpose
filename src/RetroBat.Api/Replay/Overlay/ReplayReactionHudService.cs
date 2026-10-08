@@ -68,8 +68,7 @@ public sealed class ReplayReactionHudService : BackgroundService
     /// <summary>Le resume signe d'un replay, reverifie a la lecture ; null sans cle epinglee ou sans resume.</summary>
     private RetroBat.Api.Replay.Social.SocialSummary? LireResume(string replayId)
     {
-        var epingle = _pin.Current;
-        return epingle is null ? null : _social.ReadSummary(replayId, epingle.Spki, epingle.KeyId);
+        return _social.ReadSummary(replayId, _pin);
     }
 
     /// <summary>

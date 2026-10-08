@@ -98,7 +98,9 @@ public sealed class ReplaySocialFeedService : BackgroundService
             // authentique, nous disons s'il nous concerne. Un événement authentique visant un
             // AUTRE replay n'a rien à faire dans ce journal.
             if (!string.Equals(e.TargetId, replayId, StringComparison.Ordinal)) { refuses++; continue; }
-            var refus = SocialEventVerifier.Check(e, epingle.Spki, epingle.KeyId);
+            // La cle que l'evenement nomme : l'epinglee, ou une cle d'emetteur de la carte signee.
+            var cle = _pin.Pour(e.IssuerKeyId) ?? epingle;
+            var refus = SocialEventVerifier.Check(e, cle.Spki, cle.KeyId);
             if (refus.Length > 0)
             {
                 refuses++;
@@ -149,7 +151,8 @@ public sealed class ReplaySocialFeedService : BackgroundService
         }
         if (enveloppe is null) return;
 
-        var (resume, refus) = SocialSummary.Verifier(enveloppe, epingle.Spki, epingle.KeyId);
+        var cle = _pin.Pour((string?)(enveloppe["body"] as JsonObject)?["issuer_key_id"]) ?? epingle;
+        var (resume, refus) = SocialSummary.Verifier(enveloppe, cle.Spki, cle.KeyId);
         if (resume is null)
         {
             _logger.LogWarning("Replay social : resume refuse ({Refus}) pour {ReplayId}.", refus, replayId);

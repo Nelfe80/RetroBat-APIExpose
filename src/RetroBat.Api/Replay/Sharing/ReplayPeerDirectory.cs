@@ -70,6 +70,8 @@ public sealed class ReplayPeerDirectory
         // survivre une URL périmée à son propre changement de configuration : constaté en test,
         // où le miroir de recette restait listé après avoir été repointé sur la plateforme.
         if (peer.Source.Contains(MirrorPeerSource.SourceTag, StringComparison.Ordinal)) return;
+        // Un NOEUD vient de la carte signee du reseau : s'il en sort, il ne doit pas survivre ici.
+        if (peer.Source.Contains(NodePeerSource.SourceTag, StringComparison.Ordinal)) return;
         try
         {
             var known = ReadKnown().ToDictionary(p => Normalize(p.BaseUrl), p => p, StringComparer.OrdinalIgnoreCase);

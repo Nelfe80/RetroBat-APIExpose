@@ -17,7 +17,13 @@ namespace RetroBat.Api.Replay.Social;
 ///
 /// Une clé déjà épinglée ne change pas toute seule. Si la plateforme en présente une autre, on
 /// garde l'ancienne et on le dit dans le journal : une rotation est un acte délibéré, pas un
-/// effet de bord d'une requête HTTP. Elle se fait en effaçant le fichier d'épinglage.
+/// effet de bord d'une requête HTTP.
+///
+/// LE CHANGEMENT DE CLE PASSE PAR LA CARTE DU RESEAU (CDC infra §15.10, 2026-10-08). La carte, signée par une
+/// clé que la borne épingle dans son code, publie les clés d'émetteur : celle en service, la prochaine, et
+/// les anciennes pour relire. Un événement se vérifie avec la clé QU'IL NOMME, si c'est l'épinglée ou une clé
+/// de la carte : un changement de clé ne coupe plus le flux social, et ne demande plus d'effacer un fichier.
+/// Sans épinglage, la clé en service de la carte en tient lieu.
 /// </summary>
 public sealed class SocialIssuerPin
 {
@@ -35,10 +41,33 @@ public sealed class SocialIssuerPin
     private bool _lu;
     private DateTime _dernierEssai = DateTime.MinValue;
 
+    private readonly RetroBat.Api.Reseau.ServiceDeCarte? _cartes;
+
     public SocialIssuerPin(ReplayStore store, IHttpClientFactory httpFactory, IConfiguration config,
-        ILogger<SocialIssuerPin> logger)
+        ILogger<SocialIssuerPin> logger, RetroBat.Api.Reseau.ServiceDeCarte? cartes = null)
     {
-        _store = store; _httpFactory = httpFactory; _config = config; _logger = logger;
+        _store = store; _httpFactory = httpFactory; _config = config; _logger = logger; _cartes = cartes;
+    }
+
+    /// <summary>
+    /// La clé qui doit avoir signé un contenu portant cet identifiant d'émetteur : l'épinglée si c'est elle,
+    /// sinon la clé de ce nom dans la carte signée du réseau. Inconnue des deux : l'épinglée (la vérification
+    /// échouera, comme avant).
+    /// </summary>
+    public Pin? Pour(string? keyId)
+    {
+        var epingle = Current;
+        if (string.IsNullOrEmpty(keyId) || (epingle is not null && string.Equals(epingle.KeyId, keyId, StringComparison.Ordinal)))
+            return epingle;
+        var cle = _cartes?.Actuelle.ClesSociales.FirstOrDefault(c => string.Equals(c.KeyId, keyId, StringComparison.Ordinal));
+        return cle is null ? epingle : new Pin(cle.KeyId, cle.SpkiDer, cle.Pem);
+    }
+
+    /// <summary>La clé d'émetteur en service selon la carte du réseau, quand rien n'est épinglé.</summary>
+    private Pin? DeLaCarte()
+    {
+        var cle = _cartes?.Actuelle.ClesDeVerdict.FirstOrDefault();
+        return cle is null ? null : new Pin(cle.KeyId, cle.SpkiDer, cle.Pem);
     }
 
     private string Fichier => Path.Combine(_store.SocialRoot, "issuer.json");
@@ -50,7 +79,7 @@ public sealed class SocialIssuerPin
         {
             lock (_gate)
             {
-                if (_lu) return _pin;
+                if (_lu) return _pin ?? DeLaCarte();
                 _lu = true;
                 try
                 {
@@ -71,7 +100,7 @@ public sealed class SocialIssuerPin
                     }
                 }
                 catch (Exception ex) { _logger.LogDebug(ex, "Replay social : épinglage illisible."); }
-                return _pin;
+                return _pin ?? DeLaCarte();
             }
         }
     }

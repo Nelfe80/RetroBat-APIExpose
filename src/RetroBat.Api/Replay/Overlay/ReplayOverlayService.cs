@@ -77,8 +77,7 @@ public sealed class ReplayOverlayService : BackgroundService
 
     private RetroBat.Api.Replay.Social.SocialSummary? LireResume(string replayId)
     {
-        var epingle = _pin.Current;
-        return epingle is null ? null : _social.ReadSummary(replayId, epingle.Spki, epingle.KeyId);
+        return _social.ReadSummary(replayId, _pin);
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
