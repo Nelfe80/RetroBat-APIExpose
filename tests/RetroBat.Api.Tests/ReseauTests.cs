@@ -173,10 +173,32 @@ public class ReseauTests
         Assert.Null(CarteDuReseau.Ouvrir((string)Vecteurs["map"]!, CarteDuReseau.CleDuSiteStatique));
     }
 
+    /// <summary>
+    /// La premiere carte de production (2026-10-08), signee par root avec openssl : la borne l'ouvre avec la cle
+    /// epinglee du site statique, et y trouve la cle de scellement qu'elle porte par defaut.
+    /// </summary>
+    private const string CarteDeProduction = """
+        {"format":1,"alg":"ECDSA_P256_SHA256_DER","key_id":"ac42342aeb27b98beabd6964aa675d9a9dc08854edfd714bac26627d0930bacd","payload":"eyJmb3JtYXQiOjEsImtpbmQiOiJuZWxmZXBsYXktbWFwIiwidmVyc2lvbiI6MTc5MTQ5MTM1NiwiaXNzdWVkX2F0IjoiMjAyNi0xMC0wOFQyMDoyOToxNloiLCJjZW50cmFsIjp7InVybCI6Imh0dHBzOi8vbmVsZmVwbGF5LmNvbSIsInNlYWxfa2V5IjoiLS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS1cbk1Ga3dFd1lIS29aSXpqMENBUVlJS29aSXpqMERBUWNEUWdBRUFoTXB5bDFUMENwd25oMjBtaXlFOFl2RjdUL0hcbm5CMEMxTzRDMnIrU0xLdVRldHFFUkpiTjh4K3JBQlB4RWpIR2R5VFI0andFUlpSaVhHSU4yZFBKL2c9PVxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXG4iLCJzZWFsX2tleV9pZCI6ImRmN2E5M2FhNmM3ZTAzYTAxNWFkYTQxM2E4Y2IyOTJhMDlkMzQzMDVjODgxZjYwM2I2MzM0Zjk1NWY0NDljY2IiLCJ2ZXJkaWN0X2tleXMiOlsiLS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS1cbk1Ga3dFd1lIS29aSXpqMENBUVlJS29aSXpqMERBUWNEUWdBRUdONWtGOTR4Rm5iLzlId1M0UkJBMjNMbER2aHRcbmtma3A5Wm55WThYT09WcllpQTBWWW1DTVNHU3ZRWVNFMlFDbVRtTXB2eFZ2bW9MRkhkVW56WHlIbGc9PVxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXG4iXX0sInJlcGxheSI6eyJjb3BpZXMiOjJ9LCJub2RlcyI6W3siaWQiOjEsIm5hbWUiOiJtaXJvaXIiLCJraW5kIjoic3RhdGljIiwidXJsIjoiaHR0cHM6Ly9taXJvaXIubmVsZmVwbGF5LmNvbSIsImtleV9pZCI6bnVsbCwicHVibGljX2tleSI6bnVsbCwicm9sZXMiOlsiZnJvbnQiXSwicmVnaW9uIjoiR2l0SHViIFBhZ2VzIiwiY291bnRyeSI6IiIsImhvc3QiOiJuZWxmZXBsYXkiLCJ3ZWlnaHQiOjF9XX0","signature":"MEQCIA51qrrQSrSNqmfih7ZGTitrpTbMtGbbTnBAPKOl7BKrAiA6-0CZ3k01Tn5KsAvQx9sTLVBA9g-6H9xmF0rL4-JkpQ"}
+        """;
+
+    [Fact]
+    public void La_carte_de_production_s_ouvre_avec_la_cle_epinglee()
+    {
+        var carte = CarteDuReseau.Ouvrir(CarteDeProduction, CarteDuReseau.CleDuSiteStatique);
+
+        Assert.NotNull(carte);
+        Assert.Equal(1791491356, carte.Version);
+        Assert.Equal("https://nelfeplay.com", carte.UrlDuCentral);
+        Assert.Equal(CarteDuReseau.ParDefaut.CleDeScellement?.KeyId, carte.CleDeScellement?.KeyId);
+        Assert.Equal(CarteDuReseau.ParDefaut.ClesDeVerdict.Single().KeyId, carte.ClesDeVerdict.Single().KeyId);
+        Assert.Contains(carte.Noeuds, n => n.Url == "https://miroir.nelfeplay.com" && n.Roles.SequenceEqual(["front"]));
+    }
+
     [Fact]
     public void La_carte_par_defaut_porte_les_cles_du_central()
     {
         Assert.Equal("bcd5ab3c8104cbda0a8367002a6afcd8a6cb1f1826fa5f8dedac67238151a184", CarteDuReseau.ParDefaut.ClesDeVerdict.Single().KeyId);
+        Assert.Equal("df7a93aa6c7e03a015ada413a8cb292a09d34305c881f603b6334f955f449ccb", CarteDuReseau.ParDefaut.CleDeScellement?.KeyId);
         Assert.StartsWith("ac42342a", CarteDuReseau.CleDuSiteStatique.KeyId);
         Assert.Equal(0, CarteDuReseau.ParDefaut.Version);
         Assert.Empty(CarteDuReseau.ParDefaut.Noeuds);

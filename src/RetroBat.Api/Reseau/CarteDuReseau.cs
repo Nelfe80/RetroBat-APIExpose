@@ -48,10 +48,14 @@ public sealed class CarteDuReseau
         "-----END PUBLIC KEY-----\n";
 
     /// <summary>
-    /// La cle de scellement du central (config/relay-seal.key.pem) au moment de la version : vide tant qu'elle
-    /// n'est pas nee ; la borne la recoit alors avec la premiere carte publiee.
+    /// La cle de scellement du central (config/relay-seal.key.pem, key_id df7a93aa…49ccb, nee le 2026-10-08) : elle
+    /// ouvre les requetes que la borne fait passer par un relais. La carte publiee peut la remplacer.
     /// </summary>
-    public const string CleDeScellementPem = "";
+    public const string CleDeScellementPem =
+        "-----BEGIN PUBLIC KEY-----\n" +
+        "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAhMpyl1T0Cpwnh20miyE8YvF7T/H\n" +
+        "nB0C1O4C2r+SLKuTetqERJbN8x+rABPxEjHGdyTR4jwERZRiXGIN2dPJ/g==\n" +
+        "-----END PUBLIC KEY-----\n";
 
     private static readonly Regex AdresseValide = new(@"\Ahttps?://[A-Za-z0-9.-]+(?::[0-9]{1,5})?\z", RegexOptions.CultureInvariant);
 
