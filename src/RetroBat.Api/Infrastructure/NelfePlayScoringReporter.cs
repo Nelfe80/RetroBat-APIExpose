@@ -3160,8 +3160,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // ne verrait pas arriver reste hors du 1LC comme du 1CC solo.
         if (!partieADeux && RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil1LC(profils, contexteRun.Mode) is { } profil1lc)
         {
-            var (run1lc, mort) = RetroBat.Api.Scoring.PremiereVie.Couper(bestRun,
-                vies.Where(v => v.Perte).Select(v => (v.Frame, v.Player)));
+            // Les compteurs de vies du .MEM coupent le 1LC des qu'ils ont parle : un drapeau (sante a
+            // zero, image ou son de mort) peut parler sans mort et couperait le joueur trop tot.
+            var compteurs = RetroBat.Api.Scoring.PremiereVie.Compteurs(LireMem(definitionChargee));
+            var pertes = RetroBat.Api.Scoring.PremiereVie.SurLesCompteurs(
+                vies.Where(v => v.Perte).Select(v => (v.Address, v.Frame, v.Player)).ToList(), compteurs);
+            Trace($"1LC : compteurs de vies du .MEM [{string.Join(", ", compteurs)}], {pertes.Count} perte(s) retenue(s) sur {vies.Count(v => v.Perte)}");
+            var (run1lc, mort) = RetroBat.Api.Scoring.PremiereVie.Couper(bestRun, pertes);
             if (!ScoreAMonte(run1lc))
             {
                 Trace($"1LC : rien de marque avant la premiere vie perdue (frame {mort}), pas de soumission");

@@ -95,6 +95,46 @@ public class PremiereVieTests
         Assert.Equal("rp_ABC", RetroBat.Api.Infrastructure.NelfePlayScoringReporter.ReplayDuLien("rp_ABC"));
     }
 
+    // Le bloc de vies de Double Dragon tel que le Data Pack le porte (2026-10-09) : un drapeau de sante a
+    // zero, le compteur du joueur 1, et ceux du joueur 2.
+    private const string DoubleDragon = """
+        lives = {
+          { address=0X03C1, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", player=1, desc="1P Dead (sante a zero)" },
+          { address=0X03EA, type="u8", condition="increase", action="GAIN_LIFE", player=1, desc="1P Lives increased" },
+          { address=0X03EA, type="u8", condition="decrease", action="LOSE_LIFE", player=1, desc="1P Lives decreased" },
+          { address=0X041F, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", player=2, desc="2P Dead (sante a zero)" },
+          { address=0X0448, type="u8", condition="decrease", action="LOSE_LIFE", player=2, desc="2P Lives decreased" },
+          -- { address=0X0500, type="u8", condition="decrease", action="LOSE_LIFE", desc="ligne en commentaire" },
+          { address=0X0600, type="u8", condition="decrease", action="LOSE_LIFE", no_log=true, desc="ligne muette" },
+        },
+        """;
+
+    [Fact]
+    public void Les_compteurs_sont_les_lignes_LOSE_LIFE_qui_descendent()
+    {
+        Assert.Equal(["0x3EA", "0x448"], PremiereVie.Compteurs(DoubleDragon).OrderBy(a => a).ToList());
+        Assert.Empty(PremiereVie.Compteurs(null));
+    }
+
+    [Fact]
+    public void Un_drapeau_qui_parle_au_demarrage_ne_coupe_pas_le_1LC()
+    {
+        // La sante passe par zero au depart (frame 800), la vraie mort fait baisser le compteur a 1318.
+        var pertes = new List<(string, long, int)> { ("0x03C1", 800, 1), ("0x3C1", 1300, 1), ("0x03EA", 1318, 1) };
+        var retenues = PremiereVie.SurLesCompteurs(pertes, PremiereVie.Compteurs(DoubleDragon));
+        var (_, mort) = PremiereVie.Couper(Run, retenues);
+        Assert.Equal(1318, mort);
+    }
+
+    [Fact]
+    public void Sans_compteur_entendu_toutes_les_pertes_comptent()
+    {
+        // Mort sur la derniere vie (le compteur ne descend pas), ou adresse lue autrement : le drapeau coupe.
+        var pertes = new List<(string, long, int)> { ("0x03C1", 1300, 1) };
+        var (_, mort) = PremiereVie.Couper(Run, PremiereVie.SurLesCompteurs(pertes, PremiereVie.Compteurs(DoubleDragon)));
+        Assert.Equal(1300, mort);
+    }
+
     [Fact]
     public void Le_speedrun_n_est_jamais_le_profil_d_une_partie_seule()
     {
