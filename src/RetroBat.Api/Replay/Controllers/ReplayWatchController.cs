@@ -43,7 +43,8 @@ public sealed class ReplayWatchController : ControllerBase
         [FromQuery(Name = "replay_id")] string? replayId,
         [FromQuery(Name = "return")] string? returnUrl,
         [FromQuery(Name = "token")] string? token,
-        [FromQuery(Name = "viewer")] string? viewer)
+        [FromQuery(Name = "viewer")] string? viewer,
+        [FromQuery(Name = "ruleset")] string? ruleset = null)
     {
         // Qui regarde. Le jeton vient de la page nelfeplay.com, qui sait quel COMPTE est connecte ;
         // la borne ne fait que le transporter. Sans lui, la seance est anonyme et aucune reaction
@@ -52,7 +53,21 @@ public sealed class ReplayWatchController : ControllerBase
         // Jeton valide (émis au handshake de détection, récupérable seulement par une page
         // nelfeplay.com) → AUTO-lancement. Sinon (navigation directe / expiré) → clic requis.
         var authorized = _tokens.Consume(token);
-        return Content(Html(SanitizeReplayId(replayId), SafeReturn(returnUrl), authorized), "text/html", Encoding.UTF8);
+        return Content(Html(SanitizeReplayId(replayId), SafeReturn(returnUrl), authorized, SanitizeRegle(ruleset)), "text/html", Encoding.UTF8);
+    }
+
+    /// <summary>
+    /// LA REGLE DU CLASSEMENT D'OU PART LA LECTURE (2026-10-10) : un replay lance depuis un 1LC se fige a la
+    /// premiere mort, comme depuis le panneau de la borne. Lettres minuscules, chiffres et tirets seulement.
+    /// </summary>
+    internal static string SanitizeRegle(string? regle)
+    {
+        if (string.IsNullOrWhiteSpace(regle) || regle.Length > 32) return "";
+        foreach (var c in regle)
+        {
+            if (!(c is (>= 'a' and <= 'z') or (>= '0' and <= '9') or '-')) return "";
+        }
+        return regle;
     }
 
     // Un id de replay est « rp_ » + base32 : on n'accepte que ça (defense en
@@ -79,10 +94,11 @@ public sealed class ReplayWatchController : ControllerBase
         return IsAllowedReturnHost(u.Host) ? u.GetLeftPart(UriPartial.Query) : fallback;
     }
 
-    private static string Html(string replayId, string returnUrl, bool authorized)
+    private static string Html(string replayId, string returnUrl, bool authorized, string regle = "")
     {
         // Valeurs injectées en littéraux JS sûrs (JsonSerializer échappe tout).
         var idJs = JsonSerializer.Serialize(replayId);
+        var regleJs = JsonSerializer.Serialize(regle);
         var retJs = JsonSerializer.Serialize(returnUrl);
         var authJs = authorized ? "true" : "false";
 
@@ -136,7 +152,7 @@ public sealed class ReplayWatchController : ControllerBase
   </main>
 <script>
 (function(){
-  var ID = {{idJs}}, RET = {{retJs}}, AUTH = {{authJs}};
+  var ID = {{idJs}}, RET = {{retJs}}, AUTH = {{authJs}}, REGLE = {{regleJs}};
   var card = document.getElementById('card'), title = document.getElementById('title'),
       msg = document.getElementById('msg'), back = document.getElementById('back'),
       hint = document.getElementById('hint');
@@ -234,7 +250,7 @@ public sealed class ReplayWatchController : ControllerBase
     // POST same-origin : jamais soumis au blocage Local Network Access.
     fetch('/api/v1/replay/play', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ replay_id: ID }), cache:'no-store'
+      body: JSON.stringify(REGLE ? { replay_id: ID, ruleset: REGLE } : { replay_id: ID }), cache:'no-store'
     }).then(function(r){
       if (r.status === 200) { back.hidden = true; suivre(); }
       else if (r.status === 404) { echec('ReplayNotFound'); }
