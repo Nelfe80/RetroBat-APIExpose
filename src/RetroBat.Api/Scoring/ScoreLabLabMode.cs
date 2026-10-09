@@ -25,8 +25,21 @@ public static class ScoreLabLabMode
 
     public static string FlagPath => Path.Combine(RetroBatPaths.PluginRoot, "state", "scorelab-lab.json");
 
-    /// <summary>Vrai si le drapeau existe, demande la soumission et n'a pas expire.</summary>
-    public static bool IsActive(DateTime utcNow, out string reason) => IsActive(FlagPath, utcNow, out reason);
+    /// <summary>Vrai si le drapeau existe, demande la soumission et n'a pas expire, et qu'aucun atelier
+    /// ne tient : l'atelier (<see cref="ScoreLabAtelier"/>) l'emporte toujours.</summary>
+    public static bool IsActive(DateTime utcNow, out string reason)
+        => IsActive(FlagPath, ScoreLabAtelier.FlagPath, utcNow, out reason);
+
+    internal static bool IsActive(string path, string atelierPath, DateTime utcNow, out string reason)
+    {
+        if (ScoreLabAtelier.Lire(atelierPath, utcNow, out _) is not null)
+        {
+            reason = "atelier ScoreLab actif : il l'emporte, rien ne part";
+            return false;
+        }
+
+        return IsActive(path, utcNow, out reason);
+    }
 
     internal static bool IsActive(string path, DateTime utcNow, out string reason)
     {

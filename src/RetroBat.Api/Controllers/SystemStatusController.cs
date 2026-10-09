@@ -70,6 +70,7 @@ public sealed class SystemStatusController : ControllerBase
                 ApiReachable = esApiReachable
             },
             RetroBat = BuildRetroBatStatus(),
+            ScoreLabWorkshop = BuildScoreLabWorkshopStatus(),
             Managers = new ManagersStatus
             {
                 LocalMediaManager = _runtimeOptions.IsLocalMediaManagerEnabled(),
@@ -98,6 +99,15 @@ public sealed class SystemStatusController : ControllerBase
             EmulationStationFound = Directory.Exists(RetroBatPaths.EmulationStationConfigRoot),
             SystemFolders = romsFound ? Directory.GetDirectories(romsRoot).Length : 0
         };
+    }
+
+    /// <summary>The NelfeScoreLab workshop flag, as the scoring sees it right now.</summary>
+    private static ScoreLabWorkshopStatus BuildScoreLabWorkshopStatus()
+    {
+        var etat = RetroBat.Api.Scoring.ScoreLabAtelier.Statut(DateTime.UtcNow);
+        return etat is null
+            ? new ScoreLabWorkshopStatus()
+            : new ScoreLabWorkshopStatus { Active = true, ExpiresUtc = etat.ExpiresUtc, By = etat.By, RunId = etat.RunId };
     }
 
     private static async Task<bool> ProbeEmulationStationApiAsync(CancellationToken cancellationToken)
@@ -202,7 +212,24 @@ public sealed class SystemStatusResponse
     public WebSocketStatus WebSocket { get; set; } = new();
     public EmulationStationStatus EmulationStation { get; set; } = new();
     public RetroBatStatus RetroBat { get; set; } = new();
+    public ScoreLabWorkshopStatus ScoreLabWorkshop { get; set; } = new();
     public ManagersStatus Managers { get; set; } = new();
+}
+
+/// <summary>The NelfeScoreLab workshop (state/scorelab-atelier.json). While it is active, the
+/// game in progress is not a NelfePlay game: no score, draft, replay, banner or play report
+/// leaves the cabinet. It never lasts more than six hours after the flag was written.</summary>
+public sealed class ScoreLabWorkshopStatus
+{
+    /// <example>false</example>
+    public bool Active { get; set; }
+    /// <summary>When the workshop ends (UTC). Null when inactive.</summary>
+    public DateTime? ExpiresUtc { get; set; }
+    /// <summary>Who set the flag.</summary>
+    /// <example>NelfeScoreLab</example>
+    public string? By { get; set; }
+    /// <summary>The ScoreLab run the flag belongs to.</summary>
+    public string? RunId { get; set; }
 }
 
 /// <summary>Where APIExpose thinks RetroBat is, and whether it's really there. When

@@ -207,6 +207,12 @@ public sealed class NelfePlayPlayReporter : BackgroundService
             // Une nouvelle partie ferme la precedente : Emulationstation ne
             // signale pas toujours la fin quand l'emulateur meurt seul.
             EndPlayLocked();
+            // Une seance de l'atelier NelfeScoreLab n'est pas une partie : elle
+            // relance le meme jeu vingt fois, et gonflerait son audience.
+            if (RetroBat.Api.Scoring.ScoreLabAtelier.IsActive(DateTime.UtcNow, out _))
+            {
+                return;
+            }
             // L'emulateur est lu ICI et relu a la fin : au demarrage, le
             // journal de lancement n'est pas toujours analyse, et a la fin le
             // contexte a parfois deja oublie la partie. Prendre les deux
@@ -240,6 +246,12 @@ public sealed class NelfePlayPlayReporter : BackgroundService
         }
 
         var seconds = (int)play.Clock.Elapsed.TotalSeconds;
+
+        // L'atelier pose en cours de partie la couvre aussi.
+        if (RetroBat.Api.Scoring.ScoreLabAtelier.IsActive(DateTime.UtcNow, out _))
+        {
+            return;
+        }
 
         QueueEnvironmentLocked(play, seconds);
 

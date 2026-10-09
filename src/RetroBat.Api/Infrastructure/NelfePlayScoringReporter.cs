@@ -958,8 +958,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly PartieNelfePlayService? _partie;
 
     private bool PartieNelfePlay()
-        => _partie is not { EstNelfePlay: false }
-           || RetroBat.Api.Scoring.ScoreLabLabMode.IsActive(DateTime.UtcNow, out _);
+        => !SousAtelier()
+           && (_partie is not { EstNelfePlay: false }
+               || RetroBat.Api.Scoring.ScoreLabLabMode.IsActive(DateTime.UtcNow, out _));
+
+    /// <summary>L'atelier de NelfeScoreLab tient sur la partie : rien ne se mesure ni ne part (APX-LAB-001).</summary>
+    private bool SousAtelier()
+        => _partie?.SousAtelier ?? RetroBat.Api.Scoring.ScoreLabAtelier.IsActive(DateTime.UtcNow, out _);
 
     private void CaptureAttestation(JsonElement root)
     {
@@ -996,7 +1001,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             if (systemId.Length == 0 || romGroup.Length == 0 || _esNotify is null) return;
             if (!PartieNelfePlay())
             {
-                Trace($"prevol : {systemId}/{romGroup} lance hors NelfePlay, ni annonce ni scoring");
+                Trace(SousAtelier()
+                    ? $"prevol : {systemId}/{romGroup} sous l'atelier NelfeScoreLab, ni annonce ni scoring"
+                    : $"prevol : {systemId}/{romGroup} lance hors NelfePlay, ni annonce ni scoring");
                 return;
             }
             // Si le jeu a demarre sans passer par ES, le role n'a pas encore ete repris.
@@ -1806,6 +1813,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>Un bandeau d'information sans score : la partie continue, rien n'est refuse.</summary>
     private void AnnoncerCredit(string cle, string trace)
     {
+        // Hors NelfePlay, et sous l'atelier de NelfeScoreLab, aucun bandeau : rien n'est mesure.
+        if (!PartieNelfePlay()) return;
         if (!PremierBandeauDeCoupe()) return;
         var langue = Langue();
         _overlay?.ShowTop(
@@ -2499,6 +2508,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private void AnnoncerContinue(long avant, bool parCredit = false)
     {
+        if (!PartieNelfePlay()) return;
         if (!PremierBandeauDeCoupe()) return;
         var langue = Langue();
         var cle = parCredit ? "scoring_credit" : "scoring_continue";
@@ -2620,7 +2630,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (sessionJson is null) return;
         if (!PartieNelfePlay())
         {
-            Trace("STOP: partie lancee hors NelfePlay (ni collection World Scoring, ni fonction NelfePlay)");
+            Trace(SousAtelier()
+                ? "STOP: atelier NelfeScoreLab, rien n'est mesure ni envoye"
+                : "STOP: partie lancee hors NelfePlay (ni collection World Scoring, ni fonction NelfePlay)");
             return;
         }
         RetroBat.Api.Netplay.NetplayGuestService.Role roleInvite;

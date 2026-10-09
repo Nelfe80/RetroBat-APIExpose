@@ -45,6 +45,9 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable
     private IDisposable? _abonnement;
     private (string Origine, DateTime At)? _annonce;
     private string? _origine;
+    /// <summary>L'atelier de NelfeScoreLab a ete vu pendant cette partie : elle ne produit rien jusqu'au
+    /// lancement suivant (APX-LAB-001).</summary>
+    private bool _atelier;
 
     public PartieNelfePlayService(IEventBus bus, MediaRuntimeState media, ILogger<PartieNelfePlayService>? logger = null,
         ApiContext? contexte = null, NelfePlayScoringCollectionSyncService? collection = null)
@@ -56,11 +59,12 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable
         _collection = collection;
     }
 
-    /// <summary>La partie en cours, ou la derniere, est-elle une partie NelfePlay ?</summary>
+    /// <summary>La partie en cours, ou la derniere, est-elle une partie NelfePlay ? Jamais sous l'atelier.</summary>
     public bool EstNelfePlay
     {
         get
         {
+            if (SousAtelier) return false;
             lock (_verrou)
             {
                 return _origine is not null;
@@ -73,10 +77,37 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable
     {
         get
         {
+            if (SousAtelier) return null;
             lock (_verrou)
             {
                 return _origine;
             }
+        }
+    }
+
+    /// <summary>
+    /// L'ATELIER DE NELFESCORELAB tient sur cette partie (APX-LAB-001) : rien ne se mesure, rien ne
+    /// part. Le drapeau est relu a chaque question ; vu une fois, il couvre la partie jusqu'au
+    /// lancement suivant, meme retire entre-temps.
+    /// </summary>
+    public bool SousAtelier
+    {
+        get
+        {
+            lock (_verrou)
+            {
+                if (_atelier) return true;
+            }
+
+            if (!RetroBat.Api.Scoring.ScoreLabAtelier.IsActive(DateTime.UtcNow, out var raison)) return false;
+            lock (_verrou)
+            {
+                if (_atelier) return true;
+                _atelier = true;
+            }
+
+            _logger?.LogInformation("Atelier NelfeScoreLab ({Raison}) : cette partie ne produit ni score, ni replay, ni partie comptee.", raison);
+            return true;
         }
     }
 
@@ -145,6 +176,13 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable
             _annonce = null;
             origine = Juger(carrousel, annonce, dansLaCollection);
             _origine = origine;
+            // Une autre partie : l'atelier se juge a nouveau.
+            _atelier = false;
+        }
+
+        if (SousAtelier)
+        {
+            return;
         }
 
         if (origine is null)

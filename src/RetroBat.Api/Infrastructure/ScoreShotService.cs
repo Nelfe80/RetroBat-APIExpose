@@ -120,6 +120,14 @@ public sealed class ScoreShotService : BackgroundService
         var systeme = Texte(root, "SystemId");
         if (rom.Length == 0) return;
 
+        // L'atelier de NelfeScoreLab : rien ne sera publie, et ses captures sont celles du Lab.
+        if (RetroBat.Api.Scoring.ScoreLabAtelier.IsActive(DateTime.UtcNow, out _))
+        {
+            lock (_gate) { _romGroup = rom; _systemId = systeme; _seuilConnu = false; _seuil = null; _arme = false; _scorePhotographie = 0; }
+            _logger.LogInformation("Capture record : {Rom} sous l'atelier NelfeScoreLab, pas de photo.", rom);
+            return;
+        }
+
         lock (_gate)
         {
             if (_romGroup == rom && _seuilConnu) return;
