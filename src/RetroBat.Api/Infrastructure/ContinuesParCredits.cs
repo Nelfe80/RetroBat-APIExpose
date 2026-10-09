@@ -218,6 +218,47 @@ public static class ContinuesParCompteur
             .OrderBy(f => f)
             .ToList();
 
+    /// <summary>
+    /// LES COMPTEURS DU CODE DE CONTINUE (2026-10-09). Une ligne CONTINUES a `action_map` ne lit pas
+    /// un compteur de continues : elle lit un octet que le jeu emploie aussi a autre chose, et
+    /// l'`action_map` n'en laisse passer que les valeurs du code. Alex Kidd in Miracle World compte en
+    /// 0xC057 les appuis du code de continue (7 puis 0 au huitieme), et sa boutique y range l'objet
+    /// achete avant de le remettre a 0 : un achat se lisait comme un continue, et un 1CC s'arretait en
+    /// pleine partie, sans Game Over. Les adresses sont normalisees comme celles des signaux.
+    /// </summary>
+    public static HashSet<string> CompteursDeCode(string? mem)
+    {
+        var codes = new HashSet<string>(StringComparer.Ordinal);
+        if (string.IsNullOrEmpty(mem)) return codes;
+        foreach (var brute in mem.Split('\n'))
+        {
+            var ligne = brute.Split("--", 2)[0];
+            if (!LigneContinues.IsMatch(ligne) || !ActionMap.IsMatch(ligne) || LigneMorte.IsMatch(ligne)) continue;
+            var adresse = AdresseDeLigne.Match(ligne);
+            if (adresse.Success) codes.Add(RetroBat.Api.Scoring.PremiereVie.Normaliser(adresse.Groups[1].Value));
+        }
+
+        return codes;
+    }
+
+    /// <summary>
+    /// UN CODE DE CONTINUE NE SE TAPE QU'A L'ECRAN DU GAME OVER : la baisse d'un compteur de code ne
+    /// compte que si un GAME_OVER a ete vu depuis le debut de la partie. Ailleurs, l'octet sert a
+    /// autre chose (la boutique d'Alex Kidd). Un vrai compteur de continues compte toujours.
+    /// </summary>
+    public static bool BaisseRecevable(string adresse, IReadOnlySet<string> compteursDeCode, bool gameOverDansLaPartie)
+        => gameOverDansLaPartie || !compteursDeCode.Contains(RetroBat.Api.Scoring.PremiereVie.Normaliser(adresse));
+
+    // CONTINUES en action de la ligne, ou en valeur de son action_map : le wrapper dit l'un comme l'autre.
+    private static readonly System.Text.RegularExpressions.Regex LigneContinues =
+        new(@"[""']CONTINUES[""']", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+    private static readonly System.Text.RegularExpressions.Regex ActionMap =
+        new(@"\baction_map\s*=", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+    private static readonly System.Text.RegularExpressions.Regex LigneMorte =
+        new(@"no_(log|survey)\s*=\s*true", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+    private static readonly System.Text.RegularExpressions.Regex AdresseDeLigne =
+        new(@"\baddress\s*=\s*(0[xX][0-9A-Fa-f]+)");
+
     /// <summary>Le depart d'un joueur 2 ou plus, lu sur sa propre ligne : son arrivee.</summary>
     public static long? DepartDe(IReadOnlyList<LectureDeContinues> lectures, int place)
     {

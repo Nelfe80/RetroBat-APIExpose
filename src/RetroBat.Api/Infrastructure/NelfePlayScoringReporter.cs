@@ -146,6 +146,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private (DateTime Depuis, long Frame)? _demoEnSuspens;
     /// <summary>Un GAME_OVER depuis le dernier depart : la demo qui suit est vraie, on ne la discute pas.</summary>
     private bool _gameOverVu;
+    /// <summary>
+    /// Un GAME_OVER depuis le debut de la partie en cours (2026-10-09). Le compteur d'un code de
+    /// continue ne compte qu'apres lui (ContinuesParCompteur.BaisseRecevable). Une nouvelle partie
+    /// l'efface : un START, ou le score qui retombe.
+    /// </summary>
+    private bool _gameOverDansLaPartie;
+    /// <summary>Les compteurs de code de continue du .MEM charge, lus une fois par .MEM.</summary>
+    private (string? Chemin, HashSet<string> Adresses) _compteursDeCode = (null, new HashSet<string>(StringComparer.Ordinal));
     /// <summary>Les signaux de demo ignores dans la session (journal de la session).</summary>
     private int _demosIgnorees;
     // Phase D (segmentation en RUNS, 100% APIExpose) : la trajectoire des scores suffit —
@@ -801,6 +809,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _inDemo = false;
             _demoEnSuspens = null;
             _gameOverVu = false;
+            _gameOverDansLaPartie = false;
             _demosIgnorees = 0;
             _scoresRecus = _scoresEnDemo = 0;
             _chiffreCredits = false;
@@ -816,6 +825,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _hotePartiFrame = null;
             _continuesConsole.Clear();
             _definitionChargee = null;
+            _compteursDeCode = (null, new HashSet<string>(StringComparer.Ordinal));
             _invite = RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun;
             _debutSessionUtc = DateTime.UtcNow;
             _replayDuSolo = null;
@@ -1424,7 +1434,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             else
             {
                 (_inDemo, _enJeu) = EtatsApres(_inDemo, _enJeu, action);
-                if (action.Contains("GAME_OVER", StringComparison.Ordinal)) { _gameOverVu = true; _demoEnSuspens = null; }
+                if (action.Contains("GAME_OVER", StringComparison.Ordinal)) { _gameOverVu = true; _gameOverDansLaPartie = true; _demoEnSuspens = null; }
             }
         }
         if (appuiIlYA is { } s)
@@ -1604,6 +1614,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             if (!_enJeu && _scoreAuDepart is null && _dernierTotalVu is { } auDepart) _scoreAuDepart = (_lastFrame, auDepart);
             _inDemo = false; _startVu = true; _enJeu = true;
             _gameOverVu = false;
+            _gameOverDansLaPartie = false;
             _demoEnSuspens = null;
         }
     }
@@ -2096,6 +2107,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         lock (_sync) { _definitionChargee = chemin; }
     }
 
+    /// <summary>Les compteurs de code de continue du .MEM charge, relus quand le .MEM change.</summary>
+    private HashSet<string> CompteursDeCodeDuMem()
+    {
+        string? chemin;
+        (string? Chemin, HashSet<string> Adresses) lu;
+        lock (_sync) { chemin = _definitionChargee; lu = _compteursDeCode; }
+        if (string.Equals(lu.Chemin, chemin, StringComparison.Ordinal)) return lu.Adresses;
+        var adresses = ContinuesParCompteur.CompteursDeCode(LireMem(chemin));
+        lock (_sync) { _compteursDeCode = (chemin, adresses); }
+        return adresses;
+    }
+
     /// <summary>
     /// UN CONTINUE CONSOLE : le compteur de continues du jeu baisse (ContinuesParCompteur). Le premier
     /// dit le score certifie et arrete le replay ; les suivants redisent que la partie n'est plus
@@ -2119,6 +2142,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var arrivee = false;
         var multi = false;
         var bandeau = BandeauDeCredit.Aucun;
+        var adresse = (GetString(signal, "Address") ?? "").Trim();
+        var compteursDeCode = CompteursDeCodeDuMem();
         long scoreAvant;
         lock (_sync)
         {
@@ -2128,6 +2153,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 if (_continuesConsole[i].Player != joueur) continue;
                 avant = _continuesConsole[i].Value;
                 break;
+            }
+            // UN ACHAT N'EST PAS UN CONTINUE (2026-10-09) : la baisse d'un compteur de code de continue
+            // ne compte qu'apres un Game Over de cette partie. La lecture n'est pas gardee : le calcul
+            // de fin de partie relit cette liste, il ne doit pas la voir non plus.
+            if (joueur < 2 && avant is { } precedente && valeur < precedente
+                && !ContinuesParCompteur.BaisseRecevable(adresse, compteursDeCode, _gameOverDansLaPartie))
+            {
+                Trace($"code de continue {adresse} : {precedente} puis {valeur} (frame {frame}) sans Game Over dans la partie, "
+                    + "ce n'est pas un continue (l'octet sert aussi ailleurs, la boutique d'Alex Kidd) : le 1CC continue");
+                return;
             }
             _continuesConsole.Add(new LectureDeContinues(joueur, valeur, frame));
             if (_continuesConsole.Count > MaxTrajectory) _continuesConsole.RemoveAt(0);
@@ -2282,6 +2317,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // au continue meme (labo du 2026-09-30).
             if (reference is { } avantChute && total < avantChute)
             {
+                // Une autre partie : son code de continue attendra son propre Game Over.
+                _gameOverDansLaPartie = false;
                 if (_finDeRunPubliee && !_closeParCredit)
                 {
                     _finDeRunPubliee = false;

@@ -392,4 +392,38 @@ public class ContinuesParCreditsTests
         Assert.Null(NelfePlayScoringReporter.ProfilsDuCorps("<html>503</html>"));   // une page n'est pas une reponse
         Assert.Single(NelfePlayScoringReporter.ProfilsDuCorps("{\"open\":true,\"profile\":{\"ruleset\":\"1cc\"}}")!);
     }
+
+    private const string CodeDAlexKidd =
+        "{ address=0X0057, type=\"u8\", condition=\"change\", action=\"CONTINUES\", action_map={[7]=\"CONTINUES\", [0]=\"CONTINUES\"}, desc=\"Continue code presses\" },";
+
+    [Fact]
+    public void Le_mem_dit_quelles_lignes_CONTINUES_sont_un_code_de_continue()
+    {
+        Assert.Equal(new[] { "0x57" }, ContinuesParCompteur.CompteursDeCode("continues = {\n  " + CodeDAlexKidd + "\n},"));
+        // Un vrai compteur de continues, sans action_map, compte toujours.
+        Assert.Empty(ContinuesParCompteur.CompteursDeCode(
+            "{ address=0XFE18, type=\"u8\", condition=\"change\", action=\"CONTINUES\", desc=\"Continues left\" },"));
+        // L'action_map peut seule dire CONTINUES.
+        Assert.Equal(new[] { "0x57" }, ContinuesParCompteur.CompteursDeCode(
+            "{ address=0X0057, condition=\"change\", action=\"CONTINUE_SCREEN\", action_map={[0]=\"CONTINUES\"} },"));
+        Assert.Empty(ContinuesParCompteur.CompteursDeCode("-- " + CodeDAlexKidd));
+        Assert.Empty(ContinuesParCompteur.CompteursDeCode(CodeDAlexKidd.Replace("desc=", "no_log=true, desc=")));
+        Assert.Empty(ContinuesParCompteur.CompteursDeCode(null));
+    }
+
+    [Fact]
+    public void Un_achat_en_boutique_n_est_pas_un_continue()
+    {
+        // Alex Kidd in Miracle World (2026-10-09) : 0xC057 compte les appuis du code de continue a
+        // l'ecran du Game Over, et la boutique y range l'objet achete avant de le remettre a 0. Un 1CC
+        // s'est arrete a l'achat, en pleine partie, sans aucune vie perdue.
+        var codes = ContinuesParCompteur.CompteursDeCode(CodeDAlexKidd);
+        Assert.False(ContinuesParCompteur.BaisseRecevable("0x0057", codes, gameOverDansLaPartie: false));
+        Assert.False(ContinuesParCompteur.BaisseRecevable("0X57", codes, gameOverDansLaPartie: false));
+        // Le vrai continue : le code se tape a l'ecran du Game Over.
+        Assert.True(ContinuesParCompteur.BaisseRecevable("0x0057", codes, gameOverDansLaPartie: true));
+        // Un vrai compteur de continues compte toujours, Game Over vu ou non.
+        Assert.True(ContinuesParCompteur.BaisseRecevable("0xFE18", codes, gameOverDansLaPartie: false));
+        Assert.True(ContinuesParCompteur.BaisseRecevable("", codes, gameOverDansLaPartie: false));
+    }
 }
