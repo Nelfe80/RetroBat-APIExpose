@@ -197,6 +197,14 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
         _lastDeviceKey = key;
         _logger?.LogInformation("Panel input re-scan: {Mapped} mapped [{Names}]",
             mapped, string.Join(", ", reader.DeviceMappings));
+        // Les appuis lus jusqu'ici l'ont ete sur d'AUTRES manettes : le rapporteur ne s'y fie plus
+        // pour le depart du replay tant qu'il n'en lit pas un nouveau (player, 2026-10-09 : manette
+        // perdue a la sortie de RetroArch, puis une partie entiere sans replay).
+        _eventBus.PublishAsync(new EventEnvelope
+        {
+            Type = "panel.input.devices",
+            Payload = new { Mapped = mapped }
+        });
     }
 
     /// <summary>

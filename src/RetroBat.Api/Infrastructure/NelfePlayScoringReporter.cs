@@ -201,9 +201,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private List<(string Id, long Debut, long? Fin)> _enregistrementsDeLaPartie = new();
 
     /// <summary>
-    /// Le lecteur de manettes de l'API a lu au moins un appui depuis son demarrage : il voit le
-    /// START, le score n'a pas a le remplacer (sur une borne lue, un joueur qui laisse tourner la
-    /// demo d'un jeu sans credits la ferait enregistrer).
+    /// Le lecteur de manettes de l'API a lu au moins un appui depuis que sa liste de manettes a
+    /// change : il voit le START, le score n'a pas a le remplacer (sur une borne lue, un joueur qui
+    /// laisse tourner la demo d'un jeu sans credits la ferait enregistrer).
+    ///
+    /// DEPUIS LE DERNIER CHANGEMENT DE MANETTES, ET NON DEPUIS LE DEMARRAGE (player, 2026-10-09).
+    /// L'API a perdu sa manette a la sortie de RetroArch (« re-scan: 0 mapped ») et ne la reprend
+    /// pas en pleine partie. Les appuis lus avant faisaient croire la borne lue : ni bouton, ni score
+    /// pour le depart, et vingt minutes d'Alex Kidd sans replay.
     /// </summary>
     private volatile bool _panelLu;
 
@@ -757,6 +762,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 }
                 case "panel.input.pressed":
                     CaptureStart(ToJson(envelope.Payload));
+                    break;
+                case "panel.input.devices":
+                    CaptureManettes(ToJson(envelope.Payload));
                     break;
                 case "wrapper.ports":
                     CapturePorts(ToJson(envelope.Payload));
@@ -1647,6 +1655,26 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (appuis.Any(n => n > 0)) NoterAppui();
     }
 
+    /// <summary>
+    /// La liste des manettes du lecteur de l'API a change (reenumeration hors partie) : les appuis lus
+    /// jusqu'ici l'ont ete sur d'autres manettes. Tant qu'il n'en lit pas un nouveau, le score qui
+    /// monte redevient le depart du replay.
+    /// </summary>
+    private void CaptureManettes(JsonElement root)
+    {
+        _panelLu = false;
+        var lues = Entier(root, "Mapped");
+        Trace($"manettes de l'API : {lues?.ToString() ?? "?"} lue(s) apres reenumeration ; tant qu'aucun appui n'y est lu, le score qui monte lance le replay");
+    }
+
+    /// <summary>
+    /// LE FILET DU REPLAY : le score qui monte lance l'enregistrement s'il en attend une montee, si le
+    /// lecteur de manettes de l'API n'a lu aucun appui depuis son dernier changement de manettes, et
+    /// trois fois par partie au plus.
+    /// </summary>
+    internal static bool DepartParLeScore(bool attenteMontee, bool panelLu, int departsParScore)
+        => attenteMontee && !panelLu && departsParScore < MaxDepartsParScore;
+
     private void CaptureStart(JsonElement root)
     {
         _panelLu = true;
@@ -2354,7 +2382,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     {
                         _monteeDansLEnregistrement = true;
                     }
-                    else if (_attenteMontee && !_panelLu && _departsParScore < MaxDepartsParScore)
+                    else if (DepartParLeScore(_attenteMontee, _panelLu, _departsParScore))
                     {
                         _attenteMontee = false;
                         _departsParScore++;
