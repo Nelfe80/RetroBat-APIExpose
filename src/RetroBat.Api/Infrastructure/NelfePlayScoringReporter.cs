@@ -1828,6 +1828,49 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     // au plus deux lectures de queue quand la valeur qui suit continue d'avant elles.
     private const int MaxGlitchTail = 2;
 
+    /// <summary>
+    /// LES CREUX DE PASSAGE (2026-10-09). Un score BCD tient sur plusieurs octets : quand une retenue
+    /// les change tous et que l'image se termine entre deux ecritures, le wrapper lit un total de
+    /// passage plus BAS, puis le vrai a l'image suivante. MaxGlitchTail retirait les pics de passage ;
+    /// un creux, lui, ouvrait un nouveau run. Alex Kidd in Miracle World : meilleur run de 2 lectures
+    /// sur 17, la premiere vie perdue (600 points) restait hors du run, et le 1LC prenait le score de
+    /// la deuxieme (4 400). Une ou deux lectures plus basses, suivies en moins de CreuxMaxImages
+    /// images d'une lecture qui retrouve au moins le niveau d'avant, sont un creux de passage : on les
+    /// retire. Une vraie nouvelle partie repart de zero et met bien plus longtemps a y revenir.
+    /// </summary>
+    internal static List<(long frame, long total)> SansCreux(List<(long frame, long total)> traj)
+    {
+        if (traj.Count < 3) return traj;
+        var sortie = new List<(long frame, long total)>(traj.Count);
+        var i = 0;
+        while (i < traj.Count)
+        {
+            if (sortie.Count > 0 && traj[i].total < sortie[^1].total)
+            {
+                var niveau = sortie[^1].total;
+                var reprise = -1;
+                for (var j = i + 1; j <= i + MaxGlitchTail && j < traj.Count; j++)
+                {
+                    if (traj[j].total < niveau) continue;
+                    if (traj[j].frame - traj[i].frame <= CreuxMaxImages) reprise = j;
+                    break;
+                }
+                if (reprise > 0)
+                {
+                    i = reprise;
+                    continue;
+                }
+            }
+            sortie.Add(traj[i]);
+            i++;
+        }
+
+        return sortie;
+    }
+
+    /// <summary>Un creux de passage dure une image ; une demi-seconde laisse de la marge.</summary>
+    private const long CreuxMaxImages = 30;
+
     internal static List<(long frame, long total)> SelectBestRun(List<(long frame, long total)> traj)
         => SelectBestRun(traj, []);
 
@@ -1840,6 +1883,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         List<(long frame, long total)> traj, IReadOnlyList<long> finsDeRun)
     {
         if (traj.Count == 0) return traj;
+        traj = SansCreux(traj);
         List<(long frame, long total)>? best = null;
         long bestPeak = long.MinValue;
         var cur = new List<(long frame, long total)>();

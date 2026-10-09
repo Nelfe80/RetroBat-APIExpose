@@ -62,6 +62,48 @@ public sealed class BestRunGlitchTests
         var run = NelfePlayScoringReporter.SelectBestRun(Traj(0, 500, 906030));
         Assert.Equal(906030, run[^1].total);
     }
+
+    // Alex Kidd in Miracle World (2026-10-09) : 3 900 puis 4 400, retenue sur deux octets BCD, et
+    // l'image se termine entre les deux ecritures : 3 400 lu une image, puis 4 400.
+    private static readonly List<(long frame, long total)> PartieAvecUnCreux =
+        [(1300, 200), (1400, 600), (1700, 800), (9000, 3800), (9600, 3900), (9900, 3400), (9901, 4400)];
+
+    [Fact]
+    public void Un_creux_de_passage_ne_coupe_pas_la_partie()
+    {
+        var run = NelfePlayScoringReporter.SelectBestRun(PartieAvecUnCreux);
+        Assert.Equal(200, run[0].total);
+        Assert.Equal(4400, run[^1].total);
+        Assert.DoesNotContain(run, p => p.total == 3400);
+    }
+
+    [Fact]
+    public void Deux_lectures_de_creux_de_suite_sont_retirees_aussi()
+    {
+        var run = NelfePlayScoringReporter.SelectBestRun([(100, 500), (200, 1900), (300, 1000), (301, 1050), (302, 2000)]);
+        Assert.Equal(new (long, long)[] { (100, 500), (200, 1900), (302, 2000) }, run);
+    }
+
+    [Fact]
+    public void Une_nouvelle_partie_qui_remonte_vite_reste_une_nouvelle_partie()
+    {
+        // La reprise arrive trop tard pour un creux de passage : c'est une autre partie.
+        var run = NelfePlayScoringReporter.SelectBestRun([(100, 500), (200, 1900), (300, 0), (400, 2500)]);
+        Assert.Equal(new (long, long)[] { (300, 0), (400, 2500) }, run);
+        // Sans reprise au niveau d'avant, la chute est une nouvelle partie, aussi rapide soit-elle.
+        var autre = NelfePlayScoringReporter.SelectBestRun([(100, 500), (200, 1900), (201, 0), (202, 100), (203, 300)]);
+        Assert.Equal(1900, autre[^1].total);
+    }
+
+    [Fact]
+    public void Le_1LC_retrouve_la_premiere_vie_perdue_avant_un_creux()
+    {
+        // La premiere vie perdue a 600 points (frame 1500), la deuxieme a 4 400 (frame 16127).
+        var run = NelfePlayScoringReporter.SelectBestRun(PartieAvecUnCreux);
+        var (run1lc, mort) = RetroBat.Api.Scoring.PremiereVie.Couper(run, [(1500L, 1), (16127L, 1)]);
+        Assert.Equal(1500, mort);
+        Assert.Equal(600, run1lc[^1].total);
+    }
 }
 
 /// <summary>
