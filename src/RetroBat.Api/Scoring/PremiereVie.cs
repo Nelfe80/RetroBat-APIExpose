@@ -19,6 +19,23 @@ public static class PremiereVie
     /// <summary>La raison de coupure portee par le passeport du 1LC.</summary>
     public const string Raison = "life_lost";
 
+    /// <summary>
+    /// LE JOUEUR A-T-IL MARQUE AVANT SA PREMIERE MORT ? Oui si le score a monte dans le run coupe, ou si
+    /// ce run tient en une seule lecture positive (2026-10-09). Une partie de Master System se lance au
+    /// bouton 1 ou 2, sans START : le 0 du depart n'est pas une lecture (le score n'a pas change), et
+    /// 200 points marques avant la premiere mort donnaient un run d'une seule lecture, ou rien ne
+    /// « montait » : le 1LC n'etait pas soumis. Un run ouvert par une remise a zero commence a 0.
+    /// </summary>
+    public static bool AMarque(IReadOnlyList<(long frame, long total)> run)
+    {
+        if (run.Count == 1) return run[0].total > 0;
+        for (var i = 1; i < run.Count; i++)
+        {
+            if (run[i].total > run[i - 1].total) return true;
+        }
+        return false;
+    }
+
     public static (List<(long frame, long total)> Run, long? Mort) Couper(
         IReadOnlyList<(long frame, long total)> run,
         IEnumerable<(long Frame, int Joueur)> pertes)

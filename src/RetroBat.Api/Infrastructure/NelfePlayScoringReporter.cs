@@ -3248,7 +3248,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 vies.Where(v => v.Perte).Select(v => (v.Address, v.Frame, v.Player)).ToList(), compteurs);
             Trace($"1LC : compteurs de vies du .MEM [{string.Join(", ", compteurs)}], {pertes.Count} perte(s) retenue(s) sur {vies.Count(v => v.Perte)}");
             var (run1lc, mort) = RetroBat.Api.Scoring.PremiereVie.Couper(bestRun, pertes);
-            if (!ScoreAMonte(run1lc))
+            if (!RetroBat.Api.Scoring.PremiereVie.AMarque(run1lc))
             {
                 Trace($"1LC : rien de marque avant la premiere vie perdue (frame {mort}), pas de soumission");
                 return;

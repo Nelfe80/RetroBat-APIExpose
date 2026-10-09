@@ -142,4 +142,27 @@ public class PremiereVieTests
         var unCC = Profil("""{"ruleset":"1cc"}""");
         Assert.Equal("1cc", Regle(ModesDeJeu.ChoisirProfil([speedrun, unCC], null)));
     }
+
+    [Fact]
+    public void Des_points_marques_d_un_coup_avant_la_premiere_mort_font_un_1LC()
+    {
+        // Alex Kidd sur la borne (2026-10-09), lance au bouton sans START : 200 points, la premiere vie
+        // perdue, puis 400, 600 et 800. Le 0 du depart n'est pas une lecture.
+        var run = new List<(long frame, long total)> { (1500, 200), (1950, 400), (2350, 600), (2460, 800) };
+        var (run1lc, mort) = PremiereVie.Couper(run, [(1843L, 1)]);
+        Assert.Equal(1843, mort);
+        Assert.True(PremiereVie.AMarque(run1lc));
+        Assert.Equal(200, run1lc[^1].total);
+    }
+
+    [Fact]
+    public void Rien_de_marque_avant_la_premiere_mort_ne_fait_pas_de_1LC()
+    {
+        Assert.False(PremiereVie.AMarque([]));
+        // Un run ouvert par une remise a zero commence a 0.
+        Assert.False(PremiereVie.AMarque([(100L, 0L)]));
+        Assert.True(PremiereVie.AMarque([(100L, 0L), (200L, 300L)]));
+        // Le score au depart (START vu) puis les premiers points : comme avant.
+        Assert.True(PremiereVie.AMarque([(50L, 0L), (100L, 200L)]));
+    }
 }
