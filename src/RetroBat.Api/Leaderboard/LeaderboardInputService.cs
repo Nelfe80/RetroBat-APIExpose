@@ -1438,12 +1438,14 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         // disparait et rien ne se passe pendant plusieurs secondes, ce qui se lit comme une panne.
         _overlay.Attendre(_textes.Text("leaderboard.launching", Langue()));
         _replayLance = replay;
+        // L'onglet 1LC lit le replay jusqu'a la premiere vie perdue (2026-10-09).
+        var regle = RegleDeLaVue(_modele.VueCourante);
         _ = Task.Run(async () =>
         {
             try
             {
                 await OuvrirLaSeanceDuSpectateurAsync(replay).ConfigureAwait(false);
-                await _playback.PlayAsync(replay, CancellationToken.None).ConfigureAwait(false);
+                await _playback.PlayAsync(replay, CancellationToken.None, regle).ConfigureAwait(false);
                 // Le filet : si le lecteur n'a rien lance en 45 s, la boite ne reste pas, et
                 // ES reprend la main (il n'y a pas d'emulateur a qui la disputer).
                 await Task.Delay(TimeSpan.FromSeconds(45)).ConfigureAwait(false);

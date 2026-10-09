@@ -122,7 +122,7 @@ public sealed class ReplayPlaybackService
                 ? _network.ProgressOf(sha)
                 : null;
             return new StateSnapshot(mode, _state.ToString().ToLowerInvariant(), _replayId, _frame,
-                _runStart, _runEnd, _replayEnd, _paused,
+                _runStart, _runEnd, _finDu1LC is null ? _replayEnd : FinDeLaLecture(), _paused,
                 _error == ReplayErrorCode.None ? null : _error.ToString(),
                 _nominalFps <= 0 ? 60 : _nominalFps, _fpsSource, _card, fetch,
                 _error == ReplayErrorCode.None ? null : _errorDetail, _warning);
@@ -132,13 +132,35 @@ public sealed class ReplayPlaybackService
     /// <summary>L'objet qu'on attend pendant un telechargement, pour en lire la progression.</summary>
     private string? _objetAttendu;
 
-    public async Task<PlayResult> PlayAsync(string replayId, CancellationToken ct)
+    /// <summary>
+    /// LA LECTURE D'UN 1LC (decision user du 2026-10-09). Le 1LC partage le replay du 1CC de sa partie ;
+    /// lance depuis un classement 1LC, il se lit jusqu'a la premiere vie perdue et s'y fige, avec la
+    /// carte du 1LC. La frame vient de la plateforme, signee par la borne qui a joue.
+    /// </summary>
+    private string? _regle;
+
+    /// <summary>La frame de la premiere vie perdue, quand la lecture est celle d'un 1LC.</summary>
+    private long? _finDu1LC;
+
+    /// <summary>
+    /// Appele sous _gate. La fin de la lecture : celle du replay, ou la premiere vie perdue d'un 1LC. Le
+    /// figeage de fin s'arme EndPauseMargin frames avant : la marge s'ajoute, pour figer sur la mort.
+    /// Calculee a chaque tour, le manifeste pouvant poser _replayEnd apres l'arrivee de la carte.
+    /// </summary>
+    private long FinDeLaLecture()
+        => _finDu1LC is { } mort
+            ? Math.Min(_replayEnd ?? long.MaxValue, mort + EndPauseMargin)
+            : _replayEnd ?? 0;
+
+    public async Task<PlayResult> PlayAsync(string replayId, CancellationToken ct, string? regle = null)
     {
         lock (_gate)
         {
             if (IsBusy) return new PlayResult(false, _state.ToString().ToLowerInvariant(), ReplayErrorCode.ReplayAlreadyRunning);
             _state = ReplayPlaybackState.Resolving; _replayId = replayId; _error = ReplayErrorCode.None; _errorDetail = null; _warning = null;
             _frame = 0; _paused = false; _card = null;
+            _regle = RetroBat.Api.Scoring.ModesDeJeu.Est1LC(regle) ? regle : null;
+            _finDu1LC = null;
         }
 
         var manifest = _manifests.GetManifest(replayId);
@@ -193,7 +215,11 @@ public sealed class ReplayPlaybackService
         lock (_gate) { _card = BuildCard(manifest, meta, _agent.Status.Pseudo, culture, joueurParDefaut); builtCard = _card; }
         // Backfill : replay estampillé AVANT la corrélation score → pas de score en méta.
         // On le récupère du serveur en tâche de fond ; la carte se rafraîchit via /state.
-        if (builtCard is { Score: null }) { _ = BackfillCardAsync(replayId, ct); }
+        // Une lecture de 1LC demande toujours sa carte : son score, son rang et sa frame d'arret.
+        string? regle;
+        lock (_gate) regle = _regle;
+        if (regle is not null) { _ = BackfillCardAsync(replayId, ct, regle); }
+        else if (builtCard is { Score: null }) { _ = BackfillCardAsync(replayId, ct); }
         var objectPath = _objects.ObjectPath(manifest.Object.Sha256);
 
         // ── LE RÉSEAU NE DOIT JAMAIS ÊTRE DANS LE CHEMIN DE RÉPONSE ──────────────
@@ -419,7 +445,7 @@ public sealed class ReplayPlaybackService
     {
         if (!IsBusy) return;
         long cur, hi; long? loRun; double fps;
-        lock (_gate) { cur = _frame; hi = _replayEnd ?? 0; loRun = _runStart; fps = _nominalFps <= 0 ? 60 : _nominalFps; }
+        lock (_gate) { cur = _frame; hi = FinDeLaLecture(); loRun = _runStart; fps = _nominalFps <= 0 ? 60 : _nominalFps; }
         var target = cur + (long)Math.Round(seconds * fps);
         var lo = loRun ?? 0;
         if (target < lo) target = lo;
@@ -548,7 +574,7 @@ public sealed class ReplayPlaybackService
                 // La frame atteinte face a la frame attendue les separe, et c'est la seule
                 // mesure dont on dispose ici.
                 long vue, attendue;
-                lock (_gate) { vue = _frame; attendue = _replayEnd ?? 0; }
+                lock (_gate) { vue = _frame; attendue = FinDeLaLecture(); }
                 var avantLaFin = started && attendue > 0 && vue < attendue - EndPauseMargin - 60;
                 if (avantLaFin)
                 {
@@ -574,7 +600,7 @@ public sealed class ReplayPlaybackService
                     if (_state == ReplayPlaybackState.Launching) _state = ReplayPlaybackState.Playing; // confirmation tardive
                 }
                 _paused = paused;
-                frame = _frame; end = _replayEnd ?? 0;
+                frame = _frame; end = FinDeLaLecture();
             }
             if (nowActive && !started)
             {
@@ -596,7 +622,10 @@ public sealed class ReplayPlaybackService
             {
                 await _ra.PauseToggleAsync(ct).ConfigureAwait(false);
                 endPauseSent = true; paused = true;
-                lock (_gate) _paused = true;
+                long? finDu1LC;
+                lock (_gate) { _paused = true; finDu1LC = _finDu1LC; }
+                // Le 1LC s'arrete a la premiere vie perdue : le spectateur sait pourquoi l'image se fige.
+                if (finDu1LC is not null) _bandeau?.ShowTop("1LC", Texte("replay_1lc_end"), Texte("replay_1lc_end_sub"), 8000);
             }
 
             // Avant le PREMIER « actif », la lecture DÉMARRE (handshake réseau lent sur borne faible) :
@@ -675,7 +704,7 @@ public sealed class ReplayPlaybackService
     // (estampillé AVANT la corrélation score↔replay), met à jour la carte affichée (via
     // /state) et estampille la méta locale (permanent : plus de fetch la fois suivante).
     // Best-effort : silencieux si non appairé / hors-ligne / replay inconnu du serveur.
-    private async Task BackfillCardAsync(string replayId, CancellationToken ct)
+    private async Task BackfillCardAsync(string replayId, CancellationToken ct, string? regle = null)
     {
         try
         {
@@ -688,7 +717,8 @@ public sealed class ReplayPlaybackService
             client.DefaultRequestHeaders.Add("X-NELFEPLAY-DEVICE", credential);
 
             using var resp = await client.GetAsync(
-                $"/api/v1/agent/scores/replay-card?replay_id={Uri.EscapeDataString(replayId)}", ct).ConfigureAwait(false);
+                $"/api/v1/agent/scores/replay-card?replay_id={Uri.EscapeDataString(replayId)}"
+                + (regle is null ? "" : $"&ruleset={Uri.EscapeDataString(regle)}"), ct).ConfigureAwait(false);
             if (!resp.IsSuccessStatusCode) return;
 
             using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
@@ -700,10 +730,19 @@ public sealed class ReplayPlaybackService
             var player = root.TryGetProperty("player", out var pv) && pv.ValueKind == JsonValueKind.String ? pv.GetString() : null;
             if (score is null && rank is null) return;
 
+            // Le 1LC : la lecture se fige a la premiere vie perdue (le figeage de fin s'y arme), et
+            // sa carte n'ecrase pas celle du 1CC gardee sur la borne.
+            long? arret = regle is not null && root.TryGetProperty("stop_frame", out var stv) && stv.TryGetInt64(out var st) && st > 0 ? st : null;
             lock (_gate)
             {
                 if (_card is not null && string.Equals(_replayId, replayId, StringComparison.Ordinal))
                     _card = _card with { Score = score ?? _card.Score, Rank = rank ?? _card.Rank };
+                if (arret is { } f && string.Equals(_replayId, replayId, StringComparison.Ordinal)) _finDu1LC = f;
+            }
+            if (regle is not null)
+            {
+                _logger.LogInformation("Replay {Id} lu pour le 1LC : score={Score} rang={Rank} arret={Arret}", replayId, score, rank, arret);
+                return;
             }
             var meta = _meta.GetMeta(replayId);
             if (meta is not null)

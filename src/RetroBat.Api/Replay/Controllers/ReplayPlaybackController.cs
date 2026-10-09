@@ -43,7 +43,8 @@ public sealed class ReplayPlaybackController : ControllerBase
     }
 
     // Clé canonique CDC / front : replay_id.
-    public sealed record PlayRequest([property: JsonPropertyName("replay_id")] string ReplayId);
+    public sealed record PlayRequest([property: JsonPropertyName("replay_id")] string ReplayId,
+        [property: JsonPropertyName("ruleset")] string? Ruleset = null);
 
     [HttpPost("play")]
     public async Task<IActionResult> Play([FromBody] PlayRequest? req, CancellationToken ct)
@@ -51,7 +52,7 @@ public sealed class ReplayPlaybackController : ControllerBase
         if (string.IsNullOrWhiteSpace(req?.ReplayId))
             return BadRequest(new { ok = false, error = new { code = "REPLAY_MANIFEST_INVALID" } });
 
-        var r = await _playback.PlayAsync(req.ReplayId, ct);
+        var r = await _playback.PlayAsync(req.ReplayId, ct, req.Ruleset);
         if (!r.Accepted)
         {
             var status = r.Error is ReplayErrorCode.ReplayNotFound ? 404

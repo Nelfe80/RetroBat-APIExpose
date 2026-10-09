@@ -101,7 +101,8 @@ public static class ModesDeJeu
     {
         // Le 1CC MULTI n'est jamais le classement d'une partie seule : il a sa propre soumission
         // (NelfePlayScoringReporter.SoumettreMultiAsync). La plateforme le met deja en dernier.
-        profils = SansLeMulti(profils);
+        // Le 1LC et le speedrun non plus : chacun a son passeport, mesure dans la meme partie.
+        profils = DuSolo(profils);
         if (profils.Count == 0) return null;
         var aModes = profils.Where(p => ModeDuProfil(p) is not null).ToList();
         if (aModes.Count == 0) return profils[0];
@@ -176,6 +177,42 @@ public static class ModesDeJeu
     /// <summary>Les profils des parties seules : tous sauf la categorie 1CC MULTI et ses modes.</summary>
     public static List<JsonElement> SansLeMulti(IReadOnlyList<JsonElement> profils)
         => profils.Where(p => !EstMulti(Regle(p))).ToList();
+
+    /// <summary>
+    /// Les profils du 1CC d'une partie seule : ni le 1CC MULTI, ni le 1LC, ni le speedrun. Un profil
+    /// 1LC ouvert ne doit jamais recevoir le 1CC d'une partie (2026-10-09).
+    /// </summary>
+    public static List<JsonElement> DuSolo(IReadOnlyList<JsonElement> profils)
+        => profils.Where(p => !EstMulti(Regle(p)) && !Est1LC(Regle(p)) && !EstSpeedrun(Regle(p))).ToList();
+
+    /// <summary>
+    /// LE 1LC (decision user du 2026-10-09) : le score de la premiere vie. La partie le mesure en meme
+    /// temps que son 1CC ; 1lc, et 1lc-&lt;mode&gt; pour un jeu a modes.
+    /// </summary>
+    public static bool Est1LC(string? regle)
+        => regle is { } r && (r == "1lc" || r.StartsWith("1lc-", StringComparison.Ordinal));
+
+    /// <summary>Le speedrun, et ses variantes : jamais le classement du 1CC d'une partie.</summary>
+    public static bool EstSpeedrun(string? regle)
+        => regle is { } r && (r == "speedrun" || r.StartsWith("speedrun-", StringComparison.Ordinal));
+
+    /// <summary>
+    /// Le profil 1LC d'une partie seule. Un seul, sans mode : celui-la. Des 1LC a modes : celui du
+    /// mode joue ; sans signal, celui du mode de demarrage. Null : le jeu n'a pas de 1LC ouvert.
+    /// </summary>
+    public static JsonElement? ChoisirProfil1LC(IReadOnlyList<JsonElement> profils, int? modeJoue)
+    {
+        var uneVie = profils.Where(p => Est1LC(Regle(p))).ToList();
+        if (uneVie.Count == 0) return null;
+        var aModes = uneVie.Where(p => ModeDuProfil(p) is not null).ToList();
+        if (aModes.Count == 0) return uneVie[0];
+        var mode = modeJoue ?? (ChoisirProfil(profils, null) is { } solo ? ModeDuProfil(solo) : null);
+        foreach (var p in aModes)
+        {
+            if (ModeDuProfil(p) == mode) return p;
+        }
+        return null;
+    }
 
     /// <summary>
     /// LA CATEGORIE 1CC MULTI ET SES MODES (2026-10-06) : 1cc-multi, et 1cc-multi-super,

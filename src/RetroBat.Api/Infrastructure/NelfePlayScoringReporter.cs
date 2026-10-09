@@ -1013,8 +1013,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             if (string.IsNullOrEmpty(credential)) return;
             _ = PrendreLeTicketDuLancementAsync(credential);
             var (profilsDuJeu, profilsDuSite) = await ProfilsAsync(credential, systemId, romGroup, ct).ConfigureAwait(false);
-            // Le profil d'une partie seule : jamais le 1CC MULTI, meme s'il venait en tete.
-            var seules = RetroBat.Api.Scoring.ModesDeJeu.SansLeMulti(profilsDuJeu);
+            // Le profil d'une partie seule : jamais le 1CC MULTI, ni le 1LC, meme s'ils venaient en tete.
+            var seules = RetroBat.Api.Scoring.ModesDeJeu.DuSolo(profilsDuJeu);
             JsonElement? profile = seules.Count > 0 ? seules[0] : null;
             if (profile is null)
             {
@@ -3154,6 +3154,41 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             nvram, bios, contexteRun, partieADeux ? 2 : 1, finDuSolo, null, null, replay,
             profile is { } profilChoisi && profilChoisi.TryGetProperty("ruleset", out var regleChoisie) ? regleChoisie.GetString() : null);
         await PoserEtEnvoyerAsync(brouillon, runPeak, cancellationToken).ConfigureAwait(false);
+
+        // LE 1LC (decision user du 2026-10-09) : le score de la premiere vie, mesure dans la meme partie
+        // et soumis a son propre classement, avec le meme replay. Une partie ouverte aux joueurs qu'on
+        // ne verrait pas arriver reste hors du 1LC comme du 1CC solo.
+        if (!partieADeux && RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil1LC(profils, contexteRun.Mode) is { } profil1lc)
+        {
+            var (run1lc, mort) = RetroBat.Api.Scoring.PremiereVie.Couper(bestRun,
+                vies.Where(v => v.Perte).Select(v => (v.Frame, v.Player)));
+            if (!ScoreAMonte(run1lc))
+            {
+                Trace($"1LC : rien de marque avant la premiere vie perdue (frame {mort}), pas de soumission");
+                return;
+            }
+            var pic1lc = run1lc[^1].total;
+            Trace(mort is { } perdue
+                ? $"1LC : premiere vie perdue a la frame {perdue}, score de la premiere vie {pic1lc}"
+                : $"1LC : aucune vie perdue dans le run, le 1LC est le run entier ({pic1lc})");
+            // Les lectures du passeport s'arretent a la mort : rien de ce qui suit ne doit pouvoir y
+            // etre retrouve par la plateforme.
+            var brouillon1lc = NouveauBrouillon("1lc", systemId, romGroup, sessionJson, listenerSha, coreSha, memSha,
+                contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, pic1lc, run1lc, run1lc,
+                nvram, bios, contexteRun, 1, mort is { } m ? (RetroBat.Api.Scoring.PremiereVie.Raison, m) : finDuSolo, null, null, replay,
+                profil1lc.TryGetProperty("ruleset", out var regle1lc) ? regle1lc.GetString() : null);
+            // OU LA LECTURE DU 1LC SE FIGE, en frames du replay : la mort moins le depart de
+            // l'enregistrement. Le lecteur emploie le vrai coeur, sans wrapper : il ne voit pas la mort,
+            // il lui faut sa frame.
+            if (mort is { } finDeVie && replay is { } replay1lc
+                && enregistrements.FirstOrDefault(e => string.Equals(e.Id, replay1lc, StringComparison.Ordinal)) is { Id: not null } enr
+                && finDeVie >= enr.Debut)
+            {
+                brouillon1lc["arret_du_replay"] = finDeVie - enr.Debut;
+                Trace($"1LC : la lecture du replay {replay1lc} se figera a sa frame {finDeVie - enr.Debut}");
+            }
+            await PoserEtEnvoyerAsync(brouillon1lc, pic1lc, cancellationToken).ConfigureAwait(false);
+        }
     }
 
     /// <summary>Le plus grand ecart entre deux lectures consecutives du run retenu : un saut
@@ -3179,7 +3214,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         int? place = null, string? seance = null,
         string? sessionId = null, DateTime? finUtc = null,
         (NelfePlayScoringSessionService.SessionPlayer? Joueur, bool Fige)? joueurFige = null,
-        bool? labo = null, string? versionApi = null, string? etatWrapper = null)
+        bool? labo = null, string? versionApi = null, string? etatWrapper = null, long? arretDuReplay = null)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
@@ -3310,7 +3345,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (RetroBat.Api.Scoring.ModesDeJeu.DifficultePourLePasseport(profile, ctx) is { } difficulte) jeu["difficulty"] = difficulte;
         // Ce qui a ferme le 1CC solo (continue, arrivee d'un joueur...) : garde et signe, jamais
         // affiche (decision user du 2026-09-30). Absent quand rien n'a coupe la partie.
-        if (finDuSolo is { } fin) jeu["cut"] = new JsonObject { ["reason"] = fin.Raison, ["frame"] = fin.Frame };
+        if (finDuSolo is { } fin)
+        {
+            jeu["cut"] = new JsonObject { ["reason"] = fin.Raison, ["frame"] = fin.Frame };
+            // Le 1LC dit ou sa lecture s'arrete, en frames du replay (2026-10-09).
+            if (arretDuReplay is { } arret) jeu["cut"]!["replay_frame"] = arret;
+        }
         // 1CC MULTI : la place du joueur certifie (1 pour l'hote, 2 a 4 pour les invites) et le direct
         // ou elle a ete attribuee. La plateforme les confronte a ses places.
         if (place is { } siege) jeu["seat"] = siege;
@@ -3413,8 +3453,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private async Task<JsonElement?> FetchProfileAsync(string credential, string systemId, string romGroup, CancellationToken cancellationToken)
     {
         var profils = await FetchProfilesAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false);
-        // Le profil d'une partie seule : jamais le 1CC MULTI, meme s'il venait en tete.
-        var seules = RetroBat.Api.Scoring.ModesDeJeu.SansLeMulti(profils);
+        // Le profil d'une partie seule : jamais le 1CC MULTI, ni le 1LC, meme s'ils venaient en tete.
+        var seules = RetroBat.Api.Scoring.ModesDeJeu.DuSolo(profils);
         return seules.Count > 0 ? seules[0] : null;
     }
 
@@ -3717,21 +3757,25 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var scoreText = (string?)((passport["metric"] as JsonObject)?["value"]) ?? "0";
             _ = long.TryParse(scoreText, out var score);
             var rank = (int?)(obj?["rank"]);
+            // Le 1LC arrive juste apres le verdict du 1CC de la meme partie : il se nomme.
+            var quoi = RetroBat.Api.Scoring.ModesDeJeu.Est1LC((string?)(passport["game"] as JsonObject)?["ruleset"])
+                ? "Score 1LC"
+                : "Score";
 
             var message = status switch
             {
-                "published" => $"Score certifié : {score:N0} publié" + (rank is int r ? $" (#{r})" : ""),
+                "published" => $"{quoi} certifié : {score:N0} publié" + (rank is int r ? $" (#{r})" : ""),
                 // Signalé : gardé sur le compte du joueur, jamais classé ni ancré. Il sait pourquoi.
-                "held" => $"Score {score:N0} signalé, non classé : {ReasonToText(reason)}",
+                "held" => $"{quoi} {score:N0} signalé, non classé : {ReasonToText(reason)}",
                 // La quarantaine n'est PAS un refus : le score est garde avec son passeport
                 // signe et entrera au classement des que l'emulateur sera reconnu. Le dire
                 // ainsi change tout pour le joueur, qui a joue et qui garde quelque chose.
                 "quarantined" => reason == "settings.unknown"
-                    ? $"Score {score:N0} enregistré, en attente de conformité des réglages"
-                    : $"Score {score:N0} enregistré, en attente : ton émulateur n'est pas encore reconnu",
-                "expired" => $"Score {score:N0} non classé : {ReasonToText(reason)}",
-                "refused" => $"Score {score:N0} refusé : {ReasonToText(reason)}",
-                _ => $"Score non transmis : {ReasonToText(reason)}",
+                    ? $"{quoi} {score:N0} enregistré, en attente de conformité des réglages"
+                    : $"{quoi} {score:N0} enregistré, en attente : ton émulateur n'est pas encore reconnu",
+                "expired" => $"{quoi} {score:N0} non classé : {ReasonToText(reason)}",
+                "refused" => $"{quoi} {score:N0} refusé : {ReasonToText(reason)}",
+                _ => $"{quoi} non transmis : {ReasonToText(reason)}",
             };
             await _esNotify.NotifyAsync(message, cancellationToken).ConfigureAwait(false);
         }
@@ -4479,11 +4523,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var systemId = (string?)brouillon["systeme"] ?? "";
         var romGroup = (string?)brouillon["rom_group"] ?? "";
         var multi = (string?)brouillon["genre"] == "multi";
+        var uneVie = (string?)brouillon["genre"] == "1lc";
         var mode = (int?)brouillon["mode"];
         var (profils, duSite) = await ProfilsAsync(credential, systemId, romGroup, ct).ConfigureAwait(false);
         JsonElement? profile = multi
             ? RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfilMulti(profils, mode)
-            : RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil(profils, mode);
+            : uneVie
+                ? RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil1LC(profils, mode)
+                : RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil(profils, mode);
         if (profile is null)
         {
             if ((bool?)brouillon["labo"] == true)
@@ -4492,7 +4539,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
             else if (duSite)
             {
-                Trace($"brouillon {id} : plus aucun classement ouvert pour {romGroup}{(multi ? " " + CategorieMulti : "")}, retire sans envoi");
+                Trace($"brouillon {id} : plus aucun classement ouvert pour {romGroup}{(multi ? " " + CategorieMulti : uneVie ? " 1LC" : "")}, retire sans envoi");
                 return (RetroBat.Api.Scoring.IssueDEnvoi.Definitif, null, null);
             }
             else
@@ -4549,7 +4596,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 brouillon["nvram"]?.DeepClone() as JsonArray, brouillon["bios"]?.DeepClone() as JsonObject,
                 contexte, (int?)brouillon["joueurs"] ?? 1, finDuSolo, (int?)brouillon["place"], (string?)brouillon["seance"],
                 sessionId: id, finUtc: fin, joueurFige: (joueur, true), labo: (bool?)brouillon["labo"] == true,
-                versionApi: (string?)brouillon["apiexpose"], etatWrapper: (string?)brouillon["etat_wrapper"]);
+                versionApi: (string?)brouillon["apiexpose"], etatWrapper: (string?)brouillon["etat_wrapper"],
+                arretDuReplay: (long?)brouillon["arret_du_replay"]);
             var corps = passport.DeepClone()!.AsObject();
             corps.Remove("signature");
             passport["signature"] = cle.SignB64Url(Jcs.CanonicalBytes(corps));
@@ -4632,6 +4680,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             PruneReplayLinks(); _finalizedReplay[id!] = (sha!, DateTime.UtcNow); SauverLesLiens();
         }
         TryRegisterReplayLink(id!);
+        TryRegisterReplayLink(id + LienDu1LC);
     }
 
     // Score PUBLIÉ : le record est public → son replay le devient aussi (il s'affiche
@@ -4679,13 +4728,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // Le replay vient du brouillon : celui du meilleur run pour le solo, celui de la partie
             // pour le 1CC MULTI, choisi a la fin de la partie et non plus au moment du verdict.
             if (string.IsNullOrEmpty(replayId)) return;
+            // Le 1LC partage le replay du 1CC : son rapprochement a sa propre cle.
+            var cle = RetroBat.Api.Scoring.ModesDeJeu.Est1LC((string?)(passport["game"] as JsonObject)?["ruleset"])
+                ? replayId + LienDu1LC
+                : replayId!;
             lock (_sync)
             {
                 PruneReplayLinks();
-                _pendingScoreLink[replayId!] = (sessionId!, "public", score, rank, DateTime.UtcNow);
+                _pendingScoreLink[cle] = (sessionId!, "public", score, rank, DateTime.UtcNow);
                 SauverLesLiens();
             }
-            TryRegisterReplayLink(replayId!);
+            TryRegisterReplayLink(cle);
         }
         catch (Exception ex)
         {
@@ -4696,19 +4749,21 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     // Rapprochement : quand le score publié ET le replay finalisé sont là pour le même id, on
     // enregistre le lien. Les deux entrees ne partent qu'a la REPONSE du serveur : une coupure
     // reseau ou un arret de l'API laisse le lien sur disque, et il repart au tour suivant.
-    private void TryRegisterReplayLink(string replayId)
+    private void TryRegisterReplayLink(string cle)
     {
+        var replayId = ReplayDuLien(cle);
         string sessionId, visibility, sha;
         long? score; int? rank;
         lock (_sync)
         {
-            if (_liensEnCours.Contains(replayId)) return;
-            if (!_pendingScoreLink.TryGetValue(replayId, out var p)) return;
+            if (_liensEnCours.Contains(cle)) return;
+            if (!_pendingScoreLink.TryGetValue(cle, out var p)) return;
             if (!_finalizedReplay.TryGetValue(replayId, out var f)) return;
             sessionId = p.sessionId; visibility = p.visibility; score = p.score; rank = p.rank; sha = f.sha256;
-            _liensEnCours.Add(replayId);
+            _liensEnCours.Add(cle);
         }
-        StampReplayCard(replayId, score, rank);
+        // La carte du replay reste celle du 1CC : le 1LC ne la reecrit pas.
+        if (string.Equals(cle, replayId, StringComparison.Ordinal)) StampReplayCard(replayId, score, rank);
         // Le semis est idempotent (la file ignore un replay deja inscrit) : il part tout de suite.
         if (string.Equals(visibility, "public", StringComparison.OrdinalIgnoreCase)) SemerReplayCertifie(replayId, sha);
         _ = Task.Run(async () =>
@@ -4716,15 +4771,30 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var termine = await RegisterReplayLinkAsync(sessionId, replayId, sha, visibility, CancellationToken.None).ConfigureAwait(false);
             lock (_sync)
             {
-                _liensEnCours.Remove(replayId);
+                _liensEnCours.Remove(cle);
                 if (termine)
                 {
-                    _pendingScoreLink.Remove(replayId);
-                    _finalizedReplay.Remove(replayId);
+                    _pendingScoreLink.Remove(cle);
+                    // L'objet finalise sert encore tant qu'un autre score du meme replay attend.
+                    if (!_pendingScoreLink.Keys.Any(k => string.Equals(ReplayDuLien(k), replayId, StringComparison.Ordinal)))
+                        _finalizedReplay.Remove(replayId);
                     SauverLesLiens();
                 }
             }
         });
+    }
+
+    /// <summary>
+    /// LE 1LC PARTAGE LE REPLAY DU 1CC (2026-10-09) : deux scores, deux sessions, un seul replay. Le
+    /// rapprochement du 1LC se range sous « replay|1lc » ; l'objet finalise reste sous le replay.
+    /// </summary>
+    private const string LienDu1LC = "|1lc";
+
+    /// <summary>Le replay d'une cle de rapprochement.</summary>
+    internal static string ReplayDuLien(string cle)
+    {
+        var barre = cle.IndexOf('|');
+        return barre < 0 ? cle : cle[..barre];
     }
 
     /// <summary>Retente les liens complets restes en attente (redemarrage, reseau coupe).</summary>
@@ -4734,7 +4804,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         lock (_sync)
         {
             complets = _pendingScoreLink.Keys
-                .Where(id => _finalizedReplay.ContainsKey(id) && !_liensEnCours.Contains(id))
+                .Where(cle => _finalizedReplay.ContainsKey(ReplayDuLien(cle)) && !_liensEnCours.Contains(cle))
                 .ToList();
         }
         foreach (var id in complets) TryRegisterReplayLink(id);
