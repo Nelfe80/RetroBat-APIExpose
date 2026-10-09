@@ -210,20 +210,25 @@ public sealed class ScoreShotService : BackgroundService
     {
         var avant = DateTime.UtcNow.AddSeconds(-1);   // marge d'horloge sur l'écriture du fichier
         var parMame = _mame.EstConnecte;
+        // Ces échecs se disent au journal : la photo manquait chez un joueur, deux records de suite,
+        // et rien ne le montrait (2026-10-10).
         try
         {
             var envoye = parMame
                 ? await _mame.RequestSnapshotAsync(CancellationToken.None).ConfigureAwait(false)
                 : true;
             if (!parMame) await _retroarch.ScreenshotAsync(CancellationToken.None).ConfigureAwait(false);
-            if (!envoye) { _logger.LogDebug("Capture record : MAME n'a pas pris la demande."); return; }
+            if (!envoye) { _logger.LogInformation("Capture record : MAME n'a pas pris la demande, pas de photo."); return; }
         }
-        catch (Exception ex) { _logger.LogDebug(ex, "Capture record : commande refusée."); return; }
+        catch (Exception ex) { _logger.LogInformation("Capture record : commande refusée ({Erreur}), pas de photo.", ex.Message); return; }
 
-        var apparu = await AttendreFichierAsync(avant, parMame).ConfigureAwait(false);
+        var dossiers = parMame ? DossiersMame() : CapturesRetroArch.Dossiers();
+        var apparu = await AttendreFichierAsync(avant, parMame, dossiers).ConfigureAwait(false);
         if (apparu is null)
         {
-            _logger.LogDebug("Capture record : aucun fichier apparu (RetroArch absent ?).");
+            _logger.LogInformation("Capture record : aucune image apparue en {Secondes} s dans {Dossiers}, pas de photo.",
+                AttenteFichier.TotalSeconds,
+                dossiers.Count == 0 ? "(aucun dossier)" : string.Join(" ; ", dossiers.Select(d => Directory.Exists(d) ? d : d + " (absent)")));
             return;
         }
 
@@ -248,11 +253,9 @@ public sealed class ScoreShotService : BackgroundService
     /// Attend qu'un PNG apparaisse. On cherche dans les DEUX endroits possibles, et en
     /// profondeur : RetroArch écrit à plat, MAME range par jeu (<c>snap/&lt;rom&gt;/0000.png</c>).
     /// </summary>
-    private static async Task<string?> AttendreFichierAsync(DateTime apres, bool parMame)
+    private static async Task<string?> AttendreFichierAsync(DateTime apres, bool parMame, IReadOnlyList<string> dossiers)
     {
-        var dossiers = parMame ? DossiersMame() : DossiersRetroArch();
         if (dossiers.Count == 0) return null;
-        var portee = parMame ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
         var limite = DateTime.UtcNow + AttenteFichier;
         while (DateTime.UtcNow < limite)
         {
@@ -260,11 +263,15 @@ public sealed class ScoreShotService : BackgroundService
             {
                 try
                 {
-                    var candidat = new DirectoryInfo(dossier)
-                        .EnumerateFiles("*.png", portee)
-                        .Where(f => f.LastWriteTimeUtc >= apres)
-                        .OrderByDescending(f => f.LastWriteTimeUtc)
-                        .FirstOrDefault();
+                    // RetroArch : un sous-dossier par jeu s'il range ses captures par contenu, et un
+                    // dossier absent est guetté (il peut le créer en écrivant). Voir CapturesRetroArch.
+                    var candidat = parMame
+                        ? new DirectoryInfo(dossier)
+                            .EnumerateFiles("*.png", SearchOption.AllDirectories)
+                            .Where(f => f.LastWriteTimeUtc >= apres)
+                            .OrderByDescending(f => f.LastWriteTimeUtc)
+                            .FirstOrDefault()
+                        : CapturesRetroArch.PlusRecente(dossier, apres);
                     // Fichier encore en cours d'écriture : on le saute, il sera là au tour suivant.
                     if (candidat is not null && candidat.Length > 0 && Lisible(candidat.FullName))
                         return candidat.FullName;
@@ -288,12 +295,6 @@ public sealed class ScoreShotService : BackgroundService
         return candidats.Where(Directory.Exists).ToList();
     }
 
-    private static List<string> DossiersRetroArch()
-    {
-        var d = DossierRetroArch();
-        return d is not null ? new List<string> { d } : new List<string>();
-    }
-
     private static bool Lisible(string chemin)
     {
         try
@@ -304,30 +305,6 @@ public sealed class ScoreShotService : BackgroundService
         catch { return false; }
     }
 
-    /// <summary>Où RetroArch écrit ses captures. On lit sa configuration plutôt que de supposer :
-    /// le dossier est déplaçable et une supposition fausse ne se verrait jamais.</summary>
-    private static string? DossierRetroArch()
-    {
-        try
-        {
-            var cfg = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "retroarch.cfg");
-            if (File.Exists(cfg))
-            {
-                foreach (var ligne in File.ReadLines(cfg))
-                {
-                    if (!ligne.StartsWith("screenshot_directory", StringComparison.Ordinal)) continue;
-                    var eq = ligne.IndexOf('=');
-                    if (eq < 0) continue;
-                    var valeur = ligne[(eq + 1)..].Trim().Trim('"');
-                    if (valeur.Length > 0 && valeur != ":\\" && Directory.Exists(valeur)) return valeur;
-                }
-            }
-        }
-        catch { /* configuration illisible : on retombe sur le dossier habituel */ }
-
-        var defaut = Path.Combine(RetroBatPaths.RetroBatRoot, "screenshots");
-        return Directory.Exists(defaut) ? defaut : null;
-    }
 
     /// <summary>Le verdict est tombé : l'image monte si le score a été publié, sinon elle part.</summary>
     private async Task OnVerdictAsync(JsonElement root)

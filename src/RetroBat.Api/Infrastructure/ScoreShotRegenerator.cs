@@ -330,47 +330,22 @@ public sealed class ScoreShotRegenerator
 
     private static async Task<string?> AttendreFichierAsync(DateTime apres, CancellationToken ct)
     {
-        var dossier = DossierRetroArch();
-        if (dossier is null) return null;
+        // Les memes dossiers que la photo prise en partie : voir CapturesRetroArch.
+        var dossiers = CapturesRetroArch.Dossiers();
         var fin = DateTime.UtcNow + TimeSpan.FromSeconds(5);
         while (DateTime.UtcNow < fin)
         {
-            try
+            foreach (var dossier in dossiers)
             {
-                var candidat = new DirectoryInfo(dossier)
-                    .EnumerateFiles("*.png", SearchOption.TopDirectoryOnly)
-                    .Where(f => f.LastWriteTimeUtc >= apres && f.Length > 0)
-                    .OrderByDescending(f => f.LastWriteTimeUtc)
-                    .FirstOrDefault();
-                if (candidat is not null) return candidat.FullName;
+                try
+                {
+                    if (CapturesRetroArch.PlusRecente(dossier, apres) is { } candidat) return candidat.FullName;
+                }
+                catch { }
             }
-            catch { }
             await Task.Delay(200, ct).ConfigureAwait(false);
         }
         return null;
-    }
-
-    private static string? DossierRetroArch()
-    {
-        try
-        {
-            var cfg = Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.RetroBatRoot,
-                "emulators", "retroarch", "retroarch.cfg");
-            if (File.Exists(cfg))
-            {
-                foreach (var ligne in File.ReadLines(cfg))
-                {
-                    if (!ligne.StartsWith("screenshot_directory", StringComparison.Ordinal)) continue;
-                    var eq = ligne.IndexOf('=');
-                    if (eq < 0) continue;
-                    var valeur = ligne[(eq + 1)..].Trim().Trim('"');
-                    if (valeur.Length > 0 && Directory.Exists(valeur)) return valeur;
-                }
-            }
-        }
-        catch { }
-        var defaut = Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.RetroBatRoot, "screenshots");
-        return Directory.Exists(defaut) ? defaut : null;
     }
 
     private async Task<string?> EnvoyerAsync(Candidat c, string fichier, CancellationToken ct)
