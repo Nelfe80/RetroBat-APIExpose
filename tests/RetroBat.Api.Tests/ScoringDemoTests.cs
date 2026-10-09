@@ -69,6 +69,18 @@ public class ScoringDemoTests
     }
 
     [Fact]
+    public void Un_START_en_fin_de_partie_ne_rend_pas_la_partie_hors_jeu()
+    {
+        // Alex Kidd (2026-10-09) : partie lancee au bouton, START appuye a la fin pour quitter. Toutes
+        // les lectures ont ete prises avant lui : la fenetre n'ecarte rien.
+        Assert.False(NelfePlayScoringReporter.FenetreDeJeu(true, [true, true, true, true, true, true]));
+        // Un START qui ouvre une partie : la fenetre ecarte ce qui n'est pas joue (Metal Slug 3 ci-dessus).
+        Assert.True(NelfePlayScoringReporter.FenetreDeJeu(true, [true, true, true, false, false, false, true, true]));
+        // Sans START, pas de fenetre.
+        Assert.False(NelfePlayScoringReporter.FenetreDeJeu(false, [true, false]));
+    }
+
+    [Fact]
     public void Les_autres_etats_ne_changent_rien()
     {
         // GAME_OVER, CONTINUE_SCREEN, TITLE_SCREEN : ni l'ouverture ni la fermeture d'une démo.

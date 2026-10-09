@@ -1531,6 +1531,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return (demo, enJeu);
     }
 
+    /// <summary>
+    /// LA FENETRE DE JEU NE S'APPLIQUE QUE SI UN START A OUVERT QUELQUE CHOSE (2026-10-09). Une
+    /// partie de Master System se lance au bouton : un joueur qui appuyait sur START a la fin, pour
+    /// quitter, faisait passer toute sa partie hors jeu, et rien ne partait (Alex Kidd, deux parties
+    /// de suite, 6 puis 14 lectures ecartees). Sans aucune lecture prise apres un START, la fenetre
+    /// n'ecarte rien. La demo, elle, se retire par ses propres signaux.
+    /// </summary>
+    internal static bool FenetreDeJeu(bool startVu, IReadOnlyList<bool> horsJeu)
+        => startVu && horsJeu.Contains(false);
+
     /// <summary>Les lectures prises EN JEU, c'est-à-dire entre un START et le GAME OVER qui suit.</summary>
     internal static List<(long frame, long total)> FiltrerEnJeu(
         IReadOnlyList<(long frame, long total)> trajectoire, IReadOnlyList<bool> horsJeu)
@@ -2981,7 +2991,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
             // La fenêtre de jeu : un START a été vu, donc on sait ce qui est joué. Ce qui ne l'est
             // pas (démo avant la partie, attract après le game over) sort de la trajectoire.
-            if (_startVu)
+            if (FenetreDeJeu(_startVu, horsJeu))
             {
                 var gardes = FiltrerEnJeu(lecturesBrutes, horsJeu);
                 if (gardes.Count != trajectory.Count)
