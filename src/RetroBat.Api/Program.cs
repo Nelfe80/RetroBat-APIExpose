@@ -423,6 +423,9 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<NelfePlayScoringCo
 // Dans World Scoring, notre coeur fonctionnel ; dans le systeme du jeu, le choix de confort du joueur.
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.PartieNelfePlayService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.PartieNelfePlayService>());
+// L'atelier de NelfeScoreLab, vu par ceux qui ne connaissent pas l'API : le hiscore local des consoles.
+builder.Services.AddSingleton<RetroBat.Domain.Interfaces.IAtelierDeLaPartie>(sp =>
+    sp.GetRequiredService<RetroBat.Api.Infrastructure.PartieNelfePlayService>());
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.WorldScoringLancementService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.WorldScoringLancementService>());
 // Index public des jeux ouverts au scoring : court, lu souvent, jamais authentifie. Pas de

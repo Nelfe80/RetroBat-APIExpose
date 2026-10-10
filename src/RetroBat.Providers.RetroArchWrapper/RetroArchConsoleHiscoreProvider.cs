@@ -19,6 +19,7 @@ public sealed class RetroArchConsoleHiscoreProvider : IProvider
     private readonly IHiscoreThemeWriter _hiscoreThemeWriter;
     private readonly EmulationStationSettingsService _settingsService;
     private readonly ILogger<RetroArchConsoleHiscoreProvider>? _logger;
+    private readonly IAtelierDeLaPartie? _atelier;
     private readonly Dictionary<string, ConsoleScoreState> _scores = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, ConsoleRuntimeState> _runtimeStates = new(StringComparer.OrdinalIgnoreCase);
     private IDisposable? _subscription;
@@ -29,13 +30,15 @@ public sealed class RetroArchConsoleHiscoreProvider : IProvider
         ApiContext context,
         IHiscoreThemeWriter hiscoreThemeWriter,
         EmulationStationSettingsService settingsService,
-        ILogger<RetroArchConsoleHiscoreProvider>? logger = null)
+        ILogger<RetroArchConsoleHiscoreProvider>? logger = null,
+        IAtelierDeLaPartie? atelier = null)
     {
         _eventBus = eventBus;
         _context = context;
         _hiscoreThemeWriter = hiscoreThemeWriter;
         _settingsService = settingsService;
         _logger = logger;
+        _atelier = atelier;
     }
 
     public Task StartAsync(CancellationToken cancellationToken = default)
@@ -369,6 +372,15 @@ public sealed class RetroArchConsoleHiscoreProvider : IProvider
         if (!IsExportScoresOnGameEndEnabled())
         {
             await PublishConsoleHiscoreDiagnosticAsync("hiscore.console.write.skipped", "export-disabled", null, null);
+            return;
+        }
+
+        // L'atelier de NelfeScoreLab (2026-10-10) : la partie peut partir d'un etat fabrique, son score n'est pas
+        // celui d'un joueur et n'entre pas dans la table locale.
+        if (_atelier?.SousAtelier == true)
+        {
+            _logger?.LogInformation("Console wrapper hiscore : partie sous l'atelier NelfeScoreLab, la table locale n'est pas touchee.");
+            await PublishConsoleHiscoreDiagnosticAsync("hiscore.console.write.skipped", "scorelab-workshop", null, null);
             return;
         }
 

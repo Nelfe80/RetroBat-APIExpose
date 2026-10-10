@@ -28,7 +28,7 @@ namespace RetroBat.Api.Infrastructure;
 /// alors le jeu lui-meme : s'il est dans la collection World Scoring, la partie est NelfePlay.
 /// Ne pas savoir ne doit pas faire perdre un record.
 /// </summary>
-public sealed class PartieNelfePlayService : IHostedService, IDisposable
+public sealed class PartieNelfePlayService : IHostedService, IDisposable, RetroBat.Domain.Interfaces.IAtelierDeLaPartie
 {
     /// <summary>
     /// Une annonce vaut pour le lancement qui la suit, s'il la suit d'assez pres : ES peut tarder a

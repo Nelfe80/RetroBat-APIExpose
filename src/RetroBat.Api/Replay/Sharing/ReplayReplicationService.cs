@@ -59,11 +59,15 @@ public sealed class ReplayReplicationService : BackgroundService
         IReplayManifestStore manifests,
         IReplayObjectStore objects, IReplayMetadataStore meta, IReplaySourceResolver source,
         IHttpClientFactory httpFactory, IConfiguration config, IEventBus bus,
-        ILogger<ReplayReplicationService> logger)
+        ILogger<ReplayReplicationService> logger, RetroBat.Domain.Interfaces.IAtelierDeLaPartie? atelier = null)
     {
         _follows = follows; _joues = joues; _manifests = manifests; _objects = objects; _meta = meta;
         _source = source; _httpFactory = httpFactory; _config = config; _bus = bus; _logger = logger;
+        _atelier = atelier;
     }
+
+    /// <summary>Une partie sous l'atelier de NelfeScoreLab n'est pas un jeu que le joueur vient de jouer.</summary>
+    private readonly RetroBat.Domain.Interfaces.IAtelierDeLaPartie? _atelier;
 
     private bool Enabled => _config.GetValue("Replay:Replication:Enabled", false);
     private int MaxObjects => Math.Max(1, _config.GetValue("Replay:Replication:MaxObjects", 50));
@@ -304,6 +308,7 @@ public sealed class ReplayReplicationService : BackgroundService
     /// </summary>
     private void RetenirJeuJoue(EventEnvelope e)
     {
+        if (_atelier?.SousAtelier == true) return;
         try
         {
             using var doc = JsonDocument.Parse(JsonSerializer.Serialize(e.Payload));
