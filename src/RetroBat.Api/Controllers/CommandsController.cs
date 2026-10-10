@@ -96,20 +96,33 @@ public class CommandsController : ControllerBase
         // une definition sur FBNeo, MAME RetroArch ET MAME standalone), on lance nous-memes
         // emulatorLauncher avec -emulator/-core, en reprenant mot pour mot les arguments de
         // manette du dernier lancement d'ES, comme le fait le netplay quand ES ne repond pas.
+        if (payload.RetroAchievements == false && string.IsNullOrWhiteSpace(payload.Emulator))
+        {
+            return BadRequest(new
+            {
+                message = "retroAchievements=false needs emulator: only a direct launch can turn RetroAchievements off for one session."
+            });
+        }
+
         if (!string.IsNullOrWhiteSpace(payload.Emulator))
         {
             var systeme = string.IsNullOrWhiteSpace(payload.System)
                 ? Path.GetFileName(Path.GetDirectoryName(romPath) ?? string.Empty)
                 : payload.System.Trim();
-            var arguments = string.Join(' ', new[]
+            var arguments = ArgumentsDuLanceur(RetroBat.Api.Netplay.EsLaunchArguments.ManettesDuDernierLancement(),
+                systeme, payload.Emulator.Trim(), payload.Core?.Trim(), romPath, payload.RetroAchievements);
+            if (arguments is null)
             {
-                RetroBat.Api.Netplay.EsLaunchArguments.ManettesDuDernierLancement(),
-                "-system", systeme,
-                "-emulator", payload.Emulator.Trim(),
-                string.IsNullOrWhiteSpace(payload.Core) ? string.Empty : "-core",
-                string.IsNullOrWhiteSpace(payload.Core) ? string.Empty : payload.Core.Trim(),
-                "-rom", '"' + romPath.Replace("\"", "") + '"',
-            }.Where(x => x.Length > 0));
+                return BadRequest(new
+                {
+                    message = "emulator, core and system must be plain names: letters, digits, '_', '-' or '.', not starting with '-', 64 characters at most.",
+                    system = systeme,
+                });
+            }
+            if (payload.RetroAchievements == false)
+            {
+                _logger.LogInformation("Lancement direct sans RetroAchievements pour cette seance ({Systeme}, {Emulateur}).", systeme, payload.Emulator.Trim());
+            }
             var lanceur = RetroBat.Api.Netplay.NetplayLaunch.DemarrerDirectement(arguments, _logger);
             if (lanceur is null)
             {
@@ -164,6 +177,7 @@ public class CommandsController : ControllerBase
                 system = systeme,
                 emulator = payload.Emulator.Trim(),
                 core = payload.Core?.Trim() ?? string.Empty,
+                retroAchievements = payload.RetroAchievements,
             });
         }
 
@@ -470,6 +484,38 @@ public class CommandsController : ControllerBase
 
         return match?.GamePath ?? string.Empty;
     }
+
+    /// <summary>
+    /// UN NOM, PAS UNE LIGNE DE COMMANDE (APX-LAB-002, 2026-10-10). emulator, core et system finissent dans les arguments
+    /// du lanceur de RetroBat : une espace, un guillemet ou un tiret de tete y ajouteraient des arguments. Pendant l'essai
+    /// H0 du Lab, « -retroachievements 0 » est passe ainsi a la suite du nom du coeur, et l'API l'a laisse faire.
+    /// Lettres, chiffres, « _ », « - » et « . », sans tiret en tete, 64 caracteres au plus.
+    /// </summary>
+    internal static bool NomDeLanceur(string? valeur)
+        => !string.IsNullOrEmpty(valeur) && valeur.Length <= 64 && valeur[0] != '-'
+           && valeur.All(c => char.IsAsciiLetterOrDigit(c) || c is '_' or '-' or '.');
+
+    /// <summary>
+    /// Les arguments du lanceur pour un lancement direct, ou null si un nom n'en est pas un (<see cref="NomDeLanceur"/>).
+    /// <paramref name="retroAchievements"/> a faux coupe RetroAchievements pour cette seance seulement : le lanceur ecrit
+    /// <c>cheevos_enable = "false"</c> pour elle, et le reglage d'EmulationStation ne change pas (mesure pendant H0).
+    /// </summary>
+    internal static string? ArgumentsDuLanceur(string manettes, string systeme, string emulateur, string? coeur, string romPath,
+        bool? retroAchievements)
+    {
+        var avecCoeur = !string.IsNullOrEmpty(coeur);
+        if (!NomDeLanceur(systeme) || !NomDeLanceur(emulateur) || (avecCoeur && !NomDeLanceur(coeur))) return null;
+        return string.Join(' ', new[]
+        {
+            manettes,
+            "-system", systeme,
+            "-emulator", emulateur,
+            avecCoeur ? "-core" : string.Empty,
+            avecCoeur ? coeur! : string.Empty,
+            retroAchievements == false ? "-retroachievements 0" : string.Empty,
+            "-rom", '"' + romPath.Replace("\"", "") + '"',
+        }.Where(x => x.Length > 0));
+    }
 }
 
 public class LaunchPayload
@@ -507,6 +553,14 @@ public class LaunchPayload
     /// <summary>Optional, with Emulator: the system name passed to the launcher (defaults to the ROM folder name).</summary>
     /// <example>mame</example>
     public string System { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Optional, with Emulator: false turns RetroAchievements off for this session only (launcher argument
+    /// <c>-retroachievements 0</c>); EmulationStation's own setting is left untouched. Null or true: the cabinet's
+    /// setting applies. Without Emulator the request is refused: EmulationStation's launch carries no argument.
+    /// </summary>
+    /// <example>false</example>
+    public bool? RetroAchievements { get; set; }
 }
 
 public class CloseGamePayload
