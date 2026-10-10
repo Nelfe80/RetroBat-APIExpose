@@ -31,12 +31,14 @@
     <ProjectReference Include="..\RetroBat.Providers.RetroArchWrapper\RetroBat.Providers.RetroArchWrapper.csproj" />
   </ItemGroup>
 
-  <!-- La planche des reactions voyage dans l'exe. Le dossier media n'est livre ni par la mise a
-       jour ni par l'installeur : lue la-bas, elle manquait a toutes les bornes sauf celle qui
-       fabrique la release, et la legende des reactions ne s'affichait pas. -->
+  <!-- Les images dont le code a besoin voyagent dans l'exe. Le dossier media n'est livre ni par la
+       mise a jour ni par l'installeur : lues la-bas, elles manquaient a toutes les bornes sauf celle
+       qui fabrique la release (legende des reactions absente, icones du concours en direct omises). -->
   <ItemGroup>
-    <None Remove="Replay\Overlay\reacts-icons.png" />
+    <None Remove="Replay\Overlay\reacts-icons.png;Infrastructure\livecontest-icon.png;Infrastructure\livecontest-icon-big.png" />
     <EmbeddedResource Include="Replay\Overlay\reacts-icons.png" LogicalName="RetroBat.Api.reacts-icons.png" />
+    <EmbeddedResource Include="Infrastructure\livecontest-icon.png" LogicalName="RetroBat.Api.livecontest-icon.png" />
+    <EmbeddedResource Include="Infrastructure\livecontest-icon-big.png" LogicalName="RetroBat.Api.livecontest-icon-big.png" />
   </ItemGroup>
 
   <!-- Media discovery internals (BuildAssetTable, MediaStreamAsset) are exercised by

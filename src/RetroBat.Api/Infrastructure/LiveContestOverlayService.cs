@@ -20,6 +20,24 @@ public sealed class LiveContestOverlayService : IDisposable
     private DateTime _echecA = DateTime.MinValue;
     private ManualResetEventSlim? _creation;
 
+    /// <summary>
+    /// Une icone embarquee dans l'exe (voir RetroBat.Api.csproj), ou null. Lue dans media/ jusqu'a
+    /// la 1.9.43, elle n'existait que sur la borne qui fabrique la release : ce dossier ne part ni
+    /// dans la mise a jour ni dans l'installeur.
+    /// </summary>
+    internal static Image? IconeEmbarquee(string nom)
+    {
+        try
+        {
+            using var flux = typeof(LiveContestOverlayService).Assembly.GetManifestResourceStream("RetroBat.Api." + nom);
+            if (flux is null) return null;
+            // Une copie : l'image lue d'un flux a besoin de lui tant qu'elle vit.
+            using var lue = Image.FromStream(flux);
+            return new Bitmap(lue);
+        }
+        catch (Exception) { return null; }
+    }
+
     public void Show(string? title, string text, string? sub, int? durationMs)
     {
         Poster(form => form.Present(
@@ -226,12 +244,11 @@ public sealed class LiveContestOverlayService : IDisposable
 
 
             PictureBox? icon = null;
-            var iconPath = Path.Combine(AppContext.BaseDirectory, "media", "livecontest-icon.png");
-            if (File.Exists(iconPath))
+            if (IconeEmbarquee("livecontest-icon.png") is { } petite)
             {
                 icon = new PictureBox
                 {
-                    Image = Image.FromFile(iconPath),
+                    Image = petite,
                     SizeMode = PictureBoxSizeMode.Zoom,
                     Size = new Size(20, 20),
                     Location = new Point(14, 10),
@@ -269,12 +286,11 @@ public sealed class LiveContestOverlayService : IDisposable
                 BackColor = Color.Transparent
             };
 
-            var bigIconPath = Path.Combine(AppContext.BaseDirectory, "media", "livecontest-icon-big.png");
-            if (File.Exists(bigIconPath))
+            if (IconeEmbarquee("livecontest-icon-big.png") is { } grande)
             {
                 _bigIcon = new PictureBox
                 {
-                    Image = Image.FromFile(bigIconPath),
+                    Image = grande,
                     SizeMode = PictureBoxSizeMode.Zoom,
                     Size = new Size(96, 96),
                     Visible = false,
