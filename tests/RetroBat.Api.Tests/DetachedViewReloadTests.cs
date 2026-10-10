@@ -121,4 +121,55 @@ public class DetachedViewReloadTests
 
         Assert.False(etat.ReloadGamesSilencieux);
     }
+
+    /// <summary>
+    /// Le silence se lit a la prise en charge (2026-10-10) : il etait remis a zero avant que le service qui
+    /// recharge le consulte, et la liste World Scoring sortait avec « Actualisation EmulationStation 1/1 ».
+    /// </summary>
+    [Fact]
+    public void Le_silence_et_l_annonce_se_lisent_a_la_prise_en_charge()
+    {
+        var etat = new MediaRuntimeState();
+        etat.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.Zero, TimeSpan.FromSeconds(12), silencieux: true, annonce: "liste a jour");
+
+        Assert.True(etat.TryConsumeReloadGamesReady(TimeSpan.Zero, out _, out var parLeScrap, out var porte));
+
+        Assert.False(parLeScrap);
+        Assert.Equal(new ReloadGamesCarry(true, "liste a jour", true), porte);
+        Assert.False(etat.ReloadGamesSilencieux);
+        Assert.Null(etat.AnnonceApresRechargement);
+    }
+
+    /// <summary>
+    /// Un rechargement deja en attente fait aussi celui de la liste : il en prend le silence et l'annonce
+    /// (sinon « Actualisation EmulationStation 0/1 » puis « 1/1 »), et il recharge vraiment, meme si un
+    /// rafraichissement de fiche venu du scrap s'y ajoute ensuite.
+    /// </summary>
+    [Fact]
+    public void Un_rechargement_deja_en_attente_prend_le_silence_l_annonce_et_reste_un_vrai_rechargement()
+    {
+        var etat = new MediaRuntimeState();
+        etat.RequestReloadGames(TimeSpan.Zero);
+
+        Assert.False(etat.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.Zero, TimeSpan.FromSeconds(12), silencieux: true, annonce: "liste a jour"));
+        Assert.True(etat.ReloadGamesSilencieux);
+        etat.RequestReloadGames(TimeSpan.Zero, requestedByScrape: true);
+
+        Assert.True(etat.TryConsumeReloadGamesReady(TimeSpan.Zero, out _, out var parLeScrap, out var porte));
+        Assert.False(parLeScrap);
+        Assert.True(porte.Silencieux);
+        Assert.Equal("liste a jour", porte.Annonce);
+    }
+
+    [Fact]
+    public void Une_remise_en_attente_garde_le_silence_et_l_annonce()
+    {
+        var etat = new MediaRuntimeState();
+
+        etat.RemettreLeRechargement(requestedByScrape: false, silencieux: true, annonce: "liste a jour", reelExige: true);
+
+        Assert.True(etat.ReloadGamesSilencieux);
+        Assert.Equal("liste a jour", etat.AnnonceApresRechargement);
+        Assert.True(etat.GetReloadGamesStatus(TimeSpan.Zero).Pending);
+    }
 }

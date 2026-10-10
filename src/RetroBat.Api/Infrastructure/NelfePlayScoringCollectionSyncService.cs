@@ -107,6 +107,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     private IDisposable? _abonnementReglages;
     private bool _derniereVisibilite = true;
 
+    /// <summary>La langue de la borne, pour le message d'ES qui suit la mise a jour de la liste.</summary>
+    private readonly CabinetLocale? _locale;
+
     public NelfePlayScoringCollectionSyncService(
         IHttpClientFactory httpFactory,
         IOptionsMonitor<ApiExposeOptions> options,
@@ -125,8 +128,10 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         Func<InstalledGame, OpenGame, bool>? contenuConfirme = null,
         GamelistUpdateService? gamelists = null,
         DataPackSyncService? dataPack = null,
-        Func<DateTime>? horloge = null)
+        Func<DateTime>? horloge = null,
+        CabinetLocale? locale = null)
     {
+        _locale = locale;
         _horloge = horloge ?? (() => DateTime.UtcNow);
         _gamelists = gamelists;
         _dataPack = dataPack;
@@ -311,8 +316,10 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                     chemins.Count, manifeste.Games.Count, candidats, manifeste.Revision);
                 // Une collection qui apparait, change ou disparait est un nouveau systeme pour ES :
                 // seul un rechargement des gamelists la fait exister. Silencieux : le joueur n'a
-                // rien commande.
-                _runtimeState.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(8), silencieux: true);
+                // rien commande, et ES annonce la liste a jour une fois rechargee, par sa propre
+                // notification (demande user 2026-10-10, a la place de la barre de progression).
+                _runtimeState.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(8),
+                    silencieux: true, annonce: chemins.Count > 0 ? AnnonceDeLaListe(chemins.Count) : null);
             }
 
             var maintenant = DateTime.UtcNow;
@@ -394,6 +401,12 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             return false;
         }
     }
+
+    /// <summary>Le message d'ES qui suit la mise a jour de la liste, dans la langue de la borne.</summary>
+    internal string AnnonceDeLaListe(int jeux)
+        => string.Format(
+            CabinetAnnounceText.Get(jeux == 1 ? "world_scoring_updated_one" : "world_scoring_updated", _locale?.Langue ?? "en"),
+            jeux);
 
     internal static bool RattrapageAutorise(DateTime dernierUtc, DateTime maintenantUtc)
         => maintenantUtc - dernierUtc >= RattrapageDataPackMinimum;

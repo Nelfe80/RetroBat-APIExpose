@@ -29,6 +29,11 @@ public class MediaRuntimeState
     private string _lastFrontendEvent = string.Empty;
     private string _carouselSystemId = string.Empty;
     private bool _reloadGamesSilencieux;
+    // Ce qu'EmulationStation dira une fois le rechargement fait (sa notification native), ou null.
+    private string? _annonceApresRechargement;
+    // Une collection ou une gamelist a change : seul un vrai rechargement la fait exister, et un
+    // rafraichissement de fiche « du scrap » arrive ensuite ne doit pas le remplacer.
+    private bool _rechargementReelExige;
     private DateTime _lastGameSelectedAtUtc = DateTime.MinValue;
     private DateTime _reloadGamesBypassLastGameSelectedUntilUtc = DateTime.MinValue;
     private bool _reloadGamesAllowedDuringActiveScrape;
@@ -78,6 +83,21 @@ public class MediaRuntimeState
     public void MarkReloadGamesPending(bool requestedByScrape = false)
     {
         RequestReloadGames(requestedByScrape: requestedByScrape, forceMediaDirty: true);
+    }
+
+    /// <summary>
+    /// Remet en attente un rechargement qu'EmulationStation n'a pas pris, avec ce qu'il portait :
+    /// son silence, son annonce, et l'exigence d'un vrai rechargement.
+    /// </summary>
+    public void RemettreLeRechargement(bool requestedByScrape, bool silencieux, string? annonce, bool reelExige)
+    {
+        RequestReloadGames(requestedByScrape: requestedByScrape, forceMediaDirty: true);
+        lock (_lock)
+        {
+            _reloadGamesSilencieux |= silencieux;
+            _annonceApresRechargement = annonce ?? _annonceApresRechargement;
+            _rechargementReelExige |= reelExige;
+        }
     }
 
     public void RecordMediaChange(string gameKey, int batchSize)
@@ -288,10 +308,23 @@ public class MediaRuntimeState
         get { lock (_lock) return _reloadGamesSilencieux; }
     }
 
+    /// <summary>Ce qu'EmulationStation dira une fois le rechargement en attente fait, ou null.</summary>
+    public string? AnnonceApresRechargement
+    {
+        get { lock (_lock) return _annonceApresRechargement; }
+    }
+
+    /// <summary>
+    /// Demande un vrai rechargement des gamelists. <paramref name="silencieux"/> : aucune barre de
+    /// progression. <paramref name="annonce"/> : ce qu'EmulationStation dira une fois le rechargement
+    /// fait. Un rechargement deja en attente fera aussi celui-ci : il en prend le silence, l'annonce
+    /// et l'exigence d'un vrai rechargement (rend false, rien de nouveau n'est programme).
+    /// </summary>
     public bool TryRequestReloadGamesBypassingLastGameSelected(
         TimeSpan? debounce = null,
         TimeSpan? suppressIfReloadedWithin = null,
-        bool silencieux = false)
+        bool silencieux = false,
+        string? annonce = null)
     {
         var effectiveDebounce = debounce ?? TimeSpan.FromSeconds(2);
         var effectiveSuppressWindow = suppressIfReloadedWithin ?? TimeSpan.FromSeconds(8);
@@ -306,6 +339,11 @@ public class MediaRuntimeState
 
             if (_reloadGamesPending)
             {
+                // Sans cela, la liste World Scoring rafraichie par-dessus un rechargement deja en
+                // attente sortait avec la barre « Actualisation EmulationStation » (2026-10-10).
+                _reloadGamesSilencieux |= silencieux;
+                _annonceApresRechargement = annonce ?? _annonceApresRechargement;
+                _rechargementReelExige = true;
                 return false;
             }
 
@@ -314,6 +352,8 @@ public class MediaRuntimeState
             _reloadGamesBypassLastGameSelectedUntilUtc = nowUtc.Add(ReloadGamesLastGameSelectedBypassWindow);
             _reloadGamesAllowedDuringActiveScrape = false;
             _reloadGamesSilencieux = silencieux;
+            _annonceApresRechargement = annonce;
+            _rechargementReelExige = true;
             return true;
         }
     }
@@ -327,6 +367,8 @@ public class MediaRuntimeState
             _reloadGamesAllowedDuringActiveScrape = false;
             _reloadGamesRequestedByScrape = false;
             _reloadGamesSilencieux = false;
+            _annonceApresRechargement = null;
+            _rechargementReelExige = false;
             return pending;
         }
     }
@@ -552,8 +594,19 @@ public class MediaRuntimeState
     }
 
     public bool TryConsumeReloadGamesReady(TimeSpan minimumInterval, out TimeSpan retryAfter, out bool requestedByScrape)
+        => TryConsumeReloadGamesReady(minimumInterval, out retryAfter, out requestedByScrape, out _);
+
+    /// <summary>
+    /// Prend en charge le rechargement en attente s'il est pret. <paramref name="porte"/> dit ce qu'il
+    /// portait : son silence, son annonce, l'exigence d'un vrai rechargement. Ils sont lus ICI, avant
+    /// d'etre remis a zero : le service qui recharge les relisait apres, et un rechargement silencieux
+    /// affichait quand meme sa barre de progression (2026-10-10).
+    /// </summary>
+    public bool TryConsumeReloadGamesReady(TimeSpan minimumInterval, out TimeSpan retryAfter, out bool requestedByScrape,
+        out ReloadGamesCarry porte)
     {
         requestedByScrape = false;
+        porte = ReloadGamesCarry.Aucun;
         lock (_lock)
         {
             if (!_reloadGamesPending)
@@ -604,9 +657,13 @@ public class MediaRuntimeState
             _hasMediaChangesSinceLastReload = false;
             _reloadGamesBypassLastGameSelectedUntilUtc = DateTime.MinValue;
             _reloadGamesAllowedDuringActiveScrape = false;
-            requestedByScrape = _reloadGamesRequestedByScrape;
+            // Un vrai rechargement exige ne se resume pas a un rafraichissement de fiche.
+            requestedByScrape = _reloadGamesRequestedByScrape && !_rechargementReelExige;
+            porte = new ReloadGamesCarry(_reloadGamesSilencieux, _annonceApresRechargement, _rechargementReelExige);
             _reloadGamesRequestedByScrape = false;
             _reloadGamesSilencieux = false;
+            _annonceApresRechargement = null;
+            _rechargementReelExige = false;
             _gamesChangedSinceLastReload.Clear();
             _lastReloadGamesAtUtc = nowUtc;
             retryAfter = TimeSpan.Zero;
@@ -1761,6 +1818,15 @@ public sealed record ReloadGamesStatus(
     TimeSpan RetryAfter,
     bool ReloadAllowedDuringActiveScrape,
     bool RequestedByScrape);
+
+/// <summary>
+/// Ce que porte un rechargement pris en charge : pas de barre de progression, ce qu'EmulationStation
+/// dira ensuite (sa notification native), et l'exigence d'un vrai rechargement.
+/// </summary>
+public readonly record struct ReloadGamesCarry(bool Silencieux, string? Annonce, bool ReelExige)
+{
+    public static readonly ReloadGamesCarry Aucun = new(false, null, false);
+}
 
 public sealed record ScrapeQueueSnapshot(
     int TotalJobs,

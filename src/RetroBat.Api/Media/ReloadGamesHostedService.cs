@@ -69,7 +69,7 @@ public class ReloadGamesHostedService : BackgroundService
         {
             try
             {
-                if (_runtimeState.TryConsumeReloadGamesReady(MinimumReloadInterval, out _, out var requestedByScrape))
+                if (_runtimeState.TryConsumeReloadGamesReady(MinimumReloadInterval, out _, out var requestedByScrape, out var porte))
                 {
                     try
                     {
@@ -78,7 +78,7 @@ public class ReloadGamesHostedService : BackgroundService
                             await DiscardPendingStateForLanguageSwitchAsync(
                                 "language-gamelist-sync-pending-before-scrape-reload",
                                 stoppingToken);
-                            _runtimeState.MarkReloadGamesPending(requestedByScrape: false);
+                            _runtimeState.RemettreLeRechargement(false, porte.Silencieux, porte.Annonce, porte.ReelExige);
                             _lastBlockedSignature = string.Empty;
                             continue;
                         }
@@ -129,8 +129,10 @@ public class ReloadGamesHostedService : BackgroundService
                         }
 
                         // Un rechargement demande en silence (rafraichir une fiche dans une
-                        // collection) n'annonce rien : le joueur n'a pas commande d'operation.
-                        var suppressTaskProgress = ShouldSuppressStartupReloadProgress() || _runtimeState.ReloadGamesSilencieux;
+                        // collection, la liste World Scoring) n'annonce rien : le joueur n'a pas
+                        // commande d'operation. Le silence vient de la prise en charge : relu ici
+                        // dans l'etat partage, il venait d'etre remis a zero.
+                        var suppressTaskProgress = ShouldSuppressStartupReloadProgress() || porte.Silencieux;
                         if (!suppressTaskProgress)
                         {
                             _taskProgressService.Report(
@@ -181,10 +183,11 @@ public class ReloadGamesHostedService : BackgroundService
                             await NotifyPendingVisibleMediaReallocationCompletionAsync(stoppingToken);
                             await NotifyPendingLanguageGamelistSyncCompletionAsync(stoppingToken);
                             await NotifyPendingRomSetManagerCompletionAsync(stoppingToken);
+                            await AnnoncerApresRechargementAsync(porte.Annonce, stoppingToken);
                         }
                         else
                         {
-                            _runtimeState.MarkReloadGamesPending(requestedByScrape);
+                            _runtimeState.RemettreLeRechargement(requestedByScrape, porte.Silencieux, porte.Annonce, porte.ReelExige);
                             _logger?.LogWarning("reloadgames agrege n'a pas ete accepte par EmulationStation; nouvelle tentative planifiee.");
                             await RefreshTrackingLog.AppendAsync(
                                 "reloadgames",
@@ -197,7 +200,7 @@ public class ReloadGamesHostedService : BackgroundService
                     }
                     catch (HttpRequestException ex) when (IsFrontendUnavailable(ex))
                     {
-                        _runtimeState.MarkReloadGamesPending(requestedByScrape);
+                        _runtimeState.RemettreLeRechargement(requestedByScrape, porte.Silencieux, porte.Annonce, porte.ReelExige);
                         _logger?.LogInformation(ex, "reloadgames differe: frontend EmulationStation indisponible sur 127.0.0.1:1234.");
                         await RefreshTrackingLog.AppendAsync(
                             "reloadgames",
@@ -1031,6 +1034,29 @@ public class ReloadGamesHostedService : BackgroundService
             ("message", summary?.Message ?? string.Empty));
 
         await _notificationService.MessageBoxAsync(message, cancellationToken);
+    }
+
+    /// <summary>
+    /// CE QU'EMULATIONSTATION DIT UNE FOIS LE RECHARGEMENT FAIT (2026-10-10). La liste World Scoring
+    /// annoncait sa mise a jour par la barre « Actualisation EmulationStation » ; le user prefere un
+    /// message d'ES, sa notification native. Une notification ramene ES au premier plan : jamais
+    /// quand un jeu tourne.
+    /// </summary>
+    private async Task AnnoncerApresRechargementAsync(string? annonce, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(annonce) || RetroBat.Api.Infrastructure.EmulatorForeground.EmulateurTourne())
+        {
+            return;
+        }
+
+        try
+        {
+            await _notificationService.NotifyAsync(annonce, cancellationToken);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger?.LogDebug(ex, "Annonce apres reloadgames non remise a EmulationStation.");
+        }
     }
 
     private string ResolveVisibleMediaReallocationScopeLabel(

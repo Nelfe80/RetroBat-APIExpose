@@ -55,7 +55,7 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
             Writer(),
             new EsCollectionThemeAssets(logger: null, themesRoot: Path.Combine(_racine, "themes"),
                 sourceRoot: Path.Combine(_racine, "assets"), stateRoot: Etat),
-            new MediaRuntimeState(),
+            _etat,
             logger: null,
             stateRoot: Etat,
             minimumEntreDeuxAppels: TimeSpan.Zero,
@@ -65,6 +65,8 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
             // dans les tests qui portent justement sur cette reconnaissance.
             contenuConfirme: (candidat, jeu) => _confirme(candidat, jeu),
             horloge: () => _maintenant);
+
+    private readonly MediaRuntimeState _etat = new();
 
     private Func<InstalledGame, OpenGame, bool> _confirme = (_, _) => true;
     private DateTime _maintenant = new(2026, 9, 30, 23, 20, 0, DateTimeKind.Utc);
@@ -117,6 +119,27 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
         Assert.False(statut.Stale);
         Assert.Equal(new[] { rom.Replace('\\', '/') }, Collection());
         Assert.Equal("nelfeplay-scoring", _reglages.Valeur("CollectionSystemsCustom"));
+    }
+
+    /// <summary>
+    /// La liste mise a jour recharge ES sans barre de progression, et ES l'annonce par sa propre
+    /// notification une fois recharge (demande user 2026-10-10).
+    /// </summary>
+    [Fact]
+    public async Task La_liste_mise_a_jour_recharge_es_en_silence_et_s_annonce_par_un_message_d_es()
+    {
+        PoserRom("fbneo", "19xx.zip");
+        PoserMem("arcade", "19xx", MemContenu);
+        var http = new FauxHttp(Index("sha256:aa", Jeu("arcade", "19xx", MemEmpreinte)));
+        var service = Service(http, new FauxResolveur { ["19xx.zip"] = "19xx" });
+
+        await service.SynchroniserAsync("test", CancellationToken.None);
+
+        Assert.True(_etat.GetReloadGamesStatus(TimeSpan.Zero).Pending);
+        Assert.True(_etat.ReloadGamesSilencieux);
+        // Sans langue de borne, l'anglais ; le singulier pour un seul jeu.
+        Assert.Equal("World Scoring updated: 1 game ready on this cabinet", _etat.AnnonceApresRechargement);
+        Assert.Equal("World Scoring updated: 12 games ready on this cabinet", service.AnnonceDeLaListe(12));
     }
 
     [Fact]
