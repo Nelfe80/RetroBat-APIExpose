@@ -251,19 +251,39 @@ public sealed class ReplayWatchController : ControllerBase
     }).catch(function(){ setTimeout(suivre, 1000); });
   }
 
+  // Objet deja sur la borne : la recherche du jeu se fait PENDANT la demande de lecture. On la guette a part,
+  // sans toucher au suivi qui prend la main au retour de la demande.
+  var guet = null;
+  function guetterLaRecherche(){
+    fetch('/api/v1/replay/state', { cache:'no-store' }).then(function(r){ return r.json(); }).then(function(s){
+      if (guet === null) return;
+      if (s.state === 'verifying' && s.recherche && s.recherche.total > 0){
+        progres(false, s.recherche.lus / s.recherche.total);
+        title.textContent = 'Recherche du jeu sur la borne…';
+        msg.textContent = s.recherche.lus + ' fichier(s) lu(s) sur ' + s.recherche.total
+          + '. Sans le fichier exact, la borne lance le même jeu.';
+      }
+      guet = setTimeout(guetterLaRecherche, 500);
+    }).catch(function(){ if (guet !== null) guet = setTimeout(guetterLaRecherche, 1000); });
+  }
+  function finDuGuet(){ if (guet !== null) { clearTimeout(guet); guet = null; } }
+
   function play(){
     show('', '', 'Lancement du replay…', 'Un instant, la borne prépare la lecture.', false);
     card.className = 'card';
+    guet = setTimeout(guetterLaRecherche, 700);
     // POST same-origin : jamais soumis au blocage Local Network Access.
     fetch('/api/v1/replay/play', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify(REGLE ? { replay_id: ID, ruleset: REGLE } : { replay_id: ID }), cache:'no-store'
     }).then(function(r){
+      finDuGuet();
       if (r.status === 200) { back.hidden = true; suivre(); }
       else if (r.status === 404) { echec('ReplayNotFound'); }
       else if (r.status === 409) { echec('ReplayAlreadyRunning'); }
       else { echec(''); }
     }).catch(function(){
+      finDuGuet();
       show('err','⚠️','Borne injoignable','Impossible de contacter APIExpose sur cette machine.', false);
     });
   }
