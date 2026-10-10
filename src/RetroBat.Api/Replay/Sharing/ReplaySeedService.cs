@@ -29,6 +29,16 @@ public sealed class ReplaySeedService : BackgroundService
     /// <summary>Après une poussée acceptée, on laisse à la plateforme le temps de relayer.</summary>
     private static readonly TimeSpan DelaiDeGarde = TimeSpan.FromMinutes(30);
 
+    /// <summary>
+    /// LE RECORD N'ATTEND PLUS LE TOUR SUIVANT (2026-10-10). Le replay d'un score s'inscrit à la fin de
+    /// la partie, quelques secondes AVANT qu'EmulationStation annonce la fin du jeu : la tentative
+    /// immédiate tombait « en partie », et le replay attendait le tour suivant, jusqu'à cinq minutes
+    /// de « Replay en attente » sur les classements. La fin d'une partie ou d'une lecture relance la
+    /// file trente secondes plus tard, si des replays y attendent. La cadence reste le filet.
+    /// </summary>
+    private static readonly TimeSpan ApresLaPartie = TimeSpan.FromSeconds(30);
+    private readonly SemaphoreSlim _reveil = new(0, 1);
+
     private readonly ReplaySeedQueue _queue;
     private readonly ReplayTransitPublisher _publisher;
     private readonly IEventBus _bus;
@@ -58,9 +68,31 @@ public sealed class ReplaySeedService : BackgroundService
             catch (OperationCanceledException) { break; }
             catch (Exception ex) { _logger.LogDebug(ex, "Replay : passage de semis en erreur."); }
 
-            try { await Task.Delay(Cadence, stoppingToken).ConfigureAwait(false); }
+            // La cadence, ou plus tôt : une partie (ou une lecture) qui finit avec des replays en file.
+            try
+            {
+                if (await _reveil.WaitAsync(Cadence, stoppingToken).ConfigureAwait(false))
+                    await Task.Delay(ApresLaPartie, stoppingToken).ConfigureAwait(false);
+            }
             catch (OperationCanceledException) { break; }
         }
+    }
+
+    /// <summary>La fin d'une partie ou d'une lecture relance-t-elle la file ? Seulement si des replays y attendent.</summary>
+    internal static bool Relance(string? typeEvenement, int enFile)
+        => enFile > 0 && typeEvenement is "ui.game.ended" or "replay.finished";
+
+    private void Reveiller(string type)
+    {
+        try
+        {
+            if (Relance(type, _queue.Read().Count) && _reveil.CurrentCount == 0) _reveil.Release();
+        }
+        catch (SemaphoreFullException)
+        {
+            // Un réveil est déjà en attente : il suffit.
+        }
+        catch (Exception ex) { _logger.LogDebug(ex, "Replay : relance du semis impossible."); }
     }
 
     /// <summary>Tentative immédiate, déclenchée par le geste de publication.</summary>
@@ -106,10 +138,10 @@ public sealed class ReplaySeedService : BackgroundService
         switch (e.Type)
         {
             case "ui.game.started": _gameActive = true; break;
-            case "ui.game.ended": _gameActive = false; break;
+            case "ui.game.ended": _gameActive = false; Reveiller(e.Type); break;
             case "replay.launching":
             case "replay.started": _replayActive = true; break;
-            case "replay.finished": _replayActive = false; break;
+            case "replay.finished": _replayActive = false; Reveiller(e.Type); break;
         }
     }
 }
