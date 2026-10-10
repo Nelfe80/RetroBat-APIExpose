@@ -50,14 +50,48 @@ public sealed class ReplayOverlayService : BackgroundService
     private readonly RetroBat.Api.Infrastructure.CabinetLocale _locale;
 
     /// <summary>Les libelles de la barre, dans la langue de la borne, en MAJUSCULES comme ES.</summary>
-    internal sealed record TextesDeLaBarre(string Lecture, string Deplacement, string Checkpoint, string Quitter, string Score, CultureInfo Culture, string Maintenir = "(HOLD)");
+    internal sealed record TextesDeLaBarre(string Lecture, string Deplacement, string Checkpoint, string Quitter, string Score, CultureInfo Culture,
+        string Maintenir = "(HOLD)", string DoubleAppui = "(×2)", string Reduire = "MINIMIZE");
 
     private TextesDeLaBarre Textes()
     {
         var culture = _locale.Culture;
         string T(string cle) => _locale.Text(cle).ToUpper(culture);
+        // Une cle neuve manque tant que le Data Pack de la borne n'a pas suivi, et Text rend alors
+        // le nom de la cle : on garde le libelle d'origine pour ne pas afficher « REPLAY.BAR.… ».
+        string TouDefaut(string cle, string defaut) => _locale.Text(cle) is var t && t != cle ? t.ToUpper(culture) : defaut;
         return new TextesDeLaBarre(T("replay.bar.play_pause"), T("replay.bar.rewind_forward"), T("replay.bar.checkpoint"),
-            T("replay.bar.quit"), T("replay.card.score"), culture, T("replay.bar.hold"));
+            T("replay.bar.quit"), T("replay.card.score"), culture, T("replay.bar.hold"),
+            TouDefaut("replay.bar.double", "(×2)"), TouDefaut("replay.bar.minimize", "MINIMIZE"));
+    }
+
+    /// <summary>
+    /// Les rappels du panel qui tiennent dans <paramref name="place"/> pixels, dans leur ordre
+    /// d'affichage. Quand la place manque, ils cedent un a un dans l'ordre de
+    /// <paramref name="ordreDeRetrait"/>. Avant, ils passaient sous la carte du record.
+    /// </summary>
+    internal static IReadOnlyList<int> RappelsQuiTiennent(IReadOnlyList<float> largeurs, IReadOnlyList<int> ordreDeRetrait, float ecart, float place)
+    {
+        var gardes = Enumerable.Range(0, largeurs.Count).ToList();
+        float Total() => gardes.Sum(i => largeurs[i]) + ecart * Math.Max(0, gardes.Count - 1);
+        foreach (var retire in ordreDeRetrait)
+        {
+            if (Total() <= place) break;
+            gardes.Remove(retire);
+        }
+        return Total() <= place ? gardes : Array.Empty<int>();
+    }
+
+    /// <summary>Le texte tel quel s'il tient dans <paramref name="max"/> pixels, sinon coupe et suivi de « … ».</summary>
+    internal static string Abreger(string texte, float max, Func<string, float> mesure)
+    {
+        if (mesure(texte) <= max) return texte;
+        for (var n = texte.Length - 1; n > 0; n--)
+        {
+            var essai = texte[..n].TrimEnd() + "…";
+            if (mesure(essai) <= max) return essai;
+        }
+        return "…";
     }
 
     /// <summary>
@@ -481,7 +515,7 @@ public sealed class ReplayOverlayService : BackgroundService
             {
                 try { if (_textesDeLaBarre is not null) return _textesDeLaBarre(); }
                 catch (Exception) { }
-                return new TextesDeLaBarre("LECTURE / PAUSE", "RECUL / AVANCE", "CHECKPOINT", "QUITTER", "SCORE", CultureInfo.GetCultureInfo("fr-FR"), "(MAINTENIR)");
+                return new TextesDeLaBarre("LECTURE / PAUSE", "RECUL / AVANCE", "CHECKPOINT", "QUITTER", "SCORE", CultureInfo.GetCultureInfo("fr-FR"), "(MAINTENIR)", "(×2)", "RÉDUIRE");
             }
 
             public OverlaySurface(Func<ReplayPlaybackService.StateSnapshot> get, Func<float[]?> curve,
@@ -518,8 +552,9 @@ public sealed class ReplayOverlayService : BackgroundService
                     return;
                 }
                 DrawTimeline(g, s);
-                DrawStateAndHints(g, s);
-                if (s.Card is not null) DrawRecordCard(g, s.Card);
+                // La carte d'abord : les rappels s'arretent avant son bord gauche.
+                var limite = s.Card is not null ? DrawRecordCard(g, s.Card) - 24f : Width - SidePadding;
+                DrawStateAndHints(g, s, limite);
             }
 
             private void DrawTimeline(Graphics g, ReplayPlaybackService.StateSnapshot s)
@@ -603,7 +638,16 @@ public sealed class ReplayOverlayService : BackgroundService
 
             private enum Dir { Up, Down, LeftRight }
 
-            private void DrawStateAndHints(Graphics g, ReplayPlaybackService.StateSnapshot s)
+            private const int EcartEntreRappels = 30;
+
+            /// <summary>
+            /// L'ordre dans lequel les rappels cedent leur place quand elle manque : le double appui
+            /// d'abord (il ne fait que signaler une fonction), puis le checkpoint, le recul et
+            /// l'avance, la lecture. QUITTER part en dernier : c'est la seule sortie.
+            /// </summary>
+            private static readonly int[] OrdreDeRetrait = { 4, 2, 1, 0, 3 };
+
+            private void DrawStateAndHints(Graphics g, ReplayPlaybackService.StateSnapshot s, float limite)
             {
                 var mid = RowTop + GlyphSize / 2; // centre vertical de la rangée
                 var x = SidePadding;
@@ -626,56 +670,70 @@ public sealed class ReplayOverlayService : BackgroundService
 
                 // rappels ES-style : glyphe de touche + libellé MAJUSCULE
                 var libelles = Libelles();
-                x = DrawHint(g, x, mid, label, textBrush, Dir.Up, libelles.Lecture);
-                x = DrawHint(g, x, mid, label, textBrush, Dir.LeftRight, libelles.Deplacement);
-                x = DrawHint(g, x, mid, label, textBrush, Dir.Down, libelles.Checkpoint);
-                DrawHintStart(g, x, mid, label, textBrush, libelles.Maintenir + "  " + libelles.Quitter);
+                var rappels = new (Glyphe Glyphe, string Texte)[]
+                {
+                    (GlypheDe(g, Dir.Up), libelles.Lecture),
+                    (GlypheDe(g, Dir.LeftRight), libelles.Deplacement),
+                    (GlypheDe(g, Dir.Down), libelles.Checkpoint),
+                    (GlypheDe(g, null), libelles.Maintenir + "  " + libelles.Quitter),
+                    // Le double appui sur START bascule la barre depuis longtemps ; rien ne le disait.
+                    (GlypheDe(g, null), libelles.DoubleAppui + "  " + libelles.Reduire),
+                };
+                var largeurs = rappels.Select(r => r.Glyphe.Largeur + 12f + (float)Math.Ceiling(g.MeasureString(r.Texte, label).Width)).ToArray();
+                foreach (var i in RappelsQuiTiennent(largeurs, OrdreDeRetrait, EcartEntreRappels, limite - x))
+                    x = DrawHint(g, x, mid, label, textBrush, rappels[i].Glyphe, rappels[i].Texte);
             }
 
-            /// <summary>Un rappel = glyphe de croix directionnelle (direction active en bleu) + libellé.</summary>
-            private static int DrawHint(Graphics g, int x, int mid, Font label, Brush textBrush, Dir dir, string text)
+            /// <summary>
+            /// Le pictogramme d'un rappel, choisi une seule fois : la mesure et le dessin portent sur
+            /// la meme image, meme si sa conversion se termine entre les deux.
+            /// </summary>
+            private readonly record struct Glyphe(Image? Image, Dir? Croix, int Largeur);
+
+            private static Glyphe GlypheDe(Graphics g, Dir? croix)
             {
-                // Le pictogramme de la barre d'aide d'ES pour cette direction ; la croix vectorielle
-                // ne sert plus que de repli le temps que l'image soit prete.
-                var nom = dir switch { Dir.Up => "dpad_up", Dir.Down => "dpad_down", _ => "dpad_leftright" };
-                var image = RetroBat.Api.Leaderboard.EsButtonGlyphs.Aide(nom, GlyphSize);
-                if (image is not null)
+                if (croix is Dir dir)
                 {
+                    // Le pictogramme de la barre d'aide d'ES pour cette direction ; la croix vectorielle
+                    // ne sert plus que de repli le temps que l'image soit prete.
+                    var nom = dir switch { Dir.Up => "dpad_up", Dir.Down => "dpad_down", _ => "dpad_leftright" };
+                    var image = RetroBat.Api.Leaderboard.EsButtonGlyphs.Aide(nom, GlyphSize);
+                    return new Glyphe(image, dir, image?.Width ?? GlyphSize);
+                }
+                var start = RetroBat.Api.Leaderboard.EsButtonGlyphs.Touche("start", GlyphSize);
+                return new Glyphe(start, null, start?.Width ?? LargeurDuBadgeStart(g));
+            }
+
+            /// <summary>Un rappel = pictogramme de touche + libellé. Renvoie le x du rappel suivant.</summary>
+            private static int DrawHint(Graphics g, int x, int mid, Font label, Brush textBrush, Glyphe glyphe, string text)
+            {
+                if (glyphe.Image is { } image)
                     g.DrawImage(image, x, mid - image.Height / 2, image.Width, image.Height);
-                    x += image.Width + 12;
-                }
-                else
-                {
+                else if (glyphe.Croix is Dir dir)
                     DrawDpad(g, new Rectangle(x, mid - GlyphSize / 2, GlyphSize, GlyphSize), dir);
-                    x += GlyphSize + 12;
-                }
+                else
+                    DrawStartBadge(g, x, mid);
+                x += glyphe.Largeur + 12;
                 var sz = g.MeasureString(text, label);
                 g.DrawString(text, label, textBrush, x, mid - sz.Height / 2);
-                return x + (int)Math.Ceiling(sz.Width) + 30;
-            }
-
-            /// <summary>Rappel « START (maintenir) » avec badge de touche.</summary>
-            private static void DrawHintStart(Graphics g, int x, int mid, Font label, Brush textBrush, string text)
-            {
-                var image = RetroBat.Api.Leaderboard.EsButtonGlyphs.Touche("start", GlyphSize);
-                int w;
-                if (image is not null)
-                {
-                    g.DrawImage(image, x, mid - image.Height / 2, image.Width, image.Height);
-                    w = image.Width;
-                }
-                else
-                {
-                    w = DrawStartBadge(g, x, mid);
-                }
-                x += w + 12;
-                g.DrawString(text, label, textBrush, x, mid - g.MeasureString(text, label).Height / 2);
+                return x + (int)Math.Ceiling(sz.Width) + EcartEntreRappels;
             }
 
             // ── Fiche « performance NelfePlay » (droite de la barre), façon record esport ──
             private static readonly CultureInfo Fr = CultureInfo.GetCultureInfo("fr-FR");
 
-            private void DrawRecordCard(Graphics g, ReplayPlaybackService.ReplayCard card)
+            /// <summary>
+            /// Un morceau d'une ligne de la carte : un texte, ou la place d'une image quand Texte est
+            /// null, precede d'un ecart en pixels. Les ecarts etaient des espaces, et MeasureString
+            /// ignore ceux de fin : la place du sceau (six espaces) mesurait 4 px pour un sceau de
+            /// 22, qui mordait sur « SCORE » et sur le nombre.
+            /// </summary>
+            private readonly record struct Morceau(string? Texte, Font? Police, Brush? Encre, float Avant, float Place = 0f);
+
+            private const int TailleDuSceau = 22;
+
+            /// <summary>Dessine la carte du record a droite de la barre ; renvoie son bord gauche.</summary>
+            private float DrawRecordCard(Graphics g, ReplayPlaybackService.ReplayCard card)
             {
                 var midY = RowTop + GlyphSize / 2;
 
@@ -692,65 +750,61 @@ public sealed class ReplayOverlayService : BackgroundService
                 using var white = new SolidBrush(TextColor);
                 using var dim = new SolidBrush(TextDimColor);
                 using var gold = new SolidBrush(GoldColor);
+                // Sans marge cachee autour du texte : les ecarts sont ceux qu'on ecrit.
+                using var typo = StringFormat.GenericTypographic;
+
+                float Mesure(string texte, Font police) => g.MeasureString(texte, police, PointF.Empty, typo).Width;
+                float Largeur(IEnumerable<Morceau> ligne) => ligne.Sum(m => m.Avant + (m.Texte is null ? m.Place : Mesure(m.Texte, m.Police!)));
 
                 var libelles = Libelles();
                 var score = card.Score is long v ? v.ToString("N0", libelles.Culture) : "—";
                 var rank = card.Rank is int r ? $"#{r}" : "#—";
 
-                // Ligne 1 (EN HAUT) = le SCORE, titre du record, en or + rang.
-                // Une place reservee au sceau certifie, entre « SCORE » et le nombre qu'il certifie.
-                const string placeDuSceau = "      ";
-                var line1 = new (string t, Font f, Brush b)[]
-                {
-                    (libelles.Score + " ", labelFont, dim),
-                    (card.Certified ? placeDuSceau : "", labelFont, dim),
-                    (score, scoreFont, gold),
-                    ("    ", rankFont, dim),
-                    (rank, rankFont, white),
-                };
-                // Ligne 2 = joueur · jeu · date (secondaire).
-                var line2 = new (string t, Font f, Brush b)[]
-                {
-                    (card.Player.ToUpperInvariant(), playerFont, white),
-                    ("  ·  ", infoFont, dim),
-                    (card.Game.ToUpperInvariant(), infoFont, dim),
-                    ("  ·  ", infoFont, dim),
-                    (card.DateText, infoFont, dim),
-                };
-
-                float LineWidth((string t, Font f, Brush b)[] parts)
-                {
-                    float s = 0; foreach (var p in parts) s += g.MeasureString(p.t, p.f).Width; return s;
-                }
-                var w1 = LineWidth(line1);
-                var w2 = LineWidth(line2);
-                var textRight = logoBox.Left - 18f;
-                var textLeft = textRight - Math.Max(w1, w2);
-
                 // Le sceau « certifié » : PETIT et ORANGE, juste devant le score qu'il certifie. Le grand
                 // hexagone a gauche du bloc lisait comme un logo de plus, pas comme une preuve.
-                var sceau = card.Certified ? RetroBat.Api.Leaderboard.EsButtonGlyphs.TelQuel("nelfe-verified", 22) : null;
+                var sceau = card.Certified ? RetroBat.Api.Leaderboard.EsButtonGlyphs.TelQuel("nelfe-verified", TailleDuSceau) : null;
 
-                void DrawLine((string t, Font f, Brush b)[] parts, float width, float centerY)
+                // Ligne 1 (EN HAUT) = le SCORE, titre du record, en or + rang. Le sceau a sa place
+                // entre « SCORE » et le nombre qu'il certifie, meme avant que son image soit prete.
+                var ligne1 = new List<Morceau> { new(libelles.Score, labelFont, dim, 0f) };
+                if (card.Certified) ligne1.Add(new(null, null, null, 7f, sceau?.Width ?? TailleDuSceau));
+                ligne1.Add(new(score, scoreFont, gold, card.Certified ? 7f : 8f));
+                ligne1.Add(new(rank, rankFont, white, 14f));
+
+                // Ligne 2 = joueur · jeu · date (secondaire). Un nom de jeu trop long s'abrege pour
+                // laisser leur place aux rappels du panel.
+                var joueur = new Morceau(card.Player.ToUpperInvariant(), playerFont, white, 0f);
+                var point = new Morceau("·", infoFont, dim, 9f);
+                var date = new Morceau(card.DateText, infoFont, dim, 9f);
+                var placeDuJeu = Math.Max(120f, Width * 0.40f) - Largeur(new[] { joueur, point, point, date }) - 9f;
+                var jeu = new Morceau(Abreger(card.Game.ToUpperInvariant(), placeDuJeu, t => Mesure(t, infoFont)), infoFont, dim, 9f);
+                var ligne2 = new List<Morceau> { joueur, point, jeu, point, date };
+
+                var w1 = Largeur(ligne1);
+                var w2 = Largeur(ligne2);
+                var textRight = logoBox.Left - 18f;
+
+                void DrawLine(List<Morceau> ligne, float width, float centerY)
                 {
                     var x = textRight - width;
-                    foreach (var p in parts)
+                    foreach (var m in ligne)
                     {
-                        var sz = g.MeasureString(p.t, p.f);
-                        g.DrawString(p.t, p.f, p.b, x, centerY - sz.Height / 2);
+                        x += m.Avant;
+                        if (m.Texte is null)
+                        {
+                            if (sceau is not null)
+                                g.DrawImage(sceau, x + (m.Place - sceau.Width) / 2f, centerY - sceau.Height / 2f, sceau.Width, sceau.Height);
+                            x += m.Place;
+                            continue;
+                        }
+                        var sz = g.MeasureString(m.Texte, m.Police!, PointF.Empty, typo);
+                        g.DrawString(m.Texte, m.Police!, m.Encre!, x, centerY - sz.Height / 2, typo);
                         x += sz.Width;
                     }
                 }
-                DrawLine(line1, w1, midY - 12);
-                if (sceau is not null)
-                {
-                    // Dans la place reservee, juste devant le nombre : la ligne 1 est alignee a droite,
-                    // son debut vaut textRight - w1.
-                    var debutPlace = textRight - w1 + g.MeasureString(libelles.Score + " ", labelFont).Width;
-                    var largeurPlace = g.MeasureString(placeDuSceau, labelFont).Width;
-                    g.DrawImage(sceau, debutPlace + (largeurPlace - sceau.Width) / 2f, midY - 12 - sceau.Height / 2f, sceau.Width, sceau.Height);
-                }
-                DrawLine(line2, w2, midY + 16);
+                DrawLine(ligne1, w1, midY - 12);
+                DrawLine(ligne2, w2, midY + 16);
+                return textRight - Math.Max(w1, w2);
             }
 
             // Marque « N » NelfePlay = 3 polygones à segments droits (viewBox 1000x1000, avant transform).
@@ -850,13 +904,22 @@ public sealed class ReplayOverlayService : BackgroundService
                 }
             }
 
+            private static Font PoliceDuBadgeStart() => new("Segoe UI", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
+
+            /// <summary>La largeur du badge « START » de repli, sans le dessiner.</summary>
+            private static int LargeurDuBadgeStart(Graphics g)
+            {
+                using var f = PoliceDuBadgeStart();
+                return (int)Math.Ceiling(g.MeasureString("START", f).Width) + 18;
+            }
+
             /// <summary>Badge de touche « START » (contour accent + texte). Renvoie sa largeur.</summary>
             private static int DrawStartBadge(Graphics g, int x, int mid)
             {
-                using var f = new Font("Segoe UI", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
+                using var f = PoliceDuBadgeStart();
                 const string t = "START";
                 var tw = g.MeasureString(t, f);
-                var w = (int)Math.Ceiling(tw.Width) + 18;
+                var w = LargeurDuBadgeStart(g);
                 const int h = 26;
                 var rect = new Rectangle(x, mid - h / 2, w, h);
                 using (var pen = new Pen(AccentColor, 1.5f)) DrawRounded(g, pen, rect, 7);

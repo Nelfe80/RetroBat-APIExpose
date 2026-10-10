@@ -1057,7 +1057,8 @@ public sealed class ReplayReactionHudService : BackgroundService
 
         private void DrawLegend(Graphics g, ReplayReactionService.Availability av)
         {
-            if (_sprites is not { Ok: true }) return;
+            // Sans planche, la legende garde ses emojis : elle disparaissait tout entiere, et le
+            // spectateur ne savait plus qu'il pouvait reagir.
             var can = av.CanReact;
             var rowAlpha = can ? 1f : 0.4f; // légende ESTOMPÉE quand on ne peut pas réagir
 
@@ -1110,7 +1111,8 @@ public sealed class ReplayReactionHudService : BackgroundService
                     g.DrawString(btn, btnF, gold, x, mid - bh.Height / 2f);
                 }
                 x += bw[i] + 6;
-                _sprites.Draw(g, fam, DesignBase, x + icon / 2f, mid, icon, rowAlpha);
+                if (_sprites is { Ok: true }) _sprites.Draw(g, fam, DesignBase, x + icon / 2f, mid, icon, rowAlpha);
+                else DrawEmoji(g, ReplayReactionText.Resolve(fam, 1, _locale()).Emoji, x + icon / 2f, mid, icon * 0.7f, ReplayReactionText.ColorOf(fam), rowAlpha);
                 x += icon + gap;
             }
         }

@@ -31,6 +31,14 @@
     <ProjectReference Include="..\RetroBat.Providers.RetroArchWrapper\RetroBat.Providers.RetroArchWrapper.csproj" />
   </ItemGroup>
 
+  <!-- La planche des reactions voyage dans l'exe. Le dossier media n'est livre ni par la mise a
+       jour ni par l'installeur : lue la-bas, elle manquait a toutes les bornes sauf celle qui
+       fabrique la release, et la legende des reactions ne s'affichait pas. -->
+  <ItemGroup>
+    <None Remove="Replay\Overlay\reacts-icons.png" />
+    <EmbeddedResource Include="Replay\Overlay\reacts-icons.png" LogicalName="RetroBat.Api.reacts-icons.png" />
+  </ItemGroup>
+
   <!-- Media discovery internals (BuildAssetTable, MediaStreamAsset) are exercised by
        golden/parity tests that guard the Hotpath refactor; nothing behavioural changes. -->
   <ItemGroup>

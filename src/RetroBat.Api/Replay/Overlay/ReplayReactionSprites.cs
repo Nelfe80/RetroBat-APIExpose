@@ -2,12 +2,11 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using RetroBat.Domain.Paths;
 
 namespace RetroBat.Api.Replay.Overlay;
 
 /// <summary>
-/// Planche d'icônes de réactions (media/reacts-icons.png) : 9 lignes (familles) × 6 colonnes.
+/// Planche d'icônes de réactions (reacts-icons.png, embarquée dans l'exe) : 9 lignes (familles) × 6 colonnes.
 /// Colonnes 0-2 = design gauche, 3-5 = design « lapin » (2 mascottes × 3 niveaux). Pour chaque
 /// cellule on RETIRE le fond sombre (flood-fill depuis les bords), on ISOLE l'icône principale
 /// (composante connexe depuis le centre → pas de débord voisin) et on RECADRE pile dessus
@@ -25,13 +24,18 @@ public sealed class ReplayReactionSprites : IDisposable
     private readonly object _drawLock = new();       // la planche est partagée entre 2 threads UI (barre + HUD)
     public bool Ok { get; }
 
+    /// <summary>Le nom de la planche dans l'exe (voir RetroBat.Api.csproj).</summary>
+    internal const string Ressource = "RetroBat.Api.reacts-icons.png";
+
     public ReplayReactionSprites(ILogger logger)
     {
         try
         {
-            var path = Path.Combine(RetroBatPaths.PluginRoot, "media", "reacts-icons.png");
-            if (!File.Exists(path)) { logger.LogInformation("Replay HUD : planche d'icônes absente ({Path}), fallback glyphes.", path); return; }
-            using var sheet = new Bitmap(path);
+            // Lue dans media/ jusqu'a la 1.9.43, la planche n'existait que sur la borne qui fabrique
+            // la release : ce dossier ne part ni dans la mise a jour ni dans l'installeur.
+            using var flux = typeof(ReplayReactionSprites).Assembly.GetManifestResourceStream(Ressource);
+            if (flux is null) { logger.LogWarning("Replay HUD : planche d'icônes absente de l'exe ({Ressource}), fallback glyphes.", Ressource); return; }
+            using var sheet = new Bitmap(flux);
             int Bound(int i, int n, int total) => (int)Math.Round(i * (double)total / n); // bornes arrondies (pas de dérive)
             const int ox = 20, oy = 30; // chevauchement pour capter le débord de l'icône hors de sa cellule
             for (var r = 0; r < 9; r++)
