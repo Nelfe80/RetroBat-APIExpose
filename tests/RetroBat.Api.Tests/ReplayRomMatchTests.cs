@@ -82,6 +82,36 @@ public sealed class ReplayRomMatchTests : IDisposable
         Assert.Equal(memeTitre, ReplayRuntimeResolver.MemeTitre(fichier, attendu));
     }
 
+    /// <summary>
+    /// La recherche du fichier exact sous un autre nom a un budget (2026-10-10) : 1 963 fichiers relus, 3 min 40 sur
+    /// l'ecran de lecture, pour un dump d'arcade que la borne n'avait pas.
+    /// </summary>
+    [Fact]
+    public void La_recherche_du_fichier_exact_trouve_dans_le_budget_et_s_arrete_au_dela()
+    {
+        var candidats = Enumerable.Range(0, 5).Select(i =>
+        {
+            var f = Path.Combine(_dossier, "jeu-" + i + ".bin");
+            File.WriteAllBytes(f, new byte[] { (byte) i, 7, 7 });
+            return f;
+        }).ToList();
+        var crcDuQuatrieme = Crc32(new byte[] { 3, 7, 7 });
+        var vus = new List<int>();
+
+        var trouve = ReplayRuntimeResolver.FichierExact(candidats, crcDuQuatrieme, string.Empty, TimeSpan.FromMinutes(1),
+            (lus, total) => vus.Add(lus), out var lusAvant);
+        Assert.Equal(candidats[3], trouve);
+        Assert.Equal(3, lusAvant);
+        Assert.Equal(new[] { 0, 1, 2, 3 }, vus);
+
+        Assert.Null(ReplayRuntimeResolver.FichierExact(candidats, "00000000", string.Empty, TimeSpan.FromMinutes(1), null, out var tousLus));
+        Assert.Equal(5, tousLus);
+
+        // Budget epuise : on s'arrete avant de lire, et le nombre lu dit que la recherche n'est pas allee au bout.
+        Assert.Null(ReplayRuntimeResolver.FichierExact(candidats, crcDuQuatrieme, string.Empty, TimeSpan.Zero, null, out var aucun));
+        Assert.Equal(0, aucun);
+    }
+
     private static string Crc32(byte[] data)
     {
         var table = new uint[256];

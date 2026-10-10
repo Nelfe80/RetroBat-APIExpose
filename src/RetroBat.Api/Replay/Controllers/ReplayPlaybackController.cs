@@ -139,6 +139,11 @@ public sealed class ReplayPlaybackController : ControllerBase
                 rank = s.Card.Rank,
                 certified = s.Card.Certified,
             },
+            // La recherche du jeu sur la borne (fichiers lus sur le total), l'avertissement d'une lecture lancee sans le
+            // fichier exact, et le detail d'un echec : la page de lecture les lisait sans que l'etat les donne (2026-10-10).
+            recherche = s.Recherche is null ? null : new { lus = s.Recherche.Lus, total = s.Recherche.Total },
+            warning = s.Warning,
+            error_detail = s.ErrorDetail,
         });
     }
 

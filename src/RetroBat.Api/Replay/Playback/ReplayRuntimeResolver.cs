@@ -402,7 +402,22 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
         if (crc.Length > 0 || sha.Length > 0)
         {
             foreach (var f in parNom) { if (PorteEmpreinte(f, crc, sha, limiteOctets: 0)) return f; }
-            foreach (var f in fichiers) { if (!parNom.Contains(f) && PorteEmpreinte(f, crc, sha, limiteOctets: 256L * 1024 * 1024)) return f; }
+            var autres = fichiers.Where(f => !parNom.Contains(f)).ToList();
+            try
+            {
+                var trouve = FichierExact(autres, crc, sha, BudgetDeRecherche,
+                    (lus, total) => _recherche = new RechercheDeRom(lus, total), out var lus);
+                if (trouve is not null) return trouve;
+                if (lus < autres.Count)
+                {
+                    _logger.LogInformation("Replay : fichier exact introuvable en {Secondes} s ({Lus} fichier(s) lus sur {Total} dans {Dir}), on lance le meme jeu.",
+                        BudgetDeRecherche.TotalSeconds, lus, autres.Count, romDir);
+                }
+            }
+            finally
+            {
+                _recherche = null;
+            }
         }
 
         // 2. Le même jeu, autrement : d'abord par son identité de scoring (système + contenu, tous
@@ -422,6 +437,37 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
             ? "EmulationStation ne déclare aucun dossier de ROMs pour « " + systeme + " » sur cette borne, ou il est vide."
             : "Cette borne n'a pas ce jeu" + (nomAttendu.Length > 0 ? " (« " + nomAttendu + " »)" : string.Empty)
               + " parmi les " + fichiers.Count + " fichiers de " + romDir + ", ni sous aucun autre dossier du même système.";
+        return null;
+    }
+
+    /// <summary>
+    /// LA RECHERCHE DU FICHIER EXACT A UN BUDGET (2026-10-10). Un replay de Ms. Pac-Man enregistre avec un autre dump :
+    /// la borne a relu les 1 963 fichiers (4,7 Go) du dossier fbneo pour un fichier qu'elle n'avait pas, trois minutes
+    /// quarante sur l'ecran de lecture, avant de lancer le dump du meme jeu. Passe le budget, la recherche s'arrete et la
+    /// suite est la meme : le dump du meme jeu, annonce comme tel (« ROM non identique »). En arcade, le coeur reconnait
+    /// de toute facon le jeu au nom de son zip : un fichier exact sous un autre nom n'y servirait pas.
+    /// </summary>
+    internal static readonly TimeSpan BudgetDeRecherche = TimeSpan.FromSeconds(20);
+
+    private volatile RechercheDeRom? _recherche;
+
+    /// <inheritdoc />
+    public RechercheDeRom? RechercheEnCours => _recherche;
+
+    /// <summary>
+    /// Le fichier exact parmi des candidats d'un autre nom, dans le budget ; null sinon. <paramref name="lus"/> dit combien
+    /// ont ete lus : moins que le total, le budget s'est epuise. Un fichier commence est toujours lu jusqu'au bout.
+    /// </summary>
+    internal static string? FichierExact(IReadOnlyList<string> candidats, string crc, string sha, TimeSpan budget,
+        Action<int, int>? progression, out int lus)
+    {
+        var montre = System.Diagnostics.Stopwatch.StartNew();
+        for (lus = 0; lus < candidats.Count; lus++)
+        {
+            if (montre.Elapsed >= budget) return null;
+            progression?.Invoke(lus, candidats.Count);
+            if (PorteEmpreinte(candidats[lus], crc, sha, limiteOctets: 256L * 1024 * 1024)) return candidats[lus];
+        }
         return null;
     }
 

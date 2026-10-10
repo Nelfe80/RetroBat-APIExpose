@@ -223,10 +223,17 @@ public sealed class ReplayWatchController : ControllerBase
           msg.textContent = 'La borne le demande aux bornes voisines, puis au miroir NelfePlay.';
         }
         setTimeout(suivre, 500);
+      } else if (st === 'verifying' && s.recherche && s.recherche.total > 0){
+        // La borne cherche le fichier exact du jeu parmi ses ROMs : la recherche se voit, fichier par fichier.
+        progres(false, s.recherche.lus / s.recherche.total);
+        title.textContent = 'Recherche du jeu sur la borne…';
+        msg.textContent = s.recherche.lus + ' fichier(s) lu(s) sur ' + s.recherche.total
+          + '. Sans le fichier exact, la borne lance le même jeu.';
+        setTimeout(suivre, 500);
       } else if (st === 'resolving' || st === 'verifying' || st === 'preparing' || st === 'launching'){
         progres(true, 0);
-        title.textContent = st === 'verifying' ? 'Vérification du replay…' : 'Lancement du replay…';
-        msg.textContent = st === 'verifying' ? 'Empreinte et taille contre le manifeste.' : 'Un instant, la borne prépare la lecture.';
+        title.textContent = st === 'verifying' ? 'Préparation du replay…' : 'Lancement du replay…';
+        msg.textContent = st === 'verifying' ? 'La borne retrouve le cœur et le jeu de l’enregistrement.' : 'Un instant, la borne prépare la lecture.';
         setTimeout(suivre, 500);
       } else if (st === 'playing' || st === 'paused' || st === 'finished'){
         if (barre) barre.hidden = true;

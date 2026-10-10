@@ -98,7 +98,7 @@ public sealed class ReplayPlaybackService
         long? RunStartFrame, long? RunEndFrame, long? ReplayEndFrame, bool Paused, string? Error,
         double NominalFps, string? FpsSource, ReplayCard? Card,
         RetroBat.Api.Replay.Sharing.ReplayNetworkStateService.FetchProgress? Fetch = null,
-        string? ErrorDetail = null, string? Warning = null);
+        string? ErrorDetail = null, string? Warning = null, RechercheDeRom? Recherche = null);
 
     /// <summary>Fiche « performance NelfePlay » de l'overlay (record sportif/esport). En R1
     /// seuls Game/System/Date sont réels ; Player/Score/Rank/Certified sont des emplacements
@@ -125,7 +125,9 @@ public sealed class ReplayPlaybackService
                 _runStart, _runEnd, _finDu1LC is null ? _replayEnd : FinDeLaLecture(), _paused,
                 _error == ReplayErrorCode.None ? null : _error.ToString(),
                 _nominalFps <= 0 ? 60 : _nominalFps, _fpsSource, _card, fetch,
-                _error == ReplayErrorCode.None ? null : _errorDetail, _warning);
+                _error == ReplayErrorCode.None ? null : _errorDetail, _warning,
+                // La recherche du jeu sur la borne se voit : sans elle, « verifying » durait des minutes sans un mot.
+                _state is ReplayPlaybackState.Verifying ? _resolver.RechercheEnCours : null);
         }
     }
 

@@ -11,7 +11,13 @@ public interface IReplayRuntimeResolver
 {
     /// <summary>Jamais null : quand rien n'est trouvé, le résultat dit quelle moitié manque et pourquoi.</summary>
     RuntimeResolution Resolve(ReplayManifest manifest, ReplayLaunchHint? hint);
+
+    /// <summary>La recherche du fichier exact en cours (fichiers lus sur le total), pour l'état de lecture ; null sinon.</summary>
+    RechercheDeRom? RechercheEnCours => null;
 }
+
+/// <summary>Une recherche de ROM par empreinte : fichiers déjà lus, sur combien.</summary>
+public sealed record RechercheDeRom(int Lus, int Total);
 
 /// <summary>
 /// ⭐ LA seam NelfeNet. Question posée par le lecteur avant de lancer : « rends-moi l'objet de ce
