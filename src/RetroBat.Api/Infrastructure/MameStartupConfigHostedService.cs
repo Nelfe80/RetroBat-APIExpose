@@ -40,6 +40,12 @@ public class MameStartupConfigHostedService : IHostedService
         {
             EnsureQuotedSetting(RetroBatPaths.RetroArchConfigPath, "network_cmd_enable", "true");
             EnsureQuotedSetting(RetroBatPaths.RetroArchConfigPath, "network_cmd_port", "55355");
+            // Un point de controle toutes les 5 s dans chaque replay : sans eux, RetroArch ne sait
+            // sauter nulle part a la lecture (decision user 2026-10-10). Il vaut 0 par defaut, et les
+            // replays venus des autres bornes n'en avaient aucun. Risque connu : l'encodeur de
+            // RetroArch 1.22.2 peut planter au premier point de controle ; GardeDesPlantages coupe
+            // alors l'enregistrement de ce jeu sur cette borne.
+            EnsureQuotedSetting(RetroBatPaths.RetroArchConfigPath, "replay_checkpoint_interval", "5");
             // Note: do NOT force log_to_file or log_verbosity here.
             // RetroArch already writes [RCHEEVOS]: messages to stdout (log_to_file=false),
             // which ES captures in es_launch_stdout.log. Forcing log_to_file=true would

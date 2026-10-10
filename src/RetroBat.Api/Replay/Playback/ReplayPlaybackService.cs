@@ -98,7 +98,9 @@ public sealed class ReplayPlaybackService
         long? RunStartFrame, long? RunEndFrame, long? ReplayEndFrame, bool Paused, string? Error,
         double NominalFps, string? FpsSource, ReplayCard? Card,
         RetroBat.Api.Replay.Sharing.ReplayNetworkStateService.FetchProgress? Fetch = null,
-        string? ErrorDetail = null, string? Warning = null, RechercheDeRom? Recherche = null);
+        string? ErrorDetail = null, string? Warning = null, RechercheDeRom? Recherche = null,
+        // false : le replay n'a aucun point de controle, on ne peut pas y sauter ; null : on ne sait pas.
+        bool? Navigable = null);
 
     /// <summary>Fiche « performance NelfePlay » de l'overlay (record sportif/esport). En R1
     /// seuls Game/System/Date sont réels ; Player/Score/Rank/Certified sont des emplacements
@@ -127,7 +129,8 @@ public sealed class ReplayPlaybackService
                 _nominalFps <= 0 ? 60 : _nominalFps, _fpsSource, _card, fetch,
                 _error == ReplayErrorCode.None ? null : _errorDetail, _warning,
                 // La recherche du jeu sur la borne se voit : sans elle, « verifying » durait des minutes sans un mot.
-                _state is ReplayPlaybackState.Verifying ? _resolver.RechercheEnCours : null);
+                _state is ReplayPlaybackState.Verifying ? _resolver.RechercheEnCours : null,
+                _points is null ? null : _points.Count > 0);
         }
     }
 
@@ -143,6 +146,18 @@ public sealed class ReplayPlaybackService
 
     /// <summary>La frame de la premiere vie perdue, quand la lecture est celle d'un 1LC.</summary>
     private long? _finDu1LC;
+
+    /// <summary>
+    /// Les points de controle du replay en cours, lus avant le lancement (voir <see cref="PointsDeControle"/>).
+    /// Vide : aucun saut possible. null : format inconnu, et RetroArch fait comme avant.
+    /// </summary>
+    private IReadOnlyList<long>? _points;
+
+    /// <summary>RetroArch a dit qu'aucun film ne joue plus : une bascule de pause relancerait le jeu en direct.</summary>
+    private bool _filmArrete;
+
+    /// <summary>Le dernier « pas d'avance rapide » affiche : un maintien de ◀/▶ redemande toutes les 350 ms.</summary>
+    private DateTime _sansSautAnnonceA = DateTime.MinValue;
 
     /// <summary>
     /// Appele sous _gate. La fin de la lecture : celle du replay, ou la premiere vie perdue d'un 1LC. Le
@@ -163,6 +178,7 @@ public sealed class ReplayPlaybackService
             _frame = 0; _paused = false; _card = null;
             _regle = RetroBat.Api.Scoring.ModesDeJeu.Est1LC(regle) ? regle : null;
             _finDu1LC = null;
+            _points = null; _filmArrete = false;
         }
 
         var manifest = _manifests.GetManifest(replayId);
@@ -290,6 +306,13 @@ public sealed class ReplayPlaybackService
         // contenu) ça passe toujours, sauf bit rot.
         if (!await _objects.VerifyObjectAsync(manifest.Object, ct).ConfigureAwait(false))
             return Fail(ReplayErrorCode.ReplayObjectCorrupt);
+
+        // Les points de controle, avant de lancer : ce sont eux qui disent ou l'on peut sauter.
+        var points = PointsDeControle.Lire(objectPath);
+        lock (_gate) _points = points;
+        if (points is null) _logger.LogInformation("Replay {ReplayId} : points de contrôle illisibles, sauts laissés à RetroArch.", replayId);
+        else if (points.Count == 0) _logger.LogInformation("Replay {ReplayId} : aucun point de contrôle, sauts coupés.", replayId);
+        else _logger.LogInformation("Replay {ReplayId} : {Points} point(s) de contrôle.", replayId, points.Count);
 
         // ── vérification runtime (R2 MVP : présence ; empreintes strictes quand le manifeste les portera) ──
         lock (_gate) { _state = ReplayPlaybackState.Verifying; _replayEnd = manifest.Frames.ReplayEnd;
@@ -441,14 +464,22 @@ public sealed class ReplayPlaybackService
     public async Task PauseToggleAsync(CancellationToken ct)
     {
         if (!IsBusy) return;
+        // Film arrete : RetroArch est en pause sur un jeu qui n'est plus un replay. Basculer la pause
+        // rendrait la main au spectateur, en direct.
+        lock (_gate) { if (_filmArrete) return; }
         await _ra.PauseToggleAsync(ct).ConfigureAwait(false); // _paused sera relu par le monitor
     }
 
     public async Task SeekRelativeAsync(double seconds, CancellationToken ct)
     {
         if (!IsBusy) return;
-        long cur, hi; long? loRun; double fps;
-        lock (_gate) { cur = _frame; hi = FinDeLaLecture(); loRun = _runStart; fps = _nominalFps <= 0 ? 60 : _nominalFps; }
+        long cur, hi; long? loRun; double fps; IReadOnlyList<long>? points;
+        lock (_gate) { cur = _frame; hi = FinDeLaLecture(); loRun = _runStart; fps = _nominalFps <= 0 ? 60 : _nominalFps; points = _points; }
+        if (points is not null)
+        {
+            await SauterAsync(PointsDeControle.Relatif(points, cur, (long)Math.Round(seconds * fps), hi), points, ct).ConfigureAwait(false);
+            return;
+        }
         var target = cur + (long)Math.Round(seconds * fps);
         var lo = loRun ?? 0;
         if (target < lo) target = lo;
@@ -463,6 +494,11 @@ public sealed class ReplayPlaybackService
     public async Task NextCheckpointAsync(CancellationToken ct)
     {
         if (!IsBusy) return;
+        IReadOnlyList<long>? points; long cur, hi;
+        lock (_gate) { points = _points; cur = _frame; hi = FinDeLaLecture(); }
+        // NEXT_REPLAY_CHECKPOINT sans point devant parcourt le fichier jusqu'au bout et arrete le film :
+        // on vise le point suivant connu, ou rien.
+        if (points is not null) { await SauterAsync(PointsDeControle.Suivant(points, cur, hi), points, ct).ConfigureAwait(false); return; }
         await _ra.NextCheckpointAsync(ct).ConfigureAwait(false);
     }
 
@@ -471,7 +507,36 @@ public sealed class ReplayPlaybackService
     public async Task PreviousCheckpointAsync(CancellationToken ct)
     {
         if (!IsBusy) return;
+        IReadOnlyList<long>? points; long cur;
+        lock (_gate) { points = _points; cur = _frame; }
+        if (points is not null) { await SauterAsync(PointsDeControle.Precedent(points, cur), points, ct).ConfigureAwait(false); return; }
         await _ra.PrevCheckpointAsync(ct).ConfigureAwait(false);
+    }
+
+    /// <summary>Demande un saut qui aboutit ; sans point de controle, dit pourquoi rien ne bouge.</summary>
+    private async Task SauterAsync(PointsDeControle.Saut? saut, IReadOnlyList<long> points, CancellationToken ct)
+    {
+        if (saut is not { } s)
+        {
+            if (points.Count == 0) AnnoncerSansSaut();
+            return;
+        }
+        var resp = await _ra.SeekAsync(s.Demande, ct).ConfigureAwait(false);
+        if (resp is not null && resp.StartsWith("OK", StringComparison.OrdinalIgnoreCase))
+            lock (_gate) _frame = s.Arrivee; // le monitor recalera sur active_replay
+        else
+            _logger.LogDebug("Replay : SEEK {Demande} refusé ({Resp})", s.Demande, resp);
+    }
+
+    /// <summary>Le replay n'a aucun point de controle : un bandeau le dit, une fois par maintien.</summary>
+    private void AnnoncerSansSaut()
+    {
+        lock (_gate)
+        {
+            if (DateTime.UtcNow - _sansSautAnnonceA < TimeSpan.FromSeconds(6)) return;
+            _sansSautAnnonceA = DateTime.UtcNow;
+        }
+        _bandeau?.ShowTop("REPLAY", Texte("replay_no_seek"), Texte("replay_no_seek_sub"), 5000);
     }
 
     // ── seeks NOMMÉS (R3.11) : les interfaces publiques (panel, SDK, Replay Room) demandent une
@@ -487,9 +552,12 @@ public sealed class ReplayPlaybackService
     public async Task RestartRunAsync(CancellationToken ct)
     {
         if (!IsBusy) return;
-        long target; lock (_gate) target = _runStart ?? 0;
+        long target; IReadOnlyList<long>? points;
+        lock (_gate) { target = _runStart ?? 0; points = _points; }
         await _ra.SeekAsync(target, ct).ConfigureAwait(false);
-        lock (_gate) _frame = target;
+        // RetroArch repart du dernier point avant le debut du run ; sans point, du debut du film.
+        var arrivee = points is null ? target : points.LastOrDefault(p => p < target);
+        lock (_gate) _frame = arrivee;
     }
 
     private void StartMonitor()
@@ -560,6 +628,7 @@ public sealed class ReplayPlaybackService
     {
         var idle = 0; var endHold = 0; long lastHoldFrame = -1; var endPauseSent = false;
         var started = false; var startWait = 0;   // lecture pas encore confirmée (garde de démarrage, borne lente)
+        var filmArrete = 0;                         // réponses « aucun replay » de RetroArch, pas des silences
         while (!ct.IsCancellationRequested)
         {
             Process? proc; lock (_gate) proc = _process;
@@ -600,6 +669,7 @@ public sealed class ReplayPlaybackService
                 if (nowActive)
                 {
                     _frame = active!.Frame;
+                    _filmArrete = false;
                     if (_state == ReplayPlaybackState.Launching) _state = ReplayPlaybackState.Playing; // confirmation tardive
                 }
                 _paused = paused;
@@ -617,11 +687,35 @@ public sealed class ReplayPlaybackService
                 _ = Publish("replay.playing", new { replayId = lu });
             }
 
+            // LE FILM S'EST ARRETE (2026-10-10). RetroArch REPOND qu'aucun replay ne joue (« 0 0 0 », qu'il
+            // ne rend qu'une fois le film decharge) alors que la lecture avait demarre : un saut rate l'a
+            // arrete, ou il a atteint sa fin. RetroArch 1.22.2 se met alors en pause sur le jeu, et la
+            // moindre bascule de pause le relance EN DIRECT, manette en main (vu sur 1942 : le spectateur
+            // pilotait l'avion). On ferme sans attendre, et rien ne bascule plus la pause.
+            if (started && active is { Active: false })
+            {
+                lock (_gate) _filmArrete = true;
+                if (++filmArrete >= 2)
+                {
+                    var avantLaFin = end > 0 && frame < end - EndPauseMargin - 60;
+                    if (avantLaFin)
+                    {
+                        _logger.LogWarning("Replay {ReplayId} : le film s'est arrêté à la frame {Vue} sur {Attendue}, RetroArch fermé.",
+                            _replayId, frame, end);
+                    }
+                    Finish(avantLaFin ? "film arrêté avant la fin" : "fin du film");
+                    return;
+                }
+            }
+            else filmArrete = 0;
+
             // Réarme le figeage si on a rembobiné bien avant la fin (→ re-fige si on rejoue jusqu'au bout).
             if (endPauseSent && end > 0 && frame < end - EndPauseMargin - 90) endPauseSent = false;
 
             // AUTO-PAUSE UNE SEULE FOIS un peu avant la fin (latch) → fige, permet de revenir en arrière (◀).
-            if (!endPauseSent && end > 0 && frame >= end - EndPauseMargin && !paused)
+            // Seulement sur un film qui joue : sur un film arrete, RetroArch est deja en pause, et la
+            // bascule relancerait le jeu.
+            if (nowActive && !endPauseSent && end > 0 && frame >= end - EndPauseMargin && !paused)
             {
                 await _ra.PauseToggleAsync(ct).ConfigureAwait(false);
                 endPauseSent = true; paused = true;

@@ -70,11 +70,13 @@ public sealed class ReplayOverlayService : BackgroundService
     /// <summary>
     /// Les rappels du panel qui tiennent dans <paramref name="place"/> pixels, dans leur ordre
     /// d'affichage. Quand la place manque, ils cedent un a un dans l'ordre de
-    /// <paramref name="ordreDeRetrait"/>. Avant, ils passaient sous la carte du record.
+    /// <paramref name="ordreDeRetrait"/>. Avant, ils passaient sous la carte du record. Les
+    /// <paramref name="masques"/> ne s'affichent pas (une commande sans effet sur ce replay).
     /// </summary>
-    internal static IReadOnlyList<int> RappelsQuiTiennent(IReadOnlyList<float> largeurs, IReadOnlyList<int> ordreDeRetrait, float ecart, float place)
+    internal static IReadOnlyList<int> RappelsQuiTiennent(IReadOnlyList<float> largeurs, IReadOnlyList<int> ordreDeRetrait, float ecart, float place,
+        IReadOnlyCollection<int>? masques = null)
     {
-        var gardes = Enumerable.Range(0, largeurs.Count).ToList();
+        var gardes = Enumerable.Range(0, largeurs.Count).Where(i => masques is null || !masques.Contains(i)).ToList();
         float Total() => gardes.Sum(i => largeurs[i]) + ecart * Math.Max(0, gardes.Count - 1);
         foreach (var retire in ordreDeRetrait)
         {
@@ -688,13 +690,16 @@ public sealed class ReplayOverlayService : BackgroundService
                     // Le double appui sur START bascule la barre depuis longtemps ; rien ne le disait.
                     (GlypheDe(g, null), libelles.DoubleAppui + "  " + libelles.Reduire),
                 };
+                // Un replay sans point de controle ne recule ni n'avance : son rappel ne s'affiche pas.
+                int[]? masques = s.Navigable == false ? new[] { 1 } : null;
+                var attendus = rappels.Length - (masques?.Length ?? 0);
                 // La rangee se resserre avant que les rappels cedent leur place.
                 foreach (var tenue in new[] { Aisee, Serree })
                 {
                     using var label = new Font("Segoe UI Semibold", tenue.Police, FontStyle.Regular, GraphicsUnit.Pixel);
                     var largeurs = rappels.Select(r => r.Glyphe.Largeur + tenue.EcartGlyphe + (float)Math.Ceiling(g.MeasureString(r.Texte, label).Width)).ToArray();
-                    var gardes = RappelsQuiTiennent(largeurs, OrdreDeRetrait, tenue.Ecart, limite - x);
-                    if (gardes.Count < rappels.Length && tenue != Serree) continue;
+                    var gardes = RappelsQuiTiennent(largeurs, OrdreDeRetrait, tenue.Ecart, limite - x, masques);
+                    if (gardes.Count < attendus && tenue != Serree) continue;
                     foreach (var i in gardes)
                         x = DrawHint(g, x, mid, label, textBrush, rappels[i].Glyphe, rappels[i].Texte, tenue);
                     return;

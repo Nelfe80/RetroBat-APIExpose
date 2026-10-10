@@ -144,6 +144,8 @@ public sealed class ReplayPlaybackController : ControllerBase
             recherche = s.Recherche is null ? null : new { lus = s.Recherche.Lus, total = s.Recherche.Total },
             warning = s.Warning,
             error_detail = s.ErrorDetail,
+            // false : le replay n'a aucun point de controle, les sauts ne font rien ; null : inconnu.
+            seekable = s.Navigable,
         });
     }
 

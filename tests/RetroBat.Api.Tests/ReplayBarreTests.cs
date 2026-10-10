@@ -33,6 +33,17 @@ public class ReplayBarreTests
     }
 
     [Fact]
+    public void Un_rappel_masque_ne_s_affiche_pas_et_laisse_sa_place()
+    {
+        // Un replay sans point de controle : RECUL / AVANCE ne ferait rien.
+        var masques = new[] { 1 };
+        Assert.Equal(new[] { 0, 2, 3, 4 }, ReplayOverlayService.RappelsQuiTiennent(Largeurs, Ordre, Ecart, 2000f, masques));
+        var sansLui = 170f + 160f + 135f + 180f + 3 * Ecart;
+        Assert.Equal(new[] { 0, 2, 3, 4 }, ReplayOverlayService.RappelsQuiTiennent(Largeurs, Ordre, Ecart, sansLui, masques));
+        Assert.Equal(new[] { 0, 2, 3 }, ReplayOverlayService.RappelsQuiTiennent(Largeurs, Ordre, Ecart, sansLui - 1f, masques));
+    }
+
+    [Fact]
     public void Quitter_part_en_dernier()
     {
         Assert.Equal(new[] { 3 }, ReplayOverlayService.RappelsQuiTiennent(Largeurs, Ordre, Ecart, 140f));
