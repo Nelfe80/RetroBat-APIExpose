@@ -221,7 +221,8 @@ public sealed class ReplayPlaybackService
         string? regle;
         lock (_gate) regle = _regle;
         if (regle is not null) { _ = BackfillCardAsync(replayId, ct, regle); }
-        else if (builtCard is { Score: null }) { _ = BackfillCardAsync(replayId, ct); }
+        // Un replay venu d'une autre borne demande aussi sa carte : son joueur.
+        else if (builtCard is { Score: null } || !EnregistreIci(meta)) { _ = BackfillCardAsync(replayId, ct); }
         var objectPath = _objects.ObjectPath(manifest.Object.Sha256);
 
         // ── LE RÉSEAU NE DOIT JAMAIS ÊTRE DANS LE CHEMIN DE RÉPONSE ──────────────
@@ -737,8 +738,10 @@ public sealed class ReplayPlaybackService
             long? arret = regle is not null && root.TryGetProperty("stop_frame", out var stv) && stv.TryGetInt64(out var st) && st > 0 ? st : null;
             lock (_gate)
             {
+                // LE JOUEUR DU RECORD (2026-10-10) : le replay d'un autre joueur, lu sur cette borne, s'affichait au
+                // nom de son proprietaire. La plateforme ne donne une carte que pour un score publie : il est certifie.
                 if (_card is not null && string.Equals(_replayId, replayId, StringComparison.Ordinal))
-                    _card = _card with { Score = score ?? _card.Score, Rank = rank ?? _card.Rank };
+                    _card = CompleterLaCarte(_card, score, rank, player);
                 if (arret is { } f && string.Equals(_replayId, replayId, StringComparison.Ordinal)) _finDu1LC = f;
             }
             if (regle is not null)
@@ -782,13 +785,37 @@ public sealed class ReplayPlaybackService
         // Player/score/rang viennent en priorité de la méta estampillée au scellement
         // (le vrai record) ; sinon on retombe sur le pseudo appairé (player) et le
         // snapshot du manifeste (score). Le rang n'existe que via la méta.
-        var player = !string.IsNullOrWhiteSpace(meta?.Player) ? meta!.Player!
-            : (string.IsNullOrWhiteSpace(pseudo) ? joueurParDefaut : pseudo!);
+        var player = JoueurDeLaCarte(meta, pseudo, joueurParDefaut);
         var score = meta?.ScoreValue ?? m.ScoreLink?.ScoreValueSnapshot;
         int? rank = meta?.Rank;
         var certified = string.Equals(meta?.PublicationState, "published", StringComparison.OrdinalIgnoreCase);
         return new ReplayCard(game, system, date, player, score, rank, certified);
     }
+
+    /// <summary>
+    /// La carte completee par la plateforme : score, rang, et le joueur du record quand elle le donne. Elle ne repond
+    /// que pour un score publie, d'ou « certifie ».
+    /// </summary>
+    internal static ReplayCard CompleterLaCarte(ReplayCard carte, long? score, int? rank, string? player)
+        => carte with
+        {
+            Score = score ?? carte.Score,
+            Rank = rank ?? carte.Rank,
+            Player = string.IsNullOrWhiteSpace(player) ? carte.Player : player.Trim(),
+            Certified = true,
+        };
+
+    /// <summary>
+    /// Le joueur de la carte avant toute reponse de la plateforme. Le pseudo de la borne ne vaut que pour un replay
+    /// enregistre ICI ; un replay venu d'ailleurs (recu a la lecture, ou replique) attend le joueur que la plateforme
+    /// donne (BackfillCardAsync) : jusque-la, « JOUEUR ».
+    /// </summary>
+    internal static string JoueurDeLaCarte(ReplayLocalMetadata? meta, string? pseudo, string joueurParDefaut)
+        => !string.IsNullOrWhiteSpace(meta?.Player) ? meta!.Player!
+            : (EnregistreIci(meta) && !string.IsNullOrWhiteSpace(pseudo) ? pseudo! : joueurParDefaut);
+
+    /// <summary>Ce replay a-t-il ete enregistre par cette borne ?</summary>
+    private static bool EnregistreIci(ReplayLocalMetadata? meta) => meta is { CreatedByThisDevice: true };
 
     private static string PrettifyGame(ReplayGame g)
     {
