@@ -12,7 +12,7 @@ namespace RetroBat.Api.Tests;
 /// </summary>
 public class ReplayBarreTests
 {
-    // Lecture, recul/avance, checkpoint, quitter, reduire : l'ordre ou ils cedent leur place.
+    // Lecture, recul/avance, retour au debut, quitter, reduire : l'ordre ou ils cedent leur place.
     private static readonly int[] Ordre = { 4, 2, 1, 0, 3 };
     private static readonly float[] Largeurs = { 170f, 230f, 160f, 135f, 180f };
     private const float Ecart = 30f;

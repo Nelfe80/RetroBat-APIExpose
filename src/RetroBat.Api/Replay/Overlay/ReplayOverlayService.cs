@@ -50,7 +50,7 @@ public sealed class ReplayOverlayService : BackgroundService
     private readonly RetroBat.Api.Infrastructure.CabinetLocale _locale;
 
     /// <summary>Les libelles de la barre, dans la langue de la borne, en MAJUSCULES comme ES.</summary>
-    internal sealed record TextesDeLaBarre(string Lecture, string Deplacement, string Checkpoint, string Quitter, string Score, CultureInfo Culture,
+    internal sealed record TextesDeLaBarre(string Lecture, string Deplacement, string RetourAuDebut, string Quitter, string Score, CultureInfo Culture,
         string Maintenir = "(HOLD)", string DoubleAppui = "(×2)", string Reduire = "MINIMIZE");
 
     private TextesDeLaBarre Textes()
@@ -60,7 +60,9 @@ public sealed class ReplayOverlayService : BackgroundService
         // Une cle neuve manque tant que le Data Pack de la borne n'a pas suivi, et Text rend alors
         // le nom de la cle : on garde le libelle d'origine pour ne pas afficher « REPLAY.BAR.… ».
         string TouDefaut(string cle, string defaut) => _locale.Text(cle) is var t && t != cle ? t.ToUpper(culture) : defaut;
-        return new TextesDeLaBarre(T("replay.bar.play_pause"), T("replay.bar.rewind_forward"), T("replay.bar.checkpoint"),
+        // ▼ ramene au debut du run (ReplayInputRouterService) : la barre l'annoncait « CHECKPOINT ».
+        // La cle replay.bar.checkpoint reste au Data Pack pour les bornes d'avant la 1.9.44.
+        return new TextesDeLaBarre(T("replay.bar.play_pause"), T("replay.bar.rewind_forward"), TouDefaut("replay.bar.back_to_start", "BACK TO START"),
             T("replay.bar.quit"), T("replay.card.score"), culture, T("replay.bar.hold"),
             TouDefaut("replay.bar.double", "(×2)"), TouDefaut("replay.bar.minimize", "MINIMIZE"));
     }
@@ -515,7 +517,7 @@ public sealed class ReplayOverlayService : BackgroundService
             {
                 try { if (_textesDeLaBarre is not null) return _textesDeLaBarre(); }
                 catch (Exception) { }
-                return new TextesDeLaBarre("LECTURE / PAUSE", "RECUL / AVANCE", "CHECKPOINT", "QUITTER", "SCORE", CultureInfo.GetCultureInfo("fr-FR"), "(MAINTENIR)", "(×2)", "RÉDUIRE");
+                return new TextesDeLaBarre("LECTURE / PAUSE", "RECUL / AVANCE", "RETOUR AU DÉBUT", "QUITTER", "SCORE", CultureInfo.GetCultureInfo("fr-FR"), "(MAINTENIR)", "(×2)", "RÉDUIRE");
             }
 
             public OverlaySurface(Func<ReplayPlaybackService.StateSnapshot> get, Func<float[]?> curve,
@@ -638,11 +640,19 @@ public sealed class ReplayOverlayService : BackgroundService
 
             private enum Dir { Up, Down, LeftRight }
 
-            private const int EcartEntreRappels = 30;
+            /// <summary>
+            /// La tenue des rappels : la taille du libelle, l'ecart entre pictogramme et libelle, l'ecart
+            /// entre deux rappels. La tenue serree ne sert que si l'aisee perdrait un rappel : en
+            /// francais, avec une carte courte en 1920, l'aisee depassait d'un pixel.
+            /// </summary>
+            private readonly record struct Tenue(float Police, int EcartGlyphe, int Ecart);
+
+            private static readonly Tenue Aisee = new(19f, 12, 30);
+            private static readonly Tenue Serree = new(17f, 8, 16);
 
             /// <summary>
             /// L'ordre dans lequel les rappels cedent leur place quand elle manque : le double appui
-            /// d'abord (il ne fait que signaler une fonction), puis le checkpoint, le recul et
+            /// d'abord (il ne fait que signaler une fonction), puis le retour au debut, le recul et
             /// l'avance, la lecture. QUITTER part en dernier : c'est la seule sortie.
             /// </summary>
             private static readonly int[] OrdreDeRetrait = { 4, 2, 1, 0, 3 };
@@ -652,7 +662,6 @@ public sealed class ReplayOverlayService : BackgroundService
                 var mid = RowTop + GlyphSize / 2; // centre vertical de la rangée
                 var x = SidePadding;
 
-                using var label = new Font("Segoe UI Semibold", 19f, FontStyle.Regular, GraphicsUnit.Pixel);
                 using var timeFont = new Font("Segoe UI", 22f, FontStyle.Bold, GraphicsUnit.Pixel);
                 using var textBrush = new SolidBrush(TextColor);
 
@@ -674,14 +683,22 @@ public sealed class ReplayOverlayService : BackgroundService
                 {
                     (GlypheDe(g, Dir.Up), libelles.Lecture),
                     (GlypheDe(g, Dir.LeftRight), libelles.Deplacement),
-                    (GlypheDe(g, Dir.Down), libelles.Checkpoint),
+                    (GlypheDe(g, Dir.Down), libelles.RetourAuDebut),
                     (GlypheDe(g, null), libelles.Maintenir + "  " + libelles.Quitter),
                     // Le double appui sur START bascule la barre depuis longtemps ; rien ne le disait.
                     (GlypheDe(g, null), libelles.DoubleAppui + "  " + libelles.Reduire),
                 };
-                var largeurs = rappels.Select(r => r.Glyphe.Largeur + 12f + (float)Math.Ceiling(g.MeasureString(r.Texte, label).Width)).ToArray();
-                foreach (var i in RappelsQuiTiennent(largeurs, OrdreDeRetrait, EcartEntreRappels, limite - x))
-                    x = DrawHint(g, x, mid, label, textBrush, rappels[i].Glyphe, rappels[i].Texte);
+                // La rangee se resserre avant que les rappels cedent leur place.
+                foreach (var tenue in new[] { Aisee, Serree })
+                {
+                    using var label = new Font("Segoe UI Semibold", tenue.Police, FontStyle.Regular, GraphicsUnit.Pixel);
+                    var largeurs = rappels.Select(r => r.Glyphe.Largeur + tenue.EcartGlyphe + (float)Math.Ceiling(g.MeasureString(r.Texte, label).Width)).ToArray();
+                    var gardes = RappelsQuiTiennent(largeurs, OrdreDeRetrait, tenue.Ecart, limite - x);
+                    if (gardes.Count < rappels.Length && tenue != Serree) continue;
+                    foreach (var i in gardes)
+                        x = DrawHint(g, x, mid, label, textBrush, rappels[i].Glyphe, rappels[i].Texte, tenue);
+                    return;
+                }
             }
 
             /// <summary>
@@ -705,7 +722,7 @@ public sealed class ReplayOverlayService : BackgroundService
             }
 
             /// <summary>Un rappel = pictogramme de touche + libellé. Renvoie le x du rappel suivant.</summary>
-            private static int DrawHint(Graphics g, int x, int mid, Font label, Brush textBrush, Glyphe glyphe, string text)
+            private static int DrawHint(Graphics g, int x, int mid, Font label, Brush textBrush, Glyphe glyphe, string text, Tenue tenue)
             {
                 if (glyphe.Image is { } image)
                     g.DrawImage(image, x, mid - image.Height / 2, image.Width, image.Height);
@@ -713,10 +730,10 @@ public sealed class ReplayOverlayService : BackgroundService
                     DrawDpad(g, new Rectangle(x, mid - GlyphSize / 2, GlyphSize, GlyphSize), dir);
                 else
                     DrawStartBadge(g, x, mid);
-                x += glyphe.Largeur + 12;
+                x += glyphe.Largeur + tenue.EcartGlyphe;
                 var sz = g.MeasureString(text, label);
                 g.DrawString(text, label, textBrush, x, mid - sz.Height / 2);
-                return x + (int)Math.Ceiling(sz.Width) + EcartEntreRappels;
+                return x + (int)Math.Ceiling(sz.Width) + tenue.Ecart;
             }
 
             // ── Fiche « performance NelfePlay » (droite de la barre), façon record esport ──
