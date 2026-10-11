@@ -1052,7 +1052,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var coreOptions = FilterGameplayCoreOptions(GetString(attestation, "CoreOptions"));
             var digest = !string.IsNullOrEmpty(coreOptions) ? Crypto.Sha256Hex(coreOptions) : Crypto.Sha256Hex("core-options@default");
             var contentSha1 = GetString(attestation, "ContentSha1")
-                ?? GamelistIdentity.DeclaredSha1(systemId, romGroup, SetArcade(systemId, GetString(attestation, "ContentSet")));
+                ?? Sha1Declare(systemId, romGroup, GetString(attestation, "ContentSet"));
             var mesures = new JsonObject
             {
                 ["system_id"] = systemId,
@@ -1566,13 +1566,33 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// Le set lance compte pour l'ARCADE seulement : c'est lui qui distingue deux jeux au meme nom
     /// (ddragon, le Double Dragon de Technos ouvert au scoring, et doubledr, celui de la Neo-Geo).
     /// Sans lui, l'identite etait lue par le nom du groupe, et le Double Dragon Neo-Geo s'annoncait
-    /// « certifiable » avec le sha1 de celui de Technos (2026-09-25). Une console garde sa recherche
-    /// par nom : son contenu est mesure sur le fichier.
+    /// « certifiable » avec le sha1 de celui de Technos (2026-09-25).
     /// </summary>
     internal static string? SetArcade(string? systemId, string? set)
         => string.Equals(systemId, "arcade", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(set)
             ? set.Trim()
             : null;
+
+    /// <summary>
+    /// LE SHA1 DECLARE d'un jeu, d'apres le referentiel (resources/gamelist/systems) : pour l'ARCADE
+    /// seulement, ou le sha1 du set est l'identite et ou l'emulateur verifie le contenu du set contre
+    /// son DAT au chargement.
+    ///
+    /// Une console s'identifie par son contenu MESURE sur le fichier (md5, sha256), que la plateforme
+    /// rapproche de son referentiel. Un sha1 declare pour une console etait celui de la premiere
+    /// version de son groupe, quel que soit le fichier : epingle a l'ouverture du profil d'Alex Kidd
+    /// (version japonaise), il faisait passer toute ROM rangee sous ce groupe, meme un dump inconnu
+    /// (2026-10-11). Meme regle que la plateforme : ScoringRepository::formeDeContenuAdmise.
+    /// </summary>
+    internal static string? Sha1Declare(string? systemId, string? romGroup, string? contentSet)
+    {
+        if (string.IsNullOrEmpty(romGroup)
+            || !string.Equals(RomCanonicalResolver.CanonicalScoringSystem(systemId ?? string.Empty), "arcade", StringComparison.Ordinal))
+        {
+            return null;
+        }
+        return GamelistIdentity.DeclaredSha1(systemId, romGroup, SetArcade(systemId, contentSet));
+    }
 
     /// <summary>
     /// Personne n'a joué tant que le score n'est jamais monté. Metal Slug 3 sous MAME, 2026-09-25 :
@@ -2917,7 +2937,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
         if (string.IsNullOrEmpty(contentSha1) && !string.IsNullOrEmpty(romGroup))
         {
-            contentSha1 = GamelistIdentity.DeclaredSha1(systemId, romGroup, SetArcade(systemId, contentSet));
+            contentSha1 = Sha1Declare(systemId, romGroup, contentSet);
         }
 
         var (profils, profilsDuSite) = await ProfilsAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false);
@@ -3057,10 +3077,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         //
         // Le passeport porte donc les DEUX : l'identite declaree (sha1) et ce que le
         // wrapper a reellement mesure (md5, sha256).
+        // Une console ne declare rien : son identite est ce que le wrapper a mesure (Sha1Declare).
         if (string.IsNullOrEmpty(contentSha1) && !string.IsNullOrEmpty(romGroup))
         {
-            contentSha1 = GamelistIdentity.DeclaredSha1(systemId, romGroup, SetArcade(systemId, contentSet));
-            Trace($"identite declaree : sha1={(contentSha1 is null ? "introuvable" : contentSha1)} (sys={systemId} rom={romGroup})");
+            contentSha1 = Sha1Declare(systemId, romGroup, contentSet);
+            Trace(string.Equals(RomCanonicalResolver.CanonicalScoringSystem(systemId ?? string.Empty), "arcade", StringComparison.Ordinal)
+                ? $"identite declaree : sha1={(contentSha1 is null ? "introuvable" : contentSha1)} (sys={systemId} rom={romGroup})"
+                : $"identite : contenu mesure seul, md5 et sha256 (console, sys={systemId} rom={romGroup})");
         }
 
         // Phase D : le score soumis = le MEILLEUR run. On segmente la trajectoire aux CHUTES

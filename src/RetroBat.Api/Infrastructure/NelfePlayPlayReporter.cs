@@ -265,17 +265,24 @@ public sealed class NelfePlayPlayReporter : BackgroundService
         // suite.
         var md5 = HashOf(play.GamePath);
 
-        // Identite DECLAREE, en plus de l'empreinte mesuree.
+        // Identite DECLAREE, en plus de l'empreinte mesuree, pour l'ARCADE seulement.
         //
         // Sans elle, aucune partie d'arcade ne resout jamais vers un groupe canonique :
         // la plateforme n'indexe que ce que disent les DAT, et pour l'arcade ce n'est
         // pas une empreinte du fichier - sa gamelist ne porte meme aucun md5. Toute la
         // telemetrie arcade retombait donc sur des cles de repli « systeme:~nom », ce
         // qui eclate les statistiques d'un meme jeu au lieu de les regrouper.
-        var sha1 = GamelistIdentity.DeclaredSha1(
-            play.SystemId,
-            play.GameName,
-            System.IO.Path.GetFileNameWithoutExtension(play.GamePath));
+        //
+        // Une console se rapproche par le md5 mesure (les DAT No-Intro empreintent le
+        // fichier) : un sha1 declare viendrait du nom de son groupe, pas de son contenu
+        // (meme regle que le scoring, NelfePlayScoringReporter.Sha1Declare).
+        var sha1 = string.Equals(RetroBat.Api.Media.RomCanonicalResolver.CanonicalScoringSystem(play.SystemId ?? string.Empty),
+                "arcade", StringComparison.Ordinal)
+            ? GamelistIdentity.DeclaredSha1(
+                play.SystemId,
+                play.GameName,
+                System.IO.Path.GetFileNameWithoutExtension(play.GamePath))
+            : null;
 
         if (_pending.Count >= MaxPending)
         {
