@@ -46,10 +46,13 @@ public sealed class RomCanonicalResolver : IScoreSlugResolver
     private readonly ConcurrentDictionary<string, Lazy<Dictionary<string, string>>> _memIndexes =
         new(StringComparer.OrdinalIgnoreCase);
     private readonly ILogger<RomCanonicalResolver>? _logger;
+    private readonly string? _racineDuReferentiel;
 
-    public RomCanonicalResolver(ILogger<RomCanonicalResolver>? logger = null)
+    /// <param name="racineDuReferentiel">Le dossier des fichiers « _lt.json », pour un essai ; sinon celui du plugin.</param>
+    public RomCanonicalResolver(ILogger<RomCanonicalResolver>? logger = null, string? racineDuReferentiel = null)
     {
         _logger = logger;
+        _racineDuReferentiel = racineDuReferentiel;
     }
 
     /// <summary>Fiche canonique pour un hash (md5/crc/sha1, casse libre) - null
@@ -112,7 +115,7 @@ public sealed class RomCanonicalResolver : IScoreSlugResolver
         var byHash = new Dictionary<string, CanonicalGame>(StringComparer.Ordinal);
         var byName = new Dictionary<string, CanonicalGame>(StringComparer.Ordinal);
         var indexes = new DbIndexes(byHash, byName);
-        var groupsRoot = Path.Combine(RetroBatPaths.PluginRoot, "resources", "gamelist", "systems");
+        var groupsRoot = _racineDuReferentiel ?? Path.Combine(RetroBatPaths.PluginRoot, "resources", "gamelist", "systems");
         var dataPath = ResolveDataFile(groupsRoot, normalizedSystem);
         if (string.IsNullOrWhiteSpace(dataPath))
         {

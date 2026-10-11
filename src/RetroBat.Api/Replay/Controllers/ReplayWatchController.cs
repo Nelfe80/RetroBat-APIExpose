@@ -205,6 +205,14 @@ public sealed class ReplayWatchController : ControllerBase
     // permet d'agir, la phrase générique ne fait que nommer la cause.
     if (detail){ var d = document.createElement('p'); d.className = 'detail'; d.textContent = detail; msg.appendChild(d); }
   }
+  // La borne reconnaît d'abord le jeu à son nom et par son référentiel, sans rien lire d'autre. Cette recherche, elle,
+  // n'a lieu que si aucun de ses fichiers ne porte le nom de ce jeu : elle le cherche alors par son contenu.
+  function montrerLaRecherche(r){
+    progres(false, r.lus / r.total);
+    title.textContent = 'Recherche du jeu sur la borne…';
+    msg.textContent = 'Aucun fichier de la borne ne porte le nom de ce jeu : elle le cherche par son contenu ('
+      + r.lus + ' fichier(s) lu(s) sur ' + r.total + ').';
+  }
   var suivis = 0;
   function suivre(){
     fetch('/api/v1/replay/state', { cache:'no-store' }).then(function(r){ return r.json(); }).then(function(s){
@@ -224,11 +232,7 @@ public sealed class ReplayWatchController : ControllerBase
         }
         setTimeout(suivre, 500);
       } else if (st === 'verifying' && s.recherche && s.recherche.total > 0){
-        // La borne cherche le fichier exact du jeu parmi ses ROMs : la recherche se voit, fichier par fichier.
-        progres(false, s.recherche.lus / s.recherche.total);
-        title.textContent = 'Recherche du jeu sur la borne…';
-        msg.textContent = s.recherche.lus + ' fichier(s) lu(s) sur ' + s.recherche.total
-          + '. Sans le fichier exact, la borne lance le même jeu.';
+        montrerLaRecherche(s.recherche);
         setTimeout(suivre, 500);
       } else if (st === 'resolving' || st === 'verifying' || st === 'preparing' || st === 'launching'){
         progres(true, 0);
@@ -258,10 +262,7 @@ public sealed class ReplayWatchController : ControllerBase
     fetch('/api/v1/replay/state', { cache:'no-store' }).then(function(r){ return r.json(); }).then(function(s){
       if (guet === null) return;
       if (s.state === 'verifying' && s.recherche && s.recherche.total > 0){
-        progres(false, s.recherche.lus / s.recherche.total);
-        title.textContent = 'Recherche du jeu sur la borne…';
-        msg.textContent = s.recherche.lus + ' fichier(s) lu(s) sur ' + s.recherche.total
-          + '. Sans le fichier exact, la borne lance le même jeu.';
+        montrerLaRecherche(s.recherche);
       }
       guet = setTimeout(guetterLaRecherche, 500);
     }).catch(function(){ if (guet !== null) guet = setTimeout(guetterLaRecherche, 1000); });

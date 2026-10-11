@@ -112,6 +112,104 @@ public sealed class ReplayRomMatchTests : IDisposable
         Assert.Equal(0, aucun);
     }
 
+    /// <summary>
+    /// La borne reconnait d'abord le jeu, sans rien hacher (2026-10-11). Un replay de Double Dragon enregistre sur un
+    /// autre dump : elle lisait 190 des 1 960 fichiers de roms\fbneo pendant vingt secondes, puis lancait le ddragon.zip
+    /// qu'elle avait sous les yeux. Le referentiel des jeux (resources/gamelist/systems) dit quels fichiers sont le meme
+    /// jeu : toutes les versions d'un jeu y portent le meme groupe.
+    /// </summary>
+    [Fact]
+    public void Le_referentiel_dit_quels_fichiers_sont_le_meme_jeu_sans_rien_lire()
+    {
+        // Trois fiches comme celles de fbneo_lt.json : deux versions de Double Dragon, et sa suite.
+        File.WriteAllLines(Path.Combine(_dossier, "fbneo_lt.json"), new[]
+        {
+            """{"sys": "fbneo", "t": "game", "id": "ddragon", "set": "ddragon", "grp": "double_dragon", "fn": "Double Dragon (World set 1)", "n": "Double Dragon"}""",
+            """{"sys": "fbneo", "t": "game", "id": "ddragonu", "set": "ddragonu", "grp": "double_dragon", "fn": "Double Dragon (US set 1)", "n": "Double Dragon"}""",
+            """{"sys": "fbneo", "t": "game", "id": "ddragon2", "set": "ddragon2", "grp": "double_dragon_ii_-_the_revenge", "fn": "Double Dragon II - The Revenge (World)", "n": "Double Dragon II"}""",
+        });
+        var referentiel = new RetroBat.Api.Media.RomCanonicalResolver(racineDuReferentiel: _dossier);
+        string? JeuDe(string fichier) => referentiel.ResolveByRomName("fbneo", Path.GetFileName(fichier))?.GameKey;
+        // Le jeu du replay se retrouve par le nom que porte son manifeste (« fb-alpha/ddragon »).
+        var jeu = referentiel.ResolveByRomName("fbneo", "ddragon")?.GameKey;
+        Assert.Equal("fbneo/double-dragon", jeu);
+
+        var fichiers = new[]
+        {
+            @"E:\roms\fbneo\1942.zip", @"E:\roms\fbneo\ddragon2.zip", @"E:\roms\fbneo\ddragonu.zip",
+            @"E:\roms\fbneo\ddragon.zip", @"E:\roms\mame\ddragon.zip", @"E:\roms\fbneo\inconnu.zip",
+        };
+        // Les versions du meme jeu, tous dossiers confondus ; celles qui portent le nom du replay d'abord. Ni la
+        // suite du jeu, ni un fichier que le referentiel ne connait pas.
+        Assert.Equal(
+            new[] { @"E:\roms\fbneo\ddragon.zip", @"E:\roms\mame\ddragon.zip", @"E:\roms\fbneo\ddragonu.zip" },
+            ReplayRuntimeResolver.MemeJeu(jeu!, fichiers, JeuDe, "ddragon"));
+        Assert.Empty(ReplayRuntimeResolver.MemeJeu(jeu!, new[] { @"E:\roms\fbneo\ddragon2.zip" }, JeuDe, "ddragon"));
+    }
+
+    [Fact]
+    public void Les_fichiers_proches_se_comparent_dans_l_ordre_du_plus_sur_au_moins_sur_et_une_seule_fois()
+    {
+        var parNom = new[] { @"E:\roms\megadrive\Sonic The Hedgehog (USA, Europe).zip" };
+        var memeJeu = new[] { @"E:\roms\megadrive\Sonic The Hedgehog (USA, Europe).zip", @"E:\roms\megadrive\Sonic The Hedgehog (Japan).zip" };
+        var memeTitre = new[] { @"e:\roms\megadrive\sonic the hedgehog (japan).zip", @"E:\roms\megadrive\Sonic The Hedgehog (Beta).zip" };
+
+        Assert.Equal(
+            new[]
+            {
+                @"E:\roms\megadrive\Sonic The Hedgehog (USA, Europe).zip",
+                @"E:\roms\megadrive\Sonic The Hedgehog (Japan).zip",
+                @"E:\roms\megadrive\Sonic The Hedgehog (Beta).zip",
+            },
+            ReplayRuntimeResolver.Proches(parNom, memeJeu, memeTitre));
+        Assert.Empty(ReplayRuntimeResolver.Proches(Array.Empty<string>(), Array.Empty<string>()));
+    }
+
+    /// <summary>
+    /// En arcade, le coeur reconnait le jeu au nom de son archive : chercher le meme contenu sous un autre nom ne sert a
+    /// rien, et la borne ne lit jamais le dossier pour cela.
+    /// </summary>
+    [Theory]
+    [InlineData("fbneo", "fbneo", true)]
+    [InlineData("mame", "mame", true)]
+    [InlineData("arcade", null, true)]
+    [InlineData("neogeo", "fbneo", true)]
+    [InlineData("naomi", "mame2010", true)]
+    [InlineData("megadrive", "genesis_plus_gx", false)]
+    [InlineData("snes", "snes9x", false)]
+    [InlineData("megadrive", null, false)]
+    [InlineData(null, null, false)]
+    public void Seul_un_systeme_qui_n_attache_pas_le_jeu_au_nom_du_fichier_se_cherche_par_contenu(string? systeme, string? coeur, bool nomLie)
+        => Assert.Equal(nomLie, ReplayRuntimeResolver.NomLieAuJeu(systeme, coeur));
+
+    [Fact]
+    public void La_recherche_par_contenu_lit_d_abord_les_en_tetes_des_archives()
+    {
+        var contenu = new byte[] { 9, 8, 7, 6, 5 };
+        var zip = Path.Combine(_dossier, "Autre nom.zip");
+        using (var archive = ZipFile.Open(zip, ZipArchiveMode.Create))
+        {
+            using var s = archive.CreateEntry("jeu.md").Open();
+            s.Write(contenu);
+        }
+        var nu = Path.Combine(_dossier, "nu.md");
+        File.WriteAllBytes(nu, contenu);
+        var crc = Crc32(contenu);
+
+        // L'entree d'une archive se reconnait a son CRC sans lire le fichier ; un fichier nu n'a pas d'entree.
+        Assert.True(ReplayRuntimeResolver.PorteEntree(zip, crc));
+        Assert.False(ReplayRuntimeResolver.PorteEntree(nu, crc));
+        Assert.False(ReplayRuntimeResolver.PorteEntree(zip, string.Empty));
+        // Le fichier entier, lui : le fichier nu porte ce CRC, l'archive en porte un autre (celui du zip).
+        Assert.True(ReplayRuntimeResolver.PorteFichier(nu, crc, string.Empty, limiteOctets: 0));
+        Assert.False(ReplayRuntimeResolver.PorteFichier(zip, crc, string.Empty, limiteOctets: 0));
+        Assert.False(ReplayRuntimeResolver.PorteFichier(nu, crc, string.Empty, limiteOctets: 1));
+
+        var candidats = new[] { nu, zip };
+        Assert.Equal(zip, ReplayRuntimeResolver.FichierExact(candidats, f => ReplayRuntimeResolver.PorteEntree(f, crc), TimeSpan.FromMinutes(1), null, out var lus));
+        Assert.Equal(1, lus);
+    }
+
     private static string Crc32(byte[] data)
     {
         var table = new uint[256];

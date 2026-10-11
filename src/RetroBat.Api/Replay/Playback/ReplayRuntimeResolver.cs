@@ -82,14 +82,17 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
 
     private readonly Media.InstalledGameCatalog? _catalogue;
     private readonly Infrastructure.CabinetLocale? _locale;
+    private readonly Media.RomCanonicalResolver? _referentiel;
 
     public ReplayRuntimeResolver(EsSystemsRomPaths romPaths, Storage.IReplayManifestStore manifests,
         Storage.IReplayMetadataStore meta, ILogger<ReplayRuntimeResolver> logger,
         Media.InstalledGameCatalog? catalogue = null,
-        Infrastructure.CabinetLocale? locale = null)
+        Infrastructure.CabinetLocale? locale = null,
+        Media.RomCanonicalResolver? referentiel = null)
     {
         _romPaths = romPaths; _manifests = manifests; _meta = meta; _logger = logger; _catalogue = catalogue;
         _locale = locale;
+        _referentiel = referentiel;
     }
 
     /// <summary>
@@ -361,8 +364,15 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
         return null;
     }
 
-    // ROM : hint local (rapide) → le FICHIER EXACT dans le dossier ES du système → un AUTRE DUMP
-    // du même jeu (même groupe de scoring, sinon même nom), en prévenant → rien.
+    // ROM : hint local (rapide) → les fichiers qui peuvent être CE jeu, trouvés à leur NOM (dans le dossier du système
+    // et dans ses dossiers voisins) et par le RÉFÉRENTIEL des jeux (resources/gamelist/systems : toutes les versions d'un
+    // même jeu y portent le même groupe) → parmi eux le FICHIER EXACT, reconnu à son empreinte → sinon le plus proche
+    // d'entre eux, en prévenant → et seulement si la borne n'a AUCUN fichier de ce jeu, une recherche par contenu.
+    //
+    // AVANT LE 2026-10-11, la borne hachait le dossier pendant vingt secondes AVANT de regarder ce qu'elle
+    // reconnaissait. Un replay de Double Dragon enregistré sur un autre dump lui a fait lire 190 des 1 960 fichiers de
+    // roms\fbneo, pour lancer ensuite le ddragon.zip qu'elle avait sous les yeux. Les noms et le référentiel passent
+    // devant : ils ne coûtent que des noms de fichiers.
     //
     // Le fichier exact se reconnaît à l'empreinte que RetroArch a annoncée à l'enregistrement,
     // et RetroArch ne la calcule pas partout pareil : pour une console il extrait la ROM du zip
@@ -393,44 +403,72 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
             _logger.LogWarning("Replay : aucun dossier de ROMs utilisable pour {System} ({Dir}).", systeme, romDir ?? "non déclaré");
         }
 
-        // 1. Le fichier exact. Les fichiers qui portent le nom du jeu passent en premier : c'est
-        //    presque toujours l'un d'eux, et on évite de hacher tout un dossier d'arcade pour rien.
-        //    Les autres ne sont hachés que s'ils restent raisonnables (un .iso de 700 Mo n'est pas
-        //    un candidat sérieux pour un replay de borne).
+        // 1. Les fichiers qui portent le nom du jeu, ici et dans les dossiers voisins du même système (un jeu d'arcade
+        //    vit sous fbneo comme sous mame). C'est presque toujours l'un d'eux : quelques fichiers à lire, jamais un
+        //    dossier entier.
         var nomAttendu = NomDuJeu(manifest.Game.GameId);
-        var parNom = fichiers.Where(f => MemeNom(f, nomAttendu)).ToList();
-        if (crc.Length > 0 || sha.Length > 0)
+        var partout = fichiers.Concat(FichiersDesDossiersVoisins(systeme, romDir)).ToList();
+        var parNom = partout.Where(f => MemeNom(f, nomAttendu)).ToList();
+        var aUneEmpreinte = crc.Length > 0 || sha.Length > 0;
+        if (aUneEmpreinte)
         {
             foreach (var f in parNom) { if (PorteEmpreinte(f, crc, sha, limiteOctets: 0)) return f; }
-            var autres = fichiers.Where(f => !parNom.Contains(f)).ToList();
-            try
+        }
+
+        // 2. Le même jeu sous un autre nom : ce que le référentiel range dans le même jeu, puis ce qui en porte le
+        //    titre. Parmi eux le fichier exact, sinon le plus proche : le même nom, une autre version du jeu, un dump
+        //    du même groupe de scoring, le même titre. En arcade, un fichier du même nom suffit à conclure : le cœur
+        //    reconnaît le jeu au nom de son archive, le fichier exact ne peut pas être rangé sous un autre.
+        var nomLie = NomLieAuJeu(systeme, manifest.Runtime.CoreName);
+        var autre = parNom.FirstOrDefault();
+        var comment = "même nom";
+        if (autre is null || !nomLie)
+        {
+            var memeJeu = MemeJeuAuReferentiel(systeme, nomAttendu, crc, partout);
+            var memeTitre = fichiers.Where(f => MemeTitre(f, nomAttendu)).ToList();
+            if (aUneEmpreinte)
             {
-                var trouve = FichierExact(autres, crc, sha, BudgetDeRecherche,
-                    (lus, total) => _recherche = new RechercheDeRom(lus, total), out var lus);
-                if (trouve is not null) return trouve;
-                if (lus < autres.Count)
+                foreach (var f in Proches(memeJeu, memeTitre).Except(parNom, StringComparer.OrdinalIgnoreCase))
                 {
-                    _logger.LogInformation("Replay : fichier exact introuvable en {Secondes} s ({Lus} fichier(s) lus sur {Total} dans {Dir}), on lance le meme jeu.",
-                        BudgetDeRecherche.TotalSeconds, lus, autres.Count, romDir);
+                    if (PorteEmpreinte(f, crc, sha, limiteOctets: 0)) return f;
                 }
             }
-            finally
+            if (autre is null && memeJeu.Count > 0)
             {
-                _recherche = null;
+                (autre, comment) = (memeJeu[0], "même jeu au référentiel");
+            }
+            if (autre is null)
+            {
+                var duGroupe = DumpsDuMemeGroupe(manifest);
+                if (aUneEmpreinte)
+                {
+                    foreach (var f in duGroupe) { if (PorteEmpreinte(f, crc, sha, limiteOctets: 0)) return f; }
+                }
+                (autre, comment) = duGroupe.Count > 0 ? (duGroupe[0], "même groupe de scoring")
+                    : memeTitre.Count > 0 ? (memeTitre[0], "même titre")
+                    : (autre, comment);
             }
         }
 
-        // 2. Le même jeu, autrement : d'abord par son identité de scoring (système + contenu, tous
-        //    dossiers frontend confondus), sinon par son nom. On lance, et on dit pourquoi ça
-        //    peut dériver : c'est au joueur de juger, pas à la borne de refuser.
-        var autre = DumpDuMemeGroupe(manifest) ?? parNom.FirstOrDefault() ?? fichiers.FirstOrDefault(f => MemeTitre(f, nomAttendu));
+        // 3. Le même jeu, autrement. On lance, et on dit pourquoi ça peut dériver : c'est au joueur de juger, pas à la
+        //    borne de refuser.
         if (autre is not null)
         {
+            _logger.LogInformation("Replay : {Id} rejoué sur un autre fichier du même jeu ({Comment}) : {Rom}.", manifest.ReplayId, comment, autre);
             exacte = false;
             pourquoi = crc.Length > 0
                 ? string.Format(Texte("replay_rom_other_crc"), Path.GetFileName(autre), crc)
                 : string.Format(Texte("replay_rom_other"), Path.GetFileName(autre));
             return autre;
+        }
+
+        // 4. La borne n'a aucun fichier de ce jeu sous un nom qu'elle reconnaît. Reste le fichier exact rangé sous un
+        //    autre nom : il se cherche par son contenu, dans un budget. Jamais en arcade, où le cœur reconnaît le jeu
+        //    au nom de son archive : le même contenu sous un autre nom n'y lancerait pas ce jeu.
+        if (aUneEmpreinte && !nomLie)
+        {
+            var trouve = ChercherParContenu(fichiers, crc, sha, romDir);
+            if (trouve is not null) return trouve;
         }
 
         pourquoi = fichiers.Count == 0
@@ -441,11 +479,89 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
     }
 
     /// <summary>
-    /// LA RECHERCHE DU FICHIER EXACT A UN BUDGET (2026-10-10). Un replay de Ms. Pac-Man enregistre avec un autre dump :
-    /// la borne a relu les 1 963 fichiers (4,7 Go) du dossier fbneo pour un fichier qu'elle n'avait pas, trois minutes
-    /// quarante sur l'ecran de lecture, avant de lancer le dump du meme jeu. Passe le budget, la recherche s'arrete et la
-    /// suite est la meme : le dump du meme jeu, annonce comme tel (« ROM non identique »). En arcade, le coeur reconnait
-    /// de toute facon le jeu au nom de son zip : un fichier exact sous un autre nom n'y servirait pas.
+    /// Les fichiers à comparer à l'empreinte du replay, du plus sûr au moins sûr et sans doublon : ceux qui portent le
+    /// nom du jeu, ceux que le référentiel range dans le même jeu, ceux qui en portent le titre.
+    /// </summary>
+    internal static List<string> Proches(params IEnumerable<string>[] sources)
+        => sources.SelectMany(s => s).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
+    /// <summary>
+    /// Les fichiers des AUTRES dossiers du même système de scoring : un jeu d'arcade vit sous fbneo comme sous mame, et
+    /// un replay se lance par le chemin de sa ROM, d'où qu'elle vienne. Un dossier que deux systèmes partagent ne compte
+    /// qu'une fois.
+    /// </summary>
+    private List<string> FichiersDesDossiersVoisins(string? systeme, string? romDir)
+    {
+        var voisins = new List<string>();
+        if (string.IsNullOrWhiteSpace(systeme)) return voisins;
+        var vus = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (romDir is not null) vus.Add(CheminComplet(romDir));
+        foreach (var frontend in Media.RomCanonicalResolver.FrontendSystemsFor(Media.RomCanonicalResolver.CanonicalScoringSystem(systeme)))
+        {
+            var dir = _romPaths.DirectoryFor(frontend);
+            if (dir is null || !Directory.Exists(dir) || !vus.Add(CheminComplet(dir))) continue;
+            voisins.AddRange(ListerRoms(dir));
+        }
+        return voisins;
+    }
+
+    private static string CheminComplet(string dossier)
+    {
+        try { return Path.TrimEndingDirectorySeparator(Path.GetFullPath(dossier)); }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException) { return dossier; }
+    }
+
+    /// <summary>
+    /// LES FICHIERS DU MEME JEU, D'APRES LE REFERENTIEL (resources/gamelist/systems). Chaque fiche y porte le groupe de
+    /// son jeu : toutes les versions, régions et révisions d'un jeu ont le même. Le jeu du replay s'y retrouve par le
+    /// nom de son fichier (ou par son empreinte, pour une console), et chaque fichier de la borne par le sien. Aucune
+    /// ROM n'est lue : seuls des noms sont comparés. L'index est celui du dossier (fbneo, megadrive), sinon celui du
+    /// système de scoring (arcade) ; le même sert à tous les fichiers, pour que leurs groupes se comparent.
+    /// </summary>
+    private List<string> MemeJeuAuReferentiel(string? systeme, string nomAttendu, string crc, IReadOnlyList<string> fichiers)
+    {
+        if (_referentiel is null || string.IsNullOrWhiteSpace(systeme) || fichiers.Count == 0) return new List<string>();
+        try
+        {
+            foreach (var index in new[] { systeme, Media.RomCanonicalResolver.CanonicalScoringSystem(systeme) }.Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                var fiche = (nomAttendu.Length > 0 ? _referentiel.ResolveByRomName(index, nomAttendu) : null)
+                            ?? (crc.Length > 0 ? _referentiel.Resolve(index, crc) : null);
+                if (fiche is null) continue;
+                return MemeJeu(fiche.GameKey, fichiers, f => _referentiel.ResolveByRomName(index, Path.GetFileName(f))?.GameKey, nomAttendu);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
+        {
+            _logger.LogDebug(ex, "Replay : référentiel des jeux illisible pour {Systeme}.", systeme);
+        }
+        return new List<string>();
+    }
+
+    /// <summary>Parmi ces fichiers, ceux du jeu <paramref name="jeu"/> ; ceux qui portent le nom du replay d'abord.</summary>
+    internal static List<string> MemeJeu(string jeu, IEnumerable<string> fichiers, Func<string, string?> jeuDuFichier, string nomAttendu)
+        => fichiers.Where(f => string.Equals(jeuDuFichier(f), jeu, StringComparison.OrdinalIgnoreCase))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderByDescending(f => MemeNom(f, nomAttendu))
+            .ToList();
+
+    /// <summary>
+    /// Le cœur reconnaît-il le jeu au NOM de son archive ? C'est le cas de l'arcade (FBNeo, MAME) : le même contenu sous
+    /// un autre nom n'y lancerait pas ce jeu, et le chercher par contenu dans le dossier ne sert à rien.
+    /// </summary>
+    internal static bool NomLieAuJeu(string? systeme, string? coeur)
+    {
+        if (Media.RomCanonicalResolver.CanonicalScoringSystem(systeme ?? string.Empty) == "arcade") return true;
+        var nom = (coeur ?? string.Empty).Trim().ToLowerInvariant();
+        return nom.StartsWith("fbneo", StringComparison.Ordinal) || nom.StartsWith("fbalpha", StringComparison.Ordinal)
+               || nom.StartsWith("mame", StringComparison.Ordinal) || nom.StartsWith("hbmame", StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// LA RECHERCHE PAR CONTENU A UN BUDGET (2026-10-10), ET NE VIENT QU'EN DERNIER (2026-10-11). Un replay de Ms. Pac-Man
+    /// enregistré avec un autre dump : la borne a relu les 1 963 fichiers (4,7 Go) du dossier fbneo pour un fichier
+    /// qu'elle n'avait pas, trois minutes quarante sur l'écran de lecture. Le budget a ramené cette attente à vingt
+    /// secondes ; elle n'a plus lieu du tout quand la borne reconnaît le jeu à son nom ou par le référentiel, ni en arcade.
     /// </summary>
     internal static readonly TimeSpan BudgetDeRecherche = TimeSpan.FromSeconds(20);
 
@@ -455,10 +571,50 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
     public RechercheDeRom? RechercheEnCours => _recherche;
 
     /// <summary>
+    /// Le fichier exact rangé sous un autre nom, cherché par son contenu, en deux passes dans le même budget. D'abord
+    /// les en-têtes des archives : le CRC de chaque entrée s'y lit sans rien décompresser, et c'est lui que RetroArch
+    /// annonce pour une console. Puis les fichiers entiers, tant qu'il reste du temps.
+    /// </summary>
+    private string? ChercherParContenu(IReadOnlyList<string> fichiers, string crc, string sha, string? romDir)
+    {
+        var montre = System.Diagnostics.Stopwatch.StartNew();
+        try
+        {
+            if (crc.Length > 0)
+            {
+                var archives = fichiers.Where(f => f.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)).ToList();
+                var parEntree = FichierExact(archives, f => PorteEntree(f, crc), BudgetDeRecherche,
+                    (lus, total) => _recherche = new RechercheDeRom(lus, total), out _);
+                if (parEntree is not null) return parEntree;
+            }
+            var trouve = FichierExact(fichiers, f => PorteFichier(f, crc, sha, LimiteDUnFichierCherche), BudgetDeRecherche - montre.Elapsed,
+                (lus, total) => _recherche = new RechercheDeRom(lus, total), out var entiers);
+            if (trouve is null && entiers < fichiers.Count)
+            {
+                _logger.LogInformation("Replay : fichier exact introuvable en {Secondes} s ({Lus} fichier(s) lus en entier sur {Total} dans {Dir}).",
+                    BudgetDeRecherche.TotalSeconds, entiers, fichiers.Count, romDir);
+            }
+            return trouve;
+        }
+        finally
+        {
+            _recherche = null;
+        }
+    }
+
+    /// <summary>Au-delà, un fichier rangé sous un autre nom n'est pas lu en entier : un .iso de 700 Mo n'est pas un candidat sérieux.</summary>
+    private const long LimiteDUnFichierCherche = 256L * 1024 * 1024;
+
+    /// <summary>
     /// Le fichier exact parmi des candidats d'un autre nom, dans le budget ; null sinon. <paramref name="lus"/> dit combien
     /// ont ete lus : moins que le total, le budget s'est epuise. Un fichier commence est toujours lu jusqu'au bout.
     /// </summary>
     internal static string? FichierExact(IReadOnlyList<string> candidats, string crc, string sha, TimeSpan budget,
+        Action<int, int>? progression, out int lus)
+        => FichierExact(candidats, f => PorteEmpreinte(f, crc, sha, LimiteDUnFichierCherche), budget, progression, out lus);
+
+    /// <summary>La même recherche, avec la façon de reconnaître le fichier (une entrée d'archive, ou le fichier entier).</summary>
+    internal static string? FichierExact(IReadOnlyList<string> candidats, Func<string, bool> estLeBon, TimeSpan budget,
         Action<int, int>? progression, out int lus)
     {
         var montre = System.Diagnostics.Stopwatch.StartNew();
@@ -466,7 +622,7 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
         {
             if (montre.Elapsed >= budget) return null;
             progression?.Invoke(lus, candidats.Count);
-            if (PorteEmpreinte(candidats[lus], crc, sha, limiteOctets: 256L * 1024 * 1024)) return candidats[lus];
+            if (estLeBon(candidats[lus])) return candidats[lus];
         }
         return null;
     }
@@ -527,21 +683,24 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
         return titre.Length >= 4 && (nomAttendu == titre || nomAttendu.StartsWith(titre + "-", StringComparison.Ordinal));
     }
 
-    private string? DumpDuMemeGroupe(ReplayManifest manifest)
+    /// <summary>
+    /// Les dumps installés du même groupe de SCORING (la définition .MEM du jeu, quand le manifeste en nomme une), tous
+    /// dossiers frontend confondus. Plus lent que le référentiel (il relit les gamelists) : consulté seulement quand ni
+    /// le nom ni le référentiel n'ont rien donné.
+    /// </summary>
+    private List<string> DumpsDuMemeGroupe(ReplayManifest manifest)
     {
         var groupe = manifest.Game.RomGroup;
-        if (_catalogue is null || string.IsNullOrWhiteSpace(groupe)) return null;
+        if (_catalogue is null || string.IsNullOrWhiteSpace(groupe)) return new List<string>();
         try
         {
             var canonique = Media.RomCanonicalResolver.CanonicalScoringSystem(manifest.Game.SystemFolder ?? manifest.Game.SystemId);
-            var dump = _catalogue.DumpsOf(canonique, groupe).FirstOrDefault(j => File.Exists(j.AbsolutePath));
-            if (dump is not null) _logger.LogInformation("Replay : {Id} rejoué sur un autre dump du groupe {Groupe} : {Rom}.", manifest.ReplayId, groupe, dump.AbsolutePath);
-            return dump?.AbsolutePath;
+            return _catalogue.DumpsOf(canonique, groupe).Select(j => j.AbsolutePath).Where(File.Exists).ToList();
         }
         catch (Exception ex)
         {
             _logger.LogDebug(ex, "Replay : inventaire du groupe {Groupe} impossible.", groupe);
-            return null;
+            return new List<string>();
         }
     }
 
@@ -550,17 +709,29 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
     // le fichier entier n'est lu qu'ensuite (ce que RetroArch annonce pour l'arcade), et
     // seulement s'il reste sous la limite : 0 = pas de limite.
     internal static bool PorteEmpreinte(string path, string crc, string sha, long limiteOctets)
+        => PorteEntree(path, crc) || PorteFichier(path, crc, sha, limiteOctets);
+
+    /// <summary>Une entrée de cette archive zip porte-t-elle ce CRC ? Seul l'en-tête de l'archive est lu.</summary>
+    internal static bool PorteEntree(string path, string crc)
+    {
+        if (crc.Length == 0 || !path.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)) return false;
+        try
+        {
+            using var archive = ZipFile.OpenRead(path);
+            foreach (var e in archive.Entries)
+            {
+                if (e.Length > 0 && e.Crc32.ToString("x8", System.Globalization.CultureInfo.InvariantCulture) == crc) return true;
+            }
+            return false;
+        }
+        catch { return false; }
+    }
+
+    /// <summary>Le fichier ENTIER porte-t-il ce CRC ou ce SHA-256 ? Au-dessus de la limite il n'est pas lu (0 = pas de limite).</summary>
+    internal static bool PorteFichier(string path, string crc, string sha, long limiteOctets)
     {
         try
         {
-            if (crc.Length > 0 && path.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
-            {
-                using var archive = ZipFile.OpenRead(path);
-                foreach (var e in archive.Entries)
-                {
-                    if (e.Length > 0 && e.Crc32.ToString("x8", System.Globalization.CultureInfo.InvariantCulture) == crc) return true;
-                }
-            }
             var taille = new FileInfo(path).Length;
             if (limiteOctets > 0 && taille > limiteOctets) return false;
             using var fs = File.OpenRead(path);
