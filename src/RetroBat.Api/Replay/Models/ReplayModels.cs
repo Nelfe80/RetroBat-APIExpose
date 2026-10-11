@@ -30,7 +30,15 @@ public sealed record ReplayRuntime(
     // Le NOM du core libretro (« genesis_plus_gx »), portable : l'empreinte dit la version, le
     // nom dit lequel. Sans lui, une empreinte fausse laissait la lecture deviner (2048 pour un
     // replay de Sonic, 2026-09-17). Absent des manifestes anterieurs.
-    string? CoreName = null);
+    string? CoreName = null,
+    // LE CONTENU DE L'ARCHIVE (2026-10-11) : chaque fichier du zip de la ROM et son CRC, lus dans
+    // l'en-tete. Les empreintes du zip entier (crc32, rom_sha256) changent avec l'emballage : un
+    // meme jeu d'arcade zippe autrement passait pour un autre fichier. Absent des manifestes
+    // anterieurs et pour une ROM qui n'est pas un zip.
+    IReadOnlyList<ReplayRomFile>? RomFiles = null);
+
+/// <summary>Un fichier de l'archive de la ROM : son nom dans le zip et son CRC (8 chiffres hexadecimaux).</summary>
+public sealed record ReplayRomFile(string Name, string Crc32);
 
 public sealed record ReplayObjectRef(string Sha256, long Size);
 

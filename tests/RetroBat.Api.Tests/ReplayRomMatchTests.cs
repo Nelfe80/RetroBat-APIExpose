@@ -210,6 +210,109 @@ public sealed class ReplayRomMatchTests : IDisposable
         Assert.Equal(1, lus);
     }
 
+    // ── Le contenu de l'archive (2026-10-11) ──────────────────────────────────────────────────
+
+    /// <summary>Un zip d'arcade : ces fichiers, dans cet ordre, avec cette compression.</summary>
+    private string Zip(string nom, IEnumerable<(string Nom, byte[] Octets)> fichiers, CompressionLevel compression = CompressionLevel.Optimal)
+    {
+        var chemin = Path.Combine(_dossier, nom);
+        using (var archive = ZipFile.Open(chemin, ZipArchiveMode.Create))
+        {
+            foreach (var (fichier, octets) in fichiers)
+            {
+                using var s = archive.CreateEntry(fichier, compression).Open();
+                s.Write(octets);
+            }
+        }
+        return chemin;
+    }
+
+    private static readonly (string Nom, byte[] Octets)[] Parent =
+    {
+        ("21j-1-5.26", new byte[] { 1, 2, 3, 4 }), ("21j-2-3.25", new byte[] { 5, 6, 7, 8 }), ("21j-a.ic26", new byte[] { 9, 10, 11 }),
+    };
+
+    [Fact]
+    public void Le_contenu_d_un_zip_se_lit_dans_son_en_tete_trie_par_nom_sans_dossier_ni_fichier_vide()
+    {
+        var zip = Zip("ddragon.zip", Parent.Reverse().Append(("vide.bin", Array.Empty<byte>())).Append(("sous/", Array.Empty<byte>())));
+
+        var contenu = ContenuDArchive.Lire(zip);
+
+        Assert.NotNull(contenu);
+        Assert.Equal(new[] { "21j-1-5.26", "21j-2-3.25", "21j-a.ic26" }, contenu!.Select(f => f.Name));
+        Assert.Equal(Crc32(new byte[] { 1, 2, 3, 4 }), contenu[0].Crc32);
+        Assert.Null(ContenuDArchive.Lire(Path.Combine(_dossier, "absent.zip")));
+        var nu = Path.Combine(_dossier, "jeu.md");
+        File.WriteAllBytes(nu, new byte[] { 1 });
+        Assert.Null(ContenuDArchive.Lire(nu));
+    }
+
+    /// <summary>
+    /// Le cas du Double Dragon du 2026-10-11 : le meme jeu, zippe autrement, n'a pas la meme empreinte de fichier. Son
+    /// contenu, lui, est le meme : c'est le fichier exact, sans avertissement.
+    /// </summary>
+    [Fact]
+    public void Le_meme_jeu_zippe_autrement_est_le_fichier_exact()
+    {
+        var chezLui = Zip("ddragon-a.zip", Parent, CompressionLevel.Optimal);
+        var ici = Zip("ddragon-b.zip", Parent.Reverse(), CompressionLevel.NoCompression);
+        var enregistrement = ContenuDArchive.Lire(chezLui);
+        var crcDuZip = Crc32(File.ReadAllBytes(chezLui));
+
+        Assert.False(ReplayRuntimeResolver.PorteEmpreinte(ici, crcDuZip, string.Empty, limiteOctets: 0));
+        Assert.True(ContenuDArchive.MemeJeu(ici, enregistrement));
+        Assert.Equal(new ComparaisonDArchives(true, 0, 3), ContenuDArchive.Comparer(enregistrement, ContenuDArchive.Lire(ici)));
+    }
+
+    [Fact]
+    public void Un_set_fusionne_avec_ses_clones_et_un_set_separe_sont_le_meme_jeu_dans_les_deux_sens()
+    {
+        var fusionne = ContenuDArchive.Lire(Zip("fusionne.zip", Parent.Append(("ddragonu.26", new byte[] { 42, 43 }))));
+        var separe = ContenuDArchive.Lire(Zip("separe.zip", Parent));
+
+        Assert.True(ContenuDArchive.Comparer(fusionne, separe)!.Meme);
+        Assert.True(ContenuDArchive.Comparer(separe, fusionne)!.Meme);
+    }
+
+    [Fact]
+    public void Une_autre_version_du_jeu_dit_combien_de_fichiers_different()
+    {
+        var enregistrement = ContenuDArchive.Lire(Zip("rev-a.zip", Parent));
+        var revisionB = ContenuDArchive.Lire(Zip("rev-b.zip", Parent.Take(2).Append(("21j-a.ic26", new byte[] { 99, 98, 97 }))));
+        var autreJeu = ContenuDArchive.Lire(Zip("autre.zip", new[] { ("x.bin", new byte[] { 7, 7, 7 }) }));
+
+        Assert.Equal(new ComparaisonDArchives(false, 1, 3), ContenuDArchive.Comparer(enregistrement, revisionB));
+        Assert.Equal(new ComparaisonDArchives(false, 3, 3), ContenuDArchive.Comparer(enregistrement, autreJeu));
+        // Un manifeste d'avant ce changement ne dit pas ses fichiers : rien a comparer, l'empreinte du zip reste seule juge.
+        Assert.Null(ContenuDArchive.Comparer(null, revisionB));
+        Assert.False(ContenuDArchive.MemeJeu(Path.Combine(_dossier, "rev-b.zip"), null));
+    }
+
+    [Fact]
+    public void Le_manifeste_porte_les_fichiers_de_l_archive_et_un_ancien_manifeste_se_relit_sans_eux()
+    {
+        var racine = Path.Combine(_dossier, "magasin");
+        var magasin = new RetroBat.Api.Replay.Storage.ReplayStore(Microsoft.Extensions.Logging.Abstractions.NullLogger<RetroBat.Api.Replay.Storage.ReplayStore>.Instance, racine);
+        var fichiers = ContenuDArchive.Lire(Zip("ddragon.zip", Parent));
+        RetroBat.Api.Replay.Models.ReplayManifest Manifeste(string id, IReadOnlyList<RetroBat.Api.Replay.Models.ReplayRomFile>? rom) => new(
+            RetroBat.Api.Replay.Models.ReplayManifest.SchemaId, id, "sess_x",
+            new RetroBat.Api.Replay.Models.ReplayGame("fb-alpha/ddragon", "fb_alpha", "double-dragon", null, "caefab07", "fbneo"),
+            DateTime.UtcNow, "home",
+            new RetroBat.Api.Replay.Models.ReplayRuntime("nelfe-fb-alpha-r1", "1.22.2", "a", "b", null, null, "bsv", "fbneo", rom),
+            new RetroBat.Api.Replay.Models.ReplayObjectRef(new string('c', 64), 10),
+            new RetroBat.Api.Replay.Models.ReplayFrames(0, null, null, 100, 59.1),
+            null, new RetroBat.Api.Replay.Models.ReplayRecovery(false));
+
+        magasin.SaveManifest(Manifeste("rp_avec", fichiers));
+        magasin.SaveManifest(Manifeste("rp_sans", null));
+
+        Assert.Contains("\"rom_files\"", File.ReadAllText(magasin.ManifestPath("rp_avec")));
+        Assert.DoesNotContain("rom_files", File.ReadAllText(magasin.ManifestPath("rp_sans")));
+        Assert.Equal(fichiers, magasin.GetManifest("rp_avec")!.Runtime.RomFiles);
+        Assert.Null(magasin.GetManifest("rp_sans")!.Runtime.RomFiles);
+    }
+
     private static string Crc32(byte[] data)
     {
         var table = new uint[256];

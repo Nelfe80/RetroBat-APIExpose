@@ -92,6 +92,7 @@ public class CabinetAnnounceTextTests
     [InlineData("replay_core_other_local")]
     [InlineData("replay_rom_other")]
     [InlineData("replay_rom_other_crc")]
+    [InlineData("replay_rom_other_files")]
     public void Les_bandeaux_du_replay_sont_traduits_avec_les_memes_trous(string cle)
     {
         // Ces textes etaient ecrits en dur en francais : une borne en anglais lisait

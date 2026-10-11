@@ -652,7 +652,9 @@ public sealed class ReplayRecorderService : BackgroundService
             BiosSha256: null,                        // TODO : par-système, seulement quand un BIOS est requis
             CoreOptionsDigest: null,                 // TODO : sous-ensemble DÉTERMINISTE des core options (pas les options cosmétiques)
             ReplayFormat: "bsv",
-            CoreName: string.IsNullOrEmpty(hint?.Core) ? null : hint!.Core);
+            CoreName: string.IsNullOrEmpty(hint?.Core) ? null : hint!.Core,
+            // Les fichiers du zip et leurs CRC : une autre borne reconnait ainsi le meme jeu zippe autrement.
+            RomFiles: Playback.ContenuDArchive.Lire(hint?.RomPath));
 
         var (fps, fpsSource) = ResolveFps(rec);
         var frames = new ReplayFrames(

@@ -409,10 +409,14 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
         var nomAttendu = NomDuJeu(manifest.Game.GameId);
         var partout = fichiers.Concat(FichiersDesDossiersVoisins(systeme, romDir)).ToList();
         var parNom = partout.Where(f => MemeNom(f, nomAttendu)).ToList();
-        var aUneEmpreinte = crc.Length > 0 || sha.Length > 0;
+        // Le fichier exact : le meme contenu d'archive (lu dans son en-tete, et vrai quel que soit l'emballage), sinon
+        // la meme empreinte de fichier (ce qui oblige a lire le fichier entier).
+        var contenu = manifest.Runtime.RomFiles;
+        var aUneEmpreinte = crc.Length > 0 || sha.Length > 0 || contenu is { Count: > 0 };
+        bool EstLeFichier(string f) => ContenuDArchive.MemeJeu(f, contenu) || PorteEmpreinte(f, crc, sha, limiteOctets: 0);
         if (aUneEmpreinte)
         {
-            foreach (var f in parNom) { if (PorteEmpreinte(f, crc, sha, limiteOctets: 0)) return f; }
+            foreach (var f in parNom) { if (EstLeFichier(f)) return f; }
         }
 
         // 2. Le même jeu sous un autre nom : ce que le référentiel range dans le même jeu, puis ce qui en porte le
@@ -430,7 +434,7 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
             {
                 foreach (var f in Proches(memeJeu, memeTitre).Except(parNom, StringComparer.OrdinalIgnoreCase))
                 {
-                    if (PorteEmpreinte(f, crc, sha, limiteOctets: 0)) return f;
+                    if (EstLeFichier(f)) return f;
                 }
             }
             if (autre is null && memeJeu.Count > 0)
@@ -442,7 +446,7 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
                 var duGroupe = DumpsDuMemeGroupe(manifest);
                 if (aUneEmpreinte)
                 {
-                    foreach (var f in duGroupe) { if (PorteEmpreinte(f, crc, sha, limiteOctets: 0)) return f; }
+                    foreach (var f in duGroupe) { if (EstLeFichier(f)) return f; }
                 }
                 (autre, comment) = duGroupe.Count > 0 ? (duGroupe[0], "même groupe de scoring")
                     : memeTitre.Count > 0 ? (memeTitre[0], "même titre")
@@ -456,16 +460,21 @@ public sealed class ReplayRuntimeResolver : IReplayRuntimeResolver
         {
             _logger.LogInformation("Replay : {Id} rejoué sur un autre fichier du même jeu ({Comment}) : {Rom}.", manifest.ReplayId, comment, autre);
             exacte = false;
-            pourquoi = crc.Length > 0
-                ? string.Format(Texte("replay_rom_other_crc"), Path.GetFileName(autre), crc)
-                : string.Format(Texte("replay_rom_other"), Path.GetFileName(autre));
+            // Quand l'enregistrement dit ses fichiers, l'avertissement dit combien different ici : une vraie autre version
+            // se distingue d'un emballage different (qui, lui, a ete reconnu plus haut comme le fichier exact).
+            var ecart = ContenuDArchive.Comparer(contenu, ContenuDArchive.Lire(autre));
+            pourquoi = ecart is { Total: > 0 }
+                ? string.Format(Texte("replay_rom_other_files"), Path.GetFileName(autre), ecart.Differents, ecart.Total)
+                : crc.Length > 0
+                    ? string.Format(Texte("replay_rom_other_crc"), Path.GetFileName(autre), crc)
+                    : string.Format(Texte("replay_rom_other"), Path.GetFileName(autre));
             return autre;
         }
 
         // 4. La borne n'a aucun fichier de ce jeu sous un nom qu'elle reconnaît. Reste le fichier exact rangé sous un
         //    autre nom : il se cherche par son contenu, dans un budget. Jamais en arcade, où le cœur reconnaît le jeu
         //    au nom de son archive : le même contenu sous un autre nom n'y lancerait pas ce jeu.
-        if (aUneEmpreinte && !nomLie)
+        if ((crc.Length > 0 || sha.Length > 0) && !nomLie)
         {
             var trouve = ChercherParContenu(fichiers, crc, sha, romDir);
             if (trouve is not null) return trouve;
