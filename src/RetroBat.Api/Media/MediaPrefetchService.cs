@@ -359,11 +359,8 @@ public class MediaPrefetchService : IMediaPrefetchService
         if ((mediaContentChanged || visibleSlotResolved || gamelistMetadataChanged) && !remoteDecision.LivePushed)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (allowRemoteScrape && !IsRemoteScrapeAttempted(remoteDecision))
-            {
-                await NotifyLocalScrapeStartedAsync(plan, cancellationToken);
-            }
-
+            // Aucune annonce « Scraping (FL) » ici (regle user 2026-10-04, redite le 2026-10-13) : la fiche se
+            // met a jour depuis des medias deja locaux, il n'y a rien a annoncer au joueur.
             var livePushed = await _gamelistUpdateService.PushLiveGameUpdateToEsAsync(
                 plan,
                 cancellationToken,
@@ -617,22 +614,6 @@ public class MediaPrefetchService : IMediaPrefetchService
         await _projectionService.ApplyProjectionAsync(plan, cancellationToken);
 
         return new LocalProjectionPreparation(plan, systemId, gameSlug, hadMissingLiveRefreshMediaAtSelection);
-    }
-
-    private async Task NotifyLocalScrapeStartedAsync(MediaProjectionPlan plan, CancellationToken cancellationToken)
-    {
-        if (!_gamelistUpdateService.IsCurrentlySelectedGame(plan))
-        {
-            return;
-        }
-
-        var language = (_settingsService.GetScrapingSettings().Language ?? string.Empty).Trim();
-        var gameName = EsNotificationText.ShortGameName(!string.IsNullOrWhiteSpace(plan.DisplayName) ? plan.DisplayName.Trim() : plan.GameSlug);
-        var message = _interfaceTextService.Format(
-            "notification.local.scrape_started",
-            language,
-            ("game", gameName));
-        await _notificationService.NotifyAsync(message, cancellationToken);
     }
 
     private static bool IsRemoteScrapeAttempted(RemoteScrapeDecision decision)
