@@ -39,12 +39,14 @@ public sealed class ReplayVideoPublisher
         var credential = _devices.GetCredential();
         if (string.IsNullOrEmpty(credential)) return new Rapport(0, 0, new[] { "borne non appairee" });
 
+        // Demander la liste suffit au site pour finaliser les films deja envoyes (visibilite, playlist) :
+        // une limite de 0 ne fait que cela.
         var cibles = await CiblesAsync(credential, ct).ConfigureAwait(false);
         var details = new List<string>();
         var envoyees = 0;
         foreach (var cible in cibles)
         {
-            if (envoyees >= Math.Max(1, limite)) break;
+            if (envoyees >= limite) break;
             var manifest = _manifests.GetManifest(cible.ReplayId);
             if (manifest is null || !_objects.HasObject(manifest.Object.Sha256))
             {

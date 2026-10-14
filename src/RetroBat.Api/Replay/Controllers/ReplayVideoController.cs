@@ -58,7 +58,7 @@ public sealed class ReplayVideoController : ControllerBase
     public async Task<IActionResult> Publish([FromBody] PublicationRequest? req, CancellationToken ct)
     {
         if (!IsLocalCaller()) return NotFound();
-        var r = await _publication.PublierAsync(req?.Limite ?? 1, ct).ConfigureAwait(false);
+        var r = await _publication.PublierAsync(Math.Max(0, req?.Limite ?? 1), ct).ConfigureAwait(false);
         return Ok(new { targets = r.Cibles, sent = r.Envoyees, details = r.Details });
     }
 }
