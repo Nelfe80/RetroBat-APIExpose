@@ -82,20 +82,21 @@ public sealed class PiloteDuRenduTests
     }
 }
 
-/// <summary>Le profil de l'instance de rendu reprend les reglages mesures au lot 0 (CDC video V2, §4.2).</summary>
+/// <summary>Le profil de l'instance de rendu : capture de l'image affichee (decision du 14 octobre, CDC video V2 §4.2).</summary>
 public sealed class ProfilDeRenduTests
 {
     [Fact]
-    public void Le_profil_filme_l_image_du_coeur_agrandie_sans_toucher_aux_parties()
+    public void Le_profil_filme_l_image_affichee_sans_toucher_aux_parties()
     {
         var profil = ReplayVideoRenderer.ProfilDeRendu(@"C:\rendu\sauvegardes", @"C:\rendu\films");
         Assert.Contains("network_cmd_port = \"55400\"", profil);
-        Assert.Contains("video_gpu_record = \"false\"", profil);
-        Assert.Contains("video_record_scale_factor = \"4\"", profil);
+        Assert.Contains("video_driver = \"gl\"", profil);
+        Assert.Contains("video_gpu_record = \"true\"", profil);
+        Assert.Contains("video_scale_integer = \"true\"", profil);
+        Assert.Contains("video_smooth = \"false\"", profil);
         Assert.Contains(@"recording_output_directory = ""C:\rendu\films""", profil);
         Assert.Contains("audio_mute_enable = \"true\"", profil);
         Assert.Contains("config_save_on_exit = \"false\"", profil);
         Assert.Contains(@"savefile_directory = ""C:\rendu\sauvegardes""", profil);
-        Assert.DoesNotContain("video_driver", profil);
     }
 }

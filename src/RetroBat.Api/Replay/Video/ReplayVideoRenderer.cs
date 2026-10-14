@@ -11,10 +11,10 @@ namespace RetroBat.Api.Replay.Video;
 /// <summary>
 /// LE RENDU VIDEO D'UN REPLAY (CDC video V2, §4). Rejoue le replay avec le vrai coeur, sans wrapper donc sans
 /// scoring, en avance rapide, et n'enregistre que la performance : de son debut a sa fin, en frames du replay.
-/// L'image est agrandie x4 sans lissage (YouTube garde ainsi les pixels), le son du jeu est garde dans le film et
-/// coupe en sortie, la fenetre reste reduite : la borne peut etre devant quelqu'un.
+/// L'image est celle qu'affiche RetroArch (redressee pour un jeu vertical), agrandie sans lissage ; le son du jeu
+/// est garde dans le film et coupe en sortie, la fenetre reste reduite : la borne peut etre devant quelqu'un.
 ///
-/// Reglages mesures au lot 0 (14 octobre 2026) : 32 a 44 s de rendu pour 2 min de jeu sur la borne, film net.
+/// Mesure du 14 octobre 2026 : environ le temps reel de la performance, de 1 a 1,5 fois selon le jeu.
 /// Aucune ROM, aucun coeur ne quittent la machine ; le film reste dans la zone de travail du magasin des replays,
 /// a la charge de l'appelant.
 /// </summary>
@@ -109,10 +109,10 @@ public sealed class ReplayVideoRenderer
         psi.ArgumentList.Add("--appendconfig"); psi.ArgumentList.Add(session);
 
         var chrono = Stopwatch.StartNew();
-        // Le temps accorde : la performance en temps reel, plus de quoi charger et sortir. L'avance rapide
-        // fait trois a quatre fois mieux, ce plafond ne sert qu'a ne jamais rester bloque.
+        // Le temps accorde : la capture de l'image affichee tourne entre une et une fois et demie le temps reel
+        // de la performance (mesure du 14 octobre) ; ce plafond ne sert qu'a ne jamais rester bloque.
         var fps = manifest.Frames.NominalFps > 1 ? manifest.Frames.NominalFps : 60;
-        var plafond = TimeSpan.FromSeconds((fin - debut + debut / 4.0) / fps * 1.5 + 120);
+        var plafond = TimeSpan.FromSeconds((fin - debut + debut / 2.0) / fps * 2.5 + 120);
         var pilote = new PiloteDuRendu(debut, fin);
         using var udp = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
 
@@ -207,17 +207,23 @@ public sealed class ReplayVideoRenderer
             Ligne("video_allow_rotate", "true"),
             Ligne("network_cmd_enable", "true"),
             Ligne("network_cmd_port", PortDeCommande.ToString(System.Globalization.CultureInfo.InvariantCulture)),
-            // Le film : l'image du coeur (pas celle de l'ecran), agrandie x4 sans lissage.
-            Ligne("video_gpu_record", "false"),
+            // Le film : l'image AFFICHEE, deja redressee par RetroArch (decision du 14 octobre). L'image du
+            // coeur, elle, est couchee pour un jeu vertical (Ms. Pac-Man, 19XX) et ses proportions etaient
+            // fausses dans le fichier. La lecture de l'image affichee n'existe qu'avec OpenGL (D3D11 refuse :
+            // « Failed to get viewport information ») ; agrandissement entier sans lissage, fenetre de 4 fois
+            // la taille du jeu, pixels carres. Mesure : 1280x960 pour Double Dragon, 648x864 pour Ms. Pac-Man.
+            Ligne("video_driver", "gl"),
+            Ligne("video_gpu_record", "true"),
             Ligne("video_post_filter_record", "false"),
-            Ligne("video_record_scale_factor", "4"),
+            Ligne("video_record_scale_factor", "1"),
+            Ligne("video_scale", "4"),
+            Ligne("video_scale_integer", "true"),
+            Ligne("video_smooth", "false"),
             Ligne("recording_output_directory", films),
-            // Discretion : fenetre reduite hors de l'ecran, son coupe en sortie (le film le garde).
+            // Discretion : fenetre reduite (l'enregistrement continue), son coupe en sortie (le film le garde).
             Ligne("video_fullscreen", "false"),
             Ligne("video_windowed_fullscreen", "false"),
-            Ligne("video_window_save_positions", "true"),
-            Ligne("window_position_x", "-3200"),
-            Ligne("window_position_y", "-3200"),
+            Ligne("video_window_save_positions", "false"),
             Ligne("audio_mute_enable", "true"),
             Ligne("pause_nonactive", "false"),
             Ligne("menu_pause_libretro", "false"),
