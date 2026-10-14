@@ -579,6 +579,8 @@ builder.Services.AddHostedService<RetroBat.Api.Infrastructure.ScoreShotService>(
 // et c'est la seule facon de rattraper les records deja publies. Jamais automatique : la
 // relecture prend l'ecran.
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.ScoreShotRegenerator>();
+// Le rendu video d'un replay (CDC video V2, §4) : vrai coeur, avance rapide, film agrandi x4.
+builder.Services.AddSingleton<RetroBat.Api.Replay.Video.ReplayVideoRenderer>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Social.SocialIssuerPin>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Social.ReplaySocialStore>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Social.ReplaySocialFeedService>();

@@ -204,6 +204,31 @@ public static class EmulatorForeground
     }
 
     /// <summary>
+    /// GARDE UNE FENETRE EN RETRAIT : le rendu video d'un replay (CDC video V2, §4.2) tourne pendant que la
+    /// borne peut etre devant quelqu'un. Sa fenetre est reduite sans prendre le premier plan, et de nouveau a
+    /// chaque appel : demarrer reduit ne suffit pas toujours (Bubble Bobble restait visible, 2026-10-14).
+    /// Rend vrai si la fenetre existe.
+    /// </summary>
+    public static bool GarderEnRetrait(Process process)
+    {
+        try
+        {
+            process.Refresh();
+            var fenetre = process.MainWindowHandle;
+            if (fenetre == IntPtr.Zero) return false;
+            if (!IsIconic(fenetre)) ShowWindow(fenetre, SwShowMinNoActive);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>Reduite, sans activer la fenetre ni prendre le premier plan.</summary>
+    private const int SwShowMinNoActive = 7;
+
+    /// <summary>
     /// Le premier emulateur de la liste qui a une fenetre, devant ou non, en UN parcours des
     /// processus ; null s'il n'y en a pas encore.
     ///
