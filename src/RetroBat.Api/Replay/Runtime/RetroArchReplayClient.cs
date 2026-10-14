@@ -31,6 +31,8 @@ public sealed class RetroArchReplayClient
 
     public RetroArchReplayClient(ILogger<RetroArchReplayClient> logger) => _logger = logger;
 
+    private string? _coeurDejaSignale;
+
     // Commandes d'action (RetroArch ne répond pas).
     public Task RecordAsync(CancellationToken ct) => FireAsync("RECORD_REPLAY", ct);
     public Task HaltAsync(CancellationToken ct) => FireAsync("HALT_REPLAY", ct);
@@ -53,6 +55,18 @@ public sealed class RetroArchReplayClient
 
     public async Task<RaStatus?> GetStatusAsync(CancellationToken ct)
     {
+        // GET_STATUS fait planter RetroArch 1.22.2 avec un coeur sans identifiant de systeme (GardeGetStatus).
+        if (!GardeGetStatus.SansDanger())
+        {
+            var evite = GardeGetStatus.CoeurEvite;
+            if (evite is not null && evite != _coeurDejaSignale)
+            {
+                _coeurDejaSignale = evite;
+                _logger.LogWarning("RetroArch : GET_STATUS evite, le coeur {Coeur} n'a pas d'identifiant de systeme dans son .info "
+                    + "(RetroArch 1.22.2 planterait) ; pas de replay pour cette partie.", evite);
+            }
+            return null;
+        }
         var r = await QueryAsync("GET_STATUS", ct).ConfigureAwait(false);
         if (r is null) return null;
         // "GET_STATUS PLAYING mega_drive,Jeu (USA, Europe),crc32=f9394e97"  (le nom peut contenir des virgules)

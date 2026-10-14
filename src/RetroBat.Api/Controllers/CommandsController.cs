@@ -254,6 +254,16 @@ public class CommandsController : ControllerBase
         var host = string.IsNullOrWhiteSpace(payload.Host) ? RetroArchHost : payload.Host.Trim();
         var port = payload.Port > 0 ? payload.Port : RetroArchPort;
         var commandText = payload.Command.Trim();
+        // GET_STATUS fait planter RetroArch 1.22.2 avec un coeur sans identifiant de systeme.
+        if (commandText.StartsWith("GET_STATUS", StringComparison.Ordinal) && !RetroBat.Api.Replay.Runtime.GardeGetStatus.SansDanger())
+        {
+            return Ok(new
+            {
+                status = "skipped",
+                command = commandText,
+                reason = "core without system id (RetroArch 1.22.2 would crash)",
+            });
+        }
 
         using var udp = new UdpClient();
         udp.Client.ReceiveTimeout = Math.Max(1, payload.TimeoutMs);

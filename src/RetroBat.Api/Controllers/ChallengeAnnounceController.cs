@@ -221,6 +221,9 @@ public sealed class ChallengeAnnounceController : ControllerBase
 
     private static async Task<string> SendRetroArchUdpAsync(string command, bool expectResponse)
     {
+        // GET_STATUS fait planter RetroArch 1.22.2 avec un coeur sans identifiant de systeme.
+        if (command.StartsWith("GET_STATUS", StringComparison.Ordinal) && !RetroBat.Api.Replay.Runtime.GardeGetStatus.SansDanger())
+            return string.Empty;
         using var udp = new UdpClient();
         var bytes = Encoding.UTF8.GetBytes(command);
         await udp.SendAsync(bytes, bytes.Length, "127.0.0.1", 55355);

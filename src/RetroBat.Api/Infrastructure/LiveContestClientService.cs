@@ -863,6 +863,9 @@ public sealed class LiveContestClientService : BackgroundService
 
     private static async Task<string> SendRetroArchAsync(string command, bool expectResponse)
     {
+        // GET_STATUS fait planter RetroArch 1.22.2 avec un coeur sans identifiant de systeme.
+        if (command.StartsWith("GET_STATUS", StringComparison.Ordinal) && !RetroBat.Api.Replay.Runtime.GardeGetStatus.SansDanger())
+            return string.Empty;
         try
         {
             using var udp = new UdpClient();

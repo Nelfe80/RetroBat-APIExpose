@@ -158,3 +158,30 @@ public sealed class ReplayCaptureTests
         Assert.Equal("a = \"1\"\nvideo_record_scale_factor = \"4\"\n", sans);
     }
 }
+
+/// <summary>GET_STATUS evite quand le coeur charge n'a pas d'identifiant de systeme (plantage de RetroArch 1.22.2).</summary>
+public sealed class GardeGetStatusTests
+{
+    [Fact]
+    public void Le_coeur_charge_se_lit_dans_le_journal_de_lancement()
+    {
+        string[] journal =
+        [
+            "[INFO] RetroArch 1.22.2 (Git 69a4f0e)",
+            @"[INFO] [Core] Loading dynamic libretro core from: ""H:\RetroBat\emulators\retroarch\core_proxy\amiberry_libretro.dll"".",
+            "[INFO] [Environ] SET_MEMORY_MAPS.",
+        ];
+        Assert.Equal(@"H:\RetroBat\emulators\retroarch\core_proxy\amiberry_libretro.dll",
+            RetroBat.Api.Replay.Runtime.GardeGetStatus.CoeurDuJournal(journal));
+        Assert.Null(RetroBat.Api.Replay.Runtime.GardeGetStatus.CoeurDuJournal(["[INFO] RetroArch 1.22.2 (Git 69a4f0e)"]));
+    }
+
+    [Fact]
+    public void Un_info_sans_identifiant_de_systeme_rend_get_status_dangereux()
+    {
+        Assert.True(RetroBat.Api.Replay.Runtime.GardeGetStatus.DeclareUnSysteme("display_name = \"Amiga (PUAE)\"\nsystemid = \"commodore_amiga\"\n"));
+        Assert.False(RetroBat.Api.Replay.Runtime.GardeGetStatus.DeclareUnSysteme("display_name = \"Amiga (Amiberry)\"\n"));
+        Assert.False(RetroBat.Api.Replay.Runtime.GardeGetStatus.DeclareUnSysteme("systemid = \"\"\n"));
+        Assert.False(RetroBat.Api.Replay.Runtime.GardeGetStatus.DeclareUnSysteme(null));
+    }
+}
