@@ -44,9 +44,12 @@ public sealed class ReplayVideoPublisher
         var cibles = await CiblesAsync(credential, ct).ConfigureAwait(false);
         var details = new List<string>();
         var envoyees = 0;
+        var rendus = 0;
         foreach (var cible in cibles)
         {
-            if (envoyees >= limite) break;
+            // La limite compte les rendus TENTES, pas les envois reussis : un site qui refuse ne doit pas
+            // faire filmer toute la liste (vecu le 14 octobre, une erreur du site et dix rendus de suite).
+            if (rendus >= limite) break;
             var manifest = _manifests.GetManifest(cible.ReplayId);
             if (manifest is null || !_objects.HasObject(manifest.Object.Sha256))
             {
@@ -54,6 +57,7 @@ public sealed class ReplayVideoPublisher
                 continue;
             }
 
+            rendus++;
             var film = await _rendu.RendreAsync(cible.ReplayId, cible.Debut, cible.Fin, ct).ConfigureAwait(false);
             if (!film.Ok || film.Fichier is null)
             {
@@ -66,8 +70,10 @@ public sealed class ReplayVideoPublisher
                 var videoId = await EnvoyerAsync(credential, cible.ReplayId, film.Fichier, ct).ConfigureAwait(false);
                 if (videoId is null)
                 {
+                    // Session refusee par le site ou envoi refuse par Google : on s'arrete la, le prochain
+                    // passage reprendra.
                     details.Add(cible.ReplayId + " : envoi refuse");
-                    continue;
+                    break;
                 }
                 var confirme = await PosterAsync(credential, "videos/complete", new JsonObject
                 {
