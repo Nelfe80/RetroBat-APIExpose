@@ -162,6 +162,51 @@ public sealed class ReplayCaptureTests
         Assert.StartsWith(ReplayCaptureService.PrefixeSansReplay, relue.ReplayId);
     }
 
+    [Theory]
+    // Le plus petit facteur entier qui porte le petit cote a 720 lignes (YouTube : 60 images par seconde au-dela).
+    [InlineData(256, 224, 4)]   // arcade, Mega Drive, Super Nintendo : 896 lignes
+    [InlineData(256, 240, 3)]   // NES, Double Dragon : 720 lignes
+    [InlineData(224, 384, 4)]   // 19XX sous MAME, deja vertical : 896 de large
+    [InlineData(160, 144, 5)]   // Game Boy : 800x720
+    [InlineData(240, 160, 5)]   // Game Boy Advance : 1200x800
+    [InlineData(160, 102, 8)]   // Lynx : 1280x816
+    [InlineData(640, 480, 2)]   // haute definition : 1280x960
+    [InlineData(1280, 720, 1)]
+    [InlineData(96, 64, 8)]     // Pokemon Mini : plafonne a x8
+    [InlineData(0, 0, 4)]       // inconnu : x4
+    public void Le_facteur_du_film_atteint_720_lignes_au_plus_juste(int largeur, int hauteur, int attendu)
+        => Assert.Equal(attendu, EchelleDesFilms.Facteur(largeur, hauteur));
+
+    [Fact]
+    public void La_definition_du_jeu_se_lit_dans_le_journal_de_lancement()
+    {
+        string[] journal =
+        [
+            "[INFO] [Content] Content loading skipped. Implementation will load it on its own.",
+            "[INFO] [Core] Geometry: 224x384, Aspect: 0.750, FPS: 59.64, Sample rate: 48000.00 Hz.",
+            "[INFO] [Video] Set video size to: 1920x1200.",
+        ];
+        Assert.Equal((224, 384), EchelleDesFilms.GeometrieDuJournal(journal));
+        Assert.Null(EchelleDesFilms.GeometrieDuJournal(["[INFO] [Video] Set video size to: 1920x1200."]));
+    }
+
+    [Fact]
+    public void Le_jeu_lance_se_lit_dans_les_arguments_du_script_game_start()
+    {
+        Assert.Equal(("gb", @"E:\RetroBat\roms\gb\Tetris (World).zip"),
+            EchelleDesFilms.LancementDuScript("\"E:\\RetroBat\\roms\\gb\\Tetris (World).zip\" \"Tetris (World)\" \"Tetris\""));
+        Assert.Equal(("mame", @"E:\RetroBat\roms\mame\19xx.zip"),
+            EchelleDesFilms.LancementDuScript("mame \"E:\\RetroBat\\roms\\mame\\19xx.zip\" 19xx"));
+        Assert.Equal(((string?)null, (string?)null), EchelleDesFilms.LancementDuScript(""));
+    }
+
+    [Fact]
+    public void Au_demarrage_seul_un_facteur_absent_ou_d_origine_est_remplace()
+    {
+        Assert.Equal("5", ReplayCaptureService.ValeurDans("a = \"1\"\nvideo_record_scale_factor = \"5\"\n", "video_record_scale_factor"));
+        Assert.Null(ReplayCaptureService.ValeurDans("a = \"1\"\n", "video_record_scale_factor"));
+    }
+
     [Fact]
     public void La_trame_emulee_se_lit_dans_un_signal_du_plugin_lua_de_mame()
     {

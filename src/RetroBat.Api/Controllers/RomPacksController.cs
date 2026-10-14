@@ -10,10 +10,13 @@ namespace RetroBat.Api.Controllers;
 public sealed class RomPacksController : ControllerBase
 {
     private readonly RomPackInstallerService _romPackInstaller;
+    private readonly RetroBat.Api.Replay.Video.EchelleDesFilms? _echelle;
 
-    public RomPacksController(RomPackInstallerService romPackInstaller)
+    public RomPacksController(RomPackInstallerService romPackInstaller,
+        RetroBat.Api.Replay.Video.EchelleDesFilms? echelle = null)
     {
         _romPackInstaller = romPackInstaller;
+        _echelle = echelle;
     }
 
     /// <summary>
@@ -26,6 +29,8 @@ public sealed class RomPacksController : ControllerBase
     {
         using var reader = new StreamReader(Request.Body, Encoding.UTF8);
         var rawArguments = await reader.ReadToEndAsync(cancellationToken);
+        // Le script game-start d'ES passe avant le lanceur : le facteur du film du jeu se pose ici.
+        _echelle?.PoserPourLeLancement(rawArguments);
         var result = await _romPackInstaller.EnsureLaunchRomAsync(rawArguments, cancellationToken);
         return Ok(result);
     }

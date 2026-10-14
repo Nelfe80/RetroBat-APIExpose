@@ -586,6 +586,9 @@ builder.Services.AddSingleton<RetroBat.Api.Replay.Video.ReplayVideoPublisher>();
 builder.Services.AddHostedService<RetroBat.Api.Replay.Video.ReplayVideoScheduler>();
 // Chaque partie est filmee par RetroArch pendant le jeu ; le film ne part que si c'est un record.
 builder.Services.AddHostedService<RetroBat.Api.Replay.Video.ReplayCaptureService>();
+// Le facteur d'agrandissement du film, pose avant chaque lancement selon la definition du jeu (720 lignes au moins).
+builder.Services.AddSingleton<RetroBat.Api.Replay.Video.EchelleDesFilms>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Video.EchelleDesFilms>());
 builder.Services.AddSingleton<RetroBat.Api.Replay.Social.SocialIssuerPin>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Social.ReplaySocialStore>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Social.ReplaySocialFeedService>();

@@ -611,6 +611,9 @@ public sealed class ReplayCaptureService : BackgroundService
             var chemin = RetroBatPaths.RetroArchConfigPath;
             if (!File.Exists(chemin) || Process.GetProcessesByName("retroarch").Length > 0) return;
             var contenu = File.ReadAllText(chemin);
+            // Le facteur de chaque jeu se pose avant son lancement (EchelleDesFilms) : au demarrage, seul un facteur
+            // absent ou de 1 (celui d'origine de RetroArch) devient x4.
+            if (int.TryParse(ValeurDans(contenu, "video_record_scale_factor"), out var actuel) && actuel >= 2) return;
             var nouveau = AvecReglage(contenu, "video_record_scale_factor", EchelleVoulue);
             if (nouveau is null) return;
             File.WriteAllText(chemin, nouveau, new UTF8Encoding(false));
@@ -641,6 +644,17 @@ public sealed class ReplayCaptureService : BackgroundService
         if (lignes.Count > 0 && lignes[^1].Length == 0) lignes.Insert(lignes.Count - 1, voulue);
         else lignes.Add(voulue);
         return string.Join(fin, lignes);
+    }
+
+    /// <summary>La valeur de <c>cle</c> dans un contenu de retroarch.cfg, ou null. Pur.</summary>
+    internal static string? ValeurDans(string contenu, string cle)
+    {
+        foreach (var ligne in contenu.Split('\n'))
+        {
+            var egal = ligne.IndexOf('=');
+            if (egal > 0 && ligne[..egal].Trim() == cle) return ligne[(egal + 1)..].Trim().Trim('"');
+        }
+        return null;
     }
 
     private static Dictionary<string, string> LireRetroArch()
