@@ -69,44 +69,66 @@ public sealed class ReplayVideoScheduler : BackgroundService
         }
         try { _abonnement = _bus.Subscribe<EventEnvelope>(SurEvenement); }
         catch (Exception ex) { _logger.LogWarning(ex, "Video : bus d'evenements indisponible, rendu au repos coupe."); return; }
+        _logger.LogInformation("Video : rendu au repos actif (apres {Repos} min sans activite, passage toutes les {Intervalle} min).",
+            _repos.TotalMinutes, _intervalle.TotalMinutes);
 
         var attente = _intervalle;
         while (!stoppingToken.IsCancellationRequested)
         {
             try { await Task.Delay(attente, stoppingToken).ConfigureAwait(false); }
             catch (OperationCanceledException) { break; }
-            attente = _intervalle;
-
-            bool partie; DateTime activite;
-            lock (_verrou) { partie = _partieEnCours; activite = _derniereActivite; }
-            var maintenant = DateTime.UtcNow;
-            activite = DerniereActivite(maintenant, activite, InactiviteWindows());
-            if (!AuRepos(maintenant, activite, _repos, partie, EmulatorForeground.EmulateurTourne(),
-                    _playback.GetState().State != "idle"))
-                continue;
-
-            using var rendu = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
-            lock (_verrou) _renduEnCours = rendu;
-            var veille = VeillerPendantLeRenduAsync(maintenant, rendu);
             try
             {
-                var rapport = await _publication.PublierAsync(1, rendu.Token).ConfigureAwait(false);
-                attente = ProchainPassage(rapport, _intervalle, _rienAFilmer);
+                attente = await PasserAsync(stoppingToken).ConfigureAwait(false);
             }
-            catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Video : rendu interrompu, la borne reprend du service.");
+                break;
             }
             catch (Exception ex)
             {
+                // L'hote s'arrete sur toute exception d'un service de fond (StopHost) : un passage rate ne doit
+                // jamais emporter l'API.
                 _logger.LogWarning(ex, "Video : passage au repos en echec.");
+                attente = _intervalle;
             }
-            finally
-            {
-                lock (_verrou) _renduEnCours = null;
-                try { rendu.Cancel(); } catch (ObjectDisposedException) { /* deja libere */ }
-                await veille.ConfigureAwait(false);
-            }
+        }
+    }
+
+    /// <summary>Un passage : filme un record si la borne est au repos. Rend le delai avant le suivant.</summary>
+    private async Task<TimeSpan> PasserAsync(CancellationToken stoppingToken)
+    {
+        bool partie; DateTime activiteDeLaBorne;
+        lock (_verrou) { partie = _partieEnCours; activiteDeLaBorne = _derniereActivite; }
+        var maintenant = DateTime.UtcNow;
+        var activite = DerniereActivite(maintenant, activiteDeLaBorne, InactiviteWindows());
+        if (!AuRepos(maintenant, activite, _repos, partie, EmulatorForeground.EmulateurTourne(),
+                _playback.GetState().State != "idle"))
+            return _intervalle;
+
+        using var rendu = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+        lock (_verrou)
+        {
+            // Une activite arrivee entre-temps : on ne commence pas.
+            if (_partieEnCours || _derniereActivite != activiteDeLaBorne) return _intervalle;
+            _renduEnCours = rendu;
+        }
+        var veille = VeillerPendantLeRenduAsync(maintenant, rendu);
+        try
+        {
+            var rapport = await _publication.PublierAsync(1, rendu.Token).ConfigureAwait(false);
+            return ProchainPassage(rapport, _intervalle, _rienAFilmer);
+        }
+        catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
+        {
+            _logger.LogInformation("Video : rendu interrompu, la borne reprend du service.");
+            return _intervalle;
+        }
+        finally
+        {
+            lock (_verrou) _renduEnCours = null;
+            try { rendu.Cancel(); } catch (Exception) { /* deja libere */ }
+            await veille.ConfigureAwait(false);
         }
     }
 
@@ -125,8 +147,7 @@ public sealed class ReplayVideoScheduler : BackgroundService
                     rendu.Cancel();
             }
         }
-        catch (OperationCanceledException) { /* fin du rendu */ }
-        catch (ObjectDisposedException) { /* fin du rendu */ }
+        catch (Exception) { /* fin du rendu, ou annulation deja faite : jamais d'exception d'ici */ }
     }
 
     private void SurEvenement(EventEnvelope e)
@@ -149,7 +170,7 @@ public sealed class ReplayVideoScheduler : BackgroundService
             if (!activite) return;
             _derniereActivite = DateTime.UtcNow;
             // Le joueur passe avant : le rendu s'arrete et rend la machine.
-            try { _renduEnCours?.Cancel(); } catch (ObjectDisposedException) { /* deja termine */ }
+            try { _renduEnCours?.Cancel(); } catch (Exception) { /* deja termine */ }
         }
     }
 
