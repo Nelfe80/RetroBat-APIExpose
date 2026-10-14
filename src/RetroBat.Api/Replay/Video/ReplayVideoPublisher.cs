@@ -267,7 +267,7 @@ public sealed class ReplayVideoPublisher
     /// <summary>Les refus qui rendent une capture inutile pour toujours.</summary>
     private static readonly HashSet<string> RefusDefinitifs = new(StringComparer.Ordinal)
     {
-        "pas_un_record", "deja_filme", "replay.not_owned",
+        "pas_un_record", "deja_filme", "replay.not_owned", "taille",
     };
 
     /// <summary>

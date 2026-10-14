@@ -45,6 +45,7 @@ public sealed class ReplayCaptureService : BackgroundService
     private readonly double _espaceLibreMinGo;
     private readonly TimeSpan _ageMax;
     private readonly TimeSpan _intervalleEnvoi;
+    private readonly long _tailleMax;
     private readonly string _dossier;
 
     private readonly SemaphoreSlim _operation = new(1, 1);
@@ -77,6 +78,8 @@ public sealed class ReplayCaptureService : BackgroundService
         _espaceLibreMinGo = Math.Max(1, configuration.GetValue("Video:Capture:MinFreeGb", 5.0));
         _ageMax = TimeSpan.FromHours(Math.Max(1, configuration.GetValue("Video:Capture:MaxAgeHours", 48)));
         _intervalleEnvoi = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Capture:UploadIntervalMinutes", 2)));
+        // Le plus gros film envoye (300 Mo, le plafond du site) : au-dela, la capture s'arrete en pleine partie.
+        _tailleMax = Math.Max(1, configuration.GetValue("Video:Capture:MaxMb", 300)) * 1_000_000L;
         _dossier = Path.GetFullPath(Path.Combine(objects.TempRoot, "..", "captures"));
     }
 
@@ -286,6 +289,12 @@ public sealed class ReplayCaptureService : BackgroundService
             }
         }
 
+        if (TailleDe(c.Fichier) > _tailleMax)
+        {
+            await ArreterAsync(c.ReplayId, null, abandon: true, "film plus gros que " + _tailleMax / 1_000_000 + " Mo").ConfigureAwait(false);
+            return;
+        }
+
         var actif = await _ra.GetActiveReplayAsync(ct).ConfigureAwait(false);
         if (actif is not { Recording: true }) return;
         if (c.Garde.Relever(c.Chrono.Elapsed.TotalSeconds, actif.Frame))
@@ -318,6 +327,11 @@ public sealed class ReplayCaptureService : BackgroundService
             if (age > _ageMax)
             {
                 Oublier(g, fiche, "trop ancienne");
+                continue;
+            }
+            if (TailleDe(g.Fichier) > _tailleMax)
+            {
+                Oublier(g, fiche, "plus grosse que " + _tailleMax / 1_000_000 + " Mo");
                 continue;
             }
 
@@ -485,6 +499,12 @@ public sealed class ReplayCaptureService : BackgroundService
                 ModesteDurant.TotalDays);
         }
         catch (Exception) { /* au pire, elle retentera */ }
+    }
+
+    private static long TailleDe(string chemin)
+    {
+        try { return new FileInfo(chemin).Length; }
+        catch (Exception) { return 0; }
     }
 
     private static void Effacer(string chemin)
