@@ -515,6 +515,53 @@ public sealed class ReplayVideoPublisher
         return (string?)(JsonNode.Parse(corps) as JsonObject)?["id"];
     }
 
+    /// <summary>La reponse du site a une demande de direct : l'adresse d'entree porte la cle de diffusion.</summary>
+    public sealed record DirectOuvert(bool Ok, string? LiveId, string? Ingest, string? Raison);
+
+    /// <summary>
+    /// Demande au site le direct d'un record (CDC video V2, §5.8) : la partie passe devant le premier rang. Le site prend
+    /// la machine du classement sur la ligne du premier rang. L'adresse rendue ne se journalise pas.
+    /// </summary>
+    public async Task<DirectOuvert> OuvrirLeDirectAsync(string romGroup, string regle, long score, bool essai, CancellationToken ct)
+    {
+        var credential = _devices.GetCredential();
+        if (string.IsNullOrEmpty(credential)) return new(false, null, null, "borne non appairee");
+        try
+        {
+            using var client = Client(credential, TimeSpan.FromSeconds(60));
+            var demande = new JsonObject
+            {
+                ["system_id"] = "", ["rom_group"] = romGroup, ["ruleset"] = regle, ["score"] = score, ["test"] = essai,
+            };
+            using var contenu = new StringContent(demande.ToJsonString(), Encoding.UTF8, "application/json");
+            using var reponse = await client.PostAsync("/api/v1/agent/live/record-start", contenu, ct).ConfigureAwait(false);
+            var corps = JsonNode.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false)) as JsonObject;
+            if (reponse.IsSuccessStatusCode && (bool?)corps?["ok"] == true)
+                return new(true, (string?)corps!["live_id"], (string?)corps["ingest"], null);
+            return new(false, null, null, (string?)corps?["reason"] ?? "http_" + (int)reponse.StatusCode);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
+        {
+            _logger.LogInformation("Direct : site injoignable ({Message}).", ex.Message);
+            return new(false, null, null, "site injoignable");
+        }
+    }
+
+    /// <summary>Le direct est fini (film arrete, partie finie) : le site le clot.</summary>
+    public async Task CloreLeDirectAsync(string liveId, CancellationToken ct)
+    {
+        var credential = _devices.GetCredential();
+        if (string.IsNullOrEmpty(credential)) return;
+        try
+        {
+            await PosterAsync(credential, "live/record-end", new JsonObject { ["live_id"] = liveId }, ct).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
+        {
+            _logger.LogInformation("Direct : fin du direct {Direct} non transmise ({Message}).", liveId, ex.Message);
+        }
+    }
+
     private async Task<JsonObject?> PosterAsync(string credential, string route, JsonObject corps, CancellationToken ct)
     {
         using var client = Client(credential, TimeSpan.FromSeconds(60));

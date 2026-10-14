@@ -585,7 +585,11 @@ builder.Services.AddSingleton<RetroBat.Api.Replay.Video.ReplayVideoPublisher>();
 // Les films se rendent quand la borne est au repos, et s'arretent des qu'un joueur revient.
 builder.Services.AddHostedService<RetroBat.Api.Replay.Video.ReplayVideoScheduler>();
 // Chaque partie est filmee par RetroArch pendant le jeu ; le film ne part que si c'est un record.
-builder.Services.AddHostedService<RetroBat.Api.Replay.Video.ReplayCaptureService>();
+builder.Services.AddSingleton<RetroBat.Api.Replay.Video.ReplayCaptureService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Video.ReplayCaptureService>());
+// Le premier rang qui tombe, en direct : le site previent tout le monde, la borne recopie le film sur YouTube Live.
+builder.Services.AddSingleton<RetroBat.Api.Replay.Video.DirectDuRecordService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Video.DirectDuRecordService>());
 // Le facteur d'agrandissement du film, pose avant chaque lancement selon la definition du jeu (720 lignes au moins).
 builder.Services.AddSingleton<RetroBat.Api.Replay.Video.EchelleDesFilms>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Video.EchelleDesFilms>());

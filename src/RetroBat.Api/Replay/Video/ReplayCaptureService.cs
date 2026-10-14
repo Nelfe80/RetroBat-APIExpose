@@ -367,6 +367,16 @@ public sealed class ReplayCaptureService : BackgroundService
     }
 
     /// <summary>
+    /// Le film en cours d'ecriture et la rotation du coeur, pour le direct d'un record (le direct en est la copie) ;
+    /// null quand rien n'est filme.
+    /// </summary>
+    public (string Fichier, int? Rotation)? FilmEnCours()
+    {
+        var c = _enCours;
+        return c is null ? null : (c.Fichier, c.Rotation);
+    }
+
+    /// <summary>
     /// Le verdict d'un score : sa session est celle du film sans replay en cours, ou de celui qui vient de finir (dix
     /// minutes au plus, tant qu'aucune autre partie n'est filmee). Le film d'une partie avec replay n'en a pas besoin.
     /// </summary>
