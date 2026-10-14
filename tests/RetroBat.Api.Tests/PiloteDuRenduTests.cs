@@ -92,10 +92,10 @@ public sealed class ProfilDeRenduTests
         Assert.Contains("network_cmd_port = \"55400\"", profil);
         Assert.Contains("video_gpu_record = \"false\"", profil);
         Assert.Contains("video_record_scale_factor = \"4\"", profil);
-        Assert.Contains("recording_output_directory = \"C:\rendu\films\"", profil);
+        Assert.Contains(@"recording_output_directory = ""C:\rendu\films""", profil);
         Assert.Contains("audio_mute_enable = \"true\"", profil);
         Assert.Contains("config_save_on_exit = \"false\"", profil);
-        Assert.Contains("savefile_directory = \"C:\rendu\sauvegardes\"", profil);
+        Assert.Contains(@"savefile_directory = ""C:\rendu\sauvegardes""", profil);
         Assert.DoesNotContain("video_driver", profil);
     }
 }
