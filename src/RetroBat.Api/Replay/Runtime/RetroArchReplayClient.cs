@@ -43,6 +43,8 @@ public sealed class RetroArchReplayClient
     /// moment du record, et plus tard la regeneration de cette meme image depuis un replay.
     /// </summary>
     public Task ScreenshotAsync(CancellationToken ct) => FireAsync("SCREENSHOT", ct);
+    /// <summary>Demarre ou arrete le film de RetroArch (la capture des parties, CDC video V2).</summary>
+    public Task RecordingToggleAsync(CancellationToken ct) => FireAsync("RECORDING_TOGGLE", ct);
     public Task NextCheckpointAsync(CancellationToken ct) => FireAsync("NEXT_REPLAY_CHECKPOINT", ct);
     public Task PrevCheckpointAsync(CancellationToken ct) => FireAsync("PREV_REPLAY_CHECKPOINT", ct);
 

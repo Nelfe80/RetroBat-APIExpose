@@ -591,6 +591,8 @@ public sealed class ReplayRecorderService : BackgroundService
         try
         {
             await _ra.HaltAsync(ct).ConfigureAwait(false);
+            // La capture video de la partie s'arrete avec son replay (ReplayCaptureService).
+            await PublishAsync("replay.recording.stopped", new { rec.ReplayId, rec.SessionId, rec.LastFrame }, ct).ConfigureAwait(false);
 
             var file = FindReplayFile(rec.StartedAtUtc);
             if (file is null)

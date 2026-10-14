@@ -253,19 +253,104 @@ public sealed class ReplayVideoPublisher
         }
     }
 
+    /// <summary>Ce que devient une capture apres sa demande d'envoi.</summary>
+    public enum IssueDeCapture
+    {
+        /// <summary>Envoyee chez Google et confirmee au site.</summary>
+        Envoyee,
+        /// <summary>Pas un record, deja filme ou pas a cette borne : le film peut etre efface.</summary>
+        Inutile,
+        /// <summary>Pas encore decidable (score ou replay pas encore arrives), quota, reseau : on reessaiera.</summary>
+        PlusTard,
+    }
+
+    /// <summary>Les refus qui rendent une capture inutile pour toujours.</summary>
+    private static readonly HashSet<string> RefusDefinitifs = new(StringComparer.Ordinal)
+    {
+        "pas_un_record", "deja_filme", "replay.not_owned",
+    };
+
+    /// <summary>
+    /// LE FILM D'UNE PARTIE, CAPTE PENDANT LE JEU (decision du 14 octobre 2026). Le site dit si la partie est un
+    /// record ; si oui, il ouvre la session d'envoi et la borne envoie le film directement chez Google, puis le
+    /// confirme avec la portion filmee du replay. <paramref name="debutFilm"/> et <paramref name="finFilm"/> sont
+    /// les frames du replay au debut et a la fin du film.
+    /// </summary>
+    public async Task<(IssueDeCapture Issue, string Detail)> EnvoyerCaptureAsync(string replayId, string fichier,
+        long debutFilm, long finFilm, double fps, CancellationToken ct)
+    {
+        var credential = _devices.GetCredential();
+        if (string.IsNullOrEmpty(credential)) return (IssueDeCapture.PlusTard, "borne non appairee");
+
+        var taille = new FileInfo(fichier).Length;
+        var (adresse, raison) = await OuvrirSessionAsync(credential, new JsonObject
+        {
+            ["replay_id"] = replayId,
+            ["size"] = taille,
+            ["type"] = "video/x-matroska",
+            ["source"] = "capture",
+        }, ct).ConfigureAwait(false);
+        if (adresse is null)
+            return (raison is not null && RefusDefinitifs.Contains(raison) ? IssueDeCapture.Inutile : IssueDeCapture.PlusTard,
+                raison ?? "site injoignable");
+
+        var videoId = await EnvoyerChezGoogleAsync(adresse, replayId, fichier, taille, ct).ConfigureAwait(false);
+        if (videoId is null) return (IssueDeCapture.PlusTard, "envoi refuse par Google");
+        var confirme = await PosterAsync(credential, "videos/complete", new JsonObject
+        {
+            ["replay_id"] = replayId,
+            ["youtube_video_id"] = videoId,
+            ["run_start_frame"] = debutFilm,
+            ["run_end_frame"] = finFilm,
+            ["fps"] = fps,
+        }, ct).ConfigureAwait(false);
+        return (IssueDeCapture.Envoyee, videoId + (confirme is null ? ", confirmation refusee" : ""));
+    }
+
+    /// <summary>
+    /// Demande au site la session d'envoi : son adresse, ou la raison du refus (null si le site n'a pas repondu).
+    /// L'adresse vaut autorisation pour cette seule video : elle ne se journalise pas.
+    /// </summary>
+    private async Task<(string? Adresse, string? Raison)> OuvrirSessionAsync(string credential, JsonObject demande,
+        CancellationToken ct)
+    {
+        try
+        {
+            using var client = Client(credential, TimeSpan.FromSeconds(60));
+            using var contenu = new StringContent(demande.ToJsonString(), Encoding.UTF8, "application/json");
+            using var reponse = await client.PostAsync("/api/v1/agent/videos/upload-session", contenu, ct).ConfigureAwait(false);
+            var corps = JsonNode.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false)) as JsonObject;
+            var adresse = (string?)corps?["session"];
+            if (reponse.IsSuccessStatusCode && !string.IsNullOrEmpty(adresse)) return (adresse, null);
+            var raison = (string?)corps?["reason"] ?? "http_" + (int)reponse.StatusCode;
+            _logger.LogInformation("Video : envoi de {ReplayId} refuse par le site ({Raison}).", (string?)demande["replay_id"], raison);
+            return (null, raison);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
+        {
+            _logger.LogWarning(ex, "Video : site injoignable pour la session d'envoi.");
+            return (null, null);
+        }
+    }
+
     /// <summary>Ouvre la session, envoie le film chez Google, rend l'identifiant YouTube (ou null).</summary>
     private async Task<string?> EnvoyerAsync(string credential, string replayId, string fichier, CancellationToken ct)
     {
         var taille = new FileInfo(fichier).Length;
-        var session = await PosterAsync(credential, "videos/upload-session", new JsonObject
+        var (adresse, _) = await OuvrirSessionAsync(credential, new JsonObject
         {
             ["replay_id"] = replayId,
             ["size"] = taille,
             ["type"] = "video/x-matroska",
         }, ct).ConfigureAwait(false);
-        var adresse = (string?)session?["session"];
-        if (string.IsNullOrEmpty(adresse)) return null;
+        if (adresse is null) return null;
+        return await EnvoyerChezGoogleAsync(adresse, replayId, fichier, taille, ct).ConfigureAwait(false);
+    }
 
+    /// <summary>Le fichier, directement chez Google, a l'adresse de session. Rend l'identifiant YouTube (ou null).</summary>
+    private async Task<string?> EnvoyerChezGoogleAsync(string adresse, string replayId, string fichier, long taille,
+        CancellationToken ct)
+    {
         using var http = _httpFactory.CreateClient();
         http.Timeout = TimeSpan.FromMinutes(30);
         await using var flux = File.OpenRead(fichier);
