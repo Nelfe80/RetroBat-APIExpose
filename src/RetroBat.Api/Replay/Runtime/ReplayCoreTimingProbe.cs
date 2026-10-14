@@ -40,6 +40,14 @@ public sealed class ReplayCoreTimingProbe
     // ne rien affirmer plutôt que d'estampiller un manifeste avec la cadence du jeu précédent.
     private static readonly TimeSpan MaxLogAge = TimeSpan.FromMinutes(10);
 
+    // « [Environ] SET_ROTATION: "3" (270 deg). » : quarts de tour antihoraires demandes par le coeur.
+    private static readonly Regex RotationLine = new(
+        "SET_ROTATION:\\s*\"(?<r>[0-3])\"", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    // La rotation se lit au depart du replay, qui peut venir longtemps apres le lancement (ecran titre) : le
+    // controle du contenu (CRC) protege du journal d'un autre jeu.
+    private static readonly TimeSpan MaxRotationLogAge = TimeSpan.FromHours(12);
+
     private readonly ILogger<ReplayCoreTimingProbe> _logger;
 
     public ReplayCoreTimingProbe(ILogger<ReplayCoreTimingProbe> logger) => _logger = logger;
@@ -56,6 +64,49 @@ public sealed class ReplayCoreTimingProbe
     /// <paramref name="ignoreAge"/> lève la borne d'ancienneté : réservé au DIAGNOSTIC (l'appelant
     /// affiche alors l'âge), jamais pour estampiller un manifeste.
     /// </summary>
+    /// <summary>
+    /// La rotation demandee par le coeur du contenu charge (quarts de tour antihoraires : 3 pour Ms. Pac-Man), lue
+    /// dans le meme journal ; null si le journal ne la donne pas, est trop ancien, ou parle d'un autre contenu que
+    /// <paramref name="crc32"/>. Sert a redresser les films des jeux verticaux.
+    /// </summary>
+    public int? ReadRotation(string? crc32)
+    {
+        try
+        {
+            var fi = new FileInfo(RetroBatPaths.EsLaunchStdoutLogPath);
+            if (!fi.Exists || DateTime.Now - fi.LastWriteTime > MaxRotationLogAge) return null;
+            using var fs = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            using var sr = new StreamReader(fs);
+            var lignes = new List<string>();
+            string? ligne;
+            while ((ligne = sr.ReadLine()) is not null) lignes.Add(ligne);
+            return LireRotation(lignes, crc32);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Video : rotation du coeur illisible.");
+            return null;
+        }
+    }
+
+    /// <summary>La derniere rotation du journal, si son contenu est bien <paramref name="crc32"/>. Pur, pour etre teste.</summary>
+    internal static int? LireRotation(IEnumerable<string> lignes, string? crc32)
+    {
+        int? rotation = null;
+        string? crcDuJournal = null;
+        foreach (var ligne in lignes)
+        {
+            var r = RotationLine.Match(ligne);
+            if (r.Success) rotation = r.Groups["r"].Value[0] - '0';
+            var c = ContentCrcLine.Match(ligne);
+            if (c.Success) crcDuJournal = c.Groups["crc"].Value.ToLowerInvariant().PadLeft(8, '0');
+        }
+        if (!string.IsNullOrWhiteSpace(crc32) && crcDuJournal is not null
+            && !string.Equals(crcDuJournal, crc32.Trim().ToLowerInvariant().PadLeft(8, '0'), StringComparison.Ordinal))
+            return null;
+        return rotation;
+    }
+
     public CoreTiming? ReadLatest(bool ignoreAge = false)
     {
         try

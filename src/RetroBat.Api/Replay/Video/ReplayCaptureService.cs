@@ -18,8 +18,10 @@ namespace RetroBat.Api.Replay.Video;
 /// les shaders ni les decors du joueur. Le film demarre et s'arrete avec le replay de la partie.</item>
 /// <item>Un garde-fou (<see cref="GardeDeCapture"/>) coupe la capture si le jeu ralentit ; la borne ne filme
 /// alors plus pendant 30 jours.</item>
-/// <item>Un jeu vertical sort couche : il se reconnait a l'en-tete du film (<see cref="MatroskaEntete"/>) et la
-/// capture s'arrete aussitot.</item>
+/// <item>Un jeu vertical sort couche (RetroArch 1.22 filme avant de tourner l'image) : il se reconnait a l'en-tete
+/// du film (<see cref="MatroskaEntete"/>). Le sens de rotation, annonce par le coeur dans le journal de lancement,
+/// permet de le redresser a la fin en corrigeant l'en-tete, sans reencoder (<see cref="MatroskaRotation"/>) ;
+/// YouTube l'affiche alors droit. Sans sens connu, la capture s'arrete aussitot.</item>
 /// <item>Apres la partie, hors de toute partie, la borne demande au site si c'est un record : oui, elle envoie le
 /// film directement chez Google ; non, elle l'efface. Sans reponse decidable, elle redemande, puis efface.</item>
 /// </list>
@@ -40,6 +42,7 @@ public sealed class ReplayCaptureService : BackgroundService
     private readonly RetroArchReplayClient _ra;
     private readonly ReplayVideoPublisher _publication;
     private readonly IReplayManifestStore _manifests;
+    private readonly ReplayCoreTimingProbe _coeur;
     private readonly ILogger<ReplayCaptureService> _logger;
     private readonly bool _actif;
     private readonly double _espaceLibreMinGo;
@@ -61,6 +64,8 @@ public sealed class ReplayCaptureService : BackgroundService
         public required string ReplayId;
         public required string Fichier;
         public long FrameDebut;
+        /// <summary>La rotation annoncee par le coeur (quarts de tour antihoraires), null si inconnue.</summary>
+        public int? Rotation;
         public bool EnteteVerifiee;
         public readonly GardeDeCapture Garde = new();
         public readonly Stopwatch Chrono = Stopwatch.StartNew();
@@ -78,10 +83,10 @@ public sealed class ReplayCaptureService : BackgroundService
     private static readonly TimeSpan PreteAuPlus = TimeSpan.FromHours(24);
 
     public ReplayCaptureService(IEventBus bus, RetroArchReplayClient ra, ReplayVideoPublisher publication,
-        IReplayManifestStore manifests, IReplayObjectStore objects, IConfiguration configuration,
+        IReplayManifestStore manifests, IReplayObjectStore objects, ReplayCoreTimingProbe coeur, IConfiguration configuration,
         ILogger<ReplayCaptureService> logger)
     {
-        _bus = bus; _ra = ra; _publication = publication; _manifests = manifests; _logger = logger;
+        _bus = bus; _ra = ra; _publication = publication; _manifests = manifests; _coeur = coeur; _logger = logger;
         _actif = configuration.GetValue("Video:Capture:Enabled", true);
         _espaceLibreMinGo = Math.Max(1, configuration.GetValue("Video:Capture:MinFreeGb", 5.0));
         _ageMax = TimeSpan.FromHours(Math.Max(1, configuration.GetValue("Video:Capture:MaxAgeHours", 48)));
@@ -210,8 +215,11 @@ public sealed class ReplayCaptureService : BackgroundService
                 _logger.LogInformation("Capture : RetroArch n'a pas commence a filmer {ReplayId}.", replayId);
                 return;
             }
-            _enCours = new CaptureEnCours { ReplayId = replayId, Fichier = fichier, FrameDebut = frame };
-            _logger.LogInformation("Capture : partie {ReplayId} filmee depuis la frame {Frame}.", replayId, frame);
+            var statut = await _ra.GetStatusAsync(_arret).ConfigureAwait(false);
+            var rotation = _coeur.ReadRotation(statut?.Crc32);
+            _enCours = new CaptureEnCours { ReplayId = replayId, Fichier = fichier, FrameDebut = frame, Rotation = rotation };
+            _logger.LogInformation("Capture : partie {ReplayId} filmee depuis la frame {Frame} (rotation du coeur : {Rotation}).",
+                replayId, frame, rotation?.ToString() ?? "inconnue");
         }
         catch (OperationCanceledException) { /* arret de l'API */ }
         catch (Exception ex)
@@ -248,6 +256,14 @@ public sealed class ReplayCaptureService : BackgroundService
                 Effacer(c.Fichier);
                 _logger.LogInformation("Capture : {ReplayId} abandonnee ({Pourquoi}), film efface.", c.ReplayId, pourquoi);
                 return;
+            }
+            // Jeu vertical (ou retourne) : on inscrit la rotation dans l'en-tete, sans toucher aux images.
+            if (c.Rotation is 1 or 2 or 3)
+            {
+                if (MatroskaRotation.Redresser(c.Fichier, c.Rotation.Value))
+                    _logger.LogInformation("Capture : {ReplayId} redressee (rotation {Rotation} du coeur).", c.ReplayId, c.Rotation);
+                else
+                    _logger.LogInformation("Capture : {ReplayId}, rotation non inscrite dans le film.", c.ReplayId);
             }
             var entete = MatroskaEntete.Lire(c.Fichier);
             if (entete is null || entete.Couchee || entete.Largeur < LargeurMinimale)
@@ -289,10 +305,12 @@ public sealed class ReplayCaptureService : BackgroundService
         if (!c.EnteteVerifiee && MatroskaEntete.Lire(c.Fichier) is { } entete)
         {
             c.EnteteVerifiee = true;
-            if (entete.Couchee || entete.Largeur < LargeurMinimale)
+            // Un film couche se redresse a la fin, si l'on sait dans quel sens.
+            var redressable = entete.Couchee && c.Rotation is 1 or 3;
+            if ((entete.Couchee && !redressable) || entete.Largeur < LargeurMinimale)
             {
                 await ArreterAsync(c.ReplayId, null, abandon: true,
-                    entete.Couchee ? "jeu vertical, film couche" : "image de " + entete.Largeur + " pixels, echelle x4 absente").ConfigureAwait(false);
+                    entete.Couchee ? "jeu vertical, sens de rotation inconnu" : "image de " + entete.Largeur + " pixels, echelle x4 absente").ConfigureAwait(false);
                 return;
             }
         }
