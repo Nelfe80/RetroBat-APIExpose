@@ -266,7 +266,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// devient le replay actif, mais le score solo garde le sien.
     /// </summary>
     private string? _replayDuSolo;
-    private readonly Dictionary<string, (string sessionId, string visibility, long? score, int? rank, DateTime at)> _pendingScoreLink = new();
+    private readonly Dictionary<string, (string sessionId, string visibility, long? score, int? rank, DateTime at, long? debutVideo, long? finVideo)> _pendingScoreLink = new();
     private readonly Dictionary<string, (string sha256, DateTime at)> _finalizedReplay = new();
     /// <summary>
     /// PLUS DE LIMITE DE 20 MINUTES (decision user 2026-10-02). Le score publie (a la sortie du jeu)
@@ -667,7 +667,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 // Le lien replay de la partie, perdu avec la base : on le redéclare.
                 await RegisterReplayLinkAsync((string?)record["session_id"] ?? "", (string?)lien["replay_id"] ?? "",
-                    (string?)lien["object_sha256"] ?? "", (string?)lien["visibility"] ?? "private", cancellationToken, secretRetenu)
+                    (string?)lien["object_sha256"] ?? "", (string?)lien["visibility"] ?? "private", cancellationToken, secretRetenu,
+                    (long?)lien["run_start_frame"], (long?)lien["run_end_frame"])
                     .ConfigureAwait(false);
             }
         }
@@ -3307,6 +3308,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, runPeak, bestRun, trajectory,
             nvram, bios, contexteRun, partieADeux ? 2 : 1, finDuSolo, null, null, replay,
             profile is { } profilChoisi && profilChoisi.TryGetProperty("ruleset", out var regleChoisie) ? regleChoisie.GetString() : null);
+        PoserLesBornesVideo(brouillon, replay, enregistrements, trajectory, bestRun, finsDeRun);
         await PoserEtEnvoyerAsync(brouillon, runPeak, cancellationToken).ConfigureAwait(false);
 
         // LE 1LC (decision user du 2026-10-09) : le score de la premiere vie, mesure dans la meme partie
@@ -3346,6 +3348,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 brouillon1lc["arret_du_replay"] = finDeVie - enr.Debut;
                 Trace($"1LC : la lecture du replay {replay1lc} se figera a sa frame {finDeVie - enr.Debut}");
             }
+            PoserLesBornesVideo(brouillon1lc, replay, enregistrements, trajectory, run1lc,
+                mort is { } mortDuRun ? finsDeRun.Append(mortDuRun).OrderBy(f => f).ToList() : finsDeRun);
             await PoserEtEnvoyerAsync(brouillon1lc, pic1lc, cancellationToken).ConfigureAwait(false);
         }
     }
@@ -3738,7 +3742,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// faux pour un envoi differe, qui s'annonce en groupe (voir EnvoyerLesBrouillonsAsync).
     /// </summary>
     private async Task<(RetroBat.Api.Scoring.IssueDEnvoi Issue, string? Statut, int? Rang)> SubmitAsync(
-        string credential, JsonObject passport, string? replayId, bool annoncer, CancellationToken cancellationToken)
+        string credential, JsonObject passport, string? replayId, bool annoncer, CancellationToken cancellationToken,
+        long? debutVideo = null, long? finVideo = null)
     {
         try
         {
@@ -3804,7 +3809,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 MaybeShowClaimOverlay(passport, body);
                 await NotifyVerdictAsync(passport, body, cancellationToken).ConfigureAwait(false);
             }
-            CaptureReplayLinkOnPublished(passport, body, replayId);
+            CaptureReplayLinkOnPublished(passport, body, replayId, debutVideo, finVideo);
             PublishVerdict(passport, body);
 
             string? statut = null;
@@ -4772,7 +4777,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
         var essais = _brouillons.Essais(id);
         Trace($"brouillon {id} : envoi{(essais > 0 ? $" (essai {essais + 1})" : "")}, {(string?)brouillon["genre"]} {romGroup} {(long?)brouillon["pic"]} points");
-        return await SubmitAsync(credential, passport, (string?)brouillon["replay"], annoncer, ct).ConfigureAwait(false);
+        return await SubmitAsync(credential, passport, (string?)brouillon["replay"], annoncer, ct,
+            (long?)(brouillon["bornes_video"] as JsonObject)?["debut"], (long?)(brouillon["bornes_video"] as JsonObject)?["fin"]).ConfigureAwait(false);
     }
 
     /// <summary>Un ticket de soumission, ou null quand le site ne le donne pas maintenant.</summary>
@@ -4864,7 +4870,25 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return choisi;
     }
 
-    private void CaptureReplayLinkOnPublished(JsonObject passport, string responseBody, string? replayId)
+    /// <summary>
+    /// Pose sur le brouillon les bornes de la performance dans son replay (CDC video V2, §4.4), quand on
+    /// sait les calculer. Rien sinon : le rendu filmera tout le replay.
+    /// </summary>
+    private void PoserLesBornesVideo(JsonObject brouillon, string? replay,
+        IReadOnlyList<(string Id, long Debut, long? Fin)> enregistrements,
+        IReadOnlyList<(long frame, long total)> lectures, IReadOnlyList<(long frame, long total)> run,
+        IReadOnlyList<long> coupures)
+    {
+        if (replay is null) return;
+        var enr = enregistrements.FirstOrDefault(e => string.Equals(e.Id, replay, StringComparison.Ordinal));
+        if (enr.Id is null) return;
+        if (RetroBat.Api.Scoring.BornesVideo.Calculer(enr.Debut, enr.Fin, lectures, run, coupures) is not { } bornes) return;
+        brouillon["bornes_video"] = new JsonObject { ["debut"] = bornes.Debut, ["fin"] = bornes.Fin };
+        Trace($"video : bornes de la performance dans le replay {replay} : frames {bornes.Debut} a {bornes.Fin}");
+    }
+
+    private void CaptureReplayLinkOnPublished(JsonObject passport, string responseBody, string? replayId,
+        long? debutVideo = null, long? finVideo = null)
     {
         try
         {
@@ -4894,7 +4918,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             lock (_sync)
             {
                 PruneReplayLinks();
-                _pendingScoreLink[cle] = (sessionId!, "public", score, rank, DateTime.UtcNow);
+                _pendingScoreLink[cle] = (sessionId!, "public", score, rank, DateTime.UtcNow, debutVideo, finVideo);
                 SauverLesLiens();
             }
             TryRegisterReplayLink(cle);
@@ -4912,13 +4936,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     {
         var replayId = ReplayDuLien(cle);
         string sessionId, visibility, sha;
-        long? score; int? rank;
+        long? score; int? rank; long? debutVideo, finVideo;
         lock (_sync)
         {
             if (_liensEnCours.Contains(cle)) return;
             if (!_pendingScoreLink.TryGetValue(cle, out var p)) return;
             if (!_finalizedReplay.TryGetValue(replayId, out var f)) return;
             sessionId = p.sessionId; visibility = p.visibility; score = p.score; rank = p.rank; sha = f.sha256;
+            debutVideo = p.debutVideo; finVideo = p.finVideo;
             _liensEnCours.Add(cle);
         }
         // La carte du replay reste celle du 1CC : le 1LC ne la reecrit pas.
@@ -4927,7 +4952,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (string.Equals(visibility, "public", StringComparison.OrdinalIgnoreCase)) SemerReplayCertifie(replayId, sha);
         _ = Task.Run(async () =>
         {
-            var termine = await RegisterReplayLinkAsync(sessionId, replayId, sha, visibility, CancellationToken.None).ConfigureAwait(false);
+            var termine = await RegisterReplayLinkAsync(sessionId, replayId, sha, visibility, CancellationToken.None,
+                debutVideo: debutVideo, finVideo: finVideo).ConfigureAwait(false);
             lock (_sync)
             {
                 _liensEnCours.Remove(cle);
@@ -4971,7 +4997,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     private sealed record LienEnAttente(
         string ReplayId, string? SessionId, string? Visibility, long? Score, int? Rank, DateTime? ScoreAt,
-        string? Sha256, DateTime? FinalizedAt);
+        string? Sha256, DateTime? FinalizedAt, long? DebutVideo = null, long? FinVideo = null);
 
     /// <summary>Appele sous _sync. Ecrit les rapprochements en attente, d'un bloc (fichier temporaire puis remplacement).</summary>
     private void SauverLesLiens()
@@ -4980,9 +5006,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             var liens = _pendingScoreLink.Keys.Union(_finalizedReplay.Keys).Select(id =>
             {
-                var p = _pendingScoreLink.TryGetValue(id, out var x) ? x : ((string, string, long?, int?, DateTime)?)null;
+                var p = _pendingScoreLink.TryGetValue(id, out var x) ? x : ((string, string, long?, int?, DateTime, long?, long?)?)null;
                 var f = _finalizedReplay.TryGetValue(id, out var y) ? y : ((string, DateTime)?)null;
-                return new LienEnAttente(id, p?.Item1, p?.Item2, p?.Item3, p?.Item4, p?.Item5, f?.Item1, f?.Item2);
+                return new LienEnAttente(id, p?.Item1, p?.Item2, p?.Item3, p?.Item4, p?.Item5, f?.Item1, f?.Item2, p?.Item6, p?.Item7);
             }).ToList();
             var chemin = CheminDesLiens;
             Directory.CreateDirectory(Path.GetDirectoryName(chemin)!);
@@ -5008,7 +5034,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 if (string.IsNullOrEmpty(l.ReplayId)) continue;
                 if (!string.IsNullOrEmpty(l.SessionId) && l.ScoreAt is { } quand)
-                    _pendingScoreLink[l.ReplayId] = (l.SessionId!, l.Visibility ?? "public", l.Score, l.Rank, quand);
+                    _pendingScoreLink[l.ReplayId] = (l.SessionId!, l.Visibility ?? "public", l.Score, l.Rank, quand, l.DebutVideo, l.FinVideo);
                 if (!string.IsNullOrEmpty(l.Sha256) && l.FinalizedAt is { } scelle)
                     _finalizedReplay[l.ReplayId] = (l.Sha256!, scelle);
             }
@@ -5085,7 +5111,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private async Task<bool> RegisterReplayLinkAsync(
         string sessionId, string replayId, string sha256, string visibility, CancellationToken cancellationToken,
-        string? secret = null)
+        string? secret = null, long? debutVideo = null, long? finVideo = null)
     {
         var credential = secret ?? ResolveCredential();
         if (string.IsNullOrEmpty(credential)) return false;
@@ -5099,6 +5125,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 ["object_sha256"] = sha256,
                 ["visibility"] = visibility,
             };
+            // Les bornes de la performance dans le replay (CDC video V2, §4.4) : le rendu video ne filme
+            // qu'elles. Facultatives : un ancien score se rend du debut a la fin de son replay.
+            if (debutVideo is long debut && finVideo is long fin && fin > debut)
+            {
+                body["run_start_frame"] = debut;
+                body["run_end_frame"] = fin;
+            }
             using var content = new StringContent(body.ToJsonString(), Encoding.UTF8, "application/json");
             using var response = await client.PostAsync("/api/v1/agent/scores/replay-link", content, cancellationToken).ConfigureAwait(false);
             var respBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
