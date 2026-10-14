@@ -59,6 +59,6 @@ public sealed class ReplayVideoController : ControllerBase
     {
         if (!IsLocalCaller()) return NotFound();
         var r = await _publication.PublierAsync(Math.Max(0, req?.Limite ?? 1), ct).ConfigureAwait(false);
-        return Ok(new { targets = r.Cibles, sent = r.Envoyees, details = r.Details });
+        return Ok(new { targets = r.Cibles, rendered = r.Rendus, sent = r.Envoyees, details = r.Details });
     }
 }

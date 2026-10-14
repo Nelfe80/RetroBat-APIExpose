@@ -31,13 +31,25 @@ public sealed class ReplayVideoPublisher
 
     public sealed record Cible(string ReplayId, long? Debut, long? Fin);
 
-    public sealed record Rapport(int Cibles, int Envoyees, IReadOnlyList<string> Details);
+    /// <param name="Rendus">Les rendus tentes : zero quand rien de ce que le site demande n'est filmable ici.</param>
+    /// <param name="EnvoiRefuse">Le site ou Google ont refuse un envoi (quota du jour, par exemple).</param>
+    public sealed record Rapport(int Cibles, int Rendus, int Envoyees, IReadOnlyList<string> Details,
+        bool EnvoiRefuse = false);
+
+    /// <summary>
+    /// Une borne occupee n'est pas un echec du replay : ces rendus-la ne se signalent pas, le prochain passage
+    /// reprendra.
+    /// </summary>
+    private static readonly HashSet<string> RaisonsPassageres = new(StringComparer.Ordinal)
+    {
+        "lecture_en_cours", "emulateur_en_cours", "rendu_en_cours",
+    };
 
     /// <summary>Filme et envoie au plus <paramref name="limite"/> records de cette borne.</summary>
     public async Task<Rapport> PublierAsync(int limite, CancellationToken ct)
     {
         var credential = _devices.GetCredential();
-        if (string.IsNullOrEmpty(credential)) return new Rapport(0, 0, new[] { "borne non appairee" });
+        if (string.IsNullOrEmpty(credential)) return new Rapport(0, 0, 0, new[] { "borne non appairee" });
 
         // Demander la liste suffit au site pour finaliser les films deja envoyes (visibilite, playlist) :
         // une limite de 0 ne fait que cela.
@@ -45,6 +57,7 @@ public sealed class ReplayVideoPublisher
         var details = new List<string>();
         var envoyees = 0;
         var rendus = 0;
+        var refuse = false;
         foreach (var cible in cibles)
         {
             // La limite compte les rendus TENTES, pas les envois reussis : un site qui refuse ne doit pas
@@ -54,25 +67,33 @@ public sealed class ReplayVideoPublisher
             if (manifest is null || !_objects.HasObject(manifest.Object.Sha256))
             {
                 details.Add(cible.ReplayId + " : replay absent de cette borne");
+                await SignalerEchecAsync(credential, cible.ReplayId, "replay_absent", ct).ConfigureAwait(false);
                 continue;
             }
 
             rendus++;
-            var film = await _rendu.RendreAsync(cible.ReplayId, cible.Debut, cible.Fin, ct).ConfigureAwait(false);
-            if (!film.Ok || film.Fichier is null)
-            {
-                details.Add(cible.ReplayId + " : rendu " + (film.Raison ?? "incomplet"));
-                continue;
-            }
-
+            var dossier = Path.Combine(_objects.TempRoot, "video", cible.ReplayId);
             try
             {
+                var film = await _rendu.RendreAsync(cible.ReplayId, cible.Debut, cible.Fin, ct).ConfigureAwait(false);
+                if (!film.Ok || film.Fichier is null)
+                {
+                    var raison = film.Raison ?? "incomplet";
+                    details.Add(cible.ReplayId + " : rendu " + raison);
+                    // Sinon le meme echec reviendrait en tete a chaque passage et bloquerait la file : le site
+                    // le compte comme un essai, le repropose plus tard, puis l'abandonne.
+                    if (!RaisonsPassageres.Contains(raison))
+                        await SignalerEchecAsync(credential, cible.ReplayId, "rendu_" + raison, ct).ConfigureAwait(false);
+                    continue;
+                }
+
                 var videoId = await EnvoyerAsync(credential, cible.ReplayId, film.Fichier, ct).ConfigureAwait(false);
                 if (videoId is null)
                 {
                     // Session refusee par le site ou envoi refuse par Google : on s'arrete la, le prochain
                     // passage reprendra.
                     details.Add(cible.ReplayId + " : envoi refuse");
+                    refuse = true;
                     break;
                 }
                 var confirme = await PosterAsync(credential, "videos/complete", new JsonObject
@@ -88,14 +109,34 @@ public sealed class ReplayVideoPublisher
             }
             finally
             {
-                // Le film n'est plus utile : envoye, ou a refaire au prochain passage.
-                try { Directory.Delete(Path.GetDirectoryName(Path.GetDirectoryName(film.Fichier)!)!, recursive: true); }
+                // Le film n'est plus utile : envoye, a refaire au prochain passage, ou interrompu.
+                try { if (Directory.Exists(dossier)) Directory.Delete(dossier, recursive: true); }
                 catch { /* zone de travail */ }
             }
         }
         _logger.LogInformation("Video : {Envoyees} film(s) envoye(s) sur {Cibles} cible(s). {Details}",
             envoyees, cibles.Count, string.Join(" | ", details));
-        return new Rapport(cibles.Count, envoyees, details);
+        return new Rapport(cibles.Count, rendus, envoyees, details, refuse);
+    }
+
+    /// <summary>
+    /// Ce replay ne se filme pas ici : le site le compte comme un essai. Sans reponse, rien de grave, il
+    /// reviendra au prochain passage.
+    /// </summary>
+    private async Task SignalerEchecAsync(string credential, string replayId, string raison, CancellationToken ct)
+    {
+        try
+        {
+            await PosterAsync(credential, "videos/failed", new JsonObject
+            {
+                ["replay_id"] = replayId,
+                ["reason"] = raison,
+            }, ct).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogWarning(ex, "Video : echec de {ReplayId} non signale.", replayId);
+        }
     }
 
     private async Task<IReadOnlyList<Cible>> CiblesAsync(string credential, CancellationToken ct)
