@@ -35,8 +35,8 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
     private readonly ReplayVideoPublisher _site;
     private readonly ILogger<DirectDuRecordService> _journal;
     private readonly bool _actif;
-    private readonly bool _essai;
-    private readonly long? _seuilEssai;
+    private volatile bool _essai;
+    private long? _seuilEssai;
 
     private readonly object _verrou = new();
     private int _generation;
@@ -85,6 +85,21 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         _abonnement?.Dispose();
         lock (_verrou) _relais?.Cancel();
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// L'essai, jusqu'au prochain demarrage (route locale <c>live-test</c>) : direct non repertorie annonce au seul
+    /// joueur, ouvert quand le score passe <paramref name="seuil"/> (le premier rang si null). Vaut pour le jeu suivant.
+    /// </summary>
+    public void Essayer(bool actif, long? seuil)
+    {
+        lock (_verrou)
+        {
+            _essai = actif;
+            _seuilEssai = actif ? seuil : null;
+        }
+        _journal.LogInformation("Direct : essai {Etat}{Seuil}.", actif ? "arme" : "desarme",
+            actif && seuil is long s ? " (seuil " + s + ")" : "");
     }
 
     /// <summary>Faut-il ouvrir le direct ? Le score passe devant le premier rang, une fois par partie certifiee. Pur.</summary>

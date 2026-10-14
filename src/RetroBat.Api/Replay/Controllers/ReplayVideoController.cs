@@ -14,11 +14,29 @@ public sealed class ReplayVideoController : ControllerBase
 {
     private readonly ReplayVideoRenderer _rendu;
     private readonly ReplayVideoPublisher _publication;
+    private readonly DirectDuRecordService _direct;
 
-    public ReplayVideoController(ReplayVideoRenderer rendu, ReplayVideoPublisher publication)
+    public ReplayVideoController(ReplayVideoRenderer rendu, ReplayVideoPublisher publication, DirectDuRecordService direct)
     {
         _rendu = rendu;
         _publication = publication;
+        _direct = direct;
+    }
+
+    public sealed record EssaiDuDirectRequest(
+        [property: JsonPropertyName("enabled")] bool Actif,
+        [property: JsonPropertyName("threshold")] long? Seuil);
+
+    /// <summary>
+    /// L'essai du direct d'un record (CDC video V2, §5.8), jusqu'au prochain demarrage de l'API : le prochain jeu lance
+    /// ouvre un direct non repertorie, annonce au seul joueur, quand son score passe <c>threshold</c>.
+    /// </summary>
+    [HttpPost("live-test")]
+    public IActionResult LiveTest([FromBody] EssaiDuDirectRequest? req)
+    {
+        if (!IsLocalCaller()) return NotFound();
+        _direct.Essayer(req?.Actif ?? false, req?.Seuil);
+        return Ok(new { test = req?.Actif ?? false, threshold = req?.Seuil });
     }
 
     private bool IsLocalCaller()
