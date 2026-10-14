@@ -3,33 +3,53 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using RetroBat.Api.Infrastructure;
+using RetroBat.Api.Replay.Models;
+using RetroBat.Api.Replay.Playback;
+using RetroBat.Api.Replay.Sharing;
 using RetroBat.Api.Replay.Storage;
 
 namespace RetroBat.Api.Replay.Video;
 
 /// <summary>
-/// LES FILMS DES RECORDS DE CETTE BORNE (CDC video V2, §4.1). Le serveur dit quoi filmer, la borne rend le
-/// film, le serveur ouvre une session d'envoi sur la chaine officielle, et la borne envoie le fichier
-/// directement chez Google : le serveur ne voit passer aucun octet de video. L'adresse de session vaut
-/// autorisation pour cette seule video : elle ne se journalise pas.
+/// LES FILMS DES RECORDS (CDC video V2, §4.1). Le serveur dit quoi filmer, la borne rend le film, le serveur
+/// ouvre une session d'envoi sur la chaine officielle, et la borne envoie le fichier directement chez Google :
+/// le serveur ne voit passer aucun octet de video. L'adresse de session vaut autorisation pour cette seule
+/// video : elle ne se journalise pas.
+///
+/// Le serveur donne aussi son ROLE a la borne (decision du 14 octobre 2026) : une station de rendu filme le haut
+/// de tous les classements et va chercher les replays des autres comme pour une lecture ; la borne d'un joueur
+/// ne filme rien, ou ses propres records si le serveur le lui demande.
 /// </summary>
 public sealed class ReplayVideoPublisher
 {
+    public const string RoleStation = "station";
+    public const string RoleJoueur = "player";
+    public const string RoleAucun = "none";
+
     private readonly ReplayVideoRenderer _rendu;
     private readonly IReplayManifestStore _manifests;
     private readonly IReplayObjectStore _objects;
+    private readonly IReplayMetadataStore _meta;
+    private readonly ReplayManifestFetcher _manifestFetcher;
+    private readonly IReplaySourceResolver _sources;
     private readonly NelfePlayDeviceStore _devices;
     private readonly IHttpClientFactory _httpFactory;
     private readonly ILogger<ReplayVideoPublisher> _logger;
 
     public ReplayVideoPublisher(ReplayVideoRenderer rendu, IReplayManifestStore manifests, IReplayObjectStore objects,
+        IReplayMetadataStore meta, ReplayManifestFetcher manifestFetcher, IReplaySourceResolver sources,
         NelfePlayDeviceStore devices, IHttpClientFactory httpFactory, ILogger<ReplayVideoPublisher> logger)
     {
-        _rendu = rendu; _manifests = manifests; _objects = objects; _devices = devices; _httpFactory = httpFactory;
-        _logger = logger;
+        _rendu = rendu; _manifests = manifests; _objects = objects; _meta = meta; _manifestFetcher = manifestFetcher;
+        _sources = sources; _devices = devices; _httpFactory = httpFactory; _logger = logger;
     }
 
     public sealed record Cible(string ReplayId, long? Debut, long? Fin);
+
+    /// <summary>Ce que le site demande a cette borne.</summary>
+    /// <param name="Role"><see cref="RoleStation"/>, <see cref="RoleJoueur"/> ou <see cref="RoleAucun"/> ; null
+    /// quand le site n'a pas repondu (ou une borne non appairee).</param>
+    public sealed record Liste(string? Role, IReadOnlyList<Cible> Cibles);
 
     /// <param name="Rendus">Les rendus tentes : zero quand rien de ce que le site demande n'est filmable ici.</param>
     /// <param name="EnvoiRefuse">Le site ou Google ont refuse un envoi (quota du jour, par exemple).</param>
@@ -45,15 +65,28 @@ public sealed class ReplayVideoPublisher
         "lecture_en_cours", "emulateur_en_cours", "rendu_en_cours",
     };
 
-    /// <summary>Filme et envoie au plus <paramref name="limite"/> records de cette borne.</summary>
+    /// <summary>Filme et envoie au plus <paramref name="limite"/> records de ce que le site demande.</summary>
     public async Task<Rapport> PublierAsync(int limite, CancellationToken ct)
+        => await FilmerAsync(await ListerAsync(ct).ConfigureAwait(false), limite, ct).ConfigureAwait(false);
+
+    /// <summary>
+    /// Le role de cette borne et ce qu'elle doit filmer. Demander la liste suffit au site pour finaliser les
+    /// films deja envoyes (visibilite, playlist).
+    /// </summary>
+    public async Task<Liste> ListerAsync(CancellationToken ct)
+    {
+        var credential = _devices.GetCredential();
+        if (string.IsNullOrEmpty(credential)) return new Liste(null, Array.Empty<Cible>());
+        return await CiblesAsync(credential, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>Filme et envoie au plus <paramref name="limite"/> records de la liste.</summary>
+    public async Task<Rapport> FilmerAsync(Liste liste, int limite, CancellationToken ct)
     {
         var credential = _devices.GetCredential();
         if (string.IsNullOrEmpty(credential)) return new Rapport(0, 0, 0, new[] { "borne non appairee" });
 
-        // Demander la liste suffit au site pour finaliser les films deja envoyes (visibilite, playlist) :
-        // une limite de 0 ne fait que cela.
-        var cibles = await CiblesAsync(credential, ct).ConfigureAwait(false);
+        var cibles = liste.Cibles;
         var details = new List<string>();
         var envoyees = 0;
         var rendus = 0;
@@ -66,9 +99,16 @@ public sealed class ReplayVideoPublisher
             var manifest = _manifests.GetManifest(cible.ReplayId);
             if (manifest is null || !_objects.HasObject(manifest.Object.Sha256))
             {
-                details.Add(cible.ReplayId + " : replay absent de cette borne");
-                await SignalerEchecAsync(credential, cible.ReplayId, "replay_absent", ct).ConfigureAwait(false);
-                continue;
+                // Une station filme les records des autres : elle va chercher leur replay.
+                manifest = liste.Role == RoleStation
+                    ? await AcquerirAsync(cible.ReplayId, manifest, ct).ConfigureAwait(false)
+                    : null;
+                if (manifest is null)
+                {
+                    details.Add(cible.ReplayId + " : replay absent de cette borne");
+                    await SignalerEchecAsync(credential, cible.ReplayId, "replay_absent", ct).ConfigureAwait(false);
+                    continue;
+                }
             }
 
             rendus++;
@@ -139,28 +179,77 @@ public sealed class ReplayVideoPublisher
         }
     }
 
-    private async Task<IReadOnlyList<Cible>> CiblesAsync(string credential, CancellationToken ct)
+    private async Task<Liste> CiblesAsync(string credential, CancellationToken ct)
     {
         try
         {
             using var client = Client(credential, TimeSpan.FromSeconds(60));
             using var reponse = await client.GetAsync("/api/v1/agent/videos/targets", ct).ConfigureAwait(false);
-            if (!reponse.IsSuccessStatusCode) return Array.Empty<Cible>();
-            using var doc = JsonDocument.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
-            if (!doc.RootElement.TryGetProperty("targets", out var liste)) return Array.Empty<Cible>();
-            var sortie = new List<Cible>();
+            if (!reponse.IsSuccessStatusCode) return new Liste(null, Array.Empty<Cible>());
+            return LireLaListe(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
+        {
+            _logger.LogWarning(ex, "Video : liste des records a filmer injoignable.");
+            return new Liste(null, Array.Empty<Cible>());
+        }
+    }
+
+    /// <summary>
+    /// La reponse du site. Un site d'avant les roles ne dit rien : la borne filme alors ses propres records,
+    /// comme avant. Pur, pour etre teste.
+    /// </summary>
+    internal static Liste LireLaListe(string json)
+    {
+        using var doc = JsonDocument.Parse(json);
+        var racine = doc.RootElement;
+        var role = racine.TryGetProperty("role", out var r) && r.ValueKind == JsonValueKind.String
+            ? r.GetString() switch
+            {
+                RoleStation => RoleStation,
+                RoleAucun => RoleAucun,
+                _ => RoleJoueur,
+            }
+            : RoleJoueur;
+        var sortie = new List<Cible>();
+        if (racine.TryGetProperty("targets", out var liste) && liste.ValueKind == JsonValueKind.Array)
+        {
             foreach (var c in liste.EnumerateArray())
             {
-                var id = c.TryGetProperty("replay_id", out var r) ? r.GetString() : null;
+                var id = c.TryGetProperty("replay_id", out var i) && i.ValueKind == JsonValueKind.String ? i.GetString() : null;
                 if (string.IsNullOrEmpty(id)) continue;
                 sortie.Add(new Cible(id!, Nombre(c, "run_start_frame"), Nombre(c, "run_end_frame")));
             }
-            return sortie;
         }
-        catch (Exception ex)
+        return new Liste(role, sortie);
+    }
+
+    /// <summary>
+    /// Le replay d'une autre borne, recupere comme pour une lecture : le manifeste aupres de la plateforme,
+    /// l'objet aupres des miroirs et des noeuds, verifie avant d'etre range (et encore au rendu). Null s'il
+    /// n'arrive pas.
+    /// </summary>
+    private async Task<ReplayManifest?> AcquerirAsync(string replayId, ReplayManifest? manifest, CancellationToken ct)
+    {
+        try
         {
-            _logger.LogWarning(ex, "Video : liste des records a filmer injoignable.");
-            return Array.Empty<Cible>();
+            if (manifest is null)
+            {
+                manifest = await _manifestFetcher.FetchAsync(replayId, ct).ConfigureAwait(false);
+                if (manifest is null) return null;
+                _manifests.SaveManifest(manifest);
+                if (_meta.GetMeta(replayId) is null)
+                    _meta.SaveMeta(ReplayLocalMetadata.Fresh(replayId) with { CreatedByThisDevice = false });
+            }
+            var trouve = await _sources.FindObjectAsync(manifest, ct).ConfigureAwait(false);
+            if (trouve == ReplayObjectSearch.Present && _objects.HasObject(manifest.Object.Sha256)) return manifest;
+            _logger.LogInformation("Video : replay {ReplayId} pas encore disponible pour la station ({Etat}).", replayId, trouve);
+            return null;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogWarning(ex, "Video : recuperation du replay {ReplayId} echouee.", replayId);
+            return null;
         }
     }
 

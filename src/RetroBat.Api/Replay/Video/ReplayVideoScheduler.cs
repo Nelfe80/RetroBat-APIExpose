@@ -7,11 +7,17 @@ using RetroBat.Domain.Interfaces;
 namespace RetroBat.Api.Replay.Video;
 
 /// <summary>
-/// LE RENDU DES FILMS AU REPOS (CDC video V2, lot 1). La borne filme ses records quand personne ne s'en sert :
-/// aucune partie, aucune lecture, aucun emulateur, ni navigation, ni appui sur le panel, ni clavier ou souris
-/// depuis un moment. Le joueur passe toujours avant : la moindre activite arrete le rendu en cours et rend la
-/// machine. Le site decide quoi filmer et combien par jour ; la borne ne rend qu'un film par passage, et
-/// repasse moins souvent quand il n'y a rien a filmer.
+/// QUAND LA BORNE FILME (CDC video V2, lot 1). Le site donne son role a la borne (decision du 14 octobre 2026) :
+/// <list type="bullet">
+/// <item>une STATION DE RENDU filme a toute heure, que quelqu'un se serve du PC ou non, tant qu'aucune partie,
+/// lecture ni emulateur ne tourne ; seule une partie qui commence arrete le rendu ;</item>
+/// <item>la borne d'un JOUEUR s'eteint souvent des la partie finie : elle ne filme rien, sauf si le site la
+/// laisse filmer ses propres records, et alors seulement au repos (ni navigation, ni panel, ni clavier ou
+/// souris depuis un moment), la moindre activite arretant le rendu ;</item>
+/// <item>sans role, la borne redemande de temps en temps, sans rien filmer.</item>
+/// </list>
+/// Le site decide quoi filmer et combien par jour ; la borne ne rend qu'un film par passage, et repasse moins
+/// souvent quand il n'y a rien a filmer.
 /// </summary>
 public sealed class ReplayVideoScheduler : BackgroundService
 {
@@ -23,12 +29,15 @@ public sealed class ReplayVideoScheduler : BackgroundService
     private readonly TimeSpan _repos;
     private readonly TimeSpan _intervalle;
     private readonly TimeSpan _rienAFilmer;
+    private readonly TimeSpan _sansRole;
 
     private readonly object _verrou = new();
     private DateTime _derniereActivite = DateTime.UtcNow;
     private bool _partieEnCours;
     private CancellationTokenSource? _renduEnCours;
     private IDisposable? _abonnement;
+    // Le dernier role donne par le site ; null avant sa premiere reponse.
+    private string? _role;
 
     public ReplayVideoScheduler(IEventBus bus, ReplayVideoPublisher publication, ReplayPlaybackService playback,
         IConfiguration configuration, ILogger<ReplayVideoScheduler> logger)
@@ -38,7 +47,18 @@ public sealed class ReplayVideoScheduler : BackgroundService
         _repos = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Render:IdleMinutes", 15)));
         _intervalle = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Render:IntervalMinutes", 5)));
         _rienAFilmer = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Render:NothingToDoMinutes", 60)));
+        _sansRole = TimeSpan.FromHours(Math.Max(1, configuration.GetValue("Video:Render:NoRoleHours", 6)));
     }
+
+    /// <summary>
+    /// La borne peut-elle filmer maintenant ? Une station des qu'aucune partie, lecture ni emulateur ne tourne ;
+    /// une borne de joueur seulement au repos. Pur, pour etre teste.
+    /// </summary>
+    internal static bool PeutFilmer(string? role, DateTime maintenant, DateTime derniereActivite, TimeSpan repos,
+        bool partieEnCours, bool emulateurEnCours, bool lectureEnCours)
+        => role == ReplayVideoPublisher.RoleStation
+            ? !partieEnCours && !emulateurEnCours && !lectureEnCours
+            : AuRepos(maintenant, derniereActivite, repos, partieEnCours, emulateurEnCours, lectureEnCours);
 
     /// <summary>La borne est-elle au repos ? Pur, pour etre teste.</summary>
     internal static bool AuRepos(DateTime maintenant, DateTime derniereActivite, TimeSpan repos, bool partieEnCours,
@@ -69,8 +89,8 @@ public sealed class ReplayVideoScheduler : BackgroundService
         }
         try { _abonnement = _bus.Subscribe<EventEnvelope>(SurEvenement); }
         catch (Exception ex) { _logger.LogWarning(ex, "Video : bus d'evenements indisponible, rendu au repos coupe."); return; }
-        _logger.LogInformation("Video : rendu au repos actif (apres {Repos} min sans activite, passage toutes les {Intervalle} min).",
-            _repos.TotalMinutes, _intervalle.TotalMinutes);
+        _logger.LogInformation("Video : rendu des films actif (passage toutes les {Intervalle} min ; borne de joueur : apres {Repos} min sans activite).",
+            _intervalle.TotalMinutes, _repos.TotalMinutes);
 
         var attente = _intervalle;
         while (!stoppingToken.IsCancellationRequested)
@@ -95,28 +115,41 @@ public sealed class ReplayVideoScheduler : BackgroundService
         }
     }
 
-    /// <summary>Un passage : filme un record si la borne est au repos. Rend le delai avant le suivant.</summary>
+    /// <summary>Un passage : filme un record si le role et l'etat de la borne le permettent. Rend le delai avant le suivant.</summary>
     private async Task<TimeSpan> PasserAsync(CancellationToken stoppingToken)
     {
-        bool partie; DateTime activiteDeLaBorne;
-        lock (_verrou) { partie = _partieEnCours; activiteDeLaBorne = _derniereActivite; }
+        bool partie; DateTime activiteDeLaBorne; string? role;
+        lock (_verrou) { partie = _partieEnCours; activiteDeLaBorne = _derniereActivite; role = _role; }
         var maintenant = DateTime.UtcNow;
         var activite = DerniereActivite(maintenant, activiteDeLaBorne, InactiviteWindows());
-        if (!AuRepos(maintenant, activite, _repos, partie, EmulatorForeground.EmulateurTourne(),
-                _playback.GetState().State != "idle"))
-            return _intervalle;
+        var emulateur = EmulatorForeground.EmulateurTourne();
+        var lecture = _playback.GetState().State != "idle";
+        // Role encore inconnu : on le demande des que la borne est libre, sans attendre le repos.
+        var libre = role is null ? !partie && !emulateur && !lecture
+            : PeutFilmer(role, maintenant, activite, _repos, partie, emulateur, lecture);
+        if (!libre) return _intervalle;
 
+        var liste = await _publication.ListerAsync(stoppingToken).ConfigureAwait(false);
+        if (liste.Role is null) return _intervalle;
+        if (liste.Role != role)
+            _logger.LogInformation("Video : role de cette borne pour les films : {Role}.", liste.Role);
+        lock (_verrou) _role = liste.Role;
+        if (liste.Role == ReplayVideoPublisher.RoleAucun) return _sansRole;
+        if (!PeutFilmer(liste.Role, maintenant, activite, _repos, partie, emulateur, lecture)) return _intervalle;
+        if (liste.Cibles.Count == 0) return _rienAFilmer;
+
+        var station = liste.Role == ReplayVideoPublisher.RoleStation;
         using var rendu = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
         lock (_verrou)
         {
-            // Une activite arrivee entre-temps : on ne commence pas.
-            if (_partieEnCours || _derniereActivite != activiteDeLaBorne) return _intervalle;
+            // Une partie, ou chez un joueur une activite, arrivee entre-temps : on ne commence pas.
+            if (_partieEnCours || (!station && _derniereActivite != activiteDeLaBorne)) return _intervalle;
             _renduEnCours = rendu;
         }
-        var veille = VeillerPendantLeRenduAsync(maintenant, rendu);
+        var veille = station ? Task.CompletedTask : VeillerPendantLeRenduAsync(maintenant, rendu);
         try
         {
-            var rapport = await _publication.PublierAsync(1, rendu.Token).ConfigureAwait(false);
+            var rapport = await _publication.FilmerAsync(liste, 1, rendu.Token).ConfigureAwait(false);
             return ProchainPassage(rapport, _intervalle, _rienAFilmer);
         }
         catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
@@ -169,8 +202,12 @@ public sealed class ReplayVideoScheduler : BackgroundService
             }
             if (!activite) return;
             _derniereActivite = DateTime.UtcNow;
-            // Le joueur passe avant : le rendu s'arrete et rend la machine.
-            try { _renduEnCours?.Cancel(); } catch (Exception) { /* deja termine */ }
+            // Le joueur passe avant : le rendu s'arrete et rend la machine. Une station ne s'arrete que pour
+            // une partie.
+            if (e.Type == "ui.game.started" || _role != ReplayVideoPublisher.RoleStation)
+            {
+                try { _renduEnCours?.Cancel(); } catch (Exception) { /* deja termine */ }
+            }
         }
     }
 
