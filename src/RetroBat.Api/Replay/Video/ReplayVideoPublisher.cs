@@ -281,14 +281,15 @@ public sealed class ReplayVideoPublisher
     /// LE FILM D'UNE PARTIE, CAPTE PENDANT LE JEU (decision du 14 octobre 2026). Le site dit si la partie est un
     /// record ; si oui, il ouvre la session d'envoi et la borne envoie le film directement chez Google, puis le
     /// confirme avec la portion filmee du replay (<paramref name="debutFilm"/> et <paramref name="finFilm"/>, en
-    /// frames du replay).
+    /// frames du replay). Le film d'une partie sans replay porte un identifiant a lui et les <paramref name="sessions"/>
+    /// de ses scores, par lesquelles le site la retrouve.
     /// <para>L'ENVOI SE REPREND (remarque du 14 octobre 2026) : <paramref name="session"/> est celle d'un envoi
     /// precedent, ou null ; Google dit ce qu'il a deja recu et l'envoi repart de la, sans rouvrir de session ni
     /// recompter le quota. <paramref name="memoriser"/> garde la session sur la borne des son ouverture, pour
     /// qu'une partie lancee, une borne eteinte ou une coupure du reseau ne perdent rien.</para>
     /// </summary>
     public async Task<ResultatDeCapture> EnvoyerCaptureAsync(string replayId, string fichier, long debutFilm, long finFilm,
-        double fps, string? session, Func<string?, Task> memoriser, CancellationToken ct)
+        double fps, IReadOnlyList<string>? sessions, string? session, Func<string?, Task> memoriser, CancellationToken ct)
     {
         var credential = _devices.GetCredential();
         if (string.IsNullOrEmpty(credential)) return new(IssueDeCapture.PlusTard, "borne non appairee");
@@ -317,13 +318,17 @@ public sealed class ReplayVideoPublisher
         }
         if (string.IsNullOrEmpty(session))
         {
-            var (adresse, raison) = await OuvrirSessionAsync(credential, new JsonObject
+            var demande = new JsonObject
             {
                 ["replay_id"] = replayId,
                 ["size"] = taille,
                 ["type"] = "video/x-matroska",
                 ["source"] = "capture",
-            }, ct).ConfigureAwait(false);
+            };
+            // Le film d'une partie sans replay : le site retrouve la partie par les sessions de ses scores.
+            if (sessions is { Count: > 0 })
+                demande["sessions"] = new JsonArray(sessions.Select(s => (JsonNode?)JsonValue.Create(s)).ToArray());
+            var (adresse, raison) = await OuvrirSessionAsync(credential, demande, ct).ConfigureAwait(false);
             if (adresse is null)
                 return new(raison is not null && RefusDefinitifs.Contains(raison) ? IssueDeCapture.Inutile : IssueDeCapture.PlusTard,
                     raison ?? "site injoignable");

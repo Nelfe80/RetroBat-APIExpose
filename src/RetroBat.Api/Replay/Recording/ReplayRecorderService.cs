@@ -479,9 +479,14 @@ public sealed class ReplayRecorderService : BackgroundService
                 {
                     // Le départ est consommé : sans cela on reposerait la question à chaque sondage.
                     // Et l'attente est marquée comme annoncée, sinon le journal dirait « en attente
-                    // du départ » juste après qu'on en a vu un.
+                    // du départ » juste après qu'on en a vu un. Le jeu a eu son départ : un bouton ne
+                    // réarme plus (le film de la partie ne repartirait pas sur la démo).
                     _departEnAttente = false;
                     _attenteAnnoncee = status.System + "/" + status.Game;
+                    _dejaEnregistre = true;
+                    // La partie se filme quand même, sans replay (ReplayCaptureService) : filmer ne
+                    // passe pas par l'encodeur d'état qui plante (décision du 14 octobre 2026).
+                    await PublishAsync("replay.recording.skipped", new { status.System, status.Game }, ct).ConfigureAwait(false);
                     return;
                 }
                 await StartAsync(status, ct).ConfigureAwait(false);

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using RetroBat.Api.Infrastructure;
+using RetroBat.Api.Replay.Models;
 using RetroBat.Api.Replay.Runtime;
 using RetroBat.Api.Replay.Storage;
 using RetroBat.Domain.Events;
@@ -24,6 +25,12 @@ namespace RetroBat.Api.Replay.Video;
 /// YouTube l'affiche alors droit. Sans sens connu, la capture s'arrete aussitot.</item>
 /// <item>Apres la partie, hors de toute partie, la borne demande au site si c'est un record : oui, elle envoie le
 /// film directement chez Google ; non, elle l'efface. Sans reponse decidable, elle redemande, puis efface.</item>
+/// <item>UNE PARTIE SANS REPLAY SE FILME AUSSI (19XX sous le coeur MAME, 14 octobre 2026). Sous un coeur ou
+/// l'enregistreur renonce au replay (RetroArch 1.22.2 plante en encodant l'etat du coeur MAME), le film part au meme
+/// depart (<c>replay.recording.skipped</c>) et s'arrete a la fin de la partie certifiee, a la baisse du score ou a la
+/// fin du jeu. Il porte un identifiant a lui (<c>fm_</c>) et les sessions des scores publies pendant et juste apres
+/// lui : le site y retrouve la partie et son rang. La cadence du jeu se suit alors aux trames que le plugin Lua de
+/// MAME joint a ses signaux.</item>
 /// </list>
 /// </summary>
 public sealed class ReplayCaptureService : BackgroundService
@@ -73,6 +80,11 @@ public sealed class ReplayCaptureService : BackgroundService
         /// <summary>La rotation annoncee par le coeur (quarts de tour antihoraires), null si inconnue.</summary>
         public int? Rotation;
         public bool EnteteVerifiee;
+        /// <summary>Le film d'une partie sans replay : il s'arrete et se suit sans l'enregistreur.</summary>
+        public bool SansReplay;
+        /// <summary>D'ou viennent les trames qui suivent sa cadence (un seul emetteur, sinon les compteurs se melent).</summary>
+        public string? SourceDesTrames;
+        public bool Lent;
         public readonly GardeDeCapture Garde = new();
         public readonly Stopwatch Chrono = Stopwatch.StartNew();
     }
@@ -80,10 +92,22 @@ public sealed class ReplayCaptureService : BackgroundService
     /// <summary>
     /// Une capture gardee sur la borne : en attente de la decision du site, en cours d'envoi (<paramref name="Session"/>,
     /// pour reprendre la ou l'envoi s'est arrete), puis envoyee (<paramref name="VideoId"/>) jusqu'a ce que la video
-    /// soit prete chez YouTube.
+    /// soit prete chez YouTube. Le film d'une partie sans replay (<paramref name="SansReplay"/>) porte les sessions de
+    /// ses scores (<paramref name="Sessions"/>), par lesquelles le site retrouve la partie.
     /// </summary>
     public sealed record CaptureGardee(string ReplayId, string Fichier, long DebutFilm, long FinFilm, DateTime CreeeUtc,
-        string? Session = null, string? VideoId = null, DateTime? EnvoyeeUtc = null);
+        string? Session = null, string? VideoId = null, DateTime? EnvoyeeUtc = null,
+        IReadOnlyList<string>? Sessions = null, bool SansReplay = false);
+
+    /// <summary>Le prefixe des films sans replay : le site les reconnait et les relie par les sessions des scores.</summary>
+    internal const string PrefixeSansReplay = "fm_";
+
+    /// <summary>Les verdicts arrives juste apres un film sans replay sont les siens (la partie vient de finir).</summary>
+    private static readonly TimeSpan SessionsTardivesPendant = TimeSpan.FromMinutes(10);
+
+    private readonly object _verrouSessions = new();
+    private readonly Dictionary<string, HashSet<string>> _sessionsDesFilms = new(StringComparer.Ordinal);
+    private (string Id, DateTime Fin)? _dernierSansReplay;
 
     /// <summary>Une video envoyee qui n'est toujours pas prete apres ce delai : le film n'est plus garde.</summary>
     private static readonly TimeSpan PreteAuPlus = TimeSpan.FromHours(24);
@@ -162,6 +186,23 @@ public sealed class ReplayCaptureService : BackgroundService
                     if (Chaine(e.Payload, "ReplayId") is { } arrete)
                         _ = Task.Run(() => ArreterAsync(arrete, Entier(e.Payload, "LastFrame"), abandon: false, "fin du replay"));
                     break;
+                // Une partie RetroArch sans replay (coeur MAME) : le film part quand meme, et s'arrete sans l'enregistreur.
+                case "replay.recording.skipped":
+                    _ = Task.Run(() => DemarrerAsync(PrefixeSansReplay + Ulid.New(), sansReplay: true));
+                    break;
+                case "scoring.run.ended":
+                case "scoring.replay.stop":
+                    if (_enCours is { SansReplay: true } sansReplay)
+                        _ = Task.Run(() => ArreterAsync(sansReplay.ReplayId, null, abandon: false,
+                            e.Type == "scoring.run.ended" ? "fin de la partie certifiee" : "le score a baisse"));
+                    break;
+                case "scoring.verdict":
+                    NoterSession(Chaine(e.Payload, "SessionId"));
+                    break;
+                case "ingame.memory.changed":
+                    if (_enCours is { SansReplay: true } suivi && TrameDuJeu(e.Payload) is { } trame)
+                        SuivreLaCadence(suivi, trame.Source, trame.Frame);
+                    break;
                 case "ui.game.ended":
                     _ = Task.Run(() => ArreterAsync(null, null, abandon: false, "fin de partie"));
                     break;
@@ -180,8 +221,11 @@ public sealed class ReplayCaptureService : BackgroundService
         }
     }
 
-    /// <summary>Le replay de la partie demarre : la capture aussi, si la borne le peut.</summary>
-    private async Task DemarrerAsync(string replayId)
+    /// <summary>
+    /// Le replay de la partie demarre : la capture aussi, si la borne le peut. <paramref name="sansReplay"/> : la partie
+    /// part sans replay, le film porte alors son propre identifiant.
+    /// </summary>
+    private async Task DemarrerAsync(string replayId, bool sansReplay = false)
     {
         await _operation.WaitAsync(_arret).ConfigureAwait(false);
         try
@@ -223,9 +267,21 @@ public sealed class ReplayCaptureService : BackgroundService
             }
             var statut = await _ra.GetStatusAsync(_arret).ConfigureAwait(false);
             var rotation = _coeur.ReadRotation(statut?.Crc32);
-            _enCours = new CaptureEnCours { ReplayId = replayId, Fichier = fichier, FrameDebut = frame, Rotation = rotation };
-            _logger.LogInformation("Capture : partie {ReplayId} filmee depuis la frame {Frame} (rotation du coeur : {Rotation}).",
-                replayId, frame, rotation?.ToString() ?? "inconnue");
+            lock (_verrouSessions)
+            {
+                // Une autre partie commence : les verdicts qui suivent ne sont plus ceux du film d'avant.
+                _dernierSansReplay = null;
+                _enCours = new CaptureEnCours
+                {
+                    ReplayId = replayId, Fichier = fichier, FrameDebut = frame, Rotation = rotation, SansReplay = sansReplay,
+                };
+            }
+            if (sansReplay)
+                _logger.LogInformation("Capture : partie sans replay filmee sous {ReplayId} (rotation du coeur : {Rotation}).",
+                    replayId, rotation?.ToString() ?? "inconnue");
+            else
+                _logger.LogInformation("Capture : partie {ReplayId} filmee depuis la frame {Frame} (rotation du coeur : {Rotation}).",
+                    replayId, frame, rotation?.ToString() ?? "inconnue");
         }
         catch (OperationCanceledException) { /* arret de l'API */ }
         catch (Exception ex)
@@ -249,7 +305,12 @@ public sealed class ReplayCaptureService : BackgroundService
         {
             var c = _enCours;
             if (c is null || (replayId is not null && replayId != c.ReplayId)) return;
-            _enCours = null;
+            lock (_verrouSessions)
+            {
+                _enCours = null;
+                // Le verdict du 1CC arrive juste apres la fin de la partie : il est encore a ce film.
+                if (c.SansReplay && !abandon) _dernierSansReplay = (c.ReplayId, DateTime.UtcNow);
+            }
 
             // Un film qui ne grossit plus est deja ferme (RetroArch quitte) : un RECORDING_TOGGLE en
             // relancerait un autre.
@@ -260,6 +321,7 @@ public sealed class ReplayCaptureService : BackgroundService
             if (abandon)
             {
                 Effacer(c.Fichier);
+                OublierLesSessions(c.ReplayId);
                 _logger.LogInformation("Capture : {ReplayId} abandonnee ({Pourquoi}), film efface.", c.ReplayId, pourquoi);
                 return;
             }
@@ -275,6 +337,7 @@ public sealed class ReplayCaptureService : BackgroundService
             if (entete is null || entete.Couchee || entete.Largeur < LargeurMinimale)
             {
                 Effacer(c.Fichier);
+                OublierLesSessions(c.ReplayId);
                 _logger.LogInformation("Capture : {ReplayId} non gardee ({Raison}).", c.ReplayId,
                     entete is null ? "film illisible" : entete.Couchee ? "jeu vertical, film couche" : "image trop petite");
                 return;
@@ -284,7 +347,8 @@ public sealed class ReplayCaptureService : BackgroundService
             Effacer(destination);
             File.Move(c.Fichier, destination);
             var gardee = new CaptureGardee(c.ReplayId, destination, c.FrameDebut,
-                Math.Max(c.FrameDebut, derniereFrame ?? 0), DateTime.UtcNow);
+                Math.Max(c.FrameDebut, derniereFrame ?? 0), DateTime.UtcNow,
+                Sessions: c.SansReplay ? SessionsDuFilm(c.ReplayId, null) : null, SansReplay: c.SansReplay);
             await File.WriteAllTextAsync(Path.Combine(_dossier, c.ReplayId + ".json"),
                 JsonSerializer.Serialize(gardee, Json), Encoding.UTF8, _arret).ConfigureAwait(false);
             _logger.LogInformation("Capture : {ReplayId} gardee ({Taille} octets, {Pourquoi}), en attente de la decision du site.",
@@ -299,6 +363,80 @@ public sealed class ReplayCaptureService : BackgroundService
         finally
         {
             _operation.Release();
+        }
+    }
+
+    /// <summary>
+    /// Le verdict d'un score : sa session est celle du film sans replay en cours, ou de celui qui vient de finir (dix
+    /// minutes au plus, tant qu'aucune autre partie n'est filmee). Le film d'une partie avec replay n'en a pas besoin.
+    /// </summary>
+    private void NoterSession(string? session)
+    {
+        if (string.IsNullOrWhiteSpace(session)) return;
+        lock (_verrouSessions)
+        {
+            string? film = null;
+            if (_enCours is { SansReplay: true } c) film = c.ReplayId;
+            else if (_enCours is null && _dernierSansReplay is { } d && DateTime.UtcNow - d.Fin < SessionsTardivesPendant) film = d.Id;
+            if (film is null) return;
+            if (!_sessionsDesFilms.TryGetValue(film, out var sessions))
+                _sessionsDesFilms[film] = sessions = new HashSet<string>(StringComparer.Ordinal);
+            sessions.Add(session.Trim());
+        }
+    }
+
+    /// <summary>Les sessions connues d'un film : celles deja gardees, plus celles notees depuis.</summary>
+    private IReadOnlyList<string> SessionsDuFilm(string film, IReadOnlyList<string>? deja)
+    {
+        lock (_verrouSessions)
+        {
+            var toutes = new SortedSet<string>(deja ?? Array.Empty<string>(), StringComparer.Ordinal);
+            if (_sessionsDesFilms.TryGetValue(film, out var notees)) toutes.UnionWith(notees);
+            return toutes.ToList();
+        }
+    }
+
+    private void OublierLesSessions(string film)
+    {
+        lock (_verrouSessions) _sessionsDesFilms.Remove(film);
+    }
+
+    /// <summary>
+    /// La cadence d'une partie sans replay se lit aux trames emulees que les signaux du jeu portent (plugin Lua de
+    /// MAME). Un seul emetteur : deux compteurs differents se meleraient.
+    /// </summary>
+    private void SuivreLaCadence(CaptureEnCours c, string source, long frame)
+    {
+        lock (_verrouSessions)
+        {
+            if (c.Lent || !ReferenceEquals(_enCours, c)) return;
+            c.SourceDesTrames ??= source;
+            if (!string.Equals(c.SourceDesTrames, source, StringComparison.Ordinal)) return;
+            if (!c.Garde.Relever(c.Chrono.Elapsed.TotalSeconds, frame)) return;
+            c.Lent = true;
+        }
+        MarquerModeste();
+        _ = Task.Run(() => ArreterAsync(c.ReplayId, null, abandon: true,
+            "le jeu ralentissait (reference " + c.Garde.Reference.ToString("F1") + " images/s)"));
+    }
+
+    /// <summary>L'emetteur et la trame emulee d'un signal du jeu (<c>ingame.memory.changed</c>), ou null. Pur.</summary>
+    internal static (string Source, long Frame)? TrameDuJeu(object? payload)
+    {
+        try
+        {
+            var el = payload is JsonElement j ? j : JsonSerializer.SerializeToElement(payload);
+            if (el.ValueKind != JsonValueKind.Object
+                || !el.TryGetProperty("Source", out var source) || source.ValueKind != JsonValueKind.String
+                || !el.TryGetProperty("signal", out var signal) || signal.ValueKind != JsonValueKind.Object
+                || !signal.TryGetProperty("Frame", out var f) || f.ValueKind != JsonValueKind.Number
+                || !f.TryGetInt64(out var frame) || frame <= 0)
+                return null;
+            return (source.GetString() ?? "", frame);
+        }
+        catch (Exception)
+        {
+            return null;
         }
     }
 
@@ -399,6 +537,12 @@ public sealed class ReplayCaptureService : BackgroundService
                 Oublier(g, fiche, "plus grosse que " + _tailleMax / 1_000_000 + " Mo");
                 continue;
             }
+            // Sans replay : les sessions des scores arrives depuis la fin du film le rejoignent.
+            if (g.SansReplay && SessionsDuFilm(g.ReplayId, g.Sessions) is { } sessions && sessions.Count != (g.Sessions?.Count ?? 0))
+            {
+                g = g with { Sessions = sessions };
+                await SauverAsync(g, fiche, stoppingToken).ConfigureAwait(false);
+            }
 
             using var envoi = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
             lock (_verrou) _envoiEnCours = envoi;
@@ -406,7 +550,7 @@ public sealed class ReplayCaptureService : BackgroundService
             {
                 var courante = g;
                 var resultat = await _publication.EnvoyerCaptureAsync(courante.ReplayId, courante.Fichier, courante.DebutFilm, fin, fps,
-                    courante.Session, async session =>
+                    courante.Sessions, courante.Session, async session =>
                     {
                         courante = courante with { Session = session };
                         await SauverAsync(courante, fiche, stoppingToken).ConfigureAwait(false);
@@ -452,6 +596,7 @@ public sealed class ReplayCaptureService : BackgroundService
     {
         Effacer(g.Fichier);
         Effacer(fiche);
+        OublierLesSessions(g.ReplayId);
         _logger.LogInformation("Capture : {ReplayId} {Pourquoi}, film efface de la borne.", g.ReplayId, pourquoi);
     }
 

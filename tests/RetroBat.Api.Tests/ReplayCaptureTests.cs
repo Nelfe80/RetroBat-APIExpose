@@ -144,6 +144,36 @@ public sealed class ReplayCaptureTests
         Assert.Null(g.Session);
         Assert.Null(g.VideoId);
         Assert.Null(g.EnvoyeeUtc);
+        // D'avant le film sans replay : une partie avec replay, sans sessions.
+        Assert.False(g.SansReplay);
+        Assert.Null(g.Sessions);
+    }
+
+    [Fact]
+    public void Le_film_d_une_partie_sans_replay_garde_ses_sessions()
+    {
+        var g = new ReplayCaptureService.CaptureGardee("fm_A", @"C:\captures\fm_A.mkv", 0, 0,
+            new DateTime(2026, 10, 14, 20, 23, 0, DateTimeKind.Utc), Sessions: ["sess-1lc", "sess-1cc"], SansReplay: true);
+        var relue = System.Text.Json.JsonSerializer.Deserialize<ReplayCaptureService.CaptureGardee>(
+            System.Text.Json.JsonSerializer.Serialize(g));
+        Assert.NotNull(relue);
+        Assert.True(relue!.SansReplay);
+        Assert.Equal(["sess-1lc", "sess-1cc"], relue.Sessions);
+        Assert.StartsWith(ReplayCaptureService.PrefixeSansReplay, relue.ReplayId);
+    }
+
+    [Fact]
+    public void La_trame_emulee_se_lit_dans_un_signal_du_plugin_lua_de_mame()
+    {
+        // La forme que publie MameLuaIngameProvider (ingame.memory.changed).
+        var signal = new { Source = "mame.lua", SystemId = "mame", Rom = "19xx", signal = new { Key = "SCORE", Value = 300L, Frame = (long?)4512 } };
+        Assert.Equal(("mame.lua", 4512L), ReplayCaptureService.TrameDuJeu(signal));
+
+        // Un plugin d'avant la trame, ou un signal sans trame : rien a suivre.
+        Assert.Null(ReplayCaptureService.TrameDuJeu(new { Source = "mame.lua", signal = new { Key = "SCORE", Frame = (long?)null } }));
+        Assert.Null(ReplayCaptureService.TrameDuJeu(new { Source = "mame.lua", signal = new { Key = "SCORE" } }));
+        Assert.Null(ReplayCaptureService.TrameDuJeu(new { signal = new { Frame = 10L } }));
+        Assert.Null(ReplayCaptureService.TrameDuJeu(null));
     }
 
     [Fact]
