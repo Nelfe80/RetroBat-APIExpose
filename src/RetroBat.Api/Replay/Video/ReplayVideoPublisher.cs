@@ -264,10 +264,14 @@ public sealed class ReplayVideoPublisher
         PlusTard,
     }
 
-    /// <summary>Les refus qui rendent une capture inutile pour toujours.</summary>
+    /// <summary>
+    /// Les refus qui rendent une capture inutile pour toujours. « replay.not_owned » n'en est pas un : juste
+    /// apres la partie, le replay n'est pas encore relie au score (vecu le 14 octobre, Metal Slug 3 : demande
+    /// 0,2 s apres la fin, replay finalise 5 s plus tard).
+    /// </summary>
     private static readonly HashSet<string> RefusDefinitifs = new(StringComparer.Ordinal)
     {
-        "pas_un_record", "deja_filme", "replay.not_owned", "taille",
+        "pas_un_record", "deja_filme", "taille",
     };
 
     /// <summary>Ce que donne une demande d'envoi de capture : l'issue, son detail, et la video si elle existe.</summary>

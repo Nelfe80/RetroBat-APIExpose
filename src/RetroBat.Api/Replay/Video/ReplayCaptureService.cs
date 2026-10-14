@@ -30,6 +30,12 @@ public sealed class ReplayCaptureService : BackgroundService
 {
     private static readonly TimeSpan Releve = TimeSpan.FromSeconds(2);
     private static readonly TimeSpan PasEncoreAuPlus = TimeSpan.FromHours(3);
+
+    /// <summary>
+    /// Avant la premiere demande : le replay se finalise, le score part, le site les relie et depose le replay sur
+    /// le miroir, sans quoi il ne s'affiche pas encore au classement. Quelques secondes a une minute.
+    /// </summary>
+    private static readonly TimeSpan PremiereDemandeApres = TimeSpan.FromSeconds(60);
     private static readonly TimeSpan ModesteDurant = TimeSpan.FromDays(30);
     private const string EchelleVoulue = "4";
 
@@ -381,6 +387,8 @@ public sealed class ReplayCaptureService : BackgroundService
             }
 
             var age = DateTime.UtcNow - g.CreeeUtc;
+            // Trop tot : le site ne connait pas encore la partie.
+            if (age < PremiereDemandeApres) continue;
             if (age > _ageMax)
             {
                 Oublier(g, fiche, "trop ancienne");
@@ -415,7 +423,8 @@ public sealed class ReplayCaptureService : BackgroundService
                         Oublier(courante, fiche, resultat.Detail);
                         break;
                     default:
-                        if (resultat.Detail == "pas_encore" && age > PasEncoreAuPlus) Oublier(courante, fiche, "toujours pas classee");
+                        if (resultat.Detail is "pas_encore" or "replay.not_owned" && age > PasEncoreAuPlus)
+                            Oublier(courante, fiche, "toujours pas reliee a un score classe");
                         else _logger.LogInformation("Capture : {ReplayId} attend ({Detail}).", courante.ReplayId, resultat.Detail);
                         break;
                 }
