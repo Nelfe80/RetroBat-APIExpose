@@ -62,6 +62,7 @@ public sealed class ReplayCaptureService : BackgroundService
     private readonly TimeSpan _ageMax;
     private readonly TimeSpan _intervalleEnvoi;
     private readonly long _tailleMax;
+    private readonly long _tailleLocaleMax;
     private readonly string _dossier;
 
     private readonly SemaphoreSlim _operation = new(1, 1);
@@ -121,8 +122,10 @@ public sealed class ReplayCaptureService : BackgroundService
         _espaceLibreMinGo = Math.Max(1, configuration.GetValue("Video:Capture:MinFreeGb", 5.0));
         _ageMax = TimeSpan.FromHours(Math.Max(1, configuration.GetValue("Video:Capture:MaxAgeHours", 48)));
         _intervalleEnvoi = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Capture:UploadIntervalMinutes", 2)));
-        // Le plus gros film envoye (300 Mo, le plafond du site) : au-dela, la capture s'arrete en pleine partie.
+        // Le plus gros film ENVOYE (300 Mo, le plafond du site). Le film sur le disque, lui, continue au-dela (decision du
+        // 15 octobre 2026) : le direct d'un record tombe tard dans une longue partie, et il est la copie du film.
         _tailleMax = Math.Max(1, configuration.GetValue("Video:Capture:MaxMb", 300)) * 1_000_000L;
+        _tailleLocaleMax = Math.Max(_tailleMax / 1_000_000L, configuration.GetValue("Video:Capture:MaxLocalMb", 4000L)) * 1_000_000L;
         _dossier = Path.GetFullPath(Path.Combine(objects.TempRoot, "..", "captures"));
     }
 
@@ -469,9 +472,16 @@ public sealed class ReplayCaptureService : BackgroundService
             }
         }
 
-        if (TailleDe(c.Fichier) > _tailleMax)
+        // Le film depasse le plafond d'envoi sans s'arreter : il ne partira pas sur YouTube, mais le direct d'un record
+        // tardif en est la copie. Seuls le plafond local et l'espace libre du disque l'arretent.
+        if (TailleDe(c.Fichier) > _tailleLocaleMax)
         {
-            await ArreterAsync(c.ReplayId, null, abandon: true, "film plus gros que " + _tailleMax / 1_000_000 + " Mo").ConfigureAwait(false);
+            await ArreterAsync(c.ReplayId, null, abandon: true, "film plus gros que " + _tailleLocaleMax / 1_000_000 + " Mo").ConfigureAwait(false);
+            return;
+        }
+        if (EspaceLibreGo(Path.GetDirectoryName(c.Fichier) ?? _dossier) is { } libre && libre < _espaceLibreMinGo)
+        {
+            await ArreterAsync(c.ReplayId, null, abandon: true, "plus que " + libre.ToString("F1") + " Go libres").ConfigureAwait(false);
             return;
         }
 
