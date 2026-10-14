@@ -130,7 +130,7 @@ public sealed class ReplayVideoRenderer
             while (!process.HasExited && !pilote.Termine)
             {
                 ct.ThrowIfCancellationRequested();
-                RetroBat.Api.Infrastructure.EmulatorForeground.GarderEnRetrait(process);
+                RetroBat.Api.Infrastructure.EmulatorForeground.GarderHorsEcran(process);
 
                 var action = chrono.Elapsed > plafond
                     ? pilote.Abandonner()
@@ -220,7 +220,9 @@ public sealed class ReplayVideoRenderer
             Ligne("video_scale_integer", "true"),
             Ligne("video_smooth", "false"),
             Ligne("recording_output_directory", films),
-            // Discretion : fenetre reduite (l'enregistrement continue), son coupe en sortie (le film le garde).
+            // Discretion : la fenetre demarre reduite puis vit hors de tous les ecrans (EmulatorForeground.
+            // GarderHorsEcran) ; reduite, OpenGL ne dessine plus rien (film noir, 14 octobre). Son coupe en
+            // sortie, garde dans le film.
             Ligne("video_fullscreen", "false"),
             Ligne("video_windowed_fullscreen", "false"),
             Ligne("video_window_save_positions", "false"),

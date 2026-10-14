@@ -204,19 +204,37 @@ public static class EmulatorForeground
     }
 
     /// <summary>
-    /// GARDE UNE FENETRE EN RETRAIT : le rendu video d'un replay (CDC video V2, §4.2) tourne pendant que la
-    /// borne peut etre devant quelqu'un. Sa fenetre est reduite sans prendre le premier plan, et de nouveau a
-    /// chaque appel : demarrer reduit ne suffit pas toujours (Bubble Bobble restait visible, 2026-10-14).
-    /// Rend vrai si la fenetre existe.
+    /// GARDE UNE FENETRE HORS DE TOUS LES ECRANS, sans la reduire (CDC video V2, §4.2). Le rendu video d'un
+    /// replay filme l'image affichee par OpenGL : une fenetre REDUITE n'a plus d'image (film noir, vecu le
+    /// 14 octobre), alors qu'une fenetre hors ecran garde la sienne. RetroArch demarre reduit, a sa taille ;
+    /// on le restaure ici sans l'activer, loin a gauche et en haut, et on lui retire son bouton de barre des
+    /// taches. Rejoue a chaque appel : une fenetre qui revient a l'ecran repart. Rend vrai si elle existe.
     /// </summary>
-    public static bool GarderEnRetrait(Process process)
+    public static bool GarderHorsEcran(Process process)
     {
         try
         {
             process.Refresh();
             var fenetre = process.MainWindowHandle;
             if (fenetre == IntPtr.Zero) return false;
-            if (!IsIconic(fenetre)) ShowWindow(fenetre, SwShowMinNoActive);
+
+            var style = GetWindowLongPtr(fenetre, GwlExStyle).ToInt64();
+            var voulu = (style | WsExToolWindow) & ~WsExAppWindow;
+            if (voulu != style) SetWindowLongPtr(fenetre, GwlExStyle, new IntPtr(voulu));
+
+            var placement = new Placement { Taille = Marshal.SizeOf<Placement>() };
+            if (!GetWindowPlacement(fenetre, ref placement)) return true;
+            var largeur = placement.Normale.Droite - placement.Normale.Gauche;
+            var hauteur = placement.Normale.Bas - placement.Normale.Haut;
+            if (IsIconic(fenetre) || placement.Normale.Gauche > HorsEcran / 2)
+            {
+                placement.Normale = new Rectangle
+                {
+                    Gauche = HorsEcran, Haut = HorsEcran, Droite = HorsEcran + largeur, Bas = HorsEcran + hauteur,
+                };
+                placement.Affichage = SwShowNoActivate;
+                SetWindowPlacement(fenetre, ref placement);
+            }
             return true;
         }
         catch (Exception)
@@ -225,8 +243,40 @@ public static class EmulatorForeground
         }
     }
 
-    /// <summary>Reduite, sans activer la fenetre ni prendre le premier plan.</summary>
-    private const int SwShowMinNoActive = 7;
+    /// <summary>Loin de tout ecran, a gauche et en haut (assez pour un mur d'ecrans, sans toucher -32000).</summary>
+    private const int HorsEcran = -12000;
+    private const int SwShowNoActivate = 4;
+    private const int GwlExStyle = -20;
+    private const long WsExToolWindow = 0x80;
+    private const long WsExAppWindow = 0x40000;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct Rectangle
+    {
+        public int Gauche, Haut, Droite, Bas;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct Placement
+    {
+        public int Taille;
+        public int Drapeaux;
+        public int Affichage;
+        public int MinX, MinY, MaxX, MaxY;
+        public Rectangle Normale;
+    }
+
+    [DllImport("user32.dll")]
+    private static extern bool GetWindowPlacement(IntPtr hWnd, ref Placement placement);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetWindowPlacement(IntPtr hWnd, ref Placement placement);
+
+    [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
+    private static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int index);
+
+    [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")]
+    private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int index, IntPtr valeur);
 
     /// <summary>
     /// Le premier emulateur de la liste qui a une fenetre, devant ou non, en UN parcours des
