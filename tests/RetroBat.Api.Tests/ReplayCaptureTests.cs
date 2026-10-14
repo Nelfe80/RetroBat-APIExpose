@@ -126,6 +126,27 @@ public sealed class ReplayCaptureTests
     }
 
     [Fact]
+    public void Une_reprise_d_envoi_part_de_l_octet_suivant_le_dernier_recu()
+    {
+        Assert.Equal(1048576, ReplayVideoPublisher.OctetsRecus("bytes=0-1048575"));
+        Assert.Equal(0, ReplayVideoPublisher.OctetsRecus(null));
+        Assert.Equal(0, ReplayVideoPublisher.OctetsRecus(""));
+        Assert.Equal(0, ReplayVideoPublisher.OctetsRecus("illisible"));
+    }
+
+    [Fact]
+    public void Une_fiche_d_avant_la_reprise_se_relit_sans_session_ni_video()
+    {
+        const string ancienne = """{"ReplayId":"rp_A","Fichier":"C:\\captures\\rp_A.mkv","DebutFilm":12,"FinFilm":9000,"CreeeUtc":"2026-10-14T16:00:00Z"}""";
+        var g = System.Text.Json.JsonSerializer.Deserialize<ReplayCaptureService.CaptureGardee>(ancienne);
+        Assert.NotNull(g);
+        Assert.Equal("rp_A", g!.ReplayId);
+        Assert.Null(g.Session);
+        Assert.Null(g.VideoId);
+        Assert.Null(g.EnvoyeeUtc);
+    }
+
+    [Fact]
     public void L_echelle_des_films_se_pose_une_seule_fois_dans_retroarch_cfg()
     {
         const string avant = "record_driver = \"ffmpeg\"\r\nvideo_record_scale_factor = \"1\"\r\nvideo_record_threads = \"2\"\r\n";

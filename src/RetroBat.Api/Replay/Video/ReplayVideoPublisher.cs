@@ -270,41 +270,180 @@ public sealed class ReplayVideoPublisher
         "pas_un_record", "deja_filme", "replay.not_owned", "taille",
     };
 
+    /// <summary>Ce que donne une demande d'envoi de capture : l'issue, son detail, et la video si elle existe.</summary>
+    public sealed record ResultatDeCapture(IssueDeCapture Issue, string Detail, string? VideoId = null, bool Confirmee = false);
+
     /// <summary>
     /// LE FILM D'UNE PARTIE, CAPTE PENDANT LE JEU (decision du 14 octobre 2026). Le site dit si la partie est un
     /// record ; si oui, il ouvre la session d'envoi et la borne envoie le film directement chez Google, puis le
-    /// confirme avec la portion filmee du replay. <paramref name="debutFilm"/> et <paramref name="finFilm"/> sont
-    /// les frames du replay au debut et a la fin du film.
+    /// confirme avec la portion filmee du replay (<paramref name="debutFilm"/> et <paramref name="finFilm"/>, en
+    /// frames du replay).
+    /// <para>L'ENVOI SE REPREND (remarque du 14 octobre 2026) : <paramref name="session"/> est celle d'un envoi
+    /// precedent, ou null ; Google dit ce qu'il a deja recu et l'envoi repart de la, sans rouvrir de session ni
+    /// recompter le quota. <paramref name="memoriser"/> garde la session sur la borne des son ouverture, pour
+    /// qu'une partie lancee, une borne eteinte ou une coupure du reseau ne perdent rien.</para>
     /// </summary>
-    public async Task<(IssueDeCapture Issue, string Detail)> EnvoyerCaptureAsync(string replayId, string fichier,
-        long debutFilm, long finFilm, double fps, CancellationToken ct)
+    public async Task<ResultatDeCapture> EnvoyerCaptureAsync(string replayId, string fichier, long debutFilm, long finFilm,
+        double fps, string? session, Func<string?, Task> memoriser, CancellationToken ct)
     {
         var credential = _devices.GetCredential();
-        if (string.IsNullOrEmpty(credential)) return (IssueDeCapture.PlusTard, "borne non appairee");
-
+        if (string.IsNullOrEmpty(credential)) return new(IssueDeCapture.PlusTard, "borne non appairee");
         var taille = new FileInfo(fichier).Length;
-        var (adresse, raison) = await OuvrirSessionAsync(credential, new JsonObject
-        {
-            ["replay_id"] = replayId,
-            ["size"] = taille,
-            ["type"] = "video/x-matroska",
-            ["source"] = "capture",
-        }, ct).ConfigureAwait(false);
-        if (adresse is null)
-            return (raison is not null && RefusDefinitifs.Contains(raison) ? IssueDeCapture.Inutile : IssueDeCapture.PlusTard,
-                raison ?? "site injoignable");
 
-        var videoId = await EnvoyerChezGoogleAsync(adresse, replayId, fichier, taille, ct).ConfigureAwait(false);
-        if (videoId is null) return (IssueDeCapture.PlusTard, "envoi refuse par Google");
-        var confirme = await PosterAsync(credential, "videos/complete", new JsonObject
+        // Pas de redirection automatique : Google repond 308 « reprise incomplete » pendant un envoi.
+        using var http = new HttpClient(new SocketsHttpHandler { AllowAutoRedirect = false }) { Timeout = TimeSpan.FromMinutes(30) };
+        string? videoId = null;
+        long dejaRecus = 0;
+        if (!string.IsNullOrEmpty(session))
         {
-            ["replay_id"] = replayId,
-            ["youtube_video_id"] = videoId,
-            ["run_start_frame"] = debutFilm,
-            ["run_end_frame"] = finFilm,
-            ["fps"] = fps,
-        }, ct).ConfigureAwait(false);
-        return (IssueDeCapture.Envoyee, videoId + (confirme is null ? ", confirmation refusee" : ""));
+            var (recus, id) = await EtatDeLaSessionAsync(http, session, taille, ct).ConfigureAwait(false);
+            if (recus < 0)
+            {
+                // Session expiree ou perdue chez Google : on en rouvre une.
+                session = null;
+                await memoriser(null).ConfigureAwait(false);
+            }
+            else
+            {
+                dejaRecus = recus;
+                videoId = id;
+                if (dejaRecus > 0 && videoId is null)
+                    _logger.LogInformation("Video : envoi de {ReplayId} repris a {Recus} octets sur {Taille}.", replayId, dejaRecus, taille);
+            }
+        }
+        if (string.IsNullOrEmpty(session))
+        {
+            var (adresse, raison) = await OuvrirSessionAsync(credential, new JsonObject
+            {
+                ["replay_id"] = replayId,
+                ["size"] = taille,
+                ["type"] = "video/x-matroska",
+                ["source"] = "capture",
+            }, ct).ConfigureAwait(false);
+            if (adresse is null)
+                return new(raison is not null && RefusDefinitifs.Contains(raison) ? IssueDeCapture.Inutile : IssueDeCapture.PlusTard,
+                    raison ?? "site injoignable");
+            session = adresse;
+            await memoriser(session).ConfigureAwait(false);
+        }
+
+        videoId ??= await EnvoyerLeResteAsync(http, session, replayId, fichier, dejaRecus, taille, ct).ConfigureAwait(false);
+        if (videoId is null) return new(IssueDeCapture.PlusTard, "envoi incomplet, repris au prochain passage");
+        var confirmee = await ConfirmerAsync(replayId, videoId, debutFilm, finFilm, fps, ct).ConfigureAwait(false);
+        return new(IssueDeCapture.Envoyee, videoId + (confirmee ? "" : ", confirmation a refaire"), videoId, confirmee);
+    }
+
+    /// <summary>Dit au site que la video est chez Google, avec la portion filmee du replay.</summary>
+    public async Task<bool> ConfirmerAsync(string replayId, string videoId, long debutFilm, long finFilm, double fps,
+        CancellationToken ct)
+    {
+        var credential = _devices.GetCredential();
+        if (string.IsNullOrEmpty(credential)) return false;
+        try
+        {
+            return await PosterAsync(credential, "videos/complete", new JsonObject
+            {
+                ["replay_id"] = replayId,
+                ["youtube_video_id"] = videoId,
+                ["run_start_frame"] = debutFilm,
+                ["run_end_frame"] = finFilm,
+                ["fps"] = fps,
+            }, ct).ConfigureAwait(false) is not null;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogWarning(ex, "Video : confirmation de {ReplayId} non passee.", replayId);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// L'etat du film d'un replay au site : « ready », « processing », « uploading », « failed », « none » ; null si
+    /// le site ne repond pas.
+    /// </summary>
+    public async Task<string?> EtatDuFilmAsync(string replayId, CancellationToken ct)
+    {
+        var credential = _devices.GetCredential();
+        if (string.IsNullOrEmpty(credential)) return null;
+        try
+        {
+            using var client = Client(credential, TimeSpan.FromSeconds(30));
+            using var reponse = await client.GetAsync("/api/v1/agent/videos/state?replay_id=" + Uri.EscapeDataString(replayId), ct)
+                .ConfigureAwait(false);
+            if (!reponse.IsSuccessStatusCode) return null;
+            var corps = JsonNode.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false)) as JsonObject;
+            return (string?)corps?["status"];
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
+        {
+            _logger.LogDebug(ex, "Video : etat du film de {ReplayId} inconnu.", replayId);
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Ce que Google a deja recu de cette session : le nombre d'octets, et l'identifiant de la video si l'envoi est
+    /// complet. -1 si la session n'existe plus.
+    /// </summary>
+    private async Task<(long Recus, string? VideoId)> EtatDeLaSessionAsync(HttpClient http, string adresse, long taille,
+        CancellationToken ct)
+    {
+        try
+        {
+            using var requete = new HttpRequestMessage(HttpMethod.Put, adresse) { Content = new ByteArrayContent(Array.Empty<byte>()) };
+            requete.Content.Headers.ContentRange = new ContentRangeHeaderValue(taille);
+            using var reponse = await http.SendAsync(requete, ct).ConfigureAwait(false);
+            if ((int)reponse.StatusCode == 308)
+                return (OctetsRecus(reponse.Headers.TryGetValues("Range", out var plages) ? plages.FirstOrDefault() : null), null);
+            if (reponse.IsSuccessStatusCode)
+                return (taille, (string?)(JsonNode.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false)) as JsonObject)?["id"]);
+            return (-1, null);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogInformation(ex, "Video : session d'envoi illisible, une autre sera ouverte.");
+            return (-1, null);
+        }
+    }
+
+    /// <summary>
+    /// Les octets deja recus d'apres l'en-tete Range d'une reprise (« bytes=0-1048575 ») : 1048576 ici, 0 sans
+    /// en-tete. Pur, pour etre teste.
+    /// </summary>
+    internal static long OctetsRecus(string? plage)
+    {
+        if (string.IsNullOrWhiteSpace(plage)) return 0;
+        var tiret = plage.LastIndexOf('-');
+        return tiret >= 0 && long.TryParse(plage[(tiret + 1)..].Trim(), out var dernier) && dernier >= 0 ? dernier + 1 : 0;
+    }
+
+    /// <summary>
+    /// Envoie le film a partir de <paramref name="debut"/> (0 pour un premier envoi). Rend l'identifiant YouTube
+    /// quand Google a tout recu ; null si l'envoi s'arrete avant (la session reste valable pour reprendre).
+    /// </summary>
+    private async Task<string?> EnvoyerLeResteAsync(HttpClient http, string adresse, string replayId, string fichier,
+        long debut, long taille, CancellationToken ct)
+    {
+        await using var flux = new FileStream(fichier, FileMode.Open, FileAccess.Read, FileShare.Read);
+        flux.Seek(debut, SeekOrigin.Begin);
+        using var contenu = new StreamContent(flux);
+        contenu.Headers.ContentType = new MediaTypeHeaderValue("video/x-matroska");
+        contenu.Headers.ContentLength = taille - debut;
+        if (debut > 0) contenu.Headers.ContentRange = new ContentRangeHeaderValue(debut, taille - 1, taille);
+        try
+        {
+            using var reponse = await http.PutAsync(adresse, contenu, ct).ConfigureAwait(false);
+            if (reponse.IsSuccessStatusCode)
+                return (string?)(JsonNode.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false)) as JsonObject)?["id"];
+            _logger.LogWarning("Video : envoi de {ReplayId} interrompu par Google ({Statut}), repris au prochain passage.",
+                replayId, (int)reponse.StatusCode);
+            return null;
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogInformation(ex, "Video : envoi de {ReplayId} coupe par le reseau, repris au prochain passage.", replayId);
+            return null;
+        }
     }
 
     /// <summary>

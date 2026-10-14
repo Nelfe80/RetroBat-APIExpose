@@ -66,8 +66,16 @@ public sealed class ReplayCaptureService : BackgroundService
         public readonly Stopwatch Chrono = Stopwatch.StartNew();
     }
 
-    /// <summary>Une capture gardee en attente de la decision du site.</summary>
-    public sealed record CaptureGardee(string ReplayId, string Fichier, long DebutFilm, long FinFilm, DateTime CreeeUtc);
+    /// <summary>
+    /// Une capture gardee sur la borne : en attente de la decision du site, en cours d'envoi (<paramref name="Session"/>,
+    /// pour reprendre la ou l'envoi s'est arrete), puis envoyee (<paramref name="VideoId"/>) jusqu'a ce que la video
+    /// soit prete chez YouTube.
+    /// </summary>
+    public sealed record CaptureGardee(string ReplayId, string Fichier, long DebutFilm, long FinFilm, DateTime CreeeUtc,
+        string? Session = null, string? VideoId = null, DateTime? EnvoyeeUtc = null);
+
+    /// <summary>Une video envoyee qui n'est toujours pas prete apres ce delai : le film n'est plus garde.</summary>
+    private static readonly TimeSpan PreteAuPlus = TimeSpan.FromHours(24);
 
     public ReplayCaptureService(IEventBus bus, RetroArchReplayClient ra, ReplayVideoPublisher publication,
         IReplayManifestStore manifests, IReplayObjectStore objects, IConfiguration configuration,
@@ -323,6 +331,37 @@ public sealed class ReplayCaptureService : BackgroundService
                 Effacer(fiche);
                 continue;
             }
+
+            var manifest = _manifests.GetManifest(g.ReplayId);
+            var fps = manifest?.Frames.NominalFps is > 1 ? manifest.Frames.NominalFps : 60;
+            var fin = Math.Max(g.FinFilm, manifest?.Frames.ReplayEnd ?? 0);
+
+            // Deja envoyee : le film reste sur la borne jusqu'a ce que la video soit prete. Refusee par YouTube,
+            // ou perdue, elle repart ; confirmation manquee, elle est refaite.
+            if (g.VideoId is not null)
+            {
+                var etat = await _publication.EtatDuFilmAsync(g.ReplayId, stoppingToken).ConfigureAwait(false);
+                if (etat == "ready")
+                {
+                    Oublier(g, fiche, "prete sur YouTube (" + g.VideoId + ")");
+                    continue;
+                }
+                if (etat is "failed" or "none")
+                {
+                    _logger.LogInformation("Capture : {ReplayId} refusee ou perdue par YouTube, renvoyee.", g.ReplayId);
+                    g = g with { VideoId = null, Session = null, EnvoyeeUtc = null };
+                    await SauverAsync(g, fiche, stoppingToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    if (etat == "uploading")
+                        await _publication.ConfirmerAsync(g.ReplayId, g.VideoId, g.DebutFilm, fin, fps, stoppingToken).ConfigureAwait(false);
+                    if (DateTime.UtcNow - (g.EnvoyeeUtc ?? g.CreeeUtc) > PreteAuPlus)
+                        Oublier(g, fiche, "envoyee il y a plus de 24 heures (" + g.VideoId + ")");
+                    continue;
+                }
+            }
+
             var age = DateTime.UtcNow - g.CreeeUtc;
             if (age > _ageMax)
             {
@@ -335,27 +374,31 @@ public sealed class ReplayCaptureService : BackgroundService
                 continue;
             }
 
-            var manifest = _manifests.GetManifest(g.ReplayId);
-            var fps = manifest?.Frames.NominalFps is > 1 ? manifest.Frames.NominalFps : 60;
-            var fin = Math.Max(g.FinFilm, manifest?.Frames.ReplayEnd ?? 0);
-
             using var envoi = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
             lock (_verrou) _envoiEnCours = envoi;
             try
             {
-                var (issue, detail) = await _publication.EnvoyerCaptureAsync(g.ReplayId, g.Fichier, g.DebutFilm, fin, fps, envoi.Token)
-                    .ConfigureAwait(false);
-                switch (issue)
+                var courante = g;
+                var resultat = await _publication.EnvoyerCaptureAsync(courante.ReplayId, courante.Fichier, courante.DebutFilm, fin, fps,
+                    courante.Session, async session =>
+                    {
+                        courante = courante with { Session = session };
+                        await SauverAsync(courante, fiche, stoppingToken).ConfigureAwait(false);
+                    }, envoi.Token).ConfigureAwait(false);
+                switch (resultat.Issue)
                 {
                     case ReplayVideoPublisher.IssueDeCapture.Envoyee:
-                        Oublier(g, fiche, "envoyee (" + detail + ")");
+                        await SauverAsync(courante with { Session = null, VideoId = resultat.VideoId, EnvoyeeUtc = DateTime.UtcNow },
+                            fiche, stoppingToken).ConfigureAwait(false);
+                        _logger.LogInformation("Capture : {ReplayId} envoyee ({Detail}), film garde jusqu'a la video prete.",
+                            courante.ReplayId, resultat.Detail);
                         break;
                     case ReplayVideoPublisher.IssueDeCapture.Inutile:
-                        Oublier(g, fiche, detail);
+                        Oublier(courante, fiche, resultat.Detail);
                         break;
                     default:
-                        if (detail == "pas_encore" && age > PasEncoreAuPlus) Oublier(g, fiche, "toujours pas classee");
-                        else _logger.LogInformation("Capture : {ReplayId} attend ({Detail}).", g.ReplayId, detail);
+                        if (resultat.Detail == "pas_encore" && age > PasEncoreAuPlus) Oublier(courante, fiche, "toujours pas classee");
+                        else _logger.LogInformation("Capture : {ReplayId} attend ({Detail}).", courante.ReplayId, resultat.Detail);
                         break;
                 }
             }
@@ -369,6 +412,13 @@ public sealed class ReplayCaptureService : BackgroundService
                 lock (_verrou) _envoiEnCours = null;
             }
         }
+    }
+
+    private static async Task SauverAsync(CaptureGardee g, string fiche, CancellationToken ct)
+    {
+        var temporaire = fiche + ".tmp";
+        await File.WriteAllTextAsync(temporaire, JsonSerializer.Serialize(g, Json), Encoding.UTF8, ct).ConfigureAwait(false);
+        File.Move(temporaire, fiche, overwrite: true);
     }
 
     private void Oublier(CaptureGardee g, string fiche, string pourquoi)
