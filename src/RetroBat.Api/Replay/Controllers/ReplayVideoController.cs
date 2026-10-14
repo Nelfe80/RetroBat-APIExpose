@@ -13,8 +13,13 @@ namespace RetroBat.Api.Replay.Controllers;
 public sealed class ReplayVideoController : ControllerBase
 {
     private readonly ReplayVideoRenderer _rendu;
+    private readonly ReplayVideoPublisher _publication;
 
-    public ReplayVideoController(ReplayVideoRenderer rendu) { _rendu = rendu; }
+    public ReplayVideoController(ReplayVideoRenderer rendu, ReplayVideoPublisher publication)
+    {
+        _rendu = rendu;
+        _publication = publication;
+    }
 
     private bool IsLocalCaller()
     {
@@ -44,5 +49,16 @@ public sealed class ReplayVideoController : ControllerBase
             reached_frame = r.FrameAtteinte,
             seconds = Math.Round(r.Secondes, 1),
         });
+    }
+
+    public sealed record PublicationRequest([property: JsonPropertyName("limit")] int? Limite);
+
+    /// <summary>Filme et envoie les records de cette borne que le serveur demande (au plus <c>limit</c>).</summary>
+    [HttpPost("publish")]
+    public async Task<IActionResult> Publish([FromBody] PublicationRequest? req, CancellationToken ct)
+    {
+        if (!IsLocalCaller()) return NotFound();
+        var r = await _publication.PublierAsync(req?.Limite ?? 1, ct).ConfigureAwait(false);
+        return Ok(new { targets = r.Cibles, sent = r.Envoyees, details = r.Details });
     }
 }
