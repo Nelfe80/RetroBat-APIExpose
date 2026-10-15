@@ -15,12 +15,15 @@ public sealed class ReplayVideoController : ControllerBase
     private readonly ReplayVideoRenderer _rendu;
     private readonly ReplayVideoPublisher _publication;
     private readonly DirectDuRecordService _direct;
+    private readonly DirectPartageService _partage;
 
-    public ReplayVideoController(ReplayVideoRenderer rendu, ReplayVideoPublisher publication, DirectDuRecordService direct)
+    public ReplayVideoController(ReplayVideoRenderer rendu, ReplayVideoPublisher publication, DirectDuRecordService direct,
+        DirectPartageService partage)
     {
         _rendu = rendu;
         _publication = publication;
         _direct = direct;
+        _partage = partage;
     }
 
     public sealed record EssaiDuDirectRequest(
@@ -37,6 +40,20 @@ public sealed class ReplayVideoController : ControllerBase
         if (!IsLocalCaller()) return NotFound();
         _direct.Essayer(req?.Actif ?? false, req?.Seuil);
         return Ok(new { test = req?.Actif ?? false, threshold = req?.Seuil });
+    }
+
+    public sealed record EssaiDuPartageRequest([property: JsonPropertyName("enabled")] bool Actif);
+
+    /// <summary>
+    /// L'essai du direct partage (CDC video V2.1, §5.2), jusqu'au prochain demarrage de l'API : les parties suivantes se
+    /// portent candidates en passages d'essai (directs non repertories, entre bornes en essai). Toujours desarmer apres.
+    /// </summary>
+    [HttpPost("shared-test")]
+    public IActionResult SharedTest([FromBody] EssaiDuPartageRequest? req)
+    {
+        if (!IsLocalCaller()) return NotFound();
+        _partage.Essayer(req?.Actif ?? false);
+        return Ok(new { test = req?.Actif ?? false });
     }
 
     private bool IsLocalCaller()

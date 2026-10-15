@@ -323,6 +323,9 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         }
         _journal.LogInformation("Direct : {Jeu} approche du record a {Score}, direct {Direct} ouvert, envoi par {Envoi}.", romGroup, score,
             ouvert.LiveId, envoi == "exe" ? "l'exe du direct" : "recopie du film");
+        // Le direct partage de cette borne se termine : elle ne peut pas alimenter deux directs (16 octobre 2026).
+        try { await _bus.PublishAsync(new EventEnvelope { Type = "video.live.record.started" }).ConfigureAwait(false); }
+        catch (Exception) { /* sans bus, le passage partage finira avec la partie */ }
 
         // Le record a pu tomber pendant l'ouverture ou l'attente dans la file : il se signale tout de suite.
         long? dejaTombe = null;
@@ -353,8 +356,12 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                 // La carte du classement a la fin si le record tombe (fichier ecrit alors). L'annonce, elle, se joue sur
                 // le site avant le direct (video YouTube) : le site ne sert jamais de video.
                 try { File.Delete(CheminDeLaCarte); } catch (Exception) { /* absente */ }
+                // LES CLIPS DU DIRECT (16 octobre 2026), installes par le Data Pack : « record » avant le jeu, « champion » a
+                // la fin quand le record est tombe (l'exe ne le joue qu'avec la carte du classement). Jamais sans leur
+                // empreinte attendue, que le site donne.
+                var (annonce, optionsDesClips) = Clips(ouvert.Clips);
                 var r = await LanceurDuDirect.DiffuserAsync(exe!, film.Fichier, ouvert.Ingest, film.Rotation ?? 0, _journal, arret.Token,
-                        classement: CheminDeLaCarte)
+                        annonce: annonce, classement: CheminDeLaCarte, options: optionsDesClips)
                     .ConfigureAwait(false);
                 _journal.LogInformation("Direct : {Direct} fini ({Fin}, code {Code}, {Secondes:F0} s).", ouvert.LiveId, r.Fin, r.Code,
                     r.Duree.TotalSeconds);
@@ -412,6 +419,27 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
             if (g == _generation && ++_essaisDeSignal < 3) _recordSignale = false;
         }
         _journal.LogInformation("Direct : {Direct}, le record tombe a {Score}, signal non pris par le site.", liveId, score);
+    }
+
+    /// <summary>
+    /// L'annonce (clip « record ») et les options des clips d'une alert : chaque clip present sur la borne et accompagne de
+    /// son empreinte. Rien sinon.
+    /// </summary>
+    internal static (string? Annonce, IReadOnlyList<string> Options) Clips(System.Text.Json.Nodes.JsonObject? clips, string? racine = null)
+    {
+        racine ??= RetroBat.Domain.Paths.RetroBatPaths.PluginRoot;
+        string? Chemin(string cle, out string? empreinte)
+        {
+            var c = clips?[cle] as System.Text.Json.Nodes.JsonObject;
+            empreinte = (string?)c?["sha256"];
+            var chemin = DirectPartageService.CheminDuClip(racine, (string?)c?["file"]);
+            return chemin is not null && File.Exists(chemin) && !string.IsNullOrWhiteSpace(empreinte) ? chemin : null;
+        }
+        var options = new List<string>();
+        var annonce = Chemin("record", out var empreinteRecord);
+        if (annonce is not null) options.AddRange(["--annonce-sha256", empreinteRecord!.Trim()]);
+        if (Chemin("champion", out var empreinteChampion) is { } champion) options.AddRange(["--clip", champion, "--clip-sha256", empreinteChampion!.Trim()]);
+        return (annonce, options);
     }
 
     /// <summary>Le classement mis a jour, que l'exe du direct montre a la fin quand il existe.</summary>

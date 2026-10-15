@@ -590,6 +590,9 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Repla
 // Le premier rang qui tombe, en direct : le site previent tout le monde, la borne recopie le film sur YouTube Live.
 builder.Services.AddSingleton<RetroBat.Api.Replay.Video.DirectDuRecordService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Video.DirectDuRecordService>());
+// Le direct partage (CDC video V2.1, §5.2) : une borne a l'antenne a la fois, choisie par le site.
+builder.Services.AddSingleton<RetroBat.Api.Replay.Video.DirectPartageService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Video.DirectPartageService>());
 // Le facteur d'agrandissement du film, pose avant chaque lancement selon la definition du jeu (720 lignes au moins).
 builder.Services.AddSingleton<RetroBat.Api.Replay.Video.EchelleDesFilms>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.Video.EchelleDesFilms>());

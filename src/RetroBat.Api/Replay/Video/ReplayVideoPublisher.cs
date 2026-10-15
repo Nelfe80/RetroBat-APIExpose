@@ -597,7 +597,9 @@ public sealed class ReplayVideoPublisher
     /// decision du 15 octobre 2026), la borne est a la place <c>Position</c> de la file et redemande au bout de
     /// <c>RedemanderApres</c> secondes.
     /// </summary>
-    public sealed record DirectOuvert(bool Ok, string? LiveId, string? Ingest, string? Raison, int? Position = null, int? RedemanderApres = null);
+    /// <param name="Clips">Les clips du direct et leur empreinte attendue (« record », « champion »), donnes par le site.</param>
+    public sealed record DirectOuvert(bool Ok, string? LiveId, string? Ingest, string? Raison, int? Position = null, int? RedemanderApres = null,
+        JsonObject? Clips = null);
 
     /// <summary>
     /// Demande au site le direct d'un record (CDC video V2, §5.8) : depuis le 15 octobre 2026, la partie approche du
@@ -620,7 +622,7 @@ public sealed class ReplayVideoPublisher
             using var reponse = await client.PostAsync("/api/v1/agent/live/record-start", contenu, ct).ConfigureAwait(false);
             var corps = JsonNode.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false)) as JsonObject;
             if (reponse.IsSuccessStatusCode && (bool?)corps?["ok"] == true)
-                return new(true, (string?)corps!["live_id"], (string?)corps["ingest"], null);
+                return new(true, (string?)corps!["live_id"], (string?)corps["ingest"], null, Clips: corps["clips"] as JsonObject);
             return new(false, null, null, (string?)corps?["reason"] ?? "http_" + (int)reponse.StatusCode,
                 (int?)corps?["position"], (int?)corps?["retry_after"]);
         }
@@ -649,6 +651,26 @@ public sealed class ReplayVideoPublisher
         {
             _logger.LogInformation("Direct : record du direct {Direct} non signale ({Message}).", liveId, ex.Message);
             return false;
+        }
+    }
+
+    /// <summary>
+    /// LE DIRECT PARTAGE (CDC video V2.1, §5.2, 16 octobre 2026) : la borne qui joue se porte candidate et redemande ; la
+    /// reponse dit d'attendre, d'envoyer (adresse d'entree remise une seule fois, jamais journalisee), de finir son passage
+    /// ou de s'arreter. null : site injoignable ou refus.
+    /// </summary>
+    public async Task<JsonObject?> SonderLePartageAsync(JsonObject demande, CancellationToken ct)
+    {
+        var credential = _devices.GetCredential();
+        if (string.IsNullOrEmpty(credential)) return null;
+        try
+        {
+            return await PosterAsync(credential, "live/shared-poll", demande, ct).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
+        {
+            _logger.LogInformation("Direct partage : site injoignable ({Message}).", ex.Message);
+            return null;
         }
     }
 

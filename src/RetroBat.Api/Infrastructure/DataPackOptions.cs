@@ -46,5 +46,7 @@ public class DataPackOptions
     {
         "ram", "dynpanels", "gamelist", "controls", "config-ESmenus", "locales",
         "scraping", "startup-overlay", "theme",
+        // Les clips que les bornes jouent dans leurs directs (16 octobre 2026), verifies par leur empreinte avant diffusion.
+        "live",
     };
 }
