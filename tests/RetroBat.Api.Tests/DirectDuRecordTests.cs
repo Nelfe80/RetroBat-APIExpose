@@ -188,6 +188,13 @@ public sealed class DirectDuRecordTests
     public void L_envoi_passe_par_l_exe_du_direct_s_il_est_la(string? exe, bool permis, int? rotation, string? attendu)
         => Assert.Equal(attendu, DirectDuRecordService.Envoi(exe, permis, rotation));
 
+    [Theory]
+    [InlineData("exe", true, 0, "exe")]       // l'exe agrandit le film a la taille d'origine
+    [InlineData(null, true, 0, null)]         // la recopie telle quelle ne sait pas : pas de direct
+    [InlineData("exe", false, 0, null)]
+    public void Un_film_a_la_taille_d_origine_ne_passe_que_par_l_exe(string? exe, bool permis, int? rotation, string? attendu)
+        => Assert.Equal(attendu, DirectDuRecordService.Envoi(exe, permis, rotation, origine: true));
+
     [Fact]
     public void L_adresse_du_direct_ne_passe_jamais_par_la_ligne_de_commande()
     {

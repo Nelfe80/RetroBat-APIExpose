@@ -223,11 +223,14 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
     }
 
     /// <summary>
-    /// L'envoi a utiliser : l'exe du direct s'il est la et permis, sinon la recopie telle quelle, qui ne sait pas
-    /// redresser un jeu vertical (null : pas de direct possible). Pur.
+    /// L'envoi a utiliser : l'exe du direct s'il est la et permis, sinon la recopie telle quelle, qui ne sait ni
+    /// redresser un jeu vertical ni agrandir un film a la taille d'origine (null : pas de direct possible). Pur.
     /// </summary>
-    internal static string? Envoi(string? exe, bool exePermis, int? rotation)
-        => exe is not null && exePermis ? "exe" : rotation is 1 or 3 ? null : "relais";
+    internal static string? Envoi(string? exe, bool exePermis, int? rotation, bool origine = false)
+        => exe is not null && exePermis ? "exe" : rotation is 1 or 3 || origine ? null : "relais";
+
+    /// <summary>Le film en cours est-il a la taille d'origine (4:4:4) ? Son en-tete est ecrit des le debut.</summary>
+    private static bool FilmALaTailleDOrigine(string fichier) => MatroskaEntete.Lire(fichier) is { Origine: true };
 
     /// <summary>Le score passe devant : le site ouvre le direct, la borne y envoie le film jusqu'a la fin.</summary>
     private async Task DeclencherAsync(int g, long score)
@@ -245,10 +248,12 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
             return;
         }
         var exe = LanceurDuDirect.Chemin(AppContext.BaseDirectory);
-        var envoi = Envoi(exe, _exe, film.Rotation);
+        var origine = FilmALaTailleDOrigine(film.Fichier);
+        var envoi = Envoi(exe, _exe, film.Rotation, origine);
         if (envoi is null)
         {
-            _journal.LogInformation("Direct : {Jeu} passe devant a {Score}, mais le film est couche (jeu vertical) et l'exe du direct manque : pas de direct.", romGroup, score);
+            _journal.LogInformation("Direct : {Jeu} passe devant a {Score}, mais le film est {Film} et l'exe du direct manque : pas de direct.",
+                romGroup, score, origine ? "a la taille d'origine" : "couche (jeu vertical)");
             return;
         }
 
@@ -293,8 +298,9 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                 _journal.LogInformation("Direct : {Direct} fini ({Fin}, code {Code}, {Secondes:F0} s).", ouvert.LiveId, r.Fin, r.Code,
                     r.Duree.TotalSeconds);
                 // L'exe tombe au demarrage (aucun encodeur, Windows trop ancien...) : la recopie telle quelle prend le
-                // relais pour un jeu droit, la partie continuant.
-                if (r.Code != 0 && r.Duree < TimeSpan.FromSeconds(20) && !arret.IsCancellationRequested && film.Rotation is not (1 or 3))
+                // relais pour un jeu droit filme agrandi, la partie continuant.
+                if (r.Code != 0 && r.Duree < TimeSpan.FromSeconds(20) && !arret.IsCancellationRequested
+                    && Envoi(null, false, film.Rotation, origine) == "relais")
                 {
                     _journal.LogInformation("Direct : {Direct}, l'exe n'a pas tenu : recopie du film.", ouvert.LiveId);
                     envoi = "relais";
