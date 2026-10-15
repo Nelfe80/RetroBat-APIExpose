@@ -170,6 +170,31 @@ public sealed class DirectDuRecordTests
     public void Le_direct_s_ouvre_a_l_approche_du_premier_rang(long? aBattre, long score, int joueur, bool deja, bool fini, bool attendu)
         => Assert.Equal(attendu, DirectDuRecordService.AApproche(aBattre, score, joueur, deja, fini));
 
+    private static RetroBat.Api.Leaderboard.LeaderboardClient.Ligne L(int rang, string joueur, long valeur, bool moi = false)
+        => new(rang, joueur, valeur, "", "", "", false, null, "", moi);
+
+    [Fact]
+    public void La_carte_de_fin_reclasse_le_nouveau_record()
+    {
+        var avant = new[] { L(1, "AshTaste92", 35260), L(2, "Lorenzolamas", 33730), L(3, "player", 20000, moi: true), L(4, "theJim", 25390) };
+        var carte = DirectDuRecordService.ClassementMisAJour(avant, "player", 36120);
+        Assert.Equal(new[] { "player", "AshTaste92", "Lorenzolamas", "theJim" }, carte.Select(l => l.Joueur));
+        Assert.Equal(new[] { 1, 2, 3, 4 }, carte.Select(l => l.Rang));
+        Assert.True(carte[0].Nouveau);
+        Assert.Single(carte, l => l.Nouveau);
+        // Au-dela des premieres lignes, la nouvelle reste visible.
+        var longue = Enumerable.Range(1, 30).Select(i => L(i, "j" + i, 100000 - i)).ToArray();
+        var bas = DirectDuRecordService.ClassementMisAJour(longue, "player", 5, max: 10);
+        Assert.Equal(10, bas.Count);
+        Assert.True(bas[^1].Nouveau);
+        Assert.Equal(31, bas[^1].Rang);
+    }
+
+    [Fact]
+    public void L_exe_du_direct_recoit_l_annonce_et_le_fichier_du_classement()
+        => Assert.Equal(["--film", "f.mkv", "--adresse-stdin", "--rotation", "3", "--suivre", "--annonce", "a.mp4", "--classement", "c.json"],
+            LanceurDuDirect.Arguments("f.mkv", 3, "a.mp4", "c.json"));
+
     [Theory]
     [InlineData(35260L, 31734L)]   // le record de Ms. Pac-Man : 90 % tout juste
     [InlineData(15L, 14L)]         // arrondi au-dessus, comme le site

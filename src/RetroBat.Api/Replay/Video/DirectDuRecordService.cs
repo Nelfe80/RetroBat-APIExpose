@@ -58,6 +58,10 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
     private long _meilleurScore;
     private bool _recordSignale;
     private int _essaisDeSignal;
+    /// <summary>Le classement lu au lancement et le nom du jeu : la carte de fin du direct en est faite.</summary>
+    private IReadOnlyList<LeaderboardClient.Ligne> _lignes = Array.Empty<LeaderboardClient.Ligne>();
+    private string _nomDuJeu = "";
+
     private CancellationTokenSource? _relais;
     private IDisposable? _abonnement;
 
@@ -156,6 +160,8 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                         _meilleurScore = 0;
                         _recordSignale = false;
                         _essaisDeSignal = 0;
+                        _lignes = Array.Empty<LeaderboardClient.Ligne>();
+                        _nomDuJeu = "";
                         _relais?.Cancel();
                     }
                     _ = Task.Run(() => ArmerAsync(g));
@@ -184,9 +190,12 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
 
                 case "scoring.run.ended":
                     lock (_verrou) _runTermine = true;
+                    // Le record est tombe pendant le direct : la carte de fin prend le score final du run.
+                    EcrireLaCarte();
                     break;
 
                 case "ui.game.ended":
+                    EcrireLaCarte();
                     lock (_verrou)
                     {
                         _generation++;
@@ -242,7 +251,11 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                 _romGroup = romGroup;
                 _regle = regle.Length > 0 ? regle : "1cc";
                 _aBattre = _seuilEssai ?? tete!.Valeur;
+                _lignes = classement.Lignes;
+                _nomDuJeu = string.IsNullOrWhiteSpace(jeu.GameName) ? romGroup : jeu.GameName.Trim();
             }
+            // L'annonce du direct se prepare des le lancement : prete si le score approche du record.
+            _ = Task.Run(() => _site.AnnonceDuDirectAsync(CancellationToken.None));
             _journal.LogInformation("Direct : {Jeu} ({Regle}) arme, premier rang {Valeur} ({Joueur}), direct a {Seuil}.",
                 romGroup, regle, _seuilEssai ?? tete!.Valeur, tete?.Joueur ?? "essai", SeuilDApproche(_seuilEssai ?? tete!.Valeur));
         }
@@ -339,7 +352,11 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         {
             if (envoi == "exe")
             {
-                var r = await LanceurDuDirect.DiffuserAsync(exe!, film.Fichier, ouvert.Ingest, film.Rotation ?? 0, _journal, arret.Token)
+                // L'annonce avant le jeu, et la carte du classement a la fin si le record tombe (fichier ecrit alors).
+                var annonce = await _site.AnnonceDuDirectAsync(CancellationToken.None).ConfigureAwait(false);
+                try { File.Delete(CheminDeLaCarte); } catch (Exception) { /* absente */ }
+                var r = await LanceurDuDirect.DiffuserAsync(exe!, film.Fichier, ouvert.Ingest, film.Rotation ?? 0, _journal, arret.Token,
+                        annonce, CheminDeLaCarte)
                     .ConfigureAwait(false);
                 _journal.LogInformation("Direct : {Direct} fini ({Fin}, code {Code}, {Secondes:F0} s).", ouvert.LiveId, r.Fin, r.Code,
                     r.Duree.TotalSeconds);
@@ -388,6 +405,8 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         if (pris)
         {
             _journal.LogInformation("Direct : {Direct}, le record tombe a {Score}, signale au site.", liveId, score);
+            // La carte de fin existe des maintenant ; elle prendra le score final a la fin du run.
+            EcrireLaCarte();
             return;
         }
         lock (_verrou)
@@ -395,6 +414,68 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
             if (g == _generation && ++_essaisDeSignal < 3) _recordSignale = false;
         }
         _journal.LogInformation("Direct : {Direct}, le record tombe a {Score}, signal non pris par le site.", liveId, score);
+    }
+
+    /// <summary>Le classement mis a jour, que l'exe du direct montre a la fin quand il existe.</summary>
+    private static string CheminDeLaCarte
+        => Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, "state", "nelfenet", "replay", "direct-classement.json");
+
+    /// <summary>Une ligne de la carte de fin du direct.</summary>
+    internal sealed record LigneDeCarte(int Rang, string Joueur, long Score, bool Nouveau);
+
+    /// <summary>
+    /// LE CLASSEMENT MIS A JOUR (fin d'un direct de record, demande du 15 octobre 2026) : le classement lu au lancement,
+    /// la ligne du joueur remplacee par son nouveau score, reclasse, 10 lignes au plus (la nouvelle toujours dedans). Pur.
+    /// </summary>
+    internal static IReadOnlyList<LigneDeCarte> ClassementMisAJour(IReadOnlyList<LeaderboardClient.Ligne> lignes, string joueur,
+        long score, int max = 10)
+    {
+        var autres = lignes.Where(l => !l.CestMoi && !string.Equals(l.Joueur, joueur, StringComparison.OrdinalIgnoreCase))
+            .Select(l => (l.Joueur, l.Valeur, Nouveau: false));
+        var tous = autres.Append((Joueur: joueur, Valeur: score, Nouveau: true))
+            .OrderByDescending(l => l.Valeur).ThenBy(l => l.Nouveau ? 0 : 1).ToList();
+        var carte = tous.Select((l, i) => new LigneDeCarte(i + 1, l.Joueur, l.Valeur, l.Nouveau)).ToList();
+        var garde = carte.Take(max).ToList();
+        if (!garde.Any(l => l.Nouveau)) garde[^1] = carte.First(l => l.Nouveau);
+        return garde;
+    }
+
+    /// <summary>
+    /// Ecrit la carte de fin quand le record est tombe pendant le direct (au signal, puis a la fin du run avec le score
+    /// final). Sans record tombe, rien : le direct finit sur le jeu.
+    /// </summary>
+    private void EcrireLaCarte()
+    {
+        try
+        {
+            string jeu, regle, joueur;
+            long score;
+            IReadOnlyList<LeaderboardClient.Ligne> lignes;
+            lock (_verrou)
+            {
+                if (!_recordSignale || _liveId is null) return;
+                jeu = _nomDuJeu;
+                regle = _regle;
+                score = _meilleurScore;
+                lignes = _lignes;
+                joueur = string.IsNullOrWhiteSpace(_agent.Status.Pseudo) ? "player" : _agent.Status.Pseudo!;
+            }
+            var carte = new
+            {
+                jeu,
+                regle,
+                lignes = ClassementMisAJour(lignes, joueur, score)
+                    .Select(l => new { rang = l.Rang, joueur = l.Joueur, score = l.Score, nouveau = l.Nouveau }),
+            };
+            var chemin = CheminDeLaCarte;
+            Directory.CreateDirectory(Path.GetDirectoryName(chemin)!);
+            File.WriteAllText(chemin + ".tmp", JsonSerializer.Serialize(carte));
+            File.Move(chemin + ".tmp", chemin, overwrite: true);
+        }
+        catch (Exception ex)
+        {
+            _journal.LogDebug(ex, "Direct : carte du classement non ecrite.");
+        }
     }
 
     private static long? Nombre(object? payload, string nom)

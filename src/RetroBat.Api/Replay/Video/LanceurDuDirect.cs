@@ -30,9 +30,17 @@ public static class LanceurDuDirect
         return File.Exists(chemin) ? chemin : null;
     }
 
-    /// <summary>Les arguments de l'exe : le film, le sens du jeu, suivre le film. Jamais l'adresse. Pur.</summary>
-    internal static IReadOnlyList<string> Arguments(string film, int rotation)
-        => ["--film", film, "--adresse-stdin", "--rotation", rotation.ToString(CultureInfo.InvariantCulture), "--suivre"];
+    /// <summary>
+    /// Les arguments de l'exe : le film, le sens du jeu, suivre le film, l'annonce jouee avant le jeu et le fichier du
+    /// classement montre a la fin s'il existe alors. Jamais l'adresse. Pur.
+    /// </summary>
+    internal static IReadOnlyList<string> Arguments(string film, int rotation, string? annonce = null, string? classement = null)
+    {
+        var arguments = new List<string> { "--film", film, "--adresse-stdin", "--rotation", rotation.ToString(CultureInfo.InvariantCulture), "--suivre" };
+        if (!string.IsNullOrEmpty(annonce)) arguments.AddRange(["--annonce", annonce]);
+        if (!string.IsNullOrEmpty(classement)) arguments.AddRange(["--classement", classement]);
+        return arguments;
+    }
 
     /// <summary>
     /// Les arguments de la version YouTube : le film, le fichier a ecrire, le sens du jeu, et la sequence du record
@@ -110,7 +118,7 @@ public static class LanceurDuDirect
     /// <see cref="DelaiDeFin"/> pour finir d'envoyer avant d'etre arrete.
     /// </summary>
     public static async Task<Rapport> DiffuserAsync(string exe, string film, string adresse, int rotation, ILogger journal,
-        CancellationToken ct)
+        CancellationToken ct, string? annonce = null, string? classement = null)
     {
         var info = new ProcessStartInfo(exe)
         {
@@ -121,7 +129,7 @@ public static class LanceurDuDirect
             RedirectStandardError = true,
             WorkingDirectory = Path.GetDirectoryName(exe) ?? AppContext.BaseDirectory,
         };
-        foreach (var a in Arguments(film, rotation)) info.ArgumentList.Add(a);
+        foreach (var a in Arguments(film, rotation, annonce, classement)) info.ArgumentList.Add(a);
 
         var chrono = Stopwatch.StartNew();
         using var p = Process.Start(info) ?? throw new InvalidOperationException("l'exe du direct ne demarre pas");
