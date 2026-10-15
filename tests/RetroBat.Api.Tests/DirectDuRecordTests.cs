@@ -175,6 +175,34 @@ public sealed class DirectDuRecordTests
         Assert.False(DirectDuRecordService.SansModes(["1cc", "1cc-original", "1lc"]));
     }
 
+    [Theory]
+    [InlineData("exe", true, 3, "exe")]       // l'exe redresse le jeu vertical
+    [InlineData("exe", true, 0, "exe")]
+    [InlineData(null, true, 0, "relais")]     // sans l'exe, la recopie telle quelle
+    [InlineData(null, true, null, "relais")]
+    [InlineData(null, true, 3, null)]         // ... qui ne redresse rien : pas de direct pour un jeu couche
+    [InlineData(null, true, 1, null)]
+    [InlineData("exe", false, 0, "relais")]   // l'exe coupe par la configuration
+    [InlineData("exe", false, 1, null)]
+    public void L_envoi_passe_par_l_exe_du_direct_s_il_est_la(string? exe, bool permis, int? rotation, string? attendu)
+        => Assert.Equal(attendu, DirectDuRecordService.Envoi(exe, permis, rotation));
+
+    [Fact]
+    public void L_adresse_du_direct_ne_passe_jamais_par_la_ligne_de_commande()
+    {
+        var a = LanceurDuDirect.Arguments(@"C:\captures\fm_x.mkv", 3);
+        Assert.Equal(["--film", @"C:\captures\fm_x.mkv", "--adresse-stdin", "--rotation", "3", "--suivre"], a);
+        Assert.DoesNotContain(a, x => x.Contains("rtmp", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Une_ligne_de_l_exe_ne_montre_jamais_l_adresse()
+    {
+        const string adresse = "rtmp://a.rtmp.youtube.com/live2/cle-secrete";
+        Assert.Equal("echec : connexion a <adresse> refusee", LanceurDuDirect.Masquer("echec : connexion a " + adresse + " refusee", adresse));
+        Assert.Equal("publication acceptee", LanceurDuDirect.Masquer("publication acceptee", adresse));
+    }
+
     /// <summary>
     /// Essai reel, ignore sans NELFE_DIRECT_FILM : recopie dix secondes d'un vrai film de RetroArch vers le MediaMTX local
     /// (rtmp://127.0.0.1:1935/live/csharp), qui doit l'accepter.

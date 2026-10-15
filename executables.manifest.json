@@ -18,5 +18,11 @@
     "arguments": "--self-test-child",
     "timeoutSeconds": 15,
     "expectedExitCode": 0
+  },
+  {
+    "file": "NelfePlay.LiveStreaming.exe",
+    "arguments": "--self-test",
+    "timeoutSeconds": 15,
+    "expectedExitCode": 0
   }
 ]

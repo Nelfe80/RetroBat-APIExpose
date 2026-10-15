@@ -42,9 +42,10 @@ public sealed class SelfUpdateService
 
     /// <summary>
     /// Les SEULS fichiers qu'un outils.json peut faire ecrire : il dit ou prendre un outil, il ne
-    /// choisit pas ce qu'il remplace. L'API et l'updater passent par l'update.7z.
+    /// choisit pas ce qu'il remplace. L'API et l'updater passent par l'update.7z. L'exe du direct
+    /// (depot prive NelfePlay-LiveStreaming, decision du user du 15 octobre 2026) suit le meme chemin.
     /// </summary>
-    internal static readonly string[] OutilsHorsArchive = ["RetroBat.Api.Diagnostic.exe"];
+    internal static readonly string[] OutilsHorsArchive = ["RetroBat.Api.Diagnostic.exe", "NelfePlay.LiveStreaming.exe"];
 
     /// <summary>Plafond d'un outil : l'outil de diagnostic pese ~66 Mo.</summary>
     private const long TailleMaxOutil = 512L * 1024 * 1024;

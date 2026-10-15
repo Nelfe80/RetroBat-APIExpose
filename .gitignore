@@ -86,6 +86,8 @@ logs/
 /RetroBat.Api.Update.exe
 # Construit par le depot prive APIExposeDiagnostic et depose ici a chaque compilation.
 /RetroBat.Api.Diagnostic.exe
+# Construit par le depot prive NelfePlay-LiveStreaming et depose ici a chaque compilation Release.
+/NelfePlay.LiveStreaming.exe
 /RetroBat.Api.deps.json
 /RetroBat.Api.runtimeconfig.json
 /RetroBat.Api.xml

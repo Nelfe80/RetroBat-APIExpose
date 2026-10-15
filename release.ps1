@@ -139,8 +139,9 @@ Write-Host 'Construction update.7z...'
 # release seulement quand il a change, et outils.json (plus bas) dit a l'API de la borne ou le
 # prendre ; elle ne telecharge que ce qui differe du sien (SelfUpdateService). Il reste dans le
 # full.7z et l'installeur. Les ressources (.MEM, gamelists, plugin Lua) n'y sont pas non plus :
-# elles arrivent par le Data Pack.
-$outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe')
+# elles arrivent par le Data Pack. L'exe du direct (depot prive NelfePlay-LiveStreaming, decision
+# user du 2026-10-15) suit le meme chemin.
+$outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.exe')
 $exclusOutils = @($outilsHorsArchive | ForEach-Object { "-x!$name\$_" })
 & $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" @exclusOutils -mx=5 -bsp0 -bso0
 
@@ -198,7 +199,9 @@ $autorises = @(
     # Le self-updater, a la racine comme l'API (voir src/RetroBat.Api.Update).
     'RetroBat.Api.Update.exe',
     # L'outil de diagnostic du demarrage, construit par le depot prive APIExposeDiagnostic.
-    'RetroBat.Api.Diagnostic.exe'
+    'RetroBat.Api.Diagnostic.exe',
+    # L'exe du direct, construit par le depot prive NelfePlay-LiveStreaming.
+    'NelfePlay.LiveStreaming.exe'
 )
 $suivis = @{}
 Push-Location $PSScriptRoot

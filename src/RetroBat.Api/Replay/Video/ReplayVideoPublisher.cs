@@ -516,7 +516,12 @@ public sealed class ReplayVideoPublisher
     }
 
     /// <summary>La reponse du site a une demande de direct : l'adresse d'entree porte la cle de diffusion.</summary>
-    public sealed record DirectOuvert(bool Ok, string? LiveId, string? Ingest, string? Raison);
+    /// <summary>
+    /// La reponse du site. <c>Raison</c> « en_attente » : un autre direct de record est en cours (un seul a la fois,
+    /// decision du 15 octobre 2026), la borne est a la place <c>Position</c> de la file et redemande au bout de
+    /// <c>RedemanderApres</c> secondes.
+    /// </summary>
+    public sealed record DirectOuvert(bool Ok, string? LiveId, string? Ingest, string? Raison, int? Position = null, int? RedemanderApres = null);
 
     /// <summary>
     /// Demande au site le direct d'un record (CDC video V2, §5.8) : la partie passe devant le premier rang. Le site prend
@@ -538,7 +543,8 @@ public sealed class ReplayVideoPublisher
             var corps = JsonNode.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false)) as JsonObject;
             if (reponse.IsSuccessStatusCode && (bool?)corps?["ok"] == true)
                 return new(true, (string?)corps!["live_id"], (string?)corps["ingest"], null);
-            return new(false, null, null, (string?)corps?["reason"] ?? "http_" + (int)reponse.StatusCode);
+            return new(false, null, null, (string?)corps?["reason"] ?? "http_" + (int)reponse.StatusCode,
+                (int?)corps?["position"], (int?)corps?["retry_after"]);
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
         {

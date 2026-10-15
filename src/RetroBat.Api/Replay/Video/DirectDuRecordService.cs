@@ -14,10 +14,14 @@ namespace RetroBat.Api.Replay.Video;
 /// <item>Au lancement d'une partie NelfePlay, la borne lit le premier rang du classement du jeu (celui du panneau de
 /// classement : regle principale, classement mondial).</item>
 /// <item>Quand le score en direct passe devant, elle demande le direct au site, qui verifie, ouvre un direct YouTube
-/// public et previent tout le monde. La borne y recopie le film que RetroArch tourne deja (<see cref="RelaisDuFilm"/>),
-/// jusqu'a la fin du film ou de la partie, puis le dit au site.</item>
-/// <item>Pas de direct sans film (capture coupee ou impossible), pour un jeu vertical filme couche (YouTube ne le
-/// redresserait pas), pour un contre-la-montre, ni pour un jeu a modes (le mode joue n'est connu qu'a la fin).</item>
+/// public et previent tout le monde. La borne y envoie le film que RetroArch tourne deja, jusqu'a la fin du film ou de
+/// la partie, puis le dit au site.</item>
+/// <item>Depuis le 15 octobre 2026, l'envoi passe par <c>NelfePlay.LiveStreaming.exe</c> (<see cref="LanceurDuDirect"/>),
+/// qui redresse les jeux verticaux ; sans lui, la recopie telle quelle (<see cref="RelaisDuFilm"/>), qui ne le peut
+/// pas.</item>
+/// <item>Pas de direct sans film (capture coupee ou impossible), pour un jeu vertical filme couche sans l'exe (YouTube
+/// ne le redresserait pas), pour un contre-la-montre, ni pour un jeu a modes (le mode joue n'est connu qu'a la
+/// fin).</item>
 /// </list>
 /// Un essai (<c>Video:Live:Test</c>, au lancement de l'API) ouvre un direct non repertorie que seul le joueur voit
 /// annonce ; <c>Video:Live:TestThreshold</c> remplace le score a battre.
@@ -35,6 +39,7 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
     private readonly ReplayVideoPublisher _site;
     private readonly ILogger<DirectDuRecordService> _journal;
     private readonly bool _actif;
+    private readonly bool _exe;
     private volatile bool _essai;
     private long? _seuilEssai;
 
@@ -64,6 +69,7 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         _collection = collection;
         _partie = partie;
         _actif = configuration.GetValue("Video:Live:Enabled", true);
+        _exe = configuration.GetValue("Video:Live:Exe", true);
         _essai = configuration.GetValue("Video:Live:Test", false);
         _seuilEssai = configuration.GetValue<long?>("Video:Live:TestThreshold");
     }
@@ -216,7 +222,14 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         }
     }
 
-    /// <summary>Le score passe devant : le site ouvre le direct, la borne y recopie le film jusqu'a la fin.</summary>
+    /// <summary>
+    /// L'envoi a utiliser : l'exe du direct s'il est la et permis, sinon la recopie telle quelle, qui ne sait pas
+    /// redresser un jeu vertical (null : pas de direct possible). Pur.
+    /// </summary>
+    internal static string? Envoi(string? exe, bool exePermis, int? rotation)
+        => exe is not null && exePermis ? "exe" : rotation is 1 or 3 ? null : "relais";
+
+    /// <summary>Le score passe devant : le site ouvre le direct, la borne y envoie le film jusqu'a la fin.</summary>
     private async Task DeclencherAsync(int g, long score)
     {
         string romGroup, regle;
@@ -231,19 +244,39 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
             _journal.LogInformation("Direct : {Jeu} passe devant a {Score}, mais aucun film ne tourne : pas de direct.", romGroup, score);
             return;
         }
-        if (film.Rotation is 1 or 3)
+        var exe = LanceurDuDirect.Chemin(AppContext.BaseDirectory);
+        var envoi = Envoi(exe, _exe, film.Rotation);
+        if (envoi is null)
         {
-            _journal.LogInformation("Direct : {Jeu} passe devant a {Score}, mais le film est couche (jeu vertical) : pas de direct.", romGroup, score);
+            _journal.LogInformation("Direct : {Jeu} passe devant a {Score}, mais le film est couche (jeu vertical) et l'exe du direct manque : pas de direct.", romGroup, score);
             return;
         }
 
         var ouvert = await _site.OuvrirLeDirectAsync(romGroup, regle, score, _essai, CancellationToken.None).ConfigureAwait(false);
+        // Un seul direct de record a la fois (decision du 15 octobre 2026) : la borne attend son tour dans la file et
+        // redemande tant que sa partie et son film durent.
+        while (!ouvert.Ok && ouvert.Raison == "en_attente")
+        {
+            var attente = TimeSpan.FromSeconds(Math.Clamp(ouvert.RedemanderApres ?? 60, 15, 300));
+            _journal.LogInformation("Direct : {Jeu} en file d'attente (place {Place}), nouvelle demande dans {Secondes:F0} s.", romGroup,
+                ouvert.Position, attente.TotalSeconds);
+            await Task.Delay(attente).ConfigureAwait(false);
+            bool finie;
+            lock (_verrou) finie = g != _generation;
+            if (finie || _capture.FilmEnCours() is not { } suite || suite.Fichier != film.Fichier)
+            {
+                _journal.LogInformation("Direct : {Jeu}, partie finie avant son tour dans la file : pas de direct.", romGroup);
+                return;
+            }
+            ouvert = await _site.OuvrirLeDirectAsync(romGroup, regle, score, _essai, CancellationToken.None).ConfigureAwait(false);
+        }
         if (!ouvert.Ok || ouvert.Ingest is null || ouvert.LiveId is null)
         {
             _journal.LogInformation("Direct : {Jeu} passe devant a {Score}, direct refuse par le site ({Raison}).", romGroup, score, ouvert.Raison);
             return;
         }
-        _journal.LogInformation("Direct : {Jeu} passe devant a {Score}, direct {Direct} ouvert, recopie du film.", romGroup, score, ouvert.LiveId);
+        _journal.LogInformation("Direct : {Jeu} passe devant a {Score}, direct {Direct} ouvert, envoi par {Envoi}.", romGroup, score,
+            ouvert.LiveId, envoi == "exe" ? "l'exe du direct" : "recopie du film");
 
         using var arret = new CancellationTokenSource();
         lock (_verrou)
@@ -253,9 +286,26 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         }
         try
         {
-            var rapport = await RelaisDuFilm.RecopierAsync(film.Fichier, ouvert.Ingest, _journal, arret.Token).ConfigureAwait(false);
-            _journal.LogInformation("Direct : {Direct} fini ({Fin}) : {Images} images, {Son} blocs de son, {Mo:F1} Mo en {Secondes:F0} s.",
-                ouvert.LiveId, rapport.Fin, rapport.Images, rapport.BlocsDeSon, rapport.Octets / 1e6, rapport.Secondes);
+            if (envoi == "exe")
+            {
+                var r = await LanceurDuDirect.DiffuserAsync(exe!, film.Fichier, ouvert.Ingest, film.Rotation ?? 0, _journal, arret.Token)
+                    .ConfigureAwait(false);
+                _journal.LogInformation("Direct : {Direct} fini ({Fin}, code {Code}, {Secondes:F0} s).", ouvert.LiveId, r.Fin, r.Code,
+                    r.Duree.TotalSeconds);
+                // L'exe tombe au demarrage (aucun encodeur, Windows trop ancien...) : la recopie telle quelle prend le
+                // relais pour un jeu droit, la partie continuant.
+                if (r.Code != 0 && r.Duree < TimeSpan.FromSeconds(20) && !arret.IsCancellationRequested && film.Rotation is not (1 or 3))
+                {
+                    _journal.LogInformation("Direct : {Direct}, l'exe n'a pas tenu : recopie du film.", ouvert.LiveId);
+                    envoi = "relais";
+                }
+            }
+            if (envoi == "relais")
+            {
+                var rapport = await RelaisDuFilm.RecopierAsync(film.Fichier, ouvert.Ingest, _journal, arret.Token).ConfigureAwait(false);
+                _journal.LogInformation("Direct : {Direct} fini ({Fin}) : {Images} images, {Son} blocs de son, {Mo:F1} Mo en {Secondes:F0} s.",
+                    ouvert.LiveId, rapport.Fin, rapport.Images, rapport.BlocsDeSon, rapport.Octets / 1e6, rapport.Secondes);
+            }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
