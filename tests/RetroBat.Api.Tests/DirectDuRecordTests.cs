@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using RetroBat.Api.Replay.Video;
 using Xunit;
@@ -193,6 +194,37 @@ public sealed class DirectDuRecordTests
         var a = LanceurDuDirect.Arguments(@"C:\captures\fm_x.mkv", 3);
         Assert.Equal(["--film", @"C:\captures\fm_x.mkv", "--adresse-stdin", "--rotation", "3", "--suivre"], a);
         Assert.DoesNotContain(a, x => x.Contains("rtmp", StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Essai reel, ignore sans NELFE_DIRECT_FILM ni l'exe du direct a la racine d'APIExpose (NELFE_DIRECT_EXE) : le
+    /// lanceur demarre le vrai exe sur un film de RetroArch, lui passe l'adresse du MediaMTX local par l'entree standard,
+    /// puis la « partie » s'arrete au bout de 12 s ; l'exe doit finir proprement, sans jamais montrer l'adresse.
+    /// </summary>
+    [Fact]
+    public async Task Le_vrai_exe_du_direct_envoie_un_film_au_serveur_local()
+    {
+        var film = Environment.GetEnvironmentVariable("NELFE_DIRECT_FILM");
+        var exe = Environment.GetEnvironmentVariable("NELFE_DIRECT_EXE");
+        if (string.IsNullOrEmpty(film) || !File.Exists(film) || string.IsNullOrEmpty(exe) || !File.Exists(exe)) return;
+        var lignes = new List<string>();
+        var journal = new JournalEnMemoire(lignes);
+        const string adresse = "rtmp://127.0.0.1:1935/live/lanceur";
+        using var partie = new CancellationTokenSource(TimeSpan.FromSeconds(12));
+        var r = await LanceurDuDirect.DiffuserAsync(exe, film, adresse, 3, journal, partie.Token);
+        Assert.Contains(lignes, l => l.Contains("publication acceptee", StringComparison.Ordinal));
+        Assert.DoesNotContain(lignes, l => l.Contains("rtmp://", StringComparison.Ordinal));
+        Assert.NotEqual(-1, r.Code);
+    }
+
+    private sealed class JournalEnMemoire(List<string> lignes) : ILogger
+    {
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public bool IsEnabled(LogLevel logLevel) => true;
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            lock (lignes) lignes.Add(formatter(state, exception));
+        }
     }
 
     [Fact]
