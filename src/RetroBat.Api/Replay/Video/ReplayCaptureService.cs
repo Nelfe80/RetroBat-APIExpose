@@ -161,10 +161,10 @@ public sealed class ReplayCaptureService : BackgroundService
         _espaceLibreMinGo = Math.Max(1, configuration.GetValue("Video:Capture:MinFreeGb", 5.0));
         _ageMax = TimeSpan.FromHours(Math.Max(1, configuration.GetValue("Video:Capture:MaxAgeHours", 48)));
         _intervalleEnvoi = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Capture:UploadIntervalMinutes", 2)));
-        // Le plus gros film ENVOYE (8 Go, le plafond du site : la version YouTube d'une partie de 19XX pese environ 3,7 Go
-        // de l'heure). Le film sur le disque, lui, continue au-dela (decision du 15 octobre 2026) : le direct d'un record
-        // tombe tard dans une longue partie, et il est la copie du film.
-        _tailleMax = Math.Max(1, configuration.GetValue("Video:Capture:MaxMb", 8000)) * 1_000_000L;
+        // Le plus gros film ENVOYE (300 Mo, le plafond du site). Jamais plusieurs Go demandes au joueur (decision du
+        // 15 octobre 2026 : certains paient leur envoi) ; seule la sequence du record doit partir. Le film sur le disque,
+        // lui, continue au-dela : le direct d'un record tombe tard dans une longue partie, et il est la copie du film.
+        _tailleMax = Math.Max(1, configuration.GetValue("Video:Capture:MaxMb", 300)) * 1_000_000L;
         _tailleLocaleMax = Math.Max(_tailleMax / 1_000_000L, configuration.GetValue("Video:Capture:MaxLocalMb", 4000L)) * 1_000_000L;
         _dossier = Path.GetFullPath(Path.Combine(objects.TempRoot, "..", "captures"));
     }
