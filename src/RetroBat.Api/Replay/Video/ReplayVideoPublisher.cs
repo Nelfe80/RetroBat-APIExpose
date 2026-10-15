@@ -571,7 +571,8 @@ public sealed class ReplayVideoPublisher
     public sealed record DirectOuvert(bool Ok, string? LiveId, string? Ingest, string? Raison, int? Position = null, int? RedemanderApres = null);
 
     /// <summary>
-    /// Demande au site le direct d'un record (CDC video V2, §5.8) : la partie passe devant le premier rang. Le site prend
+    /// Demande au site le direct d'un record (CDC video V2, §5.8) : depuis le 15 octobre 2026, la partie approche du
+    /// premier rang (90 %, <c>approach</c>) ; le site previent « sur le point d'etablir un nouveau record ». Le site prend
     /// la machine du classement sur la ligne du premier rang. L'adresse rendue ne se journalise pas.
     /// </summary>
     public async Task<DirectOuvert> OuvrirLeDirectAsync(string romGroup, string regle, long score, bool essai, CancellationToken ct)
@@ -584,6 +585,7 @@ public sealed class ReplayVideoPublisher
             var demande = new JsonObject
             {
                 ["system_id"] = "", ["rom_group"] = romGroup, ["ruleset"] = regle, ["score"] = score, ["test"] = essai,
+                ["approach"] = true,
             };
             using var contenu = new StringContent(demande.ToJsonString(), Encoding.UTF8, "application/json");
             using var reponse = await client.PostAsync("/api/v1/agent/live/record-start", contenu, ct).ConfigureAwait(false);
@@ -597,6 +599,27 @@ public sealed class ReplayVideoPublisher
         {
             _logger.LogInformation("Direct : site injoignable ({Message}).", ex.Message);
             return new(false, null, null, "site injoignable");
+        }
+    }
+
+    /// <summary>
+    /// LE RECORD TOMBE, EN DIRECT (decision du 15 octobre 2026) : le score passe devant le premier rang. Le site note
+    /// le moment, retitre le direct et previent tout le monde une seconde fois (« vient d'etablir un nouveau record »).
+    /// Vrai si le site l'a pris.
+    /// </summary>
+    public async Task<bool> SignalerLeRecordAsync(string liveId, long score, CancellationToken ct)
+    {
+        var credential = _devices.GetCredential();
+        if (string.IsNullOrEmpty(credential)) return false;
+        try
+        {
+            return await PosterAsync(credential, "live/record-passed", new JsonObject { ["live_id"] = liveId, ["score"] = score }, ct)
+                .ConfigureAwait(false) is not null;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
+        {
+            _logger.LogInformation("Direct : record du direct {Direct} non signale ({Message}).", liveId, ex.Message);
+            return false;
         }
     }
 

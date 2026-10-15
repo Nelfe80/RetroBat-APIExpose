@@ -13,9 +13,12 @@ namespace RetroBat.Api.Replay.Video;
 /// <list type="bullet">
 /// <item>Au lancement d'une partie NelfePlay, la borne lit le premier rang du classement du jeu (celui du panneau de
 /// classement : regle principale, classement mondial).</item>
-/// <item>Quand le score en direct passe devant, elle demande le direct au site, qui verifie, ouvre un direct YouTube
-/// public et previent tout le monde. La borne y envoie le film que RetroArch tourne deja, jusqu'a la fin du film ou de
-/// la partie, puis le dit au site.</item>
+/// <item>DEPUIS LE 15 OCTOBRE 2026, LE DIRECT S'OUVRE A L'APPROCHE : quand le score en direct atteint 90 % du premier
+/// rang, elle demande le direct au site, qui verifie, ouvre un direct YouTube public et previent tout le monde (« sur le
+/// point d'etablir un nouveau record »). La borne y envoie le film que RetroArch tourne deja, jusqu'a la fin du film ou
+/// de la partie, puis le dit au site. Quand le score passe devant, elle le signale (<see cref="ReplayVideoPublisher.SignalerLeRecordAsync"/>) :
+/// le site note le moment et previent une seconde fois. Un record manque efface l'archive du direct ; un record
+/// certifie la range dans la playlist « Records en direct ».</item>
 /// <item>Depuis le 15 octobre 2026, l'envoi passe par <c>NelfePlay.LiveStreaming.exe</c> (<see cref="LanceurDuDirect"/>),
 /// qui redresse les jeux verticaux ; sans lui, la recopie telle quelle (<see cref="RelaisDuFilm"/>), qui ne le peut
 /// pas.</item>
@@ -50,6 +53,11 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
     private long? _aBattre;
     private bool _declenche;
     private bool _runTermine;
+    /// <summary>Le direct ouvert pour cette partie (pour signaler le record), et le meilleur score du joueur 1.</summary>
+    private string? _liveId;
+    private long _meilleurScore;
+    private bool _recordSignale;
+    private int _essaisDeSignal;
     private CancellationTokenSource? _relais;
     private IDisposable? _abonnement;
 
@@ -108,9 +116,18 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
             actif && seuil is long s ? " (seuil " + s + ")" : "");
     }
 
-    /// <summary>Faut-il ouvrir le direct ? Le score passe devant le premier rang, une fois par partie certifiee. Pur.</summary>
-    internal static bool PasseDevant(long? aBattre, long score, int joueur, bool dejaDeclenche, bool runTermine)
-        => aBattre is long seuil && !dejaDeclenche && !runTermine && joueur == 1 && score > seuil;
+    /// <summary>Le direct s'ouvre a 90 % du record (decision du 15 octobre 2026), arrondi au-dessus, comme le site. Pur.</summary>
+    internal static long SeuilDApproche(long record) => (record * 90 + 99) / 100;
+
+    /// <summary>
+    /// Faut-il ouvrir le direct ? Le score du joueur 1 atteint 90 % du premier rang, une fois par partie certifiee. Pur.
+    /// </summary>
+    internal static bool AApproche(long? aBattre, long score, int joueur, bool dejaDeclenche, bool runTermine)
+        => aBattre is long record && record > 0 && !dejaDeclenche && !runTermine && joueur == 1 && score >= SeuilDApproche(record);
+
+    /// <summary>Le record tombe : le score du joueur 1 passe devant le premier rang, avant tout continue. Pur.</summary>
+    internal static bool PasseDevant(long? aBattre, long score, int joueur, bool runTermine)
+        => aBattre is long record && !runTermine && joueur == 1 && score > record;
 
     /// <summary>
     /// Les regles d'un jeu ou le premier rang se lit pendant la partie : 1CC, 1LC, 1CC MULTI. Un jeu a modes en a
@@ -135,6 +152,10 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                         _aBattre = null;
                         _declenche = false;
                         _runTermine = false;
+                        _liveId = null;
+                        _meilleurScore = 0;
+                        _recordSignale = false;
+                        _essaisDeSignal = 0;
                         _relais?.Cancel();
                     }
                     _ = Task.Run(() => ArmerAsync(g));
@@ -144,13 +165,21 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                     if (Nombre(e.Payload, "Score") is not { } score) return;
                     var joueur = (int)(Nombre(e.Payload, "Player") ?? 1);
                     int gen;
+                    bool ouvrir, signaler;
+                    string? direct;
                     lock (_verrou)
                     {
-                        if (!PasseDevant(_aBattre, score, joueur, _declenche, _runTermine)) return;
-                        _declenche = true;
+                        if (joueur == 1 && !_runTermine) _meilleurScore = Math.Max(_meilleurScore, score);
+                        ouvrir = AApproche(_aBattre, score, joueur, _declenche, _runTermine);
+                        if (ouvrir) _declenche = true;
+                        // Le direct ouvert a l'approche : le moment ou le record tombe se signale une fois.
+                        signaler = !ouvrir && _liveId is not null && !_recordSignale && PasseDevant(_aBattre, score, joueur, _runTermine);
+                        if (signaler) _recordSignale = true;
+                        direct = _liveId;
                         gen = _generation;
                     }
-                    _ = Task.Run(() => DeclencherAsync(gen, score));
+                    if (ouvrir) _ = Task.Run(() => DeclencherAsync(gen, score));
+                    else if (signaler) _ = Task.Run(() => SignalerAsync(gen, direct!, score));
                     break;
 
                 case "scoring.run.ended":
@@ -162,6 +191,7 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                     {
                         _generation++;
                         _aBattre = null;
+                        _liveId = null;
                         _relais?.Cancel();
                     }
                     break;
@@ -213,8 +243,8 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                 _regle = regle.Length > 0 ? regle : "1cc";
                 _aBattre = _seuilEssai ?? tete!.Valeur;
             }
-            _journal.LogInformation("Direct : {Jeu} ({Regle}) arme, premier rang {Valeur} ({Joueur}).",
-                romGroup, regle, _seuilEssai ?? tete!.Valeur, tete?.Joueur ?? "essai");
+            _journal.LogInformation("Direct : {Jeu} ({Regle}) arme, premier rang {Valeur} ({Joueur}), direct a {Seuil}.",
+                romGroup, regle, _seuilEssai ?? tete!.Valeur, tete?.Joueur ?? "essai", SeuilDApproche(_seuilEssai ?? tete!.Valeur));
         }
         catch (Exception ex)
         {
@@ -244,7 +274,7 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         }
         if (_capture.FilmEnCours() is not { } film)
         {
-            _journal.LogInformation("Direct : {Jeu} passe devant a {Score}, mais aucun film ne tourne : pas de direct.", romGroup, score);
+            _journal.LogInformation("Direct : {Jeu} approche du record a {Score}, mais aucun film ne tourne : pas de direct.", romGroup, score);
             return;
         }
         var exe = LanceurDuDirect.Chemin(AppContext.BaseDirectory);
@@ -252,7 +282,7 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         var envoi = Envoi(exe, _exe, film.Rotation, origine);
         if (envoi is null)
         {
-            _journal.LogInformation("Direct : {Jeu} passe devant a {Score}, mais le film est {Film} et l'exe du direct manque : pas de direct.",
+            _journal.LogInformation("Direct : {Jeu} approche du record a {Score}, mais le film est {Film} et l'exe du direct manque : pas de direct.",
                 romGroup, score, origine ? "a la taille d'origine" : "couche (jeu vertical)");
             return;
         }
@@ -277,11 +307,27 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         }
         if (!ouvert.Ok || ouvert.Ingest is null || ouvert.LiveId is null)
         {
-            _journal.LogInformation("Direct : {Jeu} passe devant a {Score}, direct refuse par le site ({Raison}).", romGroup, score, ouvert.Raison);
+            _journal.LogInformation("Direct : {Jeu} approche du record a {Score}, direct refuse par le site ({Raison}).", romGroup, score, ouvert.Raison);
             return;
         }
-        _journal.LogInformation("Direct : {Jeu} passe devant a {Score}, direct {Direct} ouvert, envoi par {Envoi}.", romGroup, score,
+        _journal.LogInformation("Direct : {Jeu} approche du record a {Score}, direct {Direct} ouvert, envoi par {Envoi}.", romGroup, score,
             ouvert.LiveId, envoi == "exe" ? "l'exe du direct" : "recopie du film");
+
+        // Le record a pu tomber pendant l'ouverture ou l'attente dans la file : il se signale tout de suite.
+        long? dejaTombe = null;
+        lock (_verrou)
+        {
+            if (g == _generation)
+            {
+                _liveId = ouvert.LiveId;
+                if (!_recordSignale && PasseDevant(_aBattre, _meilleurScore, 1, false))
+                {
+                    _recordSignale = true;
+                    dejaTombe = _meilleurScore;
+                }
+            }
+        }
+        if (dejaTombe is long tombe) _ = Task.Run(() => SignalerAsync(g, ouvert.LiveId, tombe));
 
         using var arret = new CancellationTokenSource();
         lock (_verrou)
@@ -330,6 +376,25 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
             }
             await _site.CloreLeDirectAsync(ouvert.LiveId, CancellationToken.None).ConfigureAwait(false);
         }
+    }
+
+    /// <summary>
+    /// Le record tombe pendant le direct : le site le note et previent une seconde fois. Refuse ou injoignable, le
+    /// signal se retente au changement de score suivant, trois fois au plus.
+    /// </summary>
+    private async Task SignalerAsync(int g, string liveId, long score)
+    {
+        var pris = await _site.SignalerLeRecordAsync(liveId, score, CancellationToken.None).ConfigureAwait(false);
+        if (pris)
+        {
+            _journal.LogInformation("Direct : {Direct}, le record tombe a {Score}, signale au site.", liveId, score);
+            return;
+        }
+        lock (_verrou)
+        {
+            if (g == _generation && ++_essaisDeSignal < 3) _recordSignale = false;
+        }
+        _journal.LogInformation("Direct : {Direct}, le record tombe a {Score}, signal non pris par le site.", liveId, score);
     }
 
     private static long? Nombre(object? payload, string nom)

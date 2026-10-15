@@ -159,14 +159,32 @@ public sealed class DirectDuRecordTests
     }
 
     [Theory]
-    [InlineData(100L, 101L, 1, false, false, true)]
-    [InlineData(100L, 100L, 1, false, false, false)]   // egaler ne suffit pas
+    [InlineData(100L, 90L, 1, false, false, true)]     // 90 % du record (decision du 15 octobre 2026)
+    [InlineData(100L, 89L, 1, false, false, false)]
+    [InlineData(100L, 150L, 1, false, false, true)]    // deja devant : le direct s'ouvre aussi
     [InlineData(100L, 500L, 2, false, false, false)]   // le joueur 2 d'une partie a deux
     [InlineData(100L, 500L, 1, true, false, false)]    // une fois par partie
     [InlineData(100L, 500L, 1, false, true, false)]    // apres un continue, la partie ne compte plus
     [InlineData(null, 500L, 1, false, false, false)]   // classement inconnu
-    public void Le_direct_s_ouvre_au_depassement_du_premier_rang(long? aBattre, long score, int joueur, bool deja, bool fini, bool attendu)
-        => Assert.Equal(attendu, DirectDuRecordService.PasseDevant(aBattre, score, joueur, deja, fini));
+    [InlineData(0L, 5L, 1, false, false, false)]       // pas de record a approcher
+    public void Le_direct_s_ouvre_a_l_approche_du_premier_rang(long? aBattre, long score, int joueur, bool deja, bool fini, bool attendu)
+        => Assert.Equal(attendu, DirectDuRecordService.AApproche(aBattre, score, joueur, deja, fini));
+
+    [Theory]
+    [InlineData(35260L, 31734L)]   // le record de Ms. Pac-Man : 90 % tout juste
+    [InlineData(15L, 14L)]         // arrondi au-dessus, comme le site
+    [InlineData(100L, 90L)]
+    public void Le_seuil_d_approche_est_celui_du_site(long record, long seuil)
+        => Assert.Equal(seuil, DirectDuRecordService.SeuilDApproche(record));
+
+    [Theory]
+    [InlineData(100L, 101L, 1, false, true)]
+    [InlineData(100L, 100L, 1, false, false)]   // egaler ne suffit pas
+    [InlineData(100L, 500L, 2, false, false)]   // le joueur 2
+    [InlineData(100L, 500L, 1, true, false)]    // apres un continue
+    [InlineData(null, 500L, 1, false, false)]
+    public void Le_record_tombe_au_depassement_du_premier_rang(long? aBattre, long score, int joueur, bool fini, bool attendu)
+        => Assert.Equal(attendu, DirectDuRecordService.PasseDevant(aBattre, score, joueur, fini));
 
     [Fact]
     public void Un_jeu_a_modes_n_a_pas_de_direct()
