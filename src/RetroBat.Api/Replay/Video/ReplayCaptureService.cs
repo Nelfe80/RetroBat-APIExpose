@@ -123,6 +123,58 @@ public sealed class ReplayCaptureService : BackgroundService
         public bool Lent;
         public readonly GardeDeCapture Garde = new();
         public readonly Stopwatch Chrono = Stopwatch.StartNew();
+
+        /// <summary>
+        /// LA COURBE DU SCORE du joueur 1 (secondes du film, score atteint), pour couper la sequence du record (decision
+        /// du 15 octobre 2026) : un point par quart de seconde au plus, seulement quand le score monte.
+        /// </summary>
+        public readonly List<double[]> Courbe = new();
+        /// <summary>La fin du run certifie (continue, mort du 1LC, fin de partie), en secondes du film.</summary>
+        public double? FinDuRunS;
+
+        public void NoterScore(long score)
+        {
+            lock (Courbe)
+            {
+                var t = Math.Round(Chrono.Elapsed.TotalSeconds, 2);
+                if (Courbe.Count > 0)
+                {
+                    var dernier = Courbe[^1];
+                    if (score <= dernier[1]) return;
+                    if (t - dernier[0] < 0.25)
+                    {
+                        dernier[1] = score;
+                        return;
+                    }
+                }
+                Courbe.Add([t, score]);
+            }
+        }
+
+        public List<double[]> CopieDeLaCourbe()
+        {
+            lock (Courbe) return Courbe.Select(p => (double[])p.Clone()).ToList();
+        }
+    }
+
+    /// <summary>
+    /// LA SEQUENCE DU RECORD (decision du 15 octobre 2026) : seule elle part sur YouTube, la partie complete se regarde
+    /// avec le replay. Du moment ou le score atteint 90 % de celui de la fin du run jusqu'a cette fin, 3 minutes au plus,
+    /// avec 3 s d'elan avant et 2 s apres. <paramref name="finRunS"/> : la fin du run en secondes du film (sinon la fin
+    /// du film). Sans courbe, les 3 dernieres minutes. Pur.
+    /// </summary>
+    internal static (double DebutS, double FinS) SequenceDuRecord(IReadOnlyList<double[]>? courbe, double finRunS)
+    {
+        const double Max = 180, Elan = 3, Apres = 2;
+        var points = (courbe ?? Array.Empty<double[]>()).Where(p => p.Length == 2 && p[0] <= finRunS + 1).ToList();
+        var debut = finRunS - Max;
+        if (points.Count > 0)
+        {
+            var seuil = points.Max(p => p[1]) * 0.9;
+            debut = points.First(p => p[1] >= seuil)[0] - Elan;
+        }
+        debut = Math.Max(Math.Max(0, debut), finRunS - Max);
+        return (Math.Round(debut, 2), Math.Round(finRunS + Apres, 2));
     }
 
     /// <summary>
@@ -136,7 +188,18 @@ public sealed class ReplayCaptureService : BackgroundService
     public sealed record CaptureGardee(string ReplayId, string Fichier, long DebutFilm, long FinFilm, DateTime CreeeUtc,
         string? Session = null, string? VideoId = null, DateTime? EnvoyeeUtc = null,
         IReadOnlyList<string>? Sessions = null, bool SansReplay = false,
-        bool Origine = false, int? Rotation = null, string? Version = null, int EchecsDeVersion = 0);
+        bool Origine = false, int? Rotation = null, string? Version = null, int EchecsDeVersion = 0,
+        IReadOnlyList<double[]>? Courbe = null, double? FinDuRunS = null, double? DureeS = null,
+        double? DebutSequenceS = null, double? FinSequenceS = null);
+
+    /// <summary>
+    /// Les frames du replay que la video couvre : la sequence du record quand elle a ete coupee, sinon tout le film
+    /// (<paramref name="finFilm"/>). Le site en tire le debut et la fin de chaque performance dans la video. Pur.
+    /// </summary>
+    internal static (long Debut, long Fin) PortionDuReplay(CaptureGardee g, long finFilm, double fps)
+        => g.DebutSequenceS is double debut && g.FinSequenceS is double fin && fps > 1
+            ? (g.DebutFilm + (long)Math.Round(debut * fps), Math.Min(finFilm, g.DebutFilm + (long)Math.Round(fin * fps)))
+            : (g.DebutFilm, finFilm);
 
     /// <summary>Le prefixe des films sans replay : le site les reconnait et les relie par les sessions des scores.</summary>
     internal const string PrefixeSansReplay = "fm_";
@@ -233,8 +296,15 @@ public sealed class ReplayCaptureService : BackgroundService
                 case "replay.recording.skipped":
                     _ = Task.Run(() => DemarrerAsync(PrefixeSansReplay + Ulid.New(), sansReplay: true));
                     break;
+                case "score.live.changed":
+                    // La courbe du score du joueur 1, pour la sequence du record.
+                    if (_enCours is { } filme && Entier(e.Payload, "Score") is { } valeur && (Entier(e.Payload, "Player") ?? 1) == 1)
+                        filme.NoterScore(valeur);
+                    break;
                 case "scoring.run.ended":
                 case "scoring.replay.stop":
+                    if (e.Type == "scoring.run.ended" && _enCours is { } finDuRun)
+                        finDuRun.FinDuRunS ??= Math.Round(finDuRun.Chrono.Elapsed.TotalSeconds, 2);
                     if (_enCours is { SansReplay: true } sansReplay)
                         _ = Task.Run(() => ArreterAsync(sansReplay.ReplayId, null, abandon: false,
                             e.Type == "scoring.run.ended" ? "fin de la partie certifiee" : "le score a baisse"));
@@ -348,6 +418,8 @@ public sealed class ReplayCaptureService : BackgroundService
         {
             var c = _enCours;
             if (c is null || (replayId is not null && replayId != c.ReplayId)) return;
+            // La duree du film au moment de l'arret, avant les attentes qui suivent.
+            var dureeAuStop = Math.Round(c.Chrono.Elapsed.TotalSeconds, 2);
             lock (_verrouSessions)
             {
                 _enCours = null;
@@ -395,7 +467,8 @@ public sealed class ReplayCaptureService : BackgroundService
             var gardee = new CaptureGardee(c.ReplayId, destination, c.FrameDebut,
                 Math.Max(c.FrameDebut, derniereFrame ?? 0), DateTime.UtcNow,
                 Sessions: c.SansReplay ? SessionsDuFilm(c.ReplayId, null) : null, SansReplay: c.SansReplay,
-                Origine: origine, Rotation: c.Rotation);
+                Origine: origine, Rotation: c.Rotation,
+                Courbe: c.CopieDeLaCourbe(), FinDuRunS: c.FinDuRunS, DureeS: dureeAuStop);
             await File.WriteAllTextAsync(Path.Combine(_dossier, c.ReplayId + ".json"),
                 JsonSerializer.Serialize(gardee, Json), Encoding.UTF8, _arret).ConfigureAwait(false);
             _logger.LogInformation("Capture : {ReplayId} gardee ({Taille} octets, {Format}, {Pourquoi}), en attente de la decision du site.",
@@ -583,7 +656,10 @@ public sealed class ReplayCaptureService : BackgroundService
                 else
                 {
                     if (etat == "uploading")
-                        await _publication.ConfirmerAsync(g.ReplayId, g.VideoId, g.DebutFilm, fin, fps, stoppingToken).ConfigureAwait(false);
+                    {
+                        var (debutPortion, finPortion) = PortionDuReplay(g, fin, fps);
+                        await _publication.ConfirmerAsync(g.ReplayId, g.VideoId, debutPortion, finPortion, fps, stoppingToken).ConfigureAwait(false);
+                    }
                     if (DateTime.UtcNow - (g.EnvoyeeUtc ?? g.CreeeUtc) > PreteAuPlus)
                         Oublier(g, fiche, "envoyee il y a plus de 24 heures (" + g.VideoId + ")");
                     continue;
@@ -625,6 +701,16 @@ public sealed class ReplayCaptureService : BackgroundService
                         SuivreLeRefus(courante, fiche, voulue, age);
                         continue;
                     }
+                    // Seule la sequence du record part (decision du 15 octobre 2026) : elle finit avec le run que le site
+                    // designe (frames du replay), sinon avec celui que la borne a vu finir, sinon avec le film.
+                    var finRunS = voulue.RunFinFrame is long finRun && finRun > courante.DebutFilm && fps > 1
+                        ? (finRun - courante.DebutFilm) / fps
+                        : courante.FinDuRunS ?? courante.DureeS;
+                    if (finRunS is double finDuRunS)
+                    {
+                        var (debutS, finS) = SequenceDuRecord(courante.Courbe, finDuRunS);
+                        courante = courante with { DebutSequenceS = debutS, FinSequenceS = finS };
+                    }
                     courante = await FabriquerLaVersionAsync(courante, fiche, envoi.Token).ConfigureAwait(false);
                     if (courante.Version is null) continue;
                     if (TailleDe(courante.Version) > _tailleMax)
@@ -633,8 +719,9 @@ public sealed class ReplayCaptureService : BackgroundService
                         continue;
                     }
                 }
+                var (debutPortion, finPortion) = PortionDuReplay(courante, fin, fps);
                 var resultat = await _publication.EnvoyerCaptureAsync(courante.ReplayId, courante.Version ?? courante.Fichier,
-                    courante.DebutFilm, fin, fps, courante.Sessions, courante.Session, async session =>
+                    debutPortion, finPortion, fps, courante.Sessions, courante.Session, async session =>
                     {
                         courante = courante with { Session = session };
                         await SauverAsync(courante, fiche, stoppingToken).ConfigureAwait(false);
@@ -687,9 +774,10 @@ public sealed class ReplayCaptureService : BackgroundService
         }
         var version = Path.ChangeExtension(g.Fichier, ".flv");
         Effacer(version);
-        _logger.LogInformation("Capture : {ReplayId} est un record, fabrication de sa version YouTube.", g.ReplayId);
-        var r = await LanceurDuDirect.FabriquerLaVersionAsync(exe, g.Fichier, version, g.Rotation ?? 0, _logger, ct)
-            .ConfigureAwait(false);
+        _logger.LogInformation("Capture : {ReplayId} est un record, fabrication de sa version YouTube ({Sequence}).", g.ReplayId,
+            g.DebutSequenceS is double d && g.FinSequenceS is double f ? "sequence de " + d + " a " + f + " s du film" : "film entier");
+        var r = await LanceurDuDirect.FabriquerLaVersionAsync(exe, g.Fichier, version, g.Rotation ?? 0, _logger, ct,
+            g.DebutSequenceS, g.FinSequenceS).ConfigureAwait(false);
         if (r.Code == 0 && TailleDe(version) > 0)
         {
             var faite = g with { Version = version };

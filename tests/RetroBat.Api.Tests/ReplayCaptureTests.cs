@@ -274,6 +274,50 @@ public sealed class ReplayCaptureTests
     public void La_version_youtube_se_fabrique_du_debut_du_film_dans_le_sens_du_jeu()
         => Assert.Equal(["--film", @"C:\c\01J.mkv", "--sortie-flv", @"C:\c\01J.flv", "--depuis-le-debut", "--rotation", "3"],
             LanceurDuDirect.ArgumentsDeLaVersion(@"C:\c\01J.mkv", @"C:\c\01J.flv", 3));
+
+    [Fact]
+    public void La_version_youtube_d_une_sequence_passe_ses_bornes_a_l_exe()
+        => Assert.Equal(["--film", "f.mkv", "--sortie-flv", "f.flv", "--depuis-le-debut", "--rotation", "0", "--debut", "97.5", "--fin", "117"],
+            LanceurDuDirect.ArgumentsDeLaVersion("f.mkv", "f.flv", 0, 97.5, 117));
+
+    [Fact]
+    public void La_sequence_du_record_part_de_90_pourcent_du_score_de_fin_de_run()
+    {
+        // Le score atteint 900 (90 % de 1 000) a 100 s : 3 s d'elan, 2 s apres la fin du run.
+        double[][] courbe = [[10, 100], [20, 500], [100, 900], [110, 1000]];
+        Assert.Equal((97.0, 117.0), ReplayCaptureService.SequenceDuRecord(courbe, 115));
+        // 3 minutes au plus : les dernieres.
+        double[][] longue = [[10, 100], [500, 9000], [1000, 10000]];
+        Assert.Equal((820.0, 1002.0), ReplayCaptureService.SequenceDuRecord(longue, 1000));
+        // Ce qui suit la fin du run (un continue) ne compte pas.
+        double[][] apres = [[50, 100], [200, 5000]];
+        Assert.Equal((47.0, 102.0), ReplayCaptureService.SequenceDuRecord(apres, 100));
+        // Sans courbe : les 3 dernieres minutes, jamais avant le debut du film.
+        Assert.Equal((120.0, 302.0), ReplayCaptureService.SequenceDuRecord(null, 300));
+        Assert.Equal((0.0, 62.0), ReplayCaptureService.SequenceDuRecord([], 60));
+    }
+
+    [Fact]
+    public void Le_site_recoit_les_frames_de_la_sequence_envoyee()
+    {
+        var entiere = new ReplayCaptureService.CaptureGardee("rp", "f.mkv", 1000, 9000, DateTime.UtcNow);
+        Assert.Equal((1000L, 9000L), ReplayCaptureService.PortionDuReplay(entiere, 9000, 60));
+        var sequence = entiere with { DebutSequenceS = 10, FinSequenceS = 40 };
+        Assert.Equal((1600L, 3400L), ReplayCaptureService.PortionDuReplay(sequence, 9000, 60));
+        // Jamais au-dela de la fin du replay.
+        Assert.Equal((1600L, 3000L), ReplayCaptureService.PortionDuReplay(sequence, 3000, 60));
+    }
+
+    [Fact]
+    public void Les_bornes_du_run_se_lisent_dans_la_reponse_du_site()
+    {
+        var run = System.Text.Json.Nodes.JsonNode.Parse("""{"start_frame":120,"end_frame":43210.0,"ruleset":"1cc","x":null}""")!;
+        Assert.Equal(120L, ReplayVideoPublisher.EntierJson(run["start_frame"]));
+        Assert.Equal(43210L, ReplayVideoPublisher.EntierJson(run["end_frame"]));
+        Assert.Null(ReplayVideoPublisher.EntierJson(run["x"]));
+        Assert.Null(ReplayVideoPublisher.EntierJson(run["ruleset"]));
+        Assert.Null(ReplayVideoPublisher.EntierJson(null));
+    }
 }
 
 /// <summary>GET_STATUS evite quand le coeur charge n'a pas d'identifiant de systeme (plantage de RetroArch 1.22.2).</summary>

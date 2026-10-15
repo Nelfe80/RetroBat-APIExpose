@@ -298,7 +298,12 @@ public sealed class ReplayVideoPublisher
             using var reponse = await client.PostAsync("/api/v1/agent/videos/upload-session", contenu, ct).ConfigureAwait(false);
             var corps = JsonNode.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false)) as JsonObject;
             if (reponse.IsSuccessStatusCode && corps?["wanted"] is JsonValue voulu && voulu.TryGetValue<bool>(out var oui) && oui)
-                return new(IssueDeCapture.Voulue, "record");
+            {
+                // Les bornes du run qui fait le record (absentes pour un film sans replay ou un score sans bornes).
+                var run = corps["run"] as JsonObject;
+                return new(IssueDeCapture.Voulue, "record", RunDebutFrame: EntierJson(run?["start_frame"]),
+                    RunFinFrame: EntierJson(run?["end_frame"]));
+            }
             // Un site d'avant cette question ouvrirait une session : il n'en rend pas ici (le FLV lui est inconnu).
             var raison = (string?)corps?["reason"] ?? "http_" + (int)reponse.StatusCode;
             return new(RefusDefinitifs.Contains(raison) ? IssueDeCapture.Inutile : IssueDeCapture.PlusTard, raison);
@@ -320,8 +325,16 @@ public sealed class ReplayVideoPublisher
         "pas_un_record", "deja_filme", "taille",
     };
 
-    /// <summary>Ce que donne une demande d'envoi de capture : l'issue, son detail, et la video si elle existe.</summary>
-    public sealed record ResultatDeCapture(IssueDeCapture Issue, string Detail, string? VideoId = null, bool Confirmee = false);
+    /// <summary>
+    /// Ce que donne une demande d'envoi de capture : l'issue, son detail, la video si elle existe, et pour une capture
+    /// voulue les bornes (frames du replay) du run qui fait le record, d'ou se tire sa sequence.
+    /// </summary>
+    public sealed record ResultatDeCapture(IssueDeCapture Issue, string Detail, string? VideoId = null, bool Confirmee = false,
+        long? RunDebutFrame = null, long? RunFinFrame = null);
+
+    /// <summary>Un entier d'une reponse JSON, ou null s'il manque ou n'en est pas un. Pur.</summary>
+    internal static long? EntierJson(JsonNode? n)
+        => n is JsonValue v && v.TryGetValue<long>(out var l) ? l : n is JsonValue d && d.TryGetValue<double>(out var x) ? (long)x : null;
 
     /// <summary>
     /// LE FILM D'UNE PARTIE, CAPTE PENDANT LE JEU (decision du 14 octobre 2026). Le site dit si la partie est un

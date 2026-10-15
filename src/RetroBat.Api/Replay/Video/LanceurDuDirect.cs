@@ -34,9 +34,21 @@ public static class LanceurDuDirect
     internal static IReadOnlyList<string> Arguments(string film, int rotation)
         => ["--film", film, "--adresse-stdin", "--rotation", rotation.ToString(CultureInfo.InvariantCulture), "--suivre"];
 
-    /// <summary>Les arguments de la version YouTube d'un film complet : le film, le fichier a ecrire, le sens du jeu. Pur.</summary>
-    internal static IReadOnlyList<string> ArgumentsDeLaVersion(string film, string sortie, int rotation)
-        => ["--film", film, "--sortie-flv", sortie, "--depuis-le-debut", "--rotation", rotation.ToString(CultureInfo.InvariantCulture)];
+    /// <summary>
+    /// Les arguments de la version YouTube : le film, le fichier a ecrire, le sens du jeu, et la sequence du record
+    /// (secondes du film) quand elle est connue. Pur.
+    /// </summary>
+    internal static IReadOnlyList<string> ArgumentsDeLaVersion(string film, string sortie, int rotation, double? debutS = null,
+        double? finS = null)
+    {
+        var arguments = new List<string>
+        {
+            "--film", film, "--sortie-flv", sortie, "--depuis-le-debut", "--rotation", rotation.ToString(CultureInfo.InvariantCulture),
+        };
+        if (debutS is double debut) arguments.AddRange(["--debut", debut.ToString("0.##", CultureInfo.InvariantCulture)]);
+        if (finS is double fin) arguments.AddRange(["--fin", fin.ToString("0.##", CultureInfo.InvariantCulture)]);
+        return arguments;
+    }
 
     /// <summary>
     /// LA VERSION YOUTUBE D'UN FILM A LA TAILLE D'ORIGINE (decision du 15 octobre 2026) : l'exe le redresse, l'agrandit
@@ -45,7 +57,7 @@ public static class LanceurDuDirect
     /// fichier inacheve s'efface et l'annulation remonte. Code 0 : le fichier est complet.
     /// </summary>
     public static async Task<Rapport> FabriquerLaVersionAsync(string exe, string film, string sortie, int rotation, ILogger journal,
-        CancellationToken ct)
+        CancellationToken ct, double? debutS = null, double? finS = null)
     {
         var info = new ProcessStartInfo(exe)
         {
@@ -55,7 +67,7 @@ public static class LanceurDuDirect
             RedirectStandardError = true,
             WorkingDirectory = Path.GetDirectoryName(exe) ?? AppContext.BaseDirectory,
         };
-        foreach (var a in ArgumentsDeLaVersion(film, sortie, rotation)) info.ArgumentList.Add(a);
+        foreach (var a in ArgumentsDeLaVersion(film, sortie, rotation, debutS, finS)) info.ArgumentList.Add(a);
 
         var chrono = Stopwatch.StartNew();
         using var p = Process.Start(info) ?? throw new InvalidOperationException("l'exe du direct ne demarre pas");
