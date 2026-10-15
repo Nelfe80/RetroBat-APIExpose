@@ -216,6 +216,10 @@ public sealed class ReplayVideoRenderer
             Ligne("video_gpu_record", "true"),
             Ligne("video_post_filter_record", "false"),
             Ligne("video_record_scale_factor", "1"),
+            // La qualite moyenne de RetroArch, comme avant : retroarch.cfg designe depuis le 15 octobre 2026 les
+            // reglages du film a la taille d'origine (4:4:4), faits pour la capture pendant la partie.
+            Ligne("video_record_quality", "2"),
+            Ligne("video_record_config", ""),
             Ligne("video_scale", "4"),
             Ligne("video_scale_integer", "true"),
             Ligne("video_smooth", "false"),
