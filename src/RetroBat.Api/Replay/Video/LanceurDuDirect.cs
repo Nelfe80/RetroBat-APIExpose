@@ -75,6 +75,9 @@ public static class LanceurDuDirect
         try
         {
             await p.WaitForExitAsync(ct).ConfigureAwait(false);
+            // La sortie lue en tache de fond peut arriver apres la fin du processus : on l'attend, pour que la derniere
+            // ligne soit bien la derniere.
+            p.WaitForExit();
             return new Rapport(p.ExitCode, "fin de l'exe", derniere, chrono.Elapsed);
         }
         catch (OperationCanceledException)
@@ -129,6 +132,9 @@ public static class LanceurDuDirect
         try
         {
             await p.WaitForExitAsync(ct).ConfigureAwait(false);
+            // La sortie lue en tache de fond peut arriver apres la fin du processus : on l'attend, pour que la derniere
+            // ligne soit bien la derniere.
+            p.WaitForExit();
             return new Rapport(p.ExitCode, "fin de l'exe", derniere, chrono.Elapsed);
         }
         catch (OperationCanceledException)

@@ -242,6 +242,40 @@ public sealed class DirectDuRecordTests
         Assert.NotEqual(-1, r.Code);
     }
 
+    /// <summary>
+    /// Essai reel, ignore sans NELFE_VERSION_FILM (un film a la taille d'origine) ni l'exe (NELFE_DIRECT_EXE) : la
+    /// version YouTube se fabrique jusqu'au bout (code 0, FLV ecrit) ; arretee en route (une partie commence), l'exe
+    /// s'arrete et le fichier inacheve disparait.
+    /// </summary>
+    [Fact]
+    public async Task La_version_youtube_se_fabrique_avec_le_vrai_exe_et_s_arrete_quand_une_partie_commence()
+    {
+        var film = Environment.GetEnvironmentVariable("NELFE_VERSION_FILM");
+        var exe = Environment.GetEnvironmentVariable("NELFE_DIRECT_EXE");
+        if (string.IsNullOrEmpty(film) || !File.Exists(film) || string.IsNullOrEmpty(exe) || !File.Exists(exe)) return;
+        var dossier = Path.Combine(Path.GetTempPath(), "nelfe-version-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dossier);
+        try
+        {
+            var journal = new JournalEnMemoire(new List<string>());
+            var complete = Path.Combine(dossier, "complete.flv");
+            var r = await LanceurDuDirect.FabriquerLaVersionAsync(exe, film, complete, 0, journal, CancellationToken.None);
+            Assert.Equal(0, r.Code);
+            Assert.True(new FileInfo(complete).Length > 100_000);
+            Assert.Contains("fin du film", r.DerniereLigne ?? "", StringComparison.Ordinal);
+
+            var coupee = Path.Combine(dossier, "coupee.flv");
+            using var partie = new CancellationTokenSource(TimeSpan.FromSeconds(1.5));
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => LanceurDuDirect.FabriquerLaVersionAsync(exe, film, coupee, 0, journal, partie.Token));
+            Assert.False(File.Exists(coupee));
+        }
+        finally
+        {
+            try { Directory.Delete(dossier, true); } catch (Exception) { /* dossier temporaire */ }
+        }
+    }
+
     private sealed class JournalEnMemoire(List<string> lignes) : ILogger
     {
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
