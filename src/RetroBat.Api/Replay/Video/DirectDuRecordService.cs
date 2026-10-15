@@ -254,8 +254,6 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                 _lignes = classement.Lignes;
                 _nomDuJeu = string.IsNullOrWhiteSpace(jeu.GameName) ? romGroup : jeu.GameName.Trim();
             }
-            // L'annonce du direct se prepare des le lancement : prete si le score approche du record.
-            _ = Task.Run(() => _site.AnnonceDuDirectAsync(CancellationToken.None));
             _journal.LogInformation("Direct : {Jeu} ({Regle}) arme, premier rang {Valeur} ({Joueur}), direct a {Seuil}.",
                 romGroup, regle, _seuilEssai ?? tete!.Valeur, tete?.Joueur ?? "essai", SeuilDApproche(_seuilEssai ?? tete!.Valeur));
         }
@@ -352,11 +350,11 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         {
             if (envoi == "exe")
             {
-                // L'annonce avant le jeu, et la carte du classement a la fin si le record tombe (fichier ecrit alors).
-                var annonce = await _site.AnnonceDuDirectAsync(CancellationToken.None).ConfigureAwait(false);
+                // La carte du classement a la fin si le record tombe (fichier ecrit alors). L'annonce, elle, se joue sur
+                // le site avant le direct (video YouTube) : le site ne sert jamais de video.
                 try { File.Delete(CheminDeLaCarte); } catch (Exception) { /* absente */ }
                 var r = await LanceurDuDirect.DiffuserAsync(exe!, film.Fichier, ouvert.Ingest, film.Rotation ?? 0, _journal, arret.Token,
-                        annonce, CheminDeLaCarte)
+                        classement: CheminDeLaCarte)
                     .ConfigureAwait(false);
                 _journal.LogInformation("Direct : {Direct} fini ({Fin}, code {Code}, {Secondes:F0} s).", ouvert.LiveId, r.Fin, r.Code,
                     r.Duree.TotalSeconds);

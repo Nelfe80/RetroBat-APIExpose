@@ -636,50 +636,6 @@ public sealed class ReplayVideoPublisher
         }
     }
 
-    /// <summary>L'adresse de l'annonce des directs de record sur le site (une sequence MP4 de quelques secondes).</summary>
-    public const string AdresseDeLAnnonce = "https://nelfeplay.com/assets/video/annonce-direct.mp4";
-
-    private static readonly SemaphoreSlim AnnonceEnCours = new(1, 1);
-
-    /// <summary>
-    /// L'ANNONCE D'UN DIRECT DE RECORD (decision du 15 octobre 2026) : la sequence que le site sert, gardee sur la borne
-    /// et relue une fois par jour au plus. null tant que le site n'en a pas (ou s'il est injoignable sans copie).
-    /// </summary>
-    public async Task<string?> AnnonceDuDirectAsync(CancellationToken ct)
-    {
-        var chemin = Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, "state", "nelfenet", "replay", "annonce-direct.mp4");
-        await AnnonceEnCours.WaitAsync(ct).ConfigureAwait(false);
-        try
-        {
-            if (File.Exists(chemin) && DateTime.UtcNow - File.GetLastWriteTimeUtc(chemin) < TimeSpan.FromDays(1)) return chemin;
-            using var http = _httpFactory.CreateClient();
-            http.Timeout = TimeSpan.FromSeconds(30);
-            using var reponse = await http.GetAsync(AdresseDeLAnnonce, ct).ConfigureAwait(false);
-            if (reponse.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                // Le site n'a plus d'annonce : la copie ne sert plus.
-                try { File.Delete(chemin); } catch (Exception) { /* absente */ }
-                return null;
-            }
-            if (!reponse.IsSuccessStatusCode) return File.Exists(chemin) ? chemin : null;
-            var octets = await reponse.Content.ReadAsByteArrayAsync(ct).ConfigureAwait(false);
-            if (octets.Length is 0 or > 40_000_000) return File.Exists(chemin) ? chemin : null;
-            Directory.CreateDirectory(Path.GetDirectoryName(chemin)!);
-            await File.WriteAllBytesAsync(chemin + ".tmp", octets, ct).ConfigureAwait(false);
-            File.Move(chemin + ".tmp", chemin, overwrite: true);
-            return chemin;
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
-        {
-            _logger.LogDebug(ex, "Direct : annonce non recuperee.");
-            return File.Exists(chemin) ? chemin : null;
-        }
-        finally
-        {
-            AnnonceEnCours.Release();
-        }
-    }
-
     /// <summary>Le direct est fini (film arrete, partie finie) : le site le clot.</summary>
     public async Task CloreLeDirectAsync(string liveId, CancellationToken ct)
     {
