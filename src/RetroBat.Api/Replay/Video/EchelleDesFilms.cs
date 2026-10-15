@@ -46,15 +46,17 @@ public sealed class EchelleDesFilms : IHostedService, IDisposable
     private readonly IEventBus _bus;
     private readonly ILogger<EchelleDesFilms> _logger;
     private readonly string _fichier;
+    private readonly bool _origine;
     private readonly object _verrou = new();
     private IDisposable? _abonnement;
     private DateTime _debutDuJeu = DateTime.MinValue;
 
-    public EchelleDesFilms(IEventBus bus, ILogger<EchelleDesFilms> logger)
+    public EchelleDesFilms(IEventBus bus, IConfiguration configuration, ILogger<EchelleDesFilms> logger)
     {
         _bus = bus;
         _logger = logger;
         _fichier = Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfenet", "replay", "definitions.json");
+        _origine = ReplayCaptureService.FilmsALaTailleDOrigine(configuration);
     }
 
     /// <summary>Le plus petit facteur entier qui porte le petit cote a 720 lignes (1 a 8).</summary>
@@ -117,13 +119,28 @@ public sealed class EchelleDesFilms : IHostedService, IDisposable
 
     /// <summary>
     /// Avant le lancement (script game-start d'ES) : pose dans retroarch.cfg le facteur du jeu qui va demarrer. Rien si
-    /// RetroArch tourne deja (il ne relirait pas le fichier) ou si le facteur est deja le bon.
+    /// RetroArch tourne deja (il ne relirait pas le fichier) ou si le facteur est deja le bon. Films a la taille
+    /// d'origine (depuis le 15 octobre 2026) : le facteur ne compte plus, nos reglages d'encodage se reposent s'ils
+    /// manquent.
     /// </summary>
     public void PoserPourLeLancement(string argumentsDuScript)
     {
         try
         {
             _debutDuJeu = DateTime.UtcNow;
+            if (_origine)
+            {
+                var config = RetroBatPaths.RetroArchConfigPath;
+                if (!File.Exists(config) || Process.GetProcessesByName("retroarch").Length > 0) return;
+                ReplayCaptureService.EcrireLesReglagesDuFilm();
+                if (ReplayCaptureService.ReglagesDesFilms(File.ReadAllText(config), true, ReplayCaptureService.CheminDesReglagesDuFilm)
+                    is { } reglages)
+                {
+                    File.WriteAllText(config, reglages, new UTF8Encoding(false));
+                    _logger.LogInformation("Capture : reglages du film a la taille d'origine reposes avant le lancement.");
+                }
+                return;
+            }
             var (systeme, chemin) = LancementDuScript(argumentsDuScript);
             if (chemin is null) return;
             var connue = Lire().TryGetValue(CleDuJeu(chemin), out var d) ? d : ((int L, int H)?)null;

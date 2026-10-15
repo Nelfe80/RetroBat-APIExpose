@@ -232,6 +232,48 @@ public sealed class ReplayCaptureTests
         var sans = ReplayCaptureService.AvecReglage("a = \"1\"\n", "video_record_scale_factor", "4");
         Assert.Equal("a = \"1\"\nvideo_record_scale_factor = \"4\"\n", sans);
     }
+
+    [Fact]
+    public void Le_film_a_la_taille_d_origine_se_pose_dans_retroarch_cfg_et_se_retire_au_retour_du_film_agrandi()
+    {
+        const string cfg = @"E:\RetroBat\plugins\APIExpose\state\nelfenet\replay\film-origine.cfg";
+        // La borne du 15 octobre : qualite moyenne de RetroArch, sans fichier de reglages.
+        const string avant = "video_gpu_record = \"false\"\r\nvideo_record_config = \"\"\r\nvideo_record_quality = \"2\"\r\n"
+                             + "video_record_scale_factor = \"4\"\r\n";
+        var origine = ReplayCaptureService.ReglagesDesFilms(avant, true, cfg);
+        Assert.Equal("video_gpu_record = \"false\"\r\nvideo_record_config = \"" + cfg + "\"\r\nvideo_record_quality = \"0\"\r\n"
+                     + "video_record_scale_factor = \"4\"\r\n", origine);
+        Assert.Null(ReplayCaptureService.ReglagesDesFilms(origine!, true, cfg));
+
+        // Retour au film agrandi : la qualite moyenne revient, le fichier n'est plus designe.
+        Assert.Equal(avant, ReplayCaptureService.ReglagesDesFilms(origine!, false, cfg));
+        Assert.Null(ReplayCaptureService.ReglagesDesFilms(avant, false, cfg));
+        // Un fichier de reglages du joueur n'est pas le notre : on n'y touche pas.
+        Assert.Null(ReplayCaptureService.ReglagesDesFilms(
+            "video_record_config = \"E:\\mes-reglages.cfg\"\nvideo_record_quality = \"0\"\n", false, cfg));
+    }
+
+    [Fact]
+    public void Les_reglages_du_film_a_la_taille_d_origine_sont_ceux_mesures_le_15_octobre()
+    {
+        var reglages = ReplayCaptureService.ReglagesDuFilm;
+        foreach (var attendu in new[] { "vcodec = \"libx264\"", "pix_fmt = \"yuv444p\"", "format = \"matroska\"", "scale_factor = \"1\"",
+                     "video_preset = \"medium\"", "video_tune = \"animation\"", "video_crf = \"14\"", "acodec = \"aac\"" })
+            Assert.Contains(attendu + "\n", reglages);
+        Assert.DoesNotContain("\r", reglages);
+    }
+
+    [Theory]
+    [InlineData(@"C:\captures\01J.flv", "video/x-flv")]
+    [InlineData(@"C:\captures\01J.FLV", "video/x-flv")]
+    [InlineData(@"C:\captures\01J.mkv", "video/x-matroska")]
+    public void Le_type_du_film_envoye_suit_son_format(string fichier, string attendu)
+        => Assert.Equal(attendu, ReplayVideoPublisher.TypeDuFilm(fichier));
+
+    [Fact]
+    public void La_version_youtube_se_fabrique_du_debut_du_film_dans_le_sens_du_jeu()
+        => Assert.Equal(["--film", @"C:\c\01J.mkv", "--sortie-flv", @"C:\c\01J.flv", "--depuis-le-debut", "--rotation", "3"],
+            LanceurDuDirect.ArgumentsDeLaVersion(@"C:\c\01J.mkv", @"C:\c\01J.flv", 3));
 }
 
 /// <summary>GET_STATUS evite quand le coeur charge n'a pas d'identifiant de systeme (plantage de RetroArch 1.22.2).</summary>

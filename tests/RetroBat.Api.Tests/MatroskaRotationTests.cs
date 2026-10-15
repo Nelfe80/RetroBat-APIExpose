@@ -130,6 +130,25 @@ public sealed class MatroskaRotationTests
         Assert.True(Chercher(redresse, [0x53, 0xAC, 0x82, .. U(pistes - origine, 2)]) > 0);
     }
 
+    [Theory]
+    [InlineData(244, true)]    // High 4:4:4 : le film a la taille d'origine de la borne
+    [InlineData(100, false)]   // High : le film agrandi de RetroArch
+    [InlineData(0, false)]     // pas de configuration lisible
+    public void Le_profil_du_codec_dit_si_le_film_est_a_la_taille_d_origine(int profil, bool origine)
+    {
+        var (fichier, _) = DebutDeFilm();
+        var configuration = Chercher(fichier, 0x63, 0xA2, 0x9E);
+        Assert.True(configuration > 0);
+        if (profil > 0)
+        {
+            fichier[configuration + 3] = 1;
+            fichier[configuration + 4] = (byte)profil;
+        }
+        var entete = MatroskaEntete.Lire(fichier, fichier.Length)!;
+        Assert.Equal(profil, entete.Profil);
+        Assert.Equal(origine, entete.Origine);
+    }
+
     [Fact]
     public void Un_film_droit_ou_sans_reserve_n_est_pas_touche()
     {

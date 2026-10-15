@@ -262,6 +262,52 @@ public sealed class ReplayVideoPublisher
         Inutile,
         /// <summary>Pas encore decidable (score ou replay pas encore arrives), quota, reseau : on reessaiera.</summary>
         PlusTard,
+        /// <summary>Le site veut le film (c'est un record) : sa version YouTube peut se fabriquer.</summary>
+        Voulue,
+    }
+
+    /// <summary>Le type d'un film pour Google : FLV pour la version YouTube d'un film a la taille d'origine. Pur.</summary>
+    internal static string TypeDuFilm(string fichier)
+        => string.Equals(Path.GetExtension(fichier), ".flv", StringComparison.OrdinalIgnoreCase) ? "video/x-flv" : "video/x-matroska";
+
+    /// <summary>
+    /// LE FILM A LA TAILLE D'ORIGINE (decision du 15 octobre 2026) : avant de fabriquer sa version YouTube, la borne
+    /// demande au site si la partie est un record, sans ouvrir de session (<c>check</c>). Le site fait les memes
+    /// verifications que pour l'envoi ; « Voulue », la borne fabrique la version puis l'envoie par
+    /// <see cref="EnvoyerCaptureAsync"/>.
+    /// </summary>
+    public async Task<ResultatDeCapture> CaptureVoulueAsync(string replayId, long taille, IReadOnlyList<string>? sessions,
+        CancellationToken ct)
+    {
+        var credential = _devices.GetCredential();
+        if (string.IsNullOrEmpty(credential)) return new(IssueDeCapture.PlusTard, "borne non appairee");
+        var demande = new JsonObject
+        {
+            ["replay_id"] = replayId,
+            ["size"] = taille,
+            ["type"] = "video/x-flv",
+            ["source"] = "capture",
+            ["check"] = true,
+        };
+        if (sessions is { Count: > 0 })
+            demande["sessions"] = new JsonArray(sessions.Select(s => (JsonNode?)JsonValue.Create(s)).ToArray());
+        try
+        {
+            using var client = Client(credential, TimeSpan.FromSeconds(60));
+            using var contenu = new StringContent(demande.ToJsonString(), Encoding.UTF8, "application/json");
+            using var reponse = await client.PostAsync("/api/v1/agent/videos/upload-session", contenu, ct).ConfigureAwait(false);
+            var corps = JsonNode.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false)) as JsonObject;
+            if (reponse.IsSuccessStatusCode && corps?["wanted"] is JsonValue voulu && voulu.TryGetValue<bool>(out var oui) && oui)
+                return new(IssueDeCapture.Voulue, "record");
+            // Un site d'avant cette question ouvrirait une session : il n'en rend pas ici (le FLV lui est inconnu).
+            var raison = (string?)corps?["reason"] ?? "http_" + (int)reponse.StatusCode;
+            return new(RefusDefinitifs.Contains(raison) ? IssueDeCapture.Inutile : IssueDeCapture.PlusTard, raison);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
+        {
+            _logger.LogWarning(ex, "Video : site injoignable pour la decision de {ReplayId}.", replayId);
+            return new(IssueDeCapture.PlusTard, "site injoignable");
+        }
     }
 
     /// <summary>
@@ -295,8 +341,9 @@ public sealed class ReplayVideoPublisher
         if (string.IsNullOrEmpty(credential)) return new(IssueDeCapture.PlusTard, "borne non appairee");
         var taille = new FileInfo(fichier).Length;
 
-        // Pas de redirection automatique : Google repond 308 « reprise incomplete » pendant un envoi.
-        using var http = new HttpClient(new SocketsHttpHandler { AllowAutoRedirect = false }) { Timeout = TimeSpan.FromMinutes(30) };
+        // Pas de redirection automatique : Google repond 308 « reprise incomplete » pendant un envoi. La version YouTube
+        // d'une longue partie pese quelques Go : une partie qui commence arrete l'envoi, pas une limite de temps.
+        using var http = new HttpClient(new SocketsHttpHandler { AllowAutoRedirect = false }) { Timeout = TimeSpan.FromHours(12) };
         string? videoId = null;
         long dejaRecus = 0;
         if (!string.IsNullOrEmpty(session))
@@ -322,7 +369,7 @@ public sealed class ReplayVideoPublisher
             {
                 ["replay_id"] = replayId,
                 ["size"] = taille,
-                ["type"] = "video/x-matroska",
+                ["type"] = TypeDuFilm(fichier),
                 ["source"] = "capture",
             };
             // Le film d'une partie sans replay : le site retrouve la partie par les sessions de ses scores.
@@ -436,7 +483,7 @@ public sealed class ReplayVideoPublisher
         await using var flux = new FileStream(fichier, FileMode.Open, FileAccess.Read, FileShare.Read);
         flux.Seek(debut, SeekOrigin.Begin);
         using var contenu = new StreamContent(flux);
-        contenu.Headers.ContentType = new MediaTypeHeaderValue("video/x-matroska");
+        contenu.Headers.ContentType = new MediaTypeHeaderValue(TypeDuFilm(fichier));
         contenu.Headers.ContentLength = taille - debut;
         if (debut > 0) contenu.Headers.ContentRange = new ContentRangeHeaderValue(debut, taille - 1, taille);
         try

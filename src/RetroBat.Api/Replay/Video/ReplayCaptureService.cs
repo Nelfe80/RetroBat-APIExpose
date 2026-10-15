@@ -15,8 +15,13 @@ namespace RetroBat.Api.Replay.Video;
 /// LA CAPTURE DES PARTIES (decision du 14 octobre 2026). La borne filme chaque partie enregistree, avec RetroArch,
 /// pendant le jeu ; le film ne part sur YouTube que si la partie est un record, sinon il est efface.
 /// <list type="bullet">
-/// <item>RetroArch filme l'image du coeur agrandie x4 (<c>video_record_scale_factor</c>, pose au demarrage), sans
-/// les shaders ni les decors du joueur. Le film demarre et s'arrete avec le replay de la partie.</item>
+/// <item>RetroArch filme l'image du coeur A SA TAILLE D'ORIGINE (decision du 15 octobre 2026 ; avant, agrandie x4), sans
+/// les shaders ni les decors du joueur, avec nos reglages d'encodage (<see cref="ReglagesDuFilm"/> : x264 medium,
+/// animation, CRF 14, 4:4:4). Meme fidelite que le film x4 d'avant pour 59 % de son poids et 0,27 coeur au lieu de
+/// 0,69. Le film demarre et s'arrete avec le replay de la partie. <c>Video:Capture:Format = "agrandi"</c> revient au
+/// film x4.</item>
+/// <item>Un film a la taille d'origine ne part pas tel quel sur YouTube : pour un record, la borne fabrique d'abord sa
+/// version YouTube (redressee, agrandie sans lissage, FLV) avec NelfePlay.LiveStreaming.exe, hors partie.</item>
 /// <item>Un garde-fou (<see cref="GardeDeCapture"/>) coupe la capture si le jeu ralentit ; la borne ne filme
 /// alors plus pendant 30 jours.</item>
 /// <item>Un jeu vertical sort couche (RetroArch 1.22 filme avant de tourner l'image) : il se reconnait a l'en-tete
@@ -46,8 +51,37 @@ public sealed class ReplayCaptureService : BackgroundService
     private static readonly TimeSpan ModesteDurant = TimeSpan.FromDays(30);
     private const string EchelleVoulue = "4";
 
-    /// <summary>En dessous, le film est trop petit pour YouTube : l'echelle x4 n'a pas pris.</summary>
+    /// <summary>En dessous, un film agrandi est trop petit pour YouTube : l'echelle x4 n'a pas pris.</summary>
     private const long LargeurMinimale = 512;
+
+    /// <summary>
+    /// Les reglages d'encodage du film a la taille d'origine (mesures du 15 octobre 2026, CDC video V2 §9 bis) : x264
+    /// medium, tune animation, CRF 14, en 4:4:4 (la couleur de chaque pixel du jeu), son AAC a 48 kHz. Le facteur
+    /// d'agrandissement de retroarch.cfg ne compte pas avec un fichier de reglages : celui-ci dit 1.
+    /// </summary>
+    internal const string ReglagesDuFilm =
+        "vcodec = \"libx264\"\n" +
+        "acodec = \"aac\"\n" +
+        "pix_fmt = \"yuv444p\"\n" +
+        "format = \"matroska\"\n" +
+        "threads = \"2\"\n" +
+        "scale_factor = \"1\"\n" +
+        "sample_rate = \"48000\"\n" +
+        "video_preset = \"medium\"\n" +
+        "video_tune = \"animation\"\n" +
+        "video_crf = \"14\"\n" +
+        "audio_b = \"128k\"\n";
+
+    /// <summary>Le fichier de ces reglages, que retroarch.cfg designe (<c>video_record_config</c>).</summary>
+    internal static string CheminDesReglagesDuFilm
+        => Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfenet", "replay", "film-origine.cfg");
+
+    /// <summary>Films a la taille d'origine (par defaut), ou agrandis par RetroArch comme avant le 15 octobre 2026.</summary>
+    internal static bool FilmsALaTailleDOrigine(IConfiguration configuration)
+        => !string.Equals(configuration.GetValue("Video:Capture:Format", "origine"), "agrandi", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Apres trois fabrications ratees de sa version YouTube, un film n'est plus garde.</summary>
+    private const int EchecsDeVersionMax = 3;
 
     private static readonly JsonSerializerOptions Json = new() { WriteIndented = true };
 
@@ -58,6 +92,7 @@ public sealed class ReplayCaptureService : BackgroundService
     private readonly ReplayCoreTimingProbe _coeur;
     private readonly ILogger<ReplayCaptureService> _logger;
     private readonly bool _actif;
+    private readonly bool _origine;
     private readonly double _espaceLibreMinGo;
     private readonly TimeSpan _ageMax;
     private readonly TimeSpan _intervalleEnvoi;
@@ -94,11 +129,14 @@ public sealed class ReplayCaptureService : BackgroundService
     /// Une capture gardee sur la borne : en attente de la decision du site, en cours d'envoi (<paramref name="Session"/>,
     /// pour reprendre la ou l'envoi s'est arrete), puis envoyee (<paramref name="VideoId"/>) jusqu'a ce que la video
     /// soit prete chez YouTube. Le film d'une partie sans replay (<paramref name="SansReplay"/>) porte les sessions de
-    /// ses scores (<paramref name="Sessions"/>), par lesquelles le site retrouve la partie.
+    /// ses scores (<paramref name="Sessions"/>), par lesquelles le site retrouve la partie. Un film a la taille d'origine
+    /// (<paramref name="Origine"/>) part par sa version YouTube (<paramref name="Version"/>, fabriquee avec le sens du
+    /// jeu, <paramref name="Rotation"/>).
     /// </summary>
     public sealed record CaptureGardee(string ReplayId, string Fichier, long DebutFilm, long FinFilm, DateTime CreeeUtc,
         string? Session = null, string? VideoId = null, DateTime? EnvoyeeUtc = null,
-        IReadOnlyList<string>? Sessions = null, bool SansReplay = false);
+        IReadOnlyList<string>? Sessions = null, bool SansReplay = false,
+        bool Origine = false, int? Rotation = null, string? Version = null, int EchecsDeVersion = 0);
 
     /// <summary>Le prefixe des films sans replay : le site les reconnait et les relie par les sessions des scores.</summary>
     internal const string PrefixeSansReplay = "fm_";
@@ -119,12 +157,14 @@ public sealed class ReplayCaptureService : BackgroundService
     {
         _bus = bus; _ra = ra; _publication = publication; _manifests = manifests; _coeur = coeur; _logger = logger;
         _actif = configuration.GetValue("Video:Capture:Enabled", true);
+        _origine = FilmsALaTailleDOrigine(configuration);
         _espaceLibreMinGo = Math.Max(1, configuration.GetValue("Video:Capture:MinFreeGb", 5.0));
         _ageMax = TimeSpan.FromHours(Math.Max(1, configuration.GetValue("Video:Capture:MaxAgeHours", 48)));
         _intervalleEnvoi = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Capture:UploadIntervalMinutes", 2)));
-        // Le plus gros film ENVOYE (300 Mo, le plafond du site). Le film sur le disque, lui, continue au-dela (decision du
-        // 15 octobre 2026) : le direct d'un record tombe tard dans une longue partie, et il est la copie du film.
-        _tailleMax = Math.Max(1, configuration.GetValue("Video:Capture:MaxMb", 300)) * 1_000_000L;
+        // Le plus gros film ENVOYE (8 Go, le plafond du site : la version YouTube d'une partie de 19XX pese environ 3,7 Go
+        // de l'heure). Le film sur le disque, lui, continue au-dela (decision du 15 octobre 2026) : le direct d'un record
+        // tombe tard dans une longue partie, et il est la copie du film.
+        _tailleMax = Math.Max(1, configuration.GetValue("Video:Capture:MaxMb", 8000)) * 1_000_000L;
         _tailleLocaleMax = Math.Max(_tailleMax / 1_000_000L, configuration.GetValue("Video:Capture:MaxLocalMb", 4000L)) * 1_000_000L;
         _dossier = Path.GetFullPath(Path.Combine(objects.TempRoot, "..", "captures"));
     }
@@ -140,7 +180,7 @@ public sealed class ReplayCaptureService : BackgroundService
         try
         {
             Directory.CreateDirectory(_dossier);
-            ImposerLEchelle();
+            PreparerRetroArch();
             _abonnement = _bus.Subscribe<EventEnvelope>(SurEvenement);
         }
         catch (Exception ex)
@@ -328,16 +368,19 @@ public sealed class ReplayCaptureService : BackgroundService
                 _logger.LogInformation("Capture : {ReplayId} abandonnee ({Pourquoi}), film efface.", c.ReplayId, pourquoi);
                 return;
             }
-            // Jeu vertical (ou retourne) : on inscrit la rotation dans l'en-tete, sans toucher aux images.
-            if (c.Rotation is 1 or 2 or 3)
+            var entete = MatroskaEntete.Lire(c.Fichier);
+            var origine = entete is { Origine: true };
+            // Jeu vertical (ou retourne) : un film agrandi par RetroArch se redresse dans son en-tete, sans toucher aux
+            // images ; un film a la taille d'origine se redresse dans sa version YouTube.
+            if (!origine && c.Rotation is 1 or 2 or 3)
             {
                 if (MatroskaRotation.Redresser(c.Fichier, c.Rotation.Value))
                     _logger.LogInformation("Capture : {ReplayId} redressee (rotation {Rotation} du coeur).", c.ReplayId, c.Rotation);
                 else
                     _logger.LogInformation("Capture : {ReplayId}, rotation non inscrite dans le film.", c.ReplayId);
+                entete = MatroskaEntete.Lire(c.Fichier);
             }
-            var entete = MatroskaEntete.Lire(c.Fichier);
-            if (entete is null || entete.Couchee || entete.Largeur < LargeurMinimale)
+            if (entete is null || (entete.Couchee && !(origine && c.Rotation is 1 or 3)) || (!origine && entete.Largeur < LargeurMinimale))
             {
                 Effacer(c.Fichier);
                 OublierLesSessions(c.ReplayId);
@@ -351,11 +394,13 @@ public sealed class ReplayCaptureService : BackgroundService
             File.Move(c.Fichier, destination);
             var gardee = new CaptureGardee(c.ReplayId, destination, c.FrameDebut,
                 Math.Max(c.FrameDebut, derniereFrame ?? 0), DateTime.UtcNow,
-                Sessions: c.SansReplay ? SessionsDuFilm(c.ReplayId, null) : null, SansReplay: c.SansReplay);
+                Sessions: c.SansReplay ? SessionsDuFilm(c.ReplayId, null) : null, SansReplay: c.SansReplay,
+                Origine: origine, Rotation: c.Rotation);
             await File.WriteAllTextAsync(Path.Combine(_dossier, c.ReplayId + ".json"),
                 JsonSerializer.Serialize(gardee, Json), Encoding.UTF8, _arret).ConfigureAwait(false);
-            _logger.LogInformation("Capture : {ReplayId} gardee ({Taille} octets, {Pourquoi}), en attente de la decision du site.",
-                c.ReplayId, new FileInfo(destination).Length, pourquoi);
+            _logger.LogInformation("Capture : {ReplayId} gardee ({Taille} octets, {Format}, {Pourquoi}), en attente de la decision du site.",
+                c.ReplayId, new FileInfo(destination).Length,
+                origine ? "taille d'origine " + entete.Largeur + "x" + entete.Hauteur : "agrandi " + entete.Largeur + "x" + entete.Hauteur, pourquoi);
             _reveil.Release();
         }
         catch (OperationCanceledException) { /* arret de l'API */ }
@@ -462,9 +507,10 @@ public sealed class ReplayCaptureService : BackgroundService
         if (!c.EnteteVerifiee && MatroskaEntete.Lire(c.Fichier) is { } entete)
         {
             c.EnteteVerifiee = true;
-            // Un film couche se redresse a la fin, si l'on sait dans quel sens.
+            // Un film couche se redresse a la fin (ou dans sa version YouTube), si l'on sait dans quel sens. Un film a la
+            // taille d'origine est petit par nature.
             var redressable = entete.Couchee && c.Rotation is 1 or 3;
-            if ((entete.Couchee && !redressable) || entete.Largeur < LargeurMinimale)
+            if ((entete.Couchee && !redressable) || (!entete.Origine && entete.Largeur < LargeurMinimale))
             {
                 await ArreterAsync(c.ReplayId, null, abandon: true,
                     entete.Couchee ? "jeu vertical, sens de rotation inconnu" : "image de " + entete.Largeur + " pixels, echelle x4 absente").ConfigureAwait(false);
@@ -552,7 +598,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 Oublier(g, fiche, "trop ancienne");
                 continue;
             }
-            if (TailleDe(g.Fichier) > _tailleMax)
+            if (TailleDe(g.Version ?? g.Fichier) > _tailleMax)
             {
                 Oublier(g, fiche, "plus grosse que " + _tailleMax / 1_000_000 + " Mo");
                 continue;
@@ -569,29 +615,38 @@ public sealed class ReplayCaptureService : BackgroundService
             try
             {
                 var courante = g;
-                var resultat = await _publication.EnvoyerCaptureAsync(courante.ReplayId, courante.Fichier, courante.DebutFilm, fin, fps,
-                    courante.Sessions, courante.Session, async session =>
+                // Film a la taille d'origine : sa version YouTube se fabrique d'abord, et seulement pour un record.
+                if (courante.Origine && (courante.Version is null || !File.Exists(courante.Version)))
+                {
+                    var voulue = await _publication.CaptureVoulueAsync(courante.ReplayId, TailleDe(courante.Fichier),
+                        courante.Sessions, envoi.Token).ConfigureAwait(false);
+                    if (voulue.Issue != ReplayVideoPublisher.IssueDeCapture.Voulue)
+                    {
+                        SuivreLeRefus(courante, fiche, voulue, age);
+                        continue;
+                    }
+                    courante = await FabriquerLaVersionAsync(courante, fiche, envoi.Token).ConfigureAwait(false);
+                    if (courante.Version is null) continue;
+                    if (TailleDe(courante.Version) > _tailleMax)
+                    {
+                        Oublier(courante, fiche, "version YouTube plus grosse que " + _tailleMax / 1_000_000 + " Mo");
+                        continue;
+                    }
+                }
+                var resultat = await _publication.EnvoyerCaptureAsync(courante.ReplayId, courante.Version ?? courante.Fichier,
+                    courante.DebutFilm, fin, fps, courante.Sessions, courante.Session, async session =>
                     {
                         courante = courante with { Session = session };
                         await SauverAsync(courante, fiche, stoppingToken).ConfigureAwait(false);
                     }, envoi.Token).ConfigureAwait(false);
-                switch (resultat.Issue)
+                if (resultat.Issue == ReplayVideoPublisher.IssueDeCapture.Envoyee)
                 {
-                    case ReplayVideoPublisher.IssueDeCapture.Envoyee:
-                        await SauverAsync(courante with { Session = null, VideoId = resultat.VideoId, EnvoyeeUtc = DateTime.UtcNow },
-                            fiche, stoppingToken).ConfigureAwait(false);
-                        _logger.LogInformation("Capture : {ReplayId} envoyee ({Detail}), film garde jusqu'a la video prete.",
-                            courante.ReplayId, resultat.Detail);
-                        break;
-                    case ReplayVideoPublisher.IssueDeCapture.Inutile:
-                        Oublier(courante, fiche, resultat.Detail);
-                        break;
-                    default:
-                        if (resultat.Detail is "pas_encore" or "replay.not_owned" && age > PasEncoreAuPlus)
-                            Oublier(courante, fiche, "toujours pas reliee a un score classe");
-                        else _logger.LogInformation("Capture : {ReplayId} attend ({Detail}).", courante.ReplayId, resultat.Detail);
-                        break;
+                    await SauverAsync(courante with { Session = null, VideoId = resultat.VideoId, EnvoyeeUtc = DateTime.UtcNow },
+                        fiche, stoppingToken).ConfigureAwait(false);
+                    _logger.LogInformation("Capture : {ReplayId} envoyee ({Detail}), film garde jusqu'a la video prete.",
+                        courante.ReplayId, resultat.Detail);
                 }
+                else SuivreLeRefus(courante, fiche, resultat, age);
             }
             catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
             {
@@ -605,6 +660,57 @@ public sealed class ReplayCaptureService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// Ce que le site n'accepte pas encore : un refus definitif efface le film ; une partie toujours pas reliee a un
+    /// score classe apres trois heures aussi ; le reste attend le prochain passage.
+    /// </summary>
+    private void SuivreLeRefus(CaptureGardee g, string fiche, ReplayVideoPublisher.ResultatDeCapture r, TimeSpan age)
+    {
+        if (r.Issue == ReplayVideoPublisher.IssueDeCapture.Inutile) Oublier(g, fiche, r.Detail);
+        else if (r.Detail is "pas_encore" or "replay.not_owned" && age > PasEncoreAuPlus)
+            Oublier(g, fiche, "toujours pas reliee a un score classe");
+        else _logger.LogInformation("Capture : {ReplayId} attend ({Detail}).", g.ReplayId, r.Detail);
+    }
+
+    /// <summary>
+    /// La version YouTube d'un film a la taille d'origine (NelfePlay.LiveStreaming.exe), hors partie : redressee,
+    /// agrandie sans lissage, en FLV a cote du film. Une partie qui commence l'arrete (elle reprendra) ; apres trois
+    /// echecs, le film n'est plus garde. Rend la capture, avec sa version si elle est prete.
+    /// </summary>
+    private async Task<CaptureGardee> FabriquerLaVersionAsync(CaptureGardee g, string fiche, CancellationToken ct)
+    {
+        var exe = LanceurDuDirect.Chemin(AppContext.BaseDirectory);
+        if (exe is null)
+        {
+            _logger.LogWarning("Capture : {ReplayId} attend sa version YouTube, {Exe} absent.", g.ReplayId, LanceurDuDirect.Exe);
+            return g;
+        }
+        var version = Path.ChangeExtension(g.Fichier, ".flv");
+        Effacer(version);
+        _logger.LogInformation("Capture : {ReplayId} est un record, fabrication de sa version YouTube.", g.ReplayId);
+        var r = await LanceurDuDirect.FabriquerLaVersionAsync(exe, g.Fichier, version, g.Rotation ?? 0, _logger, ct)
+            .ConfigureAwait(false);
+        if (r.Code == 0 && TailleDe(version) > 0)
+        {
+            var faite = g with { Version = version };
+            await SauverAsync(faite, fiche, _arret).ConfigureAwait(false);
+            _logger.LogInformation("Capture : version YouTube de {ReplayId} prete ({Taille} octets en {Duree:F0} s).",
+                g.ReplayId, TailleDe(version), r.Duree.TotalSeconds);
+            return faite;
+        }
+        Effacer(version);
+        var ratee = g with { EchecsDeVersion = g.EchecsDeVersion + 1 };
+        if (ratee.EchecsDeVersion >= EchecsDeVersionMax)
+        {
+            Oublier(ratee, fiche, "version YouTube impossible (" + (r.DerniereLigne ?? "code " + r.Code) + ")");
+            return ratee;
+        }
+        await SauverAsync(ratee, fiche, _arret).ConfigureAwait(false);
+        _logger.LogWarning("Capture : version YouTube de {ReplayId} ratee (code {Code} : {Ligne}), nouvel essai au prochain passage.",
+            g.ReplayId, r.Code, r.DerniereLigne);
+        return ratee;
+    }
+
     private static async Task SauverAsync(CaptureGardee g, string fiche, CancellationToken ct)
     {
         var temporaire = fiche + ".tmp";
@@ -615,34 +721,72 @@ public sealed class ReplayCaptureService : BackgroundService
     private void Oublier(CaptureGardee g, string fiche, string pourquoi)
     {
         Effacer(g.Fichier);
+        if (g.Version is not null) Effacer(g.Version);
         Effacer(fiche);
         OublierLesSessions(g.ReplayId);
         _logger.LogInformation("Capture : {ReplayId} {Pourquoi}, film efface de la borne.", g.ReplayId, pourquoi);
     }
 
     /// <summary>
-    /// L'echelle x4 des films de RetroArch : une image de jeu de 256 pixels de large n'aurait sur YouTube que du
-    /// 240p flou. Posee au demarrage, hors partie, comme les autres reglages qu'APIExpose impose a RetroArch.
+    /// Les reglages des films de RetroArch, poses au demarrage, hors partie, comme les autres reglages qu'APIExpose
+    /// impose a RetroArch (et avant chaque lancement par <see cref="EchelleDesFilms"/>). Taille d'origine : le fichier de
+    /// reglages d'APIExpose. Film agrandi : l'echelle x4 au moins (une image de jeu de 256 pixels de large n'aurait sur
+    /// YouTube que du 240p flou).
     /// </summary>
-    private void ImposerLEchelle()
+    private void PreparerRetroArch()
     {
         try
         {
             var chemin = RetroBatPaths.RetroArchConfigPath;
             if (!File.Exists(chemin) || Process.GetProcessesByName("retroarch").Length > 0) return;
+            if (_origine) EcrireLesReglagesDuFilm();
             var contenu = File.ReadAllText(chemin);
-            // Le facteur de chaque jeu se pose avant son lancement (EchelleDesFilms) : au demarrage, seul un facteur
-            // absent ou de 1 (celui d'origine de RetroArch) devient x4.
-            if (int.TryParse(ValeurDans(contenu, "video_record_scale_factor"), out var actuel) && actuel >= 2) return;
-            var nouveau = AvecReglage(contenu, "video_record_scale_factor", EchelleVoulue);
+            var nouveau = ReglagesDesFilms(contenu, _origine, CheminDesReglagesDuFilm);
+            if (!_origine)
+            {
+                // Le facteur de chaque jeu se pose avant son lancement (EchelleDesFilms) : au demarrage, seul un facteur
+                // absent ou de 1 (celui d'origine de RetroArch) devient x4.
+                var courant = nouveau ?? contenu;
+                if (!(int.TryParse(ValeurDans(courant, "video_record_scale_factor"), out var actuel) && actuel >= 2))
+                    nouveau = AvecReglage(courant, "video_record_scale_factor", EchelleVoulue) ?? nouveau;
+            }
             if (nouveau is null) return;
             File.WriteAllText(chemin, nouveau, new UTF8Encoding(false));
-            _logger.LogInformation("Capture : echelle des films de RetroArch posee a x{Echelle}.", EchelleVoulue);
+            _logger.LogInformation("Capture : RetroArch filmera {Format}.",
+                _origine ? "a la taille d'origine (" + CheminDesReglagesDuFilm + ")" : "agrandi x" + ValeurDans(nouveau, "video_record_scale_factor"));
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Capture : echelle des films non posee.");
+            _logger.LogWarning(ex, "Capture : reglages des films non poses.");
         }
+    }
+
+    /// <summary>Le fichier de reglages du film a la taille d'origine, reecrit s'il manque ou differe.</summary>
+    internal static void EcrireLesReglagesDuFilm()
+    {
+        var cfg = CheminDesReglagesDuFilm;
+        if (File.Exists(cfg) && File.ReadAllText(cfg) == ReglagesDuFilm) return;
+        Directory.CreateDirectory(Path.GetDirectoryName(cfg)!);
+        File.WriteAllText(cfg, ReglagesDuFilm, new UTF8Encoding(false));
+    }
+
+    /// <summary>
+    /// Le contenu de retroarch.cfg avec les reglages des films, ou null s'il les a deja. Taille d'origine : qualite
+    /// « personnalisee » (0) et notre fichier <paramref name="cfg"/>. Film agrandi : si nos reglages etaient poses, la
+    /// qualite moyenne de RetroArch (2) revient. Pur, pour etre teste.
+    /// </summary>
+    internal static string? ReglagesDesFilms(string contenu, bool origine, string cfg)
+    {
+        if (origine)
+        {
+            var avecQualite = AvecReglage(contenu, "video_record_quality", "0");
+            var avecFichier = AvecReglage(avecQualite ?? contenu, "video_record_config", cfg);
+            return avecFichier ?? avecQualite;
+        }
+        if (ValeurDans(contenu, "video_record_quality") != "0"
+            || !string.Equals(ValeurDans(contenu, "video_record_config"), cfg, StringComparison.OrdinalIgnoreCase))
+            return null;
+        return AvecReglage(AvecReglage(contenu, "video_record_config", "") ?? contenu, "video_record_quality", "2");
     }
 
     /// <summary>Le contenu de retroarch.cfg avec <c>cle = "valeur"</c>, ou null s'il l'a deja. Pur, pour etre teste.</summary>

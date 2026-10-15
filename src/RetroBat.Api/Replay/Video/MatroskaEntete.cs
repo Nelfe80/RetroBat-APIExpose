@@ -1,10 +1,18 @@
 namespace RetroBat.Api.Replay.Video;
 
 /// <summary>
-/// La piste video d'un film : la taille de l'image et celle de l'affichage (en pixels, ou en rapport d'aspect).
+/// La piste video d'un film : la taille de l'image et celle de l'affichage (en pixels, ou en rapport d'aspect), et le
+/// profil H.264 annonce dans sa configuration (0 s'il n'y en a pas).
 /// </summary>
-public sealed record EnteteVideo(long Largeur, long Hauteur, long LargeurAffichee, long HauteurAffichee)
+public sealed record EnteteVideo(long Largeur, long Hauteur, long LargeurAffichee, long HauteurAffichee, int Profil = 0)
 {
+    /// <summary>
+    /// Le film a la taille d'origine que la borne fait ecrire a RetroArch (decision du 15 octobre 2026) : H.264 en
+    /// 4:4:4 (profil High 4:4:4), que ni Windows ni YouTube ne prennent tel quel. Sa version YouTube se fabrique avec
+    /// NelfePlay.LiveStreaming.exe. Les profils 4:2:2 et 10 bits en sont aussi.
+    /// </summary>
+    public bool Origine => Profil is 244 or 122 or 110 or 44;
+
     /// <summary>
     /// L'image est en paysage et l'affichage en portrait, ou l'inverse : le film est couche. C'est le cas d'un
     /// jeu vertical filme par RetroArch.
@@ -32,6 +40,7 @@ public static class MatroskaEntete
     private const long HauteurPx = 0xBA;
     private const long LargeurAff = 0x54B0;
     private const long HauteurAff = 0x54BA;
+    private const long ConfigurationDuCodec = 0x63A2;
 
     /// <summary>L'en-tete du film, ou null s'il est illisible (fichier absent, tronque, autre format).</summary>
     public static EnteteVideo? Lire(string chemin)
@@ -91,10 +100,13 @@ public static class MatroskaEntete
     private static EnteteVideo? LirePiste(byte[] b, int debut, int fin)
     {
         long type = 0, largeur = 0, hauteur = 0, largeurAff = 0, hauteurAff = 0;
+        var profil = 0;
         var i = debut;
         while (i < fin && Element(b, i, fin, out var id, out var donnees, out var finElement))
         {
             if (id == TypeDePiste) type = Entier(b, donnees, finElement);
+            // avcC : version 1, puis le profil.
+            else if (id == ConfigurationDuCodec && finElement - donnees >= 2 && b[donnees] == 1) profil = b[donnees + 1];
             else if (id == Video)
             {
                 var j = donnees;
@@ -112,8 +124,8 @@ public static class MatroskaEntete
         if (type != 1 || largeur <= 0 || hauteur <= 0) return null;
         // Sans taille d'affichage, l'image s'affiche telle quelle.
         return largeurAff > 0 && hauteurAff > 0
-            ? new EnteteVideo(largeur, hauteur, largeurAff, hauteurAff)
-            : new EnteteVideo(largeur, hauteur, largeur, hauteur);
+            ? new EnteteVideo(largeur, hauteur, largeurAff, hauteurAff, profil)
+            : new EnteteVideo(largeur, hauteur, largeur, hauteur, profil);
     }
 
     /// <summary>
