@@ -115,7 +115,8 @@ public sealed class ReplayVideoPublisher
             var dossier = Path.Combine(_objects.TempRoot, "video", cible.ReplayId);
             try
             {
-                var film = await _rendu.RendreAsync(cible.ReplayId, cible.Debut, cible.Fin, ct).ConfigureAwait(false);
+                var (debut, fin) = SequenceDuReplay(cible.Debut, cible.Fin, manifest.Frames.ReplayEnd, manifest.Frames.NominalFps);
+                var film = await _rendu.RendreAsync(cible.ReplayId, debut, fin, ct).ConfigureAwait(false);
                 if (!film.Ok || film.Fichier is null)
                 {
                     var raison = film.Raison ?? "incomplet";
@@ -157,6 +158,21 @@ public sealed class ReplayVideoPublisher
         _logger.LogInformation("Video : {Envoyees} film(s) envoye(s) sur {Cibles} cible(s). {Details}",
             envoyees, cibles.Count, string.Join(" | ", details));
         return new Rapport(cibles.Count, rendus, envoyees, details, refuse);
+    }
+
+    /// <summary>
+    /// LA SEQUENCE DU RECORD RENDUE DEPUIS UN REPLAY (decision du 15 octobre 2026 : seule la sequence du record part
+    /// sur YouTube, la partie entiere se regarde avec le replay). Le rendu ne lit pas le score : comme une capture
+    /// sans courbe (<see cref="ReplayCaptureService.SequenceDuRecord"/>), la fin du run, 3 minutes au plus, et 2 s
+    /// apres. Sans bornes (score d'avant la 1.9.49), la fin du replay. En frames du replay. Pur.
+    /// </summary>
+    internal static (long Debut, long Fin) SequenceDuReplay(long? runDebut, long? runFin, long finDuReplay, double fps)
+    {
+        var ips = fps > 1 ? fps : 60;
+        var finDuRun = runFin is long f && f > 0 ? Math.Min(f, finDuReplay) : finDuReplay;
+        var debut = Math.Max(Math.Max(0, runDebut ?? 0), finDuRun - (long)Math.Round(180 * ips));
+        var fin = Math.Min(finDuRun + (long)Math.Round(2 * ips), finDuReplay);
+        return (Math.Min(debut, fin), fin);
     }
 
     /// <summary>

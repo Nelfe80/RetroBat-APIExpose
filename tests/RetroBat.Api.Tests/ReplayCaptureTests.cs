@@ -309,6 +309,21 @@ public sealed class ReplayCaptureTests
     }
 
     [Fact]
+    public void Une_station_ne_rend_que_la_fin_du_run_trois_minutes_au_plus()
+    {
+        // Run de 20 min a 60 i/s : les 3 dernieres minutes, et 2 s apres sa fin.
+        Assert.Equal((61_200L, 72_120L), ReplayVideoPublisher.SequenceDuReplay(1_000, 72_000, 80_000, 60));
+        // Run court : tout le run.
+        Assert.Equal((1_000L, 6_120L), ReplayVideoPublisher.SequenceDuReplay(1_000, 6_000, 80_000, 60));
+        // Fin du run contre la fin du replay : jamais au-dela.
+        Assert.Equal((69_000L, 79_800L), ReplayVideoPublisher.SequenceDuReplay(null, 79_800, 79_800, 60));
+        // Sans bornes (score d'avant la 1.9.49) : la fin du replay.
+        Assert.Equal((69_200L, 80_000L), ReplayVideoPublisher.SequenceDuReplay(null, null, 80_000, 60));
+        // Cadence inconnue : 60 i/s.
+        Assert.Equal((0L, 5_000L), ReplayVideoPublisher.SequenceDuReplay(null, null, 5_000, 0));
+    }
+
+    [Fact]
     public void Les_bornes_du_run_se_lisent_dans_la_reponse_du_site()
     {
         var run = System.Text.Json.Nodes.JsonNode.Parse("""{"start_frame":120,"end_frame":43210.0,"ruleset":"1cc","x":null}""")!;
