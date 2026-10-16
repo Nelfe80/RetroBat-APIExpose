@@ -151,8 +151,11 @@ public sealed class ReplayRecorderService : BackgroundService
     /// </summary>
     private async Task<bool> RenoncerAEnregistrerAsync(RaStatus status, CancellationToken ct)
     {
-        if (await CoeurSansEnregistrementAsync(status, ct).ConfigureAwait(false)) return true;
-        if (JeuSansEnregistrement(JeuxSansEnregistrement, status.Game))
+        // RETROARCH NELFEPLAY (2026-10-16) : la nocturne posee par install-retroarch-nelfeplay.bat porte le correctif de
+        // l'encodeur ; sous elle, ni le coeur MAME libretro ni TGM2 ne sont ecartes. La garde des plantages veille encore.
+        var corrige = RetroArchNelfePlayInstalle();
+        if (!corrige && await CoeurSansEnregistrementAsync(status, ct).ConfigureAwait(false)) return true;
+        if (!corrige && JeuSansEnregistrement(JeuxSansEnregistrement, status.Game))
         {
             if (!string.Equals(_jeuAnnonce, status.Game, StringComparison.OrdinalIgnoreCase))
             {
@@ -210,6 +213,43 @@ public sealed class ReplayRecorderService : BackgroundService
     /// </summary>
     private string JeuxSansEnregistrement => _config["Replay:Record:JeuxSansEnregistrement"] ?? "tgm2,tgm2p";
     private string _jeuAnnonce = "";
+
+    /// <summary>
+    /// La marque que pose install-retroarch-nelfeplay.bat (emulators\retroarch\.nelfeplay\installe.txt) ET un
+    /// retroarch.exe qui est bien celui qu'elle a installe (ligne « exe= », son SHA-256) : une mise a jour de RetroBat
+    /// qui remettrait la 1.22.2 laisse la marque, jamais la bonne empreinte. Le desinstalleur retire la marque.
+    /// </summary>
+    internal static bool RetroArchNelfePlayInstalle(string? dossierRetroArch = null)
+    {
+        try
+        {
+            var dossier = dossierRetroArch ?? Path.GetDirectoryName(RetroBat.Domain.Paths.RetroBatPaths.RetroArchConfigPath) ?? "";
+            var marque = Path.Combine(dossier, ".nelfeplay", "installe.txt");
+            var exe = Path.Combine(dossier, "retroarch.exe");
+            if (dossier.Length == 0 || !File.Exists(marque) || !File.Exists(exe)) return false;
+            var attendue = File.ReadAllLines(marque).Select(l => l.Trim())
+                .FirstOrDefault(l => l.StartsWith("exe=", StringComparison.OrdinalIgnoreCase))?[4..].Trim() ?? "";
+            if (attendue.Length != 64) return false;
+            var info = new FileInfo(exe);
+            var cle = (exe, info.Length, info.LastWriteTimeUtc);
+            lock (EmpreinteVerrou)
+            {
+                if (_empreinteLue is { } lue && lue.Cle == cle) return string.Equals(lue.Sha, attendue, StringComparison.OrdinalIgnoreCase);
+                using var flux = File.OpenRead(exe);
+                var sha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(flux));
+                _empreinteLue = (cle, sha);
+                return string.Equals(sha, attendue, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    // L'empreinte de retroarch.exe, relue seulement quand l'exe change (taille ou date).
+    private static readonly object EmpreinteVerrou = new();
+    private static ((string Exe, long Taille, DateTime Date) Cle, string Sha)? _empreinteLue;
 
     /// <summary>Ce jeu (le nom de sa ROM) est-il dans la liste ? Pur.</summary>
     internal static bool JeuSansEnregistrement(string liste, string? jeu)

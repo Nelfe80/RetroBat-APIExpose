@@ -92,4 +92,29 @@ public class ReplayPorteCoeurTests
         Assert.False(ReplayRecorderService.JeuSansEnregistrement(liste, null));
         Assert.False(ReplayRecorderService.JeuSansEnregistrement("", "tgm2"));
     }
+
+    [Fact]
+    public void La_marque_de_retroarch_nelfeplay_leve_les_portes()
+    {
+        var dossier = Path.Combine(Path.GetTempPath(), "ra-nelfeplay-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dossier);
+        try
+        {
+            var exe = Path.Combine(dossier, "retroarch.exe");
+            File.WriteAllText(exe, "la nocturne");
+            var sha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(exe))).ToLowerInvariant();
+            Assert.False(ReplayRecorderService.RetroArchNelfePlayInstalle(dossier));
+            Directory.CreateDirectory(Path.Combine(dossier, ".nelfeplay"));
+            File.WriteAllText(Path.Combine(dossier, ".nelfeplay", "installe.txt"), "nocturne=2026-10-16\r\nexe=" + sha + "\r\n");
+            Assert.True(ReplayRecorderService.RetroArchNelfePlayInstalle(dossier));
+            // Une mise a jour de RetroBat remet son exe : la marque reste, l'empreinte ne colle plus.
+            File.WriteAllText(exe, "la 1.22.2 de RetroBat");
+            File.SetLastWriteTimeUtc(exe, DateTime.UtcNow.AddMinutes(1));
+            Assert.False(ReplayRecorderService.RetroArchNelfePlayInstalle(dossier));
+        }
+        finally
+        {
+            Directory.Delete(dossier, true);
+        }
+    }
 }
