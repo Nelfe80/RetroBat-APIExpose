@@ -308,7 +308,7 @@ if (Test-Path $asyncapiSource) {
 # prendre. L'exe n'est joint a CETTE release que s'il a change : sinon l'adresse est celle de la
 # release qui le porte deja (GitHub publie l'empreinte de chaque actif, champ `digest`). Une borne
 # qui saute des versions le trouve donc toujours, puisqu'elle ne lit que la derniere release.
-$releasesPubliees = @((& gh api 'repos/Nelfe80/RetroBat-APIExpose/releases?per_page=50') | Out-String | ConvertFrom-Json |
+$releasesPubliees = @((& gh api 'repos/Nelfe80/RetroBat-APIExpose/releases?per_page=100') | Out-String | ConvertFrom-Json |
     ForEach-Object { $_ } | Where-Object { -not $_.draft })
 if ($releasesPubliees.Count -eq 0) { throw "Releases illisibles (gh api) : outils.json ne peut pas etre construit." }
 # Ce que la derniere release publiait : un outil CHANGE doit y monter de version, sinon les bornes
@@ -383,7 +383,7 @@ $setupFile = $null
 if ($Rapide) {
     # La derniere release COMPLETE : c'est son installeur que /setup sert, et c'est vers elle que
     # les notes renvoient une premiere installation.
-    $releases = (& gh api 'repos/Nelfe80/RetroBat-APIExpose/releases?per_page=30') | Out-String | ConvertFrom-Json
+    $releases = (& gh api 'repos/Nelfe80/RetroBat-APIExpose/releases?per_page=100') | Out-String | ConvertFrom-Json
     $complete = $releases | Where-Object {
         -not $_.draft -and ($_.assets | Where-Object { $_.name -eq 'APIExpose-Cabinet-Setup.exe' })
     } | Select-Object -First 1
