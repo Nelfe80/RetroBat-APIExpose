@@ -44,6 +44,8 @@ public sealed class DirectPartageService : IHostedService
     {
         public volatile bool Finie;
         public volatile bool Alert;
+        // La partie certifiee s'est fermee (un continue, l'arrivee d'un joueur) : elle cede l'antenne a qui la demande.
+        public volatile bool NonCertifiable;
         public long MeilleurScore;
         public readonly DateTime Debut = DateTime.UtcNow;
     }
@@ -156,6 +158,11 @@ public sealed class DirectPartageService : IHostedService
                 case "ui.game.ended":
                     lock (_verrou) if (_enCours is { } f) f.Finie = true;
                     break;
+                case "scoring.run.ended":
+                    // L'ANTENNE AUX PARTIES QUI COMPTENT (demande user, 2026-10-16) : un joueur qui remet des credits
+                    // n'est plus certifiable, et la regie le fait sortir des qu'une autre borne attend.
+                    lock (_verrou) if (_enCours is { } c) c.NonCertifiable = true;
+                    break;
             }
         }
         catch (Exception ex)
@@ -172,6 +179,14 @@ public sealed class DirectPartageService : IHostedService
             // La partie NelfePlay se decide au lancement, en quelques secondes.
             for (var i = 0; i < 30 && _partie?.EstNelfePlay != true && !p.Finie; i++) await Task.Delay(500).ConfigureAwait(false);
             if (_partie?.EstNelfePlay != true || p.Finie) return;
+            // PAS DE CANDIDATURE SANS L'EXE DU DIRECT (theJim, 2026-10-16) : elue, la borne recevait l'adresse d'envoi,
+            // constatait l'absence de l'exe et se taisait ; la diffusion YouTube restait « planifiee », sans image,
+            // jusqu'a l'entretien du site. L'exe arrive par outils.json.
+            if (LanceurDuDirect.Chemin(AppContext.BaseDirectory) is null)
+            {
+                _journal.LogInformation("Direct partage : l'exe du direct manque, la borne ne se porte pas candidate.");
+                return;
+            }
             if (_contexte.Ui.Running is not { } jeu) return;
             var brut = Path.GetFileNameWithoutExtension(jeu.GamePath.Length > 0 ? jeu.GamePath : jeu.GameName);
             if (brut.Length == 0 || jeu.SystemId.Length == 0) return;
@@ -219,6 +234,7 @@ public sealed class DirectPartageService : IHostedService
                     // Sans envoi en cours, le site redonne l'adresse d'entree d'un passage ouvert : sa premiere reponse a pu
                     // se perdre.
                     ["sending"] = exe is not null,
+                    ["certifiable"] = !p.NonCertifiable,
                 };
                 var r = await _site.SonderLePartageAsync(demande, CancellationToken.None).ConfigureAwait(false);
                 var role = (string?)r?["role"];
