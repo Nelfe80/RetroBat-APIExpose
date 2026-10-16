@@ -251,6 +251,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     // Les pieces mises au panel (SELECT), par frame : une piece mise pendant la chauffe du wrapper
     // ne se voit pas sur la ligne CREDITS (ContinuesParCredits.DepartAvantLaPremiereLecture).
     private readonly List<long> _pieces = new();
+    // Le depart suppose (frame du START et ligne de credit rendue), tant qu'un vrai credit du depart peut encore le
+    // remplacer (ContinuesParCredits.DepartReelApresLeSuppose).
+    private (long Start, EvenementDeCredit Ligne)? _departSuppose;
 
     // ── Lien replay ↔ score (funnel « ▷ REPLAY » de /rankings) ───────────────
     // Le reporter connaît le session_id (il le génère) et le verdict ; le recorder
@@ -868,6 +871,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _credits.Clear();
             _departs.Clear();
             _pieces.Clear();
+            _departSuppose = null;
         }
     }
 
@@ -1764,6 +1768,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 return;
             }
             if (valeur >= avant) return;   // pieces ajoutees
+            // La piece et START ensemble : la premiere lecture etait la piece, ce credit-ci est le vrai depart. Le
+            // depart suppose s'efface (sa ligne rendue disparait), et celui-ci ne se tranche pas une seconde fois.
+            if (ContinuesParCredits.DepartReelApresLeSuppose(_departSuppose?.Start, frame) && _departSuppose is { } suppose)
+            {
+                _credits.Remove(suppose.Ligne);
+                _departSuppose = null;
+                Trace($"credit consomme a la frame {frame}, {frame - suppose.Start} images apres le START : c'est le vrai depart "
+                    + "(la premiere lecture etait la piece), le depart suppose s'efface");
+                return;
+            }
             scoreAvant = _finalTotal ?? 0;
             session = _jetonDeSession;
         }
@@ -1805,7 +1819,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
             if (ContinuesParCredits.DepartAvantLaPremiereLecture(frame, _departs, _pieces) is not { } start) return;
             depart = start;
-            _credits.Insert(0, new EvenementDeCredit(valeur + 1, Math.Min(start, frame) - 1));
+            var ligne = new EvenementDeCredit(valeur + 1, Math.Min(start, frame) - 1);
+            _credits.Insert(0, ligne);
+            _departSuppose = (start, ligne);
         }
         Trace($"credit du depart pendant la chauffe du wrapper : premiere lecture {valeur} (frame {frame}) juste apres le START "
             + $"du joueur 1 (frame {depart}), piece vue au panel avant lui : c'est le depart");

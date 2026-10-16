@@ -39,6 +39,24 @@ public class ContinuesParCreditsTests
     }
 
     [Fact]
+    public void La_piece_et_start_ensemble_le_vrai_credit_du_depart_efface_le_suppose()
+    {
+        // Essai du user, TGM2 (2026-10-16) : la premiere lecture (1) est la piece, lue a la frame du START (3675) ; le jeu
+        // consomme le credit 60 images plus tard. Ce credit est le vrai depart, pas un continue.
+        Assert.True(ContinuesParCredits.DepartReelApresLeSuppose(3675, 3735));
+        Assert.True(ContinuesParCredits.DepartReelApresLeSuppose(3675, 3675 + ContinuesParCredits.FenetreDepartReel));
+        // Au-dela de 3 s, un credit consomme est un continue ; sans depart suppose, rien a effacer.
+        Assert.False(ContinuesParCredits.DepartReelApresLeSuppose(3675, 3675 + ContinuesParCredits.FenetreDepartReel + 1));
+        Assert.False(ContinuesParCredits.DepartReelApresLeSuppose(null, 3735));
+        Assert.False(ContinuesParCredits.DepartReelApresLeSuppose(3675, 3600));
+
+        // Le suppose efface, la ligne des credits ne garde que le vrai depart : aucun continue.
+        var departs = new List<DepartDeJoueur> { new(1, 3675) };
+        var credits = new List<EvenementDeCredit> { new(1, 3675), new(0, 3735) };
+        Assert.Empty(ContinuesParCredits.Calculer(credits, departs).Coupes);
+    }
+
+    [Fact]
     public void Le_test_de_la_memoire_au_demarrage_n_est_pas_un_credit()
     {
         // Bomb Jack (2026-10-16) : 0, FF, 0 au demarrage, puis la piece et le START du joueur.

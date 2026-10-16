@@ -145,6 +145,19 @@ public static class ContinuesParCredits
         return null;
     }
 
+    /// <summary>
+    /// LA PIÈCE ET START ENSEMBLE (essai du user sur TGM2, 2026-10-16) : la première lecture des crédits
+    /// peut être la pièce elle-même, lue à la frame du START, avant que le jeu ne la consomme. Le départ
+    /// supposé (<see cref="DepartAvantLaPremiereLecture"/>) passait alors devant, et le vrai crédit du
+    /// départ, consommé une seconde après, comptait pour un continue : « score certifié 0 », replay
+    /// arrêté. Un crédit consommé dans les 3 s qui suivent le START d'un départ supposé est le vrai
+    /// départ : le supposé s'efface. Aucun continue ne se prend 3 s après avoir commencé.
+    /// </summary>
+    public const long FenetreDepartReel = 180;
+
+    public static bool DepartReelApresLeSuppose(long? suppose, long frame)
+        => suppose is { } s && frame >= s && frame - s <= FenetreDepartReel;
+
     public enum Debit
     {
         /// <summary>Le départ de la partie.</summary>
