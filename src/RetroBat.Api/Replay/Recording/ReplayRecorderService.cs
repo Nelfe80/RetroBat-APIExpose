@@ -152,6 +152,17 @@ public sealed class ReplayRecorderService : BackgroundService
     private async Task<bool> RenoncerAEnregistrerAsync(RaStatus status, CancellationToken ct)
     {
         if (await CoeurSansEnregistrementAsync(status, ct).ConfigureAwait(false)) return true;
+        if (JeuSansEnregistrement(JeuxSansEnregistrement, status.Game))
+        {
+            if (!string.Equals(_jeuAnnonce, status.Game, StringComparison.OrdinalIgnoreCase))
+            {
+                _jeuAnnonce = status.Game;
+                _logger.LogInformation(
+                    "Replay : pas d'enregistrement de {Game} : RetroArch 1.22.2 plante en ouvrant son replay (etat trop gros pour son encodeur) ; la partie compte toujours et se filme.",
+                    status.Game);
+            }
+            return true;
+        }
 
         var cle = CleDuJeu(status, await _ra.GetVersionAsync(ct).ConfigureAwait(false));
         if (_garde.RenoncementPour(cle) is not { } renoncement) return false;
@@ -190,6 +201,20 @@ public sealed class ReplayRecorderService : BackgroundService
     /// </summary>
     private string CoeursSansEnregistrement => _config["Replay:Record:SansEnregistrement"] ?? "mame_libretro";
     private string _porteAnnoncee = "";
+
+    /// <summary>
+    /// LES JEUX SOUS LESQUELS ON N'ENREGISTRE PAS, noms de ROM separes par des virgules (2026-10-16). Le meme defaut de
+    /// RetroArch 1.22.2 que sous MAME libretro frappe un gros etat sous FBNeo : TGM2 (Psikyo SH-2, 1,2 Mo de memoire)
+    /// plantait RetroArch a la seconde ou le replay s'ouvrait, au credit, a chaque partie, chez deux joueurs (0xC0000005
+    /// dans memcpy de msvcrt.dll). Les jeux ouverts jusque-la enregistrent sans encombre. Vide = aucun.
+    /// </summary>
+    private string JeuxSansEnregistrement => _config["Replay:Record:JeuxSansEnregistrement"] ?? "tgm2,tgm2p";
+    private string _jeuAnnonce = "";
+
+    /// <summary>Ce jeu (le nom de sa ROM) est-il dans la liste ? Pur.</summary>
+    internal static bool JeuSansEnregistrement(string liste, string? jeu)
+        => !string.IsNullOrWhiteSpace(jeu) && liste.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Any(j => string.Equals(j, Path.GetFileNameWithoutExtension(jeu.Trim()), StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
     /// Le cœur d'après le dossier de sauvegarde que RetroBat pose au lancement :
@@ -552,6 +577,10 @@ public sealed class ReplayRecorderService : BackgroundService
     private async Task StartAsync(RaStatus status, CancellationToken ct)
     {
         var version = await _ra.GetVersionAsync(ct).ConfigureAwait(false) ?? "unknown";
+        // LA GARDE S'ARME AVANT L'ORDRE (2026-10-16) : RetroArch plantait PENDANT l'ouverture du replay (TGM2), avant la
+        // confirmation ; armee apres elle, la garde ne voyait rien et le jeu replantait a chaque partie. Un arret normal
+        // garde sa fin de session (rien a juger) ; seul un plantage fait renoncer au replay de ce jeu.
+        _garde.EnregistrementLance(CleDuJeu(status, version), status.Game, EmpreinteDeRetroArch(version));
         await _ra.RecordAsync(ct).ConfigureAwait(false);
 
         // Confirmer que l'enregistrement a bien démarré (active_replay flags=8).
@@ -576,7 +605,6 @@ public sealed class ReplayRecorderService : BackgroundService
             Categorie = _categorieSuivante,
         };
         _categorieSuivante = null;
-        _garde.EnregistrementLance(CleDuJeu(status, version), status.Game, EmpreinteDeRetroArch(version));
         rec.CoreFps = ProbeCoreFps(rec.Crc32, rec.Game);
         rec.LastSampleUtc = DateTime.UtcNow;
         _current = rec;

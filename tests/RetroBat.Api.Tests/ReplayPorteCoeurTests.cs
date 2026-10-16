@@ -78,4 +78,18 @@ public class ReplayPorteCoeurTests
         Assert.True(ReplayRecorderService.EstSansEnregistrement("mame2016", liste));
         Assert.False(ReplayRecorderService.EstSansEnregistrement("mame2003_plus", liste));
     }
+
+    [Fact]
+    public void Tgm2_ne_s_enregistre_pas_sous_FBNeo_les_autres_jeux_si()
+    {
+        // 2026-10-16 : TGM2 plantait RetroArch a l'ouverture du replay, au credit, chez deux joueurs (meme defaut, gros etat).
+        const string liste = "tgm2,tgm2p";
+        Assert.True(ReplayRecorderService.JeuSansEnregistrement(liste, "tgm2"));
+        Assert.True(ReplayRecorderService.JeuSansEnregistrement(liste, "TGM2"));
+        Assert.True(ReplayRecorderService.JeuSansEnregistrement(liste, "tgm2.zip"));
+        Assert.False(ReplayRecorderService.JeuSansEnregistrement(liste, "mslug3"));
+        Assert.False(ReplayRecorderService.JeuSansEnregistrement(liste, "tgm2x"));
+        Assert.False(ReplayRecorderService.JeuSansEnregistrement(liste, null));
+        Assert.False(ReplayRecorderService.JeuSansEnregistrement("", "tgm2"));
+    }
 }
