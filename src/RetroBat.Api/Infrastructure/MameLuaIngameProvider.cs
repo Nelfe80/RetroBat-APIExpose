@@ -901,7 +901,7 @@ public sealed class MameLuaIngameProvider : IProvider
 
         foreach (var rule in rules)
         {
-            var runtimeAddress = ApplyBanks(banks, rule.Address);
+            var (runtimeAddress, runtimeType) = ApplyBanks(banks, rule.Address, rule.Type);
             rule.RuntimeAddress = runtimeAddress;
 
             // Les rules no_log/no_survey ne publient jamais : ne pas faire lire
@@ -917,12 +917,13 @@ public sealed class MameLuaIngameProvider : IProvider
                 // score en tuiles : un watch u8 par chiffre, evaluation composee
                 for (var i = 0; i < rule.Digits; i++)
                 {
-                    var dKey = $"{runtimeAddress + i:X}|u8";
+                    var (dAddress, _) = ApplyBanks(banks, rule.Address + i, "u8");
+                    var dKey = $"{dAddress:X}|u8";
                     if (!targetMap.TryGetValue(dKey, out var dId))
                     {
                         dId = targets.Count + 1;
                         targetMap[dKey] = dId;
-                        targets.Add(new MameLuaTarget(dId, rule.Address + i, runtimeAddress + i, "u8"));
+                        targets.Add(new MameLuaTarget(dId, rule.Address + i, dAddress, "u8"));
                     }
 
                     rule.DigitTargetIds.Add(dId);
@@ -932,12 +933,12 @@ public sealed class MameLuaIngameProvider : IProvider
                 continue;
             }
 
-            var key = $"{runtimeAddress:X}|{rule.Type}";
+            var key = $"{runtimeAddress:X}|{runtimeType}";
             if (!targetMap.TryGetValue(key, out var targetId))
             {
                 targetId = targets.Count + 1;
                 targetMap[key] = targetId;
-                targets.Add(new MameLuaTarget(targetId, rule.Address, runtimeAddress, rule.Type));
+                targets.Add(new MameLuaTarget(targetId, rule.Address, runtimeAddress, runtimeType));
             }
 
             rule.TargetId = targetId;
@@ -1172,7 +1173,7 @@ public sealed class MameLuaIngameProvider : IProvider
     /// jeu traduit l'offset blob en adresse programme MAME. Sans table, le
     /// plugin Lua rebase l'offset sur la RAM principale de la machine.
     /// </summary>
-    private IReadOnlyList<(long From, long Size, long Base)> LoadBanks(string systemId, string rom)
+    private IReadOnlyList<(long From, long Size, long Base, bool Swap32)> LoadBanks(string systemId, string rom)
     {
         var path = Path.Combine(RetroBatPaths.RamResourcesRoot, systemId, "mame-banks.json");
         if (!File.Exists(path))
@@ -1188,14 +1189,15 @@ public sealed class MameLuaIngameProvider : IProvider
                 return [];
             }
 
-            var banks = new List<(long, long, long)>();
+            var banks = new List<(long, long, long, bool)>();
             foreach (var entry in list.EnumerateArray())
             {
                 if (TryParseLong(entry.GetProperty("from").GetString(), out var from) &&
                     TryParseLong(entry.GetProperty("size").GetString(), out var size) &&
                     TryParseLong(entry.GetProperty("base").GetString(), out var baseAddr))
                 {
-                    banks.Add((from, size, baseAddr));
+                    var swap32 = entry.TryGetProperty("swap32", out var s32) && s32.ValueKind == JsonValueKind.True;
+                    banks.Add((from, size, baseAddr, swap32));
                 }
             }
 
@@ -1208,17 +1210,37 @@ public sealed class MameLuaIngameProvider : IProvider
         }
     }
 
-    private static long ApplyBanks(IReadOnlyList<(long From, long Size, long Base)> banks, long logicalAddress)
+    /// <summary>
+    /// L'offset du blob du wrapper en adresse programme MAME, et le type a lire la-bas. LES MOTS DE
+    /// 32 BITS INVERSES (TGM2, Psikyo SH-2, 2026-10-16) : FBNeo range la RAM du SH-2 en mots de 32 bits
+    /// petit-boutistes (`DrvSh2RAM[(a & 0xfffff) ^ 3]`). Une valeur petit-boutiste du blob, ecrite pour
+    /// FBNeo (les .MEM de RetroAchievements), est gros-boutiste cote processeur, a une autre adresse du
+    /// meme mot : sans cette traduction, MAME lisait les octets dans le desordre.
+    /// </summary>
+    internal static (long Address, string Type) ApplyBanks(IReadOnlyList<(long From, long Size, long Base, bool Swap32)> banks,
+        long logicalAddress, string type)
     {
-        foreach (var (from, size, baseAddr) in banks)
+        foreach (var (from, size, baseAddr, swap32) in banks)
         {
-            if (logicalAddress >= from && logicalAddress < from + size)
-            {
-                return baseAddr + (logicalAddress - from);
-            }
+            if (logicalAddress < from || logicalAddress >= from + size) continue;
+            var offset = logicalAddress - from;
+            if (!swap32) return (baseAddr + offset, type);
+            var octets = TailleDuType(type);
+            var dansLeMot = (int)(offset & 3);
+            if (octets <= 1) return (baseAddr + (offset ^ 3), type);
+            if (octets + dansLeMot > 4) return (baseAddr + offset, type);   // a cheval sur deux mots : rien de sur
+            var inverse = type.EndsWith("le", StringComparison.OrdinalIgnoreCase) ? type[..^2] + "be"
+                : type.EndsWith("be", StringComparison.OrdinalIgnoreCase) ? type[..^2] + "le" : type;
+            return (baseAddr + (offset & ~3L) + (4 - octets - dansLeMot), inverse);
         }
 
-        return logicalAddress;
+        return (logicalAddress, type);
+    }
+
+    private static int TailleDuType(string type)
+    {
+        var t = type.ToLowerInvariant();
+        return t.Contains("32") ? 4 : t.Contains("24") ? 3 : t.Contains("16") ? 2 : 1;
     }
 
     private static string NormalizeRom(string rom)
