@@ -235,8 +235,9 @@ public sealed class SelfUpdateService
     /// Met a jour les outils qui voyagent hors de l'update.7z (l'outil de diagnostic) : lit
     /// outils.json, et ne telecharge que l'outil que la borne n'a pas, ou dans une version plus
     /// ancienne (<see cref="AMettreAJour"/>). L'API ne s'arrete pas : ces outils ne sont pas
-    /// charges par elle. Jamais pendant une partie ni un replay ; un outil OUVERT est renomme en
-    /// .old et le suivant sera le nouveau. Une erreur n'empeche rien : on repasse au prochain tour.
+    /// charges par elle, d'ou l'installation tout de suite, partie en cours ou pas ; un outil OUVERT
+    /// est renomme en .old et le suivant sera le nouveau. Une erreur n'empeche rien : on repasse au
+    /// prochain tour.
     /// </summary>
     public async Task MettreLesOutilsAJourAsync(string urlOutils, CancellationToken ct)
     {
@@ -260,12 +261,10 @@ public sealed class SelfUpdateService
             var cible = Path.Combine(RetroBatPaths.PluginRoot, outil.Fichier);
             try { File.Delete(cible + ".old"); } catch { }
             if (!AMettreAJour(VersionLocale(cible), outil.Version)) continue;
-            var occupe = Occupe();
-            if (occupe.Length > 0)
-            {
-                _logger.LogInformation("Outil {Outil} {Version} remis a plus tard : {Raison}.", outil.Fichier, outil.Version, occupe);
-                return;
-            }
+            // PARTIE EN COURS OU PAS (demande user, 2026-10-16 : « une mise a jour devrait tout faire
+            // immediatement »). Un outil n'est pas charge par l'API : le remplacer ne coupe rien, et un
+            // outil ouvert est renomme puis remplace (Poser). Il attendait la fin de la partie, puis la
+            // verification suivante, six heures plus tard.
 
             var partiel = Path.Combine(RetroBatPaths.PluginRoot, ".temp", "outils", outil.Fichier + ".part");
             try
