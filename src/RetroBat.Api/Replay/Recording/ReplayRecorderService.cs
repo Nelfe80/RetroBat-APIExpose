@@ -469,6 +469,19 @@ public sealed class ReplayRecorderService : BackgroundService
                 return;
             }
 
+            // La partie d'un autre, regardee ou rejointe en netplay (2026-10-16) : ni replay ni film ici.
+            if (status is { ContentLoaded: true } && !RetroBat.Api.Netplay.NetplayGuestService.PartieALaBorne)
+            {
+                var cle = "netplay:" + status.System + "/" + status.Game;
+                if (!string.Equals(_attenteAnnoncee, cle, StringComparison.Ordinal))
+                {
+                    _attenteAnnoncee = cle;
+                    _logger.LogInformation("Replay : {Game} est la partie de l'hote (netplay), pas d'enregistrement.", status.Game);
+                }
+
+                return;
+            }
+
             if (status is { ContentLoaded: true } && active is { Active: false } && !_playback.IsBusy
                 && StartRecent(status))
             {

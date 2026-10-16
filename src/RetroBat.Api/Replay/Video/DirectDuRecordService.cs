@@ -224,6 +224,8 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                 if (g != Volatile.Read(ref _generation)) return;
             }
             if (_partie?.EstNelfePlay != true) return;
+            // La partie d'un autre, regardee ou rejointe en netplay : son record n'est pas celui de cette borne.
+            if (!RetroBat.Api.Netplay.NetplayGuestService.PartieALaBorne) return;
             if (_contexte.Ui.Running is not { } jeu) return;
 
             var brut = Path.GetFileNameWithoutExtension(jeu.GamePath.Length > 0 ? jeu.GamePath : jeu.GameName);

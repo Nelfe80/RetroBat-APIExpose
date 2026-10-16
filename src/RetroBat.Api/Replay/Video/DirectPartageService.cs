@@ -179,6 +179,13 @@ public sealed class DirectPartageService : IHostedService
             // La partie NelfePlay se decide au lancement, en quelques secondes.
             for (var i = 0; i < 30 && _partie?.EstNelfePlay != true && !p.Finie; i++) await Task.Delay(500).ConfigureAwait(false);
             if (_partie?.EstNelfePlay != true || p.Finie) return;
+            // LA PARTIE D'UN AUTRE (2026-10-16) : une borne spectatrice d'un netplay s'etait portee candidate sous son
+            // propre nom, avec la partie de l'hote. Ni spectatrice ni invitee ne se presentent.
+            if (!RetroBat.Api.Netplay.NetplayGuestService.PartieALaBorne)
+            {
+                _journal.LogInformation("Direct partage : partie de l'hote (netplay), la borne ne se porte pas candidate.");
+                return;
+            }
             // PAS DE CANDIDATURE SANS L'EXE DU DIRECT (2026-10-16) : elue, la borne recevait l'adresse d'envoi,
             // constatait l'absence de l'exe et se taisait ; la diffusion YouTube restait « planifiee », sans image,
             // jusqu'a l'entretien du site. L'exe arrive par outils.json.
@@ -226,7 +233,8 @@ public sealed class DirectPartageService : IHostedService
         {
             while (true)
             {
-                var finie = p.Finie || p.Alert;
+                // Un role de netplay repris tard (jeu demarre hors ES) retire aussi la candidature.
+                var finie = p.Finie || p.Alert || !RetroBat.Api.Netplay.NetplayGuestService.PartieALaBorne;
                 var demande = new JsonObject
                 {
                     ["rom_group"] = romGroup, ["ruleset"] = regle, ["system_id"] = "", ["score"] = Interlocked.Read(ref p.MeilleurScore),

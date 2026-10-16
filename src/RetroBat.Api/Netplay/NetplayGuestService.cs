@@ -120,6 +120,27 @@ public sealed class NetplayGuestService
         }
     }
 
+    private static Role _roleDeLaPartie;
+
+    /// <summary>
+    /// LE ROLE DE CETTE BORNE DANS LA PARTIE EN COURS (2026-10-16), pose par le reporter quand il reprend le marqueur au
+    /// debut de la partie, remis a Aucun a la suivante. Une borne qui regarde (ou rejoint) la partie d'un autre ne
+    /// l'enregistre pas en replay, ne la filme pas et ne la propose a aucun direct : c'est la partie de l'hote. Vu le
+    /// 16/10 : une borne spectatrice s'est portee candidate au direct partage sous son propre nom.
+    /// </summary>
+    public static Role RoleDeLaPartie
+    {
+        get { lock (VerrouRejointe) { return _roleDeLaPartie; } }
+    }
+
+    internal static void NoterRoleDeLaPartie(Role role)
+    {
+        lock (VerrouRejointe) { _roleDeLaPartie = role; }
+    }
+
+    /// <summary>Cette borne joue sa propre partie (ni spectatrice ni invitee d'une partie en netplay).</summary>
+    public static bool PartieALaBorne => RoleDeLaPartie == Role.Aucun;
+
     private static void MarquerRejointe(Role role)
     {
         lock (VerrouRejointe)

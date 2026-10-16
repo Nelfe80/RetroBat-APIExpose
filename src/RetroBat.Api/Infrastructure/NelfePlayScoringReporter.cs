@@ -124,6 +124,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             : null;
         var seance = place is null ? null : RetroBat.Api.Netplay.NetplayGuestService.SeanceDeLaPlace;
         lock (_sync) { _invite = role; _placeInvite = place; _seanceInvite = seance; }
+        // L'enregistreur, la capture et les directs le lisent : ils laissent la partie de l'hote.
+        RetroBat.Api.Netplay.NetplayGuestService.NoterRoleDeLaPartie(role);
         Trace(place is { } p
             ? $"partie rejointe en netplay en joueur, place {p} : pas de 1CC solo, le 1CC MULTI du joueur {p}"
             : $"partie rejointe en netplay ({role}) : la partie de l'hote, rien a soumettre ici");
@@ -839,6 +841,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _definitionChargee = null;
             _compteursDeCode = (null, new HashSet<string>(StringComparer.Ordinal));
             _invite = RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun;
+            RetroBat.Api.Netplay.NetplayGuestService.NoterRoleDeLaPartie(RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun);
             _debutSessionUtc = DateTime.UtcNow;
             _replayDuSolo = null;
             // Le replay actif est celui de CETTE partie : il repart a zero au lancement (avant tout
