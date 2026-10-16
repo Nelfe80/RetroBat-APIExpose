@@ -45,7 +45,10 @@ public sealed class SelfUpdateService
     /// choisit pas ce qu'il remplace. L'API et l'updater passent par l'update.7z. L'exe du direct
     /// (depot prive NelfePlay-LiveStreaming, decision du user du 15 octobre 2026) suit le meme chemin.
     /// </summary>
-    internal static readonly string[] OutilsHorsArchive = ["RetroBat.Api.Diagnostic.exe", "NelfePlay.LiveStreaming.exe"];
+    internal static readonly string[] OutilsHorsArchive = ["RetroBat.Api.Diagnostic.exe", "NelfePlay.LiveStreaming.exe",
+        // RETROARCH NELFEPLAY (2026-10-16) : l'archive de la nocturne corrigee, que pose install-retroarch-nelfeplay.bat
+        // (RetroArchNelfePlayService la lance). Une archive n'a pas de version : elle se reprend sur son empreinte.
+        RetroArchNelfePlay.CheminDeLArchive];
 
     /// <summary>Plafond d'un outil : l'outil de diagnostic pese ~66 Mo.</summary>
     private const long TailleMaxOutil = 512L * 1024 * 1024;
@@ -260,7 +263,8 @@ public sealed class SelfUpdateService
         {
             var cible = Path.Combine(RetroBatPaths.PluginRoot, outil.Fichier);
             try { File.Delete(cible + ".old"); } catch { }
-            if (!AMettreAJour(VersionLocale(cible), outil.Version)) continue;
+            // Un exe se compare par sa version ; une archive (sans version) par son empreinte.
+            if (EstUnExe(outil.Fichier) ? !AMettreAJour(VersionLocale(cible), outil.Version) : MemeEmpreinte(cible, outil.Sha256)) continue;
             // PARTIE EN COURS OU PAS (demande user, 2026-10-16 : « une mise a jour devrait tout faire
             // immediatement »). Un outil n'est pas charge par l'API : le remplacer ne coupe rien, et un
             // outil ouvert est renomme puis remplace (Poser). Il attendait la fin de la partie, puis la
@@ -301,6 +305,23 @@ public sealed class SelfUpdateService
         if (publiee is null) return false;
         var locale = versionLocale is null ? null : LireVersion(versionLocale);
         return locale is null || locale < publiee;
+    }
+
+    internal static bool EstUnExe(string fichier) => fichier.EndsWith(".exe", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Le fichier de la borne a-t-il deja l'empreinte publiee ? Faux s'il manque ou se lit mal.</summary>
+    private static bool MemeEmpreinte(string chemin, string sha256)
+    {
+        try
+        {
+            if (!File.Exists(chemin)) return false;
+            using var flux = File.OpenRead(chemin);
+            return string.Equals(Convert.ToHexString(SHA256.HashData(flux)), sha256, StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     /// <summary>La version de l'outil de la borne : null s'il n'y est pas, vide s'il est illisible.</summary>
@@ -349,6 +370,7 @@ public sealed class SelfUpdateService
     /// </summary>
     internal static void Poser(string nouveau, string cible)
     {
+        if (Path.GetDirectoryName(cible) is { Length: > 0 } dossier) Directory.CreateDirectory(dossier);
         try
         {
             File.Move(nouveau, cible, overwrite: true);

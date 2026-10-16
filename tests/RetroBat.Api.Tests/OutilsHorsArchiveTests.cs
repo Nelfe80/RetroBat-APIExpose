@@ -46,6 +46,32 @@ public class OutilsHorsArchiveTests
     }
 
     [Fact]
+    public void L_archive_de_retroarch_nelfeplay_est_retenue_avec_son_chemin()
+    {
+        // 2026-10-16 : la nocturne corrigee voyage par outils.json, dans un sous-dossier, sans version de fichier.
+        var outil = Assert.Single(SelfUpdateService.LireOutils($"{{\"outils\":[{Outil(RetroArchNelfePlay.CheminDeLArchive, Sha,
+            "https://github.com/Nelfe80/RetroBat-APIExpose/releases/download/v1.9.60/RetroArch_update-2026-10-16.7z", 59264658)}]}}", Depot));
+        Assert.Equal("tools/retroarch-nelfeplay/RetroArch_update-2026-10-16.7z", outil.Fichier);
+        Assert.False(SelfUpdateService.EstUnExe(outil.Fichier));
+        Assert.True(SelfUpdateService.EstUnExe("NelfePlay.LiveStreaming.exe"));
+        // Un autre chemin sous tools n'est pas prevu : il est ignore.
+        Assert.Empty(SelfUpdateService.LireOutils($"{{\"outils\":[{Outil("tools/autre/x.7z", Sha,
+            "https://github.com/Nelfe80/RetroBat-APIExpose/releases/download/v1/x.7z", 10)}]}}", Depot));
+    }
+
+    [Theory]
+    [InlineData(true, true, false, false, false, true)]
+    [InlineData(false, true, false, false, false, false)]   // l'archive n'est pas encore arrivee
+    [InlineData(true, false, false, false, false, false)]   // l'installeur manque
+    [InlineData(true, true, true, false, false, false)]     // le joueur l'a desinstallee
+    [InlineData(true, true, false, true, false, false)]     // deja en place
+    [InlineData(true, true, false, false, true, false)]     // un jeu tourne
+    public void RetroArch_nelfeplay_ne_s_installe_que_si_tout_le_permet(bool archive, bool installeur, bool refus, bool deja, bool jeu, bool attendu)
+    {
+        Assert.Equal(attendu, RetroArchNelfePlayService.AInstaller(archive, installeur, refus, deja, jeu));
+    }
+
+    [Fact]
     public void Sans_liste_rien_n_est_retenu()
     {
         Assert.Empty(SelfUpdateService.LireOutils("{}", Depot));

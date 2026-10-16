@@ -10,6 +10,13 @@ set "RA=%RETROBAT_ROOT%\emulators\retroarch"
 set "ETAT=%RA%\.nelfeplay"
 set "SAUVEGARDE=%ETAT%\sauvegarde"
 set "AJOUTES=%ETAT%\ajoutes.txt"
+set "REFUS=%PLUGIN_DIR%state\retroarch-nelfeplay-refus.txt"
+set "SILENCIEUX="
+set "ANNULATION="
+for %%A in (%*) do (
+  if /I "%%~A"=="/silencieux" set "SILENCIEUX=1"
+  if /I "%%~A"=="/annulation" set "ANNULATION=1"
+)
 
 echo RetroArch NelfePlay : retour a la version de RetroBat
 echo   dossier : %RA%
@@ -27,6 +34,18 @@ for %%P in (retroarch.exe emulatorLauncher.exe) do (
   )
 )
 
+rem RetroBat a-t-il remplace RetroArch depuis l'installation ? Alors sa sauvegarde est perimee : on ne la remet pas.
+set "EXE_MARQUE="
+set "EXE_ICI="
+if exist "%ETAT%\installe.txt" for /f "usebackq tokens=1,* delims==" %%A in ("%ETAT%\installe.txt") do if /I "%%A"=="exe" set "EXE_MARQUE=%%B"
+for /f "skip=1 delims=" %%H in ('certutil -hashfile "%RA%\retroarch.exe" SHA256 2^>nul') do if not defined EXE_ICI set "EXE_ICI=%%H"
+set "EXE_ICI=%EXE_ICI: =%"
+if defined EXE_MARQUE if /I not "%EXE_ICI%"=="%EXE_MARQUE%" (
+  echo RetroArch a deja ete remplace depuis l'installation ^(mise a jour de RetroBat^) : il reste tel quel.
+  rmdir /s /q "%ETAT%"
+  goto :refus
+)
+
 rem Les fichiers d'origine d'abord, puis le retrait de ceux que la nocturne avait ajoutes.
 robocopy "%SAUVEGARDE%" "%RA%" /E /R:2 /W:1 /NFL /NDL /NJH /NJS /NP >nul
 if errorlevel 8 (
@@ -38,15 +57,23 @@ if exist "%AJOUTES%" (
 )
 rmdir /s /q "%ETAT%"
 
+:refus
+rem Le choix du joueur : APIExpose ne la reinstallera pas d'elle-meme. Relancer l'installeur a la main la reprend.
+if not defined ANNULATION (
+  if not exist "%PLUGIN_DIR%state" mkdir "%PLUGIN_DIR%state"
+  > "%REFUS%" echo Desinstallee le %DATE% %TIME% : APIExpose ne reinstalle pas RetroArch NelfePlay.
+)
+
 echo Fait. RetroArch est de nouveau celui de RetroBat.
+if not defined ANNULATION echo APIExpose ne la reinstallera pas. Pour la reprendre : install-retroarch-nelfeplay.bat
 goto :fin
 
 :echec
 echo.
 echo Desinstallation non terminee.
-if /I not "%~1"=="/silencieux" pause
+if not defined SILENCIEUX pause
 exit /b 1
 
 :fin
-if /I not "%~1"=="/silencieux" pause
+if not defined SILENCIEUX pause
 exit /b 0

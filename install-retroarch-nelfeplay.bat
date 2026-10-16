@@ -21,14 +21,30 @@ set "NOUVEAU=%ETAT%\nouveau"
 set "SAUVEGARDE=%ETAT%\sauvegarde"
 set "AJOUTES=%ETAT%\ajoutes.txt"
 set "MARQUE=%ETAT%\installe.txt"
+set "REFUS=%PLUGIN_DIR%state\retroarch-nelfeplay-refus.txt"
+set "SILENCIEUX="
+for %%A in (%*) do if /I "%%~A"=="/silencieux" set "SILENCIEUX=1"
 
 echo RetroArch NelfePlay : installation de la nocturne du 16 octobre 2026
 echo   dossier : %RA%
 echo.
 
+rem Lancee a la main apres une desinstallation : le joueur la reprend, APIExpose pourra la tenir a jour.
+if exist "%REFUS%" del /f /q "%REFUS%"
+
 if exist "%MARQUE%" (
-  echo Deja installee. Pour revenir a la version de RetroBat : uninstall-retroarch-nelfeplay.bat
-  goto :fin
+  set "EXE_MARQUE="
+  for /f "usebackq tokens=1,* delims==" %%A in ("%MARQUE%") do if /I "%%A"=="exe" set "EXE_MARQUE=%%B"
+  set "EXE_ICI="
+  for /f "skip=1 delims=" %%H in ('certutil -hashfile "%RA%\retroarch.exe" SHA256 2^>nul') do if not defined EXE_ICI set "EXE_ICI=%%H"
+)
+if exist "%MARQUE%" (
+  call set "EXE_ICI=%%EXE_ICI: =%%"
+  call :deja
+  if not errorlevel 1 goto :fin
+  rem La marque reste mais retroarch.exe a change (une mise a jour de RetroBat) : la sauvegarde est perimee.
+  echo RetroArch a change depuis l'installation precedente : nouvelle installation.
+  rmdir /s /q "%ETAT%"
 )
 if not exist "%RA%\retroarch.exe" (
   echo RetroArch introuvable : %RA%\retroarch.exe
@@ -90,7 +106,7 @@ endlocal
 robocopy "%SRC%" "%RA%" /E /R:2 /W:1 /NFL /NDL /NJH /NJS /NP >nul
 if errorlevel 8 (
   echo Copie incomplete : retour a la version de RetroBat.
-  call "%PLUGIN_DIR%uninstall-retroarch-nelfeplay.bat" /silencieux
+  call "%PLUGIN_DIR%uninstall-retroarch-nelfeplay.bat" /silencieux /annulation
   goto :echec
 )
 rmdir /s /q "%NOUVEAU%"
@@ -115,9 +131,18 @@ if exist "%ETAT%" rmdir /s /q "%ETAT%"
 :echec
 echo.
 echo Installation non faite.
-if /I not "%~1"=="/silencieux" pause
+if not defined SILENCIEUX pause
 exit /b 1
 
 :fin
-if /I not "%~1"=="/silencieux" pause
+if not defined SILENCIEUX pause
 exit /b 0
+
+rem La nocturne est-elle deja en place ? 0 si retroarch.exe a l'empreinte que la marque a gardee.
+:deja
+if not defined EXE_MARQUE exit /b 1
+if /I "%EXE_ICI%"=="%EXE_MARQUE%" (
+  echo Deja installee. Pour revenir a la version de RetroBat : uninstall-retroarch-nelfeplay.bat
+  exit /b 0
+)
+exit /b 1

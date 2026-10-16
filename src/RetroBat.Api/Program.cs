@@ -279,6 +279,8 @@ builder.Services.AddHostedService<PanelInputWatcherService>();
 // La borne prend la derniere version publiee au lancement, quand rien ne tourne.
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.SelfUpdateService>();
 builder.Services.AddHostedService<RetroBat.Api.Infrastructure.SelfUpdateHostedService>();
+// La nocturne corrigee de RetroArch, installee des qu'aucun jeu ne tourne (2026-10-16).
+builder.Services.AddHostedService<RetroBat.Api.Infrastructure.RetroArchNelfePlayService>();
 // Combien d'objets fenetre et graphiques l'API tient : la trace d'une fuite, dans le journal.
 builder.Services.AddHostedService<RetroBat.Api.Infrastructure.GuiResourceMonitorService>();
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.DataPackSyncService>();

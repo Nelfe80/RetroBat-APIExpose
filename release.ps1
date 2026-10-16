@@ -141,8 +141,10 @@ Write-Host 'Construction update.7z...'
 # full.7z et l'installeur. Les ressources (.MEM, gamelists, plugin Lua) n'y sont pas non plus :
 # elles arrivent par le Data Pack. L'exe du direct (depot prive NelfePlay-LiveStreaming, decision
 # user du 2026-10-15) suit le meme chemin.
-$outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.exe')
-$exclusOutils = @($outilsHorsArchive | ForEach-Object { "-x!$name\$_" })
+# RETROARCH NELFEPLAY (2026-10-16) : l'archive de la nocturne corrigee voyage aussi par outils.json (chemin relatif au
+# dossier d'APIExpose, joint sous son seul nom de fichier ; une archive se reprend sur son empreinte, sans version).
+$outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.exe', 'tools/retroarch-nelfeplay/RetroArch_update-2026-10-16.7z')
+$exclusOutils = @($outilsHorsArchive | ForEach-Object { "-x!$name\$($_ -replace '/', '\')" })
 & $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" @exclusOutils -mx=5 -bsp0 -bso0
 
 # La configuration du depot, sous le nom que le programme lit. L'updater ne l'ecrase jamais sur
@@ -322,30 +324,35 @@ if ($actifPrecedent) {
 $outils = New-Object System.Collections.ArrayList
 $outilsJoints = @()
 foreach ($nomOutil in $outilsHorsArchive) {
-    $cheminOutil = Join-Path $PSScriptRoot $nomOutil
+    $cheminOutil = Join-Path $PSScriptRoot ($nomOutil -replace '/', '\')
+    $nomActif = Split-Path $cheminOutil -Leaf
+    $estExe = $nomOutil -like '*.exe'
     if (-not (Test-Path -LiteralPath $cheminOutil)) {
         throw "$nomOutil absent de la racine : il ne serait ni dans l'archive ni dans outils.json."
     }
     $fichierOutil = Get-Item -LiteralPath $cheminOutil
     $shaOutil = (Get-FileHash -LiteralPath $cheminOutil -Algorithm SHA256).Hash.ToLowerInvariant()
     $deja = $releasesPubliees | ForEach-Object { $_.assets } |
-        Where-Object { $_.name -eq $nomOutil -and $_.digest -eq "sha256:$shaOutil" } | Select-Object -First 1
+        Where-Object { $_.name -eq $nomActif -and $_.digest -eq "sha256:$shaOutil" } | Select-Object -First 1
     if ($deja) {
         $urlOutil = $deja.browser_download_url
         Write-Host "Outil $nomOutil inchange : deja publie ($urlOutil)."
     } else {
-        $versionOutil = [version](("$($fichierOutil.VersionInfo.ProductVersion)" -split '\+')[0])
-        $precedent = $outilsPrecedents | Where-Object { $_.fichier -eq $nomOutil } | Select-Object -First 1
-        if ($precedent -and $versionOutil -le [version](($precedent.version -split '\+')[0])) {
-            throw "$nomOutil a change mais reste en $versionOutil (publie : $($precedent.version)) : monter sa version, sinon les bornes ne le prendront pas."
+        if ($estExe) {
+            $versionOutil = [version](("$($fichierOutil.VersionInfo.ProductVersion)" -split '\+')[0])
+            $precedent = $outilsPrecedents | Where-Object { $_.fichier -eq $nomOutil } | Select-Object -First 1
+            if ($precedent -and $versionOutil -le [version](($precedent.version -split '\+')[0])) {
+                throw "$nomOutil a change mais reste en $versionOutil (publie : $($precedent.version)) : monter sa version, sinon les bornes ne le prendront pas."
+            }
         }
-        $urlOutil = "https://github.com/Nelfe80/RetroBat-APIExpose/releases/download/v$ver/$nomOutil"
+        $urlOutil = "https://github.com/Nelfe80/RetroBat-APIExpose/releases/download/v$ver/$nomActif"
         $outilsJoints += $cheminOutil
         Write-Host ("Outil $nomOutil nouveau : joint a cette release ({0:N0} Mo)." -f ($fichierOutil.Length / 1MB))
     }
     [void]$outils.Add([pscustomobject]@{
         fichier = $nomOutil
-        version = "$($fichierOutil.VersionInfo.ProductVersion)".Trim()
+        # Une archive n'a pas de version de fichier : sa date, prise dans son nom (les bornes la comparent sur son empreinte).
+        version = if ($estExe) { "$($fichierOutil.VersionInfo.ProductVersion)".Trim() } else { ($nomActif -replace '^.*?(\d{4})-(\d{2})-(\d{2}).*$', '$1.$2.$3') }
         sha256  = $shaOutil
         taille  = $fichierOutil.Length
         url     = $urlOutil
