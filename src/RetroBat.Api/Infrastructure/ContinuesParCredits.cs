@@ -106,6 +106,34 @@ public static class ContinuesParCredits
         return new Bilan(coupes, plusieurs) { Arrivees = arrivees, Depart = depart };
     }
 
+    /// <summary>
+    /// L'écart toléré entre un START du joueur 1 et la première lecture des crédits, dans un sens ou
+    /// dans l'autre : 1 s. Le START vient du panel, la lecture du wrapper, par deux chemins.
+    /// </summary>
+    public const long FenetreDepartInvisible = 60;
+
+    /// <summary>
+    /// LE CRÉDIT DU DÉPART PEUT TOMBER AVANT LA PREMIÈRE LECTURE (essai du user, 2026-10-16). Le
+    /// wrapper ne dit rien pendant sa chauffe (120 images au lancement) : une pièce mise dès le
+    /// lancement y passe sans bruit, et la première lecture des crédits est celle d'APRÈS le START.
+    /// Aucun départ ne se voyait alors, et le premier continue passait pour lui : une partie
+    /// continuée concourait en 1CC (Shinobi, 4 300 au continue, 5 100 envoyés).
+    ///
+    /// Quand la première lecture suit de près un START du joueur 1, et qu'une pièce a été mise au
+    /// panel avant ce START, ce START a consommé un crédit : on rend la frame de ce départ. Sans
+    /// pièce vue avant lui (un START sans crédit, puis une pièce), rien n'est supposé.
+    /// </summary>
+    public static long? DepartAvantLaPremiereLecture(long frame, IReadOnlyList<DepartDeJoueur> departs, IReadOnlyList<long> pieces)
+    {
+        foreach (var depart in departs.Where(d => d.Player == 1).OrderBy(d => Math.Abs(d.Frame - frame)))
+        {
+            if (Math.Abs(depart.Frame - frame) > FenetreDepartInvisible) break;
+            if (pieces.Any(p => p <= depart.Frame)) return depart.Frame;
+        }
+
+        return null;
+    }
+
     public enum Debit
     {
         /// <summary>Le départ de la partie.</summary>

@@ -23,6 +23,35 @@ public class ContinuesParCreditsTests
     }
 
     [Fact]
+    public void Une_piece_mise_pendant_la_chauffe_du_wrapper_n_efface_plus_le_depart()
+    {
+        // Essai du user, Shinobi (2026-10-16) : la piece tombe pendant les 120 images ou le wrapper
+        // ne dit rien, le START suit ; la premiere lecture des credits est le 0 d'apres le START.
+        var pieces = new List<long> { 40 };
+        var departs = new List<DepartDeJoueur> { new(1, 250) };
+        Assert.Equal(250, ContinuesParCredits.DepartAvantLaPremiereLecture(253, departs, pieces));
+        // Le START du panel arrive un peu apres la lecture du wrapper (deux chemins) : meme depart.
+        Assert.Equal(250, ContinuesParCredits.DepartAvantLaPremiereLecture(230, departs, pieces));
+
+        // La lecture rendue (un credit de plus, juste avant) : le continue coupe, comme au labo.
+        var credits = new List<EvenementDeCredit> { new(1, 249), new(0, 253), new(1, 5000), new(0, 5033) };
+        Assert.Equal(new long[] { 5033 }, ContinuesParCredits.Calculer(credits, departs).Coupes);
+    }
+
+    [Fact]
+    public void Sans_piece_avant_le_START_rien_n_est_suppose()
+    {
+        // Un START sans credit, puis une piece : la premiere lecture est la piece, pas un depart.
+        var departs = new List<DepartDeJoueur> { new(1, 250) };
+        Assert.Null(ContinuesParCredits.DepartAvantLaPremiereLecture(270, departs, [280]));
+        Assert.Null(ContinuesParCredits.DepartAvantLaPremiereLecture(270, departs, []));
+        // Une premiere lecture loin de tout START (la RAM qui s'initialise) ne dit rien non plus.
+        Assert.Null(ContinuesParCredits.DepartAvantLaPremiereLecture(900, departs, [40]));
+        // Le START d'un joueur 2 n'est pas le depart du joueur 1.
+        Assert.Null(ContinuesParCredits.DepartAvantLaPremiereLecture(253, [new DepartDeJoueur(2, 250)], [40]));
+    }
+
+    [Fact]
     public void Un_credit_consomme_apres_le_depart_est_un_continue()
     {
         // Deux credits remis avant de commencer : autorise. Le second part en pleine partie.

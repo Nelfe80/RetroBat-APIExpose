@@ -246,6 +246,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private readonly List<EvenementDeCredit> _credits = new();
     private readonly List<DepartDeJoueur> _departs = new();
+    // Les pieces mises au panel (SELECT), par frame : une piece mise pendant la chauffe du wrapper
+    // ne se voit pas sur la ligne CREDITS (ContinuesParCredits.DepartAvantLaPremiereLecture).
+    private readonly List<long> _pieces = new();
 
     // ── Lien replay ↔ score (funnel « ▷ REPLAY » de /rankings) ───────────────
     // Le reporter connaît le session_id (il le génère) et le verdict ; le recorder
@@ -861,6 +864,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _contextes.Clear();
             _credits.Clear();
             _departs.Clear();
+            _pieces.Clear();
         }
     }
 
@@ -1702,6 +1706,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if ((Entier(root, "Player") ?? Entier(root, "player") ?? 1) == 1) _portLocal.AppuiDuPanel();
         NoterAppui();
         var systeme = GetString(root, "System") ?? GetString(root, "system") ?? "";
+        if (string.Equals(systeme, "SELECT", StringComparison.OrdinalIgnoreCase))
+        {
+            lock (_sync)
+            {
+                _pieces.Add(_lastFrame);
+                if (_pieces.Count > MaxTrajectory) _pieces.RemoveAt(0);
+            }
+            return;
+        }
         if (!string.Equals(systeme, "START", StringComparison.OrdinalIgnoreCase)) return;
         var joueur = Entier(root, "Player") ?? Entier(root, "player") ?? 1;
         // Le START lu au panel ouvre la partie : le dire au journal, c'est ce qui manquait pour voir
@@ -1735,7 +1748,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var avant = _credits.Count > 0 ? _credits[^1].Value : (int?)null;
             _credits.Add(new EvenementDeCredit(valeur, frame));
             if (_credits.Count > MaxTrajectory) _credits.RemoveAt(0);
-            if (avant is null || valeur >= avant) return;   // premiere lecture, ou pieces ajoutees
+            if (avant is null)
+            {
+                // La premiere lecture : le START du panel peut arriver un peu apres elle.
+                var jeton = _jetonDeSession;
+                _ = DepartAvantLaPremiereLectureAsync(jeton, valeur, frame);
+                return;
+            }
+            if (valeur >= avant) return;   // pieces ajoutees
             scoreAvant = _finalTotal ?? 0;
             session = _jetonDeSession;
         }
@@ -1755,6 +1775,37 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// classement solo, une fois (joueur 2, au depart compris) ; les joueurs suivants, rien. On
     /// attend 3,5 s pour voir arriver ce joueur (ContinuesParCredits.FenetreArrivee).
     /// </summary>
+    /// <summary>
+    /// LE DEPART TOMBE PENDANT LA CHAUFFE DU WRAPPER (ContinuesParCredits.DepartAvantLaPremiereLecture) :
+    /// une seconde apres la premiere lecture des credits, si elle suivait de pres un START du joueur 1
+    /// et qu'une piece avait ete mise avant ce START, on rend la lecture qui manque (un credit de plus,
+    /// juste avant) et le depart se tranche comme un autre. Sans quoi le premier continue passait
+    /// pour le depart.
+    /// </summary>
+    private async Task DepartAvantLaPremiereLectureAsync(int session, int valeur, long frame)
+    {
+        await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+        long depart;
+        lock (_sync)
+        {
+            if (session != _jetonDeSession || _departAuCredit) return;
+            // Une autre lecture a deja baisse : le depart s'est vu, rien a supposer.
+            if (_credits.Count == 0 || _credits[0].Frame != frame) return;
+            for (var i = 1; i < _credits.Count; i++)
+            {
+                if (_credits[i].Value < _credits[i - 1].Value) return;
+            }
+            if (ContinuesParCredits.DepartAvantLaPremiereLecture(frame, _departs, _pieces) is not { } start) return;
+            depart = start;
+            _credits.Insert(0, new EvenementDeCredit(valeur + 1, Math.Min(start, frame) - 1));
+        }
+        Trace($"credit du depart pendant la chauffe du wrapper : premiere lecture {valeur} (frame {frame}) juste apres le START "
+            + $"du joueur 1 (frame {depart}), piece vue au panel avant lui : c'est le depart");
+        AnnoncerLeDepart("credit consomme");
+        SortirDeDemo();
+        await ConfirmerCreditAsync(session, 0, frame).ConfigureAwait(false);
+    }
+
     private async Task ConfirmerCreditAsync(int session, long scoreAvant, long frame)
     {
         await Task.Delay(ConfirmationContinue).ConfigureAwait(false);
