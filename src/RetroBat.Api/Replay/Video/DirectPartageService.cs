@@ -126,7 +126,7 @@ public sealed class DirectPartageService : IHostedService
         return o;
     }
 
-    /// <summary>Le record a battre, sur la bande : « RECORD 523 400 · theJim ». Vide sans record. Pur.</summary>
+    /// <summary>Le record a battre, sur la bande : « RECORD 523 400 · player ». Vide sans record. Pur.</summary>
     internal static string TexteDuRecord(long? valeur, string? joueur)
         => valeur is long v && v > 0
             ? "RECORD " + v.ToString("#,0", CultureInfo.InvariantCulture).Replace(',', ' ') + (string.IsNullOrWhiteSpace(joueur) ? "" : " · " + joueur.Trim())
@@ -179,7 +179,7 @@ public sealed class DirectPartageService : IHostedService
             // La partie NelfePlay se decide au lancement, en quelques secondes.
             for (var i = 0; i < 30 && _partie?.EstNelfePlay != true && !p.Finie; i++) await Task.Delay(500).ConfigureAwait(false);
             if (_partie?.EstNelfePlay != true || p.Finie) return;
-            // PAS DE CANDIDATURE SANS L'EXE DU DIRECT (theJim, 2026-10-16) : elue, la borne recevait l'adresse d'envoi,
+            // PAS DE CANDIDATURE SANS L'EXE DU DIRECT (2026-10-16) : elue, la borne recevait l'adresse d'envoi,
             // constatait l'absence de l'exe et se taisait ; la diffusion YouTube restait « planifiee », sans image,
             // jusqu'a l'entretien du site. L'exe arrive par outils.json.
             if (LanceurDuDirect.Chemin(AppContext.BaseDirectory) is null)
@@ -243,7 +243,14 @@ public sealed class DirectPartageService : IHostedService
                 if (role == "on_air" && exe is null && !finie && (string?)r!["ingest"] is { Length: > 0 } adresse)
                 {
                     exe = Lancer(r, adresse, regle, record, out secours);
-                    if (exe is null) return;
+                    if (exe is null)
+                    {
+                        // ELUE SANS POUVOIR ENVOYER (2026-10-16) : la borne se taisait, et la sortante tenait son clip de fin
+                        // en attendant une suivante qui ne venait pas. Le site l'apprend tout de suite (partie finie) et
+                        // abandonne le passage.
+                        p.Finie = true;
+                        continue;
+                    }
                     _journal.LogInformation("Direct partage : {Jeu} a l'antenne (passage {Passage}).", romGroup, (string?)r["passage_id"]);
                 }
                 else if (role == "outro")

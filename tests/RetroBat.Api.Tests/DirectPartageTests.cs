@@ -31,7 +31,7 @@ public sealed class DirectPartageTests
     [Fact]
     public void Le_record_a_battre_se_lit_sur_la_bande()
     {
-        Assert.Equal("RECORD 523 400 · theJim", DirectPartageService.TexteDuRecord(523_400, "theJim"));
+        Assert.Equal("RECORD 523 400 · player", DirectPartageService.TexteDuRecord(523_400, "player"));
         Assert.Equal("RECORD 900", DirectPartageService.TexteDuRecord(900, null));
         Assert.Equal("", DirectPartageService.TexteDuRecord(null, "x"));
         Assert.Equal("", DirectPartageService.TexteDuRecord(0, "x"));

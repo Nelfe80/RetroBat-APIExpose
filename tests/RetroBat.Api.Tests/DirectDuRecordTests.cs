@@ -176,9 +176,9 @@ public sealed class DirectDuRecordTests
     [Fact]
     public void La_carte_de_fin_reclasse_le_nouveau_record()
     {
-        var avant = new[] { L(1, "AshTaste92", 35260), L(2, "Lorenzolamas", 33730), L(3, "player", 20000, moi: true), L(4, "theJim", 25390) };
+        var avant = new[] { L(1, "joueur-a", 35260), L(2, "joueur-b", 33730), L(3, "player", 20000, moi: true), L(4, "joueur-c", 25390) };
         var carte = DirectDuRecordService.ClassementMisAJour(avant, "player", 36120);
-        Assert.Equal(new[] { "player", "AshTaste92", "Lorenzolamas", "theJim" }, carte.Select(l => l.Joueur));
+        Assert.Equal(new[] { "player", "joueur-a", "joueur-b", "joueur-c" }, carte.Select(l => l.Joueur));
         Assert.Equal(new[] { 1, 2, 3, 4 }, carte.Select(l => l.Rang));
         Assert.True(carte[0].Nouveau);
         Assert.Single(carte, l => l.Nouveau);

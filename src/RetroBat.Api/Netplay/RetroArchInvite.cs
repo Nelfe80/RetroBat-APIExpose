@@ -22,7 +22,7 @@ namespace RetroBat.Api.Netplay;
 ///
 /// LE DEPART DE L'HOTE. Quand l'hote ferme sa partie, RetroArch ecrit « Netplay disconnected » et
 /// continue le jeu EN LOCAL chez l'invite : le personnage de l'hote ne recoit plus rien et reste
-/// immobile (test du 2026-10-02 avec RetroLife). La connexion au relais tombe a ce moment-la ; si
+/// immobile (test du 2026-10-02 avec un joueur). La connexion au relais tombe a ce moment-la ; si
 /// RetroArch tourne encore, la partie en ligne est finie, et la borne le dit puis ferme le jeu.
 /// </summary>
 internal static class RetroArchInvite
