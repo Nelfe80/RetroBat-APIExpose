@@ -1741,6 +1741,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (!nom.Equals("CREDITS", StringComparison.OrdinalIgnoreCase)) return;
         if (Entier(signal, "Value") is not { } valeur) return;
         var frame = Entier(signal, "Frame") ?? _lastFrame;
+        if (!ContinuesParCredits.LectureVraisemblable(valeur))
+        {
+            Trace($"credits : lecture {valeur} (frame {frame}) ecartee, la memoire du demarrage et non un nombre de credits");
+            return;
+        }
         int session;
         long scoreAvant;
         lock (_sync)

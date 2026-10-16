@@ -39,6 +39,22 @@ public class ContinuesParCreditsTests
     }
 
     [Fact]
+    public void Le_test_de_la_memoire_au_demarrage_n_est_pas_un_credit()
+    {
+        // Bomb Jack (2026-10-16) : 0, FF, 0 au demarrage, puis la piece et le START du joueur.
+        Assert.False(ContinuesParCredits.LectureVraisemblable(0xFF));
+        Assert.False(ContinuesParCredits.LectureVraisemblable(0xA0));
+        Assert.True(ContinuesParCredits.LectureVraisemblable(0x99));
+        Assert.True(ContinuesParCredits.LectureVraisemblable(0));
+        // Les lectures qui restent : le START du joueur est le depart, rien n'est coupe.
+        var credits = new List<EvenementDeCredit> { new(0, 1), new(0, 491), new(1, 1200), new(0, 1326) }
+            .Where(c => ContinuesParCredits.LectureVraisemblable(c.Value)).ToList();
+        var bilan = ContinuesParCredits.Calculer(credits, [new DepartDeJoueur(1, 1326)]);
+        Assert.Empty(bilan.Coupes);
+        Assert.Equal(1326, bilan.Depart);
+    }
+
+    [Fact]
     public void Sans_piece_avant_le_START_rien_n_est_suppose()
     {
         // Un START sans credit, puis une piece : la premiere lecture est la piece, pas un depart.

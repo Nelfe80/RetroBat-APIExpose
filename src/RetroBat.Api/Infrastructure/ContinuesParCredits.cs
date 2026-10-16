@@ -107,6 +107,17 @@ public static class ContinuesParCredits
     }
 
     /// <summary>
+    /// UNE LECTURE DE CRÉDITS AU-DELÀ DE 99 N'EST PAS UN NOMBRE DE CRÉDITS (essai du user, Bomb Jack,
+    /// 2026-10-16). Le test de la mémoire au démarrage écrit FF partout puis remet 0 : la chute FF → 0
+    /// passait pour un crédit consommé, donc pour le départ ; elle sortait aussi de la démo, dont les
+    /// points comptaient alors, et le vrai START du joueur devenait un continue. Un compteur de crédits
+    /// ne dépasse jamais 99 (0x99 en BCD) : une valeur au-delà est la mémoire du démarrage, on l'écarte.
+    /// </summary>
+    public const int CreditsAuPlus = 0x99;
+
+    public static bool LectureVraisemblable(int valeur) => valeur >= 0 && valeur <= CreditsAuPlus;
+
+    /// <summary>
     /// L'écart toléré entre un START du joueur 1 et la première lecture des crédits, dans un sens ou
     /// dans l'autre : 1 s. Le START vient du panel, la lecture du wrapper, par deux chemins.
     /// </summary>
