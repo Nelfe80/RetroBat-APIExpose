@@ -21,6 +21,78 @@ public static class RetroArchNelfePlay
 
     /// <summary>Pose par le desinstalleur : le joueur est revenu a la version de RetroBat, on ne reinstalle pas.</summary>
     public const string Refus = "state/retroarch-nelfeplay-refus.txt";
+
+    /// <summary>L'empreinte du retroarch.exe de la nocturne : tant qu'il est en place, ses bibliotheques lui servent.</summary>
+    public const string ExeDeLaNocturne = "cbc50e13d6a097ad7276dc40698516bf99f74d4a619a30dfbf9e849ee58d3d7b";
+
+    /// <summary>
+    /// LES RESTES DE LA NOCTURNE (2026-10-17) : les fichiers que la nocturne ajoute a la racine de RetroArch 1.22.2, a leur
+    /// taille et a leur empreinte dans l'archive du 16 octobre. Ils restaient quand RetroBat avait remis son RetroArch entre
+    /// l'installation et le retrait (le desinstalleur laisse alors tout en place) : la mise a jour de RetroBat remettait
+    /// l'ancienne libwinpthread-1.dll a cote de l'avutil-61.dll de la nocturne, et le direct, qui prenait la FFmpeg la plus
+    /// recente du dossier, ouvrait chez un joueur une fenetre « clock_gettime64 introuvable » a chaque partie.
+    /// </summary>
+    public static readonly IReadOnlyDictionary<string, (long Taille, string Sha256)> Restes =
+        new Dictionary<string, (long Taille, string Sha256)>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["avcodec-63.dll"] = (21414912, "0d39d62b6bee1dbefe3736053f1c22c265b2e149be17cfe889050adb7d448afc"),
+        ["avdevice-63.dll"] = (160256, "9d91fe01d55436fd4221a3ff33afe82a9e30088354dedae2f5ad9a201f2a3f7f"),
+        ["avfilter-12.dll"] = (6281728, "f271399e9c16ae84e252934f454fc7c0debb6756a91610161cf03aefb0b19838"),
+        ["avformat-63.dll"] = (2869248, "3c93892ebc9ef45295c75d553de3759f9e5dda83a33331cadb61b9fe3d1ffe87"),
+        ["avutil-61.dll"] = (1102336, "83f6a4899b7d7faaf64e6cc42bda259a4e0f8e53cf4af99f8b2eb6b8c55c0079"),
+        ["icudt78.dll"] = (33206351, "e441284efaf677e5a6651f656857fa50cf6dd63d28c754671d7b3450538acff3"),
+        ["icuin78.dll"] = (5084935, "0af4dcbc4f51da0004107f8cdbb4d8bb7c0938efc2ec109683975163650eff01"),
+        ["icuuc78.dll"] = (2867944, "2ec3d5b5b15478eef2ca195c8ecebac711d0f2f442d9cf56fa91c8dd4d48d2cb"),
+        ["libbluray-2.dll"] = (2080033, "7f511900bcda94ff4e0914e51fe98f8749faee73909a570a344f6e6c9614b531"),
+        ["libbrotlicommon.dll"] = (231763, "ce68162241d9b14fe362b208c1d2c96186462237e0273000899757cd9a5366e2"),
+        ["libbrotlidec.dll"] = (153242, "c7b1b8755c3915504ebf79964db1d2bb9329bd97aec3dfe9abc8a9d55fff99c9"),
+        ["libbrotlienc.dll"] = (893820, "a6d8aac256554803d7237f30f625d669ab73e283d2b76c85017f17e07056267c"),
+        ["libgallium_wgl.dll"] = (29774213, "0513b6bbc1cd72564bb1122fa225e9d1e236785f2fc68f3be5a13558bc0887e2"),
+        ["libgnurx-0.dll"] = (191756, "8289ae92449ba1402e0b7a5e11ddc74adbb515a5199b42692ba859f13fb94199"),
+        ["libhogweed-7.dll"] = (8771268, "83356a2b939a75636f30fc4bffb027c98830be2e434fff0daab1476a18168c79"),
+        ["libmpg123-0.dll"] = (873218, "4dbdc12b91bf81531d32a754fbeab721245dec4bc576f5396c53cd8244226c73"),
+        ["libnettle-9.dll"] = (10376573, "e91cd78b66ca8c13213a192fc978ffbf04764d8fdb81c90e46069342e116679d"),
+        ["libpcre2-8-0.dll"] = (557482, "b57a1c717450b0d6f6856576295000e9379f4a2aa777967bc80c62004704f735"),
+        ["libtheoradec-2.dll"] = (473435, "81b620c1ef5916c419db82d43cfd6115835a707255ad229a077c89d8dbf89326"),
+        ["libtheoraenc-2.dll"] = (970675, "3ee9115745187af164bcbb6e6374e89015bc42965afd46f84c75b0f32af3abe5"),
+        ["libunistring-5.dll"] = (5677100, "94c35b358fa319e22be1109ce89b369862df581570d49dca76d2e5996ffbe16b"),
+        ["libx264-165.dll"] = (3165982, "f0014f85580b03040679e816a6ce63d7333bc1a3e620e5fcd92fb0c3ec80c5bf"),
+        ["libx265.dll"] = (26493445, "f63c39ea9912e8adf03cdd386450e0d8fa80ece4b4796822f487babce6f7d5a2"),
+        ["libxml2-16.dll"] = (5615527, "5c3e6752bce0638d2d0972b5a5fdbccc8523daf00eb817d56ca99b863cc88ae9"),
+        ["SDL3.dll"] = (23392677, "a3fbf83adae70db678a15f32792989a10960f002f470b45989b188418182d4f3"),
+        ["swresample-7.dll"] = (180224, "1cbd46392b2ba54d097f354ec81ed09b2c4c49772568e2ed2cc01306dd516f8a"),
+        ["swscale-10.dll"] = (2120192, "4083a3f263924d7acfc2dcd63d4f168c4d7a28782cc28aa8d945903251514bb1"),
+    };
+
+    /// <summary>
+    /// Les restes de la nocturne dans ce dossier : un fichier de la liste a sa taille et a son empreinte exactes, jamais un
+    /// fichier de RetroBat qui porterait le meme nom. Aucun tant que l'exe de la nocturne est en place.
+    /// </summary>
+    internal static List<string> RestesDans(string dossier, IReadOnlyDictionary<string, (long Taille, string Sha256)> liste, string exeDeLaNocturne)
+    {
+        var restes = new List<string>();
+        foreach (var (nom, (taille, sha)) in liste)
+        {
+            var chemin = Path.Combine(dossier, nom);
+            var info = new FileInfo(chemin);
+            if (info.Exists && info.Length == taille && string.Equals(Sha256De(chemin), sha, StringComparison.OrdinalIgnoreCase))
+            {
+                restes.Add(chemin);
+            }
+        }
+        var exe = Path.Combine(dossier, "retroarch.exe");
+        if (restes.Count > 0 && File.Exists(exe) && string.Equals(Sha256De(exe), exeDeLaNocturne, StringComparison.OrdinalIgnoreCase))
+        {
+            restes.Clear();
+        }
+        return restes;
+    }
+
+    private static string Sha256De(string chemin)
+    {
+        using var flux = File.OpenRead(chemin);
+        return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(flux));
+    }
 }
 
 /// <summary>
@@ -48,6 +120,7 @@ public sealed class RetroArchNelfePlayService : BackgroundService
     private IDisposable? _abonnement;
     private int _enCours;
     private DateTime _pasAvant = DateTime.MinValue;
+    private bool _restesRetires;
 
     public RetroArchNelfePlayService(IEventBus bus, ApiContext contexte, IConfiguration configuration, ILogger<RetroArchNelfePlayService> journal)
     {
@@ -115,12 +188,16 @@ public sealed class RetroArchNelfePlayService : BackgroundService
             if (_retirer)
             {
                 var desinstalleur = Path.Combine(racine, RetroArchNelfePlay.Desinstalleur);
-                if (!ARetirer(File.Exists(Path.Combine(dossierRetroArch, RetroArchNelfePlay.Marque)), File.Exists(desinstalleur), unJeuTourne)) return;
+                var marque = File.Exists(Path.Combine(dossierRetroArch, RetroArchNelfePlay.Marque));
+                // Retiree (ou jamais posee) : ses restes partent, s'il y en a.
+                if (!marque && !unJeuTourne) RetirerLesRestes(dossierRetroArch);
+                if (!ARetirer(marque, File.Exists(desinstalleur), unJeuTourne)) return;
                 _journal.LogInformation("RetroArch NelfePlay : retrait de la nocturne (ses manettes SDL3 ne suivent pas les touches de RetroBat).");
                 var (code, texte) = await LancerAsync(desinstalleur, "/silencieux /annulation", racine, ct).ConfigureAwait(false);
                 if (code == 0 && !File.Exists(Path.Combine(dossierRetroArch, RetroArchNelfePlay.Marque)))
                 {
                     _journal.LogInformation("RetroArch NelfePlay : retiree, RetroArch de RetroBat remis ({Sortie}).", texte);
+                    RetirerLesRestes(dossierRetroArch);
                 }
                 else
                 {
@@ -158,6 +235,42 @@ public sealed class RetroArchNelfePlayService : BackgroundService
         {
             Interlocked.Exchange(ref _enCours, 0);
         }
+    }
+
+    /// <summary>
+    /// Retire les restes de la nocturne (RetroArchNelfePlay.Restes), une fois par demarrage de l'API quand tout est propre :
+    /// un fichier tenu par un programme reste, et le releve suivant le reprend.
+    /// </summary>
+    private void RetirerLesRestes(string dossierRetroArch)
+    {
+        if (_restesRetires || dossierRetroArch.Length == 0) return;
+        var restes = RetroArchNelfePlay.RestesDans(dossierRetroArch, RetroArchNelfePlay.Restes, RetroArchNelfePlay.ExeDeLaNocturne);
+        var retires = new List<string>();
+        var tenus = new List<string>();
+        foreach (var chemin in restes)
+        {
+            try
+            {
+                File.Delete(chemin);
+                retires.Add(Path.GetFileName(chemin));
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                tenus.Add(Path.GetFileName(chemin));
+            }
+        }
+        if (retires.Count > 0)
+        {
+            _journal.LogInformation("RetroArch NelfePlay : {Nombre} reste(s) de la nocturne retire(s) de RetroArch : {Fichiers}.",
+                retires.Count, string.Join(", ", retires));
+        }
+        if (tenus.Count > 0)
+        {
+            _journal.LogWarning("RetroArch NelfePlay : reste(s) de la nocturne encore tenu(s), nouvel essai au prochain releve : {Fichiers}.",
+                string.Join(", ", tenus));
+            return;
+        }
+        _restesRetires = true;
     }
 
     /// <summary>Lance un des deux scripts, sans fenetre, sa sortie gardee pour le journal ; dix minutes au plus.</summary>
