@@ -30,6 +30,14 @@ if (args.Any(arg => string.Equals(arg, "--hide-console", StringComparison.Ordina
     RetroBat.Api.Infrastructure.ConsoleWindowNative.Hide();
 }
 
+// LA DESINSTALLATION PROPRE (2026-10-17) : lancee par le desinstalleur avant qu'il supprime ses fichiers, sans demarrer
+// l'API. Elle retire la collection World Scoring, les reglages d'APIExpose dans ES et les donnees du dossier, et garde les
+// medias, l'identite de la borne et les replays (Desinstallation).
+if (args.Any(arg => string.Equals(arg, RetroBat.Api.Infrastructure.Desinstallation.Argument, StringComparison.OrdinalIgnoreCase)))
+{
+    return RetroBat.Api.Infrastructure.Desinstallation.Executer();
+}
+
 var testModeRequested = args.Any(arg =>
     string.Equals(arg, "--test-mode", StringComparison.OrdinalIgnoreCase) ||
     string.Equals(arg, "/test-mode", StringComparison.OrdinalIgnoreCase) ||

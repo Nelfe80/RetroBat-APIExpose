@@ -110,6 +110,10 @@ Filename: "{app}\RetroBat.Api.Diagnostic.exe"; WorkingDir: "{app}"; Description:
 
 [UninstallRun]
 Filename: "taskkill"; Parameters: "/f /im {#AppExe}"; Flags: runhidden; RunOnceId: "StopApi"
+; LA DESINSTALLATION PROPRE (2026-10-17) : avant que les fichiers partent, l'exe retire la collection World Scoring, ses
+; images, les reglages d'APIExpose dans ES, ses dossiers dans les themes et les donnees du dossier ; il garde media,
+; l'identite de la borne et les replays (src/RetroBat.Api/Infrastructure/Desinstallation.cs).
+Filename: "{app}\{#AppExe}"; Parameters: "--desinstaller"; WorkingDir: "{app}"; Flags: runhidden; RunOnceId: "Nettoyage"
 
 ; Detection/validation du RetroBat cible (DefaultDirName + avertissement si mauvais dossier).
 #include "retrobat-detect.iss"
@@ -179,6 +183,41 @@ begin
     Target := ExtractFileDir(ExtractFileDir(ExpandConstant('{app}'))) + '\emulators\retroarch\core_proxy';
     if DirExists(Target) and DelTree(Target, True, True, True) then
       Log('Wrapper retire du lanceur (core_proxy) : ' + Target);
+  end;
+end;
+
+// EmulationStation reecrit es_settings.cfg en quittant : desinstaller pendant qu'il tourne ferait revenir la collection
+// World Scoring et les reglages d'APIExpose. On demande de fermer RetroBat ; en silencieux, on le note seulement.
+function EmulationStationTourne(): Boolean;
+var
+  Fichier: String;
+  Contenu: AnsiString;
+  Code: Integer;
+begin
+  Result := False;
+  Fichier := AddBackslash(GetTempDir()) + 'apiexpose-es-processus.txt';
+  if Exec(ExpandConstant('{cmd}'), '/c tasklist /FI "IMAGENAME eq emulationstation.exe" /NH > "' + Fichier + '"', '',
+      SW_HIDE, ewWaitUntilTerminated, Code) then
+    Result := LoadStringFromFile(Fichier, Contenu) and (Pos('emulationstation.exe', Lowercase(String(Contenu))) > 0);
+  DeleteFile(Fichier);
+end;
+
+function InitializeUninstall(): Boolean;
+begin
+  Result := True;
+  while EmulationStationTourne() do
+  begin
+    if UninstallSilent() then
+    begin
+      Log('EmulationStation tourne : il reecrira ses reglages en quittant.');
+      Exit;
+    end;
+    if MsgBox('Fermez RetroBat (EmulationStation) avant de désinstaller APIExpose : en quittant, il réécrirait ses réglages et la collection World Scoring reviendrait.'
+        + #13#10#13#10 + 'Cliquez OK une fois RetroBat fermé, ou Annuler pour désinstaller plus tard.', mbInformation, MB_OKCANCEL) = IDCANCEL then
+    begin
+      Result := False;
+      Exit;
+    end;
   end;
 end;
 
