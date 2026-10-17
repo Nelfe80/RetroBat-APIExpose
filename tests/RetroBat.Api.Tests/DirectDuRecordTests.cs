@@ -159,16 +159,20 @@ public sealed class DirectDuRecordTests
     }
 
     [Theory]
-    [InlineData(100L, 90L, 1, false, false, true)]     // 90 % du record (decision du 15 octobre 2026)
-    [InlineData(100L, 89L, 1, false, false, false)]
-    [InlineData(100L, 150L, 1, false, false, true)]    // deja devant : le direct s'ouvre aussi
-    [InlineData(100L, 500L, 2, false, false, false)]   // le joueur 2 d'une partie a deux
-    [InlineData(100L, 500L, 1, true, false, false)]    // une fois par partie
-    [InlineData(100L, 500L, 1, false, true, false)]    // apres un continue, la partie ne compte plus
-    [InlineData(null, 500L, 1, false, false, false)]   // classement inconnu
-    [InlineData(0L, 5L, 1, false, false, false)]       // pas de record a approcher
-    public void Le_direct_s_ouvre_a_l_approche_du_premier_rang(long? aBattre, long score, int joueur, bool deja, bool fini, bool attendu)
-        => Assert.Equal(attendu, DirectDuRecordService.AApproche(aBattre, score, joueur, deja, fini));
+    [InlineData(100L, 90L, 1, false, false, 0L, true)]       // 90 % du record (decision du 15 octobre 2026)
+    [InlineData(100L, 89L, 1, false, false, 0L, false)]
+    [InlineData(100L, 150L, 1, false, false, 0L, true)]      // deja devant : le direct s'ouvre aussi
+    [InlineData(100L, 500L, 2, false, false, 0L, false)]     // le joueur 2 d'une partie a deux
+    [InlineData(100L, 500L, 1, true, false, 0L, false)]      // une fois par partie
+    [InlineData(100L, 500L, 1, false, true, 0L, false)]      // apres un continue, la partie ne compte plus
+    [InlineData(null, 500L, 1, false, false, 0L, false)]     // classement inconnu
+    [InlineData(0L, 5L, 1, false, false, 0L, false)]         // pas de record a approcher
+    // Un score commence a 0 (2026-10-17) : une valeur lue d'emblee au-dessus du seuil, jamais partie d'en bas, n'ouvre rien.
+    [InlineData(35940L, 906030L, 1, false, false, 906030L, false)] // la lecture figee de Ms. Pac-Man
+    [InlineData(35940L, 906030L, 1, false, false, 32345L, true)]   // parti d'en bas, meme s'il saute loin ensuite
+    [InlineData(100L, 95L, 1, false, false, 90L, false)]     // le plus bas vu deja au seuil : rien ne prouve le depart
+    public void Le_direct_s_ouvre_a_l_approche_du_premier_rang(long? aBattre, long score, int joueur, bool deja, bool fini, long plusBas, bool attendu)
+        => Assert.Equal(attendu, DirectDuRecordService.AApproche(aBattre, score, joueur, deja, fini, plusBas));
 
     private static RetroBat.Api.Leaderboard.LeaderboardClient.Ligne L(int rang, string joueur, long valeur, bool moi = false)
         => new(rang, joueur, valeur, "", "", "", false, null, "", moi);

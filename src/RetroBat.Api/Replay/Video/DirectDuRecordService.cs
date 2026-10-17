@@ -56,6 +56,8 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
     /// <summary>Le direct ouvert pour cette partie (pour signaler le record), et le meilleur score du joueur 1.</summary>
     private string? _liveId;
     private long _meilleurScore;
+    /// <summary>Le plus bas score du joueur 1 vu dans la partie : un vrai score part de 0 (voir AApproche).</summary>
+    private long _plusBasVu = long.MaxValue;
     private bool _recordSignale;
     private int _essaisDeSignal;
     /// <summary>Le classement lu au lancement et le nom du jeu : la carte de fin du direct en est faite.</summary>
@@ -124,10 +126,15 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
     internal static long SeuilDApproche(long record) => (record * 90 + 99) / 100;
 
     /// <summary>
-    /// Faut-il ouvrir le direct ? Le score du joueur 1 atteint 90 % du premier rang, une fois par partie certifiee. Pur.
+    /// Faut-il ouvrir le direct ? Le score du joueur 1 atteint 90 % du premier rang, une fois par partie certifiee, ET il
+    /// est parti d'en bas : un score commence a 0. Le 17 octobre 2026, une borne lisait 906 030 sur Ms. Pac-Man des le
+    /// lancement, une valeur fixe qui ne bougeait plus (record a 35 940) : le direct s'ouvrait et annoncait un « nouveau
+    /// record » a tous les abonnes, sans partie derriere. Le plus bas score vu dans la partie doit etre passe sous le seuil
+    /// d'approche. Pur.
     /// </summary>
-    internal static bool AApproche(long? aBattre, long score, int joueur, bool dejaDeclenche, bool runTermine)
-        => aBattre is long record && record > 0 && !dejaDeclenche && !runTermine && joueur == 1 && score >= SeuilDApproche(record);
+    internal static bool AApproche(long? aBattre, long score, int joueur, bool dejaDeclenche, bool runTermine, long plusBasVu)
+        => aBattre is long record && record > 0 && !dejaDeclenche && !runTermine && joueur == 1 && score >= SeuilDApproche(record)
+           && plusBasVu < SeuilDApproche(record);
 
     /// <summary>Le record tombe : le score du joueur 1 passe devant le premier rang, avant tout continue. Pur.</summary>
     internal static bool PasseDevant(long? aBattre, long score, int joueur, bool runTermine)
@@ -158,6 +165,7 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                         _runTermine = false;
                         _liveId = null;
                         _meilleurScore = 0;
+                        _plusBasVu = long.MaxValue;
                         _recordSignale = false;
                         _essaisDeSignal = 0;
                         _lignes = Array.Empty<LeaderboardClient.Ligne>();
@@ -175,8 +183,20 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                     string? direct;
                     lock (_verrou)
                     {
-                        if (joueur == 1 && !_runTermine) _meilleurScore = Math.Max(_meilleurScore, score);
-                        ouvrir = AApproche(_aBattre, score, joueur, _declenche, _runTermine);
+                        if (joueur == 1 && !_runTermine)
+                        {
+                            _meilleurScore = Math.Max(_meilleurScore, score);
+                            _plusBasVu = Math.Min(_plusBasVu, score);
+                        }
+                        ouvrir = AApproche(_aBattre, score, joueur, _declenche, _runTermine, _plusBasVu);
+                        // Une seule fois par partie, la valeur qui n'est jamais partie d'en bas se dit dans le journal.
+                        if (!ouvrir && !_declenche && joueur == 1 && _aBattre is long rec && rec > 0 && score >= SeuilDApproche(rec)
+                            && _plusBasVu >= SeuilDApproche(rec))
+                        {
+                            _declenche = true;
+                            _journal.LogWarning("Direct : {Jeu}, score {Score} lu sans etre parti d'en bas (plus bas vu {Bas}) : pas de direct.",
+                                _romGroup, score, _plusBasVu);
+                        }
                         if (ouvrir) _declenche = true;
                         // Le direct ouvert a l'approche : le moment ou le record tombe se signale une fois.
                         signaler = !ouvrir && _liveId is not null && !_recordSignale && PasseDevant(_aBattre, score, joueur, _runTermine);
