@@ -67,10 +67,31 @@ public sealed class DataPackSyncService : BackgroundService
     /// <summary>Le dernier bilan, pour l'endpoint de maintenance.</summary>
     public DataPackSyncResult? Dernier { get; private set; }
 
+    /// <summary>
+    /// UNE BORNE EN RETARD SE SYNCHRONISE VITE (2026-10-18). La premiere synchronisation attendait 120 s apres chaque
+    /// demarrage : une API relancee plus souvent ne se synchronisait jamais (une borne avait quatre jours de retard, et
+    /// Double Dragon y restait « non certifiable »). En retard (derniere synchronisation plus vieille que l'intervalle, ou
+    /// jamais faite), 30 s au plus ; a jour, a l'echeance (jamais avant le delai de demarrage). Pur.
+    /// </summary>
+    internal static TimeSpan PremierDelai(DateTime derniereUtc, DateTime maintenantUtc, TimeSpan intervalle, TimeSpan delaiDeDemarrage)
+    {
+        var depuis = maintenantUtc - derniereUtc;
+        if (derniereUtc == default || depuis >= intervalle || depuis < TimeSpan.Zero)
+        {
+            return delaiDeDemarrage < TimeSpan.FromSeconds(30) ? delaiDeDemarrage : TimeSpan.FromSeconds(30);
+        }
+        var echeance = intervalle - depuis;
+        return echeance > delaiDeDemarrage ? echeance : delaiDeDemarrage;
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var delai = Math.Max(5, _options.CurrentValue.DataPack.StartupDelaySeconds);
-        try { await Task.Delay(TimeSpan.FromSeconds(delai), stoppingToken); }
+        var demarrage = _options.CurrentValue.DataPack;
+        var delai = PremierDelai(LoadState().LastSyncUtc, DateTime.UtcNow, TimeSpan.FromHours(Math.Max(1, demarrage.IntervalHours)),
+            TimeSpan.FromSeconds(Math.Max(5, demarrage.StartupDelaySeconds)));
+        _logger.LogInformation("Data Pack : premiere synchronisation dans {Delai}.", delai.TotalMinutes >= 2
+            ? $"{(int) delai.TotalHours} h {delai.Minutes:00}" : $"{(int) delai.TotalSeconds} s");
+        try { await Task.Delay(delai, stoppingToken); }
         catch (OperationCanceledException) { return; }
 
         while (!stoppingToken.IsCancellationRequested)
@@ -132,7 +153,12 @@ public sealed class DataPackSyncService : BackgroundService
                 _logger.LogWarning(ex, "Data Pack : la partie cartes d'instructions a echoue.");
             }
 
-            state.LastSyncUtc = DateTime.UtcNow;
+            // Une synchronisation dont la partie depot a echoue (GitHub injoignable, limite de requetes) ne compte pas comme
+            // faite : la borne, en retard, reessaiera vite au prochain demarrage (2026-10-18).
+            if (!result.Errors.Any(e => e.StartsWith("arbre", StringComparison.Ordinal)))
+            {
+                state.LastSyncUtc = DateTime.UtcNow;
+            }
             SaveState(state);
             result.FinishedUtc = DateTime.UtcNow;
             Dernier = result;

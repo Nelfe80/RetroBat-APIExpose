@@ -40,10 +40,21 @@ if not errorlevel 1 (
 )
 
 rem Healthy but still starting? Then just wait below. Otherwise (re)start it.
-curl.exe -s -m 2 "%HEALTH_URL%" 2>nul | find /I "healthy" >nul
+rem A BUSY API IS NOT A STUCK API (2026-10-18): just after a game (score, replay, film) it can take more than 2 s to
+rem answer. One 2 s try killed it at each return to ES on a cabinet, and its Data Pack never finished syncing. Three
+rem tries of 3 s, about 10 s in all, before deciding it is stuck.
+set /a HEALTH_TRIES=3
+:healthloop
+curl.exe -s -m 3 "%HEALTH_URL%" 2>nul | find /I "healthy" >nul
 if not errorlevel 1 (
   echo %date% %time% API already running, waiting for readiness.>> "%LOG_FILE%"
   goto waitready
+)
+set /a HEALTH_TRIES-=1
+if %HEALTH_TRIES% GTR 0 (
+  echo %date% %time% API not answering yet, trying again.>> "%LOG_FILE%"
+  ping -n 2 127.0.0.1 >nul
+  goto healthloop
 )
 
 rem Not answering: clear any stale process, then start fresh.
