@@ -9,51 +9,58 @@ namespace RetroBat.Api.Infrastructure;
 /// <summary>Les chemins de RetroArch NelfePlay, relatifs au dossier d'APIExpose.</summary>
 public static class RetroArchNelfePlay
 {
-    /// <summary>L'archive officielle de la nocturne, livree par outils.json.</summary>
+    /// <summary>L'archive officielle de la nocturne (livree par outils.json en 1.9.60 seulement).</summary>
     public const string CheminDeLArchive = "tools/retroarch-nelfeplay/RetroArch_update-2026-10-16.7z";
 
     public const string Installeur = "install-retroarch-nelfeplay.bat";
+
+    public const string Desinstalleur = "uninstall-retroarch-nelfeplay.bat";
+
+    /// <summary>La marque de l'installeur, dans le dossier de RetroArch : la nocturne a ete posee ici.</summary>
+    public const string Marque = ".nelfeplay/installe.txt";
 
     /// <summary>Pose par le desinstalleur : le joueur est revenu a la version de RetroBat, on ne reinstalle pas.</summary>
     public const string Refus = "state/retroarch-nelfeplay-refus.txt";
 }
 
 /// <summary>
-/// RETROARCH NELFEPLAY S'INSTALLE TOUT SEUL (decision du user, 2026-10-16) : la mise a jour livre l'archive de la nocturne
-/// corrigee (outils.json) et ce service lance install-retroarch-nelfeplay.bat des qu'aucun jeu ne tourne. RetroArch 1.22.2
-/// plante en ouvrant un replay sur un gros etat (TGM2, MAME libretro) ; la nocturne non.
+/// RETROARCH NELFEPLAY SE RETIRE (2026-10-17). La 1.9.60 installait d'elle-meme la nocturne de RetroArch du 16 octobre, qui
+/// tient le replay des gros etats (TGM2, MAME libretro). Mais elle lit les manettes par SDL3, quand RetroBat ecrit a chaque
+/// lancement des touches numerotees pour SDL2 : chez les joueurs, la piece sur L1, START sur L2, la croix morte ; on ne
+/// pouvait plus jouer, et aucune partie ne marquait de points (theJim, Gogerad, la nuit du 16 au 17).
 ///
-/// Le retour en arriere reste au joueur : uninstall-retroarch-nelfeplay.bat remet le RetroArch de RetroBat et pose un
-/// refus, que ce service respecte ; relancer l'installeur a la main le retire. Une mise a jour de RetroBat qui remet sa
-/// 1.22.2 (la marque reste, l'empreinte de l'exe non) se rattrape au tour suivant.
+/// Ce service la DESINSTALLE donc, la ou elle est posee, des qu'aucun jeu ne tourne (uninstall-retroarch-nelfeplay.bat
+/// /annulation : RetroArch de RetroBat remis tel qu'il etait, sans poser de refus). L'installation automatique reste
+/// possible (RetroArchNelfePlay:AutoInstall), coupee par defaut. Sous la 1.22.2, TGM2 et MAME libretro restent sans replay.
 /// </summary>
 public sealed class RetroArchNelfePlayService : BackgroundService
 {
     private static readonly TimeSpan PremierEssai = TimeSpan.FromSeconds(45);
     private static readonly TimeSpan Releve = TimeSpan.FromMinutes(5);
-    private static readonly TimeSpan ApresUnEchec = TimeSpan.FromHours(1);
+    private static readonly TimeSpan ApresUnEchec = TimeSpan.FromMinutes(30);
     private static readonly string[] Emulateurs = ["retroarch", "emulatorLauncher", "mame", "mame64"];
 
     private readonly IEventBus _bus;
     private readonly ApiContext _contexte;
     private readonly ILogger<RetroArchNelfePlayService> _journal;
-    private readonly bool _actif;
+    private readonly bool _installer;
+    private readonly bool _retirer;
     private IDisposable? _abonnement;
     private int _enCours;
     private DateTime _pasAvant = DateTime.MinValue;
-    private bool _refusDit;
 
     public RetroArchNelfePlayService(IEventBus bus, ApiContext contexte, IConfiguration configuration, ILogger<RetroArchNelfePlayService> journal)
     {
         _bus = bus;
         _contexte = contexte;
         _journal = journal;
-        _actif = configuration.GetValue("RetroArchNelfePlay:AutoInstall", true);
+        _installer = configuration.GetValue("RetroArchNelfePlay:AutoInstall", false);
+        _retirer = !_installer && configuration.GetValue("RetroArchNelfePlay:Retrait", true);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        if (!_actif) return;
+        if (!_installer && !_retirer) return;
         try { _abonnement = _bus.Subscribe<EventEnvelope>(SurEvenement); }
         catch (Exception ex) { _journal.LogDebug(ex, "RetroArch NelfePlay : abonnement au bus impossible."); }
         try
@@ -76,7 +83,7 @@ public sealed class RetroArchNelfePlayService : BackgroundService
 
     private void SurEvenement(EventEnvelope e)
     {
-        // La fin d'une partie libere RetroArch : le moment d'installer, une fois ES revenu.
+        // La fin d'une partie libere RetroArch : le moment d'agir, une fois ES revenu.
         if (string.Equals(e.Type, "ui.game.ended", StringComparison.OrdinalIgnoreCase))
         {
             _ = Task.Run(async () =>
@@ -91,6 +98,9 @@ public sealed class RetroArchNelfePlayService : BackgroundService
     internal static bool AInstaller(bool archive, bool installeur, bool refus, bool dejaInstallee, bool unJeuTourne)
         => archive && installeur && !refus && !dejaInstallee && !unJeuTourne;
 
+    /// <summary>Faut-il retirer la nocturne ? Elle est posee (la marque), le desinstalleur est la, et rien ne tourne. Pur.</summary>
+    internal static bool ARetirer(bool marque, bool desinstalleur, bool unJeuTourne) => marque && desinstalleur && !unJeuTourne;
+
     private async Task EssayerAsync(CancellationToken ct)
     {
         if (Interlocked.Exchange(ref _enCours, 1) == 1) return;
@@ -98,65 +108,84 @@ public sealed class RetroArchNelfePlayService : BackgroundService
         {
             if (DateTime.UtcNow < _pasAvant) return;
             var racine = RetroBatPaths.PluginRoot;
-            var bat = Path.Combine(racine, RetroArchNelfePlay.Installeur);
-            var refus = File.Exists(Path.Combine(racine, RetroArchNelfePlay.Refus));
-            if (refus && !_refusDit)
-            {
-                _refusDit = true;
-                _journal.LogInformation("RetroArch NelfePlay : desinstalle par le joueur, pas de reinstallation (relancer {Bat} pour la reprendre).",
-                    RetroArchNelfePlay.Installeur);
-            }
+            var dossierRetroArch = Path.GetDirectoryName(RetroBatPaths.RetroArchConfigPath) ?? "";
             var unJeuTourne = _contexte.Ui.Running is not null
                 || Process.GetProcesses().Any(p => Emulateurs.Contains(p.ProcessName, StringComparer.OrdinalIgnoreCase));
-            if (!AInstaller(File.Exists(Path.Combine(racine, RetroArchNelfePlay.CheminDeLArchive)), File.Exists(bat), refus,
+
+            if (_retirer)
+            {
+                var desinstalleur = Path.Combine(racine, RetroArchNelfePlay.Desinstalleur);
+                if (!ARetirer(File.Exists(Path.Combine(dossierRetroArch, RetroArchNelfePlay.Marque)), File.Exists(desinstalleur), unJeuTourne)) return;
+                _journal.LogInformation("RetroArch NelfePlay : retrait de la nocturne (ses manettes SDL3 ne suivent pas les touches de RetroBat).");
+                var (code, texte) = await LancerAsync(desinstalleur, "/silencieux /annulation", racine, ct).ConfigureAwait(false);
+                if (code == 0 && !File.Exists(Path.Combine(dossierRetroArch, RetroArchNelfePlay.Marque)))
+                {
+                    _journal.LogInformation("RetroArch NelfePlay : retiree, RetroArch de RetroBat remis ({Sortie}).", texte);
+                }
+                else
+                {
+                    _pasAvant = DateTime.UtcNow + ApresUnEchec;
+                    _journal.LogWarning("RetroArch NelfePlay : retrait non fait (code {Code}) : {Sortie}. Nouvel essai dans 30 min.", code, texte);
+                }
+                return;
+            }
+
+            var installeur = Path.Combine(racine, RetroArchNelfePlay.Installeur);
+            var refus = File.Exists(Path.Combine(racine, RetroArchNelfePlay.Refus));
+            if (!AInstaller(File.Exists(Path.Combine(racine, RetroArchNelfePlay.CheminDeLArchive)), File.Exists(installeur), refus,
                     RetroBat.Api.Replay.Recording.ReplayRecorderService.RetroArchNelfePlayInstalle(), unJeuTourne))
             {
                 return;
             }
-
             _journal.LogInformation("RetroArch NelfePlay : installation de la nocturne corrigee (aucun jeu ne tourne).");
-            using var processus = new Process
+            var (codeInstall, sortie) = await LancerAsync(installeur, "/silencieux", racine, ct).ConfigureAwait(false);
+            if (codeInstall == 0 && RetroBat.Api.Replay.Recording.ReplayRecorderService.RetroArchNelfePlayInstalle())
             {
-                StartInfo = new ProcessStartInfo("cmd.exe", "/c \"\"" + bat + "\" /silencieux\"")
-                {
-                    WorkingDirectory = racine,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                },
-            };
-            processus.Start();
-            var sortie = processus.StandardOutput.ReadToEndAsync(ct);
-            using (var delai = CancellationTokenSource.CreateLinkedTokenSource(ct))
-            {
-                delai.CancelAfter(TimeSpan.FromMinutes(10));
-                try { await processus.WaitForExitAsync(delai.Token).ConfigureAwait(false); }
-                catch (OperationCanceledException) when (!ct.IsCancellationRequested)
-                {
-                    try { processus.Kill(true); } catch { }
-                }
-            }
-            var texte = string.Join(" | ", (await sortie.ConfigureAwait(false)).Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
-            if (processus.HasExited && processus.ExitCode == 0 && RetroBat.Api.Replay.Recording.ReplayRecorderService.RetroArchNelfePlayInstalle())
-            {
-                _journal.LogInformation("RetroArch NelfePlay : installee ({Sortie}).", texte);
+                _journal.LogInformation("RetroArch NelfePlay : installee ({Sortie}).", sortie);
             }
             else
             {
                 _pasAvant = DateTime.UtcNow + ApresUnEchec;
-                _journal.LogWarning("RetroArch NelfePlay : installation non faite (code {Code}) : {Sortie}. Nouvel essai dans une heure.",
-                    processus.HasExited ? processus.ExitCode : -1, texte);
+                _journal.LogWarning("RetroArch NelfePlay : installation non faite (code {Code}) : {Sortie}.", codeInstall, sortie);
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             _pasAvant = DateTime.UtcNow + ApresUnEchec;
-            _journal.LogWarning("RetroArch NelfePlay : installation impossible ({Erreur}). Nouvel essai dans une heure.", ex.Message);
+            _journal.LogWarning("RetroArch NelfePlay : operation impossible ({Erreur}).", ex.Message);
         }
         finally
         {
             Interlocked.Exchange(ref _enCours, 0);
         }
+    }
+
+    /// <summary>Lance un des deux scripts, sans fenetre, sa sortie gardee pour le journal ; dix minutes au plus.</summary>
+    private static async Task<(int Code, string Sortie)> LancerAsync(string bat, string arguments, string dossier, CancellationToken ct)
+    {
+        using var processus = new Process
+        {
+            StartInfo = new ProcessStartInfo("cmd.exe", "/c \"\"" + bat + "\" " + arguments + "\"")
+            {
+                WorkingDirectory = dossier,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            },
+        };
+        processus.Start();
+        var sortie = processus.StandardOutput.ReadToEndAsync(ct);
+        using (var delai = CancellationTokenSource.CreateLinkedTokenSource(ct))
+        {
+            delai.CancelAfter(TimeSpan.FromMinutes(10));
+            try { await processus.WaitForExitAsync(delai.Token).ConfigureAwait(false); }
+            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+            {
+                try { processus.Kill(true); } catch { }
+            }
+        }
+        var texte = string.Join(" | ", (await sortie.ConfigureAwait(false)).Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+        return (processus.HasExited ? processus.ExitCode : -1, texte);
     }
 }

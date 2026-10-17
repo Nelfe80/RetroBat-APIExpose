@@ -55,6 +55,9 @@ if errorlevel 8 (
 if exist "%AJOUTES%" (
   for /f "usebackq delims=" %%L in ("%AJOUTES%") do if exist "%RA%\%%L" del /f /q "%RA%\%%L"
 )
+rem La nocturne recopie les identifiants (RetroAchievements...) dans un trousseau a cote de sa cle ; la 1.22.2 ne s'en
+rem sert pas, RetroBat les garde dans retroarch.cfg. On ne laisse pas cette copie derriere.
+for %%K in (retroarch-keychain.cfg retroarch-keychain.key) do if exist "%RA%\%%K" del /f /q "%RA%\%%K"
 rmdir /s /q "%ETAT%"
 
 :refus

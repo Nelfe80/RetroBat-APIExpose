@@ -71,6 +71,17 @@ public class OutilsHorsArchiveTests
         Assert.Equal(attendu, RetroArchNelfePlayService.AInstaller(archive, installeur, refus, deja, jeu));
     }
 
+    [Theory]
+    [InlineData(true, true, false, true)]
+    [InlineData(false, true, false, false)]   // jamais installee ici
+    [InlineData(true, false, false, false)]   // le desinstalleur manque
+    [InlineData(true, true, true, false)]     // un jeu tourne : apres la partie
+    public void RetroArch_nelfeplay_se_retire_des_qu_aucun_jeu_ne_tourne(bool marque, bool desinstalleur, bool jeu, bool attendu)
+    {
+        // 2026-10-17 : ses manettes SDL3 ne suivaient pas les touches de RetroBat (piece sur L1, croix morte).
+        Assert.Equal(attendu, RetroArchNelfePlayService.ARetirer(marque, desinstalleur, jeu));
+    }
+
     [Fact]
     public void Sans_liste_rien_n_est_retenu()
     {

@@ -143,7 +143,9 @@ Write-Host 'Construction update.7z...'
 # user du 2026-10-15) suit le meme chemin.
 # RETROARCH NELFEPLAY (2026-10-16) : l'archive de la nocturne corrigee voyage aussi par outils.json (chemin relatif au
 # dossier d'APIExpose, joint sous son seul nom de fichier ; une archive se reprend sur son empreinte, sans version).
-$outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.exe', 'tools/retroarch-nelfeplay/RetroArch_update-2026-10-16.7z')
+# Retiree en 1.9.61 (2026-10-17) : ses manettes SDL3 ne suivent pas les touches que RetroBat ecrit pour SDL2. La liste
+# accepte de nouveau un chemin relatif le jour ou une version qui convient sera prete.
+$outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.exe')
 $exclusOutils = @($outilsHorsArchive | ForEach-Object { "-x!$name\$($_ -replace '/', '\')" })
 & $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" @exclusOutils -mx=5 -bsp0 -bso0
 
