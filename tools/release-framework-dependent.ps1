@@ -13,7 +13,9 @@ $ProjectPath = Join-Path $PluginRoot "src\RetroBat.Api\RetroBat.Api.csproj"
 $UpdaterProjectPath = Join-Path $PluginRoot "src\RetroBat.Api.Update\RetroBat.Api.Update.csproj"
 $PropsPath = Join-Path $PluginRoot "Directory.Build.props"
 $ArtifactsRoot = Join-Path $PluginRoot "artifacts\release"
-$TempRoot = Join-Path ([System.IO.Path]::GetTempPath()) "APIExpose-publish"
+# Les intermediaires restent sur le disque du plugin (jamais le dossier temporaire du
+# systeme, souvent sur un disque plein) et partent a la fin.
+$TempRoot = Join-Path $PluginRoot "artifacts\publish"
 
 if (-not (Test-Path -LiteralPath $ProjectPath)) {
     throw "Project not found: $ProjectPath"
@@ -86,6 +88,8 @@ if (-not $NoRootCopy) {
         Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $PluginRoot $_.Name) -Force
     }
 }
+
+cmd.exe /c "rmdir /s /q `"$TempRoot`"" | Out-Null
 
 $ExePath = Join-Path $ReleaseDir "RetroBat.Api.exe"
 $TotalBytes = (Get-ChildItem -LiteralPath $ReleaseDir -File -Recurse | Measure-Object -Property Length -Sum).Sum
