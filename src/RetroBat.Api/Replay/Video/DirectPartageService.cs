@@ -215,7 +215,11 @@ public sealed class DirectPartageService : IHostedService
             {
                 // Sans classement, la bande dit nelfeplay.com.
             }
-            await PasserAsync(p, romGroup, regle, record).ConfigureAwait(false);
+            // Le systeme du classement : le dossier de la definition (arcade, megadrive, mastersystem...), jamais celui d'ES
+            // (fbneo, mame). Le site le devinait depuis le 17 octobre 2026 ; le titre du direct disait « (Arcade) » pour un
+            // jeu Master System quand il manquait.
+            var systeme = (def.SystemId ?? "").Trim().ToLowerInvariant();
+            await PasserAsync(p, romGroup, regle, record, systeme).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -223,7 +227,7 @@ public sealed class DirectPartageService : IHostedService
         }
     }
 
-    private async Task PasserAsync(Partie p, string romGroup, string regle, string record)
+    private async Task PasserAsync(Partie p, string romGroup, string regle, string record, string systeme)
     {
         Task<LanceurDuDirect.Rapport>? exe = null;
         CancellationTokenSource? secours = null;
@@ -237,7 +241,7 @@ public sealed class DirectPartageService : IHostedService
                 var finie = p.Finie || p.Alert || !RetroBat.Api.Netplay.NetplayGuestService.PartieALaBorne;
                 var demande = new JsonObject
                 {
-                    ["rom_group"] = romGroup, ["ruleset"] = regle, ["system_id"] = "", ["score"] = Interlocked.Read(ref p.MeilleurScore),
+                    ["rom_group"] = romGroup, ["ruleset"] = regle, ["system_id"] = systeme, ["score"] = Interlocked.Read(ref p.MeilleurScore),
                     ["state"] = finie ? "ended" : "playing", ["elapsed_s"] = (int)(DateTime.UtcNow - p.Debut).TotalSeconds, ["test"] = essai,
                     // Sans envoi en cours, le site redonne l'adresse d'entree d'un passage ouvert : sa premiere reponse a pu
                     // se perdre.
