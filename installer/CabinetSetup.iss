@@ -72,6 +72,24 @@ english.MediaNeuf=New RetroBat: APIExpose manages the media (automatic scraping 
 english.MediaConfigure=Already configured RetroBat: my media are mine (automatic scraping off; APIExpose never replaces a media I chose)
 english.MediaGarder=Keep my current APIExpose settings
 english.MediaSuggestion=Suggested from this RetroBat: %1
+french.ActionPageCaption=APIExpose est déjà installé
+french.ActionPageDescription=Que voulez-vous faire dans ce RetroBat ?
+french.ActionPageSubCaption=APIExpose %1 est installé dans %2.
+french.ActionMettreAJour=Mettre à jour APIExpose (recommandé)
+french.ActionDesinstaller=Désinstaller APIExpose de ce RetroBat (les médias, l'identité de la borne et les replays sont gardés)
+french.ActionConfirmer=Désinstaller APIExpose de %1 ?%n%nLa collection World Scoring, les réglages d'APIExpose dans EmulationStation et les données du plugin seront retirés. Les médias, l'identité de la borne et les replays restent.
+french.ActionFermerES=Fermez RetroBat (EmulationStation) avant de désinstaller APIExpose : en quittant, il réécrirait ses réglages.%n%nCliquez OK une fois RetroBat fermé, ou Annuler pour revenir.
+french.ActionFait=APIExpose est désinstallé de %1.%n%nLes médias, l'identité de la borne et les replays restent dans plugins\APIExpose.%nJournal : %2
+french.ActionEchec=La désinstallation n'a pas pu se faire : %1.
+english.ActionPageCaption=APIExpose is already installed
+english.ActionPageDescription=What do you want to do in this RetroBat?
+english.ActionPageSubCaption=APIExpose %1 is installed in %2.
+english.ActionMettreAJour=Update APIExpose (recommended)
+english.ActionDesinstaller=Uninstall APIExpose from this RetroBat (media, the cabinet identity and replays are kept)
+english.ActionConfirmer=Uninstall APIExpose from %1?%n%nThe World Scoring collection, APIExpose settings in EmulationStation and the plugin data will be removed. Media, the cabinet identity and replays stay.
+english.ActionFermerES=Close RetroBat (EmulationStation) before uninstalling APIExpose: it would rewrite its settings when quitting.%n%nClick OK once RetroBat is closed, or Cancel to go back.
+english.ActionFait=APIExpose is uninstalled from %1.%n%nMedia, the cabinet identity and replays stay in plugins\APIExpose.%nLog: %2
+english.ActionEchec=The uninstall could not be done: %1.
 
 [Files]
 ; APIExpose COMPLET (= contenu de full.7z) : moteur + .installer (hooks ES) +
@@ -96,6 +114,10 @@ Source: "..\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createalls
 ; `appsettings.default.json` est produit par tools\build-default-settings.ps1, qui le tire de
 ; HEAD : il ne peut donc pas deriver en silence.
 Source: "appsettings.default.json"; DestDir: "{app}"; DestName: "appsettings.json"; Flags: onlyifdoesntexist uninsneveruninstall
+; Le choix « Desinstaller » de l'installeur (2026-10-17) : l'exe de CET installeur fait le nettoyage, meme pour une
+; installation plus ancienne qui ne connait pas --desinstaller. Extrait dans {tmp}, jamais copie.
+; Meme nom que celui du plugin : le nettoyage garde alors l'exe en place pour le desinstalleur de Windows.
+Source: "..\RetroBat.Api.exe"; DestDir: "{tmp}"; Flags: dontcopy
 
 [Dirs]
 ; état local (sessions RA, sauvegardes de config) - préservé à la désinstallation
@@ -431,9 +453,138 @@ begin
   end;
 end;
 
-// La page de dossier ne sert que pour « un autre dossier », ou quand aucun RetroBat n'a ete trouve.
+// ── METTRE A JOUR OU DESINSTALLER (demande user, 2026-10-17) ────────────────────────────────
+// Relance sur un RetroBat ou APIExpose est deja installe, l'installeur propose de le desinstaller. Le nettoyage est fait
+// par l'exe de cet installeur, extrait dans {tmp} et lance dans le dossier du plugin (il le trouve par le dossier courant) :
+// une installation plus ancienne, qui ne connait pas --desinstaller, est donc nettoyee aussi. Le desinstalleur de Windows
+// passe ensuite s'il existe. Medias, identite de la borne et replays restent. En silencieux : /DESINSTALLER=1 /DIR=...
+var
+  ActionPage: TInputOptionWizardPage;
+  Desinstalle: Boolean;
+
+// Vide si tout s'est fait, sinon la raison.
+function DesinstallerApiExpose(Dossier: String): String;
+var
+  Code: Integer;
+  Nettoyage: String;
+begin
+  Result := '';
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /im RetroBat.Api.exe', '', SW_HIDE, ewWaitUntilTerminated, Code);
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /im NelfePlay.LiveStreaming.exe', '', SW_HIDE, ewWaitUntilTerminated, Code);
+  try
+    ExtractTemporaryFile('RetroBat.Api.exe');
+  except
+    Result := 'programme de nettoyage absent de l''installeur';
+    Exit;
+  end;
+  Nettoyage := ExpandConstant('{tmp}\RetroBat.Api.exe');
+  if not Exec(Nettoyage, '--desinstaller', Dossier, SW_HIDE, ewWaitUntilTerminated, Code) then
+  begin
+    Result := 'nettoyage non lance (' + SysErrorMessage(Code) + ')';
+    Exit;
+  end;
+  Log('Desinstallation : nettoyage de ' + Dossier + ', code ' + IntToStr(Code));
+  if Code <> 0 then
+  begin
+    Result := 'nettoyage refuse (code ' + IntToStr(Code) + ')';
+    Exit;
+  end;
+  if FileExists(AddBackslash(Dossier) + 'unins000.exe') then
+  begin
+    Exec(AddBackslash(Dossier) + 'unins000.exe', '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART', Dossier, SW_HIDE,
+      ewWaitUntilTerminated, Code);
+    Log('Desinstallation : desinstalleur de Windows, code ' + IntToStr(Code));
+  end
+  else
+  begin
+    DeleteFile(AddBackslash(Dossier) + 'RetroBat.Api.exe');
+    DeleteFile(AddBackslash(Dossier) + 'desinstaller-apiexpose.bat');
+    Log('Desinstallation : pas de desinstalleur de Windows (installation depuis une archive), programme retire.');
+  end;
+end;
+
+<event('InitializeSetup')>
+function ActionInitializeSetup(): Boolean;
+var
+  Dossier, Raison: String;
+begin
+  Result := True;
+  if ExpandConstant('{param:DESINSTALLER|}') <> '1' then
+    Exit;
+  Result := False;
+  Dossier := RemoveBackslashUnlessRoot(ExpandConstant('{param:DIR|}'));
+  if Dossier = '' then
+  begin
+    Log('Desinstallation : /DIR= manquant, rien n''est fait.');
+    Exit;
+  end;
+  Raison := DesinstallerApiExpose(Dossier);
+  if Raison = '' then
+    Log('Desinstallation terminee : ' + Dossier)
+  else
+    Log('Desinstallation impossible : ' + Raison);
+end;
+
+<event('InitializeWizard')>
+procedure ActionInitializeWizard;
+begin
+  Desinstalle := False;
+  ActionPage := CreateInputOptionPage(wpSelectDir, CustomMessage('ActionPageCaption'),
+    CustomMessage('ActionPageDescription'), '', True, False);
+  ActionPage.Add(CustomMessage('ActionMettreAJour'));
+  ActionPage.Add(CustomMessage('ActionDesinstaller'));
+  ActionPage.SelectedValueIndex := 0;
+end;
+
+<event('CurPageChanged')>
+procedure ActionCurPageChanged(CurPageID: Integer);
+begin
+  if (ActionPage <> nil) and (CurPageID = ActionPage.ID) then
+    ActionPage.SubCaptionLabel.Caption := FmtMessage(CustomMessage('ActionPageSubCaption'),
+      [ApiExposeInstalledVersion(RacineDuDossierChoisi()), RacineDuDossierChoisi()]);
+end;
+
+<event('NextButtonClick')>
+function ActionNextButtonClick(CurPageID: Integer): Boolean;
+var
+  Dossier, Raison: String;
+begin
+  Result := True;
+  if WizardSilent() or (ActionPage = nil) or (CurPageID <> ActionPage.ID) or (ActionPage.SelectedValueIndex <> 1) then
+    Exit;
+  Result := False;
+  Dossier := RemoveBackslashUnlessRoot(WizardForm.DirEdit.Text);
+  if MsgBox(FmtMessage(CustomMessage('ActionConfirmer'), [RacineDuDossierChoisi()]), mbConfirmation, MB_YESNO) <> IDYES then
+    Exit;
+  while EmulationStationTourne() do
+    if MsgBox(CustomMessage('ActionFermerES'), mbInformation, MB_OKCANCEL) = IDCANCEL then
+      Exit;
+  Raison := DesinstallerApiExpose(Dossier);
+  if Raison <> '' then
+  begin
+    MsgBox(FmtMessage(CustomMessage('ActionEchec'), [Raison]), mbError, MB_OK);
+    Exit;
+  end;
+  MsgBox(FmtMessage(CustomMessage('ActionFait'), [RacineDuDossierChoisi(),
+    AddBackslash(GetTempDir()) + 'apiexpose-desinstallation.log']), mbInformation, MB_OK);
+  Desinstalle := True;
+  WizardForm.Close;
+end;
+
+// Apres une desinstallation, l'installeur se ferme sans demander « Quitter l'installation ? ».
+<event('CancelButtonClick')>
+procedure ActionCancelButtonClick(CurPageID: Integer; var Cancel, Confirm: Boolean);
+begin
+  if Desinstalle then
+    Confirm := False;
+end;
+
+// La page de dossier ne sert que pour « un autre dossier », ou quand aucun RetroBat n'a ete trouve. La page « Que faire ? »
+// ne vient que si APIExpose est deja installe dans le RetroBat choisi (jamais en silencieux).
 <event('ShouldSkipPage')>
 function RetroBatShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := (PageID = wpSelectDir) and RetroBatChoisi();
+  if (ActionPage <> nil) and (PageID = ActionPage.ID) then
+    Result := WizardSilent() or (ApiExposeInstalledVersion(RacineDuDossierChoisi()) = '');
 end;

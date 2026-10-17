@@ -73,13 +73,26 @@ public static class Desinstallation
               && nom.EndsWith(motif[(etoile + 1)..], StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>Le dossier est-il bien celui du plugin : nomme APIExpose, sous un dossier plugins ? Pur.</summary>
+    internal static bool DossierDuPlugin(string racine)
+    {
+        var dossier = new DirectoryInfo(racine.TrimEnd('\\', '/'));
+        return dossier.Name.Equals("APIExpose", StringComparison.OrdinalIgnoreCase)
+               && dossier.Parent is { } parent && parent.Name.Equals("plugins", StringComparison.OrdinalIgnoreCase);
+    }
+
     /// <summary>Retire d'es_settings.cfg chaque reglage dont le nom commence par global.apiexpose. Pur sur le document.</summary>
     internal static bool RetirerLesReglages(XDocument document)
     {
         var aRetirer = document.Descendants()
             .Where(e => ((string?)e.Attribute("name") ?? "").StartsWith("global.apiexpose.", StringComparison.OrdinalIgnoreCase))
             .ToList();
-        foreach (var e in aRetirer) e.Remove();
+        foreach (var e in aRetirer)
+        {
+            // Le blanc qui precedait la ligne part avec elle : pas de lignes vides dans le fichier d'ES.
+            if (e.PreviousNode is XText blanc && string.IsNullOrWhiteSpace(blanc.Value)) blanc.Remove();
+            e.Remove();
+        }
         return aRetirer.Count > 0;
     }
 
@@ -96,6 +109,13 @@ public static class Desinstallation
 
         var racine = RetroBatPaths.PluginRoot;
         Dire("desinstallation d'APIExpose : " + racine);
+        // JAMAIS AILLEURS QUE DANS <RetroBat>\plugins\APIExpose : le dossier se vide, une racine mal trouvee viderait autre
+        // chose (le dossier courant, RetroBat entier).
+        if (!DossierDuPlugin(racine))
+        {
+            Dire("REFUS : " + racine + " n'est pas un dossier plugins\\APIExpose ; rien n'est touche.");
+            return 2;
+        }
         if (Process.GetProcessesByName("emulationstation").Length > 0)
         {
             Dire("ATTENTION : EmulationStation tourne ; il reecrira es_settings.cfg en quittant (la collection peut revenir dans la liste).");

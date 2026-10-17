@@ -51,6 +51,15 @@ public sealed class DesinstallationTests : IDisposable
         }.OrderBy(f => f), aSupprimer);
     }
 
+    [Theory]
+    [InlineData(@"E:\RetroBat\plugins\APIExpose", true)]
+    [InlineData(@"D:\Jeux\RetroBat\plugins\apiexpose\", true)]
+    [InlineData(@"E:\RetroBat", false)]                  // une racine mal trouvee : jamais RetroBat entier
+    [InlineData(@"E:\RetroBat\plugins", false)]
+    [InlineData(@"C:\Users\joueur\Downloads\APIExpose", false)]
+    public void Le_nettoyage_ne_tourne_que_dans_plugins_APIExpose(string dossier, bool attendu)
+        => Assert.Equal(attendu, Desinstallation.DossierDuPlugin(dossier));
+
     [Fact]
     public void Seuls_les_reglages_d_APIExpose_sortent_d_es_settings()
     {
