@@ -64,9 +64,9 @@ COLLECTIONS PACK MANAGER
 |---|---|
 | Stop APIExpose | Double-click `stop.bat` |
 | Remove the automatic startup | Double-click `uninstall-es-start-hook.bat` |
-| Uninstall everything | Windows Settings, Apps, "APIExpose (borne RetroBat)": the hook is removed too |
+| Uninstall everything | Windows Settings, Apps, "APIExpose (borne RetroBat)"; or run the installer again and choose "Uninstall"; or double-click `desinstaller-apiexpose.bat` |
 
-Files stay in `plugins\APIExpose` - reinstalling the hook brings everything back.
+Uninstalling removes APIExpose from RetroBat (World Scoring collection, settings, automatic startup, menu) and empties `plugins\APIExpose`, except your media, your cabinet identity and your replays: a reinstall finds everything again. Close RetroBat first.
 
 !!! tip "Simple advice"
     Install the hook once, then start RetroBat normally. Do not delete the `media\`, `resources\`, `tools\` or `wrapper\` folders: APIExpose needs them.

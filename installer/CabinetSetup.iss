@@ -540,8 +540,9 @@ end;
 procedure ActionCurPageChanged(CurPageID: Integer);
 begin
   if (ActionPage <> nil) and (CurPageID = ActionPage.ID) then
-    ActionPage.SubCaptionLabel.Caption := FmtMessage(CustomMessage('ActionPageSubCaption'),
-      [ApiExposeInstalledVersion(RacineDuDossierChoisi()), RacineDuDossierChoisi()]);
+    // (Une ligne qui commence par un crochet est lue par Inno comme un titre de section : le tableau reste en fin de ligne.)
+    ActionPage.SubCaptionLabel.Caption := FmtMessage(CustomMessage('ActionPageSubCaption'), [
+      ApiExposeInstalledVersion(RacineDuDossierChoisi()), RacineDuDossierChoisi()]);
 end;
 
 <event('NextButtonClick')>

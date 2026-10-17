@@ -135,6 +135,34 @@ démarrage (`InstallProfileHostedService`, avant les valeurs par défaut qui rec
 En silencieux, aucun profil n'est déposé, sauf avec `/MEDIAPROFILE=neuf` ou `/MEDIAPROFILE=configure` :
 une mise à jour silencieuse ne change jamais les réglages du joueur.
 
+## Désinstallation (depuis la 1.9.64)
+
+Trois chemins, un seul nettoyage : `RetroBat.Api.exe --desinstaller` (`src/RetroBat.Api/Infrastructure/Desinstallation.cs`).
+
+| Chemin | Pour qui |
+|---|---|
+| Paramètres Windows > Applications > « APIExpose (borne RetroBat) » | installation faite avec un installeur 1.9.64 ou plus récent (`[UninstallRun]` lance le nettoyage) |
+| Relancer l'installeur : page « APIExpose est déjà installé », choix « Désinstaller » | toute installation, même ancienne : l'installeur extrait SON exe dans `{tmp}` et le lance dans le dossier du plugin, puis passe `unins000.exe` s'il existe |
+| `desinstaller-apiexpose.bat` à la racine du plugin | installation depuis une archive, ou désinstalleur trop ancien (le `.bat` arrive par la mise à jour) |
+
+En silencieux : `APIExpose-Cabinet-Setup.exe /VERYSILENT /DESINSTALLER=1 "/DIR=<RetroBat>\plugins\APIExpose" /LOG=<fichier>`.
+
+Le nettoyage retire : RetroArch NelfePlay s'il est installé, le lancement avec ES, le menu d'ES (`es_features_apiexpose.cfg`),
+`emulators\retroarch\core_proxy`, les dossiers d'APIExpose à la racine des thèmes (`.panels`, `.gameinfos`, `.medias`), la
+collection World Scoring (fichier, nom dans `CollectionSystemsCustom`, logos, fonds et lignes de `collections.info`, selon
+les manifestes de propriété), les réglages `global.apiexpose.*` d'`es_settings.cfg`, puis tout le dossier du plugin.
+
+Il GARDE : `media` (les gamelists de RetroBat y pointent ; elles ne sont pas modifiées), l'identité de la borne
+(`state\nelfeplay\device.json`, et la clé Windows `NelfePlay.DeviceKey`, jamais touchée) et les replays
+(`state\nelfenet\replay`). Une réinstallation retrouve la même borne. Il refuse de tourner ailleurs que dans un dossier
+`plugins\APIExpose`. Journal : `%TEMP%\apiexpose-desinstallation.log`.
+
+EmulationStation réécrit `es_settings.cfg` en quittant : le désinstalleur et l'installeur demandent de fermer RetroBat
+s'il tourne (en silencieux, ils le notent seulement).
+
+PIÈGE DE COMPILATION : dans `[Code]`, une ligne qui COMMENCE par `[` (un tableau passé à `FmtMessage` sur une ligne de
+continuation) est lue comme un titre de section : « Invalid section tag ». Garder le crochet en fin de ligne précédente.
+
 ## Modifier puis vérifier
 
 ### 1. Contrôle rapide du code (quelques secondes)
