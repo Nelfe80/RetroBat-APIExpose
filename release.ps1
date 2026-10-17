@@ -197,6 +197,8 @@ $autorises = @(
     'resources/gamelist/', 'resources/startup-overlay/', 'resources/config-ESmenus/',
     'resources/scraping/', 'resources/iccards/', 'resources/colors/', 'resources/history/',
     'resources/command/', 'resources/locales/', 'tools/mem-explorer/',
+    # Les clips des directs (Data Pack, dossier "live" de DataPackOptions depuis le 16 octobre 2026).
+    'resources/live/',
     # Le verificateur de score (APIExposeOCR), construit depuis son propre depot et
     # depose ici par APIExposeOCR\tools\release.ps1, comme mem-explorer.
     'tools/score-verifier/',
