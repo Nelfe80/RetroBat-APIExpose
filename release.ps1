@@ -98,6 +98,8 @@ $ex = @(
     # Binaires tiers : lourds, et fournis par l'INSTALLER, pas par les archives. Un pack
     # runtime n'a pas a redistribuer ffmpeg, ImageMagick ni translateLocally.
     "-x!$name\tools\ffmpeg", "-x!$name\tools\imagemagick", "-x!$name\tools\translateLocally",
+    # L'archive de RetroArch NelfePlay (nocturne retiree en 1.9.61) ne part ni dans le full.7z ni dans l'installeur.
+    "-x!$name\tools\retroarch-nelfeplay",
     # resources\ra : donnees RetroAchievements personnelles de la borne (leaderboards).
     "-x!$name\resources\ra",
     # resources\ram\.user : definitions .MEM PERSONNELLES (couche perso, pre-integration
