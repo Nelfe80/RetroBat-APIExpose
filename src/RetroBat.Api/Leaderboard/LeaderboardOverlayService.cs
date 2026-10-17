@@ -544,6 +544,21 @@ public sealed class LeaderboardOverlayService : IDisposable
                 if (!Visible) Show();
                 PasserDevant();
                 Invalidate();
+                // OU EST LE PANNEAU (2026-10-17 : un joueur ne le voyait pas, ES en plein ecran comme sans bordure) : sa
+                // place, l'ecran d'ES et s'il a ete trouve, et le programme dont une fenetre passerait devant nous.
+                try
+                {
+                    var es = EmulatorForeground.FenetreDEmulationStation();
+                    var ecran = es != IntPtr.Zero ? Screen.FromHandle(es) : Screen.PrimaryScreen;
+                    _service._logger.LogInformation(
+                        "Classement : panneau a {Place} ; ES {Es} sur l'ecran {Ecran} {EcranPlace} ; devant nous : {Devant}.",
+                        Bounds, es != IntPtr.Zero ? "trouve" : "introuvable (ecran principal)", ecran?.DeviceName, ecran?.Bounds,
+                        QuiNousPasseDevant() ?? "personne");
+                }
+                catch (Exception ex)
+                {
+                    _service._logger.LogDebug(ex, "Classement : place du panneau illisible.");
+                }
                 // Ce qui separe « ouvert » de « VISIBLE » : l'attente du fil de la fenetre, ou le
                 // premier dessin. Mesure pour trancher (2026-09-30).
                 if (_service._depuisLAppui is { } chrono)
@@ -633,16 +648,34 @@ public sealed class LeaderboardOverlayService : IDisposable
         }
 
         /// <summary>Une fenetre visible d'un AUTRE processus se trouve-t-elle au-dessus de nous ?</summary>
-        private bool QuelquUnNousPasseDevant()
+        private bool QuelquUnNousPasseDevant() => PidDevantNous() != 0;
+
+        private uint PidDevantNous()
         {
             var moi = GetCurrentProcessId();
             for (var h = GetWindow(Handle, GwHwndPrev); h != IntPtr.Zero; h = GetWindow(h, GwHwndPrev))
             {
                 if (!IsWindowVisible(h)) continue;
                 GetWindowThreadProcessId(h, out var pid);
-                if (pid != moi) return true;
+                if (pid != moi) return pid;
             }
-            return false;
+            return 0;
+        }
+
+        /// <summary>Le programme dont une fenetre visible passe devant le panneau, ou null.</summary>
+        private string? QuiNousPasseDevant()
+        {
+            var pid = PidDevantNous();
+            if (pid == 0) return null;
+            try
+            {
+                using var p = Process.GetProcessById((int) pid);
+                return p.ProcessName;
+            }
+            catch (Exception)
+            {
+                return "pid " + pid;
+            }
         }
 
         /// <summary>
