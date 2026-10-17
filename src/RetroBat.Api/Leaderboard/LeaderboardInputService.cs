@@ -174,6 +174,20 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         _ = Task.Run(() => ChienDeGardeAsync(_arret.Token), CancellationToken.None);
         _ = Task.Run(() => GuetterLesDirectsSuivisAsync(_arret.Token), CancellationToken.None);
         _logger.LogInformation("Classement : panneau arme (appui long sur le slot {Slot}).", SlotValider);
+        // A ET B INVERSES DANS ES (2026-10-17) : le « valider » d'ES change de bouton, pas le notre. Dit au demarrage, pour
+        // qu'un « le panneau ne s'ouvre pas » s'explique a la lecture du journal.
+        try
+        {
+            if (new RetroBat.Domain.Services.EsSettingsStore().ReadAllSettings().TryGetValue("InvertButtons", out var inverse)
+                && string.Equals(inverse, "true", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.LogInformation("Classement : ES a les boutons A et B inverses (InvertButtons) ; le panneau s'ouvre toujours par le slot {Slot}.", SlotValider);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Classement : reglage InvertButtons d'ES illisible.");
+        }
 
         // Les pictogrammes se preparent maintenant, pas a la premiere ouverture : le joueur ne
         // doit jamais attendre qu'ImageMagick travaille pour voir son classement.
@@ -293,6 +307,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 if (appuye) Direction(identite);
                 return;
             }
+            if (systeme is null) NoterUnAppuiLongAilleurs(appuye, identite, slot);
             if (slot is null) return;
 
             if (slot == SlotValider)
@@ -357,6 +372,39 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             _logger.LogWarning(ex, "Classement : entree ignoree.");
         }
     }
+
+    /// <summary>
+    /// L'APPUI LONG SUR UN AUTRE BOUTON (2026-10-17 : « pas de leaderboard » chez un joueur a la manette, et pas une ligne
+    /// dans son journal). Le panneau ne s'ouvre que par le bouton du slot 1 ; un joueur qui en tient un autre (A et B
+    /// inverses dans ES, manette sans cartographie de borne) ne voyait rien s'ouvrir, et nous ne le savions pas. On le dit,
+    /// une fois par bouton et par demarrage de l'API, quand ES est devant et le panneau ferme.
+    /// </summary>
+    private void NoterUnAppuiLongAilleurs(bool appuye, string? identite, int? slot)
+    {
+        if (string.IsNullOrEmpty(identite) || slot == SlotValider || _modele.Etat != LeaderboardPanelModel.Foyer.Ferme)
+        {
+            _autreAppui = null;
+            return;
+        }
+        if (appuye)
+        {
+            _autreAppui = (identite, slot, DateTime.UtcNow);
+            return;
+        }
+        if (_autreAppui is not { } a || !string.Equals(a.Identite, identite, StringComparison.OrdinalIgnoreCase)) return;
+        _autreAppui = null;
+        if ((DateTime.UtcNow - a.Depuis).TotalMilliseconds < Math.Max(200, _options.CurrentValue.Leaderboard.LongPressMs)
+            || !EsEstDevant() || !_appuisLongsSignales.Add(identite))
+        {
+            return;
+        }
+        _logger.LogInformation(
+            "Classement : appui long sur le bouton {Identite} ({Slot}) ; le panneau ne s'ouvre que par un appui long sur le bouton du slot {Valider}.",
+            identite, a.Slot is { } s ? "slot " + s : "sans slot dans la cartographie de la borne", SlotValider);
+    }
+
+    private (string Identite, int? Slot, DateTime Depuis)? _autreAppui;
+    private readonly HashSet<string> _appuisLongsSignales = new(StringComparer.OrdinalIgnoreCase);
 
     private void Direction(string? identite)
     {
