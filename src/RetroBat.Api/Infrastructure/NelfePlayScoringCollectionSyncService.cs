@@ -151,7 +151,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         _minimumEntreDeuxAppels = minimumEntreDeuxAppels ?? TimeSpan.FromSeconds(30);
         _emulateurTourne = emulateurTourne ?? EmulatorForeground.EmulateurTourne;
         _contenuConfirme = contenuConfirme
-            ?? ((candidat, jeu) => ContenuConfirme(candidat, jeu, GamelistIdentity.DeclaredSha1, Md5DuContenu));
+            ?? ((candidat, jeu) => ContenuConfirme(candidat, jeu, GamelistIdentity.DeclaredSha1, Md5DuContenu,
+                GamelistIdentity.DeclaredBootlegOrHack));
     }
 
     /// <summary>Le dernier etat connu, tel que l'endpoint de statut le publie.</summary>
@@ -871,12 +872,19 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     ///   BIOS Neo-Geo : le second n'entre jamais, meme sous le meme nom.
     /// - Une console sans hash dans sa gamelist (jeu jamais scrape) : la borne calcule le md5 du
     ///   fichier, ou du fichier unique d'un zip, plutot que de l'exclure a tort.
+    /// - LES BOOTLEGS ET LES HACKS (2026-10-18) : un set que le referentiel marque ainsi n'entre que si
+    ///   le .MEM le nomme, c'est-a-dire porte le md5 de son nom de set (l'empreinte arcade des .MEM,
+    ///   « mspacman.zip » = md5 de « mspacman »). Le sha1 declare d'un set est souvent celui d'un
+    ///   fichier qu'il partage avec son parent : mspacmab, bootleg de Ms. Pac-Man, porte le meme que
+    ///   mspacman et entrait dans la collection, alors que sa memoire ne suit pas la definition (score
+    ///   qui ne monte pas, faux credits au demarrage, chez un joueur).
     /// </summary>
     internal static bool ContenuConfirme(
         InstalledGame candidat,
         OpenGame jeu,
         Func<string?, string?, string?, string?> sha1DuSet,
-        Func<string, string?> md5DuContenu)
+        Func<string, string?> md5DuContenu,
+        Func<string?, string?, bool>? bootlegOuHack = null)
     {
         var hashes = jeu.ContentHashes;
         if (hashes is null) return false;
@@ -893,12 +901,18 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         {
             var set = Path.GetFileNameWithoutExtension(candidat.AbsolutePath);
             var sha1 = set.Length == 0 ? null : sha1DuSet(candidat.CanonicalSystemId, jeu.RomGroup, set);
-            return sha1 is { Length: > 0 } && sha1s.Contains(sha1);
+            if (sha1 is not { Length: > 0 } || !sha1s.Contains(sha1)) return false;
+            return bootlegOuHack?.Invoke(candidat.CanonicalSystemId, set) != true || connus.Contains(Md5DuNomDeSet(set));
         }
 
         var calcule = md5DuContenu(candidat.AbsolutePath);
         return calcule is { Length: > 0 } && connus.Contains(calcule);
     }
+
+    /// <summary>L'empreinte arcade d'un set dans un .MEM : le md5 de son nom, en minuscules. Pur.</summary>
+    internal static string Md5DuNomDeSet(string set)
+        => Convert.ToHexString(System.Security.Cryptography.MD5.HashData(System.Text.Encoding.UTF8.GetBytes(set.Trim().ToLowerInvariant())))
+            .ToLowerInvariant();
 
     /// <summary>Au-dela, ce n'est plus une cartouche : on ne lit pas un disque entier pour une collection.</summary>
     private const long PlafondMd5 = 64L * 1024 * 1024;

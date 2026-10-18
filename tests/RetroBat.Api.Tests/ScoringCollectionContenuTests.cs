@@ -70,6 +70,43 @@ public class ScoringCollectionContenuTests
         Assert.True(NelfePlayScoringCollectionSyncService.ContenuConfirme(fichier, DoubleDragon, Referentiel, AucunCalcul));
     }
 
+    // mspacmab (2026-10-18, chez un joueur) : bootleg de Ms. Pac-Man, meme sha1 declare que mspacman (un fichier partage).
+    private const string Sha1MsPacMan = "5e8b472b615f12efca3fe792410c23619f067845";
+
+    private static OpenGame MsPacMan(params string[] md5) => new()
+    {
+        SystemId = "arcade",
+        RomGroup = "ms-pac-man",
+        ContentHashes = new ContentHashes { Md5 = md5, Sha1 = [Sha1MsPacMan] },
+    };
+
+    private static readonly Func<string?, string?, string?, string?> ReferentielPacMan = (_, _, set) =>
+        set?.ToLowerInvariant() is "mspacman" or "mspacmab" ? Sha1MsPacMan : null;
+
+    private static readonly Func<string?, string?, bool> Bootlegs = (_, set) => string.Equals(set, "mspacmab", StringComparison.OrdinalIgnoreCase);
+
+    [Fact]
+    public void Le_MEM_nomme_ses_sets_par_le_md5_de_leur_nom()
+        => Assert.Equal("01052a074f9e7ce8dc823a5dd2155d14", NelfePlayScoringCollectionSyncService.Md5DuNomDeSet("mspacman"));
+
+    [Fact]
+    public void Un_bootleg_au_sha1_du_parent_n_entre_pas_sans_le_MEM()
+    {
+        var jeu = MsPacMan("01052a074f9e7ce8dc823a5dd2155d14");
+        Assert.True(NelfePlayScoringCollectionSyncService.ContenuConfirme(
+            Arcade("E:/roms/mame/mspacman.zip"), jeu, ReferentielPacMan, AucunCalcul, Bootlegs));
+        Assert.False(NelfePlayScoringCollectionSyncService.ContenuConfirme(
+            Arcade("E:/roms/mame/mspacmab.zip"), jeu, ReferentielPacMan, AucunCalcul, Bootlegs));
+    }
+
+    [Fact]
+    public void Un_bootleg_nomme_par_le_MEM_entre()
+    {
+        var jeu = MsPacMan("01052a074f9e7ce8dc823a5dd2155d14", NelfePlayScoringCollectionSyncService.Md5DuNomDeSet("mspacmab"));
+        Assert.True(NelfePlayScoringCollectionSyncService.ContenuConfirme(
+            Arcade("E:/roms/mame/MSPACMAB.zip"), jeu, ReferentielPacMan, AucunCalcul, Bootlegs));
+    }
+
     [Fact]
     public void Un_profil_sans_aucun_hash_ne_confirme_rien()
     {

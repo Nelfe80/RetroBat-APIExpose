@@ -107,6 +107,59 @@ public static class GamelistIdentity
 
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, string?> CacheNom = new();
 
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> CacheBootleg =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Le referentiel marque-t-il ce SET comme un bootleg ou un hack (« t » = hack, ou « bootleg » / « hack » dans ses
+    /// « flg ») ? Cherche le set exact, jamais le groupe : un bootleg range sous le groupe de son parent prendrait sinon
+    /// les drapeaux du parent. Un set inconnu n'est pas marque.
+    /// </summary>
+    public static bool DeclaredBootlegOrHack(string? systemId, string? set)
+    {
+        var nom = (set ?? string.Empty).Trim();
+        if (nom.Length == 0) return false;
+
+        var cle = (systemId ?? "") + "|" + nom;
+        if (CacheBootleg.TryGetValue(cle, out var connu)) return connu;
+
+        var racine = Path.Combine(AppContext.BaseDirectory, "resources", "gamelist", "systems");
+        var systemes = new List<string>();
+        if (!string.IsNullOrWhiteSpace(systemId)) systemes.Add(systemId.Trim());
+        foreach (var repli in ReplisArcade)
+        {
+            if (!systemes.Contains(repli, StringComparer.OrdinalIgnoreCase)) systemes.Add(repli);
+        }
+
+        string? trouve = null;
+        foreach (var systeme in systemes)
+        {
+            trouve = Chercher(Path.Combine(racine, systeme + "_lt.json"), "", nom, Marque);
+            if (trouve is not null) break;
+        }
+
+        var marque = trouve is { Length: > 0 };
+        CacheBootleg[cle] = marque;
+        return marque;
+    }
+
+    /// <summary>« bootleg » ou « hack » si le referentiel le dit de ce set, sinon "" (connu, sans marque).</summary>
+    private static string Marque(JsonElement root)
+    {
+        if (root.TryGetProperty("t", out var t) && string.Equals(t.GetString(), "hack", StringComparison.OrdinalIgnoreCase))
+            return "hack";
+        if (root.TryGetProperty("flg", out var flg) && flg.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var f in flg.EnumerateArray())
+            {
+                var v = f.ValueKind == JsonValueKind.String ? f.GetString() : null;
+                if (string.Equals(v, "bootleg", StringComparison.OrdinalIgnoreCase) || string.Equals(v, "hack", StringComparison.OrdinalIgnoreCase))
+                    return v!.ToLowerInvariant();
+            }
+        }
+        return "";
+    }
+
     /// <summary>
     /// Le NOM declare du jeu (« 19XX: The War Against Destiny »), ou null. Sert a inscrire dans sa
     /// gamelist un jeu qu'EmulationStation ne connait pas encore : un set d'arcade s'y appellerait
