@@ -137,7 +137,7 @@ public sealed class DirectPartageService : IHostedService
     /// clip), bande sous le jeu. Pur.
     /// </summary>
     internal static IReadOnlyList<string> OptionsDuPassage(int debitKbps, string commande, string? clip, string? empreinte, string bandeau,
-        string? applaudissements = null, string? empreinteApplaudissements = null)
+        string? applaudissements = null, string? empreinteApplaudissements = null, string? relance = null, string? empreinteRelance = null)
     {
         var o = new List<string> { "--debit", Math.Clamp(debitKbps, 500, 9000).ToString(CultureInfo.InvariantCulture), "--commande", commande,
             "--attente-max", "90", "--bandeau", bandeau };
@@ -145,7 +145,27 @@ public sealed class DirectPartageService : IHostedService
         // Les applaudissements d'un record tombe pendant le passage (18 octobre 2026), joues avant la transition.
         if (applaudissements is not null && !string.IsNullOrWhiteSpace(empreinteApplaudissements))
             o.AddRange(["--applaudissements", applaudissements, "--applaudissements-sha256", empreinteApplaudissements.Trim()]);
+        // « Try again », a la place de la transition quand le joueur relance une partie ratee (18 octobre 2026).
+        if (relance is not null && !string.IsNullOrWhiteSpace(empreinteRelance))
+            o.AddRange(["--relance", relance, "--relance-sha256", empreinteRelance.Trim()]);
         return o;
+    }
+
+    /// <summary>Une partie plus courte que ca, sans autre joueur annonce, est une partie ratee que le joueur relance.</summary>
+    internal static readonly TimeSpan DureeDUneRelance = TimeSpan.FromMinutes(2);
+
+    /// <summary>
+    /// LE JOUEUR RELANCE (demande du user, 18 octobre 2026) : AshTaste92 relancait Bomb Jack toutes les 30 a 60 s apres un
+    /// depart rate, et chaque fin de partie rejouait la transition de la chaine, en boucle. Une partie courte, ou suivie
+    /// d'une nouvelle partie deja lancee sur la borne, finit sur « try again », sauf si un autre joueur est annonce ou qu'un
+    /// direct de record prend le relais. Pur.
+    /// </summary>
+    internal static bool EstUneRelance(TimeSpan duree, string? joueurAnnonce, string? joueur, bool nouvellePartieLancee, bool alert)
+    {
+        if (alert) return false;
+        var autreJoueur = !string.IsNullOrWhiteSpace(joueurAnnonce)
+            && !string.Equals(joueurAnnonce.Trim(), (joueur ?? "").Trim(), StringComparison.OrdinalIgnoreCase);
+        return !autreJoueur && (nouvellePartieLancee || duree < DureeDUneRelance);
     }
 
     /// <summary>
@@ -340,8 +360,11 @@ public sealed class DirectPartageService : IHostedService
                     if (!finAnnoncee) _journal.LogInformation("Direct partage : fin du passage de {Jeu}.", romGroup);
                     finAnnoncee = true;
                     var suivante = r!["next"] as JsonObject;
+                    bool nouvellePartie;
+                    lock (_verrou) nouvellePartie = _enCours is not null && _enCours != p;
+                    var relance = EstUneRelance(DateTime.UtcNow - p.Debut, (string?)suivante?["player"], p.BandeJoueur, nouvellePartie, p.Alert);
                     EcrireLaCommande(p, fin: true, arret: false, (string?)suivante?["player"], (string?)suivante?["game"],
-                        RecordBattu(Interlocked.Read(ref p.MeilleurScore), p.Record, p.NonCertifiable, p.Alert));
+                        RecordBattu(Interlocked.Read(ref p.MeilleurScore), p.Record, p.NonCertifiable, p.Alert), relance);
                 }
                 else if (role == "stop" || (role == "none" && exe is not null))
                 {
@@ -418,8 +441,11 @@ public sealed class DirectPartageService : IHostedService
         var bravo = (r["clips"] as JsonObject)?["applause"] as JsonObject;
         var applaudissements = CheminDuClip(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, (string?)bravo?["file"]);
         if (applaudissements is not null && !File.Exists(applaudissements)) applaudissements = null;
+        var essai = (r["clips"] as JsonObject)?["relaunch"] as JsonObject;
+        var relanceClip = CheminDuClip(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, (string?)essai?["file"]);
+        if (relanceClip is not null && !File.Exists(relanceClip)) relanceClip = null;
         var options = OptionsDuPassage((int?)r["bitrate_kbps"] ?? 3000, CheminDeLaCommande, clip, (string?)transition?["sha256"], CheminDuBandeau,
-            applaudissements, (string?)bravo?["sha256"]);
+            applaudissements, (string?)bravo?["sha256"], relanceClip, (string?)essai?["sha256"]);
         secours = new CancellationTokenSource();
         var jeton = secours.Token;
         var tache = Task.Run(async () =>
@@ -427,7 +453,7 @@ public sealed class DirectPartageService : IHostedService
             if (precedent is not null)
             {
                 // L'ordre d'arret, que l'exe precedent lit chaque seconde ; au-dela de 15 s, son lanceur l'arrete.
-                Ecrire(CheminDeLaCommande, CommandeJson(fin: true, arret: true, null, null, false));
+                Ecrire(CheminDeLaCommande, CommandeJson(fin: true, arret: true, null, null, false, false));
                 if (await Task.WhenAny(precedent, Task.Delay(TimeSpan.FromSeconds(15))).ConfigureAwait(false) != precedent)
                 {
                     try { secoursPrecedent?.Cancel(); } catch (ObjectDisposedException) { /* deja fini */ }
@@ -437,7 +463,7 @@ public sealed class DirectPartageService : IHostedService
                     relais ? "reprend le meme direct" : "prend l'antenne");
             }
             EcrireLeBandeau(p.BandeJoueur, p.BandeJeu, p.BandeSysteme, LibelleDuMode(p.RegleDuRecord ?? regleParDefaut), p.RecordTexte);
-            Ecrire(CheminDeLaCommande, CommandeJson(fin: false, arret: false, null, null, false));
+            Ecrire(CheminDeLaCommande, CommandeJson(fin: false, arret: false, null, null, false, false));
             return await LanceurDuDirect.DiffuserAsync(exe, film.Fichier, adresse, film.Rotation ?? 0, _journal, jeton,
                 options: options, delaiDeFin: TimeSpan.FromSeconds(10)).ConfigureAwait(false);
         });
@@ -450,19 +476,20 @@ public sealed class DirectPartageService : IHostedService
     }
 
     /// <summary>La commande de l'exe ; seule la partie a qui l'exe appartient l'ecrit (une ancienne partie se tait).</summary>
-    private void EcrireLaCommande(Partie p, bool fin, bool arret, string? joueur, string? jeu, bool recordBattu = false)
+    private void EcrireLaCommande(Partie p, bool fin, bool arret, string? joueur, string? jeu, bool recordBattu = false, bool relance = false)
     {
         lock (_verrou) if (_aLAntenne != p) return;
-        Ecrire(CheminDeLaCommande, CommandeJson(fin, arret, joueur, jeu, recordBattu));
+        Ecrire(CheminDeLaCommande, CommandeJson(fin, arret, joueur, jeu, recordBattu, relance));
     }
 
-    internal static string CommandeJson(bool fin, bool arret, string? joueur, string? jeu, bool recordBattu)
+    internal static string CommandeJson(bool fin, bool arret, string? joueur, string? jeu, bool recordBattu, bool relance)
     {
         var commande = new JsonObject
         {
             ["fin"] = fin, ["arret"] = arret,
             ["suivant"] = joueur is null && jeu is null ? null : new JsonObject { ["joueur"] = joueur, ["jeu"] = jeu },
             ["recordBattu"] = recordBattu,
+            ["relance"] = relance,
         };
         return commande.ToJsonString();
     }

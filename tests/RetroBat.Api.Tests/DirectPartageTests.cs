@@ -91,11 +91,29 @@ public sealed class DirectPartageTests
     [Fact]
     public void La_commande_dit_a_l_exe_si_le_record_est_tombe()
     {
-        // Le format que lit CarteASuivre dans l'exe du direct (0.5.5).
-        Assert.Equal("""{"fin":true,"arret":false,"suivant":{"joueur":"player","jeu":"1942"},"recordBattu":true}""",
-            DirectPartageService.CommandeJson(true, false, "player", "1942", true));
-        Assert.Equal("""{"fin":true,"arret":true,"suivant":null,"recordBattu":false}""",
-            DirectPartageService.CommandeJson(true, true, null, null, false));
+        // Le format que lit CarteASuivre dans l'exe du direct (0.5.6).
+        Assert.Equal("""{"fin":true,"arret":false,"suivant":{"joueur":"player","jeu":"1942"},"recordBattu":true,"relance":false}""",
+            DirectPartageService.CommandeJson(true, false, "player", "1942", true, false));
+        Assert.Equal("""{"fin":true,"arret":true,"suivant":null,"recordBattu":false,"relance":true}""",
+            DirectPartageService.CommandeJson(true, true, null, null, false, true));
+    }
+
+    [Theory]
+    [InlineData(45, null, false, false, true)]          // un depart rate, personne d'annonce
+    [InlineData(45, "player", false, false, true)]      // la carte annonce deja sa nouvelle partie
+    [InlineData(45, "autre", false, false, false)]      // un autre joueur prend l'antenne
+    [InlineData(300, null, false, false, false)]        // une vraie partie : la transition de la chaine
+    [InlineData(300, null, true, false, true)]          // une longue partie, mais il a deja relance
+    [InlineData(45, null, false, true, false)]          // un direct de record prend le relais
+    public void Une_partie_ratee_puis_relancee_finit_sur_try_again(int secondes, string? annonce, bool nouvelle, bool alert, bool attendu)
+        => Assert.Equal(attendu, DirectPartageService.EstUneRelance(TimeSpan.FromSeconds(secondes), annonce, "Player", nouvelle, alert));
+
+    [Fact]
+    public void Try_again_ne_part_qu_avec_son_empreinte()
+    {
+        var avec = DirectPartageService.OptionsDuPassage(3000, "c", null, null, "b", null, null, "TryAgain.mp4", "EE");
+        Assert.Equal(["--relance", "TryAgain.mp4", "--relance-sha256", "EE"], avec.Skip(8));
+        Assert.DoesNotContain("--relance", DirectPartageService.OptionsDuPassage(3000, "c", null, null, "b", null, null, "TryAgain.mp4", " "));
     }
 
     [Fact]
