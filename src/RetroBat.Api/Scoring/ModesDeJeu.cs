@@ -174,6 +174,21 @@ public static class ModesDeJeu
             ? contexte
             : contexte with { Mode = ModeDesDrapeaux(modes, contexte.Drapeaux) };
 
+    /// <summary>
+    /// LE MODE JOUE, PENDANT LA PARTIE (2026-10-18) : le classement d'une partie seule que disent le mode et les drapeaux
+    /// lus jusqu'ici. Le code d'un mode se tape a l'ecran titre, avant le depart : le direct (bandeau, applaudissements,
+    /// direct de record) n'a pas a attendre la fin de la partie. Null quand aucun classement ne couvre ce mode. Pur.
+    /// </summary>
+    public static string? RegleDuMode(IReadOnlyList<JsonElement> profils, IReadOnlyList<ModeParDrapeaux> modes, ContexteDeJeu contexte)
+    {
+        var resolu = Resoudre(contexte, modes);
+        if (resolu.Mode == SansClassement) return null;
+        return ChoisirProfil(profils, resolu.Mode) is { } profil && profil.TryGetProperty("ruleset", out var r)
+               && r.ValueKind == JsonValueKind.String && r.GetString() is { Length: > 0 } regle
+            ? regle
+            : null;
+    }
+
     /// <summary>Les profils des parties seules : tous sauf la categorie 1CC MULTI et ses modes.</summary>
     public static List<JsonElement> SansLeMulti(IReadOnlyList<JsonElement> profils)
         => profils.Where(p => !EstMulti(Regle(p))).ToList();

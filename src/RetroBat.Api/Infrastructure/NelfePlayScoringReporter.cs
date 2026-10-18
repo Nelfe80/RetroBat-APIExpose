@@ -240,6 +240,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// mode le run retenu a ete joue. Voir ModesDeJeu.
     /// </summary>
     private RetroBat.Api.Scoring.ContexteDeJeu _contexte = RetroBat.Api.Scoring.ContexteDeJeu.Vide;
+    // Les profils lus au lancement, et leurs modes par drapeaux : le direct y lit le mode joue (RegleDuModeEnCours).
+    private (string RomGroup, List<JsonElement> Profils, List<RetroBat.Api.Scoring.ModesDeJeu.ModeParDrapeaux> Modes)? _profilsDuLancement;
     private readonly List<RetroBat.Api.Scoring.ContexteDeJeu> _contextes = new();
 
     /// <summary>
@@ -1050,6 +1052,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             if (string.IsNullOrEmpty(credential)) return;
             _ = PrendreLeTicketDuLancementAsync(credential);
             var (profilsDuJeu, profilsDuSite) = await ProfilsAsync(credential, systemId, romGroup, ct).ConfigureAwait(false);
+            if (profilsDuJeu.Count > 0)
+            {
+                var modesDuJeu = RetroBat.Api.Scoring.ModesDeJeu.ModesParDrapeaux(profilsDuJeu);
+                lock (_sync) _profilsDuLancement = (romGroup.Trim(), profilsDuJeu, modesDuJeu);
+            }
             // Le profil d'une partie seule : jamais le 1CC MULTI, ni le 1LC, meme s'ils venaient en tete.
             var seules = RetroBat.Api.Scoring.ModesDeJeu.DuSolo(profilsDuJeu);
             JsonElement? profile = seules.Count > 0 ? seules[0] : null;
@@ -2198,6 +2205,22 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // passait pour un continue (Double Dragon coupe a 29 960 pour 41 520 au premier credit).
             // Elles restent relevees, pour le 1LC et pour le diagnostic.
             return;
+        }
+    }
+
+    /// <summary>
+    /// LE MODE JOUE, PENDANT LA PARTIE (2026-10-18) : le classement que disent le mode et les drapeaux lus jusqu'ici, avec
+    /// les profils du lancement. Le direct partage et le direct de record s'en servent (record de la bande, applaudissements,
+    /// direct a l'approche). Null quand on ne sait pas : jeu dont les profils n'ont pas ete lus, ou mode sans classement.
+    /// La soumission, elle, tranche toujours en fin de partie, sur le mode en vigueur au debut du run retenu.
+    /// </summary>
+    public string? RegleDuModeEnCours(string romGroup)
+    {
+        lock (_sync)
+        {
+            if (_profilsDuLancement is not { } p || !string.Equals(p.RomGroup, romGroup.Trim(), StringComparison.OrdinalIgnoreCase))
+                return null;
+            return RetroBat.Api.Scoring.ModesDeJeu.RegleDuMode(p.Profils, p.Modes, _contexte);
         }
     }
 

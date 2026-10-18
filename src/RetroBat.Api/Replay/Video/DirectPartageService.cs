@@ -38,6 +38,7 @@ public sealed class DirectPartageService : IHostedService
     private readonly bool _actif;
     private volatile bool _essai;
     private IDisposable? _abonnement;
+    private readonly NelfePlayScoringReporter? _rapporteur;
 
     /// <summary>La partie en cours, et ce que son passage en sait.</summary>
     private sealed class Partie
@@ -47,8 +48,14 @@ public sealed class DirectPartageService : IHostedService
         // La partie certifiee s'est fermee (un continue, l'arrivee d'un joueur) : elle cede l'antenne a qui la demande.
         public volatile bool NonCertifiable;
         public long MeilleurScore;
-        // Le record a battre (rang 1 du classement au debut de la partie), quand plus haut est mieux : rien sinon.
+        // Le record a battre (rang 1 du classement du mode joue), quand plus haut est mieux : rien sinon, ni quand le mode
+        // d'un jeu a modes n'est pas connu.
         public long? Record;
+        // LE MODE JOUE (2026-10-18) : le classement dont la bande montre le record, et ce texte. Null : mode inconnu.
+        public string? RegleDuRecord;
+        public string RecordTexte = "";
+        // La bande sous le jeu, telle que le site l'a donnee au passage : relue pour la reecrire quand le mode change.
+        public string? BandeJoueur, BandeJeu, BandeSysteme, BandeRegleParDefaut;
         public readonly DateTime Debut = DateTime.UtcNow;
         // LE RELAIS (2026-10-18) : la cle de la partie, pour que le site distingue deux parties de la borne (l'ancienne
         // finit sa fin de passage pendant que la nouvelle se presente pour reprendre le meme direct).
@@ -65,7 +72,8 @@ public sealed class DirectPartageService : IHostedService
     public DirectPartageService(IEventBus bus, ApiContext contexte, LeaderboardClient classement, NelfePlayAgentService agent,
         RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider wrapper, ReplayCaptureService capture,
         ReplayVideoPublisher site, IConfiguration configuration, ILogger<DirectPartageService> journal,
-        NelfePlayScoringCollectionSyncService? collection = null, PartieNelfePlayService? partie = null)
+        NelfePlayScoringCollectionSyncService? collection = null, PartieNelfePlayService? partie = null,
+        NelfePlayScoringReporter? rapporteur = null)
     {
         _bus = bus;
         _contexte = contexte;
@@ -77,6 +85,7 @@ public sealed class DirectPartageService : IHostedService
         _journal = journal;
         _collection = collection;
         _partie = partie;
+        _rapporteur = rapporteur;
         _actif = configuration.GetValue("Video:Shared:Enabled", true);
         _essai = configuration.GetValue("Video:Shared:Test", false);
     }
@@ -220,31 +229,19 @@ public sealed class DirectPartageService : IHostedService
             var def = _wrapper.ResolveDefinitionFor(brut, jeu.SystemId);
             if (!(def.AliasMatched || def.DefinitionExists) || string.IsNullOrWhiteSpace(def.Rom)) return;
             var romGroup = def.Rom.Trim().ToLowerInvariant();
-            var regle = LeaderboardClient.ReglePrincipale(_collection?.ReglesOuvertes(romGroup) ?? Array.Empty<string>());
+            var regles = _collection?.ReglesOuvertes(romGroup) ?? Array.Empty<string>();
+            var regle = LeaderboardClient.ReglePrincipale(regles);
             if (regle.Length == 0) regle = "1cc";
-
-            // Le record a battre, pour la bande.
-            var record = "";
-            try
-            {
-                var classement = await _classement.MondeAsync(romGroup, _agent.Status.Pseudo ?? "", CancellationToken.None, regle)
-                    .ConfigureAwait(false);
-                if (classement.Lignes.OrderBy(l => l.Rang).FirstOrDefault() is { } tete)
-                {
-                    record = TexteDuRecord(tete.Valeur, tete.Joueur);
-                    // Un contre-la-montre ne se compare pas au score : pas d'applaudissements a sa fin.
-                    if (!tete.PlusBasEstMieux) p.Record = tete.Valeur;
-                }
-            }
-            catch (Exception)
-            {
-                // Sans classement, la bande dit nelfeplay.com.
-            }
+            // UN JEU A MODES (2026-10-18) : le record de la bande et des applaudissements est celui du mode joue, que le
+            // rapporteur lit pendant la partie. Le 18 octobre, la bande d'AshTaste92 montrait le record du 1CC normal de
+            // Bubble Bobble (1 013 700) quel que soit son mode (ORIGINAL : 1 333 090). Mode inconnu : ni record ni bravo.
+            var aModes = !DirectDuRecordService.SansModes(regles);
+            await MettreAJourLeRecordAsync(p, romGroup, aModes ? _rapporteur?.RegleDuModeEnCours(romGroup) : regle).ConfigureAwait(false);
             // Le systeme du classement : le dossier de la definition (arcade, megadrive, mastersystem...), jamais celui d'ES
             // (fbneo, mame). Le site le devinait depuis le 17 octobre 2026 ; le titre du direct disait « (Arcade) » pour un
             // jeu Master System quand il manquait.
             var systeme = (def.SystemId ?? "").Trim().ToLowerInvariant();
-            await PasserAsync(p, romGroup, regle, record, systeme).ConfigureAwait(false);
+            await PasserAsync(p, romGroup, regle, systeme, aModes).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -252,7 +249,43 @@ public sealed class DirectPartageService : IHostedService
         }
     }
 
-    private async Task PasserAsync(Partie p, string romGroup, string regle, string record, string systeme)
+    /// <summary>
+    /// Le record du classement <paramref name="regle"/>, pour la bande et les applaudissements. Rien sans classement ni
+    /// quand le mode joue est inconnu (null) : la bande dit alors nelfeplay.com.
+    /// </summary>
+    private async Task MettreAJourLeRecordAsync(Partie p, string romGroup, string? regle)
+    {
+        p.RegleDuRecord = regle;
+        p.Record = null;
+        p.RecordTexte = "";
+        if (regle is null) return;
+        try
+        {
+            var classement = await _classement.MondeAsync(romGroup, _agent.Status.Pseudo ?? "", CancellationToken.None, regle)
+                .ConfigureAwait(false);
+            if (classement.Lignes.OrderBy(l => l.Rang).FirstOrDefault() is { } tete)
+            {
+                p.RecordTexte = TexteDuRecord(tete.Valeur, tete.Joueur);
+                // Un contre-la-montre ne se compare pas au score : pas d'applaudissements a sa fin.
+                if (!tete.PlusBasEstMieux) p.Record = tete.Valeur;
+            }
+        }
+        catch (Exception)
+        {
+            // Sans classement, la bande dit nelfeplay.com.
+        }
+    }
+
+    /// <summary>Le mode sur la bande : « 1CC POWER-UP » pour le classement 1cc-power-up. Pur.</summary>
+    internal static string LibelleDuMode(string regle)
+    {
+        // Seul le premier tiret separe la categorie du mode : « power-up » garde le sien.
+        var libelle = regle.Trim().ToUpperInvariant();
+        var i = libelle.IndexOf('-');
+        return i > 0 ? libelle[..i] + " " + libelle[(i + 1)..] : libelle;
+    }
+
+    private async Task PasserAsync(Partie p, string romGroup, string regleParDefaut, string systeme, bool aModes)
     {
         Task<LanceurDuDirect.Rapport>? exe = null;
         CancellationTokenSource? secours = null;
@@ -262,6 +295,15 @@ public sealed class DirectPartageService : IHostedService
         {
             while (true)
             {
+                // Le code d'un mode se tape a l'ecran titre : le mode joue se relit a chaque tour, la bande suit.
+                if (aModes && !p.Finie && _rapporteur?.RegleDuModeEnCours(romGroup) is var duMode && duMode != p.RegleDuRecord)
+                {
+                    await MettreAJourLeRecordAsync(p, romGroup, duMode).ConfigureAwait(false);
+                    _journal.LogInformation("Direct partage : {Jeu}, mode joue {Regle}, record a battre {Record}.", romGroup,
+                        duMode ?? "inconnu", p.Record?.ToString(CultureInfo.InvariantCulture) ?? "aucun");
+                    EcrireLaBande(p);
+                }
+                var regle = p.RegleDuRecord ?? regleParDefaut;
                 // Un role de netplay repris tard (jeu demarre hors ES) retire aussi la candidature.
                 var finie = p.Finie || p.Alert || !RetroBat.Api.Netplay.NetplayGuestService.PartieALaBorne;
                 var demande = new JsonObject
@@ -282,7 +324,7 @@ public sealed class DirectPartageService : IHostedService
 
                 if (role == "on_air" && exe is null && !finie && (string?)r!["ingest"] is { Length: > 0 } adresse)
                 {
-                    exe = Lancer(p, r, adresse, regle, record, out secours);
+                    exe = Lancer(p, r, adresse, regleParDefaut, out secours);
                     if (exe is null)
                     {
                         // ELUE SANS POUVOIR ENVOYER (2026-10-16) : la borne se taisait, et la sortante tenait son clip de fin
@@ -346,7 +388,7 @@ public sealed class DirectPartageService : IHostedService
     /// envoie encore (sa fin de passage, quand la nouvelle partie reprend le meme direct) s'arrete d'abord : une seule
     /// connexion par adresse d'entree, une seule commande.
     /// </summary>
-    private Task<LanceurDuDirect.Rapport>? Lancer(Partie p, JsonObject r, string adresse, string regle, string record, out CancellationTokenSource? secours)
+    private Task<LanceurDuDirect.Rapport>? Lancer(Partie p, JsonObject r, string adresse, string regleParDefaut, out CancellationTokenSource? secours)
     {
         secours = null;
         var exe = LanceurDuDirect.Chemin(AppContext.BaseDirectory);
@@ -366,6 +408,10 @@ public sealed class DirectPartageService : IHostedService
         }
         var relais = (bool?)r["relay"] == true;
         var banniere = r["banner"] as JsonObject;
+        p.BandeJoueur = (string?)banniere?["player"] ?? _agent.Status.Pseudo;
+        p.BandeJeu = (string?)banniere?["game"];
+        p.BandeSysteme = (string?)banniere?["system"];
+        p.BandeRegleParDefaut = regleParDefaut;
         var transition = (r["clips"] as JsonObject)?["transition"] as JsonObject;
         var clip = CheminDuClip(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, (string?)transition?["file"]);
         if (clip is not null && !File.Exists(clip)) clip = null;
@@ -390,8 +436,7 @@ public sealed class DirectPartageService : IHostedService
                 _journal.LogInformation("Direct partage : l'exe de la partie precedente s'est arrete, la nouvelle partie {Mode}.",
                     relais ? "reprend le meme direct" : "prend l'antenne");
             }
-            EcrireLeBandeau((string?)banniere?["player"] ?? _agent.Status.Pseudo, (string?)banniere?["game"], (string?)banniere?["system"],
-                regle.ToUpperInvariant(), record);
+            EcrireLeBandeau(p.BandeJoueur, p.BandeJeu, p.BandeSysteme, LibelleDuMode(p.RegleDuRecord ?? regleParDefaut), p.RecordTexte);
             Ecrire(CheminDeLaCommande, CommandeJson(fin: false, arret: false, null, null, false));
             return await LanceurDuDirect.DiffuserAsync(exe, film.Fichier, adresse, film.Rotation ?? 0, _journal, jeton,
                 options: options, delaiDeFin: TimeSpan.FromSeconds(10)).ConfigureAwait(false);
@@ -420,6 +465,13 @@ public sealed class DirectPartageService : IHostedService
             ["recordBattu"] = recordBattu,
         };
         return commande.ToJsonString();
+    }
+
+    /// <summary>La bande d'une partie a l'antenne, reecrite (l'exe la relit toutes les deux secondes) ; une autre se tait.</summary>
+    private void EcrireLaBande(Partie p)
+    {
+        lock (_verrou) if (_aLAntenne != p || p.BandeRegleParDefaut is null) return;
+        EcrireLeBandeau(p.BandeJoueur, p.BandeJeu, p.BandeSysteme, LibelleDuMode(p.RegleDuRecord ?? p.BandeRegleParDefaut), p.RecordTexte);
     }
 
     private void EcrireLeBandeau(string? joueur, string? jeu, string? systeme, string mode, string record)

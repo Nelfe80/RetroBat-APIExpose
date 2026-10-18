@@ -81,6 +81,13 @@ public sealed class DirectPartageTests
     public void Le_record_battu_pendant_un_passage(long meilleur, long? record, bool nonCertifiable, bool alert, bool attendu)
         => Assert.Equal(attendu, DirectPartageService.RecordBattu(meilleur, record, nonCertifiable, alert));
 
+    [Theory]
+    [InlineData("1cc", "1CC")]
+    [InlineData("1cc-power-up", "1CC POWER-UP")]
+    [InlineData("1cc-original", "1CC ORIGINAL")]
+    public void La_bande_dit_le_mode_comme_le_classement(string regle, string attendu)
+        => Assert.Equal(attendu, DirectPartageService.LibelleDuMode(regle));
+
     [Fact]
     public void La_commande_dit_a_l_exe_si_le_record_est_tombe()
     {

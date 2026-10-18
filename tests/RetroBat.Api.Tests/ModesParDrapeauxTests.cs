@@ -109,6 +109,33 @@ public sealed class ModesParDrapeauxTests
         // Avant le decodage, la borne prend la valeur lue (1) pour mode : aucun profil ne porte 1.
         Assert.Null(ModesDeJeu.ChoisirProfil(Profils, 1));
     }
+
+    // Le mode pendant la partie (2026-10-18) : AshTaste92 passait les 1 013 700 du 1CC normal sur le direct partage, sans
+    // qu'on sache s'il jouait en ORIGINAL (record 1 333 090) ou en POWER-UP (1 106 220).
+    [Theory]
+    [InlineData(null, 0, "1cc")]                 // aucun code tape : le mode normal
+    [InlineData("0XE5D1", 1, "1cc-original")]
+    [InlineData("0XE5D2", 1, "1cc-power-up")]
+    [InlineData("0xe5db", 1, "1cc-super")]
+    [InlineData("0XE5DB", 0, "1cc")]              // un drapeau retombe
+    public void Le_mode_joue_se_sait_pendant_la_partie(string? adresse, int valeur, string attendu)
+    {
+        var modes = ModesDeJeu.ModesParDrapeaux(Profils);
+        var c = adresse is null ? ContexteDeJeu.Vide : Avec((adresse, valeur));
+        Assert.Equal(attendu, ModesDeJeu.RegleDuMode(Profils, modes, c));
+    }
+
+    [Fact]
+    public void Deux_codes_a_la_fois_n_ont_pas_de_classement_pendant_la_partie()
+        => Assert.Null(ModesDeJeu.RegleDuMode(Profils, ModesDeJeu.ModesParDrapeaux(Profils), Avec(("0XE5D1", 1), ("0XE5D2", 1))));
+
+    [Fact]
+    public void Un_jeu_sans_modes_a_son_seul_classement()
+    {
+        var ms3 = new[] { JsonDocument.Parse("""{"ruleset":"1cc"}""").RootElement.Clone(),
+            JsonDocument.Parse("""{"ruleset":"1cc-multi"}""").RootElement.Clone() };
+        Assert.Equal("1cc", ModesDeJeu.RegleDuMode(ms3, ModesDeJeu.ModesParDrapeaux(ms3), ContexteDeJeu.Vide));
+    }
 }
 
 /// <summary>Les modes se cumulent avec le 1CC MULTI (1cc-multi-super...), demande user 2026-10-06.</summary>

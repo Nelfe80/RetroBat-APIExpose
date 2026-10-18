@@ -41,6 +41,7 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
     private readonly ReplayCaptureService _capture;
     private readonly ReplayVideoPublisher _site;
     private readonly ILogger<DirectDuRecordService> _journal;
+    private readonly RetroBat.Api.Infrastructure.NelfePlayScoringReporter? _rapporteur;
     private readonly bool _actif;
     private readonly bool _exe;
     private volatile bool _essai;
@@ -51,6 +52,10 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
     private string _romGroup = "";
     private string _regle = "";
     private long? _aBattre;
+    // UN JEU A MODES (2026-10-18) : le direct s'arme sur le record du mode joue, relu a chaque score ; un mode qui change
+    // (un code tape a l'ecran titre) le desarme le temps de lire le classement du nouveau.
+    private bool _aModes;
+    private bool _rearmement;
     private bool _declenche;
     private bool _runTermine;
     /// <summary>Le direct ouvert pour cette partie (pour signaler le record), et le meilleur score du joueur 1.</summary>
@@ -70,8 +75,10 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
     public DirectDuRecordService(IEventBus bus, ApiContext contexte, LeaderboardClient classement, NelfePlayAgentService agent,
         RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider wrapper, ReplayCaptureService capture,
         ReplayVideoPublisher site, IConfiguration configuration, ILogger<DirectDuRecordService> journal,
-        NelfePlayScoringCollectionSyncService? collection = null, PartieNelfePlayService? partie = null)
+        NelfePlayScoringCollectionSyncService? collection = null, PartieNelfePlayService? partie = null,
+        RetroBat.Api.Infrastructure.NelfePlayScoringReporter? rapporteur = null)
     {
+        _rapporteur = rapporteur;
         _bus = bus;
         _contexte = contexte;
         _classement = classement;
@@ -141,8 +148,8 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         => aBattre is long record && !runTermine && joueur == 1 && score > record;
 
     /// <summary>
-    /// Les regles d'un jeu ou le premier rang se lit pendant la partie : 1CC, 1LC, 1CC MULTI. Un jeu a modes en a
-    /// d'autres, et le mode joue n'est connu qu'a la fin. Pur.
+    /// Les regles d'un jeu sans modes : 1CC, 1LC, 1CC MULTI. Un jeu a modes en a d'autres ; depuis le 18 octobre 2026, le
+    /// mode joue se lit pendant la partie (NelfePlayScoringReporter.RegleDuModeEnCours). Pur.
     /// </summary>
     internal static bool SansModes(IReadOnlyList<string> regles)
         => regles.All(r => r is "1cc" or "1lc" or "1cc-multi");
@@ -161,6 +168,8 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                         _romGroup = "";
                         _regle = "";
                         _aBattre = null;
+                        _aModes = false;
+                        _rearmement = false;
                         _declenche = false;
                         _runTermine = false;
                         _liveId = null;
@@ -179,10 +188,26 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                     if (Nombre(e.Payload, "Score") is not { } score) return;
                     var joueur = (int)(Nombre(e.Payload, "Player") ?? 1);
                     int gen;
-                    bool ouvrir, signaler;
+                    bool ouvrir, signaler, rearmer = false;
                     string? direct;
+                    string jeuEnCours;
+                    bool aModes;
                     lock (_verrou)
                     {
+                        aModes = _aModes;
+                        jeuEnCours = _romGroup;
+                    }
+                    // Le mode joue, lu hors du verrou (le rapporteur a le sien).
+                    var duMode = aModes ? _rapporteur?.RegleDuModeEnCours(jeuEnCours) : null;
+                    lock (_verrou)
+                    {
+                        if (_aModes && duMode is not null && duMode != _regle && !_declenche && !_runTermine && !_rearmement)
+                        {
+                            _regle = duMode;
+                            _aBattre = null;
+                            _rearmement = true;
+                            rearmer = true;
+                        }
                         if (joueur == 1 && !_runTermine)
                         {
                             _meilleurScore = Math.Max(_meilleurScore, score);
@@ -204,6 +229,7 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                         direct = _liveId;
                         gen = _generation;
                     }
+                    if (rearmer) _ = Task.Run(() => ArmerSurAsync(gen, jeuEnCours, duMode!));
                     if (ouvrir) _ = Task.Run(() => DeclencherAsync(gen, score));
                     else if (signaler) _ = Task.Run(() => SignalerAsync(gen, direct!, score));
                     break;
@@ -255,33 +281,58 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
             var romGroup = def.Rom.Trim().ToLowerInvariant();
 
             var regles = _collection?.ReglesOuvertes(romGroup) ?? Array.Empty<string>();
-            if (!SansModes(regles))
-            {
-                _journal.LogInformation("Direct : {Jeu} a plusieurs modes, pas de direct (le mode joue n'est connu qu'a la fin).", romGroup);
-                return;
-            }
-            var regle = LeaderboardClient.ReglePrincipale(regles);
-            var classement = await _classement.MondeAsync(romGroup, _agent.Status.Pseudo ?? "", CancellationToken.None, regle)
-                .ConfigureAwait(false);
-            var tete = classement.Lignes.OrderBy(l => l.Rang).FirstOrDefault();
-            if (tete is null && _seuilEssai is null) return;
-            if (tete is { PlusBasEstMieux: true }) return;
-
+            var aModes = !SansModes(regles);
+            // UN JEU A MODES : le classement du mode joue, que le rapporteur lit (null : pas encore connu, le direct s'arme
+            // au premier score lu dans un mode connu).
+            var regle = aModes ? _rapporteur?.RegleDuModeEnCours(romGroup) : LeaderboardClient.ReglePrincipale(regles);
             lock (_verrou)
             {
                 if (g != _generation) return;
                 _romGroup = romGroup;
-                _regle = regle.Length > 0 ? regle : "1cc";
-                _aBattre = _seuilEssai ?? tete!.Valeur;
-                _lignes = classement.Lignes;
+                _aModes = aModes;
                 _nomDuJeu = string.IsNullOrWhiteSpace(jeu.GameName) ? romGroup : jeu.GameName.Trim();
+                if (regle is not null) _regle = regle.Length > 0 ? regle : "1cc";
+                if (regle is not null) _rearmement = true;
             }
-            _journal.LogInformation("Direct : {Jeu} ({Regle}) arme, premier rang {Valeur} ({Joueur}), direct a {Seuil}.",
-                romGroup, regle, _seuilEssai ?? tete!.Valeur, tete?.Joueur ?? "essai", SeuilDApproche(_seuilEssai ?? tete!.Valeur));
+            if (regle is null)
+            {
+                _journal.LogInformation("Direct : {Jeu} a plusieurs modes, direct arme des que le mode joue sera connu.", romGroup);
+                return;
+            }
+            await ArmerSurAsync(g, romGroup, regle.Length > 0 ? regle : "1cc").ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             _journal.LogDebug(ex, "Direct : premier rang illisible, pas de direct pour cette partie.");
+        }
+    }
+
+    /// <summary>Le premier rang du classement <paramref name="regle"/> : le record a battre de cette partie.</summary>
+    private async Task ArmerSurAsync(int g, string romGroup, string regle)
+    {
+        try
+        {
+            var classement = await _classement.MondeAsync(romGroup, _agent.Status.Pseudo ?? "", CancellationToken.None, regle)
+                .ConfigureAwait(false);
+            var tete = classement.Lignes.OrderBy(l => l.Rang).FirstOrDefault();
+            var aBattre = tete is { PlusBasEstMieux: true } ? null : _seuilEssai ?? tete?.Valeur;
+            lock (_verrou)
+            {
+                if (g != _generation || _regle != regle) return;
+                _aBattre = aBattre;
+                _lignes = classement.Lignes;
+            }
+            if (aBattre is long a)
+                _journal.LogInformation("Direct : {Jeu} ({Regle}) arme, premier rang {Valeur} ({Joueur}), direct a {Seuil}.",
+                    romGroup, regle, a, tete?.Joueur ?? "essai", SeuilDApproche(a));
+        }
+        catch (Exception ex)
+        {
+            _journal.LogDebug(ex, "Direct : premier rang de {Regle} illisible, pas de direct.", regle);
+        }
+        finally
+        {
+            lock (_verrou) if (g == _generation) _rearmement = false;
         }
     }
 
