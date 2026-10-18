@@ -294,7 +294,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             var relache = string.Equals(e.Type, "panel.input.released", StringComparison.Ordinal);
             if (!appuye && !relache) return;
 
-            var (identite, systeme, slot) = LireBouton(e.Payload);
+            var (identite, systeme, slot, roleEs) = LireBouton(e.Payload);
+            // VALIDER ET REVENIR COMME DANS ES (2026-10-18) : le role du bouton dans EmulationStation (son « a », son « b »,
+            // inverses s'il le faut) passe avant le slot ; un appareil qu'ES ne connait pas garde les slots 1 et 2. Un
+            // joueur a la manette, « a » configure sur le bouton de droite, ne voyait jamais le panneau s'ouvrir.
+            var valider = roleEs is not null ? roleEs == "valider" : slot == SlotValider;
+            var annuler = roleEs is not null ? roleEs == "retour" : slot == SlotAnnuler;
             if (_modele.Etat != LeaderboardPanelModel.Foyer.Ferme)
             {
                 _logger.LogDebug("Classement : {Type} identite={Identite} systeme={Systeme} slot={Slot} (etat {Etat})",
@@ -307,10 +312,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 if (appuye) Direction(identite);
                 return;
             }
-            if (systeme is null) NoterUnAppuiLongAilleurs(appuye, identite, slot);
-            if (slot is null) return;
+            if (systeme is null) NoterUnAppuiLongAilleurs(appuye, identite, slot, valider);
+            if (slot is null && !valider && !annuler) return;
 
-            if (slot == SlotValider)
+            if (valider)
             {
                 if (appuye)
                 {
@@ -355,11 +360,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             }
 
             if (!appuye) return;
-            var entree = slot == SlotDeLIdentite("y") ? EntreePanneau.Defier
+            var entree = annuler ? EntreePanneau.Annuler
+                : slot == SlotDeLIdentite("y") ? EntreePanneau.Defier
                 : slot == SlotDeLIdentite("x") ? EntreePanneau.Suivre
                 : slot switch
                 {
-                    SlotAnnuler => EntreePanneau.Annuler,
                     SlotPageHaut => EntreePanneau.PageHaut,
                     SlotPageBas => EntreePanneau.PageBas,
                     _ => (EntreePanneau?) null,
@@ -379,9 +384,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// inverses dans ES, manette sans cartographie de borne) ne voyait rien s'ouvrir, et nous ne le savions pas. On le dit,
     /// une fois par bouton et par demarrage de l'API, quand ES est devant et le panneau ferme.
     /// </summary>
-    private void NoterUnAppuiLongAilleurs(bool appuye, string? identite, int? slot)
+    private void NoterUnAppuiLongAilleurs(bool appuye, string? identite, int? slot, bool valider)
     {
-        if (string.IsNullOrEmpty(identite) || slot == SlotValider || _modele.Etat != LeaderboardPanelModel.Foyer.Ferme)
+        if (string.IsNullOrEmpty(identite) || valider || _modele.Etat != LeaderboardPanelModel.Foyer.Ferme)
         {
             _autreAppui = null;
             return;
@@ -399,7 +404,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             return;
         }
         _logger.LogInformation(
-            "Classement : appui long sur le bouton {Identite} ({Slot}) ; le panneau ne s'ouvre que par un appui long sur le bouton du slot {Valider}.",
+            "Classement : appui long sur le bouton {Identite} ({Slot}) ; le panneau s'ouvre par un appui long sur le bouton « valider » d'ES (le slot {Valider} si ES ne connait pas la manette).",
             identite, a.Slot is { } s ? "slot " + s : "sans slot dans la cartographie de la borne", SlotValider);
     }
 
@@ -2072,9 +2077,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         };
     }
 
-    private static (string? Identite, string? Systeme, int? Slot) LireBouton(object? payload)
+    private static (string? Identite, string? Systeme, int? Slot, string? RoleEs) LireBouton(object? payload)
     {
-        if (payload is null) return (null, null, null);
+        if (payload is null) return (null, null, null, null);
         try
         {
             var el = JsonSerializer.SerializeToElement(payload);
@@ -2085,11 +2090,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // gauche/droite tout en repondant aux boutons.
             int? Nombre(string nom) => el.TryGetProperty(nom, out var v) && v.ValueKind == JsonValueKind.Number
                 && v.TryGetInt32(out var n) ? n : null;
-            return (Texte("Identity"), Texte("System"), Nombre("Slot"));
+            return (Texte("Identity"), Texte("System"), Nombre("Slot"), Texte("EsRole"));
         }
         catch
         {
-            return (null, null, null);
+            return (null, null, null, null);
         }
     }
 

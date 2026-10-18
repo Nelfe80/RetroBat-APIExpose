@@ -103,7 +103,7 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
 
             // (device, identity) of everything currently down: the diff between two polls is
             // what becomes a press and a release
-            var held = new HashSet<(int Device, string Identity)>();
+            var held = new HashSet<(int Device, string Identity, int Raw)>();
 
             while (!_stop)
             {
@@ -127,19 +127,19 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
 
                     // Boutons cabinet (canal historique) + directions (canal additif dpad/stick).
                     var now = _reader!.Snapshot()
-                        .Select(p => (Device: p.DeviceIndex, p.Identity))
-                        .Concat(_reader!.SnapshotDirections().Select(p => (Device: p.DeviceIndex, p.Identity)))
+                        .Select(p => (Device: p.DeviceIndex, p.Identity, Raw: p.RawButton))
+                        .Concat(_reader!.SnapshotDirections().Select(p => (Device: p.DeviceIndex, p.Identity, Raw: -1)))
                         .ToHashSet();
 
                     foreach (var down in now.Where(x => !held.Contains(x)))
                     {
-                        Publish("panel.input.pressed", down.Device, down.Identity);
+                        Publish("panel.input.pressed", down.Device, down.Identity, down.Raw);
                         _dernierChangement = DateTime.UtcNow;
                     }
 
                     foreach (var up in held.Where(x => !now.Contains(x)).ToList())
                     {
-                        Publish("panel.input.released", up.Device, up.Identity);
+                        Publish("panel.input.released", up.Device, up.Identity, up.Raw);
                         _dernierChangement = DateTime.UtcNow;
                     }
 
@@ -222,7 +222,34 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
         if (devices.Count > 0) _logger?.LogInformation("Panel input players: {Players}", key);
     }
 
-    private void Publish(string type, int device, string identity)
+    /// <summary>
+    /// LE ROLE D'UN BOUTON DANS EMULATIONSTATION (2026-10-18) : « valider » (son bouton « a »), « retour » (son « b »),
+    /// echanges quand ES a les boutons inverses (InvertButtons) ; null pour les autres, ou quand ES ne connait pas
+    /// l'appareil. Le panneau de classement suit ces roles : il valide et revient avec les memes boutons qu'ES. Pur.
+    /// </summary>
+    internal static string? RoleEs(int raw, int? boutonA, int? boutonB, bool inverse)
+    {
+        if (raw < 0) return null;
+        var valider = inverse ? boutonB : boutonA;
+        var retour = inverse ? boutonA : boutonB;
+        return raw == valider ? "valider" : raw == retour ? "retour" : null;
+    }
+
+    private readonly RetroBat.Domain.Services.EsSettingsStore _reglagesEs = new();
+
+    private bool EsInverse()
+    {
+        try
+        {
+            return _reglagesEs.ReadAllSettings().TryGetValue("InvertButtons", out var v) && string.Equals(v, "true", StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    private void Publish(string type, int device, string identity, int raw = -1)
     {
         // Le joueur de cet appareil : le panel est toujours le joueur 1 (PlayerNumbering), et
         // non « index SDL + 1 », qui mettait une manette Xbox devant le panel.
@@ -230,6 +257,8 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
         var player = device < players.Length ? players[device] : device + 1;
         var slot = ResolveSlot(player, identity);
         var system = SystemInput(identity);
+        var (esA, esB) = _reader?.BoutonsEsDe(device) ?? ((int?) null, (int?) null);
+        var roleEs = raw >= 0 && (esA is not null || esB is not null) ? RoleEs(raw, esA, esB, EsInverse()) : null;
 
         // One line for the first press of a session: proof the cabinet is being read at
         // all. Without it, "nothing lights up" cannot be told apart from "nothing was
@@ -237,8 +266,8 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
         if (type.EndsWith(".pressed", StringComparison.Ordinal) && !_firstPressLogged)
         {
             _firstPressLogged = true;
-            _logger?.LogInformation("First cabinet press read: player {Player}, identity {Identity}, slot {Slot}, system {System}",
-                player, identity, slot?.ToString() ?? "-", system ?? "-");
+            _logger?.LogInformation("First cabinet press read: player {Player}, identity {Identity}, slot {Slot}, system {System}, ES {Role} (boutons ES a={A}, b={B}, inverses={Inverse})",
+                player, identity, slot?.ToString() ?? "-", system ?? "-", roleEs ?? "-", esA?.ToString() ?? "-", esB?.ToString() ?? "-", EsInverse());
         }
 
         _eventBus.PublishAsync(new EventEnvelope
@@ -254,7 +283,9 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
                 // is precisely the question a wiring check is asking.
                 System = system,
                 Identity = identity,
-                Device = device
+                Device = device,
+                // « valider » / « retour » d'EmulationStation pour cet appareil (2026-10-18), null sinon.
+                EsRole = roleEs
             }
         });
     }

@@ -140,6 +140,9 @@ public sealed class CabinetInputReader : IDisposable
         public required string Guid { get; init; }
         public required string Name { get; init; }
         public Dictionary<int, string> ButtonToIdentity { get; } = new();
+        /// <summary>Les boutons « a » et « b » d'EmulationStation pour cet appareil (numeros SDL), s'il y est configure.</summary>
+        public int? EsBoutonA { get; set; }
+        public int? EsBoutonB { get; set; }
         public List<(int Axis, int Sign, string Identity)> AxisToIdentity { get; } = new();
         public bool HasMapping => ButtonToIdentity.Count > 0 || AxisToIdentity.Count > 0;
 
@@ -263,6 +266,7 @@ public sealed class CabinetInputReader : IDisposable
 
             var device = new Device { Handle = handle, Guid = SansCrc(GuidString(handle)), Name = name };
             ApplyMapping(device);
+            LireLesBoutonsEs(device);
             _devices.Add(device);
         }
 
@@ -830,6 +834,47 @@ public sealed class CabinetInputReader : IDisposable
 
     /// <summary>L'identite RetroPad d'un nom d'EmulationStation, null s'il n'en porte aucune.</summary>
     internal static string? IdentiteDuNomEs(string nom) => EsToIdentity.TryGetValue(nom, out var identite) ? identite : null;
+
+    /// <summary>
+    /// LES BOUTONS « A » ET « B » D'EMULATIONSTATION d'un appareil (2026-10-18) : ceux qui valident et reviennent dans ES,
+    /// tels que le joueur les a configures (es_input.cfg ; meme recherche que le mappage : GUID, prefixe, nom). Un joueur
+    /// avait configure sa manette Xbox avec « a » sur le bouton de droite : le panneau de classement, qui ne s'ouvrait que
+    /// par le bouton du bas (slot 1), ne s'ouvrait jamais chez lui. Null : bouton absent ou sur un axe. Pur.
+    /// </summary>
+    internal static (int? A, int? B) BoutonsEs(XDocument esInput, string guid, string nom)
+    {
+        var configs = esInput.Root?.Elements("inputConfig")
+            .Where(e => string.Equals((string?)e.Attribute("type"), "joystick", StringComparison.OrdinalIgnoreCase)).ToList() ?? new();
+        string Guid(XElement e) => (string?)e.Attribute("deviceGUID") ?? string.Empty;
+        var config = configs.FirstOrDefault(e => string.Equals(Guid(e), guid, StringComparison.OrdinalIgnoreCase))
+            ?? (guid.Length >= 24 ? configs.FirstOrDefault(e => Guid(e).Length >= 24 && string.Equals(Guid(e)[..24], guid[..24], StringComparison.OrdinalIgnoreCase)) : null)
+            ?? configs.FirstOrDefault(e => string.Equals((string?)e.Attribute("deviceName"), nom, StringComparison.OrdinalIgnoreCase));
+        int? Bouton(string nomEs)
+        {
+            var input = config?.Elements("input").FirstOrDefault(i => string.Equals((string?)i.Attribute("name"), nomEs, StringComparison.OrdinalIgnoreCase)
+                && string.Equals((string?)i.Attribute("type"), "button", StringComparison.OrdinalIgnoreCase));
+            return int.TryParse((string?)input?.Attribute("id"), out var id) ? id : null;
+        }
+        return (Bouton("a"), Bouton("b"));
+    }
+
+    private void LireLesBoutonsEs(Device device)
+    {
+        try
+        {
+            var chemin = string.IsNullOrEmpty(_retroBatRoot) ? "" : Path.Combine(_retroBatRoot, "emulationstation", ".emulationstation", "es_input.cfg");
+            if (chemin.Length == 0 || !File.Exists(chemin)) return;
+            (device.EsBoutonA, device.EsBoutonB) = BoutonsEs(XDocument.Load(chemin), device.Guid, device.Name);
+        }
+        catch (Exception)
+        {
+            // Sans es_input.cfg lisible, le panneau garde ses slots.
+        }
+    }
+
+    /// <summary>Les boutons « a » et « b » d'ES de l'appareil n (numeros SDL), null quand ES ne le connait pas.</summary>
+    public (int? A, int? B) BoutonsEsDe(int deviceIndex)
+        => deviceIndex >= 0 && deviceIndex < _devices.Count ? (_devices[deviceIndex].EsBoutonA, _devices[deviceIndex].EsBoutonB) : (null, null);
 
     /// <summary>Directions d'EmulationStation (dpad et stick gauche) pour le transport Replay.</summary>
     private static readonly IReadOnlyDictionary<string, string> EsToDirection = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
