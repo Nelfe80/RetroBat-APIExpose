@@ -82,6 +82,16 @@ public sealed class DirectPartageTests
         => Assert.Equal(attendu, DirectPartageService.RecordBattu(meilleur, record, nonCertifiable, alert));
 
     [Fact]
+    public void La_commande_dit_a_l_exe_si_le_record_est_tombe()
+    {
+        // Le format que lit CarteASuivre dans l'exe du direct (0.5.5).
+        Assert.Equal("""{"fin":true,"arret":false,"suivant":{"joueur":"player","jeu":"1942"},"recordBattu":true}""",
+            DirectPartageService.CommandeJson(true, false, "player", "1942", true));
+        Assert.Equal("""{"fin":true,"arret":true,"suivant":null,"recordBattu":false}""",
+            DirectPartageService.CommandeJson(true, true, null, null, false));
+    }
+
+    [Fact]
     public void Une_alert_applaudit_quand_le_clip_est_sur_la_borne()
     {
         var racine = Path.Combine(Path.GetTempPath(), "nelfe-clips-" + Guid.NewGuid().ToString("N"));

@@ -50,10 +50,17 @@ public sealed class DirectPartageService : IHostedService
         // Le record a battre (rang 1 du classement au debut de la partie), quand plus haut est mieux : rien sinon.
         public long? Record;
         public readonly DateTime Debut = DateTime.UtcNow;
+        // LE RELAIS (2026-10-18) : la cle de la partie, pour que le site distingue deux parties de la borne (l'ancienne
+        // finit sa fin de passage pendant que la nouvelle se presente pour reprendre le meme direct).
+        public readonly string Cle = Guid.NewGuid().ToString("N");
     }
 
     private Partie? _enCours;
     private readonly object _verrou = new();
+    // L'exe qui envoie, et la partie a qui il appartient : elle seule ecrit la commande qu'il lit.
+    private Partie? _aLAntenne;
+    private Task<LanceurDuDirect.Rapport>? _exeCourant;
+    private CancellationTokenSource? _secoursCourant;
 
     public DirectPartageService(IEventBus bus, ApiContext contexte, LeaderboardClient classement, NelfePlayAgentService agent,
         RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider wrapper, ReplayCaptureService capture,
@@ -265,6 +272,9 @@ public sealed class DirectPartageService : IHostedService
                     // se perdre.
                     ["sending"] = exe is not null,
                     ["certifiable"] = !p.NonCertifiable,
+                    ["game_key"] = p.Cle,
+                    // Le film de la partie tourne : elle peut reprendre tout de suite le direct de la precedente.
+                    ["film"] = _capture.FilmEnCours() is not null,
                 };
                 var r = await _site.SonderLePartageAsync(demande, CancellationToken.None).ConfigureAwait(false);
                 var role = (string?)r?["role"];
@@ -272,7 +282,7 @@ public sealed class DirectPartageService : IHostedService
 
                 if (role == "on_air" && exe is null && !finie && (string?)r!["ingest"] is { Length: > 0 } adresse)
                 {
-                    exe = Lancer(r, adresse, regle, record, out secours);
+                    exe = Lancer(p, r, adresse, regle, record, out secours);
                     if (exe is null)
                     {
                         // ELUE SANS POUVOIR ENVOYER (2026-10-16) : la borne se taisait, et la sortante tenait son clip de fin
@@ -288,12 +298,12 @@ public sealed class DirectPartageService : IHostedService
                     if (!finAnnoncee) _journal.LogInformation("Direct partage : fin du passage de {Jeu}.", romGroup);
                     finAnnoncee = true;
                     var suivante = r!["next"] as JsonObject;
-                    EcrireLaCommande(fin: true, arret: false, (string?)suivante?["player"], (string?)suivante?["game"],
+                    EcrireLaCommande(p, fin: true, arret: false, (string?)suivante?["player"], (string?)suivante?["game"],
                         RecordBattu(Interlocked.Read(ref p.MeilleurScore), p.Record, p.NonCertifiable, p.Alert));
                 }
                 else if (role == "stop" || (role == "none" && exe is not null))
                 {
-                    EcrireLaCommande(fin: true, arret: true, null, null);
+                    EcrireLaCommande(p, fin: true, arret: true, null, null);
                     _journal.LogInformation("Direct partage : {Jeu}, arret demande par le site.", romGroup);
                     return;
                 }
@@ -331,21 +341,31 @@ public sealed class DirectPartageService : IHostedService
         }
     }
 
-    /// <summary>Lance l'exe du passage sur le film en cours ; null s'il n'y a ni film ni exe.</summary>
-    private Task<LanceurDuDirect.Rapport>? Lancer(JsonObject r, string adresse, string regle, string record, out CancellationTokenSource? secours)
+    /// <summary>
+    /// Lance l'exe du passage sur le film en cours ; null s'il n'y a ni film ni exe. L'exe d'une partie precedente qui
+    /// envoie encore (sa fin de passage, quand la nouvelle partie reprend le meme direct) s'arrete d'abord : une seule
+    /// connexion par adresse d'entree, une seule commande.
+    /// </summary>
+    private Task<LanceurDuDirect.Rapport>? Lancer(Partie p, JsonObject r, string adresse, string regle, string record, out CancellationTokenSource? secours)
     {
         secours = null;
         var exe = LanceurDuDirect.Chemin(AppContext.BaseDirectory);
         if (_capture.FilmEnCours() is not { } film || exe is null)
         {
             _journal.LogInformation("Direct partage : a l'antenne, mais {Manque} : pas de passage.", exe is null ? "l'exe du direct manque" : "aucun film ne tourne");
-            EcrireLaCommande(fin: true, arret: true, null, null);
+            EcrireLaCommande(p, fin: true, arret: true, null, null);
             return null;
         }
+        Task<LanceurDuDirect.Rapport>? precedent;
+        CancellationTokenSource? secoursPrecedent;
+        lock (_verrou)
+        {
+            precedent = _exeCourant is { IsCompleted: false } enCours && _aLAntenne != p ? enCours : null;
+            secoursPrecedent = _secoursCourant;
+            _aLAntenne = p;
+        }
+        var relais = (bool?)r["relay"] == true;
         var banniere = r["banner"] as JsonObject;
-        EcrireLeBandeau((string?)banniere?["player"] ?? _agent.Status.Pseudo, (string?)banniere?["game"], (string?)banniere?["system"],
-            regle.ToUpperInvariant(), record);
-        EcrireLaCommande(fin: false, arret: false, null, null);
         var transition = (r["clips"] as JsonObject)?["transition"] as JsonObject;
         var clip = CheminDuClip(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, (string?)transition?["file"]);
         if (clip is not null && !File.Exists(clip)) clip = null;
@@ -356,11 +376,42 @@ public sealed class DirectPartageService : IHostedService
             applaudissements, (string?)bravo?["sha256"]);
         secours = new CancellationTokenSource();
         var jeton = secours.Token;
-        return Task.Run(() => LanceurDuDirect.DiffuserAsync(exe, film.Fichier, adresse, film.Rotation ?? 0, _journal, jeton,
-            options: options, delaiDeFin: TimeSpan.FromSeconds(10)));
+        var tache = Task.Run(async () =>
+        {
+            if (precedent is not null)
+            {
+                // L'ordre d'arret, que l'exe precedent lit chaque seconde ; au-dela de 15 s, son lanceur l'arrete.
+                Ecrire(CheminDeLaCommande, CommandeJson(fin: true, arret: true, null, null, false));
+                if (await Task.WhenAny(precedent, Task.Delay(TimeSpan.FromSeconds(15))).ConfigureAwait(false) != precedent)
+                {
+                    try { secoursPrecedent?.Cancel(); } catch (ObjectDisposedException) { /* deja fini */ }
+                    await Task.WhenAny(precedent, Task.Delay(TimeSpan.FromSeconds(12))).ConfigureAwait(false);
+                }
+                _journal.LogInformation("Direct partage : l'exe de la partie precedente s'est arrete, la nouvelle partie {Mode}.",
+                    relais ? "reprend le meme direct" : "prend l'antenne");
+            }
+            EcrireLeBandeau((string?)banniere?["player"] ?? _agent.Status.Pseudo, (string?)banniere?["game"], (string?)banniere?["system"],
+                regle.ToUpperInvariant(), record);
+            Ecrire(CheminDeLaCommande, CommandeJson(fin: false, arret: false, null, null, false));
+            return await LanceurDuDirect.DiffuserAsync(exe, film.Fichier, adresse, film.Rotation ?? 0, _journal, jeton,
+                options: options, delaiDeFin: TimeSpan.FromSeconds(10)).ConfigureAwait(false);
+        });
+        lock (_verrou)
+        {
+            _exeCourant = tache;
+            _secoursCourant = secours;
+        }
+        return tache;
     }
 
-    private void EcrireLaCommande(bool fin, bool arret, string? joueur, string? jeu, bool recordBattu = false)
+    /// <summary>La commande de l'exe ; seule la partie a qui l'exe appartient l'ecrit (une ancienne partie se tait).</summary>
+    private void EcrireLaCommande(Partie p, bool fin, bool arret, string? joueur, string? jeu, bool recordBattu = false)
+    {
+        lock (_verrou) if (_aLAntenne != p) return;
+        Ecrire(CheminDeLaCommande, CommandeJson(fin, arret, joueur, jeu, recordBattu));
+    }
+
+    internal static string CommandeJson(bool fin, bool arret, string? joueur, string? jeu, bool recordBattu)
     {
         var commande = new JsonObject
         {
@@ -368,7 +419,7 @@ public sealed class DirectPartageService : IHostedService
             ["suivant"] = joueur is null && jeu is null ? null : new JsonObject { ["joueur"] = joueur, ["jeu"] = jeu },
             ["recordBattu"] = recordBattu,
         };
-        Ecrire(CheminDeLaCommande, commande.ToJsonString());
+        return commande.ToJsonString();
     }
 
     private void EcrireLeBandeau(string? joueur, string? jeu, string? systeme, string mode, string record)
