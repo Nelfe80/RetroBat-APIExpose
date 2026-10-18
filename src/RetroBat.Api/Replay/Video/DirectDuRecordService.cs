@@ -461,6 +461,8 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         var annonce = Chemin("record", out var empreinteRecord);
         if (annonce is not null) options.AddRange(["--annonce-sha256", empreinteRecord!.Trim()]);
         if (Chemin("champion", out var empreinteChampion) is { } champion) options.AddRange(["--clip", champion, "--clip-sha256", empreinteChampion!.Trim()]);
+        // Les applaudissements d'un record tombe (18 octobre 2026), apres le classement mis a jour.
+        if (Chemin("applause", out var empreinteBravo) is { } bravo) options.AddRange(["--applaudissements", bravo, "--applaudissements-sha256", empreinteBravo!.Trim()]);
         return (annonce, options);
     }
 

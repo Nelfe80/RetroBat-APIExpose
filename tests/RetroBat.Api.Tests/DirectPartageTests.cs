@@ -64,6 +64,43 @@ public sealed class DirectPartageTests
     }
 
     [Fact]
+    public void Les_applaudissements_ne_partent_qu_avec_leur_empreinte()
+    {
+        var avec = DirectPartageService.OptionsDuPassage(3000, "c", null, null, "b", "Applause.mp4", "CC");
+        Assert.Equal(["--applaudissements", "Applause.mp4", "--applaudissements-sha256", "CC"], avec.Skip(8));
+        Assert.DoesNotContain("--applaudissements", DirectPartageService.OptionsDuPassage(3000, "c", null, null, "b", "Applause.mp4", ""));
+    }
+
+    [Theory]
+    [InlineData(1_200, 1_000L, false, false, true)]
+    [InlineData(1_000, 1_000L, false, false, false)]   // egaler n'est pas battre
+    [InlineData(1_200, null, false, false, false)]     // pas de record connu (classement vide, contre-la-montre)
+    [InlineData(1_200, 0L, false, false, false)]
+    [InlineData(1_200, 1_000L, true, false, false)]    // un continue : la partie ne compte plus
+    [InlineData(1_200, 1_000L, false, true, false)]    // l'alert a pris le relais et joue les siens
+    public void Le_record_battu_pendant_un_passage(long meilleur, long? record, bool nonCertifiable, bool alert, bool attendu)
+        => Assert.Equal(attendu, DirectPartageService.RecordBattu(meilleur, record, nonCertifiable, alert));
+
+    [Fact]
+    public void Une_alert_applaudit_quand_le_clip_est_sur_la_borne()
+    {
+        var racine = Path.Combine(Path.GetTempPath(), "nelfe-clips-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(Path.Combine(racine, "resources", "live"));
+        File.WriteAllText(Path.Combine(racine, "resources", "live", "Applause.mp4"), "x");
+        try
+        {
+            var clips = System.Text.Json.Nodes.JsonNode.Parse("""{"applause":{"file":"Applause.mp4","sha256":"DD"}}""")
+                as System.Text.Json.Nodes.JsonObject;
+            Assert.Equal(["--applaudissements", Path.Combine(racine, "resources", "live", "Applause.mp4"), "--applaudissements-sha256", "DD"],
+                DirectDuRecordService.Clips(clips, racine).Options);
+        }
+        finally
+        {
+            Directory.Delete(racine, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Les_options_du_passage_suivent_les_arguments_du_direct()
     {
         var args = LanceurDuDirect.Arguments("film.mkv", 0, options: ["--debit", "3000"]);

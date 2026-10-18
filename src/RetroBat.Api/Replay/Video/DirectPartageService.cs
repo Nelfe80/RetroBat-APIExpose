@@ -47,6 +47,8 @@ public sealed class DirectPartageService : IHostedService
         // La partie certifiee s'est fermee (un continue, l'arrivee d'un joueur) : elle cede l'antenne a qui la demande.
         public volatile bool NonCertifiable;
         public long MeilleurScore;
+        // Le record a battre (rang 1 du classement au debut de la partie), quand plus haut est mieux : rien sinon.
+        public long? Record;
         public readonly DateTime Debut = DateTime.UtcNow;
     }
 
@@ -118,13 +120,24 @@ public sealed class DirectPartageService : IHostedService
     /// Les options de l'exe pour un passage : debit, commande, clip de transition et son empreinte (sans empreinte, pas de
     /// clip), bande sous le jeu. Pur.
     /// </summary>
-    internal static IReadOnlyList<string> OptionsDuPassage(int debitKbps, string commande, string? clip, string? empreinte, string bandeau)
+    internal static IReadOnlyList<string> OptionsDuPassage(int debitKbps, string commande, string? clip, string? empreinte, string bandeau,
+        string? applaudissements = null, string? empreinteApplaudissements = null)
     {
         var o = new List<string> { "--debit", Math.Clamp(debitKbps, 500, 9000).ToString(CultureInfo.InvariantCulture), "--commande", commande,
             "--attente-max", "90", "--bandeau", bandeau };
         if (clip is not null && !string.IsNullOrWhiteSpace(empreinte)) o.AddRange(["--clip", clip, "--clip-sha256", empreinte.Trim()]);
+        // Les applaudissements d'un record tombe pendant le passage (18 octobre 2026), joues avant la transition.
+        if (applaudissements is not null && !string.IsNullOrWhiteSpace(empreinteApplaudissements))
+            o.AddRange(["--applaudissements", applaudissements, "--applaudissements-sha256", empreinteApplaudissements.Trim()]);
         return o;
     }
+
+    /// <summary>
+    /// Le record est-il tombe pendant le passage ? Seulement une partie restee certifiable, sans direct de record pour le
+    /// prendre (l'alert joue ses propres applaudissements), qui a depasse un record connu. Pur.
+    /// </summary>
+    internal static bool RecordBattu(long meilleurScore, long? record, bool nonCertifiable, bool alert)
+        => !nonCertifiable && !alert && record is long r && r > 0 && meilleurScore > r;
 
     /// <summary>Le record a battre, sur la bande : « RECORD 523 400 · player ». Vide sans record. Pur.</summary>
     internal static string TexteDuRecord(long? valeur, string? joueur)
@@ -209,7 +222,12 @@ public sealed class DirectPartageService : IHostedService
             {
                 var classement = await _classement.MondeAsync(romGroup, _agent.Status.Pseudo ?? "", CancellationToken.None, regle)
                     .ConfigureAwait(false);
-                if (classement.Lignes.OrderBy(l => l.Rang).FirstOrDefault() is { } tete) record = TexteDuRecord(tete.Valeur, tete.Joueur);
+                if (classement.Lignes.OrderBy(l => l.Rang).FirstOrDefault() is { } tete)
+                {
+                    record = TexteDuRecord(tete.Valeur, tete.Joueur);
+                    // Un contre-la-montre ne se compare pas au score : pas d'applaudissements a sa fin.
+                    if (!tete.PlusBasEstMieux) p.Record = tete.Valeur;
+                }
             }
             catch (Exception)
             {
@@ -270,7 +288,8 @@ public sealed class DirectPartageService : IHostedService
                     if (!finAnnoncee) _journal.LogInformation("Direct partage : fin du passage de {Jeu}.", romGroup);
                     finAnnoncee = true;
                     var suivante = r!["next"] as JsonObject;
-                    EcrireLaCommande(fin: true, arret: false, (string?)suivante?["player"], (string?)suivante?["game"]);
+                    EcrireLaCommande(fin: true, arret: false, (string?)suivante?["player"], (string?)suivante?["game"],
+                        RecordBattu(Interlocked.Read(ref p.MeilleurScore), p.Record, p.NonCertifiable, p.Alert));
                 }
                 else if (role == "stop" || (role == "none" && exe is not null))
                 {
@@ -330,19 +349,24 @@ public sealed class DirectPartageService : IHostedService
         var transition = (r["clips"] as JsonObject)?["transition"] as JsonObject;
         var clip = CheminDuClip(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, (string?)transition?["file"]);
         if (clip is not null && !File.Exists(clip)) clip = null;
-        var options = OptionsDuPassage((int?)r["bitrate_kbps"] ?? 3000, CheminDeLaCommande, clip, (string?)transition?["sha256"], CheminDuBandeau);
+        var bravo = (r["clips"] as JsonObject)?["applause"] as JsonObject;
+        var applaudissements = CheminDuClip(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, (string?)bravo?["file"]);
+        if (applaudissements is not null && !File.Exists(applaudissements)) applaudissements = null;
+        var options = OptionsDuPassage((int?)r["bitrate_kbps"] ?? 3000, CheminDeLaCommande, clip, (string?)transition?["sha256"], CheminDuBandeau,
+            applaudissements, (string?)bravo?["sha256"]);
         secours = new CancellationTokenSource();
         var jeton = secours.Token;
         return Task.Run(() => LanceurDuDirect.DiffuserAsync(exe, film.Fichier, adresse, film.Rotation ?? 0, _journal, jeton,
             options: options, delaiDeFin: TimeSpan.FromSeconds(10)));
     }
 
-    private void EcrireLaCommande(bool fin, bool arret, string? joueur, string? jeu)
+    private void EcrireLaCommande(bool fin, bool arret, string? joueur, string? jeu, bool recordBattu = false)
     {
         var commande = new JsonObject
         {
             ["fin"] = fin, ["arret"] = arret,
             ["suivant"] = joueur is null && jeu is null ? null : new JsonObject { ["joueur"] = joueur, ["jeu"] = jeu },
+            ["recordBattu"] = recordBattu,
         };
         Ecrire(CheminDeLaCommande, commande.ToJsonString());
     }
