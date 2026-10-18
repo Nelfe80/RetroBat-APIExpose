@@ -2,8 +2,8 @@
 // dotnet-runtime.iss - PREREQUIS .NET 8 de RetroBat.Api.exe : .NET Runtime 8, ASP.NET Core
 // Runtime 8 et .NET Desktop Runtime 8, en x64 (l'exe est framework-dependent, serveur web +
 // Windows Forms). Le .NET Runtime de base (Microsoft.NETCore.App) est verifie et installe pour
-// lui-meme, en premier : les deux autres paquets l'embarquent d'ordinaire, mais une machine ou
-// il manquait a ete vue chez un testeur (2026-09-17), et c'est lui que l'apphost reclame.
+// lui-meme, en dernier : une machine ou il manquait a ete vue chez un testeur (2026-09-17), une
+// autre ou il etait plus ancien qu'ASP.NET Core (2026-10-18), et c'est lui que l'apphost reclame.
 //
 // IMPORTANT : commence DIRECTEMENT par [Code], uniquement des commentaires « // » (voir
 // retrobat-detect.iss). Les procedures d'evenement sont declarees par attributs <event(...)> :
@@ -106,9 +106,70 @@ end;
 // qui est la maintenant. On exige donc les fichiers. Au pire on repose un runtime deja present,
 // ce que l'installeur de Microsoft regle en quelques secondes ; au mieux on evite une borne qui
 // ne demarre pas et un joueur qui abandonne.
+// Le plus haut correctif 8.0.N d'un framework dans un dossier dotnet (-1 sans dossier 8.0.*).
+function DotNetFxPatchInFolder(const Root, Fx: String): Integer;
+var
+  FindRec: TFindRec;
+  Reste: String;
+  N: Integer;
+begin
+  Result := -1;
+  if Root = '' then
+    Exit;
+  if FindFirst(Root + '\shared\' + Fx + '\8.0.*', FindRec) then
+  begin
+    try
+      repeat
+        if (FindRec.Attributes and FILE_ATTRIBUTE_DIRECTORY) <> 0 then
+        begin
+          Reste := Copy(FindRec.Name, 5, Length(FindRec.Name));
+          if Pos('-', Reste) > 0 then
+            Reste := Copy(Reste, 1, Pos('-', Reste) - 1);
+          N := StrToIntDef(Reste, -1);
+          if N > Result then
+            Result := N;
+        end;
+      until not FindNext(FindRec);
+    finally
+      FindClose(FindRec);
+    end;
+  end;
+end;
+
+function DotNetFxPatch(const Fx: String): Integer;
+var
+  P: Integer;
+begin
+  Result := -1;
+  if not IsWin64 then
+    Exit;
+  Result := DotNetFxPatchInFolder(ExpandConstant('{commonpf64}\dotnet'), Fx);
+  P := DotNetFxPatchInFolder(GetEnv('DOTNET_ROOT'), Fx);
+  if P > Result then
+    Result := P;
+end;
+
+// LE SOCLE A JOUR (turbo, 2026-10-18) : ASP.NET Core 8.0.32 avec un .NET Runtime de base 8.0.0. Les trois dossiers
+// etaient la, l'installeur concluait « present », et RetroBat.Api.exe refusait de demarrer : chaque framework 8.0.N
+// exige un socle 8.0.N au moins. Le socle est donc « absent » tant qu'il est plus ancien qu'ASP.NET Core ou Desktop ;
+// il s'installe en DERNIER (voir DotNetPrepareToInstall), apres les deux autres, en version a jour.
 function DotNetFxPresent(Index: Integer): Boolean;
+var
+  Socle, Exigeant: Integer;
 begin
   Result := DotNetFxOnDisk(DotNetFxName(Index));
+  if Result and (Index = 0) then
+  begin
+    Socle := DotNetFxPatch(DotNetFxName(0));
+    Exigeant := DotNetFxPatch(DotNetFxName(1));
+    if DotNetFxPatch(DotNetFxName(2)) > Exigeant then
+      Exigeant := DotNetFxPatch(DotNetFxName(2));
+    if Socle < Exigeant then
+    begin
+      Log(Format('.NET 8 : le .NET Runtime de base (8.0.%d) est plus ancien que ASP.NET Core ou Desktop (8.0.%d) : il se reinstalle a jour', [Socle, Exigeant]));
+      Result := False;
+    end;
+  end;
 end;
 
 function DotNetAllPresent(): Boolean;
@@ -201,7 +262,9 @@ var
   I: Integer;
 begin
   Result := '';
-  for I := 0 to DotNetFxCount - 1 do
+  // Le socle (index 0) en dernier : ASP.NET Core et Desktop s'installent en version a jour, et le socle doit l'etre au
+  // moins autant qu'eux (DotNetFxPresent le relit apres leur installation).
+  for I := DotNetFxCount - 1 downto 0 do
   begin
     if DotNetFxPresent(I) then
       Log('.NET 8 : ' + DotNetFxLabel(I) + ' present')
