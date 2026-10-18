@@ -92,7 +92,7 @@ public sealed class DirectPartageTests
     public void La_commande_dit_a_l_exe_si_le_record_est_tombe()
     {
         // Le format que lit CarteASuivre dans l'exe du direct (0.5.6).
-        Assert.Equal("""{"fin":true,"arret":false,"suivant":{"joueur":"player","jeu":"1942"},"recordBattu":true,"relance":false}""",
+        Assert.Equal("""{"fin":true,"arret":false,"suivant":{"joueur":"player","jeu":"1942","record":false},"recordBattu":true,"relance":false}""",
             DirectPartageService.CommandeJson(true, false, "player", "1942", true, false));
         Assert.Equal("""{"fin":true,"arret":true,"suivant":null,"recordBattu":false,"relance":true}""",
             DirectPartageService.CommandeJson(true, true, null, null, false, true));
@@ -107,6 +107,18 @@ public sealed class DirectPartageTests
     [InlineData(45, null, false, true, false)]          // un direct de record prend le relais
     public void Une_partie_ratee_puis_relancee_finit_sur_try_again(int secondes, string? annonce, bool nouvelle, bool alert, bool attendu)
         => Assert.Equal(attendu, DirectPartageService.EstUneRelance(TimeSpan.FromSeconds(secondes), annonce, "Player", nouvelle, alert));
+
+    [Fact]
+    public void La_carte_de_fin_dit_RECORD_ALERT_quand_la_suivante_approche_le_record()
+        => Assert.Contains("\"record\":true", DirectPartageService.CommandeJson(true, false, "player", "1942", false, false, true));
+
+    [Fact]
+    public void Le_champion_et_l_annonce_d_une_greffe_partent_avec_leur_empreinte()
+    {
+        var o = DirectPartageService.OptionsDuPassage(3000, "c", null, null, "b", null, null, null, null, "New_Champion.mp4", "CC", "AA");
+        Assert.Equal(["--champion", "New_Champion.mp4", "--champion-sha256", "CC", "--annonce-sha256", "AA"], o.Skip(8));
+        Assert.DoesNotContain("--champion", DirectPartageService.OptionsDuPassage(3000, "c", null, null, "b", null, null, null, null, "New_Champion.mp4", " "));
+    }
 
     [Fact]
     public void Try_again_ne_part_qu_avec_son_empreinte()

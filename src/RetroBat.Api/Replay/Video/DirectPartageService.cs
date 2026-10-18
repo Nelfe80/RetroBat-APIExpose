@@ -56,6 +56,11 @@ public sealed class DirectPartageService : IHostedService
         public string RecordTexte = "";
         // La bande sous le jeu, telle que le site l'a donnee au passage : relue pour la reecrire quand le mode change.
         public string? BandeJoueur, BandeJeu, BandeSysteme, BandeRegleParDefaut;
+        // LA GREFFE (18 octobre 2026) : le classement du mode joue (la carte de fin d'un record tombe sur la chaine), et la
+        // bande « RECORD ALERT » pendant que la partie approche le record.
+        public IReadOnlyList<LeaderboardClient.Ligne> Lignes = Array.Empty<LeaderboardClient.Ligne>();
+        public volatile bool AlerteRecord;
+        public bool CarteEcrite;
         public readonly DateTime Debut = DateTime.UtcNow;
         // LE RELAIS (2026-10-18) : la cle de la partie, pour que le site distingue deux parties de la borne (l'ancienne
         // finit sa fin de passage pendant que la nouvelle se presente pour reprendre le meme direct).
@@ -137,7 +142,8 @@ public sealed class DirectPartageService : IHostedService
     /// clip), bande sous le jeu. Pur.
     /// </summary>
     internal static IReadOnlyList<string> OptionsDuPassage(int debitKbps, string commande, string? clip, string? empreinte, string bandeau,
-        string? applaudissements = null, string? empreinteApplaudissements = null, string? relance = null, string? empreinteRelance = null)
+        string? applaudissements = null, string? empreinteApplaudissements = null, string? relance = null, string? empreinteRelance = null,
+        string? champion = null, string? empreinteChampion = null, string? empreinteAnnonce = null)
     {
         var o = new List<string> { "--debit", Math.Clamp(debitKbps, 500, 9000).ToString(CultureInfo.InvariantCulture), "--commande", commande,
             "--attente-max", "90", "--bandeau", bandeau };
@@ -148,6 +154,11 @@ public sealed class DirectPartageService : IHostedService
         // « Try again », a la place de la transition quand le joueur relance une partie ratee (18 octobre 2026).
         if (relance is not null && !string.IsNullOrWhiteSpace(empreinteRelance))
             o.AddRange(["--relance", relance, "--relance-sha256", empreinteRelance.Trim()]);
+        // La greffe : le nouveau champion d'un record tombe sur la chaine, et l'empreinte de « New Record » (le chemin de
+        // l'annonce part a part, par LanceurDuDirect).
+        if (champion is not null && !string.IsNullOrWhiteSpace(empreinteChampion))
+            o.AddRange(["--champion", champion, "--champion-sha256", empreinteChampion.Trim()]);
+        if (!string.IsNullOrWhiteSpace(empreinteAnnonce)) o.AddRange(["--annonce-sha256", empreinteAnnonce.Trim()]);
         return o;
     }
 
@@ -278,11 +289,13 @@ public sealed class DirectPartageService : IHostedService
         p.RegleDuRecord = regle;
         p.Record = null;
         p.RecordTexte = "";
+        p.Lignes = Array.Empty<LeaderboardClient.Ligne>();
         if (regle is null) return;
         try
         {
             var classement = await _classement.MondeAsync(romGroup, _agent.Status.Pseudo ?? "", CancellationToken.None, regle)
                 .ConfigureAwait(false);
+            p.Lignes = classement.Lignes;
             if (classement.Lignes.OrderBy(l => l.Rang).FirstOrDefault() is { } tete)
             {
                 p.RecordTexte = TexteDuRecord(tete.Valeur, tete.Joueur);
@@ -341,6 +354,12 @@ public sealed class DirectPartageService : IHostedService
                 var r = await _site.SonderLePartageAsync(demande, CancellationToken.None).ConfigureAwait(false);
                 var role = (string?)r?["role"];
                 var attente = TimeSpan.FromSeconds(Math.Clamp((int?)r?["poll_after"] ?? 10, 3, 60));
+                // LA GREFFE : la partie approche le record, la bande sous le jeu le dit (l'exe la relit toutes les 2 s).
+                if (role == "on_air" && ((bool?)r!["record_alert"] == true) != p.AlerteRecord)
+                {
+                    p.AlerteRecord = (bool?)r["record_alert"] == true;
+                    EcrireLaBande(p);
+                }
 
                 if (role == "on_air" && exe is null && !finie && (string?)r!["ingest"] is { Length: > 0 } adresse)
                 {
@@ -363,8 +382,16 @@ public sealed class DirectPartageService : IHostedService
                     bool nouvellePartie;
                     lock (_verrou) nouvellePartie = _enCours is not null && _enCours != p;
                     var relance = EstUneRelance(DateTime.UtcNow - p.Debut, (string?)suivante?["player"], p.BandeJoueur, nouvellePartie, p.Alert);
+                    var recordBattu = RecordBattu(Interlocked.Read(ref p.MeilleurScore), p.Record, p.NonCertifiable, p.Alert);
+                    // Le classement mis a jour, que l'exe montre apres le nouveau champion : ecrit avant la commande qui
+                    // ouvre la fin de passage.
+                    if (recordBattu && !p.CarteEcrite)
+                    {
+                        p.CarteEcrite = true;
+                        EcrireLaCarte(p, romGroup);
+                    }
                     EcrireLaCommande(p, fin: true, arret: false, (string?)suivante?["player"], (string?)suivante?["game"],
-                        RecordBattu(Interlocked.Read(ref p.MeilleurScore), p.Record, p.NonCertifiable, p.Alert), relance);
+                        recordBattu, relance, (bool?)suivante?["record"] == true);
                 }
                 else if (role == "stop" || (role == "none" && exe is not null))
                 {
@@ -441,11 +468,20 @@ public sealed class DirectPartageService : IHostedService
         var bravo = (r["clips"] as JsonObject)?["applause"] as JsonObject;
         var applaudissements = CheminDuClip(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, (string?)bravo?["file"]);
         if (applaudissements is not null && !File.Exists(applaudissements)) applaudissements = null;
+        // LA GREFFE (18 octobre 2026) : une partie qui prend la chaine pour un record s'ouvre par « New Record » ; un record
+        // tombe finit sur « New Champion » et le classement mis a jour.
+        var clipRecord = (r["clips"] as JsonObject)?["record"] as JsonObject;
+        var annonce = (bool?)r["record"] == true ? CheminDuClip(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, (string?)clipRecord?["file"]) : null;
+        if (annonce is not null && (!File.Exists(annonce) || string.IsNullOrWhiteSpace((string?)clipRecord?["sha256"]))) annonce = null;
+        var clipChampion = (r["clips"] as JsonObject)?["champion"] as JsonObject;
+        var champion = CheminDuClip(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, (string?)clipChampion?["file"]);
+        if (champion is not null && !File.Exists(champion)) champion = null;
         var essai = (r["clips"] as JsonObject)?["relaunch"] as JsonObject;
         var relanceClip = CheminDuClip(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, (string?)essai?["file"]);
         if (relanceClip is not null && !File.Exists(relanceClip)) relanceClip = null;
         var options = OptionsDuPassage((int?)r["bitrate_kbps"] ?? 3000, CheminDeLaCommande, clip, (string?)transition?["sha256"], CheminDuBandeau,
-            applaudissements, (string?)bravo?["sha256"], relanceClip, (string?)essai?["sha256"]);
+            applaudissements, (string?)bravo?["sha256"], relanceClip, (string?)essai?["sha256"], champion, (string?)clipChampion?["sha256"],
+            annonce is null ? null : (string?)clipRecord?["sha256"]);
         secours = new CancellationTokenSource();
         var jeton = secours.Token;
         var tache = Task.Run(async () =>
@@ -462,10 +498,12 @@ public sealed class DirectPartageService : IHostedService
                 _journal.LogInformation("Direct partage : l'exe de la partie precedente s'est arrete, la nouvelle partie {Mode}.",
                     relais ? "reprend le meme direct" : "prend l'antenne");
             }
-            EcrireLeBandeau(p.BandeJoueur, p.BandeJeu, p.BandeSysteme, LibelleDuMode(p.RegleDuRecord ?? regleParDefaut), p.RecordTexte);
+            EcrireLeBandeau(p.BandeJoueur, p.BandeJeu, p.BandeSysteme, ModeDeLaBande(p, regleParDefaut), p.RecordTexte);
+            // La carte d'un passage precedent ne se montre jamais : elle s'ecrit au moment ou le record tombe.
+            try { File.Delete(CheminDeLaCarte); } catch (Exception) { /* absente */ }
             Ecrire(CheminDeLaCommande, CommandeJson(fin: false, arret: false, null, null, false, false));
             return await LanceurDuDirect.DiffuserAsync(exe, film.Fichier, adresse, film.Rotation ?? 0, _journal, jeton,
-                options: options, delaiDeFin: TimeSpan.FromSeconds(10)).ConfigureAwait(false);
+                annonce: annonce, classement: CheminDeLaCarte, options: options, delaiDeFin: TimeSpan.FromSeconds(10)).ConfigureAwait(false);
         });
         lock (_verrou)
         {
@@ -476,18 +514,21 @@ public sealed class DirectPartageService : IHostedService
     }
 
     /// <summary>La commande de l'exe ; seule la partie a qui l'exe appartient l'ecrit (une ancienne partie se tait).</summary>
-    private void EcrireLaCommande(Partie p, bool fin, bool arret, string? joueur, string? jeu, bool recordBattu = false, bool relance = false)
+    private void EcrireLaCommande(Partie p, bool fin, bool arret, string? joueur, string? jeu, bool recordBattu = false, bool relance = false,
+        bool suivanteRecord = false)
     {
         lock (_verrou) if (_aLAntenne != p) return;
-        Ecrire(CheminDeLaCommande, CommandeJson(fin, arret, joueur, jeu, recordBattu, relance));
+        Ecrire(CheminDeLaCommande, CommandeJson(fin, arret, joueur, jeu, recordBattu, relance, suivanteRecord));
     }
 
-    internal static string CommandeJson(bool fin, bool arret, string? joueur, string? jeu, bool recordBattu, bool relance)
+    internal static string CommandeJson(bool fin, bool arret, string? joueur, string? jeu, bool recordBattu, bool relance,
+        bool suivanteRecord = false)
     {
         var commande = new JsonObject
         {
             ["fin"] = fin, ["arret"] = arret,
-            ["suivant"] = joueur is null && jeu is null ? null : new JsonObject { ["joueur"] = joueur, ["jeu"] = jeu },
+            // « record » : la partie suivante approche le record, la carte de fin dit RECORD ALERT (greffe).
+            ["suivant"] = joueur is null && jeu is null ? null : new JsonObject { ["joueur"] = joueur, ["jeu"] = jeu, ["record"] = suivanteRecord },
             ["recordBattu"] = recordBattu,
             ["relance"] = relance,
         };
@@ -498,7 +539,37 @@ public sealed class DirectPartageService : IHostedService
     private void EcrireLaBande(Partie p)
     {
         lock (_verrou) if (_aLAntenne != p || p.BandeRegleParDefaut is null) return;
-        EcrireLeBandeau(p.BandeJoueur, p.BandeJeu, p.BandeSysteme, LibelleDuMode(p.RegleDuRecord ?? p.BandeRegleParDefaut), p.RecordTexte);
+        EcrireLeBandeau(p.BandeJoueur, p.BandeJeu, p.BandeSysteme, ModeDeLaBande(p, p.BandeRegleParDefaut), p.RecordTexte);
+    }
+
+    /// <summary>Le mode sur la bande : « RECORD ALERT » pendant que la partie approche le record, sinon son classement.</summary>
+    private static string ModeDeLaBande(Partie p, string regleParDefaut)
+        => p.AlerteRecord ? "RECORD ALERT" : LibelleDuMode(p.RegleDuRecord ?? regleParDefaut);
+
+    /// <summary>La carte de fin d'un passage : le classement mis a jour quand le record est tombe sur la chaine.</summary>
+    internal static string CheminDeLaCarte => Path.Combine(Dossier, "partage-classement.json");
+
+    /// <summary>Ecrit la carte du classement mis a jour, au format que lit l'exe (CarteDuClassement).</summary>
+    private void EcrireLaCarte(Partie p, string romGroup)
+    {
+        try
+        {
+            var joueur = string.IsNullOrWhiteSpace(p.BandeJoueur) ? _agent.Status.Pseudo ?? "player" : p.BandeJoueur!;
+            var carte = new JsonObject
+            {
+                ["jeu"] = string.IsNullOrWhiteSpace(p.BandeJeu) ? romGroup : p.BandeJeu,
+                ["regle"] = p.RegleDuRecord ?? p.BandeRegleParDefaut ?? "1cc",
+                ["lignes"] = new JsonArray(DirectDuRecordService.ClassementMisAJour(p.Lignes, joueur, Interlocked.Read(ref p.MeilleurScore))
+                    .Select(l => (JsonNode)new JsonObject { ["rang"] = l.Rang, ["joueur"] = l.Joueur, ["score"] = l.Score, ["nouveau"] = l.Nouveau })
+                    .ToArray()),
+            };
+            Ecrire(CheminDeLaCarte, carte.ToJsonString());
+            _journal.LogInformation("Direct partage : {Jeu}, record tombe, carte du classement ecrite.", romGroup);
+        }
+        catch (Exception ex)
+        {
+            _journal.LogDebug(ex, "Direct partage : carte du classement non ecrite.");
+        }
     }
 
     private void EcrireLeBandeau(string? joueur, string? jeu, string? systeme, string mode, string record)
