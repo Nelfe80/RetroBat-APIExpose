@@ -47,6 +47,25 @@ public class NeutralisationCollectionTests
         }
     }
 
+    // Au lancement (2026-10-18, Turbo) : le jeu lance par le crochet game-start se retrouve dans la collection.
+    [Theory]
+    [InlineData("mame", "mspacmab.zip", true)]
+    [InlineData("MAME", "MSPACMAB.ZIP", true)]
+    [InlineData("fbneo", "mspacmab.zip", false)]
+    [InlineData("mame", "pacman.zip", false)]
+    public void Le_jeu_lance_se_retrouve_dans_la_collection(string systeme, string fichier, bool attendu)
+        => Assert.Equal(attendu, CertifiedSettingsService.DansLaCollection(
+            new[] { ("mame", "mspacmab.zip"), ("megadrive", "Sonic The Hedgehog (Japan, Korea).md") }, systeme, fichier));
+
+    [Fact]
+    public void Le_crochet_game_start_donne_le_systeme_et_la_rom()
+    {
+        var (systeme, chemin) = RetroBat.Api.Replay.Video.EchelleDesFilms.LancementDuScript(
+            "\"G:\\Emulation\\Retrobat\\roms\\mame\\mspacmab.zip\" \"Ms. Pac-Man\" \"mspacmab\"");
+        Assert.Equal("mame", systeme);
+        Assert.Equal("mspacmab.zip", Path.GetFileName(chemin));
+    }
+
     [Fact]
     public void Sans_collection_aucun_jeu()
     {

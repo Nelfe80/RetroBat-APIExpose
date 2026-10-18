@@ -11,12 +11,15 @@ public sealed class RomPacksController : ControllerBase
 {
     private readonly RomPackInstallerService _romPackInstaller;
     private readonly RetroBat.Api.Replay.Video.EchelleDesFilms? _echelle;
+    private readonly RetroBat.Api.Infrastructure.CertifiedSettingsService? _certifies;
 
     public RomPacksController(RomPackInstallerService romPackInstaller,
-        RetroBat.Api.Replay.Video.EchelleDesFilms? echelle = null)
+        RetroBat.Api.Replay.Video.EchelleDesFilms? echelle = null,
+        RetroBat.Api.Infrastructure.CertifiedSettingsService? certifies = null)
     {
         _romPackInstaller = romPackInstaller;
         _echelle = echelle;
+        _certifies = certifies;
     }
 
     /// <summary>
@@ -31,6 +34,8 @@ public sealed class RomPacksController : ControllerBase
         var rawArguments = await reader.ReadToEndAsync(cancellationToken);
         // Le script game-start d'ES passe avant le lanceur : le facteur du film du jeu se pose ici.
         _echelle?.PoserPourLeLancement(rawArguments);
+        // Et les reglages certifies du jeu (rembobinage, run-ahead, sauvegarde auto), que le lanceur lit juste apres.
+        _certifies?.NeutraliserAvantLeLancement(rawArguments);
         var result = await _romPackInstaller.EnsureLaunchRomAsync(rawArguments, cancellationToken);
         return Ok(result);
     }

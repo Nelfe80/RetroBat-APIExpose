@@ -202,11 +202,43 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
     private void NeutraliserLaCollection()
     {
         if (!_options.CurrentValue.NelfePlay.ForceCertifiedSettings) return;
-        var collection = Path.Combine(RetroBatPaths.EmulationStationConfigRoot, "collections",
-            "custom-" + NelfePlayScoringCollectionSyncService.CollectionName + ".cfg");
-        NeutraliserPlusieurs(JeuxDeLaCollection(collection, RetroBatPaths.RomsRoot,
-            Path.GetDirectoryName(RetroBatPaths.EmulationStationConfigRoot) ?? RetroBatPaths.EmulationStationConfigRoot));
+        NeutraliserPlusieurs(JeuxDeLaCollectionSurLeDisque());
     }
+
+    private static IReadOnlyList<(string Systeme, string Fichier)> JeuxDeLaCollectionSurLeDisque()
+        => JeuxDeLaCollection(Path.Combine(RetroBatPaths.EmulationStationConfigRoot, "collections",
+                "custom-" + NelfePlayScoringCollectionSyncService.CollectionName + ".cfg"), RetroBatPaths.RomsRoot,
+            Path.GetDirectoryName(RetroBatPaths.EmulationStationConfigRoot) ?? RetroBatPaths.EmulationStationConfigRoot);
+
+    /// <summary>
+    /// AU LANCEMENT, AVANT LE LANCEUR (2026-10-18, Turbo). Le crochet game-start d'EmulationStation attend la reponse de
+    /// l'API avant de lancer l'emulateur : les cles par jeu (rembobinage, run-ahead, sauvegarde auto) s'y reecrivent
+    /// pour un jeu de la collection World Scoring, sans le raccourci de la selection. ES efface les cles qu'il n'a pas
+    /// chargees quand il resauvegarde ses reglages (un changement dans un menu) ; Turbo changeait l'option des reglages
+    /// certifies, revenait sur le meme jeu, la selection ne reecrivait rien (meme jeu), et toutes ses parties partaient
+    /// avec le rembobinage, non certifiables.
+    /// </summary>
+    public void NeutraliserAvantLeLancement(string argumentsDuScript)
+    {
+        try
+        {
+            if (!_options.CurrentValue.NelfePlay.ForceCertifiedSettings) return;
+            var (systeme, chemin) = RetroBat.Api.Replay.Video.EchelleDesFilms.LancementDuScript(argumentsDuScript);
+            if (string.IsNullOrWhiteSpace(systeme) || string.IsNullOrWhiteSpace(chemin)) return;
+            var fichier = Path.GetFileName(chemin);
+            if (!DansLaCollection(JeuxDeLaCollectionSurLeDisque(), systeme, fichier)) return;
+            NeutraliserPlusieurs([(systeme, fichier)]);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Reglages certifies : cles du lancement non posees.");
+        }
+    }
+
+    /// <summary>Le jeu (dossier de systeme, fichier) est-il dans la collection ? Sans egard a la casse. Pur.</summary>
+    internal static bool DansLaCollection(IReadOnlyList<(string Systeme, string Fichier)> jeux, string systeme, string fichier)
+        => jeux.Any(j => string.Equals(j.Systeme, systeme, StringComparison.OrdinalIgnoreCase)
+                         && string.Equals(j.Fichier, fichier, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
     /// Les jeux d'un fichier de collection d'EmulationStation : (systeme, fichier), le systeme etant
