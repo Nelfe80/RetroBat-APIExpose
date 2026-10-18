@@ -1141,6 +1141,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var chiffreCredits = root.TryGetProperty("credit_digit", out var cd) && cd.ValueKind == JsonValueKind.True;
             lock (_sync) { _chiffreCredits = chiffreCredits; }
             var reason = root.TryGetProperty("reason", out var r) ? r.GetString() ?? "" : "";
+            // LES BOOTLEGS ET LES HACKS (2026-10-19) : le joueur l'apprend avant de jouer, avec la vraie raison (le site,
+            // qui ne voit que le sha1 partage avec le parent, dirait « certifiable »).
+            if (BootlegHorsDefinition(systemId, romGroup, GetString(attestation, "ContentSet")))
+            {
+                certifiable = false;
+                reason = "content.bootleg_unnamed";
+                Trace($"prevol : {GetString(attestation, "ContentSet")} est un bootleg ou un hack que le .MEM ne nomme pas, non certifiable");
+            }
             var force = (GetString(attestation, "ForcedOptions") ?? "").Length > 0;
             // Les reglages du JEU que le forcage a remis d'usine (DIP), nommes au joueur : il les avait
             // changes, il doit savoir qu'ils ne comptent pas (decision user 2026-10-07).
@@ -1603,6 +1611,22 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// (version japonaise), il faisait passer toute ROM rangee sous ce groupe, meme un dump inconnu
     /// (2026-10-11). Meme regle que la plateforme : ScoringRepository::formeDeContenuAdmise.
     /// </summary>
+    /// <summary>
+    /// LES BOOTLEGS ET LES HACKS (2026-10-19, mspacmab) : la regle de la collection World Scoring (1.9.75) vaut aussi pour
+    /// la partie. Un set que le referentiel marque bootleg ou hack, et que le .MEM ne nomme pas (le md5 de son nom absent
+    /// des empreintes du profil ouvert), n'a pas d'identite certifiable : son sha1 declare est souvent celui d'un fichier
+    /// partage avec son parent, et la plateforme ne peut pas les distinguer. Arcade seulement.
+    /// </summary>
+    internal static bool BootlegHorsDefinition(string? systemId, string? romGroup, string? contentSet,
+        ContentHashes? empreintes = null, Func<string?, string?, bool>? bootlegOuHack = null)
+    {
+        var set = SetArcade(systemId, contentSet);
+        if (set is null || string.IsNullOrEmpty(romGroup)) return false;
+        if (!(bootlegOuHack ?? GamelistIdentity.DeclaredBootlegOrHack)(systemId, set)) return false;
+        var md5 = (empreintes ?? NelfePlayScoringCollectionSyncService.EmpreintesOuvertes(romGroup))?.Md5 ?? [];
+        return !md5.Contains(NelfePlayScoringCollectionSyncService.Md5DuNomDeSet(set), StringComparer.OrdinalIgnoreCase);
+    }
+
     internal static string? Sha1Declare(string? systemId, string? romGroup, string? contentSet)
     {
         if (string.IsNullOrEmpty(romGroup)
@@ -3038,6 +3062,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             contentSha1 = Sha1Declare(systemId, romGroup, contentSet);
         }
+        if (BootlegHorsDefinition(systemId, romGroup, contentSet))
+        {
+            Trace($"1CC MULTI : STOP, {contentSet} est un bootleg ou un hack que le .MEM ne nomme pas");
+            return;
+        }
 
         var (profils, profilsDuSite) = await ProfilsAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false);
         // LE MODE DE LA PARTIE A PLUSIEURS (2026-10-06) : un jeu a modes peut avoir un 1CC MULTI par
@@ -3183,6 +3212,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             Trace(string.Equals(RomCanonicalResolver.CanonicalScoringSystem(systemId ?? string.Empty), "arcade", StringComparison.Ordinal)
                 ? $"identite declaree : sha1={(contentSha1 is null ? "introuvable" : contentSha1)} (sys={systemId} rom={romGroup})"
                 : $"identite : contenu mesure seul, md5 et sha256 (console, sys={systemId} rom={romGroup})");
+        }
+        if (BootlegHorsDefinition(systemId, romGroup, contentSet))
+        {
+            Trace($"STOP: {contentSet} est un bootleg ou un hack que le .MEM ne nomme pas : aucune identite certifiable");
+            return;
         }
 
         // Phase D : le score soumis = le MEILLEUR run. On segmente la trajectoire aux CHUTES
@@ -4232,6 +4266,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "metric.spike" => "lecture isolée : le score ne suit pas la partie, à vérifier",
         "metric.single_sample" => "une seule lecture du score sur toute la partie : mets APIExpose à jour",
         "profile.content_mismatch" => "ROM non reconnue",
+        "content.bootleg_unnamed" => "version bootleg ou hack, absente de la définition du jeu",
         "profile.mem_mismatch" => "définition mémoire non reconnue",
         "profile.core_options_mismatch" => "réglages en attente de conformité",
         "profile.listener_unauthorized" => "listener non homologué (wrapper ou plugin MAME)",

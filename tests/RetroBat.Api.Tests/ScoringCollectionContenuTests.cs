@@ -107,6 +107,38 @@ public class ScoringCollectionContenuTests
             Arcade("E:/roms/mame/MSPACMAB.zip"), jeu, ReferentielPacMan, AucunCalcul, Bootlegs));
     }
 
+    // La meme regle pour la partie (2026-10-19) : prevol non certifiable, rien n'est soumis.
+    [Fact]
+    public void Une_partie_sur_un_bootleg_que_le_MEM_ne_nomme_pas_n_est_pas_certifiable()
+    {
+        var empreintes = new ContentHashes { Md5 = ["01052a074f9e7ce8dc823a5dd2155d14"], Sha1 = [Sha1MsPacMan] };
+        Assert.True(NelfePlayScoringReporter.BootlegHorsDefinition("arcade", "ms-pac-man", "mspacmab", empreintes, Bootlegs));
+        Assert.False(NelfePlayScoringReporter.BootlegHorsDefinition("arcade", "ms-pac-man", "mspacman", empreintes, Bootlegs));
+        var nomme = new ContentHashes { Md5 = [NelfePlayScoringCollectionSyncService.Md5DuNomDeSet("mspacmab")] };
+        Assert.False(NelfePlayScoringReporter.BootlegHorsDefinition("arcade", "ms-pac-man", "mspacmab", nomme, Bootlegs));
+        // Une console s'identifie par son contenu mesure : la regle ne la touche pas.
+        Assert.False(NelfePlayScoringReporter.BootlegHorsDefinition("megadrive", "sonic", "mspacmab", empreintes, Bootlegs));
+    }
+
+    [Fact]
+    public void Les_empreintes_du_profil_ouvert_se_lisent_dans_l_index_garde_sur_disque()
+    {
+        var dossier = Path.Combine(Path.GetTempPath(), "nelfe-index-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dossier);
+        try
+        {
+            File.WriteAllText(Path.Combine(dossier, "scoring-collection-remote.json"),
+                """{"ok":true,"games":[{"system_id":"arcade","rom_group":"ms-pac-man","content_hashes":{"md5":["01052a074f9e7ce8dc823a5dd2155d14"]}}]}""");
+            Assert.Equal(["01052a074f9e7ce8dc823a5dd2155d14"], NelfePlayScoringCollectionSyncService.EmpreintesOuvertes("MS-PAC-MAN", dossier)!.Md5);
+            Assert.Null(NelfePlayScoringCollectionSyncService.EmpreintesOuvertes("1942", dossier));
+            Assert.Null(NelfePlayScoringCollectionSyncService.EmpreintesOuvertes("ms-pac-man", Path.Combine(dossier, "absent")));
+        }
+        finally
+        {
+            Directory.Delete(dossier, recursive: true);
+        }
+    }
+
     [Fact]
     public void Un_profil_sans_aucun_hash_ne_confirme_rien()
     {

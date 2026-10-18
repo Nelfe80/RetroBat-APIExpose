@@ -909,6 +909,25 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         return calcule is { Length: > 0 } && connus.Contains(calcule);
     }
 
+    /// <summary>
+    /// Les empreintes du profil ouvert d'un jeu, d'apres le dernier index des jeux ouverts garde sur disque (celui de la
+    /// collection) ; null sans index ou sans ce jeu.
+    /// </summary>
+    internal static ContentHashes? EmpreintesOuvertes(string romGroup, string? stateRoot = null)
+    {
+        try
+        {
+            var chemin = Path.Combine(stateRoot ?? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay"), "scoring-collection-remote.json");
+            if (string.IsNullOrWhiteSpace(romGroup) || !File.Exists(chemin)) return null;
+            var manifeste = JsonSerializer.Deserialize<OpenGamesManifest>(File.ReadAllText(chemin), JsonLecture);
+            return manifeste?.Games?.FirstOrDefault(g => string.Equals(g.RomGroup, romGroup, StringComparison.OrdinalIgnoreCase))?.ContentHashes;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
     /// <summary>L'empreinte arcade d'un set dans un .MEM : le md5 de son nom, en minuscules. Pur.</summary>
     internal static string Md5DuNomDeSet(string set)
         => Convert.ToHexString(System.Security.Cryptography.MD5.HashData(System.Text.Encoding.UTF8.GetBytes(set.Trim().ToLowerInvariant())))
