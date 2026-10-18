@@ -74,6 +74,16 @@ for (var i = 0; i < args.Length; i++)
 }
 var hostArgs = hostArgList.ToArray();
 
+// UNE SEULE API PAR SESSION (2026-10-18, theJim) : avant le journal, les services et le port. Voir InstanceUnique.
+using var instanceUnique = selfTestRequested ? null : RetroBat.Api.Infrastructure.InstanceUnique.Prendre(
+    RetroBat.Api.Infrastructure.InstanceUnique.AttenteDeLaPrecedente,
+    () => Console.WriteLine("Une autre APIExpose tourne : attente de sa sortie (10 s au plus)..."));
+if (!selfTestRequested && instanceUnique is null)
+{
+    RetroBat.Api.Infrastructure.InstanceUnique.Annoncer();
+    return 0;
+}
+
 // Le journal fatal est pret AVANT l'hote : une exception pendant CreateBuilder, Build ou Run
 // (Kestrel qui ne peut pas ecouter, un service qui echoue a demarrer) y laisse sa trace.
 RetroBat.Api.Infrastructure.StartupFatalLog.Configure(diagnosticMode || diagnosticConfigPath is not null, diagnosticConfigPath, args);
@@ -999,7 +1009,19 @@ app.MapControllers();
 // une SALLE multi-bornes passe "Urls": "http://0.0.0.0:12345" dans
 // appsettings pour que le hub joigne la borne par le LAN - et active alors
 // Security:ApiKey (les requêtes non-loopback exigent X-Api-Key).
-app.Run(app.Configuration["Urls"] ?? "http://127.0.0.1:12345");
+var adresseDEcoute = app.Configuration["Urls"] ?? "http://127.0.0.1:12345";
+try
+{
+    app.Run(adresseDEcoute);
+}
+catch (IOException ex) when (ex.InnerException is Microsoft.AspNetCore.Connections.AddressInUseException)
+{
+    // Un AUTRE programme tient le port (une API ne passe plus le verrou) : le dire, sans la fenetre « a cesse de
+    // fonctionner ».
+    RetroBat.Api.Infrastructure.StartupFatalLog.Write("port-occupe", ex, adresseDEcoute);
+    Console.Error.WriteLine("APIExpose ne peut pas ecouter " + adresseDEcoute + " : un autre programme utilise ce port.");
+    return 3;
+}
 return 0;
 
 static async Task HandleWebSocketAsync(HttpContext context, string stream)

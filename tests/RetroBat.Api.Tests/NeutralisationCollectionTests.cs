@@ -66,6 +66,33 @@ public class NeutralisationCollectionTests
         Assert.Equal("mspacmab.zip", Path.GetFileName(chemin));
     }
 
+    // theJim (2026-10-18) : une seconde API lancee pendant que la premiere tournait plantait sur le port pris.
+    [Fact]
+    public void Une_seconde_API_ne_prend_pas_le_verrou_tant_que_la_premiere_le_garde()
+    {
+        var nom = @"Local\NelfePlay.RetroBat.Api.Test." + Guid.NewGuid().ToString("N");
+        using var tenu = new ManualResetEventSlim();
+        using var rendre = new ManualResetEventSlim();
+        var premiere = new Thread(() =>
+        {
+            using var verrou = InstanceUnique.Prendre(TimeSpan.Zero, nom: nom);
+            Assert.NotNull(verrou);
+            tenu.Set();
+            rendre.Wait();
+            verrou!.ReleaseMutex();
+        });
+        premiere.Start();
+        tenu.Wait();
+        var occupe = false;
+        Assert.Null(InstanceUnique.Prendre(TimeSpan.FromMilliseconds(100), () => occupe = true, nom));
+        Assert.True(occupe);
+        rendre.Set();
+        premiere.Join();
+        // La premiere sortie, la suivante le prend (cas de la mise a jour).
+        using var suivante = InstanceUnique.Prendre(TimeSpan.FromSeconds(2), nom: nom);
+        Assert.NotNull(suivante);
+    }
+
     [Fact]
     public void Sans_collection_aucun_jeu()
     {
