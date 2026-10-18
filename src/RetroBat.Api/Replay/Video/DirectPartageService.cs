@@ -488,9 +488,18 @@ public sealed class DirectPartageService : IHostedService
         {
             if (precedent is not null)
             {
-                // L'ordre d'arret, que l'exe precedent lit chaque seconde ; au-dela de 15 s, son lanceur l'arrete.
-                Ecrire(CheminDeLaCommande, CommandeJson(fin: true, arret: true, null, null, false, false));
-                if (await Task.WhenAny(precedent, Task.Delay(TimeSpan.FromSeconds(15))).ConfigureAwait(false) != precedent)
+                // LA FIN DE LA PARTIE PRECEDENTE (2026-10-18, Lorenzolamas sur Tetris TGM2) : sa nouvelle partie tournait deja
+                // quand l'ancienne est passee en fin de passage, et le relais arrivait une seconde apres. L'ordre d'arret
+                // ecrit aussitot remplacait la commande de fin que l'exe precedent n'avait pas encore lue (il la lit une fois
+                // par seconde) : il s'arretait net, sans « try again ». La commande dit d'abord de finir sur « try again » (le
+                // record fete d'abord, s'il est tombe) ; l'ordre d'arret ne vient qu'une fois qu'elle a ete lue, et l'attente
+                // couvre la fete d'un record. Au-dela, son lanceur l'arrete.
+                var recordFete = RecordFeteDansLaCommande(LireLaCommande());
+                var (finir, arreter) = CommandesDuRelais(recordFete);
+                Ecrire(CheminDeLaCommande, finir);
+                await Task.Delay(LectureDeLaCommande).ConfigureAwait(false);
+                Ecrire(CheminDeLaCommande, arreter);
+                if (await Task.WhenAny(precedent, Task.Delay(PatienceDuRelais(recordFete))).ConfigureAwait(false) != precedent)
                 {
                     try { secoursPrecedent?.Cancel(); } catch (ObjectDisposedException) { /* deja fini */ }
                     await Task.WhenAny(precedent, Task.Delay(TimeSpan.FromSeconds(12))).ConfigureAwait(false);
@@ -511,6 +520,44 @@ public sealed class DirectPartageService : IHostedService
             _secoursCourant = secours;
         }
         return tache;
+    }
+
+    /// <summary>L'exe relit la commande au plus une fois par seconde : la fin d'un relais tient un peu plus avant l'arret.</summary>
+    internal static readonly TimeSpan LectureDeLaCommande = TimeSpan.FromMilliseconds(1500);
+
+    /// <summary>
+    /// Les deux commandes d'un relais, pour l'exe de la partie precedente : finir sur « try again » (apres le nouveau
+    /// champion, le classement et les applaudissements si le record est tombe), puis s'arreter (la carte « STAY TUNED »
+    /// ne tient pas). Pur.
+    /// </summary>
+    internal static (string Finir, string Arreter) CommandesDuRelais(bool recordFete)
+        => (CommandeJson(fin: true, arret: false, null, null, recordFete, relance: true),
+            CommandeJson(fin: true, arret: true, null, null, recordFete, relance: true));
+
+    /// <summary>
+    /// Le temps laisse a l'exe precedent pour finir : « try again » et la fin de la carte, ou toute la fete d'un record
+    /// (nouveau champion, classement de 8 s, applaudissements, puis « try again »). Pur.
+    /// </summary>
+    internal static TimeSpan PatienceDuRelais(bool recordFete) => TimeSpan.FromSeconds(recordFete ? 45 : 15);
+
+    /// <summary>Le record tombe que dit une commande (celle de la partie precedente) ; faux si elle est illisible. Pur.</summary>
+    internal static bool RecordFeteDansLaCommande(string? commande)
+    {
+        if (string.IsNullOrWhiteSpace(commande)) return false;
+        try
+        {
+            return JsonNode.Parse(commande)?["recordBattu"] is JsonValue v && v.TryGetValue<bool>(out var battu) && battu;
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return false;
+        }
+    }
+
+    private static string? LireLaCommande()
+    {
+        try { return File.ReadAllText(CheminDeLaCommande); }
+        catch (Exception) { return null; }
     }
 
     /// <summary>La commande de l'exe ; seule la partie a qui l'exe appartient l'ecrit (une ancienne partie se tait).</summary>

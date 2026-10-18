@@ -108,6 +108,30 @@ public sealed class DirectPartageTests
     public void Une_partie_ratee_puis_relancee_finit_sur_try_again(int secondes, string? annonce, bool nouvelle, bool alert, bool attendu)
         => Assert.Equal(attendu, DirectPartageService.EstUneRelance(TimeSpan.FromSeconds(secondes), annonce, "Player", nouvelle, alert));
 
+    // Lorenzolamas, Tetris TGM2 (2026-10-18) : la nouvelle partie tournait deja, le relais arrivait une seconde apres la fin.
+    [Fact]
+    public void Un_relais_laisse_l_exe_precedent_finir_sur_try_again_avant_l_arret()
+    {
+        var (finir, arreter) = DirectPartageService.CommandesDuRelais(recordFete: false);
+        Assert.Equal("""{"fin":true,"arret":false,"suivant":null,"recordBattu":false,"relance":true}""", finir);
+        Assert.Equal("""{"fin":true,"arret":true,"suivant":null,"recordBattu":false,"relance":true}""", arreter);
+        Assert.Equal(TimeSpan.FromSeconds(15), DirectPartageService.PatienceDuRelais(false));
+        // L'exe relit la commande une fois par seconde : l'arret attend qu'il ait lu la fin.
+        Assert.True(DirectPartageService.LectureDeLaCommande > TimeSpan.FromSeconds(1));
+    }
+
+    [Fact]
+    public void Un_relais_garde_la_fete_d_un_record_tombe()
+    {
+        var precedente = DirectPartageService.CommandeJson(true, false, null, null, recordBattu: true, relance: false);
+        Assert.True(DirectPartageService.RecordFeteDansLaCommande(precedente));
+        Assert.False(DirectPartageService.RecordFeteDansLaCommande(DirectPartageService.CommandeJson(true, false, null, null, false, false)));
+        Assert.False(DirectPartageService.RecordFeteDansLaCommande(null));
+        Assert.False(DirectPartageService.RecordFeteDansLaCommande("{casse"));
+        Assert.Contains("\"recordBattu\":true", DirectPartageService.CommandesDuRelais(recordFete: true).Finir);
+        Assert.Equal(TimeSpan.FromSeconds(45), DirectPartageService.PatienceDuRelais(true));
+    }
+
     [Fact]
     public void La_carte_de_fin_dit_RECORD_ALERT_quand_la_suivante_approche_le_record()
         => Assert.Contains("\"record\":true", DirectPartageService.CommandeJson(true, false, "player", "1942", false, false, true));
