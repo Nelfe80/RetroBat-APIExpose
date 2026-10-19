@@ -4053,14 +4053,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var scoreText = (string?)((passport["metric"] as JsonObject)?["value"]) ?? "0";
             _ = long.TryParse(scoreText, out var score);
             var rank = (int?)(obj?["rank"]);
+            var regle = (string?)(passport["game"] as JsonObject)?["ruleset"];
             // Le 1LC arrive juste apres le verdict du 1CC de la meme partie : il se nomme.
-            var quoi = RetroBat.Api.Scoring.ModesDeJeu.Est1LC((string?)(passport["game"] as JsonObject)?["ruleset"])
+            var quoi = RetroBat.Api.Scoring.ModesDeJeu.Est1LC(regle)
                 ? "Score 1LC"
                 : "Score";
 
             var message = status switch
             {
-                "published" => $"{quoi} certifié : {score:N0} publié" + (rank is int r ? $" (#{r})" : ""),
+                "published" => TexteDuScorePublie(score, rank, regle),
                 // Signalé : gardé sur le compte du joueur, jamais classé ni ancré. Il sait pourquoi.
                 "held" => $"{quoi} {score:N0} signalé, non classé : {ReasonToText(reason)}",
                 // La quarantaine n'est PAS un refus : le score est garde avec son passeport
@@ -4241,6 +4242,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             if (nom.Length > 0 && !noms.Contains(nom)) noms.Add(nom);
         }
         return noms;
+    }
+
+    /// <summary>
+    /// « Score certifié : 27 186 publié (#6 en 1CC NORMAL) » : le rang dit dans quel classement il se lit (decision user
+    /// 2026-10-20). Le classement remplace « Score 1LC » : « (#1 en 1LC) » le dit deja.
+    /// </summary>
+    internal static string TexteDuScorePublie(long score, int? rang, string? regle)
+    {
+        var classement = RetroBat.Api.Scoring.ModesDeJeu.NomDuClassement(regle);
+        var ou = rang is int r ? $"#{r}" + (classement.Length > 0 ? $" en {classement}" : "") : classement;
+        return $"Score certifié : {score:N0} publié" + (ou.Length > 0 ? $" ({ou})" : "");
     }
 
     private static string ReasonToText(string reason) => reason switch

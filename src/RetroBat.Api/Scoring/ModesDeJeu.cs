@@ -207,6 +207,14 @@ public static class ModesDeJeu
     public static bool Est1LC(string? regle)
         => regle is { } r && (r == "1lc" || r.StartsWith("1lc-", StringComparison.Ordinal));
 
+    /// <summary>
+    /// LE NOM D'UN CLASSEMENT DANS L'ANNONCE DE FIN DE PARTIE (decision user 2026-10-20) : « 1cc-normal » s'ecrit
+    /// « 1CC NORMAL », comme sur le site. un joueur lisait un rang sans savoir de quel classement il parlait (Tetris TGM2,
+    /// un classement par mode). Vide sans regle.
+    /// </summary>
+    public static string NomDuClassement(string? regle)
+        => string.IsNullOrWhiteSpace(regle) ? "" : regle.Trim().ToUpperInvariant().Replace('-', ' ');
+
     /// <summary>Le speedrun, et ses variantes : jamais le classement du 1CC d'une partie.</summary>
     public static bool EstSpeedrun(string? regle)
         => regle is { } r && (r == "speedrun" || r.StartsWith("speedrun-", StringComparison.Ordinal));
