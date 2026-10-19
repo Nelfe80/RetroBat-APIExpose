@@ -33,6 +33,24 @@ public sealed record ContexteDeJeu(int? Mode, IReadOnlyDictionary<string, int> D
 
     public ContexteDeJeu AvecMode(int valeur) => Mode == valeur ? this : this with { Mode = valeur };
 
+    /// <summary>
+    /// LE MODE DE CHAQUE JOUEUR (decision user 2026-10-20) : en 1CC MULTI, chaque joueur garde son mode (Tetris TGM2 : le
+    /// joueur 1 en MASTER, le joueur 2 en NORMAL). Une ligne GAME_MODE qui porte player=N le range ici ; le mode de la
+    /// machine (<see cref="Mode"/>) reste celui du joueur 1, du solo et des jeux a drapeaux (Bubble Bobble).
+    /// </summary>
+    public IReadOnlyDictionary<int, int> ModesParJoueur { get; init; } = new Dictionary<int, int>();
+
+    public ContexteDeJeu AvecModeDuJoueur(int joueur, int valeur)
+    {
+        if (ModesParJoueur.TryGetValue(joueur, out var avant) && avant == valeur) return this;
+        var copie = new Dictionary<int, int>(ModesParJoueur) { [joueur] = valeur };
+        return this with { ModesParJoueur = copie };
+    }
+
+    /// <summary>Le contexte vu du joueur N : son mode quand il a ete lu, sinon celui de la machine.</summary>
+    public ContexteDeJeu PourLeJoueur(int joueur)
+        => ModesParJoueur.TryGetValue(joueur, out var m) && m != Mode ? this with { Mode = m } : this;
+
     public ContexteDeJeu AvecDrapeau(string adresse, int valeur)
     {
         var cle = ModesDeJeu.Adresse(adresse);

@@ -2260,16 +2260,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var mode = nom == RetroBat.Api.Scoring.ModesDeJeu.SignalMode;
         if (!mode && nom != RetroBat.Api.Scoring.ModesDeJeu.SignalDifficulte) return;
         if (Entier(signal, "Value") is not { } valeur) return;
+        // Le joueur de la ligne : un GAME_MODE player=2 est le mode du joueur 2, pas celui de la machine (2026-10-20).
+        var joueur = Entier(signal, "Player") ?? Entier(root, "player") ?? 1;
         string trace;
         lock (_sync)
         {
-            if (mode)
+            if (mode && joueur >= 2)
+            {
+                _contexte = _contexte.AvecModeDuJoueur(joueur, valeur);
+                trace = $"mode de jeu du joueur {joueur} : {valeur} (0x{valeur:X2})";
+            }
+            else if (mode)
             {
                 // L'octet lu, et sa valeur par adresse : un jeu a drapeaux se relit en fin de partie
                 // avec ses profils (ModesDeJeu.ModesParDrapeaux).
                 var adresse = (GetString(signal, "Address") ?? "").Trim();
                 if (adresse.Length > 0) _contexte = _contexte.AvecDrapeau(adresse, valeur);
-                _contexte = _contexte.AvecMode(valeur);
+                _contexte = _contexte.AvecMode(valeur).AvecModeDuJoueur(1, valeur);
                 trace = adresse.Length > 0
                     ? $"mode de jeu : {RetroBat.Api.Scoring.ModesDeJeu.Adresse(adresse)} = {valeur} (0x{valeur:X2})"
                     : $"mode de jeu : {valeur} (0x{valeur:X2})";
@@ -3070,9 +3077,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
         var (profils, profilsDuSite) = await ProfilsAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false);
         // LE MODE DE LA PARTIE A PLUSIEURS (2026-10-06) : un jeu a modes peut avoir un 1CC MULTI par
-        // mode (1cc-multi-super...). Le mode vaut pour toute la machine : celui des lectures du joueur 1
-        // au debut du run retenu.
-        var contexteMulti = ContexteDepuis(bestRun.Count > 0 ? bestRun[0].frame : (trajectory.Count > 0 ? trajectory[0].frame : 0));
+        // mode (1cc-multi-super...). CHAQUE JOUEUR GARDE SON MODE (decision user 2026-10-20, Tetris TGM2) :
+        // celui que sa ligne GAME_MODE player=N a lu ; a defaut, celui de la machine (les lectures du joueur 1
+        // au debut du run retenu, et les drapeaux de Bubble Bobble, qui valent pour tous).
+        var contexteMulti = ContexteDepuis(bestRun.Count > 0 ? bestRun[0].frame : (trajectory.Count > 0 ? trajectory[0].frame : 0))
+            .PourLeJoueur(place);
         JsonElement? profile = RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfilMulti(profils, contexteMulti.Mode);
         if (profile is null && profilsDuSite)
         {
