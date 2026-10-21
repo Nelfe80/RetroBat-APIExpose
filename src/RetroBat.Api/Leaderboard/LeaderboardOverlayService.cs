@@ -32,7 +32,7 @@ namespace RetroBat.Api.Leaderboard;
 /// sont ses propres glyphes de boutons.
 /// </summary>
 [SupportedOSPlatform("windows")]
-public sealed class LeaderboardOverlayService : IDisposable
+public sealed partial class LeaderboardOverlayService : IDisposable
 {
     /// <summary>Au-dela de ce silence, on rend la main a ES de nous-memes.</summary>
     public static readonly TimeSpan SilenceMax = TimeSpan.FromSeconds(45);
@@ -209,12 +209,15 @@ public sealed class LeaderboardOverlayService : IDisposable
 
     // ── Ouvrir, montrer, fermer ──────────────────────────────────────────────
 
-    public void Ouvrir(EsMenuStyle style, Contenu contenu)
+    public void Ouvrir(EsMenuStyle style, Contenu contenu) => OuvrirAvec(style, contenu, null);
+
+    private void OuvrirAvec(EsMenuStyle style, Contenu contenu, ContenuMultiplayer? multiplayer)
     {
         lock (_gate)
         {
             _style = style;
             _contenu = contenu;
+            _multiplayer = multiplayer;
             _dernierGeste = DateTime.UtcNow;
             if (_glyphes is null)
             {
@@ -257,7 +260,11 @@ public sealed class LeaderboardOverlayService : IDisposable
         if (ANousLaMain) RendreLeFocus();
         _forme?.Cacher();
         _forme?.SEtendre(false);
-        lock (_gate) { _contenu = _contenu with { Attente = "", AttenteTitre = "", AttenteDetail = "" }; }
+        lock (_gate)
+        {
+            _contenu = _contenu with { Attente = "", AttenteTitre = "", AttenteDetail = "" };
+            _multiplayer = null;
+        }
     }
 
     /// <summary>
@@ -271,6 +278,7 @@ public sealed class LeaderboardOverlayService : IDisposable
             if (!Affiche) return;
             Affiche = false;
             _contenu = _contenu with { Attente = "", AttenteTitre = "", AttenteDetail = "" };
+            _multiplayer = null;
         }
         ANousLaMain = false;
         _forme?.RefuserLActivation();
@@ -444,7 +452,7 @@ public sealed class LeaderboardOverlayService : IDisposable
 
     // ── La fenetre ───────────────────────────────────────────────────────────
 
-    private sealed class Panneau : Form
+    private sealed partial class Panneau : Form
     {
         private readonly LeaderboardOverlayService _service;
         private readonly System.Windows.Forms.Timer _minuteur;
@@ -504,8 +512,9 @@ public sealed class LeaderboardOverlayService : IDisposable
                 if (!Visible) Show();
                 PasserDevant();
                 var contenu = _service.Lire();
-                // Le sablier tourne : attente d'un lancement, ou replay en cours d'envoi.
-                if (contenu.Attente.Length > 0 || AUnReplayEnPreparation(contenu))
+                // Le sablier tourne : attente d'un lancement, ou replay en cours d'envoi. Le
+                // decompte MULTIPLAYER aussi : il se recalcule a chaque tour, entre deux sondages.
+                if (contenu.Attente.Length > 0 || AUnReplayEnPreparation(contenu) || _service.LireMultiplayer()?.DecompteFinUtc is not null)
                 {
                     _imageSablier++;
                     Invalidate();
@@ -750,6 +759,14 @@ public sealed class LeaderboardOverlayService : IDisposable
             }
 
             DessinerLeCadre(g);
+
+            // MULTIPLAYER (lot M3) : la meme fenetre, un autre contenu.
+            if (_service.LireMultiplayer() is { } multiplayer && c.Attente.Length == 0)
+            {
+                DessinerLeMultiplayer(g, multiplayer, c, s, policeTitre, policeTexte, policePetite, policeGras, policePied,
+                    tailleTitre, tailleTexte, taillePetite, taillePied);
+                return;
+            }
 
             if (c.Attente.Length > 0)
             {

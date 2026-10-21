@@ -448,6 +448,8 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multi
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerClient>();
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerSessionService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>());
+// Le panneau MULTIPLAYER d'ES : la fenetre du classement, un autre contenu (lot M3).
+builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerPanelService>();
 // Dans World Scoring, notre coeur fonctionnel ; dans le systeme du jeu, le choix de confort du joueur.
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.PartieNelfePlayService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.PartieNelfePlayService>());

@@ -137,10 +137,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider wrapper,
         ILogger<LeaderboardInputService> logger,
         Infrastructure.NelfePlayScoringCollectionSyncService? collection = null,
-        Infrastructure.PartieNelfePlayService? partie = null)
+        Infrastructure.PartieNelfePlayService? partie = null,
+        Multiplayer.MultiplayerPanelService? multiplayer = null)
     {
         _collection = collection;
         _partie = partie;
+        _multiplayer = multiplayer;
         _wrapper = wrapper;
         _social = social;
         _invite = invite;
@@ -234,6 +236,18 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 PreparerLaCle();
             }
             if (string.Equals(e.Type, "ui.game.selected", StringComparison.Ordinal)
+                && _multiplayer is { Ouvert: true } multiplayerOuvert)
+            {
+                var (systemeVu, jeuVu) = JeuSelectionne();
+                if (jeuVu.Length > 0 && (!string.Equals(jeuVu, _jeuAffiche, StringComparison.OrdinalIgnoreCase)
+                        || !string.Equals(systemeVu, _systemeAffiche, StringComparison.OrdinalIgnoreCase)))
+                {
+                    _logger.LogInformation("MULTIPLAYER : la selection a change ({Jeu}), le panneau se ferme.", jeuVu);
+                    multiplayerOuvert.Fermer();
+                }
+                return;
+            }
+            if (string.Equals(e.Type, "ui.game.selected", StringComparison.Ordinal)
                 && _modele.Etat != LeaderboardPanelModel.Foyer.Ferme)
             {
                 var (systemeVu, jeuVu) = JeuSelectionne();
@@ -262,6 +276,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             if (string.Equals(e.Type, "ui.game.started", StringComparison.Ordinal))
             {
                 // L'emulateur prend le premier plan : on s'efface sans le disputer a ES.
+                if (_multiplayer is { Ouvert: true } panneauMultiplayer)
+                {
+                    panneauMultiplayer.FermerPourLeJeu();
+                }
                 _modele.Fermer();
                 _overlay.FermerPourLeJeu();
                 return;
@@ -300,6 +318,24 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // joueur a la manette, « a » configure sur le bouton de droite, ne voyait jamais le panneau s'ouvrir.
             var valider = roleEs is not null ? roleEs == "valider" : slot == SlotValider;
             var annuler = roleEs is not null ? roleEs == "retour" : slot == SlotAnnuler;
+
+            // MULTIPLAYER ouvert : ses gestes, et rien pour le classement (pas d'appui long non plus).
+            if (_multiplayer is { Ouvert: true } panneau)
+            {
+                if (string.Equals(systeme, "DPAD", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (appuye) panneau.Direction(identite);
+                }
+                else if (valider)
+                {
+                    if (relache) panneau.Valider();
+                }
+                else if (annuler)
+                {
+                    panneau.Annuler(appuye);
+                }
+                return;
+            }
             if (_modele.Etat != LeaderboardPanelModel.Foyer.Ferme)
             {
                 _logger.LogDebug("Classement : {Type} identite={Identite} systeme={Systeme} slot={Slot} (etat {Etat})",
@@ -453,6 +489,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
 
                 if (_validerDepuis is { } depuis
                     && _modele.Etat == LeaderboardPanelModel.Foyer.Ferme
+                    && _multiplayer is not { Ouvert: true }
                     && (DateTime.UtcNow - depuis).TotalMilliseconds >= Math.Max(200, _options.CurrentValue.Leaderboard.LongPressMs))
                 {
                     _validerDepuis = null;
@@ -488,6 +525,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     _logger.LogInformation("Classement : le premier plan est parti ailleurs, le panneau se ferme.");
                     Fermer();
                 }
+                if (_multiplayer is { Ouvert: true } multiplayer && !EsEstDevant() && !_overlay.EstAuPremierPlan())
+                {
+                    _logger.LogInformation("MULTIPLAYER : le premier plan est parti ailleurs, le panneau se ferme.");
+                    multiplayer.Fermer();
+                }
             }
             catch (OperationCanceledException) { return; }
             catch (Exception ex)
@@ -514,6 +556,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             return;
         }
         var msConditions = chronoConditions.ElapsedMilliseconds;
+        if (_versMultiplayer && _multiplayer is not null)
+        {
+            _jeuAffiche = nomDuJeu;
+            _systemeAffiche = systeme;
+            await _multiplayer.OuvrirAsync(cheminDuJeu, Glyphe(SlotValider), Glyphe(SlotAnnuler), ct).ConfigureAwait(false);
+            return;
+        }
 
         // La cle du classement est celle de la plateforme, donc celle que le WRAPPER pose sur
         // une partie : alias.json du systeme, nom normalise, repli arcade. Le slug du nom
@@ -589,6 +638,15 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
 
     /// <summary>Qui sait quels jeux sont ouverts au scoring sur cette borne.</summary>
     private readonly Infrastructure.NelfePlayScoringCollectionSyncService? _collection;
+
+    /// <summary>
+    /// Le panneau MULTIPLAYER (lot M3). Dans la collection MULTIPLAYER, l'appui long ouvre SON
+    /// panneau et pas celui du classement (V24-01) ; tant qu'il est ouvert, les gestes lui vont.
+    /// </summary>
+    private readonly Multiplayer.MultiplayerPanelService? _multiplayer;
+
+    /// <summary>La derniere ouverture visait-elle la collection MULTIPLAYER ?</summary>
+    private bool _versMultiplayer;
     private readonly Infrastructure.PartieNelfePlayService? _partie;
 
     /// <summary>Les conditions d'ouverture. Toutes doivent tenir : un panneau qui s'ouvre au mauvais moment se ferme mal.</summary>
@@ -653,6 +711,17 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         if (nomDuJeu.Length == 0)
         {
             return Refus("le jeu selectionne n'a pas de nom");
+        }
+
+        // DANS LA COLLECTION MULTIPLAYER, l'appui long veut dire « je veux jouer » (V24-01, V24-03) :
+        // c'est son panneau qui s'ouvre, que le jeu soit ouvert au scoring ou non.
+        _versMultiplayer = _multiplayer is { Actif: true }
+            && string.Equals(_context.Ui.SelectedSystem?.Name ?? _dernierCarrousel,
+                Multiplayer.MultiplayerCollectionSyncService.CollectionName, StringComparison.OrdinalIgnoreCase);
+        if (_versMultiplayer)
+        {
+            _dernierRefus = "";
+            return true;
         }
 
         // LE PANNEAU EST CELUI DU SCORING MONDIAL : il n'a rien a dire d'un jeu qui n'y est pas
