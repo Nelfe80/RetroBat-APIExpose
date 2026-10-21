@@ -228,6 +228,35 @@ public class MultiplayerCollectionSyncTests : IDisposable
     }
 
     [Fact]
+    public void Un_jeu_a_un_moniteur_par_joueur_donne_son_ecran_a_chaque_place_et_fige_son_option()
+    {
+        var catalogue = new MultiplayerCatalogue
+        {
+            SchemaVersion = 1,
+            Cores = new Dictionary<string, MultiplayerCore>
+            {
+                ["arcade"] = new() { Core = "fbneo", Options = new Dictionary<string, string> { ["fbneo-commun"] = "a" } },
+            },
+        };
+        var wrally2 = new MultiplayerGame
+        {
+            Id = "arcade/wrally2", System = "arcade", Set = "wrally2", Players = 2, Screens = 2, SeatScreens = [1, 2],
+            Options = new Dictionary<string, string> { ["fbneo-dipswitch-wrally2-Monitors"] = "Two", ["fbneo-commun"] = "b" },
+        };
+        var harddunk = new MultiplayerGame { Id = "arcade/harddunk", System = "arcade", Set = "harddunk", Players = 6, Screens = 2 };
+
+        var coeur = catalogue.CoreOf(wrally2)!;
+        Assert.Equal("fbneo", coeur.Core);
+        Assert.Equal("Two", coeur.Options!["fbneo-dipswitch-wrally2-Monitors"]);
+        Assert.Equal("b", coeur.Options["fbneo-commun"]);
+        Assert.Equal("a", catalogue.CoreOf(harddunk)!.Options!["fbneo-commun"]);
+        Assert.Equal([1, 2], new[] { wrally2.EcranDeLaPlace(1), wrally2.EcranDeLaPlace(2) });
+        // Sans table : trois places par ecran, dans l'ordre.
+        Assert.Equal([1, 1, 1, 2, 2, 2], Enumerable.Range(1, 6).Select(harddunk.EcranDeLaPlace).ToArray());
+        Assert.Equal(1, new MultiplayerGame { Players = 4 }.EcranDeLaPlace(3));
+    }
+
+    [Fact]
     public void Par_defaut_la_collection_est_coupee()
         => Assert.False(new NelfePlayOptions().ShowMultiplayerCollection);
 
@@ -238,6 +267,8 @@ public class MultiplayerCollectionSyncTests : IDisposable
     [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":2},{\"id\":\"A\",\"system\":\"arcade\",\"set\":\"b\",\"players\":2}]}", "en double")]
     [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":2,\"level\":\"pro\"}]}", "niveau")]
     [InlineData("{\"schema_version\":2,\"games\":[]}", "schema 2")]
+    [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":2,\"screens\":2,\"seat_screens\":[1,3]}]}", "ecrans par place")]
+    [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":6,\"screens\":2,\"seat_screens\":[1,2]}]}", "ecrans par place")]
     public void Un_catalogue_douteux_est_refuse(string json, string raison)
     {
         var catalogue = JsonSerializer.Deserialize<MultiplayerCatalogue>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });

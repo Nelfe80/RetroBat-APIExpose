@@ -34,15 +34,27 @@ public sealed record MultiplayerCatalogue
     [JsonPropertyName("games")]
     public IReadOnlyList<MultiplayerGame> Games { get; init; } = [];
 
-    /// <summary>Le coeur d'un jeu : le sien s'il en nomme un, sinon celui de son systeme.</summary>
+    /// <summary>
+    /// Le coeur d'un jeu : le sien s'il en nomme un, sinon celui de son systeme ; ses options
+    /// propres s'ajoutent a celles du systeme et l'emportent sur elles.
+    /// </summary>
     public MultiplayerCore? CoreOf(MultiplayerGame jeu)
     {
-        if (jeu.Core is { Length: > 0 } propre)
+        MultiplayerCore? coeur = jeu.Core is { Length: > 0 } propre
+            ? new MultiplayerCore { Core = propre }
+            : Cores.TryGetValue(jeu.System, out var duSysteme) ? duSysteme : null;
+        if (coeur == null || jeu.Options is not { Count: > 0 } options)
         {
-            return new MultiplayerCore { Core = propre };
+            return coeur;
         }
 
-        return Cores.TryGetValue(jeu.System, out var coeur) ? coeur : null;
+        var fusion = new Dictionary<string, string>(coeur.Options ?? new Dictionary<string, string>(), StringComparer.Ordinal);
+        foreach (var (cle, valeur) in options)
+        {
+            fusion[cle] = valeur;
+        }
+
+        return coeur with { Options = fusion };
     }
 }
 
@@ -104,8 +116,41 @@ public sealed record MultiplayerGame
     [JsonPropertyName("core")]
     public string? Core { get; init; }
 
+    /// <summary>Options du coeur propres a ce jeu (un reglage DIP d'arcade), les memes sur toutes les bornes.</summary>
+    [JsonPropertyName("options")]
+    public IReadOnlyDictionary<string, string>? Options { get; init; }
+
+    /// <summary>
+    /// Les ecrans que le coeur dessine cote a cote : une borne d'origine a un moniteur par joueur
+    /// (World Rally 2, OutRunners). Chaque borne n'en affiche qu'un, celui de sa place.
+    /// </summary>
+    [JsonPropertyName("screens")]
+    public int Screens { get; init; } = 1;
+
+    /// <summary>L'ecran de chaque place, 1 etant le plus a gauche (Hard Dunk : trois joueurs par ecran).</summary>
+    [JsonPropertyName("seat_screens")]
+    public IReadOnlyList<int>? SeatScreens { get; init; }
+
     [JsonIgnore]
     public bool EstArcade => string.Equals(System, "arcade", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>L'ecran a afficher pour cette place (1 a <see cref="Screens"/>).</summary>
+    public int EcranDeLaPlace(int place)
+    {
+        if (Screens <= 1)
+        {
+            return 1;
+        }
+
+        if (SeatScreens is { Count: > 0 } ecrans && place >= 1 && place <= ecrans.Count)
+        {
+            return ecrans[place - 1];
+        }
+
+        // Sans table : les places se repartissent dans l'ordre, a parts egales.
+        var parEcran = Math.Max(1, (int)Math.Ceiling(Math.Max(Players, 1) / (double)Screens));
+        return Math.Clamp((Math.Max(place, 1) - 1) / parEcran + 1, 1, Screens);
+    }
 }
 
 public sealed record MultiplayerContent
@@ -240,6 +285,14 @@ public sealed class MultiplayerCatalogueStore
             if (jeu.Level is not (MultiplayerLevels.Classique or MultiplayerLevels.NelfePlay))
             {
                 return jeu.Id + " : niveau « " + jeu.Level + " » inconnu";
+            }
+
+            if (jeu.Screens is < 1 or > 4
+                || (jeu.SeatScreens is { Count: > 0 } ecrans
+                    && (ecrans.Count < jeu.Players || ecrans.Any(ecran => ecran < 1 || ecran > jeu.Screens))))
+            {
+                // Une place sans ecran, ou un ecran qui n'existe pas : une borne afficherait la vue d'un autre.
+                return jeu.Id + " : ecrans par place incoherents";
             }
         }
 
