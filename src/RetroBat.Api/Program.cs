@@ -440,6 +440,10 @@ builder.Services.AddSingleton(sp => new RetroBat.Api.Infrastructure.CoreMemoryCa
     sp.GetService<ILogger<RetroBat.Api.Infrastructure.CoreMemoryCapability>>()));
 builder.Services.AddSingleton<NelfePlayScoringCollectionSyncService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<NelfePlayScoringCollectionSyncService>());
+// La collection NELFEPLAY MULTIPLAYER : le catalogue du Data Pack croise avec ce que la borne possede.
+builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerCatalogueStore>();
+builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerCollectionSyncService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerCollectionSyncService>());
 // Dans World Scoring, notre coeur fonctionnel ; dans le systeme du jeu, le choix de confort du joueur.
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.PartieNelfePlayService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.PartieNelfePlayService>());

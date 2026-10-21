@@ -48,5 +48,7 @@ public class DataPackOptions
         "scraping", "startup-overlay", "theme",
         // Les clips que les bornes jouent dans leurs directs (16 octobre 2026), verifies par leur empreinte avant diffusion.
         "live",
+        // Le catalogue NELFEPLAY MULTIPLAYER (21 octobre 2026) : jeux, coeurs imposes, niveaux.
+        "multiplayer",
     };
 }

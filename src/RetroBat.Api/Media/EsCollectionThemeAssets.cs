@@ -75,15 +75,19 @@ public sealed class EsCollectionThemeAssets
     /// <summary>
     /// Depose les assets dans chaque theme installe qui sait les lire. Rien n'est recopie si
     /// la source n'a pas change : le deploiement ne doit pas provoquer un reload a chaque
-    /// demarrage.
+    /// demarrage. <paramref name="logo"/> et <paramref name="fond"/> nomment les fichiers du
+    /// Data Pack (<c>theme/images</c>) d'une autre collection que World Scoring.
     /// </summary>
-    public EsCollectionAssetsResult Install(string collectionName)
+    public EsCollectionAssetsResult Install(string collectionName, string? logo = null, string? fond = null)
     {
         var nom = collectionName.Trim();
         if (nom.Length == 0 || !Directory.Exists(_themesRoot))
         {
             return EsCollectionAssetsResult.Rien;
         }
+
+        var logoSource = string.IsNullOrWhiteSpace(logo) ? LogoSource : Path.Combine(_sourceRoot, logo.Trim());
+        var fondSource = string.IsNullOrWhiteSpace(fond) ? FondSource : Path.Combine(_sourceRoot, fond.Trim());
 
         var manifeste = LireManifeste(nom) ?? new EsCollectionAssetsManifest { Collection = nom };
         var deposes = manifeste.Files.ToDictionary(fichier => fichier.Path, StringComparer.OrdinalIgnoreCase);
@@ -99,8 +103,8 @@ public sealed class EsCollectionThemeAssets
             // UN SEUL fichier de logo. Carbon essaie « <nom>.png », « <nom>.svg », puis les
             // variantes « -w », et garde le dernier trouve : plusieurs fichiers deposes et
             // c'est la variante blanche, ou le vectoriel, qui l'emporterait sur la marque.
-            change |= Deposer(theme, DossiersLogos, nom + ".png", LogoSource, deposes, voulus);
-            change |= Deposer(theme, DossiersFonds, nom + ".jpg", FondSource, deposes, voulus);
+            change |= Deposer(theme, DossiersLogos, nom + ".png", logoSource, deposes, voulus);
+            change |= Deposer(theme, DossiersFonds, nom + ".jpg", fondSource, deposes, voulus);
         }
 
         // Un fichier qu'une version precedente deposait et qui n'est plus voulu s'en va, a
