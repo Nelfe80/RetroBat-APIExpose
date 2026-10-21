@@ -670,7 +670,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         systeme = "";
         nomDuJeu = "";
         if (_playback.IsBusy) return Refus("une lecture de replay est en cours");
-        if (EmulatorForeground.EmulateurTourne()) return Refus("un jeu tourne");
+        // Le RetroArch cache d'un rendu video n'est pas un jeu : les panneaux restent ouvrables (22/10).
+        if (EmulatorForeground.EmulateurDeJeuTourne()) return Refus("un jeu tourne");
         if (!EsEstDevant()) return Refus("EmulationStation n'est pas la fenetre active");
 
         var ui = _context.Ui;

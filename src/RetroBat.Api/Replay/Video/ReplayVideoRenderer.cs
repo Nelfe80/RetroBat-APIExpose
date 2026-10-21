@@ -124,13 +124,19 @@ public sealed class ReplayVideoRenderer
             return Echec("retroarch_indisponible", debut, fin);
         }
         _logger.LogInformation("Video : rendu de {ReplayId}, frames {Debut} a {Fin}.", replayId, debut, fin);
+        // Ce RetroArch n'est pas une partie : les panneaux d'ES restent ouvrables pendant le rendu (22/10).
+        RetroBat.Api.Infrastructure.EmulatorForeground.NoterLeRendu(process.Id);
 
         try
         {
             while (!process.HasExited && !pilote.Termine)
             {
                 ct.ThrowIfCancellationRequested();
-                RetroBat.Api.Infrastructure.EmulatorForeground.GarderHorsEcran(process);
+                if (RetroBat.Api.Infrastructure.EmulatorForeground.GarderHorsEcran(process))
+                {
+                    // Lance « reduit », il s'active quand meme : ES perdait le premier plan et la manette.
+                    RetroBat.Api.Infrastructure.EmulatorForeground.RendreAEsSiLeRenduEstDevant(process);
+                }
 
                 var action = chrono.Elapsed > plafond
                     ? pilote.Abandonner()
@@ -158,6 +164,7 @@ public sealed class ReplayVideoRenderer
         }
         finally
         {
+            RetroBat.Api.Infrastructure.EmulatorForeground.OublierLeRendu();
             if (!process.HasExited) { try { process.Kill(entireProcessTree: true); } catch { /* deja parti */ } }
             try { Directory.Delete(sauvegardes, recursive: true); } catch { /* zone de travail */ }
         }

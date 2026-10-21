@@ -14,7 +14,7 @@ public class MultiplayerPanelModelTests
     [Fact]
     public void Les_onglets_se_rangent_de_droite_a_gauche_et_restent_en_anglais()
     {
-        Assert.Equal(["INVITE FRIENDS", "WAITING FOR FRIENDS", "FOR PLAYERS…"], M.Onglets.Select(M.Titre).ToArray());
+        Assert.Equal(["INVITE", "WAITING FOR FRIENDS", "FOR PLAYERS…"], M.Onglets.Select(M.Titre).ToArray());
         var m = new M();
         m.Ouvrir();
         Assert.Equal(M.Foyer.MenuEs, m.Etat);

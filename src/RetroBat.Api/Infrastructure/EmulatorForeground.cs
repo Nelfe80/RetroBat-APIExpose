@@ -92,6 +92,75 @@ public static class EmulatorForeground
     /// d'« conditions »), et la surveillance du panel toutes les 5 s pendant une partie lancee
     /// hors d'ES.
     /// </summary>
+    /// <summary>
+    /// Le RetroArch du RENDU VIDEO d'un replay (role « station ») : il tourne cache, hors de l'ecran. Ce n'est pas
+    /// une partie : les panneaux d'ES ne doivent pas le prendre pour un jeu (vu le 22/10 : plus aucun panneau ne
+    /// s'ouvrait pendant les trois minutes d'un rendu).
+    /// </summary>
+    private static volatile int _processusDuRendu;
+
+    public static void NoterLeRendu(int processus) => _processusDuRendu = processus;
+
+    public static void OublierLeRendu() => _processusDuRendu = 0;
+
+    /// <summary>Un emulateur tourne-t-il pour une PARTIE (le RetroArch d'un rendu video ne compte pas) ?</summary>
+    public static bool EmulateurDeJeuTourne()
+    {
+        var rendu = _processusDuRendu;
+        Process[] tous;
+        try
+        {
+            tous = Process.GetProcesses();
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+
+        var trouve = false;
+        foreach (var p in tous)
+        {
+            try
+            {
+                if (!trouve && p.Id != rendu)
+                {
+                    var nom = p.ProcessName;
+                    trouve = Emulateurs.Any(emulateur => nom.StartsWith(emulateur, StringComparison.OrdinalIgnoreCase));
+                }
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                p.Dispose();
+            }
+        }
+
+        return trouve;
+    }
+
+    /// <summary>
+    /// Le RetroArch d'un rendu a pris le premier plan en demarrant (Windows active une fenetre lancee « reduite ») :
+    /// ES perdait la main, et la manette avec. On la lui rend, seulement si c'est bien cette fenetre-la qui est
+    /// devant : un jeu lance entre-temps garde la sienne.
+    /// </summary>
+    public static void RendreAEsSiLeRenduEstDevant(Process rendu)
+    {
+        try
+        {
+            var fenetre = rendu.MainWindowHandle;
+            if (fenetre != IntPtr.Zero && GetForegroundWindow() == fenetre)
+            {
+                FocusEmulationStation();
+            }
+        }
+        catch (Exception)
+        {
+            // Un rendu qui s'arrete entre-temps n'a plus de fenetre : rien a rendre.
+        }
+    }
+
     public static bool EmulateurTourne()
     {
         Process[] tous;

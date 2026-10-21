@@ -223,7 +223,10 @@ public sealed partial class LeaderboardOverlayService
             {
                 var j = c.Lignes[i];
                 var zone = new RectangleF(marge, y, Width - 2 * marge, hauteur);
-                if (c.NousAvonsLaMain && i == c.LigneCourante)
+                // Sur la ligne choisie, tout le texte prend la couleur des textes selectionnes d'ES : le pays et
+                // l'etat disparaissaient sur le bleu de la selection (apercu du 22/10).
+                var choisie = c.NousAvonsLaMain && i == c.LigneCourante;
+                if (choisie)
                 {
                     using var chemin = Arrondi(zone, taille * 0.3f);
                     using var fond = new SolidBrush(Teinte(s.SelectorColor));
@@ -255,7 +258,7 @@ public sealed partial class LeaderboardOverlayService
                 // A droite, de l'exterieur vers l'interieur : pret (ou absent), connexion, hote.
                 var droite = zone.Right - taille * 0.5f;
                 var alpha = j.Present ? 255 : 130;
-                using (var encre = new SolidBrush(j.Present ? Color.FromArgb(120, 229, 163) : Teinte(s.GroupColor, 200)))
+                using (var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : j.Present ? Color.FromArgb(120, 229, 163) : Teinte(s.GroupColor, 200)))
                 using (var aDroite = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Far, LineAlignment = StringAlignment.Center })
                 {
                     var largeur = g.MeasureString(j.Etat, petite, PointF.Empty, StringFormat.GenericTypographic).Width + 4f;
@@ -285,15 +288,21 @@ public sealed partial class LeaderboardOverlayService
                 // Le nom, puis le pays dessous. Pas de ville (V24-18).
                 var x = avatar.Right + taille * 0.6f;
                 var largeurNom = Math.Max(0, droite - x);
-                using (var encre = new SolidBrush(j.Moi ? Teinte(s.TitleColor, alpha) : Teinte(s.TextColor, alpha)))
+                using (var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : j.Moi ? Teinte(s.TitleColor, alpha) : Teinte(s.TextColor, alpha)))
                 {
                     g.DrawString(Couper(g, j.Nom, gras, largeurNom), gras, encre, new PointF(x, y + hauteur * 0.14f), StringFormat.GenericTypographic);
                 }
 
                 if (j.Pays.Length > 0)
                 {
-                    using var encre = new SolidBrush(Teinte(s.GroupColor, alpha));
-                    g.DrawString(j.Pays, petite, encre, new PointF(x, y + hauteur * 0.56f), StringFormat.GenericTypographic);
+                    // Le drapeau sous le nom (V24-18) ; un pays qu'on ne sait pas dessiner garde son code.
+                    var hauteurDrapeau = hauteur * 0.24f;
+                    var drapeau = new RectangleF(x, y + hauteur * 0.6f, hauteurDrapeau * 1.5f, hauteurDrapeau);
+                    if (!Drapeaux.Dessiner(g, j.Pays, drapeau, alpha))
+                    {
+                        using var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : Teinte(s.GroupColor, alpha));
+                        g.DrawString(j.Pays, petite, encre, new PointF(x, y + hauteur * 0.56f), StringFormat.GenericTypographic);
+                    }
                 }
 
                 y += hauteur + ecart;

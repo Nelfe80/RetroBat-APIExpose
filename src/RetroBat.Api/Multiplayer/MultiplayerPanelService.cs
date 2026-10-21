@@ -668,7 +668,7 @@ public sealed class MultiplayerPanelService
     }
 
     private bool EnJeu()
-        => EmulatorForeground.EmulateurTourne() || string.Equals(_contexte?.Ui.State, "playing", StringComparison.OrdinalIgnoreCase);
+        => EmulatorForeground.EmulateurDeJeuTourne() || string.Equals(_contexte?.Ui.State, "playing", StringComparison.OrdinalIgnoreCase);
 
     private MultiplayerRoom? RoomDuJeu()
     {

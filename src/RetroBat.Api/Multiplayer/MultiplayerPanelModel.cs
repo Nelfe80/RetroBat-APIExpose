@@ -25,11 +25,12 @@ public sealed class MultiplayerPanelModel
 
     /// <summary>
     /// Les titres, courts : les trois tiennent dans le panneau (retour du user du 22/10, « INVITE FRIENDS »
-    /// sortait a gauche). Les deux onglets d'attente se lisent d'un trait : WAITING FOR FRIENDS | FOR PLAYERS….
+    /// sortait a gauche, verifie a l'apercu). Les deux onglets d'attente se lisent d'un trait :
+    /// WAITING FOR FRIENDS | FOR PLAYERS….
     /// </summary>
     public static string Titre(Onglet onglet) => onglet switch
     {
-        Onglet.InviteFriends => "INVITE FRIENDS",
+        Onglet.InviteFriends => "INVITE",
         Onglet.WaitingForFriends => "WAITING FOR FRIENDS",
         _ => "FOR PLAYERS…",
     };
