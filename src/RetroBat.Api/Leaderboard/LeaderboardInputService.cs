@@ -726,9 +726,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
 
         // DANS LA COLLECTION MULTIPLAYER, l'appui long veut dire « je veux jouer » (V24-01, V24-03) :
         // c'est son panneau qui s'ouvre, que le jeu soit ouvert au scoring ou non.
-        _versMultiplayer = _multiplayer is { Actif: true }
-            && string.Equals(_context.Ui.SelectedSystem?.Name ?? _dernierCarrousel,
-                Multiplayer.MultiplayerCollectionSyncService.CollectionName, StringComparison.OrdinalIgnoreCase);
+        _versMultiplayer = _multiplayer is { Actif: true, DansLaCollection: true };
         if (_versMultiplayer)
         {
             _dernierRefus = "";

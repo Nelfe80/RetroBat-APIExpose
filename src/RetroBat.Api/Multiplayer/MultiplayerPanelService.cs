@@ -47,6 +47,7 @@ public sealed class MultiplayerPanelService
     private readonly ILogger<MultiplayerPanelService> _journal;
     private readonly LiveContestOverlayService? _bandeau;
     private readonly ApiContext? _contexte;
+    private readonly MediaRuntimeState? _etatDesMedias;
     private readonly MultiplayerPanelModel _modele = new();
     private readonly object _verrou = new();
     private readonly Dictionary<string, MultiplayerRoom> _connues = new(StringComparer.Ordinal);
@@ -75,7 +76,8 @@ public sealed class MultiplayerPanelService
         IOptionsMonitor<ApiExposeOptions> options,
         ILogger<MultiplayerPanelService> journal,
         LiveContestOverlayService? bandeau = null,
-        ApiContext? contexte = null)
+        ApiContext? contexte = null,
+        MediaRuntimeState? etatDesMedias = null)
     {
         _session = session;
         _overlay = overlay;
@@ -85,6 +87,7 @@ public sealed class MultiplayerPanelService
         _journal = journal;
         _bandeau = bandeau;
         _contexte = contexte;
+        _etatDesMedias = etatDesMedias;
         _session.Change += SurChangement;
     }
 
@@ -96,6 +99,14 @@ public sealed class MultiplayerPanelService
 
     /// <summary>MULTIPLAYER est-il en service sur cette borne ?</summary>
     public bool Actif => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: true };
+
+    /// <summary>
+    /// Le carrousel montre-t-il la collection MULTIPLAYER ? C'est le carrousel qui compte, pas le systeme du
+    /// jeu : a la selection d'un jeu, l'API prend le systeme du jeu (« fbneo »), meme dans une collection
+    /// (vu le 22/10 : l'appui long ouvrait le classement).
+    /// </summary>
+    public bool DansLaCollection
+        => string.Equals(_etatDesMedias?.CarouselSystemId, MultiplayerCollectionSyncService.CollectionName, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Une invitation attend sa reponse : l'appui long la prend avant tout panneau.</summary>
     public bool InvitationEnAttente
