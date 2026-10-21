@@ -444,6 +444,10 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<NelfePlayScoringCo
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerCatalogueStore>();
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerCollectionSyncService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerCollectionSyncService>());
+// Les gamerooms du joueur : le client de la plateforme et le sondage qui les tient a jour.
+builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerClient>();
+builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerSessionService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>());
 // Dans World Scoring, notre coeur fonctionnel ; dans le systeme du jeu, le choix de confort du joueur.
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.PartieNelfePlayService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.PartieNelfePlayService>());

@@ -47,6 +47,12 @@ public sealed class NetplayRelayPicker
     private string? _choix;
     private DateTime _mesureLe = DateTime.MinValue;
 
+    /// <summary>
+    /// La latence du relais retenu, en millisecondes, ou null tant qu'aucune mesure n'a abouti.
+    /// MULTIPLAYER la rapporte a la plateforme : la borne la mieux connectee heberge (V24-12).
+    /// </summary>
+    public int? MeilleurTempsMs { get; private set; }
+
     public NetplayRelayPicker(ILogger<NetplayRelayPicker> logger)
     {
         _logger = logger;
@@ -100,6 +106,7 @@ public sealed class NetplayRelayPicker
 
             _choix = meilleur;
             _mesureLe = DateTime.UtcNow;
+            MeilleurTempsMs = (int)Math.Ceiling(meilleurTemps);
             _logger.LogInformation("Netplay : relais retenu {Poignee} ({Temps} ms).", meilleur, (int)meilleurTemps);
             return meilleur;
         }

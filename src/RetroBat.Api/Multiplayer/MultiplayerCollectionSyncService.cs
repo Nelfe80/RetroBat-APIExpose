@@ -264,9 +264,11 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         foreach (var jeu in catalogue.Games)
         {
             string? chemin;
+            string? cle;
             if (jeu.EstArcade)
             {
                 chemin = TrouverSet(jeu.Set!);
+                cle = jeu.Set!;
             }
             else
             {
@@ -275,12 +277,12 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
                     inventaires[jeu.System] = inventaire = _catalog.Enumerate([jeu.System]);
                 }
 
-                chemin = TrouverContenu(jeu.Content!, inventaire);
+                (chemin, cle) = TrouverContenu(jeu.Content!, inventaire);
             }
 
-            if (chemin != null)
+            if (chemin != null && cle != null)
             {
-                retenus.Add(new MultiplayerInstalledGame(jeu, chemin, catalogue.CoreOf(jeu)));
+                retenus.Add(new MultiplayerInstalledGame(jeu, chemin, catalogue.CoreOf(jeu), cle));
             }
         }
 
@@ -310,7 +312,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     /// quand il correspond ; sinon le contenu est mesure, mais seulement pour un fichier qui passe
     /// le prefiltre : on ne hache pas un dossier de deux mille cartouches a chaque passe.
     /// </summary>
-    private string? TrouverContenu(MultiplayerContent contenu, IReadOnlyList<InstalledGame> inventaire)
+    private (string? Chemin, string? Md5) TrouverContenu(MultiplayerContent contenu, IReadOnlyList<InstalledGame> inventaire)
     {
         var md5 = contenu.Md5.ToHashSet(StringComparer.OrdinalIgnoreCase);
         var trouves = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -339,11 +341,11 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         {
             if (trouves.TryGetValue(prefere, out var chemin))
             {
-                return chemin;
+                return (chemin, prefere);
             }
         }
 
-        return null;
+        return (null, null);
     }
 
     internal static bool PassePrefiltre(string chemin, MultiplayerContent contenu)
@@ -401,8 +403,11 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     }
 }
 
-/// <summary>Un jeu du catalogue, le fichier qui le porte sur cette borne, et son coeur.</summary>
-public sealed record MultiplayerInstalledGame(MultiplayerGame Game, string Path, MultiplayerCore? Core);
+/// <summary>
+/// Un jeu du catalogue, le fichier qui le porte sur cette borne, son coeur, et la cle de contenu
+/// que la plateforme compare (le set en arcade, le md5 en console) : une gameroom ne reunit que la meme.
+/// </summary>
+public sealed record MultiplayerInstalledGame(MultiplayerGame Game, string Path, MultiplayerCore? Core, string ContentKey);
 
 public sealed record MultiplayerCollectionStatus(
     bool Enabled,
