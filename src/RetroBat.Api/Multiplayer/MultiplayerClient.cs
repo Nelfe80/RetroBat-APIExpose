@@ -322,6 +322,10 @@ public sealed record MultiplayerInvitation
     [JsonPropertyName("game")]
     public string Game { get; init; } = string.Empty;
 
+    /// <summary>Le contenu de la gameroom : la borne invitee doit avoir le meme pour rejoindre.</summary>
+    [JsonPropertyName("content")]
+    public string Content { get; init; } = string.Empty;
+
     [JsonPropertyName("from")]
     public MultiplayerJoueur? From { get; init; }
 

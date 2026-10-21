@@ -141,6 +141,30 @@ public sealed class NetplayGuestService
     /// <summary>Cette borne joue sa propre partie (ni spectatrice ni invitee d'une partie en netplay).</summary>
     public static bool PartieALaBorne => RoleDeLaPartie == Role.Aucun;
 
+    /// <summary>
+    /// MULTIPLAYER (lot M4) : la borne invitee d'une gameroom joue la partie de l'hote, a sa place. Meme marqueur que
+    /// le Join, pose avant le lancement : le rapporteur ne soumettra pas le score du joueur 1 sous son nom.
+    /// </summary>
+    internal static void NoterInviteMultiplayer(int place)
+    {
+        MarquerRejointe(Role.Joueur);
+        lock (VerrouRejointe)
+        {
+            _place = place;
+            _seancePlace = null;
+        }
+    }
+
+    /// <summary>La partie MULTIPLAYER de l'invite est finie : sa place se libere.</summary>
+    internal static void OublierInviteMultiplayer()
+    {
+        lock (VerrouRejointe)
+        {
+            _place = null;
+            _seancePlace = null;
+        }
+    }
+
     private static void MarquerRejointe(Role role)
     {
         lock (VerrouRejointe)

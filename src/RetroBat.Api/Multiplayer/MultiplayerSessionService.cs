@@ -190,6 +190,18 @@ public sealed class MultiplayerSessionService : BackgroundService
         return _collection.Games.FirstOrDefault(jeu => string.Equals(Path.GetFullPath(jeu.Path), cible, StringComparison.OrdinalIgnoreCase));
     }
 
+    /// <summary>
+    /// Le jeu d'une gameroom sur cette borne : meme jeu ET meme contenu (un autre dump se desynchroniserait).
+    /// Null quand la borne ne l'a pas.
+    /// </summary>
+    public MultiplayerInstalledGame? JeuDeLaRoom(MultiplayerRoom room)
+        => _collection.Games.FirstOrDefault(jeu => jeu.Game.Id == room.Game
+            && string.Equals(jeu.ContentKey, room.Content, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>Le nom d'un jeu du catalogue, jamais traduit ; son identifiant s'il n'est pas sur cette borne.</summary>
+    public string NomDuJeu(string id)
+        => _collection.Games.FirstOrDefault(jeu => jeu.Game.Id == id)?.Game.Name ?? id;
+
     /// <summary>Un sondage, tout de suite. Un seul a la fois.</summary>
     internal async Task SonderAsync(CancellationToken ct)
     {

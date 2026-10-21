@@ -328,7 +328,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 }
                 else if (valider)
                 {
-                    if (relache) panneau.Valider();
+                    panneau.Valider(appuye);
                 }
                 else if (annuler)
                 {
@@ -347,6 +347,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             {
                 if (appuye) Direction(identite);
                 return;
+            }
+            // Une invitation MULTIPLAYER attend : « retour » la refuse (ES recoit aussi le bouton, comme toujours).
+            if (annuler && relache && _multiplayer is { InvitationEnAttente: true } invitee)
+            {
+                invitee.RefuserInvitation();
             }
             if (systeme is null) NoterUnAppuiLongAilleurs(appuye, identite, slot, valider);
             if (slot is null && !valider && !annuler) return;
@@ -494,6 +499,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 {
                     _validerDepuis = null;
                     _depuisLAppui = System.Diagnostics.Stopwatch.StartNew();
+                    // Une invitation MULTIPLAYER attend sa reponse : l'appui long la prend avant tout panneau.
+                    if (_multiplayer is { InvitationEnAttente: true } invite && EsEstDevant())
+                    {
+                        await invite.AccepterInvitationAsync(ct).ConfigureAwait(false);
+                        continue;
+                    }
                     await OuvrirAsync(ct).ConfigureAwait(false);
                 }
 

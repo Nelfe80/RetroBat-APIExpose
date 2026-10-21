@@ -1,19 +1,26 @@
+using System.Globalization;
 using System.Runtime.Versioning;
 using Microsoft.Extensions.Options;
 using RetroBat.Api.Infrastructure;
 using RetroBat.Api.Leaderboard;
+using RetroBat.Domain.Models;
 using RetroBat.Domain.Services;
 
 namespace RetroBat.Api.Multiplayer;
 
 /// <summary>
-/// Le panneau MULTIPLAYER d'ES (CDC MULTIPLAYER v2.5, lot M3) : ce qu'il montre et ce que la manette y
-/// fait. Il s'ouvre par l'appui long sur un jeu de la collection MULTIPLAYER (V24-01, V24-03) : le
-/// joueur est place dans une gameroom tout de suite, deja pret, et le panneau montre qui l'attend.
+/// Ce que MULTIPLAYER montre dans ES (CDC MULTIPLAYER v2.5, lots M3 et M5), et ce que la manette y fait :
+///
+///   - le PANNEAU, ouvert par l'appui long sur un jeu de la collection (V24-01, V24-03) : le joueur est
+///     place dans une gameroom tout de suite, deja pret, et voit qui l'attend ;
+///   - la PRESENTATION, « Les joueurs se synchronisent… », du decompte jusqu'a l'arrivee du jeu ;
+///   - le RESULTAT, apres la partie : les joueurs, la duree, « Rejouer » (A maintenu), retour a ES en 12 s ;
+///   - en haut d'ES, le rappel de « Votre selection » (panneau ferme, le joueur attend toujours) et le
+///     toast d'une invitation (A maintenu pour rejoindre, B pour refuser).
 ///
 /// La fenetre, le focus et l'habillage sont ceux du panneau de classement
 /// (<see cref="LeaderboardOverlayService"/>) ; l'appui long et la lecture de la manette restent a
-/// <see cref="LeaderboardInputService"/>, qui transmet ici les gestes tant que ce panneau est ouvert.
+/// <see cref="LeaderboardInputService"/>, qui transmet ici les gestes tant que MULTIPLAYER est a l'ecran.
 /// </summary>
 [SupportedOSPlatform("windows")]
 public sealed class MultiplayerPanelService
@@ -21,21 +28,44 @@ public sealed class MultiplayerPanelService
     /// <summary>Les couleurs d'avatar, tirees de la poignee : la meme pour un joueur sur toutes les bornes.</summary>
     private static readonly string[] Couleurs = ["A98BFF", "78E5A3", "FF9F6B", "49E3CB", "FFD37A", "FF8C9A"];
 
+    /// <summary>V24-17 : « Vous serez de retour dans 12 s ».</summary>
+    private static readonly TimeSpan DureeDuResultat = TimeSpan.FromSeconds(12);
+
+    private enum Mode
+    {
+        Ferme,
+        Panneau,
+        Presentation,
+        Resultat,
+    }
+
     private readonly MultiplayerSessionService _session;
     private readonly LeaderboardOverlayService _overlay;
     private readonly InterfaceTextService _textes;
     private readonly EmulationStationSettingsService _reglages;
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly ILogger<MultiplayerPanelService> _journal;
+    private readonly LiveContestOverlayService? _bandeau;
+    private readonly ApiContext? _contexte;
     private readonly MultiplayerPanelModel _modele = new();
     private readonly object _verrou = new();
+    private readonly Dictionary<string, MultiplayerRoom> _connues = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _invitationsVues = new(StringComparer.Ordinal);
+    private Mode _mode = Mode.Ferme;
     private MultiplayerInstalledGame? _jeu;
     private IReadOnlyList<MultiplayerAmi> _amis = [];
     private string? _refus;
+    private DateTime? _validerDepuis;
     private DateTime? _annulerDepuis;
     private string _glypheValider = "button_a";
     private string _glypheAnnuler = "button_b";
     private string _langue = "";
+    private string _roomDuResultat = "";
+    private int? _dureeDuResultat;
+    private DateTime _finDuResultat;
+    private CancellationTokenSource? _retour;
+    private string _texteDuBandeau = "";
+    private MultiplayerInvitation? _invitation;
 
     public MultiplayerPanelService(
         MultiplayerSessionService session,
@@ -43,7 +73,9 @@ public sealed class MultiplayerPanelService
         InterfaceTextService textes,
         EmulationStationSettingsService reglages,
         IOptionsMonitor<ApiExposeOptions> options,
-        ILogger<MultiplayerPanelService> journal)
+        ILogger<MultiplayerPanelService> journal,
+        LiveContestOverlayService? bandeau = null,
+        ApiContext? contexte = null)
     {
         _session = session;
         _overlay = overlay;
@@ -51,20 +83,33 @@ public sealed class MultiplayerPanelService
         _reglages = reglages;
         _options = options;
         _journal = journal;
-        _session.Change += _ => Rafraichir();
+        _bandeau = bandeau;
+        _contexte = contexte;
+        _session.Change += SurChangement;
     }
 
-    /// <summary>Le panneau est-il ouvert ? Tant qu'il l'est, les gestes viennent ici.</summary>
-    public bool Ouvert => _modele.Etat != MultiplayerPanelModel.Foyer.Ferme;
+    /// <summary>MULTIPLAYER est-il a l'ecran ? Tant qu'il l'est, les gestes viennent ici.</summary>
+    public bool Ouvert
+    {
+        get { lock (_verrou) return _mode != Mode.Ferme; }
+    }
 
     /// <summary>MULTIPLAYER est-il en service sur cette borne ?</summary>
     public bool Actif => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: true };
 
+    /// <summary>Une invitation attend sa reponse : l'appui long la prend avant tout panneau.</summary>
+    public bool InvitationEnAttente
+    {
+        get { lock (_verrou) return _invitation is not null; }
+    }
+
+    // ── le panneau ─────────────────────────────────────────────────────────────────────────────
+
     /// <summary>
     /// L'APPUI LONG sur un jeu de la collection : le joueur rejoint une gameroom et le panneau s'ouvre.
-    /// Rend faux quand le jeu n'est pas MULTIPLAYER sur cette borne : le classement garde la main.
+    /// Rend faux quand le jeu n'est pas MULTIPLAYER sur cette borne.
     /// </summary>
-    public async Task<bool> OuvrirAsync(string cheminDuJeu, string glypheValider, string glypheAnnuler, CancellationToken ct)
+    public async Task<bool> OuvrirAsync(string cheminDuJeu, string glypheValider, string glypheAnnuler, CancellationToken ct, bool rejoindre = true)
     {
         var jeu = _session.JeuDe(cheminDuJeu);
         if (jeu is null)
@@ -78,20 +123,26 @@ public sealed class MultiplayerPanelService
             _jeu = jeu;
             _refus = null;
             _amis = [];
-            _glypheValider = glypheValider.Length > 0 ? glypheValider : "button_a";
-            _glypheAnnuler = glypheAnnuler.Length > 0 ? glypheAnnuler : "button_b";
+            _glypheValider = glypheValider.Length > 0 ? glypheValider : _glypheValider;
+            _glypheAnnuler = glypheAnnuler.Length > 0 ? glypheAnnuler : _glypheAnnuler;
             _langue = "";
+            _mode = Mode.Panneau;
+            _retour?.Cancel();
             _modele.Ouvrir();
         }
 
         _session.PanneauOuvert = true;
+        MettreAJourLeBandeau();
         _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal), Composer());
         _journal.LogInformation("MULTIPLAYER : panneau ouvert sur {Jeu}", jeu.Game.Id);
 
-        var refus = await _session.RejoindreAsync(cheminDuJeu, ct).ConfigureAwait(false);
-        lock (_verrou)
+        if (rejoindre)
         {
-            _refus = refus;
+            var refus = await _session.RejoindreAsync(cheminDuJeu, ct).ConfigureAwait(false);
+            lock (_verrou)
+            {
+                _refus = refus;
+            }
         }
 
         Rafraichir();
@@ -105,11 +156,15 @@ public sealed class MultiplayerPanelService
         lock (_verrou)
         {
             _modele.Fermer();
+            _mode = Mode.Ferme;
+            _validerDepuis = null;
             _annulerDepuis = null;
+            _retour?.Cancel();
         }
 
         _session.PanneauOuvert = false;
         _overlay.Fermer();
+        MettreAJourLeBandeau();
     }
 
     /// <summary>Un jeu demarre : la fenetre s'efface sans reprendre le premier plan a l'emulateur.</summary>
@@ -118,11 +173,102 @@ public sealed class MultiplayerPanelService
         lock (_verrou)
         {
             _modele.Fermer();
+            _mode = Mode.Ferme;
         }
 
         _session.PanneauOuvert = false;
         _overlay.FermerPourLeJeu();
+        _bandeau?.Hide();
+        _texteDuBandeau = "";
     }
+
+    /// <summary>L'emulateur est la : la presentation s'efface.</summary>
+    public void EffacerPourLeJeu() => FermerPourLeJeu();
+
+    // ── la presentation et le resultat ────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Le decompte est fini : « Les joueurs se synchronisent… » jusqu'a l'arrivee du jeu (ecrans 9 et 14 de
+    /// la toile). Au niveau Classique, le message de la borne d'origine s'ajoute.
+    /// </summary>
+    public void AnnoncerLeLancement(MultiplayerRoom room, MultiplayerInstalledGame? jeu)
+    {
+        var langue = Langue();
+        bool deja;
+        lock (_verrou)
+        {
+            deja = _mode == Mode.Presentation;
+            _mode = Mode.Presentation;
+            _modele.Fermer();
+            _jeu = jeu ?? _jeu;
+            _retour?.Cancel();
+        }
+
+        _session.PanneauOuvert = false;
+        _bandeau?.Hide();
+        _texteDuBandeau = "";
+        if (deja)
+        {
+            return;
+        }
+
+        var classique = room.Level != MultiplayerLevels.NelfePlay;
+        _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal), Composer());
+        _overlay.Attendre(
+            _textes.Text("multiplayer.syncing", langue),
+            jeu?.Game.Name ?? string.Empty,
+            classique ? _textes.Text("multiplayer.classic.message", langue) : string.Empty);
+    }
+
+    /// <summary>
+    /// Apres la partie, l'ecran de resultat (V24-17, 00quater.10) : au niveau Classique, les joueurs et la
+    /// duree. Il se ferme de lui-meme au bout de 12 s ; A maintenu relance le meme jeu.
+    /// </summary>
+    public void MontrerLeResultat(string room, int? dureeSecondes)
+    {
+        _ = Task.Run(async () =>
+        {
+            // L'hote annonce la fin : un ou deux sondages plus tard, la gameroom est « finished ».
+            for (var essai = 0; essai < 6 && !_session.Etat.Rooms.Any(r => r.Room == room && r.State == "finished"); essai++)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+            }
+
+            var retour = new CancellationTokenSource();
+            lock (_verrou)
+            {
+                _retour?.Cancel();
+                _retour = retour;
+                _mode = Mode.Resultat;
+                _roomDuResultat = room;
+                _dureeDuResultat = dureeSecondes;
+                _finDuResultat = DateTime.UtcNow + DureeDuResultat;
+                _modele.Fermer();
+            }
+
+            _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal), Composer());
+            try
+            {
+                await Task.Delay(DureeDuResultat, retour.Token).ConfigureAwait(false);
+                bool encore;
+                lock (_verrou)
+                {
+                    encore = _mode == Mode.Resultat && ReferenceEquals(_retour, retour);
+                }
+
+                if (encore)
+                {
+                    Fermer();
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rejouer, ou fermer a la main : rien a faire de plus.
+            }
+        });
+    }
+
+    // ── les gestes ──────────────────────────────────────────────────────────────────────────────────
 
     /// <summary>Une direction du DPAD : <c>left</c>, <c>right</c>, <c>up</c>, <c>down</c>.</summary>
     public void Direction(string? identite)
@@ -130,6 +276,11 @@ public sealed class MultiplayerPanelService
         MultiplayerPanelModel.Effet effet;
         lock (_verrou)
         {
+            if (_mode != Mode.Panneau)
+            {
+                return;
+            }
+
             effet = (identite ?? string.Empty).ToLowerInvariant() switch
             {
                 "left" => _modele.Gauche(),
@@ -143,13 +294,29 @@ public sealed class MultiplayerPanelService
         Appliquer(effet);
     }
 
-    /// <summary>Le bouton « valider » relache : agir sur la ligne.</summary>
-    public void Valider()
+    /// <summary>Le bouton « valider » : relache, il agit sur la ligne ; au resultat, maintenu, il relance le jeu.</summary>
+    public void Valider(bool appuye)
     {
         MultiplayerPanelModel.Effet effet;
+        bool rejouer;
         lock (_verrou)
         {
-            effet = _modele.Valider();
+            if (appuye)
+            {
+                _validerDepuis = DateTime.UtcNow;
+                return;
+            }
+
+            var maintenu = Maintenu(_validerDepuis);
+            _validerDepuis = null;
+            rejouer = _mode == Mode.Resultat && maintenu;
+            effet = _mode == Mode.Panneau ? _modele.Valider() : MultiplayerPanelModel.Effet.Rien;
+        }
+
+        if (rejouer)
+        {
+            _ = RejouerAsync();
+            return;
         }
 
         Appliquer(effet);
@@ -167,14 +334,84 @@ public sealed class MultiplayerPanelService
                 return;
             }
 
-            var maintenu = _annulerDepuis is { } depuis
-                && (DateTime.UtcNow - depuis).TotalMilliseconds >= Math.Max(200, _options.CurrentValue.Leaderboard.LongPressMs);
+            var maintenu = Maintenu(_annulerDepuis);
             _annulerDepuis = null;
-            effet = maintenu ? _modele.AnnulerMaintenu() : _modele.Annuler();
+            if (_mode == Mode.Resultat)
+            {
+                effet = MultiplayerPanelModel.Effet.Fermer;
+            }
+            else if (_mode == Mode.Panneau)
+            {
+                effet = maintenu ? _modele.AnnulerMaintenu() : _modele.Annuler();
+            }
+            else
+            {
+                return;   // la presentation ne s'interrompt pas
+            }
         }
 
         Appliquer(effet);
     }
+
+    /// <summary>L'appui long pendant une invitation : le joueur rejoint la gameroom de son ami.</summary>
+    public async Task AccepterInvitationAsync(CancellationToken ct = default)
+    {
+        MultiplayerInvitation? invitation;
+        lock (_verrou)
+        {
+            invitation = _invitation;
+            _invitation = null;
+        }
+
+        if (invitation is null)
+        {
+            return;
+        }
+
+        _bandeau?.Hide();
+        _texteDuBandeau = "";
+        var jeu = _session.JeuDeLaRoom(new MultiplayerRoom { Game = invitation.Game, Content = invitation.Content });
+        if (jeu is null)
+        {
+            // Sans le meme contenu, la partie se desynchroniserait : on refuse plutot que de rejoindre.
+            await _session.RepondreAsync(invitation.Invitation, false, ct).ConfigureAwait(false);
+            _bandeau?.ShowTop("MULTIPLAYER", _textes.Text("multiplayer.refused.content_refused", Langue()), string.Empty, 5000);
+            return;
+        }
+
+        var refus = await _session.RepondreAsync(invitation.Invitation, true, ct).ConfigureAwait(false);
+        if (refus is not null)
+        {
+            _bandeau?.ShowTop("MULTIPLAYER", _textes.Text("multiplayer.refused." + refus, Langue()), string.Empty, 5000);
+            return;
+        }
+
+        await OuvrirAsync(jeu.Path, string.Empty, string.Empty, ct, rejoindre: false).ConfigureAwait(false);
+    }
+
+    /// <summary>B pendant une invitation : elle est refusee.</summary>
+    public void RefuserInvitation()
+    {
+        MultiplayerInvitation? invitation;
+        lock (_verrou)
+        {
+            invitation = _invitation;
+            _invitation = null;
+        }
+
+        if (invitation is null)
+        {
+            return;
+        }
+
+        _bandeau?.Hide();
+        _texteDuBandeau = "";
+        _ = _session.RepondreAsync(invitation.Invitation, false);
+        MettreAJourLeBandeau();
+    }
+
+    private bool Maintenu(DateTime? depuis)
+        => depuis is { } debut && (DateTime.UtcNow - debut).TotalMilliseconds >= Math.Max(200, _options.CurrentValue.Leaderboard.LongPressMs);
 
     private void Appliquer(MultiplayerPanelModel.Effet effet)
     {
@@ -205,6 +442,19 @@ public sealed class MultiplayerPanelService
         }
 
         Rafraichir();
+    }
+
+    private async Task RejouerAsync()
+    {
+        var jeu = _jeu;
+        if (jeu is null)
+        {
+            Fermer();
+            return;
+        }
+
+        _journal.LogInformation("MULTIPLAYER : rejouer a {Jeu}", jeu.Game.Id);
+        await OuvrirAsync(jeu.Path, string.Empty, string.Empty, CancellationToken.None).ConfigureAwait(false);
     }
 
     private async Task QuitterAsync()
@@ -253,15 +503,128 @@ public sealed class MultiplayerPanelService
         Rafraichir();
     }
 
+    // ── l'etat qui change ────────────────────────────────────────────────────────────────────────
+
+    private void SurChangement(MultiplayerEtat etat)
+    {
+        MultiplayerRoom? aPresenter = null;
+        lock (_verrou)
+        {
+            foreach (var room in etat.Rooms)
+            {
+                _connues[room.Room] = room;
+                if (room.State == "launching" && room.Launch is not null && _mode != Mode.Presentation)
+                {
+                    aPresenter = room;
+                }
+            }
+
+            // Une invitation nouvelle s'affiche une fois ; celle qui disparait (repondue ou expiree) s'oublie.
+            var nouvelle = etat.Invitations.FirstOrDefault(i => !_invitationsVues.Contains(i.Invitation));
+            if (nouvelle is not null)
+            {
+                _invitationsVues.Add(nouvelle.Invitation);
+                _invitation = nouvelle;
+            }
+            else if (_invitation is { } courante && etat.Invitations.All(i => i.Invitation != courante.Invitation))
+            {
+                _invitation = null;
+            }
+        }
+
+        if (aPresenter is not null && !EnJeu())
+        {
+            // Le decompte est fini : l'hote lance, les invites attendent sa session. Tout le monde voit la presentation.
+            AnnoncerLeLancement(aPresenter, _session.JeuDeLaRoom(aPresenter));
+            return;
+        }
+
+        Rafraichir();
+        MettreAJourLeBandeau();
+    }
+
     private void Rafraichir()
     {
-        if (!Ouvert)
+        lock (_verrou)
         {
-            return;
+            if (_mode is not (Mode.Panneau or Mode.Resultat))
+            {
+                return;
+            }
         }
 
         _overlay.MontrerMultiplayer(Composer());
     }
+
+    /// <summary>
+    /// Le bandeau du haut d'ES, quand le panneau est ferme : l'invitation d'abord (20 s), sinon « Votre
+    /// selection » (V24-09). Jamais pendant une partie. Il ne se redessine que si son texte change.
+    /// </summary>
+    private void MettreAJourLeBandeau()
+    {
+        if (_bandeau is null)
+        {
+            return;
+        }
+
+        var langue = Langue();
+        string titre;
+        string texte;
+        string detail;
+        int? duree = null;
+        lock (_verrou)
+        {
+            if (_mode != Mode.Ferme || EnJeu())
+            {
+                return;
+            }
+
+            if (_invitation is { } invitation)
+            {
+                titre = "MULTIPLAYER";
+                texte = _textes.Format("multiplayer.invitation", langue,
+                    ("player", invitation.From?.Pseudo ?? string.Empty), ("game", NomDuJeu(invitation.Game)));
+                detail = _textes.Text("multiplayer.invitation.help", langue);
+                duree = Math.Max(1000, invitation.ExpiresMs);
+            }
+            else
+            {
+                var attentes = _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3).ToList();
+                if (attentes.Count == 0)
+                {
+                    titre = texte = detail = string.Empty;
+                }
+                else
+                {
+                    titre = _textes.Text("multiplayer.selection", langue);
+                    texte = string.Join("   ·   ", attentes.Select(r =>
+                        NomDuJeu(r.Game) + " " + r.Players.Count(j => j.Present) + "/" + r.Max
+                        + (r.State == "countdown" ? " ▶" : string.Empty)));
+                    var absent = attentes.Any(r => r.Players.Any(j => j.You && !j.Present));
+                    detail = _textes.Text(absent ? "multiplayer.selection.away" : "multiplayer.selection.help", langue);
+                }
+            }
+        }
+
+        var cle = titre + "|" + texte + "|" + detail;
+        if (cle == _texteDuBandeau)
+        {
+            return;
+        }
+
+        _texteDuBandeau = cle;
+        if (texte.Length == 0)
+        {
+            _bandeau.Hide();
+        }
+        else
+        {
+            _bandeau.ShowTop(titre, texte, detail, duree);
+        }
+    }
+
+    private bool EnJeu()
+        => EmulatorForeground.EmulateurTourne() || string.Equals(_contexte?.Ui.State, "playing", StringComparison.OrdinalIgnoreCase);
 
     private MultiplayerRoom? RoomDuJeu()
     {
@@ -272,6 +635,10 @@ public sealed class MultiplayerPanelService
     /// <summary>Les amis qu'on peut inviter : en ligne, et pas deja avec vous.</summary>
     private List<MultiplayerAmi> Invitables() => _amis.Where(ami => ami.State != "with_you").ToList();
 
+    private string NomDuJeu(string id) => _session.NomDuJeu(id);
+
+    // ── la composition ─────────────────────────────────────────────────────────────────────────
+
     /// <summary>Ce que le panneau montre, compose en bloc depuis l'etat courant.</summary>
     internal LeaderboardOverlayService.ContenuMultiplayer Composer()
     {
@@ -279,61 +646,97 @@ public sealed class MultiplayerPanelService
         string T(string cle) => _textes.Text(cle, langue);
         lock (_verrou)
         {
-            var jeu = _jeu;
-            var room = RoomDuJeu();
-            var classique = (room?.Level ?? jeu?.Game.Level) != MultiplayerLevels.NelfePlay;
-            var max = room?.Max ?? jeu?.Game.Players ?? 2;
-            var presents = room?.Players.Count(joueur => joueur.Present) ?? 0;
-
-            IReadOnlyList<LeaderboardOverlayService.JoueurMultiplayer> lignes = _modele.OngletCourant switch
-            {
-                MultiplayerPanelModel.Onglet.WaitingForPlayers => (room?.Players ?? []).Select(joueur => new LeaderboardOverlayService.JoueurMultiplayer(
-                    joueur.Pseudo.Length > 0 ? joueur.Pseudo : joueur.Handle,
-                    joueur.Country,
-                    CouleurDe(joueur.Handle),
-                    joueur.Host,
-                    joueur.You,
-                    joueur.Present,
-                    Barres(joueur.RttMs),
-                    joueur.Present ? T("multiplayer.ready") : T("multiplayer.away"),
-                    T("multiplayer.host"))).ToList(),
-                MultiplayerPanelModel.Onglet.WaitingForFriends => _amis
-                    .Where(ami => ami.State is "with_you" or "in_es")
-                    .Select(ami => Ami(ami, T)).ToList(),
-                _ => Invitables().Select(ami => Ami(ami, T)).ToList(),
-            };
-            _modele.PoserLesLignes(lignes.Count);
-
-            var bandeau = room?.State is "launching" or "playing"
-                ? (classique ? T("multiplayer.classic.message") + " " : string.Empty) + T("multiplayer.syncing")
-                : string.Empty;
-            var message = _refus is { Length: > 0 } refus ? T("multiplayer.refused." + refus) : string.Empty;
-            if (message.StartsWith("multiplayer.refused.", StringComparison.Ordinal))
-            {
-                message = T("multiplayer.refused.other");
-            }
-
-            return new LeaderboardOverlayService.ContenuMultiplayer(
-                MultiplayerPanelModel.Onglets.Select(MultiplayerPanelModel.Titre).ToList(),
-                _modele.IndexOnglet,
-                _modele.Etat == MultiplayerPanelModel.Foyer.Panneau,
-                classique ? T("multiplayer.badge.classic") : string.Empty,
-                classique ? T("multiplayer.info.classic") : string.Empty,
-                presents + "/" + max,
-                room is { State: "countdown", CountdownMs: { } ms } ? DateTime.UtcNow.AddMilliseconds(ms) : null,
-                lignes,
-                _modele.Ligne,
-                message,
-                bandeau,
-                Aides(T));
+            return _mode == Mode.Resultat ? ComposerLeResultat(T) : ComposerLePanneau(T);
         }
     }
+
+    private LeaderboardOverlayService.ContenuMultiplayer ComposerLePanneau(Func<string, string> T)
+    {
+        var jeu = _jeu;
+        var room = RoomDuJeu();
+        var classique = (room?.Level ?? jeu?.Game.Level) != MultiplayerLevels.NelfePlay;
+        var max = room?.Max ?? jeu?.Game.Players ?? 2;
+        var presents = room?.Players.Count(joueur => joueur.Present) ?? 0;
+
+        IReadOnlyList<LeaderboardOverlayService.JoueurMultiplayer> lignes = _modele.OngletCourant switch
+        {
+            MultiplayerPanelModel.Onglet.WaitingForPlayers => (room?.Players ?? []).Select(joueur => Joueur(joueur,
+                joueur.Present ? T("multiplayer.ready") : T("multiplayer.away"), T)).ToList(),
+            MultiplayerPanelModel.Onglet.WaitingForFriends => _amis
+                .Where(ami => ami.State is "with_you" or "in_es")
+                .Select(ami => Ami(ami, T)).ToList(),
+            _ => Invitables().Select(ami => Ami(ami, T)).ToList(),
+        };
+        _modele.PoserLesLignes(lignes.Count);
+
+        var message = _refus is { Length: > 0 } refus ? T("multiplayer.refused." + refus) : string.Empty;
+        if (message.StartsWith("multiplayer.refused.", StringComparison.Ordinal))
+        {
+            message = T("multiplayer.refused.other");
+        }
+
+        return new LeaderboardOverlayService.ContenuMultiplayer(
+            MultiplayerPanelModel.Onglets.Select(MultiplayerPanelModel.Titre).ToList(),
+            _modele.IndexOnglet,
+            _modele.Etat == MultiplayerPanelModel.Foyer.Panneau,
+            classique ? T("multiplayer.badge.classic") : string.Empty,
+            classique ? T("multiplayer.info.classic") : string.Empty,
+            presents + "/" + max,
+            room is { State: "countdown", CountdownMs: { } ms } ? DateTime.UtcNow.AddMilliseconds(ms) : null,
+            lignes,
+            _modele.Ligne,
+            message,
+            string.Empty,
+            AidesDuPanneau(T));
+    }
+
+    private LeaderboardOverlayService.ContenuMultiplayer ComposerLeResultat(Func<string, string> T)
+    {
+        _connues.TryGetValue(_roomDuResultat, out var connue);
+        var finie = _session.Etat.Rooms.FirstOrDefault(r => r.Room == _roomDuResultat) ?? connue;
+        var classique = (finie?.Level ?? _jeu?.Game.Level) != MultiplayerLevels.NelfePlay;
+        var joueurs = (finie?.Players ?? [])
+            .Where(j => j.Seat is not null || finie?.State != "finished")
+            .OrderBy(j => j.Seat ?? 99)
+            .Select(j => Joueur(j with { Present = true }, j.Seat is { } place ? "P" + place.ToString(CultureInfo.InvariantCulture) : string.Empty, T))
+            .ToList();
+        var duree = finie?.Ended?.DurationS ?? _dureeDuResultat;
+        var info = duree is { } secondes
+            ? T("multiplayer.result.playtime") + " " + TimeSpan.FromSeconds(secondes).ToString(secondes >= 3600 ? @"h\:mm\:ss" : @"m\:ss", CultureInfo.InvariantCulture)
+            : string.Empty;
+
+        return new LeaderboardOverlayService.ContenuMultiplayer(
+            [classique ? T("multiplayer.result.classic") : T("multiplayer.result.title")],
+            0,
+            false,
+            classique ? T("multiplayer.badge.classic") : string.Empty,
+            info,
+            string.Empty,
+            _finDuResultat,
+            joueurs,
+            -1,
+            string.Empty,
+            classique ? T("multiplayer.result.classic_note") : string.Empty,
+            [new(_glypheValider, T("multiplayer.help.replay")), new(_glypheAnnuler, T("multiplayer.help.close"))]);
+    }
+
+    private LeaderboardOverlayService.JoueurMultiplayer Joueur(MultiplayerJoueur joueur, string etat, Func<string, string> T)
+        => new(
+            joueur.Pseudo.Length > 0 ? joueur.Pseudo : joueur.Handle,
+            joueur.Country,
+            CouleurDe(joueur.Handle),
+            joueur.Host,
+            joueur.You,
+            joueur.Present,
+            Barres(joueur.RttMs),
+            etat,
+            T("multiplayer.host"));
 
     private LeaderboardOverlayService.JoueurMultiplayer Ami(MultiplayerAmi ami, Func<string, string> T)
         => new(ami.Pseudo.Length > 0 ? ami.Pseudo : ami.Handle, ami.Country, CouleurDe(ami.Handle), false, false,
             true, null, T("multiplayer.friend." + ami.State));
 
-    private IReadOnlyList<LeaderboardOverlayService.Aide> Aides(Func<string, string> T)
+    private IReadOnlyList<LeaderboardOverlayService.Aide> AidesDuPanneau(Func<string, string> T)
     {
         if (_modele.Etat != MultiplayerPanelModel.Foyer.Panneau)
         {

@@ -107,6 +107,9 @@ public sealed class NetplayHostService
     public static bool OuverteAuxJoueursDepuis(DateTime depuis)
         => _ouverteAuxJoueurs is { } ouverte && ouverte >= depuis;
 
+    /// <summary>MULTIPLAYER (lot M4) : l'hote d'une gameroom ouvre sa partie a d'autres joueurs, comme un Join.</summary>
+    internal static void NoterOuverteAuxJoueurs() => _ouverteAuxJoueurs = DateTime.UtcNow;
+
     public static bool OuverteAuxJoueursPendant(string? sessionJson)
     {
         if (_ouverteAuxJoueurs is not { } ouverte) return false;
