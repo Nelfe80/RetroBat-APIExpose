@@ -449,6 +449,7 @@ builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerClient>();
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerSessionService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>());
 // Le panneau MULTIPLAYER d'ES : la fenetre du classement, un autre contenu (lot M3).
+builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerToastOverlay>();
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerPanelService>();
 // Le lancement d'une partie MULTIPLAYER sur l'ordre de la plateforme : hote ou invite, coeur impose (lot M4).
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerLaunchService>();

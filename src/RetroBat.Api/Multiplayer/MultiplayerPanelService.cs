@@ -45,7 +45,9 @@ public sealed class MultiplayerPanelService
     private readonly EmulationStationSettingsService _reglages;
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly ILogger<MultiplayerPanelService> _journal;
-    private readonly LiveContestOverlayService? _bandeau;
+    private readonly MultiplayerToastOverlay? _cartes;
+    private string? _message;
+    private DateTime _messageJusqua;
     private readonly ApiContext? _contexte;
     private readonly MediaRuntimeState? _etatDesMedias;
     private readonly MultiplayerPanelModel _modele = new();
@@ -75,7 +77,7 @@ public sealed class MultiplayerPanelService
         EmulationStationSettingsService reglages,
         IOptionsMonitor<ApiExposeOptions> options,
         ILogger<MultiplayerPanelService> journal,
-        LiveContestOverlayService? bandeau = null,
+        MultiplayerToastOverlay? cartes = null,
         ApiContext? contexte = null,
         MediaRuntimeState? etatDesMedias = null)
     {
@@ -85,7 +87,7 @@ public sealed class MultiplayerPanelService
         _reglages = reglages;
         _options = options;
         _journal = journal;
-        _bandeau = bandeau;
+        _cartes = cartes;
         _contexte = contexte;
         _etatDesMedias = etatDesMedias;
         _session.Change += SurChangement;
@@ -178,6 +180,25 @@ public sealed class MultiplayerPanelService
         MettreAJourLeBandeau();
     }
 
+    /// <summary>
+    /// Une autre fenetre est passee devant ES (un rendu de replay, un editeur sur un autre ecran), ou le
+    /// joueur ne touche plus a rien : le panneau reste a l'ecran, on y attend un joueur. Seul le foyer revient a ES.
+    /// </summary>
+    public void RendreLaMain()
+    {
+        bool change;
+        lock (_verrou)
+        {
+            change = _mode == Mode.Panneau && _modele.RendreLaMain();
+        }
+
+        if (change)
+        {
+            _journal.LogInformation("MULTIPLAYER : le panneau reste ouvert et rend la main a ES.");
+            Rafraichir();
+        }
+    }
+
     /// <summary>Un jeu demarre : la fenetre s'efface sans reprendre le premier plan a l'emulateur.</summary>
     public void FermerPourLeJeu()
     {
@@ -189,7 +210,7 @@ public sealed class MultiplayerPanelService
 
         _session.PanneauOuvert = false;
         _overlay.FermerPourLeJeu();
-        _bandeau?.Hide();
+        _cartes?.Cacher();
         _texteDuBandeau = "";
     }
 
@@ -216,7 +237,7 @@ public sealed class MultiplayerPanelService
         }
 
         _session.PanneauOuvert = false;
-        _bandeau?.Hide();
+        _cartes?.Cacher();
         _texteDuBandeau = "";
         if (deja)
         {
@@ -379,21 +400,21 @@ public sealed class MultiplayerPanelService
             return;
         }
 
-        _bandeau?.Hide();
+        _cartes?.Cacher();
         _texteDuBandeau = "";
         var jeu = _session.JeuDeLaRoom(new MultiplayerRoom { Game = invitation.Game, Content = invitation.Content });
         if (jeu is null)
         {
             // Sans le meme contenu, la partie se desynchroniserait : on refuse plutot que de rejoindre.
             await _session.RepondreAsync(invitation.Invitation, false, ct).ConfigureAwait(false);
-            _bandeau?.ShowTop("MULTIPLAYER", _textes.Text("multiplayer.refused.content_refused", Langue()), string.Empty, 5000);
+            Signaler(_textes.Text("multiplayer.refused.content_refused", Langue()));
             return;
         }
 
         var refus = await _session.RepondreAsync(invitation.Invitation, true, ct).ConfigureAwait(false);
         if (refus is not null)
         {
-            _bandeau?.ShowTop("MULTIPLAYER", _textes.Text("multiplayer.refused." + refus, Langue()), string.Empty, 5000);
+            Signaler(_textes.Text("multiplayer.refused." + refus, Langue()));
             return;
         }
 
@@ -415,7 +436,7 @@ public sealed class MultiplayerPanelService
             return;
         }
 
-        _bandeau?.Hide();
+        _cartes?.Cacher();
         _texteDuBandeau = "";
         _ = _session.RepondreAsync(invitation.Invitation, false);
         MettreAJourLeBandeau();
@@ -568,70 +589,82 @@ public sealed class MultiplayerPanelService
     }
 
     /// <summary>
-    /// Le bandeau du haut d'ES, quand le panneau est ferme : l'invitation d'abord (20 s), sinon « Votre
-    /// selection » (V24-09). Jamais pendant une partie. Il ne se redessine que si son texte change.
+    /// Les cartes du haut d'ES, quand le panneau est ferme (retour du user du 22/10 : petites, discretes, en
+    /// haut a droite, comme le cartouche d'un defi) : l'invitation d'abord, puis un message passager, puis une
+    /// carte par jeu de « Votre selection » (V24-09), avec son decompte. Jamais pendant une partie.
     /// </summary>
     private void MettreAJourLeBandeau()
     {
-        if (_bandeau is null)
+        if (_cartes is null)
         {
             return;
         }
 
         var langue = Langue();
-        string titre;
-        string texte;
-        string detail;
-        int? duree = null;
+        string T(string cle) => _textes.Text(cle, langue);
+        var cartes = new List<MultiplayerToastOverlay.Carte>();
         lock (_verrou)
         {
             if (_mode != Mode.Ferme || EnJeu())
             {
-                return;
-            }
-
-            if (_invitation is { } invitation)
-            {
-                titre = "MULTIPLAYER";
-                texte = _textes.Format("multiplayer.invitation", langue,
-                    ("player", invitation.From?.Pseudo ?? string.Empty), ("game", NomDuJeu(invitation.Game)));
-                detail = _textes.Text("multiplayer.invitation.help", langue);
-                duree = Math.Max(1000, invitation.ExpiresMs);
+                cartes.Clear();
             }
             else
             {
-                var attentes = _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3).ToList();
-                if (attentes.Count == 0)
+                if (_invitation is { } invitation)
                 {
-                    titre = texte = detail = string.Empty;
+                    cartes.Add(new MultiplayerToastOverlay.Carte(
+                        T("multiplayer.invitation.title"),
+                        _textes.Format("multiplayer.invitation", langue,
+                            ("player", invitation.From?.Pseudo ?? string.Empty), ("game", NomDuJeu(invitation.Game))),
+                        T("multiplayer.invitation.help"),
+                        DateTime.UtcNow.AddMilliseconds(Math.Max(1000, invitation.ExpiresMs)),
+                        Alerte: true));
                 }
-                else
+
+                if (_message is { } message && DateTime.UtcNow < _messageJusqua)
                 {
-                    titre = _textes.Text("multiplayer.selection", langue);
-                    texte = string.Join("   ·   ", attentes.Select(r =>
-                        NomDuJeu(r.Game) + " " + r.Players.Count(j => j.Present) + "/" + r.Max
-                        + (r.State == "countdown" ? " ▶" : string.Empty)));
-                    var absent = attentes.Any(r => r.Players.Any(j => j.You && !j.Present));
-                    detail = _textes.Text(absent ? "multiplayer.selection.away" : "multiplayer.selection.help", langue);
+                    cartes.Add(new MultiplayerToastOverlay.Carte("MULTIPLAYER", message, string.Empty, Alerte: true));
+                }
+
+                foreach (var room in _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3))
+                {
+                    var absent = room.Players.Any(j => j.You && !j.Present);
+                    cartes.Add(new MultiplayerToastOverlay.Carte(
+                        T("multiplayer.selection"),
+                        NomDuJeu(room.Game),
+                        room.Players.Count(j => j.Present) + "/" + room.Max + "   " + T(absent ? "multiplayer.selection.away" : "multiplayer.selection.help"),
+                        room is { State: "countdown", CountdownMs: { } ms } ? DateTime.UtcNow.AddMilliseconds(ms) : null));
                 }
             }
         }
 
-        var cle = titre + "|" + texte + "|" + detail;
-        if (cle == _texteDuBandeau)
+        // La pile ne change que si son contenu change ; le decompte, lui, se recalcule dans la carte.
+        var cle = string.Join("|", cartes.Select(c => c.Surtitre + "/" + c.Titre + "/" + c.Detail + "/" + (c.FinDuDecompteUtc is null ? "" : "d")));
+        if (cle == _texteDuBandeau && !cartes.Any(c => c.FinDuDecompteUtc is not null))
         {
             return;
         }
 
         _texteDuBandeau = cle;
-        if (texte.Length == 0)
+        _cartes.Montrer(cartes);
+    }
+
+    /// <summary>Un message passager dans les cartes du haut (un refus), 5 s.</summary>
+    private void Signaler(string message)
+    {
+        lock (_verrou)
         {
-            _bandeau.Hide();
+            _message = message;
+            _messageJusqua = DateTime.UtcNow.AddSeconds(5);
         }
-        else
+
+        MettreAJourLeBandeau();
+        _ = Task.Run(async () =>
         {
-            _bandeau.ShowTop(titre, texte, detail, duree);
-        }
+            await Task.Delay(TimeSpan.FromSeconds(5.5)).ConfigureAwait(false);
+            MettreAJourLeBandeau();
+        });
     }
 
     private bool EnJeu()

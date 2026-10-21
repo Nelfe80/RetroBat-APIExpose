@@ -1,5 +1,10 @@
+using System.Drawing;
+using System.Runtime.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using RetroBat.Api.Infrastructure;
+using RetroBat.Api.Leaderboard;
 using RetroBat.Api.Multiplayer;
+using RetroBat.Domain.Services;
 
 namespace RetroBat.Api.Controllers;
 
@@ -77,4 +82,76 @@ public sealed class MultiplayerController : ControllerBase
     /// <summary>Les amis en ligne (INVITE FRIENDS).</summary>
     [HttpGet("friends")]
     public async Task<IActionResult> Friends(CancellationToken ct) => Ok(await _session.AmisAsync(ct));
+
+    /// <summary>
+    /// L'APERCU d'un ecran MULTIPLAYER en image, dessine hors ecran avec le theme de la borne (outil de mise au
+    /// point) : <c>panel</c>, <c>panel-focus</c>, <c>invite</c>, <c>presentation</c>, <c>result</c>, <c>cards</c>.
+    /// Joueurs fictifs ; rien n'est montre a l'ecran ni envoye a la plateforme.
+    /// </summary>
+    [HttpGet("preview/{vue}")]
+    [SupportedOSPlatform("windows")]
+    public IActionResult Preview(string vue, [FromServices] InterfaceTextService textes, [FromServices] EmulationStationSettingsService reglages,
+        [FromServices] ILogger<LeaderboardOverlayService> journal)
+    {
+        string langue;
+        try { langue = reglages.GetScrapingSettings().Language; } catch (Exception) { langue = "fr"; }
+        string T(string cle) => textes.Text(cle, langue);
+        var style = EsMenuStyle.Lire(journal);
+        var onglets = MultiplayerPanelModel.Onglets.Select(MultiplayerPanelModel.Titre).ToList();
+        var aides = new List<LeaderboardOverlayService.Aide>
+        {
+            new("dpad_leftright", T("multiplayer.help.tab")), new("button_b", T("multiplayer.help.back")), new("button_b", T("multiplayer.help.leave")),
+        };
+        LeaderboardOverlayService.JoueurMultiplayer Joueur(string nom, string pays, string couleur, bool hote, bool moi, bool present, int? barres, string etat)
+            => new(nom, pays, couleur, hote, moi, present, barres, etat, T("multiplayer.host"));
+        var deux = new List<LeaderboardOverlayService.JoueurMultiplayer>
+        {
+            Joueur("PLAYER 1", "FR", "A98BFF", false, true, true, 3, T("multiplayer.ready")),
+            Joueur("PLAYER 2", "JP", "FF9F6B", true, false, true, 4, T("multiplayer.ready")),
+        };
+        var socle = new LeaderboardOverlayService.ContenuMultiplayer(onglets, 2, false, T("multiplayer.badge.classic"), T("multiplayer.info.classic"),
+            "1/2", null, deux.Take(1).ToList(), 0, string.Empty, string.Empty,
+            [new("dpad_left", T("multiplayer.help.open")), new("button_b", T("multiplayer.help.close"))]);
+        try
+        {
+            byte[] png = vue switch
+            {
+                "panel" => LeaderboardOverlayService.ApercuMultiplayer(style, socle, "", "", "", journal),
+                "panel-focus" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with
+                {
+                    NousAvonsLaMain = true, Compte = "2/2", Lignes = deux, DecompteFinUtc = DateTime.UtcNow.AddSeconds(4), Aides = aides,
+                }, "", "", "", journal),
+                "invite" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with
+                {
+                    OngletCourant = 0, NousAvonsLaMain = true, Lignes =
+                    [
+                        Joueur("PLAYER 3", "BE", "78E5A3", false, false, true, null, T("multiplayer.friend.in_es")),
+                        Joueur("PLAYER 4", "DE", "FFD37A", false, false, true, null, T("multiplayer.friend.invited")),
+                    ],
+                    Aides = [new("dpad_leftright", T("multiplayer.help.tab")), new("dpad_updown", T("multiplayer.help.choose")), new("button_a", T("multiplayer.help.invite")), new("button_b", T("multiplayer.help.back"))],
+                }, "", "", "", journal),
+                "presentation" => LeaderboardOverlayService.ApercuMultiplayer(style, socle, T("multiplayer.syncing"), "Metal Slug 3", T("multiplayer.classic.message"), journal),
+                "result" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with
+                {
+                    Onglets = [T("multiplayer.result.classic")], OngletCourant = 0, Compte = string.Empty,
+                    Info = T("multiplayer.result.playtime") + " 7:42", DecompteFinUtc = DateTime.UtcNow.AddSeconds(12),
+                    Lignes = [Joueur("PLAYER 1", "FR", "A98BFF", false, true, true, 3, "P1"), Joueur("PLAYER 2", "JP", "FF9F6B", true, false, true, 4, "P2")],
+                    LigneCourante = -1, Bandeau = T("multiplayer.result.classic_note"),
+                    Aides = [new("button_a", T("multiplayer.help.replay")), new("button_b", T("multiplayer.help.close"))],
+                }, "", "", "", journal),
+                "cards" => MultiplayerToastOverlay.Apercu(style,
+                [
+                    new(T("multiplayer.invitation.title"), textes.Format("multiplayer.invitation", langue, ("player", "PLAYER 2"), ("game", "Metal Slug 3")), T("multiplayer.invitation.help"), DateTime.UtcNow.AddSeconds(17), Alerte: true),
+                    new(T("multiplayer.selection"), "Street Fighter II' Champion Edition", "1/2   " + T("multiplayer.selection.help")),
+                    new(T("multiplayer.selection"), "Bomber Man World", "3/4   " + T("multiplayer.selection.help"), DateTime.UtcNow.AddSeconds(4)),
+                ], new Rectangle(0, 0, 1920, 1200)),
+                _ => [],
+            };
+            return png.Length == 0 ? NotFound(new { vues = new[] { "panel", "panel-focus", "invite", "presentation", "result", "cards" } }) : File(png, "image/png");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return StatusCode(500, new { erreur = ex.InnerException?.Message ?? ex.Message });
+        }
+    }
 }

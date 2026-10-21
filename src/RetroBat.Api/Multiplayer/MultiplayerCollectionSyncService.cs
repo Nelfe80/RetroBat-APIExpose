@@ -104,6 +104,28 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
 
     private bool Visible => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: true };
 
+    /// <summary>
+    /// Les jeux MULTIPLAYER de la borne, calcules tout de suite s'ils ne le sont pas encore : juste apres le
+    /// demarrage de l'API, la premiere passe n'arrive qu'au bout d'une minute, et l'appui long repondait « pas un
+    /// jeu de la collection » (vu le 22/10). Le calcul ne touche ni a la collection d'ES ni aux themes.
+    /// </summary>
+    public IReadOnlyList<MultiplayerInstalledGame> JeuxConnus()
+    {
+        if (Games.Count > 0 || !Visible)
+        {
+            return Games;
+        }
+
+        var catalogue = _store.Lire(out _);
+        if (catalogue is null)
+        {
+            return Games;
+        }
+
+        Games = Intersecter(catalogue);
+        return Games;
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _derniereVisibilite = Visible;

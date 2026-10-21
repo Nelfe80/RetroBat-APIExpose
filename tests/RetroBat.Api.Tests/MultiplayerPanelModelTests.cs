@@ -14,7 +14,7 @@ public class MultiplayerPanelModelTests
     [Fact]
     public void Les_onglets_se_rangent_de_droite_a_gauche_et_restent_en_anglais()
     {
-        Assert.Equal(["INVITE FRIENDS", "WAITING FOR FRIENDS", "WAITING FOR PLAYERS…"], M.Onglets.Select(M.Titre).ToArray());
+        Assert.Equal(["INVITE FRIENDS", "WAITING FOR FRIENDS", "FOR PLAYERS…"], M.Onglets.Select(M.Titre).ToArray());
         var m = new M();
         m.Ouvrir();
         Assert.Equal(M.Foyer.MenuEs, m.Etat);
@@ -95,6 +95,19 @@ public class MultiplayerPanelModelTests
         Assert.Equal(M.Effet.QuitterLaGameroom, m.AnnulerMaintenu());
         Assert.Equal(M.Foyer.Ferme, m.Etat);
         Assert.Equal(M.Effet.Rien, m.AnnulerMaintenu());
+    }
+
+    [Fact]
+    public void Une_fenetre_qui_passe_devant_rend_la_main_sans_fermer()
+    {
+        var m = new M();
+        m.Ouvrir();
+        Assert.False(m.RendreLaMain());          // ES navigue deja : rien a rendre
+        m.Gauche();
+        m.Gauche();
+        Assert.True(m.RendreLaMain());
+        Assert.Equal(M.Foyer.MenuEs, m.Etat);    // toujours ouvert : on attend un joueur
+        Assert.Equal(M.Effet.PrendreLeFocus, m.Gauche());
     }
 
     [Theory]

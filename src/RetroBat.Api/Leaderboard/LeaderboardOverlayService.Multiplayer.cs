@@ -326,3 +326,49 @@ public sealed partial class LeaderboardOverlayService
         }
     }
 }
+
+public sealed partial class LeaderboardOverlayService
+{
+    /// <summary>
+    /// L'APERCU du panneau MULTIPLAYER, dessine hors ecran dans une image (outil de mise au point : juger le rendu
+    /// sans borne devant soi). Aucune fenetre n'est montree. <paramref name="attente"/> dessine la presentation.
+    /// </summary>
+    internal static byte[] ApercuMultiplayer(EsMenuStyle style, ContenuMultiplayer contenu, string attente, string attenteTitre,
+        string attenteDetail, ILogger<LeaderboardOverlayService> logger)
+    {
+        byte[] png = [];
+        Exception? erreur = null;
+        var fil = new Thread(() =>
+        {
+            try
+            {
+                var service = new LeaderboardOverlayService(logger);
+                service._style = style;
+                service._contenu = service._contenu with { Attente = attente, AttenteTitre = attenteTitre, AttenteDetail = attenteDetail };
+                service._multiplayer = contenu;
+                service._glyphes = new EsGlyphCache(style, logger);
+                service.ChargerLesPolices(style);
+                using var forme = new Panneau(service);
+                forme.CreateControl();
+                using var image = new Bitmap(Math.Max(1, forme.Width), Math.Max(1, forme.Height));
+                forme.DrawToBitmap(image, new Rectangle(0, 0, image.Width, image.Height));
+                using var flux = new MemoryStream();
+                image.Save(flux, System.Drawing.Imaging.ImageFormat.Png);
+                png = flux.ToArray();
+            }
+            catch (Exception ex)
+            {
+                erreur = ex;
+            }
+        });
+        fil.SetApartmentState(ApartmentState.STA);
+        fil.Start();
+        fil.Join(TimeSpan.FromSeconds(20));
+        if (erreur is not null)
+        {
+            throw new InvalidOperationException("apercu impossible", erreur);
+        }
+
+        return png;
+    }
+}

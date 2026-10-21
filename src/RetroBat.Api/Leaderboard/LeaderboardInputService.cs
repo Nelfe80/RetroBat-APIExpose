@@ -514,6 +514,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     // On rend la main a ES sans fermer : le classement reste sous les yeux, et
                     // le joueur retrouve sa manette. Fermer coupait la lecture d'un coup.
                     _modele.RendreLaMain();
+                    _multiplayer?.RendreLaMain();
                     Appliquer(LeaderboardPanelModel.Effet.RendreLeFocus);
                 }
 
@@ -536,10 +537,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     _logger.LogInformation("Classement : le premier plan est parti ailleurs, le panneau se ferme.");
                     Fermer();
                 }
+                // MULTIPLAYER ATTEND UN JOUEUR : il ne se ferme pas parce qu'une autre fenetre passe devant (un rendu de
+                // replay, l'editeur ouvert sur un autre ecran ; vu le 22/10, le panneau se fermait en 8 s). Il rend
+                // seulement la main a ES. Un jeu qui demarre le ferme toujours (ui.game.started).
                 if (_multiplayer is { Ouvert: true } multiplayer && !EsEstDevant() && !_overlay.EstAuPremierPlan())
                 {
-                    _logger.LogInformation("MULTIPLAYER : le premier plan est parti ailleurs, le panneau se ferme.");
-                    multiplayer.Fermer();
+                    multiplayer.RendreLaMain();
                 }
             }
             catch (OperationCanceledException) { return; }

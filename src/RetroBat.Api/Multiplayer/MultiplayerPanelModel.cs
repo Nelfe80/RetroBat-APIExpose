@@ -23,11 +23,15 @@ public sealed class MultiplayerPanelModel
 
     public static readonly IReadOnlyList<Onglet> Onglets = [Onglet.InviteFriends, Onglet.WaitingForFriends, Onglet.WaitingForPlayers];
 
+    /// <summary>
+    /// Les titres, courts : les trois tiennent dans le panneau (retour du user du 22/10, « INVITE FRIENDS »
+    /// sortait a gauche). Les deux onglets d'attente se lisent d'un trait : WAITING FOR FRIENDS | FOR PLAYERS….
+    /// </summary>
     public static string Titre(Onglet onglet) => onglet switch
     {
         Onglet.InviteFriends => "INVITE FRIENDS",
         Onglet.WaitingForFriends => "WAITING FOR FRIENDS",
-        _ => "WAITING FOR PLAYERS…",
+        _ => "FOR PLAYERS…",
     };
 
     public enum Foyer
@@ -159,6 +163,21 @@ public sealed class MultiplayerPanelModel
             default:
                 return Effet.Rien;
         }
+    }
+
+    /// <summary>
+    /// Une autre fenetre est passee devant, ou plus rien n'arrive : le panneau RESTE a l'ecran (on y attend un
+    /// joueur) et rend seulement la main a ES. Rend vrai si le foyer a change.
+    /// </summary>
+    public bool RendreLaMain()
+    {
+        if (Etat != Foyer.Panneau)
+        {
+            return false;
+        }
+
+        Etat = Foyer.MenuEs;
+        return true;
     }
 
     /// <summary>B maintenu : le joueur quitte la gameroom, et le panneau se ferme.</summary>
