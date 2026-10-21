@@ -266,7 +266,11 @@ public sealed partial class LeaderboardOverlayService
                     droite -= largeur + taille * 0.7f;
                 }
 
-                droite = DessinerLaConnexion(g, s, j.Barres, droite, y, hauteur, taille, alpha);
+                // Pas de mesure, pas de barres : des barres grises pour un ami dont on ignore la latence ne disaient rien.
+                if (j.Barres is not null)
+                {
+                    droite = DessinerLaConnexion(g, s, j.Barres, droite, y, hauteur, taille, alpha);
+                }
 
                 if (j.Hote)
                 {

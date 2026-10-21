@@ -183,7 +183,11 @@ public sealed class MultiplayerLaunchService : IHostedService
             var session = await _lobby.AttendreAsync(jeton, PatienceLobby).ConfigureAwait(false);
             if (session is null)
             {
-                _journal.LogWarning("MULTIPLAYER : aucune session au lobby pour {Room} : les invites ne pourront pas rejoindre", room.Room);
+                // Sans session, personne ne rejoindra : l'hote ne joue pas seul en croyant qu'on va venir. La partie
+                // se ferme, la gameroom est quittee, et les autres retrouvent l'attente.
+                _journal.LogWarning("MULTIPLAYER : aucune session au lobby pour {Room} : la partie se ferme", room.Room);
+                await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
+                await RetroArchInvite.FermerAsync().ConfigureAwait(false);
                 return;
             }
 

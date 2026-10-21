@@ -69,6 +69,10 @@ public sealed class MultiplayerPanelService
     private CancellationTokenSource? _retour;
     private string _texteDuBandeau = "";
     private MultiplayerInvitation? _invitation;
+    private DateTime _presenteeDepuis;
+
+    /// <summary>La presentation ne dure pas plus : au-dela, la partie ne s'est pas ouverte, le joueur retrouve ES.</summary>
+    private static readonly TimeSpan PresentationMax = TimeSpan.FromMinutes(2);
 
     public MultiplayerPanelService(
         MultiplayerSessionService session,
@@ -234,6 +238,10 @@ public sealed class MultiplayerPanelService
             _modele.Fermer();
             _jeu = jeu ?? _jeu;
             _retour?.Cancel();
+            if (!deja)
+            {
+                _presenteeDepuis = DateTime.UtcNow;
+            }
         }
 
         _session.PanneauOuvert = false;
@@ -562,6 +570,24 @@ public sealed class MultiplayerPanelService
             {
                 _invitation = null;
             }
+        }
+
+        // La presentation s'efface quand la partie ne part plus : la gameroom est revenue a l'attente (l'hote
+        // n'a pas publie sa session), ou rien n'arrive depuis deux minutes. Sinon le joueur restait devant
+        // « Les joueurs se synchronisent… » pour toujours.
+        bool presentationPerimee;
+        lock (_verrou)
+        {
+            presentationPerimee = _mode == Mode.Presentation && !EnJeu()
+                && (etat.Rooms.All(r => r.State is not ("launching" or "playing")) || DateTime.UtcNow - _presenteeDepuis > PresentationMax);
+        }
+
+        if (presentationPerimee)
+        {
+            _journal.LogInformation("MULTIPLAYER : la partie ne s'est pas ouverte, la presentation s'efface.");
+            Fermer();
+            Signaler(_textes.Text("multiplayer.launch.failed", Langue()));
+            return;
         }
 
         if (aPresenter is not null && !EnJeu())
