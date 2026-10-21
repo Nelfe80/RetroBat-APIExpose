@@ -162,6 +162,23 @@ public class MultiplayerCollectionSyncTests : IDisposable
     }
 
     [Fact]
+    public async Task Avec_deux_versions_acceptees_la_preferee_du_catalogue_l_emporte()
+    {
+        // L'europeenne arrive la premiere dans le dossier, mais l'USA est en tete du catalogue.
+        var europe = PoserCartouche("gba", "a (Europe).zip", "a.gba", "version europe");
+        var usa = PoserCartouche("gba", "b (USA).zip", "b.gba", "version usa");
+        PoserCatalogue(Catalogue(new
+        {
+            id = "gba/jeu", system = "gba", name = "Jeu", family = "course", players = 4, level = "classique",
+            content = new { md5 = new[] { usa.Md5, europe.Md5 }, crc = new[] { usa.Crc, europe.Crc } },
+        }));
+
+        await Service().SynchroniserAsync("test", CancellationToken.None);
+
+        Assert.Equal(new HashSet<string>(StringComparer.OrdinalIgnoreCase) { usa.Chemin }, Collection());
+    }
+
+    [Fact]
     public void Le_prefiltre_ecarte_un_zip_dont_le_crc_differe_sans_le_decompresser()
     {
         var cartouche = PoserCartouche("gba", "a.zip", "a.gba", "contenu");

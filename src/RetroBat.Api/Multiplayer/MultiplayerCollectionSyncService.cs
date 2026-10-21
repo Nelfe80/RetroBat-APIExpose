@@ -305,26 +305,41 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     }
 
     /// <summary>
-    /// Le premier dump installe dont le CONTENU est accepte. Le md5 de la gamelist suffit quand il
-    /// correspond ; sinon le contenu est mesure, mais seulement pour un fichier qui passe le
-    /// prefiltre : on ne hache pas un dossier de deux mille cartouches a chaque passe.
+    /// Le dump installe dont le CONTENU est accepte, dans l'ordre de preference du catalogue (la
+    /// version USA avant celle qui demande sa langue au demarrage). Le md5 de la gamelist suffit
+    /// quand il correspond ; sinon le contenu est mesure, mais seulement pour un fichier qui passe
+    /// le prefiltre : on ne hache pas un dossier de deux mille cartouches a chaque passe.
     /// </summary>
     private string? TrouverContenu(MultiplayerContent contenu, IReadOnlyList<InstalledGame> inventaire)
     {
         var md5 = contenu.Md5.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var trouves = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (var installe in inventaire)
         {
             if (installe.Md5 is { Length: > 0 } declare && md5.Contains(declare))
             {
-                return installe.AbsolutePath;
+                trouves.TryAdd(declare, installe.AbsolutePath);
             }
         }
 
         foreach (var installe in inventaire)
         {
+            if (trouves.Count == md5.Count)
+            {
+                break;
+            }
+
             if (PassePrefiltre(installe.AbsolutePath, contenu) && _md5DuContenu(installe.AbsolutePath) is { } mesure && md5.Contains(mesure))
             {
-                return installe.AbsolutePath;
+                trouves.TryAdd(mesure, installe.AbsolutePath);
+            }
+        }
+
+        foreach (var prefere in contenu.Md5)
+        {
+            if (trouves.TryGetValue(prefere, out var chemin))
+            {
+                return chemin;
             }
         }
 

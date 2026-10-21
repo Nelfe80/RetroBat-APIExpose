@@ -74,7 +74,10 @@ public sealed record MultiplayerGame
     [JsonPropertyName("set")]
     public string? Set { get; init; }
 
-    /// <summary>Console : les contenus acceptes. Une gameroom ne reunit que des joueurs au meme contenu.</summary>
+    /// <summary>
+    /// Console : les contenus acceptes, le prefere d'abord. Une gameroom ne reunit que des joueurs
+    /// au meme contenu.
+    /// </summary>
     [JsonPropertyName("content")]
     public MultiplayerContent? Content { get; init; }
 
