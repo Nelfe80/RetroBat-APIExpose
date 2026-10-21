@@ -29,12 +29,12 @@ public class MultiplayerLaunchPlanTests : IDisposable
     [Fact]
     public void L_hote_impose_son_coeur_coupe_les_succes_et_passe_tout_le_netplay_en_arguments()
     {
-        var netplay = MultiplayerLaunchPlan.ArgumentsHote("NELFEPLAY_kenji_ab12cd34", "aaaa1111", "bbbb2222", "madrid");
+        var netplay = MultiplayerLaunchPlan.ArgumentsHote("NELFEPLAY_player_ab12cd34", "aaaa1111", "bbbb2222", "madrid");
         var ligne = MultiplayerLaunchPlan.Arguments("-p1index 0", "fbneo", "fbneo", @"E:\RetroBat\roms\fbneo\mslug3.zip", Mslug3, 2, netplay);
 
         Assert.Equal(
             "-p1index 0 -system fbneo -emulator libretro -core fbneo -retroachievements 0 -netplay true -netplaymode host"
-            + " -netplay.nickname NELFEPLAY_kenji_ab12cd34 -netplay.password aaaa1111 -netplay.spectatepassword bbbb2222"
+            + " -netplay.nickname NELFEPLAY_player_ab12cd34 -netplay.password aaaa1111 -netplay.spectatepassword bbbb2222"
             + " -netplay.relay madrid -netplay.port 55435 -netplay_public_announce true -rom \"E:\\RetroBat\\roms\\fbneo\\mslug3.zip\"",
             ligne);
     }
@@ -45,7 +45,7 @@ public class MultiplayerLaunchPlanTests : IDisposable
         var session = new MultiplayerSessionNetplay { Relay = "europe-west1.relay.retroarch.com", Port = 55435, Session = "s3ss10n", PlayerPassword = "aaaa1111" };
         var ligne = MultiplayerLaunchPlan.Arguments("", "gba", "mgba_splitscreen", @"E:\RetroBat\roms\gba\Doom II (USA).zip",
             new MultiplayerGame { Id = "gba/doom-ii", System = "gba", Players = 4 }, 3,
-            MultiplayerLaunchPlan.ArgumentsInvite("NELFEPLAY_lina_01ff", session));
+            MultiplayerLaunchPlan.ArgumentsInvite("NELFEPLAY_player2_01ff", session));
 
         Assert.Contains("-netplaymode client -netplayip europe-west1.relay.retroarch.com -netplayport 55435 -netplaysession s3ss10n -netplaypass aaaa1111", ligne);
         Assert.Contains("-core mgba_splitscreen", ligne);
