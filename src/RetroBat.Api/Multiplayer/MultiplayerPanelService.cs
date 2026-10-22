@@ -259,11 +259,18 @@ public sealed class MultiplayerPanelService
         }
 
         var classique = room.Level != MultiplayerLevels.NelfePlay;
+        // NIVEAU NELFEPLAY : les personnages dans l'ordre des places (00quater.10), a la place du message du Classique.
+        var personnages = string.Join("  ·  ", room.Players
+            .Where(joueur => joueur.Seat is not null)
+            .OrderBy(joueur => joueur.Seat)
+            .Select(joueur => (Place: joueur.Seat!.Value, Nom: PersonnageDe(joueur)))
+            .Where(paire => paire.Nom.Length > 0)
+            .Select(paire => "P" + paire.Place.ToString(CultureInfo.InvariantCulture) + " " + paire.Nom));
         _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal), Composer());
         _overlay.Attendre(
             _textes.Text("multiplayer.syncing", langue),
             jeu?.Game.Name ?? string.Empty,
-            classique ? _textes.Text("multiplayer.classic.message", langue) : string.Empty);
+            classique ? _textes.Text("multiplayer.classic.message", langue) : personnages);
     }
 
     /// <summary>
@@ -879,6 +886,10 @@ public sealed class MultiplayerPanelService
         {
             aides.Add(new("dpad_updown", T("multiplayer.help.choose")));
             aides.Add(new(_glypheValider, T("multiplayer.help.invite")));
+        }
+        else if (_modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers && _jeu?.Game is { EstNelfePlay: true, Choices.Count: > 0 })
+        {
+            aides.Add(new("dpad_updown", T("multiplayer.help.character")));
         }
 
         aides.Add(new(_glypheAnnuler, T("multiplayer.help.back")));

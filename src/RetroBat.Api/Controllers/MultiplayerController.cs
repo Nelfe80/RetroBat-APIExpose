@@ -85,7 +85,8 @@ public sealed class MultiplayerController : ControllerBase
 
     /// <summary>
     /// L'APERCU d'un ecran MULTIPLAYER en image, dessine hors ecran avec le theme de la borne (outil de mise au
-    /// point) : <c>panel</c>, <c>panel-focus</c>, <c>invite</c>, <c>presentation</c>, <c>result</c>, <c>cards</c>.
+    /// point) : <c>panel</c>, <c>panel-focus</c>, <c>invite</c>, <c>presentation</c>, <c>result</c>, <c>cards</c>, et au niveau
+    /// NelfePlay <c>np-panel</c>, <c>np-presentation</c>, <c>np-result</c>.
     /// Joueurs fictifs ; rien n'est montre a l'ecran ni envoye a la plateforme.
     /// </summary>
     [HttpGet("preview/{vue}")]
@@ -139,6 +140,26 @@ public sealed class MultiplayerController : ControllerBase
                     LigneCourante = -1, Bandeau = T("multiplayer.result.classic_note"),
                     Aides = [new("button_a", T("multiplayer.help.replay")), new("button_b", T("multiplayer.help.close"))],
                 }, "", "", "", journal),
+                "np-panel" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with
+                {
+                    Badge = string.Empty, Info = "1 VS 1", NousAvonsLaMain = true, Compte = "2/2", DecompteFinUtc = DateTime.UtcNow.AddSeconds(4),
+                    Lignes = [deux[0] with { Personnage = "KEN" }, deux[1] with { Personnage = "CHUN-LI" }],
+                    Aides = [new("dpad_leftright", T("multiplayer.help.tab")), new("dpad_updown", T("multiplayer.help.character")), new("button_b", T("multiplayer.help.back"))],
+                }, "", "", "", journal),
+                "np-presentation" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with { Badge = string.Empty },
+                    T("multiplayer.syncing"), "Street Fighter II' Champion Edition", "P1 KEN  ·  P2 CHUN-LI", journal),
+                "np-result" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with
+                {
+                    Onglets = [T("multiplayer.result.victory")], OngletCourant = 0, Compte = string.Empty, Badge = string.Empty,
+                    Info = T("multiplayer.result.playtime") + " 1:01", DecompteFinUtc = DateTime.UtcNow.AddSeconds(12),
+                    Lignes =
+                    [
+                        Joueur("PLAYER 1", "FR", "A98BFF", false, true, true, 3, "P1 · " + T("multiplayer.result.victory")) with { Personnage = "KEN" },
+                        Joueur("PLAYER 2", "JP", "FF9F6B", true, false, true, 4, "P2 · " + T("multiplayer.result.defeat")) with { Personnage = "CHUN-LI" },
+                    ],
+                    LigneCourante = -1, Bandeau = string.Empty,
+                    Aides = [new("button_a", T("multiplayer.help.replay")), new("button_b", T("multiplayer.help.close"))],
+                }, "", "", "", journal),
                 "cards" => MultiplayerToastOverlay.Apercu(style,
                 [
                     new(T("multiplayer.invitation.title"), textes.Format("multiplayer.invitation", langue, ("player", "PLAYER 2"), ("game", "Metal Slug 3")), T("multiplayer.invitation.help"), DateTime.UtcNow.AddSeconds(17), Alerte: true),
@@ -147,7 +168,9 @@ public sealed class MultiplayerController : ControllerBase
                 ], new Rectangle(0, 0, 1920, 1200)),
                 _ => [],
             };
-            return png.Length == 0 ? NotFound(new { vues = new[] { "panel", "panel-focus", "invite", "presentation", "result", "cards" } }) : File(png, "image/png");
+            return png.Length == 0
+                ? NotFound(new { vues = new[] { "panel", "panel-focus", "invite", "presentation", "result", "cards", "np-panel", "np-presentation", "np-result" } })
+                : File(png, "image/png");
         }
         catch (InvalidOperationException ex)
         {
