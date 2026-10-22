@@ -26,7 +26,8 @@ public sealed partial class LeaderboardOverlayService
         bool Present,
         int? Barres,
         string Etat,
-        string MotHote = "HOST");
+        string MotHote = "HOST",
+        string Personnage = "");
 
     /// <summary>Ce que le panneau MULTIPLAYER montre. Remplace en bloc, comme le classement.</summary>
     public sealed record ContenuMultiplayer(
@@ -307,6 +308,15 @@ public sealed partial class LeaderboardOverlayService
                         using var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : Teinte(s.GroupColor, alpha));
                         g.DrawString(j.Pays, petite, encre, new PointF(x, y + hauteur * 0.56f), StringFormat.GenericTypographic);
                     }
+                }
+
+                // NIVEAU NELFEPLAY : le personnage du joueur, a cote de son drapeau (V24-18) ; ▲▼ le change.
+                if (j.Personnage.Length > 0)
+                {
+                    var apres = x + hauteur * 0.24f * 1.5f + taille * 0.5f;
+                    using var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TitleColor, alpha));
+                    g.DrawString(Couper(g, j.Personnage, petite, Math.Max(0, droite - apres)), petite, encre,
+                        new PointF(apres, y + hauteur * 0.56f), StringFormat.GenericTypographic);
                 }
 
                 y += hauteur + ecart;

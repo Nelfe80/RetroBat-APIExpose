@@ -320,6 +320,7 @@ public sealed class MultiplayerPanelService
     public void Direction(string? identite)
     {
         MultiplayerPanelModel.Effet effet;
+        var sens = (identite ?? string.Empty).ToLowerInvariant();
         lock (_verrou)
         {
             if (_mode != Mode.Panneau)
@@ -327,7 +328,18 @@ public sealed class MultiplayerPanelService
                 return;
             }
 
-            effet = (identite ?? string.Empty).ToLowerInvariant() switch
+            // NIVEAU NELFEPLAY : ▲▼ change le personnage dans WAITING FOR PLAYERS (V24-04), quand nous avons la main.
+            if (sens is "up" or "down"
+                && _modele.Etat == MultiplayerPanelModel.Foyer.Panneau
+                && _modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers
+                && _jeu?.Game is { EstNelfePlay: true, Choices.Count: > 0 } jeuNelfePlay
+                && RoomDuJeu() is { State: "waiting" or "countdown" } salle)
+            {
+                _ = ChangerDePersonnageAsync(salle.Room, jeuNelfePlay, sens == "down" ? 1 : -1);
+                return;
+            }
+
+            effet = sens switch
             {
                 "left" => _modele.Gauche(),
                 "right" => _modele.Droite(),
@@ -806,7 +818,39 @@ public sealed class MultiplayerPanelService
             joueur.Present,
             Barres(joueur.RttMs),
             etat,
-            T("multiplayer.host"));
+            T("multiplayer.host"),
+            PersonnageDe(joueur));
+
+    private async Task ChangerDePersonnageAsync(string room, MultiplayerGame jeu, int pas)
+    {
+        // Le nom change tout de suite a l'ecran ; la gameroom le recoit dans la foulee.
+        var envoi = _session.ChangerDeChoixAsync(room, jeu, pas);
+        Rafraichir();
+        var refus = await envoi.ConfigureAwait(false);
+        if (refus is not null)
+        {
+            _journal?.LogInformation("MULTIPLAYER : choix de personnage refuse ({Raison})", refus);
+        }
+
+        Rafraichir();
+    }
+
+    /// <summary>NIVEAU NELFEPLAY : le nom du personnage de ce joueur (le premier choix du catalogue), ou rien.</summary>
+    private string PersonnageDe(MultiplayerJoueur joueur)
+    {
+        var jeu = _jeu?.Game;
+        if (jeu is not { EstNelfePlay: true, Choices: { Count: > 0 } choix })
+        {
+            return string.Empty;
+        }
+
+        var premier = choix[0];
+        // Le sien d'abord : ▲▼ le change ici avant que la gameroom le renvoie.
+        var valeur = joueur.You ? _session.MesChoix(jeu).GetValueOrDefault(premier.Key, premier.Default)
+            : joueur.Choices is not null && joueur.Choices.TryGetValue(premier.Key, out var v) ? v
+            : premier.Default;
+        return premier.NomDe(valeur);
+    }
 
     private LeaderboardOverlayService.JoueurMultiplayer Ami(MultiplayerAmi ami, Func<string, string> T)
         => new(ami.Pseudo.Length > 0 ? ami.Pseudo : ami.Handle, ami.Country, CouleurDe(ami.Handle), false, false,

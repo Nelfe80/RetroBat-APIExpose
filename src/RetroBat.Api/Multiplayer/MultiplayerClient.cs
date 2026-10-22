@@ -38,8 +38,13 @@ public sealed class MultiplayerClient
     }
 
     /// <summary>L'appui long : une gameroom pour ce jeu et ce contenu.</summary>
-    public Task<MultiplayerReponse?> RejoindreAsync(string jeu, string contenu, int? rttMs, bool panneauOuvert, CancellationToken ct)
-        => EnvoyerAsync("join", new { game = jeu, content = contenu, rtt_ms = rttMs, panel = panneauOuvert }, ct);
+    public Task<MultiplayerReponse?> RejoindreAsync(string jeu, string contenu, int? rttMs, bool panneauOuvert, CancellationToken ct,
+        IReadOnlyDictionary<string, int>? choix = null)
+        => EnvoyerAsync("join", new { game = jeu, content = contenu, rtt_ms = rttMs, panel = panneauOuvert, choices = choix }, ct);
+
+    /// <summary>NIVEAU NELFEPLAY : ▲▼ dans le panneau, le joueur change de personnage (permis jusqu'au lancement).</summary>
+    public Task<MultiplayerReponse?> ChoisirAsync(string room, IReadOnlyDictionary<string, int> choix, CancellationToken ct)
+        => EnvoyerAsync("choice", new { room, choices = choix }, ct);
 
     /// <summary>B maintenu : quitter cette gameroom.</summary>
     public Task<MultiplayerReponse?> QuitterAsync(string room, CancellationToken ct)
@@ -253,6 +258,10 @@ public sealed record MultiplayerJoueur
 
     [JsonPropertyName("rtt_ms")]
     public int? RttMs { get; init; }
+
+    /// <summary>NIVEAU NELFEPLAY : les choix de ce joueur (<c>character</c> =&gt; valeur), permis par le catalogue.</summary>
+    [JsonPropertyName("choices")]
+    public IReadOnlyDictionary<string, int>? Choices { get; init; }
 }
 
 /// <summary>Ce que cette borne doit faire : heberger, ou rejoindre a sa place.</summary>

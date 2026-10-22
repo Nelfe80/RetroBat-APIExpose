@@ -38,7 +38,11 @@ public sealed class MultiplayerLaunchService : IHostedService
     private readonly ILogger<MultiplayerLaunchService> _journal;
     private readonly object _verrou = new();
     private readonly HashSet<string> _lancees = new(StringComparer.Ordinal);
+    private readonly MultiplayerDepartPret _depart;
     private string? _enCours;
+
+    /// <summary>L'etat d'un depart pret pose dans l'emplacement reserve de RetroArch, retire a la fin de la partie.</summary>
+    private string? _etatPose;
 
     public MultiplayerLaunchService(
         MultiplayerSessionService session,
@@ -58,6 +62,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         _contexte = contexte;
         _bus = bus;
         _journal = journal;
+        _depart = new MultiplayerDepartPret(new CommandesRetroArchUdp());
     }
 
     private static string RacineRetroArch => Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch");
@@ -159,6 +164,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             NetplayHostService.NoterOuverteAuxJoueurs();
             _ = Task.Run(() => PublierLaSessionAsync(room, jeu, jeton, motJoueur, motSpectateur));
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
+            RetirerLEtatPose();
             await _client.TerminerAsync(room.Room, "game_closed", duree, CancellationToken.None).ConfigureAwait(false);
             _panneau.MontrerLeResultat(room.Room, duree);
         }
@@ -191,6 +197,15 @@ public sealed class MultiplayerLaunchService : IHostedService
                 return;
             }
 
+            // NIVEAU NELFEPLAY : le depart pret, AVANT que la session parte et que quiconque se connecte. Les invites
+            // recevront l'etat de l'hote, choix compris ; un depart qui ne se verifie pas ne part pas du tout.
+            if (jeu.Game.EstNelfePlay && !await PreparerLeDepartAsync(room, jeu).ConfigureAwait(false))
+            {
+                await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
+                await RetroArchInvite.FermerAsync().ConfigureAwait(false);
+                return;
+            }
+
             // Le mot de passe que RetroArch applique, relu dans sa configuration (voir NetplayHostService).
             var config = File.Exists(ConfigRetroArch) ? await File.ReadAllTextAsync(ConfigRetroArch).ConfigureAwait(false) : string.Empty;
             var (joueurReel, spectateurReel) = NetplayHostService.LireMotsDePasse(config);
@@ -211,6 +226,57 @@ public sealed class MultiplayerLaunchService : IHostedService
         catch (Exception ex)
         {
             _journal.LogWarning(ex, "MULTIPLAYER : publication de la session de {Room} interrompue", room.Room);
+        }
+    }
+
+    /// <summary>Charge l'etat, ecrit le choix de chaque place, relit. Faux quand le depart ne se verifie pas.</summary>
+    private async Task<bool> PreparerLeDepartAsync(MultiplayerRoom room, MultiplayerInstalledGame jeu)
+    {
+        var etat = Path.Combine(RetroBatPaths.PluginRoot, "resources", "multiplayer", jeu.Game.Start!.State.Replace('/', Path.DirectorySeparatorChar));
+        var choixParPlace = room.Players
+            .Where(joueur => joueur.Seat is not null)
+            .GroupBy(joueur => joueur.Seat!.Value)
+            .ToDictionary(groupe => groupe.Key, groupe => groupe.First().Choices);
+        var resultat = await _depart.PreparerAsync(jeu.Game, etat, Path.GetFileNameWithoutExtension(jeu.Path), choixParPlace, CancellationToken.None)
+            .ConfigureAwait(false);
+        lock (_verrou)
+        {
+            _etatPose = resultat.Fichier;
+        }
+
+        if (!resultat.Ok)
+        {
+            _journal.LogWarning("MULTIPLAYER : depart pret de {Jeu} annule pour {Room} : {Raison}", jeu.Game.Id, room.Room, resultat.Raison);
+            RetirerLEtatPose();
+            return false;
+        }
+
+        _journal.LogInformation("MULTIPLAYER : depart pret de {Jeu} pose et verifie ({Places} places)", jeu.Game.Id, choixParPlace.Count);
+        return true;
+    }
+
+    private void RetirerLEtatPose()
+    {
+        string? fichier;
+        lock (_verrou)
+        {
+            fichier = _etatPose;
+            _etatPose = null;
+        }
+
+        if (fichier is null)
+        {
+            return;
+        }
+
+        try
+        {
+            File.Delete(fichier);
+            File.Delete(fichier + ".png");
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _journal.LogDebug(ex, "MULTIPLAYER : etat du depart pret non retire ({Fichier})", fichier);
         }
     }
 

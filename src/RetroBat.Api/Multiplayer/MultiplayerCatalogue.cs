@@ -131,8 +131,22 @@ public sealed record MultiplayerGame
     [JsonPropertyName("seat_screens")]
     public IReadOnlyList<int>? SeatScreens { get; init; }
 
+    /// <summary>
+    /// NIVEAU NELFEPLAY : le depart pret (V24-15). Un etat que l'hote charge avant que les autres se connectent ;
+    /// ils le recoivent avec la connexion (verifie le 22/10 sur Street Fighter II' CE, deux RetroArch).
+    /// </summary>
+    [JsonPropertyName("start")]
+    public MultiplayerStart? Start { get; init; }
+
+    /// <summary>NIVEAU NELFEPLAY : ce que chaque joueur choisit (le personnage par ▲▼), ecrit chez l'hote apres l'etat.</summary>
+    [JsonPropertyName("choices")]
+    public IReadOnlyList<MultiplayerChoice>? Choices { get; init; }
+
     [JsonIgnore]
     public bool EstArcade => string.Equals(System, "arcade", StringComparison.OrdinalIgnoreCase);
+
+    [JsonIgnore]
+    public bool EstNelfePlay => Level == MultiplayerLevels.NelfePlay && Start is not null;
 
     /// <summary>L'ecran a afficher pour cette place (1 a <see cref="Screens"/>).</summary>
     public int EcranDeLaPlace(int place)
@@ -165,6 +179,79 @@ public sealed record MultiplayerContent
     /// <summary>Prefiltre d'un fichier nu.</summary>
     [JsonPropertyName("size")]
     public IReadOnlyList<long> Size { get; init; } = [];
+}
+
+/// <summary>L'etat d'un depart pret, livre par le Data Pack sous <c>resources/multiplayer/</c>.</summary>
+public sealed record MultiplayerStart
+{
+    /// <summary>Chemin relatif au dossier du catalogue : <c>states/arcade/sf2ce/selection-2p-fbneo.state</c>.</summary>
+    [JsonPropertyName("state")]
+    public string State { get; init; } = string.Empty;
+
+    /// <summary>L'empreinte de l'etat : un fichier retouche ne se charge pas.</summary>
+    [JsonPropertyName("sha256")]
+    public string Sha256 { get; init; } = string.Empty;
+}
+
+/// <summary>
+/// Un choix du joueur parmi des valeurs permises (S5 du socle commun : jamais une valeur libre), et l'endroit ou
+/// l'ecrire pour chaque place. L'adresse est celle que RetroArch lit et ecrit (<c>READ_CORE_RAM</c>) : le decalage
+/// dans la memoire systeme du coeur, deja inverse sur les cartes 68000.
+/// </summary>
+public sealed record MultiplayerChoice
+{
+    [JsonPropertyName("key")]
+    public string Key { get; init; } = string.Empty;
+
+    [JsonPropertyName("values")]
+    public IReadOnlyList<MultiplayerChoiceValue> Values { get; init; } = [];
+
+    [JsonPropertyName("default")]
+    public int Default { get; init; }
+
+    [JsonPropertyName("seats")]
+    public IReadOnlyList<MultiplayerChoiceSeat> Seats { get; init; } = [];
+
+    /// <summary>La valeur suivante (ou precedente) dans la liste, en boucle.</summary>
+    public int Voisine(int valeur, int pas)
+    {
+        if (Values.Count == 0)
+        {
+            return valeur;
+        }
+
+        var index = Values.ToList().FindIndex(v => v.Value == valeur);
+        index = index < 0 ? 0 : ((index + pas) % Values.Count + Values.Count) % Values.Count;
+        return Values[index].Value;
+    }
+
+    public string NomDe(int valeur) => Values.FirstOrDefault(v => v.Value == valeur)?.Name ?? string.Empty;
+}
+
+public sealed record MultiplayerChoiceValue
+{
+    [JsonPropertyName("value")]
+    public int Value { get; init; }
+
+    /// <summary>Le nom a l'ecran (un nom de personnage, jamais traduit).</summary>
+    [JsonPropertyName("name")]
+    public string Name { get; init; } = string.Empty;
+}
+
+public sealed record MultiplayerChoiceSeat
+{
+    [JsonPropertyName("seat")]
+    public int Seat { get; init; }
+
+    /// <summary>Le decalage en hexadecimal (<c>0x864E</c>).</summary>
+    [JsonPropertyName("core_ram")]
+    public string CoreRam { get; init; } = string.Empty;
+
+    [JsonIgnore]
+    public long? Decalage => CoreRam.Trim() is { Length: > 2 } texte && texte.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
+        && long.TryParse(texte[2..], global::System.Globalization.NumberStyles.HexNumber, null, out var valeur) && valeur >= 0
+            ? valeur
+            : null;
 }
 
 public static class MultiplayerLevels
@@ -293,6 +380,62 @@ public sealed class MultiplayerCatalogueStore
             {
                 // Une place sans ecran, ou un ecran qui n'existe pas : une borne afficherait la vue d'un autre.
                 return jeu.Id + " : ecrans par place incoherents";
+            }
+
+            if (ValiderLeDepart(jeu) is { } depart)
+            {
+                return jeu.Id + " : " + depart;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Le niveau NelfePlay exige son depart pret (V24-15) ; chaque choix a des valeurs permises distinctes, un defaut
+    /// parmi elles, et une adresse pour chaque place. Un choix sans adresse pour une place laisserait ce joueur au
+    /// personnage de l'etat sans le lui dire.
+    /// </summary>
+    internal static string? ValiderLeDepart(MultiplayerGame jeu)
+    {
+        if (jeu.Level == MultiplayerLevels.NelfePlay)
+        {
+            if (jeu.Start is null || string.IsNullOrWhiteSpace(jeu.Start.State))
+            {
+                return "niveau NelfePlay sans depart pret";
+            }
+
+            if (jeu.Start.State.Contains("..", StringComparison.Ordinal) || global::System.IO.Path.IsPathRooted(jeu.Start.State))
+            {
+                return "chemin de l'etat hors du dossier MULTIPLAYER";
+            }
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(jeu.Start.Sha256.Trim(), "^[0-9a-fA-F]{64}$"))
+            {
+                return "empreinte de l'etat manquante";
+            }
+        }
+
+        foreach (var choix in jeu.Choices ?? [])
+        {
+            if (string.IsNullOrWhiteSpace(choix.Key) || choix.Values.Count == 0
+                || choix.Values.Select(v => v.Value).Distinct().Count() != choix.Values.Count
+                || choix.Values.Any(v => v.Value is < 0 or > 255 || string.IsNullOrWhiteSpace(v.Name)))
+            {
+                return "choix « " + choix.Key + " » sans valeurs permises distinctes";
+            }
+
+            if (choix.Values.All(v => v.Value != choix.Default))
+            {
+                return "choix « " + choix.Key + " » : defaut hors des valeurs";
+            }
+
+            for (var place = 1; place <= jeu.Players; place++)
+            {
+                if (choix.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage is null)
+                {
+                    return "choix « " + choix.Key + " » : pas d'adresse pour la place " + place;
+                }
             }
         }
 

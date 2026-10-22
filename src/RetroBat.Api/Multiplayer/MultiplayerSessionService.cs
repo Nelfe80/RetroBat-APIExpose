@@ -129,7 +129,8 @@ public sealed class MultiplayerSessionService : BackgroundService
         }
 
         _appui = true;
-        var reponse = await _client.RejoindreAsync(jeu.Game.Id, jeu.ContentKey, _relais?.MeilleurTempsMs, PanneauOuvert, ct).ConfigureAwait(false);
+        var reponse = await _client.RejoindreAsync(jeu.Game.Id, jeu.ContentKey, _relais?.MeilleurTempsMs, PanneauOuvert, ct,
+            jeu.Game.Choices is { Count: > 0 } ? MesChoix(jeu.Game) : null).ConfigureAwait(false);
         if (reponse is null)
         {
             return "offline";
@@ -168,6 +169,83 @@ public sealed class MultiplayerSessionService : BackgroundService
     }
 
     public Task<IReadOnlyList<MultiplayerAmi>> AmisAsync(CancellationToken ct = default) => _client.AmisAsync(ct);
+
+    // ── niveau NelfePlay : les choix du joueur ─────────────────────────────────────────────────
+
+    private static string FichierDesChoix => Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, "state", "nelfeplay", "multiplayer-choix.json");
+
+    private Dictionary<string, Dictionary<string, int>>? _choix;
+
+    /// <summary>
+    /// Les choix du joueur pour ce jeu : ceux de sa derniere partie (« le joueur est pret avec son dernier
+    /// personnage », 00quater.5), gardes sur la borne ; sinon le defaut du catalogue.
+    /// </summary>
+    public IReadOnlyDictionary<string, int> MesChoix(MultiplayerGame jeu)
+    {
+        lock (_verrou)
+        {
+            _choix ??= LireLesChoix();
+            var gardes = _choix.TryGetValue(jeu.Id, out var siens) ? siens : null;
+            return (jeu.Choices ?? []).ToDictionary(
+                choix => choix.Key,
+                choix => gardes is not null && gardes.TryGetValue(choix.Key, out var v) && choix.Values.Any(x => x.Value == v) ? v : choix.Default,
+                StringComparer.Ordinal);
+        }
+    }
+
+    /// <summary>▲▼ : le choix voisin, garde sur la borne et envoye a la gameroom. Rend la raison d'un refus, ou null.</summary>
+    public async Task<string?> ChangerDeChoixAsync(string room, MultiplayerGame jeu, int pas, CancellationToken ct = default)
+    {
+        if (jeu.Choices is not { Count: > 0 } choix)
+        {
+            return "no_choice";
+        }
+
+        var actuels = MesChoix(jeu);
+        var premier = choix[0];
+        var nouveaux = new Dictionary<string, int>(actuels, StringComparer.Ordinal)
+        {
+            [premier.Key] = premier.Voisine(actuels.TryGetValue(premier.Key, out var v) ? v : premier.Default, pas),
+        };
+        lock (_verrou)
+        {
+            _choix ??= LireLesChoix();
+            _choix[jeu.Id] = nouveaux;
+            EcrireLesChoix(_choix);
+        }
+
+        _appui = true;
+        var reponse = await _client.ChoisirAsync(room, nouveaux, ct).ConfigureAwait(false);
+        Reveiller();
+        return reponse is null ? "offline" : reponse.Ok ? null : reponse.Reason ?? "refused";
+    }
+
+    private static Dictionary<string, Dictionary<string, int>> LireLesChoix()
+    {
+        try
+        {
+            return File.Exists(FichierDesChoix)
+                ? System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, int>>>(File.ReadAllText(FichierDesChoix)) ?? []
+                : [];
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Text.Json.JsonException)
+        {
+            return [];
+        }
+    }
+
+    private void EcrireLesChoix(Dictionary<string, Dictionary<string, int>> choix)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(FichierDesChoix)!);
+            File.WriteAllText(FichierDesChoix, System.Text.Json.JsonSerializer.Serialize(choix), new System.Text.UTF8Encoding(false));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _journal?.LogDebug(ex, "MULTIPLAYER : choix non gardes");
+        }
+    }
 
     /// <summary>Le jeu MULTIPLAYER d'un fichier, tel que la collection l'a reconnu, ou null.</summary>
     public MultiplayerInstalledGame? JeuDe(string cheminDuJeu)
