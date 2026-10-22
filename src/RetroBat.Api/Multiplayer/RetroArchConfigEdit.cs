@@ -52,6 +52,43 @@ public static partial class RetroArchConfigEdit
         return avant;
     }
 
+    /// <summary>
+    /// Retire les cles que <paramref name="doitPartir"/> designe et rend ce qu'elles valaient : <see cref="Rendre"/> les
+    /// remettra. Une option de coeur absente du fichier prend la valeur par defaut que le coeur declare.
+    /// </summary>
+    public static Dictionary<string, string?> Retirer(string fichier, Func<string, bool> doitPartir)
+    {
+        var avant = new Dictionary<string, string?>(StringComparer.Ordinal);
+        if (!File.Exists(fichier))
+        {
+            return avant;
+        }
+
+        var lignes = File.ReadAllLines(fichier).ToList();
+        for (var i = lignes.Count - 1; i >= 0; i--)
+        {
+            var egal = lignes[i].IndexOf('=');
+            if (egal <= 0)
+            {
+                continue;
+            }
+
+            var cle = lignes[i][..egal].Trim();
+            if (cle.Length > 0 && doitPartir(cle))
+            {
+                avant[cle] = Valeur(lignes[i]);
+                lignes.RemoveAt(i);
+            }
+        }
+
+        if (avant.Count > 0)
+        {
+            Ecrire(fichier, lignes);
+        }
+
+        return avant;
+    }
+
     /// <summary>Rend les valeurs d'avant ; une cle qui n'existait pas s'en va.</summary>
     public static void Rendre(string fichier, IReadOnlyDictionary<string, string?> avant)
     {

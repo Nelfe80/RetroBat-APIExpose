@@ -407,9 +407,23 @@ public sealed class MultiplayerLaunchService : IHostedService
 
         _panneau.AnnoncerLeLancement(room, jeu);
 
+        var imposees = MultiplayerLaunchPlan.OptionsDuCoeur(jeu.Core, Math.Max(2, lancement.Players), lancement.Seat);
+        var optionsAvant = RetroArchConfigEdit.Poser(OptionsDesCoeurs, imposees);
+        // Les DIP du jeu que le catalogue ne fixe pas reprennent la valeur par defaut du coeur, la meme sur toutes les
+        // bornes : le netplay ne synchronise pas les options, et une difficulte ou un nombre de vies changes sur une
+        // seule borne desynchroniseraient la partie. Les reglages du joueur sont rendus a la fin.
+        if (MultiplayerLaunchPlan.PrefixeDesDip(jeu.Game, coeur) is { } prefixe)
+        {
+            foreach (var (cle, valeur) in RetroArchConfigEdit.Retirer(OptionsDesCoeurs,
+                         cle => cle.StartsWith(prefixe, StringComparison.Ordinal) && !imposees.ContainsKey(cle)))
+            {
+                optionsAvant.TryAdd(cle, valeur);
+            }
+        }
+
         var aRendre = new Dictionary<string, Dictionary<string, string?>>(StringComparer.OrdinalIgnoreCase)
         {
-            [OptionsDesCoeurs] = RetroArchConfigEdit.Poser(OptionsDesCoeurs, MultiplayerLaunchPlan.OptionsDuCoeur(jeu.Core, Math.Max(2, lancement.Players), lancement.Seat)),
+            [OptionsDesCoeurs] = optionsAvant,
             [ConfigRetroArch] = RetroArchConfigEdit.Poser(ConfigRetroArch, MultiplayerLaunchPlan.Place(lancement.Seat)),
         };
         RetroArchConfigEdit.Noter(Journal, aRendre);

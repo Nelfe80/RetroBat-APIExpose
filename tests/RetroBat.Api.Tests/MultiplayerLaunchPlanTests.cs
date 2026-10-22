@@ -150,4 +150,47 @@ public class MultiplayerLaunchPlanTests : IDisposable
         Assert.Equal("true", RetroArchConfigEdit.Lire(fichier, "netplay_request_device_p10"));
         Assert.Equal("false", RetroArchConfigEdit.Lire(fichier, "netplay_request_device_p1"));
     }
+
+    [Fact]
+    public void Les_DIP_non_fixes_partent_le_temps_de_la_partie_puis_reviennent()
+    {
+        var fichier = Path.Combine(Path.GetTempPath(), "mp-dip-" + Guid.NewGuid().ToString("N") + ".cfg");
+        File.WriteAllLines(fichier,
+        [
+            "fbneo-dipswitch-sf2ce-Difficulty = \"7 (Hardest)\"",
+            "fbneo-dipswitch-sf2ce-Free_Play = \"On\"",
+            "fbneo-dipswitch-mslug3-Difficulty = \"8\"",
+            "fbneo-cpu-speed-adjust = \"100%\"",
+        ]);
+        try
+        {
+            var jeu = new MultiplayerGame { Id = "arcade/sf2ce", System = "arcade", Set = "sf2ce", Players = 2 };
+            var prefixe = MultiplayerLaunchPlan.PrefixeDesDip(jeu, "fbneo");
+            Assert.Equal("fbneo-dipswitch-sf2ce-", prefixe);
+            Assert.Null(MultiplayerLaunchPlan.PrefixeDesDip(jeu with { System = "gba", Set = null }, "mgba_splitscreen"));
+
+            var imposees = new Dictionary<string, string> { ["fbneo-dipswitch-sf2ce-Free_Play"] = "Off" };
+            var avant = RetroArchConfigEdit.Poser(fichier, imposees);
+            foreach (var (cle, valeur) in RetroArchConfigEdit.Retirer(fichier, cle => cle.StartsWith(prefixe!, StringComparison.Ordinal) && !imposees.ContainsKey(cle)))
+            {
+                avant.TryAdd(cle, valeur);
+            }
+
+            // Pendant la partie : la difficulte du joueur est partie (le coeur prend sa valeur par defaut), le DIP fixe
+            // par le catalogue est pose, les DIP des autres jeux et les autres options ne bougent pas.
+            Assert.Null(RetroArchConfigEdit.Lire(fichier, "fbneo-dipswitch-sf2ce-Difficulty"));
+            Assert.Equal("Off", RetroArchConfigEdit.Lire(fichier, "fbneo-dipswitch-sf2ce-Free_Play"));
+            Assert.Equal("8", RetroArchConfigEdit.Lire(fichier, "fbneo-dipswitch-mslug3-Difficulty"));
+            Assert.Equal("100%", RetroArchConfigEdit.Lire(fichier, "fbneo-cpu-speed-adjust"));
+
+            // Apres : tout est rendu.
+            RetroArchConfigEdit.Rendre(fichier, avant);
+            Assert.Equal("7 (Hardest)", RetroArchConfigEdit.Lire(fichier, "fbneo-dipswitch-sf2ce-Difficulty"));
+            Assert.Equal("On", RetroArchConfigEdit.Lire(fichier, "fbneo-dipswitch-sf2ce-Free_Play"));
+        }
+        finally
+        {
+            File.Delete(fichier);
+        }
+    }
 }

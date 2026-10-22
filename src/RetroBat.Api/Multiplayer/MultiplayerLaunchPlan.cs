@@ -49,6 +49,15 @@ public static class MultiplayerLaunchPlan
     /// La place netplay : RetroArch donne a chaque borne la manette qu'elle demande. L'hote demande la
     /// sienne comme un invite : il n'est donc pas forcement P1 (V24-12).
     /// </summary>
+    /// <summary>
+    /// Le prefixe des DIP d'un jeu d'arcade sous FBNeo (<c>fbneo-dipswitch-sf2ce-</c>), ou null ailleurs. Ceux que le
+    /// catalogue ne fixe pas sont retires le temps de la partie : toutes les bornes prennent la valeur par defaut du coeur.
+    /// </summary>
+    public static string? PrefixeDesDip(MultiplayerGame jeu, string coeur)
+        => jeu.EstArcade && jeu.Set is { Length: > 0 } set && string.Equals(coeur, "fbneo", StringComparison.OrdinalIgnoreCase)
+            ? "fbneo-dipswitch-" + set + "-"
+            : null;
+
     public static IReadOnlyDictionary<string, string> Place(int place)
     {
         var reglages = new Dictionary<string, string>(StringComparer.Ordinal);
