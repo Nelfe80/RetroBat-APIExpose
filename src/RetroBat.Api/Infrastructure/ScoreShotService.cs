@@ -51,6 +51,7 @@ public sealed class ScoreShotService : BackgroundService
     private readonly NelfePlayDeviceStore _devices;
     private readonly IHttpClientFactory _httpFactory;
     private readonly ILogger<ScoreShotService> _logger;
+    private readonly PartieNelfePlayService? _partie;
 
     private readonly object _gate = new();
     private IDisposable? _subscription;
@@ -67,10 +68,10 @@ public sealed class ScoreShotService : BackgroundService
 
     public ScoreShotService(IEventBus bus, RetroArchReplayClient retroarch,
         MameLuaIngameProvider mame, NelfePlayDeviceStore devices, IHttpClientFactory httpFactory,
-        ILogger<ScoreShotService> logger)
+        ILogger<ScoreShotService> logger, PartieNelfePlayService? partie = null)
     {
         _bus = bus; _retroarch = retroarch; _mame = mame; _devices = devices;
-        _httpFactory = httpFactory; _logger = logger;
+        _httpFactory = httpFactory; _logger = logger; _partie = partie;
     }
 
     private static string DossierLocal
@@ -125,6 +126,15 @@ public sealed class ScoreShotService : BackgroundService
         {
             lock (_gate) { _romGroup = rom; _systemId = systeme; _seuilConnu = false; _seuil = null; _arme = false; _scorePhotographie = 0; }
             _logger.LogInformation("Capture record : {Rom} sous l'atelier NelfeScoreLab, pas de photo.", rom);
+            return;
+        }
+
+        // HORS NELFEPLAY, PAS DE PHOTO (vu le 22/10 : « Capture record » pendant une partie MULTIPLAYER de SF2CE). Une
+        // partie du joueur, ou de MULTIPLAYER, ne publie aucun score : son image ne monterait jamais.
+        if (_partie is { EstNelfePlay: false })
+        {
+            lock (_gate) { _romGroup = rom; _systemId = systeme; _seuilConnu = false; _seuil = null; _arme = false; _scorePhotographie = 0; }
+            _logger.LogInformation("Capture record : {Rom} hors NelfePlay, pas de photo.", rom);
             return;
         }
 
