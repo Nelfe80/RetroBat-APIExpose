@@ -188,8 +188,16 @@ public sealed class MultiplayerController : ControllerBase
                     Info = T("multiplayer.result.playtime") + " 1:01", DecompteFinUtc = DateTime.UtcNow.AddSeconds(12),
                     Lignes =
                     [
-                        Joueur("PLAYER 1", "FR", "A98BFF", false, true, true, 3, "P1 · " + T("multiplayer.result.victory")) with { Personnage = "KEN" },
-                        Joueur("PLAYER 2", "JP", "FF9F6B", true, false, true, 4, "P2 · " + T("multiplayer.result.defeat")) with { Personnage = "CHUN-LI" },
+                        Joueur("PLAYER 1", "FR", "A98BFF", false, true, true, 3, "P1 · " + T("multiplayer.result.victory") + " · 1516 (+16)") with
+                        {
+                            Personnage = "KEN  ·  " + T("multiplayer.result.stats").Replace("{hits}", "12").Replace("{kos}", "2").Replace("{perfects}", "1"),
+                            Avatar = planche, Portrait = Portrait(307540), Place = 1,
+                        },
+                        Joueur("PLAYER 2", "JP", "FF9F6B", true, false, true, 4, "P2 · " + T("multiplayer.result.defeat") + " · 1484 (-16)") with
+                        {
+                            Personnage = "CHUN-LI  ·  " + T("multiplayer.result.stats").Replace("{hits}", "7").Replace("{kos}", "0").Replace("{perfects}", "0"),
+                            Portrait = Portrait(307541), Place = 2,
+                        },
                     ],
                     LigneCourante = -1, Bandeau = string.Empty,
                     Aides = [new("button_a", T("multiplayer.help.replay")), new("button_b", T("multiplayer.help.close"))],
