@@ -34,10 +34,26 @@ public class MultiplayerLaunchPlanTests : IDisposable
 
         Assert.Equal(
             "-p1index 0 -system fbneo -emulator libretro -core fbneo -retroachievements 0"
-            + " -rewind 0 -autosave 0 -runahead 0 -preemptive_frames 0 -fastforward_ratio 1.000000 -netplay true -netplaymode host"
+            + " -rewind 0 -autosave 0 -runahead 0 -fastforward_ratio 1.000000 -netplay true -netplaymode host"
             + " -netplay.nickname NELFEPLAY_player_ab12cd34 -netplay.password aaaa1111 -netplay.spectatepassword bbbb2222"
             + " -netplay.relay madrid -netplay.port 55435 -netplay_public_announce true -rom \"E:\\RetroBat\\roms\\fbneo\\mslug3.zip\"",
             ligne);
+    }
+
+    [Fact]
+    public void Aucune_cle_de_la_ligne_ne_commence_par_p_hors_manettes()
+    {
+        // Le lanceur prend tout « -p... » pour une manette : « -preemptive_frames » cassait tout netplay (23/10).
+        var session = new MultiplayerSessionNetplay { Relay = "europe-west1.relay.retroarch.com", Port = 55435, Session = "s3ss10n", PlayerPassword = "aaaa1111" };
+        foreach (var netplay in new[]
+                 {
+                     MultiplayerLaunchPlan.ArgumentsHote("NELFEPLAY_player_ab12cd34", "aaaa1111", "bbbb2222", "madrid"),
+                     MultiplayerLaunchPlan.ArgumentsInvite("NELFEPLAY_player2_01ff", session),
+                 })
+        {
+            var ligne = MultiplayerLaunchPlan.Arguments("", "fbneo", "fbneo", @"E:\RetroBat\roms\fbneo\wrally2.zip", Wrally2, 2, netplay)!;
+            Assert.DoesNotContain(ligne.Split(' '), morceau => morceau.StartsWith("-p", StringComparison.Ordinal));
+        }
     }
 
     [Fact]

@@ -104,9 +104,14 @@ public static class MultiplayerLaunchPlan
     /// automatiques, l'execution anticipee et les trames preemptives ; l'avance rapide ramenee a la vitesse normale.
     /// Le lanceur lit ces paires en dernier, comme le reste de la ligne. Restent ses raccourcis de chargement d'etat : il les
     /// reecrit a chaque lancement et les retire des surcharges de RetroArch.
+    ///
+    /// JAMAIS DE CLE EN « -p » (vu le 23/10 : plus aucun netplay ne partait depuis la 1.9.83) : le lanceur prend tout argument
+    /// qui commence par « -p » pour une manette (« -p1name »...). « -preemptive_frames » y devenait une manette fantome de
+    /// joueur 0, sans identifiant, rangee avant celle du joueur 1, et la lecture des manettes cassait le lancement. Les trames
+    /// preemptives restent coupees : le lanceur ne les allume qu'avec l'execution anticipee, que « -runahead 0 » coupe.
     /// </summary>
     internal static readonly IReadOnlyList<string> ArgumentsDuTempsPartage =
-        ["-rewind", "0", "-autosave", "0", "-runahead", "0", "-preemptive_frames", "0", "-fastforward_ratio", "1.000000"];
+        ["-rewind", "0", "-autosave", "0", "-runahead", "0", "-fastforward_ratio", "1.000000"];
 
     /// <summary>
     /// Les noms des manettes d'une ligne de lancement d'ES (« P1 Generic USB Joystick, P2 vJoy Device »), sans leur
