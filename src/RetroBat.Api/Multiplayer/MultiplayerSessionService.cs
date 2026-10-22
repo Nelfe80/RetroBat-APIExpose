@@ -301,7 +301,8 @@ public sealed class MultiplayerSessionService : BackgroundService
                 return;
             }
 
-            Poser(new MultiplayerEtat(reponse.Rooms, reponse.Invitations, null, DateTime.UtcNow));
+            Poser(new MultiplayerEtat(reponse.Rooms, reponse.Invitations, null, DateTime.UtcNow, reponse.Conduct,
+                reponse.Conduct is { SuspendedMs: > 0 } c ? DateTime.UtcNow.AddMilliseconds(c.SuspendedMs) : null));
         }
         finally
         {
@@ -349,7 +350,9 @@ public sealed record MultiplayerEtat(
     IReadOnlyList<MultiplayerRoom> Rooms,
     IReadOnlyList<MultiplayerInvitation> Invitations,
     string? Erreur,
-    DateTime? MisAJourUtc)
+    DateTime? MisAJourUtc,
+    MultiplayerConduite? Conduite = null,
+    DateTime? SuspenduJusquaUtc = null)
 {
     public static MultiplayerEtat Vide => new([], [], null, null);
 

@@ -341,7 +341,16 @@ public sealed class MultiplayerToastOverlay : IDisposable
                 using var trait = new Pen(couleur, Math.Max(2f, HauteurCarte * 0.06f));
                 g.DrawEllipse(trait, cercle);
                 using var encre = new SolidBrush(secondes <= 5 ? rouge : Couleur(s.TitleColor));
-                g.DrawString(secondes.ToString(CultureInfo.InvariantCulture), policeChiffre, encre, cercle, centre);
+                // Au-dela de 99 s (une suspension), minutes et secondes, en plus petit pour tenir dans l'anneau.
+                if (secondes >= 100)
+                {
+                    g.DrawString((secondes / 60).ToString(CultureInfo.InvariantCulture) + ":" + (secondes % 60).ToString("00", CultureInfo.InvariantCulture),
+                        policePetite, encre, cercle, centre);
+                }
+                else
+                {
+                    g.DrawString(secondes.ToString(CultureInfo.InvariantCulture), policeChiffre, encre, cercle, centre);
+                }
                 return cercle.Left - marge;
             }
 

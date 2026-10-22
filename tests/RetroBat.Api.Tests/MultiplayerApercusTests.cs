@@ -1,5 +1,6 @@
 using System.Runtime.Versioning;
 using RetroBat.Api.Leaderboard;
+using RetroBat.Api.Multiplayer;
 using Xunit;
 using L = RetroBat.Api.Leaderboard.LeaderboardOverlayService;
 
@@ -89,6 +90,33 @@ public class MultiplayerApercusTests
                 Lignes = Enumerable.Range(1, 6).Select(i => Classique("Player " + i, i % 2 == 0 ? "JP" : "FR", "A98BFF", i, i == 2, 3)).ToList(),
             },
         };
+
+        vues["np-2-abandon-moi"] = vues["np-2-resultat"] with
+        {
+            Onglets = ["ABANDON"], PartageDesDegats = null,
+            Bandeau = "Abandon 2 of 3: at 3, 15 minutes without MULTIPLAYER. A match played to the end removes one.",
+            Lignes =
+            [
+                moi with { Issue = "ABANDON", Abandon = true, Evolution = "-14", Cote = "ELO 1502", Stats = stats1, ChoixModifiable = false },
+                lui with { Issue = "", Stats = stats2 },
+            ],
+        };
+        vues["np-2-abandon-lui"] = vues["np-2-abandon-moi"] with
+        {
+            Onglets = ["OPPONENT LEFT"], Bandeau = "Your opponent left before the end: your rating does not move.",
+            Lignes =
+            [
+                moi with { Issue = "", Stats = stats1, ChoixModifiable = false },
+                lui with { Issue = "ABANDON", Abandon = true, Evolution = "-14", Cote = "ELO 1470", Stats = stats2 },
+            ],
+        };
+
+        var cartes = MultiplayerToastOverlay.Apercu(style,
+        [
+            new("MULTIPLAYER SUSPENDED", "3 matches left before the end", "a match played to the end removes one", DateTime.UtcNow.AddSeconds(14 * 60 + 32), Alerte: true),
+            new("YOUR SELECTION", "", "", Lignes: [new("Street Fighter II' Champion Edition", "1/2   waiting for players")]),
+        ], new System.Drawing.Rectangle(0, 0, 1920, 1200));
+        File.WriteAllBytes(Path.Combine(Sortie, "cartes-suspension.png"), cartes);
 
         foreach (var (nom, contenu) in vues)
         {

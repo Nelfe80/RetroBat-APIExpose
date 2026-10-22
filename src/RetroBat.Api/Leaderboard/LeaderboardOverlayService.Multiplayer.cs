@@ -38,7 +38,8 @@ public sealed partial class LeaderboardOverlayService
         string Issue = "",
         bool Gagnant = false,
         IReadOnlyList<StatDuJoueur>? Stats = null,
-        bool ChoixModifiable = false);
+        bool ChoixModifiable = false,
+        bool Abandon = false);
 
     /// <summary>Une statistique d'un joueur au resultat : son libelle et sa valeur (« COUPS », « 12 »).</summary>
     public sealed record StatDuJoueur(string Libelle, string Valeur);
@@ -470,7 +471,7 @@ public sealed partial class LeaderboardOverlayService
 
         /// <summary>La couleur de l'etat d'un joueur : la victoire en or, pret en vert, le reste discret.</summary>
         private Color CouleurDeLEtat(JoueurMultiplayer j, EsMenuStyle s)
-            => j.Issue.Length > 0 ? (j.Gagnant ? Or : Teinte(s.GroupColor, 220))
+            => j.Issue.Length > 0 ? (j.Gagnant ? Or : j.Abandon ? Rouge : Teinte(s.GroupColor, 220))
                 : j.Present ? Vert : Teinte(s.GroupColor, 200);
 
         /// <summary>

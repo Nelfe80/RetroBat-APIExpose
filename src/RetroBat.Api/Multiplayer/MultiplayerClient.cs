@@ -202,6 +202,30 @@ public sealed record MultiplayerReponse
 
     [JsonPropertyName("friends")]
     public IReadOnlyList<MultiplayerAmi> Friends { get; init; } = [];
+
+    /// <summary>Le compteur d'abandons du joueur et sa suspension, rendus par le sondage.</summary>
+    [JsonPropertyName("conduct")]
+    public MultiplayerConduite? Conduct { get; init; }
+
+    /// <summary>Un refus « suspended » : le temps qui reste, en millisecondes.</summary>
+    [JsonPropertyName("retry_in_ms")]
+    public long? RetryInMs { get; init; }
+}
+
+/// <summary>
+/// L'ABANDON : combien de rencontres le joueur a quittees avant leur fin (une rencontre jouee jusqu'au bout en efface
+/// une), et ce qu'il reste de sa suspension (0 : libre). <c>Limit</c> : le nombre d'abandons qui suspend.
+/// </summary>
+public sealed record MultiplayerConduite
+{
+    [JsonPropertyName("abandons")]
+    public int Abandons { get; init; }
+
+    [JsonPropertyName("suspended_ms")]
+    public long SuspendedMs { get; init; }
+
+    [JsonPropertyName("limit")]
+    public int Limit { get; init; } = 3;
 }
 
 /// <summary>Une gameroom, vue par ce joueur.</summary>
@@ -393,6 +417,10 @@ public sealed record MultiplayerFin
     /// <summary>Les statistiques du duel, par place, mesurees chez l'hote.</summary>
     [JsonPropertyName("stats")]
     public IReadOnlyDictionary<string, MultiplayerStatsPlace>? Stats { get; init; }
+
+    /// <summary>La place qui a quitte la rencontre avant sa fin (<c>result</c> vaut alors <c>abandoned</c>).</summary>
+    [JsonPropertyName("abandoned_seat")]
+    public int? AbandonedSeat { get; init; }
 }
 
 public sealed record MultiplayerStatsPlace

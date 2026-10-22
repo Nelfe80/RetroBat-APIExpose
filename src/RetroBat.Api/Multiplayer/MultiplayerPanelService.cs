@@ -711,6 +711,17 @@ public sealed class MultiplayerPanelService
             {
                 // Panneau ouvert, seule la selection se tait (le panneau la montre) : une invitation ne se voyait pas quand
                 // l'invite attendait deja dans son panneau (retour du user du 22/10).
+                if (_session.Etat is { SuspenduJusquaUtc: { } jusqua, Conduite: { } conduite } && jusqua > DateTime.UtcNow)
+                {
+                    // L'ABANDON : le temps qui reste, et pourquoi (retour du user du 22/10).
+                    cartes.Add(new MultiplayerToastOverlay.Carte(
+                        T("multiplayer.suspended.title"),
+                        _textes.Format("multiplayer.suspended.reason", langue, ("n", conduite.Abandons.ToString(CultureInfo.InvariantCulture))),
+                        T("multiplayer.suspended.help"),
+                        jusqua,
+                        Alerte: true));
+                }
+
                 if (_invitation is { } invitation)
                 {
                     cartes.Add(new MultiplayerToastOverlay.Carte(
@@ -993,6 +1004,8 @@ public sealed class MultiplayerPanelService
         var elo = finie?.Ended?.Elo;
         MultiplayerEvolution? EloDe(int? place)
             => place is not null && elo is not null && elo.TryGetValue(place.Value.ToString(CultureInfo.InvariantCulture), out var e) ? e : null;
+        // L'ABANDON : celui qui part prend la defaite et perd des points, l'autre ne gagne ni ne perd rien.
+        var abandon = classique ? null : finie?.Ended?.AbandonedSeat;
         // RANK-03 : la cote ne s'affiche qu'une fois le resultat valide, avec « Verification en cours » avant.
         var bandeauDuResultat = finie?.Ended?.Result switch
         {
@@ -1010,6 +1023,20 @@ public sealed class MultiplayerPanelService
             {
                 // Le numero de la place est dans sa pastille : l'etat n'a plus a dire « P1 ».
                 var ligne = Joueur(j with { Present = true }, string.Empty, T) with { Place = j.Seat };
+                if (abandon is not null && j.Seat is not null)
+                {
+                    var perte = EloDe(j.Seat);
+                    var ecart = perte is null ? 0 : (int)Math.Round(perte.After - perte.Before);
+                    return ligne with
+                    {
+                        Issue = j.Seat == abandon ? T("multiplayer.result.abandon") : string.Empty,
+                        Abandon = j.Seat == abandon,
+                        Cote = perte is null ? ligne.Cote : "ELO " + Math.Round(perte.After).ToString(CultureInfo.InvariantCulture),
+                        Evolution = perte is null ? string.Empty : ecart.ToString(CultureInfo.InvariantCulture),
+                        Stats = StatsDe(finie, j.Seat, T),
+                    };
+                }
+
                 if (gagnante is null || j.Seat is null)
                 {
                     return ligne;
@@ -1030,8 +1057,19 @@ public sealed class MultiplayerPanelService
             .ToList();
         var maPlace = finie?.Players.FirstOrDefault(j => j.You)?.Seat;
         var titre = classique ? T("multiplayer.result.classic")
+            : abandon is not null && maPlace is not null ? T(maPlace == abandon ? "multiplayer.result.abandon" : "multiplayer.result.opponent_left")
             : gagnante is not null && maPlace is not null ? T(maPlace == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat")
             : T("multiplayer.result.title");
+        if (abandon is not null && maPlace is not null)
+        {
+            // Celui qui part lit ou en est son compteur ; l'autre, que sa cote ne bouge pas.
+            var conduite = _session.Etat.Conduite;
+            bandeauDuResultat = maPlace == abandon
+                ? _textes.Format("multiplayer.abandon.counter", Langue(),
+                    ("n", (conduite?.Abandons ?? 1).ToString(CultureInfo.InvariantCulture)),
+                    ("limit", (conduite?.Limit ?? 3).ToString(CultureInfo.InvariantCulture)))
+                : T("multiplayer.abandon.opponent");
+        }
         var duree = finie?.Ended?.DurationS ?? _dureeDuResultat;
         var info = duree is { } secondes
             ? T("multiplayer.result.playtime") + " " + TimeSpan.FromSeconds(secondes).ToString(secondes >= 3600 ? @"h\:mm\:ss" : @"m\:ss", CultureInfo.InvariantCulture)
