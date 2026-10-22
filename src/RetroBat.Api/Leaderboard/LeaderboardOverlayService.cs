@@ -911,7 +911,20 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             // qu'il va jouer pendant que l'emulateur demarre.
             if (c.AttenteTitre.Length > 0)
             {
-                using var policeTitre = new Font(police.FontFamily, taille * 1.6f, FontStyle.Bold, GraphicsUnit.Pixel);
+                // Un nom long (« Street Fighter II' Champion Edition ») tient sur la largeur : la police se reduit, jamais
+                // sous la taille du texte courant (vu le 22/10 : le nom etait coupe a « CHAMPION »).
+                var titreAffiche = c.AttenteTitre.ToUpperInvariant();
+                var tailleTitre = taille * 1.6f;
+                using (var essai = new Font(police.FontFamily, tailleTitre, FontStyle.Bold, GraphicsUnit.Pixel))
+                {
+                    var mesure = g.MeasureString(titreAffiche, essai, PointF.Empty, StringFormat.GenericTypographic).Width;
+                    if (mesure > Width * 0.94f)
+                    {
+                        tailleTitre = Math.Max(taille, tailleTitre * Width * 0.94f / mesure);
+                    }
+                }
+
+                using var policeTitre = new Font(police.FontFamily, tailleTitre, FontStyle.Bold, GraphicsUnit.Pixel);
                 using var enBas = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Far };
                 using var encreTitre = new SolidBrush(Teinte(s.GroupColor));
                 using var encreDetail = new SolidBrush(Teinte(s.TitleColor));
@@ -921,7 +934,7 @@ public sealed partial class LeaderboardOverlayService : IDisposable
                     g.DrawString(c.AttenteDetail.ToUpperInvariant(), police, encreDetail, new RectangleF(0, yDetail - taille * 1.6f, Width, taille * 1.6f), enBas);
                     yDetail -= taille * 1.9f;
                 }
-                g.DrawString(c.AttenteTitre.ToUpperInvariant(), policeTitre, encreTitre, new RectangleF(0, yDetail - taille * 2.2f, Width, taille * 2.2f), enBas);
+                g.DrawString(titreAffiche, policeTitre, encreTitre, new RectangleF(0, yDetail - taille * 2.2f, Width, taille * 2.2f), enBas);
             }
 
             using (var fond = new SolidBrush(Color.FromArgb(255, Teinte(s.BackgroundColor))))
