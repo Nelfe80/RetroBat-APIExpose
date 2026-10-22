@@ -21,8 +21,19 @@ namespace RetroBat.Api.Multiplayer;
 [SupportedOSPlatform("windows")]
 public sealed class MultiplayerToastOverlay : IDisposable
 {
-    /// <summary>Une carte : un surtitre en petit, le titre, un detail, et le decompte quand il court.</summary>
-    public sealed record Carte(string Surtitre, string Titre, string Detail, DateTime? FinDuDecompteUtc = null, bool Alerte = false);
+    /// <summary>
+    /// Une carte : un surtitre en petit, le titre, un detail, et le decompte quand il court. Avec des <c>Lignes</c>,
+    /// c'est un bloc : le surtitre une fois, puis une ligne par entree, un trait entre deux (« Votre selection », retour
+    /// du user du 22/10 : un seul bloc plutot qu'une carte par jeu).
+    /// </summary>
+    public sealed record Carte(string Surtitre, string Titre, string Detail, DateTime? FinDuDecompteUtc = null, bool Alerte = false,
+        IReadOnlyList<Ligne>? Lignes = null)
+    {
+        public bool Decompte => FinDuDecompteUtc is not null || Lignes?.Any(l => l.FinDuDecompteUtc is not null) == true;
+    }
+
+    /// <summary>Une entree d'un bloc : le titre, un detail, et son decompte.</summary>
+    public sealed record Ligne(string Titre, string Detail, DateTime? FinDuDecompteUtc = null);
 
     private readonly ILogger<MultiplayerToastOverlay>? _journal;
     private readonly object _verrou = new();
@@ -159,7 +170,6 @@ public sealed class MultiplayerToastOverlay : IDisposable
         private readonly Dictionary<string, FontFamily> _familles = new(StringComparer.OrdinalIgnoreCase);
         private readonly System.Windows.Forms.Timer _minuteur;
         private Rectangle _ecran;
-        private int _nombre;
 
         public Fenetre(MultiplayerToastOverlay service, Rectangle ecran)
         {
@@ -182,7 +192,7 @@ public sealed class MultiplayerToastOverlay : IDisposable
                 }
 
                 SetWindowPos(Handle, HwndTopmost, 0, 0, 0, 0, SwpNoActivate | SwpNoMove | SwpNoSize);
-                if (_service.Lire().Any(c => c.FinDuDecompteUtc is not null))
+                if (_service.Lire().Any(c => c.Decompte))
                 {
                     Invalidate();
                 }
@@ -207,6 +217,28 @@ public sealed class MultiplayerToastOverlay : IDisposable
 
         private float Ecart => _ecran.Height * 0.008f;
 
+        // Un bloc : le bandeau du surtitre, une hauteur de ligne par entree, un pied ; d'une entree, la hauteur d'une carte.
+        private float EnteteDuBloc => HauteurCarte * 0.36f;
+
+        private float HauteurDeLigne => HauteurCarte * 0.62f;
+
+        private float HauteurDe(Carte carte)
+            => carte.Lignes is { Count: > 0 } lignes ? EnteteDuBloc + lignes.Count * HauteurDeLigne + HauteurCarte * 0.06f : HauteurCarte;
+
+        /// <summary>Le haut de chaque carte de la pile, une sous l'autre.</summary>
+        private List<float> Hauts(IReadOnlyList<Carte> cartes)
+        {
+            var hauts = new List<float>();
+            var y = 0f;
+            foreach (var carte in cartes)
+            {
+                hauts.Add(y);
+                y += HauteurDe(carte) + Ecart;
+            }
+
+            return hauts;
+        }
+
         /// <summary>En haut a droite de l'ecran d'ES, une carte sous l'autre ; la fenetre a la taille de la pile.</summary>
         public void Placer(Rectangle ecran)
         {
@@ -218,15 +250,15 @@ public sealed class MultiplayerToastOverlay : IDisposable
 
             _ecran = ecran;
             var cartes = _service.Lire();
-            _nombre = Math.Max(1, cartes.Count);
             var largeur = (int)(ecran.Width * 0.18);
-            var hauteur = (int)Math.Ceiling(_nombre * HauteurCarte + (_nombre - 1) * Ecart);
+            var hauts = Hauts(cartes);
+            var hauteur = cartes.Count == 0 ? (int)HauteurCarte : (int)Math.Ceiling(hauts[^1] + HauteurDe(cartes[^1]));
             var marge = (int)(ecran.Height * 0.018);
             Bounds = new Rectangle(ecran.Right - largeur - marge, ecran.Top + marge, largeur, hauteur);
             var region = new Region(new Rectangle(0, 0, 0, 0));
-            for (var i = 0; i < _nombre; i++)
+            for (var i = 0; i < cartes.Count; i++)
             {
-                using var chemin = Arrondi(new RectangleF(0, i * (HauteurCarte + Ecart), largeur, HauteurCarte), HauteurCarte * 0.16f);
+                using var chemin = Arrondi(new RectangleF(0, hauts[i], largeur, HauteurDe(cartes[i])), HauteurCarte * 0.16f);
                 region.Union(chemin);
             }
 
@@ -298,10 +330,26 @@ public sealed class MultiplayerToastOverlay : IDisposable
             using var pale = new SolidBrush(Couleur(s.GroupColor));
             var rouge = Color.FromArgb(229, 83, 75);
 
-            for (var i = 0; i < cartes.Count && i < _nombre; i++)
+            var marge = HauteurCarte * 0.16f;
+
+            // A droite, le decompte : un anneau et ses secondes, rouge aux 5 dernieres (V24-07). Rend le bord gauche.
+            float Decompte(DateTime fin, float droite, float haut, float hauteur, float diametre)
+            {
+                var secondes = Math.Max(0, (int)Math.Ceiling((fin - DateTime.UtcNow).TotalSeconds));
+                var cercle = new RectangleF(droite - diametre, haut + (hauteur - diametre) / 2f, diametre, diametre);
+                var couleur = secondes <= 5 ? rouge : Couleur(s.SelectorColor);
+                using var trait = new Pen(couleur, Math.Max(2f, HauteurCarte * 0.06f));
+                g.DrawEllipse(trait, cercle);
+                using var encre = new SolidBrush(secondes <= 5 ? rouge : Couleur(s.TitleColor));
+                g.DrawString(secondes.ToString(CultureInfo.InvariantCulture), policeChiffre, encre, cercle, centre);
+                return cercle.Left - marge;
+            }
+
+            var hauts = Hauts(cartes);
+            for (var i = 0; i < cartes.Count; i++)
             {
                 var carte = cartes[i];
-                var zone = new RectangleF(0, i * (HauteurCarte + Ecart), Width, HauteurCarte);
+                var zone = new RectangleF(0, hauts[i], Width, HauteurDe(carte));
                 using (var chemin = Arrondi(zone, HauteurCarte * 0.16f))
                 using (var fond = new SolidBrush(Couleur(s.BackgroundColor)))
                 using (var lisere = new Pen(carte.Alerte ? Couleur(s.SelectorColor) : Color.FromArgb(255, 60, 60, 60), carte.Alerte ? 2f : 1f))
@@ -310,21 +358,44 @@ public sealed class MultiplayerToastOverlay : IDisposable
                     g.DrawPath(lisere, new GraphicsPath(chemin.PathPoints, chemin.PathTypes));
                 }
 
-                var marge = HauteurCarte * 0.16f;
-                var droite = zone.Right - marge;
+                if (carte.Lignes is { Count: > 0 } lignes)
+                {
+                    // Le bloc : le surtitre une fois, puis chaque entree sous un trait fin.
+                    g.DrawString(carte.Surtitre.ToUpperInvariant(), policePetite, pale,
+                        new RectangleF(zone.X + marge, zone.Y + HauteurCarte * 0.08f, zone.Width - 2 * marge, HauteurCarte * 0.32f), gauche);
+                    for (var k = 0; k < lignes.Count; k++)
+                    {
+                        var ligne = lignes[k];
+                        var haut = zone.Y + EnteteDuBloc + k * HauteurDeLigne;
+                        if (k > 0)
+                        {
+                            using var separateur = new Pen(Color.FromArgb(255, 60, 60, 60), 1f);
+                            g.DrawLine(separateur, zone.X + marge, haut, zone.Right - marge, haut);
+                        }
 
-                // A droite, le decompte : un anneau et ses secondes, rouge aux 5 dernieres (V24-07).
+                        var bord = zone.Right - marge;
+                        if (ligne.FinDuDecompteUtc is { } finDeLigne)
+                        {
+                            bord = Decompte(finDeLigne, bord, haut, HauteurDeLigne, HauteurDeLigne * 0.78f);
+                        }
+
+                        var place = Math.Max(10f, bord - marge - zone.X);
+                        g.DrawString(ligne.Titre, policeTitre, blanc,
+                            new RectangleF(zone.X + marge, haut + HauteurDeLigne * 0.04f, place, HauteurDeLigne * 0.52f), gauche);
+                        if (ligne.Detail.Length > 0)
+                        {
+                            g.DrawString(ligne.Detail, policePetite, gris,
+                                new RectangleF(zone.X + marge, haut + HauteurDeLigne * 0.54f, place, HauteurDeLigne * 0.42f), gauche);
+                        }
+                    }
+
+                    continue;
+                }
+
+                var droite = zone.Right - marge;
                 if (carte.FinDuDecompteUtc is { } fin)
                 {
-                    var secondes = Math.Max(0, (int)Math.Ceiling((fin - DateTime.UtcNow).TotalSeconds));
-                    var diametre = HauteurCarte * 0.62f;
-                    var cercle = new RectangleF(droite - diametre, zone.Y + (HauteurCarte - diametre) / 2f, diametre, diametre);
-                    var couleur = secondes <= 5 ? rouge : Couleur(s.SelectorColor);
-                    using var trait = new Pen(couleur, Math.Max(2f, HauteurCarte * 0.06f));
-                    g.DrawEllipse(trait, cercle);
-                    using var encre = new SolidBrush(secondes <= 5 ? rouge : Couleur(s.TitleColor));
-                    g.DrawString(secondes.ToString(CultureInfo.InvariantCulture), policeChiffre, encre, cercle, centre);
-                    droite = cercle.Left - marge;
+                    droite = Decompte(fin, droite, zone.Y, HauteurCarte, HauteurCarte * 0.62f);
                 }
 
                 var largeur = Math.Max(10f, droite - marge - zone.X);

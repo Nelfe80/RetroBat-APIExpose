@@ -206,8 +206,12 @@ public sealed class MultiplayerController : ControllerBase
                 "cards" => MultiplayerToastOverlay.Apercu(style,
                 [
                     new(T("multiplayer.invitation.title"), textes.Format("multiplayer.invitation", langue, ("player", "PLAYER 2"), ("game", "Metal Slug 3")), T("multiplayer.invitation.help"), DateTime.UtcNow.AddSeconds(17), Alerte: true),
-                    new(T("multiplayer.selection"), "Street Fighter II' Champion Edition", "1/2   " + T("multiplayer.selection.help")),
-                    new(T("multiplayer.selection"), "Bomber Man World", "3/4   " + T("multiplayer.selection.help"), DateTime.UtcNow.AddSeconds(4)),
+                    new(T("multiplayer.selection"), string.Empty, string.Empty, Lignes:
+                    [
+                        new("Street Fighter II' Champion Edition", "1/2   " + T("multiplayer.selection.help")),
+                        new("Street Fighter III: 3rd Strike", "1/2   " + T("multiplayer.selection.help")),
+                        new("Bomber Man World", "3/4   " + T("multiplayer.selection.help"), DateTime.UtcNow.AddSeconds(4)),
+                    ]),
                 ], new Rectangle(0, 0, 1920, 1200)),
                 _ => [],
             };

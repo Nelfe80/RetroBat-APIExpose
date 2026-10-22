@@ -690,21 +690,26 @@ public sealed class MultiplayerPanelService
                     cartes.Add(new MultiplayerToastOverlay.Carte("MULTIPLAYER", message, string.Empty, Alerte: true));
                 }
 
-                foreach (var room in _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3))
+                // Un seul bloc « Votre selection », un jeu par ligne (retour du user du 22/10).
+                var lignes = _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3).Select(room =>
                 {
                     var absent = room.Players.Any(j => j.You && !j.Present);
-                    cartes.Add(new MultiplayerToastOverlay.Carte(
-                        T("multiplayer.selection"),
+                    return new MultiplayerToastOverlay.Ligne(
                         NomDuJeu(room.Game),
                         room.Players.Count(j => j.Present) + "/" + room.Max + "   " + T(absent ? "multiplayer.selection.away" : "multiplayer.selection.help"),
-                        room is { State: "countdown", CountdownMs: { } ms } ? DateTime.UtcNow.AddMilliseconds(ms) : null));
+                        room is { State: "countdown", CountdownMs: { } ms } ? DateTime.UtcNow.AddMilliseconds(ms) : null);
+                }).ToList();
+                if (lignes.Count > 0)
+                {
+                    cartes.Add(new MultiplayerToastOverlay.Carte(T("multiplayer.selection"), string.Empty, string.Empty, Lignes: lignes));
                 }
             }
         }
 
         // La pile ne change que si son contenu change ; le decompte, lui, se recalcule dans la carte.
-        var cle = string.Join("|", cartes.Select(c => c.Surtitre + "/" + c.Titre + "/" + c.Detail + "/" + (c.FinDuDecompteUtc is null ? "" : "d")));
-        if (cle == _texteDuBandeau && !cartes.Any(c => c.FinDuDecompteUtc is not null))
+        var cle = string.Join("|", cartes.Select(c => c.Surtitre + "/" + c.Titre + "/" + c.Detail + "/" + (c.FinDuDecompteUtc is null ? "" : "d")
+            + string.Concat((c.Lignes ?? []).Select(l => "/" + l.Titre + "/" + l.Detail + "/" + (l.FinDuDecompteUtc is null ? "" : "d")))));
+        if (cle == _texteDuBandeau && !cartes.Any(c => c.Decompte))
         {
             return;
         }

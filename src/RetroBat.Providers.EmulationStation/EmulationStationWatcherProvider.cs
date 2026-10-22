@@ -111,8 +111,47 @@ public class EmulationStationWatcherProvider : IProvider
         };
     }
 
+    /// <summary>
+    /// Le dernier systeme annonce par le carrousel, garde sur disque : apres un redemarrage de l'API (mise a jour,
+    /// installation), ES reste sur sa vue sans rien annoncer, et l'appui long d'une collection MULTIPLAYER ouvrait le
+    /// panneau de classement (journal du 22/10, 17:20). ES annonce son systeme a son propre demarrage, ce qui corrige
+    /// une valeur perimee.
+    /// </summary>
+    private static string CarrouselPath => Path.Combine(RetroBatPaths.PluginRoot, "state", "es-carrousel.txt");
+
+    private void ReprendreLeCarrousel()
+    {
+        try
+        {
+            if (_mediaRuntimeState.CarouselSystemId.Length == 0 && File.Exists(CarrouselPath)
+                && File.ReadAllText(CarrouselPath).Trim() is { Length: > 0 } systeme)
+            {
+                _mediaRuntimeState.MarkCarouselSystem(systeme);
+                _logger?.LogInformation("Carrousel repris du dernier lancement : {SystemId}", systeme);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger?.LogDebug(ex, "Carrousel : le dernier systeme n'a pas pu etre relu");
+        }
+    }
+
+    private void GarderLeCarrousel(string systeme)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(CarrouselPath)!);
+            File.WriteAllText(CarrouselPath, systeme);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger?.LogDebug(ex, "Carrousel : le systeme n'a pas pu etre garde");
+        }
+    }
+
     public Task StartAsync(CancellationToken cancellationToken = default)
     {
+        ReprendreLeCarrousel();
         if (!Directory.Exists(_eventsIniDir))
         {
             Directory.CreateDirectory(_eventsIniDir);
@@ -744,6 +783,7 @@ public class EmulationStationWatcherProvider : IProvider
                 // jeu, et c'est ce qui decide si un /addgames sera visible (voir
                 // MediaRuntimeState.IsViewDetachedFromSystem).
                 _mediaRuntimeState.MarkCarouselSystem(sysId);
+                GarderLeCarrousel(sysId);
                 _mediaRuntimeState.ClearPostLiveAddGamesFirstGamelistSelectionGuardForSystemChange(sysId);
                 _context.Ui.SelectedSystem = new SystemDetails { Name = sysId };
                 _context.Ui.Selected = null;

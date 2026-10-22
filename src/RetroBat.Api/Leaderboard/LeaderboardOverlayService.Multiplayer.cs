@@ -285,48 +285,48 @@ public sealed partial class LeaderboardOverlayService
                     gaucheAvatar = DessinerLeNumero(g, place, s, petite, taille, zone, choisie, libre: false);
                 }
 
-                // L'avatar : la tete de face de sa planche ; a defaut, un carre a sa couleur et son initiale.
+                // Le carre de gauche : au niveau NelfePlay, le portrait du personnage choisi (demande du user du 22/10) ;
+                // sinon la tete de face de sa planche ; a defaut, un carre a sa couleur et son initiale.
                 var cote = hauteur * 0.7f;
                 var avatar = new RectangleF(gaucheAvatar, y + (hauteur - cote) / 2f, cote, cote);
-                using (var chemin = Arrondi(avatar, cote * 0.22f))
-                using (var fond = new SolidBrush(Teinte(j.Couleur, j.Present ? 255 : 110)))
-                {
-                    g.FillPath(fond, chemin);
-                }
-
-                if (Image(j.Avatar) is { } planche && planche.Width >= 64 && planche.Height >= 64)
-                {
-                    var etatAvatar = g.Save();
-                    using (var masque = Arrondi(avatar, cote * 0.22f))
-                    {
-                        g.SetClip(masque);
-                    }
-
-                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-                    g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
-                    using var attenuation = j.Present ? null : Transparence(0.5f);
-                    g.DrawImage(planche, Rectangle.Round(avatar), 0, 0, 64, 64, GraphicsUnit.Pixel, attenuation);
-                    g.Restore(etatAvatar);
-                }
-                else
-                {
-                    using var encre = new SolidBrush(Color.FromArgb(j.Present ? 255 : 150, 12, 12, 12));
-                    using var milieu = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-                    var initiale = j.Nom.Length > 0 ? j.Nom[..1].ToUpperInvariant() : "?";
-                    g.DrawString(initiale, gras, encre, avatar, milieu);
-                }
-
-                // A droite, de l'exterieur vers l'interieur : le portrait du personnage (niveau NelfePlay), pret (ou
-                // absent), connexion, hote.
-                var droite = zone.Right - taille * 0.5f;
                 var alpha = j.Present ? 255 : 130;
                 if (Image(j.Portrait) is { } portrait)
                 {
-                    var carre = new RectangleF(droite - cote, y + (hauteur - cote) / 2f, cote, cote);
-                    DessinerUnPortrait(g, portrait, carre, s, choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TitleColor, alpha), Math.Max(1.5f, _hauteurEcran / 700f));
-                    droite -= cote + taille * 0.6f;
+                    DessinerUnPortrait(g, portrait, avatar, s, choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TitleColor, alpha), Math.Max(1.5f, _hauteurEcran / 700f));
+                }
+                else
+                {
+                    using (var chemin = Arrondi(avatar, cote * 0.22f))
+                    using (var fond = new SolidBrush(Teinte(j.Couleur, j.Present ? 255 : 110)))
+                    {
+                        g.FillPath(fond, chemin);
+                    }
+
+                    if (Image(j.Avatar) is { } planche && planche.Width >= 64 && planche.Height >= 64)
+                    {
+                        var etatAvatar = g.Save();
+                        using (var masque = Arrondi(avatar, cote * 0.22f))
+                        {
+                            g.SetClip(masque);
+                        }
+
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                        g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                        using var attenuation = j.Present ? null : Transparence(0.5f);
+                        g.DrawImage(planche, Rectangle.Round(avatar), 0, 0, 64, 64, GraphicsUnit.Pixel, attenuation);
+                        g.Restore(etatAvatar);
+                    }
+                    else
+                    {
+                        using var encre = new SolidBrush(Color.FromArgb(j.Present ? 255 : 150, 12, 12, 12));
+                        using var milieu = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+                        var initiale = j.Nom.Length > 0 ? j.Nom[..1].ToUpperInvariant() : "?";
+                        g.DrawString(initiale, gras, encre, avatar, milieu);
+                    }
                 }
 
+                // A droite, de l'exterieur vers l'interieur : pret (ou absent), connexion, hote.
+                var droite = zone.Right - taille * 0.5f;
                 using (var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : j.Present ? Color.FromArgb(120, 229, 163) : Teinte(s.GroupColor, 200)))
                 using (var aDroite = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Far, LineAlignment = StringAlignment.Center })
                 {
@@ -358,33 +358,38 @@ public sealed partial class LeaderboardOverlayService
                     droite -= largeur + taille * 0.6f;
                 }
 
-                // Le nom, puis le pays dessous. Pas de ville (V24-18).
+                // Le nom, le drapeau a sa droite (demande du user du 22/10). Pas de ville (V24-18).
                 var x = avatar.Right + taille * 0.6f;
-                var largeurNom = Math.Max(0, droite - x);
+                var hauteurDrapeau = hauteur * 0.24f;
+                var placeDuDrapeau = j.Pays.Length > 0 ? hauteurDrapeau * 1.5f + taille * 0.5f : 0f;
+                var nom = Couper(g, j.Nom, gras, Math.Max(0, droite - x - placeDuDrapeau));
+                var mesure = g.MeasureString(nom, gras, PointF.Empty, StringFormat.GenericTypographic);
+                // Sans personnage dessous (niveau Classique), le nom se centre sur la carte.
+                var hautDuNom = j.Personnage.Length > 0 ? y + hauteur * 0.14f : y + (hauteur - mesure.Height) / 2f;
                 using (var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : j.Moi ? Teinte(s.TitleColor, alpha) : Teinte(s.TextColor, alpha)))
                 {
-                    g.DrawString(Couper(g, j.Nom, gras, largeurNom), gras, encre, new PointF(x, y + hauteur * 0.14f), StringFormat.GenericTypographic);
+                    g.DrawString(nom, gras, encre, new PointF(x, hautDuNom), StringFormat.GenericTypographic);
                 }
 
                 if (j.Pays.Length > 0)
                 {
-                    // Le drapeau sous le nom (V24-18) ; un pays qu'on ne sait pas dessiner garde son code.
-                    var hauteurDrapeau = hauteur * 0.24f;
-                    var drapeau = new RectangleF(x, y + hauteur * 0.6f, hauteurDrapeau * 1.5f, hauteurDrapeau);
+                    // Centre sur la hauteur du nom ; un pays qu'on ne sait pas dessiner garde son code.
+                    var gaucheDrapeau = x + mesure.Width + taille * 0.5f;
+                    var drapeau = new RectangleF(gaucheDrapeau, hautDuNom + (mesure.Height - hauteurDrapeau) / 2f, hauteurDrapeau * 1.5f, hauteurDrapeau);
                     if (!Drapeaux.Dessiner(g, j.Pays, drapeau, alpha))
                     {
                         using var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : Teinte(s.GroupColor, alpha));
-                        g.DrawString(j.Pays, petite, encre, new PointF(x, y + hauteur * 0.56f), StringFormat.GenericTypographic);
+                        using var auMilieu = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center };
+                        g.DrawString(j.Pays, petite, encre, new RectangleF(gaucheDrapeau, hautDuNom, Math.Max(1, droite - gaucheDrapeau), mesure.Height), auMilieu);
                     }
                 }
 
-                // NIVEAU NELFEPLAY : le personnage du joueur, a cote de son drapeau (V24-18) ; ▲▼ le change.
+                // NIVEAU NELFEPLAY : le personnage du joueur, sous son nom ; ▲▼ le change.
                 if (j.Personnage.Length > 0)
                 {
-                    var apres = x + hauteur * 0.24f * 1.5f + taille * 0.5f;
                     using var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TitleColor, alpha));
-                    g.DrawString(Couper(g, j.Personnage, petite, Math.Max(0, droite - apres)), petite, encre,
-                        new PointF(apres, y + hauteur * 0.56f), StringFormat.GenericTypographic);
+                    g.DrawString(Couper(g, j.Personnage, petite, Math.Max(0, droite - x)), petite, encre,
+                        new PointF(x, y + hauteur * 0.56f), StringFormat.GenericTypographic);
                 }
 
                 y += hauteur + ecart;
