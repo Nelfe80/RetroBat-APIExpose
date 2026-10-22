@@ -18,7 +18,10 @@ public interface ICommandesRetroArch
 /// <summary>Les commandes reseau de la partie en cours, sur cette borne.</summary>
 public sealed class CommandesRetroArchUdp : ICommandesRetroArch
 {
-    private const int Port = 55355;
+    private readonly int _port;
+
+    /// <summary>Le port des commandes de RetroArch : 55355 pour une partie, un autre sur un banc d'essai.</summary>
+    public CommandesRetroArchUdp(int port = 55355) => _port = port;
 
     public async Task<string?> DemanderAsync(string commande, CancellationToken ct, int delaiMs = 500)
     {
@@ -26,7 +29,7 @@ public sealed class CommandesRetroArchUdp : ICommandesRetroArch
         {
             using var udp = new UdpClient();
             var octets = Encoding.ASCII.GetBytes(commande);
-            await udp.SendAsync(octets, octets.Length, "127.0.0.1", Port).WaitAsync(ct).ConfigureAwait(false);
+            await udp.SendAsync(octets, octets.Length, "127.0.0.1", _port).WaitAsync(ct).ConfigureAwait(false);
             using var delai = CancellationTokenSource.CreateLinkedTokenSource(ct);
             delai.CancelAfter(delaiMs);
             var reponse = await udp.ReceiveAsync(delai.Token).ConfigureAwait(false);
@@ -44,7 +47,7 @@ public sealed class CommandesRetroArchUdp : ICommandesRetroArch
         {
             using var udp = new UdpClient();
             var octets = Encoding.ASCII.GetBytes(commande);
-            await udp.SendAsync(octets, octets.Length, "127.0.0.1", Port).WaitAsync(ct).ConfigureAwait(false);
+            await udp.SendAsync(octets, octets.Length, "127.0.0.1", _port).WaitAsync(ct).ConfigureAwait(false);
         }
         catch (SocketException)
         {
