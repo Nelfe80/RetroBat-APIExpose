@@ -38,9 +38,9 @@ public class MultiplayerApercusTests
         var aidesResultat = new List<L.Aide> { new("button_a", "PLAY AGAIN"), new("button_b", "CLOSE") };
         L.JoueurMultiplayer Libre(int place) => new("FREE SEAT", "", "", false, false, false, null, "waiting for a player", Place: place, Libre: true);
         var moi = new L.JoueurMultiplayer("Nelfe80", "FR", "A98BFF", false, true, true, 3, "ready", "HOST", "KEN",
-            Portrait: Portrait(307540), Place: 1, Cote: "ELO 1516", Provisoire: "provisional", ChoixModifiable: true);
+            Portrait: Portrait(307540), Place: 1, Cote: "? · ELO 1016", Provisoire: "provisional", ChoixModifiable: true);
         var lui = new L.JoueurMultiplayer("RetroLife", "FR", "FF9F6B", true, false, true, 4, "ready", "HOST", "CHUN-LI",
-            Portrait: Portrait(307541), Place: 2, Cote: "ELO 1484", Provisoire: "provisional");
+            Portrait: Portrait(307541), Place: 2, Cote: "? · ELO 984", Provisoire: "provisional");
         var socle = new L.ContenuMultiplayer(onglets, 2, true, "", "1 VS 1", "1/2", null, [moi, Libre(2)], -1, "", "", aidesNp,
             Selection: bande, SelectionCourante: 4, Disposition: L.DispositionDesJoueurs.Colonnes);
         var stats1 = new List<L.StatDuJoueur> { new("HITS", "12"), new("K.O.", "2"), new("PERFECTS", "1"), new("DAMAGE", "288") };
@@ -59,7 +59,7 @@ public class MultiplayerApercusTests
                 Lignes =
                 [
                     moi with { Issue = "VICTORY", Gagnant = true, Evolution = "+16", Stats = stats1, ChoixModifiable = false },
-                    lui with { Issue = "DEFEAT", Cote = "ELO 1484", Evolution = "-16", Stats = stats2 },
+                    lui with { Issue = "DEFEAT", Cote = "? · ELO 968", Evolution = "-16", Stats = stats2 },
                 ],
                 PartageDesDegats = new L.Partage(288 / 378d, "A98BFF", "FF9F6B", "DAMAGE DEALT"),
             },
@@ -98,7 +98,7 @@ public class MultiplayerApercusTests
             Bandeau = "Abandon 2 of 3: at 3, 15 minutes without MULTIPLAYER. A match played to the end removes one.",
             Lignes =
             [
-                moi with { Issue = "ABANDON", Abandon = true, Evolution = "-14", Cote = "ELO 1502", Stats = stats1, ChoixModifiable = false },
+                moi with { Issue = "ABANDON", Abandon = true, Evolution = "-14", Cote = "? · ELO 984", Stats = stats1, ChoixModifiable = false },
                 lui with { Issue = "", Stats = stats2 },
             ],
         };
@@ -108,7 +108,7 @@ public class MultiplayerApercusTests
             Lignes =
             [
                 moi with { Issue = "", Stats = stats1, ChoixModifiable = false },
-                lui with { Issue = "ABANDON", Abandon = true, Evolution = "-14", Cote = "ELO 1470", Stats = stats2 },
+                lui with { Issue = "ABANDON", Abandon = true, Evolution = "-14", Cote = "? · ELO 968", Stats = stats2 },
             ],
         };
 

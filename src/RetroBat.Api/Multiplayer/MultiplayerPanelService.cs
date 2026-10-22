@@ -826,6 +826,7 @@ public sealed class MultiplayerPanelService
         var jeu = _jeu;
         var room = RoomDuJeu();
         var classique = (room?.Level ?? jeu?.Game.Level) != MultiplayerLevels.NelfePlay;
+        var classe = jeu?.Game.EstClasse == true;
         var max = room?.Max ?? jeu?.Game.Players ?? 2;
         var presents = room?.Players.Count(joueur => joueur.Present) ?? 0;
 
@@ -853,7 +854,7 @@ public sealed class MultiplayerPanelService
             _modele.IndexOnglet,
             _modele.Etat == MultiplayerPanelModel.Foyer.Panneau,
             classique ? T("multiplayer.badge.classic") : string.Empty,
-            classique ? T("multiplayer.info.classic") : string.Empty,
+            classique ? T(classe ? "multiplayer.info.classic_ranked" : "multiplayer.info.classic") : string.Empty,
             presents + "/" + max,
             room is { State: "countdown", CountdownMs: { } ms } ? DateTime.UtcNow.AddMilliseconds(ms) : null,
             lignes,
@@ -998,14 +999,16 @@ public sealed class MultiplayerPanelService
         _connues.TryGetValue(_roomDuResultat, out var connue);
         var finie = _session.Etat.Rooms.FirstOrDefault(r => r.Room == _roomDuResultat) ?? connue;
         var classique = (finie?.Level ?? _jeu?.Game.Level) != MultiplayerLevels.NelfePlay;
+        // Classee (23/10) : une rencontre versus a fin lue, quel que soit le niveau ; sa cote et son vainqueur s'affichent.
+        var classe = _jeu?.Game.EstClasse == true;
         // NIVEAU NELFEPLAY : la place gagnante lue chez l'hote (V24-16) ; le gagnant d'abord, une defaite presentee avec
         // le meme soin (00quater.3).
-        var gagnante = classique ? null : finie?.Ended?.WinnerSeat;
+        var gagnante = classe ? finie?.Ended?.WinnerSeat : null;
         var elo = finie?.Ended?.Elo;
         MultiplayerEvolution? EloDe(int? place)
             => place is not null && elo is not null && elo.TryGetValue(place.Value.ToString(CultureInfo.InvariantCulture), out var e) ? e : null;
         // L'ABANDON : celui qui part prend la defaite et perd des points, l'autre ne gagne ni ne perd rien.
-        var abandon = classique ? null : finie?.Ended?.AbandonedSeat;
+        var abandon = classe ? finie?.Ended?.AbandonedSeat : null;
         // RANK-03 : la cote ne s'affiche qu'une fois le resultat valide, avec « Verification en cours » avant.
         var bandeauDuResultat = finie?.Ended?.Result switch
         {
@@ -1056,7 +1059,7 @@ public sealed class MultiplayerPanelService
             })
             .ToList();
         var maPlace = finie?.Players.FirstOrDefault(j => j.You)?.Seat;
-        var titre = classique ? T("multiplayer.result.classic")
+        var titre = classique && !classe ? T("multiplayer.result.classic")
             : abandon is not null && maPlace is not null ? T(maPlace == abandon ? "multiplayer.result.abandon" : "multiplayer.result.opponent_left")
             : gagnante is not null && maPlace is not null ? T(maPlace == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat")
             : T("multiplayer.result.title");
@@ -1086,9 +1089,9 @@ public sealed class MultiplayerPanelService
             joueurs,
             -1,
             string.Empty,
-            classique ? T("multiplayer.result.classic_note") : bandeauDuResultat,
+            classique && !classe ? T("multiplayer.result.classic_note") : bandeauDuResultat,
             [new(_glypheValider, T("multiplayer.help.replay")), new(_glypheAnnuler, T("multiplayer.help.close"))],
-            PartageDesDegats: classique ? null : LePartage(finie, T),
+            PartageDesDegats: classe ? LePartage(finie, T) : null,
             Disposition: disposition);
     }
 
@@ -1121,7 +1124,7 @@ public sealed class MultiplayerPanelService
             Portrait: PortraitDeJoueur(joueur),
             // Versus classe : la cote du joueur sur ce jeu, a la suite de son pseudo ; « provisoire » pendant ses 10
             // premieres rencontres et tant qu'il n'a pas rencontre 3 adversaires differents (RANK-03).
-            Cote: joueur.Rating is { } cote ? "ELO " + Math.Round(cote.Value).ToString(CultureInfo.InvariantCulture) : string.Empty,
+            Cote: joueur.Rating is { } cote ? cote.Lettre + " · ELO " + Math.Round(cote.Value).ToString(CultureInfo.InvariantCulture) : string.Empty,
             Provisoire: joueur.Rating is { Provisional: true } ? T("multiplayer.rating.provisional") : string.Empty);
 
     /// <summary>NIVEAU NELFEPLAY : le portrait du personnage de ce joueur.</summary>

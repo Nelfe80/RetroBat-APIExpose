@@ -112,6 +112,13 @@ public sealed record MultiplayerGame
     [JsonPropertyName("level")]
     public string Level { get; init; } = MultiplayerLevels.Classique;
 
+    /// <summary>
+    /// Le type versus du jeu (combat, puzzle, sport, course, arene, fps, strategie) : sa cote par type. Null pour la coop,
+    /// classee par le score en 1CC MULTI (decisions du 23/10).
+    /// </summary>
+    [JsonPropertyName("elo_type")]
+    public string? EloType { get; init; }
+
     /// <summary>Un coeur propre a ce jeu, a la place de celui de son systeme.</summary>
     [JsonPropertyName("core")]
     public string? Core { get; init; }
@@ -158,6 +165,13 @@ public sealed record MultiplayerGame
 
     [JsonIgnore]
     public bool EstNelfePlay => Level == MultiplayerLevels.NelfePlay && Start is not null;
+
+    /// <summary>
+    /// Classe (23/10) : un jeu versus dont on lit la fin, quel que soit son niveau. Le depart pret du niveau NelfePlay
+    /// reste un plus, pas une condition de la cote.
+    /// </summary>
+    [JsonIgnore]
+    public bool EstClasse => End is not null && EloType is { Length: > 0 } type && MultiplayerLevels.TypesVersus.Contains(type);
 
     /// <summary>L'ecran a afficher pour cette place (1 a <see cref="Screens"/>).</summary>
     public int EcranDeLaPlace(int place)
@@ -319,6 +333,10 @@ public sealed record MultiplayerChoiceSeat
 
 public static class MultiplayerLevels
 {
+    /// <summary>Les types versus de la v1 (champ <c>elo_type</c>) : la cote par type du joueur.</summary>
+    public static readonly IReadOnlySet<string> TypesVersus = new HashSet<string>(StringComparer.Ordinal)
+        { "combat", "puzzle", "sport", "course", "arene", "fps", "strategie" };
+
     public const string Classique = "classique";
     public const string NelfePlay = "nelfeplay";
 }

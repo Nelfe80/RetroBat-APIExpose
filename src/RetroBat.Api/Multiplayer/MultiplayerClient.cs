@@ -314,9 +314,35 @@ public sealed record MultiplayerCote
     [JsonPropertyName("matches")]
     public int Matches { get; init; }
 
-    /// <summary>Moins de 10 rencontres ou moins de 3 adversaires distincts (RANK-03).</summary>
+    /// <summary>Moins de 10 rencontres (conventions de Fightcade, 23/10).</summary>
     [JsonPropertyName("provisional")]
     public bool Provisional { get; init; }
+
+    /// <summary>La lettre de Fightcade (E a S), « ? » tant que la cote est provisoire.</summary>
+    [JsonPropertyName("rank")]
+    public string? Rank { get; init; }
+
+    /// <summary>La cote du type de ce jeu (combat, puzzle...).</summary>
+    [JsonPropertyName("type")]
+    public MultiplayerCote? Type { get; init; }
+
+    /// <summary>L'ELOF : la moyenne des cotes par type, ponderee par les rencontres.</summary>
+    [JsonPropertyName("elof")]
+    public MultiplayerCote? Elof { get; init; }
+
+    /// <summary>La lettre a montrer : celle de la plateforme, sinon calculee (une plateforme plus ancienne n'en envoie pas).</summary>
+    public string Lettre => Provisional ? "?" : Rank is { Length: > 0 } r ? r : LettreDe(Value);
+
+    /// <summary>Les paliers de Fightcade : E jusqu'a 699, D de 700, C de 1000, B de 1300, A de 1600, S de 1900.</summary>
+    public static string LettreDe(double cote) => cote switch
+    {
+        >= 1900 => "S",
+        >= 1600 => "A",
+        >= 1300 => "B",
+        >= 1000 => "C",
+        >= 700 => "D",
+        _ => "E",
+    };
 }
 
 public sealed record MultiplayerEvolution

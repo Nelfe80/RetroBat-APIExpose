@@ -250,7 +250,8 @@ public sealed class MultiplayerLaunchService : IHostedService
             };
             var reponse = await _client.PublierNetplayAsync(room.Room, publiee, CancellationToken.None).ConfigureAwait(false);
             _journal.LogInformation("MULTIPLAYER : session {Session} publiee pour {Room} ({Statut})", session.Id, room.Room, reponse?.Ok == true ? "ok" : reponse?.Reason ?? "injoignable");
-            if (reponse?.Ok == true && jeu.Game is { EstNelfePlay: true, End: not null })
+            // Une rencontre classee (fin lue + type versus, 23/10), quel que soit le niveau : l'hote guette sa fin.
+            if (reponse?.Ok == true && jeu.Game.EstClasse)
             {
                 _ = Task.Run(() => GuetterLaFinAsync(room, jeu.Game));
             }
@@ -422,7 +423,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             // NIVEAU NELFEPLAY : l'invite joue la meme partie que l'hote ; il guette les memes compteurs et rapporte la place
             // gagnante. Le resultat n'est valide, et la cote ne bouge, que si les deux concordent.
             using var guetInvite = new CancellationTokenSource();
-            if (jeu.Game is { EstNelfePlay: true, End: not null })
+            if (jeu.Game.EstClasse)
             {
                 _ = Task.Run(() => RapporterEnInviteAsync(room, jeu.Game, guetInvite.Token));
             }
