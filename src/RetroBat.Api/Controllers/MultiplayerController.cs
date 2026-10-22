@@ -201,6 +201,7 @@ public sealed class MultiplayerController : ControllerBase
                     ],
                     LigneCourante = -1, Bandeau = string.Empty,
                     Aides = [new("button_a", T("multiplayer.help.replay")), new("button_b", T("multiplayer.help.close"))],
+                    PartageDesDegats = new LeaderboardOverlayService.Partage(288 / 378d, "A98BFF", "FF9F6B", T("multiplayer.result.damage")),
                 }, "", "", "", journal),
                 "cards" => MultiplayerToastOverlay.Apercu(style,
                 [

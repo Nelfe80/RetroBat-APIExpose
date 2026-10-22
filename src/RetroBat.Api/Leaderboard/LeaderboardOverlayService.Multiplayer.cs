@@ -56,7 +56,14 @@ public sealed partial class LeaderboardOverlayService
         string Pseudo = "",
         bool EnLigne = false,
         IReadOnlyList<PortraitDeChoix>? Selection = null,
-        int SelectionCourante = -1);
+        int SelectionCourante = -1,
+        Partage? PartageDesDegats = null);
+
+    /// <summary>
+    /// La barre de partage du resultat (00quater.3) : la part des degats infliges par chaque cote d'un duel, a ses
+    /// couleurs. <c>PartGauche</c> va de 0 a 1.
+    /// </summary>
+    public sealed record Partage(double PartGauche, string CouleurGauche, string CouleurDroite, string Libelle);
 
     /// <summary>La teinte du badge CLASSIQUE (toile, ecrans 13 a 15).</summary>
     internal const string TeinteClassique = "B8C7D9";
@@ -141,6 +148,11 @@ public sealed partial class LeaderboardOverlayService
             var marge = _largeurEcran * 0.012f;
             y += tailleTexte * 0.6f;
             y = DessinerLInfoMultiplayer(g, c, s, policeTexte, policePetite, tailleTexte, marge, y);
+
+            if (c.PartageDesDegats is { } partage)
+            {
+                y = DessinerLePartage(g, partage, s, policePetite, tailleTexte, taillePetite, marge, y);
+            }
 
             if (c.Bandeau.Length > 0)
             {
@@ -377,6 +389,55 @@ public sealed partial class LeaderboardOverlayService
 
                 y += hauteur + ecart;
             }
+        }
+
+        /// <summary>
+        /// La barre de partage des degats : deux barres qui se rejoignent au point d'equilibre, chacune a la couleur de son
+        /// joueur, les pourcentages a leurs bouts. Rend le bas de la barre.
+        /// </summary>
+        private float DessinerLePartage(Graphics g, Partage partage, EsMenuStyle s, Font petite, float taille, float taillePetite, float marge, float y)
+        {
+            using var centre = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center };
+            using (var encre = new SolidBrush(Teinte(s.GroupColor)))
+            {
+                g.DrawString(partage.Libelle, petite, encre, new RectangleF(marge, y, Width - 2 * marge, taillePetite * 1.4f), centre);
+            }
+
+            y += taillePetite * 1.5f;
+            var hauteur = taille * 1.1f;
+            var zone = new RectangleF(marge, y, Width - 2 * marge, hauteur);
+            var part = (float)Math.Clamp(partage.PartGauche, 0, 1);
+            var milieu = zone.X + zone.Width * part;
+            var etat = g.Save();
+            using (var forme = Arrondi(zone, hauteur * 0.5f))
+            {
+                g.SetClip(forme);
+            }
+
+            using (var gauche = new SolidBrush(Teinte(partage.CouleurGauche)))
+            using (var droite = new SolidBrush(Teinte(partage.CouleurDroite)))
+            {
+                g.FillRectangle(gauche, zone.X, zone.Y, milieu - zone.X, hauteur);
+                g.FillRectangle(droite, milieu, zone.Y, zone.Right - milieu, hauteur);
+            }
+
+            // L'eclair du point de rencontre : un trait clair, comme le choc des deux barres.
+            using (var eclair = new Pen(Color.FromArgb(230, 255, 255, 255), Math.Max(2f, _hauteurEcran / 500f)))
+            {
+                g.DrawLine(eclair, milieu, zone.Y, milieu, zone.Bottom);
+            }
+
+            g.Restore(etat);
+            using var police = new Font(petite.FontFamily, petite.Size, FontStyle.Bold, petite.Unit);
+            using var sombre = new SolidBrush(Color.FromArgb(20, 22, 28));
+            using var aGauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center };
+            using var aDroite = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Far, LineAlignment = StringAlignment.Center };
+            var pourcentGauche = (int)Math.Round(part * 100);
+            g.DrawString(pourcentGauche.ToString(System.Globalization.CultureInfo.InvariantCulture) + " %", police, sombre,
+                new RectangleF(zone.X + taille * 0.5f, zone.Y, zone.Width / 2f, hauteur), aGauche);
+            g.DrawString((100 - pourcentGauche).ToString(System.Globalization.CultureInfo.InvariantCulture) + " %", police, sombre,
+                new RectangleF(zone.X + zone.Width / 2f, zone.Y, zone.Width / 2f - taille * 0.5f, hauteur), aDroite);
+            return zone.Bottom + taille * 0.6f;
         }
 
         /// <summary>Le numero d'une place, dans une pastille sur le bord gauche de la carte. Rend ou commence l'avatar.</summary>

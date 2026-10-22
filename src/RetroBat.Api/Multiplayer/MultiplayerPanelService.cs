@@ -955,7 +955,21 @@ public sealed class MultiplayerPanelService
             -1,
             string.Empty,
             classique ? T("multiplayer.result.classic_note") : bandeauDuResultat,
-            [new(_glypheValider, T("multiplayer.help.replay")), new(_glypheAnnuler, T("multiplayer.help.close"))]);
+            [new(_glypheValider, T("multiplayer.help.replay")), new(_glypheAnnuler, T("multiplayer.help.close"))],
+            PartageDesDegats: classique ? null : LePartage(finie, T));
+    }
+
+    /// <summary>La part des degats infliges par chaque place d'un duel, a leurs couleurs (P1 a gauche).</summary>
+    private LeaderboardOverlayService.Partage? LePartage(MultiplayerRoom? room, Func<string, string> T)
+    {
+        if (room?.Ended?.Stats is not { } stats || !stats.TryGetValue("1", out var p1) || !stats.TryGetValue("2", out var p2)
+            || p1.Damage + p2.Damage <= 0)
+        {
+            return null;
+        }
+
+        var couleur = (int place) => room.Players.FirstOrDefault(j => j.Seat == place) is { } j ? CouleurDe(j.Handle) : "8A93A6";
+        return new LeaderboardOverlayService.Partage(p1.Damage / (double)(p1.Damage + p2.Damage), couleur(1), couleur(2), T("multiplayer.result.damage"));
     }
 
     private LeaderboardOverlayService.JoueurMultiplayer Joueur(MultiplayerJoueur joueur, string etat, Func<string, string> T)
