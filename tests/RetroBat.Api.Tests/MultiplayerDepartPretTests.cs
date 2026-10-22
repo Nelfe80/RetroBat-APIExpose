@@ -224,6 +224,66 @@ public class MultiplayerDepartPretTests : IDisposable
     }
 
     [Fact]
+    public async Task Les_statistiques_comptent_coups_ko_et_perfects()
+    {
+        var ra = new FauxRetroArchAMots { };
+        var jeu = Sf2ce().Jeu with
+        {
+            End = Manches,
+            Stats = new MultiplayerStats
+            {
+                Life = new MultiplayerStatLife
+                {
+                    Bytes = 2, Full = 144, Ko = 0xFFFF,
+                    Seats = [new() { Seat = 1, CoreRam = "0x83E8" }, new() { Seat = 2, CoreRam = "0x86E8" }],
+                },
+            },
+        };
+        ra.Mots[0x83E8] = 144;
+        ra.Mots[0x86E8] = 144;
+        using var fin = new CancellationTokenSource();
+        var suivi = new MultiplayerStatsDuDuel(ra, TimeSpan.FromMilliseconds(10)).SuivreAsync(jeu, [1, 2], fin.Token);
+        async Task Pose(long adresse, int valeur) { ra.Mots[adresse] = valeur; await Task.Delay(60); }
+
+        await Task.Delay(60);
+        await Pose(0x86E8, 120);      // P1 touche P2
+        await Pose(0x86E8, 0xFFFF);   // K.O. de P2
+        ra.Octets[0x864F] = 1;        // P1 gagne la manche, sa vie pleine : perfect
+        await Task.Delay(60);
+        await Pose(0x86E8, 144);      // nouvelle manche
+        await Pose(0x86E8, 0xFFFF);   // second K.O.
+        ra.Octets[0x864F] = 2;
+        await Task.Delay(60);
+        fin.Cancel();
+        var stats = await suivi;
+
+        Assert.Equal(new StatsDeLaPlace(3, 2, 2, 24 + 120 + 144), stats[1]);
+        Assert.Equal(new StatsDeLaPlace(0, 0, 0, 0), stats[2]);
+    }
+
+    /// <summary>Un RetroArch de test qui repond aux lectures de 1 ou 2 octets (vies sur deux octets, manches sur un).</summary>
+    private sealed class FauxRetroArchAMots : ICommandesRetroArch
+    {
+        public readonly System.Collections.Concurrent.ConcurrentDictionary<long, int> Mots = new();
+        public readonly System.Collections.Concurrent.ConcurrentDictionary<long, int> Octets = new();
+
+        public Task<string?> DemanderAsync(string commande, CancellationToken ct, int delaiMs = 500)
+        {
+            var m = commande.Split(' ');
+            var adresse = long.Parse(m[1], NumberStyles.HexNumber);
+            if (m[2] == "2")
+            {
+                var v = Mots.GetValueOrDefault(adresse);
+                return Task.FromResult<string?>($"READ_CORE_RAM {m[1]} {v & 0xFF:x2} {(v >> 8) & 0xFF:x2}");
+            }
+
+            return Task.FromResult<string?>($"READ_CORE_RAM {m[1]} {Octets.GetValueOrDefault(adresse):x2}");
+        }
+
+        public Task EnvoyerAsync(string commande, CancellationToken ct) => Task.CompletedTask;
+    }
+
+    [Fact]
     public void Les_fleches_parcourent_les_personnages_en_boucle()
     {
         var choix = Sf2ce().Jeu.Choices![0];

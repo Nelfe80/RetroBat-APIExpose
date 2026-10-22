@@ -40,6 +40,10 @@ public sealed class MultiplayerLaunchService : IHostedService
     private readonly HashSet<string> _lancees = new(StringComparer.Ordinal);
     private readonly MultiplayerDepartPret _depart;
     private readonly MultiplayerFinDeRencontre _fin;
+    private readonly MultiplayerStatsDuDuel _statsDuDuel;
+
+    /// <summary>Le suivi des statistiques du duel en cours chez l'hote ; il rend ce qu'il a vu quand le guet s'arrete.</summary>
+    private Task<IReadOnlyDictionary<int, StatsDeLaPlace>>? _suiviDesStats;
     private string? _enCours;
 
     /// <summary>Le guet de la fin d'une rencontre NelfePlay, et la place gagnante qu'il a vue.</summary>
@@ -69,6 +73,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         _journal = journal;
         _depart = new MultiplayerDepartPret(new CommandesRetroArchUdp());
         _fin = new MultiplayerFinDeRencontre(new CommandesRetroArchUdp());
+        _statsDuDuel = new MultiplayerStatsDuDuel(new CommandesRetroArchUdp());
     }
 
     private static string RacineRetroArch => Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch");
@@ -172,16 +177,20 @@ public sealed class MultiplayerLaunchService : IHostedService
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
             RetirerLEtatPose();
             int? vainqueur;
+            Task<IReadOnlyDictionary<int, StatsDeLaPlace>>? suivi;
             lock (_verrou)
             {
                 _guet?.Cancel();
                 _guet = null;
                 vainqueur = _vainqueur;
                 _vainqueur = null;
+                suivi = _suiviDesStats;
+                _suiviDesStats = null;
             }
 
-            await _client.TerminerAsync(room.Room, vainqueur is null ? "game_closed" : "match_over", duree, CancellationToken.None, vainqueur)
-                .ConfigureAwait(false);
+            var stats = suivi is null ? null : await suivi.ConfigureAwait(false);
+            await _client.TerminerAsync(room.Room, vainqueur is null ? "game_closed" : "match_over", duree, CancellationToken.None, vainqueur,
+                vainqueur is null ? null : stats).ConfigureAwait(false);
             _panneau.MontrerLeResultat(room.Room, duree);
         }
         catch (Exception ex)
@@ -264,6 +273,14 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
 
         var places = room.Players.Where(joueur => joueur.Seat is not null).Select(joueur => joueur.Seat!.Value).Distinct().ToList();
+        if (jeu.Stats?.Life is not null)
+        {
+            lock (_verrou)
+            {
+                _suiviDesStats = _statsDuDuel.SuivreAsync(jeu, places, jeton);
+            }
+        }
+
         var vainqueur = await _fin.AttendreLeVainqueurAsync(jeu.End!, places, jeton).ConfigureAwait(false);
         if (vainqueur is null)
         {

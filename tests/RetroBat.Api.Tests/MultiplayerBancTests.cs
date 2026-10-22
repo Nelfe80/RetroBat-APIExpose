@@ -48,6 +48,14 @@ public class MultiplayerBancTests
                 FirstTo = 2, CloseAfterS = 5,
                 Seats = [new() { Seat = 1, CoreRam = "0x864F" }, new() { Seat = 2, CoreRam = "0x894F" }],
             },
+            Stats = new MultiplayerStats
+            {
+                Life = new MultiplayerStatLife
+                {
+                    Bytes = 2, Full = 144, Ko = 0xFFFF,
+                    Seats = [new() { Seat = 1, CoreRam = "0x83E8" }, new() { Seat = 2, CoreRam = "0x86E8" }],
+                },
+            },
         };
 
         var places = new Dictionary<int, IReadOnlyDictionary<string, int>?>
@@ -62,6 +70,8 @@ public class MultiplayerBancTests
 
             using var delai = new CancellationTokenSource(TimeSpan.FromSeconds(120));
             var guet = new MultiplayerFinDeRencontre(ra).AttendreLeVainqueurAsync(jeu.End, [1, 2], delai.Token);
+            using var finDuSuivi = new CancellationTokenSource();
+            var suivi = new MultiplayerStatsDuDuel(ra).SuivreAsync(jeu, [1, 2], finDuSuivi.Token);
 
             // Le combat part seul a la fin du chrono de la selection : la vie de P2 passe a 144.
             for (var manche = 1; manche <= 2; manche++)
@@ -74,6 +84,12 @@ public class MultiplayerBancTests
             }
 
             Assert.Equal(1, await guet);
+            await Task.Delay(1500);
+            finDuSuivi.Cancel();
+            var stats = await suivi;
+            // Deux K.O. de P2 a vie pleine : deux coups, deux K.O. et deux perfects pour P1, 288 de degats.
+            Assert.Equal(new StatsDeLaPlace(2, 2, 2, 288), stats[1]);
+            Assert.Equal(0, stats[2].Coups);
         }
         finally
         {

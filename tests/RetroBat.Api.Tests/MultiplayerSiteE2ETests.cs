@@ -168,11 +168,14 @@ public class MultiplayerSiteE2ETests
         {
             Relay = "r", Port = 1, Session = "s", PlayerPassword = "p", SpectatePassword = "q", Core = "fbneo", CoreVersion = "v", Crc = "abcd1234",
         }, CancellationToken.None))?.Ok);
-        Assert.True((await hoteNp.TerminerAsync(sa.Room!, "match_over", 61, CancellationToken.None, 2))?.Ok);
+        Assert.True((await hoteNp.TerminerAsync(sa.Room!, "match_over", 61, CancellationToken.None, 2,
+            new Dictionary<int, StatsDeLaPlace> { [1] = new(4, 0, 0, 80), [2] = new(9, 2, 1, 288) }))?.Ok);
         var resultatA = await AttendreAsync(a, sa.Room!, r => r.State == "finished");
         Assert.Equal(2, resultatA?.Ended?.WinnerSeat);
         Assert.Equal("match_over", resultatA?.Ended?.Reason);
         Assert.Equal("pending", resultatA?.Ended?.Result);   // l'hote seul ne valide rien
+        Assert.Equal(2, resultatA?.Ended?.Stats?["2"].Kos);
+        Assert.Equal(9, resultatA?.Ended?.Stats?["2"].Hits);
 
         // L'invite rapporte la meme place : le resultat est valide, la cote bouge (RANK-03 : 1500 contre 1500, +16 / -16).
         var invite = ReferenceEquals(hoteNp, a) ? b : a;

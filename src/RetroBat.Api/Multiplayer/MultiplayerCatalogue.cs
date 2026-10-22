@@ -149,6 +149,10 @@ public sealed record MultiplayerGame
     [JsonPropertyName("end")]
     public MultiplayerEnd? End { get; init; }
 
+    /// <summary>NIVEAU NELFEPLAY : ce que l'hote mesure pendant un duel pour l'ecran de resultat (00quater.3, ecran 10).</summary>
+    [JsonPropertyName("stats")]
+    public MultiplayerStats? Stats { get; init; }
+
     [JsonIgnore]
     public bool EstArcade => string.Equals(System, "arcade", StringComparison.OrdinalIgnoreCase);
 
@@ -250,6 +254,34 @@ public sealed record MultiplayerEnd
 
     [JsonPropertyName("close_after_s")]
     public int CloseAfterS { get; init; } = 5;
+}
+
+/// <summary>
+/// Les statistiques d'un duel. SF2CE (00quater.3) : un coup reussi est une baisse de la vie adverse, un K.O. une vie a
+/// 0xFFFF, un perfect une manche gagnee avec la vie pleine (144).
+/// </summary>
+public sealed record MultiplayerStats
+{
+    [JsonPropertyName("life")]
+    public MultiplayerStatLife? Life { get; init; }
+}
+
+public sealed record MultiplayerStatLife
+{
+    /// <summary>L'adresse de la vie de chaque place (decalage de RetroArch, premier octet lu).</summary>
+    [JsonPropertyName("seats")]
+    public IReadOnlyList<MultiplayerChoiceSeat> Seats { get; init; } = [];
+
+    /// <summary>1 ou 2 octets, lus dans l'ordre de la memoire du coeur (petit-boutiste).</summary>
+    [JsonPropertyName("bytes")]
+    public int Bytes { get; init; } = 2;
+
+    [JsonPropertyName("full")]
+    public int Full { get; init; }
+
+    /// <summary>La valeur du K.O. (SF2CE : 0xFFFF).</summary>
+    [JsonPropertyName("ko")]
+    public int Ko { get; init; } = 0xFFFF;
 }
 
 public sealed record MultiplayerChoiceValue
@@ -459,6 +491,22 @@ public sealed class MultiplayerCatalogueStore
                 if (fin.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage is null)
                 {
                     return "fin de rencontre : pas d'adresse pour la place " + place;
+                }
+            }
+        }
+
+        if (jeu.Stats?.Life is { } vie)
+        {
+            if (vie.Bytes is < 1 or > 2 || vie.Full < 1)
+            {
+                return "statistiques incoherentes";
+            }
+
+            for (var place = 1; place <= jeu.Players; place++)
+            {
+                if (vie.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage is null)
+                {
+                    return "statistiques : pas d'adresse de vie pour la place " + place;
                 }
             }
         }

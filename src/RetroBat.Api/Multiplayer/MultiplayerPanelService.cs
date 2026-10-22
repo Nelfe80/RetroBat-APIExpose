@@ -929,7 +929,10 @@ public sealed class MultiplayerPanelService
             .OrderBy(j => gagnante is not null && j.Seat == gagnante ? 0 : 1)
             .ThenBy(j => j.Seat ?? 99)
             .Select(j => Joueur(j with { Present = true },
-                (j.Seat is { } place ? "P" + place.ToString(CultureInfo.InvariantCulture) : string.Empty) + Issue(j.Seat), T))
+                (j.Seat is { } place ? "P" + place.ToString(CultureInfo.InvariantCulture) : string.Empty) + Issue(j.Seat), T) is var ligne
+                    && StatsDe(finie, j.Seat, T) is { Length: > 0 } stats
+                        ? ligne with { Personnage = NomDuPersonnage(j) is { Length: > 0 } nom ? nom + "  ·  " + stats : stats }
+                        : ligne)
             .ToList();
         var maPlace = finie?.Players.FirstOrDefault(j => j.You)?.Seat;
         var titre = classique ? T("multiplayer.result.classic")
@@ -998,6 +1001,28 @@ public sealed class MultiplayerPanelService
 
         Rafraichir();
     }
+
+    /// <summary>Les statistiques d'une place au resultat (ecran 10) : coups reussis, K.O., perfects.</summary>
+    private string StatsDe(MultiplayerRoom? room, int? place, Func<string, string> T)
+    {
+        if (place is null || room?.Ended?.Stats is not { } stats
+            || !stats.TryGetValue(place.Value.ToString(CultureInfo.InvariantCulture), out var s))
+        {
+            return string.Empty;
+        }
+
+        return T("multiplayer.result.stats")
+            .Replace("{hits}", s.Hits.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
+            .Replace("{kos}", s.Kos.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
+            .Replace("{perfects}", s.Perfects.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
+    }
+
+    /// <summary>Le nom seul du personnage de ce joueur, sans sa cote.</summary>
+    private string NomDuPersonnage(MultiplayerJoueur joueur)
+        => _jeu?.Game is { EstNelfePlay: true, Choices: { Count: > 0 } choix } jeu
+            ? choix[0].NomDe(joueur.You ? _session.MesChoix(jeu).GetValueOrDefault(choix[0].Key, choix[0].Default)
+                : joueur.Choices is not null && joueur.Choices.TryGetValue(choix[0].Key, out var v) ? v : choix[0].Default)
+            : string.Empty;
 
     /// <summary>NIVEAU NELFEPLAY : le nom du personnage de ce joueur (le premier choix du catalogue), ou rien.</summary>
     private string PersonnageDe(MultiplayerJoueur joueur)

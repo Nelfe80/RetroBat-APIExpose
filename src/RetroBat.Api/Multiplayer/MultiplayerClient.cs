@@ -70,8 +70,14 @@ public sealed class MultiplayerClient
         }, ct);
 
     /// <summary>L'hote annonce la fin de la partie.</summary>
-    public Task<MultiplayerReponse?> TerminerAsync(string room, string raison, int? dureeSecondes, CancellationToken ct, int? placeGagnante = null)
-        => EnvoyerAsync("ended", new { room, reason = raison, duration_s = dureeSecondes, winner_seat = placeGagnante }, ct);
+    public Task<MultiplayerReponse?> TerminerAsync(string room, string raison, int? dureeSecondes, CancellationToken ct, int? placeGagnante = null,
+        IReadOnlyDictionary<int, StatsDeLaPlace>? stats = null)
+        => EnvoyerAsync("ended", new
+        {
+            room, reason = raison, duration_s = dureeSecondes, winner_seat = placeGagnante,
+            stats = stats?.ToDictionary(p => p.Key.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                p => new { hits = p.Value.Coups, kos = p.Value.KO, perfects = p.Value.Perfects, damage = p.Value.Degats }),
+        }, ct);
 
     /// <summary>NIVEAU NELFEPLAY : un invite rapporte la place gagnante qu'il a vue ; le resultat est valide s'il concorde avec l'hote.</summary>
     public Task<MultiplayerReponse?> RapporterAsync(string room, int placeGagnante, CancellationToken ct)
@@ -383,6 +389,25 @@ public sealed record MultiplayerFin
     /// <summary>Les cotes avant et apres, par place, une fois le resultat valide.</summary>
     [JsonPropertyName("elo")]
     public IReadOnlyDictionary<string, MultiplayerEvolution>? Elo { get; init; }
+
+    /// <summary>Les statistiques du duel, par place, mesurees chez l'hote.</summary>
+    [JsonPropertyName("stats")]
+    public IReadOnlyDictionary<string, MultiplayerStatsPlace>? Stats { get; init; }
+}
+
+public sealed record MultiplayerStatsPlace
+{
+    [JsonPropertyName("hits")]
+    public int Hits { get; init; }
+
+    [JsonPropertyName("kos")]
+    public int Kos { get; init; }
+
+    [JsonPropertyName("perfects")]
+    public int Perfects { get; init; }
+
+    [JsonPropertyName("damage")]
+    public int Damage { get; init; }
 }
 
 public sealed record MultiplayerInvitation
