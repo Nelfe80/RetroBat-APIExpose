@@ -101,6 +101,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     private Dictionary<LeaderboardPanelModel.Vue, IReadOnlyDictionary<string, int>> _rangsDesAutres = new();
     private string _jeuAffiche = "";
     private string _systemeAffiche = "";
+
+    /// <summary>Quand un panneau s'est ouvert : un systeme choisi dans la foulee de l'ouverture ne le ferme pas.</summary>
+    private DateTime _ouvertureUtc = DateTime.MinValue;
+    private static readonly TimeSpan MargeDOuverture = TimeSpan.FromSeconds(2);
     private string _romGroup = "";
     private string _maVille = "";
     private string _monPays = "";
@@ -234,6 +238,26 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 // La cle du prochain classement se prepare tout de suite : a l'ouverture, il
                 // sera trop tard pour faire attendre le joueur.
                 PreparerLaCle();
+            }
+            // LE CARROUSEL DES SYSTEMES (retour du user du 22/10 : « le panneau restait ouvert meme quand on navigue dans
+            // ES »). Revenir au carrousel, ou y tourner, n'emet qu'un systeme choisi, jamais un jeu choisi : le panneau
+            // parlait d'un jeu qui n'etait plus a l'ecran (vu dans le journal : ouvert a 09:33:49, toujours la a 09:37
+            // apres un aller-retour au carrousel). Il se ferme. Pas la presentation d'un lancement ni un resultat, ni la
+            // boite d'attente d'un lancement : ES emet aussi ce signal au retour d'une partie.
+            if (string.Equals(e.Type, "ui.system.selected", StringComparison.Ordinal)
+                && DateTime.UtcNow - _ouvertureUtc > MargeDOuverture)
+            {
+                if (_multiplayer is { PanneauAffiche: true } panneauDesGamerooms)
+                {
+                    _logger.LogInformation("MULTIPLAYER : retour au carrousel des systemes, le panneau se ferme.");
+                    panneauDesGamerooms.Fermer();
+                }
+                if (_modele.Etat != LeaderboardPanelModel.Foyer.Ferme && !_overlay.EnAttente)
+                {
+                    _logger.LogInformation("Classement : retour au carrousel des systemes, le panneau se ferme.");
+                    Fermer();
+                }
+                return;
             }
             if (string.Equals(e.Type, "ui.game.selected", StringComparison.Ordinal)
                 && _multiplayer is { Ouvert: true } multiplayerOuvert)
@@ -586,6 +610,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         {
             _jeuAffiche = nomDuJeu;
             _systemeAffiche = systeme;
+            _ouvertureUtc = DateTime.UtcNow;
             await _multiplayer.OuvrirAsync(cheminDuJeu, Glyphe(SlotValider), Glyphe(SlotAnnuler), ct).ConfigureAwait(false);
             return;
         }
@@ -599,6 +624,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         var msCle = chronoCle.ElapsedMilliseconds;
         _jeuAffiche = nomDuJeu;
         _systemeAffiche = systeme;
+        _ouvertureUtc = DateTime.UtcNow;
         if (_romGroup.Length == 0) return;
         _reglesDuJeu = _collection?.ReglesOuvertes(_romGroup) ?? Array.Empty<string>();
         _reglePrincipale = LeaderboardClient.ReglePrincipale(_reglesDuJeu);

@@ -103,6 +103,12 @@ public sealed class MultiplayerPanelService
         get { lock (_verrou) return _mode != Mode.Ferme; }
     }
 
+    /// <summary>Le panneau des gamerooms est-il a l'ecran ? Ni la presentation d'un lancement, ni un resultat.</summary>
+    public bool PanneauAffiche
+    {
+        get { lock (_verrou) return _mode == Mode.Panneau; }
+    }
+
     /// <summary>MULTIPLAYER est-il en service sur cette borne ?</summary>
     public bool Actif => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: true };
 
