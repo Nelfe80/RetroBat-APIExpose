@@ -315,7 +315,7 @@ public sealed class MultiplayerLaunchService : IHostedService
     private async Task AnnoncerQuandLEmulateurEstLaAsync(GameReference jeu)
     {
         var limite = DateTime.UtcNow.AddSeconds(60);
-        while (DateTime.UtcNow < limite && !EmulatorForeground.EmulateurTourne())
+        while (DateTime.UtcNow < limite && !EmulatorForeground.EmulateurDeJeuTourne())
         {
             await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
         }

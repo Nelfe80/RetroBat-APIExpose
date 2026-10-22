@@ -377,7 +377,7 @@ public sealed class NetplayGuestService
             while (!apparu && DateTime.UtcNow < apparition)
             {
                 await Task.Delay(TimeSpan.FromSeconds(2), CancellationToken.None).ConfigureAwait(false);
-                apparu = EmulatorForeground.EmulateurTourne();
+                apparu = EmulatorForeground.EmulateurDeJeuTourne();
             }
             if (!apparu)
             {
@@ -401,7 +401,7 @@ public sealed class NetplayGuestService
             }
 
             var limite = DateTime.UtcNow.AddHours(4);
-            while (DateTime.UtcNow < limite && EmulatorForeground.EmulateurTourne())
+            while (DateTime.UtcNow < limite && EmulatorForeground.EmulateurDeJeuTourne())
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), CancellationToken.None).ConfigureAwait(false);
             }

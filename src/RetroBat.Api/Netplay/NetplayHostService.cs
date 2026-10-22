@@ -279,7 +279,7 @@ public sealed class NetplayHostService
             while (!apparu && DateTime.UtcNow < apparition)
             {
                 await Task.Delay(TimeSpan.FromSeconds(2), CancellationToken.None).ConfigureAwait(false);
-                apparu = EmulatorForeground.EmulateurTourne();
+                apparu = EmulatorForeground.EmulateurDeJeuTourne();
             }
             if (!apparu)
             {
@@ -291,7 +291,7 @@ public sealed class NetplayHostService
             // c'est exactement la peremption de l'annonce, donc au-dela il n'y a plus rien a
             // retirer de toute facon.
             var limite = DateTime.UtcNow.AddHours(2);
-            while (DateTime.UtcNow < limite && EmulatorForeground.EmulateurTourne())
+            while (DateTime.UtcNow < limite && EmulatorForeground.EmulateurDeJeuTourne())
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), CancellationToken.None).ConfigureAwait(false);
             }

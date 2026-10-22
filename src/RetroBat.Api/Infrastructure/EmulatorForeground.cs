@@ -161,6 +161,28 @@ public static class EmulatorForeground
         }
     }
 
+    /// <summary>
+    /// La fenetre de premier plan est-elle celle du RetroArch cache d'un rendu video ? Les panneaux d'ES ne se
+    /// ferment pas pour lui : ils rendent le premier plan a ES (le rendu le reprend parfois en cours de route).
+    /// </summary>
+    public static bool RenduEstDevant()
+    {
+        var rendu = _processusDuRendu;
+        if (rendu == 0)
+        {
+            return false;
+        }
+
+        var devant = GetForegroundWindow();
+        if (devant == IntPtr.Zero)
+        {
+            return false;
+        }
+
+        GetWindowThreadProcessId(devant, out var pid);
+        return pid == (uint) rendu;
+    }
+
     public static bool EmulateurTourne()
     {
         Process[] tous;

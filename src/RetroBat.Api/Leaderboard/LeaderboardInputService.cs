@@ -530,7 +530,19 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 //
                 // L'invariant qui manquait : l'etat du modele ne survit pas a la visibilite de la
                 // fenetre. Ni ES ni nous au premier plan, donc le joueur est parti ailleurs.
+                //
+                // Sauf quand c'est le RetroArch cache d'un rendu video qui est passe devant : le joueur n'est
+                // parti nulle part. Le premier plan revient a ES, le panneau reste (retour du user du 22/10 :
+                // « au bout d'un moment il se ferme tout seul », defaut commun a tous les panneaux).
+                var renduDevant = EmulatorForeground.RenduEstDevant();
+                if (renduDevant && (_modele.Etat != LeaderboardPanelModel.Foyer.Ferme || _multiplayer is { Ouvert: true }))
+                {
+                    _logger.LogInformation("Classement : le rendu video d'un replay a pris le premier plan, il revient a ES.");
+                    EmulatorForeground.FocusEmulationStation();
+                }
+
                 if (_modele.Etat != LeaderboardPanelModel.Foyer.Ferme
+                    && !renduDevant
                     && !EsEstDevant()
                     && !_overlay.EstAuPremierPlan())
                 {
@@ -1584,7 +1596,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 // Le filet : si le lecteur n'a rien lance en 45 s, la boite ne reste pas, et
                 // ES reprend la main (il n'y a pas d'emulateur a qui la disputer).
                 await Task.Delay(TimeSpan.FromSeconds(45)).ConfigureAwait(false);
-                if (_overlay.EnAttente && !EmulatorForeground.EmulateurTourne())
+                if (_overlay.EnAttente && !EmulatorForeground.EmulateurDeJeuTourne())
                 {
                     _replayLance = "";
                     Fermer();
@@ -1612,7 +1624,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         var limite = DateTime.UtcNow + TimeSpan.FromSeconds(60);
         while (DateTime.UtcNow < limite && _overlay.EnAttente)
         {
-            if (EmulatorForeground.EmulateurTourne())
+            if (EmulatorForeground.EmulateurDeJeuTourne())
             {
                 // La fenetre suit son processus, et `ui.game.started` a pu fermer entre-temps.
                 await Task.Delay(1500).ConfigureAwait(false);
@@ -1638,7 +1650,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     private async Task SEffacerQuandLEmulateurEstLaAsync()
     {
         var limite = DateTime.UtcNow + TimeSpan.FromSeconds(20);
-        while (DateTime.UtcNow < limite && !EmulatorForeground.EmulateurTourne())
+        while (DateTime.UtcNow < limite && !EmulatorForeground.EmulateurDeJeuTourne())
         {
             await Task.Delay(250).ConfigureAwait(false);
         }
@@ -1653,7 +1665,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     private async Task RendreEsApresLeReplayAsync()
     {
         var limite = DateTime.UtcNow + TimeSpan.FromSeconds(20);
-        while (DateTime.UtcNow < limite && EmulatorForeground.EmulateurTourne())
+        while (DateTime.UtcNow < limite && EmulatorForeground.EmulateurDeJeuTourne())
         {
             await Task.Delay(300).ConfigureAwait(false);
         }

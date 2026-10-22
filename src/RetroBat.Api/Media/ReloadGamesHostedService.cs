@@ -1044,7 +1044,7 @@ public class ReloadGamesHostedService : BackgroundService
     /// </summary>
     private async Task AnnoncerApresRechargementAsync(string? annonce, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(annonce) || RetroBat.Api.Infrastructure.EmulatorForeground.EmulateurTourne())
+        if (string.IsNullOrWhiteSpace(annonce) || RetroBat.Api.Infrastructure.EmulatorForeground.EmulateurDeJeuTourne())
         {
             return;
         }

@@ -124,7 +124,7 @@ public static class NetplayLaunch
         try
         {
             var limite = DateTime.UtcNow + PatienceApparition;
-            while (DateTime.UtcNow < limite && !EmulatorForeground.EmulateurTourne())
+            while (DateTime.UtcNow < limite && !EmulatorForeground.EmulateurDeJeuTourne())
             {
                 await Task.Delay(TimeSpan.FromSeconds(2), CancellationToken.None).ConfigureAwait(false);
             }
