@@ -18,6 +18,7 @@ public class MultiplayerApercusTests
 {
     private static readonly string? Sortie = Environment.GetEnvironmentVariable("NELFEPLAY_APERCUS");
     private static readonly string? Badges = Environment.GetEnvironmentVariable("NELFEPLAY_APERCUS_BADGES");
+    private static readonly string? Planche = Environment.GetEnvironmentVariable("NELFEPLAY_APERCUS_PLANCHE");
 
     [Fact]
     public void Les_dispositions_du_panneau_se_dessinent()
@@ -45,7 +46,7 @@ public class MultiplayerApercusTests
         var stats1 = new List<L.StatDuJoueur> { new("HITS", "12"), new("K.O.", "2"), new("PERFECTS", "1"), new("DAMAGE", "288") };
         var stats2 = new List<L.StatDuJoueur> { new("HITS", "7"), new("K.O.", "0"), new("PERFECTS", "0"), new("DAMAGE", "90") };
         L.JoueurMultiplayer Classique(string nom, string pays, string couleur, int place, bool hote, int? barres)
-            => new(nom, pays, couleur, hote, place == 1, true, barres, "ready", "HOST", Place: place);
+            => new(nom, pays, couleur, hote, place == 1, true, barres, "ready", "HOST", Place: place, Avatar: place == 1 ? Planche : null);
 
         var vues = new Dictionary<string, L.ContenuMultiplayer>
         {

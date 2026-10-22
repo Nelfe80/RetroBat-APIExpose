@@ -333,11 +333,7 @@ public sealed partial class LeaderboardOverlayService
                 }
                 else
                 {
-                    using (var chemin = Arrondi(avatar, cote * 0.22f))
-                    using (var fond = new SolidBrush(Teinte(j.Couleur, j.Present ? 255 : 110)))
-                    {
-                        g.FillPath(fond, chemin);
-                    }
+                    RemplirLeFondDuVisage(g, avatar, cote * 0.22f, j);
 
                     if (Image(j.Avatar) is { } planche && planche.Width >= 64 && planche.Height >= 64)
                     {
@@ -836,6 +832,62 @@ public sealed partial class LeaderboardOverlayService
             g.Restore(etat);
         }
 
+        /// <summary>
+        /// Le fond du carre d'un joueur sans portrait : un degrade en diagonale entre deux teintes voisines de sa couleur
+        /// (plus claire, la roue des couleurs tournee de -18 degres en haut a gauche ; plus profonde, tournee de +28 degres en
+        /// bas a droite), un reflet doux en haut et un fin lisere clair. La couleur unie faisait date (retour du user du 23/10).
+        /// </summary>
+        private void RemplirLeFondDuVisage(Graphics g, RectangleF carre, float rayon, JoueurMultiplayer j)
+        {
+            var alpha = j.Present ? 255 : 110;
+            var teinte = Teinte(j.Couleur, alpha);
+            var clair = Voisine(teinte, -18f, 1.05f, 1.22f, alpha);
+            var profond = Voisine(teinte, 28f, 1.15f, 0.62f, alpha);
+            using var chemin = Arrondi(carre, rayon);
+            using (var degrade = new System.Drawing.Drawing2D.LinearGradientBrush(carre, clair, profond, 45f))
+            {
+                degrade.InterpolationColors = new System.Drawing.Drawing2D.ColorBlend
+                {
+                    Colors = [clair, teinte, profond],
+                    Positions = [0f, 0.45f, 1f],
+                };
+                g.FillPath(degrade, chemin);
+            }
+
+            var etat = g.Save();
+            g.SetClip(chemin);
+            var reflet = new RectangleF(carre.X - carre.Width * 0.2f, carre.Y - carre.Height * 0.55f, carre.Width * 1.4f, carre.Height);
+            using (var lumiere = new System.Drawing.Drawing2D.LinearGradientBrush(reflet, Color.FromArgb(j.Present ? 70 : 30, 255, 255, 255),
+                Color.FromArgb(0, 255, 255, 255), 90f))
+            {
+                g.FillEllipse(lumiere, reflet);
+            }
+
+            g.Restore(etat);
+            using var lisere = new Pen(Color.FromArgb(j.Present ? 90 : 40, 255, 255, 255), Math.Max(1f, _hauteurEcran / 900f));
+            g.DrawPath(lisere, chemin);
+        }
+
+        /// <summary>Une teinte voisine : la roue tournee de <paramref name="decalage"/> degres, saturation et luminosite multipliees.</summary>
+        private static Color Voisine(Color c, float decalage, float saturation, float luminosite, int alpha)
+        {
+            var h = (c.GetHue() + decalage + 360f) % 360f;
+            var s = Math.Clamp(c.GetSaturation() * saturation, 0f, 1f);
+            var l = Math.Clamp(c.GetBrightness() * luminosite, 0f, 0.92f);
+            // TSL vers RVB.
+            var q = l < 0.5f ? l * (1 + s) : l + s - l * s;
+            var p = 2 * l - q;
+            float Composante(float t)
+            {
+                t = (t % 1f + 1f) % 1f;
+                return t < 1f / 6 ? p + (q - p) * 6 * t : t < 0.5f ? q : t < 2f / 3 ? p + (q - p) * (2f / 3 - t) * 6 : p;
+            }
+
+            var hn = h / 360f;
+            return Color.FromArgb(alpha, (int)Math.Round(Composante(hn + 1f / 3) * 255), (int)Math.Round(Composante(hn) * 255),
+                (int)Math.Round(Composante(hn - 1f / 3) * 255));
+        }
+
         /// <summary>Le carre d'un joueur : le portrait du personnage, sinon la tete de sa planche, sinon son initiale.</summary>
         private void DessinerLeVisage(Graphics g, JoueurMultiplayer j, EsMenuStyle s, Font gras, RectangleF carre, bool choisie, int alpha)
         {
@@ -845,11 +897,7 @@ public sealed partial class LeaderboardOverlayService
                 return;
             }
 
-            using (var chemin = Arrondi(carre, carre.Width * 0.18f))
-            using (var fond = new SolidBrush(Teinte(j.Couleur, j.Present ? 255 : 110)))
-            {
-                g.FillPath(fond, chemin);
-            }
+            RemplirLeFondDuVisage(g, carre, carre.Width * 0.18f, j);
 
             if (Image(j.Avatar) is { } planche && planche.Width >= 64 && planche.Height >= 64)
             {
