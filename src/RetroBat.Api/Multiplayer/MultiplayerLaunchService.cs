@@ -35,6 +35,9 @@ public sealed class MultiplayerLaunchService : IHostedService
     private readonly NetplayLobbyClient _lobby;
     private readonly ApiContext _contexte;
     private readonly IEventBus _bus;
+
+    /// <summary>Le bilan de fin de partie du wrapper : une rencontre classee s'annule sur triche (22/10).</summary>
+    private readonly MultiplayerBilanDuWrapper _bilans;
     private readonly ILogger<MultiplayerLaunchService> _journal;
     private readonly object _verrou = new();
     private readonly HashSet<string> _lancees = new(StringComparer.Ordinal);
@@ -74,6 +77,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         _contexte = contexte;
         _bus = bus;
         _journal = journal;
+        _bilans = new MultiplayerBilanDuWrapper(bus);
         _depart = new MultiplayerDepartPret(new CommandesRetroArchUdp());
         _fin = new MultiplayerFinDeRencontre(new CommandesRetroArchUdp());
         _statsDuDuel = new MultiplayerStatsDuDuel(new CommandesRetroArchUdp());
@@ -192,8 +196,17 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
 
             var stats = suivi is null ? null : await suivi.ConfigureAwait(false);
-            await _client.TerminerAsync(room.Room, vainqueur is null ? "game_closed" : "match_over", duree, CancellationToken.None, vainqueur,
-                vainqueur is null ? null : stats).ConfigureAwait(false);
+            // Le depart pret charge un etat chez l'hote : c'est le seul chargement permis.
+            if (await JugerLeBilanAsync(room, jeu.Game, partie.Debut, jeu.Game.EstNelfePlay ? 1 : 0).ConfigureAwait(false) is { } motif)
+            {
+                await _client.TerminerAsync(room.Room, "voided", duree, CancellationToken.None).ConfigureAwait(false);
+            }
+            else
+            {
+                await _client.TerminerAsync(room.Room, vainqueur is null ? "game_closed" : "match_over", duree, CancellationToken.None, vainqueur,
+                    vainqueur is null ? null : stats).ConfigureAwait(false);
+            }
+
             _panneau.MontrerLeResultat(room.Room, duree, stats);
         }
         catch (Exception ex)
@@ -438,6 +451,12 @@ public sealed class MultiplayerLaunchService : IHostedService
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
             guetInvite.Cancel();
             NetplayGuestService.OublierInviteMultiplayer();
+            // Un chargement d'etat fait ici se propage a l'hote sans y etre compte : l'invite juge son propre bilan.
+            if (await JugerLeBilanAsync(room, jeu.Game, partie.Debut, 0).ConfigureAwait(false) is { } motif)
+            {
+                await _client.AnnulerAsync(room.Room, motif, CancellationToken.None).ConfigureAwait(false);
+            }
+
             // En Classique, la partie finit quand tous les invites sont partis : la plateforme doit le savoir.
             await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
             Task<IReadOnlyDictionary<int, StatsDeLaPlace>>? suiviInvite;
@@ -550,6 +569,25 @@ public sealed class MultiplayerLaunchService : IHostedService
     }
 
     /// <summary>Attend que le lanceur rende la main, rend les reglages et annonce la fin. Rend la duree, en secondes.</summary>
+    /// <summary>
+    /// Le bilan du wrapper de cette partie, attendu 4 s apres sa fin et journalise. Rend le motif d'annulation d'une
+    /// rencontre classee (triche, retour arriere, avance rapide, execution anticipee, chargement d'etat en trop), ou null.
+    /// </summary>
+    private async Task<string?> JugerLeBilanAsync(MultiplayerRoom room, MultiplayerGame jeu, DateTime debut, int chargementsPermis)
+    {
+        var bilan = await _bilans.AttendreAsync(debut, TimeSpan.FromSeconds(4)).ConfigureAwait(false);
+        if (bilan is not { } b)
+        {
+            _journal.LogInformation("MULTIPLAYER : pas de bilan du wrapper pour {Room} ({Jeu})", room.Room, jeu.Id);
+            return null;
+        }
+
+        var (annulee, motif) = MultiplayerBilanDuWrapper.Juger(b, chargementsPermis);
+        _journal.LogInformation("MULTIPLAYER : bilan du wrapper pour {Jeu} : {Bilan}{Verdict}", jeu.Id, MultiplayerBilanDuWrapper.Resume(b),
+            annulee ? " ; rencontre annulee (" + motif + ")" : string.Empty);
+        return annulee && jeu.EstClasse ? motif : null;
+    }
+
     private async Task<int> AttendreLaFinAsync(Partie partie)
     {
         try

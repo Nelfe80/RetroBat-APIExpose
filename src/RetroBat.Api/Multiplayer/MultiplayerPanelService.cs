@@ -1000,7 +1000,9 @@ public sealed class MultiplayerPanelService
         var finie = _session.Etat.Rooms.FirstOrDefault(r => r.Room == _roomDuResultat) ?? connue;
         var classique = (finie?.Level ?? _jeu?.Game.Level) != MultiplayerLevels.NelfePlay;
         // Classee (23/10) : une rencontre versus a fin lue, quel que soit le niveau ; sa cote et son vainqueur s'affichent.
-        var classe = _jeu?.Game.EstClasse == true;
+        // Annulee sur le bilan du wrapper (22/10) : ni vainqueur, ni cote, ni ecart.
+        var annulee = finie?.Ended?.Result == "void";
+        var classe = _jeu?.Game.EstClasse == true && !annulee;
         // NIVEAU NELFEPLAY : la place gagnante lue chez l'hote (V24-16) ; le gagnant d'abord, une defaite presentee avec
         // le meme soin (00quater.3).
         var gagnante = classe ? finie?.Ended?.WinnerSeat : null;
@@ -1014,6 +1016,7 @@ public sealed class MultiplayerPanelService
         {
             "pending" => T("multiplayer.result.pending"),
             "disputed" => T("multiplayer.result.disputed"),
+            "void" => T("multiplayer.result.void_note"),
             _ => string.Empty,
         };
         // En cartes, P1 reste a gauche ; en liste, le gagnant d'abord.
@@ -1059,7 +1062,8 @@ public sealed class MultiplayerPanelService
             })
             .ToList();
         var maPlace = finie?.Players.FirstOrDefault(j => j.You)?.Seat;
-        var titre = classique && !classe ? T("multiplayer.result.classic")
+        var titre = annulee ? T("multiplayer.result.void")
+            : classique && !classe ? T("multiplayer.result.classic")
             : abandon is not null && maPlace is not null ? T(maPlace == abandon ? "multiplayer.result.abandon" : "multiplayer.result.opponent_left")
             : gagnante is not null && maPlace is not null ? T(maPlace == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat")
             : T("multiplayer.result.title");

@@ -83,6 +83,10 @@ public sealed class MultiplayerClient
     public Task<MultiplayerReponse?> RapporterAsync(string room, int placeGagnante, CancellationToken ct)
         => EnvoyerAsync("report", new { room, winner_seat = placeGagnante }, ct);
 
+    /// <summary>Un invite annule la rencontre : son bilan du wrapper montre une triche (22/10). La cote ne bouge pas.</summary>
+    public Task<MultiplayerReponse?> AnnulerAsync(string room, string motif, CancellationToken ct)
+        => EnvoyerAsync("report", new { room, voided = true, reason = motif }, ct);
+
     public Task<MultiplayerReponse?> InviterAsync(string room, string poignee, CancellationToken ct)
         => EnvoyerAsync("invite", new { room, handle = poignee }, ct);
 
