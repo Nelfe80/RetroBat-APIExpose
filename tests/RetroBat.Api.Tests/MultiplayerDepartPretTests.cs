@@ -168,6 +168,44 @@ public class MultiplayerDepartPretTests : IDisposable
         Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Level = MultiplayerLevels.Classique, Start = null, Choices = null }));
     }
 
+    private static readonly MultiplayerEnd Manches = new()
+    {
+        FirstTo = 2, CloseAfterS = 5,
+        Seats = [new() { Seat = 1, CoreRam = "0x864F" }, new() { Seat = 2, CoreRam = "0x894F" }],
+    };
+
+    [Fact]
+    public async Task La_premiere_place_a_deux_manches_gagne_confirmee_par_deux_lectures()
+    {
+        var ra = new FauxRetroArch { DossierDesEtats = _dossier };
+        ra.Memoire[0x894F] = 0xFF;   // une valeur d'avant le combat ne gagne rien
+        var guet = new MultiplayerFinDeRencontre(ra, TimeSpan.FromMilliseconds(20));
+        var attente = guet.AttendreLeVainqueurAsync(Manches, [1, 2], CancellationToken.None);
+        await Task.Delay(80);
+        Assert.False(attente.IsCompleted);
+        ra.Memoire[0x894F] = 1;
+        ra.Memoire[0x864F] = 2;
+        Assert.Equal(1, await attente.WaitAsync(TimeSpan.FromSeconds(5)));
+    }
+
+    [Fact]
+    public async Task La_partie_fermee_avant_la_fin_ne_designe_personne()
+    {
+        using var fin = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
+        var guet = new MultiplayerFinDeRencontre(new FauxRetroArch { DossierDesEtats = _dossier }, TimeSpan.FromMilliseconds(20));
+        Assert.Null(await guet.AttendreLeVainqueurAsync(Manches, [1, 2], fin.Token));
+    }
+
+    [Fact]
+    public void La_fin_de_rencontre_exige_une_adresse_par_place()
+    {
+        var (jeu, _) = Sf2ce();
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(jeu with { End = Manches }));
+        Assert.Equal("fin de rencontre : pas d'adresse pour la place 2",
+            MultiplayerCatalogueStore.ValiderLeDepart(jeu with { End = Manches with { Seats = [Manches.Seats[0]] } }));
+        Assert.Equal("fin de rencontre incoherente", MultiplayerCatalogueStore.ValiderLeDepart(jeu with { End = Manches with { FirstTo = 0 } }));
+    }
+
     [Fact]
     public void Les_fleches_parcourent_les_personnages_en_boucle()
     {

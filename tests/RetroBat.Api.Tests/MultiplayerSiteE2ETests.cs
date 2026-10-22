@@ -146,6 +146,32 @@ public class MultiplayerSiteE2ETests
         Assert.True((await b.QuitterAsync(publique, CancellationToken.None))?.Ok);
         var abandon = await AttendreAsync(c, publique, r => r.State == "finished", 10);
         Assert.Equal("host_left", abandon?.Ended?.Reason);
+
+        // NIVEAU NELFEPLAY (M6) : A arrive avec Ken, B avec Chun-Li ; un personnage hors liste est refuse ; B passe a Ryu
+        // par les fleches ; au lancement, chaque place garde le sien (l'hote les ecrira dans l'etat).
+        var sa = await a.RejoindreAsync("arcade/sf2ce", "sf2ce", 80, true, CancellationToken.None, new Dictionary<string, int> { ["character"] = 4 });
+        Assert.True(sa?.Ok, sa?.Reason);
+        var sb = await b.RejoindreAsync("arcade/sf2ce", "sf2ce", 25, true, CancellationToken.None, new Dictionary<string, int> { ["character"] = 5 });
+        Assert.Equal(sa!.Room, sb?.Room);
+        Assert.Equal("choice_refused", (await b.ChoisirAsync(sa.Room!, new Dictionary<string, int> { ["character"] = 7 }, CancellationToken.None))?.Reason);
+        Assert.True((await b.ChoisirAsync(sa.Room!, new Dictionary<string, int> { ["character"] = 0 }, CancellationToken.None))?.Ok);
+        var depart = await AttendreAsync(a, sa.Room!, r => r.State == "launching" && r.Launch is not null);
+        Assert.Equal("nelfeplay", depart?.Level);
+        var parPlace = depart!.Players.Where(j => j.Seat is not null).ToDictionary(j => j.Seat!.Value, j => j.Choices?["character"]);
+        Assert.Equal(4, parPlace[1]);
+        Assert.Equal(0, parPlace[2]);
+        Assert.Equal("too_late", (await a.ChoisirAsync(sa.Room!, new Dictionary<string, int> { ["character"] = 5 }, CancellationToken.None))?.Reason);
+
+        // La rencontre finie, l'hote annonce la place gagnante : chaque borne la lit pour VICTORY ou DEFEAT.
+        var hoteNp = depart.Players.First(j => j.Host).You ? a : b;
+        Assert.True((await hoteNp.PublierNetplayAsync(sa.Room!, new MultiplayerSessionNetplay
+        {
+            Relay = "r", Port = 1, Session = "s", PlayerPassword = "p", SpectatePassword = "q", Core = "fbneo", CoreVersion = "v", Crc = "abcd1234",
+        }, CancellationToken.None))?.Ok);
+        Assert.True((await hoteNp.TerminerAsync(sa.Room!, "match_over", 61, CancellationToken.None, 2))?.Ok);
+        var resultatA = await AttendreAsync(a, sa.Room!, r => r.State == "finished");
+        Assert.Equal(2, resultatA?.Ended?.WinnerSeat);
+        Assert.Equal("match_over", resultatA?.Ended?.Reason);
     }
 
     private static readonly string? BorneC = Environment.GetEnvironmentVariable("NELFEPLAY_E2E_BORNE_C");

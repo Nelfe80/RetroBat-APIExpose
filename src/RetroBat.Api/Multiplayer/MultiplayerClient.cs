@@ -70,8 +70,8 @@ public sealed class MultiplayerClient
         }, ct);
 
     /// <summary>L'hote annonce la fin de la partie.</summary>
-    public Task<MultiplayerReponse?> TerminerAsync(string room, string raison, int? dureeSecondes, CancellationToken ct)
-        => EnvoyerAsync("ended", new { room, reason = raison, duration_s = dureeSecondes }, ct);
+    public Task<MultiplayerReponse?> TerminerAsync(string room, string raison, int? dureeSecondes, CancellationToken ct, int? placeGagnante = null)
+        => EnvoyerAsync("ended", new { room, reason = raison, duration_s = dureeSecondes, winner_seat = placeGagnante }, ct);
 
     public Task<MultiplayerReponse?> InviterAsync(string room, string poignee, CancellationToken ct)
         => EnvoyerAsync("invite", new { room, handle = poignee }, ct);
@@ -318,6 +318,10 @@ public sealed record MultiplayerFin
 
     [JsonPropertyName("duration_s")]
     public int? DurationS { get; init; }
+
+    /// <summary>NIVEAU NELFEPLAY : la place gagnante de la rencontre, lue chez l'hote.</summary>
+    [JsonPropertyName("winner_seat")]
+    public int? WinnerSeat { get; init; }
 }
 
 public sealed record MultiplayerInvitation

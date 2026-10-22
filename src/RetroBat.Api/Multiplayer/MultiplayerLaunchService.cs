@@ -39,7 +39,12 @@ public sealed class MultiplayerLaunchService : IHostedService
     private readonly object _verrou = new();
     private readonly HashSet<string> _lancees = new(StringComparer.Ordinal);
     private readonly MultiplayerDepartPret _depart;
+    private readonly MultiplayerFinDeRencontre _fin;
     private string? _enCours;
+
+    /// <summary>Le guet de la fin d'une rencontre NelfePlay, et la place gagnante qu'il a vue.</summary>
+    private CancellationTokenSource? _guet;
+    private int? _vainqueur;
 
     /// <summary>L'etat d'un depart pret pose dans l'emplacement reserve de RetroArch, retire a la fin de la partie.</summary>
     private string? _etatPose;
@@ -63,6 +68,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         _bus = bus;
         _journal = journal;
         _depart = new MultiplayerDepartPret(new CommandesRetroArchUdp());
+        _fin = new MultiplayerFinDeRencontre(new CommandesRetroArchUdp());
     }
 
     private static string RacineRetroArch => Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch");
@@ -165,7 +171,17 @@ public sealed class MultiplayerLaunchService : IHostedService
             _ = Task.Run(() => PublierLaSessionAsync(room, jeu, jeton, motJoueur, motSpectateur));
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
             RetirerLEtatPose();
-            await _client.TerminerAsync(room.Room, "game_closed", duree, CancellationToken.None).ConfigureAwait(false);
+            int? vainqueur;
+            lock (_verrou)
+            {
+                _guet?.Cancel();
+                _guet = null;
+                vainqueur = _vainqueur;
+                _vainqueur = null;
+            }
+
+            await _client.TerminerAsync(room.Room, vainqueur is null ? "game_closed" : "match_over", duree, CancellationToken.None, vainqueur)
+                .ConfigureAwait(false);
             _panneau.MontrerLeResultat(room.Room, duree);
         }
         catch (Exception ex)
@@ -222,11 +238,55 @@ public sealed class MultiplayerLaunchService : IHostedService
             };
             var reponse = await _client.PublierNetplayAsync(room.Room, publiee, CancellationToken.None).ConfigureAwait(false);
             _journal.LogInformation("MULTIPLAYER : session {Session} publiee pour {Room} ({Statut})", session.Id, room.Room, reponse?.Ok == true ? "ok" : reponse?.Reason ?? "injoignable");
+            if (reponse?.Ok == true && jeu.Game is { EstNelfePlay: true, End: not null })
+            {
+                _ = Task.Run(() => GuetterLaFinAsync(room, jeu.Game));
+            }
         }
         catch (Exception ex)
         {
             _journal.LogWarning(ex, "MULTIPLAYER : publication de la session de {Room} interrompue", room.Room);
         }
+    }
+
+    /// <summary>
+    /// V24-16 : au niveau NelfePlay, la rencontre finie, la plateforme ferme le jeu (sans cela, le gagnant d'un SF2
+    /// continuerait seul contre l'ordinateur). Le delai du catalogue laisse voir le vainqueur.
+    /// </summary>
+    private async Task GuetterLaFinAsync(MultiplayerRoom room, MultiplayerGame jeu)
+    {
+        CancellationToken jeton;
+        lock (_verrou)
+        {
+            _guet?.Cancel();
+            _guet = new CancellationTokenSource();
+            jeton = _guet.Token;
+        }
+
+        var places = room.Players.Where(joueur => joueur.Seat is not null).Select(joueur => joueur.Seat!.Value).Distinct().ToList();
+        var vainqueur = await _fin.AttendreLeVainqueurAsync(jeu.End!, places, jeton).ConfigureAwait(false);
+        if (vainqueur is null)
+        {
+            return;
+        }
+
+        lock (_verrou)
+        {
+            _vainqueur = vainqueur;
+        }
+
+        _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} finie, la place {Place} gagne ; le jeu se ferme dans {Delai} s",
+            jeu.Id, vainqueur, jeu.End!.CloseAfterS);
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(jeu.End.CloseAfterS), jeton).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            return;   // la partie s'est fermee avant
+        }
+
+        await RetroArchInvite.FermerAsync().ConfigureAwait(false);
     }
 
     /// <summary>Charge l'etat, ecrit le choix de chaque place, relit. Faux quand le depart ne se verifie pas.</summary>

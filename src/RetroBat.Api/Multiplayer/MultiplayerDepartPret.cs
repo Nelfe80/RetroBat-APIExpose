@@ -208,3 +208,65 @@ public sealed class MultiplayerDepartPret
                 : null;
     }
 }
+
+/// <summary>
+/// LA FIN D'UNE RENCONTRE AU NIVEAU NELFEPLAY (V24-16), guettee chez l'hote : la premiere place dont le compteur atteint
+/// le seuil du catalogue gagne. Deux lectures de suite le confirment : une valeur lue au vol pendant une ecriture du jeu
+/// ne termine rien. Le guet ne commence qu'une fois le depart pret pose ; avant, la demo du jeu pourrait faire monter
+/// les compteurs.
+/// </summary>
+public sealed class MultiplayerFinDeRencontre
+{
+    private readonly ICommandesRetroArch _commandes;
+    private readonly TimeSpan _periode;
+
+    public MultiplayerFinDeRencontre(ICommandesRetroArch commandes, TimeSpan? periode = null)
+    {
+        _commandes = commandes;
+        _periode = periode ?? TimeSpan.FromMilliseconds(500);
+    }
+
+    /// <summary>La place gagnante, ou null si la partie se ferme avant (annulation).</summary>
+    public async Task<int?> AttendreLeVainqueurAsync(MultiplayerEnd fin, IReadOnlyCollection<int> places, CancellationToken ct)
+    {
+        int? candidat = null;
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                int? vu = null;
+                foreach (var place in places.OrderBy(p => p))
+                {
+                    var adresse = fin.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage;
+                    if (adresse is null)
+                    {
+                        continue;
+                    }
+
+                    var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {adresse.Value:x} 1", ct).ConfigureAwait(false);
+                    var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (morceaux is { Length: >= 3 } && morceaux[0] == "READ_CORE_RAM"
+                        && int.TryParse(morceaux[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var valeur)
+                        && valeur >= fin.FirstTo && valeur < 0xFF)
+                    {
+                        vu = place;
+                        break;
+                    }
+                }
+
+                if (vu is not null && vu == candidat)
+                {
+                    return vu;
+                }
+
+                candidat = vu;
+                await Task.Delay(_periode, ct).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+
+        return null;
+    }
+}

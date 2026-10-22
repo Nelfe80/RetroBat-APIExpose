@@ -783,18 +783,29 @@ public sealed class MultiplayerPanelService
         _connues.TryGetValue(_roomDuResultat, out var connue);
         var finie = _session.Etat.Rooms.FirstOrDefault(r => r.Room == _roomDuResultat) ?? connue;
         var classique = (finie?.Level ?? _jeu?.Game.Level) != MultiplayerLevels.NelfePlay;
+        // NIVEAU NELFEPLAY : la place gagnante lue chez l'hote (V24-16) ; le gagnant d'abord, une defaite presentee avec
+        // le meme soin (00quater.3).
+        var gagnante = classique ? null : finie?.Ended?.WinnerSeat;
+        string Issue(int? place) => gagnante is null || place is null ? string.Empty
+            : " · " + T(place == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat");
         var joueurs = (finie?.Players ?? [])
             .Where(j => j.Seat is not null || finie?.State != "finished")
-            .OrderBy(j => j.Seat ?? 99)
-            .Select(j => Joueur(j with { Present = true }, j.Seat is { } place ? "P" + place.ToString(CultureInfo.InvariantCulture) : string.Empty, T))
+            .OrderBy(j => gagnante is not null && j.Seat == gagnante ? 0 : 1)
+            .ThenBy(j => j.Seat ?? 99)
+            .Select(j => Joueur(j with { Present = true },
+                (j.Seat is { } place ? "P" + place.ToString(CultureInfo.InvariantCulture) : string.Empty) + Issue(j.Seat), T))
             .ToList();
+        var maPlace = finie?.Players.FirstOrDefault(j => j.You)?.Seat;
+        var titre = classique ? T("multiplayer.result.classic")
+            : gagnante is not null && maPlace is not null ? T(maPlace == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat")
+            : T("multiplayer.result.title");
         var duree = finie?.Ended?.DurationS ?? _dureeDuResultat;
         var info = duree is { } secondes
             ? T("multiplayer.result.playtime") + " " + TimeSpan.FromSeconds(secondes).ToString(secondes >= 3600 ? @"h\:mm\:ss" : @"m\:ss", CultureInfo.InvariantCulture)
             : string.Empty;
 
         return new LeaderboardOverlayService.ContenuMultiplayer(
-            [classique ? T("multiplayer.result.classic") : T("multiplayer.result.title")],
+            [titre],
             0,
             false,
             classique ? T("multiplayer.badge.classic") : string.Empty,

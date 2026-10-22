@@ -142,6 +142,13 @@ public sealed record MultiplayerGame
     [JsonPropertyName("choices")]
     public IReadOnlyList<MultiplayerChoice>? Choices { get; init; }
 
+    /// <summary>
+    /// NIVEAU NELFEPLAY : la fin d'une rencontre (V24-16), lue chez l'hote ; la plateforme ferme alors le jeu, sinon le
+    /// gagnant d'un SF2 continuerait seul contre l'ordinateur.
+    /// </summary>
+    [JsonPropertyName("end")]
+    public MultiplayerEnd? End { get; init; }
+
     [JsonIgnore]
     public bool EstArcade => string.Equals(System, "arcade", StringComparison.OrdinalIgnoreCase);
 
@@ -226,6 +233,23 @@ public sealed record MultiplayerChoice
     }
 
     public string NomDe(int valeur) => Values.FirstOrDefault(v => v.Value == valeur)?.Name ?? string.Empty;
+}
+
+/// <summary>
+/// La fin d'une rencontre : la premiere place dont le compteur atteint <see cref="FirstTo"/> gagne (les manches de
+/// SF2CE, mesurees le 22/10 sous FBNeo : P1 0xFF864E, P2 0xFF894E, 2 pour gagner). Le jeu se ferme
+/// <see cref="CloseAfterS"/> secondes plus tard, le temps de voir le vainqueur.
+/// </summary>
+public sealed record MultiplayerEnd
+{
+    [JsonPropertyName("first_to")]
+    public int FirstTo { get; init; }
+
+    [JsonPropertyName("seats")]
+    public IReadOnlyList<MultiplayerChoiceSeat> Seats { get; init; } = [];
+
+    [JsonPropertyName("close_after_s")]
+    public int CloseAfterS { get; init; } = 5;
 }
 
 public sealed record MultiplayerChoiceValue
@@ -413,6 +437,22 @@ public sealed class MultiplayerCatalogueStore
             if (!System.Text.RegularExpressions.Regex.IsMatch(jeu.Start.Sha256.Trim(), "^[0-9a-fA-F]{64}$"))
             {
                 return "empreinte de l'etat manquante";
+            }
+        }
+
+        if (jeu.End is { } fin)
+        {
+            if (fin.FirstTo is < 1 or > 255 || fin.CloseAfterS is < 0 or > 60)
+            {
+                return "fin de rencontre incoherente";
+            }
+
+            for (var place = 1; place <= jeu.Players; place++)
+            {
+                if (fin.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage is null)
+                {
+                    return "fin de rencontre : pas d'adresse pour la place " + place;
+                }
             }
         }
 
