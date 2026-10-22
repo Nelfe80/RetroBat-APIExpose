@@ -229,15 +229,21 @@ public sealed class MultiplayerFinDeRencontre
         _periode = periode ?? TimeSpan.FromMilliseconds(500);
     }
 
-    /// <summary>La place gagnante, ou null si la partie se ferme avant (annulation).</summary>
+    /// <summary>
+    /// La place gagnante, ou null si la partie se ferme avant (annulation). Un vainqueur ne compte qu'apres avoir vu
+    /// tous les compteurs sous le seuil : la demo du jeu, chez un invite qui n'a pas encore recu l'etat de l'hote,
+    /// ne termine rien.
+    /// </summary>
     public async Task<int?> AttendreLeVainqueurAsync(MultiplayerEnd fin, IReadOnlyCollection<int> places, CancellationToken ct)
     {
         int? candidat = null;
+        var departVu = false;
         try
         {
             while (!ct.IsCancellationRequested)
             {
                 int? vu = null;
+                var lues = 0;
                 foreach (var place in places.OrderBy(p => p))
                 {
                     var adresse = fin.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage;
@@ -249,15 +255,22 @@ public sealed class MultiplayerFinDeRencontre
                     var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {adresse.Value:x} 1", ct).ConfigureAwait(false);
                     var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                     if (morceaux is { Length: >= 3 } && morceaux[0] == "READ_CORE_RAM"
-                        && int.TryParse(morceaux[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var valeur)
-                        && valeur >= fin.FirstTo && valeur < 0xFF)
+                        && int.TryParse(morceaux[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var valeur))
                     {
-                        vu = place;
-                        break;
+                        lues++;
+                        if (valeur >= fin.FirstTo && valeur < 0xFF && vu is null)
+                        {
+                            vu = place;
+                        }
                     }
                 }
 
-                if (vu is not null && vu == candidat)
+                if (vu is null && lues == places.Count)
+                {
+                    departVu = true;
+                }
+
+                if (departVu && vu is not null && vu == candidat)
                 {
                     return vu;
                 }

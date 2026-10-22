@@ -289,6 +289,31 @@ public sealed class MultiplayerLaunchService : IHostedService
         await RetroArchInvite.FermerAsync().ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Chez l'invite : le meme guet que l'hote, une fois sa partie lancee, puis le rapport de la place gagnante. Le guet
+    /// attend d'avoir vu les compteurs au depart : avant de recevoir l'etat de l'hote, l'invite tourne sa propre demo.
+    /// </summary>
+    private async Task RapporterEnInviteAsync(MultiplayerRoom room, MultiplayerGame jeu, CancellationToken ct)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(10), ct).ConfigureAwait(false);
+            var places = room.Players.Where(joueur => joueur.Seat is not null).Select(joueur => joueur.Seat!.Value).Distinct().ToList();
+            var vainqueur = await _fin.AttendreLeVainqueurAsync(jeu.End!, places, ct).ConfigureAwait(false);
+            if (vainqueur is null)
+            {
+                return;
+            }
+
+            var reponse = await _client.RapporterAsync(room.Room, vainqueur.Value, CancellationToken.None).ConfigureAwait(false);
+            _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} vue finie chez l'invite, place {Place} rapportee ({Statut})",
+                jeu.Id, vainqueur, reponse?.Ok == true ? "ok" : reponse?.Reason ?? "injoignable");
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
     /// <summary>Charge l'etat, ecrit le choix de chaque place, relit. Faux quand le depart ne se verifie pas.</summary>
     private async Task<bool> PreparerLeDepartAsync(MultiplayerRoom room, MultiplayerInstalledGame jeu)
     {
@@ -364,6 +389,14 @@ public sealed class MultiplayerLaunchService : IHostedService
                 return;
             }
 
+            // NIVEAU NELFEPLAY : l'invite joue la meme partie que l'hote ; il guette les memes compteurs et rapporte la place
+            // gagnante. Le resultat n'est valide, et la cote ne bouge, que si les deux concordent.
+            using var guetInvite = new CancellationTokenSource();
+            if (jeu.Game is { EstNelfePlay: true, End: not null })
+            {
+                _ = Task.Run(() => RapporterEnInviteAsync(room, jeu.Game, guetInvite.Token));
+            }
+
             // RetroArch demande le mot de passe a l'ecran : la borne le tape. Si l'hote part, la partie se ferme.
             _ = Task.Run(() => RetroArchInvite.SuivreAsync(session.Relay, session.Port, session.PlayerPassword,
                 async () =>
@@ -372,6 +405,7 @@ public sealed class MultiplayerLaunchService : IHostedService
                     await RetroArchInvite.FermerAsync().ConfigureAwait(false);
                 }, _journal));
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
+            guetInvite.Cancel();
             NetplayGuestService.OublierInviteMultiplayer();
             // En Classique, la partie finit quand tous les invites sont partis : la plateforme doit le savoir.
             await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);

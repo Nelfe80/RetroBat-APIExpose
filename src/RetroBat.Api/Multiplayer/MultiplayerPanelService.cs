@@ -903,8 +903,27 @@ public sealed class MultiplayerPanelService
         // NIVEAU NELFEPLAY : la place gagnante lue chez l'hote (V24-16) ; le gagnant d'abord, une defaite presentee avec
         // le meme soin (00quater.3).
         var gagnante = classique ? null : finie?.Ended?.WinnerSeat;
+        var elo = finie?.Ended?.Elo;
+        string Evolution(int? place)
+        {
+            if (place is null || elo is null || !elo.TryGetValue(place.Value.ToString(CultureInfo.InvariantCulture), out var e))
+            {
+                return string.Empty;
+            }
+
+            var delta = (int)Math.Round(e.After - e.Before);
+            return " · " + Math.Round(e.After).ToString(CultureInfo.InvariantCulture) + " (" + (delta >= 0 ? "+" : "") + delta.ToString(CultureInfo.InvariantCulture) + ")";
+        }
+
         string Issue(int? place) => gagnante is null || place is null ? string.Empty
-            : " · " + T(place == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat");
+            : " · " + T(place == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat") + Evolution(place);
+        // RANK-03 : la cote ne s'affiche qu'une fois le resultat valide, avec « Verification en cours » avant.
+        var bandeauDuResultat = finie?.Ended?.Result switch
+        {
+            "pending" => T("multiplayer.result.pending"),
+            "disputed" => T("multiplayer.result.disputed"),
+            _ => string.Empty,
+        };
         var joueurs = (finie?.Players ?? [])
             .Where(j => j.Seat is not null || finie?.State != "finished")
             .OrderBy(j => gagnante is not null && j.Seat == gagnante ? 0 : 1)
@@ -932,7 +951,7 @@ public sealed class MultiplayerPanelService
             joueurs,
             -1,
             string.Empty,
-            classique ? T("multiplayer.result.classic_note") : string.Empty,
+            classique ? T("multiplayer.result.classic_note") : bandeauDuResultat,
             [new(_glypheValider, T("multiplayer.help.replay")), new(_glypheAnnuler, T("multiplayer.help.close"))]);
     }
 
@@ -994,7 +1013,11 @@ public sealed class MultiplayerPanelService
         var valeur = joueur.You ? _session.MesChoix(jeu).GetValueOrDefault(premier.Key, premier.Default)
             : joueur.Choices is not null && joueur.Choices.TryGetValue(premier.Key, out var v) ? v
             : premier.Default;
-        return premier.NomDe(valeur);
+        // Versus classe : la cote du joueur sur ce jeu suit son personnage (V24-18) ; « ? » tant qu'elle est provisoire.
+        var cote = joueur.Rating is { } r
+            ? "  ·  ELO " + Math.Round(r.Value).ToString(CultureInfo.InvariantCulture) + (r.Provisional ? " ?" : string.Empty)
+            : string.Empty;
+        return premier.NomDe(valeur) + cote;
     }
 
     private LeaderboardOverlayService.JoueurMultiplayer Ami(MultiplayerAmi ami, Func<string, string> T)

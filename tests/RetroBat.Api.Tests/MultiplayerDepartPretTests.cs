@@ -189,6 +189,23 @@ public class MultiplayerDepartPretTests : IDisposable
     }
 
     [Fact]
+    public async Task Un_invite_en_pleine_demo_attend_d_avoir_vu_le_depart()
+    {
+        // L'invite demarre sa propre demo avant de recevoir l'etat de l'hote : un compteur deja a 2 ne gagne rien.
+        var ra = new FauxRetroArch { DossierDesEtats = _dossier };
+        ra.Memoire[0x864F] = 2;
+        var guet = new MultiplayerFinDeRencontre(ra, TimeSpan.FromMilliseconds(20));
+        var attente = guet.AttendreLeVainqueurAsync(Manches, [1, 2], CancellationToken.None);
+        await Task.Delay(120);
+        Assert.False(attente.IsCompleted);
+        ra.Memoire[0x864F] = 0;   // l'etat de l'hote arrive : la rencontre commence
+        await Task.Delay(80);
+        Assert.False(attente.IsCompleted);
+        ra.Memoire[0x894F] = 2;
+        Assert.Equal(2, await attente.WaitAsync(TimeSpan.FromSeconds(5)));
+    }
+
+    [Fact]
     public async Task La_partie_fermee_avant_la_fin_ne_designe_personne()
     {
         using var fin = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));

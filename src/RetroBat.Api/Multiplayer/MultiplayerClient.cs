@@ -73,6 +73,10 @@ public sealed class MultiplayerClient
     public Task<MultiplayerReponse?> TerminerAsync(string room, string raison, int? dureeSecondes, CancellationToken ct, int? placeGagnante = null)
         => EnvoyerAsync("ended", new { room, reason = raison, duration_s = dureeSecondes, winner_seat = placeGagnante }, ct);
 
+    /// <summary>NIVEAU NELFEPLAY : un invite rapporte la place gagnante qu'il a vue ; le resultat est valide s'il concorde avec l'hote.</summary>
+    public Task<MultiplayerReponse?> RapporterAsync(string room, int placeGagnante, CancellationToken ct)
+        => EnvoyerAsync("report", new { room, winner_seat = placeGagnante }, ct);
+
     public Task<MultiplayerReponse?> InviterAsync(string room, string poignee, CancellationToken ct)
         => EnvoyerAsync("invite", new { room, handle = poignee }, ct);
 
@@ -266,6 +270,32 @@ public sealed record MultiplayerJoueur
     /// <summary>Son avatar : sa planche NelfeNet (que la borne demande au relais si elle lui manque), comme dans un direct.</summary>
     [JsonPropertyName("avatar")]
     public MultiplayerAvatar? Avatar { get; init; }
+
+    /// <summary>NIVEAU NELFEPLAY, versus 1 contre 1 : sa cote Elo sur ce jeu.</summary>
+    [JsonPropertyName("rating")]
+    public MultiplayerCote? Rating { get; init; }
+}
+
+public sealed record MultiplayerCote
+{
+    [JsonPropertyName("value")]
+    public double Value { get; init; }
+
+    [JsonPropertyName("matches")]
+    public int Matches { get; init; }
+
+    /// <summary>Moins de 10 rencontres ou moins de 3 adversaires distincts (RANK-03).</summary>
+    [JsonPropertyName("provisional")]
+    public bool Provisional { get; init; }
+}
+
+public sealed record MultiplayerEvolution
+{
+    [JsonPropertyName("before")]
+    public double Before { get; init; }
+
+    [JsonPropertyName("after")]
+    public double After { get; init; }
 }
 
 public sealed record MultiplayerAvatar
@@ -345,6 +375,14 @@ public sealed record MultiplayerFin
     /// <summary>NIVEAU NELFEPLAY : la place gagnante de la rencontre, lue chez l'hote.</summary>
     [JsonPropertyName("winner_seat")]
     public int? WinnerSeat { get; init; }
+
+    /// <summary><c>pending</c> (en attente d'un invite), <c>validated</c>, <c>disputed</c>, ou null hors versus classe.</summary>
+    [JsonPropertyName("result")]
+    public string? Result { get; init; }
+
+    /// <summary>Les cotes avant et apres, par place, une fois le resultat valide.</summary>
+    [JsonPropertyName("elo")]
+    public IReadOnlyDictionary<string, MultiplayerEvolution>? Elo { get; init; }
 }
 
 public sealed record MultiplayerInvitation

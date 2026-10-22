@@ -172,6 +172,14 @@ public class MultiplayerSiteE2ETests
         var resultatA = await AttendreAsync(a, sa.Room!, r => r.State == "finished");
         Assert.Equal(2, resultatA?.Ended?.WinnerSeat);
         Assert.Equal("match_over", resultatA?.Ended?.Reason);
+        Assert.Equal("pending", resultatA?.Ended?.Result);   // l'hote seul ne valide rien
+
+        // L'invite rapporte la meme place : le resultat est valide, la cote bouge (RANK-03 : 1500 contre 1500, +16 / -16).
+        var invite = ReferenceEquals(hoteNp, a) ? b : a;
+        Assert.True((await invite.RapporterAsync(sa.Room!, 2, CancellationToken.None))?.Ok);
+        var valide = await AttendreAsync(a, sa.Room!, r => r.Ended?.Result == "validated");
+        Assert.Equal(1516, Math.Round(valide!.Ended!.Elo!["2"].After));
+        Assert.Equal(1484, Math.Round(valide.Ended.Elo["1"].After));
     }
 
     private static readonly string? BorneC = Environment.GetEnvironmentVariable("NELFEPLAY_E2E_BORNE_C");
