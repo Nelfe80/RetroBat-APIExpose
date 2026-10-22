@@ -63,6 +63,7 @@ public sealed class MultiplayerPanelService
     /// <summary>Les planches et les portraits deja demandes : une demande par fichier manquant, pas une par dessin.</summary>
     private readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> _demandes = new(StringComparer.Ordinal);
     private IReadOnlyList<MultiplayerAmi> _amis = [];
+    private readonly SemaphoreSlim _telechargementsDePortraits = new(2, 2);
     private string? _refus;
     private DateTime? _validerDepuis;
     private DateTime? _annulerDepuis;
@@ -552,7 +553,7 @@ public sealed class MultiplayerPanelService
         lock (_verrou)
         {
             var invitables = Invitables();
-            ami = _modele.Ligne < invitables.Count ? invitables[_modele.Ligne] : null;
+            ami = _modele.Ligne >= 0 && _modele.Ligne < invitables.Count ? invitables[_modele.Ligne] : null;
         }
 
         if (room is null || ami is null)
@@ -745,7 +746,18 @@ public sealed class MultiplayerPanelService
     }
 
     /// <summary>Les amis qu'on peut inviter : en ligne, et pas deja avec vous.</summary>
-    private List<MultiplayerAmi> Invitables() => _amis.Where(ami => ami.State != "with_you").ToList();
+    private List<MultiplayerAmi> Invitables() => AmisDuJeu().Where(ami => ami.State != "with_you").ToList();
+
+    /// <summary>
+    /// Les amis vus depuis le jeu du panneau. La plateforme dit « deja avec vous » des qu'un ami partage UNE de vos
+    /// gamerooms ; ici, cela ne vaut que pour celle de ce jeu : un ami avec vous sur un autre jeu est seulement en ligne,
+    /// et on peut l'inviter (retour du user du 22/10).
+    /// </summary>
+    private IEnumerable<MultiplayerAmi> AmisDuJeu()
+    {
+        var avecMoi = RoomDuJeu()?.Players.Select(j => j.Handle).ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
+        return _amis.Select(ami => ami.State == "with_you" && !avecMoi.Contains(ami.Handle) ? ami with { State = "in_es" } : ami);
+    }
 
     private string NomDuJeu(string id) => _session.NomDuJeu(id);
 
@@ -773,7 +785,7 @@ public sealed class MultiplayerPanelService
         IReadOnlyList<LeaderboardOverlayService.JoueurMultiplayer> lignes = _modele.OngletCourant switch
         {
             MultiplayerPanelModel.Onglet.WaitingForPlayers => LesPlaces(room, max, T),
-            MultiplayerPanelModel.Onglet.WaitingForFriends => _amis
+            MultiplayerPanelModel.Onglet.WaitingForFriends => AmisDuJeu()
                 .Where(ami => ami.State is "with_you" or "in_es")
                 .Select(ami => Ami(ami, T)).ToList(),
             _ => Invitables().Select(ami => Ami(ami, T)).ToList(),
@@ -803,8 +815,22 @@ public sealed class MultiplayerPanelService
             string.Empty,
             AidesDuPanneau(T),
             Selection: selection,
-            SelectionCourante: selectionCourante);
+            SelectionCourante: selectionCourante,
+            Disposition: _modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers
+                ? DispositionPour(max)
+                : LeaderboardOverlayService.DispositionDesJoueurs.Liste);
     }
+
+    /// <summary>
+    /// Deux places : deux cartes cote a cote ; trois ou quatre : une grille 2 x 2 ; au-dela, une ligne par joueur
+    /// (retour du user du 22/10).
+    /// </summary>
+    internal static LeaderboardOverlayService.DispositionDesJoueurs DispositionPour(int places) => places switch
+    {
+        2 => LeaderboardOverlayService.DispositionDesJoueurs.Colonnes,
+        3 or 4 => LeaderboardOverlayService.DispositionDesJoueurs.Grille,
+        _ => LeaderboardOverlayService.DispositionDesJoueurs.Liste,
+    };
 
     /// <summary>
     /// Une carte par place, numerotee comme la manette du netplay : les joueurs dans l'ordre d'arrivee, puis les places
@@ -858,14 +884,31 @@ public sealed class MultiplayerPanelService
         {
             _ = Task.Run(async () =>
             {
+                // Deux a la fois : une bande de vingt portraits demandee d'un coup se faisait limiter par le serveur, et
+                // un portrait manque ne revenait plus avant un redemarrage de l'API (retour du user du 22/10). Un echec
+                // se reessaie une minute plus tard, au dessin suivant.
+                await _telechargementsDePortraits.WaitAsync().ConfigureAwait(false);
                 try
                 {
                     await _retroAchievements.TelechargerLeBadgeAsync(badge!, CancellationToken.None).ConfigureAwait(false);
                 }
+                catch (Exception ex) when (ex is HttpRequestException or IOException or TaskCanceledException)
+                {
+                    _journal?.LogDebug(ex, "MULTIPLAYER : portrait {Badge} en echec", badge);
+                }
                 finally
                 {
-                    Rafraichir();
+                    _telechargementsDePortraits.Release();
                 }
+
+                if (!File.Exists(chemin))
+                {
+                    _journal?.LogInformation("MULTIPLAYER : portrait {Badge} non telecharge (media.retroachievements.org), nouvel essai dans une minute", badge);
+                    await Task.Delay(TimeSpan.FromMinutes(1)).ConfigureAwait(false);
+                    _demandes.TryRemove("badge:" + badge, out _);
+                }
+
+                Rafraichir();
             });
         }
 
@@ -909,19 +952,8 @@ public sealed class MultiplayerPanelService
         // le meme soin (00quater.3).
         var gagnante = classique ? null : finie?.Ended?.WinnerSeat;
         var elo = finie?.Ended?.Elo;
-        string Evolution(int? place)
-        {
-            if (place is null || elo is null || !elo.TryGetValue(place.Value.ToString(CultureInfo.InvariantCulture), out var e))
-            {
-                return string.Empty;
-            }
-
-            var delta = (int)Math.Round(e.After - e.Before);
-            return " · " + Math.Round(e.After).ToString(CultureInfo.InvariantCulture) + " (" + (delta >= 0 ? "+" : "") + delta.ToString(CultureInfo.InvariantCulture) + ")";
-        }
-
-        string Issue(int? place) => gagnante is null || place is null ? string.Empty
-            : " · " + T(place == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat") + Evolution(place);
+        MultiplayerEvolution? EloDe(int? place)
+            => place is not null && elo is not null && elo.TryGetValue(place.Value.ToString(CultureInfo.InvariantCulture), out var e) ? e : null;
         // RANK-03 : la cote ne s'affiche qu'une fois le resultat valide, avec « Verification en cours » avant.
         var bandeauDuResultat = finie?.Ended?.Result switch
         {
@@ -929,15 +961,33 @@ public sealed class MultiplayerPanelService
             "disputed" => T("multiplayer.result.disputed"),
             _ => string.Empty,
         };
-        var joueurs = (finie?.Players ?? [])
-            .Where(j => j.Seat is not null || finie?.State != "finished")
-            .OrderBy(j => gagnante is not null && j.Seat == gagnante ? 0 : 1)
+        // En cartes, P1 reste a gauche ; en liste, le gagnant d'abord.
+        var joueursDuResultat = (finie?.Players ?? []).Where(j => j.Seat is not null || finie?.State != "finished").ToList();
+        var disposition = DispositionPour(finie?.Max ?? joueursDuResultat.Count);
+        var joueurs = joueursDuResultat
+            .OrderBy(j => disposition == LeaderboardOverlayService.DispositionDesJoueurs.Liste && gagnante is not null && j.Seat == gagnante ? 0 : 1)
             .ThenBy(j => j.Seat ?? 99)
-            .Select(j => Joueur(j with { Present = true },
-                (j.Seat is { } place ? "P" + place.ToString(CultureInfo.InvariantCulture) : string.Empty) + Issue(j.Seat), T) is var ligne
-                    && StatsDe(finie, j.Seat, T) is { Length: > 0 } stats
-                        ? ligne with { Personnage = NomDuPersonnage(j) is { Length: > 0 } nom ? nom + "  ·  " + stats : stats }
-                        : ligne)
+            .Select(j =>
+            {
+                // Le numero de la place est dans sa pastille : l'etat n'a plus a dire « P1 ».
+                var ligne = Joueur(j with { Present = true }, string.Empty, T) with { Place = j.Seat };
+                if (gagnante is null || j.Seat is null)
+                {
+                    return ligne;
+                }
+
+                // La cote d'apres la rencontre, et son ecart (RANK-03 : seulement un resultat valide en porte une).
+                var evolution = EloDe(j.Seat);
+                var delta = evolution is null ? 0 : (int)Math.Round(evolution.After - evolution.Before);
+                return ligne with
+                {
+                    Issue = T(j.Seat == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat"),
+                    Gagnant = j.Seat == gagnante,
+                    Cote = evolution is null ? ligne.Cote : "ELO " + Math.Round(evolution.After).ToString(CultureInfo.InvariantCulture),
+                    Evolution = evolution is null ? string.Empty : (delta >= 0 ? "+" : "") + delta.ToString(CultureInfo.InvariantCulture),
+                    Stats = StatsDe(finie, j.Seat, T),
+                };
+            })
             .ToList();
         var maPlace = finie?.Players.FirstOrDefault(j => j.You)?.Seat;
         var titre = classique ? T("multiplayer.result.classic")
@@ -961,7 +1011,8 @@ public sealed class MultiplayerPanelService
             string.Empty,
             classique ? T("multiplayer.result.classic_note") : bandeauDuResultat,
             [new(_glypheValider, T("multiplayer.help.replay")), new(_glypheAnnuler, T("multiplayer.help.close"))],
-            PartageDesDegats: classique ? null : LePartage(finie, T));
+            PartageDesDegats: classique ? null : LePartage(finie, T),
+            Disposition: disposition);
     }
 
     /// <summary>La part des degats infliges par chaque place d'un duel, a leurs couleurs (P1 a gauche).</summary>
@@ -990,7 +1041,11 @@ public sealed class MultiplayerPanelService
             T("multiplayer.host"),
             PersonnageDe(joueur),
             Avatar: PlancheDe(joueur.Avatar),
-            Portrait: PortraitDeJoueur(joueur));
+            Portrait: PortraitDeJoueur(joueur),
+            // Versus classe : la cote du joueur sur ce jeu, a la suite de son pseudo ; « provisoire » pendant ses 10
+            // premieres rencontres et tant qu'il n'a pas rencontre 3 adversaires differents (RANK-03).
+            Cote: joueur.Rating is { } cote ? "ELO " + Math.Round(cote.Value).ToString(CultureInfo.InvariantCulture) : string.Empty,
+            Provisoire: joueur.Rating is { Provisional: true } ? T("multiplayer.rating.provisional") : string.Empty);
 
     /// <summary>NIVEAU NELFEPLAY : le portrait du personnage de ce joueur.</summary>
     private string? PortraitDeJoueur(MultiplayerJoueur joueur)
@@ -1021,27 +1076,22 @@ public sealed class MultiplayerPanelService
         Rafraichir();
     }
 
-    /// <summary>Les statistiques d'une place au resultat (ecran 10) : coups reussis, K.O., perfects.</summary>
-    private string StatsDe(MultiplayerRoom? room, int? place, Func<string, string> T)
+    /// <summary>Les statistiques d'une place au resultat (ecran 10) : coups reussis, K.O., perfects, degats infliges.</summary>
+    private IReadOnlyList<LeaderboardOverlayService.StatDuJoueur>? StatsDe(MultiplayerRoom? room, int? place, Func<string, string> T)
     {
         if (place is null || room?.Ended?.Stats is not { } stats
             || !stats.TryGetValue(place.Value.ToString(CultureInfo.InvariantCulture), out var s))
         {
-            return string.Empty;
+            return null;
         }
 
-        return T("multiplayer.result.stats")
-            .Replace("{hits}", s.Hits.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
-            .Replace("{kos}", s.Kos.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
-            .Replace("{perfects}", s.Perfects.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
+        string N(int n) => n.ToString(CultureInfo.InvariantCulture);
+        return
+        [
+            new(T("multiplayer.stat.hits"), N(s.Hits)), new(T("multiplayer.stat.kos"), N(s.Kos)),
+            new(T("multiplayer.stat.perfects"), N(s.Perfects)), new(T("multiplayer.stat.damage"), N(s.Damage)),
+        ];
     }
-
-    /// <summary>Le nom seul du personnage de ce joueur, sans sa cote.</summary>
-    private string NomDuPersonnage(MultiplayerJoueur joueur)
-        => _jeu?.Game is { EstNelfePlay: true, Choices: { Count: > 0 } choix } jeu
-            ? choix[0].NomDe(joueur.You ? _session.MesChoix(jeu).GetValueOrDefault(choix[0].Key, choix[0].Default)
-                : joueur.Choices is not null && joueur.Choices.TryGetValue(choix[0].Key, out var v) ? v : choix[0].Default)
-            : string.Empty;
 
     /// <summary>NIVEAU NELFEPLAY : le nom du personnage de ce joueur (le premier choix du catalogue), ou rien.</summary>
     private string PersonnageDe(MultiplayerJoueur joueur)
@@ -1057,11 +1107,7 @@ public sealed class MultiplayerPanelService
         var valeur = joueur.You ? _session.MesChoix(jeu).GetValueOrDefault(premier.Key, premier.Default)
             : joueur.Choices is not null && joueur.Choices.TryGetValue(premier.Key, out var v) ? v
             : premier.Default;
-        // Versus classe : la cote du joueur sur ce jeu suit son personnage (V24-18) ; « ? » tant qu'elle est provisoire.
-        var cote = joueur.Rating is { } r
-            ? "  ·  ELO " + Math.Round(r.Value).ToString(CultureInfo.InvariantCulture) + (r.Provisional ? " ?" : string.Empty)
-            : string.Empty;
-        return premier.NomDe(valeur) + cote;
+        return premier.NomDe(valeur);
     }
 
     private LeaderboardOverlayService.JoueurMultiplayer Ami(MultiplayerAmi ami, Func<string, string> T)

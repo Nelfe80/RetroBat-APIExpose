@@ -51,18 +51,37 @@ public class MultiplayerPanelModelTests
     }
 
     [Fact]
-    public void Haut_et_bas_restent_dans_les_lignes()
+    public void Entrer_dans_le_panneau_n_active_que_l_onglet()
     {
         var m = new M();
         m.Ouvrir();
         m.Gauche();
         m.PoserLesLignes(2);
+        Assert.Equal(-1, m.Ligne);                    // WAITING FOR PLAYERS : aucun joueur surligne
+        Assert.Equal(M.Effet.Rien, m.Bas());          // rien a choisir dans cet onglet
+        Assert.Equal(-1, m.Ligne);
+    }
+
+    [Fact]
+    public void Haut_et_bas_restent_dans_les_lignes_d_invite_friends()
+    {
+        var m = new M();
+        m.Ouvrir();
+        m.Gauche();
+        m.Gauche();
+        m.Gauche();                                   // INVITE FRIENDS
+        m.PoserLesLignes(2);
+        Assert.Equal(-1, m.Ligne);
         Assert.Equal(M.Effet.Rien, m.Haut());
+        Assert.Equal(M.Effet.ChargerLOnglet, m.Bas());
+        Assert.Equal(0, m.Ligne);
         Assert.Equal(M.Effet.ChargerLOnglet, m.Bas());
         Assert.Equal(1, m.Ligne);
         Assert.Equal(M.Effet.Rien, m.Bas());
         m.PoserLesLignes(1);
         Assert.Equal(0, m.Ligne);
+        Assert.Equal(M.Effet.ChargerLOnglet, m.Haut());
+        Assert.Equal(-1, m.Ligne);                    // retour a l'onglet seul
     }
 
     [Fact]
@@ -78,6 +97,8 @@ public class MultiplayerPanelModelTests
         m.PoserLesLignes(0);
         Assert.Equal(M.Effet.Rien, m.Valider());   // personne a inviter
         m.PoserLesLignes(2);
+        Assert.Equal(M.Effet.Rien, m.Valider());   // aucun ami choisi
+        m.Bas();
         Assert.Equal(M.Effet.AgirSurLaLigne, m.Valider());
     }
 

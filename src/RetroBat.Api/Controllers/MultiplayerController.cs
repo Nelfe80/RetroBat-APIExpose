@@ -111,6 +111,11 @@ public sealed class MultiplayerController : ControllerBase
         };
         LeaderboardOverlayService.JoueurMultiplayer Joueur(string nom, string pays, string couleur, bool hote, bool moi, bool present, int? barres, string etat)
             => new(nom, pays, couleur, hote, moi, present, barres, etat, T("multiplayer.host"));
+        List<LeaderboardOverlayService.StatDuJoueur> Stats(int coups, int ko, int perfects, int degats)
+            => [new(T("multiplayer.stat.hits"), coups.ToString(System.Globalization.CultureInfo.InvariantCulture)),
+                new(T("multiplayer.stat.kos"), ko.ToString(System.Globalization.CultureInfo.InvariantCulture)),
+                new(T("multiplayer.stat.perfects"), perfects.ToString(System.Globalization.CultureInfo.InvariantCulture)),
+                new(T("multiplayer.stat.damage"), degats.ToString(System.Globalization.CultureInfo.InvariantCulture))];
         var deux = new List<LeaderboardOverlayService.JoueurMultiplayer>
         {
             Joueur("PLAYER 1", "FR", "A98BFF", false, true, true, 3, T("multiplayer.ready")),
@@ -126,7 +131,8 @@ public sealed class MultiplayerController : ControllerBase
                 "panel" => LeaderboardOverlayService.ApercuMultiplayer(style, socle, "", "", "", journal),
                 "panel-focus" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with
                 {
-                    NousAvonsLaMain = true, Compte = "2/2", Lignes = deux, DecompteFinUtc = DateTime.UtcNow.AddSeconds(4), Aides = aides,
+                    NousAvonsLaMain = true, Compte = "2/2", Lignes = deux.Select((j, i) => j with { Place = i + 1 }).ToList(), DecompteFinUtc = DateTime.UtcNow.AddSeconds(4), Aides = aides,
+                    Disposition = LeaderboardOverlayService.DispositionDesJoueurs.Colonnes,
                 }, "", "", "", journal),
                 "invite" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with
                 {
@@ -142,8 +148,8 @@ public sealed class MultiplayerController : ControllerBase
                 {
                     Onglets = [T("multiplayer.result.classic")], OngletCourant = 0, Compte = string.Empty,
                     Info = T("multiplayer.result.playtime") + " 7:42", DecompteFinUtc = DateTime.UtcNow.AddSeconds(12),
-                    Lignes = [Joueur("PLAYER 1", "FR", "A98BFF", false, true, true, 3, "P1"), Joueur("PLAYER 2", "JP", "FF9F6B", true, false, true, 4, "P2")],
-                    LigneCourante = -1, Bandeau = T("multiplayer.result.classic_note"),
+                    Lignes = [Joueur("PLAYER 1", "FR", "A98BFF", false, true, true, 3, "") with { Place = 1 }, Joueur("PLAYER 2", "JP", "FF9F6B", true, false, true, 4, "") with { Place = 2 }],
+                    LigneCourante = -1, Bandeau = T("multiplayer.result.classic_note"), Disposition = LeaderboardOverlayService.DispositionDesJoueurs.Colonnes,
                     Aides = [new("button_a", T("multiplayer.help.replay")), new("button_b", T("multiplayer.help.close"))],
                 }, "", "", "", journal),
                 "np-panel" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with
@@ -151,10 +157,10 @@ public sealed class MultiplayerController : ControllerBase
                     Badge = string.Empty, Info = "1 VS 1", NousAvonsLaMain = true, Compte = "1/2", DecompteFinUtc = null,
                     Lignes =
                     [
-                        deux[0] with { Personnage = "KEN", Avatar = planche, Portrait = Portrait(307540), Place = 1 },
+                        deux[0] with { Personnage = "KEN", Avatar = planche, Portrait = Portrait(307540), Place = 1, Cote = "ELO 1516", Provisoire = T("multiplayer.rating.provisional") },
                         new(T("multiplayer.seat.free"), "", "", false, false, false, null, T("multiplayer.seat.waiting"), Place: 2, Libre: true),
                     ],
-                    Selection = bande, SelectionCourante = 4,
+                    Selection = bande, SelectionCourante = 4, LigneCourante = -1, Disposition = LeaderboardOverlayService.DispositionDesJoueurs.Colonnes,
                     Aides = [new("dpad_leftright", T("multiplayer.help.tab")), new("dpad_updown", T("multiplayer.help.character")), new("button_b", T("multiplayer.help.back"))],
                 }, "", "", "", journal),
                 "np-panel-full" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with
@@ -162,10 +168,10 @@ public sealed class MultiplayerController : ControllerBase
                     Badge = string.Empty, Info = "1 VS 1", NousAvonsLaMain = true, Compte = "2/2", DecompteFinUtc = DateTime.UtcNow.AddSeconds(4),
                     Lignes =
                     [
-                        deux[0] with { Personnage = "KEN", Avatar = planche, Portrait = Portrait(307540), Place = 1 },
-                        deux[1] with { Personnage = "CHUN-LI", Portrait = Portrait(307541), Place = 2 },
+                        deux[0] with { Personnage = "KEN", Avatar = planche, Portrait = Portrait(307540), Place = 1, Cote = "ELO 1516", Provisoire = T("multiplayer.rating.provisional") },
+                        deux[1] with { Personnage = "CHUN-LI", Portrait = Portrait(307541), Place = 2, Cote = "ELO 1484", Provisoire = T("multiplayer.rating.provisional") },
                     ],
-                    Selection = bande, SelectionCourante = 4,
+                    Selection = bande, SelectionCourante = 4, LigneCourante = -1, Disposition = LeaderboardOverlayService.DispositionDesJoueurs.Colonnes,
                     Aides = [new("dpad_leftright", T("multiplayer.help.tab")), new("dpad_updown", T("multiplayer.help.character")), new("button_b", T("multiplayer.help.back"))],
                 }, "", "", "", journal),
                 "panel-seats" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with
@@ -178,7 +184,7 @@ public sealed class MultiplayerController : ControllerBase
                         new(T("multiplayer.seat.free"), "", "", false, false, false, null, T("multiplayer.seat.waiting"), Place: 3, Libre: true),
                         new(T("multiplayer.seat.free"), "", "", false, false, false, null, T("multiplayer.seat.waiting"), Place: 4, Libre: true),
                     ],
-                    Aides = aides,
+                    Aides = aides, LigneCourante = -1, Disposition = LeaderboardOverlayService.DispositionDesJoueurs.Grille,
                 }, "", "", "", journal),
                 "np-presentation" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with { Badge = string.Empty },
                     T("multiplayer.syncing"), "Street Fighter II' Champion Edition", "P1 KEN  ·  P2 CHUN-LI", journal),
@@ -188,18 +194,18 @@ public sealed class MultiplayerController : ControllerBase
                     Info = T("multiplayer.result.playtime") + " 1:01", DecompteFinUtc = DateTime.UtcNow.AddSeconds(12),
                     Lignes =
                     [
-                        Joueur("PLAYER 1", "FR", "A98BFF", false, true, true, 3, "P1 · " + T("multiplayer.result.victory") + " · 1516 (+16)") with
+                        Joueur("PLAYER 1", "FR", "A98BFF", false, true, true, 3, "") with
                         {
-                            Personnage = "KEN  ·  " + T("multiplayer.result.stats").Replace("{hits}", "12").Replace("{kos}", "2").Replace("{perfects}", "1"),
-                            Avatar = planche, Portrait = Portrait(307540), Place = 1,
+                            Personnage = "KEN", Avatar = planche, Portrait = Portrait(307540), Place = 1, Issue = T("multiplayer.result.victory"), Gagnant = true,
+                            Cote = "ELO 1516", Evolution = "+16", Provisoire = T("multiplayer.rating.provisional"), Stats = Stats(12, 2, 1, 288),
                         },
-                        Joueur("PLAYER 2", "JP", "FF9F6B", true, false, true, 4, "P2 · " + T("multiplayer.result.defeat") + " · 1484 (-16)") with
+                        Joueur("PLAYER 2", "JP", "FF9F6B", true, false, true, 4, "") with
                         {
-                            Personnage = "CHUN-LI  ·  " + T("multiplayer.result.stats").Replace("{hits}", "7").Replace("{kos}", "0").Replace("{perfects}", "0"),
-                            Portrait = Portrait(307541), Place = 2,
+                            Personnage = "CHUN-LI", Portrait = Portrait(307541), Place = 2, Issue = T("multiplayer.result.defeat"),
+                            Cote = "ELO 1484", Evolution = "-16", Provisoire = T("multiplayer.rating.provisional"), Stats = Stats(7, 0, 0, 90),
                         },
                     ],
-                    LigneCourante = -1, Bandeau = string.Empty,
+                    LigneCourante = -1, Bandeau = string.Empty, Disposition = LeaderboardOverlayService.DispositionDesJoueurs.Colonnes,
                     Aides = [new("button_a", T("multiplayer.help.replay")), new("button_b", T("multiplayer.help.close"))],
                     PartageDesDegats = new LeaderboardOverlayService.Partage(288 / 378d, "A98BFF", "FF9F6B", T("multiplayer.result.damage")),
                 }, "", "", "", journal),

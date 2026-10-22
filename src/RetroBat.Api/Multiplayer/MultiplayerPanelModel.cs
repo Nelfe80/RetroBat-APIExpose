@@ -54,7 +54,10 @@ public sealed class MultiplayerPanelModel
     }
 
     private int _onglet = Onglets.Count - 1;
-    private int _ligne;
+
+    // -1 : aucune ligne choisie, seul l'onglet est actif (retour du user du 22/10 : entrer dans le panneau surlignait le
+    // premier joueur, qui n'etait pas toujours soi). Seul INVITE FRIENDS a des lignes a choisir, ▼ y prend la premiere.
+    private int _ligne = -1;
     private int _lignes;
 
     public Foyer Etat { get; private set; } = Foyer.Ferme;
@@ -70,20 +73,22 @@ public sealed class MultiplayerPanelModel
     {
         Etat = Foyer.MenuEs;
         _onglet = Onglets.Count - 1;
-        _ligne = 0;
+        _ligne = -1;
     }
 
     public void Fermer()
     {
         Etat = Foyer.Ferme;
-        _ligne = 0;
+        _ligne = -1;
     }
+
+    private bool LignesAChoisir => Etat == Foyer.Panneau && OngletCourant == Onglet.InviteFriends;
 
     /// <summary>Le nombre de lignes de l'onglet courant, pour borner ▲▼.</summary>
     public void PoserLesLignes(int nombre)
     {
         _lignes = Math.Max(0, nombre);
-        _ligne = _lignes == 0 ? 0 : Math.Clamp(_ligne, 0, _lignes - 1);
+        _ligne = OngletCourant != Onglet.InviteFriends || _lignes == 0 ? -1 : Math.Clamp(_ligne, -1, _lignes - 1);
     }
 
     public Effet Gauche()
@@ -94,11 +99,11 @@ public sealed class MultiplayerPanelModel
                 // Depuis le menu d'ES : on entre chez nous, contre la porte.
                 Etat = Foyer.Panneau;
                 _onglet = Onglets.Count - 1;
-                _ligne = 0;
+                _ligne = -1;
                 return Effet.PrendreLeFocus;
             case Foyer.Panneau when _onglet > 0:
                 _onglet--;
-                _ligne = 0;
+                _ligne = -1;
                 return Effet.ChargerLOnglet;
             default:
                 return Effet.Rien;   // le mur : ES ne reboucle pas non plus
@@ -119,13 +124,14 @@ public sealed class MultiplayerPanelModel
         }
 
         _onglet++;
-        _ligne = 0;
+        _ligne = -1;
         return Effet.ChargerLOnglet;
     }
 
+    /// <summary>▲ : remonte d'une ligne, jusqu'a l'onglet seul (aucune ligne).</summary>
     public Effet Haut()
     {
-        if (Etat != Foyer.Panneau || _ligne == 0)
+        if (!LignesAChoisir || _ligne < 0)
         {
             return Effet.Rien;
         }
@@ -136,7 +142,7 @@ public sealed class MultiplayerPanelModel
 
     public Effet Bas()
     {
-        if (Etat != Foyer.Panneau || _ligne >= _lignes - 1)
+        if (!LignesAChoisir || _ligne >= _lignes - 1)
         {
             return Effet.Rien;
         }
@@ -147,7 +153,7 @@ public sealed class MultiplayerPanelModel
 
     /// <summary>A : agir sur la ligne. Seul INVITE FRIENDS a une action ; ailleurs, rien.</summary>
     public Effet Valider()
-        => Etat == Foyer.Panneau && OngletCourant == Onglet.InviteFriends && _lignes > 0 ? Effet.AgirSurLaLigne : Effet.Rien;
+        => LignesAChoisir && _lignes > 0 && _ligne >= 0 ? Effet.AgirSurLaLigne : Effet.Rien;
 
     /// <summary>B relache : « BACK » veut dire la meme chose partout. Depuis le menu d'ES, ferme le panneau.</summary>
     public Effet Annuler()
