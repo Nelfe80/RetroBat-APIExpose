@@ -80,7 +80,10 @@ public sealed partial class LeaderboardOverlayService
         IReadOnlyList<PortraitDeChoix>? Selection = null,
         int SelectionCourante = -1,
         Partage? PartageDesDegats = null,
-        DispositionDesJoueurs Disposition = DispositionDesJoueurs.Liste);
+        DispositionDesJoueurs Disposition = DispositionDesJoueurs.Liste,
+        bool PleinEcran = false,
+        string BoutonOk = "",
+        string GlypheOk = "");
 
     /// <summary>
     /// La barre de partage du resultat (00quater.3) : la part des degats infliges par chaque cote d'un duel, a ses
@@ -104,6 +107,7 @@ public sealed partial class LeaderboardOverlayService
 
     public void MontrerMultiplayer(ContenuMultiplayer contenu)
     {
+        bool etendre;
         lock (_gate)
         {
             if (_multiplayer is null)
@@ -111,8 +115,14 @@ public sealed partial class LeaderboardOverlayService
                 return;   // le panneau a ete ferme ou rendu au classement entre-temps
             }
 
+            etendre = _multiplayer.PleinEcran != contenu.PleinEcran;
             _multiplayer = contenu;
             _dernierGeste = DateTime.UtcNow;
+        }
+
+        if (etendre)
+        {
+            _forme?.SEtendre(contenu.PleinEcran);
         }
 
         _forme?.Rafraichir();
@@ -140,27 +150,17 @@ public sealed partial class LeaderboardOverlayService
             float taillePetite,
             float taillePied)
         {
+            if (c.PleinEcran)
+            {
+                DessinerLeResultatPleinEcran(g, c, s, policeTitre, policeTexte, policePetite, policeGras, policePied,
+                    tailleTitre, tailleTexte, taillePetite, taillePied);
+                return;
+            }
+
             // Le logo MULTIPLAYER tient le titre, comme celui de World Scoring.
             var hauteurTitre = tailleTitre * 1.5f;
             var y = _hauteurEcran * 0.0637f - hauteurTitre / 2f;
-            var chemin = Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", "nelfeplay-multiplayer.png");
-            var logo = File.Exists(chemin) ? _service._glyphes?.Glyphe(chemin, (int)Math.Round(hauteurTitre * 1.75f)) : null;
-            if (logo is not null && logo.Width > Width * 0.75f)
-            {
-                logo = _service._glyphes?.Glyphe(chemin, (int)Math.Round(hauteurTitre * 1.75f * Width * 0.75f / logo.Width));
-            }
-
-            if (logo is not null)
-            {
-                g.DrawImage(logo, (Width - logo.Width) / 2f, y + (hauteurTitre - logo.Height) / 2f - hauteurTitre * 0.22f, logo.Width, logo.Height);
-            }
-            else
-            {
-                using var encre = new SolidBrush(Teinte(s.TitleColor));
-                using var centre = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-                g.DrawString("MULTIPLAYER", policeTitre, encre, new RectangleF(0, y, Width, hauteurTitre), centre);
-            }
-
+            DessinerLeLogoMultiplayer(g, s, policeTitre, hauteurTitre, y, Width * 0.75f);
             y = _hauteurEcran * 0.0637f * 2f - hauteurTitre / 2f;
             var marge = _largeurEcran * 0.012f;
 
@@ -224,6 +224,156 @@ public sealed partial class LeaderboardOverlayService
             }
 
             DessinerLAide(g, socle with { Aides = c.Aides, Pseudo = c.Pseudo, EnLigne = c.EnLigne }, s, policePied, taillePied, basDeLAide + tailleTexte * 1.9f);
+        }
+
+        /// <summary>Le logo MULTIPLAYER centre, a la hauteur du titre et jamais plus large que <paramref name="largeurMax"/>.</summary>
+        private void DessinerLeLogoMultiplayer(Graphics g, EsMenuStyle s, Font policeTitre, float hauteurTitre, float y, float largeurMax)
+        {
+            var chemin = Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", "nelfeplay-multiplayer.png");
+            var logo = File.Exists(chemin) ? _service._glyphes?.Glyphe(chemin, (int)Math.Round(hauteurTitre * 1.75f)) : null;
+            if (logo is not null && logo.Width > largeurMax)
+            {
+                logo = _service._glyphes?.Glyphe(chemin, (int)Math.Round(hauteurTitre * 1.75f * largeurMax / logo.Width));
+            }
+
+            if (logo is not null)
+            {
+                g.DrawImage(logo, (Width - logo.Width) / 2f, y + (hauteurTitre - logo.Height) / 2f - hauteurTitre * 0.22f, logo.Width, logo.Height);
+            }
+            else
+            {
+                using var encre = new SolidBrush(Teinte(s.TitleColor));
+                using var centre = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+                g.DrawString("MULTIPLAYER", policeTitre, encre, new RectangleF(0, y, Width, hauteurTitre), centre);
+            }
+        }
+
+        /// <summary>
+        /// LE RESULTAT EN PLEIN ECRAN (retour du user du 23/10) : tout l'ecran d'ES, la marque puis l'issue de la rencontre
+        /// en grand, les cartes des joueurs dans une colonne au centre, et en bas le bouton OK. Le resultat reste jusqu'a ce
+        /// que le joueur le valide.
+        /// </summary>
+        private void DessinerLeResultatPleinEcran(Graphics g, ContenuMultiplayer c, EsMenuStyle s, Font policeTitre, Font policeTexte,
+            Font policePetite, Font policeGras, Font policePied, float tailleTitre, float tailleTexte, float taillePetite, float taillePied)
+        {
+            var colonne = Math.Min(Width * 0.72f, _hauteurEcran * 1.3f);
+            var marge = (Width - colonne) / 2f;
+            var hauteurTitre = tailleTitre * 1.5f;
+            var y = _hauteurEcran * 0.035f;
+            DessinerLeLogoMultiplayer(g, s, policeTitre, hauteurTitre, y, colonne * 0.6f);
+            y += hauteurTitre + tailleTexte * 0.4f;
+
+            // L'issue : VICTOIRE, DEFAITE, ABANDON, RENCONTRE ANNULEE, PARTIE TERMINEE.
+            if (c.Onglets.Count > 0 && c.Onglets[0].Length > 0)
+            {
+                using var policeIssue = new Font(policeTitre.FontFamily, policeTitre.Size * 1.45f, FontStyle.Bold, policeTitre.Unit);
+                using var encre = new SolidBrush(Teinte(s.TitleColor));
+                using var centre = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+                var hauteur = policeIssue.Size * 1.35f;
+                g.DrawString(c.Onglets[0].ToUpperInvariant(), policeIssue, encre, new RectangleF(0, y, Width, hauteur), centre);
+                y += hauteur + tailleTexte * 0.4f;
+            }
+
+            if (c.Badge.Length > 0 || c.Info.Length > 0 || c.Compte.Length > 0)
+            {
+                var carte = new RectangleF(marge, y, colonne, tailleTexte * 1.9f);
+                using (var contour = Arrondi(carte, tailleTexte * 0.3f))
+                using (var fond = new SolidBrush(Color.FromArgb(120, 8, 10, 14)))
+                {
+                    g.FillPath(fond, contour);
+                }
+
+                DessinerLInfoMultiplayer(g, c, s, policeTexte, policePetite, tailleTexte, marge + tailleTexte * 0.5f, y);
+                y = carte.Bottom + tailleTexte * 0.5f;
+            }
+
+            if (c.PartageDesDegats is { } partage)
+            {
+                y = DessinerLePartage(g, partage, s, policePetite, tailleTexte, taillePetite, marge, y);
+            }
+
+            if (c.Bandeau.Length > 0)
+            {
+                using var encre = new SolidBrush(Teinte(s.GroupColor));
+                using var centre = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, Trimming = StringTrimming.Word };
+                g.DrawString(c.Bandeau, policePetite, encre, new RectangleF(marge, y, colonne, taillePetite * 2.8f), centre);
+                y += taillePetite * 3f;
+            }
+
+            // En bas : l'aide, et au-dessus le bouton OK.
+            var hauteurAide = taillePied * 1.5f;
+            var hautDeLAide = Height - _hauteurEcran * 0.03f - hauteurAide;
+            var hauteurBouton = tailleTexte * 2.3f;
+            var hautDuBouton = hautDeLAide - tailleTexte * 0.7f - hauteurBouton;
+            if (c.BoutonOk.Length > 0)
+            {
+                DessinerLeBoutonOk(g, c, s, policeGras, tailleTexte, hautDuBouton, hauteurBouton);
+            }
+
+            DessinerLAideCentree(g, c.Aides, s, policePied, taillePied, hautDeLAide);
+
+            var bas = hautDuBouton - tailleTexte * 0.8f;
+            if (c.Disposition == DispositionDesJoueurs.Liste)
+            {
+                DessinerLesJoueurs(g, c, s, policeGras, policePetite, tailleTexte, taillePetite, marge, y, bas);
+            }
+            else if (c.Lignes.Count > 0)
+            {
+                DessinerLesCartes(g, c, s, policeGras, policePetite, tailleTexte, marge, y, bas);
+            }
+        }
+
+        /// <summary>Le bouton OK, centre : la couleur de selection du theme, le glyphe du bouton « valider » et son mot.</summary>
+        private void DessinerLeBoutonOk(Graphics g, ContenuMultiplayer c, EsMenuStyle s, Font gras, float taille, float y, float hauteur)
+        {
+            var encre = Teinte(s.SelectedTextColor);
+            var icone = c.GlypheOk.Length > 0 ? _service._glyphes?.Glyphe(c.GlypheOk, (int)(taille * 1.3f), encre) : null;
+            var mot = c.BoutonOk.ToUpperInvariant();
+            var largeurMot = g.MeasureString(mot, gras, PointF.Empty, StringFormat.GenericTypographic).Width;
+            var contenu = (icone is null ? 0f : icone.Width + taille * 0.5f) + largeurMot;
+            var largeur = Math.Max(taille * 8f, contenu + taille * 2.4f);
+            var zone = new RectangleF((Width - largeur) / 2f, y, largeur, hauteur);
+            using (var forme = Arrondi(zone, hauteur * 0.5f))
+            using (var fond = new SolidBrush(Teinte(s.SelectorColor)))
+            {
+                g.FillPath(fond, forme);
+            }
+
+            var x = zone.X + (zone.Width - contenu) / 2f;
+            if (icone is not null)
+            {
+                g.DrawImage(icone, x, zone.Y + (hauteur - icone.Height) / 2f, icone.Width, icone.Height);
+                x += icone.Width + taille * 0.5f;
+            }
+
+            using var pinceau = new SolidBrush(encre);
+            using var milieu = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center };
+            g.DrawString(mot, gras, pinceau, new RectangleF(x, zone.Y, largeurMot + 4f, hauteur), milieu);
+        }
+
+        /// <summary>La ligne d'aide d'ES (glyphe puis mot), centree sur l'ecran.</summary>
+        private void DessinerLAideCentree(Graphics g, IReadOnlyList<Aide> aides, EsMenuStyle s, Font police, float taille, float y)
+        {
+            var hauteur = taille * 1.5f;
+            var couleurIcone = Teinte(s.HelpIconColor);
+            var morceaux = aides.Select(a => (Icone: _service._glyphes?.Glyphe(a.Glyphe, (int)(taille * 1.2f), couleurIcone), Mot: a.Mot.ToUpperInvariant())).ToList();
+            float Mesure(string mot) => g.MeasureString(mot, police, PointF.Empty, StringFormat.GenericTypographic).Width;
+            var total = morceaux.Sum(m => (m.Icone is null ? 0f : m.Icone.Width + taille * 0.35f) + Mesure(m.Mot))
+                + Math.Max(0, morceaux.Count - 1) * taille * 1.2f;
+            var x = (Width - total) / 2f;
+            using var encre = new SolidBrush(Teinte(s.FooterColor));
+            using var centre = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center };
+            foreach (var (icone, mot) in morceaux)
+            {
+                if (icone is not null)
+                {
+                    g.DrawImage(icone, x, y + (hauteur - icone.Height) / 2f, icone.Width, icone.Height);
+                    x += icone.Width + taille * 0.35f;
+                }
+
+                g.DrawString(mot, police, encre, new RectangleF(x, y, Width, hauteur), centre);
+                x += Mesure(mot) + taille * 1.2f;
+            }
         }
 
         /// <summary>

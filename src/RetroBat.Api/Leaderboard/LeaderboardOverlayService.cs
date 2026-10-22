@@ -53,6 +53,9 @@ public sealed partial class LeaderboardOverlayService : IDisposable
     public void PoserLesSuivis(IReadOnlySet<string> suivis) => _suivis = suivis;
     private DateTime _dernierGeste = DateTime.UtcNow;
 
+    /// <summary>Le voile noir de fin de partie est a l'ecran, sans rien d'autre (voir FonduAuNoir).</summary>
+    private bool _noir;
+
     public LeaderboardOverlayService(ILogger<LeaderboardOverlayService> logger)
     {
         _logger = logger;
@@ -218,6 +221,7 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             _style = style;
             _contenu = contenu;
             _multiplayer = multiplayer;
+            _noir = false;
             _dernierGeste = DateTime.UtcNow;
             if (_glyphes is null)
             {
@@ -225,7 +229,8 @@ public sealed partial class LeaderboardOverlayService : IDisposable
                 _glyphes.Pret += () => _forme?.Rafraichir();   // un glyphe pret : on redessine
             }
             ChargerLesPolices(style);
-            _forme?.SEtendre(false);   // jamais rouvrir en plein ecran d'attente
+            // Jamais rouvrir en plein ecran d'attente ; le resultat MULTIPLAYER, lui, prend tout l'ecran (23/10).
+            _forme?.SEtendre(multiplayer?.PleinEcran == true);
 
             if (_fil is null)
             {
@@ -238,6 +243,53 @@ public sealed partial class LeaderboardOverlayService : IDisposable
         // Sans cela, la fenetre n'apparaissait qu'au prochain tour du minuteur : jusqu'a une
         // demi-seconde d'attente apres que tout etait pret.
         _forme?.Paraitre();
+        if (multiplayer?.PleinEcran == true)
+        {
+            // L'ecran de fin sort du noir (retour du user du 23/10), celui du fondu de fin de partie s'il est la.
+            _forme?.SortirDuNoir();
+        }
+    }
+
+    /// <summary>
+    /// LE FONDU AU NOIR DE FIN DE PARTIE (retour du user du 23/10) : le noir monte sur l'image du jeu juste avant que
+    /// RetroArch se ferme ; l'ecran de fin en sortira. Rien si un panneau est deja la ou si la fenetre n'existe pas
+    /// encore. Un voile que rien ne vient remplacer s'en va de lui-meme au bout de 30 s. Vrai si le fondu part.
+    /// </summary>
+    public bool FonduAuNoir(EsMenuStyle style, TimeSpan duree)
+    {
+        Panneau? forme;
+        lock (_gate)
+        {
+            forme = _forme;
+            if (Affiche || forme is null)
+            {
+                return false;
+            }
+
+            _style = style;
+            _noir = true;
+            _multiplayer = null;
+            _dernierGeste = DateTime.UtcNow;
+            Affiche = true;
+        }
+
+        forme.FonduAuNoir(duree);
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(TimeSpan.FromSeconds(30)).ConfigureAwait(false);
+            bool encore;
+            lock (_gate)
+            {
+                encore = _noir && Affiche;
+            }
+
+            if (encore)
+            {
+                _logger.LogInformation("MULTIPLAYER : le voile de fin de partie n'a pas ete remplace en 30 s, il s'en va.");
+                Fermer();
+            }
+        });
+        return true;
     }
 
     public void Montrer(Contenu contenu)
@@ -264,6 +316,7 @@ public sealed partial class LeaderboardOverlayService : IDisposable
         {
             _contenu = _contenu with { Attente = "", AttenteTitre = "", AttenteDetail = "" };
             _multiplayer = null;
+            _noir = false;
         }
     }
 
@@ -279,6 +332,7 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             Affiche = false;
             _contenu = _contenu with { Attente = "", AttenteTitre = "", AttenteDetail = "" };
             _multiplayer = null;
+            _noir = false;
         }
         ANousLaMain = false;
         _forme?.RefuserLActivation();
@@ -464,6 +518,19 @@ public sealed partial class LeaderboardOverlayService : IDisposable
         private int _imageAttente;
         private int _imageSablier;
 
+        /// <summary>
+        /// LE FONDU (23/10) : la fenetre monte de transparente a opaque en <c>_montee</c> ms, noire ; puis le voile noir peint
+        /// par-dessus le contenu (<c>_voile</c>, 0 a 255) s'efface en <c>_sortie</c> ms. Une seule horloge pour les deux.
+        /// </summary>
+        private readonly System.Windows.Forms.Timer _horlogeDuFondu = new() { Interval = 16 };
+        private DateTime _debutDuFondu;
+        private double _montee;
+        private double _sortie;
+        private int _voile;
+
+        private const int MonteeAvantLEcranDeFin = 300;
+        private const int SortieDuNoir = 500;
+
         private static bool AUnReplayEnPreparation(Contenu c)
             => (c.ReplaysEnPreparation is { Count: > 0 } attente
                 && c.Lignes.Any(l => l.CestMoi && l.ReplayId is not { Length: > 0 } && attente.Contains(l.Valeur)))
@@ -503,7 +570,9 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             // gardes entre les deux volets : c'est le plus large possible sans rien empieter.
             var w = _largeurEcran - largeurMenuEs - _largeurEcran * 0.15f;
             _largeurNormale = (int) w;
-            Bounds = new Rectangle(ecranDEs.X, ecranDEs.Y, (int) w, BasDuPanneau(_hauteurEcran));
+            Bounds = service.LireMultiplayer() is { PleinEcran: true }
+                ? ecranDEs
+                : new Rectangle(ecranDEs.X, ecranDEs.Y, (int) w, BasDuPanneau(_hauteurEcran));
 
             _minuteur = new System.Windows.Forms.Timer { Interval = 500 };
             _minuteur.Tick += (_, _) =>
@@ -521,6 +590,77 @@ public sealed partial class LeaderboardOverlayService : IDisposable
                 }
             };
             _minuteur.Start();
+            _horlogeDuFondu.Tick += (_, _) => AnimerLeFondu();
+        }
+
+        /// <summary>Le noir monte sur ce qui est a l'ecran (le jeu), plein ecran, sans prendre le premier plan.</summary>
+        public void FonduAuNoir(TimeSpan duree)
+        {
+            if (!IsHandleCreated) return;
+            BeginInvoke(() =>
+            {
+                var (ecran, _, _) = EcranDEs();
+                Bounds = ecran;
+                _voile = 255;
+                _montee = Math.Max(1, duree.TotalMilliseconds);
+                _sortie = 0;
+                Opacity = 0;
+                if (!Visible) Show();
+                PasserDevant();
+                _debutDuFondu = DateTime.UtcNow;
+                _horlogeDuFondu.Start();
+                Invalidate();
+            });
+        }
+
+        /// <summary>
+        /// L'ecran de fin sort du noir : tout de suite si le voile est deja la, sinon apres une courte montee au noir (on ne
+        /// passe jamais d'ES a l'ecran de fin sans fondu).
+        /// </summary>
+        public void SortirDuNoir()
+        {
+            if (!IsHandleCreated) return;
+            BeginInvoke(() =>
+            {
+                var dejaNoir = Visible && Opacity >= 0.99 && _voile == 255;
+                _montee = dejaNoir ? 0 : MonteeAvantLEcranDeFin;
+                _sortie = SortieDuNoir;
+                if (!dejaNoir)
+                {
+                    _voile = 255;
+                    Opacity = 0;
+                }
+
+                _debutDuFondu = DateTime.UtcNow;
+                _horlogeDuFondu.Start();
+                Invalidate();
+            });
+        }
+
+        private void AnimerLeFondu()
+        {
+            var t = (DateTime.UtcNow - _debutDuFondu).TotalMilliseconds;
+            if (_montee > 0 && t < _montee)
+            {
+                Opacity = t / _montee;
+                _voile = 255;
+            }
+            else
+            {
+                Opacity = 1d;
+                var apres = t - _montee;
+                if (_sortie > 0)
+                {
+                    _voile = apres >= _sortie ? 0 : (int)Math.Round(255 * (1 - apres / _sortie));
+                }
+
+                if (_sortie <= 0 || apres >= _sortie)
+                {
+                    _horlogeDuFondu.Stop();
+                }
+            }
+
+            Invalidate();
         }
 
         protected override bool ShowWithoutActivation => true;
@@ -593,7 +733,16 @@ public sealed partial class LeaderboardOverlayService : IDisposable
 
         public void Cacher()
         {
-            if (IsHandleCreated) BeginInvoke(() => { if (Visible) Hide(); });
+            if (IsHandleCreated) BeginInvoke(() =>
+            {
+                if (Visible) Hide();
+                if (_voile != 0 || Opacity < 1d)
+                {
+                    _horlogeDuFondu.Stop();
+                    _voile = 0;
+                    Opacity = 1d;
+                }
+            });
         }
 
         public void Fermer()
@@ -758,6 +907,15 @@ public sealed partial class LeaderboardOverlayService : IDisposable
                 _service._depuisLAppui = null;
             }
 
+            // Le voile de fin de partie seul : du noir, rien d'autre.
+            bool noir;
+            lock (_service._gate) noir = _service._noir;
+            if (noir)
+            {
+                g.Clear(Color.Black);
+                return;
+            }
+
             DessinerLeCadre(g);
 
             // MULTIPLAYER (lot M3) : la meme fenetre, un autre contenu.
@@ -765,6 +923,12 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             {
                 DessinerLeMultiplayer(g, multiplayer, c, s, policeTitre, policeTexte, policePetite, policeGras, policePied,
                     tailleTitre, tailleTexte, taillePetite, taillePied);
+                if (_voile > 0)
+                {
+                    using var voile = new SolidBrush(Color.FromArgb(_voile, 0, 0, 0));
+                    g.FillRectangle(voile, ClientRectangle);
+                }
+
                 return;
             }
 
@@ -1628,6 +1792,7 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             if (disposing)
             {
                 _minuteur.Dispose();
+                _horlogeDuFondu.Dispose();
             }
             base.Dispose(disposing);
         }

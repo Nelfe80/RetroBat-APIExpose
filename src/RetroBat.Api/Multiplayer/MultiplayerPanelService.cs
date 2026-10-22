@@ -28,8 +28,17 @@ public sealed class MultiplayerPanelService
     /// <summary>Les couleurs d'avatar, tirees de la poignee : la meme pour un joueur sur toutes les bornes.</summary>
     private static readonly string[] Couleurs = ["A98BFF", "78E5A3", "FF9F6B", "49E3CB", "FFD37A", "FF8C9A"];
 
-    /// <summary>V24-17 : « Vous serez de retour dans 12 s ».</summary>
-    private static readonly TimeSpan DureeDuResultat = TimeSpan.FromSeconds(12);
+    /// <summary>
+    /// Le resultat ne se ferme pas d'un appui fait juste avant qu'il paraisse : en fin de rencontre, les joueurs appuient
+    /// encore sur leurs boutons.
+    /// </summary>
+    private static readonly TimeSpan GardeDuResultat = TimeSpan.FromSeconds(1.5);
+
+    /// <summary>Le noir qui monte sur le jeu avant qu'il se ferme (retour du user du 23/10).</summary>
+    private static readonly TimeSpan DureeDuFondu = TimeSpan.FromMilliseconds(600);
+
+    /// <summary>Le temps laisse a RetroArch pour disparaitre avant que le resultat prenne la manette.</summary>
+    private static readonly TimeSpan PatienceDeLaSortie = TimeSpan.FromSeconds(20);
 
     private enum Mode
     {
@@ -83,7 +92,10 @@ public sealed class MultiplayerPanelService
     private string _langue = "";
     private string _roomDuResultat = "";
     private int? _dureeDuResultat;
-    private DateTime _finDuResultat;
+    private DateTime _resultatDepuis;
+
+    /// <summary>Le resultat a pris la manette : s'il la perd, il se ferme (voir RendreLaMain).</summary>
+    private bool _resultatALaMain;
     private CancellationTokenSource? _retour;
     private string _texteDuBandeau = "";
     private MultiplayerInvitation? _invitation;
@@ -221,9 +233,20 @@ public sealed class MultiplayerPanelService
     public void RendreLaMain()
     {
         bool change;
+        bool resultat;
         lock (_verrou)
         {
             change = _mode == Mode.Panneau && _modele.RendreLaMain();
+            // Le resultat qui perd la manette ne sert plus : le « valider » du bouton OK irait aussi a ES. Avant de l'avoir
+            // prise (RetroArch sort encore, ES n'est pas encore revenu), il reste.
+            resultat = _mode == Mode.Resultat && _resultatALaMain && !EnJeu();
+        }
+
+        if (resultat)
+        {
+            _journal.LogInformation("MULTIPLAYER : le resultat perd la manette, il se ferme.");
+            Fermer();
+            return;
         }
 
         if (change)
@@ -324,14 +347,23 @@ public sealed class MultiplayerPanelService
                 _mode = Mode.Resultat;
                 _roomDuResultat = room;
                 _dureeDuResultat = dureeSecondes;
-                _finDuResultat = DateTime.UtcNow + DureeDuResultat;
+                _resultatDepuis = DateTime.UtcNow;
+                _resultatALaMain = false;
                 _modele.Fermer();
             }
 
+            // EN PLEIN ECRAN, JUSQU'A OK (retour du user du 23/10). Le resultat parait des que le coeur est decharge, souvent
+            // avant que RetroArch ait fini de sortir ; il prend la manette une fois l'emulateur parti, sinon le « valider »
+            // du bouton OK irait aussi a ES, qui lancerait le jeu selectionne.
             _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal), Composer());
             try
             {
-                await Task.Delay(DureeDuResultat, retour.Token).ConfigureAwait(false);
+                var limite = DateTime.UtcNow + PatienceDeLaSortie;
+                while (EmulatorForeground.EmulateurDeJeuTourne() && DateTime.UtcNow < limite)
+                {
+                    await Task.Delay(250, retour.Token).ConfigureAwait(false);
+                }
+
                 bool encore;
                 lock (_verrou)
                 {
@@ -340,7 +372,14 @@ public sealed class MultiplayerPanelService
 
                 if (encore)
                 {
-                    Fermer();
+                    var pris = _overlay.PrendreLeFocus();
+                    lock (_verrou)
+                    {
+                        _resultatALaMain = pris;
+                    }
+
+                    _journal.LogInformation("MULTIPLAYER : resultat de {Room} a l'ecran, manette {Prise}", room,
+                        pris ? "prise" : "refusee par Windows (ES la garde)");
                 }
             }
             catch (OperationCanceledException)
@@ -411,7 +450,9 @@ public sealed class MultiplayerPanelService
             }
 
             rejouer = _mode == Mode.Resultat && maintenu;
-            effet = _mode == Mode.Panneau ? _modele.Valider() : MultiplayerPanelModel.Effet.Rien;
+            effet = _mode == Mode.Panneau ? _modele.Valider()
+                : _mode == Mode.Resultat && !maintenu && ResultatGarde() ? MultiplayerPanelModel.Effet.Fermer
+                : MultiplayerPanelModel.Effet.Rien;
         }
 
         if (rejouer)
@@ -445,7 +486,7 @@ public sealed class MultiplayerPanelService
 
             if (_mode == Mode.Resultat)
             {
-                effet = MultiplayerPanelModel.Effet.Fermer;
+                effet = ResultatGarde() ? MultiplayerPanelModel.Effet.Fermer : MultiplayerPanelModel.Effet.Rien;
             }
             else if (_mode == Mode.Panneau)
             {
@@ -459,6 +500,16 @@ public sealed class MultiplayerPanelService
 
         Appliquer(effet);
     }
+
+    /// <summary>
+    /// LE FONDU AU NOIR DE FIN DE PARTIE (retour du user du 23/10) : le noir monte sur le jeu, l'ecran de fin en sortira.
+    /// Rendu une fois le noir complet ; tout de suite s'il n'a pas pu partir (un voile deja la, par exemple).
+    /// </summary>
+    public Task FonduAuNoirAsync()
+        => _overlay.FonduAuNoir(EsMenuStyle.Lire(_journal), DureeDuFondu) ? Task.Delay(DureeDuFondu) : Task.CompletedTask;
+
+    /// <summary>Le resultat est-il la depuis assez longtemps pour qu'un appui le ferme (voir GardeDuResultat) ?</summary>
+    private bool ResultatGarde() => DateTime.UtcNow - _resultatDepuis >= GardeDuResultat;
 
     /// <summary>L'appui long pendant une invitation : le joueur rejoint la gameroom de son ami.</summary>
     public async Task AccepterInvitationAsync(CancellationToken ct = default)
@@ -1089,14 +1140,18 @@ public sealed class MultiplayerPanelService
             classique ? T("multiplayer.badge.classic") : string.Empty,
             info,
             string.Empty,
-            _finDuResultat,
+            null,
             joueurs,
             -1,
             string.Empty,
             classique && !classe ? T("multiplayer.result.classic_note") : bandeauDuResultat,
             [new(_glypheValider, T("multiplayer.help.replay")), new(_glypheAnnuler, T("multiplayer.help.close"))],
             PartageDesDegats: classe ? LePartage(finie, T) : null,
-            Disposition: disposition);
+            Disposition: disposition,
+            // En plein ecran, jusqu'a OK (retour du user du 23/10) : « OK » se lit dans toutes les langues.
+            PleinEcran: true,
+            BoutonOk: "OK",
+            GlypheOk: _glypheValider);
     }
 
     /// <summary>La part des degats infliges par chaque place d'un duel, a leurs couleurs (P1 a gauche).</summary>

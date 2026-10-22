@@ -112,6 +112,13 @@ public class MultiplayerApercusTests
             ],
         };
 
+        // Le resultat en plein ecran, jusqu'a OK (retour du user du 23/10).
+        var aidesPlein = new List<L.Aide> { new("button_a", "HOLD: PLAY AGAIN"), new("button_b", "CLOSE") };
+        foreach (var nom in new[] { "np-2-resultat", "np-2-abandon-moi", "classique-3-resultat" })
+        {
+            vues[nom + "-plein"] = vues[nom] with { PleinEcran = true, BoutonOk = "OK", GlypheOk = "button_a", DecompteFinUtc = null, Aides = aidesPlein };
+        }
+
         var cartes = MultiplayerToastOverlay.Apercu(style,
         [
             new("MULTIPLAYER SUSPENDED", "3 matches left before the end", "a match played to the end removes one", DateTime.UtcNow.AddSeconds(14 * 60 + 32), Alerte: true),

@@ -49,10 +49,13 @@ public sealed class MultiplayerBilanDuWrapper : IDisposable
         }
     }
 
-    /// <summary>Le bilan recu depuis <paramref name="depuis"/>, attendu jusqu'a <paramref name="delai"/> ; null sans bilan.</summary>
-    public async Task<JsonElement?> AttendreAsync(DateTime depuis, TimeSpan delai)
+    /// <summary>
+    /// Le bilan recu depuis <paramref name="depuis"/>, attendu jusqu'a <paramref name="delai"/> (sans limite :
+    /// <see cref="Timeout.InfiniteTimeSpan"/>) ; null sans bilan, ou si <paramref name="ct"/> l'interrompt.
+    /// </summary>
+    public async Task<JsonElement?> AttendreAsync(DateTime depuis, TimeSpan delai, CancellationToken ct = default)
     {
-        var limite = DateTime.UtcNow + delai;
+        var limite = delai == Timeout.InfiniteTimeSpan ? DateTime.MaxValue : DateTime.UtcNow + delai;
         while (true)
         {
             lock (_verrou)
@@ -68,7 +71,14 @@ public sealed class MultiplayerBilanDuWrapper : IDisposable
                 return null;
             }
 
-            await Task.Delay(200).ConfigureAwait(false);
+            try
+            {
+                await Task.Delay(200, ct).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                return null;
+            }
         }
     }
 

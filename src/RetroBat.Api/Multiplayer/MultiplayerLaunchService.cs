@@ -59,6 +59,9 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// <summary>L'etat d'un depart pret pose dans l'emplacement reserve de RetroArch, retire a la fin de la partie.</summary>
     private string? _etatPose;
 
+    /// <summary>La sortie du lanceur de la derniere partie : ses reglages se rendent alors (voir AttendreLaFinAsync).</summary>
+    private Task? _sortie;
+
     public MultiplayerLaunchService(
         MultiplayerSessionService session,
         MultiplayerClient client,
@@ -215,6 +218,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
         finally
         {
+            await AttendreLaSortieAsync().ConfigureAwait(false);
             lock (_verrou)
             {
                 _enCours = null;
@@ -320,6 +324,8 @@ public sealed class MultiplayerLaunchService : IHostedService
             return;   // la partie s'est fermee avant
         }
 
+        // Le noir monte sur le jeu, puis RetroArch se ferme : l'ecran de fin sortira du noir (retour du user du 23/10).
+        await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
         await RetroArchInvite.FermerAsync().ConfigureAwait(false);
     }
 
@@ -352,6 +358,9 @@ public sealed class MultiplayerLaunchService : IHostedService
             var reponse = await _client.RapporterAsync(room.Room, vainqueur.Value, CancellationToken.None).ConfigureAwait(false);
             _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} vue finie chez l'invite, place {Place} rapportee ({Statut})",
                 jeu.Id, vainqueur, reponse?.Ok == true ? "ok" : reponse?.Reason ?? "injoignable");
+            // Le noir monte en meme temps que chez l'hote, qui ferme le jeu au meme delai (retour du user du 23/10).
+            await Task.Delay(TimeSpan.FromSeconds(jeu.End!.CloseAfterS), ct).ConfigureAwait(false);
+            await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -446,6 +455,7 @@ public sealed class MultiplayerLaunchService : IHostedService
                 async () =>
                 {
                     _journal.LogInformation("MULTIPLAYER : l'hote de {Room} est parti, la partie se ferme", room.Room);
+                    await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
                     await RetroArchInvite.FermerAsync().ConfigureAwait(false);
                 }, _journal));
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
@@ -476,6 +486,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
         finally
         {
+            await AttendreLaSortieAsync().ConfigureAwait(false);
             lock (_verrou)
             {
                 _enCours = null;
@@ -588,7 +599,37 @@ public sealed class MultiplayerLaunchService : IHostedService
         return annulee && jeu.EstClasse ? motif : null;
     }
 
+    /// <summary>
+    /// LA PARTIE EST FINIE QUAND LE COEUR EST DECHARGE (retour du user du 23/10 : « j'etais devant ES pendant 10 secondes
+    /// avec netplay disconnected »). RetroArch rend alors son bilan au wrapper, puis plante en sortant (0xC0000005) et ne
+    /// rend la main au lanceur qu'une dizaine de secondes plus tard. Le resultat n'attend plus cette sortie ; les reglages
+    /// se rendent, et la fin du jeu s'annonce, quand le lanceur est vraiment sorti (RetroArch ecrit encore en partant).
+    /// </summary>
     private async Task<int> AttendreLaFinAsync(Partie partie)
+    {
+        var sortie = SortirAsync(partie);
+        lock (_verrou)
+        {
+            _sortie = sortie;
+        }
+
+        using var arret = new CancellationTokenSource();
+        var coeurDecharge = _bilans.AttendreAsync(partie.Debut, Timeout.InfiniteTimeSpan, arret.Token);
+        await Task.WhenAny(sortie, coeurDecharge).ConfigureAwait(false);
+        arret.Cancel();
+        if (!sortie.IsCompleted && EmulatorForeground.RenduEnCours)
+        {
+            // Le RetroArch cache d'un rendu video a peut-etre rendu ce bilan : seule la sortie du lanceur fait foi.
+            await sortie.ConfigureAwait(false);
+        }
+
+        var duree = (int)Math.Max(0, (DateTime.UtcNow - partie.Debut).TotalSeconds);
+        _journal.LogInformation("MULTIPLAYER : partie de {Jeu} finie apres {Duree} s{Detail}", partie.Jeu.GameName, duree,
+            sortie.IsCompleted ? string.Empty : " (coeur decharge, RetroArch pas encore sorti)");
+        return duree;
+    }
+
+    private async Task SortirAsync(Partie partie)
     {
         try
         {
@@ -599,7 +640,6 @@ public sealed class MultiplayerLaunchService : IHostedService
             // Le lanceur a deja disparu.
         }
 
-        var duree = (int)Math.Max(0, (DateTime.UtcNow - partie.Debut).TotalSeconds);
         Rendre(partie.ARendre);
         if (ReferenceEquals(_contexte.Ui.Running, partie.Jeu))
         {
@@ -612,8 +652,37 @@ public sealed class MultiplayerLaunchService : IHostedService
             Type = "ui.game.ended",
             Payload = new { Source = "multiplayer", partie.Jeu.SystemId, partie.Jeu.GamePath, partie.Jeu.GameName, Direct = true },
         }).ConfigureAwait(false);
-        _journal.LogInformation("MULTIPLAYER : partie de {Jeu} finie apres {Duree} s", partie.Jeu.GameName, duree);
-        return duree;
+    }
+
+    /// <summary>
+    /// La sortie du lanceur de la derniere partie, attendue avant de liberer la borne : une partie suivante poserait ses
+    /// reglages, et la sortie en retard y remettrait ceux d'avant.
+    /// </summary>
+    private async Task AttendreLaSortieAsync()
+    {
+        Task? sortie;
+        lock (_verrou)
+        {
+            sortie = _sortie;
+        }
+
+        if (sortie is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await sortie.WaitAsync(TimeSpan.FromSeconds(60)).ConfigureAwait(false);
+        }
+        catch (TimeoutException)
+        {
+            _journal.LogWarning("MULTIPLAYER : le lanceur n'est pas sorti 60 s apres la partie, la borne se libere quand meme");
+        }
+        catch (Exception ex)
+        {
+            _journal.LogWarning(ex, "MULTIPLAYER : sortie du lanceur en echec");
+        }
     }
 
     private void Rendre(Dictionary<string, Dictionary<string, string?>> aRendre)

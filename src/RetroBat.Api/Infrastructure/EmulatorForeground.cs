@@ -103,6 +103,9 @@ public static class EmulatorForeground
 
     public static void OublierLeRendu() => _processusDuRendu = 0;
 
+    /// <summary>Un rendu video tourne-t-il ? Son wrapper rend alors aussi un bilan de fin, qui n'est pas celui de la partie.</summary>
+    public static bool RenduEnCours => _processusDuRendu != 0;
+
     /// <summary>Un emulateur tourne-t-il pour une PARTIE (le RetroArch d'un rendu video ne compte pas) ?</summary>
     public static bool EmulateurDeJeuTourne()
     {
