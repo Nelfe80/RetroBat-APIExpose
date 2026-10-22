@@ -126,8 +126,9 @@ public class EmulationStationWatcherProvider : IProvider
             if (_mediaRuntimeState.CarouselSystemId.Length == 0 && File.Exists(CarrouselPath)
                 && File.ReadAllText(CarrouselPath).Trim() is { Length: > 0 } systeme)
             {
-                _mediaRuntimeState.MarkCarouselSystem(systeme);
-                _logger?.LogInformation("Carrousel repris du dernier lancement : {SystemId}", systeme);
+                // Repris, pas confirme : il route l'appui long, il ne juge pas une partie World Scoring.
+                _mediaRuntimeState.MarkCarouselSystem(systeme, confirme: false);
+                _logger?.LogInformation("Carrousel repris du dernier lancement : {SystemId} (pour l'appui long seulement)", systeme);
             }
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)

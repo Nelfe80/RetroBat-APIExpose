@@ -162,7 +162,8 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable, RetroB
             return;
         }
 
-        var carrousel = _media.CarouselSystemId;
+        // Le carrousel annonce par ES seulement : un carrousel repris du dernier lancement de l'API peut etre perime.
+        var carrousel = _media.CarouselSystemIdConfirme;
         bool? dansLaCollection = null;
         if (carrousel.Length == 0 && _contexte?.Ui.Running?.GamePath is { Length: > 0 } chemin)
         {

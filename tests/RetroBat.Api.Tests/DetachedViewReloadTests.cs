@@ -33,6 +33,22 @@ public class DetachedViewReloadTests
     }
 
     [Fact]
+    public void Un_carrousel_repris_du_dernier_lancement_ne_juge_ni_la_vue_ni_la_partie()
+    {
+        // ES n'a rien annonce depuis le demarrage de l'API : le souvenir route l'appui long MULTIPLAYER, mais une partie
+        // World Scoring ne doit pas etre jugee sur un carrousel peut-etre perime (22/10).
+        var etat = new MediaRuntimeState();
+        etat.MarkCarouselSystem("nelfeplay-multiplayer", confirme: false);
+
+        Assert.Equal("nelfeplay-multiplayer", etat.CarouselSystemId);
+        Assert.Equal(string.Empty, etat.CarouselSystemIdConfirme);
+        Assert.False(etat.IsViewDetachedFromSystem("fbneo"));
+
+        etat.MarkCarouselSystem("nelfeplay-scoring");
+        Assert.Equal("nelfeplay-scoring", etat.CarouselSystemIdConfirme);
+    }
+
+    [Fact]
     public void Sans_systeme_connu_on_ne_conclut_rien()
     {
         var etat = new MediaRuntimeState();

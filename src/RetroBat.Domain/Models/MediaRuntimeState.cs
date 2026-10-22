@@ -28,6 +28,7 @@ public class MediaRuntimeState
     private bool _startupReloadGamesRequested;
     private string _lastFrontendEvent = string.Empty;
     private string _carouselSystemId = string.Empty;
+    private bool _carouselConfirme;
     private bool _reloadGamesSilencieux;
     // Ce qu'EmulationStation dira une fois le rechargement fait (sa notification native), ou null.
     private string? _annonceApresRechargement;
@@ -720,11 +721,32 @@ public class MediaRuntimeState
     /// <c>system-selected</c>. Ce n'est pas toujours le systeme du jeu selectionne : dans une
     /// collection, le carrousel dit « nelfeplay-scoring » pendant que le jeu vit sous fbneo.
     /// </summary>
-    public void MarkCarouselSystem(string systemId)
+    /// <param name="confirme">
+    /// Faux pour un carrousel repris du dernier lancement de l'API (ES n'a rien annonce depuis) : il sert a router l'appui
+    /// long, jamais a juger une partie (voir <see cref="CarouselSystemIdConfirme"/>).
+    /// </param>
+    public void MarkCarouselSystem(string systemId, bool confirme = true)
     {
         lock (_lock)
         {
             _carouselSystemId = (systemId ?? string.Empty).Trim();
+            _carouselConfirme = confirme;
+        }
+    }
+
+    /// <summary>
+    /// Le carrousel qu'ES a annonce depuis le demarrage de l'API, vide sinon. Un carrousel seulement repris du dernier
+    /// lancement peut etre perime (ES demarre avant l'API) : juger une partie World Scoring dessus l'aurait exclue du
+    /// scoring, alors qu'un carrousel inconnu laisse decider la collection (22/10).
+    /// </summary>
+    public string CarouselSystemIdConfirme
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _carouselConfirme ? _carouselSystemId : string.Empty;
+            }
         }
     }
 
@@ -755,6 +777,7 @@ public class MediaRuntimeState
         lock (_lock)
         {
             return systeme.Length > 0
+                && _carouselConfirme
                 && _carouselSystemId.Length > 0
                 && !string.Equals(_carouselSystemId, systeme, StringComparison.OrdinalIgnoreCase);
         }
