@@ -260,6 +260,13 @@ public sealed record MultiplayerChoiceValue
     /// <summary>Le nom a l'ecran (un nom de personnage, jamais traduit).</summary>
     [JsonPropertyName("name")]
     public string Name { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Le portrait carre du personnage : un badge public de RetroAchievements (SF2CE : les succes « finir le jeu avec »),
+    /// que chaque borne telecharge dans son propre cache. Aucune image du jeu ne passe par le Data Pack.
+    /// </summary>
+    [JsonPropertyName("ra_badge")]
+    public string? RaBadge { get; init; }
 }
 
 public sealed record MultiplayerChoiceSeat

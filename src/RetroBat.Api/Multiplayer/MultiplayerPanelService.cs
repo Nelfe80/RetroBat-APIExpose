@@ -56,6 +56,12 @@ public sealed class MultiplayerPanelService
     private readonly HashSet<string> _invitationsVues = new(StringComparer.Ordinal);
     private Mode _mode = Mode.Ferme;
     private MultiplayerInstalledGame? _jeu;
+    private readonly RetroBat.Api.Avatar.AvatarSheetStore? _planches;
+    private readonly RetroBat.Api.Replay.Sharing.ReplayRelayService? _relaisDesPlanches;
+    private readonly RetroAchievementsService? _retroAchievements;
+
+    /// <summary>Les planches et les portraits deja demandes : une demande par fichier manquant, pas une par dessin.</summary>
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> _demandes = new(StringComparer.Ordinal);
     private IReadOnlyList<MultiplayerAmi> _amis = [];
     private string? _refus;
     private DateTime? _validerDepuis;
@@ -83,8 +89,14 @@ public sealed class MultiplayerPanelService
         ILogger<MultiplayerPanelService> journal,
         MultiplayerToastOverlay? cartes = null,
         ApiContext? contexte = null,
-        MediaRuntimeState? etatDesMedias = null)
+        MediaRuntimeState? etatDesMedias = null,
+        RetroBat.Api.Avatar.AvatarSheetStore? planches = null,
+        RetroBat.Api.Replay.Sharing.ReplayRelayService? relais = null,
+        RetroAchievementsService? retroAchievements = null)
     {
+        _planches = planches;
+        _relaisDesPlanches = relais;
+        _retroAchievements = retroAchievements;
         _session = session;
         _overlay = overlay;
         _textes = textes;
@@ -755,14 +767,16 @@ public sealed class MultiplayerPanelService
 
         IReadOnlyList<LeaderboardOverlayService.JoueurMultiplayer> lignes = _modele.OngletCourant switch
         {
-            MultiplayerPanelModel.Onglet.WaitingForPlayers => (room?.Players ?? []).Select(joueur => Joueur(joueur,
-                joueur.Present ? T("multiplayer.ready") : T("multiplayer.away"), T)).ToList(),
+            MultiplayerPanelModel.Onglet.WaitingForPlayers => LesPlaces(room, max, T),
             MultiplayerPanelModel.Onglet.WaitingForFriends => _amis
                 .Where(ami => ami.State is "with_you" or "in_es")
                 .Select(ami => Ami(ami, T)).ToList(),
             _ => Invitables().Select(ami => Ami(ami, T)).ToList(),
         };
-        _modele.PoserLesLignes(lignes.Count);
+        _modele.PoserLesLignes(lignes.Count(ligne => !ligne.Libre));
+        var (selection, selectionCourante) = _modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers
+            ? LaBandeDesPersonnages()
+            : (null, -1);
 
         var message = _refus is { Length: > 0 } refus ? T("multiplayer.refused." + refus) : string.Empty;
         if (message.StartsWith("multiplayer.refused.", StringComparison.Ordinal))
@@ -782,7 +796,103 @@ public sealed class MultiplayerPanelService
             _modele.Ligne,
             message,
             string.Empty,
-            AidesDuPanneau(T));
+            AidesDuPanneau(T),
+            Selection: selection,
+            SelectionCourante: selectionCourante);
+    }
+
+    /// <summary>
+    /// Une carte par place, numerotee comme la manette du netplay : les joueurs dans l'ordre d'arrivee, puis les places
+    /// libres jusqu'au nombre de joueurs du jeu (retour du user du 22/10).
+    /// </summary>
+    private List<LeaderboardOverlayService.JoueurMultiplayer> LesPlaces(MultiplayerRoom? room, int max, Func<string, string> T)
+    {
+        var lignes = (room?.Players ?? [])
+            .Select((joueur, i) => Joueur(joueur, joueur.Present ? T("multiplayer.ready") : T("multiplayer.away"), T) with { Place = joueur.Seat ?? i + 1 })
+            .ToList();
+        if (room is null)
+        {
+            return lignes;
+        }
+
+        for (var place = lignes.Count + 1; place <= max; place++)
+        {
+            lignes.Add(new LeaderboardOverlayService.JoueurMultiplayer(T("multiplayer.seat.free"), string.Empty, string.Empty, false, false, false,
+                null, T("multiplayer.seat.waiting"), Place: place, Libre: true));
+        }
+
+        return lignes;
+    }
+
+    /// <summary>NIVEAU NELFEPLAY : tous les personnages du jeu en portraits, le choix du joueur en avant (▲▼).</summary>
+    private (IReadOnlyList<LeaderboardOverlayService.PortraitDeChoix>?, int) LaBandeDesPersonnages()
+    {
+        if (_jeu?.Game is not { EstNelfePlay: true, Choices: { Count: > 0 } choix } jeu)
+        {
+            return (null, -1);
+        }
+
+        var premier = choix[0];
+        var mien = _session.MesChoix(jeu).GetValueOrDefault(premier.Key, premier.Default);
+        var bande = premier.Values.Select(valeur => new LeaderboardOverlayService.PortraitDeChoix(PortraitDu(valeur.RaBadge), valeur.Name)).ToList();
+        return (bande, premier.Values.ToList().FindIndex(valeur => valeur.Value == mien));
+    }
+
+    /// <summary>
+    /// Le portrait d'un personnage : son badge RetroAchievements en cache, telecharge a la premiere demande (une image
+    /// publique, sans cle). Le chemin est rendu tout de suite : le panneau dessine le portrait des qu'il est la.
+    /// </summary>
+    private string? PortraitDu(string? badge)
+    {
+        if (_retroAchievements?.CheminDuBadge(badge) is not { } chemin)
+        {
+            return null;
+        }
+
+        if (!File.Exists(chemin) && _demandes.TryAdd("badge:" + badge, true))
+        {
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _retroAchievements.TelechargerLeBadgeAsync(badge!, CancellationToken.None).ConfigureAwait(false);
+                }
+                finally
+                {
+                    Rafraichir();
+                }
+            });
+        }
+
+        return chemin;
+    }
+
+    /// <summary>
+    /// La planche d'avatar d'un joueur : la sienne si la borne la detient, sinon demandee au relais (comme pour la foule
+    /// d'un direct) ; le panneau se redessine quand elle arrive.
+    /// </summary>
+    private string? PlancheDe(MultiplayerAvatar? avatar)
+    {
+        if (_planches is null || avatar?.Sheet is not { } sha || !RetroBat.Api.Avatar.AvatarSheetStore.EstSha(sha))
+        {
+            return null;
+        }
+
+        if (!_planches.Has(sha) && _relaisDesPlanches is not null && _demandes.TryAdd("planche:" + sha, true))
+        {
+            _ = Task.Run(async () =>
+            {
+                await _relaisDesPlanches.RequestAsync(sha, CancellationToken.None, "avatar").ConfigureAwait(false);
+                for (var essai = 0; essai < 15 && !_planches.Has(sha); essai++)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+                }
+
+                Rafraichir();
+            });
+        }
+
+        return _planches.ObjectPath(sha);
     }
 
     private LeaderboardOverlayService.ContenuMultiplayer ComposerLeResultat(Func<string, string> T)
@@ -837,7 +947,24 @@ public sealed class MultiplayerPanelService
             Barres(joueur.RttMs),
             etat,
             T("multiplayer.host"),
-            PersonnageDe(joueur));
+            PersonnageDe(joueur),
+            Avatar: PlancheDe(joueur.Avatar),
+            Portrait: PortraitDeJoueur(joueur));
+
+    /// <summary>NIVEAU NELFEPLAY : le portrait du personnage de ce joueur.</summary>
+    private string? PortraitDeJoueur(MultiplayerJoueur joueur)
+    {
+        if (_jeu?.Game is not { EstNelfePlay: true, Choices: { Count: > 0 } choix } jeu)
+        {
+            return null;
+        }
+
+        var premier = choix[0];
+        var valeur = joueur.You ? _session.MesChoix(jeu).GetValueOrDefault(premier.Key, premier.Default)
+            : joueur.Choices is not null && joueur.Choices.TryGetValue(premier.Key, out var v) ? v
+            : premier.Default;
+        return PortraitDu(premier.Values.FirstOrDefault(x => x.Value == valeur)?.RaBadge);
+    }
 
     private async Task ChangerDePersonnageAsync(string room, MultiplayerGame jeu, int pas)
     {

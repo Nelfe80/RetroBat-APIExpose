@@ -92,8 +92,14 @@ public sealed class MultiplayerController : ControllerBase
     [HttpGet("preview/{vue}")]
     [SupportedOSPlatform("windows")]
     public IActionResult Preview(string vue, [FromServices] InterfaceTextService textes, [FromServices] EmulationStationSettingsService reglages,
-        [FromServices] ILogger<LeaderboardOverlayService> journal)
+        [FromServices] ILogger<LeaderboardOverlayService> journal, [FromServices] RetroBat.Api.Avatar.AvatarSheetStore planches,
+        [FromServices] RetroAchievementsService retroAchievements)
     {
+        // Une vraie planche de la borne pour l'avatar, et les portraits des personnages de SF2CE (badges en cache).
+        var planche = planches.Objets().FirstOrDefault() is { } sha ? planches.ObjectPath(sha) : null;
+        string? Portrait(int badge) => retroAchievements.CheminDuBadge(badge.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        var noms = new[] { "RYU", "E. HONDA", "BLANKA", "GUILE", "KEN", "CHUN-LI", "ZANGIEF", "DHALSIM", "M. BISON", "SAGAT", "BALROG", "VEGA" };
+        var bande = noms.Select((nom, i) => new LeaderboardOverlayService.PortraitDeChoix(Portrait(307536 + i), nom)).ToList();
         string langue;
         try { langue = reglages.GetScrapingSettings().Language; } catch (Exception) { langue = "fr"; }
         string T(string cle) => textes.Text(cle, langue);
@@ -142,9 +148,37 @@ public sealed class MultiplayerController : ControllerBase
                 }, "", "", "", journal),
                 "np-panel" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with
                 {
-                    Badge = string.Empty, Info = "1 VS 1", NousAvonsLaMain = true, Compte = "2/2", DecompteFinUtc = DateTime.UtcNow.AddSeconds(4),
-                    Lignes = [deux[0] with { Personnage = "KEN" }, deux[1] with { Personnage = "CHUN-LI" }],
+                    Badge = string.Empty, Info = "1 VS 1", NousAvonsLaMain = true, Compte = "1/2", DecompteFinUtc = null,
+                    Lignes =
+                    [
+                        deux[0] with { Personnage = "KEN", Avatar = planche, Portrait = Portrait(307540), Place = 1 },
+                        new(T("multiplayer.seat.free"), "", "", false, false, false, null, T("multiplayer.seat.waiting"), Place: 2, Libre: true),
+                    ],
+                    Selection = bande, SelectionCourante = 4,
                     Aides = [new("dpad_leftright", T("multiplayer.help.tab")), new("dpad_updown", T("multiplayer.help.character")), new("button_b", T("multiplayer.help.back"))],
+                }, "", "", "", journal),
+                "np-panel-full" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with
+                {
+                    Badge = string.Empty, Info = "1 VS 1", NousAvonsLaMain = true, Compte = "2/2", DecompteFinUtc = DateTime.UtcNow.AddSeconds(4),
+                    Lignes =
+                    [
+                        deux[0] with { Personnage = "KEN", Avatar = planche, Portrait = Portrait(307540), Place = 1 },
+                        deux[1] with { Personnage = "CHUN-LI", Portrait = Portrait(307541), Place = 2 },
+                    ],
+                    Selection = bande, SelectionCourante = 4,
+                    Aides = [new("dpad_leftright", T("multiplayer.help.tab")), new("dpad_updown", T("multiplayer.help.character")), new("button_b", T("multiplayer.help.back"))],
+                }, "", "", "", journal),
+                "panel-seats" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with
+                {
+                    NousAvonsLaMain = true, Compte = "2/4",
+                    Lignes =
+                    [
+                        deux[0] with { Avatar = planche, Place = 1 },
+                        deux[1] with { Place = 2 },
+                        new(T("multiplayer.seat.free"), "", "", false, false, false, null, T("multiplayer.seat.waiting"), Place: 3, Libre: true),
+                        new(T("multiplayer.seat.free"), "", "", false, false, false, null, T("multiplayer.seat.waiting"), Place: 4, Libre: true),
+                    ],
+                    Aides = aides,
                 }, "", "", "", journal),
                 "np-presentation" => LeaderboardOverlayService.ApercuMultiplayer(style, socle with { Badge = string.Empty },
                     T("multiplayer.syncing"), "Street Fighter II' Champion Edition", "P1 KEN  ·  P2 CHUN-LI", journal),
@@ -169,7 +203,7 @@ public sealed class MultiplayerController : ControllerBase
                 _ => [],
             };
             return png.Length == 0
-                ? NotFound(new { vues = new[] { "panel", "panel-focus", "invite", "presentation", "result", "cards", "np-panel", "np-presentation", "np-result" } })
+                ? NotFound(new { vues = new[] { "panel", "panel-focus", "panel-seats", "invite", "presentation", "result", "cards", "np-panel", "np-panel-full", "np-presentation", "np-result" } })
                 : File(png, "image/png");
         }
         catch (InvalidOperationException ex)

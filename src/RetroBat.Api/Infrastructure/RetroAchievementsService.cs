@@ -2111,6 +2111,22 @@ public sealed class RetroAchievementsService : IDisposable, IProvider
         }
     }
 
+    /// <summary>
+    /// MULTIPLAYER : le chemin local d'un badge public de RetroAchievements (le portrait d'un personnage), ou null pour
+    /// un nom qui n'est pas un numero de badge. Le fichier n'existe peut-etre pas encore : voir
+    /// <see cref="TelechargerLeBadgeAsync"/>.
+    /// </summary>
+    public string? CheminDuBadge(string? badge)
+        => badge is { Length: > 0 and <= 12 } nom && nom.All(char.IsAsciiDigit)
+            ? Path.Combine(ResolveCacheRoot(), "badges", nom + ".png")
+            : null;
+
+    /// <summary>Telecharge ce badge public dans le cache s'il n'y est pas ; aucune cle d'API n'est necessaire.</summary>
+    public Task TelechargerLeBadgeAsync(string badge, CancellationToken cancellationToken)
+        => CheminDuBadge(badge) is { } chemin
+            ? DownloadMediaAsync(ToMediaUri("/Badge/" + badge + ".png"), chemin, cancellationToken)
+            : Task.CompletedTask;
+
     private async Task DownloadMediaAsync(Uri uri, string destination, CancellationToken cancellationToken)
     {
         if (File.Exists(destination))

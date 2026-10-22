@@ -262,6 +262,29 @@ public sealed record MultiplayerJoueur
     /// <summary>NIVEAU NELFEPLAY : les choix de ce joueur (<c>character</c> =&gt; valeur), permis par le catalogue.</summary>
     [JsonPropertyName("choices")]
     public IReadOnlyDictionary<string, int>? Choices { get; init; }
+
+    /// <summary>Son avatar : sa planche NelfeNet (que la borne demande au relais si elle lui manque), comme dans un direct.</summary>
+    [JsonPropertyName("avatar")]
+    public MultiplayerAvatar? Avatar { get; init; }
+}
+
+public sealed record MultiplayerAvatar
+{
+    [JsonPropertyName("pseudo")]
+    public string Pseudo { get; init; } = string.Empty;
+
+    [JsonPropertyName("family")]
+    public string Family { get; init; } = string.Empty;
+
+    [JsonPropertyName("variation")]
+    public int Variation { get; init; }
+
+    /// <summary>L'empreinte de la planche (PNG de 320 x 192), ou null tant qu'aucune n'est declaree.</summary>
+    [JsonPropertyName("sheet")]
+    public string? Sheet { get; init; }
+
+    [JsonPropertyName("generator")]
+    public string? Generator { get; init; }
 }
 
 /// <summary>Ce que cette borne doit faire : heberger, ou rejoindre a sa place.</summary>

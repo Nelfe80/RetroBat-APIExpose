@@ -27,7 +27,17 @@ public sealed partial class LeaderboardOverlayService
         int? Barres,
         string Etat,
         string MotHote = "HOST",
-        string Personnage = "");
+        string Personnage = "",
+        string? Avatar = null,
+        string? Portrait = null,
+        int? Place = null,
+        bool Libre = false);
+
+    /// <summary>
+    /// Un personnage de la bande de choix : son portrait carre (badge RetroAchievements en cache), ou rien encore, et son nom.
+    /// <c>Avatar</c> d'un joueur : la planche NelfeNet (PNG 320 x 192), dont on dessine la tete de face au repos.
+    /// </summary>
+    public sealed record PortraitDeChoix(string? Chemin, string Nom);
 
     /// <summary>Ce que le panneau MULTIPLAYER montre. Remplace en bloc, comme le classement.</summary>
     public sealed record ContenuMultiplayer(
@@ -44,7 +54,9 @@ public sealed partial class LeaderboardOverlayService
         string Bandeau,
         IReadOnlyList<Aide> Aides,
         string Pseudo = "",
-        bool EnLigne = false);
+        bool EnLigne = false,
+        IReadOnlyList<PortraitDeChoix>? Selection = null,
+        int SelectionCourante = -1);
 
     /// <summary>La teinte du badge CLASSIQUE (toile, ecrans 13 a 15).</summary>
     internal const string TeinteClassique = "B8C7D9";
@@ -140,6 +152,13 @@ public sealed partial class LeaderboardOverlayService
             }
 
             var basDeLAide = Height - taillePied * 1.5f - tailleTexte * 1.9f - _hauteurEcran * 0.012f;
+            var basDesJoueurs = basDeLAide;
+            if (c.Selection is { Count: > 0 } selection)
+            {
+                // NIVEAU NELFEPLAY : la bande des personnages au-dessus de l'aide, le choix courant en grand.
+                basDesJoueurs = DessinerLaSelection(g, selection, c.SelectionCourante, s, policePetite, tailleTexte, taillePetite, marge, basDeLAide);
+            }
+
             if (c.Lignes.Count == 0)
             {
                 using var encre = new SolidBrush(Teinte(s.TextColor));
@@ -148,7 +167,7 @@ public sealed partial class LeaderboardOverlayService
             }
             else
             {
-                DessinerLesJoueurs(g, c, s, policeGras, policePetite, tailleTexte, taillePetite, marge, y, basDeLAide);
+                DessinerLesJoueurs(g, c, s, policeGras, policePetite, tailleTexte, taillePetite, marge, y, basDesJoueurs);
             }
 
             DessinerLAide(g, socle with { Aides = c.Aides, Pseudo = c.Pseudo, EnLigne = c.EnLigne }, s, policePied, taillePied, basDeLAide + tailleTexte * 1.9f);
@@ -224,6 +243,13 @@ public sealed partial class LeaderboardOverlayService
             {
                 var j = c.Lignes[i];
                 var zone = new RectangleF(marge, y, Width - 2 * marge, hauteur);
+                if (j.Libre)
+                {
+                    DessinerUnePlaceLibre(g, j, s, gras, petite, taille, zone);
+                    y += hauteur + ecart;
+                    continue;
+                }
+
                 // Sur la ligne choisie, tout le texte prend la couleur des textes selectionnes d'ES : le pays et
                 // l'etat disparaissaient sur le bleu de la selection (apercu du 22/10).
                 var choisie = c.NousAvonsLaMain && i == c.LigneCourante;
@@ -240,25 +266,55 @@ public sealed partial class LeaderboardOverlayService
                     g.FillPath(fond, chemin);
                 }
 
-                // L'avatar : un carre arrondi a la couleur du joueur, son initiale dedans.
+                // Le numero de la place (la manette du netplay), sur le bord gauche de la carte.
+                var gaucheAvatar = zone.X + taille * 0.45f;
+                if (j.Place is { } place)
+                {
+                    gaucheAvatar = DessinerLeNumero(g, place, s, petite, taille, zone, choisie, libre: false);
+                }
+
+                // L'avatar : la tete de face de sa planche ; a defaut, un carre a sa couleur et son initiale.
                 var cote = hauteur * 0.7f;
-                var avatar = new RectangleF(zone.X + taille * 0.45f, y + (hauteur - cote) / 2f, cote, cote);
+                var avatar = new RectangleF(gaucheAvatar, y + (hauteur - cote) / 2f, cote, cote);
                 using (var chemin = Arrondi(avatar, cote * 0.22f))
                 using (var fond = new SolidBrush(Teinte(j.Couleur, j.Present ? 255 : 110)))
                 {
                     g.FillPath(fond, chemin);
                 }
 
-                using (var encre = new SolidBrush(Color.FromArgb(j.Present ? 255 : 150, 12, 12, 12)))
-                using (var milieu = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+                if (Image(j.Avatar) is { } planche && planche.Width >= 64 && planche.Height >= 64)
                 {
+                    var etatAvatar = g.Save();
+                    using (var masque = Arrondi(avatar, cote * 0.22f))
+                    {
+                        g.SetClip(masque);
+                    }
+
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                    g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                    using var attenuation = j.Present ? null : Transparence(0.5f);
+                    g.DrawImage(planche, Rectangle.Round(avatar), 0, 0, 64, 64, GraphicsUnit.Pixel, attenuation);
+                    g.Restore(etatAvatar);
+                }
+                else
+                {
+                    using var encre = new SolidBrush(Color.FromArgb(j.Present ? 255 : 150, 12, 12, 12));
+                    using var milieu = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
                     var initiale = j.Nom.Length > 0 ? j.Nom[..1].ToUpperInvariant() : "?";
                     g.DrawString(initiale, gras, encre, avatar, milieu);
                 }
 
-                // A droite, de l'exterieur vers l'interieur : pret (ou absent), connexion, hote.
+                // A droite, de l'exterieur vers l'interieur : le portrait du personnage (niveau NelfePlay), pret (ou
+                // absent), connexion, hote.
                 var droite = zone.Right - taille * 0.5f;
                 var alpha = j.Present ? 255 : 130;
+                if (Image(j.Portrait) is { } portrait)
+                {
+                    var carre = new RectangleF(droite - cote, y + (hauteur - cote) / 2f, cote, cote);
+                    DessinerUnPortrait(g, portrait, carre, s, choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TitleColor, alpha), Math.Max(1.5f, _hauteurEcran / 700f));
+                    droite -= cote + taille * 0.6f;
+                }
+
                 using (var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : j.Present ? Color.FromArgb(120, 229, 163) : Teinte(s.GroupColor, 200)))
                 using (var aDroite = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Far, LineAlignment = StringAlignment.Center })
                 {
@@ -321,6 +377,181 @@ public sealed partial class LeaderboardOverlayService
 
                 y += hauteur + ecart;
             }
+        }
+
+        /// <summary>Le numero d'une place, dans une pastille sur le bord gauche de la carte. Rend ou commence l'avatar.</summary>
+        private float DessinerLeNumero(Graphics g, int place, EsMenuStyle s, Font petite, float taille, RectangleF zone, bool choisie, bool libre)
+        {
+            var diametre = taille * 1.15f;
+            var pastille = new RectangleF(zone.X + taille * 0.4f, zone.Y + (zone.Height - diametre) / 2f, diametre, diametre);
+            using (var chemin = Arrondi(pastille, diametre * 0.3f))
+            {
+                if (libre)
+                {
+                    using var trait = new Pen(Teinte(s.GroupColor, 170), Math.Max(1.2f, _hauteurEcran / 900f)) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dash };
+                    g.DrawPath(trait, chemin);
+                }
+                else
+                {
+                    using var fond = new SolidBrush(choisie ? Color.FromArgb(70, 255, 255, 255) : Teinte(s.TitleColor, 60));
+                    g.FillPath(fond, chemin);
+                }
+            }
+
+            using var police = new Font(petite.FontFamily, petite.Size, FontStyle.Bold, petite.Unit);
+            using var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : libre ? Teinte(s.GroupColor, 200) : Teinte(s.TitleColor));
+            using var milieu = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+            g.DrawString(place.ToString(System.Globalization.CultureInfo.InvariantCulture), police, encre, pastille, milieu);
+            return pastille.Right + taille * 0.45f;
+        }
+
+        /// <summary>Une place qui attend son joueur : une carte en pointilles, son numero, une silhouette vide.</summary>
+        private void DessinerUnePlaceLibre(Graphics g, JoueurMultiplayer j, EsMenuStyle s, Font gras, Font petite, float taille, RectangleF zone)
+        {
+            var epaisseur = Math.Max(1.2f, _hauteurEcran / 900f);
+            using (var chemin = Arrondi(zone, taille * 0.3f))
+            using (var trait = new Pen(Teinte(s.GroupColor, 150), epaisseur) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dash })
+            {
+                g.DrawPath(trait, chemin);
+            }
+
+            var gauche = DessinerLeNumero(g, j.Place ?? 0, s, petite, taille, zone, choisie: false, libre: true);
+            var cote = zone.Height * 0.7f;
+            var silhouette = new RectangleF(gauche, zone.Y + (zone.Height - cote) / 2f, cote, cote);
+            using (var chemin = Arrondi(silhouette, cote * 0.22f))
+            using (var trait = new Pen(Teinte(s.GroupColor, 120), epaisseur) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dot })
+            {
+                g.DrawPath(trait, chemin);
+            }
+
+            using (var encre = new SolidBrush(Teinte(s.GroupColor, 140)))
+            using (var milieu = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+            {
+                g.DrawString("?", gras, encre, silhouette, milieu);
+            }
+
+            var x = silhouette.Right + taille * 0.6f;
+            var largeur = Math.Max(0, zone.Right - taille * 0.5f - x);
+            using var encreNom = new SolidBrush(Teinte(s.GroupColor, 220));
+            g.DrawString(Couper(g, j.Nom, gras, largeur), gras, encreNom, new PointF(x, zone.Y + zone.Height * 0.14f), StringFormat.GenericTypographic);
+            using var encreEtat = new SolidBrush(Teinte(s.GroupColor, 160));
+            g.DrawString(Couper(g, j.Etat, petite, largeur), petite, encreEtat, new PointF(x, zone.Y + zone.Height * 0.56f), StringFormat.GenericTypographic);
+        }
+
+        /// <summary>Un portrait carre, en gros pixels, dans un cadre arrondi.</summary>
+        private void DessinerUnPortrait(Graphics g, Image portrait, RectangleF carre, EsMenuStyle s, Color cadre, float epaisseur)
+        {
+            var etat = g.Save();
+            using (var masque = Arrondi(carre, carre.Width * 0.14f))
+            {
+                g.SetClip(masque);
+            }
+
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+            g.DrawImage(portrait, carre);
+            g.Restore(etat);
+            using var chemin = Arrondi(carre, carre.Width * 0.14f);
+            using var trait = new Pen(cadre, epaisseur);
+            g.DrawPath(trait, chemin);
+        }
+
+        /// <summary>
+        /// La bande des personnages (V24-04, ▲▼) : tous les portraits a la suite, le choix courant agrandi sous le cadre de
+        /// selection d'ES, son nom dessous. Rend le haut de la bande : les joueurs s'arretent au-dessus.
+        /// </summary>
+        private float DessinerLaSelection(Graphics g, IReadOnlyList<PortraitDeChoix> selection, int courant, EsMenuStyle s, Font petite,
+            float taille, float taillePetite, float marge, float bas)
+        {
+            var largeurUtile = Width - 2 * marge;
+            var pas = Math.Min(largeurUtile / (selection.Count + 0.6f), taille * 2.4f);
+            var petit = pas * 0.84f;
+            var grand = pas * 1.32f;
+            var hauteurBande = grand + taillePetite * 1.9f;
+            var haut = bas - hauteurBande - taille * 0.3f;
+            var milieuY = haut + grand / 2f;
+            var depart = marge + (largeurUtile - pas * (selection.Count - 1) - grand) / 2f;
+            var x = depart;
+            for (var i = 0; i < selection.Count; i++)
+            {
+                var actuel = i == courant;
+                var cote = actuel ? grand : petit;
+                var carre = new RectangleF(x + (actuel ? 0 : (pas - petit) / 2f), milieuY - cote / 2f, cote, cote);
+                if (Image(selection[i].Chemin) is { } portrait)
+                {
+                    using var attenuation = actuel ? null : Transparence(0.55f);
+                    var etat = g.Save();
+                    using (var masque = Arrondi(carre, cote * 0.14f))
+                    {
+                        g.SetClip(masque);
+                    }
+
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                    g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                    g.DrawImage(portrait, Rectangle.Round(carre), 0, 0, portrait.Width, portrait.Height, GraphicsUnit.Pixel, attenuation);
+                    g.Restore(etat);
+                }
+                else
+                {
+                    using var chemin = Arrondi(carre, cote * 0.14f);
+                    using var fond = new SolidBrush(Color.FromArgb(actuel ? 140 : 70, 8, 10, 14));
+                    g.FillPath(fond, chemin);
+                }
+
+                if (actuel)
+                {
+                    using var chemin = Arrondi(carre, cote * 0.14f);
+                    using var trait = new Pen(Teinte(s.SelectorColor), Math.Max(2.5f, _hauteurEcran / 380f));
+                    g.DrawPath(trait, chemin);
+                    using var police = new Font(petite.FontFamily, petite.Size, FontStyle.Bold, petite.Unit);
+                    using var encre = new SolidBrush(Teinte(s.TitleColor));
+                    using var centre = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center };
+                    g.DrawString(selection[i].Nom, police, encre, new RectangleF(carre.X - pas, carre.Bottom + taillePetite * 0.35f, cote + 2 * pas, taillePetite * 1.5f), centre);
+                }
+
+                x += actuel ? grand + (pas - petit) / 2f : pas;
+            }
+
+            return haut;
+        }
+
+        private readonly Dictionary<string, Image?> _images = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Une image du disque, lue une fois (sans garder le fichier ouvert) ; null si elle manque encore.</summary>
+        private Image? Image(string? chemin)
+        {
+            if (string.IsNullOrEmpty(chemin))
+            {
+                return null;
+            }
+
+            if (_images.TryGetValue(chemin, out var deja) && deja is not null)
+            {
+                return deja;
+            }
+
+            try
+            {
+                if (!File.Exists(chemin))
+                {
+                    return null;   // pas encore telechargee : on reessaiera au prochain dessin
+                }
+
+                var image = System.Drawing.Image.FromStream(new MemoryStream(File.ReadAllBytes(chemin)));
+                _images[chemin] = image;
+                return image;
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or OutOfMemoryException)
+            {
+                return null;
+            }
+        }
+
+        private static System.Drawing.Imaging.ImageAttributes Transparence(float opacite)
+        {
+            var attributs = new System.Drawing.Imaging.ImageAttributes();
+            attributs.SetColorMatrix(new System.Drawing.Imaging.ColorMatrix { Matrix33 = opacite });
+            return attributs;
         }
 
         /// <summary>Quatre barres de connexion, pleines selon la latence ; grises quand elle est inconnue.</summary>
