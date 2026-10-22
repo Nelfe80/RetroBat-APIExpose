@@ -14,7 +14,6 @@ public class ApiExposeOptions
     public DatasThemeExposeOptions DatasThemeExpose { get; set; } = new();
     public MarqueeManagerOptions MarqueeManager { get; set; } = new();
     public GameEventsManagerOptions GameEventsManager { get; set; } = new();
-    public MonitorSyncOptions MonitorSync { get; set; } = new();
     public ControlManagerOptions ControlManager { get; set; } = new();
     public RomSetManagerOptions RomSetManager { get; set; } = new();
     public CollectionPackManagerOptions CollectionPackManager { get; set; } = new();
@@ -378,21 +377,6 @@ public class ApiExposeOptions
         public bool SystemMarqueeThemeBackgroundEnabled { get; set; } = true;
         public string DmdAutogenProfile { get; set; } = "no";
         public bool AutogenNotifyEnabled { get; set; } = true;
-    }
-
-    public class MonitorSyncOptions
-    {
-        // Quand true, APIExpose écrit <système>.MonitorIndex dans es_settings.cfg pour
-        // que les émulateurs standalone (MAME/FBNeo…) ciblent l'écran RetroBat. La
-        // valeur = le NUMÉRO N du device name GDI \\.\DISPLAYN de cet écran (ce que
-        // emulatorLauncher concatène en "\\.\DISPLAY" + MonitorIndex), recalculé au
-        // démarrage et à chaque changement d'écran dans Marquee Manager (le dropdown
-        // ES plafonne à 10 et ne peut pas exprimer un device number élevé comme 24).
-        public bool Enabled { get; set; } = true;
-        public string[] Systems { get; set; } = new[]
-        {
-            "mame", "fbneo", "fba", "hbmame", "neogeo", "neogeo64", "neogeocd"
-        };
     }
 
     public class GameEventsManagerOptions

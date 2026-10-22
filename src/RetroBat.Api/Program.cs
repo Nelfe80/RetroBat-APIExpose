@@ -369,8 +369,6 @@ builder.Services.AddSingleton<MediaReferenceCatalog>();
 builder.Services.AddSingleton<IEsSettingsStore, EsSettingsStore>();
 builder.Services.AddSingleton<EsSettingsChangeBus>();
 builder.Services.AddSingleton<IEsSettingsChangeBus>(sp => sp.GetRequiredService<EsSettingsChangeBus>());
-builder.Services.AddSingleton<RetroBat.Api.Infrastructure.MonitorIndexSyncService>();
-builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.MonitorIndexSyncService>());
 builder.Services.AddSingleton<IGamelistStore, GamelistStore>();
 builder.Services.AddSingleton(typeof(IRuntimeConfigSnapshotProvider<>), typeof(RuntimeConfigSnapshotProvider<>));
 builder.Services.AddSingleton<EmulationStationSettingsService>();
