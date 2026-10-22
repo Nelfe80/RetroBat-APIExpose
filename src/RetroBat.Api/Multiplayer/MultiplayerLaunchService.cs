@@ -44,6 +44,9 @@ public sealed class MultiplayerLaunchService : IHostedService
 
     /// <summary>Le suivi des statistiques du duel en cours chez l'hote ; il rend ce qu'il a vu quand le guet s'arrete.</summary>
     private Task<IReadOnlyDictionary<int, StatsDeLaPlace>>? _suiviDesStats;
+
+    /// <summary>Le meme suivi chez l'invite, pour son ecran de fin.</summary>
+    private Task<IReadOnlyDictionary<int, StatsDeLaPlace>>? _suiviDesStatsInvite;
     private string? _enCours;
 
     /// <summary>Le guet de la fin d'une rencontre NelfePlay, et la place gagnante qu'il a vue.</summary>
@@ -191,7 +194,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             var stats = suivi is null ? null : await suivi.ConfigureAwait(false);
             await _client.TerminerAsync(room.Room, vainqueur is null ? "game_closed" : "match_over", duree, CancellationToken.None, vainqueur,
                 vainqueur is null ? null : stats).ConfigureAwait(false);
-            _panneau.MontrerLeResultat(room.Room, duree);
+            _panneau.MontrerLeResultat(room.Room, duree, stats);
         }
         catch (Exception ex)
         {
@@ -316,6 +319,16 @@ public sealed class MultiplayerLaunchService : IHostedService
         {
             await Task.Delay(TimeSpan.FromSeconds(10), ct).ConfigureAwait(false);
             var places = room.Players.Where(joueur => joueur.Seat is not null).Select(joueur => joueur.Seat!.Value).Distinct().ToList();
+            // L'invite joue la meme partie : il compte les memes coups que l'hote, pour son propre ecran de fin (l'hote
+            // d'une version plus ancienne n'en envoie pas, et celui qui part avant la fin n'envoie rien).
+            if (jeu.Stats?.Life is not null)
+            {
+                lock (_verrou)
+                {
+                    _suiviDesStatsInvite = _statsDuDuel.SuivreAsync(jeu, places, ct);
+                }
+            }
+
             var vainqueur = await _fin.AttendreLeVainqueurAsync(jeu.End!, places, ct).ConfigureAwait(false);
             if (vainqueur is null)
             {
@@ -426,7 +439,16 @@ public sealed class MultiplayerLaunchService : IHostedService
             NetplayGuestService.OublierInviteMultiplayer();
             // En Classique, la partie finit quand tous les invites sont partis : la plateforme doit le savoir.
             await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
-            _panneau.MontrerLeResultat(room.Room, duree);
+            Task<IReadOnlyDictionary<int, StatsDeLaPlace>>? suiviInvite;
+            lock (_verrou)
+            {
+                suiviInvite = _suiviDesStatsInvite;
+                _suiviDesStatsInvite = null;
+            }
+
+            guetInvite.Cancel();
+            var statsInvite = suiviInvite is null ? null : await suiviInvite.ConfigureAwait(false);
+            _panneau.MontrerLeResultat(room.Room, duree, statsInvite);
         }
         catch (Exception ex)
         {
@@ -449,7 +471,11 @@ public sealed class MultiplayerLaunchService : IHostedService
         var lancement = room.Launch!;
         var systeme = NetplayHostService.SystemeDuChemin(jeu.Path, RetroBatPaths.RomsRoot);
         var coeur = jeu.Core?.Core ?? string.Empty;
-        var arguments = MultiplayerLaunchPlan.Arguments(EsLaunchArguments.ManettesDuDernierLancement(), systeme, coeur, jeu.Path, jeu.Game, lancement.Seat, netplay);
+        var manettes = EsLaunchArguments.ManettesDuDernierLancement();
+        // En netplay, chaque borne joue avec SON joueur 1 de RetroArch, quelle que soit sa place : si le panel n'y est pas,
+        // ses commandes ne repondent pas (vu le 22/10 sur la seconde borne). Le journal dit donc qui est le joueur 1.
+        _journal.LogInformation("MULTIPLAYER : manettes transmises au lanceur : {Manettes}", MultiplayerLaunchPlan.NomsDesManettes(manettes));
+        var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeu.Game, lancement.Seat, netplay);
         if (arguments is null)
         {
             _journal.LogWarning("MULTIPLAYER : lancement de {Jeu} refuse (systeme « {Systeme} », coeur « {Coeur} »)", jeu.Game.Id, systeme, coeur);

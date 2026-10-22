@@ -37,7 +37,8 @@ public sealed partial class LeaderboardOverlayService
         string Evolution = "",
         string Issue = "",
         bool Gagnant = false,
-        IReadOnlyList<StatDuJoueur>? Stats = null);
+        IReadOnlyList<StatDuJoueur>? Stats = null,
+        bool ChoixModifiable = false);
 
     /// <summary>Une statistique d'un joueur au resultat : son libelle et sa valeur (« COUPS », « 12 »).</summary>
     public sealed record StatDuJoueur(string Libelle, string Valeur);
@@ -542,7 +543,7 @@ public sealed partial class LeaderboardOverlayService
 
                 if (j.Provisoire.Length > 0)
                 {
-                    morceaux.Add((j.Provisoire, petite, choisie ? Teinte(s.SelectedTextColor) : Teinte(s.GroupColor, alpha)));
+                    morceaux.Add(("(" + j.Provisoire + ")", petite, choisie ? Teinte(s.SelectedTextColor) : Teinte(s.GroupColor, alpha)));
                 }
 
                 suite = morceaux.Sum(m => Largeur(m.Texte, m.Police) + ecart * 0.6f) + ecart;
@@ -608,6 +609,12 @@ public sealed partial class LeaderboardOverlayService
             }
 
             if (j.Personnage.Length > 0)
+            {
+                using var policePerso = PoliceDuPersonnage(gras);
+                hauteur += H(policePerso) * 1.2f + (j.ChoixModifiable ? taille * 0.9f : 0f);
+            }
+
+            if (j.Cote.Length > 0)
             {
                 hauteur += H(petite) * 1.35f;
             }
@@ -683,20 +690,46 @@ public sealed partial class LeaderboardOverlayService
             var carre = new RectangleF(zone.X + (zone.Width - cote) / 2f, haut, cote, cote);
             DessinerLeVisage(g, j, s, gras, carre, choisie, alpha);
 
-            // Dessous, centres : le pseudo et sa cote, le personnage, l'etat (ou la victoire).
+            // Dessous, centres : le personnage en gros (avec ses fleches quand ▲▼ le change), le pseudo, sa cote, l'etat.
             var largeur = zone.Width - 2 * pad;
             var y = carre.Bottom + taille * 0.45f;
             var hauteurNom = g.MeasureString("Ag", gras, PointF.Empty, StringFormat.GenericTypographic).Height;
             using var centre = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center };
             var limite = zone.Bottom - pad;
-            DessinerLeNomEtLaCote(g, j, s, gras, petite, taille, zone.X + pad, y, largeur, hauteurNom, choisie, alpha, centre: true);
-            y += hauteurNom * 1.25f;
             var hauteurPetite = g.MeasureString("Ag", petite, PointF.Empty, StringFormat.GenericTypographic).Height;
-            if (j.Personnage.Length > 0 && y + hauteurPetite <= limite)
+            if (j.Personnage.Length > 0)
             {
-                using var policePerso = new Font(petite.FontFamily, petite.Size, FontStyle.Bold, petite.Unit);
-                using var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TitleColor, alpha));
-                g.DrawString(Couper(g, j.Personnage, policePerso, largeur), policePerso, encre, new RectangleF(zone.X + pad, y, largeur, hauteurPetite * 1.3f), centre);
+                using var policePerso = PoliceDuPersonnage(gras);
+                var hauteurPerso = g.MeasureString("Ag", policePerso, PointF.Empty, StringFormat.GenericTypographic).Height;
+                var milieu = zone.X + zone.Width / 2f;
+                if (j.ChoixModifiable)
+                {
+                    DessinerUneFleche(g, s, milieu, y, taille * 0.32f, versLeHaut: true, choisie);
+                    y += taille * 0.45f;
+                }
+
+                using (var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TitleColor, alpha)))
+                {
+                    g.DrawString(Couper(g, j.Personnage, policePerso, largeur), policePerso, encre, new RectangleF(zone.X + pad, y, largeur, hauteurPerso * 1.2f), centre);
+                }
+
+                y += hauteurPerso * 1.2f;
+                if (j.ChoixModifiable)
+                {
+                    DessinerUneFleche(g, s, milieu, y, taille * 0.32f, versLeHaut: false, choisie);
+                    y += taille * 0.45f;
+                }
+            }
+
+            using (var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : j.Moi ? Teinte(s.TitleColor, alpha) : Teinte(s.TextColor, alpha)))
+            {
+                g.DrawString(Couper(g, j.Nom, gras, largeur), gras, encre, new RectangleF(zone.X + pad, y, largeur, hauteurNom * 1.2f), centre);
+            }
+
+            y += hauteurNom * 1.25f;
+            if (j.Cote.Length > 0 && y + hauteurPetite <= limite)
+            {
+                DessinerLaCoteCentree(g, j, s, petite, taille, zone.X + pad, y, largeur, hauteurPetite, choisie, alpha);
                 y += hauteurPetite * 1.35f;
             }
 
@@ -739,6 +772,67 @@ public sealed partial class LeaderboardOverlayService
                     g.DrawString(stats[k].Valeur, policeValeur, clair, new RectangleF(case_.X, case_.Y + hauteurPetite * 1.05f, demi, hValeur * 1.2f), centre);
                 }
             }
+        }
+
+        /// <summary>Le nom du personnage dans une carte : en gros, sous le portrait.</summary>
+        private static Font PoliceDuPersonnage(Font gras) => new(gras.FontFamily, gras.Size * 1.15f, FontStyle.Bold, gras.Unit);
+
+        /// <summary>Une petite fleche bleue, pointe vers le haut ou vers le bas : ▲▼ change le personnage.</summary>
+        private void DessinerUneFleche(Graphics g, EsMenuStyle s, float milieu, float haut, float cote, bool versLeHaut, bool choisie)
+        {
+            var points = versLeHaut
+                ? new[] { new PointF(milieu - cote, haut + cote * 0.8f), new PointF(milieu + cote, haut + cote * 0.8f), new PointF(milieu, haut) }
+                : new[] { new PointF(milieu - cote, haut), new PointF(milieu + cote, haut), new PointF(milieu, haut + cote * 0.8f) };
+            using var encre = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : Teinte(s.SelectorColor));
+            g.FillPolygon(encre, points);
+        }
+
+        /// <summary>« ELO 1516 +16 (provisoire) », centre sous le pseudo d'une carte.</summary>
+        private void DessinerLaCoteCentree(Graphics g, JoueurMultiplayer j, EsMenuStyle s, Font petite, float taille, float x, float haut,
+            float largeur, float hauteurLigne, bool choisie, int alpha)
+        {
+            using var gras = new Font(petite.FontFamily, petite.Size, FontStyle.Bold, petite.Unit);
+            var morceaux = new List<(string Texte, Font Police, Color Couleur)>
+            {
+                (j.Cote, gras, choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TitleColor, alpha)),
+            };
+            if (j.Evolution.Length > 0)
+            {
+                morceaux.Add((j.Evolution, gras, choisie ? Teinte(s.SelectedTextColor) : j.Evolution.StartsWith('-') ? Rouge : Vert));
+            }
+
+            if (j.Provisoire.Length > 0)
+            {
+                morceaux.Add(("(" + j.Provisoire + ")", petite, choisie ? Teinte(s.SelectedTextColor) : Teinte(s.GroupColor, alpha)));
+            }
+
+            float Largeur(string t, Font f) => g.MeasureString(t, f, PointF.Empty, StringFormat.GenericTypographic).Width;
+            var ecart = taille * 0.3f;
+            var total = morceaux.Sum(m => Largeur(m.Texte, m.Police)) + ecart * (morceaux.Count - 1);
+            var curseur = x + Math.Max(0, (largeur - total) / 2f);
+            using var auMilieu = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center };
+            foreach (var (texte, police, couleur) in morceaux)
+            {
+                using var encre = new SolidBrush(couleur);
+                var w = Largeur(texte, police);
+                g.DrawString(texte, police, encre, new RectangleF(curseur, haut, w + 2f, hauteurLigne * 1.2f), auMilieu);
+                curseur += w + ecart;
+            }
+        }
+
+        /// <summary>Un leger effet d'ecran cathodique sur un portrait : une ligne sur deux, noire a 50 %.</summary>
+        private static void DessinerLesLignesDeBalayage(Graphics g, RectangleF carre)
+        {
+            var etat = g.Save();
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
+            using var ligne = new SolidBrush(Color.FromArgb(128, 0, 0, 0));
+            for (var y = (int)Math.Ceiling(carre.Top) + 1; y < carre.Bottom; y += 2)
+            {
+                g.FillRectangle(ligne, carre.Left, y, carre.Width, 1);
+            }
+
+            g.Restore(etat);
         }
 
         /// <summary>Le carre d'un joueur : le portrait du personnage, sinon la tete de sa planche, sinon son initiale.</summary>
@@ -898,6 +992,7 @@ public sealed partial class LeaderboardOverlayService
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
             g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
             g.DrawImage(portrait, carre);
+            DessinerLesLignesDeBalayage(g, carre);
             g.Restore(etat);
             using var chemin = Arrondi(carre, carre.Width * 0.14f);
             using var trait = new Pen(cadre, epaisseur);

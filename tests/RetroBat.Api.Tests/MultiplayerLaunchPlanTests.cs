@@ -33,10 +33,20 @@ public class MultiplayerLaunchPlanTests : IDisposable
         var ligne = MultiplayerLaunchPlan.Arguments("-p1index 0", "fbneo", "fbneo", @"E:\RetroBat\roms\fbneo\mslug3.zip", Mslug3, 2, netplay);
 
         Assert.Equal(
-            "-p1index 0 -system fbneo -emulator libretro -core fbneo -retroachievements 0 -netplay true -netplaymode host"
+            "-p1index 0 -system fbneo -emulator libretro -core fbneo -retroachievements 0"
+            + " -rewind 0 -autosave 0 -runahead 0 -preemptive_frames 0 -fastforward_ratio 1.000000 -netplay true -netplaymode host"
             + " -netplay.nickname NELFEPLAY_player_ab12cd34 -netplay.password aaaa1111 -netplay.spectatepassword bbbb2222"
             + " -netplay.relay madrid -netplay.port 55435 -netplay_public_announce true -rom \"E:\\RetroBat\\roms\\fbneo\\mslug3.zip\"",
             ligne);
+    }
+
+    [Fact]
+    public void Le_journal_nomme_les_manettes_sans_chemin_ni_identifiant()
+    {
+        var ligne = "-p1index 0 -p1guid 03000000 -p1path \"HID#VID_1\" -p1name \"Generic USB Joystick\" -p1nbbuttons 12"
+            + " -p2index 1 -p2guid 0300ab -p2path \"HID#VID_2\" -p2name \"vJoy Device\" -p2nbbuttons 8";
+        Assert.Equal("P1 Generic USB Joystick, P2 vJoy Device", MultiplayerLaunchPlan.NomsDesManettes(ligne));
+        Assert.StartsWith("aucune", MultiplayerLaunchPlan.NomsDesManettes(""));
     }
 
     [Fact]

@@ -36,7 +36,7 @@ public class MultiplayerApercusTests
         var aidesResultat = new List<L.Aide> { new("button_a", "PLAY AGAIN"), new("button_b", "CLOSE") };
         L.JoueurMultiplayer Libre(int place) => new("FREE SEAT", "", "", false, false, false, null, "waiting for a player", Place: place, Libre: true);
         var moi = new L.JoueurMultiplayer("Nelfe80", "FR", "A98BFF", false, true, true, 3, "ready", "HOST", "KEN",
-            Portrait: Portrait(307540), Place: 1, Cote: "ELO 1516", Provisoire: "provisional");
+            Portrait: Portrait(307540), Place: 1, Cote: "ELO 1516", Provisoire: "provisional", ChoixModifiable: true);
         var lui = new L.JoueurMultiplayer("RetroLife", "FR", "FF9F6B", true, false, true, 4, "ready", "HOST", "CHUN-LI",
             Portrait: Portrait(307541), Place: 2, Cote: "ELO 1484", Provisoire: "provisional");
         var socle = new L.ContenuMultiplayer(onglets, 2, true, "", "1 VS 1", "1/2", null, [moi, Libre(2)], -1, "", "", aidesNp,
@@ -56,7 +56,7 @@ public class MultiplayerApercusTests
                 DecompteFinUtc = DateTime.UtcNow.AddSeconds(12), Selection = null, Aides = aidesResultat,
                 Lignes =
                 [
-                    moi with { Issue = "VICTORY", Gagnant = true, Evolution = "+16", Stats = stats1 },
+                    moi with { Issue = "VICTORY", Gagnant = true, Evolution = "+16", Stats = stats1, ChoixModifiable = false },
                     lui with { Issue = "DEFEAT", Cote = "ELO 1484", Evolution = "-16", Stats = stats2 },
                 ],
                 PartageDesDegats = new L.Partage(288 / 378d, "A98BFF", "FF9F6B", "DAMAGE DEALT"),

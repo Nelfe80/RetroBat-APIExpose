@@ -64,6 +64,17 @@ public sealed class MultiplayerPanelService
     private readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> _demandes = new(StringComparer.Ordinal);
     private IReadOnlyList<MultiplayerAmi> _amis = [];
     private readonly SemaphoreSlim _telechargementsDePortraits = new(2, 2);
+
+    /// <summary>Les statistiques que cette borne a vues pendant la rencontre : l'ecran de fin s'en sert sans celles du site.</summary>
+    private IReadOnlyDictionary<int, StatsDeLaPlace>? _statsVues;
+
+    /// <summary>Les statistiques d'une rencontre finie : celles de la plateforme (l'hote), sinon celles vues ici.</summary>
+    private IReadOnlyDictionary<string, MultiplayerStatsPlace>? StatsDeLaRencontre(MultiplayerRoom? room)
+        => room?.Ended?.Stats is { Count: > 0 } envoyees ? envoyees
+            : _statsVues is { Count: > 0 } vues
+                ? vues.ToDictionary(p => p.Key.ToString(CultureInfo.InvariantCulture),
+                    p => new MultiplayerStatsPlace { Hits = p.Value.Coups, Kos = p.Value.KO, Perfects = p.Value.Perfects, Damage = p.Value.Degats })
+                : null;
     private string? _refus;
     private DateTime? _validerDepuis;
     private DateTime? _annulerDepuis;
@@ -290,8 +301,13 @@ public sealed class MultiplayerPanelService
     /// Apres la partie, l'ecran de resultat (V24-17, 00quater.10) : au niveau Classique, les joueurs et la
     /// duree. Il se ferme de lui-meme au bout de 12 s ; A maintenu relance le meme jeu.
     /// </summary>
-    public void MontrerLeResultat(string room, int? dureeSecondes)
+    public void MontrerLeResultat(string room, int? dureeSecondes, IReadOnlyDictionary<int, StatsDeLaPlace>? statsVues = null)
     {
+        lock (_verrou)
+        {
+            _statsVues = statsVues;
+        }
+
         _ = Task.Run(async () =>
         {
             // L'hote annonce la fin : un ou deux sondages plus tard, la gameroom est « finished ».
@@ -387,6 +403,13 @@ public sealed class MultiplayerPanelService
 
             var maintenu = Maintenu(_validerDepuis);
             _validerDepuis = null;
+            if (maintenu && _invitation is not null)
+            {
+                // Panneau ouvert, une invitation attend (sa carte est en haut a droite) : l'appui long la prend.
+                _ = AccepterInvitationAsync();
+                return;
+            }
+
             rejouer = _mode == Mode.Resultat && maintenu;
             effet = _mode == Mode.Panneau ? _modele.Valider() : MultiplayerPanelModel.Effet.Rien;
         }
@@ -414,6 +437,12 @@ public sealed class MultiplayerPanelService
 
             var maintenu = Maintenu(_annulerDepuis);
             _annulerDepuis = null;
+            if (!maintenu && _invitation is not null)
+            {
+                RefuserInvitation();
+                return;
+            }
+
             if (_mode == Mode.Resultat)
             {
                 effet = MultiplayerPanelModel.Effet.Fermer;
@@ -448,6 +477,7 @@ public sealed class MultiplayerPanelService
 
         _cartes?.Cacher();
         _texteDuBandeau = "";
+        _journal?.LogInformation("MULTIPLAYER : invitation de {Ami} pour {Jeu} acceptee", invitation.From?.Pseudo, invitation.Game);
         var jeu = _session.JeuDeLaRoom(new MultiplayerRoom { Game = invitation.Game, Content = invitation.Content });
         if (jeu is null)
         {
@@ -484,6 +514,7 @@ public sealed class MultiplayerPanelService
 
         _cartes?.Cacher();
         _texteDuBandeau = "";
+        _journal?.LogInformation("MULTIPLAYER : invitation de {Ami} pour {Jeu} refusee", invitation.From?.Pseudo, invitation.Game);
         _ = _session.RepondreAsync(invitation.Invitation, false);
         MettreAJourLeBandeau();
     }
@@ -562,6 +593,7 @@ public sealed class MultiplayerPanelService
         }
 
         var refus = await _session.InviterAsync(room.Room, ami.Handle).ConfigureAwait(false);
+        _journal?.LogInformation("MULTIPLAYER : invitation envoyee a {Ami} pour {Jeu} ({Statut})", ami.Pseudo, room.Game, refus ?? "ok");
         lock (_verrou)
         {
             _refus = refus;
@@ -603,6 +635,8 @@ public sealed class MultiplayerPanelService
             {
                 _invitationsVues.Add(nouvelle.Invitation);
                 _invitation = nouvelle;
+                _journal?.LogInformation("MULTIPLAYER : invitation recue de {Ami} pour {Jeu} (panneau {Mode}, en jeu {EnJeu})",
+                    nouvelle.From?.Pseudo, nouvelle.Game, _mode, EnJeu());
             }
             else if (_invitation is { } courante && etat.Invitations.All(i => i.Invitation != courante.Invitation))
             {
@@ -669,12 +703,14 @@ public sealed class MultiplayerPanelService
         var cartes = new List<MultiplayerToastOverlay.Carte>();
         lock (_verrou)
         {
-            if (_mode != Mode.Ferme || EnJeu())
+            if (EnJeu())
             {
                 cartes.Clear();
             }
             else
             {
+                // Panneau ouvert, seule la selection se tait (le panneau la montre) : une invitation ne se voyait pas quand
+                // l'invite attendait deja dans son panneau (retour du user du 22/10).
                 if (_invitation is { } invitation)
                 {
                     cartes.Add(new MultiplayerToastOverlay.Carte(
@@ -692,7 +728,7 @@ public sealed class MultiplayerPanelService
                 }
 
                 // Un seul bloc « Votre selection », un jeu par ligne (retour du user du 22/10).
-                var lignes = _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3).Select(room =>
+                var lignes = _mode != Mode.Ferme ? [] : _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3).Select(room =>
                 {
                     var absent = room.Players.Any(j => j.You && !j.Present);
                     return new MultiplayerToastOverlay.Ligne(
@@ -838,8 +874,11 @@ public sealed class MultiplayerPanelService
     /// </summary>
     private List<LeaderboardOverlayService.JoueurMultiplayer> LesPlaces(MultiplayerRoom? room, int max, Func<string, string> T)
     {
+        // ▲▼ change son propre personnage tant que la gameroom attend ou decompte : sa carte le montre par des fleches.
+        var choixOuvert = room?.State is "waiting" or "countdown" && _jeu?.Game is { EstNelfePlay: true, Choices.Count: > 0 };
         var lignes = (room?.Players ?? [])
-            .Select((joueur, i) => Joueur(joueur, joueur.Present ? T("multiplayer.ready") : T("multiplayer.away"), T) with { Place = joueur.Seat ?? i + 1 })
+            .Select((joueur, i) => Joueur(joueur, joueur.Present ? T("multiplayer.ready") : T("multiplayer.away"), T)
+                with { Place = joueur.Seat ?? i + 1, ChoixModifiable = choixOuvert && joueur.You })
             .ToList();
         if (room is null)
         {
@@ -1018,7 +1057,7 @@ public sealed class MultiplayerPanelService
     /// <summary>La part des degats infliges par chaque place d'un duel, a leurs couleurs (P1 a gauche).</summary>
     private LeaderboardOverlayService.Partage? LePartage(MultiplayerRoom? room, Func<string, string> T)
     {
-        if (room?.Ended?.Stats is not { } stats || !stats.TryGetValue("1", out var p1) || !stats.TryGetValue("2", out var p2)
+        if (StatsDeLaRencontre(room) is not { } stats || !stats.TryGetValue("1", out var p1) || !stats.TryGetValue("2", out var p2)
             || p1.Damage + p2.Damage <= 0)
         {
             return null;
@@ -1079,7 +1118,7 @@ public sealed class MultiplayerPanelService
     /// <summary>Les statistiques d'une place au resultat (ecran 10) : coups reussis, K.O., perfects, degats infliges.</summary>
     private IReadOnlyList<LeaderboardOverlayService.StatDuJoueur>? StatsDe(MultiplayerRoom? room, int? place, Func<string, string> T)
     {
-        if (place is null || room?.Ended?.Stats is not { } stats
+        if (place is null || StatsDeLaRencontre(room) is not { } stats
             || !stats.TryGetValue(place.Value.ToString(CultureInfo.InvariantCulture), out var s))
         {
             return null;

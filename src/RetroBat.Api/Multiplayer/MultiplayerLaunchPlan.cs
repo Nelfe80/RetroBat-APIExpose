@@ -86,6 +86,7 @@ public static class MultiplayerLaunchPlan
         }
 
         var morceaux = new List<string> { manettes, "-system", systeme, "-emulator", "libretro", "-core", coeur, "-retroachievements", "0" };
+        morceaux.AddRange(ArgumentsDuTempsPartage);
         if (ShaderDeLaPlace(jeu, place) is { } shader)
         {
             // Un seul ecran, au format de la borne d'origine, sans habillage qui decalerait l'image.
@@ -95,6 +96,28 @@ public static class MultiplayerLaunchPlan
         morceaux.AddRange(netplay);
         morceaux.AddRange(["-rom", '"' + rom.Replace("\"", "") + '"']);
         return string.Join(' ', morceaux.Where(morceau => morceau.Length > 0));
+    }
+
+    /// <summary>
+    /// Ce qui pourrait alterer le temps d'une partie partagee, coupe le temps du lancement (retour du user du 22/10) : le
+    /// retour arriere (que le lanceur allume d'office sur les coeurs qui le permettent), la sauvegarde et le chargement
+    /// automatiques, l'execution anticipee et les trames preemptives ; l'avance rapide ramenee a la vitesse normale.
+    /// Le lanceur lit ces paires en dernier, comme le reste de la ligne. Restent ses raccourcis de chargement d'etat : il les
+    /// reecrit a chaque lancement et les retire des surcharges de RetroArch.
+    /// </summary>
+    internal static readonly IReadOnlyList<string> ArgumentsDuTempsPartage =
+        ["-rewind", "0", "-autosave", "0", "-runahead", "0", "-preemptive_frames", "0", "-fastforward_ratio", "1.000000"];
+
+    /// <summary>
+    /// Les noms des manettes d'une ligne de lancement d'ES (« P1 Generic USB Joystick, P2 vJoy Device »), sans leur
+    /// chemin ni leur identifiant ; « aucune » quand rien n'est repris : le lanceur range alors les manettes lui-meme.
+    /// </summary>
+    public static string NomsDesManettes(string manettes)
+    {
+        var noms = System.Text.RegularExpressions.Regex.Matches(manettes ?? string.Empty, @"-p(\d+)name ""([^""]*)""")
+            .Select(m => "P" + m.Groups[1].Value + " " + m.Groups[2].Value)
+            .ToList();
+        return noms.Count == 0 ? "aucune (le lanceur range les manettes lui-meme)" : string.Join(", ", noms);
     }
 
     /// <summary>L'hote : ses reglages netplay passent tous en arguments, mots de passe compris.</summary>
