@@ -261,6 +261,20 @@ public sealed record MultiplayerChoice
     public bool Distinct { get; init; }
 
     /// <summary>
+    /// LES ADRESSES DE LA CARTE DU COEUR (GBA, 23/10) : avec <c>core_map</c>, chaque <c>core_ram</c> est une adresse de la
+    /// carte memoire que le coeur declare (READ_CORE_MEMORY / WRITE_CORE_MEMORY), pas un decalage dans sa memoire systeme
+    /// (READ_CORE_RAM). mGBA Splitscreen y range chaque console : la console 1 aux adresses de la GBA (EWRAM 0x02000000),
+    /// la console N a +0x10000000 par console, que READ_CORE_RAM ne voit pas.
+    /// </summary>
+    [JsonPropertyName("memory")]
+    public string? Memory { get; init; }
+
+    public const string CarteDuCoeur = "core_map";
+
+    [JsonIgnore]
+    public bool ParLaCarteDuCoeur => string.Equals(Memory, CarteDuCoeur, StringComparison.Ordinal);
+
+    /// <summary>
     /// La valeur de chaque place, dans l'ordre des places : un choix distinct deja pris par une place d'avant passe a la
     /// suivante libre. Le meme calcul chez l'hote (ce qu'il ecrit) et dans le panneau (ce qu'il montre).
     /// </summary>

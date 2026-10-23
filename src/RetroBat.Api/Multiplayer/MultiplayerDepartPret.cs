@@ -135,16 +135,16 @@ public sealed class MultiplayerDepartPret
         await _commandes.EnvoyerAsync("LOAD_STATE_SLOT " + Emplacement.ToString(CultureInfo.InvariantCulture), ct).ConfigureAwait(false);
         await Task.Delay(_apresLeChargement, ct).ConfigureAwait(false);
 
-        var ecritures = Ecritures(jeu, choixParPlace);
-        foreach (var (decalage, valeur) in ecritures)
+        var ecritures = EcrituresParCommande(jeu, choixParPlace);
+        foreach (var (decalage, valeur, carte) in ecritures)
         {
-            await _commandes.EnvoyerAsync($"WRITE_CORE_RAM {decalage:x} {valeur:x2}", ct).ConfigureAwait(false);
+            await _commandes.EnvoyerAsync($"{(carte ? "WRITE_CORE_MEMORY" : "WRITE_CORE_RAM")} {decalage:x} {valeur:x2}", ct).ConfigureAwait(false);
         }
 
         // Verifiee (S5.4) : chaque valeur relue avant que quiconque se connecte ; un ecart annule le depart.
-        foreach (var (decalage, valeur) in ecritures)
+        foreach (var (decalage, valeur, carte) in ecritures)
         {
-            var lu = await LireAsync(decalage, ct).ConfigureAwait(false);
+            var lu = await LireAsync(decalage, ct, carte).ConfigureAwait(false);
             if (lu != valeur)
             {
                 return new Resultat(false, $"relecture differente a 0x{decalage:X} ({(lu is { } v ? v.ToString(CultureInfo.InvariantCulture) : "rien")} au lieu de {valeur})", fichier);
@@ -157,8 +157,13 @@ public sealed class MultiplayerDepartPret
     /// <summary>Ce qu'il faut ecrire : pour chaque choix et chaque place de la partie, la valeur du joueur ou le defaut.</summary>
     public static IReadOnlyList<(long Decalage, int Valeur)> Ecritures(
         MultiplayerGame jeu, IReadOnlyDictionary<int, IReadOnlyDictionary<string, int>?> choixParPlace)
+        => EcrituresParCommande(jeu, choixParPlace).Select(e => (e.Decalage, e.Valeur)).ToList();
+
+    /// <summary>Les ecritures, chacune avec sa commande : la carte du coeur (<see cref="MultiplayerChoice.ParLaCarteDuCoeur"/>) ou la memoire systeme.</summary>
+    public static IReadOnlyList<(long Decalage, int Valeur, bool Carte)> EcrituresParCommande(
+        MultiplayerGame jeu, IReadOnlyDictionary<int, IReadOnlyDictionary<string, int>?> choixParPlace)
     {
-        var ecritures = new List<(long, int)>();
+        var ecritures = new List<(long, int, bool)>();
         foreach (var choix in jeu.Choices ?? [])
         {
             // Un choix distinct deja pris par une place d'avant passe a la suivante libre (Metal Slug 3).
@@ -172,7 +177,7 @@ public sealed class MultiplayerDepartPret
                     continue;
                 }
 
-                ecritures.Add((adresse.Value, valeur));
+                ecritures.Add((adresse.Value, valeur, choix.ParLaCarteDuCoeur));
             }
         }
 
@@ -201,11 +206,12 @@ public sealed class MultiplayerDepartPret
         return null;
     }
 
-    private async Task<int?> LireAsync(long decalage, CancellationToken ct)
+    private async Task<int?> LireAsync(long decalage, CancellationToken ct, bool carte = false)
     {
-        var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {decalage:x} 1", ct).ConfigureAwait(false);
+        var commande = carte ? "READ_CORE_MEMORY" : "READ_CORE_RAM";
+        var reponse = await _commandes.DemanderAsync($"{commande} {decalage:x} 1", ct).ConfigureAwait(false);
         var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        return morceaux is { Length: >= 3 } && morceaux[0] == "READ_CORE_RAM"
+        return morceaux is { Length: >= 3 } && morceaux[0] == commande
             && int.TryParse(morceaux[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var valeur)
                 ? valeur
                 : null;

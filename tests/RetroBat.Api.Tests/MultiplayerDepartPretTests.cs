@@ -20,6 +20,8 @@ public class MultiplayerDepartPretTests : IDisposable
     private sealed class FauxRetroArch : ICommandesRetroArch
     {
         public readonly Dictionary<long, int> Memoire = new();
+        /// <summary>La carte memoire du coeur (READ_CORE_MEMORY / WRITE_CORE_MEMORY), a part de la memoire systeme.</summary>
+        public readonly Dictionary<long, int> Carte = new();
         public readonly List<string> Recues = new();
         public bool Muet { get; init; }
         public string DossierDesEtats { get; init; } = string.Empty;
@@ -39,6 +41,8 @@ public class MultiplayerDepartPretTests : IDisposable
                 "GET_STATUS" => "GET_STATUS PLAYING fb_alpha,sf2ce,crc32=2090400e",
                 "GET_CONFIG_PARAM" => "GET_CONFIG_PARAM savestate_directory " + DossierDesEtats,
                 "READ_CORE_RAM" => $"READ_CORE_RAM {morceaux[1]} {Memoire.GetValueOrDefault(long.Parse(morceaux[1], NumberStyles.HexNumber)):x2}",
+                "READ_CORE_MEMORY" => Carte.TryGetValue(long.Parse(morceaux[1], NumberStyles.HexNumber), out var v)
+                    ? $"READ_CORE_MEMORY {morceaux[1]} {v:X2}" : $"READ_CORE_MEMORY {morceaux[1]} -1 no descriptor for address",
                 _ => null,
             });
         }
@@ -47,6 +51,11 @@ public class MultiplayerDepartPretTests : IDisposable
         {
             Recues.Add(commande);
             var morceaux = commande.Split(' ');
+            if (morceaux[0] == "WRITE_CORE_MEMORY")
+            {
+                Carte[long.Parse(morceaux[1], NumberStyles.HexNumber)] = int.Parse(morceaux[2], NumberStyles.HexNumber);
+            }
+
             if (morceaux[0] == "WRITE_CORE_RAM")
             {
                 var adresse = long.Parse(morceaux[1], NumberStyles.HexNumber);
@@ -148,6 +157,75 @@ public class MultiplayerDepartPretTests : IDisposable
         Assert.Equal(3, choix.VoisineLibre(0, -1, new HashSet<int> { 2 }));
         // Un choix sans le drapeau ne saute rien.
         Assert.Equal(2, (choix with { Distinct = false }).Departager([(1, 2), (2, 2)])[2]);
+    }
+
+    /// <summary>Mario Kart: Super Circuit sous mGBA Splitscreen : la case du pilote dans l'EWRAM de chaque console.</summary>
+    private (MultiplayerGame, string) MarioKart()
+    {
+        var etat = Path.Combine(_dossier, "mksc.state");
+        File.WriteAllBytes(etat, [7, 7, 7]);
+        var jeu = new MultiplayerGame
+        {
+            Id = "gba/mario-kart-super-circuit", System = "gba", Players = 2, Level = MultiplayerLevels.NelfePlay,
+            Start = new MultiplayerStart { State = "etat", Sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(etat))) },
+            Choices =
+            [
+                new MultiplayerChoice
+                {
+                    Key = "character", Default = 0, Memory = MultiplayerChoice.CarteDuCoeur,
+                    Values = [new() { Value = 0, Name = "MARIO" }, new() { Value = 1, Name = "LUIGI" }, new() { Value = 8, Name = "BOWSER" }],
+                    Seats = [new() { Seat = 1, CoreRam = "0x0202A8EC" }, new() { Seat = 2, CoreRam = "0x1202A8EC" }],
+                },
+            ],
+        };
+        return (jeu, etat);
+    }
+
+    [Fact]
+    public async Task Un_choix_par_la_carte_du_coeur_s_ecrit_et_se_relit_dans_chaque_console()
+    {
+        var (jeu, etat) = MarioKart();
+        var ra = new FauxRetroArch { DossierDesEtats = Path.Combine(_dossier, "etats") };
+        var resultat = await new MultiplayerDepartPret(ra, apresLeChargement: TimeSpan.Zero)
+            .PreparerAsync(jeu, etat, "mksc", Places(8, 1), CancellationToken.None);
+
+        Assert.True(resultat.Ok, resultat.Raison);
+        Assert.Equal(8, ra.Carte[0x0202A8EC]);
+        Assert.Equal(1, ra.Carte[0x1202A8EC]);
+        Assert.Empty(ra.Memoire);   // rien par READ_CORE_RAM : la console 2 n'y est pas
+        Assert.Contains("WRITE_CORE_MEMORY 1202a8ec 01", ra.Recues);
+        Assert.Contains("READ_CORE_MEMORY 1202a8ec 1", ra.Recues);
+    }
+
+    [Fact]
+    public async Task Une_carte_absente_annule_le_depart()
+    {
+        // L'ancien coeur (sans carte memoire) : RetroArch repond « no descriptor », le depart ne part pas a l'aveugle.
+        var (jeu, etat) = MarioKart();
+        var ra = new SansCarte { DossierDesEtats = Path.Combine(_dossier, "etats") };
+        var resultat = await new MultiplayerDepartPret(ra, apresLeChargement: TimeSpan.Zero)
+            .PreparerAsync(jeu, etat, "mksc", Places(8, 1), CancellationToken.None);
+        Assert.False(resultat.Ok);
+        Assert.Contains("relecture", resultat.Raison);
+    }
+
+    private sealed class SansCarte : ICommandesRetroArch
+    {
+        public string DossierDesEtats { get; init; } = string.Empty;
+
+        public Task<string?> DemanderAsync(string commande, CancellationToken ct, int delaiMs = 500)
+        {
+            var morceaux = commande.Split(' ');
+            return Task.FromResult<string?>(morceaux[0] switch
+            {
+                "GET_STATUS" => "GET_STATUS PLAYING game_boy_advance,mksc,crc32=ed316e37",
+                "GET_CONFIG_PARAM" => "GET_CONFIG_PARAM savestate_directory " + DossierDesEtats,
+                "READ_CORE_MEMORY" => $"READ_CORE_MEMORY {morceaux[1]} -1 no memory map defined",
+                _ => null,
+            });
+        }
+
+        public Task EnvoyerAsync(string commande, CancellationToken ct) => Task.CompletedTask;
     }
 
     [Fact]
