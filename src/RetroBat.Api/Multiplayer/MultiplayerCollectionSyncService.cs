@@ -59,6 +59,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     private readonly string _romsRoot;
     private readonly Func<bool> _emulateurTourne;
     private readonly Func<string, string?> _md5DuContenu;
+    private bool _inscriptionsFaites;
     private readonly SemaphoreSlim _porte = new(1, 1);
     private IDisposable? _abonnementReglages;
     private IDisposable? _abonnementBus;
@@ -77,7 +78,8 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         ILogger<MultiplayerCollectionSyncService>? logger = null,
         string? romsRoot = null,
         Func<bool>? emulateurTourne = null,
-        Func<string, string?>? md5DuContenu = null)
+        Func<string, string?>? md5DuContenu = null,
+        GamelistUpdateService? gamelists = null)
     {
         _options = options;
         _store = store;
@@ -91,7 +93,11 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         _romsRoot = romsRoot ?? RetroBatPaths.RomsRoot;
         _emulateurTourne = emulateurTourne ?? EmulatorForeground.EmulateurTourne;
         _md5DuContenu = md5DuContenu ?? NelfePlayScoringCollectionSyncService.Md5DuContenu;
+        Declarer = gamelists is null ? null : (systeme, jeux) => gamelists.DeclarerJeuxAbsents(systeme, jeux);
     }
+
+    /// <summary>Inscrit dans la gamelist d'un systeme les jeux qu'elle ne nomme pas (voir <see cref="InscrireLesJeuxInconnusDEs"/>).</summary>
+    internal Func<string, IReadOnlyList<(string CheminAbsolu, string Nom)>, int>? Declarer { get; set; }
 
     /// <summary>Le dernier etat connu.</summary>
     public MultiplayerCollectionStatus Status => _statut;
@@ -224,7 +230,8 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
             }
 
             Games = jeux;
-            if (resultat.Changed || visuel.Changed)
+            var inscrits = resultat.Changed || !_inscriptionsFaites ? InscrireLesJeuxInconnusDEs(jeux) : 0;
+            if (resultat.Changed || visuel.Changed || inscrits > 0)
             {
                 _logger?.LogInformation(
                     "Collection MULTIPLAYER : {Entrees} jeux sur {Catalogue} au catalogue, revision {Revision}",
@@ -258,6 +265,50 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         {
             _porte.Release();
         }
+    }
+
+    /// <summary>
+    /// UN JEU DE LA COLLECTION DOIT EXISTER POUR EMULATIONSTATION (comme World Scoring, 26/09). Avec ParseGamelistOnly,
+    /// ES ne charge que les jeux que leur gamelist nomme, et n'affiche dans une collection que les jeux qu'il a charges :
+    /// Mario Kart: Super Circuit manquait a la collection (23/10), le catalogue preferant la version USA quand la gamelist
+    /// ne nommait que l'europeenne. Chaque jeu retenu y est inscrit s'il n'y est pas ; a la premiere passe et quand la
+    /// collection change, pas a chaque tic : une gamelist d'arcade se relit cher.
+    /// </summary>
+    private int InscrireLesJeuxInconnusDEs(IReadOnlyList<MultiplayerInstalledGame> jeux)
+    {
+        _inscriptionsFaites = true;
+        if (Declarer is null || jeux.Count == 0)
+        {
+            return 0;
+        }
+
+        var total = 0;
+        foreach (var systeme in jeux.GroupBy(jeu => Path.GetFileName(Path.GetDirectoryName(jeu.Path)) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+        {
+            if (systeme.Key.Length == 0)
+            {
+                continue;
+            }
+
+            var entrees = systeme
+                .Select(jeu => (jeu.Path, GamelistIdentity.DeclaredName(systeme.Key, jeu.Game.Name, Path.GetFileNameWithoutExtension(jeu.Path)) ?? jeu.Game.Name))
+                .ToList();
+            try
+            {
+                total += Declarer(systeme.Key, entrees);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Xml.XmlException)
+            {
+                _logger?.LogWarning(ex, "Collection MULTIPLAYER : gamelist de {Systeme} non completee", systeme.Key);
+            }
+        }
+
+        if (total > 0)
+        {
+            _logger?.LogInformation("Collection MULTIPLAYER : {Nombre} jeu(x) inscrit(s) dans leur gamelist pour qu'EmulationStation les charge", total);
+        }
+
+        return total;
     }
 
     private MultiplayerCollectionStatus Desactiver()

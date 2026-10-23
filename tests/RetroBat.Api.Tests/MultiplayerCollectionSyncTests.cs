@@ -257,6 +257,37 @@ public class MultiplayerCollectionSyncTests : IDisposable
     }
 
     [Fact]
+    public async Task Un_jeu_retenu_est_inscrit_dans_sa_gamelist_a_la_premiere_passe_et_quand_la_collection_change()
+    {
+        // Mario Kart (23/10) : la gamelist de la borne ne nommait que la version europeenne, le catalogue preferait l'USA ;
+        // avec ParseGamelistOnly, ES n'affichait pas le jeu de la collection.
+        var usa = PoserCartouche("gba", "Mario Kart - Super Circuit (USA).zip", "a.gba", "version usa");
+        var arcade = PoserFichier("fbneo", "mslug3.zip");
+        PoserCatalogue(Catalogue(JeuConsole("gba/mario-kart-super-circuit", "gba", usa.Md5, usa.Crc), Arcade("mslug3")));
+        var service = Service();
+        var appels = new List<(string Systeme, List<string> Chemins)>();
+        service.Declarer = (systeme, jeux) =>
+        {
+            appels.Add((systeme, jeux.Select(j => Path.GetFullPath(j.CheminAbsolu)).ToList()));
+            return jeux.Count;
+        };
+
+        await service.SynchroniserAsync("test", CancellationToken.None);
+        Assert.Equal(["fbneo", "gba"], appels.Select(a => a.Systeme).Order(StringComparer.Ordinal).ToArray());
+        Assert.Contains(Path.GetFullPath(usa.Chemin), appels.Single(a => a.Systeme == "gba").Chemins);
+        Assert.Contains(Path.GetFullPath(arcade), appels.Single(a => a.Systeme == "fbneo").Chemins);
+
+        // Une passe sans changement ne relit pas les gamelists ; un jeu de plus, si.
+        appels.Clear();
+        await service.SynchroniserAsync("test", CancellationToken.None);
+        Assert.Empty(appels);
+        PoserFichier("fbneo", "sf2ce.zip");
+        PoserCatalogue(Catalogue(JeuConsole("gba/mario-kart-super-circuit", "gba", usa.Md5, usa.Crc), Arcade("mslug3"), Arcade("sf2ce")));
+        await service.SynchroniserAsync("test", CancellationToken.None);
+        Assert.NotEmpty(appels);
+    }
+
+    [Fact]
     public void Par_defaut_la_collection_est_coupee()
         => Assert.False(new NelfePlayOptions().ShowMultiplayerCollection);
 
