@@ -189,12 +189,17 @@ public sealed record MultiplayerGame
     public bool EstNelfePlay => Level == MultiplayerLevels.NelfePlay && Start is not null;
 
     /// <summary>
-    /// Le depart pret d'une partie a <paramref name="joueurs"/> : celui de <see cref="Starts"/> a ce nombre, sinon
-    /// <see cref="Start"/> quand il vaut pour tous les nombres ou pour celui-la. Null : pas d'etat pour ce nombre.
+    /// Le depart pret d'une partie a <paramref name="joueurs"/> sur <paramref name="contenu"/> (le md5 de la gameroom) :
+    /// celui de <see cref="Starts"/> a ce nombre, sinon <see cref="Start"/> quand il vaut pour tous les nombres ou pour
+    /// celui-la. Un etat fait sur un contenu ne se charge jamais sur un autre. Null : la partie se joue en classique.
     /// </summary>
-    public MultiplayerStart? DepartPour(int joueurs)
-        => Starts?.FirstOrDefault(depart => depart.Players == joueurs)
-           ?? (Start is { } commun && (commun.Players is null || commun.Players == joueurs) ? commun : null);
+    public MultiplayerStart? DepartPour(int joueurs, string? contenu = null)
+        => Starts?.FirstOrDefault(depart => depart.Players == joueurs && depart.VautPour(contenu))
+           ?? (Start is { } commun && (commun.Players is null || commun.Players == joueurs) && commun.VautPour(contenu) ? commun : null);
+
+    /// <summary>Un depart pret existe-t-il pour ce contenu, a un nombre de joueurs au moins ? Sinon, pas de choix a proposer.</summary>
+    public bool ADesDepartsPour(string? contenu)
+        => (Starts ?? []).Prepend(Start).Any(depart => depart is not null && depart.VautPour(contenu));
 
     /// <summary>
     /// Classe (23/10) : un jeu versus dont on lit la fin, quel que soit son niveau. Le depart pret du niveau NelfePlay
@@ -250,6 +255,13 @@ public sealed record MultiplayerStart
     /// <summary>Le nombre de joueurs de l'etat, ou null quand il vaut pour tous (un etat d'arcade).</summary>
     [JsonPropertyName("players")]
     public int? Players { get; init; }
+
+    /// <summary>Console : le md5 du contenu sur lequel l'etat a ete fait (un etat USA casserait la version Europe).</summary>
+    [JsonPropertyName("content")]
+    public string? Content { get; init; }
+
+    public bool VautPour(string? contenu)
+        => Content is null || string.Equals(Content, contenu, StringComparison.OrdinalIgnoreCase);
 }
 
 /// <summary>
@@ -725,6 +737,11 @@ public sealed class MultiplayerCatalogueStore
                 {
                     return "etat pour " + joueurs + " joueurs hors de 2 a " + jeu.Players;
                 }
+
+                if (depart.Content is { } md5 && !(jeu.Content?.Md5 ?? []).Contains(md5, StringComparer.OrdinalIgnoreCase))
+                {
+                    return "etat fait sur un contenu hors du catalogue";
+                }
             }
 
             if (jeu.Start.Players is not null || jeu.Starts is { Count: > 0 })
@@ -733,16 +750,20 @@ public sealed class MultiplayerCatalogueStore
                 // aurait sinon le panneau des choix sans depart pour les appliquer.
                 if ((jeu.Starts ?? []).Any(depart => depart.Players is null)
                     || (jeu.Starts ?? []).Prepend(jeu.Start).Where(depart => depart.Players is not null)
-                        .GroupBy(depart => depart.Players).Any(groupe => groupe.Count() > 1))
+                        .GroupBy(depart => (depart.Players, Contenu: depart.Content?.ToLowerInvariant())).Any(groupe => groupe.Count() > 1))
                 {
                     return "etats par nombre de joueurs sans nombre ou en double";
                 }
 
-                for (var joueurs = 2; joueurs <= jeu.Players; joueurs++)
+                // Chaque contenu qui a des etats les a pour tous les nombres ; un contenu sans etat se joue en classique.
+                foreach (var contenu in (jeu.Starts ?? []).Prepend(jeu.Start).Select(depart => depart.Content?.ToLowerInvariant()).Distinct())
                 {
-                    if (jeu.DepartPour(joueurs) is null)
+                    for (var joueurs = 2; joueurs <= jeu.Players; joueurs++)
                     {
-                        return "pas d'etat pour " + joueurs + " joueurs";
+                        if (jeu.DepartPour(joueurs, contenu) is null)
+                        {
+                            return "pas d'etat pour " + joueurs + " joueurs";
+                        }
                     }
                 }
             }

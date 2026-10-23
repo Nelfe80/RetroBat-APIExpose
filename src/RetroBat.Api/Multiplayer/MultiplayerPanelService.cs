@@ -409,7 +409,7 @@ public sealed class MultiplayerPanelService
             if (sens is "up" or "down"
                 && _modele.Etat == MultiplayerPanelModel.Foyer.Panneau
                 && _modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers
-                && _jeu?.Game is { EstNelfePlay: true, Choices.Count: > 0 } jeuNelfePlay
+                && _jeu is { ChoixOuverts: true, Game: var jeuNelfePlay }
                 && RoomDuJeu() is { State: "waiting" or "countdown" } salle)
             {
                 _ = ChangerDePersonnageAsync(salle, jeuNelfePlay, sens == "down" ? 1 : -1);
@@ -940,7 +940,7 @@ public sealed class MultiplayerPanelService
     private List<LeaderboardOverlayService.JoueurMultiplayer> LesPlaces(MultiplayerRoom? room, int max, Func<string, string> T)
     {
         // ▲▼ change son propre personnage tant que la gameroom attend ou decompte : sa carte le montre par des fleches.
-        var choixOuvert = room?.State is "waiting" or "countdown" && _jeu?.Game is { EstNelfePlay: true, Choices.Count: > 0 };
+        var choixOuvert = room?.State is "waiting" or "countdown" && _jeu is { ChoixOuverts: true };
         var lignes = (room?.Players ?? [])
             .Select((joueur, i) => Joueur(joueur, joueur.Present ? T("multiplayer.ready") : T("multiplayer.away"), T)
                 with { Place = joueur.Seat ?? i + 1, ChoixModifiable = choixOuvert && joueur.You })
@@ -962,7 +962,7 @@ public sealed class MultiplayerPanelService
     /// <summary>NIVEAU NELFEPLAY : tous les personnages du jeu en portraits, le choix du joueur en avant (▲▼).</summary>
     private (IReadOnlyList<LeaderboardOverlayService.PortraitDeChoix>?, int) LaBandeDesPersonnages()
     {
-        if (_jeu?.Game is not { EstNelfePlay: true, Choices: { Count: > 0 } choix } jeu)
+        if (_jeu is not { ChoixOuverts: true, Game: { Choices: { } choix } jeu })
         {
             return (null, -1);
         }
@@ -1201,7 +1201,7 @@ public sealed class MultiplayerPanelService
     /// <summary>NIVEAU NELFEPLAY : le portrait du personnage de ce joueur.</summary>
     private string? PortraitDeJoueur(MultiplayerJoueur joueur)
     {
-        if (_jeu?.Game is not { EstNelfePlay: true, Choices: { Count: > 0 } choix } jeu)
+        if (_jeu is not { ChoixOuverts: true, Game: { Choices: { } choix } jeu })
         {
             return null;
         }
@@ -1275,8 +1275,7 @@ public sealed class MultiplayerPanelService
     /// <summary>NIVEAU NELFEPLAY : le nom du personnage de ce joueur (le premier choix du catalogue), ou rien.</summary>
     private string PersonnageDe(MultiplayerJoueur joueur)
     {
-        var jeu = _jeu?.Game;
-        if (jeu is not { EstNelfePlay: true, Choices: { Count: > 0 } choix })
+        if (_jeu is not { ChoixOuverts: true, Game: { Choices: { } choix } jeu })
         {
             return string.Empty;
         }
@@ -1303,7 +1302,7 @@ public sealed class MultiplayerPanelService
             aides.Add(new("dpad_updown", T("multiplayer.help.choose")));
             aides.Add(new(_glypheValider, T("multiplayer.help.invite")));
         }
-        else if (_modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers && _jeu?.Game is { EstNelfePlay: true, Choices.Count: > 0 })
+        else if (_modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers && _jeu is { ChoixOuverts: true })
         {
             aides.Add(new("dpad_updown", T("multiplayer.help.character")));
         }

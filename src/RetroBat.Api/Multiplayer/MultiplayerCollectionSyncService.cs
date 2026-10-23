@@ -480,7 +480,14 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
 /// Un jeu du catalogue, le fichier qui le porte sur cette borne, son coeur, et la cle de contenu
 /// que la plateforme compare (le set en arcade, le md5 en console) : une gameroom ne reunit que la meme.
 /// </summary>
-public sealed record MultiplayerInstalledGame(MultiplayerGame Game, string Path, MultiplayerCore? Core, string ContentKey);
+public sealed record MultiplayerInstalledGame(MultiplayerGame Game, string Path, MultiplayerCore? Core, string ContentKey)
+{
+    /// <summary>Le panneau propose les choix du niveau NelfePlay quand un depart pret existe pour ce contenu.</summary>
+    public bool ChoixOuverts => Game.EstNelfePlay && Game.Choices is { Count: > 0 } && Game.ADesDepartsPour(ContentKey);
+
+    /// <summary>Le depart pret d'une partie a <paramref name="joueurs"/> sur ce contenu ; null : elle se joue en classique.</summary>
+    public MultiplayerStart? DepartPour(int joueurs) => Game.EstNelfePlay ? Game.DepartPour(joueurs, ContentKey) : null;
+}
 
 public sealed record MultiplayerCollectionStatus(
     bool Enabled,

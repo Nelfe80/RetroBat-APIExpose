@@ -200,7 +200,7 @@ public sealed class MultiplayerLaunchService : IHostedService
 
             var stats = suivi is null ? null : await suivi.ConfigureAwait(false);
             // Le depart pret charge un etat chez l'hote : c'est le seul chargement permis.
-            if (await JugerLeBilanAsync(room, jeu.Game, partie.Debut, jeu.Game.EstNelfePlay ? 1 : 0).ConfigureAwait(false) is { } motif)
+            if (await JugerLeBilanAsync(room, jeu.Game, partie.Debut, DepartDeLaRoom(room, jeu) is null ? 0 : 1).ConfigureAwait(false) is { } motif)
             {
                 await _client.TerminerAsync(room.Room, "voided", duree, CancellationToken.None).ConfigureAwait(false);
             }
@@ -243,8 +243,16 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
 
             // NIVEAU NELFEPLAY : le depart pret, AVANT que la session parte et que quiconque se connecte. Les invites
-            // recevront l'etat de l'hote, choix compris ; un depart qui ne se verifie pas ne part pas du tout.
-            if (jeu.Game.EstNelfePlay && !await PreparerLeDepartAsync(room, jeu).ConfigureAwait(false))
+            // recevront l'etat de l'hote, choix compris ; un depart qui ne se verifie pas ne part pas du tout. Sans etat
+            // pour ce contenu (Mario Kart Europe, l'etat est fait sur l'USA), la partie se joue en classique.
+            var depart = DepartDeLaRoom(room, jeu);
+            if (depart is null && jeu.Game.EstNelfePlay)
+            {
+                _journal.LogInformation("MULTIPLAYER : pas de depart pret de {Jeu} pour ce contenu a {Joueurs} joueurs : partie classique ({Room})",
+                    jeu.Game.Id, JoueursDeLaRoom(room), room.Room);
+            }
+
+            if (depart is not null && !await PreparerLeDepartAsync(room, jeu, depart).ConfigureAwait(false))
             {
                 await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
                 await RetroArchInvite.FermerAsync().ConfigureAwait(false);
@@ -367,18 +375,15 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
     }
 
-    /// <summary>Charge l'etat, ecrit le choix de chaque place, relit. Faux quand le depart ne se verifie pas.</summary>
-    private async Task<bool> PreparerLeDepartAsync(MultiplayerRoom room, MultiplayerInstalledGame jeu)
-    {
-        // Le nombre de joueurs est celui des options du coeur (Lancer) : l'etat doit avoir autant de consoles que lui.
-        var joueurs = Math.Max(2, room.Launch?.Players ?? 0);
-        var depart = jeu.Game.DepartPour(joueurs);
-        if (depart is null)
-        {
-            _journal.LogWarning("MULTIPLAYER : pas de depart pret de {Jeu} pour {Joueurs} joueurs ({Room})", jeu.Game.Id, joueurs, room.Room);
-            return false;
-        }
+    /// <summary>Le nombre de joueurs de la partie, celui des options du coeur (Lancer) : l'etat a autant de consoles que lui.</summary>
+    private static int JoueursDeLaRoom(MultiplayerRoom room) => Math.Max(2, room.Launch?.Players ?? 0);
 
+    /// <summary>Le depart pret de cette partie (niveau NelfePlay, nombre de joueurs, contenu), ou null : partie classique.</summary>
+    private static MultiplayerStart? DepartDeLaRoom(MultiplayerRoom room, MultiplayerInstalledGame jeu) => jeu.DepartPour(JoueursDeLaRoom(room));
+
+    /// <summary>Charge l'etat, ecrit le choix de chaque place, relit. Faux quand le depart ne se verifie pas.</summary>
+    private async Task<bool> PreparerLeDepartAsync(MultiplayerRoom room, MultiplayerInstalledGame jeu, MultiplayerStart depart)
+    {
         var etat = Path.Combine(RetroBatPaths.PluginRoot, "resources", "multiplayer", depart.State.Replace('/', Path.DirectorySeparatorChar));
         var choixParPlace = room.Players
             .Where(joueur => joueur.Seat is not null)

@@ -239,6 +239,47 @@ public class MultiplayerDepartPretTests : IDisposable
             MultiplayerCatalogueStore.ValiderLeDepart(QuatreConsoles with { Starts = [Etat(3, 'b') with { State = "../x.state" }, Etat(4, 'c')] }));
     }
 
+    private const string Usa = "784a036ff1aae709e90167186639b75e";
+    private const string Europe = "f99fb545ac65126e9956a7718c30d6a3";
+
+    private static readonly MultiplayerGame SurLUsa = QuatreConsoles with
+    {
+        Content = new MultiplayerContent { Md5 = [Usa, Europe] },
+        Start = Etat(2) with { Content = Usa },
+        Starts = [Etat(3, 'b') with { Content = Usa }, Etat(4, 'c') with { Content = Usa }],
+        Choices = [new MultiplayerChoice { Key = "character", Default = 4, Values = [new() { Value = 4, Name = "RANDOM" }] }],
+    };
+
+    [Fact]
+    public void Un_etat_fait_sur_un_contenu_ne_se_charge_pas_sur_un_autre()
+    {
+        Assert.Equal(3, SurLUsa.DepartPour(3, Usa)!.Players);
+        Assert.Equal(3, SurLUsa.DepartPour(3, Usa.ToUpperInvariant())!.Players);
+        Assert.Null(SurLUsa.DepartPour(3, Europe));
+        Assert.True(SurLUsa.ADesDepartsPour(Usa));
+        Assert.False(SurLUsa.ADesDepartsPour(Europe));
+
+        // Sur la version Europe, le jeu reste au catalogue et se joue en classique : ni choix au panneau, ni etat.
+        var europe = new MultiplayerInstalledGame(SurLUsa, "mksc-e.gba", null, Europe);
+        Assert.False(europe.ChoixOuverts);
+        Assert.Null(europe.DepartPour(2));
+        var usa = europe with { ContentKey = Usa };
+        Assert.True(usa.ChoixOuverts);
+        Assert.Equal(4, usa.DepartPour(4)!.Players);
+    }
+
+    [Fact]
+    public void Le_contenu_d_un_etat_est_un_contenu_du_catalogue_et_a_tous_ses_nombres()
+    {
+        var sansChoix = SurLUsa with { Choices = null };
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(sansChoix));
+        Assert.Equal("etat fait sur un contenu hors du catalogue",
+            MultiplayerCatalogueStore.ValiderLeDepart(sansChoix with { Start = sansChoix.Start! with { Content = new string('e', 32) } }));
+        // Un nombre fait sur l'Europe seule laisserait l'Europe sans les deux autres.
+        Assert.Equal("pas d'etat pour 2 joueurs",
+            MultiplayerCatalogueStore.ValiderLeDepart(sansChoix with { Starts = [.. sansChoix.Starts!, Etat(3, 'd') with { Content = Europe }] }));
+    }
+
     [Fact]
     public async Task Le_depart_retenu_est_celui_dont_l_empreinte_se_verifie()
     {
