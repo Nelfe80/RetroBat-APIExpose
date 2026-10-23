@@ -93,13 +93,21 @@ public sealed class MultiplayerController : ControllerBase
     [SupportedOSPlatform("windows")]
     public IActionResult Preview(string vue, [FromServices] InterfaceTextService textes, [FromServices] EmulationStationSettingsService reglages,
         [FromServices] ILogger<LeaderboardOverlayService> journal, [FromServices] RetroBat.Api.Avatar.AvatarSheetStore planches,
-        [FromServices] RetroAchievementsService retroAchievements)
+        [FromServices] RetroAchievementsService retroAchievements, [FromServices] MultiplayerCatalogueStore catalogue,
+        [FromQuery] string? jeu = null)
     {
-        // Une vraie planche de la borne pour l'avatar, et les portraits des personnages de SF2CE (badges en cache).
+        // Une vraie planche de la borne pour l'avatar, et les portraits des personnages de SF2CE (badges en cache) ; avec
+        // ?jeu=arcade/magdrop3, la bande du choix de ce jeu, images du Data Pack d'abord, comme le panneau.
         var planche = planches.Objets().FirstOrDefault() is { } sha ? planches.ObjectPath(sha) : null;
         string? Portrait(int badge) => retroAchievements.CheminDuBadge(badge.ToString(System.Globalization.CultureInfo.InvariantCulture));
         var noms = new[] { "RYU", "E. HONDA", "BLANKA", "GUILE", "KEN", "CHUN-LI", "ZANGIEF", "DHALSIM", "M. BISON", "SAGAT", "BALROG", "VEGA" };
         var bande = noms.Select((nom, i) => new LeaderboardOverlayService.PortraitDeChoix(Portrait(307536 + i), nom)).ToList();
+        if (jeu is not null && catalogue.Lire(out _)?.Games.FirstOrDefault(g => g.Id == jeu)?.Choices is { Count: > 0 } choix)
+        {
+            var dossier = Path.GetDirectoryName(catalogue.Path)!;
+            bande = choix[0].Values.Select(v => new LeaderboardOverlayService.PortraitDeChoix(
+                v.CheminDeLImage(dossier) is { } image && System.IO.File.Exists(image) ? image : retroAchievements.CheminDuBadge(v.RaBadge), v.Name)).ToList();
+        }
         string langue;
         try { langue = reglages.GetScrapingSettings().Language; } catch (Exception) { langue = "fr"; }
         string T(string cle) => textes.Text(cle, langue);
