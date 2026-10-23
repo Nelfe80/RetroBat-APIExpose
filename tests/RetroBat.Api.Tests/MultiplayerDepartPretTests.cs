@@ -249,6 +249,57 @@ public class MultiplayerDepartPretTests : IDisposable
         Assert.Equal(1, await attente.WaitAsync(TimeSpan.FromSeconds(5)));
     }
 
+    private static readonly MultiplayerMatchEnd AuScore = new()
+    {
+        Type = MultiplayerMatchEnd.ScoreFinal, CloseAfterS = 5,
+        Over = new() { CoreRam = "0x500", Value = 1 },
+        Seats = [new() { Seat = 1, CoreRam = "0x600" }, new() { Seat = 2, CoreRam = "0x610" }],
+        Score = new() { Bytes = 1, Bcd = true },
+    };
+
+    [Fact]
+    public async Task Au_score_le_plus_haut_gagne_au_signal_de_fin_et_pas_au_signal_du_match_d_avant()
+    {
+        var ra = new FauxRetroArch { DossierDesEtats = _dossier };
+        ra.Memoire[0x500] = 1;   // le signal du match d'avant, encore la au lancement
+        ra.Memoire[0x600] = 0x02;
+        ra.Memoire[0x610] = 0x05;
+        var guet = new MultiplayerFinDeRencontre(ra, TimeSpan.FromMilliseconds(20));
+        var attente = guet.AttendreLeScoreFinalAsync(AuScore, [1, 2], CancellationToken.None);
+        await Task.Delay(120);
+        Assert.False(attente.IsCompleted);
+        ra.Memoire[0x500] = 0;   // le match commence
+        await Task.Delay(80);
+        ra.Memoire[0x600] = 0x13;   // 13 en BCD
+        ra.Memoire[0x610] = 0x09;
+        ra.Memoire[0x500] = 1;
+        Assert.Equal(1, await attente.WaitAsync(TimeSpan.FromSeconds(5)));
+    }
+
+    [Fact]
+    public async Task Au_score_une_egalite_est_un_match_nul()
+    {
+        var ra = new FauxRetroArch { DossierDesEtats = _dossier };
+        var guet = new MultiplayerFinDeRencontre(ra, TimeSpan.FromMilliseconds(20));
+        var attente = guet.AttendreLeScoreFinalAsync(AuScore, [1, 2], CancellationToken.None);
+        await Task.Delay(80);
+        ra.Memoire[0x600] = 0x03;
+        ra.Memoire[0x610] = 0x03;
+        ra.Memoire[0x500] = 1;
+        Assert.Equal(MultiplayerResultats.MatchNul, await attente.WaitAsync(TimeSpan.FromSeconds(5)));
+    }
+
+    [Theory]
+    [InlineData(new[] { 0x45, 0x01 }, true, "le", 145)]
+    [InlineData(new[] { 0x01, 0x45 }, true, "be", 145)]
+    [InlineData(new[] { 0x10, 0x27 }, false, "le", 10000)]
+    public void Un_score_se_lit_dans_son_format(int[] octets, bool bcd, string ordre, long attendu)
+        => Assert.Equal(attendu, new MultiplayerScoreFormat { Bytes = octets.Length, Bcd = bcd, Order = ordre }.Valeur(octets));
+
+    [Fact]
+    public void Un_chiffre_bcd_impossible_ne_donne_pas_de_score()
+        => Assert.Null(new MultiplayerScoreFormat { Bytes = 1, Bcd = true }.Valeur([0x1A]));
+
     [Fact]
     public async Task La_partie_fermee_avant_la_fin_ne_designe_personne()
     {

@@ -302,6 +302,103 @@ public sealed class MultiplayerFinDeRencontre
         return null;
     }
 
+    /// <summary>La fin d'une rencontre, selon le type du jeu : la place gagnante, <see cref="MultiplayerResultats.MatchNul"/>, ou null.</summary>
+    public Task<int?> AttendreLaFinAsync(MultiplayerGame jeu, IReadOnlyCollection<int> places, CancellationToken ct)
+        => jeu.End is { } manches ? AttendreLeVainqueurAsync(manches, places, ct)
+            : jeu.MatchEnd is { EstConnu: true } autre ? AttendreLeScoreFinalAsync(autre, places, ct)
+            : Task.FromResult<int?>(null);
+
+    /// <summary>
+    /// LA FIN AU SCORE (score_final, 23/10) : le signal de fin, deja vu retombe au moins une fois sous la garde, puis le
+    /// score de chaque place. Le plus haut, seul, gagne ; une egalite est un match nul. Deux lectures de suite concordent.
+    /// </summary>
+    public async Task<int?> AttendreLeScoreFinalAsync(MultiplayerMatchEnd fin, IReadOnlyCollection<int> places, CancellationToken ct)
+    {
+        int? candidat = null;
+        var departVu = false;
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                if (fin.Duel is { Decalage: { } garde } && await LireAsync(garde, ct).ConfigureAwait(false) != fin.Duel.Value)
+                {
+                    candidat = null;
+                    await Task.Delay(_periode, ct).ConfigureAwait(false);
+                    continue;
+                }
+
+                var signal = await LireAsync(fin.Over!.Decalage!.Value, ct).ConfigureAwait(false);
+                if (signal != fin.Over.Value)
+                {
+                    // Le match n'est pas fini : un signal vu ensuite sera le sien, pas celui du match d'avant.
+                    departVu = signal is not null || departVu;
+                    candidat = null;
+                    await Task.Delay(_periode, ct).ConfigureAwait(false);
+                    continue;
+                }
+
+                int? resultat = null;
+                if (departVu)
+                {
+                    var scores = new List<(int Place, long Score)>();
+                    foreach (var place in places.OrderBy(p => p))
+                    {
+                        var adresse = fin.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage;
+                        if (adresse is not null && await LireLesOctetsAsync(adresse.Value, fin.Score.Bytes, ct).ConfigureAwait(false) is { } octets
+                            && fin.Score.Valeur(octets) is { } score)
+                        {
+                            scores.Add((place, score));
+                        }
+                    }
+
+                    if (scores.Count == places.Count)
+                    {
+                        var haut = scores.Max(s => s.Score);
+                        var enTete = scores.Where(s => s.Score == haut).ToList();
+                        resultat = enTete.Count == 1 ? enTete[0].Place : MultiplayerResultats.MatchNul;
+                    }
+                }
+
+                if (resultat is not null && resultat == candidat)
+                {
+                    return resultat;
+                }
+
+                candidat = resultat;
+                await Task.Delay(_periode, ct).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+
+        return null;
+    }
+
+    /// <summary>Plusieurs octets de la memoire du coeur, dans l'ordre de la memoire, ou null si la reponse est incomplete.</summary>
+    private async Task<IReadOnlyList<int>?> LireLesOctetsAsync(long adresse, int n, CancellationToken ct)
+    {
+        var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {adresse:x} {n}", ct).ConfigureAwait(false);
+        var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (morceaux is not { Length: >= 3 } || morceaux[0] != "READ_CORE_RAM" || morceaux.Length < 2 + n)
+        {
+            return null;
+        }
+
+        var octets = new List<int>(n);
+        for (var i = 0; i < n; i++)
+        {
+            if (!int.TryParse(morceaux[2 + i], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var o))
+            {
+                return null;
+            }
+
+            octets.Add(o);
+        }
+
+        return octets;
+    }
+
     /// <summary>Un octet de la memoire du coeur, ou null si RetroArch ne repond pas.</summary>
     private async Task<int?> LireAsync(long adresse, CancellationToken ct)
     {

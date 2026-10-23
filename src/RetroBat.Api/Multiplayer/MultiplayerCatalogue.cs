@@ -156,6 +156,21 @@ public sealed record MultiplayerGame
     [JsonPropertyName("end")]
     public MultiplayerEnd? End { get; init; }
 
+    /// <summary>
+    /// LES AUTRES TYPES DE FIN (decision du user du 23/10) : <c>score_final</c> d'abord (les sports). Une cle a part : une
+    /// API d'avant, qui ne connait que <see cref="End"/>, l'ignore et garde le jeu en Classique.
+    /// </summary>
+    [JsonPropertyName("match_end")]
+    public MultiplayerMatchEnd? MatchEnd { get; init; }
+
+    /// <summary>La fin de rencontre se lit-elle (manches, ou un type de <see cref="MatchEnd"/> connu) ?</summary>
+    [JsonIgnore]
+    public bool FinLue => End is not null || MatchEnd is { EstConnu: true };
+
+    /// <summary>Le delai avant de fermer le jeu, la rencontre finie, le temps de voir le resultat.</summary>
+    [JsonIgnore]
+    public int DelaiDeFermeture => End?.CloseAfterS ?? MatchEnd?.CloseAfterS ?? 5;
+
     /// <summary>NIVEAU NELFEPLAY : ce que l'hote mesure pendant un duel pour l'ecran de resultat (00quater.3, ecran 10).</summary>
     [JsonPropertyName("stats")]
     public MultiplayerStats? Stats { get; init; }
@@ -171,7 +186,7 @@ public sealed record MultiplayerGame
     /// reste un plus, pas une condition de la cote.
     /// </summary>
     [JsonIgnore]
-    public bool EstClasse => End is not null && EloType is { Length: > 0 } type && MultiplayerLevels.TypesVersus.Contains(type);
+    public bool EstClasse => FinLue && EloType is { Length: > 0 } type && MultiplayerLevels.TypesVersus.Contains(type);
 
     /// <summary>L'ecran a afficher pour cette place (1 a <see cref="Screens"/>).</summary>
     public int EcranDeLaPlace(int place)
@@ -278,6 +293,77 @@ public sealed record MultiplayerEnd
     /// </summary>
     [JsonPropertyName("duel")]
     public MultiplayerDuelGuard? Duel { get; init; }
+}
+
+/// <summary>
+/// UNE FIN AU SCORE (<c>score_final</c>, decision du user du 23/10) : quand l'octet <see cref="Over"/> prend sa valeur (fin
+/// du match, chronometre a zero), la place au score le plus haut gagne ; a egalite, match nul. Un signal de fin deja la au
+/// depart (le match d'avant) ne compte pas : il faut l'avoir vu retomber. Garde de duel facultative, comme <see cref="MultiplayerEnd.Duel"/>.
+/// </summary>
+public sealed record MultiplayerMatchEnd
+{
+    public const string ScoreFinal = "score_final";
+
+    [JsonPropertyName("type")]
+    public string Type { get; init; } = string.Empty;
+
+    [JsonPropertyName("close_after_s")]
+    public int CloseAfterS { get; init; } = 5;
+
+    /// <summary>Le signal de fin de match : l'octet et la valeur qu'il prend quand le match est fini.</summary>
+    [JsonPropertyName("over")]
+    public MultiplayerDuelGuard? Over { get; init; }
+
+    /// <summary>Le score de chaque place (decalage de RetroArch, premier octet lu).</summary>
+    [JsonPropertyName("seats")]
+    public IReadOnlyList<MultiplayerChoiceSeat> Seats { get; init; } = [];
+
+    [JsonPropertyName("score")]
+    public MultiplayerScoreFormat Score { get; init; } = new();
+
+    [JsonPropertyName("duel")]
+    public MultiplayerDuelGuard? Duel { get; init; }
+
+    [JsonIgnore]
+    public bool EstConnu => Type == ScoreFinal;
+}
+
+/// <summary>Comment se lit un score : son nombre d'octets, BCD ou binaire, et l'ordre des octets lus (<c>le</c> ou <c>be</c>).</summary>
+public sealed record MultiplayerScoreFormat
+{
+    [JsonPropertyName("bytes")]
+    public int Bytes { get; init; } = 1;
+
+    [JsonPropertyName("bcd")]
+    public bool Bcd { get; init; }
+
+    [JsonPropertyName("order")]
+    public string Order { get; init; } = "le";
+
+    /// <summary>La valeur des octets lus dans l'ordre de la memoire, ou null si un chiffre BCD est impossible.</summary>
+    public long? Valeur(IReadOnlyList<int> octets)
+    {
+        var ordonnes = Order == "be" ? octets : octets.Reverse().ToList();
+        long valeur = 0;
+        foreach (var o in ordonnes)
+        {
+            if (Bcd)
+            {
+                if ((o >> 4) > 9 || (o & 0x0F) > 9)
+                {
+                    return null;
+                }
+
+                valeur = valeur * 100 + (o >> 4) * 10 + (o & 0x0F);
+            }
+            else
+            {
+                valeur = (valeur << 8) | (uint)o;
+            }
+        }
+
+        return valeur;
+    }
 }
 
 /// <summary>L'octet de la garde de duel (decalage de RetroArch) et la valeur qu'il a pendant un duel.</summary>
@@ -549,6 +635,37 @@ public sealed class MultiplayerCatalogueStore
             }
 
             if (fin.Duel is { } garde && (garde.Decalage is null || garde.Value is < 0 or > 255))
+            {
+                return "fin de rencontre : garde de duel incoherente";
+            }
+        }
+
+        if (jeu.MatchEnd is { } autre)
+        {
+            if (!autre.EstConnu)
+            {
+                return "fin de rencontre : type « " + autre.Type + " » inconnu";
+            }
+
+            if (autre.Over?.Decalage is null || autre.Over.Value is < 0 or > 255 || autre.CloseAfterS is < 0 or > 60)
+            {
+                return "fin de rencontre : signal de fin incoherent";
+            }
+
+            if (autre.Score.Bytes is < 1 or > 4 || autre.Score.Order is not ("le" or "be"))
+            {
+                return "fin de rencontre : format du score incoherent";
+            }
+
+            for (var place = 1; place <= jeu.Players; place++)
+            {
+                if (autre.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage is null)
+                {
+                    return "fin de rencontre : pas de score pour la place " + place;
+                }
+            }
+
+            if (autre.Duel is { } garde && (garde.Decalage is null || garde.Value is < 0 or > 255))
             {
                 return "fin de rencontre : garde de duel incoherente";
             }

@@ -302,7 +302,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
         }
 
-        var vainqueur = await _fin.AttendreLeVainqueurAsync(jeu.End!, places, jeton).ConfigureAwait(false);
+        var vainqueur = await _fin.AttendreLaFinAsync(jeu, places, jeton).ConfigureAwait(false);
         if (vainqueur is null)
         {
             return;
@@ -314,10 +314,10 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
 
         _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} finie, {Issue} ; le jeu se ferme dans {Delai} s",
-            jeu.Id, vainqueur == MultiplayerResultats.MatchNul ? "match nul" : "la place " + vainqueur + " gagne", jeu.End!.CloseAfterS);
+            jeu.Id, vainqueur == MultiplayerResultats.MatchNul ? "match nul" : "la place " + vainqueur + " gagne", jeu.DelaiDeFermeture);
         try
         {
-            await Task.Delay(TimeSpan.FromSeconds(jeu.End.CloseAfterS), jeton).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromSeconds(jeu.DelaiDeFermeture), jeton).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -349,7 +349,7 @@ public sealed class MultiplayerLaunchService : IHostedService
                 }
             }
 
-            var vainqueur = await _fin.AttendreLeVainqueurAsync(jeu.End!, places, ct).ConfigureAwait(false);
+            var vainqueur = await _fin.AttendreLaFinAsync(jeu, places, ct).ConfigureAwait(false);
             if (vainqueur is null)
             {
                 return;
@@ -359,7 +359,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} vue finie chez l'invite, place {Place} rapportee ({Statut})",
                 jeu.Id, vainqueur, reponse?.Ok == true ? "ok" : reponse?.Reason ?? "injoignable");
             // Le noir monte en meme temps que chez l'hote, qui ferme le jeu au meme delai (retour du user du 23/10).
-            await Task.Delay(TimeSpan.FromSeconds(jeu.End!.CloseAfterS), ct).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromSeconds(jeu.DelaiDeFermeture), ct).ConfigureAwait(false);
             await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
         }
         catch (OperationCanceledException)
