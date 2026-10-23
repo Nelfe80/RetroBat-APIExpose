@@ -205,6 +205,50 @@ public class MultiplayerDepartPretTests : IDisposable
         Assert.Equal(2, await attente.WaitAsync(TimeSpan.FromSeconds(5)));
     }
 
+    private static readonly MultiplayerEnd SetsGardes = new()
+    {
+        FirstTo = 2, CloseAfterS = 5,
+        Seats = [new() { Seat = 1, CoreRam = "0x873" }, new() { Seat = 2, CoreRam = "0x8F3" }],
+        Duel = new() { CoreRam = "0x100", Value = 3 },
+    };
+
+    [Fact]
+    public async Task Hors_duel_les_sets_gagnes_par_l_ordinateur_ne_comptent_pas()
+    {
+        // Mesure au banc (Windjammers, 23/10) : P1 seul contre l'ordinateur (0x100 = 1), la machine gagne deux sets dans la
+        // case du joueur 2. Puis le joueur 2 entre (0x100 = 3), les sets repartent de zero, et c'est lui qui gagne.
+        var ra = new FauxRetroArch { DossierDesEtats = _dossier };
+        ra.Memoire[0x100] = 1;
+        ra.Memoire[0x8F3] = 2;
+        var guet = new MultiplayerFinDeRencontre(ra, TimeSpan.FromMilliseconds(20));
+        var attente = guet.AttendreLeVainqueurAsync(SetsGardes, [1, 2], CancellationToken.None);
+        await Task.Delay(120);
+        Assert.False(attente.IsCompleted);
+        ra.Memoire[0x8F3] = 0;
+        ra.Memoire[0x100] = 3;
+        await Task.Delay(80);
+        Assert.False(attente.IsCompleted);
+        ra.Memoire[0x8F3] = 2;
+        Assert.Equal(2, await attente.WaitAsync(TimeSpan.FromSeconds(5)));
+    }
+
+    [Fact]
+    public async Task Deux_places_au_seuil_ensemble_ne_designent_personne_le_set_suivant_tranche()
+    {
+        // Un set nul donne un point a chacun : a 2-2, personne ne gagne encore ; a 3-2, la place 1 gagne.
+        var ra = new FauxRetroArch { DossierDesEtats = _dossier };
+        ra.Memoire[0x100] = 3;
+        var guet = new MultiplayerFinDeRencontre(ra, TimeSpan.FromMilliseconds(20));
+        var attente = guet.AttendreLeVainqueurAsync(SetsGardes, [1, 2], CancellationToken.None);
+        await Task.Delay(80);
+        ra.Memoire[0x873] = 2;
+        ra.Memoire[0x8F3] = 2;
+        await Task.Delay(120);
+        Assert.False(attente.IsCompleted);
+        ra.Memoire[0x873] = 3;
+        Assert.Equal(1, await attente.WaitAsync(TimeSpan.FromSeconds(5)));
+    }
+
     [Fact]
     public async Task La_partie_fermee_avant_la_fin_ne_designe_personne()
     {

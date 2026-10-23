@@ -254,9 +254,10 @@ public sealed record MultiplayerChoice
 }
 
 /// <summary>
-/// La fin d'une rencontre : la premiere place dont le compteur atteint <see cref="FirstTo"/> gagne (les manches de
-/// SF2CE, mesurees le 22/10 sous FBNeo : P1 0xFF864E, P2 0xFF894E, 2 pour gagner). Le jeu se ferme
-/// <see cref="CloseAfterS"/> secondes plus tard, le temps de voir le vainqueur.
+/// La fin d'une rencontre : la place dont le compteur atteint <see cref="FirstTo"/>, seule en tete, gagne (les manches de
+/// SF2CE, mesurees le 22/10 sous FBNeo : P1 0xFF864E, P2 0xFF894E, 2 pour gagner), et seulement pendant le duel quand
+/// une garde le dit (<see cref="Duel"/>). Le jeu se ferme <see cref="CloseAfterS"/> secondes plus tard, le temps de voir
+/// le vainqueur.
 /// </summary>
 public sealed record MultiplayerEnd
 {
@@ -268,6 +269,31 @@ public sealed record MultiplayerEnd
 
     [JsonPropertyName("close_after_s")]
     public int CloseAfterS { get; init; } = 5;
+
+    /// <summary>
+    /// LA GARDE DE DUEL (vague 1 du 23/10) : l'octet qui dit que les deux joueurs sont dans le match, et sa valeur. Sans
+    /// elle, une manche gagnee par l'ordinateur contre le joueur 1, avant l'arrivee du joueur 2, comptait dans la case du
+    /// joueur 2 (mesure au banc : Windjammers, Magical Drop III, Super Puzzle Fighter II Turbo). Absente : les compteurs
+    /// comptent toujours, comme sur SF2CE, ou le depart pret met les deux joueurs en duel.
+    /// </summary>
+    [JsonPropertyName("duel")]
+    public MultiplayerDuelGuard? Duel { get; init; }
+}
+
+/// <summary>L'octet de la garde de duel (decalage de RetroArch) et la valeur qu'il a pendant un duel.</summary>
+public sealed record MultiplayerDuelGuard
+{
+    [JsonPropertyName("core_ram")]
+    public string CoreRam { get; init; } = string.Empty;
+
+    [JsonPropertyName("value")]
+    public int Value { get; init; }
+
+    [JsonIgnore]
+    public long? Decalage => CoreRam.Trim() is { Length: > 2 } texte && texte.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
+        && long.TryParse(texte[2..], global::System.Globalization.NumberStyles.HexNumber, null, out var valeur) && valeur >= 0
+            ? valeur
+            : null;
 }
 
 /// <summary>
@@ -510,6 +536,11 @@ public sealed class MultiplayerCatalogueStore
                 {
                     return "fin de rencontre : pas d'adresse pour la place " + place;
                 }
+            }
+
+            if (fin.Duel is { } garde && (garde.Decalage is null || garde.Value is < 0 or > 255))
+            {
+                return "fin de rencontre : garde de duel incoherente";
             }
         }
 

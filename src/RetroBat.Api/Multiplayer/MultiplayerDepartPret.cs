@@ -242,8 +242,17 @@ public sealed class MultiplayerFinDeRencontre
         {
             while (!ct.IsCancellationRequested)
             {
-                int? vu = null;
+                // HORS DUEL, RIEN NE COMPTE (garde du 23/10) : le joueur 1 seul contre l'ordinateur, la manche que gagne la
+                // machine tombe dans la case du joueur 2. Le depart se voit quand le duel commence, compteurs remis a zero.
+                if (fin.Duel is { Decalage: { } garde } && await LireAsync(garde, ct).ConfigureAwait(false) != fin.Duel.Value)
+                {
+                    candidat = null;
+                    await Task.Delay(_periode, ct).ConfigureAwait(false);
+                    continue;
+                }
+
                 var lues = 0;
+                var auSeuil = new List<(int Place, int Valeur)>();
                 foreach (var place in places.OrderBy(p => p))
                 {
                     var adresse = fin.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage;
@@ -252,20 +261,27 @@ public sealed class MultiplayerFinDeRencontre
                         continue;
                     }
 
-                    var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {adresse.Value:x} 1", ct).ConfigureAwait(false);
-                    var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                    if (morceaux is { Length: >= 3 } && morceaux[0] == "READ_CORE_RAM"
-                        && int.TryParse(morceaux[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var valeur))
+                    if (await LireAsync(adresse.Value, ct).ConfigureAwait(false) is { } valeur)
                     {
                         lues++;
-                        if (valeur >= fin.FirstTo && valeur < 0xFF && vu is null)
+                        if (valeur >= fin.FirstTo && valeur < 0xFF)
                         {
-                            vu = place;
+                            auSeuil.Add((place, valeur));
                         }
                     }
                 }
 
-                if (vu is null && lues == places.Count)
+                // UN SEUL VAINQUEUR : la place la plus haute parmi celles qui ont atteint le seuil. Deux places a egalite (un
+                // set nul de Windjammers donne un point a chacun, 2-2) ne designent personne : le set suivant tranche.
+                int? vu = null;
+                if (auSeuil.Count > 0)
+                {
+                    var haut = auSeuil.Max(p => p.Valeur);
+                    var enTete = auSeuil.Where(p => p.Valeur == haut).ToList();
+                    vu = enTete.Count == 1 ? enTete[0].Place : null;
+                }
+
+                if (auSeuil.Count == 0 && lues == places.Count)
                 {
                     departVu = true;
                 }
@@ -284,6 +300,17 @@ public sealed class MultiplayerFinDeRencontre
         }
 
         return null;
+    }
+
+    /// <summary>Un octet de la memoire du coeur, ou null si RetroArch ne repond pas.</summary>
+    private async Task<int?> LireAsync(long adresse, CancellationToken ct)
+    {
+        var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {adresse:x} 1", ct).ConfigureAwait(false);
+        var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return morceaux is { Length: >= 3 } && morceaux[0] == "READ_CORE_RAM"
+            && int.TryParse(morceaux[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var valeur)
+                ? valeur
+                : null;
     }
 }
 
