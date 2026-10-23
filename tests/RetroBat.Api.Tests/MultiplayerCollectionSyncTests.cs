@@ -327,6 +327,15 @@ public class MultiplayerCollectionSyncTests : IDisposable
         var dossier = Path.GetDirectoryName(depot)!;
         var images = catalogue.Games.SelectMany(jeu => jeu.Choices ?? []).SelectMany(choix => choix.Values).Where(v => v.Image is not null).ToList();
         Assert.All(images, v => Assert.True(v.CheminDeLImage(dossier) is { } chemin && File.Exists(chemin), v.Image));
+
+        // Chaque etat de depart est livre, a l'empreinte du catalogue : sinon le depart de ce jeu s'annulerait partout.
+        var departs = catalogue.Games.SelectMany(jeu => (jeu.Starts ?? []).Prepend(jeu.Start)).OfType<MultiplayerStart>().ToList();
+        Assert.All(departs, depart =>
+        {
+            var fichier = Path.Combine(dossier, depart.State.Replace('/', Path.DirectorySeparatorChar));
+            Assert.True(File.Exists(fichier), depart.State);
+            Assert.Equal(depart.Sha256.Trim().ToUpperInvariant(), Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(fichier))));
+        });
     }
 
     [Theory]
