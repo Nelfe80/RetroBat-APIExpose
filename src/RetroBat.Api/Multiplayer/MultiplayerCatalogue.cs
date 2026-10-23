@@ -145,6 +145,13 @@ public sealed record MultiplayerGame
     [JsonPropertyName("start")]
     public MultiplayerStart? Start { get; init; }
 
+    /// <summary>
+    /// Les autres departs, un par nombre de joueurs (mGBA Splitscreen : un etat a deux consoles ne se charge pas a
+    /// trois). <see cref="Start"/> reste obligatoire, une API plus ancienne ne lit que lui.
+    /// </summary>
+    [JsonPropertyName("starts")]
+    public IReadOnlyList<MultiplayerStart>? Starts { get; init; }
+
     /// <summary>NIVEAU NELFEPLAY : ce que chaque joueur choisit (le personnage par ▲▼), ecrit chez l'hote apres l'etat.</summary>
     [JsonPropertyName("choices")]
     public IReadOnlyList<MultiplayerChoice>? Choices { get; init; }
@@ -180,6 +187,14 @@ public sealed record MultiplayerGame
 
     [JsonIgnore]
     public bool EstNelfePlay => Level == MultiplayerLevels.NelfePlay && Start is not null;
+
+    /// <summary>
+    /// Le depart pret d'une partie a <paramref name="joueurs"/> : celui de <see cref="Starts"/> a ce nombre, sinon
+    /// <see cref="Start"/> quand il vaut pour tous les nombres ou pour celui-la. Null : pas d'etat pour ce nombre.
+    /// </summary>
+    public MultiplayerStart? DepartPour(int joueurs)
+        => Starts?.FirstOrDefault(depart => depart.Players == joueurs)
+           ?? (Start is { } commun && (commun.Players is null || commun.Players == joueurs) ? commun : null);
 
     /// <summary>
     /// Classe (23/10) : un jeu versus dont on lit la fin, quel que soit son niveau. Le depart pret du niveau NelfePlay
@@ -231,6 +246,10 @@ public sealed record MultiplayerStart
     /// <summary>L'empreinte de l'etat : un fichier retouche ne se charge pas.</summary>
     [JsonPropertyName("sha256")]
     public string Sha256 { get; init; } = string.Empty;
+
+    /// <summary>Le nombre de joueurs de l'etat, ou null quand il vaut pour tous (un etat d'arcade).</summary>
+    [JsonPropertyName("players")]
+    public int? Players { get; init; }
 }
 
 /// <summary>
@@ -689,14 +708,43 @@ public sealed class MultiplayerCatalogueStore
                 return "niveau NelfePlay sans depart pret";
             }
 
-            if (jeu.Start.State.Contains("..", StringComparison.Ordinal) || global::System.IO.Path.IsPathRooted(jeu.Start.State))
+            foreach (var depart in (jeu.Starts ?? []).Prepend(jeu.Start))
             {
-                return "chemin de l'etat hors du dossier MULTIPLAYER";
+                if (string.IsNullOrWhiteSpace(depart.State) || depart.State.Contains("..", StringComparison.Ordinal)
+                    || global::System.IO.Path.IsPathRooted(depart.State))
+                {
+                    return "chemin de l'etat hors du dossier MULTIPLAYER";
+                }
+
+                if (!System.Text.RegularExpressions.Regex.IsMatch(depart.Sha256.Trim(), "^[0-9a-fA-F]{64}$"))
+                {
+                    return "empreinte de l'etat manquante";
+                }
+
+                if (depart.Players is { } joueurs && (joueurs < 2 || joueurs > jeu.Players))
+                {
+                    return "etat pour " + joueurs + " joueurs hors de 2 a " + jeu.Players;
+                }
             }
 
-            if (!System.Text.RegularExpressions.Regex.IsMatch(jeu.Start.Sha256.Trim(), "^[0-9a-fA-F]{64}$"))
+            if (jeu.Start.Players is not null || jeu.Starts is { Count: > 0 })
             {
-                return "empreinte de l'etat manquante";
+                // Les etats propres a un nombre de joueurs couvrent chaque nombre, sans doublon : une gameroom a trois
+                // aurait sinon le panneau des choix sans depart pour les appliquer.
+                if ((jeu.Starts ?? []).Any(depart => depart.Players is null)
+                    || (jeu.Starts ?? []).Prepend(jeu.Start).Where(depart => depart.Players is not null)
+                        .GroupBy(depart => depart.Players).Any(groupe => groupe.Count() > 1))
+                {
+                    return "etats par nombre de joueurs sans nombre ou en double";
+                }
+
+                for (var joueurs = 2; joueurs <= jeu.Players; joueurs++)
+                {
+                    if (jeu.DepartPour(joueurs) is null)
+                    {
+                        return "pas d'etat pour " + joueurs + " joueurs";
+                    }
+                }
             }
         }
 

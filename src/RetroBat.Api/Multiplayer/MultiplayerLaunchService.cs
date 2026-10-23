@@ -370,12 +370,21 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// <summary>Charge l'etat, ecrit le choix de chaque place, relit. Faux quand le depart ne se verifie pas.</summary>
     private async Task<bool> PreparerLeDepartAsync(MultiplayerRoom room, MultiplayerInstalledGame jeu)
     {
-        var etat = Path.Combine(RetroBatPaths.PluginRoot, "resources", "multiplayer", jeu.Game.Start!.State.Replace('/', Path.DirectorySeparatorChar));
+        // Le nombre de joueurs est celui des options du coeur (Lancer) : l'etat doit avoir autant de consoles que lui.
+        var joueurs = Math.Max(2, room.Launch?.Players ?? 0);
+        var depart = jeu.Game.DepartPour(joueurs);
+        if (depart is null)
+        {
+            _journal.LogWarning("MULTIPLAYER : pas de depart pret de {Jeu} pour {Joueurs} joueurs ({Room})", jeu.Game.Id, joueurs, room.Room);
+            return false;
+        }
+
+        var etat = Path.Combine(RetroBatPaths.PluginRoot, "resources", "multiplayer", depart.State.Replace('/', Path.DirectorySeparatorChar));
         var choixParPlace = room.Players
             .Where(joueur => joueur.Seat is not null)
             .GroupBy(joueur => joueur.Seat!.Value)
             .ToDictionary(groupe => groupe.Key, groupe => groupe.First().Choices);
-        var resultat = await _depart.PreparerAsync(jeu.Game, etat, Path.GetFileNameWithoutExtension(jeu.Path), choixParPlace, CancellationToken.None)
+        var resultat = await _depart.PreparerAsync(jeu.Game, etat, Path.GetFileNameWithoutExtension(jeu.Path), choixParPlace, CancellationToken.None, depart)
             .ConfigureAwait(false);
         lock (_verrou)
         {

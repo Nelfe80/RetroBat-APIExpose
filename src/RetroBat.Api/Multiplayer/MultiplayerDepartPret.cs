@@ -85,16 +85,19 @@ public sealed class MultiplayerDepartPret
 
     /// <summary>
     /// Prepare le depart. <paramref name="choixParPlace"/> donne, pour chaque place de la partie, les choix de son
-    /// joueur ; un choix absent prend le defaut du catalogue.
+    /// joueur ; un choix absent prend le defaut du catalogue. <paramref name="depart"/> est l'etat retenu pour le nombre
+    /// de joueurs (<see cref="MultiplayerGame.DepartPour"/>), <see cref="MultiplayerGame.Start"/> sans lui.
     /// </summary>
     public async Task<Resultat> PreparerAsync(
         MultiplayerGame jeu,
         string cheminDeLEtat,
         string nomDuContenu,
         IReadOnlyDictionary<int, IReadOnlyDictionary<string, int>?> choixParPlace,
-        CancellationToken ct)
+        CancellationToken ct,
+        MultiplayerStart? depart = null)
     {
-        if (jeu.Start is null)
+        depart ??= jeu.Start;
+        if (depart is null)
         {
             return new Resultat(false, "pas de depart pret", null);
         }
@@ -109,7 +112,7 @@ public sealed class MultiplayerDepartPret
             return new Resultat(false, "etat introuvable", null);
         }
 
-        if (!string.Equals(Convert.ToHexString(SHA256.HashData(etat)), jeu.Start.Sha256.Trim(), StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(Convert.ToHexString(SHA256.HashData(etat)), depart.Sha256.Trim(), StringComparison.OrdinalIgnoreCase))
         {
             return new Resultat(false, "empreinte de l'etat differente du catalogue", null);
         }

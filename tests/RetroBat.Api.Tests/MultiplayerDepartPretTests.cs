@@ -159,7 +159,10 @@ public class MultiplayerDepartPretTests : IDisposable
         Assert.Equal(2, (choix with { Distinct = false }).Departager([(1, 2), (2, 2)])[2]);
     }
 
-    /// <summary>Mario Kart: Super Circuit sous mGBA Splitscreen : la case du pilote dans l'EWRAM de chaque console.</summary>
+    /// <summary>
+    /// Mario Kart: Super Circuit sous mGBA Splitscreen : le curseur du joueur N est a 0x0202A8EC + 4(N-1) dans chaque
+    /// console, et s'ecrit dans la console du joueur (mesure du 23/10 : la copie de la console 1 est ecrasee).
+    /// </summary>
     private (MultiplayerGame, string) MarioKart()
     {
         var etat = Path.Combine(_dossier, "mksc.state");
@@ -174,7 +177,7 @@ public class MultiplayerDepartPretTests : IDisposable
                 {
                     Key = "character", Default = 0, Memory = MultiplayerChoice.CarteDuCoeur,
                     Values = [new() { Value = 0, Name = "MARIO" }, new() { Value = 1, Name = "LUIGI" }, new() { Value = 8, Name = "BOWSER" }],
-                    Seats = [new() { Seat = 1, CoreRam = "0x0202A8EC" }, new() { Seat = 2, CoreRam = "0x1202A8EC" }],
+                    Seats = [new() { Seat = 1, CoreRam = "0x0202A8EC" }, new() { Seat = 2, CoreRam = "0x1202A8F0" }],
                 },
             ],
         };
@@ -191,10 +194,66 @@ public class MultiplayerDepartPretTests : IDisposable
 
         Assert.True(resultat.Ok, resultat.Raison);
         Assert.Equal(8, ra.Carte[0x0202A8EC]);
-        Assert.Equal(1, ra.Carte[0x1202A8EC]);
+        Assert.Equal(1, ra.Carte[0x1202A8F0]);
         Assert.Empty(ra.Memoire);   // rien par READ_CORE_RAM : la console 2 n'y est pas
-        Assert.Contains("WRITE_CORE_MEMORY 1202a8ec 01", ra.Recues);
-        Assert.Contains("READ_CORE_MEMORY 1202a8ec 1", ra.Recues);
+        Assert.Contains("WRITE_CORE_MEMORY 1202a8f0 01", ra.Recues);
+        Assert.Contains("READ_CORE_MEMORY 1202a8f0 1", ra.Recues);
+    }
+
+    /// <summary>Un etat par nombre de joueurs : celui a deux consoles ne se charge pas a trois.</summary>
+    private static MultiplayerStart Etat(int? joueurs, char motif = 'a')
+        => new() { State = $"states/gba/mksc/selection-{joueurs}p.state", Sha256 = new string(motif, 64), Players = joueurs };
+
+    private static readonly MultiplayerGame QuatreConsoles = new()
+    {
+        Id = "gba/mario-kart-super-circuit", System = "gba", Players = 4, Level = MultiplayerLevels.NelfePlay,
+        Start = Etat(2), Starts = [Etat(3, 'b'), Etat(4, 'c')],
+    };
+
+    [Fact]
+    public void Le_depart_se_choisit_par_le_nombre_de_joueurs()
+    {
+        Assert.Equal(2, QuatreConsoles.DepartPour(2)!.Players);
+        Assert.Equal(3, QuatreConsoles.DepartPour(3)!.Players);
+        Assert.Equal(4, QuatreConsoles.DepartPour(4)!.Players);
+        Assert.Null(QuatreConsoles.DepartPour(5));
+        // Un etat d'arcade n'a pas de nombre : il vaut pour tous, comme avant.
+        var arcade = QuatreConsoles with { Start = Etat(null), Starts = null };
+        Assert.Same(arcade.Start, arcade.DepartPour(3));
+    }
+
+    [Fact]
+    public void Les_etats_par_nombre_de_joueurs_couvrent_chaque_nombre_une_fois()
+    {
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(QuatreConsoles));
+        Assert.Equal("pas d'etat pour 4 joueurs", MultiplayerCatalogueStore.ValiderLeDepart(QuatreConsoles with { Starts = [Etat(3, 'b')] }));
+        Assert.Equal("etats par nombre de joueurs sans nombre ou en double",
+            MultiplayerCatalogueStore.ValiderLeDepart(QuatreConsoles with { Starts = [Etat(3, 'b'), Etat(3, 'c'), Etat(4)] }));
+        Assert.Equal("etats par nombre de joueurs sans nombre ou en double",
+            MultiplayerCatalogueStore.ValiderLeDepart(QuatreConsoles with { Starts = [Etat(null, 'b')] }));
+        Assert.Equal("etat pour 5 joueurs hors de 2 a 4",
+            MultiplayerCatalogueStore.ValiderLeDepart(QuatreConsoles with { Starts = [Etat(3, 'b'), Etat(4, 'c'), Etat(5, 'd')] }));
+        Assert.Equal("empreinte de l'etat manquante",
+            MultiplayerCatalogueStore.ValiderLeDepart(QuatreConsoles with { Starts = [Etat(3, 'b') with { Sha256 = "" }, Etat(4, 'c')] }));
+        Assert.Equal("chemin de l'etat hors du dossier MULTIPLAYER",
+            MultiplayerCatalogueStore.ValiderLeDepart(QuatreConsoles with { Starts = [Etat(3, 'b') with { State = "../x.state" }, Etat(4, 'c')] }));
+    }
+
+    [Fact]
+    public async Task Le_depart_retenu_est_celui_dont_l_empreinte_se_verifie()
+    {
+        var (jeu, etat) = MarioKart();
+        var ra = new FauxRetroArch { DossierDesEtats = Path.Combine(_dossier, "etats") };
+        var trois = Etat(3, '0');
+        var refuse = await new MultiplayerDepartPret(ra, apresLeChargement: TimeSpan.Zero)
+            .PreparerAsync(jeu, etat, "mksc", Places(8, 1), CancellationToken.None, trois);
+        Assert.False(refuse.Ok);
+        Assert.Equal("empreinte de l'etat differente du catalogue", refuse.Raison);
+
+        var bon = trois with { Sha256 = jeu.Start!.Sha256 };
+        var accepte = await new MultiplayerDepartPret(ra, apresLeChargement: TimeSpan.Zero)
+            .PreparerAsync(jeu, etat, "mksc", Places(8, 1), CancellationToken.None, bon);
+        Assert.True(accepte.Ok, accepte.Raison);
     }
 
     [Fact]
