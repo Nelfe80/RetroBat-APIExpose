@@ -226,6 +226,53 @@ public class MultiplayerBancTests
         public void Dispose() => _udp.Dispose();
     }
 
+    /// <summary>
+    /// Mario Kart: Super Circuit sous mGBA Splitscreen, l'etat de l'ecran des pilotes a N consoles (VS 100cc) : le pilote
+    /// de chaque place s'ecrit dans la console de cette place, par la carte du coeur, et se relit. Le banc valide ensuite
+    /// dans le jeu (bandeau de l'ecran des circuits). Banc : NELFEPLAY_BANC_RA_PORT, NELFEPLAY_BANC_MKSC_ETAT,
+    /// NELFEPLAY_BANC_JOUEURS (2 a 4).
+    /// </summary>
+    [Fact]
+    public async Task Mario_Kart_part_avec_le_pilote_de_chaque_place_ecrit_dans_sa_console()
+    {
+        var etat = Environment.GetEnvironmentVariable("NELFEPLAY_BANC_MKSC_ETAT");
+        if (Port is null || etat is null)
+        {
+            return;   // banc non monte
+        }
+
+        var joueurs = int.Parse(Environment.GetEnvironmentVariable("NELFEPLAY_BANC_JOUEURS") ?? "2", CultureInfo.InvariantCulture);
+        var ra = new CommandesRetroArchUdp(int.Parse(Port, CultureInfo.InvariantCulture));
+        var jeu = new MultiplayerGame
+        {
+            Id = "gba/mario-kart-super-circuit", System = "gba", Players = 4, Level = MultiplayerLevels.NelfePlay,
+            Start = new MultiplayerStart
+            {
+                State = "banc", Sha256 = Convert.ToHexString(SHA256.HashData(await File.ReadAllBytesAsync(etat))), Players = joueurs,
+            },
+            Choices =
+            [
+                new MultiplayerChoice
+                {
+                    Key = "character", Default = 4, Memory = MultiplayerChoice.CarteDuCoeur,
+                    Values = [.. Enumerable.Range(0, 9).Select(v => new MultiplayerChoiceValue { Value = v, Name = "P" + v })],
+                    Seats =
+                    [
+                        new() { Seat = 1, CoreRam = "0x0202A8EC" }, new() { Seat = 2, CoreRam = "0x1202A8F0" },
+                        new() { Seat = 3, CoreRam = "0x2202A8F4" }, new() { Seat = 4, CoreRam = "0x3202A8F8" },
+                    ],
+                },
+            ],
+        };
+
+        // Bowser, Donkey Kong, Peach, Yoshi.
+        int[] pilotes = [8, 6, 2, 5];
+        var places = Enumerable.Range(1, joueurs).ToDictionary(
+            place => place, place => (IReadOnlyDictionary<string, int>?) new Dictionary<string, int> { ["character"] = pilotes[place - 1] });
+        var depart = await new MultiplayerDepartPret(ra).PreparerAsync(jeu, etat, "Mario Kart - Super Circuit (USA)", places, CancellationToken.None);
+        Assert.True(depart.Ok, depart.Raison);
+    }
+
     private static async Task<bool> AttendreAsync(ICommandesRetroArch ra, long decalage, int valeur, TimeSpan delai)
     {
         var limite = DateTime.UtcNow + delai;
