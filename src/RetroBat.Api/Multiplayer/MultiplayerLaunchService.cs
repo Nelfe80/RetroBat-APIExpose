@@ -313,8 +313,8 @@ public sealed class MultiplayerLaunchService : IHostedService
             _vainqueur = vainqueur;
         }
 
-        _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} finie, la place {Place} gagne ; le jeu se ferme dans {Delai} s",
-            jeu.Id, vainqueur, jeu.End!.CloseAfterS);
+        _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} finie, {Issue} ; le jeu se ferme dans {Delai} s",
+            jeu.Id, vainqueur == MultiplayerResultats.MatchNul ? "match nul" : "la place " + vainqueur + " gagne", jeu.End!.CloseAfterS);
         try
         {
             await Task.Delay(TimeSpan.FromSeconds(jeu.End.CloseAfterS), jeton).ConfigureAwait(false);

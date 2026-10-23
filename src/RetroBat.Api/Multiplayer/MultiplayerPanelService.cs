@@ -1104,8 +1104,10 @@ public sealed class MultiplayerPanelService
                 var delta = evolution is null ? 0 : (int)Math.Round(evolution.After - evolution.Before);
                 return ligne with
                 {
-                    Issue = T(j.Seat == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat"),
-                    Gagnant = j.Seat == gagnante,
+                    // Le match nul (place 0, 23/10) : ni vainqueur ni vaincu.
+                    Issue = T(gagnante == MultiplayerResultats.MatchNul ? "multiplayer.result.draw"
+                        : j.Seat == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat"),
+                    Gagnant = gagnante != MultiplayerResultats.MatchNul && j.Seat == gagnante,
                     Cote = evolution is null ? ligne.Cote : "ELO " + Math.Round(evolution.After).ToString(CultureInfo.InvariantCulture),
                     Evolution = evolution is null ? string.Empty : (delta >= 0 ? "+" : "") + delta.ToString(CultureInfo.InvariantCulture),
                     Stats = StatsDe(finie, j.Seat, T),
@@ -1116,6 +1118,7 @@ public sealed class MultiplayerPanelService
         var titre = annulee ? T("multiplayer.result.void")
             : classique && !classe ? T("multiplayer.result.classic")
             : abandon is not null && maPlace is not null ? T(maPlace == abandon ? "multiplayer.result.abandon" : "multiplayer.result.opponent_left")
+            : gagnante == MultiplayerResultats.MatchNul ? T("multiplayer.result.draw")
             : gagnante is not null && maPlace is not null ? T(maPlace == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat")
             : T("multiplayer.result.title");
         if (abandon is not null && maPlace is not null)

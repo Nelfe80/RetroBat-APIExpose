@@ -357,6 +357,16 @@ public sealed record MultiplayerChoiceSeat
             : null;
 }
 
+/// <summary>Les resultats d'une rencontre, tels que la plateforme les recoit.</summary>
+public static class MultiplayerResultats
+{
+    /// <summary>
+    /// LE MATCH NUL (decision du user du 23/10) : la place gagnante 0. Un score egal au coup de sifflet, une arrivee ex
+    /// aequo : 0,5 chacun pour la cote, une rencontre menee a son terme, jamais un abandon.
+    /// </summary>
+    public const int MatchNul = 0;
+}
+
 public static class MultiplayerLevels
 {
     /// <summary>Les types versus de la v1 (champ <c>elo_type</c>) : la cote par type du joueur.</summary>
