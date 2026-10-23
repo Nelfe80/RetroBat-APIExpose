@@ -48,7 +48,11 @@ public sealed class SelfUpdateService
     internal static readonly string[] OutilsHorsArchive = ["RetroBat.Api.Diagnostic.exe", "NelfePlay.LiveStreaming.exe",
         // RETROARCH NELFEPLAY (2026-10-16) : l'archive de la nocturne corrigee, que pose install-retroarch-nelfeplay.bat
         // (RetroArchNelfePlayService la lance). Une archive n'a pas de version : elle se reprend sur son empreinte.
-        RetroArchNelfePlay.CheminDeLArchive];
+        RetroArchNelfePlay.CheminDeLArchive,
+        // LE COEUR GBA DE MULTIPLAYER (2026-10-23) : mGBA Splitscreen compile par NelfePlay et sa fiche, que
+        // MultiplayerCoeurGbaService pose chez RetroArch. Ni RetroBat ni libretro ne le distribuent.
+        RetroBat.Api.Multiplayer.MultiplayerCoeurGbaService.CheminDuCoeur,
+        RetroBat.Api.Multiplayer.MultiplayerCoeurGbaService.CheminDeLaFiche];
 
     /// <summary>Plafond d'un outil : l'outil de diagnostic pese ~66 Mo.</summary>
     private const long TailleMaxOutil = 512L * 1024 * 1024;
