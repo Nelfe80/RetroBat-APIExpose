@@ -161,7 +161,10 @@ public sealed class MultiplayerDepartPret
         var ecritures = new List<(long, int)>();
         foreach (var choix in jeu.Choices ?? [])
         {
-            foreach (var (place, siens) in choixParPlace.OrderBy(paire => paire.Key))
+            // Un choix distinct deja pris par une place d'avant passe a la suivante libre (Metal Slug 3).
+            var retenues = choix.Departager(choixParPlace.Select(paire =>
+                (paire.Key, paire.Value is not null && paire.Value.TryGetValue(choix.Key, out var voulu) ? voulu : choix.Default)));
+            foreach (var (place, valeur) in retenues)
             {
                 var adresse = choix.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage;
                 if (adresse is null)
@@ -169,9 +172,6 @@ public sealed class MultiplayerDepartPret
                     continue;
                 }
 
-                var valeur = siens is not null && siens.TryGetValue(choix.Key, out var voulu) && choix.Values.Any(v => v.Value == voulu)
-                    ? voulu
-                    : choix.Default;
                 ecritures.Add((adresse.Value, valeur));
             }
         }

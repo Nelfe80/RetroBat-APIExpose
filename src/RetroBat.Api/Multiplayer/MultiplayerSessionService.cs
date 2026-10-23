@@ -194,7 +194,7 @@ public sealed class MultiplayerSessionService : BackgroundService
     }
 
     /// <summary>▲▼ : le choix voisin, garde sur la borne et envoye a la gameroom. Rend la raison d'un refus, ou null.</summary>
-    public async Task<string?> ChangerDeChoixAsync(string room, MultiplayerGame jeu, int pas, CancellationToken ct = default)
+    public async Task<string?> ChangerDeChoixAsync(string room, MultiplayerGame jeu, int pas, CancellationToken ct = default, IReadOnlySet<int>? prises = null)
     {
         if (jeu.Choices is not { Count: > 0 } choix)
         {
@@ -205,7 +205,9 @@ public sealed class MultiplayerSessionService : BackgroundService
         var premier = choix[0];
         var nouveaux = new Dictionary<string, int>(actuels, StringComparer.Ordinal)
         {
-            [premier.Key] = premier.Voisine(actuels.TryGetValue(premier.Key, out var v) ? v : premier.Default, pas),
+            [premier.Key] = premier.Distinct && prises is { Count: > 0 }
+                ? premier.VoisineLibre(actuels.TryGetValue(premier.Key, out var v) ? v : premier.Default, pas, prises)
+                : premier.Voisine(actuels.TryGetValue(premier.Key, out var w) ? w : premier.Default, pas),
         };
         lock (_verrou)
         {

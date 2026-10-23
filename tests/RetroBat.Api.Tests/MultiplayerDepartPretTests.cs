@@ -112,6 +112,44 @@ public class MultiplayerDepartPretTests : IDisposable
         Assert.Equal([(0x864EL, 0), (0x894EL, 0)], ecritures);
     }
 
+    /// <summary>Metal Slug 3 : quatre soldats (Marco 0, Tarma 1, Eri 2, Fio 3), deux joueurs jamais sur le meme.</summary>
+    private static MultiplayerGame Mslug3() => new()
+    {
+        Id = "arcade/mslug3", System = "arcade", Set = "mslug3", Players = 2, Level = MultiplayerLevels.NelfePlay,
+        Choices =
+        [
+            new MultiplayerChoice
+            {
+                Key = "character", Default = 0, Distinct = true,
+                Values = [new() { Value = 0, Name = "MARCO" }, new() { Value = 2, Name = "ERI" }, new() { Value = 1, Name = "TARMA" }, new() { Value = 3, Name = "FIO" }],
+                Seats = [new() { Seat = 1, CoreRam = "0x2BB" }, new() { Seat = 2, CoreRam = "0x36B" }],
+            },
+        ],
+    };
+
+    [Theory]
+    [InlineData(0, 0, 0, 2)]   // le meme soldat : la place 2 prend le suivant de la liste (Eri)
+    [InlineData(3, 3, 3, 0)]   // en bout de liste, on repart au debut
+    [InlineData(2, 1, 2, 1)]   // deux soldats differents : rien ne change
+    [InlineData(-1, -1, 0, 2)] // deux choix absents : le defaut, puis le suivant libre
+    public void Un_choix_distinct_ne_donne_jamais_deux_fois_la_meme_valeur(int voulu1, int voulu2, int ecrit1, int ecrit2)
+    {
+        var ecritures = MultiplayerDepartPret.Ecritures(Mslug3(), Places(voulu1 < 0 ? null : voulu1, voulu2 < 0 ? null : voulu2));
+        Assert.Equal([(0x2BBL, ecrit1), (0x36BL, ecrit2)], ecritures);
+    }
+
+    [Fact]
+    public void Le_panneau_saute_les_valeurs_deja_prises()
+    {
+        var choix = Mslug3().Choices![0];
+        // Marco vers le bas : Eri, deja prise ; Tarma.
+        Assert.Equal(1, choix.VoisineLibre(0, 1, new HashSet<int> { 2 }));
+        // Vers le haut depuis Marco : Fio en boucle.
+        Assert.Equal(3, choix.VoisineLibre(0, -1, new HashSet<int> { 2 }));
+        // Un choix sans le drapeau ne saute rien.
+        Assert.Equal(2, (choix with { Distinct = false }).Departager([(1, 2), (2, 2)])[2]);
+    }
+
     [Fact]
     public async Task Un_etat_retouche_ne_se_charge_pas()
     {

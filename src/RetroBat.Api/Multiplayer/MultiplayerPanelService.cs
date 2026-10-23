@@ -412,7 +412,7 @@ public sealed class MultiplayerPanelService
                 && _jeu?.Game is { EstNelfePlay: true, Choices.Count: > 0 } jeuNelfePlay
                 && RoomDuJeu() is { State: "waiting" or "countdown" } salle)
             {
-                _ = ChangerDePersonnageAsync(salle.Room, jeuNelfePlay, sens == "down" ? 1 : -1);
+                _ = ChangerDePersonnageAsync(salle, jeuNelfePlay, sens == "down" ? 1 : -1);
                 return;
             }
 
@@ -1207,16 +1207,44 @@ public sealed class MultiplayerPanelService
         }
 
         var premier = choix[0];
-        var valeur = joueur.You ? _session.MesChoix(jeu).GetValueOrDefault(premier.Key, premier.Default)
-            : joueur.Choices is not null && joueur.Choices.TryGetValue(premier.Key, out var v) ? v
-            : premier.Default;
+        var valeur = ValeurJouee(joueur, jeu, premier);
         return PortraitDu(premier.Values.FirstOrDefault(x => x.Value == valeur));
     }
 
-    private async Task ChangerDePersonnageAsync(string room, MultiplayerGame jeu, int pas)
+    /// <summary>La valeur voulue par ce joueur : la sienne tout de suite (▲▼), celle de la gameroom pour les autres.</summary>
+    private int ValeurVoulue(MultiplayerJoueur joueur, MultiplayerGame jeu, MultiplayerChoice premier)
+        => joueur.You ? _session.MesChoix(jeu).GetValueOrDefault(premier.Key, premier.Default)
+            : joueur.Choices is not null && joueur.Choices.TryGetValue(premier.Key, out var v) ? v
+            : premier.Default;
+
+    /// <summary>
+    /// La valeur que l'hote ecrira pour ce joueur : un choix distinct deja pris par une place d'avant passe a la suivante
+    /// libre (le meme calcul que <see cref="MultiplayerDepartPret.Ecritures"/>), le panneau montre donc le vrai soldat.
+    /// </summary>
+    private int ValeurJouee(MultiplayerJoueur joueur, MultiplayerGame jeu, MultiplayerChoice premier)
     {
+        if (!premier.Distinct || joueur.Seat is not { } place || RoomDuJeu() is not { } salle)
+        {
+            return ValeurVoulue(joueur, jeu, premier);
+        }
+
+        var retenues = premier.Departager(salle.Players
+            .Where(j => j.Seat is not null)
+            .GroupBy(j => j.Seat!.Value)
+            .Select(g => (g.Key, ValeurVoulue(g.First(), jeu, premier))));
+        return retenues.TryGetValue(place, out var valeur) ? valeur : ValeurVoulue(joueur, jeu, premier);
+    }
+
+    private async Task ChangerDePersonnageAsync(MultiplayerRoom salle, MultiplayerGame jeu, int pas)
+    {
+        // Le choix distinct (Metal Slug 3) saute ce que les autres joueurs ont deja pris, comme le jeu.
+        var premier = jeu.Choices![0];
+        var prises = salle.Players
+            .Where(joueur => !joueur.You)
+            .Select(joueur => joueur.Choices is not null && joueur.Choices.TryGetValue(premier.Key, out var v) ? v : premier.Default)
+            .ToHashSet();
         // Le nom change tout de suite a l'ecran ; la gameroom le recoit dans la foulee.
-        var envoi = _session.ChangerDeChoixAsync(room, jeu, pas);
+        var envoi = _session.ChangerDeChoixAsync(salle.Room, jeu, pas, prises: prises);
         Rafraichir();
         var refus = await envoi.ConfigureAwait(false);
         if (refus is not null)
@@ -1255,10 +1283,7 @@ public sealed class MultiplayerPanelService
 
         var premier = choix[0];
         // Le sien d'abord : ▲▼ le change ici avant que la gameroom le renvoie.
-        var valeur = joueur.You ? _session.MesChoix(jeu).GetValueOrDefault(premier.Key, premier.Default)
-            : joueur.Choices is not null && joueur.Choices.TryGetValue(premier.Key, out var v) ? v
-            : premier.Default;
-        return premier.NomDe(valeur);
+        return premier.NomDe(ValeurJouee(joueur, jeu, premier));
     }
 
     private LeaderboardOverlayService.JoueurMultiplayer Ami(MultiplayerAmi ami, Func<string, string> T)

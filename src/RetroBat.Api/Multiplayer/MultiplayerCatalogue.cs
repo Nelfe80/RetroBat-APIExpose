@@ -252,6 +252,53 @@ public sealed record MultiplayerChoice
     [JsonPropertyName("seats")]
     public IReadOnlyList<MultiplayerChoiceSeat> Seats { get; init; } = [];
 
+    /// <summary>
+    /// DEUX JOUEURS, DEUX VALEURS (Metal Slug 3, 23/10) : le jeu ne laisse pas deux joueurs sur le meme soldat, et deux
+    /// fois la meme valeur ecrite le bloque (« PLEASE WAIT »). Le panneau saute les valeurs prises, et l'hote donne au
+    /// joueur arrive le second la suivante libre.
+    /// </summary>
+    [JsonPropertyName("distinct")]
+    public bool Distinct { get; init; }
+
+    /// <summary>
+    /// La valeur de chaque place, dans l'ordre des places : un choix distinct deja pris par une place d'avant passe a la
+    /// suivante libre. Le meme calcul chez l'hote (ce qu'il ecrit) et dans le panneau (ce qu'il montre).
+    /// </summary>
+    public IReadOnlyDictionary<int, int> Departager(IEnumerable<(int Place, int Valeur)> voulues)
+    {
+        var prises = new HashSet<int>();
+        var retenues = new Dictionary<int, int>();
+        foreach (var (place, voulue) in voulues.OrderBy(v => v.Place))
+        {
+            var valeur = Values.Any(v => v.Value == voulue) ? voulue : Default;
+            if (Distinct && prises.Contains(valeur))
+            {
+                valeur = VoisineLibre(valeur, 1, prises);
+            }
+
+            prises.Add(valeur);
+            retenues[place] = valeur;
+        }
+
+        return retenues;
+    }
+
+    /// <summary>La voisine qu'aucun autre joueur n'a prise ; la voisine tout court si toutes le sont.</summary>
+    public int VoisineLibre(int valeur, int pas, IReadOnlySet<int> prises)
+    {
+        var candidate = valeur;
+        for (var essai = 0; essai < Values.Count; essai++)
+        {
+            candidate = Voisine(candidate, pas);
+            if (!prises.Contains(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        return Voisine(valeur, pas);
+    }
+
     /// <summary>La valeur suivante (ou precedente) dans la liste, en boucle.</summary>
     public int Voisine(int valeur, int pas)
     {
