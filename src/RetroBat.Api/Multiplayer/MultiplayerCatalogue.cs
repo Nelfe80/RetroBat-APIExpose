@@ -420,11 +420,31 @@ public sealed record MultiplayerChoiceValue
     public string Name { get; init; } = string.Empty;
 
     /// <summary>
-    /// Le portrait carre du personnage : un badge public de RetroAchievements (SF2CE : les succes « finir le jeu avec »),
-    /// que chaque borne telecharge dans son propre cache. Aucune image du jeu ne passe par le Data Pack.
+    /// L'IMAGE DU CHOIX (personnage, vehicule, equipe), livree par le Data Pack (decision du user du 23/10) : un PNG
+    /// relatif au dossier du catalogue, sous <c>images/</c> (<c>images/arcade/sf2ce/character/ryu.png</c>). Elle passe
+    /// avant le badge : une borne qui ne joint pas RetroAchievements a quand meme ses portraits.
+    /// </summary>
+    [JsonPropertyName("image")]
+    public string? Image { get; init; }
+
+    /// <summary>
+    /// Le portrait de secours : un badge public de RetroAchievements (SF2CE : les succes « finir le jeu avec »), que la
+    /// borne telecharge dans son cache quand l'image du Data Pack manque (API 1.9.88 et avant : la seule source).
     /// </summary>
     [JsonPropertyName("ra_badge")]
     public string? RaBadge { get; init; }
+
+    /// <summary>
+    /// Le chemin local de l'image sous <paramref name="dossierDuCatalogue"/>, ou null pour un chemin qui sortirait de
+    /// <c>images/</c> ou qui n'est pas un PNG. Une image mal nommee se passe de portrait, elle ne refuse pas le catalogue.
+    /// </summary>
+    public string? CheminDeLImage(string dossierDuCatalogue)
+        => Image is { Length: > 0 } image
+            && image.StartsWith("images/", StringComparison.Ordinal)
+            && image.EndsWith(".png", StringComparison.OrdinalIgnoreCase)
+            && RetroBat.Api.Infrastructure.DataPackPaths.CheminRelatifSur(image)
+            ? global::System.IO.Path.Combine(dossierDuCatalogue, image.Replace('/', global::System.IO.Path.DirectorySeparatorChar))
+            : null;
 }
 
 public sealed record MultiplayerChoiceSeat

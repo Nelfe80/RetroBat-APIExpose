@@ -74,6 +74,8 @@ public sealed class MultiplayerPanelService
     private IReadOnlyList<MultiplayerAmi> _amis = [];
     private readonly SemaphoreSlim _telechargementsDePortraits = new(2, 2);
 
+    private static string DossierDuCatalogue => Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, "resources", "multiplayer");
+
     /// <summary>Les statistiques que cette borne a vues pendant la rencontre : l'ecran de fin s'en sert sans celles du site.</summary>
     private IReadOnlyDictionary<int, StatsDeLaPlace>? _statsVues;
 
@@ -967,16 +969,23 @@ public sealed class MultiplayerPanelService
 
         var premier = choix[0];
         var mien = _session.MesChoix(jeu).GetValueOrDefault(premier.Key, premier.Default);
-        var bande = premier.Values.Select(valeur => new LeaderboardOverlayService.PortraitDeChoix(PortraitDu(valeur.RaBadge), valeur.Name)).ToList();
+        var bande = premier.Values.Select(valeur => new LeaderboardOverlayService.PortraitDeChoix(PortraitDu(valeur), valeur.Name)).ToList();
         return (bande, premier.Values.ToList().FindIndex(valeur => valeur.Value == mien));
     }
 
     /// <summary>
-    /// Le portrait d'un personnage : son badge RetroAchievements en cache, telecharge a la premiere demande (une image
-    /// publique, sans cle). Le chemin est rendu tout de suite : le panneau dessine le portrait des qu'il est la.
+    /// L'image d'un choix : celle du Data Pack d'abord (23/10), deja sur la borne. A defaut, le badge RetroAchievements en
+    /// cache, telecharge a la premiere demande (une image publique, sans cle) ; le chemin est rendu tout de suite, le
+    /// panneau dessine le portrait des qu'il est la.
     /// </summary>
-    private string? PortraitDu(string? badge)
+    private string? PortraitDu(MultiplayerChoiceValue? valeur)
     {
+        if (valeur?.CheminDeLImage(DossierDuCatalogue) is { } image && File.Exists(image))
+        {
+            return image;
+        }
+
+        var badge = valeur?.RaBadge;
         if (_retroAchievements?.CheminDuBadge(badge) is not { } chemin)
         {
             return null;
@@ -1201,7 +1210,7 @@ public sealed class MultiplayerPanelService
         var valeur = joueur.You ? _session.MesChoix(jeu).GetValueOrDefault(premier.Key, premier.Default)
             : joueur.Choices is not null && joueur.Choices.TryGetValue(premier.Key, out var v) ? v
             : premier.Default;
-        return PortraitDu(premier.Values.FirstOrDefault(x => x.Value == valeur)?.RaBadge);
+        return PortraitDu(premier.Values.FirstOrDefault(x => x.Value == valeur));
     }
 
     private async Task ChangerDePersonnageAsync(string room, MultiplayerGame jeu, int pas)

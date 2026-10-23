@@ -290,6 +290,34 @@ public class MultiplayerCollectionSyncTests : IDisposable
         Assert.Null(erreur);
         Assert.NotNull(catalogue);
         Assert.All(catalogue!.Games, jeu => Assert.NotNull(catalogue.CoreOf(jeu)));
+
+        // Chaque image citee est un chemin admis, et le fichier est dans le depot : une image oubliee laisserait la borne
+        // au badge de secours sans que personne le voie.
+        var dossier = Path.GetDirectoryName(depot)!;
+        var images = catalogue.Games.SelectMany(jeu => jeu.Choices ?? []).SelectMany(choix => choix.Values).Where(v => v.Image is not null).ToList();
+        Assert.All(images, v => Assert.True(v.CheminDeLImage(dossier) is { } chemin && File.Exists(chemin), v.Image));
+    }
+
+    [Theory]
+    [InlineData("images/arcade/sf2ce/character/ryu.png", true)]
+    [InlineData("images/arcade/sf2ce/character/RYU.PNG", true)]
+    [InlineData("images/../states/arcade/sf2ce/selection-2p-fbneo.state", false)]
+    [InlineData("images/arcade/sf2ce/character/ryu.state", false)]
+    [InlineData("states/arcade/sf2ce/ryu.png", false)]
+    [InlineData("/images/arcade/ryu.png", false)]
+    [InlineData("C:/images/ryu.png", false)]
+    [InlineData("images//ryu.png", false)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public void L_image_d_un_choix_reste_sous_images(string? image, bool admise)
+    {
+        var dossier = Path.Combine(_racine, "resources", "multiplayer");
+        var chemin = new MultiplayerChoiceValue { Name = "RYU", Image = image }.CheminDeLImage(dossier);
+        Assert.Equal(admise, chemin is not null);
+        if (chemin is not null)
+        {
+            Assert.StartsWith(Path.Combine(dossier, "images") + Path.DirectorySeparatorChar, chemin);
+        }
     }
 
     private sealed class SansDefinition : IScoreSlugResolver
