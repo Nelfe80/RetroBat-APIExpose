@@ -313,11 +313,27 @@ public class MultiplayerBancTests
             ],
         };
 
+        // Les pseudos : la table des joueurs lies (0x14 par place) dans chaque console, le nom propre dans la sienne.
+        jeu = jeu with
+        {
+            Names = new MultiplayerNames
+            {
+                Length = 8, Allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,-'&_/ ", Memory = MultiplayerChoice.CarteDuCoeur,
+                Seats = [.. Enumerable.Range(1, 4).SelectMany(place => new MultiplayerNameSeat[]
+                {
+                    new() { Seat = place, CoreRam = $"0x{0x03003330 + 0x14 * (place - 1):X8}", Consoles = "all" },
+                    new() { Seat = place, CoreRam = "0x03002D7A" }, new() { Seat = place, CoreRam = "0x03002FF8" },
+                })],
+            },
+        };
+
         // Wind Walker, Fire Ball, J.B. Crystal, Hot Violet.
         int[] bolides = [3, 1, 2, 0];
+        string[] pseudos = ["Nelfe", "Bob", "Carole", "David44"];
         var places = Enumerable.Range(1, joueurs).ToDictionary(
             place => place, place => (IReadOnlyDictionary<string, int>?) new Dictionary<string, int> { ["machine"] = bolides[place - 1] });
-        var depart = await new MultiplayerDepartPret(ra).PreparerAsync(jeu, etat, "F-Zero - Maximum Velocity (USA, Europe)", places, CancellationToken.None);
+        var depart = await new MultiplayerDepartPret(ra).PreparerAsync(jeu, etat, "F-Zero - Maximum Velocity (USA, Europe)", places, CancellationToken.None,
+            null, Enumerable.Range(1, joueurs).ToDictionary(place => place, place => pseudos[place - 1]));
         Assert.True(depart.Ok, depart.Raison);
     }
 
