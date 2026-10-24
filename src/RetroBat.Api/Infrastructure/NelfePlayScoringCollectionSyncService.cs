@@ -928,6 +928,38 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// LE JEU OUVERT D'UNE ROM CONSOLE, PAR SON CONTENU (24/10, demande du user : « c'est le hash compatible qui fait
+    /// foi ») : le groupe dont les empreintes publiees contiennent le md5 ou le sha256 MESURE, sur le meme systeme.
+    /// Le nom du fichier n'y entre pas : « Sonic The Hedgehog (Japan) (En) (Virtual Console) » etait dans la collection
+    /// par son contenu et la partie cherchait le profil « sonic-the-hedgehog-japan-en-virtual-console ». Arcade : null,
+    /// le set y est l'identite. Null aussi sans index ou sans empreinte qui corresponde.
+    /// </summary>
+    internal static string? GroupeOuvertDuContenu(string? systemId, string? md5, string? sha256, string? stateRoot = null)
+    {
+        try
+        {
+            var systeme = RomCanonicalResolver.CanonicalScoringSystem(systemId ?? string.Empty);
+            if (string.IsNullOrEmpty(systeme) || systeme == "arcade" || (string.IsNullOrWhiteSpace(md5) && string.IsNullOrWhiteSpace(sha256)))
+            {
+                return null;
+            }
+
+            var chemin = Path.Combine(stateRoot ?? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay"), "scoring-collection-remote.json");
+            if (!File.Exists(chemin)) return null;
+            var manifeste = JsonSerializer.Deserialize<OpenGamesManifest>(File.ReadAllText(chemin), JsonLecture);
+            return manifeste?.Games?.FirstOrDefault(g =>
+                    string.Equals(RomCanonicalResolver.CanonicalScoringSystem(g.SystemId), systeme, StringComparison.Ordinal)
+                    && ((!string.IsNullOrWhiteSpace(md5) && (g.ContentHashes?.Md5 ?? []).Contains(md5.Trim(), StringComparer.OrdinalIgnoreCase))
+                        || (!string.IsNullOrWhiteSpace(sha256) && (g.ContentHashes?.Sha256 ?? []).Contains(sha256.Trim(), StringComparer.OrdinalIgnoreCase))))
+                ?.RomGroup;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
     /// <summary>L'empreinte arcade d'un set dans un .MEM : le md5 de son nom, en minuscules. Pur.</summary>
     internal static string Md5DuNomDeSet(string set)
         => Convert.ToHexString(System.Security.Cryptography.MD5.HashData(System.Text.Encoding.UTF8.GetBytes(set.Trim().ToLowerInvariant())))

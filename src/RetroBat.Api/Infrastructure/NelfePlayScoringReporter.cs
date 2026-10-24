@@ -1019,7 +1019,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         try
         {
             var systemId = GetString(attestation, "SystemId") ?? "";
-            var romGroup = GetString(attestation, "Rom") ?? "";
+            var romGroup = GroupeDeLaPartie(systemId, GetString(attestation, "Rom") ?? "",
+                GetString(attestation, "ContentMd5"), GetString(attestation, "ContentSha256"));
             if (systemId.Length == 0 || romGroup.Length == 0 || _esNotify is null) return;
             if (!PartieNelfePlay())
             {
@@ -1617,6 +1618,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// des empreintes du profil ouvert), n'a pas d'identite certifiable : son sha1 declare est souvent celui d'un fichier
     /// partage avec son parent, et la plateforme ne peut pas les distinguer. Arcade seulement.
     /// </summary>
+    /// <summary>
+    /// LE GROUPE D'UNE PARTIE (24/10) : pour une console, celui que le CONTENU mesure designe parmi les jeux ouverts ; le
+    /// nom du fichier, que le wrapper reduit en slug, ne fait pas l'identite. Sinon (arcade, contenu inconnu), celui du
+    /// wrapper. Voir NelfePlayScoringCollectionSyncService.GroupeOuvertDuContenu.
+    /// </summary>
+    internal static string GroupeDeLaPartie(string systemId, string romGroupDuWrapper, string? md5, string? sha256, string? stateRoot = null)
+        => NelfePlayScoringCollectionSyncService.GroupeOuvertDuContenu(systemId, md5, sha256, stateRoot) ?? romGroupDuWrapper;
+
     internal static bool BootlegHorsDefinition(string? systemId, string? romGroup, string? contentSet,
         ContentHashes? empreintes = null, Func<string?, string?, bool>? bootlegOuHack = null)
     {
@@ -2801,9 +2810,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private async Task OnSessionAsync(JsonElement payload, CancellationToken cancellationToken)
     {
         var systemId = GetString(payload, "SystemId") ?? "";
-        var romGroup = GetString(payload, "Rom") ?? "";
+        var romDuFichier = GetString(payload, "Rom") ?? "";
+        string? md5DuContenu, sha256DuContenu;
+        lock (_sync) { md5DuContenu = _contentMd5; sha256DuContenu = _contentSha256; }
+        var romGroup = GroupeDeLaPartie(systemId, romDuFichier, md5DuContenu, sha256DuContenu);
         var sessionJson = GetString(payload, "Session");
-        Trace($"session reçue sys={systemId} rom={romGroup} sessionLen={sessionJson?.Length ?? -1}");
+        Trace($"session reçue sys={systemId} rom={romGroup} sessionLen={sessionJson?.Length ?? -1}"
+              + (string.Equals(romGroup, romDuFichier, StringComparison.Ordinal) ? "" : $" (fichier {romDuFichier} : groupe trouve par le contenu)"));
         int demoAuBilan;
         lock (_sync)
         {

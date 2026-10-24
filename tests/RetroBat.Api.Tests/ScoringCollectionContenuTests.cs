@@ -139,6 +139,34 @@ public class ScoringCollectionContenuTests
         }
     }
 
+    // 24/10 : « Sonic The Hedgehog (Japan) (En) (Virtual Console) », dans la collection par son contenu, cherchait le profil
+    // du nom de son fichier. Une console s'identifie par son contenu mesure, quel que soit le nom.
+    [Fact]
+    public void Une_partie_console_trouve_son_jeu_par_le_contenu_et_jamais_par_le_nom_du_fichier()
+    {
+        var dossier = Path.Combine(Path.GetTempPath(), "nelfe-index-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dossier);
+        try
+        {
+            File.WriteAllText(Path.Combine(dossier, "scoring-collection-remote.json"),
+                """{"ok":true,"games":[{"system_id":"megadrive","rom_group":"sonic-the-hedgehog","content_hashes":{"md5":["09dadb5071eb35050067a32462e39c5f"],"sha256":["46160baa06362c711c9f1a5017cb7371026444936c8af5e93a78996cf32ff2a6"]}},{"system_id":"arcade","rom_group":"ms-pac-man","content_hashes":{"md5":["01052a074f9e7ce8dc823a5dd2155d14"]}}]}""");
+            Assert.Equal("sonic-the-hedgehog", NelfePlayScoringReporter.GroupeDeLaPartie("megadrive", "sonic-the-hedgehog-japan-en-virtual-console",
+                "09DADB5071EB35050067A32462E39C5F", null, dossier));
+            Assert.Equal("sonic-the-hedgehog", NelfePlayScoringReporter.GroupeDeLaPartie("megadrive", "n-importe-quoi",
+                null, "46160baa06362c711c9f1a5017cb7371026444936c8af5e93a78996cf32ff2a6", dossier));
+            // Un contenu inconnu garde le groupe du wrapper : la plateforme dira « non ouvert ».
+            Assert.Equal("sonic-the-hedgehog-japan-en-virtual-console", NelfePlayScoringReporter.GroupeDeLaPartie("megadrive",
+                "sonic-the-hedgehog-japan-en-virtual-console", "00000000000000000000000000000000", null, dossier));
+            // Le meme md5 sur un autre systeme ne vaut rien ; l'arcade garde son set (le md5 de son nom n'est pas un contenu).
+            Assert.Null(NelfePlayScoringCollectionSyncService.GroupeOuvertDuContenu("snes", "09dadb5071eb35050067a32462e39c5f", null, dossier));
+            Assert.Null(NelfePlayScoringCollectionSyncService.GroupeOuvertDuContenu("arcade", "01052a074f9e7ce8dc823a5dd2155d14", null, dossier));
+        }
+        finally
+        {
+            Directory.Delete(dossier, recursive: true);
+        }
+    }
+
     [Fact]
     public void Un_profil_sans_aucun_hash_ne_confirme_rien()
     {
