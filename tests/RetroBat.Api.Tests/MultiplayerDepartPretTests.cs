@@ -318,7 +318,9 @@ public class MultiplayerDepartPretTests : IDisposable
     [Theory]
     [InlineData("Nelfe", "NELFE   ")]
     [InlineData("  bob  ", "BOB     ")]
-    [InlineData("Ève+42!", "-VE-42! ")]
+    [InlineData("Ève+42!", "EVE-42! ")]
+    [InlineData("Rémi", "REMI    ")]
+    [InlineData("Æsir", "-SIR    ")]
     [InlineData("TresLongPseudo", "TRESLONG")]
     [InlineData("", "        ")]
     public void Un_pseudo_se_code_comme_le_jeu_l_affiche(string pseudo, string attendu)

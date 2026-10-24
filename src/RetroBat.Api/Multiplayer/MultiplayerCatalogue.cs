@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
@@ -597,7 +599,9 @@ public sealed record MultiplayerNames
     {
         var remplacant = Replacement.Length > 0 ? Replacement[0] : '-';
         var bourrage = Pad.Length > 0 ? Pad[0] : ' ';
-        var texte = new string((pseudo ?? string.Empty).Trim().ToUpperInvariant()
+        // Les accents tombent (REMI pour Rémi) avant que les caracteres absents du jeu deviennent le remplacant.
+        var texte = new string((pseudo ?? string.Empty).Trim().ToUpperInvariant().Normalize(NormalizationForm.FormD)
+            .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
             .Select(c => Allowed.Contains(c, StringComparison.Ordinal) ? c : remplacant).Take(Length).ToArray());
         return texte.PadRight(Length, bourrage).Select(c => (byte) c).ToArray();
     }
