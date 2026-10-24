@@ -157,6 +157,13 @@ public sealed record MultiplayerGame
     public IReadOnlyList<MultiplayerChoice>? Choices { get; init; }
 
     /// <summary>
+    /// NIVEAU NELFEPLAY : le pseudo de chaque joueur ecrit dans le jeu au depart pret, avec les choix (F-Zero, 24/10 :
+    /// les noms des coureurs a l'ecran des bolides et en course).
+    /// </summary>
+    [JsonPropertyName("names")]
+    public MultiplayerNames? Names { get; init; }
+
+    /// <summary>
     /// NIVEAU NELFEPLAY : la fin d'une rencontre (V24-16), lue chez l'hote ; la plateforme ferme alors le jeu, sinon le
     /// gagnant d'un SF2 continuerait seul contre l'ordinateur.
     /// </summary>
@@ -556,6 +563,68 @@ public sealed record MultiplayerChoiceValue
             : null;
 }
 
+/// <summary>
+/// LE PSEUDO DANS LE JEU (F-Zero, 24/10) : une chaine de longueur fixe, chaque caractere un octet ASCII (majuscules du
+/// jeu), completee par <see cref="Pad"/>. Un caractere que le jeu n'a pas devient <see cref="Replacement"/>.
+/// </summary>
+public sealed record MultiplayerNames
+{
+    [JsonPropertyName("length")]
+    public int Length { get; init; }
+
+    /// <summary>Les caracteres que le jeu sait afficher (son clavier) ; les autres deviennent le remplacant.</summary>
+    [JsonPropertyName("allowed")]
+    public string Allowed { get; init; } = string.Empty;
+
+    [JsonPropertyName("replacement")]
+    public string Replacement { get; init; } = "-";
+
+    [JsonPropertyName("pad")]
+    public string Pad { get; init; } = " ";
+
+    /// <summary>Comme pour un choix : <c>core_map</c>, la carte du coeur (READ/WRITE_CORE_MEMORY).</summary>
+    [JsonPropertyName("memory")]
+    public string? Memory { get; init; }
+
+    [JsonPropertyName("seats")]
+    public IReadOnlyList<MultiplayerNameSeat> Seats { get; init; } = [];
+
+    [JsonIgnore]
+    public bool ParLaCarteDuCoeur => string.Equals(Memory, MultiplayerChoice.CarteDuCoeur, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Le pseudo tel que le jeu l'ecrit : majuscules, caracteres permis, coupe ou complete a la longueur.</summary>
+    public byte[] Coder(string pseudo)
+    {
+        var remplacant = Replacement.Length > 0 ? Replacement[0] : '-';
+        var bourrage = Pad.Length > 0 ? Pad[0] : ' ';
+        var texte = new string((pseudo ?? string.Empty).Trim().ToUpperInvariant()
+            .Select(c => Allowed.Contains(c, StringComparison.Ordinal) ? c : remplacant).Take(Length).ToArray());
+        return texte.PadRight(Length, bourrage).Select(c => (byte) c).ToArray();
+    }
+}
+
+/// <summary>
+/// Une adresse du pseudo d'une place. <c>consoles</c> : <c>all</c> = dans chaque console de la partie (la table des
+/// joueurs lies de F-Zero), <c>own</c> = dans la console de cette place seulement (son propre nom).
+/// </summary>
+public sealed record MultiplayerNameSeat
+{
+    [JsonPropertyName("seat")]
+    public int Seat { get; init; }
+
+    [JsonPropertyName("core_ram")]
+    public string CoreRam { get; init; } = string.Empty;
+
+    [JsonPropertyName("consoles")]
+    public string Consoles { get; init; } = "own";
+
+    [JsonIgnore]
+    public bool DansChaqueConsole => string.Equals(Consoles, "all", StringComparison.OrdinalIgnoreCase);
+
+    [JsonIgnore]
+    public long? Decalage => new MultiplayerChoiceSeat { CoreRam = CoreRam }.Decalage;
+}
+
 public sealed record MultiplayerChoiceSeat
 {
     [JsonPropertyName("seat")]
@@ -854,6 +923,29 @@ public sealed class MultiplayerCatalogueStore
                 if (vie.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage is null)
                 {
                     return "statistiques : pas d'adresse de vie pour la place " + place;
+                }
+            }
+        }
+
+        if (jeu.Names is { } noms)
+        {
+            if (noms.Length is < 1 or > 32 || noms.Allowed.Length == 0 || noms.Allowed.Any(c => c is < ' ' or > '~')
+                || noms.Replacement.Length != 1 || noms.Pad.Length != 1 || noms.Replacement[0] > '~' || noms.Pad[0] > '~')
+            {
+                return "pseudos : longueur ou caracteres incoherents";
+            }
+
+            if (noms.Seats.Any(s => s.Decalage is null || s.Consoles is not ("all" or "own"))
+                || (noms.Seats.Any(s => s.DansChaqueConsole) && !noms.ParLaCarteDuCoeur))
+            {
+                return "pseudos : adresse ou consoles incoherentes";
+            }
+
+            for (var place = 1; place <= jeu.Players; place++)
+            {
+                if (noms.Seats.All(s => s.Seat != place))
+                {
+                    return "pseudos : pas d'adresse pour la place " + place;
                 }
             }
         }

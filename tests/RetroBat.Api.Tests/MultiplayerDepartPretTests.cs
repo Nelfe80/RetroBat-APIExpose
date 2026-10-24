@@ -290,6 +290,68 @@ public class MultiplayerDepartPretTests : IDisposable
         Assert.Equal("choix « machine » : toutes les consoles sans la carte du coeur", MultiplayerCatalogueStore.ValiderLeDepart(sansCarte));
     }
 
+    /// <summary>F-Zero (24/10) : 8 caracteres ASCII ; la table des joueurs lies dans chaque console, le nom propre dans la sienne.</summary>
+    private static readonly MultiplayerNames NomsFZero = new()
+    {
+        Length = 8, Allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,-'&_/ ", Replacement = "-", Pad = " ", Memory = MultiplayerChoice.CarteDuCoeur,
+        Seats =
+        [
+            new() { Seat = 1, CoreRam = "0x03003330", Consoles = "all" }, new() { Seat = 1, CoreRam = "0x03002D7A" },
+            new() { Seat = 2, CoreRam = "0x03003344", Consoles = "all" }, new() { Seat = 2, CoreRam = "0x03002D7A" },
+            new() { Seat = 3, CoreRam = "0x03003358", Consoles = "all" }, new() { Seat = 3, CoreRam = "0x03002D7A" },
+            new() { Seat = 4, CoreRam = "0x0300336C", Consoles = "all" }, new() { Seat = 4, CoreRam = "0x03002D7A" },
+        ],
+    };
+
+    [Theory]
+    [InlineData("Nelfe", "NELFE   ")]
+    [InlineData("  bob  ", "BOB     ")]
+    [InlineData("Ève+42!", "-VE-42! ")]
+    [InlineData("TresLongPseudo", "TRESLONG")]
+    [InlineData("", "        ")]
+    public void Un_pseudo_se_code_comme_le_jeu_l_affiche(string pseudo, string attendu)
+        => Assert.Equal(attendu, global::System.Text.Encoding.ASCII.GetString(NomsFZero.Coder(pseudo)));
+
+    [Fact]
+    public void Le_pseudo_de_chaque_place_s_ecrit_dans_la_table_de_chaque_console_et_dans_sa_console()
+    {
+        var jeu = QuatreConsoles with { Choices = [BolideFZero], Names = NomsFZero };
+        var ecritures = MultiplayerDepartPret.EcrituresParCommande(jeu, Bolides(3, 1), new Dictionary<int, string> { [1] = "Nelfe", [2] = "Bob" });
+        // 2 bolides x 2 consoles, puis par place : 2 tables + son nom, 8 octets chacun.
+        Assert.Equal(4 + 2 * 3 * 8, ecritures.Count);
+        Assert.Contains((0x03003330L, (int) 'N', true), ecritures);
+        Assert.Contains((0x13003330L + 4, (int) 'E', true), ecritures);   // la console 2 connait le nom du joueur 1
+        Assert.Contains((0x13002D7AL, (int) 'B', true), ecritures);       // le nom propre du joueur 2, dans sa console
+        Assert.DoesNotContain(ecritures, e => e.Decalage == 0x03002D7AL && e.Valeur == 'B');
+        Assert.Contains((0x13003344L + 7, (int) ' ', true), ecritures);
+    }
+
+    [Fact]
+    public void Les_pseudos_du_catalogue_ont_une_adresse_par_place()
+    {
+        var jeu = QuatreConsoles with { Choices = [BolideFZero], Names = NomsFZero };
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(jeu));
+        Assert.Equal("pseudos : pas d'adresse pour la place 4",
+            MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Names = NomsFZero with { Seats = [.. NomsFZero.Seats.Where(s => s.Seat != 4)] } }));
+        Assert.Equal("pseudos : adresse ou consoles incoherentes",
+            MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Names = NomsFZero with { Memory = null } }));
+        Assert.Equal("pseudos : longueur ou caracteres incoherents",
+            MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Names = NomsFZero with { Length = 0 } }));
+    }
+
+    [Fact]
+    public async Task Le_depart_ecrit_les_pseudos_et_les_relit()
+    {
+        var (jeu, etat) = MarioKart();
+        var avecNoms = jeu with { Names = NomsFZero };
+        var ra = new FauxRetroArch { DossierDesEtats = Path.Combine(_dossier, "etats") };
+        var resultat = await new MultiplayerDepartPret(ra, apresLeChargement: TimeSpan.Zero)
+            .PreparerAsync(avecNoms, etat, "mksc", Places(8, 1), CancellationToken.None, null, new Dictionary<int, string> { [1] = "Nelfe", [2] = "Bob" });
+        Assert.True(resultat.Ok, resultat.Raison);
+        Assert.Equal((int) 'N', ra.Carte[0x03003330]);
+        Assert.Equal((int) 'O', ra.Carte[0x13003344 + 1]);
+    }
+
     private const string Usa = "784a036ff1aae709e90167186639b75e";
     private const string Europe = "f99fb545ac65126e9956a7718c30d6a3";
 

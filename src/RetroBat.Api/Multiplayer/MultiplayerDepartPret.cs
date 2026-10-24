@@ -94,7 +94,8 @@ public sealed class MultiplayerDepartPret
         string nomDuContenu,
         IReadOnlyDictionary<int, IReadOnlyDictionary<string, int>?> choixParPlace,
         CancellationToken ct,
-        MultiplayerStart? depart = null)
+        MultiplayerStart? depart = null,
+        IReadOnlyDictionary<int, string>? pseudos = null)
     {
         depart ??= jeu.Start;
         if (depart is null)
@@ -138,7 +139,7 @@ public sealed class MultiplayerDepartPret
         await _commandes.EnvoyerAsync("LOAD_STATE_SLOT " + Emplacement.ToString(CultureInfo.InvariantCulture), ct).ConfigureAwait(false);
         await Task.Delay(_apresLeChargement, ct).ConfigureAwait(false);
 
-        var ecritures = EcrituresParCommande(jeu, choixParPlace);
+        var ecritures = EcrituresParCommande(jeu, choixParPlace, pseudos);
         foreach (var (decalage, valeur, carte) in ecritures)
         {
             await _commandes.EnvoyerAsync($"{(carte ? "WRITE_CORE_MEMORY" : "WRITE_CORE_RAM")} {decalage:x} {valeur:x2}", ct).ConfigureAwait(false);
@@ -164,7 +165,8 @@ public sealed class MultiplayerDepartPret
 
     /// <summary>Les ecritures, chacune avec sa commande : la carte du coeur (<see cref="MultiplayerChoice.ParLaCarteDuCoeur"/>) ou la memoire systeme.</summary>
     public static IReadOnlyList<(long Decalage, int Valeur, bool Carte)> EcrituresParCommande(
-        MultiplayerGame jeu, IReadOnlyDictionary<int, IReadOnlyDictionary<string, int>?> choixParPlace)
+        MultiplayerGame jeu, IReadOnlyDictionary<int, IReadOnlyDictionary<string, int>?> choixParPlace,
+        IReadOnlyDictionary<int, string>? pseudos = null)
     {
         var ecritures = new List<(long, int, bool)>();
         // Une console par joueur de la partie (mGBA Splitscreen) : c'est aussi le nombre de joueurs des adresses par nombre.
@@ -186,6 +188,26 @@ public sealed class MultiplayerDepartPret
                 for (var console = 0; console < consoles; console++)
                 {
                     ecritures.Add((adresse + console * 0x10000000L, valeur, choix.ParLaCarteDuCoeur));
+                }
+            }
+        }
+
+        // Le pseudo de chaque joueur, un octet par caractere : la table de chaque console, puis le nom de sa propre console.
+        if (jeu.Names is { } noms && pseudos is not null)
+        {
+            foreach (var (place, pseudo) in pseudos.OrderBy(p => p.Key))
+            {
+                var octets = noms.Coder(pseudo);
+                foreach (var adresse in noms.Seats.Where(s => s.Seat == place && s.Decalage is not null))
+                {
+                    var consoles = adresse.DansChaqueConsole ? Enumerable.Range(0, joueurs) : [noms.ParLaCarteDuCoeur ? place - 1 : 0];
+                    foreach (var console in consoles)
+                    {
+                        for (var i = 0; i < octets.Length; i++)
+                        {
+                            ecritures.Add((adresse.Decalage!.Value + console * 0x10000000L + i, octets[i], noms.ParLaCarteDuCoeur));
+                        }
+                    }
                 }
             }
         }

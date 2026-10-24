@@ -389,7 +389,13 @@ public sealed class MultiplayerLaunchService : IHostedService
             .Where(joueur => joueur.Seat is not null)
             .GroupBy(joueur => joueur.Seat!.Value)
             .ToDictionary(groupe => groupe.Key, groupe => groupe.First().Choices);
-        var resultat = await _depart.PreparerAsync(jeu.Game, etat, Path.GetFileNameWithoutExtension(jeu.Path), choixParPlace, CancellationToken.None, depart)
+        // Le pseudo de chaque place, ecrit dans le jeu quand le catalogue sait ou (F-Zero) ; le nom de compte a defaut.
+        var pseudos = room.Players
+            .Where(joueur => joueur.Seat is not null)
+            .GroupBy(joueur => joueur.Seat!.Value)
+            .ToDictionary(groupe => groupe.Key, groupe => groupe.First() is var j && j.Pseudo.Length > 0 ? j.Pseudo : j.Handle);
+        var resultat = await _depart.PreparerAsync(jeu.Game, etat, Path.GetFileNameWithoutExtension(jeu.Path), choixParPlace, CancellationToken.None, depart,
+                pseudos)
             .ConfigureAwait(false);
         lock (_verrou)
         {
