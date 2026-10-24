@@ -369,6 +369,56 @@ public class MultiplayerDepartPretTests : IDisposable
         Assert.Contains("READ_CORE_MEMORY 3003330 8", ra.Recues);
     }
 
+    private static readonly MultiplayerRotation CoupeMarioKart = new()
+    {
+        Key = "cup", Memory = MultiplayerChoice.CarteDuCoeur, CoreRam = "0x0300001E", AllConsoles = true,
+        Values = [new() { Value = 0, Name = "MUSHROOM CUP" }, new() { Value = 1, Name = "FLOWER CUP" }, new() { Value = 2, Name = "LIGHTNING CUP" },
+            new() { Value = 3, Name = "STAR CUP" }, new() { Value = 4, Name = "SPECIAL CUP" }],
+    };
+
+    [Fact]
+    public void La_coupe_change_toutes_les_deux_heures_aux_heures_paires_UTC()
+    {
+        var avant = CoupeMarioKart.A(new DateTimeOffset(2026, 10, 24, 13, 59, 59, TimeSpan.Zero))!.Value;
+        var apres = CoupeMarioKart.A(new DateTimeOffset(2026, 10, 24, 14, 0, 0, TimeSpan.Zero))!.Value;
+        Assert.Equal(new DateTimeOffset(2026, 10, 24, 14, 0, 0, TimeSpan.Zero), avant.Jusqua);
+        Assert.Equal((avant.Valeur.Value + 1) % 5, apres.Valeur.Value);
+        // La meme heure vue d'un autre fuseau : la meme coupe.
+        Assert.Equal(avant.Valeur, CoupeMarioKart.A(new DateTimeOffset(2026, 10, 24, 15, 59, 59, TimeSpan.FromHours(2)))!.Value.Valeur);
+    }
+
+    [Fact]
+    public void La_coupe_du_moment_s_ecrit_dans_chaque_console()
+    {
+        var jeu = QuatreConsoles with { Choices = [], Rotation = CoupeMarioKart };
+        var instant = new DateTimeOffset(2026, 10, 24, 14, 30, 0, TimeSpan.Zero);
+        var coupe = CoupeMarioKart.A(instant)!.Value.Valeur.Value;
+        var ecritures = MultiplayerDepartPret.EcrituresParCommande(jeu, Bolides(3, 1), maintenant: instant);
+        Assert.Equal([(0x0300001EL, coupe, true), (0x1300001EL, coupe, true)], ecritures);
+    }
+
+    [Fact]
+    public void Un_roulement_incoherent_refuse_le_jeu()
+    {
+        var jeu = QuatreConsoles with { Choices = [BolideFZero], Rotation = CoupeMarioKart };
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(jeu));
+        Assert.Equal("roulement : tranche ou valeurs incoherentes", MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Rotation = CoupeMarioKart with { PeriodH = 5 } }));
+        Assert.Equal("roulement : tranche ou valeurs incoherentes", MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Rotation = CoupeMarioKart with { Values = [] } }));
+        Assert.Equal("roulement : adresse incoherente", MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Rotation = CoupeMarioKart with { CoreRam = "" } }));
+        Assert.Equal("roulement : adresse incoherente", MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Rotation = CoupeMarioKart with { Memory = null } }));
+    }
+
+    [Fact]
+    public void Le_panneau_annonce_la_coupe_et_l_heure_de_la_suivante()
+    {
+        var jeu = QuatreConsoles with { Rotation = CoupeMarioKart };
+        var instant = new DateTimeOffset(2026, 10, 24, 14, 30, 0, TimeSpan.Zero);
+        var texte = MultiplayerPanelService.LeRoulement(jeu, instant, cle => cle == "multiplayer.rotation.until" ? "jusqu'a {time}" : cle);
+        Assert.StartsWith(CoupeMarioKart.A(instant)!.Value.Valeur.Name + " · jusqu'a ", texte);
+        Assert.EndsWith(new DateTimeOffset(2026, 10, 24, 16, 0, 0, TimeSpan.Zero).ToLocalTime().ToString("HH:mm"), texte);
+        Assert.Equal(string.Empty, MultiplayerPanelService.LeRoulement(jeu with { Level = MultiplayerLevels.Classique }, instant, cle => cle));
+    }
+
     [Fact]
     public void Les_octets_contigus_d_une_meme_commande_forment_un_bloc()
     {

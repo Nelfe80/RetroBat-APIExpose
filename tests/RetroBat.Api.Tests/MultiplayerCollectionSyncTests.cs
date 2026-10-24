@@ -325,7 +325,8 @@ public class MultiplayerCollectionSyncTests : IDisposable
         // Chaque image citee est un chemin admis, et le fichier est dans le depot : une image oubliee laisserait la borne
         // au badge de secours sans que personne le voie.
         var dossier = Path.GetDirectoryName(depot)!;
-        var images = catalogue.Games.SelectMany(jeu => jeu.Choices ?? []).SelectMany(choix => choix.Values).Where(v => v.Image is not null).ToList();
+        var images = catalogue.Games.SelectMany(jeu => jeu.Choices ?? []).SelectMany(choix => choix.Values)
+            .Concat(catalogue.Games.SelectMany(jeu => jeu.Rotation?.Values ?? [])).Where(v => v.Image is not null).ToList();
         Assert.All(images, v => Assert.True(v.CheminDeLImage(dossier) is { } chemin && File.Exists(chemin), v.Image));
 
         // Chaque etat de depart est livre, a l'empreinte du catalogue : sinon le depart de ce jeu s'annulerait partout.

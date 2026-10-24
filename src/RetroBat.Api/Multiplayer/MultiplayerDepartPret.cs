@@ -197,7 +197,7 @@ public sealed class MultiplayerDepartPret
     /// <summary>Les ecritures, chacune avec sa commande : la carte du coeur (<see cref="MultiplayerChoice.ParLaCarteDuCoeur"/>) ou la memoire systeme.</summary>
     public static IReadOnlyList<(long Decalage, int Valeur, bool Carte)> EcrituresParCommande(
         MultiplayerGame jeu, IReadOnlyDictionary<int, IReadOnlyDictionary<string, int>?> choixParPlace,
-        IReadOnlyDictionary<int, string>? pseudos = null)
+        IReadOnlyDictionary<int, string>? pseudos = null, DateTimeOffset? maintenant = null)
     {
         var ecritures = new List<(long, int, bool)>();
         // Une console par joueur de la partie (mGBA Splitscreen) : c'est aussi le nombre de joueurs des adresses par nombre.
@@ -220,6 +220,16 @@ public sealed class MultiplayerDepartPret
                 {
                     ecritures.Add((adresse + console * 0x10000000L, valeur, choix.ParLaCarteDuCoeur));
                 }
+            }
+        }
+
+        // Le roulement (la coupe de Mario Kart) : la valeur de l'heure, a une adresse, dans chaque console avec all_consoles.
+        if (jeu.Rotation is { Decalage: { } adresseDuRoulement } roulement && roulement.A(maintenant ?? DateTimeOffset.UtcNow) is { } enCours)
+        {
+            var consoles = roulement.AllConsoles && roulement.ParLaCarteDuCoeur ? joueurs : 1;
+            for (var console = 0; console < consoles; console++)
+            {
+                ecritures.Add((adresseDuRoulement + console * 0x10000000L, enCours.Valeur.Value, roulement.ParLaCarteDuCoeur));
             }
         }
 

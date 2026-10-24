@@ -907,7 +907,7 @@ public sealed class MultiplayerPanelService
             _modele.IndexOnglet,
             _modele.Etat == MultiplayerPanelModel.Foyer.Panneau,
             classique ? T("multiplayer.badge.classic") : string.Empty,
-            classique ? T(classe ? "multiplayer.info.classic_ranked" : "multiplayer.info.classic") : string.Empty,
+            classique ? T(classe ? "multiplayer.info.classic_ranked" : "multiplayer.info.classic") : LeRoulement(jeu?.Game, DateTimeOffset.UtcNow, T),
             presents + "/" + max,
             room is { State: "countdown", CountdownMs: { } ms } ? DateTime.UtcNow.AddMilliseconds(ms) : null,
             lignes,
@@ -921,6 +921,16 @@ public sealed class MultiplayerPanelService
                 ? DispositionPour(max)
                 : LeaderboardOverlayService.DispositionDesJoueurs.Liste);
     }
+
+    /// <summary>
+    /// LE ROULEMENT AU PANNEAU (24/10) : la valeur que l'hote ecrira si la partie part maintenant, et l'heure locale de la
+    /// suivante (« LIGHTNING CUP · jusqu'a 16:00 »). Le nom est celui du jeu, jamais traduit.
+    /// </summary>
+    internal static string LeRoulement(MultiplayerGame? jeu, DateTimeOffset maintenant, Func<string, string> T)
+        => jeu is { Level: MultiplayerLevels.NelfePlay, Rotation: { } roulement } && roulement.A(maintenant) is { } enCours
+            ? enCours.Valeur.Name + " · " + T("multiplayer.rotation.until").Replace("{time}",
+                enCours.Jusqua.ToLocalTime().ToString("HH:mm", CultureInfo.InvariantCulture), StringComparison.Ordinal)
+            : string.Empty;
 
     /// <summary>
     /// Deux places : deux cartes cote a cote ; trois ou quatre : une grille 2 x 2 ; au-dela, une ligne par joueur

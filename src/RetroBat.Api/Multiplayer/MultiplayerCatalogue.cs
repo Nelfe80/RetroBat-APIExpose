@@ -166,6 +166,14 @@ public sealed record MultiplayerGame
     public MultiplayerNames? Names { get; init; }
 
     /// <summary>
+    /// NIVEAU NELFEPLAY : LE ROULEMENT (demande du user du 24/10 : la coupe de Mario Kart, au rythme de Splatoon) : une
+    /// valeur du jeu qui change avec l'heure, la meme sur toutes les bornes, ecrite par l'hote au depart pret. Personne
+    /// ne la choisit.
+    /// </summary>
+    [JsonPropertyName("rotation")]
+    public MultiplayerRotation? Rotation { get; init; }
+
+    /// <summary>
     /// NIVEAU NELFEPLAY : la fin d'une rencontre (V24-16), lue chez l'hote ; la plateforme ferme alors le jeu, sinon le
     /// gagnant d'un SF2 continuerait seul contre l'ordinateur.
     /// </summary>
@@ -629,6 +637,55 @@ public sealed record MultiplayerNameSeat
     public long? Decalage => new MultiplayerChoiceSeat { CoreRam = CoreRam }.Decalage;
 }
 
+/// <summary>
+/// LE ROULEMENT (24/10) : les valeurs du catalogue tour a tour, une par tranche de <see cref="PeriodH"/> heures comptees
+/// depuis le 1er janvier 1970 a minuit UTC (2 h, comme les stages de Splatoon : le changement tombe aux heures paires
+/// UTC). Elle ne depend que de l'heure, toutes les bornes ont donc la meme. Ecrite au depart pret a une seule adresse,
+/// dans chaque console avec <see cref="AllConsoles"/>. Le jeu la presente ; Mario Kart laisse encore le joueur 1 changer
+/// de coupe a l'ecran des circuits (preselection).
+/// </summary>
+public sealed record MultiplayerRotation
+{
+    [JsonPropertyName("key")]
+    public string Key { get; init; } = string.Empty;
+
+    [JsonPropertyName("period_h")]
+    public int PeriodH { get; init; } = 2;
+
+    [JsonPropertyName("values")]
+    public IReadOnlyList<MultiplayerChoiceValue> Values { get; init; } = [];
+
+    [JsonPropertyName("memory")]
+    public string? Memory { get; init; }
+
+    [JsonPropertyName("core_ram")]
+    public string CoreRam { get; init; } = string.Empty;
+
+    [JsonPropertyName("all_consoles")]
+    public bool AllConsoles { get; init; }
+
+    [JsonIgnore]
+    public bool ParLaCarteDuCoeur => string.Equals(Memory, MultiplayerChoice.CarteDuCoeur, StringComparison.Ordinal);
+
+    [JsonIgnore]
+    public long? Decalage => new MultiplayerChoiceSeat { CoreRam = CoreRam }.Decalage;
+
+    /// <summary>Le numero de la tranche ou tombe <paramref name="instant"/>.</summary>
+    public long Tranche(DateTimeOffset instant) => instant.ToUnixTimeSeconds() / (PeriodH * 3600L);
+
+    /// <summary>La valeur de la tranche en cours, et l'heure ou la suivante prend sa place.</summary>
+    public (MultiplayerChoiceValue Valeur, DateTimeOffset Jusqua)? A(DateTimeOffset instant)
+    {
+        if (Values.Count == 0 || PeriodH < 1)
+        {
+            return null;
+        }
+
+        var tranche = Tranche(instant);
+        return (Values[(int) (tranche % Values.Count)], DateTimeOffset.FromUnixTimeSeconds((tranche + 1) * PeriodH * 3600L));
+    }
+}
+
 public sealed record MultiplayerChoiceSeat
 {
     [JsonPropertyName("seat")]
@@ -951,6 +1008,22 @@ public sealed class MultiplayerCatalogueStore
                 {
                     return "pseudos : pas d'adresse pour la place " + place;
                 }
+            }
+        }
+
+        if (jeu.Rotation is { } roulement)
+        {
+            // Une tranche qui ne divise pas la journee changerait a une heure differente chaque jour.
+            if (string.IsNullOrWhiteSpace(roulement.Key) || roulement.Values.Count == 0 || roulement.PeriodH is < 1 or > 24
+                || 24 % roulement.PeriodH != 0 || roulement.Values.Any(v => v.Value is < 0 or > 255)
+                || roulement.Values.Select(v => v.Value).Distinct().Count() != roulement.Values.Count)
+            {
+                return "roulement : tranche ou valeurs incoherentes";
+            }
+
+            if (roulement.Decalage is null || (roulement.AllConsoles && !roulement.ParLaCarteDuCoeur))
+            {
+                return "roulement : adresse incoherente";
             }
         }
 
