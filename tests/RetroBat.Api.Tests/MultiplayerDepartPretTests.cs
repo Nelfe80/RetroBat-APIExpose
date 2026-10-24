@@ -409,6 +409,32 @@ public class MultiplayerDepartPretTests : IDisposable
     }
 
     [Fact]
+    public void La_classe_tenue_part_dans_la_table_de_verrous_du_coeur_une_entree_par_console()
+    {
+        // F-Zero : la classe ne s'ecrit pas, le coeur la tient (0x03002E4F, Queen 3).
+        var classe = new MultiplayerRotation
+        {
+            Key = "cup", Memory = MultiplayerChoice.CarteDuCoeur, LockCoreRam = "0x03002E4F", AllConsoles = true,
+            Values = [new() { Value = 0, Name = "PAWN" }, new() { Value = 1, Name = "KNIGHT" }, new() { Value = 2, Name = "BISHOP" }, new() { Value = 3, Name = "QUEEN" }],
+        };
+        var jeu = QuatreConsoles with { Choices = [], Rotation = classe };
+        var instant = new DateTimeOffset(2026, 10, 24, 14, 30, 0, TimeSpan.Zero);
+        var valeur = classe.A(instant)!.Value.Valeur.Value;
+        var ecritures = MultiplayerDepartPret.EcrituresParCommande(jeu, Bolides(3, 1), maintenant: instant);
+        Assert.Equal(16, ecritures.Count);
+        Assert.Equal([0x4F, 0x2E, 0x00, 0x03, valeur, 1, 0, 0], ecritures.Take(8).Select(e => e.Valeur));
+        Assert.Equal([0x4F, 0x2E, 0x00, 0x13, valeur, 1, 0, 0], ecritures.Skip(8).Select(e => e.Valeur));
+        Assert.Equal(MultiplayerRotation.TableDesVerrous + 8, ecritures[8].Decalage);
+        Assert.All(ecritures, e => Assert.True(e.Carte));
+        // Un seul bloc a ecrire et a relire.
+        Assert.Single(MultiplayerDepartPret.Blocs(ecritures));
+
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(jeu));
+        Assert.Equal("roulement : adresse incoherente", MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Rotation = classe with { LockCoreRam = "0x13002E4F" } }));
+        Assert.Equal("roulement : adresse incoherente", MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Rotation = classe with { Memory = null, AllConsoles = false } }));
+    }
+
+    [Fact]
     public void Le_panneau_annonce_la_coupe_et_l_heure_de_la_suivante()
     {
         var jeu = QuatreConsoles with { Rotation = CoupeMarioKart };

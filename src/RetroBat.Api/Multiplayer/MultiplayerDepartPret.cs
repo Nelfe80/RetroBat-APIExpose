@@ -223,13 +223,29 @@ public sealed class MultiplayerDepartPret
             }
         }
 
-        // Le roulement (la coupe de Mario Kart) : la valeur de l'heure, a une adresse, dans chaque console avec all_consoles.
-        if (jeu.Rotation is { Decalage: { } adresseDuRoulement } roulement && roulement.A(maintenant ?? DateTimeOffset.UtcNow) is { } enCours)
+        // Le roulement (la coupe) : la valeur de l'heure, ecrite une fois et/ou tenue par le coeur, dans chaque console
+        // avec all_consoles. Un verrou : une entree de la table du coeur (adresse sur 4 octets, valeur, actif).
+        if (jeu.Rotation is { } roulement && roulement.A(maintenant ?? DateTimeOffset.UtcNow) is { } enCours)
         {
             var consoles = roulement.AllConsoles && roulement.ParLaCarteDuCoeur ? joueurs : 1;
             for (var console = 0; console < consoles; console++)
             {
-                ecritures.Add((adresseDuRoulement + console * 0x10000000L, enCours.Valeur.Value, roulement.ParLaCarteDuCoeur));
+                if (roulement.Decalage is { } adresse)
+                {
+                    ecritures.Add((adresse + console * 0x10000000L, enCours.Valeur.Value, roulement.ParLaCarteDuCoeur));
+                }
+            }
+
+            if (roulement.DecalageDuVerrou is { } tenue)
+            {
+                for (var console = 0; console < consoles; console++)
+                {
+                    var cible = (uint) (tenue + console * 0x10000000L);
+                    var entree = MultiplayerRotation.TableDesVerrous + console * 8L;
+                    int[] octets = [(int) (cible & 0xFF), (int) ((cible >> 8) & 0xFF), (int) ((cible >> 16) & 0xFF), (int) (cible >> 24),
+                        enCours.Valeur.Value, 1, 0, 0];
+                    ecritures.AddRange(octets.Select((octet, i) => (entree + i, octet, true)));
+                }
             }
         }
 

@@ -658,17 +658,33 @@ public sealed record MultiplayerRotation
     [JsonPropertyName("memory")]
     public string? Memory { get; init; }
 
+    /// <summary>Ecrite une fois au depart (Mario Kart : la coupe que l'ecran des circuits reprend). Facultative.</summary>
     [JsonPropertyName("core_ram")]
     public string CoreRam { get; init; } = string.Empty;
 
+    /// <summary>
+    /// TENUE toute la partie (demande du user du 24/10 : la coupe ne se choisit pas) : le coeur mGBA Splitscreen de
+    /// NelfePlay la repose avant chaque pas d'emulation, depuis sa table de verrous (<see cref="TableDesVerrous"/>),
+    /// rangee dans l'etat : l'invite du netplay la recoit en se connectant. Facultative.
+    /// </summary>
+    [JsonPropertyName("lock_core_ram")]
+    public string LockCoreRam { get; init; } = string.Empty;
+
     [JsonPropertyName("all_consoles")]
     public bool AllConsoles { get; init; }
+
+    /// <summary>La table de verrous du coeur dans sa carte : 16 entrees de 8 octets (adresse, valeur, actif).</summary>
+    public const long TableDesVerrous = 0x7F000000;
+    public const int VerrousMax = 16;
 
     [JsonIgnore]
     public bool ParLaCarteDuCoeur => string.Equals(Memory, MultiplayerChoice.CarteDuCoeur, StringComparison.Ordinal);
 
     [JsonIgnore]
-    public long? Decalage => new MultiplayerChoiceSeat { CoreRam = CoreRam }.Decalage;
+    public long? Decalage => CoreRam.Length == 0 ? null : new MultiplayerChoiceSeat { CoreRam = CoreRam }.Decalage;
+
+    [JsonIgnore]
+    public long? DecalageDuVerrou => LockCoreRam.Length == 0 ? null : new MultiplayerChoiceSeat { CoreRam = LockCoreRam }.Decalage;
 
     /// <summary>Le numero de la tranche ou tombe <paramref name="instant"/>.</summary>
     public long Tranche(DateTimeOffset instant) => instant.ToUnixTimeSeconds() / (PeriodH * 3600L);
@@ -1021,7 +1037,13 @@ public sealed class MultiplayerCatalogueStore
                 return "roulement : tranche ou valeurs incoherentes";
             }
 
-            if (roulement.Decalage is null || (roulement.AllConsoles && !roulement.ParLaCarteDuCoeur))
+            // Une adresse au moins ; le verrou n'existe que dans le coeur de NelfePlay (sa carte), et l'adresse est celle
+            // de la console 1 (l'API ajoute celle de chaque console).
+            if ((roulement.CoreRam.Length > 0 && roulement.Decalage is null)
+                || (roulement.LockCoreRam.Length > 0 && roulement.DecalageDuVerrou is not (>= 0 and < 0x10000000))
+                || (roulement.Decalage is null && roulement.DecalageDuVerrou is null)
+                || ((roulement.AllConsoles || roulement.DecalageDuVerrou is not null) && !roulement.ParLaCarteDuCoeur)
+                || (roulement.DecalageDuVerrou is not null && (roulement.AllConsoles ? jeu.Players : 1) > MultiplayerRotation.VerrousMax))
             {
                 return "roulement : adresse incoherente";
             }
