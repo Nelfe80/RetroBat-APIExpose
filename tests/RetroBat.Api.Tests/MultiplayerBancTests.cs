@@ -269,7 +269,7 @@ public class MultiplayerBancTests
             // la tranche 0 donne l'Eclair, et la coupe vue a l'ecran differe de celle de l'etat (Champignon).
             Rotation = new MultiplayerRotation
             {
-                Key = "cup", Memory = MultiplayerChoice.CarteDuCoeur, CoreRam = "0x0300001E", AllConsoles = true,
+                Key = "cup", Memory = MultiplayerChoice.CarteDuCoeur, CoreRam = "0x0300001E", LockCoreRam = "0x0202AB38", AllConsoles = true,
                 Values = [.. Enumerable.Range(0, 5).Select(v => new MultiplayerChoiceValue { Value = (v + 2) % 5, Name = "C" + v })],
             },
         };
@@ -323,8 +323,14 @@ public class MultiplayerBancTests
         };
 
         // Les pseudos : la table des joueurs lies (0x14 par place) dans chaque console, le nom propre dans la sienne.
+        // La classe tenue par le coeur (QUEEN seule au banc : elle se joue meme verrouillee dans la sauvegarde).
         jeu = jeu with
         {
+            Rotation = new MultiplayerRotation
+            {
+                Key = "cup", Memory = MultiplayerChoice.CarteDuCoeur, LockCoreRam = "0x03002E4F", AllConsoles = true,
+                Values = [new MultiplayerChoiceValue { Value = 3, Name = "QUEEN" }],
+            },
             Names = new MultiplayerNames
             {
                 Length = 8, Allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,-'&_/ ", Memory = MultiplayerChoice.CarteDuCoeur,
