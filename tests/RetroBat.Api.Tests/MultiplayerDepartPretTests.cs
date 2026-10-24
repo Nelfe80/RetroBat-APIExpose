@@ -40,28 +40,40 @@ public class MultiplayerDepartPretTests : IDisposable
             {
                 "GET_STATUS" => "GET_STATUS PLAYING fb_alpha,sf2ce,crc32=2090400e",
                 "GET_CONFIG_PARAM" => "GET_CONFIG_PARAM savestate_directory " + DossierDesEtats,
-                "READ_CORE_RAM" => $"READ_CORE_RAM {morceaux[1]} {Memoire.GetValueOrDefault(long.Parse(morceaux[1], NumberStyles.HexNumber)):x2}",
-                "READ_CORE_MEMORY" => Carte.TryGetValue(long.Parse(morceaux[1], NumberStyles.HexNumber), out var v)
-                    ? $"READ_CORE_MEMORY {morceaux[1]} {v:X2}" : $"READ_CORE_MEMORY {morceaux[1]} -1 no descriptor for address",
+                "READ_CORE_RAM" => $"READ_CORE_RAM {morceaux[1]} {string.Join(' ', Adresses(morceaux).Select(a => Memoire.GetValueOrDefault(a).ToString("x2")))}",
+                "READ_CORE_MEMORY" => Adresses(morceaux).All(Carte.ContainsKey)
+                    ? $"READ_CORE_MEMORY {morceaux[1]} {string.Join(' ', Adresses(morceaux).Select(a => Carte[a].ToString("X2")))}"
+                    : $"READ_CORE_MEMORY {morceaux[1]} -1 no descriptor for address",
                 _ => null,
             });
+        }
+
+        private static IEnumerable<long> Adresses(string[] morceaux)
+        {
+            var debut = long.Parse(morceaux[1], NumberStyles.HexNumber);
+            var nombre = morceaux.Length > 2 ? int.Parse(morceaux[2], CultureInfo.InvariantCulture) : 1;
+            return Enumerable.Range(0, nombre).Select(i => debut + i);
         }
 
         public Task EnvoyerAsync(string commande, CancellationToken ct)
         {
             Recues.Add(commande);
             var morceaux = commande.Split(' ');
-            if (morceaux[0] == "WRITE_CORE_MEMORY")
+            if (morceaux[0] is "WRITE_CORE_MEMORY" or "WRITE_CORE_RAM")
             {
-                Carte[long.Parse(morceaux[1], NumberStyles.HexNumber)] = int.Parse(morceaux[2], NumberStyles.HexNumber);
-            }
-
-            if (morceaux[0] == "WRITE_CORE_RAM")
-            {
-                var adresse = long.Parse(morceaux[1], NumberStyles.HexNumber);
-                if (adresse != AdresseQuiResiste)
+                var debut = long.Parse(morceaux[1], NumberStyles.HexNumber);
+                for (var i = 2; i < morceaux.Length; i++)
                 {
-                    Memoire[adresse] = int.Parse(morceaux[2], NumberStyles.HexNumber);
+                    var adresse = debut + i - 2;
+                    var valeur = int.Parse(morceaux[i], NumberStyles.HexNumber);
+                    if (morceaux[0] == "WRITE_CORE_MEMORY")
+                    {
+                        Carte[adresse] = valeur;
+                    }
+                    else if (adresse != AdresseQuiResiste)
+                    {
+                        Memoire[adresse] = valeur;
+                    }
                 }
             }
 
@@ -350,6 +362,18 @@ public class MultiplayerDepartPretTests : IDisposable
         Assert.True(resultat.Ok, resultat.Raison);
         Assert.Equal((int) 'N', ra.Carte[0x03003330]);
         Assert.Equal((int) 'O', ra.Carte[0x13003344 + 1]);
+        // Un pseudo part en une commande et se relit en une commande.
+        Assert.Contains("WRITE_CORE_MEMORY 3003330 4e 45 4c 46 45 20 20 20", ra.Recues);
+        Assert.Contains("READ_CORE_MEMORY 3003330 8", ra.Recues);
+    }
+
+    [Fact]
+    public void Les_octets_contigus_d_une_meme_commande_forment_un_bloc()
+    {
+        var blocs = MultiplayerDepartPret.Blocs([(0x10, 1, true), (0x11, 2, true), (0x12, 3, false), (0x14, 4, false), (0x15, 5, false)]);
+        Assert.Equal([0x10L, 0x12L, 0x14L], blocs.Select(b => b.Decalage));
+        Assert.Equal([4, 5], blocs[2].Octets);
+        Assert.Equal(64, MultiplayerDepartPret.Blocs([.. Enumerable.Range(0, 70).Select(i => ((long) i, 0, true))])[0].Octets.Count);
     }
 
     private const string Usa = "784a036ff1aae709e90167186639b75e";

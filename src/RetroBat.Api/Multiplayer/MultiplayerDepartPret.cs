@@ -139,23 +139,54 @@ public sealed class MultiplayerDepartPret
         await _commandes.EnvoyerAsync("LOAD_STATE_SLOT " + Emplacement.ToString(CultureInfo.InvariantCulture), ct).ConfigureAwait(false);
         await Task.Delay(_apresLeChargement, ct).ConfigureAwait(false);
 
-        var ecritures = EcrituresParCommande(jeu, choixParPlace, pseudos);
-        foreach (var (decalage, valeur, carte) in ecritures)
+        // Les octets qui se suivent partent en une commande (un pseudo : 8 octets) : des centaines d'ecritures d'un octet
+        // faisaient attendre la premiere relecture au-dela de son delai (F-Zero a quatre, 24/10).
+        var blocs = Blocs(EcrituresParCommande(jeu, choixParPlace, pseudos));
+        foreach (var (decalage, octets, carte) in blocs)
         {
-            await _commandes.EnvoyerAsync($"{(carte ? "WRITE_CORE_MEMORY" : "WRITE_CORE_RAM")} {decalage:x} {valeur:x2}", ct).ConfigureAwait(false);
+            await _commandes.EnvoyerAsync($"{(carte ? "WRITE_CORE_MEMORY" : "WRITE_CORE_RAM")} {decalage:x} {string.Join(' ', octets.Select(o => o.ToString("x2", CultureInfo.InvariantCulture)))}", ct)
+                .ConfigureAwait(false);
         }
 
         // Verifiee (S5.4) : chaque valeur relue avant que quiconque se connecte ; un ecart annule le depart.
-        foreach (var (decalage, valeur, carte) in ecritures)
+        foreach (var (decalage, octets, carte) in blocs)
         {
-            var lu = await LireAsync(decalage, ct, carte).ConfigureAwait(false);
-            if (lu != valeur)
+            var lus = await LireAsync(decalage, octets.Count, ct, carte).ConfigureAwait(false);
+            for (var essai = 0; lus is null && essai < 2; essai++)
             {
-                return new Resultat(false, $"relecture differente a 0x{decalage:X} ({(lu is { } v ? v.ToString(CultureInfo.InvariantCulture) : "rien")} au lieu de {valeur})", fichier);
+                lus = await LireAsync(decalage, octets.Count, ct, carte).ConfigureAwait(false);
+            }
+
+            for (var i = 0; i < octets.Count; i++)
+            {
+                var lu = lus is not null && i < lus.Count ? lus[i] : (int?) null;
+                if (lu != octets[i])
+                {
+                    return new Resultat(false, $"relecture differente a 0x{decalage + i:X} ({(lu is { } v ? v.ToString(CultureInfo.InvariantCulture) : "rien")} au lieu de {octets[i]})", fichier);
+                }
             }
         }
 
         return new Resultat(true, null, fichier);
+    }
+
+    /// <summary>Les ecritures regroupees en suites d'octets contigus, par la meme commande, dans l'ordre.</summary>
+    internal static IReadOnlyList<(long Decalage, IReadOnlyList<int> Octets, bool Carte)> Blocs(IReadOnlyList<(long Decalage, int Valeur, bool Carte)> ecritures)
+    {
+        var blocs = new List<(long, List<int>, bool)>();
+        foreach (var (decalage, valeur, carte) in ecritures)
+        {
+            if (blocs.Count > 0 && blocs[^1] is var (debut, suite, memeCarte) && memeCarte == carte && debut + suite.Count == decalage && suite.Count < 64)
+            {
+                suite.Add(valeur);
+            }
+            else
+            {
+                blocs.Add((decalage, [valeur], carte));
+            }
+        }
+
+        return blocs.Select(b => (b.Item1, (IReadOnlyList<int>) b.Item2, b.Item3)).ToList();
     }
 
     /// <summary>Ce qu'il faut ecrire : pour chaque choix et chaque place de la partie, la valeur du joueur ou le defaut.</summary>
@@ -237,15 +268,28 @@ public sealed class MultiplayerDepartPret
         return null;
     }
 
-    private async Task<int?> LireAsync(long decalage, CancellationToken ct, bool carte = false)
+    private async Task<IReadOnlyList<int>?> LireAsync(long decalage, int nombre, CancellationToken ct, bool carte = false)
     {
         var commande = carte ? "READ_CORE_MEMORY" : "READ_CORE_RAM";
-        var reponse = await _commandes.DemanderAsync($"{commande} {decalage:x} 1", ct).ConfigureAwait(false);
+        var reponse = await _commandes.DemanderAsync($"{commande} {decalage:x} {nombre}", ct).ConfigureAwait(false);
         var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        return morceaux is { Length: >= 3 } && morceaux[0] == commande
-            && int.TryParse(morceaux[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var valeur)
-                ? valeur
-                : null;
+        if (morceaux is not { Length: >= 3 } || morceaux[0] != commande)
+        {
+            return null;
+        }
+
+        var lus = new List<int>();
+        foreach (var morceau in morceaux.Skip(2).Take(nombre))
+        {
+            if (!int.TryParse(morceau, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var valeur))
+            {
+                return null;
+            }
+
+            lus.Add(valeur);
+        }
+
+        return lus.Count == nombre ? lus : null;
     }
 }
 
