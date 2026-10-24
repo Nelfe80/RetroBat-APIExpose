@@ -233,7 +233,7 @@ public class MultiplayerBancTests
     /// NELFEPLAY_BANC_JOUEURS (2 a 4).
     /// </summary>
     [Fact]
-    public async Task Mario_Kart_part_avec_le_pilote_de_chaque_place_ecrit_dans_sa_console()
+    public async Task Mario_Kart_part_avec_le_pilote_de_chaque_place_dans_toutes_les_consoles_et_la_coupe_du_moment()
     {
         var etat = Environment.GetEnvironmentVariable("NELFEPLAY_BANC_MKSC_ETAT");
         if (Port is null || etat is null)
@@ -254,15 +254,24 @@ public class MultiplayerBancTests
             [
                 new MultiplayerChoice
                 {
-                    Key = "character", Default = 4, Memory = MultiplayerChoice.CarteDuCoeur,
+                    // Chaque curseur dans TOUTES les consoles (24/10) : ecrit dans la seule console du joueur, les autres
+                    // gardaient une vieille copie et dessinaient ce joueur avec un autre pilote en course.
+                    Key = "character", Default = 4, Memory = MultiplayerChoice.CarteDuCoeur, AllConsoles = true,
                     Values = [.. Enumerable.Range(0, 9).Select(v => new MultiplayerChoiceValue { Value = v, Name = "P" + v })],
                     Seats =
                     [
-                        new() { Seat = 1, CoreRam = "0x0202A8EC" }, new() { Seat = 2, CoreRam = "0x1202A8F0" },
-                        new() { Seat = 3, CoreRam = "0x2202A8F4" }, new() { Seat = 4, CoreRam = "0x3202A8F8" },
+                        new() { Seat = 1, CoreRam = "0x0202A8EC" }, new() { Seat = 2, CoreRam = "0x0202A8F0" },
+                        new() { Seat = 3, CoreRam = "0x0202A8F4" }, new() { Seat = 4, CoreRam = "0x0202A8F8" },
                     ],
                 },
             ],
+            // La coupe retenue, que l'ecran des circuits reprend a son ouverture. L'ordre est decale de deux au banc :
+            // la tranche 0 donne l'Eclair, et la coupe vue a l'ecran differe de celle de l'etat (Champignon).
+            Rotation = new MultiplayerRotation
+            {
+                Key = "cup", Memory = MultiplayerChoice.CarteDuCoeur, CoreRam = "0x0300001E", AllConsoles = true,
+                Values = [.. Enumerable.Range(0, 5).Select(v => new MultiplayerChoiceValue { Value = (v + 2) % 5, Name = "C" + v })],
+            },
         };
 
         // Bowser, Donkey Kong, Peach, Yoshi.
