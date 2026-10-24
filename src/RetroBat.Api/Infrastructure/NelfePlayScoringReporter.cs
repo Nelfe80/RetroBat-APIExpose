@@ -98,6 +98,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// ce qui suit ne concourt, meme quand le jeu remet le score a zero (Double Dragon).
     /// </summary>
     private bool _closeParCredit;
+    /// <summary>Le ✓1CC de la partie : le premier signal de fin du .MEM cite par le profil, avant tout continue (FinDuJeu).</summary>
+    private RetroBat.Api.Scoring.FinDuJeu.Clear? _clear;
     /// <summary>L'arrivee d'un joueur 2 a deja ete dite : la partie est hors classement solo.</summary>
     private bool _partieADeuxAnnoncee;
     /// <summary>
@@ -761,6 +763,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     CaptureVie(charge);
                     CaptureModeEtDifficulte(charge);
                     CaptureCredits(charge);
+                    CaptureFinDuJeu(charge);
                     CaptureDefinitionChargee(charge);
                     CaptureContinuesConsole(charge);
                     // Les ETATS du pont Lua de MAME arrivent ici, et seulement ici : le wrapper les
@@ -836,6 +839,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _finDeRunPubliee = false;
             _jetonDeSession++;
             _departAuCredit = _closeParCredit = _partieADeuxAnnoncee = false;
+            _clear = null;
             _scoresAutresJoueurs.Clear();
             _trajectoiresAutres.Clear();
             _placeInvite = null;
@@ -1781,6 +1785,45 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// (ContinuesParCredits). Le joueur l'apprend a chaque fois, et le replay s'arrete au premier.
     /// La decision de la soumission se refait en fin de session, sur tout.
     /// </summary>
+    /// <summary>
+    /// LE ✓1CC (2026-10-24) : le jeu atteint la fin que son profil designe (une ligne existante du .MEM). Le premier
+    /// signal conforme d'une partie jouee compte, tant qu'aucun continue ni arrivee n'a ferme le 1CC solo ; il part
+    /// avec le brouillon et le passeport, et la plateforme le confronte a son profil.
+    /// </summary>
+    private void CaptureFinDuJeu(JsonElement root)
+    {
+        if (!root.TryGetProperty("signal", out var signal) && !root.TryGetProperty("Signal", out signal)) return;
+        RetroBat.Api.Scoring.FinDuJeu.Regle? regle;
+        lock (_sync)
+        {
+            regle = _clear is null && _profilsDuLancement is { } lancement
+                && RetroBat.Api.Scoring.ModesDeJeu.DuSolo(lancement.Profils) is { Count: > 0 } seules
+                ? RetroBat.Api.Scoring.FinDuJeu.DuProfil(seules[0])
+                : null;
+        }
+        if (regle is null || !RetroBat.Api.Scoring.FinDuJeu.Correspond(regle, GetString(signal, "Name"), GetString(signal, "Address"), Entier(signal, "Value")))
+        {
+            return;
+        }
+
+        var frame = (long?) Entier(signal, "Frame") ?? _lastFrame;
+        long score;
+        bool annoncer;
+        lock (_sync)
+        {
+            if (_clear is not null || _inDemo || _closeParCredit) return;
+            score = _finalTotal ?? 0;
+            _clear = new RetroBat.Api.Scoring.FinDuJeu.Clear(frame, score, regle);
+            annoncer = _prevolCertifiable;
+        }
+
+        Trace($"✓1CC : fin du jeu atteinte ({regle.Action}) a la frame {frame}, score {score}");
+        if (annoncer)
+        {
+            _overlay?.ShowTop("SCORING", Texte("scoring_clear_title"), Texte("scoring_clear_sub"), 9000);
+        }
+    }
+
     private void CaptureCredits(JsonElement root)
     {
         if (!root.TryGetProperty("signal", out var signal) && !root.TryGetProperty("Signal", out signal)) return;
@@ -3462,6 +3505,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, runPeak, bestRun, trajectory,
             nvram, bios, contexteRun, partieADeux ? 2 : 1, finDuSolo, null, null, replay,
             profile is { } profilChoisi && profilChoisi.TryGetProperty("ruleset", out var regleChoisie) ? regleChoisie.GetString() : null);
+        // Le ✓1CC s'il tombe dans le run retenu ; une partie a deux n'a pas de clear solo.
+        RetroBat.Api.Scoring.FinDuJeu.Clear? clear;
+        lock (_sync) { clear = _clear; }
+        if (!partieADeux && clear is not null && RetroBat.Api.Scoring.FinDuJeu.DansLeRun(clear, bestRun, trajectory))
+        {
+            brouillon["clear"] = RetroBat.Api.Scoring.FinDuJeu.EnJson(clear);
+            Trace($"✓1CC : le clear de la frame {clear.Frame} part avec le score");
+        }
+        else if (clear is not null)
+        {
+            Trace($"✓1CC : le clear de la frame {clear.Frame} n'est pas dans le run retenu, le score part sans");
+        }
         PoserLesBornesVideo(brouillon, replay, enregistrements, trajectory, bestRun, finsDeRun);
         await PoserEtEnvoyerAsync(brouillon, runPeak, cancellationToken).ConfigureAwait(false);
 
@@ -3531,7 +3586,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         int? place = null, string? seance = null,
         string? sessionId = null, DateTime? finUtc = null,
         (NelfePlayScoringSessionService.SessionPlayer? Joueur, bool Fige)? joueurFige = null,
-        bool? labo = null, string? versionApi = null, string? etatWrapper = null, long? arretDuReplay = null)
+        bool? labo = null, string? versionApi = null, string? etatWrapper = null, long? arretDuReplay = null,
+        JsonObject? clear = null)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
@@ -3763,6 +3819,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // Les NVRAM du jeu (EEPROM, RAM de sauvegarde) : jointes seulement quand le jeu en a, pour
         // qu'un passeport sans NVRAM reste identique. Le profil dit ou sont les reglages.
         if (nvram is { Count: > 0 }) document["artifacts"]!["nvram"] = nvram;
+        // Le ✓1CC, signe avec le reste : absent, le passeport reste identique a celui d'avant.
+        if (clear is not null) document["progression"]!["clear"] = clear.DeepClone();
         return document;
     }
 
@@ -4928,7 +4986,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 contexte, (int?)brouillon["joueurs"] ?? 1, finDuSolo, (int?)brouillon["place"], (string?)brouillon["seance"],
                 sessionId: id, finUtc: fin, joueurFige: (joueur, true), labo: (bool?)brouillon["labo"] == true,
                 versionApi: (string?)brouillon["apiexpose"], etatWrapper: (string?)brouillon["etat_wrapper"],
-                arretDuReplay: (long?)brouillon["arret_du_replay"]);
+                arretDuReplay: (long?)brouillon["arret_du_replay"], clear: brouillon["clear"] as JsonObject);
             var corps = passport.DeepClone()!.AsObject();
             corps.Remove("signature");
             passport["signature"] = cle.SignB64Url(Jcs.CanonicalBytes(corps));
