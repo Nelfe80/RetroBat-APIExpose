@@ -167,6 +167,8 @@ public sealed class MultiplayerDepartPret
         MultiplayerGame jeu, IReadOnlyDictionary<int, IReadOnlyDictionary<string, int>?> choixParPlace)
     {
         var ecritures = new List<(long, int, bool)>();
+        // Une console par joueur de la partie (mGBA Splitscreen) : c'est aussi le nombre de joueurs des adresses par nombre.
+        var joueurs = choixParPlace.Count;
         foreach (var choix in jeu.Choices ?? [])
         {
             // Un choix distinct deja pris par une place d'avant passe a la suivante libre (Metal Slug 3).
@@ -174,13 +176,17 @@ public sealed class MultiplayerDepartPret
                 (paire.Key, paire.Value is not null && paire.Value.TryGetValue(choix.Key, out var voulu) ? voulu : choix.Default)));
             foreach (var (place, valeur) in retenues)
             {
-                var adresse = choix.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage;
-                if (adresse is null)
+                if (choix.AdressePour(place, joueurs) is not { } adresse)
                 {
                     continue;
                 }
 
-                ecritures.Add((adresse.Value, valeur, choix.ParLaCarteDuCoeur));
+                // F-Zero : le bolide de chaque joueur dans chaque console (la console N a +0x10000000 par console).
+                var consoles = choix.AllConsoles && choix.ParLaCarteDuCoeur ? joueurs : 1;
+                for (var console = 0; console < consoles; console++)
+                {
+                    ecritures.Add((adresse + console * 0x10000000L, valeur, choix.ParLaCarteDuCoeur));
+                }
             }
         }
 

@@ -239,6 +239,57 @@ public class MultiplayerDepartPretTests : IDisposable
             MultiplayerCatalogueStore.ValiderLeDepart(QuatreConsoles with { Starts = [Etat(3, 'b') with { State = "../x.state" }, Etat(4, 'c')] }));
     }
 
+    /// <summary>
+    /// F-Zero: Maximum Velocity sous mGBA Splitscreen (mesure du 24/10) : le bolide de chaque joueur en IWRAM, dans TOUTES
+    /// les consoles ; a deux et a trois, le joueur 2 est en 3e ligne (une ligne de l'ordinateur s'intercale).
+    /// </summary>
+    private static readonly MultiplayerChoice BolideFZero = new()
+    {
+        Key = "machine", Default = 0, Memory = MultiplayerChoice.CarteDuCoeur, AllConsoles = true,
+        Values = [new() { Value = 0, Name = "HOT VIOLET" }, new() { Value = 1, Name = "FIRE BALL" }, new() { Value = 2, Name = "J.B. CRYSTAL" }, new() { Value = 3, Name = "WIND WALKER" }],
+        Seats =
+        [
+            new() { Seat = 1, CoreRam = "0x030031A4" },
+            new() { Seat = 2, CoreRam = "0x030031AC" }, new() { Seat = 2, CoreRam = "0x030031A8", Players = 4 },
+            new() { Seat = 3, CoreRam = "0x030031B0", Players = 3 }, new() { Seat = 3, CoreRam = "0x030031AC", Players = 4 },
+            new() { Seat = 4, CoreRam = "0x030031B0", Players = 4 },
+        ],
+    };
+
+    private static Dictionary<int, IReadOnlyDictionary<string, int>?> Bolides(params int[] valeurs)
+        => valeurs.Select((v, i) => (i + 1, v)).ToDictionary(p => p.Item1, p => (IReadOnlyDictionary<string, int>?) new Dictionary<string, int> { ["machine"] = p.v });
+
+    [Fact]
+    public void Un_choix_de_toutes_les_consoles_s_ecrit_dans_chacune_a_l_adresse_du_nombre_de_joueurs()
+    {
+        var jeu = QuatreConsoles with { Choices = [BolideFZero] };
+        var deux = MultiplayerDepartPret.EcrituresParCommande(jeu, Bolides(3, 1));
+        Assert.Equal(
+            new (long, int, bool)[] { (0x030031A4L, 3, true), (0x130031A4L, 3, true), (0x030031ACL, 1, true), (0x130031ACL, 1, true) },
+            deux);
+
+        var quatre = MultiplayerDepartPret.EcrituresParCommande(jeu, Bolides(0, 1, 2, 3));
+        Assert.Equal(16, quatre.Count);
+        Assert.Contains((0x330031A8L, 1, true), quatre);   // le joueur 2 en 2e ligne a quatre, vu par la console 4
+        Assert.Contains((0x030031B0L, 3, true), quatre);
+        Assert.DoesNotContain(quatre, e => e.Decalage == 0x030031ACL && e.Valeur == 1);
+
+        var trois = MultiplayerDepartPret.EcrituresParCommande(jeu, Bolides(0, 1, 2));
+        Assert.Contains((0x230031B0L, 2, true), trois);
+        Assert.Contains((0x230031ACL, 1, true), trois);
+    }
+
+    [Fact]
+    public void Les_adresses_par_nombre_de_joueurs_couvrent_chaque_place_de_chaque_nombre()
+    {
+        var jeu = QuatreConsoles with { Choices = [BolideFZero] };
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(jeu));
+        var sansTrois = jeu with { Choices = [BolideFZero with { Seats = [.. BolideFZero.Seats.Where(s => !(s.Seat == 3 && s.Players == 3))] }] };
+        Assert.Equal("choix « machine » : pas d'adresse pour la place 3 a 3 joueurs", MultiplayerCatalogueStore.ValiderLeDepart(sansTrois));
+        var sansCarte = jeu with { Choices = [BolideFZero with { Memory = null }] };
+        Assert.Equal("choix « machine » : toutes les consoles sans la carte du coeur", MultiplayerCatalogueStore.ValiderLeDepart(sansCarte));
+    }
+
     private const string Usa = "784a036ff1aae709e90167186639b75e";
     private const string Europe = "f99fb545ac65126e9956a7718c30d6a3";
 

@@ -284,6 +284,23 @@ public sealed record MultiplayerChoice
     public IReadOnlyList<MultiplayerChoiceSeat> Seats { get; init; } = [];
 
     /// <summary>
+    /// TOUTES LES CONSOLES (F-Zero, 24/10) : avec <c>core_map</c>, la valeur d'une place s'ecrit dans chaque console de la
+    /// partie (adresse + 0x10000000 par console). F-Zero garde le bolide de chaque joueur dans toutes les consoles et ne le
+    /// transmet pas par la liaison : ecrit dans une seule, les autres le verraient sur Hot Violet. Mario Kart, lui, lit
+    /// le choix dans la console du joueur seulement (sans cette cle).
+    /// </summary>
+    [JsonPropertyName("all_consoles")]
+    public bool AllConsoles { get; init; }
+
+    /// <summary>
+    /// L'adresse d'une place pour une partie a <paramref name="joueurs"/> : celle de ce nombre (<c>players</c> de la place),
+    /// sinon celle qui vaut pour tous. F-Zero range ses joueurs selon leur nombre (a deux, le joueur 2 est en 3e ligne).
+    /// </summary>
+    public long? AdressePour(int place, int joueurs)
+        => (Seats.FirstOrDefault(s => s.Seat == place && s.Players == joueurs)
+            ?? Seats.FirstOrDefault(s => s.Seat == place && s.Players is null))?.Decalage;
+
+    /// <summary>
     /// DEUX JOUEURS, DEUX VALEURS (Metal Slug 3, 23/10) : le jeu ne laisse pas deux joueurs sur le meme soldat, et deux
     /// fois la meme valeur ecrite le bloque (« PLEASE WAIT »). Le panneau saute les valeurs prises, et l'hote donne au
     /// joueur arrive le second la suivante libre.
@@ -547,6 +564,10 @@ public sealed record MultiplayerChoiceSeat
     /// <summary>Le decalage en hexadecimal (<c>0x864E</c>).</summary>
     [JsonPropertyName("core_ram")]
     public string CoreRam { get; init; } = string.Empty;
+
+    /// <summary>Choix seulement : l'adresse ne vaut que pour une partie a ce nombre de joueurs (null : pour tous).</summary>
+    [JsonPropertyName("players")]
+    public int? Players { get; init; }
 
     [JsonIgnore]
     public long? Decalage => CoreRam.Trim() is { Length: > 2 } texte && texte.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
@@ -851,12 +872,22 @@ public sealed class MultiplayerCatalogueStore
                 return "choix « " + choix.Key + " » : defaut hors des valeurs";
             }
 
-            for (var place = 1; place <= jeu.Players; place++)
+            // Chaque nombre de joueurs a l'adresse de chacune de ses places (la sienne, ou celle qui vaut pour tous).
+            for (var joueurs = 2; joueurs <= jeu.Players; joueurs++)
             {
-                if (choix.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage is null)
+                for (var place = 1; place <= joueurs; place++)
                 {
-                    return "choix « " + choix.Key + " » : pas d'adresse pour la place " + place;
+                    if (choix.AdressePour(place, joueurs) is null)
+                    {
+                        return "choix « " + choix.Key + " » : pas d'adresse pour la place " + place
+                            + (choix.Seats.Any(s => s.Players is not null) ? " a " + joueurs + " joueurs" : string.Empty);
+                    }
                 }
+            }
+
+            if (choix.AllConsoles && !choix.ParLaCarteDuCoeur)
+            {
+                return "choix « " + choix.Key + " » : toutes les consoles sans la carte du coeur";
             }
         }
 
