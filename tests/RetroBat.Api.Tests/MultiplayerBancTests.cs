@@ -273,6 +273,54 @@ public class MultiplayerBancTests
         Assert.True(depart.Ok, depart.Raison);
     }
 
+    /// <summary>
+    /// F-Zero: Maximum Velocity sous mGBA Splitscreen, l'etat du choix des bolides en Multipak (2 a 4 consoles) : le bolide
+    /// de chaque place s'ecrit dans TOUTES les consoles, a l'adresse du nombre de joueurs. Banc : NELFEPLAY_BANC_RA_PORT,
+    /// NELFEPLAY_BANC_FZERO_ETAT, NELFEPLAY_BANC_JOUEURS.
+    /// </summary>
+    [Fact]
+    public async Task F_Zero_part_avec_le_bolide_de_chaque_place_dans_toutes_les_consoles()
+    {
+        var etat = Environment.GetEnvironmentVariable("NELFEPLAY_BANC_FZERO_ETAT");
+        if (Port is null || etat is null)
+        {
+            return;   // banc non monte
+        }
+
+        var joueurs = int.Parse(Environment.GetEnvironmentVariable("NELFEPLAY_BANC_JOUEURS") ?? "2", CultureInfo.InvariantCulture);
+        var ra = new CommandesRetroArchUdp(int.Parse(Port, CultureInfo.InvariantCulture));
+        var jeu = new MultiplayerGame
+        {
+            Id = "gba/f-zero-maximum-velocity", System = "gba", Players = 4, Level = MultiplayerLevels.NelfePlay,
+            Start = new MultiplayerStart
+            {
+                State = "banc", Sha256 = Convert.ToHexString(SHA256.HashData(await File.ReadAllBytesAsync(etat))), Players = joueurs,
+            },
+            Choices =
+            [
+                new MultiplayerChoice
+                {
+                    Key = "machine", Default = 0, Memory = MultiplayerChoice.CarteDuCoeur, AllConsoles = true,
+                    Values = [.. Enumerable.Range(0, 4).Select(v => new MultiplayerChoiceValue { Value = v, Name = "M" + v })],
+                    Seats =
+                    [
+                        new() { Seat = 1, CoreRam = "0x030031A4" },
+                        new() { Seat = 2, CoreRam = "0x030031AC" }, new() { Seat = 2, CoreRam = "0x030031A8", Players = 4 },
+                        new() { Seat = 3, CoreRam = "0x030031B0", Players = 3 }, new() { Seat = 3, CoreRam = "0x030031AC", Players = 4 },
+                        new() { Seat = 4, CoreRam = "0x030031B0", Players = 4 },
+                    ],
+                },
+            ],
+        };
+
+        // Wind Walker, Fire Ball, J.B. Crystal, Hot Violet.
+        int[] bolides = [3, 1, 2, 0];
+        var places = Enumerable.Range(1, joueurs).ToDictionary(
+            place => place, place => (IReadOnlyDictionary<string, int>?) new Dictionary<string, int> { ["machine"] = bolides[place - 1] });
+        var depart = await new MultiplayerDepartPret(ra).PreparerAsync(jeu, etat, "F-Zero - Maximum Velocity (USA, Europe)", places, CancellationToken.None);
+        Assert.True(depart.Ok, depart.Raison);
+    }
+
     private static async Task<bool> AttendreAsync(ICommandesRetroArch ra, long decalage, int valeur, TimeSpan delai)
     {
         var limite = DateTime.UtcNow + delai;
