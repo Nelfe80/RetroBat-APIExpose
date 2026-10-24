@@ -1259,6 +1259,33 @@ public sealed partial class LeaderboardOverlayService : IDisposable
         }
 
         /// <summary>Un rectangle cale sur la grille de pixels : pas de couture entre deux aplats.</summary>
+        /// <summary>Le dore du ✓1CC, celui du site la nuit.</summary>
+        private static readonly Color OrDuClear = Color.FromArgb(0xFF, 0xCB, 0x05);
+
+        /// <summary>
+        /// LA MARQUE DU ✓1CC (One-Credit Clear, 24/10) : la coche puis « 1CC ». La coche vient de la police d'icones d'ES
+        /// (FontAwesome, comme la coupe du premier) : la police du theme, chargee a part, peut ne pas l'avoir.
+        /// </summary>
+        private void DessinerClear(Graphics g, Font petite, float taille, float xDroite, float y, float hauteur, Color couleur, StringFormat droite)
+        {
+            using var encre = new SolidBrush(couleur);
+            g.DrawString("1CC", petite, encre, new RectangleF(0, y, xDroite, hauteur), droite);
+            var largeur = g.MeasureString("1CC", petite, PointF.Empty, StringFormat.GenericTypographic).Width + taille * 0.12f;
+            if (_service._policeSymboles is { } symboles)
+            {
+                using var coche = new Font(symboles, taille * 0.62f, FontStyle.Regular, GraphicsUnit.Pixel);
+                g.DrawString("", coche, encre, new RectangleF(0, y, xDroite - largeur, hauteur), droite);
+            }
+            else
+            {
+                g.DrawString("✓", petite, encre, new RectangleF(0, y, xDroite - largeur, hauteur), droite);
+            }
+        }
+
+        /// <summary>La place de la marque du ✓1CC devant le score, ecart compris.</summary>
+        private float LargeurClear(Graphics g, Font petite, float taille)
+            => g.MeasureString("1CC", petite, PointF.Empty, StringFormat.GenericTypographic).Width + taille * 1.1f;
+
         private static Rectangle Entier(RectangleF z)
             => Rectangle.FromLTRB((int) Math.Floor(z.Left), (int) Math.Floor(z.Top), (int) Math.Ceiling(z.Right), (int) Math.Ceiling(z.Bottom));
 
@@ -1324,7 +1351,8 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             for (var i = premier; i < finVisible; i++)
             {
                 var l = c.Lignes[i];
-                largeurScore = Math.Max(largeurScore, g.MeasureString(l.Valeur.ToString("N0", System.Globalization.CultureInfo.CurrentCulture), gras, PointF.Empty, StringFormat.GenericTypographic).Width);
+                largeurScore = Math.Max(largeurScore, g.MeasureString(l.Valeur.ToString("N0", System.Globalization.CultureInfo.CurrentCulture), gras, PointF.Empty, StringFormat.GenericTypographic).Width
+                    + (l.Clear ? LargeurClear(g, petite, taille) : 0f));
                 largeurNomMax = Math.Max(largeurNomMax, g.MeasureString((l.Joueur.Length > 0 ? l.Joueur : "?").ToUpperInvariant(), police, PointF.Empty, StringFormat.GenericTypographic).Width + 2);
                 sceauVisible |= l.Scelle;
                 attenteVisible |= l.EnAttente;
@@ -1383,9 +1411,16 @@ public sealed partial class LeaderboardOverlayService : IDisposable
                 var encre = choisie ? couleurChoisi : (l.CestMoi ? couleurMoi : couleurTexte);
                 using var pinceau = new SolidBrush(encre);
 
-                // Le score en GRAS : c'est la donnee que l'oeil cherche en premier.
+                // Le score en GRAS : c'est la donnee que l'oeil cherche en premier. Un ✓1CC (jeu fini sur un
+                // seul credit) passe en dore, sa marque juste devant le nombre.
                 var valeur = l.Valeur.ToString("N0", System.Globalization.CultureInfo.CurrentCulture);
-                g.DrawString(valeur, gras, pinceau, new RectangleF(0, y, xScore, hauteur), droite);
+                using var pinceauScore = new SolidBrush(l.Clear && !choisie ? OrDuClear : encre);
+                g.DrawString(valeur, gras, pinceauScore, new RectangleF(0, y, xScore, hauteur), droite);
+                if (l.Clear)
+                {
+                    var largeurValeur = g.MeasureString(valeur, gras, PointF.Empty, StringFormat.GenericTypographic).Width;
+                    DessinerClear(g, petite, taille, xScore - largeurValeur - taille * 0.3f, y, hauteur, choisie ? encre : OrDuClear, droite);
+                }
                 if (l.Scelle && sceau is not null)
                 {
                     g.DrawImage(sceau, xSceau - sceau.Width, y + (hauteur - sceau.Height) / 2f, sceau.Width, sceau.Height);

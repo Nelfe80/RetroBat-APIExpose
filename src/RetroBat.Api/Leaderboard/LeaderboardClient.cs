@@ -40,7 +40,8 @@ public sealed class LeaderboardClient
         string Monde = "",
         string Poignee = "",    // la poignee publique du joueur : ce qui permet de le suivre
         bool PlusBasEstMieux = false,   // le sens du PROFIL du jeu : vrai pour un contre-la-montre
-        bool EnAttente = false);        // MES RECORDS : partie gardee sur la borne, pas encore envoyee (sablier)
+        bool EnAttente = false,         // MES RECORDS : partie gardee sur la borne, pas encore envoyee (sablier)
+        bool Clear = false);            // le ✓1CC (One-Credit Clear) : le jeu fini sur un seul credit, drapeau « clear » du site
 
     /// <summary>Ce qu'une vue a a montrer, y compris son echec.</summary>
     public sealed record Resultat(IReadOnlyList<Ligne> Lignes, string Etat)
@@ -276,7 +277,9 @@ public sealed class LeaderboardClient
                     monPseudo.Length > 0 && string.Equals(joueur, monPseudo, StringComparison.OrdinalIgnoreCase),
                     Texte("world"),     // home | station | stream : le monde du record, comme sur le site
                     Texte("handle"),
-                    string.Equals(Texte("better"), "lower", StringComparison.OrdinalIgnoreCase)));
+                    string.Equals(Texte("better"), "lower", StringComparison.OrdinalIgnoreCase),
+                    Clear: r.TryGetProperty("flags", out var drapeaux) && drapeaux.ValueKind == JsonValueKind.Array
+                        && drapeaux.EnumerateArray().Any(d => d.ValueKind == JsonValueKind.String && d.GetString() == "clear")));
             }
         }
         catch (JsonException)

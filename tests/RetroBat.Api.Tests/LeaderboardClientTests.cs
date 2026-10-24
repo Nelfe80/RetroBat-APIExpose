@@ -40,6 +40,16 @@ public class LeaderboardClientTests
         Assert.False(Assert.Single(LeaderboardClient.Lire(Reel, "")).CestMoi);
     }
 
+    // Le ✓1CC (24/10) : le drapeau « clear » que le site pose sur un jeu fini sur un seul credit.
+    [Fact]
+    public void Le_drapeau_clear_du_site_fait_un_score_dore()
+    {
+        var json = """{"ok":true,"rows":[{"player":"A","value":45000,"flags":["before_continue","clear"]},{"player":"B","value":30000,"flags":["recovered"]},{"player":"C","value":10}]}""";
+        var lignes = LeaderboardClient.Lire(json, "");
+        Assert.Equal([true, false, false], lignes.Select(l => l.Clear));
+        Assert.False(Assert.Single(LeaderboardClient.Lire(Reel, "Nelfe80")).Clear);
+    }
+
     [Fact]
     public void Un_score_anonyme_ne_porte_pas_de_nom()
     {
