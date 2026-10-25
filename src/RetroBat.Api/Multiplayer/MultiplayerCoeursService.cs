@@ -204,6 +204,22 @@ public sealed class MultiplayerCoeursService : BackgroundService
         return lanceurs.Length > 0;
     }
 
+    /// <summary>
+    /// Un coeur que NelfePlay livre est-il pose chez RetroArch (dans <c>cores/</c> ou <c>cores_real/</c>) ? Un autre coeur
+    /// n'est pas juge ici : vrai. La collection MULTIPLAYER cache le jeu d'un coeur livre pas encore pose (25/10).
+    /// </summary>
+    public static bool EstPose(string? coeur, ApiExposeOptions options)
+    {
+        var livre = Coeurs.FirstOrDefault(c => string.Equals(c.Nom, coeur, StringComparison.OrdinalIgnoreCase));
+        if (livre is null)
+        {
+            return true;
+        }
+
+        var deploiement = options.RetroArchWrapperDeployment;
+        return File.Exists(OuEstLeVraiCoeur(CheminDeLaBorne(deploiement.CoresPath), CheminDeLaBorne(deploiement.RealCoresPath), livre.Bibliotheques[0]));
+    }
+
     private static string CheminDeLaBorne(string configure)
         => Path.IsPathRooted(configure)
             ? Path.GetFullPath(configure)

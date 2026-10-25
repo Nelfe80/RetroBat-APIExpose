@@ -40,7 +40,7 @@ public class MultiplayerCollectionSyncTests : IDisposable
         collectionsRoot: Path.Combine(_racine, "collections"),
         stateRoot: Etat);
 
-    private MultiplayerCollectionSyncService Service() => new(
+    private MultiplayerCollectionSyncService Service(Func<string?, bool>? coeurPose = null) => new(
         new FauxOptions(new ApiExposeOptions { NelfePlay = _nelfeplay }),
         new MultiplayerCatalogueStore(logger: null, path: CataloguePath),
         new InstalledGameCatalog(new SansDefinition(), logger: null, romsRoot: Roms, ramRoot: Path.Combine(_racine, "ram")),
@@ -50,7 +50,8 @@ public class MultiplayerCollectionSyncTests : IDisposable
         new MediaRuntimeState(),
         logger: null,
         romsRoot: Roms,
-        emulateurTourne: () => false);
+        emulateurTourne: () => false,
+        coeurPose: coeurPose ?? (_ => true));
 
     private string PoserFichier(string systeme, string nom, string contenu = "rom")
     {
@@ -159,6 +160,32 @@ public class MultiplayerCollectionSyncTests : IDisposable
         Assert.Equal("mgba_splitscreen", jeu.Core?.Core);
         Assert.Equal("off", jeu.Core?.Options?["splitscreen_boot_menu"]);
         Assert.Equal("{seat}", jeu.Core?.SeatOptions?["splitscreen_focus_player"]);
+    }
+
+    [Fact]
+    public async Task Le_jeu_d_un_coeur_livre_pas_encore_pose_attend_et_les_autres_entrent()
+    {
+        // 25/10 : sans le coeur NGP Link ou mGBA Splitscreen chez RetroArch, le jeu serait affiche et ne se lancerait pas.
+        var cartouche = PoserCartouche("gba", "mksc.zip", "x.gba", "mario kart usa");
+        var arcade = PoserFichier("fbneo", "sf2ce.zip");
+        PoserCatalogue(Catalogue(JeuConsole("gba/mksc", "gba", cartouche.Md5, cartouche.Crc), Arcade("sf2ce")));
+
+        var service = Service(coeur => coeur != "mgba_splitscreen");
+        var statut = await service.SynchroniserAsync("test", CancellationToken.None);
+
+        Assert.Equal(new HashSet<string>(StringComparer.OrdinalIgnoreCase) { arcade }, Collection());
+        Assert.Equal(["gba/mksc"], statut.Missing);
+
+        await Service().SynchroniserAsync("test", CancellationToken.None);
+        Assert.Contains(cartouche.Chemin, Collection());
+    }
+
+    [Fact]
+    public void Un_coeur_que_nelfeplay_ne_livre_pas_n_est_pas_juge()
+    {
+        var options = new ApiExposeOptions();
+        Assert.True(MultiplayerCoeursService.EstPose("fbneo", options));
+        Assert.True(MultiplayerCoeursService.EstPose(null, options));
     }
 
     [Fact]

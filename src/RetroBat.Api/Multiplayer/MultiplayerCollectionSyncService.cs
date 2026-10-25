@@ -59,6 +59,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     private readonly string _romsRoot;
     private readonly Func<bool> _emulateurTourne;
     private readonly Func<string, string?> _md5DuContenu;
+    private readonly Func<string?, bool> _coeurPose;
     private bool _inscriptionsFaites;
     private readonly SemaphoreSlim _porte = new(1, 1);
     private IDisposable? _abonnementReglages;
@@ -79,7 +80,8 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         string? romsRoot = null,
         Func<bool>? emulateurTourne = null,
         Func<string, string?>? md5DuContenu = null,
-        GamelistUpdateService? gamelists = null)
+        GamelistUpdateService? gamelists = null,
+        Func<string?, bool>? coeurPose = null)
     {
         _options = options;
         _store = store;
@@ -93,6 +95,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         _romsRoot = romsRoot ?? RetroBatPaths.RomsRoot;
         _emulateurTourne = emulateurTourne ?? EmulatorForeground.EmulateurTourne;
         _md5DuContenu = md5DuContenu ?? NelfePlayScoringCollectionSyncService.Md5DuContenu;
+        _coeurPose = coeurPose ?? (coeur => MultiplayerCoeursService.EstPose(coeur, _options.CurrentValue));
         Declarer = gamelists is null ? null : (systeme, jeux) => gamelists.DeclarerJeuxAbsents(systeme, jeux);
     }
 
@@ -329,13 +332,22 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         return MultiplayerCollectionStatus.Initial with { Enabled = false, State = "disabled" };
     }
 
-    /// <summary>Un fichier par jeu du catalogue que la borne possede, dans l'ordre du catalogue.</summary>
+    /// <summary>
+    /// Un fichier par jeu du catalogue que la borne possede, dans l'ordre du catalogue. Le jeu d'un coeur que NelfePlay livre
+    /// (NGP Link, mGBA Splitscreen) attend que ce coeur soit pose : sans lui, RetroArch ne lancerait rien.
+    /// </summary>
     internal IReadOnlyList<MultiplayerInstalledGame> Intersecter(MultiplayerCatalogue catalogue)
     {
         var inventaires = new Dictionary<string, IReadOnlyList<InstalledGame>>(StringComparer.OrdinalIgnoreCase);
         var retenus = new List<MultiplayerInstalledGame>();
         foreach (var jeu in catalogue.Games)
         {
+            var coeur = catalogue.CoreOf(jeu);
+            if (!_coeurPose(coeur?.Core))
+            {
+                continue;
+            }
+
             string? chemin;
             string? cle;
             if (jeu.EstArcade)
@@ -355,7 +367,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
 
             if (chemin != null && cle != null)
             {
-                retenus.Add(new MultiplayerInstalledGame(jeu, chemin, catalogue.CoreOf(jeu), cle));
+                retenus.Add(new MultiplayerInstalledGame(jeu, chemin, coeur, cle));
             }
         }
 
