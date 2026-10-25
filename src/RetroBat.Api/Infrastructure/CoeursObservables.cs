@@ -86,6 +86,25 @@ public static class CoeursObservables
     }
 
     /// <summary>
+    /// CE QUE PERMET UN LANCEMENT D'ARCADE (decision du user du 25 octobre 2026 : « le coeur supportant le plus de choses
+    /// en priorite »). FBNeo sous RetroArch : mesure, replay et film (3) ; MAME sous RetroArch : mesure et film, pas de
+    /// replay, RetroArch 1.22.2 plantant en ecrivant l'etat de MAME (2) ; MAME autonome : la mesure seule (1). Tout autre
+    /// lancement : 0, il ne se compare pas. Pur.
+    /// </summary>
+    public static int Capacite(string? emulateur, string? coeur)
+    {
+        var e = (emulateur ?? string.Empty).Trim();
+        var c = (coeur ?? string.Empty).Trim();
+        if (e.Equals("libretro", StringComparison.OrdinalIgnoreCase))
+        {
+            return c.Equals("fbneo", StringComparison.OrdinalIgnoreCase) ? 3
+                : c.Equals("mame", StringComparison.OrdinalIgnoreCase) ? 2
+                : 0;
+        }
+        return EmulateursAutonomesMesures.Contains(e) ? 1 : 0;
+    }
+
+    /// <summary>
     /// Un coeur libretro d'arcade, designe par son fichier, mesure-t-il ? Null hors arcade : ce
     /// n'est pas la liste blanche qui en juge.
     /// </summary>

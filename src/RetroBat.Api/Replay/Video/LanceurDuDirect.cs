@@ -35,22 +35,30 @@ public static class LanceurDuDirect
     /// classement montre a la fin s'il existe alors. Jamais l'adresse. Pur.
     /// </summary>
     internal static IReadOnlyList<string> Arguments(string film, int rotation, string? annonce = null, string? classement = null,
-        IReadOnlyList<string>? options = null)
+        IReadOnlyList<string>? options = null, double? forme = null)
     {
         var arguments = new List<string> { "--film", film, "--adresse-stdin", "--rotation", rotation.ToString(CultureInfo.InvariantCulture), "--suivre" };
         if (!string.IsNullOrEmpty(annonce)) arguments.AddRange(["--annonce", annonce]);
         if (!string.IsNullOrEmpty(classement)) arguments.AddRange(["--classement", classement]);
         // Le direct partage (16 octobre 2026) : debit, fichier de commande, clip et son empreinte, bande sous le jeu.
         if (options is not null) arguments.AddRange(options);
+        arguments.AddRange(Forme(forme));
         return arguments;
     }
+
+    /// <summary>
+    /// La forme de l'image annoncee par le coeur (25 octobre 2026) : l'exe (0.5.8) rend a cette forme un film aux pixels
+    /// non carres, au lieu de l'etirer. Pur.
+    /// </summary>
+    internal static IEnumerable<string> Forme(double? forme)
+        => forme is double f and > 0.2 and < 5 ? ["--forme", f.ToString("0.####", CultureInfo.InvariantCulture)] : [];
 
     /// <summary>
     /// Les arguments de la version YouTube : le film, le fichier a ecrire, le sens du jeu, et la sequence du record
     /// (secondes du film) quand elle est connue. Pur.
     /// </summary>
     internal static IReadOnlyList<string> ArgumentsDeLaVersion(string film, string sortie, int rotation, double? debutS = null,
-        double? finS = null)
+        double? finS = null, double? forme = null)
     {
         var arguments = new List<string>
         {
@@ -58,6 +66,7 @@ public static class LanceurDuDirect
         };
         if (debutS is double debut) arguments.AddRange(["--debut", debut.ToString("0.##", CultureInfo.InvariantCulture)]);
         if (finS is double fin) arguments.AddRange(["--fin", fin.ToString("0.##", CultureInfo.InvariantCulture)]);
+        arguments.AddRange(Forme(forme));
         return arguments;
     }
 
@@ -68,7 +77,7 @@ public static class LanceurDuDirect
     /// fichier inacheve s'efface et l'annulation remonte. Code 0 : le fichier est complet.
     /// </summary>
     public static async Task<Rapport> FabriquerLaVersionAsync(string exe, string film, string sortie, int rotation, ILogger journal,
-        CancellationToken ct, double? debutS = null, double? finS = null)
+        CancellationToken ct, double? debutS = null, double? finS = null, double? forme = null)
     {
         var info = new ProcessStartInfo(exe)
         {
@@ -78,7 +87,7 @@ public static class LanceurDuDirect
             RedirectStandardError = true,
             WorkingDirectory = Path.GetDirectoryName(exe) ?? AppContext.BaseDirectory,
         };
-        foreach (var a in ArgumentsDeLaVersion(film, sortie, rotation, debutS, finS)) info.ArgumentList.Add(a);
+        foreach (var a in ArgumentsDeLaVersion(film, sortie, rotation, debutS, finS, forme)) info.ArgumentList.Add(a);
 
         var chrono = Stopwatch.StartNew();
         using var p = Process.Start(info) ?? throw new InvalidOperationException("l'exe du direct ne demarre pas");
@@ -122,7 +131,7 @@ public static class LanceurDuDirect
     /// </summary>
     public static async Task<Rapport> DiffuserAsync(string exe, string film, string adresse, int rotation, ILogger journal,
         CancellationToken ct, string? annonce = null, string? classement = null, IReadOnlyList<string>? options = null,
-        TimeSpan? delaiDeFin = null)
+        TimeSpan? delaiDeFin = null, double? forme = null)
     {
         var info = new ProcessStartInfo(exe)
         {
@@ -133,7 +142,7 @@ public static class LanceurDuDirect
             RedirectStandardError = true,
             WorkingDirectory = Path.GetDirectoryName(exe) ?? AppContext.BaseDirectory,
         };
-        foreach (var a in Arguments(film, rotation, annonce, classement, options)) info.ArgumentList.Add(a);
+        foreach (var a in Arguments(film, rotation, annonce, classement, options, forme)) info.ArgumentList.Add(a);
 
         var chrono = Stopwatch.StartNew();
         using var p = Process.Start(info) ?? throw new InvalidOperationException("l'exe du direct ne demarre pas");

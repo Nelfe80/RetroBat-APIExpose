@@ -92,20 +92,94 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
 
     /// <summary>
     /// Le lancement d'un jeu de World Scoring mesure-t-il ? Sinon, le coeur a lui imposer ; null
-    /// quand il mesure deja ou que son systeme ne declare rien qui mesure.
+    /// quand il mesure deja ou que son systeme ne declare rien qui mesure. LE COEUR QUI FAIT LE PLUS
+    /// (decision du user du 25 octobre 2026, pas de replay pour les records sous MAME) : un lancement
+    /// qui mesure cede aussi la place a un coeur du systeme qui en permet plus, FBNeo devant MAME.
     /// </summary>
     internal static (string Emulator, string Core)? AImposer(
         EmulationStationLaunchConfig lancement,
         bool coeurChoisi,
         IReadOnlyList<EmulationStationSystemEmulatorCore> coeursDuSysteme)
     {
-        if (CoeursObservables.Juger(lancement, coeurChoisi, coeursDuSysteme).Observable)
+        var meilleur = CoeursObservables.MeilleurLancement(coeursDuSysteme);
+        if (!CoeursObservables.Juger(lancement, coeurChoisi, coeursDuSysteme).Observable)
+        {
+            return meilleur;
+        }
+
+        return meilleur is { } m && CoeursObservables.Capacite(m.Emulator, m.Core)
+            > CoeursObservables.Capacite(lancement.Emulator, lancement.Core)
+            ? meilleur
+            : null;
+    }
+
+    /// <summary>
+    /// UN SET MAME SOUS FBNEO (25/10) : le systeme mame de RetroBat ne declare pas FBNeo, alors qu'il lit les sets MAME des
+    /// jeux classes (les onze d'arcade de World Scoring, essayes sur la borne) et qu'il est le seul a rendre un replay. Un
+    /// jeu d'un systeme MAME passe donc sous FBNeo si FBNeo connait son set et ne l'a pas deja refuse sur cette borne.
+    /// Pur.
+    /// </summary>
+    internal static (string Emulator, string Core)? FbneoPourUnSetMame(
+        EmulationStationLaunchConfig lancement,
+        IReadOnlyList<EmulationStationSystemEmulatorCore> coeursDuSysteme,
+        bool fbneoConnaitLeSet,
+        bool refuseIci)
+    {
+        static bool Libretro(EmulationStationSystemEmulatorCore e) => e.Emulator.Equals("libretro", StringComparison.OrdinalIgnoreCase);
+        if (!fbneoConnaitLeSet || refuseIci
+            || coeursDuSysteme.Any(e => Libretro(e) && e.Core.Equals("fbneo", StringComparison.OrdinalIgnoreCase))
+            || !coeursDuSysteme.Any(e => Libretro(e) && e.Core.StartsWith("mame", StringComparison.OrdinalIgnoreCase)))
         {
             return null;
         }
 
-        return CoeursObservables.MeilleurLancement(coeursDuSysteme);
+        return CoeursObservables.Capacite(lancement.Emulator, lancement.Core) < CoeursObservables.Capacite("libretro", "fbneo")
+            ? ("libretro", "fbneo")
+            : null;
     }
+
+    /// <summary>
+    /// FBNEO A-T-IL REFUSE LE SET ? Le journal du dernier lancement (es_launch_stdout.log) : le coeur FBNeo, puis RetroArch
+    /// qui ne charge pas le contenu, ou FBNeo qui reclame un fichier. Le fichier du jeu refuse (« altbeast.zip »), ou null.
+    /// Pur.
+    /// </summary>
+    internal static string? SetRefuseParFbneo(IEnumerable<string> journal)
+    {
+        var fbneo = false;
+        string? set = null;
+        var refus = false;
+        foreach (var ligne in journal)
+        {
+            if (ligne.Contains("Loading dynamic libretro core from", StringComparison.OrdinalIgnoreCase))
+                fbneo = ligne.Contains("fbneo_libretro.dll", StringComparison.OrdinalIgnoreCase);
+            if (System.Text.RegularExpressions.Regex.Match(ligne, @"\[FBNeo\] Searching all possible locations for romset (?<s>\S+)") is { Success: true } m)
+                set = m.Groups["s"].Value;
+            if (ligne.Contains("Failed to load content", StringComparison.OrdinalIgnoreCase)
+                || (ligne.Contains("[FBNeo]", StringComparison.Ordinal)
+                    && (ligne.Contains("missing", StringComparison.OrdinalIgnoreCase) || ligne.Contains(" is required", StringComparison.OrdinalIgnoreCase))))
+                refus = true;
+        }
+        return fbneo && refus && set is { Length: > 0 } s ? s + ".zip" : null;
+    }
+
+    /// <summary>Les sets que FBNeo connait, tires de la liste des titres du Data Pack (fbneo_lt.json), une fois.</summary>
+    private static readonly Lazy<HashSet<string>> SetsFbneo = new(() =>
+    {
+        var sets = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        try
+        {
+            var chemin = Path.Combine(RetroBatPaths.PluginRoot, "resources", "gamelist", "systems", "fbneo_lt.json");
+            var motif = new System.Text.RegularExpressions.Regex("\"set\":\\s*\"(?<s>[^\"]+)\"");
+            foreach (var ligne in File.ReadLines(chemin))
+            {
+                foreach (System.Text.RegularExpressions.Match m in motif.Matches(ligne)) sets.Add(m.Groups["s"].Value);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+        return sets;
+    });
 
     /// <summary>Que faire d'un choix mis de cote, au vu de la fiche actuelle dans ES ?</summary>
     internal static Remise QueRendre(Confort confort, string emulatorActuel, string coreActuel)
@@ -125,6 +199,23 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
 
     private void OnEvenement(EventEnvelope evenement)
     {
+        if (string.Equals(evenement.Type, "ui.game.ended", StringComparison.Ordinal))
+        {
+            var fin = _arret?.Token ?? CancellationToken.None;
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await VerifierLeRefusAsync(fin).ConfigureAwait(false);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    _logger?.LogDebug(ex, "World Scoring : refus de FBNeo non verifie.");
+                }
+            }, fin);
+            return;
+        }
+
         if (!string.Equals(evenement.Type, "ui.system.selected.raw", StringComparison.Ordinal))
         {
             return;
@@ -201,20 +292,35 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
                 var coeurs = _systemes.GetEmulatorCores(groupe.Key);
                 var fragments = new List<XElement>();
                 var cles = new List<(string Cle, Confort Confort)>();
+                var refus = LireLesRefus();
                 foreach (var (systeme, fichier) in groupe)
                 {
                     fiches.TryGetValue(fichier, out var actuel);
                     var (lancement, coeurChoisi) = _systemes.ResolveGameLaunchConfig(systeme, actuel.Emulator, actuel.Core, reglages);
-                    if (AImposer(lancement, coeurChoisi, coeurs) is not { } impose)
+                    var cle = systeme + "/" + fichier;
+                    var impose = FbneoPourUnSetMame(lancement, coeurs, SetsFbneo.Value.Contains(Path.GetFileNameWithoutExtension(fichier)),
+                            refus.Contains(cle))
+                        ?? AImposer(lancement, coeurChoisi, coeurs);
+                    if (impose is not { } voulu || (string.Equals(voulu.Emulator, lancement.Emulator, StringComparison.OrdinalIgnoreCase)
+                            && string.Equals(voulu.Core, lancement.Core, StringComparison.OrdinalIgnoreCase) && coeurChoisi))
                     {
                         continue;
                     }
 
-                    var cle = systeme + "/" + fichier;
-                    cles.Add((cle, etat.TryGetValue(cle, out var deja)
+                    var confort = etat.TryGetValue(cle, out var deja)
                         ? deja
-                        : new Confort(actuel.Emulator ?? string.Empty, actuel.Core ?? string.Empty, impose.Emulator, impose.Core)));
-                    fragments.Add(Fragment(fichier, impose.Emulator, impose.Core));
+                        : new Confort(actuel.Emulator ?? string.Empty, actuel.Core ?? string.Empty, voulu.Emulator, voulu.Core);
+                    // Un jeu en automatique sous FBNeo : en sortant, il retrouve le coeur MAME qu'il aurait eu (ES ne sait
+                    // pas vider le champ, FBNeo resterait hors de World Scoring).
+                    if (confort.Emulator.Length == 0 && confort.Core.Length == 0
+                        && string.Equals(voulu.Core, "fbneo", StringComparison.OrdinalIgnoreCase)
+                        && !coeurs.Any(e => e.Core.Equals("fbneo", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        confort = confort with { Emulator = lancement.Emulator ?? "libretro", Core = lancement.Core ?? "mame" };
+                    }
+
+                    cles.Add((cle, confort));
+                    fragments.Add(Fragment(fichier, voulu.Emulator, voulu.Core));
                 }
 
                 if (fragments.Count > 0 && await EnvoyerAsync(groupe.Key, fragments, cancellationToken).ConfigureAwait(false))
@@ -310,6 +416,91 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
         finally
         {
             _porte.Release();
+        }
+    }
+
+    /// <summary>
+    /// FBNeo a refuse le set MAME de cette borne (25/10) : le jeu retrouve tout de suite son coeur MAME, et ne repassera
+    /// plus sous FBNeo ici.
+    /// </summary>
+    private async Task VerifierLeRefusAsync(CancellationToken cancellationToken)
+    {
+        string? refuse;
+        try
+        {
+            refuse = SetRefuseParFbneo(File.ReadLines(RetroBatPaths.EsLaunchStdoutLogPath).ToList());
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return;
+        }
+
+        if (refuse is null)
+        {
+            return;
+        }
+
+        await _porte.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var etat = LireEtat();
+            var concernes = etat.Where(e => e.Key.EndsWith("/" + refuse, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(e.Value.ImposeCore, "fbneo", StringComparison.OrdinalIgnoreCase)).ToList();
+            if (concernes.Count == 0)
+            {
+                return;
+            }
+
+            var refus = LireLesRefus();
+            foreach (var (cle, confort) in concernes)
+            {
+                refus.Add(cle);
+                var systeme = cle[..cle.IndexOf('/')];
+                var fichier = cle[(cle.IndexOf('/') + 1)..];
+                var mame = confort.Core.Length > 0 ? confort : confort with { Emulator = "libretro", Core = "mame" };
+                if (await EnvoyerAsync(systeme, [Fragment(fichier, mame.Emulator, mame.Core)], cancellationToken).ConfigureAwait(false))
+                {
+                    etat.Remove(cle);
+                }
+
+                _logger?.LogWarning("World Scoring : FBNeo refuse le set {Cle} de cette borne, retour sous {Coeur}.", cle, mame.Core);
+            }
+
+            EcrireLesRefus(refus);
+            EcrireEtat(etat);
+        }
+        finally
+        {
+            _porte.Release();
+        }
+    }
+
+    private string CheminDesRefus => Path.Combine(Path.GetDirectoryName(_etatPath)!, "world-scoring-fbneo-refus.json");
+
+    private HashSet<string> LireLesRefus()
+    {
+        try
+        {
+            return File.Exists(CheminDesRefus)
+                ? new HashSet<string>(JsonSerializer.Deserialize<List<string>>(File.ReadAllText(CheminDesRefus)) ?? [], StringComparer.OrdinalIgnoreCase)
+                : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
+        {
+            return new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        }
+    }
+
+    private void EcrireLesRefus(HashSet<string> refus)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(CheminDesRefus)!);
+            File.WriteAllText(CheminDesRefus, JsonSerializer.Serialize(refus.OrderBy(r => r, StringComparer.OrdinalIgnoreCase).ToList()));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger?.LogDebug(ex, "World Scoring : refus de FBNeo non ecrits.");
         }
     }
 

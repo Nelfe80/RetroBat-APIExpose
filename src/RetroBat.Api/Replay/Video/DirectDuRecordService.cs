@@ -272,6 +272,15 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
             if (_partie?.EstNelfePlay != true) return;
             // La partie d'un autre, regardee ou rejointe en netplay : son record n'est pas celui de cette borne.
             if (!RetroBat.Api.Netplay.NetplayGuestService.PartieALaBorne) return;
+            // UN FILTRE D'IMAGE DU COEUR (decision du user du 25 octobre 2026) : ni direct ni film de la partie, et le
+            // joueur le sait par un message de RetroArch, avant que la partie commence ; son replay donnera la video.
+            if (await _capture.FiltreActifAuChargementAsync(TimeSpan.FromSeconds(20), CancellationToken.None).ConfigureAwait(false) is { } filtre)
+            {
+                if (g != Volatile.Read(ref _generation)) return;
+                _journal.LogInformation("Direct : filtre d'image du coeur actif ({Filtre}), pas de direct ni de film ; joueur prevenu.", filtre);
+                await _capture.PrevenirDuFiltreAsync(CancellationToken.None).ConfigureAwait(false);
+                return;
+            }
             if (_contexte.Ui.Running is not { } jeu) return;
 
             var brut = Path.GetFileNameWithoutExtension(jeu.GamePath.Length > 0 ? jeu.GamePath : jeu.GameName);
@@ -434,7 +443,7 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                 // empreinte attendue, que le site donne.
                 var (annonce, optionsDesClips) = Clips(ouvert.Clips);
                 var r = await LanceurDuDirect.DiffuserAsync(exe!, film.Fichier, ouvert.Ingest, film.Rotation ?? 0, _journal, arret.Token,
-                        annonce: annonce, classement: CheminDeLaCarte, options: optionsDesClips)
+                        annonce: annonce, classement: CheminDeLaCarte, options: optionsDesClips, forme: film.Forme)
                     .ConfigureAwait(false);
                 _journal.LogInformation("Direct : {Direct} fini ({Fin}, code {Code}, {Secondes:F0} s).", ouvert.LiveId, r.Fin, r.Code,
                     r.Duree.TotalSeconds);

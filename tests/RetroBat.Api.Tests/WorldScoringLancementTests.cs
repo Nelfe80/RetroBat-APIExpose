@@ -37,10 +37,11 @@ public class WorldScoringLancementTests
             AImposer(new EmulationStationLaunchConfig("mame", "libretro", "mame"), coeurChoisi: false, Mame));
 
     [Fact]
-    public void Un_choix_qui_mesure_deja_est_laisse()
+    public void Un_choix_qui_mesure_deja_est_laisse_sauf_si_le_systeme_a_mieux()
     {
-        Assert.Null(AImposer(new EmulationStationLaunchConfig("mame", "mame64", ""), coeurChoisi: true, Mame));
         Assert.Null(AImposer(new EmulationStationLaunchConfig("fbneo", "libretro", "fbneo"), coeurChoisi: false, Fbneo));
+        // 25/10 : MAME autonome mesure, MAME sous RetroArch mesure ET filme : il passe devant (MAME autonome mis de cote).
+        Assert.Equal(("libretro", "mame"), AImposer(new EmulationStationLaunchConfig("mame", "mame64", ""), coeurChoisi: true, Mame));
     }
 
     [Fact]
@@ -52,6 +53,48 @@ public class WorldScoringLancementTests
         }));
         Assert.Equal(("libretro", "genesis_plus_gx"),
             AImposer(new EmulationStationLaunchConfig("megadrive", "kega-fusion", "auto"), coeurChoisi: true, Megadrive));
+    }
+
+    [Fact]
+    public void Un_set_MAME_passe_sous_FBNeo_qui_seul_rend_un_replay()
+    {
+        // 25/10 : les records sous MAME (RA) n'ont pas de replay ; FBNeo lit les sets MAME des jeux classes.
+        var automatique = new EmulationStationLaunchConfig("mame", "libretro", "mame");
+        Assert.Equal(("libretro", "fbneo"), FbneoPourUnSetMame(automatique, Mame, fbneoConnaitLeSet: true, refuseIci: false));
+        Assert.Equal(("libretro", "fbneo"),
+            FbneoPourUnSetMame(new EmulationStationLaunchConfig("mame", "mame64", ""), Mame, fbneoConnaitLeSet: true, refuseIci: false));
+        // Un set que FBNeo ne connait pas, ou qu'il a deja refuse ici, reste sous MAME.
+        Assert.Null(FbneoPourUnSetMame(automatique, Mame, fbneoConnaitLeSet: false, refuseIci: false));
+        Assert.Null(FbneoPourUnSetMame(automatique, Mame, fbneoConnaitLeSet: true, refuseIci: true));
+        // Un systeme qui declare FBNeo passe par la regle commune ; hors arcade, rien.
+        Assert.Null(FbneoPourUnSetMame(new EmulationStationLaunchConfig("fbneo", "libretro", "fbneo"), Fbneo, true, false));
+        Assert.Null(FbneoPourUnSetMame(new EmulationStationLaunchConfig("megadrive", "libretro", "genesis_plus_gx"), Megadrive, true, false));
+    }
+
+    [Fact]
+    public void Un_coeur_qui_mesure_cede_la_place_a_celui_qui_en_permet_plus()
+    {
+        var arcade = new List<EmulationStationSystemEmulatorCore>
+        {
+            new("arcade", "libretro", "mame"), new("arcade", "libretro", "fbneo"),
+        };
+        Assert.Equal(("libretro", "fbneo"), AImposer(new EmulationStationLaunchConfig("arcade", "libretro", "mame"), true, arcade));
+        Assert.Null(AImposer(new EmulationStationLaunchConfig("arcade", "libretro", "fbneo"), true, arcade));
+    }
+
+    [Fact]
+    public void Le_refus_de_FBNeo_se_lit_dans_le_journal_du_lancement()
+    {
+        string[] refuse =
+        [
+            "[INFO] [Core] Loading dynamic libretro core from: \"E:\\RetroBat\\emulators\\retroarch\\core_proxy\\fbneo_libretro.dll\".",
+            "[libretro INFO] [FBNeo] Searching all possible locations for romset altbeast",
+            "[ERROR] [Content] Failed to load content.",
+        ];
+        Assert.Equal("altbeast.zip", SetRefuseParFbneo(refuse));
+        Assert.Null(SetRefuseParFbneo(refuse.Take(2)));
+        string[] mame = ["[INFO] [Core] Loading dynamic libretro core from: \"E:\\x\\mame_libretro.dll\".", "[ERROR] [Content] Failed to load content."];
+        Assert.Null(SetRefuseParFbneo(mame));
     }
 
     [Fact]

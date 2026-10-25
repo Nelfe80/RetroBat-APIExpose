@@ -512,7 +512,8 @@ public sealed class DirectPartageService : IHostedService
             try { File.Delete(CheminDeLaCarte); } catch (Exception) { /* absente */ }
             Ecrire(CheminDeLaCommande, CommandeJson(fin: false, arret: false, null, null, false, false));
             return await LanceurDuDirect.DiffuserAsync(exe, film.Fichier, adresse, film.Rotation ?? 0, _journal, jeton,
-                annonce: annonce, classement: CheminDeLaCarte, options: options, delaiDeFin: TimeSpan.FromSeconds(10)).ConfigureAwait(false);
+                annonce: annonce, classement: CheminDeLaCarte, options: options, delaiDeFin: TimeSpan.FromSeconds(10),
+                forme: film.Forme).ConfigureAwait(false);
         });
         lock (_verrou)
         {

@@ -6,8 +6,11 @@ namespace RetroBat.Api.Replay.Runtime;
 
 /// <summary>Cadence annoncée par le core au chargement du contenu (av_info). <paramref name="Crc32"/>
 /// est le CRC du contenu journalisé juste avant : il permet de VÉRIFIER que cette cadence est bien
-/// celle de la partie en cours, et pas celle du jeu précédent.</summary>
-public sealed record CoreTiming(double Fps, int Width, int Height, double SampleRate, string? Crc32);
+/// celle de la partie en cours, et pas celle du jeu précédent. <paramref name="Aspect"/> est la forme de l'image
+/// annoncée par le core (25/10 : un filtre NTSC double la largeur sans changer la forme), <paramref name="Coeur"/> le
+/// nom de son fichier sans « _libretro.dll » (genesis_plus_gx).</summary>
+public sealed record CoreTiming(double Fps, int Width, int Height, double SampleRate, string? Crc32, double? Aspect = null,
+    string? Coeur = null);
 
 /// <summary>
 /// R3.2 — d'où vient la VRAIE cadence d'un jeu. RetroArch journalise l'av_info du core au
@@ -28,8 +31,13 @@ public sealed class ReplayCoreTimingProbe
 {
     // « FPS: 59.92 » dans une ligne [Core] Geometry. Point décimal : log en culture C.
     private static readonly Regex GeometryLine = new(
-        @"\[Core\]\s+Geometry:\s*(?<w>\d+)x(?<h>\d+).*?FPS:\s*(?<fps>\d+(?:\.\d+)?)(?:.*?Sample rate:\s*(?<sr>\d+(?:\.\d+)?))?",
+        @"\[Core\]\s+Geometry:\s*(?<w>\d+)x(?<h>\d+)(?:,\s*Aspect:\s*(?<a>\d+(?:\.\d+)?))?.*?FPS:\s*(?<fps>\d+(?:\.\d+)?)(?:.*?Sample rate:\s*(?<sr>\d+(?:\.\d+)?))?",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    // « [Core] Loading dynamic libretro core from: "...\core_proxy\genesis_plus_gx_libretro.dll". »
+    private static readonly Regex CoreLine = new(
+        @"Loading dynamic libretro core from:\s*""?(?:[^""]*[\\/])?(?<c>[^""\\/]+?)_libretro\.dll",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
     // « [Content] CRC32: 0xf9394e97. » — journalisé au chargement, juste AVANT la géométrie.
     private static readonly Regex ContentCrcLine = new(
@@ -122,31 +130,48 @@ public sealed class ReplayCoreTimingProbe
 
             // Le log est réécrit à chaque lancement (quelques Ko) ; on prend la DERNIÈRE occurrence,
             // en retenant le CRC du contenu vu juste avant elle.
-            CoreTiming? last = null;
-            string? pendingCrc = null;
             using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             using var sr = new StreamReader(fs);
+            var lignes = new List<string>();
             string? line;
-            while ((line = sr.ReadLine()) is not null)
-            {
-                var crcMatch = ContentCrcLine.Match(line);
-                if (crcMatch.Success) { pendingCrc = crcMatch.Groups["crc"].Value.ToLowerInvariant().PadLeft(8, '0'); continue; }
-
-                var m = GeometryLine.Match(line);
-                if (!m.Success) continue;
-                if (!double.TryParse(m.Groups["fps"].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var fps)) continue;
-                if (fps is <= 1 or > 1000) continue; // garde-fou : une cadence aberrante ne vaut pas mieux qu'aucune
-                int.TryParse(m.Groups["w"].Value, out var w);
-                int.TryParse(m.Groups["h"].Value, out var h);
-                double.TryParse(m.Groups["sr"].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var sampleRate);
-                last = new CoreTiming(fps, w, h, sampleRate, pendingCrc);
-            }
-            return last;
+            while ((line = sr.ReadLine()) is not null) lignes.Add(line);
+            return LireLaCadence(lignes);
         }
         catch (Exception ex)
         {
             _logger.LogDebug(ex, "Replay : lecture de la cadence du core impossible.");
             return null;
         }
+    }
+
+    /// <summary>
+    /// La derniere geometrie du journal, avec le CRC du contenu et le core charges juste avant elle. Le log est reecrit a
+    /// chaque lancement (quelques Ko) ; on prend la DERNIERE occurrence. Pur, pour etre teste.
+    /// </summary>
+    internal static CoreTiming? LireLaCadence(IEnumerable<string> lignes)
+    {
+        CoreTiming? last = null;
+        string? pendingCrc = null;
+        string? pendingCore = null;
+        foreach (var line in lignes)
+        {
+            var coreMatch = CoreLine.Match(line);
+            if (coreMatch.Success) { pendingCore = coreMatch.Groups["c"].Value.ToLowerInvariant(); continue; }
+
+            var crcMatch = ContentCrcLine.Match(line);
+            if (crcMatch.Success) { pendingCrc = crcMatch.Groups["crc"].Value.ToLowerInvariant().PadLeft(8, '0'); continue; }
+
+            var m = GeometryLine.Match(line);
+            if (!m.Success) continue;
+            if (!double.TryParse(m.Groups["fps"].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var fps)) continue;
+            if (fps is <= 1 or > 1000) continue; // garde-fou : une cadence aberrante ne vaut pas mieux qu'aucune
+            int.TryParse(m.Groups["w"].Value, out var w);
+            int.TryParse(m.Groups["h"].Value, out var h);
+            double.TryParse(m.Groups["sr"].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var sampleRate);
+            double? aspect = double.TryParse(m.Groups["a"].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var a)
+                && a is > 0.2 and < 5 ? a : null;
+            last = new CoreTiming(fps, w, h, sampleRate, pendingCrc, aspect, pendingCore);
+        }
+        return last;
     }
 }

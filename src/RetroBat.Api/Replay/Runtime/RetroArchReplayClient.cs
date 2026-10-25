@@ -47,6 +47,9 @@ public sealed class RetroArchReplayClient
     public Task ScreenshotAsync(CancellationToken ct) => FireAsync("SCREENSHOT", ct);
     /// <summary>Demarre ou arrete le film de RetroArch (la capture des parties, CDC video V2).</summary>
     public Task RecordingToggleAsync(CancellationToken ct) => FireAsync("RECORDING_TOGGLE", ct);
+    /// <summary>Un message a l'ecran de RetroArch (SHOW_MSG), sur une ligne : les retours a la ligne deviennent des espaces.</summary>
+    public Task ShowMessageAsync(string texte, CancellationToken ct)
+        => FireAsync("SHOW_MSG " + texte.Replace('\r', ' ').Replace('\n', ' ').Trim(), ct);
     public Task NextCheckpointAsync(CancellationToken ct) => FireAsync("NEXT_REPLAY_CHECKPOINT", ct);
     public Task PrevCheckpointAsync(CancellationToken ct) => FireAsync("PREV_REPLAY_CHECKPOINT", ct);
 

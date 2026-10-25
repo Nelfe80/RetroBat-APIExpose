@@ -92,7 +92,22 @@ public sealed class ReplayVideoRenderer
         Directory.CreateDirectory(sauvegardes);
         Directory.CreateDirectory(films);
         var session = Path.Combine(dossier, "rendu.cfg");
-        await File.WriteAllTextAsync(session, ProfilDeRendu(sauvegardes, films), ct).ConfigureAwait(false);
+        // Les options des coeurs de cette machine, filtres d'image coupes : le film d'un record se fait sans eux.
+        string? optionsDesCoeurs = null;
+        try
+        {
+            var source = FiltreDImage.FichierDesOptions(RetroBatPaths.RetroArchConfigPath, ValeurDeRetroArch("core_options_path"));
+            if (File.Exists(source))
+            {
+                optionsDesCoeurs = Path.Combine(dossier, "options-des-coeurs.cfg");
+                await File.WriteAllLinesAsync(optionsDesCoeurs, FiltreDImage.SansFiltres(File.ReadLines(source)), ct).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            optionsDesCoeurs = null;
+        }
+        await File.WriteAllTextAsync(session, ProfilDeRendu(sauvegardes, films, optionsDesCoeurs), ct).ConfigureAwait(false);
 
         var exe = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "retroarch.exe");
         var psi = new ProcessStartInfo
@@ -183,10 +198,14 @@ public sealed class ReplayVideoRenderer
     /// (<c>config_save_on_exit</c> faux). Repris du lecteur de replays (sorties de menu neutralisees, sauvegardes
     /// jetables, presentation neutre), plus ce que le lot 0 a mesure pour filmer.
     /// </summary>
-    internal static string ProfilDeRendu(string sauvegardes, string films)
+    internal static string ProfilDeRendu(string sauvegardes, string films, string? optionsDesCoeurs = null)
     {
         string Ligne(string cle, string valeur) => cle + " = \"" + valeur.Replace("\"", "") + "\"";
-        return string.Join('\n', new[]
+        // Sans filtre d'image (25/10) : les options des coeurs de la machine, filtres coupes.
+        var options = optionsDesCoeurs is null
+            ? Array.Empty<string>()
+            : new[] { Ligne("global_core_options", "true"), Ligne("core_options_path", optionsDesCoeurs) };
+        return string.Join('\n', options.Concat(new[]
         {
             Ligne("config_save_on_exit", "false"),
             Ligne("savefile_directory", sauvegardes),
@@ -244,7 +263,18 @@ public sealed class ReplayVideoRenderer
             // L'avance rapide sans limite.
             Ligne("fastforward_ratio", "0.0"),
             Ligne("fastforward_frameskip", "false"),
-        }) + "\n";
+        })) + "\n";
+    }
+
+    /// <summary>Un reglage de retroarch.cfg, ou null.</summary>
+    private static string? ValeurDeRetroArch(string cle)
+    {
+        foreach (var ligne in File.ReadLines(RetroBatPaths.RetroArchConfigPath))
+        {
+            var egal = ligne.IndexOf('=');
+            if (egal > 0 && ligne[..egal].Trim() == cle) return ligne[(egal + 1)..].Trim().Trim('"');
+        }
+        return null;
     }
 
     private static async Task<PiloteDuRendu.Releve> ReleverAsync(UdpClient udp, double secondes, CancellationToken ct)

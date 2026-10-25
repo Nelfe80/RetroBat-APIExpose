@@ -8,6 +8,7 @@ using RetroBat.Api.Replay.Storage;
 using RetroBat.Domain.Events;
 using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Paths;
+using RetroBat.Domain.Services;
 
 namespace RetroBat.Api.Replay.Video;
 
@@ -100,6 +101,8 @@ public sealed class ReplayCaptureService : BackgroundService
     private readonly long _tailleLocaleMax;
     private readonly string _dossier;
 
+    private readonly InterfaceTextService? _textes;
+    private readonly EmulationStationSettingsService? _reglagesEs;
     private readonly SemaphoreSlim _operation = new(1, 1);
     private readonly SemaphoreSlim _reveil = new(0);
     private readonly object _verrou = new();
@@ -115,6 +118,8 @@ public sealed class ReplayCaptureService : BackgroundService
         public long FrameDebut;
         /// <summary>La rotation annoncee par le coeur (quarts de tour antihoraires), null si inconnue.</summary>
         public int? Rotation;
+        /// <summary>La forme de l'image annoncee par le coeur (libretro « Aspect »), null si inconnue.</summary>
+        public double? Forme;
         public bool EnteteVerifiee;
         /// <summary>Le film d'une partie sans replay : il s'arrete et se suit sans l'enregistreur.</summary>
         public bool SansReplay;
@@ -183,14 +188,113 @@ public sealed class ReplayCaptureService : BackgroundService
     /// soit prete chez YouTube. Le film d'une partie sans replay (<paramref name="SansReplay"/>) porte les sessions de
     /// ses scores (<paramref name="Sessions"/>), par lesquelles le site retrouve la partie. Un film a la taille d'origine
     /// (<paramref name="Origine"/>) part par sa version YouTube (<paramref name="Version"/>, fabriquee avec le sens du
-    /// jeu, <paramref name="Rotation"/>).
+    /// jeu, <paramref name="Rotation"/>, et la forme de l'image du coeur, <paramref name="Forme"/>).
     /// </summary>
     public sealed record CaptureGardee(string ReplayId, string Fichier, long DebutFilm, long FinFilm, DateTime CreeeUtc,
         string? Session = null, string? VideoId = null, DateTime? EnvoyeeUtc = null,
         IReadOnlyList<string>? Sessions = null, bool SansReplay = false,
         bool Origine = false, int? Rotation = null, string? Version = null, int EchecsDeVersion = 0,
         IReadOnlyList<double[]>? Courbe = null, double? FinDuRunS = null, double? DureeS = null,
-        double? DebutSequenceS = null, double? FinSequenceS = null);
+        double? DebutSequenceS = null, double? FinSequenceS = null, double? Forme = null,
+        int Largeur = 0, int Hauteur = 0);
+
+    /// <summary>
+    /// LE GARDE-FOU DE LA FORME (decision du user du 25 octobre 2026) : un film dont l'image n'a pas la forme du jeu ne part
+    /// pas sur YouTube. Sans forme connue du coeur, une image deux fois plus large que haute (ou l'inverse) est refusee ;
+    /// avec elle, un ecart de 15 % ou plus demande un exe qui sait la rendre (--forme, 0.5.8). Un jeu tourne garde son
+    /// redressement d'avant. La raison du refus, ou null. Pur.
+    /// </summary>
+    internal static string? FormeRefusee(int largeur, int hauteur, int? rotation, double? forme, bool exeSaitLaForme)
+    {
+        if (largeur <= 0 || hauteur <= 0 || rotation is 1 or 2 or 3) return null;
+        var rapport = (double)largeur / hauteur;
+        if (forme is not double a)
+            return rapport is > 2.0 or < 0.5 ? $"image {largeur}x{hauteur} sans forme connue du coeur" : null;
+        if (Math.Abs(rapport - a) / a >= 0.15 && !exeSaitLaForme)
+            return $"image {largeur}x{hauteur} a la forme {a:0.###}, exe du direct trop ancien pour la rendre";
+        return null;
+    }
+
+    /// <summary>L'exe du direct sait-il rendre la forme du coeur (--forme, a partir de 0.5.8) ?</summary>
+    internal static bool ExeSaitLaForme(string? exe)
+    {
+        if (exe is null) return false;
+        try
+        {
+            var v = FileVersionInfo.GetVersionInfo(exe);
+            return new Version(v.FileMajorPart, v.FileMinorPart, v.FileBuildPart) >= new Version(0, 5, 8);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>Le message RetroArch d'un filtre d'image, si le Data Pack ne l'a pas encore (meme texte en anglais).</summary>
+    internal const string MessageDuFiltreParDefaut =
+        "Image filter (NTSC) on: no live or video of this game. A record video will be made from the replay, without the filter.";
+
+    /// <summary>
+    /// PREVENIR DU FILTRE AU LANCEMENT (decision du user du 25 octobre 2026) : un message de RetroArch, la partie pas
+    /// encore commencee (le direct d'une partie NelfePlay s'arme au chargement du jeu). Trois fois, RetroArch ne le
+    /// tient que trois secondes.
+    /// </summary>
+    public async Task PrevenirDuFiltreAsync(CancellationToken ct)
+    {
+        string langue;
+        try { langue = _reglagesEs?.GetScrapingSettings().Language ?? "en"; } catch (Exception) { langue = "en"; }
+        var texte = _textes?.Text("video.filter.no_live", langue) is { Length: > 0 } t && t != "video.filter.no_live"
+            ? t : MessageDuFiltreParDefaut;
+        for (var i = 0; i < 3 && !ct.IsCancellationRequested; i++)
+        {
+            await _ra.ShowMessageAsync(texte, ct).ConfigureAwait(false);
+            await Task.Delay(3200, ct).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Le filtre d'image actif du coeur charge (<see cref="FiltreDImage"/>), « cle = valeur », ou null : la partie ne se
+    /// filme pas, son direct ne part pas.
+    /// </summary>
+    public string? FiltreActif() => FiltreActif(null);
+
+    /// <summary>
+    /// Le filtre d'image actif, une fois le jeu charge dans RetroArch (le journal parle alors de lui) ; null apres
+    /// <paramref name="attente"/> sans jeu charge.
+    /// </summary>
+    public async Task<string?> FiltreActifAuChargementAsync(TimeSpan attente, CancellationToken ct)
+    {
+        var limite = DateTime.UtcNow + attente;
+        while (DateTime.UtcNow < limite && !ct.IsCancellationRequested)
+        {
+            if (await _ra.GetStatusAsync(ct).ConfigureAwait(false) is { ContentLoaded: true } statut)
+                return FiltreActif(statut.Crc32);
+            await Task.Delay(1000, ct).ConfigureAwait(false);
+        }
+        return null;
+    }
+
+    /// <summary>Le filtre actif ; <paramref name="crc32"/> donne, le journal doit parler de ce contenu-la.</summary>
+    private string? FiltreActif(string? crc32)
+    {
+        try
+        {
+            var cadence = _coeur.ReadLatest();
+            if (crc32 is { Length: > 0 } crc && cadence?.Crc32 is { } duJournal
+                && !string.Equals(duJournal, crc.Trim().ToLowerInvariant().PadLeft(8, '0'), StringComparison.Ordinal))
+                return null;
+            var coeur = cadence?.Coeur;
+            if (coeur is null) return null;
+            var reglages = LireRetroArch();
+            var fichier = FiltreDImage.FichierDesOptions(RetroBatPaths.RetroArchConfigPath, Valeur(reglages, "core_options_path"));
+            return File.Exists(fichier) ? FiltreDImage.Actif(coeur, File.ReadLines(fichier)) : null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Capture : options du coeur illisibles.");
+            return null;
+        }
+    }
 
     /// <summary>
     /// Les frames du replay que la video couvre : la sequence du record quand elle a ete coupee, sinon tout le film
@@ -216,9 +320,10 @@ public sealed class ReplayCaptureService : BackgroundService
 
     public ReplayCaptureService(IEventBus bus, RetroArchReplayClient ra, ReplayVideoPublisher publication,
         IReplayManifestStore manifests, IReplayObjectStore objects, ReplayCoreTimingProbe coeur, IConfiguration configuration,
-        ILogger<ReplayCaptureService> logger)
+        ILogger<ReplayCaptureService> logger, InterfaceTextService? textes = null, EmulationStationSettingsService? reglagesEs = null)
     {
         _bus = bus; _ra = ra; _publication = publication; _manifests = manifests; _coeur = coeur; _logger = logger;
+        _textes = textes; _reglagesEs = reglagesEs;
         _actif = configuration.GetValue("Video:Capture:Enabled", true);
         _origine = FilmsALaTailleDOrigine(configuration);
         _espaceLibreMinGo = Math.Max(1, configuration.GetValue("Video:Capture:MinFreeGb", 5.0));
@@ -350,6 +455,13 @@ public sealed class ReplayCaptureService : BackgroundService
                 _logger.LogInformation("Capture : RetroArch filme l'image affichee (video_gpu_record), partie non filmee.");
                 return;
             }
+            // Un filtre d'image du coeur (NTSC) ne se diffuse pas bien (25/10) : ni film ni direct ; la video d'un record
+            // se fera depuis son replay, rendu sans les reglages du joueur.
+            if (FiltreActif() is { } filtre)
+            {
+                _logger.LogInformation("Capture : filtre d'image du coeur actif ({Filtre}), partie non filmee.", filtre);
+                return;
+            }
             var dossier = Valeur(reglages, "recording_output_directory");
             if (string.IsNullOrWhiteSpace(dossier))
             {
@@ -380,6 +492,10 @@ public sealed class ReplayCaptureService : BackgroundService
             }
             var statut = await _ra.GetStatusAsync(_arret).ConfigureAwait(false);
             var rotation = _coeur.ReadRotation(statut?.Crc32);
+            // La forme de l'image du coeur, si le journal parle bien de ce contenu.
+            var cadence = _coeur.ReadLatest();
+            var forme = cadence is { Aspect: double a } && (statut?.Crc32 is not { Length: > 0 } crc || cadence.Crc32 is null
+                || string.Equals(cadence.Crc32, crc.Trim().ToLowerInvariant().PadLeft(8, '0'), StringComparison.Ordinal)) ? a : (double?)null;
             lock (_verrouSessions)
             {
                 // Une autre partie commence : les verdicts qui suivent ne sont plus ceux du film d'avant.
@@ -387,6 +503,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 _enCours = new CaptureEnCours
                 {
                     ReplayId = replayId, Fichier = fichier, FrameDebut = frame, Rotation = rotation, SansReplay = sansReplay,
+                    Forme = forme,
                 };
             }
             if (sansReplay)
@@ -468,7 +585,8 @@ public sealed class ReplayCaptureService : BackgroundService
                 Math.Max(c.FrameDebut, derniereFrame ?? 0), DateTime.UtcNow,
                 Sessions: c.SansReplay ? SessionsDuFilm(c.ReplayId, null) : null, SansReplay: c.SansReplay,
                 Origine: origine, Rotation: c.Rotation,
-                Courbe: c.CopieDeLaCourbe(), FinDuRunS: c.FinDuRunS, DureeS: dureeAuStop);
+                Courbe: c.CopieDeLaCourbe(), FinDuRunS: c.FinDuRunS, DureeS: dureeAuStop,
+                Forme: c.Forme, Largeur: (int)entete.Largeur, Hauteur: (int)entete.Hauteur);
             await File.WriteAllTextAsync(Path.Combine(_dossier, c.ReplayId + ".json"),
                 JsonSerializer.Serialize(gardee, Json), Encoding.UTF8, _arret).ConfigureAwait(false);
             _logger.LogInformation("Capture : {ReplayId} gardee ({Taille} octets, {Format}, {Pourquoi}), en attente de la decision du site.",
@@ -491,10 +609,10 @@ public sealed class ReplayCaptureService : BackgroundService
     /// Le film en cours d'ecriture et la rotation du coeur, pour le direct d'un record (le direct en est la copie) ;
     /// null quand rien n'est filme.
     /// </summary>
-    public (string Fichier, int? Rotation)? FilmEnCours()
+    public (string Fichier, int? Rotation, double? Forme)? FilmEnCours()
     {
         var c = _enCours;
-        return c is null ? null : (c.Fichier, c.Rotation);
+        return c is null ? null : (c.Fichier, c.Rotation, c.Forme);
     }
 
     /// <summary>
@@ -711,6 +829,13 @@ public sealed class ReplayCaptureService : BackgroundService
                         var (debutS, finS) = SequenceDuRecord(courante.Courbe, finDuRunS);
                         courante = courante with { DebutSequenceS = debutS, FinSequenceS = finS };
                     }
+                    // Jamais un film deforme sur YouTube (25/10) : la video du record se fera depuis son replay.
+                    if (FormeRefusee(courante.Largeur, courante.Hauteur, courante.Rotation, courante.Forme,
+                            ExeSaitLaForme(LanceurDuDirect.Chemin(AppContext.BaseDirectory))) is { } refus)
+                    {
+                        Oublier(courante, fiche, "forme de l'image : " + refus);
+                        continue;
+                    }
                     courante = await FabriquerLaVersionAsync(courante, fiche, envoi.Token).ConfigureAwait(false);
                     if (courante.Version is null) continue;
                     if (TailleDe(courante.Version) > _tailleMax)
@@ -777,7 +902,7 @@ public sealed class ReplayCaptureService : BackgroundService
         _logger.LogInformation("Capture : {ReplayId} est un record, fabrication de sa version YouTube ({Sequence}).", g.ReplayId,
             g.DebutSequenceS is double d && g.FinSequenceS is double f ? "sequence de " + d + " a " + f + " s du film" : "film entier");
         var r = await LanceurDuDirect.FabriquerLaVersionAsync(exe, g.Fichier, version, g.Rotation ?? 0, _logger, ct,
-            g.DebutSequenceS, g.FinSequenceS).ConfigureAwait(false);
+            g.DebutSequenceS, g.FinSequenceS, g.Forme).ConfigureAwait(false);
         if (r.Code == 0 && TailleDe(version) > 0)
         {
             var faite = g with { Version = version };
