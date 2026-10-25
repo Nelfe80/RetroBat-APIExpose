@@ -71,6 +71,14 @@ public sealed class MultiplayerSessionService : BackgroundService
     /// <summary>Le panneau MULTIPLAYER est-il ouvert ? Fermer le panneau veut dire attendre depuis « Votre selection ».</summary>
     public bool PanneauOuvert { get; set; }
 
+    /// <summary>
+    /// La gameroom dont le jeu demarre sur cette borne, du lancement jusqu'a l'arrivee de l'emulateur (le lanceur la pose,
+    /// voir MultiplayerLaunchService) ; null sinon. Pendant ce temps, ni l'appui long ni B maintenu ne touchent a la salle :
+    /// le 25/10, une salle quittee pendant un demarrage de 48 s a fait refuser la session (409), et l'invite n'a jamais pu
+    /// se connecter.
+    /// </summary>
+    public string? LancementEnCours { get; set; }
+
     /// <summary>Un changement d'etat, pour le panneau.</summary>
     public event Action<MultiplayerEtat>? Change;
 

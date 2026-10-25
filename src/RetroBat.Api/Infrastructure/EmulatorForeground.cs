@@ -107,7 +107,14 @@ public static class EmulatorForeground
     public static bool RenduEnCours => _processusDuRendu != 0;
 
     /// <summary>Un emulateur tourne-t-il pour une PARTIE (le RetroArch d'un rendu video ne compte pas) ?</summary>
-    public static bool EmulateurDeJeuTourne()
+    public static bool EmulateurDeJeuTourne() => EmulateurDeJeuTourne(null);
+
+    /// <summary>
+    /// Le meme, pour un emulateur demarre apres <paramref name="demarreApres"/> (heure locale) : celui d'un lancement
+    /// precis. Un RetroArch deja ouvert ne passe pas pour le jeu qui demarre (25/10 : un RetroArch de banc a fait effacer
+    /// « Les joueurs se synchronisent… » 48 s avant l'arrivee du vrai jeu, et la salle a ete quittee entre-temps).
+    /// </summary>
+    public static bool EmulateurDeJeuTourne(DateTime? demarreApres)
     {
         var rendu = _processusDuRendu;
         Process[] tous;
@@ -128,7 +135,8 @@ public static class EmulatorForeground
                 if (!trouve && p.Id != rendu)
                 {
                     var nom = p.ProcessName;
-                    trouve = Emulateurs.Any(emulateur => nom.StartsWith(emulateur, StringComparison.OrdinalIgnoreCase));
+                    trouve = Emulateurs.Any(emulateur => nom.StartsWith(emulateur, StringComparison.OrdinalIgnoreCase))
+                        && (demarreApres is not { } depuis || p.StartTime >= depuis);
                 }
             }
             catch (Exception)

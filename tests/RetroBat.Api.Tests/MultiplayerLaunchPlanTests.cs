@@ -242,4 +242,12 @@ public class MultiplayerLaunchPlanTests : IDisposable
             File.Delete(fichier);
         }
     }
+
+    [Fact]
+    public void Un_emulateur_deja_ouvert_ne_passe_pas_pour_le_jeu_qui_demarre()
+    {
+        // 25/10 : un RetroArch ouvert avant le lancement faisait effacer « Les joueurs se synchronisent… » 48 s trop tot.
+        // Aucun processus n'a pu demarrer dans une heure : avec cette borne, rien ne compte.
+        Assert.False(RetroBat.Api.Infrastructure.EmulatorForeground.EmulateurDeJeuTourne(DateTime.Now.AddHours(1)));
+    }
 }

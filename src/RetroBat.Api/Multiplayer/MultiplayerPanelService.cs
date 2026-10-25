@@ -179,6 +179,16 @@ public sealed class MultiplayerPanelService
             return false;
         }
 
+        // UN JEU DEMARRE SUR CETTE BORNE : l'appui long ne rouvre pas le panneau (il rejoindrait une salle, et B maintenu la
+        // quitterait en plein lancement : 25/10, session refusee, invite jamais connecte). La presentation revient.
+        if (_session.LancementEnCours is { } enLancement
+            && _session.Etat.Rooms.FirstOrDefault(room => room.Room == enLancement) is { } salle)
+        {
+            _journal.LogInformation("MULTIPLAYER : {Room} est en cours de lancement, l'appui long remontre l'attente", enLancement);
+            AnnoncerLeLancement(salle, _session.JeuDeLaRoom(salle));
+            return true;
+        }
+
         lock (_verrou)
         {
             _jeu = jeu;
@@ -623,6 +633,13 @@ public sealed class MultiplayerPanelService
     {
         var room = RoomDuJeu();
         Fermer();
+        if (room is not null && _session.LancementEnCours == room.Room)
+        {
+            // Son jeu demarre sur cette borne : la quitter maintenant ferait refuser la session aux autres.
+            _journal.LogInformation("MULTIPLAYER : B maintenu ignore, {Room} est en cours de lancement", room.Room);
+            return;
+        }
+
         if (room is not null)
         {
             await _session.QuitterAsync(room.Room).ConfigureAwait(false);

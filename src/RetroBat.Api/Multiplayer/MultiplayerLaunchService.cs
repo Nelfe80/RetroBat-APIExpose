@@ -218,6 +218,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
         finally
         {
+            FinDuLancement(room.Room);
             await AttendreLaSortieAsync().ConfigureAwait(false);
             lock (_verrou)
             {
@@ -273,8 +274,27 @@ public sealed class MultiplayerLaunchService : IHostedService
                 CoreVersion = session.VersionCoeur,
                 Crc = NetplayContent.Empreinte(jeu.Path),
             };
+            // La plateforme rend le meme 409 pour une salle quittee et pour une base occupee un instant : trois essais avant de
+            // conclure au refus.
             var reponse = await _client.PublierNetplayAsync(room.Room, publiee, CancellationToken.None).ConfigureAwait(false);
-            _journal.LogInformation("MULTIPLAYER : session {Session} publiee pour {Room} ({Statut})", session.Id, room.Room, reponse?.Ok == true ? "ok" : reponse?.Reason ?? "injoignable");
+            for (var essai = 2; essai <= 3 && reponse?.Ok != true; essai++)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
+                reponse = await _client.PublierNetplayAsync(room.Room, publiee, CancellationToken.None).ConfigureAwait(false);
+            }
+
+            _journal.LogInformation("MULTIPLAYER : session {Session} publiee pour {Room} ({Statut})", session.Id, room.Room,
+                reponse?.Ok == true ? "ok" : reponse is null ? "injoignable" : "refusee" + (reponse.Reason is { Length: > 0 } r ? " : " + r : string.Empty));
+            if (reponse is { Ok: false })
+            {
+                // La plateforme refuse la session : la salle n'est plus en lancement (quittee, abandonnee). Personne ne pourra
+                // rejoindre (25/10 : l'hote restait seul sur l'ecran des bolides, START sans effet). Comme sans session au
+                // lobby, la partie se ferme.
+                _journal.LogWarning("MULTIPLAYER : la plateforme refuse la session de {Room} : la partie se ferme", room.Room);
+                await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
+                await RetroArchInvite.FermerAsync().ConfigureAwait(false);
+                return;
+            }
             // Une rencontre classee (fin lue + type versus, 23/10), quel que soit le niveau : l'hote guette sa fin.
             if (reponse?.Ok == true && jeu.Game.EstClasse)
             {
@@ -506,6 +526,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
         finally
         {
+            FinDuLancement(room.Room);
             await AttendreLaSortieAsync().ConfigureAwait(false);
             lock (_verrou)
             {
@@ -562,32 +583,47 @@ public sealed class MultiplayerLaunchService : IHostedService
 
         _journal.LogInformation("MULTIPLAYER : {Jeu} lance en {Role}, place {Place} sur {Joueurs}, coeur {Coeur}",
             jeu.Game.Id, lancement.Role, lancement.Seat, lancement.Players, coeur);
+        // Jusqu'a l'arrivee de l'emulateur, la salle ne se quitte pas et le panneau ne se rouvre pas (voir LancementEnCours).
+        var lanceA = DateTime.Now;
+        _session.LancementEnCours = room.Room;
         var lanceur = NetplayLaunch.DemarrerDirectement(arguments, _journal);
         if (lanceur is null)
         {
+            FinDuLancement(room.Room);
             Rendre(aRendre);
             _panneau.Fermer();
             return null;
         }
 
         var reference = new GameReference { SystemId = systeme, GamePath = jeu.Path, GameName = jeu.Game.Name };
-        _ = Task.Run(() => AnnoncerQuandLEmulateurEstLaAsync(reference));
+        _ = Task.Run(() => AnnoncerQuandLEmulateurEstLaAsync(reference, room.Room, lanceA));
         return new Partie(lanceur, aRendre, DateTime.UtcNow, reference);
+    }
+
+    /// <summary>Le lancement de cette salle est fini (l'emulateur est la, ou la partie n'a pas pu partir).</summary>
+    private void FinDuLancement(string room)
+    {
+        if (_session.LancementEnCours == room)
+        {
+            _session.LancementEnCours = null;
+        }
     }
 
     /// <summary>
     /// SANS EMULATIONSTATION, PERSONNE NE DIT QUEL JEU TOURNE (voir le lancement a moteur impose). On pose le jeu
     /// nous-memes et on annonce son debut quand l'emulateur parait : avant, l'annonce fermerait la presentation
-    /// « Les joueurs se synchronisent… » pendant que RetroArch charge encore.
+    /// « Les joueurs se synchronisent… » pendant que RetroArch charge encore. Seul compte un emulateur demarre apres ce
+    /// lancement : un RetroArch deja ouvert (un banc, le 25/10) effacait la presentation 48 s avant le vrai jeu.
     /// </summary>
-    private async Task AnnoncerQuandLEmulateurEstLaAsync(GameReference jeu)
+    private async Task AnnoncerQuandLEmulateurEstLaAsync(GameReference jeu, string room, DateTime lanceA)
     {
         var limite = DateTime.UtcNow.AddSeconds(60);
-        while (DateTime.UtcNow < limite && !EmulatorForeground.EmulateurDeJeuTourne())
+        while (DateTime.UtcNow < limite && !EmulatorForeground.EmulateurDeJeuTourne(lanceA.AddSeconds(-1)))
         {
             await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
         }
 
+        FinDuLancement(room);
         _contexte.Ui.Running = jeu;
         _contexte.Ui.State = "playing";
         _panneau.EffacerPourLeJeu();
