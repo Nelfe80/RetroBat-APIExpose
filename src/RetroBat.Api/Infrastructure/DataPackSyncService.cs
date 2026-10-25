@@ -81,8 +81,15 @@ public sealed class DataPackSyncService : BackgroundService
     internal static TimeSpan PremierDelai(DateTime derniereUtc, DateTime maintenantUtc, TimeSpan intervalle, TimeSpan delaiDeDemarrage,
         bool arbreARelire = false, bool versionChangee = false)
     {
+        // Juste apres une mise a jour, tout de suite : l'outil de mise a jour vient de relancer l'API, le Data Pack suit sans
+        // attendre (26/10, le user : « pourquoi 30 s ? »).
+        if (versionChangee || arbreARelire)
+        {
+            return TimeSpan.Zero;
+        }
+
         var depuis = maintenantUtc - derniereUtc;
-        if (arbreARelire || versionChangee || derniereUtc == default || depuis >= intervalle || depuis < TimeSpan.Zero)
+        if (derniereUtc == default || depuis >= intervalle || depuis < TimeSpan.Zero)
         {
             return delaiDeDemarrage < TimeSpan.FromSeconds(30) ? delaiDeDemarrage : TimeSpan.FromSeconds(30);
         }

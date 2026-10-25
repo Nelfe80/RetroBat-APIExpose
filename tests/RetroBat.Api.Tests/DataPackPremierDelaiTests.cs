@@ -38,12 +38,12 @@ public sealed class DataPackPremierDelaiTests
         => Assert.Equal(TimeSpan.FromSeconds(30), DataPackSyncService.PremierDelai(Maintenant.AddHours(3), Maintenant, Jour, Demarrage));
 
     [Fact]
-    public void Une_API_mise_a_jour_synchronise_le_Data_Pack_sans_attendre_l_echeance()
-        // 26/10 : « il faut mettre a jour le Data Pack quand on met a jour l'API ». La meme borne, a jour depuis 4 h, attendrait 20 h.
-        => Assert.Equal(TimeSpan.FromSeconds(30), DataPackSyncService.PremierDelai(Maintenant.AddHours(-4), Maintenant, Jour, Demarrage, versionChangee: true));
+    public void Une_API_mise_a_jour_synchronise_le_Data_Pack_tout_de_suite()
+        // 26/10 : le Data Pack suit la mise a jour de l API tout de suite. La meme borne, a jour depuis 4 h, attendrait 20 h.
+        => Assert.Equal(TimeSpan.Zero, DataPackSyncService.PremierDelai(Maintenant.AddHours(-4), Maintenant, Jour, Demarrage, versionChangee: true));
 
     [Fact]
     public void Un_dossier_ajoute_fait_relire_le_depot_sans_attendre_l_echeance()
         // 25/10 : une installation neuve, synchronisee d'abord sans « multiplayer », attendait 24 h son catalogue.
-        => Assert.Equal(TimeSpan.FromSeconds(30), DataPackSyncService.PremierDelai(Maintenant.AddHours(-1), Maintenant, Jour, Demarrage, arbreARelire: true));
+        => Assert.Equal(TimeSpan.Zero, DataPackSyncService.PremierDelai(Maintenant.AddHours(-1), Maintenant, Jour, Demarrage, arbreARelire: true));
 }
