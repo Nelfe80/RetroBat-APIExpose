@@ -73,10 +73,13 @@ public sealed class DataPackSyncService : BackgroundService
     /// Double Dragon y restait « non certifiable »). En retard (derniere synchronisation plus vieille que l'intervalle, ou
     /// jamais faite), 30 s au plus ; a jour, a l'echeance (jamais avant le delai de demarrage). Pur.
     /// </summary>
-    internal static TimeSpan PremierDelai(DateTime derniereUtc, DateTime maintenantUtc, TimeSpan intervalle, TimeSpan delaiDeDemarrage)
+    internal static TimeSpan PremierDelai(DateTime derniereUtc, DateTime maintenantUtc, TimeSpan intervalle, TimeSpan delaiDeDemarrage,
+        bool arbreARelire = false)
     {
         var depuis = maintenantUtc - derniereUtc;
-        if (derniereUtc == default || depuis >= intervalle || depuis < TimeSpan.Zero)
+        // UN DOSSIER S'EST AJOUTE (25/10) : la borne mise a jour relit le depot tout de suite, pas a l'echeance de 24 h. Une
+        // installation neuve (paquet de la 1.9.72, synchronise d'abord sans « multiplayer ») attendait le lendemain.
+        if (arbreARelire || derniereUtc == default || depuis >= intervalle || depuis < TimeSpan.Zero)
         {
             return delaiDeDemarrage < TimeSpan.FromSeconds(30) ? delaiDeDemarrage : TimeSpan.FromSeconds(30);
         }
@@ -87,8 +90,11 @@ public sealed class DataPackSyncService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var demarrage = _options.CurrentValue.DataPack;
-        var delai = PremierDelai(LoadState().LastSyncUtc, DateTime.UtcNow, TimeSpan.FromHours(Math.Max(1, demarrage.IntervalHours)),
-            TimeSpan.FromSeconds(Math.Max(5, demarrage.StartupDelaySeconds)));
+        var etat = LoadState();
+        var arbreARelire = etat.Files.Count > 0
+            && !DataPackPaths.MemesDossiers(etat.Folders, new HashSet<string>(demarrage.Folders, StringComparer.OrdinalIgnoreCase));
+        var delai = PremierDelai(etat.LastSyncUtc, DateTime.UtcNow, TimeSpan.FromHours(Math.Max(1, demarrage.IntervalHours)),
+            TimeSpan.FromSeconds(Math.Max(5, demarrage.StartupDelaySeconds)), arbreARelire);
         _logger.LogInformation("Data Pack : premiere synchronisation dans {Delai}.", delai.TotalMinutes >= 2
             ? $"{(int) delai.TotalHours} h {delai.Minutes:00}" : $"{(int) delai.TotalSeconds} s");
         try { await Task.Delay(delai, stoppingToken); }
