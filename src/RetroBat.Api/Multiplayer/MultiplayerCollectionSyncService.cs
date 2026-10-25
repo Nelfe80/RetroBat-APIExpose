@@ -66,6 +66,8 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     private IDisposable? _abonnementBus;
     private bool _derniereVisibilite;
     private MultiplayerCollectionStatus _statut = MultiplayerCollectionStatus.Initial;
+    private readonly DataPackSyncService? _dataPack;
+    private DateTime _dernierRattrapageUtc = DateTime.MinValue;
 
     public MultiplayerCollectionSyncService(
         IOptionsMonitor<ApiExposeOptions> options,
@@ -81,8 +83,10 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         Func<bool>? emulateurTourne = null,
         Func<string, string?>? md5DuContenu = null,
         GamelistUpdateService? gamelists = null,
-        Func<string?, bool>? coeurPose = null)
+        Func<string?, bool>? coeurPose = null,
+        DataPackSyncService? dataPack = null)
     {
+        _dataPack = dataPack;
         _options = options;
         _store = store;
         _catalog = catalog;
@@ -194,6 +198,43 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// LE CATALOGUE QUI MANQUE SE RATTRAPE TOUT DE SUITE (25/10), comme la definition en retard de World Scoring : une
+    /// borne ne relit le Data Pack qu'a son demarrage puis toutes les 24 h. Une installation neuve, synchronisee d'abord par
+    /// une version qui ne suivait pas « multiplayer », restait sans collection jusqu'au lendemain. Au plus une fois toutes
+    /// les 4 minutes (<see cref="NelfePlayScoringCollectionSyncService.RattrapageAutorise"/>). Vrai si des fichiers sont arrives.
+    /// </summary>
+    private async Task<bool> RattraperLeDataPackAsync(string? erreur, string declencheur, CancellationToken cancellationToken)
+    {
+        if (_dataPack is null || !_options.CurrentValue.DataPack.Enabled)
+        {
+            return false;
+        }
+
+        var maintenant = DateTime.UtcNow;
+        if (!NelfePlayScoringCollectionSyncService.RattrapageAutorise(_dernierRattrapageUtc, maintenant))
+        {
+            return false;
+        }
+
+        _dernierRattrapageUtc = maintenant;
+        _logger?.LogInformation("Collection MULTIPLAYER : {Erreur}, synchronisation du Data Pack ({Declencheur})", erreur, declencheur);
+        try
+        {
+            var bilan = await _dataPack.SyncNowAsync(cancellationToken).ConfigureAwait(false);
+            return bilan.Added + bilan.Updated > 0;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Collection MULTIPLAYER : rattrapage du Data Pack en echec");
+            return false;
+        }
+    }
+
     /// <summary>Une passe : catalogue, inventaire, intersection, ecriture.</summary>
     public async Task<MultiplayerCollectionStatus> SynchroniserAsync(string declencheur, CancellationToken cancellationToken)
     {
@@ -216,6 +257,13 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
             }
 
             var catalogue = _store.Lire(out var erreur);
+            // Comme World Scoring pour un .MEM en retard : le catalogue qui manque se demande au Data Pack tout de suite,
+            // puis la passe continue avec lui (25/10, borne neuve : « catalogue absent » jusqu'a la synchro du lendemain).
+            if (catalogue == null && await RattraperLeDataPackAsync(erreur, declencheur, cancellationToken).ConfigureAwait(false))
+            {
+                catalogue = _store.Lire(out erreur);
+            }
+
             if (catalogue == null)
             {
                 // Un catalogue absent ou refuse n'est pas une liste vide : la collection reste telle quelle.
