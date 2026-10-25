@@ -41,6 +41,29 @@ public class MultiplayerLaunchPlanTests : IDisposable
     }
 
     [Fact]
+    public void Les_reglages_que_le_lanceur_reecrirait_passent_sur_sa_ligne_sans_cle_en_p()
+    {
+        // Micro Mages : sans l'adaptateur 4 joueurs sur la ligne, le lanceur remettait « auto » (plus de joueurs 3 et 4).
+        var jeu = new MultiplayerGame
+        {
+            Id = "nes/micro-mages", System = "nes", Players = 4,
+            LauncherOptions = new Dictionary<string, string>
+            {
+                ["nestopia_select_adapter"] = "ntsc",
+                ["pce_multitap"] = "enabled",
+                ["douteux"] = "a b",
+                ["autre_reglage"] = "1",
+            },
+        };
+
+        var ligne = MultiplayerLaunchPlan.Arguments("", "nes", "nestopia", @"E:\RetroBat\roms\nes\Micro Mages.zip", jeu, 1, [])!;
+
+        Assert.Contains(" -fastforward_ratio 1.000000 -autre_reglage 1 -nestopia_select_adapter ntsc -rom ", ligne);
+        Assert.DoesNotContain("pce_multitap", ligne);
+        Assert.DoesNotContain("douteux", ligne);
+    }
+
+    [Fact]
     public void Aucune_cle_de_la_ligne_ne_commence_par_p_hors_manettes()
     {
         // Le lanceur prend tout « -p... » pour une manette : « -preemptive_frames » cassait tout netplay (23/10).

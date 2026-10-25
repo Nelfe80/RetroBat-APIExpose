@@ -130,6 +130,15 @@ public sealed record MultiplayerGame
     public IReadOnlyDictionary<string, string>? Options { get; init; }
 
     /// <summary>
+    /// LES REGLAGES QUE LE LANCEUR ECRIT LUI-MEME (Micro Mages, 25/10) : pour une option qu'il connait (une « feature »
+    /// d'ES), emulatorLauncher ecrit SA valeur dans les options du coeur au lancement, celle d'ES ou son defaut, par-dessus
+    /// celle que l'API vient de poser (l'adaptateur 4 joueurs de Nestopia revenait a « auto » : plus de joueurs 3 et 4).
+    /// Ces paires passent donc aussi sur sa ligne, qu'il lit en dernier. Jamais une cle en « p » (une manette fantome).
+    /// </summary>
+    [JsonPropertyName("launcher_options")]
+    public IReadOnlyDictionary<string, string>? LauncherOptions { get; init; }
+
+    /// <summary>
     /// Les ecrans que le coeur dessine cote a cote : une borne d'origine a un moniteur par joueur
     /// (World Rally 2, OutRunners). Chaque borne n'en affiche qu'un, celui de sa place.
     /// </summary>

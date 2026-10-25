@@ -87,6 +87,7 @@ public static class MultiplayerLaunchPlan
 
         var morceaux = new List<string> { manettes, "-system", systeme, "-emulator", "libretro", "-core", coeur, "-retroachievements", "0" };
         morceaux.AddRange(ArgumentsDuTempsPartage);
+        morceaux.AddRange(ArgumentsDuJeu(jeu));
         if (ShaderDeLaPlace(jeu, place) is { } shader)
         {
             // Un seul ecran, au format de la borne d'origine, sans habillage qui decalerait l'image.
@@ -112,6 +113,24 @@ public static class MultiplayerLaunchPlan
     /// </summary>
     internal static readonly IReadOnlyList<string> ArgumentsDuTempsPartage =
         ["-rewind", "0", "-autosave", "0", "-runahead", "0", "-fastforward_ratio", "1.000000"];
+
+    /// <summary>
+    /// Les reglages du jeu que le lanceur reecrirait sinon (<see cref="MultiplayerGame.LauncherOptions"/>), en paires
+    /// « -cle valeur », dans l'ordre des cles. Une cle en « p » (une manette pour le lanceur) ou un nom douteux est ecarte.
+    /// </summary>
+    internal static IEnumerable<string> ArgumentsDuJeu(MultiplayerGame jeu)
+    {
+        foreach (var (cle, valeur) in (jeu.LauncherOptions ?? new Dictionary<string, string>()).OrderBy(p => p.Key, StringComparer.Ordinal))
+        {
+            if (cle.StartsWith('p') || cle.StartsWith('P') || !CommandsController.NomDeLanceur(cle) || !CommandsController.NomDeLanceur(valeur))
+            {
+                continue;
+            }
+
+            yield return "-" + cle;
+            yield return valeur;
+        }
+    }
 
     /// <summary>
     /// Les noms des manettes d'une ligne de lancement d'ES (« P1 Generic USB Joystick, P2 vJoy Device »), sans leur
