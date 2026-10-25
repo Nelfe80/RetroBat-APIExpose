@@ -197,7 +197,11 @@ public sealed class DataPackSyncService : BackgroundService
         var dossiers = new HashSet<string>(opt.Folders, StringComparer.OrdinalIgnoreCase);
         // Ce que le depot contient : l'arbre s'il a bouge, sinon ce qu'on en sait deja.
         Dictionary<string, string> attendu;
-        if (string.Equals(state.LastTreeSha, sha, StringComparison.Ordinal) && state.Files.Count > 0)
+        // L'arbre deja lu ne vaut que pour les memes dossiers : une API mise a jour qui en suit un de plus (« multiplayer »
+        // le 21/10) relit l'arbre. Sinon le dossier n'etait jamais tire (25/10, borne neuve synchronisee d'abord par une
+        // version plus ancienne : collection MULTIPLAYER absente, « catalogue absent » a chaque passe).
+        if (string.Equals(state.LastTreeSha, sha, StringComparison.Ordinal) && state.Files.Count > 0
+            && DataPackPaths.MemesDossiers(state.Folders, dossiers))
         {
             result.TreeUnchanged = true;
             attendu = state.Files.ToDictionary(kv => kv.Key, kv => kv.Value.Sha, StringComparer.Ordinal);
@@ -317,7 +321,11 @@ public sealed class DataPackSyncService : BackgroundService
         await Task.WhenAll(taches);
 
         // Tout repris sans faute : ce HEAD est acquis, on ne relira plus l'arbre pour lui.
-        if (result.Errors.Count == 0) state.LastTreeSha = sha;
+        if (result.Errors.Count == 0)
+        {
+            state.LastTreeSha = sha;
+            state.Folders = dossiers.Order(StringComparer.OrdinalIgnoreCase).ToList();
+        }
         foreach (var t in touches.Where(t => t.StartsWith("gamelist/", StringComparison.OrdinalIgnoreCase)))
         {
             _gamelistIndex.Oublier(DataPackPaths.Local(t));
@@ -690,6 +698,8 @@ public sealed class DataPackSyncService : BackgroundService
     private sealed class SyncState
     {
         public string? LastTreeSha { get; set; }
+        /// <summary>Les dossiers suivis quand cet arbre a ete lu ; absent d'un etat d'avant le 25/10 (l'arbre se relit alors).</summary>
+        public List<string>? Folders { get; set; }
         public DateTime LastSyncUtc { get; set; }
         /// <summary>Les fichiers du depot : chemin -> empreinte de blob appliquee, taille et date locales.</summary>
         public Dictionary<string, FileState> Files { get; set; } = new(StringComparer.Ordinal);
@@ -761,6 +771,10 @@ public static class DataPackPaths
         }
         return dossiers.Contains(segments[0]);
     }
+
+    /// <summary>Les dossiers d'un arbre deja lu sont-ils ceux d'aujourd'hui ? Un etat sans cette liste ne l'est pas.</summary>
+    public static bool MemesDossiers(IReadOnlyCollection<string>? connus, ISet<string> actuels)
+        => connus is not null && connus.Count == actuels.Count && connus.All(actuels.Contains);
 
     /// <summary>Un chemin d'archive admis : relatif, sans remontee, sans caractere interdit.</summary>
     public static bool CheminRelatifSur(string rel)
