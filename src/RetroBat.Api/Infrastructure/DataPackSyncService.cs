@@ -72,14 +72,17 @@ public sealed class DataPackSyncService : BackgroundService
     /// demarrage : une API relancee plus souvent ne se synchronisait jamais (une borne avait quatre jours de retard, et
     /// Double Dragon y restait « non certifiable »). En retard (derniere synchronisation plus vieille que l'intervalle, ou
     /// jamais faite), 30 s au plus ; a jour, a l'echeance (jamais avant le delai de demarrage). Pur.
+    ///
+    /// LE DATA PACK SE MET A JOUR AVEC L'API (26/10, demande du user) : une API mise a jour (<paramref name="versionChangee"/> :
+    /// la derniere synchronisation a ete faite par une autre version) synchronise 30 s apres son demarrage, au lieu d'attendre
+    /// l'echeance de 24 h ; de meme une API qui suit un dossier de plus (<paramref name="arbreARelire"/>). Une installation
+    /// neuve (paquet de la 1.9.72, synchronisee d'abord sans « multiplayer ») recevait le catalogue MULTIPLAYER le lendemain.
     /// </summary>
     internal static TimeSpan PremierDelai(DateTime derniereUtc, DateTime maintenantUtc, TimeSpan intervalle, TimeSpan delaiDeDemarrage,
-        bool arbreARelire = false)
+        bool arbreARelire = false, bool versionChangee = false)
     {
         var depuis = maintenantUtc - derniereUtc;
-        // UN DOSSIER S'EST AJOUTE (25/10) : la borne mise a jour relit le depot tout de suite, pas a l'echeance de 24 h. Une
-        // installation neuve (paquet de la 1.9.72, synchronise d'abord sans « multiplayer ») attendait le lendemain.
-        if (arbreARelire || derniereUtc == default || depuis >= intervalle || depuis < TimeSpan.Zero)
+        if (arbreARelire || versionChangee || derniereUtc == default || depuis >= intervalle || depuis < TimeSpan.Zero)
         {
             return delaiDeDemarrage < TimeSpan.FromSeconds(30) ? delaiDeDemarrage : TimeSpan.FromSeconds(30);
         }
@@ -93,8 +96,9 @@ public sealed class DataPackSyncService : BackgroundService
         var etat = LoadState();
         var arbreARelire = etat.Files.Count > 0
             && !DataPackPaths.MemesDossiers(etat.Folders, new HashSet<string>(demarrage.Folders, StringComparer.OrdinalIgnoreCase));
+        var versionChangee = !string.Equals(etat.ApiVersion, ApiExposeVersion.Current, StringComparison.Ordinal);
         var delai = PremierDelai(etat.LastSyncUtc, DateTime.UtcNow, TimeSpan.FromHours(Math.Max(1, demarrage.IntervalHours)),
-            TimeSpan.FromSeconds(Math.Max(5, demarrage.StartupDelaySeconds)), arbreARelire);
+            TimeSpan.FromSeconds(Math.Max(5, demarrage.StartupDelaySeconds)), arbreARelire, versionChangee);
         _logger.LogInformation("Data Pack : premiere synchronisation dans {Delai}.", delai.TotalMinutes >= 2
             ? $"{(int) delai.TotalHours} h {delai.Minutes:00}" : $"{(int) delai.TotalSeconds} s");
         try { await Task.Delay(delai, stoppingToken); }
@@ -164,6 +168,7 @@ public sealed class DataPackSyncService : BackgroundService
             if (!result.Errors.Any(e => e.StartsWith("arbre", StringComparison.Ordinal)))
             {
                 state.LastSyncUtc = DateTime.UtcNow;
+                state.ApiVersion = ApiExposeVersion.Current;
             }
             SaveState(state);
             result.FinishedUtc = DateTime.UtcNow;
@@ -707,6 +712,8 @@ public sealed class DataPackSyncService : BackgroundService
         /// <summary>Les dossiers suivis quand cet arbre a ete lu ; absent d'un etat d'avant le 25/10 (l'arbre se relit alors).</summary>
         public List<string>? Folders { get; set; }
         public DateTime LastSyncUtc { get; set; }
+        /// <summary>La version de l'API qui a fait cette synchronisation : une autre version synchronise a son demarrage.</summary>
+        public string? ApiVersion { get; set; }
         /// <summary>Les fichiers du depot : chemin -> empreinte de blob appliquee, taille et date locales.</summary>
         public Dictionary<string, FileState> Files { get; set; } = new(StringComparer.Ordinal);
         /// <summary>Les bases par systeme : chemin -> sha256 applique, taille et date locales.</summary>
