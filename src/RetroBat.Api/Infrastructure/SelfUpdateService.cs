@@ -49,10 +49,9 @@ public sealed class SelfUpdateService
         // RETROARCH NELFEPLAY (2026-10-16) : l'archive de la nocturne corrigee, que pose install-retroarch-nelfeplay.bat
         // (RetroArchNelfePlayService la lance). Une archive n'a pas de version : elle se reprend sur son empreinte.
         RetroArchNelfePlay.CheminDeLArchive,
-        // LE COEUR GBA DE MULTIPLAYER (2026-10-23) : mGBA Splitscreen compile par NelfePlay et sa fiche, que
-        // MultiplayerCoeurGbaService pose chez RetroArch. Ni RetroBat ni libretro ne le distribuent.
-        RetroBat.Api.Multiplayer.MultiplayerCoeurGbaService.CheminDuCoeur,
-        RetroBat.Api.Multiplayer.MultiplayerCoeurGbaService.CheminDeLaFiche];
+        // LES COEURS DE MULTIPLAYER (2026-10-23, NGP Link le 25/10) : mGBA Splitscreen et NGP Link compiles par NelfePlay,
+        // et leurs fiches, que MultiplayerCoeursService pose chez RetroArch. Ni RetroBat ni libretro ne les distribuent.
+        .. RetroBat.Api.Multiplayer.MultiplayerCoeursService.Coeurs.SelectMany(c => c.CheminsDesOutils)];
 
     /// <summary>Plafond d'un outil : l'outil de diagnostic pese ~66 Mo.</summary>
     private const long TailleMaxOutil = 512L * 1024 * 1024;

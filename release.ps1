@@ -147,10 +147,12 @@ Write-Host 'Construction update.7z...'
 # dossier d'APIExpose, joint sous son seul nom de fichier ; une archive se reprend sur son empreinte, sans version).
 # Retiree en 1.9.61 (2026-10-17) : ses manettes SDL3 ne suivent pas les touches que RetroBat ecrit pour SDL2. La liste
 # accepte de nouveau un chemin relatif le jour ou une version qui convient sera prete.
-# LE COEUR GBA DE MULTIPLAYER (2026-10-23) : mGBA Splitscreen compile par NelfePlay (branche nelfeplay-build du fork) et sa
-# fiche, poses chez RetroArch par MultiplayerCoeurGbaService. Repris sur leur empreinte, comme une archive.
+# LES COEURS DE MULTIPLAYER (2026-10-23) : mGBA Splitscreen compile par NelfePlay (branche nelfeplay-build du fork) et NGP
+# Link (25/10, Beetle NGP et son cable de liaison), avec leurs fiches, poses chez RetroArch par MultiplayerCoeursService.
+# Repris sur leur empreinte, comme une archive. La liste suit MultiplayerCoeursService.Coeurs.
 $outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.exe',
-    'tools/cores/mgba_splitscreen_libretro.dll', 'tools/cores/mgba_splitscreen_libretro.info')
+    'tools/cores/mgba_splitscreen_libretro.dll', 'tools/cores/mgba_splitscreen_libretro.info',
+    'tools/cores/mednafen_ngp_link_libretro.dll', 'tools/cores/mednafen_ngp_link_libretro.info')
 $exclusOutils = @($outilsHorsArchive | ForEach-Object { "-x!$name\$($_ -replace '/', '\')" })
 & $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" @exclusOutils -mx=5 -bsp0 -bso0
 
