@@ -808,12 +808,21 @@ public sealed partial class LeaderboardOverlayService : IDisposable
         /// <summary>Une fenetre visible d'un AUTRE processus se trouve-t-elle au-dessus de nous ?</summary>
         private bool QuelquUnNousPasseDevant() => PidDevantNous() != 0;
 
+        /// <summary>
+        /// MESURE DU 25/10 (l'ecran s'eteignait a chaque ouverture du panneau MULTIPLAYER) : tout en haut de la bande
+        /// topmost vit une fenetre d'aide de l'Explorateur (ThumbnailDeviceHelperWnd, 1 x 1 pixel en 0,0), « visible ».
+        /// Elle passait toujours devant nous, et la bascule NOTOPMOST -> TOPMOST qui suivait faisait clignoter l'ecran face a
+        /// ES en plein ecran. Ne compte donc qu'une fenetre qui RECOUVRE vraiment le panneau (16 x 16 pixels au moins).
+        /// </summary>
         private uint PidDevantNous()
         {
             var moi = GetCurrentProcessId();
+            var nous = Bounds;
             for (var h = GetWindow(Handle, GwHwndPrev); h != IntPtr.Zero; h = GetWindow(h, GwHwndPrev))
             {
-                if (!IsWindowVisible(h)) continue;
+                if (!IsWindowVisible(h) || !GetWindowRect(h, out var r)) continue;
+                var commun = Rectangle.Intersect(nous, Rectangle.FromLTRB(r.Gauche, r.Haut, r.Droite, r.Bas));
+                if (commun.Width < 16 || commun.Height < 16) continue;
                 GetWindowThreadProcessId(h, out var pid);
                 if (pid != moi) return pid;
             }
@@ -1848,6 +1857,8 @@ public sealed partial class LeaderboardOverlayService : IDisposable
         private const int GwlExStyle = -20;
         [DllImport("user32.dll")] private static extern IntPtr GetWindow(IntPtr h, uint commande);
         [DllImport("user32.dll")] private static extern bool IsWindowVisible(IntPtr h);
+        [StructLayout(LayoutKind.Sequential)] private struct Rect { public int Gauche, Haut, Droite, Bas; }
+        [DllImport("user32.dll")] private static extern bool GetWindowRect(IntPtr h, out Rect r);
         [DllImport("kernel32.dll")] private static extern uint GetCurrentProcessId();
         private const uint SwpNoMove = 0x0002;
         private const uint SwpNoSize = 0x0001;
