@@ -315,8 +315,9 @@ public class MultiplayerCollectionSyncTests : IDisposable
     }
 
     [Fact]
-    public void Par_defaut_la_collection_est_coupee()
-        => Assert.False(new NelfePlayOptions().ShowMultiplayerCollection);
+    public void Par_defaut_la_collection_est_visible()
+        // 25/10 : une borne neuve n'avait pas la collection tant que le joueur n'allait pas l'allumer dans le menu d'ES.
+        => Assert.True(new NelfePlayOptions().ShowMultiplayerCollection);
 
     [Theory]
     [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"name\":\"A\",\"players\":2}]}", "set manquant")]

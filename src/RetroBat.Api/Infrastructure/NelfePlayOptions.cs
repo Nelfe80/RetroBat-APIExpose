@@ -27,10 +27,10 @@ public sealed class NelfePlayOptions
 
     /// <summary>
     /// Afficher la collection NELFEPLAY MULTIPLAYER : les jeux du catalogue du Data Pack que la
-    /// borne possede. Coupee par defaut tant que le lancement d'une gameroom n'est pas livre :
-    /// une tuile qui promet du multijoueur et lance une partie seule serait un mensonge.
+    /// borne possede. Visible par defaut depuis le 25/10/2026 (decision du user : une borne neuve
+    /// n'avait pas la collection tant que le joueur n'allait pas l'allumer dans le menu d'ES).
     /// </summary>
-    public bool ShowMultiplayerCollection { get; set; }
+    public bool ShowMultiplayerCollection { get; set; } = true;
 
     /// <summary>Releve d'audience : ce qui est joue et combien de temps, jamais par qui.</summary>
     public bool PlayReportingEnabled { get; set; } = true;

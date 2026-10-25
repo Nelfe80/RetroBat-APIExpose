@@ -76,7 +76,8 @@ public sealed class MultiplayerDepartPret
     public MultiplayerDepartPret(ICommandesRetroArch commandes, TimeSpan? attenteDuJeu = null, TimeSpan? apresLeChargement = null)
     {
         _commandes = commandes;
-        _attenteDuJeu = attenteDuJeu ?? TimeSpan.FromSeconds(30);
+        // 60 s pour que le jeu soit pret (demande du user, 25/10 : un lancement a pris 48 s sur sa borne).
+        _attenteDuJeu = attenteDuJeu ?? TimeSpan.FromSeconds(60);
         _apresLeChargement = apresLeChargement ?? TimeSpan.FromSeconds(1.5);
     }
 

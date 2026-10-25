@@ -170,8 +170,7 @@ public sealed class ApiExposeAppsettingsSyncService
             ["global.apiexpose.nelfeplay.force_certified_settings"] = Bool("NelfePlay", "ForceCertifiedSettings"),
             // La collection « NELFEPLAY WORLD SCORING » dans le carrousel d'EmulationStation.
             ["global.apiexpose.nelfeplay.show_scoring_collection"] = Bool("NelfePlay", "ShowScoringCollection"),
-            // La collection « NELFEPLAY MULTIPLAYER ». Pas encore d'entree de menu ni de valeur
-            // semee : elle reste coupee tant que le lancement d'une gameroom n'est pas livre.
+            // La collection « NELFEPLAY MULTIPLAYER », dans GAME EVENTS MANAGER ; visible par defaut (25/10).
             ["global.apiexpose.nelfeplay.show_multiplayer_collection"] = Bool("NelfePlay", "ShowMultiplayerCollection"),
             // Bouton maitre des surfaces NelfePlay. Pas d'entree de menu : aujourd'hui il ne
             // coupe que la collection, et un interrupteur qui promet plus qu'il ne fait est un

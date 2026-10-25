@@ -103,8 +103,11 @@ public sealed class MultiplayerPanelService
     private MultiplayerInvitation? _invitation;
     private DateTime _presenteeDepuis;
 
-    /// <summary>La presentation ne dure pas plus : au-dela, la partie ne s'est pas ouverte, le joueur retrouve ES.</summary>
-    private static readonly TimeSpan PresentationMax = TimeSpan.FromMinutes(2);
+    /// <summary>
+    /// La presentation ne dure pas plus : au-dela, la partie ne s'est pas ouverte, le joueur retrouve ES. Le meme delai que
+    /// la plateforme laisse a l'hote pour publier sa session (3 min depuis le 25/10 : 60 s pour que le jeu soit pret).
+    /// </summary>
+    private static readonly TimeSpan PresentationMax = TimeSpan.FromMinutes(3);
 
     public MultiplayerPanelService(
         MultiplayerSessionService session,
