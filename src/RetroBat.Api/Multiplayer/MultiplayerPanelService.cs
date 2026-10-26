@@ -178,6 +178,12 @@ public sealed class MultiplayerPanelService
         get { lock (_verrou) return _mode == Mode.Panneau; }
     }
 
+    /// <summary>Le panneau des gamerooms est a l'ecran et ES a la main : un « gauche » y entrerait.</summary>
+    public bool AttendQuOnEntre
+    {
+        get { lock (_verrou) return _mode == Mode.Panneau && _modele.Etat == MultiplayerPanelModel.Foyer.MenuEs; }
+    }
+
     /// <summary>MULTIPLAYER est-il en service sur cette borne ?</summary>
     public bool Actif => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: true };
 
@@ -423,6 +429,10 @@ public sealed class MultiplayerPanelService
 
                     _journal.LogInformation("MULTIPLAYER : resultat de {Room} a l'ecran, manette {Prise}", room,
                         pris ? "prise" : "refusee par Windows (ES la garde)");
+                    if (pris)
+                    {
+                        await GarderLePremierPlanAsync(retour).ConfigureAwait(false);
+                    }
                 }
             }
             catch (OperationCanceledException)
@@ -430,6 +440,42 @@ public sealed class MultiplayerPanelService
                 // Rejouer, ou fermer a la main : rien a faire de plus.
             }
         });
+    }
+
+    /// <summary>
+    /// L'ECRAN DE FIN GARDE LE PREMIER PLAN (2026-10-26, borne de falken : manette prise, ecran pourtant invisible ; sur
+    /// cette machine un panneau ne se voit que s'il est la fenetre active). Pendant 6 s, s'il lui echappe, le journal dit
+    /// qui l'a pris et l'ecran le reprend, une fois.
+    /// </summary>
+    private async Task GarderLePremierPlanAsync(CancellationTokenSource retour)
+    {
+        var repris = false;
+        for (var tour = 0; tour < 12; tour++)
+        {
+            await Task.Delay(500, retour.Token).ConfigureAwait(false);
+            lock (_verrou)
+            {
+                if (_mode != Mode.Resultat || !ReferenceEquals(_retour, retour))
+                {
+                    return;
+                }
+            }
+
+            if (_overlay.EstAuPremierPlan())
+            {
+                continue;
+            }
+
+            var qui = _overlay.QuiALePremierPlan();
+            if (repris)
+            {
+                _journal.LogInformation("MULTIPLAYER : l'ecran de fin a encore perdu le premier plan ({Qui})", qui);
+                return;
+            }
+            repris = true;
+            var pris = _overlay.PrendreLeFocus();
+            _journal.LogInformation("MULTIPLAYER : l'ecran de fin avait perdu le premier plan ({Qui}), repris : {Pris}", qui, pris ? "oui" : "non");
+        }
     }
 
     // ── les gestes ──────────────────────────────────────────────────────────────────────────────────

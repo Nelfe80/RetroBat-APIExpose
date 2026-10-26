@@ -403,6 +403,27 @@ public sealed partial class LeaderboardOverlayService : IDisposable
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern IntPtr GetForegroundWindow();
 
+    [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "GetWindowThreadProcessId")]
+    private static extern uint ProcessusDeLaFenetre(IntPtr fenetre, out uint pid);
+
+    /// <summary>Le programme dont la fenetre a le premier plan (« nous » si c'est le panneau), pour le journal.</summary>
+    public string QuiALePremierPlan()
+    {
+        var devant = GetForegroundWindow();
+        if (devant == IntPtr.Zero) return "personne";
+        if (devant == _handle) return "nous";
+        try
+        {
+            _ = ProcessusDeLaFenetre(devant, out var pid);
+            using var p = Process.GetProcessById((int) pid);
+            return p.ProcessName;
+        }
+        catch (Exception)
+        {
+            return "?";
+        }
+    }
+
     /// <summary>Le handle de la fenetre, retenu a sa creation.</summary>
     private IntPtr _handle;
 

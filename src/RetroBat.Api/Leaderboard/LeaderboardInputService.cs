@@ -105,6 +105,16 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// <summary>Quand un panneau s'est ouvert : un systeme choisi dans la foulee de l'ouverture ne le ferme pas.</summary>
     private DateTime _ouvertureUtc = DateTime.MinValue;
     private static readonly TimeSpan MargeDOuverture = TimeSpan.FromSeconds(2);
+
+    /// <summary>
+    /// L'ENTREE AUTOMATIQUE (idee du user, 2026-10-26, borne de falken) : 1 s apres l'appui long, l'API joue elle-meme le
+    /// « gauche » qui entre dans le panneau. Sur certaines machines (portable AMD), un panneau ne se voit que quand il est
+    /// la fenetre active : il restait invisible tant qu'ES gardait la main, et paraissait au premier « gauche ». Rien si le
+    /// joueur a deja bouge le DPAD (il navigue chez ES ou chez nous) ou si le panneau s'est ferme.
+    /// </summary>
+    private static readonly TimeSpan EntreeAutomatique = TimeSpan.FromSeconds(1);
+    private DateTime? _entrerA;
+    private DateTime _dernierGesteDpad = DateTime.MinValue;
     private string _romGroup = "";
     private string _maVille = "";
     private string _monPays = "";
@@ -348,7 +358,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             {
                 if (string.Equals(systeme, "DPAD", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (appuye) panneau.Direction(identite);
+                    if (appuye)
+                    {
+                        _dernierGesteDpad = DateTime.UtcNow;
+                        panneau.Direction(identite);
+                    }
                 }
                 else if (valider)
                 {
@@ -369,7 +383,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // Les directions arrivent par le canal DPAD, sans slot.
             if (string.Equals(systeme, "DPAD", StringComparison.OrdinalIgnoreCase))
             {
-                if (appuye) Direction(identite);
+                if (appuye)
+                {
+                    _dernierGesteDpad = DateTime.UtcNow;
+                    Direction(identite);
+                }
                 return;
             }
             // Une invitation MULTIPLAYER attend : « retour » la refuse (ES recoit aussi le bouton, comme toujours).
@@ -476,6 +494,35 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     private (string Identite, int? Slot, DateTime Depuis)? _autreAppui;
     private readonly HashSet<string> _appuisLongsSignales = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>Le « gauche » de l'entree automatique (voir <see cref="EntreeAutomatique"/>), joue comme un vrai appui.</summary>
+    private void EntrerSiLeJoueurNAPasBouge()
+    {
+        if (_entrerA is not { } quand || DateTime.UtcNow < quand)
+        {
+            return;
+        }
+        _entrerA = null;
+        if (_dernierGesteDpad >= _ouvertureUtc)
+        {
+            return;
+        }
+
+        if (_multiplayer is { Ouvert: true } multiplayer)
+        {
+            if (multiplayer.AttendQuOnEntre)
+            {
+                _logger.LogInformation("MULTIPLAYER : entree automatique dans le panneau (gauche joue par l'API).");
+                multiplayer.Direction("left");
+            }
+            return;
+        }
+        if (_modele.Etat == LeaderboardPanelModel.Foyer.MenuEs)
+        {
+            _logger.LogInformation("Classement : entree automatique dans le panneau (gauche joue par l'API).");
+            Direction("left");
+        }
+    }
+
     private void Direction(string? identite)
     {
         var entree = (identite ?? "").ToLowerInvariant() switch
@@ -531,6 +578,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     }
                     await OuvrirAsync(ct).ConfigureAwait(false);
                 }
+
+                EntrerSiLeJoueurNAPasBouge();
 
                 // Le filet : si nous tenons la manette et que plus rien n'arrive, on la rend.
                 if (_overlay.TropLongSilence())
@@ -611,6 +660,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             _jeuAffiche = nomDuJeu;
             _systemeAffiche = systeme;
             _ouvertureUtc = DateTime.UtcNow;
+            _entrerA = _ouvertureUtc + EntreeAutomatique;
             await _multiplayer.OuvrirAsync(cheminDuJeu, Glyphe(SlotValider), Glyphe(SlotAnnuler), ct).ConfigureAwait(false);
             return;
         }
@@ -625,6 +675,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         _jeuAffiche = nomDuJeu;
         _systemeAffiche = systeme;
         _ouvertureUtc = DateTime.UtcNow;
+        _entrerA = _ouvertureUtc + EntreeAutomatique;
         if (_romGroup.Length == 0) return;
         _reglesDuJeu = _collection?.ReglesOuvertes(_romGroup) ?? Array.Empty<string>();
         _reglePrincipale = LeaderboardClient.ReglePrincipale(_reglesDuJeu);
