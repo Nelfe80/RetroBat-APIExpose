@@ -160,7 +160,7 @@ public sealed class NetplayHostService
 
         // Par ES de preference : lui seul cesse de dessiner pendant la partie (voir NetplayLaunch).
         var lancement = await NetplayLaunch.LancerAsync(
-            cheminRom, Arguments(resolution, cheminRom), _httpFactory, _logger, ct).ConfigureAwait(false);
+            cheminRom, () => Arguments(resolution, cheminRom, EsManettes.PourLancer(_logger).Arguments), _httpFactory, _logger, ct).ConfigureAwait(false);
         if (!lancement.Ok)
         {
             return Echec.LancementRefuse;
@@ -430,7 +430,7 @@ public sealed class NetplayHostService
     /// depuis ne pouvait pas etre heberge, et le defi partait sans direct ni message (Metal Slug 3,
     /// 2026-10-01, sur une borne ou il avait deja ete joue). On refait donc ce qu'ES decide : le
     /// systeme est le dossier de la ROM, l'emulateur et le coeur viennent de la fiche du jeu, puis
-    /// des reglages du systeme, puis de son defaut ; les manettes sont celles du dernier lancement.
+    /// des reglages du systeme, puis de son defaut. Les manettes se calculent au lancement (EsManettes).
     /// C'est la meme resolution que celle de la collection World Scoring.
     /// </summary>
     private async Task<EsLaunchArguments.Resolution?> ReconstituerAsync(string cheminRom, CancellationToken ct)
@@ -451,8 +451,7 @@ public sealed class NetplayHostService
         _logger.LogInformation(
             "Netplay : {Rom} absent du journal d'ES, lancement reconstitue ({Systeme}, {Emulateur}, {Coeur}).",
             Path.GetFileName(cheminRom), systeme, lancement.Emulator, lancement.Core.Length > 0 ? lancement.Core : "-");
-        return new EsLaunchArguments.Resolution(
-            systeme, lancement.Emulator, lancement.Core, EsLaunchArguments.ManettesDuDernierLancement());
+        return new EsLaunchArguments.Resolution(systeme, lancement.Emulator, lancement.Core);
     }
 
     /// <summary>
@@ -558,10 +557,10 @@ public sealed class NetplayHostService
         return (Valeur("netplay_password"), Valeur("netplay_spectate_password"));
     }
 
-    private static string Arguments(EsLaunchArguments.Resolution r, string cheminRom)
+    private static string Arguments(EsLaunchArguments.Resolution r, string cheminRom, string manettes)
         => string.Join(' ', new[]
         {
-            r.Manettes,
+            manettes,
             "-system", r.Systeme,
             "-emulator", r.Emulateur,
             "-core", r.Coeur,

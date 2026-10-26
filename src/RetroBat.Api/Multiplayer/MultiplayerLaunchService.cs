@@ -543,10 +543,12 @@ public sealed class MultiplayerLaunchService : IHostedService
         var lancement = room.Launch!;
         var systeme = NetplayHostService.SystemeDuChemin(jeu.Path, RetroBatPaths.RomsRoot);
         var coeur = jeu.Core?.Core ?? string.Empty;
-        var manettes = EsLaunchArguments.ManettesDuDernierLancement();
+        // Sans ES, les manettes se calculent comme ES le ferait : le lanceur n'en cherche aucune lui-meme (EsManettes).
+        var choix = EsManettes.PourLancer(_journal);
+        var manettes = choix.Arguments;
         // En netplay, chaque borne joue avec SON joueur 1 de RetroArch, quelle que soit sa place : si le panel n'y est pas,
         // ses commandes ne repondent pas (vu le 22/10 sur la seconde borne). Le journal dit donc qui est le joueur 1.
-        _journal.LogInformation("MULTIPLAYER : manettes transmises au lanceur : {Manettes}", MultiplayerLaunchPlan.NomsDesManettes(manettes));
+        _journal.LogInformation("MULTIPLAYER : manettes transmises au lanceur ({Source}) : {Manettes}", choix.Source, MultiplayerLaunchPlan.NomsDesManettes(manettes));
         var joueurs = Math.Max(2, lancement.Players);
         var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeu.Game, lancement.Seat, netplay, joueurs);
         if (arguments is null)
@@ -609,7 +611,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
 
         var reference = new GameReference { SystemId = systeme, GamePath = jeu.Path, GameName = jeu.Game.Name };
-        _ = Task.Run(() => AnnoncerQuandLEmulateurEstLaAsync(reference, room.Room, lanceA));
+        _ = Task.Run(() => AnnoncerQuandLEmulateurEstLaAsync(reference, room.Room, lanceA, sansManette: manettes.Length == 0));
         return new Partie(lanceur, aRendre, DateTime.UtcNow, reference);
     }
 
@@ -628,7 +630,7 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// « Les joueurs se synchronisent… » pendant que RetroArch charge encore. Seul compte un emulateur demarre apres ce
     /// lancement : un RetroArch deja ouvert (un banc, le 25/10) effacait la presentation 48 s avant le vrai jeu.
     /// </summary>
-    private async Task AnnoncerQuandLEmulateurEstLaAsync(GameReference jeu, string room, DateTime lanceA)
+    private async Task AnnoncerQuandLEmulateurEstLaAsync(GameReference jeu, string room, DateTime lanceA, bool sansManette)
     {
         var limite = DateTime.UtcNow.AddSeconds(60);
         while (DateTime.UtcNow < limite && !EmulatorForeground.EmulateurDeJeuTourne(lanceA.AddSeconds(-1)))
@@ -646,6 +648,41 @@ public sealed class MultiplayerLaunchService : IHostedService
             Payload = new { Source = "multiplayer", jeu.SystemId, jeu.GamePath, jeu.GameName, Direct = true },
         }).ConfigureAwait(false);
         _ = EmulatorForeground.FocusEmulatorWhenUpAsync();
+        if (sansManette)
+        {
+            await PrevenirSansManetteAsync().ConfigureAwait(false);
+        }
+    }
+
+    private const string MessageSansManetteParDefaut =
+        "No controller found for this game: only the keyboard responds. Plug in a controller, set it up in EmulationStation, then start the game again.";
+
+    /// <summary>
+    /// AUCUNE MANETTE POUR CETTE PARTIE (decision du user du 26/10 : « utilise les messages retroarch ») : ni ES, ni le
+    /// calcul, ni les journaux n'en donnent une, et le lanceur n'en cherche pas. Le joueur l'apprend dans RetroArch, le
+    /// jeu charge, trois fois : RetroArch ne tient un message que trois secondes.
+    /// </summary>
+    private async Task PrevenirSansManetteAsync()
+    {
+        var commandes = new CommandesRetroArchUdp();
+        var limite = DateTime.UtcNow.AddSeconds(60);
+        while (DateTime.UtcNow < limite)
+        {
+            var statut = await commandes.DemanderAsync("GET_STATUS", CancellationToken.None).ConfigureAwait(false);
+            if (statut is not null && (statut.Contains("PLAYING", StringComparison.Ordinal) || statut.Contains("PAUSED", StringComparison.Ordinal)))
+            {
+                break;
+            }
+            await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+        }
+
+        var texte = _panneau.Texte("multiplayer.no_controller", MessageSansManetteParDefaut);
+        _journal.LogWarning("MULTIPLAYER : aucune manette pour cette partie, le joueur est prevenu dans RetroArch");
+        for (var i = 0; i < 3; i++)
+        {
+            await commandes.EnvoyerAsync("SHOW_MSG " + texte.ReplaceLineEndings(" ").Trim(), CancellationToken.None).ConfigureAwait(false);
+            await Task.Delay(3200).ConfigureAwait(false);
+        }
     }
 
     /// <summary>Attend que le lanceur rende la main, rend les reglages et annonce la fin. Rend la duree, en secondes.</summary>

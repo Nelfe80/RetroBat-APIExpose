@@ -94,8 +94,8 @@ public class CommandsController : ControllerBase
         // MOTEUR IMPOSE : l'API HTTP d'EmulationStation ne prend qu'un chemin de ROM, et c'est ES
         // qui choisit l'emulateur. Quand l'appelant impose un emulateur (le labo, qui qualifie
         // une definition sur FBNeo, MAME RetroArch ET MAME standalone), on lance nous-memes
-        // emulatorLauncher avec -emulator/-core, en reprenant mot pour mot les arguments de
-        // manette du dernier lancement d'ES, comme le fait le netplay quand ES ne repond pas.
+        // emulatorLauncher avec -emulator/-core, avec les manettes qu'ES donnerait (EsManettes),
+        // comme le fait le netplay quand ES ne repond pas.
         if (payload.RetroAchievements == false && string.IsNullOrWhiteSpace(payload.Emulator))
         {
             return BadRequest(new
@@ -109,7 +109,7 @@ public class CommandsController : ControllerBase
             var systeme = string.IsNullOrWhiteSpace(payload.System)
                 ? Path.GetFileName(Path.GetDirectoryName(romPath) ?? string.Empty)
                 : payload.System.Trim();
-            var arguments = ArgumentsDuLanceur(RetroBat.Api.Netplay.EsLaunchArguments.ManettesDuDernierLancement(),
+            var arguments = ArgumentsDuLanceur(RetroBat.Api.Netplay.EsManettes.PourLancer(_logger).Arguments,
                 systeme, payload.Emulator.Trim(), payload.Core?.Trim(), romPath, payload.RetroAchievements);
             if (arguments is null)
             {

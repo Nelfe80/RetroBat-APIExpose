@@ -38,6 +38,14 @@ if (args.Any(arg => string.Equals(arg, RetroBat.Api.Infrastructure.Desinstallati
     return RetroBat.Api.Infrastructure.Desinstallation.Executer();
 }
 
+// LES MANETTES COMME ES LES VOIT (2026-10-26) : l'API se relance avec cet argument au moment d'une partie lancee sans ES.
+// Le processus enumere les manettes avec le SDL et les reglages d'ES, ecrit la liste et sort, sans rien demarrer d'autre.
+// A part parce que le lecteur de manettes de l'API tient deja ce SDL avec d'autres reglages. Voir EsManettes.
+if (args.Any(arg => string.Equals(arg, RetroBat.Api.Netplay.EsManettes.Argument, StringComparison.OrdinalIgnoreCase)))
+{
+    return RetroBat.Api.Netplay.EsManettes.Executer();
+}
+
 var testModeRequested = args.Any(arg =>
     string.Equals(arg, "--test-mode", StringComparison.OrdinalIgnoreCase) ||
     string.Equals(arg, "/test-mode", StringComparison.OrdinalIgnoreCase) ||

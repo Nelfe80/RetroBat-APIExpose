@@ -1381,4 +1381,11 @@ public sealed class MultiplayerPanelService
 
         return _langue;
     }
+
+    /// <summary>Un texte de l'interface dans la langue d'ES, ou `parDefaut` si le dictionnaire ne l'a pas encore.</summary>
+    public string Texte(string cle, string parDefaut)
+    {
+        var texte = _textes.Text(cle, Langue());
+        return texte.Length > 0 && texte != cle ? texte : parDefaut;
+    }
 }

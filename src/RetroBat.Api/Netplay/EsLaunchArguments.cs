@@ -22,15 +22,35 @@ namespace RetroBat.Api.Netplay;
 ///
 /// Pour un jeu deja lance sur cette borne, la reponse est donc deja dans le journal : rien a
 /// relancer, rien a deviner.
+///
+/// MAIS ES N'ECRIT CETTE LIGNE QU'EN `LogLevel` « information » OU « debug » (2026-10-26) : sans reglage, il n'ecrit
+/// que ses erreurs. Le lanceur, lui, ecrit chaque ligne de commande recue dans emulatorLauncher.log, quel que soit le
+/// reglage d'ES : ce journal se lit en premier, ses seules lignes d'ES (`-gameinfo`, que l'API ne passe jamais).
 /// </summary>
 public static class EsLaunchArguments
 {
-    /// <summary>Ce qu'il faut pour relancer un jeu comme ES l'aurait fait.</summary>
-    public sealed record Resolution(string Systeme, string Emulateur, string Coeur, string Manettes);
+    /// <summary>Ce qu'il faut pour relancer un jeu comme ES l'aurait fait (les manettes : <see cref="EsManettes"/>).</summary>
+    public sealed record Resolution(string Systeme, string Emulateur, string Coeur);
 
-    /// <summary>Les journaux d'ES, du plus recent au plus ancien.</summary>
-    private static IEnumerable<string> Journaux()
+    /// <summary>Un journal, et ce qui y fait une ligne de lancement d'ES.</summary>
+    private sealed record Journal(string Chemin, Func<string, bool>? Filtre);
+
+    /// <summary>Une ligne du journal du lanceur venue d'ES : sa ligne de commande, avec la fiche du jeu qu'ES lui passe.</summary>
+    internal static bool LancementDEsDansLeJournalDuLanceur(string ligne)
+        => ligne.Contains("[Startup]", StringComparison.Ordinal) && ligne.Contains(" -gameinfo ", StringComparison.Ordinal);
+
+    /// <summary>Les journaux, du plus recent au plus ancien : celui du lanceur, puis ceux d'ES.</summary>
+    private static IEnumerable<Journal> Journaux()
     {
+        var lanceur = Path.Combine(RetroBatPaths.RetroBatRoot, "emulationstation", "emulatorLauncher.log");
+        foreach (var chemin in new[] { lanceur, lanceur + ".old" })
+        {
+            if (File.Exists(chemin))
+            {
+                yield return new Journal(chemin, LancementDEsDansLeJournalDuLanceur);
+            }
+        }
+
         var dossier = Path.Combine(RetroBatPaths.RetroBatRoot, "emulationstation", ".emulationstation");
         if (!Directory.Exists(dossier))
         {
@@ -39,14 +59,14 @@ public static class EsLaunchArguments
         var principal = Path.Combine(dossier, "es_log.txt");
         if (File.Exists(principal))
         {
-            yield return principal;
+            yield return new Journal(principal, null);
         }
         for (var i = 0; i <= 3; i++)
         {
             var rotation = Path.Combine(dossier, $"es_log.{i}.txt");
             if (File.Exists(rotation))
             {
-                yield return rotation;
+                yield return new Journal(rotation, null);
             }
         }
     }
@@ -70,15 +90,14 @@ public static class EsLaunchArguments
         // plus recent au plus ancien, donc la premiere ligne qui repond fait foi.
         foreach (var journal in Journaux())
         {
-            foreach (var ligne in LancementsDepuisLaFin(journal))
+            foreach (var ligne in LancementsDepuisLaFin(journal.Chemin, filtre: journal.Filtre))
             {
                 if (string.Equals(NomDeFichier(Valeur(ligne, "rom")), fichier, StringComparison.OrdinalIgnoreCase))
                 {
                     return new Resolution(
                         Valeur(ligne, "system"),
                         Valeur(ligne, "emulator"),
-                        Valeur(ligne, "core"),
-                        ManettesDe(ligne));
+                        Valeur(ligne, "core"));
                 }
             }
         }
@@ -86,10 +105,11 @@ public static class EsLaunchArguments
     }
 
     /// <summary>
-    /// Les arguments de manette du DERNIER lancement journalise, quel que soit le jeu.
+    /// Les arguments de manette du DERNIER lancement d'ES journalise, quel que soit le jeu. Ils peuvent dater : un
+    /// lancement s'en sert a travers <see cref="EsManettes.PourLancer"/>, qui retire les manettes debranchees.
     ///
-    /// Une chaine vide n'est pas une panne : sur une borne qui vient de demarrer il n'y a rien a
-    /// reprendre, et `emulatorLauncher` retombera sur sa propre enumeration.
+    /// Une chaine vide n'est pas une panne : sur une borne ou ES n'a encore rien lance, il n'y a rien a reprendre. Le
+    /// lanceur, lui, ne cherche AUCUNE manette sans ces arguments (Program.LoadControllerConfiguration).
     /// </summary>
     public static string ManettesDuDernierLancement()
     {
@@ -97,7 +117,7 @@ public static class EsLaunchArguments
         {
             // Le dernier lancement du journal, et lui seul : un journal dont le dernier lancement
             // n'a pas de manette passe la main au suivant, comme avant.
-            var dernier = LancementsDepuisLaFin(journal).FirstOrDefault();
+            var dernier = LancementsDepuisLaFin(journal.Chemin, filtre: journal.Filtre).FirstOrDefault();
             var manettes = dernier is null ? string.Empty : ManettesDe(dernier);
             if (manettes.Length > 0)
             {
@@ -172,9 +192,10 @@ public static class EsLaunchArguments
     /// une demi-seconde et des dizaines de Mo a chaque partie, de plus en plus avec le temps. On
     /// lit par blocs depuis la fin, et l'appelant s'arrete a la premiere ligne qui lui repond.
     /// Un saut de ligne est un octet 0x0A en UTF-8, jamais un morceau d'un autre caractere : on
-    /// peut couper le fichier en blocs d'octets sans casser une ligne.
+    /// peut couper le fichier en blocs d'octets sans casser une ligne. `filtre` ne garde que certains lancements (ceux
+    /// d'ES dans le journal du lanceur).
     /// </summary>
-    internal static IEnumerable<string> LancementsDepuisLaFin(string chemin, int bloc = 64 * 1024)
+    internal static IEnumerable<string> LancementsDepuisLaFin(string chemin, int bloc = 64 * 1024, Func<string, bool>? filtre = null)
     {
         using var flux = Ouvrir(chemin);
         if (flux is null)
@@ -205,7 +226,7 @@ public static class EsLaunchArguments
                     continue;
                 }
                 var ligne = Encoding.UTF8.GetString(morceau, i + 1, fin - i - 1);
-                if (EstUnLancement(ligne))
+                if (EstUnLancement(ligne) && (filtre?.Invoke(ligne) ?? true))
                 {
                     yield return ligne.Trim();
                 }
@@ -217,7 +238,7 @@ public static class EsLaunchArguments
         if (reste.Length > 0)
         {
             var premiere = Encoding.UTF8.GetString(reste);
-            if (EstUnLancement(premiere))
+            if (EstUnLancement(premiere) && (filtre?.Invoke(premiere) ?? true))
             {
                 yield return premiere.Trim();
             }

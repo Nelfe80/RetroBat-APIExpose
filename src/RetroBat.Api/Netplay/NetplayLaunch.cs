@@ -34,11 +34,12 @@ public static class NetplayLaunch
     public sealed record Resultat(bool Ok, bool ParEs);
 
     /// <summary>
-    /// Lance `rom` : par ES si possible, directement sinon. `argumentsDirects` sont les arguments
-    /// complets du lanceur pour le repli, netplay compris.
+    /// Lance `rom` : par ES si possible, directement sinon. `argumentsDirects` rend les arguments
+    /// complets du lanceur pour le repli, netplay compris ; il ne se calcule que pour le repli (les manettes
+    /// s'y relisent au moment du lancement, et ES les calcule lui-meme).
     /// </summary>
     public static async Task<Resultat> LancerAsync(
-        string rom, string argumentsDirects, IHttpClientFactory httpFactory, ILogger logger, CancellationToken ct)
+        string rom, Func<string> argumentsDirects, IHttpClientFactory httpFactory, ILogger logger, CancellationToken ct)
     {
         if (await LancerParEsAsync(rom, httpFactory, logger, ct).ConfigureAwait(false))
         {
@@ -50,7 +51,7 @@ public static class NetplayLaunch
 
         // Repli : les cles ne servent a rien au lancement direct, qui porte tout en arguments.
         NetplaySettings.EffacerLancement(logger);
-        return new Resultat(LancerDirectement(argumentsDirects, logger), false);
+        return new Resultat(LancerDirectement(argumentsDirects(), logger), false);
     }
 
     private static async Task<bool> LancerParEsAsync(

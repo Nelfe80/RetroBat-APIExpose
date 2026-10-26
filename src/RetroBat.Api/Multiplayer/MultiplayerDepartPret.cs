@@ -28,7 +28,7 @@ public sealed class CommandesRetroArchUdp : ICommandesRetroArch
         try
         {
             using var udp = new UdpClient();
-            var octets = Encoding.ASCII.GetBytes(commande);
+            var octets = Encoding.UTF8.GetBytes(commande);
             await udp.SendAsync(octets, octets.Length, "127.0.0.1", _port).WaitAsync(ct).ConfigureAwait(false);
             using var delai = CancellationTokenSource.CreateLinkedTokenSource(ct);
             delai.CancelAfter(delaiMs);
@@ -45,8 +45,9 @@ public sealed class CommandesRetroArchUdp : ICommandesRetroArch
     {
         try
         {
+            // En UTF-8 : un message a l'ecran (SHOW_MSG) porte des accents ; les commandes, elles, sont en ASCII.
             using var udp = new UdpClient();
-            var octets = Encoding.ASCII.GetBytes(commande);
+            var octets = Encoding.UTF8.GetBytes(commande);
             await udp.SendAsync(octets, octets.Length, "127.0.0.1", _port).WaitAsync(ct).ConfigureAwait(false);
         }
         catch (SocketException)

@@ -269,7 +269,7 @@ public sealed class NetplayGuestService
             _seancePlace = _place is null ? null : sessionId;
         }
         var lancement = await NetplayLaunch.LancerAsync(
-            rom, Arguments(resolution, rom, mode, infos.Value), _httpFactory, _logger, ct).ConfigureAwait(false);
+            rom, () => Arguments(resolution, rom, mode, infos.Value, EsManettes.PourLancer(_logger).Arguments), _httpFactory, _logger, ct).ConfigureAwait(false);
         if (!lancement.Ok)
         {
             MarquerRejointe(Role.Aucun);
@@ -579,10 +579,10 @@ public sealed class NetplayGuestService
     }
 
     /// <summary>Les arguments du lanceur pour rejoindre : le REPLI quand ES ne repond pas.</summary>
-    private static string Arguments(EsLaunchArguments.Resolution r, string rom, string mode, Infos infos)
+    private static string Arguments(EsLaunchArguments.Resolution r, string rom, string mode, Infos infos, string manettes)
         => string.Join(' ', new[]
         {
-            r.Manettes,
+            manettes,
             "-system", r.Systeme,
             "-emulator", r.Emulateur,
             "-core", r.Coeur,
