@@ -71,17 +71,19 @@ public sealed class MultiplayerClient
 
     /// <summary>L'hote annonce la fin de la partie.</summary>
     public Task<MultiplayerReponse?> TerminerAsync(string room, string raison, int? dureeSecondes, CancellationToken ct, int? placeGagnante = null,
-        IReadOnlyDictionary<int, StatsDeLaPlace>? stats = null)
+        IReadOnlyDictionary<int, StatsDeLaPlace>? stats = null, object? mesures = null)
         => EnvoyerAsync("ended", new
         {
             room, reason = raison, duration_s = dureeSecondes, winner_seat = placeGagnante,
             stats = stats?.ToDictionary(p => p.Key.ToString(System.Globalization.CultureInfo.InvariantCulture),
                 p => new { hits = p.Value.Coups, kos = p.Value.KO, perfects = p.Value.Perfects, damage = p.Value.Degats }),
+            // Le format generique du lot 2 (profil, puis valeur et etat de chaque statistique) ; un site plus ancien l'ignore.
+            metrics = mesures,
         }, ct);
 
     /// <summary>NIVEAU NELFEPLAY : un invite rapporte la place gagnante qu'il a vue ; le resultat est valide s'il concorde avec l'hote.</summary>
-    public Task<MultiplayerReponse?> RapporterAsync(string room, int placeGagnante, CancellationToken ct)
-        => EnvoyerAsync("report", new { room, winner_seat = placeGagnante }, ct);
+    public Task<MultiplayerReponse?> RapporterAsync(string room, int placeGagnante, CancellationToken ct, object? mesures = null)
+        => EnvoyerAsync("report", new { room, winner_seat = placeGagnante, metrics = mesures }, ct);
 
     /// <summary>Un invite annule la rencontre : son bilan du wrapper montre une triche (22/10). La cote ne bouge pas.</summary>
     public Task<MultiplayerReponse?> AnnulerAsync(string room, string motif, CancellationToken ct)
@@ -452,9 +454,42 @@ public sealed record MultiplayerFin
     [JsonPropertyName("stats")]
     public IReadOnlyDictionary<string, MultiplayerStatsPlace>? Stats { get; init; }
 
+    /// <summary>Les trois statistiques de chaque place selon le profil du jeu (lot 2), mesurees chez l'hote.</summary>
+    [JsonPropertyName("metrics")]
+    public MultiplayerMesuresDuSite? Metrics { get; init; }
+
     /// <summary>La place qui a quitte la rencontre avant sa fin (<c>result</c> vaut alors <c>abandoned</c>).</summary>
     [JsonPropertyName("abandoned_seat")]
     public int? AbandonedSeat { get; init; }
+}
+
+/// <summary>Les statistiques d'une rencontre selon un profil : le profil, puis par place, chaque statistique par son id.</summary>
+public sealed record MultiplayerMesuresDuSite
+{
+    [JsonPropertyName("profile")]
+    public MultiplayerProfilDuSite? Profile { get; init; }
+
+    [JsonPropertyName("seats")]
+    public IReadOnlyDictionary<string, IReadOnlyDictionary<string, MultiplayerMesureDuSite>>? Seats { get; init; }
+}
+
+public sealed record MultiplayerProfilDuSite
+{
+    [JsonPropertyName("id")]
+    public string Id { get; init; } = string.Empty;
+
+    [JsonPropertyName("version")]
+    public int Version { get; init; }
+}
+
+public sealed record MultiplayerMesureDuSite
+{
+    [JsonPropertyName("value")]
+    public double? Value { get; init; }
+
+    /// <summary><c>measured</c>, <c>zero</c>, <c>unavailable</c>.</summary>
+    [JsonPropertyName("state")]
+    public string? State { get; init; }
 }
 
 public sealed record MultiplayerStatsPlace

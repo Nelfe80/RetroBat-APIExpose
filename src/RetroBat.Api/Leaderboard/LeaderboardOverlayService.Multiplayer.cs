@@ -821,11 +821,15 @@ public sealed partial class LeaderboardOverlayService
             if (j.Stats is { Count: > 0 } stats)
             {
                 using var policeValeur = new Font(gras.FontFamily, gras.Size * 0.95f, FontStyle.Bold, gras.Unit);
-                hauteur += taille * 0.45f + (stats.Count + 1) / 2 * (H(petite) + H(policeValeur) + taille * 0.25f);
+                var colonnes = ColonnesDesStats(stats.Count);
+                hauteur += taille * 0.45f + (stats.Count + colonnes - 1) / colonnes * (H(petite) + H(policeValeur) + taille * 0.25f);
             }
 
             return hauteur + pad;
         }
+
+        /// <summary>Les trois statistiques d'un profil (Execution, Efficacite, Maitrise) tiennent sur une rangee ; sinon deux par rangee.</summary>
+        private static int ColonnesDesStats(int nombre) => nombre == 3 ? 3 : 2;
 
         private void DessinerUneCarteDeJoueur(Graphics g, JoueurMultiplayer j, EsMenuStyle s, Font gras, Font petite, float taille, RectangleF zone, float cote, bool choisie)
         {
@@ -939,7 +943,7 @@ public sealed partial class LeaderboardOverlayService
                 }
             }
 
-            // Au resultat : les statistiques, deux par rangee, sous un trait fin.
+            // Au resultat : les statistiques sous un trait fin, deux par rangee ; les trois d'un profil sur une seule.
             if (j.Stats is { Count: > 0 } stats && y + hauteurPetite * 2.4f <= limite)
             {
                 using (var trait = new Pen(choisie ? Teinte(s.SelectedTextColor, 120) : Teinte(s.GroupColor, 90), 1f))
@@ -948,18 +952,19 @@ public sealed partial class LeaderboardOverlayService
                 }
 
                 y += taille * 0.45f;
-                var demi = largeur / 2f;
+                var colonnes = ColonnesDesStats(stats.Count);
+                var demi = largeur / colonnes;
                 using var policeValeur = new Font(gras.FontFamily, gras.Size * 0.95f, FontStyle.Bold, gras.Unit);
                 var hValeur = g.MeasureString("Ag", policeValeur, PointF.Empty, StringFormat.GenericTypographic).Height;
                 for (var k = 0; k < stats.Count; k++)
                 {
-                    var rangee = y + k / 2 * (hauteurPetite + hValeur + taille * 0.25f);
+                    var rangee = y + k / colonnes * (hauteurPetite + hValeur + taille * 0.25f);
                     if (rangee + hauteurPetite + hValeur > limite)
                     {
                         break;
                     }
 
-                    var case_ = new RectangleF(zone.X + pad + k % 2 * demi, rangee, demi, hauteurPetite + hValeur);
+                    var case_ = new RectangleF(zone.X + pad + k % colonnes * demi, rangee, demi, hauteurPetite + hValeur);
                     using var pale = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : Teinte(s.GroupColor, alpha));
                     using var clair = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TitleColor, alpha));
                     g.DrawString(stats[k].Libelle, petite, pale, new RectangleF(case_.X, case_.Y, demi, hauteurPetite * 1.2f), centre);

@@ -365,6 +365,14 @@ public class MultiplayerCollectionSyncTests : IDisposable
             Assert.True(File.Exists(fichier), depart.State);
             Assert.Equal(depart.Sha256.Trim().ToUpperInvariant(), Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(fichier))));
         });
+
+        // Chaque profil de statistiques cite est livre et valide : sinon le jeu retomberait sur son bloc de vie sans le dire.
+        Assert.All(catalogue.Games.Where(jeu => jeu.Stats?.Profile is not null), jeu =>
+        {
+            var profil = MultiplayerStatsProfil.Charger(jeu.Stats!.Profile!, dossier, out var refus);
+            Assert.True(profil is not null, jeu.Id + " : " + refus);
+            Assert.Equal(jeu.Players, profil!.Players);
+        });
     }
 
     [Theory]

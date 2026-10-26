@@ -585,6 +585,13 @@ public sealed record MultiplayerStats
 {
     [JsonPropertyName("life")]
     public MultiplayerStatLife? Life { get; init; }
+
+    /// <summary>
+    /// LE PROFIL DE STATISTIQUES du jeu (lot 2 du CDC des statistiques), relatif au dossier du catalogue, sous
+    /// <c>stats/</c> (<c>stats/arcade/sf2ce.json</c>). Une API plus ancienne l'ignore et garde <see cref="Life"/>.
+    /// </summary>
+    [JsonPropertyName("profile")]
+    public string? Profile { get; init; }
 }
 
 public sealed record MultiplayerStatLife

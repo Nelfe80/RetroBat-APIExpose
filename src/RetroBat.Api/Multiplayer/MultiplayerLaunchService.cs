@@ -43,13 +43,13 @@ public sealed class MultiplayerLaunchService : IHostedService
     private readonly HashSet<string> _lancees = new(StringComparer.Ordinal);
     private readonly MultiplayerDepartPret _depart;
     private readonly MultiplayerFinDeRencontre _fin;
-    private readonly MultiplayerStatsDuDuel _statsDuDuel;
+    private readonly MultiplayerStatsMoteur _moteurDesStats;
 
-    /// <summary>Le suivi des statistiques du duel en cours chez l'hote ; il rend ce qu'il a vu quand le guet s'arrete.</summary>
-    private Task<IReadOnlyDictionary<int, StatsDeLaPlace>>? _suiviDesStats;
+    /// <summary>Le suivi des statistiques de la rencontre chez l'hote (profil du jeu) ; il rend ce qu'il a vu quand le guet s'arrete.</summary>
+    private MultiplayerStatsSuivi? _suiviDesStats;
 
-    /// <summary>Le meme suivi chez l'invite, pour son ecran de fin.</summary>
-    private Task<IReadOnlyDictionary<int, StatsDeLaPlace>>? _suiviDesStatsInvite;
+    /// <summary>Le meme suivi chez l'invite, pour son ecran de fin et son rapport.</summary>
+    private MultiplayerStatsSuivi? _suiviDesStatsInvite;
     private string? _enCours;
 
     /// <summary>Le guet de la fin d'une rencontre NelfePlay, et la place gagnante qu'il a vue.</summary>
@@ -83,7 +83,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         _bilans = new MultiplayerBilanDuWrapper(bus);
         _depart = new MultiplayerDepartPret(new CommandesRetroArchUdp());
         _fin = new MultiplayerFinDeRencontre(new CommandesRetroArchUdp());
-        _statsDuDuel = new MultiplayerStatsDuDuel(new CommandesRetroArchUdp());
+        _moteurDesStats = new MultiplayerStatsMoteur(new CommandesRetroArchUdp());
     }
 
     private static string RacineRetroArch => Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch");
@@ -187,7 +187,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
             RetirerLEtatPose();
             int? vainqueur;
-            Task<IReadOnlyDictionary<int, StatsDeLaPlace>>? suivi;
+            MultiplayerStatsSuivi? suivi;
             lock (_verrou)
             {
                 _guet?.Cancel();
@@ -198,7 +198,8 @@ public sealed class MultiplayerLaunchService : IHostedService
                 _suiviDesStats = null;
             }
 
-            var stats = suivi is null ? null : await suivi.ConfigureAwait(false);
+            var mesures = suivi is null ? null : await suivi.Fin.ConfigureAwait(false);
+            var stats = mesures?.AncienDesPlaces();
             // Le depart pret charge un etat chez l'hote : c'est le seul chargement permis.
             if (await JugerLeBilanAsync(room, jeu.Game, partie.Debut, DepartDeLaRoom(room, jeu) is null ? 0 : 1).ConfigureAwait(false) is { } motif)
             {
@@ -207,10 +208,10 @@ public sealed class MultiplayerLaunchService : IHostedService
             else
             {
                 await _client.TerminerAsync(room.Room, vainqueur is null ? "game_closed" : "match_over", duree, CancellationToken.None, vainqueur,
-                    vainqueur is null ? null : stats).ConfigureAwait(false);
+                    vainqueur is null ? null : stats, vainqueur is null ? null : mesures?.PourLeSite()).ConfigureAwait(false);
             }
 
-            _panneau.MontrerLeResultat(room.Room, duree, stats);
+            _panneau.MontrerLeResultat(room.Room, duree, stats, mesures);
         }
         catch (Exception ex)
         {
@@ -322,11 +323,11 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
 
         var places = room.Players.Where(joueur => joueur.Seat is not null).Select(joueur => joueur.Seat!.Value).Distinct().ToList();
-        if (jeu.Stats?.Life is not null)
+        if (ProfilDesStats(jeu) is { } profil)
         {
             lock (_verrou)
             {
-                _suiviDesStats = _statsDuDuel.SuivreAsync(jeu, places, jeton);
+                _suiviDesStats = _moteurDesStats.Suivre(profil, places, jeton);
             }
         }
 
@@ -369,11 +370,13 @@ public sealed class MultiplayerLaunchService : IHostedService
             var places = room.Players.Where(joueur => joueur.Seat is not null).Select(joueur => joueur.Seat!.Value).Distinct().ToList();
             // L'invite joue la meme partie : il compte les memes coups que l'hote, pour son propre ecran de fin (l'hote
             // d'une version plus ancienne n'en envoie pas, et celui qui part avant la fin n'envoie rien).
-            if (jeu.Stats?.Life is not null)
+            MultiplayerStatsSuivi? suiviInvite = null;
+            if (ProfilDesStats(jeu) is { } profil)
             {
+                suiviInvite = _moteurDesStats.Suivre(profil, places, ct);
                 lock (_verrou)
                 {
-                    _suiviDesStatsInvite = _statsDuDuel.SuivreAsync(jeu, places, ct);
+                    _suiviDesStatsInvite = suiviInvite;
                 }
             }
 
@@ -383,7 +386,9 @@ public sealed class MultiplayerLaunchService : IHostedService
                 return;
             }
 
-            var reponse = await _client.RapporterAsync(room.Room, vainqueur.Value, CancellationToken.None).ConfigureAwait(false);
+            // Ses statistiques partent avec son rapport : le site les compare a celles de l'hote (ecart journalise, sans suite en V1).
+            var reponse = await _client.RapporterAsync(room.Room, vainqueur.Value, CancellationToken.None,
+                suiviInvite?.Instantane().PourLeSite()).ConfigureAwait(false);
             _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} vue finie chez l'invite, place {Place} rapportee ({Statut})",
                 jeu.Id, vainqueur, reponse?.Ok == true ? "ok" : reponse?.Reason ?? "injoignable");
             // Le noir monte en meme temps que chez l'hote, qui ferme le jeu au meme delai (retour du user du 23/10).
@@ -393,6 +398,17 @@ public sealed class MultiplayerLaunchService : IHostedService
         catch (OperationCanceledException)
         {
         }
+    }
+
+    /// <summary>Le profil de statistiques du jeu (son fichier, sinon son bloc <c>stats.life</c>), ou null : rien a mesurer.</summary>
+    private MultiplayerStatsProfil? ProfilDesStats(MultiplayerGame jeu)
+    {
+        var profil = MultiplayerStatsProfil.Pour(jeu, out var erreur);
+        if (erreur is not null)
+        {
+            _journal.LogWarning("MULTIPLAYER : profil de statistiques de {Jeu} refuse ({Erreur}), repli sur son bloc de vie", jeu.Id, erreur);
+        }
+        return profil;
     }
 
     /// <summary>Le nombre de joueurs de la partie, celui des options du coeur (Lancer) : l'etat a autant de consoles que lui.</summary>
@@ -509,7 +525,7 @@ public sealed class MultiplayerLaunchService : IHostedService
 
             // En Classique, la partie finit quand tous les invites sont partis : la plateforme doit le savoir.
             await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
-            Task<IReadOnlyDictionary<int, StatsDeLaPlace>>? suiviInvite;
+            MultiplayerStatsSuivi? suiviInvite;
             lock (_verrou)
             {
                 suiviInvite = _suiviDesStatsInvite;
@@ -517,8 +533,8 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
 
             guetInvite.Cancel();
-            var statsInvite = suiviInvite is null ? null : await suiviInvite.ConfigureAwait(false);
-            _panneau.MontrerLeResultat(room.Room, duree, statsInvite);
+            var mesuresInvite = suiviInvite is null ? null : await suiviInvite.Fin.ConfigureAwait(false);
+            _panneau.MontrerLeResultat(room.Room, duree, mesuresInvite?.AncienDesPlaces(), mesuresInvite);
         }
         catch (Exception ex)
         {

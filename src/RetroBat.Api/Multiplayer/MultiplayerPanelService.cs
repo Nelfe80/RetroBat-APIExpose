@@ -80,6 +80,9 @@ public sealed class MultiplayerPanelService
     /// <summary>Les statistiques que cette borne a vues pendant la rencontre : l'ecran de fin s'en sert sans celles du site.</summary>
     private IReadOnlyDictionary<int, StatsDeLaPlace>? _statsVues;
 
+    /// <summary>Les statistiques du profil du jeu (lot 2) que cette borne a mesurees : l'ecran de fin s'en sert sans celles du site.</summary>
+    private MultiplayerStatsResultat? _mesuresVues;
+
     /// <summary>Les statistiques d'une rencontre finie : celles de la plateforme (l'hote), sinon celles vues ici.</summary>
     private IReadOnlyDictionary<string, MultiplayerStatsPlace>? StatsDeLaRencontre(MultiplayerRoom? room)
         => room?.Ended?.Stats is { Count: > 0 } envoyees ? envoyees
@@ -545,11 +548,13 @@ public sealed class MultiplayerPanelService
     /// Apres la partie, l'ecran de resultat (V24-17, 00quater.10) : au niveau Classique, les joueurs et la
     /// duree. Il se ferme de lui-meme au bout de 12 s ; A maintenu relance le meme jeu.
     /// </summary>
-    public void MontrerLeResultat(string room, int? dureeSecondes, IReadOnlyDictionary<int, StatsDeLaPlace>? statsVues = null)
+    public void MontrerLeResultat(string room, int? dureeSecondes, IReadOnlyDictionary<int, StatsDeLaPlace>? statsVues = null,
+        MultiplayerStatsResultat? mesuresVues = null)
     {
         lock (_verrou)
         {
             _statsVues = statsVues;
+            _mesuresVues = mesuresVues;
         }
 
         _ = Task.Run(async () =>
@@ -1537,9 +1542,17 @@ public sealed class MultiplayerPanelService
         Rafraichir();
     }
 
-    /// <summary>Les statistiques d'une place au resultat (ecran 10) : coups reussis, K.O., perfects, degats infliges.</summary>
+    /// <summary>
+    /// Les statistiques d'une place au resultat (ecran 10) : les trois du profil du jeu (Execution, Efficacite, Maitrise),
+    /// celles de la plateforme (l'hote) d'abord, sinon celles vues ici ; a defaut, les quatre compteurs d'avant les profils.
+    /// </summary>
     private IReadOnlyList<LeaderboardOverlayService.StatDuJoueur>? StatsDe(MultiplayerRoom? room, int? place, Func<string, string> T)
     {
+        if (place is not null && MesuresDe(room, place.Value, T) is { } mesures)
+        {
+            return mesures;
+        }
+
         if (place is null || StatsDeLaRencontre(room) is not { } stats
             || !stats.TryGetValue(place.Value.ToString(CultureInfo.InvariantCulture), out var s))
         {
@@ -1552,6 +1565,40 @@ public sealed class MultiplayerPanelService
             new(T("multiplayer.stat.hits"), N(s.Hits)), new(T("multiplayer.stat.kos"), N(s.Kos)),
             new(T("multiplayer.stat.perfects"), N(s.Perfects)), new(T("multiplayer.stat.damage"), N(s.Damage)),
         ];
+    }
+
+    /// <summary>
+    /// Les trois statistiques du profil pour une place, ou null sans profil ni mesure. Celles du site ne valent que pour le
+    /// profil que cette borne connait (meme identifiant) : un autre profil se lirait de travers.
+    /// </summary>
+    private IReadOnlyList<LeaderboardOverlayService.StatDuJoueur>? MesuresDe(MultiplayerRoom? room, int place, Func<string, string> T)
+    {
+        var profil = _mesuresVues?.Profil ?? (_jeu?.Game is { } jeu ? MultiplayerStatsProfil.Pour(jeu, out _) : null);
+        if (profil is null)
+        {
+            return null;
+        }
+
+        var cle = place.ToString(CultureInfo.InvariantCulture);
+        IReadOnlyList<(MultiplayerStatsMesure Mesure, long? Valeur, string Etat)>? valeurs = null;
+        if (room?.Ended?.Metrics is { Seats: { } sieges } envoyees && envoyees.Profile?.Id == profil.Id && sieges.TryGetValue(cle, out var parId))
+        {
+            valeurs = profil.Metrics.Select(m => parId.TryGetValue(m.Id, out var v) && v.State is MultiplayerStatsValeur.Mesuree or MultiplayerStatsValeur.Zero
+                    ? (m, v.Value is { } d ? (long?) Math.Round(d) : null, v.State)
+                    : (m, (long?) null, MultiplayerStatsValeur.Indisponible))
+                .ToList();
+        }
+        else if (_mesuresVues is { } vues && vues.Compteurs.ContainsKey(place))
+        {
+            valeurs = vues.MesuresDe(place).Select(v => (v.Mesure, v.Valeur, v.Etat)).ToList();
+        }
+
+        return valeurs?.Select(v => new LeaderboardOverlayService.StatDuJoueur(
+                T("multiplayer.stat.category." + v.Mesure.Category),
+                v.Etat == MultiplayerStatsValeur.Indisponible || v.Valeur is null
+                    ? T("multiplayer.stat.unmeasured")
+                    : v.Valeur.Value.ToString(CultureInfo.InvariantCulture) + " " + T(v.Mesure.Label).ToLowerInvariant()))
+            .ToList();
     }
 
     /// <summary>NIVEAU NELFEPLAY : le nom du personnage de ce joueur (le premier choix du catalogue), ou rien.</summary>

@@ -524,125 +524,26 @@ public sealed class MultiplayerFinDeRencontre
 public sealed record StatsDeLaPlace(int Coups, int KO, int Perfects, int Degats);
 
 /// <summary>
-/// LES STATISTIQUES D'UN DUEL, suivies chez l'hote pendant la rencontre (00quater.3, ecran 10) : la vie des deux places,
-/// lue une douzaine de fois par seconde, et leurs compteurs de manches. Une baisse de la vie adverse est un coup reussi
-/// (un combo en compte plusieurs, les degats de garde aussi), un passage a la valeur du K.O. un K.O., une manche gagnee
-/// avec la vie pleine un perfect. Une lecture manquee ne compte rien : on ne devine pas.
+/// LES STATISTIQUES D'UN DUEL d'avant les profils (00quater.3, ecran 10) : coups, K.O., perfects et degats de chaque place.
+/// Depuis le lot 2 du CDC des statistiques, c'est le profil IMPLICITE du jeu (son bloc <c>stats.life</c>) que suit
+/// <see cref="MultiplayerStatsMoteur"/> : memes regles, memes chiffres. Garde pour le banc et les essais.
 /// </summary>
 public sealed class MultiplayerStatsDuDuel
 {
-    private readonly ICommandesRetroArch _commandes;
-    private readonly TimeSpan _periode;
+    private readonly MultiplayerStatsMoteur _moteur;
 
     public MultiplayerStatsDuDuel(ICommandesRetroArch commandes, TimeSpan? periode = null)
-    {
-        _commandes = commandes;
-        _periode = periode ?? TimeSpan.FromMilliseconds(80);
-    }
+        => _moteur = new MultiplayerStatsMoteur(commandes, periode);
 
     /// <summary>Suit le duel jusqu'a l'annulation (la fin de la partie), puis rend les statistiques de chaque place.</summary>
     public async Task<IReadOnlyDictionary<int, StatsDeLaPlace>> SuivreAsync(MultiplayerGame jeu, IReadOnlyList<int> places, CancellationToken ct)
     {
-        var vie = jeu.Stats?.Life;
-        var resultat = places.ToDictionary(p => p, _ => new int[4]);   // coups, K.O., perfects, degats
-        if (vie is null || places.Count != 2)
+        if (MultiplayerStatsProfil.Implicite(jeu) is not { } profil || places.Count != 2)
         {
-            return Rendre(resultat);
+            return places.ToDictionary(p => p, _ => new StatsDeLaPlace(0, 0, 0, 0));
         }
 
-        var avant = new Dictionary<int, int?>();          // la derniere vie CONFIRMEE (lue deux fois de suite)
-        var brut = new Dictionary<int, int?>();           // la derniere lecture, confirmee ou non
-        var manchesAvant = new Dictionary<int, int?>();
-        try
-        {
-            while (!ct.IsCancellationRequested)
-            {
-                var vies = new Dictionary<int, int?>();
-                var manches = new Dictionary<int, int?>();
-                foreach (var place in places)
-                {
-                    vies[place] = await LireAsync(vie.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage, vie.Bytes, ct).ConfigureAwait(false);
-                    manches[place] = await LireAsync(jeu.End?.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage, 1, ct).ConfigureAwait(false);
-                }
-
-                // Une vie n'est retenue que lue deux fois de suite : une lecture au vol (le jeu remet la vie a zero entre
-                // deux manches, octet par octet) ne compte pas un coup fantome.
-                var confirmees = new Dictionary<int, int?>();
-                foreach (var place in places)
-                {
-                    confirmees[place] = vies[place] is { } lue && lue == brut.GetValueOrDefault(place) ? lue : null;
-                    brut[place] = vies[place];
-                }
-
-                foreach (var place in places)
-                {
-                    var adversaire = places.First(p => p != place);
-                    if (avant.GetValueOrDefault(place) is { } precedente && confirmees[place] is { } actuelle && actuelle != precedente && precedente != vie.Ko)
-                    {
-                        if (actuelle == vie.Ko)
-                        {
-                            resultat[adversaire][0]++;
-                            resultat[adversaire][1]++;
-                            resultat[adversaire][3] += Math.Clamp(precedente, 0, vie.Full);
-                        }
-                        else if (actuelle < precedente)
-                        {
-                            resultat[adversaire][0]++;
-                            resultat[adversaire][3] += precedente - actuelle;
-                        }
-                    }
-
-                    // Une manche gagnee, la vie pleine : un perfect.
-                    if (manchesAvant.GetValueOrDefault(place) is { } m && manches[place] is { } n && n == m + 1 && (confirmees[place] ?? avant.GetValueOrDefault(place)) == vie.Full)
-                    {
-                        resultat[place][2]++;
-                    }
-                }
-
-                foreach (var place in places)
-                {
-                    avant[place] = confirmees[place] ?? avant.GetValueOrDefault(place);
-                    manchesAvant[place] = manches[place] ?? manchesAvant.GetValueOrDefault(place);
-                }
-
-                await Task.Delay(_periode, ct).ConfigureAwait(false);
-            }
-        }
-        catch (OperationCanceledException)
-        {
-        }
-
-        return Rendre(resultat);
-    }
-
-    private static IReadOnlyDictionary<int, StatsDeLaPlace> Rendre(Dictionary<int, int[]> brut)
-        => brut.ToDictionary(paire => paire.Key, paire => new StatsDeLaPlace(paire.Value[0], paire.Value[1], paire.Value[2], paire.Value[3]));
-
-    private async Task<int?> LireAsync(long? decalage, int octets, CancellationToken ct)
-    {
-        if (decalage is null)
-        {
-            return null;
-        }
-
-        var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {decalage.Value:x} {octets}", ct).ConfigureAwait(false);
-        var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (morceaux is null || morceaux.Length < 2 + octets || morceaux[0] != "READ_CORE_RAM")
-        {
-            return null;
-        }
-
-        var valeur = 0;
-        for (var i = 0; i < octets; i++)
-        {
-            if (!int.TryParse(morceaux[2 + i], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var o))
-            {
-                return null;
-            }
-
-            valeur |= o << (8 * i);
-        }
-
-        return valeur;
+        var resultat = await _moteur.Suivre(profil, places, ct).Fin.ConfigureAwait(false);
+        return places.ToDictionary(p => p, resultat.Ancien);
     }
 }
