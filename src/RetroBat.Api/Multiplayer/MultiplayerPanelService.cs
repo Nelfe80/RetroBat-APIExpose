@@ -123,8 +123,10 @@ public sealed class MultiplayerPanelService
         RetroBat.Api.Avatar.AvatarSheetStore? planches = null,
         RetroBat.Api.Replay.Sharing.ReplayRelayService? relais = null,
         RetroAchievementsService? retroAchievements = null,
-        RetroBat.Domain.Interfaces.IEventBus? bus = null)
+        RetroBat.Domain.Interfaces.IEventBus? bus = null,
+        RetroBat.Domain.Interfaces.IEmulationStationNotificationService? notifications = null)
     {
+        _notifications = notifications;
         _planches = planches;
         _relaisDesPlanches = relais;
         _retroAchievements = retroAchievements;
@@ -138,6 +140,8 @@ public sealed class MultiplayerPanelService
         _contexte = contexte;
         _etatDesMedias = etatDesMedias;
         _session.Change += SurChangement;
+        _session.DansLaCollection = () => DansLaCollection && !EnJeu();
+        _session.Propositions += SurPropositions;
         // ES FERME, PLUS DE PANNEAU (2026-10-26, borne de falken) : le panneau reste ouvert quand il rend la main a ES ;
         // ES ferme, il restait sur le bureau jusqu'a l'arret de l'API. Il part avec ES, cartes comprises.
         _sortieDEs = bus?.Subscribe<RetroBat.Domain.Events.EventEnvelope>(e =>
@@ -222,6 +226,96 @@ public sealed class MultiplayerPanelService
             _classementOuvert = ouvert;
         }
         MettreAJourLeBandeau();
+    }
+
+    private readonly RetroBat.Domain.Interfaces.IEmulationStationNotificationService? _notifications;
+    private readonly HashSet<string> _propositionsVues = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Queue<string> _messagesAEnvoyer = new();
+    private DateTime _dernierMessageUtc = DateTime.MinValue;
+    private bool _envoiEnCours;
+    private static readonly TimeSpan EspacementDesMessages = TimeSpan.FromSeconds(3);
+
+    /// <summary>
+    /// « X PROPOSE DE JOUER A Y » (demande du user du 26/10) : un joueur que ce compte suit attend dans une gameroom, les
+    /// deux bornes montrent la collection MULTIPLAYER, et celle-ci a le meme jeu ET le meme contenu. Un message d'ES par
+    /// salle et par joueur, jamais plus d'un toutes les 3 s.
+    /// </summary>
+    private void SurPropositions(IReadOnlyList<MultiplayerProposition> propositions)
+    {
+        if (_notifications is null || !DansLaCollection || EnJeu())
+        {
+            return;
+        }
+
+        var langue = Langue();
+        lock (_verrou)
+        {
+            foreach (var proposition in propositions)
+            {
+                if (proposition.From is not { } de || !_propositionsVues.Add(proposition.Room + "|" + de.Handle)
+                    || _session.JeuCompatible(proposition.Game, proposition.Content) is not { } jeu)
+                {
+                    continue;
+                }
+
+                var message = _textes.Format("multiplayer.proposal", langue, ("player", de.Pseudo), ("game", jeu.Game.Name));
+                _messagesAEnvoyer.Enqueue(message.StartsWith("multiplayer.", StringComparison.Ordinal)
+                    ? de.Pseudo + " wants to play " + jeu.Game.Name
+                    : message);
+            }
+
+            if (_messagesAEnvoyer.Count == 0 || _envoiEnCours)
+            {
+                return;
+            }
+            _envoiEnCours = true;
+        }
+
+        _ = Task.Run(EnvoyerLesPropositionsAsync);
+    }
+
+    private async Task EnvoyerLesPropositionsAsync()
+    {
+        while (true)
+        {
+            TimeSpan attente;
+            lock (_verrou)
+            {
+                if (_messagesAEnvoyer.Count == 0)
+                {
+                    _envoiEnCours = false;
+                    return;
+                }
+                attente = _dernierMessageUtc + EspacementDesMessages - DateTime.UtcNow;
+            }
+
+            if (attente > TimeSpan.Zero)
+            {
+                await Task.Delay(attente).ConfigureAwait(false);
+            }
+
+            string message;
+            lock (_verrou)
+            {
+                message = _messagesAEnvoyer.Dequeue();
+                _dernierMessageUtc = DateTime.UtcNow;
+            }
+
+            // Sorti de la collection ou parti jouer entre-temps : le message n'a plus lieu d'etre.
+            if (!DansLaCollection || EnJeu())
+            {
+                continue;
+            }
+            try
+            {
+                await _notifications!.NotifyAsync(message).ConfigureAwait(false);
+                _journal.LogInformation("MULTIPLAYER : proposition annoncee dans ES ({Message})", message);
+            }
+            catch (Exception ex)
+            {
+                _journal.LogDebug(ex, "MULTIPLAYER : proposition non annoncee");
+            }
+        }
     }
 
     /// <summary>ES vient de se fermer : rien du MULTIPLAYER ne reste a l'ecran.</summary>

@@ -51,8 +51,8 @@ public sealed class MultiplayerClient
         => EnvoyerAsync("leave", new { room }, ct);
 
     /// <summary>Le sondage : presence, decompte, lancement, resultat, invitations.</summary>
-    public Task<MultiplayerReponse?> SonderAsync(bool appui, bool panneauOuvert, int? rttMs, CancellationToken ct)
-        => EnvoyerAsync("poll", new { input = appui, panel = panneauOuvert, rtt_ms = rttMs }, ct);
+    public Task<MultiplayerReponse?> SonderAsync(bool appui, bool panneauOuvert, int? rttMs, CancellationToken ct, bool dansLaCollection = false)
+        => EnvoyerAsync("poll", new { input = appui, panel = panneauOuvert, rtt_ms = rttMs, collection = dansLaCollection }, ct);
 
     /// <summary>L'hote publie sa session netplay.</summary>
     public Task<MultiplayerReponse?> PublierNetplayAsync(string room, MultiplayerSessionNetplay session, CancellationToken ct)
@@ -206,6 +206,10 @@ public sealed record MultiplayerReponse
 
     [JsonPropertyName("friends")]
     public IReadOnlyList<MultiplayerAmi> Friends { get; init; } = [];
+
+    /// <summary>Les joueurs suivis qui attendent dans une gameroom, quand les deux bornes montrent la collection.</summary>
+    [JsonPropertyName("proposals")]
+    public IReadOnlyList<MultiplayerProposition> Proposals { get; init; } = [];
 
     /// <summary>Le compteur d'abandons du joueur et sa suspension, rendus par le sondage.</summary>
     [JsonPropertyName("conduct")]
@@ -488,6 +492,25 @@ public sealed record MultiplayerInvitation
 
     [JsonPropertyName("expires_ms")]
     public int ExpiresMs { get; init; }
+}
+
+/// <summary>
+/// UNE PROPOSITION (demande du user du 26/10) : un joueur que ce compte suit a mis un jeu dans sa selection, et sa borne
+/// montre la collection MULTIPLAYER comme celle-ci. La borne la dit si elle a le meme jeu et le meme contenu.
+/// </summary>
+public sealed record MultiplayerProposition
+{
+    [JsonPropertyName("room")]
+    public string Room { get; init; } = string.Empty;
+
+    [JsonPropertyName("game")]
+    public string Game { get; init; } = string.Empty;
+
+    [JsonPropertyName("content")]
+    public string Content { get; init; } = string.Empty;
+
+    [JsonPropertyName("from")]
+    public MultiplayerJoueur? From { get; init; }
 }
 
 /// <summary>Un ami en ligne : <c>in_es</c>, <c>in_game</c>, <c>invited</c> ou <c>with_you</c>.</summary>

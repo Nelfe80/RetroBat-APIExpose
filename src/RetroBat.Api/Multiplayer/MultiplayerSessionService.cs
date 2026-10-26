@@ -25,6 +25,9 @@ public sealed class MultiplayerSessionService : BackgroundService
     private static readonly TimeSpan PeriodeActive = TimeSpan.FromSeconds(2);
     private static readonly TimeSpan PeriodeAuRepos = TimeSpan.FromSeconds(10);
 
+    /// <summary>Dans la collection MULTIPLAYER, sans salle : une proposition d'un joueur suivi arrive vite.</summary>
+    private static readonly TimeSpan PeriodeDansLaCollection = TimeSpan.FromSeconds(5);
+
     private readonly MultiplayerClient _client;
     private readonly MultiplayerCollectionSyncService _collection;
     private readonly NetplayRelayPicker? _relais;
@@ -82,6 +85,15 @@ public sealed class MultiplayerSessionService : BackgroundService
     /// <summary>Un changement d'etat, pour le panneau.</summary>
     public event Action<MultiplayerEtat>? Change;
 
+    /// <summary>Les propositions du dernier sondage (des joueurs suivis qui attendent), a trier par le panneau.</summary>
+    public event Action<IReadOnlyList<MultiplayerProposition>>? Propositions;
+
+    /// <summary>
+    /// La borne montre-t-elle la collection MULTIPLAYER, hors partie ? Pose par le panneau, dit a chaque sondage : la
+    /// plateforme ne propose un joueur, et ne propose a un joueur, que dans ce cas.
+    /// </summary>
+    public Func<bool>? DansLaCollection { get; set; }
+
     private bool Active => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: true };
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -95,7 +107,9 @@ public sealed class MultiplayerSessionService : BackgroundService
                     await SonderAsync(stoppingToken).ConfigureAwait(false);
                 }
 
-                var attente = Active && Etat.Occupe ? PeriodeActive : PeriodeAuRepos;
+                var attente = Active && Etat.Occupe ? PeriodeActive
+                    : Active && DansLaCollection?.Invoke() == true ? PeriodeDansLaCollection
+                    : PeriodeAuRepos;
                 using var lie = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, _reveil.Token);
                 try
                 {
@@ -286,6 +300,11 @@ public sealed class MultiplayerSessionService : BackgroundService
         => _collection.JeuxConnus().FirstOrDefault(jeu => jeu.Game.Id == room.Game
             && string.Equals(jeu.ContentKey, room.Content, StringComparison.OrdinalIgnoreCase));
 
+    /// <summary>Le jeu installe sur cette borne avec ce jeu ET ce contenu, ou null : rejoindre se desynchroniserait.</summary>
+    public MultiplayerInstalledGame? JeuCompatible(string jeu, string contenu)
+        => _collection.JeuxConnus().FirstOrDefault(installe => installe.Game.Id == jeu
+            && string.Equals(installe.ContentKey, contenu, StringComparison.OrdinalIgnoreCase));
+
     /// <summary>Le nom d'un jeu du catalogue, jamais traduit ; son identifiant s'il n'est pas sur cette borne.</summary>
     public string NomDuJeu(string id)
         => _collection.JeuxConnus().FirstOrDefault(jeu => jeu.Game.Id == id)?.Game.Name ?? id;
@@ -302,7 +321,7 @@ public sealed class MultiplayerSessionService : BackgroundService
         {
             var appui = _appui;
             _appui = false;
-            var reponse = await _client.SonderAsync(appui, PanneauOuvert, _relais?.MeilleurTempsMs, ct).ConfigureAwait(false);
+            var reponse = await _client.SonderAsync(appui, PanneauOuvert, _relais?.MeilleurTempsMs, ct, DansLaCollection?.Invoke() == true).ConfigureAwait(false);
             if (reponse is null || !reponse.Ok)
             {
                 // L'appui n'est pas perdu : il partira au sondage suivant.
@@ -313,6 +332,10 @@ public sealed class MultiplayerSessionService : BackgroundService
 
             Poser(new MultiplayerEtat(reponse.Rooms, reponse.Invitations, null, DateTime.UtcNow, reponse.Conduct,
                 reponse.Conduct is { SuspendedMs: > 0 } c ? DateTime.UtcNow.AddMilliseconds(c.SuspendedMs) : null));
+            if (reponse.Proposals.Count > 0)
+            {
+                Propositions?.Invoke(reponse.Proposals);
+            }
         }
         finally
         {
