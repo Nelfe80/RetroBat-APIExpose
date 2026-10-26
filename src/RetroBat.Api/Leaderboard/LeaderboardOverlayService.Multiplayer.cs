@@ -85,7 +85,8 @@ public sealed partial class LeaderboardOverlayService
         string BoutonOk = "",
         string GlypheOk = "",
         IReadOnlyList<JeuDeMaSelection>? MaSelection = null,
-        string TitreDeMaSelection = "");
+        string TitreDeMaSelection = "",
+        EcranDeFin? Fin = null);
 
     /// <summary>Un jeu de « Votre selection » : son nom, le compte de ses joueurs, et s'il est celui du panneau.</summary>
     public sealed record JeuDeMaSelection(string Nom, string Compte, bool Courant);
@@ -155,6 +156,13 @@ public sealed partial class LeaderboardOverlayService
             float taillePetite,
             float taillePied)
         {
+            // L'ecran de fin v2 (CDC Ecrans v1.0) ; l'ancien resultat plein ecran reste en secours.
+            if (c.PleinEcran && c.Fin is { } fin)
+            {
+                DessinerLEcranDeFin(g, fin, policeTitre);
+                return;
+            }
+
             if (c.PleinEcran)
             {
                 DessinerLeResultatPleinEcran(g, c, s, policeTitre, policeTexte, policePetite, policeGras, policePied,
@@ -1382,7 +1390,7 @@ public sealed partial class LeaderboardOverlayService
     /// sans borne devant soi). Aucune fenetre n'est montree. <paramref name="attente"/> dessine la presentation.
     /// </summary>
     internal static byte[] ApercuMultiplayer(EsMenuStyle style, ContenuMultiplayer contenu, string attente, string attenteTitre,
-        string attenteDetail, ILogger<LeaderboardOverlayService> logger)
+        string attenteDetail, ILogger<LeaderboardOverlayService> logger, double? temps = null)
     {
         byte[] png = [];
         Exception? erreur = null;
@@ -1394,6 +1402,7 @@ public sealed partial class LeaderboardOverlayService
                 service._style = style;
                 service._contenu = service._contenu with { Attente = attente, AttenteTitre = attenteTitre, AttenteDetail = attenteDetail };
                 service._multiplayer = contenu;
+                service._tempsDApercu = temps;
                 service._glyphes = new EsGlyphCache(style, logger);
                 service.ChargerLesPolices(style);
                 using var forme = new Panneau(service);

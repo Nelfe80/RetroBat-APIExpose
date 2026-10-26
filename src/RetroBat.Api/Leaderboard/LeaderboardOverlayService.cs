@@ -1905,6 +1905,12 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             {
                 _minuteur.Dispose();
                 _horlogeDuFondu.Dispose();
+                _imagesDeLaFin?.Dispose();
+                _fondDeFin?.Dispose();
+                foreach (var portrait in _portraits.Values)
+                {
+                    portrait?.Dispose();
+                }
             }
             base.Dispose(disposing);
         }

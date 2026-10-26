@@ -1431,6 +1431,10 @@ public sealed class MultiplayerPanelService
         var info = duree is { } secondes
             ? T("multiplayer.result.playtime") + " " + TimeSpan.FromSeconds(secondes).ToString(secondes >= 3600 ? @"h\:mm\:ss" : @"m\:ss", CultureInfo.InvariantCulture)
             : string.Empty;
+        var ecranDeFin = ComposerLEcranDeFin(finie, joueursDuResultat, gagnante, EloDe,
+            annulee || (classique && !classe) || (abandon is not null && maPlace is not null) ? titre : null, titre,
+            classique ? T("multiplayer.badge.classic") : string.Empty,
+            classique && !classe ? T("multiplayer.result.classic_note") : bandeauDuResultat, duree, T);
 
         return new LeaderboardOverlayService.ContenuMultiplayer(
             [titre],
@@ -1450,7 +1454,107 @@ public sealed class MultiplayerPanelService
             // En plein ecran, jusqu'a OK (retour du user du 23/10) : « OK » se lit dans toutes les langues.
             PleinEcran: true,
             BoutonOk: "OK",
-            GlypheOk: _glypheValider);
+            GlypheOk: _glypheValider,
+            Fin: ecranDeFin);
+    }
+
+    /// <summary>
+    /// L'ECRAN DE FIN v2 (CDC Ecrans v1.0) : le mot de fin du type (une rencontre annulee, un abandon ou une partie Classique
+    /// gardent le titre du resultat), le vainqueur d'abord, puis chaque joueur avec son personnage, sa lettre et sa cote
+    /// d'apres la rencontre, ses mesures, ses etoiles et sa distinction ; la jauge globale ; le fanart de ce jeu sur cette borne.
+    /// </summary>
+    private LeaderboardOverlayService.EcranDeFin ComposerLEcranDeFin(MultiplayerRoom? finie, IReadOnlyList<MultiplayerJoueur> joueurs, int? gagnante,
+        Func<int?, MultiplayerEvolution?> eloDe, string? titreImpose, string titre, string badge, string note, int? duree, Func<string, string> T)
+    {
+        var jeu = _jeu?.Game;
+        var maPlace = finie?.Players.FirstOrDefault(j => j.You)?.Seat;
+        var nul = gagnante == MultiplayerResultats.MatchNul;
+        var mot = titreImpose
+            ?? (nul ? T("multiplayer.end.draw")
+                : gagnante is not null && maPlace is not null ? T(maPlace == gagnante ? "multiplayer.end.victory" : "multiplayer.end.defeat")
+                : titre);
+        var vainqueur = nul ? null : gagnante;
+        var assis = joueurs.Where(j => j.Seat is not null)
+            .OrderBy(j => vainqueur is not null && j.Seat == vainqueur ? 0 : 1)
+            .ThenBy(j => j.Seat)
+            .ToList();
+        var (profil, valeurs) = ValeursDeLaRencontre(finie, assis.Select(j => j.Seat!.Value));
+        var calcul = profil is not null && valeurs.Count > 0 ? MultiplayerEcranDeFin.Calculer(profil, valeurs, vainqueur, T) : null;
+        var milliers = new NumberFormatInfo { NumberGroupSeparator = " ", NumberGroupSizes = [3] };
+        var rang = 0;
+        var fiches = assis.Select(j =>
+        {
+            var place = j.Seat!.Value;
+            var apres = eloDe(place);
+            var cote = apres?.After ?? j.Rating?.Value;
+            var ecart = apres is null ? 0 : (int)Math.Round(apres.After - apres.Before);
+            return new LeaderboardOverlayService.JoueurDeFin(
+                place,
+                j.Pseudo.Length > 0 ? j.Pseudo : j.Handle,
+                PersonnageDe(j),
+                PortraitDeJoueur(j),
+                cote is null ? string.Empty : j.Rating is { Provisional: true } ? "?" : MultiplayerCote.LettreDe(cote.Value),
+                cote is null ? string.Empty : Math.Round(cote.Value).ToString("#,0", milliers),
+                apres is null ? string.Empty : (ecart >= 0 ? "+" : "") + ecart.ToString(CultureInfo.InvariantCulture),
+                vainqueur == place,
+                vainqueur is null ? null : ++rang,
+                calcul?.Distinctions.GetValueOrDefault(place) ?? string.Empty,
+                calcul?.Mesures.GetValueOrDefault(place) ?? []);
+        }).ToList();
+
+        return new LeaderboardOverlayService.EcranDeFin(
+            _roomDuResultat,
+            StylesDesEcrans.TypeDe(jeu?.EloType, jeu?.Family),
+            mot,
+            jeu?.Name ?? string.Empty,
+            duree is { } s ? TimeSpan.FromSeconds(s).ToString(s >= 3600 ? @"h\:mm\:ss" : @"m\:ss", CultureInfo.InvariantCulture) : string.Empty,
+            FanartDuJeu(),
+            fiches,
+            calcul?.Jauge,
+            note,
+            badge,
+            new(T("multiplayer.end.over"), T("multiplayer.end.winner"), T("multiplayer.end.tagline"), T("multiplayer.end.hold"),
+                T("multiplayer.end.rematch"), T("multiplayer.end.quit")),
+            _glypheValider,
+            _glypheAnnuler);
+    }
+
+    private string? _cheminDuFanart;
+    private string? _fanart;
+
+    /// <summary>Le fanart du jeu sur cette borne, sinon sa capture : lu une fois par jeu dans son gamelist.</summary>
+    private string? FanartDuJeu()
+    {
+        var chemin = _jeu?.Path;
+        if (chemin != _cheminDuFanart)
+        {
+            _cheminDuFanart = chemin;
+            _fanart = RetroBat.Api.Media.MediaDuGamelist.Resoudre(chemin, "fanart", "image");
+        }
+
+        return _fanart;
+    }
+
+    /// <summary>Le profil des statistiques et les valeurs de chaque place qui en a.</summary>
+    private (MultiplayerStatsProfil? Profil, Dictionary<int, IReadOnlyList<MultiplayerEcranDeFin.ValeurDeFin>> Valeurs) ValeursDeLaRencontre(
+        MultiplayerRoom? room, IEnumerable<int> places)
+    {
+        var valeurs = new Dictionary<int, IReadOnlyList<MultiplayerEcranDeFin.ValeurDeFin>>();
+        var profil = _mesuresVues?.Profil ?? (_jeu?.Game is { } jeu ? MultiplayerStatsProfil.Pour(jeu, out _) : null);
+        if (profil is null)
+        {
+            return (null, valeurs);
+        }
+
+        foreach (var place in places)
+        {
+            if (ValeursDe(room, profil, place) is { } lues)
+            {
+                valeurs[place] = lues.Select(v => new MultiplayerEcranDeFin.ValeurDeFin(v.Mesure, v.Valeur, v.Etat)).ToList();
+            }
+        }
+
+        return (profil, valeurs);
     }
 
     /// <summary>La part des degats infliges par chaque place d'un duel, a leurs couleurs (P1 a gauche).</summary>
@@ -1579,26 +1683,35 @@ public sealed class MultiplayerPanelService
             return null;
         }
 
-        var cle = place.ToString(CultureInfo.InvariantCulture);
-        IReadOnlyList<(MultiplayerStatsMesure Mesure, long? Valeur, string Etat)>? valeurs = null;
-        if (room?.Ended?.Metrics is { Seats: { } sieges } envoyees && envoyees.Profile?.Id == profil.Id && sieges.TryGetValue(cle, out var parId))
-        {
-            valeurs = profil.Metrics.Select(m => parId.TryGetValue(m.Id, out var v) && v.State is MultiplayerStatsValeur.Mesuree or MultiplayerStatsValeur.Zero
-                    ? (m, v.Value is { } d ? (long?) Math.Round(d) : null, v.State)
-                    : (m, (long?) null, MultiplayerStatsValeur.Indisponible))
-                .ToList();
-        }
-        else if (_mesuresVues is { } vues && vues.Compteurs.ContainsKey(place))
-        {
-            valeurs = vues.MesuresDe(place).Select(v => (v.Mesure, v.Valeur, v.Etat)).ToList();
-        }
-
-        return valeurs?.Select(v => new LeaderboardOverlayService.StatDuJoueur(
+        return ValeursDe(room, profil, place)?.Select(v => new LeaderboardOverlayService.StatDuJoueur(
                 T("multiplayer.stat.category." + v.Mesure.Category),
                 v.Etat == MultiplayerStatsValeur.Indisponible || v.Valeur is null
                     ? T("multiplayer.stat.unmeasured")
                     : v.Valeur.Value.ToString(CultureInfo.InvariantCulture) + " " + T(v.Mesure.Label).ToLowerInvariant()))
             .ToList();
+    }
+
+    /// <summary>
+    /// Les valeurs du profil pour une place : celles de la plateforme (l'hote) si elles sont du meme profil, sinon celles vues
+    /// ici ; null sans mesure. Une valeur que la plateforme n'a pas eue reste non mesuree.
+    /// </summary>
+    private IReadOnlyList<(MultiplayerStatsMesure Mesure, long? Valeur, string Etat)>? ValeursDe(MultiplayerRoom? room, MultiplayerStatsProfil profil, int place)
+    {
+        var cle = place.ToString(CultureInfo.InvariantCulture);
+        if (room?.Ended?.Metrics is { Seats: { } sieges } envoyees && envoyees.Profile?.Id == profil.Id && sieges.TryGetValue(cle, out var parId))
+        {
+            return profil.Metrics.Select(m => parId.TryGetValue(m.Id, out var v) && v.State is MultiplayerStatsValeur.Mesuree or MultiplayerStatsValeur.Zero
+                    ? (m, v.Value is { } d ? (long?) Math.Round(d) : null, v.State)
+                    : (m, (long?) null, MultiplayerStatsValeur.Indisponible))
+                .ToList();
+        }
+
+        if (_mesuresVues is { } vues && vues.Compteurs.ContainsKey(place))
+        {
+            return vues.MesuresDe(place).Select(v => (v.Mesure, v.Valeur, v.Etat)).ToList();
+        }
+
+        return null;
     }
 
     /// <summary>NIVEAU NELFEPLAY : le nom du personnage de ce joueur (le premier choix du catalogue), ou rien.</summary>
