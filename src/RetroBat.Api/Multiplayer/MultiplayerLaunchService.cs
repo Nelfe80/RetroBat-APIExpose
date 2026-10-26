@@ -514,9 +514,11 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
 
             // RetroArch demande le mot de passe a l'ecran : la borne le tape. Si l'hote part, la partie se ferme.
+            var hoteParti = false;
             _ = Task.Run(() => RetroArchInvite.SuivreAsync(session.Relay, session.Port, session.PlayerPassword,
                 async () =>
                 {
+                    hoteParti = true;
                     _journal.LogInformation("MULTIPLAYER : l'hote de {Room} est parti, la partie se ferme", room.Room);
                     await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
                     await RetroArchInvite.FermerAsync().ConfigureAwait(false);
@@ -530,8 +532,9 @@ public sealed class MultiplayerLaunchService : IHostedService
                 await _client.AnnulerAsync(room.Room, motif, CancellationToken.None).ConfigureAwait(false);
             }
 
-            // En Classique, la partie finit quand tous les invites sont partis : la plateforme doit le savoir.
-            await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
+            // En Classique, la partie finit quand tous les invites sont partis : la plateforme doit le savoir. Parti derriere
+            // l'hote, cette borne le dit : elle parle parfois avant lui, et prenait alors l'abandon a sa place (26/10).
+            await _client.QuitterAsync(room.Room, CancellationToken.None, hoteParti ? "host_gone" : null).ConfigureAwait(false);
             MultiplayerStatsSuivi? suiviInvite;
             lock (_verrou)
             {

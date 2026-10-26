@@ -14,6 +14,7 @@ namespace RetroBat.Api.Tests;
 /// RetroAchievements (portraits des personnages). Sinon il passe sans rien faire.
 /// </summary>
 [SupportedOSPlatform("windows")]
+[Collection(PolicesPartagees.Nom)]
 public class MultiplayerApercusTests
 {
     private static readonly string? Sortie = Environment.GetEnvironmentVariable("NELFEPLAY_APERCUS");

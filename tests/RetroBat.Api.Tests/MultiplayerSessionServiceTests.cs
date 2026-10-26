@@ -137,6 +137,22 @@ public class MultiplayerSessionServiceTests : IDisposable
         Assert.True(plateforme.Tous("poll")[^1].GetProperty("input").GetBoolean());
     }
 
+    [Fact]
+    public async Task L_invite_parti_derriere_l_hote_le_dit_a_la_plateforme()
+    {
+        var plateforme = new Plateforme();
+        var client = new MultiplayerClient(new SansFabrique(), new NelfePlayDeviceStore(NullLogger<NelfePlayDeviceStore>.Instance),
+            clientDeTest: () => new HttpClient(plateforme) { BaseAddress = new Uri("https://nelfeplay.test") });
+
+        await client.QuitterAsync("r1", CancellationToken.None, "host_gone");
+        await client.QuitterAsync("r1", CancellationToken.None);
+
+        var departs = plateforme.Tous("leave");
+        // 26/10 : sa borne parlait parfois avant celle de l'hote, et il prenait l'abandon a sa place.
+        Assert.Equal("host_gone", departs[0].GetProperty("reason").GetString());
+        Assert.False(departs[1].TryGetProperty("reason", out _));
+    }
+
     /// <summary>NelfePlay en bouteille : une gameroom r1, et la trace des corps envoyes.</summary>
     private sealed class Plateforme(bool avecSession = false, bool enPanne = false) : HttpMessageHandler
     {

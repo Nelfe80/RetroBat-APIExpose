@@ -1349,7 +1349,9 @@ public sealed class MultiplayerPanelService
         // Classee (23/10) : une rencontre versus a fin lue, quel que soit le niveau ; sa cote et son vainqueur s'affichent.
         // Annulee sur le bilan du wrapper (22/10) : ni vainqueur, ni cote, ni ecart.
         var annulee = finie?.Ended?.Result == "void";
-        var classe = _jeu?.Game.EstClasse == true && !annulee;
+        // Non disputee (26/10) : un joueur n'a pas joue ; comme une rencontre annulee, ni vainqueur ni cote.
+        var nonDisputee = finie?.Ended?.Result == "unplayed";
+        var classe = _jeu?.Game.EstClasse == true && !annulee && !nonDisputee;
         // NIVEAU NELFEPLAY : la place gagnante lue chez l'hote (V24-16) ; le gagnant d'abord, une defaite presentee avec
         // le meme soin (00quater.3).
         var gagnante = classe ? finie?.Ended?.WinnerSeat : null;
@@ -1364,6 +1366,9 @@ public sealed class MultiplayerPanelService
             "pending" => T("multiplayer.result.pending"),
             "disputed" => T("multiplayer.result.disputed"),
             "void" => T("multiplayer.result.void_note"),
+            "unplayed" => T("multiplayer.result.unplayed_note"),
+            // Amicale (26/10) : une victoire deja comptee aujourd'hui contre cet adversaire ; le vainqueur reste montre.
+            "friendly" => T("multiplayer.result.friendly_note"),
             _ => string.Empty,
         };
         // En cartes, P1 reste a gauche ; en liste, le gagnant d'abord.
@@ -1412,6 +1417,7 @@ public sealed class MultiplayerPanelService
             .ToList();
         var maPlace = finie?.Players.FirstOrDefault(j => j.You)?.Seat;
         var titre = annulee ? T("multiplayer.result.void")
+            : nonDisputee ? T("multiplayer.result.unplayed")
             : classique && !classe ? T("multiplayer.result.classic")
             : abandon is not null && maPlace is not null ? T(maPlace == abandon ? "multiplayer.result.abandon" : "multiplayer.result.opponent_left")
             : gagnante == MultiplayerResultats.MatchNul ? T("multiplayer.result.draw")
@@ -1432,9 +1438,9 @@ public sealed class MultiplayerPanelService
             ? T("multiplayer.result.playtime") + " " + TimeSpan.FromSeconds(secondes).ToString(secondes >= 3600 ? @"h\:mm\:ss" : @"m\:ss", CultureInfo.InvariantCulture)
             : string.Empty;
         var ecranDeFin = ComposerLEcranDeFin(finie, joueursDuResultat, gagnante, EloDe,
-            annulee || (classique && !classe) || (abandon is not null && maPlace is not null) ? titre : null, titre,
+            annulee || nonDisputee || (classique && !classe) || (abandon is not null && maPlace is not null) ? titre : null, titre,
             classique ? T("multiplayer.badge.classic") : string.Empty,
-            classique && !classe ? T("multiplayer.result.classic_note") : bandeauDuResultat, duree, T);
+            classique && !classe && !annulee && !nonDisputee ? T("multiplayer.result.classic_note") : bandeauDuResultat, duree, T);
 
         return new LeaderboardOverlayService.ContenuMultiplayer(
             [titre],
@@ -1447,7 +1453,7 @@ public sealed class MultiplayerPanelService
             joueurs,
             -1,
             string.Empty,
-            classique && !classe ? T("multiplayer.result.classic_note") : bandeauDuResultat,
+            classique && !classe && !annulee && !nonDisputee ? T("multiplayer.result.classic_note") : bandeauDuResultat,
             [new(_glypheValider, T("multiplayer.help.replay")), new(_glypheAnnuler, T("multiplayer.help.close"))],
             PartageDesDegats: classe ? LePartage(finie, T) : null,
             Disposition: disposition,

@@ -13,6 +13,7 @@ namespace RetroBat.Api.Tests;
 /// Les apercus (PNG) ne se dessinent que si NELFEPLAY_APERCUS donne un dossier de sortie.
 /// </summary>
 [SupportedOSPlatform("windows")]
+[Collection(PolicesPartagees.Nom)]
 public class MultiplayerEcranDeFinTests
 {
     private static readonly MultiplayerStatsMesure Coups = new() { Category = "execution", Id = "coups", Label = "multiplayer.stat.hits" };

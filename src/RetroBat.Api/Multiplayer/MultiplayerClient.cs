@@ -47,8 +47,9 @@ public sealed class MultiplayerClient
         => EnvoyerAsync("choice", new { room, choices = choix }, ct);
 
     /// <summary>B maintenu : quitter cette gameroom.</summary>
-    public Task<MultiplayerReponse?> QuitterAsync(string room, CancellationToken ct)
-        => EnvoyerAsync("leave", new { room }, ct);
+    /// <param name="raison"><c>host_gone</c> : le jeu de cet invite s'est ferme parce que l'hote est parti, jamais un abandon (26/10).</param>
+    public Task<MultiplayerReponse?> QuitterAsync(string room, CancellationToken ct, string? raison = null)
+        => raison is null ? EnvoyerAsync("leave", new { room }, ct) : EnvoyerAsync("leave", new { room, reason = raison }, ct);
 
     /// <summary>Le sondage : presence, decompte, lancement, resultat, invitations.</summary>
     public Task<MultiplayerReponse?> SonderAsync(bool appui, bool panneauOuvert, int? rttMs, CancellationToken ct, bool dansLaCollection = false)

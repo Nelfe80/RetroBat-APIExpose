@@ -13,6 +13,7 @@ namespace RetroBat.Api.Tests;
 /// NELFEPLAY_APERCUS donne un dossier.
 /// </summary>
 [SupportedOSPlatform("windows")]
+[Collection(PolicesPartagees.Nom)]
 public class MultiplayerPanneauxEnJeuTests
 {
     private static readonly MultiplayerGame Sf2ce = new() { Id = "arcade/sf2ce", System = "arcade", Set = "sf2ce", Players = 2, Family = "duel", EloType = "combat" };
