@@ -150,6 +150,40 @@ public sealed record MultiplayerGame
     public IReadOnlyList<int>? SeatScreens { get; init; }
 
     /// <summary>
+    /// L'ECRAN PARTAGE (26/10, demande du user : « il ne faut afficher que la partie splitee qui concerne le joueur ») : un
+    /// jeu qui dessine la vue de chaque joueur dans une seule image (Super Mario Kart, GoldenEye 007, Herzog Zwei, Metal
+    /// Warriors). Chaque borne ne montre que le rectangle de sa place, a son format. Une vue peut ne valoir que pour un
+    /// nombre de joueurs (GoldenEye : deux bandes a deux, quatre quarts au-dela).
+    /// </summary>
+    [JsonPropertyName("views")]
+    public IReadOnlyList<MultiplayerView>? Views { get; init; }
+
+    /// <summary>Le format de l'image entiere sur l'ecran d'origine (4/3 pour une console de salon) : celui d'une vue s'en deduit.</summary>
+    [JsonPropertyName("frame_aspect")]
+    public double FrameAspect { get; init; } = 4.0 / 3.0;
+
+    /// <summary>
+    /// La version d'API a partir de laquelle le jeu entre dans la collection (« 1.9.97 ») : un jeu qui demande ce qu'une
+    /// API plus ancienne ne sait pas faire (une vue par place) n'y entre pas chez elle.
+    /// </summary>
+    [JsonPropertyName("min_api")]
+    public string? MinApi { get; init; }
+
+    /// <summary>La vue de cette place pour ce nombre de joueurs, ou null : la borne montre alors toute l'image.</summary>
+    public MultiplayerView? VueDeLaPlace(int place, int joueurs)
+        => Views?.FirstOrDefault(vue => vue.Seat == place && vue.Players == joueurs)
+           ?? Views?.FirstOrDefault(vue => vue.Seat == place && vue.Players is null);
+
+    /// <summary>Le format d'une vue : celui de l'image entiere, ramene a sa largeur et a sa hauteur.</summary>
+    public double FormatDeLaVue(MultiplayerView vue)
+        => (FrameAspect > 0 ? FrameAspect : 4.0 / 3.0) * vue.W / vue.H;
+
+    /// <summary>Cette API est-elle assez recente pour ce jeu ?</summary>
+    public bool AdmisPar(Version api)
+        => MinApi is not { Length: > 0 } minimum
+           || (Version.TryParse(minimum.Split('+')[0].Trim(), out var requise) && api >= requise);
+
+    /// <summary>
     /// NIVEAU NELFEPLAY : le depart pret (V24-15). Un etat que l'hote charge avant que les autres se connectent ;
     /// ils le recoivent avec la connexion (verifie le 22/10 sur Street Fighter II' CE, deux RetroArch).
     /// </summary>
@@ -251,6 +285,32 @@ public sealed record MultiplayerGame
         var parEcran = Math.Max(1, (int)Math.Ceiling(Math.Max(Players, 1) / (double)Screens));
         return Math.Clamp((Math.Max(place, 1) - 1) / parEcran + 1, 1, Screens);
     }
+}
+
+/// <summary>
+/// Le rectangle de l'image que voit une place, en fractions de l'image entiere (0 a 1) : x et y son coin haut gauche, w et h
+/// sa largeur et sa hauteur. Super Mario Kart a deux : place 1 { x 0, y 0, w 1, h 0,5 }, place 2 { x 0, y 0,5, w 1, h 0,5 }.
+/// </summary>
+public sealed record MultiplayerView
+{
+    [JsonPropertyName("seat")]
+    public int Seat { get; init; }
+
+    /// <summary>Le nombre de joueurs pour lequel cette vue vaut, ou null pour tous.</summary>
+    [JsonPropertyName("players")]
+    public int? Players { get; init; }
+
+    [JsonPropertyName("x")]
+    public double X { get; init; }
+
+    [JsonPropertyName("y")]
+    public double Y { get; init; }
+
+    [JsonPropertyName("w")]
+    public double W { get; init; } = 1;
+
+    [JsonPropertyName("h")]
+    public double H { get; init; } = 1;
 }
 
 public sealed record MultiplayerContent
@@ -873,9 +933,59 @@ public sealed class MultiplayerCatalogueStore
                 return jeu.Id + " : ecrans par place incoherents";
             }
 
+            if (ValiderLesVues(jeu) is { } vues)
+            {
+                return jeu.Id + " : " + vues;
+            }
+
             if (ValiderLeDepart(jeu) is { } depart)
             {
                 return jeu.Id + " : " + depart;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Chaque vue tient dans l'image et appartient a une place du jeu, et chaque place a la sienne : une place sans vue
+    /// verrait l'image entiere, donc l'ecran des autres.
+    /// </summary>
+    internal static string? ValiderLesVues(MultiplayerGame jeu)
+    {
+        if (jeu.Views is not { Count: > 0 } vues)
+        {
+            return null;
+        }
+
+        if (jeu.Screens > 1)
+        {
+            return "ecrans multiples et vues par place a la fois";
+        }
+
+        if (jeu.FrameAspect is <= 0 or > 8)
+        {
+            return "format d'image invalide";
+        }
+
+        const double Marge = 1e-6;
+        foreach (var vue in vues)
+        {
+            if (vue.Seat < 1 || vue.Seat > jeu.Players || vue.Players is < 1 || vue.Players > jeu.Players
+                || vue.W <= 0 || vue.H <= 0 || vue.X < 0 || vue.Y < 0 || vue.X + vue.W > 1 + Marge || vue.Y + vue.H > 1 + Marge)
+            {
+                return "vue de la place " + vue.Seat + " hors de l'image ou hors des places";
+            }
+        }
+
+        for (var joueurs = 2; joueurs <= jeu.Players; joueurs++)
+        {
+            for (var place = 1; place <= joueurs; place++)
+            {
+                if (jeu.VueDeLaPlace(place, joueurs) is null)
+                {
+                    return "la place " + place + " n'a pas de vue a " + joueurs + " joueurs";
+                }
             }
         }
 

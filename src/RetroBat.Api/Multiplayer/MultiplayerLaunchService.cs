@@ -547,7 +547,8 @@ public sealed class MultiplayerLaunchService : IHostedService
         // En netplay, chaque borne joue avec SON joueur 1 de RetroArch, quelle que soit sa place : si le panel n'y est pas,
         // ses commandes ne repondent pas (vu le 22/10 sur la seconde borne). Le journal dit donc qui est le joueur 1.
         _journal.LogInformation("MULTIPLAYER : manettes transmises au lanceur : {Manettes}", MultiplayerLaunchPlan.NomsDesManettes(manettes));
-        var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeu.Game, lancement.Seat, netplay);
+        var joueurs = Math.Max(2, lancement.Players);
+        var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeu.Game, lancement.Seat, netplay, joueurs);
         if (arguments is null)
         {
             _journal.LogWarning("MULTIPLAYER : lancement de {Jeu} refuse (systeme « {Systeme} », coeur « {Coeur} »)", jeu.Game.Id, systeme, coeur);
@@ -570,13 +571,25 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
         }
 
+        // L'ecran partage : la vue de cette place, a son format (« -ratio config » sur la ligne du lanceur).
+        var vue = jeu.Game.VueDeLaPlace(lancement.Seat, joueurs);
+        var reglagesDeLaPlace = new Dictionary<string, string>(MultiplayerLaunchPlan.Place(lancement.Seat), StringComparer.Ordinal);
+        if (vue is not null)
+        {
+            reglagesDeLaPlace["video_aspect_ratio"] = MultiplayerLaunchPlan.FormatPourRetroArch(jeu.Game, vue);
+        }
+
         var aRendre = new Dictionary<string, Dictionary<string, string?>>(StringComparer.OrdinalIgnoreCase)
         {
             [OptionsDesCoeurs] = optionsAvant,
-            [ConfigRetroArch] = RetroArchConfigEdit.Poser(ConfigRetroArch, MultiplayerLaunchPlan.Place(lancement.Seat)),
+            [ConfigRetroArch] = RetroArchConfigEdit.Poser(ConfigRetroArch, reglagesDeLaPlace),
         };
         RetroArchConfigEdit.Noter(Journal, aRendre);
-        if (jeu.Game.Screens > 1)
+        if (vue is not null)
+        {
+            PoserLesFichiersDeShader(MultiplayerLaunchPlan.FichiersDeLaVue(vue));
+        }
+        else if (jeu.Game.Screens > 1)
         {
             PoserLeShader(jeu.Game.EcranDeLaPlace(lancement.Seat), jeu.Game.Screens);
         }
@@ -766,13 +779,15 @@ public sealed class MultiplayerLaunchService : IHostedService
     }
 
     /// <summary>Le shader de recadrage, ecrit une fois sous les shaders de RetroBat (dossier nelfeplay).</summary>
-    private void PoserLeShader(int ecran, int ecrans)
+    private void PoserLeShader(int ecran, int ecrans) => PoserLesFichiersDeShader(MultiplayerLaunchPlan.FichiersDeShader(ecran, ecrans));
+
+    private void PoserLesFichiersDeShader(IReadOnlyDictionary<string, string> fichiers)
     {
         var dossier = Path.Combine(RetroBatPaths.RetroBatRoot, "system", "shaders", MultiplayerLaunchPlan.DossierShaders);
         try
         {
             Directory.CreateDirectory(dossier);
-            foreach (var (nom, contenu) in MultiplayerLaunchPlan.FichiersDeShader(ecran, ecrans))
+            foreach (var (nom, contenu) in fichiers)
             {
                 var chemin = Path.Combine(dossier, nom);
                 if (!File.Exists(chemin) || File.ReadAllText(chemin) != contenu)

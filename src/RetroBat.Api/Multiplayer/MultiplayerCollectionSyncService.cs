@@ -384,6 +384,10 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     /// Un fichier par jeu du catalogue que la borne possede, dans l'ordre du catalogue. Le jeu d'un coeur que NelfePlay livre
     /// (NGP Link, mGBA Splitscreen) attend que ce coeur soit pose : sans lui, RetroArch ne lancerait rien.
     /// </summary>
+    /// <summary>La version de cette API, pour <see cref="MultiplayerGame.MinApi"/> (« 1.9.97 », sans le suffixe de build).</summary>
+    internal Version VersionDeLApi { get; set; } =
+        Version.TryParse(ApiExposeVersion.Current.Split('+')[0], out var version) ? version : new Version(0, 0);
+
     internal IReadOnlyList<MultiplayerInstalledGame> Intersecter(MultiplayerCatalogue catalogue)
     {
         var inventaires = new Dictionary<string, IReadOnlyList<InstalledGame>>(StringComparer.OrdinalIgnoreCase);
@@ -391,7 +395,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         foreach (var jeu in catalogue.Games)
         {
             var coeur = catalogue.CoreOf(jeu);
-            if (!_coeurPose(coeur?.Core))
+            if (!_coeurPose(coeur?.Core) || !jeu.AdmisPar(VersionDeLApi))
             {
                 continue;
             }

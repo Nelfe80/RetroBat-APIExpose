@@ -69,16 +69,22 @@ public static class MultiplayerLaunchPlan
         return reglages;
     }
 
-    /// <summary>Le nom du shader qui ne montre que l'ecran de cette place, ou null pour un jeu a un seul ecran.</summary>
-    public static string? ShaderDeLaPlace(MultiplayerGame jeu, int place)
-        => jeu.Screens <= 1 ? null : $"{DossierShaders}/half-{jeu.EcranDeLaPlace(place)}-of-{jeu.Screens}";
+    /// <summary>
+    /// Le nom du shader qui ne montre que l'ecran de cette place (moniteurs cote a cote d'une borne d'origine) ou sa vue (ecran
+    /// partage d'un jeu de salon), ou null pour un jeu a un seul ecran.
+    /// </summary>
+    public static string? ShaderDeLaPlace(MultiplayerGame jeu, int place, int joueurs = 2)
+        => jeu.VueDeLaPlace(place, joueurs) is { } vue
+            ? $"{DossierShaders}/{NomDeLaVue(vue)}"
+            : jeu.Screens <= 1 ? null : $"{DossierShaders}/half-{jeu.EcranDeLaPlace(place)}-of-{jeu.Screens}";
 
     /// <summary>
     /// Les arguments du lanceur. <paramref name="netplay"/> est la partie netplay de la ligne,
     /// propre a l'hote ou a l'invite (<see cref="ArgumentsHote"/>, <see cref="ArgumentsInvite"/>).
     /// Null quand un nom n'est pas un nom (meme garde que le lancement a moteur impose).
     /// </summary>
-    public static string? Arguments(string manettes, string systeme, string coeur, string rom, MultiplayerGame jeu, int place, IEnumerable<string> netplay)
+    public static string? Arguments(string manettes, string systeme, string coeur, string rom, MultiplayerGame jeu, int place, IEnumerable<string> netplay,
+        int joueurs = 2)
     {
         if (!CommandsController.NomDeLanceur(systeme) || !CommandsController.NomDeLanceur(coeur))
         {
@@ -88,10 +94,13 @@ public static class MultiplayerLaunchPlan
         var morceaux = new List<string> { manettes, "-system", systeme, "-emulator", "libretro", "-core", coeur, "-retroachievements", "0" };
         morceaux.AddRange(ArgumentsDuTempsPartage);
         morceaux.AddRange(ArgumentsDuJeu(jeu));
-        if (ShaderDeLaPlace(jeu, place) is { } shader)
+        if (ShaderDeLaPlace(jeu, place, joueurs) is { } shader)
         {
-            // Un seul ecran, au format de la borne d'origine, sans habillage qui decalerait l'image.
-            morceaux.AddRange(["-shaderset", "none", "-shader", shader, "-ratio", "4/3", "-bezel", "none"]);
+            // Un seul ecran, au format de la borne d'origine, sans habillage qui decalerait l'image. Une vue d'ecran partage
+            // prend son propre format : « config » fait lire a RetroArch video_aspect_ratio, que l'API pose (le lanceur n'y
+            // touche pas), sinon la moitie d'un Herzog Zwei s'etirait au 4/3.
+            var format = jeu.VueDeLaPlace(place, joueurs) is null ? "4/3" : "config";
+            morceaux.AddRange(["-shaderset", "none", "-shader", shader, "-ratio", format, "-bezel", "none"]);
         }
 
         morceaux.AddRange(netplay);
@@ -207,13 +216,34 @@ public static class MultiplayerLaunchPlan
     /// (d3d11, vulkan, glcore) et en GLSL (pilote gl). Une seule passe, a la taille de l'affichage.
     /// </summary>
     public static IReadOnlyDictionary<string, string> FichiersDeShader(int ecran, int ecrans)
+        => Fichiers($"half-{ecran}-of-{ecrans}", $"seul l'ecran {ecran} sur {ecrans}", 1.0 / ecrans, (ecran - 1) / (double)ecrans, 1, 0);
+
+    /// <summary>Le nom du shader d'une vue : son rectangle en millieme de l'image (view-x-y-w-h).</summary>
+    public static string NomDeLaVue(MultiplayerView vue)
     {
-        var echelle = (1.0 / ecrans).ToString("0.000000", CultureInfo.InvariantCulture);
-        var decalage = ((ecran - 1) / (double)ecrans).ToString("0.000000", CultureInfo.InvariantCulture);
-        var nom = $"half-{ecran}-of-{ecrans}";
+        static string Millieme(double fraction) => ((int)Math.Round(fraction * 1000)).ToString("0000", CultureInfo.InvariantCulture);
+        return $"view-{Millieme(vue.X)}-{Millieme(vue.Y)}-{Millieme(vue.W)}-{Millieme(vue.H)}";
+    }
+
+    /// <summary>Le shader qui ne lit que le rectangle d'une vue (l'ecran partage d'un jeu de salon).</summary>
+    public static IReadOnlyDictionary<string, string> FichiersDeLaVue(MultiplayerView vue)
+        => Fichiers(NomDeLaVue(vue), "seule la vue " + NomDeLaVue(vue) + " de l'ecran partage", vue.W, vue.X, vue.H, vue.Y);
+
+    /// <summary>Le format a donner a RetroArch (video_aspect_ratio) pour une vue, ecrit a la decimale anglaise.</summary>
+    public static string FormatPourRetroArch(MultiplayerGame jeu, MultiplayerView vue)
+        => jeu.FormatDeLaVue(vue).ToString("0.000000", CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Le shader qui ne lit qu'un rectangle de l'image : largeur <paramref name="ex"/> a partir de <paramref name="ox"/>,
+    /// hauteur <paramref name="ey"/> a partir de <paramref name="oy"/>, en fractions. Slang et GLSL, une passe.
+    /// </summary>
+    private static IReadOnlyDictionary<string, string> Fichiers(string nom, string quoi, double ex, double ox, double ey, double oy)
+    {
+        static string F(double v) => v.ToString("0.000000", CultureInfo.InvariantCulture);
+        var (echelleX, decalageX, echelleY, decalageY) = (F(ex), F(ox), F(ey), F(oy));
         var slang = $$"""
             #version 450
-            // NelfePlay MULTIPLAYER : seul l'ecran {{ecran}} sur {{ecrans}}, celui de la place de cette borne.
+            // NelfePlay MULTIPLAYER : {{quoi}}, celui de la place de cette borne.
             layout(push_constant) uniform Push
             {
                vec4 SourceSize;
@@ -235,7 +265,7 @@ public static class MultiplayerLaunchPlan
             void main()
             {
                gl_Position = global.MVP * Position;
-               vTexCoord = vec2(TexCoord.x * {{echelle}} + {{decalage}}, TexCoord.y);
+               vTexCoord = vec2(TexCoord.x * {{echelleX}} + {{decalageX}}, TexCoord.y * {{echelleY}} + {{decalageY}});
             }
 
             #pragma stage fragment
@@ -249,7 +279,7 @@ public static class MultiplayerLaunchPlan
             }
             """;
         var glsl = $$"""
-            // NelfePlay MULTIPLAYER : seul l'ecran {{ecran}} sur {{ecrans}}, celui de la place de cette borne.
+            // NelfePlay MULTIPLAYER : {{quoi}}, celui de la place de cette borne.
             #if defined(VERTEX)
             #if __VERSION__ >= 130
             #define COMPAT_VARYING out
@@ -268,7 +298,7 @@ public static class MultiplayerLaunchPlan
             {
                 gl_Position = MVPMatrix * VertexCoord;
                 vec2 plein = InputSize / TextureSize;
-                TEX0.xy = vec2(TexCoord.x * {{echelle}} + plein.x * {{decalage}}, TexCoord.y);
+                TEX0.xy = vec2(TexCoord.x * {{echelleX}} + plein.x * {{decalageX}}, TexCoord.y * {{echelleY}} + plein.y * {{decalageY}});
             }
             #elif defined(FRAGMENT)
             #if __VERSION__ >= 130

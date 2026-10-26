@@ -115,6 +115,83 @@ public class MultiplayerLaunchPlanTests : IDisposable
         Assert.Contains("plein.x * 0.500000", fichiers["half-2-of-2.glsl"]);
     }
 
+    /// <summary>Super Mario Kart : la place 1 en haut, la place 2 en bas (26/10).</summary>
+    private static readonly MultiplayerGame MarioKart = new()
+    {
+        Id = "snes/super-mario-kart", System = "snes", Players = 2,
+        Views = [new() { Seat = 1, X = 0, Y = 0, W = 1, H = 0.5 }, new() { Seat = 2, X = 0, Y = 0.5, W = 1, H = 0.5 }],
+    };
+
+    /// <summary>GoldenEye 007 : deux bandes a deux, quatre quarts a trois et quatre.</summary>
+    private static readonly MultiplayerGame GoldenEye = new()
+    {
+        Id = "n64/goldeneye-007", System = "n64", Players = 4,
+        Views =
+        [
+            new() { Seat = 1, Players = 2, X = 0, Y = 0, W = 1, H = 0.5 }, new() { Seat = 2, Players = 2, X = 0, Y = 0.5, W = 1, H = 0.5 },
+            new() { Seat = 1, X = 0, Y = 0, W = 0.5, H = 0.5 }, new() { Seat = 2, X = 0.5, Y = 0, W = 0.5, H = 0.5 },
+            new() { Seat = 3, X = 0, Y = 0.5, W = 0.5, H = 0.5 }, new() { Seat = 4, X = 0.5, Y = 0.5, W = 0.5, H = 0.5 },
+        ],
+    };
+
+    [Fact]
+    public void Un_ecran_partage_ne_montre_que_la_vue_de_la_place_a_son_format()
+    {
+        var ligne = MultiplayerLaunchPlan.Arguments("", "snes", "snes9x", @"E:\r\smk.zip", MarioKart, 2, [])!;
+
+        Assert.Contains("-shaderset none -shader nelfeplay/view-0000-0500-1000-0500 -ratio config -bezel none", ligne);
+        // La moitie basse d'une image 4/3 : 8/3.
+        Assert.Equal("2.666667", MultiplayerLaunchPlan.FormatPourRetroArch(MarioKart, MarioKart.VueDeLaPlace(2, 2)!));
+        var fichiers = MultiplayerLaunchPlan.FichiersDeLaVue(MarioKart.VueDeLaPlace(2, 2)!);
+        Assert.Contains("TexCoord.x * 1.000000 + 0.000000, TexCoord.y * 0.500000 + 0.500000", fichiers["view-0000-0500-1000-0500.slang"]);
+        Assert.Contains("plein.y * 0.500000", fichiers["view-0000-0500-1000-0500.glsl"]);
+    }
+
+    [Fact]
+    public void La_vue_depend_du_nombre_de_joueurs()
+    {
+        Assert.Equal("nelfeplay/view-0000-0000-1000-0500", MultiplayerLaunchPlan.ShaderDeLaPlace(GoldenEye, 1, 2));
+        Assert.Equal("nelfeplay/view-0000-0000-0500-0500", MultiplayerLaunchPlan.ShaderDeLaPlace(GoldenEye, 1, 4));
+        Assert.Equal("nelfeplay/view-0500-0500-0500-0500", MultiplayerLaunchPlan.ShaderDeLaPlace(GoldenEye, 4, 4));
+        // Un quart d'image 4/3 garde le 4/3.
+        Assert.Equal("1.333333", MultiplayerLaunchPlan.FormatPourRetroArch(GoldenEye, GoldenEye.VueDeLaPlace(3, 3)!));
+    }
+
+    [Fact]
+    public void Le_shader_des_moniteurs_cote_a_cote_ne_change_pas_de_calcul()
+        => Assert.Contains("TexCoord.x * 0.500000 + 0.500000, TexCoord.y * 1.000000 + 0.000000",
+            MultiplayerLaunchPlan.FichiersDeShader(2, 2)["half-2-of-2.slang"]);
+
+    [Fact]
+    public void Des_vues_coherentes_passent()
+    {
+        Assert.Null(MultiplayerCatalogueStore.ValiderLesVues(MarioKart));
+        Assert.Null(MultiplayerCatalogueStore.ValiderLesVues(GoldenEye));
+    }
+
+    [Fact]
+    public void Une_place_sans_vue_ferait_voir_l_ecran_des_autres()
+    {
+        var sansQuatre = GoldenEye with { Views = GoldenEye.Views!.Where(vue => vue.Seat != 4).ToList() };
+        Assert.Contains("la place 4 n'a pas de vue a 4 joueurs", MultiplayerCatalogueStore.ValiderLesVues(sansQuatre));
+    }
+
+    [Fact]
+    public void Une_vue_hors_de_l_image_est_refusee()
+    {
+        var deborde = MarioKart with { Views = [new() { Seat = 1, Y = 0, H = 0.6 }, new() { Seat = 2, Y = 0.5, H = 0.6 }] };
+        Assert.Contains("hors de l'image", MultiplayerCatalogueStore.ValiderLesVues(deborde));
+    }
+
+    [Theory]
+    [InlineData(null, "1.9.96", true)]
+    [InlineData("1.9.97", "1.9.96", false)]
+    [InlineData("1.9.97", "1.9.97", true)]
+    [InlineData("1.9.97+20261026", "1.9.98", true)]
+    [InlineData("pas une version", "1.9.98", false)]
+    public void Un_jeu_n_entre_que_chez_une_API_assez_recente(string? minimum, string api, bool admis)
+        => Assert.Equal(admis, (MarioKart with { MinApi = minimum }).AdmisPar(Version.Parse(api)));
+
     [Theory]
     [InlineData("fbneo core")]
     [InlineData("-netplay")]
