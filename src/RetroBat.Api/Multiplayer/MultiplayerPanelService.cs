@@ -55,6 +55,7 @@ public sealed class MultiplayerPanelService
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly ILogger<MultiplayerPanelService> _journal;
     private readonly MultiplayerToastOverlay? _cartes;
+    private readonly IDisposable? _sortieDEs;
     private string? _message;
     private DateTime _messageJusqua;
     private readonly ApiContext? _contexte;
@@ -121,7 +122,8 @@ public sealed class MultiplayerPanelService
         MediaRuntimeState? etatDesMedias = null,
         RetroBat.Api.Avatar.AvatarSheetStore? planches = null,
         RetroBat.Api.Replay.Sharing.ReplayRelayService? relais = null,
-        RetroAchievementsService? retroAchievements = null)
+        RetroAchievementsService? retroAchievements = null,
+        RetroBat.Domain.Interfaces.IEventBus? bus = null)
     {
         _planches = planches;
         _relaisDesPlanches = relais;
@@ -136,6 +138,32 @@ public sealed class MultiplayerPanelService
         _contexte = contexte;
         _etatDesMedias = etatDesMedias;
         _session.Change += SurChangement;
+        // ES FERME, PLUS DE PANNEAU (2026-10-26, borne de falken) : le panneau reste ouvert quand il rend la main a ES ;
+        // ES ferme, il restait sur le bureau jusqu'a l'arret de l'API. Il part avec ES, cartes comprises.
+        _sortieDEs = bus?.Subscribe<RetroBat.Domain.Events.EventEnvelope>(e =>
+        {
+            if (e.Type == "ui.frontend.stopped")
+            {
+                QuandEsSeFerme();
+            }
+        });
+    }
+
+    /// <summary>ES vient de se fermer : rien du MULTIPLAYER ne reste a l'ecran.</summary>
+    internal void QuandEsSeFerme()
+    {
+        bool ouvert;
+        lock (_verrou)
+        {
+            ouvert = _mode != Mode.Ferme;
+        }
+
+        if (ouvert)
+        {
+            _journal.LogInformation("MULTIPLAYER : EmulationStation fermee, le panneau se ferme");
+            Fermer();
+        }
+        _cartes?.Cacher();
     }
 
     /// <summary>MULTIPLAYER est-il a l'ecran ? Tant qu'il l'est, les gestes viennent ici.</summary>

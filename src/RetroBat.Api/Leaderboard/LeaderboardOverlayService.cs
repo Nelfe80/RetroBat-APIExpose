@@ -531,6 +531,15 @@ public sealed partial class LeaderboardOverlayService : IDisposable
         private const int MonteeAvantLEcranDeFin = 300;
         private const int SortieDuNoir = 500;
 
+        /// <summary>
+        /// LES DESSINS DE SURETE (2026-10-26, borne de falken) : un panneau qui ne se redessine plus apres son apparition
+        /// ou son fondu reste invisible sur certaines machines (l'ecran de fin, le classement a l'appui long), et parait au
+        /// premier geste qui le redessine ; le panneau d'attente, redessine toutes les 500 ms, se voit. On le redessine donc
+        /// a chaque tour du minuteur pendant les premieres secondes.
+        /// </summary>
+        private const int DessinsDeSurete = 6;
+        private int _dessinsRestants;
+
         private static bool AUnReplayEnPreparation(Contenu c)
             => (c.ReplaysEnPreparation is { Count: > 0 } attente
                 && c.Lignes.Any(l => l.CestMoi && l.ReplayId is not { Length: > 0 } && attente.Contains(l.Valeur)))
@@ -587,6 +596,14 @@ public sealed partial class LeaderboardOverlayService : IDisposable
                 {
                     _imageSablier++;
                     Invalidate();
+                }
+                else if (_dessinsRestants > 0)
+                {
+                    Invalidate();
+                }
+                if (_dessinsRestants > 0)
+                {
+                    _dessinsRestants--;
                 }
             };
             _minuteur.Start();
@@ -657,6 +674,7 @@ public sealed partial class LeaderboardOverlayService : IDisposable
                 if (_sortie <= 0 || apres >= _sortie)
                 {
                     _horlogeDuFondu.Stop();
+                    _dessinsRestants = DessinsDeSurete;
                 }
             }
 
@@ -693,16 +711,18 @@ public sealed partial class LeaderboardOverlayService : IDisposable
                 if (!Visible) Show();
                 PasserDevant();
                 Invalidate();
+                _dessinsRestants = DessinsDeSurete;
                 // OU EST LE PANNEAU (2026-10-17 : un joueur ne le voyait pas, ES en plein ecran comme sans bordure) : sa
-                // place, l'ecran d'ES et s'il a ete trouve, et le programme dont une fenetre passerait devant nous.
+                // place, l'ecran d'ES et s'il a ete trouve, le programme dont une fenetre passerait devant nous, et si le
+                // compositeur de Windows nous masque (cloaking, 2026-10-26).
                 try
                 {
                     var es = EmulatorForeground.FenetreDEmulationStation();
                     var ecran = es != IntPtr.Zero ? Screen.FromHandle(es) : Screen.PrimaryScreen;
                     _service._logger.LogInformation(
-                        "Classement : panneau a {Place} ; ES {Es} sur l'ecran {Ecran} {EcranPlace} ; devant nous : {Devant}.",
+                        "Classement : panneau a {Place} ; ES {Es} sur l'ecran {Ecran} {EcranPlace} ; devant nous : {Devant} ; masque par Windows : {Masque}.",
                         Bounds, es != IntPtr.Zero ? "trouve" : "introuvable (ecran principal)", ecran?.DeviceName, ecran?.Bounds,
-                        QuiNousPasseDevant() ?? "personne");
+                        QuiNousPasseDevant() ?? "personne", MasqueParLeCompositeur(Handle));
                 }
                 catch (Exception ex)
                 {
@@ -827,6 +847,33 @@ public sealed partial class LeaderboardOverlayService : IDisposable
                 if (pid != moi) return pid;
             }
             return 0;
+        }
+
+        [DllImport("dwmapi.dll")]
+        private static extern int DwmGetWindowAttribute(IntPtr hwnd, int attribute, out int value, int size);
+
+        /// <summary>
+        /// Si le compositeur de Windows masque la fenetre (DWMWA_CLOAKED) : « non », ou la raison (l'application, le
+        /// bureau de Windows, une fenetre parente), ou « ? » si Windows ne le dit pas.
+        /// </summary>
+        private static string MasqueParLeCompositeur(IntPtr fenetre)
+        {
+            try
+            {
+                if (DwmGetWindowAttribute(fenetre, 14, out var raison, sizeof(int)) != 0) return "?";
+                return raison switch
+                {
+                    0 => "non",
+                    1 => "oui (application)",
+                    2 => "oui (bureau de Windows)",
+                    4 => "oui (fenetre parente)",
+                    _ => "oui (" + raison + ")",
+                };
+            }
+            catch (Exception)
+            {
+                return "?";
+            }
         }
 
         /// <summary>Le programme dont une fenetre visible passe devant le panneau, ou null.</summary>
