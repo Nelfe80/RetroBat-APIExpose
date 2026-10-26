@@ -131,7 +131,14 @@ public sealed class MultiplayerController : ControllerBase
         };
         var socle = new LeaderboardOverlayService.ContenuMultiplayer(onglets, 2, false, T("multiplayer.badge.classic"), T("multiplayer.info.classic"),
             "1/2", null, deux.Take(1).ToList(), 0, string.Empty, string.Empty,
-            [new("dpad_left", T("multiplayer.help.open")), new("button_b", T("multiplayer.help.close"))]);
+            [new("dpad_left", T("multiplayer.help.open")), new("button_b", T("multiplayer.help.close"))],
+            MaSelection:
+            [
+                new("Street Fighter II' Champion Edition", "1/2", true),
+                new("Street Fighter III: 3rd Strike", "1/2", false),
+                new("Bomber Man World", "3/4", false),
+            ],
+            TitreDeMaSelection: T("multiplayer.selection"));
         try
         {
             byte[] png = vue switch

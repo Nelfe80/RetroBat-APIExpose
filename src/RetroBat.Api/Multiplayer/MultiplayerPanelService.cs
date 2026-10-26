@@ -1013,7 +1013,13 @@ public sealed class MultiplayerPanelService
             SelectionCourante: selectionCourante,
             Disposition: _modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers
                 ? DispositionPour(max)
-                : LeaderboardOverlayService.DispositionDesJoueurs.Liste);
+                : LeaderboardOverlayService.DispositionDesJoueurs.Liste,
+            // « VOTRE SELECTION » en haut a gauche du panneau (demande du user du 26/10), les memes jeux que la carte d'ES.
+            MaSelection: _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3)
+                .Select(r => new LeaderboardOverlayService.JeuDeMaSelection(
+                    NomDuJeu(r.Game), r.Players.Count(j => j.Present) + "/" + r.Max, room is not null && r.Room == room.Room))
+                .ToList(),
+            TitreDeMaSelection: T("multiplayer.selection"));
     }
 
     /// <summary>

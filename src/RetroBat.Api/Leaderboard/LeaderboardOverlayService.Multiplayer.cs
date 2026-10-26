@@ -83,7 +83,12 @@ public sealed partial class LeaderboardOverlayService
         DispositionDesJoueurs Disposition = DispositionDesJoueurs.Liste,
         bool PleinEcran = false,
         string BoutonOk = "",
-        string GlypheOk = "");
+        string GlypheOk = "",
+        IReadOnlyList<JeuDeMaSelection>? MaSelection = null,
+        string TitreDeMaSelection = "");
+
+    /// <summary>Un jeu de « Votre selection » : son nom, le compte de ses joueurs, et s'il est celui du panneau.</summary>
+    public sealed record JeuDeMaSelection(string Nom, string Compte, bool Courant);
 
     /// <summary>
     /// La barre de partage du resultat (00quater.3) : la part des degats infliges par chaque cote d'un duel, a ses
@@ -160,9 +165,10 @@ public sealed partial class LeaderboardOverlayService
             // Le logo MULTIPLAYER tient le titre, comme celui de World Scoring.
             var hauteurTitre = tailleTitre * 1.5f;
             var y = _hauteurEcran * 0.0637f - hauteurTitre / 2f;
-            DessinerLeLogoMultiplayer(g, s, policeTitre, hauteurTitre, y, Width * 0.75f);
+            var gaucheDuLogo = DessinerLeLogoMultiplayer(g, s, policeTitre, hauteurTitre, y, Width * 0.75f);
             y = _hauteurEcran * 0.0637f * 2f - hauteurTitre / 2f;
             var marge = _largeurEcran * 0.012f;
+            DessinerMaSelection(g, c, s, policePetite, taillePetite, marge, marge * 0.6f, gaucheDuLogo - 2 * marge, y - marge * 0.4f);
 
             // L'information (badge Classique, nombre de joueurs, decompte) dans une carte au-dessus des onglets : la liste
             // dessous gagne sa ligne (retour du user du 22/10).
@@ -226,8 +232,11 @@ public sealed partial class LeaderboardOverlayService
             DessinerLAide(g, socle with { Aides = c.Aides, Pseudo = c.Pseudo, EnLigne = c.EnLigne }, s, policePied, taillePied, basDeLAide + tailleTexte * 1.9f);
         }
 
-        /// <summary>Le logo MULTIPLAYER centre, a la hauteur du titre et jamais plus large que <paramref name="largeurMax"/>.</summary>
-        private void DessinerLeLogoMultiplayer(Graphics g, EsMenuStyle s, Font policeTitre, float hauteurTitre, float y, float largeurMax)
+        /// <summary>
+        /// Le logo MULTIPLAYER centre, a la hauteur du titre et jamais plus large que <paramref name="largeurMax"/>. Rend son
+        /// bord gauche : « Votre selection » s'arrete avant.
+        /// </summary>
+        private float DessinerLeLogoMultiplayer(Graphics g, EsMenuStyle s, Font policeTitre, float hauteurTitre, float y, float largeurMax)
         {
             var chemin = Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", "nelfeplay-multiplayer.png");
             var logo = File.Exists(chemin) ? _service._glyphes?.Glyphe(chemin, (int)Math.Round(hauteurTitre * 1.75f)) : null;
@@ -239,12 +248,49 @@ public sealed partial class LeaderboardOverlayService
             if (logo is not null)
             {
                 g.DrawImage(logo, (Width - logo.Width) / 2f, y + (hauteurTitre - logo.Height) / 2f - hauteurTitre * 0.22f, logo.Width, logo.Height);
+                return (Width - logo.Width) / 2f;
             }
-            else
+
+            using var encre = new SolidBrush(Teinte(s.TitleColor));
+            using var centre = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+            g.DrawString("MULTIPLAYER", policeTitre, encre, new RectangleF(0, y, Width, hauteurTitre), centre);
+            return (Width - g.MeasureString("MULTIPLAYER", policeTitre, PointF.Empty, StringFormat.GenericTypographic).Width) / 2f;
+        }
+
+        /// <summary>
+        /// « VOTRE SELECTION » EN HAUT A GAUCHE (demande du user du 26/10) : les jeux ou le joueur attend, un par ligne, le
+        /// compte des joueurs a droite, celui du panneau a la couleur de selection d'ES. Entre le bord et le logo, au-dessus
+        /// de la carte d'information : ce qui n'y tient pas ne se dessine pas.
+        /// </summary>
+        private void DessinerMaSelection(Graphics g, ContenuMultiplayer c, EsMenuStyle s, Font petite, float taillePetite,
+            float x, float haut, float largeur, float bas)
+        {
+            if (c.MaSelection is not { Count: > 0 } jeux || largeur < taillePetite * 8f)
             {
-                using var encre = new SolidBrush(Teinte(s.TitleColor));
-                using var centre = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-                g.DrawString("MULTIPLAYER", policeTitre, encre, new RectangleF(0, y, Width, hauteurTitre), centre);
+                return;
+            }
+
+            var pas = taillePetite * 1.3f;
+            var lignes = Math.Min(jeux.Count, (int)Math.Floor((bas - haut) / pas) - 1);
+            if (lignes <= 0)
+            {
+                return;
+            }
+
+            using var surtitre = new SolidBrush(Teinte(s.GroupColor));
+            using var texte = new SolidBrush(Teinte(s.TextColor));
+            using var choisi = new SolidBrush(Teinte(s.SelectedTextColor));
+            using var format = new StringFormat(StringFormat.GenericTypographic) { FormatFlags = StringFormatFlags.NoWrap };
+            g.DrawString(LeaderboardOverlayService.Couper(g, c.TitreDeMaSelection.ToUpperInvariant(), petite, largeur), petite, surtitre, x, haut, format);
+            for (var i = 0; i < lignes; i++)
+            {
+                var jeu = jeux[i];
+                var y = haut + pas * (i + 1);
+                var encre = jeu.Courant ? choisi : texte;
+                var largeurDuCompte = g.MeasureString(jeu.Compte, petite, PointF.Empty, format).Width;
+                g.DrawString(jeu.Compte, petite, encre, x + largeur - largeurDuCompte, y, format);
+                var nom = LeaderboardOverlayService.Couper(g, jeu.Nom, petite, largeur - largeurDuCompte - taillePetite * 0.8f);
+                g.DrawString(nom, petite, encre, x, y, format);
             }
         }
 
