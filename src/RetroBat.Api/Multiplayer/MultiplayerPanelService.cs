@@ -149,6 +149,26 @@ public sealed class MultiplayerPanelService
         });
     }
 
+    private bool _classementOuvert;
+
+    /// <summary>
+    /// LE CLASSEMENT DE L'APPUI LONG EST OUVERT (retour du user du 26/10) : le menu du jeu d'ES s'ouvre a droite, et la
+    /// carte « Votre selection » du haut a droite en cachait le debut. Elle se tait le temps du panneau ; une invitation,
+    /// elle, passe toujours.
+    /// </summary>
+    public void PoserLeClassementOuvert(bool ouvert)
+    {
+        lock (_verrou)
+        {
+            if (_classementOuvert == ouvert)
+            {
+                return;
+            }
+            _classementOuvert = ouvert;
+        }
+        MettreAJourLeBandeau();
+    }
+
     /// <summary>ES vient de se fermer : rien du MULTIPLAYER ne reste a l'ecran.</summary>
     internal void QuandEsSeFerme()
     {
@@ -886,7 +906,7 @@ public sealed class MultiplayerPanelService
                 }
 
                 // Un seul bloc « Votre selection », un jeu par ligne (retour du user du 22/10).
-                var lignes = _mode != Mode.Ferme ? [] : _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3).Select(room =>
+                var lignes = _mode != Mode.Ferme || _classementOuvert ? [] : _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3).Select(room =>
                 {
                     var absent = room.Players.Any(j => j.You && !j.Present);
                     return new MultiplayerToastOverlay.Ligne(

@@ -580,6 +580,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 }
 
                 EntrerSiLeJoueurNAPasBouge();
+                // Le menu du jeu d'ES est a droite tant que le classement est ouvert : la carte « Votre selection » se tait.
+                _multiplayer?.PoserLeClassementOuvert(_modele.Etat != LeaderboardPanelModel.Foyer.Ferme);
 
                 // Le filet : si nous tenons la manette et que plus rien n'arrive, on la rend.
                 if (_overlay.TropLongSilence())
