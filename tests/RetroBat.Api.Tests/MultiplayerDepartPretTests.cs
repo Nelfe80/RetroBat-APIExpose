@@ -646,6 +646,8 @@ public class MultiplayerDepartPretTests : IDisposable
     [Fact]
     public async Task Hors_duel_les_sets_gagnes_par_l_ordinateur_ne_comptent_pas()
     {
+        // Les attentes laissent au guet (un releve toutes les 20 ms) le temps de voir chaque etat, meme quand toute la
+        // suite tourne en parallele : a 80 ms, il en manquait un de temps en temps (26/10).
         // Mesure au banc (Windjammers, 23/10) : P1 seul contre l'ordinateur (0x100 = 1), la machine gagne deux sets dans la
         // case du joueur 2. Puis le joueur 2 entre (0x100 = 3), les sets repartent de zero, et c'est lui qui gagne.
         var ra = new FauxRetroArch { DossierDesEtats = _dossier };
@@ -653,11 +655,11 @@ public class MultiplayerDepartPretTests : IDisposable
         ra.Memoire[0x8F3] = 2;
         var guet = new MultiplayerFinDeRencontre(ra, TimeSpan.FromMilliseconds(20));
         var attente = guet.AttendreLeVainqueurAsync(SetsGardes, [1, 2], CancellationToken.None);
-        await Task.Delay(120);
+        await Task.Delay(300);
         Assert.False(attente.IsCompleted);
         ra.Memoire[0x8F3] = 0;
         ra.Memoire[0x100] = 3;
-        await Task.Delay(80);
+        await Task.Delay(300);
         Assert.False(attente.IsCompleted);
         ra.Memoire[0x8F3] = 2;
         Assert.Equal(2, await attente.WaitAsync(TimeSpan.FromSeconds(5)));
@@ -671,10 +673,10 @@ public class MultiplayerDepartPretTests : IDisposable
         ra.Memoire[0x100] = 3;
         var guet = new MultiplayerFinDeRencontre(ra, TimeSpan.FromMilliseconds(20));
         var attente = guet.AttendreLeVainqueurAsync(SetsGardes, [1, 2], CancellationToken.None);
-        await Task.Delay(80);
+        await Task.Delay(300);
         ra.Memoire[0x873] = 2;
         ra.Memoire[0x8F3] = 2;
-        await Task.Delay(120);
+        await Task.Delay(300);
         Assert.False(attente.IsCompleted);
         ra.Memoire[0x873] = 3;
         Assert.Equal(1, await attente.WaitAsync(TimeSpan.FromSeconds(5)));
@@ -769,17 +771,17 @@ public class MultiplayerDepartPretTests : IDisposable
         ra.Mots[0x86E8] = 144;
         using var fin = new CancellationTokenSource();
         var suivi = new MultiplayerStatsDuDuel(ra, TimeSpan.FromMilliseconds(10)).SuivreAsync(jeu, [1, 2], fin.Token);
-        async Task Pose(long adresse, int valeur) { ra.Mots[adresse] = valeur; await Task.Delay(60); }
+        async Task Pose(long adresse, int valeur) { ra.Mots[adresse] = valeur; await Task.Delay(250); }
 
-        await Task.Delay(60);
+        await Task.Delay(250);
         await Pose(0x86E8, 120);      // P1 touche P2
         await Pose(0x86E8, 0xFFFF);   // K.O. de P2
         ra.Octets[0x864F] = 1;        // P1 gagne la manche, sa vie pleine : perfect
-        await Task.Delay(60);
+        await Task.Delay(250);
         await Pose(0x86E8, 144);      // nouvelle manche
         await Pose(0x86E8, 0xFFFF);   // second K.O.
         ra.Octets[0x864F] = 2;
-        await Task.Delay(60);
+        await Task.Delay(250);
         fin.Cancel();
         var stats = await suivi;
 
