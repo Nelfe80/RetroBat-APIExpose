@@ -595,11 +595,15 @@ public sealed class MultiplayerLaunchService : IHostedService
                     cote is null ? string.Empty : cote.Lettre,
                     cote is null ? string.Empty : MultiplayerDecor.Cote(cote.Value),
                     cote is null || cote.Provisional ? null : MultiplayerDecor.Palier(cote.Value),
-                    j.RttMs);
+                    j.RttMs,
+                    cote?.Wins,
+                    cote?.Streak);
             }).ToList();
             var type = RetroBat.Api.Leaderboard.StylesDesEcrans.TypeDe(jeu.Game.EloType, jeu.Game.Family);
             var fanart = RetroBat.Api.Media.MediaDuGamelist.Resoudre(jeu.Path, "fanart", "image");
-            using var image = RetroBat.Api.Leaderboard.PanneauxEnJeu.Dessiner(ecran.Width, ecran.Height, bandes, type, fanart, fiches);
+            var mots = new RetroBat.Api.Leaderboard.PanneauxEnJeu.MotsDesPanneaux(
+                _panneau.Texte("multiplayer.panel.wins", "WINS"), _panneau.Texte("multiplayer.panel.streak", "STREAK"));
+            using var image = RetroBat.Api.Leaderboard.PanneauxEnJeu.Dessiner(ecran.Width, ecran.Height, bandes, type, fanart, fiches, mots);
             if (!MultiplayerDecor.Ecrire(systeme, jeu.Path, image, bandes))
             {
                 return null;

@@ -476,7 +476,8 @@ public sealed partial class LeaderboardOverlayService
                 [(12, 12, _relief), (17, 17, Nuit)], opacite);
             var xPseudo = un.Right + 26;
             var pseudo = vainqueur.Pseudo.ToUpperInvariant();
-            var taillePseudo = TraitsDesEcrans.TailleQuiTient(pseudo, famille, 140, 880 - xPseudo);
+            // Les cartes commencent a 880 : le pseudo s'arrete avant, contour, relief et lueur de la carte gagnante compris.
+            var taillePseudo = TraitsDesEcrans.TailleQuiTient(pseudo, famille, 140, 880 - 84 - xPseudo);
             var boitePseudo = TraitsDesEcrans.BoiteDuTexte(pseudo, famille, taillePseudo);
             var basDuPseudo = basDuBloc - 96;
             var rendu = TraitsDesEcrans.TexteEnRelief(g, pseudo, famille, taillePseudo, new PointF(xPseudo - boitePseudo.X, basDuPseudo - boitePseudo.Bottom),

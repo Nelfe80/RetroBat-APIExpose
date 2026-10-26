@@ -332,6 +332,14 @@ public sealed record MultiplayerCote
     [JsonPropertyName("rank")]
     public string? Rank { get; init; }
 
+    /// <summary>Ses victoires sur ce jeu (26/10) ; null si la plateforme ne les envoie pas.</summary>
+    [JsonPropertyName("wins")]
+    public int? Wins { get; init; }
+
+    /// <summary>Sa serie de victoires en cours sur ce jeu (26/10).</summary>
+    [JsonPropertyName("streak")]
+    public int? Streak { get; init; }
+
     /// <summary>La cote du type de ce jeu (combat, puzzle...).</summary>
     [JsonPropertyName("type")]
     public MultiplayerCote? Type { get; init; }

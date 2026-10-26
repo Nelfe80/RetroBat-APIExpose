@@ -314,5 +314,11 @@ public class MultiplayerEcranDeFinTests
         File.WriteAllBytes(Path.Combine(Sortie, "fin-quatre.png"), L.ApercuMultiplayer(style, socle with { Fin = quatre }, "", "", "", null!, 6));
         File.WriteAllBytes(Path.Combine(Sortie, "fin-trois.png"), L.ApercuMultiplayer(style, socle with { Fin = trois }, "", "", "", null!, 6));
         File.WriteAllBytes(Path.Combine(Sortie, "fin-sans-fanart.png"), L.ApercuMultiplayer(style, socle with { Fin = duel with { Fanart = null, Cle = "x" } }, "", "", "", null!, 6));
+        // Un pseudo long ne mord pas sur les cartes (vu a la borne le 26/10).
+        foreach (var (nom, pseudo) in new[] { ("fin-pseudo-long.png", "LORENZOLAMAS"), ("fin-pseudo-tres-long.png", "MEGAWARRIOR_MAXIMUS24") })
+        {
+            var long_ = duel with { Joueurs = [duel.Joueurs[0] with { Pseudo = pseudo }, .. duel.Joueurs.Skip(1)] };
+            File.WriteAllBytes(Path.Combine(Sortie, nom), L.ApercuMultiplayer(style, socle with { Fin = long_ }, "", "", "", null!, 6));
+        }
     }
 }

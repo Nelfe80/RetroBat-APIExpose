@@ -56,6 +56,17 @@ public class MultiplayerPanneauxEnJeuTests
     }
 
     [Fact]
+    public void La_cote_porte_les_victoires_et_la_serie_quand_la_plateforme_les_envoie()
+    {
+        var cote = JsonSerializer.Deserialize<MultiplayerCote>("""{"value":1842,"matches":140,"rank":"A","wins":97,"streak":3}""")!;
+        Assert.Equal((97, 3), (cote.Wins, cote.Streak));
+        // Une plateforme plus ancienne ne les envoie pas : les panneaux ne les montrent pas.
+        var ancienne = JsonSerializer.Deserialize<MultiplayerCote>("""{"value":1842,"matches":140}""")!;
+        Assert.Null(ancienne.Wins);
+        Assert.Null(ancienne.Streak);
+    }
+
+    [Fact]
     public void L_image_laisse_le_jeu_transparent_et_peint_les_bandes()
     {
         var bandes = PanneauxEnJeu.Calculer(960, 540, MultiplayerDecor.FormatArcade)!;
@@ -142,7 +153,7 @@ public class MultiplayerPanneauxEnJeuTests
         var bandes = PanneauxEnJeu.Calculer(1920, 1080, MultiplayerDecor.FormatArcade)!;
         void Apercu(string nom, IReadOnlyList<PanneauxEnJeu.Joueur> joueurs)
         {
-            using var panneaux = PanneauxEnJeu.Dessiner(1920, 1080, bandes, StylesDesEcrans.Combat, fanart, joueurs);
+            using var panneaux = PanneauxEnJeu.Dessiner(1920, 1080, bandes, StylesDesEcrans.Combat, fanart, joueurs, new("VICTOIRES", "SÉRIE"));
             using var ecran = new Bitmap(1920, 1080);
             using (var g = Graphics.FromImage(ecran))
             {
@@ -162,12 +173,12 @@ public class MultiplayerPanneauxEnJeuTests
 
         var vega = Path.Combine(Images, "arcade", "sf2ce", "character", "vega.png");
         var guile = Path.Combine(Images, "arcade", "sf2ce", "character", "guile.png");
-        Apercu("jeu-duel.png", [new(1, "NELFE", "VEGA", vega, "A", "1 842", 0.81, 24), new(2, "AKIRA", "GUILE", guile, "A", "1 796", 0.65, 31)]);
-        Apercu("jeu-sans-personnage.png", [new(1, "NELFE", "", null, "A", "1 842", 0.81, 24), new(2, "AKIRA", "", null, "?", "1 012", null, 112)]);
+        Apercu("jeu-duel.png", [new(1, "NELFE", "VEGA", vega, "A", "1 842", 0.81, 24, 128, 4), new(2, "AKIRA", "GUILE", guile, "A", "1 796", 0.65, 31, 97, 0)]);
+        Apercu("jeu-sans-personnage.png", [new(1, "NELFE", "", null, "A", "1 842", 0.81, 24, 1204, 12), new(2, "AKIRA", "", null, "?", "1 012", null, 112, 3, 1)]);
         Apercu("jeu-quatre.png",
         [
-            new(1, "NELFE", "VEGA", vega, "A", "1 842", 0.81, 24), new(2, "AKIRA", "GUILE", guile, "A", "1 796", 0.65, 31),
-            new(3, "MOMO", "VEGA", vega, "C", "1 188", 0.63, 64), new(4, "RAFALE", "GUILE", guile, "B", "1 532", 0.77, 140),
+            new(1, "NELFE", "VEGA", vega, "A", "1 842", 0.81, 24, 128, 4), new(2, "AKIRA", "GUILE", guile, "A", "1 796", 0.65, 31, 97, 0),
+            new(3, "MOMO", "VEGA", vega, "C", "1 188", 0.63, 64, 12, 2), new(4, "RAFALE", "GUILE", guile, "B", "1 532", 0.77, 140),
         ]);
     }
 }

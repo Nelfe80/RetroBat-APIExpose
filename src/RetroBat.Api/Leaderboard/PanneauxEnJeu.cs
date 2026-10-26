@@ -18,8 +18,21 @@ namespace RetroBat.Api.Leaderboard;
 [SupportedOSPlatform("windows")]
 public static class PanneauxEnJeu
 {
-    /// <summary>Un joueur : <c>Palier</c> va de 0 a 1 vers la lettre suivante ; <c>PingMs</c>, la latence vers le relais.</summary>
-    public sealed record Joueur(int Place, string Pseudo, string Personnage, string? Portrait, string Lettre, string Cote, double? Palier, int? PingMs);
+    /// <summary>
+    /// Un joueur : <c>Palier</c> va de 0 a 1 vers la lettre suivante ; <c>PingMs</c>, la latence vers le relais ; ses
+    /// victoires sur ce jeu et sa serie en cours, que la plateforme donne avec la cote (null : pas montrees).
+    /// </summary>
+    public sealed record Joueur(int Place, string Pseudo, string Personnage, string? Portrait, string Lettre, string Cote, double? Palier, int? PingMs,
+        int? Victoires = null, int? Serie = null);
+
+    /// <summary>Les libelles des panneaux, dans la langue d'ES.</summary>
+    public sealed record MotsDesPanneaux(string Victoires, string Serie)
+    {
+        public static readonly MotsDesPanneaux ParDefaut = new("WINS", "STREAK");
+    }
+
+    private static readonly Color Trophee = Color.FromArgb(255, 210, 60);
+    private static readonly Color Flamme = Color.FromArgb(255, 138, 61);
 
     /// <summary>Les bandes de part et d'autre du jeu, en pixels de l'ecran.</summary>
     public sealed record Bandes(int Gauche, int Droite, int Jeu);
@@ -36,8 +49,10 @@ public static class PanneauxEnJeu
         return largeur <= 0 || hauteur <= 0 || Math.Min(gauche, droite) < largeur * 0.1 ? null : new(gauche, droite, jeu);
     }
 
-    public static Bitmap Dessiner(int largeur, int hauteur, Bandes bandes, string type, string? fanart, IReadOnlyList<Joueur> joueurs)
+    public static Bitmap Dessiner(int largeur, int hauteur, Bandes bandes, string type, string? fanart, IReadOnlyList<Joueur> joueurs,
+        MotsDesPanneaux? mots = null)
     {
+        mots ??= MotsDesPanneaux.ParDefaut;
         var image = new Bitmap(largeur, hauteur, PixelFormat.Format32bppArgb);
         using var g = Graphics.FromImage(image);
         g.Clear(Color.Transparent);
@@ -62,13 +77,13 @@ public static class PanneauxEnJeu
             var largeurUtile = bande.Width / k;
             if (ici.Count == 1)
             {
-                DessinerUnPanneau(g, ici[0], style, famille, secours, logo, largeurUtile, 0, 1080, cote == 1, compact: false);
+                DessinerUnPanneau(g, ici[0], style, famille, secours, logo, mots, largeurUtile, 0, 1080, cote == 1, compact: false);
             }
             else
             {
                 for (var i = 0; i < ici.Count && i < 2; i++)
                 {
-                    DessinerUnPanneau(g, ici[i], style, famille, secours, i == 0 ? logo : null, largeurUtile, i * 540, 540, cote == 1, compact: true);
+                    DessinerUnPanneau(g, ici[i], style, famille, secours, i == 0 ? logo : null, mots, largeurUtile, i * 540, 540, cote == 1, compact: true);
                 }
             }
 
@@ -158,10 +173,11 @@ public static class PanneauxEnJeu
 
     /// <summary>
     /// Un panneau, en pixels d'un ecran de 1080 de haut : le logo, « P1 », le personnage dans sa forme (ou le pseudo
-    /// remonte), le pseudo, la lettre de rang et l'ELO, et le ping en bas. Compact a deux joueurs par bande.
+    /// remonte), le pseudo, la lettre de rang et l'ELO, ses victoires et sa serie, et le ping en bas. Compact a deux joueurs
+    /// par bande.
     /// </summary>
     private static void DessinerUnPanneau(Graphics g, Joueur j, StyleDEcran style, FontFamily famille, Font secours, Bitmap? logo,
-        float largeur, float haut, float hauteur, bool aGauche, bool compact)
+        MotsDesPanneaux mots, float largeur, float haut, float hauteur, bool aGauche, bool compact)
     {
         var couleur = Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place));
         var marge = 16f;
@@ -250,6 +266,46 @@ public static class PanneauxEnJeu
                     using var formePleine = FormesDesEcrans.Arrondi(new RectangleF(piste.X, piste.Y, (float)(piste.Width * Math.Clamp(palier, 0, 1)), piste.Height), 4);
                     g.FillPath(plein, formePleine);
                 }
+
+                y += piste.Height;
+            }
+        }
+
+        if (j.Victoires is not null || j.Serie is not null)
+        {
+            var basUtile = haut + hauteur - (compact ? 44 : 70);
+            if (compact)
+            {
+                // Une ligne, deux moities : le trophee et ses victoires, la flamme et la serie.
+                var ligne = new RectangleF(marge, y + 4, utile, 30);
+                if (ligne.Bottom <= basUtile)
+                {
+                    DessinerUnBilan(g, "trophee", Trophee, null, j.Victoires, new RectangleF(ligne.X, ligne.Y, ligne.Width / 2 - 6, ligne.Height), secours, false);
+                    DessinerUnBilan(g, "flamme", Flamme, null, j.Serie, new RectangleF(ligne.X + ligne.Width / 2 + 6, ligne.Y, ligne.Width / 2 - 6, ligne.Height), secours, j.Serie >= 2);
+                }
+            }
+            else
+            {
+                var ligne = new RectangleF(marge, y + 30, utile, 56);
+                foreach (var (icone, couleurIcone, mot, valeur, vive) in new[]
+                         {
+                             ("trophee", Trophee, mots.Victoires, j.Victoires, false),
+                             ("flamme", Flamme, mots.Serie, j.Serie, j.Serie >= 2),
+                         })
+                {
+                    if (ligne.Bottom > basUtile)
+                    {
+                        break;
+                    }
+
+                    using (var filet = new SolidBrush(Color.FromArgb(31, 255, 255, 255)))
+                    {
+                        g.FillRectangle(filet, ligne.X, ligne.Y, ligne.Width, 1.5f);
+                    }
+
+                    DessinerUnBilan(g, icone, couleurIcone, mot, valeur, new RectangleF(ligne.X, ligne.Y + 4, ligne.Width, ligne.Height - 4), secours, vive);
+                    ligne.Y += ligne.Height + 4;
+                }
             }
         }
 
@@ -257,6 +313,36 @@ public static class PanneauxEnJeu
         {
             DessinerLePing(g, ping, secours, milieu, haut + hauteur - (compact ? 22 : 30), compact);
         }
+    }
+
+    private static readonly System.Globalization.NumberFormatInfo Groupes = new() { NumberGroupSeparator = " ", NumberGroupSizes = [3] };
+
+    /// <summary>
+    /// Une ligne de bilan : l'icone en pixels, le libelle (absent en compact) et la valeur. <paramref name="vive"/> : une
+    /// serie qui compte, en couleur de flamme.
+    /// </summary>
+    private static void DessinerUnBilan(Graphics g, string icone, Color couleurIcone, string? mot, int? valeur, RectangleF zone, Font secours, bool vive)
+    {
+        var cote = Math.Min(zone.Height, mot is null ? 24f : 30f);
+        var boite = new RectangleF(zone.X, zone.Y + (zone.Height - cote) / 2f, cote * IconesPixel.Rapport(icone), cote);
+        IconesPixel.Dessiner(g, icone, boite, icone == "flamme" && !vive ? Alpha(couleurIcone, 0.55) : couleurIcone);
+        var texte = valeur is { } v ? v.ToString("#,0", Groupes) : "-";
+        using var police = Chiffres(mot is null ? 26 : 38, secours);
+        using var encre = new SolidBrush(vive ? Flamme : Color.White);
+        var taille = Mesure(g, texte, police);
+        if (mot is null)
+        {
+            g.DrawString(texte, police, encre, boite.Right + 8, zone.Y + (zone.Height - taille.Height) / 2f, Typo);
+            return;
+        }
+
+        var droite = zone.Right - taille.Width;
+        g.DrawString(texte, police, encre, droite, zone.Y + (zone.Height - taille.Height) / 2f, Typo);
+        using var petite = Libelles(16, secours);
+        var libelle = mot.ToUpperInvariant();
+        var place = droite - 10 - (boite.Right + 10);
+        var espacement = LargeurEspacee(g, libelle, petite, 2.5f) <= place ? 2.5f : 0f;
+        TexteEspace(g, libelle, petite, Color.FromArgb(216, 212, 240), boite.Right + 10, zone.Y + (zone.Height - Mesure(g, libelle, petite).Height) / 2f, espacement);
     }
 
     /// <summary>Le portrait du personnage choisi dans la forme du type, agrandi sans lissage, avec son ombre.</summary>
