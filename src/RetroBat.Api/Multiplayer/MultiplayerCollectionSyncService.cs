@@ -69,6 +69,9 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     private readonly DataPackSyncService? _dataPack;
     private DateTime _dernierRattrapageUtc = DateTime.MinValue;
 
+    /// <summary>Les jeux restes dans les paquets du gestionnaire de ROM, reconnus a leur contenu (26/10).</summary>
+    private readonly MultiplayerContenusDesPaquets? _paquets;
+
     public MultiplayerCollectionSyncService(
         IOptionsMonitor<ApiExposeOptions> options,
         MultiplayerCatalogueStore store,
@@ -84,8 +87,10 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         Func<string, string?>? md5DuContenu = null,
         GamelistUpdateService? gamelists = null,
         Func<string?, bool>? coeurPose = null,
-        DataPackSyncService? dataPack = null)
+        DataPackSyncService? dataPack = null,
+        MultiplayerContenusDesPaquets? paquets = null)
     {
+        _paquets = paquets;
         _dataPack = dataPack;
         _options = options;
         _store = store;
@@ -281,6 +286,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
             }
 
             Games = jeux;
+            LireLesPaquetsEnAttente(catalogue, cancellationToken);
             var inscrits = resultat.Changed || !_inscriptionsFaites ? InscrireLesJeuxInconnusDEs(jeux) : 0;
             if (resultat.Changed || visuel.Changed || inscrits > 0)
             {
@@ -426,6 +432,42 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         return retenus;
     }
 
+    /// <summary>
+    /// Les paquets du gestionnaire de ROM d'un systeme console du catalogue, pas encore lus : leur lecture part en arriere-plan
+    /// (aucune partie ne tourne), puis la collection se refait avec les jeux qu'elle a reconnus.
+    /// </summary>
+    private void LireLesPaquetsEnAttente(MultiplayerCatalogue catalogue, CancellationToken cancellationToken)
+    {
+        if (_paquets is null)
+        {
+            return;
+        }
+
+        var systemes = catalogue.Games.Where(j => !j.EstArcade).Select(j => j.System).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        if (_paquets.ALire(systemes).Count == 0)
+        {
+            return;
+        }
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                if (await _paquets.LireAsync(systemes, _emulateurTourne, cancellationToken).ConfigureAwait(false))
+                {
+                    await SynchroniserAsync("paquets lus", cancellationToken).ConfigureAwait(false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning(ex, "Collection MULTIPLAYER : lecture des paquets du gestionnaire de ROM en echec");
+            }
+        }, cancellationToken);
+    }
+
     private string? TrouverSet(string set)
     {
         foreach (var dossier in DossiersArcade)
@@ -466,6 +508,17 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
             if (trouves.Count == md5.Count)
             {
                 break;
+            }
+
+            // Un fichier d'attente du gestionnaire de ROM : son contenu est celui du paquet, deja lu (26/10).
+            if (_paquets?.Md5DuTemoin(installe.AbsolutePath) is { } duPaquet)
+            {
+                if (md5.Contains(duPaquet))
+                {
+                    trouves.TryAdd(duPaquet, installe.AbsolutePath);
+                }
+
+                continue;
             }
 
             if (PassePrefiltre(installe.AbsolutePath, contenu) && _md5DuContenu(installe.AbsolutePath) is { } mesure && md5.Contains(mesure))

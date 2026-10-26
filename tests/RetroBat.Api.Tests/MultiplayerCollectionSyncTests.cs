@@ -40,7 +40,7 @@ public class MultiplayerCollectionSyncTests : IDisposable
         collectionsRoot: Path.Combine(_racine, "collections"),
         stateRoot: Etat);
 
-    private MultiplayerCollectionSyncService Service(Func<string?, bool>? coeurPose = null) => new(
+    private MultiplayerCollectionSyncService Service(Func<string?, bool>? coeurPose = null, MultiplayerContenusDesPaquets? paquets = null) => new(
         new FauxOptions(new ApiExposeOptions { NelfePlay = _nelfeplay }),
         new MultiplayerCatalogueStore(logger: null, path: CataloguePath),
         new InstalledGameCatalog(new SansDefinition(), logger: null, romsRoot: Roms, ramRoot: Path.Combine(_racine, "ram")),
@@ -51,7 +51,29 @@ public class MultiplayerCollectionSyncTests : IDisposable
         logger: null,
         romsRoot: Roms,
         emulateurTourne: () => false,
-        coeurPose: coeurPose ?? (_ => true));
+        coeurPose: coeurPose ?? (_ => true),
+        paquets: paquets);
+
+    [Fact]
+    public async Task Le_fichier_d_attente_d_un_jeu_reste_dans_son_paquet_entre_dans_la_collection()
+    {
+        // 26/10 : Wild Guns (Europe), Goof Troop (France)... restaient dans snes.rar du gestionnaire de ROM, la borne n'en
+        // avait qu'un fichier d'attente, et la collection les ignorait.
+        using var banc = new MultiplayerContenusDesPaquetsTests();
+        var (paquets, temoin, md5) = banc.Monter(roms: Roms);
+        PoserCatalogue(Catalogue(JeuConsole("snes/wild-guns", "snes", md5)));
+        var service = Service(paquets: paquets);
+        await service.SynchroniserAsync("test", CancellationToken.None);
+        Assert.Empty(service.Games);
+
+        await paquets.LireAsync(MultiplayerContenusDesPaquetsTests.Snes, () => false, CancellationToken.None);
+        await service.SynchroniserAsync("paquets lus", CancellationToken.None);
+
+        var jeu = Assert.Single(service.Games);
+        Assert.Equal(Path.GetFullPath(temoin), Path.GetFullPath(jeu.Path));
+        Assert.Equal(md5, jeu.ContentKey);
+        Assert.Contains(Path.GetFullPath(temoin), Collection());
+    }
 
     private string PoserFichier(string systeme, string nom, string contenu = "rom")
     {

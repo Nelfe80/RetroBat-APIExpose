@@ -39,6 +39,9 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// <summary>ES se tait pendant la partie : il ne sait pas qu'un jeu tourne (retour du user du 26/10).</summary>
     private readonly SonDEmulationStation? _sonDEs;
 
+    /// <summary>Sort de son paquet le jeu d'un fichier d'attente, qu'ES aurait extrait a son lancement (26/10).</summary>
+    private readonly RetroBat.Api.Media.RomPackInstallerService? _gestionnaireDeRoms;
+
     /// <summary>Le bilan de fin de partie du wrapper : une rencontre classee s'annule sur triche (22/10).</summary>
     private readonly MultiplayerBilanDuWrapper _bilans;
     private readonly ILogger<MultiplayerLaunchService> _journal;
@@ -74,9 +77,11 @@ public sealed class MultiplayerLaunchService : IHostedService
         ApiContext contexte,
         IEventBus bus,
         ILogger<MultiplayerLaunchService> journal,
-        SonDEmulationStation? sonDEs = null)
+        SonDEmulationStation? sonDEs = null,
+        RetroBat.Api.Media.RomPackInstallerService? gestionnaireDeRoms = null)
     {
         _sonDEs = sonDEs;
+        _gestionnaireDeRoms = gestionnaireDeRoms;
         _session = session;
         _client = client;
         _panneau = panneau;
@@ -170,6 +175,12 @@ public sealed class MultiplayerLaunchService : IHostedService
             if (jeu is null)
             {
                 _journal.LogWarning("MULTIPLAYER : {Jeu} n'est plus sur cette borne, la gameroom {Room} est quittee", room.Game, room.Room);
+                await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
+                return;
+            }
+
+            if (!await SortirDuPaquetAsync(jeu).ConfigureAwait(false))
+            {
                 await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
                 return;
             }
@@ -481,6 +492,30 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
     }
 
+    /// <summary>
+    /// LE JEU RESTE DANS SON PAQUET (26/10) : le gestionnaire de ROM n'en laisse qu'un fichier d'attente, et ne l'extrait qu'a
+    /// sa selection ou a son lancement par ES ; une partie MULTIPLAYER ne passe pas par ES. Il sort donc ici, avant RetroArch,
+    /// et le gestionnaire le remet en attente a la fin de la partie, comme apres un jeu lance par ES. Faux s'il n'a pas pu sortir.
+    /// </summary>
+    private async Task<bool> SortirDuPaquetAsync(MultiplayerInstalledGame jeu)
+    {
+        if (_gestionnaireDeRoms is null || !RetroBat.Api.Media.RomPackInstallerService.EstUnTemoin(jeu.Path))
+        {
+            return true;
+        }
+
+        _journal.LogInformation("MULTIPLAYER : {Jeu} sort de son paquet avant la partie", jeu.Game.Id);
+        var resultat = await _gestionnaireDeRoms.PreparerPourUnePartieAsync(jeu.Path, jeu.Game.Name).ConfigureAwait(false);
+        var pret = File.Exists(jeu.Path) && !RetroBat.Api.Media.RomPackInstallerService.EstUnTemoin(jeu.Path);
+        if (!pret)
+        {
+            _journal.LogWarning("MULTIPLAYER : {Jeu} n'a pas pu sortir de son paquet ({Etat}, {Raison}) : la gameroom est quittee",
+                jeu.Game.Id, resultat.Status, resultat.Reason);
+        }
+
+        return pret;
+    }
+
     private async Task RejoindreAsync(MultiplayerRoom room)
     {
         try
@@ -490,6 +525,12 @@ public sealed class MultiplayerLaunchService : IHostedService
             if (jeu is null)
             {
                 _journal.LogWarning("MULTIPLAYER : {Jeu} n'est plus sur cette borne, la gameroom {Room} est quittee", room.Game, room.Room);
+                await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
+                return;
+            }
+
+            if (!await SortirDuPaquetAsync(jeu).ConfigureAwait(false))
+            {
                 await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
                 return;
             }

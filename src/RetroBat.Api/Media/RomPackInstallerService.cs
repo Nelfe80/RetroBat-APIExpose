@@ -1332,6 +1332,28 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
         return true;
     }
 
+    /// <summary>Un fichier d'attente du gestionnaire : le jeu reste dans son paquet jusqu'a son extraction.</summary>
+    internal static bool EstUnTemoin(string chemin) => IsOnTheFlyPlaceholder(chemin);
+
+    /// <summary>Extrait tout un paquet dans un dossier (la lecture des contenus pour MULTIPLAYER, 26/10).</summary>
+    internal static Task ExtraireToutAsync(string paquet, string dossier, CancellationToken cancellationToken)
+        => ExtractArchiveAsync(paquet, dossier, cancellationToken);
+
+    /// <summary>
+    /// MULTIPLAYER (26/10) : l'API lance la partie elle-meme, sans passer par ES ; le jeu sort de son paquet comme au
+    /// lancement par ES, quel que soit le declencheur choisi dans les reglages.
+    /// </summary>
+    public Task<OnTheFlyRomInstallResult> PreparerPourUnePartieAsync(string cheminDuJeu, string? nom, CancellationToken cancellationToken = default)
+        => TryInstallMissingRomAsync(
+            new GameReference
+            {
+                SystemId = Path.GetFileName(Path.GetDirectoryName(cheminDuJeu)) ?? string.Empty,
+                GamePath = "./" + Path.GetFileName(cheminDuJeu),
+                GameName = nom ?? Path.GetFileNameWithoutExtension(cheminDuJeu),
+            },
+            OnTheFlyRomExtractionTrigger.GameStart,
+            cancellationToken);
+
     public async Task<OnTheFlyRomInstallResult> EnsureLaunchRomAsync(
         string rawGameStartArguments,
         CancellationToken cancellationToken = default)
@@ -2299,6 +2321,7 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
         }
 
         using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Unable to start 7za.exe.");
+        using var arretDuProcessus = cancellationToken.Register(() => ArreterLeProcessus(process));
         var stdOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
         var stdErr = process.StandardError.ReadToEndAsync(cancellationToken);
         await process.WaitForExitAsync(cancellationToken);
@@ -2455,6 +2478,7 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
         startInfo.ArgumentList.Add(archivePath);
 
         using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Unable to start 7za.exe.");
+        using var arretDuProcessus = cancellationToken.Register(() => ArreterLeProcessus(process));
         var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
         var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
         await process.WaitForExitAsync(cancellationToken);
@@ -2658,6 +2682,7 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
         startInfo.ArgumentList.Add(archivePath);
 
         using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Unable to start tar.exe.");
+        using var arretDuProcessus = cancellationToken.Register(() => ArreterLeProcessus(process));
         var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
         var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
         await process.WaitForExitAsync(cancellationToken);
@@ -3357,6 +3382,7 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
         }
 
         using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Unable to start tar.exe.");
+        using var arretDuProcessus = cancellationToken.Register(() => ArreterLeProcessus(process));
         var stdOut = process.StandardOutput.ReadToEndAsync(cancellationToken);
         var stdErr = process.StandardError.ReadToEndAsync(cancellationToken);
         await process.WaitForExitAsync(cancellationToken);
@@ -3366,6 +3392,24 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
         }
 
         await stdOut;
+    }
+
+    /// <summary>
+    /// Un extracteur annule (delai depasse, partie MULTIPLAYER qui commence pendant la lecture d'un paquet) ne continue pas
+    /// derriere : son processus s'arrete, au lieu d'ecrire encore dans un dossier qu'on efface (26/10).
+    /// </summary>
+    private static void ArreterLeProcessus(Process process)
+    {
+        try
+        {
+            if (!process.HasExited)
+            {
+                process.Kill(entireProcessTree: true);
+            }
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception or NotSupportedException)
+        {
+        }
     }
 
     private static IEnumerable<string> EnumeratePackageRomCandidates(string contentRoot)
