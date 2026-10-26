@@ -137,6 +137,67 @@ public class EmulationStationWatcherProvider : IProvider
         }
     }
 
+    /// <summary>Les collections NelfePlay, ou un jeu d'une liste quittee sans « system-selected » se retrouve.</summary>
+    private static readonly string[] CollectionsNelfePlay = ["nelfeplay-scoring", "nelfeplay-multiplayer"];
+
+    /// <summary>
+    /// LE CHANGEMENT DE LISTE QU'ES NE DIT PAS (2026-10-26) : passer d'une liste de jeux a la suivante par gauche/droite
+    /// (ViewController::goToNextGameList) ne declenche aucun « system-selected ». Le carrousel retenu restait celui d'avant :
+    /// dans World Scoring, l'appui long sur 19xx (aussi au MULTIPLAYER) ouvrait le panneau MULTIPLAYER, et une partie de
+    /// 1942 etait jugee hors NelfePlay. Un jeu selectionne absent de la collection retenue prouve qu'on en est sorti : on
+    /// retient la collection NelfePlay qui le contient, sinon son systeme. Non confirme : il route l'appui long, et la
+    /// partie se juge sur la collection du jeu (comme un carrousel repris au demarrage).
+    /// </summary>
+    private void CorrigerLeCarrouselSelonLeJeu(string systemeDuJeu, string cheminDuJeu)
+    {
+        try
+        {
+            var retenu = _mediaRuntimeState.CarouselSystemId;
+            if (retenu.Length == 0 || cheminDuJeu.Length == 0
+                || string.Equals(retenu, systemeDuJeu, StringComparison.OrdinalIgnoreCase)
+                || ContientLeJeu(retenu, cheminDuJeu) is not false)
+            {
+                return;
+            }
+
+            var trouvees = CollectionsNelfePlay
+                .Where(c => !string.Equals(c, retenu, StringComparison.OrdinalIgnoreCase) && ContientLeJeu(c, cheminDuJeu) == true)
+                .ToList();
+            var nouveau = trouvees.Count == 1 ? trouvees[0] : systemeDuJeu;
+            if (nouveau.Length == 0)
+            {
+                return;
+            }
+
+            _mediaRuntimeState.MarkCarouselSystem(nouveau, confirme: false);
+            GarderLeCarrousel(nouveau);
+            _logger?.LogInformation(
+                "Carrousel corrige : {Avant} -> {Apres} ({Jeu} n'est pas dans {Avant} ; ES ne signale pas un changement de liste par gauche/droite)",
+                retenu, nouveau, Path.GetFileName(cheminDuJeu), retenu);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger?.LogDebug(ex, "Carrousel : la collection n'a pas pu etre relue");
+        }
+    }
+
+    /// <summary>
+    /// Vrai si la collection personnalisee d'ES `nom` liste ce jeu, faux si elle ne le liste pas, null si `nom` n'est pas une
+    /// collection personnalisee (un systeme, une collection automatique : on ne sait pas).
+    /// </summary>
+    private static bool? ContientLeJeu(string nom, string cheminDuJeu)
+    {
+        var fichier = Path.Combine(RetroBatPaths.EmulationStationConfigRoot, "collections", "custom-" + nom + ".cfg");
+        if (!File.Exists(fichier))
+        {
+            return null;
+        }
+
+        static string Normal(string chemin) => chemin.Trim().Trim('"').Replace('\\', '/');
+        var cible = Normal(cheminDuJeu);
+        return File.ReadLines(fichier).Any(ligne => string.Equals(Normal(ligne), cible, StringComparison.OrdinalIgnoreCase));
+    }
+
     private void GarderLeCarrousel(string systeme)
     {
         try
@@ -658,6 +719,7 @@ public class EmulationStationWatcherProvider : IProvider
                     GameName = name
                 };
 
+                CorrigerLeCarrouselSelonLeJeu(systemId, path);
                 _mediaRuntimeState.RecordGameSelectedSelection(systemId, path);
                 _mediaRuntimeState.ClearLiveAddGamesSuppressionOnGameSelected(systemId, path, name);
                 var localProjectionOnGameSelected = options.LocalProjectionOnGameSelected || options.PrefetchOnGameSelected;
