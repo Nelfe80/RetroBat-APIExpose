@@ -221,6 +221,8 @@ public sealed class MultiplayerLaunchService : IHostedService
         {
             FinDuLancement(room.Room);
             await AttendreLaSortieAsync().ConfigureAwait(false);
+            // Le decor des panneaux en jeu s'efface une fois la partie finie : il n'apparait pas parmi les decors d'ES.
+            MultiplayerDecor.Effacer();
             lock (_verrou)
             {
                 _enCours = null;
@@ -544,6 +546,8 @@ public sealed class MultiplayerLaunchService : IHostedService
         {
             FinDuLancement(room.Room);
             await AttendreLaSortieAsync().ConfigureAwait(false);
+            // Le decor des panneaux en jeu s'efface une fois la partie finie : il n'apparait pas parmi les decors d'ES.
+            MultiplayerDecor.Effacer();
             lock (_verrou)
             {
                 _enCours = null;

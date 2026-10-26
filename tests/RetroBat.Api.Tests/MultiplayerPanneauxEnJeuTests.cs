@@ -89,6 +89,9 @@ public class MultiplayerPanneauxEnJeuTests
             Assert.Equal(0, info.RootElement.GetProperty("top").GetInt32());
             // Un systeme qui n'est pas un nom ne s'ecrit pas.
             Assert.False(MultiplayerDecor.Ecrire("fb neo", @"E:\x\sf2ce.zip", image, bandes, racine));
+            // A la fin de la partie, le decor s'efface : il n'apparait pas parmi les decors d'ES.
+            MultiplayerDecor.Effacer(racine);
+            Assert.False(Directory.Exists(racine));
         }
         finally
         {

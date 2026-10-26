@@ -77,6 +77,22 @@ public static class MultiplayerDecor
         return true;
     }
 
+    /// <summary>Retire le decor (fin de partie) ; une erreur ne compte pas : le prochain lancement le recrira.</summary>
+    public static void Effacer(string? racine = null)
+    {
+        try
+        {
+            var dossier = racine ?? Dossier;
+            if (Directory.Exists(dossier))
+            {
+                Directory.Delete(dossier, recursive: true);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+    }
+
     /// <summary>Le <c>.info</c> d'un decor de RetroBat : la taille de l'image et les marges du trou ou le jeu s'affiche.</summary>
     public static string Info(int largeur, int hauteur, PanneauxEnJeu.Bandes bandes)
         => JsonSerializer.Serialize(new Dictionary<string, object>
