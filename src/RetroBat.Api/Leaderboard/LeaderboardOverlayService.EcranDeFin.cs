@@ -80,8 +80,6 @@ public sealed partial class LeaderboardOverlayService
         private static readonly Color Gain = Color.FromArgb(57, 229, 140);
         private static readonly Color Perte = Color.FromArgb(255, 79, 100);
 
-        private static readonly StringFormat Typo = CreerTypo();
-
         private readonly Stopwatch _horlogeDeLaFin = new();
         private string? _cleDeLaFin;
         private System.Windows.Forms.Timer? _imagesDeLaFin;
@@ -90,13 +88,6 @@ public sealed partial class LeaderboardOverlayService
         private Color _accent = Color.FromArgb(212, 255, 58);
         private Color _relief = Dore;
         private readonly Dictionary<string, Image?> _portraits = new(StringComparer.OrdinalIgnoreCase);
-
-        private static StringFormat CreerTypo()
-        {
-            var format = new StringFormat(StringFormat.GenericTypographic);
-            format.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
-            return format;
-        }
 
         // ── L'horloge ────────────────────────────────────────────────────────
 
@@ -173,7 +164,7 @@ public sealed partial class LeaderboardOverlayService
             g.ScaleTransform(k, k);
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-            var titre = Famille(fin.Police ?? style.Police, secours);
+            var titre = TraitsDesEcrans.Famille(fin.Police ?? style.Police, secours);
             try
             {
                 DessinerLeDecor(g, fin.Type, t);
@@ -192,100 +183,6 @@ public sealed partial class LeaderboardOverlayService
                 g.Restore(etat);
             }
         }
-
-        private static FontFamily Famille(string nom, Font secours) => PolicesDesEcrans.Famille(nom) ?? secours.FontFamily;
-
-        private static Font Police(string famille, float taille, Font secours, FontStyle style = FontStyle.Regular)
-            => PolicesDesEcrans.Police(famille, taille, style) ?? new Font(secours.FontFamily, Math.Max(1f, taille), style, GraphicsUnit.Pixel);
-
-        private static Font Chiffres(float taille, Font secours, bool italique = false)
-            => PolicesDesEcrans.Police(StylesDesEcrans.PoliceDesChiffres, taille, italique ? FontStyle.Italic : FontStyle.Regular)
-               ?? Police(StylesDesEcrans.PoliceDesLibelles, taille, secours, FontStyle.Bold);
-
-        private static Font Libelles(float taille, Font secours)
-            => PolicesDesEcrans.Police(StylesDesEcrans.PoliceDesLibelles, taille, FontStyle.Bold) ?? Police("", taille, secours, FontStyle.Bold);
-
-        private static Font LibellesFins(float taille, Font secours)
-            => PolicesDesEcrans.Police("Barlow Condensed SemiBold", taille) ?? Libelles(taille, secours);
-
-        private static Color Hex(string hex, int alpha = 255)
-        {
-            var (r, v, b, _) = EsMenuStyle.Couleur(hex, alpha);
-            return Color.FromArgb(alpha, r, v, b);
-        }
-
-        private static Color Alpha(Color c, double opacite) => Color.FromArgb((int)Math.Round(Math.Clamp(opacite, 0, 1) * c.A), c.R, c.G, c.B);
-
-        private static SizeF Mesure(Graphics g, string texte, Font police) => g.MeasureString(texte, police, PointF.Empty, Typo);
-
-        /// <summary>
-        /// Un texte detoure, avec ses reliefs : chaque relief est une copie decalee et pleine (la plus lointaine d'abord), puis
-        /// le contour, puis le texte. Rend la boite du texte.
-        /// </summary>
-        private static RectangleF TexteEnRelief(Graphics g, string texte, FontFamily famille, float taille, PointF origine, Color remplissage,
-            Color contour, float epaisseur, IReadOnlyList<(float Dx, float Dy, Color Couleur)> reliefs, double opacite = 1, FontStyle style = FontStyle.Regular)
-        {
-            if (texte.Length == 0 || opacite <= 0.01)
-            {
-                return RectangleF.Empty;
-            }
-
-            using var chemin = new GraphicsPath();
-            chemin.AddString(texte, famille, (int)(famille.IsStyleAvailable(style) ? style : FontStyle.Regular), taille, origine, Typo);
-            for (var i = reliefs.Count - 1; i >= 0; i--)
-            {
-                var (dx, dy, couleur) = reliefs[i];
-                using var copie = (GraphicsPath)chemin.Clone();
-                using var decalage = new Matrix();
-                decalage.Translate(dx, dy);
-                copie.Transform(decalage);
-                using var plein = new SolidBrush(Alpha(couleur, opacite));
-                g.FillPath(plein, copie);
-                if (epaisseur > 0)
-                {
-                    using var bord = new Pen(Alpha(couleur, opacite), epaisseur) { LineJoin = LineJoin.Round };
-                    g.DrawPath(bord, copie);
-                }
-            }
-
-            if (epaisseur > 0)
-            {
-                using var trait = new Pen(Alpha(contour, opacite), epaisseur) { LineJoin = LineJoin.Round };
-                g.DrawPath(trait, chemin);
-            }
-
-            using var pinceau = new SolidBrush(Alpha(remplissage, opacite));
-            g.FillPath(pinceau, chemin);
-            return chemin.GetBounds();
-        }
-
-        private static RectangleF BoiteDuTexte(string texte, FontFamily famille, float taille)
-        {
-            using var chemin = new GraphicsPath();
-            chemin.AddString(texte, famille, (int)FontStyle.Regular, taille, PointF.Empty, Typo);
-            return chemin.GetBounds();
-        }
-
-        /// <summary>La taille a laquelle <paramref name="texte"/> tient dans <paramref name="largeur"/>, sans depasser <paramref name="taille"/>.</summary>
-        private static float TailleQuiTient(string texte, FontFamily famille, float taille, float largeur)
-        {
-            var boite = BoiteDuTexte(texte, famille, taille);
-            return boite.Width <= largeur || boite.Width <= 0 ? taille : taille * largeur / boite.Width;
-        }
-
-        private static void TexteEspace(Graphics g, string texte, Font police, Color couleur, float x, float y, float espacement)
-        {
-            using var pinceau = new SolidBrush(couleur);
-            foreach (var c in texte)
-            {
-                var morceau = c.ToString();
-                g.DrawString(morceau, police, pinceau, x, y, Typo);
-                x += Mesure(g, morceau, police).Width + espacement;
-            }
-        }
-
-        private static float LargeurEspacee(Graphics g, string texte, Font police, float espacement)
-            => texte.Sum(c => Mesure(g, c.ToString(), police).Width) + espacement * Math.Max(0, texte.Length - 1);
 
         // ── Le fond, precalcule ──────────────────────────────────────────────
 
@@ -331,8 +228,8 @@ public sealed partial class LeaderboardOverlayService
             try
             {
                 var (titre, relief) = CouleurDuTitre.Choisir(fanart, fin.Joueurs.Where(j => j.Place is not null).Select(j => j.Place!.Value), style.Couleur);
-                _accent = Hex(titre);
-                _relief = Hex(relief);
+                _accent = TraitsDesEcrans.Hex(titre);
+                _relief = TraitsDesEcrans.Hex(relief);
                 _fondDeFin = DessinerLeFond(fanart, fin.Type, Math.Max(1, Width), Math.Max(1, Height));
             }
             finally
@@ -434,8 +331,8 @@ public sealed partial class LeaderboardOverlayService
             switch (type)
             {
                 case StylesDesEcrans.Course:
-                    using (var vitesse = new SolidBrush(Alpha(_accent, 0.85 * opacite)))
-                    using (var bleu = new SolidBrush(Alpha(Color.FromArgb(47, 213, 255), 0.7 * opacite)))
+                    using (var vitesse = new SolidBrush(TraitsDesEcrans.Alpha(_accent, 0.85 * opacite)))
+                    using (var bleu = new SolidBrush(TraitsDesEcrans.Alpha(Color.FromArgb(47, 213, 255), 0.7 * opacite)))
                     {
                         Trainee(g, vitesse, -20, 132, 760, 22);
                         Trainee(g, bleu, 80, 170, 620, 10);
@@ -445,16 +342,16 @@ public sealed partial class LeaderboardOverlayService
                 case StylesDesEcrans.Puzzle:
                     foreach (var (cx, cy, r, couleur) in new[] { (70f, 104f, 34f, "ff4f64"), (890f, 120f, 30f, "3d7bff"), (940f, 280f, 22f, "ffd23c"), (36f, 370f, 24f, "39e58c") })
                     {
-                        using var bille = new SolidBrush(Alpha(Hex(couleur), opacite));
-                        using var reflet = new SolidBrush(Alpha(Color.White, 0.7 * opacite));
+                        using var bille = new SolidBrush(TraitsDesEcrans.Alpha(TraitsDesEcrans.Hex(couleur), opacite));
+                        using var reflet = new SolidBrush(TraitsDesEcrans.Alpha(Color.White, 0.7 * opacite));
                         g.FillEllipse(bille, cx - r, cy - r, 2 * r, 2 * r);
                         g.FillEllipse(reflet, cx - r * 0.62f, cy - r * 0.62f, r * 0.54f, r * 0.54f);
                     }
                     break;
                 case StylesDesEcrans.Combat:
                     // Les eclaboussures derriere le titre, a la couleur du titre et a celle de son relief.
-                    using (var encre = new SolidBrush(Alpha(_accent, 0.75 * opacite)))
-                    using (var goutte = new SolidBrush(Alpha(_relief, 0.8 * opacite)))
+                    using (var encre = new SolidBrush(TraitsDesEcrans.Alpha(_accent, 0.75 * opacite)))
+                    using (var goutte = new SolidBrush(TraitsDesEcrans.Alpha(_relief, 0.8 * opacite)))
                     {
                         foreach (var (cx, cy, r) in new[] { (188f, 198f, 67f), (272f, 182f, 48f), (121f, 221f, 39f), (64f, 155f, 15f), (415f, 270f, 8f), (362f, 159f, 12f) })
                         {
@@ -493,42 +390,42 @@ public sealed partial class LeaderboardOverlayService
 
         private void DessinerLEnTete(Graphics g, EcranDeFin fin, Font secours)
         {
-            using var grand = LibellesFins(28, secours);
-            using var petit = LibellesFins(22, secours);
+            using var grand = TraitsDesEcrans.LibellesFins(28, secours);
+            using var petit = TraitsDesEcrans.LibellesFins(22, secours);
             const float droite = 1856;
             var mot = fin.Textes.FinDePartie.ToUpperInvariant();
-            var largeurMot = LargeurEspacee(g, mot, grand, 9);
-            var largeurBarres = Mesure(g, "  //", grand).Width;
-            TexteEspace(g, mot, grand, Color.White, droite - largeurBarres - largeurMot, 46, 9);
+            var largeurMot = TraitsDesEcrans.LargeurEspacee(g, mot, grand, 9);
+            var largeurBarres = TraitsDesEcrans.Mesure(g, "  //", grand).Width;
+            TraitsDesEcrans.TexteEspace(g, mot, grand, Color.White, droite - largeurBarres - largeurMot, 46, 9);
             using (var accent = new SolidBrush(_accent))
             {
-                g.DrawString("  //", grand, accent, droite - largeurBarres, 46, Typo);
+                g.DrawString("  //", grand, accent, droite - largeurBarres, 46, TraitsDesEcrans.Typo);
             }
 
             var sousTitre = string.Join(" · ", new[] { fin.Jeu, fin.Duree }.Where(x => x.Length > 0));
             using (var gris = new SolidBrush(Color.FromArgb(201, 195, 255)))
             {
-                g.DrawString(sousTitre, petit, gris, droite - Mesure(g, sousTitre, petit).Width, 88, Typo);
+                g.DrawString(sousTitre, petit, gris, droite - TraitsDesEcrans.Mesure(g, sousTitre, petit).Width, 88, TraitsDesEcrans.Typo);
             }
 
             var y = 124f;
             if (fin.Badge.Length > 0)
             {
-                using var police = Libelles(18, secours);
-                var largeur = LargeurEspacee(g, fin.Badge.ToUpperInvariant(), police, 3) + 24;
+                using var police = TraitsDesEcrans.Libelles(18, secours);
+                var largeur = TraitsDesEcrans.LargeurEspacee(g, fin.Badge.ToUpperInvariant(), police, 3) + 24;
                 var zone = new RectangleF(droite - largeur, y, largeur, 30);
                 using var forme = FormesDesEcrans.Arrondi(zone, 15);
                 using var bord = new Pen(Color.FromArgb(184, 199, 217), 2);
                 g.DrawPath(bord, forme);
-                TexteEspace(g, fin.Badge.ToUpperInvariant(), police, Color.FromArgb(184, 199, 217), zone.X + 12, y + 5, 3);
+                TraitsDesEcrans.TexteEspace(g, fin.Badge.ToUpperInvariant(), police, Color.FromArgb(184, 199, 217), zone.X + 12, y + 5, 3);
                 y += 40;
             }
 
             if (fin.Note.Length > 0)
             {
-                using var police = LibellesFins(20, secours);
+                using var police = TraitsDesEcrans.LibellesFins(20, secours);
                 using var encre = new SolidBrush(Color.FromArgb(255, 216, 168));
-                using var aDroite = new StringFormat(Typo) { Alignment = StringAlignment.Far, Trimming = StringTrimming.Word };
+                using var aDroite = new StringFormat(TraitsDesEcrans.Typo) { Alignment = StringAlignment.Far, Trimming = StringTrimming.Word };
                 g.DrawString(fin.Note, police, encre, new RectangleF(droite - 760, y, 760, 60), aDroite);
             }
         }
@@ -540,7 +437,7 @@ public sealed partial class LeaderboardOverlayService
                 return;
             }
 
-            var taille = TailleQuiTient(titre, famille, 184, 860);
+            var taille = TraitsDesEcrans.TailleQuiTient(titre, famille, 184, 860);
             var impact = Entre(t, 0, 0.27);
             var echelle = t < 0.27 ? 2.6 - (2.6 - 0.92) * Sortie(impact) : 0.92 + 0.08 * Entre(t, 0.27, 0.34);
             var secousse = t is >= 0.34 and < 0.5 ? Math.Sin((t - 0.34) * 70) * 8 * (1 - Entre(t, 0.34, 0.5)) : 0;
@@ -550,7 +447,7 @@ public sealed partial class LeaderboardOverlayService
             g.RotateTransform(-5);
             g.ScaleTransform((float)echelle, (float)echelle);
             g.TranslateTransform(-pivot.X, -pivot.Y);
-            TexteEnRelief(g, titre, famille, taille, new PointF(60, 100), _accent, Nuit, 10,
+            TraitsDesEcrans.TexteEnRelief(g, titre, famille, taille, new PointF(60, 100), _accent, Nuit, 10,
                 [(11, 11, _relief), (16, 16, Nuit)], Entre(t, 0, 0.12));
             g.Restore(etat);
         }
@@ -574,27 +471,27 @@ public sealed partial class LeaderboardOverlayService
             g.TranslateTransform((float)decalage, 0);
             const float gauche = 64;
             const float basDuBloc = 940;
-            var boiteUn = BoiteDuTexte("1", famille, 300);
-            var un = TexteEnRelief(g, "1", famille, 300, new PointF(gauche - boiteUn.X, basDuBloc - boiteUn.Bottom), _accent, Nuit, 8,
+            var boiteUn = TraitsDesEcrans.BoiteDuTexte("1", famille, 300);
+            var un = TraitsDesEcrans.TexteEnRelief(g, "1", famille, 300, new PointF(gauche - boiteUn.X, basDuBloc - boiteUn.Bottom), _accent, Nuit, 8,
                 [(12, 12, _relief), (17, 17, Nuit)], opacite);
             var xPseudo = un.Right + 26;
             var pseudo = vainqueur.Pseudo.ToUpperInvariant();
-            var taillePseudo = TailleQuiTient(pseudo, famille, 140, 880 - xPseudo);
-            var boitePseudo = BoiteDuTexte(pseudo, famille, taillePseudo);
+            var taillePseudo = TraitsDesEcrans.TailleQuiTient(pseudo, famille, 140, 880 - xPseudo);
+            var boitePseudo = TraitsDesEcrans.BoiteDuTexte(pseudo, famille, taillePseudo);
             var basDuPseudo = basDuBloc - 96;
-            var rendu = TexteEnRelief(g, pseudo, famille, taillePseudo, new PointF(xPseudo - boitePseudo.X, basDuPseudo - boitePseudo.Bottom),
+            var rendu = TraitsDesEcrans.TexteEnRelief(g, pseudo, famille, taillePseudo, new PointF(xPseudo - boitePseudo.X, basDuPseudo - boitePseudo.Bottom),
                 Color.White, Nuit, 6, [(8, 8, Nuit)], opacite);
 
             // L'etiquette VAINQUEUR, penchee, sous le pseudo.
             var mot = fin.Textes.Vainqueur.ToUpperInvariant();
-            var boiteMot = BoiteDuTexte(mot, famille, 52);
+            var boiteMot = TraitsDesEcrans.BoiteDuTexte(mot, famille, 52);
             var etiquette = new RectangleF(xPseudo, basDuPseudo + 20, boiteMot.Width + 48, 64);
             var etatEtiquette = g.Save();
             g.TranslateTransform(etiquette.X, etiquette.Y + etiquette.Height);
             g.RotateTransform(-6);
             g.TranslateTransform(-etiquette.X, -(etiquette.Y + etiquette.Height));
-            using (var ombre = new SolidBrush(Alpha(Nuit, opacite)))
-            using (var fond = new SolidBrush(Alpha(_accent, opacite)))
+            using (var ombre = new SolidBrush(TraitsDesEcrans.Alpha(Nuit, opacite)))
+            using (var fond = new SolidBrush(TraitsDesEcrans.Alpha(_accent, opacite)))
             using (var formeOmbre = FormesDesEcrans.Arrondi(new RectangleF(etiquette.X + 6, etiquette.Y + 6, etiquette.Width, etiquette.Height), 6))
             using (var forme = FormesDesEcrans.Arrondi(etiquette, 6))
             {
@@ -602,7 +499,7 @@ public sealed partial class LeaderboardOverlayService
                 g.FillPath(fond, forme);
             }
 
-            TexteEnRelief(g, mot, famille, 52, new PointF(etiquette.X + 24 - boiteMot.X, etiquette.Y + (etiquette.Height - boiteMot.Height) / 2f - boiteMot.Y),
+            TraitsDesEcrans.TexteEnRelief(g, mot, famille, 52, new PointF(etiquette.X + 24 - boiteMot.X, etiquette.Y + (etiquette.Height - boiteMot.Height) / 2f - boiteMot.Y),
                 Nuit, Nuit, 0, [], opacite);
             g.Restore(etatEtiquette);
 
@@ -616,8 +513,8 @@ public sealed partial class LeaderboardOverlayService
                 g.TranslateTransform(couronne.X + couronne.Width / 2, couronne.Y + couronne.Height / 2);
                 g.RotateTransform((float)(t < 0.95 ? -18 + 24 * Sortie(chute) : 6 * (1 - Entre(t, 0.95, 1.2))));
                 g.TranslateTransform(-(couronne.X + couronne.Width / 2), -(couronne.Y + couronne.Height / 2));
-                IconesPixel.Dessiner(g, "couronne", couronne, Alpha(Dore, Math.Min(opacite, Sortie(chute) * 2)));
-                IconesPixel.Dessiner(g, "joyaux", couronne, Alpha(Color.FromArgb(176, 122, 0), Math.Min(opacite, Sortie(chute) * 2)));
+                IconesPixel.Dessiner(g, "couronne", couronne, TraitsDesEcrans.Alpha(Dore, Math.Min(opacite, Sortie(chute) * 2)));
+                IconesPixel.Dessiner(g, "joyaux", couronne, TraitsDesEcrans.Alpha(Color.FromArgb(176, 122, 0), Math.Min(opacite, Sortie(chute) * 2)));
                 g.Restore(etatCouronne);
             }
 
@@ -631,9 +528,9 @@ public sealed partial class LeaderboardOverlayService
                 return;
             }
 
-            using var police = LibellesFins(26, secours);
+            using var police = TraitsDesEcrans.LibellesFins(26, secours);
             using var encre = new SolidBrush(Color.FromArgb(232, 228, 255));
-            g.DrawString(phrase, police, encre, 64, 1004, Typo);
+            g.DrawString(phrase, police, encre, 64, 1004, TraitsDesEcrans.Typo);
         }
 
         // ── A droite : la jauge globale et les joueurs ───────────────────────
@@ -658,24 +555,24 @@ public sealed partial class LeaderboardOverlayService
             var remplissage = Sortie(Entre(t, 1.35, 2.5));
             var egale = 1.0 / jauge.Parts.Count;
             var parts = jauge.Parts.Select(p => (p.Place, Part: egale + (p.Part - egale) * remplissage)).ToList();
-            using var libelle = Libelles(20, secours);
+            using var libelle = TraitsDesEcrans.Libelles(20, secours);
             var mot = jauge.Libelle;
-            var largeurMot = LargeurEspacee(g, mot, libelle, 5);
-            TexteEspace(g, mot, libelle, Alpha(Color.FromArgb(232, 228, 255), apparition), x + (largeur - largeurMot) / 2f, y + 14, 5);
+            var largeurMot = TraitsDesEcrans.LargeurEspacee(g, mot, libelle, 5);
+            TraitsDesEcrans.TexteEspace(g, mot, libelle, TraitsDesEcrans.Alpha(Color.FromArgb(232, 228, 255), apparition), x + (largeur - largeurMot) / 2f, y + 14, 5);
             if (parts.Count == 2)
             {
                 foreach (var (part, aDroite) in new[] { (parts[0], false), (parts[1], true) })
                 {
                     var texte = Math.Round(part.Part * 100).ToString(CultureInfo.InvariantCulture) + " %";
-                    var boite = BoiteDuTexte(texte, famille, 42);
+                    var boite = TraitsDesEcrans.BoiteDuTexte(texte, famille, 42);
                     var gauche = aDroite ? x + largeur - boite.Width : x;
-                    TexteEnRelief(g, texte, famille, 42, new PointF(gauche - boite.X, y + 42 - boite.Bottom), Hex(StylesDesEcrans.CouleurDeLaPlace(part.Place)),
+                    TraitsDesEcrans.TexteEnRelief(g, texte, famille, 42, new PointF(gauche - boite.X, y + 42 - boite.Bottom), TraitsDesEcrans.Hex(StylesDesEcrans.CouleurDeLaPlace(part.Place)),
                         Nuit, 0, [(3, 3, Nuit)], apparition);
                 }
             }
 
             var barre = new RectangleF(x, y + 52, largeur, 34);
-            using (var halo = new Pen(Alpha(Color.FromArgb(51, 255, 255, 255), apparition), 2))
+            using (var halo = new Pen(TraitsDesEcrans.Alpha(Color.FromArgb(51, 255, 255, 255), apparition), 2))
             using (var formeHalo = FormesDesEcrans.Arrondi(RectangleF.Inflate(barre, 4, 4), 21))
             {
                 g.DrawPath(halo, formeHalo);
@@ -687,13 +584,13 @@ public sealed partial class LeaderboardOverlayService
                 g.SetClip(forme, CombineMode.Intersect);
                 var gaucheDuMorceau = barre.X;
                 using var rayures = new HatchBrush(HatchStyle.WideUpwardDiagonal, Color.FromArgb((int)(40 * apparition), 255, 255, 255), Color.Transparent);
-                using var separation = new Pen(Alpha(Color.White, apparition), 4);
-                using var police = Libelles(22, secours);
+                using var separation = new Pen(TraitsDesEcrans.Alpha(Color.White, apparition), 4);
+                using var police = TraitsDesEcrans.Libelles(22, secours);
                 for (var i = 0; i < parts.Count; i++)
                 {
                     var largeurDuMorceau = i == parts.Count - 1 ? barre.Right - gaucheDuMorceau : (float)(parts[i].Part * largeur);
                     var morceau = new RectangleF(gaucheDuMorceau, barre.Y, largeurDuMorceau, barre.Height);
-                    using (var couleur = new SolidBrush(Alpha(Hex(StylesDesEcrans.CouleurDeLaPlace(parts[i].Place)), apparition)))
+                    using (var couleur = new SolidBrush(TraitsDesEcrans.Alpha(TraitsDesEcrans.Hex(StylesDesEcrans.CouleurDeLaPlace(parts[i].Place)), apparition)))
                     {
                         g.FillRectangle(couleur, morceau);
                     }
@@ -701,8 +598,8 @@ public sealed partial class LeaderboardOverlayService
                     g.FillRectangle(rayures, morceau);
                     if (parts.Count > 2 && largeurDuMorceau > 70)
                     {
-                        using var sombre = new SolidBrush(Alpha(Nuit, apparition));
-                        g.DrawString(Math.Round(parts[i].Part * 100).ToString(CultureInfo.InvariantCulture) + " %", police, sombre, morceau.X + 12, morceau.Y + 6, Typo);
+                        using var sombre = new SolidBrush(TraitsDesEcrans.Alpha(Nuit, apparition));
+                        g.DrawString(Math.Round(parts[i].Part * 100).ToString(CultureInfo.InvariantCulture) + " %", police, sombre, morceau.X + 12, morceau.Y + 6, TraitsDesEcrans.Typo);
                     }
 
                     if (i > 0)
@@ -714,7 +611,7 @@ public sealed partial class LeaderboardOverlayService
                 }
 
                 g.Clip = clip;
-                using var bord = new Pen(Alpha(Nuit, apparition), 3);
+                using var bord = new Pen(TraitsDesEcrans.Alpha(Nuit, apparition), 3);
                 g.DrawPath(bord, forme);
             }
 
@@ -761,17 +658,17 @@ public sealed partial class LeaderboardOverlayService
             {
                 for (var i = 3; i >= 1; i--)
                 {
-                    using var halo = new Pen(Alpha(Color.FromArgb(28 * i, _accent), opacite), 6 * i + 3);
+                    using var halo = new Pen(TraitsDesEcrans.Alpha(Color.FromArgb(28 * i, _accent), opacite), 6 * i + 3);
                     g.DrawPath(halo, forme);
                 }
             }
 
-            using (var fond = new SolidBrush(Alpha(Color.FromArgb(230, 18, 10, 40), opacite)))
+            using (var fond = new SolidBrush(TraitsDesEcrans.Alpha(Color.FromArgb(230, 18, 10, 40), opacite)))
             {
                 g.FillPath(fond, forme);
             }
 
-            using var bord = new Pen(Alpha(j.Gagnant ? _accent : Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)), opacite), 3);
+            using var bord = new Pen(TraitsDesEcrans.Alpha(j.Gagnant ? _accent : TraitsDesEcrans.Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)), opacite), 3);
             g.DrawPath(bord, forme);
         }
 
@@ -785,8 +682,8 @@ public sealed partial class LeaderboardOverlayService
 
             var miroir = j.Place is { } p && p % 2 == 0;
             using (var cadre = FormesDesEcrans.Portrait(style.Forme, zone, miroir))
-            using (var couleur = new SolidBrush(Alpha(Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)), opacite)))
-            using (var ombre = new SolidBrush(Alpha(Color.FromArgb(140, 0, 0, 0), opacite)))
+            using (var couleur = new SolidBrush(TraitsDesEcrans.Alpha(TraitsDesEcrans.Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)), opacite)))
+            using (var ombre = new SolidBrush(TraitsDesEcrans.Alpha(Color.FromArgb(140, 0, 0, 0), opacite)))
             using (var cadreOmbre = FormesDesEcrans.Portrait(style.Forme, new RectangleF(zone.X + 4, zone.Y + 5, zone.Width, zone.Height), miroir))
             {
                 g.FillPath(ombre, cadreOmbre);
@@ -850,13 +747,13 @@ public sealed partial class LeaderboardOverlayService
         private static void DessinerLaPastilleDeFin(Graphics g, int? place, Font police, PointF coin, double opacite)
         {
             var texte = "P" + (place?.ToString(CultureInfo.InvariantCulture) ?? "?");
-            var taille = Mesure(g, texte, police);
+            var taille = TraitsDesEcrans.Mesure(g, texte, police);
             var zone = new RectangleF(coin.X, coin.Y, taille.Width + 18, taille.Height + 8);
             using var forme = FormesDesEcrans.Arrondi(zone, 4);
-            using var fond = new SolidBrush(Alpha(Hex(StylesDesEcrans.CouleurDeLaPlace(place)), opacite));
-            using var encre = new SolidBrush(Alpha(Nuit, opacite));
+            using var fond = new SolidBrush(TraitsDesEcrans.Alpha(TraitsDesEcrans.Hex(StylesDesEcrans.CouleurDeLaPlace(place)), opacite));
+            using var encre = new SolidBrush(TraitsDesEcrans.Alpha(Nuit, opacite));
             g.FillPath(fond, forme);
-            g.DrawString(texte, police, encre, zone.X + 9, zone.Y + 4, Typo);
+            g.DrawString(texte, police, encre, zone.X + 9, zone.Y + 4, TraitsDesEcrans.Typo);
         }
 
         /// <summary>La lettre de rang dans son hexagone d'or, puis l'ELO et l'ecart. Rend le bord droit.</summary>
@@ -872,31 +769,31 @@ public sealed partial class LeaderboardOverlayService
             {
                 var hexagone = new RectangleF(x, coin.Y, hauteur * 1.15f, hauteur);
                 using var forme = FormesDesEcrans.Hexagone(hexagone);
-                using var or = new SolidBrush(Alpha(Dore, opacite));
+                using var or = new SolidBrush(TraitsDesEcrans.Alpha(Dore, opacite));
                 g.FillPath(or, forme);
-                using var police = Chiffres(hauteur * 0.72f, secours);
-                using var encre = new SolidBrush(Alpha(Nuit, opacite));
-                var taille = Mesure(g, j.Lettre, police);
-                g.DrawString(j.Lettre, police, encre, hexagone.X + (hexagone.Width - taille.Width) / 2f, hexagone.Y + (hexagone.Height - taille.Height) / 2f, Typo);
+                using var police = TraitsDesEcrans.Chiffres(hauteur * 0.72f, secours);
+                using var encre = new SolidBrush(TraitsDesEcrans.Alpha(Nuit, opacite));
+                var taille = TraitsDesEcrans.Mesure(g, j.Lettre, police);
+                g.DrawString(j.Lettre, police, encre, hexagone.X + (hexagone.Width - taille.Width) / 2f, hexagone.Y + (hexagone.Height - taille.Height) / 2f, TraitsDesEcrans.Typo);
                 x = hexagone.Right + hauteur * 0.32f;
             }
 
-            using (var police = Chiffres(hauteur * 0.78f, secours))
-            using (var blanc = new SolidBrush(Alpha(Color.White, opacite)))
+            using (var police = TraitsDesEcrans.Chiffres(hauteur * 0.78f, secours))
+            using (var blanc = new SolidBrush(TraitsDesEcrans.Alpha(Color.White, opacite)))
             {
                 var texte = "ELO " + j.Cote;
-                var taille = Mesure(g, texte, police);
-                g.DrawString(texte, police, blanc, x, coin.Y + (hauteur - taille.Height) / 2f, Typo);
+                var taille = TraitsDesEcrans.Mesure(g, texte, police);
+                g.DrawString(texte, police, blanc, x, coin.Y + (hauteur - taille.Height) / 2f, TraitsDesEcrans.Typo);
                 x += taille.Width + hauteur * 0.3f;
             }
 
             if (j.Ecart.Length > 0)
             {
                 var montee = Sortie(Entre(t, 1.44, 1.71));
-                using var police = Chiffres(hauteur * 1.0f, secours);
-                using var couleur = new SolidBrush(Alpha(j.Ecart.StartsWith('-') ? Perte : Gain, opacite * montee));
-                var taille = Mesure(g, j.Ecart, police);
-                g.DrawString(j.Ecart, police, couleur, x, coin.Y + (hauteur - taille.Height) / 2f + (float)(16 * (1 - montee)), Typo);
+                using var police = TraitsDesEcrans.Chiffres(hauteur * 1.0f, secours);
+                using var couleur = new SolidBrush(TraitsDesEcrans.Alpha(j.Ecart.StartsWith('-') ? Perte : Gain, opacite * montee));
+                var taille = TraitsDesEcrans.Mesure(g, j.Ecart, police);
+                g.DrawString(j.Ecart, police, couleur, x, coin.Y + (hauteur - taille.Height) / 2f + (float)(16 * (1 - montee)), TraitsDesEcrans.Typo);
                 x += taille.Width;
             }
 
@@ -916,7 +813,7 @@ public sealed partial class LeaderboardOverlayService
             g.TranslateTransform(zone.X + zone.Width / 2, zone.Y + zone.Height / 2);
             g.ScaleTransform((float)echelle, (float)echelle);
             g.TranslateTransform(-(zone.X + zone.Width / 2), -(zone.Y + zone.Height / 2));
-            IconesPixel.Dessiner(g, "etoile", zone, Alpha(Dore, opacite));
+            IconesPixel.Dessiner(g, "etoile", zone, TraitsDesEcrans.Alpha(Dore, opacite));
             g.Restore(etat);
         }
 
@@ -936,7 +833,7 @@ public sealed partial class LeaderboardOverlayService
 
             var echelle = t < 2.75 ? 1.6 - (1.6 - 0.92) * Sortie(x) : 0.92 + 0.08 * Entre(t, 2.75, 2.88);
             var mot = distinction.ToUpperInvariant();
-            var boite = BoiteDuTexte(mot, famille, taille);
+            var boite = TraitsDesEcrans.BoiteDuTexte(mot, famille, taille);
             var hauteur = taille * 1.45f;
             var largeur = boite.Width + taille * 2.1f;
             var zone = new RectangleF(coinHautDroit.X - largeur + 22, coinHautDroit.Y - hauteur * 0.62f, largeur, hauteur);
@@ -948,9 +845,9 @@ public sealed partial class LeaderboardOverlayService
             var opacite = Math.Min(1, x * 3);
             using (var ombre = FormesDesEcrans.Arrondi(new RectangleF(zone.X + 5, zone.Y + 5, zone.Width, zone.Height), 8))
             using (var forme = FormesDesEcrans.Arrondi(zone, 8))
-            using (var noir = new SolidBrush(Alpha(Nuit, opacite)))
-            using (var jaune = new SolidBrush(Alpha(Dore, opacite)))
-            using (var bord = new Pen(Alpha(Nuit, opacite), 3))
+            using (var noir = new SolidBrush(TraitsDesEcrans.Alpha(Nuit, opacite)))
+            using (var jaune = new SolidBrush(TraitsDesEcrans.Alpha(Dore, opacite)))
+            using (var bord = new Pen(TraitsDesEcrans.Alpha(Nuit, opacite), 3))
             {
                 g.FillPath(noir, ombre);
                 g.FillPath(jaune, forme);
@@ -958,8 +855,8 @@ public sealed partial class LeaderboardOverlayService
             }
 
             var couronne = new RectangleF(zone.X + taille * 0.45f, zone.Y + (zone.Height - taille * 0.56f) / 2f, taille, taille * 0.56f);
-            IconesPixel.Dessiner(g, "couronne", couronne, Alpha(Nuit, opacite));
-            TexteEnRelief(g, mot, famille, taille, new PointF(couronne.Right + taille * 0.3f - boite.X, zone.Y + (zone.Height - boite.Height) / 2f - boite.Y),
+            IconesPixel.Dessiner(g, "couronne", couronne, TraitsDesEcrans.Alpha(Nuit, opacite));
+            TraitsDesEcrans.TexteEnRelief(g, mot, famille, taille, new PointF(couronne.Right + taille * 0.3f - boite.X, zone.Y + (zone.Height - boite.Height) / 2f - boite.Y),
                 Nuit, Nuit, 0, [], opacite);
             g.Restore(etat);
         }
@@ -984,9 +881,9 @@ public sealed partial class LeaderboardOverlayService
             if (j.Rang is { } rang)
             {
                 var texte = rang.ToString(CultureInfo.InvariantCulture);
-                var boite = BoiteDuTexte(texte, famille, 128);
-                var rendu = TexteEnRelief(g, texte, famille, 128, new PointF(x - boite.X, y + hautEntete - boite.Bottom),
-                    j.Gagnant ? _accent : Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)), Nuit, 0, [(5, 5, Nuit)], opacite);
+                var boite = TraitsDesEcrans.BoiteDuTexte(texte, famille, 128);
+                var rendu = TraitsDesEcrans.TexteEnRelief(g, texte, famille, 128, new PointF(x - boite.X, y + hautEntete - boite.Bottom),
+                    j.Gagnant ? _accent : TraitsDesEcrans.Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)), Nuit, 0, [(5, 5, Nuit)], opacite);
                 x = rendu.Right + 18;
             }
 
@@ -996,22 +893,22 @@ public sealed partial class LeaderboardOverlayService
                 x += 124 + 18;
             }
 
-            using (var pastille = Chiffres(21, secours))
+            using (var pastille = TraitsDesEcrans.Chiffres(21, secours))
             {
                 DessinerLaPastilleDeFin(g, j.Place, pastille, new PointF(x, y + hautEntete - 76), opacite);
             }
 
             if (j.Personnage.Length > 0)
             {
-                using var police = Libelles(22, secours);
-                TexteEspace(g, j.Personnage.ToUpperInvariant(), police, Alpha(Color.FromArgb(201, 195, 255), opacite), x, y + hautEntete - 30, 3);
+                using var police = TraitsDesEcrans.Libelles(22, secours);
+                TraitsDesEcrans.TexteEspace(g, j.Personnage.ToUpperInvariant(), police, TraitsDesEcrans.Alpha(Color.FromArgb(201, 195, 255), opacite), x, y + hautEntete - 30, 3);
             }
 
             y += hautEntete + 16;
             var pseudo = j.Pseudo.ToUpperInvariant();
-            var taillePseudo = TailleQuiTient(pseudo, famille, 64, largeur - 56);
-            var boitePseudo = BoiteDuTexte(pseudo, famille, taillePseudo);
-            TexteEnRelief(g, pseudo, famille, taillePseudo, new PointF(carte.X + 28 - boitePseudo.X, y + 58 - boitePseudo.Bottom), Color.White, Nuit, 0,
+            var taillePseudo = TraitsDesEcrans.TailleQuiTient(pseudo, famille, 64, largeur - 56);
+            var boitePseudo = TraitsDesEcrans.BoiteDuTexte(pseudo, famille, taillePseudo);
+            TraitsDesEcrans.TexteEnRelief(g, pseudo, famille, taillePseudo, new PointF(carte.X + 28 - boitePseudo.X, y + 58 - boitePseudo.Bottom), Color.White, Nuit, 0,
                 [(4, 4, Color.Black)], opacite);
             y += 61;
             if (j.Cote.Length > 0)
@@ -1022,36 +919,36 @@ public sealed partial class LeaderboardOverlayService
             }
 
             y += 16;
-            using (var trait = new Pen(Alpha(Color.FromArgb(31, 255, 255, 255), opacite), 2))
+            using (var trait = new Pen(TraitsDesEcrans.Alpha(Color.FromArgb(31, 255, 255, 255), opacite), 2))
             {
                 g.DrawLine(trait, carte.X + 28, y, carte.Right - 28, y);
             }
 
             y += 18;
-            using var libelle = Libelles(24, secours);
-            using var valeur = Chiffres(54, secours, italique: true);
-            using var nonMesure = Chiffres(40, secours, italique: true);
+            using var libelle = TraitsDesEcrans.Libelles(24, secours);
+            using var valeur = TraitsDesEcrans.Chiffres(54, secours, italique: true);
+            using var nonMesure = TraitsDesEcrans.Chiffres(40, secours, italique: true);
             var remplissage = Sortie(Entre(t, 1.35, 2.5));
             foreach (var m in j.Mesures)
             {
-                var couleur = Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place));
+                var couleur = TraitsDesEcrans.Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place));
                 var rond = new RectangleF(carte.X + 28, y, 52, 52);
-                using (var fond = new SolidBrush(Alpha(Color.FromArgb(13, 8, 32), opacite)))
-                using (var bord = new Pen(Alpha(couleur, opacite), 2))
+                using (var fond = new SolidBrush(TraitsDesEcrans.Alpha(Color.FromArgb(13, 8, 32), opacite)))
+                using (var bord = new Pen(TraitsDesEcrans.Alpha(couleur, opacite), 2))
                 {
                     g.FillEllipse(fond, rond);
                     g.DrawEllipse(bord, rond);
                 }
 
                 var rapport = IconesPixel.Rapport(m.Icone);
-                IconesPixel.Dessiner(g, m.Icone, RectangleF.Inflate(rond, -12, -12 / Math.Max(1f, rapport)), Alpha(Color.White, opacite));
-                TexteEspace(g, m.Libelle, libelle, Alpha(Color.FromArgb(216, 212, 240), opacite), rond.Right + 14, y + 13, 2.4f);
+                IconesPixel.Dessiner(g, m.Icone, RectangleF.Inflate(rond, -12, -12 / Math.Max(1f, rapport)), TraitsDesEcrans.Alpha(Color.White, opacite));
+                TraitsDesEcrans.TexteEspace(g, m.Libelle, libelle, TraitsDesEcrans.Alpha(Color.FromArgb(216, 212, 240), opacite), rond.Right + 14, y + 13, 2.4f);
                 var texte = m.Valeur is { } v ? Decompte(v, t).ToString(CultureInfo.InvariantCulture) : "-";
                 var police = m.Valeur is null ? nonMesure : valeur;
-                var taille = Mesure(g, texte, police);
-                using (var encre = new SolidBrush(Alpha(m.Meilleure ? Dore : Color.White, opacite)))
+                var taille = TraitsDesEcrans.Mesure(g, texte, police);
+                using (var encre = new SolidBrush(TraitsDesEcrans.Alpha(m.Meilleure ? Dore : Color.White, opacite)))
                 {
-                    g.DrawString(texte, police, encre, carte.Right - 28 - taille.Width, y + 26 - taille.Height / 2f, Typo);
+                    g.DrawString(texte, police, encre, carte.Right - 28 - taille.Width, y + 26 - taille.Height / 2f, TraitsDesEcrans.Typo);
                 }
 
                 if (m.Meilleure)
@@ -1061,7 +958,7 @@ public sealed partial class LeaderboardOverlayService
 
                 var piste = new RectangleF(carte.X + 28, y + 58, largeur - 56, 12);
                 using (var fondDePiste = FormesDesEcrans.Arrondi(piste, 6))
-                using (var gris = new SolidBrush(Alpha(Color.FromArgb(20, 255, 255, 255), opacite)))
+                using (var gris = new SolidBrush(TraitsDesEcrans.Alpha(Color.FromArgb(20, 255, 255, 255), opacite)))
                 {
                     g.FillPath(gris, fondDePiste);
                 }
@@ -1070,7 +967,7 @@ public sealed partial class LeaderboardOverlayService
                 if (largeurPleine > 1)
                 {
                     using var plein = FormesDesEcrans.Arrondi(new RectangleF(piste.X, piste.Y, Math.Max(12, largeurPleine), piste.Height), 6);
-                    using var pinceau = new SolidBrush(Alpha(couleur, opacite));
+                    using var pinceau = new SolidBrush(TraitsDesEcrans.Alpha(couleur, opacite));
                     g.FillPath(pinceau, plein);
                 }
 
@@ -1097,8 +994,8 @@ public sealed partial class LeaderboardOverlayService
             if (j.Rang is { } rang)
             {
                 var texte = rang.ToString(CultureInfo.InvariantCulture);
-                var boite = BoiteDuTexte(texte, famille, 96);
-                TexteEnRelief(g, texte, famille, 96, new PointF(x - boite.X, y + 96 - boite.Bottom), j.Gagnant ? _accent : Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)),
+                var boite = TraitsDesEcrans.BoiteDuTexte(texte, famille, 96);
+                TraitsDesEcrans.TexteEnRelief(g, texte, famille, 96, new PointF(x - boite.X, y + 96 - boite.Bottom), j.Gagnant ? _accent : TraitsDesEcrans.Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)),
                     Nuit, 0, [(4, 4, Nuit)], opacite);
                 x += 70 + 16;
             }
@@ -1109,27 +1006,27 @@ public sealed partial class LeaderboardOverlayService
                 x += 104 + 16;
             }
 
-            using (var pastille = Chiffres(19, secours))
+            using (var pastille = TraitsDesEcrans.Chiffres(19, secours))
             {
                 DessinerLaPastilleDeFin(g, j.Place, pastille, new PointF(x, y), opacite);
             }
 
             var pseudo = j.Pseudo.ToUpperInvariant();
-            var taillePseudo = TailleQuiTient(pseudo, famille, 40, carte.Right - 22 - x);
-            var boitePseudo = BoiteDuTexte(pseudo, famille, taillePseudo);
-            TexteEnRelief(g, pseudo, famille, taillePseudo, new PointF(x - boitePseudo.X, y + 70 - boitePseudo.Bottom), Color.White, Nuit, 0, [(2, 2, Nuit)], opacite);
+            var taillePseudo = TraitsDesEcrans.TailleQuiTient(pseudo, famille, 40, carte.Right - 22 - x);
+            var boitePseudo = TraitsDesEcrans.BoiteDuTexte(pseudo, famille, taillePseudo);
+            TraitsDesEcrans.TexteEnRelief(g, pseudo, famille, taillePseudo, new PointF(x - boitePseudo.X, y + 70 - boitePseudo.Bottom), Color.White, Nuit, 0, [(2, 2, Nuit)], opacite);
             DessinerLaCoteDeFin(g, j, secours, new PointF(x, y + 76), 24, opacite, t);
             y += 96 + 16;
             var colonne = (largeur - 44 - 2 * 14) / 3f;
-            using var libelle = Libelles(15, secours);
-            using var valeur = Chiffres(40, secours, italique: true);
+            using var libelle = TraitsDesEcrans.Libelles(15, secours);
+            using var valeur = TraitsDesEcrans.Chiffres(40, secours, italique: true);
             var remplissage = Sortie(Entre(t, 1.35, 2.5));
             for (var i = 0; i < Math.Min(3, j.Mesures.Count); i++)
             {
                 var m = j.Mesures[i];
                 var cx = carte.X + 22 + i * (colonne + 14);
-                IconesPixel.Dessiner(g, m.Icone, new RectangleF(cx, y, 20, 20), Alpha(Color.FromArgb(195, 205, 245), opacite));
-                TexteEspace(g, m.Libelle, libelle, Alpha(Color.FromArgb(195, 205, 245), opacite), cx + 26, y + 2, 1.2f);
+                IconesPixel.Dessiner(g, m.Icone, new RectangleF(cx, y, 20, 20), TraitsDesEcrans.Alpha(Color.FromArgb(195, 205, 245), opacite));
+                TraitsDesEcrans.TexteEspace(g, m.Libelle, libelle, TraitsDesEcrans.Alpha(Color.FromArgb(195, 205, 245), opacite), cx + 26, y + 2, 1.2f);
                 var texte = m.Valeur is { } v ? Decompte(v, t).ToString(CultureInfo.InvariantCulture) : "-";
                 var decalage = m.Meilleure ? 26f : 0f;
                 if (m.Meilleure)
@@ -1137,18 +1034,18 @@ public sealed partial class LeaderboardOverlayService
                     DessinerLEtoile(g, new RectangleF(cx, y + 34, 20, 20), t, opacite);
                 }
 
-                using (var encre = new SolidBrush(Alpha(m.Meilleure ? Dore : Color.White, opacite)))
+                using (var encre = new SolidBrush(TraitsDesEcrans.Alpha(m.Meilleure ? Dore : Color.White, opacite)))
                 {
-                    g.DrawString(texte, valeur, encre, cx + decalage, y + 24, Typo);
+                    g.DrawString(texte, valeur, encre, cx + decalage, y + 24, TraitsDesEcrans.Typo);
                 }
 
                 var piste = new RectangleF(cx, y + 76, colonne, 8);
-                using (var gris = new SolidBrush(Alpha(Color.FromArgb(20, 255, 255, 255), opacite)))
+                using (var gris = new SolidBrush(TraitsDesEcrans.Alpha(Color.FromArgb(20, 255, 255, 255), opacite)))
                 {
                     g.FillRectangle(gris, piste);
                 }
 
-                using var pinceau = new SolidBrush(Alpha(Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)), opacite));
+                using var pinceau = new SolidBrush(TraitsDesEcrans.Alpha(TraitsDesEcrans.Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)), opacite));
                 g.FillRectangle(pinceau, piste.X, piste.Y, (float)(piste.Width * m.Part * remplissage), piste.Height);
             }
 
@@ -1164,17 +1061,17 @@ public sealed partial class LeaderboardOverlayService
             var colonnes = joueurs.FirstOrDefault()?.Mesures ?? [];
             const float largeurColonne = 160;
             var xMesures = gauche + largeur - 26 - colonnes.Count * largeurColonne - Math.Max(0, colonnes.Count - 1) * 18;
-            using var libelle = Libelles(17, secours);
+            using var libelle = TraitsDesEcrans.Libelles(17, secours);
             var (dyTete, opaciteTete) = Apparition(t, 0);
             for (var i = 0; i < colonnes.Count; i++)
             {
                 var cx = xMesures + i * (largeurColonne + 18);
-                IconesPixel.Dessiner(g, colonnes[i].Icone, new RectangleF(cx, haut + dyTete, 20, 20), Alpha(Color.FromArgb(195, 205, 245), opaciteTete));
-                TexteEspace(g, colonnes[i].Libelle, libelle, Alpha(Color.FromArgb(195, 205, 245), opaciteTete), cx + 26, haut + 2 + dyTete, 1.4f);
+                IconesPixel.Dessiner(g, colonnes[i].Icone, new RectangleF(cx, haut + dyTete, 20, 20), TraitsDesEcrans.Alpha(Color.FromArgb(195, 205, 245), opaciteTete));
+                TraitsDesEcrans.TexteEspace(g, colonnes[i].Libelle, libelle, TraitsDesEcrans.Alpha(Color.FromArgb(195, 205, 245), opaciteTete), cx + 26, haut + 2 + dyTete, 1.4f);
             }
 
             var y = haut + 40;
-            using var valeur = Chiffres(Math.Min(48, hauteurDeLigne * 0.36f), secours, italique: true);
+            using var valeur = TraitsDesEcrans.Chiffres(Math.Min(48, hauteurDeLigne * 0.36f), secours, italique: true);
             var remplissage = Sortie(Entre(t, 1.35, 2.5));
             for (var r = 0; r < joueurs.Count; r++)
             {
@@ -1189,9 +1086,9 @@ public sealed partial class LeaderboardOverlayService
                     {
                         var texte = rang.ToString(CultureInfo.InvariantCulture);
                         var taille = Math.Min(72, hauteurDeLigne * 0.55f);
-                        var boite = BoiteDuTexte(texte, famille, taille);
-                        TexteEnRelief(g, texte, famille, taille, new PointF(x - boite.X, ligne.Y + (hauteurDeLigne + boite.Height) / 2f - boite.Bottom),
-                            j.Gagnant ? _accent : Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)), Nuit, 0, [(4, 4, Nuit)], opacite);
+                        var boite = TraitsDesEcrans.BoiteDuTexte(texte, famille, taille);
+                        TraitsDesEcrans.TexteEnRelief(g, texte, famille, taille, new PointF(x - boite.X, ligne.Y + (hauteurDeLigne + boite.Height) / 2f - boite.Bottom),
+                            j.Gagnant ? _accent : TraitsDesEcrans.Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)), Nuit, 0, [(4, 4, Nuit)], opacite);
                         x += 70;
                     }
 
@@ -1203,19 +1100,19 @@ public sealed partial class LeaderboardOverlayService
                     }
 
                     var pseudo = j.Pseudo.ToUpperInvariant();
-                    var taillePseudo = TailleQuiTient(pseudo, famille, Math.Min(40, hauteurDeLigne * 0.3f), xMesures - 24 - x);
-                    var boitePseudo = BoiteDuTexte(pseudo, famille, taillePseudo);
-                    TexteEnRelief(g, pseudo, famille, taillePseudo, new PointF(x - boitePseudo.X, ligne.Y + hauteurDeLigne * 0.5f - boitePseudo.Bottom), Color.White, Nuit, 0,
+                    var taillePseudo = TraitsDesEcrans.TailleQuiTient(pseudo, famille, Math.Min(40, hauteurDeLigne * 0.3f), xMesures - 24 - x);
+                    var boitePseudo = TraitsDesEcrans.BoiteDuTexte(pseudo, famille, taillePseudo);
+                    TraitsDesEcrans.TexteEnRelief(g, pseudo, famille, taillePseudo, new PointF(x - boitePseudo.X, ligne.Y + hauteurDeLigne * 0.5f - boitePseudo.Bottom), Color.White, Nuit, 0,
                         [(2, 2, Nuit)], opacite);
-                    using (var pastille = Chiffres(Math.Min(19, hauteurDeLigne * 0.15f), secours))
+                    using (var pastille = TraitsDesEcrans.Chiffres(Math.Min(19, hauteurDeLigne * 0.15f), secours))
                     {
                         DessinerLaPastilleDeFin(g, j.Place, pastille, new PointF(x, ligne.Y + hauteurDeLigne * 0.56f), opacite);
                     }
 
                     if (j.Personnage.Length > 0)
                     {
-                        using var police = Libelles(Math.Min(20, hauteurDeLigne * 0.15f), secours);
-                        TexteEspace(g, j.Personnage.ToUpperInvariant(), police, Alpha(Color.FromArgb(195, 205, 245), opacite), x + 54, ligne.Y + hauteurDeLigne * 0.58f, 2);
+                        using var police = TraitsDesEcrans.Libelles(Math.Min(20, hauteurDeLigne * 0.15f), secours);
+                        TraitsDesEcrans.TexteEspace(g, j.Personnage.ToUpperInvariant(), police, TraitsDesEcrans.Alpha(Color.FromArgb(195, 205, 245), opacite), x + 54, ligne.Y + hauteurDeLigne * 0.58f, 2);
                     }
 
                     for (var i = 0; i < Math.Min(colonnes.Count, j.Mesures.Count); i++)
@@ -1229,18 +1126,18 @@ public sealed partial class LeaderboardOverlayService
                             DessinerLEtoile(g, new RectangleF(cx, ligne.Y + hauteurDeLigne * 0.3f, 22, 22), t, opacite);
                         }
 
-                        using (var encre = new SolidBrush(Alpha(m.Meilleure ? Dore : Color.White, opacite)))
+                        using (var encre = new SolidBrush(TraitsDesEcrans.Alpha(m.Meilleure ? Dore : Color.White, opacite)))
                         {
-                            g.DrawString(texte, valeur, encre, cx + decalage, ligne.Y + hauteurDeLigne * 0.2f, Typo);
+                            g.DrawString(texte, valeur, encre, cx + decalage, ligne.Y + hauteurDeLigne * 0.2f, TraitsDesEcrans.Typo);
                         }
 
                         var piste = new RectangleF(cx, ligne.Y + hauteurDeLigne * 0.7f, largeurColonne, 10);
-                        using (var gris = new SolidBrush(Alpha(Color.FromArgb(20, 255, 255, 255), opacite)))
+                        using (var gris = new SolidBrush(TraitsDesEcrans.Alpha(Color.FromArgb(20, 255, 255, 255), opacite)))
                         {
                             g.FillRectangle(gris, piste);
                         }
 
-                        using var pinceau = new SolidBrush(Alpha(Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)), opacite));
+                        using var pinceau = new SolidBrush(TraitsDesEcrans.Alpha(TraitsDesEcrans.Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place)), opacite));
                         g.FillRectangle(pinceau, piste.X, piste.Y, (float)(piste.Width * m.Part * remplissage), piste.Height);
                     }
 
@@ -1276,7 +1173,7 @@ public sealed partial class LeaderboardOverlayService
                 var etat = g.Save();
                 g.TranslateTransform(x, (float)y);
                 g.RotateTransform((float)(avance * 540));
-                using var pinceau = new SolidBrush(Alpha(Hex(couleur), opacite));
+                using var pinceau = new SolidBrush(TraitsDesEcrans.Alpha(TraitsDesEcrans.Hex(couleur), opacite));
                 g.FillRectangle(pinceau, -taille / 2, -taille / 2, taille, taille);
                 g.Restore(etat);
             }
@@ -1286,9 +1183,9 @@ public sealed partial class LeaderboardOverlayService
         {
             const float bas = 1034;
             const float droite = 1856;
-            using var petit = Libelles(16, secours);
+            using var petit = TraitsDesEcrans.Libelles(16, secours);
             var motQuitter = fin.Textes.Quitter.ToUpperInvariant();
-            var boiteQuitter = BoiteDuTexte(motQuitter, famille, 40);
+            var boiteQuitter = TraitsDesEcrans.BoiteDuTexte(motQuitter, famille, 40);
             var quitter = new RectangleF(droite - (boiteQuitter.Width + 14 + 46 + 16 + 34), bas - 70, boiteQuitter.Width + 14 + 46 + 16 + 34, 70);
             using (var forme = FormesDesEcrans.Arrondi(quitter, 35))
             using (var bord = new Pen(Color.FromArgb(115, 255, 255, 255), 3))
@@ -1297,16 +1194,16 @@ public sealed partial class LeaderboardOverlayService
             }
 
             DessinerUnGlypheDeFin(g, fin.GlypheQuitter, new RectangleF(quitter.X + 14, quitter.Y + 12, 46, 46), Color.White, k);
-            TexteEnRelief(g, motQuitter, famille, 40, new PointF(quitter.X + 14 + 46 + 16 - boiteQuitter.X, quitter.Y + (70 - boiteQuitter.Height) / 2f - boiteQuitter.Y),
+            TraitsDesEcrans.TexteEnRelief(g, motQuitter, famille, 40, new PointF(quitter.X + 14 + 46 + 16 - boiteQuitter.X, quitter.Y + (70 - boiteQuitter.Height) / 2f - boiteQuitter.Y),
                 Color.White, Color.White, 0, []);
 
             // REVANCHE s'allume a 2,5 s : grise avant, puis une petite pulsation.
             var allume = Entre(t, 2.5, 2.75);
             var echelle = t < 2.75 ? 0.96 + 0.12 * Sortie(allume) : 1.08 - 0.08 * Entre(t, 2.75, 3);
             var motRevanche = fin.Textes.Revanche.ToUpperInvariant();
-            var boiteRevanche = BoiteDuTexte(motRevanche, famille, 40);
+            var boiteRevanche = TraitsDesEcrans.BoiteDuTexte(motRevanche, famille, 40);
             var motMaintenir = fin.Textes.Maintenir.ToUpperInvariant();
-            var largeurMaintenir = LargeurEspacee(g, motMaintenir, petit, 2.5f);
+            var largeurMaintenir = TraitsDesEcrans.LargeurEspacee(g, motMaintenir, petit, 2.5f);
             var largeurTexte = Math.Max(boiteRevanche.Width, largeurMaintenir);
             var revanche = new RectangleF(quitter.X - 22 - (14 + 46 + 16 + largeurTexte + 34), bas - 70, 14 + 46 + 16 + largeurTexte + 34, 70);
             var etat = g.Save();
@@ -1319,7 +1216,7 @@ public sealed partial class LeaderboardOverlayService
             {
                 if (allume > 0)
                 {
-                    using var halo = new Pen(Alpha(Color.FromArgb(110, _accent), allume), 14);
+                    using var halo = new Pen(TraitsDesEcrans.Alpha(Color.FromArgb(110, _accent), allume), 14);
                     g.DrawPath(halo, forme);
                 }
 
@@ -1330,8 +1227,8 @@ public sealed partial class LeaderboardOverlayService
             // autour (demande du user du 26/10). Fonce sur le bouton allume, blanc sur le bouton en contour.
             DessinerUnGlypheDeFin(g, fin.GlypheRevanche, new RectangleF(revanche.X + 14, revanche.Y + 12, 46, 46), Nuit, k);
             var xTexte = revanche.X + 14 + 46 + 16;
-            TexteEspace(g, motMaintenir, petit, Nuit, xTexte, revanche.Y + 11, 2.5f);
-            TexteEnRelief(g, motRevanche, famille, 36, new PointF(xTexte - BoiteDuTexte(motRevanche, famille, 36).X, revanche.Y + 58 - BoiteDuTexte(motRevanche, famille, 36).Bottom),
+            TraitsDesEcrans.TexteEspace(g, motMaintenir, petit, Nuit, xTexte, revanche.Y + 11, 2.5f);
+            TraitsDesEcrans.TexteEnRelief(g, motRevanche, famille, 36, new PointF(xTexte - TraitsDesEcrans.BoiteDuTexte(motRevanche, famille, 36).X, revanche.Y + 58 - TraitsDesEcrans.BoiteDuTexte(motRevanche, famille, 36).Bottom),
                 Nuit, Nuit, 0, []);
             g.Restore(etat);
         }

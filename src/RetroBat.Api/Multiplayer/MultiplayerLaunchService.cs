@@ -553,6 +553,92 @@ public sealed class MultiplayerLaunchService : IHostedService
 
     private sealed record Partie(Process Lanceur, Dictionary<string, Dictionary<string, string?>> ARendre, DateTime Debut, GameReference Jeu);
 
+    /// <summary>
+    /// Dessine les panneaux des joueurs (pseudo, personnage choisi, lettre et cote, ping) et les ecrit comme un decor de
+    /// RetroBat ; rend le nom du decor a passer au lanceur, ou null (jeu non concerne, ecran sans bandes, echec). Jamais
+    /// bloquant : une partie sans panneaux reste une partie.
+    /// </summary>
+    private string? PoserLesPanneaux(MultiplayerRoom room, MultiplayerInstalledGame jeu, string systeme, int joueurs)
+    {
+        try
+        {
+            var place = room.Launch!.Seat;
+            if (!MultiplayerDecor.Concerne(jeu.Game) || jeu.Game.VueDeLaPlace(place, joueurs) is not null
+                || MultiplayerLaunchPlan.ShaderDeLaPlace(jeu.Game, place, joueurs) is not null)
+            {
+                return null;
+            }
+
+            var ecran = System.Windows.Forms.Screen.PrimaryScreen?.Bounds ?? new System.Drawing.Rectangle(0, 0, 1920, 1080);
+            if (RetroBat.Api.Leaderboard.PanneauxEnJeu.Calculer(ecran.Width, ecran.Height, MultiplayerDecor.FormatArcade) is not { } bandes)
+            {
+                _journal.LogInformation("MULTIPLAYER : pas de panneaux en jeu, l'ecran {Largeur} x {Hauteur} n'a pas de bandes", ecran.Width, ecran.Height);
+                return null;
+            }
+
+            var assis = room.Players.Where(j => j.Seat is not null).ToList();
+            var personnages = PersonnagesDesPlaces(jeu, assis);
+            var fiches = assis.Select(j =>
+            {
+                var siege = j.Seat!.Value;
+                var (nom, image) = personnages.TryGetValue(siege, out var p) ? p : (string.Empty, null);
+                var cote = j.Rating;
+                return new RetroBat.Api.Leaderboard.PanneauxEnJeu.Joueur(
+                    siege,
+                    j.Pseudo.Length > 0 ? j.Pseudo : j.Handle,
+                    nom,
+                    image,
+                    cote is null ? string.Empty : cote.Lettre,
+                    cote is null ? string.Empty : MultiplayerDecor.Cote(cote.Value),
+                    cote is null || cote.Provisional ? null : MultiplayerDecor.Palier(cote.Value),
+                    j.RttMs);
+            }).ToList();
+            var type = RetroBat.Api.Leaderboard.StylesDesEcrans.TypeDe(jeu.Game.EloType, jeu.Game.Family);
+            var fanart = RetroBat.Api.Media.MediaDuGamelist.Resoudre(jeu.Path, "fanart", "image");
+            using var image = RetroBat.Api.Leaderboard.PanneauxEnJeu.Dessiner(ecran.Width, ecran.Height, bandes, type, fanart, fiches);
+            if (!MultiplayerDecor.Ecrire(systeme, jeu.Path, image, bandes))
+            {
+                return null;
+            }
+
+            _journal.LogInformation("MULTIPLAYER : panneaux en jeu poses (decor {Decor}, bandes {Gauche} et {Droite} pixels, {Joueurs} joueurs, fanart {Fanart})",
+                MultiplayerDecor.Nom, bandes.Gauche, bandes.Droite, fiches.Count, fanart is null ? "absent" : "present");
+            return MultiplayerDecor.Nom;
+        }
+        catch (Exception ex)
+        {
+            _journal.LogWarning(ex, "MULTIPLAYER : panneaux en jeu non poses");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// NIVEAU NELFEPLAY : le personnage de chaque place (le premier choix du catalogue) et son image du Data Pack ; un choix
+    /// distinct deja pris par une place d'avant passe au suivant libre, comme le depart pret l'ecrit.
+    /// </summary>
+    private static IReadOnlyDictionary<int, (string Nom, string? Image)> PersonnagesDesPlaces(MultiplayerInstalledGame jeu, IReadOnlyList<MultiplayerJoueur> assis)
+    {
+        var resultat = new Dictionary<int, (string, string?)>();
+        if (!jeu.ChoixOuverts || jeu.Game.Choices is not { Count: > 0 } choix)
+        {
+            return resultat;
+        }
+
+        var premier = choix[0];
+        var voulues = assis.GroupBy(j => j.Seat!.Value)
+            .Select(g => (Place: g.Key, Valeur: g.First().Choices is { } c && c.TryGetValue(premier.Key, out var v) ? v : premier.Default))
+            .ToList();
+        IReadOnlyDictionary<int, int> retenues = premier.Distinct ? premier.Departager(voulues) : voulues.ToDictionary(v => v.Place, v => v.Valeur);
+        foreach (var (place, valeur) in retenues)
+        {
+            var valeurDuChoix = premier.Values.FirstOrDefault(x => x.Value == valeur);
+            var image = valeurDuChoix?.CheminDeLImage(MultiplayerStatsProfil.DossierDuCatalogue);
+            resultat[place] = (valeurDuChoix?.Name ?? string.Empty, image is not null && File.Exists(image) ? image : null);
+        }
+
+        return resultat;
+    }
+
     /// <summary>Pose les reglages, lance, et annonce la partie quand l'emulateur est la.</summary>
     private Partie? Lancer(MultiplayerRoom room, MultiplayerInstalledGame jeu, IReadOnlyList<string> netplay)
     {
@@ -566,7 +652,9 @@ public sealed class MultiplayerLaunchService : IHostedService
         // ses commandes ne repondent pas (vu le 22/10 sur la seconde borne). Le journal dit donc qui est le joueur 1.
         _journal.LogInformation("MULTIPLAYER : manettes transmises au lanceur ({Source}) : {Manettes}", choix.Source, MultiplayerLaunchPlan.NomsDesManettes(manettes));
         var joueurs = Math.Max(2, lancement.Players);
-        var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeu.Game, lancement.Seat, netplay, joueurs);
+        // Les panneaux en jeu (CDC Ecrans v1.0, lot E3) : un decor que RetroArch affiche lui-meme, dans les bandes.
+        var decor = PoserLesPanneaux(room, jeu, systeme, joueurs);
+        var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeu.Game, lancement.Seat, netplay, joueurs, decor);
         if (arguments is null)
         {
             _journal.LogWarning("MULTIPLAYER : lancement de {Jeu} refuse (systeme « {Systeme} », coeur « {Coeur} »)", jeu.Game.Id, systeme, coeur);

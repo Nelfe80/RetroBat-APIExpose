@@ -81,10 +81,11 @@ public static class MultiplayerLaunchPlan
     /// <summary>
     /// Les arguments du lanceur. <paramref name="netplay"/> est la partie netplay de la ligne,
     /// propre a l'hote ou a l'invite (<see cref="ArgumentsHote"/>, <see cref="ArgumentsInvite"/>).
-    /// Null quand un nom n'est pas un nom (meme garde que le lancement a moteur impose).
+    /// Null quand un nom n'est pas un nom (meme garde que le lancement a moteur impose). <paramref name="decor"/> : le jeu de
+    /// decor qui porte les panneaux en jeu (<see cref="MultiplayerDecor"/>), ou null.
     /// </summary>
     public static string? Arguments(string manettes, string systeme, string coeur, string rom, MultiplayerGame jeu, int place, IEnumerable<string> netplay,
-        int joueurs = 2)
+        int joueurs = 2, string? decor = null)
     {
         if (!CommandsController.NomDeLanceur(systeme) || !CommandsController.NomDeLanceur(coeur))
         {
@@ -101,6 +102,11 @@ public static class MultiplayerLaunchPlan
             // touche pas), sinon la moitie d'un Herzog Zwei s'etirait au 4/3.
             var format = jeu.VueDeLaPlace(place, joueurs) is null ? "4/3" : "config";
             morceaux.AddRange(["-shaderset", "none", "-shader", shader, "-ratio", format, "-bezel", "none"]);
+        }
+        else if (decor is not null && CommandsController.NomDeLanceur(decor))
+        {
+            // Les panneaux en jeu : le lanceur affiche notre decor et cale le jeu dans son trou (CDC Ecrans v1.0, 3.6).
+            morceaux.AddRange(["-bezel", decor]);
         }
 
         morceaux.AddRange(netplay);
