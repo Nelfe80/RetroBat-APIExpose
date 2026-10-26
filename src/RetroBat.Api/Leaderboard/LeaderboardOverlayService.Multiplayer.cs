@@ -168,7 +168,7 @@ public sealed partial class LeaderboardOverlayService
             var gaucheDuLogo = DessinerLeLogoMultiplayer(g, s, policeTitre, hauteurTitre, y, Width * 0.75f);
             y = _hauteurEcran * 0.0637f * 2f - hauteurTitre / 2f;
             var marge = _largeurEcran * 0.012f;
-            DessinerMaSelection(g, c, s, policePetite, taillePetite, marge, marge * 0.6f, gaucheDuLogo - 2 * marge, y - marge * 0.4f);
+            DessinerMaSelection(g, c, s, policePetite, taillePetite, marge, marge * 0.4f, gaucheDuLogo - 2 * marge, y - marge * 0.3f);
 
             // L'information (badge Classique, nombre de joueurs, decompte) dans une carte au-dessus des onglets : la liste
             // dessous gagne sa ligne (retour du user du 22/10).
@@ -270,7 +270,8 @@ public sealed partial class LeaderboardOverlayService
                 return;
             }
 
-            var pas = taillePetite * 1.3f;
+            // Serre : la selection compte jusqu'a trois jeux, et les trois tiennent avec leur surtitre au-dessus de la carte.
+            var pas = taillePetite * 1.12f;
             var lignes = Math.Min(jeux.Count, (int)Math.Floor((bas - haut) / pas) - 1);
             if (lignes <= 0)
             {
