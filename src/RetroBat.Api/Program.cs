@@ -458,6 +458,8 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multi
 // Le panneau MULTIPLAYER d'ES : la fenetre du classement, un autre contenu (lot M3).
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerToastOverlay>();
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerPanelService>();
+// Le son d'ES coupe pendant une partie MULTIPLAYER (26/10) : l'API lance le jeu, ES ne le sait pas.
+builder.Services.AddSingleton<RetroBat.Api.Multiplayer.SonDEmulationStation>();
 // Le lancement d'une partie MULTIPLAYER sur l'ordre de la plateforme : hote ou invite, coeur impose (lot M4).
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerLaunchService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerLaunchService>());

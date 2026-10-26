@@ -36,6 +36,9 @@ public sealed class MultiplayerLaunchService : IHostedService
     private readonly ApiContext _contexte;
     private readonly IEventBus _bus;
 
+    /// <summary>ES se tait pendant la partie : il ne sait pas qu'un jeu tourne (retour du user du 26/10).</summary>
+    private readonly SonDEmulationStation? _sonDEs;
+
     /// <summary>Le bilan de fin de partie du wrapper : une rencontre classee s'annule sur triche (22/10).</summary>
     private readonly MultiplayerBilanDuWrapper _bilans;
     private readonly ILogger<MultiplayerLaunchService> _journal;
@@ -70,8 +73,10 @@ public sealed class MultiplayerLaunchService : IHostedService
         NetplayLobbyClient lobby,
         ApiContext contexte,
         IEventBus bus,
-        ILogger<MultiplayerLaunchService> journal)
+        ILogger<MultiplayerLaunchService> journal,
+        SonDEmulationStation? sonDEs = null)
     {
+        _sonDEs = sonDEs;
         _session = session;
         _client = client;
         _panneau = panneau;
@@ -713,9 +718,11 @@ public sealed class MultiplayerLaunchService : IHostedService
         // Jusqu'a l'arrivee de l'emulateur, la salle ne se quitte pas et le panneau ne se rouvre pas (voir LancementEnCours).
         var lanceA = DateTime.Now;
         _session.LancementEnCours = room.Room;
+        _sonDEs?.Couper();
         var lanceur = NetplayLaunch.DemarrerDirectement(arguments, _journal);
         if (lanceur is null)
         {
+            _sonDEs?.Rendre();
             FinDuLancement(room.Room);
             Rendre(aRendre);
             _panneau.Fermer();
@@ -858,6 +865,8 @@ public sealed class MultiplayerLaunchService : IHostedService
             // Le lanceur a deja disparu.
         }
 
+        // Le son d'ES revient au premier appui : cet appui le sort aussi de son ecran de veille.
+        _sonDEs?.RendreAuProchainAppui();
         Rendre(partie.ARendre);
         if (ReferenceEquals(_contexte.Ui.Running, partie.Jeu))
         {
