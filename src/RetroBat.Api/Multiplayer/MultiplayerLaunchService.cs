@@ -582,9 +582,10 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
 
             var ecran = System.Windows.Forms.Screen.PrimaryScreen?.Bounds ?? new System.Drawing.Rectangle(0, 0, 1920, 1080);
-            if (RetroBat.Api.Leaderboard.PanneauxEnJeu.Calculer(ecran.Width, ecran.Height, MultiplayerDecor.FormatArcade) is not { } bandes)
+            if (RetroBat.Api.Leaderboard.PanneauxEnJeu.Calculer(ecran.Width, ecran.Height, jeu.Game.Format) is not { } bandes)
             {
-                _journal.LogInformation("MULTIPLAYER : pas de panneaux en jeu, l'ecran {Largeur} x {Hauteur} n'a pas de bandes", ecran.Width, ecran.Height);
+                _journal.LogInformation("MULTIPLAYER : pas de panneaux en jeu, l'ecran {Largeur} x {Hauteur} n'a pas de bandes pour un jeu en {Format}",
+                    ecran.Width, ecran.Height, jeu.Game.Aspect ?? "4:3");
                 return null;
             }
 
@@ -608,10 +609,12 @@ public sealed class MultiplayerLaunchService : IHostedService
                     cote?.Streak);
             }).ToList();
             var type = RetroBat.Api.Leaderboard.StylesDesEcrans.TypeDe(jeu.Game.EloType, jeu.Game.Family);
-            var fanart = RetroBat.Api.Media.MediaDuGamelist.Resoudre(jeu.Path, "fanart", "image");
+            // Un fanart ecarte au catalogue (suggestif) ne sert pas : les bandes restent sur leur fond (E4, 26/10).
+            var fanart = jeu.Game.Ecran?.Fanart == false ? null : RetroBat.Api.Media.MediaDuGamelist.Resoudre(jeu.Path, "fanart", "image");
             var mots = new RetroBat.Api.Leaderboard.PanneauxEnJeu.MotsDesPanneaux(
                 _panneau.Texte("multiplayer.panel.wins", "WINS"), _panneau.Texte("multiplayer.panel.streak", "STREAK"));
-            using var image = RetroBat.Api.Leaderboard.PanneauxEnJeu.Dessiner(ecran.Width, ecran.Height, bandes, type, fanart, fiches, mots);
+            using var image = RetroBat.Api.Leaderboard.PanneauxEnJeu.Dessiner(ecran.Width, ecran.Height, bandes, type, fanart, fiches, mots,
+                jeu.Game.Ecran?.Police, jeu.Game.Ecran?.RegardeAGauche == true);
             if (!MultiplayerDecor.Ecrire(systeme, jeu.Path, image, bandes))
             {
                 return null;

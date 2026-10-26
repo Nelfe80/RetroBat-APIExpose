@@ -49,8 +49,10 @@ public static class PanneauxEnJeu
         return largeur <= 0 || hauteur <= 0 || Math.Min(gauche, droite) < largeur * 0.1 ? null : new(gauche, droite, jeu);
     }
 
+    /// <param name="police">Une police imposee par le catalogue a la place de celle du type.</param>
+    /// <param name="regardeAGauche">Les personnages du jeu regardent a gauche : le portrait se retourne a gauche, pas a droite.</param>
     public static Bitmap Dessiner(int largeur, int hauteur, Bandes bandes, string type, string? fanart, IReadOnlyList<Joueur> joueurs,
-        MotsDesPanneaux? mots = null)
+        MotsDesPanneaux? mots = null, string? police = null, bool regardeAGauche = false)
     {
         mots ??= MotsDesPanneaux.ParDefaut;
         var image = new Bitmap(largeur, hauteur, PixelFormat.Format32bppArgb);
@@ -61,6 +63,10 @@ public static class PanneauxEnJeu
         g.InterpolationMode = InterpolationMode.HighQualityBicubic;
         using var secours = new Font("Segoe UI", 12, FontStyle.Bold, GraphicsUnit.Pixel);
         var style = StylesDesEcrans.Pour(type);
+        if (police is { Length: > 0 })
+        {
+            style = style with { Police = police };
+        }
         var famille = Famille(style.Police, secours);
         using var fond = Charger(fanart);
         using var logo = Charger(Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", "nelfeplay-multiplayer.png"));
@@ -77,13 +83,14 @@ public static class PanneauxEnJeu
             var largeurUtile = bande.Width / k;
             if (ici.Count == 1)
             {
-                DessinerUnPanneau(g, ici[0], style, famille, secours, logo, mots, largeurUtile, 0, 1080, cote == 1, compact: false);
+                DessinerUnPanneau(g, ici[0], style, famille, secours, logo, mots, largeurUtile, 0, 1080, cote == 1, compact: false, regardeAGauche);
             }
             else
             {
                 for (var i = 0; i < ici.Count && i < 2; i++)
                 {
-                    DessinerUnPanneau(g, ici[i], style, famille, secours, i == 0 ? logo : null, mots, largeurUtile, i * 540, 540, cote == 1, compact: true);
+                    DessinerUnPanneau(g, ici[i], style, famille, secours, i == 0 ? logo : null, mots, largeurUtile, i * 540, 540, cote == 1, compact: true,
+                        regardeAGauche);
                 }
             }
 
@@ -177,7 +184,7 @@ public static class PanneauxEnJeu
     /// par bande.
     /// </summary>
     private static void DessinerUnPanneau(Graphics g, Joueur j, StyleDEcran style, FontFamily famille, Font secours, Bitmap? logo,
-        MotsDesPanneaux mots, float largeur, float haut, float hauteur, bool aGauche, bool compact)
+        MotsDesPanneaux mots, float largeur, float haut, float hauteur, bool aGauche, bool compact, bool regardeAGauche)
     {
         var couleur = Hex(StylesDesEcrans.CouleurDeLaPlace(j.Place));
         var marge = 16f;
@@ -204,7 +211,8 @@ public static class PanneauxEnJeu
             using (portrait)
             {
                 var forme = new RectangleF(milieu - (compact ? 48 : 75), y, compact ? 96 : 150, compact ? 114 : 178);
-                DessinerLePortrait(g, portrait, style.Forme, forme, couleur, miroir: !aGauche);
+                // Le portrait regarde le jeu : retourne du cote ou il tournerait le dos.
+                DessinerLePortrait(g, portrait, style.Forme, forme, couleur, miroir: regardeAGauche ? aGauche : !aGauche);
                 y = forme.Bottom + 8;
             }
 

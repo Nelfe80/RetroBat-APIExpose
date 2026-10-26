@@ -1522,20 +1522,27 @@ public sealed class MultiplayerPanelService
             new(T("multiplayer.end.over"), T("multiplayer.end.winner"), T("multiplayer.end.tagline"), T("multiplayer.end.hold"),
                 T("multiplayer.end.rematch"), T("multiplayer.end.quit")),
             _glypheValider,
-            _glypheAnnuler);
+            _glypheAnnuler,
+            // E4 (26/10) : une police imposee par le catalogue l'emporte sur celle du type.
+            jeu?.Ecran?.Police is { Length: > 0 } police ? police : null);
     }
 
     private string? _cheminDuFanart;
     private string? _fanart;
 
-    /// <summary>Le fanart du jeu sur cette borne, sinon sa capture : lu une fois par jeu dans son gamelist.</summary>
+    /// <summary>
+    /// Le fanart du jeu sur cette borne, sinon sa capture : lu une fois par jeu dans son gamelist. Un fanart ecarte au
+    /// catalogue (suggestif, Final Fight) laisse la capture seule.
+    /// </summary>
     private string? FanartDuJeu()
     {
         var chemin = _jeu?.Path;
         if (chemin != _cheminDuFanart)
         {
             _cheminDuFanart = chemin;
-            _fanart = RetroBat.Api.Media.MediaDuGamelist.Resoudre(chemin, "fanart", "image");
+            _fanart = _jeu?.Game.Ecran?.Fanart == false
+                ? RetroBat.Api.Media.MediaDuGamelist.Resoudre(chemin, "image")
+                : RetroBat.Api.Media.MediaDuGamelist.Resoudre(chemin, "fanart", "image");
         }
 
         return _fanart;

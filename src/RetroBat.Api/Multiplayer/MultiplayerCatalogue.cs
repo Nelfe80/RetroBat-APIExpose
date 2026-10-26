@@ -150,6 +150,33 @@ public sealed record MultiplayerGame
     public IReadOnlyList<int>? SeatScreens { get; init; }
 
     /// <summary>
+    /// Le format de l'image du jeu, « largeur:hauteur » (« 3:4 » pour un jeu vertical comme 19XX, « 8:3 » pour deux ecrans
+    /// cote a cote) ; absent, 4:3. Les panneaux en jeu calent le trou du decor sur ce format (CDC Ecrans v1.0, 26/10).
+    /// </summary>
+    [JsonPropertyName("aspect")]
+    public string? Aspect { get; init; }
+
+    /// <summary>Les reglages des ecrans MULTIPLAYER propres a ce jeu : police imposee, fanart ecarte, sens du portrait.</summary>
+    [JsonPropertyName("screen")]
+    public MultiplayerEcranDuJeu? Ecran { get; init; }
+
+    /// <summary>Le format de l'image en largeur sur hauteur : celui du catalogue, sinon 4:3 (un format illisible aussi).</summary>
+    [JsonIgnore]
+    public double Format
+    {
+        get
+        {
+            var morceaux = (Aspect ?? string.Empty).Split(':');
+            return morceaux.Length == 2
+                && double.TryParse(morceaux[0], global::System.Globalization.NumberStyles.Float, global::System.Globalization.CultureInfo.InvariantCulture, out var largeur)
+                && double.TryParse(morceaux[1], global::System.Globalization.NumberStyles.Float, global::System.Globalization.CultureInfo.InvariantCulture, out var hauteur)
+                && largeur > 0 && hauteur > 0
+                ? largeur / hauteur
+                : 4.0 / 3.0;
+        }
+    }
+
+    /// <summary>
     /// L'ECRAN PARTAGE (26/10, demande du user : « il ne faut afficher que la partie splitee qui concerne le joueur ») : un
     /// jeu qui dessine la vue de chaque joueur dans une seule image (Super Mario Kart, GoldenEye 007, Herzog Zwei, Metal
     /// Warriors). Chaque borne ne montre que le rectangle de sa place, a son format. Une vue peut ne valoir que pour un
@@ -720,6 +747,31 @@ public sealed record MultiplayerNameSeat
 /// dans chaque console avec <see cref="AllConsoles"/>. Le jeu la presente ; Mario Kart laisse encore le joueur 1 changer
 /// de coupe a l'ecran des circuits (preselection).
 /// </summary>
+/// <summary>
+/// LES ECRANS D'UN JEU (CDC Ecrans v1.0, lot E4) : ce qui ne se deduit pas de son type. La police du titre de fin, un
+/// fanart a ecarter (un fanart suggestif, Final Fight), le sens dans lequel regardent les personnages de ses images.
+/// </summary>
+public sealed record MultiplayerEcranDuJeu
+{
+    /// <summary>Une police des ecrans (« Bangers », « Titan One »...) a la place de celle du type.</summary>
+    [JsonPropertyName("font")]
+    public string? Police { get; init; }
+
+    /// <summary>Faux : ni l'ecran de fin ni les panneaux en jeu ne prennent son fanart.</summary>
+    [JsonPropertyName("fanart")]
+    public bool Fanart { get; init; } = true;
+
+    /// <summary>
+    /// Ou regardent ses personnages : « right » (le defaut) ou « left ». Le panneau de droite retourne le portrait pour qu'il
+    /// regarde le jeu ; regardant deja a gauche, il ne se retourne pas, et celui de gauche si.
+    /// </summary>
+    [JsonPropertyName("portrait_faces")]
+    public string? Regard { get; init; }
+
+    [JsonIgnore]
+    public bool RegardeAGauche => string.Equals(Regard, "left", StringComparison.OrdinalIgnoreCase);
+}
+
 public sealed record MultiplayerRotation
 {
     [JsonPropertyName("key")]

@@ -16,9 +16,8 @@ namespace RetroBat.Api.Multiplayer;
 /// lance avec <c>-bezel nelfeplay-multiplayer</c> : RetroArch les dessine lui-meme, rien n'est pose par-dessus le jeu, et
 /// pas une option d'EmulationStation n'est ecrite.
 ///
-/// PREMIERE VERSION : panneaux fixes, poses au lancement, et seulement pour les jeux d'arcade horizontaux au format 4:3
-/// (duels, versus, equipes). Le catalogue ne dit pas encore l'orientation d'un jeu : des marges de 4:3 etireraient un jeu
-/// vertical.
+/// Panneaux fixes, poses au lancement. Le trou suit le format du jeu donne par le catalogue (<c>aspect</c>, 4:3 par
+/// defaut) : un jeu vertical a des bandes larges, un jeu plus large que l'ecran n'a pas de panneaux (26/10).
 /// </summary>
 [SupportedOSPlatform("windows")]
 public static class MultiplayerDecor
@@ -30,11 +29,17 @@ public static class MultiplayerDecor
     /// <summary>Les paliers de Fightcade, comme <see cref="MultiplayerCote.LettreDe"/> : E, D, C, B, A, puis S.</summary>
     private static readonly double[] Paliers = [0, 700, 1000, 1300, 1600, 1900];
 
+    /// <summary>
+    /// Les consoles dont l'image tient en 4:3 sur un seul ecran. La GBA affiche une vue par place (l'ecran partage) et la
+    /// Neo Geo Pocket une console par borne : elles gardent leur image entiere.
+    /// </summary>
+    private static readonly HashSet<string> Consoles = new(StringComparer.OrdinalIgnoreCase) { "megadrive", "snes", "nes", "pcengine" };
+
     public static string Dossier => Path.Combine(RetroBatPaths.RetroBatRoot, "decorations", Nom);
 
-    /// <summary>Un jeu dont les panneaux se posent : un seul ecran, d'arcade, horizontal (duel, versus, equipes).</summary>
+    /// <summary>Un jeu dont les panneaux se posent : un seul ecran, d'arcade ou d'une console en 4:3, quelle que soit sa famille.</summary>
     public static bool Concerne(MultiplayerGame jeu)
-        => jeu.EstArcade && jeu.Screens <= 1 && jeu.Family is "duel" or "versus" or "equipes";
+        => jeu.Screens <= 1 && (jeu.EstArcade || Consoles.Contains(jeu.System));
 
     /// <summary>La progression vers la lettre suivante (0 a 1), pleine a S.</summary>
     public static double Palier(double cote)

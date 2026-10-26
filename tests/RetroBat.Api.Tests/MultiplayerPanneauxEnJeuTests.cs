@@ -29,13 +29,37 @@ public class MultiplayerPanneauxEnJeuTests
     }
 
     [Fact]
-    public void Seuls_les_jeux_d_arcade_horizontaux_a_un_ecran_ont_leurs_panneaux()
+    public void Les_jeux_a_un_ecran_d_arcade_et_des_consoles_en_4_3_ont_leurs_panneaux()
     {
         Assert.True(MultiplayerDecor.Concerne(Sf2ce));
-        Assert.True(MultiplayerDecor.Concerne(Sf2ce with { Family = "equipes" }));
-        Assert.False(MultiplayerDecor.Concerne(Sf2ce with { Family = "coop" }));
+        Assert.True(MultiplayerDecor.Concerne(Sf2ce with { Family = "coop" }));
+        Assert.True(MultiplayerDecor.Concerne(Sf2ce with { System = "megadrive", Family = "coop" }));
+        // La GBA montre une vue par place, la Neo Geo Pocket une console par borne : leur image reste entiere.
         Assert.False(MultiplayerDecor.Concerne(Sf2ce with { System = "gba" }));
+        Assert.False(MultiplayerDecor.Concerne(Sf2ce with { System = "ngpc" }));
         Assert.False(MultiplayerDecor.Concerne(Sf2ce with { Screens = 2 }));
+    }
+
+    [Fact]
+    public void Le_trou_suit_le_format_du_jeu()
+    {
+        Assert.Equal(4.0 / 3.0, Sf2ce.Format, 6);
+        Assert.Equal(0.75, (Sf2ce with { Aspect = "3:4" }).Format, 6);
+        Assert.Equal(4.0 / 3.0, (Sf2ce with { Aspect = "vertical" }).Format, 6);
+        // Un jeu vertical (19XX) laisse deux larges bandes ; un jeu plus large que l'ecran (Hard Dunk, 8:3), aucune.
+        var vertical = PanneauxEnJeu.Calculer(1920, 1080, (Sf2ce with { Aspect = "3:4" }).Format);
+        Assert.Equal((555, 555, 810), (vertical!.Gauche, vertical.Droite, vertical.Jeu));
+        Assert.Null(PanneauxEnJeu.Calculer(1920, 1080, (Sf2ce with { Aspect = "8:3" }).Format));
+    }
+
+    [Fact]
+    public void Le_catalogue_regle_les_ecrans_d_un_jeu()
+    {
+        var jeu = JsonSerializer.Deserialize<MultiplayerGame>("""{"id":"arcade/ffight","system":"arcade","set":"ffight","screen":{"fanart":false,"portrait_faces":"left","font":"Bangers"}}""")!;
+        Assert.Equal((false, true, "Bangers"), (jeu.Ecran!.Fanart, jeu.Ecran.RegardeAGauche, jeu.Ecran.Police));
+        // Sans reglage : le fanart sert, les personnages regardent a droite.
+        var sans = JsonSerializer.Deserialize<MultiplayerEcranDuJeu>("{}")!;
+        Assert.Equal((true, false), (sans.Fanart, sans.RegardeAGauche));
     }
 
     [Theory]
@@ -176,6 +200,21 @@ public class MultiplayerPanneauxEnJeuTests
         var guile = Path.Combine(Images, "arcade", "sf2ce", "character", "guile.png");
         Apercu("jeu-duel.png", [new(1, "NELFE", "VEGA", vega, "A", "1 842", 0.81, 24, 128, 4), new(2, "AKIRA", "GUILE", guile, "A", "1 796", 0.65, 31, 97, 0)]);
         Apercu("jeu-sans-personnage.png", [new(1, "NELFE", "", null, "A", "1 842", 0.81, 24, 1204, 12), new(2, "AKIRA", "", null, "?", "1 012", null, 112, 3, 1)]);
+        // Un jeu vertical : le trou en 3:4, les bandes de 555 pixels.
+        {
+            var etroit = PanneauxEnJeu.Calculer(1920, 1080, 0.75)!;
+            using var panneaux = PanneauxEnJeu.Dessiner(1920, 1080, etroit, StylesDesEcrans.Coop, fanart,
+                [new(1, "NELFE", "VEGA", vega, "", "", null, 24), new(2, "AKIRA", "", null, "", "", null, 31)], new("VICTOIRES", "SÉRIE"));
+            using var ecran = new Bitmap(1920, 1080);
+            using (var g = Graphics.FromImage(ecran))
+            {
+                g.Clear(Color.Black);
+                g.DrawImage(panneaux, 0, 0);
+            }
+
+            ecran.Save(Path.Combine(Sortie, "jeu-vertical-coop.png"), System.Drawing.Imaging.ImageFormat.Png);
+        }
+
         Apercu("jeu-quatre.png",
         [
             new(1, "NELFE", "VEGA", vega, "A", "1 842", 0.81, 24, 128, 4), new(2, "AKIRA", "GUILE", guile, "A", "1 796", 0.65, 31, 97, 0),
