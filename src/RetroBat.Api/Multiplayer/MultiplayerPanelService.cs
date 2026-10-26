@@ -142,11 +142,66 @@ public sealed class MultiplayerPanelService
         // ES ferme, il restait sur le bureau jusqu'a l'arret de l'API. Il part avec ES, cartes comprises.
         _sortieDEs = bus?.Subscribe<RetroBat.Domain.Events.EventEnvelope>(e =>
         {
-            if (e.Type == "ui.frontend.stopped")
+            switch (e.Type)
             {
-                QuandEsSeFerme();
+                case "ui.frontend.stopped":
+                    QuandEsSeFerme();
+                    break;
+                case "ui.game.started":
+                    EndormirLaSelection();
+                    break;
+                case "ui.game.ended":
+                    lock (_verrou)
+                    {
+                        _finDePartieUtc = DateTime.UtcNow;
+                    }
+                    break;
+                case "panel.input.pressed" or "ui.game.selected.raw" or "ui.system.selected.raw":
+                    ReveillerLaSelection();
+                    break;
             }
         });
+    }
+
+    /// <summary>
+    /// LA SELECTION DORT PENDANT UNE PARTIE (retour du user du 26/10 : au sortir d'une partie et de son ecran de fin, la
+    /// carte « Votre selection » clignotait). Elle s'efface au lancement d'un jeu et ne revient qu'au premier geste du
+    /// joueur dans ES : un appui, un jeu ou un systeme selectionne. Ni le « game-selected » qu'ES envoie de lui-meme apres
+    /// une partie, ni l'appui qui ferme l'ecran de fin ne la reveillent : il faut le panneau ferme depuis 2 s et la partie
+    /// finie depuis 3 s.
+    /// </summary>
+    private bool _selectionEndormie;
+    private DateTime _fermeDepuisUtc = DateTime.MinValue;
+    private DateTime _finDePartieUtc = DateTime.MinValue;
+
+    private void EndormirLaSelection()
+    {
+        lock (_verrou)
+        {
+            if (_selectionEndormie)
+            {
+                return;
+            }
+            _selectionEndormie = true;
+        }
+        MettreAJourLeBandeau();
+    }
+
+    private void ReveillerLaSelection()
+    {
+        lock (_verrou)
+        {
+            var maintenant = DateTime.UtcNow;
+            if (!_selectionEndormie || _mode != Mode.Ferme
+                || maintenant - _fermeDepuisUtc < TimeSpan.FromSeconds(2)
+                || maintenant - _finDePartieUtc < TimeSpan.FromSeconds(3)
+                || EnJeu())
+            {
+                return;
+            }
+            _selectionEndormie = false;
+        }
+        MettreAJourLeBandeau();
     }
 
     private bool _classementOuvert;
@@ -285,6 +340,7 @@ public sealed class MultiplayerPanelService
         {
             _modele.Fermer();
             _mode = Mode.Ferme;
+            _fermeDepuisUtc = DateTime.UtcNow;
             _validerDepuis = null;
             _annulerDepuis = null;
             _retour?.Cancel();
@@ -332,6 +388,8 @@ public sealed class MultiplayerPanelService
         {
             _modele.Fermer();
             _mode = Mode.Ferme;
+            _fermeDepuisUtc = DateTime.UtcNow;
+            _selectionEndormie = true;
         }
 
         _session.PanneauOuvert = false;
@@ -906,7 +964,7 @@ public sealed class MultiplayerPanelService
                 }
 
                 // Un seul bloc « Votre selection », un jeu par ligne (retour du user du 22/10).
-                var lignes = _mode != Mode.Ferme || _classementOuvert ? [] : _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3).Select(room =>
+                var lignes = _mode != Mode.Ferme || _classementOuvert || _selectionEndormie ? [] : _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3).Select(room =>
                 {
                     var absent = room.Players.Any(j => j.You && !j.Present);
                     return new MultiplayerToastOverlay.Ligne(
