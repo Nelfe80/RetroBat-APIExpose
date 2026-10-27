@@ -86,7 +86,8 @@ public sealed partial class LeaderboardOverlayService
         string GlypheOk = "",
         IReadOnlyList<JeuDeMaSelection>? MaSelection = null,
         string TitreDeMaSelection = "",
-        EcranDeFin? Fin = null);
+        EcranDeFin? Fin = null,
+        EcranDeLancement? Lancement = null);
 
     /// <summary>Un jeu de « Votre selection » : son nom, le compte de ses joueurs, et s'il est celui du panneau.</summary>
     public sealed record JeuDeMaSelection(string Nom, string Compte, bool Courant);
@@ -156,7 +157,13 @@ public sealed partial class LeaderboardOverlayService
             float taillePetite,
             float taillePied)
         {
-            // L'ecran de fin v2 (CDC Ecrans v1.0) ; l'ancien resultat plein ecran reste en secours.
+            // L'ecran de lancement (le VS, 28/10), puis l'ecran de fin v2 (CDC Ecrans v1.0) ; l'ancien resultat plein ecran reste en secours.
+            if (c.PleinEcran && c.Lancement is { } lancement)
+            {
+                DessinerLEcranDeLancement(g, lancement, policeTitre);
+                return;
+            }
+
             if (c.PleinEcran && c.Fin is { } fin)
             {
                 DessinerLEcranDeFin(g, fin, policeTitre);

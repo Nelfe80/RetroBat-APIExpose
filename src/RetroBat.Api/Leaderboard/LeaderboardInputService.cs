@@ -309,6 +309,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             }
             if (string.Equals(e.Type, "ui.game.started", StringComparison.Ordinal))
             {
+                // L'ECRAN DE LANCEMENT TIENT DEVANT LE JEU (28/10) : c'est lui qui s'effacera, au depart.
+                if (_multiplayer is { TientLeLancement: true })
+                {
+                    return;
+                }
+
                 // L'emulateur prend le premier plan : on s'efface sans le disputer a ES.
                 if (_multiplayer is { Ouvert: true } panneauMultiplayer)
                 {

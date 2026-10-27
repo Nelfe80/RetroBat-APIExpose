@@ -23,7 +23,7 @@ namespace RetroBat.Api.Multiplayer;
 /// <see cref="LeaderboardInputService"/>, qui transmet ici les gestes tant que MULTIPLAYER est a l'ecran.
 /// </summary>
 [SupportedOSPlatform("windows")]
-public sealed class MultiplayerPanelService
+public sealed partial class MultiplayerPanelService
 {
     /// <summary>Les couleurs d'avatar, tirees de la poignee : la meme pour un joueur sur toutes les bornes.</summary>
     private static readonly string[] Couleurs = ["A98BFF", "78E5A3", "FF9F6B", "49E3CB", "FFD37A", "FF8C9A"];
@@ -433,6 +433,7 @@ public sealed class MultiplayerPanelService
     /// <summary>Fermer sans quitter : le jeu reste dans « Votre selection » (V24-09).</summary>
     public void Fermer()
     {
+        OublierLeLancement();
         lock (_verrou)
         {
             _modele.Fermer();
@@ -478,9 +479,15 @@ public sealed class MultiplayerPanelService
         }
     }
 
-    /// <summary>Un jeu demarre : la fenetre s'efface sans reprendre le premier plan a l'emulateur.</summary>
+    /// <summary>Un jeu demarre : la fenetre s'efface sans reprendre le premier plan a l'emulateur (sauf l'ecran de lancement qui tient).</summary>
     public void FermerPourLeJeu()
     {
+        if (TientLeLancement)
+        {
+            return;
+        }
+
+        OublierLeLancement();
         lock (_verrou)
         {
             _modele.Fermer();
@@ -495,8 +502,17 @@ public sealed class MultiplayerPanelService
         _texteDuBandeau = "";
     }
 
-    /// <summary>L'emulateur est la : la presentation s'efface.</summary>
-    public void EffacerPourLeJeu() => FermerPourLeJeu();
+    /// <summary>
+    /// L'emulateur est la : la presentation s'efface, sauf l'ecran de lancement qui tient devant le jeu (la boucle du depart
+    /// chez l'hote, la connexion chez l'invite).
+    /// </summary>
+    public void EffacerPourLeJeu()
+    {
+        if (!TenirDevantLeJeu())
+        {
+            FermerPourLeJeu();
+        }
+    }
 
     // ── la presentation et le resultat ────────────────────────────────────────────────────────────
 
@@ -504,13 +520,15 @@ public sealed class MultiplayerPanelService
     /// Le decompte est fini : « Les joueurs se synchronisent… » jusqu'a l'arrivee du jeu (ecrans 9 et 14 de
     /// la toile). Au niveau Classique, le message de la borne d'origine s'ajoute.
     /// </summary>
-    public void AnnoncerLeLancement(MultiplayerRoom room, MultiplayerInstalledGame? jeu)
+    public void AnnoncerLeLancement(MultiplayerRoom room, MultiplayerInstalledGame? jeu, bool tenir = false)
     {
         var langue = Langue();
         bool deja;
         lock (_verrou)
         {
             deja = _mode == Mode.Presentation;
+            // Le lancement annonce par la plateforme passe avant celui de cette borne : la tenue s'ajoute alors.
+            _tenirLeLancement |= tenir && deja;
             _mode = Mode.Presentation;
             _modele.Fermer();
             _jeu = jeu ?? _jeu;
@@ -526,6 +544,14 @@ public sealed class MultiplayerPanelService
         _texteDuBandeau = "";
         if (deja)
         {
+            return;
+        }
+
+        // L'ECRAN DE LANCEMENT (le VS, 28/10) ; l'ancienne attente reste en secours, sans jeu connu.
+        PreparerLeLancement(room, tenir);
+        if (ComposerLEcranDeLancement() is { } ecran)
+        {
+            _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal), ContenuDuLancement(ecran));
             return;
         }
 
@@ -708,6 +734,13 @@ public sealed class MultiplayerPanelService
 
             var maintenu = Maintenu(_validerDepuis);
             _validerDepuis = null;
+            if (_mode == Mode.Presentation)
+            {
+                // L'attente trop longue : A relance l'attente ; sinon la presentation ne s'interrompt pas.
+                _ = Task.Run(() => ReessayerLeLancement());
+                return;
+            }
+
             if (maintenu && _invitation is not null)
             {
                 // Panneau ouvert, une invitation attend (sa carte est en haut a droite) : l'appui long la prend.
@@ -760,7 +793,13 @@ public sealed class MultiplayerPanelService
             }
             else
             {
-                return;   // la presentation ne s'interrompt pas
+                // La presentation ne s'interrompt pas, sauf B maintenu pendant l'attente trop longue (QUITTER).
+                if (maintenu)
+                {
+                    _ = Task.Run(() => QuitterLeLancement());
+                }
+
+                return;
             }
         }
 
@@ -880,7 +919,15 @@ public sealed class MultiplayerPanelService
         }
 
         _journal.LogInformation("MULTIPLAYER : rejouer a {Jeu}", jeu.Game.Id);
+        lock (_verrou)
+        {
+            _resultatALaMain = false;
+        }
+
         await OuvrirAsync(jeu.Path, string.Empty, string.Empty, CancellationToken.None).ConfigureAwait(false);
+        // COMME UN APPUI LONG DANS LA COLLECTION (verifie le 28/10) : ES garde la main, le panneau s'affiche par-dessus. Sans
+        // cela, la fenetre gardait la manette prise par l'ecran de fin, avec un panneau qui croyait la main a ES.
+        _overlay.RendreLeFocus();
     }
 
     private async Task QuitterAsync()
@@ -999,12 +1046,21 @@ public sealed class MultiplayerPanelService
 
     private void Rafraichir()
     {
+        bool lancement;
         lock (_verrou)
         {
-            if (_mode is not (Mode.Panneau or Mode.Resultat))
+            // L'ecran de lancement se recompose aussi (un ping, un joueur qui change).
+            lancement = _mode == Mode.Presentation && _roomDuLancement is not null;
+            if (!lancement && _mode is not (Mode.Panneau or Mode.Resultat))
             {
                 return;
             }
+        }
+
+        if (lancement)
+        {
+            MontrerLeLancement();
+            return;
         }
 
         _overlay.MontrerMultiplayer(Composer());

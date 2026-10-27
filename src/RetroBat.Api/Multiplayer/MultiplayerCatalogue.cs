@@ -810,6 +810,10 @@ public sealed record MultiplayerEcranDuJeu
     [JsonPropertyName("portrait_faces")]
     public string? Regard { get; init; }
 
+    /// <summary>« LE CONSEIL DU COIN » de l'ecran de lancement, par langue (« fr », « en »...) : une phrase courte, vraie pour ce jeu.</summary>
+    [JsonPropertyName("tips")]
+    public IReadOnlyDictionary<string, string>? Conseils { get; init; }
+
     [JsonIgnore]
     public bool RegardeAGauche => string.Equals(Regard, "left", StringComparison.OrdinalIgnoreCase);
 }

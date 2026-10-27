@@ -355,6 +355,10 @@ public sealed class MultiplayerLaunchService : IHostedService
             {
                 _ = Task.Run(() => BouclerLeDepartAsync(room, jeu.Game, liens));
             }
+            else
+            {
+                _panneau.DonnerLeDepart();
+            }
 
             if (reponse?.Ok == true)
             {
@@ -625,6 +629,8 @@ public sealed class MultiplayerLaunchService : IHostedService
                 MultiplayerAttenteDesInvites.CheminDuJournal, liens, PatienceDesInvites, jeton).ConfigureAwait(false);
             _journal.LogInformation("MULTIPLAYER : depart pret de {Jeu} repris {Tours} fois en {Secondes:F0} s en attendant le premier invite ({Room})",
                 jeu.Id, tours, (DateTime.UtcNow - debut).TotalSeconds, room.Room);
+            // Le premier invite arrive, la partie part : « A VOUS DE JOUER ! » sur l'ecran de lancement.
+            _panneau.DonnerLeDepart();
         }
         catch (OperationCanceledException)
         {
@@ -633,6 +639,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         catch (Exception ex)
         {
             _journal.LogWarning(ex, "MULTIPLAYER : boucle du depart pret de {Room} interrompue", room.Room);
+            _panneau.DonnerLeDepart();
         }
     }
 
@@ -895,7 +902,12 @@ public sealed class MultiplayerLaunchService : IHostedService
             return null;
         }
 
-        _panneau.AnnoncerLeLancement(room, jeu);
+        // L'ECRAN DE LANCEMENT TIENT DEVANT LE JEU (28/10) : chez l'hote d'un depart pret, tant que la boucle du depart le
+        // fige (rien ne bouge dessous) ; chez un invite, le temps de sa connexion. Sans boucle, il s'efface a l'arrivee du jeu.
+        var tenir = lancement.Role == "host"
+            ? DepartDeLaRoom(room, jeu) is not null && MultiplayerAttenteDesInvites.BoucleEnService
+            : lancement.Role == "guest";
+        _panneau.AnnoncerLeLancement(room, jeu, tenir);
 
         var imposees = MultiplayerLaunchPlan.OptionsDuCoeur(jeu.Core, Math.Max(2, lancement.Players), lancement.Seat);
         var optionsAvant = RetroArchConfigEdit.Poser(OptionsDesCoeurs, imposees);
