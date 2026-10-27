@@ -83,6 +83,88 @@ public sealed class MultiplayerStatsProfilTests : IDisposable
         Assert.All(resultat.MesuresDe(2), v => Assert.Equal((0L, "zero"), (v.Valeur ?? -1, v.Etat)));
     }
 
+    /// <summary>Le profil de TGM2 (releve du 27/10) : le jeu ne garde pas les lignes, elles se deduisent du niveau.</summary>
+    private const string ProfilPuzzle = """
+        {
+          "id": "arcade/puzzle/versus", "version": 1, "players": 2,
+          "signals": {
+            "niveau": { "source": "poll", "seats": { "1": "0x100", "2": "0x200" }, "bytes": 2 },
+            "apparitions": { "source": "poll", "seats": { "1": "0x102", "2": "0x202" }, "bytes": 2 },
+            "poses": { "source": "poll", "seats": { "1": "0x104", "2": "0x204" }, "bytes": 2 }
+          },
+          "counters": {
+            "pieces": { "rule": "hausse", "signal": "poses" },
+            "niveaux": { "rule": "somme_hausse", "signal": "niveau" },
+            "apparitions": { "rule": "somme_hausse", "signal": "apparitions" },
+            "manches": { "rule": "atteint", "signal": "apparitions", "value": "1" },
+            "tetris": { "rule": "hausse_d_au_moins", "signal": "niveau", "value": "4" }
+          },
+          "metrics": [
+            { "category": "execution", "id": "pieces", "label": "multiplayer.stat.pieces", "formula": "pieces" },
+            { "category": "efficacite", "id": "lignes", "label": "multiplayer.stat.lines", "formula": "niveaux - apparitions + manches" },
+            { "category": "maitrise", "id": "tetris", "label": "multiplayer.stat.tetris", "formula": "tetris" }
+          ]
+        }
+        """;
+
+    [Fact]
+    public async Task Les_hausses_de_la_place_comptent_pieces_lignes_et_tetris_d_une_manche_a_l_autre_jusqu_a_la_victoire()
+    {
+        var profil = Charger(ProfilPuzzle, out var erreur);
+        Assert.Null(erreur);
+        Assert.False(profil.LitLAdversaire);
+        var ra = new FauxRetroArch();
+        using var fin = new CancellationTokenSource();
+        var suivi = new MultiplayerStatsMoteur(ra, TimeSpan.FromMilliseconds(10)).Suivre(profil, [1, 2], fin.Token);
+        async Task Pose(params (long Adresse, int Valeur)[] valeurs)
+        {
+            foreach (var (adresse, valeur) in valeurs)
+            {
+                ra.Mots[adresse] = valeur;
+            }
+            await Task.Delay(250);
+        }
+
+        // Comme dans le jeu : une piece apparait (le niveau monte, sauf a la premiere de la manche), elle se pose, et les
+        // lignes qu'elle efface montent le niveau d'autant, a l'instant ou elle se pose.
+        await Task.Delay(250);
+        await Pose((0x102, 1));
+        await Pose((0x104, 1));
+        await Pose((0x102, 2), (0x100, 1));
+        await Pose((0x104, 2), (0x100, 2));    // une simple
+        await Pose((0x102, 3), (0x100, 3));
+        await Pose((0x104, 3));
+        await Pose((0x100, 0), (0x102, 0), (0x104, 0));   // manche suivante : tout repart de zero
+        await Pose((0x102, 1));
+        await Pose((0x104, 1), (0x100, 4));    // un TETRIS
+        await Pose((0x102, 2), (0x100, 5));
+        suivi.Figer();                          // le vainqueur est designe : la suite (le gagnant seul) ne compte plus
+        await Pose((0x100, 0), (0x102, 0), (0x104, 0));
+        await Pose((0x102, 1), (0x104, 1), (0x100, 4));
+        fin.Cancel();
+        var resultat = await suivi.Fin;
+
+        Assert.Equal(
+            [("execution", 4L, "measured"), ("efficacite", 5L, "measured"), ("maitrise", 1L, "measured")],
+            resultat.MesuresDe(1).Select(v => (v.Mesure.Category, v.Valeur ?? -1, v.Etat)));
+        Assert.All(resultat.MesuresDe(2), v => Assert.Equal((0L, "zero"), (v.Valeur ?? -1, v.Etat)));
+        // Sans coups ni degats, le format d'avant les profils ne part pas.
+        Assert.Null(resultat.AncienDesPlaces());
+    }
+
+    [Theory]
+    [InlineData(", \"value\": \"4\"", "", "hausse minimale inconnue")]
+    [InlineData("\"niveaux - apparitions + manches\"", "\"niveaux apparitions\"", "statistique « lignes » incoherente")]
+    [InlineData("\"niveaux - apparitions + manches\"", "\"niveaux - inconnu\"", "statistique « lignes » incoherente")]
+    [InlineData("\"niveaux - apparitions + manches\"", "\"niveaux -\"", "statistique « lignes » incoherente")]
+    [InlineData("\"value\": \"1\"", "\"value\": \"x\"", "valeur a atteindre inconnue")]
+    public void Un_profil_de_puzzle_incoherent_est_refuse(string avant, string apres, string raison)
+    {
+        Assert.Contains(avant, ProfilPuzzle);
+        Assert.Null(Charger(ProfilPuzzle.Replace(avant, apres), out var erreur));
+        Assert.Contains(raison, erreur);
+    }
+
     [Fact]
     public async Task Un_RetroArch_muet_ne_donne_que_des_statistiques_non_mesurees()
     {

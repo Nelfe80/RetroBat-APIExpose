@@ -130,11 +130,30 @@ public sealed class MultiplayerStatsSuivi
         }
     }
 
+    /// <summary>
+    /// Arrete les comptes : la rencontre est jouee (vainqueur designe). Le jeu tourne encore le temps de montrer la victoire,
+    /// et le gagnant y continue seul (contre l'ordinateur dans SF2CE, en solo dans TGM2) : rien de cela ne compte.
+    /// </summary>
+    public void Figer()
+    {
+        lock (_verrou)
+        {
+            _fige = true;
+        }
+    }
+
+    private bool _fige;
+
     /// <summary>Un tour de lecture : <paramref name="nouvelles"/> (null = rien de retenu ce tour), apres <paramref name="avant"/>.</summary>
     internal void Appliquer(IReadOnlyDictionary<(string Signal, int Place), int?> nouvelles, IReadOnlyDictionary<(string Signal, int Place), int?> avant)
     {
         lock (_verrou)
         {
+            if (_fige)
+            {
+                return;
+            }
+
             foreach (var ((signal, place), valeur) in nouvelles)
             {
                 if (valeur is not null)
@@ -174,6 +193,28 @@ public sealed class MultiplayerStatsSuivi
                                 && (nouvelles.GetValueOrDefault((compteur.Signal, place)) ?? avant.GetValueOrDefault((compteur.Signal, place))) == signal.Full)
                             {
                                 _compteurs[place][nom]++;
+                            }
+                            break;
+
+                        case MultiplayerStatsProfil.RegleAtteint:
+                            if (compteur.Cible(signal) is { } atteinte
+                                && avant.GetValueOrDefault((compteur.Signal, place)) is { } d && d != atteinte
+                                && nouvelles.GetValueOrDefault((compteur.Signal, place)) == atteinte)
+                            {
+                                _compteurs[place][nom]++;
+                            }
+                            break;
+
+                        case MultiplayerStatsProfil.RegleHausse or MultiplayerStatsProfil.RegleSommeHausse or MultiplayerStatsProfil.RegleHausseDAuMoins:
+                            // La valeur de la place elle-meme : une hausse entre deux valeurs retenues (une baisse ne compte rien).
+                            if (avant.GetValueOrDefault((compteur.Signal, place)) is { } a && nouvelles.GetValueOrDefault((compteur.Signal, place)) is { } b && b > a)
+                            {
+                                _compteurs[place][nom] += compteur.Rule switch
+                                {
+                                    MultiplayerStatsProfil.RegleSommeHausse => b - a,
+                                    MultiplayerStatsProfil.RegleHausseDAuMoins => b - a >= compteur.Cible(signal) ? 1 : 0,
+                                    _ => 1,
+                                };
                             }
                             break;
                     }

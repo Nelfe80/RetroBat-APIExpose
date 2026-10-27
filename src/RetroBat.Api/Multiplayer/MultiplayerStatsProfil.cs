@@ -41,6 +41,7 @@ public sealed record MultiplayerStatsProfil
     public static readonly IReadOnlySet<string> Regles = new HashSet<string>(StringComparer.Ordinal)
     {
         RegleBaisseAdverse, RegleSommeBaisseAdverse, RegleAtteintAdverse, RegleMancheGagneeSiPlein,
+        RegleHausse, RegleSommeHausse, RegleHausseDAuMoins, RegleAtteint,
     };
 
     /// <summary>Une baisse de la valeur adverse (une vie) : un coup reussi, credite a l'autre place.</summary>
@@ -55,8 +56,25 @@ public sealed record MultiplayerStatsProfil
     /// <summary>Le compteur de manches de la place monte d'un, sa valeur pleine : un perfect.</summary>
     public const string RegleMancheGagneeSiPlein = "manche_gagnee_si_plein";
 
+    /// <summary>
+    /// Une hausse de la valeur de la place (un compteur du jeu : pieces posees, lignes) : comptee une fois. Une baisse (le
+    /// compteur remis a zero a la manche suivante) ne compte rien, et la hausse d'apres repart de la.
+    /// </summary>
+    public const string RegleHausse = "hausse";
+
+    /// <summary>La somme des hausses de la valeur de la place : les lignes effacees, sur toutes les manches.</summary>
+    public const string RegleSommeHausse = "somme_hausse";
+
+    /// <summary>Une hausse d'au moins <c>value</c> d'un coup (un TETRIS : quatre lignes a la fois), comptee une fois.</summary>
+    public const string RegleHausseDAuMoins = "hausse_d_au_moins";
+
+    /// <summary>La valeur de la place atteint <c>value</c> : comptee une fois a chaque passage (la premiere piece d'une manche).</summary>
+    public const string RegleAtteint = "atteint";
+
     /// <summary>Les regles qui lisent l'adversaire : elles demandent un duel (deux places).</summary>
-    public bool LitLAdversaire => Counters.Values.Any(c => c.Rule is RegleBaisseAdverse or RegleSommeBaisseAdverse or RegleAtteintAdverse);
+    public bool LitLAdversaire => Counters.Values.Any(c => LitLAdversaireSelon(c.Rule));
+
+    public static bool LitLAdversaireSelon(string regle) => regle is RegleBaisseAdverse or RegleSommeBaisseAdverse or RegleAtteintAdverse;
 
     /// <summary>
     /// Le profil d'un jeu : son fichier (<c>stats.profile</c>), sinon le profil IMPLICITE de son bloc <c>stats.life</c>
@@ -200,10 +218,12 @@ public sealed record MultiplayerStatsProfil
             }
             switch (compteur.Rule)
             {
-                case RegleAtteintAdverse when compteur.Cible(signal) is null:
+                case RegleAtteintAdverse or RegleAtteint when compteur.Cible(signal) is null:
                     return "compteur « " + nom + " » : valeur a atteindre inconnue";
                 case RegleMancheGagneeSiPlein when signal.Full is null || compteur.Rounds is null || !profil.Signals.ContainsKey(compteur.Rounds):
                     return "compteur « " + nom + " » : valeur pleine ou manches manquantes";
+                case RegleHausseDAuMoins when compteur.Cible(signal) is not > 0:
+                    return "compteur « " + nom + " » : hausse minimale inconnue";
             }
         }
 
@@ -219,7 +239,8 @@ public sealed record MultiplayerStatsProfil
         foreach (var mesure in profil.Metrics)
         {
             if (mesure.Id.Length is 0 or > 32 || !mesure.Id.All(c => c is >= 'a' and <= 'z' or >= '0' and <= '9' or '_')
-                || !profil.Counters.ContainsKey(mesure.Formula) || mesure.Better is not ("higher" or "lower"))
+                || mesure.Termes() is not { Count: > 0 } termes || !termes.All(t => profil.Counters.ContainsKey(t.Compteur))
+                || mesure.Better is not ("higher" or "lower"))
             {
                 return "statistique « " + mesure.Id + " » incoherente";
             }
@@ -270,7 +291,10 @@ public sealed record MultiplayerStatsCompteur
     [JsonPropertyName("rounds")]
     public string? Rounds { get; init; }
 
-    /// <summary><see cref="MultiplayerStatsProfil.RegleAtteintAdverse"/> : « ko », « full », ou un nombre.</summary>
+    /// <summary>
+    /// <see cref="MultiplayerStatsProfil.RegleAtteintAdverse"/> : « ko », « full », ou un nombre ;
+    /// <see cref="MultiplayerStatsProfil.RegleHausseDAuMoins"/> : la hausse minimale, un nombre.
+    /// </summary>
     [JsonPropertyName("value")]
     public string? Value { get; init; }
 
@@ -297,9 +321,36 @@ public sealed record MultiplayerStatsMesure
     [JsonPropertyName("label")]
     public string Label { get; init; } = string.Empty;
 
-    /// <summary>Le compteur montre : la seule formule de la V1 (les taux et les « par minute » viendront avec le temps actif).</summary>
+    /// <summary>
+    /// Le compteur montre, ou des compteurs ajoutes et retranches (« niveaux - apparitions + manches » : les lignes de TGM2,
+    /// que le jeu ne garde nulle part) ; les taux et les « par minute » viendront avec le temps actif.
+    /// </summary>
     [JsonPropertyName("formula")]
     public string Formula { get; init; } = string.Empty;
+
+    /// <summary>Les compteurs de la formule et leur signe, ou null si elle est mal formee.</summary>
+    public IReadOnlyList<(string Compteur, int Signe)>? Termes()
+    {
+        // Un compteur, puis des paires « signe compteur » : rien d'autre.
+        var termes = new List<(string, int)>();
+        int? signe = 1;
+        foreach (var morceau in Formula.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var estUnSigne = morceau is "+" or "-";
+            if (estUnSigne == signe is not null)
+            {
+                return null;   // deux compteurs sans signe entre eux, ou deux signes de suite
+            }
+            if (estUnSigne)
+            {
+                signe = morceau == "+" ? 1 : -1;
+                continue;
+            }
+            termes.Add((morceau, signe!.Value));
+            signe = null;
+        }
+        return signe is null ? termes : null;
+    }
 
     [JsonPropertyName("unit")]
     public string Unit { get; init; } = "count";
@@ -332,12 +383,17 @@ public sealed record MultiplayerStatsResultat(
         var adversaireLu = Compteurs.Keys.Where(p => p != place).All(PlacesLues.Contains);
         return Profil.Metrics.Select(mesure =>
         {
-            var compteur = Profil.Counters.GetValueOrDefault(mesure.Formula);
-            var lisible = PlacesLues.Contains(place) && (compteur is null || compteur.Rule == MultiplayerStatsProfil.RegleMancheGagneeSiPlein || adversaireLu);
-            if (compteur is null || !lisible || !Compteurs.TryGetValue(place, out var valeurs) || !valeurs.TryGetValue(mesure.Formula, out var valeur))
+            var termes = mesure.Termes() ?? [];
+            var compteurs = termes.Select(t => Profil.Counters.GetValueOrDefault(t.Compteur)).ToList();
+            var lisible = termes.Count > 0 && PlacesLues.Contains(place)
+                && compteurs.All(c => c is not null && (!MultiplayerStatsProfil.LitLAdversaireSelon(c.Rule) || adversaireLu));
+            if (!lisible || !Compteurs.TryGetValue(place, out var valeurs) || !termes.All(t => valeurs.ContainsKey(t.Compteur)))
             {
                 return new MultiplayerStatsValeur(mesure, null, MultiplayerStatsValeur.Indisponible);
             }
+            // Une difference ne descend pas sous zero : entre deux evenements d'un meme fait (la piece posee, le niveau
+            // pas encore monte), elle peut valoir -1 un instant.
+            var valeur = Math.Max(0, termes.Sum(t => t.Signe * valeurs[t.Compteur]));
             return new MultiplayerStatsValeur(mesure, valeur, valeur == 0 ? MultiplayerStatsValeur.Zero : MultiplayerStatsValeur.Mesuree);
         }).ToList();
     }

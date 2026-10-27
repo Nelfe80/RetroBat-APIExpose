@@ -489,6 +489,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         lock (_verrou)
         {
             _vainqueur = vainqueur;
+            _suiviDesStats?.Figer();
         }
 
         _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} finie, {Issue} ; le jeu se ferme dans {Delai} s",
@@ -535,6 +536,7 @@ public sealed class MultiplayerLaunchService : IHostedService
                 return;
             }
 
+            suiviInvite?.Figer();
             // Ses statistiques partent avec son rapport : le site les compare a celles de l'hote (ecart journalise, sans suite en V1).
             var reponse = await _client.RapporterAsync(room.Room, vainqueur.Value, CancellationToken.None,
                 suiviInvite?.Instantane().PourLeSite()).ConfigureAwait(false);
