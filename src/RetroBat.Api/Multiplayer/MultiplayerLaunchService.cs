@@ -28,6 +28,12 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// <summary>La plateforme rend la gameroom a l'attente au bout de 90 s sans session : on publie avant.</summary>
     private static readonly TimeSpan PatienceLobby = TimeSpan.FromSeconds(85);
 
+    /// <summary>
+    /// Le depart pret en pause attend les invites au plus ce temps apres la publication de la session (un lancement a pris
+    /// 48 s sur une borne, le 25/10) ; au-dela, il reprend comme avant.
+    /// </summary>
+    private static readonly TimeSpan PatienceDesInvites = TimeSpan.FromSeconds(90);
+
     private readonly MultiplayerSessionService _session;
     private readonly MultiplayerClient _client;
     private readonly MultiplayerPanelService _panneau;
@@ -60,6 +66,10 @@ public sealed class MultiplayerLaunchService : IHostedService
 
     /// <summary>Le guet de la fin d'une rencontre NelfePlay, et la place gagnante qu'il a vue.</summary>
     private CancellationTokenSource? _guet;
+
+    /// <summary>Le depart pret en pause jusqu'a l'arrivee des invites, puis garde sans pause jusqu'a la fin (27/10).</summary>
+    private readonly MultiplayerAttenteDesInvites _attente;
+    private CancellationTokenSource? _gardeSansPause;
     private int? _vainqueur;
 
     /// <summary>L'etat d'un depart pret pose dans l'emplacement reserve de RetroArch, retire a la fin de la partie.</summary>
@@ -92,6 +102,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         _journal = journal;
         _bilans = new MultiplayerBilanDuWrapper(bus);
         _depart = new MultiplayerDepartPret(new CommandesRetroArchUdp());
+        _attente = new MultiplayerAttenteDesInvites(new CommandesRetroArchUdp());
         _fin = new MultiplayerFinDeRencontre(new CommandesRetroArchUdp());
         _moteurDesStats = new MultiplayerStatsMoteur(new CommandesRetroArchUdp());
     }
@@ -208,6 +219,8 @@ public sealed class MultiplayerLaunchService : IHostedService
             {
                 _guet?.Cancel();
                 _guet = null;
+                _gardeSansPause?.Cancel();
+                _gardeSansPause = null;
                 vainqueur = _vainqueur;
                 _vainqueur = null;
                 suivi = _suiviDesStats;
@@ -279,6 +292,15 @@ public sealed class MultiplayerLaunchService : IHostedService
                 return;
             }
 
+            // LE DEPART ATTEND TOUT LE MONDE (27/10) : le match ne commence pas avant que les invites soient la.
+            var enPause = depart is not null && await _attente.MettreEnPauseAsync(CancellationToken.None).ConfigureAwait(false);
+            if (depart is not null)
+            {
+                _journal.LogInformation(enPause
+                    ? "MULTIPLAYER : depart pret de {Jeu} en pause jusqu'a l'arrivee des invites ({Room})"
+                    : "MULTIPLAYER : depart pret de {Jeu} sans pause, RetroArch ne s'est pas arrete ({Room})", jeu.Game.Id, room.Room);
+            }
+
             // Le mot de passe que RetroArch applique, relu dans sa configuration (voir NetplayHostService).
             var config = File.Exists(ConfigRetroArch) ? await File.ReadAllTextAsync(ConfigRetroArch).ConfigureAwait(false) : string.Empty;
             var (joueurReel, spectateurReel) = NetplayHostService.LireMotsDePasse(config);
@@ -314,6 +336,11 @@ public sealed class MultiplayerLaunchService : IHostedService
                 await RetroArchInvite.FermerAsync().ConfigureAwait(false);
                 return;
             }
+            if (enPause)
+            {
+                _ = Task.Run(() => LibererLeDepartAsync(room, jeu.Game));
+            }
+
             // Une rencontre classee (fin lue + type versus, 23/10), quel que soit le niveau : l'hote guette sa fin.
             if (reponse?.Ok == true && jeu.Game.EstClasse)
             {
@@ -323,6 +350,49 @@ public sealed class MultiplayerLaunchService : IHostedService
         catch (Exception ex)
         {
             _journal.LogWarning(ex, "MULTIPLAYER : publication de la session de {Room} interrompue", room.Room);
+        }
+    }
+
+    /// <summary>
+    /// Le depart pret en pause reprend quand chaque invite a rejoint sa place dans le journal de RetroArch (au plus
+    /// <see cref="PatienceDesInvites"/>), puis la partie reste sans pause jusqu'a sa fin : la pause, permise pour l'attente,
+    /// ne sert pas a figer l'autre joueur.
+    /// </summary>
+    private async Task LibererLeDepartAsync(MultiplayerRoom room, MultiplayerGame jeu)
+    {
+        CancellationToken jeton;
+        lock (_verrou)
+        {
+            _gardeSansPause?.Cancel();
+            _gardeSansPause = new CancellationTokenSource();
+            jeton = _gardeSansPause.Token;
+        }
+
+        try
+        {
+            var attendus = Math.Max(1, room.Players.Count(joueur => joueur.Seat is not null) - 1);
+            var debut = DateTime.UtcNow;
+            var vus = await _attente.AttendreLesInvitesAsync(
+                    MultiplayerAttenteDesInvites.CheminDuJournal(MultiplayerAttenteDesInvites.DossierDuJournal), attendus, PatienceDesInvites, jeton)
+                .ConfigureAwait(false);
+            // L'etat que RetroArch envoie a l'arrivee d'un invite se charge chez lui : un instant avant de repartir.
+            await Task.Delay(TimeSpan.FromSeconds(1), jeton).ConfigureAwait(false);
+            var repris = await _attente.ReprendreAsync(jeton).ConfigureAwait(false);
+            _journal.LogInformation("MULTIPLAYER : {Jeu}, {Vus}/{Attendus} invite(s) a leur place en {Secondes:F0} s : le depart pret {Etat} ({Room})",
+                jeu.Id, vus, attendus, (DateTime.UtcNow - debut).TotalSeconds, repris ? "reprend" : "reste en pause", room.Room);
+            var levees = await _attente.GarderSansPauseAsync(jeton).ConfigureAwait(false);
+            if (levees > 0)
+            {
+                _journal.LogInformation("MULTIPLAYER : {Jeu}, {Levees} pause(s) levee(s) pendant la partie ({Room})", jeu.Id, levees, room.Room);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // La partie est finie avant l'arrivee des invites.
+        }
+        catch (Exception ex)
+        {
+            _journal.LogWarning(ex, "MULTIPLAYER : reprise du depart pret de {Room} interrompue", room.Room);
         }
     }
 
@@ -743,6 +813,27 @@ public sealed class MultiplayerLaunchService : IHostedService
         if (vue is not null)
         {
             reglagesDeLaPlace["video_aspect_ratio"] = MultiplayerLaunchPlan.FormatPourRetroArch(jeu.Game, vue);
+        }
+
+        // LE DEPART ATTEND TOUT LE MONDE (27/10) : l'hote d'un depart pret peut se mettre en pause, et son journal dit
+        // l'arrivee de chaque invite (MultiplayerAttenteDesInvites). Un journal d'une partie precedente ne compte pas.
+        if (lancement.Role == "host" && DepartDeLaRoom(room, jeu) is not null)
+        {
+            var dossier = MultiplayerAttenteDesInvites.DossierDuJournal;
+            try
+            {
+                Directory.CreateDirectory(dossier);
+                File.Delete(MultiplayerAttenteDesInvites.CheminDuJournal(dossier));
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                _journal.LogDebug(ex, "MULTIPLAYER : journal de RetroArch de la partie precedente non efface");
+            }
+
+            foreach (var (cle, valeur) in MultiplayerAttenteDesInvites.Reglages(dossier))
+            {
+                reglagesDeLaPlace[cle] = valeur;
+            }
         }
 
         var aRendre = new Dictionary<string, Dictionary<string, string?>>(StringComparer.OrdinalIgnoreCase)
