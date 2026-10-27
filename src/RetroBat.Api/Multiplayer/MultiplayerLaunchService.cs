@@ -67,9 +67,9 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// <summary>Le guet de la fin d'une rencontre NelfePlay, et la place gagnante qu'il a vue.</summary>
     private CancellationTokenSource? _guet;
 
-    /// <summary>Le depart pret en pause jusqu'a l'arrivee des invites, puis garde sans pause jusqu'a la fin (27/10).</summary>
+    /// <summary>Le depart pret au ralenti jusqu'a l'arrivee des invites, puis garde a vitesse normale jusqu'a la fin (27/10).</summary>
     private readonly MultiplayerAttenteDesInvites _attente;
-    private CancellationTokenSource? _gardeSansPause;
+    private CancellationTokenSource? _gardeDeVitesse;
     private CancellationTokenSource? _suiviDesInvites;
     private int? _vainqueur;
 
@@ -220,8 +220,8 @@ public sealed class MultiplayerLaunchService : IHostedService
             {
                 _guet?.Cancel();
                 _guet = null;
-                _gardeSansPause?.Cancel();
-                _gardeSansPause = null;
+                _gardeDeVitesse?.Cancel();
+                _gardeDeVitesse = null;
                 _suiviDesInvites?.Cancel();
                 _suiviDesInvites = null;
                 vainqueur = _vainqueur;
@@ -295,15 +295,15 @@ public sealed class MultiplayerLaunchService : IHostedService
                 return;
             }
 
-            // LE DEPART ATTEND TOUT LE MONDE (27/10) : le match ne commence pas avant que les invites soient la. Hors service le
-            // soir meme : un invite connecte pendant la pause restait fige (MultiplayerAttenteDesInvites.EnService).
-            var enPause = depart is not null && MultiplayerAttenteDesInvites.EnService
-                && await _attente.MettreEnPauseAsync(CancellationToken.None).ConfigureAwait(false);
+            // LE DEPART ATTEND TOUT LE MONDE (27/10) : le match ne commence pas avant que les invites soient la. Le jeu passe au
+            // ralenti x30 jusqu'a leur arrivee (la pause, elle, figeait l'invite : MultiplayerAttenteDesInvites).
+            var auRalenti = depart is not null && MultiplayerAttenteDesInvites.EnService
+                && await _attente.MettreAuRalentiAsync(CancellationToken.None).ConfigureAwait(false);
             if (depart is not null && MultiplayerAttenteDesInvites.EnService)
             {
-                _journal.LogInformation(enPause
-                    ? "MULTIPLAYER : depart pret de {Jeu} en pause jusqu'a l'arrivee des invites ({Room})"
-                    : "MULTIPLAYER : depart pret de {Jeu} sans pause, RetroArch ne s'est pas arrete ({Room})", jeu.Game.Id, room.Room);
+                _journal.LogInformation(auRalenti
+                    ? "MULTIPLAYER : depart pret de {Jeu} au ralenti jusqu'a l'arrivee des invites ({Room})"
+                    : "MULTIPLAYER : depart pret de {Jeu} sans ralenti, RetroArch n'a pas ralenti ({Room})", jeu.Game.Id, room.Room);
             }
 
             // Le mot de passe que RetroArch applique, relu dans sa configuration (voir NetplayHostService).
@@ -341,7 +341,7 @@ public sealed class MultiplayerLaunchService : IHostedService
                 await RetroArchInvite.FermerAsync().ConfigureAwait(false);
                 return;
             }
-            if (enPause)
+            if (auRalenti)
             {
                 _ = Task.Run(() => LibererLeDepartAsync(room, jeu.Game));
             }
@@ -397,18 +397,18 @@ public sealed class MultiplayerLaunchService : IHostedService
     }
 
     /// <summary>
-    /// Le depart pret en pause reprend quand chaque invite a rejoint sa place dans le journal de RetroArch (au plus
-    /// <see cref="PatienceDesInvites"/>), puis la partie reste sans pause jusqu'a sa fin : la pause, permise pour l'attente,
-    /// ne sert pas a figer l'autre joueur.
+    /// Le depart pret au ralenti repart a vitesse normale quand chaque invite a rejoint sa place dans le journal de RetroArch
+    /// (au plus <see cref="PatienceDesInvites"/>), puis la partie reste a vitesse normale jusqu'a sa fin : une bascule perdue
+    /// ne laisse pas le match au ralenti.
     /// </summary>
     private async Task LibererLeDepartAsync(MultiplayerRoom room, MultiplayerGame jeu)
     {
         CancellationToken jeton;
         lock (_verrou)
         {
-            _gardeSansPause?.Cancel();
-            _gardeSansPause = new CancellationTokenSource();
-            jeton = _gardeSansPause.Token;
+            _gardeDeVitesse?.Cancel();
+            _gardeDeVitesse = new CancellationTokenSource();
+            jeton = _gardeDeVitesse.Token;
         }
 
         try
@@ -419,13 +419,22 @@ public sealed class MultiplayerLaunchService : IHostedService
                 .ConfigureAwait(false);
             // L'etat que RetroArch envoie a l'arrivee d'un invite se charge chez lui : un instant avant de repartir.
             await Task.Delay(TimeSpan.FromSeconds(1), jeton).ConfigureAwait(false);
-            var repris = await _attente.ReprendreAsync(jeton).ConfigureAwait(false);
-            _journal.LogInformation("MULTIPLAYER : {Jeu}, {Vus}/{Attendus} invite(s) a leur place en {Secondes:F0} s : le depart pret {Etat} ({Room})",
-                jeu.Id, vus, attendus, (DateTime.UtcNow - debut).TotalSeconds, repris ? "reprend" : "reste en pause", room.Room);
-            var levees = await _attente.GarderSansPauseAsync(jeton).ConfigureAwait(false);
+            var repris = await _attente.RetrouverLaVitesseAsync(jeton).ConfigureAwait(false);
+            if (repris)
+            {
+                _journal.LogInformation("MULTIPLAYER : {Jeu}, {Vus}/{Attendus} invite(s) a leur place en {Secondes:F0} s : le depart pret repart a vitesse normale ({Room})",
+                    jeu.Id, vus, attendus, (DateTime.UtcNow - debut).TotalSeconds, room.Room);
+            }
+            else
+            {
+                _journal.LogWarning("MULTIPLAYER : {Jeu}, {Vus}/{Attendus} invite(s) a leur place en {Secondes:F0} s : le depart pret reste au ralenti ({Room})",
+                    jeu.Id, vus, attendus, (DateTime.UtcNow - debut).TotalSeconds, room.Room);
+            }
+
+            var levees = await _attente.GarderLaVitesseAsync(TimeSpan.FromSeconds(3), jeton).ConfigureAwait(false);
             if (levees > 0)
             {
-                _journal.LogInformation("MULTIPLAYER : {Jeu}, {Levees} pause(s) levee(s) pendant la partie ({Room})", jeu.Id, levees, room.Room);
+                _journal.LogInformation("MULTIPLAYER : {Jeu}, {Levees} ralenti(s) leve(s) pendant la partie ({Room})", jeu.Id, levees, room.Room);
             }
         }
         catch (OperationCanceledException)
@@ -862,8 +871,8 @@ public sealed class MultiplayerLaunchService : IHostedService
             reglagesDeLaPlace["video_aspect_ratio"] = MultiplayerLaunchPlan.FormatPourRetroArch(jeu.Game, vue);
         }
 
-        // LE DEPART ATTEND TOUT LE MONDE (27/10) : l'hote d'un depart pret peut se mettre en pause ; son journal (celui du
-        // lanceur) dit l'arrivee de chaque invite (MultiplayerAttenteDesInvites).
+        // LE DEPART ATTEND TOUT LE MONDE (27/10) : l'hote d'un depart pret passe au ralenti x30 en attendant ses invites ; son
+        // journal (celui du lanceur) dit l'arrivee de chaque invite (MultiplayerAttenteDesInvites).
         if (MultiplayerAttenteDesInvites.EnService && lancement.Role == "host" && DepartDeLaRoom(room, jeu) is not null)
         {
             foreach (var (cle, valeur) in MultiplayerAttenteDesInvites.Reglages)

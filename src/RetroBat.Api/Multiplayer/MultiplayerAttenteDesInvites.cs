@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using RetroBat.Domain.Paths;
 
@@ -6,26 +7,26 @@ namespace RetroBat.Api.Multiplayer;
 /// <summary>
 /// LE DEPART ATTEND TOUT LE MONDE (27/10, Tetris TGM2 : « les pieces tombent deja quand le 2e joueur arrive »). Le depart
 /// pret se pose chez l'hote AVANT que les invites se connectent : le match commencait seul, et l'invite arrivait quelques
-/// secondes plus tard, ses premieres pieces deja tombees. L'hote met donc le jeu en pause juste apres son depart pret, et
-/// le reprend quand le journal de RetroArch dit que chaque invite a rejoint sa place.
+/// secondes plus tard, ses premieres pieces deja tombees.
 /// <list type="bullet">
-/// <item>Un RetroArch en pause ne traite pas le reseau : la connexion de l'invite attend dans la file du systeme, et
-/// l'invite abandonne au bout de 12 s (banc du 27/10). Pendant l'attente, l'hote avance donc d'une image toutes les
-/// 500 ms (FRAMEADVANCE) : assez pour accueillir l'invite, pas pour faire avancer le jeu (TGM2 reste sur « ROUND 1 GO »,
-/// le chrono a 02:40:00). L'invite rejoint en pause ; a la reprise, memoire identique, aucune desynchronisation.</item>
-/// <item>RetroArch refuse toute pause en netplay sans <c>netplay_allow_pausing</c>, meme seul (banc du 27/10) : l'hote
-/// le recoit le temps de la partie (le lanceur ne reecrit pas cette cle). Son journal est celui que le lanceur lui donne
-/// a chaque lancement (<c>--log-file es_launch_stdout.log -verbose</c>, MULTIPLAYER compris), vide a son demarrage.</item>
-/// <item>Recharger l'etat a l'arrivee de l'invite ne marche pas : l'invite recoit « Netplay state load out of order » et se
-/// deconnecte (banc du 27/10).</item>
-/// <item>La pause permise, un joueur pourrait figer la partie de l'autre : apres la reprise, une pause qui dure est levee.</item>
+/// <item>LA PAUSE (1.9.105) : l'hote se mettait en pause et avancait d'une image toutes les 500 ms pour accueillir l'invite.
+/// Un invite connecte pendant cette pause ne jouait plus une seule image apres la reprise, et RetroArch 1.22.2 le raccrochait
+/// 6 s plus tard (Title Fight puis SF2CE entre deux bornes, le 27/10 au soir ; reproduit au banc par le relais comme en
+/// connexion directe). Hors service en 1.9.108.</item>
+/// <item>RECHARGER LE DEPART une fois l'invite arrive ne marche pas : il recoit « Netplay state load out of order » et
+/// decroche, meme dans une partie saine (banc du 27/10).</item>
+/// <item>LE RALENTI (1.9.109) : l'hote passe au ralenti x30 (<c>slowmotion_ratio</c> et la commande SLOWMOTION) jusqu'a
+/// l'arrivee des invites. RetroArch continue de jouer des images, donc de traiter le reseau : l'invite rejoint, et a la
+/// vitesse normale les deux jeux tournent sur la meme image (banc_pause_relais.py --ralenti=30, captures identiques). Quinze
+/// secondes d'attente font une demi-seconde de jeu. Le ralenti passe par la synchronisation sur le son : sans son, il
+/// n'agit pas. Le bilan du wrapper n'y voit ni avance rapide ni triche, et le garde-fou de la capture tient ce qui tourne
+/// sous 20 images par seconde pour une pause.</item>
+/// <item>Une partie certifiee (le 1CC MULTI, a venir) ne commence qu'au retour a la vitesse normale : le ralenti n'y entre
+/// jamais.</item>
 /// </list>
-/// HORS SERVICE (27/10 au soir, Title Fight puis SF2CE entre deux bornes) : un invite qui se connecte pendant cette pause ne
-/// joue plus une seule image apres la reprise, et l'hote le raccroche 6 s plus tard (RetroArch 1.22.2 raccroche un invite muet
-/// depuis 5 s). Banc banc_pause_relais.py : par le relais comme en connexion directe ; reprendre apres plus d'images, des
-/// l'arrivee de la connexion, ou par une pause de l'un ou de l'autre n'y change rien ; sans pause, tout marche. Le banc du
-/// matin comparait les memoires a la reprise : elles etaient egales parce que les deux jeux etaient figes. Le depart part donc
-/// sans attendre (<see cref="EnService"/>) ; ce qui suit l'arrivee et le depart des invites dans le journal reste.
+/// La vitesse se lit au temps de reponse de GET_STATUS : RetroArch ne traite ses commandes qu'entre deux images, ~16 ms a
+/// vitesse normale, ~500 ms au ralenti x30 (sonde_ralenti.py). Une bascule perdue laisserait le match au ralenti : chaque
+/// bascule se verifie, et la partie est gardee a vitesse normale jusqu'a sa fin.
 /// </summary>
 public sealed class MultiplayerAttenteDesInvites
 {
@@ -33,8 +34,8 @@ public sealed class MultiplayerAttenteDesInvites
 
     public MultiplayerAttenteDesInvites(ICommandesRetroArch commandes) => _commandes = commandes;
 
-    /// <summary>La pause d'attente du depart pret : hors service tant qu'un invite connecte pendant la pause reste fige.</summary>
-    public static bool EnService { get; } = false;
+    /// <summary>L'attente du depart pret, au ralenti.</summary>
+    public static bool EnService { get; } = true;
 
     /// <summary>
     /// Le journal de RetroArch : le lanceur le lui donne a chaque lancement (<c>--log-file</c>), et un <c>log_dir</c> pose dans
@@ -45,8 +46,14 @@ public sealed class MultiplayerAttenteDesInvites
     /// <summary>Les reglages de RetroArch le temps de la partie, rendus apres comme ceux de la place.</summary>
     public static IReadOnlyDictionary<string, string> Reglages { get; } = new Dictionary<string, string>(StringComparer.Ordinal)
     {
-        ["netplay_allow_pausing"] = "true",
+        ["slowmotion_ratio"] = "30.000000",
     };
+
+    /// <summary>Au-dela, GET_STATUS repond au rythme du ralenti (~500 ms) et non entre deux images (~16 ms).</summary>
+    internal static readonly TimeSpan SeuilDuRalenti = TimeSpan.FromMilliseconds(150);
+
+    /// <summary>Le temps laisse a une bascule de vitesse avant de la mesurer.</summary>
+    internal static TimeSpan DelaiDeBascule { get; set; } = TimeSpan.FromMilliseconds(800);
 
     // « [INFO] [Netplay] client_pause has joined as player 2 (ping: 130 ms) », ou avec deux ports (Title Fight) « client_ports
     // has joined with input devices 2, 4 (ping: 46 ms) » ; « [INFO] [Netplay] "client_rech" has disconnected ».
@@ -89,22 +96,39 @@ public sealed class MultiplayerAttenteDesInvites
         return morceaux.Length >= 2 && morceaux[0] == "GET_STATUS" ? morceaux[1] : null;
     }
 
-    private async Task<string?> EtatAsync(CancellationToken ct)
-        => Etat(await _commandes.DemanderAsync("GET_STATUS", ct).ConfigureAwait(false));
-
-    /// <summary>Met le jeu en pause et le verifie. Faux si RetroArch ne s'est pas arrete (la partie part alors comme avant).</summary>
-    public async Task<bool> MettreEnPauseAsync(CancellationToken ct)
+    /// <summary>
+    /// Le jeu est-il au ralenti ? Le temps de reponse median de trois GET_STATUS, compare a <see cref="SeuilDuRalenti"/> ;
+    /// null si RetroArch ne repond pas ou ne joue pas.
+    /// </summary>
+    internal async Task<bool?> AuRalentiAsync(CancellationToken ct)
     {
-        if (await EtatAsync(ct).ConfigureAwait(false) != "PLAYING")
+        var mesures = new List<TimeSpan>();
+        for (var i = 0; i < 3; i++)
         {
-            return false;
+            var chrono = Stopwatch.StartNew();
+            if (Etat(await _commandes.DemanderAsync("GET_STATUS", ct, 1500).ConfigureAwait(false)) != "PLAYING")
+            {
+                return null;
+            }
+
+            mesures.Add(chrono.Elapsed);
         }
 
-        await _commandes.EnvoyerAsync("PAUSE_TOGGLE", ct).ConfigureAwait(false);
-        for (var essai = 0; essai < 6; essai++)
+        mesures.Sort();
+        return mesures[1] > SeuilDuRalenti;
+    }
+
+    /// <summary>
+    /// Bascule la vitesse jusqu'a obtenir <paramref name="ralenti"/>, deux bascules au plus. Rend vrai si la vitesse voulue
+    /// est mesuree.
+    /// </summary>
+    private async Task<bool> BasculerAsync(bool ralenti, CancellationToken ct)
+    {
+        for (var essai = 0; essai < 2; essai++)
         {
-            await Task.Delay(250, ct).ConfigureAwait(false);
-            if (await EtatAsync(ct).ConfigureAwait(false) == "PAUSED")
+            await _commandes.EnvoyerAsync("SLOWMOTION", ct).ConfigureAwait(false);
+            await Task.Delay(DelaiDeBascule, ct).ConfigureAwait(false);
+            if (await AuRalentiAsync(ct).ConfigureAwait(false) == ralenti)
             {
                 return true;
             }
@@ -113,27 +137,69 @@ public sealed class MultiplayerAttenteDesInvites
         return false;
     }
 
-    /// <summary>L'hote en pause avance d'une image a ce rythme pendant l'attente : son netplay accueille l'invite.</summary>
-    internal static readonly TimeSpan RythmeDesImages = TimeSpan.FromMilliseconds(500);
+    /// <summary>Met le jeu au ralenti et le verifie. Faux si RetroArch ne joue pas ou n'a pas ralenti (la partie part alors comme avant).</summary>
+    public async Task<bool> MettreAuRalentiAsync(CancellationToken ct)
+    {
+        if (await AuRalentiAsync(ct).ConfigureAwait(false) is not false)
+        {
+            return false;
+        }
+
+        if (await BasculerAsync(true, ct).ConfigureAwait(false))
+        {
+            return true;
+        }
+
+        // Une bascule qui ne se mesure pas ne laisse pas le jeu dans un etat douteux.
+        if (await AuRalentiAsync(ct).ConfigureAwait(false) == true)
+        {
+            await BasculerAsync(false, ct).ConfigureAwait(false);
+        }
+
+        return false;
+    }
+
+    /// <summary>Remet le jeu a vitesse normale, et le verifie. Faux s'il est reste au ralenti.</summary>
+    public async Task<bool> RetrouverLaVitesseAsync(CancellationToken ct)
+    {
+        for (var essai = 0; essai < 3; essai++)
+        {
+            switch (await AuRalentiAsync(ct).ConfigureAwait(false))
+            {
+                case false:
+                    return true;
+                case true:
+                    if (await BasculerAsync(false, ct).ConfigureAwait(false))
+                    {
+                        return true;
+                    }
+
+                    break;
+                default:
+                    await Task.Delay(DelaiDeBascule, ct).ConfigureAwait(false);
+                    break;
+            }
+        }
+
+        return await AuRalentiAsync(ct).ConfigureAwait(false) == false;
+    }
 
     /// <summary>
     /// Attend que <paramref name="attendus"/> invites aient rejoint leur place dans le journal (relu toutes les 500 ms), au
-    /// plus <paramref name="patience"/>, en avancant d'une image a chaque fois. Rend le nombre d'invites vus.
+    /// plus <paramref name="patience"/>. Rend le nombre d'invites vus.
     /// </summary>
     public async Task<int> AttendreLesInvitesAsync(string journal, int attendus, TimeSpan patience, CancellationToken ct)
     {
         var limite = DateTime.UtcNow + patience;
-        var vus = 0;
         while (true)
         {
-            vus = InvitesALeurPlace(LireLesLignes(journal)).Count;
+            var vus = InvitesALeurPlace(LireLesLignes(journal)).Count;
             if (vus >= attendus || DateTime.UtcNow >= limite)
             {
                 return vus;
             }
 
-            await _commandes.EnvoyerAsync("FRAMEADVANCE", ct).ConfigureAwait(false);
-            await Task.Delay(RythmeDesImages, ct).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromMilliseconds(500), ct).ConfigureAwait(false);
         }
     }
 
@@ -176,51 +242,32 @@ public sealed class MultiplayerAttenteDesInvites
         }
     }
 
-    /// <summary>Reprend le jeu s'il est en pause, et le verifie. Faux s'il est reste en pause.</summary>
-    public async Task<bool> ReprendreAsync(CancellationToken ct)
-    {
-        for (var essai = 0; essai < 3; essai++)
-        {
-            var etat = await EtatAsync(ct).ConfigureAwait(false);
-            if (etat == "PLAYING")
-            {
-                return true;
-            }
-
-            if (etat == "PAUSED")
-            {
-                await _commandes.EnvoyerAsync("PAUSE_TOGGLE", ct).ConfigureAwait(false);
-            }
-
-            await Task.Delay(400, ct).ConfigureAwait(false);
-        }
-
-        return await EtatAsync(ct).ConfigureAwait(false) == "PLAYING";
-    }
-
     /// <summary>
-    /// Apres la reprise, jusqu'a l'annulation (fin de partie) : une pause vue deux fois de suite, a une seconde d'ecart, est
-    /// levee. Rend le nombre de pauses levees.
+    /// Apres le retour a la vitesse normale, jusqu'a l'annulation (fin de partie) : un ralenti mesure deux fois de suite, a
+    /// <paramref name="rythme"/> d'ecart, est leve (une bascule perdue, une touche de ralenti). Rend le nombre de ralentis leves.
     /// </summary>
-    public async Task<int> GarderSansPauseAsync(CancellationToken ct)
+    public async Task<int> GarderLaVitesseAsync(TimeSpan rythme, CancellationToken ct)
     {
         var levees = 0;
-        var vue = false;
+        var vu = false;
         try
         {
             while (!ct.IsCancellationRequested)
             {
-                await Task.Delay(1000, ct).ConfigureAwait(false);
-                var etat = await EtatAsync(ct).ConfigureAwait(false);
-                if (etat == "PAUSED" && vue)
+                await Task.Delay(rythme, ct).ConfigureAwait(false);
+                var ralenti = await AuRalentiAsync(ct).ConfigureAwait(false) == true;
+                if (ralenti && vu)
                 {
-                    await _commandes.EnvoyerAsync("PAUSE_TOGGLE", ct).ConfigureAwait(false);
-                    levees++;
-                    vue = false;
+                    if (await BasculerAsync(false, ct).ConfigureAwait(false))
+                    {
+                        levees++;
+                    }
+
+                    vu = false;
                     continue;
                 }
 
-                vue = etat == "PAUSED";
+                vu = ralenti;
             }
         }
         catch (OperationCanceledException)
