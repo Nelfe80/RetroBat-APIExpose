@@ -58,12 +58,15 @@ public static class MultiplayerLaunchPlan
             ? "fbneo-dipswitch-" + set + "-"
             : null;
 
-    public static IReadOnlyDictionary<string, string> Place(int place)
+    public static IReadOnlyDictionary<string, string> Place(int place) => Place([place]);
+
+    /// <summary>Les ports que la borne demande au netplay : deux pour un boxeur de Title Fight (<see cref="MultiplayerGame.SeatPorts"/>).</summary>
+    public static IReadOnlyDictionary<string, string> Place(IReadOnlyCollection<int> ports)
     {
         var reglages = new Dictionary<string, string>(StringComparer.Ordinal);
         for (var i = 1; i <= 8; i++)
         {
-            reglages["netplay_request_device_p" + i] = i == place ? "true" : "false";
+            reglages["netplay_request_device_p" + i] = ports.Contains(i) ? "true" : "false";
         }
 
         return reglages;

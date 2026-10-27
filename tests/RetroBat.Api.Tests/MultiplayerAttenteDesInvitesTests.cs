@@ -21,6 +21,9 @@ public class MultiplayerAttenteDesInvitesTests
             "[INFO] [Netplay] regard has joined as spectator",
         ];
         Assert.Equal(new Dictionary<string, int> { ["client_pause"] = 2 }, MultiplayerAttenteDesInvites.InvitesALeurPlace(journal));
+        // Deux ports par borne (Title Fight, banc du 27/10) : RetroArch dit « with input devices ».
+        Assert.Equal(new Dictionary<string, int> { ["client_ports"] = 2 }, MultiplayerAttenteDesInvites.InvitesALeurPlace(
+            ["[INFO] [Netplay] You have joined with input devices 1, 3", "[INFO] [Netplay] client_ports has joined with input devices 2, 4 (ping: 46 ms)"]));
         // Un invite parti ne compte plus.
         Assert.Empty(MultiplayerAttenteDesInvites.InvitesALeurPlace([.. journal, "[INFO] [Netplay] \"client_pause\" has disconnected"]));
     }

@@ -233,6 +233,18 @@ public class MultiplayerLaunchPlanTests : IDisposable
     }
 
     [Fact]
+    public void Un_boxeur_de_Title_Fight_tient_deux_ports_et_les_autres_jeux_un_seul()
+    {
+        var titlef = new MultiplayerGame { Id = "arcade/titlef", System = "arcade", Set = "titlef", Players = 2, SeatPorts = [[1, 3], [2, 4]] };
+        Assert.Equal([2, 4], titlef.PortsDeLaPlace(2));
+        var place = MultiplayerLaunchPlan.Place(titlef.PortsDeLaPlace(2));
+        Assert.Equal(["netplay_request_device_p2", "netplay_request_device_p4"], place.Where(p => p.Value == "true").Select(p => p.Key).OrderBy(k => k));
+        Assert.Equal([3], new MultiplayerGame { Players = 4 }.PortsDeLaPlace(3));
+
+        // La validation du catalogue : voir MultiplayerCollectionSyncTests.Un_catalogue_douteux_est_refuse.
+    }
+
+    [Fact]
     public void Les_reglages_poses_sont_rendus_et_une_cle_ajoutee_repart()
     {
         var fichier = Path.Combine(_racine, "retroarch.cfg");

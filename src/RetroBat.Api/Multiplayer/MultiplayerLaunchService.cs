@@ -808,7 +808,7 @@ public sealed class MultiplayerLaunchService : IHostedService
 
         // L'ecran partage : la vue de cette place, a son format (« -ratio config » sur la ligne du lanceur).
         var vue = jeu.Game.VueDeLaPlace(lancement.Seat, joueurs);
-        var reglagesDeLaPlace = new Dictionary<string, string>(MultiplayerLaunchPlan.Place(lancement.Seat), StringComparer.Ordinal);
+        var reglagesDeLaPlace = new Dictionary<string, string>(MultiplayerLaunchPlan.Place(jeu.Game.PortsDeLaPlace(lancement.Seat)), StringComparer.Ordinal);
         if (vue is not null)
         {
             reglagesDeLaPlace["video_aspect_ratio"] = MultiplayerLaunchPlan.FormatPourRetroArch(jeu.Game, vue);

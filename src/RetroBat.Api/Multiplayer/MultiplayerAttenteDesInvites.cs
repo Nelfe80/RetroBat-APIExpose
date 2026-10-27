@@ -39,8 +39,9 @@ public sealed class MultiplayerAttenteDesInvites
         ["netplay_allow_pausing"] = "true",
     };
 
-    // « [INFO] [Netplay] client_pause has joined as player 2 (ping: 130 ms) » ; « [INFO] [Netplay] "client_rech" has disconnected ».
-    private static readonly Regex Arrivee = new(@"\[Netplay\]\s+""?(?<nom>.+?)""?\s+has joined as player (?<place>\d+)",
+    // « [INFO] [Netplay] client_pause has joined as player 2 (ping: 130 ms) », ou avec deux ports (Title Fight) « client_ports
+    // has joined with input devices 2, 4 (ping: 46 ms) » ; « [INFO] [Netplay] "client_rech" has disconnected ».
+    private static readonly Regex Arrivee = new(@"\[Netplay\]\s+""?(?<nom>.+?)""?\s+has joined (?:as player|with input devices) (?<place>\d+)",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
     private static readonly Regex Depart = new(@"\[Netplay\]\s+""?(?<nom>.+?)""?\s+has (?:disconnected|left)",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);

@@ -350,6 +350,9 @@ public class MultiplayerCollectionSyncTests : IDisposable
     [InlineData("{\"schema_version\":2,\"games\":[]}", "schema 2")]
     [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":2,\"screens\":2,\"seat_screens\":[1,3]}]}", "ecrans par place")]
     [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":6,\"screens\":2,\"seat_screens\":[1,2]}]}", "ecrans par place")]
+    [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":2,\"seat_ports\":[[1,3],[3,4]]}]}", "ports par place")]
+    [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":2,\"seat_ports\":[[1,3]]}]}", "ports par place")]
+    [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":2,\"seat_ports\":[[1,9],[2]]}]}", "ports par place")]
     public void Un_catalogue_douteux_est_refuse(string json, string raison)
     {
         var catalogue = JsonSerializer.Deserialize<MultiplayerCatalogue>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });

@@ -150,6 +150,19 @@ public sealed record MultiplayerGame
     public IReadOnlyList<int>? SeatScreens { get; init; }
 
     /// <summary>
+    /// DEUX MANETTES PAR JOUEUR (Title Fight, 27/10 : un boxeur = un poing par manette, P1 sur les ports 1 et 3, P2 sur 2 et
+    /// 4) : les ports du coeur que tient chaque place, la place 1 en premier. La borne les demande tous au netplay
+    /// (<c>netplay_request_device_pN</c>) ; RetroArch lit chacun sur sa manette locale suivante (joueur 1, puis 2), vu au banc
+    /// le 27/10 (« has joined with input devices 2, 4 »). Sans table : le port de sa place.
+    /// </summary>
+    [JsonPropertyName("seat_ports")]
+    public IReadOnlyList<IReadOnlyList<int>>? SeatPorts { get; init; }
+
+    /// <summary>Les ports que tient cette place, dans l'ordre de ses manettes locales.</summary>
+    public IReadOnlyList<int> PortsDeLaPlace(int place)
+        => SeatPorts is { Count: > 0 } ports && place >= 1 && place <= ports.Count && ports[place - 1].Count > 0 ? ports[place - 1] : [place];
+
+    /// <summary>
     /// Le format de l'image du jeu, « largeur:hauteur » (« 3:4 » pour un jeu vertical comme 19XX, « 8:3 » pour deux ecrans
     /// cote a cote) ; absent, 4:3. Les panneaux en jeu calent le trou du decor sur ce format (CDC Ecrans v1.0, 26/10).
     /// </summary>
@@ -999,6 +1012,14 @@ public sealed class MultiplayerCatalogueStore
             {
                 // Une place sans ecran, ou un ecran qui n'existe pas : une borne afficherait la vue d'un autre.
                 return jeu.Id + " : ecrans par place incoherents";
+            }
+
+            if (jeu.SeatPorts is { Count: > 0 } ports
+                && (ports.Count < jeu.Players || ports.Any(p => p.Count == 0 || p.Any(n => n is < 1 or > 8))
+                    || ports.SelectMany(p => p).Distinct().Count() != ports.Sum(p => p.Count)))
+            {
+                // Une place sans port, un port hors du netplay ou tenu par deux places : deux bornes joueraient le meme poing.
+                return jeu.Id + " : ports par place incoherents";
             }
 
             if (ValiderLesVues(jeu) is { } vues)
