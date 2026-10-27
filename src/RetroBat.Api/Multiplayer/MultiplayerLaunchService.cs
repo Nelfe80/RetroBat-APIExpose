@@ -776,7 +776,12 @@ public sealed class MultiplayerLaunchService : IHostedService
         var coeur = jeu.Core?.Core ?? string.Empty;
         // Sans ES, les manettes se calculent comme ES le ferait : le lanceur n'en cherche aucune lui-meme (EsManettes).
         var choix = EsManettes.PourLancer(_journal);
-        var manettes = choix.Arguments;
+        // Le joueur 1 de la borne est une vraie manette : un vJoy passe derriere (27/10).
+        var manettes = EsManettes.VirtuellesEnDernier(choix.Arguments);
+        if (manettes != choix.Arguments)
+        {
+            _journal.LogInformation("MULTIPLAYER : manette virtuelle (vJoy) rangee apres les vraies");
+        }
         // En netplay, chaque borne joue avec SON joueur 1 de RetroArch, quelle que soit sa place : si le panel n'y est pas,
         // ses commandes ne repondent pas (vu le 22/10 sur la seconde borne). Le journal dit donc qui est le joueur 1.
         _journal.LogInformation("MULTIPLAYER : manettes transmises au lanceur ({Source}) : {Manettes}", choix.Source, MultiplayerLaunchPlan.NomsDesManettes(manettes));

@@ -158,4 +158,24 @@ public sealed class EsLaunchArgumentsJournalDuLanceurTests : IDisposable
         Assert.Equal([DEs], lignes);
         Assert.Equal("-p1index 0 -p1name \"Xbox 360 Controller\"", EsLaunchArguments.ManettesDe(lignes[0]));
     }
+
+    // La borne du user le 27/10 : sa manette 360 et un vJoy (joystick virtuel), ici range devant.
+    private const string VJoyDevant =
+        @"-p1index 1 -p1guid 0300000034120000adbe000000000000 -p1path ""\?\HID#HIDCLASS#1&2D595CA7&0&0000"" -p1name ""vJoy Device"" -p1nbbuttons 8 -p1nbhats 0 -p1nbaxes 8 " +
+        @"-p2index 0 -p2guid 030000005e0400008e02000000007200 -p2path ""USB\VID_045E&PID_028E&IG_00\8&2BC6B5DA&0&00"" -p2name ""Xbox 360 Controller"" -p2nbbuttons 11 -p2nbhats 1 -p2nbaxes 6";
+
+    [Fact]
+    public void Un_vJoy_passe_apres_la_vraie_manette_qui_devient_le_joueur_1()
+    {
+        var ranges = EsManettes.VirtuellesEnDernier(VJoyDevant);
+        Assert.StartsWith("-p1index 0 -p1guid 030000005e0400008e02000000007200", ranges);
+        Assert.Contains("-p2name \"vJoy Device\"", ranges);
+        Assert.DoesNotContain("-p3", ranges);
+        // Deja dans l'ordre, ou rien que des virtuelles : la ligne ne change pas.
+        Assert.Equal(ranges, EsManettes.VirtuellesEnDernier(ranges));
+        const string SeulVJoy = "-p1index 1 -p1guid 0300000034120000adbe000000000000 -p1name \"vJoy Device\" -p1nbaxes 8";
+        Assert.Equal(SeulVJoy, EsManettes.VirtuellesEnDernier(SeulVJoy));
+        Assert.True(EsManettes.EstVirtuelle("vJoy Device", string.Empty));
+        Assert.False(EsManettes.EstVirtuelle("Xbox 360 Controller", "030000005e0400008e02000000007200"));
+    }
 }

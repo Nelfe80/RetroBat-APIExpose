@@ -286,6 +286,8 @@ public class MultiplayerLaunchPlanTests : IDisposable
         // La borne du user le 27/10 : une manette 360 (6 axes) et le vJoy (8 axes).
         Assert.False(MultiplayerLaunchPlan.DeuxSticksArcade("-p1index 0 -p1nbaxes 6 -p2index 1 -p2nbaxes 8"));
         Assert.False(MultiplayerLaunchPlan.DeuxSticksArcade("-p1index 0 -p1nbaxes 2"));
+        // Un vJoy ne compte jamais, meme reduit a deux axes.
+        Assert.False(MultiplayerLaunchPlan.DeuxSticksArcade("-p1index 0 -p1name \"Arcade Stick\" -p1nbaxes 2 -p2index 1 -p2guid 0300000034120000adbe000000000000 -p2name \"vJoy Device\" -p2nbaxes 2"));
         Assert.False(MultiplayerLaunchPlan.DeuxSticksArcade(string.Empty));
     }
 

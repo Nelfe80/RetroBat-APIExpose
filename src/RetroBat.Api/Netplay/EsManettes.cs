@@ -334,6 +334,52 @@ public static class EsManettes
         return string.Join(' ', morceaux);
     }
 
+    /// <summary>
+    /// LES MANETTES VIRTUELLES APRES LES VRAIES (27/10, borne du user : un « vJoy Device » a cote de sa manette 360) : un
+    /// vJoy est un joystick que d'autres logiciels pilotent, jamais la main du joueur. En MULTIPLAYER, la borne joue avec
+    /// son joueur 1 : un vJoy range devant rendrait la vraie manette muette. Les vraies gardent leur ordre, les virtuelles
+    /// passent derriere ; une borne qui n'a que des virtuelles les garde.
+    /// </summary>
+    public static string VirtuellesEnDernier(string manettes)
+    {
+        var joueurs = new SortedDictionary<int, List<(string Cle, string Valeur)>>();
+        foreach (Match m in ArgumentDeManette.Matches(manettes ?? string.Empty))
+        {
+            var numero = int.Parse(m.Groups["joueur"].Value, System.Globalization.CultureInfo.InvariantCulture);
+            if (!joueurs.TryGetValue(numero, out var liste))
+            {
+                joueurs[numero] = liste = [];
+            }
+            liste.Add((m.Groups["cle"].Value, m.Groups["valeur"].Value));
+        }
+
+        var ranges = joueurs.Values.Where(l => !EstVirtuelle(l)).Concat(joueurs.Values.Where(EstVirtuelle)).ToList();
+        if (ranges.SequenceEqual(joueurs.Values))
+        {
+            return manettes ?? string.Empty;
+        }
+
+        var morceaux = new List<string>();
+        for (var i = 0; i < ranges.Count; i++)
+        {
+            foreach (var (cle, valeur) in ranges[i])
+            {
+                morceaux.Add("-p" + (i + 1) + cle);
+                morceaux.Add(valeur);
+            }
+        }
+        return string.Join(' ', morceaux);
+    }
+
+    /// <summary>Un vJoy : son nom, ou l'identifiant de son pilote (vendeur 0x1234, produit 0xBEAD) dans le GUID SDL.</summary>
+    public static bool EstVirtuelle(string nom, string guid)
+        => (nom ?? string.Empty).Contains("vJoy", StringComparison.OrdinalIgnoreCase)
+           || (guid ?? string.Empty).Contains("34120000adbe", StringComparison.OrdinalIgnoreCase);
+
+    private static bool EstVirtuelle(List<(string Cle, string Valeur)> joueur)
+        => EstVirtuelle(joueur.FirstOrDefault(x => x.Cle == "name").Valeur?.Trim('"') ?? string.Empty,
+            joueur.FirstOrDefault(x => x.Cle == "guid").Valeur ?? string.Empty);
+
     /// <summary>Deux listes de manettes sans leurs index SDL, qu'ES et le calcul peuvent numeroter autrement.</summary>
     private static string SansIndex(string manettes)
         => Regex.Replace(manettes, "-p\\d+index\\s+\\S+\\s*", string.Empty, RegexOptions.CultureInvariant).Trim();

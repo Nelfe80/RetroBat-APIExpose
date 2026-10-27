@@ -122,19 +122,24 @@ public static class MultiplayerLaunchPlan
     }
 
     /// <summary>
-    /// Deux vrais sticks arcade : les manettes des joueurs 1 et 2 n'ont chacune qu'un stick (moins de 4 axes). Une manette
-    /// de salon en a 6 ; le vJoy d'une borne, 8. Un panel qui se presente comme deux manettes Xbox ne se reconnait pas : il
-    /// joue alors en stick et boutons, comme une manette a un stick.
+    /// Deux vrais sticks arcade : les manettes des joueurs 1 et 2 n'ont chacune qu'un stick (moins de 4 axes), et aucune
+    /// n'est virtuelle. Une manette de salon a 6 axes ; un vJoy (joystick que d'autres logiciels pilotent) ne compte
+    /// jamais (decision du user du 27/10 : une manette se prend en entier). Un panel qui se presente comme deux manettes
+    /// Xbox ne se reconnait pas : il joue alors en stick et boutons, comme une manette a un stick.
     /// </summary>
     public static bool DeuxSticksArcade(string manettes)
     {
-        int? Axes(int joueur)
+        string? Valeur(int joueur, string cle)
         {
-            var m = System.Text.RegularExpressions.Regex.Match(manettes ?? string.Empty, $"-p{joueur}nbaxes\\s+(\\d+)");
-            return m.Success ? int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture) : null;
+            var m = System.Text.RegularExpressions.Regex.Match(manettes ?? string.Empty, $"-p{joueur}{cle}\\s+(\"[^\"]*\"|\\S+)");
+            return m.Success ? m.Groups[1].Value.Trim('"') : null;
         }
 
-        return Axes(1) is < 4 && Axes(2) is < 4;
+        bool StickArcade(int joueur)
+            => int.TryParse(Valeur(joueur, "nbaxes"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var axes) && axes < 4
+               && !Netplay.EsManettes.EstVirtuelle(Valeur(joueur, "name") ?? string.Empty, Valeur(joueur, "guid") ?? string.Empty);
+
+        return StickArcade(1) && StickArcade(2);
     }
 
     /// <summary>Le remappage de jeu que RetroArch cherche : config/remaps/&lt;nom du coeur&gt;/&lt;nom du jeu&gt;.rmp.</summary>
