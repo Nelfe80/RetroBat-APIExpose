@@ -341,14 +341,17 @@ public sealed class MultiplayerLaunchService : IHostedService
                 await RetroArchInvite.FermerAsync().ConfigureAwait(false);
                 return;
             }
+            // Les liens des invites au relais : leur arrivee et leur depart vus par le reseau, quelle que soit la langue du
+            // journal de RetroArch (27/10, deux bornes de langues differentes).
+            var liens = await RetroArchInvite.LiensDesInvitesAsync(publiee.Relay, publiee.Port).ConfigureAwait(false);
             if (auRalenti)
             {
-                _ = Task.Run(() => LibererLeDepartAsync(room, jeu.Game));
+                _ = Task.Run(() => LibererLeDepartAsync(room, jeu.Game, liens));
             }
 
             if (reponse?.Ok == true)
             {
-                _ = Task.Run(() => FermerQuandLesInvitesSontPartisAsync(room));
+                _ = Task.Run(() => FermerQuandLesInvitesSontPartisAsync(room, liens));
             }
 
             // Une rencontre classee (fin lue + type versus, 23/10), quel que soit le niveau : l'hote guette sa fin.
@@ -368,7 +371,7 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// partie de l'hote en local, et l'hote se croyait encore en ligne. Le journal de RetroArch dit chaque arrivee et chaque
     /// depart : plus aucun invite a sa place, la partie se ferme, comme chez l'invite quand l'hote part.
     /// </summary>
-    private async Task FermerQuandLesInvitesSontPartisAsync(MultiplayerRoom room)
+    private async Task FermerQuandLesInvitesSontPartisAsync(MultiplayerRoom room, Func<int?> liens)
     {
         CancellationToken jeton;
         lock (_verrou)
@@ -380,7 +383,7 @@ public sealed class MultiplayerLaunchService : IHostedService
 
         try
         {
-            await _attente.AttendreLeDepartDesInvitesAsync(MultiplayerAttenteDesInvites.CheminDuJournal, TimeSpan.FromSeconds(1), jeton)
+            await _attente.AttendreLeDepartDesInvitesAsync(MultiplayerAttenteDesInvites.CheminDuJournal, liens, TimeSpan.FromSeconds(1), jeton)
                 .ConfigureAwait(false);
             _journal.LogInformation("MULTIPLAYER : les invites de {Room} sont partis, la partie se ferme", room.Room);
             await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
@@ -401,7 +404,7 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// (au plus <see cref="PatienceDesInvites"/>), puis la partie reste a vitesse normale jusqu'a sa fin : une bascule perdue
     /// ne laisse pas le match au ralenti.
     /// </summary>
-    private async Task LibererLeDepartAsync(MultiplayerRoom room, MultiplayerGame jeu)
+    private async Task LibererLeDepartAsync(MultiplayerRoom room, MultiplayerGame jeu, Func<int?> liens)
     {
         CancellationToken jeton;
         lock (_verrou)
@@ -415,7 +418,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         {
             var attendus = Math.Max(1, room.Players.Count(joueur => joueur.Seat is not null) - 1);
             var debut = DateTime.UtcNow;
-            var vus = await _attente.AttendreLesInvitesAsync(MultiplayerAttenteDesInvites.CheminDuJournal, attendus, PatienceDesInvites, jeton)
+            var vus = await _attente.AttendreLesInvitesAsync(MultiplayerAttenteDesInvites.CheminDuJournal, attendus, PatienceDesInvites, liens, jeton)
                 .ConfigureAwait(false);
             // L'etat que RetroArch envoie a l'arrivee d'un invite se charge chez lui : un instant avant de repartir.
             await Task.Delay(TimeSpan.FromSeconds(1), jeton).ConfigureAwait(false);

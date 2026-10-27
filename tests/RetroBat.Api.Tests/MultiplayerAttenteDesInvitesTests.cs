@@ -10,7 +10,14 @@ namespace RetroBat.Api.Tests;
 /// </summary>
 public class MultiplayerAttenteDesInvitesTests
 {
-    public MultiplayerAttenteDesInvitesTests() => MultiplayerAttenteDesInvites.DelaiDeBascule = TimeSpan.FromMilliseconds(50);
+    public MultiplayerAttenteDesInvitesTests()
+    {
+        // Des temps courts, et un ecart large entre vitesse normale et ralenti simule (500 ms) : la charge des tests en
+        // parallele ne fait pas passer une reponse immediate pour un ralenti.
+        MultiplayerAttenteDesInvites.DelaiDeBascule = TimeSpan.FromMilliseconds(50);
+        MultiplayerAttenteDesInvites.SeuilDuRalenti = TimeSpan.FromMilliseconds(250);
+        MultiplayerAttenteDesInvites.LienQuiTient = TimeSpan.FromMilliseconds(300);
+    }
 
     [Fact]
     public void Le_journal_dit_quels_invites_sont_a_leur_place()
@@ -29,6 +36,24 @@ public class MultiplayerAttenteDesInvitesTests
             ["[INFO] [Netplay] You have joined with input devices 1, 3", "[INFO] [Netplay] client_ports has joined with input devices 2, 4 (ping: 46 ms)"]));
         // Un invite parti ne compte plus.
         Assert.Empty(MultiplayerAttenteDesInvites.InvitesALeurPlace([.. journal, "[INFO] [Netplay] \"client_pause\" has disconnected"]));
+    }
+
+    [Fact]
+    public void Le_journal_se_lit_dans_toutes_les_langues_de_retroarch()
+    {
+        // 27/10 : la borne de Falken, en francais, hote ; l'API ne voyait jamais l'invite. Puis deux traductions de RetroArch
+        // 1.22.2 ou le pseudo n'est pas en tete (chinois, irlandais) ; « (ping: N ms) » ne se traduit jamais.
+        string[] journal =
+        [
+            "[INFO] [Netplay] Vous avez rejoint le jeu en tant que joueur 1",
+            "[INFO] [Netplay] Emplacement de connexion 0",
+            "[INFO] [Netplay] Connexion reçue depuis : \"NELFEPLAY_Nelfe80_2b56\"",
+            "[INFO] [Netplay] NELFEPLAY_Nelfe80_2b56 à rejoint le jeu en tant que joueur 2 (ping: 499 ms)\r",
+            "[INFO] [Netplay] 「NELFEPLAY_Akira_77a1」已加入为玩家「3」 (ping: 40 ms)",
+            "[INFO] [Netplay] Tá NELFEPLAY_Falken_e090 tar éis dul isteach le gléasanna ionchuir 4, 6 (ping: 31 ms)",
+        ];
+        Assert.Equal(new Dictionary<string, int> { ["NELFEPLAY_Nelfe80_2b56"] = 2, ["NELFEPLAY_Akira_77a1"] = 3, ["NELFEPLAY_Falken_e090"] = 4 },
+            MultiplayerAttenteDesInvites.InvitesALeurPlace(journal));
     }
 
     [Fact]
@@ -97,14 +122,18 @@ public class MultiplayerAttenteDesInvitesTests
             File.WriteAllText(journal, "[INFO] [Netplay] You have joined as player 1\n[INFO] [Netplay] b has joined as player 2 (ping: 20 ms)\n");
             var ra = new RetroArchSimule("PLAYING");
             var attente = new MultiplayerAttenteDesInvites(ra);
-            Assert.Equal(1, await attente.AttendreLesInvitesAsync(journal, 1, TimeSpan.FromSeconds(5), CancellationToken.None));
+            Assert.Equal(1, await attente.AttendreLesInvitesAsync(journal, 1, TimeSpan.FromSeconds(5), null, CancellationToken.None));
             var debut = DateTime.UtcNow;
-            Assert.Equal(1, await attente.AttendreLesInvitesAsync(journal, 3, TimeSpan.FromMilliseconds(600), CancellationToken.None));
+            Assert.Equal(1, await attente.AttendreLesInvitesAsync(journal, 3, TimeSpan.FromMilliseconds(600), null, CancellationToken.None));
             Assert.True(DateTime.UtcNow - debut < TimeSpan.FromSeconds(3));
             // Au ralenti, RetroArch traite le reseau tout seul : l'attente ne lui envoie rien.
             Assert.Empty(ra.Envoyees);
             // Sans journal (RetroArch ne l'a pas encore cree), personne.
-            Assert.Equal(0, await attente.AttendreLesInvitesAsync(journal + ".absent", 1, TimeSpan.Zero, CancellationToken.None));
+            Assert.Equal(0, await attente.AttendreLesInvitesAsync(journal + ".absent", 1, TimeSpan.Zero, null, CancellationToken.None));
+            // Un journal muet, mais un lien d'invite au relais qui tient : l'invite est la.
+            debut = DateTime.UtcNow;
+            Assert.Equal(1, await attente.AttendreLesInvitesAsync(journal + ".absent", 1, TimeSpan.FromSeconds(10), () => 1, CancellationToken.None));
+            Assert.True(DateTime.UtcNow - debut < TimeSpan.FromSeconds(3));
         }
         finally
         {
@@ -120,7 +149,8 @@ public class MultiplayerAttenteDesInvitesTests
         {
             File.WriteAllText(journal, "[INFO] [Netplay] You have joined as player 2\n");
             var attente = new MultiplayerAttenteDesInvites(new RetroArchSimule("PLAYING"));
-            var suivi = attente.AttendreLeDepartDesInvitesAsync(journal, TimeSpan.FromMilliseconds(50), CancellationToken.None);
+            // Sans liens lisibles : le journal en anglais.
+            var suivi = attente.AttendreLeDepartDesInvitesAsync(journal, null, TimeSpan.FromMilliseconds(50), CancellationToken.None);
             // Personne n'est encore venu : la partie continue.
             await Task.Delay(300);
             Assert.False(suivi.IsCompleted);
@@ -137,7 +167,35 @@ public class MultiplayerAttenteDesInvitesTests
             using var fin = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
             File.WriteAllText(journal, "[INFO] [Netplay] a has joined as player 1 (ping: 20 ms)\n");
             await Assert.ThrowsAnyAsync<OperationCanceledException>(
-                () => attente.AttendreLeDepartDesInvitesAsync(journal, TimeSpan.FromMilliseconds(50), fin.Token));
+                () => attente.AttendreLeDepartDesInvitesAsync(journal, null, TimeSpan.FromMilliseconds(50), fin.Token));
+        }
+        finally
+        {
+            File.Delete(journal);
+        }
+    }
+
+    [Fact]
+    public async Task Le_depart_se_voit_au_reseau_dans_toutes_les_langues()
+    {
+        var journal = Path.Combine(Path.GetTempPath(), "nelfe-depart-fr-" + Guid.NewGuid().ToString("N") + ".log");
+        try
+        {
+            // Une borne en francais : le journal dit l'arrivee, jamais le depart en anglais.
+            File.WriteAllText(journal, "[INFO] [Netplay] NELFEPLAY_Nelfe80_2b56 à rejoint le jeu en tant que joueur 2 (ping: 499 ms)\n");
+            var attente = new MultiplayerAttenteDesInvites(new RetroArchSimule("PLAYING"));
+            var liens = 1;
+            var suivi = attente.AttendreLeDepartDesInvitesAsync(journal, () => liens, TimeSpan.FromMilliseconds(50), CancellationToken.None);
+            await Task.Delay(300);
+            Assert.False(suivi.IsCompleted);
+            // Le lien de l'invite au relais tombe : il est parti.
+            liens = 0;
+            Assert.Same(suivi, await Task.WhenAny(suivi, Task.Delay(TimeSpan.FromSeconds(5))));
+
+            // Un reseau qui n'a jamais montre de lien (adresse du relais differente) ne ferme jamais la partie.
+            using var fin = new CancellationTokenSource(TimeSpan.FromMilliseconds(800));
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => attente.AttendreLeDepartDesInvitesAsync(journal, () => 0, TimeSpan.FromMilliseconds(50), fin.Token));
         }
         finally
         {
@@ -173,7 +231,7 @@ public class MultiplayerAttenteDesInvitesTests
 
         var attente = new MultiplayerAttenteDesInvites(new CommandesRetroArchUdp(int.Parse(port, System.Globalization.CultureInfo.InvariantCulture)));
         Assert.True(await attente.MettreAuRalentiAsync(CancellationToken.None));
-        Assert.Equal(1, await attente.AttendreLesInvitesAsync(journal, 1, TimeSpan.FromSeconds(60), CancellationToken.None));
+        Assert.Equal(1, await attente.AttendreLesInvitesAsync(journal, 1, TimeSpan.FromSeconds(60), null, CancellationToken.None));
         await Task.Delay(TimeSpan.FromSeconds(1));
         Assert.True(await attente.RetrouverLaVitesseAsync(CancellationToken.None));
     }
@@ -198,7 +256,7 @@ public class MultiplayerAttenteDesInvitesTests
 
             if (AuRalenti)
             {
-                await Task.Delay(300, ct);
+                await Task.Delay(500, ct);
             }
 
             return "GET_STATUS " + etat + " fb_alpha,tgm2,crc32=ff408c75";

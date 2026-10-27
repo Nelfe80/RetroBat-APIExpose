@@ -50,28 +50,44 @@ public sealed class MultiplayerAttenteDesInvites
     };
 
     /// <summary>Au-dela, GET_STATUS repond au rythme du ralenti (~500 ms) et non entre deux images (~16 ms).</summary>
-    internal static readonly TimeSpan SeuilDuRalenti = TimeSpan.FromMilliseconds(150);
+    internal static TimeSpan SeuilDuRalenti { get; set; } = TimeSpan.FromMilliseconds(150);
 
     /// <summary>Le temps laisse a une bascule de vitesse avant de la mesurer.</summary>
     internal static TimeSpan DelaiDeBascule { get; set; } = TimeSpan.FromMilliseconds(800);
 
-    // « [INFO] [Netplay] client_pause has joined as player 2 (ping: 130 ms) », ou avec deux ports (Title Fight) « client_ports
-    // has joined with input devices 2, 4 (ping: 46 ms) » ; « [INFO] [Netplay] "client_rech" has disconnected ».
+    // LE JOURNAL SUIT LA LANGUE DE LA BORNE (27/10, borne en francais : « NELFEPLAY_Nelfe80_2b56 à rejoint le jeu en tant que
+    // joueur 2 (ping: 499 ms) ») : RetroArch traduit ses messages (intl/msg_hash_*.h), et une borne en francais ne voyait
+    // jamais l'invite. Ce qui ne se traduit pas : notre pseudo de netplay (NetplaySettings.ComposerPseudo, NELFEPLAY_ et de
+    // l'ASCII), et « (ping: N ms) », que RetroArch ajoute en dur a l'arrivee d'un JOUEUR (jamais d'un spectateur, ni de
+    // l'hote lui-meme). Dans toutes ses langues, la place vient apres le pseudo (« as player 2 », « with input devices 2, 4 »).
+    private static readonly Regex AvecPing = new(@"\[Netplay\]\s+(?<message>.+?)\s+\(ping: -?\d+ ms\)\s*$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    private static readonly Regex PseudoNelfePlay = new(@"NELFEPLAY_[A-Za-z0-9_]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    private static readonly Regex Nombre = new(@"\d+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    // En anglais, pour un autre pseudo (les bancs) : « client_pause has joined as player 2 (ping: 130 ms) », « client_ports has
+    // joined with input devices 2, 4 (ping: 46 ms) » ; « [INFO] [Netplay] "client_rech" has disconnected ».
     private static readonly Regex Arrivee = new(@"\[Netplay\]\s+""?(?<nom>.+?)""?\s+has joined (?:as player|with input devices) (?<place>\d+)",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
     private static readonly Regex Depart = new(@"\[Netplay\]\s+""?(?<nom>.+?)""?\s+has (?:disconnected|left)",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary>
-    /// Les invites a leur place d'apres le journal de l'hote : pseudo et place de RetroArch. L'hote lui-meme (« You have
-    /// joined ») et un spectateur ne comptent pas ; un invite parti n'y est plus. Pur.
+    /// Les invites a leur place d'apres le journal de l'hote, dans toutes les langues de RetroArch : pseudo et place. L'hote
+    /// lui-meme (« You have joined ») et un spectateur ne comptent pas ; un invite parti n'y est plus quand le journal le dit
+    /// en anglais (dans les autres langues, son depart se voit au reseau : <see cref="AttendreLeDepartDesInvitesAsync"/>). Pur.
     /// </summary>
     internal static IReadOnlyDictionary<string, int> InvitesALeurPlace(IEnumerable<string> lignes)
     {
         var invites = new Dictionary<string, int>(StringComparer.Ordinal);
         foreach (var ligne in lignes)
         {
-            if (Arrivee.Match(ligne) is { Success: true } a && a.Groups["nom"].Value != "You")
+            if (AvecPing.Match(ligne.TrimEnd('\r')) is { Success: true } p && PseudoNelfePlay.Match(p.Groups["message"].Value) is { Success: true } pseudo
+                && Nombre.Match(p.Groups["message"].Value, pseudo.Index + pseudo.Length) is { Success: true } place)
+            {
+                invites[pseudo.Value] = int.Parse(place.Value, System.Globalization.CultureInfo.InvariantCulture);
+            }
+            else if (Arrivee.Match(ligne) is { Success: true } a && a.Groups["nom"].Value != "You")
             {
                 invites[a.Groups["nom"].Value] = int.Parse(a.Groups["place"].Value, System.Globalization.CultureInfo.InvariantCulture);
             }
@@ -83,6 +99,9 @@ public sealed class MultiplayerAttenteDesInvites
 
         return invites;
     }
+
+    /// <summary>Le temps qu'un lien d'invite au relais doit tenir pour compter comme une arrivee que le journal n'a pas dite.</summary>
+    internal static TimeSpan LienQuiTient { get; set; } = TimeSpan.FromSeconds(8);
 
     /// <summary>L'etat de RetroArch d'apres GET_STATUS : PLAYING, PAUSED, autre chose, ou null sans reponse. Pur.</summary>
     internal static string? Etat(string? reponse)
@@ -186,14 +205,24 @@ public sealed class MultiplayerAttenteDesInvites
 
     /// <summary>
     /// Attend que <paramref name="attendus"/> invites aient rejoint leur place dans le journal (relu toutes les 500 ms), au
-    /// plus <paramref name="patience"/>. Rend le nombre d'invites vus.
+    /// plus <paramref name="patience"/>. En secours, des liens au relais (<paramref name="liens"/>, voir
+    /// <see cref="RetroBat.Api.Netplay.RetroArchInvite.LiensDesInvitesAsync"/>) assez nombreux pendant <see cref="LienQuiTient"/>
+    /// valent une arrivee que le journal n'aurait pas dite. Rend le nombre d'invites vus.
     /// </summary>
-    public async Task<int> AttendreLesInvitesAsync(string journal, int attendus, TimeSpan patience, CancellationToken ct)
+    public async Task<int> AttendreLesInvitesAsync(string journal, int attendus, TimeSpan patience, Func<int?>? liens, CancellationToken ct)
     {
         var limite = DateTime.UtcNow + patience;
+        DateTime? liesDepuis = null;
         while (true)
         {
             var vus = InvitesALeurPlace(LireLesLignes(journal)).Count;
+            var lies = liens?.Invoke() ?? 0;
+            liesDepuis = lies >= attendus ? liesDepuis ?? DateTime.UtcNow : null;
+            if (vus < attendus && liesDepuis is { } depuis && DateTime.UtcNow - depuis >= LienQuiTient)
+            {
+                return Math.Max(vus, lies);
+            }
+
             if (vus >= attendus || DateTime.UtcNow >= limite)
             {
                 return vus;
@@ -204,21 +233,33 @@ public sealed class MultiplayerAttenteDesInvites
     }
 
     /// <summary>
-    /// Rend quand le dernier invite est parti : au moins un invite a rejoint sa place dans le journal de l'hote (relu a ce
-    /// <paramref name="rythme"/>), puis plus aucun n'y est. Jusque-la, attend ; l'annulation (fin de partie) l'arrete.
+    /// Rend quand le dernier invite est parti : un lien d'invite au relais vu (<paramref name="liens"/>), puis plus aucun
+    /// deux releves de suite, a ce <paramref name="rythme"/>. C'est le reseau, que la langue de la borne ne change pas (banc
+    /// du 27/10 : le lien tombe une seconde apres le depart). Un reseau qui n'a jamais montre de lien (adresse du relais
+    /// differente, table illisible) ne ferme rien : seul le journal en anglais le dit alors. Jusque-la, attend ;
+    /// l'annulation (fin de partie) l'arrete.
     /// </summary>
-    public async Task AttendreLeDepartDesInvitesAsync(string journal, TimeSpan rythme, CancellationToken ct)
+    public async Task AttendreLeDepartDesInvitesAsync(string journal, Func<int?>? liens, TimeSpan rythme, CancellationToken ct)
     {
-        var vus = false;
+        var vusAuJournal = false;
+        var vusAuReseau = false;
+        var sansLien = 0;
         while (true)
         {
             ct.ThrowIfCancellationRequested();
             var presents = InvitesALeurPlace(LireLesLignes(journal)).Count;
-            if (presents > 0)
+            var lies = liens?.Invoke();
+            vusAuJournal |= presents > 0;
+            vusAuReseau |= lies > 0;
+            if (vusAuReseau && lies is { } nombre)
             {
-                vus = true;
+                sansLien = nombre == 0 ? sansLien + 1 : 0;
+                if (sansLien >= 2)
+                {
+                    return;
+                }
             }
-            else if (vus)
+            else if (vusAuJournal && !vusAuReseau && presents == 0)
             {
                 return;
             }

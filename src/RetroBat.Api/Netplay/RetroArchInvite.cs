@@ -151,9 +151,35 @@ internal static class RetroArchInvite
 
     /// <summary>Une connexion etablie vers le relais (son adresse si elle est connue, et son port).</summary>
     internal static bool ConnexionVers(IEnumerable<TcpConnectionInformation> connexions, IReadOnlyCollection<IPAddress> adresses, int port)
-        => connexions.Any(c => c.State == TcpState.Established
-                               && c.RemoteEndPoint.Port == port
-                               && (adresses.Count == 0 || adresses.Contains(Normaliser(c.RemoteEndPoint.Address))));
+        => NombreDeConnexionsVers(connexions, adresses, port) > 0;
+
+    /// <summary>Les connexions etablies vers le relais (son adresse si elle est connue, et son port).</summary>
+    internal static int NombreDeConnexionsVers(IEnumerable<TcpConnectionInformation> connexions, IReadOnlyCollection<IPAddress> adresses, int port)
+        => connexions.Count(c => c.State == TcpState.Established
+                                 && c.RemoteEndPoint.Port == port
+                                 && (adresses.Count == 0 || adresses.Contains(Normaliser(c.RemoteEndPoint.Address))));
+
+    /// <summary>
+    /// LES INVITES DE L'HOTE, VUS PAR LE RESEAU (27/10, deux bornes de langues differentes) : par le relais, le RetroArch de
+    /// l'hote garde une connexion de controle, plus un lien par invite (« Tunnel link connection » ; banc du 27/10 : 2 avec un
+    /// invite, 1 une seconde apres son depart). Rend de quoi compter ces liens, ou null pour une table illisible ; aucun
+    /// texte de RetroArch, qui suit la langue de la borne.
+    /// </summary>
+    public static async Task<Func<int?>> LiensDesInvitesAsync(string relais, int port, CancellationToken ct = default)
+    {
+        var adresses = await AdressesAsync(relais, ct).ConfigureAwait(false);
+        return () =>
+        {
+            try
+            {
+                return Math.Max(0, NombreDeConnexionsVers(IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpConnections(), adresses, port) - 1);
+            }
+            catch (NetworkInformationException)
+            {
+                return null;
+            }
+        };
+    }
 
     /// <summary>Les caracteres postes a la fenetre de RetroArch : le mot de passe, puis Entree.</summary>
     internal static IReadOnlyList<char> Frappes(string motDePasse) => (motDePasse + "\r").ToCharArray();
