@@ -149,10 +149,12 @@ Write-Host 'Construction update.7z...'
 # accepte de nouveau un chemin relatif le jour ou une version qui convient sera prete.
 # LES COEURS DE MULTIPLAYER (2026-10-23) : mGBA Splitscreen compile par NelfePlay (branche nelfeplay-build du fork) et NGP
 # Link (25/10, Beetle NGP et son cable de liaison), avec leurs fiches, poses chez RetroArch par MultiplayerCoeursService.
-# Repris sur leur empreinte, comme une archive. La liste suit MultiplayerCoeursService.Coeurs.
+# Repris sur leur empreinte, comme une archive. La liste suit MultiplayerCoeursService.Coeurs. FBNeo Multi 32 (27/10) :
+# FBNeo aux etats portables (branche nelfeplay-multi32 du fork), avec le texte de sa licence.
 $outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.exe',
     'tools/cores/mgba_splitscreen_libretro.dll', 'tools/cores/mgba_splitscreen_libretro.info',
-    'tools/cores/mednafen_ngp_link_libretro.dll', 'tools/cores/mednafen_ngp_link_libretro.info')
+    'tools/cores/mednafen_ngp_link_libretro.dll', 'tools/cores/mednafen_ngp_link_libretro.info',
+    'tools/cores/fbneo_multi32_libretro.dll', 'tools/cores/fbneo_multi32_license.txt', 'tools/cores/fbneo_multi32_libretro.info')
 $exclusOutils = @($outilsHorsArchive | ForEach-Object { "-x!$name\$($_ -replace '/', '\')" })
 & $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" @exclusOutils -mx=5 -bsp0 -bso0
 

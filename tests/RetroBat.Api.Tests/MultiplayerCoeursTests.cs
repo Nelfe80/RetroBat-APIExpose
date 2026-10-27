@@ -48,6 +48,12 @@ public class MultiplayerCoeursTests : IDisposable
               <emulator name="libretro"><cores><core>mednafen_ngp</core><core>race</core></cores></emulator>
             </emulators>
           </system>
+          <system>
+            <name>fbneo</name>
+            <emulators>
+              <emulator name="libretro"><cores><core>fbneo</core></cores></emulator>
+            </emulators>
+          </system>
         </systemList>
         """;
 
@@ -61,11 +67,12 @@ public class MultiplayerCoeursTests : IDisposable
         Assert.NotNull(sortie);
         var doc = System.Xml.Linq.XDocument.Parse(sortie!);
         var systemes = doc.Root!.Elements("system").ToArray();
-        Assert.Equal(["gba", "ngpc"], systemes.Select(s => (string?) s.Element("name")));
+        Assert.Equal(["gba", "ngpc", "fbneo"], systemes.Select(s => (string?) s.Element("name")));
         var emulateurs = systemes[0].Element("emulators")!.Elements("emulator").Select(e => e.Attribute("name")!.Value).ToArray();
         Assert.Equal(["libretro", "mgba", "nosgba"], emulateurs);
         Assert.Equal(["mgba", "gpsp", "mgba_splitscreen"], CoeursDe(systemes[0]));
         Assert.Equal(["mednafen_ngp", "race", "mednafen_ngp_link"], CoeursDe(systemes[1]));
+        Assert.Equal(["fbneo", "fbneo_multi32"], CoeursDe(systemes[2]));
         // Rien des autres systemes, rien que RetroBat decrit ailleurs (nom complet, extensions).
         Assert.Null(systemes[0].Element("fullname"));
         // Une seconde passe ne l'ajoute pas deux fois.
@@ -124,7 +131,8 @@ public class MultiplayerCoeursTests : IDisposable
         });
         var livres = MultiplayerCoeursService.Coeurs.SelectMany(c => c.CheminsDesOutils).ToArray();
         Assert.Equal(["tools/cores/mgba_splitscreen_libretro.dll", "tools/cores/mgba_splitscreen_libretro.info",
-            "tools/cores/mednafen_ngp_link_libretro.dll", "tools/cores/mednafen_ngp_link_libretro.info"], livres);
+            "tools/cores/mednafen_ngp_link_libretro.dll", "tools/cores/mednafen_ngp_link_libretro.info",
+            "tools/cores/fbneo_multi32_libretro.dll", "tools/cores/fbneo_multi32_license.txt", "tools/cores/fbneo_multi32_libretro.info"], livres);
         var json = "{\"outils\":[" + string.Join(",", livres.Append("tools/cores/fbneo_libretro.dll").Select(Outil)) + "]}";
         var retenus = SelfUpdateService.LireOutils(json, "Nelfe80/RetroBat-APIExpose").Select(o => o.Fichier).ToArray();
         Assert.Equal(livres, retenus);

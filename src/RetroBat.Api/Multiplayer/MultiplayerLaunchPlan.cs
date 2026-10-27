@@ -52,9 +52,11 @@ public static class MultiplayerLaunchPlan
     /// <summary>
     /// Le prefixe des DIP d'un jeu d'arcade sous FBNeo (<c>fbneo-dipswitch-sf2ce-</c>), ou null ailleurs. Ceux que le
     /// catalogue ne fixe pas sont retires le temps de la partie : toutes les bornes prennent la valeur par defaut du coeur.
+    /// FBNeo Multi 32 (<c>fbneo_multi32</c>, 27/10) lit les memes options.
     /// </summary>
     public static string? PrefixeDesDip(MultiplayerGame jeu, string coeur)
-        => jeu.EstArcade && jeu.Set is { Length: > 0 } set && string.Equals(coeur, "fbneo", StringComparison.OrdinalIgnoreCase)
+        => jeu.EstArcade && jeu.Set is { Length: > 0 } set
+            && (string.Equals(coeur, "fbneo", StringComparison.OrdinalIgnoreCase) || string.Equals(coeur, "fbneo_multi32", StringComparison.OrdinalIgnoreCase))
             ? "fbneo-dipswitch-" + set + "-"
             : null;
 

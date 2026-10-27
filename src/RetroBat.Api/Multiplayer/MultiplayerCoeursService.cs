@@ -22,8 +22,9 @@ public sealed record MultiplayerCoeurLivre(string Systeme, string Nom, IReadOnly
 /// <summary>
 /// LES COEURS DE MULTIPLAYER SUR CHAQUE BORNE (CDC MULTIPLAYER 00quater.9, point 2 ; 23/10, NGPC le 25/10). Certains jeux se
 /// jouent a plusieurs dans un seul coeur que NelfePlay compile : mGBA Splitscreen (2 a 4 GBA reliees) et NGP Link (deux Neo
-/// Geo Pocket reliees par le cable, Card Fighters' Clash). Ni RetroBat ni le serveur de libretro ne les distribuent : ils
-/// arrivent par outils.json dans <c>tools/cores/</c>, et ce service les pose chez RetroArch.
+/// Geo Pocket reliees par le cable, Card Fighters' Clash). D'autres demandent un coeur corrige : FBNeo Multi 32 (27/10).
+/// Ni RetroBat ni le serveur de libretro ne les distribuent : ils arrivent par outils.json dans <c>tools/cores/</c>, et ce
+/// service les pose chez RetroArch.
 ///
 /// Pour chaque coeur, chaque fichier est repris s'il manque ou differe : ses bibliotheques (dans <c>cores/</c>, ou
 /// <c>cores_real/</c> si le wrapper y range deja le vrai coeur ; les suivantes a cote de la premiere), sa fiche <c>.info</c> (son <c>systemid</c> evite le plantage de GET_STATUS sous RetroArch 1.22.2), et
@@ -43,6 +44,13 @@ public sealed class MultiplayerCoeursService : BackgroundService
         new("ngpc", "mednafen_ngp_link", ["mednafen_ngp_link_libretro.dll"], "mednafen_ngp_link_libretro.info",
             "le coeur libretro mednafen_ngp_link (deux Neo Geo Pocket reliees par le cable dans un seul coeur, pour le netplay "
             + "de MULTIPLAYER), en dernier : mednafen_ngp reste le coeur des parties solo"),
+        // FBNEO MULTI 32 (27/10) : FBNeo mettait dans ses etats les adresses de la puce son MultiPCM, propres au processus ;
+        // l'invite d'un netplay plantait des le premier son (Title Fight, Hard Dunk, OutRunners, Stadium Cross). Cette
+        // compilation les reconstruit au chargement (finalburnneo/FBNeo#2838). Un coeur a part : fbneo_libretro.dll garde
+        // l'empreinte que le scoring certifie. Sa licence (non commerciale) le suit, a cote de lui.
+        new("fbneo", "fbneo_multi32", ["fbneo_multi32_libretro.dll", "fbneo_multi32_license.txt"], "fbneo_multi32_libretro.info",
+            "le coeur libretro fbneo_multi32 (FBNeo aux etats portables, pour le netplay des jeux Sega Multi 32 de "
+            + "MULTIPLAYER), en dernier : fbneo reste le coeur des parties solo"),
     ];
 
     public const string FichierEs = "es_systems_nelfeplay.cfg";

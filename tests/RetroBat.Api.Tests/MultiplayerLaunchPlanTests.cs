@@ -381,6 +381,8 @@ public class MultiplayerLaunchPlanTests : IDisposable
             var jeu = new MultiplayerGame { Id = "arcade/sf2ce", System = "arcade", Set = "sf2ce", Players = 2 };
             var prefixe = MultiplayerLaunchPlan.PrefixeDesDip(jeu, "fbneo");
             Assert.Equal("fbneo-dipswitch-sf2ce-", prefixe);
+            Assert.Equal("fbneo-dipswitch-sf2ce-", MultiplayerLaunchPlan.PrefixeDesDip(jeu, "fbneo_multi32"));
+            Assert.Null(MultiplayerLaunchPlan.PrefixeDesDip(jeu, "mame"));
             Assert.Null(MultiplayerLaunchPlan.PrefixeDesDip(jeu with { System = "gba", Set = null }, "mgba_splitscreen"));
 
             var imposees = new Dictionary<string, string> { ["fbneo-dipswitch-sf2ce-Free_Play"] = "Off" };

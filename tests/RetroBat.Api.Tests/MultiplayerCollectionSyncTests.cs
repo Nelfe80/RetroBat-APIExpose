@@ -203,6 +203,22 @@ public class MultiplayerCollectionSyncTests : IDisposable
     }
 
     [Fact]
+    public async Task Un_jeu_multi_32_attend_le_coeur_fbneo_corrige()
+    {
+        // 27/10 : sous le FBNeo de RetroBat, l'invite d'un netplay plante au premier son ; Title Fight attend fbneo_multi32.
+        var titlef = PoserFichier("fbneo", "titlef.zip");
+        var sf2ce = PoserFichier("fbneo", "sf2ce.zip");
+        var multi32 = new { id = "arcade/titlef", system = "arcade", set = "titlef", name = "Title Fight", family = "duel", players = 2, level = "classique", core = "fbneo_multi32" };
+        PoserCatalogue(Catalogue(multi32, Arcade("sf2ce")));
+
+        await Service(coeur => coeur != "fbneo_multi32").SynchroniserAsync("test", CancellationToken.None);
+        Assert.Equal(new HashSet<string>(StringComparer.OrdinalIgnoreCase) { sf2ce }, Collection());
+
+        await Service().SynchroniserAsync("test", CancellationToken.None);
+        Assert.Contains(titlef, Collection());
+    }
+
+    [Fact]
     public void Un_coeur_que_nelfeplay_ne_livre_pas_n_est_pas_juge()
     {
         var options = new ApiExposeOptions();
