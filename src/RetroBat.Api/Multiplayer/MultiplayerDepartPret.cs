@@ -138,8 +138,38 @@ public sealed class MultiplayerDepartPret
             return new Resultat(false, "etat impossible a poser", null);
         }
 
+        var raison = await AppliquerAsync(jeu, choixParPlace, pseudos, _apresLeChargement, ct).ConfigureAwait(false);
+        return new Resultat(raison is null, raison, fichier);
+    }
+
+    /// <summary>Le temps laisse au rechargement du depart, dans la boucle qui attend les invites.</summary>
+    internal static TimeSpan ApresUnRechargement { get; set; } = TimeSpan.FromMilliseconds(400);
+
+    /// <summary>
+    /// LA BOUCLE DU DEPART (1.9.112) : reprend le depart deja pose (l'emplacement <see cref="Emplacement"/>), y reecrit le
+    /// choix de chaque place et le relit. Seulement tant qu'aucun invite n'est connecte : un etat charge chez l'hote, invite
+    /// connecte, le fait decrocher (« Netplay state load out of order »). Une reprise rapide qui ne se relit pas (un jeu
+    /// qui n'accepte l'ecriture qu'un moment apres le chargement) se refait au rythme de la premiere pose, verifiee : le
+    /// jeu ne reste jamais sur un depart sans les choix. Vrai si le depart est repris, choix compris.
+    /// </summary>
+    public async Task<bool> ReappliquerAsync(
+        MultiplayerGame jeu,
+        IReadOnlyDictionary<int, IReadOnlyDictionary<string, int>?> choixParPlace,
+        CancellationToken ct,
+        IReadOnlyDictionary<int, string>? pseudos = null)
+        => await AppliquerAsync(jeu, choixParPlace, pseudos, ApresUnRechargement, ct).ConfigureAwait(false) is null
+           || await AppliquerAsync(jeu, choixParPlace, pseudos, _apresLeChargement, ct).ConfigureAwait(false) is null;
+
+    /// <summary>Charge le depart pose, ecrit les choix, puis les relit. Rend null, ou la raison d'un ecart.</summary>
+    private async Task<string?> AppliquerAsync(
+        MultiplayerGame jeu,
+        IReadOnlyDictionary<int, IReadOnlyDictionary<string, int>?> choixParPlace,
+        IReadOnlyDictionary<int, string>? pseudos,
+        TimeSpan apresLeChargement,
+        CancellationToken ct)
+    {
         await _commandes.EnvoyerAsync("LOAD_STATE_SLOT " + Emplacement.ToString(CultureInfo.InvariantCulture), ct).ConfigureAwait(false);
-        await Task.Delay(_apresLeChargement, ct).ConfigureAwait(false);
+        await Task.Delay(apresLeChargement, ct).ConfigureAwait(false);
 
         // Les octets qui se suivent partent en une commande (un pseudo : 8 octets) : des centaines d'ecritures d'un octet
         // faisaient attendre la premiere relecture au-dela de son delai (F-Zero a quatre, 24/10).
@@ -164,12 +194,12 @@ public sealed class MultiplayerDepartPret
                 var lu = lus is not null && i < lus.Count ? lus[i] : (int?) null;
                 if (lu != octets[i])
                 {
-                    return new Resultat(false, $"relecture differente a 0x{decalage + i:X} ({(lu is { } v ? v.ToString(CultureInfo.InvariantCulture) : "rien")} au lieu de {octets[i]})", fichier);
+                    return $"relecture differente a 0x{decalage + i:X} ({(lu is { } v ? v.ToString(CultureInfo.InvariantCulture) : "rien")} au lieu de {octets[i]})";
                 }
             }
         }
 
-        return new Resultat(true, null, fichier);
+        return null;
     }
 
     /// <summary>Les ecritures regroupees en suites d'octets contigus, par la meme commande, dans l'ordre.</summary>

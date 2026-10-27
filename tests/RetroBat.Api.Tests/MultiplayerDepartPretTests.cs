@@ -109,6 +109,27 @@ public class MultiplayerDepartPretTests : IDisposable
     };
 
     [Fact]
+    public async Task Le_depart_se_reprend_choix_compris_pour_la_boucle()
+    {
+        var (jeu, etat) = Sf2ce();
+        var ra = new FauxRetroArch { DossierDesEtats = Path.Combine(_dossier, "etats") };
+        var depart = new MultiplayerDepartPret(ra, TimeSpan.FromSeconds(2), TimeSpan.Zero);
+        MultiplayerDepartPret.ApresUnRechargement = TimeSpan.Zero;
+        Assert.True((await depart.PreparerAsync(jeu, etat, "sf2ce", Places(4, 5), CancellationToken.None)).Ok);
+        // Le rechargement remet la memoire de l'etat : les choix y sont reecrits, puis relus.
+        ra.Memoire.Clear();
+        ra.Recues.Clear();
+        Assert.True(await depart.ReappliquerAsync(jeu, Places(4, 5), CancellationToken.None));
+        Assert.Equal("LOAD_STATE_SLOT 97", ra.Recues[0]);
+        Assert.Equal(4, ra.Memoire[0x864E]);
+        Assert.Equal(5, ra.Memoire[0x894E]);
+
+        // Un choix qui ne se relit pas : le depart ne se reprend pas.
+        var resiste = new FauxRetroArch { DossierDesEtats = ra.DossierDesEtats, AdresseQuiResiste = 0x894E };
+        Assert.False(await new MultiplayerDepartPret(resiste, TimeSpan.FromSeconds(2), TimeSpan.Zero).ReappliquerAsync(jeu, Places(4, 5), CancellationToken.None));
+    }
+
+    [Fact]
     public async Task Le_depart_pose_l_etat_ecrit_chaque_place_et_relit()
     {
         var (jeu, etat) = Sf2ce();

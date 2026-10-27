@@ -70,6 +70,7 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// <summary>Le depart pret au ralenti jusqu'a l'arrivee des invites, puis garde a vitesse normale jusqu'a la fin (27/10).</summary>
     private readonly MultiplayerAttenteDesInvites _attente;
     private CancellationTokenSource? _gardeDeVitesse;
+    private CancellationTokenSource? _boucleDuDepart;
     private CancellationTokenSource? _suiviDesInvites;
     private int? _vainqueur;
 
@@ -222,6 +223,8 @@ public sealed class MultiplayerLaunchService : IHostedService
                 _guet = null;
                 _gardeDeVitesse?.Cancel();
                 _gardeDeVitesse = null;
+                _boucleDuDepart?.Cancel();
+                _boucleDuDepart = null;
                 _suiviDesInvites?.Cancel();
                 _suiviDesInvites = null;
                 vainqueur = _vainqueur;
@@ -347,6 +350,10 @@ public sealed class MultiplayerLaunchService : IHostedService
             if (auRalenti)
             {
                 _ = Task.Run(() => LibererLeDepartAsync(room, jeu.Game, liens));
+            }
+            else if (depart is not null && reponse?.Ok == true && MultiplayerAttenteDesInvites.BoucleEnService)
+            {
+                _ = Task.Run(() => BouclerLeDepartAsync(room, jeu.Game, liens));
             }
 
             if (reponse?.Ok == true)
@@ -563,15 +570,7 @@ public sealed class MultiplayerLaunchService : IHostedService
     private async Task<bool> PreparerLeDepartAsync(MultiplayerRoom room, MultiplayerInstalledGame jeu, MultiplayerStart depart)
     {
         var etat = Path.Combine(RetroBatPaths.PluginRoot, "resources", "multiplayer", depart.State.Replace('/', Path.DirectorySeparatorChar));
-        var choixParPlace = room.Players
-            .Where(joueur => joueur.Seat is not null)
-            .GroupBy(joueur => joueur.Seat!.Value)
-            .ToDictionary(groupe => groupe.Key, groupe => groupe.First().Choices);
-        // Le pseudo de chaque place, ecrit dans le jeu quand le catalogue sait ou (F-Zero) ; le nom de compte a defaut.
-        var pseudos = room.Players
-            .Where(joueur => joueur.Seat is not null)
-            .GroupBy(joueur => joueur.Seat!.Value)
-            .ToDictionary(groupe => groupe.Key, groupe => groupe.First() is var j && j.Pseudo.Length > 0 ? j.Pseudo : j.Handle);
+        var (choixParPlace, pseudos) = ChoixEtPseudos(room);
         var resultat = await _depart.PreparerAsync(jeu.Game, etat, Path.GetFileNameWithoutExtension(jeu.Path), choixParPlace, CancellationToken.None, depart,
                 pseudos)
             .ConfigureAwait(false);
@@ -589,6 +588,50 @@ public sealed class MultiplayerLaunchService : IHostedService
 
         _journal.LogInformation("MULTIPLAYER : depart pret de {Jeu} pose et verifie ({Places} places)", jeu.Game.Id, choixParPlace.Count);
         return true;
+    }
+
+    /// <summary>
+    /// Le choix de chaque place, et son pseudo, ecrit dans le jeu quand le catalogue sait ou (F-Zero) ; le nom de compte a
+    /// defaut.
+    /// </summary>
+    private static (Dictionary<int, IReadOnlyDictionary<string, int>?> Choix, Dictionary<int, string> Pseudos) ChoixEtPseudos(MultiplayerRoom room)
+    {
+        var places = room.Players.Where(joueur => joueur.Seat is not null).GroupBy(joueur => joueur.Seat!.Value).ToList();
+        return (places.ToDictionary(groupe => groupe.Key, groupe => groupe.First().Choices),
+            places.ToDictionary(groupe => groupe.Key, groupe => groupe.First() is var j && j.Pseudo.Length > 0 ? j.Pseudo : j.Handle));
+    }
+
+    /// <summary>
+    /// LA BOUCLE DU DEPART (1.9.112) : tant qu'aucun invite ne se connecte, l'hote reprend son depart pret, choix compris
+    /// (MultiplayerAttenteDesInvites.BouclerLeDepartAsync) ; le match ne file pas avant l'arrivee du premier invite.
+    /// </summary>
+    private async Task BouclerLeDepartAsync(MultiplayerRoom room, MultiplayerGame jeu, Func<int?> liens)
+    {
+        CancellationToken jeton;
+        lock (_verrou)
+        {
+            _boucleDuDepart?.Cancel();
+            _boucleDuDepart = new CancellationTokenSource();
+            jeton = _boucleDuDepart.Token;
+        }
+
+        try
+        {
+            var (choix, pseudos) = ChoixEtPseudos(room);
+            var debut = DateTime.UtcNow;
+            var tours = await _attente.BouclerLeDepartAsync(ct => _depart.ReappliquerAsync(jeu, choix, ct, pseudos),
+                MultiplayerAttenteDesInvites.CheminDuJournal, liens, PatienceDesInvites, jeton).ConfigureAwait(false);
+            _journal.LogInformation("MULTIPLAYER : depart pret de {Jeu} repris {Tours} fois en {Secondes:F0} s en attendant le premier invite ({Room})",
+                jeu.Id, tours, (DateTime.UtcNow - debut).TotalSeconds, room.Room);
+        }
+        catch (OperationCanceledException)
+        {
+            // La partie est finie avant l'arrivee des invites.
+        }
+        catch (Exception ex)
+        {
+            _journal.LogWarning(ex, "MULTIPLAYER : boucle du depart pret de {Room} interrompue", room.Room);
+        }
     }
 
     private void RetirerLEtatPose()

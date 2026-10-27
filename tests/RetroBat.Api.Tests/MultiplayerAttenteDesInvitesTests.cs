@@ -205,6 +205,60 @@ public class MultiplayerAttenteDesInvitesTests
     }
 
     [Fact]
+    public void Le_journal_dit_qu_un_invite_se_connecte_des_que_le_relais_l_annonce()
+    {
+        // Les lignes du tunnel sont en anglais meme sur une borne en francais (journal de Falken, 27/10).
+        string[] seul = ["[INFO] [Netplay] Vous avez rejoint le jeu en tant que joueur 1"];
+        Assert.False(MultiplayerAttenteDesInvites.UnInviteSeConnecte(seul));
+        Assert.True(MultiplayerAttenteDesInvites.UnInviteSeConnecte([.. seul, "[INFO] [Netplay] Queued tunnel link connection."]));
+        Assert.True(MultiplayerAttenteDesInvites.UnInviteSeConnecte([.. seul, "[INFO] [Netplay] Tunnel link connection completed."]));
+        Assert.True(MultiplayerAttenteDesInvites.UnInviteSeConnecte(
+            [.. seul, "[INFO] [Netplay] NELFEPLAY_Nelfe80_2b56 à rejoint le jeu en tant que joueur 2 (ping: 499 ms)"]));
+    }
+
+    [Fact]
+    public async Task La_boucle_reprend_le_depart_jusqu_au_premier_signe_d_un_invite()
+    {
+        MultiplayerAttenteDesInvites.RythmeDeLaBoucle = TimeSpan.FromMilliseconds(20);
+        var journal = Path.Combine(Path.GetTempPath(), "nelfe-boucle-" + Guid.NewGuid().ToString("N") + ".log");
+        try
+        {
+            File.WriteAllText(journal, "[INFO] [Netplay] You have joined as player 1\n");
+            var attente = new MultiplayerAttenteDesInvites(new RetroArchSimule("PLAYING"));
+            var reprises = 0;
+            Task<bool> Reprendre(CancellationToken _)
+            {
+                // Au cinquieme tour, le relais annonce un invite.
+                if (++reprises == 5)
+                {
+                    File.AppendAllText(journal, "[INFO] [Netplay] Queued tunnel link connection.\n");
+                }
+
+                return Task.FromResult(true);
+            }
+
+            Assert.Equal(5, await attente.BouclerLeDepartAsync(Reprendre, journal, () => 0, TimeSpan.FromSeconds(10), CancellationToken.None));
+            Assert.Equal(5, reprises);
+
+            // Un lien d'invite au relais : rien n'est repris.
+            File.WriteAllText(journal, "[INFO] [Netplay] You have joined as player 1\n");
+            reprises = 0;
+            Assert.Equal(0, await attente.BouclerLeDepartAsync(Reprendre, journal, () => 1, TimeSpan.FromSeconds(10), CancellationToken.None));
+            Assert.Equal(0, reprises);
+
+            // Un depart qui ne se reprend pas arrete la boucle ; la patience aussi.
+            Assert.Equal(0, await attente.BouclerLeDepartAsync(_ => Task.FromResult(false), journal, () => 0, TimeSpan.FromSeconds(10), CancellationToken.None));
+            var debut = DateTime.UtcNow;
+            Assert.True(await attente.BouclerLeDepartAsync(_ => Task.FromResult(true), journal, null, TimeSpan.FromMilliseconds(300), CancellationToken.None) > 0);
+            Assert.True(DateTime.UtcNow - debut < TimeSpan.FromSeconds(3));
+        }
+        finally
+        {
+            File.Delete(journal);
+        }
+    }
+
+    [Fact]
     public async Task Un_ralenti_qui_dure_pendant_la_partie_est_leve()
     {
         var ra = new RetroArchSimule("PLAYING") { AuRalenti = true };

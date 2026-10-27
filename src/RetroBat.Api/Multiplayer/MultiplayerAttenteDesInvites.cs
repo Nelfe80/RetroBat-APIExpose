@@ -108,6 +108,56 @@ public sealed class MultiplayerAttenteDesInvites
     /// <summary>Le temps qu'un lien d'invite au relais doit tenir pour compter comme une arrivee que le journal n'a pas dite.</summary>
     internal static TimeSpan LienQuiTient { get; set; } = TimeSpan.FromSeconds(8);
 
+    // « Queued tunnel link connection » et « Tunnel link connection completed » : RetroArch les ecrit en dur (sans
+    // traduction, vu sur la borne en francais de Falken), des que le relais lui annonce un invite, avant meme qu'il se
+    // connecte : le premier signe de son arrivee.
+    private static readonly string[] LignesDuTunnel = ["[Netplay] Queued tunnel link connection", "[Netplay] Tunnel link connection completed"];
+
+    /// <summary>
+    /// LA BOUCLE DU DEPART (1.9.112, idee du user) : tant qu'aucun invite n'est connecte, l'hote recharge son depart pret,
+    /// sans pause ni ralenti ; il s'arrete au premier signe d'un invite. Banc banc_pause_relais.py --boucle, par le relais
+    /// avec 15 s d'attente : 30 rechargements, l'invite arrive 2,5 s apres la fin de la boucle, les deux jeux sur la meme
+    /// image, et le bilan du wrapper ne compte aucun chargement. A trois ou quatre, les invites suivants arrivent plus tard.
+    /// </summary>
+    public static bool BoucleEnService { get; } = true;
+
+    /// <summary>Le temps entre deux rechargements du depart.</summary>
+    internal static TimeSpan RythmeDeLaBoucle { get; set; } = TimeSpan.FromMilliseconds(250);
+
+    /// <summary>Un invite se connecte-t-il, d'apres le journal de l'hote : le relais l'annonce, ou il a rejoint sa place. Pur.</summary>
+    internal static bool UnInviteSeConnecte(IReadOnlyCollection<string> lignes)
+        => lignes.Any(ligne => LignesDuTunnel.Any(signe => ligne.Contains(signe, StringComparison.Ordinal))) || InvitesALeurPlace(lignes).Count > 0;
+
+    /// <summary>
+    /// Reprend le depart (<paramref name="reprendre"/>) a chaque tour, au plus <paramref name="patience"/>, tant qu'aucun invite
+    /// ne se connecte : ni dans le journal (<see cref="UnInviteSeConnecte"/>), ni au relais (<paramref name="liens"/>). Un
+    /// depart qui ne se reprend pas arrete la boucle (la partie continue telle quelle). Rend le nombre de reprises.
+    /// </summary>
+    public async Task<int> BouclerLeDepartAsync(Func<CancellationToken, Task<bool>> reprendre, string journal, Func<int?>? liens,
+        TimeSpan patience, CancellationToken ct)
+    {
+        var limite = DateTime.UtcNow + patience;
+        var tours = 0;
+        while (DateTime.UtcNow < limite)
+        {
+            ct.ThrowIfCancellationRequested();
+            if (UnInviteSeConnecte(LireLesLignes(journal).ToList()) || liens?.Invoke() > 0)
+            {
+                return tours;
+            }
+
+            if (!await reprendre(ct).ConfigureAwait(false))
+            {
+                return tours;
+            }
+
+            tours++;
+            await Task.Delay(RythmeDeLaBoucle, ct).ConfigureAwait(false);
+        }
+
+        return tours;
+    }
+
     /// <summary>L'etat de RetroArch d'apres GET_STATUS : PLAYING, PAUSED, autre chose, ou null sans reponse. Pur.</summary>
     internal static string? Etat(string? reponse)
     {
