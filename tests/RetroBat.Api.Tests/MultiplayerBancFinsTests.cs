@@ -64,6 +64,45 @@ public class MultiplayerBancFinsTests
         Assert.True(vainqueur == 1, $"vainqueur {vainqueur} ; fin {await LireAsync(ra, 0x8300)}, vies {await LireAsync(ra, 0x8478)} et {await LireAsync(ra, 0x9078)}");
     }
 
+    /// <summary>
+    /// KOF '98 (equipes de trois) : depuis le choix des personnages, ou les compteurs comptent les combattants choisis
+    /// (la garde 0x0500 = 2 les ignore), jusqu'aux trois K.O. de l'equipe de P2 (vie a 1, puis un coup de P1).
+    /// </summary>
+    [Fact]
+    public async Task KOF_98_finit_quand_une_equipe_est_eliminee()
+    {
+        const string Id = "arcade/kof98";
+        if (Port is null || Fin != Id)
+        {
+            return;   // banc non monte
+        }
+
+        var ra = new CommandesRetroArchUdp(int.Parse(Port, CultureInfo.InvariantCulture));
+        var jeu = DuCatalogue(Id);
+        using var delai = new CancellationTokenSource(TimeSpan.FromSeconds(200));
+        var guet = new MultiplayerFinDeRencontre(ra).AttendreLeVainqueurAsync(jeu.End!, [1, 2], delai.Token);
+        using var manette = new MultiplayerBancTests.ManetteReseau(1);
+        while (!guet.IsCompleted && !delai.IsCancellationRequested)
+        {
+            if (await LireAsync(ra, 0x500) == 8 && await LireAsync(ra, 0x8438) is > 1 and < 0x80)
+            {
+                await ra.EnvoyerAsync("WRITE_CORE_RAM 8438 01", CancellationToken.None);
+            }
+
+            await manette.TenirAsync(7, TimeSpan.FromMilliseconds(600));   // droite
+            foreach (var bouton in new[] { 8, 0, 1, 9 })                    // A, B, Y, X
+            {
+                await Task.Delay(300);
+                await manette.TenirAsync(bouton, TimeSpan.FromMilliseconds(150));
+            }
+
+            await Task.Delay(300);
+        }
+
+        var vainqueur = await guet;
+        Assert.True(vainqueur == 1, $"vainqueur {vainqueur} ; garde {await LireAsync(ra, 0x500)}, manches {await LireAsync(ra, 0xA85F)} et {await LireAsync(ra, 0xA84C)}");
+    }
+
     private static async Task<int?> LireAsync(CommandesRetroArchUdp ra, long adresse)
     {
         var reponse = await ra.DemanderAsync($"READ_CORE_RAM {adresse:x} 1", CancellationToken.None);
