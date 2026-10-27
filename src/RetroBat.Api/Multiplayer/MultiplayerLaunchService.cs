@@ -372,8 +372,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         {
             var attendus = Math.Max(1, room.Players.Count(joueur => joueur.Seat is not null) - 1);
             var debut = DateTime.UtcNow;
-            var vus = await _attente.AttendreLesInvitesAsync(
-                    MultiplayerAttenteDesInvites.CheminDuJournal(MultiplayerAttenteDesInvites.DossierDuJournal), attendus, PatienceDesInvites, jeton)
+            var vus = await _attente.AttendreLesInvitesAsync(MultiplayerAttenteDesInvites.CheminDuJournal, attendus, PatienceDesInvites, jeton)
                 .ConfigureAwait(false);
             // L'etat que RetroArch envoie a l'arrivee d'un invite se charge chez lui : un instant avant de repartir.
             await Task.Delay(TimeSpan.FromSeconds(1), jeton).ConfigureAwait(false);
@@ -815,22 +814,11 @@ public sealed class MultiplayerLaunchService : IHostedService
             reglagesDeLaPlace["video_aspect_ratio"] = MultiplayerLaunchPlan.FormatPourRetroArch(jeu.Game, vue);
         }
 
-        // LE DEPART ATTEND TOUT LE MONDE (27/10) : l'hote d'un depart pret peut se mettre en pause, et son journal dit
-        // l'arrivee de chaque invite (MultiplayerAttenteDesInvites). Un journal d'une partie precedente ne compte pas.
+        // LE DEPART ATTEND TOUT LE MONDE (27/10) : l'hote d'un depart pret peut se mettre en pause ; son journal (celui du
+        // lanceur) dit l'arrivee de chaque invite (MultiplayerAttenteDesInvites).
         if (lancement.Role == "host" && DepartDeLaRoom(room, jeu) is not null)
         {
-            var dossier = MultiplayerAttenteDesInvites.DossierDuJournal;
-            try
-            {
-                Directory.CreateDirectory(dossier);
-                File.Delete(MultiplayerAttenteDesInvites.CheminDuJournal(dossier));
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-            {
-                _journal.LogDebug(ex, "MULTIPLAYER : journal de RetroArch de la partie precedente non efface");
-            }
-
-            foreach (var (cle, valeur) in MultiplayerAttenteDesInvites.Reglages(dossier))
+            foreach (var (cle, valeur) in MultiplayerAttenteDesInvites.Reglages)
             {
                 reglagesDeLaPlace[cle] = valeur;
             }

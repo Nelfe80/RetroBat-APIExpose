@@ -36,14 +36,11 @@ public class MultiplayerAttenteDesInvitesTests
     }
 
     [Fact]
-    public void L_hote_recoit_la_pause_et_son_journal_le_temps_de_la_partie()
+    public void L_hote_recoit_la_pause_et_lit_le_journal_que_lui_donne_le_lanceur()
     {
-        var reglages = MultiplayerAttenteDesInvites.Reglages(@"C:\journal");
-        Assert.Equal("true", reglages["netplay_allow_pausing"]);
-        Assert.Equal("true", reglages["log_to_file"]);
-        Assert.Equal("false", reglages["log_to_file_timestamp"]);
-        Assert.Equal(@"C:\journal", reglages["log_dir"]);
-        Assert.Equal(Path.Combine(@"C:\journal", "retroarch.log"), MultiplayerAttenteDesInvites.CheminDuJournal(@"C:\journal"));
+        // Le lanceur passe toujours --log-file es_launch_stdout.log : un log_dir pose dans retroarch.cfg n'y changerait rien.
+        Assert.Equal(new Dictionary<string, string> { ["netplay_allow_pausing"] = "true" }, MultiplayerAttenteDesInvites.Reglages);
+        Assert.Equal(RetroBat.Domain.Paths.RetroBatPaths.EsLaunchStdoutLogPath, MultiplayerAttenteDesInvites.CheminDuJournal);
     }
 
     [Fact]

@@ -14,7 +14,8 @@ namespace RetroBat.Api.Multiplayer;
 /// 500 ms (FRAMEADVANCE) : assez pour accueillir l'invite, pas pour faire avancer le jeu (TGM2 reste sur « ROUND 1 GO »,
 /// le chrono a 02:40:00). L'invite rejoint en pause ; a la reprise, memoire identique, aucune desynchronisation.</item>
 /// <item>RetroArch refuse toute pause en netplay sans <c>netplay_allow_pausing</c>, meme seul (banc du 27/10) : l'hote
-/// le recoit le temps de la partie, avec son journal dans un fichier. Le lanceur ne reecrit aucune de ces cles.</item>
+/// le recoit le temps de la partie (le lanceur ne reecrit pas cette cle). Son journal est celui que le lanceur lui donne
+/// a chaque lancement (<c>--log-file es_launch_stdout.log -verbose</c>, MULTIPLAYER compris), vide a son demarrage.</item>
 /// <item>Recharger l'etat a l'arrivee de l'invite ne marche pas : l'invite recoit « Netplay state load out of order » et se
 /// deconnecte (banc du 27/10).</item>
 /// <item>La pause permise, un joueur pourrait figer la partie de l'autre : apres la reprise, une pause qui dure est levee.</item>
@@ -26,20 +27,16 @@ public sealed class MultiplayerAttenteDesInvites
 
     public MultiplayerAttenteDesInvites(ICommandesRetroArch commandes) => _commandes = commandes;
 
-    /// <summary>Le dossier du journal de RetroArch pendant une partie hebergee avec depart pret.</summary>
-    public static string DossierDuJournal => Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay", "retroarch-multiplayer");
-
-    /// <summary>Le journal que RetroArch y ecrit (sans horodatage dans le nom).</summary>
-    public static string CheminDuJournal(string dossier) => Path.Combine(dossier, "retroarch.log");
+    /// <summary>
+    /// Le journal de RetroArch : le lanceur le lui donne a chaque lancement (<c>--log-file</c>), et un <c>log_dir</c> pose dans
+    /// retroarch.cfg n'y change rien (vu le 27/10 dans emulatorLauncher.log).
+    /// </summary>
+    public static string CheminDuJournal => RetroBatPaths.EsLaunchStdoutLogPath;
 
     /// <summary>Les reglages de RetroArch le temps de la partie, rendus apres comme ceux de la place.</summary>
-    public static IReadOnlyDictionary<string, string> Reglages(string dossier) => new Dictionary<string, string>(StringComparer.Ordinal)
+    public static IReadOnlyDictionary<string, string> Reglages { get; } = new Dictionary<string, string>(StringComparer.Ordinal)
     {
         ["netplay_allow_pausing"] = "true",
-        ["log_to_file"] = "true",
-        ["log_to_file_timestamp"] = "false",
-        ["log_verbosity"] = "true",
-        ["log_dir"] = dossier,
     };
 
     // « [INFO] [Netplay] client_pause has joined as player 2 (ping: 130 ms) » ; « [INFO] [Netplay] "client_rech" has disconnected ».
