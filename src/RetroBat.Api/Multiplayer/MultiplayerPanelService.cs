@@ -1256,8 +1256,10 @@ public sealed class MultiplayerPanelService
 
         var premier = choix[0];
         var mien = _session.MesChoix(jeu).GetValueOrDefault(premier.Key, premier.Default);
-        var bande = premier.Values.Select(valeur => new LeaderboardOverlayService.PortraitDeChoix(PortraitDu(valeur), valeur.Name)).ToList();
-        return (bande, premier.Values.ToList().FindIndex(valeur => valeur.Value == mien));
+        // Les personnages de MA place (Title Fight : chaque ecran a ses quatre boxeurs) ; avant d'etre assis, ceux du choix.
+        var valeurs = premier.ValeursDe(RoomDuJeu()?.Players.FirstOrDefault(j => j.You)?.Seat);
+        var bande = valeurs.Select(valeur => new LeaderboardOverlayService.PortraitDeChoix(PortraitDu(valeur), valeur.Name)).ToList();
+        return (bande, valeurs.ToList().FindIndex(valeur => valeur.Value == mien));
     }
 
     /// <summary>
@@ -1612,7 +1614,7 @@ public sealed class MultiplayerPanelService
 
         var premier = choix[0];
         var valeur = ValeurJouee(joueur, jeu, premier);
-        return PortraitDu(premier.Values.FirstOrDefault(x => x.Value == valeur));
+        return PortraitDu(premier.ValeursDe(joueur.Seat).FirstOrDefault(x => x.Value == valeur));
     }
 
     /// <summary>La valeur voulue par ce joueur : la sienne tout de suite (▲▼), celle de la gameroom pour les autres.</summary>

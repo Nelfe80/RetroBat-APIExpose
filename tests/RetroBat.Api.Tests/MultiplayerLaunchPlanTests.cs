@@ -233,15 +233,89 @@ public class MultiplayerLaunchPlanTests : IDisposable
     }
 
     [Fact]
-    public void Un_boxeur_de_Title_Fight_tient_deux_ports_et_les_autres_jeux_un_seul()
+    public void Une_place_peut_tenir_deux_ports_et_les_autres_jeux_un_seul()
     {
-        var titlef = new MultiplayerGame { Id = "arcade/titlef", System = "arcade", Set = "titlef", Players = 2, SeatPorts = [[1, 3], [2, 4]] };
-        Assert.Equal([2, 4], titlef.PortsDeLaPlace(2));
-        var place = MultiplayerLaunchPlan.Place(titlef.PortsDeLaPlace(2));
+        var deuxPorts = new MultiplayerGame { Id = "arcade/deux", System = "arcade", Set = "deux", Players = 2, SeatPorts = [[1, 3], [2, 4]] };
+        Assert.Equal([2, 4], deuxPorts.PortsDeLaPlace(2));
+        var place = MultiplayerLaunchPlan.Place(deuxPorts.PortsDeLaPlace(2));
         Assert.Equal(["netplay_request_device_p2", "netplay_request_device_p4"], place.Where(p => p.Value == "true").Select(p => p.Key).OrderBy(k => k));
         Assert.Equal([3], new MultiplayerGame { Players = 4 }.PortsDeLaPlace(3));
 
         // La validation du catalogue : voir MultiplayerCollectionSyncTests.Un_catalogue_douteux_est_refuse.
+    }
+
+    private static readonly MultiplayerGame TitleFight = new()
+    {
+        Id = "arcade/titlef", System = "arcade", Set = "titlef", Players = 2, TwinStick = true,
+        SeatRemap = [new() { Seat = 2, Keys = new Dictionary<string, string> { ["input_player1_btn_start"] = "-1" } }],
+    };
+
+    [Fact]
+    public void Title_Fight_joue_les_deux_bras_sur_une_manette_et_le_netplay_transmet_les_sticks()
+    {
+        var cles = MultiplayerLaunchPlan.Remappage(TitleFight, 1, 2, deuxSticksArcade: false)!;
+        // Les manettes « Classic » de FBNeo, analogiques : le netplay transmet alors le stick droit.
+        Assert.Equal("5", cles["input_libretro_device_p1"]);
+        Assert.Equal("5", cles["input_libretro_device_p2"]);
+        // Le losange en second stick : X haut (23), B bas (22), Y gauche (21), A droite (20).
+        Assert.Equal(["23", "22", "21", "20"], new[] { "x", "b", "y", "a" }.Select(b => cles["input_player1_btn_" + b]));
+        // Le clic des sticks est le « Service » de System 32 : muet.
+        Assert.Equal(["-1", "-1"], new[] { "l3", "r3" }.Select(b => cles["input_player1_btn_" + b]));
+        Assert.Equal("1", cles["input_player1_analog_dpad_mode"]);
+        // Une seule manette : le joueur 2 de la borne (le vJoy) ne joue pas, il ne sert aucun port du netplay.
+        Assert.DoesNotContain(cles.Keys, cle => cle.StartsWith("input_player2_", StringComparison.Ordinal) || cle == "input_remap_port_p2");
+        Assert.False(cles.ContainsKey("input_player1_btn_start"));
+
+        // La place 2 n'a pas le START du port 2 : c'est celui de l'ecran 1.
+        Assert.Equal("-1", MultiplayerLaunchPlan.Remappage(TitleFight, 2, 2, deuxSticksArcade: false)!["input_player1_btn_start"]);
+        Assert.Null(MultiplayerLaunchPlan.Remappage(new MultiplayerGame { Id = "arcade/sf2ce", Players = 2 }, 1, 2, false));
+    }
+
+    [Fact]
+    public void Deux_vrais_sticks_arcade_font_les_deux_bras_d_un_seul_boxeur()
+    {
+        var cles = MultiplayerLaunchPlan.Remappage(TitleFight, 1, 2, deuxSticksArcade: true)!;
+        // Le second stick sert le port du premier, sa croix en stick droit, ses boutons muets.
+        Assert.Equal("0", cles["input_remap_port_p2"]);
+        Assert.Equal(["23", "22", "21", "20"], new[] { "up", "down", "left", "right" }.Select(d => cles["input_player2_btn_" + d]));
+        Assert.Equal("-1", cles["input_player2_btn_start"]);
+        Assert.Equal("-1", cles["input_player2_btn_select"]);
+
+        const string arcade = "-p1index 0 -p1nbbuttons 10 -p1nbhats 0 -p1nbaxes 2 -p2index 1 -p2nbbuttons 10 -p2nbhats 0 -p2nbaxes 2";
+        Assert.True(MultiplayerLaunchPlan.DeuxSticksArcade(arcade));
+        // La borne du user le 27/10 : une manette 360 (6 axes) et le vJoy (8 axes).
+        Assert.False(MultiplayerLaunchPlan.DeuxSticksArcade("-p1index 0 -p1nbaxes 6 -p2index 1 -p2nbaxes 8"));
+        Assert.False(MultiplayerLaunchPlan.DeuxSticksArcade("-p1index 0 -p1nbaxes 2"));
+        Assert.False(MultiplayerLaunchPlan.DeuxSticksArcade(string.Empty));
+    }
+
+    [Fact]
+    public void Le_remappage_va_au_nom_du_coeur_et_repart_tout_entier_apres_la_partie()
+    {
+        Directory.CreateDirectory(Path.Combine(_racine, "info"));
+        File.WriteAllText(Path.Combine(_racine, "info", "fbneo_libretro.info"), "display_name = \"Arcade (FinalBurn Neo)\"\ncorename = \"FinalBurn Neo\"\n");
+        var chemin = MultiplayerLaunchPlan.CheminDuRemappage(_racine, "fbneo", @"E:\RetroBat\roms\fbneo\titlef.zip")!;
+        Assert.Equal(Path.Combine(_racine, "config", "remaps", "FinalBurn Neo", "titlef.rmp"), chemin);
+        Assert.Null(MultiplayerLaunchPlan.CheminDuRemappage(_racine, "inconnu", "x.zip"));
+
+        // Absent avant : il s'en va, meme apres que RetroArch l'a reecrit en quittant.
+        var avant = RetroArchConfigEdit.Remplacer(chemin, MultiplayerLaunchPlan.Remappage(TitleFight, 1, 2, false)!);
+        Assert.Contains("input_player1_btn_x = \"23\"", File.ReadAllText(chemin));
+        File.AppendAllText(chemin, "input_turbo_enable = \"false\"\n");
+        RetroArchConfigEdit.Rendre(chemin, avant);
+        Assert.False(File.Exists(chemin));
+
+        // Present avant (le remappage du joueur) : il revient octet pour octet, aussi par le journal d'une partie interrompue.
+        const string sien = "input_player1_btn_a = \"8\"\r\n# le sien\r\n";
+        File.WriteAllText(chemin, sien);
+        var journal = Path.Combine(_racine, "journal.json");
+        RetroArchConfigEdit.Noter(journal, new Dictionary<string, Dictionary<string, string?>>
+        {
+            [chemin] = RetroArchConfigEdit.Remplacer(chemin, MultiplayerLaunchPlan.Remappage(TitleFight, 2, 2, false)!),
+        });
+        Assert.Contains("input_player1_btn_start = \"-1\"", File.ReadAllText(chemin));
+        Assert.Equal(1, RetroArchConfigEdit.RendreLeJournal(journal));
+        Assert.Equal(sien, File.ReadAllText(chemin));
     }
 
     [Fact]

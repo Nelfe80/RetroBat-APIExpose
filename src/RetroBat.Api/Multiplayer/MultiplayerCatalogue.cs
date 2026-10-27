@@ -150,10 +150,10 @@ public sealed record MultiplayerGame
     public IReadOnlyList<int>? SeatScreens { get; init; }
 
     /// <summary>
-    /// DEUX MANETTES PAR JOUEUR (Title Fight, 27/10 : un boxeur = un poing par manette, P1 sur les ports 1 et 3, P2 sur 2 et
-    /// 4) : les ports du coeur que tient chaque place, la place 1 en premier. La borne les demande tous au netplay
-    /// (<c>netplay_request_device_pN</c>) ; RetroArch lit chacun sur sa manette locale suivante (joueur 1, puis 2), vu au banc
-    /// le 27/10 (« has joined with input devices 2, 4 »). Sans table : le port de sa place.
+    /// PLUSIEURS PORTS PAR PLACE : les ports du coeur que tient chaque place, la place 1 en premier. La borne les demande
+    /// tous au netplay (<c>netplay_request_device_pN</c>) ; RetroArch lit chacun sur sa manette locale suivante (joueur 1,
+    /// puis 2), vu au banc le 27/10 (« has joined with input devices 2, 4 »). Sans table : le port de sa place. Title Fight
+    /// n'en a plus besoin : son bras droit est le stick droit du port du joueur (<see cref="TwinStick"/>).
     /// </summary>
     [JsonPropertyName("seat_ports")]
     public IReadOnlyList<IReadOnlyList<int>>? SeatPorts { get; init; }
@@ -161,6 +161,22 @@ public sealed record MultiplayerGame
     /// <summary>Les ports que tient cette place, dans l'ordre de ses manettes locales.</summary>
     public IReadOnlyList<int> PortsDeLaPlace(int place)
         => SeatPorts is { Count: > 0 } ports && place >= 1 && place <= ports.Count && ports[place - 1].Count > 0 ? ports[place - 1] : [place];
+
+    /// <summary>
+    /// DEUX STICKS PAR JOUEUR (Title Fight, 27/10, decision du user) : FBNeo envoie le second stick du joueur sur le stick
+    /// analogique droit de son port. La borne pose pour la partie un remappage de RetroArch
+    /// (<see cref="MultiplayerLaunchPlan.Remappage"/>) : manettes analogiques (sinon le netplay ne transmet pas les sticks),
+    /// boutons de facade en second stick pour une manette qui n'en a qu'un, et deux vrais sticks arcade sur un seul joueur.
+    /// </summary>
+    [JsonPropertyName("twin_stick")]
+    public bool TwinStick { get; init; }
+
+    /// <summary>
+    /// Des cles de remappage de RetroArch propres a une place (Title Fight : le START du port 2 est celui de l'ecran 1, la
+    /// place 2 ne l'a pas). Elles s'ajoutent a celles de <see cref="TwinStick"/>.
+    /// </summary>
+    [JsonPropertyName("seat_remap")]
+    public IReadOnlyList<MultiplayerSeatRemap>? SeatRemap { get; init; }
 
     /// <summary>
     /// Le format de l'image du jeu, « largeur:hauteur » (« 3:4 » pour un jeu vertical comme 19XX, « 8:3 » pour deux ecrans
@@ -425,6 +441,10 @@ public sealed record MultiplayerChoice
     public long? AdressePour(int place, int joueurs)
         => (Seats.FirstOrDefault(s => s.Seat == place && s.Players == joueurs)
             ?? Seats.FirstOrDefault(s => s.Seat == place && s.Players is null))?.Decalage;
+
+    /// <summary>Les valeurs que voit cette place : les siennes quand elle en a, sinon celles du choix (place inconnue aussi).</summary>
+    public IReadOnlyList<MultiplayerChoiceValue> ValeursDe(int? place)
+        => place is { } p && Seats.FirstOrDefault(s => s.Seat == p && s.Values is { Count: > 0 })?.Values is { } siennes ? siennes : Values;
 
     /// <summary>
     /// DEUX JOUEURS, DEUX VALEURS (Metal Slug 3, 23/10) : le jeu ne laisse pas deux joueurs sur le meme soldat, et deux
@@ -865,11 +885,40 @@ public sealed record MultiplayerChoiceSeat
     [JsonPropertyName("players")]
     public int? Players { get; init; }
 
+    /// <summary>
+    /// Choix seulement : les valeurs de cette place, quand chaque cote a les siennes (Title Fight : quatre boxeurs par
+    /// ecran). Les memes nombres que les valeurs du choix, d'autres noms et d'autres images ; la plateforme, qui ne
+    /// regarde que les nombres, n'a rien a savoir.
+    /// </summary>
+    [JsonPropertyName("values")]
+    public IReadOnlyList<MultiplayerChoiceValue>? Values { get; init; }
+
     [JsonIgnore]
     public long? Decalage => CoreRam.Trim() is { Length: > 2 } texte && texte.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
         && long.TryParse(texte[2..], global::System.Globalization.NumberStyles.HexNumber, null, out var valeur) && valeur >= 0
             ? valeur
             : null;
+}
+
+/// <summary>Des cles de remappage de RetroArch pour une place (<see cref="MultiplayerGame.SeatRemap"/>).</summary>
+public sealed record MultiplayerSeatRemap
+{
+    [JsonPropertyName("seat")]
+    public int Seat { get; init; }
+
+    [JsonPropertyName("keys")]
+    public IReadOnlyDictionary<string, string> Keys { get; init; } = new Dictionary<string, string>();
+
+    /// <summary>Une cle d'un fichier de remappage : bouton, stick, type de manette, port ou mode analogique d'un joueur.</summary>
+    public static bool CleDeRemappage(string cle) => CleRegex.IsMatch(cle ?? string.Empty);
+
+    /// <summary>Un numero de bouton ou de stick de RetroArch, -1 pour aucun.</summary>
+    public static bool ValeurDeRemappage(string valeur)
+        => int.TryParse(valeur, NumberStyles.Integer, CultureInfo.InvariantCulture, out var v) && v is >= -1 and <= 1024;
+
+    private static readonly System.Text.RegularExpressions.Regex CleRegex = new(
+        "^(input_player[1-8]_(btn|stk)_[a-z0-9_]+[+-]?|input_libretro_device_p[1-8]|input_remap_port_p[1-8]|input_player[1-8]_analog_dpad_mode)$",
+        System.Text.RegularExpressions.RegexOptions.CultureInvariant);
 }
 
 /// <summary>Les resultats d'une rencontre, tels que la plateforme les recoit.</summary>
@@ -1020,6 +1069,14 @@ public sealed class MultiplayerCatalogueStore
             {
                 // Une place sans port, un port hors du netplay ou tenu par deux places : deux bornes joueraient le meme poing.
                 return jeu.Id + " : ports par place incoherents";
+            }
+
+            if (jeu.SeatRemap is { Count: > 0 } remaps
+                && remaps.Any(r => r.Seat < 1 || r.Seat > jeu.Players || r.Keys.Count == 0
+                    || r.Keys.Any(p => !MultiplayerSeatRemap.CleDeRemappage(p.Key) || !MultiplayerSeatRemap.ValeurDeRemappage(p.Value))))
+            {
+                // Une cle qui n'est pas du remappage (un reglage de RetroArch glisse dans le fichier) ou une place qui n'existe pas.
+                return jeu.Id + " : remappage par place incoherent";
             }
 
             if (ValiderLesVues(jeu) is { } vues)
@@ -1269,6 +1326,16 @@ public sealed class MultiplayerCatalogueStore
             if (choix.Values.All(v => v.Value != choix.Default))
             {
                 return "choix « " + choix.Key + " » : defaut hors des valeurs";
+            }
+
+            // Les valeurs d'une place : les memes nombres que celles du choix (la plateforme et le departage n'en voient pas
+            // d'autres), chacune avec son nom.
+            var nombres = choix.Values.Select(v => v.Value).OrderBy(v => v).ToList();
+            if (choix.Seats.FirstOrDefault(s => s.Values is { Count: > 0 } siennes
+                    && (!siennes.Select(v => v.Value).OrderBy(v => v).SequenceEqual(nombres) || siennes.Any(v => string.IsNullOrWhiteSpace(v.Name))))
+                is { } placeAuxValeurs)
+            {
+                return "choix « " + choix.Key + " » : valeurs de la place " + placeAuxValeurs.Seat + " differentes de celles du choix";
             }
 
             // Chaque nombre de joueurs a l'adresse de chacune de ses places (la sienne, ou celle qui vaut pour tous).

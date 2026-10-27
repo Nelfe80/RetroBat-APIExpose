@@ -89,9 +89,42 @@ public static partial class RetroArchConfigEdit
         return avant;
     }
 
+    /// <summary>
+    /// LE FICHIER ENTIER (27/10, remappage de Title Fight) : RetroArch reecrit tout un remappage de jeu en quittant, une
+    /// restauration cle par cle y laisserait les siennes. Cette cle du journal garde le contenu d'avant (null : le fichier
+    /// n'existait pas, il s'en va).
+    /// </summary>
+    public const string FichierEntier = "*fichier entier*";
+
+    /// <summary>Remplace tout le fichier par ces reglages et rend de quoi le remettre tel quel (<see cref="FichierEntier"/>).</summary>
+    public static Dictionary<string, string?> Remplacer(string fichier, IReadOnlyDictionary<string, string> reglages)
+    {
+        var avant = new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            [FichierEntier] = File.Exists(fichier) ? File.ReadAllText(fichier) : null,
+        };
+        Directory.CreateDirectory(Path.GetDirectoryName(fichier)!);
+        Ecrire(fichier, reglages.Select(r => $"{r.Key} = \"{r.Value}\"").ToList());
+        return avant;
+    }
+
     /// <summary>Rend les valeurs d'avant ; une cle qui n'existait pas s'en va.</summary>
     public static void Rendre(string fichier, IReadOnlyDictionary<string, string?> avant)
     {
+        if (avant.TryGetValue(FichierEntier, out var contenu))
+        {
+            if (contenu is null)
+            {
+                File.Delete(fichier);
+            }
+            else
+            {
+                File.WriteAllText(fichier, contenu, new UTF8Encoding(false));
+            }
+
+            return;
+        }
+
         if (!File.Exists(fichier) || avant.Count == 0)
         {
             return;

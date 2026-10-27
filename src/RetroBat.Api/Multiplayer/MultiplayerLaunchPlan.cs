@@ -60,7 +60,104 @@ public static class MultiplayerLaunchPlan
 
     public static IReadOnlyDictionary<string, string> Place(int place) => Place([place]);
 
-    /// <summary>Les ports que la borne demande au netplay : deux pour un boxeur de Title Fight (<see cref="MultiplayerGame.SeatPorts"/>).</summary>
+    /// <summary>
+    /// LE REMAPPAGE DE LA PARTIE (Title Fight, 27/10, decisions du user) : le fichier de remappage du jeu que RetroArch
+    /// charge, ou null quand le jeu n'en demande pas. Le lanceur laisse ce fichier en place (vu au banc le 27/10) ; il ne
+    /// sait pas, lui, donner une meme manette a deux joueurs (il change un index en double).
+    /// - Deux sticks (<see cref="MultiplayerGame.TwinStick"/>) : FBNeo lit le second stick sur le stick droit du port.
+    ///   Les manettes deviennent analogiques (« Classic » de FBNeo) : sinon le netplay ne transmet que les boutons. Les
+    ///   boutons de facade font aussi le second stick, pour une manette qui n'en a qu'un (haut, bas, gauche, droite du
+    ///   losange), et L3 et R3 se taisent (« Service » sur System 32 : un clic du stick droit ouvrirait le menu de service).
+    /// - Deux vrais sticks arcade (<paramref name="deuxSticksArcade"/>) : le second va au port du premier, sa croix en stick
+    ///   droit, ses boutons muets ; c'est la borne d'origine. Le netplay lit la manette locale par le port qu'elle sert.
+    /// - Puis les cles propres a la place (<see cref="MultiplayerGame.SeatRemap"/>).
+    /// </summary>
+    public static IReadOnlyDictionary<string, string>? Remappage(MultiplayerGame jeu, int place, int joueurs, bool deuxSticksArcade)
+    {
+        var propres = jeu.SeatRemap?.Where(r => r.Seat == place).SelectMany(r => r.Keys).ToList() ?? [];
+        if (!jeu.TwinStick && propres.Count == 0)
+        {
+            return null;
+        }
+
+        var cles = new SortedDictionary<string, string>(StringComparer.Ordinal);
+        if (jeu.TwinStick)
+        {
+            for (var port = 1; port <= Math.Max(2, joueurs); port++)
+            {
+                cles["input_libretro_device_p" + port] = "5";
+            }
+
+            cles["input_remap_port_p1"] = "0";
+            cles["input_player1_analog_dpad_mode"] = "1";
+            foreach (var (bouton, axe) in BoutonsEnStickDroit)
+            {
+                cles["input_player1_btn_" + bouton] = axe;
+            }
+
+            cles["input_player1_btn_l3"] = Muet;
+            cles["input_player1_btn_r3"] = Muet;
+            if (deuxSticksArcade)
+            {
+                cles["input_remap_port_p2"] = "0";
+                cles["input_player2_analog_dpad_mode"] = "0";
+                foreach (var bouton in BoutonsDuRetroPad)
+                {
+                    cles["input_player2_btn_" + bouton] = Muet;
+                }
+
+                foreach (var (direction, axe) in CroixEnStickDroit)
+                {
+                    cles["input_player2_btn_" + direction] = axe;
+                }
+            }
+        }
+
+        foreach (var (cle, valeur) in propres)
+        {
+            cles[cle] = valeur;
+        }
+
+        return cles;
+    }
+
+    /// <summary>
+    /// Deux vrais sticks arcade : les manettes des joueurs 1 et 2 n'ont chacune qu'un stick (moins de 4 axes). Une manette
+    /// de salon en a 6 ; le vJoy d'une borne, 8. Un panel qui se presente comme deux manettes Xbox ne se reconnait pas : il
+    /// joue alors en stick et boutons, comme une manette a un stick.
+    /// </summary>
+    public static bool DeuxSticksArcade(string manettes)
+    {
+        int? Axes(int joueur)
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(manettes ?? string.Empty, $"-p{joueur}nbaxes\\s+(\\d+)");
+            return m.Success ? int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture) : null;
+        }
+
+        return Axes(1) is < 4 && Axes(2) is < 4;
+    }
+
+    /// <summary>Le remappage de jeu que RetroArch cherche : config/remaps/&lt;nom du coeur&gt;/&lt;nom du jeu&gt;.rmp.</summary>
+    public static string? CheminDuRemappage(string racineRetroArch, string coeur, string rom)
+    {
+        var info = Path.Combine(racineRetroArch, "info", coeur + "_libretro.info");
+        var nom = File.Exists(info) ? RetroArchConfigEdit.Lire(info, "corename") : null;
+        return nom is { Length: > 0 } && nom.IndexOfAny(Path.GetInvalidFileNameChars()) < 0
+            ? Path.Combine(racineRetroArch, "config", "remaps", nom, Path.GetFileNameWithoutExtension(rom) + ".rmp")
+            : null;
+    }
+
+    /// <summary>Un bouton qui ne fait rien (le remappage de RetroArch ecrit -1).</summary>
+    private const string Muet = "-1";
+
+    /// <summary>Les boutons de facade en stick droit, en losange : X en haut, B en bas, Y a gauche, A a droite (RetroArch : 23 haut, 22 bas, 21 gauche, 20 droite).</summary>
+    private static readonly (string Bouton, string Axe)[] BoutonsEnStickDroit = [("x", "23"), ("b", "22"), ("y", "21"), ("a", "20")];
+
+    private static readonly (string Direction, string Axe)[] CroixEnStickDroit = [("up", "23"), ("down", "22"), ("left", "21"), ("right", "20")];
+
+    private static readonly string[] BoutonsDuRetroPad = ["b", "y", "select", "start", "a", "x", "l", "r", "l2", "r2", "l3", "r3"];
+
+    /// <summary>Les ports que la borne demande au netplay (<see cref="MultiplayerGame.SeatPorts"/>).</summary>
     public static IReadOnlyDictionary<string, string> Place(IReadOnlyCollection<int> ports)
     {
         var reglages = new Dictionary<string, string>(StringComparer.Ordinal);

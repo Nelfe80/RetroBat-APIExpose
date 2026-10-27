@@ -760,7 +760,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         IReadOnlyDictionary<int, int> retenues = premier.Distinct ? premier.Departager(voulues) : voulues.ToDictionary(v => v.Place, v => v.Valeur);
         foreach (var (place, valeur) in retenues)
         {
-            var valeurDuChoix = premier.Values.FirstOrDefault(x => x.Value == valeur);
+            var valeurDuChoix = premier.ValeursDe(place).FirstOrDefault(x => x.Value == valeur);
             var image = valeurDuChoix?.CheminDeLImage(MultiplayerStatsProfil.DossierDuCatalogue);
             resultat[place] = (valeurDuChoix?.Name ?? string.Empty, image is not null && File.Exists(image) ? image : null);
         }
@@ -829,6 +829,23 @@ public sealed class MultiplayerLaunchService : IHostedService
             [OptionsDesCoeurs] = optionsAvant,
             [ConfigRetroArch] = RetroArchConfigEdit.Poser(ConfigRetroArch, reglagesDeLaPlace),
         };
+        // LE REMAPPAGE DE LA PARTIE (Title Fight, 27/10) : tout le fichier du jeu, rendu tel quel apres la partie.
+        var deuxSticksArcade = MultiplayerLaunchPlan.DeuxSticksArcade(manettes);
+        if (MultiplayerLaunchPlan.Remappage(jeu.Game, lancement.Seat, joueurs, deuxSticksArcade) is { } remappage
+            && MultiplayerLaunchPlan.CheminDuRemappage(RacineRetroArch, coeur, jeu.Path) is { } cheminDuRemappage)
+        {
+            try
+            {
+                aRendre[cheminDuRemappage] = RetroArchConfigEdit.Remplacer(cheminDuRemappage, remappage);
+                _journal.LogInformation("MULTIPLAYER : remappage de {Jeu} pose pour la place {Place} ({Sticks})", jeu.Game.Id, lancement.Seat,
+                    deuxSticksArcade ? "deux sticks arcade" : "une manette, deux sticks ou boutons");
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                _journal.LogWarning(ex, "MULTIPLAYER : remappage de {Jeu} non pose", jeu.Game.Id);
+            }
+        }
+
         RetroArchConfigEdit.Noter(Journal, aRendre);
         if (vue is not null)
         {

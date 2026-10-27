@@ -636,6 +636,25 @@ public class MultiplayerDepartPretTests : IDisposable
         Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Level = MultiplayerLevels.Classique, Start = null, Choices = null }));
     }
 
+    [Fact]
+    public void Chaque_cote_de_Title_Fight_voit_ses_boxeurs_aux_memes_nombres()
+    {
+        var (jeu, _) = Sf2ce();
+        var choix = jeu.Choices![0];
+        IReadOnlyList<MultiplayerChoiceValue> rouges = [new() { Value = 0, Name = "MAXIMUM SCHMIDT" }, new() { Value = 4, Name = "GEORGE" }, new() { Value = 5, Name = "PINKY" }];
+        var deuxListes = jeu with { Choices = [choix with { Seats = [choix.Seats[0], choix.Seats[1] with { Values = rouges }] }] };
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(deuxListes));
+        var parCote = deuxListes.Choices![0];
+        Assert.Equal("RYU", parCote.ValeursDe(1)[0].Name);
+        Assert.Equal("MAXIMUM SCHMIDT", parCote.ValeursDe(2)[0].Name);
+        Assert.Equal("RYU", parCote.ValeursDe(null)[0].Name);
+
+        // D'autres nombres que ceux du choix : la plateforme refuserait la valeur, l'hote ecrirait n'importe quoi.
+        IReadOnlyList<MultiplayerChoiceValue> autres = [new() { Value = 0, Name = "A" }, new() { Value = 1, Name = "B" }, new() { Value = 5, Name = "C" }];
+        var faux = jeu with { Choices = [choix with { Seats = [choix.Seats[0], choix.Seats[1] with { Values = autres }] }] };
+        Assert.Equal("choix « character » : valeurs de la place 2 differentes de celles du choix", MultiplayerCatalogueStore.ValiderLeDepart(faux));
+    }
+
     private static readonly MultiplayerEnd Manches = new()
     {
         FirstTo = 2, CloseAfterS = 5,

@@ -353,6 +353,9 @@ public class MultiplayerCollectionSyncTests : IDisposable
     [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":2,\"seat_ports\":[[1,3],[3,4]]}]}", "ports par place")]
     [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":2,\"seat_ports\":[[1,3]]}]}", "ports par place")]
     [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":2,\"seat_ports\":[[1,9],[2]]}]}", "ports par place")]
+    [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":2,\"seat_remap\":[{\"seat\":2,\"keys\":{\"video_driver\":\"gl\"}}]}]}", "remappage par place")]
+    [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":2,\"seat_remap\":[{\"seat\":3,\"keys\":{\"input_player1_btn_start\":\"-1\"}}]}]}", "remappage par place")]
+    [InlineData("{\"schema_version\":1,\"games\":[{\"id\":\"a\",\"system\":\"arcade\",\"set\":\"a\",\"players\":2,\"seat_remap\":[{\"seat\":2,\"keys\":{\"input_player1_btn_start\":\"joue\"}}]}]}", "remappage par place")]
     public void Un_catalogue_douteux_est_refuse(string json, string raison)
     {
         var catalogue = JsonSerializer.Deserialize<MultiplayerCatalogue>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
