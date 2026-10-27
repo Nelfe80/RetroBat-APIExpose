@@ -257,6 +257,8 @@ public class MultiplayerBancTests
                     // Chaque curseur dans TOUTES les consoles (24/10) : ecrit dans la seule console du joueur, les autres
                     // gardaient une vieille copie et dessinaient ce joueur avec un autre pilote en course.
                     Key = "character", Default = 4, Memory = MultiplayerChoice.CarteDuCoeur, AllConsoles = true,
+                    // NELFEPLAY_BANC_TENU=1 : le pilote tenu par la table de verrous du coeur (27/10).
+                    Lock = Environment.GetEnvironmentVariable("NELFEPLAY_BANC_TENU") == "1",
                     Values = [.. Enumerable.Range(0, 9).Select(v => new MultiplayerChoiceValue { Value = v, Name = "P" + v })],
                     Seats =
                     [
@@ -270,7 +272,7 @@ public class MultiplayerBancTests
             Rotation = new MultiplayerRotation
             {
                 Key = "cup", Memory = MultiplayerChoice.CarteDuCoeur, CoreRam = "0x0300001E", LockCoreRam = "0x0202AB38", AllConsoles = true,
-                Values = [.. Enumerable.Range(0, 5).Select(v => new MultiplayerChoiceValue { Value = (v + 2) % 5, Name = "C" + v })],
+                Values = [.. Enumerable.Range(0, 4).Select(v => new MultiplayerChoiceValue { Value = (v + 2) % 4, Name = "C" + v })],
             },
         };
 
@@ -309,7 +311,7 @@ public class MultiplayerBancTests
             [
                 new MultiplayerChoice
                 {
-                    Key = "machine", Default = 0, Memory = MultiplayerChoice.CarteDuCoeur, AllConsoles = true,
+                    Key = "machine", Default = 0, Memory = MultiplayerChoice.CarteDuCoeur, AllConsoles = true, Lock = Environment.GetEnvironmentVariable("NELFEPLAY_BANC_TENU") == "1",
                     Values = [.. Enumerable.Range(0, 4).Select(v => new MultiplayerChoiceValue { Value = v, Name = "M" + v })],
                     Seats =
                     [

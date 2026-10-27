@@ -422,6 +422,15 @@ public sealed record MultiplayerChoice
     public bool Distinct { get; init; }
 
     /// <summary>
+    /// TENU TOUTE LA PARTIE (27/10, Mario Kart : les joueurs changeaient de pilote par rapport au panneau) : avec
+    /// <c>core_map</c>, la valeur de chaque place entre aussi dans la table de verrous du coeur mGBA Splitscreen de NelfePlay
+    /// (<see cref="MultiplayerRotation.TableDesVerrous"/>), dans chaque console avec <see cref="AllConsoles"/> : le curseur ne
+    /// bouge plus. Apres le roulement, et seulement si tout tient dans la table ; sinon le choix n'est que preselectionne.
+    /// </summary>
+    [JsonPropertyName("lock")]
+    public bool Lock { get; init; }
+
+    /// <summary>
     /// LES ADRESSES DE LA CARTE DU COEUR (GBA, 23/10) : avec <c>core_map</c>, chaque <c>core_ram</c> est une adresse de la
     /// carte memoire que le coeur declare (READ_CORE_MEMORY / WRITE_CORE_MEMORY), pas un decalage dans sa memoire systeme
     /// (READ_CORE_RAM). mGBA Splitscreen y range chaque console : la console 1 aux adresses de la GBA (EWRAM 0x02000000),
@@ -1257,6 +1266,12 @@ public sealed class MultiplayerCatalogueStore
             if (choix.AllConsoles && !choix.ParLaCarteDuCoeur)
             {
                 return "choix « " + choix.Key + " » : toutes les consoles sans la carte du coeur";
+            }
+
+            // Seul le coeur mGBA Splitscreen de NelfePlay a une table de verrous, dans sa carte.
+            if (choix.Lock && !choix.ParLaCarteDuCoeur)
+            {
+                return "choix « " + choix.Key + " » : tenu sans la carte du coeur";
             }
         }
 

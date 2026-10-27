@@ -435,6 +435,43 @@ public class MultiplayerDepartPretTests : IDisposable
     }
 
     [Fact]
+    public void Un_choix_tenu_entre_dans_la_table_de_verrous_apres_la_coupe_dans_chaque_console()
+    {
+        // Mario Kart a deux : la coupe tenue dans les deux consoles (entrees 0 et 1), puis chaque pilote dans chaque console.
+        var coupe = CoupeMarioKart with { LockCoreRam = "0x0202AB38" };
+        var jeu = QuatreConsoles with { Choices = [BolideFZero with { Lock = true }], Rotation = coupe };
+        var instant = new DateTimeOffset(2026, 10, 24, 14, 30, 0, TimeSpan.Zero);
+        var valeurDeLaCoupe = coupe.A(instant)!.Value.Valeur.Value;
+        var ecritures = MultiplayerDepartPret.EcrituresParCommande(jeu, Bolides(3, 1), maintenant: instant);
+        var table = ecritures.Where(e => e.Decalage >= MultiplayerRotation.TableDesVerrous).ToList();
+        Assert.Equal(6 * 8, table.Count);
+        int[] Entree(int k) => table.Skip(k * 8).Take(8).Select(e => e.Valeur).ToArray();
+        Assert.Equal([0x38, 0xAB, 0x02, 0x02, valeurDeLaCoupe, 1, 0, 0], Entree(0));
+        Assert.Equal([0x38, 0xAB, 0x02, 0x12, valeurDeLaCoupe, 1, 0, 0], Entree(1));
+        Assert.Equal([0xA4, 0x31, 0x00, 0x03, 3, 1, 0, 0], Entree(2));
+        Assert.Equal([0xA4, 0x31, 0x00, 0x13, 3, 1, 0, 0], Entree(3));
+        Assert.Equal([0xAC, 0x31, 0x00, 0x03, 1, 1, 0, 0], Entree(4));
+        Assert.Equal([0xAC, 0x31, 0x00, 0x13, 1, 1, 0, 0], Entree(5));
+        // La valeur s'ecrit aussi une fois, comme avant.
+        Assert.Contains((0x030031A4L, 3, true), ecritures);
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(jeu));
+
+        // A quatre, la coupe prend 4 entrees et les pilotes 16 : aucun pilote n'est tenu, la coupe l'est toujours.
+        var quatre = MultiplayerDepartPret.EcrituresParCommande(jeu, Bolides(3, 1, 0, 2), maintenant: instant);
+        Assert.Equal(4 * 8, quatre.Count(e => e.Decalage >= MultiplayerRotation.TableDesVerrous));
+        // Sans roulement, les 16 entrees suffisent aux quatre pilotes dans les quatre consoles.
+        var sansCoupe = MultiplayerDepartPret.EcrituresParCommande(jeu with { Rotation = null }, Bolides(3, 1, 0, 2), maintenant: instant);
+        Assert.Equal(16 * 8, sansCoupe.Count(e => e.Decalage >= MultiplayerRotation.TableDesVerrous));
+    }
+
+    [Fact]
+    public void Un_choix_tenu_sans_la_carte_du_coeur_refuse_le_jeu()
+    {
+        var jeu = QuatreConsoles with { Choices = [BolideFZero with { Lock = true, Memory = null, AllConsoles = false }] };
+        Assert.Equal("choix « machine » : tenu sans la carte du coeur", MultiplayerCatalogueStore.ValiderLeDepart(jeu));
+    }
+
+    [Fact]
     public void Le_panneau_annonce_la_coupe_et_l_heure_de_la_suivante()
     {
         var jeu = QuatreConsoles with { Rotation = CoupeMarioKart };

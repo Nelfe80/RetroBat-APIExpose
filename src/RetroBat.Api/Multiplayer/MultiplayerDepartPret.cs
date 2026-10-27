@@ -204,6 +204,9 @@ public sealed class MultiplayerDepartPret
         var ecritures = new List<(long, int, bool)>();
         // Une console par joueur de la partie (mGBA Splitscreen) : c'est aussi le nombre de joueurs des adresses par nombre.
         var joueurs = choixParPlace.Count;
+        // Les octets que le coeur tient toute la partie (adresse de la carte, valeur), dans l'ordre de sa table de verrous.
+        var verrous = new List<(uint Cible, int Valeur)>();
+        var choixTenus = new List<(uint Cible, int Valeur)>();
         foreach (var choix in jeu.Choices ?? [])
         {
             // Un choix distinct deja pris par une place d'avant passe a la suivante libre (Metal Slug 3).
@@ -221,12 +224,16 @@ public sealed class MultiplayerDepartPret
                 for (var console = 0; console < consoles; console++)
                 {
                     ecritures.Add((adresse + console * 0x10000000L, valeur, choix.ParLaCarteDuCoeur));
+                    if (choix.Lock && choix.ParLaCarteDuCoeur)
+                    {
+                        choixTenus.Add(((uint) (adresse + console * 0x10000000L), valeur));
+                    }
                 }
             }
         }
 
         // Le roulement (la coupe) : la valeur de l'heure, ecrite une fois et/ou tenue par le coeur, dans chaque console
-        // avec all_consoles. Un verrou : une entree de la table du coeur (adresse sur 4 octets, valeur, actif).
+        // avec all_consoles.
         if (jeu.Rotation is { } roulement && roulement.A(maintenant ?? DateTimeOffset.UtcNow) is { } enCours)
         {
             var consoles = roulement.AllConsoles && roulement.ParLaCarteDuCoeur ? joueurs : 1;
@@ -242,13 +249,26 @@ public sealed class MultiplayerDepartPret
             {
                 for (var console = 0; console < consoles; console++)
                 {
-                    var cible = (uint) (tenue + console * 0x10000000L);
-                    var entree = MultiplayerRotation.TableDesVerrous + console * 8L;
-                    int[] octets = [(int) (cible & 0xFF), (int) ((cible >> 8) & 0xFF), (int) ((cible >> 16) & 0xFF), (int) (cible >> 24),
-                        enCours.Valeur.Value, 1, 0, 0];
-                    ecritures.AddRange(octets.Select((octet, i) => (entree + i, octet, true)));
+                    verrous.Add(((uint) (tenue + console * 0x10000000L), enCours.Valeur.Value));
                 }
             }
+        }
+
+        // LES CHOIX TENUS (27/10, Mario Kart : les joueurs changeaient de pilote par rapport au panneau) : apres le roulement,
+        // tous ou aucun. Un joueur tenu et l'autre libre fausserait la rencontre ; sans la place (16 entrees : quatre joueurs
+        // dans quatre consoles plus la coupe), le choix reste preselectionne, comme avant.
+        if (verrous.Count + choixTenus.Count <= MultiplayerRotation.VerrousMax)
+        {
+            verrous.AddRange(choixTenus);
+        }
+
+        // Un verrou : une entree de la table du coeur (adresse sur 4 octets, valeur, actif).
+        for (var k = 0; k < verrous.Count; k++)
+        {
+            var (cible, valeur) = verrous[k];
+            var entree = MultiplayerRotation.TableDesVerrous + k * 8L;
+            int[] octets = [(int) (cible & 0xFF), (int) ((cible >> 8) & 0xFF), (int) ((cible >> 16) & 0xFF), (int) (cible >> 24), valeur, 1, 0, 0];
+            ecritures.AddRange(octets.Select((octet, i) => (entree + i, octet, true)));
         }
 
         // Le pseudo de chaque joueur, un octet par caractere : la table de chaque console, puis le nom de sa propre console.
