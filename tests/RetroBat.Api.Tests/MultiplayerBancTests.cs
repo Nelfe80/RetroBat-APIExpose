@@ -192,11 +192,14 @@ public class MultiplayerBancTests
         }
     }
 
-    /// <summary>La manette reseau d'une place (port 55400 + place - 1) : un bouton tenu se renvoie toutes les 18 ms.</summary>
-    private sealed class ManetteReseau(int place) : IDisposable
+    /// <summary>
+    /// La manette reseau d'une place (port 55400 + place - 1, ou NELFEPLAY_BANC_MANETTE_PORT + place - 1 : l'enregistreur
+    /// de replays d'une API en marche tient deja 55400) : un bouton tenu se renvoie toutes les 18 ms.
+    /// </summary>
+    internal sealed class ManetteReseau(int place) : IDisposable
     {
         private readonly System.Net.Sockets.UdpClient _udp = new();
-        private readonly int _port = 55400 + place - 1;
+        private readonly int _port = (int.TryParse(Environment.GetEnvironmentVariable("NELFEPLAY_BANC_MANETTE_PORT"), out var base_) ? base_ : 55400) + place - 1;
 
         public async Task TenirAsync(int bouton, TimeSpan duree)
         {
