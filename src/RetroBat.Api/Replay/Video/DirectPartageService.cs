@@ -65,6 +65,8 @@ public sealed class DirectPartageService : IHostedService
         // LE RELAIS (2026-10-18) : la cle de la partie, pour que le site distingue deux parties de la borne (l'ancienne
         // finit sa fin de passage pendant que la nouvelle se presente pour reprendre le meme direct).
         public readonly string Cle = Guid.NewGuid().ToString("N");
+        // LE DIRECT D'UNE PARTIE MULTIPLAYER (27/10) : la gameroom que cette borne heberge, ses joueurs sur la bande.
+        public RetroBat.Api.Multiplayer.MultiplayerPartieDeLHote? Multi;
     }
 
     private Partie? _enCours;
@@ -186,6 +188,29 @@ public sealed class DirectPartageService : IHostedService
     internal static bool RecordBattu(long meilleurScore, long? record, bool nonCertifiable, bool alert)
         => !nonCertifiable && !alert && record is long r && r > 0 && meilleurScore > r;
 
+    /// <summary>La regle d'un direct MULTIPLAYER : la bande dit « MULTIPLAYER », le site la reconnait.</summary>
+    internal const string RegleMultiplayer = "multiplayer";
+
+    /// <summary>
+    /// Le jeu d'un direct MULTIPLAYER pour le site : « mp. » puis l'identifiant du catalogue (arcade/sf2ce donne
+    /// mp.arcade.sf2ce), jamais confondu avec un classement de score. Pur.
+    /// </summary>
+    internal static string RomGroupMultiplayer(string jeu)
+        => "mp." + jeu.Trim().ToLowerInvariant().Replace('/', '.');
+
+    /// <summary>
+    /// Les deux cotes de la bande d'une partie MULTIPLAYER, comme les panneaux de la borne : le joueur 1 (et le 3) a
+    /// gauche, le joueur 2 (et le 4) a droite, chacun avec sa lettre quand le jeu est classe. Pur.
+    /// </summary>
+    internal static (string Gauche, string Droite) CotesDeLaBande(IEnumerable<RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect> places)
+    {
+        static string Joueur(RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect j)
+            => j.Pseudo.Trim() + (string.IsNullOrWhiteSpace(j.Letter) ? "" : " · " + j.Letter.Trim());
+        var assis = places.Where(j => !string.IsNullOrWhiteSpace(j.Pseudo)).OrderBy(j => j.Seat).ToList();
+        return (string.Join(" & ", assis.Where(j => j.Seat % 2 == 1).Select(Joueur)),
+            string.Join(" & ", assis.Where(j => j.Seat % 2 == 0).Select(Joueur)));
+    }
+
     /// <summary>Le record a battre, sur la bande : « RECORD 523 400 · player ». Vide sans record. Pur.</summary>
     internal static string TexteDuRecord(long? valeur, string? joueur)
         => valeur is long v && v > 0
@@ -206,6 +231,17 @@ public sealed class DirectPartageService : IHostedService
                         _enCours = partie;
                     }
                     _ = Task.Run(() => DeroulerAsync(partie));
+                    break;
+                case RetroBat.Api.Multiplayer.MultiplayerLaunchService.EvenementPartieDeLHote:
+                    if (PartieMultiplayer(e.Payload) is not { } mp) return;
+                    var duel = new Partie { Multi = mp };
+                    lock (_verrou)
+                    {
+                        // La partie que ui.game.started venait d'ouvrir est celle-ci : elle laisse la place.
+                        if (_enCours is not null) _enCours.Finie = true;
+                        _enCours = duel;
+                    }
+                    _ = Task.Run(() => DeroulerLaPartieMultiplayerAsync(duel, mp));
                     break;
                 case "score.live.changed":
                     if (Nombre(e.Payload, "Score") is not { } score || (Nombre(e.Payload, "Player") ?? 1) != 1) return;
@@ -281,6 +317,48 @@ public sealed class DirectPartageService : IHostedService
     }
 
     /// <summary>
+    /// UNE PARTIE MULTIPLAYER (demande du user, 27/10) : la borne qui heberge la gameroom voit toute la partie, la filme
+    /// (ReplayCaptureService) et se porte candidate. Le site verifie qu'elle heberge bien cette gameroom en cours ; la
+    /// bande montre les joueurs de chaque cote, sans record a battre.
+    /// </summary>
+    private async Task DeroulerLaPartieMultiplayerAsync(Partie p, RetroBat.Api.Multiplayer.MultiplayerPartieDeLHote mp)
+    {
+        try
+        {
+            if (LanceurDuDirect.Chemin(AppContext.BaseDirectory) is null)
+            {
+                _journal.LogInformation("Direct partage : l'exe du direct manque, la borne ne se porte pas candidate.");
+                return;
+            }
+            var (gauche, droite) = CotesDeLaBande(mp.Players);
+            p.BandeJoueur = gauche;
+            p.RecordTexte = droite;
+            _journal.LogInformation("Direct partage : partie MULTIPLAYER {Jeu} ({Room}), la borne se porte candidate.", mp.Game, mp.Room);
+            await PasserAsync(p, RomGroupMultiplayer(mp.Game), RegleMultiplayer, mp.System.Trim().ToLowerInvariant(), aModes: false)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _journal.LogInformation("Direct partage : passage MULTIPLAYER interrompu ({Type} : {Message}).", ex.GetType().Name, ex.Message);
+        }
+    }
+
+    /// <summary>La partie MULTIPLAYER annoncee par le lancement (l'objet lui-meme sur le bus, ou sa forme JSON).</summary>
+    internal static RetroBat.Api.Multiplayer.MultiplayerPartieDeLHote? PartieMultiplayer(object? payload)
+    {
+        try
+        {
+            var mp = payload as RetroBat.Api.Multiplayer.MultiplayerPartieDeLHote
+                ?? (payload is JsonElement j ? j.Deserialize<RetroBat.Api.Multiplayer.MultiplayerPartieDeLHote>() : null);
+            return mp is { Room.Length: > 0, Game.Length: > 0 } ? mp : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
     /// Le record du classement <paramref name="regle"/>, pour la bande et les applaudissements. Rien sans classement ni
     /// quand le mode joue est inconnu (null) : la bande dit alors nelfeplay.com.
     /// </summary>
@@ -351,6 +429,8 @@ public sealed class DirectPartageService : IHostedService
                     // Le film de la partie tourne : elle peut reprendre tout de suite le direct de la precedente.
                     ["film"] = _capture.FilmEnCours() is not null,
                 };
+                // Le site verifie que cette borne heberge la gameroom, et que la partie s'y joue encore.
+                if (p.Multi is { } mp) demande["multiplayer_room"] = mp.Room;
                 var r = await _site.SonderLePartageAsync(demande, CancellationToken.None).ConfigureAwait(false);
                 var role = (string?)r?["role"];
                 var attente = TimeSpan.FromSeconds(Math.Clamp((int?)r?["poll_after"] ?? 10, 3, 60));
@@ -381,7 +461,9 @@ public sealed class DirectPartageService : IHostedService
                     var suivante = r!["next"] as JsonObject;
                     bool nouvellePartie;
                     lock (_verrou) nouvellePartie = _enCours is not null && _enCours != p;
-                    var relance = EstUneRelance(DateTime.UtcNow - p.Debut, (string?)suivante?["player"], p.BandeJoueur, nouvellePartie, p.Alert);
+                    // Une rencontre courte n'est pas une partie ratee : jamais « try again » en MULTIPLAYER.
+                    var relance = p.Multi is null
+                        && EstUneRelance(DateTime.UtcNow - p.Debut, (string?)suivante?["player"], p.BandeJoueur, nouvellePartie, p.Alert);
                     var recordBattu = RecordBattu(Interlocked.Read(ref p.MeilleurScore), p.Record, p.NonCertifiable, p.Alert);
                     // Le classement mis a jour, que l'exe montre apres le nouveau champion : ecrit avant la commande qui
                     // ouvre la fin de passage.
@@ -458,8 +540,9 @@ public sealed class DirectPartageService : IHostedService
         }
         var relais = (bool?)r["relay"] == true;
         var banniere = r["banner"] as JsonObject;
-        p.BandeJoueur = (string?)banniere?["player"] ?? _agent.Status.Pseudo;
-        p.BandeJeu = (string?)banniere?["game"];
+        // En MULTIPLAYER, la bande garde les joueurs de chaque cote (le site dit « A vs B », trop long a gauche).
+        if (p.Multi is null) p.BandeJoueur = (string?)banniere?["player"] ?? _agent.Status.Pseudo;
+        p.BandeJeu = (string?)banniere?["game"] ?? p.Multi?.Name;
         p.BandeSysteme = (string?)banniere?["system"];
         p.BandeRegleParDefaut = regleParDefaut;
         var transition = (r["clips"] as JsonObject)?["transition"] as JsonObject;

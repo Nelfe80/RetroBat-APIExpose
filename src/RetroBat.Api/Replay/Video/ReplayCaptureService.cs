@@ -308,6 +308,17 @@ public sealed class ReplayCaptureService : BackgroundService
     /// <summary>Le prefixe des films sans replay : le site les reconnait et les relie par les sessions des scores.</summary>
     internal const string PrefixeSansReplay = "fm_";
 
+    /// <summary>
+    /// Le prefixe du film d'une partie MULTIPLAYER (27/10) : il ne sert qu'au direct partage, la borne l'efface apres la
+    /// fin de passage.
+    /// </summary>
+    internal const string PrefixeMultiplayer = "mp_";
+
+    /// <summary>Le film MULTIPLAYER reste le temps que l'exe du direct joue sa fin de passage (deux minutes au plus).</summary>
+    private static readonly TimeSpan GardeDuFilmMultiplayer = TimeSpan.FromMinutes(5);
+
+    internal static bool EstUnFilmMultiplayer(string replayId) => replayId.StartsWith(PrefixeMultiplayer, StringComparison.Ordinal);
+
     /// <summary>Les verdicts arrives juste apres un film sans replay sont les siens (la partie vient de finir).</summary>
     private static readonly TimeSpan SessionsTardivesPendant = TimeSpan.FromMinutes(10);
 
@@ -401,6 +412,10 @@ public sealed class ReplayCaptureService : BackgroundService
                 case "replay.recording.skipped":
                     _ = Task.Run(() => DemarrerAsync(PrefixeSansReplay + Ulid.New(), sansReplay: true));
                     break;
+                // La borne qui heberge une partie MULTIPLAYER la filme pour le direct (aucun replay : pas de score).
+                case RetroBat.Api.Multiplayer.MultiplayerLaunchService.EvenementPartieDeLHote:
+                    _ = Task.Run(FilmerLaPartieMultiplayerAsync);
+                    break;
                 case "score.live.changed":
                     // La courbe du score du joueur 1, pour la sequence du record.
                     if (_enCours is { } filme && Entier(e.Payload, "Score") is { } valeur && (Entier(e.Payload, "Player") ?? 1) == 1)
@@ -410,7 +425,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 case "scoring.replay.stop":
                     if (e.Type == "scoring.run.ended" && _enCours is { } finDuRun)
                         finDuRun.FinDuRunS ??= Math.Round(finDuRun.Chrono.Elapsed.TotalSeconds, 2);
-                    if (_enCours is { SansReplay: true } sansReplay)
+                    if (_enCours is { SansReplay: true } sansReplay && !EstUnFilmMultiplayer(sansReplay.ReplayId))
                         _ = Task.Run(() => ArreterAsync(sansReplay.ReplayId, null, abandon: false,
                             e.Type == "scoring.run.ended" ? "fin de la partie certifiee" : "le score a baisse"));
                     break;
@@ -525,6 +540,30 @@ public sealed class ReplayCaptureService : BackgroundService
     }
 
     /// <summary>
+    /// L'emulateur de la partie MULTIPLAYER vient de paraitre : le film part quand le jeu est charge (un RECORDING_TOGGLE
+    /// envoye pendant le chargement se perd). Sans GET_STATUS sur ce coeur (GardeGetStatus), il part apres quelques
+    /// secondes.
+    /// </summary>
+    private async Task FilmerLaPartieMultiplayerAsync()
+    {
+        try
+        {
+            for (var i = 0; i < 40; i++)
+            {
+                await Task.Delay(750, _arret).ConfigureAwait(false);
+                if (!GardeGetStatus.SansDanger())
+                {
+                    if (i >= 6) break;
+                    continue;
+                }
+                if ((await _ra.GetStatusAsync(_arret).ConfigureAwait(false))?.ContentLoaded == true) break;
+            }
+            await DemarrerAsync(PrefixeMultiplayer + Ulid.New(), sansReplay: true).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) { /* arret de l'API */ }
+    }
+
+    /// <summary>
     /// Arrete la capture en cours : RetroArch ferme le film, la borne le range (ou l'efface s'il est
     /// <paramref name="abandon"/>ne). <paramref name="replayId"/> null : quelle que soit la capture.
     /// </summary>
@@ -541,7 +580,7 @@ public sealed class ReplayCaptureService : BackgroundService
             {
                 _enCours = null;
                 // Le verdict du 1CC arrive juste apres la fin de la partie : il est encore a ce film.
-                if (c.SansReplay && !abandon) _dernierSansReplay = (c.ReplayId, DateTime.UtcNow);
+                if (c.SansReplay && !abandon && !EstUnFilmMultiplayer(c.ReplayId)) _dernierSansReplay = (c.ReplayId, DateTime.UtcNow);
             }
 
             // Un film qui ne grossit plus est deja ferme (RetroArch quitte) : un RECORDING_TOGGLE en
@@ -549,6 +588,21 @@ public sealed class ReplayCaptureService : BackgroundService
             if (await GrossitAsync(c.Fichier).ConfigureAwait(false))
                 await _ra.RecordingToggleAsync(_arret).ConfigureAwait(false);
             await AttendreLaFinAsync(c.Fichier).ConfigureAwait(false);
+
+            if (EstUnFilmMultiplayer(c.ReplayId) && !abandon)
+            {
+                // Aucun site ne le demandera : il s'efface une fois la fin de passage jouee.
+                var film = c.Fichier;
+                _ = Task.Run(async () =>
+                {
+                    try { await Task.Delay(GardeDuFilmMultiplayer, _arret).ConfigureAwait(false); }
+                    catch (OperationCanceledException) { /* arret de l'API : efface tout de suite */ }
+                    Effacer(film);
+                });
+                _logger.LogInformation("Capture : partie MULTIPLAYER {ReplayId} finie, film efface dans {Minutes} min.", c.ReplayId,
+                    GardeDuFilmMultiplayer.TotalMinutes);
+                return;
+            }
 
             if (abandon)
             {

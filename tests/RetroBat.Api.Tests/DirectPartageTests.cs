@@ -172,6 +172,62 @@ public sealed class DirectPartageTests
     }
 
     [Fact]
+    public void Le_direct_multiplayer_met_le_joueur_1_a_gauche_et_le_joueur_2_a_droite()
+    {
+        var places = new[]
+        {
+            new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(2, "ANOTHERKIFF", "?", 1031),
+            new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(1, "LORENZOLAMAS", "C", 1112),
+        };
+        Assert.Equal(("LORENZOLAMAS · C", "ANOTHERKIFF · ?"), DirectPartageService.CotesDeLaBande(places));
+        // A quatre, chaque cote garde ses deux places ; un jeu sans classement n'a pas de lettre.
+        var quatre = new[]
+        {
+            new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(1, "A", null, null),
+            new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(2, "B", null, null),
+            new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(3, "C", null, null),
+            new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(4, "D", null, null),
+        };
+        Assert.Equal(("A & C", "B & D"), DirectPartageService.CotesDeLaBande(quatre));
+    }
+
+    [Fact]
+    public void Le_jeu_d_un_direct_multiplayer_ne_se_confond_pas_avec_un_classement_de_score()
+    {
+        Assert.Equal("mp.arcade.sf2ce", DirectPartageService.RomGroupMultiplayer("arcade/sf2ce"));
+        Assert.Equal("mp.gba.doom-ii", DirectPartageService.RomGroupMultiplayer(" GBA/Doom-II "));
+        Assert.Matches("^[a-z0-9][a-z0-9._-]{0,189}$", DirectPartageService.RomGroupMultiplayer("snes/smk"));
+    }
+
+    [Fact]
+    public void L_hote_annonce_sa_partie_multiplayer_avec_chaque_place()
+    {
+        var room = new RetroBat.Api.Multiplayer.MultiplayerRoom
+        {
+            Room = "r1",
+            Players =
+            [
+                new() { Handle = "ak", Pseudo = "", Seat = 2, Rating = new() { Value = 1031, Provisional = true } },
+                new() { Handle = "lorenzo", Pseudo = "LORENZOLAMAS", Seat = 1, Rating = new() { Value = 1112 } },
+                new() { Handle = "spectateur", Pseudo = "VU" },
+            ],
+        };
+        var jeu = new RetroBat.Api.Multiplayer.MultiplayerInstalledGame(
+            new RetroBat.Api.Multiplayer.MultiplayerGame { Id = "arcade/sf2ce", Name = "Street Fighter II' Champion Edition", System = "arcade" },
+            "sf2ce.zip", null, "sf2ce");
+        var partie = RetroBat.Api.Multiplayer.MultiplayerLaunchService.PartieDeLHote(room, jeu);
+        Assert.Equal(("r1", "arcade/sf2ce", "arcade"), (partie.Room, partie.Game, partie.System));
+        Assert.Equal(
+            [new(1, "LORENZOLAMAS", "C", 1112), new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(2, "ak", "?", 1031)],
+            partie.Players);
+        // Le bus passe l'objet tel quel ; sa forme JSON se relit aussi.
+        Assert.Same(partie, DirectPartageService.PartieMultiplayer(partie));
+        var json = System.Text.Json.JsonSerializer.SerializeToElement(partie);
+        Assert.Equal("r1", DirectPartageService.PartieMultiplayer(json)?.Room);
+        Assert.Null(DirectPartageService.PartieMultiplayer(new { Room = "" }));
+    }
+
+    [Fact]
     public void Les_options_du_passage_suivent_les_arguments_du_direct()
     {
         var args = LanceurDuDirect.Arguments("film.mkv", 0, options: ["--debit", "3000"]);

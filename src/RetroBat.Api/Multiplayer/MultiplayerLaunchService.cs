@@ -777,7 +777,8 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
 
         var reference = new GameReference { SystemId = systeme, GamePath = jeu.Path, GameName = jeu.Game.Name };
-        _ = Task.Run(() => AnnoncerQuandLEmulateurEstLaAsync(reference, room.Room, lanceA, sansManette: manettes.Length == 0));
+        _ = Task.Run(() => AnnoncerQuandLEmulateurEstLaAsync(reference, room.Room, lanceA, sansManette: manettes.Length == 0,
+            hote: lancement.Role == "host" ? (room, jeu) : null));
         return new Partie(lanceur, aRendre, DateTime.UtcNow, reference);
     }
 
@@ -796,7 +797,8 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// « Les joueurs se synchronisent… » pendant que RetroArch charge encore. Seul compte un emulateur demarre apres ce
     /// lancement : un RetroArch deja ouvert (un banc, le 25/10) effacait la presentation 48 s avant le vrai jeu.
     /// </summary>
-    private async Task AnnoncerQuandLEmulateurEstLaAsync(GameReference jeu, string room, DateTime lanceA, bool sansManette)
+    private async Task AnnoncerQuandLEmulateurEstLaAsync(GameReference jeu, string room, DateTime lanceA, bool sansManette,
+        (MultiplayerRoom Room, MultiplayerInstalledGame Jeu)? hote = null)
     {
         var limite = DateTime.UtcNow.AddSeconds(60);
         while (DateTime.UtcNow < limite && !EmulatorForeground.EmulateurDeJeuTourne(lanceA.AddSeconds(-1)))
@@ -813,12 +815,37 @@ public sealed class MultiplayerLaunchService : IHostedService
             Type = "ui.game.started",
             Payload = new { Source = "multiplayer", jeu.SystemId, jeu.GamePath, jeu.GameName, Direct = true },
         }).ConfigureAwait(false);
+        // LE DIRECT D'UNE PARTIE MULTIPLAYER (27/10) : l'hote voit toute la partie ; sa borne la filme et se porte candidate
+        // au direct partage, avec les joueurs de chaque place (voir DirectPartageService).
+        if (hote is { } h)
+        {
+            await _bus.PublishAsync(new EventEnvelope
+            {
+                Type = EvenementPartieDeLHote,
+                Payload = PartieDeLHote(h.Room, h.Jeu),
+            }).ConfigureAwait(false);
+        }
+
         _ = EmulatorForeground.FocusEmulatorWhenUpAsync();
         if (sansManette)
         {
             await PrevenirSansManetteAsync().ConfigureAwait(false);
         }
     }
+
+    /// <summary>La partie MULTIPLAYER de cette borne, qui l'heberge, a commence : son direct peut partir.</summary>
+    public const string EvenementPartieDeLHote = "multiplayer.host.started";
+
+    /// <summary>
+    /// Ce que le direct d'une partie MULTIPLAYER a besoin d'en savoir : la gameroom (le site verifie que cette borne
+    /// l'heberge), le jeu, et chaque place avec son joueur et sa cote. Pur.
+    /// </summary>
+    internal static MultiplayerPartieDeLHote PartieDeLHote(MultiplayerRoom room, MultiplayerInstalledGame jeu)
+        => new(room.Room, jeu.Game.Id, jeu.Game.Name, jeu.Game.System,
+            room.Players.Where(j => j.Seat is not null).OrderBy(j => j.Seat)
+                .Select(j => new MultiplayerPlaceDuDirect(j.Seat!.Value, j.Pseudo.Length > 0 ? j.Pseudo : j.Handle,
+                    j.Rating is { } c ? c.Lettre : null, j.Rating?.Value))
+                .ToList());
 
     private const string MessageSansManetteParDefaut =
         "No controller found for this game: only the keyboard responds. Plug in a controller, set it up in EmulationStation, then start the game again.";
@@ -1012,3 +1039,10 @@ public sealed class MultiplayerLaunchService : IHostedService
 
     private static string Hex(int octets) => Convert.ToHexString(RandomNumberGenerator.GetBytes(octets)).ToLowerInvariant();
 }
+
+/// <summary>La partie MULTIPLAYER que cette borne heberge, pour son direct (evenement multiplayer.host.started).</summary>
+public sealed record MultiplayerPartieDeLHote(string Room, string Game, string Name, string System,
+    IReadOnlyList<MultiplayerPlaceDuDirect> Players);
+
+/// <summary>Une place de la partie : son joueur, sa lettre et sa cote sur ce jeu (null hors classement).</summary>
+public sealed record MultiplayerPlaceDuDirect(int Seat, string Pseudo, string? Letter, double? Rating);
