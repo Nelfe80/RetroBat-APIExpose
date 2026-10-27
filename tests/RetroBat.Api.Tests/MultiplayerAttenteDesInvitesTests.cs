@@ -69,7 +69,8 @@ public class MultiplayerAttenteDesInvitesTests
     [Fact]
     public void L_hote_recoit_le_ralenti_et_lit_le_journal_que_lui_donne_le_lanceur()
     {
-        Assert.True(MultiplayerAttenteDesInvites.EnService);
+        // Hors service depuis 1.9.111 (27/10 au soir : SF2CE entre deux bornes restait au ralenti).
+        Assert.False(MultiplayerAttenteDesInvites.EnService);
         // Le lanceur passe toujours --log-file es_launch_stdout.log : un log_dir pose dans retroarch.cfg n'y changerait rien.
         Assert.Equal(new Dictionary<string, string> { ["slowmotion_ratio"] = "30.000000" }, MultiplayerAttenteDesInvites.Reglages);
         Assert.Equal(RetroBat.Domain.Paths.RetroBatPaths.EsLaunchStdoutLogPath, MultiplayerAttenteDesInvites.CheminDuJournal);

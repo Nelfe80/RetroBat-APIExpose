@@ -34,8 +34,13 @@ public sealed class MultiplayerAttenteDesInvites
 
     public MultiplayerAttenteDesInvites(ICommandesRetroArch commandes) => _commandes = commandes;
 
-    /// <summary>L'attente du depart pret, au ralenti.</summary>
-    public static bool EnService { get; } = true;
+    /// <summary>
+    /// L'attente du depart pret, au ralenti : HORS SERVICE (1.9.111, 27/10 au soir). Entre deux bornes eloignees (SF2CE,
+    /// hote en francais), le retour a la vitesse normale ne se mesurait pas : une fois l'invite arrive, RetroArch rattrape
+    /// l'ecart entre les deux jeux, ses reponses ralentissent, et la bascule repartait au ralenti ; l'invite restait en
+    /// avance, le jeu fige au ralenti. Le banc, sur une seule machine sans latence, ne le montrait pas.
+    /// </summary>
+    public static bool EnService { get; } = false;
 
     /// <summary>
     /// Le journal de RetroArch : le lanceur le lui donne a chaque lancement (<c>--log-file</c>), et un <c>log_dir</c> pose dans
