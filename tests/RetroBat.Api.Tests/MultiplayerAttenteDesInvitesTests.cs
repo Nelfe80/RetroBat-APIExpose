@@ -91,6 +91,46 @@ public class MultiplayerAttenteDesInvitesTests
     }
 
     [Fact]
+    public void L_attente_en_pause_est_hors_service()
+    {
+        // 27/10 au soir (banc_pause_relais.py) : un invite connecte pendant la pause restait fige apres la reprise.
+        Assert.False(MultiplayerAttenteDesInvites.EnService);
+    }
+
+    [Fact]
+    public async Task La_partie_se_ferme_quand_le_dernier_invite_est_parti()
+    {
+        var journal = Path.Combine(Path.GetTempPath(), "nelfe-depart-" + Guid.NewGuid().ToString("N") + ".log");
+        try
+        {
+            File.WriteAllText(journal, "[INFO] [Netplay] You have joined as player 2\n");
+            var attente = new MultiplayerAttenteDesInvites(new RetroArchSimule("PLAYING"));
+            var suivi = attente.AttendreLeDepartDesInvitesAsync(journal, TimeSpan.FromMilliseconds(50), CancellationToken.None);
+            // Personne n'est encore venu : la partie continue.
+            await Task.Delay(300);
+            Assert.False(suivi.IsCompleted);
+            File.AppendAllText(journal, "[INFO] [Netplay] a has joined as player 1 (ping: 20 ms)\n[INFO] [Netplay] b has joined as player 3 (ping: 30 ms)\n");
+            await Task.Delay(300);
+            // Un des deux s'en va : l'autre joue encore.
+            File.AppendAllText(journal, "[INFO] [Netplay] \"a\" has disconnected\n");
+            await Task.Delay(300);
+            Assert.False(suivi.IsCompleted);
+            File.AppendAllText(journal, "[INFO] [Netplay] \"b\" has disconnected\n");
+            Assert.Same(suivi, await Task.WhenAny(suivi, Task.Delay(TimeSpan.FromSeconds(5))));
+
+            // La fin de la partie arrete le suivi.
+            using var fin = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
+            File.WriteAllText(journal, "[INFO] [Netplay] a has joined as player 1 (ping: 20 ms)\n");
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => attente.AttendreLeDepartDesInvitesAsync(journal, TimeSpan.FromMilliseconds(50), fin.Token));
+        }
+        finally
+        {
+            File.Delete(journal);
+        }
+    }
+
+    [Fact]
     public async Task Une_pause_qui_dure_pendant_la_partie_est_levee()
     {
         var ra = new RetroArchSimule("PAUSED");

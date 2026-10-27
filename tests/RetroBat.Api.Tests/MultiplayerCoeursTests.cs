@@ -108,6 +108,14 @@ public class MultiplayerCoeursTests : IDisposable
     }
 
     [Fact]
+    public void Un_coeur_pas_encore_pose_se_reessaie_vite()
+    {
+        // 27/10 : fbneo_multi32 arrivait apres la premiere passe, ses jeux restaient caches 30 min.
+        Assert.Equal(TimeSpan.FromMinutes(2), MultiplayerCoeursService.ProchainePasse(toutEstPose: false));
+        Assert.Equal(TimeSpan.FromMinutes(30), MultiplayerCoeursService.ProchainePasse(toutEstPose: true));
+    }
+
+    [Fact]
     public void Un_fichier_identique_n_est_pas_recopie()
     {
         var source = Path.Combine(_racine, "source.dll");

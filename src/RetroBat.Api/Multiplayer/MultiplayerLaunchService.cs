@@ -70,6 +70,7 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// <summary>Le depart pret en pause jusqu'a l'arrivee des invites, puis garde sans pause jusqu'a la fin (27/10).</summary>
     private readonly MultiplayerAttenteDesInvites _attente;
     private CancellationTokenSource? _gardeSansPause;
+    private CancellationTokenSource? _suiviDesInvites;
     private int? _vainqueur;
 
     /// <summary>L'etat d'un depart pret pose dans l'emplacement reserve de RetroArch, retire a la fin de la partie.</summary>
@@ -221,6 +222,8 @@ public sealed class MultiplayerLaunchService : IHostedService
                 _guet = null;
                 _gardeSansPause?.Cancel();
                 _gardeSansPause = null;
+                _suiviDesInvites?.Cancel();
+                _suiviDesInvites = null;
                 vainqueur = _vainqueur;
                 _vainqueur = null;
                 suivi = _suiviDesStats;
@@ -292,9 +295,11 @@ public sealed class MultiplayerLaunchService : IHostedService
                 return;
             }
 
-            // LE DEPART ATTEND TOUT LE MONDE (27/10) : le match ne commence pas avant que les invites soient la.
-            var enPause = depart is not null && await _attente.MettreEnPauseAsync(CancellationToken.None).ConfigureAwait(false);
-            if (depart is not null)
+            // LE DEPART ATTEND TOUT LE MONDE (27/10) : le match ne commence pas avant que les invites soient la. Hors service le
+            // soir meme : un invite connecte pendant la pause restait fige (MultiplayerAttenteDesInvites.EnService).
+            var enPause = depart is not null && MultiplayerAttenteDesInvites.EnService
+                && await _attente.MettreEnPauseAsync(CancellationToken.None).ConfigureAwait(false);
+            if (depart is not null && MultiplayerAttenteDesInvites.EnService)
             {
                 _journal.LogInformation(enPause
                     ? "MULTIPLAYER : depart pret de {Jeu} en pause jusqu'a l'arrivee des invites ({Room})"
@@ -341,6 +346,11 @@ public sealed class MultiplayerLaunchService : IHostedService
                 _ = Task.Run(() => LibererLeDepartAsync(room, jeu.Game));
             }
 
+            if (reponse?.Ok == true)
+            {
+                _ = Task.Run(() => FermerQuandLesInvitesSontPartisAsync(room));
+            }
+
             // Une rencontre classee (fin lue + type versus, 23/10), quel que soit le niveau : l'hote guette sa fin.
             if (reponse?.Ok == true && jeu.Game.EstClasse)
             {
@@ -350,6 +360,39 @@ public sealed class MultiplayerLaunchService : IHostedService
         catch (Exception ex)
         {
             _journal.LogWarning(ex, "MULTIPLAYER : publication de la session de {Room} interrompue", room.Room);
+        }
+    }
+
+    /// <summary>
+    /// LES INVITES PARTIS (27/10 au soir, Title Fight puis SF2CE) : quand le dernier invite s'en va, RetroArch continue la
+    /// partie de l'hote en local, et l'hote se croyait encore en ligne. Le journal de RetroArch dit chaque arrivee et chaque
+    /// depart : plus aucun invite a sa place, la partie se ferme, comme chez l'invite quand l'hote part.
+    /// </summary>
+    private async Task FermerQuandLesInvitesSontPartisAsync(MultiplayerRoom room)
+    {
+        CancellationToken jeton;
+        lock (_verrou)
+        {
+            _suiviDesInvites?.Cancel();
+            _suiviDesInvites = new CancellationTokenSource();
+            jeton = _suiviDesInvites.Token;
+        }
+
+        try
+        {
+            await _attente.AttendreLeDepartDesInvitesAsync(MultiplayerAttenteDesInvites.CheminDuJournal, TimeSpan.FromSeconds(1), jeton)
+                .ConfigureAwait(false);
+            _journal.LogInformation("MULTIPLAYER : les invites de {Room} sont partis, la partie se ferme", room.Room);
+            await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
+            await RetroArchInvite.FermerAsync().ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            // La partie s'est finie avant.
+        }
+        catch (Exception ex)
+        {
+            _journal.LogWarning(ex, "MULTIPLAYER : suivi des invites de {Room} interrompu", room.Room);
         }
     }
 
@@ -821,7 +864,7 @@ public sealed class MultiplayerLaunchService : IHostedService
 
         // LE DEPART ATTEND TOUT LE MONDE (27/10) : l'hote d'un depart pret peut se mettre en pause ; son journal (celui du
         // lanceur) dit l'arrivee de chaque invite (MultiplayerAttenteDesInvites).
-        if (lancement.Role == "host" && DepartDeLaRoom(room, jeu) is not null)
+        if (MultiplayerAttenteDesInvites.EnService && lancement.Role == "host" && DepartDeLaRoom(room, jeu) is not null)
         {
             foreach (var (cle, valeur) in MultiplayerAttenteDesInvites.Reglages)
             {

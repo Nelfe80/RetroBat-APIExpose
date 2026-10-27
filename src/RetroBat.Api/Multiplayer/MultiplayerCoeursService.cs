@@ -58,6 +58,14 @@ public sealed class MultiplayerCoeursService : BackgroundService
     private static readonly TimeSpan PremierDelai = TimeSpan.FromSeconds(60);
     private static readonly TimeSpan Periode = TimeSpan.FromMinutes(30);
 
+    /// <summary>
+    /// Tant qu'un coeur livre n'est pas pose, la passe suivante vient vite (27/10 : fbneo_multi32, 66 Mo, arrivait apres la
+    /// premiere passe, et ses jeux restaient caches une demi-heure).
+    /// </summary>
+    private static readonly TimeSpan PeriodeEnAttente = TimeSpan.FromMinutes(2);
+
+    internal static TimeSpan ProchainePasse(bool toutEstPose) => toutEstPose ? Periode : PeriodeEnAttente;
+
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly RetroArchWrapperDeploymentService _wrapper;
     private readonly IEventBus? _bus;
@@ -105,7 +113,7 @@ public sealed class MultiplayerCoeursService : BackgroundService
             while (!stoppingToken.IsCancellationRequested)
             {
                 await VerifierAsync(stoppingToken).ConfigureAwait(false);
-                await Task.Delay(Periode, stoppingToken).ConfigureAwait(false);
+                await Task.Delay(ProchainePasse(Coeurs.All(c => EstPose(c.Nom, _options.CurrentValue))), stoppingToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)

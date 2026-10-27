@@ -20,12 +20,21 @@ namespace RetroBat.Api.Multiplayer;
 /// deconnecte (banc du 27/10).</item>
 /// <item>La pause permise, un joueur pourrait figer la partie de l'autre : apres la reprise, une pause qui dure est levee.</item>
 /// </list>
+/// HORS SERVICE (27/10 au soir, Title Fight puis SF2CE entre deux bornes) : un invite qui se connecte pendant cette pause ne
+/// joue plus une seule image apres la reprise, et l'hote le raccroche 6 s plus tard (RetroArch 1.22.2 raccroche un invite muet
+/// depuis 5 s). Banc banc_pause_relais.py : par le relais comme en connexion directe ; reprendre apres plus d'images, des
+/// l'arrivee de la connexion, ou par une pause de l'un ou de l'autre n'y change rien ; sans pause, tout marche. Le banc du
+/// matin comparait les memoires a la reprise : elles etaient egales parce que les deux jeux etaient figes. Le depart part donc
+/// sans attendre (<see cref="EnService"/>) ; ce qui suit l'arrivee et le depart des invites dans le journal reste.
 /// </summary>
 public sealed class MultiplayerAttenteDesInvites
 {
     private readonly ICommandesRetroArch _commandes;
 
     public MultiplayerAttenteDesInvites(ICommandesRetroArch commandes) => _commandes = commandes;
+
+    /// <summary>La pause d'attente du depart pret : hors service tant qu'un invite connecte pendant la pause reste fige.</summary>
+    public static bool EnService { get; } = false;
 
     /// <summary>
     /// Le journal de RetroArch : le lanceur le lui donne a chaque lancement (<c>--log-file</c>), et un <c>log_dir</c> pose dans
@@ -125,6 +134,30 @@ public sealed class MultiplayerAttenteDesInvites
 
             await _commandes.EnvoyerAsync("FRAMEADVANCE", ct).ConfigureAwait(false);
             await Task.Delay(RythmeDesImages, ct).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Rend quand le dernier invite est parti : au moins un invite a rejoint sa place dans le journal de l'hote (relu a ce
+    /// <paramref name="rythme"/>), puis plus aucun n'y est. Jusque-la, attend ; l'annulation (fin de partie) l'arrete.
+    /// </summary>
+    public async Task AttendreLeDepartDesInvitesAsync(string journal, TimeSpan rythme, CancellationToken ct)
+    {
+        var vus = false;
+        while (true)
+        {
+            ct.ThrowIfCancellationRequested();
+            var presents = InvitesALeurPlace(LireLesLignes(journal)).Count;
+            if (presents > 0)
+            {
+                vus = true;
+            }
+            else if (vus)
+            {
+                return;
+            }
+
+            await Task.Delay(rythme, ct).ConfigureAwait(false);
         }
     }
 
