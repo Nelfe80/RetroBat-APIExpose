@@ -25,6 +25,53 @@ public class MultiplayerBancFinsTests
     }
 
     /// <summary>
+    /// Yu Yu Hakusho (BATTLE ROYALE a deux) : la vie de P2 ramenee a 1 (jamais quand elle est deja a 0 : le jeu le
+    /// ressusciterait avant le K.O.), P1 avance et frappe ; au K.O., la fin du combat (0x8300) passe a 1 et la vie restante
+    /// designe P1.
+    /// </summary>
+    [Fact]
+    public async Task Yu_Yu_Hakusho_finit_au_KO_lu_par_la_vie_de_chaque_joueur()
+    {
+        const string Id = "megadrive/yu-yu-hakusho-makyou-toitsusen";
+        if (Port is null || Fin != Id)
+        {
+            return;   // banc non monte
+        }
+
+        var ra = new CommandesRetroArchUdp(int.Parse(Port, CultureInfo.InvariantCulture));
+        var jeu = DuCatalogue(Id);
+        using var delai = new CancellationTokenSource(TimeSpan.FromSeconds(120));
+        var guet = new MultiplayerFinDeRencontre(ra).AttendreLeScoreFinalAsync(jeu.MatchEnd!, [1, 2], delai.Token);
+        using var manette = new MultiplayerBancTests.ManetteReseau(1);
+        while (!guet.IsCompleted && !delai.IsCancellationRequested)
+        {
+            if (await LireAsync(ra, 0x8300) == 0 && await LireAsync(ra, 0x9078) is > 1)
+            {
+                await ra.EnvoyerAsync("WRITE_CORE_RAM 9078 01", CancellationToken.None);
+            }
+
+            await manette.TenirAsync(7, TimeSpan.FromMilliseconds(700));   // droite
+            foreach (var bouton in new[] { 8, 0, 1 })                       // A, B, Y
+            {
+                await Task.Delay(400);
+                await manette.TenirAsync(bouton, TimeSpan.FromMilliseconds(150));
+            }
+
+            await Task.Delay(400);
+        }
+
+        var vainqueur = await guet;
+        Assert.True(vainqueur == 1, $"vainqueur {vainqueur} ; fin {await LireAsync(ra, 0x8300)}, vies {await LireAsync(ra, 0x8478)} et {await LireAsync(ra, 0x9078)}");
+    }
+
+    private static async Task<int?> LireAsync(CommandesRetroArchUdp ra, long adresse)
+    {
+        var reponse = await ra.DemanderAsync($"READ_CORE_RAM {adresse:x} 1", CancellationToken.None);
+        var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? [];
+        return morceaux.Length >= 3 && int.TryParse(morceaux[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var v) ? v : null;
+    }
+
+    /// <summary>
     /// Twinkle Star Sprites (versus) : la vie de P1 tenue pleine, celle de P2 basse ; au match perdu par P2, ses victoires
     /// de match restent a 0 et celles de P1 passent a 1.
     /// </summary>
