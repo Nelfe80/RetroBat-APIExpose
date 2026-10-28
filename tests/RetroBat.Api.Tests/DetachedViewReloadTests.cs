@@ -94,13 +94,38 @@ public class DetachedViewReloadTests
     public void Le_rechargement_passe_malgre_une_selection_en_cours()
     {
         var etat = new MediaRuntimeState();
-        etat.SetLastFrontendEvent("game-selected");
+        etat.SetLastFrontendEvent("game-selected", DateTime.UtcNow.AddSeconds(-10));
 
         etat.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.Zero, TimeSpan.FromSeconds(12));
         var statut = etat.GetReloadGamesStatus(TimeSpan.Zero);
 
         Assert.True(statut.Pending);
         Assert.True(statut.Ready);
+    }
+
+    /// <summary>
+    /// Passer outre la retenue n'est pas recharger sous les doigts du joueur : le 28/10, ES a plante sur le rechargement de
+    /// la collection MULTIPLAYER parti en plein defilement. Le rechargement attend une pause de la navigation (jeu ou systeme).
+    /// </summary>
+    [Theory]
+    [InlineData("game-selected")]
+    [InlineData("system-selected")]
+    public void Le_rechargement_attend_que_le_joueur_lache_la_navigation(string evenement)
+    {
+        var etat = new MediaRuntimeState();
+        etat.SetLastFrontendEvent(evenement, DateTime.UtcNow.AddSeconds(-1));
+        etat.TryRequestReloadGamesBypassingLastGameSelected(TimeSpan.Zero, TimeSpan.FromSeconds(12), silencieux: true);
+
+        var statut = etat.GetReloadGamesStatus(TimeSpan.Zero);
+        Assert.True(statut.Pending);
+        Assert.False(statut.Ready);
+        Assert.False(etat.TryConsumeReloadGamesReady(TimeSpan.Zero, out var attente, out _, out _));
+        Assert.InRange(attente.TotalSeconds, 2, 4);
+
+        // La pause venue (le dernier geste a plus de quatre secondes), il part.
+        etat.SetLastFrontendEvent(evenement, DateTime.UtcNow.AddSeconds(-5));
+        Assert.True(etat.TryConsumeReloadGamesReady(TimeSpan.Zero, out _, out _, out var porte));
+        Assert.True(porte.Silencieux);
     }
 
     /// <summary>

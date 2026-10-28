@@ -16,6 +16,8 @@ public class MediaRuntimeState
     private static readonly TimeSpan PostScrapeQuietPeriod = TimeSpan.FromSeconds(2);
     private static readonly TimeSpan PostGameEndLiveAddGamesQuietPeriod = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan ReloadGamesLastGameSelectedBypassWindow = TimeSpan.FromSeconds(15);
+    // Un rechargement d'ES attend que le joueur ait lache la navigation depuis ce temps (28/10, voir AttendLaPauseDeNavigation).
+    private static readonly TimeSpan NavigationQuietBeforeReload = TimeSpan.FromSeconds(4);
     private readonly HashSet<string> _gamesChangedSinceLastReload = new(StringComparer.OrdinalIgnoreCase);
     private bool _reloadGamesPending;
     private bool _hasMediaChangesSinceLastReload;
@@ -36,6 +38,7 @@ public class MediaRuntimeState
     // rafraichissement de fiche « du scrap » arrive ensuite ne doit pas le remplacer.
     private bool _rechargementReelExige;
     private DateTime _lastGameSelectedAtUtc = DateTime.MinValue;
+    private DateTime _lastNavigationAtUtc = DateTime.MinValue;
     private DateTime _reloadGamesBypassLastGameSelectedUntilUtc = DateTime.MinValue;
     private bool _reloadGamesAllowedDuringActiveScrape;
     private bool _reloadGamesRequestedByScrape;
@@ -643,6 +646,12 @@ public class MediaRuntimeState
                 }
             }
 
+            if (AttendLaPauseDeNavigation(nowUtc, prolonger: true, out var pause))
+            {
+                retryAfter = pause;
+                return false;
+            }
+
             var bypassLastGameSelected = nowUtc <= _reloadGamesBypassLastGameSelectedUntilUtc;
             if (string.Equals(_lastFrontendEvent, "game-selected", StringComparison.OrdinalIgnoreCase) &&
                 !bypassLastGameSelected)
@@ -703,6 +712,11 @@ public class MediaRuntimeState
                 {
                     return new ReloadGamesStatus(true, false, false, _hasMediaChangesSinceLastReload, _activeBlockingScrapeCount, _activeBackgroundScrapeCount, _lastFrontendEvent, scrapeQuietUntilUtc - nowUtc, _reloadGamesAllowedDuringActiveScrape, _reloadGamesRequestedByScrape);
                 }
+            }
+
+            if (AttendLaPauseDeNavigation(nowUtc, prolonger: false, out var pause))
+            {
+                return new ReloadGamesStatus(true, false, false, _hasMediaChangesSinceLastReload, _activeBlockingScrapeCount, _activeBackgroundScrapeCount, _lastFrontendEvent, pause, _reloadGamesAllowedDuringActiveScrape, _reloadGamesRequestedByScrape);
             }
 
             var bypassLastGameSelected = nowUtc <= _reloadGamesBypassLastGameSelectedUntilUtc;
@@ -783,11 +797,44 @@ public class MediaRuntimeState
         }
     }
 
-    public void SetLastFrontendEvent(string eventName)
+    /// <summary>
+    /// Un rechargement d'ES ne part jamais sous les doigts du joueur, meme demande en passant outre la retenue
+    /// « game-selected » : le 28/10 a 19:26, ES a plante (tas corrompu) sur le rechargement de la collection MULTIPLAYER
+    /// parti en plein defilement, juste apres un deplacement de ROM. Il attend que la navigation (jeu ou systeme) se soit
+    /// arretee depuis <see cref="NavigationQuietBeforeReload"/> ; <paramref name="prolonger"/> : le contournement tient
+    /// jusqu'a cette pause, au lieu d'expirer pendant que le joueur navigue. Sous le verrou.
+    /// </summary>
+    private bool AttendLaPauseDeNavigation(DateTime nowUtc, bool prolonger, out TimeSpan reste)
+    {
+        reste = _lastNavigationAtUtc == DateTime.MinValue ? TimeSpan.Zero : _lastNavigationAtUtc.Add(NavigationQuietBeforeReload) - nowUtc;
+        if (reste <= TimeSpan.Zero)
+        {
+            reste = TimeSpan.Zero;
+            return false;
+        }
+
+        if (prolonger && nowUtc <= _reloadGamesBypassLastGameSelectedUntilUtc)
+        {
+            _reloadGamesBypassLastGameSelectedUntilUtc = Max(_reloadGamesBypassLastGameSelectedUntilUtc, nowUtc.Add(reste).AddSeconds(2));
+        }
+
+        return true;
+    }
+
+    public void SetLastFrontendEvent(string eventName) => SetLastFrontendEvent(eventName, DateTime.UtcNow);
+
+    /// <summary>Le dernier evenement d'ES et son heure (les tests datent la navigation).</summary>
+    public void SetLastFrontendEvent(string eventName, DateTime atUtc)
     {
         lock (_lock)
         {
             _lastFrontendEvent = eventName ?? string.Empty;
+            if (string.Equals(_lastFrontendEvent, "game-selected", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(_lastFrontendEvent, "system-selected", StringComparison.OrdinalIgnoreCase))
+            {
+                _lastNavigationAtUtc = atUtc;
+            }
+
             if (string.Equals(_lastFrontendEvent, "game-start", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(_lastFrontendEvent, "ui.game.started", StringComparison.OrdinalIgnoreCase))
             {
@@ -804,7 +851,7 @@ public class MediaRuntimeState
             }
             else if (string.Equals(_lastFrontendEvent, "game-selected", StringComparison.OrdinalIgnoreCase))
             {
-                _lastGameSelectedAtUtc = DateTime.UtcNow;
+                _lastGameSelectedAtUtc = atUtc;
                 MarkScrapeQueueActivity();
             }
             else
