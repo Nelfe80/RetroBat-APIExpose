@@ -127,6 +127,8 @@ public sealed class ReplayCaptureService : BackgroundService
         public string? Fond;
         /// <summary>Le film du spectateur cache d'une partie MULTIPLAYER (toutes les consoles), pas celui du jeu.</summary>
         public bool DuSpectateur;
+        /// <summary>Le jeu est ne sur un ecran a tube : le direct et la video en prennent l'effet CRT (29/10).</summary>
+        public bool Crt;
         public bool EnteteVerifiee;
         /// <summary>Le film d'une partie sans replay : il s'arrete et se suit sans l'enregistreur.</summary>
         public bool SansReplay;
@@ -203,7 +205,7 @@ public sealed class ReplayCaptureService : BackgroundService
         bool Origine = false, int? Rotation = null, string? Version = null, int EchecsDeVersion = 0,
         IReadOnlyList<double[]>? Courbe = null, double? FinDuRunS = null, double? DureeS = null,
         double? DebutSequenceS = null, double? FinSequenceS = null, double? Forme = null,
-        int Largeur = 0, int Hauteur = 0, string? Fond = null);
+        int Largeur = 0, int Hauteur = 0, string? Fond = null, bool Crt = false);
 
     /// <summary>
     /// LE GARDE-FOU DE LA FORME (decision du user du 25 octobre 2026) : un film dont l'image n'a pas la forme du jeu ne part
@@ -535,6 +537,8 @@ public sealed class ReplayCaptureService : BackgroundService
                 {
                     ReplayId = replayId, Fichier = fichier, FrameDebut = frame, Rotation = rotation, SansReplay = sansReplay,
                     Forme = forme, Fond = FondDuJeu(_cheminDuJeu), DuSpectateur = duSpectateur,
+                    Crt = LanceurDuDirect.EcranATube(_cheminDuJeu is { Length: > 0 } cheminDuJeu
+                        ? RetroBat.Api.Netplay.NetplayHostService.SystemeDuChemin(cheminDuJeu, RetroBatPaths.RomsRoot) : null),
                 };
             }
             if (sansReplay)
@@ -672,7 +676,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 Sessions: c.SansReplay ? SessionsDuFilm(c.ReplayId, null) : null, SansReplay: c.SansReplay,
                 Origine: origine, Rotation: c.Rotation,
                 Courbe: c.CopieDeLaCourbe(), FinDuRunS: c.FinDuRunS, DureeS: dureeAuStop,
-                Forme: c.Forme, Largeur: (int)entete.Largeur, Hauteur: (int)entete.Hauteur, Fond: c.Fond);
+                Forme: c.Forme, Largeur: (int)entete.Largeur, Hauteur: (int)entete.Hauteur, Fond: c.Fond, Crt: c.Crt);
             await File.WriteAllTextAsync(Path.Combine(_dossier, c.ReplayId + ".json"),
                 JsonSerializer.Serialize(gardee, Json), Encoding.UTF8, _arret).ConfigureAwait(false);
             _logger.LogInformation("Capture : {ReplayId} gardee ({Taille} octets, {Format}, {Pourquoi}), en attente de la decision du site.",
@@ -695,10 +699,10 @@ public sealed class ReplayCaptureService : BackgroundService
     /// Le film en cours d'ecriture et la rotation du coeur, pour le direct d'un record (le direct en est la copie) ;
     /// null quand rien n'est filme.
     /// </summary>
-    public (string Fichier, int? Rotation, double? Forme, string? Fond, bool DuSpectateur)? FilmEnCours()
+    public (string Fichier, int? Rotation, double? Forme, string? Fond, bool DuSpectateur, bool Crt)? FilmEnCours()
     {
         var c = _enCours;
-        return c is null ? null : (c.Fichier, c.Rotation, c.Forme, c.Fond, c.DuSpectateur);
+        return c is null ? null : (c.Fichier, c.Rotation, c.Forme, c.Fond, c.DuSpectateur, c.Crt);
     }
 
     /// <summary>
@@ -995,7 +999,7 @@ public sealed class ReplayCaptureService : BackgroundService
         _logger.LogInformation("Capture : {ReplayId} est un record, fabrication de sa version YouTube ({Sequence}).", g.ReplayId,
             g.DebutSequenceS is double d && g.FinSequenceS is double f ? "sequence de " + d + " a " + f + " s du film" : "film entier");
         var r = await LanceurDuDirect.FabriquerLaVersionAsync(exe, g.Fichier, version, g.Rotation ?? 0, _logger, ct,
-            g.DebutSequenceS, g.FinSequenceS, g.Forme, g.Fond).ConfigureAwait(false);
+            g.DebutSequenceS, g.FinSequenceS, g.Forme, g.Fond, g.Crt).ConfigureAwait(false);
         if (r.Code == 0 && TailleDe(version) > 0)
         {
             var faite = g with { Version = version };

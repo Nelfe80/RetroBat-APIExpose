@@ -618,7 +618,7 @@ public sealed class DirectPartageService : IHostedService
             Ecrire(CheminDeLaCommande, CommandeJson(fin: false, arret: false, null, null, false, false));
             return await LanceurDuDirect.DiffuserAsync(exe, film.Fichier, adresse, film.Rotation ?? 0, _journal, jeton,
                 annonce: annonce, classement: CheminDeLaCarte, options: options, delaiDeFin: TimeSpan.FromSeconds(10),
-                forme: film.Forme, fond: film.Fond).ConfigureAwait(false);
+                forme: film.Forme, fond: film.Fond, crt: film.Crt).ConfigureAwait(false);
         });
         lock (_verrou)
         {

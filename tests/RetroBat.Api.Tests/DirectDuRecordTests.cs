@@ -199,6 +199,29 @@ public sealed class DirectDuRecordTests
         => Assert.Equal(["--film", "f.mkv", "--adresse-stdin", "--rotation", "3", "--suivre", "--annonce", "a.mp4", "--classement", "c.json"],
             LanceurDuDirect.Arguments("f.mkv", 3, "a.mp4", "c.json"));
 
+    /// <summary>
+    /// L'EFFET CRT (demande du user, 29/10) : un jeu ne sur un ecran a tube (arcade, consoles de salon) le demande a l'exe,
+    /// au direct comme a la video ; jamais une console portable, une machine HD ni un systeme inconnu.
+    /// </summary>
+    [Theory]
+    [InlineData("fbneo", true)]
+    [InlineData("mame", true)]
+    [InlineData("snes", true)]
+    [InlineData("megadrive", true)]
+    [InlineData("gba", false)]
+    [InlineData("gbc2players", false)]
+    [InlineData("ngpc", false)]
+    [InlineData("lynx", false)]
+    [InlineData("switch", false)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public void L_effet_crt_va_aux_jeux_nes_sur_un_tube(string? systeme, bool attendu)
+    {
+        Assert.Equal(attendu, LanceurDuDirect.EcranATube(systeme));
+        Assert.Equal(attendu, LanceurDuDirect.Arguments("f.mkv", 0, crt: LanceurDuDirect.EcranATube(systeme)).Contains("--crt"));
+        Assert.Equal(attendu, LanceurDuDirect.ArgumentsDeLaVersion("f.mkv", "v.flv", 0, crt: LanceurDuDirect.EcranATube(systeme)).Contains("--crt"));
+    }
+
     [Theory]
     [InlineData(35260L, 31734L)]   // le record de Ms. Pac-Man : 90 % tout juste
     [InlineData(15L, 14L)]         // arrondi au-dessus, comme le site
