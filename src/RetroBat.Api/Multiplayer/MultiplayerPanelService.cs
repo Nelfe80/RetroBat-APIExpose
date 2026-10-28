@@ -1398,10 +1398,10 @@ public sealed partial class MultiplayerPanelService
                 ? DispositionPour(max)
                 : LeaderboardOverlayService.DispositionDesJoueurs.Liste,
             // « VOTRE SELECTION » en haut a gauche du panneau (demande du user du 26/10), les memes jeux que la carte d'ES.
-            // Une gameroom d'amis s'y dit « AMIS » devant son compte (question du user du 28/10).
+            // Une gameroom d'amis s'y dit « [AMIS] » devant son compte (question du user du 28/10).
             MaSelection: _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3)
                 .Select(r => new LeaderboardOverlayService.JeuDeMaSelection(
-                    NomDuJeu(r.Game), (r.EntreAmis ? Texte("multiplayer.selection.friends", "FRIENDS") + "  " : string.Empty)
+                    NomDuJeu(r.Game), (r.EntreAmis ? "[" + Texte("multiplayer.selection.friends", "FRIENDS") + "]  " : string.Empty)
                         + r.Players.Count(j => j.Present) + "/" + r.Max,
                     RoomDuJeu() is { } courante && r.Room == courante.Room))
                 .ToList(),
