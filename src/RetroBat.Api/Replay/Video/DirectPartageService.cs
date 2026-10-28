@@ -727,7 +727,7 @@ public sealed class DirectPartageService : IHostedService
 
     private void EcrireLeBandeau(Partie p, string mode)
         => Ecrire(CheminDuBandeau, DonneesDeLaBande(p.BandeJoueur, p.BandeJeu, p.BandeSysteme, mode, p.RecordTexte,
-            p.Multi is { } mp ? GrilleDuDirect(mp) : null).ToJsonString());
+            p.Multi is { } mp ? GrilleDuDirect(mp, _capture.FilmEnCours()?.DuSpectateur == true) : null).ToJsonString());
 
     /// <summary>
     /// Ce que lit l'exe : la bande, et la grille d'un jeu a plusieurs ecrans (colonnes, lignes, et le joueur de chaque case
@@ -755,8 +755,15 @@ public sealed class DirectPartageService : IHostedService
     /// en a plusieurs) et la couleur de la premiere. Rien pour un jeu a un ecran. Pur.
     /// </summary>
     internal static (int Colonnes, int Lignes, IReadOnlyList<(string Nom, int Place)> Cases)? GrilleDuDirect(
-        RetroBat.Api.Multiplayer.MultiplayerPartieDeLHote mp)
+        RetroBat.Api.Multiplayer.MultiplayerPartieDeLHote mp, bool duSpectateur = false)
     {
+        // LE FILM DU SPECTATEUR CACHE (consoles reliees, 28/10) : une case par console, dans l'ordre des places.
+        if (duSpectateur && mp.SpectatorColumns is int colonnes && mp.SpectatorRows is int lignes)
+        {
+            var parPlace = mp.Players.Where(j => !string.IsNullOrWhiteSpace(j.Pseudo)).OrderBy(j => j.Seat)
+                .Take(colonnes * lignes).Select(j => (NomSurLaBande(j), j.Seat)).ToList();
+            return parPlace.Count > 1 ? (colonnes, lignes, parPlace) : null;
+        }
         if (mp.Screens < 2) return null;
         int EcranDe(int place) => mp.SeatScreens is { } e && place >= 1 && place <= e.Count ? e[place - 1] : (place - 1) % mp.Screens + 1;
         var cases = new List<(string, int)>();

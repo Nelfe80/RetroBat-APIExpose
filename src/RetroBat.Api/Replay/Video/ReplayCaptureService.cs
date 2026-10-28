@@ -125,6 +125,8 @@ public sealed class ReplayCaptureService : BackgroundService
         public double? Forme;
         /// <summary>Le fanart du jeu (sinon sa capture), fond du cadre 16:9 du direct et de la video ; null sans image.</summary>
         public string? Fond;
+        /// <summary>Le film du spectateur cache d'une partie MULTIPLAYER (toutes les consoles), pas celui du jeu.</summary>
+        public bool DuSpectateur;
         public bool EnteteVerifiee;
         /// <summary>Le film d'une partie sans replay : il s'arrete et se suit sans l'enregistreur.</summary>
         public bool SansReplay;
@@ -465,7 +467,7 @@ public sealed class ReplayCaptureService : BackgroundService
     /// Le replay de la partie demarre : la capture aussi, si la borne le peut. <paramref name="sansReplay"/> : la partie
     /// part sans replay, le film porte alors son propre identifiant.
     /// </summary>
-    private async Task DemarrerAsync(string replayId, bool sansReplay = false)
+    private async Task DemarrerAsync(string replayId, bool sansReplay = false, bool duSpectateur = false)
     {
         await _operation.WaitAsync(_arret).ConfigureAwait(false);
         try
@@ -484,7 +486,8 @@ public sealed class ReplayCaptureService : BackgroundService
                 _logger.LogInformation("Capture : filtre d'image du coeur actif ({Filtre}), partie non filmee.", filtre);
                 return;
             }
-            var dossier = Valeur(reglages, "recording_output_directory");
+            // Le spectateur cache d'une partie MULTIPLAYER filme dans son propre dossier (MultiplayerSpectateur).
+            var dossier = duSpectateur ? RetroBat.Api.Multiplayer.MultiplayerSpectateur.DossierDesFilms : Valeur(reglages, "recording_output_directory");
             if (string.IsNullOrWhiteSpace(dossier))
             {
                 _logger.LogInformation("Capture : aucun dossier de films dans retroarch.cfg, partie non filmee.");
@@ -498,8 +501,9 @@ public sealed class ReplayCaptureService : BackgroundService
             }
 
             var avant = new HashSet<string>(Directory.GetFiles(dossier, "*.mkv"), StringComparer.OrdinalIgnoreCase);
-            await _ra.RecordingToggleAsync(_arret).ConfigureAwait(false);
-            var frame = (await _ra.GetActiveReplayAsync(_arret).ConfigureAwait(false))?.Frame ?? 0;
+            if (duSpectateur) await RetroBat.Api.Multiplayer.MultiplayerSpectateur.CommandeAsync("RECORDING_TOGGLE", false, _arret).ConfigureAwait(false);
+            else await _ra.RecordingToggleAsync(_arret).ConfigureAwait(false);
+            var frame = duSpectateur ? 0 : (await _ra.GetActiveReplayAsync(_arret).ConfigureAwait(false))?.Frame ?? 0;
             string? fichier = null;
             for (var i = 0; i < 25 && fichier is null; i++)
             {
@@ -512,10 +516,11 @@ public sealed class ReplayCaptureService : BackgroundService
                 _logger.LogInformation("Capture : RetroArch n'a pas commence a filmer {ReplayId}.", replayId);
                 return;
             }
-            var statut = await _ra.GetStatusAsync(_arret).ConfigureAwait(false);
-            var rotation = _coeur.ReadRotation(statut?.Crc32);
-            // La forme de l'image du coeur, si le journal parle bien de ce contenu.
-            var cadence = _coeur.ReadLatest();
+            var statut = duSpectateur ? null : await _ra.GetStatusAsync(_arret).ConfigureAwait(false);
+            var rotation = duSpectateur ? 0 : _coeur.ReadRotation(statut?.Crc32);
+            // La forme de l'image du coeur, si le journal parle bien de ce contenu. Jamais pour le spectateur : la forme
+            // annoncee est celle d'UNE console (3:2), son image en montre deux ou quatre.
+            var cadence = duSpectateur ? null : _coeur.ReadLatest();
             var forme = cadence is { Aspect: double a } && (statut?.Crc32 is not { Length: > 0 } crc || cadence.Crc32 is null
                 || string.Equals(cadence.Crc32, crc.Trim().ToLowerInvariant().PadLeft(8, '0'), StringComparison.Ordinal)) ? a : (double?)null;
             lock (_verrouSessions)
@@ -525,7 +530,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 _enCours = new CaptureEnCours
                 {
                     ReplayId = replayId, Fichier = fichier, FrameDebut = frame, Rotation = rotation, SansReplay = sansReplay,
-                    Forme = forme, Fond = FondDuJeu(_cheminDuJeu),
+                    Forme = forme, Fond = FondDuJeu(_cheminDuJeu), DuSpectateur = duSpectateur,
                 };
             }
             if (sansReplay)
@@ -551,6 +556,9 @@ public sealed class ReplayCaptureService : BackgroundService
     /// envoye pendant le chargement se perd). Sans GET_STATUS sur ce coeur (GardeGetStatus), il part apres quelques
     /// secondes.
     /// </summary>
+    /// <summary>L'attente du spectateur cache : l'arrivee des invites (le depart les attend 150 s au plus), puis la sienne.</summary>
+    private const int AttenteDuSpectateurS = 240;
+
     private async Task FilmerLaPartieMultiplayerAsync()
     {
         try
@@ -565,7 +573,16 @@ public sealed class ReplayCaptureService : BackgroundService
                 }
                 if ((await _ra.GetStatusAsync(_arret).ConfigureAwait(false))?.ContentLoaded == true) break;
             }
-            await DemarrerAsync(PrefixeMultiplayer + Ulid.New(), sansReplay: true).ConfigureAwait(false);
+            // LE SPECTATEUR CACHE (28/10) : une partie de consoles reliees se filme chez lui (toutes les consoles), des qu'il a
+            // rejoint la partie ; il arrive apres les invites. Sans lui, l'hote filme sa propre image, comme avant.
+            for (var i = 0; i < AttenteDuSpectateurS && RetroBat.Api.Multiplayer.MultiplayerSpectateur.Prevu
+                            && !RetroBat.Api.Multiplayer.MultiplayerSpectateur.Connecte; i++)
+            {
+                await Task.Delay(1000, _arret).ConfigureAwait(false);
+            }
+            var duSpectateur = RetroBat.Api.Multiplayer.MultiplayerSpectateur.Connecte;
+            if (duSpectateur) await Task.Delay(3000, _arret).ConfigureAwait(false);
+            await DemarrerAsync(PrefixeMultiplayer + Ulid.New(), sansReplay: true, duSpectateur: duSpectateur).ConfigureAwait(false);
         }
         catch (OperationCanceledException) { /* arret de l'API */ }
     }
@@ -593,7 +610,10 @@ public sealed class ReplayCaptureService : BackgroundService
             // Un film qui ne grossit plus est deja ferme (RetroArch quitte) : un RECORDING_TOGGLE en
             // relancerait un autre.
             if (await GrossitAsync(c.Fichier).ConfigureAwait(false))
-                await _ra.RecordingToggleAsync(_arret).ConfigureAwait(false);
+            {
+                if (c.DuSpectateur) await RetroBat.Api.Multiplayer.MultiplayerSpectateur.CommandeAsync("RECORDING_TOGGLE", false, _arret).ConfigureAwait(false);
+                else await _ra.RecordingToggleAsync(_arret).ConfigureAwait(false);
+            }
             await AttendreLaFinAsync(c.Fichier).ConfigureAwait(false);
 
             if (EstUnFilmMultiplayer(c.ReplayId) && !abandon)
@@ -670,10 +690,10 @@ public sealed class ReplayCaptureService : BackgroundService
     /// Le film en cours d'ecriture et la rotation du coeur, pour le direct d'un record (le direct en est la copie) ;
     /// null quand rien n'est filme.
     /// </summary>
-    public (string Fichier, int? Rotation, double? Forme, string? Fond)? FilmEnCours()
+    public (string Fichier, int? Rotation, double? Forme, string? Fond, bool DuSpectateur)? FilmEnCours()
     {
         var c = _enCours;
-        return c is null ? null : (c.Fichier, c.Rotation, c.Forme, c.Fond);
+        return c is null ? null : (c.Fichier, c.Rotation, c.Forme, c.Fond, c.DuSpectateur);
     }
 
     /// <summary>

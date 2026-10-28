@@ -72,6 +72,24 @@ public sealed record MultiplayerCore
     /// <summary>Propres a chaque borne (ce qu'elle affiche, ce qu'elle fait entendre). <c>{seat}</c> = sa place.</summary>
     [JsonPropertyName("seat_options")]
     public IReadOnlyDictionary<string, string>? SeatOptions { get; init; }
+
+    /// <summary>
+    /// LE SPECTATEUR CACHE DE L'HOTE (28/10) : un coeur dont chaque borne n'affiche que sa console fait filmer le direct par
+    /// un spectateur qui les montre toutes (<see cref="MultiplayerSpectateur"/>). Absent : l'hote filme sa propre image.
+    /// </summary>
+    [JsonPropertyName("spectator")]
+    public MultiplayerSpectatorView? Spectator { get; init; }
+}
+
+/// <summary>Ce que montre le spectateur cache : ses options de coeur (la vue de toutes les consoles) et la grille de son image.</summary>
+public sealed record MultiplayerSpectatorView
+{
+    [JsonPropertyName("options")]
+    public IReadOnlyDictionary<string, string>? Options { get; init; }
+
+    /// <summary><c>auto</c> (cote a cote a deux, 2 x 2 a trois ou quatre) ou « colonnes x lignes ».</summary>
+    [JsonPropertyName("grid")]
+    public string? Grid { get; init; }
 }
 
 public sealed record MultiplayerGame

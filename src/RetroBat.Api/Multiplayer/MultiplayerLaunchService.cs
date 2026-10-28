@@ -203,9 +203,16 @@ public sealed class MultiplayerLaunchService : IHostedService
             var motJoueur = Hex(4);
             var motSpectateur = Hex(4);
             var pseudo = MultiplayerLaunchPlan.Pseudo(MonPseudo(room), jeton);
+            // Les consoles reliees : la capture attendra le spectateur cache de l'hote (MultiplayerSpectateur).
+            // Seulement si la borne peut passer a l'antenne (l'exe du direct est la) : sinon il ne servirait a rien.
+            if (jeu.Core?.Spectator is not null && RetroBat.Api.Replay.Video.LanceurDuDirect.Chemin(AppContext.BaseDirectory) is not null)
+            {
+                MultiplayerSpectateur.Prevoir();
+            }
             var partie = Lancer(room, jeu, MultiplayerLaunchPlan.ArgumentsHote(pseudo, motJoueur, motSpectateur, relais));
             if (partie is null)
             {
+                MultiplayerSpectateur.Arreter();
                 await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
                 return;
             }
@@ -346,7 +353,12 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
             // Les liens des invites au relais : leur arrivee et leur depart vus par le reseau, quelle que soit la langue du
             // journal de RetroArch (27/10, deux bornes de langues differentes).
-            var liens = await RetroArchInvite.LiensDesInvitesAsync(publiee.Relay, publiee.Port).ConfigureAwait(false);
+            // Le spectateur cache ajoute deux connexions au relais : elles ne comptent jamais pour des invites.
+            var liens = MultiplayerSpectateur.Corriger(await RetroArchInvite.LiensDesInvitesAsync(publiee.Relay, publiee.Port).ConfigureAwait(false));
+            if (reponse?.Ok == true && jeu.Core?.Spectator is not null && MultiplayerSpectateur.Prevu)
+            {
+                _ = Task.Run(() => LancerLeSpectateurAsync(room, jeu, publiee, liens));
+            }
             if (auRalenti)
             {
                 _ = Task.Run(() => LibererLeDepartAsync(room, jeu.Game, liens));
@@ -1054,11 +1066,16 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// l'heberge), le jeu, et chaque place avec son joueur et sa cote. Pur.
     /// </summary>
     internal static MultiplayerPartieDeLHote PartieDeLHote(MultiplayerRoom room, MultiplayerInstalledGame jeu)
-        => new(room.Room, jeu.Game.Id, jeu.Game.Name, jeu.Game.System,
-            room.Players.Where(j => j.Seat is not null).OrderBy(j => j.Seat)
-                .Select(j => new MultiplayerPlaceDuDirect(j.Seat!.Value, j.Pseudo.Length > 0 ? j.Pseudo : j.Handle,
-                    j.Rating is { } c ? c.Lettre : null, j.Rating?.Value))
-                .ToList(), jeu.Game.Family, Math.Max(1, jeu.Game.Screens), jeu.Game.SeatScreens);
+    {
+        var places = room.Players.Where(j => j.Seat is not null).OrderBy(j => j.Seat)
+            .Select(j => new MultiplayerPlaceDuDirect(j.Seat!.Value, j.Pseudo.Length > 0 ? j.Pseudo : j.Handle,
+                j.Rating is { } c ? c.Lettre : null, j.Rating?.Value))
+            .ToList();
+        // La grille du spectateur cache (consoles reliees), si le direct filme le sien.
+        (int, int)? grille = jeu.Core?.Spectator is { } vue ? MultiplayerSpectateur.Grille(vue.Grid, Math.Max(2, places.Count)) : null;
+        return new(room.Room, jeu.Game.Id, jeu.Game.Name, jeu.Game.System, places, jeu.Game.Family, Math.Max(1, jeu.Game.Screens),
+            jeu.Game.SeatScreens, grille?.Item1, grille?.Item2);
+    }
 
     private const string MessageSansManetteParDefaut =
         "No controller found for this game: only the keyboard responds. Plug in a controller, set it up in EmulationStation, then start the game again.";
@@ -1138,7 +1155,41 @@ public sealed class MultiplayerLaunchService : IHostedService
         var duree = (int)Math.Max(0, (DateTime.UtcNow - partie.Debut).TotalSeconds);
         _journal.LogInformation("MULTIPLAYER : partie de {Jeu} finie apres {Duree} s{Detail}", partie.Jeu.GameName, duree,
             sortie.IsCompleted ? string.Empty : " (coeur decharge, RetroArch pas encore sorti)");
+        // Le spectateur cache s'arrete apres la capture, qui ferme d'abord son film.
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(TimeSpan.FromSeconds(8)).ConfigureAwait(false);
+            MultiplayerSpectateur.Arreter();
+        });
         return duree;
+    }
+
+    /// <summary>
+    /// LE SPECTATEUR CACHE (28/10) : une fois les invites arrives (au plus 150 s), l'hote lance son spectateur sur sa propre
+    /// session, avec les options de la partie et la vue de toutes les consoles. Il vient apres le depart : sa connexion ne
+    /// passe jamais pour l'arrivee d'un invite.
+    /// </summary>
+    private async Task LancerLeSpectateurAsync(MultiplayerRoom room, MultiplayerInstalledGame jeu, MultiplayerSessionNetplay session,
+        Func<int?> liens)
+    {
+        try
+        {
+            if (jeu.Core is not { Spectator: { } vue } coeur) return;
+            var joueurs = Math.Max(2, room.Players.Count(j => j.Seat is not null));
+            var limite = DateTime.UtcNow.AddSeconds(150);
+            while (DateTime.UtcNow < limite && (liens() ?? 0) < joueurs - 1 && MultiplayerSpectateur.Prevu)
+            {
+                await Task.Delay(1000).ConfigureAwait(false);
+            }
+            if (!MultiplayerSpectateur.Prevu) return;
+            await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
+            var options = MultiplayerSpectateur.OptionsDuSpectateur(coeur, vue, joueurs);
+            await MultiplayerSpectateur.LancerAsync(session, coeur.Core, jeu.Path, options, _journal, CancellationToken.None).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _journal.LogInformation("Spectateur : lancement interrompu ({Message}).", ex.Message);
+        }
     }
 
     private async Task SortirAsync(Partie partie)
@@ -1259,7 +1310,8 @@ public sealed class MultiplayerLaunchService : IHostedService
 /// Fight : deux) font la grille que le cadre 16:9 du direct alterne.
 /// </summary>
 public sealed record MultiplayerPartieDeLHote(string Room, string Game, string Name, string System,
-    IReadOnlyList<MultiplayerPlaceDuDirect> Players, string? Family = null, int Screens = 1, IReadOnlyList<int>? SeatScreens = null);
+    IReadOnlyList<MultiplayerPlaceDuDirect> Players, string? Family = null, int Screens = 1, IReadOnlyList<int>? SeatScreens = null,
+    int? SpectatorColumns = null, int? SpectatorRows = null);
 
 /// <summary>Une place de la partie : son joueur, sa lettre et sa cote sur ce jeu (null hors classement).</summary>
 public sealed record MultiplayerPlaceDuDirect(int Seat, string Pseudo, string? Letter, double? Rating);
