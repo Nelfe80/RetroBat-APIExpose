@@ -196,6 +196,28 @@ public sealed class MultiplayerStatsProfilTests : IDisposable
     }
 
     [Fact]
+    public void Le_maximum_garde_la_plus_haute_valeur_vue_d_une_course_a_l_autre()
+    {
+        var profil = new MultiplayerStatsProfil
+        {
+            Id = "x", Players = 2,
+            Signals = new Dictionary<string, MultiplayerStatsSignal> { ["pieces"] = new() { Seats = new Dictionary<string, string> { ["1"] = "0x10", ["2"] = "0x20" } } },
+            Counters = new Dictionary<string, MultiplayerStatsCompteur> { ["record"] = new() { Rule = "maximum", Signal = "pieces" } },
+        };
+        var suivi = new MultiplayerStatsMoteur(new RetroArchMuet()).Suivre(profil, [1, 2], new CancellationToken(true));
+        var avant = new Dictionary<(string, int), int?>();
+        foreach (var valeur in new[] { 3, 12, 28, 0, 9, 19 })
+        {
+            var nouvelles = new Dictionary<(string, int), int?> { [("pieces", 1)] = valeur, [("pieces", 2)] = 0 };
+            suivi.Appliquer(nouvelles, avant);
+            avant = nouvelles;
+        }
+
+        // La premiere lecture (3) ne compte pas : elle peut venir d'avant le depart.
+        Assert.Equal(28, suivi.Instantane().Compteurs[1]["record"]);
+    }
+
+    [Fact]
     public async Task KOF98_la_vie_sous_zero_est_un_KO_et_la_recharge_entre_deux_manches_ne_compte_pas()
     {
         var profil = Charger("""

@@ -215,6 +215,13 @@ public sealed class MultiplayerStatsSuivi
                             }
                             break;
 
+                        case MultiplayerStatsProfil.RegleMaximum:
+                            if (nouvelles.GetValueOrDefault((compteur.Signal, place)) is { } valeurMax && avant.ContainsKey((compteur.Signal, place)))
+                            {
+                                _compteurs[place][nom] = Math.Max(_compteurs[place][nom], valeurMax);
+                            }
+                            break;
+
                         case MultiplayerStatsProfil.RegleAtteint:
                             if (compteur.Cible(signal) is { } atteinte
                                 && avant.GetValueOrDefault((compteur.Signal, place)) is { } d && d != atteinte

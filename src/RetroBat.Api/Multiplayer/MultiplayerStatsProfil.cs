@@ -48,7 +48,7 @@ public sealed record MultiplayerStatsProfil
     public static readonly IReadOnlySet<string> Regles = new HashSet<string>(StringComparer.Ordinal)
     {
         RegleBaisseAdverse, RegleSommeBaisseAdverse, RegleAtteintAdverse, RegleMancheGagneeSiPlein,
-        RegleHausse, RegleSommeHausse, RegleHausseDAuMoins, RegleAtteint, ReglePlusGrandeHausse,
+        RegleHausse, RegleSommeHausse, RegleHausseDAuMoins, RegleAtteint, ReglePlusGrandeHausse, RegleMaximum,
     };
 
     /// <summary>Une baisse de la valeur adverse (une vie) : un coup reussi, credite a l'autre place.</summary>
@@ -80,6 +80,9 @@ public sealed record MultiplayerStatsProfil
 
     /// <summary>La plus grande hausse d'un coup de la valeur de la place : le meilleur coup (la plus grosse chaine d'un puzzle).</summary>
     public const string ReglePlusGrandeHausse = "plus_grande_hausse";
+
+    /// <summary>La plus haute valeur atteinte par la place (le record de pieces sur une course, la plus longue chaine).</summary>
+    public const string RegleMaximum = "maximum";
 
     /// <summary>Les regles qui lisent l'adversaire : elles demandent un duel (deux places).</summary>
     public bool LitLAdversaire => Counters.Values.Any(c => LitLAdversaireSelon(c.Rule));
