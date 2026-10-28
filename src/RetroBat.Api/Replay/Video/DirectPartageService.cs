@@ -131,6 +131,24 @@ public sealed class DirectPartageService : IHostedService
     /// Un clip livre par le Data Pack (resources/live) : seulement un nom de fichier, jamais un chemin, et seulement un
     /// MP4. Null sinon. Pur.
     /// </summary>
+    /// <summary>
+    /// L'annonce jouee avant le jeu au debut d'un passage, et son empreinte : « New Record » (live_clips.record) quand le
+    /// site met un record a l'antenne ; sinon, pour une partie MULTIPLAYER (demande du user, 28/10), « MULTIPLAYER LIVE »
+    /// (live_clips.multiplayer, Multiplayer_Live.mp4 du Data Pack). Rien sans fichier livre ni empreinte.
+    /// </summary>
+    internal static (string? Chemin, string? Empreinte) AnnonceDuPassage(JsonObject? clips, bool record, bool multiplayer, string racine)
+    {
+        (string?, string?) Clip(string cle)
+        {
+            var clip = clips?[cle] as JsonObject;
+            var chemin = CheminDuClip(racine, (string?)clip?["file"]);
+            var empreinte = (string?)clip?["sha256"];
+            return chemin is not null && File.Exists(chemin) && !string.IsNullOrWhiteSpace(empreinte) ? (chemin, empreinte) : (null, null);
+        }
+        if (record && Clip("record") is { Item1: not null } nouveauRecord) return nouveauRecord;
+        return multiplayer ? Clip("multiplayer") : (null, null);
+    }
+
     internal static string? CheminDuClip(string racine, string? fichier)
     {
         if (string.IsNullOrWhiteSpace(fichier)) return null;
@@ -557,10 +575,9 @@ public sealed class DirectPartageService : IHostedService
         var applaudissements = CheminDuClip(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, (string?)bravo?["file"]);
         if (applaudissements is not null && !File.Exists(applaudissements)) applaudissements = null;
         // LA GREFFE (18 octobre 2026) : une partie qui prend la chaine pour un record s'ouvre par « New Record » ; un record
-        // tombe finit sur « New Champion » et le classement mis a jour.
-        var clipRecord = (r["clips"] as JsonObject)?["record"] as JsonObject;
-        var annonce = (bool?)r["record"] == true ? CheminDuClip(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, (string?)clipRecord?["file"]) : null;
-        if (annonce is not null && (!File.Exists(annonce) || string.IsNullOrWhiteSpace((string?)clipRecord?["sha256"]))) annonce = null;
+        // tombe finit sur « New Champion » et le classement mis a jour. Une partie MULTIPLAYER s'ouvre par « MULTIPLAYER LIVE ».
+        var (annonce, empreinteDeLAnnonce) = AnnonceDuPassage(r["clips"] as JsonObject, (bool?)r["record"] == true, p.Multi is not null,
+            RetroBat.Domain.Paths.RetroBatPaths.PluginRoot);
         var clipChampion = (r["clips"] as JsonObject)?["champion"] as JsonObject;
         var champion = CheminDuClip(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, (string?)clipChampion?["file"]);
         if (champion is not null && !File.Exists(champion)) champion = null;
@@ -569,7 +586,7 @@ public sealed class DirectPartageService : IHostedService
         if (relanceClip is not null && !File.Exists(relanceClip)) relanceClip = null;
         var options = OptionsDuPassage((int?)r["bitrate_kbps"] ?? 3000, CheminDeLaCommande, clip, (string?)transition?["sha256"], CheminDuBandeau,
             applaudissements, (string?)bravo?["sha256"], relanceClip, (string?)essai?["sha256"], champion, (string?)clipChampion?["sha256"],
-            annonce is null ? null : (string?)clipRecord?["sha256"]);
+            empreinteDeLAnnonce);
         secours = new CancellationTokenSource();
         var jeton = secours.Token;
         var tache = Task.Run(async () =>

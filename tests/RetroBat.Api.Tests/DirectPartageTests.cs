@@ -257,6 +257,33 @@ public sealed class DirectPartageTests
     }
 
     [Fact]
+    public void Une_partie_multiplayer_s_ouvre_par_son_annonce_sauf_quand_un_record_l_ouvre()
+    {
+        var racine = Path.Combine(Path.GetTempPath(), "annonce-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(Path.Combine(racine, "resources", "live"));
+        try
+        {
+            File.WriteAllText(Path.Combine(racine, "resources", "live", "Multiplayer_Live.mp4"), "m");
+            File.WriteAllText(Path.Combine(racine, "resources", "live", "New_Record.mp4"), "r");
+            var clips = System.Text.Json.Nodes.JsonNode.Parse("""
+                { "record": { "file": "New_Record.mp4", "sha256": "aa" }, "multiplayer": { "file": "Multiplayer_Live.mp4", "sha256": "bb" } }
+                """)!.AsObject();
+            var multi = DirectPartageService.AnnonceDuPassage(clips, record: false, multiplayer: true, racine);
+            Assert.Equal((Path.Combine(racine, "resources", "live", "Multiplayer_Live.mp4"), "bb"), multi);
+            Assert.Equal("aa", DirectPartageService.AnnonceDuPassage(clips, record: true, multiplayer: true, racine).Empreinte);
+            Assert.Equal((null, null), DirectPartageService.AnnonceDuPassage(clips, record: false, multiplayer: false, racine));
+            // Un site qui ne donne pas encore le clip, ou un Data Pack qui ne l'a pas : pas d'annonce.
+            Assert.Equal((null, null), DirectPartageService.AnnonceDuPassage(new System.Text.Json.Nodes.JsonObject(), false, true, racine));
+            File.Delete(Path.Combine(racine, "resources", "live", "Multiplayer_Live.mp4"));
+            Assert.Equal((null, null), DirectPartageService.AnnonceDuPassage(clips, record: false, multiplayer: true, racine));
+        }
+        finally
+        {
+            Directory.Delete(racine, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Le_fanart_du_jeu_part_en_fond_du_cadre_des_directs_et_des_videos()
     {
         Assert.Equal(["--film", "f.mkv", "--adresse-stdin", "--rotation", "0", "--suivre", "--fond", @"C:\m\fanart.jpg"],
