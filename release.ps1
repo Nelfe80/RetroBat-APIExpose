@@ -206,6 +206,10 @@ $autorises = @(
     'resources/command/', 'resources/locales/', 'tools/mem-explorer/',
     # Les clips des directs (Data Pack, dossier "live" de DataPackOptions depuis le 16 octobre 2026).
     'resources/live/',
+    # MULTIPLAYER (2026-10-28, premiere release complete depuis la 1.9.72) : le catalogue, ses etats de depart,
+    # images et profils de statistiques, copie du dossier multiplayer du Data Pack public ; et les coeurs relies
+    # (FBNeo Multi 32, NGP Link, mGBA Splitscreen), publies a part en release rapide (outils.json).
+    'resources/multiplayer/', 'tools/cores/',
     # Le verificateur de score (APIExposeOCR), construit depuis son propre depot et
     # depose ici par APIExposeOCR\tools\release.ps1, comme mem-explorer.
     'tools/score-verifier/',
