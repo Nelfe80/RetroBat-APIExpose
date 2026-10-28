@@ -1058,7 +1058,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             room.Players.Where(j => j.Seat is not null).OrderBy(j => j.Seat)
                 .Select(j => new MultiplayerPlaceDuDirect(j.Seat!.Value, j.Pseudo.Length > 0 ? j.Pseudo : j.Handle,
                     j.Rating is { } c ? c.Lettre : null, j.Rating?.Value))
-                .ToList());
+                .ToList(), jeu.Game.Family);
 
     private const string MessageSansManetteParDefaut =
         "No controller found for this game: only the keyboard responds. Plug in a controller, set it up in EmulationStation, then start the game again.";
@@ -1253,9 +1253,12 @@ public sealed class MultiplayerLaunchService : IHostedService
     private static string Hex(int octets) => Convert.ToHexString(RandomNumberGenerator.GetBytes(octets)).ToLowerInvariant();
 }
 
-/// <summary>La partie MULTIPLAYER que cette borne heberge, pour son direct (evenement multiplayer.host.started).</summary>
+/// <summary>
+/// La partie MULTIPLAYER que cette borne heberge, pour son direct (evenement multiplayer.host.started) ; sa famille
+/// (coop, duel, equipes...) dit sur la bande si les joueurs s'affrontent.
+/// </summary>
 public sealed record MultiplayerPartieDeLHote(string Room, string Game, string Name, string System,
-    IReadOnlyList<MultiplayerPlaceDuDirect> Players);
+    IReadOnlyList<MultiplayerPlaceDuDirect> Players, string? Family = null);
 
 /// <summary>Une place de la partie : son joueur, sa lettre et sa cote sur ce jeu (null hors classement).</summary>
 public sealed record MultiplayerPlaceDuDirect(int Seat, string Pseudo, string? Letter, double? Rating);

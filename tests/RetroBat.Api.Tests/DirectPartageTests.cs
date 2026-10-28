@@ -172,15 +172,15 @@ public sealed class DirectPartageTests
     }
 
     [Fact]
-    public void Le_direct_multiplayer_met_le_joueur_1_a_gauche_et_le_joueur_2_a_droite()
+    public void La_bande_d_un_direct_multiplayer_dit_qui_contre_qui_avec_les_cotes()
     {
         var places = new[]
         {
-            new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(2, "ANOTHERKIFF", "?", 1031),
-            new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(1, "LORENZOLAMAS", "C", 1112),
+            new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(2, "Nelfe80", "?", 1499.6),
+            new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(1, "Falken", "C", 1512.4),
         };
-        Assert.Equal(("LORENZOLAMAS · C", "ANOTHERKIFF · ?"), DirectPartageService.CotesDeLaBande(places));
-        // A quatre, chaque cote garde ses deux places ; un jeu sans classement n'a pas de lettre.
+        Assert.Equal("Falken (1512) vs Nelfe80 (1500)", DirectPartageService.TexteDeLaBande(places, "duel"));
+        // Un jeu sans classement n'a pas de cote ; une coop reunit ses joueurs, un jeu en equipes oppose impairs et pairs.
         var quatre = new[]
         {
             new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(1, "A", null, null),
@@ -188,7 +188,10 @@ public sealed class DirectPartageTests
             new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(3, "C", null, null),
             new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(4, "D", null, null),
         };
-        Assert.Equal(("A & C", "B & D"), DirectPartageService.CotesDeLaBande(quatre));
+        Assert.Equal("A & B & C & D", DirectPartageService.TexteDeLaBande(quatre, "coop"));
+        Assert.Equal("A & C vs B & D", DirectPartageService.TexteDeLaBande(quatre, "equipes"));
+        Assert.Equal("A vs B vs C vs D", DirectPartageService.TexteDeLaBande(quatre, "course"));
+        Assert.Equal("A vs B vs C vs D", DirectPartageService.TexteDeLaBande(quatre, null));
     }
 
     [Fact]
@@ -213,10 +216,10 @@ public sealed class DirectPartageTests
             ],
         };
         var jeu = new RetroBat.Api.Multiplayer.MultiplayerInstalledGame(
-            new RetroBat.Api.Multiplayer.MultiplayerGame { Id = "arcade/sf2ce", Name = "Street Fighter II' Champion Edition", System = "arcade" },
+            new RetroBat.Api.Multiplayer.MultiplayerGame { Id = "arcade/sf2ce", Name = "Street Fighter II' Champion Edition", System = "arcade", Family = "duel" },
             "sf2ce.zip", null, "sf2ce");
         var partie = RetroBat.Api.Multiplayer.MultiplayerLaunchService.PartieDeLHote(room, jeu);
-        Assert.Equal(("r1", "arcade/sf2ce", "arcade"), (partie.Room, partie.Game, partie.System));
+        Assert.Equal(("r1", "arcade/sf2ce", "arcade", "duel"), (partie.Room, partie.Game, partie.System, partie.Family));
         Assert.Equal(
             [new(1, "LORENZOLAMAS", "C", 1112), new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(2, "ak", "?", 1031)],
             partie.Players);

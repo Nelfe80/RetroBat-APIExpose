@@ -199,16 +199,24 @@ public sealed class DirectPartageService : IHostedService
         => "mp." + jeu.Trim().ToLowerInvariant().Replace('/', '.');
 
     /// <summary>
-    /// Les deux cotes de la bande d'une partie MULTIPLAYER, comme les panneaux de la borne : le joueur 1 (et le 3) a
-    /// gauche, le joueur 2 (et le 4) a droite, chacun avec sa lettre quand le jeu est classe. Pur.
+    /// QUI CONTRE QUI, sur la bande d'une partie MULTIPLAYER (demande du user, 28/10) : « Falken (1500) vs Nelfe80 (1500) »,
+    /// la cote de chacun entre parentheses quand le jeu est classe. Une coop reunit ses joueurs (« A & B »), un jeu en
+    /// equipes oppose les places impaires aux paires (« A & C vs B & D »), les autres jeux opposent chaque joueur. Pur.
     /// </summary>
-    internal static (string Gauche, string Droite) CotesDeLaBande(IEnumerable<RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect> places)
+    internal static string TexteDeLaBande(IEnumerable<RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect> places, string? famille)
     {
         static string Joueur(RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect j)
-            => j.Pseudo.Trim() + (string.IsNullOrWhiteSpace(j.Letter) ? "" : " · " + j.Letter.Trim());
+            => j.Pseudo.Trim() + (j.Rating is double cote
+                ? " (" + Math.Round(cote, MidpointRounding.AwayFromZero).ToString("0", CultureInfo.InvariantCulture) + ")"
+                : "");
         var assis = places.Where(j => !string.IsNullOrWhiteSpace(j.Pseudo)).OrderBy(j => j.Seat).ToList();
-        return (string.Join(" & ", assis.Where(j => j.Seat % 2 == 1).Select(Joueur)),
-            string.Join(" & ", assis.Where(j => j.Seat % 2 == 0).Select(Joueur)));
+        return famille?.Trim().ToLowerInvariant() switch
+        {
+            "coop" => string.Join(" & ", assis.Select(Joueur)),
+            "equipes" when assis.Count > 2 => string.Join(" & ", assis.Where(j => j.Seat % 2 == 1).Select(Joueur)) + " vs "
+                + string.Join(" & ", assis.Where(j => j.Seat % 2 == 0).Select(Joueur)),
+            _ => string.Join(" vs ", assis.Select(Joueur)),
+        };
     }
 
     /// <summary>Le record a battre, sur la bande : « RECORD 523 400 · player ». Vide sans record. Pur.</summary>
@@ -330,9 +338,9 @@ public sealed class DirectPartageService : IHostedService
                 _journal.LogInformation("Direct partage : l'exe du direct manque, la borne ne se porte pas candidate.");
                 return;
             }
-            var (gauche, droite) = CotesDeLaBande(mp.Players);
-            p.BandeJoueur = gauche;
-            p.RecordTexte = droite;
+            // Les joueurs a gauche ; a droite, nelfeplay.com (pas de record a battre).
+            p.BandeJoueur = TexteDeLaBande(mp.Players, mp.Family);
+            p.RecordTexte = "";
             _journal.LogInformation("Direct partage : partie MULTIPLAYER {Jeu} ({Room}), la borne se porte candidate.", mp.Game, mp.Room);
             await PasserAsync(p, RomGroupMultiplayer(mp.Game), RegleMultiplayer, mp.System.Trim().ToLowerInvariant(), aModes: false)
                 .ConfigureAwait(false);
