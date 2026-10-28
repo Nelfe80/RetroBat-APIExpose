@@ -38,15 +38,22 @@ public class MultiplayerSpectateurTests
     public void Le_spectateur_rejoint_la_session_du_relais_cache_et_muet()
     {
         var session = new MultiplayerSessionNetplay { Relay = "europe-west1.relay.retroarch.com", Port = 55435, Session = "ABC", SpectatePassword = "ps" };
-        var arguments = MultiplayerSpectateur.Arguments("c.dll", "jeu.zip", "retroarch.cfg", "spect.cfg", "spect.log", session);
+        var arguments = MultiplayerSpectateur.Arguments("c.dll", "jeu.zip", "retroarch.cfg", "spect.cfg", "spect.log", "film.mkv", session);
+        // Il filme des son lancement : aucune commande a lui envoyer, donc aucun port.
         Assert.Equal(["-L", "c.dll", "jeu.zip", "--config", "retroarch.cfg", "--appendconfig", "spect.cfg", "--verbose", "--log-file",
-            "spect.log", "--connect=europe-west1.relay.retroarch.com", "--port=55435", "--nick=NelfePlayTV", "--mitm-session=ABC"], arguments);
-        Assert.DoesNotContain("--mitm-session=", MultiplayerSpectateur.Arguments("c", "r", "a", "b", "l", session with { Session = "" }).Last());
+            "spect.log", "--record=film.mkv", "--connect=europe-west1.relay.retroarch.com", "--port=55435", "--nick=NelfePlayTV",
+            "--mitm-session=ABC"], arguments);
+        Assert.DoesNotContain("--mitm-session=", MultiplayerSpectateur.Arguments("c", "r", "a", "b", "l", "f", session with { Session = "" }).Last());
 
         var reglages = MultiplayerSpectateur.Reglages("opts.cfg", "sauv", "films", "ps");
         Assert.Contains("netplay_start_as_spectator = \"true\"", reglages);
         Assert.Contains("netplay_password = \"ps\"", reglages);
-        Assert.Contains("network_cmd_port = \"55357\"", reglages);
+        // Son journal en anglais, lu par l'API sur toutes les bornes (« Connecte a » en francais, 28/10).
+        Assert.Contains("user_language = \"0\"", reglages);
+        // Aucune ecoute reseau, donc aucune demande du pare-feu (28/10).
+        Assert.Contains("network_cmd_enable = \"false\"", reglages);
+        Assert.Contains("network_remote_enable = \"false\"", reglages);
+        Assert.DoesNotContain(reglages, l => l.StartsWith("network_cmd_port", StringComparison.Ordinal));
         Assert.Contains("input_overlay_enable = \"false\"", reglages);
         Assert.Contains("video_shader_enable = \"false\"", reglages);
         Assert.Contains("audio_mute_enable = \"true\"", reglages);
@@ -55,8 +62,9 @@ public class MultiplayerSpectateurTests
     }
 
     /// <summary>
-    /// LE BANC (python m6_spikeanc_spectateur_api.py) : un hote relaye, sa session dans NELFEPLAY_BANC_SPECTATEUR ({relay,
-    /// port, session, password, rom}). Le spectateur de l'API le rejoint, filme dix secondes, puis s'arrete.
+    /// LE BANC (python m6_spike/banc_spectateur_api.py) : un hote relaye, sa session dans NELFEPLAY_BANC_SPECTATEUR ({relay,
+    /// port, session, password, rom}). Le spectateur de l'API le rejoint en filmant, puis sa fenetre se ferme : RetroArch
+    /// termine le film en quittant.
     /// </summary>
     [Fact]
     public async Task Le_spectateur_de_l_api_rejoint_un_hote_relaye_et_se_filme()
@@ -76,15 +84,14 @@ public class MultiplayerSpectateurTests
             Assert.True(await MultiplayerSpectateur.LancerAsync(session, "mgba_splitscreen", r.GetProperty("rom").GetString()!, options,
                 journal, CancellationToken.None), "le spectateur n'a pas rejoint la partie");
             Assert.True(MultiplayerSpectateur.Connecte);
-            await Task.Delay(3000);
-            await MultiplayerSpectateur.CommandeAsync("RECORDING_TOGGLE", false, CancellationToken.None);
+            var film = MultiplayerSpectateur.Film;
+            Assert.NotNull(film);
+            Assert.True(File.Exists(film), "pas de film : " + film);
             await Task.Delay(10000);
-            await MultiplayerSpectateur.CommandeAsync("RECORDING_TOGGLE", false, CancellationToken.None);
-            await Task.Delay(3000);
-            var films = Directory.GetFiles(MultiplayerSpectateur.DossierDesFilms, "*.mkv");
-            Assert.Single(films);
-            Assert.True(new FileInfo(films[0]).Length > 100_000, "film trop petit : " + new FileInfo(films[0]).Length);
-            File.Copy(films[0], Path.Combine(r.GetProperty("sortie").GetString()!, "spectateur.mkv"), overwrite: true);
+            Assert.True(await MultiplayerSpectateur.FermerAsync(CancellationToken.None), "le spectateur n'a pas quitte");
+            Assert.False(MultiplayerSpectateur.Connecte);
+            Assert.True(new FileInfo(film!).Length > 100_000, "film trop petit : " + new FileInfo(film!).Length);
+            File.Copy(film!, Path.Combine(r.GetProperty("sortie").GetString()!, "spectateur.mkv"), overwrite: true);
         }
         finally
         {

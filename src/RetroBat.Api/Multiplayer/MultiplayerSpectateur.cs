@@ -1,7 +1,5 @@
 using System.Diagnostics;
 using System.Globalization;
-using System.Net;
-using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using RetroBat.Domain.Paths;
@@ -21,20 +19,47 @@ namespace RetroBat.Api.Multiplayer;
 /// lui) : <see cref="Corriger"/> les retire du compte des invites. Le mot de passe des spectateurs se tape dans sa fenetre
 /// (RetroArch le demande au client, comme a l'invite). L'exe est une copie de retroarch.exe sous un autre nom : les services
 /// qui cherchent « retroarch » (premier plan, partie en cours) ne le confondent jamais avec le jeu.
+///
+/// Retour du premier direct a deux bornes (28/10, hote Falken) : (1) son journal suit la langue de la borne (« Connecte a »
+/// en francais) : l'API ne le voyait jamais rejoindre, l'arretait au bout de 60 s et filmait l'hote ; il journalise donc en
+/// anglais. (2) Windows demandait l'autorisation du pare-feu a chaque direct : son port de commandes (UDP sur toutes les
+/// interfaces) etait la seule ecoute d'un exe neuf. Il n'en a plus : il filme des son lancement (--record) et l'API ferme sa
+/// fenetre a la fin, RetroArch termine alors le film (le RetroArch de Windows n'a pas l'interface de commandes par l'entree
+/// standard, vu au banc). Seule reste sa connexion sortante au relais.
 /// </summary>
 public static class MultiplayerSpectateur
 {
-    /// <summary>Son port de commandes (55355 : le jeu ; 55400 : le rendu des replays).</summary>
-    public const int PortDeCommande = 55357;
-
     public const string Exe = "nelfeplay-spectateur.exe";
 
     private static readonly object Verrou = new();
     private static Process? _processus;
     private static volatile bool _prevu;
 
-    /// <summary>Le dossier de ses films (la capture y cherche le sien).</summary>
+    /// <summary>Le dossier de ses films.</summary>
     public static string DossierDesFilms => Path.Combine(Dossier, "films");
+
+    /// <summary>
+    /// Son film, le plus recent de son dossier ; null s'il ne tourne pas. RetroArch le recommence (nom date) quand le coeur
+    /// change sa cadence ou sa geometrie : Mario Kart change la sienne au demarrage, juste apres le premier (banc du 28/10).
+    /// </summary>
+    public static string? Film
+    {
+        get
+        {
+            lock (Verrou)
+            {
+                if (_processus is not { HasExited: false }) return null;
+            }
+            try
+            {
+                return Directory.GetFiles(DossierDesFilms, "*.mkv").OrderByDescending(File.GetLastWriteTimeUtc).FirstOrDefault();
+            }
+            catch (IOException)
+            {
+                return null;
+            }
+        }
+    }
 
     private static string Dossier => Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfenet", "replay", "spectateur");
 
@@ -104,7 +129,8 @@ public static class MultiplayerSpectateur
 
     /// <summary>
     /// Ses reglages, ajoutes a retroarch.cfg : spectateur, cache, muet (le film garde le son), ni menu ni sortie a la manette,
-    /// ni decor ni shader de la borne, ses propres sauvegardes, ses options de coeur, ses films. Pur.
+    /// ni decor ni shader de la borne, ses propres sauvegardes, ses options de coeur, ses films ; journal en anglais (lu par
+    /// <see cref="AJoint"/>), aucun port de commandes (aucune demande du pare-feu). Pur.
     /// </summary>
     internal static IReadOnlyList<string> Reglages(string optionsDuCoeur, string sauvegardes, string films, string motDePasse)
     {
@@ -117,8 +143,9 @@ public static class MultiplayerSpectateur
             Ligne("netplay_nickname", "NelfePlayTV"),
             Ligne("netplay_public_announce", "false"),
             Ligne("netplay_use_mitm_server", "false"),
-            Ligne("network_cmd_enable", "true"),
-            Ligne("network_cmd_port", PortDeCommande.ToString(CultureInfo.InvariantCulture)),
+            Ligne("user_language", "0"),
+            Ligne("network_cmd_enable", "false"),
+            Ligne("network_remote_enable", "false"),
             Ligne("core_options_path", optionsDuCoeur),
             Ligne("global_core_options", "true"),
             Ligne("game_specific_options", "false"),
@@ -199,6 +226,8 @@ public static class MultiplayerSpectateur
             await File.WriteAllLinesAsync(reglages, Reglages(options, sauvegardes, DossierDesFilms, session.SpectatePassword), ct)
                 .ConfigureAwait(false);
             var journalDuSpectateur = Path.Combine(Dossier, "spectateur.log");
+            var film = Path.Combine(DossierDesFilms,
+                Path.GetFileNameWithoutExtension(rom) + "-" + DateTime.Now.ToString("yyMMdd-HHmmss", CultureInfo.InvariantCulture) + ".mkv");
 
             var psi = new ProcessStartInfo
             {
@@ -207,7 +236,7 @@ public static class MultiplayerSpectateur
                 UseShellExecute = false,
                 WindowStyle = ProcessWindowStyle.Minimized,
             };
-            foreach (var a in Arguments(dll, rom, RetroBatPaths.RetroArchConfigPath, reglages, journalDuSpectateur, session))
+            foreach (var a in Arguments(dll, rom, RetroBatPaths.RetroArchConfigPath, reglages, journalDuSpectateur, film, session))
             {
                 psi.ArgumentList.Add(a);
             }
@@ -247,18 +276,50 @@ public static class MultiplayerSpectateur
         }
     }
 
-    /// <summary>Ses arguments : le coeur, le jeu, la config de RetroBat et la sienne, la session du relais. Pur.</summary>
+    /// <summary>
+    /// Ses arguments : le coeur, le jeu, la config de RetroBat et la sienne, son film (commence au chargement du jeu), la
+    /// session du relais. Pur.
+    /// </summary>
     internal static IReadOnlyList<string> Arguments(string dll, string rom, string config, string reglages, string journal,
-        MultiplayerSessionNetplay session)
+        string film, MultiplayerSessionNetplay session)
     {
         var arguments = new List<string>
         {
             "-L", dll, rom, "--config", config, "--appendconfig", reglages, "--verbose", "--log-file", journal,
+            "--record=" + film,
             "--connect=" + session.Relay, "--port=" + (session.Port > 0 ? session.Port : 55435).ToString(CultureInfo.InvariantCulture),
             "--nick=NelfePlayTV",
         };
         if (!string.IsNullOrWhiteSpace(session.Session)) arguments.Add("--mitm-session=" + session.Session);
         return arguments;
+    }
+
+    /// <summary>
+    /// Ferme sa fenetre, comme la croix : RetroArch quitte proprement et termine son film. Attend sa sortie (10 s au plus).
+    /// Rend vrai s'il est sorti.
+    /// </summary>
+    public static async Task<bool> FermerAsync(CancellationToken ct)
+    {
+        Process? p;
+        lock (Verrou)
+        {
+            p = _processus;
+        }
+        if (p is null) return true;
+        try
+        {
+            if (p.HasExited) return true;
+            p.Refresh();
+            if (p.MainWindowHandle == IntPtr.Zero || !PostMessage(p.MainWindowHandle, 0x0010, IntPtr.Zero, IntPtr.Zero)) return false;
+            using var delai = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            delai.CancelAfter(TimeSpan.FromSeconds(10));
+            await p.WaitForExitAsync(delai.Token).ConfigureAwait(false);
+            return true;
+        }
+        catch (Exception ex) when (ex is OperationCanceledException or InvalidOperationException)
+        {
+            return false;
+        }
     }
 
     /// <summary>Arrete le spectateur (fin de la partie de l'hote), son film d'abord ferme par la capture.</summary>
@@ -277,6 +338,13 @@ public static class MultiplayerSpectateur
         if (p is null) return;
         try
         {
+            // Sa fenetre fermee d'abord : son film se termine proprement s'il tourne encore.
+            if (!p.HasExited)
+            {
+                p.Refresh();
+                if (p.MainWindowHandle != IntPtr.Zero && PostMessage(p.MainWindowHandle, 0x0010, IntPtr.Zero, IntPtr.Zero))
+                    p.WaitForExit(5000);
+            }
             if (!p.HasExited) p.Kill(entireProcessTree: true);
         }
         catch (Exception)
@@ -286,26 +354,6 @@ public static class MultiplayerSpectateur
         finally
         {
             p.Dispose();
-        }
-    }
-
-    /// <summary>Une commande a son RetroArch (RECORDING_TOGGLE, GET_STATUS), et sa reponse s'il en donne une.</summary>
-    public static async Task<string?> CommandeAsync(string commande, bool reponse, CancellationToken ct)
-    {
-        try
-        {
-            using var udp = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
-            var octets = Encoding.ASCII.GetBytes(commande);
-            await udp.SendAsync(octets, octets.Length, new IPEndPoint(IPAddress.Loopback, PortDeCommande)).ConfigureAwait(false);
-            if (!reponse) return null;
-            using var delai = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            delai.CancelAfter(TimeSpan.FromSeconds(2));
-            var recu = await udp.ReceiveAsync(delai.Token).ConfigureAwait(false);
-            return Encoding.ASCII.GetString(recu.Buffer).Trim();
-        }
-        catch (Exception ex) when (ex is SocketException or OperationCanceledException)
-        {
-            return null;
         }
     }
 

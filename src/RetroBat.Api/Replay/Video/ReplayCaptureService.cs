@@ -500,16 +500,20 @@ public sealed class ReplayCaptureService : BackgroundService
                 return;
             }
 
-            var avant = new HashSet<string>(Directory.GetFiles(dossier, "*.mkv"), StringComparer.OrdinalIgnoreCase);
-            if (duSpectateur) await RetroBat.Api.Multiplayer.MultiplayerSpectateur.CommandeAsync("RECORDING_TOGGLE", false, _arret).ConfigureAwait(false);
-            else await _ra.RecordingToggleAsync(_arret).ConfigureAwait(false);
-            var frame = duSpectateur ? 0 : (await _ra.GetActiveReplayAsync(_arret).ConfigureAwait(false))?.Frame ?? 0;
-            string? fichier = null;
-            for (var i = 0; i < 25 && fichier is null; i++)
+            // Le spectateur cache filme depuis son lancement (sans port de commandes, MultiplayerSpectateur) : son film est la.
+            string? fichier = duSpectateur && RetroBat.Api.Multiplayer.MultiplayerSpectateur.Film is { } film && File.Exists(film) ? film : null;
+            var frame = 0L;
+            if (!duSpectateur)
             {
-                await Task.Delay(200, _arret).ConfigureAwait(false);
-                fichier = Directory.GetFiles(dossier, "*.mkv").Where(f => !avant.Contains(f))
-                    .OrderByDescending(File.GetLastWriteTimeUtc).FirstOrDefault();
+                var avant = new HashSet<string>(Directory.GetFiles(dossier, "*.mkv"), StringComparer.OrdinalIgnoreCase);
+                await _ra.RecordingToggleAsync(_arret).ConfigureAwait(false);
+                frame = (await _ra.GetActiveReplayAsync(_arret).ConfigureAwait(false))?.Frame ?? 0;
+                for (var i = 0; i < 25 && fichier is null; i++)
+                {
+                    await Task.Delay(200, _arret).ConfigureAwait(false);
+                    fichier = Directory.GetFiles(dossier, "*.mkv").Where(f => !avant.Contains(f))
+                        .OrderByDescending(File.GetLastWriteTimeUtc).FirstOrDefault();
+                }
             }
             if (fichier is null)
             {
@@ -611,7 +615,8 @@ public sealed class ReplayCaptureService : BackgroundService
             // relancerait un autre.
             if (await GrossitAsync(c.Fichier).ConfigureAwait(false))
             {
-                if (c.DuSpectateur) await RetroBat.Api.Multiplayer.MultiplayerSpectateur.CommandeAsync("RECORDING_TOGGLE", false, _arret).ConfigureAwait(false);
+                // Le spectateur termine son film en quittant (sa fenetre fermee).
+                if (c.DuSpectateur) await RetroBat.Api.Multiplayer.MultiplayerSpectateur.FermerAsync(_arret).ConfigureAwait(false);
                 else await _ra.RecordingToggleAsync(_arret).ConfigureAwait(false);
             }
             await AttendreLaFinAsync(c.Fichier).ConfigureAwait(false);

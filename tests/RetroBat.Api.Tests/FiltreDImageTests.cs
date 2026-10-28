@@ -67,6 +67,30 @@ public class FiltreDImageTests
         Assert.Equal(59.92, cadence.Fps);
     }
 
+    [Fact]
+    public void La_forme_suit_la_derniere_geometrie_annoncee_par_le_coeur()
+    {
+        // mGBA Splitscreen en vue « focus » (28/10, direct de Mario Kart etire en 3:1) : 480x160 au chargement, puis la vue de
+        // la place, 480x320, a la premiere image. Le film prend la geometrie du moment ou il commence.
+        var lignes = new[]
+        {
+            "[INFO] [Core] Loading dynamic libretro core from: \"E:\\RetroBat\\emulators\\retroarch\\cores\\mgba_splitscreen_libretro.dll\".",
+            "[INFO] [Content] CRC32: 0xed316e37.",
+            "[INFO] [Core] Geometry: 480x160, Aspect: 3.000, FPS: 59.73, Sample rate: 32768.00 Hz.",
+            "[libretro INFO] [splitscreen] view: focus, focused player 1",
+            "[INFO] [Environ] SET_SYSTEM_AV_INFO: 480x320, Aspect: 1.500, FPS: 59.73, Sample rate: 32768.00 Hz.",
+        };
+        var cadence = ReplayCoreTimingProbe.LireLaCadence(lignes)!;
+        Assert.Equal((480, 320, 1.5), (cadence.Width, cadence.Height, cadence.Aspect));
+        Assert.Equal(59.73, cadence.Fps);
+        Assert.Equal("ed316e37", cadence.Crc32);
+
+        var geometrie = ReplayCoreTimingProbe.LireLaCadence([.. lignes, "[INFO] [Environ] SET_GEOMETRY: 240x160, Aspect: 1.500."])!;
+        Assert.Equal((240, 160, 1.5), (geometrie.Width, geometrie.Height, geometrie.Aspect));
+        // Une annonce avant le chargement d'un contenu ne decrit aucune partie.
+        Assert.Null(ReplayCoreTimingProbe.LireLaCadence(["[INFO] [Environ] SET_SYSTEM_AV_INFO: 480x320, Aspect: 1.500, FPS: 59.73, Sample rate: 32768.00 Hz."]));
+    }
+
     [Theory]
     // Sans forme connue : une image deux fois plus large que haute ne part pas.
     [InlineData(640, 224, null, null, true, true)]

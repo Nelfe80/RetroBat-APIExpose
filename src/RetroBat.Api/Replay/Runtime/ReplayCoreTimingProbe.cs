@@ -34,6 +34,13 @@ public sealed class ReplayCoreTimingProbe
         @"\[Core\]\s+Geometry:\s*(?<w>\d+)x(?<h>\d+)(?:,\s*Aspect:\s*(?<a>\d+(?:\.\d+)?))?.*?FPS:\s*(?<fps>\d+(?:\.\d+)?)(?:.*?Sample rate:\s*(?<sr>\d+(?:\.\d+)?))?",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    // « [Environ] SET_SYSTEM_AV_INFO: 480x320, Aspect: 1.500, FPS: ... » et « [Environ] SET_GEOMETRY: 240x160, Aspect: 1.500. » :
+    // la geometrie annoncee par le coeur APRES le chargement (28/10 : mGBA Splitscreen passe de 480x160 a la vue de la place,
+    // 480x320, a sa premiere image ; la forme du chargement etirait le direct en 3:1).
+    private static readonly Regex AnnonceLine = new(
+        @"\[Environ\]\s+SET_(?:SYSTEM_AV_INFO|GEOMETRY):\s*(?<w>\d+)x(?<h>\d+),\s*Aspect:\s*(?<a>\d+(?:\.\d+)?)",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
     // « [Core] Loading dynamic libretro core from: "...\core_proxy\genesis_plus_gx_libretro.dll". »
     private static readonly Regex CoreLine = new(
         @"Loading dynamic libretro core from:\s*""?(?:[^""]*[\\/])?(?<c>[^""\\/]+?)_libretro\.dll",
@@ -146,7 +153,8 @@ public sealed class ReplayCoreTimingProbe
 
     /// <summary>
     /// La derniere geometrie du journal, avec le CRC du contenu et le core charges juste avant elle. Le log est reecrit a
-    /// chaque lancement (quelques Ko) ; on prend la DERNIERE occurrence. Pur, pour etre teste.
+    /// chaque lancement (quelques Ko) ; on prend la DERNIERE occurrence. Les annonces du coeur qui suivent (SET_SYSTEM_AV_INFO,
+    /// SET_GEOMETRY) en corrigent la taille et la forme ; la cadence reste celle du chargement. Pur, pour etre teste.
     /// </summary>
     internal static CoreTiming? LireLaCadence(IEnumerable<string> lignes)
     {
@@ -160,6 +168,17 @@ public sealed class ReplayCoreTimingProbe
 
             var crcMatch = ContentCrcLine.Match(line);
             if (crcMatch.Success) { pendingCrc = crcMatch.Groups["crc"].Value.ToLowerInvariant().PadLeft(8, '0'); continue; }
+
+            var annonce = AnnonceLine.Match(line);
+            if (annonce.Success)
+            {
+                if (last is not null && int.TryParse(annonce.Groups["w"].Value, out var aw) && int.TryParse(annonce.Groups["h"].Value, out var ah)
+                    && aw > 0 && ah > 0 && double.TryParse(annonce.Groups["a"].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var aa))
+                {
+                    last = last with { Width = aw, Height = ah, Aspect = aa is > 0.2 and < 5 ? aa : last.Aspect };
+                }
+                continue;
+            }
 
             var m = GeometryLine.Match(line);
             if (!m.Success) continue;
