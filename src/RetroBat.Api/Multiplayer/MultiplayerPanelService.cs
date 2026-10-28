@@ -1242,7 +1242,8 @@ public sealed partial class MultiplayerPanelService
                     var absent = room.Players.Any(j => j.You && !j.Present);
                     return new MultiplayerToastOverlay.Ligne(
                         NomDuJeu(room.Game),
-                        room.Players.Count(j => j.Present) + "/" + room.Max + "   " + T(absent ? "multiplayer.selection.away" : "multiplayer.selection.help"),
+                        room.Players.Count(j => j.Present) + "/" + room.Max + "   " + (absent ? T("multiplayer.selection.away")
+                            : room.EntreAmis ? Texte("multiplayer.selection.help_friends", "waiting for friends") : T("multiplayer.selection.help")),
                         room is { State: "countdown", CountdownMs: { } ms } ? DateTime.UtcNow.AddMilliseconds(ms) : null);
                 }).ToList();
                 if (lignes.Count > 0)
@@ -1397,9 +1398,12 @@ public sealed partial class MultiplayerPanelService
                 ? DispositionPour(max)
                 : LeaderboardOverlayService.DispositionDesJoueurs.Liste,
             // « VOTRE SELECTION » en haut a gauche du panneau (demande du user du 26/10), les memes jeux que la carte d'ES.
+            // Une gameroom d'amis s'y dit « AMIS » devant son compte (question du user du 28/10).
             MaSelection: _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3)
                 .Select(r => new LeaderboardOverlayService.JeuDeMaSelection(
-                    NomDuJeu(r.Game), r.Players.Count(j => j.Present) + "/" + r.Max, room is not null && r.Room == room.Room))
+                    NomDuJeu(r.Game), (r.EntreAmis ? Texte("multiplayer.selection.friends", "FRIENDS") + "  " : string.Empty)
+                        + r.Players.Count(j => j.Present) + "/" + r.Max,
+                    RoomDuJeu() is { } courante && r.Room == courante.Room))
                 .ToList(),
             TitreDeMaSelection: T("multiplayer.selection"));
     }
