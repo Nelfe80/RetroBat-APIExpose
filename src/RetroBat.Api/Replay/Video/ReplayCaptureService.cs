@@ -111,6 +111,9 @@ public sealed class ReplayCaptureService : BackgroundService
     private IDisposable? _abonnement;
     private CancellationToken _arret;
 
+    // Le chemin du jeu lance (ui.game.started), pour le fond du cadre de son film.
+    private volatile string? _cheminDuJeu;
+
     private sealed class CaptureEnCours
     {
         public required string ReplayId;
@@ -120,6 +123,8 @@ public sealed class ReplayCaptureService : BackgroundService
         public int? Rotation;
         /// <summary>La forme de l'image annoncee par le coeur (libretro « Aspect »), null si inconnue.</summary>
         public double? Forme;
+        /// <summary>Le fanart du jeu (sinon sa capture), fond du cadre 16:9 du direct et de la video ; null sans image.</summary>
+        public string? Fond;
         public bool EnteteVerifiee;
         /// <summary>Le film d'une partie sans replay : il s'arrete et se suit sans l'enregistreur.</summary>
         public bool SansReplay;
@@ -196,7 +201,7 @@ public sealed class ReplayCaptureService : BackgroundService
         bool Origine = false, int? Rotation = null, string? Version = null, int EchecsDeVersion = 0,
         IReadOnlyList<double[]>? Courbe = null, double? FinDuRunS = null, double? DureeS = null,
         double? DebutSequenceS = null, double? FinSequenceS = null, double? Forme = null,
-        int Largeur = 0, int Hauteur = 0);
+        int Largeur = 0, int Hauteur = 0, string? Fond = null);
 
     /// <summary>
     /// LE GARDE-FOU DE LA FORME (decision du user du 25 octobre 2026) : un film dont l'image n'a pas la forme du jeu ne part
@@ -440,6 +445,8 @@ public sealed class ReplayCaptureService : BackgroundService
                     _ = Task.Run(() => ArreterAsync(null, null, abandon: false, "fin de partie"));
                     break;
                 case "ui.game.started":
+                    // Le jeu lance, pour le fond du cadre de son film (fanart).
+                    _cheminDuJeu = Chaine(e.Payload, "GamePath");
                     // Le joueur passe avant : un envoi en cours s'arrete, il reprendra apres la partie.
                     lock (_verrou)
                     {
@@ -518,7 +525,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 _enCours = new CaptureEnCours
                 {
                     ReplayId = replayId, Fichier = fichier, FrameDebut = frame, Rotation = rotation, SansReplay = sansReplay,
-                    Forme = forme,
+                    Forme = forme, Fond = FondDuJeu(_cheminDuJeu),
                 };
             }
             if (sansReplay)
@@ -640,7 +647,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 Sessions: c.SansReplay ? SessionsDuFilm(c.ReplayId, null) : null, SansReplay: c.SansReplay,
                 Origine: origine, Rotation: c.Rotation,
                 Courbe: c.CopieDeLaCourbe(), FinDuRunS: c.FinDuRunS, DureeS: dureeAuStop,
-                Forme: c.Forme, Largeur: (int)entete.Largeur, Hauteur: (int)entete.Hauteur);
+                Forme: c.Forme, Largeur: (int)entete.Largeur, Hauteur: (int)entete.Hauteur, Fond: c.Fond);
             await File.WriteAllTextAsync(Path.Combine(_dossier, c.ReplayId + ".json"),
                 JsonSerializer.Serialize(gardee, Json), Encoding.UTF8, _arret).ConfigureAwait(false);
             _logger.LogInformation("Capture : {ReplayId} gardee ({Taille} octets, {Format}, {Pourquoi}), en attente de la decision du site.",
@@ -663,11 +670,18 @@ public sealed class ReplayCaptureService : BackgroundService
     /// Le film en cours d'ecriture et la rotation du coeur, pour le direct d'un record (le direct en est la copie) ;
     /// null quand rien n'est filme.
     /// </summary>
-    public (string Fichier, int? Rotation, double? Forme)? FilmEnCours()
+    public (string Fichier, int? Rotation, double? Forme, string? Fond)? FilmEnCours()
     {
         var c = _enCours;
-        return c is null ? null : (c.Fichier, c.Rotation, c.Forme);
+        return c is null ? null : (c.Fichier, c.Rotation, c.Forme, c.Fond);
     }
+
+    /// <summary>
+    /// LE FOND DU CADRE 16:9 (28 octobre 2026) : le fanart du jeu dans le gamelist d'ES, sinon sa capture ; null sans image.
+    /// L'exe du direct le pose couvrant, flou et assombri derriere le jeu.
+    /// </summary>
+    internal static string? FondDuJeu(string? cheminDuJeu)
+        => string.IsNullOrWhiteSpace(cheminDuJeu) ? null : RetroBat.Api.Media.MediaDuGamelist.Resoudre(cheminDuJeu, "fanart", "image");
 
     /// <summary>
     /// Le verdict d'un score : sa session est celle du film sans replay en cours, ou de celui qui vient de finir (dix
@@ -956,7 +970,7 @@ public sealed class ReplayCaptureService : BackgroundService
         _logger.LogInformation("Capture : {ReplayId} est un record, fabrication de sa version YouTube ({Sequence}).", g.ReplayId,
             g.DebutSequenceS is double d && g.FinSequenceS is double f ? "sequence de " + d + " a " + f + " s du film" : "film entier");
         var r = await LanceurDuDirect.FabriquerLaVersionAsync(exe, g.Fichier, version, g.Rotation ?? 0, _logger, ct,
-            g.DebutSequenceS, g.FinSequenceS, g.Forme).ConfigureAwait(false);
+            g.DebutSequenceS, g.FinSequenceS, g.Forme, g.Fond).ConfigureAwait(false);
         if (r.Code == 0 && TailleDe(version) > 0)
         {
             var faite = g with { Version = version };

@@ -443,7 +443,7 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                 // empreinte attendue, que le site donne.
                 var (annonce, optionsDesClips) = Clips(ouvert.Clips);
                 var r = await LanceurDuDirect.DiffuserAsync(exe!, film.Fichier, ouvert.Ingest, film.Rotation ?? 0, _journal, arret.Token,
-                        annonce: annonce, classement: CheminDeLaCarte, options: optionsDesClips, forme: film.Forme)
+                        annonce: annonce, classement: CheminDeLaCarte, options: optionsDesClips, forme: film.Forme, fond: film.Fond)
                     .ConfigureAwait(false);
                 _journal.LogInformation("Direct : {Direct} fini ({Fin}, code {Code}, {Secondes:F0} s).", ouvert.LiveId, r.Fin, r.Code,
                     r.Duree.TotalSeconds);

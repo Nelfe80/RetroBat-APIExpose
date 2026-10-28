@@ -231,6 +231,43 @@ public sealed class DirectPartageTests
     }
 
     [Fact]
+    public void Un_jeu_a_plusieurs_ecrans_donne_au_direct_sa_grille_et_le_joueur_de_chaque_case()
+    {
+        RetroBat.Api.Multiplayer.MultiplayerPartieDeLHote Partie(int ecrans, IReadOnlyList<int>? places, params (int Seat, string Pseudo, double? Cote)[] joueurs)
+            => new("r1", "arcade/x", "X", "arcade",
+                joueurs.Select(j => new RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect(j.Seat, j.Pseudo, null, j.Cote)).ToList(),
+                "duel", ecrans, places);
+
+        // Title Fight : deux ecrans, un boxeur par ecran, cotes entre parentheses.
+        var titlef = DirectPartageService.GrilleDuDirect(Partie(2, [1, 2], (2, "Nelfe80", 983.6), (1, "Falken", 1016.4)));
+        Assert.NotNull(titlef);
+        Assert.Equal((2, 1), (titlef!.Value.Colonnes, titlef.Value.Lignes));
+        Assert.Equal([("Falken (1016)", 1), ("Nelfe80 (984)", 2)], titlef.Value.Cases);
+        // Trois joueurs par ecran (Hard Dunk) : une case par ecran, la couleur de sa premiere place.
+        var dunk = DirectPartageService.GrilleDuDirect(Partie(2, [1, 1, 1, 2, 2, 2], (1, "A", null), (2, "B", null), (4, "D", null)));
+        Assert.Equal([("A & B", 1), ("D", 4)], dunk!.Value.Cases);
+        // Un seul ecran : pas de grille.
+        Assert.Null(DirectPartageService.GrilleDuDirect(Partie(1, null, (1, "A", null), (2, "B", null))));
+
+        var bande = DirectPartageService.DonneesDeLaBande("Falken (1016) vs Nelfe80 (984)", "Title Fight", "Arcade", "MULTIPLAYER", "", titlef);
+        Assert.Equal(2, (int)bande["colonnes"]!);
+        Assert.Equal("Nelfe80 (984)", (string)bande["cases"]![1]!["nom"]!);
+        Assert.Null(bande["record"]);
+        Assert.False(DirectPartageService.DonneesDeLaBande("A", "B", "C", "D", "", null).ContainsKey("cases"));
+    }
+
+    [Fact]
+    public void Le_fanart_du_jeu_part_en_fond_du_cadre_des_directs_et_des_videos()
+    {
+        Assert.Equal(["--film", "f.mkv", "--adresse-stdin", "--rotation", "0", "--suivre", "--fond", @"C:\m\fanart.jpg"],
+            LanceurDuDirect.Arguments("f.mkv", 0, fond: @"C:\m\fanart.jpg"));
+        Assert.Equal(["--film", "f.mkv", "--sortie-flv", "f.flv", "--depuis-le-debut", "--rotation", "0", "--fond", @"C:\m\fanart.jpg"],
+            LanceurDuDirect.ArgumentsDeLaVersion("f.mkv", "f.flv", 0, fond: @"C:\m\fanart.jpg"));
+        Assert.DoesNotContain("--fond", LanceurDuDirect.Arguments("f.mkv", 0, fond: " "));
+        Assert.Null(ReplayCaptureService.FondDuJeu(null));
+    }
+
+    [Fact]
     public void Les_options_du_passage_suivent_les_arguments_du_direct()
     {
         var args = LanceurDuDirect.Arguments("film.mkv", 0, options: ["--debit", "3000"]);

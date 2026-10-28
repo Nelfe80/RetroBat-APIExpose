@@ -205,10 +205,7 @@ public sealed class DirectPartageService : IHostedService
     /// </summary>
     internal static string TexteDeLaBande(IEnumerable<RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect> places, string? famille)
     {
-        static string Joueur(RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect j)
-            => j.Pseudo.Trim() + (j.Rating is double cote
-                ? " (" + Math.Round(cote, MidpointRounding.AwayFromZero).ToString("0", CultureInfo.InvariantCulture) + ")"
-                : "");
+        static string Joueur(RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect j) => NomSurLaBande(j);
         var assis = places.Where(j => !string.IsNullOrWhiteSpace(j.Pseudo)).OrderBy(j => j.Seat).ToList();
         return famille?.Trim().ToLowerInvariant() switch
         {
@@ -598,13 +595,13 @@ public sealed class DirectPartageService : IHostedService
                 _journal.LogInformation("Direct partage : l'exe de la partie precedente s'est arrete, la nouvelle partie {Mode}.",
                     relais ? "reprend le meme direct" : "prend l'antenne");
             }
-            EcrireLeBandeau(p.BandeJoueur, p.BandeJeu, p.BandeSysteme, ModeDeLaBande(p, regleParDefaut), p.RecordTexte);
+            EcrireLeBandeau(p, ModeDeLaBande(p, regleParDefaut));
             // La carte d'un passage precedent ne se montre jamais : elle s'ecrit au moment ou le record tombe.
             try { File.Delete(CheminDeLaCarte); } catch (Exception) { /* absente */ }
             Ecrire(CheminDeLaCommande, CommandeJson(fin: false, arret: false, null, null, false, false));
             return await LanceurDuDirect.DiffuserAsync(exe, film.Fichier, adresse, film.Rotation ?? 0, _journal, jeton,
                 annonce: annonce, classement: CheminDeLaCarte, options: options, delaiDeFin: TimeSpan.FromSeconds(10),
-                forme: film.Forme).ConfigureAwait(false);
+                forme: film.Forme, fond: film.Fond).ConfigureAwait(false);
         });
         lock (_verrou)
         {
@@ -678,7 +675,7 @@ public sealed class DirectPartageService : IHostedService
     private void EcrireLaBande(Partie p)
     {
         lock (_verrou) if (_aLAntenne != p || p.BandeRegleParDefaut is null) return;
-        EcrireLeBandeau(p.BandeJoueur, p.BandeJeu, p.BandeSysteme, ModeDeLaBande(p, p.BandeRegleParDefaut), p.RecordTexte);
+        EcrireLeBandeau(p, ModeDeLaBande(p, p.BandeRegleParDefaut));
     }
 
     /// <summary>Le mode sur la bande : « RECORD ALERT » pendant que la partie approche le record, sinon son classement.</summary>
@@ -711,11 +708,54 @@ public sealed class DirectPartageService : IHostedService
         }
     }
 
-    private void EcrireLeBandeau(string? joueur, string? jeu, string? systeme, string mode, string record)
-        => Ecrire(CheminDuBandeau, new JsonObject
+    private void EcrireLeBandeau(Partie p, string mode)
+        => Ecrire(CheminDuBandeau, DonneesDeLaBande(p.BandeJoueur, p.BandeJeu, p.BandeSysteme, mode, p.RecordTexte,
+            p.Multi is { } mp ? GrilleDuDirect(mp) : null).ToJsonString());
+
+    /// <summary>
+    /// Ce que lit l'exe : la bande, et la grille d'un jeu a plusieurs ecrans (colonnes, lignes, et le joueur de chaque case
+    /// dans l'ordre des cases), que le cadre 16:9 alterne avec chaque ecran en plein cadre (exe 0.6.0). Pur.
+    /// </summary>
+    internal static JsonObject DonneesDeLaBande(string? joueur, string? jeu, string? systeme, string mode, string record,
+        (int Colonnes, int Lignes, IReadOnlyList<(string Nom, int Place)> Cases)? grille)
+    {
+        var bande = new JsonObject
         {
             ["joueur"] = joueur, ["jeu"] = jeu, ["systeme"] = systeme, ["mode"] = mode, ["record"] = record.Length > 0 ? record : null,
-        }.ToJsonString());
+        };
+        if (grille is { } g)
+        {
+            bande["colonnes"] = g.Colonnes;
+            bande["lignes"] = g.Lignes;
+            bande["cases"] = new JsonArray(g.Cases.Select(c => (JsonNode)new JsonObject { ["nom"] = c.Nom, ["place"] = c.Place }).ToArray());
+        }
+        return bande;
+    }
+
+    /// <summary>
+    /// LA GRILLE D'UN JEU A PLUSIEURS ECRANS (demande du user, 28/10) : Title Fight montre ses deux ecrans cote a cote dans
+    /// l'image de l'hote. Une case par ecran, de gauche a droite, avec les joueurs de ses places (« A & B » quand un ecran
+    /// en a plusieurs) et la couleur de la premiere. Rien pour un jeu a un ecran. Pur.
+    /// </summary>
+    internal static (int Colonnes, int Lignes, IReadOnlyList<(string Nom, int Place)> Cases)? GrilleDuDirect(
+        RetroBat.Api.Multiplayer.MultiplayerPartieDeLHote mp)
+    {
+        if (mp.Screens < 2) return null;
+        int EcranDe(int place) => mp.SeatScreens is { } e && place >= 1 && place <= e.Count ? e[place - 1] : (place - 1) % mp.Screens + 1;
+        var cases = new List<(string, int)>();
+        for (var ecran = 1; ecran <= mp.Screens; ecran++)
+        {
+            var assis = mp.Players.Where(j => !string.IsNullOrWhiteSpace(j.Pseudo) && EcranDe(j.Seat) == ecran).OrderBy(j => j.Seat).ToList();
+            cases.Add((string.Join(" & ", assis.Select(NomSurLaBande)), assis.Count > 0 ? assis[0].Seat : ecran));
+        }
+        return (mp.Screens, 1, cases);
+    }
+
+    /// <summary>Un joueur sur la bande : son pseudo, et sa cote entre parentheses quand le jeu est classe. Pur.</summary>
+    private static string NomSurLaBande(RetroBat.Api.Multiplayer.MultiplayerPlaceDuDirect j)
+        => j.Pseudo.Trim() + (j.Rating is double cote
+            ? " (" + Math.Round(cote, MidpointRounding.AwayFromZero).ToString("0", CultureInfo.InvariantCulture) + ")"
+            : "");
 
     /// <summary>Ecriture atomique : l'exe ne lit jamais un fichier a moitie ecrit.</summary>
     private void Ecrire(string chemin, string texte)
