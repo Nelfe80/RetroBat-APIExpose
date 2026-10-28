@@ -47,7 +47,7 @@ public sealed record MultiplayerStatsProfil
     /// <summary>Les regles de compteur connues : la liste fermee du CDC.</summary>
     public static readonly IReadOnlySet<string> Regles = new HashSet<string>(StringComparer.Ordinal)
     {
-        RegleBaisseAdverse, RegleSommeBaisseAdverse, RegleAtteintAdverse, RegleMancheGagneeSiPlein,
+        RegleBaisseAdverse, RegleSommeBaisseAdverse, RegleAtteintAdverse, RegleMancheGagneeSiPlein, ReglePlusGrandeBaisseAdverse,
         RegleHausse, RegleSommeHausse, RegleHausseDAuMoins, RegleAtteint, ReglePlusGrandeHausse, RegleMaximum,
     };
 
@@ -56,6 +56,12 @@ public sealed record MultiplayerStatsProfil
 
     /// <summary>La somme des baisses de la valeur adverse : les degats infliges (un K.O. compte la vie qui restait).</summary>
     public const string RegleSommeBaisseAdverse = "somme_baisse_adverse";
+
+    /// <summary>
+    /// La plus grande baisse d'un coup de la valeur adverse : le meilleur coup (28/10, Yu Yu Hakusho). Des coups enchaines
+    /// plus vite que deux lectures (80 ms) n'en font qu'un : c'est alors le meilleur enchainement.
+    /// </summary>
+    public const string ReglePlusGrandeBaisseAdverse = "plus_grande_baisse_adverse";
 
     /// <summary>La valeur adverse atteint une valeur (le K.O.) : compte une fois a chaque passage.</summary>
     public const string RegleAtteintAdverse = "atteint_adverse";
@@ -87,7 +93,8 @@ public sealed record MultiplayerStatsProfil
     /// <summary>Les regles qui lisent l'adversaire : elles demandent un duel (deux places).</summary>
     public bool LitLAdversaire => Counters.Values.Any(c => LitLAdversaireSelon(c.Rule));
 
-    public static bool LitLAdversaireSelon(string regle) => regle is RegleBaisseAdverse or RegleSommeBaisseAdverse or RegleAtteintAdverse;
+    public static bool LitLAdversaireSelon(string regle)
+        => regle is RegleBaisseAdverse or RegleSommeBaisseAdverse or RegleAtteintAdverse or ReglePlusGrandeBaisseAdverse;
 
     /// <summary>
     /// Le profil d'un jeu : son fichier (<c>stats.profile</c>), sinon le profil IMPLICITE de son bloc <c>stats.life</c>

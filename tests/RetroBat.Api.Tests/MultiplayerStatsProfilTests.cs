@@ -196,6 +196,32 @@ public sealed class MultiplayerStatsProfilTests : IDisposable
     }
 
     [Fact]
+    public void La_plus_grande_baisse_adverse_garde_le_meilleur_coup_porte()
+    {
+        var profil = new MultiplayerStatsProfil
+        {
+            Id = "x", Players = 2,
+            Signals = new Dictionary<string, MultiplayerStatsSignal>
+            {
+                ["vie"] = new() { Seats = new Dictionary<string, string> { ["1"] = "0x10", ["2"] = "0x20" }, Full = 223, Ko = 0 },
+            },
+            Counters = new Dictionary<string, MultiplayerStatsCompteur> { ["meilleur"] = new() { Rule = "plus_grande_baisse_adverse", Signal = "vie" } },
+        };
+        var suivi = new MultiplayerStatsMoteur(new RetroArchMuet()).Suivre(profil, [1, 2], new CancellationToken(true));
+        var avant = new Dictionary<(string, int), int?>();
+        // La vie de P2 : trois coups de P1 (20, 55, 10), puis le K.O. (la vie restante, 30).
+        foreach (var vie in new[] { 223, 203, 203, 148, 138, 30, 0 })
+        {
+            var nouvelles = new Dictionary<(string, int), int?> { [("vie", 1)] = 223, [("vie", 2)] = vie };
+            suivi.Appliquer(nouvelles, avant);
+            avant = nouvelles;
+        }
+
+        Assert.Equal(108, suivi.Instantane().Compteurs[1]["meilleur"]);
+        Assert.Equal(0, suivi.Instantane().Compteurs[2]["meilleur"]);
+    }
+
+    [Fact]
     public void Le_maximum_garde_la_plus_haute_valeur_vue_d_une_course_a_l_autre()
     {
         var profil = new MultiplayerStatsProfil

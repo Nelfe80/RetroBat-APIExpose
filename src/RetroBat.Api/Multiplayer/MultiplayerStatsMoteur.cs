@@ -189,10 +189,16 @@ public sealed class MultiplayerStatsSuivi
 
                     switch (compteur.Rule)
                     {
-                        case MultiplayerStatsProfil.RegleBaisseAdverse or MultiplayerStatsProfil.RegleSommeBaisseAdverse:
+                        case MultiplayerStatsProfil.RegleBaisseAdverse or MultiplayerStatsProfil.RegleSommeBaisseAdverse
+                            or MultiplayerStatsProfil.ReglePlusGrandeBaisseAdverse:
                             if (Baisse(signal, avant.GetValueOrDefault((compteur.Signal, adversaire)), nouvelles.GetValueOrDefault((compteur.Signal, adversaire))) is { } baisse)
                             {
-                                _compteurs[place][nom] += compteur.Rule == MultiplayerStatsProfil.RegleBaisseAdverse ? 1 : baisse;
+                                _compteurs[place][nom] = compteur.Rule switch
+                                {
+                                    MultiplayerStatsProfil.RegleBaisseAdverse => _compteurs[place][nom] + 1,
+                                    MultiplayerStatsProfil.RegleSommeBaisseAdverse => _compteurs[place][nom] + baisse,
+                                    _ => Math.Max(_compteurs[place][nom], baisse),
+                                };
                             }
                             break;
 
