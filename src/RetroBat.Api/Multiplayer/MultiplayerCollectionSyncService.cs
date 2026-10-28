@@ -417,7 +417,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
             {
                 if (!inventaires.TryGetValue(jeu.System, out var inventaire))
                 {
-                    inventaires[jeu.System] = inventaire = _catalog.Enumerate([jeu.System]);
+                    inventaires[jeu.System] = inventaire = _catalog.Enumerate(SystemesDuContenu(jeu.System));
                 }
 
                 (chemin, cle) = TrouverContenu(jeu.Content!, inventaire);
@@ -467,6 +467,29 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
             }
         }, cancellationToken);
     }
+
+    private const string SuffixeADeux = "2players";
+
+    /// <summary>
+    /// Les systemes ou chercher un jeu console : le sien, puis, pour un systeme « a deux » de RetroBat (gbc2players,
+    /// gb2players), le systeme de base, ou le user range aussi ses cartouches (28/10 : Super Mario Bros. Deluxe, deplace de
+    /// gbc2players vers gbc, sortait de la collection). Pur.
+    /// </summary>
+    internal static IReadOnlyList<string> SystemesDuContenu(string systeme)
+        => systeme.Length > SuffixeADeux.Length && systeme.EndsWith(SuffixeADeux, StringComparison.OrdinalIgnoreCase)
+            ? [systeme, systeme[..^SuffixeADeux.Length]]
+            : [systeme];
+
+    /// <summary>
+    /// Le systeme donne au lanceur : celui du dossier de la ROM (fbneo ou mame pour l'arcade), sauf pour un systeme « a
+    /// deux » du catalogue : le lanceur de RetroBat ne branche le cable de TGBDual qu'en gb2players et gbc2players (en gbc,
+    /// il pose tgbdual_gblink_enable = disabled), ou que soit rangee la cartouche. Pur.
+    /// </summary>
+    internal static string SystemeDuLancement(string systemeDuCatalogue, string systemeDuDossier)
+        => SystemesDuContenu(systemeDuCatalogue).Count > 1
+           && SystemesDuContenu(systemeDuCatalogue).Contains(systemeDuDossier, StringComparer.OrdinalIgnoreCase)
+            ? systemeDuCatalogue
+            : systemeDuDossier;
 
     private string? TrouverSet(string set)
     {

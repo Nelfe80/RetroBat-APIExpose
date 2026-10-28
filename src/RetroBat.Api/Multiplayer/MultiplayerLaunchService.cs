@@ -891,7 +891,8 @@ public sealed class MultiplayerLaunchService : IHostedService
     private Partie? Lancer(MultiplayerRoom room, MultiplayerInstalledGame jeu, IReadOnlyList<string> netplay)
     {
         var lancement = room.Launch!;
-        var systeme = NetplayHostService.SystemeDuChemin(jeu.Path, RetroBatPaths.RomsRoot);
+        var systeme = MultiplayerCollectionSyncService.SystemeDuLancement(jeu.Game.System,
+            NetplayHostService.SystemeDuChemin(jeu.Path, RetroBatPaths.RomsRoot));
         var coeur = jeu.Core?.Core ?? string.Empty;
         // Sans ES, les manettes se calculent comme ES le ferait : le lanceur n'en cherche aucune lui-meme (EsManettes).
         var choix = EsManettes.PourLancer(_journal);

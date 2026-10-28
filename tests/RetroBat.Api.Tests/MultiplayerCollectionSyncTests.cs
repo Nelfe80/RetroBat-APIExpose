@@ -130,6 +130,7 @@ public class MultiplayerCollectionSyncTests : IDisposable
         cores = new Dictionary<string, object>
         {
             ["arcade"] = new { core = "fbneo" },
+            ["gbc2players"] = new { core = "tgbdual" },
             ["gba"] = new
             {
                 core = "mgba_splitscreen",
@@ -182,6 +183,36 @@ public class MultiplayerCollectionSyncTests : IDisposable
         Assert.Equal("mgba_splitscreen", jeu.Core?.Core);
         Assert.Equal("off", jeu.Core?.Options?["splitscreen_boot_menu"]);
         Assert.Equal("{seat}", jeu.Core?.SeatOptions?["splitscreen_focus_player"]);
+    }
+
+    [Fact]
+    public async Task Une_cartouche_d_un_systeme_a_deux_se_trouve_aussi_dans_le_systeme_de_base()
+    {
+        // 28/10 : le user a range Super Mario Bros. Deluxe dans gbc (au lieu de gbc2players), le jeu sortait de la collection.
+        var deluxe = PoserCartouche("gbc", "Super Mario Bros. Deluxe (USA, Europe).zip", "x.gbc", "smb deluxe");
+        PoserCatalogue(Catalogue(JeuConsole("gbc2players/super-mario-bros-deluxe", "gbc2players", deluxe.Md5, deluxe.Crc)));
+
+        var service = Service();
+        var statut = await service.SynchroniserAsync("test", CancellationToken.None);
+
+        Assert.Empty(statut.Missing);
+        Assert.Contains(deluxe.Chemin, Collection());
+        Assert.Equal("gbc2players/super-mario-bros-deluxe", service.Games.Single().Game.Id);
+    }
+
+    [Theory]
+    // Le lanceur ne branche le cable de TGBDual qu'en gbc2players et gb2players : ce systeme part, ou que soit la cartouche.
+    [InlineData("gbc2players", "gbc", "gbc2players")]
+    [InlineData("gbc2players", "gbc2players", "gbc2players")]
+    [InlineData("gb2players", "gb", "gb2players")]
+    // L'arcade part sous le dossier de son set ; un systeme ordinaire sous le sien.
+    [InlineData("arcade", "fbneo", "fbneo")]
+    [InlineData("gba", "gba", "gba")]
+    public void Un_systeme_a_deux_part_sous_son_nom(string catalogue, string dossier, string attendu)
+    {
+        Assert.Equal(attendu, MultiplayerCollectionSyncService.SystemeDuLancement(catalogue, dossier));
+        Assert.Equal(["gbc2players", "gbc"], MultiplayerCollectionSyncService.SystemesDuContenu("gbc2players"));
+        Assert.Equal(["gba"], MultiplayerCollectionSyncService.SystemesDuContenu("gba"));
     }
 
     [Fact]
