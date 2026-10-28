@@ -41,7 +41,7 @@ public class StartupFatalLogTests
     }
 
     [Fact]
-    public void Le_manifeste_des_executables_declare_les_trois_exe_de_la_racine()
+    public void Le_manifeste_des_executables_declare_les_exe_de_la_racine()
     {
         var dossier = AppContext.BaseDirectory;
         string? manifeste = null;
@@ -54,7 +54,7 @@ public class StartupFatalLogTests
         Assert.NotNull(manifeste);
         using var doc = JsonDocument.Parse(File.ReadAllText(manifeste!));
         var fichiers = doc.RootElement.EnumerateArray().Select(e => e.GetProperty("file").GetString()).ToArray();
-        Assert.Equal(new[] { "RetroBat.Api.exe", "RetroBat.Api.Update.exe", "RetroBat.Api.Diagnostic.exe", "NelfePlay.LiveStreaming.exe" }, fichiers);
+        Assert.Equal(new[] { "RetroBat.Api.exe", "RetroBat.Api.Update.exe", "RetroBat.Api.Diagnostic.exe", "NelfePlay.LiveStreaming.exe", "RetroBat.ApiConnect.exe" }, fichiers);
         Assert.All(doc.RootElement.EnumerateArray(), e => Assert.InRange(e.GetProperty("timeoutSeconds").GetInt32(), 1, 600));
     }
 }

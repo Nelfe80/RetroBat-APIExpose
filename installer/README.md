@@ -10,6 +10,7 @@
 | Prérequis .NET 8 | `dotnet-runtime.iss` | Détecte ASP.NET Core Runtime 8 et .NET Desktop Runtime 8 (x64) ; télécharge et installe celui qui manque. Détail plus bas. |
 | Fichiers | `CabinetSetup.iss`, `[Files]` | Le dossier du plugin, moins les exclusions (sources, docs, état local, secrets, outils internes). `appsettings.json` n'est posé que s'il n'existe pas ; `wrapper\.env` jamais. |
 | Hook EmulationStation | `CabinetSetup.iss`, `[Code]` | Copie `.installer\scripts\start\APIExpose-start-wait.bat` dans `<RetroBat>\emulationstation\.emulationstation\scripts\start\`, y compris en installation silencieuse. Le retire à la désinstallation. |
+| Liaison au compte | `[Run]` | `RetroBat.ApiConnect.exe` (dépôt privé APIExposeConnect), lancé sans case à cocher, ignoré en silencieux : il ouvre le navigateur, la machine est liée au compte NelfePlay du joueur, puis il se ferme. Machine déjà liée : il se ferme aussitôt. |
 | Fin d'installation | `[Run]` | Case « Démarrer APIExpose maintenant », décochée, ignorée en silencieux. |
 
 L'installeur tourne **sans droits administrateur** (`PrivilegesRequired=lowest`) : il écrit dans le dossier de RetroBat et inscrit sa désinstallation dans `HKCU`. Seule l'installation d'un runtime .NET demande une élévation, ponctuelle.

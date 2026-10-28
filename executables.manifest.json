@@ -24,5 +24,11 @@
     "arguments": "--self-test",
     "timeoutSeconds": 15,
     "expectedExitCode": 0
+  },
+  {
+    "file": "RetroBat.ApiConnect.exe",
+    "arguments": "--self-test",
+    "timeoutSeconds": 15,
+    "expectedExitCode": 0
   }
 ]

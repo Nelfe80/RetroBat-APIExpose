@@ -47,6 +47,9 @@ internal static class Program
     private const string NomArchive = "APIExpose";           // le dossier racine DANS l'archive
     private const string ExeApi = "RetroBat.Api.exe";
     private const string ExeMoi = "RetroBat.Api.Update.exe";
+    // La liaison au compte (depot prive APIExposeConnect) : elle peut tourner pendant une mise a
+    // jour, une liaison en cours dans le navigateur. On ne la coupe pas, on la remplace comme soi.
+    private const string ExeConnect = "RetroBat.ApiConnect.exe";
     private const string Configuration = "appsettings.json";
 
     private static readonly string[] JamaisEcrases = { Configuration };
@@ -317,7 +320,8 @@ internal static class Program
                 var source = Path.Combine(scene, rel);
                 var cible = Path.Combine(racine, rel);
                 Directory.CreateDirectory(Path.GetDirectoryName(cible)!);
-                if (string.Equals(rel, ExeMoi, StringComparison.OrdinalIgnoreCase) && File.Exists(cible))
+                if ((string.Equals(rel, ExeMoi, StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(rel, ExeConnect, StringComparison.OrdinalIgnoreCase)) && File.Exists(cible))
                 {
                     // Un exe qui tourne ne se reecrit pas, mais il se RENOMME : on le pousse de
                     // cote, le nouveau prend sa place, et l'ancien sera efface au prochain passage.
@@ -624,12 +628,15 @@ internal static class Program
 
     private static void NettoyerLAncienMoi(string racine)
     {
-        try
+        foreach (var exe in new[] { ExeMoi, ExeConnect })
         {
-            var vieux = Path.Combine(racine, ExeMoi + ".old");
-            if (File.Exists(vieux)) File.Delete(vieux);
+            try
+            {
+                var vieux = Path.Combine(racine, exe + ".old");
+                if (File.Exists(vieux)) File.Delete(vieux);
+            }
+            catch { /* encore verrouille par le passage precedent : au suivant */ }
         }
-        catch { /* encore verrouille par le passage precedent : au suivant */ }
     }
 
     private static void Dire(string message)

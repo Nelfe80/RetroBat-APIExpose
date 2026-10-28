@@ -129,9 +129,16 @@ Name: "{app}\state"; Flags: uninsneveruninstall
 Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"; Description: "Démarrer APIExpose maintenant"; Flags: postinstall nowait skipifsilent unchecked
 ; L'outil de diagnostic (depot APIExposeDiagnostic) : il dit pourquoi APIExpose ne demarre pas.
 Filename: "{app}\RetroBat.Api.Diagnostic.exe"; WorkingDir: "{app}"; Description: "Diagnostiquer le démarrage d'APIExpose"; Flags: postinstall nowait skipifsilent unchecked; Check: DiagnosticToolPresent
+; LA LIAISON AU COMPTE (depot prive APIExposeConnect, 2026-10-28), sans case a cocher : l'installation vaut accord. Les
+; joueurs n'arrivaient jamais a lier leur machine : la page de liaison est servie par APIExpose, qui s'arrete avec
+; EmulationStation, et ils quittaient RetroBat pour ouvrir le site. ApiConnect sert sa propre page sur 127.0.0.1:12346,
+; ouvre le navigateur, et se ferme une fois la machine liee (aussitot si elle l'est deja). runasoriginaluser : la cle de
+; la machine vit dans le coffre de Windows de l'UTILISATEUR, celui sous lequel l'API tournera.
+Filename: "{app}\RetroBat.ApiConnect.exe"; WorkingDir: "{app}"; StatusMsg: "Connexion de la machine à NelfePlay..."; Flags: nowait skipifsilent runasoriginaluser; Check: ApiConnectPresent
 
 [UninstallRun]
 Filename: "taskkill"; Parameters: "/f /im {#AppExe}"; Flags: runhidden; RunOnceId: "StopApi"
+Filename: "taskkill"; Parameters: "/f /im RetroBat.ApiConnect.exe"; Flags: runhidden; RunOnceId: "StopApiConnect"
 ; LA DESINSTALLATION PROPRE (2026-10-17) : avant que les fichiers partent, l'exe retire la collection World Scoring, ses
 ; images, les reglages d'APIExpose dans ES, ses dossiers dans les themes et les donnees du dossier ; il garde media,
 ; l'identite de la borne et les replays (src/RetroBat.Api/Infrastructure/Desinstallation.cs).
@@ -149,6 +156,12 @@ Filename: "{app}\{#AppExe}"; Parameters: "--desinstaller"; WorkingDir: "{app}"; 
 function DiagnosticToolPresent(): Boolean;
 begin
   Result := FileExists(ExpandConstant('{app}\RetroBat.Api.Diagnostic.exe'));
+end;
+
+// La liaison au compte ne se lance que si l'exe a ete livre.
+function ApiConnectPresent(): Boolean;
+begin
+  Result := FileExists(ExpandConstant('{app}\RetroBat.ApiConnect.exe'));
 end;
 
 // Dossier des scripts de demarrage d'EmulationStation du RetroBat cible.

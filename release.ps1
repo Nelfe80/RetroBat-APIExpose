@@ -216,7 +216,10 @@ $autorises = @(
     # L'outil de diagnostic du demarrage, construit par le depot prive APIExposeDiagnostic.
     'RetroBat.Api.Diagnostic.exe',
     # L'exe du direct, construit par le depot prive NelfePlay-LiveStreaming.
-    'NelfePlay.LiveStreaming.exe'
+    'NelfePlay.LiveStreaming.exe',
+    # La liaison au compte, construite par le depot prive APIExposeConnect. Quelques centaines de
+    # Ko : elle voyage dans l'archive de mise a jour, contrairement aux deux outils ci-dessus.
+    'RetroBat.ApiConnect.exe'
 )
 $suivis = @{}
 Push-Location $PSScriptRoot
