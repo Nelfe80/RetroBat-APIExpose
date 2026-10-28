@@ -1242,7 +1242,9 @@ public sealed partial class MultiplayerPanelService
                     var absent = room.Players.Any(j => j.You && !j.Present);
                     return new MultiplayerToastOverlay.Ligne(
                         NomDuJeu(room.Game),
-                        room.Players.Count(j => j.Present) + "/" + room.Max + "   " + (absent ? T("multiplayer.selection.away")
+                        // [AMIS] devant le compte d'une gameroom d'amis, comme dans le panneau (demande du user du 29/10).
+                        (room.EntreAmis ? "[" + Texte("multiplayer.selection.friends", "FRIENDS") + "]  " : string.Empty)
+                        + room.Players.Count(j => j.Present) + "/" + room.Max + "   " + (absent ? T("multiplayer.selection.away")
                             : room.EntreAmis ? Texte("multiplayer.selection.help_friends", "waiting for friends") : T("multiplayer.selection.help")),
                         room is { State: "countdown", CountdownMs: { } ms } ? DateTime.UtcNow.AddMilliseconds(ms) : null);
                 }).ToList();
