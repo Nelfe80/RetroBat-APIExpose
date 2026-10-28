@@ -165,6 +165,86 @@ public sealed class MultiplayerStatsProfilTests : IDisposable
         Assert.Contains(raison, erreur);
     }
 
+    [Theory]
+    [InlineData("le", false, new[] { 0x34, 0x12 }, 0x1234)]
+    [InlineData("be", false, new[] { 0x12, 0x34 }, 0x1234)]
+    [InlineData("68k", true, new[] { 0x00, 0x00, 0x50, 0x12 }, 1250)]
+    [InlineData("68k", true, new[] { 0x01, 0x00, 0x00, 0x99 }, 19900)]
+    [InlineData("le", true, new[] { 0x5A }, -1)]
+    public void Un_score_se_lit_dans_son_ordre_et_en_BCD(string ordre, bool bcd, int[] octets, int attendu)
+        => Assert.Equal(attendu < 0 ? null : attendu, new MultiplayerStatsSignal { Bytes = octets.Length, Order = ordre, Bcd = bcd }.Valeur(octets));
+
+    [Fact]
+    public void La_plus_grande_hausse_garde_le_meilleur_coup()
+    {
+        var profil = new MultiplayerStatsProfil
+        {
+            Id = "x", Players = 2,
+            Signals = new Dictionary<string, MultiplayerStatsSignal> { ["score"] = new() { Seats = new Dictionary<string, string> { ["1"] = "0x10", ["2"] = "0x20" } } },
+            Counters = new Dictionary<string, MultiplayerStatsCompteur> { ["meilleur"] = new() { Rule = "plus_grande_hausse", Signal = "score" } },
+        };
+        var suivi = new MultiplayerStatsMoteur(new RetroArchMuet()).Suivre(profil, [1, 2], new CancellationToken(true));
+        var avant = new Dictionary<(string, int), int?>();
+        foreach (var valeur in new[] { 0, 30, 30, 130, 150, 0, 60 })
+        {
+            var nouvelles = new Dictionary<(string, int), int?> { [("score", 1)] = valeur, [("score", 2)] = 0 };
+            suivi.Appliquer(nouvelles, avant);
+            avant = nouvelles;
+        }
+
+        Assert.Equal(100, suivi.Instantane().Compteurs[1]["meilleur"]);
+    }
+
+    [Fact]
+    public async Task KOF98_la_vie_sous_zero_est_un_KO_et_la_recharge_entre_deux_manches_ne_compte_pas()
+    {
+        var profil = Charger("""
+            {
+              "id": "arcade/kof98/duel", "version": 1, "players": 2, "settle_after_round_ms": 600,
+              "signals": {
+                "vie": { "source": "poll", "seats": { "1": "0x8238", "2": "0x8438" }, "bytes": 1, "full": 103 },
+                "manches": { "source": "poll", "seats": { "1": "0xA85F", "2": "0xA84C" }, "bytes": 1, "confirm": false }
+              },
+              "counters": {
+                "coups": { "rule": "baisse_adverse", "signal": "vie" },
+                "degats": { "rule": "somme_baisse_adverse", "signal": "vie" },
+                "perfects": { "rule": "manche_gagnee_si_plein", "signal": "vie", "rounds": "manches" }
+              },
+              "metrics": [
+                { "category": "execution", "id": "coups", "label": "multiplayer.stat.hits", "formula": "coups" },
+                { "category": "efficacite", "id": "degats", "label": "multiplayer.stat.damage", "formula": "degats" },
+                { "category": "maitrise", "id": "perfects", "label": "multiplayer.stat.perfects", "formula": "perfects" }
+              ]
+            }
+            """, out var erreur);
+        Assert.Null(erreur);
+        var ra = new FauxRetroArch();
+        ra.Octets[0x8238] = 103;
+        ra.Octets[0x8438] = 103;
+        using var fin = new CancellationTokenSource();
+        var suivi = new MultiplayerStatsMoteur(ra, TimeSpan.FromMilliseconds(10)).Suivre(profil, [1, 2], fin.Token);
+        async Task Pose(long adresse, int valeur) { ra.Octets[adresse] = valeur; await Task.Delay(150); }
+
+        await Task.Delay(150);
+        await Pose(0x8438, 93);     // P1 touche P2 : 10
+        await Pose(0x8238, 24);     // P2 touche P1 : 79
+        await Pose(0x8438, 7);      // P1 touche P2 : 86
+        await Pose(0x8438, 253);    // K.O. de P2 : la vie passe sous zero, le coup compte les 7 qui restaient
+        await Pose(0xA85F, 1);      // P1 elimine le premier combattant de P2
+        await Pose(0x8438, 103);    // le suivant arrive
+        await Pose(0x8238, 103);    // la vie de P1 passe a 103 un instant...
+        await Pose(0x8238, 34);     // ... puis retombe a 34 : pas un coup
+        await Task.Delay(700);
+        await Pose(0x8438, 90);     // le calme passe : P1 touche P2 (13)
+        fin.Cancel();
+        var resultat = await suivi.Fin;
+
+        Assert.Equal(
+            [("execution", 4L), ("efficacite", 10L + 86 + 7 + 13), ("maitrise", 0L)],
+            resultat.MesuresDe(1).Select(v => (v.Mesure.Category, v.Valeur ?? -1)));
+        Assert.Equal([("execution", 1L), ("efficacite", 79L)], resultat.MesuresDe(2).Take(2).Select(v => (v.Mesure.Category, v.Valeur ?? -1)));
+    }
+
     [Fact]
     public async Task Un_RetroArch_muet_ne_donne_que_des_statistiques_non_mesurees()
     {

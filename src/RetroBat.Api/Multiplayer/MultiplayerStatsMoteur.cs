@@ -44,7 +44,7 @@ public sealed class MultiplayerStatsMoteur
                 {
                     foreach (var place in places)
                     {
-                        var lue = await LireAsync(signal.Decalage(place), signal.Bytes, ct).ConfigureAwait(false);
+                        var lue = await LireAsync(signal.Decalage(place), signal, ct).ConfigureAwait(false);
                         var cle = (nom, place);
                         nouvelles[cle] = signal.Confirm ? (lue is { } v && v == brutes.GetValueOrDefault(cle) ? v : null) : lue;
                         brutes[cle] = lue;
@@ -67,8 +67,9 @@ public sealed class MultiplayerStatsMoteur
         return suivi.Instantane();
     }
 
-    private async Task<int?> LireAsync(long? decalage, int octets, CancellationToken ct)
+    private async Task<int?> LireAsync(long? decalage, MultiplayerStatsSignal signal, CancellationToken ct)
     {
+        var octets = signal.Bytes;
         if (decalage is null)
         {
             return null;
@@ -81,7 +82,7 @@ public sealed class MultiplayerStatsMoteur
             return null;
         }
 
-        var valeur = 0;
+        var lus = new List<int>(octets);
         for (var i = 0; i < octets; i++)
         {
             if (!int.TryParse(morceaux[2 + i], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var o))
@@ -89,10 +90,10 @@ public sealed class MultiplayerStatsMoteur
                 return null;
             }
 
-            valeur |= o << (8 * i);
+            lus.Add(o);
         }
 
-        return valeur;
+        return signal.Valeur(lus);
     }
 }
 
@@ -145,6 +146,9 @@ public sealed class MultiplayerStatsSuivi
     private bool _fige;
 
     /// <summary>Un tour de lecture : <paramref name="nouvelles"/> (null = rien de retenu ce tour), apres <paramref name="avant"/>.</summary>
+    /// <summary>Jusqu'a quand les regles qui lisent l'adversaire se taisent (le calme apres un changement de manche).</summary>
+    private DateTime _calmeJusqua = DateTime.MinValue;
+
     internal void Appliquer(IReadOnlyDictionary<(string Signal, int Place), int?> nouvelles, IReadOnlyDictionary<(string Signal, int Place), int?> avant)
     {
         lock (_verrou)
@@ -153,6 +157,16 @@ public sealed class MultiplayerStatsSuivi
             {
                 return;
             }
+
+            // LE CALME APRES UNE MANCHE (KOF '98, 28/10) : entre deux manches, la vie se recharge par a-coups (103 un instant,
+            // puis 34) ; une baisse lue la n'est pas un coup.
+            if (Profil.SettleAfterRoundMs > 0 && Profil.Counters.Values.Select(c => c.Rounds).OfType<string>().Distinct().Any(manches =>
+                    Places.Any(place => avant.GetValueOrDefault((manches, place)) is { } a && nouvelles.GetValueOrDefault((manches, place)) is { } b && a != b)))
+            {
+                _calmeJusqua = DateTime.UtcNow.AddMilliseconds(Profil.SettleAfterRoundMs);
+            }
+
+            var calme = DateTime.UtcNow < _calmeJusqua;
 
             foreach (var ((signal, place), valeur) in nouvelles)
             {
@@ -168,6 +182,11 @@ public sealed class MultiplayerStatsSuivi
                 foreach (var place in Places)
                 {
                     var adversaire = Places.FirstOrDefault(p => p != place);
+                    if (calme && MultiplayerStatsProfil.LitLAdversaireSelon(compteur.Rule))
+                    {
+                        continue;
+                    }
+
                     switch (compteur.Rule)
                     {
                         case MultiplayerStatsProfil.RegleBaisseAdverse or MultiplayerStatsProfil.RegleSommeBaisseAdverse:
@@ -205,15 +224,17 @@ public sealed class MultiplayerStatsSuivi
                             }
                             break;
 
-                        case MultiplayerStatsProfil.RegleHausse or MultiplayerStatsProfil.RegleSommeHausse or MultiplayerStatsProfil.RegleHausseDAuMoins:
+                        case MultiplayerStatsProfil.RegleHausse or MultiplayerStatsProfil.RegleSommeHausse or MultiplayerStatsProfil.RegleHausseDAuMoins
+                            or MultiplayerStatsProfil.ReglePlusGrandeHausse:
                             // La valeur de la place elle-meme : une hausse entre deux valeurs retenues (une baisse ne compte rien).
                             if (avant.GetValueOrDefault((compteur.Signal, place)) is { } a && nouvelles.GetValueOrDefault((compteur.Signal, place)) is { } b && b > a)
                             {
-                                _compteurs[place][nom] += compteur.Rule switch
+                                _compteurs[place][nom] = compteur.Rule switch
                                 {
-                                    MultiplayerStatsProfil.RegleSommeHausse => b - a,
-                                    MultiplayerStatsProfil.RegleHausseDAuMoins => b - a >= compteur.Cible(signal) ? 1 : 0,
-                                    _ => 1,
+                                    MultiplayerStatsProfil.RegleSommeHausse => _compteurs[place][nom] + (b - a),
+                                    MultiplayerStatsProfil.RegleHausseDAuMoins => _compteurs[place][nom] + (b - a >= compteur.Cible(signal) ? 1 : 0),
+                                    MultiplayerStatsProfil.ReglePlusGrandeHausse => Math.Max(_compteurs[place][nom], b - a),
+                                    _ => _compteurs[place][nom] + 1,
                                 };
                             }
                             break;
@@ -236,6 +257,12 @@ public sealed class MultiplayerStatsSuivi
         if (signal.Ko is { } k && a == k)
         {
             return Math.Clamp(p, 0, signal.Full ?? p);
+        }
+        // LA VIE PASSE SOUS ZERO (KOF '98, 28/10) : l'octet repart par le haut (7, puis 253). Au-dessus de la vie pleine, c'est
+        // le K.O. : le dernier coup compte ce qui restait.
+        if (signal.Full is { } plein && a > plein && p <= plein)
+        {
+            return Math.Clamp(p, 0, plein);
         }
         return a < p ? p - a : null;
     }

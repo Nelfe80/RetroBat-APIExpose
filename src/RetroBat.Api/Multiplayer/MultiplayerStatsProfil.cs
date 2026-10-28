@@ -25,6 +25,13 @@ public sealed record MultiplayerStatsProfil
     [JsonPropertyName("players")]
     public int Players { get; init; } = 2;
 
+    /// <summary>
+    /// Le calme apres un changement de manche, en millisecondes : les regles qui lisent l'adversaire se taisent le temps que
+    /// la vie se recharge (KOF '98). 0 : aucun.
+    /// </summary>
+    [JsonPropertyName("settle_after_round_ms")]
+    public int SettleAfterRoundMs { get; init; }
+
     [JsonPropertyName("signals")]
     public IReadOnlyDictionary<string, MultiplayerStatsSignal> Signals { get; init; } = new Dictionary<string, MultiplayerStatsSignal>();
 
@@ -41,7 +48,7 @@ public sealed record MultiplayerStatsProfil
     public static readonly IReadOnlySet<string> Regles = new HashSet<string>(StringComparer.Ordinal)
     {
         RegleBaisseAdverse, RegleSommeBaisseAdverse, RegleAtteintAdverse, RegleMancheGagneeSiPlein,
-        RegleHausse, RegleSommeHausse, RegleHausseDAuMoins, RegleAtteint,
+        RegleHausse, RegleSommeHausse, RegleHausseDAuMoins, RegleAtteint, ReglePlusGrandeHausse,
     };
 
     /// <summary>Une baisse de la valeur adverse (une vie) : un coup reussi, credite a l'autre place.</summary>
@@ -70,6 +77,9 @@ public sealed record MultiplayerStatsProfil
 
     /// <summary>La valeur de la place atteint <c>value</c> : comptee une fois a chaque passage (la premiere piece d'une manche).</summary>
     public const string RegleAtteint = "atteint";
+
+    /// <summary>La plus grande hausse d'un coup de la valeur de la place : le meilleur coup (la plus grosse chaine d'un puzzle).</summary>
+    public const string ReglePlusGrandeHausse = "plus_grande_hausse";
 
     /// <summary>Les regles qui lisent l'adversaire : elles demandent un duel (deux places).</summary>
     public bool LitLAdversaire => Counters.Values.Any(c => LitLAdversaireSelon(c.Rule));
@@ -193,9 +203,9 @@ public sealed record MultiplayerStatsProfil
 
         foreach (var (nom, signal) in profil.Signals)
         {
-            if (signal.Source != "poll" || signal.Bytes is < 1 or > 4)
+            if (signal.Source != "poll" || signal.Bytes is < 1 or > 4 || signal.Order is not ("le" or "be" or "68k"))
             {
-                return "signal « " + nom + " » : source ou taille inconnue";
+                return "signal « " + nom + " » : source, taille ou ordre inconnu";
             }
             for (var place = 1; place <= profil.Players; place++)
             {
@@ -262,6 +272,47 @@ public sealed record MultiplayerStatsSignal
     /// <summary>1 a 4 octets, lus dans l'ordre de la memoire du coeur (petit-boutiste).</summary>
     [JsonPropertyName("bytes")]
     public int Bytes { get; init; } = 1;
+
+    /// <summary>
+    /// L'ordre des octets : « le » (petit-boutiste, le defaut), « be » (gros-boutiste), « 68k » (un nombre du 68000 tel que
+    /// FBNeo le range, octets permutes deux a deux : Neo Geo, CPS).
+    /// </summary>
+    [JsonPropertyName("order")]
+    public string Order { get; init; } = "le";
+
+    /// <summary>Un nombre en decimal code binaire (les scores des jeux d'arcade) : chaque quartet est un chiffre.</summary>
+    [JsonPropertyName("bcd")]
+    public bool Bcd { get; init; }
+
+    /// <summary>Les octets lus, dans l'ordre de la memoire, devenus la valeur du signal ; null s'ils ne sont pas un nombre BCD.</summary>
+    public int? Valeur(IReadOnlyList<int> octets)
+    {
+        var ordonnes = Order switch
+        {
+            "be" => octets.ToList(),
+            "68k" => Enumerable.Range(0, octets.Count).Select(i => (i ^ 1) < octets.Count ? octets[i ^ 1] : octets[i]).ToList(),
+            _ => octets.Reverse().ToList(),
+        };
+        long valeur = 0;
+        foreach (var o in ordonnes)
+        {
+            if (Bcd)
+            {
+                if (o >> 4 > 9 || (o & 15) > 9)
+                {
+                    return null;
+                }
+
+                valeur = valeur * 100 + (o >> 4) * 10 + (o & 15);
+            }
+            else
+            {
+                valeur = (valeur << 8) | (uint)o;
+            }
+        }
+
+        return valeur > int.MaxValue ? null : (int)valeur;
+    }
 
     [JsonPropertyName("full")]
     public int? Full { get; init; }
