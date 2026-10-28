@@ -206,6 +206,20 @@ public sealed class DirectDuRecordTests
     public void Le_seuil_d_approche_est_celui_du_site(long record, long seuil)
         => Assert.Equal(seuil, DirectDuRecordService.SeuilDApproche(record));
 
+    /// <summary>
+    /// L'APPROCHE DU RECORD, LUE PAR MULTIPLAYER (28/10) : une invitation recue en partie attend la fin quand le meilleur
+    /// score du joueur 1 passe le seuil du direct (parti d'en bas), jusqu'a la fin du run.
+    /// </summary>
+    [Theory]
+    [InlineData(100L, 90L, 0L, false, true)]
+    [InlineData(100L, 89L, 0L, false, false)]
+    [InlineData(100L, 120L, 0L, false, true)]       // record deja battu : toujours en jeu
+    [InlineData(100L, 95L, 95L, false, false)]      // jamais parti d'en bas : une valeur fixe
+    [InlineData(100L, 95L, 0L, true, false)]        // run termine (continue) : plus rien a proteger
+    [InlineData(null, 95L, 0L, false, false)]       // partie non certifiee
+    public void L_approche_du_record_garde_l_invitation(long? record, long meilleur, long plusBas, bool runTermine, bool attendu)
+        => Assert.Equal(attendu, DirectDuRecordService.ApprocheLeRecord(record, meilleur, plusBas, runTermine));
+
     [Theory]
     [InlineData(100L, 101L, 1, false, true)]
     [InlineData(100L, 100L, 1, false, false)]   // egaler ne suffit pas

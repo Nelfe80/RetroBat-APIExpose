@@ -37,10 +37,20 @@ public sealed class MultiplayerClient
         _clientDeTest = clientDeTest;
     }
 
-    /// <summary>L'appui long : une gameroom pour ce jeu et ce contenu.</summary>
+    /// <summary>
+    /// Une gameroom pour ce jeu et ce contenu. <paramref name="sorte"/> (28/10) : null pour l'appui long (sa gameroom de ce
+    /// jeu, sinon celle d'un ami qui l'attend en FOR FRIENDS, sinon une publique), <see cref="MultiplayerSortes.Publique"/>
+    /// en passant sur FOR PLAYERS…, <see cref="MultiplayerSortes.Amis"/> en passant sur FOR FRIENDS.
+    /// </summary>
     public Task<MultiplayerReponse?> RejoindreAsync(string jeu, string contenu, int? rttMs, bool panneauOuvert, CancellationToken ct,
-        IReadOnlyDictionary<string, int>? choix = null)
-        => EnvoyerAsync("join", new { game = jeu, content = contenu, rtt_ms = rttMs, panel = panneauOuvert, choices = choix }, ct);
+        IReadOnlyDictionary<string, int>? choix = null, string? sorte = null)
+        => sorte is null
+            ? EnvoyerAsync("join", new { game = jeu, content = contenu, rtt_ms = rttMs, panel = panneauOuvert, choices = choix }, ct)
+            : EnvoyerAsync("join", new { game = jeu, content = contenu, rtt_ms = rttMs, panel = panneauOuvert, choices = choix, kind = sorte }, ct);
+
+    /// <summary>FOR FRIENDS, touche X (28/10) : l'ouvreur regle le nombre de joueurs qu'il attend.</summary>
+    public Task<MultiplayerReponse?> ReglerAsync(string room, int joueurs, CancellationToken ct)
+        => EnvoyerAsync("size", new { room, players = joueurs }, ct);
 
     /// <summary>NIVEAU NELFEPLAY : ▲▼ dans le panneau, le joueur change de personnage (permis jusqu'au lancement).</summary>
     public Task<MultiplayerReponse?> ChoisirAsync(string room, IReadOnlyDictionary<string, int> choix, CancellationToken ct)
@@ -201,6 +211,10 @@ public sealed record MultiplayerReponse
     [JsonPropertyName("room")]
     public string? Room { get; init; }
 
+    /// <summary>La sorte de la gameroom rejointe (28/10) : <c>public</c> ou <c>friends</c> ; null d'un site plus ancien.</summary>
+    [JsonPropertyName("kind")]
+    public string? Kind { get; init; }
+
     [JsonPropertyName("rooms")]
     public IReadOnlyList<MultiplayerRoom> Rooms { get; init; } = [];
 
@@ -254,8 +268,23 @@ public sealed record MultiplayerRoom
     [JsonPropertyName("level")]
     public string Level { get; init; } = MultiplayerLevels.Classique;
 
+    /// <summary>Le nombre de places : celui du jeu, ou, dans une gameroom d'amis, celui que son ouvreur attend.</summary>
     [JsonPropertyName("max")]
     public int Max { get; init; }
+
+    /// <summary>LES GAMEROOMS D'AMIS (28/10) : <c>public</c> (FOR PLAYERS…) ou <c>friends</c> (FOR FRIENDS).</summary>
+    [JsonPropertyName("kind")]
+    public string Kind { get; init; } = MultiplayerSortes.Publique;
+
+    /// <summary>Le nombre de joueurs du jeu, borne de la touche X d'une gameroom d'amis (0 d'un site plus ancien).</summary>
+    [JsonPropertyName("game_max")]
+    public int GameMax { get; init; }
+
+    /// <summary>Ce joueur regle la gameroom d'amis (il l'a ouverte, ou elle lui est passee).</summary>
+    [JsonPropertyName("owner")]
+    public bool Owner { get; init; }
+
+    public bool EntreAmis => Kind == MultiplayerSortes.Amis;
 
     /// <summary><c>waiting</c>, <c>countdown</c>, <c>launching</c>, <c>playing</c>, <c>finished</c>.</summary>
     [JsonPropertyName("state")]
@@ -315,6 +344,10 @@ public sealed record MultiplayerJoueur
     /// <summary>NIVEAU NELFEPLAY, versus 1 contre 1 : sa cote Elo sur ce jeu.</summary>
     [JsonPropertyName("rating")]
     public MultiplayerCote? Rating { get; init; }
+
+    /// <summary>Il regle la gameroom d'amis (28/10).</summary>
+    [JsonPropertyName("owner")]
+    public bool Owner { get; init; }
 }
 
 public sealed record MultiplayerCote
@@ -536,6 +569,17 @@ public sealed record MultiplayerInvitation
 
     [JsonPropertyName("expires_ms")]
     public int ExpiresMs { get; init; }
+
+    /// <summary>Une invitation dans une gameroom d'amis vaut tant que celui qui invite y reste (28/10).</summary>
+    [JsonPropertyName("kind")]
+    public string Kind { get; init; } = MultiplayerSortes.Publique;
+}
+
+/// <summary>Les deux sortes de gameroom (28/10) : publique (FOR PLAYERS…) et d'amis (FOR FRIENDS).</summary>
+public static class MultiplayerSortes
+{
+    public const string Publique = "public";
+    public const string Amis = "friends";
 }
 
 /// <summary>

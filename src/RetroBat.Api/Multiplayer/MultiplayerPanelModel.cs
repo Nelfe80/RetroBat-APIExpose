@@ -9,6 +9,10 @@ namespace RetroBat.Api.Multiplayer;
 /// ► sur l'onglet de droite rend la main a ES. B rend aussi la main ; B MAINTENU quitte la gameroom
 /// (V24-07) ; ▲▼ choisit une ligne ; A agit sur la ligne (inviter un ami).
 ///
+/// LES GAMEROOMS D'AMIS (28/10) : FOR PLAYERS… est la gameroom publique, WAITING FOR FRIENDS une gameroom reservee aux
+/// amis de son ouvreur ; passer de l'un a l'autre change de gameroom (le service s'en charge). X regle, chez l'ouvreur, le
+/// nombre de joueurs attendus (<see cref="TailleSuivante"/>).
+///
 /// Pur : pas d'ecran, pas de reseau, pas d'horloge. C'est ce qui se teste.
 /// </summary>
 public sealed class MultiplayerPanelModel
@@ -55,6 +59,9 @@ public sealed class MultiplayerPanelModel
 
     private int _onglet = Onglets.Count - 1;
 
+    // L'onglet ou l'on entre depuis ES (◄) : FOR PLAYERS…, ou WAITING FOR FRIENDS quand on attend dans une gameroom d'amis.
+    private int _porte = Onglets.Count - 1;
+
     // -1 : aucune ligne choisie, seul l'onglet est actif (retour du user du 22/10 : entrer dans le panneau surlignait le
     // premier joueur, qui n'etait pas toujours soi). Seul INVITE FRIENDS a des lignes a choisir, ▼ y prend la premiere.
     private int _ligne = -1;
@@ -73,6 +80,7 @@ public sealed class MultiplayerPanelModel
     {
         Etat = Foyer.MenuEs;
         _onglet = Onglets.Count - 1;
+        _porte = _onglet;
         _ligne = -1;
     }
 
@@ -81,6 +89,40 @@ public sealed class MultiplayerPanelModel
         Etat = Foyer.Ferme;
         _ligne = -1;
     }
+
+    /// <summary>
+    /// L'appui long l'a place dans une gameroom d'amis (la sienne, ou celle d'un ami qui l'attend) : le panneau montre
+    /// WAITING FOR FRIENDS, sans toucher au foyer.
+    /// </summary>
+    public void PlacerSurLOnglet(Onglet onglet)
+    {
+        _onglet = Math.Max(0, IndexDe(onglet));
+        _porte = _onglet;
+        _ligne = -1;
+    }
+
+    /// <summary>L'onglet ou ◄ fera entrer depuis ES : celui de la gameroom ou le joueur attend (28/10).</summary>
+    public void PoserLaPorte(Onglet onglet) => _porte = Math.Max(0, IndexDe(onglet));
+
+    private static int IndexDe(Onglet onglet)
+    {
+        for (var i = 0; i < Onglets.Count; i++)
+        {
+            if (Onglets[i] == onglet)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    /// LA TOUCHE X DE FOR FRIENDS (28/10) : le nombre de joueurs attendus passe au suivant, puis revient a ceux qui sont deja
+    /// la (deux au moins) apres le maximum du jeu. Pur.
+    /// </summary>
+    public static int TailleSuivante(int actuelle, int presents, int maxDuJeu)
+        => actuelle >= maxDuJeu ? Math.Min(maxDuJeu, Math.Max(2, presents)) : Math.Max(actuelle + 1, Math.Max(2, presents));
 
     private bool LignesAChoisir => Etat == Foyer.Panneau && OngletCourant == Onglet.InviteFriends;
 
@@ -96,9 +138,9 @@ public sealed class MultiplayerPanelModel
         switch (Etat)
         {
             case Foyer.MenuEs:
-                // Depuis le menu d'ES : on entre chez nous, contre la porte.
+                // Depuis le menu d'ES : on entre chez nous, par la porte (l'onglet de la gameroom ou l'on attend).
                 Etat = Foyer.Panneau;
-                _onglet = Onglets.Count - 1;
+                _onglet = _porte;
                 _ligne = -1;
                 return Effet.PrendreLeFocus;
             case Foyer.Panneau when _onglet > 0:

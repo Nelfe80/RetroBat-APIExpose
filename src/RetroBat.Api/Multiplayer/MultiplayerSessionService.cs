@@ -134,9 +134,10 @@ public sealed class MultiplayerSessionService : BackgroundService
     /// <summary>
     /// L'APPUI LONG sur un jeu de la collection : « je veux jouer a ce jeu ». Rend la raison d'un
     /// refus (<c>not_multiplayer</c>, <c>selection_full</c>, <c>offline</c>…), ou null si le joueur
-    /// est dans une gameroom.
+    /// est dans une gameroom. <paramref name="sorte"/> (28/10) : null pour l'appui long, sinon la gameroom publique
+    /// (FOR PLAYERS…) ou d'amis (FOR FRIENDS) ou passer.
     /// </summary>
-    public async Task<string?> RejoindreAsync(string cheminDuJeu, CancellationToken ct = default)
+    public async Task<string?> RejoindreAsync(string cheminDuJeu, CancellationToken ct = default, string? sorte = null)
     {
         var jeu = JeuDe(cheminDuJeu);
         if (jeu is null)
@@ -152,7 +153,7 @@ public sealed class MultiplayerSessionService : BackgroundService
 
         _appui = true;
         var reponse = await _client.RejoindreAsync(jeu.Game.Id, jeu.ContentKey, _relais?.MeilleurTempsMs, PanneauOuvert, ct,
-            jeu.Game.Choices is { Count: > 0 } ? MesChoix(jeu.Game) : null).ConfigureAwait(false);
+            jeu.Game.Choices is { Count: > 0 } ? MesChoix(jeu.Game) : null, sorte).ConfigureAwait(false);
         if (reponse is null)
         {
             return "offline";
@@ -163,7 +164,8 @@ public sealed class MultiplayerSessionService : BackgroundService
             return reponse.Reason ?? "refused";
         }
 
-        _journal?.LogInformation("MULTIPLAYER : {Jeu} rejoint ({Room})", jeu.Game.Id, reponse.Room);
+        _journal?.LogInformation("MULTIPLAYER : {Jeu} rejoint ({Room}{Sorte})", jeu.Game.Id, reponse.Room,
+            reponse.Kind == MultiplayerSortes.Amis ? ", entre amis" : string.Empty);
         await SonderAsync(ct).ConfigureAwait(false);
         return null;
     }
@@ -174,6 +176,15 @@ public sealed class MultiplayerSessionService : BackgroundService
         var reponse = await _client.QuitterAsync(room, ct).ConfigureAwait(false);
         Reveiller();
         return reponse?.Ok == true;
+    }
+
+    /// <summary>FOR FRIENDS, touche X (28/10) : le nombre de joueurs que l'ouvreur attend. Rend la raison d'un refus, ou null.</summary>
+    public async Task<string?> ReglerAsync(string room, int joueurs, CancellationToken ct = default)
+    {
+        _appui = true;
+        var reponse = await _client.ReglerAsync(room, joueurs, ct).ConfigureAwait(false);
+        await SonderAsync(ct).ConfigureAwait(false);
+        return reponse is null ? "offline" : reponse.Ok ? null : reponse.Reason ?? "refused";
     }
 
     public async Task<string?> InviterAsync(string room, string poignee, CancellationToken ct = default)

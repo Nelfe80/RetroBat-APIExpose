@@ -143,6 +143,26 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         => aBattre is long record && record > 0 && !dejaDeclenche && !runTermine && joueur == 1 && score >= SeuilDApproche(record)
            && plusBasVu < SeuilDApproche(record);
 
+    /// <summary>
+    /// LA PARTIE EN COURS APPROCHE LE RECORD (28/10) : dans une partie certifiee, le meilleur score du joueur 1 a passe le seuil
+    /// d'approche du direct (90 % du premier rang, parti d'en bas), jusqu'a la fin du run. Une invitation MULTIPLAYER recue en
+    /// partie ne s'affiche alors pas dans le jeu : elle attend le retour dans ES.
+    /// </summary>
+    public bool EnApprocheDuRecord
+    {
+        get
+        {
+            lock (_verrou)
+            {
+                return ApprocheLeRecord(_aBattre, _meilleurScore, _plusBasVu, _runTermine);
+            }
+        }
+    }
+
+    /// <summary>Le meilleur score passe le seuil d'approche, apres etre parti d'en bas, run pas termine. Pur.</summary>
+    internal static bool ApprocheLeRecord(long? aBattre, long meilleur, long plusBasVu, bool runTermine)
+        => aBattre is long record && record > 0 && !runTermine && meilleur >= SeuilDApproche(record) && plusBasVu < SeuilDApproche(record);
+
     /// <summary>Le record tombe : le score du joueur 1 passe devant le premier rang, avant tout continue. Pur.</summary>
     internal static bool PasseDevant(long? aBattre, long score, int joueur, bool runTermine)
         => aBattre is long record && !runTermine && joueur == 1 && score > record;

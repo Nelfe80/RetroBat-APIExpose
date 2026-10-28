@@ -95,7 +95,19 @@ public sealed partial class MultiplayerPanelService
     private DateTime? _annulerDepuis;
     private string _glypheValider = "button_a";
     private string _glypheAnnuler = "button_b";
+    private string _glypheX = "button_x";
     private string _langue = "";
+
+    /// <summary>Un passage d'une gameroom a l'autre a la fois (FOR PLAYERS… et FOR FRIENDS, 28/10).</summary>
+    private readonly SemaphoreSlim _changementDeSalle = new(1, 1);
+
+    /// <summary>
+    /// Une rencontre MULTIPLAYER classee (ELO) tourne sur cette borne (pose par MultiplayerLaunchService) : une invitation
+    /// recue n'y parait pas, elle attend le retour dans ES (decision du user du 28/10).
+    /// </summary>
+    public Func<bool>? RencontreClasseeEnCours { get; set; }
+
+    private readonly IServiceProvider? _services;
     private string _roomDuResultat = "";
     private int? _dureeDuResultat;
     private DateTime _resultatDepuis;
@@ -127,8 +139,10 @@ public sealed partial class MultiplayerPanelService
         RetroBat.Api.Replay.Sharing.ReplayRelayService? relais = null,
         RetroAchievementsService? retroAchievements = null,
         RetroBat.Domain.Interfaces.IEventBus? bus = null,
-        RetroBat.Domain.Interfaces.IEmulationStationNotificationService? notifications = null)
+        RetroBat.Domain.Interfaces.IEmulationStationNotificationService? notifications = null,
+        IServiceProvider? services = null)
     {
+        _services = services;
         _notifications = notifications;
         _planches = planches;
         _relaisDesPlanches = relais;
@@ -379,7 +393,8 @@ public sealed partial class MultiplayerPanelService
     /// L'APPUI LONG sur un jeu de la collection : le joueur rejoint une gameroom et le panneau s'ouvre.
     /// Rend faux quand le jeu n'est pas MULTIPLAYER sur cette borne.
     /// </summary>
-    public async Task<bool> OuvrirAsync(string cheminDuJeu, string glypheValider, string glypheAnnuler, CancellationToken ct, bool rejoindre = true)
+    public async Task<bool> OuvrirAsync(string cheminDuJeu, string glypheValider, string glypheAnnuler, CancellationToken ct, bool rejoindre = true,
+        string glypheX = "")
     {
         var jeu = _session.JeuDe(cheminDuJeu);
         if (jeu is null)
@@ -405,6 +420,7 @@ public sealed partial class MultiplayerPanelService
             _amis = [];
             _glypheValider = glypheValider.Length > 0 ? glypheValider : _glypheValider;
             _glypheAnnuler = glypheAnnuler.Length > 0 ? glypheAnnuler : _glypheAnnuler;
+            _glypheX = glypheX.Length > 0 ? glypheX : _glypheX;
             _langue = "";
             _mode = Mode.Panneau;
             _retour?.Cancel();
@@ -422,12 +438,99 @@ public sealed partial class MultiplayerPanelService
             lock (_verrou)
             {
                 _refus = refus;
+                // L'appui long l'a mene dans une gameroom d'amis (la sienne, ou celle d'un ami qui l'attend) : FOR FRIENDS.
+                if (RoomDuJeu() is { EntreAmis: true } && _modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers)
+                {
+                    _modele.PlacerSurLOnglet(MultiplayerPanelModel.Onglet.WaitingForFriends);
+                }
             }
         }
 
         Rafraichir();
         _ = ChargerLesAmisAsync(ct);
         return true;
+    }
+
+    /// <summary>
+    /// D'UNE GAMEROOM A L'AUTRE (demande du user du 28/10) : sur WAITING FOR FRIENDS, le joueur passe dans la gameroom d'amis
+    /// (celle d'un ami, sinon la sienne) ; revenu sur FOR PLAYERS…, dans une gameroom publique. INVITE ne change rien : on y
+    /// arrive par FOR FRIENDS, et l'invitation fait entrer l'ami dans la gameroom d'amis.
+    /// </summary>
+    private async Task ChangerDeGameroomAsync()
+    {
+        await _changementDeSalle.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            string? sorte;
+            MultiplayerInstalledGame? jeu;
+            lock (_verrou)
+            {
+                jeu = _jeu;
+                var room = RoomDuJeu();
+                sorte = _mode != Mode.Panneau ? null : _modele.OngletCourant switch
+                {
+                    MultiplayerPanelModel.Onglet.WaitingForFriends when room is not { EntreAmis: true } => MultiplayerSortes.Amis,
+                    MultiplayerPanelModel.Onglet.WaitingForPlayers when room is null or { EntreAmis: true } => MultiplayerSortes.Publique,
+                    _ => null,
+                };
+            }
+
+            if (sorte is null || jeu is null)
+            {
+                return;
+            }
+
+            var refus = await _session.RejoindreAsync(jeu.Path, CancellationToken.None, sorte).ConfigureAwait(false);
+            _journal.LogInformation("MULTIPLAYER : {Jeu}, passage en gameroom {Sorte} ({Statut})", jeu.Game.Id,
+                sorte == MultiplayerSortes.Amis ? "d'amis" : "publique", refus ?? "ok");
+            lock (_verrou)
+            {
+                _refus = refus;
+            }
+
+            Rafraichir();
+        }
+        finally
+        {
+            _changementDeSalle.Release();
+        }
+    }
+
+    /// <summary>
+    /// LA TOUCHE X DE FOR FRIENDS (28/10) : l'ouvreur de la gameroom d'amis fait passer le nombre de joueurs attendus au
+    /// suivant (jusqu'au maximum du jeu, puis retour a ceux qui sont la). Rien ailleurs.
+    /// </summary>
+    public void Joueurs()
+    {
+        MultiplayerRoom? room;
+        lock (_verrou)
+        {
+            if (_mode != Mode.Panneau || _modele.Etat != MultiplayerPanelModel.Foyer.Panneau
+                || _modele.OngletCourant != MultiplayerPanelModel.Onglet.WaitingForFriends)
+            {
+                return;
+            }
+
+            room = RoomDuJeu();
+        }
+
+        if (room is not { EntreAmis: true, Owner: true, State: "waiting" or "countdown" } || room.GameMax <= 2)
+        {
+            return;
+        }
+
+        var suivante = MultiplayerPanelModel.TailleSuivante(room.Max, room.Players.Count, room.GameMax);
+        _ = Task.Run(async () =>
+        {
+            var refus = await _session.ReglerAsync(room.Room, suivante).ConfigureAwait(false);
+            _journal.LogInformation("MULTIPLAYER : gameroom d'amis {Room}, {Joueurs} joueurs attendus ({Statut})", room.Room, suivante, refus ?? "ok");
+            lock (_verrou)
+            {
+                _refus = refus;
+            }
+
+            Rafraichir();
+        });
     }
 
     /// <summary>Fermer sans quitter : le jeu reste dans « Votre selection » (V24-09).</summary>
@@ -695,15 +798,24 @@ public sealed partial class MultiplayerPanelService
                 return;
             }
 
-            // NIVEAU NELFEPLAY : ▲▼ change le personnage dans WAITING FOR PLAYERS (V24-04), quand nous avons la main.
+            // NIVEAU NELFEPLAY : ▲▼ change le personnage dans WAITING FOR PLAYERS (V24-04) et dans la gameroom d'amis (28/10),
+            // quand nous avons la main.
             if (sens is "up" or "down"
                 && _modele.Etat == MultiplayerPanelModel.Foyer.Panneau
-                && _modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers
+                && _modele.OngletCourant is MultiplayerPanelModel.Onglet.WaitingForPlayers or MultiplayerPanelModel.Onglet.WaitingForFriends
                 && _jeu is { ChoixOuverts: true, Game: var jeuNelfePlay }
                 && RoomDuJeu() is { State: "waiting" or "countdown" } salle)
             {
                 _ = ChangerDePersonnageAsync(salle, jeuNelfePlay, sens == "down" ? 1 : -1);
                 return;
+            }
+
+            // On entre par l'onglet de la gameroom ou l'on attend : WAITING FOR FRIENDS pour une gameroom d'amis (28/10).
+            if (sens == "left" && _modele.Etat == MultiplayerPanelModel.Foyer.MenuEs)
+            {
+                _modele.PoserLaPorte(RoomDuJeu() is { EntreAmis: true }
+                    ? MultiplayerPanelModel.Onglet.WaitingForFriends
+                    : MultiplayerPanelModel.Onglet.WaitingForPlayers);
             }
 
             effet = sens switch
@@ -898,7 +1010,9 @@ public sealed partial class MultiplayerPanelService
                 _ = InviterAsync();
                 break;
             case MultiplayerPanelModel.Effet.ChargerLOnglet:
-                if (_modele.OngletCourant != MultiplayerPanelModel.Onglet.WaitingForPlayers)
+                // FOR PLAYERS… et FOR FRIENDS sont deux gamerooms : passer de l'un a l'autre en change (28/10).
+                _ = Task.Run(ChangerDeGameroomAsync);
+                if (_modele.OngletCourant == MultiplayerPanelModel.Onglet.InviteFriends)
                 {
                     _ = ChargerLesAmisAsync(CancellationToken.None);
                 }
@@ -1008,6 +1122,10 @@ public sealed partial class MultiplayerPanelService
                 _invitation = nouvelle;
                 _journal?.LogInformation("MULTIPLAYER : invitation recue de {Ami} pour {Jeu} (panneau {Mode}, en jeu {EnJeu})",
                     nouvelle.From?.Pseudo, nouvelle.Game, _mode, EnJeu());
+                if (EnJeu())
+                {
+                    _ = Task.Run(() => AnnoncerEnPartieAsync(nouvelle));
+                }
             }
             else if (_invitation is { } courante && etat.Invitations.All(i => i.Invitation != courante.Invitation))
             {
@@ -1166,6 +1284,40 @@ public sealed partial class MultiplayerPanelService
     private bool EnJeu()
         => EmulatorForeground.EmulateurDeJeuTourne() || string.Equals(_contexte?.Ui.State, "playing", StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// L'INVITATION RECUE EN PARTIE (decision du user du 28/10) : un message discret de RetroArch, une seule fois
+    /// (« Falken t'invite a Mario Kart : c'est quand tu veux ! ») ; la carte de l'invitation attend le retour dans ES. Il
+    /// ne parait pas pendant une rencontre MULTIPLAYER classee, ni quand une partie certifiee approche le record (le seuil
+    /// du direct de record) : seule la carte, au retour.
+    /// </summary>
+    private async Task AnnoncerEnPartieAsync(MultiplayerInvitation invitation)
+    {
+        var report = PourquoiAttendreLaFin();
+        if (report is not null)
+        {
+            _journal.LogInformation("MULTIPLAYER : invitation de {Ami} gardee pour la fin de la partie ({Raison})", invitation.From?.Pseudo, report);
+            return;
+        }
+
+        var texte = Texte("multiplayer.invitation.ingame", "{player} invites you to {game}: whenever you're ready!")
+            .Replace("{player}", invitation.From?.Pseudo ?? string.Empty, StringComparison.Ordinal)
+            .Replace("{game}", NomDuJeu(invitation.Game), StringComparison.Ordinal);
+        await new CommandesRetroArchUdp().EnvoyerAsync("SHOW_MSG " + texte.ReplaceLineEndings(" ").Trim(), CancellationToken.None).ConfigureAwait(false);
+        _journal.LogInformation("MULTIPLAYER : invitation de {Ami} annoncee dans le jeu", invitation.From?.Pseudo);
+    }
+
+    /// <summary>Pourquoi une invitation attend la fin de la partie, ou null si elle peut s'afficher dans le jeu.</summary>
+    private string? PourquoiAttendreLaFin()
+    {
+        if (RencontreClasseeEnCours?.Invoke() == true)
+        {
+            return "rencontre classee";
+        }
+
+        var direct = _services?.GetService(typeof(RetroBat.Api.Replay.Video.DirectDuRecordService)) as RetroBat.Api.Replay.Video.DirectDuRecordService;
+        return direct?.EnApprocheDuRecord == true ? "record en approche" : null;
+    }
+
     private MultiplayerRoom? RoomDuJeu()
     {
         var jeu = _jeu;
@@ -1204,24 +1356,21 @@ public sealed partial class MultiplayerPanelService
     private LeaderboardOverlayService.ContenuMultiplayer ComposerLePanneau(Func<string, string> T)
     {
         var jeu = _jeu;
-        var room = RoomDuJeu();
+        // LES DEUX GAMEROOMS (28/10) : FOR PLAYERS… montre la gameroom publique, WAITING FOR FRIENDS celle des amis ; pendant
+        // le passage de l'une a l'autre, l'onglet n'en montre aucune.
+        var surUneSalle = _modele.OngletCourant is MultiplayerPanelModel.Onglet.WaitingForPlayers or MultiplayerPanelModel.Onglet.WaitingForFriends;
+        var room = RoomDuJeu() is { } salle && (!surUneSalle
+            || salle.EntreAmis == (_modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForFriends)) ? salle : null;
         var classique = (room?.Level ?? jeu?.Game.Level) != MultiplayerLevels.NelfePlay;
         var classe = jeu?.Game.EstClasse == true;
         var max = room?.Max ?? jeu?.Game.Players ?? 2;
         var presents = room?.Players.Count(joueur => joueur.Present) ?? 0;
 
-        IReadOnlyList<LeaderboardOverlayService.JoueurMultiplayer> lignes = _modele.OngletCourant switch
-        {
-            MultiplayerPanelModel.Onglet.WaitingForPlayers => LesPlaces(room, max, T),
-            MultiplayerPanelModel.Onglet.WaitingForFriends => AmisDuJeu()
-                .Where(ami => ami.State is "with_you" or "in_es")
-                .Select(ami => Ami(ami, T)).ToList(),
-            _ => Invitables().Select(ami => Ami(ami, T)).ToList(),
-        };
+        IReadOnlyList<LeaderboardOverlayService.JoueurMultiplayer> lignes = surUneSalle
+            ? LesPlaces(room, max, T)
+            : Invitables().Select(ami => Ami(ami, T)).ToList();
         _modele.PoserLesLignes(lignes.Count(ligne => !ligne.Libre));
-        var (selection, selectionCourante) = _modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers
-            ? LaBandeDesPersonnages()
-            : (null, -1);
+        var (selection, selectionCourante) = surUneSalle ? LaBandeDesPersonnages() : (null, -1);
 
         var message = _refus is { Length: > 0 } refus ? T("multiplayer.refused." + refus) : string.Empty;
         if (message.StartsWith("multiplayer.refused.", StringComparison.Ordinal))
@@ -1244,7 +1393,7 @@ public sealed partial class MultiplayerPanelService
             AidesDuPanneau(T),
             Selection: selection,
             SelectionCourante: selectionCourante,
-            Disposition: _modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers
+            Disposition: surUneSalle
                 ? DispositionPour(max)
                 : LeaderboardOverlayService.DispositionDesJoueurs.Liste,
             // « VOTRE SELECTION » en haut a gauche du panneau (demande du user du 26/10), les memes jeux que la carte d'ES.
@@ -1293,10 +1442,12 @@ public sealed partial class MultiplayerPanelService
             return lignes;
         }
 
+        // Une place libre de la gameroom d'amis attend un ami (28/10).
+        var attente = room.EntreAmis ? Texte("multiplayer.seat.waiting_friend", "waiting for a friend") : T("multiplayer.seat.waiting");
         for (var place = lignes.Count + 1; place <= max; place++)
         {
             lignes.Add(new LeaderboardOverlayService.JoueurMultiplayer(T("multiplayer.seat.free"), string.Empty, string.Empty, false, false, false,
-                null, T("multiplayer.seat.waiting"), Place: place, Libre: true));
+                null, attente, Place: place, Libre: true));
         }
 
         return lignes;
@@ -1815,9 +1966,17 @@ public sealed partial class MultiplayerPanelService
             aides.Add(new("dpad_updown", T("multiplayer.help.choose")));
             aides.Add(new(_glypheValider, T("multiplayer.help.invite")));
         }
-        else if (_modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers && _jeu is { ChoixOuverts: true })
+        else if (_modele.OngletCourant is MultiplayerPanelModel.Onglet.WaitingForPlayers or MultiplayerPanelModel.Onglet.WaitingForFriends
+                 && _jeu is { ChoixOuverts: true })
         {
             aides.Add(new("dpad_updown", T("multiplayer.help.character")));
+        }
+
+        // X, chez l'ouvreur de la gameroom d'amis : le nombre de joueurs attendus (28/10).
+        if (_modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForFriends
+            && RoomDuJeu() is { EntreAmis: true, Owner: true, GameMax: > 2, State: "waiting" or "countdown" })
+        {
+            aides.Add(new(_glypheX, Texte("multiplayer.help.players", "players")));
         }
 
         aides.Add(new(_glypheAnnuler, T("multiplayer.help.back")));

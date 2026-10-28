@@ -107,6 +107,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         _attente = new MultiplayerAttenteDesInvites(new CommandesRetroArchUdp());
         _fin = new MultiplayerFinDeRencontre(new CommandesRetroArchUdp());
         _moteurDesStats = new MultiplayerStatsMoteur(new CommandesRetroArchUdp());
+        _panneau.RencontreClasseeEnCours = () => RencontreClasseeEnCours;
     }
 
     private static string RacineRetroArch => Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch");
@@ -121,6 +122,25 @@ public sealed class MultiplayerLaunchService : IHostedService
     public bool EnPartie
     {
         get { lock (_verrou) return _enCours is not null; }
+    }
+
+    /// <summary>
+    /// Une rencontre classee (ELO) tourne-t-elle sur cette borne ? Une invitation recue n'y parait pas : elle attend le retour
+    /// dans ES (decision du user du 28/10).
+    /// </summary>
+    public bool RencontreClasseeEnCours
+    {
+        get
+        {
+            string? room;
+            lock (_verrou)
+            {
+                room = _enCours;
+            }
+
+            return room is not null && _session.Etat.Rooms.FirstOrDefault(r => r.Room == room) is { } salle
+                && _session.JeuDeLaRoom(salle)?.Game.EstClasse == true;
+        }
     }
 
     public Task StartAsync(CancellationToken cancellationToken)

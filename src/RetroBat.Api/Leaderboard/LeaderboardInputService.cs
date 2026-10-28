@@ -378,6 +378,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 {
                     panneau.Annuler(appuye);
                 }
+                else if (appuye && slot is not null && slot == SlotDeLIdentite("x"))
+                {
+                    // FOR FRIENDS : X regle le nombre de joueurs attendus (28/10).
+                    panneau.Joueurs();
+                }
                 return;
             }
             if (_modele.Etat != LeaderboardPanelModel.Foyer.Ferme)
@@ -669,7 +674,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             _systemeAffiche = systeme;
             _ouvertureUtc = DateTime.UtcNow;
             _entrerA = _ouvertureUtc + EntreeAutomatique;
-            await _multiplayer.OuvrirAsync(cheminDuJeu, Glyphe(SlotValider), Glyphe(SlotAnnuler), ct).ConfigureAwait(false);
+            await _multiplayer.OuvrirAsync(cheminDuJeu, Glyphe(SlotValider), Glyphe(SlotAnnuler), ct, glypheX: Glyphe(SlotDeLIdentite("x"))).ConfigureAwait(false);
             return;
         }
 

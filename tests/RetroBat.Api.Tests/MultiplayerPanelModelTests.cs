@@ -147,4 +147,43 @@ public class MultiplayerPanelModelTests
         Assert.Equal(MultiplayerPanelService.CouleurDe("aaaaaaaaaaaaaaaa"), MultiplayerPanelService.CouleurDe("aaaaaaaaaaaaaaaa"));
         Assert.Matches("^[0-9A-F]{6}$", MultiplayerPanelService.CouleurDe("bbbbbbbbbbbbbbbb"));
     }
+
+    /// <summary>
+    /// LES GAMEROOMS D'AMIS (28/10) : l'appui long d'un ami le mene dans la gameroom d'amis qui l'attend ; le panneau s'ouvre
+    /// alors sur WAITING FOR FRIENDS, ES gardant la main, et ◄ ► continuent depuis cet onglet.
+    /// </summary>
+    [Fact]
+    public void Une_gameroom_d_amis_ouvre_le_panneau_sur_waiting_for_friends()
+    {
+        var m = new M();
+        m.Ouvrir();
+        m.PlacerSurLOnglet(M.Onglet.WaitingForFriends);
+        Assert.Equal((M.Foyer.MenuEs, M.Onglet.WaitingForFriends, -1), (m.Etat, m.OngletCourant, m.Ligne));
+        // L'entree (◄ depuis ES, ou l'entree automatique) garde FOR FRIENDS.
+        Assert.Equal(M.Effet.PrendreLeFocus, m.Gauche());
+        Assert.Equal(M.Onglet.WaitingForFriends, m.OngletCourant);
+        Assert.Equal(M.Effet.ChargerLOnglet, m.Gauche());
+        Assert.Equal(M.Onglet.InviteFriends, m.OngletCourant);
+        Assert.Equal(M.Effet.ChargerLOnglet, m.Droite());
+        Assert.Equal(M.Effet.ChargerLOnglet, m.Droite());
+        Assert.Equal(M.Onglet.WaitingForPlayers, m.OngletCourant);
+
+        // Rendu a ES depuis FOR FRIENDS, on y rentre par la porte posee par le service (la gameroom ou l'on attend).
+        m.Gauche();
+        Assert.Equal(M.Effet.RendreLeFocus, m.Annuler());
+        m.PoserLaPorte(M.Onglet.WaitingForFriends);
+        m.Gauche();
+        Assert.Equal(M.Onglet.WaitingForFriends, m.OngletCourant);
+    }
+
+    /// <summary>X chez l'ouvreur : un joueur de plus jusqu'au maximum du jeu, puis retour a ceux qui sont la (deux au moins).</summary>
+    [Theory]
+    [InlineData(2, 2, 4, 3)]
+    [InlineData(3, 2, 4, 4)]
+    [InlineData(4, 2, 4, 2)]
+    [InlineData(4, 3, 4, 3)]   // trois deja la : jamais moins
+    [InlineData(4, 1, 4, 2)]   // jamais une partie seul
+    [InlineData(2, 3, 4, 3)]   // un ancien reglage sous les presents remonte a eux
+    public void X_fait_tourner_le_nombre_de_joueurs_attendus(int actuelle, int presents, int maxDuJeu, int suivante)
+        => Assert.Equal(suivante, M.TailleSuivante(actuelle, presents, maxDuJeu));
 }
