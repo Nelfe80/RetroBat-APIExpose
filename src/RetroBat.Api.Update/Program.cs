@@ -11,7 +11,8 @@ namespace RetroBat.Api.Update;
 /// <summary>
 /// Met APIExpose a jour vers la derniere release publiee, depuis la borne elle-meme.
 ///
-///   RetroBat.Api.Update.exe                   verifie, telecharge, applique, relance (demande avant d'appliquer)
+///   RetroBat.Api.Update.exe                   verifie, telecharge, applique, relance (demande avant d'appliquer),
+///                                             puis synchronise le Data Pack, meme si le programme etait a jour
 ///   RetroBat.Api.Update.exe --check           dit seulement s'il y a une mise a jour (code 10 si oui, 0 sinon)
 ///   RetroBat.Api.Update.exe --yes             applique sans question (flotte, tache planifiee)
 ///   RetroBat.Api.Update.exe --force           reapplique meme si la version est deja la
@@ -24,8 +25,8 @@ namespace RetroBat.Api.Update;
 ///
 /// Le DATA PACK (.MEM, dynpanels, gamelists, controles...) ne voyage pas dans l'archive du
 /// programme : l'API le tire fichier par fichier depuis le depot RetroBat-DataPack. Dans la
-/// foulee d'une mise a jour, cet exe lui demande une synchronisation immediate et rapporte ce
-/// qu'elle a repris.
+/// foulee d'une mise a jour, ou tout de suite si le programme est deja a jour, cet exe lui
+/// demande une synchronisation immediate et rapporte ce qu'elle a repris.
 ///
 /// Ce qu'il fait, dans l'ordre : lit la version installee sur RetroBat.Api.exe, demande a GitHub
 /// la derniere release, telecharge `APIExpose-X.Y.Z-update.7z`, VERIFIE son SHA-256 contre ce que
@@ -158,7 +159,16 @@ internal static class Program
         if (!options.Force && installee is not null && release.Version <= installee)
         {
             Dire("Deja a jour.");
-            return 0;
+            // Le programme a jour ne dit rien du Data Pack (29/10 : borne en 1.9.126 restee sur un ancien catalogue
+            // MULTIPLAYER, la mise a jour lancee a la main s'arretait ici). Lancer cet exe le synchronise toujours.
+            // L'API, elle, ne nous lance pas quand il n'y a rien de neuf : pas de synchronisation a chaque demarrage.
+            if (options.Check || options.NoData) return 0;
+            if (await AttendreApiAsync(http, options.Port, TimeSpan.FromSeconds(5)).ConfigureAwait(false) is null)
+            {
+                Dire("Data Pack : l'API ne tourne pas, elle synchronisera au prochain demarrage.");
+                return 0;
+            }
+            return await SynchroniserDataPackAsync(http, options.Port).ConfigureAwait(false) ? 0 : 2;
         }
         if (options.Check)
         {
