@@ -218,6 +218,9 @@ public sealed class MultiplayerLaunchService : IHostedService
                 return;
             }
 
+            // Un jeu qui numerote ses joueurs dans l'ordre du netplay (l'hote d'abord) : ses places remises dans celles de la
+            // plateforme, pour toute la partie (MultiplayerOrdreNetplay).
+            jeu = MultiplayerOrdreNetplay.PourLaRoom(jeu, room);
             var relais = await _relais.ChoisirAsync().ConfigureAwait(false);
             var jeton = Hex(4);
             var motJoueur = Hex(4);
@@ -595,7 +598,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         {
             _journal.LogWarning("MULTIPLAYER : profil de statistiques de {Jeu} refuse ({Erreur}), repli sur son bloc de vie", jeu.Id, erreur);
         }
-        return profil;
+        return profil is null ? null : MultiplayerOrdreNetplay.Permuter(profil, jeu.PlacesDuNetplay);
     }
 
     /// <summary>Le nombre de joueurs de la partie, celui des options du coeur (Lancer) : l'etat a autant de consoles que lui.</summary>
@@ -743,6 +746,7 @@ public sealed class MultiplayerLaunchService : IHostedService
                 return;
             }
 
+            jeu = MultiplayerOrdreNetplay.PourLaRoom(jeu, room);
             // La borne invitee joue la partie de l'hote : le rapporteur ne soumettra pas le score du P1 sous son nom.
             NetplayGuestService.NoterInviteMultiplayer(room.Launch.Seat);
             var pseudo = MultiplayerLaunchPlan.Pseudo(MonPseudo(room), Hex(2));
@@ -812,7 +816,8 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
     }
 
-    private sealed record Partie(Process Lanceur, Dictionary<string, Dictionary<string, string?>> ARendre, DateTime Debut, GameReference Jeu);
+    private sealed record Partie(Process Lanceur, Dictionary<string, Dictionary<string, string?>> ARendre, DateTime Debut, GameReference Jeu,
+        string? DepartDuCoeur = null);
 
     /// <summary>
     /// Dessine les panneaux des joueurs (pseudo, personnage choisi, lettre et cote, ping) et les ecrit comme un decor de
@@ -935,6 +940,24 @@ public sealed class MultiplayerLaunchService : IHostedService
             return null;
         }
 
+        // LE DEPART PAR PLACE (29/10) : l'etat de cette place, la ou le coeur le cherche ; sans lui, la borne ne part pas
+        // (elle demarrerait au menu pendant que les autres jouent).
+        var departDuCoeur = MultiplayerDepartDuCoeur.Poser(jeu, joueurs, lancement.Seat,
+            Path.Combine(RetroBatPaths.PluginRoot, "resources", "multiplayer"), MultiplayerDepartDuCoeur.DossierSysteme);
+        if (!departDuCoeur.Ok)
+        {
+            _journal.LogWarning("MULTIPLAYER : depart par place de {Jeu} non pose ({Raison}) : lancement annule", jeu.Game.Id, departDuCoeur.Raison);
+            return null;
+        }
+        if (departDuCoeur.Fichier is not null)
+        {
+            _journal.LogInformation("MULTIPLAYER : depart par place de {Jeu} pose pour la place {Place}", jeu.Game.Id, lancement.Seat);
+        }
+        else if (departDuCoeur.Raison is not null)
+        {
+            _journal.LogInformation("MULTIPLAYER : {Jeu} sans depart par place ({Raison})", jeu.Game.Id, departDuCoeur.Raison);
+        }
+
         // L'ECRAN DE LANCEMENT TIENT DEVANT LE JEU (28/10) : chez l'hote d'un depart pret, tant que la boucle du depart le
         // fige (rien ne bouge dessous) ; chez un invite, le temps de sa connexion. Sans boucle, il s'efface a l'arrivee du jeu.
         var tenir = lancement.Role == "host"
@@ -1018,6 +1041,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             _sonDEs?.Rendre();
             FinDuLancement(room.Room);
             Rendre(aRendre);
+            MultiplayerDepartDuCoeur.Retirer(departDuCoeur.Fichier);
             _panneau.Fermer();
             return null;
         }
@@ -1025,7 +1049,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         var reference = new GameReference { SystemId = systeme, GamePath = jeu.Path, GameName = jeu.Game.Name };
         _ = Task.Run(() => AnnoncerQuandLEmulateurEstLaAsync(reference, room.Room, lanceA, sansManette: manettes.Length == 0,
             hote: lancement.Role == "host" ? (room, jeu) : null));
-        return new Partie(lanceur, aRendre, DateTime.UtcNow, reference);
+        return new Partie(lanceur, aRendre, DateTime.UtcNow, reference, departDuCoeur.Fichier);
     }
 
     /// <summary>Le lancement de cette salle est fini (l'emulateur est la, ou la partie n'a pas pu partir).</summary>
@@ -1227,6 +1251,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         // Le son d'ES revient au premier appui : cet appui le sort aussi de son ecran de veille.
         _sonDEs?.RendreAuProchainAppui();
         Rendre(partie.ARendre);
+        MultiplayerDepartDuCoeur.Retirer(partie.DepartDuCoeur);
         if (ReferenceEquals(_contexte.Ui.Running, partie.Jeu))
         {
             _contexte.Ui.Running = null;

@@ -40,11 +40,14 @@ public sealed class MultiplayerStatsMoteur
             while (!ct.IsCancellationRequested)
             {
                 var nouvelles = new Dictionary<(string, int), int?>();
+                // Un pointeur se lit une fois par passe, pour tous les signaux qui le suivent.
+                var pointeurs = new Dictionary<long, long?>();
                 foreach (var (nom, signal) in profil.Signals)
                 {
                     foreach (var place in places)
                     {
-                        var lue = await LireAsync(signal.Decalage(place), signal, ct).ConfigureAwait(false);
+                        var adresse = await AdresseAsync(signal, place, pointeurs, ct).ConfigureAwait(false);
+                        var lue = signal.Vraisemblable(await LireAsync(adresse, signal, ct).ConfigureAwait(false));
                         var cle = (nom, place);
                         nouvelles[cle] = signal.Confirm ? (lue is { } v && v == brutes.GetValueOrDefault(cle) ? v : null) : lue;
                         brutes[cle] = lue;
@@ -67,15 +70,40 @@ public sealed class MultiplayerStatsMoteur
         return suivi.Instantane();
     }
 
+    /// <summary>L'adresse de la place : fixe, ou l'ecart de la place depuis l'endroit que designe le pointeur du signal.</summary>
+    private async Task<long?> AdresseAsync(MultiplayerStatsSignal signal, int place, Dictionary<long, long?> pointeurs, CancellationToken ct)
+    {
+        if (signal.Decalage(place) is not { } ecart)
+        {
+            return null;
+        }
+        if (signal.Pointer is not { Decalage: { } ou } pointeur)
+        {
+            return ecart;
+        }
+        if (!pointeurs.TryGetValue(ou, out var cible))
+        {
+            var octets = await LireOctetsAsync(ou, 4, ct).ConfigureAwait(false);
+            cible = octets is null ? null : pointeur.Cible(octets[0] | (long)octets[1] << 8 | (long)octets[2] << 16 | (long)octets[3] << 24);
+            pointeurs[ou] = cible;
+        }
+        return cible + ecart;
+    }
+
     private async Task<int?> LireAsync(long? decalage, MultiplayerStatsSignal signal, CancellationToken ct)
     {
-        var octets = signal.Bytes;
         if (decalage is null)
         {
             return null;
         }
 
-        var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {decalage.Value:x} {octets}", ct).ConfigureAwait(false);
+        var lus = await LireOctetsAsync(decalage.Value, signal.Bytes, ct).ConfigureAwait(false);
+        return lus is null ? null : signal.Valeur(lus);
+    }
+
+    private async Task<IReadOnlyList<int>?> LireOctetsAsync(long decalage, int octets, CancellationToken ct)
+    {
+        var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {decalage:x} {octets}", ct).ConfigureAwait(false);
         var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (morceaux is null || morceaux.Length < 2 + octets || morceaux[0] != "READ_CORE_RAM")
         {
@@ -93,7 +121,7 @@ public sealed class MultiplayerStatsMoteur
             lus.Add(o);
         }
 
-        return signal.Valeur(lus);
+        return lus;
     }
 }
 

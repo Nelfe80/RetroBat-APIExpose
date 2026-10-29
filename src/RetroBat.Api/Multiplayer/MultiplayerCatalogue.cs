@@ -271,6 +271,22 @@ public sealed record MultiplayerGame
     [JsonPropertyName("starts")]
     public IReadOnlyList<MultiplayerStart>? Starts { get; init; }
 
+    /// <summary>
+    /// LE DEPART PAR PLACE, CHARGE PAR LE COEUR (29/10, Bomberman PSP) : un etat par place, que chaque borne pose la ou le
+    /// coeur le cherche avant le lancement. Le coeur le charge a la fin de son demarrage, puis attend que tous les joueurs
+    /// de l'etat soient connectes : RetroArch refuse tout chargement pendant une session netplay a paquets (Netpacket), et
+    /// chaque PSP a sa propre memoire. Une cle a part : une API d'avant l'ignore, et le jeu reste en Classique.
+    /// </summary>
+    [JsonPropertyName("core_start")]
+    public MultiplayerCoreStart? CoreStart { get; init; }
+
+    /// <summary>
+    /// Pendant une partie seulement : place du jeu vers place de la plateforme, quand le jeu numerote ses joueurs dans
+    /// l'ordre du netplay et que l'hote n'a pas la place 1 (<see cref="MultiplayerOrdreNetplay"/>). Null : les memes.
+    /// </summary>
+    [JsonIgnore]
+    public IReadOnlyDictionary<int, int>? PlacesDuNetplay { get; init; }
+
     /// <summary>NIVEAU NELFEPLAY : ce que chaque joueur choisit (le personnage par ▲▼), ecrit chez l'hote apres l'etat.</summary>
     [JsonPropertyName("choices")]
     public IReadOnlyList<MultiplayerChoice>? Choices { get; init; }
@@ -548,6 +564,43 @@ public sealed record MultiplayerChoice
     }
 
     public string NomDe(int valeur) => Values.FirstOrDefault(v => v.Value == valeur)?.Name ?? string.Empty;
+}
+
+/// <summary>Le depart par place d'un jeu (<see cref="MultiplayerGame.CoreStart"/>).</summary>
+public sealed record MultiplayerCoreStart
+{
+    /// <summary>Ou le coeur cherche l'etat, relatif au dossier systeme de RetroArch (le bios de RetroBat).</summary>
+    [JsonPropertyName("path")]
+    public string Path { get; init; } = string.Empty;
+
+    /// <summary>Le nombre de joueurs des etats : une partie a un autre nombre part sans eux.</summary>
+    [JsonPropertyName("players")]
+    public int Players { get; init; } = 2;
+
+    /// <summary>Le md5 du contenu sur lequel les etats ont ete faits.</summary>
+    [JsonPropertyName("content")]
+    public string? Content { get; init; }
+
+    [JsonPropertyName("seats")]
+    public IReadOnlyList<MultiplayerCoreStartSeat> Seats { get; init; } = [];
+
+    public bool VautPour(int joueurs, string? contenu)
+        => joueurs == Players && (Content is null || string.Equals(Content, contenu, StringComparison.OrdinalIgnoreCase));
+
+    public MultiplayerCoreStartSeat? DeLaPlace(int place) => Seats.FirstOrDefault(s => s.Seat == place);
+}
+
+public sealed record MultiplayerCoreStartSeat
+{
+    [JsonPropertyName("seat")]
+    public int Seat { get; init; }
+
+    /// <summary>Chemin relatif au dossier du catalogue : <c>states/psp/bomberman/manche1-p1-ppsspp.state</c>.</summary>
+    [JsonPropertyName("state")]
+    public string State { get; init; } = string.Empty;
+
+    [JsonPropertyName("sha256")]
+    public string Sha256 { get; init; } = string.Empty;
 }
 
 /// <summary>
@@ -1110,9 +1163,64 @@ public sealed class MultiplayerCatalogueStore
             {
                 return jeu.Id + " : " + depart;
             }
+
+            if (ValiderLeDepartDuCoeur(jeu) is { } departDuCoeur)
+            {
+                return jeu.Id + " : " + departDuCoeur;
+            }
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Le depart par place : un chemin qui reste sous le dossier systeme, un etat sous <c>states/</c> a l'empreinte connue
+    /// pour chaque place, exactement une fois. Une place sans etat demarrerait seule au menu pendant que l'autre joue.
+    /// </summary>
+    internal static string? ValiderLeDepartDuCoeur(MultiplayerGame jeu)
+    {
+        if (jeu.CoreStart is not { } depart)
+        {
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(depart.Path) || depart.Path.Contains("..", StringComparison.Ordinal)
+            || global::System.IO.Path.IsPathRooted(depart.Path) || depart.Path.Contains(':'))
+        {
+            return "depart par place : chemin hors du dossier systeme";
+        }
+
+        if (depart.Players < 2 || depart.Players > jeu.Players)
+        {
+            return "depart par place pour " + depart.Players + " joueurs hors de 2 a " + jeu.Players;
+        }
+
+        if (depart.Content is { } md5 && !(jeu.Content?.Md5 ?? []).Contains(md5, StringComparer.OrdinalIgnoreCase))
+        {
+            return "depart par place fait sur un contenu hors du catalogue";
+        }
+
+        for (var place = 1; place <= depart.Players; place++)
+        {
+            var etats = depart.Seats.Where(s => s.Seat == place).ToList();
+            if (etats.Count != 1)
+            {
+                return "depart par place : " + (etats.Count == 0 ? "pas d'etat" : "plusieurs etats") + " pour la place " + place;
+            }
+
+            var etat = etats[0];
+            if (!etat.State.StartsWith("states/", StringComparison.Ordinal) || etat.State.Contains("..", StringComparison.Ordinal))
+            {
+                return "depart par place : etat hors du dossier MULTIPLAYER";
+            }
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(etat.Sha256.Trim(), "^[0-9a-fA-F]{64}$"))
+            {
+                return "depart par place : empreinte de l'etat manquante";
+            }
+        }
+
+        return depart.Seats.All(s => s.Seat >= 1 && s.Seat <= depart.Players) ? null : "depart par place : place hors de la partie";
     }
 
     /// <summary>

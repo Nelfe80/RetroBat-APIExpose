@@ -150,11 +150,13 @@ Write-Host 'Construction update.7z...'
 # LES COEURS DE MULTIPLAYER (2026-10-23) : mGBA Splitscreen compile par NelfePlay (branche nelfeplay-build du fork) et NGP
 # Link (25/10, Beetle NGP et son cable de liaison), avec leurs fiches, poses chez RetroArch par MultiplayerCoeursService.
 # Repris sur leur empreinte, comme une archive. La liste suit MultiplayerCoeursService.Coeurs. FBNeo Multi 32 (27/10) :
-# FBNeo aux etats portables (branche nelfeplay-multi32 du fork), avec le texte de sa licence.
+# FBNeo aux etats portables (branche nelfeplay-multi32 du fork), avec le texte de sa licence. PPSSPP Netplay (29/10) :
+# le multijoueur ad hoc de la PSP par le netplay de RetroArch (branche libretro-netpacket-adhoc du fork), avec sa licence.
 $outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.exe',
     'tools/cores/mgba_splitscreen_libretro.dll', 'tools/cores/mgba_splitscreen_libretro.info',
     'tools/cores/mednafen_ngp_link_libretro.dll', 'tools/cores/mednafen_ngp_link_libretro.info',
-    'tools/cores/fbneo_multi32_libretro.dll', 'tools/cores/fbneo_multi32_license.txt', 'tools/cores/fbneo_multi32_libretro.info')
+    'tools/cores/fbneo_multi32_libretro.dll', 'tools/cores/fbneo_multi32_license.txt', 'tools/cores/fbneo_multi32_libretro.info',
+    'tools/cores/ppsspp_netplay_libretro.dll', 'tools/cores/ppsspp_netplay_license.txt', 'tools/cores/ppsspp_netplay_libretro.info')
 $exclusOutils = @($outilsHorsArchive | ForEach-Object { "-x!$name\$($_ -replace '/', '\')" })
 & $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" @exclusOutils -mx=5 -bsp0 -bso0
 

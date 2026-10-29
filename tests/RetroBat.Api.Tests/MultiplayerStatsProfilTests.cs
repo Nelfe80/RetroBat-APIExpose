@@ -362,16 +362,103 @@ public sealed class MultiplayerStatsProfilTests : IDisposable
         Assert.Null(MultiplayerStatsProfil.Implicite(jeu with { Stats = null }));
     }
 
-    /// <summary>Un RetroArch de test : vies sur deux octets, manches sur un.</summary>
+    /// <summary>
+    /// Le profil de Bomberman (PSP, 29/10) : les fiches des joueurs, recreees a chaque manche ailleurs dans le tas, se
+    /// trouvent par le pointeur 0xAE5A78 ; une fiche liberee se lit 0xFF, que les bornes ecartent.
+    /// </summary>
+    private const string ProfilAuPointeur = """
+        {
+          "id": "psp/bomberman/duel", "version": 1, "players": 2,
+          "signals": {
+            "bombes": { "source": "poll", "pointer": { "core_ram": "0xAE5A78", "base": "0x08000000" },
+                        "seats": { "1": "0x00", "2": "0xBC" }, "bytes": 1, "min": 0, "max": 10 },
+            "feu": { "source": "poll", "pointer": { "core_ram": "0xAE5A78", "base": "0x08000000" },
+                     "seats": { "1": "0x20", "2": "0xDC" }, "bytes": 1, "min": 1, "max": 20 }
+          },
+          "counters": {
+            "bombes": { "rule": "hausse", "signal": "bombes" },
+            "bonus": { "rule": "somme_hausse", "signal": "feu" },
+            "feu_max": { "rule": "maximum", "signal": "feu" }
+          },
+          "metrics": [
+            { "category": "execution", "id": "bombes", "label": "multiplayer.stat.bombs", "formula": "bombes" },
+            { "category": "efficacite", "id": "bonus", "label": "multiplayer.stat.items", "formula": "bonus" },
+            { "category": "maitrise", "id": "feu_max", "label": "multiplayer.stat.best_fire", "formula": "feu_max" }
+          ]
+        }
+        """;
+
+    [Fact]
+    public async Task Un_signal_au_pointeur_suit_les_fiches_d_une_manche_a_l_autre_et_ecarte_les_lectures_hors_bornes()
+    {
+        var profil = Charger(ProfilAuPointeur, out var erreur);
+        Assert.Null(erreur);
+        var ra = new FauxRetroArch();
+        void Fiche(long debut, int bombes1, int feu1, int bombes2, int feu2)
+        {
+            ra.Octets[debut] = bombes1;
+            ra.Octets[debut + 0x20] = feu1;
+            ra.Octets[debut + 0xBC] = bombes2;
+            ra.Octets[debut + 0xDC] = feu2;
+        }
+        ra.Longs[0xAE5A78] = 0x08D1A500;
+        Fiche(0xD1A500, 0, 2, 0, 2);
+        using var fin = new CancellationTokenSource();
+        var suivi = new MultiplayerStatsMoteur(ra, TimeSpan.FromMilliseconds(10)).Suivre(profil, [1, 2], fin.Token);
+        async Task Pause() => await Task.Delay(250);
+
+        await Pause();
+        Fiche(0xD1A500, 1, 2, 0, 2);   // P1 pose une bombe
+        await Pause();
+        Fiche(0xD1A500, 0, 3, 0, 2);   // elle explose ; P1 ramasse un « Feu + »
+        await Pause();
+        Fiche(0xD1A500, 1, 3, 0, 2);   // une deuxieme bombe
+        await Pause();
+        // Fin de manche : la fiche liberee se lit 0xFF, puis le pointeur s'efface, puis la manche suivante a ses fiches
+        // ailleurs, remises a leurs valeurs de depart.
+        Fiche(0xD1A500, 0xFF, 0xFF, 0xFF, 0xFF);
+        await Pause();
+        ra.Longs[0xAE5A78] = 0;
+        await Pause();
+        ra.Longs[0xAE5A78] = 0x08D1A7C0;
+        Fiche(0xD1A7C0, 0, 2, 0, 2);
+        await Pause();
+        Fiche(0xD1A7C0, 0, 2, 1, 2);   // P2 pose une bombe, dans la nouvelle fiche
+        await Pause();
+        fin.Cancel();
+        var resultat = await suivi.Fin;
+
+        Assert.Equal([2L, 1L, 3L], resultat.MesuresDe(1).Select(v => v.Valeur ?? -1));
+        Assert.Equal([1L, 0L, 2L], resultat.MesuresDe(2).Select(v => v.Valeur ?? -1));
+    }
+
+    [Theory]
+    [InlineData("\"core_ram\": \"0xAE5A78\"", "\"core_ram\": \"AE5A78\"", "pointeur illisible")]
+    [InlineData("\"feu\": { \"source\": \"poll\", \"pointer\": { \"core_ram\": \"0xAE5A78\", \"base\": \"0x08000000\" }", "\"feu\": { \"source\": \"poll\", \"pointer\": { \"core_ram\": \"0xAE5A78\", \"base\": \"huit\" }", "pointeur illisible")]
+    [InlineData("\"min\": 0, \"max\": 10", "\"min\": 11, \"max\": 10", "bornes inversees")]
+    public void Un_pointeur_ou_des_bornes_douteux_refusent_le_profil(string avant, string apres, string raison)
+    {
+        Assert.Contains(avant, ProfilAuPointeur);
+        Charger(ProfilAuPointeur.Replace(avant, apres), out var erreur);
+        Assert.Contains(raison, erreur);
+    }
+
+    /// <summary>Un RetroArch de test : vies sur deux octets, manches sur un, pointeurs sur quatre.</summary>
     private sealed class FauxRetroArch : ICommandesRetroArch
     {
         public readonly System.Collections.Concurrent.ConcurrentDictionary<long, int> Mots = new();
         public readonly System.Collections.Concurrent.ConcurrentDictionary<long, int> Octets = new();
+        public readonly System.Collections.Concurrent.ConcurrentDictionary<long, long> Longs = new();
 
         public Task<string?> DemanderAsync(string commande, CancellationToken ct, int delaiMs = 500)
         {
             var m = commande.Split(' ');
             var adresse = long.Parse(m[1], NumberStyles.HexNumber);
+            if (m[2] == "4")
+            {
+                var l = Longs.GetValueOrDefault(adresse);
+                return Task.FromResult<string?>($"READ_CORE_RAM {m[1]} {l & 0xFF:x2} {(l >> 8) & 0xFF:x2} {(l >> 16) & 0xFF:x2} {(l >> 24) & 0xFF:x2}");
+            }
             if (m[2] == "2")
             {
                 var v = Mots.GetValueOrDefault(adresse);

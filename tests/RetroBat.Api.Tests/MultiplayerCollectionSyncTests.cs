@@ -441,6 +441,15 @@ public class MultiplayerCollectionSyncTests : IDisposable
             Assert.Equal(depart.Sha256.Trim().ToUpperInvariant(), Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(fichier))));
         });
 
+        // Chaque etat d'un depart par place est livre, a l'empreinte du catalogue : sinon cette place ne partirait pas.
+        var parPlace = catalogue.Games.SelectMany(jeu => jeu.CoreStart?.Seats ?? []).ToList();
+        Assert.All(parPlace, etat =>
+        {
+            var fichier = Path.Combine(dossier, etat.State.Replace('/', Path.DirectorySeparatorChar));
+            Assert.True(File.Exists(fichier), etat.State);
+            Assert.Equal(etat.Sha256.Trim().ToUpperInvariant(), Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(fichier))));
+        });
+
         // Chaque profil de statistiques cite est livre et valide : sinon le jeu retomberait sur son bloc de vie sans le dire.
         Assert.All(catalogue.Games.Where(jeu => jeu.Stats?.Profile is not null), jeu =>
         {

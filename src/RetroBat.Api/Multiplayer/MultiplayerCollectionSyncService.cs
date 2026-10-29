@@ -627,6 +627,9 @@ public sealed record MultiplayerInstalledGame(MultiplayerGame Game, string Path,
 
     /// <summary>Le depart pret d'une partie a <paramref name="joueurs"/> sur ce contenu ; null : elle se joue en classique.</summary>
     public MultiplayerStart? DepartPour(int joueurs) => Game.EstNelfePlay ? Game.DepartPour(joueurs, ContentKey) : null;
+
+    /// <summary>Le depart par place d'une partie a <paramref name="joueurs"/> sur ce contenu, ou null.</summary>
+    public MultiplayerCoreStart? DepartDuCoeurPour(int joueurs) => Game.CoreStart is { } depart && depart.VautPour(joueurs, ContentKey) ? depart : null;
 }
 
 public sealed record MultiplayerCollectionStatus(

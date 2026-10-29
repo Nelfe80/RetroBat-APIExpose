@@ -51,6 +51,12 @@ public sealed class MultiplayerCoeursService : BackgroundService
         new("fbneo", "fbneo_multi32", ["fbneo_multi32_libretro.dll", "fbneo_multi32_license.txt"], "fbneo_multi32_libretro.info",
             "le coeur libretro fbneo_multi32 (FBNeo aux etats portables, pour le netplay des jeux Sega Multi 32 de "
             + "MULTIPLAYER), en dernier : fbneo reste le coeur des parties solo"),
+        // PPSSPP NETPLAY (29/10) : le multijoueur ad hoc de la PSP par le netplay de RetroArch (Netpacket, PR
+        // hrydgard/ppsspp #22832), avec le GameMode qui se renvoie et le depart par place. Un coeur a part : le PPSSPP de
+        // RetroBat reste celui des parties solo. Sa licence (GPL, avec l'adresse des sources) le suit, a cote de lui.
+        new("psp", "ppsspp_netplay", ["ppsspp_netplay_libretro.dll", "ppsspp_netplay_license.txt"], "ppsspp_netplay_libretro.info",
+            "le coeur libretro ppsspp_netplay (PPSSPP au multijoueur ad hoc par le netplay de RetroArch, pour MULTIPLAYER), "
+            + "en dernier : ppsspp reste le coeur des parties solo"),
     ];
 
     public const string FichierEs = "es_systems_nelfeplay.cfg";

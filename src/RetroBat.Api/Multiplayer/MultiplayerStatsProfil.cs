@@ -217,6 +217,14 @@ public sealed record MultiplayerStatsProfil
             {
                 return "signal « " + nom + " » : source, taille ou ordre inconnu";
             }
+            if (signal.Pointer is { } pointeur && (pointeur.Decalage is null || pointeur.Origine is null))
+            {
+                return "signal « " + nom + " » : pointeur illisible";
+            }
+            if (signal.Min is { } min && signal.Max is { } max && min > max)
+            {
+                return "signal « " + nom + " » : bornes inversees";
+            }
             for (var place = 1; place <= profil.Players; place++)
             {
                 if (signal.Decalage(place) is null)
@@ -334,10 +342,54 @@ public sealed record MultiplayerStatsSignal
     [JsonPropertyName("confirm")]
     public bool Confirm { get; init; } = true;
 
+    /// <summary>
+    /// LES FICHES QUI CHANGENT DE PLACE (29/10, Bomberman PSP) : le jeu recree ses fiches de joueurs a chaque manche, ailleurs
+    /// dans le tas. Avec un pointeur, l'adresse de chaque place est un ecart depuis l'endroit qu'il designe, relu a chaque
+    /// passe. Sans lui, l'adresse est fixe.
+    /// </summary>
+    [JsonPropertyName("pointer")]
+    public MultiplayerStatsPointeur? Pointer { get; init; }
+
+    /// <summary>
+    /// Les bornes de vraisemblance : une lecture hors de [min, max] ne compte pas (une fiche liberee entre deux manches se lit
+    /// 0xFF, qui ferait une hausse).
+    /// </summary>
+    [JsonPropertyName("min")]
+    public int? Min { get; init; }
+
+    [JsonPropertyName("max")]
+    public int? Max { get; init; }
+
     public long? Decalage(int place)
         => Seats.TryGetValue(place.ToString(CultureInfo.InvariantCulture), out var adresse)
             ? new MultiplayerChoiceSeat { CoreRam = adresse }.Decalage
             : null;
+
+    /// <summary>La valeur si elle est vraisemblable, sinon null.</summary>
+    public int? Vraisemblable(int? valeur)
+        => valeur is { } v && (Min is not { } min || v >= min) && (Max is not { } max || v <= max) ? valeur : null;
+}
+
+/// <summary>
+/// Un pointeur de 32 bits, petit-boutiste, a l'adresse <see cref="CoreRam"/> (decalage de RetroArch) ; le decalage qu'il
+/// designe est sa valeur moins <see cref="Base"/> (0x08000000 sur PSP, ou la memoire du jeu commence a cette adresse).
+/// </summary>
+public sealed record MultiplayerStatsPointeur
+{
+    [JsonPropertyName("core_ram")]
+    public string CoreRam { get; init; } = string.Empty;
+
+    [JsonPropertyName("base")]
+    public string Base { get; init; } = "0x0";
+
+    [JsonIgnore]
+    public long? Decalage => new MultiplayerChoiceSeat { CoreRam = CoreRam }.Decalage;
+
+    [JsonIgnore]
+    public long? Origine => new MultiplayerChoiceSeat { CoreRam = Base }.Decalage;
+
+    /// <summary>Le decalage designe par une valeur lue, ou null pour un pointeur nul ou en dessous de la base.</summary>
+    public long? Cible(long valeur) => Origine is { } origine && valeur > origine ? valeur - origine : null;
 }
 
 public sealed record MultiplayerStatsCompteur
