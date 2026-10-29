@@ -24,13 +24,16 @@ public sealed class SystemStatusController : ControllerBase
 
     private readonly ApiExposeRuntimeOptionsService _runtimeOptions;
     private readonly WebSocketConnectionManager _webSocketManager;
+    private readonly MediaRuntimeState? _mediaRuntimeState;
 
     public SystemStatusController(
         ApiExposeRuntimeOptionsService runtimeOptions,
-        WebSocketConnectionManager webSocketManager)
+        WebSocketConnectionManager webSocketManager,
+        MediaRuntimeState? mediaRuntimeState = null)
     {
         _runtimeOptions = runtimeOptions;
         _webSocketManager = webSocketManager;
+        _mediaRuntimeState = mediaRuntimeState;
     }
 
     /// <summary>
@@ -67,7 +70,9 @@ public sealed class SystemStatusController : ControllerBase
             EmulationStation = new EmulationStationStatus
             {
                 ProcessRunning = esProcessRunning,
-                ApiReachable = esApiReachable
+                ApiReachable = esApiReachable,
+                CarouselSystem = _mediaRuntimeState?.CarouselSystemId ?? string.Empty,
+                CarouselConfirmed = _mediaRuntimeState is { CarouselSystemIdConfirme.Length: > 0 }
             },
             RetroBat = BuildRetroBatStatus(),
             ScoreLabWorkshop = BuildScoreLabWorkshopStatus(),
@@ -278,6 +283,15 @@ public sealed class EmulationStationStatus
     /// <summary>The EmulationStation HTTP API answers on http://127.0.0.1:1234.</summary>
     /// <example>true</example>
     public bool ApiReachable { get; set; }
+    /// <summary>
+    /// The system or collection the EmulationStation carousel shows, as APIExpose last knew it (empty until ES announces
+    /// one). The long press opens the MULTIPLAYER panel only while this is <c>nelfeplay-multiplayer</c>.
+    /// </summary>
+    /// <example>nelfeplay-multiplayer</example>
+    public string CarouselSystem { get; set; } = string.Empty;
+    /// <summary>False when that carousel was restored from the last run or guessed from the selected game, not announced by ES.</summary>
+    /// <example>true</example>
+    public bool CarouselConfirmed { get; set; }
 }
 
 /// <summary>Effective ON/OFF gate of each manager (parents win over children).</summary>

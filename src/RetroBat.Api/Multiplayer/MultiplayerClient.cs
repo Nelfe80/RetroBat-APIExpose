@@ -82,7 +82,7 @@ public sealed class MultiplayerClient
 
     /// <summary>L'hote annonce la fin de la partie.</summary>
     public Task<MultiplayerReponse?> TerminerAsync(string room, string raison, int? dureeSecondes, CancellationToken ct, int? placeGagnante = null,
-        IReadOnlyDictionary<int, StatsDeLaPlace>? stats = null, object? mesures = null)
+        IReadOnlyDictionary<int, StatsDeLaPlace>? stats = null, object? mesures = null, IReadOnlyList<MultiplayerRang>? rangs = null)
         => EnvoyerAsync("ended", new
         {
             room, reason = raison, duration_s = dureeSecondes, winner_seat = placeGagnante,
@@ -90,11 +90,18 @@ public sealed class MultiplayerClient
                 p => new { hits = p.Value.Coups, kos = p.Value.KO, perfects = p.Value.Perfects, damage = p.Value.Degats }),
             // Le format generique du lot 2 (profil, puis valeur et etat de chaque statistique) ; un site plus ancien l'ignore.
             metrics = mesures,
+            // Le rang de chaque humain d'une fin a plusieurs (CDC Classements v1.0 §6) ; un site plus ancien l'ignore.
+            ranks = Rangs(rangs),
         }, ct);
 
     /// <summary>NIVEAU NELFEPLAY : un invite rapporte la place gagnante qu'il a vue ; le resultat est valide s'il concorde avec l'hote.</summary>
-    public Task<MultiplayerReponse?> RapporterAsync(string room, int placeGagnante, CancellationToken ct, object? mesures = null)
-        => EnvoyerAsync("report", new { room, winner_seat = placeGagnante, metrics = mesures }, ct);
+    public Task<MultiplayerReponse?> RapporterAsync(string room, int placeGagnante, CancellationToken ct, object? mesures = null,
+        IReadOnlyList<MultiplayerRang>? rangs = null)
+        => EnvoyerAsync("report", new { room, winner_seat = placeGagnante, metrics = mesures, ranks = Rangs(rangs) }, ct);
+
+    /// <summary>Les rangs tels que le site les lit, ou null sans classement a plusieurs (un duel lu par end ou match_end).</summary>
+    private static object? Rangs(IReadOnlyList<MultiplayerRang>? rangs)
+        => rangs is { Count: > 0 } ? rangs.Select(r => new { seat = r.Seat, rank = r.Rank, camp = r.Camp }).ToList() : null;
 
     /// <summary>Un invite annule la rencontre : son bilan du wrapper montre une triche (22/10). La cote ne bouge pas.</summary>
     public Task<MultiplayerReponse?> AnnulerAsync(string room, string motif, CancellationToken ct)
@@ -503,6 +510,26 @@ public sealed record MultiplayerFin
     /// <summary>La place qui a quitte la rencontre avant sa fin (<c>result</c> vaut alors <c>abandoned</c>).</summary>
     [JsonPropertyName("abandoned_seat")]
     public int? AbandonedSeat { get; init; }
+
+    /// <summary>Le rang de chaque humain d'une fin a plusieurs (CDC Classements v1.0 §6), tel que l'hote l'a rapporte.</summary>
+    [JsonPropertyName("ranks")]
+    public IReadOnlyList<MultiplayerRangDuSite>? Ranks { get; init; }
+
+    /// <summary>Les places parties avant le resultat d'une rencontre a plusieurs : chacune a pris sa defaite, seule.</summary>
+    [JsonPropertyName("abandoned_seats")]
+    public IReadOnlyList<int>? AbandonedSeats { get; init; }
+}
+
+public sealed record MultiplayerRangDuSite
+{
+    [JsonPropertyName("seat")]
+    public int Seat { get; init; }
+
+    [JsonPropertyName("rank")]
+    public int Rank { get; init; }
+
+    [JsonPropertyName("camp")]
+    public int? Camp { get; init; }
 }
 
 /// <summary>Les statistiques d'une rencontre selon un profil : le profil, puis par place, chaque statistique par son id.</summary>

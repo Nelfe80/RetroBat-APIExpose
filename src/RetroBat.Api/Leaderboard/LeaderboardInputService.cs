@@ -503,6 +503,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     }
 
     private (string Identite, int? Slot, DateTime Depuis)? _autreAppui;
+
+    /// <summary>L'appui long deja dit au journal comme pris par un ecran MULTIPLAYER : un appui, une ligne.</summary>
+    private DateTime? _appuiLongMultiplayerSignale;
     private readonly HashSet<string> _appuisLongsSignales = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Le « gauche » de l'entree automatique (voir <see cref="EntreeAutomatique"/>), joue comme un vrai appui.</summary>
@@ -563,6 +566,19 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             try
             {
                 await Task.Delay(80, ct).ConfigureAwait(false);
+
+                // Le meme pour MULTIPLAYER (29/10, « a la sortie d'un jeu multiplayer, l'appui long ne fonctionne plus ») :
+                // tant qu'un de ses ecrans se croit ouvert (le resultat, la presentation d'un lancement), il prend chaque
+                // appui, et l'appui long n'ouvre rien. On le dit, avec ce qu'il montre et qui a le premier plan.
+                if (_multiplayer is { Ouvert: true, PanneauAffiche: false } ecranMultiplayer
+                    && ecranMultiplayer.ValiderTenuDepuis is { } tenuMultiplayer
+                    && (DateTime.UtcNow - tenuMultiplayer).TotalMilliseconds >= Math.Max(200, _options.CurrentValue.Leaderboard.LongPressMs)
+                    && _appuiLongMultiplayerSignale != tenuMultiplayer)
+                {
+                    _appuiLongMultiplayerSignale = tenuMultiplayer;
+                    _logger.LogInformation("Classement : appui long pris par l'ecran MULTIPLAYER ({Ecran}) ; ES devant : {EsDevant}, notre fenetre devant : {Nous}.",
+                        ecranMultiplayer.EcranAffiche, EsEstDevant() ? "oui" : "non", _overlay.EstAuPremierPlan() ? "oui" : "non");
+                }
 
                 // Un appui long vu alors que le panneau se croit deja ouvert ne s'ouvre pas : on le
                 // dit, sinon « rien ne s'affiche » ne laisse aucune trace (2026-09-30).
@@ -833,6 +849,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         // DANS LA COLLECTION MULTIPLAYER, l'appui long veut dire « je veux jouer » (V24-01, V24-03) :
         // c'est son panneau qui s'ouvre, que le jeu soit ouvert au scoring ou non.
         _versMultiplayer = _multiplayer is { Actif: true, DansLaCollection: true };
+        // Le carrousel qui a decide, au journal (29/10 : « a la sortie d'un jeu multiplayer, l'appui long ne fonctionne plus »).
+        _logger.LogInformation("Classement : appui long sur {Jeu}, carrousel « {Carrousel} » : {Vers}.", nomDuJeu,
+            _multiplayer?.Carrousel is { Length: > 0 } carrousel ? carrousel : "(aucun)",
+            _versMultiplayer ? "panneau MULTIPLAYER" : "classement");
         if (_versMultiplayer)
         {
             _dernierRefus = "";

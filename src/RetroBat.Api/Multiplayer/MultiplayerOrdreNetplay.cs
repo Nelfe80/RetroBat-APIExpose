@@ -44,6 +44,10 @@ public static class MultiplayerOrdreNetplay
         return jeu with
         {
             End = jeu.End is { } fin ? fin with { Seats = fin.Seats.Select(s => s with { Seat = Place(s.Seat) }).ToList() } : null,
+            MatchEnd = jeu.MatchEnd is { } score ? score with { Seats = score.Seats.Select(s => s with { Seat = Place(s.Seat) }).ToList() } : null,
+            RankingEnd = jeu.RankingEnd is { } classement
+                ? classement with { Seats = classement.Seats.Select(s => s with { Seat = Place(s.Seat) }).ToList() }
+                : null,
             CoreStart = jeu.CoreStart is { } depart ? depart with { Seats = depart.Seats.Select(s => s with { Seat = Place(s.Seat) }).ToList() } : null,
             PlacesDuNetplay = permutation,
         };

@@ -842,6 +842,14 @@ public class EmulationStationWatcherProvider : IProvider
             if (args.Length > 0)
             {
                 var sysId = args[0].Trim();
+                // La valeur au journal (29/10) : l'appui long d'une collection MULTIPLAYER se route sur elle, et on ne savait
+                // pas dire, apres coup, ce qu'ES avait annonce.
+                var avant = _mediaRuntimeState.CarouselSystemId;
+                if (!string.Equals(avant, sysId, StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger?.LogInformation("Carrousel : {Avant} -> {Apres} (system-selected d'ES)", avant.Length > 0 ? avant : "(aucun)", sysId);
+                }
+
                 // Ce que le carrousel montre : dans une collection, ce n'est pas le systeme du
                 // jeu, et c'est ce qui decide si un /addgames sera visible (voir
                 // MediaRuntimeState.IsViewDetachedFromSystem).

@@ -320,13 +320,24 @@ public sealed record MultiplayerGame
     [JsonPropertyName("match_end")]
     public MultiplayerMatchEnd? MatchEnd { get; init; }
 
-    /// <summary>La fin de rencontre se lit-elle (manches, ou un type de <see cref="MatchEnd"/> connu) ?</summary>
+    /// <summary>LE CLASSEMENT A PLUSIEURS (CDC Classements v1.0 §3) : chaque humain classe, a 2 joueurs ou plus.</summary>
+    [JsonPropertyName("ranking_end")]
+    public MultiplayerRankingEnd? RankingEnd { get; init; }
+
+    /// <summary>La fin de rencontre se lit-elle (manches, un type de <see cref="MatchEnd"/> connu, ou une regle de <see cref="RankingEnd"/>) ?</summary>
     [JsonIgnore]
-    public bool FinLue => End is not null || MatchEnd is { EstConnu: true };
+    public bool FinLue => End is not null || MatchEnd is { EstConnu: true } || RankingEnd is { EstConnu: true };
 
     /// <summary>Le delai avant de fermer le jeu, la rencontre finie, le temps de voir le resultat.</summary>
     [JsonIgnore]
-    public int DelaiDeFermeture => End?.CloseAfterS ?? MatchEnd?.CloseAfterS ?? 5;
+    public int DelaiDeFermeture => End?.CloseAfterS ?? MatchEnd?.CloseAfterS ?? RankingEnd?.CloseAfterS ?? 5;
+
+    /// <summary>
+    /// Une rencontre a ces places humaines est-elle classee ? Le jeu l'est, et sa fin a plusieurs la classe a ce nombre
+    /// d'humains (deux au moins, face a face dans un jeu en equipes).
+    /// </summary>
+    public bool ClassePour(IReadOnlyCollection<int> humains)
+        => EstClasse && (RankingEnd is not { } classement || classement.Classable(humains));
 
     /// <summary>NIVEAU NELFEPLAY : ce que l'hote mesure pendant un duel pour l'ecran de resultat (00quater.3, ecran 10).</summary>
     [JsonPropertyName("stats")]
@@ -438,6 +449,18 @@ public sealed record MultiplayerStart
 
     public bool VautPour(string? contenu)
         => Content is null || string.Equals(Content, contenu, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// LE DELAI DES CHOIX (CDC Classements v1.1 §1, 29/10) : les images entre le chargement de l'etat et l'ecriture des
+    /// choix, a chaque ecriture (la premiere, chaque tour de la boucle du depart, le repli). Magical Drop III n'accepte
+    /// l'ecriture qu'entre 50 et 300 ms apres le chargement : 1,5 s arrivait trop tard. Absent : le delai habituel.
+    /// </summary>
+    [JsonPropertyName("write_after_frames")]
+    public int? WriteAfterFrames { get; init; }
+
+    /// <summary>Le delai d'ecriture du catalogue, en temps (60 images par seconde), ou null.</summary>
+    [JsonIgnore]
+    public TimeSpan? DelaiDesChoix => WriteAfterFrames is { } images ? TimeSpan.FromMilliseconds(images * 1000.0 / 60) : null;
 }
 
 /// <summary>
@@ -628,6 +651,16 @@ public sealed record MultiplayerEnd
     /// </summary>
     [JsonPropertyName("duel")]
     public MultiplayerDuelGuard? Duel { get; init; }
+
+    /// <summary>
+    /// LA CARTE DU COEUR (CDC Classements v1.1 §2) : <c>core_map</c>, chaque adresse de la fin (places et garde) se lit par
+    /// READ_CORE_MEMORY, comme les choix. Absent : READ_CORE_RAM.
+    /// </summary>
+    [JsonPropertyName("memory")]
+    public string? Memory { get; init; }
+
+    [JsonIgnore]
+    public bool ParLaCarteDuCoeur => string.Equals(Memory, MultiplayerChoice.CarteDuCoeur, StringComparison.Ordinal);
 }
 
 /// <summary>
@@ -659,8 +692,164 @@ public sealed record MultiplayerMatchEnd
     [JsonPropertyName("duel")]
     public MultiplayerDuelGuard? Duel { get; init; }
 
+    /// <summary><c>core_map</c> : le signal, les scores et la garde se lisent par READ_CORE_MEMORY (CDC Classements v1.1 §2).</summary>
+    [JsonPropertyName("memory")]
+    public string? Memory { get; init; }
+
+    [JsonIgnore]
+    public bool ParLaCarteDuCoeur => string.Equals(Memory, MultiplayerChoice.CarteDuCoeur, StringComparison.Ordinal);
+
     [JsonIgnore]
     public bool EstConnu => Type == ScoreFinal;
+}
+
+/// <summary>
+/// LES CLASSEMENTS A PLUSIEURS (CDC Classements v1.0 §3 a §5, 29/10) : une fin qui classe chaque humain, a 2 joueurs ou
+/// plus, contre l'ordinateur ou en equipes. Quatre regles : <c>manches</c> (premier a N), <c>survie</c> (le dernier en vie),
+/// <c>arrivee</c> (l'ordre d'arrivee d'une course), <c>score_fige</c> (le score d'avant la premiere mort). Une cle a part :
+/// une API d'avant l'ignore, et le jeu reste au niveau Classique chez elle ; un jeu qui la porte porte aussi son
+/// <c>min_api</c>.
+/// </summary>
+public sealed record MultiplayerRankingEnd
+{
+    public const string Manches = "manches";
+    public const string Survie = "survie";
+    public const string Arrivee = "arrivee";
+    public const string ScoreFige = "score_fige";
+
+    public static readonly IReadOnlySet<string> Regles = new HashSet<string>(StringComparer.Ordinal) { Manches, Survie, Arrivee, ScoreFige };
+
+    [JsonPropertyName("rule")]
+    public string Rule { get; init; } = string.Empty;
+
+    /// <summary><c>core_map</c> : toutes les adresses de la fin se lisent par READ_CORE_MEMORY (CDC Classements v1.1 §2).</summary>
+    [JsonPropertyName("memory")]
+    public string? Memory { get; init; }
+
+    /// <summary>Une entree par place que le jeu peut avoir, humaine ou non (l'ordinateur se lit aussi).</summary>
+    [JsonPropertyName("seats")]
+    public IReadOnlyList<MultiplayerRankingSeat> Seats { get; init; } = [];
+
+    /// <summary><c>manches</c> : le nombre de manches qui ferme la rencontre, atteint par une place humaine ou non.</summary>
+    [JsonPropertyName("first_to")]
+    public int? FirstTo { get; init; }
+
+    /// <summary><c>survie</c> : une place est eliminee quand sa valeur reste a ce seuil ou en dessous.</summary>
+    [JsonPropertyName("out_at")]
+    public long OutAt { get; init; }
+
+    /// <summary>Le signal global de fin de rencontre, facultatif.</summary>
+    [JsonPropertyName("over")]
+    public MultiplayerDuelGuard? Over { get; init; }
+
+    /// <summary>La lecture ne vaut que pendant que cet octet a cette valeur (les menus, la demo et les transitions ne comptent pas).</summary>
+    [JsonPropertyName("guard")]
+    public MultiplayerDuelGuard? Guard { get; init; }
+
+    /// <summary>
+    /// Une valeur n'est retenue qu'apres etre restee la meme ce delai (une vie lue au vol entre deux manches, la vie du
+    /// gagnant qui remonte un instant a KOF '98).
+    /// </summary>
+    [JsonPropertyName("settle_ms")]
+    public int SettleMs { get; init; } = 1000;
+
+    [JsonPropertyName("min_humans")]
+    public int MinHumans { get; init; } = 2;
+
+    [JsonPropertyName("close_after_s")]
+    public int CloseAfterS { get; init; } = 5;
+
+    [JsonIgnore]
+    public bool EstConnu => Regles.Contains(Rule);
+
+    [JsonIgnore]
+    public bool ParLaCarteDuCoeur => string.Equals(Memory, MultiplayerChoice.CarteDuCoeur, StringComparison.Ordinal);
+
+    /// <summary>Jamais moins de deux humains pour classer (regle du user du 29/10).</summary>
+    [JsonIgnore]
+    public int HumainsMin => Math.Max(2, MinHumans);
+
+    [JsonIgnore]
+    public bool AvecCamps => Seats.Any(s => s.Camp is not null);
+
+    public MultiplayerRankingSeat? Place(int place) => Seats.FirstOrDefault(s => s.Seat == place);
+
+    /// <summary>
+    /// Une rencontre a ces places humaines se classe-t-elle ? Au moins <see cref="HumainsMin"/> humains, et, dans un jeu en
+    /// equipes, des humains dans deux camps au moins (face a face) : tous du meme cote, personne n'est en face.
+    /// </summary>
+    public bool Classable(IReadOnlyCollection<int> humains)
+        => humains.Count >= HumainsMin
+           && (!AvecCamps || humains.Select(h => Place(h)?.Camp).Where(c => c is not null).Distinct().Count() >= 2);
+}
+
+/// <summary>Une place d'une fin a plusieurs : sa valeur (compteur, vie, position ou score), son camp, sa mort, son arrivee.</summary>
+public sealed record MultiplayerRankingSeat
+{
+    [JsonPropertyName("seat")]
+    public int Seat { get; init; }
+
+    /// <summary>La valeur de la place ; facultative en <c>survie</c> quand <see cref="Dead"/> suffit.</summary>
+    [JsonPropertyName("core_ram")]
+    public string CoreRam { get; init; } = string.Empty;
+
+    [JsonPropertyName("bytes")]
+    public int Bytes { get; init; } = 1;
+
+    [JsonPropertyName("bcd")]
+    public bool Bcd { get; init; }
+
+    /// <summary>« le », « be », ou « 68k » (un nombre du 68000 tel que FBNeo le range, octets permutes deux a deux).</summary>
+    [JsonPropertyName("order")]
+    public string Order { get; init; } = "le";
+
+    /// <summary>Le camp de la place dans un jeu en equipes ; absent, chacun pour soi.</summary>
+    [JsonPropertyName("camp")]
+    public int? Camp { get; init; }
+
+    [JsonPropertyName("dead")]
+    public MultiplayerDuelGuard? Dead { get; init; }
+
+    [JsonPropertyName("finished")]
+    public MultiplayerDuelGuard? Finished { get; init; }
+
+    [JsonIgnore]
+    public long? Decalage => new MultiplayerChoiceSeat { CoreRam = CoreRam }.Decalage;
+
+    /// <summary>Les octets lus, dans l'ordre de la memoire, devenus la valeur de la place ; null pour un chiffre BCD impossible.</summary>
+    public long? Valeur(IReadOnlyList<int> octets)
+    {
+        if (octets.Count != Bytes)
+        {
+            return null;
+        }
+
+        var ordonnes = Order switch
+        {
+            "be" => octets.ToList(),
+            "68k" => Enumerable.Range(0, octets.Count).Select(i => (i ^ 1) < octets.Count ? octets[i ^ 1] : octets[i]).ToList(),
+            _ => octets.Reverse().ToList(),
+        };
+        long valeur = 0;
+        foreach (var o in ordonnes)
+        {
+            if (Bcd)
+            {
+                if (o >> 4 > 9 || (o & 15) > 9)
+                {
+                    return null;
+                }
+
+                valeur = valeur * 100 + (o >> 4) * 10 + (o & 15);
+            }
+            else
+            {
+                valeur = (valeur << 8) | (uint)o;
+            }
+        }
+
+        return valeur;
+    }
 }
 
 /// <summary>Comment se lit un score : son nombre d'octets, BCD ou binaire, et l'ordre des octets lus (<c>le</c> ou <c>be</c>).</summary>
@@ -1030,13 +1219,17 @@ public sealed class MultiplayerCatalogueStore
     private readonly object _verrou = new();
     private (DateTime Ecrit, long Taille, MultiplayerCatalogue? Catalogue, string? Erreur) _cache;
 
-    public MultiplayerCatalogueStore(ILogger<MultiplayerCatalogueStore>? logger = null, string? path = null)
+    public MultiplayerCatalogueStore(ILogger<MultiplayerCatalogueStore>? logger = null, string? path = null, Version? api = null)
     {
         _logger = logger;
         Path = path ?? System.IO.Path.Combine(RetroBatPaths.PluginRoot, "resources", "multiplayer", "catalogue.json");
+        Api = api ?? (Version.TryParse(RetroBat.Api.Infrastructure.ApiExposeVersion.Current.Split('+')[0], out var version) ? version : new Version(0, 0));
     }
 
     public string Path { get; }
+
+    /// <summary>La version de cette API : un jeu dont le <c>min_api</c> la depasse quitte le catalogue lu.</summary>
+    public Version Api { get; }
 
     /// <summary>
     /// Le catalogue courant, relu seulement quand le fichier change. Null avec une raison quand
@@ -1068,11 +1261,16 @@ public sealed class MultiplayerCatalogueStore
                 catalogue = JsonSerializer.Deserialize<MultiplayerCatalogue>(flux, Lecture);
             }
 
-            erreur = Valider(catalogue);
-            var retenu = erreur == null ? Nettoyer(catalogue!) : null;
+            var sains = Retenir(catalogue, Api, out erreur, out var ecartes);
+            var retenu = sains is null ? null : Nettoyer(sains);
             if (erreur != null)
             {
                 _logger?.LogWarning("Catalogue MULTIPLAYER refuse : {Erreur}", erreur);
+            }
+
+            foreach (var raison in ecartes)
+            {
+                _logger?.LogWarning("Catalogue MULTIPLAYER : jeu ecarte, {Raison}", raison);
             }
 
             lock (_verrou)
@@ -1109,65 +1307,205 @@ public sealed class MultiplayerCatalogueStore
                 return "identifiant vide ou en double : « " + jeu.Id + " »";
             }
 
-            if (string.IsNullOrWhiteSpace(jeu.System))
+            if (ValiderLeJeu(jeu) is { } erreur)
             {
-                return jeu.Id + " : systeme manquant";
+                return jeu.Id + " : " + erreur;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// UN JEU INVALIDE EST ECARTE SEUL (CDC Classements v1.0 §2, 29/10) : jusqu'a la 1.9.126, un seul jeu au type de fin
+    /// inconnu faisait refuser tout le catalogue, et la borne perdait la collection MULTIPLAYER. Le catalogue garde ici ses
+    /// jeux sains ; un jeu en double, invalide ou qui demande une API plus recente (<see cref="MultiplayerGame.MinApi"/>)
+    /// le quitte, avec sa raison. Null avec une erreur seulement quand le fichier entier ne se lit pas (schema inconnu).
+    /// </summary>
+    internal static MultiplayerCatalogue? Retenir(MultiplayerCatalogue? catalogue, Version api, out string? erreur, out IReadOnlyList<string> ecartes)
+    {
+        var raisons = new List<string>();
+        ecartes = raisons;
+        if (catalogue == null)
+        {
+            erreur = "catalogue vide";
+            return null;
+        }
+
+        if (catalogue.SchemaVersion != MultiplayerCatalogue.SchemaVersionSupportee)
+        {
+            erreur = "schema " + catalogue.SchemaVersion + " inconnu (attendu " + MultiplayerCatalogue.SchemaVersionSupportee + ")";
+            return null;
+        }
+
+        var vus = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var retenus = new List<MultiplayerGame>();
+        foreach (var jeu in catalogue.Games)
+        {
+            if (string.IsNullOrWhiteSpace(jeu.Id) || !vus.Add(jeu.Id.Trim()))
+            {
+                raisons.Add("identifiant vide ou en double : « " + jeu.Id + " »");
+                continue;
             }
 
-            if (jeu.EstArcade ? string.IsNullOrWhiteSpace(jeu.Set) : (jeu.Content?.Md5.Count ?? 0) == 0)
+            // Un jeu fait pour une API plus recente n'est pas juge par celle-ci : il pourrait porter ce qu'elle ne connait pas.
+            if (!jeu.AdmisPar(api))
             {
-                // Sans identite, le jeu entrerait sur la foi d'un nom de fichier.
-                return jeu.Id + (jeu.EstArcade ? " : set manquant" : " : aucun md5 de contenu");
+                continue;
             }
 
-            if (jeu.Players < 2)
+            if (ValiderLeJeu(jeu) is { } raison)
             {
-                return jeu.Id + " : moins de deux joueurs";
+                raisons.Add(jeu.Id + " : " + raison);
+                continue;
             }
 
-            if (jeu.Level is not (MultiplayerLevels.Classique or MultiplayerLevels.NelfePlay))
+            retenus.Add(jeu);
+        }
+
+        erreur = null;
+        return catalogue with { Games = retenus };
+    }
+
+    /// <summary>Ce qui ne va pas dans un jeu du catalogue, ou null.</summary>
+    internal static string? ValiderLeJeu(MultiplayerGame jeu)
+    {
+        if (string.IsNullOrWhiteSpace(jeu.System))
+        {
+            return "systeme manquant";
+        }
+
+        if (jeu.EstArcade ? string.IsNullOrWhiteSpace(jeu.Set) : (jeu.Content?.Md5.Count ?? 0) == 0)
+        {
+            // Sans identite, le jeu entrerait sur la foi d'un nom de fichier.
+            return jeu.EstArcade ? "set manquant" : "aucun md5 de contenu";
+        }
+
+        if (jeu.Players < 2)
+        {
+            return "moins de deux joueurs";
+        }
+
+        if (jeu.Level is not (MultiplayerLevels.Classique or MultiplayerLevels.NelfePlay))
+        {
+            return "niveau « " + jeu.Level + " » inconnu";
+        }
+
+        if (jeu.Screens is < 1 or > 4
+            || (jeu.SeatScreens is { Count: > 0 } ecrans
+                && (ecrans.Count < jeu.Players || ecrans.Any(ecran => ecran < 1 || ecran > jeu.Screens))))
+        {
+            // Une place sans ecran, ou un ecran qui n'existe pas : une borne afficherait la vue d'un autre.
+            return "ecrans par place incoherents";
+        }
+
+        if (jeu.SeatPorts is { Count: > 0 } ports
+            && (ports.Count < jeu.Players || ports.Any(p => p.Count == 0 || p.Any(n => n is < 1 or > 8))
+                || ports.SelectMany(p => p).Distinct().Count() != ports.Sum(p => p.Count)))
+        {
+            // Une place sans port, un port hors du netplay ou tenu par deux places : deux bornes joueraient le meme poing.
+            return "ports par place incoherents";
+        }
+
+        if (jeu.SeatRemap is { Count: > 0 } remaps
+            && remaps.Any(r => r.Seat < 1 || r.Seat > jeu.Players || r.Keys.Count == 0
+                || r.Keys.Any(p => !MultiplayerSeatRemap.CleDeRemappage(p.Key) || !MultiplayerSeatRemap.ValeurDeRemappage(p.Value))))
+        {
+            // Une cle qui n'est pas du remappage (un reglage de RetroArch glisse dans le fichier) ou une place qui n'existe pas.
+            return "remappage par place incoherent";
+        }
+
+        // Le champ « bios » (CDC Classements v1.1 §5) n'est pas lu ici : l'outil de diagnostic dit quel BIOS manque (decision
+        // du user du 29/10).
+        return ValiderLesVues(jeu) ?? ValiderLeDepart(jeu) ?? ValiderLeDepartDuCoeur(jeu) ?? ValiderLeClassement(jeu);
+    }
+
+    /// <summary>
+    /// La fin a plusieurs (CDC Classements v1.0 §3) : une regle connue, une adresse lisible pour chaque place du jeu, ce que
+    /// la regle demande (le seuil des manches, la vie ou la mort de la survie, la position de l'arrivee, le score et la mort
+    /// du score fige), et des camps coherents. Jamais avec <c>end</c> ou <c>match_end</c> : une API d'avant lirait l'autre.
+    /// </summary>
+    internal static string? ValiderLeClassement(MultiplayerGame jeu)
+    {
+        if (jeu.RankingEnd is not { } fin)
+        {
+            return null;
+        }
+
+        if (jeu.End is not null || jeu.MatchEnd is not null)
+        {
+            return "classement : ranking_end avec end ou match_end";
+        }
+
+        if (!fin.EstConnu)
+        {
+            return "classement : regle « " + fin.Rule + " » inconnue";
+        }
+
+        if (fin.Memory is not (null or MultiplayerChoice.CarteDuCoeur))
+        {
+            return "classement : memoire « " + fin.Memory + " » inconnue";
+        }
+
+        if (fin.SettleMs is < 0 or > 10000 || fin.CloseAfterS is < 0 or > 60 || fin.MinHumans > 8)
+        {
+            return "classement : delais ou nombre d'humains incoherents";
+        }
+
+        static bool Octet(MultiplayerDuelGuard? signal) => signal is null || (signal.Decalage is not null && signal.Value is >= 0 and <= 255);
+        if (!Octet(fin.Over) || !Octet(fin.Guard))
+        {
+            return "classement : signal de fin ou garde incoherent";
+        }
+
+        if (fin.Seats.Any(s => s.Seat is < 1 or > 8) || fin.Seats.Select(s => s.Seat).Distinct().Count() != fin.Seats.Count)
+        {
+            return "classement : place hors de 1 a 8 ou en double";
+        }
+
+        for (var place = 1; place <= jeu.Players; place++)
+        {
+            if (fin.Place(place) is null)
             {
-                return jeu.Id + " : niveau « " + jeu.Level + " » inconnu";
+                return "classement : pas d'entree pour la place " + place;
+            }
+        }
+
+        foreach (var place in fin.Seats)
+        {
+            var sansValeur = place.CoreRam.Length == 0;
+            if ((!sansValeur && place.Decalage is null) || place.Bytes is < 1 or > 4 || place.Order is not ("le" or "be" or "68k")
+                || !Octet(place.Dead) || !Octet(place.Finished))
+            {
+                return "classement : adresse ou format de la place " + place.Seat + " incoherent";
             }
 
-            if (jeu.Screens is < 1 or > 4
-                || (jeu.SeatScreens is { Count: > 0 } ecrans
-                    && (ecrans.Count < jeu.Players || ecrans.Any(ecran => ecran < 1 || ecran > jeu.Screens))))
+            // Sans valeur, seule la survie se lit encore (la mort de la place suffit).
+            var manque = fin.Rule switch
             {
-                // Une place sans ecran, ou un ecran qui n'existe pas : une borne afficherait la vue d'un autre.
-                return jeu.Id + " : ecrans par place incoherents";
+                MultiplayerRankingEnd.Survie => sansValeur && place.Dead is null,
+                MultiplayerRankingEnd.ScoreFige => sansValeur || place.Dead is null,
+                _ => sansValeur,
+            };
+            if (manque)
+            {
+                return "classement : la place " + place.Seat + " n'a pas ce que la regle « " + fin.Rule + " » lit";
             }
+        }
 
-            if (jeu.SeatPorts is { Count: > 0 } ports
-                && (ports.Count < jeu.Players || ports.Any(p => p.Count == 0 || p.Any(n => n is < 1 or > 8))
-                    || ports.SelectMany(p => p).Distinct().Count() != ports.Sum(p => p.Count)))
-            {
-                // Une place sans port, un port hors du netplay ou tenu par deux places : deux bornes joueraient le meme poing.
-                return jeu.Id + " : ports par place incoherents";
-            }
+        if (fin.Rule == MultiplayerRankingEnd.Manches && fin.FirstTo is not (>= 1 and <= 255) && fin.Over is null)
+        {
+            return "classement : manches sans seuil ni signal de fin";
+        }
 
-            if (jeu.SeatRemap is { Count: > 0 } remaps
-                && remaps.Any(r => r.Seat < 1 || r.Seat > jeu.Players || r.Keys.Count == 0
-                    || r.Keys.Any(p => !MultiplayerSeatRemap.CleDeRemappage(p.Key) || !MultiplayerSeatRemap.ValeurDeRemappage(p.Value))))
-            {
-                // Une cle qui n'est pas du remappage (un reglage de RetroArch glisse dans le fichier) ou une place qui n'existe pas.
-                return jeu.Id + " : remappage par place incoherent";
-            }
+        if (fin.Rule == MultiplayerRankingEnd.Arrivee && fin.Over is null && fin.Seats.Any(s => s.Finished is null))
+        {
+            return "classement : arrivee sans drapeau d'arrivee ni signal de fin";
+        }
 
-            if (ValiderLesVues(jeu) is { } vues)
-            {
-                return jeu.Id + " : " + vues;
-            }
-
-            if (ValiderLeDepart(jeu) is { } depart)
-            {
-                return jeu.Id + " : " + depart;
-            }
-
-            if (ValiderLeDepartDuCoeur(jeu) is { } departDuCoeur)
-            {
-                return jeu.Id + " : " + departDuCoeur;
-            }
+        if (fin.AvecCamps && (fin.Seats.Any(s => s.Camp is not (>= 1 and <= 8)) || fin.Seats.Select(s => s.Camp).Distinct().Count() < 2))
+        {
+            return "classement : camps incoherents (chaque place en a un, deux camps au moins)";
         }
 
         return null;
@@ -1300,6 +1638,12 @@ public sealed class MultiplayerCatalogueStore
                     return "etat pour " + joueurs + " joueurs hors de 2 a " + jeu.Players;
                 }
 
+                // Dix secondes au plus : au-dela, le jeu a quitte depuis longtemps l'ecran ou il accepte les choix.
+                if (depart.WriteAfterFrames is < 0 or > 600)
+                {
+                    return "delai d'ecriture des choix hors de 0 a 600 images";
+                }
+
                 if (depart.Content is { } md5 && !(jeu.Content?.Md5 ?? []).Contains(md5, StringComparer.OrdinalIgnoreCase))
                 {
                     return "etat fait sur un contenu hors du catalogue";
@@ -1333,7 +1677,7 @@ public sealed class MultiplayerCatalogueStore
 
         if (jeu.End is { } fin)
         {
-            if (fin.FirstTo is < 1 or > 255 || fin.CloseAfterS is < 0 or > 60)
+            if (fin.FirstTo is < 1 or > 255 || fin.CloseAfterS is < 0 or > 60 || fin.Memory is not (null or MultiplayerChoice.CarteDuCoeur))
             {
                 return "fin de rencontre incoherente";
             }
@@ -1359,7 +1703,8 @@ public sealed class MultiplayerCatalogueStore
                 return "fin de rencontre : type « " + autre.Type + " » inconnu";
             }
 
-            if (autre.Over?.Decalage is null || autre.Over.Value is < 0 or > 255 || autre.CloseAfterS is < 0 or > 60)
+            if (autre.Over?.Decalage is null || autre.Over.Value is < 0 or > 255 || autre.CloseAfterS is < 0 or > 60
+                || autre.Memory is not (null or MultiplayerChoice.CarteDuCoeur))
             {
                 return "fin de rencontre : signal de fin incoherent";
             }

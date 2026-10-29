@@ -455,9 +455,15 @@ public class MultiplayerCollectionSyncTests : IDisposable
             return;
         }
 
-        var catalogue = new MultiplayerCatalogueStore(logger: null, path: depot).Lire(out var erreur);
+        // Strict : la lecture d'une borne ecarte un jeu invalide sans rien dire au-dessus d'elle (CDC Classements v1.0 §2), le
+        // depot n'en livre aucun. Une API tres recente : aucun jeu n'est ecarte pour son min_api, tous sont controles.
+        var brut = JsonSerializer.Deserialize<MultiplayerCatalogue>(File.ReadAllText(depot),
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true, ReadCommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true });
+        Assert.Null(MultiplayerCatalogueStore.Valider(brut));
+        var catalogue = new MultiplayerCatalogueStore(logger: null, path: depot, api: new Version(99, 0)).Lire(out var erreur);
         Assert.Null(erreur);
         Assert.NotNull(catalogue);
+        Assert.Equal(brut!.Games.Count, catalogue!.Games.Count);
         Assert.All(catalogue!.Games, jeu => Assert.NotNull(catalogue.CoreOf(jeu)));
 
         // Chaque image citee est un chemin admis, et le fichier est dans le depot : une image oubliee laisserait la borne

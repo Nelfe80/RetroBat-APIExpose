@@ -83,6 +83,12 @@ public sealed partial class MultiplayerPanelService
     /// <summary>Les statistiques du profil du jeu (lot 2) que cette borne a mesurees : l'ecran de fin s'en sert sans celles du site.</summary>
     private MultiplayerStatsResultat? _mesuresVues;
 
+    /// <summary>
+    /// Les rangs d'une fin a plusieurs lus sur cette borne (CDC Classements v1.0 §7) : l'ecran de fin les montre tant que le
+    /// site n'a pas les siens.
+    /// </summary>
+    private IReadOnlyList<MultiplayerRang>? _rangsVus;
+
     /// <summary>Les statistiques d'une rencontre finie : celles de la plateforme (l'hote), sinon celles vues ici.</summary>
     private IReadOnlyDictionary<string, MultiplayerStatsPlace>? StatsDeLaRencontre(MultiplayerRoom? room)
         => room?.Ended?.Stats is { Count: > 0 } envoyees ? envoyees
@@ -358,6 +364,29 @@ public sealed partial class MultiplayerPanelService
         get { lock (_verrou) return _mode != Mode.Ferme; }
     }
 
+    /// <summary>Le bouton « valider » tenu depuis cet instant, quand un ecran MULTIPLAYER a l'appui ; null sinon.</summary>
+    public DateTime? ValiderTenuDepuis
+    {
+        get { lock (_verrou) return _validerDepuis; }
+    }
+
+    /// <summary>L'ecran MULTIPLAYER montre, pour le journal : panneau, presentation (et sa tenue), resultat (et sa manette).</summary>
+    public string EcranAffiche
+    {
+        get
+        {
+            lock (_verrou)
+            {
+                return _mode switch
+                {
+                    Mode.Resultat => "resultat, manette " + (_resultatALaMain ? "prise" : "laissee a ES"),
+                    Mode.Presentation => "presentation" + (_tenirLeLancement ? " tenue devant le jeu" : string.Empty),
+                    _ => _mode.ToString().ToLowerInvariant(),
+                };
+            }
+        }
+    }
+
     /// <summary>Le panneau des gamerooms est-il a l'ecran ? Ni la presentation d'un lancement, ni un resultat.</summary>
     public bool PanneauAffiche
     {
@@ -380,6 +409,9 @@ public sealed partial class MultiplayerPanelService
     /// </summary>
     public bool DansLaCollection
         => string.Equals(_etatDesMedias?.CarouselSystemId, MultiplayerCollectionSyncService.CollectionName, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Le carrousel tel que l'API le connait, pour le journal de l'appui long.</summary>
+    public string Carrousel => _etatDesMedias?.CarouselSystemId ?? string.Empty;
 
     /// <summary>Une invitation attend sa reponse : l'appui long la prend avant tout panneau.</summary>
     public bool InvitationEnAttente
@@ -678,12 +710,13 @@ public sealed partial class MultiplayerPanelService
     /// duree. Il se ferme de lui-meme au bout de 12 s ; A maintenu relance le meme jeu.
     /// </summary>
     public void MontrerLeResultat(string room, int? dureeSecondes, IReadOnlyDictionary<int, StatsDeLaPlace>? statsVues = null,
-        MultiplayerStatsResultat? mesuresVues = null)
+        MultiplayerStatsResultat? mesuresVues = null, IReadOnlyList<MultiplayerRang>? rangsVus = null)
     {
         lock (_verrou)
         {
             _statsVues = statsVues;
             _mesuresVues = mesuresVues;
+            _rangsVus = rangsVus is { Count: > 0 } ? rangsVus : null;
         }
 
         _ = Task.Run(async () =>
@@ -1566,10 +1599,19 @@ public sealed partial class MultiplayerPanelService
         var annulee = finie?.Ended?.Result == "void";
         // Non disputee (26/10) : un joueur n'a pas joue ; comme une rencontre annulee, ni vainqueur ni cote.
         var nonDisputee = finie?.Ended?.Result == "unplayed";
-        var classe = _jeu?.Game.EstClasse == true && !annulee && !nonDisputee;
+        IReadOnlyList<int> placesDeLaRencontre = finie is null ? [] : MultiplayerLaunchService.PlacesDe(finie);
+        var classe = _jeu?.Game is { } jeuDuResultat && (finie is null ? jeuDuResultat.EstClasse : jeuDuResultat.ClassePour(placesDeLaRencontre))
+            && !annulee && !nonDisputee;
         // NIVEAU NELFEPLAY : la place gagnante lue chez l'hote (V24-16) ; le gagnant d'abord, une defaite presentee avec
         // le meme soin (00quater.3).
         var gagnante = classe ? finie?.Ended?.WinnerSeat : null;
+        // UNE FIN A PLUSIEURS (CDC Classements v1.0 §7) : le rang de chaque humain, celui du site, sinon celui lu ici.
+        var rangs = classe ? RangsDuResultat(finie) : null;
+        var rangDe = (int? place) => place is not null && rangs?.FirstOrDefault(r => r.Seat == place) is { } r ? r : null;
+        if (rangs is not null && gagnante is null)
+        {
+            gagnante = MultiplayerIssue.DesRangs(rangs).Gagnante;
+        }
         var elo = finie?.Ended?.Elo;
         MultiplayerEvolution? EloDe(int? place)
             => place is not null && elo is not null && elo.TryGetValue(place.Value.ToString(CultureInfo.InvariantCulture), out var e) ? e : null;
@@ -1589,8 +1631,9 @@ public sealed partial class MultiplayerPanelService
         // En cartes, P1 reste a gauche ; en liste, le gagnant d'abord.
         var joueursDuResultat = (finie?.Players ?? []).Where(j => j.Seat is not null || finie?.State != "finished").ToList();
         var disposition = DispositionPour(finie?.Max ?? joueursDuResultat.Count);
+        var enListe = disposition == LeaderboardOverlayService.DispositionDesJoueurs.Liste;
         var joueurs = joueursDuResultat
-            .OrderBy(j => disposition == LeaderboardOverlayService.DispositionDesJoueurs.Liste && gagnante is not null && j.Seat == gagnante ? 0 : 1)
+            .OrderBy(j => !enListe ? 0 : rangs is not null ? rangDe(j.Seat)?.Rank ?? 99 : gagnante is not null && j.Seat == gagnante ? 0 : 1)
             .ThenBy(j => j.Seat ?? 99)
             .Select(j =>
             {
@@ -1620,9 +1663,11 @@ public sealed partial class MultiplayerPanelService
                 var delta = evolution is null ? 0 : (int)Math.Round(evolution.After - evolution.Before);
                 return ligne with
                 {
-                    // Le match nul (place 0, 23/10) : ni vainqueur ni vaincu.
-                    Issue = T(gagnante == MultiplayerResultats.MatchNul ? "multiplayer.result.draw"
-                        : j.Seat == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat"),
+                    // Le match nul (place 0, 23/10) : ni vainqueur ni vaincu. A plusieurs, chacun a son rang (« 2E PLACE »).
+                    Issue = rangs is not null && rangDe(j.Seat) is { } rang
+                        ? IssueDuRang(rang, rangs, gagnante, T)
+                        : T(gagnante == MultiplayerResultats.MatchNul ? "multiplayer.result.draw"
+                            : j.Seat == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat"),
                     Gagnant = gagnante != MultiplayerResultats.MatchNul && j.Seat == gagnante,
                     Cote = evolution is null ? ligne.Cote : "ELO " + Math.Round(evolution.After).ToString(CultureInfo.InvariantCulture),
                     Evolution = evolution is null ? string.Empty : (delta >= 0 ? "+" : "") + delta.ToString(CultureInfo.InvariantCulture),
@@ -1635,6 +1680,7 @@ public sealed partial class MultiplayerPanelService
             : nonDisputee ? T("multiplayer.result.unplayed")
             : classique && !classe ? T("multiplayer.result.classic")
             : abandon is not null && maPlace is not null ? T(maPlace == abandon ? "multiplayer.result.abandon" : "multiplayer.result.opponent_left")
+            : rangs is not null && rangDe(maPlace) is { } monRang ? IssueDuRang(monRang with { Camp = null }, rangs, gagnante, T)
             : gagnante == MultiplayerResultats.MatchNul ? T("multiplayer.result.draw")
             : gagnante is not null && maPlace is not null ? T(maPlace == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat")
             : T("multiplayer.result.title");
@@ -1655,7 +1701,7 @@ public sealed partial class MultiplayerPanelService
         var ecranDeFin = ComposerLEcranDeFin(finie, joueursDuResultat, gagnante, EloDe,
             annulee || nonDisputee || (classique && !classe) || (abandon is not null && maPlace is not null) ? titre : null, titre,
             classique ? T("multiplayer.badge.classic") : string.Empty,
-            classique && !classe && !annulee && !nonDisputee ? T("multiplayer.result.classic_note") : bandeauDuResultat, duree, T);
+            classique && !classe && !annulee && !nonDisputee ? T("multiplayer.result.classic_note") : bandeauDuResultat, duree, T, rangs);
 
         return new LeaderboardOverlayService.ContenuMultiplayer(
             [titre],
@@ -1685,18 +1731,22 @@ public sealed partial class MultiplayerPanelService
     /// d'apres la rencontre, ses mesures, ses etoiles et sa distinction ; la jauge globale ; le fanart de ce jeu sur cette borne.
     /// </summary>
     private LeaderboardOverlayService.EcranDeFin ComposerLEcranDeFin(MultiplayerRoom? finie, IReadOnlyList<MultiplayerJoueur> joueurs, int? gagnante,
-        Func<int?, MultiplayerEvolution?> eloDe, string? titreImpose, string titre, string badge, string note, int? duree, Func<string, string> T)
+        Func<int?, MultiplayerEvolution?> eloDe, string? titreImpose, string titre, string badge, string note, int? duree, Func<string, string> T,
+        IReadOnlyList<MultiplayerRang>? rangs = null)
     {
         var jeu = _jeu?.Game;
         var maPlace = finie?.Players.FirstOrDefault(j => j.You)?.Seat;
         var nul = gagnante == MultiplayerResultats.MatchNul;
+        var monRang = rangs?.FirstOrDefault(r => r.Seat == maPlace);
+        // A plusieurs (CDC Classements v1.0 §7) : VICTOIRE au rang 1, sinon le rang de cette borne (« 3E PLACE »).
         var mot = titreImpose
-            ?? (nul ? T("multiplayer.end.draw")
+            ?? (monRang is not null && rangs!.Count > 2 && monRang.Rank > 1 ? TexteDuRang(monRang.Rank, T)
+                : nul ? T("multiplayer.end.draw")
                 : gagnante is not null && maPlace is not null ? T(maPlace == gagnante ? "multiplayer.end.victory" : "multiplayer.end.defeat")
                 : titre);
         var vainqueur = nul ? null : gagnante;
         var assis = joueurs.Where(j => j.Seat is not null)
-            .OrderBy(j => vainqueur is not null && j.Seat == vainqueur ? 0 : 1)
+            .OrderBy(j => rangs?.FirstOrDefault(r => r.Seat == j.Seat)?.Rank ?? (vainqueur is not null && j.Seat == vainqueur ? 0 : 99))
             .ThenBy(j => j.Seat)
             .ToList();
         var (profil, valeurs) = ValeursDeLaRencontre(finie, assis.Select(j => j.Seat!.Value));
@@ -1718,7 +1768,7 @@ public sealed partial class MultiplayerPanelService
                 cote is null ? string.Empty : Math.Round(cote.Value).ToString("#,0", milliers),
                 apres is null ? string.Empty : (ecart >= 0 ? "+" : "") + ecart.ToString(CultureInfo.InvariantCulture),
                 vainqueur == place,
-                vainqueur is null ? null : ++rang,
+                rangs?.FirstOrDefault(r => r.Seat == place)?.Rank ?? (vainqueur is null ? null : ++rang),
                 calcul?.Distinctions.GetValueOrDefault(place) ?? string.Empty,
                 calcul?.Mesures.GetValueOrDefault(place) ?? []);
         }).ToList();
@@ -1740,6 +1790,52 @@ public sealed partial class MultiplayerPanelService
             _glypheAnnuler,
             // E4 (26/10) : une police imposee par le catalogue l'emporte sur celle du type.
             jeu?.Ecran?.Police is { Length: > 0 } police ? police : null);
+    }
+
+    /// <summary>Les rangs d'une fin a plusieurs : ceux que le site a recus de l'hote, sinon ceux lus sur cette borne ; null en duel.</summary>
+    private IReadOnlyList<MultiplayerRang>? RangsDuResultat(MultiplayerRoom? finie)
+    {
+        if (_jeu?.Game.RankingEnd is null)
+        {
+            return null;
+        }
+
+        if (finie?.Ended?.Ranks is { Count: > 0 } duSite)
+        {
+            return duSite.Select(r => new MultiplayerRang(r.Seat, r.Rank, r.Camp)).ToList();
+        }
+
+        lock (_verrou)
+        {
+            return _rangsVus;
+        }
+    }
+
+    /// <summary>
+    /// Ce que dit la ligne d'un joueur classe : VICTOIRE seul au rang 1 (MATCH NUL a plusieurs au rang 1), DEFAITE en duel,
+    /// sinon son rang (« 3E PLACE ») ; son equipe a la suite dans un jeu en equipes.
+    /// </summary>
+    private static string IssueDuRang(MultiplayerRang rang, IReadOnlyList<MultiplayerRang> rangs, int? gagnante, Func<string, string> T)
+    {
+        var issue = rang.Rank == 1
+            ? T(gagnante == MultiplayerResultats.MatchNul ? "multiplayer.result.draw" : "multiplayer.result.victory")
+            : rangs.Count > 2 ? TexteDuRang(rang.Rank, T) : T("multiplayer.result.defeat");
+        if (rang.Camp is not { } camp)
+        {
+            return issue;
+        }
+
+        var equipe = T("multiplayer.result.team");
+        var numero = camp.ToString(CultureInfo.InvariantCulture);
+        return issue + " · " + (equipe == "multiplayer.result.team" ? numero : equipe.Replace("{camp}", numero));
+    }
+
+    /// <summary>« 2E PLACE », « 3RD PLACE »... (cles <c>multiplayer.rank.N</c>) ; « #N » si la cle manque encore au Data Pack.</summary>
+    private static string TexteDuRang(int rang, Func<string, string> T)
+    {
+        var cle = "multiplayer.rank." + rang.ToString(CultureInfo.InvariantCulture);
+        var texte = T(cle);
+        return texte == cle ? "#" + rang.ToString(CultureInfo.InvariantCulture) : texte;
     }
 
     private string? _cheminDuFanart;

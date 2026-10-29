@@ -152,11 +152,14 @@ Write-Host 'Construction update.7z...'
 # Repris sur leur empreinte, comme une archive. La liste suit MultiplayerCoeursService.Coeurs. FBNeo Multi 32 (27/10) :
 # FBNeo aux etats portables (branche nelfeplay-multi32 du fork), avec le texte de sa licence. PPSSPP Netplay (29/10) :
 # le multijoueur ad hoc de la PSP par le netplay de RetroArch (branche nelfeplay-netplay du fork), avec sa licence.
+# TGBDual Multi (29/10) : les deux Game Boy reliees lisibles par leur carte memoire (branche nelfeplay-multi du fork), avec
+# sa licence ; FBNeo Multi 32 y gagne la memoire de travail des jeux MCR-3 (Rampage).
 $outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.exe',
     'tools/cores/mgba_splitscreen_libretro.dll', 'tools/cores/mgba_splitscreen_libretro.info',
     'tools/cores/mednafen_ngp_link_libretro.dll', 'tools/cores/mednafen_ngp_link_libretro.info',
     'tools/cores/fbneo_multi32_libretro.dll', 'tools/cores/fbneo_multi32_license.txt', 'tools/cores/fbneo_multi32_libretro.info',
-    'tools/cores/ppsspp_netplay_libretro.dll', 'tools/cores/ppsspp_netplay_license.txt', 'tools/cores/ppsspp_netplay_libretro.info')
+    'tools/cores/ppsspp_netplay_libretro.dll', 'tools/cores/ppsspp_netplay_license.txt', 'tools/cores/ppsspp_netplay_libretro.info',
+    'tools/cores/tgbdual_multi_libretro.dll', 'tools/cores/tgbdual_multi_license.txt', 'tools/cores/tgbdual_multi_libretro.info')
 $exclusOutils = @($outilsHorsArchive | ForEach-Object { "-x!$name\$($_ -replace '/', '\')" })
 & $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" @exclusOutils -mx=5 -bsp0 -bso0
 

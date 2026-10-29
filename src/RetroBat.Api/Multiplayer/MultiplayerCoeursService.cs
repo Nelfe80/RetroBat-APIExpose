@@ -13,10 +13,14 @@ namespace RetroBat.Api.Multiplayer;
 /// Un coeur que NelfePlay compile et livre lui-meme : son systeme d'EmulationStation, son nom de coeur, ses bibliotheques
 /// (la premiere est le coeur, les suivantes vont a cote d'elle) et sa fiche <c>.info</c>.
 /// </summary>
-public sealed record MultiplayerCoeurLivre(string Systeme, string Nom, IReadOnlyList<string> Bibliotheques, string Fiche, string Ajout)
+public sealed record MultiplayerCoeurLivre(string Systeme, string Nom, IReadOnlyList<string> Bibliotheques, string Fiche, string Ajout,
+    IReadOnlyList<string>? AutresSystemes = null)
 {
     /// <summary>Ou outils.json depose chaque fichier, relatif au dossier d'APIExpose.</summary>
     public IEnumerable<string> CheminsDesOutils => Bibliotheques.Append(Fiche).Select(fichier => "tools/cores/" + fichier);
+
+    /// <summary>Les systemes d'EmulationStation qui recoivent ce coeur (TGBDual Multi : gb2players et gbc2players).</summary>
+    public IEnumerable<string> SesSystemes => (AutresSystemes ?? []).Prepend(Systeme);
 }
 
 /// <summary>
@@ -58,6 +62,13 @@ public sealed class MultiplayerCoeursService : BackgroundService
         new("psp", "ppsspp_netplay", ["ppsspp_netplay_libretro.dll", "ppsspp_netplay_license.txt"], "ppsspp_netplay_libretro.info",
             "le coeur libretro ppsspp_netplay (PPSSPP au multijoueur ad hoc par le netplay de RetroArch, pour MULTIPLAYER), "
             + "en dernier : ppsspp reste le coeur des parties solo"),
+        // TGBDUAL MULTI (CDC Classements v1.1 §4, 29/10) : TGBDual qui declare la carte memoire des DEUX Game Boy (la seconde a
+        // +0x10000000, comme mGBA Splitscreen) ; celui de RetroBat n'expose que la premiere, et la fin ou les statistiques de
+        // la seconde ne se lisaient pas (MGS Ghost Babel, Faceball 2000). Memes images, memes etats, meme netplay. Un coeur a
+        // part : tgbdual_libretro.dll reste celui des parties solo. Sa licence (GPL v2) le suit, a cote de lui.
+        new("gb2players", "tgbdual_multi", ["tgbdual_multi_libretro.dll", "tgbdual_multi_license.txt"], "tgbdual_multi_libretro.info",
+            "le coeur libretro tgbdual_multi (deux Game Boy reliees dont la memoire se lit, pour MULTIPLAYER), en dernier : "
+            + "tgbdual reste le coeur des parties solo", ["gbc2players"]),
     ];
 
     public const string FichierEs = "es_systems_nelfeplay.cfg";
@@ -193,7 +204,7 @@ public sealed class MultiplayerCoeursService : BackgroundService
             {
                 EcrireAtomique(esNelfePlay, System.Text.Encoding.UTF8.GetBytes(contenu));
                 _logger?.LogInformation("MULTIPLAYER : {Fichier} ecrit, EmulationStation connait {Coeurs} au prochain demarrage",
-                    FichierEs, string.Join(", ", livres.Select(c => c.Systeme + "/" + c.Nom)));
+                    FichierEs, string.Join(", ", livres.SelectMany(c => c.SesSystemes.Select(s => s + "/" + c.Nom))));
             }
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Xml.XmlException)
@@ -293,9 +304,9 @@ public sealed class MultiplayerCoeursService : BackgroundService
         var doc = XDocument.Parse(esSystemsDeRetroBat);
         var systemes = new List<XElement>();
         var ajouts = new List<string>();
-        foreach (var coeur in coeurs)
+        foreach (var (coeur, nom) in coeurs.SelectMany(c => c.SesSystemes.Select(s => (c, s))))
         {
-            var systeme = doc.Root?.Elements("system").FirstOrDefault(s => string.Equals((string?) s.Element("name"), coeur.Systeme, StringComparison.OrdinalIgnoreCase));
+            var systeme = doc.Root?.Elements("system").FirstOrDefault(s => string.Equals((string?) s.Element("name"), nom, StringComparison.OrdinalIgnoreCase));
             if (systeme?.Element("emulators") is not { } emulateurs)
             {
                 continue;
@@ -320,8 +331,8 @@ public sealed class MultiplayerCoeursService : BackgroundService
                 liste.Add(new XElement("core", coeur.Nom));
             }
 
-            systemes.Add(new XElement("system", new XElement("name", coeur.Systeme), copie));
-            ajouts.Add($"systeme {coeur.Systeme} : {coeur.Ajout}");
+            systemes.Add(new XElement("system", new XElement("name", nom), copie));
+            ajouts.Add($"systeme {nom} : {coeur.Ajout}");
         }
 
         if (systemes.Count == 0)

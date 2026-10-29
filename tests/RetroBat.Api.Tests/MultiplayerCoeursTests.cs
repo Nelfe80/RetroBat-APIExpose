@@ -81,6 +81,24 @@ public class MultiplayerCoeursTests : IDisposable
     }
 
     [Fact]
+    public void Un_coeur_de_deux_systemes_entre_dans_chacun()
+    {
+        // TGBDual Multi (29/10) : les jeux a deux Game Boy se lancent en gb2players ou gbc2players, ou le lanceur branche le cable.
+        const string deuxGameBoy = """
+            <systemList>
+              <system><name>gb2players</name><emulators><emulator name="libretro"><cores><core>tgbdual</core><core>sameboy</core></cores></emulator></emulators></system>
+              <system><name>gbc2players</name><emulators><emulator name="libretro"><cores><core>tgbdual</core></cores></emulator></emulators></system>
+            </systemList>
+            """;
+        var tgbdual = MultiplayerCoeursService.Coeurs.Where(c => c.Nom == "tgbdual_multi").ToArray();
+        var doc = System.Xml.Linq.XDocument.Parse(MultiplayerCoeursService.EsSystemsNelfePlay(deuxGameBoy, tgbdual)!);
+        var systemes = doc.Root!.Elements("system").ToArray();
+        Assert.Equal(["gb2players", "gbc2players"], systemes.Select(s => (string?) s.Element("name")));
+        Assert.Equal(["tgbdual", "sameboy", "tgbdual_multi"], CoeursDe(systemes[0]));
+        Assert.Equal(["tgbdual", "tgbdual_multi"], CoeursDe(systemes[1]));
+    }
+
+    [Fact]
     public void Un_coeur_pas_encore_livre_ne_touche_pas_a_son_systeme()
     {
         var gba = MultiplayerCoeursService.Coeurs.Where(c => c.Systeme == "gba").ToArray();
@@ -141,7 +159,8 @@ public class MultiplayerCoeursTests : IDisposable
         Assert.Equal(["tools/cores/mgba_splitscreen_libretro.dll", "tools/cores/mgba_splitscreen_libretro.info",
             "tools/cores/mednafen_ngp_link_libretro.dll", "tools/cores/mednafen_ngp_link_libretro.info",
             "tools/cores/fbneo_multi32_libretro.dll", "tools/cores/fbneo_multi32_license.txt", "tools/cores/fbneo_multi32_libretro.info",
-            "tools/cores/ppsspp_netplay_libretro.dll", "tools/cores/ppsspp_netplay_license.txt", "tools/cores/ppsspp_netplay_libretro.info"], livres);
+            "tools/cores/ppsspp_netplay_libretro.dll", "tools/cores/ppsspp_netplay_license.txt", "tools/cores/ppsspp_netplay_libretro.info",
+            "tools/cores/tgbdual_multi_libretro.dll", "tools/cores/tgbdual_multi_license.txt", "tools/cores/tgbdual_multi_libretro.info"], livres);
         var json = "{\"outils\":[" + string.Join(",", livres.Append("tools/cores/fbneo_libretro.dll").Select(Outil)) + "]}";
         var retenus = SelfUpdateService.LireOutils(json, "Nelfe80/RetroBat-APIExpose").Select(o => o.Fichier).ToArray();
         Assert.Equal(livres, retenus);

@@ -213,9 +213,10 @@ public sealed record MultiplayerStatsProfil
 
         foreach (var (nom, signal) in profil.Signals)
         {
-            if (signal.Source != "poll" || signal.Bytes is < 1 or > 4 || signal.Order is not ("le" or "be" or "68k"))
+            if (signal.Source != "poll" || signal.Bytes is < 1 or > 4 || signal.Order is not ("le" or "be" or "68k")
+                || signal.Memory is not (null or MultiplayerChoice.CarteDuCoeur))
             {
-                return "signal « " + nom + " » : source, taille ou ordre inconnu";
+                return "signal « " + nom + " » : source, taille, ordre ou memoire inconnu";
             }
             if (signal.Pointer is { } pointeur && (pointeur.Decalage is null || pointeur.Origine is null))
             {
@@ -282,6 +283,16 @@ public sealed record MultiplayerStatsSignal
     /// <summary>« poll » : lu par l'API toutes les 80 ms (les evenements du wrapper viendront avec un pilote qui en a besoin).</summary>
     [JsonPropertyName("source")]
     public string Source { get; init; } = "poll";
+
+    /// <summary>
+    /// <c>core_map</c> : le signal (et son pointeur) se lit dans la carte du coeur, par READ_CORE_MEMORY (CDC Classements v1.1
+    /// §2) : sous mGBA Splitscreen, READ_CORE_RAM ne rend que des octets fixes, jamais la memoire du jeu.
+    /// </summary>
+    [JsonPropertyName("memory")]
+    public string? Memory { get; init; }
+
+    [JsonIgnore]
+    public bool ParLaCarteDuCoeur => string.Equals(Memory, MultiplayerChoice.CarteDuCoeur, StringComparison.Ordinal);
 
     /// <summary>L'adresse de chaque place (decalage de RetroArch, premier octet lu), par numero de place.</summary>
     [JsonPropertyName("seats")]

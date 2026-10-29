@@ -129,6 +129,60 @@ public class MultiplayerDepartPretTests : IDisposable
         Assert.False(await new MultiplayerDepartPret(resiste, TimeSpan.FromSeconds(2), TimeSpan.Zero).ReappliquerAsync(jeu, Places(4, 5), CancellationToken.None));
     }
 
+    /// <summary>Le temps entre chaque chargement de l'etat et la premiere ecriture qui le suit.</summary>
+    private sealed class Chronometre(ICommandesRetroArch ra) : ICommandesRetroArch
+    {
+        private readonly System.Diagnostics.Stopwatch _horloge = System.Diagnostics.Stopwatch.StartNew();
+        private TimeSpan? _chargement;
+        public readonly List<TimeSpan> Delais = new();
+
+        public Task<string?> DemanderAsync(string commande, CancellationToken ct, int delaiMs = 500) => ra.DemanderAsync(commande, ct, delaiMs);
+
+        public Task EnvoyerAsync(string commande, CancellationToken ct)
+        {
+            if (commande.StartsWith("LOAD_STATE_SLOT", StringComparison.Ordinal))
+            {
+                _chargement = _horloge.Elapsed;
+            }
+            else if (commande.StartsWith("WRITE_CORE", StringComparison.Ordinal) && _chargement is { } depuis)
+            {
+                Delais.Add(_horloge.Elapsed - depuis);
+                _chargement = null;
+            }
+
+            return ra.EnvoyerAsync(commande, ct);
+        }
+    }
+
+    [Fact]
+    public async Task Le_delai_des_choix_du_catalogue_vaut_pour_chaque_ecriture()
+    {
+        // Magical Drop III (CDC Classements v1.1 §1) : 9 images, 150 ms ; ni la premiere pose, ni la boucle, ni le repli ne
+        // l'oublient. Les delais habituels sont mis a zero : sans celui du jeu, l'ecriture suivrait le chargement.
+        var (jeu, etat) = Sf2ce();
+        var depart = jeu.Start! with { WriteAfterFrames = 9 };
+        jeu = jeu with { Start = depart };
+        var ra = new FauxRetroArch { DossierDesEtats = Path.Combine(_dossier, "etats") };
+        var chrono = new Chronometre(ra);
+        MultiplayerDepartPret.ApresUnRechargement = TimeSpan.Zero;
+        var pret = new MultiplayerDepartPret(chrono, TimeSpan.FromSeconds(2), TimeSpan.Zero);
+        Assert.True((await pret.PreparerAsync(jeu, etat, "sf2ce", Places(4, 5), CancellationToken.None, depart)).Ok);
+        Assert.True(await pret.ReappliquerAsync(jeu, Places(4, 5), CancellationToken.None, null, depart));
+
+        // Un choix qui ne se relit pas : la reprise et son repli, chacun au delai du jeu.
+        var resiste = new Chronometre(new FauxRetroArch { DossierDesEtats = ra.DossierDesEtats, AdresseQuiResiste = 0x894E });
+        Assert.False(await new MultiplayerDepartPret(resiste, TimeSpan.FromSeconds(2), TimeSpan.Zero).ReappliquerAsync(jeu, Places(4, 5), CancellationToken.None, null, depart));
+
+        Assert.Equal(2, chrono.Delais.Count);
+        Assert.Equal(2, resiste.Delais.Count);
+        Assert.All(chrono.Delais.Concat(resiste.Delais), delai => Assert.InRange(delai.TotalMilliseconds, 140, 1500));
+
+        // Sans delai au catalogue, rien ne change : l'ecriture suit le chargement.
+        var sans = new Chronometre(new FauxRetroArch { DossierDesEtats = ra.DossierDesEtats });
+        Assert.True(await new MultiplayerDepartPret(sans, TimeSpan.FromSeconds(2), TimeSpan.Zero).ReappliquerAsync(jeu, Places(4, 5), CancellationToken.None));
+        Assert.InRange(sans.Delais.Single().TotalMilliseconds, 0, 100);
+    }
+
     [Fact]
     public async Task Le_depart_pose_l_etat_ecrit_chaque_place_et_relit()
     {

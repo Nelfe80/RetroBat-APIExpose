@@ -83,7 +83,7 @@ public sealed class MultiplayerStatsMoteur
         }
         if (!pointeurs.TryGetValue(ou, out var cible))
         {
-            var octets = await LireOctetsAsync(ou, 4, ct).ConfigureAwait(false);
+            var octets = await LireOctetsAsync(ou, 4, ct, signal.ParLaCarteDuCoeur).ConfigureAwait(false);
             cible = octets is null ? null : pointeur.Cible(octets[0] | (long)octets[1] << 8 | (long)octets[2] << 16 | (long)octets[3] << 24);
             pointeurs[ou] = cible;
         }
@@ -97,15 +97,17 @@ public sealed class MultiplayerStatsMoteur
             return null;
         }
 
-        var lus = await LireOctetsAsync(decalage.Value, signal.Bytes, ct).ConfigureAwait(false);
+        var lus = await LireOctetsAsync(decalage.Value, signal.Bytes, ct, signal.ParLaCarteDuCoeur).ConfigureAwait(false);
         return lus is null ? null : signal.Valeur(lus);
     }
 
-    private async Task<IReadOnlyList<int>?> LireOctetsAsync(long decalage, int octets, CancellationToken ct)
+    /// <summary>Des octets de la memoire du coeur, ou de sa carte (READ_CORE_MEMORY) avec <paramref name="carte"/>.</summary>
+    private async Task<IReadOnlyList<int>?> LireOctetsAsync(long decalage, int octets, CancellationToken ct, bool carte = false)
     {
-        var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {decalage:x} {octets}", ct).ConfigureAwait(false);
+        var commande = carte ? "READ_CORE_MEMORY" : "READ_CORE_RAM";
+        var reponse = await _commandes.DemanderAsync($"{commande} {decalage:x} {octets}", ct).ConfigureAwait(false);
         var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (morceaux is null || morceaux.Length < 2 + octets || morceaux[0] != "READ_CORE_RAM")
+        if (morceaux is null || morceaux.Length < 2 + octets || morceaux[0] != commande)
         {
             return null;
         }

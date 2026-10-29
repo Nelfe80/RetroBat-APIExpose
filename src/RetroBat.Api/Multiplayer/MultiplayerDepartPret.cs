@@ -138,7 +138,7 @@ public sealed class MultiplayerDepartPret
             return new Resultat(false, "etat impossible a poser", null);
         }
 
-        var raison = await AppliquerAsync(jeu, choixParPlace, pseudos, _apresLeChargement, ct).ConfigureAwait(false);
+        var raison = await AppliquerAsync(jeu, choixParPlace, pseudos, depart.DelaiDesChoix ?? _apresLeChargement, ct).ConfigureAwait(false);
         return new Resultat(raison is null, raison, fichier);
     }
 
@@ -151,14 +151,18 @@ public sealed class MultiplayerDepartPret
     /// connecte, le fait decrocher (« Netplay state load out of order »). Une reprise rapide qui ne se relit pas (un jeu
     /// qui n'accepte l'ecriture qu'un moment apres le chargement) se refait au rythme de la premiere pose, verifiee : le
     /// jeu ne reste jamais sur un depart sans les choix. Vrai si le depart est repris, choix compris.
+    ///
+    /// Un depart au delai des choix du catalogue (<see cref="MultiplayerStart.WriteAfterFrames"/>, CDC Classements v1.1 §1)
+    /// le garde a chaque reprise et a son repli : le jeu n'accepte les choix que dans cette fenetre.
     /// </summary>
     public async Task<bool> ReappliquerAsync(
         MultiplayerGame jeu,
         IReadOnlyDictionary<int, IReadOnlyDictionary<string, int>?> choixParPlace,
         CancellationToken ct,
-        IReadOnlyDictionary<int, string>? pseudos = null)
-        => await AppliquerAsync(jeu, choixParPlace, pseudos, ApresUnRechargement, ct).ConfigureAwait(false) is null
-           || await AppliquerAsync(jeu, choixParPlace, pseudos, _apresLeChargement, ct).ConfigureAwait(false) is null;
+        IReadOnlyDictionary<int, string>? pseudos = null,
+        MultiplayerStart? depart = null)
+        => await AppliquerAsync(jeu, choixParPlace, pseudos, depart?.DelaiDesChoix ?? ApresUnRechargement, ct).ConfigureAwait(false) is null
+           || await AppliquerAsync(jeu, choixParPlace, pseudos, depart?.DelaiDesChoix ?? _apresLeChargement, ct).ConfigureAwait(false) is null;
 
     /// <summary>Charge le depart pose, ecrit les choix, puis les relit. Rend null, ou la raison d'un ecart.</summary>
     private async Task<string?> AppliquerAsync(
@@ -381,11 +385,15 @@ public sealed class MultiplayerFinDeRencontre
 {
     private readonly ICommandesRetroArch _commandes;
     private readonly TimeSpan _periode;
+    private readonly TimeSpan _periodeDuClassement;
 
     public MultiplayerFinDeRencontre(ICommandesRetroArch commandes, TimeSpan? periode = null)
     {
         _commandes = commandes;
         _periode = periode ?? TimeSpan.FromMilliseconds(500);
+        // Un classement retient une valeur apres settle_ms (une seconde par defaut) : quatre lectures par seconde la voient
+        // tenir sans attendre une demi-seconde de plus.
+        _periodeDuClassement = periode ?? TimeSpan.FromMilliseconds(250);
     }
 
     /// <summary>
@@ -403,7 +411,7 @@ public sealed class MultiplayerFinDeRencontre
             {
                 // HORS DUEL, RIEN NE COMPTE (garde du 23/10) : le joueur 1 seul contre l'ordinateur, la manche que gagne la
                 // machine tombe dans la case du joueur 2. Le depart se voit quand le duel commence, compteurs remis a zero.
-                if (fin.Duel is { Decalage: { } garde } && await LireAsync(garde, ct).ConfigureAwait(false) != fin.Duel.Value)
+                if (fin.Duel is { Decalage: { } garde } && await LireAsync(garde, ct, fin.ParLaCarteDuCoeur).ConfigureAwait(false) != fin.Duel.Value)
                 {
                     candidat = null;
                     await Task.Delay(_periode, ct).ConfigureAwait(false);
@@ -420,7 +428,7 @@ public sealed class MultiplayerFinDeRencontre
                         continue;
                     }
 
-                    if (await LireAsync(adresse.Value, ct).ConfigureAwait(false) is { } valeur)
+                    if (await LireAsync(adresse.Value, ct, fin.ParLaCarteDuCoeur).ConfigureAwait(false) is { } valeur)
                     {
                         lues++;
                         if (valeur >= fin.FirstTo && valeur < 0xFF)
@@ -462,10 +470,82 @@ public sealed class MultiplayerFinDeRencontre
     }
 
     /// <summary>La fin d'une rencontre, selon le type du jeu : la place gagnante, <see cref="MultiplayerResultats.MatchNul"/>, ou null.</summary>
-    public Task<int?> AttendreLaFinAsync(MultiplayerGame jeu, IReadOnlyCollection<int> places, CancellationToken ct)
-        => jeu.End is { } manches ? AttendreLeVainqueurAsync(manches, places, ct)
-            : jeu.MatchEnd is { EstConnu: true } autre ? AttendreLeScoreFinalAsync(autre, places, ct)
-            : Task.FromResult<int?>(null);
+    public async Task<int?> AttendreLaFinAsync(MultiplayerGame jeu, IReadOnlyCollection<int> places, CancellationToken ct)
+        => (await AttendreLIssueAsync(jeu, places, ct).ConfigureAwait(false))?.Gagnante;
+
+    /// <summary>
+    /// L'issue d'une rencontre, selon la fin du jeu : la place gagnante d'un duel (<c>end</c>, <c>match_end</c>), ou le rang
+    /// de chaque humain (<c>ranking_end</c>). Null si la partie se ferme avant, ou si la rencontre ne se classe pas a ces
+    /// places (moins de deux humains, tous dans le meme camp).
+    /// </summary>
+    public async Task<MultiplayerIssue?> AttendreLIssueAsync(MultiplayerGame jeu, IReadOnlyCollection<int> places, CancellationToken ct)
+    {
+        if (jeu.RankingEnd is { EstConnu: true } classement)
+        {
+            return await AttendreLeClassementAsync(classement, places, ct).ConfigureAwait(false) is { } rangs ? MultiplayerIssue.DesRangs(rangs) : null;
+        }
+
+        var gagnante = jeu.End is { } manches ? await AttendreLeVainqueurAsync(manches, places, ct).ConfigureAwait(false)
+            : jeu.MatchEnd is { EstConnu: true } autre ? await AttendreLeScoreFinalAsync(autre, places, ct).ConfigureAwait(false)
+            : null;
+        return gagnante is { } g ? MultiplayerIssue.DuVainqueur(g) : null;
+    }
+
+    /// <summary>
+    /// LE CLASSEMENT A PLUSIEURS (CDC Classements v1.0 §5) : la memoire lue a chaque passe (garde, signal, et chaque place du
+    /// jeu, l'ordinateur compris), confiee a <see cref="MultiplayerClassementEnCours"/>, jusqu'aux rangs des humains. Null
+    /// sans classement possible a ces places, ou si la partie se ferme avant.
+    /// </summary>
+    public async Task<IReadOnlyList<MultiplayerRang>?> AttendreLeClassementAsync(MultiplayerRankingEnd fin, IReadOnlyCollection<int> humains, CancellationToken ct)
+    {
+        if (!fin.Classable(humains))
+        {
+            return null;
+        }
+
+        var enCours = new MultiplayerClassementEnCours(fin, humains);
+        var horloge = System.Diagnostics.Stopwatch.StartNew();
+        var carte = fin.ParLaCarteDuCoeur;
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                var garde = fin.Guard?.Decalage is { } g ? await LireAsync(g, ct, carte).ConfigureAwait(false) : null;
+                var signal = fin.Guard is null || garde == fin.Guard.Value
+                    ? fin.Over?.Decalage is { } o ? await LireAsync(o, ct, carte).ConfigureAwait(false) : null
+                    : null;
+                var places = new Dictionary<int, MultiplayerReleveDePlace>();
+                // Hors de la garde, les places ne se lisent pas : le classement les ignorerait.
+                if (fin.Guard is null || garde == fin.Guard.Value)
+                {
+                    foreach (var place in fin.Seats)
+                    {
+                        long? valeur = null;
+                        if (place.Decalage is { } adresse && await LireLesOctetsAsync(adresse, place.Bytes, ct, carte).ConfigureAwait(false) is { } octets)
+                        {
+                            valeur = place.Valeur(octets);
+                        }
+
+                        var mort = place.Dead?.Decalage is { } m ? await LireAsync(m, ct, carte).ConfigureAwait(false) : null;
+                        var fini = place.Finished?.Decalage is { } f ? await LireAsync(f, ct, carte).ConfigureAwait(false) : null;
+                        places[place.Seat] = new MultiplayerReleveDePlace(valeur, mort, fini);
+                    }
+                }
+
+                if (enCours.Observer(new MultiplayerReleve(garde, signal, places), horloge.ElapsedMilliseconds) is { } rangs)
+                {
+                    return rangs;
+                }
+
+                await Task.Delay(_periodeDuClassement, ct).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// LA FIN AU SCORE (score_final, 23/10) : le signal de fin, deja vu retombe au moins une fois sous la garde, puis le
@@ -479,14 +559,14 @@ public sealed class MultiplayerFinDeRencontre
         {
             while (!ct.IsCancellationRequested)
             {
-                if (fin.Duel is { Decalage: { } garde } && await LireAsync(garde, ct).ConfigureAwait(false) != fin.Duel.Value)
+                if (fin.Duel is { Decalage: { } garde } && await LireAsync(garde, ct, fin.ParLaCarteDuCoeur).ConfigureAwait(false) != fin.Duel.Value)
                 {
                     candidat = null;
                     await Task.Delay(_periode, ct).ConfigureAwait(false);
                     continue;
                 }
 
-                var signal = await LireAsync(fin.Over!.Decalage!.Value, ct).ConfigureAwait(false);
+                var signal = await LireAsync(fin.Over!.Decalage!.Value, ct, fin.ParLaCarteDuCoeur).ConfigureAwait(false);
                 if (signal != fin.Over.Value)
                 {
                     // Le match n'est pas fini : un signal vu ensuite sera le sien, pas celui du match d'avant.
@@ -503,7 +583,7 @@ public sealed class MultiplayerFinDeRencontre
                     foreach (var place in places.OrderBy(p => p))
                     {
                         var adresse = fin.Seats.FirstOrDefault(s => s.Seat == place)?.Decalage;
-                        if (adresse is not null && await LireLesOctetsAsync(adresse.Value, fin.Score.Bytes, ct).ConfigureAwait(false) is { } octets
+                        if (adresse is not null && await LireLesOctetsAsync(adresse.Value, fin.Score.Bytes, ct, fin.ParLaCarteDuCoeur).ConfigureAwait(false) is { } octets
                             && fin.Score.Valeur(octets) is { } score)
                         {
                             scores.Add((place, score));
@@ -534,12 +614,16 @@ public sealed class MultiplayerFinDeRencontre
         return null;
     }
 
-    /// <summary>Plusieurs octets de la memoire du coeur, dans l'ordre de la memoire, ou null si la reponse est incomplete.</summary>
-    private async Task<IReadOnlyList<int>?> LireLesOctetsAsync(long adresse, int n, CancellationToken ct)
+    /// <summary>
+    /// Plusieurs octets de la memoire du coeur, dans l'ordre de la memoire, ou null si la reponse est incomplete. Avec
+    /// <paramref name="carte"/>, l'adresse est celle de la carte du coeur (READ_CORE_MEMORY, CDC Classements v1.1 §2).
+    /// </summary>
+    private async Task<IReadOnlyList<int>?> LireLesOctetsAsync(long adresse, int n, CancellationToken ct, bool carte = false)
     {
-        var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {adresse:x} {n}", ct).ConfigureAwait(false);
+        var commande = carte ? "READ_CORE_MEMORY" : "READ_CORE_RAM";
+        var reponse = await _commandes.DemanderAsync($"{commande} {adresse:x} {n}", ct).ConfigureAwait(false);
         var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (morceaux is not { Length: >= 3 } || morceaux[0] != "READ_CORE_RAM" || morceaux.Length < 2 + n)
+        if (morceaux is not { Length: >= 3 } || morceaux[0] != commande || morceaux.Length < 2 + n)
         {
             return null;
         }
@@ -558,12 +642,13 @@ public sealed class MultiplayerFinDeRencontre
         return octets;
     }
 
-    /// <summary>Un octet de la memoire du coeur, ou null si RetroArch ne repond pas.</summary>
-    private async Task<int?> LireAsync(long adresse, CancellationToken ct)
+    /// <summary>Un octet de la memoire du coeur (de sa carte avec <paramref name="carte"/>), ou null si RetroArch ne repond pas.</summary>
+    private async Task<int?> LireAsync(long adresse, CancellationToken ct, bool carte = false)
     {
-        var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {adresse:x} 1", ct).ConfigureAwait(false);
+        var commande = carte ? "READ_CORE_MEMORY" : "READ_CORE_RAM";
+        var reponse = await _commandes.DemanderAsync($"{commande} {adresse:x} 1", ct).ConfigureAwait(false);
         var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        return morceaux is { Length: >= 3 } && morceaux[0] == "READ_CORE_RAM"
+        return morceaux is { Length: >= 3 } && morceaux[0] == commande
             && int.TryParse(morceaux[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var valeur)
                 ? valeur
                 : null;

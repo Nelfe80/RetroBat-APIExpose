@@ -72,7 +72,17 @@ public sealed class MultiplayerLaunchService : IHostedService
     private CancellationTokenSource? _gardeDeVitesse;
     private CancellationTokenSource? _boucleDuDepart;
     private CancellationTokenSource? _suiviDesInvites;
-    private int? _vainqueur;
+    /// <summary>L'issue que le guet a lue : la place gagnante, et le rang de chaque humain pour une fin a plusieurs.</summary>
+    private MultiplayerIssue? _issue;
+
+    /// <summary>La meme, lue chez l'invite : son ecran de fin classe les joueurs avant que le site reponde.</summary>
+    private MultiplayerIssue? _issueInvite;
+
+    /// <summary>L'issue dite au journal : « la place 2 gagne », « match nul », ou les rangs (« 1:1 3:2 2:3 »).</summary>
+    private static string DireLIssue(MultiplayerIssue issue)
+        => issue.Rangs.Count > 0
+            ? "rangs " + string.Join(' ', issue.Rangs.Select(r => r.Seat + ":" + r.Rank + (r.Camp is { } c ? "/camp " + c : string.Empty)))
+            : issue.Gagnante == MultiplayerResultats.MatchNul ? "match nul" : "la place " + issue.Gagnante + " gagne";
 
     /// <summary>L'etat d'un depart pret pose dans l'emplacement reserve de RetroArch, retire a la fin de la partie.</summary>
     private string? _etatPose;
@@ -139,7 +149,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
 
             return room is not null && _session.Etat.Rooms.FirstOrDefault(r => r.Room == room) is { } salle
-                && _session.JeuDeLaRoom(salle)?.Game.EstClasse == true;
+                && _session.JeuDeLaRoom(salle)?.Game.ClassePour(PlacesDe(salle)) == true;
         }
     }
 
@@ -245,7 +255,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             _ = Task.Run(() => PublierLaSessionAsync(room, jeu, jeton, motJoueur, motSpectateur));
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
             RetirerLEtatPose();
-            int? vainqueur;
+            MultiplayerIssue? issue;
             MultiplayerStatsSuivi? suivi;
             lock (_verrou)
             {
@@ -257,8 +267,8 @@ public sealed class MultiplayerLaunchService : IHostedService
                 _boucleDuDepart = null;
                 _suiviDesInvites?.Cancel();
                 _suiviDesInvites = null;
-                vainqueur = _vainqueur;
-                _vainqueur = null;
+                issue = _issue;
+                _issue = null;
                 suivi = _suiviDesStats;
                 _suiviDesStats = null;
             }
@@ -272,11 +282,11 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
             else
             {
-                await _client.TerminerAsync(room.Room, vainqueur is null ? "game_closed" : "match_over", duree, CancellationToken.None, vainqueur,
-                    vainqueur is null ? null : stats, vainqueur is null ? null : mesures?.PourLeSite()).ConfigureAwait(false);
+                await _client.TerminerAsync(room.Room, issue is null ? "game_closed" : "match_over", duree, CancellationToken.None, issue?.Gagnante,
+                    issue is null ? null : stats, issue is null ? null : mesures?.PourLeSite(), issue?.Rangs).ConfigureAwait(false);
             }
 
-            _panneau.MontrerLeResultat(room.Room, duree, stats, mesures);
+            _panneau.MontrerLeResultat(room.Room, duree, stats, mesures, issue?.Rangs);
         }
         catch (Exception ex)
         {
@@ -386,9 +396,9 @@ public sealed class MultiplayerLaunchService : IHostedService
             {
                 _ = Task.Run(() => LibererLeDepartAsync(room, jeu.Game, liens));
             }
-            else if (depart is not null && reponse?.Ok == true && MultiplayerAttenteDesInvites.BoucleEnService)
+            else if (depart is { } departPose && reponse?.Ok == true && MultiplayerAttenteDesInvites.BoucleEnService)
             {
-                _ = Task.Run(() => BouclerLeDepartAsync(room, jeu.Game, liens));
+                _ = Task.Run(() => BouclerLeDepartAsync(room, jeu.Game, liens, departPose));
             }
             else
             {
@@ -400,8 +410,9 @@ public sealed class MultiplayerLaunchService : IHostedService
                 _ = Task.Run(() => FermerQuandLesInvitesSontPartisAsync(room, liens));
             }
 
-            // Une rencontre classee (fin lue + type versus, 23/10), quel que soit le niveau : l'hote guette sa fin.
-            if (reponse?.Ok == true && jeu.Game.EstClasse)
+            // Une rencontre classee (fin lue + type versus, 23/10), quel que soit le niveau : l'hote guette sa fin. Une fin a
+            // plusieurs ne classe qu'a deux humains au moins, face a face en equipes (29/10) : sinon, une partie libre.
+            if (reponse?.Ok == true && jeu.Game.ClassePour(PlacesDe(room)))
             {
                 _ = Task.Run(() => GuetterLaFinAsync(room, jeu.Game));
             }
@@ -519,20 +530,20 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
         }
 
-        var vainqueur = await _fin.AttendreLaFinAsync(jeu, places, jeton).ConfigureAwait(false);
-        if (vainqueur is null)
+        var issue = await _fin.AttendreLIssueAsync(jeu, places, jeton).ConfigureAwait(false);
+        if (issue is null)
         {
             return;
         }
 
         lock (_verrou)
         {
-            _vainqueur = vainqueur;
+            _issue = issue;
             _suiviDesStats?.Figer();
         }
 
         _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} finie, {Issue} ; le jeu se ferme dans {Delai} s",
-            jeu.Id, vainqueur == MultiplayerResultats.MatchNul ? "match nul" : "la place " + vainqueur + " gagne", jeu.DelaiDeFermeture);
+            jeu.Id, DireLIssue(issue), jeu.DelaiDeFermeture);
         try
         {
             await Task.Delay(TimeSpan.FromSeconds(jeu.DelaiDeFermeture), jeton).ConfigureAwait(false);
@@ -569,18 +580,23 @@ public sealed class MultiplayerLaunchService : IHostedService
                 }
             }
 
-            var vainqueur = await _fin.AttendreLaFinAsync(jeu, places, ct).ConfigureAwait(false);
-            if (vainqueur is null)
+            var issue = await _fin.AttendreLIssueAsync(jeu, places, ct).ConfigureAwait(false);
+            if (issue is null)
             {
                 return;
             }
 
             suiviInvite?.Figer();
+            lock (_verrou)
+            {
+                _issueInvite = issue;
+            }
+
             // Ses statistiques partent avec son rapport : le site les compare a celles de l'hote (ecart journalise, sans suite en V1).
-            var reponse = await _client.RapporterAsync(room.Room, vainqueur.Value, CancellationToken.None,
-                suiviInvite?.Instantane().PourLeSite()).ConfigureAwait(false);
-            _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} vue finie chez l'invite, place {Place} rapportee ({Statut})",
-                jeu.Id, vainqueur, reponse?.Ok == true ? "ok" : reponse?.Reason ?? "injoignable");
+            var reponse = await _client.RapporterAsync(room.Room, issue.Gagnante, CancellationToken.None,
+                suiviInvite?.Instantane().PourLeSite(), issue.Rangs).ConfigureAwait(false);
+            _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} vue finie chez l'invite, {Issue} rapportee ({Statut})",
+                jeu.Id, DireLIssue(issue), reponse?.Ok == true ? "ok" : reponse?.Reason ?? "injoignable");
             // Le noir monte en meme temps que chez l'hote, qui ferme le jeu au meme delai (retour du user du 23/10).
             await Task.Delay(TimeSpan.FromSeconds(jeu.DelaiDeFermeture), ct).ConfigureAwait(false);
             await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
@@ -600,6 +616,10 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
         return profil is null ? null : MultiplayerOrdreNetplay.Permuter(profil, jeu.PlacesDuNetplay);
     }
+
+    /// <summary>Les places humaines de la partie : celles des joueurs de la gameroom.</summary>
+    internal static IReadOnlyList<int> PlacesDe(MultiplayerRoom room)
+        => room.Players.Where(joueur => joueur.Seat is not null).Select(joueur => joueur.Seat!.Value).Distinct().ToList();
 
     /// <summary>Le nombre de joueurs de la partie, celui des options du coeur (Lancer) : l'etat a autant de consoles que lui.</summary>
     private static int JoueursDeLaRoom(MultiplayerRoom room) => Math.Max(2, room.Launch?.Players ?? 0);
@@ -646,7 +666,7 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// LA BOUCLE DU DEPART (1.9.112) : tant qu'aucun invite ne se connecte, l'hote reprend son depart pret, choix compris
     /// (MultiplayerAttenteDesInvites.BouclerLeDepartAsync) ; le match ne file pas avant l'arrivee du premier invite.
     /// </summary>
-    private async Task BouclerLeDepartAsync(MultiplayerRoom room, MultiplayerGame jeu, Func<int?> liens)
+    private async Task BouclerLeDepartAsync(MultiplayerRoom room, MultiplayerGame jeu, Func<int?> liens, MultiplayerStart depart)
     {
         CancellationToken jeton;
         lock (_verrou)
@@ -660,7 +680,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         {
             var (choix, pseudos) = ChoixEtPseudos(room);
             var debut = DateTime.UtcNow;
-            var tours = await _attente.BouclerLeDepartAsync(ct => _depart.ReappliquerAsync(jeu, choix, ct, pseudos),
+            var tours = await _attente.BouclerLeDepartAsync(ct => _depart.ReappliquerAsync(jeu, choix, ct, pseudos, depart),
                 MultiplayerAttenteDesInvites.CheminDuJournal, liens, PatienceDesInvites, jeton).ConfigureAwait(false);
             _journal.LogInformation("MULTIPLAYER : depart pret de {Jeu} repris {Tours} fois en {Secondes:F0} s en attendant le premier invite ({Room})",
                 jeu.Id, tours, (DateTime.UtcNow - debut).TotalSeconds, room.Room);
@@ -761,7 +781,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             // NIVEAU NELFEPLAY : l'invite joue la meme partie que l'hote ; il guette les memes compteurs et rapporte la place
             // gagnante. Le resultat n'est valide, et la cote ne bouge, que si les deux concordent.
             using var guetInvite = new CancellationTokenSource();
-            if (jeu.Game.EstClasse)
+            if (jeu.Game.ClassePour(PlacesDe(room)))
             {
                 _ = Task.Run(() => RapporterEnInviteAsync(room, jeu.Game, guetInvite.Token));
             }
@@ -789,15 +809,18 @@ public sealed class MultiplayerLaunchService : IHostedService
             // l'hote, cette borne le dit : elle parle parfois avant lui, et prenait alors l'abandon a sa place (26/10).
             await _client.QuitterAsync(room.Room, CancellationToken.None, hoteParti ? "host_gone" : null).ConfigureAwait(false);
             MultiplayerStatsSuivi? suiviInvite;
+            MultiplayerIssue? issueInvite;
             lock (_verrou)
             {
                 suiviInvite = _suiviDesStatsInvite;
                 _suiviDesStatsInvite = null;
+                issueInvite = _issueInvite;
+                _issueInvite = null;
             }
 
             guetInvite.Cancel();
             var mesuresInvite = suiviInvite is null ? null : await suiviInvite.Fin.ConfigureAwait(false);
-            _panneau.MontrerLeResultat(room.Room, duree, mesuresInvite?.AncienDesPlaces(), mesuresInvite);
+            _panneau.MontrerLeResultat(room.Room, duree, mesuresInvite?.AncienDesPlaces(), mesuresInvite, issueInvite?.Rangs);
         }
         catch (Exception ex)
         {
