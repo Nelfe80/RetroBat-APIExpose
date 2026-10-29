@@ -287,6 +287,41 @@ public class MultiplayerCollectionSyncTests : IDisposable
     }
 
     [Fact]
+    public async Task Un_disque_de_plus_de_64_Mo_entre_dans_la_collection_et_ses_paquets_ne_se_lisent_pas()
+    {
+        // Bomberman PSP (29/10) : une ISO de 110 Mo dans son zip ; le plafond des cartouches l'ecartait.
+        var dossier = Path.Combine(Roms, "psp");
+        Directory.CreateDirectory(dossier);
+        var chemin = Path.Combine(dossier, "Disque (USA).zip");
+        var iso = new byte[70 * 1024 * 1024];
+        iso[12345] = 7;
+        using (var zip = ZipFile.Open(chemin, ZipArchiveMode.Create))
+        {
+            using var flux = zip.CreateEntry("Disque (USA).iso", CompressionLevel.Fastest).Open();
+            flux.Write(iso);
+        }
+        string crc;
+        using (var zip = ZipFile.OpenRead(chemin))
+        {
+            crc = zip.Entries[0].Crc32.ToString("x8");
+        }
+        var md5 = Convert.ToHexString(System.Security.Cryptography.MD5.HashData(iso)).ToLowerInvariant();
+        var disque = new
+        {
+            id = "psp/disque", system = "psp", name = "Disque", family = "versus", players = 2, level = "classique",
+            content = new { md5 = new[] { md5 }, crc = new[] { crc }, size = new[] { (long)iso.Length } },
+        };
+        PoserCatalogue(Catalogue(disque));
+
+        await Service().SynchroniserAsync("test", CancellationToken.None);
+
+        Assert.Equal(new HashSet<string>(StringComparer.OrdinalIgnoreCase) { chemin }, Collection());
+        var jeu = JsonSerializer.Deserialize<MultiplayerGame>(JsonSerializer.Serialize(disque))!;
+        Assert.False(MultiplayerCollectionSyncService.SystemeACartouches(jeu));
+        Assert.True(MultiplayerCollectionSyncService.SystemeACartouches(jeu with { Content = new MultiplayerContent { Size = [4194304] } }));
+    }
+
+    [Fact]
     public async Task Un_catalogue_absent_ou_refuse_n_efface_pas_la_collection()
     {
         var fbneo = PoserFichier("fbneo", "mslug3.zip");

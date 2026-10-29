@@ -42,7 +42,11 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     private static readonly string[] ExtensionsArcade = [".zip", ".7z"];
     private static readonly TimeSpan PremierDelai = TimeSpan.FromSeconds(60);
     private static readonly TimeSpan Periode = TimeSpan.FromSeconds(300);
-    private const long PlafondContenu = 64L * 1024 * 1024;
+    /// <summary>
+    /// Le plus gros contenu reconnu : un disque (29/10, Bomberman PSP : 110 Mo, un UMD va jusqu'a 1,8 Go). Seul un fichier
+    /// dont le CRC et la taille correspondent deja au catalogue est lu en entier pour son md5, une fois par lancement.
+    /// </summary>
+    internal const long PlafondContenu = 4L * 1024 * 1024 * 1024;
 
     /// <summary>Le prefiltre d'un fichier, garde tant qu'il ne change pas : CRC de l'entree unique d'un zip, ou taille.</summary>
     private static readonly ConcurrentDictionary<string, (string? Crc, long Taille)> Prefiltres = new(StringComparer.OrdinalIgnoreCase);
@@ -103,7 +107,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         _logger = logger;
         _romsRoot = romsRoot ?? RetroBatPaths.RomsRoot;
         _emulateurTourne = emulateurTourne ?? EmulatorForeground.EmulateurTourne;
-        _md5DuContenu = md5DuContenu ?? NelfePlayScoringCollectionSyncService.Md5DuContenu;
+        _md5DuContenu = md5DuContenu ?? (chemin => NelfePlayScoringCollectionSyncService.Md5DuContenu(chemin, PlafondContenu));
         _coeurPose = coeurPose ?? (coeur => MultiplayerCoeursService.EstPose(coeur, _options.CurrentValue));
         Declarer = gamelists is null ? null : (systeme, jeux) => gamelists.DeclarerJeuxAbsents(systeme, jeux);
     }
@@ -443,7 +447,9 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
             return;
         }
 
-        var systemes = catalogue.Games.Where(j => !j.EstArcade).Select(j => j.System).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        // Les cartouches seulement : un paquet de disques (PSP, 29/10) se compte en dizaines de Go, et ce lecteur l'extrairait
+        // en entier pour en reconnaitre un seul jeu.
+        var systemes = catalogue.Games.Where(j => !j.EstArcade && SystemeACartouches(j)).Select(j => j.System).ToHashSet(StringComparer.OrdinalIgnoreCase);
         if (_paquets.ALire(systemes).Count == 0)
         {
             return;
@@ -560,6 +566,11 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
 
         return (null, null);
     }
+
+    /// <summary>Un jeu sur cartouche : tous ses contenus connus tiennent sous le plafond d'une cartouche (64 Mo).</summary>
+    internal static bool SystemeACartouches(MultiplayerGame jeu) => (jeu.Content?.Size ?? []).All(taille => taille <= PlafondCartouche);
+
+    private const long PlafondCartouche = 64L * 1024 * 1024;
 
     internal static bool PassePrefiltre(string chemin, MultiplayerContent contenu)
     {

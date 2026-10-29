@@ -972,14 +972,17 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
 
     /// <summary>
     /// Le md5 du CONTENU : celui du fichier, ou du fichier unique d'un zip (une cartouche zippee a le
-    /// md5 de sa ROM, pas celui de son emballage). Garde en memoire tant que le fichier ne change pas.
+    /// md5 de sa ROM, pas celui de son emballage). Garde en memoire tant que le fichier ne change pas. Le plafond se
+    /// releve pour un appelant qui ne lit que des candidats deja reconnus (MULTIPLAYER : un disque PSP).
     /// </summary>
-    internal static string? Md5DuContenu(string chemin)
+    internal static string? Md5DuContenu(string chemin) => Md5DuContenu(chemin, PlafondMd5);
+
+    internal static string? Md5DuContenu(string chemin, long plafond)
     {
         try
         {
             var info = new FileInfo(chemin);
-            if (!info.Exists || info.Length > PlafondMd5) return null;
+            if (!info.Exists || info.Length > plafond) return null;
             var cle = info.FullName + "|" + info.Length + "|" + info.LastWriteTimeUtc.Ticks;
             if (Md5Calcules.TryGetValue(cle, out var connu)) return connu;
 
@@ -988,7 +991,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             {
                 using var zip = ZipFile.OpenRead(info.FullName);
                 var fichiers = zip.Entries.Where(entree => entree.Length > 0).ToList();
-                if (fichiers.Count == 1 && fichiers[0].Length <= PlafondMd5)
+                if (fichiers.Count == 1 && fichiers[0].Length <= plafond)
                 {
                     using var flux = fichiers[0].Open();
                     md5 = Convert.ToHexString(MD5.HashData(flux)).ToLowerInvariant();
