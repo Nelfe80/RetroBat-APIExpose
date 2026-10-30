@@ -488,6 +488,8 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             StartPosition = FormStartPosition.Manual;
             MinimumSize = Size.Empty;
             Size = new Size(2, 2);
+            // Windows impose une taille minimale (16 pixels) : seuls deux se dessinent, rien ne deborde sur un ecran voisin.
+            Region = new Region(new Rectangle(0, 0, 2, 2));
         }
 
         protected override bool ShowWithoutActivation => true;
