@@ -82,6 +82,11 @@ public sealed class ReplayVideoScheduler : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        if (RetroBat.Api.Infrastructure.EmulatorForeground.ArreterLeRenduOrphelin())
+        {
+            _logger.LogWarning("Video : un rendu reste d'une API arretee, il n'a plus de pilote : arrete.");
+        }
+
         if (!_actif)
         {
             _logger.LogInformation("Video : rendu au repos desactive (Video:Render:Enabled).");

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using RetroBat.Domain.Paths;
 
 namespace RetroBat.Api.Infrastructure;
 
@@ -99,9 +100,61 @@ public static class EmulatorForeground
     /// </summary>
     private static volatile int _processusDuRendu;
 
-    public static void NoterLeRendu(int processus) => _processusDuRendu = processus;
+    /// <summary>
+    /// LA TRACE DU RENDU (30/10/2026, idee du user) : ce RetroArch est pilote par l'API, c'est elle qui lui dit de finir.
+    /// Une API relancee pendant un rendu le laissait cache pour toujours, et il passait pour un jeu : plus aucun panneau.
+    /// Le numero seul ne suffit pas, Windows le redonne a un autre programme : l'heure de depart prouve que c'est le meme.
+    /// </summary>
+    private static string FichierDuRendu => Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay", "rendu-en-cours.txt");
 
-    public static void OublierLeRendu() => _processusDuRendu = 0;
+    public static void NoterLeRendu(int processus)
+    {
+        _processusDuRendu = processus;
+        EcrireLaTrace(FichierDuRendu, processus);
+    }
+
+    public static void OublierLeRendu()
+    {
+        _processusDuRendu = 0;
+        try { File.Delete(FichierDuRendu); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+    }
+
+    internal static void EcrireLaTrace(string fichier, int processus)
+    {
+        try
+        {
+            using var p = Process.GetProcessById(processus);
+            Directory.CreateDirectory(Path.GetDirectoryName(fichier)!);
+            File.WriteAllText(fichier, processus + " " + p.StartTime.ToUniversalTime().Ticks);
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException or IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
+        {
+            // Sans trace, on retombe sur l'ancien comportement : le rendu reste connu tant que l'API tourne.
+        }
+    }
+
+    /// <summary>Au demarrage de l'API : un rendu encore en vie n'a plus de pilote, il s'arrete. Rend vrai s'il y en avait un.</summary>
+    public static bool ArreterLeRenduOrphelin() => ArreterLeRenduOrphelin(FichierDuRendu);
+
+    internal static bool ArreterLeRenduOrphelin(string fichier)
+    {
+        try
+        {
+            if (!File.Exists(fichier)) return false;
+            var trace = File.ReadAllText(fichier).Split(' ');
+            File.Delete(fichier);
+            if (trace.Length != 2 || !int.TryParse(trace[0], out var processus) || !long.TryParse(trace[1], out var depart)) return false;
+            using var p = Process.GetProcessById(processus);
+            if (p.StartTime.ToUniversalTime().Ticks != depart) return false;
+            p.Kill(entireProcessTree: true);
+            return true;
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException or IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
+        {
+            return false;
+        }
+    }
 
     /// <summary>Un rendu video tourne-t-il ? Son wrapper rend alors aussi un bilan de fin, qui n'est pas celui de la partie.</summary>
     public static bool RenduEnCours => _processusDuRendu != 0;
