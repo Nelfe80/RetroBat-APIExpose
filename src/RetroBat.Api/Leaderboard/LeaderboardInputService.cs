@@ -189,6 +189,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         _arret = new CancellationTokenSource();
         _ = Task.Run(() => ChienDeGardeAsync(_arret.Token), CancellationToken.None);
         _ = Task.Run(() => GuetterLesDirectsSuivisAsync(_arret.Token), CancellationToken.None);
+        // La lecture de tous les replays se fait ici une fois : la premiere ouverture du panneau ne l'attend pas.
+        _ = Task.Run(() => _replays.ListerSansRelire(), CancellationToken.None);
         _logger.LogInformation("Classement : panneau arme (appui long sur le slot {Slot}).", SlotValider);
         // A ET B INVERSES DANS ES (2026-10-17) : le « valider » d'ES change de bouton, pas le notre. Dit au demarrage, pour
         // qu'un « le panneau ne s'ouvre pas » s'explique a la lecture du journal.
@@ -1130,9 +1132,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         var cible = Path.GetFullPath(cheminDuJeu.Replace('/', '\\'));
         try
         {
-            foreach (var manifeste in _replays.ListManifests())
+            foreach (var (manifeste, meta) in _replays.ListerSansRelire())
             {
-                var meta = _replays.GetMeta(manifeste.ReplayId);
                 if (meta is null || !meta.CreatedByThisDevice || meta.ScoreValue is not { } score) continue;
                 var rom = meta.Launch?.RomPath ?? "";
                 if (rom.Length == 0) continue;
@@ -1172,9 +1173,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         var cible = cheminDuJeu.Length > 0 ? Path.GetFullPath(cheminDuJeu.Replace('/', '\\')) : "";
         try
         {
-            foreach (var manifeste in _replays.ListManifests())
+            foreach (var (manifeste, meta) in _replays.ListerSansRelire())
             {
-                var meta = _replays.GetMeta(manifeste.ReplayId);
                 if (meta is null || !meta.CreatedByThisDevice) continue;
                 var rom = meta.Launch?.RomPath ?? "";
                 var memeJeu = string.Equals(manifeste.Game.RomGroup, _romGroup, StringComparison.OrdinalIgnoreCase)
@@ -1274,9 +1274,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
 
     private async Task ChargerAsync(CancellationToken ct, bool relecture = false)
     {
+        // « VISIBLE N ms » ne mesure que la fenetre : ce chrono dit quand le joueur voit ses scores (30/10/2026).
+        var duree = System.Diagnostics.Stopwatch.StartNew();
         if (!relecture) _ = ChargerLesEvenementsAsync(ct);
         // MES RECORDS ne depend que du disque : il s'affiche sans attendre le reseau.
         var mesParties = MesPartiesLocales();
+        var disque = duree.ElapsedMilliseconds;
         lock (_gate) { _mesParties = mesParties; }
         if (!relecture && _modele.Etat != LeaderboardPanelModel.Foyer.Ferme) Rafraichir();
         var pseudo = _agent.Status.Pseudo ?? "";
@@ -1347,6 +1350,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         // L'onglet d'une autre regle n'existe que si son classement a des scores.
         _modele.PoserLesRegles(autres.Where(a => a.Value.Lignes.Count > 0).Select(a => a.Key).ToList());
         Rafraichir();
+        if (!relecture)
+        {
+            _logger.LogInformation("Classement : contenu pret en {Ms} ms (disque {Disque} ms, {Regles} classement(s)).",
+                duree.ElapsedMilliseconds, disque, onglets.Count + 1);
+        }
+
         if (!relecture && UnReplayEstEnAttente()) RelireTantQueLeReplayArrive();
     }
 

@@ -273,6 +273,53 @@ public sealed class ReplayStore : IReplayManifestStore, IReplayObjectStore, IRep
         return list;
     }
 
+    private readonly Dictionary<string, (DateTime EcritManifeste, DateTime EcritMeta, ReplayManifest Manifeste, ReplayLocalMetadata? Meta)> _lus =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// LES REPLAYS ET LEURS META, SANS RELIRE CE QUI N'A PAS CHANGE (30/10/2026, « leaderboard un peu long a arriver ») : le
+    /// panneau de classement les parcourait tous a chaque ouverture et toutes les 20 s, 300 a 750 ms pour 250 replays, et
+    /// le temps montait a chaque partie. Lecture seule : ces objets sont partages, et <see cref="GetMeta"/> reste la voie
+    /// de qui veut modifier une meta.
+    /// </summary>
+    public IReadOnlyList<(ReplayManifest Manifeste, ReplayLocalMetadata? Meta)> ListerSansRelire()
+    {
+        var sortie = new List<(ReplayManifest Manifeste, ReplayLocalMetadata? Meta)>();
+        if (!Directory.Exists(_manifests)) return sortie;
+        var metas = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
+        if (Directory.Exists(_meta))
+        {
+            foreach (var f in new DirectoryInfo(_meta).EnumerateFiles("*.json"))
+            {
+                metas[Path.GetFileNameWithoutExtension(f.Name)] = f.LastWriteTimeUtc;
+            }
+        }
+
+        lock (_lus)
+        {
+            var vus = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var f in new DirectoryInfo(_manifests).EnumerateFiles("*.json"))
+            {
+                var id = Path.GetFileNameWithoutExtension(f.Name);
+                vus.Add(id);
+                metas.TryGetValue(id, out var ecritMeta);
+                if (!_lus.TryGetValue(id, out var lu) || lu.EcritManifeste != f.LastWriteTimeUtc || lu.EcritMeta != ecritMeta)
+                {
+                    var manifeste = ReadJson<ReplayManifest>(f.FullName);
+                    if (manifeste is null) continue;
+                    lu = (f.LastWriteTimeUtc, ecritMeta, manifeste, ecritMeta == default ? null : ReadJson<ReplayLocalMetadata>(MetaPath(id)));
+                    _lus[id] = lu;
+                }
+
+                sortie.Add((lu.Manifeste, lu.Meta));
+            }
+
+            foreach (var parti in _lus.Keys.Where(k => !vus.Contains(k)).ToList()) _lus.Remove(parti);
+        }
+
+        return sortie;
+    }
+
     // ── métadonnées locales (mutables) ──────────────────────────────────────
     public string MetaPath(string replayId) => Path.Combine(_meta, replayId + ".json");
     public void SaveMeta(ReplayLocalMetadata meta) => WriteJsonAtomic(MetaPath(meta.ReplayId), meta);
