@@ -62,8 +62,9 @@ public sealed class MultiplayerClient
         => raison is null ? EnvoyerAsync("leave", new { room }, ct) : EnvoyerAsync("leave", new { room, reason = raison }, ct);
 
     /// <summary>Le sondage : presence, decompte, lancement, resultat, invitations.</summary>
-    public Task<MultiplayerReponse?> SonderAsync(bool appui, bool panneauOuvert, int? rttMs, CancellationToken ct, bool dansLaCollection = false)
-        => EnvoyerAsync("poll", new { input = appui, panel = panneauOuvert, rtt_ms = rttMs, collection = dansLaCollection }, ct);
+    public Task<MultiplayerReponse?> SonderAsync(bool appui, bool panneauOuvert, int? rttMs, CancellationToken ct, bool dansLaCollection = false,
+        bool? enPartie = null)
+        => EnvoyerAsync("poll", new { input = appui, panel = panneauOuvert, rtt_ms = rttMs, collection = dansLaCollection, playing = enPartie }, ct);
 
     /// <summary>L'hote publie sa session netplay.</summary>
     public Task<MultiplayerReponse?> PublierNetplayAsync(string room, MultiplayerSessionNetplay session, CancellationToken ct)

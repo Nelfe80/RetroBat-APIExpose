@@ -164,6 +164,14 @@ public sealed partial class MultiplayerPanelService
         _etatDesMedias = etatDesMedias;
         _session.Change += SurChangement;
         _session.DansLaCollection = () => DansLaCollection && !EnJeu();
+        // En partie pour le site jusqu'a la fermeture de l'ecran de fin : l'echeance d'une invitation attend le retour (30/10).
+        _session.EnPartie = () =>
+        {
+            lock (_verrou)
+            {
+                return EnJeu() || _mode == Mode.Resultat;
+            }
+        };
         _session.Propositions += SurPropositions;
         // ES FERME, PLUS DE PANNEAU (2026-10-26, borne de falken) : le panneau reste ouvert quand il rend la main a ES ;
         // ES ferme, il restait sur le bureau jusqu'a l'arret de l'API. Il part avec ES, cartes comprises.
@@ -182,6 +190,8 @@ public sealed partial class MultiplayerPanelService
                     {
                         _finDePartieUtc = DateTime.UtcNow;
                     }
+
+                    RafraichirLesCartesApres(InvitationApresUnePartie + TimeSpan.FromMilliseconds(200));
                     break;
                 case "panel.input.pressed" or "ui.game.selected.raw" or "ui.system.selected.raw":
                     ReveillerLaSelection();
@@ -200,6 +210,30 @@ public sealed partial class MultiplayerPanelService
     private bool _selectionEndormie;
     private DateTime _fermeDepuisUtc = DateTime.MinValue;
     private DateTime _finDePartieUtc = DateTime.MinValue;
+
+    /// <summary>
+    /// L'INVITATION AU RETOUR D'UNE PARTIE (decisions du user du 30/10) : elle ne parait que 5 s apres le retour dans ES (la
+    /// partie finie, l'ecran de fin ferme), le temps que le joueur se retrouve ; et seule une invitation visible se prend ou
+    /// se refuse : une invitation qu'il ne voit pas ne prend jamais son appui long. Le site met son echeance en pause pendant
+    /// la partie et lui laisse le temps de decider a son retour.
+    /// </summary>
+    private static readonly TimeSpan InvitationApresUnePartie = TimeSpan.FromSeconds(5);
+
+    /// <summary>L'heure ou l'ecran de fin d'une partie MULTIPLAYER s'est ferme : le retour dans ES.</summary>
+    private DateTime _resultatFermeUtc = DateTime.MinValue;
+
+    /// <summary>L'invitation en attente est-elle a l'ecran ? Sous le verrou.</summary>
+    private bool InvitationVisible(DateTime maintenant)
+        => _invitation is not null && _mode != Mode.Resultat && !EnJeu()
+           && maintenant - (_finDePartieUtc > _resultatFermeUtc ? _finDePartieUtc : _resultatFermeUtc) >= InvitationApresUnePartie;
+
+    /// <summary>Les cartes se recomposent un peu apres : une invitation retenue y parait a son heure.</summary>
+    private void RafraichirLesCartesApres(TimeSpan delai)
+        => _ = Task.Run(async () =>
+        {
+            await Task.Delay(delai).ConfigureAwait(false);
+            MettreAJourLeBandeau();
+        });
 
     private void EndormirLaSelection()
     {
@@ -416,7 +450,7 @@ public sealed partial class MultiplayerPanelService
     /// <summary>Une invitation attend sa reponse : l'appui long la prend avant tout panneau.</summary>
     public bool InvitationEnAttente
     {
-        get { lock (_verrou) return _invitation is not null; }
+        get { lock (_verrou) return InvitationVisible(DateTime.UtcNow); }
     }
 
     // ── le panneau ─────────────────────────────────────────────────────────────────────────────
@@ -571,6 +605,13 @@ public sealed partial class MultiplayerPanelService
         OublierLeLancement();
         lock (_verrou)
         {
+            if (_mode == Mode.Resultat)
+            {
+                // Le retour dans ES : une invitation qui attend parait dans 5 s (30/10).
+                _resultatFermeUtc = DateTime.UtcNow;
+                RafraichirLesCartesApres(InvitationApresUnePartie + TimeSpan.FromMilliseconds(200));
+            }
+
             _modele.Fermer();
             _mode = Mode.Ferme;
             _fermeDepuisUtc = DateTime.UtcNow;
@@ -886,7 +927,7 @@ public sealed partial class MultiplayerPanelService
                 return;
             }
 
-            if (maintenu && _invitation is not null)
+            if (maintenu && InvitationVisible(DateTime.UtcNow))
             {
                 // Panneau ouvert, une invitation attend (sa carte est en haut a droite) : l'appui long la prend.
                 _ = AccepterInvitationAsync();
@@ -922,7 +963,7 @@ public sealed partial class MultiplayerPanelService
 
             var maintenu = Maintenu(_annulerDepuis);
             _annulerDepuis = null;
-            if (!maintenu && _invitation is not null)
+            if (!maintenu && InvitationVisible(DateTime.UtcNow))
             {
                 RefuserInvitation();
                 return;
@@ -1253,7 +1294,7 @@ public sealed partial class MultiplayerPanelService
                         Alerte: true));
                 }
 
-                if (_invitation is { } invitation)
+                if (_invitation is { } invitation && InvitationVisible(DateTime.UtcNow))
                 {
                     cartes.Add(new MultiplayerToastOverlay.Carte(
                         T("multiplayer.invitation.title"),

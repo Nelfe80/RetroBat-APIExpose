@@ -94,6 +94,9 @@ public sealed class MultiplayerSessionService : BackgroundService
     /// </summary>
     public Func<bool>? DansLaCollection { get; set; }
 
+    /// <summary>Le joueur est en partie (ou devant son ecran de fin) : le site met l'echeance de ses invitations en pause (30/10).</summary>
+    public Func<bool>? EnPartie { get; set; }
+
     private bool Active => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: true };
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -332,7 +335,8 @@ public sealed class MultiplayerSessionService : BackgroundService
         {
             var appui = _appui;
             _appui = false;
-            var reponse = await _client.SonderAsync(appui, PanneauOuvert, _relais?.MeilleurTempsMs, ct, DansLaCollection?.Invoke() == true).ConfigureAwait(false);
+            var reponse = await _client.SonderAsync(appui, PanneauOuvert, _relais?.MeilleurTempsMs, ct, DansLaCollection?.Invoke() == true,
+                EnPartie?.Invoke()).ConfigureAwait(false);
             if (reponse is null || !reponse.Ok)
             {
                 // L'appui n'est pas perdu : il partira au sondage suivant.
