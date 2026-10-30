@@ -106,6 +106,57 @@ public class MultiplayerClassementTests
         Assert.Equal("2:1 1:2", Dire(rangs));
     }
 
+    /// <summary>Bomber Man World (livraison du 29/10) : compteurs BCD, premier a 3, fin au GAME OVER (0x11328 = 2), sans garde.</summary>
+    private static readonly MultiplayerRankingEnd BomberManWorld = new()
+    {
+        Rule = MultiplayerRankingEnd.Manches, FirstTo = 3, SettleMs = 1000,
+        Over = new() { CoreRam = "0x11328", Value = 2 },
+        Seats =
+        [
+            new() { Seat = 1, CoreRam = "0x113B5", Bcd = true }, new() { Seat = 2, CoreRam = "0x113C5", Bcd = true },
+            new() { Seat = 3, CoreRam = "0x113D5", Bcd = true }, new() { Seat = 4, CoreRam = "0x113E5", Bcd = true },
+        ],
+    };
+
+    [Fact]
+    public void Manches_un_humain_elimine_garde_ses_victoires()
+    {
+        // Mesure de la livraison (v1.1 §7, n° 29) : P1, elimine avec une victoire, passe au tableau des meilleurs et son
+        // compteur retombe a 0 pendant que P2 joue encore. Au GAME OVER, chacun a une victoire : match nul, pas une defaite.
+        var rangs = Rejouer(new MultiplayerClassementEnCours(BomberManWorld, [1, 2]),
+            (R(null, 0, V(1, 0), V(2, 0), V(3, 0), V(4, 0)), 2),
+            (R(null, 0, V(1, 1), V(2, 0), V(3, 0), V(4, 0)), 6),
+            (R(null, 0, V(1, 1), V(2, 1), V(3, 0), V(4, 0)), 6),
+            (R(null, 0, V(1, 0), V(2, 1), V(3, 0), V(4, 0)), 6),
+            (R(null, 2, V(1, 0), V(2, 1), V(3, 0), V(4, 0)), 6));
+        Assert.Equal("1:1 2:1", Dire(rangs));
+        Assert.Equal(MultiplayerResultats.MatchNul, MultiplayerIssue.DesRangs(rangs!).Gagnante);
+    }
+
+    [Fact]
+    public void Manches_une_valeur_lue_au_vol_ne_devient_pas_la_plus_haute()
+    {
+        var rangs = Rejouer(new MultiplayerClassementEnCours(BomberManWorld, [1, 2]),
+            (R(null, 0, V(1, 0), V(2, 0), V(3, 0), V(4, 0)), 2),
+            (R(null, 0, V(1, 2), V(2, 0), V(3, 0), V(4, 0)), 2),
+            (R(null, 0, V(1, 0), V(2, 1), V(3, 0), V(4, 0)), 6),
+            (R(null, 2, V(1, 0), V(2, 1), V(3, 0), V(4, 0)), 6));
+        Assert.Equal("2:1 1:2", Dire(rangs));
+    }
+
+    [Fact]
+    public void Manches_la_plus_haute_valeur_repart_de_zero_hors_de_la_garde()
+    {
+        // P1 a 4 K.O., puis un joueur ouvre le menu RULE : la rencontre repart, ses 4 K.O. d'avant ne comptent plus.
+        var rangs = Rejouer(new MultiplayerClassementEnCours(SonicBattle, [1, 2, 3]),
+            (R(0, null, V(1, 0), V(2, 0), V(3, 0), V(4, 0)), 2),
+            (R(0, null, V(1, 4), V(2, 0), V(3, 0), V(4, 0)), 6),
+            (R(1, null, V(1, 4), V(2, 0), V(3, 0), V(4, 0)), 4),
+            (R(0, null, V(1, 0), V(2, 0), V(3, 0), V(4, 0)), 6),
+            (R(0, null, V(1, 0), V(2, 5), V(3, 2), V(4, 0)), 6));
+        Assert.Equal("2:1 3:2 1:3", Dire(rangs));
+    }
+
     [Fact]
     public void Manches_un_compteur_a_FF_n_est_pas_une_place()
     {
@@ -140,6 +191,35 @@ public class MultiplayerClassementTests
             (R(null, null, V(1, 5), V(2, 0), V(3, 5)), 2),
             (R(null, null, V(1, 5), V(2, 0), V(3, 0)), 8));
         Assert.Equal("1:1 2:2 3:2", Dire(rangs));
+    }
+
+    /// <summary>Un combat fini au temps : P3 tombe, puis le temps s'ecoule avec P1 (30) et P2 (50) debout ; P4 est l'ordinateur.</summary>
+    private static readonly (MultiplayerReleve, int)[] FiniAuTemps =
+    [
+        (R(null, 0, V(1, 90), V(2, 90), V(3, 90), V(4, 90)), 2),
+        (R(null, 0, V(1, 60), V(2, 70), V(3, 0), V(4, 40)), 8),
+        (R(null, 1, V(1, 30), V(2, 50), V(3, 0), V(4, 40)), 8),
+    ];
+
+    [Fact]
+    public void Survie_au_temps_le_departage_classe_les_survivants_par_leur_vie()
+    {
+        // Sugoi Hebereke (v1.1 §7, n° 20) : la vie restante departage ceux qui sont encore debout au signal de fin.
+        var auTemps = Survie with { Over = new() { CoreRam = "0x20", Value = 1 } };
+        Assert.Equal("2:1 1:2 3:3", Dire(Rejouer(new MultiplayerClassementEnCours(auTemps with { TieBreak = new() }, [1, 2, 3]), FiniAuTemps)));
+        Assert.Equal("1:1 2:2 3:3", Dire(Rejouer(new MultiplayerClassementEnCours(auTemps with { TieBreak = new() { Better = "lower" } }, [1, 2, 3]), FiniAuTemps)));
+        // Sans departage, ils partagent leur rang, comme avant.
+        Assert.Equal("1:1 2:1 3:3", Dire(Rejouer(new MultiplayerClassementEnCours(auTemps, [1, 2, 3]), FiniAuTemps)));
+    }
+
+    [Fact]
+    public void Survie_au_temps_deux_vies_egales_partagent_leur_rang()
+    {
+        var fin = Survie with { Over = new() { CoreRam = "0x20", Value = 1 }, TieBreak = new() };
+        var rangs = Rejouer(new MultiplayerClassementEnCours(fin, [1, 2, 3]),
+            (R(null, 0, V(1, 90), V(2, 90), V(3, 90), V(4, 90)), 2),
+            (R(null, 1, V(1, 50), V(2, 50), V(3, 20), V(4, 0)), 8));
+        Assert.Equal("1:1 2:1 3:3", Dire(rangs));
     }
 
     [Fact]
@@ -442,6 +522,10 @@ public class MultiplayerClassementTests
     [InlineData("\"rule\": \"score_fige\", \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "n'a pas ce que la regle")]
     [InlineData("\"rule\": \"arrivee\", \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "arrivee sans drapeau")]
     [InlineData("\"rule\": \"survie\", \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\", \"camp\": 1 }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "camps incoherents")]
+    [InlineData("\"rule\": \"manches\", \"first_to\": 3, \"tie_break\": { \"better\": \"higher\" }, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "departage incoherent")]
+    [InlineData("\"rule\": \"survie\", \"tie_break\": { \"better\": \"most\" }, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "departage incoherent")]
+    [InlineData("\"rule\": \"survie\", \"tie_break\": { \"core_ram\": \"0x9\" }, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "departage incoherent")]
+    [InlineData("\"rule\": \"survie\", \"tie_break\": { }, \"seats\": [ { \"seat\": 1, \"dead\": { \"core_ram\": \"0x1\", \"value\": 1 } }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "departage incoherent")]
     [InlineData("\"rule\": \"survie\", \"memory\": \"ram\", \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "memoire « ram » inconnue")]
     public void Une_fin_a_plusieurs_douteuse_est_refusee(string classement, string raison)
     {
@@ -529,6 +613,25 @@ public class MultiplayerClassementTests
                 { "seat": 1, "finished": { "core_ram": "0x030045EC", "value": 10 } }, { "seat": 2, "finished": { "core_ram": "0x130045EC", "value": 10 } },
                 { "seat": 3, "finished": { "core_ram": "0x230045EC", "value": 10 } }, { "seat": 4, "finished": { "core_ram": "0x330045EC", "value": 10 } } ] } } ] }
         """;
+
+    [Fact]
+    public void La_livraison_de_Bomber_Man_World_est_un_jeu_classe()
+    {
+        var catalogue = Lire("""
+            { "schema_version": 1, "games": [
+              { "id": "arcade/bbmanw", "system": "arcade", "set": "bbmanw", "players": 4, "elo_type": "arene", "min_api": "1.9.129",
+                "ranking_end": { "rule": "manches", "first_to": 3, "over": { "core_ram": "0x11328", "value": 2 },
+                  "settle_ms": 1000, "min_humans": 2, "close_after_s": 5,
+                  "seats": [
+                    { "seat": 1, "core_ram": "0x113B5", "bytes": 1, "bcd": true, "order": "le" },
+                    { "seat": 2, "core_ram": "0x113C5", "bytes": 1, "bcd": true, "order": "le" },
+                    { "seat": 3, "core_ram": "0x113D5", "bytes": 1, "bcd": true, "order": "le" },
+                    { "seat": 4, "core_ram": "0x113E5", "bytes": 1, "bcd": true, "order": "le" } ] } } ] }
+            """);
+        Assert.Null(MultiplayerCatalogueStore.Valider(catalogue));
+        Assert.True(catalogue.Games[0].EstClasse);
+        Assert.False(catalogue.Games[0].RankingEnd!.ParLaCarteDuCoeur);
+    }
 
     [Fact]
     public void Les_livraisons_du_lot_B_sont_des_jeux_classes()

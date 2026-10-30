@@ -546,6 +546,58 @@ public class MultiplayerDepartPretTests : IDisposable
         Assert.Equal("choix « machine » : tenu sans la carte du coeur", MultiplayerCatalogueStore.ValiderLeDepart(jeu));
     }
 
+    /// <summary>Sonic Battle (catalogue du 30/10) : la regle K.O. et le nombre de K.O., tenus dans chaque console.</summary>
+    private static readonly IReadOnlyList<MultiplayerStartLock> ReglesDeSonicBattle =
+    [
+        new() { CoreRam = "0x03002600", Value = 0, AllConsoles = true },
+        new() { CoreRam = "0x03002601", Value = 0, AllConsoles = true },
+    ];
+
+    [Fact]
+    public void Les_verrous_du_depart_entrent_dans_la_table_apres_la_coupe_et_avant_les_choix_tenus()
+    {
+        var coupe = CoupeMarioKart with { LockCoreRam = "0x0202AB38" };
+        var jeu = QuatreConsoles with
+        {
+            Start = QuatreConsoles.Start! with { Locks = ReglesDeSonicBattle }, Choices = [BolideFZero with { Lock = true }], Rotation = coupe,
+        };
+        var instant = new DateTimeOffset(2026, 10, 24, 14, 30, 0, TimeSpan.Zero);
+        var table = MultiplayerDepartPret.EcrituresParCommande(jeu, Bolides(3, 1), maintenant: instant)
+            .Where(e => e.Decalage >= MultiplayerRotation.TableDesVerrous).ToList();
+        // A deux : la coupe (2 entrees), les deux verrous dans les deux consoles (4), puis les pilotes (4).
+        Assert.Equal(10 * 8, table.Count);
+        int[] Entree(int k) => table.Skip(k * 8).Take(8).Select(e => e.Valeur).ToArray();
+        Assert.Equal([0x00, 0x26, 0x00, 0x03, 0, 1, 0, 0], Entree(2));
+        Assert.Equal([0x00, 0x26, 0x00, 0x13, 0, 1, 0, 0], Entree(3));
+        Assert.Equal([0x01, 0x26, 0x00, 0x03, 0, 1, 0, 0], Entree(4));
+        Assert.Equal([0x01, 0x26, 0x00, 0x13, 0, 1, 0, 0], Entree(5));
+        Assert.Equal([0xA4, 0x31, 0x00, 0x03, 3, 1, 0, 0], Entree(6));
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(jeu));
+
+        // Sans choix ni coupe (Sonic Battle) : la table seule, un verrou par console.
+        var seuls = MultiplayerDepartPret.EcrituresParCommande(jeu with { Choices = [], Rotation = null }, Bolides(3, 1, 0, 2));
+        Assert.Equal(8 * 8, seuls.Count);
+        Assert.All(seuls, e => Assert.True(e.Carte));
+    }
+
+    [Fact]
+    public void Des_verrous_du_depart_douteux_refusent_le_jeu()
+    {
+        var jeu = QuatreConsoles with { Start = QuatreConsoles.Start! with { Locks = ReglesDeSonicBattle } };
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(jeu));
+        const string Refus = "verrous du depart incoherents (coeur mGBA Splitscreen, adresse de la console 1, octet, 16 entrees au plus)";
+        // Seul le coeur mGBA Splitscreen a une table de verrous.
+        Assert.Equal(Refus, MultiplayerCatalogueStore.ValiderLeDepart(jeu with { System = "snes" }));
+        Assert.Equal(Refus, MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Start = jeu.Start! with { Locks = [new() { CoreRam = "0x13002600" }] } }));
+        Assert.Equal(Refus, MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Start = jeu.Start! with { Locks = [new() { CoreRam = "0x03002600", Value = 256 }] } }));
+        // Cinq verrous dans quatre consoles : 20 entrees pour une table de 16.
+        var cinq = Enumerable.Range(0, 5).Select(i => new MultiplayerStartLock { CoreRam = "0x0300260" + i, AllConsoles = true }).ToList();
+        Assert.Equal(Refus, MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Start = jeu.Start! with { Locks = cinq } }));
+        // Ils valent pour tous les departs : un depart a trois qui en porterait serait lu a moitie.
+        Assert.Equal("verrous du depart ailleurs que sous start",
+            MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Starts = [Etat(3, 'b') with { Locks = ReglesDeSonicBattle }, Etat(4, 'c')] }));
+    }
+
     [Fact]
     public void Le_panneau_annonce_la_coupe_et_l_heure_de_la_suivante()
     {

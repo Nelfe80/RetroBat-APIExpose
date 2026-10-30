@@ -39,9 +39,12 @@ public sealed record MultiplayerCoeurLivre(string Systeme, string Nom, IReadOnly
 [SupportedOSPlatform("windows")]
 public sealed class MultiplayerCoeursService : BackgroundService
 {
+    /// <summary>Le seul coeur qui a une table de verrous (choix tenus, roulement, verrous du depart).</summary>
+    public const string MgbaSplitscreen = "mgba_splitscreen";
+
     public static readonly IReadOnlyList<MultiplayerCoeurLivre> Coeurs =
     [
-        new("gba", "mgba_splitscreen", ["mgba_splitscreen_libretro.dll"], "mgba_splitscreen_libretro.info",
+        new("gba", MgbaSplitscreen, ["mgba_splitscreen_libretro.dll"], "mgba_splitscreen_libretro.info",
             "le coeur libretro mgba_splitscreen (2 a 4 GBA reliees dans un seul coeur, pour le netplay de MULTIPLAYER), en "
             + "dernier : mgba reste le coeur des parties solo"),
         // NGP LINK (25/10) : deux copies du moteur Beetle NGP liees dans le meme fichier, chacune avec ses variables.

@@ -288,6 +288,20 @@ public sealed class MultiplayerDepartPret
             }
         }
 
+        // Les verrous du depart (v1.1 §10.3, Sonic Battle : le menu RULE), apres le roulement et avant les choix tenus.
+        foreach (var verrou in jeu.Start?.Locks ?? [])
+        {
+            if (verrou.Decalage is not { } adresse)
+            {
+                continue;
+            }
+
+            for (var console = 0; console < (verrou.AllConsoles ? joueurs : 1); console++)
+            {
+                verrous.Add(((uint) (adresse + console * 0x10000000L), verrou.Value));
+            }
+        }
+
         // LES CHOIX TENUS (27/10, Mario Kart : les joueurs changeaient de pilote par rapport au panneau) : apres le roulement,
         // tous ou aucun. Un joueur tenu et l'autre libre fausserait la rencontre ; sans la place (16 entrees : quatre joueurs
         // dans quatre consoles plus la coupe), le choix reste preselectionne, comme avant.

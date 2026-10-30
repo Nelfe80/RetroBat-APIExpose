@@ -48,9 +48,18 @@ public sealed class MultiplayerClassementEnCours
     private bool _signalRetombe;
     private bool _departVu;
 
+    /// <summary>Survie : la derniere valeur lue de chaque place, pour le departage des places debout au signal de fin.</summary>
+    private readonly Dictionary<int, long> _dernieresValeurs = [];
+
     /// <summary>Survie : l'instant ou chaque place est tombee. Arrivee : la position de chaque place a son arrivee.</summary>
     private readonly Dictionary<int, long> _eliminees = [];
     private readonly Dictionary<int, long> _arrivees = [];
+
+    /// <summary>
+    /// Manches : la plus haute valeur stable de chaque place depuis le depart (v1.1 §7, n° 29). Le compteur d'un humain
+    /// elimine peut retomber a 0 pendant que les autres jouent (Bomber Man World) : ses victoires restent acquises.
+    /// </summary>
+    private readonly Dictionary<int, long> _plusHautes = [];
 
     /// <summary>Score fige : le dernier score stable de chaque place en vie, et celui retenu a sa premiere mort.</summary>
     private readonly Dictionary<int, long> _derniersScores = [];
@@ -81,6 +90,7 @@ public sealed class MultiplayerClassementEnCours
             if (lue != garde.Value)
             {
                 _suivis.Clear();
+                _plusHautes.Clear();
                 return null;
             }
         }
@@ -104,7 +114,10 @@ public sealed class MultiplayerClassementEnCours
 
     // ── Les quatre regles ──────────────────────────────────────────────────
 
-    /// <summary>Premier a N manches (une place humaine ou non), ou le signal de fin : les humains par leur compteur.</summary>
+    /// <summary>
+    /// Premier a N manches (une place humaine ou non), ou le signal de fin : les humains par la plus haute valeur stable de
+    /// leur compteur depuis le depart.
+    /// </summary>
     private IReadOnlyList<MultiplayerRang>? Manches(MultiplayerReleve releve, long ms, bool signalTenu)
     {
         var tenues = new Dictionary<int, long?>();
@@ -125,25 +138,33 @@ public sealed class MultiplayerClassementEnCours
             return null;
         }
 
-        var auSeuil = _fin.FirstTo is { } premierA && tenues.Values.Any(v => v >= premierA);
+        foreach (var (place, tenue) in tenues)
+        {
+            if (tenue is { } v && (!_plusHautes.TryGetValue(place, out var haute) || v > haute))
+            {
+                _plusHautes[place] = v;
+            }
+        }
+
+        var auSeuil = _fin.FirstTo is { } premierA && _plusHautes.Values.Any(v => v >= premierA);
         if (!auSeuil && !signalTenu)
         {
             return null;
         }
 
         // Chaque humain doit avoir une valeur retenue : sinon le releve suivant tranchera.
-        if (_humains.Any(h => tenues.GetValueOrDefault(h) is null))
+        if (_humains.Any(h => !_plusHautes.ContainsKey(h)))
         {
             return null;
         }
 
-        return Classer(seat => tenues.GetValueOrDefault(seat) is { } v ? (0, -v) : (1, 0));
+        return Classer(seat => _plusHautes.TryGetValue(seat, out var v) ? (0, -v) : (1, 0));
     }
 
     /// <summary>
     /// Le dernier en vie : une place tombe quand sa valeur reste a <c>out_at</c> ou en dessous (ou quand sa mort prend sa
     /// valeur). La rencontre est acquise des qu'il ne reste qu'un humain (ou un camp d'humains) debout, l'ordinateur en jeu
-    /// ou non ; le signal de fin classe ceux qui restent ensemble.
+    /// ou non ; le signal de fin classe ceux qui restent ensemble, ou par leur valeur avec un departage (v1.1 §7, n° 20).
     /// </summary>
     private IReadOnlyList<MultiplayerRang>? Survie(MultiplayerReleve releve, long ms, bool signalTenu)
     {
@@ -159,6 +180,12 @@ public sealed class MultiplayerClassementEnCours
             if (tombee is not true && place.CoreRam.Length > 0 && lu?.Valeur is { } valeur)
             {
                 tombee = valeur <= _fin.OutAt;
+            }
+
+            if (place.CoreRam.Length > 0 && lu?.Valeur is { } derniere)
+            {
+                _dernieresValeurs[place.Seat] = derniere;
+                Tenue("v" + place.Seat, derniere, ms);
             }
 
             if (tombee is false)
@@ -186,8 +213,24 @@ public sealed class MultiplayerClassementEnCours
             return null;
         }
 
-        return Classer(seat => _eliminees.TryGetValue(seat, out var t) ? (1, -t) : (0, 0), egales: (a, b) =>
-            a.Item1 == b.Item1 && (a.Item1 == 0 || Math.Abs(a.Item2 - b.Item2) <= _fin.SettleMs));
+        // Debout : a egalite, sauf departage par la valeur tenue (la vie figee au temps), la derniere lue a defaut.
+        var departage = _fin.TieBreak;
+        return Classer(seat =>
+        {
+            if (_eliminees.TryGetValue(seat, out var t))
+            {
+                return (1, -t);
+            }
+
+            if (departage is null)
+            {
+                return (0, 0);
+            }
+
+            var valeur = Tenue("v" + seat, null, ms) ?? (_dernieresValeurs.TryGetValue(seat, out var d) ? d : (long?)null);
+            return valeur is { } v ? (0, departage.PlusBasDAbord ? v : -v) : (0, long.MaxValue);
+        }, egales: (a, b) =>
+            a.Item1 == b.Item1 && (a.Item1 == 0 ? departage is null || a.Item2 == b.Item2 : Math.Abs(a.Item2 - b.Item2) <= _fin.SettleMs));
     }
 
     /// <summary>

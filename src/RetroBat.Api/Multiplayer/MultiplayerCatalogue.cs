@@ -461,6 +461,31 @@ public sealed record MultiplayerStart
     /// <summary>Le delai d'ecriture du catalogue, en temps (60 images par seconde), ou null.</summary>
     [JsonIgnore]
     public TimeSpan? DelaiDesChoix => WriteAfterFrames is { } images ? TimeSpan.FromMilliseconds(images * 1000.0 / 60) : null;
+
+    /// <summary>
+    /// LES VERROUS DU DEPART (CDC Classements v1.1 §10.3, 30/10) : des octets que le coeur mGBA Splitscreen de NelfePlay tient
+    /// toute la partie, depuis sa table de verrous (<see cref="MultiplayerRotation.TableDesVerrous"/>), comme un choix tenu.
+    /// Sonic Battle : a l'ecran des personnages, R ouvre le menu RULE, ou un joueur passerait en Time ou changerait le nombre
+    /// de K.O. Seulement sous <c>start</c> : ils valent pour tous les departs du jeu.
+    /// </summary>
+    [JsonPropertyName("locks")]
+    public IReadOnlyList<MultiplayerStartLock>? Locks { get; init; }
+}
+
+/// <summary>Un octet tenu toute la partie : son adresse dans la carte du coeur (console 1), sa valeur, dans chaque console ou non.</summary>
+public sealed record MultiplayerStartLock
+{
+    [JsonPropertyName("core_ram")]
+    public string CoreRam { get; init; } = string.Empty;
+
+    [JsonPropertyName("value")]
+    public int Value { get; init; }
+
+    [JsonPropertyName("all_consoles")]
+    public bool AllConsoles { get; init; }
+
+    [JsonIgnore]
+    public long? Decalage => CoreRam.Length == 0 ? null : new MultiplayerChoiceSeat { CoreRam = CoreRam }.Decalage;
 }
 
 /// <summary>
@@ -710,6 +735,20 @@ public sealed record MultiplayerMatchEnd
 /// une API d'avant l'ignore, et le jeu reste au niveau Classique chez elle ; un jeu qui la porte porte aussi son
 /// <c>min_api</c>.
 /// </summary>
+/// <summary>Le departage d'une fin a plusieurs : par la valeur de chaque place, la plus haute ou la plus basse d'abord.</summary>
+public sealed record MultiplayerTieBreak
+{
+    [JsonPropertyName("better")]
+    public string Better { get; init; } = "higher";
+
+    /// <summary>Une adresse a part pour le departage : pas encore lue (la valeur de la place suffit a Sugoi Hebereke).</summary>
+    [JsonPropertyName("core_ram")]
+    public string? CoreRam { get; init; }
+
+    [JsonIgnore]
+    public bool PlusBasDAbord => Better == "lower";
+}
+
 public sealed record MultiplayerRankingEnd
 {
     public const string Manches = "manches";
@@ -776,6 +815,13 @@ public sealed record MultiplayerRankingEnd
     /// </summary>
     [JsonPropertyName("position")]
     public string? Position { get; init; }
+
+    /// <summary>
+    /// <c>survie</c> : le departage des places encore debout au signal de fin (CDC Classements v1.1 §7, n° 20 ; Sugoi
+    /// Hebereke, un combat fini au temps) par la valeur de chaque place, sa vie restante. Absent : elles partagent leur rang.
+    /// </summary>
+    [JsonPropertyName("tie_break")]
+    public MultiplayerTieBreak? TieBreak { get; init; }
 
     [JsonIgnore]
     public bool ParOrdreDArrivee => string.Equals(Position, OrdreDArrivee, StringComparison.Ordinal)
@@ -1587,6 +1633,13 @@ public sealed class MultiplayerCatalogueStore
             return "classement : camps incoherents (chaque place en a un, deux camps au moins)";
         }
 
+        // Le departage lit la valeur de chaque place : seulement en survie, chaque place avec sa valeur.
+        if (fin.TieBreak is { } departage && (fin.Rule != MultiplayerRankingEnd.Survie || departage.Better is not ("higher" or "lower")
+                || !string.IsNullOrEmpty(departage.CoreRam) || fin.Seats.Any(s => s.CoreRam.Length == 0)))
+        {
+            return "classement : departage incoherent (survie, « higher » ou « lower », par la valeur de chaque place)";
+        }
+
         return null;
     }
 
@@ -1726,6 +1779,25 @@ public sealed class MultiplayerCatalogueStore
                 if (depart.Content is { } md5 && !(jeu.Content?.Md5 ?? []).Contains(md5, StringComparer.OrdinalIgnoreCase))
                 {
                     return "etat fait sur un contenu hors du catalogue";
+                }
+
+                if (depart.Locks is { Count: > 0 } && !ReferenceEquals(depart, jeu.Start))
+                {
+                    return "verrous du depart ailleurs que sous start";
+                }
+            }
+
+            if (jeu.Start.Locks is { Count: > 0 } verrous)
+            {
+                // La table de verrous n'existe que dans le coeur mGBA Splitscreen de NelfePlay ; les adresses sont celles de la
+                // console 1, et tout tient dans la table avec le roulement (les choix tenus passent apres, tous ou aucun).
+                var consoles = (MultiplayerStartLock verrou) => verrou.AllConsoles ? jeu.Players : 1;
+                var duRoulement = jeu.Rotation is { DecalageDuVerrou: not null } coupe ? (coupe.AllConsoles ? jeu.Players : 1) : 0;
+                if (!MultiplayerCoeursService.Coeurs.Any(coeur => coeur.Nom == MultiplayerCoeursService.MgbaSplitscreen && coeur.SesSystemes.Contains(jeu.System))
+                    || verrous.Any(v => v.Decalage is not (>= 0 and < 0x10000000) || v.Value is < 0 or > 255)
+                    || verrous.Sum(consoles) + duRoulement > MultiplayerRotation.VerrousMax)
+                {
+                    return "verrous du depart incoherents (coeur mGBA Splitscreen, adresse de la console 1, octet, 16 entrees au plus)";
                 }
             }
 
