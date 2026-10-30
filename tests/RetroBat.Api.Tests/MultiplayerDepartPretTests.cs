@@ -598,6 +598,105 @@ public class MultiplayerDepartPretTests : IDisposable
             MultiplayerCatalogueStore.ValiderLeDepart(jeu with { Starts = [Etat(3, 'b') with { Locks = ReglesDeSonicBattle }, Etat(4, 'c')] }));
     }
 
+    /// <summary>Marvel vs. Capcom (livraison du 29/10) : deux personnages par place, distincts, la table 0x40B0.</summary>
+    private static readonly MultiplayerChoice EquipeMvc = new()
+    {
+        Key = "character", Picks = 2, Default = 18, Defaults = [18, 32],
+        Values = [new() { Value = 22, Name = "CHUN-LI" }, new() { Value = 18, Name = "RYU" }, new() { Value = 26, Name = "ZANGIEF" }, new() { Value = 32, Name = "MEGA MAN" }],
+        Seats =
+        [
+            new() { Seat = 1, CoreRam = "0x40B0", CoreRams = ["0x40B0", "0x40B2"] },
+            new() { Seat = 2, CoreRam = "0x40B4", CoreRams = ["0x40B4", "0x40B6"] },
+        ],
+    };
+
+    private static readonly MultiplayerGame Mvc = new()
+    {
+        Id = "arcade/mvsc", System = "arcade", Players = 2, Level = MultiplayerLevels.NelfePlay, Start = Etat(null), Choices = [EquipeMvc],
+    };
+
+    [Fact]
+    public void Deux_personnages_par_place_s_ecrivent_dans_l_ordre_des_choix()
+    {
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(Mvc));
+        var choix = new Dictionary<int, IReadOnlyDictionary<string, int>?>
+        {
+            [1] = new Dictionary<string, int> { ["character"] = 26, ["character#2"] = 22 },
+            // P2 n'a donne que son premier : le second prend son defaut.
+            [2] = new Dictionary<string, int> { ["character"] = 22 },
+        };
+        var ecritures = MultiplayerDepartPret.Ecritures(Mvc, choix);
+        Assert.Equal([(0x40B0L, 26), (0x40B2L, 22), (0x40B4L, 22), (0x40B6L, 32)], ecritures);
+    }
+
+    [Fact]
+    public void Une_equipe_n_a_jamais_deux_fois_le_meme_personnage()
+    {
+        // Un doublon ecrit, le jeu le garde sans le corriger (livraison) : le second passe a son defaut, ou a la premiere valeur libre.
+        Assert.Equal([26, 32], EquipeMvc.Equipe(rang => 26));
+        Assert.Equal([32, 22], EquipeMvc.Equipe(rang => 32));
+        Assert.Equal([18, 32], EquipeMvc.Equipe(rang => 99));
+        Assert.Equal("character#2", EquipeMvc.CleDu(2));
+        Assert.Equal("character", EquipeMvc.CleDu(1));
+    }
+
+    [Fact]
+    public void L_equipe_ordonnee_ecrit_aussi_son_ordre_de_passage()
+    {
+        // KOF '98 (v1.1 §8.2) : l'equipe aux octets du choix, la permutation identite aux octets de l'ordre de passage.
+        var kof = Mvc with
+        {
+            Id = "arcade/kof98",
+            Choices =
+            [
+                new()
+                {
+                    Key = "fighter", Picks = 3, Ordered = true, Default = 0, Defaults = [0, 2, 4],
+                    Values = Enumerable.Range(0, 10).Select(v => new MultiplayerChoiceValue { Value = v, Name = "F" + v }).ToList(),
+                    Seats =
+                    [
+                        new() { Seat = 1, CoreRam = "0xA84F", CoreRams = ["0xA84F", "0xA84E", "0xA851"], OrderCoreRams = ["0xA855", "0xA854", "0xA857"] },
+                        new() { Seat = 2, CoreRam = "0xA85E", CoreRams = ["0xA85E", "0xA861", "0xA860"], OrderCoreRams = ["0xA864", "0xA867", "0xA866"] },
+                    ],
+                },
+            ],
+        };
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(kof));
+        var ecritures = MultiplayerDepartPret.Ecritures(kof, new Dictionary<int, IReadOnlyDictionary<string, int>?>
+        {
+            [1] = new Dictionary<string, int> { ["fighter"] = 2, ["fighter#2"] = 4, ["fighter#3"] = 0 },
+            [2] = new Dictionary<string, int> { ["fighter"] = 8, ["fighter#2"] = 7, ["fighter#3"] = 6 },
+        });
+        Assert.Equal(
+            [(0xA84FL, 2), (0xA84EL, 4), (0xA851L, 0), (0xA855L, 0), (0xA854L, 1), (0xA857L, 2),
+             (0xA85EL, 8), (0xA861L, 7), (0xA860L, 6), (0xA864L, 0), (0xA867L, 1), (0xA866L, 2)],
+            ecritures);
+    }
+
+    [Fact]
+    public void Plusieurs_choix_par_place_douteux_refusent_le_jeu()
+    {
+        const string Refus = "choix « character » : plusieurs choix par place incoherents";
+        MultiplayerGame Avec(MultiplayerChoice choix) => Mvc with { Choices = [choix] };
+        Assert.Equal(Refus, MultiplayerCatalogueStore.ValiderLeDepart(Avec(EquipeMvc with { Defaults = [18] })));
+        Assert.Equal(Refus, MultiplayerCatalogueStore.ValiderLeDepart(Avec(EquipeMvc with { Defaults = [18, 18] })));
+        Assert.Equal(Refus, MultiplayerCatalogueStore.ValiderLeDepart(Avec(EquipeMvc with { Defaults = [32, 18] })));
+        Assert.Equal(Refus, MultiplayerCatalogueStore.ValiderLeDepart(Avec(EquipeMvc with { Picks = 5 })));
+        Assert.Equal(Refus, MultiplayerCatalogueStore.ValiderLeDepart(Avec(EquipeMvc with { Distinct = true })));
+        Assert.Equal(Refus, MultiplayerCatalogueStore.ValiderLeDepart(Avec(EquipeMvc with { Ordered = true })));
+        // Le premier choix garde core_ram : une API d'avant n'ecrit que lui.
+        Assert.Equal(Refus, MultiplayerCatalogueStore.ValiderLeDepart(Avec(EquipeMvc with
+        {
+            Seats = [new() { Seat = 1, CoreRam = "0x40B2", CoreRams = ["0x40B0", "0x40B2"] }, new() { Seat = 2, CoreRam = "0x40B4", CoreRams = ["0x40B4", "0x40B6"] }],
+        })));
+        Assert.Equal(Refus, MultiplayerCatalogueStore.ValiderLeDepart(Avec(EquipeMvc with
+        {
+            Seats = [new() { Seat = 1, CoreRam = "0x40B0", CoreRams = ["0x40B0"] }, new() { Seat = 2, CoreRam = "0x40B4", CoreRams = ["0x40B4", "0x40B6"] }],
+        })));
+        // Une adresse par choix sans picks : refuse plutot qu'ignore.
+        Assert.Equal(Refus, MultiplayerCatalogueStore.ValiderLeDepart(Avec(EquipeMvc with { Picks = 1, Defaults = null })));
+    }
+
     [Fact]
     public void Le_panneau_annonce_la_coupe_et_l_heure_de_la_suivante()
     {

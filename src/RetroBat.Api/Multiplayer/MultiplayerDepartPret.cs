@@ -243,6 +243,41 @@ public sealed class MultiplayerDepartPret
         var choixTenus = new List<(uint Cible, int Valeur)>();
         foreach (var choix in jeu.Choices ?? [])
         {
+            if (choix.Picks > 1)
+            {
+                // Plusieurs choix par place (v1.0 §8.2) : l'equipe de chaque place dans l'ordre des choix, puis, pour un ordre
+                // de passage (KOF '98), le rang de chaque combattant : le premier choisi combat le premier.
+                foreach (var (place, voulus) in choixParPlace)
+                {
+                    if (choix.SiegePour(place, joueurs) is not { } siege)
+                    {
+                        continue;
+                    }
+
+                    var equipe = choix.Equipe(rang => voulus is not null && voulus.TryGetValue(choix.CleDu(rang), out var v) ? v : null);
+                    for (var rang = 0; rang < equipe.Count && rang < siege.Decalages.Count; rang++)
+                    {
+                        if (siege.Decalages[rang] is { } adresse)
+                        {
+                            ecritures.Add((adresse, equipe[rang], choix.ParLaCarteDuCoeur));
+                        }
+                    }
+
+                    if (choix.Ordered)
+                    {
+                        for (var rang = 0; rang < siege.DecalagesDeLOrdre.Count; rang++)
+                        {
+                            if (siege.DecalagesDeLOrdre[rang] is { } ordre)
+                            {
+                                ecritures.Add((ordre, rang, choix.ParLaCarteDuCoeur));
+                            }
+                        }
+                    }
+                }
+
+                continue;
+            }
+
             // Un choix distinct deja pris par une place d'avant passe a la suivante libre (Metal Slug 3).
             var retenues = choix.Departager(choixParPlace.Select(paire =>
                 (paire.Key, paire.Value is not null && paire.Value.TryGetValue(choix.Key, out var voulu) ? voulu : choix.Default)));

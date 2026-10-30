@@ -39,7 +39,9 @@ public sealed partial class LeaderboardOverlayService
         bool Gagnant = false,
         IReadOnlyList<StatDuJoueur>? Stats = null,
         bool ChoixModifiable = false,
-        bool Abandon = false);
+        bool Abandon = false,
+        IReadOnlyList<string?>? Portraits = null,
+        int RangCourant = -1);
 
     /// <summary>Une statistique d'un joueur au resultat : son libelle et sa valeur (« COUPS », « 12 »).</summary>
     public sealed record StatDuJoueur(string Libelle, string Valeur);
@@ -539,7 +541,11 @@ public sealed partial class LeaderboardOverlayService
                 var cote = hauteur * 0.7f;
                 var avatar = new RectangleF(gaucheAvatar, y + (hauteur - cote) / 2f, cote, cote);
                 var alpha = j.Present ? 255 : 130;
-                if (Image(j.Portrait) is { } portrait)
+                if (j.Portraits is { Count: > 1 })
+                {
+                    DessinerLEquipe(g, j, s, avatar, choisie, alpha);
+                }
+                else if (Image(j.Portrait) is { } portrait)
                 {
                     DessinerUnPortrait(g, portrait, avatar, s, choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TitleColor, alpha), Math.Max(1.5f, _hauteurEcran / 700f));
                 }
@@ -1108,6 +1114,11 @@ public sealed partial class LeaderboardOverlayService
         /// <summary>Le carre d'un joueur : le portrait du personnage, sinon la tete de sa planche, sinon son initiale.</summary>
         private void DessinerLeVisage(Graphics g, JoueurMultiplayer j, EsMenuStyle s, Font gras, RectangleF carre, bool choisie, int alpha)
         {
+            if (DessinerLEquipe(g, j, s, carre, choisie, alpha))
+            {
+                return;
+            }
+
             if (Image(j.Portrait) is { } portrait)
             {
                 DessinerUnPortrait(g, portrait, carre, s, choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TitleColor, alpha), Math.Max(1.5f, _hauteurEcran / 700f));
@@ -1247,6 +1258,44 @@ public sealed partial class LeaderboardOverlayService
         }
 
         /// <summary>Un portrait carre, en gros pixels, dans un cadre arrondi.</summary>
+        /// <summary>
+        /// PLUSIEURS CHOIX PAR PLACE (v1.0 §8.2) : l'equipe dans le carre du joueur, un portrait par choix, en demi-taille : en
+        /// diagonale a deux, en triangle a trois, en grille a quatre. Celui que ▲▼ change porte le cadre du curseur. Faux sans
+        /// equipe : le carre se dessine comme avant.
+        /// </summary>
+        private bool DessinerLEquipe(Graphics g, JoueurMultiplayer j, EsMenuStyle s, RectangleF carre, bool choisie, int alpha)
+        {
+            if (j.Portraits is not { Count: > 1 } portraits)
+            {
+                return false;
+            }
+
+            (float X, float Y)[] cases = portraits.Count switch
+            {
+                2 => [(0f, 0f), (1f, 1f)],
+                3 => [(0f, 0f), (1f, 0f), (0.5f, 1f)],
+                _ => [(0f, 0f), (1f, 0f), (0f, 1f), (1f, 1f)],
+            };
+            var cote = carre.Width / 2f;
+            var epaisseur = Math.Max(1.5f, _hauteurEcran / 700f);
+            for (var i = 0; i < portraits.Count && i < cases.Length; i++)
+            {
+                var zone = new RectangleF(carre.X + cases[i].X * cote, carre.Y + cases[i].Y * cote, cote, cote);
+                var courant = i == j.RangCourant;
+                var cadre = courant ? Teinte(s.SelectorColor) : choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TitleColor, alpha);
+                if (Image(portraits[i]) is { } portrait)
+                {
+                    DessinerUnPortrait(g, portrait, zone, s, cadre, courant ? epaisseur * 2f : epaisseur);
+                }
+                else
+                {
+                    RemplirLeFondDuVisage(g, zone, cote * 0.22f, j);
+                }
+            }
+
+            return true;
+        }
+
         private void DessinerUnPortrait(Graphics g, Image portrait, RectangleF carre, EsMenuStyle s, Color cadre, float epaisseur)
         {
             var etat = g.Save();

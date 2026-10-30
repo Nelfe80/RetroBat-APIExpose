@@ -53,6 +53,28 @@ public class MultiplayerApercusTests
         {
             ["np-2-attente"] = socle,
             ["np-2-plein"] = socle with { Compte = "2/2", DecompteFinUtc = DateTime.UtcNow.AddSeconds(4), Lignes = [moi, lui] },
+            // Plusieurs choix par place (v1.0 §8.2) : deux personnages par joueur, le second en cours de choix.
+            ["np-2-equipes"] = socle with
+            {
+                Compte = "2/2", SelectionCourante = 1,
+                Aides = [new("dpad_leftright", "TAB"), new("dpad_updown", "CHARACTER"), new("button_a", "NEXT"), new("button_b", "BACK")],
+                Lignes =
+                [
+                    moi with { Personnage = "RYU / MEGA MAN", Portraits = [Portrait(307536), Portrait(307540)], RangCourant = 1 },
+                    lui with { Personnage = "CHUN-LI / ZANGIEF", Portraits = [Portrait(307541), Portrait(307542)] },
+                ],
+            },
+            ["np-4-equipes"] = socle with
+            {
+                Compte = "4/4", Disposition = L.DispositionDesJoueurs.Grille,
+                Lignes =
+                [
+                    moi with { Personnage = "RYU / KEN / GUILE", Portraits = [Portrait(307536), Portrait(307540), Portrait(307539)], RangCourant = 2 },
+                    lui with { Personnage = "CHUN-LI / ZANGIEF", Portraits = [Portrait(307541), Portrait(307542)] },
+                    lui with { Nom = "Arcadia", Place = 3, Personnage = "BLANKA / VEGA", Portraits = [Portrait(307538), Portrait(307547)] },
+                    lui with { Nom = "Pixel", Place = 4, Personnage = "SAGAT / BALROG", Portraits = [Portrait(307545), Portrait(307546)] },
+                ],
+            },
             ["np-2-resultat"] = socle with
             {
                 Onglets = ["VICTORY"], OngletCourant = 0, NousAvonsLaMain = false, Compte = "", Info = "PLAY TIME 1:01",

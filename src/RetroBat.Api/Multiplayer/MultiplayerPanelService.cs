@@ -874,11 +874,7 @@ public sealed partial class MultiplayerPanelService
 
             // NIVEAU NELFEPLAY : ▲▼ change le personnage dans WAITING FOR PLAYERS (V24-04) et dans la gameroom d'amis (28/10),
             // quand nous avons la main.
-            if (sens is "up" or "down"
-                && _modele.Etat == MultiplayerPanelModel.Foyer.Panneau
-                && _modele.OngletCourant is MultiplayerPanelModel.Onglet.WaitingForPlayers or MultiplayerPanelModel.Onglet.WaitingForFriends
-                && _jeu is { ChoixOuverts: true, Game: var jeuNelfePlay }
-                && RoomDuJeu() is { State: "waiting" or "countdown" } salle)
+            if (sens is "up" or "down" && AuChoixDuPersonnage() is ({ } salle, { } jeuNelfePlay))
             {
                 _ = ChangerDePersonnageAsync(salle, jeuNelfePlay, sens == "down" ? 1 : -1);
                 return;
@@ -904,6 +900,21 @@ public sealed partial class MultiplayerPanelService
 
         Appliquer(effet);
     }
+
+    /// <summary>Le joueur est-il au choix de son personnage (onglet d'attente, la main, gameroom ouverte) ? La gameroom et le jeu.</summary>
+    private (MultiplayerRoom Salle, MultiplayerGame Jeu)? AuChoixDuPersonnage()
+        => _modele.Etat == MultiplayerPanelModel.Foyer.Panneau
+           && _modele.OngletCourant is MultiplayerPanelModel.Onglet.WaitingForPlayers or MultiplayerPanelModel.Onglet.WaitingForFriends
+           && _jeu is { ChoixOuverts: true, Game: var jeu }
+           && RoomDuJeu() is { State: "waiting" or "countdown" } salle
+            ? (salle, jeu)
+            : null;
+
+    /// <summary>Plusieurs choix par place (v1.0 §8.2) : celui que ▲▼ change, de 1 a <see cref="MultiplayerChoice.Picks"/>, par jeu.</summary>
+    private (string Jeu, int Rang) _choixCourant = (string.Empty, 1);
+
+    private int RangDuChoix(MultiplayerGame jeu)
+        => _choixCourant.Jeu == jeu.Id && jeu.Choices is [{ Picks: > 1 } premier, ..] ? Math.Clamp(_choixCourant.Rang, 1, premier.Picks) : 1;
 
     /// <summary>Le bouton « valider » : relache, il agit sur la ligne ; au resultat, maintenu, il relance le jeu.</summary>
     public void Valider(bool appuye)
@@ -931,6 +942,14 @@ public sealed partial class MultiplayerPanelService
             {
                 // Panneau ouvert, une invitation attend (sa carte est en haut a droite) : l'appui long la prend.
                 _ = AccepterInvitationAsync();
+                return;
+            }
+
+            // Plusieurs choix par place (v1.0 §8.2) : A passe au choix suivant de l'equipe, ▲▼ change celui-la.
+            if (!maintenu && _mode == Mode.Panneau && AuChoixDuPersonnage() is (_, { Choices: [{ Picks: > 1 } aPlusieurs, ..] } jeuDeLEquipe))
+            {
+                _choixCourant = (jeuDeLEquipe.Id, RangDuChoix(jeuDeLEquipe) % aPlusieurs.Picks + 1);
+                Rafraichir();
                 return;
             }
 
@@ -1542,7 +1561,8 @@ public sealed partial class MultiplayerPanelService
         }
 
         var premier = choix[0];
-        var mien = _session.MesChoix(jeu).GetValueOrDefault(premier.Key, premier.Default);
+        var rang = RangDuChoix(jeu);
+        var mien = _session.MesChoix(jeu).GetValueOrDefault(premier.CleDu(rang), premier.DefautDu(rang));
         // Les personnages de MA place (Title Fight : chaque ecran a ses quatre boxeurs) ; avant d'etre assis, ceux du choix.
         var valeurs = premier.ValeursDe(RoomDuJeu()?.Players.FirstOrDefault(j => j.You)?.Seat);
         var bande = valeurs.Select(valeur => new LeaderboardOverlayService.PortraitDeChoix(PortraitDu(valeur), valeur.Name)).ToList();
@@ -1949,6 +1969,8 @@ public sealed partial class MultiplayerPanelService
             PersonnageDe(joueur),
             Avatar: PlancheDe(joueur.Avatar),
             Portrait: PortraitDeJoueur(joueur),
+            Portraits: PortraitsDuJoueur(joueur),
+            RangCourant: joueur.You && _jeu is { Game: var jeuDuJoueur } && AuChoixDuPersonnage() is not null ? RangDuChoix(jeuDuJoueur) - 1 : -1,
             // Versus classe : la cote du joueur sur ce jeu, a la suite de son pseudo ; « provisoire » pendant ses 10
             // premieres rencontres et tant qu'il n'a pas rencontre 3 adversaires differents (RANK-03).
             Cote: joueur.Rating is { } cote ? cote.Lettre + " · ELO " + Math.Round(cote.Value).ToString(CultureInfo.InvariantCulture) : string.Empty,
@@ -1965,6 +1987,24 @@ public sealed partial class MultiplayerPanelService
         var premier = choix[0];
         var valeur = ValeurJouee(joueur, jeu, premier);
         return PortraitDu(premier.ValeursDe(joueur.Seat).FirstOrDefault(x => x.Value == valeur));
+    }
+
+    /// <summary>Plusieurs choix par place (v1.0 §8.2) : le portrait de chaque personnage de l'equipe, dans l'ordre des choix.</summary>
+    private IReadOnlyList<string?>? PortraitsDuJoueur(MultiplayerJoueur joueur)
+    {
+        if (_jeu is not { ChoixOuverts: true, Game: { Choices: [{ Picks: > 1 } premier, ..] } jeu })
+        {
+            return null;
+        }
+
+        return EquipeDe(joueur, jeu, premier).Select(valeur => PortraitDu(premier.ValeursDe(joueur.Seat).FirstOrDefault(x => x.Value == valeur))).ToList();
+    }
+
+    /// <summary>L'equipe de ce joueur : la sienne tout de suite (▲▼), celle de la gameroom pour les autres.</summary>
+    private IReadOnlyList<int> EquipeDe(MultiplayerJoueur joueur, MultiplayerGame jeu, MultiplayerChoice premier)
+    {
+        var siens = joueur.You ? _session.MesChoix(jeu) : joueur.Choices;
+        return premier.Equipe(rang => siens is not null && siens.TryGetValue(premier.CleDu(rang), out var v) ? v : null);
     }
 
     /// <summary>La valeur voulue par ce joueur : la sienne tout de suite (▲▼), celle de la gameroom pour les autres.</summary>
@@ -2000,7 +2040,7 @@ public sealed partial class MultiplayerPanelService
             .Select(joueur => joueur.Choices is not null && joueur.Choices.TryGetValue(premier.Key, out var v) ? v : premier.Default)
             .ToHashSet();
         // Le nom change tout de suite a l'ecran ; la gameroom le recoit dans la foulee.
-        var envoi = _session.ChangerDeChoixAsync(salle.Room, jeu, pas, prises: prises);
+        var envoi = _session.ChangerDeChoixAsync(salle.Room, jeu, pas, prises: prises, rang: RangDuChoix(jeu));
         Rafraichir();
         var refus = await envoi.ConfigureAwait(false);
         if (refus is not null)
@@ -2088,6 +2128,12 @@ public sealed partial class MultiplayerPanelService
         }
 
         var premier = choix[0];
+        // Plusieurs choix par place : l'equipe, dans l'ordre des choix.
+        if (premier.Picks > 1)
+        {
+            return string.Join(" / ", EquipeDe(joueur, jeu, premier).Select(premier.NomDe));
+        }
+
         // Le sien d'abord : ▲▼ le change ici avant que la gameroom le renvoie.
         return premier.NomDe(ValeurJouee(joueur, jeu, premier));
     }
@@ -2113,6 +2159,10 @@ public sealed partial class MultiplayerPanelService
                  && _jeu is { ChoixOuverts: true })
         {
             aides.Add(new("dpad_updown", T("multiplayer.help.character")));
+            if (_jeu.Game.Choices is [{ Picks: > 1 }, ..])
+            {
+                aides.Add(new(_glypheValider, Texte("multiplayer.help.next_pick", "next")));
+            }
         }
 
         // X, chez l'ouvreur de la gameroom d'amis : le nombre de joueurs attendus (28/10).

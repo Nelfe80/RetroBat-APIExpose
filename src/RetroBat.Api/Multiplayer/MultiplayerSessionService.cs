@@ -222,15 +222,29 @@ public sealed class MultiplayerSessionService : BackgroundService
         {
             _choix ??= LireLesChoix();
             var gardes = _choix.TryGetValue(jeu.Id, out var siens) ? siens : null;
-            return (jeu.Choices ?? []).ToDictionary(
-                choix => choix.Key,
-                choix => gardes is not null && gardes.TryGetValue(choix.Key, out var v) && choix.Values.Any(x => x.Value == v) ? v : choix.Default,
-                StringComparer.Ordinal);
+            var choisis = new Dictionary<string, int>(StringComparer.Ordinal);
+            foreach (var choix in jeu.Choices ?? [])
+            {
+                // Plusieurs choix par place (v1.0 §8.2) : chacun sous sa cle, distincts entre eux.
+                IReadOnlyList<int> equipe = choix.Picks > 1
+                    ? choix.Equipe(rang => gardes is not null && gardes.TryGetValue(choix.CleDu(rang), out var v) ? v : null)
+                    : [gardes is not null && gardes.TryGetValue(choix.Key, out var w) && choix.Values.Any(x => x.Value == w) ? w : choix.Default];
+                for (var rang = 1; rang <= equipe.Count; rang++)
+                {
+                    choisis[choix.CleDu(rang)] = equipe[rang - 1];
+                }
+            }
+
+            return choisis;
         }
     }
 
-    /// <summary>▲▼ : le choix voisin, garde sur la borne et envoye a la gameroom. Rend la raison d'un refus, ou null.</summary>
-    public async Task<string?> ChangerDeChoixAsync(string room, MultiplayerGame jeu, int pas, CancellationToken ct = default, IReadOnlySet<int>? prises = null)
+    /// <summary>
+    /// ▲▼ : le choix voisin, garde sur la borne et envoye a la gameroom. <paramref name="rang"/> : lequel des choix de la place
+    /// (plusieurs choix par place, v1.0 §8.2). Rend la raison d'un refus, ou null.
+    /// </summary>
+    public async Task<string?> ChangerDeChoixAsync(string room, MultiplayerGame jeu, int pas, CancellationToken ct = default, IReadOnlySet<int>? prises = null,
+        int rang = 1)
     {
         if (jeu.Choices is not { Count: > 0 } choix)
         {
@@ -239,12 +253,22 @@ public sealed class MultiplayerSessionService : BackgroundService
 
         var actuels = MesChoix(jeu);
         var premier = choix[0];
-        var nouveaux = new Dictionary<string, int>(actuels, StringComparer.Ordinal)
+        var nouveaux = new Dictionary<string, int>(actuels, StringComparer.Ordinal);
+        if (premier.Picks > 1)
         {
-            [premier.Key] = premier.Distinct && prises is { Count: > 0 }
+            // Les autres choix de la place sont pris : une equipe n'a pas deux fois le meme personnage.
+            rang = Math.Clamp(rang, 1, premier.Picks);
+            var miens = Enumerable.Range(1, premier.Picks).Where(r => r != rang)
+                .Select(r => actuels.TryGetValue(premier.CleDu(r), out var x) ? x : premier.DefautDu(r)).ToHashSet();
+            nouveaux[premier.CleDu(rang)] = premier.VoisineLibre(actuels.TryGetValue(premier.CleDu(rang), out var u) ? u : premier.DefautDu(rang), pas, miens);
+        }
+        else
+        {
+            nouveaux[premier.Key] = premier.Distinct && prises is { Count: > 0 }
                 ? premier.VoisineLibre(actuels.TryGetValue(premier.Key, out var v) ? v : premier.Default, pas, prises)
-                : premier.Voisine(actuels.TryGetValue(premier.Key, out var w) ? w : premier.Default, pas),
-        };
+                : premier.Voisine(actuels.TryGetValue(premier.Key, out var w) ? w : premier.Default, pas);
+        }
+
         lock (_verrou)
         {
             _choix ??= LireLesChoix();

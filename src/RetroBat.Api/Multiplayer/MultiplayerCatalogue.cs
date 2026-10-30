@@ -576,9 +576,7 @@ public sealed record MultiplayerChoice
     /// L'adresse d'une place pour une partie a <paramref name="joueurs"/> : celle de ce nombre (<c>players</c> de la place),
     /// sinon celle qui vaut pour tous. F-Zero range ses joueurs selon leur nombre (a deux, le joueur 2 est en 3e ligne).
     /// </summary>
-    public long? AdressePour(int place, int joueurs)
-        => (Seats.FirstOrDefault(s => s.Seat == place && s.Players == joueurs)
-            ?? Seats.FirstOrDefault(s => s.Seat == place && s.Players is null))?.Decalage;
+    public long? AdressePour(int place, int joueurs) => SiegePour(place, joueurs)?.Decalage;
 
     /// <summary>Les valeurs que voit cette place : les siennes quand elle en a, sinon celles du choix (place inconnue aussi).</summary>
     public IReadOnlyList<MultiplayerChoiceValue> ValeursDe(int? place)
@@ -600,6 +598,57 @@ public sealed record MultiplayerChoice
     /// </summary>
     [JsonPropertyName("lock")]
     public bool Lock { get; init; }
+
+    /// <summary>
+    /// PLUSIEURS CHOIX PAR PLACE (CDC Classements v1.0 §8.2, v1.1 §8.1 et §8.2 ; Marvel vs. Capcom : deux personnages,
+    /// KOF '98 : une equipe de trois) : chaque place donne <c>picks</c> valeurs distinctes, l'une apres l'autre (▲▼ puis A).
+    /// Le premier choix garde <see cref="Key"/>, <see cref="Default"/> et le <c>core_ram</c> de chaque place, que lit une API
+    /// d'avant ; les suivants partent sous « cle#2 », « cle#3 » (<see cref="CleDu"/>), avec <see cref="Defaults"/> et les
+    /// <c>core_rams</c> de chaque place.
+    /// </summary>
+    [JsonPropertyName("picks")]
+    public int Picks { get; init; } = 1;
+
+    /// <summary>Le defaut de chaque choix d'une place, le premier egal a <see cref="Default"/>.</summary>
+    [JsonPropertyName("defaults")]
+    public IReadOnlyList<int>? Defaults { get; init; }
+
+    /// <summary>
+    /// L'ORDRE DE PASSAGE (KOF '98, v1.1 §8.2) : l'equipe s'ecrit dans l'ordre des choix, et chaque place pose aussi la
+    /// permutation qui va avec (0, 1, 2) a ses <c>order_core_rams</c> : le premier choisi combat le premier.
+    /// </summary>
+    [JsonPropertyName("ordered")]
+    public bool Ordered { get; init; }
+
+    /// <summary>La cle d'un choix de la place (1 = <see cref="Key"/>), telle que la gameroom la garde.</summary>
+    public string CleDu(int rang) => rang <= 1 ? Key : Key + "#" + rang.ToString(CultureInfo.InvariantCulture);
+
+    public int DefautDu(int rang) => rang <= 1 || Defaults is not { } defauts || rang > defauts.Count ? Default : defauts[rang - 1];
+
+    /// <summary>La place de ce choix pour une partie a <paramref name="joueurs"/> : celle de ce nombre, sinon celle qui vaut pour tous.</summary>
+    public MultiplayerChoiceSeat? SiegePour(int place, int joueurs)
+        => Seats.FirstOrDefault(s => s.Seat == place && s.Players == joueurs) ?? Seats.FirstOrDefault(s => s.Seat == place && s.Players is null);
+
+    /// <summary>
+    /// Les valeurs d'une place, une par choix : la voulue quand elle est permise et pas deja prise par un choix d'avant de la
+    /// place, sinon le defaut du rang, ou la premiere valeur libre (une equipe n'a pas deux fois le meme personnage).
+    /// </summary>
+    public IReadOnlyList<int> Equipe(Func<int, int?> voulue)
+    {
+        var equipe = new List<int>();
+        for (var rang = 1; rang <= Math.Max(1, Picks); rang++)
+        {
+            var valeur = voulue(rang) is { } v && Values.Any(x => x.Value == v) && !equipe.Contains(v) ? v : DefautDu(rang);
+            if (equipe.Contains(valeur))
+            {
+                valeur = Values.Select(x => x.Value).Where(x => !equipe.Contains(x)).DefaultIfEmpty(valeur).First();
+            }
+
+            equipe.Add(valeur);
+        }
+
+        return equipe;
+    }
 
     /// <summary>
     /// LES ADRESSES DE LA CARTE DU COEUR (GBA, 23/10) : avec <c>core_map</c>, chaque <c>core_ram</c> est une adresse de la
@@ -1383,6 +1432,20 @@ public sealed record MultiplayerChoiceSeat
     /// </summary>
     [JsonPropertyName("values")]
     public IReadOnlyList<MultiplayerChoiceValue>? Values { get; init; }
+
+    /// <summary>Plusieurs choix par place (<see cref="MultiplayerChoice.Picks"/>) : l'adresse de chaque choix, la premiere celle de <c>core_ram</c>.</summary>
+    [JsonPropertyName("core_rams")]
+    public IReadOnlyList<string>? CoreRams { get; init; }
+
+    /// <summary>L'ordre de passage (<see cref="MultiplayerChoice.Ordered"/>) : ou poser le rang de chaque combattant de l'equipe.</summary>
+    [JsonPropertyName("order_core_rams")]
+    public IReadOnlyList<string>? OrderCoreRams { get; init; }
+
+    [JsonIgnore]
+    public IReadOnlyList<long?> Decalages => (CoreRams ?? []).Select(texte => new MultiplayerChoiceSeat { CoreRam = texte }.Decalage).ToList();
+
+    [JsonIgnore]
+    public IReadOnlyList<long?> DecalagesDeLOrdre => (OrderCoreRams ?? []).Select(texte => new MultiplayerChoiceSeat { CoreRam = texte }.Decalage).ToList();
 
     [JsonIgnore]
     public long? Decalage => CoreRam.Trim() is { Length: > 2 } texte && texte.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
@@ -2176,6 +2239,22 @@ public sealed class MultiplayerCatalogueStore
             if (choix.AllConsoles && !choix.ParLaCarteDuCoeur)
             {
                 return "choix « " + choix.Key + " » : toutes les consoles sans la carte du coeur";
+            }
+
+            // Plusieurs choix par place (v1.0 §8.2) : 2 a 4, des defauts distincts et permis (le premier celui d'une API
+            // d'avant), une adresse par choix dans chaque place (la premiere celle de core_ram), l'ordre de passage a la
+            // sienne. Pas encore avec un choix distinct entre places, tenu, ou ecrit dans toutes les consoles.
+            if (choix.Picks != 1 || choix.Defaults is not null || choix.Ordered || choix.Seats.Any(s => s.CoreRams is not null || s.OrderCoreRams is not null))
+            {
+                var defauts = choix.Defaults ?? [];
+                if (choix.Picks is < 2 or > 4 || choix.Key.Contains('#') || defauts.Count != choix.Picks || defauts[0] != choix.Default
+                    || defauts.Distinct().Count() != defauts.Count || defauts.Any(d => choix.Values.All(v => v.Value != d)) || choix.Distinct
+                    || choix.Lock || choix.AllConsoles
+                    || choix.Seats.Any(s => s.Decalages.Count != choix.Picks || s.Decalages.Any(d => d is null) || s.Decalages[0] != s.Decalage
+                        || (choix.Ordered ? s.DecalagesDeLOrdre.Count != choix.Picks || s.DecalagesDeLOrdre.Any(d => d is null) : s.OrderCoreRams is not null)))
+                {
+                    return "choix « " + choix.Key + " » : plusieurs choix par place incoherents";
+                }
             }
 
             // Seul le coeur mGBA Splitscreen de NelfePlay a une table de verrous, dans sa carte.
