@@ -640,6 +640,14 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         long value,
         string rawValueHex)
     {
+        // Tile digit: one digit per byte, the tile drawn on screen. A byte above 9 is the blank
+        // tile of a leading zero (Galaga 0x24, Shadow Warriors 0x80), read as a number it would
+        // weigh 36 or 128 times its place.
+        if (value > 9 && description.Contains("tile digit", StringComparison.OrdinalIgnoreCase))
+        {
+            return new ScorePartTransform(0, 1, "tile-digit-blank");
+        }
+
         // BCD place PAIR: one byte carries TWO decimal digits named by their places
         // ("tens, units", "hundreds, thousands", "ten thousands, hundred thousands").
         // The byte's weight is the LOWEST named place and its value the BCD pair -
