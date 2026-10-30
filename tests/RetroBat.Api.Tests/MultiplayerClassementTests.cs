@@ -327,6 +327,35 @@ public class MultiplayerClassementTests
     }
 
     [Fact]
+    public void Une_victoire_de_camp_n_est_pas_un_match_nul()
+    {
+        // Slam Masters a quatre (couloir 3, 30/10) : camp 1 (places 1 et 2) contre camp 2 (3 et 4), le camp 2 gagne.
+        IReadOnlyList<MultiplayerRang> rangs = [new(3, 1, 2), new(4, 1, 2), new(1, 2, 1), new(2, 2, 1)];
+        var issue = MultiplayerIssue.DesRangs(rangs);
+        Assert.Equal(3, issue.Gagnante);
+        Assert.Equal(2, MultiplayerIssue.UnitesDe(rangs));
+
+        // Tout le camp vainqueur a gagne, tout le camp perdant a perdu : DEFAITE, pas « 2E PLACE ».
+        static string T(string cle) => cle;
+        Assert.All(new[] { 3, 4 }, place => Assert.True(MultiplayerPanelService.EstVainqueur(place, rangs, issue.Gagnante)));
+        Assert.All(new[] { 1, 2 }, place => Assert.False(MultiplayerPanelService.EstVainqueur(place, rangs, issue.Gagnante)));
+        Assert.Equal("multiplayer.result.victory", MultiplayerPanelService.IssueDuRang(rangs[1] with { Camp = null }, rangs, issue.Gagnante, T));
+        Assert.Equal("multiplayer.result.defeat", MultiplayerPanelService.IssueDuRang(rangs[3] with { Camp = null }, rangs, issue.Gagnante, T));
+
+        // Les deux camps au rang 1 : un vrai nul.
+        IReadOnlyList<MultiplayerRang> nul = [new(1, 1, 1), new(2, 1, 2)];
+        Assert.Equal(MultiplayerResultats.MatchNul, MultiplayerIssue.DesRangs(nul).Gagnante);
+        Assert.False(MultiplayerPanelService.EstVainqueur(1, nul, MultiplayerResultats.MatchNul));
+
+        // Trois camps ou plus, ou chacun pour soi : le rang reste affiche.
+        IReadOnlyList<MultiplayerRang> trois = [new(1, 1), new(2, 2), new(3, 3)];
+        Assert.Equal(1, MultiplayerIssue.DesRangs(trois).Gagnante);
+        Assert.StartsWith("#", MultiplayerPanelService.IssueDuRang(trois[1], trois, 1, T));
+        // Deux humains a egalite sans camp : un nul, comme avant.
+        Assert.Equal(MultiplayerResultats.MatchNul, MultiplayerIssue.DesRangs([new(1, 1), new(2, 1), new(3, 3)]).Gagnante);
+    }
+
+    [Fact]
     public void Survie_un_camp_tombe_avec_son_premier_membre()
     {
         // WrestleFest en Tag (v1.1 §7, n° 15) : P1 et l'ordinateur (P2) contre P3 et l'ordinateur (P4) ; P2 tombe le premier.

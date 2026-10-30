@@ -12,12 +12,21 @@ public sealed record MultiplayerIssue(int Gagnante, IReadOnlyList<MultiplayerRan
     /// <summary>Un duel lu par <c>end</c> ou <c>match_end</c> : la place gagnante seule (0 pour un match nul).</summary>
     public static MultiplayerIssue DuVainqueur(int gagnante) => new(gagnante, []);
 
-    /// <summary>Des rangs : la place gagnante est celle qui est seule au rang 1 ; plusieurs au rang 1, un match nul.</summary>
+    /// <summary>
+    /// Des rangs : la place gagnante est celle qui est seule au rang 1. Un camp seul au rang 1 gagne aussi : la place gagnante
+    /// est sa premiere (ses coequipiers gagnent avec elle, les rangs le disent ; signale par le couloir 3 sur Slam Masters, 30/10).
+    /// Plusieurs au rang 1 hors d'un meme camp : un match nul.
+    /// </summary>
     public static MultiplayerIssue DesRangs(IReadOnlyList<MultiplayerRang> rangs)
     {
-        var premiers = rangs.Where(r => r.Rank == 1).ToList();
-        return new MultiplayerIssue(premiers.Count == 1 ? premiers[0].Seat : MultiplayerResultats.MatchNul, rangs);
+        var premiers = rangs.Where(r => r.Rank == 1).OrderBy(r => r.Seat).ToList();
+        var seul = premiers.Count == 1
+            || (premiers.Count > 1 && premiers[0].Camp is { } camp && premiers.All(r => r.Camp == camp) && rangs.Any(r => r.Camp != camp));
+        return new MultiplayerIssue(seul ? premiers[0].Seat : MultiplayerResultats.MatchNul, rangs);
     }
+
+    /// <summary>Le nombre d'unites classees : les camps, et chaque joueur sans camp. A deux, le second a perdu ; au-dela, il a un rang.</summary>
+    public static int UnitesDe(IReadOnlyList<MultiplayerRang> rangs) => rangs.Select(r => r.Camp is { } camp ? -camp : r.Seat).Distinct().Count();
 }
 
 /// <summary>Une lecture de la memoire du jeu : la garde, le signal de fin, et chaque place (null : pas lu).</summary>

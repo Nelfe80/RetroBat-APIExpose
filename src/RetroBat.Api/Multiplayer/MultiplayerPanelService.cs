@@ -1739,7 +1739,7 @@ public sealed partial class MultiplayerPanelService
                         ? IssueDuRang(rang, rangs, gagnante, T)
                         : T(gagnante == MultiplayerResultats.MatchNul ? "multiplayer.result.draw"
                             : j.Seat == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat"),
-                    Gagnant = gagnante != MultiplayerResultats.MatchNul && j.Seat == gagnante,
+                    Gagnant = EstVainqueur(j.Seat, rangs, gagnante),
                     Cote = evolution is null ? ligne.Cote : "ELO " + Math.Round(evolution.After).ToString(CultureInfo.InvariantCulture),
                     Evolution = evolution is null ? string.Empty : (delta >= 0 ? "+" : "") + delta.ToString(CultureInfo.InvariantCulture),
                     Stats = StatsDe(finie, j.Seat, T),
@@ -1811,9 +1811,9 @@ public sealed partial class MultiplayerPanelService
         var monRang = rangs?.FirstOrDefault(r => r.Seat == maPlace);
         // A plusieurs (CDC Classements v1.0 §7) : VICTOIRE au rang 1, sinon le rang de cette borne (« 3E PLACE »).
         var mot = titreImpose
-            ?? (monRang is not null && rangs!.Count > 2 && monRang.Rank > 1 ? TexteDuRang(monRang.Rank, T)
+            ?? (monRang is not null && MultiplayerIssue.UnitesDe(rangs!) > 2 && monRang.Rank > 1 ? TexteDuRang(monRang.Rank, T)
                 : nul ? T("multiplayer.end.draw")
-                : gagnante is not null && maPlace is not null ? T(maPlace == gagnante ? "multiplayer.end.victory" : "multiplayer.end.defeat")
+                : gagnante is not null && maPlace is not null ? T(EstVainqueur(maPlace, rangs, gagnante) ? "multiplayer.end.victory" : "multiplayer.end.defeat")
                 : titre);
         var vainqueur = nul ? null : gagnante;
         var assis = joueurs.Where(j => j.Seat is not null)
@@ -1838,7 +1838,7 @@ public sealed partial class MultiplayerPanelService
                 cote is null ? string.Empty : j.Rating is { Provisional: true } ? "?" : MultiplayerCote.LettreDe(cote.Value),
                 cote is null ? string.Empty : Math.Round(cote.Value).ToString("#,0", milliers),
                 apres is null ? string.Empty : (ecart >= 0 ? "+" : "") + ecart.ToString(CultureInfo.InvariantCulture),
-                vainqueur == place,
+                EstVainqueur(place, rangs, vainqueur),
                 rangs?.FirstOrDefault(r => r.Seat == place)?.Rank ?? (vainqueur is null ? null : ++rang),
                 calcul?.Distinctions.GetValueOrDefault(place) ?? string.Empty,
                 calcul?.Mesures.GetValueOrDefault(place) ?? [],
@@ -1883,15 +1883,20 @@ public sealed partial class MultiplayerPanelService
         }
     }
 
+    /// <summary>Cette place a-t-elle gagne ? Son rang le dit (tout le camp vainqueur), sinon la place gagnante ; jamais un match nul.</summary>
+    internal static bool EstVainqueur(int? place, IReadOnlyList<MultiplayerRang>? rangs, int? gagnante)
+        => gagnante is not null && gagnante != MultiplayerResultats.MatchNul
+           && (rangs?.FirstOrDefault(r => r.Seat == place) is { } rang ? rang.Rank == 1 : place == gagnante);
+
     /// <summary>
-    /// Ce que dit la ligne d'un joueur classe : VICTOIRE seul au rang 1 (MATCH NUL a plusieurs au rang 1), DEFAITE en duel,
-    /// sinon son rang (« 3E PLACE ») ; son equipe a la suite dans un jeu en equipes.
+    /// Ce que dit la ligne d'un joueur classe : VICTOIRE au rang 1 (MATCH NUL si plusieurs y sont sans camp commun), DEFAITE entre
+    /// deux joueurs ou deux camps, sinon son rang (« 3E PLACE ») ; son equipe a la suite dans un jeu en equipes.
     /// </summary>
-    private static string IssueDuRang(MultiplayerRang rang, IReadOnlyList<MultiplayerRang> rangs, int? gagnante, Func<string, string> T)
+    internal static string IssueDuRang(MultiplayerRang rang, IReadOnlyList<MultiplayerRang> rangs, int? gagnante, Func<string, string> T)
     {
         var issue = rang.Rank == 1
             ? T(gagnante == MultiplayerResultats.MatchNul ? "multiplayer.result.draw" : "multiplayer.result.victory")
-            : rangs.Count > 2 ? TexteDuRang(rang.Rank, T) : T("multiplayer.result.defeat");
+            : MultiplayerIssue.UnitesDe(rangs) > 2 ? TexteDuRang(rang.Rank, T) : T("multiplayer.result.defeat");
         if (rang.Camp is not { } camp)
         {
             return issue;
