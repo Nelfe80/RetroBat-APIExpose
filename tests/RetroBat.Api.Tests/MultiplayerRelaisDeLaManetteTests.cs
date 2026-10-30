@@ -92,6 +92,114 @@ public class MultiplayerRelaisDeLaManetteTests
         Assert.False(hote.Observer(0, 20000));
     }
 
+    /// <summary>Marvel vs. Capcom a quatre : les places 1 et 3 sur le port 1, 2 et 4 sur le port 2. Adresses fictives.</summary>
+    private static readonly MultiplayerTeamRelay Tag = new()
+    {
+        SettleMs = 200,
+        Camps =
+        [
+            new() { Port = 1, Seats = [1, 3], CoreRam = "0x10", Values = new Dictionary<string, int> { ["0"] = 0, ["1"] = 1 } },
+            new() { Port = 2, Seats = [2, 4], CoreRam = "0x20", Values = new Dictionary<string, int> { ["0"] = 0, ["1"] = 1 } },
+        ],
+    };
+
+    [Fact]
+    public void La_main_vient_au_joueur_du_combattant_actif()
+    {
+        var camp = Tag.Camps[0];
+        var premier = new MultiplayerMainDEquipe(Tag, camp, [1, 2, 3, 4], 1);
+        var second = new MultiplayerMainDEquipe(Tag, camp, [1, 2, 3, 4], 3);
+        // Au depart, le premier combattant : sa place est prevenue, une fois.
+        Assert.False(premier.Observer(0, 0));
+        Assert.True(premier.Observer(0, 200));
+        Assert.False(premier.Observer(0, 400));
+        Assert.False(second.Observer(0, 200));
+        // Le changement : une lecture au vol ne compte pas, la valeur doit tenir.
+        Assert.False(second.Observer(1, 500));
+        Assert.False(second.Observer(0, 600));
+        Assert.False(second.Observer(1, 700));
+        Assert.True(second.Observer(1, 900));
+        Assert.False(premier.Observer(1, 500));
+        Assert.False(premier.Observer(1, 900));
+        // Le retour au premier le previent de nouveau.
+        Assert.False(premier.Observer(0, 1000));
+        Assert.True(premier.Observer(0, 1200));
+        // Hors de la table (une transition) : rien ne change.
+        Assert.False(premier.Observer(9, 1300));
+        Assert.False(premier.Observer(9, 2000));
+    }
+
+    [Fact]
+    public void Moins_de_joueurs_que_de_combattants_se_les_repartissent()
+    {
+        var kof = new MultiplayerTeamRelayCamp { Port = 1, Seats = [1, 3, 5], CoreRam = "0x10", Values = new Dictionary<string, int> { ["0"] = 0, ["1"] = 1, ["2"] = 2 } };
+        Assert.Equal(5, kof.PlaceDuRang(2, [1, 2, 3, 4, 5, 6]));
+        // Deux humains dans le camp : le troisieme combattant revient au premier d'entre eux.
+        Assert.Equal(1, kof.PlaceDuRang(0, [1, 2, 3]));
+        Assert.Equal(3, kof.PlaceDuRang(1, [1, 2, 3]));
+        Assert.Equal(1, kof.PlaceDuRang(2, [1, 2, 3]));
+        Assert.Null(kof.PlaceDuRang(0, [2, 4]));
+    }
+
+    [Fact]
+    public void Le_jeu_d_equipe_donne_le_port_du_camp_et_se_valide()
+    {
+        var jeu = new MultiplayerGame { Id = "arcade/mvsc", System = "arcade", Players = 4, TeamRelay = Tag };
+        Assert.Equal([1], jeu.PortsDeLaPlace(1));
+        Assert.Equal([2], jeu.PortsDeLaPlace(2));
+        Assert.Equal([1], jeu.PortsDeLaPlace(3));
+        Assert.Equal([2], jeu.PortsDeLaPlace(4));
+        Assert.Null(MultiplayerCatalogueStore.ValiderLaManetteDEquipe(jeu));
+        Assert.Equal("2", MultiplayerLaunchPlan.PartageDesPorts["netplay_share_digital"]);
+
+        void Refuse(MultiplayerGame douteux) => Assert.StartsWith("manette d'equipe incoherente", MultiplayerCatalogueStore.ValiderLaManetteDEquipe(douteux));
+        Refuse(jeu with { Players = 3 });
+        Refuse(jeu with { TeamRelay = Tag with { Camps = [Tag.Camps[0]] } });
+        Refuse(jeu with { TeamRelay = Tag with { Camps = [Tag.Camps[0], Tag.Camps[1] with { Port = 1 }] } });
+        Refuse(jeu with { TeamRelay = Tag with { Camps = [Tag.Camps[0], Tag.Camps[1] with { Seats = [3, 4] }] } });
+        Refuse(jeu with { TeamRelay = Tag with { Camps = [Tag.Camps[0], Tag.Camps[1] with { Values = new Dictionary<string, int>() }] } });
+        Refuse(jeu with { SeatPorts = [[1], [2], [1], [2]] });
+        Refuse(jeu with { TurnRelay = Worms });
+    }
+
+    /// <summary>Un RetroArch de test : l'octet du combattant actif se lit, les commandes envoyees se gardent.</summary>
+    private sealed class RetroArchDuTest : ICommandesRetroArch
+    {
+        public volatile int Valeur;
+        public System.Collections.Concurrent.ConcurrentQueue<string> Envoyees { get; } = new();
+
+        public Task<string?> DemanderAsync(string commande, CancellationToken ct, int delaiMs = 500)
+            => Task.FromResult<string?>($"READ_CORE_RAM 10 {Valeur:x2}");
+
+        public Task EnvoyerAsync(string commande, CancellationToken ct)
+        {
+            Envoyees.Enqueue(commande);
+            return Task.CompletedTask;
+        }
+    }
+
+    [Fact]
+    public async Task La_borne_dont_c_est_le_tour_le_dit_au_joueur()
+    {
+        var ra = new RetroArchDuTest { Valeur = 1 };
+        using var fin = new CancellationTokenSource();
+        var boucle = new MultiplayerRelaisDeLaManette(ra, periode: TimeSpan.FromMilliseconds(5))
+            .AnnoncerLaMainAsync(Tag with { SettleMs = 0 }, 3, [1, 2, 3, 4], "À toi !", fin.Token);
+        while (ra.Envoyees.IsEmpty)
+        {
+            await Task.Delay(5);
+        }
+
+        fin.Cancel();
+        Assert.Equal(1, await boucle);
+        Assert.Equal(["SHOW_MSG À toi !"], ra.Envoyees);
+
+        // Seul humain de son camp, il n'a rien a se passer : aucune lecture, aucun message.
+        var seul = new RetroArchDuTest();
+        Assert.Equal(0, await new MultiplayerRelaisDeLaManette(seul).AnnoncerLaMainAsync(Tag, 1, [1, 2], "À toi !", CancellationToken.None));
+        Assert.Empty(seul.Envoyees);
+    }
+
     /// <summary>
     /// AU BANC (banc_relais.py api, plugins-70) : deux RetroArch en netplay, l'hote en 56510 et l'invite en 56511, leurs
     /// journaux dans NELFEPLAY_BANC_RELAIS. Les deux vraies boucles du relais tournent ici ; le test ecrit lui-meme l'octet du

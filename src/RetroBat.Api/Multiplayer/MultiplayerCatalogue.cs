@@ -179,6 +179,7 @@ public sealed record MultiplayerGame
     /// <summary>Les ports que tient cette place, dans l'ordre de ses manettes locales ; la manette unique d'un jeu a tour.</summary>
     public IReadOnlyList<int> PortsDeLaPlace(int place)
         => TurnRelay is { } relais ? [relais.Port]
+            : TeamRelay?.CampDe(place) is { } camp ? [camp.Port]
             : SeatPorts is { Count: > 0 } ports && place >= 1 && place <= ports.Count && ports[place - 1].Count > 0 ? ports[place - 1]
             : [PlaceDuJeu(place)];
 
@@ -188,6 +189,13 @@ public sealed record MultiplayerGame
     /// </summary>
     [JsonPropertyName("turn_relay")]
     public MultiplayerTurnRelay? TurnRelay { get; init; }
+
+    /// <summary>
+    /// LA MANETTE D'EQUIPE (proposition du user du 30/10 ; Marvel vs. Capcom, KOF '98) : tous les joueurs d'un camp tiennent le
+    /// meme port, et chacun est prevenu quand c'est a lui de jouer (<see cref="MultiplayerRelaisDeLaManette"/>).
+    /// </summary>
+    [JsonPropertyName("team_relay")]
+    public MultiplayerTeamRelay? TeamRelay { get; init; }
 
     /// <summary>
     /// L'ORDRE DES PLACES (CDC Classements v1.1 §8.3, n° 14 ; NBA Jam TE, WrestleFest en Tag) : la place k de la plateforme
@@ -892,6 +900,73 @@ public sealed record MultiplayerTurnRelay
     /// <summary>La place dont c'est le tour, ou null : personne.</summary>
     public int? PlaceDuTour(long valeur)
         => Values.TryGetValue(valeur.ToString(CultureInfo.InvariantCulture), out var place) ? place : null;
+}
+
+/// <summary>
+/// La manette d'equipe (<see cref="MultiplayerGame.TeamRelay"/>) : un camp par port. Banc du 30/10 (quatre RetroArch, deux
+/// joueurs par port, netplay_share_digital OR) : les appuis de chacun arrivent a son port et a lui seul, et se cumulent ;
+/// celui qui n'a pas la main doit donc lacher sa manette.
+/// </summary>
+public sealed record MultiplayerTeamRelay
+{
+    [JsonPropertyName("camps")]
+    public IReadOnlyList<MultiplayerTeamRelayCamp> Camps { get; init; } = [];
+
+    /// <summary>La valeur du combattant actif doit tenir ce delai avant qu'un joueur soit prevenu.</summary>
+    [JsonPropertyName("settle_ms")]
+    public int SettleMs { get; init; } = 200;
+
+    public MultiplayerTeamRelayCamp? CampDe(int place) => Camps.FirstOrDefault(camp => camp.Seats.Contains(place));
+}
+
+/// <summary>Un camp : son port, ses places dans l'ordre de ses combattants, et l'octet de son combattant actif.</summary>
+public sealed record MultiplayerTeamRelayCamp
+{
+    [JsonPropertyName("port")]
+    public int Port { get; init; } = 1;
+
+    [JsonPropertyName("seats")]
+    public IReadOnlyList<int> Seats { get; init; } = [];
+
+    [JsonPropertyName("core_ram")]
+    public string CoreRam { get; init; } = string.Empty;
+
+    [JsonPropertyName("bytes")]
+    public int Bytes { get; init; } = 1;
+
+    [JsonPropertyName("order")]
+    public string Order { get; init; } = "le";
+
+    /// <summary><c>core_map</c> : l'adresse est dans la carte du coeur (READ_CORE_MEMORY).</summary>
+    [JsonPropertyName("memory")]
+    public string? Memory { get; init; }
+
+    /// <summary>Valeur lue (en texte decimal) vers le rang du combattant dans l'equipe, 0 pour le premier.</summary>
+    [JsonPropertyName("values")]
+    public IReadOnlyDictionary<string, int> Values { get; init; } = new Dictionary<string, int>();
+
+    [JsonIgnore]
+    public long? Decalage => new MultiplayerChoiceSeat { CoreRam = CoreRam }.Decalage;
+
+    [JsonIgnore]
+    public bool ParLaCarteDuCoeur => string.Equals(Memory, MultiplayerChoice.CarteDuCoeur, StringComparison.Ordinal);
+
+    /// <summary>La lecture de l'octet du combattant actif, sur sa largeur et dans son ordre.</summary>
+    [JsonIgnore]
+    public MultiplayerDuelGuard Signal => new() { CoreRam = CoreRam, Bytes = Bytes, Order = Order };
+
+    /// <summary>Le rang du combattant actif, ou null : une valeur hors de la table (une transition), personne ne change.</summary>
+    public int? RangDe(long valeur) => Values.TryGetValue(valeur.ToString(CultureInfo.InvariantCulture), out var rang) ? rang : null;
+
+    /// <summary>
+    /// La place qui joue ce combattant, parmi les humains de la partie : a chacun le sien, et moins de joueurs que de
+    /// combattants se les repartissent a tour de role. Null sans humain dans le camp.
+    /// </summary>
+    public int? PlaceDuRang(int rang, IReadOnlyCollection<int> humains)
+    {
+        var presents = Seats.Where(humains.Contains).ToList();
+        return presents.Count == 0 ? null : presents[rang % presents.Count];
+    }
 }
 
 /// <summary>Le departage d'une fin a plusieurs : par la valeur de chaque place, la plus haute ou la plus basse d'abord.</summary>
@@ -1762,7 +1837,7 @@ public sealed class MultiplayerCatalogueStore
         // Le champ « bios » (CDC Classements v1.1 §5) n'est pas lu ici : l'outil de diagnostic dit quel BIOS manque (decision
         // du user du 29/10).
         return ValiderLesVues(jeu) ?? ValiderLeDepart(jeu) ?? ValiderLeDepartDuCoeur(jeu) ?? ValiderLeClassement(jeu) ?? ValiderLOrdreDesPlaces(jeu)
-            ?? ValiderLeRelais(jeu);
+            ?? ValiderLeRelais(jeu) ?? ValiderLaManetteDEquipe(jeu);
     }
 
     /// <summary>
@@ -1859,6 +1934,32 @@ public sealed class MultiplayerCatalogueStore
             || jeu.SeatOrder is not null || jeu.SeatPorts is { Count: > 0 } || jeu.CoreStart is not null)
         {
             return "relais de la manette incoherent (adresse, valeurs vers places, port ; sans ordre, ports ni depart par place)";
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// La manette d'equipe : au moins deux camps, un port par camp, chaque place du jeu dans un camp et un seul, l'octet du
+    /// combattant actif et sa table. Pas avec les autres manieres de donner un port a une place.
+    /// </summary>
+    internal static string? ValiderLaManetteDEquipe(MultiplayerGame jeu)
+    {
+        if (jeu.TeamRelay is not { } equipe)
+        {
+            return null;
+        }
+
+        var places = equipe.Camps.SelectMany(camp => camp.Seats).ToList();
+        if (equipe.Camps.Count < 2 || equipe.SettleMs is < 0 or > 5000
+            || equipe.Camps.Select(camp => camp.Port).Distinct().Count() != equipe.Camps.Count
+            || !places.Order().SequenceEqual(Enumerable.Range(1, jeu.Players))
+            || equipe.Camps.Any(camp => camp.Port is < 1 or > 8 || camp.Decalage is null || camp.Bytes is < 1 or > 4 || camp.Order is not ("le" or "be" or "68k")
+                || camp.Memory is not (null or MultiplayerChoice.CarteDuCoeur) || camp.Values.Count == 0
+                || camp.Values.Any(v => !long.TryParse(v.Key, NumberStyles.None, CultureInfo.InvariantCulture, out _) || v.Value < 0))
+            || jeu.TurnRelay is not null || jeu.SeatOrder is not null || jeu.SeatPorts is { Count: > 0 } || jeu.CoreStart is not null)
+        {
+            return "manette d'equipe incoherente (deux camps ou plus, un port par camp, chaque place une fois, octet et table du combattant actif)";
         }
 
         return null;

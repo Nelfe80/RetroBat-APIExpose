@@ -75,6 +75,9 @@ public sealed class MultiplayerLaunchService : IHostedService
 
     /// <summary>La manette passee au joueur courant d'un jeu a tour (v1.0 §8.3), chez l'hote comme chez l'invite.</summary>
     private readonly MultiplayerRelaisDeLaManette _manette;
+
+    /// <summary>Le message de la manette d'equipe sans traduction.</summary>
+    internal const string MessageDeLaMainParDefaut = "Your turn!";
     private CancellationTokenSource? _relaisDeLaManette;
     /// <summary>L'issue que le guet a lue : la place gagnante, et le rang de chaque humain pour une fin a plusieurs.</summary>
     private MultiplayerIssue? _issue;
@@ -258,7 +261,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             // Une partie ouverte a d'autres joueurs n'entre pas au classement solo (charte de la partie certifiee).
             NetplayHostService.NoterOuverteAuxJoueurs();
             _ = Task.Run(() => PublierLaSessionAsync(room, jeu, jeton, motJoueur, motSpectateur));
-            RelayerLaManette(jeu.Game, room.Launch!.Seat);
+            RelayerLaManette(jeu.Game, room.Launch!.Seat, PlacesDe(room));
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
             RetirerLEtatPose();
             MultiplayerIssue? issue;
@@ -626,11 +629,12 @@ public sealed class MultiplayerLaunchService : IHostedService
     }
 
     /// <summary>
-    /// UN JEU A TOUR (v1.0 §8.3, Worms) : la manette unique passe a la borne dont c'est le tour, jusqu'a la fin de la partie.
+    /// UN JEU A TOUR (v1.0 §8.3, Worms) : la manette unique passe a la borne dont c'est le tour. UN JEU D'EQUIPE (Marvel vs.
+    /// Capcom) : les joueurs d'un camp partagent son port, et celui dont c'est le tour est prevenu. Jusqu'a la fin de la partie.
     /// </summary>
-    private void RelayerLaManette(MultiplayerGame jeu, int place)
+    private void RelayerLaManette(MultiplayerGame jeu, int place, IReadOnlyList<int> humains)
     {
-        if (jeu.TurnRelay is not { } relais)
+        if (jeu.TurnRelay is null && jeu.TeamRelay is null)
         {
             return;
         }
@@ -643,8 +647,19 @@ public sealed class MultiplayerLaunchService : IHostedService
             jeton = _relaisDeLaManette.Token;
         }
 
-        _journal.LogInformation("MULTIPLAYER : relais de la manette de {Jeu} pour la place {Place} (port {Port})", jeu.Id, place, relais.Port);
-        _ = Task.Run(() => _manette.RelayerAsync(relais, place, MultiplayerAttenteDesInvites.CheminDuJournal, jeton));
+        if (jeu.TurnRelay is { } relais)
+        {
+            _journal.LogInformation("MULTIPLAYER : relais de la manette de {Jeu} pour la place {Place} (port {Port})", jeu.Id, place, relais.Port);
+            _ = Task.Run(() => _manette.RelayerAsync(relais, place, MultiplayerAttenteDesInvites.CheminDuJournal, jeton));
+        }
+
+        if (jeu.TeamRelay is { } equipe)
+        {
+            var message = _panneau.Texte("multiplayer.relay.your_turn", MessageDeLaMainParDefaut);
+            _journal.LogInformation("MULTIPLAYER : manette d'equipe de {Jeu} pour la place {Place} (port {Port}, humains {Humains})",
+                jeu.Id, place, equipe.CampDe(place)?.Port, string.Join(',', humains));
+            _ = Task.Run(() => _manette.AnnoncerLaMainAsync(equipe, place, humains, message, jeton));
+        }
     }
 
     /// <summary>Les places humaines de la partie : celles des joueurs de la gameroom.</summary>
@@ -826,7 +841,7 @@ public sealed class MultiplayerLaunchService : IHostedService
                     await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
                     await RetroArchInvite.FermerAsync().ConfigureAwait(false);
                 }, _journal));
-            RelayerLaManette(jeu.Game, room.Launch.Seat);
+            RelayerLaManette(jeu.Game, room.Launch.Seat, PlacesDe(room));
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
             guetInvite.Cancel();
             lock (_verrou)
@@ -1042,6 +1057,14 @@ public sealed class MultiplayerLaunchService : IHostedService
         // L'ecran partage : la vue de cette place, a son format (« -ratio config » sur la ligne du lanceur).
         var vue = jeu.Game.VueDeLaPlace(lancement.Seat, joueurs);
         var reglagesDeLaPlace = new Dictionary<string, string>(MultiplayerLaunchPlan.Place(jeu.Game.PortsDeLaPlace(lancement.Seat)), StringComparer.Ordinal);
+        if (jeu.Game.TeamRelay is not null)
+        {
+            foreach (var (cle, valeur) in MultiplayerLaunchPlan.PartageDesPorts)
+            {
+                reglagesDeLaPlace[cle] = valeur;
+            }
+        }
+
         if (vue is not null)
         {
             reglagesDeLaPlace["video_aspect_ratio"] = MultiplayerLaunchPlan.FormatPourRetroArch(jeu.Game, vue);

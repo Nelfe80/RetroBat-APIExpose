@@ -164,6 +164,17 @@ public static class MultiplayerLaunchPlan
 
     private static readonly string[] BoutonsDuRetroPad = ["b", "y", "select", "start", "a", "x", "l", "r", "l2", "r2", "l3", "r3"];
 
+    /// <summary>
+    /// LA MANETTE D'EQUIPE (<see cref="MultiplayerGame.TeamRelay"/>) : le partage des entrees, chez chaque borne de la partie.
+    /// RetroArch refuse un second joueur sur un port si l'un des deux ne partage pas ; 2 = OR pour les boutons, MAX pour les
+    /// sticks. Le lanceur ne touche pas a ces cles.
+    /// </summary>
+    public static IReadOnlyDictionary<string, string> PartageDesPorts { get; } = new Dictionary<string, string>(StringComparer.Ordinal)
+    {
+        ["netplay_share_digital"] = "2",
+        ["netplay_share_analog"] = "2",
+    };
+
     /// <summary>Les ports que la borne demande au netplay (<see cref="MultiplayerGame.SeatPorts"/>).</summary>
     public static IReadOnlyDictionary<string, string> Place(IReadOnlyCollection<int> ports)
     {

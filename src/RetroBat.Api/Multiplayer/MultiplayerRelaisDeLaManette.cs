@@ -89,6 +89,46 @@ public sealed class MultiplayerRelaisEnCours
 }
 
 /// <summary>
+/// LA MAIN DANS UNE EQUIPE, SANS LECTURE : il recoit l'octet du combattant actif du camp, et dit quand la main vient a cette
+/// place. La valeur doit tenir <see cref="MultiplayerTeamRelay.SettleMs"/> ; une valeur hors de la table ne change rien.
+/// </summary>
+public sealed class MultiplayerMainDEquipe
+{
+    private readonly MultiplayerTeamRelay _equipe;
+    private readonly MultiplayerTeamRelayCamp _camp;
+    private readonly IReadOnlyCollection<int> _humains;
+    private readonly int _place;
+    private (long Valeur, long Depuis)? _suivi;
+    private int? _active;
+
+    public MultiplayerMainDEquipe(MultiplayerTeamRelay equipe, MultiplayerTeamRelayCamp camp, IReadOnlyCollection<int> humains, int place)
+    {
+        _equipe = equipe;
+        _camp = camp;
+        _humains = humains;
+        _place = place;
+    }
+
+    /// <summary>Un releve de l'octet (null : pas lu). Vrai : la main vient d'arriver a cette place, il faut le lui dire.</summary>
+    public bool Observer(long? valeur, long ms)
+    {
+        if (valeur is { } lue && (_suivi is not { } suivi || suivi.Valeur != lue))
+        {
+            _suivi = (lue, ms);
+        }
+
+        if (_suivi is not { } tenu || ms - tenu.Depuis < _equipe.SettleMs || _camp.RangDe(tenu.Valeur) is not { } rang
+            || _camp.PlaceDuRang(rang, _humains) is not { } active || active == _active)
+        {
+            return false;
+        }
+
+        _active = active;
+        return active == _place;
+    }
+}
+
+/// <summary>
 /// LA MANETTE PASSEE AU JOUEUR COURANT (CDC Classements v1.0 §8.3, revise le 29/10 ; Worms) : chaque borne lit l'octet du
 /// tour (le netplay le garde le meme partout), rend la manette quand le tour passe a un autre, et la prend quand il lui
 /// revient, par NETPLAY_GAME_WATCH, la bascule joueur / spectateur de RetroArch. C'est une commande reseau de la 1.22.2
@@ -169,7 +209,7 @@ public sealed class MultiplayerRelaisDeLaManette
                     }
                 }
 
-                var valeur = await LireLeTourAsync(relais, ct).ConfigureAwait(false);
+                var valeur = await LireAsync(relais.Decalage, relais.ParLaCarteDuCoeur, relais.Bytes, relais.Signal, ct).ConfigureAwait(false);
                 if (valeur is not null && valeur != vue)
                 {
                     vue = valeur;
@@ -200,23 +240,60 @@ public sealed class MultiplayerRelaisDeLaManette
         return bascules;
     }
 
-    private async Task<long?> LireLeTourAsync(MultiplayerTurnRelay relais, CancellationToken ct)
+    /// <summary>
+    /// LA MANETTE D'EQUIPE : les joueurs d'un camp tiennent le meme port ; cette boucle relit le combattant actif de son camp
+    /// et dit au joueur de cette borne, a l'ecran, quand la main est a lui, jusqu'a l'annulation (la fin de la partie). Un camp
+    /// d'un seul humain n'a rien a se passer. Rend le nombre d'annonces.
+    /// </summary>
+    public async Task<int> AnnoncerLaMainAsync(MultiplayerTeamRelay equipe, int place, IReadOnlyCollection<int> humains, string message, CancellationToken ct)
     {
-        if (relais.Decalage is not { } decalage)
+        if (equipe.CampDe(place) is not { } camp || camp.Seats.Count(humains.Contains) < 2)
+        {
+            return 0;
+        }
+
+        var enCours = new MultiplayerMainDEquipe(equipe, camp, humains, place);
+        var horloge = System.Diagnostics.Stopwatch.StartNew();
+        var annonces = 0;
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                var valeur = await LireAsync(camp.Decalage, camp.ParLaCarteDuCoeur, camp.Bytes, camp.Signal, ct).ConfigureAwait(false);
+                if (enCours.Observer(valeur, horloge.ElapsedMilliseconds))
+                {
+                    annonces++;
+                    _journal?.LogInformation("MULTIPLAYER : manette d'equipe, la main est a la place {Place} (valeur {Valeur})", place, valeur);
+                    await _commandes.EnvoyerAsync("SHOW_MSG " + message.ReplaceLineEndings(" ").Trim(), ct).ConfigureAwait(false);
+                }
+
+                await Task.Delay(_periode, ct).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+
+        return annonces;
+    }
+
+    private async Task<long?> LireAsync(long? adresse, bool carte, int largeur, MultiplayerDuelGuard signal, CancellationToken ct)
+    {
+        if (adresse is not { } decalage)
         {
             return null;
         }
 
-        var commande = relais.ParLaCarteDuCoeur ? "READ_CORE_MEMORY" : "READ_CORE_RAM";
-        var reponse = await _commandes.DemanderAsync($"{commande} {decalage:x} {relais.Bytes}", ct).ConfigureAwait(false);
+        var commande = carte ? "READ_CORE_MEMORY" : "READ_CORE_RAM";
+        var reponse = await _commandes.DemanderAsync($"{commande} {decalage:x} {largeur}", ct).ConfigureAwait(false);
         var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (morceaux is null || morceaux.Length < 2 + relais.Bytes || morceaux[0] != commande)
+        if (morceaux is null || morceaux.Length < 2 + largeur || morceaux[0] != commande)
         {
             return null;
         }
 
-        var octets = new List<int>(relais.Bytes);
-        for (var i = 0; i < relais.Bytes; i++)
+        var octets = new List<int>(largeur);
+        for (var i = 0; i < largeur; i++)
         {
             if (!int.TryParse(morceaux[2 + i], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var octet))
             {
@@ -226,7 +303,7 @@ public sealed class MultiplayerRelaisDeLaManette
             octets.Add(octet);
         }
 
-        return relais.Signal.Valeur(octets);
+        return signal.Valeur(octets);
     }
 
     /// <summary>Les lignes ajoutees au journal depuis la derniere lecture ; il repart du debut s'il a ete recree.</summary>
