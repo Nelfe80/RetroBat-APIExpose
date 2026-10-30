@@ -57,6 +57,32 @@ public class MultiplayerCollectionSyncTests : IDisposable
         md5DuContenu: md5);
 
     [Fact]
+    public void L_inventaire_de_la_collection_ne_cherche_aucun_groupe_de_score()
+    {
+        // 30/10 : trouver le groupe ouvrait 5 500 .MEM a chaque demarrage de l'API, pour une liste qui ne s'en sert pas.
+        PoserCartouche("gba", "nom quelconque.zip", "x.gba", "mario kart usa");
+        var resolveur = new CompteLesResolutions();
+        var inventaire = new InstalledGameCatalog(resolveur, logger: null, romsRoot: Roms, ramRoot: Path.Combine(_racine, "ram"));
+
+        Assert.Single(inventaire.Enumerate(["gba"], avecGroupe: false));
+        Assert.Equal(0, resolveur.Appels);
+
+        Assert.Single(inventaire.Enumerate(["gba"]));
+        Assert.Equal(1, resolveur.Appels);
+    }
+
+    private sealed class CompteLesResolutions : IScoreSlugResolver
+    {
+        public int Appels { get; private set; }
+
+        public string? ResolveScoreSlug(string systemId, string? romFileName, string? md5, string? cheevosHash)
+        {
+            Appels++;
+            return null;
+        }
+    }
+
+    [Fact]
     public async Task La_derniere_passe_repart_du_disque_sans_mesurer_une_rom()
     {
         var cartouche = PoserCartouche("gba", "nom quelconque.zip", "x.gba", "mario kart usa");

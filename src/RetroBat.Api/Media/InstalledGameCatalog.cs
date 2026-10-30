@@ -48,8 +48,11 @@ public sealed class InstalledGameCatalog
     /// exemple <c>arcade</c> ou <c>megadrive</c>). Limiter le parcours a ce que le serveur
     /// annonce evite de scanner cent systemes pour en retenir trois.
     /// Sans systeme demande, tout ce qui est present est parcouru.
+    /// <paramref name="avecGroupe"/> a faux : pas de groupe de score. Le trouver ouvre tous les .MEM du systeme et son
+    /// alias.json (5 500 fichiers pour les consoles de MULTIPLAYER, 2 min 30 a chaque demarrage de l'API, 30/10/2026) :
+    /// qui ne lit que le chemin et le md5 s'en passe.
     /// </summary>
-    public IReadOnlyList<InstalledGame> Enumerate(IEnumerable<string>? canonicalSystemIds = null)
+    public IReadOnlyList<InstalledGame> Enumerate(IEnumerable<string>? canonicalSystemIds = null, bool avecGroupe = true)
     {
         if (!Directory.Exists(_romsRoot))
         {
@@ -78,7 +81,7 @@ public sealed class InstalledGameCatalog
 
             try
             {
-                jeux.AddRange(EnumerateSystem(frontend, dossier));
+                jeux.AddRange(EnumerateSystem(frontend, dossier, avecGroupe));
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
@@ -89,7 +92,7 @@ public sealed class InstalledGameCatalog
         return jeux;
     }
 
-    private IEnumerable<InstalledGame> EnumerateSystem(string frontendSystemId, string systemRoot)
+    private IEnumerable<InstalledGame> EnumerateSystem(string frontendSystemId, string systemRoot, bool avecGroupe)
     {
         var canonique = RomCanonicalResolver.CanonicalScoringSystem(frontendSystemId);
         var gamelist = Path.Combine(systemRoot, "gamelist.xml");
@@ -123,7 +126,8 @@ public sealed class InstalledGameCatalog
                     // Le choix d'emulateur fait POUR CE JEU dans EmulationStation : c'est une
                     // metadonnee de la fiche, pas un reglage d'es_settings.
                     emulateur: Text(noeud, "emulator"),
-                    coeur: Text(noeud, "core")));
+                    coeur: Text(noeud, "core"),
+                    avecGroupe: avecGroupe));
             }
         }
 
@@ -133,7 +137,7 @@ public sealed class InstalledGameCatalog
         {
             if (vus.Add(chemin))
             {
-                jeux.Add(Build(frontendSystemId, canonique, chemin, null, null, null, fromGamelist: false));
+                jeux.Add(Build(frontendSystemId, canonique, chemin, null, null, null, fromGamelist: false, avecGroupe: avecGroupe));
             }
         }
 
@@ -149,10 +153,11 @@ public sealed class InstalledGameCatalog
         string? cheevosHash,
         bool fromGamelist,
         string? emulateur = null,
-        string? coeur = null)
+        string? coeur = null,
+        bool avecGroupe = true)
     {
         var fichier = Path.GetFileName(absolutePath);
-        var groupe = _canonical.ResolveScoreSlug(frontendSystemId, fichier, md5, cheevosHash);
+        var groupe = avecGroupe ? _canonical.ResolveScoreSlug(frontendSystemId, fichier, md5, cheevosHash) : null;
         return new InstalledGame(
             frontendSystemId,
             canonicalSystemId,

@@ -524,7 +524,8 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
             {
                 if (!inventaires.TryGetValue(jeu.System, out var inventaire))
                 {
-                    inventaires[jeu.System] = inventaire = _catalog.Enumerate(SystemesDuContenu(jeu.System));
+                    // Le chemin et le md5 suffisent ici : le groupe de score couterait deux minutes a chaque demarrage.
+                    inventaires[jeu.System] = inventaire = _catalog.Enumerate(SystemesDuContenu(jeu.System), avecGroupe: false);
                 }
 
                 (chemin, cle) = TrouverContenu(jeu.Content!, inventaire);
