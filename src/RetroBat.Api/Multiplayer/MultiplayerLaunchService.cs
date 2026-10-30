@@ -72,6 +72,10 @@ public sealed class MultiplayerLaunchService : IHostedService
     private CancellationTokenSource? _gardeDeVitesse;
     private CancellationTokenSource? _boucleDuDepart;
     private CancellationTokenSource? _suiviDesInvites;
+
+    /// <summary>La manette passee au joueur courant d'un jeu a tour (v1.0 §8.3), chez l'hote comme chez l'invite.</summary>
+    private readonly MultiplayerRelaisDeLaManette _manette;
+    private CancellationTokenSource? _relaisDeLaManette;
     /// <summary>L'issue que le guet a lue : la place gagnante, et le rang de chaque humain pour une fin a plusieurs.</summary>
     private MultiplayerIssue? _issue;
 
@@ -116,6 +120,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         _depart = new MultiplayerDepartPret(new CommandesRetroArchUdp());
         _attente = new MultiplayerAttenteDesInvites(new CommandesRetroArchUdp());
         _fin = new MultiplayerFinDeRencontre(new CommandesRetroArchUdp());
+        _manette = new MultiplayerRelaisDeLaManette(new CommandesRetroArchUdp(), journal);
         _moteurDesStats = new MultiplayerStatsMoteur(new CommandesRetroArchUdp());
         _panneau.RencontreClasseeEnCours = () => RencontreClasseeEnCours;
     }
@@ -253,6 +258,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             // Une partie ouverte a d'autres joueurs n'entre pas au classement solo (charte de la partie certifiee).
             NetplayHostService.NoterOuverteAuxJoueurs();
             _ = Task.Run(() => PublierLaSessionAsync(room, jeu, jeton, motJoueur, motSpectateur));
+            RelayerLaManette(jeu.Game, room.Launch!.Seat);
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
             RetirerLEtatPose();
             MultiplayerIssue? issue;
@@ -267,6 +273,8 @@ public sealed class MultiplayerLaunchService : IHostedService
                 _boucleDuDepart = null;
                 _suiviDesInvites?.Cancel();
                 _suiviDesInvites = null;
+                _relaisDeLaManette?.Cancel();
+                _relaisDeLaManette = null;
                 issue = _issue;
                 _issue = null;
                 suivi = _suiviDesStats;
@@ -617,6 +625,28 @@ public sealed class MultiplayerLaunchService : IHostedService
         return profil is null ? null : MultiplayerOrdreNetplay.Permuter(profil, jeu.PlacesDuNetplay);
     }
 
+    /// <summary>
+    /// UN JEU A TOUR (v1.0 §8.3, Worms) : la manette unique passe a la borne dont c'est le tour, jusqu'a la fin de la partie.
+    /// </summary>
+    private void RelayerLaManette(MultiplayerGame jeu, int place)
+    {
+        if (jeu.TurnRelay is not { } relais)
+        {
+            return;
+        }
+
+        CancellationToken jeton;
+        lock (_verrou)
+        {
+            _relaisDeLaManette?.Cancel();
+            _relaisDeLaManette = new CancellationTokenSource();
+            jeton = _relaisDeLaManette.Token;
+        }
+
+        _journal.LogInformation("MULTIPLAYER : relais de la manette de {Jeu} pour la place {Place} (port {Port})", jeu.Id, place, relais.Port);
+        _ = Task.Run(() => _manette.RelayerAsync(relais, place, MultiplayerAttenteDesInvites.CheminDuJournal, jeton));
+    }
+
     /// <summary>Les places humaines de la partie : celles des joueurs de la gameroom.</summary>
     internal static IReadOnlyList<int> PlacesDe(MultiplayerRoom room)
         => room.Players.Where(joueur => joueur.Seat is not null).Select(joueur => joueur.Seat!.Value).Distinct().ToList();
@@ -796,8 +826,15 @@ public sealed class MultiplayerLaunchService : IHostedService
                     await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
                     await RetroArchInvite.FermerAsync().ConfigureAwait(false);
                 }, _journal));
+            RelayerLaManette(jeu.Game, room.Launch.Seat);
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
             guetInvite.Cancel();
+            lock (_verrou)
+            {
+                _relaisDeLaManette?.Cancel();
+                _relaisDeLaManette = null;
+            }
+
             NetplayGuestService.OublierInviteMultiplayer();
             // Un chargement d'etat fait ici se propage a l'hote sans y etre compte : l'invite juge son propre bilan.
             if (await JugerLeBilanAsync(room, jeu.Game, partie.Debut, 0).ConfigureAwait(false) is { } motif)

@@ -176,10 +176,18 @@ public sealed record MultiplayerGame
     [JsonPropertyName("seat_ports")]
     public IReadOnlyList<IReadOnlyList<int>>? SeatPorts { get; init; }
 
-    /// <summary>Les ports que tient cette place, dans l'ordre de ses manettes locales.</summary>
+    /// <summary>Les ports que tient cette place, dans l'ordre de ses manettes locales ; la manette unique d'un jeu a tour.</summary>
     public IReadOnlyList<int> PortsDeLaPlace(int place)
-        => SeatPorts is { Count: > 0 } ports && place >= 1 && place <= ports.Count && ports[place - 1].Count > 0 ? ports[place - 1]
+        => TurnRelay is { } relais ? [relais.Port]
+            : SeatPorts is { Count: > 0 } ports && place >= 1 && place <= ports.Count && ports[place - 1].Count > 0 ? ports[place - 1]
             : [PlaceDuJeu(place)];
+
+    /// <summary>
+    /// LA MANETTE PASSEE AU JOUEUR COURANT (CDC Classements v1.0 §8.3, revise le 29/10 ; Worms) : une seule manette, que
+    /// chaque borne prend et rend par le netplay selon l'octet du tour (<see cref="MultiplayerRelaisDeLaManette"/>).
+    /// </summary>
+    [JsonPropertyName("turn_relay")]
+    public MultiplayerTurnRelay? TurnRelay { get; init; }
 
     /// <summary>
     /// L'ORDRE DES PLACES (CDC Classements v1.1 §8.3, n° 14 ; NBA Jam TE, WrestleFest en Tag) : la place k de la plateforme
@@ -840,6 +848,52 @@ public sealed record MultiplayerMatchEnd
 /// une API d'avant l'ignore, et le jeu reste au niveau Classique chez elle ; un jeu qui la porte porte aussi son
 /// <c>min_api</c>.
 /// </summary>
+/// <summary>
+/// L'octet du tour d'un jeu a tour (<see cref="MultiplayerGame.TurnRelay"/>) : sa valeur dit la place qui joue ; une valeur
+/// absente de la table (le tour de l'ordinateur, un ecran de transition), personne.
+/// </summary>
+public sealed record MultiplayerTurnRelay
+{
+    [JsonPropertyName("core_ram")]
+    public string CoreRam { get; init; } = string.Empty;
+
+    [JsonPropertyName("bytes")]
+    public int Bytes { get; init; } = 1;
+
+    [JsonPropertyName("order")]
+    public string Order { get; init; } = "le";
+
+    /// <summary><c>core_map</c> : l'adresse est dans la carte du coeur (READ_CORE_MEMORY).</summary>
+    [JsonPropertyName("memory")]
+    public string? Memory { get; init; }
+
+    /// <summary>Valeur lue (en texte decimal) vers la place dont c'est le tour.</summary>
+    [JsonPropertyName("values")]
+    public IReadOnlyDictionary<string, int> Values { get; init; } = new Dictionary<string, int>();
+
+    /// <summary>Le port de la manette unique, que chaque borne demande au netplay.</summary>
+    [JsonPropertyName("port")]
+    public int Port { get; init; } = 1;
+
+    /// <summary>La valeur du tour doit tenir ce delai avant qu'une manette change de main.</summary>
+    [JsonPropertyName("settle_ms")]
+    public int SettleMs { get; init; } = 300;
+
+    [JsonIgnore]
+    public long? Decalage => new MultiplayerChoiceSeat { CoreRam = CoreRam }.Decalage;
+
+    [JsonIgnore]
+    public bool ParLaCarteDuCoeur => string.Equals(Memory, MultiplayerChoice.CarteDuCoeur, StringComparison.Ordinal);
+
+    /// <summary>La lecture de l'octet du tour, sur sa largeur et dans son ordre.</summary>
+    [JsonIgnore]
+    public MultiplayerDuelGuard Signal => new() { CoreRam = CoreRam, Bytes = Bytes, Order = Order };
+
+    /// <summary>La place dont c'est le tour, ou null : personne.</summary>
+    public int? PlaceDuTour(long valeur)
+        => Values.TryGetValue(valeur.ToString(CultureInfo.InvariantCulture), out var place) ? place : null;
+}
+
 /// <summary>Le departage d'une fin a plusieurs : par la valeur de chaque place, la plus haute ou la plus basse d'abord.</summary>
 public sealed record MultiplayerTieBreak
 {
@@ -1707,7 +1761,8 @@ public sealed class MultiplayerCatalogueStore
 
         // Le champ « bios » (CDC Classements v1.1 §5) n'est pas lu ici : l'outil de diagnostic dit quel BIOS manque (decision
         // du user du 29/10).
-        return ValiderLesVues(jeu) ?? ValiderLeDepart(jeu) ?? ValiderLeDepartDuCoeur(jeu) ?? ValiderLeClassement(jeu) ?? ValiderLOrdreDesPlaces(jeu);
+        return ValiderLesVues(jeu) ?? ValiderLeDepart(jeu) ?? ValiderLeDepartDuCoeur(jeu) ?? ValiderLeClassement(jeu) ?? ValiderLOrdreDesPlaces(jeu)
+            ?? ValiderLeRelais(jeu);
     }
 
     /// <summary>
@@ -1781,6 +1836,29 @@ public sealed class MultiplayerCatalogueStore
             || jeu.SeatRemap is { Count: > 0 } || jeu.Views is { Count: > 0 } || jeu.CoreStart is not null || jeu.Choices is { Count: > 0 } || jeu.Names is not null)
         {
             return "ordre des places incoherent (chaque place une fois, sans choix, pseudos, ports, ecrans ni depart par place)";
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// La manette passee au joueur courant (v1.0 §8.3) : une adresse, une table valeur vers place (des places du jeu), le port
+    /// de la manette. Pas avec un ordre des places, des ports par place ni un depart par place, que le relais ignorerait.
+    /// </summary>
+    internal static string? ValiderLeRelais(MultiplayerGame jeu)
+    {
+        if (jeu.TurnRelay is not { } relais)
+        {
+            return null;
+        }
+
+        if (relais.Decalage is null || relais.Bytes is < 1 or > 4 || relais.Order is not ("le" or "be" or "68k")
+            || relais.Memory is not (null or MultiplayerChoice.CarteDuCoeur) || relais.Port is < 1 or > 8 || relais.SettleMs is < 0 or > 5000
+            || relais.Values.Count == 0 || relais.Values.Any(v => !long.TryParse(v.Key, NumberStyles.None, CultureInfo.InvariantCulture, out _)
+                || v.Value < 1 || v.Value > jeu.Players)
+            || jeu.SeatOrder is not null || jeu.SeatPorts is { Count: > 0 } || jeu.CoreStart is not null)
+        {
+            return "relais de la manette incoherent (adresse, valeurs vers places, port ; sans ordre, ports ni depart par place)";
         }
 
         return null;
