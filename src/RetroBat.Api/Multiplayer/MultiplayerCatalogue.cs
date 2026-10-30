@@ -345,6 +345,26 @@ public sealed record MultiplayerGame
     [JsonPropertyName("ranking_ends")]
     public IReadOnlyList<MultiplayerRankingEnd>? RankingEnds { get; init; }
 
+    /// <summary>
+    /// UNE FIN PAR CONTENU (CDC Classements v1.1 §7, n° 9 ; Sonic Battle : les adresses de l'USA ne sont pas celles de
+    /// l'Europe ni du Japon) : la fin de chaque md5 du contenu, comme <c>start.content</c>. Seuls les contenus listes sont
+    /// classes ; un autre joue en partie libre. <see cref="RankingEnd"/> reste pour les API d'avant (en copie de l'un d'eux).
+    /// </summary>
+    [JsonPropertyName("ranking_end_by_content")]
+    public IReadOnlyDictionary<string, MultiplayerRankingEnd>? RankingEndByContent { get; init; }
+
+    /// <summary>Le jeu sur ce contenu : avec <see cref="RankingEndByContent"/>, la fin de ce contenu, ou aucune.</summary>
+    public MultiplayerGame PourLeContenu(string contenu)
+    {
+        if (RankingEndByContent is not { Count: > 0 } parContenu)
+        {
+            return this;
+        }
+
+        var fin = parContenu.FirstOrDefault(p => string.Equals(p.Key, contenu, StringComparison.OrdinalIgnoreCase)).Value;
+        return this with { RankingEnd = fin, RankingEndByContent = null };
+    }
+
     /// <summary>La fin a plusieurs d'une partie a ce nombre de joueurs, ou null quand aucune ne le prend.</summary>
     public MultiplayerRankingEnd? ClassementPour(int joueurs)
     {
@@ -1634,6 +1654,25 @@ public sealed class MultiplayerCatalogueStore
     /// </summary>
     internal static string? ValiderLeClassement(MultiplayerGame jeu)
     {
+        // Une fin par contenu (v1.1 §7, n° 9) : chaque cle est un md5 du contenu du jeu, chaque fin se valide comme
+        // ranking_end, qui reste obligatoire pour les API d'avant.
+        if (jeu.RankingEndByContent is { Count: > 0 } parContenu)
+        {
+            if (jeu.RankingEnd is null || jeu.RankingEnds is { Count: > 0 }
+                || parContenu.Keys.Any(cle => !(jeu.Content?.Md5 ?? []).Contains(cle, StringComparer.OrdinalIgnoreCase)))
+            {
+                return "classement : fins par contenu incoherentes (md5 du contenu, avec ranking_end, sans ranking_ends)";
+            }
+
+            foreach (var (cle, fin) in parContenu)
+            {
+                if (ValiderUneFin(jeu with { RankingEnd = fin, RankingEndByContent = null }) is { } raison)
+                {
+                    return raison + " (contenu " + cle + ")";
+                }
+            }
+        }
+
         if (jeu.RankingEnds is not { Count: > 0 } autres)
         {
             return ValiderUneFin(jeu);

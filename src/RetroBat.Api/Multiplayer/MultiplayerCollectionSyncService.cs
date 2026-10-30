@@ -429,7 +429,8 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
 
             if (chemin != null && cle != null)
             {
-                retenus.Add(new MultiplayerInstalledGame(jeu, chemin, coeur, cle));
+                // La fin de CE contenu (une fin par contenu, v1.1 §7, n° 9) : la session, le panneau et le guet n'en voient pas d'autre.
+                retenus.Add(new MultiplayerInstalledGame(jeu.PourLeContenu(cle), chemin, coeur, cle));
             }
         }
 

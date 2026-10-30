@@ -638,6 +638,35 @@ public class MultiplayerClassementTests
         Assert.Equal(5, jeu.DelaiDeFermeture);
     }
 
+    [Fact]
+    public void Une_fin_par_contenu_ne_classe_que_les_contenus_listes()
+    {
+        // Sonic Battle (v1.1 §7, n° 9) : seules les adresses de l'USA sont mesurees ; l'Europe joue en partie libre.
+        const string Usa = "100579ef01225c620560f88e65ca423a", Europe = "7194f25da6be4548f7e0c80f73e3f628";
+        var catalogue = Lire("{ \"schema_version\": 1, \"games\": [" + SonicBattleAuCatalogue.Replace(
+            "\"content\": { \"md5\": [\"100579ef01225c620560f88e65ca423a\"] }",
+            "\"content\": { \"md5\": [\"" + Usa + "\", \"" + Europe + "\"] }") + "] }");
+        var sansContenu = catalogue.Games[0];
+        var jeu = sansContenu with { RankingEndByContent = new Dictionary<string, MultiplayerRankingEnd> { [Usa.ToUpperInvariant()] = SonicBattle } };
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeClassement(jeu));
+
+        Assert.Same(SonicBattle, jeu.PourLeContenu(Usa).RankingEnd);
+        Assert.True(jeu.PourLeContenu(Usa).ClassePour([1, 2]));
+        var europe = jeu.PourLeContenu(Europe);
+        Assert.Null(europe.RankingEnd);
+        Assert.False(europe.FinLue);
+        Assert.False(europe.ClassePour([1, 2]));
+        // Sans fin par contenu, rien ne change.
+        Assert.Same(sansContenu, sansContenu.PourLeContenu(Europe));
+
+        // Une cle qui n'est pas un md5 du jeu (un CRC), ou sans ranking_end : refuse.
+        Assert.Contains("fins par contenu incoherentes", MultiplayerCatalogueStore.ValiderLeClassement(
+            jeu with { RankingEndByContent = new Dictionary<string, MultiplayerRankingEnd> { ["9ec9d86f"] = SonicBattle } }));
+        Assert.Contains("fins par contenu incoherentes", MultiplayerCatalogueStore.ValiderLeClassement(jeu with { RankingEnd = null }));
+        Assert.Contains("(contenu " + Usa + ")", MultiplayerCatalogueStore.ValiderLeClassement(
+            jeu with { RankingEndByContent = new Dictionary<string, MultiplayerRankingEnd> { [Usa] = SonicBattle with { FirstTo = null } } }));
+    }
+
     [Theory]
     [InlineData("\"rule\": \"relais\", \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "regle « relais » inconnue")]
     [InlineData("\"rule\": \"manches\", \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "manches sans seuil")]
