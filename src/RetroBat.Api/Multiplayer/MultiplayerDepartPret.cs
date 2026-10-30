@@ -600,6 +600,15 @@ public sealed class MultiplayerFinDeRencontre
     /// LA FIN AU SCORE (score_final, 23/10) : le signal de fin, deja vu retombe au moins une fois sous la garde, puis le
     /// score de chaque place. Le plus haut, seul, gagne ; une egalite est un match nul. Deux lectures de suite concordent.
     /// </summary>
+    /// <summary>
+    /// LE GUET DU SCORE FINAL, PLUS SERRE (CDC Classements v1.1, lot C n° 13 ; MGS Ghost Babel : EXIT choisi moins d'une
+    /// seconde apres la fin remet les scores a 0 et donnait un faux nul) : un releve deux fois plus frequent, et la relecture
+    /// qui confirme un resultat cinq fois plus vite que la periode.
+    /// </summary>
+    private TimeSpan GuetDuScore => _periode / 2;
+
+    private TimeSpan Confirmation => _periode / 5;
+
     public async Task<int?> AttendreLeScoreFinalAsync(MultiplayerMatchEnd fin, IReadOnlyCollection<int> places, CancellationToken ct)
     {
         int? candidat = null;
@@ -611,7 +620,7 @@ public sealed class MultiplayerFinDeRencontre
                 if (fin.Duel is { Decalage: { } garde } && await LireAsync(garde, ct, fin.ParLaCarteDuCoeur).ConfigureAwait(false) != fin.Duel.Value)
                 {
                     candidat = null;
-                    await Task.Delay(_periode, ct).ConfigureAwait(false);
+                    await Task.Delay(GuetDuScore, ct).ConfigureAwait(false);
                     continue;
                 }
 
@@ -621,7 +630,7 @@ public sealed class MultiplayerFinDeRencontre
                     // Le match n'est pas fini : un signal vu ensuite sera le sien, pas celui du match d'avant.
                     departVu = signal is not null || departVu;
                     candidat = null;
-                    await Task.Delay(_periode, ct).ConfigureAwait(false);
+                    await Task.Delay(GuetDuScore, ct).ConfigureAwait(false);
                     continue;
                 }
 
@@ -653,7 +662,8 @@ public sealed class MultiplayerFinDeRencontre
                 }
 
                 candidat = resultat;
-                await Task.Delay(_periode, ct).ConfigureAwait(false);
+                // Le signal de fin vu : la relecture qui confirme vient vite, avant qu'un EXIT ne remette les scores a 0.
+                await Task.Delay(resultat is null ? GuetDuScore : Confirmation, ct).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)

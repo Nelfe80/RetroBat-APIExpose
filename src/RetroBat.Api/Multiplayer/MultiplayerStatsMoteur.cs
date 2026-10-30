@@ -54,8 +54,9 @@ public sealed class MultiplayerStatsMoteur
                     }
                 }
 
-                suivi.Appliquer(nouvelles, retenues);
-                foreach (var (cle, valeur) in nouvelles)
+                var comptees = SansLesPlacesHorsJeu(profil, places, nouvelles, retenues);
+                suivi.Appliquer(comptees, retenues);
+                foreach (var (cle, valeur) in comptees)
                 {
                     retenues[cle] = valeur ?? retenues.GetValueOrDefault(cle);
                 }
@@ -68,6 +69,41 @@ public sealed class MultiplayerStatsMoteur
         }
 
         return suivi.Instantane();
+    }
+
+    /// <summary>
+    /// LA PRESENCE (lot C, n° 30) : les lectures d'une place hors jeu (l'ordinateur l'a reprise) ne comptent pas. Pour les
+    /// regles, rien n'est lu de la place ce tour ; sa valeur d'avant suit la lecture, et rien ne saute a son retour.
+    /// </summary>
+    internal static Dictionary<(string, int), int?> SansLesPlacesHorsJeu(MultiplayerStatsProfil profil, IReadOnlyList<int> places,
+        Dictionary<(string, int), int?> nouvelles, Dictionary<(string, int), int?> retenues)
+    {
+        if (profil.Presence is not { } presence)
+        {
+            return nouvelles;
+        }
+
+        var comptees = new Dictionary<(string, int), int?>(nouvelles);
+        foreach (var place in places)
+        {
+            var cle = (presence.Signal, place);
+            if (presence.EnJeu(place, nouvelles.GetValueOrDefault(cle) ?? retenues.GetValueOrDefault(cle)) != false)
+            {
+                continue;
+            }
+
+            foreach (var nom in profil.Signals.Keys)
+            {
+                if (nouvelles.GetValueOrDefault((nom, place)) is { } valeur)
+                {
+                    retenues[(nom, place)] = valeur;
+                }
+
+                comptees[(nom, place)] = null;
+            }
+        }
+
+        return comptees;
     }
 
     /// <summary>L'adresse de la place : fixe, ou l'ecart de la place depuis l'endroit que designe le pointeur du signal.</summary>

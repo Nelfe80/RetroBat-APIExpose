@@ -41,6 +41,14 @@ public sealed record MultiplayerStatsProfil
     [JsonPropertyName("metrics")]
     public IReadOnlyList<MultiplayerStatsMesure> Metrics { get; init; } = [];
 
+    /// <summary>
+    /// LA PRESENCE D'UNE PLACE (CDC Classements v1.1, lot C n° 30 ; Bomber Man World : l'ordinateur reprend la place d'un
+    /// humain elimine, et ses bombes monteraient les statistiques de la place) : tant que la place n'est pas en jeu, ses
+    /// valeurs sont suivies sans rien compter. Absent : toujours en jeu.
+    /// </summary>
+    [JsonPropertyName("presence")]
+    public MultiplayerStatsPresence? Presence { get; init; }
+
     /// <summary>Les trois categories du CDC, dans l'ordre de l'ecran.</summary>
     public static readonly IReadOnlyList<string> Categories = ["execution", "efficacite", "maitrise"];
 
@@ -256,6 +264,12 @@ public sealed record MultiplayerStatsProfil
             }
         }
 
+        if (profil.Presence is { } presence && (!profil.Signals.ContainsKey(presence.Signal)
+                || (presence.Mask is { } masques && Enumerable.Range(1, profil.Players).Any(place => !masques.TryGetValue(place.ToString(CultureInfo.InvariantCulture), out var m) || m <= 0))))
+        {
+            return "presence : signal inconnu ou masque manquant";
+        }
+
         if (profil.LitLAdversaire && profil.Players != 2)
         {
             return "les regles qui lisent l'adversaire demandent un duel";
@@ -414,6 +428,27 @@ public sealed record MultiplayerStatsPointeur
 
     /// <summary>Le decalage designe par une valeur lue, ou null pour un pointeur nul ou en dessous de la base.</summary>
     public long? Cible(long valeur) => Origine is { } origine && valeur > origine ? valeur - origine : null;
+}
+
+/// <summary>Ce qui dit une place en jeu : un signal du profil, et le bit de chaque place ou la valeur attendue.</summary>
+public sealed record MultiplayerStatsPresence
+{
+    [JsonPropertyName("signal")]
+    public string Signal { get; init; } = string.Empty;
+
+    /// <summary>Le bit de chaque place dans la valeur (Bomber Man World, <c>0x11316</c> : 1, 2, 4, 8) ; absent : la valeur elle-meme.</summary>
+    [JsonPropertyName("mask")]
+    public IReadOnlyDictionary<string, int>? Mask { get; init; }
+
+    /// <summary>Sans masque, la valeur qui dit la place en jeu ; absente : toute valeur non nulle.</summary>
+    [JsonPropertyName("value")]
+    public int? Value { get; init; }
+
+    /// <summary>La place est-elle en jeu, selon la valeur lue de son signal ? Null : on ne sait pas (rien de lu).</summary>
+    public bool? EnJeu(int place, int? valeur)
+        => valeur is not { } v ? null
+            : Mask is { } masques ? masques.TryGetValue(place.ToString(CultureInfo.InvariantCulture), out var masque) ? (v & masque) != 0 : null
+            : Value is { } attendue ? v == attendue : v != 0;
 }
 
 public sealed record MultiplayerStatsCompteur

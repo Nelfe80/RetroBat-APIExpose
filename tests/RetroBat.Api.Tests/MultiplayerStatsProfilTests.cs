@@ -243,6 +243,56 @@ public sealed class MultiplayerStatsProfilTests : IDisposable
         Assert.Equal(28, suivi.Instantane().Compteurs[1]["record"]);
     }
 
+    /// <summary>Bomber Man World : les bombes de chaque place, et les bits 0 et 1 de 0x11316 qui disent P1 et P2 en jeu.</summary>
+    private static readonly MultiplayerStatsProfil BombesEtPresence = new()
+    {
+        Id = "x", Players = 2,
+        Signals = new Dictionary<string, MultiplayerStatsSignal>
+        {
+            ["bombes"] = new() { Seats = new Dictionary<string, string> { ["1"] = "0x113B7", ["2"] = "0x113C7" } },
+            ["en_jeu"] = new() { Seats = new Dictionary<string, string> { ["1"] = "0x11316", ["2"] = "0x11316" } },
+        },
+        Counters = new Dictionary<string, MultiplayerStatsCompteur>
+        {
+            ["posees"] = new() { Rule = "hausse", Signal = "bombes" }, ["record"] = new() { Rule = "maximum", Signal = "bombes" },
+        },
+        Presence = new() { Signal = "en_jeu", Mask = new Dictionary<string, int> { ["1"] = 1, ["2"] = 2 } },
+    };
+
+    [Fact]
+    public void Une_place_hors_jeu_ne_compte_rien()
+    {
+        // Lot C, n° 30 : P1 eliminee (bit 0 eteint), l'ordinateur reprend sa place et pose des bombes ; rien ne monte chez P1.
+        var suivi = new MultiplayerStatsMoteur(new RetroArchMuet()).Suivre(BombesEtPresence, [1, 2], new CancellationToken(true));
+        var retenues = new Dictionary<(string, int), int?>();
+        foreach (var (p1, p2, enJeu) in new[] { (0, 0, 3), (1, 1, 3), (0, 0, 3), (1, 2, 2), (2, 0, 2), (0, 1, 2) })
+        {
+            var nouvelles = new Dictionary<(string, int), int?>
+            {
+                [("bombes", 1)] = p1, [("bombes", 2)] = p2, [("en_jeu", 1)] = enJeu, [("en_jeu", 2)] = enJeu,
+            };
+            var comptees = MultiplayerStatsMoteur.SansLesPlacesHorsJeu(BombesEtPresence, [1, 2], nouvelles, retenues);
+            suivi.Appliquer(comptees, retenues);
+            foreach (var (cle, valeur) in comptees)
+            {
+                retenues[cle] = valeur ?? retenues.GetValueOrDefault(cle);
+            }
+        }
+
+        var compteurs = suivi.Instantane().Compteurs;
+        Assert.Equal(1, compteurs[1]["posees"]);
+        Assert.Equal(1, compteurs[1]["record"]);
+        Assert.Equal(3, compteurs[2]["posees"]);
+        Assert.Equal(2, compteurs[2]["record"]);
+        Assert.DoesNotContain("presence", MultiplayerStatsProfil.Valider(BombesEtPresence) ?? string.Empty);
+        Assert.Equal("presence : signal inconnu ou masque manquant",
+            MultiplayerStatsProfil.Valider(BombesEtPresence with { Presence = new() { Signal = "vies" } }));
+        Assert.Equal("presence : signal inconnu ou masque manquant",
+            MultiplayerStatsProfil.Valider(BombesEtPresence with { Presence = new() { Signal = "en_jeu", Mask = new Dictionary<string, int> { ["1"] = 1 } } }));
+        Assert.Equal(true, new MultiplayerStatsPresence { Signal = "en_jeu", Value = 1 }.EnJeu(2, 1));
+        Assert.Null(new MultiplayerStatsPresence { Signal = "en_jeu" }.EnJeu(1, null));
+    }
+
     [Fact]
     public async Task KOF98_la_vie_sous_zero_est_un_KO_et_la_recharge_entre_deux_manches_ne_compte_pas()
     {
