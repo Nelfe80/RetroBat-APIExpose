@@ -39,6 +39,9 @@
     <EmbeddedResource Include="Replay\Overlay\reacts-icons.png" LogicalName="RetroBat.Api.reacts-icons.png" />
     <EmbeddedResource Include="Infrastructure\livecontest-icon.png" LogicalName="RetroBat.Api.livecontest-icon.png" />
     <EmbeddedResource Include="Infrastructure\livecontest-icon-big.png" LogicalName="RetroBat.Api.livecontest-icon-big.png" />
+    <!-- Les reglements des defis du prototype Sonic, embarques jusqu'a l'index des defis du site (lot S4). -->
+    <Content Remove="Speedrun\Reglements\*.json" />
+    <EmbeddedResource Include="Speedrun\Reglements\*.json" LogicalName="RetroBat.Api.Speedrun.Reglements.%(Filename)%(Extension)" />
   </ItemGroup>
 
   <!-- Media discovery internals (BuildAssetTable, MediaStreamAsset) are exercised by

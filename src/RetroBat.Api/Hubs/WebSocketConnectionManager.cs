@@ -27,6 +27,7 @@ public class WebSocketConnectionManager
     private string? _retainedPanelConfigJson;
     private string? _retainedScoreJson;
     private string? _retainedTimerJson;
+    private string? _retainedSpeedrunJson;
     private string? _retainedRetroAchievementsSessionJson;
     private string? _retainedRetroAchievementsCatalogJson;
 
@@ -399,6 +400,11 @@ public class WebSocketConnectionManager
             return One(_retainedTimerJson);
         }
 
+        if (string.Equals(stream, "speedrun", StringComparison.OrdinalIgnoreCase))
+        {
+            return One(_retainedSpeedrunJson);
+        }
+
         if (string.Equals(stream, "retroachievements", StringComparison.OrdinalIgnoreCase))
         {
             return new[] { _retainedRetroAchievementsCatalogJson, _retainedRetroAchievementsSessionJson }
@@ -440,6 +446,14 @@ public class WebSocketConnectionManager
             string.Equals(timerEnvelope.Type, "timer.live.changed", StringComparison.OrdinalIgnoreCase))
         {
             _retainedTimerJson = json;
+        }
+
+        // Le snapshot de la session de speedrun, ou sa fermeture : le HUD qui se (re)connecte sait aussitot ou on en est (§11 bis.5).
+        if (message is EventEnvelope speedrunEnvelope &&
+            (string.Equals(speedrunEnvelope.Type, "speedrun.session", StringComparison.OrdinalIgnoreCase) ||
+             string.Equals(speedrunEnvelope.Type, "speedrun.session.closed", StringComparison.OrdinalIgnoreCase)))
+        {
+            _retainedSpeedrunJson = json;
         }
 
         if (message is EventEnvelope raEnvelope &&
@@ -636,6 +650,7 @@ public class WebSocketConnectionManager
             ["arcade"] = ["arcade.", "mame.", "fbneo.", "outputs."],
             ["score"] = ["score.live."],
             ["timer"] = ["timer.live."],
+            ["speedrun"] = ["speedrun."],
             ["retroachievements"] = ["retroachievements."],
             ["hiscore"] = ["hiscore."],
             ["media"] = ["media."],
@@ -654,6 +669,7 @@ public class WebSocketConnectionManager
             ["panel"] = ["panel.state", "panel.config.changed"],
             ["score"] = ["score.live.changed"],
             ["timer"] = ["timer.live.changed"],
+            ["speedrun"] = ["speedrun.session"],
             ["retroachievements"] = ["retroachievements.catalog.updated", "retroachievements.session.updated"]
         };
 

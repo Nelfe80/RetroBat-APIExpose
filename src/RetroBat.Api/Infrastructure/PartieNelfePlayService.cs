@@ -59,6 +59,15 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable, RetroB
         _collection = collection;
     }
 
+    /// <summary>L'origine d'un defi de speedrun lance par l'API (prototype Sonic, §10).</summary>
+    public const string OrigineSpeedrun = "speedrun";
+
+    /// <summary>
+    /// UN DEFI DE SPEEDRUN (contexte de lancement type « challenge », v1.0 §06.2) : la partie est NelfePlay (replay,
+    /// reglages certifies) mais n'envoie aucun score au World Scoring, meme si le jeu y est ouvert (T-21).
+    /// </summary>
+    public bool EstSpeedrun => string.Equals(Origine, OrigineSpeedrun, StringComparison.Ordinal);
+
     /// <summary>La partie en cours, ou la derniere, est-elle une partie NelfePlay ? Jamais sous l'atelier.</summary>
     public bool EstNelfePlay
     {

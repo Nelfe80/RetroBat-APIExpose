@@ -40,8 +40,6 @@ public sealed class GameLaunchController : ControllerBase
     /// s'y joue sous plusieurs émulateurs. RetroBat, lui, le range par émulateur. On cherche
     /// donc dans les dossiers qui peuvent le porter, dans l'ordre où on préfère les trouver.
     /// </summary>
-    private static readonly string[] DossiersArcade = ["fbneo", "mame", "mame64", "fba", "arcade"];
-
     private readonly IGamelistStore _gamelists;
     private readonly RomCanonicalResolver _canonical;
     private readonly ReplayLaunchTokenStore _tokens;
@@ -291,63 +289,5 @@ public sealed class GameLaunchController : ControllerBase
     /// décide, à la fin d'une partie, sous quel groupe le score est publié. Comparer des
     /// libellés ferait diverger le jeu lancé et le classement affiché.
     /// </summary>
-    private string? Trouver(string system, string romGroup)
-    {
-        var cible = romGroup.Trim().ToLowerInvariant();
-        var systeme = system.Trim().ToLowerInvariant();
-        var dossiers = systeme is "arcade" ? DossiersArcade : [systeme];
-
-        foreach (var dossier in dossiers)
-        {
-            // Un identifiant de système ne doit jamais devenir un chemin : seul un nom de
-            // dossier simple est accepte.
-            if (dossier.Length == 0 || !string.Equals(Path.GetFileName(dossier), dossier, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            var racine = Path.Combine(RetroBatPaths.RomsRoot, dossier);
-            var chemin = Path.Combine(racine, "gamelist.xml");
-            if (!System.IO.File.Exists(chemin))
-            {
-                continue;
-            }
-
-            XDocument? doc;
-            lock (_gamelists.GetLock(chemin))
-            {
-                doc = _gamelists.Load(chemin, LoadOptions.None);
-            }
-            if (doc?.Root is null)
-            {
-                continue;
-            }
-
-            foreach (var jeu in doc.Root.Elements("game"))
-            {
-                var brut = ((string?)jeu.Element("path") ?? "").Trim().Replace('\\', '/');
-                var fichier = Path.GetFileName(brut);
-                if (fichier.Length == 0)
-                {
-                    continue;
-                }
-
-                var md5 = ((string?)jeu.Element("md5") ?? "").Trim().ToLowerInvariant();
-                var cheevos = ((string?)jeu.Element("cheevosHash") ?? "").Trim();
-                var slug = _canonical.ResolveScoreSlug(dossier, fichier, md5, cheevos);
-                if (slug is null || !string.Equals(slug, cible, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                var complet = Path.GetFullPath(Path.Combine(racine, fichier));
-                if (System.IO.File.Exists(complet) || Directory.Exists(complet))
-                {
-                    return complet;
-                }
-            }
-        }
-
-        return null;
-    }
+    private string? Trouver(string system, string romGroup) => RomDuGroupe.Trouver(_gamelists, _canonical, system, romGroup);
 }

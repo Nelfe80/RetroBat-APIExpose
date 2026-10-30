@@ -123,51 +123,12 @@ public class CommandsController : ControllerBase
             {
                 _logger.LogInformation("Lancement direct sans RetroAchievements pour cette seance ({Systeme}, {Emulateur}).", systeme, payload.Emulator.Trim());
             }
-            var lanceur = RetroBat.Api.Netplay.NetplayLaunch.DemarrerDirectement(arguments, _logger);
+            // Le jeu en cours, son debut et sa fin sont poses par le lancement direct (ES ne dit rien).
+            var lanceur = RetroBat.Api.Infrastructure.LancementDirect.Lancer(arguments, systeme, romPath, _context, _bus, _logger);
             if (lanceur is null)
             {
                 return StatusCode(StatusCodes.Status502BadGateway, new { message = "emulatorLauncher could not be started.", romPath });
             }
-            // SANS EMULATIONSTATION, PERSONNE NE DIT QUEL JEU TOURNE. Le contexte « jeu en cours »
-            // vient d'ordinaire du hook game-start d'ES ; sans lui, le wrapper resout sa
-            // definition sur le jeu SELECTIONNE dans le menu, ou sur rien, et aucun score
-            // n'est lu (labo du 2026-09-22 : 0 evenement sur FBNeo lance en direct). On pose
-            // donc le jeu nous-memes, on annonce son debut, et sa fin quand le lanceur rend la
-            // main - il vit tant que l'emulateur tourne.
-            var jeu = new GameReference
-            {
-                SystemId = systeme,
-                GamePath = romPath,
-                GameName = Path.GetFileNameWithoutExtension(romPath),
-            };
-            _context.Ui.Running = jeu;
-            _context.Ui.State = "playing";
-            _ = _bus.PublishAsync(new RetroBat.Domain.Events.EventEnvelope
-            {
-                Type = "ui.game.started",
-                Payload = new { Source = "commands.launch", SystemId = systeme, GamePath = romPath, GameName = jeu.GameName, Direct = true },
-            });
-            var bus = _bus;
-            var contexte = _context;
-            _ = Task.Run(async () =>
-            {
-                try { await lanceur.WaitForExitAsync().ConfigureAwait(false); } catch { /* le lanceur a deja disparu */ }
-                if (ReferenceEquals(contexte.Ui.Running, jeu))
-                {
-                    contexte.Ui.Running = null;
-                    contexte.Ui.State = "browsing";
-                }
-                try
-                {
-                    await bus.PublishAsync(new RetroBat.Domain.Events.EventEnvelope
-                    {
-                        Type = "ui.game.ended",
-                        Payload = new { Source = "commands.launch", SystemId = systeme, GamePath = romPath, GameName = jeu.GameName, Direct = true },
-                    }).ConfigureAwait(false);
-                }
-                catch { /* rien a faire de plus */ }
-            });
-            _ = RetroBat.Api.Infrastructure.EmulatorForeground.FocusEmulatorWhenUpAsync();
             return Accepted(new
             {
                 status = "launching",

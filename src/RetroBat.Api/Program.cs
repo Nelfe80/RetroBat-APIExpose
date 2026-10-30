@@ -295,6 +295,9 @@ builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardSocialClient>(
 builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardRankHistory>();
 builder.Services.AddSingleton<RetroBat.Api.Leaderboard.ChallengeHudService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Leaderboard.ChallengeHudService>());
+// Les defis de speedrun (prototype Sonic, lot S3) : session, evaluateur branche sur le flux du wrapper, contrat du HUD.
+builder.Services.AddSingleton<RetroBat.Api.Speedrun.SpeedrunSessionService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Speedrun.SpeedrunSessionService>());
 builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardOverlayService>();
 builder.Services.AddHostedService<RetroBat.Api.Leaderboard.LeaderboardInputService>();
 // LE LECTEUR DE MANETTES DEMARRE AVEC LE PANNEAU (2026-10-04). Les services demarrent l'un apres

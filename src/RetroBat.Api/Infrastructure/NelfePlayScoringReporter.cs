@@ -983,8 +983,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private readonly PartieNelfePlayService? _partie;
 
+    /// <summary>
+    /// Un defi de speedrun est une partie NelfePlay qui ne mesure ni n'envoie aucun score : sa mesure est celle de
+    /// SpeedrunSessionService (T-21 du CDC Speedruns).
+    /// </summary>
     private bool PartieNelfePlay()
         => !SousAtelier()
+           && _partie is not { EstSpeedrun: true }
            && (_partie is not { EstNelfePlay: false }
                || RetroBat.Api.Scoring.ScoreLabLabMode.IsActive(DateTime.UtcNow, out _));
 
@@ -1030,7 +1035,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 Trace(SousAtelier()
                     ? $"prevol : {systemId}/{romGroup} sous l'atelier NelfeScoreLab, ni annonce ni scoring"
-                    : $"prevol : {systemId}/{romGroup} lance hors NelfePlay, ni annonce ni scoring");
+                    : _partie is { EstSpeedrun: true }
+                        ? $"prevol : {systemId}/{romGroup} lance pour un defi de speedrun, ni annonce ni scoring"
+                        : $"prevol : {systemId}/{romGroup} lance hors NelfePlay, ni annonce ni scoring");
                 return;
             }
             // Si le jeu a demarre sans passer par ES, le role n'a pas encore ete repris.
@@ -2876,7 +2883,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             Trace(SousAtelier()
                 ? "STOP: atelier NelfeScoreLab, rien n'est mesure ni envoye"
-                : "STOP: partie lancee hors NelfePlay (ni collection World Scoring, ni fonction NelfePlay)");
+                : _partie is { EstSpeedrun: true }
+                    ? "STOP: defi de speedrun, aucun score World Scoring (la mesure est celle de la session de speedrun)"
+                    : "STOP: partie lancee hors NelfePlay (ni collection World Scoring, ni fonction NelfePlay)");
             return;
         }
         RetroBat.Api.Netplay.NetplayGuestService.Role roleInvite;
