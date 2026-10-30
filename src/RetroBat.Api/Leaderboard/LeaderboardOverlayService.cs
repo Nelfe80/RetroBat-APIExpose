@@ -470,6 +470,71 @@ public sealed partial class LeaderboardOverlayService : IDisposable
         }
     }
 
+    /// <summary>
+    /// LA VEILLEUSE (30/10/2026, « mon ecran s'eteint comme s'il changeait de definition », Intel UHD) : ES plein ecran passe
+    /// directement a l'ecran, et la premiere fenetre posee dessus oblige Windows a tout recomposer : l'ecran s'eteignait
+    /// juste avant le panneau. Deux pixels noirs laisses dans un coin gardent cette composition en place, le panneau n'a
+    /// plus de transition a provoquer. Essai sur la borne : plus de flash avec eux, le flash revient sans eux. Retiree
+    /// pendant les parties : un jeu passe directement a l'ecran, sans une image de retard.
+    /// </summary>
+    private sealed class Veilleuse : Form
+    {
+        public Veilleuse()
+        {
+            FormBorderStyle = FormBorderStyle.None;
+            ShowInTaskbar = false;
+            TopMost = true;
+            BackColor = Color.Black;
+            StartPosition = FormStartPosition.Manual;
+            MinimumSize = Size.Empty;
+            Size = new Size(2, 2);
+        }
+
+        protected override bool ShowWithoutActivation => true;
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                const int WsExNoActivate = 0x08000000;
+                const int WsExTopmost = 0x00000008;
+                const int WsExToolWindow = 0x00000080;
+                var p = base.CreateParams;
+                p.ExStyle |= WsExNoActivate | WsExToolWindow | WsExTopmost;
+                return p;
+            }
+        }
+    }
+
+    private Veilleuse? _veilleuse;
+    private bool _veilleuseVoulue;
+
+    /// <summary>La veilleuse ne se pose que sur ES a l'ecran, jamais pendant une partie ni la lecture d'un replay.</summary>
+    internal static bool VeilleuseVoulue(bool activee, string? etat, bool esPresent, bool replayEnLecture)
+        => activee && esPresent && !replayEnLecture && string.Equals(etat, "browsing", StringComparison.OrdinalIgnoreCase);
+
+    public void PoserLaVeilleuse(bool voulue)
+    {
+        if (voulue == _veilleuseVoulue) return;
+        var forme = _forme;
+        if (forme is null || !forme.IsHandleCreated) return;
+        _veilleuseVoulue = voulue;
+        forme.BeginInvoke(() =>
+        {
+            if (!voulue)
+            {
+                _veilleuse?.Hide();
+                return;
+            }
+
+            _veilleuse ??= new Veilleuse();
+            var es = EmulatorForeground.FenetreDEmulationStation();
+            var ecran = (es != IntPtr.Zero ? Screen.FromHandle(es) : Screen.PrimaryScreen)?.Bounds ?? Rectangle.Empty;
+            _veilleuse.Bounds = new Rectangle(ecran.Right - 2, ecran.Bottom - 2, 2, 2);
+            _veilleuse.Show();
+        });
+    }
+
     private void Boucle()
     {
         try

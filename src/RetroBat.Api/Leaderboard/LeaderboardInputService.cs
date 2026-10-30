@@ -189,8 +189,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         _arret = new CancellationTokenSource();
         _ = Task.Run(() => ChienDeGardeAsync(_arret.Token), CancellationToken.None);
         _ = Task.Run(() => GuetterLesDirectsSuivisAsync(_arret.Token), CancellationToken.None);
-        // La lecture de tous les replays se fait ici une fois : la premiere ouverture du panneau ne l'attend pas.
-        _ = Task.Run(() => _replays.ListerSansRelire(), CancellationToken.None);
+        // Les parties et les replays se lisent ici une fois : la premiere ouverture du panneau ne l'attend pas. Elle
+        // bloquait le chien de garde, et un appui long tombe pendant cette lecture se perdait (30/10/2026).
+        _ = Task.Run(() =>
+        {
+            _partiesLocales.Toutes();
+            _replays.ListerSansRelire();
+        }, CancellationToken.None);
         _logger.LogInformation("Classement : panneau arme (appui long sur le slot {Slot}).", SlotValider);
         // A ET B INVERSES DANS ES (2026-10-17) : le « valider » d'ES change de bouton, pas le notre. Dit au demarrage, pour
         // qu'un « le panneau ne s'ouvre pas » s'explique a la lecture du journal.
@@ -561,6 +566,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// PENDANT que le bouton est encore tenu, au moment meme ou ES ouvre son menu. Attendre le
     /// relache ferait apparaitre le panneau apres coup.
     /// </summary>
+    private int _toursDeLaVeilleuse;
+
     private async Task ChienDeGardeAsync(CancellationToken ct)
     {
         while (!ct.IsCancellationRequested)
@@ -568,6 +575,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             try
             {
                 await Task.Delay(80, ct).ConfigureAwait(false);
+
+                if (++_toursDeLaVeilleuse >= 12)
+                {
+                    _toursDeLaVeilleuse = 0;
+                    _overlay.PoserLaVeilleuse(LeaderboardOverlayService.VeilleuseVoulue(_options.CurrentValue.Leaderboard.Veilleuse,
+                        _context.Ui.State, EmulatorForeground.FenetreDEmulationStation() != IntPtr.Zero, _playback.IsBusy));
+                }
 
                 // Le meme pour MULTIPLAYER (29/10, « a la sortie d'un jeu multiplayer, l'appui long ne fonctionne plus ») :
                 // tant qu'un de ses ecrans se croit ouvert (le resultat, la presentation d'un lancement), il prend chaque

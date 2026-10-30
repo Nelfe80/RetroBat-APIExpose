@@ -785,6 +785,12 @@ public class ApiExposeOptions
         /// l'atteigne jamais.
         /// </summary>
         public int LongPressMs { get; set; } = 600;
+
+        /// <summary>
+        /// Une fenetre de 2 pixels au-dessus d'EmulationStation, hors des parties : sans elle, l'apparition du panneau fait
+        /// recomposer l'ecran par Windows, et certains ecrans s'eteignent une seconde (30/10/2026, Intel UHD).
+        /// </summary>
+        public bool Veilleuse { get; set; } = true;
     }
 
     /// <summary>
