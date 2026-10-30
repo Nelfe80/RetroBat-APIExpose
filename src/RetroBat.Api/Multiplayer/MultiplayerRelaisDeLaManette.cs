@@ -155,6 +155,7 @@ public sealed class MultiplayerRelaisDeLaManette
         var journal = new SuiteDuJournal(cheminDuJournal);
         var horloge = System.Diagnostics.Stopwatch.StartNew();
         var bascules = 0;
+        long? vue = null;
         try
         {
             while (!ct.IsCancellationRequested)
@@ -169,6 +170,13 @@ public sealed class MultiplayerRelaisDeLaManette
                 }
 
                 var valeur = await LireLeTourAsync(relais, ct).ConfigureAwait(false);
+                if (valeur is not null && valeur != vue)
+                {
+                    vue = valeur;
+                    _journal?.LogInformation("MULTIPLAYER : relais de la manette, place {Place} : tour {Valeur} (place {DuTour})", place, valeur,
+                        relais.PlaceDuTour(valeur.Value)?.ToString(CultureInfo.InvariantCulture) ?? "aucune");
+                }
+
                 if (enCours.Observer(valeur, horloge.ElapsedMilliseconds))
                 {
                     bascules++;

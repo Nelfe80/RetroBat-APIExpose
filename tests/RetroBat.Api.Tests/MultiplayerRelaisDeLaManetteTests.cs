@@ -92,6 +92,112 @@ public class MultiplayerRelaisDeLaManetteTests
         Assert.False(hote.Observer(0, 20000));
     }
 
+    /// <summary>
+    /// AU BANC (banc_relais.py api, plugins-70) : deux RetroArch en netplay, l'hote en 56510 et l'invite en 56511, leurs
+    /// journaux dans NELFEPLAY_BANC_RELAIS. Les deux vraies boucles du relais tournent ici ; le test ecrit lui-meme l'octet du
+    /// tour dans les deux jeux (une adresse que Worms laisse en paix), et le journal de chaque RetroArch dit qui tient la
+    /// manette. Sans la variable, il passe sans rien faire.
+    /// </summary>
+    [Fact]
+    public async Task Au_banc_la_manette_suit_l_octet_du_tour()
+    {
+        if (Environment.GetEnvironmentVariable("NELFEPLAY_BANC_RELAIS") is not { Length: > 0 } dossier)
+        {
+            return;
+        }
+
+        var relais = Worms with { CoreRam = "0x1FFFE" };
+        var ecrivains = new[] { new CommandesRetroArchUdp(56510, 56533), new CommandesRetroArchUdp(56511, 56534) };
+        using var fin = new CancellationTokenSource();
+        var tour = 0;
+        var ecriture = Task.Run(async () =>
+        {
+            // L'octet est reecrit sans cesse dans les deux jeux : un retour en arriere du netplay le remettrait sinon.
+            while (!fin.IsCancellationRequested)
+            {
+                foreach (var ecrivain in ecrivains)
+                {
+                    await ecrivain.EnvoyerAsync($"WRITE_CORE_RAM 1fffe {tour:x2}", CancellationToken.None);
+                }
+
+                await Task.Delay(50);
+            }
+        });
+        var trace = new JournalDuBanc(Path.Combine(dossier, "relais-api.log"));
+        var hote = new MultiplayerRelaisDeLaManette(new CommandesRetroArchUdp(56510, 56531), trace).RelayerAsync(relais, 1, Path.Combine(dossier, "hote.log"), fin.Token);
+        var invite = new MultiplayerRelaisDeLaManette(new CommandesRetroArchUdp(56511, 56532), trace).RelayerAsync(relais, 2, Path.Combine(dossier, "invite.log"), fin.Token);
+        foreach (var suivant in new[] { 1, 0, 1, 0 })
+        {
+            await Task.Delay(5000);
+            tour = suivant;
+        }
+
+        await Task.Delay(5000);
+        fin.Cancel();
+        await ecriture;
+        var bascules = (await hote, await invite);
+
+        // Quatre changements de main : l'hote rend et reprend deux fois, l'invite prend et rend deux fois.
+        // RetroArch tient son journal ouvert en ecriture : il se lit en partage.
+        string[] Lignes(string role)
+        {
+            using var flux = new FileStream(Path.Combine(dossier, role + ".log"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            using var lecteur = new StreamReader(flux);
+            return lecteur.ReadToEnd().Split('\n');
+        }
+
+        string[] Siennes(string role) => Lignes(role)
+            .Where(ligne => MultiplayerRelaisDeLaManette.Lire(ligne) is MultiplayerReponseDuNetplay.Rejoint or MultiplayerReponseDuNetplay.Quitte)
+            .Select(ligne => MultiplayerRelaisDeLaManette.Lire(ligne)!.Value.ToString()).ToArray();
+        Assert.Equal(["Rejoint", "Quitte", "Rejoint", "Quitte", "Rejoint"], Siennes("hote"));
+        Assert.Equal(["Rejoint", "Quitte", "Rejoint", "Quitte"], Siennes("invite"));
+        // Une prise refusee (la manette pas encore rendue) se redemande : au moins quatre bascules de chaque cote.
+        Assert.True(bascules.Item1 >= 4 && bascules.Item2 >= 4, bascules.ToString());
+    }
+
+    /// <summary>
+    /// AU BANC SUR LE VRAI JEU (banc_relais.py worms) : le depart a deux du couloir 1, l'octet du tour de Worms (0x1F6A), et
+    /// personne aux manettes : chaque tour finit au temps, la main passe d'elle-meme. NELFEPLAY_BANC_RELAIS_WORMS donne la duree.
+    /// </summary>
+    [Fact]
+    public async Task Au_banc_la_manette_suit_le_vrai_tour_de_Worms()
+    {
+        if (Environment.GetEnvironmentVariable("NELFEPLAY_BANC_RELAIS") is not { Length: > 0 } dossier
+            || !int.TryParse(Environment.GetEnvironmentVariable("NELFEPLAY_BANC_RELAIS_WORMS"), out var secondes))
+        {
+            return;
+        }
+
+        var relais = Worms with { CoreRam = "0x1F6A" };
+        using var fin = new CancellationTokenSource(TimeSpan.FromSeconds(secondes));
+        var trace = new JournalDuBanc(Path.Combine(dossier, "relais-worms.log"));
+        var hote = new MultiplayerRelaisDeLaManette(new CommandesRetroArchUdp(56510, 56531), trace).RelayerAsync(relais, 1, Path.Combine(dossier, "hote.log"), fin.Token);
+        var invite = new MultiplayerRelaisDeLaManette(new CommandesRetroArchUdp(56511, 56532), trace).RelayerAsync(relais, 2, Path.Combine(dossier, "invite.log"), fin.Token);
+        var bascules = (await hote, await invite);
+        // Au moins un tour passe : l'hote rend la manette, l'invite la prend.
+        Assert.True(bascules.Item1 >= 1 && bascules.Item2 >= 1, bascules.ToString());
+    }
+
+    /// <summary>Le journal des deux boucles du banc, ligne a ligne, a l'instant de chaque ligne.</summary>
+    private sealed class JournalDuBanc(string chemin) : Microsoft.Extensions.Logging.ILogger
+    {
+        private readonly object _verrou = new();
+        private readonly System.Diagnostics.Stopwatch _horloge = System.Diagnostics.Stopwatch.StartNew();
+
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+
+        public bool IsEnabled(Microsoft.Extensions.Logging.LogLevel logLevel) => true;
+
+        public void Log<TState>(Microsoft.Extensions.Logging.LogLevel logLevel, Microsoft.Extensions.Logging.EventId eventId, TState state, Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            lock (_verrou)
+            {
+                File.AppendAllText(chemin, $"{_horloge.ElapsedMilliseconds,7} {formatter(state, exception)}{Environment.NewLine}");
+            }
+        }
+    }
+
     [Fact]
     public void Le_jeu_a_tour_demande_la_seule_manette_et_se_valide()
     {

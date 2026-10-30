@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
@@ -19,15 +20,26 @@ public interface ICommandesRetroArch
 public sealed class CommandesRetroArchUdp : ICommandesRetroArch
 {
     private readonly int _port;
+    private readonly int? _portLocal;
 
-    /// <summary>Le port des commandes de RetroArch : 55355 pour une partie, un autre sur un banc d'essai.</summary>
-    public CommandesRetroArchUdp(int port = 55355) => _port = port;
+    /// <summary>
+    /// Le port des commandes de RetroArch : 55355 pour une partie, un autre sur un banc d'essai. <paramref name="portLocal"/> :
+    /// le port d'ou partent les commandes, sur un banc (dans la plage du banc : un port ephemere peut prendre celui d'un autre
+    /// banc) ; absent, un port ephemere.
+    /// </summary>
+    public CommandesRetroArchUdp(int port = 55355, int? portLocal = null)
+    {
+        _port = port;
+        _portLocal = portLocal;
+    }
+
+    private UdpClient Client() => _portLocal is { } local ? new UdpClient(new IPEndPoint(IPAddress.Loopback, local)) : new UdpClient();
 
     public async Task<string?> DemanderAsync(string commande, CancellationToken ct, int delaiMs = 500)
     {
         try
         {
-            using var udp = new UdpClient();
+            using var udp = Client();
             var octets = Encoding.UTF8.GetBytes(commande);
             await udp.SendAsync(octets, octets.Length, "127.0.0.1", _port).WaitAsync(ct).ConfigureAwait(false);
             using var delai = CancellationTokenSource.CreateLinkedTokenSource(ct);
@@ -46,7 +58,7 @@ public sealed class CommandesRetroArchUdp : ICommandesRetroArch
         try
         {
             // En UTF-8 : un message a l'ecran (SHOW_MSG) porte des accents ; les commandes, elles, sont en ASCII.
-            using var udp = new UdpClient();
+            using var udp = Client();
             var octets = Encoding.UTF8.GetBytes(commande);
             await udp.SendAsync(octets, octets.Length, "127.0.0.1", _port).WaitAsync(ct).ConfigureAwait(false);
         }
