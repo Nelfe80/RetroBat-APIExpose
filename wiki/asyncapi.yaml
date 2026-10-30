@@ -155,6 +155,20 @@ channels:
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
+  speedrun:
+    address: /ws/speedrun
+    description: >
+      Prefix `speedrun.` - speedrun challenge session, for the SpeedrunHUD:
+      speedrun.session (snapshot, retained: sessionId, attemptId, attemptNumber,
+      challengeId, rulesVersion, state, cause, sequence, start, official, splits,
+      comparisons, allowedActions, demo), speedrun.state, speedrun.started,
+      speedrun.finish.provisional, speedrun.attempt.ended, speedrun.attempt.opened,
+      speedrun.restart.failed, speedrun.comparison, speedrun.session.closed
+      (retained after the game ends). Every event carries the session `sequence`.
+      Commands go through POST /api/v1/speedrun/commands (local token).
+    messages:
+      envelope:
+        $ref: '#/components/messages/envelope'
   retroachievements:
     address: /ws/retroachievements
     description: >
