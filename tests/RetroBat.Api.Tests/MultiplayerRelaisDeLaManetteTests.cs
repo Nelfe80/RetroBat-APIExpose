@@ -80,6 +80,33 @@ public class MultiplayerRelaisDeLaManetteTests
     }
 
     [Fact]
+    public void Worms_garde_la_manette_pendant_le_vol_d_un_tir()
+    {
+        // Juste apres un tir, 0x1F6A vaut 0x41 ou 0x43, hors de la table, aussi longtemps que dure le vol : la manette ne bouge pas.
+        var table = Worms with { Values = new Dictionary<string, int> { ["0"] = 1, ["1"] = 2, ["3"] = 3, ["4"] = 4 } };
+        var joueur = new MultiplayerRelaisEnCours(table, 2);
+        joueur.Noter(MultiplayerReponseDuNetplay.Rejoint, 0);
+        Assert.False(joueur.Observer(1, 100));
+        Assert.False(joueur.Observer(1, 400));
+        Assert.False(joueur.Observer(0x41, 500));
+        Assert.False(joueur.Observer(0x41, 3000));
+        // Le tour revient au meme joueur : rien non plus.
+        Assert.False(joueur.Observer(1, 3100));
+        Assert.False(joueur.Observer(1, 3500));
+        Assert.True(joueur.Joue);
+
+        // Le tour passe ensuite a la place 3, par une valeur hors de la table : la seule bascule, une fois sa valeur tenue.
+        Assert.False(joueur.Observer(0x43, 4000));
+        Assert.False(joueur.Observer(0x43, 5000));
+        Assert.False(joueur.Observer(3, 5100));
+        Assert.True(joueur.Observer(3, 5400));
+
+        // La table parle de places du jeu : il en faut quatre au catalogue.
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeRelais(new MultiplayerGame { Id = "snes/worms", System = "snes", Players = 4, TurnRelay = table }));
+        Assert.NotNull(MultiplayerCatalogueStore.ValiderLeRelais(new MultiplayerGame { Id = "snes/worms", System = "snes", Players = 2, TurnRelay = table }));
+    }
+
+    [Fact]
     public void Une_bascule_sans_reponse_arrete_le_relais()
     {
         // La commande bascule : sans reponse, la redemander pourrait rendre la manette a contretemps.
