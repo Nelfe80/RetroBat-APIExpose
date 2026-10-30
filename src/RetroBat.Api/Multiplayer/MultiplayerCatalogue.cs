@@ -759,6 +759,28 @@ public sealed record MultiplayerRankingEnd
     [JsonPropertyName("close_after_s")]
     public int CloseAfterS { get; init; } = 5;
 
+    /// <summary>
+    /// <c>arrivee</c> : la base des positions du jeu, 0 ou 1 (CDC Classements v1.1 §7, n° 3 ; Mario Kart SC et F-Zero
+    /// comptent depuis 0). Les humains se classent par l'ordre de leurs positions : la base ne change rien au classement,
+    /// elle dit seulement ce que le jeu ecrit.
+    /// </summary>
+    [JsonPropertyName("rank_base")]
+    public int RankBase { get; init; } = 1;
+
+    public const string OrdreDArrivee = "finish_order";
+
+    /// <summary>
+    /// <c>arrivee</c> sans octet de position (v1.1 §7, n° 4) : <c>finish_order</c>, chaque place prend son rang dans l'ordre
+    /// ou son drapeau d'arrivee tient (Kurukuru Kururin, Sonic Advance 3) ; deux arrivees dans la meme fenetre
+    /// <see cref="SettleMs"/> partagent leur rang. Absent : la position que lit chaque place.
+    /// </summary>
+    [JsonPropertyName("position")]
+    public string? Position { get; init; }
+
+    [JsonIgnore]
+    public bool ParOrdreDArrivee => string.Equals(Position, OrdreDArrivee, StringComparison.Ordinal)
+        || (Rule == Arrivee && Seats.Count > 0 && Seats.All(s => s.CoreRam.Length == 0));
+
     [JsonIgnore]
     public bool EstConnu => Regles.Contains(Rule);
 
@@ -799,6 +821,13 @@ public sealed record MultiplayerRankingSeat
     [JsonPropertyName("bcd")]
     public bool Bcd { get; init; }
 
+    /// <summary>
+    /// UN CHIFFRE PAR OCTET (CDC Classements v1.1 §7, n° 21 ; Rampage, 7 octets) : chaque octet porte un chiffre decimal
+    /// (son quartet bas), jusqu'a 8 octets ; un quartet au-dela de 9 rend la lecture impossible.
+    /// </summary>
+    [JsonPropertyName("digits")]
+    public bool Digits { get; init; }
+
     /// <summary>« le », « be », ou « 68k » (un nombre du 68000 tel que FBNeo le range, octets permutes deux a deux).</summary>
     [JsonPropertyName("order")]
     public string Order { get; init; } = "le";
@@ -833,7 +862,16 @@ public sealed record MultiplayerRankingSeat
         long valeur = 0;
         foreach (var o in ordonnes)
         {
-            if (Bcd)
+            if (Digits)
+            {
+                if ((o & 15) > 9)
+                {
+                    return null;
+                }
+
+                valeur = valeur * 10 + (o & 15);
+            }
+            else if (Bcd)
             {
                 if (o >> 4 > 9 || (o & 15) > 9)
                 {
@@ -850,6 +888,10 @@ public sealed record MultiplayerRankingSeat
 
         return valeur;
     }
+
+    /// <summary>Le nombre d'octets permis : 8 en chiffres, 4 sinon.</summary>
+    [JsonIgnore]
+    public int OctetsMax => Digits ? 8 : 4;
 }
 
 /// <summary>Comment se lit un score : son nombre d'octets, BCD ou binaire, et l'ordre des octets lus (<c>le</c> ou <c>be</c>).</summary>
@@ -899,11 +941,38 @@ public sealed record MultiplayerDuelGuard
     [JsonPropertyName("value")]
     public int Value { get; init; }
 
+    /// <summary>
+    /// LA LARGEUR DU SIGNAL (CDC Classements v1.1 §7, n° 1) : 1 a 4 octets, dans l'ordre <see cref="Order"/> (Mario Kart SC lit
+    /// son arrivee sur un mot de 16 bits). Seule une fin a plusieurs (<c>ranking_end</c>) lit plus d'un octet.
+    /// </summary>
+    [JsonPropertyName("bytes")]
+    public int Bytes { get; init; } = 1;
+
+    [JsonPropertyName("order")]
+    public string Order { get; init; } = "le";
+
     [JsonIgnore]
     public long? Decalage => CoreRam.Trim() is { Length: > 2 } texte && texte.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
         && long.TryParse(texte[2..], global::System.Globalization.NumberStyles.HexNumber, null, out var valeur) && valeur >= 0
             ? valeur
             : null;
+
+    /// <summary>La valeur des octets lus, dans l'ordre de la memoire, selon <see cref="Order"/> ; null s'ils ne sont pas <see cref="Bytes"/>.</summary>
+    public long? Valeur(IReadOnlyList<int> octets)
+    {
+        if (octets.Count != Bytes)
+        {
+            return null;
+        }
+
+        var ordonnes = Order switch
+        {
+            "be" => octets.ToList(),
+            "68k" => Enumerable.Range(0, octets.Count).Select(i => (i ^ 1) < octets.Count ? octets[i ^ 1] : octets[i]).ToList(),
+            _ => octets.Reverse().ToList(),
+        };
+        return ordonnes.Aggregate(0L, (valeur, o) => (valeur << 8) | (uint)o);
+    }
 }
 
 /// <summary>
@@ -1452,10 +1521,19 @@ public sealed class MultiplayerCatalogueStore
             return "classement : delais ou nombre d'humains incoherents";
         }
 
-        static bool Octet(MultiplayerDuelGuard? signal) => signal is null || (signal.Decalage is not null && signal.Value is >= 0 and <= 255);
+        // Un signal de 1 a 4 octets (v1.1 §7, n° 1), une valeur qui tient dans sa largeur.
+        static bool Octet(MultiplayerDuelGuard? signal) => signal is null
+            || (signal.Decalage is not null && signal.Bytes is >= 1 and <= 4 && signal.Order is "le" or "be" or "68k"
+                && signal.Value >= 0 && (signal.Bytes == 4 || signal.Value < 1L << (8 * signal.Bytes)));
         if (!Octet(fin.Over) || !Octet(fin.Guard))
         {
             return "classement : signal de fin ou garde incoherent";
+        }
+
+        if (fin.RankBase is not (0 or 1) || fin.Position is not (null or MultiplayerRankingEnd.OrdreDArrivee)
+            || (fin.Position is not null && fin.Rule != MultiplayerRankingEnd.Arrivee))
+        {
+            return "classement : base ou mode des positions incoherent";
         }
 
         if (fin.Seats.Any(s => s.Seat is < 1 or > 8) || fin.Seats.Select(s => s.Seat).Distinct().Count() != fin.Seats.Count)
@@ -1474,17 +1552,18 @@ public sealed class MultiplayerCatalogueStore
         foreach (var place in fin.Seats)
         {
             var sansValeur = place.CoreRam.Length == 0;
-            if ((!sansValeur && place.Decalage is null) || place.Bytes is < 1 or > 4 || place.Order is not ("le" or "be" or "68k")
-                || !Octet(place.Dead) || !Octet(place.Finished))
+            if ((!sansValeur && place.Decalage is null) || place.Bytes < 1 || place.Bytes > place.OctetsMax || place.Order is not ("le" or "be" or "68k")
+                || (place.Digits && place.Bcd) || !Octet(place.Dead) || !Octet(place.Finished))
             {
                 return "classement : adresse ou format de la place " + place.Seat + " incoherent";
             }
 
-            // Sans valeur, seule la survie se lit encore (la mort de la place suffit).
+            // Sans valeur, la survie se lit encore par la mort de la place, et l'arrivee par l'ordre des drapeaux (v1.1 §7).
             var manque = fin.Rule switch
             {
                 MultiplayerRankingEnd.Survie => sansValeur && place.Dead is null,
                 MultiplayerRankingEnd.ScoreFige => sansValeur || place.Dead is null,
+                MultiplayerRankingEnd.Arrivee when fin.ParOrdreDArrivee => place.Finished is null,
                 _ => sansValeur,
             };
             if (manque)
@@ -1690,7 +1769,7 @@ public sealed class MultiplayerCatalogueStore
                 }
             }
 
-            if (fin.Duel is { } garde && (garde.Decalage is null || garde.Value is < 0 or > 255))
+            if (fin.Duel is { } garde && (garde.Decalage is null || garde.Value is < 0 or > 255 || garde.Bytes != 1))
             {
                 return "fin de rencontre : garde de duel incoherente";
             }
@@ -1703,7 +1782,7 @@ public sealed class MultiplayerCatalogueStore
                 return "fin de rencontre : type « " + autre.Type + " » inconnu";
             }
 
-            if (autre.Over?.Decalage is null || autre.Over.Value is < 0 or > 255 || autre.CloseAfterS is < 0 or > 60
+            if (autre.Over?.Decalage is null || autre.Over.Value is < 0 or > 255 || autre.Over.Bytes != 1 || autre.CloseAfterS is < 0 or > 60
                 || autre.Memory is not (null or MultiplayerChoice.CarteDuCoeur))
             {
                 return "fin de rencontre : signal de fin incoherent";
@@ -1722,7 +1801,7 @@ public sealed class MultiplayerCatalogueStore
                 }
             }
 
-            if (autre.Duel is { } garde && (garde.Decalage is null || garde.Value is < 0 or > 255))
+            if (autre.Duel is { } garde && (garde.Decalage is null || garde.Value is < 0 or > 255 || garde.Bytes != 1))
             {
                 return "fin de rencontre : garde de duel incoherente";
             }

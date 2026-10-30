@@ -510,9 +510,9 @@ public sealed class MultiplayerFinDeRencontre
         {
             while (!ct.IsCancellationRequested)
             {
-                var garde = fin.Guard?.Decalage is { } g ? await LireAsync(g, ct, carte).ConfigureAwait(false) : null;
+                var garde = await LireLeSignalAsync(fin.Guard, ct, carte).ConfigureAwait(false);
                 var signal = fin.Guard is null || garde == fin.Guard.Value
-                    ? fin.Over?.Decalage is { } o ? await LireAsync(o, ct, carte).ConfigureAwait(false) : null
+                    ? await LireLeSignalAsync(fin.Over, ct, carte).ConfigureAwait(false)
                     : null;
                 var places = new Dictionary<int, MultiplayerReleveDePlace>();
                 // Hors de la garde, les places ne se lisent pas : le classement les ignorerait.
@@ -526,8 +526,8 @@ public sealed class MultiplayerFinDeRencontre
                             valeur = place.Valeur(octets);
                         }
 
-                        var mort = place.Dead?.Decalage is { } m ? await LireAsync(m, ct, carte).ConfigureAwait(false) : null;
-                        var fini = place.Finished?.Decalage is { } f ? await LireAsync(f, ct, carte).ConfigureAwait(false) : null;
+                        var mort = await LireLeSignalAsync(place.Dead, ct, carte).ConfigureAwait(false);
+                        var fini = await LireLeSignalAsync(place.Finished, ct, carte).ConfigureAwait(false);
                         places[place.Seat] = new MultiplayerReleveDePlace(valeur, mort, fini);
                     }
                 }
@@ -613,6 +613,12 @@ public sealed class MultiplayerFinDeRencontre
 
         return null;
     }
+
+    /// <summary>Un signal d'une fin a plusieurs (garde, fin, mort, arrivee), sur sa largeur (1 a 4 octets), ou null : absent ou pas lu.</summary>
+    private async Task<long?> LireLeSignalAsync(MultiplayerDuelGuard? signal, CancellationToken ct, bool carte)
+        => signal?.Decalage is { } adresse && await LireLesOctetsAsync(adresse, signal.Bytes, ct, carte).ConfigureAwait(false) is { } octets
+            ? signal.Valeur(octets)
+            : null;
 
     /// <summary>
     /// Plusieurs octets de la memoire du coeur, dans l'ordre de la memoire, ou null si la reponse est incomplete. Avec

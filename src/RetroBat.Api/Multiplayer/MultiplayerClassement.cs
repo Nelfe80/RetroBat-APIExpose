@@ -21,10 +21,10 @@ public sealed record MultiplayerIssue(int Gagnante, IReadOnlyList<MultiplayerRan
 }
 
 /// <summary>Une lecture de la memoire du jeu : la garde, le signal de fin, et chaque place (null : pas lu).</summary>
-public sealed record MultiplayerReleve(int? Garde, int? Signal, IReadOnlyDictionary<int, MultiplayerReleveDePlace> Places);
+public sealed record MultiplayerReleve(long? Garde, long? Signal, IReadOnlyDictionary<int, MultiplayerReleveDePlace> Places);
 
 /// <summary>Ce qu'on a lu d'une place : sa valeur, l'octet de sa mort et celui de son arrivee (null : pas lu ou absent).</summary>
-public sealed record MultiplayerReleveDePlace(long? Valeur, int? Mort = null, int? Fini = null);
+public sealed record MultiplayerReleveDePlace(long? Valeur, long? Mort = null, long? Fini = null);
 
 /// <summary>
 /// LE CLASSEMENT D'UNE RENCONTRE EN COURS (CDC Classements v1.0 §4 et §5), sans lecture : il recoit les releves, dans
@@ -112,7 +112,7 @@ public sealed class MultiplayerClassementEnCours
         foreach (var place in _fin.Seats)
         {
             // Tous les bits a 1 : un compteur pas encore initialise (une place que personne ne tient).
-            var lue = Lue(releve, place.Seat) is { } v && !(place.Bcd is false && v == (1L << (8 * place.Bytes)) - 1) ? v : (long?)null;
+            var lue = Lue(releve, place.Seat) is { } v && !(!place.Bcd && !place.Digits && v == (1L << (8 * place.Bytes)) - 1) ? v : (long?)null;
             lues[place.Seat] = lue;
             tenues[place.Seat] = Tenue("v" + place.Seat, lue, ms);
         }
@@ -211,10 +211,18 @@ public sealed class MultiplayerClassementEnCours
                 _vusEnJeu.Add(place.Seat);
             }
 
-            if (Tenue("f" + place.Seat, octet == fini.Value ? 1 : 0, ms) == 1 && _departVu && !_arrivees.ContainsKey(place.Seat)
-                && positions[place.Seat] is { } position)
+            var cle = "f" + place.Seat;
+            if (Tenue(cle, octet == fini.Value ? 1 : 0, ms) == 1 && _departVu && !_arrivees.ContainsKey(place.Seat))
             {
-                _arrivees[place.Seat] = position;
+                // Sans octet de position (v1.1 §7, n° 4) : l'instant ou son drapeau a commence a tenir fait sa position.
+                if (_fin.ParOrdreDArrivee)
+                {
+                    _arrivees[place.Seat] = _suivis[cle].Depuis;
+                }
+                else if (positions[place.Seat] is { } position)
+                {
+                    _arrivees[place.Seat] = position;
+                }
             }
         }
 
@@ -227,6 +235,14 @@ public sealed class MultiplayerClassementEnCours
         if (!signalTenu && !_humains.All(_arrivees.ContainsKey))
         {
             return null;
+        }
+
+        if (_fin.ParOrdreDArrivee)
+        {
+            // Deux arrivees dans la meme fenetre partagent leur rang, comme deux chutes en survie ; un humain pas arrive au
+            // signal passe derriere, a egalite avec les autres retardataires.
+            return Classer(seat => _arrivees.TryGetValue(seat, out var t) ? (0, t) : (1, 0), egales: (a, b) =>
+                a.Item1 == b.Item1 && (a.Item1 == 1 || Math.Abs(a.Item2 - b.Item2) <= _fin.SettleMs));
         }
 
         return Classer(seat => _arrivees.TryGetValue(seat, out var p) ? (0, p) : (1, positions.GetValueOrDefault(seat) ?? long.MaxValue));

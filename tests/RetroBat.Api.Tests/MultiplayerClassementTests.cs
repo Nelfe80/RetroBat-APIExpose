@@ -484,6 +484,138 @@ public class MultiplayerClassementTests
         Assert.Contains("schema 2 inconnu", schema);
     }
 
+    // ── Lot B (v1.1 §7) ───────────────────────────────────────────────────
+
+    [Fact]
+    public void Un_score_a_un_chiffre_par_octet_se_lit()
+    {
+        // Rampage : 7 chiffres, poids fort d'abord ; le quartet bas porte le chiffre (une tuile « 3x » aussi).
+        var place = new MultiplayerRankingSeat { Bytes = 7, Digits = true, Order = "be" };
+        Assert.Equal(1650, place.Valeur([0, 0, 0, 1, 6, 5, 0]));
+        Assert.Equal(1650, place.Valeur([0x30, 0x30, 0x30, 0x31, 0x36, 0x35, 0x30]));
+        Assert.Null(place.Valeur([0, 0, 0, 1, 0x0A, 5, 0]));
+        var signal = JsonSerializer.Deserialize<MultiplayerStatsSignal>("""{ "seats": { "1": "0x3ACD" }, "bytes": 7, "digits": true, "order": "be" }""")!;
+        Assert.Equal(6000, signal.Valeur([0, 0, 0, 6, 0, 0, 0]));
+    }
+
+    [Fact]
+    public void Un_signal_se_lit_sur_sa_largeur()
+    {
+        // Mario Kart SC : l'arrivee sur un mot de 16 bits (0x000A en petit-boutiste).
+        Assert.Equal(10, new MultiplayerDuelGuard { Bytes = 2, Order = "le" }.Valeur([0x0A, 0x00]));
+        Assert.Equal(0x0A00, new MultiplayerDuelGuard { Bytes = 2, Order = "be" }.Valeur([0x0A, 0x00]));
+        Assert.Null(new MultiplayerDuelGuard { Bytes = 2 }.Valeur([0x0A]));
+    }
+
+    private const string LesLivraisonsDuLotB = """
+        { "schema_version": 1, "games": [
+          { "id": "arcade/rampage", "system": "arcade", "set": "rampage", "players": 3, "elo_type": "arene", "core": "fbneo_multi32", "min_api": "1.9.128",
+            "ranking_end": { "rule": "score_fige", "settle_ms": 1000, "min_humans": 2, "close_after_s": 8,
+              "over": { "core_ram": "0x3AF1", "value": 4 }, "guard": { "core_ram": "0x3A9B", "value": 0 },
+              "seats": [
+                { "seat": 1, "core_ram": "0x3ACD", "bytes": 7, "digits": true, "order": "be", "dead": { "core_ram": "0x391F", "value": 3 } },
+                { "seat": 2, "core_ram": "0x3AD4", "bytes": 7, "digits": true, "order": "be", "dead": { "core_ram": "0x396F", "value": 3 } },
+                { "seat": 3, "core_ram": "0x3ADB", "bytes": 7, "digits": true, "order": "be", "dead": { "core_ram": "0x39BF", "value": 3 } } ] } },
+          { "id": "gba/mksc", "system": "gba", "content": { "md5": ["1"] }, "players": 4, "elo_type": "course", "min_api": "1.9.128",
+            "ranking_end": { "rule": "arrivee", "memory": "core_map", "rank_base": 0, "over": { "core_ram": "0x03003A28", "bytes": 2, "value": 15 },
+              "seats": [
+                { "seat": 1, "core_ram": "0x030023B4", "bytes": 1, "finished": { "core_ram": "0x03003A28", "bytes": 2, "order": "le", "value": 10 } },
+                { "seat": 2, "core_ram": "0x130023B4", "bytes": 1, "finished": { "core_ram": "0x13003A28", "bytes": 2, "order": "le", "value": 10 } },
+                { "seat": 3, "core_ram": "0x230023B4", "bytes": 1, "finished": { "core_ram": "0x23003A28", "bytes": 2, "order": "le", "value": 10 } },
+                { "seat": 4, "core_ram": "0x330023B4", "bytes": 1, "finished": { "core_ram": "0x33003A28", "bytes": 2, "order": "le", "value": 10 } } ] } },
+          { "id": "gba/kurukuru", "system": "gba", "content": { "md5": ["2"] }, "players": 4, "elo_type": "course", "min_api": "1.9.128",
+            "ranking_end": { "rule": "arrivee", "position": "finish_order", "memory": "core_map", "settle_ms": 500,
+              "seats": [
+                { "seat": 1, "finished": { "core_ram": "0x030045EC", "value": 10 } }, { "seat": 2, "finished": { "core_ram": "0x130045EC", "value": 10 } },
+                { "seat": 3, "finished": { "core_ram": "0x230045EC", "value": 10 } }, { "seat": 4, "finished": { "core_ram": "0x330045EC", "value": 10 } } ] } } ] }
+        """;
+
+    [Fact]
+    public void Les_livraisons_du_lot_B_sont_des_jeux_classes()
+    {
+        var catalogue = Lire(LesLivraisonsDuLotB);
+        Assert.Null(MultiplayerCatalogueStore.Valider(catalogue));
+        Assert.All(catalogue.Games, jeu => Assert.True(jeu.EstClasse, jeu.Id));
+        Assert.True(catalogue.Games[2].RankingEnd!.ParOrdreDArrivee);
+        Assert.False(catalogue.Games[1].RankingEnd!.ParOrdreDArrivee);
+    }
+
+    [Theory]
+    [InlineData("\"position\": \"finish_order\", \"seats\": [ { \"seat\": 1, \"finished\": { \"core_ram\": \"0x1\", \"value\": 1 } }, { \"seat\": 2 } ]", "n'a pas ce que la regle")]
+    [InlineData("\"rank_base\": 2, \"over\": { \"core_ram\": \"0x9\", \"value\": 1 }, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "base ou mode")]
+    [InlineData("\"over\": { \"core_ram\": \"0x9\", \"bytes\": 1, \"value\": 300 }, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "signal de fin")]
+    [InlineData("\"over\": { \"core_ram\": \"0x9\", \"value\": 1 }, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\", \"bytes\": 5 }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "format de la place 1")]
+    [InlineData("\"over\": { \"core_ram\": \"0x9\", \"value\": 1 }, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\", \"bytes\": 3, \"digits\": true, \"bcd\": true }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "format de la place 1")]
+    public void Une_arrivee_douteuse_est_refusee(string classement, string raison)
+    {
+        var json = "{ \"schema_version\": 1, \"games\": [ { \"id\": \"a\", \"system\": \"arcade\", \"set\": \"a\", \"players\": 2, \"ranking_end\": { \"rule\": \"arrivee\", "
+            + classement + " } } ] }";
+        Assert.Contains(raison, MultiplayerCatalogueStore.Valider(Lire(json)));
+    }
+
+    [Fact]
+    public void Une_fin_en_duel_garde_ses_signaux_d_un_octet()
+    {
+        // Une API d'avant lirait un octet : la largeur n'existe que dans une fin a plusieurs.
+        var json = "{ \"schema_version\": 1, \"games\": [ { \"id\": \"a\", \"system\": \"arcade\", \"set\": \"a\", \"players\": 2, "
+            + "\"match_end\": { \"type\": \"score_final\", \"over\": { \"core_ram\": \"0x9\", \"bytes\": 2, \"value\": 1 }, "
+            + "\"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ] } } ] }";
+        Assert.Contains("signal de fin incoherent", MultiplayerCatalogueStore.Valider(Lire(json)));
+    }
+
+    [Fact]
+    public void Mario_Kart_SC_classe_par_ses_positions_comptees_depuis_zero()
+    {
+        var fin = Lire(LesLivraisonsDuLotB).Games[1].RankingEnd! with { SettleMs = 500 };
+        // P2 (1er, position 0) et P4 (ordinateur) arrivent, puis P1 3e (position 2) ; P3 (4e) n'a pas fini au signal.
+        var rangs = Rejouer(new MultiplayerClassementEnCours(fin, [1, 2, 3]),
+            (R(null, 7, (1, 2, null, 7), (2, 0, null, 7), (3, 3, null, 7), (4, 1, null, 7)), 2),
+            (R(null, 7, (1, 2, null, 7), (2, 0, null, 10), (3, 3, null, 7), (4, 1, null, 10)), 4),
+            (R(null, 7, (1, 2, null, 10), (2, 0, null, 10), (3, 3, null, 7), (4, 1, null, 10)), 4),
+            (R(null, 15, (1, 2, null, 10), (2, 0, null, 10), (3, 3, null, 7), (4, 1, null, 10)), 4));
+        Assert.Equal("2:1 1:2 3:3", Dire(rangs));
+    }
+
+    [Fact]
+    public void Kurukuru_classe_par_l_ordre_ou_les_drapeaux_tombent()
+    {
+        var fin = Lire(LesLivraisonsDuLotB).Games[2].RankingEnd!;
+        // P3 arrive le premier, puis P1 et P4 dans la meme fenetre de 500 ms, P2 en dernier.
+        var rangs = Rejouer(new MultiplayerClassementEnCours(fin, [1, 2, 3, 4]),
+            (R(null, null, (1, null, null, 2), (2, null, null, 2), (3, null, null, 2), (4, null, null, 2)), 2),
+            (R(null, null, (1, null, null, 2), (2, null, null, 2), (3, null, null, 10), (4, null, null, 2)), 4),
+            (R(null, null, (1, null, null, 10), (2, null, null, 2), (3, null, null, 10), (4, null, null, 2)), 1),
+            (R(null, null, (1, null, null, 10), (2, null, null, 2), (3, null, null, 10), (4, null, null, 10)), 4),
+            (R(null, null, (1, null, null, 10), (2, null, null, 10), (3, null, null, 10), (4, null, null, 10)), 4));
+        Assert.Equal("3:1 1:2 4:2 2:4", Dire(rangs));
+    }
+
+    [Fact]
+    public async Task Un_signal_de_deux_octets_se_lit_dans_la_carte_du_coeur()
+    {
+        var ra = new CarteSeule();
+        var fin = Lire(LesLivraisonsDuLotB).Games[1].RankingEnd! with { SettleMs = 0 };
+        var jeu = new MultiplayerGame { Id = "gba/mksc", Players = 4, EloType = "course", RankingEnd = fin };
+        foreach (var console in new long[] { 0x03003A28, 0x13003A28, 0x23003A28, 0x33003A28 })
+        {
+            ra.Poser(console, 7);
+        }
+
+        ra.Poser(0x030023B4, 1);
+        ra.Poser(0x130023B4, 0);
+        var guet = new MultiplayerFinDeRencontre(ra, TimeSpan.FromMilliseconds(5));
+        var attente = guet.AttendreLIssueAsync(jeu, [1, 2], CancellationToken.None);
+        for (var i = 0; i < 200 && ra.Lectures("READ_CORE_MEMORY") < 40; i++)
+        {
+            await Task.Delay(10);
+        }
+
+        ra.Poser(0x03003A28, 10);
+        ra.Poser(0x13003A28, 10);
+        var issue = await attente.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Equal("2:1 1:2", Dire(issue!.Rangs));
+    }
+
     [Fact]
     public void Le_delai_des_choix_se_compte_en_images_et_reste_borne()
     {

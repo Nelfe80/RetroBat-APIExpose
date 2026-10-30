@@ -213,8 +213,8 @@ public sealed record MultiplayerStatsProfil
 
         foreach (var (nom, signal) in profil.Signals)
         {
-            if (signal.Source != "poll" || signal.Bytes is < 1 or > 4 || signal.Order is not ("le" or "be" or "68k")
-                || signal.Memory is not (null or MultiplayerChoice.CarteDuCoeur))
+            if (signal.Source != "poll" || signal.Bytes < 1 || signal.Bytes > (signal.Digits ? 8 : 4) || signal.Order is not ("le" or "be" or "68k")
+                || (signal.Digits && signal.Bcd) || signal.Memory is not (null or MultiplayerChoice.CarteDuCoeur))
             {
                 return "signal « " + nom + " » : source, taille, ordre ou memoire inconnu";
             }
@@ -313,6 +313,10 @@ public sealed record MultiplayerStatsSignal
     [JsonPropertyName("bcd")]
     public bool Bcd { get; init; }
 
+    /// <summary>Un chiffre par octet, son quartet bas (Rampage, CDC Classements v1.1 §7, n° 21) : jusqu'a 8 octets.</summary>
+    [JsonPropertyName("digits")]
+    public bool Digits { get; init; }
+
     /// <summary>Les octets lus, dans l'ordre de la memoire, devenus la valeur du signal ; null s'ils ne sont pas un nombre BCD.</summary>
     public int? Valeur(IReadOnlyList<int> octets)
     {
@@ -325,7 +329,16 @@ public sealed record MultiplayerStatsSignal
         long valeur = 0;
         foreach (var o in ordonnes)
         {
-            if (Bcd)
+            if (Digits)
+            {
+                if ((o & 15) > 9)
+                {
+                    return null;
+                }
+
+                valeur = valeur * 10 + (o & 15);
+            }
+            else if (Bcd)
             {
                 if (o >> 4 > 9 || (o & 15) > 9)
                 {
