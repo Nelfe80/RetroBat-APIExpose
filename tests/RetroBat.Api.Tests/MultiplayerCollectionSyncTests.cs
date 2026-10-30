@@ -40,7 +40,8 @@ public class MultiplayerCollectionSyncTests : IDisposable
         collectionsRoot: Path.Combine(_racine, "collections"),
         stateRoot: Etat);
 
-    private MultiplayerCollectionSyncService Service(Func<string?, bool>? coeurPose = null, MultiplayerContenusDesPaquets? paquets = null) => new(
+    private MultiplayerCollectionSyncService Service(Func<string?, bool>? coeurPose = null, MultiplayerContenusDesPaquets? paquets = null,
+        Func<string, string?>? md5 = null) => new(
         new FauxOptions(new ApiExposeOptions { NelfePlay = _nelfeplay }),
         new MultiplayerCatalogueStore(logger: null, path: CataloguePath),
         new InstalledGameCatalog(new SansDefinition(), logger: null, romsRoot: Roms, ramRoot: Path.Combine(_racine, "ram")),
@@ -52,7 +53,78 @@ public class MultiplayerCollectionSyncTests : IDisposable
         romsRoot: Roms,
         emulateurTourne: () => false,
         coeurPose: coeurPose ?? (_ => true),
-        paquets: paquets);
+        paquets: paquets,
+        md5DuContenu: md5);
+
+    [Fact]
+    public async Task La_derniere_passe_repart_du_disque_sans_mesurer_une_rom()
+    {
+        var cartouche = PoserCartouche("gba", "nom quelconque.zip", "x.gba", "mario kart usa");
+        PoserCatalogue(Catalogue(JeuConsole("gba/mksc", "gba", cartouche.Md5, cartouche.Crc)));
+        var trace = Path.Combine(Etat, "multiplayer-jeux.json");
+        var avant = Service();
+        avant.FichierDesJeux = trace;
+        await avant.SynchroniserAsync("test", CancellationToken.None);
+        var mesures = 0;
+
+        var apres = Service(md5: _ =>
+        {
+            Interlocked.Increment(ref mesures);
+            return null;
+        });
+        apres.FichierDesJeux = trace;
+
+        Assert.Equal("gba/mksc", apres.JeuxConnus().Single().Game.Id);
+        Assert.Equal(0, mesures);
+    }
+
+    [Fact]
+    public async Task Un_fichier_disparu_ne_revient_pas_de_la_derniere_passe()
+    {
+        var chemin = PoserFichier("fbneo", "mslug3.zip");
+        PoserCatalogue(Catalogue(Arcade("mslug3")));
+        var trace = Path.Combine(Etat, "multiplayer-jeux.json");
+        var avant = Service();
+        avant.FichierDesJeux = trace;
+        await avant.SynchroniserAsync("test", CancellationToken.None);
+        File.Delete(chemin);
+
+        var apres = Service();
+        apres.FichierDesJeux = trace;
+
+        Assert.Empty(apres.JeuxConnus());
+    }
+
+    [Fact]
+    public void Un_calcul_long_ne_retient_pas_le_panneau()
+    {
+        // 30/10 : la lecture des ROM a tenu l'appui long 3 minutes, et aucun panneau ne s'ouvrait plus.
+        var cartouche = PoserCartouche("gba", "nom quelconque.zip", "x.gba", "mario kart usa");
+        PoserCatalogue(Catalogue(JeuConsole("gba/mksc", "gba", cartouche.Md5, cartouche.Crc)));
+        using var libere = new ManualResetEventSlim();
+        var service = Service(md5: _ =>
+        {
+            libere.Wait(TimeSpan.FromSeconds(10));
+            return cartouche.Md5;
+        });
+
+        var chrono = System.Diagnostics.Stopwatch.StartNew();
+        var pendant = service.JeuxConnus();
+        chrono.Stop();
+
+        Assert.Empty(pendant);
+        Assert.True(chrono.Elapsed < TimeSpan.FromSeconds(3), chrono.Elapsed.ToString());
+
+        // Le calcul fini, sa reponse sert au panneau suivant.
+        libere.Set();
+        var limite = DateTime.UtcNow.AddSeconds(5);
+        while (service.JeuxConnus().Count == 0 && DateTime.UtcNow < limite)
+        {
+            Thread.Sleep(20);
+        }
+
+        Assert.Equal("gba/mksc", service.JeuxConnus().Single().Game.Id);
+    }
 
     [Fact]
     public async Task Le_fichier_d_attente_d_un_jeu_reste_dans_son_paquet_entre_dans_la_collection()

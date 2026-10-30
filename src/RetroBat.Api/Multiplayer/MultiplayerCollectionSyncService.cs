@@ -66,6 +66,15 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     private readonly Func<string?, bool> _coeurPose;
     private bool _inscriptionsFaites;
     private readonly SemaphoreSlim _porte = new(1, 1);
+
+    /// <summary>Combien un panneau attend le calcul des jeux avant de passer son chemin.</summary>
+    private static readonly TimeSpan AttenteDuCalcul = TimeSpan.FromMilliseconds(150);
+    private readonly object _verrouDuCalcul = new();
+    private Task<IReadOnlyList<MultiplayerInstalledGame>>? _calcul;
+    private bool _calculFini;
+
+    /// <summary>Ou se garde la liste de la derniere passe. Null : aucune trace (les essais qui ne le demandent pas).</summary>
+    internal string? FichierDesJeux { get; set; }
     private IDisposable? _abonnementReglages;
     private IDisposable? _abonnementBus;
     private bool _derniereVisibilite;
@@ -106,6 +115,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         _bus = bus;
         _logger = logger;
         _romsRoot = romsRoot ?? RetroBatPaths.RomsRoot;
+        FichierDesJeux = romsRoot is null ? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay", "multiplayer-jeux.json") : null;
         _emulateurTourne = emulateurTourne ?? EmulatorForeground.EmulateurTourne;
         _md5DuContenu = md5DuContenu ?? (chemin => NelfePlayScoringCollectionSyncService.Md5DuContenu(chemin, PlafondContenu));
         _coeurPose = coeurPose ?? (coeur => MultiplayerCoeursService.EstPose(coeur, _options.CurrentValue));
@@ -133,7 +143,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     /// </summary>
     public IReadOnlyList<MultiplayerInstalledGame> JeuxConnus()
     {
-        if (Games.Count > 0 || !Visible)
+        if (Games.Count > 0 || !Visible || _calculFini)
         {
             return Games;
         }
@@ -144,8 +154,100 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
             return Games;
         }
 
-        Games = Intersecter(catalogue);
+        // LE CALCUL NE BLOQUE PLUS LE PANNEAU (30/10/2026, 3 min sans aucun panneau apres un demarrage de l'API, joue dans
+        // l'appui long lui-meme). La derniere passe repart du disque ; sinon le calcul tourne a cote, et on ne l'attend qu'un
+        // instant : un jeu pas encore connu vaut mieux que des panneaux figes.
+        var repris = Reprendre(catalogue);
+        if (repris.Count > 0)
+        {
+            Games = repris;
+            return Games;
+        }
+
+        Task<IReadOnlyList<MultiplayerInstalledGame>> calcul;
+        lock (_verrouDuCalcul)
+        {
+            calcul = _calcul ??= Task.Run(() => Intersecter(catalogue));
+        }
+
+        try
+        {
+            if (calcul.Wait(AttenteDuCalcul))
+            {
+                _calculFini = true;
+                if (Games.Count == 0)
+                {
+                    Games = calcul.Result;
+                }
+            }
+        }
+        catch (AggregateException ex)
+        {
+            _calculFini = true;
+            _logger?.LogWarning(ex, "Collection MULTIPLAYER : calcul des jeux en echec");
+        }
+
         return Games;
+    }
+
+    /// <summary>La liste de la derniere passe : le jeu, son fichier, sa cle de contenu. Rien qui demande de relire une ROM.</summary>
+    private sealed record JeuDeLaTrace(string Id, string Chemin, string Cle);
+
+    private void GarderLaTrace(IReadOnlyList<MultiplayerInstalledGame> jeux)
+    {
+        if (FichierDesJeux is null)
+        {
+            return;
+        }
+
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(FichierDesJeux)!);
+            File.WriteAllText(FichierDesJeux, System.Text.Json.JsonSerializer.Serialize(
+                jeux.Select(jeu => new JeuDeLaTrace(jeu.Game.Id, jeu.Path, jeu.ContentKey)).ToList()));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger?.LogDebug(ex, "Collection MULTIPLAYER : liste non gardee");
+        }
+    }
+
+    /// <summary>
+    /// La derniere passe, relue du disque sans mesurer une seule ROM. Elle se reverifie sur ce qui se voit tout de suite (le
+    /// jeu au catalogue, son fichier, son coeur) ; la passe suivante reste juge de son contenu.
+    /// </summary>
+    private List<MultiplayerInstalledGame> Reprendre(MultiplayerCatalogue catalogue)
+    {
+        var retenus = new List<MultiplayerInstalledGame>();
+        if (FichierDesJeux is null || !File.Exists(FichierDesJeux))
+        {
+            return retenus;
+        }
+
+        try
+        {
+            foreach (var trace in System.Text.Json.JsonSerializer.Deserialize<List<JeuDeLaTrace>>(File.ReadAllText(FichierDesJeux)) ?? [])
+            {
+                var jeu = catalogue.Games.FirstOrDefault(entree => entree.Id == trace.Id);
+                if (jeu is null || !File.Exists(trace.Chemin))
+                {
+                    continue;
+                }
+
+                var coeur = catalogue.CoreOf(jeu);
+                if (_coeurPose(coeur?.Core) && jeu.AdmisPar(VersionDeLApi))
+                {
+                    retenus.Add(new MultiplayerInstalledGame(jeu.PourLeContenu(trace.Cle), trace.Chemin, coeur, trace.Cle));
+                }
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Text.Json.JsonException)
+        {
+            _logger?.LogDebug(ex, "Collection MULTIPLAYER : liste gardee illisible");
+            retenus.Clear();
+        }
+
+        return retenus;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -290,6 +392,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
             }
 
             Games = jeux;
+            GarderLaTrace(jeux);
             LireLesPaquetsEnAttente(catalogue, cancellationToken);
             var inscrits = resultat.Changed || !_inscriptionsFaites ? InscrireLesJeuxInconnusDEs(jeux) : 0;
             if (resultat.Changed || visuel.Changed || inscrits > 0)
