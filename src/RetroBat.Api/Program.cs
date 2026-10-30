@@ -296,6 +296,16 @@ builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardRankHistory>()
 builder.Services.AddSingleton<RetroBat.Api.Leaderboard.ChallengeHudService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Leaderboard.ChallengeHudService>());
 // Les defis de speedrun (prototype Sonic, lot S3) : session, evaluateur branche sur le flux du wrapper, contrat du HUD.
+// Le catalogue vient de l'index du site ; meme client prudent que l'index des jeux ouverts.
+builder.Services.AddSingleton<RetroBat.Api.Speedrun.CatalogueDesDefis>();
+builder.Services.AddHostedService<RetroBat.Api.Speedrun.IndexDesDefisService>();
+builder.Services
+    .AddHttpClient(RetroBat.Api.Speedrun.IndexDesDefisService.HttpClientName, client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(10);
+        client.MaxResponseContentBufferSize = 2 * 1024 * 1024;
+    })
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
 builder.Services.AddSingleton<RetroBat.Api.Speedrun.SpeedrunSessionService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Speedrun.SpeedrunSessionService>());
 builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardOverlayService>();

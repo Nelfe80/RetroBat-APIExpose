@@ -33,6 +33,10 @@
     <None Update="social-summary-vector.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <!-- Le reglement de Green Hill 1 tel qu'il est depose sur le site : les tests partent de lui. -->
+    <None Update="Reglements\sonic-the-hedgehog.green-hill-1.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

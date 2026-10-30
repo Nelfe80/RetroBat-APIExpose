@@ -20,8 +20,8 @@ namespace RetroBat.Api.Tests;
 /// </summary>
 public class SpeedrunSessionTests
 {
-    private static readonly Reglement GreenHill1 = CatalogueDesDefis.Trouver("sonic-the-hedgehog.green-hill-1")
-        ?? throw new InvalidOperationException("reglement de Green Hill 1 non embarque");
+    private static readonly Reglement GreenHill1 = Reglement.Lire(File.ReadAllText(
+        Path.Combine(AppContext.BaseDirectory, "Reglements", "sonic-the-hedgehog.green-hill-1.json")));
 
     private static Signal S(long frame, string action, string adresse, int valeur, long? horloge = null)
         => Signal.Depuis(frame, action, adresse, valeur, horloge ?? 1_000_000 + (long)(frame * 1000 / 59.922743));

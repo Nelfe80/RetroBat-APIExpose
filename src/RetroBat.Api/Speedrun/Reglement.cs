@@ -59,6 +59,7 @@ public sealed class Reglement
 
     public string ChallengeId { get; private init; } = "";
     public int Version { get; private init; }
+    public string Ruleset { get; private init; } = "";
     public string Kind { get; private init; } = "";
     public string SystemId { get; private init; } = "";
     public string RomGroup { get; private init; } = "";
@@ -127,6 +128,7 @@ public sealed class Reglement
             {
                 ChallengeId = Texte(r, "challenge_id") ?? throw new ReglementInvalideException("challenge_id absent"),
                 Version = r.TryGetProperty("version", out var v) ? v.GetInt32() : throw new ReglementInvalideException("version absente"),
+                Ruleset = Texte(r, "ruleset") ?? "",
                 Kind = Texte(r, "kind") ?? "",
                 SystemId = r.TryGetProperty("game", out var g) ? Texte(g, "system_id") ?? "" : "",
                 RomGroup = r.TryGetProperty("game", out var g2) ? Texte(g2, "rom_group") ?? "" : "",

@@ -63,6 +63,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private readonly ICommandesRetroArch _commandes;
     private readonly ILogger<SpeedrunSessionService> _journal;
     private readonly PartieNelfePlayService? _partie;
+    private readonly CatalogueDesDefis _catalogue;
     private readonly InterfaceTextService? _textes;
     private readonly EmulationStationSettingsService? _reglages;
     private readonly string _fichierDesTentatives;
@@ -84,8 +85,9 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
     public SpeedrunSessionService(IEventBus bus, ApiContext contexte, ILogger<SpeedrunSessionService> journal,
         PartieNelfePlayService? partie = null, ICommandesRetroArch? commandes = null, string? fichierDesTentatives = null,
-        InterfaceTextService? textes = null, EmulationStationSettingsService? reglages = null)
+        InterfaceTextService? textes = null, EmulationStationSettingsService? reglages = null, CatalogueDesDefis? catalogue = null)
     {
+        _catalogue = catalogue ?? new CatalogueDesDefis();
         _bus = bus;
         _contexte = contexte;
         _journal = journal;
@@ -130,7 +132,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     /// </summary>
     public ReponseLancement Lancer(string? defiId, Func<string, string, string?> trouverLaRom)
     {
-        var reglement = CatalogueDesDefis.Trouver(defiId);
+        var reglement = _catalogue.Trouver(defiId);
         if (reglement is null) return new(false, "unknown_challenge");
         if (_contexte.Ui.Running is not null) return new(false, "game_running");
 

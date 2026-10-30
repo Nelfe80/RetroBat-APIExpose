@@ -1,36 +1,24 @@
-using System.Reflection;
-
 namespace RetroBat.Api.Speedrun;
 
 /// <summary>
-/// LES DEFIS OUVERTS SUR CETTE BORNE, le temps du prototype : leurs reglements sont embarques dans l'API
-/// (Speedrun/Reglements). Au lot S4, le site les publie et les sert par un index des defis ouverts (§3.5 du
-/// CDC v1.4) ; ce catalogue lira alors cet index au lieu des ressources.
+/// LES DEFIS OUVERTS SUR CETTE BORNE : ceux de l'index du site (§3.5 du CDC v1.4), tenus a jour par
+/// <see cref="IndexDesDefisService"/>. La plateforme publie et retire, la borne ne decide pas. Une session en cours garde
+/// son reglement : un defi retire ne coupe pas une tentative partie.
 /// </summary>
-public static class CatalogueDesDefis
+public sealed class CatalogueDesDefis
 {
-    private const string Prefixe = "RetroBat.Api.Speedrun.Reglements.";
+    private volatile IReadOnlyDictionary<string, Reglement> _reglements = new Dictionary<string, Reglement>();
 
-    private static readonly Lazy<IReadOnlyDictionary<string, Reglement>> Reglements = new(Charger);
+    public IReadOnlyCollection<Reglement> Tous => _reglements.Values.ToList();
 
-    public static IReadOnlyCollection<Reglement> Tous => Reglements.Value.Values.ToList();
+    public Reglement? Trouver(string? defiId)
+        => defiId is not null && _reglements.TryGetValue(defiId.Trim(), out var r) ? r : null;
 
-    public static Reglement? Trouver(string? defiId)
-        => defiId is not null && Reglements.Value.TryGetValue(defiId.Trim(), out var r) ? r : null;
-
-    private static IReadOnlyDictionary<string, Reglement> Charger()
+    /// <summary>Remplace tout le catalogue d'un coup : un lecteur voit l'ancien ou le nouveau, jamais un melange.</summary>
+    public void Remplacer(IEnumerable<Reglement> reglements)
     {
-        var assemblage = typeof(CatalogueDesDefis).Assembly;
         var defis = new Dictionary<string, Reglement>(StringComparer.OrdinalIgnoreCase);
-        foreach (var nom in assemblage.GetManifestResourceNames().Where(n => n.StartsWith(Prefixe, StringComparison.Ordinal)))
-        {
-            using var flux = assemblage.GetManifestResourceStream(nom);
-            if (flux is null) continue;
-            using var lecteur = new StreamReader(flux);
-            var reglement = Reglement.Lire(lecteur.ReadToEnd());
-            defis[reglement.ChallengeId] = reglement;
-        }
-
-        return defis;
+        foreach (var r in reglements) defis[r.ChallengeId] = r;
+        _reglements = defis;
     }
 }

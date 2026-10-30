@@ -24,9 +24,11 @@ public sealed class SpeedrunController : ControllerBase
     private readonly SpeedrunSessionService _session;
     private readonly IGamelistStore _gamelists;
     private readonly RomCanonicalResolver _canonical;
+    private readonly CatalogueDesDefis _catalogue;
 
-    public SpeedrunController(SpeedrunSessionService session, IGamelistStore gamelists, RomCanonicalResolver canonical)
+    public SpeedrunController(SpeedrunSessionService session, IGamelistStore gamelists, RomCanonicalResolver canonical, CatalogueDesDefis catalogue)
     {
+        _catalogue = catalogue;
         _session = session;
         _gamelists = gamelists;
         _canonical = canonical;
@@ -34,7 +36,7 @@ public sealed class SpeedrunController : ControllerBase
 
     /// <summary>Les defis ouverts sur cette borne.</summary>
     [HttpGet("challenges")]
-    public IActionResult Defis() => Ok(CatalogueDesDefis.Tous.Select(r => new
+    public IActionResult Defis() => Ok(_catalogue.Tous.Select(r => new
     {
         challengeId = r.ChallengeId,
         version = r.Version,
