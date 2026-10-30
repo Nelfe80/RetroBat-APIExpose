@@ -109,7 +109,7 @@ public class MultiplayerClassementTests
     /// <summary>Bomber Man World (livraison du 29/10) : compteurs BCD, premier a 3, fin au GAME OVER (0x11328 = 2), sans garde.</summary>
     private static readonly MultiplayerRankingEnd BomberManWorld = new()
     {
-        Rule = MultiplayerRankingEnd.Manches, FirstTo = 3, SettleMs = 1000,
+        Rule = MultiplayerRankingEnd.Manches, FirstTo = 3, SettleMs = 1000, Keep = MultiplayerRankingEnd.LaPlusHaute,
         Over = new() { CoreRam = "0x11328", Value = 2 },
         Seats =
         [
@@ -148,13 +148,75 @@ public class MultiplayerClassementTests
     public void Manches_la_plus_haute_valeur_repart_de_zero_hors_de_la_garde()
     {
         // P1 a 4 K.O., puis un joueur ouvre le menu RULE : la rencontre repart, ses 4 K.O. d'avant ne comptent plus.
-        var rangs = Rejouer(new MultiplayerClassementEnCours(SonicBattle, [1, 2, 3]),
+        var rangs = Rejouer(new MultiplayerClassementEnCours(SonicBattle with { Keep = MultiplayerRankingEnd.LaPlusHaute }, [1, 2, 3]),
             (R(0, null, V(1, 0), V(2, 0), V(3, 0), V(4, 0)), 2),
             (R(0, null, V(1, 4), V(2, 0), V(3, 0), V(4, 0)), 6),
             (R(1, null, V(1, 4), V(2, 0), V(3, 0), V(4, 0)), 4),
             (R(0, null, V(1, 0), V(2, 0), V(3, 0), V(4, 0)), 6),
             (R(0, null, V(1, 0), V(2, 5), V(3, 2), V(4, 0)), 6));
         Assert.Equal("2:1 3:2 1:3", Dire(rangs));
+    }
+
+    [Fact]
+    public void Manches_sans_keep_un_compteur_qui_baisse_compte_a_sa_derniere_valeur()
+    {
+        // Doom II (v1.1 §7, n° 6) : P1 a 2 frags puis se suicide (1) ; au signal de fin, P2 (2) passe devant.
+        var doom = BomberManWorld with { Keep = null, FirstTo = 10 };
+        var rangs = Rejouer(new MultiplayerClassementEnCours(doom, [1, 2]),
+            (R(null, 0, V(1, 0), V(2, 0), V(3, 0), V(4, 0)), 2),
+            (R(null, 0, V(1, 2), V(2, 1), V(3, 0), V(4, 0)), 6),
+            (R(null, 0, V(1, 1), V(2, 2), V(3, 0), V(4, 0)), 6),
+            (R(null, 2, V(1, 1), V(2, 2), V(3, 0), V(4, 0)), 6));
+        Assert.Equal("2:1 1:2", Dire(rangs));
+    }
+
+    [Fact]
+    public void Une_valeur_signee_passe_sous_zero()
+    {
+        var place = new MultiplayerRankingSeat { Seat = 1, CoreRam = "0x1", Bytes = 2, Signed = true };
+        Assert.Equal(-1L, place.Valeur([0xFF, 0xFF]));
+        Assert.Equal(-2L, place.Valeur([0xFE, 0xFF]));
+        Assert.Equal(32767L, place.Valeur([0xFF, 0x7F]));
+        Assert.Equal(-1L, (place with { Bytes = 1 }).Valeur([0xFF]));
+        Assert.Equal(255L, (place with { Bytes = 1, Signed = false }).Valeur([0xFF]));
+    }
+
+    [Fact]
+    public void Score_fige_le_plus_bas_d_abord()
+    {
+        // Mario Golf (v1.1 §7, n° 5 et 6) : le score au par, signe ; -2 bat +1. Fin au signal, chacun en jeu.
+        var golf = new MultiplayerRankingEnd
+        {
+            Rule = MultiplayerRankingEnd.ScoreFige, Better = "lower", Over = new() { CoreRam = "0x30", Value = 1 }, SettleMs = 1000,
+            Seats = [new() { Seat = 1, CoreRam = "0x10", Signed = true }, new() { Seat = 2, CoreRam = "0x11", Signed = true }],
+        };
+        var rangs = Rejouer(new MultiplayerClassementEnCours(golf, [1, 2]),
+            (R(null, 0, V(1, 0), V(2, 0)), 2),
+            (R(null, 0, V(1, 1), V(2, -2)), 6),
+            (R(null, 1, V(1, 1), V(2, -2)), 6));
+        Assert.Equal("2:1 1:2", Dire(rangs));
+    }
+
+    [Fact]
+    public void Un_signal_a_plusieurs_valeurs_prend_chacune()
+    {
+        // F-Zero MV (v1.1 §7, n° 2) : l'arrivee vaut 06 ou 10 selon la course.
+        var arrivee = new MultiplayerDuelGuard { CoreRam = "0x1", Values = [6, 16] };
+        Assert.True(arrivee.Vaut(6));
+        Assert.True(arrivee.Vaut(16));
+        Assert.False(arrivee.Vaut(0));
+        Assert.True(new MultiplayerDuelGuard { CoreRam = "0x1", Value = 3 }.Vaut(3));
+
+        var course = new MultiplayerRankingEnd
+        {
+            Rule = MultiplayerRankingEnd.Arrivee, Position = MultiplayerRankingEnd.OrdreDArrivee, SettleMs = 500,
+            Seats = [new() { Seat = 1, Finished = arrivee }, new() { Seat = 2, Finished = arrivee }],
+        };
+        var rangs = Rejouer(new MultiplayerClassementEnCours(course, [1, 2]),
+            (R(null, null, (1, null, null, 0), (2, null, null, 0)), 2),
+            (R(null, null, (1, null, null, 0), (2, null, null, 16)), 4),
+            (R(null, null, (1, null, null, 6), (2, null, null, 16)), 4));
+        Assert.Equal("2:1 1:2", Dire(rangs));
     }
 
     [Fact]
@@ -587,6 +649,10 @@ public class MultiplayerClassementTests
     [InlineData("\"rule\": \"survie\", \"tie_break\": { \"better\": \"most\" }, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "departage incoherent")]
     [InlineData("\"rule\": \"survie\", \"tie_break\": { \"core_ram\": \"0x9\" }, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "departage incoherent")]
     [InlineData("\"rule\": \"survie\", \"tie_break\": { }, \"seats\": [ { \"seat\": 1, \"dead\": { \"core_ram\": \"0x1\", \"value\": 1 } }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "departage incoherent")]
+    [InlineData("\"rule\": \"survie\", \"keep\": \"highest\", \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "keep (manches) ou better (score_fige) incoherent")]
+    [InlineData("\"rule\": \"manches\", \"first_to\": 3, \"better\": \"lower\", \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "keep (manches) ou better (score_fige) incoherent")]
+    [InlineData("\"rule\": \"manches\", \"first_to\": 3, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\", \"bcd\": true, \"signed\": true }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "format de la place 1")]
+    [InlineData("\"rule\": \"manches\", \"first_to\": 3, \"over\": { \"core_ram\": \"0x9\", \"values\": [1, 300] }, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "signal de fin ou garde incoherent")]
     [InlineData("\"rule\": \"survie\", \"memory\": \"ram\", \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ]", "memoire « ram » inconnue")]
     public void Une_fin_a_plusieurs_douteuse_est_refusee(string classement, string raison)
     {
@@ -681,7 +747,7 @@ public class MultiplayerClassementTests
         var catalogue = Lire("""
             { "schema_version": 1, "games": [
               { "id": "arcade/bbmanw", "system": "arcade", "set": "bbmanw", "players": 4, "elo_type": "arene", "min_api": "1.9.129",
-                "ranking_end": { "rule": "manches", "first_to": 3, "over": { "core_ram": "0x11328", "value": 2 },
+                "ranking_end": { "rule": "manches", "keep": "highest", "first_to": 3, "over": { "core_ram": "0x11328", "value": 2 },
                   "settle_ms": 1000, "min_humans": 2, "close_after_s": 5,
                   "seats": [
                     { "seat": 1, "core_ram": "0x113B5", "bytes": 1, "bcd": true, "order": "le" },
@@ -692,6 +758,7 @@ public class MultiplayerClassementTests
         Assert.Null(MultiplayerCatalogueStore.Valider(catalogue));
         Assert.True(catalogue.Games[0].EstClasse);
         Assert.False(catalogue.Games[0].RankingEnd!.ParLaCarteDuCoeur);
+        Assert.True(catalogue.Games[0].RankingEnd!.GardeLaPlusHaute);
     }
 
     [Fact]
@@ -766,6 +833,15 @@ public class MultiplayerClassementTests
         Assert.Contains("ordre des places incoherent", MultiplayerCatalogueStore.ValiderLOrdreDesPlaces(jeu with { SeatPorts = [[1], [2], [3], [4]] }));
         Assert.Contains("camp_out incoherent", MultiplayerCatalogueStore.ValiderLeClassement(jeu with { RankingEnd = Survie with { CampOut = "first" } }));
         Assert.Contains("camp_out incoherent", MultiplayerCatalogueStore.ValiderLeClassement(jeu with { RankingEnd = jeu.RankingEnd with { CampOut = "last" } }));
+    }
+
+    [Fact]
+    public void Une_fin_en_duel_ne_prend_qu_une_valeur_de_signal()
+    {
+        var json = "{ \"schema_version\": 1, \"games\": [ { \"id\": \"a\", \"system\": \"arcade\", \"set\": \"a\", \"players\": 2, "
+            + "\"match_end\": { \"type\": \"score_final\", \"over\": { \"core_ram\": \"0x9\", \"value\": 1, \"values\": [1, 2] }, "
+            + "\"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ] } } ] }";
+        Assert.Contains("signal de fin incoherent", MultiplayerCatalogueStore.Valider(Lire(json)));
     }
 
     [Fact]

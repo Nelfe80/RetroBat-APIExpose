@@ -56,8 +56,8 @@ public sealed class MultiplayerClassementEnCours
     private readonly Dictionary<int, long> _arrivees = [];
 
     /// <summary>
-    /// Manches : la plus haute valeur stable de chaque place depuis le depart (v1.1 §7, n° 29). Le compteur d'un humain
-    /// elimine peut retomber a 0 pendant que les autres jouent (Bomber Man World) : ses victoires restent acquises.
+    /// Manches avec <c>keep</c> « highest » : la plus haute valeur stable de chaque place depuis le depart (v1.1 §7, n° 29).
+    /// Le compteur d'un humain elimine peut retomber a 0 pendant que les autres jouent (Bomber Man World).
     /// </summary>
     private readonly Dictionary<int, long> _plusHautes = [];
 
@@ -87,7 +87,7 @@ public sealed class MultiplayerClassementEnCours
             }
 
             // Hors de la garde (un menu, une transition), rien ne se lit : les valeurs repartent de zero a son retour.
-            if (lue != garde.Value)
+            if (!garde.Vaut(lue))
             {
                 _suivis.Clear();
                 _plusHautes.Clear();
@@ -98,8 +98,8 @@ public sealed class MultiplayerClassementEnCours
         var signalTenu = false;
         if (_fin.Over is { } signal && releve.Signal is { } valeurDuSignal)
         {
-            _signalRetombe |= valeurDuSignal != signal.Value;
-            signalTenu = Tenue("signal", valeurDuSignal == signal.Value ? 1 : 0, instantMs) == 1 && valeurDuSignal == signal.Value;
+            _signalRetombe |= !signal.Vaut(valeurDuSignal);
+            signalTenu = Tenue("signal", signal.Vaut(valeurDuSignal) ? 1 : 0, instantMs) == 1 && signal.Vaut(valeurDuSignal);
         }
 
         return _fin.Rule switch
@@ -115,8 +115,8 @@ public sealed class MultiplayerClassementEnCours
     // ── Les quatre regles ──────────────────────────────────────────────────
 
     /// <summary>
-    /// Premier a N manches (une place humaine ou non), ou le signal de fin : les humains par la plus haute valeur stable de
-    /// leur compteur depuis le depart.
+    /// Premier a N manches (une place humaine ou non), ou le signal de fin : les humains par leur compteur, ou par sa plus
+    /// haute valeur stable depuis le depart avec <c>keep</c> « highest ».
     /// </summary>
     private IReadOnlyList<MultiplayerRang>? Manches(MultiplayerReleve releve, long ms, bool signalTenu)
     {
@@ -138,27 +138,33 @@ public sealed class MultiplayerClassementEnCours
             return null;
         }
 
-        foreach (var (place, tenue) in tenues)
+        IReadOnlyDictionary<int, long?> retenues = tenues;
+        if (_fin.GardeLaPlusHaute)
         {
-            if (tenue is { } v && (!_plusHautes.TryGetValue(place, out var haute) || v > haute))
+            foreach (var (place, tenue) in tenues)
             {
-                _plusHautes[place] = v;
+                if (tenue is { } v && (!_plusHautes.TryGetValue(place, out var haute) || v > haute))
+                {
+                    _plusHautes[place] = v;
+                }
             }
+
+            retenues = _plusHautes.ToDictionary(p => p.Key, p => (long?)p.Value);
         }
 
-        var auSeuil = _fin.FirstTo is { } premierA && _plusHautes.Values.Any(v => v >= premierA);
+        var auSeuil = _fin.FirstTo is { } premierA && retenues.Values.Any(v => v >= premierA);
         if (!auSeuil && !signalTenu)
         {
             return null;
         }
 
         // Chaque humain doit avoir une valeur retenue : sinon le releve suivant tranchera.
-        if (_humains.Any(h => !_plusHautes.ContainsKey(h)))
+        if (_humains.Any(h => retenues.GetValueOrDefault(h) is null))
         {
             return null;
         }
 
-        return Classer(seat => _plusHautes.TryGetValue(seat, out var v) ? (0, -v) : (1, 0));
+        return Classer(seat => retenues.GetValueOrDefault(seat) is { } v ? (0, -v) : (1, 0));
     }
 
     /// <summary>
@@ -174,7 +180,7 @@ public sealed class MultiplayerClassementEnCours
             bool? tombee = null;
             if (place.Dead is { } mort && lu?.Mort is { } octet)
             {
-                tombee = octet == mort.Value;
+                tombee = mort.Vaut(octet);
             }
 
             if (tombee is not true && place.CoreRam.Length > 0 && lu?.Valeur is { } valeur)
@@ -255,13 +261,13 @@ public sealed class MultiplayerClassementEnCours
                 continue;
             }
 
-            if (octet != fini.Value)
+            if (!fini.Vaut(octet))
             {
                 _vusEnJeu.Add(place.Seat);
             }
 
             var cle = "f" + place.Seat;
-            if (Tenue(cle, octet == fini.Value ? 1 : 0, ms) == 1 && _departVu && !_arrivees.ContainsKey(place.Seat))
+            if (Tenue(cle, fini.Vaut(octet) ? 1 : 0, ms) == 1 && _departVu && !_arrivees.ContainsKey(place.Seat))
             {
                 // Sans octet de position (v1.1 §7, n° 4) : l'instant ou son drapeau a commence a tenir fait sa position.
                 if (_fin.ParOrdreDArrivee)
@@ -308,7 +314,7 @@ public sealed class MultiplayerClassementEnCours
             var lu = releve.Places.GetValueOrDefault(place.Seat);
             // Sans mort lue (NBA Jam TE), une place est en jeu des que son score se lit : le signal de fin fige les scores.
             bool? morte = place.Dead is { } mort
-                ? lu?.Mort is { } octet ? octet == mort.Value : null
+                ? lu?.Mort is { } octet ? mort.Vaut(octet) : null
                 : lu?.Valeur is null ? null : false;
             var score = Tenue("v" + place.Seat, lu?.Valeur, ms);
             if (morte is false)
@@ -340,7 +346,7 @@ public sealed class MultiplayerClassementEnCours
         return Classer(seat =>
         {
             var retenu = _retenus.TryGetValue(seat, out var r) ? r : _derniersScores.TryGetValue(seat, out var d) ? d : (long?)null;
-            return retenu is { } v ? (0, -v) : (1, 0);
+            return retenu is { } v ? (0, _fin.PlusBasDAbord ? v : -v) : (1, 0);
         });
     }
 

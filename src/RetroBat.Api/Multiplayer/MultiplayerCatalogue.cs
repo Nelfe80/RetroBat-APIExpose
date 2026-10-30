@@ -852,6 +852,29 @@ public sealed record MultiplayerRankingEnd
     [JsonPropertyName("position")]
     public string? Position { get; init; }
 
+    public const string LaPlusHaute = "highest";
+
+    /// <summary>
+    /// <c>manches</c> : <c>highest</c>, chaque place garde la plus haute valeur stable vue depuis le depart (CDC Classements
+    /// v1.1 §7, n° 29 ; Bomber Man World : le compteur d'un humain elimine retombe a 0 pendant que les autres jouent).
+    /// Absent ou <c>last</c> : la valeur du moment, qui peut baisser (Doom II : un suicide retire un frag).
+    /// </summary>
+    [JsonPropertyName("keep")]
+    public string? Keep { get; init; }
+
+    [JsonIgnore]
+    public bool GardeLaPlusHaute => string.Equals(Keep, LaPlusHaute, StringComparison.Ordinal);
+
+    /// <summary>
+    /// <c>score_fige</c> : <c>lower</c>, le plus petit score d'abord (v1.1 §7, n° 5 ; Mario Golf : le score au par).
+    /// Absent ou <c>higher</c> : le plus grand.
+    /// </summary>
+    [JsonPropertyName("better")]
+    public string? Better { get; init; }
+
+    [JsonIgnore]
+    public bool PlusBasDAbord => string.Equals(Better, "lower", StringComparison.Ordinal);
+
     /// <summary>Les nombres de joueurs de cette fin, quand le jeu en a une par nombre (<see cref="MultiplayerGame.RankingEnds"/>).</summary>
     [JsonPropertyName("players")]
     public IReadOnlyList<int>? Players { get; init; }
@@ -930,6 +953,13 @@ public sealed record MultiplayerRankingSeat
     [JsonPropertyName("order")]
     public string Order { get; init; } = "le";
 
+    /// <summary>
+    /// UNE VALEUR SIGNEE (CDC Classements v1.1 §7, n° 6 ; Doom II, Duke Nukem : des frags qui passent sous zero au suicide ;
+    /// Mario Golf : le score au par) : en complement a deux sur sa largeur. Binaire seulement.
+    /// </summary>
+    [JsonPropertyName("signed")]
+    public bool Signed { get; init; }
+
     /// <summary>Le camp de la place dans un jeu en equipes ; absent, chacun pour soi.</summary>
     [JsonPropertyName("camp")]
     public int? Camp { get; init; }
@@ -984,7 +1014,7 @@ public sealed record MultiplayerRankingSeat
             }
         }
 
-        return valeur;
+        return Signed && !Digits && !Bcd && valeur >= 1L << (8 * Bytes - 1) ? valeur - (1L << (8 * Bytes)) : valeur;
     }
 
     /// <summary>Le nombre d'octets permis : 8 en chiffres, 4 sinon.</summary>
@@ -1038,6 +1068,16 @@ public sealed record MultiplayerDuelGuard
 
     [JsonPropertyName("value")]
     public int Value { get; init; }
+
+    /// <summary>
+    /// PLUSIEURS VALEURS (CDC Classements v1.1 §7, n° 2 ; F-Zero MV : l'arrivee vaut 06 ou 10) a la place de
+    /// <see cref="Value"/>, dans une fin a plusieurs seulement : une API d'avant ne lirait que <see cref="Value"/>.
+    /// </summary>
+    [JsonPropertyName("values")]
+    public IReadOnlyList<long>? Values { get; init; }
+
+    /// <summary>La lecture prend-elle la valeur du signal (l'une de <see cref="Values"/>, sinon <see cref="Value"/>) ?</summary>
+    public bool Vaut(long lue) => Values is { Count: > 0 } valeurs ? valeurs.Contains(lue) : lue == Value;
 
     /// <summary>
     /// LA LARGEUR DU SIGNAL (CDC Classements v1.1 §7, n° 1) : 1 a 4 octets, dans l'ordre <see cref="Order"/> (Mario Kart SC lit
@@ -1674,7 +1714,7 @@ public sealed class MultiplayerCatalogueStore
         // Un signal de 1 a 4 octets (v1.1 §7, n° 1), une valeur qui tient dans sa largeur.
         static bool Octet(MultiplayerDuelGuard? signal) => signal is null
             || (signal.Decalage is not null && signal.Bytes is >= 1 and <= 4 && signal.Order is "le" or "be" or "68k"
-                && signal.Value >= 0 && (signal.Bytes == 4 || signal.Value < 1L << (8 * signal.Bytes)));
+                && (signal.Values ?? []).Append((long)signal.Value).All(v => v >= 0 && (signal.Bytes == 4 ? v <= uint.MaxValue : v < 1L << (8 * signal.Bytes))));
         if (!Octet(fin.Over) || !Octet(fin.Guard))
         {
             return "classement : signal de fin ou garde incoherent";
@@ -1703,7 +1743,7 @@ public sealed class MultiplayerCatalogueStore
         {
             var sansValeur = place.CoreRam.Length == 0;
             if ((!sansValeur && place.Decalage is null) || place.Bytes < 1 || place.Bytes > place.OctetsMax || place.Order is not ("le" or "be" or "68k")
-                || (place.Digits && place.Bcd) || !Octet(place.Dead) || !Octet(place.Finished))
+                || (place.Digits && place.Bcd) || (place.Signed && (place.Digits || place.Bcd)) || !Octet(place.Dead) || !Octet(place.Finished))
             {
                 return "classement : adresse ou format de la place " + place.Seat + " incoherent";
             }
@@ -1736,6 +1776,12 @@ public sealed class MultiplayerCatalogueStore
         if (fin.AvecCamps && (fin.Seats.Any(s => s.Camp is not (>= 1 and <= 8)) || fin.Seats.Select(s => s.Camp).Distinct().Count() < 2))
         {
             return "classement : camps incoherents (chaque place en a un, deux camps au moins)";
+        }
+
+        if (fin.Keep is not (null or "last" or MultiplayerRankingEnd.LaPlusHaute) || (fin.Keep is not null && fin.Rule != MultiplayerRankingEnd.Manches)
+            || fin.Better is not (null or "higher" or "lower") || (fin.Better is not null && fin.Rule != MultiplayerRankingEnd.ScoreFige))
+        {
+            return "classement : keep (manches) ou better (score_fige) incoherent";
         }
 
         if (fin.CampOut is not (null or "all" or MultiplayerRankingEnd.CampTombeAuPremier)
@@ -1952,7 +1998,7 @@ public sealed class MultiplayerCatalogueStore
                 }
             }
 
-            if (fin.Duel is { } garde && (garde.Decalage is null || garde.Value is < 0 or > 255 || garde.Bytes != 1))
+            if (fin.Duel is { } garde && (garde.Decalage is null || garde.Value is < 0 or > 255 || garde.Bytes != 1 || garde.Values is not null))
             {
                 return "fin de rencontre : garde de duel incoherente";
             }
@@ -1965,7 +2011,7 @@ public sealed class MultiplayerCatalogueStore
                 return "fin de rencontre : type « " + autre.Type + " » inconnu";
             }
 
-            if (autre.Over?.Decalage is null || autre.Over.Value is < 0 or > 255 || autre.Over.Bytes != 1 || autre.CloseAfterS is < 0 or > 60
+            if (autre.Over?.Decalage is null || autre.Over.Value is < 0 or > 255 || autre.Over.Bytes != 1 || autre.Over.Values is not null || autre.CloseAfterS is < 0 or > 60
                 || autre.Memory is not (null or MultiplayerChoice.CarteDuCoeur))
             {
                 return "fin de rencontre : signal de fin incoherent";
@@ -1984,7 +2030,7 @@ public sealed class MultiplayerCatalogueStore
                 }
             }
 
-            if (autre.Duel is { } garde && (garde.Decalage is null || garde.Value is < 0 or > 255 || garde.Bytes != 1))
+            if (autre.Duel is { } garde && (garde.Decalage is null || garde.Value is < 0 or > 255 || garde.Bytes != 1 || garde.Values is not null))
             {
                 return "fin de rencontre : garde de duel incoherente";
             }
