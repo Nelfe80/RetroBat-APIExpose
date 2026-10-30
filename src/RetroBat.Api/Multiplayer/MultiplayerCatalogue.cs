@@ -178,7 +178,20 @@ public sealed record MultiplayerGame
 
     /// <summary>Les ports que tient cette place, dans l'ordre de ses manettes locales.</summary>
     public IReadOnlyList<int> PortsDeLaPlace(int place)
-        => SeatPorts is { Count: > 0 } ports && place >= 1 && place <= ports.Count && ports[place - 1].Count > 0 ? ports[place - 1] : [place];
+        => SeatPorts is { Count: > 0 } ports && place >= 1 && place <= ports.Count && ports[place - 1].Count > 0 ? ports[place - 1]
+            : [PlaceDuJeu(place)];
+
+    /// <summary>
+    /// L'ORDRE DES PLACES (CDC Classements v1.1 §8.3, n° 14 ; NBA Jam TE, WrestleFest en Tag) : la place k de la plateforme
+    /// joue la place <c>seat_order[k - 1]</c> du jeu. <c>[1, 3, 2, 4]</c> met deux humains face a face (P1 et P3 dans des
+    /// camps opposes) ; l'invite demande ce port au netplay et l'etat a deux en tient compte. En entrant dans la partie, la
+    /// fin et les statistiques sont remises dans l'ordre de la plateforme (<see cref="MultiplayerOrdreNetplay"/>).
+    /// </summary>
+    [JsonPropertyName("seat_order")]
+    public IReadOnlyList<int>? SeatOrder { get; init; }
+
+    /// <summary>La place du jeu que joue cette place de la plateforme.</summary>
+    public int PlaceDuJeu(int place) => SeatOrder is { Count: > 0 } ordre && place >= 1 && place <= ordre.Count ? ordre[place - 1] : place;
 
     /// <summary>
     /// DEUX STICKS PAR JOUEUR (Title Fight, 27/10, decision du user) : FBNeo envoie le second stick du joueur sur le stick
@@ -324,6 +337,26 @@ public sealed record MultiplayerGame
     [JsonPropertyName("ranking_end")]
     public MultiplayerRankingEnd? RankingEnd { get; init; }
 
+    /// <summary>
+    /// UNE FIN PAR NOMBRE DE JOUEURS (CDC Classements v1.1 §7, n° 16 ; Slam Masters : duel sans camp a deux, equipes a trois
+    /// ou quatre) : d'autres fins, chacune avec ses <c>players</c>. <see cref="RankingEnd"/> vaut pour ses <c>players</c>, ou
+    /// pour les nombres qu'aucune autre ne prend. Une API d'avant ne lit que <see cref="RankingEnd"/>.
+    /// </summary>
+    [JsonPropertyName("ranking_ends")]
+    public IReadOnlyList<MultiplayerRankingEnd>? RankingEnds { get; init; }
+
+    /// <summary>La fin a plusieurs d'une partie a ce nombre de joueurs, ou null quand aucune ne le prend.</summary>
+    public MultiplayerRankingEnd? ClassementPour(int joueurs)
+    {
+        if (RankingEnds is not { Count: > 0 } autres)
+        {
+            return RankingEnd;
+        }
+
+        return autres.Prepend(RankingEnd).FirstOrDefault(fin => fin?.Players?.Contains(joueurs) == true)
+            ?? (RankingEnd is { Players: null } ? RankingEnd : null);
+    }
+
     /// <summary>La fin de rencontre se lit-elle (manches, un type de <see cref="MatchEnd"/> connu, ou une regle de <see cref="RankingEnd"/>) ?</summary>
     [JsonIgnore]
     public bool FinLue => End is not null || MatchEnd is { EstConnu: true } || RankingEnd is { EstConnu: true };
@@ -337,7 +370,10 @@ public sealed record MultiplayerGame
     /// d'humains (deux au moins, face a face dans un jeu en equipes).
     /// </summary>
     public bool ClassePour(IReadOnlyCollection<int> humains)
-        => EstClasse && (RankingEnd is not { } classement || classement.Classable(humains));
+        => EstClasse && (RankingEnd is null
+            || (ClassementPour(humains.Count) is { } classement
+                // Hors partie, le catalogue est dans l'ordre du jeu : chaque humain y tient sa place du jeu.
+                && classement.Classable(PlacesDuNetplay is null ? humains.Select(PlaceDuJeu).ToList() : humains)));
 
     /// <summary>NIVEAU NELFEPLAY : ce que l'hote mesure pendant un duel pour l'ecran de resultat (00quater.3, ecran 10).</summary>
     [JsonPropertyName("stats")]
@@ -815,6 +851,22 @@ public sealed record MultiplayerRankingEnd
     /// </summary>
     [JsonPropertyName("position")]
     public string? Position { get; init; }
+
+    /// <summary>Les nombres de joueurs de cette fin, quand le jeu en a une par nombre (<see cref="MultiplayerGame.RankingEnds"/>).</summary>
+    [JsonPropertyName("players")]
+    public IReadOnlyList<int>? Players { get; init; }
+
+    public const string CampTombeAuPremier = "first";
+
+    /// <summary>
+    /// <c>survie</c> en equipes (v1.1 §7, n° 15 ; WrestleFest en Tag, Slam Masters) : <c>first</c>, un camp tombe avec son
+    /// premier membre ; <c>all</c> (defaut), avec le dernier.
+    /// </summary>
+    [JsonPropertyName("camp_out")]
+    public string? CampOut { get; init; }
+
+    [JsonIgnore]
+    public bool CampTombeAvecLePremier => string.Equals(CampOut, CampTombeAuPremier, StringComparison.Ordinal);
 
     /// <summary>
     /// <c>survie</c> : le departage des places encore debout au signal de fin (CDC Classements v1.1 §7, n° 20 ; Sugoi
@@ -1532,7 +1584,7 @@ public sealed class MultiplayerCatalogueStore
 
         // Le champ « bios » (CDC Classements v1.1 §5) n'est pas lu ici : l'outil de diagnostic dit quel BIOS manque (decision
         // du user du 29/10).
-        return ValiderLesVues(jeu) ?? ValiderLeDepart(jeu) ?? ValiderLeDepartDuCoeur(jeu) ?? ValiderLeClassement(jeu);
+        return ValiderLesVues(jeu) ?? ValiderLeDepart(jeu) ?? ValiderLeDepartDuCoeur(jeu) ?? ValiderLeClassement(jeu) ?? ValiderLOrdreDesPlaces(jeu);
     }
 
     /// <summary>
@@ -1541,6 +1593,58 @@ public sealed class MultiplayerCatalogueStore
     /// du score fige), et des camps coherents. Jamais avec <c>end</c> ou <c>match_end</c> : une API d'avant lirait l'autre.
     /// </summary>
     internal static string? ValiderLeClassement(MultiplayerGame jeu)
+    {
+        if (jeu.RankingEnds is not { Count: > 0 } autres)
+        {
+            return ValiderUneFin(jeu);
+        }
+
+        // Une fin par nombre de joueurs (v1.1 §7, n° 16) : chaque autre fin a ses nombres, aucun nombre n'en a deux, et
+        // chacune se valide a son plus grand nombre de joueurs.
+        if (jeu.RankingEnd is null)
+        {
+            return "classement : ranking_ends sans ranking_end";
+        }
+
+        var fins = autres.Prepend(jeu.RankingEnd).ToList();
+        var nombres = fins.SelectMany(f => f.Players ?? []).ToList();
+        if (autres.Any(f => f.Players is not { Count: > 0 }) || nombres.Any(n => n < 2 || n > jeu.Players) || nombres.Distinct().Count() != nombres.Count)
+        {
+            return "classement : nombres de joueurs des fins incoherents";
+        }
+
+        foreach (var fin in fins)
+        {
+            if (ValiderUneFin(jeu with { RankingEnd = fin, RankingEnds = null, Players = fin.Players?.Max() ?? jeu.Players }) is { } raison)
+            {
+                return raison + (fin.Players is { } n ? " (fin a " + string.Join(", ", n) + " joueurs)" : string.Empty);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// L'ordre des places (v1.1 §8.3) : chaque place du jeu une fois. Les choix, les pseudos, les ports et les ecrans par
+    /// place se lisent encore dans l'ordre du jeu : avec eux, il est refuse plutot que lu a moitie.
+    /// </summary>
+    internal static string? ValiderLOrdreDesPlaces(MultiplayerGame jeu)
+    {
+        if (jeu.SeatOrder is not { } ordre)
+        {
+            return null;
+        }
+
+        if (!ordre.Order().SequenceEqual(Enumerable.Range(1, jeu.Players)) || jeu.SeatPorts is { Count: > 0 } || jeu.SeatScreens is { Count: > 0 }
+            || jeu.SeatRemap is { Count: > 0 } || jeu.Views is { Count: > 0 } || jeu.CoreStart is not null || jeu.Choices is { Count: > 0 } || jeu.Names is not null)
+        {
+            return "ordre des places incoherent (chaque place une fois, sans choix, pseudos, ports, ecrans ni depart par place)";
+        }
+
+        return null;
+    }
+
+    private static string? ValiderUneFin(MultiplayerGame jeu)
     {
         if (jeu.RankingEnd is not { } fin)
         {
@@ -1608,7 +1712,8 @@ public sealed class MultiplayerCatalogueStore
             var manque = fin.Rule switch
             {
                 MultiplayerRankingEnd.Survie => sansValeur && place.Dead is null,
-                MultiplayerRankingEnd.ScoreFige => sansValeur || place.Dead is null,
+                // Sans mort lue, le score du signal de fin (NBA Jam TE) : toutes les places sans mort, et le signal.
+                MultiplayerRankingEnd.ScoreFige => sansValeur || (place.Dead is null && (fin.Over is null || fin.Seats.Any(s => s.Dead is not null))),
                 MultiplayerRankingEnd.Arrivee when fin.ParOrdreDArrivee => place.Finished is null,
                 _ => sansValeur,
             };
@@ -1631,6 +1736,12 @@ public sealed class MultiplayerCatalogueStore
         if (fin.AvecCamps && (fin.Seats.Any(s => s.Camp is not (>= 1 and <= 8)) || fin.Seats.Select(s => s.Camp).Distinct().Count() < 2))
         {
             return "classement : camps incoherents (chaque place en a un, deux camps au moins)";
+        }
+
+        if (fin.CampOut is not (null or "all" or MultiplayerRankingEnd.CampTombeAuPremier)
+            || (fin.CampOut is not null && (fin.Rule != MultiplayerRankingEnd.Survie || !fin.AvecCamps)))
+        {
+            return "classement : camp_out incoherent (survie en equipes, « first » ou « all »)";
         }
 
         // Le departage lit la valeur de chaque place : seulement en survie, chaque place avec sa valeur.

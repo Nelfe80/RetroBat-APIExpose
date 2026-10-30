@@ -207,7 +207,11 @@ public sealed class MultiplayerClassementEnCours
             return null;
         }
 
-        var debout = Unites().Count(unite => unite.Membres.Any(m => !_eliminees.ContainsKey(m)));
+        // Un camp tient tant qu'un membre est debout, ou, avec camp_out « first » (v1.1 §7, n° 15), tant qu'aucun n'est tombe.
+        var auPremier = _fin.CampTombeAvecLePremier;
+        var debout = Unites().Count(unite => auPremier
+            ? unite.Membres.All(m => !_eliminees.ContainsKey(m))
+            : unite.Membres.Any(m => !_eliminees.ContainsKey(m)));
         if (debout > 1 && !signalTenu)
         {
             return null;
@@ -230,7 +234,9 @@ public sealed class MultiplayerClassementEnCours
             var valeur = Tenue("v" + seat, null, ms) ?? (_dernieresValeurs.TryGetValue(seat, out var d) ? d : (long?)null);
             return valeur is { } v ? (0, departage.PlusBasDAbord ? v : -v) : (0, long.MaxValue);
         }, egales: (a, b) =>
-            a.Item1 == b.Item1 && (a.Item1 == 0 ? departage is null || a.Item2 == b.Item2 : Math.Abs(a.Item2 - b.Item2) <= _fin.SettleMs));
+            a.Item1 == b.Item1 && (a.Item1 == 0 ? departage is null || a.Item2 == b.Item2 : Math.Abs(a.Item2 - b.Item2) <= _fin.SettleMs),
+            // Un camp tombe avec son premier membre : il prend la cle de son pire membre (sa premiere chute).
+            parLePire: auPremier);
     }
 
     /// <summary>
@@ -300,7 +306,10 @@ public sealed class MultiplayerClassementEnCours
         foreach (var place in _fin.Seats)
         {
             var lu = releve.Places.GetValueOrDefault(place.Seat);
-            bool? morte = place.Dead is { } mort && lu?.Mort is { } octet ? octet == mort.Value : null;
+            // Sans mort lue (NBA Jam TE), une place est en jeu des que son score se lit : le signal de fin fige les scores.
+            bool? morte = place.Dead is { } mort
+                ? lu?.Mort is { } octet ? octet == mort.Value : null
+                : lu?.Valeur is null ? null : false;
             var score = Tenue("v" + place.Seat, lu?.Valeur, ms);
             if (morte is false)
             {
@@ -352,13 +361,14 @@ public sealed class MultiplayerClassementEnCours
     }
 
     /// <summary>
-    /// Les rangs des humains : chaque unite prend la meilleure cle de ses membres (la plus petite), puis le rang de
-    /// competition (1, 1, 3) ; deux unites « egales » partagent leur rang.
+    /// Les rangs des humains : chaque unite prend la meilleure cle de ses membres (la plus petite ; la pire avec
+    /// <paramref name="parLePire"/>), puis le rang de competition (1, 1, 3) ; deux unites « egales » partagent leur rang.
     /// </summary>
-    private IReadOnlyList<MultiplayerRang> Classer(Func<int, (long, long)> cle, Func<(long, long), (long, long), bool>? egales = null)
+    private IReadOnlyList<MultiplayerRang> Classer(Func<int, (long, long)> cle, Func<(long, long), (long, long), bool>? egales = null, bool parLePire = false)
     {
         egales ??= (a, b) => a == b;
-        var unites = Unites().Select(u => (u.Camp, u.Humains, Cle: u.Membres.Select(cle).Min())).OrderBy(u => u.Cle).ToList();
+        var unites = Unites().Select(u => (u.Camp, u.Humains, Cle: parLePire ? u.Membres.Select(cle).Max() : u.Membres.Select(cle).Min()))
+            .OrderBy(u => u.Cle).ToList();
         var rangs = new List<MultiplayerRang>();
         var tete = 0;
         for (var i = 0; i < unites.Count; i++)

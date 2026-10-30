@@ -10,15 +10,29 @@ namespace RetroBat.Api.Multiplayer;
 /// </summary>
 public static class MultiplayerOrdreNetplay
 {
-    /// <summary>Le jeu de cette partie, ses places remises dans l'ordre de la plateforme ; le meme quand rien ne change.</summary>
+    /// <summary>
+    /// Le jeu de cette partie : la fin de son nombre de joueurs (v1.1 §7, n° 16), ses places remises dans l'ordre de la
+    /// plateforme (son <c>seat_order</c>, ou l'ordre du netplay d'un depart par place) ; le meme quand rien ne change.
+    /// </summary>
     public static MultiplayerInstalledGame PourLaRoom(MultiplayerInstalledGame jeu, MultiplayerRoom room)
     {
-        if (jeu.Game.CoreStart is null || Permutation(room) is not { } permutation)
+        var partie = jeu.Game;
+        if (partie.RankingEnds is { Count: > 0 })
         {
-            return jeu;
+            partie = partie with { RankingEnd = partie.ClassementPour(room.Players.Count(j => j.Seat is not null)), RankingEnds = null };
         }
 
-        return jeu with { Game = Permuter(jeu.Game, permutation) };
+        if (partie.SeatOrder is { Count: > 0 } ordre)
+        {
+            // La place k de la plateforme joue la place ordre[k - 1] du jeu.
+            partie = Permuter(partie, ordre.Select((placeDuJeu, k) => (placeDuJeu, k + 1)).ToDictionary(p => p.placeDuJeu, p => p.Item2));
+        }
+        else if (partie.CoreStart is not null && Permutation(room) is { } permutation)
+        {
+            partie = Permuter(partie, permutation);
+        }
+
+        return ReferenceEquals(partie, jeu.Game) ? jeu : jeu with { Game = partie };
     }
 
     /// <summary>

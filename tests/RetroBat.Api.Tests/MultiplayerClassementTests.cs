@@ -265,6 +265,41 @@ public class MultiplayerClassementTests
     }
 
     [Fact]
+    public void Survie_un_camp_tombe_avec_son_premier_membre()
+    {
+        // WrestleFest en Tag (v1.1 §7, n° 15) : P1 et l'ordinateur (P2) contre P3 et l'ordinateur (P4) ; P2 tombe le premier.
+        var tag = Survie with
+        {
+            Seats = [new() { Seat = 1, CoreRam = "0x10", Camp = 1 }, new() { Seat = 2, CoreRam = "0x11", Camp = 1 },
+                new() { Seat = 3, CoreRam = "0x12", Camp = 2 }, new() { Seat = 4, CoreRam = "0x13", Camp = 2 }],
+        };
+        (MultiplayerReleve, int)[] suite =
+        [
+            (R(null, null, V(1, 5), V(2, 5), V(3, 5), V(4, 5)), 2),
+            (R(null, null, V(1, 5), V(2, 0), V(3, 5), V(4, 5)), 8),
+        ];
+        Assert.Equal("3:1/2 1:2/1", Dire(Rejouer(new MultiplayerClassementEnCours(tag with { CampOut = "first" }, [1, 3]), suite)));
+        // Par defaut, le camp 1 tient tant que P1 est debout.
+        Assert.Null(Rejouer(new MultiplayerClassementEnCours(tag, [1, 3]), suite));
+    }
+
+    [Fact]
+    public void Survie_une_mort_qui_vaut_zero_se_lit()
+    {
+        // v1.1 §7, n° 17 : l'octet de la mort vaut 1 en jeu et 0 a la chute.
+        var fin = new MultiplayerRankingEnd
+        {
+            Rule = MultiplayerRankingEnd.Survie, SettleMs = 1000,
+            Seats = [new() { Seat = 1, Dead = new() { CoreRam = "0x20", Value = 0 } }, new() { Seat = 2, Dead = new() { CoreRam = "0x21", Value = 0 } }],
+        };
+        var rangs = Rejouer(new MultiplayerClassementEnCours(fin, [1, 2]),
+            (R(null, null, (1, null, 1, null), (2, null, 1, null)), 2),
+            (R(null, null, (1, null, 1, null), (2, null, 0, null)), 8));
+        Assert.Equal("1:1 2:2", Dire(rangs));
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeClassement(new MultiplayerGame { Id = "a", System = "arcade", Players = 2, RankingEnd = fin }));
+    }
+
+    [Fact]
     public void En_equipes_tous_les_humains_du_meme_cote_ne_se_classent_pas()
     {
         var fin = Survie with
@@ -356,6 +391,32 @@ public class MultiplayerClassementTests
             (R(null, 0, (1, 700, 0, null), (2, 900, 0, null)), 4),
             (R(null, 0, (1, 700, 1, null), (2, 900, 1, null)), 4));
         Assert.Equal("2:1 1:2", Dire(rangs));
+    }
+
+    [Fact]
+    public void Score_fige_sans_mort_le_score_du_signal_de_fin_classe_les_camps()
+    {
+        // NBA Jam TE remis dans l'ordre de la plateforme (seat_order [1, 3, 2, 4]) : places 1 et 3 au camp 1, 2 et 4 au camp 2,
+        // un score par camp. L'etat garde 3 points de la demo ; FINAL (50) fige le score.
+        var fin = new MultiplayerRankingEnd
+        {
+            Rule = MultiplayerRankingEnd.ScoreFige, Over = new() { CoreRam = "0x1D8DA", Value = 50 }, SettleMs = 1000,
+            Seats =
+            [
+                new() { Seat = 1, CoreRam = "0x1D5FA", Bytes = 2, Camp = 1 }, new() { Seat = 2, CoreRam = "0x1D5FC", Bytes = 2, Camp = 2 },
+                new() { Seat = 3, CoreRam = "0x1D5FA", Bytes = 2, Camp = 1 }, new() { Seat = 4, CoreRam = "0x1D5FC", Bytes = 2, Camp = 2 },
+            ],
+        };
+        var rangs = Rejouer(new MultiplayerClassementEnCours(fin, [1, 2]),
+            (R(null, 22, V(1, 3), V(2, 0), V(3, 3), V(4, 0)), 2),
+            (R(null, 22, V(1, 0), V(2, 0), V(3, 0), V(4, 0)), 4),
+            (R(null, 17, V(1, 12), V(2, 20), V(3, 12), V(4, 20)), 8),
+            (R(null, 50, V(1, 12), V(2, 20), V(3, 12), V(4, 20)), 8));
+        Assert.Equal("2:1/2 1:2/1", Dire(rangs));
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeClassement(new MultiplayerGame { Id = "a", System = "arcade", Players = 4, RankingEnd = fin }));
+        // Sans signal de fin ni mort, rien ne fige le score : refuse.
+        Assert.Contains("n'a pas ce que la regle",
+            MultiplayerCatalogueStore.ValiderLeClassement(new MultiplayerGame { Id = "a", System = "arcade", Players = 4, RankingEnd = fin with { Over = null } }));
     }
 
     [Fact]
@@ -654,6 +715,57 @@ public class MultiplayerClassementTests
         var json = "{ \"schema_version\": 1, \"games\": [ { \"id\": \"a\", \"system\": \"arcade\", \"set\": \"a\", \"players\": 2, \"ranking_end\": { \"rule\": \"arrivee\", "
             + classement + " } } ] }";
         Assert.Contains(raison, MultiplayerCatalogueStore.Valider(Lire(json)));
+    }
+
+    private const string SlamMastersAuCatalogue = """
+        { "schema_version": 1, "games": [ { "id": "arcade/slammast", "system": "arcade", "set": "slammast", "players": 4, "elo_type": "combat",
+          "ranking_end": { "players": [3, 4], "rule": "manches", "first_to": 1, "guard": { "core_ram": "0xA095", "value": 1 },
+            "seats": [ { "seat": 1, "core_ram": "0x929E", "camp": 1 }, { "seat": 2, "core_ram": "0x949E", "camp": 1 },
+                       { "seat": 3, "core_ram": "0x969E", "camp": 2 }, { "seat": 4, "core_ram": "0x989E", "camp": 2 } ] },
+          "ranking_ends": [ AUTRES ] } ] }
+        """;
+
+    private const string DuelDeSlamMasters = """
+        { "players": [2], "rule": "manches", "first_to": 1, "guard": { "core_ram": "0xA095", "value": 1 },
+          "seats": [ { "seat": 1, "core_ram": "0x929E" }, { "seat": 2, "core_ram": "0x949E" } ] }
+        """;
+
+    [Fact]
+    public void La_livraison_de_Slam_Masters_est_un_jeu_classe()
+    {
+        var catalogue = Lire(SlamMastersAuCatalogue.Replace("AUTRES", DuelDeSlamMasters));
+        Assert.Null(MultiplayerCatalogueStore.Valider(catalogue));
+        Assert.Equal([2], catalogue.Games[0].ClassementPour(2)!.Players);
+        Assert.Equal([3, 4], catalogue.Games[0].ClassementPour(4)!.Players);
+    }
+
+    [Theory]
+    [InlineData("{ \"rule\": \"manches\", \"first_to\": 1, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ] }", "nombres de joueurs des fins incoherents")]
+    [InlineData("{ \"players\": [2, 3], \"rule\": \"manches\", \"first_to\": 1, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" }, { \"seat\": 3, \"core_ram\": \"0x3\" } ] }", "nombres de joueurs des fins incoherents")]
+    [InlineData("{ \"players\": [5], \"rule\": \"manches\", \"first_to\": 1, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" }, { \"seat\": 2, \"core_ram\": \"0x2\" } ] }", "nombres de joueurs des fins incoherents")]
+    [InlineData("{ \"players\": [2], \"rule\": \"manches\", \"first_to\": 1, \"seats\": [ { \"seat\": 1, \"core_ram\": \"0x1\" } ] }", "pas d'entree pour la place 2 (fin a 2 joueurs)")]
+    public void Une_fin_par_nombre_de_joueurs_douteuse_est_refusee(string autre, string raison)
+        => Assert.Contains(raison, MultiplayerCatalogueStore.Valider(Lire(SlamMastersAuCatalogue.Replace("AUTRES", autre))));
+
+    [Fact]
+    public void L_ordre_des_places_et_le_camp_qui_tombe_au_premier_se_valident()
+    {
+        var jeu = new MultiplayerGame
+        {
+            Id = "a", System = "arcade", Players = 4, EloType = "combat", SeatOrder = [1, 3, 2, 4],
+            RankingEnd = Survie with
+            {
+                CampOut = "first",
+                Seats = [new() { Seat = 1, CoreRam = "0x10", Camp = 1 }, new() { Seat = 2, CoreRam = "0x11", Camp = 1 },
+                    new() { Seat = 3, CoreRam = "0x12", Camp = 2 }, new() { Seat = 4, CoreRam = "0x13", Camp = 2 }],
+            },
+        };
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeClassement(jeu) ?? MultiplayerCatalogueStore.ValiderLOrdreDesPlaces(jeu));
+        Assert.Contains("ordre des places incoherent", MultiplayerCatalogueStore.ValiderLOrdreDesPlaces(jeu with { SeatOrder = [1, 1, 2, 4] }));
+        Assert.Contains("ordre des places incoherent", MultiplayerCatalogueStore.ValiderLOrdreDesPlaces(jeu with { SeatOrder = [1, 3, 2] }));
+        Assert.Contains("ordre des places incoherent", MultiplayerCatalogueStore.ValiderLOrdreDesPlaces(jeu with { SeatPorts = [[1], [2], [3], [4]] }));
+        Assert.Contains("camp_out incoherent", MultiplayerCatalogueStore.ValiderLeClassement(jeu with { RankingEnd = Survie with { CampOut = "first" } }));
+        Assert.Contains("camp_out incoherent", MultiplayerCatalogueStore.ValiderLeClassement(jeu with { RankingEnd = jeu.RankingEnd with { CampOut = "last" } }));
     }
 
     [Fact]
