@@ -629,6 +629,79 @@ public class MultiplayerDepartPretTests : IDisposable
         Assert.Equal([(0x40B0L, 26), (0x40B2L, 22), (0x40B4L, 22), (0x40B6L, 32)], ecritures);
     }
 
+    /// <summary>
+    /// Marvel vs. Capcom en manette d'equipe : a deux, deux personnages chacun ; a quatre, un chacun ; a trois, le joueur seul
+    /// de son camp garde les deux. Les places 1 et 3 forment un camp, 2 et 4 l'autre.
+    /// </summary>
+    private static readonly MultiplayerGame MvcEnEquipes = Mvc with
+    {
+        Players = 4,
+        TeamRelay = new()
+        {
+            Camps =
+            [
+                new() { Port = 1, Seats = [1, 3], CoreRam = "0x40CB", Values = new Dictionary<string, int> { ["48"] = 0, ["56"] = 1 } },
+                new() { Port = 2, Seats = [2, 4], CoreRam = "0x40D3", Values = new Dictionary<string, int> { ["52"] = 0, ["60"] = 1 } },
+            ],
+        },
+        Choices =
+        [
+            EquipeMvc with
+            {
+                Seats =
+                [
+                    new() { Seat = 1, Players = 2, CoreRam = "0x40B0", CoreRams = ["0x40B0", "0x40B2"] },
+                    new() { Seat = 2, Players = 2, CoreRam = "0x40B4", CoreRams = ["0x40B4", "0x40B6"] },
+                    new() { Seat = 1, Players = 3, CoreRam = "0x40B0" },
+                    new() { Seat = 3, Players = 3, CoreRam = "0x40B2" },
+                    new() { Seat = 2, Players = 3, CoreRam = "0x40B4", CoreRams = ["0x40B4", "0x40B6"] },
+                    new() { Seat = 1, Players = 4, CoreRam = "0x40B0" },
+                    new() { Seat = 3, Players = 4, CoreRam = "0x40B2" },
+                    new() { Seat = 2, Players = 4, CoreRam = "0x40B4" },
+                    new() { Seat = 4, Players = 4, CoreRam = "0x40B6" },
+                ],
+            },
+        ],
+    };
+
+    [Fact]
+    public void En_manette_d_equipe_chaque_joueur_choisit_les_personnages_de_sa_place()
+    {
+        var choix = MvcEnEquipes.Choices![0];
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeDepart(MvcEnEquipes));
+        Assert.Equal(2, choix.PicksDe(1, 2));
+        Assert.Equal(1, choix.PicksDe(1, 4));
+        Assert.Equal(1, choix.PicksDe(3, 3));
+        Assert.Equal(2, choix.PicksDe(2, 3));
+        Assert.Equal(2, choix.PicksDe(null, 2));
+
+        IReadOnlyDictionary<string, int> Veut(params (string Cle, int Valeur)[] voulus) => voulus.ToDictionary(v => v.Cle, v => v.Valeur);
+
+        // A quatre : un personnage chacun, a sa place de l'equipe.
+        Assert.Equal([(0x40B0L, 26), (0x40B4L, 22), (0x40B2L, 18), (0x40B6L, 32)], MultiplayerDepartPret.Ecritures(MvcEnEquipes,
+            new Dictionary<int, IReadOnlyDictionary<string, int>?>
+            {
+                [1] = Veut(("character", 26)), [2] = Veut(("character", 22)), [3] = Veut(("character", 18)), [4] = Veut(("character", 32)),
+            }));
+
+        // A trois : le joueur seul de son camp prend les deux personnages du camp.
+        Assert.Equal([(0x40B0L, 26), (0x40B4L, 22), (0x40B6L, 18), (0x40B2L, 32)], MultiplayerDepartPret.Ecritures(MvcEnEquipes,
+            new Dictionary<int, IReadOnlyDictionary<string, int>?>
+            {
+                [1] = Veut(("character", 26)), [2] = Veut(("character", 22), ("character#2", 18)), [3] = Veut(("character", 32)),
+            }));
+
+        // Deux coequipiers veulent le meme : le second passe a la premiere valeur libre du camp ; le miroir entre camps reste permis.
+        var ecritures = MultiplayerDepartPret.Ecritures(MvcEnEquipes, new Dictionary<int, IReadOnlyDictionary<string, int>?>
+        {
+            [1] = Veut(("character", 26)), [2] = Veut(("character", 26)), [3] = Veut(("character", 26)), [4] = Veut(("character", 22)),
+        });
+        Assert.Equal(26, ecritures.Single(e => e.Decalage == 0x40B0).Valeur);
+        Assert.Equal(26, ecritures.Single(e => e.Decalage == 0x40B4).Valeur);
+        Assert.NotEqual(26, ecritures.Single(e => e.Decalage == 0x40B2).Valeur);
+        Assert.Equal(22, ecritures.Single(e => e.Decalage == 0x40B6).Valeur);
+    }
+
     [Fact]
     public void Une_equipe_n_a_jamais_deux_fois_le_meme_personnage()
     {

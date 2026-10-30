@@ -646,18 +646,27 @@ public sealed record MultiplayerChoice
         => Seats.FirstOrDefault(s => s.Seat == place && s.Players == joueurs) ?? Seats.FirstOrDefault(s => s.Seat == place && s.Players is null);
 
     /// <summary>
-    /// Les valeurs d'une place, une par choix : la voulue quand elle est permise et pas deja prise par un choix d'avant de la
-    /// place, sinon le defaut du rang, ou la premiere valeur libre (une equipe n'a pas deux fois le meme personnage).
+    /// Le nombre de choix d'une place dans une partie a ce nombre de joueurs : autant que les adresses de sa place. Marvel vs.
+    /// Capcom en manette d'equipe : deux a deux joueurs, un seul a quatre, chacun son personnage. Pas encore assis : tous.
     /// </summary>
-    public IReadOnlyList<int> Equipe(Func<int, int?> voulue)
+    public int PicksDe(int? place, int joueurs)
+        => place is not { } p ? Math.Max(1, Picks) : SiegePour(p, joueurs)?.CoreRams is { Count: > 0 } adresses ? adresses.Count : 1;
+
+    /// <summary>
+    /// Les valeurs d'une place, une par choix (<paramref name="nombre"/>, sinon tous) : la voulue quand elle est permise et pas
+    /// deja prise, par un choix d'avant de la place ou par <paramref name="prises"/> (ses coequipiers), sinon le defaut du rang,
+    /// ou la premiere valeur libre (une equipe n'a pas deux fois le meme personnage).
+    /// </summary>
+    public IReadOnlyList<int> Equipe(Func<int, int?> voulue, int? nombre = null, IReadOnlyCollection<int>? prises = null)
     {
         var equipe = new List<int>();
-        for (var rang = 1; rang <= Math.Max(1, Picks); rang++)
+        bool Pris(int valeur) => equipe.Contains(valeur) || prises?.Contains(valeur) == true;
+        for (var rang = 1; rang <= (nombre ?? Math.Max(1, Picks)); rang++)
         {
-            var valeur = voulue(rang) is { } v && Values.Any(x => x.Value == v) && !equipe.Contains(v) ? v : DefautDu(rang);
-            if (equipe.Contains(valeur))
+            var valeur = voulue(rang) is { } v && Values.Any(x => x.Value == v) && !Pris(v) ? v : DefautDu(rang);
+            if (Pris(valeur))
             {
-                valeur = Values.Select(x => x.Value).Where(x => !equipe.Contains(x)).DefaultIfEmpty(valeur).First();
+                valeur = Values.Select(x => x.Value).Where(x => !Pris(x)).DefaultIfEmpty(valeur).First();
             }
 
             equipe.Add(valeur);
@@ -915,6 +924,13 @@ public sealed record MultiplayerTeamRelay
     /// <summary>La valeur du combattant actif doit tenir ce delai avant qu'un joueur soit prevenu.</summary>
     [JsonPropertyName("settle_ms")]
     public int SettleMs { get; init; } = 200;
+
+    /// <summary>
+    /// Le combattant actif ne se lit que pendant que ce signal a cette valeur (KOF '98 : 0x500 = 8, le combat ; ailleurs, les
+    /// memes octets disent autre chose). Facultatif.
+    /// </summary>
+    [JsonPropertyName("guard")]
+    public MultiplayerDuelGuard? Guard { get; init; }
 
     public MultiplayerTeamRelayCamp? CampDe(int place) => Camps.FirstOrDefault(camp => camp.Seats.Contains(place));
 }
@@ -1573,6 +1589,10 @@ public sealed record MultiplayerChoiceSeat
     [JsonIgnore]
     public IReadOnlyList<long?> Decalages => (CoreRams ?? []).Select(texte => new MultiplayerChoiceSeat { CoreRam = texte }.Decalage).ToList();
 
+    /// <summary>L'adresse de chaque choix de cette place : ses <c>core_rams</c>, ou son seul <c>core_ram</c>.</summary>
+    [JsonIgnore]
+    public IReadOnlyList<long?> AdressesDesChoix => CoreRams is { Count: > 0 } ? Decalages : [Decalage];
+
     [JsonIgnore]
     public IReadOnlyList<long?> DecalagesDeLOrdre => (OrderCoreRams ?? []).Select(texte => new MultiplayerChoiceSeat { CoreRam = texte }.Decalage).ToList();
 
@@ -1952,6 +1972,7 @@ public sealed class MultiplayerCatalogueStore
 
         var places = equipe.Camps.SelectMany(camp => camp.Seats).ToList();
         if (equipe.Camps.Count < 2 || equipe.SettleMs is < 0 or > 5000
+            || (equipe.Guard is { } garde && (garde.Decalage is null || garde.Bytes is < 1 or > 4 || garde.Order is not ("le" or "be" or "68k")))
             || equipe.Camps.Select(camp => camp.Port).Distinct().Count() != equipe.Camps.Count
             || !places.Order().SequenceEqual(Enumerable.Range(1, jeu.Players))
             || equipe.Camps.Any(camp => camp.Port is < 1 or > 8 || camp.Decalage is null || camp.Bytes is < 1 or > 4 || camp.Order is not ("le" or "be" or "68k")
@@ -2429,7 +2450,9 @@ public sealed class MultiplayerCatalogueStore
                 if (choix.Picks is < 2 or > 4 || choix.Key.Contains('#') || defauts.Count != choix.Picks || defauts[0] != choix.Default
                     || defauts.Distinct().Count() != defauts.Count || defauts.Any(d => choix.Values.All(v => v.Value != d)) || choix.Distinct
                     || choix.Lock || choix.AllConsoles
-                    || choix.Seats.Any(s => s.Decalages.Count != choix.Picks || s.Decalages.Any(d => d is null) || s.Decalages[0] != s.Decalage
+                    // En manette d'equipe, une place peut avoir moins de choix : ses coequipiers prennent les autres.
+                    || choix.Seats.Any(s => s.AdressesDesChoix.Count > choix.Picks || (jeu.TeamRelay is null && s.AdressesDesChoix.Count != choix.Picks)
+                        || s.AdressesDesChoix.Any(d => d is null) || s.AdressesDesChoix[0] != s.Decalage
                         || (choix.Ordered ? s.DecalagesDeLOrdre.Count != choix.Picks || s.DecalagesDeLOrdre.Any(d => d is null) : s.OrderCoreRams is not null)))
                 {
                     return "choix « " + choix.Key + " » : plusieurs choix par place incoherents";

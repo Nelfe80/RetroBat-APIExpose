@@ -259,17 +259,23 @@ public sealed class MultiplayerDepartPret
             {
                 // Plusieurs choix par place (v1.0 §8.2) : l'equipe de chaque place dans l'ordre des choix, puis, pour un ordre
                 // de passage (KOF '98), le rang de chaque combattant : le premier choisi combat le premier.
-                foreach (var (place, voulus) in choixParPlace)
+                // En manette d'equipe, les coequipiers se partagent un camp : les places d'avant ont deja pris leurs personnages.
+                var prisesDuCamp = new Dictionary<int, HashSet<int>>();
+                foreach (var (place, voulus) in choixParPlace.OrderBy(p => p.Key))
                 {
                     if (choix.SiegePour(place, joueurs) is not { } siege)
                     {
                         continue;
                     }
 
-                    var equipe = choix.Equipe(rang => voulus is not null && voulus.TryGetValue(choix.CleDu(rang), out var v) ? v : null);
-                    for (var rang = 0; rang < equipe.Count && rang < siege.Decalages.Count; rang++)
+                    var adresses = siege.AdressesDesChoix;
+                    var camp = jeu.TeamRelay?.CampDe(place)?.Port;
+                    var prises = camp is { } port ? prisesDuCamp.TryGetValue(port, out var deja) ? deja : prisesDuCamp[port] = [] : null;
+                    var equipe = choix.Equipe(rang => voulus is not null && voulus.TryGetValue(choix.CleDu(rang), out var v) ? v : null, adresses.Count, prises);
+                    prises?.UnionWith(equipe);
+                    for (var rang = 0; rang < equipe.Count; rang++)
                     {
-                        if (siege.Decalages[rang] is { } adresse)
+                        if (adresses[rang] is { } adresse)
                         {
                             ecritures.Add((adresse, equipe[rang], choix.ParLaCarteDuCoeur));
                         }

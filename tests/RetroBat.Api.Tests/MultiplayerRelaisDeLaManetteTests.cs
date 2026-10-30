@@ -168,8 +168,10 @@ public class MultiplayerRelaisDeLaManetteTests
         public volatile int Valeur;
         public System.Collections.Concurrent.ConcurrentQueue<string> Envoyees { get; } = new();
 
+        public volatile int Garde = 8;
+
         public Task<string?> DemanderAsync(string commande, CancellationToken ct, int delaiMs = 500)
-            => Task.FromResult<string?>($"READ_CORE_RAM 10 {Valeur:x2}");
+            => Task.FromResult<string?>($"READ_CORE_RAM 10 {(commande.Contains(" 500 ", StringComparison.Ordinal) ? Garde : Valeur):x2}");
 
         public Task EnvoyerAsync(string commande, CancellationToken ct)
         {
@@ -198,6 +200,26 @@ public class MultiplayerRelaisDeLaManetteTests
         var seul = new RetroArchDuTest();
         Assert.Equal(0, await new MultiplayerRelaisDeLaManette(seul).AnnoncerLaMainAsync(Tag, 1, [1, 2], "À toi !", CancellationToken.None));
         Assert.Empty(seul.Envoyees);
+    }
+
+    [Fact]
+    public async Task Hors_de_la_garde_personne_n_est_prevenu()
+    {
+        // KOF '98 : au choix des personnages, 0x500 vaut 2 et le compteur est un masque ; au combat, 0x500 vaut 8.
+        var ra = new RetroArchDuTest { Valeur = 1, Garde = 2 };
+        using var fin = new CancellationTokenSource();
+        var boucle = new MultiplayerRelaisDeLaManette(ra, periode: TimeSpan.FromMilliseconds(5)).AnnoncerLaMainAsync(
+            Tag with { SettleMs = 0, Guard = new() { CoreRam = "0x500", Value = 8 } }, 3, [1, 2, 3, 4], "À toi !", fin.Token);
+        await Task.Delay(60);
+        Assert.Empty(ra.Envoyees);
+        ra.Garde = 8;
+        while (ra.Envoyees.IsEmpty)
+        {
+            await Task.Delay(5);
+        }
+
+        fin.Cancel();
+        Assert.Equal(1, await boucle);
     }
 
     /// <summary>

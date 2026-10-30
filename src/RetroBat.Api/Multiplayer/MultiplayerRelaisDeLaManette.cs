@@ -259,6 +259,14 @@ public sealed class MultiplayerRelaisDeLaManette
         {
             while (!ct.IsCancellationRequested)
             {
+                // Hors de la garde, l'octet dit autre chose (KOF '98, au choix des personnages) : rien ne se lit.
+                if (equipe.Guard is { } garde
+                    && await LireAsync(garde.Decalage, camp.ParLaCarteDuCoeur, garde.Bytes, garde, ct).ConfigureAwait(false) is { } lue && !garde.Vaut(lue))
+                {
+                    await Task.Delay(_periode, ct).ConfigureAwait(false);
+                    continue;
+                }
+
                 var valeur = await LireAsync(camp.Decalage, camp.ParLaCarteDuCoeur, camp.Bytes, camp.Signal, ct).ConfigureAwait(false);
                 if (enCours.Observer(valeur, horloge.ElapsedMilliseconds))
                 {

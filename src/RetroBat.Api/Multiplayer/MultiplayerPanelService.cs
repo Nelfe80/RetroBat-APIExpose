@@ -914,7 +914,16 @@ public sealed partial class MultiplayerPanelService
     private (string Jeu, int Rang) _choixCourant = (string.Empty, 1);
 
     private int RangDuChoix(MultiplayerGame jeu)
-        => _choixCourant.Jeu == jeu.Id && jeu.Choices is [{ Picks: > 1 } premier, ..] ? Math.Clamp(_choixCourant.Rang, 1, premier.Picks) : 1;
+        => _choixCourant.Jeu == jeu.Id && jeu.Choices is [{ Picks: > 1 }, ..] ? Math.Clamp(_choixCourant.Rang, 1, Math.Max(1, MesChoixDansLaSalle(jeu))) : 1;
+
+    /// <summary>Le nombre de choix de ce joueur, a sa place et au nombre de joueurs assis de la gameroom (une partie a deux au moins).</summary>
+    private int ChoixDe(MultiplayerJoueur joueur, MultiplayerGame jeu, MultiplayerChoice premier)
+        => premier.PicksDe(joueur.Seat, Math.Max(2, RoomDuJeu()?.Players.Count(j => j.Seat is not null) ?? 2));
+
+    /// <summary>Le nombre de choix de la place de cette borne ; tous, tant qu'elle n'est pas assise.</summary>
+    private int MesChoixDansLaSalle(MultiplayerGame jeu)
+        => jeu.Choices is not [var premier, ..] ? 1
+            : RoomDuJeu()?.Players.FirstOrDefault(j => j.You) is { } moi ? ChoixDe(moi, jeu, premier) : premier.PicksDe(null, 2);
 
     /// <summary>Le bouton « valider » : relache, il agit sur la ligne ; au resultat, maintenu, il relance le jeu.</summary>
     public void Valider(bool appuye)
@@ -946,9 +955,10 @@ public sealed partial class MultiplayerPanelService
             }
 
             // Plusieurs choix par place (v1.0 §8.2) : A passe au choix suivant de l'equipe, ▲▼ change celui-la.
-            if (!maintenu && _mode == Mode.Panneau && AuChoixDuPersonnage() is (_, { Choices: [{ Picks: > 1 } aPlusieurs, ..] } jeuDeLEquipe))
+            if (!maintenu && _mode == Mode.Panneau && AuChoixDuPersonnage() is (_, { Choices: [{ Picks: > 1 }, ..] } jeuDeLEquipe)
+                && MesChoixDansLaSalle(jeuDeLEquipe) > 1)
             {
-                _choixCourant = (jeuDeLEquipe.Id, RangDuChoix(jeuDeLEquipe) % aPlusieurs.Picks + 1);
+                _choixCourant = (jeuDeLEquipe.Id, RangDuChoix(jeuDeLEquipe) % MesChoixDansLaSalle(jeuDeLEquipe) + 1);
                 Rafraichir();
                 return;
             }
@@ -1993,7 +2003,7 @@ public sealed partial class MultiplayerPanelService
     /// <summary>Plusieurs choix par place (v1.0 §8.2) : le portrait de chaque personnage de l'equipe, dans l'ordre des choix.</summary>
     private IReadOnlyList<string?>? PortraitsDuJoueur(MultiplayerJoueur joueur)
     {
-        if (_jeu is not { ChoixOuverts: true, Game: { Choices: [{ Picks: > 1 } premier, ..] } jeu })
+        if (_jeu is not { ChoixOuverts: true, Game: { Choices: [{ Picks: > 1 } premier, ..] } jeu } || ChoixDe(joueur, jeu, premier) < 2)
         {
             return null;
         }
@@ -2009,7 +2019,7 @@ public sealed partial class MultiplayerPanelService
     private IReadOnlyList<int> EquipeDe(MultiplayerJoueur joueur, MultiplayerGame jeu, MultiplayerChoice premier)
     {
         var siens = joueur.You ? _session.MesChoix(jeu) : joueur.Choices;
-        return premier.Equipe(rang => siens is not null && siens.TryGetValue(premier.CleDu(rang), out var v) ? v : null);
+        return premier.Equipe(rang => siens is not null && siens.TryGetValue(premier.CleDu(rang), out var v) ? v : null, ChoixDe(joueur, jeu, premier));
     }
 
     /// <summary>La valeur voulue par ce joueur : la sienne tout de suite (▲▼), celle de la gameroom pour les autres.</summary>
@@ -2044,8 +2054,16 @@ public sealed partial class MultiplayerPanelService
             .Where(joueur => !joueur.You)
             .Select(joueur => joueur.Choices is not null && joueur.Choices.TryGetValue(premier.Key, out var v) ? v : premier.Default)
             .ToHashSet();
+        // En manette d'equipe : ce que ses coequipiers ont pris, tous leurs choix.
+        if (jeu.TeamRelay is { } equipe)
+        {
+            var monCamp = salle.Players.FirstOrDefault(joueur => joueur.You)?.Seat is { } maPlace ? equipe.CampDe(maPlace) : null;
+            prises = salle.Players.Where(joueur => !joueur.You && joueur.Seat is { } place && monCamp?.Seats.Contains(place) == true)
+                .SelectMany(joueur => EquipeDe(joueur, jeu, premier)).ToHashSet();
+        }
+
         // Le nom change tout de suite a l'ecran ; la gameroom le recoit dans la foulee.
-        var envoi = _session.ChangerDeChoixAsync(salle.Room, jeu, pas, prises: prises, rang: RangDuChoix(jeu));
+        var envoi = _session.ChangerDeChoixAsync(salle.Room, jeu, pas, prises: prises, rang: RangDuChoix(jeu), nombre: MesChoixDansLaSalle(jeu));
         Rafraichir();
         var refus = await envoi.ConfigureAwait(false);
         if (refus is not null)
@@ -2164,7 +2182,7 @@ public sealed partial class MultiplayerPanelService
                  && _jeu is { ChoixOuverts: true })
         {
             aides.Add(new("dpad_updown", T("multiplayer.help.character")));
-            if (_jeu.Game.Choices is [{ Picks: > 1 }, ..])
+            if (_jeu.Game.Choices is [{ Picks: > 1 }, ..] && MesChoixDansLaSalle(_jeu.Game) > 1)
             {
                 aides.Add(new(_glypheValider, Texte("multiplayer.help.next_pick", "next")));
             }

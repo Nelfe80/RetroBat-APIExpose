@@ -551,6 +551,9 @@ public sealed class MultiplayerLaunchService : IHostedService
         {
             _issue = issue;
             _suiviDesStats?.Figer();
+            // La rencontre finie, le combattant actif ne veut plus rien dire (MvC : l'octet revient au premier a la victoire).
+            _relaisDeLaManette?.Cancel();
+            _relaisDeLaManette = null;
         }
 
         _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} finie, {Issue} ; le jeu se ferme dans {Delai} s",
@@ -601,6 +604,8 @@ public sealed class MultiplayerLaunchService : IHostedService
             lock (_verrou)
             {
                 _issueInvite = issue;
+                _relaisDeLaManette?.Cancel();
+                _relaisDeLaManette = null;
             }
 
             // Ses statistiques partent avec son rapport : le site les compare a celles de l'hote (ecart journalise, sans suite en V1).

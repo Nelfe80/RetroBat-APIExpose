@@ -240,11 +240,11 @@ public sealed class MultiplayerSessionService : BackgroundService
     }
 
     /// <summary>
-    /// ▲▼ : le choix voisin, garde sur la borne et envoye a la gameroom. <paramref name="rang"/> : lequel des choix de la place
-    /// (plusieurs choix par place, v1.0 §8.2). Rend la raison d'un refus, ou null.
+    /// ▲▼ : le choix voisin, garde sur la borne et envoye a la gameroom. <paramref name="rang"/> : lequel des choix de la place,
+    /// qui en a <paramref name="nombre"/> (plusieurs choix par place, v1.0 §8.2). Rend la raison d'un refus, ou null.
     /// </summary>
     public async Task<string?> ChangerDeChoixAsync(string room, MultiplayerGame jeu, int pas, CancellationToken ct = default, IReadOnlySet<int>? prises = null,
-        int rang = 1)
+        int rang = 1, int? nombre = null)
     {
         if (jeu.Choices is not { Count: > 0 } choix)
         {
@@ -257,9 +257,16 @@ public sealed class MultiplayerSessionService : BackgroundService
         if (premier.Picks > 1)
         {
             // Les autres choix de la place sont pris : une equipe n'a pas deux fois le meme personnage.
-            rang = Math.Clamp(rang, 1, premier.Picks);
-            var miens = Enumerable.Range(1, premier.Picks).Where(r => r != rang)
+            var sesChoix = nombre ?? premier.Picks;
+            rang = Math.Clamp(rang, 1, sesChoix);
+            var miens = Enumerable.Range(1, sesChoix).Where(r => r != rang)
                 .Select(r => actuels.TryGetValue(premier.CleDu(r), out var x) ? x : premier.DefautDu(r)).ToHashSet();
+            // En manette d'equipe, un personnage pris par un coequipier est pris (le miroir entre camps reste permis).
+            if (jeu.TeamRelay is not null && prises is not null)
+            {
+                miens.UnionWith(prises);
+            }
+
             nouveaux[premier.CleDu(rang)] = premier.VoisineLibre(actuels.TryGetValue(premier.CleDu(rang), out var u) ? u : premier.DefautDu(rang), pas, miens);
         }
         else
