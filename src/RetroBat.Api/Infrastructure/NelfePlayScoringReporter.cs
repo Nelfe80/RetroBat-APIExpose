@@ -33,6 +33,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     private readonly IEventBus _eventBus;
     private readonly IHttpClientFactory _httpFactory;
+    private readonly RetroBat.Api.Speedrun.SpeedrunSessionService? _speedrun;
     private readonly NelfePlayDeviceStore _devices;
     /// <summary>La carte du reseau (CDC infra §15.4) : les cles qui signent les verdicts, les relais.</summary>
     private readonly RetroBat.Api.Reseau.ServiceDeCarte? _cartes;
@@ -317,8 +318,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         RetroBat.Domain.Interfaces.IEsSettingsStore? esSettings = null,
         PartieNelfePlayService? partie = null,
         RetroBat.Api.Reseau.ServiceDeCarte? cartes = null,
-        RetroBat.Api.Reseau.ClientDeRelais? relais = null)
+        RetroBat.Api.Reseau.ClientDeRelais? relais = null,
+        RetroBat.Api.Speedrun.SpeedrunSessionService? speedrun = null)
     {
+        _speedrun = speedrun;
         _cartes = cartes;
         _relais = relais;
         _esSettings = esSettings;
@@ -2879,6 +2882,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // qui decidera, un peu plus bas, s'il y avait quelque chose a mesurer.
         _sessionRecue = true;
         if (sessionJson is null) return;
+        if (_partie is { EstSpeedrun: true } && !SousAtelier())
+        {
+            await SoumettreDefiAsync(systemId, romGroup, sessionJson, cancellationToken).ConfigureAwait(false);
+            return;
+        }
         if (!PartieNelfePlay())
         {
             Trace(SousAtelier()
@@ -3031,6 +3039,74 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// depart a son propre continue ; le credit consomme par un autre joueur, sans START de ce panel,
     /// ne coupe rien ici. Le port de la borne, retrouve a ses appuis, doit etre celui de sa place.
     /// </summary>
+    /// <summary>
+    /// LE DEFI DE SPEEDRUN A LA FERMETURE DU JEU (§11) : le meilleur temps du lancement, et lui seul. Le bilan du wrapper
+    /// n'existe qu'ici et couvre tout le lancement : s'il dit une triche ou un etat charge, aucune tentative ne part.
+    /// </summary>
+    private async Task SoumettreDefiAsync(string systemId, string romGroup, string sessionJson, CancellationToken cancellationToken)
+    {
+        if (_speedrun?.PrendreLeMeilleurTemps() is not { } defi)
+        {
+            Trace("defi de speedrun : aucun temps classable dans ce lancement, rien a envoyer");
+            return;
+        }
+
+        var frames = defi.Tentative.Resultat.FramesOfficielles ?? 0;
+        if (RetroBat.Api.Speedrun.PasseportDeDefi.Salissure(sessionJson) is { } motif)
+        {
+            Trace($"defi de speedrun : STOP, le bilan du wrapper signale {motif}, aucune tentative de ce lancement ne part");
+            if (_esNotify is not null)
+                await _esNotify.NotifyAsync("Défi : temps non envoyé, triche ou état chargé détecté pendant ce lancement", cancellationToken).ConfigureAwait(false);
+            return;
+        }
+
+        string? listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, replay;
+        lock (_sync)
+        {
+            listenerSha = _listenerSha256; coreSha = _coreSha256; memSha = _memSha256;
+            contentSha = _contentSha256; contentMd5 = _contentMd5; contentSha1 = _contentSha1; wrapperVersion = _wrapperVersion;
+            coreName = _coreName; coreVersion = _coreVersion;
+            replay = _replayDeLaPartie;
+        }
+        if (listenerSha is null)
+        {
+            Trace("defi de speedrun : STOP, pas d'attestation");
+            return;
+        }
+
+        var points = new List<(long frame, long total)> { (0, 0), (frames, frames) };
+        var brouillon = NouveauBrouillon("defi", systemId, romGroup, sessionJson, listenerSha, coreSha, memSha,
+            contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, frames, points, points,
+            null, null, null, 1, null, null, null, replay, null);
+        brouillon["defi"] = RetroBat.Api.Speedrun.PasseportDeDefi.Decrire(defi.Reglement, defi.Tentative);
+        // L'identifiant de la tentative est celui du passeport : un renvoi revient en « duplicate ».
+        if (Guid.TryParse(defi.Tentative.AttemptId, out var tentative)) brouillon["id"] = tentative.ToString();
+        await PoserEtEnvoyerAsync(brouillon, frames, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>Le defi dans l'index du site ; joignable a faux tant que le site ne repond pas.</summary>
+    private async Task<(bool Joignable, RetroBat.Api.Speedrun.EntreeDeLIndex? Entree)> LireLIndexDesDefisAsync(
+        string credential, string defiId, int version, CancellationToken ct)
+    {
+        try
+        {
+            using var client = CreateClient(credential);
+            using var reponse = await client.GetAsync("/api/v1/challenges/open", ct).ConfigureAwait(false);
+            if (!reponse.IsSuccessStatusCode)
+            {
+                Trace($"index des defis : HTTP {(int)reponse.StatusCode}");
+                return (false, null);
+            }
+            var corps = await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+            return (true, RetroBat.Api.Speedrun.PasseportDeDefi.Lire(corps, defiId, version));
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            Trace($"index des defis : site injoignable ({ex.GetType().Name})");
+            return (false, null);
+        }
+    }
+
     private async Task SoumettreMultiAsync(string systemId, string romGroup, string sessionJson, string credential,
         int place, string? seance, CancellationToken cancellationToken)
     {
@@ -4139,6 +4215,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 return;   // l'overlay claim s'en charge
             }
 
+            if (passport["challenge"] is not null)
+            {
+                await _esNotify.NotifyAsync(RetroBat.Api.Speedrun.PasseportDeDefi.TexteDuVerdict(passport, status, (int?)(obj?["rank"]), ReasonToText(reason)), cancellationToken).ConfigureAwait(false);
+                return;
+            }
+
             var scoreText = (string?)((passport["metric"] as JsonObject)?["value"]) ?? "0";
             _ = long.TryParse(scoreText, out var score);
             var rank = (int?)(obj?["rank"]);
@@ -4947,6 +5029,25 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
         }
 
+        var defi = (string?)brouillon["genre"] == "defi" ? brouillon["defi"] as JsonObject : null;
+        RetroBat.Api.Speedrun.EntreeDeLIndex? entreeDuDefi = null;
+        if (defi is not null)
+        {
+            var defiId = (string?)defi["challenge"]?["challenge_id"] ?? "";
+            var (joignable, entree) = await LireLIndexDesDefisAsync(credential, defiId, (int?)defi["challenge"]?["version"] ?? 0, ct).ConfigureAwait(false);
+            if (!joignable)
+            {
+                Trace($"brouillon {id} : index des defis indisponible, nouvel essai plus tard");
+                return (Retenter, null, null);
+            }
+            if (entree is null || (entree.MemSha256 is { Length: > 0 } attendu && !string.Equals(attendu, (string?)brouillon["mem"], StringComparison.OrdinalIgnoreCase)))
+            {
+                Trace($"brouillon {id} : defi {defiId} ferme ou autre .MEM, retire sans envoi");
+                return (RetroBat.Api.Scoring.IssueDEnvoi.Definitif, null, null);
+            }
+            entreeDuDefi = entree;
+        }
+
         var ticket = await TicketAsync(credential, ct).ConfigureAwait(false);
         // Le site muet : le ticket pris au lancement fait un passeport complet, qu'un relais pourra garder.
         if (ticket is null && brouillon["ticket_du_lancement"] is JsonObject secours
@@ -4996,6 +5097,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 sessionId: id, finUtc: fin, joueurFige: (joueur, true), labo: (bool?)brouillon["labo"] == true,
                 versionApi: (string?)brouillon["apiexpose"], etatWrapper: (string?)brouillon["etat_wrapper"],
                 arretDuReplay: (long?)brouillon["arret_du_replay"], clear: brouillon["clear"] as JsonObject);
+            if (defi is not null) RetroBat.Api.Speedrun.PasseportDeDefi.Appliquer(passport, defi, entreeDuDefi!);
             var corps = passport.DeepClone()!.AsObject();
             corps.Remove("signature");
             passport["signature"] = cle.SignB64Url(Jcs.CanonicalBytes(corps));

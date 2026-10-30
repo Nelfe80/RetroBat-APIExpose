@@ -1,8 +1,10 @@
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging.Abstractions;
 using RetroBat.Api.Infrastructure;
 using RetroBat.Api.Multiplayer;
+using RetroBat.Api.Scoring;
 using RetroBat.Api.Speedrun;
 using RetroBat.Domain.Events;
 using RetroBat.Domain.Models;
@@ -48,6 +50,150 @@ public class SpeedrunSessionTests
 
     private static SessionSpeedrun Nouvelle() => new(GreenHill1.ChallengeId, GreenHill1,
         () => "id" + Interlocked.Increment(ref _ids).ToString(CultureInfo.InvariantCulture));
+
+    [Fact]
+    public void Le_joueur_est_prevenu_une_fois_que_le_defi_est_pret()
+    {
+        var s = Nouvelle();
+        Image(s, S(500, "TITLE_SCREEN", "0x00F601", 0x04));
+        foreach (var a in s.AdressesInconnues) s.Relever(a, 0);
+        Image(s, S(501, "TITLE_SCREEN", "0x00F601", 0x04));
+        Assert.Equal("speedrun.msg.ready", Assert.Single(s.PrendreLesMessages()).Cle);
+        s.Commander(new CommandeSpeedrun("r1", s.SessionId, "run.restart", false, null), out _);
+        s.RelanceFaite();
+        foreach (var a in s.AdressesInconnues) s.Relever(a, 0);
+        Image(s, S(600, "TITLE_SCREEN", "0x00F601", 0x04));
+        Assert.Empty(s.PrendreLesMessages());
+    }
+
+    [Fact]
+    public void L_arrivee_dit_le_temps_le_meilleur_temps_et_le_classement_a_la_fermeture()
+    {
+        var s = Nouvelle();
+        Partir(s);
+        Finir(s);
+        var premier = s.PrendreLesMessages().Last();
+        Assert.Equal("speedrun.msg.finish_best", premier.Cle);
+        Assert.Equal(("time", "0:47.48"), Assert.Single(premier.Valeurs));
+
+        s.MeilleurTemps = 2000;
+        Partir(s, 4000);
+        Finir(s, 4000);
+        var second = s.PrendreLesMessages().Last();
+        Assert.Equal("speedrun.msg.finish", second.Cle);
+        Assert.Contains(second.Valeurs, v => v.Nom == "best" && v.Valeur == "0:33.38");
+        Assert.Equal(2000, s.MeilleurTemps);
+    }
+
+    [Fact]
+    public void Une_tentative_ratee_ou_annulee_le_dit_au_joueur()
+    {
+        var s = Nouvelle();
+        Partir(s);
+        s.PrendreLesMessages();
+        Image(s, S(1500, "LOSE_LIFE", "0x00FE13", 2));
+        Assert.Equal("speedrun.msg.failed", Assert.Single(s.PrendreLesMessages()).Cle);
+
+        Partir(s, 2000);
+        s.PrendreLesMessages();
+        Image(s, S(3500, "PAUSE_ON", "0x00F63A", 1));
+        Assert.Equal("speedrun.msg.voided_pause", Assert.Single(s.PrendreLesMessages()).Cle);
+    }
+
+    private static readonly EntreeDeLIndex EntreeGH1 = new("ch-sonic-green-hill-1-v1", new string('a', 64), null);
+
+    private static JsonObject PasseportDePartie() => new()
+    {
+        ["game"] = new JsonObject { ["ruleset"] = "1cc", ["profile_version"] = 3, ["profile_document_sha256"] = new string('b', 64), ["manifest_commit"] = "abc" },
+        ["metric"] = new JsonObject { ["type"] = "score" },
+    };
+
+    [Fact]
+    public void Seul_le_meilleur_temps_classable_du_lancement_se_garde_et_une_seule_fois()
+    {
+        var s = Nouvelle();
+        Partir(s);
+        Finir(s);
+        Partir(s, 4000);
+        for (var sec = 1; sec <= 45; sec++) Image(s, S(4000 + 909 + 60 * sec, "LEVEL_TIMER", "0x00FE25", sec));
+        Image(s, S(4000 + 3634, "GENERAL_TIMER", "0x00FE1F", 0));
+        foreach (var a in s.AdressesInconnues) s.Relever(a, 0);
+        Image(s, S(4000 + 3758, "LEVEL_CLEAR", "0x00F7CD", 1));
+
+        var meilleure = s.PrendreLaMeilleure();
+        Assert.Equal(2725, meilleure?.Resultat.FramesOfficielles);
+        Assert.Equal(2, meilleure?.Numero);
+        Assert.Null(s.PrendreLaMeilleure());
+    }
+
+    [Fact]
+    public void Le_passeport_cite_le_reglement_et_porte_les_deux_chronos_sans_decimal()
+    {
+        var s = Nouvelle();
+        Partir(s);
+        Finir(s);
+        var t = s.PrendreLaMeilleure()!;
+
+        var p = PasseportDePartie();
+        PasseportDeDefi.Appliquer(p, PasseportDeDefi.Decrire(GreenHill1, t), EntreeGH1);
+
+        Assert.Equal("ch-sonic-green-hill-1-v1", (string?)p["game"]?["ruleset"]);
+        Assert.Equal(1, (int?)p["game"]?["profile_version"]);
+        Assert.Equal(new string('a', 64), (string?)p["game"]?["profile_document_sha256"]);
+        Assert.Equal("abc", (string?)p["game"]?["manifest_commit"]);
+        Assert.Equal("time", (string?)p["metric"]?["type"]);
+        Assert.Equal("2845", (string?)p["metric"]?["value"]);
+        Assert.Equal("lower_better", (string?)p["metric"]?["ranking_direction"]);
+
+        var c = p["challenge"]!;
+        Assert.Equal("sonic-the-hedgehog.green-hill-1", (string?)c["challenge_id"]);
+        Assert.Equal(2845, (long?)c["timing"]?["aligned"]?["frames"]);
+        Assert.Equal(909, (long?)c["timing"]?["aligned"]?["start_frame"]);
+        Assert.Equal(934, (long?)c["timing"]?["independent"]?["start_frame"]);
+        Assert.Equal(59922743, (long?)c["timing"]?["frame_rate_e6"]);
+        Assert.Equal("ch-sonic-green-hill-1-v1", (string?)c["boards"]?[0]);
+
+        var points = p["progression"]!["checkpoints"]!.AsArray();
+        Assert.Equal("run_start", (string?)points[0]?["event"]);
+        Assert.Equal("game_end", (string?)points[^1]?["event"]);
+        Assert.Equal("2845", (string?)points[^1]?["metric"]);
+        Assert.Equal(Crypto.Sha256Hex(Jcs.CanonicalBytes(points)), (string?)p["progression"]?["checkpoints_digest"]);
+        // L'horloge borne le meme intervalle que le chrono officiel (909 a 3754) : le site la confronte aux frames a 1 s pres.
+        Assert.InRange((long?)c["timing"]?["clock_ms"] ?? 0, 2845 * 1000 / 59.922743 - 20, 2845 * 1000 / 59.922743 + 20);
+        Assert.Equal((long?)c["timing"]?["clock_ms"], (long?)p["timing"]?["monotonic_ms"]);
+
+        // Le JCS refuse un decimal : ceci leverait s'il en restait un.
+        Assert.NotEmpty(Jcs.CanonicalBytes(p));
+    }
+
+    [Theory]
+    [InlineData("""{"resets":4,"save_state_loads":0,"cheats":0}""", null)]
+    [InlineData("""{"resets":0,"save_state_loads":2}""", "save_state_loads")]
+    [InlineData("""{"fast_forward":1}""", "fast_forward")]
+    public void Un_lancement_sali_se_reconnait_au_bilan_et_la_relance_ne_salit_pas(string session, string? attendu)
+        => Assert.Equal(attendu, PasseportDeDefi.Salissure(session));
+
+    [Fact]
+    public void L_index_du_site_donne_le_ruleset_et_l_empreinte_du_defi()
+    {
+        const string Index = """{"ok":true,"schema_version":1,"revision":"sha256:x","challenges":[{"challenge_id":"a.b","version":2,"ruleset":"ch-a-v2","document_sha256":"ff","mem_sha256":"00"}]}""";
+        Assert.Equal(new EntreeDeLIndex("ch-a-v2", "ff", "00"), PasseportDeDefi.Lire(Index, "a.b", 2));
+        Assert.Null(PasseportDeDefi.Lire(Index, "a.b", 1));
+        Assert.Null(PasseportDeDefi.Lire(Index, "z", 2));
+    }
+
+    [Fact]
+    public void Le_verdict_se_dit_en_temps()
+    {
+        var s = Nouvelle();
+        Partir(s);
+        Finir(s);
+        var p = PasseportDePartie();
+        PasseportDeDefi.Appliquer(p, PasseportDeDefi.Decrire(GreenHill1, s.PrendreLaMeilleure()!), EntreeGH1);
+        Assert.Equal("Défi : 0:47.48 classé, 9e", PasseportDeDefi.TexteDuVerdict(p, "published", 9, ""));
+        Assert.Equal("Défi : 0:47.48 classé, 1er", PasseportDeDefi.TexteDuVerdict(p, "published", 1, ""));
+        Assert.StartsWith("Défi : 0:47.48 non classé", PasseportDeDefi.TexteDuVerdict(p, "refused", null, "raison"));
+    }
 
     [Fact]
     public void Le_reglement_embarque_de_Green_Hill_1_ne_cite_que_des_lignes_du_MEM_certifie()
@@ -328,7 +474,7 @@ public class SpeedrunSessionTests
     [Fact]
     public async Task Le_service_ouvre_la_session_au_lancement_type_et_arme_par_READ_CORE_RAM()
     {
-        var (service, bus, _, publies, journal) = await Demarrer();
+        var (service, bus, retroArch, publies, journal) = await Demarrer();
         try
         {
             Assert.Equal(SessionSpeedrun.Idle, service.Instantane()?.Etat);
@@ -338,6 +484,7 @@ public class SpeedrunSessionTests
             await Emettre(bus, 934, "GAME_PLAYING", "0x00F601", 0x0C, Heure(934));
             await Attendre(() => service.Instantane()?.Etat == SessionSpeedrun.Running);
             Assert.Equal(909, service.Instantane()?.Depart?.Frame);
+            lock (retroArch.Envoyees) Assert.Single(retroArch.Envoyees, c => c.StartsWith("SHOW_MSG Challenge ready.", StringComparison.Ordinal));
             lock (publies) Assert.Contains(publies, e => e.Type == "speedrun.session");
 
             await bus.PublishAsync(new EventEnvelope { Type = "ui.game.ended", Payload = new { } });

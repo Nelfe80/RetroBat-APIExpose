@@ -3,6 +3,7 @@
   "challenge_id": "sonic-the-hedgehog.green-hill-1",
   "version": 1,
   "ruleset": "ch-sonic-green-hill-1-v1",
+  "title": { "fr": "Green Hill Zone · Acte 1", "en": "Green Hill Zone · Act 1" },
   "kind": "speedrun_level",
   "game": { "system_id": "megadrive", "rom_group": "sonic-the-hedgehog" },
   "mem_sha256": "00bf82c7b8783299fde03272c77541049f18e8cc4dd0a54ae5d6fe7e5dcdebe6",

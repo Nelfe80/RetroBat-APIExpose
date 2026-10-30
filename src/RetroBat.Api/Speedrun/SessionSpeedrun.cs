@@ -26,6 +26,12 @@ public enum EffetDemande { Aucun, Relancer }
 /// <summary>Un evenement du contrat (type « speedrun.xxx »), avec la sequence de la session.</summary>
 public sealed record EvenementSession(string Type, long Sequence, object Donnees);
 
+/// <summary>Une tentative finie et classable, avec son horloge : la matiere du passeport (§11).</summary>
+public sealed record TentativeFinie(string AttemptId, int Numero, ResultatTentative Resultat, long DepartMs, long ArriveeMs);
+
+/// <summary>Un message au joueur dans RetroArch : sa cle du dictionnaire, son texte par defaut et ses valeurs.</summary>
+public sealed record MessageJoueur(string Cle, string ParDefaut, params (string Nom, string Valeur)[] Valeurs);
+
 /// <summary>Le depart publie au HUD : frame, horloge de la borne a cet instant, cadence du coeur (§11 bis.2).</summary>
 public sealed record DepartPublie(
     [property: JsonPropertyName("frame")] long Frame,
@@ -102,6 +108,10 @@ public sealed class SessionSpeedrun
     private readonly Queue<string> _ordreDesReponses = new();
     private readonly List<EvenementSession> _aPublier = new();
     private readonly List<(string AttemptId, ResultatTentative Resultat)> _closes = new();
+    private readonly List<MessageJoueur> _messages = new();
+    private bool _departAnnonce;
+    private TentativeFinie? _meilleure;
+    private long? _horlogeDArrivee;
     private Evaluateur _courante;
     private Evaluateur? _suivante;
     private EtatTentative _etatVu = EtatTentative.Preparee;
@@ -154,6 +164,22 @@ public sealed class SessionSpeedrun
         var c = _closes.ToList();
         _closes.Clear();
         return c;
+    }
+
+    /// <summary>Le meilleur temps classable de ce lancement, une seule fois : lui seul part au site (decision du 30/10).</summary>
+    public TentativeFinie? PrendreLaMeilleure()
+    {
+        var m = _meilleure;
+        _meilleure = null;
+        return m;
+    }
+
+    /// <summary>Les messages au joueur depuis le dernier appel : le service les affiche dans RetroArch.</summary>
+    public IReadOnlyList<MessageJoueur> PrendreLesMessages()
+    {
+        var m = _messages.ToList();
+        _messages.Clear();
+        return m;
     }
 
     /// <summary>Les evenements a publier depuis le dernier appel, dans l'ordre de leur sequence.</summary>
@@ -378,6 +404,7 @@ public sealed class SessionSpeedrun
         if (!partie && etat is EtatTentative.EnCourse or EtatTentative.ArriveeProvisoire or EtatTentative.Finie)
         {
             _horlogeDuDepart = _horlogeDeLImage;
+            _horlogeDArrivee = null;
             var depart = Officielle(res)?.Depart;
             Publier("speedrun.started", new { sessionId = SessionId, attemptId = AttemptId, frame = depart, clockMs = _horlogeDuDepart, rate = _r.Cadence });
             partie = true;
@@ -387,12 +414,20 @@ public sealed class SessionSpeedrun
 
         if (etat == EtatTentative.ArriveeProvisoire)
         {
+            _horlogeDArrivee = _horlogeDeLImage;
             Publier("speedrun.finish.provisional", new { sessionId = SessionId, attemptId = AttemptId, frame = FrameDArriveeProvisoire(res) });
             return;
         }
 
         if (!_courante.EstTerminee)
         {
+            if (etat == EtatTentative.Armee && !_departAnnonce)
+            {
+                _departAnnonce = true;
+                _messages.Add(new MessageJoueur("speedrun.msg.ready",
+                    "Challenge ready. Your best time is sent when you quit the game. Hotkey + A: restart. Hotkey + Start: quit."));
+            }
+
             Publier("speedrun.state", new { sessionId = SessionId, attemptId = AttemptId, state = Etat });
             return;
         }
@@ -405,8 +440,13 @@ public sealed class SessionSpeedrun
         }
 
         _closes.Add((AttemptId, res));
-        if (etat == EtatTentative.Finie && res.FramesOfficielles is { } frames && (MeilleurTemps is not { } pb || frames < pb))
+        var precedent = MeilleurTemps;
+        if (EstClassable(res) && res.FramesOfficielles is { } frames && (precedent is not { } pb || frames < pb))
             MeilleurTemps = frames;
+        if (EstClassable(res) && res.FramesOfficielles is { } temps && (_meilleure?.Resultat.FramesOfficielles is not { } vu || temps < vu)
+            && _horlogeDuDepart is { } departMs && (_horlogeDArrivee ?? _horlogeDeLImage) is { } arriveeMs)
+            _meilleure = new TentativeFinie(AttemptId, Numero, res, departMs, arriveeMs);
+        if (MessageDeFin(res, precedent) is { } message) _messages.Add(message);
         Publier("speedrun.attempt.ended", new
         {
             sessionId = SessionId,
@@ -417,6 +457,38 @@ public sealed class SessionSpeedrun
             official = res.FramesOfficielles is { } f ? Chrono(f, false) : null,
             demo = Demonstration(res),
         });
+    }
+
+    /// <summary>Un temps fini que le temps du jeu ne contredit pas : lui seul compte comme meilleur temps et part au site.</summary>
+    public static bool EstClassable(ResultatTentative r) => r.Etat == EtatTentative.Finie && r.ControleTempsDuJeu != "ecart";
+
+    /// <summary>
+    /// CE QUE LE JOUEUR APPREND A LA FIN D'UNE TENTATIVE (decision du user du 30/10) : le classement ne vient qu'a la
+    /// fermeture du jeu, seul moment ou le bilan du wrapper existe. Une tentative abandonnee ne dit rien : le joueur
+    /// vient de la quitter.
+    /// </summary>
+    private static MessageJoueur? MessageDeFin(ResultatTentative r, long? precedent)
+    {
+        const string Relancer = "Hotkey + A: restart.";
+        if (r.Etat == EtatTentative.Ratee) return new MessageJoueur("speedrun.msg.failed", "Attempt failed. " + Relancer);
+        if (r.Etat == EtatTentative.Annulee)
+        {
+            return r.Cause switch
+            {
+                "pause" or "PAUSE_ON" => new MessageJoueur("speedrun.msg.voided_pause", "Attempt voided: pause. " + Relancer),
+                "fast_forward" => new MessageJoueur("speedrun.msg.voided_fast_forward", "Attempt voided: fast forward. " + Relancer),
+                _ => new MessageJoueur("speedrun.msg.voided", "Attempt voided. " + Relancer),
+            };
+        }
+
+        if (r.Etat != EtatTentative.Finie || r.FramesOfficielles is not { } frames) return null;
+        var temps = ("time", Chronometrage.Afficher(frames, r.Cadence));
+        if (!EstClassable(r))
+            return new MessageJoueur("speedrun.msg.finish_unranked", "Finish {time}: the game timer disagrees, this time will not be ranked.", temps);
+        if (precedent is { } pb && frames >= pb)
+            return new MessageJoueur("speedrun.msg.finish", "Finish {time} (best {best}). Ranking when you quit the game.",
+                temps, ("best", Chronometrage.Afficher(pb, r.Cadence)));
+        return new MessageJoueur("speedrun.msg.finish_best", "Finish {time}: new best time. Ranking when you quit the game.", temps);
     }
 
     private void Publier(string type, object donnees) => _aPublier.Add(new EvenementSession(type, ++Sequence, donnees));

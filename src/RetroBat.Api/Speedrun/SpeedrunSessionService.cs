@@ -9,6 +9,7 @@ using RetroBat.Domain.Events;
 using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Models;
 using RetroBat.Domain.Paths;
+using RetroBat.Domain.Services;
 
 namespace RetroBat.Api.Speedrun;
 
@@ -62,6 +63,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private readonly ICommandesRetroArch _commandes;
     private readonly ILogger<SpeedrunSessionService> _journal;
     private readonly PartieNelfePlayService? _partie;
+    private readonly InterfaceTextService? _textes;
+    private readonly EmulationStationSettingsService? _reglages;
     private readonly string _fichierDesTentatives;
     private readonly object _verrou = new();
     private readonly List<Signal> _image = new();
@@ -71,6 +74,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private IDisposable? _abonnement;
     private System.Threading.Timer? _vidage;
     private SessionSpeedrun? _session;
+    private SessionSpeedrun? _sessionDuLancement;
     private CancellationTokenSource? _releves;
     private (Reglement Reglement, string Rom, DateTime At)? _lancement;
     private long? _frameDeLImage;
@@ -79,12 +83,15 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private int _requetesDeLaManette;
 
     public SpeedrunSessionService(IEventBus bus, ApiContext contexte, ILogger<SpeedrunSessionService> journal,
-        PartieNelfePlayService? partie = null, ICommandesRetroArch? commandes = null, string? fichierDesTentatives = null)
+        PartieNelfePlayService? partie = null, ICommandesRetroArch? commandes = null, string? fichierDesTentatives = null,
+        InterfaceTextService? textes = null, EmulationStationSettingsService? reglages = null)
     {
         _bus = bus;
         _contexte = contexte;
         _journal = journal;
         _partie = partie;
+        _textes = textes;
+        _reglages = reglages;
         _commandes = commandes ?? new CommandesRetroArchUdp();
         _fichierDesTentatives = fichierDesTentatives ?? Path.Combine(RetroBatPaths.PluginRoot, "state", "speedrun", "tentatives.jsonl");
     }
@@ -255,6 +262,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             if (enCours is { Length: > 0 } && !string.Equals(Path.GetFullPath(enCours), Path.GetFullPath(l.Rom), StringComparison.OrdinalIgnoreCase)) return;
 
             _session = new SessionSpeedrun(l.Reglement.ChallengeId, l.Reglement) { MeilleurTemps = MeilleurTempsDuJournal(l.Reglement.ChallengeId) };
+            _sessionDuLancement = _session;
             _sondeDeRetroArch = l.Reglement.AdressesCitees().FirstOrDefault();
             _image.Clear();
             _cadence.Clear();
@@ -503,6 +511,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         }
 
         foreach (var (attemptId, resultat) in _session.PrendreLesCloses()) EcrireTentative(_session, attemptId, resultat);
+        foreach (var message in _session.PrendreLesMessages()) _ = AfficherAsync(message);
         _derniereSession = _session.SessionId;
         if (evenements.Count > 0 || _snapshotPublie != _session.Sequence)
         {
@@ -512,6 +521,39 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     }
 
     private long _snapshotPublie = -1;
+
+    /// <summary>
+    /// Le meilleur temps du lancement, une seule fois, meme apres la fermeture de la session : le bilan du wrapper
+    /// peut arriver avant ou apres la fin du jeu vue par ES.
+    /// </summary>
+    public (Reglement Reglement, TentativeFinie Tentative)? PrendreLeMeilleurTemps()
+    {
+        lock (_verrou)
+        {
+            return _sessionDuLancement is { } s && s.PrendreLaMeilleure() is { } t ? (s.Reglement, t) : null;
+        }
+    }
+
+    /// <summary>Un message au joueur dans RetroArch, dans la langue d'ES. Tant que le SpeedrunHUD n'est pas la, c'est son seul retour a l'ecran.</summary>
+    private async Task AfficherAsync(MessageJoueur message)
+    {
+        try
+        {
+            var texte = TexteDe(message);
+            foreach (var (nom, valeur) in message.Valeurs) texte = texte.Replace("{" + nom + "}", valeur, StringComparison.Ordinal);
+            await _commandes.EnvoyerAsync("SHOW_MSG " + texte.ReplaceLineEndings(" ").Trim(), CancellationToken.None).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _journal.LogDebug(ex, "Speedrun : message {Cle} non affiche.", message.Cle);
+        }
+    }
+
+    private string TexteDe(MessageJoueur message)
+    {
+        var texte = _textes?.Text(message.Cle, _reglages?.GetScrapingSettings().Language);
+        return string.IsNullOrEmpty(texte) || texte == message.Cle ? message.ParDefaut : texte;
+    }
 
     private void EcrireTentative(SessionSpeedrun session, string attemptId, ResultatTentative r)
     {
@@ -573,6 +615,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                     && r.TryGetProperty("challengeId", out var c) && string.Equals(c.GetString(), defiId, StringComparison.OrdinalIgnoreCase)
                     && r.TryGetProperty("state", out var s) && s.GetString() == SessionSpeedrun.Finished
                     && r.TryGetProperty("officialFrames", out var f) && f.ValueKind == JsonValueKind.Number
+                    && !(r.TryGetProperty("gameTimeCheck", out var g) && g.GetString() == "ecart")
                     && (meilleur is not { } m || f.GetInt64() < m))
                     meilleur = f.GetInt64();
             }
