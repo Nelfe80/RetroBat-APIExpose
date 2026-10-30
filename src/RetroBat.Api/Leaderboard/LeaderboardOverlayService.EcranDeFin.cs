@@ -45,7 +45,8 @@ public sealed partial class LeaderboardOverlayService
 
     /// <summary>
     /// Un joueur a la fin. <c>Rang</c> : 1 pour le vainqueur, null sans vainqueur. <c>Lettre</c>, <c>Cote</c>, <c>Ecart</c> :
-    /// vides sans cote. <c>Portrait</c> : l'image du personnage choisi, ou null (le pseudo remonte).
+    /// vides sans cote. <c>Portrait</c> : l'image du personnage choisi, ou null (le pseudo remonte). <c>Coequipiers</c> : avec
+    /// plusieurs personnages par place (Marvel vs. Capcom, KOF '98), l'image des suivants, en vignettes sur le portrait.
     /// </summary>
     public sealed record JoueurDeFin(
         int? Place,
@@ -58,7 +59,8 @@ public sealed partial class LeaderboardOverlayService
         bool Gagnant,
         int? Rang,
         string Distinction,
-        IReadOnlyList<MesureDeFin> Mesures);
+        IReadOnlyList<MesureDeFin> Mesures,
+        IReadOnlyList<string?>? Coequipiers = null);
 
     /// <summary>Une mesure d'un joueur : <c>Valeur</c> null = non mesuree ; <c>Part</c> de 0 a 1, relative au meilleur.</summary>
     public sealed record MesureDeFin(string Icone, string Libelle, long? Valeur, double Part, bool Meilleure);
@@ -712,6 +714,29 @@ public sealed partial class LeaderboardOverlayService
             g.Clip = clip;
             g.InterpolationMode = interpolation;
             g.PixelOffsetMode = decalage;
+            DessinerLesCoequipiers(g, j, style, zone, opacite);
+        }
+
+        /// <summary>
+        /// L'EQUIPE (option B du user, 30/10) : le premier personnage reste en grand, les suivants en vignettes de la meme
+        /// forme, en bas a gauche, dans le portrait : le coin bas-droit garde la coche du lancement, et rien ne descend sur le
+        /// nom ecrit dessous. Un petit portrait (une ligne de liste) n'en porte pas : elles y seraient illisibles.
+        /// </summary>
+        private void DessinerLesCoequipiers(Graphics g, JoueurDeFin j, StyleDEcran style, RectangleF zone, double opacite)
+        {
+            if (j.Coequipiers is not { Count: > 0 } coequipiers || zone.Width < 100)
+            {
+                return;
+            }
+
+            var largeur = zone.Width * 0.36f;
+            var hauteur = largeur * zone.Height / zone.Width;
+            var marge = Math.Max(6f, zone.Width * 0.04f);
+            for (var i = 0; i < coequipiers.Count && i < 3; i++)
+            {
+                var vignette = new RectangleF(zone.X + marge + i * (largeur * 0.82f), zone.Bottom - hauteur - marge, largeur, hauteur);
+                DessinerLePortraitDeFin(g, j with { Portrait = coequipiers[i], Coequipiers = null }, style, vignette, opacite);
+            }
         }
 
         private Image? Portrait(string? chemin)

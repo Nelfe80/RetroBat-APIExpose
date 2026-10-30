@@ -115,6 +115,28 @@ public class MultiplayerEcranDeLancementTests
         Ecrire("lancement-puzzle.png", L.ApercuMultiplayer(style, socle with { Lancement = puzzle }, "", "", "", null!, 2));
         Ecrire("lancement-course.png", L.ApercuMultiplayer(style, socle with { Lancement = course }, "", "", "", null!, 2));
         Ecrire("lancement-coop.png", L.ApercuMultiplayer(style, socle with { Lancement = coop }, "", "", "", null!, 2));
+        // Plusieurs personnages par place (option B du user, 30/10) : le premier en grand, les suivants en vignettes.
+        var mvc = combat with
+        {
+            Cle = "l-8", Jeu = "Marvel vs. Capcom", Fanart = Fanart("arcade", "mvsc"),
+            Joueurs =
+            [
+                combat.Joueurs[0] with { Personnage = "RYU / MEGA MAN", Portrait = Image("arcade/mvsc/character/ryu.png"),
+                    Coequipiers = [Image("arcade/mvsc/character/mega-man.png")] },
+                combat.Joueurs[1] with { Personnage = "WOLVERINE / HULK", Portrait = Image("arcade/mvsc/character/wolverine.png"),
+                    Coequipiers = [Image("arcade/mvsc/character/hulk.png")] },
+            ],
+        };
+        Ecrire("lancement-equipes.png", L.ApercuMultiplayer(style, socle with { Lancement = mvc }, "", "", "", null!, 2));
+        Ecrire("lancement-equipes-trois.png", L.ApercuMultiplayer(style, socle with
+        {
+            Lancement = mvc with
+            {
+                Cle = "l-9",
+                Joueurs = [mvc.Joueurs[0] with { Coequipiers = [Image("arcade/mvsc/character/mega-man.png"), Image("arcade/mvsc/character/chun-li.png")] },
+                    mvc.Joueurs[1] with { Coequipiers = [Image("arcade/mvsc/character/hulk.png"), Image("arcade/mvsc/character/venom.png")] }],
+            },
+        }, "", "", "", null!, 2));
         Ecrire("lancement-sans-portrait.png", L.ApercuMultiplayer(style, socle with
         {
             Lancement = combat with { Cle = "l-5", Joueurs = [.. combat.Joueurs.Select(j => j with { Portrait = null, Personnage = "" })] },

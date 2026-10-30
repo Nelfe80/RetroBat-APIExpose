@@ -369,7 +369,8 @@ public sealed partial class MultiplayerPanelService
                 TexteDe(etat),
                 j.RttMs,
                 Barres(j.RttMs),
-                depuis);
+                depuis,
+                CoequipiersDe(j));
         }).ToList();
 
         var attendus = joueurs.Where(j => j.Etat != Etat.Pret).Select(j => j.Pseudo.ToUpperInvariant()).ToList();

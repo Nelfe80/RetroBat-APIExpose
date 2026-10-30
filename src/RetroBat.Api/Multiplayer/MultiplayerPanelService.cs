@@ -1831,7 +1831,8 @@ public sealed partial class MultiplayerPanelService
                 vainqueur == place,
                 rangs?.FirstOrDefault(r => r.Seat == place)?.Rank ?? (vainqueur is null ? null : ++rang),
                 calcul?.Distinctions.GetValueOrDefault(place) ?? string.Empty,
-                calcul?.Mesures.GetValueOrDefault(place) ?? []);
+                calcul?.Mesures.GetValueOrDefault(place) ?? [],
+                CoequipiersDe(j));
         }).ToList();
 
         return new LeaderboardOverlayService.EcranDeFin(
@@ -1999,6 +2000,10 @@ public sealed partial class MultiplayerPanelService
 
         return EquipeDe(joueur, jeu, premier).Select(valeur => PortraitDu(premier.ValeursDe(joueur.Seat).FirstOrDefault(x => x.Value == valeur))).ToList();
     }
+
+    /// <summary>Les suivants de l'equipe de ce joueur (ecrans de lancement et de fin), ou null : un seul personnage.</summary>
+    private IReadOnlyList<string?>? CoequipiersDe(MultiplayerJoueur joueur)
+        => PortraitsDuJoueur(joueur) is { Count: > 1 } equipe ? equipe.Skip(1).ToList() : null;
 
     /// <summary>L'equipe de ce joueur : la sienne tout de suite (▲▼), celle de la gameroom pour les autres.</summary>
     private IReadOnlyList<int> EquipeDe(MultiplayerJoueur joueur, MultiplayerGame jeu, MultiplayerChoice premier)

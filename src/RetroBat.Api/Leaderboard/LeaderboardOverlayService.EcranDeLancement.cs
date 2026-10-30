@@ -59,7 +59,8 @@ public sealed partial class LeaderboardOverlayService
 
     /// <summary>
     /// Un joueur au lancement. <c>Portrait</c> : l'image du personnage choisi, ou null (le pseudo remonte). <c>Lettre</c>,
-    /// <c>Cote</c> : vides sans cote. <c>Barres</c> : de 1 a 4, null sans mesure.
+    /// <c>Cote</c> : vides sans cote. <c>Barres</c> : de 1 a 4, null sans mesure. <c>Coequipiers</c> : les suivants d'une
+    /// equipe, en vignettes sur le portrait.
     /// </summary>
     public sealed record JoueurDeLancement(
         int? Place,
@@ -77,7 +78,8 @@ public sealed partial class LeaderboardOverlayService
         string TexteDeLEtat,
         int? PingMs,
         int? Barres,
-        DateTime ChangeUtc);
+        DateTime ChangeUtc,
+        IReadOnlyList<string?>? Coequipiers = null);
 
     /// <summary>Un mot de plus de huit lettres en deux lignes, coupe a l'espace le plus proche du milieu (ON FAIT / EQUIPE !).</summary>
     internal static string[] MotEnDeuxLignes(string mot)
@@ -518,7 +520,7 @@ public sealed partial class LeaderboardOverlayService
         }
 
         private static JoueurDeFin CommeALaFin(JoueurDeLancement j)
-            => new(j.Place, j.Pseudo, j.Personnage, j.Portrait, j.Lettre, j.Cote, string.Empty, false, null, string.Empty, []);
+            => new(j.Place, j.Pseudo, j.Personnage, j.Portrait, j.Lettre, j.Cote, string.Empty, false, null, string.Empty, [], j.Coequipiers);
 
         private static bool Tourne(EtatAuLancement etat) => etat is EtatAuLancement.Chargement or EtatAuLancement.Synchronisation or EtatAuLancement.EnRoute;
 

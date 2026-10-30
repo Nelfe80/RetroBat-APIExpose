@@ -313,6 +313,19 @@ public class MultiplayerEcranDeFinTests
         }
 
         File.WriteAllBytes(Path.Combine(Sortie, "fin-quatre.png"), L.ApercuMultiplayer(style, socle with { Fin = quatre }, "", "", "", null!, 6));
+        // Plusieurs personnages par place (option B du user, 30/10) : les suivants en vignettes sur le portrait.
+        var equipes = duel with
+        {
+            Cle = "salle-4", Jeu = "Marvel vs. Capcom", Fanart = Fanart("arcade", "mvsc"),
+            Joueurs =
+            [
+                duel.Joueurs[0] with { Personnage = "RYU / MEGA MAN", Portrait = Image("arcade/mvsc/character/ryu.png"),
+                    Coequipiers = [Image("arcade/mvsc/character/mega-man.png")] },
+                duel.Joueurs[1] with { Personnage = "WOLVERINE / HULK", Portrait = Image("arcade/mvsc/character/wolverine.png"),
+                    Coequipiers = [Image("arcade/mvsc/character/hulk.png")] },
+            ],
+        };
+        File.WriteAllBytes(Path.Combine(Sortie, "fin-equipes.png"), L.ApercuMultiplayer(style, socle with { Fin = equipes }, "", "", "", null!, 6));
         File.WriteAllBytes(Path.Combine(Sortie, "fin-trois.png"), L.ApercuMultiplayer(style, socle with { Fin = trois }, "", "", "", null!, 6));
         File.WriteAllBytes(Path.Combine(Sortie, "fin-sans-fanart.png"), L.ApercuMultiplayer(style, socle with { Fin = duel with { Fanart = null, Cle = "x" } }, "", "", "", null!, 6));
         // Un pseudo long ne mord pas sur les cartes (vu a la borne le 26/10).
