@@ -357,7 +357,7 @@ internal static class Program
         if (tournait)
         {
             var version = LancerApi(racine)
-                ? await AttendreApiAsync(http, port, TimeSpan.FromSeconds(60)).ConfigureAwait(false)
+                ? await AttendreLaRelanceAsync(http, port, racine).ConfigureAwait(false)
                 : null;
             if (version is null)
             {
@@ -365,7 +365,7 @@ internal static class Program
                 ArreterApi(racine);
                 var remis = Restaurer(sauvegarde, racine);
                 var retour = LancerApi(racine)
-                    ? await AttendreApiAsync(http, port, TimeSpan.FromSeconds(60)).ConfigureAwait(false)
+                    ? await AttendreLaRelanceAsync(http, port, racine).ConfigureAwait(false)
                     : null;
                 Dire(retour is null ? "L'API ne repond toujours pas : intervention necessaire." : $"Version {retour} remise en service.");
                 return remis && retour is not null ? 3 : 4;
@@ -523,6 +523,74 @@ internal static class Program
             Dire("Lancement de l'API : " + ex.Message);
             return false;
         }
+    }
+
+    /// <summary>Le plus long qu'on attende une API relancee dont le processus vit encore.</summary>
+    internal static readonly TimeSpan PatienceDeLaRelance = TimeSpan.FromMinutes(4);
+
+    /// <summary>
+    /// LA RELANCE APRES UNE MISE A JOUR (31/10/2026). L'API ne repond qu'une fois ses services demarres : 45 s sur la borne
+    /// du user, davantage au premier lancement de fichiers neufs (disque froid, antivirus). Au bout de 60 s, on remettait la
+    /// sauvegarde a une API qui demarrait encore (getupor, 1.9.106 vers 1.9.131). On attend donc tant que son processus vit,
+    /// jusqu'a <see cref="PatienceDeLaRelance"/> ; un processus disparu ne repondra plus, on n'attend pas pour rien.
+    /// </summary>
+    private static async Task<string?> AttendreLaRelanceAsync(HttpClient http, int port, string racine)
+    {
+        var debut = DateTime.UtcNow;
+        var dit = debut;
+        var absences = 0;
+        while (DateTime.UtcNow - debut < PatienceDeLaRelance)
+        {
+            if (await AttendreApiAsync(http, port, TimeSpan.FromSeconds(5)).ConfigureAwait(false) is { } version)
+            {
+                return version;
+            }
+
+            absences = ApiEnCours(racine) ? 0 : absences + 1;
+            if (DecisionDAttente(absences, DateTime.UtcNow - debut) is { } fin)
+            {
+                Dire(fin);
+                return null;
+            }
+
+            if (DateTime.UtcNow - dit >= TimeSpan.FromSeconds(30))
+            {
+                Dire($"L'API demarre encore ({(int)(DateTime.UtcNow - debut).TotalSeconds} s)...");
+                dit = DateTime.UtcNow;
+            }
+        }
+
+        Dire($"L'API ne repond toujours pas apres {(int)PatienceDeLaRelance.TotalMinutes} minutes.");
+        return null;
+    }
+
+    /// <summary>
+    /// Faut-il cesser d'attendre ? Oui quand le processus de l'API a disparu trois releves de suite (environ 15 s) : elle
+    /// s'est arretee. Null tant qu'elle vit : elle demarre.
+    /// </summary>
+    internal static string? DecisionDAttente(int absencesDeSuite, TimeSpan ecoule)
+        => absencesDeSuite >= 3 ? $"L'API s'est arretee apres {(int)ecoule.TotalSeconds} s sans repondre." : null;
+
+    /// <summary>Le processus de l'API de CETTE installation tourne-t-il ?</summary>
+    private static bool ApiEnCours(string racine)
+    {
+        var exe = Path.GetFullPath(Path.Combine(racine, ExeApi));
+        foreach (var p in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(ExeApi)))
+        {
+            try
+            {
+                var chemin = p.MainModule?.FileName;
+                if (chemin is null || string.Equals(Path.GetFullPath(chemin), exe, StringComparison.OrdinalIgnoreCase)) return true;
+            }
+            catch
+            {
+                // Un processus qu'on ne peut pas lire (droits) : on le compte comme le notre plutot que de renoncer trop tot.
+                return true;
+            }
+            finally { p.Dispose(); }
+        }
+
+        return false;
     }
 
     private static async Task<string?> AttendreApiAsync(HttpClient http, int port, TimeSpan patience)
