@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using RetroBat.Api.Infrastructure;
@@ -71,6 +72,7 @@ public sealed class MultiplayerLaunchService : IHostedService
     private readonly MultiplayerAttenteDesInvites _attente;
     private CancellationTokenSource? _gardeDeVitesse;
     private CancellationTokenSource? _annonceDuDepart;
+    private long? _corrections;
     private CancellationTokenSource? _boucleDuDepart;
     private CancellationTokenSource? _suiviDesInvites;
 
@@ -221,6 +223,7 @@ public sealed class MultiplayerLaunchService : IHostedService
 
     private async Task HebergerAsync(MultiplayerRoom room)
     {
+        int? dureeJouee = null;
         try
         {
             var jeu = _session.JeuDeLaRoom(room);
@@ -264,6 +267,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             _ = Task.Run(() => PublierLaSessionAsync(room, jeu, jeton, motJoueur, motSpectateur));
             RelayerLaManette(jeu.Game, room.Launch!.Seat, PlacesDe(room));
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
+            dureeJouee = duree;
             RetirerLEtatPose();
             MultiplayerIssue? issue;
             MultiplayerStatsSuivi? suivi;
@@ -310,6 +314,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         {
             FinDuLancement(room.Room);
             await AttendreLaSortieAsync().ConfigureAwait(false);
+            NoterLaPartie(room, dureeJouee);
             // Le decor des panneaux en jeu s'efface une fois la partie finie : il n'apparait pas parmi les decors d'ES.
             MultiplayerDecor.Effacer();
             lock (_verrou)
@@ -331,7 +336,7 @@ public sealed class MultiplayerLaunchService : IHostedService
                 // se ferme, la gameroom est quittee, et les autres retrouvent l'attente.
                 _journal.LogWarning("MULTIPLAYER : aucune session au lobby pour {Room} : la partie se ferme", room.Room);
                 await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
-                await RetroArchInvite.FermerAsync().ConfigureAwait(false);
+                await RetroArchInvite.FermerPourDeBonAsync().ConfigureAwait(false);
                 return;
             }
 
@@ -348,7 +353,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             if (depart is not null && !await PreparerLeDepartAsync(room, jeu, depart).ConfigureAwait(false))
             {
                 await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
-                await RetroArchInvite.FermerAsync().ConfigureAwait(false);
+                await RetroArchInvite.FermerPourDeBonAsync().ConfigureAwait(false);
                 return;
             }
 
@@ -395,7 +400,7 @@ public sealed class MultiplayerLaunchService : IHostedService
                 // lobby, la partie se ferme.
                 _journal.LogWarning("MULTIPLAYER : la plateforme refuse la session de {Room} : la partie se ferme", room.Room);
                 await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
-                await RetroArchInvite.FermerAsync().ConfigureAwait(false);
+                await RetroArchInvite.FermerPourDeBonAsync().ConfigureAwait(false);
                 return;
             }
             // Les liens des invites au relais : leur arrivee et leur depart vus par le reseau, quelle que soit la langue du
@@ -495,7 +500,7 @@ public sealed class MultiplayerLaunchService : IHostedService
                 .ConfigureAwait(false);
             _journal.LogInformation("MULTIPLAYER : les invites de {Room} sont partis, la partie se ferme", room.Room);
             await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
-            await RetroArchInvite.FermerAsync().ConfigureAwait(false);
+            await RetroArchInvite.FermerPourDeBonAsync().ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -609,7 +614,7 @@ public sealed class MultiplayerLaunchService : IHostedService
 
         // Le noir monte sur le jeu, puis RetroArch se ferme : l'ecran de fin sortira du noir (retour du user du 23/10).
         await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
-        await RetroArchInvite.FermerAsync().ConfigureAwait(false);
+        await RetroArchInvite.FermerPourDeBonAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -839,6 +844,7 @@ public sealed class MultiplayerLaunchService : IHostedService
 
     private async Task RejoindreAsync(MultiplayerRoom room)
     {
+        int? dureeJouee = null;
         try
         {
             var jeu = _session.JeuDeLaRoom(room);
@@ -884,10 +890,11 @@ public sealed class MultiplayerLaunchService : IHostedService
                     hoteParti = true;
                     _journal.LogInformation("MULTIPLAYER : l'hote de {Room} est parti, la partie se ferme", room.Room);
                     await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
-                    await RetroArchInvite.FermerAsync().ConfigureAwait(false);
+                    await RetroArchInvite.FermerPourDeBonAsync().ConfigureAwait(false);
                 }, _journal));
             RelayerLaManette(jeu.Game, room.Launch.Seat, PlacesDe(room));
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
+            dureeJouee = duree;
             guetInvite.Cancel();
             lock (_verrou)
             {
@@ -927,6 +934,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         {
             FinDuLancement(room.Room);
             await AttendreLaSortieAsync().ConfigureAwait(false);
+            NoterLaPartie(room, dureeJouee);
             // Le decor des panneaux en jeu s'efface une fois la partie finie : il n'apparait pas parmi les decors d'ES.
             MultiplayerDecor.Effacer();
             lock (_verrou)
@@ -1113,6 +1121,12 @@ public sealed class MultiplayerLaunchService : IHostedService
         if (vue is not null)
         {
             reglagesDeLaPlace["video_aspect_ratio"] = MultiplayerLaunchPlan.FormatPourRetroArch(jeu.Game, vue);
+        }
+
+        if (lancement.Role == "host")
+        {
+            reglagesDeLaPlace["netplay_max_connections"] = MultiplayerLaunchPlan.ConnexionsDeLHote(joueurs, MultiplayerSpectateur.Prevu)
+                .ToString(CultureInfo.InvariantCulture);
         }
 
         // LE DEPART ATTEND TOUT LE MONDE (27/10) : l'hote d'un depart pret passe au ralenti x30 en attendant ses invites ; son
@@ -1315,6 +1329,7 @@ public sealed class MultiplayerLaunchService : IHostedService
     private async Task<string?> JugerLeBilanAsync(MultiplayerRoom room, MultiplayerGame jeu, DateTime debut, int chargementsPermis)
     {
         var bilan = await _bilans.AttendreAsync(debut, TimeSpan.FromSeconds(4)).ConfigureAwait(false);
+        _corrections = bilan is { } lu && lu.TryGetProperty("netplay_rollbacks", out var corrections) && corrections.TryGetInt64(out var nombre) ? nombre : null;
         if (bilan is not { } b)
         {
             _journal.LogInformation("MULTIPLAYER : pas de bilan du wrapper pour {Room} ({Jeu})", room.Room, jeu.Id);
@@ -1325,6 +1340,41 @@ public sealed class MultiplayerLaunchService : IHostedService
         _journal.LogInformation("MULTIPLAYER : bilan du wrapper pour {Jeu} : {Bilan}{Verdict}", jeu.Id, MultiplayerBilanDuWrapper.Resume(b),
             annulee ? " ; rencontre annulee (" + motif + ")" : string.Empty);
         return annulee && jeu.EstClasse ? motif : null;
+    }
+
+    /// <summary>
+    /// Le releve de la partie, une fois RetroArch sorti et avant qu'un autre lancement n'ecrase son journal : dans le journal de
+    /// l'API pour les rapports de support, et au site. Rien ici ne retient la suite, ni ne la fait tomber.
+    /// </summary>
+    private void NoterLaPartie(MultiplayerRoom room, int? duree)
+    {
+        if (duree is not { } secondes)
+        {
+            return;
+        }
+
+        var corrections = _corrections;
+        _corrections = null;
+        try
+        {
+            var journal = MultiplayerAttenteDesInvites.CheminDuJournal;
+            var lignes = MultiplayerQualite.Lire(journal);
+            var ping = MultiplayerQualite.PingDe(lignes);
+            foreach (var ligne in MultiplayerQualite.LignesDuNetplay(lignes))
+            {
+                _journal.LogInformation("MULTIPLAYER : RetroArch dit : {Ligne}", ligne);
+            }
+
+            _journal.LogInformation("MULTIPLAYER : releve de {Room} : ping {Ping} ms, {Corrections} corrections en {Duree} s", room.Room,
+                ping?.ToString(CultureInfo.InvariantCulture) ?? "?", corrections?.ToString(CultureInfo.InvariantCulture) ?? "?", secondes);
+            MultiplayerQualite.Garder(journal, Path.Combine(RetroBatPaths.PluginRoot, ".log", "multiplayer"),
+                DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture) + "-" + room.Room[..Math.Min(8, room.Room.Length)] + ".log");
+            _ = _client.QualiteAsync(room.Room, ping, corrections, secondes, CancellationToken.None);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _journal.LogDebug(ex, "MULTIPLAYER : releve de {Room} incomplet", room.Room);
+        }
     }
 
     /// <summary>

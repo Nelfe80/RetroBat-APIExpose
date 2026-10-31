@@ -76,9 +76,8 @@ internal static class RetroArchInvite
                 var connexion = DateTime.UtcNow;
                 for (var i = 0; i < Essais.Length; i++)
                 {
-                    var attente = connexion + Essais[i] - DateTime.UtcNow;
-                    if (attente > TimeSpan.Zero) await Task.Delay(attente, ct).ConfigureAwait(false);
-                    if (!ConnecteAuRelais(adresses, port)) break;
+                    // 31/10 : une coupure pendant ces 15 s ne se voyait qu'a l'essai suivant, l'invite restait fige.
+                    if (!await ResteConnecteAsync(adresses, port, connexion + Essais[i], ct).ConfigureAwait(false)) break;
                     if (Taper(motDePasse))
                     {
                         logger.LogInformation("Netplay : mot de passe tape dans RetroArch (essai {Essai}/{Total}).", i + 1, Essais.Length);
@@ -112,6 +111,39 @@ internal static class RetroArchInvite
     }
 
     /// <summary>Ferme RetroArch proprement (commande QUIT, comme LiveContest) : il sauvegarde en sortant.</summary>
+    /// <summary>Connecte au relais jusqu'a cette heure ? Relu chaque seconde : faux des que la connexion tombe.</summary>
+    private static async Task<bool> ResteConnecteAsync(IReadOnlyCollection<IPAddress> adresses, int port, DateTime jusqua, CancellationToken ct)
+    {
+        while (true)
+        {
+            if (!ConnecteAuRelais(adresses, port)) return false;
+            var reste = jusqua - DateTime.UtcNow;
+            if (reste <= TimeSpan.Zero) return true;
+            await Task.Delay(reste < TimeSpan.FromSeconds(1) ? reste : TimeSpan.FromSeconds(1), ct).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// FERMER POUR DE BON (31/10/2026) : la commande part en UDP, sans reponse, et un seul QUIT a laisse un hote 9 s devant un
+    /// ecran noir, jusqu'a son propre START. Elle repart tant que RetroArch tourne, 12 s au plus.
+    /// </summary>
+    public static Task FermerPourDeBonAsync()
+        => InsisterAsync(FermerAsync, () => RetroBat.Api.Infrastructure.EmulatorForeground.EmulateurDeJeuTourne(), TimeSpan.FromMilliseconds(500), 24);
+
+    /// <summary>Envoie au moins une fois, puis tant que <paramref name="tourne"/> dit vrai. Rend le nombre d'envois.</summary>
+    internal static async Task<int> InsisterAsync(Func<Task> envoyer, Func<bool> tourne, TimeSpan pause, int max)
+    {
+        for (var envois = 1; ; envois++)
+        {
+            await envoyer().ConfigureAwait(false);
+            await Task.Delay(pause).ConfigureAwait(false);
+            if (envois >= max || !tourne())
+            {
+                return envois;
+            }
+        }
+    }
+
     public static async Task FermerAsync()
     {
         using var udp = new UdpClient();

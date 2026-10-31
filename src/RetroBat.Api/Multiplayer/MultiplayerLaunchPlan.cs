@@ -285,6 +285,14 @@ public static class MultiplayerLaunchPlan
         return noms.Count == 0 ? "aucune (le lanceur range les manettes lui-meme)" : string.Join(", ", noms);
     }
 
+    /// <summary>
+    /// LA PORTE DE L'HOTE (31/10/2026) : RetroArch crashe des qu'un pair sans compression a negocie puis qu'un etat est envoye
+    /// (pipe_trans, corrige en amont, pas dans la 1.22.2). Ses salles sont sur le lobby public et l'en-tete passe avant le mot de
+    /// passe : les places au-dela des invites attendus restaient ouvertes a n'importe qui. RetroArch refuse le pair en trop
+    /// avant toute negociation, par le relais aussi. Le spectateur cache est un client comme un autre.
+    /// </summary>
+    public static int ConnexionsDeLHote(int joueurs, bool spectateurCache) => Math.Max(1, joueurs - 1) + (spectateurCache ? 1 : 0);
+
     /// <summary>L'hote : ses reglages netplay passent tous en arguments, mots de passe compris.</summary>
     public static IReadOnlyList<string> ArgumentsHote(string pseudo, string motDePasseJoueur, string motDePasseSpectateur, string relais)
     {

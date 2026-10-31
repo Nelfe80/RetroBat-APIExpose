@@ -86,6 +86,10 @@ public sealed class MultiplayerClient
     public Task<MultiplayerReponse?> CommenceeAsync(string room, CancellationToken ct)
         => EnvoyerAsync("started", new { room }, ct);
 
+    /// <summary>Le releve de la partie vu de cette borne (31/10) : le vrai ping et les corrections du netplay. Un site plus ancien ne le connait pas.</summary>
+    public Task<MultiplayerReponse?> QualiteAsync(string room, int? pingMs, long? corrections, int dureeSecondes, CancellationToken ct)
+        => EnvoyerAsync("quality", new { room, ping_ms = pingMs, corrections, duration_s = dureeSecondes }, ct);
+
     /// <summary>L'hote annonce la fin de la partie.</summary>
     public Task<MultiplayerReponse?> TerminerAsync(string room, string raison, int? dureeSecondes, CancellationToken ct, int? placeGagnante = null,
         IReadOnlyDictionary<int, StatsDeLaPlace>? stats = null, object? mesures = null, IReadOnlyList<MultiplayerRang>? rangs = null)

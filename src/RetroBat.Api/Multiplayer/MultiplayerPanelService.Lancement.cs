@@ -269,15 +269,9 @@ public sealed partial class MultiplayerPanelService
     /// <summary>Le jeu n'est peut-etre pas encore la : RetroArch n'entendrait pas une commande envoyee une seule fois.</summary>
     private async Task FermerLeJeuDuLancementAsync(string room)
     {
-        for (var essai = 0; essai < 40; essai++)
-        {
-            await RetroBat.Api.Netplay.RetroArchInvite.FermerAsync().ConfigureAwait(false);
-            await Task.Delay(TimeSpan.FromMilliseconds(500)).ConfigureAwait(false);
-            if (_session.LancementEnCours != room && !RetroBat.Api.Infrastructure.EmulatorForeground.EmulateurDeJeuTourne())
-            {
-                return;
-            }
-        }
+        await RetroBat.Api.Netplay.RetroArchInvite.InsisterAsync(RetroBat.Api.Netplay.RetroArchInvite.FermerAsync,
+            () => _session.LancementEnCours == room || RetroBat.Api.Infrastructure.EmulatorForeground.EmulateurDeJeuTourne(),
+            TimeSpan.FromMilliseconds(500), 40).ConfigureAwait(false);
     }
 
     private void MontrerLeLancement()
