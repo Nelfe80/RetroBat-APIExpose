@@ -790,6 +790,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     var charge = ToJson(envelope.Payload);
                     CaptureTrameMemoire(charge);
                     CaptureVie(charge);
+                    CaptureTricheDuJeu(charge);
                     CaptureModeEtDifficulte(charge);
                     CaptureCredits(charge);
                     CaptureFinDuJeu(charge);
@@ -874,6 +875,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _placeInvite = null;
             _seanceInvite = null;
             _multiplayer = null;
+            _tricheDuJeu = false;
             _creditsMuets = null;
             _hotePartiFrame = null;
             _continuesConsole.Clear();
@@ -2290,6 +2292,55 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
         if (cur.Count > 0) sortie.Add(cur);
         return sortie;
+    }
+
+    /// <summary>L'action du .MEM de toute triche integree au jeu (mode debug, code).</summary>
+    internal const string TricheDuJeu = "LEVEL_CHEAT_ACTIVATED";
+
+    /// <summary>La partie a vu une triche integree au jeu : le passeport porte cheats = true.</summary>
+    private bool _tricheDuJeu;
+
+    /// <summary>
+    /// LA TRICHE INTEGREE AU JEU (CDC Demandes v1.2, D3, 31/10/2026). Le mode debug de Sonic 1 (0xFFFB, active au titre par
+    /// un code) donne l'invincibilite et la pose d'objets sans triche de l'emulateur : le wrapper ne le voit pas, et le
+    /// passeport disait cheats = false. Une ligne LEVEL_CHEAT_ACTIVATED du .MEM, emise avec une valeur non nulle pendant la
+    /// partie, la marque ; le refus existant du site (rules.cheats = forbidden) s'applique sans regle nouvelle. La ligne se
+    /// pose jeu par jeu, apres mesure, jamais par conversion : l'invincibilite est souvent un bonus normal.
+    /// </summary>
+    private void CaptureTricheDuJeu(JsonElement root)
+    {
+        if (ValeurDeTricheDuJeu(root) is not { } valeur)
+        {
+            return;
+        }
+
+        bool premiere;
+        lock (_sync)
+        {
+            premiere = !_tricheDuJeu;
+            _tricheDuJeu = true;
+        }
+
+        if (premiere)
+        {
+            Trace($"triche integree au jeu ({TricheDuJeu} = {valeur}) : la partie porte cheats = true");
+        }
+    }
+
+    /// <summary>La valeur d'un signal LEVEL_CHEAT_ACTIVATED non nul, ou null pour tout autre signal (ou une valeur nulle).</summary>
+    internal static long? ValeurDeTricheDuJeu(JsonElement root)
+    {
+        if (!root.TryGetProperty("signal", out var signal) && !root.TryGetProperty("Signal", out signal))
+        {
+            return null;
+        }
+
+        if (!string.Equals((GetString(signal, "Name") ?? "").Trim(), TricheDuJeu, StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        return Entier(signal, "Value") is { } valeur && valeur != 0 ? valeur : null;
     }
 
     /// <summary>
@@ -3802,7 +3853,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         string? sessionId = null, DateTime? finUtc = null,
         (NelfePlayScoringSessionService.SessionPlayer? Joueur, bool Fige)? joueurFige = null,
         bool? labo = null, string? versionApi = null, string? etatWrapper = null, long? arretDuReplay = null,
-        JsonObject? clear = null, JsonObject? depart = null)
+        JsonObject? clear = null, JsonObject? depart = null, bool tricheDuJeu = false)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
@@ -4010,7 +4061,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             },
             ["sensitive"] = new JsonObject
             {
-                ["cheats"] = cheats > 0, ["save_state_loaded"] = saveStateLoads > 0, ["resets"] = resets,
+                // La triche integree au jeu (LEVEL_CHEAT_ACTIVATED, D3) compte comme celle de l'emulateur.
+                ["cheats"] = cheats > 0 || tricheDuJeu, ["save_state_loaded"] = saveStateLoads > 0, ["resets"] = resets,
                 ["rewind"] = rewind > 0, ["runahead"] = runahead > 0, ["fast_forward"] = fastForward > 0,
                 ["netplay"] = netplay > 0, ["continues"] = continues,
                 ["impossible_inputs"] = impossibleInputs,
@@ -4940,11 +4992,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     {
         DateTime fin;
         JsonNode? ticketDuLancement;
+        bool tricheDuJeu;
         lock (_sync)
         {
             fin = _finDeLaSession;
             ticketDuLancement = _ticketDuLancement;
             _ticketDuLancement = null;
+            tricheDuJeu = _tricheDuJeu;
         }
         var joueur = _scoringSession?.Get();
         var difficulte = new JsonObject();
@@ -4989,6 +5043,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             ["apiexpose"] = CabinetState.Version,
             ["etat_wrapper"] = CabinetState.Wrapper,
             ["ticket_du_lancement"] = TicketValablePour(ticketDuLancement, fin) ? ticketDuLancement : null,
+            ["triche_du_jeu"] = tricheDuJeu,
         };
     }
 
@@ -5242,7 +5297,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 sessionId: id, finUtc: fin, joueurFige: (joueur, true), labo: (bool?)brouillon["labo"] == true,
                 versionApi: (string?)brouillon["apiexpose"], etatWrapper: (string?)brouillon["etat_wrapper"],
                 arretDuReplay: (long?)brouillon["arret_du_replay"], clear: brouillon["clear"] as JsonObject,
-                depart: brouillon["depart"] as JsonObject);
+                depart: brouillon["depart"] as JsonObject, tricheDuJeu: (bool?)brouillon["triche_du_jeu"] == true);
             if (defi is not null) RetroBat.Api.Speedrun.PasseportDeDefi.Appliquer(passport, defi, entreeDuDefi!);
             var corps = passport.DeepClone()!.AsObject();
             corps.Remove("signature");
