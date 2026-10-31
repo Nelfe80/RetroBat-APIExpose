@@ -1,10 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using System.Text.Json;
 using RetroBat.Domain.Events;
 using RetroBat.Domain.Interfaces;
-using RetroBat.Domain.Paths;
 
 namespace RetroBat.Api.Multiplayer;
 
@@ -23,26 +21,32 @@ public interface ISessionsDuMelangeur
 /// LE SON D'ES PENDANT UNE PARTIE MULTIPLAYER (retour du user du 26/10) : l'API lance le jeu elle-meme, ES ne sait donc pas
 /// qu'une partie tourne et garde sa musique et son mode attract, que l'on entend sous le jeu. Quand ES lance un jeu, il coupe
 /// son audio lui-meme (FileData.cpp) ; ici, la session audio d'emulationstation.exe est coupee dans le melangeur de Windows
-/// pendant la partie, comme le ferait le joueur, puis rendue au premier appui apres la partie : cet appui sort aussi ES de son
-/// ecran de veille, dont la video retrouverait sinon le son sous l'ecran de fin. Aucune option d'ES n'est touchee, et une
-/// session que le joueur avait deja coupee le reste.
+/// pendant la partie, puis rendue au premier appui apres la partie (cet appui sort aussi ES de son ecran de veille, dont la
+/// video retrouverait sinon le son sous l'ecran de fin), ou au plus tard quelques secondes apres.
 ///
-/// Une marque sur le disque dit qu'ES a ete coupe : si l'API tombe en pleine partie, elle lui rend le son a son redemarrage,
-/// des que la session d'ES existe (ES peut demarrer apres l'API).
+/// LA MUSIQUE REVIENT TOUJOURS (decision du user du 31/10 : un joueur restait sans musique d'une partie a l'autre, et Windows
+/// garde le bouton muet d'une application d'un lancement a l'autre). Hors d'une partie MULTIPLAYER, ES n'est jamais laisse
+/// muet : a son demarrage, au retour d'un jeu et a chaque activite dans ES, toute session muette retrouve le son, y compris
+/// une session coupee a la main dans le melangeur. Couper la musique, c'est le reglage d'ES.
 /// </summary>
 [SupportedOSPlatform("windows")]
 public sealed class SonDEmulationStation : IDisposable
 {
     public const string Processus = "emulationstation";
 
-    private static readonly TimeSpan Periode = TimeSpan.FromSeconds(2);
-
-    /// <summary>Au redemarrage, combien de temps attendre qu'ES ouvre sa session pour lui rendre le son.</summary>
+    /// <summary>Au demarrage, combien de temps attendre qu'ES ouvre sa session pour lui rendre le son.</summary>
     private static readonly TimeSpan PatienceAuDemarrage = TimeSpan.FromMinutes(3);
 
+    /// <summary>Au retour d'un jeu lance par ES, combien de temps attendre qu'il rouvre sa session.</summary>
+    private static readonly TimeSpan PatienceAuRetour = TimeSpan.FromSeconds(30);
+
+    /// <summary>Le melangeur n'est pas relu plus souvent que ca, quelle que soit l'activite dans ES.</summary>
+    private static readonly TimeSpan EntreDeuxControles = TimeSpan.FromSeconds(2);
+
     private readonly ISessionsDuMelangeur _melangeur;
-    private readonly string _marque;
     private readonly TimeSpan _apresLAppui;
+    private readonly TimeSpan _periode;
+    private readonly TimeSpan _auPlusTard;
     private readonly ILogger<SonDEmulationStation>? _journal;
     private readonly IDisposable? _abonnement;
     private readonly System.Threading.Timer _minuterie;
@@ -50,51 +54,42 @@ public sealed class SonDEmulationStation : IDisposable
     private readonly HashSet<string> _coupees = new(StringComparer.Ordinal);
     private Etat _etat = Etat.Libre;
     private DateTime _rendreAvant;
+    private DateTime _dernierControle;
 
     private enum Etat
     {
         Libre,
         Coupe,
         AuProchainAppui,
-        ARendreAuDemarrage,
+        ARendre,
     }
 
     public SonDEmulationStation(IEventBus? bus = null, ILogger<SonDEmulationStation>? journal = null)
-        : this(new MelangeurDeWindows(), DefaultMarque, TimeSpan.FromMilliseconds(600), bus, journal)
+        : this(new MelangeurDeWindows(), TimeSpan.FromMilliseconds(600), bus, journal)
     {
     }
 
-    internal SonDEmulationStation(ISessionsDuMelangeur melangeur, string marque, TimeSpan apresLAppui, IEventBus? bus = null,
-        ILogger<SonDEmulationStation>? journal = null)
+    internal SonDEmulationStation(ISessionsDuMelangeur melangeur, TimeSpan apresLAppui, IEventBus? bus = null,
+        ILogger<SonDEmulationStation>? journal = null, TimeSpan? periode = null, TimeSpan? auPlusTard = null)
     {
         _melangeur = melangeur;
-        _marque = marque;
         _apresLAppui = apresLAppui;
+        _periode = periode ?? TimeSpan.FromSeconds(2);
+        _auPlusTard = auPlusTard ?? TimeSpan.FromSeconds(20);
         _journal = journal;
         _minuterie = new System.Threading.Timer(_ => Tenir(), null, Timeout.Infinite, Timeout.Infinite);
-        // Tout appui sur la borne : apres une partie, il rend le son.
-        _abonnement = bus?.Subscribe<EventEnvelope>(e =>
-        {
-            if (string.Equals(e.Type, "panel.input.pressed", StringComparison.Ordinal))
-            {
-                AppuiRecu();
-            }
-        });
+        _abonnement = bus?.Subscribe<EventEnvelope>(e => SurEvenement(e.Type));
 
-        if (File.Exists(_marque))
+        // Au demarrage, quelle que soit l'histoire : Windows a pu garder ES muet depuis son dernier lancement.
+        lock (_verrou)
         {
-            lock (_verrou)
-            {
-                _etat = Etat.ARendreAuDemarrage;
-                _rendreAvant = DateTime.UtcNow + PatienceAuDemarrage;
-            }
-
-            Tenir();
-            Armer();
+            _etat = Etat.ARendre;
+            _rendreAvant = DateTime.UtcNow + PatienceAuDemarrage;
         }
-    }
 
-    public static string DefaultMarque => Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay", "es-son-coupe.json");
+        Tenir();
+        ArmerSiBesoin();
+    }
 
     /// <summary>ES est-il tenu muet en ce moment (partie en cours, ou fin de partie avant le premier appui) ?</summary>
     public bool Coupe
@@ -116,12 +111,12 @@ public sealed class SonDEmulationStation : IDisposable
             _etat = Etat.Coupe;
         }
 
-        EcrireLaMarque();
+        DecrireAvantLaPartie();
         Tenir();
         Armer();
     }
 
-    /// <summary>La partie est finie : le son revient au premier appui du joueur.</summary>
+    /// <summary>La partie est finie : le son revient au premier appui du joueur, ou au plus tard apres quelques secondes.</summary>
     public void RendreAuProchainAppui()
     {
         lock (_verrou)
@@ -129,6 +124,7 @@ public sealed class SonDEmulationStation : IDisposable
             if (_etat == Etat.Coupe)
             {
                 _etat = Etat.AuProchainAppui;
+                _rendreAvant = DateTime.UtcNow + _auPlusTard;
             }
         }
     }
@@ -147,7 +143,25 @@ public sealed class SonDEmulationStation : IDisposable
         }
 
         Desarmer();
-        RendreLesNotres();
+        RendreToutes();
+    }
+
+    private void SurEvenement(string? type)
+    {
+        switch (type)
+        {
+            case "panel.input.pressed":
+                AppuiRecu();
+                ActiviteDansEs();
+                break;
+            case "ui.system.selected.raw":
+            case "ui.game.selected.raw":
+                ActiviteDansEs();
+                break;
+            case "ui.game.ended.raw":
+                RetourDUnJeu();
+                break;
+        }
     }
 
     private void AppuiRecu()
@@ -174,27 +188,79 @@ public sealed class SonDEmulationStation : IDisposable
             }
 
             Desarmer();
-            RendreLesNotres();
+            RendreToutes();
         }, TaskScheduler.Default);
+    }
+
+    /// <summary>Le joueur est dans ES, sans partie MULTIPLAYER : ES ne reste pas muet.</summary>
+    private void ActiviteDansEs()
+    {
+        lock (_verrou)
+        {
+            if (_etat != Etat.Libre || DateTime.UtcNow - _dernierControle < EntreDeuxControles)
+            {
+                return;
+            }
+
+            _dernierControle = DateTime.UtcNow;
+        }
+
+        _ = Task.Run(RendreToutes);
+    }
+
+    /// <summary>ES reprend la main apres un jeu qu'il a lance : le son revient des qu'il rouvre sa session.</summary>
+    private void RetourDUnJeu()
+    {
+        lock (_verrou)
+        {
+            if (_etat != Etat.Libre)
+            {
+                return;
+            }
+
+            _etat = Etat.ARendre;
+            _rendreAvant = DateTime.UtcNow + PatienceAuRetour;
+        }
+
+        Armer();
     }
 
     /// <summary>
     /// A chaque tour : pendant la partie, une session d'ES ouverte entre-temps (la video d'un ecran de veille) se tait aussi ;
-    /// au redemarrage, le son revient des que la session d'ES existe.
+    /// apres la partie, le son revient a l'echeance meme sans appui ; au demarrage, il revient des que la session d'ES existe.
     /// </summary>
     private void Tenir()
     {
         try
         {
             Etat etat;
+            DateTime echeance;
             lock (_verrou)
             {
                 etat = _etat;
+                echeance = _rendreAvant;
             }
 
-            if (etat == Etat.ARendreAuDemarrage)
+            if (etat == Etat.ARendre)
             {
-                RendreAuDemarrage();
+                RendreQuandEsEstLa();
+                return;
+            }
+
+            if (etat == Etat.AuProchainAppui && DateTime.UtcNow >= echeance)
+            {
+                lock (_verrou)
+                {
+                    if (_etat != Etat.AuProchainAppui)
+                    {
+                        return;
+                    }
+
+                    _etat = Etat.Libre;
+                }
+
+                Desarmer();
+                RendreToutes();
                 return;
             }
 
@@ -210,13 +276,18 @@ public sealed class SonDEmulationStation : IDisposable
                     continue;
                 }
 
-                _melangeur.Muette(Processus, session.Id, true);
                 bool nouvelle;
                 lock (_verrou)
                 {
+                    if (_etat is not (Etat.Coupe or Etat.AuProchainAppui))
+                    {
+                        return;
+                    }
+
                     nouvelle = _coupees.Add(session.Id);
                 }
 
+                _melangeur.Muette(Processus, session.Id, true);
                 if (nouvelle)
                 {
                     _journal?.LogInformation("MULTIPLAYER : son d'EmulationStation coupe pendant la partie");
@@ -229,19 +300,24 @@ public sealed class SonDEmulationStation : IDisposable
         }
     }
 
-    private void RendreAuDemarrage()
+    private void RendreQuandEsEstLa()
     {
         var sessions = _melangeur.De(Processus);
-        // La marque dit que c'est l'API qui a coupe ES : toute session d'ES muette retrouve le son.
-        foreach (var session in sessions.Where(s => s.Muette))
+        var muettes = sessions.Where(s => s.Muette).ToList();
+        foreach (var session in muettes)
         {
             _melangeur.Muette(Processus, session.Id, false);
+        }
+
+        if (muettes.Count > 0)
+        {
+            _journal?.LogInformation("MULTIPLAYER : son d'EmulationStation rendu ({Muettes} session(s) muette(s) a son arrivee)", muettes.Count);
         }
 
         bool fini;
         lock (_verrou)
         {
-            fini = sessions.Count > 0 || DateTime.UtcNow >= _rendreAvant;
+            fini = _etat == Etat.ARendre && (sessions.Count > 0 || DateTime.UtcNow >= _rendreAvant);
             if (fini)
             {
                 _etat = Etat.Libre;
@@ -250,34 +326,27 @@ public sealed class SonDEmulationStation : IDisposable
 
         if (fini)
         {
-            if (sessions.Count > 0)
-            {
-                _journal?.LogInformation("MULTIPLAYER : son d'EmulationStation rendu apres un redemarrage de l'API en pleine partie");
-            }
-
             Desarmer();
-            EffacerLaMarque();
         }
     }
 
-    private void RendreLesNotres()
+    /// <summary>Toute session muette d'ES retrouve le son, celle que nous avons coupee comme une autre.</summary>
+    private void RendreToutes()
     {
-        string[] ids;
         lock (_verrou)
         {
-            ids = [.. _coupees];
             _coupees.Clear();
         }
 
         try
         {
-            var presentes = _melangeur.De(Processus);
-            foreach (var session in presentes.Where(s => s.Muette && ids.Contains(s.Id, StringComparer.Ordinal)))
+            var muettes = _melangeur.De(Processus).Where(s => s.Muette).ToList();
+            foreach (var session in muettes)
             {
                 _melangeur.Muette(Processus, session.Id, false);
             }
 
-            if (ids.Length > 0)
+            if (muettes.Count > 0)
             {
                 _journal?.LogInformation("MULTIPLAYER : son d'EmulationStation rendu");
             }
@@ -285,40 +354,38 @@ public sealed class SonDEmulationStation : IDisposable
         catch (Exception ex) when (ex is COMException or InvalidOperationException or UnauthorizedAccessException)
         {
             _journal?.LogWarning(ex, "MULTIPLAYER : son d'EmulationStation non rendu");
-            return;
         }
-
-        EffacerLaMarque();
     }
 
-    private void Armer() => _minuterie.Change(Periode, Periode);
+    /// <summary>L'etat du son d'ES au depart d'une partie : aucune session, c'est qu'ES a ferme son audio ; muette, qu'il l'etait deja.</summary>
+    private void DecrireAvantLaPartie()
+    {
+        try
+        {
+            var sessions = _melangeur.De(Processus);
+            _journal?.LogInformation("MULTIPLAYER : son d'EmulationStation avant la partie : {Sessions} session(s), {Muettes} muette(s)",
+                sessions.Count, sessions.Count(s => s.Muette));
+        }
+        catch (Exception ex) when (ex is COMException or InvalidOperationException or UnauthorizedAccessException)
+        {
+            _journal?.LogDebug(ex, "MULTIPLAYER : melangeur de Windows injoignable");
+        }
+    }
+
+    private void Armer() => _minuterie.Change(_periode, _periode);
+
+    private void ArmerSiBesoin()
+    {
+        lock (_verrou)
+        {
+            if (_etat == Etat.ARendre)
+            {
+                Armer();
+            }
+        }
+    }
 
     private void Desarmer() => _minuterie.Change(Timeout.Infinite, Timeout.Infinite);
-
-    private void EcrireLaMarque()
-    {
-        try
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(_marque)!);
-            File.WriteAllText(_marque, JsonSerializer.Serialize(new { coupe = DateTime.UtcNow }));
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            _journal?.LogDebug(ex, "MULTIPLAYER : marque du son d'ES non ecrite");
-        }
-    }
-
-    private void EffacerLaMarque()
-    {
-        try
-        {
-            File.Delete(_marque);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            _journal?.LogDebug(ex, "MULTIPLAYER : marque du son d'ES non effacee");
-        }
-    }
 
     public void Dispose()
     {
