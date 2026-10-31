@@ -60,10 +60,21 @@ public class CoopMultiplayerConcourtTests
     }
 
     [Fact]
-    public void Seules_les_coop_concourent()
+    public void Seules_les_coop_sorties_au_World_Scoring_concourent()
     {
-        Assert.True(MultiplayerScoring.Concourt(new MultiplayerGame { Id = "arcade/ddragon", Family = "coop" }));
-        Assert.False(MultiplayerScoring.Concourt(new MultiplayerGame { Id = "arcade/sf2ce", Family = "duel" }));
+        var sortie = new MultiplayerScoringDuJeu { RomGroup = "double-dragon" };
+        Assert.True(MultiplayerScoring.Concourt(new MultiplayerGame { Id = "arcade/ddragon", Family = "coop", Scoring = sortie }));
+        // Profils ouverts mais depart pas encore admis (19xx, 31/10) : il ne concourt pas, aucun refus apres chaque partie.
+        Assert.False(MultiplayerScoring.Concourt(new MultiplayerGame { Id = "arcade/19xx", Family = "coop" }));
+        Assert.False(MultiplayerScoring.Concourt(new MultiplayerGame { Id = "arcade/sf2ce", Family = "duel", Scoring = sortie }));
+    }
+
+    [Fact]
+    public void Le_catalogue_dit_la_coop_qui_concourt()
+    {
+        var jeu = JsonSerializer.Deserialize<MultiplayerGame>("{\"id\":\"arcade/ddragon\",\"family\":\"coop\",\"scoring\":{\"rom_group\":\"double-dragon\"}}")!;
+        Assert.Equal("double-dragon", jeu.Scoring?.RomGroup);
+        Assert.True(MultiplayerScoring.Concourt(jeu));
     }
 
     [Fact]

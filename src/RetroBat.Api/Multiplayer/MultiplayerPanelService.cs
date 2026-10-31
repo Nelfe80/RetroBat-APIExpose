@@ -1347,6 +1347,8 @@ public sealed partial class MultiplayerPanelService
                         NomDuJeu(room.Game),
                         // [AMIS] devant le compte d'une gameroom d'amis, comme dans le panneau (demande du user du 29/10).
                         (room.EntreAmis ? "[" + Texte("multiplayer.selection.friends", "FRIENDS") + "]  " : string.Empty)
+                        // [1CC MULTI] devant une coop qui concourt (31/10) : la partie entre au classement, sans rien a choisir.
+                        + (_session.Concourt(room.Game) ? "[" + MultiplayerScoring.Etiquette + "]  " : string.Empty)
                         + room.Players.Count(j => j.Present) + "/" + room.Max + "   " + (absent ? T("multiplayer.selection.away")
                             : room.EntreAmis ? Texte("multiplayer.selection.help_friends", "waiting for friends") : T("multiplayer.selection.help")),
                         room is { State: "countdown", CountdownMs: { } ms } ? DateTime.UtcNow.AddMilliseconds(ms) : null);

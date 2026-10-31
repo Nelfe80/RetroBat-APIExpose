@@ -29,8 +29,15 @@ public static class MultiplayerScoring
     private static readonly object Verrou = new();
     private static (PartieMultiplayerCertifiee Partie, DateTime Quand)? _posee;
 
-    /// <summary>Seules les coop concourent ; leur classement s'ouvre ou non au site (profil 1cc-multi, 1lc-multi).</summary>
-    public static bool Concourt(MultiplayerGame jeu) => string.Equals(jeu.Family, "coop", StringComparison.Ordinal);
+    /// <summary>
+    /// Une coop que le catalogue fait concourir (sa sortie au World Scoring l'a dit) ; son classement s'ouvre ou non au site
+    /// (profils 1cc-multi, 1lc-multi).
+    /// </summary>
+    public static bool Concourt(MultiplayerGame jeu)
+        => string.Equals(jeu.Family, "coop", StringComparison.Ordinal) && jeu.Scoring is { RomGroup.Length: > 0 };
+
+    /// <summary>Le nom du classement, jamais traduit, comme le sigle que la borne et le site affichent.</summary>
+    public const string Etiquette = "1CC MULTI";
 
     public static void Poser(PartieMultiplayerCertifiee partie, DateTime maintenant)
     {

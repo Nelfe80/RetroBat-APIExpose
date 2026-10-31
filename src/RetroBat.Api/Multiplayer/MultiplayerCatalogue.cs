@@ -107,6 +107,14 @@ public sealed record MultiplayerGame
     public string? Set { get; init; }
 
     /// <summary>
+    /// LA COOP QUI CONCOURT (decision user du 2026-10-31) : le jeu du World Scoring ou chaque partie entre de base au 1CC MULTI
+    /// et au 1LC MULTI. Pose a la sortie du jeu (SORTIE_JEU_WORLD_SCORING.md), quand ses profils admettent son depart pret.
+    /// Absent : le jeu ne concourt pas, meme si ses profils sont ouverts (son depart y serait refuse).
+    /// </summary>
+    [JsonPropertyName("scoring")]
+    public MultiplayerScoringDuJeu? Scoring { get; init; }
+
+    /// <summary>
     /// Console : les contenus acceptes, le prefere d'abord. Une gameroom ne reunit que des joueurs
     /// au meme contenu.
     /// </summary>
@@ -498,6 +506,13 @@ public sealed record MultiplayerContent
     /// <summary>Prefiltre d'un fichier nu.</summary>
     [JsonPropertyName("size")]
     public IReadOnlyList<long> Size { get; init; } = [];
+}
+
+/// <summary>Le jeu du World Scoring d'une coop qui concourt : son groupe de score (<c>double-dragon</c>).</summary>
+public sealed record MultiplayerScoringDuJeu
+{
+    [JsonPropertyName("rom_group")]
+    public string RomGroup { get; init; } = string.Empty;
 }
 
 /// <summary>L'etat d'un depart pret, livre par le Data Pack sous <c>resources/multiplayer/</c>.</summary>

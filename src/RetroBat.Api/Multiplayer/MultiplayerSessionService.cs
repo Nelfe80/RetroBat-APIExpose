@@ -354,6 +354,10 @@ public sealed class MultiplayerSessionService : BackgroundService
     public string NomDuJeu(string id)
         => _collection.JeuxConnus().FirstOrDefault(jeu => jeu.Game.Id == id)?.Game.Name ?? id;
 
+    /// <summary>Ce jeu concourt-il au 1CC MULTI (MultiplayerScoring.Concourt) ? Faux pour un jeu que la borne ne connait pas.</summary>
+    public bool Concourt(string id)
+        => _collection.JeuxConnus().FirstOrDefault(jeu => jeu.Game.Id == id) is { } connu && MultiplayerScoring.Concourt(connu.Game);
+
     /// <summary>Un sondage, tout de suite. Un seul a la fois.</summary>
     internal async Task SonderAsync(CancellationToken ct)
     {

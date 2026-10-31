@@ -378,7 +378,9 @@ public sealed partial class MultiplayerPanelService
             ? T("multiplayer.launch.all_ready")
             : _textes.Format("multiplayer.launch.waiting", langue, ("players", string.Join(T("multiplayer.launch.and"), attendus)));
         var classique = room.Level != MultiplayerLevels.NelfePlay;
-        var entete = jeu.EstClasse ? T("multiplayer.launch.header.ranked") : coop ? T("multiplayer.launch.header.coop") : T("multiplayer.launch.header.match");
+        var entete = jeu.EstClasse ? T("multiplayer.launch.header.ranked")
+            : coop ? T("multiplayer.launch.header.coop") + (MultiplayerScoring.Concourt(jeu) ? " · " + MultiplayerScoring.Etiquette : string.Empty)
+            : T("multiplayer.launch.header.match");
         var sousTitre = type == StylesDesEcrans.Course ? Nombre("multiplayer.launch.race", joueurs.Count)
             : !coop && joueurs.Count == 2 ? T("multiplayer.launch.duel")
             : Nombre("multiplayer.launch.players", joueurs.Count);
