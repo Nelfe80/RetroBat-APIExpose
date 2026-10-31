@@ -327,6 +327,28 @@ public class MultiplayerEcranDeFinTests
         };
         File.WriteAllBytes(Path.Combine(Sortie, "fin-equipes.png"), L.ApercuMultiplayer(style, socle with { Fin = equipes }, "", "", "", null!, 6));
         File.WriteAllBytes(Path.Combine(Sortie, "fin-trois.png"), L.ApercuMultiplayer(style, socle with { Fin = trois }, "", "", "", null!, 6));
+        // Une coop qui concourt (proposition du 31/10) : ton score en grand a la place du vainqueur, celui des autres en petit sous
+        // leur nom ; un joueur dont le verdict n'est pas arrive montre « … ».
+        var coop = new L.EcranDeFin("salle-5", "coop", "PARTIE TERMINÉE", "Altered Beast", "18:40", Fanart("arcade", "altbeast"),
+        [
+            new(1, "NELFE", "", null, "", "", "", false, null, "", [new("trophee", "1CC MULTI", 120000, 1, true, Milliers: true, Suffixe: "#2")]),
+            new(2, "AKIRA", "", null, "", "", "", false, null, "", [new("trophee", "1CC MULTI", 98300, 98300 / 120000.0, false, Milliers: true, Suffixe: "#4")]),
+        ], null, "Chaque score compte jusqu'au premier continue de son joueur.", "1CC MULTI", textes, "button_a", "button_b",
+            MonScore: new L.ScoreDeFin("Ton score", "120 000", "1CC MULTI · #2", "1LC MULTI  45 600 · #5", false));
+        File.WriteAllBytes(Path.Combine(Sortie, "fin-coop-1cc-multi.png"), L.ApercuMultiplayer(style, socle with { Fin = coop }, "", "", "", null!, 6));
+        var coopTrois = trois with
+        {
+            Cle = "salle-6", Badge = "1CC MULTI", Note = "Chaque score compte jusqu'au premier continue de son joueur.",
+            Joueurs =
+            [
+                trois.Joueurs[0] with { Mesures = [new("trophee", "1CC MULTI", 212400, 1, true, Milliers: true, Suffixe: "#1"), .. trois.Joueurs[0].Mesures.Take(2)] },
+                // Son verdict n'est pas encore arrive : « - », sans place.
+                trois.Joueurs[1] with { Mesures = [new("trophee", "1CC MULTI", null, 0, false, Milliers: true), .. trois.Joueurs[1].Mesures.Take(2)] },
+                trois.Joueurs[2] with { Mesures = [new("trophee", "1CC MULTI", 87150, 87150 / 212400.0, false, Milliers: true, Suffixe: "#9"), .. trois.Joueurs[2].Mesures.Take(2)] },
+            ],
+            MonScore = new L.ScoreDeFin("Ton score", "212 400", "1CC MULTI · #1", "1LC MULTI  61 200 · #3", true),
+        };
+        File.WriteAllBytes(Path.Combine(Sortie, "fin-coop-1cc-multi-trois.png"), L.ApercuMultiplayer(style, socle with { Fin = coopTrois }, "", "", "", null!, 6));
         File.WriteAllBytes(Path.Combine(Sortie, "fin-sans-fanart.png"), L.ApercuMultiplayer(style, socle with { Fin = duel with { Fanart = null, Cle = "x" } }, "", "", "", null!, 6));
         // Un pseudo long ne mord pas sur les cartes (vu a la borne le 26/10).
         foreach (var (nom, pseudo) in new[] { ("fin-pseudo-long.png", "LORENZOLAMAS"), ("fin-pseudo-tres-long.png", "MEGAWARRIOR_MAXIMUS24") })
