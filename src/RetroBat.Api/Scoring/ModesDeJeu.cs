@@ -209,21 +209,43 @@ public static class ModesDeJeu
 
     /// <summary>Les profils des parties seules : tous sauf la categorie 1CC MULTI et ses modes.</summary>
     public static List<JsonElement> SansLeMulti(IReadOnlyList<JsonElement> profils)
-        => profils.Where(p => !EstMulti(Regle(p))).ToList();
+        => profils.Where(p => !EstMulti(Regle(p)) && !Est1LCMulti(Regle(p))).ToList();
 
     /// <summary>
     /// Les profils du 1CC d'une partie seule : ni le 1CC MULTI, ni le 1LC, ni le speedrun. Un profil
     /// 1LC ouvert ne doit jamais recevoir le 1CC d'une partie (2026-10-09).
     /// </summary>
     public static List<JsonElement> DuSolo(IReadOnlyList<JsonElement> profils)
-        => profils.Where(p => !EstMulti(Regle(p)) && !Est1LC(Regle(p)) && !EstSpeedrun(Regle(p))).ToList();
+        => profils.Where(p => !EstMulti(Regle(p)) && !Est1LC(Regle(p)) && !Est1LCMulti(Regle(p)) && !EstSpeedrun(Regle(p))).ToList();
 
     /// <summary>
     /// LE 1LC (decision user du 2026-10-09) : le score de la premiere vie. La partie le mesure en meme
     /// temps que son 1CC ; 1lc, et 1lc-&lt;mode&gt; pour un jeu a modes.
     /// </summary>
     public static bool Est1LC(string? regle)
-        => regle is { } r && (r == "1lc" || r.StartsWith("1lc-", StringComparison.Ordinal));
+        => regle is { } r && (r == "1lc" || r.StartsWith("1lc-", StringComparison.Ordinal)) && !Est1LCMulti(r);
+
+    /// <summary>
+    /// LE 1LC MULTI (decision user du 2026-10-31) : le score de chaque joueur d'une coop de MULTIPLAYER jusqu'a sa premiere
+    /// vie perdue. Il commence comme un mode du 1LC (« 1lc-multi ») : jamais le 1LC d'une partie seule.
+    /// </summary>
+    public static bool Est1LCMulti(string? regle)
+        => regle is { } r && (r == "1lc-multi" || r.StartsWith("1lc-multi-", StringComparison.Ordinal));
+
+    /// <summary>Le profil 1LC MULTI, comme celui du 1CC MULTI : celui du mode joue s'il y en a plusieurs. Null : rien a soumettre.</summary>
+    public static JsonElement? ChoisirProfil1LCMulti(IReadOnlyList<JsonElement> profils, int? modeJoue)
+    {
+        var multis = profils.Where(p => Est1LCMulti(Regle(p))).ToList();
+        if (multis.Count == 0) return null;
+        var aModes = multis.Where(p => ModeDuProfil(p) is not null).ToList();
+        if (aModes.Count == 0) return multis[0];
+        var mode = modeJoue ?? (ChoisirProfil(profils, null) is { } solo ? ModeDuProfil(solo) : null);
+        foreach (var p in aModes)
+        {
+            if (ModeDuProfil(p) == mode) return p;
+        }
+        return null;
+    }
 
     /// <summary>
     /// LE NOM D'UN CLASSEMENT DANS L'ANNONCE DE FIN DE PARTIE (decision user 2026-10-20) : « 1cc-normal » s'ecrit

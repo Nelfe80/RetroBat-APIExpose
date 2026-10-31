@@ -1123,9 +1123,11 @@ public sealed class MultiplayerLaunchService : IHostedService
         var lanceA = DateTime.Now;
         _session.LancementEnCours = room.Room;
         _sonDEs?.Couper();
+        PoserLaPartieQuiConcourt(room, jeu, lancement);
         var lanceur = NetplayLaunch.DemarrerDirectement(arguments, _journal);
         if (lanceur is null)
         {
+            MultiplayerScoring.Oublier();
             _sonDEs?.Rendre();
             FinDuLancement(room.Room);
             Rendre(aRendre);
@@ -1138,6 +1140,30 @@ public sealed class MultiplayerLaunchService : IHostedService
         _ = Task.Run(() => AnnoncerQuandLEmulateurEstLaAsync(reference, room.Room, lanceA, sansManette: manettes.Length == 0,
             hote: lancement.Role == "host" ? (room, jeu) : null));
         return new Partie(lanceur, aRendre, DateTime.UtcNow, reference, departDuCoeur.Fichier);
+    }
+
+    /// <summary>
+    /// UNE COOP CONCOURT DE BASE (decision user du 2026-10-31) : le rapporteur prend cette partie au debut du jeu et soumet a
+    /// la fin le 1CC MULTI et le 1LC MULTI de cette place, si le site les a ouverts pour le jeu. Le depart est celui que
+    /// l'hote charge (l'etat du catalogue et les choix des joueurs), le meme pour chaque borne ; l'hote seul le charge.
+    /// </summary>
+    private void PoserLaPartieQuiConcourt(MultiplayerRoom room, MultiplayerInstalledGame jeu, MultiplayerLancement lancement)
+    {
+        if (!MultiplayerScoring.Concourt(jeu.Game))
+        {
+            MultiplayerScoring.Oublier();
+            return;
+        }
+
+        var depart = DepartDeLaRoom(room, jeu);
+        var empreinte = depart is { Sha256.Length: > 0 } ? depart.Sha256.ToLowerInvariant() : null;
+        IReadOnlyList<ChoixDuDepart> choix = empreinte is null ? [] : MultiplayerScoring.ChoixEcrits(jeu.Game, ChoixEtPseudos(room).Choix);
+        var hote = string.Equals(lancement.Role, "host", StringComparison.Ordinal);
+        var partie = new PartieMultiplayerCertifiee(room.Room, lancement.Seat, jeu.Game.PlaceDuJeu(lancement.Seat), Math.Max(2, lancement.Players),
+            jeu.Path, empreinte, choix, hote && empreinte is not null ? 1 : 0);
+        MultiplayerScoring.Poser(partie, DateTime.UtcNow);
+        _journal.LogInformation("MULTIPLAYER : {Jeu} concourt (1CC MULTI, 1LC MULTI), place {Place}, {Depart}", jeu.Game.Id, lancement.Seat,
+            empreinte is null ? "demarrage a froid" : "depart " + empreinte[..12] + (choix.Count > 0 ? ", " + choix.Count + " choix" : string.Empty));
     }
 
     /// <summary>Le lancement de cette salle est fini (l'emulateur est la, ou la partie n'a pas pu partir).</summary>

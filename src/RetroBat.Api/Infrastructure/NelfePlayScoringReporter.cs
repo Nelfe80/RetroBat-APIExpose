@@ -118,6 +118,20 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     private void PrendreRoleInvite()
     {
+        if (RetroBat.Api.Multiplayer.MultiplayerScoring.Prendre(DateTime.UtcNow) is { } multiplayer)
+        {
+            lock (_sync)
+            {
+                _multiplayer = multiplayer;
+                // PARTIE D'UN ETAT, LE JEU EST DEJA EN COURS : aucun START ne l'ouvrira. Sans quoi un signal de demo lu au
+                // chargement de l'etat (Double Dragon : 0x0401 vaut 1 en mission 1) passait pour l'attract, et aucun score ne
+                // comptait. La fenetre de jeu (_startVu) reste fermee : le START d'un continue ne doit rien ecarter.
+                if (multiplayer.EtatDeDepart is not null) { _enJeu = true; _inDemo = false; }
+            }
+            Trace($"partie MULTIPLAYER {multiplayer.Gameroom} : place {multiplayer.Place} sur {multiplayer.Joueurs}, "
+                + (multiplayer.EtatDeDepart is { } etat ? $"depart par l'etat {etat[..12]}" : "demarrage a froid")
+                + " : 1CC MULTI et 1LC MULTI de la place a la fin de la partie");
+        }
         var role = RetroBat.Api.Netplay.NetplayGuestService.PrendreRejointe(FenetreRejointe);
         if (role == RetroBat.Api.Netplay.NetplayGuestService.Role.Aucun) return;
         // La place et la seance, prises MAINTENANT : la place se libere quand l'emulateur se ferme,
@@ -135,6 +149,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
     private int? _placeInvite;
     private string? _seanceInvite;
+
+    /// <summary>
+    /// UNE COOP DE MULTIPLAYER QUI CONCOURT (decision user du 2026-10-31) : la gameroom, la place, le depart. Prise au debut
+    /// de la partie, elle decide de la soumission a la fin : le 1CC MULTI et le 1LC MULTI de la place, rien d'autre. Ce
+    /// n'est pas une partie NelfePlay complete : aucun bandeau en partie, aucun 1CC solo.
+    /// </summary>
+    private RetroBat.Api.Multiplayer.PartieMultiplayerCertifiee? _multiplayer;
+
+    private RetroBat.Api.Multiplayer.PartieMultiplayerCertifiee? MultiplayerDeLaPartie()
+    {
+        lock (_sync) return _multiplayer;
+    }
 
     // 1CC MULTI (2026-09-30) : le port de manette de cette borne, retrouve a ses appuis, et la
     // trajectoire du score de chaque autre joueur (celle de sa place, pour la borne invitee).
@@ -847,6 +873,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _trajectoiresAutres.Clear();
             _placeInvite = null;
             _seanceInvite = null;
+            _multiplayer = null;
             _creditsMuets = null;
             _hotePartiFrame = null;
             _continuesConsole.Clear();
@@ -1015,6 +1042,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _coreName = GetString(root, "CoreName");
             _coreVersion = GetString(root, "CoreVersion");
             _systemeDuJeu = GetString(root, "SystemId") ?? "";
+            if (_multiplayer is { } multiplayer && GetString(root, "Rom") is { Length: > 0 } rom
+                && !string.Equals(Path.GetFileName(rom), Path.GetFileName(multiplayer.Chemin), StringComparison.OrdinalIgnoreCase))
+            {
+                _multiplayer = null;
+                Trace($"partie MULTIPLAYER oubliee : le jeu charge ({Path.GetFileName(rom)}) n'est pas celui de la gameroom");
+            }
         }
         _ = PreflightAsync(root, CancellationToken.None);
     }
@@ -1034,6 +1067,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var romGroup = GroupeDeLaPartie(systemId, GetString(attestation, "Rom") ?? "",
                 GetString(attestation, "ContentMd5"), GetString(attestation, "ContentSha256"));
             if (systemId.Length == 0 || romGroup.Length == 0 || _esNotify is null) return;
+            if (MultiplayerDeLaPartie() is { } multiplayer && !SousAtelier())
+            {
+                // En partie, rien (decision user du 2026-10-31) : l'ecran de lancement a dit que la partie concourt.
+                Trace($"prevol : {systemId}/{romGroup} en MULTIPLAYER, place {multiplayer.Place} : aucune annonce en partie");
+                return;
+            }
             if (!PartieNelfePlay())
             {
                 Trace(SousAtelier()
@@ -2887,6 +2926,20 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             await SoumettreDefiAsync(systemId, romGroup, sessionJson, cancellationToken).ConfigureAwait(false);
             return;
         }
+        if (MultiplayerDeLaPartie() is { } multiplayer && !SousAtelier())
+        {
+            // UNE COOP DE MULTIPLAYER (2026-10-31) : chaque borne soumet sa place, l'hote comme les invites, sur la
+            // gameroom ; jamais de 1CC solo (pas de partie seul en MULTIPLAYER).
+            var credentialMultiplayer = ResolveCredential();
+            if (string.IsNullOrEmpty(credentialMultiplayer))
+            {
+                Trace("STOP: pas de credential (ni appairé ni anonyme)");
+                return;
+            }
+            await SoumettreMultiAsync(systemId, romGroup, sessionJson, credentialMultiplayer, multiplayer.Place, multiplayer.Gameroom,
+                cancellationToken, multiplayer).ConfigureAwait(false);
+            return;
+        }
         if (!PartieNelfePlay())
         {
             Trace(SousAtelier()
@@ -3108,9 +3161,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     private async Task SoumettreMultiAsync(string systemId, string romGroup, string sessionJson, string credential,
-        int place, string? seance, CancellationToken cancellationToken)
+        int place, string? seance, CancellationToken cancellationToken,
+        RetroBat.Api.Multiplayer.PartieMultiplayerCertifiee? multiplayer = null)
     {
+        // En MULTIPLAYER, le joueur du jeu de cette place (ses lignes du .MEM, son port) ; la place reste celle du passeport.
+        var siege = place;
+        place = multiplayer?.JoueurDuJeu ?? place;
         var port = place - 1;
+        // Le depart pret charge un etat ou le jeu a deja commence : le premier credit que ce panel consomme avec un START
+        // est un continue, jamais le depart.
+        var departParEtat = multiplayer?.EtatDeDepart is not null;
         var joueurs = JoueursActifs(sessionJson);
         if (joueurs < 2)
         {
@@ -3152,7 +3212,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 var brutes = new List<(long, long)>(_trajectory);
                 var horsJeu = new List<bool>(_horsJeu);
-                trajectory = _startVu ? FiltrerEnJeu(brutes, horsJeu) : brutes;
+                // Parti d'un etat, le jeu n'a pas vu le START du depart : celui d'un continue ne doit pas faire du credit
+                // joue avant lui une lecture « hors jeu ».
+                trajectory = _startVu && !departParEtat ? FiltrerEnJeu(brutes, horsJeu) : brutes;
             }
             else
             {
@@ -3168,7 +3230,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // Une partie a plusieurs bornes : un credit consomme sans START de ce panel revient a un
         // autre joueur (son arrivee, ou son continue) et ne coupe rien ici.
         var bilan = ContinuesParCredits.Calculer(credits, departs, ouverteAuxJoueurs: true);
-        if (place > 1)
+        var coupesDuCredit = departParEtat && bilan.Depart is { } premierCredit
+            ? bilan.Coupes.Append(premierCredit).OrderBy(f => f).ToList()
+            : bilan.Coupes.ToList();
+        if (place > 1 && !departParEtat)
         {
             // L'invite part a la premiere lecture de sa ligne CONTINUES (Neo-Geo : son PLAYER_MOD
             // passe a 1), sinon au premier credit consomme avec un START de son panel : son score
@@ -3188,7 +3253,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
         // Ses continues seulement : ceux d'un autre joueur, lus sur sa propre ligne, ne coupent rien.
         var coupesDuCompteur = ContinuesParCompteur.CoupesDeLaPlace(continuesConsole, place);
-        var coupes = bilan.Coupes.Concat(coupesDuCompteur).OrderBy(f => f).ToList();
+        var coupes = coupesDuCredit.Concat(coupesDuCompteur).OrderBy(f => f).ToList();
         if (coupes.Count > 0)
         {
             Trace($"1CC MULTI : continue de ce joueur a la frame {coupes[0]}");
@@ -3247,15 +3312,80 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // Le 1CC MULTI garde le replay de la partie entiere.
         string? replay;
         lock (_sync) replay = _replayDeLaPartie;
-        var coupe = FinDuSolo.Premiere((FinDuSolo.Continue, bilan.Coupes), (FinDuSolo.ContinueConsole, coupesDuCompteur));
+        var coupe = FinDuSolo.Premiere((FinDuSolo.Continue, coupesDuCredit), (FinDuSolo.ContinueConsole, coupesDuCompteur));
         Trace($"1CC MULTI : partie du joueur {place}, {runPeak} points");
         var regleMulti = profile is { } choisi && choisi.TryGetProperty("ruleset", out var rg) && rg.ValueKind == JsonValueKind.String
             ? rg.GetString() ?? CategorieMulti
             : CategorieMulti;
+        var departDuBrouillon = DepartDuBrouillon(multiplayer);
         var brouillon = NouveauBrouillon("multi", systemId, romGroup, sessionDuJoueur, listenerSha, coreSha, memSha,
             contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, runPeak, bestRun, trajectory,
-            nvram, bios, contexteMulti, joueurs, coupe, place, seance, replay, regleMulti);
+            nvram, bios, contexteMulti, joueurs, coupe, siege, seance, replay, regleMulti);
+        brouillon["depart"] = departDuBrouillon?.DeepClone();
         await PoserEtEnvoyerAsync(brouillon, runPeak, cancellationToken).ConfigureAwait(false);
+
+        // LE 1LC MULTI (decision user du 2026-10-31) : en MULTIPLAYER, le score de ce joueur jusqu'a sa premiere vie perdue,
+        // pris dans le run de son 1CC MULTI (deja coupe a son premier continue). Ses morts seulement : celles d'un autre
+        // joueur ne coupent rien ici.
+        if (multiplayer is null || RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil1LCMulti(profils, contexteMulti.Mode) is not { } profil1lc)
+        {
+            return;
+        }
+        List<EvenementDeVie> vies;
+        string? definitionChargee;
+        lock (_sync)
+        {
+            vies = new List<EvenementDeVie>(_vies);
+            definitionChargee = _definitionChargee;
+        }
+        var compteurs = RetroBat.Api.Scoring.PremiereVie.Compteurs(LireMem(definitionChargee));
+        var pertes = RetroBat.Api.Scoring.PremiereVie.SurLesCompteurs(
+            PertesDuJoueur(vies, place).Select(v => (v.Address, v.Frame, 1)).ToList(), compteurs);
+        var (run1lc, mort) = RetroBat.Api.Scoring.PremiereVie.Couper(bestRun, pertes);
+        if (!RetroBat.Api.Scoring.PremiereVie.AMarque(run1lc))
+        {
+            Trace($"1LC MULTI : rien de marque par le joueur {place} avant sa premiere vie perdue (frame {mort}), pas de soumission");
+            return;
+        }
+        var pic1lc = run1lc[^1].total;
+        Trace(mort is { } perdue
+            ? $"1LC MULTI : joueur {place}, premiere vie perdue a la frame {perdue}, {pic1lc} points"
+            : $"1LC MULTI : joueur {place}, aucune vie perdue avant son premier continue, {pic1lc} points");
+        var brouillon1lc = NouveauBrouillon(GenreDu1LCMulti, systemId, romGroup, sessionDuJoueur, listenerSha, coreSha, memSha,
+            contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, pic1lc, run1lc, run1lc,
+            nvram, bios, contexteMulti, joueurs, mort is { } mortDuJoueur ? (RetroBat.Api.Scoring.PremiereVie.Raison, mortDuJoueur) : coupe, siege, seance, replay,
+            profil1lc.TryGetProperty("ruleset", out var regle1lc) ? regle1lc.GetString() : null);
+        brouillon1lc["depart"] = departDuBrouillon?.DeepClone();
+        await PoserEtEnvoyerAsync(brouillon1lc, pic1lc, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>Le genre du brouillon du 1LC MULTI : son envoi choisit le profil 1lc-multi.</summary>
+    internal const string GenreDu1LCMulti = "1lc-multi";
+
+    /// <summary>
+    /// Les vies perdues par ce joueur du jeu. Une ligne du .MEM sans joueur vaut pour le joueur 1 (le reporter y met 1).
+    /// </summary>
+    internal static IEnumerable<EvenementDeVie> PertesDuJoueur(IEnumerable<EvenementDeVie> vies, int joueur)
+        => vies.Where(v => v.Perte && (v.Player == joueur || (joueur == 1 && v.Player < 1)));
+
+    /// <summary>
+    /// Le depart d'une partie MULTIPLAYER pour le passeport : l'etat du catalogue et les choix ecrits, et les chargements
+    /// d'etat qu'il explique (ils ne valent pas une sauvegarde chargee). Null hors MULTIPLAYER.
+    /// </summary>
+    internal static JsonObject? DepartDuBrouillon(RetroBat.Api.Multiplayer.PartieMultiplayerCertifiee? multiplayer)
+    {
+        if (multiplayer is null) return null;
+        var choix = new JsonArray();
+        foreach (var c in multiplayer.Choix)
+        {
+            choix.Add(new JsonObject { ["seat"] = c.Place, ["key"] = c.Cle, ["value"] = c.Valeur });
+        }
+        return new JsonObject
+        {
+            ["etat"] = multiplayer.EtatDeDepart,
+            ["choix"] = choix,
+            ["chargements_permis"] = multiplayer.ChargementsPermis,
+        };
     }
 
     /// <summary>La categorie (ruleset) des parties a plusieurs, chacun sur son credit.</summary>
@@ -3672,13 +3802,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         string? sessionId = null, DateTime? finUtc = null,
         (NelfePlayScoringSessionService.SessionPlayer? Joueur, bool Fige)? joueurFige = null,
         bool? labo = null, string? versionApi = null, string? etatWrapper = null, long? arretDuReplay = null,
-        JsonObject? clear = null)
+        JsonObject? clear = null, JsonObject? depart = null)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
         long monotonicMs = (long?)session["monotonic_ms"] ?? 0;
         long resets = (long?)session["resets"] ?? 0;
-        long saveStateLoads = (long?)session["save_state_loads"] ?? 0;
+        // Les chargements du depart pret (l'hote charge l'etat de la gameroom) ne sont pas une sauvegarde : le passeport nomme
+        // l'etat, la plateforme le juge.
+        long saveStateLoads = Math.Max(0, ((long?)session["save_state_loads"] ?? 0) - ((long?)depart?["chargements_permis"] ?? 0));
         // Anti-triche (Gap 2) : le wrapper homologué compte ces vecteurs et les émet dans
         // la session ; absents (vieux wrapper / autre backend) → 0 = neutre. Le certifié
         // n'existe QUE via un listener whitelisté (CoreVerifier profile.listener_unauthorized),
@@ -3813,6 +3945,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // ou elle a ete attribuee. La plateforme les confronte a ses places.
         if (place is { } siege) jeu["seat"] = siege;
         if (!string.IsNullOrEmpty(seance)) jeu["netplay_session"] = seance;
+        // LE DEPART PAR UN ETAT (2026-10-31, coop de MULTIPLAYER) : la plateforme ne l'admet que s'il est l'un des departs
+        // du profil, choix compris.
+        if (depart?["etat"] is JsonValue etatDuDepart && etatDuDepart.TryGetValue<string>(out var empreinteDuDepart) && empreinteDuDepart.Length > 0)
+        {
+            jeu["start_state_sha256"] = empreinteDuDepart;
+            jeu["start_choices"] = depart["choix"]?.DeepClone() ?? new JsonArray();
+        }
 
         // L'heure de fin est celle de la PARTIE (brouillon), pas celle de l'assemblage : un brouillon
         // envoye au retour du site garde sa date.
@@ -4226,9 +4365,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var rank = (int?)(obj?["rank"]);
             var regle = (string?)(passport["game"] as JsonObject)?["ruleset"];
             // Le 1LC arrive juste apres le verdict du 1CC de la meme partie : il se nomme.
-            var quoi = RetroBat.Api.Scoring.ModesDeJeu.Est1LC(regle)
-                ? "Score 1LC"
-                : "Score";
+            var quoi = RetroBat.Api.Scoring.ModesDeJeu.Est1LCMulti(regle)
+                ? "Score 1LC MULTI"
+                : RetroBat.Api.Scoring.ModesDeJeu.Est1LC(regle)
+                    ? "Score 1LC"
+                    : "Score";
 
             var message = status switch
             {
@@ -4433,6 +4574,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "runtime.rewind_detected" => "rembobinage détecté",
         "runtime.runahead_detected" => "run-ahead détecté",
         "runtime.save_state_detected" => "sauvegarde d'état détectée",
+        "runtime.start_state_unknown" => "départ de la partie non admis",
         "runtime.cheat_detected" => "triche (cheat) détectée",
         "runtime.continue_forbidden" => "continue interdit pour ce record",
         "runtime.impossible_inputs" => "directions opposées simultanées (manette ou stick non conforme)",
@@ -5004,13 +5146,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var romGroup = (string?)brouillon["rom_group"] ?? "";
         var multi = (string?)brouillon["genre"] == "multi";
         var uneVie = (string?)brouillon["genre"] == "1lc";
+        var uneVieMulti = (string?)brouillon["genre"] == GenreDu1LCMulti;
         var mode = (int?)brouillon["mode"];
         var (profils, duSite) = await ProfilsAsync(credential, systemId, romGroup, ct).ConfigureAwait(false);
         JsonElement? profile = multi
             ? RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfilMulti(profils, mode)
-            : uneVie
-                ? RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil1LC(profils, mode)
-                : RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil(profils, mode);
+            : uneVieMulti
+                ? RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil1LCMulti(profils, mode)
+                : uneVie
+                    ? RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil1LC(profils, mode)
+                    : RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil(profils, mode);
         if (profile is null)
         {
             if ((bool?)brouillon["labo"] == true)
@@ -5019,7 +5164,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
             else if (duSite)
             {
-                Trace($"brouillon {id} : plus aucun classement ouvert pour {romGroup}{(multi ? " " + CategorieMulti : uneVie ? " 1LC" : "")}, retire sans envoi");
+                Trace($"brouillon {id} : plus aucun classement ouvert pour {romGroup}{(multi ? " " + CategorieMulti : uneVieMulti ? " " + GenreDu1LCMulti : uneVie ? " 1LC" : "")}, retire sans envoi");
                 return (RetroBat.Api.Scoring.IssueDEnvoi.Definitif, null, null);
             }
             else
@@ -5096,7 +5241,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 contexte, (int?)brouillon["joueurs"] ?? 1, finDuSolo, (int?)brouillon["place"], (string?)brouillon["seance"],
                 sessionId: id, finUtc: fin, joueurFige: (joueur, true), labo: (bool?)brouillon["labo"] == true,
                 versionApi: (string?)brouillon["apiexpose"], etatWrapper: (string?)brouillon["etat_wrapper"],
-                arretDuReplay: (long?)brouillon["arret_du_replay"], clear: brouillon["clear"] as JsonObject);
+                arretDuReplay: (long?)brouillon["arret_du_replay"], clear: brouillon["clear"] as JsonObject,
+                depart: brouillon["depart"] as JsonObject);
             if (defi is not null) RetroBat.Api.Speedrun.PasseportDeDefi.Appliquer(passport, defi, entreeDuDefi!);
             var corps = passport.DeepClone()!.AsObject();
             corps.Remove("signature");
