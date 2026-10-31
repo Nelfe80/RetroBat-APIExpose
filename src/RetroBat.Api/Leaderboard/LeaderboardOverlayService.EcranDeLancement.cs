@@ -55,7 +55,8 @@ public sealed partial class LeaderboardOverlayService
         string Maintenir,
         string GlypheReessayer,
         string GlypheQuitter,
-        string? Police = null);
+        string? Police = null,
+        bool SortiePossible = false);
 
     /// <summary>
     /// Un joueur au lancement. <c>Portrait</c> : l'image du personnage choisi, ou null (le pseudo remonte). <c>Lettre</c>,
@@ -251,7 +252,7 @@ public sealed partial class LeaderboardOverlayService
 
                 DessinerLeConseil(g, l, famille, secours, t);
                 DessinerLesEtapes(g, l, secours, t);
-                if (l.AttenteLongue && l.DepartUtc is null)
+                if ((l.AttenteLongue || l.SortiePossible) && l.DepartUtc is null)
                 {
                     DessinerLesBoutonsDuLancement(g, l, famille, secours, k);
                 }
@@ -984,17 +985,20 @@ public sealed partial class LeaderboardOverlayService
 
         /// <summary>
         /// L'ATTENTE TROP LONGUE : l'anneau tourne depuis trop longtemps, on propose de reessayer ou de quitter, avec les
-        /// pictogrammes d'ES comme les boutons de l'ecran de fin (demande du user du 28/10).
+        /// pictogrammes d'ES comme les boutons de l'ecran de fin (demande du user du 28/10). QUITTER se voit aussi tout le
+        /// lancement, seul (31/10).
         /// </summary>
         private void DessinerLesBoutonsDuLancement(Graphics g, EcranDeLancement l, FontFamily famille, Font secours, float k)
         {
             using var petit = TraitsDesEcrans.Libelles(16, secours);
             const float haut = 760;
-            var boutons = new List<(string Glyphe, string Mot, string Dessus, bool Plein)>
+            var boutons = new List<(string Glyphe, string Mot, string Dessus, bool Plein)>();
+            if (l.AttenteLongue)
             {
-                (l.GlypheReessayer, l.Reessayer.ToUpperInvariant(), string.Empty, true),
-                (l.GlypheQuitter, l.Quitter.ToUpperInvariant(), l.Maintenir.ToUpperInvariant(), false),
-            };
+                boutons.Add((l.GlypheReessayer, l.Reessayer.ToUpperInvariant(), string.Empty, true));
+            }
+
+            boutons.Add((l.GlypheQuitter, l.Quitter.ToUpperInvariant(), l.Maintenir.ToUpperInvariant(), false));
             var largeurs = boutons.Select(b => Math.Max(TraitsDesEcrans.BoiteDuTexte(b.Mot, famille, 36).Width, TraitsDesEcrans.LargeurEspacee(g, b.Dessus, petit, 2.5f)) + 14 + 46 + 16 + 34).ToList();
             var x = 960 - (largeurs.Sum() + 22) / 2;
             for (var i = 0; i < boutons.Count; i++)

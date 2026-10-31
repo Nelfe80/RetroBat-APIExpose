@@ -99,15 +99,26 @@ public sealed class MultiplayerSessionService : BackgroundService
 
     private bool Active => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: true };
 
+    /// <summary>Ce que la borne se donne pour dire son depart a la plateforme, l'arret de l'API n'attend pas plus.</summary>
+    private static readonly TimeSpan DelaiDuDepart = TimeSpan.FromSeconds(3);
+
+    /// <summary>La borne attend ou joue dans cette gameroom (pas une gameroom finie, gardee pour son resultat).</summary>
+    private static bool Engagee(MultiplayerRoom room) => room.State is "waiting" or "countdown" or "launching" or "playing";
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
         {
+            var aVide = false;
             while (!stoppingToken.IsCancellationRequested)
             {
                 if (Active)
                 {
-                    await SonderAsync(stoppingToken).ConfigureAwait(false);
+                    aVide = aVide || await RepartirAVideAsync(stoppingToken).ConfigureAwait(false);
+                    if (aVide)
+                    {
+                        await SonderAsync(stoppingToken).ConfigureAwait(false);
+                    }
                 }
 
                 var attente = Active && Etat.Occupe ? PeriodeActive
@@ -132,6 +143,63 @@ public sealed class MultiplayerSessionService : BackgroundService
         catch (OperationCanceledException)
         {
         }
+    }
+
+    /// <summary>
+    /// L'API S'ARRETE (31/10/2026) : fermer RetroBat ne disait rien a la plateforme, qui gardait le joueur dans sa gameroom
+    /// et lui lancait une partie. La borne quitte ses gamerooms en partant, sauf si un jeu tourne : il
+    /// continue sans elle.
+    /// </summary>
+    public override async Task StopAsync(CancellationToken cancellationToken)
+    {
+        await QuitterEnPartantAsync().ConfigureAwait(false);
+        await base.StopAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task QuitterEnPartantAsync()
+    {
+        var rooms = Etat.Rooms.Where(Engagee).ToList();
+        if (rooms.Count == 0 || RetroBat.Api.Infrastructure.EmulatorForeground.EmulateurDeJeuTourne())
+        {
+            return;
+        }
+
+        using var limite = new CancellationTokenSource(DelaiDuDepart);
+        foreach (var room in rooms)
+        {
+            await _client.QuitterAsync(room.Room, limite.Token, "shutdown").ConfigureAwait(false);
+            _journal?.LogInformation("MULTIPLAYER : gameroom {Room} quittee, l'API s'arrete", room.Room);
+        }
+    }
+
+    /// <summary>
+    /// L'API DEMARRE (31/10/2026) : une gameroom d'une session passee, c'est une partie que personne n'a demandee
+    /// ici. Elle se lancait une seconde apres le demarrage, sur un ES a peine ouvert, sans sortie. Avant son premier etat,
+    /// la borne quitte ce qui reste, sauf si un jeu tourne deja. Faux tant que la plateforme n'a pas repondu : on
+    /// recommence au tour suivant, et rien ne se lance d'ici la.
+    /// </summary>
+    internal async Task<bool> RepartirAVideAsync(CancellationToken ct)
+    {
+        var reponse = await _client.SonderAsync(false, PanneauOuvert, _relais?.MeilleurTempsMs, ct, DansLaCollection?.Invoke() == true,
+            EnPartie?.Invoke()).ConfigureAwait(false);
+        if (reponse is null || !reponse.Ok)
+        {
+            Poser(Etat with { Erreur = reponse?.Reason ?? "offline" });
+            return false;
+        }
+
+        if (RetroBat.Api.Infrastructure.EmulatorForeground.EmulateurDeJeuTourne())
+        {
+            return true;
+        }
+
+        foreach (var room in reponse.Rooms.Where(Engagee))
+        {
+            await _client.QuitterAsync(room.Room, ct, "restart").ConfigureAwait(false);
+            _journal?.LogInformation("MULTIPLAYER : gameroom {Room} d'une session passee quittee au demarrage", room.Room);
+        }
+
+        return true;
     }
 
     /// <summary>

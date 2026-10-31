@@ -65,6 +65,52 @@ public class MultiplayerSessionServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task Au_demarrage_la_borne_quitte_la_gameroom_d_une_session_passee()
+    {
+        // 31/10, un player : relance dans une partie une seconde apres le demarrage, sans l'avoir demandee.
+        var (session, plateforme, _) = await MonterAsync(new Plateforme(avecSession: true));
+
+        Assert.True(await session.RepartirAVideAsync(CancellationToken.None));
+
+        var depart = plateforme.Corps("leave");
+        Assert.Equal("r1", depart.GetProperty("room").GetString());
+        Assert.Equal("restart", depart.GetProperty("reason").GetString());
+    }
+
+    [Fact]
+    public async Task Sans_reponse_de_la_plateforme_la_borne_ne_quitte_rien_et_recommencera()
+    {
+        var (session, plateforme, _) = await MonterAsync(new Plateforme(enPanne: true));
+
+        Assert.False(await session.RepartirAVideAsync(CancellationToken.None));
+        Assert.Empty(plateforme.Tous("leave"));
+    }
+
+    [Fact]
+    public async Task L_API_qui_s_arrete_quitte_ses_gamerooms()
+    {
+        // 31/10, un player : RetroBat ferme, sa gameroom le gardait et la partie l'attendait au redemarrage.
+        var (session, plateforme, jeu) = await MonterAsync();
+        Assert.Null(await session.RejoindreAsync(jeu));
+
+        await session.QuitterEnPartantAsync();
+
+        var depart = plateforme.Corps("leave");
+        Assert.Equal("r1", depart.GetProperty("room").GetString());
+        Assert.Equal("shutdown", depart.GetProperty("reason").GetString());
+    }
+
+    [Fact]
+    public async Task Sans_gameroom_l_API_ne_dit_rien_en_partant()
+    {
+        var (session, plateforme, _) = await MonterAsync();
+
+        await session.QuitterEnPartantAsync();
+
+        Assert.Empty(plateforme.Tous("leave"));
+    }
+
+    [Fact]
     public async Task L_appui_long_envoie_le_jeu_et_le_set_de_la_collection()
     {
         var (session, plateforme, jeu) = await MonterAsync();

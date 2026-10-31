@@ -70,6 +70,7 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// <summary>Le depart pret au ralenti jusqu'a l'arrivee des invites, puis garde a vitesse normale jusqu'a la fin (27/10).</summary>
     private readonly MultiplayerAttenteDesInvites _attente;
     private CancellationTokenSource? _gardeDeVitesse;
+    private CancellationTokenSource? _annonceDuDepart;
     private CancellationTokenSource? _boucleDuDepart;
     private CancellationTokenSource? _suiviDesInvites;
 
@@ -274,6 +275,8 @@ public sealed class MultiplayerLaunchService : IHostedService
                 _gardeDeVitesse = null;
                 _boucleDuDepart?.Cancel();
                 _boucleDuDepart = null;
+                _annonceDuDepart?.Cancel();
+                _annonceDuDepart = null;
                 _suiviDesInvites?.Cancel();
                 _suiviDesInvites = null;
                 _relaisDeLaManette?.Cancel();
@@ -419,6 +422,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             if (reponse?.Ok == true)
             {
                 _ = Task.Run(() => FermerQuandLesInvitesSontPartisAsync(room, liens));
+                _ = Task.Run(() => AnnoncerLeVraiDepartAsync(room, liens));
             }
 
             // Une rencontre classee (fin lue + type versus, 23/10), quel que soit le niveau : l'hote guette sa fin. Une fin a
@@ -431,6 +435,42 @@ public sealed class MultiplayerLaunchService : IHostedService
         catch (Exception ex)
         {
             _journal.LogWarning(ex, "MULTIPLAYER : publication de la session de {Room} interrompue", room.Room);
+        }
+    }
+
+    /// <summary>
+    /// LE VRAI DEPART (31/10/2026) : tous les invites sont a leur place, la rencontre commence. La plateforme le note : partir
+    /// avant, ou juste apres, n'est pas un abandon. Sans cette annonce (un invite jamais arrive), elle compte a partir du
+    /// lancement.
+    /// </summary>
+    private async Task AnnoncerLeVraiDepartAsync(MultiplayerRoom room, Func<int?> liens)
+    {
+        CancellationToken jeton;
+        lock (_verrou)
+        {
+            _annonceDuDepart?.Cancel();
+            _annonceDuDepart = new CancellationTokenSource();
+            jeton = _annonceDuDepart.Token;
+        }
+
+        try
+        {
+            var attendus = Math.Max(1, room.Players.Count(joueur => joueur.Seat is not null) - 1);
+            var vus = await _attente.AttendreLesInvitesAsync(MultiplayerAttenteDesInvites.CheminDuJournal, attendus, PatienceDesInvites, liens, jeton)
+                .ConfigureAwait(false);
+            if (vus >= attendus)
+            {
+                await _client.CommenceeAsync(room.Room, jeton).ConfigureAwait(false);
+                _journal.LogInformation("MULTIPLAYER : les {Attendus} invite(s) de {Room} sont a leur place, la rencontre commence", attendus, room.Room);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // La partie est finie avant l'arrivee des invites.
+        }
+        catch (Exception ex)
+        {
+            _journal.LogWarning(ex, "MULTIPLAYER : vrai depart de {Room} non annonce", room.Room);
         }
     }
 

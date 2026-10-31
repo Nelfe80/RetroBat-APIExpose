@@ -14,7 +14,7 @@ namespace RetroBat.Api.Multiplayer;
 /// dessous), et le depart se donne quand le premier invite arrive ; chez un invite, il reste 3 s, le temps de sa connexion ;
 /// sans boucle, il s'efface a l'arrivee du jeu, comme avant (il ne cacherait que du jeu) ;</item>
 /// <item>« A VOUS DE JOUER ! » 1,3 s, puis l'ecran s'efface en 0,35 s ;</item>
-/// <item>au-dela d'une minute d'attente, REESSAYER (A) relance l'attente et QUITTER (B maintenu) ferme la partie.</item>
+/// <item>QUITTER (B maintenu) ferme la partie jusqu'au depart ; au-dela d'une minute d'attente, REESSAYER (A) relance l'attente.</item>
 /// </list>
 /// </summary>
 public sealed partial class MultiplayerPanelService
@@ -221,6 +221,12 @@ public sealed partial class MultiplayerPanelService
         => _mode == Mode.Presentation && _tenirLeLancement && _jeuArrive && _departDuLancement is null
             && DateTime.UtcNow - _attenteRelanceeA >= AttenteTropLongue && _etatsAuLancement.Values.Any(e => e.Etat != Etat.Pret);
 
+    /// <summary>
+    /// QUITTER DES LE LANCEMENT (31/10/2026, un player : 22 s devant cet ecran sans sortie, QUITTER n'arrivait qu'a 60 s, il a
+    /// fini a l'Alt+F4) : tant que le depart n'est pas donne, B maintenu ferme la partie. La plateforme n'y voit pas d'abandon.
+    /// </summary>
+    private bool SortiePossible() => _mode == Mode.Presentation && _roomDuLancement is not null && _departDuLancement is null;
+
     /// <summary>A relache pendant l'attente trop longue : on attend encore une minute.</summary>
     private bool ReessayerLeLancement()
     {
@@ -239,22 +245,39 @@ public sealed partial class MultiplayerPanelService
         return true;
     }
 
-    /// <summary>B maintenu pendant l'attente trop longue : la partie se ferme, la suite (resultat, salle) suit son cours.</summary>
+    /// <summary>B maintenu avant le depart : la partie se ferme, la suite (resultat, salle) suit son cours.</summary>
     private bool QuitterLeLancement()
     {
+        string room;
         lock (_verrou)
         {
-            if (!AttenteLongueAffichee())
+            if (!SortiePossible())
             {
                 return false;
             }
+
+            room = _roomDuLancement!.Room;
         }
 
-        _journal.LogInformation("MULTIPLAYER : attente trop longue, le joueur quitte la partie");
+        _journal.LogInformation("MULTIPLAYER : le joueur quitte le lancement de {Room}", room);
         OublierLeLancement();
         FermerPourLeJeu();
-        _ = RetroBat.Api.Netplay.RetroArchInvite.FermerAsync();
+        _ = Task.Run(() => FermerLeJeuDuLancementAsync(room));
         return true;
+    }
+
+    /// <summary>Le jeu n'est peut-etre pas encore la : RetroArch n'entendrait pas une commande envoyee une seule fois.</summary>
+    private async Task FermerLeJeuDuLancementAsync(string room)
+    {
+        for (var essai = 0; essai < 40; essai++)
+        {
+            await RetroBat.Api.Netplay.RetroArchInvite.FermerAsync().ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromMilliseconds(500)).ConfigureAwait(false);
+            if (_session.LancementEnCours != room && !RetroBat.Api.Infrastructure.EmulatorForeground.EmulateurDeJeuTourne())
+            {
+                return;
+            }
+        }
     }
 
     private void MontrerLeLancement()
@@ -314,12 +337,14 @@ public sealed partial class MultiplayerPanelService
         Dictionary<int, (Etat Etat, DateTime Depuis)> etats;
         DateTime? depart;
         bool longue;
+        bool sortie;
         lock (_verrou)
         {
             room = _roomDuLancement;
             etats = new Dictionary<int, (Etat, DateTime)>(_etatsAuLancement);
             depart = _departDuLancement;
             longue = AttenteLongueAffichee();
+            sortie = SortiePossible();
         }
 
         var jeu = _jeu?.Game;
@@ -415,6 +440,7 @@ public sealed partial class MultiplayerPanelService
             T("multiplayer.end.hold"),
             _glypheValider,
             _glypheAnnuler,
-            jeu.Ecran?.Police is { Length: > 0 } police ? police : null);
+            jeu.Ecran?.Police is { Length: > 0 } police ? police : null,
+            sortie);
     }
 }

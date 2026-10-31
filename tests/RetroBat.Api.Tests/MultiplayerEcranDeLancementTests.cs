@@ -157,6 +157,10 @@ public class MultiplayerEcranDeLancementTests
         {
             Lancement = combat with { Cle = "l-6", AttenteLongue = true, Joueurs = [combat.Joueurs[0], combat.Joueurs[1] with { Etat = E.EnRoute, TexteDeLEtat = "EN ROUTE DEPUIS 1 MIN" }] },
         }, "", "", "", null!, 2));
+        Ecrire("lancement-quitter.png", L.ApercuMultiplayer(style, socle with
+        {
+            Lancement = combat with { Cle = "l-8", SortiePossible = true },
+        }, "", "", "", null!, 2));
         Ecrire("lancement-depart.png", L.ApercuMultiplayer(style, socle with
         {
             Lancement = combat with { Cle = "l-7", Etape = 2, Legende = "Tout le monde est prêt", DepartUtc = DateTime.UtcNow,
