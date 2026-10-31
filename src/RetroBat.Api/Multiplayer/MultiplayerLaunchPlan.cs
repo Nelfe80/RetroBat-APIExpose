@@ -77,12 +77,20 @@ public static class MultiplayerLaunchPlan
     public static IReadOnlyDictionary<string, string>? Remappage(MultiplayerGame jeu, int place, int joueurs, bool deuxSticksArcade)
     {
         var propres = jeu.SeatRemap?.Where(r => r.Seat == place).SelectMany(r => r.Keys).ToList() ?? [];
-        if (!jeu.TwinStick && propres.Count == 0)
+        var appareils = jeu.Device ?? [];
+        if (!jeu.TwinStick && propres.Count == 0 && appareils.Count == 0)
         {
             return null;
         }
 
         var cles = new SortedDictionary<string, string>(StringComparer.Ordinal);
+        // Le type de manette d'un port (D1, multitap) : sur toutes les bornes, ce que le .rmp de la console masquerait.
+        foreach (var appareil in appareils)
+        {
+            cles["input_libretro_device_p" + appareil.Port.ToString(System.Globalization.CultureInfo.InvariantCulture)] =
+                appareil.Id.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+
         if (jeu.TwinStick)
         {
             for (var port = 1; port <= Math.Max(2, joueurs); port++)

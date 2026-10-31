@@ -272,6 +272,29 @@ public class MultiplayerLaunchPlanTests : IDisposable
     }
 
     [Fact]
+    public void Le_type_de_manette_d_un_port_va_dans_le_remappage_du_jeu()
+    {
+        // CDC Demandes v1.2, D1 (31/10) : le multitap de Yu Yu Hakusho, 1537 sur le port 2, pour chaque borne.
+        var jeu = new MultiplayerGame
+        {
+            Id = "megadrive/yu-yu-hakusho-makyou-toitsusen", System = "megadrive", Players = 4,
+            Content = new MultiplayerContent { Md5 = [new string('a', 32)] }, Device = [new() { Port = 2, Id = 1537 }],
+        };
+        foreach (var place in new[] { 1, 3 })
+        {
+            Assert.Equal(new Dictionary<string, string> { ["input_libretro_device_p2"] = "1537" },
+                MultiplayerLaunchPlan.Remappage(jeu, place, 4, deuxSticksArcade: false));
+        }
+
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeJeu(jeu));
+        Assert.NotNull(MultiplayerCatalogueStore.ValiderLeJeu(jeu with { Device = [new() { Port = 9, Id = 1537 }] }));
+        Assert.NotNull(MultiplayerCatalogueStore.ValiderLeJeu(jeu with { Device = [new() { Port = 2, Id = 1 }, new() { Port = 2, Id = 257 }] }));
+        // Le catalogue le lit tel que le lot D l'ecrit.
+        var lu = System.Text.Json.JsonSerializer.Deserialize<MultiplayerGame>("{\"id\":\"snes/sugoi-hebereke\",\"device\":[{\"port\":3,\"id\":257}]}")!;
+        Assert.Equal(257, lu.Device![0].Id);
+    }
+
+    [Fact]
     public void Deux_vrais_sticks_arcade_font_les_deux_bras_d_un_seul_boxeur()
     {
         var cles = MultiplayerLaunchPlan.Remappage(TitleFight, 1, 2, deuxSticksArcade: true)!;
