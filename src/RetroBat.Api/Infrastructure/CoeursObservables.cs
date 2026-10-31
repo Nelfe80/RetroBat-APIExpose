@@ -64,13 +64,19 @@ public static class CoeursObservables
 
     /// <summary>
     /// NOTRE COEUR FONCTIONNEL pour un systeme, celui que World Scoring impose quel que soit le choix
-    /// de confort du joueur : FBNeo s'il est declare (le replay et la mesure y sont les plus surs),
-    /// sinon MAME recent, sinon, hors arcade, le premier coeur libretro. Null : rien a imposer.
+    /// de confort du joueur. Un systeme de console : son propre coeur (<see cref="CoeurDeConsole"/>).
+    /// Un systeme d'arcade : FBNeo s'il est declare (le replay et la mesure y sont les plus surs),
+    /// sinon MAME recent, sinon le premier coeur libretro hors arcade. Null : rien a imposer.
     /// </summary>
     public static (string Emulator, string Core)? MeilleurLancement(IReadOnlyList<EmulationStationSystemEmulatorCore> coeursDuSysteme)
     {
         static bool Libretro(EmulationStationSystemEmulatorCore entree) =>
             entree.Emulator.Equals("libretro", StringComparison.OrdinalIgnoreCase);
+
+        if (CoeurDeConsole(coeursDuSysteme) is { } propre)
+        {
+            return ("libretro", propre);
+        }
 
         foreach (var voulu in new[] { "fbneo", "mame" })
         {
@@ -83,6 +89,19 @@ public static class CoeursObservables
         var autre = coeursDuSysteme.FirstOrDefault(entree =>
             Libretro(entree) && entree.Core.Length > 0 && !EstCoeurArcade(entree.Core));
         return autre is null ? null : ("libretro", autre.Core);
+    }
+
+    /// <summary>
+    /// LE COEUR PROPRE D'UN SYSTEME DE CONSOLE (31/10/2026) : son premier coeur libretro, quand ce n'est pas un coeur
+    /// d'arcade. RetroBat declare FBNeo ou MAME en secours sur des dizaines de systemes (Mega Drive, Master System, Game
+    /// Gear, PC Engine, MSX...), ou ils ne lisent que leurs propres sets : Sonic sous FBNeo s'arrete sur « Romset is
+    /// unknown ». Leur capacite ne vaut donc que sur un systeme d'arcade. Null : un systeme d'arcade (ou sans libretro).
+    /// </summary>
+    public static string? CoeurDeConsole(IReadOnlyList<EmulationStationSystemEmulatorCore> coeursDuSysteme)
+    {
+        var premier = coeursDuSysteme.FirstOrDefault(entree =>
+            entree.Emulator.Equals("libretro", StringComparison.OrdinalIgnoreCase) && entree.Core.Length > 0);
+        return premier is null || EstCoeurArcade(premier.Core) ? null : premier.Core;
     }
 
     /// <summary>
@@ -113,7 +132,7 @@ public static class CoeursObservables
 
     private static bool EstCoeurMame(string coeur) => coeur.StartsWith("mame", StringComparison.OrdinalIgnoreCase);
 
-    private static bool EstCoeurArcade(string coeur) =>
+    public static bool EstCoeurArcade(string coeur) =>
         EstCoeurMame(coeur) ||
         coeur.StartsWith("fbneo", StringComparison.OrdinalIgnoreCase) ||
         coeur.StartsWith("fbalpha", StringComparison.OrdinalIgnoreCase) ||

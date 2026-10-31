@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using RetroBat.Api.Infrastructure;
 using Xunit;
 using static RetroBat.Api.Infrastructure.WorldScoringLancementService;
@@ -53,6 +54,58 @@ public class WorldScoringLancementTests
         }));
         Assert.Equal(("libretro", "genesis_plus_gx"),
             AImposer(new EmulationStationLaunchConfig("megadrive", "kega-fusion", "auto"), coeurChoisi: true, Megadrive));
+    }
+
+    private static List<EmulationStationSystemEmulatorCore> Libretro(string systeme, params string[] coeurs)
+        => coeurs.Select(coeur => new EmulationStationSystemEmulatorCore(systeme, "libretro", coeur)).ToList();
+
+    [Fact]
+    public void Un_jeu_de_console_garde_le_coeur_de_sa_console()
+    {
+        // 31/10 : les listes d'es_systems.cfg, ou FBNeo et MAME sont des secours qui ne lisent pas les ROM de la console.
+        var megadrive = Libretro("megadrive", "genesis_plus_gx", "genesis_plus_gx_wide", "picodrive", "fbneo");
+        var pcengine = Libretro("pcengine", "mednafen_pce", "mednafen_pce_fast", "fbneo");
+        var odyssey2 = Libretro("odyssey2", "o2em", "mame");
+        Assert.Equal(("libretro", "genesis_plus_gx"), CoeursObservables.MeilleurLancement(megadrive));
+        Assert.Equal(("libretro", "mednafen_pce"), CoeursObservables.MeilleurLancement(pcengine));
+        Assert.Equal(("libretro", "o2em"), CoeursObservables.MeilleurLancement(odyssey2));
+        Assert.Null(AImposer(new EmulationStationLaunchConfig("megadrive", "libretro", "genesis_plus_gx"), coeurChoisi: false, megadrive));
+        // Le choix du joueur qui mesure reste le sien.
+        Assert.Null(AImposer(new EmulationStationLaunchConfig("megadrive", "libretro", "picodrive"), coeurChoisi: true, megadrive));
+        Assert.Null(AImposer(new EmulationStationLaunchConfig("odyssey2", "libretro", "o2em"), coeurChoisi: true, odyssey2));
+    }
+
+    [Fact]
+    public void Une_fiche_collee_sous_FBNeo_retrouve_le_coeur_de_sa_console()
+    {
+        var megadrive = Libretro("megadrive", "genesis_plus_gx", "genesis_plus_gx_wide", "picodrive", "fbneo");
+        Assert.Equal(("libretro", "genesis_plus_gx"),
+            AImposer(new EmulationStationLaunchConfig("megadrive", "libretro", "fbneo"), coeurChoisi: true, megadrive));
+    }
+
+    [Fact]
+    public void L_arcade_garde_son_ordre_FBNeo_devant_MAME()
+    {
+        var cave = Libretro("cave", "fbneo", "fbalpha", "fbalpha2012", "mame", "mame2016", "mame2014");
+        Assert.Null(CoeursObservables.CoeurDeConsole(cave));
+        Assert.Null(CoeursObservables.CoeurDeConsole(Mame));
+        Assert.Equal(("libretro", "fbneo"), AImposer(new EmulationStationLaunchConfig("cave", "libretro", "mame"), coeurChoisi: true, cave));
+    }
+
+    [Fact]
+    public void Un_coeur_d_arcade_colle_sur_une_console_ne_se_rend_jamais()
+    {
+        // La fiche en automatique, collee sous FBNeo : le coeur de la console reste en sortant.
+        var colle = ConfortARendre(null, "libretro", "fbneo", ("libretro", "genesis_plus_gx"));
+        Assert.Equal(Remise.GarderLeNotre, QueRendre(colle, "libretro", "genesis_plus_gx"));
+        // Le choix du joueur mis de cote avant la 1.9.94 revient, face au coeur imposé maintenant.
+        var mis = new Confort("libretro", "picodrive", "libretro", "fbneo");
+        var repris = ConfortARendre(mis, "libretro", "fbneo", ("libretro", "genesis_plus_gx"));
+        Assert.Equal(new Confort("libretro", "picodrive", "libretro", "genesis_plus_gx"), repris);
+        Assert.Equal(Remise.RemettreConfort, QueRendre(repris, "libretro", "genesis_plus_gx"));
+        // En arcade, rien ne change : le choix du joueur revient.
+        Assert.Equal(new Confort("libretro", "mame2003_plus", "libretro", "mame"),
+            ConfortARendre(null, "libretro", "mame2003_plus", ("libretro", "mame")));
     }
 
     [Fact]

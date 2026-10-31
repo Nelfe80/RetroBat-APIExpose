@@ -71,7 +71,11 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
         _abonnement = _bus.Subscribe<EventEnvelope>(OnEvenement);
         // Un choix reste a rendre si l'API s'est arretee pendant qu'on etait dans World Scoring.
         // ES n'est peut-etre pas encore la : on reessaie quelques minutes.
-        _ = Task.Run(() => RendreAuDemarrageAsync(_arret.Token));
+        _ = Task.Run(async () =>
+        {
+            await RendreAuDemarrageAsync(_arret.Token).ConfigureAwait(false);
+            await ReparerAuDemarrageAsync(_arret.Token).ConfigureAwait(false);
+        });
         return Task.CompletedTask;
     }
 
@@ -95,6 +99,8 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
     /// quand il mesure deja ou que son systeme ne declare rien qui mesure. LE COEUR QUI FAIT LE PLUS
     /// (decision du user du 25 octobre 2026, pas de replay pour les records sous MAME) : un lancement
     /// qui mesure cede aussi la place a un coeur du systeme qui en permet plus, FBNeo devant MAME.
+    /// Sur un systeme de console, rien ne monte : seul un coeur d'arcade laisse sa place au coeur de la
+    /// console, FBNeo ne lisant pas ses ROM.
     /// </summary>
     internal static (string Emulator, string Core)? AImposer(
         EmulationStationLaunchConfig lancement,
@@ -105,6 +111,11 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
         if (!CoeursObservables.Juger(lancement, coeurChoisi, coeursDuSysteme).Observable)
         {
             return meilleur;
+        }
+
+        if (CoeursObservables.CoeurDeConsole(coeursDuSysteme) is { } propre)
+        {
+            return CoeursObservables.EstCoeurArcade(lancement.Core ?? string.Empty) ? ("libretro", propre) : null;
         }
 
         return meilleur is { } m && CoeursObservables.Capacite(m.Emulator, m.Core)
@@ -180,6 +191,21 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
         }
         return sets;
     });
+
+    /// <summary>
+    /// Ce que la sortie de World Scoring rendra : le choix deja mis de cote s'il y en a un, sinon la fiche actuelle, toujours
+    /// face au coeur qu'on impose maintenant. Un coeur d'arcade remplace par celui de la console ne se rend jamais : il y
+    /// a ete colle par la 1.9.94 et il ne lance pas le jeu. Pur.
+    /// </summary>
+    internal static Confort ConfortARendre(Confort? deja, string emulateur, string coeur, (string Emulator, string Core) voulu)
+    {
+        var confort = deja is null
+            ? new Confort(emulateur, coeur, voulu.Emulator, voulu.Core)
+            : deja with { ImposeEmulator = voulu.Emulator, ImposeCore = voulu.Core };
+        return !CoeursObservables.EstCoeurArcade(voulu.Core) && CoeursObservables.EstCoeurArcade(confort.Core)
+            ? confort with { Emulator = string.Empty, Core = string.Empty }
+            : confort;
+    }
 
     /// <summary>Que faire d'un choix mis de cote, au vu de la fiche actuelle dans ES ?</summary>
     internal static Remise QueRendre(Confort confort, string emulatorActuel, string coreActuel)
@@ -307,9 +333,7 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
                         continue;
                     }
 
-                    var confort = etat.TryGetValue(cle, out var deja)
-                        ? deja
-                        : new Confort(actuel.Emulator ?? string.Empty, actuel.Core ?? string.Empty, voulu.Emulator, voulu.Core);
+                    var confort = ConfortARendre(etat.GetValueOrDefault(cle), actuel.Emulator ?? string.Empty, actuel.Core ?? string.Empty, voulu);
                     // Un jeu en automatique sous FBNeo : en sortant, il retrouve le coeur MAME qu'il aurait eu (ES ne sait
                     // pas vider le champ, FBNeo resterait hors de World Scoring).
                     if (confort.Emulator.Length == 0 && confort.Core.Length == 0
@@ -339,6 +363,68 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
                 _logger?.LogInformation("World Scoring : coeur fonctionnel impose pour {Nombre} jeu(x) : {Detail}",
                     imposes.Count, string.Join(", ", imposes));
             }
+        }
+        finally
+        {
+            _porte.Release();
+        }
+    }
+
+    /// <summary>
+    /// LES FICHES COLLEES SOUS UN COEUR D'ARCADE (31/10/2026). De la 1.9.94 a la 1.9.132, World Scoring imposait FBNeo aux
+    /// jeux de console dont le systeme le declare, et un jeu parti en automatique le gardait en sortant : Sonic echoue aussi
+    /// dans la liste du systeme, ou aucune entree dans la collection ne le repare. Une passe au demarrage leur rend le coeur
+    /// de leur console. Elle ne touche que ces fiches. Faux : ES n'a pas repondu pour un systeme.
+    /// </summary>
+    private async Task<bool> ReparerAsync(CancellationToken cancellationToken)
+    {
+        await _porte.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var collection = Path.Combine(RetroBatPaths.EmulationStationConfigRoot, "collections",
+                "custom-" + NelfePlayScoringCollectionSyncService.CollectionName + ".cfg");
+            var jeux = CertifiedSettingsService.JeuxDeLaCollection(collection, RetroBatPaths.RomsRoot,
+                Path.GetDirectoryName(RetroBatPaths.EmulationStationConfigRoot) ?? RetroBatPaths.EmulationStationConfigRoot);
+            var repares = new List<string>();
+            var toutFait = true;
+            foreach (var groupe in jeux.GroupBy(jeu => jeu.Systeme, StringComparer.OrdinalIgnoreCase))
+            {
+                if (CoeursObservables.CoeurDeConsole(_systemes.GetEmulatorCores(groupe.Key)) is not { } propre)
+                {
+                    continue;
+                }
+
+                var fiches = await LireFichesAsync(groupe.Key, cancellationToken).ConfigureAwait(false);
+                if (fiches == null)
+                {
+                    toutFait = false;
+                    continue;
+                }
+
+                var colles = groupe.Where(jeu => fiches.TryGetValue(jeu.Fichier, out var fiche)
+                    && CoeursObservables.EstCoeurArcade(fiche.Core ?? string.Empty)).Select(jeu => jeu.Fichier).ToList();
+                if (colles.Count == 0)
+                {
+                    continue;
+                }
+
+                if (await EnvoyerAsync(groupe.Key, colles.Select(fichier => Fragment(fichier, "libretro", propre)).ToList(), cancellationToken).ConfigureAwait(false))
+                {
+                    repares.AddRange(colles.Select(fichier => $"{groupe.Key}/{fichier} → {propre}"));
+                }
+                else
+                {
+                    toutFait = false;
+                }
+            }
+
+            if (repares.Count > 0)
+            {
+                _logger?.LogInformation("World Scoring : fiche collee sous un coeur d'arcade reparee pour {Nombre} jeu(x) : {Detail}",
+                    repares.Count, string.Join(", ", repares));
+            }
+
+            return toutFait;
         }
         finally
         {
@@ -523,6 +609,28 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
         catch (Exception ex)
         {
             _logger?.LogWarning(ex, "World Scoring : choix de confort non rendus au demarrage.");
+        }
+    }
+
+    private async Task ReparerAuDemarrageAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            for (var essai = 0; essai < 10; essai++)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(essai == 0 ? 20 : 30), cancellationToken).ConfigureAwait(false);
+                if (await ReparerAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    return;
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "World Scoring : fiches non reparees au demarrage.");
         }
     }
 
