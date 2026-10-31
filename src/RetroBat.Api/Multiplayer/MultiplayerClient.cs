@@ -353,9 +353,23 @@ public sealed record MultiplayerJoueur
     [JsonPropertyName("rating")]
     public MultiplayerCote? Rating { get; init; }
 
+    /// <summary>Une coop qui concourt (31/10/2026) : son meilleur score publie au 1CC MULTI et sa place. Null sans score.</summary>
+    [JsonPropertyName("onecc_multi")]
+    public MultiplayerUnCreditMulti? UnCreditMulti { get; init; }
+
     /// <summary>Il regle la gameroom d'amis (28/10).</summary>
     [JsonPropertyName("owner")]
     public bool Owner { get; init; }
+}
+
+/// <summary>Le meilleur 1CC MULTI d'un joueur sur le jeu de la gameroom, et sa place au classement (tous mondes).</summary>
+public sealed record MultiplayerUnCreditMulti
+{
+    [JsonPropertyName("score")]
+    public long Score { get; init; }
+
+    [JsonPropertyName("rank")]
+    public int Rank { get; init; }
 }
 
 public sealed record MultiplayerCote

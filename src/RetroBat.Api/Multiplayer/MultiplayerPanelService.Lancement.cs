@@ -361,8 +361,11 @@ public sealed partial class MultiplayerPanelService
                 j.Country,
                 cote is null ? string.Empty : cote.Lettre,
                 cote is null ? string.Empty : Math.Round(cote.Value).ToString("#,0", milliers),
-                T("multiplayer.launch.wins"),
-                cote?.Wins is { } victoires ? victoires.ToString(CultureInfo.InvariantCulture) : string.Empty,
+                // Coop qui concourt (31/10) : le trophee porte son meilleur 1CC MULTI et sa place.
+                cote is null && j.UnCreditMulti is not null ? MultiplayerScoring.Etiquette : T("multiplayer.launch.wins"),
+                cote?.Wins is { } victoires ? victoires.ToString(CultureInfo.InvariantCulture)
+                    : j.UnCreditMulti is { } score ? MultiplayerScoring.ScoreEtRang(score)
+                    : string.Empty,
                 T("multiplayer.launch.streak"),
                 cote?.Streak is { } serie and > 0 ? (serie == 1 ? T("multiplayer.launch.streak_one") : Nombre("multiplayer.launch.streak_value", serie)) : string.Empty,
                 etat,

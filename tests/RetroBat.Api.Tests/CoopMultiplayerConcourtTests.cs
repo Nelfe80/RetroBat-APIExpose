@@ -70,6 +70,14 @@ public class CoopMultiplayerConcourtTests
     }
 
     [Fact]
+    public void Le_score_et_la_place_d_un_joueur_se_lisent_d_un_trait()
+    {
+        var joueur = JsonSerializer.Deserialize<MultiplayerJoueur>("{\"handle\":\"r\",\"onecc_multi\":{\"score\":120000,\"rank\":2}}")!;
+        Assert.Equal("120 000 · #2", MultiplayerScoring.ScoreEtRang(joueur.UnCreditMulti!));
+        Assert.Null(JsonSerializer.Deserialize<MultiplayerJoueur>("{\"handle\":\"s\",\"onecc_multi\":null}")!.UnCreditMulti);
+    }
+
+    [Fact]
     public void Le_catalogue_dit_la_coop_qui_concourt()
     {
         var jeu = JsonSerializer.Deserialize<MultiplayerGame>("{\"id\":\"arcade/ddragon\",\"family\":\"coop\",\"scoring\":{\"rom_group\":\"double-dragon\"}}")!;

@@ -39,6 +39,11 @@ public static class MultiplayerScoring
     /// <summary>Le nom du classement, jamais traduit, comme le sigle que la borne et le site affichent.</summary>
     public const string Etiquette = "1CC MULTI";
 
+    /// <summary>« 120 000 · #2 » : le meilleur score d'un joueur et sa place, milliers separes par une espace.</summary>
+    public static string ScoreEtRang(MultiplayerUnCreditMulti score)
+        => score.Score.ToString("#,0", new System.Globalization.NumberFormatInfo { NumberGroupSeparator = " ", NumberGroupSizes = [3] })
+           + " · #" + score.Rank.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
     public static void Poser(PartieMultiplayerCertifiee partie, DateTime maintenant)
     {
         lock (Verrou)

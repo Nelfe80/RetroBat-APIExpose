@@ -115,6 +115,18 @@ public class MultiplayerEcranDeLancementTests
         Ecrire("lancement-puzzle.png", L.ApercuMultiplayer(style, socle with { Lancement = puzzle }, "", "", "", null!, 2));
         Ecrire("lancement-course.png", L.ApercuMultiplayer(style, socle with { Lancement = course }, "", "", "", null!, 2));
         Ecrire("lancement-coop.png", L.ApercuMultiplayer(style, socle with { Lancement = coop }, "", "", "", null!, 2));
+        // Une coop qui concourt (31/10) : l'en-tete le dit, et le trophee porte le meilleur 1CC MULTI de chacun et sa place.
+        var coopQuiConcourt = coop with
+        {
+            Cle = "l-4b", Jeu = "Altered Beast", Entete = "PARTIE EN COOP · 1CC MULTI", SousTitre = "2 joueurs", Fanart = Fanart("arcade", "altbeast"),
+            Legende = "Tout le monde est prêt",
+            Joueurs =
+            [
+                Joueur(1, "NELFE", "", null, "FR", "", "", "120 000 · #2", "", E.Pret, "PRÊT !", 24, 4) with { LibelleVictoires = "1CC MULTI" },
+                Joueur(2, "AKIRA", "", null, "JP", "", "", "", "", E.Pret, "PRÊT !", 31, 3),
+            ],
+        };
+        Ecrire("lancement-coop-1cc-multi.png", L.ApercuMultiplayer(style, socle with { Lancement = coopQuiConcourt }, "", "", "", null!, 2));
         // Plusieurs personnages par place (option B du user, 30/10) : le premier en grand, les suivants en vignettes.
         var mvc = combat with
         {

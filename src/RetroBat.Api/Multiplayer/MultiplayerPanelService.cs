@@ -1991,7 +1991,10 @@ public sealed partial class MultiplayerPanelService
             RangCourant: joueur.You && _jeu is { Game: var jeuDuJoueur } && AuChoixDuPersonnage() is not null ? RangDuChoix(jeuDuJoueur) - 1 : -1,
             // Versus classe : la cote du joueur sur ce jeu, a la suite de son pseudo ; « provisoire » pendant ses 10
             // premieres rencontres et tant qu'il n'a pas rencontre 3 adversaires differents (RANK-03).
-            Cote: joueur.Rating is { } cote ? cote.Lettre + " · ELO " + Math.Round(cote.Value).ToString(CultureInfo.InvariantCulture) : string.Empty,
+            // Coop qui concourt (31/10) : son meilleur 1CC MULTI et sa place, a la place de la cote.
+            Cote: joueur.Rating is { } cote ? cote.Lettre + " · ELO " + Math.Round(cote.Value).ToString(CultureInfo.InvariantCulture)
+                : joueur.UnCreditMulti is { } score ? MultiplayerScoring.Etiquette + " " + MultiplayerScoring.ScoreEtRang(score)
+                : string.Empty,
             Provisoire: joueur.Rating is { Provisional: true } ? T("multiplayer.rating.provisional") : string.Empty);
 
     /// <summary>NIVEAU NELFEPLAY : le portrait du personnage de ce joueur.</summary>
