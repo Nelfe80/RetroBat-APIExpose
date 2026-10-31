@@ -41,7 +41,7 @@ public sealed record MultiplayerReleveDePlace(long? Valeur, long? Mort = null, l
 /// l'ordinateur compris, mais seuls les humains sont classes, entre eux : une victoire de l'ordinateur ne donne la victoire
 /// a personne. Dans un jeu en equipes, chaque camp prend le meilleur de ses membres, et chaque humain le rang de son camp.
 ///
-/// Une valeur n'est retenue qu'apres <see cref="MultiplayerRankingEnd.SettleMs"/> sans changer, et seulement sous la garde ;
+/// Une valeur n'est retenue qu'apres <see cref="MultiplayerRankingEnd.AttenteMs"/> sans changer, et seulement sous la garde ;
 /// rien ne finit avant d'avoir vu un depart (chaque humain en jeu, les compteurs sous le seuil, le signal de fin retombe) :
 /// la demo, ou l'ecran de fin de la rencontre d'avant, ne terminent rien.
 /// </summary>
@@ -249,7 +249,7 @@ public sealed class MultiplayerClassementEnCours
             var valeur = Tenue("v" + seat, null, ms) ?? (_dernieresValeurs.TryGetValue(seat, out var d) ? d : (long?)null);
             return valeur is { } v ? (0, departage.PlusBasDAbord ? v : -v) : (0, long.MaxValue);
         }, egales: (a, b) =>
-            a.Item1 == b.Item1 && (a.Item1 == 0 ? departage is null || a.Item2 == b.Item2 : Math.Abs(a.Item2 - b.Item2) <= _fin.SettleMs),
+            a.Item1 == b.Item1 && (a.Item1 == 0 ? departage is null || a.Item2 == b.Item2 : Math.Abs(a.Item2 - b.Item2) <= _fin.AttenteMs),
             // Un camp tombe avec son premier membre : il prend la cle de son pire membre (sa premiere chute).
             parLePire: auPremier);
     }
@@ -306,7 +306,7 @@ public sealed class MultiplayerClassementEnCours
             // Deux arrivees dans la meme fenetre partagent leur rang, comme deux chutes en survie ; un humain pas arrive au
             // signal passe derriere, a egalite avec les autres retardataires.
             return Classer(seat => _arrivees.TryGetValue(seat, out var t) ? (0, t) : (1, 0), egales: (a, b) =>
-                a.Item1 == b.Item1 && (a.Item1 == 1 || Math.Abs(a.Item2 - b.Item2) <= _fin.SettleMs));
+                a.Item1 == b.Item1 && (a.Item1 == 1 || Math.Abs(a.Item2 - b.Item2) <= _fin.AttenteMs));
         }
 
         return Classer(seat => _arrivees.TryGetValue(seat, out var p) ? (0, p) : (1, positions.GetValueOrDefault(seat) ?? long.MaxValue));
@@ -405,7 +405,7 @@ public sealed class MultiplayerClassementEnCours
     private static long? Lue(MultiplayerReleve releve, int place) => releve.Places.GetValueOrDefault(place)?.Valeur;
 
     /// <summary>
-    /// La valeur retenue sous cette cle : la lecture, si elle n'a pas change depuis <see cref="MultiplayerRankingEnd.SettleMs"/>.
+    /// La valeur retenue sous cette cle : la lecture, si elle n'a pas change depuis <see cref="MultiplayerRankingEnd.AttenteMs"/>.
     /// Une lecture manquee ne change rien au suivi.
     /// </summary>
     private long? Tenue(string cle, long? lue, long ms)
@@ -415,6 +415,6 @@ public sealed class MultiplayerClassementEnCours
             _suivis[cle] = (valeur, ms);
         }
 
-        return _suivis.TryGetValue(cle, out var tenu) && ms - tenu.Depuis >= _fin.SettleMs ? tenu.Valeur : null;
+        return _suivis.TryGetValue(cle, out var tenu) && ms - tenu.Depuis >= _fin.AttenteMs ? tenu.Valeur : null;
     }
 }

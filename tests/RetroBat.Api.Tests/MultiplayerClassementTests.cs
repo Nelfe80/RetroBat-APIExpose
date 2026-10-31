@@ -391,6 +391,32 @@ public class MultiplayerClassementTests
     }
 
     [Fact]
+    public void Une_attente_de_fin_au_dela_de_10_s_passe_par_un_champ_nouveau()
+    {
+        // CDC Demandes v1.2, D2 (31/10) : le vainqueur de Sugoi Hebereke se lit 11 s apres l'elimination.
+        var fin = new MultiplayerRankingEnd
+        {
+            Rule = MultiplayerRankingEnd.Survie, SettleMs = 10000, SettleExtraMs = 2000,
+            Seats = [new() { Seat = 1, Dead = new() { CoreRam = "0x20", Value = 0 } }, new() { Seat = 2, Dead = new() { CoreRam = "0x21", Value = 0 } }],
+        };
+        Assert.Equal(12000, fin.AttenteMs);
+        Assert.Null(MultiplayerCatalogueStore.ValiderLeClassement(new MultiplayerGame { Id = "a", System = "arcade", Players = 2, RankingEnd = fin }));
+        // Une chute ne se retient qu'apres 12 s de tenue : a 11 s, personne n'est encore elimine.
+        var avant = Rejouer(new MultiplayerClassementEnCours(fin, [1, 2]),
+            (R(null, null, (1, null, 1, null), (2, null, 1, null)), 2),
+            (R(null, null, (1, null, 1, null), (2, null, 0, null)), 11));
+        Assert.Null(avant);
+        Assert.NotNull(MultiplayerCatalogueStore.ValiderLeClassement(new MultiplayerGame
+            { Id = "a", System = "arcade", Players = 2, RankingEnd = fin with { SettleExtraMs = 25000 } }));
+        Assert.NotNull(MultiplayerCatalogueStore.ValiderLeClassement(new MultiplayerGame
+            { Id = "a", System = "arcade", Players = 2, RankingEnd = fin with { SettleExtraMs = -1 } }));
+        // Une version d'avant ne connait pas le champ : il se lit, et ne change rien quand il manque.
+        var lu = System.Text.Json.JsonSerializer.Deserialize<MultiplayerRankingEnd>("{\"rule\":\"survie\",\"settle_ms\":10000,\"settle_extra_ms\":1500}")!;
+        Assert.Equal(11500, lu.AttenteMs);
+        Assert.Equal(1000, new MultiplayerRankingEnd().AttenteMs);
+    }
+
+    [Fact]
     public void En_equipes_tous_les_humains_du_meme_cote_ne_se_classent_pas()
     {
         var fin = Survie with

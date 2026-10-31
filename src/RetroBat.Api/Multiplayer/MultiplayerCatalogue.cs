@@ -227,6 +227,16 @@ public sealed record MultiplayerGame
     public bool TwinStick { get; init; }
 
     /// <summary>
+    /// LE TYPE DE MANETTE D'UN PORT (CDC Demandes v1.2, D1, 31/10/2026) : le multitap de Yu Yu Hakusho (Genesis Plus GX,
+    /// 1537 sur le port 2) ou de Sugoi Hebereke (snes9x, 257 sur le port 3). Le lanceur l'ecrit dans le .rmp du coeur, mais
+    /// les .rmp megadrive et snes de la borne passent devant et les manettes 3 et 4 restent muettes ; le .rmp du JEU passe
+    /// devant eux. L'API y pose ces lignes le temps de la partie (<see cref="MultiplayerLaunchPlan.Remappage"/>) et rend le
+    /// fichier d'avant. Port 1-based. Une version d'avant ignore le champ : le jeu se joue a deux, comme avant.
+    /// </summary>
+    [JsonPropertyName("device")]
+    public IReadOnlyList<MultiplayerDevice>? Device { get; init; }
+
+    /// <summary>
     /// Des cles de remappage de RetroArch propres a une place (Title Fight : le START du port 2 est celui de l'ecran 1, la
     /// place 2 ne l'a pas). Elles s'ajoutent a celles de <see cref="TwinStick"/>.
     /// </summary>
@@ -506,6 +516,16 @@ public sealed record MultiplayerContent
     /// <summary>Prefiltre d'un fichier nu.</summary>
     [JsonPropertyName("size")]
     public IReadOnlyList<long> Size { get; init; } = [];
+}
+
+/// <summary>Le type de manette (identifiant libretro) d'un port, 1-based.</summary>
+public sealed record MultiplayerDevice
+{
+    [JsonPropertyName("port")]
+    public int Port { get; init; }
+
+    [JsonPropertyName("id")]
+    public int Id { get; init; }
 }
 
 /// <summary>Le jeu du World Scoring d'une coop qui concourt : son groupe de score (<c>double-dragon</c>).</summary>
@@ -1056,6 +1076,18 @@ public sealed record MultiplayerRankingEnd
     /// </summary>
     [JsonPropertyName("settle_ms")]
     public int SettleMs { get; init; } = 1000;
+
+    /// <summary>
+    /// CE QUI S'AJOUTE A <see cref="SettleMs"/> (CDC Demandes v1.2, D2, 31/10/2026) : le drapeau du vainqueur de Sugoi
+    /// Hebereke arrive 11 s apres l'elimination. Un champ a part : une version d'avant l'ignore (relever le plafond de
+    /// settle_ms ferait ecarter le jeu par la 1.9.127, et refuser tout le catalogue par la 1.9.126). Jusqu'a 30 s en tout.
+    /// </summary>
+    [JsonPropertyName("settle_extra_ms")]
+    public int SettleExtraMs { get; init; }
+
+    /// <summary>L'attente de fin reellement tenue : settle_ms plus settle_extra_ms.</summary>
+    [JsonIgnore]
+    public int AttenteMs => SettleMs + Math.Max(0, SettleExtraMs);
 
     [JsonPropertyName("min_humans")]
     public int MinHumans { get; init; } = 2;
@@ -1871,6 +1903,13 @@ public sealed class MultiplayerCatalogueStore
 
         // Le champ « bios » (CDC Classements v1.1 §5) n'est pas lu ici : l'outil de diagnostic dit quel BIOS manque (decision
         // du user du 29/10).
+        // Le type de manette d'un port (D1) : un port reel, une fois, un identifiant libretro.
+        if (jeu.Device is { Count: > 0 } appareils
+            && (appareils.Any(a => a.Port is < 1 or > 8 || a.Id < 0) || appareils.Select(a => a.Port).Distinct().Count() != appareils.Count))
+        {
+            return "type de manette par port incoherent";
+        }
+
         return ValiderLesVues(jeu) ?? ValiderLeDepart(jeu) ?? ValiderLeDepartDuCoeur(jeu) ?? ValiderLeClassement(jeu) ?? ValiderLOrdreDesPlaces(jeu)
             ?? ValiderLeRelais(jeu) ?? ValiderLaManetteDEquipe(jeu);
     }
@@ -2023,7 +2062,7 @@ public sealed class MultiplayerCatalogueStore
             return "classement : memoire « " + fin.Memory + " » inconnue";
         }
 
-        if (fin.SettleMs is < 0 or > 10000 || fin.CloseAfterS is < 0 or > 60 || fin.MinHumans > 8)
+        if (fin.SettleMs is < 0 or > 10000 || fin.SettleExtraMs < 0 || fin.AttenteMs > 30000 || fin.CloseAfterS is < 0 or > 60 || fin.MinHumans > 8)
         {
             return "classement : delais ou nombre d'humains incoherents";
         }
