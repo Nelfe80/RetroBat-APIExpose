@@ -78,6 +78,24 @@ public class CoopMultiplayerConcourtTests
     }
 
     [Fact]
+    public void L_ecran_de_fin_lit_le_score_de_chaque_place_et_dit_sa_place_selon_le_verdict()
+    {
+        var fin = JsonSerializer.Deserialize<MultiplayerFin>(
+            "{\"scores\":{\"1\":{\"1cc-multi\":{\"score\":130000,\"status\":\"published\",\"rank\":2},\"1lc-multi\":{\"score\":41000,\"status\":\"published\",\"rank\":5}},"
+            + "\"2\":{\"1cc-multi\":{\"score\":70000,\"status\":\"quarantined\",\"rank\":null}}}}")!;
+        var place1 = fin.Scores!["1"]["1cc-multi"];
+        Assert.Equal(130000, place1.Score);
+        Assert.Equal("#2", MultiplayerScoring.PlaceAffichee(place1));
+        // En attente d'un emulateur ou de reglages a reconnaitre : le score se montre, sa place pas encore.
+        Assert.Equal("?", MultiplayerScoring.PlaceAffichee(fin.Scores["2"]["1cc-multi"]));
+        // Refuse ou signale : il ne compte pas, l'ecran montre « - ».
+        Assert.Null(MultiplayerScoring.PlaceAffichee(new MultiplayerScoreDeFin { Score = 5, Status = "refused" }));
+        Assert.Null(MultiplayerScoring.PlaceAffichee(new MultiplayerScoreDeFin { Score = 5, Status = "held" }));
+        Assert.Equal("1 234 567", MultiplayerScoring.Milliers(1234567));
+        Assert.Null(JsonSerializer.Deserialize<MultiplayerFin>("{\"reason\":\"game_closed\"}")!.Scores);
+    }
+
+    [Fact]
     public void Le_catalogue_dit_la_coop_qui_concourt()
     {
         var jeu = JsonSerializer.Deserialize<MultiplayerGame>("{\"id\":\"arcade/ddragon\",\"family\":\"coop\",\"scoring\":{\"rom_group\":\"double-dragon\"}}")!;

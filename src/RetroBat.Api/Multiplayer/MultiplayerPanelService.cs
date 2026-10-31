@@ -1771,10 +1771,13 @@ public sealed partial class MultiplayerPanelService
         var info = duree is { } secondes
             ? T("multiplayer.result.playtime") + " " + TimeSpan.FromSeconds(secondes).ToString(secondes >= 3600 ? @"h\:mm\:ss" : @"m\:ss", CultureInfo.InvariantCulture)
             : string.Empty;
+        // Une coop qui concourt (31/10/2026) : le classement en badge, et sa regle en note.
+        var concourt = _jeu?.Game is { } jeuFini && MultiplayerScoring.Concourt(jeuFini);
         var ecranDeFin = ComposerLEcranDeFin(finie, joueursDuResultat, gagnante, EloDe,
             annulee || nonDisputee || (classique && !classe) || (abandon is not null && maPlace is not null) ? titre : null, titre,
-            classique ? T("multiplayer.badge.classic") : string.Empty,
-            classique && !classe && !annulee && !nonDisputee ? T("multiplayer.result.classic_note") : bandeauDuResultat, duree, T, rangs);
+            concourt ? MultiplayerScoring.Etiquette : classique ? T("multiplayer.badge.classic") : string.Empty,
+            concourt ? Texte("multiplayer.end.onecc_note", "Each score counts up to its player's first continue.")
+                : classique && !classe && !annulee && !nonDisputee ? T("multiplayer.result.classic_note") : bandeauDuResultat, duree, T, rangs);
 
         return new LeaderboardOverlayService.ContenuMultiplayer(
             [titre],
@@ -1826,9 +1829,23 @@ public sealed partial class MultiplayerPanelService
         var calcul = profil is not null && valeurs.Count > 0 ? MultiplayerEcranDeFin.Calculer(profil, valeurs, vainqueur, T) : null;
         var milliers = new NumberFormatInfo { NumberGroupSeparator = " ", NumberGroupSizes = [3] };
         var rang = 0;
+        // UNE COOP QUI CONCOURT (31/10/2026) : le score de chaque place en premiere mesure, des qu'il arrive.
+        var scores = jeu is not null && MultiplayerScoring.Concourt(jeu) ? finie?.Ended?.Scores ?? new Dictionary<string, IReadOnlyDictionary<string, MultiplayerScoreDeFin>>() : null;
+        MultiplayerScoreDeFin? ScoreDe(int place, string regle)
+            => scores is not null && scores.TryGetValue(place.ToString(CultureInfo.InvariantCulture), out var deLaPlace)
+               && deLaPlace.TryGetValue(regle, out var score) && MultiplayerScoring.PlaceAffichee(score) is not null ? score : null;
+        var meilleur = scores is null ? 0 : assis.Select(j => ScoreDe(j.Seat!.Value, "1cc-multi")?.Score ?? 0).DefaultIfEmpty(0).Max();
         var fiches = assis.Select(j =>
         {
             var place = j.Seat!.Value;
+            var mesures = calcul?.Mesures.GetValueOrDefault(place) ?? [];
+            if (scores is not null)
+            {
+                var score = ScoreDe(place, "1cc-multi");
+                mesures = [new LeaderboardOverlayService.MesureDeFin("trophee", MultiplayerScoring.Etiquette, score?.Score,
+                    score is null || meilleur <= 0 ? 0 : (double)score.Score / meilleur, score is not null && score.Score == meilleur && meilleur > 0,
+                    Milliers: true, Suffixe: score is null ? string.Empty : MultiplayerScoring.PlaceAffichee(score)!), .. mesures.Take(2)];
+            }
             var apres = eloDe(place);
             var cote = apres?.After ?? j.Rating?.Value;
             var ecart = apres is null ? 0 : (int)Math.Round(apres.After - apres.Before);
@@ -1843,9 +1860,24 @@ public sealed partial class MultiplayerPanelService
                 EstVainqueur(place, rangs, vainqueur),
                 rangs?.FirstOrDefault(r => r.Seat == place)?.Rank ?? (vainqueur is null ? null : ++rang),
                 calcul?.Distinctions.GetValueOrDefault(place) ?? string.Empty,
-                calcul?.Mesures.GetValueOrDefault(place) ?? [],
+                mesures,
                 CoequipiersDe(j));
         }).ToList();
+
+        // Le score de ce joueur, mis en avant a la place du vainqueur, des que le sien est arrive.
+        LeaderboardOverlayService.ScoreDeFin? monScore = null;
+        if (scores is not null && maPlace is { } moi && ScoreDe(moi, "1cc-multi") is { } mien)
+        {
+            var uneVie = ScoreDe(moi, "1lc-multi");
+            var placeDuMien = MultiplayerScoring.PlaceAffichee(mien)!;
+            monScore = new LeaderboardOverlayService.ScoreDeFin(
+                Texte("multiplayer.end.your_score", "Your score"),
+                MultiplayerScoring.Milliers(mien.Score),
+                MultiplayerScoring.Etiquette + (placeDuMien.Length > 0 ? " · " + placeDuMien : string.Empty),
+                uneVie is null ? string.Empty : MultiplayerScoring.EtiquetteUneVie + "  " + MultiplayerScoring.Milliers(uneVie.Score)
+                    + (MultiplayerScoring.PlaceAffichee(uneVie) is { Length: > 0 } placeUneVie ? " · " + placeUneVie : string.Empty),
+                mien.Status == "published" && mien.Rank == 1);
+        }
 
         return new LeaderboardOverlayService.EcranDeFin(
             _roomDuResultat,
@@ -1863,7 +1895,8 @@ public sealed partial class MultiplayerPanelService
             _glypheValider,
             _glypheAnnuler,
             // E4 (26/10) : une police imposee par le catalogue l'emporte sur celle du type.
-            jeu?.Ecran?.Police is { Length: > 0 } police ? police : null);
+            jeu?.Ecran?.Police is { Length: > 0 } police ? police : null,
+            monScore);
     }
 
     /// <summary>Les rangs d'une fin a plusieurs : ceux que le site a recus de l'hote, sinon ceux lus sur cette borne ; null en duel.</summary>

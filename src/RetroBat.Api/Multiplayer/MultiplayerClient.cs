@@ -494,8 +494,28 @@ public sealed record MultiplayerSessionNetplay
     public override string ToString() => $"{Relay}:{Port} {Session} {Core} {CoreVersion}";
 }
 
+/// <summary>Un score soumis par une place d'une coop qui concourt : sa valeur, son verdict, et sa place une fois publie.</summary>
+public sealed record MultiplayerScoreDeFin
+{
+    [JsonPropertyName("score")]
+    public long Score { get; init; }
+
+    [JsonPropertyName("status")]
+    public string Status { get; init; } = string.Empty;
+
+    [JsonPropertyName("rank")]
+    public int? Rank { get; init; }
+}
+
 public sealed record MultiplayerFin
 {
+    /// <summary>
+    /// Une coop qui concourt (31/10/2026) : par place (« 1 »), puis par classement (« 1cc-multi », « 1lc-multi »), le dernier
+    /// score soumis depuis le lancement. Chaque borne ne connait que le sien : les autres arrivent au fil des sondages.
+    /// </summary>
+    [JsonPropertyName("scores")]
+    public IReadOnlyDictionary<string, IReadOnlyDictionary<string, MultiplayerScoreDeFin>>? Scores { get; init; }
+
     [JsonPropertyName("reason")]
     public string? Reason { get; init; }
 

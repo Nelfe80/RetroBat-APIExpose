@@ -39,6 +39,24 @@ public static class MultiplayerScoring
     /// <summary>Le nom du classement, jamais traduit, comme le sigle que la borne et le site affichent.</summary>
     public const string Etiquette = "1CC MULTI";
 
+    /// <summary>Le classement du 1LC MULTI, jamais traduit.</summary>
+    public const string EtiquetteUneVie = "1LC MULTI";
+
+    /// <summary>« 120 000 » : un score, milliers separes par une espace.</summary>
+    public static string Milliers(long score)
+        => score.ToString("#,0", new System.Globalization.NumberFormatInfo { NumberGroupSeparator = " ", NumberGroupSizes = [3] });
+
+    /// <summary>
+    /// Ce qu'un score de fin dit de sa place : « #2 » publie, « ? » en attente (un emulateur ou des reglages a reconnaitre),
+    /// rien sinon. Null quand le score ne compte pas (refuse, signale) : l'ecran montre « - ».
+    /// </summary>
+    public static string? PlaceAffichee(MultiplayerScoreDeFin score) => score.Status switch
+    {
+        "published" => score.Rank is { } rang ? "#" + rang.ToString(System.Globalization.CultureInfo.InvariantCulture) : string.Empty,
+        "quarantined" => "?",
+        _ => null,
+    };
+
     /// <summary>« 120 000 · #2 » : le meilleur score d'un joueur et sa place, milliers separes par une espace.</summary>
     public static string ScoreEtRang(MultiplayerUnCreditMulti score)
         => score.Score.ToString("#,0", new System.Globalization.NumberFormatInfo { NumberGroupSeparator = " ", NumberGroupSizes = [3] })
