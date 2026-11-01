@@ -94,6 +94,9 @@ public sealed class MultiplayerSessionService : BackgroundService
     /// </summary>
     public Func<bool>? DansLaCollection { get; set; }
 
+    /// <summary>Un jeu tourne sur cette borne : on ne quitte rien sous les pieds du joueur.</summary>
+    internal Func<bool> UnJeuTourne { get; set; } = RetroBat.Api.Infrastructure.EmulatorForeground.EmulateurDeJeuTourne;
+
     /// <summary>Le joueur est en partie (ou devant son ecran de fin) : le site met l'echeance de ses invitations en pause (30/10).</summary>
     public Func<bool>? EnPartie { get; set; }
 
@@ -159,7 +162,7 @@ public sealed class MultiplayerSessionService : BackgroundService
     internal async Task QuitterEnPartantAsync()
     {
         var rooms = Etat.Rooms.Where(Engagee).ToList();
-        if (rooms.Count == 0 || RetroBat.Api.Infrastructure.EmulatorForeground.EmulateurDeJeuTourne())
+        if (rooms.Count == 0 || UnJeuTourne())
         {
             return;
         }
@@ -188,7 +191,7 @@ public sealed class MultiplayerSessionService : BackgroundService
             return false;
         }
 
-        if (RetroBat.Api.Infrastructure.EmulatorForeground.EmulateurDeJeuTourne())
+        if (UnJeuTourne())
         {
             return true;
         }

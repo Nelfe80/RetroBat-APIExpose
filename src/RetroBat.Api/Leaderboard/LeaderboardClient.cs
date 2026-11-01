@@ -98,11 +98,13 @@ public sealed class LeaderboardClient
     }
 
     /// <summary>
-    /// La regle des onglets ordinaires d'un jeu : le 1CC s'il est ouvert, sinon sa premiere regle.
+    /// La regle des onglets ordinaires d'un jeu : la premiere regle du 1CC solo, sinon sa premiere regle.
+    /// La plateforme met le mode de depart en tete de l'index (01/11/2026) : TGM2 ouvre sur « 1cc-normal »,
+    /// alors que « 1cc » y nomme Master. Un 1CC MULTI n'est jamais cette regle.
     /// Vide quand la borne ne connait pas ses regles : on demande alors tout, comme avant.
     /// </summary>
     public static string ReglePrincipale(IReadOnlyList<string> regles)
-        => regles.Contains("1cc", StringComparer.OrdinalIgnoreCase) ? "1cc" : regles.FirstOrDefault() ?? "";
+        => regles.FirstOrDefault(r => LeaderboardInputService.FamilleEtMode(r).Famille == "1cc") ?? regles.FirstOrDefault() ?? "";
 
     /// <summary>
     /// Le classement complet d'un jeu (le mondial), depuis le cache s'il est frais. Le pseudo de

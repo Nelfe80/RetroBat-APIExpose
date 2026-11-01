@@ -61,7 +61,8 @@ public class MultiplayerSessionServiceTests : IDisposable
         plateforme ??= new Plateforme();
         var client = new MultiplayerClient(new SansFabrique(), new NelfePlayDeviceStore(NullLogger<NelfePlayDeviceStore>.Instance),
             clientDeTest: () => new HttpClient(plateforme) { BaseAddress = new Uri("https://nelfeplay.test") });
-        return (new MultiplayerSessionService(client, collection, options, relais: null, bus: _bus), plateforme, jeu);
+        // Jamais la machine : un RetroArch de banc faisait tomber ces tests.
+        return (new MultiplayerSessionService(client, collection, options, relais: null, bus: _bus) { UnJeuTourne = () => false }, plateforme, jeu);
     }
 
     [Fact]
@@ -98,6 +99,19 @@ public class MultiplayerSessionServiceTests : IDisposable
         var depart = plateforme.Corps("leave");
         Assert.Equal("r1", depart.GetProperty("room").GetString());
         Assert.Equal("shutdown", depart.GetProperty("reason").GetString());
+    }
+
+    [Fact]
+    public async Task Un_jeu_qui_tourne_garde_la_gameroom_au_demarrage_comme_a_l_arret()
+    {
+        var (session, plateforme, jeu) = await MonterAsync(new Plateforme(avecSession: true));
+        session.UnJeuTourne = () => true;
+
+        Assert.True(await session.RepartirAVideAsync(CancellationToken.None));
+        Assert.Null(await session.RejoindreAsync(jeu));
+        await session.QuitterEnPartantAsync();
+
+        Assert.Empty(plateforme.Tous("leave"));
     }
 
     [Fact]

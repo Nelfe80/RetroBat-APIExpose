@@ -15,6 +15,9 @@ public sealed class LeaderboardRulesTabsTests
     [Theory]
     [InlineData(new[] { "1cc", "1cc-multi" }, "1cc")]
     [InlineData(new[] { "1cc-multi", "1cc" }, "1cc")]
+    [InlineData(new[] { "1cc-normal", "1cc" }, "1cc-normal")]
+    [InlineData(new[] { "1cc-multi-super", "1lc", "1cc-normal", "1cc" }, "1cc-normal")]
+    [InlineData(new[] { "1cc-multi", "1lc" }, "1cc-multi")]
     [InlineData(new[] { "1lc" }, "1lc")]
     [InlineData(new string[0], "")]
     public void La_regle_principale_est_le_1cc_s_il_est_ouvert(string[] regles, string attendue)
