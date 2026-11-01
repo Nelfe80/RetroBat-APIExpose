@@ -647,6 +647,13 @@ public sealed class CabinetInputReader : IDisposable
             return (Path.Combine(retroBatRoot, "emulators", "retroarch", "SDL2.dll"), "RetroArch");
         }
 
+        // Un SDL d'ES qui n'est pas en 64 bits (RetroBat ancien ou modifie, 31/10/2026) : l'API le refuse, et le resolveur ne
+        // s'installe qu'une fois. Sans ce repli, plus aucune manette n'est lue.
+        if (MachineDeLaDll(es) is { } machine && machine != MachineX64)
+        {
+            return (Path.Combine(retroBatRoot, "emulators", "retroarch", "SDL2.dll"), "RetroArch, SDL d'ES inutilisable");
+        }
+
         try
         {
             var dossier = dossierCopie ?? Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, "state", "native");
@@ -666,6 +673,36 @@ public sealed class CabinetInputReader : IDisposable
         {
             // Copie impossible (une autre API l'a deja chargee, droits) : le fichier d'ES lui-meme.
             return (es, "EmulationStation, sans copie");
+        }
+    }
+
+    private const ushort MachineX64 = 0x8664;
+
+    /// <summary>Le processeur que vise une DLL, lu dans son en-tete PE ; null pour un fichier illisible ou qui n'en est pas une.</summary>
+    internal static ushort? MachineDeLaDll(string chemin)
+    {
+        try
+        {
+            using var flux = new FileStream(chemin, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            using var lecteur = new BinaryReader(flux);
+            if (flux.Length < 0x40 || lecteur.ReadUInt16() != 0x5A4D)
+            {
+                return null;
+            }
+
+            flux.Position = 0x3C;
+            var pe = lecteur.ReadInt32();
+            if (pe < 0 || pe + 6L > flux.Length)
+            {
+                return null;
+            }
+
+            flux.Position = pe;
+            return lecteur.ReadUInt32() == 0x00004550 ? lecteur.ReadUInt16() : null;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return null;
         }
     }
 

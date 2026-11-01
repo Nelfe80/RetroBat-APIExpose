@@ -923,6 +923,13 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
 
             guetInvite.Cancel();
+            // Sans le rapport de l'invite, le resultat de l'hote reste en attente, sans points : le dire dans les rapports de support.
+            if (issueInvite is null && jeu.Game.ClassePour(PlacesDe(room)))
+            {
+                _journal.LogInformation("MULTIPLAYER : fin de {Jeu} non vue chez l'invite, rien de rapporte pour {Room}{Detail}", jeu.Game.Id, room.Room,
+                    hoteParti ? " (hote parti)" : string.Empty);
+            }
+
             var mesuresInvite = suiviInvite is null ? null : await suiviInvite.Fin.ConfigureAwait(false);
             _panneau.MontrerLeResultat(room.Room, duree, mesuresInvite?.AncienDesPlaces(), mesuresInvite, issueInvite?.Rangs);
         }
