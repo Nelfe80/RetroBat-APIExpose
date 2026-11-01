@@ -23,7 +23,8 @@ public sealed partial class LeaderboardOverlayService
 {
     /// <summary>
     /// Ce que l'ecran de fin montre. <c>Cle</c> designe la rencontre : une autre cle relance l'animation. <c>Fanart</c> : le
-    /// chemin de l'image du jeu sur cette borne, ou null.
+    /// chemin de l'image du jeu sur cette borne, ou null. <c>Logo</c> : le fichier du logo, celui de MULTIPLAYER par defaut.
+    /// <c>Classement</c> : le bilan d'une epreuve, le haut du classement et la place du joueur sous sa ligne.
     /// </summary>
     public sealed record EcranDeFin(
         string Cle,
@@ -40,7 +41,9 @@ public sealed partial class LeaderboardOverlayService
         string GlypheRevanche,
         string GlypheQuitter,
         string? Police = null,
-        ScoreDeFin? MonScore = null);
+        ScoreDeFin? MonScore = null,
+        string? Logo = null,
+        IReadOnlyList<LigneDeDefi>? Classement = null);
 
     /// <summary>
     /// UNE COOP QUI CONCOURT (31/10/2026) : le score de ce joueur, mis en avant a la place du vainqueur. <c>Ruban</c> : le
@@ -180,13 +183,18 @@ public sealed partial class LeaderboardOverlayService
             try
             {
                 DessinerLeDecor(g, fin.Type, t);
-                DessinerLeLogo(g, k);
+                DessinerLeLogo(g, k, fin.Logo);
                 DessinerLEnTete(g, fin, secours);
                 DessinerLeTitre(g, fin.Titre, titre, t);
                 DessinerLeVainqueur(g, fin, titre, secours, t);
                 DessinerLaPhrase(g, fin.Textes.Phrase, secours);
                 var haut = DessinerLaJauge(g, fin, titre, secours, t);
                 DessinerLesJoueursDeFin(g, fin, style, titre, secours, haut, t);
+                if (fin.Classement is { Count: > 0 } classement)
+                {
+                    DessinerLeClassementDuBilan(g, classement, secours, t);
+                }
+
                 DessinerLesConfettis(g, t);
                 DessinerLesBoutons(g, fin, titre, secours, k, t);
             }
@@ -389,9 +397,9 @@ public sealed partial class LeaderboardOverlayService
             g.FillPolygon(pinceau, [new PointF(x + biais, y), new PointF(x + largeur + biais, y), new PointF(x + largeur, y + hauteur), new PointF(x, y + hauteur)]);
         }
 
-        private void DessinerLeLogo(Graphics g, float k)
+        private void DessinerLeLogo(Graphics g, float k, string? fichier = null)
         {
-            var chemin = Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", "nelfeplay-multiplayer.png");
+            var chemin = Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", fichier ?? "nelfeplay-multiplayer.png");
             if (!File.Exists(chemin) || _service._glyphes?.Glyphe(chemin, (int)Math.Round(70 * k)) is not { } logo)
             {
                 return;

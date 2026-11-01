@@ -31,6 +31,7 @@ public sealed partial class LeaderboardOverlayService
     /// <summary>
     /// Ce que l'ecran de lancement montre. <c>Cle</c> designe la rencontre : une autre cle relance l'entree. <c>DepartUtc</c> :
     /// le depart est donne (« A VOUS DE JOUER ! »). <c>Etape</c> : 1 pendant la synchronisation, 2 quand tout le monde est pret.
+    /// <c>Fiche</c> : la preparation d'une epreuve en solo, a la place des joueurs (CDC du panneau, §8.1).
     /// </summary>
     public sealed record EcranDeLancement(
         string Cle,
@@ -56,7 +57,9 @@ public sealed partial class LeaderboardOverlayService
         string GlypheReessayer,
         string GlypheQuitter,
         string? Police = null,
-        bool SortiePossible = false);
+        bool SortiePossible = false,
+        IReadOnlyList<ChampDeFiche>? Fiche = null,
+        string? Logo = null);
 
     /// <summary>
     /// Un joueur au lancement. <c>Portrait</c> : l'image du personnage choisi, ou null (le pseudo remonte). <c>Lettre</c>,
@@ -223,10 +226,14 @@ public sealed partial class LeaderboardOverlayService
 
             try
             {
-                DessinerLeLogo(g, k);
+                DessinerLeLogo(g, k, l.Logo);
                 DessinerLEnTeteDuLancement(g, l, secours);
                 var liste = l.Joueurs.Count is not (2 or 4);
-                if (l.Joueurs.Count == 2)
+                if (l.Fiche is { Count: > 0 } fiche)
+                {
+                    DessinerLaFicheDeLEpreuve(g, l.SousTitre, fiche, famille, secours, t);
+                }
+                else if (l.Joueurs.Count == 2)
                 {
                     for (var i = 0; i < 2; i++)
                     {
