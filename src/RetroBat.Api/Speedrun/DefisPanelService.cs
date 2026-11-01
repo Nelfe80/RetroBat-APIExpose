@@ -65,7 +65,8 @@ public sealed partial class DefisPanelService
         SonDEmulationStation? sonDEs = null,
         ILogger<DefisPanelService>? journal = null,
         ApiContext? contexte = null,
-        ClassementsDesDefis? classements = null)
+        ClassementsDesDefis? classements = null,
+        RetroBat.Domain.Interfaces.IEventBus? bus = null)
     {
         _options = options;
         _collection = collection;
@@ -79,6 +80,7 @@ public sealed partial class DefisPanelService
         _journal = journal;
         _contexte = contexte;
         _classements = classements;
+        _abonnement = bus?.Subscribe<RetroBat.Domain.Events.EventEnvelope>(SurEvenement);
     }
 
     public bool Actif => _options.CurrentValue.NelfePlay is { Enabled: true, ShowChallengesCollection: true };
@@ -109,6 +111,9 @@ public sealed partial class DefisPanelService
         lock (_verrou)
         {
             _chemin = chemin;
+            _nomDuJeu = _contexte?.Ui.Selected is { } choisi && CheminsEgaux(choisi.GamePath, chemin) && choisi.GameName.Length > 0
+                ? choisi.GameName
+                : NomDuFichier(chemin);
             _defis = _collection.DefisDuJeu(chemin);
             _bilan = _session.BilanDuJournal();
             _glypheValider = glypheValider.Length > 0 ? glypheValider : "a";
@@ -309,11 +314,13 @@ public sealed partial class DefisPanelService
     {
         Reglement? defi;
         string chemin;
+        string jeu;
         lock (_verrou)
         {
             if (_lancement) return;
             defi = DefiChoisi();
             chemin = _chemin;
+            jeu = _nomDuJeu;
             if (defi is null) return;
             _lancement = true;
         }
@@ -325,19 +332,11 @@ public sealed partial class DefisPanelService
             await _es.TapAsync(new EsControllerTapRequest { Input = "back" }, CancellationToken.None).ConfigureAwait(false);
             await Task.Delay(300).ConfigureAwait(false);
 
-            var reponse = _session.Lancer(defi.ChallengeId, (_, _) => File.Exists(chemin) ? chemin : null);
-            if (reponse.Lance)
+            if (LancerLEpreuve(defi, chemin, jeu) is { } raison)
             {
-                _journal?.LogInformation("Defis : {Defi} lance depuis le panneau.", defi.ChallengeId);
-                _sonDEs?.Couper();
-                _sonDEs?.RendreAuProchainAppui();
-                FermerPourLeJeu();
-                return;
+                lock (_verrou) _message = T("speedrun.panel.refused." + raison, "Cannot start: " + raison);
+                Rafraichir();
             }
-
-            _journal?.LogInformation("Defis : lancement de {Defi} refuse ({Raison} {Detail}).", defi.ChallengeId, reponse.Raison, reponse.Detail);
-            lock (_verrou) _message = T("speedrun.panel.refused." + reponse.Raison, "Cannot start: " + reponse.Raison);
-            Rafraichir();
         }
         finally
         {

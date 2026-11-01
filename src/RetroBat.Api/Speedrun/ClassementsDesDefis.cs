@@ -34,17 +34,18 @@ public sealed class ClassementsDesDefis
         lock (_connus) return regles.Where(_connus.ContainsKey).Distinct().ToDictionary(r => r, r => _connus[r].Classement);
     }
 
-    public async Task<IReadOnlyDictionary<string, ClassementDEpreuve>> ChargerAsync(IReadOnlyCollection<string> regles, CancellationToken ct)
+    /// <summary><paramref name="forcer"/> : apres un verdict, le classement d'il y a moins d'une minute ne compte plus.</summary>
+    public async Task<IReadOnlyDictionary<string, ClassementDEpreuve>> ChargerAsync(IReadOnlyCollection<string> regles, CancellationToken ct, bool forcer = false)
     {
-        await Task.WhenAll(regles.Distinct().Select(r => ChargerAsync(r, ct))).ConfigureAwait(false);
+        await Task.WhenAll(regles.Distinct().Select(r => ChargerAsync(r, ct, forcer))).ConfigureAwait(false);
         return Connus(regles);
     }
 
-    private async Task ChargerAsync(string regle, CancellationToken ct)
+    private async Task ChargerAsync(string regle, CancellationToken ct, bool forcer)
     {
         lock (_connus)
         {
-            if (_connus.TryGetValue(regle, out var deja) && DateTime.UtcNow - deja.Lu < Fraicheur) return;
+            if (!forcer && _connus.TryGetValue(regle, out var deja) && DateTime.UtcNow - deja.Lu < Fraicheur) return;
         }
 
         try

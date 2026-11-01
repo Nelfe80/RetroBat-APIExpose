@@ -16,6 +16,10 @@ namespace RetroBat.Api.Speedrun;
 /// <summary>Le refus d'un lancement de defi, avec sa raison (unknown_challenge, game_running, not_installed...).</summary>
 public sealed record ReponseLancement(bool Lance, string? Raison, string? Detail = null);
 
+/// <summary>Ce qu'une session laisse au journal : la page de bilan part de la.</summary>
+public sealed record BilanDeSession(string SessionId, string DefiId, int Tentatives, int Finies, long? Meilleur, string? DernierEtat,
+    string? DerniereCause);
+
 /// <summary>
 /// LA SESSION DE SPEEDRUN SUR LA BORNE (lot S3 du prototype Sonic, §10 et §11 bis).
 ///
@@ -82,6 +86,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private long? _horlogeDeLImage;
     private CancellationTokenSource? _maintien;
     private int _requetesDeLaManette;
+    private DateTime? _premiereImage;
 
     public SpeedrunSessionService(IEventBus bus, ApiContext contexte, ILogger<SpeedrunSessionService> journal,
         PartieNelfePlayService? partie = null, ICommandesRetroArch? commandes = null, string? fichierDesTentatives = null,
@@ -117,6 +122,15 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         _abonnement?.Dispose();
         _vidage?.Dispose();
         _releves?.Cancel();
+    }
+
+    /// <summary>
+    /// Quand le wrapper a lu la premiere image de la session en cours : le coeur tourne, le jeu est a l'ecran. Le lancement
+    /// annonce le jeu des le depart de RetroArch, bien avant (la page de preparation attend ce signe-ci).
+    /// </summary>
+    public DateTime? PremiereImageUtc
+    {
+        get { lock (_verrou) return _session is null ? null : _premiereImage; }
     }
 
     /// <summary>Le snapshot de la session en cours, ou null sans session.</summary>
@@ -270,6 +284,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             _cadence.Clear();
             _tenus.Clear();
             _frameDeLImage = _horlogeDeLImage = null;
+            _premiereImage = null;
             _releves?.Cancel();
             _releves = new CancellationTokenSource();
             _ = ReleverEnBoucleAsync(_session, _releves.Token);
@@ -334,6 +349,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         _image.Clear();
         _frameDeLImage = _horlogeDeLImage = null;
         _session.RecevoirImage(image, horloge);
+        _premiereImage ??= DateTime.UtcNow;
         GuetterLAvanceRapide(image[0].Frame, horloge);
         Publier();
     }
@@ -633,6 +649,54 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         }
 
         return bilan;
+    }
+
+    /// <summary>Le bilan d'une session du journal local, pour la page de fin ; null si elle n'y a rien ecrit.</summary>
+    public BilanDeSession? BilanDeLaSession(string sessionId)
+    {
+        try
+        {
+            return File.Exists(_fichierDesTentatives) ? LireLeBilan(File.ReadLines(_fichierDesTentatives), sessionId) : null;
+        }
+        catch (IOException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Les tentatives d'une session, celles allees jusqu'a l'arrivee, le meilleur temps classable (le temps du jeu ne le
+    /// contredit pas) et la fin de la derniere. Sans disque : ce qui se teste.
+    /// </summary>
+    internal static BilanDeSession? LireLeBilan(IEnumerable<string> lignes, string sessionId)
+    {
+        string? defi = null, dernierEtat = null, derniereCause = null;
+        var tentatives = 0;
+        var finies = 0;
+        long? meilleur = null;
+        foreach (var ligne in lignes)
+        {
+            if (ligne.Length == 0) continue;
+            JsonDocument doc;
+            try { doc = JsonDocument.Parse(ligne); }
+            catch (JsonException) { continue; }
+            using (doc)
+            {
+                var r = doc.RootElement;
+                if (!r.TryGetProperty("kind", out var k) || k.GetString() != "attempt"
+                    || !r.TryGetProperty("sessionId", out var s) || s.GetString() != sessionId) continue;
+                defi ??= r.TryGetProperty("challengeId", out var c) ? c.GetString() : null;
+                tentatives++;
+                dernierEtat = r.TryGetProperty("state", out var e) ? e.GetString() : null;
+                derniereCause = r.TryGetProperty("cause", out var ca) && ca.ValueKind == JsonValueKind.String ? ca.GetString() : null;
+                if (dernierEtat != SessionSpeedrun.Finished || !r.TryGetProperty("officialFrames", out var f) || f.ValueKind != JsonValueKind.Number) continue;
+                finies++;
+                if (r.TryGetProperty("gameTimeCheck", out var g) && g.GetString() == "ecart") continue;
+                if (meilleur is not { } m || f.GetInt64() < m) meilleur = f.GetInt64();
+            }
+        }
+
+        return defi is null ? null : new BilanDeSession(sessionId, defi, tentatives, finies, meilleur, dernierEtat, derniereCause);
     }
 
     internal long? MeilleurTempsDuJournal(string defiId)

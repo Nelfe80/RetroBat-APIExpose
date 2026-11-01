@@ -33,7 +33,8 @@ public sealed partial class DefisPanelService
 
     private const string LogoDesPages = "nelfeplay-challenges.png";
 
-    internal EcranDeLancement ComposerLaPreparation(Reglement defi, string jeu, string? fanart, bool jeuPret, string langue) => new(
+    /// <summary><paramref name="depart"/> : le jeu est la, « A TOI ! » s'affiche.</summary>
+    internal EcranDeLancement ComposerLaPreparation(Reglement defi, string jeu, string? fanart, bool jeuPret, string langue, DateTime? depart = null) => new(
         "epreuve-" + defi.ChallengeId,
         StylesDesEcrans.Course,
         MotDe(defi),
@@ -51,9 +52,9 @@ public sealed partial class DefisPanelService
             T("speedrun.page.step.loading", "LOADING THE GAME"),
             T("speedrun.page.step.go", "IT'S ON!"),
         ],
-        jeuPret ? 2 : 1,
+        jeuPret || depart is not null ? 2 : 1,
         T("speedrun.page.go", "YOUR TURN!"),
-        null,
+        depart,
         false,
         "",
         T("speedrun.page.quit", "QUIT"),
@@ -85,7 +86,8 @@ public sealed partial class DefisPanelService
             ? "+" + Chronometrage.Afficher(t - record, b.Defi.Cadence) + " " + T("speedrun.page.from_record", "from the record")
             : "";
         return new EcranDeFin(
-            "bilan-" + b.Defi.ChallengeId,
+            // Le verdict change la cle : le titre se rejoue quand le temps est classe.
+            "bilan-" + b.Defi.ChallengeId + "-" + b.Issue,
             StylesDesEcrans.Course,
             TitreDuBilan(b.Issue, premier),
             b.Jeu,

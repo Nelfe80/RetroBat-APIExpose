@@ -341,6 +341,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     return;
                 }
 
+                // La preparation d'une epreuve aussi : le lancement annonce le jeu bien avant sa premiere image.
+                if (_panneauDesDefis is { TientLaPreparation: true })
+                {
+                    return;
+                }
+
                 // L'emulateur prend le premier plan : on s'efface sans le disputer a ES.
                 if (_multiplayer is { Ouvert: true } panneauMultiplayer)
                 {
@@ -385,6 +391,14 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // joueur a la manette, « a » configure sur le bouton de droite, ne voyait jamais le panneau s'ouvrir.
             var valider = roleEs is not null ? roleEs == "valider" : slot == SlotValider;
             var annuler = roleEs is not null ? roleEs == "retour" : slot == SlotAnnuler;
+
+            // Une page d'epreuve (preparation, bilan) : Valider et Retour sont a elle.
+            if (_panneauDesDefis is { EnPage: true } page)
+            {
+                if (valider) page.ValiderSurLaPage(appuye);
+                else if (annuler) page.AnnulerSurLaPage(appuye);
+                return;
+            }
 
             // Le panneau des defis ouvert : ses gestes, et rien pour le classement.
             if (_panneauDesDefis is { Ouvert: true } defis)
