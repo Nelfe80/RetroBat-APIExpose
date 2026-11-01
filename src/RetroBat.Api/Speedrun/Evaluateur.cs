@@ -98,6 +98,9 @@ public sealed class Evaluateur
     /// du temps du jeu et des valeurs d'arrivee (les minutes restent a 0 sur un acte de moins d'une minute) ;
     /// a relever des l'arrivee provisoire, quand le timer du jeu est fige.
     /// </summary>
+    /// <summary>La derniere valeur connue d'une adresse, par un evenement ou un releve ; null si on ne la connait pas.</summary>
+    public int? ValeurConnue(long adresse) => _valeurs.TryGetValue(adresse, out var v) ? v : null;
+
     public IReadOnlyList<long> AdressesInconnues
         => (EnCourse
                 ? _r.TempsDuJeu.Select(l => l.Adresse).Concat(_r.ValeursFinales.Select(v => v.Adresse))

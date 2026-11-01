@@ -32,6 +32,9 @@ public sealed class NelfePlayOptions
     /// </summary>
     public bool ShowMultiplayerCollection { get; set; } = true;
 
+    /// <summary>Afficher la collection NELFEPLAY CHALLENGES &amp; SPEEDRUNS : les jeux de la borne qui ont un defi ouvert.</summary>
+    public bool ShowChallengesCollection { get; set; } = true;
+
     /// <summary>Releve d'audience : ce qui est joue et combien de temps, jamais par qui.</summary>
     public bool PlayReportingEnabled { get; set; } = true;
 

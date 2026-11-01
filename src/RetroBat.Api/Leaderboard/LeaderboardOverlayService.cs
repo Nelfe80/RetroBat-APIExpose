@@ -214,13 +214,14 @@ public sealed partial class LeaderboardOverlayService : IDisposable
 
     public void Ouvrir(EsMenuStyle style, Contenu contenu) => OuvrirAvec(style, contenu, null);
 
-    private void OuvrirAvec(EsMenuStyle style, Contenu contenu, ContenuMultiplayer? multiplayer)
+    private void OuvrirAvec(EsMenuStyle style, Contenu contenu, ContenuMultiplayer? multiplayer, ContenuDefis? defis = null)
     {
         lock (_gate)
         {
             _style = style;
             _contenu = contenu;
             _multiplayer = multiplayer;
+            _defis = defis;
             _noir = false;
             _dernierGeste = DateTime.UtcNow;
             if (_glyphes is null)
@@ -269,6 +270,7 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             _style = style;
             _noir = true;
             _multiplayer = null;
+            _defis = null;
             _dernierGeste = DateTime.UtcNow;
             Affiche = true;
         }
@@ -316,6 +318,7 @@ public sealed partial class LeaderboardOverlayService : IDisposable
         {
             _contenu = _contenu with { Attente = "", AttenteTitre = "", AttenteDetail = "" };
             _multiplayer = null;
+            _defis = null;
             _noir = false;
         }
     }
@@ -332,6 +335,7 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             Affiche = false;
             _contenu = _contenu with { Attente = "", AttenteTitre = "", AttenteDetail = "" };
             _multiplayer = null;
+            _defis = null;
             _noir = false;
         }
         ANousLaMain = false;
@@ -1073,6 +1077,14 @@ public sealed partial class LeaderboardOverlayService : IDisposable
                     g.FillRectangle(voile, ClientRectangle);
                 }
 
+                return;
+            }
+
+            // Le panneau des defis (lot P5) : la meme fenetre, un troisieme contenu.
+            if (_service.LireDefis() is { } defis && c.Attente.Length == 0)
+            {
+                DessinerLesDefis(g, defis, c, s, policeTitre, policeTexte, policePetite, policeGras, policeGroupe, policePied,
+                    tailleTitre, tailleTexte, taillePetite, tailleGroupe, taillePied);
                 return;
             }
 

@@ -267,7 +267,9 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
             ("global.apiexpose.nelfeplay.show_scoring_collection", ToEsBool(options.NelfePlay.ShowScoringCollection)),
             // La collection « NELFEPLAY MULTIPLAYER » : visible par defaut elle aussi (25/10), posee seulement si
             // le joueur n'a jamais touche l'option.
-            ("global.apiexpose.nelfeplay.show_multiplayer_collection", ToEsBool(options.NelfePlay.ShowMultiplayerCollection))
+            ("global.apiexpose.nelfeplay.show_multiplayer_collection", ToEsBool(options.NelfePlay.ShowMultiplayerCollection)),
+            // Comme MULTIPLAYER : visible par defaut, posee seulement si le joueur n'a jamais touche l'option.
+            ("global.apiexpose.nelfeplay.show_challenges_collection", ToEsBool(options.NelfePlay.ShowChallengesCollection))
         };
 
         if (includeRomSetVisibilityDefaults)

@@ -60,6 +60,18 @@ public sealed class Reglement
     public string ChallengeId { get; private init; } = "";
     public int Version { get; private init; }
     public string Ruleset { get; private init; } = "";
+
+    /// <summary>Le nom de l'epreuve par langue (« fr », « en ») ; « title » texte simple = toutes les langues.</summary>
+    public IReadOnlyDictionary<string, string> Titres { get; private init; } = new Dictionary<string, string>();
+
+    /// <summary>Le nom dans cette langue, sinon en anglais, sinon le premier, sinon l'identifiant.</summary>
+    public string Titre(string? langue)
+    {
+        var court = (langue ?? "").Split('_', '-')[0].ToLowerInvariant();
+        return Titres.TryGetValue(court, out var t) ? t
+            : Titres.TryGetValue("en", out var en) ? en
+            : Titres.Values.FirstOrDefault() ?? ChallengeId;
+    }
     public string Kind { get; private init; } = "";
     public string SystemId { get; private init; } = "";
     public string RomGroup { get; private init; } = "";
@@ -129,6 +141,7 @@ public sealed class Reglement
                 ChallengeId = Texte(r, "challenge_id") ?? throw new ReglementInvalideException("challenge_id absent"),
                 Version = r.TryGetProperty("version", out var v) ? v.GetInt32() : throw new ReglementInvalideException("version absente"),
                 Ruleset = Texte(r, "ruleset") ?? "",
+                Titres = LireTitres(r),
                 Kind = Texte(r, "kind") ?? "",
                 SystemId = r.TryGetProperty("game", out var g) ? Texte(g, "system_id") ?? "" : "",
                 RomGroup = r.TryGetProperty("game", out var g2) ? Texte(g2, "rom_group") ?? "" : "",
@@ -357,6 +370,22 @@ public sealed class Reglement
         => e.ValueKind == JsonValueKind.Object && e.TryGetProperty(nom, out var p) && p.ValueKind == JsonValueKind.Array
             ? p.EnumerateArray().ToList()
             : [];
+
+    private static Dictionary<string, string> LireTitres(JsonElement r)
+    {
+        var titres = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        if (!r.TryGetProperty("title", out var t)) return titres;
+        if (t.ValueKind == JsonValueKind.String && t.GetString() is { Length: > 0 } seul) titres["*"] = seul;
+        if (t.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var p in t.EnumerateObject())
+            {
+                if (p.Value.ValueKind == JsonValueKind.String && p.Value.GetString() is { Length: > 0 } v) titres[p.Name.ToLowerInvariant()] = v;
+            }
+        }
+
+        return titres;
+    }
 
     private static string? Texte(JsonElement e, string nom)
         => e.ValueKind == JsonValueKind.Object && e.TryGetProperty(nom, out var p) && p.ValueKind == JsonValueKind.String ? p.GetString() : null;

@@ -110,6 +110,7 @@ public sealed class SessionSpeedrun
     private readonly List<(string AttemptId, ResultatTentative Resultat)> _closes = new();
     private readonly List<MessageJoueur> _messages = new();
     private bool _departAnnonce;
+    private bool _tricheSignalee;
     private TentativeFinie? _meilleure;
     private long? _horlogeDArrivee;
     private Evaluateur _courante;
@@ -392,8 +393,28 @@ public sealed class SessionSpeedrun
     }
 
     /// <summary>Compare l'etat de la tentative courante a celui deja publie, et publie ce qui a change.</summary>
+    /// <summary>
+    /// LE DEPART EMPECHE PAR UN CODE DE TRICHE DU JEU (mode debug de Sonic, decision du user du 31/10) : une condition de
+    /// depart porte sur une adresse que le reglement annule aussi par une ligne LEVEL_CHEAT_*, et sa valeur connue la rend
+    /// fausse. Le joueur l'apprend une fois, puis de nouveau s'il revient au titre et recommence avec le code.
+    /// </summary>
+    private void SignalerLaTriche()
+    {
+        if (_courante.Etat != EtatTentative.Preparee) return;
+        var adresses = _r.AnnulationsJeu.Where(e => e.Action?.StartsWith("LEVEL_CHEAT", StringComparison.Ordinal) == true && e.Adresse is not null)
+            .Select(e => e.Adresse!.Value).ToHashSet();
+        var bloque = _r.Depart.Any(c => adresses.Contains(c.Adresse) && _courante.ValeurConnue(c.Adresse) is { } v && !c.Vraie(v));
+        if (bloque && !_tricheSignalee)
+        {
+            _messages.Add(new MessageJoueur("speedrun.msg.debug_blocked", "Debug mode active: challenge unavailable, go back to the title screen."));
+        }
+
+        _tricheSignalee = bloque;
+    }
+
     private void Constater()
     {
+        SignalerLaTriche();
         var etat = _courante.Etat;
         if (etat == _etatVu) return;
         var avant = _etatVu;
@@ -477,6 +498,8 @@ public sealed class SessionSpeedrun
             {
                 "pause" or "PAUSE_ON" => new MessageJoueur("speedrun.msg.voided_pause", "Attempt voided: pause. " + Relancer),
                 "fast_forward" => new MessageJoueur("speedrun.msg.voided_fast_forward", "Attempt voided: fast forward. " + Relancer),
+                var c when c?.StartsWith("LEVEL_CHEAT", StringComparison.Ordinal) == true
+                    => new MessageJoueur("speedrun.msg.voided_debug", "Attempt voided: debug mode. Go back to the title screen."),
                 _ => new MessageJoueur("speedrun.msg.voided", "Attempt voided. " + Relancer),
             };
         }

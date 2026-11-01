@@ -152,11 +152,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         ILogger<LeaderboardInputService> logger,
         Infrastructure.NelfePlayScoringCollectionSyncService? collection = null,
         Infrastructure.PartieNelfePlayService? partie = null,
-        Multiplayer.MultiplayerPanelService? multiplayer = null)
+        Multiplayer.MultiplayerPanelService? multiplayer = null,
+        Speedrun.DefisPanelService? defis = null)
     {
         _collection = collection;
         _partie = partie;
         _multiplayer = multiplayer;
+        _panneauDesDefis = defis;
         _wrapper = wrapper;
         _social = social;
         _invite = invite;
@@ -269,10 +271,27 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     _logger.LogInformation("MULTIPLAYER : retour au carrousel des systemes, le panneau se ferme.");
                     panneauDesGamerooms.Fermer();
                 }
+                if (_panneauDesDefis is { Ouvert: true } defisAuCarrousel)
+                {
+                    _logger.LogInformation("Defis : retour au carrousel des systemes, le panneau se ferme.");
+                    defisAuCarrousel.Fermer();
+                }
                 if (_modele.Etat != LeaderboardPanelModel.Foyer.Ferme && !_overlay.EnAttente)
                 {
                     _logger.LogInformation("Classement : retour au carrousel des systemes, le panneau se ferme.");
                     Fermer();
+                }
+                return;
+            }
+            if (string.Equals(e.Type, "ui.game.selected", StringComparison.Ordinal)
+                && _panneauDesDefis is { Ouvert: true } defisOuvert)
+            {
+                var (systemeVu, jeuVu) = JeuSelectionne();
+                if (jeuVu.Length > 0 && (!string.Equals(jeuVu, _jeuAffiche, StringComparison.OrdinalIgnoreCase)
+                        || !string.Equals(systemeVu, _systemeAffiche, StringComparison.OrdinalIgnoreCase)))
+                {
+                    _logger.LogInformation("Defis : la selection a change ({Jeu}), le panneau se ferme.", jeuVu);
+                    defisOuvert.Fermer();
                 }
                 return;
             }
@@ -327,6 +346,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 {
                     panneauMultiplayer.FermerPourLeJeu();
                 }
+                _panneauDesDefis?.FermerPourLeJeu();
                 _modele.Fermer();
                 _overlay.FermerPourLeJeu();
                 return;
@@ -365,6 +385,40 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // joueur a la manette, « a » configure sur le bouton de droite, ne voyait jamais le panneau s'ouvrir.
             var valider = roleEs is not null ? roleEs == "valider" : slot == SlotValider;
             var annuler = roleEs is not null ? roleEs == "retour" : slot == SlotAnnuler;
+
+            // Le panneau des defis ouvert : ses gestes, et rien pour le classement.
+            if (_panneauDesDefis is { Ouvert: true } defis)
+            {
+                if (string.Equals(systeme, "DPAD", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (appuye)
+                    {
+                        _dernierGesteDpad = DateTime.UtcNow;
+                        defis.Direction(identite);
+                    }
+                }
+                else if (valider)
+                {
+                    defis.Valider(appuye);
+                }
+                else if (annuler)
+                {
+                    defis.Annuler(appuye);
+                }
+                else if (appuye && slot is not null && slot == SlotDeLIdentite("x"))
+                {
+                    defis.X();
+                }
+                else if (appuye && slot is not null && slot == SlotDeLIdentite("l"))
+                {
+                    defis.GroupePrecedent();
+                }
+                else if (appuye && slot is not null && slot == SlotDeLIdentite("r"))
+                {
+                    defis.GroupeSuivant();
+                }
+                return;
+            }
 
             // MULTIPLAYER ouvert : ses gestes, et rien pour le classement (pas d'appui long non plus).
             if (_multiplayer is { Ouvert: true } panneau)
@@ -528,6 +582,15 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             return;
         }
 
+        if (_panneauDesDefis is { Ouvert: true } defis)
+        {
+            if (defis.AttendQuOnEntre)
+            {
+                _logger.LogInformation("Defis : entree automatique dans le panneau (gauche joue par l'API).");
+                defis.Direction("left");
+            }
+            return;
+        }
         if (_multiplayer is { Ouvert: true } multiplayer)
         {
             if (multiplayer.AttendQuOnEntre)
@@ -609,6 +672,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 if (_validerDepuis is { } depuis
                     && _modele.Etat == LeaderboardPanelModel.Foyer.Ferme
                     && _multiplayer is not { Ouvert: true }
+                    && _panneauDesDefis is not { Ouvert: true }
                     && (DateTime.UtcNow - depuis).TotalMilliseconds >= Math.Max(200, _options.CurrentValue.Leaderboard.LongPressMs))
                 {
                     _validerDepuis = null;
@@ -633,6 +697,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     // le joueur retrouve sa manette. Fermer coupait la lecture d'un coup.
                     _modele.RendreLaMain();
                     _multiplayer?.RendreLaMain();
+                    _panneauDesDefis?.RendreLaMain();
                     Appliquer(LeaderboardPanelModel.Effet.RendreLeFocus);
                 }
 
@@ -674,6 +739,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 {
                     multiplayer.RendreLaMain();
                 }
+                if (_panneauDesDefis is { Ouvert: true } defisDevant && !renduDevant && !EsEstDevant() && !_overlay.EstAuPremierPlan())
+                {
+                    _logger.LogInformation("Defis : le premier plan est parti ailleurs, le panneau se ferme.");
+                    defisDevant.Fermer();
+                }
             }
             catch (OperationCanceledException) { return; }
             catch (Exception ex)
@@ -700,6 +770,16 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             return;
         }
         var msConditions = chronoConditions.ElapsedMilliseconds;
+        if (_versDefis && _panneauDesDefis is not null)
+        {
+            _jeuAffiche = nomDuJeu;
+            _systemeAffiche = systeme;
+            _ouvertureUtc = DateTime.UtcNow;
+            _entrerA = _ouvertureUtc + EntreeAutomatique;
+            _panneauDesDefis.Ouvrir(cheminDuJeu, Glyphe(SlotValider), Glyphe(SlotAnnuler),
+                Glyphe(SlotDeLIdentite("x")), Glyphe(SlotDeLIdentite("l")), Glyphe(SlotDeLIdentite("r")));
+            return;
+        }
         if (_versMultiplayer && _multiplayer is not null)
         {
             _jeuAffiche = nomDuJeu;
@@ -792,6 +872,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// panneau et pas celui du classement (V24-01) ; tant qu'il est ouvert, les gestes lui vont.
     /// </summary>
     private readonly Multiplayer.MultiplayerPanelService? _multiplayer;
+    /// <summary>Le panneau des defis (lot P5) : l'appui long dans la collection des defis.</summary>
+    private readonly Speedrun.DefisPanelService? _panneauDesDefis;
+    private bool _versDefis;
 
     /// <summary>La derniere ouverture visait-elle la collection MULTIPLAYER ?</summary>
     private bool _versMultiplayer;
@@ -864,6 +947,15 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
 
         // DANS LA COLLECTION MULTIPLAYER, l'appui long veut dire « je veux jouer » (V24-01, V24-03) :
         // c'est son panneau qui s'ouvre, que le jeu soit ouvert au scoring ou non.
+        // DANS LA COLLECTION DES DEFIS, l'appui long ouvre le panneau des defis (lot P5).
+        _versDefis = _panneauDesDefis is { Actif: true, DansLaCollection: true };
+        if (_versDefis)
+        {
+            _versMultiplayer = false;
+            _logger.LogInformation("Classement : appui long sur {Jeu}, carrousel des defis : panneau des defis.", nomDuJeu);
+            _dernierRefus = "";
+            return true;
+        }
         _versMultiplayer = _multiplayer is { Actif: true, DansLaCollection: true };
         // Le carrousel qui a decide, au journal (29/10 : « a la sortie d'un jeu multiplayer, l'appui long ne fonctionne plus »).
         _logger.LogInformation("Classement : appui long sur {Jeu}, carrousel « {Carrousel} » : {Vers}.", nomDuJeu,

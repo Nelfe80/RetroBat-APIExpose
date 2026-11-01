@@ -602,6 +602,39 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     }
 
     /// <summary>Le meilleur temps fini de ce defi dans le journal local, en frames.</summary>
+    /// <summary>
+    /// Le bilan du journal local par defi : tentatives parties et meilleur temps classable. Le panneau s'en sert pour dire
+    /// qu'une epreuve a deja ete tentee ou reussie sur cette borne (§7.7 du CDC du panneau).
+    /// </summary>
+    public IReadOnlyDictionary<string, (int Tentatives, long? Meilleur)> BilanDuJournal()
+    {
+        var bilan = new Dictionary<string, (int Tentatives, long? Meilleur)>(StringComparer.OrdinalIgnoreCase);
+        try
+        {
+            if (!File.Exists(_fichierDesTentatives)) return bilan;
+            foreach (var ligne in File.ReadLines(_fichierDesTentatives))
+            {
+                if (ligne.Length == 0) continue;
+                using var doc = JsonDocument.Parse(ligne);
+                var r = doc.RootElement;
+                if (!r.TryGetProperty("kind", out var k) || k.GetString() != "attempt" || !r.TryGetProperty("challengeId", out var c)) continue;
+                var id = c.GetString() ?? "";
+                var (tentatives, meilleur) = bilan.GetValueOrDefault(id);
+                if (r.TryGetProperty("state", out var s) && s.GetString() == SessionSpeedrun.Finished
+                    && r.TryGetProperty("officialFrames", out var f) && f.ValueKind == JsonValueKind.Number
+                    && !(r.TryGetProperty("gameTimeCheck", out var g) && g.GetString() == "ecart")
+                    && (meilleur is not { } m || f.GetInt64() < m))
+                    meilleur = f.GetInt64();
+                bilan[id] = (tentatives + 1, meilleur);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or JsonException)
+        {
+        }
+
+        return bilan;
+    }
+
     internal long? MeilleurTempsDuJournal(string defiId)
     {
         try

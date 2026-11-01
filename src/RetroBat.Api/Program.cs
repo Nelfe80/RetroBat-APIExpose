@@ -461,6 +461,10 @@ builder.Services.AddSingleton<NelfePlayScoringCollectionSyncService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<NelfePlayScoringCollectionSyncService>());
 // La collection NELFEPLAY MULTIPLAYER : le catalogue du Data Pack croise avec ce que la borne possede.
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerCatalogueStore>();
+builder.Services.AddSingleton<RetroBat.Api.Speedrun.DefisCollectionSyncService>();
+builder.Services.AddSingleton<RetroBat.Api.Speedrun.ClassementsDesDefis>();
+builder.Services.AddSingleton<RetroBat.Api.Speedrun.DefisPanelService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Speedrun.DefisCollectionSyncService>());
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerCollectionSyncService>();
 builder.Services.AddHostedService<RetroBat.Api.Multiplayer.MultiplayerCoeursService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerCollectionSyncService>());

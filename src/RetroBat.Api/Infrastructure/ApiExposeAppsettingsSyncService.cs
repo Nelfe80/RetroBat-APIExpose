@@ -172,6 +172,8 @@ public sealed class ApiExposeAppsettingsSyncService
             ["global.apiexpose.nelfeplay.show_scoring_collection"] = Bool("NelfePlay", "ShowScoringCollection"),
             // La collection « NELFEPLAY MULTIPLAYER », dans GAME EVENTS MANAGER ; visible par defaut (25/10).
             ["global.apiexpose.nelfeplay.show_multiplayer_collection"] = Bool("NelfePlay", "ShowMultiplayerCollection"),
+            // La collection « NELFEPLAY CHALLENGES & SPEEDRUNS », dans GAME EVENTS MANAGER ; visible par defaut.
+            ["global.apiexpose.nelfeplay.show_challenges_collection"] = Bool("NelfePlay", "ShowChallengesCollection"),
             // Bouton maitre des surfaces NelfePlay. Pas d'entree de menu : aujourd'hui il ne
             // coupe que la collection, et un interrupteur qui promet plus qu'il ne fait est un
             // mensonge. Il reste reglable dans appsettings et se synchronise si la cle existe.

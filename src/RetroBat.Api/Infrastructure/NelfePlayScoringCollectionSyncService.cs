@@ -158,6 +158,12 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// <summary>Le dernier etat connu, tel que l'endpoint de statut le publie.</summary>
     public ScoringCollectionStatus Status => _statut;
 
+    /// <summary>
+    /// Le fichier retenu pour chaque jeu de la derniere passe, par « systeme/jeu » ; null avant la premiere passe. La
+    /// collection des defis part de lui : un jeu n'y entre que s'il a passe les controles de World Scoring.
+    /// </summary>
+    public IReadOnlyDictionary<string, string>? CheminsParJeu { get; private set; }
+
     private string EtatPath => Path.Combine(_stateRoot, "scoring-collection.json");
 
     private string ManifestePath => Path.Combine(_stateRoot, "scoring-collection-remote.json");
@@ -569,6 +575,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         var precedents = LireCollectionPrecedente();
         var retenus = new List<string>();
         var aDeclarer = new List<(InstalledGame Jeu, string RomGroup)>();
+        var cheminsParJeu = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         _coeursParJeu.Clear();
         // POURQUOI CHAQUE JEU MANQUANT MANQUE.
         //
@@ -653,6 +660,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             if (choisi is { Length: > 0 })
             {
                 retenus.Add(choisi);
+                cheminsParJeu[jeu.SystemId + "/" + jeu.RomGroup] = choisi;
                 var retenu = candidats.FirstOrDefault(candidat =>
                     string.Equals(candidat.AbsolutePath, choisi, StringComparison.OrdinalIgnoreCase));
                 if (retenu is { FromGamelist: false })
@@ -670,6 +678,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         _manques = manques;
         _aDeclarer = aDeclarer;
         _definitionsPerimees = perimees;
+        CheminsParJeu = cheminsParJeu;
 
         return retenus;
     }
