@@ -147,4 +147,19 @@ public class ModesDeJeuTests
         var ctx = ModesDeJeu.ContexteDuRun([(0, 10)], [ContexteDeJeu.Vide], [(5, 99)], courant);
         Assert.Same(courant, ctx);
     }
+
+    [Fact]
+    public void Le_direct_garde_le_mode_de_la_partie_jouee_apres_son_game_over()
+    {
+        // TGM2 : 1 Normal, 2 Master ; l'ecran titre ecrit 2, les demos 2, 10 et 4.
+        var titre = ContexteDeJeu.Vide.AvecMode(2);
+        var normal = ContexteDeJeu.Vide.AvecMode(1);
+        var demo = ContexteDeJeu.Vide.AvecMode(10);
+
+        Assert.Equal(2, ModesDeJeu.ContexteDuDirect(false, titre, null).Mode);       // avant le premier START : le mode lu
+        Assert.Equal(1, ModesDeJeu.ContexteDuDirect(true, normal, null).Mode);       // en jeu : le mode lu
+        Assert.Equal(1, ModesDeJeu.ContexteDuDirect(false, titre, normal).Mode);     // GAME OVER, retour a l'ecran titre
+        Assert.Equal(1, ModesDeJeu.ContexteDuDirect(false, demo, normal).Mode);      // demo suivante
+        Assert.Equal(2, ModesDeJeu.ContexteDuDirect(true, titre, normal).Mode);      // nouveau START : le mode lu, Master choisi
+    }
 }

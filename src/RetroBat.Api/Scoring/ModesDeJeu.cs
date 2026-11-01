@@ -207,6 +207,15 @@ public static class ModesDeJeu
             : null;
     }
 
+    /// <summary>
+    /// LE MODE DU DIRECT APRES LE GAME OVER (01/11/2026) : en jeu, le mode lu ; apres le GAME OVER, celui de la partie
+    /// jouee, jusqu'au START suivant. L'ecran titre et les demos de TGM2 ecrivent 2 (Master) a l'adresse du mode, puis 10
+    /// et 4 : la bande d'Ushuushow7, en Normal a 107 376, passait sur le record Master (18 007) des son GAME OVER, et la
+    /// fin de passage l'aurait applaudi. Avant le premier START, le mode lu, comme avant. Pur.
+    /// </summary>
+    public static ContexteDeJeu ContexteDuDirect(bool enJeu, ContexteDeJeu courant, ContexteDeJeu? partieJouee)
+        => enJeu || partieJouee is null ? courant : partieJouee;
+
     /// <summary>Les profils des parties seules : tous sauf la categorie 1CC MULTI et ses modes.</summary>
     public static List<JsonElement> SansLeMulti(IReadOnlyList<JsonElement> profils)
         => profils.Where(p => !EstMulti(Regle(p)) && !Est1LCMulti(Regle(p))).ToList();

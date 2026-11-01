@@ -269,6 +269,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// mode le run retenu a ete joue. Voir ModesDeJeu.
     /// </summary>
     private RetroBat.Api.Scoring.ContexteDeJeu _contexte = RetroBat.Api.Scoring.ContexteDeJeu.Vide;
+    // Le contexte de la derniere partie jouee, fige a son GAME OVER : le direct le garde pendant l'ecran titre et les demos.
+    private RetroBat.Api.Scoring.ContexteDeJeu? _contexteDeLaPartieJouee;
     // Les profils lus au lancement, et leurs modes par drapeaux : le direct y lit le mode joue (RegleDuModeEnCours).
     private (string RomGroup, List<JsonElement> Profils, List<RetroBat.Api.Scoring.ModesDeJeu.ModeParDrapeaux> Modes)? _profilsDuLancement;
     private readonly List<RetroBat.Api.Scoring.ContexteDeJeu> _contextes = new();
@@ -905,6 +907,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _enregistrements.Clear();
             _vies.Clear();
             _contexte = RetroBat.Api.Scoring.ContexteDeJeu.Vide;
+            _contexteDeLaPartieJouee = null;
             _contextes.Clear();
             _credits.Clear();
             _departs.Clear();
@@ -1531,6 +1534,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
             else
             {
+                // Le mode de la partie qui finit : l'ecran titre et les demos qui suivent n'y touchent plus (direct).
+                if (_enJeu && action.Contains("GAME_OVER", StringComparison.Ordinal)) _contexteDeLaPartieJouee = _contexte;
                 (_inDemo, _enJeu) = EtatsApres(_inDemo, _enJeu, action);
                 if (action.Contains("GAME_OVER", StringComparison.Ordinal)) { _gameOverVu = true; _gameOverDansLaPartie = true; _demoEnSuspens = null; }
             }
@@ -2388,6 +2393,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// LE MODE JOUE, PENDANT LA PARTIE (2026-10-18) : le classement que disent le mode et les drapeaux lus jusqu'ici, avec
     /// les profils du lancement. Le direct partage et le direct de record s'en servent (record de la bande, applaudissements,
     /// direct a l'approche). Null quand on ne sait pas : jeu dont les profils n'ont pas ete lus, ou mode sans classement.
+    /// Apres un GAME OVER, le mode de la partie jouee jusqu'au START suivant (ModesDeJeu.ContexteDuDirect).
     /// La soumission, elle, tranche toujours en fin de partie, sur le mode en vigueur au debut du run retenu.
     /// </summary>
     public string? RegleDuModeEnCours(string romGroup)
@@ -2396,7 +2402,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             if (_profilsDuLancement is not { } p || !string.Equals(p.RomGroup, romGroup.Trim(), StringComparison.OrdinalIgnoreCase))
                 return null;
-            return RetroBat.Api.Scoring.ModesDeJeu.RegleDuMode(p.Profils, p.Modes, _contexte);
+            var contexte = RetroBat.Api.Scoring.ModesDeJeu.ContexteDuDirect(_enJeu, _contexte, _contexteDeLaPartieJouee);
+            return RetroBat.Api.Scoring.ModesDeJeu.RegleDuMode(p.Profils, p.Modes, contexte);
         }
     }
 
