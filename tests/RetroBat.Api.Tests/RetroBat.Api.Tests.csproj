@@ -37,6 +37,10 @@
     <None Update="Reglements\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <!-- Le .MEM que cite un reglement de test : VerifierContre le relit tel quel. -->
+    <None Update="Reglements\*.MEM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

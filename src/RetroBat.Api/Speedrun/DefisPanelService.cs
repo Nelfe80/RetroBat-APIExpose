@@ -46,6 +46,7 @@ public sealed partial class DefisPanelService
     private IReadOnlyDictionary<string, ClassementDEpreuve> _tableaux = new Dictionary<string, ClassementDEpreuve>();
     private IReadOnlyList<TypeDeRecords> _records = [];
     private string _glypheValider = "a";
+    private string _glypheDefier = "y";
     private string _glypheAnnuler = "b";
     private string _glypheX = "x";
     private string _glypheLb = "l";
@@ -105,7 +106,8 @@ public sealed partial class DefisPanelService
         get { lock (_verrou) return _chemin; }
     }
 
-    public void Ouvrir(string chemin, string glypheValider, string glypheAnnuler, string glypheX = "", string glypheLb = "", string glypheRb = "")
+    public void Ouvrir(string chemin, string glypheValider, string glypheAnnuler, string glypheX = "", string glypheLb = "", string glypheRb = "",
+        string glypheDefier = "")
     {
         IReadOnlyList<string> regles;
         lock (_verrou)
@@ -117,6 +119,7 @@ public sealed partial class DefisPanelService
             _defis = _collection.DefisDuJeu(chemin);
             _bilan = _session.BilanDuJournal();
             _glypheValider = glypheValider.Length > 0 ? glypheValider : "a";
+            _glypheDefier = glypheDefier.Length > 0 ? glypheDefier : "y";
             _glypheAnnuler = glypheAnnuler.Length > 0 ? glypheAnnuler : "b";
             _glypheX = glypheX.Length > 0 ? glypheX : "x";
             _glypheLb = glypheLb.Length > 0 ? glypheLb : "l";
@@ -254,9 +257,17 @@ public sealed partial class DefisPanelService
         Appliquer(effet);
     }
 
+    /// <summary>
+    /// Valider ne lance rien dans le panneau (essai du 01/11) : le menu d'ES se referme avant le lancement, et ES, qui
+    /// reprend la main, entendait encore A et lancait le jeu une seconde fois. Deux Metal Slug 3 tournaient ensemble.
+    /// </summary>
     public void Valider(bool appuye)
     {
-        if (!appuye) return;
+    }
+
+    /// <summary>LE BOUTON CHALLENGE (le « y » d'ES), comme au World Scoring : il lance l'epreuve choisie, a l'appui.</summary>
+    public void Defier()
+    {
         DefisPanelModel.Effet effet;
         lock (_verrou) effet = _modele.Valider();
         Appliquer(effet);
@@ -376,7 +387,7 @@ public sealed partial class DefisPanelService
                 lignes.Select(l => l.Ligne).ToList(),
                 courante,
                 bandeaux || defi is null ? [] : Fiche(defi),
-                defi is null ? null : new Aide(_glypheValider, action),
+                defi is null ? null : new Aide(_glypheDefier, action),
                 Aides(),
                 Message: _message.Length > 0 ? _message : T("speedrun.panel.empty", "No open challenge for this game"),
                 Pseudo: Pseudo,
@@ -533,7 +544,10 @@ public sealed partial class DefisPanelService
         return new VueDeRecords(defi.Titre(langue) + " · " + Objectif(defi), ["", T("speedrun.panel.time", "TIME")], lignes, moi is null ? null : moi.Rang - 1);
     }
 
-    private string Objectif(Reglement defi) => defi.Kind switch
+    /// <summary>Ce que dit le defi de lui-meme, sinon ce que dit son genre.</summary>
+    private string Objectif(Reglement defi) => defi.Resume(Langue()) ?? ObjectifDuGenre(defi);
+
+    private string ObjectifDuGenre(Reglement defi) => defi.Kind switch
     {
         "speedrun_level" => T("speedrun.panel.goal.level", "Finish the level alive"),
         "speedrun_boss" => T("speedrun.panel.goal.boss", "Defeat the boss alive"),

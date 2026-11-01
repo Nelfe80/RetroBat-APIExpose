@@ -72,6 +72,21 @@ public sealed class Reglement
             : Titres.TryGetValue("en", out var en) ? en
             : Titres.Values.FirstOrDefault() ?? ChallengeId;
     }
+    /// <summary>
+    /// Le resume du defi par langue (« summary », facultatif) : ce que le panneau dit du defi sous son nom. Le genre ne suffit
+    /// pas a le dire pour un challenge (« Mission 1 jusqu'a Huge Hermit, au couteau, sans mourir »).
+    /// </summary>
+    public IReadOnlyDictionary<string, string> Resumes { get; private init; } = new Dictionary<string, string>();
+
+    /// <summary>Le resume dans cette langue, sinon en anglais, sinon le premier ; null sans resume.</summary>
+    public string? Resume(string? langue)
+    {
+        var court = (langue ?? "").Split('_', '-')[0].ToLowerInvariant();
+        return Resumes.TryGetValue(court, out var r) ? r
+            : Resumes.TryGetValue("en", out var en) ? en
+            : Resumes.Values.FirstOrDefault();
+    }
+
     public string Kind { get; private init; } = "";
     public string SystemId { get; private init; } = "";
     public string RomGroup { get; private init; } = "";
@@ -102,6 +117,18 @@ public sealed class Reglement
 
     /// <summary>L'ecart tolere entre l'horloge de la borne et les frames avant de conclure a une pause (§5.5 du CDC v1.4).</summary>
     public int TolerancePauseMs { get; private init; } = 1000;
+
+    /// <summary>
+    /// LE BLOC DE MEMOIRE QUE LE COEUR EXPOSE (« runtime.core_ram », facultatif) : la ou READ_CORE_RAM lit une adresse du .MEM.
+    /// Sans lui, l'adresse telle quelle (Mega Drive). FBNeo expose la RAM 68000 du Neo-Geo a partir de 0x100000 en mots de
+    /// l'hote : « base » 0x100000, « swap16 » vrai (labo du 01/11, RetroAchievements coupe comme au lancement d'un defi).
+    /// </summary>
+    public long? BaseDuCoeur { get; private init; }
+
+    public bool MotsInversesDuCoeur { get; private init; }
+
+    /// <summary>L'offset a demander a READ_CORE_RAM pour cette adresse du .MEM.</summary>
+    public long OffsetDansLeCoeur(long adresse) => BaseDuCoeur is { } b ? (adresse - b) ^ (MotsInversesDuCoeur ? 1L : 0L) : adresse;
 
     public DefinitionChrono? Officiel => ChronoOfficiel == ChronoIndependant ? Independant : Cale;
 
@@ -136,12 +163,23 @@ public sealed class Reglement
                     : throw new ReglementInvalideException("aucune arrivee : ni « finish » ni evenement d'arrivee du chrono officiel");
             }
 
+            long? baseDuCoeur = null;
+            var motsInverses = false;
+            if (r.TryGetProperty("runtime", out var rtc) && rtc.TryGetProperty("core_ram", out var cr) && cr.ValueKind == JsonValueKind.Object)
+            {
+                if (cr.TryGetProperty("base", out var cb)) baseDuCoeur = Nombre(cb);
+                motsInverses = cr.TryGetProperty("swap16", out var sw) && sw.ValueKind == JsonValueKind.True;
+            }
+
             return new Reglement
             {
+                BaseDuCoeur = baseDuCoeur,
+                MotsInversesDuCoeur = motsInverses,
                 ChallengeId = Texte(r, "challenge_id") ?? throw new ReglementInvalideException("challenge_id absent"),
                 Version = r.TryGetProperty("version", out var v) ? v.GetInt32() : throw new ReglementInvalideException("version absente"),
                 Ruleset = Texte(r, "ruleset") ?? "",
                 Titres = LireTitres(r),
+                Resumes = LireTitres(r, "summary"),
                 Kind = Texte(r, "kind") ?? "",
                 SystemId = r.TryGetProperty("game", out var g) ? Texte(g, "system_id") ?? "" : "",
                 RomGroup = r.TryGetProperty("game", out var g2) ? Texte(g2, "rom_group") ?? "" : "",
@@ -276,9 +314,16 @@ public sealed class Reglement
     }
 
     /// <summary>Toutes les adresses dont l'evaluateur doit connaitre la valeur : celles du depart et des conditions des bornes.</summary>
+    /// <summary>
+    /// Les adresses a connaitre avant le depart : conditions d'armement, conditions « when » des departs, et l'adresse d'un
+    /// evenement de depart qui porte un « leaves ». Metal Slug 3 part quand le vehicule passe de 00 a 01 : ce 00 ne change pas
+    /// depuis l'allumage, aucun evenement ne le dit, il se releve.
+    /// </summary>
     public IEnumerable<long> AdressesDeDepart()
         => Depart.Select(c => c.Adresse)
             .Concat(new[] { Cale, Independant }.Where(c => c is not null).SelectMany(c => c!.Depart.Quand).Select(q => q.Adresse))
+            .Concat(new[] { Cale, Independant }.Where(c => c is not null).SelectMany(c => c!.Depart.Evenements)
+                .Where(e => e.Quitte is not null && e.Adresse is not null).Select(e => e.Adresse!.Value))
             .Distinct();
 
     /// <summary>Toutes les adresses citees, pour reconnaitre un capteur coupe par le wrapper.</summary>
@@ -371,10 +416,10 @@ public sealed class Reglement
             ? p.EnumerateArray().ToList()
             : [];
 
-    private static Dictionary<string, string> LireTitres(JsonElement r)
+    private static Dictionary<string, string> LireTitres(JsonElement r, string champ = "title")
     {
         var titres = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        if (!r.TryGetProperty("title", out var t)) return titres;
+        if (!r.TryGetProperty(champ, out var t)) return titres;
         if (t.ValueKind == JsonValueKind.String && t.GetString() is { Length: > 0 } seul) titres["*"] = seul;
         if (t.ValueKind == JsonValueKind.Object)
         {

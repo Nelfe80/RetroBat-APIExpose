@@ -419,6 +419,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 {
                     defis.Annuler(appuye);
                 }
+                else if (appuye && slot is not null && slot == SlotDeLIdentite("y"))
+                {
+                    defis.Defier();
+                }
                 else if (appuye && slot is not null && slot == SlotDeLIdentite("x"))
                 {
                     defis.X();
@@ -791,7 +795,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             _ouvertureUtc = DateTime.UtcNow;
             _entrerA = _ouvertureUtc + EntreeAutomatique;
             _panneauDesDefis.Ouvrir(cheminDuJeu, Glyphe(SlotValider), Glyphe(SlotAnnuler),
-                Glyphe(SlotDeLIdentite("x")), Glyphe(SlotDeLIdentite("l")), Glyphe(SlotDeLIdentite("r")));
+                Glyphe(SlotDeLIdentite("x")), Glyphe(SlotDeLIdentite("l")), Glyphe(SlotDeLIdentite("r")), Glyphe(SlotDeLIdentite("y")));
             return;
         }
         if (_versMultiplayer && _multiplayer is not null)

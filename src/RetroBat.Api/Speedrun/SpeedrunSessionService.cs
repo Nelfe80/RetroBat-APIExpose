@@ -157,6 +157,10 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
         var rom = trouverLaRom(reglement.SystemId, reglement.RomGroup);
         if (rom is null) return new(false, "not_installed");
+        // Un chemin Windows : FBNeo ne retrouve pas le dossier du romset dans « E:/RetroBat/roms/fbneo/mslug3.zip » (essai du
+        // 01/11, « romset unknown »), Genesis Plus GX ne voyait pas la difference.
+        try { rom = Path.GetFullPath(rom); }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException) { }
 
         var coeur = reglement.Coeurs.FirstOrDefault() is { Length: > 0 } c ? c : null;
         var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
@@ -279,7 +283,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
             _session = new SessionSpeedrun(l.Reglement.ChallengeId, l.Reglement) { MeilleurTemps = MeilleurTempsDuJournal(l.Reglement.ChallengeId) };
             _sessionDuLancement = _session;
-            _sondeDeRetroArch = l.Reglement.AdressesCitees().FirstOrDefault();
+            _sondeDeRetroArch = l.Reglement.OffsetDansLeCoeur(l.Reglement.AdressesCitees().FirstOrDefault());
             _image.Clear();
             _cadence.Clear();
             _tenus.Clear();
@@ -492,7 +496,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
             foreach (var adresse in adresses)
             {
-                var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {adresse:x} 1", ct).ConfigureAwait(false);
+                // L'offset dans le bloc que le coeur expose : sous FBNeo, ni l'adresse du .MEM ni le meme ordre d'octets.
+                var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {session.Reglement.OffsetDansLeCoeur(adresse):x} 1", ct).ConfigureAwait(false);
                 var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 if (morceaux is not { Length: >= 3 } || morceaux[0] != "READ_CORE_RAM"
                     || !int.TryParse(morceaux[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var valeur))
