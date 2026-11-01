@@ -130,13 +130,6 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable, RetroB
     }
 
     /// <summary>
-    /// Le carrousel ne dit pas d'ou vient la partie. Avec ses collections regroupees, ES annonce « collections » quelle que soit
-    /// celle qui est ouverte (31/10/2026 : toutes les parties d'une borne refusees « hors NelfePlay »).
-    /// </summary>
-    internal static bool CarrouselInconnu(string? carrousel)
-        => string.IsNullOrWhiteSpace(carrousel) || string.Equals(carrousel.Trim(), "collections", StringComparison.OrdinalIgnoreCase);
-
-    /// <summary>
     /// L'origine d'une partie NelfePlay, ou null pour une partie du joueur. `dansLaCollection` ne
     /// sert que si le carrousel est inconnu.
     /// </summary>
@@ -147,12 +140,12 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable, RetroB
             return annonce;
         }
 
-        if (CarrouselInconnu(carrousel))
+        if (string.IsNullOrWhiteSpace(carrousel))
         {
             return dansLaCollection == true ? "collection (carrousel inconnu)" : null;
         }
 
-        return string.Equals(carrousel!.Trim(), NelfePlayScoringCollectionSyncService.CollectionName, StringComparison.OrdinalIgnoreCase)
+        return string.Equals(carrousel.Trim(), NelfePlayScoringCollectionSyncService.CollectionName, StringComparison.OrdinalIgnoreCase)
             ? "collection"
             : null;
     }
@@ -181,7 +174,7 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable, RetroB
         // Le carrousel annonce par ES seulement : un carrousel repris du dernier lancement de l'API peut etre perime.
         var carrousel = _media.CarouselSystemIdConfirme;
         bool? dansLaCollection = null;
-        if (CarrouselInconnu(carrousel) && _contexte?.Ui.Running?.GamePath is { Length: > 0 } chemin)
+        if (carrousel.Length == 0 && _contexte?.Ui.Running?.GamePath is { Length: > 0 } chemin)
         {
             dansLaCollection = _collection?.EstOuvertAuScoring(chemin);
         }

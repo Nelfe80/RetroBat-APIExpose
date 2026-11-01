@@ -102,13 +102,4 @@ public sealed class PartieNelfePlayTests
 
         Assert.True(partie.EstNelfePlay);
     }
-
-    [Theory]
-    [InlineData("collections", true, "collection (carrousel inconnu)")]
-    [InlineData("COLLECTIONS", true, "collection (carrousel inconnu)")]
-    [InlineData("collections", false, null)]
-    [InlineData("collections", null, null)]
-    [InlineData("favorites", true, null)]
-    public void Le_regroupement_des_collections_ne_dit_pas_d_ou_vient_la_partie(string carrousel, bool? dansLaCollection, string? attendu)
-        => Assert.Equal(attendu, PartieNelfePlayService.Juger(carrousel, null, dansLaCollection));
 }
