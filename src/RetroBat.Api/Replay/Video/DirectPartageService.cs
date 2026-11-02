@@ -63,7 +63,8 @@ public sealed class DirectPartageService : IHostedService
         public IReadOnlyList<LeaderboardClient.Ligne> Lignes = Array.Empty<LeaderboardClient.Ligne>();
         public volatile bool AlerteRecord;
         public bool CarteEcrite;
-        public readonly DateTime Debut = DateTime.UtcNow;
+        // Une epreuve recale son debut sur le chargement de son etat de depart (voir AttendreLeDepartAsync).
+        public DateTime Debut = DateTime.UtcNow;
         // LE RELAIS (2026-10-18) : la cle de la partie, pour que le site distingue deux parties de la borne (l'ancienne
         // finit sa fin de passage pendant que la nouvelle se presente pour reprendre le meme direct).
         public readonly string Cle = Guid.NewGuid().ToString("N");
@@ -329,6 +330,11 @@ public sealed class DirectPartageService : IHostedService
             var romGroup = def.Rom.Trim().ToLowerInvariant();
             if (_epreuves?.EpreuveEnCours is { } epreuve)
             {
+                // L'ANTENNE EN 3 SECONDES (essai du user, 02/11 22:56) : elue 3 s apres le lancement par ES, la partie n'avait
+                // ni film ni etat de depart (RetroArch demarrait encore) et le passage tombait aussitot (« aucun film ne
+                // tourne »). Une epreuve ne se presente qu'une fois le film lance et son etat de depart charge, et ses 3
+                // secondes comptent de la.
+                if (!await AttendreLeDepartAsync(p, epreuve).ConfigureAwait(false)) return;
                 // L'EPREUVE (02/11) : son classement (ch-...), sa bande, son meilleur temps ; jamais le score du jeu.
                 p.ModeImpose = LibelleDeLEpreuve(epreuve.Kind, epreuve.Titre("en"));
                 p.RegleDuRecord = epreuve.Ruleset;
@@ -428,6 +434,33 @@ public sealed class DirectPartageService : IHostedService
             // Sans classement, la bande dit nelfeplay.com.
         }
     }
+
+    /// <summary>Le plus long qu'on attende le film et l'etat de depart d'une epreuve : un lancement de RetroArch, avec marge.</summary>
+    internal static readonly TimeSpan AttenteDuDepart = TimeSpan.FromMinutes(3);
+
+    /// <summary>
+    /// Attend que l'epreuve puisse passer a l'antenne : le film tourne et, si elle part d'un etat, cet etat est charge. Le
+    /// debut de la partie se recale alors sur cet instant. Faux si la partie finit avant, ou au-dela d'AttenteDuDepart.
+    /// </summary>
+    private async Task<bool> AttendreLeDepartAsync(Partie p, RetroBat.Api.Speedrun.Reglement epreuve)
+    {
+        var limite = DateTime.UtcNow + AttenteDuDepart;
+        while (!p.Finie && DateTime.UtcNow < limite)
+        {
+            if (PretPourLAntenne(_capture.FilmEnCours() is not null, epreuve.Etat is not null, _epreuves?.EtatChargeUtc))
+            {
+                p.Debut = DateTime.UtcNow;
+                return true;
+            }
+            await Task.Delay(500).ConfigureAwait(false);
+        }
+        _journal.LogInformation("Direct partage : epreuve {Defi} sans film ou sans etat de depart, pas de candidature.", epreuve.ChallengeId);
+        return false;
+    }
+
+    /// <summary>Une epreuve peut-elle se presenter : un film tourne, et son etat de depart est charge quand elle en a un. Pur.</summary>
+    internal static bool PretPourLAntenne(bool filmEnCours, bool partDUnEtat, DateTime? etatCharge)
+        => filmEnCours && (!partDUnEtat || etatCharge is not null);
 
     /// <summary>
     /// L'epreuve sur la bande : « SPEEDRUN MARBLE ZONE · ACT 1 », « CHALLENGE MY ### AND MY KNIFE ». Le titre se coupe a

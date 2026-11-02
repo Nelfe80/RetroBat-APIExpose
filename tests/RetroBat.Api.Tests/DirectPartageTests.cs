@@ -100,6 +100,14 @@ public sealed class DirectPartageTests
     public void Un_titre_d_epreuve_trop_long_se_coupe()
         => Assert.Equal("SPEEDRUN " + new string('A', 39) + "…", DirectPartageService.LibelleDeLEpreuve("speedrun_level", new string('a', 60)));
 
+    [Theory]
+    [InlineData(false, true, true, false)]   // RetroArch demarre : aucun film (essai du 02/11, 22:56)
+    [InlineData(true, true, false, false)]   // le film tourne, l'etat de depart n'est pas encore charge
+    [InlineData(true, true, true, true)]
+    [InlineData(true, false, false, true)]   // une epreuve sans etat (Any%) part avec le film
+    public void Une_epreuve_ne_se_presente_qu_avec_son_film_et_son_depart(bool film, bool partDUnEtat, bool charge, bool attendu)
+        => Assert.Equal(attendu, DirectPartageService.PretPourLAntenne(film, partDUnEtat, charge ? DateTime.UtcNow : null));
+
     [Fact]
     public void Le_record_d_une_epreuve_est_un_temps()
     {
