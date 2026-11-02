@@ -462,7 +462,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
             _session = new SessionSpeedrun(l.Reglement.ChallengeId, l.Reglement) { MeilleurTemps = MeilleurTempsDuJournal(l.Reglement.ChallengeId) };
             _etatJournalise = null;
-            _signauxRecus = _signauxAvantLEtat = 0;
+            _signauxRecus = _signauxAvantLEtat = _signauxArmesJournalises = 0;
             _derniersReleves.Clear();
             _sessionDuLancement = _session;
             _sondeDeRetroArch = l.Reglement.OffsetDansLeCoeur(l.Reglement.AdressesCitees().FirstOrDefault());
@@ -554,6 +554,14 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         var horloge = _horlogeDeLImage;
         _image.Clear();
         _frameDeLImage = _horlogeDeLImage = null;
+        // LE DEPART QUI NE VIENT PAS (essai du user du 03/11, Green Hill 2 : ARMED puis IDLE 47 s plus tard, jamais RUNNING ;
+        // au banc, le meme defi part). Tant que l'epreuve est armee, chaque signal recu s'ecrit, 60 au plus par session.
+        if (_session.Etat == SessionSpeedrun.Armed && _signauxArmesJournalises < 60)
+        {
+            foreach (var sig in image.Take(60 - _signauxArmesJournalises))
+                _journal.LogInformation("Speedrun : arme, image {Frame} : {Action} {Adresse} = {Valeur}.", sig.Frame, sig.Action, Hex.Ecrire(sig.Adresse), Hex.Ecrire(sig.Valeur));
+            _signauxArmesJournalises += Math.Min(image.Count, 60 - _signauxArmesJournalises);
+        }
         _session.RecevoirImage(image, horloge);
         _premiereImage ??= DateTime.UtcNow;
         GuetterLAvanceRapide(image[0].Frame, horloge);
@@ -844,7 +852,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     // pourquoi). Chaque changement d'etat se journalise, et la fermeture dit ce que le wrapper a envoye et ce que les releves
     // ont lu en dernier.
     private string? _etatJournalise;
-    private int _signauxRecus, _signauxAvantLEtat;
+    private int _signauxRecus, _signauxAvantLEtat, _signauxArmesJournalises;
     private readonly Dictionary<long, int> _derniersReleves = new();
 
     /// <summary>
