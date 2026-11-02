@@ -34,6 +34,21 @@ public class VerrousDeDefiTests
         Assert.Empty(Couteau.VerifierContre(File.ReadAllBytes(Fichier("metal-slug-3.MEM"))));
     }
 
+    /// <summary>
+    /// LA V4 (essai du user du 02/11, 22:56) : le bit du couteau ne vaut que pour le pistolet ; la mitrailleuse lourde ramassee
+    /// tirait (munitions 200 puis 20). Le second verrou tient l'arme du joueur 1 sur le pistolet (0x10EAF3 = 00).
+    /// </summary>
+    [Fact]
+    public void La_v4_tient_aussi_l_arme_sur_le_pistolet()
+    {
+        var v4 = Reglement.Lire(File.ReadAllText(Fichier("metal-slug-3.mission-1-knife.v4.json")));
+        Assert.Equal("ch-ms3-m1-knife-v4", v4.Ruleset);
+        Assert.Equal(4, v4.Version);
+        Assert.Equal(2, v4.Verrous.Count);
+        Assert.Equal(LigneDuCouteau + ";0x10EAF3,1,value,0x00", v4.LignesDesVerrous);
+        Assert.Empty(v4.VerifierContre(File.ReadAllBytes(Fichier("metal-slug-3.MEM"))));
+    }
+
     [Fact]
     public void Un_reglement_sans_verrou_n_en_demande_aucun()
     {
