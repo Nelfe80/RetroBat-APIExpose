@@ -724,6 +724,8 @@ public class RetroArchWrapperProvider : IProvider
                     CoreVersion = Get("core_version"),
                     CoreOptions = Get("core_options"),
                     ForcedOptions = Get("forced_options"),
+                    // Les verrous du defi lus par le wrapper 0.343 (D18) ; null avec un wrapper plus ancien.
+                    Locks = Get("locks"),
                     SessionNonce = Get("session_nonce"),
                 }
             });

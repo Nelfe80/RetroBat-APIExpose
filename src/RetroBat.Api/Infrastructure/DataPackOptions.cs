@@ -50,5 +50,7 @@ public class DataPackOptions
         "live",
         // Le catalogue NELFEPLAY MULTIPLAYER (21 octobre 2026) : jeux, coeurs imposes, niveaux.
         "multiplayer",
+        // Les etats de depart des defis (1er novembre 2026), verifies par l'empreinte du reglement avant chaque pose.
+        "challenges",
     };
 }

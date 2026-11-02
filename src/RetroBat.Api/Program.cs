@@ -306,6 +306,8 @@ builder.Services
         client.MaxResponseContentBufferSize = 2 * 1024 * 1024;
     })
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+// Le jeu d'abord pendant un defi : RetroArch au-dessus de la normale, ES en dessous (mesure du 01/11).
+builder.Services.AddSingleton<RetroBat.Api.Speedrun.IPrioritesDuJeu, RetroBat.Api.Speedrun.PrioritesDuJeuWindows>();
 builder.Services.AddSingleton<RetroBat.Api.Speedrun.SpeedrunSessionService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Speedrun.SpeedrunSessionService>());
 builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardOverlayService>();

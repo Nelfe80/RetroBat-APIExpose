@@ -135,6 +135,26 @@ public sealed class ReplayCaptureTests
     }
 
     [Fact]
+    public void La_marque_de_capacite_n_est_pas_une_fiche_de_film()
+    {
+        // Essai du 01/11 : lue comme une fiche abimee, elle etait effacee au premier tour sans jeu.
+        var dossier = Path.Combine(Path.GetTempPath(), "captures-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dossier);
+        try
+        {
+            File.WriteAllText(Path.Combine(dossier, "capacite.json"), """{"modeste_depuis":"2026-11-01T22:05:24Z"}""");
+            File.WriteAllText(Path.Combine(dossier, "rp_A.json"), "{}");
+            File.WriteAllText(Path.Combine(dossier, "rp_A.mkv"), "");
+            Assert.Equal(["rp_A.json"], ReplayCaptureService.FichesDesFilms(dossier).Select(Path.GetFileName));
+            Assert.Empty(ReplayCaptureService.FichesDesFilms(Path.Combine(dossier, "absent")));
+        }
+        finally
+        {
+            Directory.Delete(dossier, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Une_fiche_d_avant_la_reprise_se_relit_sans_session_ni_video()
     {
         const string ancienne = """{"ReplayId":"rp_A","Fichier":"C:\\captures\\rp_A.mkv","DebutFilm":12,"FinFilm":9000,"CreeeUtc":"2026-10-14T16:00:00Z"}""";

@@ -7,7 +7,8 @@
   "kind": "speedrun_level",
   "game": { "system_id": "megadrive", "rom_group": "sonic-the-hedgehog" },
   "mem_sha256": "9e9141086b0411d880d4dbeb47de0b6796d089a0e70101b5e9cf89a3da5953fb",
-  "start_policy": "normal_boot",
+  "start_policy": "canonical_state",
+  "state": { "name": "green-hill-1-panneau-genesis", "sha256": "d35a49cb3f95afd5bc8878399fb8592657422588290e89dd2641e83dc675e87a", "file": "megadrive/sonic-the-hedgehog/green-hill-1-panneau.state" },
   "start": [
     { "value": { "address": "0xFE11", "equals": "0x00" } },
     { "value": { "address": "0xFE10", "equals": "0x00" } },

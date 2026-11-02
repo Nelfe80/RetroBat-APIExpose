@@ -42,7 +42,8 @@ public class DefiCouteauMetalSlug3Tests
         Assert.Equal("challenge_rule", Couteau.Kind);
         Assert.Equal("My ### and my knife", Couteau.Titre("en"));
         Assert.Equal("Ma ### et mon couteau", Couteau.Titre("fr"));
-        Assert.Equal("Mission 1 jusqu'à Huge Hermit, au couteau, sans mourir", Couteau.Resume("fr_FR"));
+        Assert.Equal("Mission 1 jusqu'à Huge Hermit, au couteau et aux grenades, sans mourir", Couteau.Resume("fr_FR"));
+        Assert.Equal("ch-ms3-m1-knife-v2", Couteau.Ruleset);
     }
 
     [Theory]
@@ -98,10 +99,9 @@ public class DefiCouteauMetalSlug3Tests
 
     [Theory]
     [InlineData("AMMO_LOSE", "0x100590", 0x01)]
-    [InlineData("BOMB_FIRED", "0x10EAF5", 0x09)]
     [InlineData("LOSE_LIFE", "0x1002BB", 0x01)]
     [InlineData("MOUNT_STATE", "0x1002C1", 0x04)]
-    public void Un_tir_une_grenade_une_mort_ou_un_vehicule_font_echouer(string action, string adresse, int valeur)
+    public void Un_tir_une_mort_ou_un_vehicule_font_echouer(string action, string adresse, int valeur)
     {
         var s = Nouvelle();
         Partir(s);
@@ -109,6 +109,19 @@ public class DefiCouteauMetalSlug3Tests
         Image(s, S(3000, action, adresse, valeur));
 
         Assert.Equal(SessionSpeedrun.Invalid, s.Etat);
+    }
+
+    /// <summary>Version 2 (choix du user du 02/11) : la tour de l'epave ne prend pas le couteau, six a sept grenades l'abattent.</summary>
+    [Fact]
+    public void Une_grenade_ne_fait_pas_echouer()
+    {
+        var s = Nouvelle();
+        Partir(s);
+
+        Image(s, S(3000, "BOMB_FIRED", "0x10EAF5", 0x09));
+        Image(s, S(3040, "BOMB_FIRED", "0x10EAF5", 0x08));
+
+        Assert.Equal(SessionSpeedrun.Running, s.Etat);
     }
 
     [Fact]

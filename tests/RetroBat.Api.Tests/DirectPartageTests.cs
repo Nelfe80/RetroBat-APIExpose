@@ -88,6 +88,25 @@ public sealed class DirectPartageTests
     public void La_bande_dit_le_mode_comme_le_classement(string regle, string attendu)
         => Assert.Equal(attendu, DirectPartageService.LibelleDuMode(regle));
 
+    [Theory]
+    [InlineData("speedrun_level", "Marble Zone · Act 1", "SPEEDRUN MARBLE ZONE · ACT 1")]
+    [InlineData("speedrun_full", "Any%", "SPEEDRUN ANY%")]
+    [InlineData("challenge_rule", "My ### and my knife", "CHALLENGE MY ### AND MY KNIFE")]
+    [InlineData("challenge_rule", "", "CHALLENGE")]
+    public void La_bande_dit_l_epreuve(string kind, string titre, string attendu)
+        => Assert.Equal(attendu, DirectPartageService.LibelleDeLEpreuve(kind, titre));
+
+    [Fact]
+    public void Un_titre_d_epreuve_trop_long_se_coupe()
+        => Assert.Equal("SPEEDRUN " + new string('A', 39) + "…", DirectPartageService.LibelleDeLEpreuve("speedrun_level", new string('a', 60)));
+
+    [Fact]
+    public void Le_record_d_une_epreuve_est_un_temps()
+    {
+        Assert.Equal("RECORD 0:34.84 · Nelfe80", DirectPartageService.TexteDuTempsRecord("0:34.84", " Nelfe80 "));
+        Assert.Equal("RECORD 0:34.84", DirectPartageService.TexteDuTempsRecord("0:34.84", null));
+    }
+
     [Fact]
     public void La_commande_dit_a_l_exe_si_le_record_est_tombe()
     {

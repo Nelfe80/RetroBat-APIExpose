@@ -408,13 +408,22 @@ public class SpeedrunSessionTests
             SpeedrunSessionService.HorlogeDeLaLigne(ligne, DateTimeOffset.Parse(maintenant, CultureInfo.InvariantCulture)));
     }
 
-    /// <summary>Un RetroArch d'essai : READ_CORE_RAM rend la valeur donnee, 0 sinon ; RESET est note.</summary>
+    /// <summary>
+    /// Un RetroArch d'essai : READ_CORE_RAM rend la valeur donnee, 0 sinon ; GET_STATUS rend le statut pose (rien par
+    /// defaut), PAUSE_TOGGLE le remet en jeu ; les commandes envoyees sont notees.
+    /// </summary>
     private sealed class RetroArchDEssai(IReadOnlyDictionary<long, int>? valeurs = null) : ICommandesRetroArch
     {
         public List<string> Envoyees { get; } = new();
 
+        public string? Statut { get; set; }
+
+        /// <summary>Le joueur tient la touche pause : l'appui virtuel de PAUSE_TOGGLE ne fait rien.</summary>
+        public bool PauseTenue { get; set; }
+
         public Task<string?> DemanderAsync(string commande, CancellationToken ct, int delaiMs = 500)
         {
+            if (commande == "GET_STATUS") return Task.FromResult(Statut);
             var m = commande.Split(' ');
             if (m[0] != "READ_CORE_RAM") return Task.FromResult<string?>(null);
             var valeur = valeurs?.GetValueOrDefault(long.Parse(m[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture)) ?? 0;
@@ -424,7 +433,14 @@ public class SpeedrunSessionTests
         public Task EnvoyerAsync(string commande, CancellationToken ct)
         {
             lock (Envoyees) Envoyees.Add(commande);
+            if (commande == "PAUSE_TOGGLE" && !PauseTenue && Statut?.StartsWith("GET_STATUS PAUSED", StringComparison.Ordinal) == true)
+                Statut = "GET_STATUS PLAYING" + Statut["GET_STATUS PAUSED".Length..];
             return Task.CompletedTask;
+        }
+
+        public int Commandes(string commande)
+        {
+            lock (Envoyees) return Envoyees.Count(c => c == commande);
         }
     }
 
@@ -523,6 +539,124 @@ public class SpeedrunSessionTests
         }
     }
 
+    /// <summary>Des priorites d'essai : note les appels, ne touche a aucun processus.</summary>
+    private sealed class PrioritesDEssai : IPrioritesDuJeu
+    {
+        public int Donnees;
+        public int Rendues;
+
+        public Task DonnerLaMainAuJeuAsync(CancellationToken ct)
+        {
+            Interlocked.Increment(ref Donnees);
+            return Task.CompletedTask;
+        }
+
+        public void RendreLaMain() => Interlocked.Increment(ref Rendues);
+    }
+
+    [Fact]
+    public async Task Le_jeu_passe_devant_pendant_la_session_et_ES_retrouve_sa_priorite_a_la_fermeture()
+    {
+        var bus = new SimpleEventBus();
+        var contexte = new ApiContext();
+        var rom = Path.Combine(Path.GetTempPath(), "Sonic The Hedgehog (USA, Europe).zip");
+        contexte.Ui.Running = new GameReference { SystemId = "megadrive", GamePath = rom };
+        var priorites = new PrioritesDEssai();
+        var journal = Path.Combine(Path.GetTempPath(), "speedrun-" + Guid.NewGuid().ToString("N") + ".jsonl");
+        using var service = new SpeedrunSessionService(bus, contexte, NullLogger<SpeedrunSessionService>.Instance, null, new RetroArchDEssai(),
+            journal, priorites: priorites);
+        try
+        {
+            await service.StartAsync(default);
+            // Au demarrage de l'API : ES remis a la normale, au cas ou une API arretee en plein defi l'aurait laisse en retrait.
+            await Attendre(() => Volatile.Read(ref priorites.Rendues) == 1);
+            Assert.Equal(0, priorites.Donnees);
+
+            service.AttendreLeLancement(GreenHill1, rom);
+            await bus.PublishAsync(new EventEnvelope { Type = "ui.game.started", Payload = new { GamePath = rom } });
+            await Attendre(() => Volatile.Read(ref priorites.Donnees) == 1);
+
+            await bus.PublishAsync(new EventEnvelope { Type = "ui.game.ended", Payload = new { } });
+            Assert.Equal(2, priorites.Rendues);
+            // Une fin de jeu sans session ne touche a rien.
+            await bus.PublishAsync(new EventEnvelope { Type = "ui.game.ended", Payload = new { } });
+            Assert.Equal(2, priorites.Rendues);
+        }
+        finally
+        {
+            File.Delete(journal);
+        }
+    }
+
+    [Fact]
+    public async Task La_pause_de_RetroArch_est_levee_pendant_tout_le_defi()
+    {
+        const string Pause = "GET_STATUS PAUSED megadrive,Sonic The Hedgehog (USA, Europe),crc32=f9394e97";
+        var (service, bus, retroArch, _, journal) = await Demarrer();
+        try
+        {
+            // Touche pause ou image par image : RetroArch repond PAUSED. Avant le depart deja, la pause est levee.
+            await Attendre(() => service.Instantane()?.Etat == SessionSpeedrun.Armed);
+            retroArch.Statut = Pause;
+            await Attendre(() => retroArch.Commandes("PAUSE_TOGGLE") == 1);
+            Assert.StartsWith("GET_STATUS PLAYING", retroArch.Statut);
+
+            await Emettre(bus, 905, "GAME_PLAYING", "0x00F601", 0x8C, Heure(905));
+            await Emettre(bus, 909, "GENERAL_TIMER", "0x00FE1F", 1, Heure(909));
+            await Emettre(bus, 934, "GAME_PLAYING", "0x00F601", 0x0C, Heure(934));
+            await Attendre(() => service.Instantane()?.Etat == SessionSpeedrun.Running);
+
+            // Remis en jeu, il n'est plus touche ; une nouvelle pause pendant la course est levee a son tour.
+            await Task.Delay(600);
+            Assert.Equal(1, retroArch.Commandes("PAUSE_TOGGLE"));
+            retroArch.Statut = Pause;
+            await Attendre(() => retroArch.Commandes("PAUSE_TOGGLE") == 2);
+            Assert.Equal(SessionSpeedrun.Running, service.Instantane()?.Etat);
+
+            // Apres la fin de la tentative aussi (essai du 01/11 : la pause apres un echec surprenait).
+            await Emettre(bus, 1200, "PAUSE_ON", "0x00F63A", 1, Heure(1200));
+            await Attendre(() => service.Instantane()?.Etat == SessionSpeedrun.Invalid);
+            retroArch.Statut = Pause;
+            await Attendre(() => retroArch.Commandes("PAUSE_TOGGLE") == 3);
+        }
+        finally
+        {
+            service.Dispose();
+            File.Delete(journal);
+        }
+    }
+
+    [Fact]
+    public async Task Une_pause_tenue_une_seconde_ramene_au_depart_quand_la_touche_est_lachee()
+    {
+        var (service, bus, retroArch, _, journal) = await Demarrer();
+        try
+        {
+            await Attendre(() => service.Instantane()?.Etat == SessionSpeedrun.Armed);
+            await Emettre(bus, 905, "GAME_PLAYING", "0x00F601", 0x8C, Heure(905));
+            await Emettre(bus, 909, "GENERAL_TIMER", "0x00FE1F", 1, Heure(909));
+            await Emettre(bus, 934, "GAME_PLAYING", "0x00F601", 0x0C, Heure(934));
+            await Attendre(() => service.Instantane()?.Etat == SessionSpeedrun.Running);
+
+            retroArch.PauseTenue = true;
+            retroArch.Statut = "GET_STATUS PAUSED megadrive,Sonic The Hedgehog (USA, Europe),crc32=f9394e97";
+            await Attendre(() => retroArch.Commandes("SHOW_MSG No pause during a challenge.") == 1);
+            await Attendre(() => retroArch.Commandes("SHOW_MSG Pause held: back to the start.") == 1);
+            // Rien ne repart tant que la touche est tenue.
+            Assert.Equal(0, retroArch.Commandes("RESET"));
+
+            retroArch.PauseTenue = false;
+            await Attendre(() => retroArch.Commandes("RESET") == 1);
+            // Un message par pause, pas un par releve.
+            Assert.Equal(1, retroArch.Commandes("SHOW_MSG No pause during a challenge."));
+        }
+        finally
+        {
+            service.Dispose();
+            File.Delete(journal);
+        }
+    }
+
     [Fact]
     public async Task L_avance_rapide_annule_la_tentative()
     {
@@ -572,13 +706,13 @@ public class SpeedrunSessionTests
     }
 
     [Fact]
-    public async Task Hotkey_A_avant_le_depart_relance_aussitot()
+    public async Task Hotkey_gauche_avant_le_depart_relance_aussitot()
     {
         var (service, bus, retroArch, _, journal) = await Demarrer();
         try
         {
             await bus.PublishAsync(new EventEnvelope { Type = "panel.input.pressed", Payload = new { Player = 1, Identity = "select" } });
-            await bus.PublishAsync(new EventEnvelope { Type = "panel.input.pressed", Payload = new { Player = 1, Identity = "a" } });
+            await bus.PublishAsync(new EventEnvelope { Type = "panel.input.pressed", Payload = new { Player = 1, Identity = "left" } });
             await Attendre(() => { lock (retroArch.Envoyees) return retroArch.Envoyees.Contains("RESET"); });
         }
         finally

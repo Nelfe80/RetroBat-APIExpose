@@ -39,6 +39,8 @@ public sealed class DirectPartageService : IHostedService
     private volatile bool _essai;
     private IDisposable? _abonnement;
     private readonly NelfePlayScoringReporter? _rapporteur;
+    private readonly RetroBat.Api.Speedrun.SpeedrunSessionService? _epreuves;
+    private readonly RetroBat.Api.Speedrun.ClassementsDesDefis? _tableaux;
 
     /// <summary>La partie en cours, et ce que son passage en sait.</summary>
     private sealed class Partie
@@ -67,6 +69,9 @@ public sealed class DirectPartageService : IHostedService
         public readonly string Cle = Guid.NewGuid().ToString("N");
         // LE DIRECT D'UNE PARTIE MULTIPLAYER (27/10) : la gameroom que cette borne heberge, ses joueurs sur la bande.
         public RetroBat.Api.Multiplayer.MultiplayerPartieDeLHote? Multi;
+        // LE DIRECT D'UNE EPREUVE (demande du user, 02/11) : un speedrun ou un defi se classe au temps, sans score ; la bande
+        // dit l'epreuve et son meilleur temps.
+        public string? ModeImpose;
     }
 
     private Partie? _enCours;
@@ -80,8 +85,11 @@ public sealed class DirectPartageService : IHostedService
         RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider wrapper, ReplayCaptureService capture,
         ReplayVideoPublisher site, IConfiguration configuration, ILogger<DirectPartageService> journal,
         NelfePlayScoringCollectionSyncService? collection = null, PartieNelfePlayService? partie = null,
-        NelfePlayScoringReporter? rapporteur = null)
+        NelfePlayScoringReporter? rapporteur = null, RetroBat.Api.Speedrun.SpeedrunSessionService? epreuves = null,
+        RetroBat.Api.Speedrun.ClassementsDesDefis? tableaux = null)
     {
+        _epreuves = epreuves;
+        _tableaux = tableaux;
         _bus = bus;
         _contexte = contexte;
         _classement = classement;
@@ -319,6 +327,17 @@ public sealed class DirectPartageService : IHostedService
             var def = _wrapper.ResolveDefinitionFor(brut, jeu.SystemId);
             if (!(def.AliasMatched || def.DefinitionExists) || string.IsNullOrWhiteSpace(def.Rom)) return;
             var romGroup = def.Rom.Trim().ToLowerInvariant();
+            if (_epreuves?.EpreuveEnCours is { } epreuve)
+            {
+                // L'EPREUVE (02/11) : son classement (ch-...), sa bande, son meilleur temps ; jamais le score du jeu.
+                p.ModeImpose = LibelleDeLEpreuve(epreuve.Kind, epreuve.Titre("en"));
+                p.RegleDuRecord = epreuve.Ruleset;
+                p.RecordTexte = await RecordDeLEpreuveAsync(epreuve).ConfigureAwait(false);
+                _journal.LogInformation("Direct partage : epreuve {Defi}, la borne se porte candidate.", epreuve.ChallengeId);
+                await PasserAsync(p, romGroup, epreuve.Ruleset, (def.SystemId ?? "").Trim().ToLowerInvariant(), aModes: false)
+                    .ConfigureAwait(false);
+                return;
+            }
             var regles = _collection?.ReglesOuvertes(romGroup) ?? Array.Empty<string>();
             var regle = LeaderboardClient.ReglePrincipale(regles);
             if (regle.Length == 0) regle = "1cc";
@@ -410,6 +429,39 @@ public sealed class DirectPartageService : IHostedService
         }
     }
 
+    /// <summary>
+    /// L'epreuve sur la bande : « SPEEDRUN MARBLE ZONE · ACT 1 », « CHALLENGE MY ### AND MY KNIFE ». Le titre se coupe a
+    /// 40 caracteres : la bande tient sur une ligne. Pur.
+    /// </summary>
+    internal static string LibelleDeLEpreuve(string kind, string titre)
+    {
+        var famille = kind.StartsWith("speedrun", StringComparison.OrdinalIgnoreCase) ? "SPEEDRUN" : "CHALLENGE";
+        var t = (titre ?? "").Trim().ToUpperInvariant();
+        if (t.Length > 40) t = t[..39].TrimEnd() + "…";
+        return t.Length == 0 ? famille : famille + " " + t;
+    }
+
+    /// <summary>« RECORD 0:34.84 · Nelfe80 » : le premier temps du classement de l'epreuve ; rien sans temps publie.</summary>
+    private async Task<string> RecordDeLEpreuveAsync(RetroBat.Api.Speedrun.Reglement epreuve)
+    {
+        if (_tableaux is null) return "";
+        try
+        {
+            var tableaux = await _tableaux.ChargerAsync(new[] { epreuve.Ruleset }, CancellationToken.None).ConfigureAwait(false);
+            return tableaux.TryGetValue(epreuve.Ruleset, out var c) && c.Lignes.OrderBy(l => l.Rang).FirstOrDefault() is { } tete
+                ? TexteDuTempsRecord(RetroBat.Api.Speedrun.Chronometrage.Afficher(tete.Valeur, epreuve.Cadence), tete.Joueur)
+                : "";
+        }
+        catch (Exception)
+        {
+            return "";
+        }
+    }
+
+    /// <summary>« RECORD 0:34.84 · Nelfe80 ». Pur.</summary>
+    internal static string TexteDuTempsRecord(string temps, string? joueur)
+        => "RECORD " + temps + (string.IsNullOrWhiteSpace(joueur) ? "" : " · " + joueur.Trim());
+
     /// <summary>Le mode sur la bande : « 1CC POWER-UP » pour le classement 1cc-power-up. Pur.</summary>
     internal static string LibelleDuMode(string regle)
     {
@@ -442,7 +494,9 @@ public sealed class DirectPartageService : IHostedService
                 var finie = p.Finie || p.Alert || !RetroBat.Api.Netplay.NetplayGuestService.PartieALaBorne;
                 var demande = new JsonObject
                 {
-                    ["rom_group"] = romGroup, ["ruleset"] = regle, ["system_id"] = systeme, ["score"] = Interlocked.Read(ref p.MeilleurScore),
+                    // Une epreuve se classe au temps : son score ne se compare a rien.
+                    ["rom_group"] = romGroup, ["ruleset"] = regle, ["system_id"] = systeme,
+                    ["score"] = p.ModeImpose is null ? Interlocked.Read(ref p.MeilleurScore) : null,
                     ["state"] = finie ? "ended" : "playing", ["elapsed_s"] = (int)(DateTime.UtcNow - p.Debut).TotalSeconds, ["test"] = essai,
                     // Sans envoi en cours, le site redonne l'adresse d'entree d'un passage ouvert : sa premiere reponse a pu
                     // se perdre.
@@ -697,7 +751,7 @@ public sealed class DirectPartageService : IHostedService
 
     /// <summary>Le mode sur la bande : « RECORD ALERT » pendant que la partie approche le record, sinon son classement.</summary>
     private static string ModeDeLaBande(Partie p, string regleParDefaut)
-        => p.AlerteRecord ? "RECORD ALERT" : LibelleDuMode(p.RegleDuRecord ?? regleParDefaut);
+        => p.ModeImpose ?? (p.AlerteRecord ? "RECORD ALERT" : LibelleDuMode(p.RegleDuRecord ?? regleParDefaut));
 
     /// <summary>La carte de fin d'un passage : le classement mis a jour quand le record est tombe sur la chaine.</summary>
     internal static string CheminDeLaCarte => Path.Combine(Dossier, "partage-classement.json");

@@ -316,6 +316,30 @@ public class SpeedrunTests
     }
 
     [Fact]
+    public void Une_borne_lente_n_est_pas_une_pause()
+    {
+        // Essai du 01/11 : Sonic a 50 images par seconde sur une borne chargee, sept secondes sans evenement.
+        var e = Partie();
+        e.Recevoir(S(1000, "LEVEL_TIMER", "0x00FE25", 1, horloge: 10_000));
+        e.Recevoir(S(1350, "LEVEL_TIMER", "0x00FE25", 6, horloge: 17_000));
+        Assert.Equal(EtatTentative.EnCourse, e.Etat);
+        // Plus lente encore : 37 images par seconde, au-dessus des 60 % attendus.
+        e.Recevoir(S(1572, "LEVEL_TIMER", "0x00FE25", 9, horloge: 23_000));
+        Assert.Equal(EtatTentative.EnCourse, e.Etat);
+    }
+
+    [Fact]
+    public void Le_ralenti_de_RetroArch_est_une_pause()
+    {
+        // Le ralenti de RetroArch joue au tiers de la vitesse : 60 images en trois secondes.
+        var e = Partie();
+        e.Recevoir(S(1000, "LEVEL_TIMER", "0x00FE25", 1, horloge: 10_000));
+        e.Recevoir(S(1060, "LEVEL_TIMER", "0x00FE25", 2, horloge: 13_000));
+        Assert.Equal(EtatTentative.Annulee, e.Etat);
+        Assert.Equal("pause", e.Cause);
+    }
+
+    [Fact]
     public void Un_chargement_d_etat_annule_meme_avant_le_depart()
     {
         var e = new Evaluateur(Reglement.Lire(GreenHill1));

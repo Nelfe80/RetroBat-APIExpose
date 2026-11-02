@@ -35,7 +35,11 @@ public sealed record ReplayRuntime(
     // l'en-tete. Les empreintes du zip entier (crc32, rom_sha256) changent avec l'emballage : un
     // meme jeu d'arcade zippe autrement passait pour un autre fichier. Absent des manifestes
     // anterieurs et pour une ROM qui n'est pas un zip.
-    IReadOnlyList<ReplayRomFile>? RomFiles = null);
+    IReadOnlyList<ReplayRomFile>? RomFiles = null,
+    // LES VERROUS D'UN DEFI (D18, wrapper 0.343) : les lignes que le wrapper a tenues pendant l'enregistrement, telles
+    // qu'il les a attestees (« 0x100596,1,set_bits,0x01 », separees par « ; »). Le replay ne garde que les appuis : sans
+    // les memes verrous a la lecture, la partie diverge. Null hors defi a verrous et dans les manifestes anterieurs.
+    string? Locks = null);
 
 /// <summary>Un fichier de l'archive de la ROM : son nom dans le zip et son CRC (8 chiffres hexadecimaux).</summary>
 public sealed record ReplayRomFile(string Name, string Crc32);

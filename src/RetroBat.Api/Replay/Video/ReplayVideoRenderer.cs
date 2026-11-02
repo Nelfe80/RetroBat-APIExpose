@@ -117,7 +117,10 @@ public sealed class ReplayVideoRenderer
             UseShellExecute = false,
             WindowStyle = ProcessWindowStyle.Minimized,
         };
-        psi.ArgumentList.Add("-L"); psi.ArgumentList.Add(resolution.Runtime.CoreDll);
+        // Un replay de defi a verrous se rend par le wrapper, qui remet les memes verrous (D18).
+        var (coeurDuRendu, refusDesVerrous) = RetroBat.Api.Replay.Playback.LectureAvecVerrous.Preparer(manifest, resolution.Runtime.CoreDll, resolution.Runtime.RomPath, psi);
+        if (refusDesVerrous != RetroBat.Api.Replay.Models.ReplayErrorCode.None) return Echec("verrous_non_tenus");
+        psi.ArgumentList.Add("-L"); psi.ArgumentList.Add(coeurDuRendu);
         psi.ArgumentList.Add(resolution.Runtime.RomPath);
         psi.ArgumentList.Add("-P"); psi.ArgumentList.Add(objet);
         psi.ArgumentList.Add("--config"); psi.ArgumentList.Add(RetroBatPaths.RetroArchConfigPath);
@@ -138,6 +141,7 @@ public sealed class ReplayVideoRenderer
             _logger.LogWarning(ex, "Video : RetroArch ne demarre pas pour {ReplayId}.", replayId);
             return Echec("retroarch_indisponible", debut, fin);
         }
+        RetroBat.Api.Replay.Playback.LectureAvecVerrous.EffacerALaFin(manifest, process);
         _logger.LogInformation("Video : rendu de {ReplayId}, frames {Debut} a {Fin}.", replayId, debut, fin);
         // Ce RetroArch n'est pas une partie : les panneaux d'ES restent ouvrables pendant le rendu (22/10).
         RetroBat.Api.Infrastructure.EmulatorForeground.NoterLeRendu(process.Id);

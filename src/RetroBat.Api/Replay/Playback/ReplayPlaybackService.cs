@@ -406,7 +406,14 @@ public sealed class ReplayPlaybackService
         lock (_gate) _state = ReplayPlaybackState.Launching;
         var exe = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "retroarch.exe");
         var psi = new ProcessStartInfo { FileName = exe, WorkingDirectory = Path.GetDirectoryName(exe)!, UseShellExecute = false };
-        psi.ArgumentList.Add("-L"); psi.ArgumentList.Add(coreDll);
+        // Un replay de defi a verrous se relit par le wrapper, qui remet les memes verrous (D18).
+        var (coeurDeLecture, refusDesVerrous) = LectureAvecVerrous.Preparer(manifest, coreDll, resolved.RomPath, psi);
+        if (refusDesVerrous != ReplayErrorCode.None)
+        {
+            _logger.LogWarning("Replay : {ReplayId} tient des verrous ({Verrous}) que le wrapper de cette borne ne sait pas poser.", replayId, manifest.Runtime.Locks);
+            return Fail(refusDesVerrous);
+        }
+        psi.ArgumentList.Add("-L"); psi.ArgumentList.Add(coeurDeLecture);
         psi.ArgumentList.Add(resolved.RomPath);
         psi.ArgumentList.Add("-P"); psi.ArgumentList.Add(objectPath);
         psi.ArgumentList.Add("--config"); psi.ArgumentList.Add(RetroBatPaths.RetroArchConfigPath);
@@ -417,6 +424,7 @@ public sealed class ReplayPlaybackService
         try { proc = Process.Start(psi)!; }
         catch (Exception ex) { _logger.LogWarning(ex, "Replay : lancement RetroArch échoué"); return Fail(ReplayErrorCode.RetroArchUnavailable); }
         lock (_gate) _process = proc;
+        LectureAvecVerrous.EffacerALaFin(manifest, proc);
         // Une lecture demandee depuis le web part derriere le navigateur : c'est lui qui a le
         // premier plan au moment ou RetroArch demarre. On le ramene devant des que sa fenetre
         // existe - elle n'existe pas encore ici, le coeur charge sa ROM.

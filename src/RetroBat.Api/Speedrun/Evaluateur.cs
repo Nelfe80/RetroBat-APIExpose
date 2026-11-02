@@ -336,15 +336,24 @@ public sealed class Evaluateur
     private void Annuler(string cause, long frame) { Etat = EtatTentative.Annulee; Cause = cause; _frameDeFin = frame; }
 
     /// <summary>
-    /// L'HORLOGE A AVANCE SANS LES FRAMES : pause de RetroArch, menu, perte du focus, PC suspendu (§5.5 du CDC
-    /// v1.4). Les evenements sont espaces ; on compare, entre deux, le temps de la borne et celui des frames.
+    /// Sous cette part des images attendues, le jeu s'est arrete (menu, ralenti de RetroArch a un tiers) ; au-dessus,
+    /// c'est la borne qui peine (essai du 01/11 : Sonic entre 45 et 55 images par seconde sur une borne chargee).
+    /// </summary>
+    public const double PartMinimaleDesImages = 0.6;
+
+    /// <summary>
+    /// L'HORLOGE A AVANCE SANS LES FRAMES : menu de RetroArch, ralenti, PC suspendu (§5.5 du CDC v1.4). Les
+    /// evenements sont espaces ; on compare, entre deux, le temps de la borne et celui des frames. Il faut un ecart
+    /// au-dela de la tolerance ET moins de 60 % des images attendues : un jeu qui tourne a 50 images par seconde
+    /// pendant six secondes sans evenement n'est pas en pause. La touche pause et l'image par image sont levees
+    /// par le service de la session des qu'il les voit.
     /// </summary>
     private bool PauseRevelee(Signal s)
     {
         if (s.HorlogeMs is not { } h || _derniereHorloge is not { } h0 || _frameDeLHorloge is not { } f0) return false;
         var horloge = h - h0;
         var frames = (s.Frame - f0) * 1000.0 / _r.Cadence;
-        return horloge - frames > _r.TolerancePauseMs;
+        return horloge - frames > _r.TolerancePauseMs && frames < horloge * PartMinimaleDesImages;
     }
 
     private bool Borne(BorneDeChrono borne, Signal s, int? precedente)

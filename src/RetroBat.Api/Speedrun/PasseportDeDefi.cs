@@ -21,11 +21,54 @@ public static class PasseportDeDefi
     private static readonly string[] CompteursInterdits = ["cheats", "save_state_loads", "rewind", "runahead", "fast_forward", "netplay"];
 
     /// <summary>Le compteur qui salit ce lancement, ou null. La relance du joueur (« resets ») n'en est pas un.</summary>
-    public static string? Salissure(string sessionJson)
+    public static string? Salissure(string sessionJson, int chargementsPermis = 0)
     {
         var session = JsonNode.Parse(sessionJson) as JsonObject;
-        return CompteursInterdits.FirstOrDefault(c => session?[c] is JsonValue v && v.TryGetValue<long>(out var n) && n > 0);
+        return CompteursInterdits.FirstOrDefault(c => session?[c] is JsonValue v && v.TryGetValue<long>(out var n)
+            && n > (c == "save_state_loads" ? chargementsPermis : 0));
     }
+
+    /// <summary>
+    /// LES VERROUS AU BILAN DU WRAPPER (D18). Le bilan rend les verrous qu'il a lus (« locks ») : ils doivent etre exactement
+    /// ceux du reglement, aucun compris. Un verrou que le reglement ne demande pas changerait le jeu sans le dire ; un verrou
+    /// demande et absent (wrapper d'avant 0.343, fichier perdu) ne tient pas sa promesse. Chaque verrou demande doit ensuite
+    /// avoir ete arme au chargement de l'etat de depart (« from_frame ») et pose sur toutes les images jouees depuis, aucune
+    /// manquee. Rend le motif, ou null si le bilan est conforme.
+    /// </summary>
+    public static string? EcartDesVerrous(string sessionJson, Reglement reglement)
+    {
+        var session = JsonNode.Parse(sessionJson) as JsonObject;
+        var lus = session?["locks"] is JsonValue l && l.TryGetValue<string>(out var s) ? s : "";
+        if (!string.Equals(lus, reglement.LignesDesVerrous, StringComparison.Ordinal))
+            return $"verrous lus « {lus} » au lieu de « {reglement.LignesDesVerrous} »";
+        if (reglement.Verrous.Count == 0) return null;
+
+        var images = session?["frame_count"] is JsonValue f && f.TryGetValue<long>(out var n) ? n : -1;
+        var comptes = session?["lock_frames"] as JsonArray;
+        foreach (var verrou in reglement.Verrous)
+        {
+            var compte = comptes?.OfType<JsonObject>().FirstOrDefault(o => (string?)o["lock"] == verrou.Ligne);
+            if (compte is null) return $"verrou {verrou.Ligne} absent du bilan";
+            if (compte["valid"] is JsonValue v && v.TryGetValue<bool>(out var valide) && !valide) return $"verrou {verrou.Ligne} illisible par le wrapper";
+            var manquees = (long?)compte["missed"] ?? -1;
+            var posees = (long?)compte["applied"] ?? -1;
+            var depuis = (long?)compte["from_frame"] ?? -1;
+            if (depuis < 0) return $"verrou {verrou.Ligne} jamais arme (aucun etat de depart charge)";
+            if (manquees != 0) return $"verrou {verrou.Ligne} manque sur {manquees} image(s)";
+            if (posees != images - depuis) return $"verrou {verrou.Ligne} pose sur {posees} image(s) pour {images - depuis} jouee(s) depuis le depart";
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Le depart sur etat pour le passeport, comme celui de MULTIPLAYER : l'empreinte de l'etat (game.start_state_sha256, que le
+    /// site compare aux departs admis du defi) et le seul chargement qu'il explique. Null pour un demarrage normal.
+    /// </summary>
+    public static JsonObject? Depart(Reglement reglement)
+        => reglement.Etat is { } etat
+            ? new JsonObject { ["etat"] = etat.Sha256, ["choix"] = new JsonArray(), ["chargements_permis"] = 1 }
+            : null;
 
     /// <summary>La tentative a garder dans le brouillon, sans rien du site : le ruleset et l'empreinte du reglement sont lus a l'envoi.</summary>
     public static JsonObject Decrire(Reglement reglement, TentativeFinie t)

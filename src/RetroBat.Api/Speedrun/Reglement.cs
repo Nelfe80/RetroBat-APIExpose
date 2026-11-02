@@ -45,6 +45,19 @@ public sealed record CritereDeRang(string Mesure, bool PlusPetitMeilleur);
 
 public sealed class ReglementInvalideException(string message) : Exception(message);
 
+/// <summary>L'etat de depart d'un defi (« state ») : son nom, l'empreinte SHA-256 du fichier, le fichier sous resources/challenges/states.</summary>
+public sealed record EtatDeDepart(string Nom, string Sha256, string Fichier);
+
+/// <summary>
+/// UNE VALEUR TENUE PENDANT TOUTE LA PARTIE (« locks », D18 du CDC v1.4). Le wrapper 0.343 la pose avant chaque image ;
+/// <see cref="Ligne"/> est la ligne qu'il lit dans certified.txt et qu'il rend telle quelle a l'attestation et au bilan.
+/// Mode : « set_bits » (OU), « clear_bits » (ET NON) ou « value » (valeur entiere), sur un octet.
+/// </summary>
+public sealed record VerrouDeDefi(long Adresse, string Mode, int Valeur, string Raison)
+{
+    public string Ligne => $"0x{Adresse:X},1,{Mode},0x{Valeur:X2}";
+}
+
 /// <summary>
 /// LE REGLEMENT D'UN DEFI, schema nelfe.challenge.v2 (prototype Sonic, §9.2). Il garde les champs de la v1
 /// du pilote (kind, start_policy, mem_sha256, start, finish, fail, void) et ajoute ce que la grille Sonic
@@ -92,6 +105,21 @@ public sealed class Reglement
     public string RomGroup { get; private init; } = "";
     public string? MemSha256 { get; private init; }
     public string StartPolicy { get; private init; } = "normal_boot";
+
+    /// <summary>L'etat charge au lancement ; null pour un demarrage normal.</summary>
+    public EtatDeDepart? Etat { get; private init; }
+
+    /// <summary>
+    /// La place du defi dans son groupe du panneau (« order », facultatif) : les niveaux de Sonic dans l'ordre du jeu. Sans
+    /// elle, 0 : Green Hill 1 v2, depose avant ce champ et immuable, reste ainsi en tete de ses niveaux (2 a 19).
+    /// </summary>
+    public int Ordre { get; private init; }
+
+    /// <summary>Les valeurs tenues pendant toute la partie, dans l'ordre du reglement ; vide pour un defi sans verrou.</summary>
+    public IReadOnlyList<VerrouDeDefi> Verrous { get; private init; } = [];
+
+    /// <summary>Les verrous tels que le wrapper les rend (« locks » de l'attestation et du bilan) : « » sans verrou.</summary>
+    public string LignesDesVerrous => string.Join(";", Verrous.Select(v => v.Ligne));
     public IReadOnlyList<ConditionValeur> Depart { get; private init; } = [];
     public IReadOnlyList<CibleEvenement> Arrivee { get; private init; } = [];
     /// <summary>Les evenements qui confirment l'arrivee provisoire (« finish_confirm », un seul ou « any_of ») ; vide : aucune confirmation.</summary>
@@ -171,7 +199,7 @@ public sealed class Reglement
                 motsInverses = cr.TryGetProperty("swap16", out var sw) && sw.ValueKind == JsonValueKind.True;
             }
 
-            return new Reglement
+            var reglement = new Reglement
             {
                 BaseDuCoeur = baseDuCoeur,
                 MotsInversesDuCoeur = motsInverses,
@@ -180,6 +208,7 @@ public sealed class Reglement
                 Ruleset = Texte(r, "ruleset") ?? "",
                 Titres = LireTitres(r),
                 Resumes = LireTitres(r, "summary"),
+                Etat = LireEtat(r),
                 Kind = Texte(r, "kind") ?? "",
                 SystemId = r.TryGetProperty("game", out var g) ? Texte(g, "system_id") ?? "" : "",
                 RomGroup = r.TryGetProperty("game", out var g2) ? Texte(g2, "rom_group") ?? "" : "",
@@ -211,8 +240,51 @@ public sealed class Reglement
                 Cadence = r.TryGetProperty("runtime", out var rt) && rt.TryGetProperty("frame_rate", out var fr) ? fr.GetDouble()
                     : r.TryGetProperty("runtime", out var rt2) && rt2.TryGetProperty("refresh_hz", out var hz) ? hz.GetDouble() : 60,
                 TolerancePauseMs = r.TryGetProperty("runtime", out var rt3) && rt3.TryGetProperty("pause_tolerance_ms", out var tol) ? tol.GetInt32() : 1000,
+                Verrous = Liste(r, "locks").Select(LireVerrou).ToList(),
+                Ordre = Entier(r, "order") ?? 0,
             };
+            reglement.ControlerLesVerrous();
+            return reglement;
         }
+    }
+
+    /// <summary>
+    /// LES LIMITES D'UN VERROU (D18). Il part de l'etat de depart, seul instant que le wrapper connait : un defi a verrous part
+    /// donc sur un etat. Il ne tient jamais une adresse que le reglement lit (depart, arrivee, echec, annulation, chrono) : le
+    /// verrou deciderait alors du resultat qu'il est cense laisser au joueur.
+    /// </summary>
+    private void ControlerLesVerrous()
+    {
+        if (Verrous.Count == 0) return;
+        if (StartPolicy == "normal_boot" || Etat is null)
+            throw new ReglementInvalideException("un defi a verrous part d'un etat (start_policy canonical_state et « state »)");
+        var lues = AdressesCitees().ToHashSet();
+        foreach (var v in Verrous)
+        {
+            if (lues.Contains(v.Adresse))
+                throw new ReglementInvalideException($"verrou sur {Hex.Ecrire(v.Adresse)} : le reglement lit cette adresse");
+        }
+
+        if (Verrous.Select(v => v.Adresse).Distinct().Count() != Verrous.Count)
+            throw new ReglementInvalideException("deux verrous sur la meme adresse");
+    }
+
+    private static VerrouDeDefi LireVerrou(JsonElement e)
+    {
+        var type = Texte(e, "type") ?? "u8";
+        if (type != "u8") throw new ReglementInvalideException($"verrou de type {type} : seul « u8 » est tenu (wrapper 0.343)");
+        var depuis = Texte(e, "from") ?? "attempt_start";
+        if (depuis != "attempt_start") throw new ReglementInvalideException($"verrou depuis « {depuis} » : seul « attempt_start » existe");
+        if (Entier(e, "player") is { } joueur && joueur != 1) throw new ReglementInvalideException($"verrou du joueur {joueur} : seul le joueur 1 existe");
+        var raison = Texte(e, "reason") ?? "";
+        if (raison is not ("constraint" or "advantage" or "event"))
+            throw new ReglementInvalideException($"verrou sans raison connue ({raison}) : constraint, advantage ou event");
+        var modes = new[] { "set_bits", "clear_bits", "value" }.Where(m => e.TryGetProperty(m, out _)).ToList();
+        if (modes.Count != 1) throw new ReglementInvalideException("un verrou porte exactement un de set_bits, clear_bits, value");
+        var valeur = Nombre(e.GetProperty(modes[0]));
+        if (valeur is < 0 or > 0xFF) throw new ReglementInvalideException($"verrou : valeur {valeur} hors d'un octet");
+        if (modes[0] != "value" && valeur == 0) throw new ReglementInvalideException("verrou de bits sans aucun bit");
+        return new VerrouDeDefi(Adresse(e), modes[0], (int)valeur, raison);
     }
 
     /// <summary>
@@ -415,6 +487,15 @@ public sealed class Reglement
         => e.ValueKind == JsonValueKind.Object && e.TryGetProperty(nom, out var p) && p.ValueKind == JsonValueKind.Array
             ? p.EnumerateArray().ToList()
             : [];
+
+    private static EtatDeDepart? LireEtat(JsonElement r)
+    {
+        if (!r.TryGetProperty("state", out var e) || e.ValueKind != JsonValueKind.Object) return null;
+        var nom = Texte(e, "name");
+        var sha = Texte(e, "sha256");
+        var fichier = Texte(e, "file");
+        return nom is { Length: > 0 } && sha is { Length: 64 } && fichier is { Length: > 0 } ? new EtatDeDepart(nom, sha.ToLowerInvariant(), fichier) : null;
+    }
 
     private static Dictionary<string, string> LireTitres(JsonElement r, string champ = "title")
     {

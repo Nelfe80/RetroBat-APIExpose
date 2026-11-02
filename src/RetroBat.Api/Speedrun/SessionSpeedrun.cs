@@ -446,7 +446,7 @@ public sealed class SessionSpeedrun
             {
                 _departAnnonce = true;
                 _messages.Add(new MessageJoueur("speedrun.msg.ready",
-                    "Challenge ready. Your best time is sent when you quit the game. Hotkey + A: restart. Hotkey + Start: quit."));
+                    "Challenge ready. Your best time is sent when you quit the game. Hotkey + Left: restart. Hotkey + Start: quit."));
             }
 
             Publier("speedrun.state", new { sessionId = SessionId, attemptId = AttemptId, state = Etat });
@@ -490,7 +490,7 @@ public sealed class SessionSpeedrun
     /// </summary>
     private static MessageJoueur? MessageDeFin(ResultatTentative r, long? precedent)
     {
-        const string Relancer = "Hotkey + A: restart.";
+        const string Relancer = "Hotkey + Left: restart.";
         if (r.Etat == EtatTentative.Ratee) return new MessageJoueur("speedrun.msg.failed", "Attempt failed. " + Relancer);
         if (r.Etat == EtatTentative.Annulee)
         {

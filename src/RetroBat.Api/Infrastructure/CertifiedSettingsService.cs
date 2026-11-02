@@ -285,6 +285,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             }
             else if (type == "ui.game.ended" || type == "ui.game.ended.raw")
             {
+                RetroBat.Api.Speedrun.VerrousDuLancement.Retirer();
                 Effacer();
                 NeutraliserLaCollection();
             }
@@ -307,7 +308,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         {
             if (!_options.CurrentValue.NelfePlay.ForceCertifiedSettings)
             {
-                Effacer();
+                EffacerSaufVerrous();
                 return;
             }
             // La lecture d'un replay n'est pas une partie : rien a forcer, rien a neutraliser.
@@ -344,7 +345,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             if (attendus is null)
             {
                 // Jeu non ouvert au scoring : rien a forcer, rien a neutraliser.
-                if (!selection) Effacer();
+                if (!selection) EffacerSaufVerrous();
                 return;
             }
 
@@ -361,7 +362,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             }
             if (attendus.Count == 0)
             {
-                if (!selection) Effacer();
+                if (!selection) EffacerSaufVerrous();
                 return;
             }
 
@@ -372,7 +373,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         {
             // Jamais au prix de la partie : sans fichier, le listener ne force rien.
             _logger?.LogWarning(ex, "Reglages certifies : preparation impossible.");
-            Effacer();
+            EffacerSaufVerrous();
         }
     }
 
@@ -455,9 +456,53 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             if (paire.Key.Contains('=') || paire.Value.Contains('\n') || paire.Value.Contains('\r')) continue;
             texte.Append("opt.").Append(paire.Key).Append('=').Append(paire.Value).Append('\n');
         }
+        // Les verrous du defi qui se lance sur cette ROM (D18) : chaque reecriture les garde.
+        RetroBat.Api.Speedrun.VerrousDuLancement.Ecrire(texte, RetroBat.Api.Speedrun.VerrousDuLancement.Pour(romBasename));
         var chemin = FilePath;
         Directory.CreateDirectory(Path.GetDirectoryName(chemin)!);
         File.WriteAllText(chemin, texte.ToString(), new UTF8Encoding(false));
+    }
+
+    /// <summary>
+    /// LES VERROUS D'UN DEFI AU LANCEMENT (D18) : certified.txt garde les reglages qu'il porte deja pour cette ROM et recoit
+    /// les lignes lock.*. Appele par le lancement du defi, avant le lanceur : le wrapper lit ce fichier au chargement du jeu.
+    /// </summary>
+    public static void PoserLesVerrous(string romBasename)
+    {
+        var valeurs = new Dictionary<string, string>(StringComparer.Ordinal);
+        try
+        {
+            if (File.Exists(FilePath))
+            {
+                var lignes = File.ReadAllLines(FilePath);
+                var rom = lignes.FirstOrDefault(l => l.StartsWith("rom=", StringComparison.Ordinal))?[4..];
+                if (string.Equals(rom, romBasename, StringComparison.OrdinalIgnoreCase))
+                {
+                    foreach (var l in lignes.Where(l => l.StartsWith("opt.", StringComparison.Ordinal) && l.Contains('=')))
+                        valeurs[l[4..l.IndexOf('=')]] = l[(l.IndexOf('=') + 1)..];
+                }
+            }
+        }
+        catch (IOException)
+        {
+            // Le fichier se reecrit au demarrage du jeu, verrous compris.
+        }
+
+        Ecrire(romBasename, valeurs);
+    }
+
+    /// <summary>Hors fin de partie : sans reglage a forcer, le fichier ne garde que les verrous du defi qui se lance, s'il y en a.</summary>
+    private void EffacerSaufVerrous()
+    {
+        var jeu = _context.Ui.Running ?? _context.Ui.Selected;
+        var rom = string.IsNullOrWhiteSpace(jeu?.GamePath) ? null : Path.GetFileNameWithoutExtension(jeu!.GamePath);
+        if (rom is not null && RetroBat.Api.Speedrun.VerrousDuLancement.Pour(rom).Count > 0)
+        {
+            Ecrire(rom, new Dictionary<string, string>());
+            return;
+        }
+
+        Effacer();
     }
 
     private static void Effacer()

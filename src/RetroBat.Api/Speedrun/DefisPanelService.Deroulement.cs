@@ -126,7 +126,10 @@ public sealed partial class DefisPanelService
             while (DateTime.UtcNow < limite)
             {
                 await Task.Delay(500, jeton).ConfigureAwait(false);
-                if (_session.PremiereImageUtc is { } image && image >= epreuve.LanceA)
+                // Un depart sur etat : le jeu est la quand l'etat est pose, pret a charger, pas a sa premiere image (le BIOS, le
+                // titre, qu'aucune image du wrapper ne dit avant le chargement).
+                var arrivee = epreuve.Defi.Etat is not null ? _session.EtatPoseUtc : _session.PremiereImageUtc;
+                if (arrivee is { } image && image >= epreuve.LanceA)
                 {
                     arrive = true;
                     break;
@@ -146,6 +149,9 @@ public sealed partial class DefisPanelService
             _overlay.GarderDevantLeJeu();
             _overlay.MontrerMultiplayer(PleinEcran(lancement: ComposerLaPreparation(epreuve.Defi, epreuve.Jeu, epreuve.Fanart, true, Langue(), DateTime.UtcNow)));
             await Task.Delay(DureeDuDepart, jeton).ConfigureAwait(false);
+            // Le depart sur etat se charge ici, sous la page qui s'efface : le joueur le decouvre a sa premiere image, et le
+            // chrono (2,7 s plus tard sur Green Hill 1, 1,75 s sur Metal Slug 3) ne part jamais derriere la page.
+            if (epreuve.Defi.Etat is not null) _session.ChargerLEtatDeDepart();
             _overlay.Estomper(DureeDeLEffacement);
             await Task.Delay(DureeDeLEffacement, jeton).ConfigureAwait(false);
             lock (_verrou)
@@ -349,7 +355,11 @@ public sealed partial class DefisPanelService
 
     private void NoterLeBilanDuWrapper(JsonElement resume)
     {
-        if (Texte(resume, "Session") is not { Length: > 0 } session || PasseportDeDefi.Salissure(session) is not { } motif) return;
+        if (Texte(resume, "Session") is not { Length: > 0 } session) return;
+        EpreuveLancee? lancee;
+        lock (_verrou) lancee = _epreuve;
+        // Le chargement de l'etat de depart n'est pas une sauvegarde chargee.
+        if (lancee is null || PasseportDeDefi.Salissure(session, lancee.Defi.Etat is null ? 0 : 1) is not { } motif) return;
         BilanDEpreuve? b;
         lock (_verrou)
         {

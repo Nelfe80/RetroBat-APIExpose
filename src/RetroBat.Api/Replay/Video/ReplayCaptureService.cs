@@ -833,9 +833,7 @@ public sealed class ReplayCaptureService : BackgroundService
     private async Task EnvoyerLesCapturesAsync(CancellationToken stoppingToken)
     {
         if (_enCours is not null || EmulatorForeground.EmulateurTourne()) return;
-        var fiches = Directory.Exists(_dossier)
-            ? Directory.GetFiles(_dossier, "*.json").OrderBy(File.GetCreationTimeUtc).ToList()
-            : new List<string>();
+        var fiches = FichesDesFilms(_dossier);
         foreach (var fiche in fiches)
         {
             if (_enCours is not null || EmulatorForeground.EmulateurTourne()) return;
@@ -1182,7 +1180,21 @@ public sealed class ReplayCaptureService : BackgroundService
         }
     }
 
-    private string CheminDeCapacite => Path.Combine(_dossier, "capacite.json");
+    private const string NomDeLaCapacite = "capacite.json";
+
+    private string CheminDeCapacite => Path.Combine(_dossier, NomDeLaCapacite);
+
+    /// <summary>
+    /// Les fiches des films gardes, des plus anciennes aux plus recentes. Sans la marque de capacite, rangee dans le
+    /// meme dossier : lue comme une fiche abimee, elle etait effacee au premier tour sans jeu, et la borne qui ralentit
+    /// refilmait des la partie suivante au lieu d'attendre 30 jours (essai du 01/11).
+    /// </summary>
+    internal static List<string> FichesDesFilms(string dossier)
+        => Directory.Exists(dossier)
+            ? Directory.GetFiles(dossier, "*.json")
+                .Where(f => !string.Equals(Path.GetFileName(f), NomDeLaCapacite, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(File.GetCreationTimeUtc).ToList()
+            : new List<string>();
 
     /// <summary>La borne a ralenti en filmant : elle ne filme plus pendant 30 jours.</summary>
     private bool EstModeste()

@@ -31,8 +31,9 @@ public sealed record BilanDeSession(string SessionId, string DefiId, int Tentati
 ///   chaque evenement est celle de son emission par le wrapper, pas celle de sa reception ici.
 /// - Les valeurs qu'une ligne « change » n'a pas encore emises (l'acte de Green Hill 1, les minutes a 0) sont
 ///   relevees par READ_CORE_RAM, aux seules adresses du .MEM citees par le reglement.
-/// - Relancer : RESET de RetroArch, tentative neuve. Abandonner : tentative close, rien ne change dans le jeu.
-///   A la manette (D29) : Hotkey + A relance (maintenu une seconde pendant un run), Hotkey + Start quitte.
+/// - Relancer : RESET de RetroArch, ou l'etat de depart recharge (D19), tentative neuve. Abandonner : tentative close,
+///   rien ne change dans le jeu. A la manette (D29) : Hotkey + gauche relance (maintenu une seconde pendant un run),
+///   Hotkey + Start quitte.
 /// - Le contrat du HUD : snapshot « speedrun.session » (retenu par le WebSocket, flux « speedrun »),
 ///   evenements « speedrun.* » avec la sequence de la session, commandes par SpeedrunController.
 ///
@@ -48,11 +49,19 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     /// <summary>Les evenements d'une frame arrivent ensemble ; sans suite apres ce delai, l'image est jugee.</summary>
     private const int AttenteDeLImageMs = 40;
 
-    /// <summary>Hotkey + A pendant un run : maintenu une seconde, pour eviter la relance par accident (D29).</summary>
+    /// <summary>Hotkey + gauche pendant un run : maintenu une seconde, pour eviter la relance par accident (D29).</summary>
     private static readonly TimeSpan MaintienDeLaRelance = TimeSpan.FromSeconds(1);
 
     /// <summary>La touche Hotkey de RetroBat (Select sur la borne de reference, releve le 29/10).</summary>
     private const string Hotkey = "select";
+
+    /// <summary>
+    /// RELANCER : HOTKEY + GAUCHE (choix du user, 01/11). Chaque bouton du visage est deja pris avec Hotkey : en bas le menu
+    /// de RetroArch, a droite le game manager de RetroBat, en haut le chargement d'une sauvegarde, a gauche son ecriture.
+    /// Hotkey + gauche est le retour arriere de RetroArch, coupe pendant un defi (rewind_enable faux) ; droite est l'avance
+    /// rapide, haut et bas changent d'emplacement de sauvegarde.
+    /// </summary>
+    private const string BoutonDeRelance = "left";
 
     /// <summary>Avance rapide : les frames vont 1,5 fois plus vite que l'horloge, sur au moins 1,5 seconde.</summary>
     private const double RapportDAvanceRapide = 1.5;
@@ -70,6 +79,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private readonly CatalogueDesDefis _catalogue;
     private readonly InterfaceTextService? _textes;
     private readonly EmulationStationSettingsService? _reglages;
+    private readonly IPrioritesDuJeu? _priorites;
     private readonly string _fichierDesTentatives;
     private readonly object _verrou = new();
     private readonly List<Signal> _image = new();
@@ -87,11 +97,27 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private CancellationTokenSource? _maintien;
     private int _requetesDeLaManette;
     private DateTime? _premiereImage;
+    private DateTime? _etatCharge;
+    private DateTime? _etatPose;
+    private TaskCompletionSource? _demandeDeChargement;
+    private bool _etatAttendu;
+
+    /// <summary>L'epreuve de la partie en cours, que le direct partage montre ; null hors epreuve.</summary>
+    public Reglement? EpreuveEnCours
+    {
+        get { lock (_verrou) return _session?.Reglement; }
+    }
+
+    /// <summary>Sans demande de la page de preparation (fermee, absente), l'etat pose se charge seul au bout de ce delai.</summary>
+    internal TimeSpan ChargementDeSecours { get; set; } = TimeSpan.FromSeconds(15);
 
     public SpeedrunSessionService(IEventBus bus, ApiContext contexte, ILogger<SpeedrunSessionService> journal,
         PartieNelfePlayService? partie = null, ICommandesRetroArch? commandes = null, string? fichierDesTentatives = null,
-        InterfaceTextService? textes = null, EmulationStationSettingsService? reglages = null, CatalogueDesDefis? catalogue = null)
+        InterfaceTextService? textes = null, EmulationStationSettingsService? reglages = null, CatalogueDesDefis? catalogue = null,
+        IPrioritesDuJeu? priorites = null)
     {
+        // Sans priorites (les tests), personne ne touche aux processus de la machine.
+        _priorites = priorites;
         _catalogue = catalogue ?? new CatalogueDesDefis();
         _bus = bus;
         _contexte = contexte;
@@ -107,6 +133,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     {
         _abonnement = _bus.Subscribe<EventEnvelope>(SurEvenement);
         _vidage = new System.Threading.Timer(_ => ViderLImage(), null, Timeout.Infinite, Timeout.Infinite);
+        // Une API arretee en plein defi a laisse ES en retrait.
+        if (_priorites is { } priorites) _ = Task.Run(priorites.RendreLaMain, CancellationToken.None);
         return Task.CompletedTask;
     }
 
@@ -114,6 +142,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     {
         _abonnement?.Dispose();
         _releves?.Cancel();
+        _priorites?.RendreLaMain();
         return Task.CompletedTask;
     }
 
@@ -131,6 +160,29 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     public DateTime? PremiereImageUtc
     {
         get { lock (_verrou) return _session is null ? null : _premiereImage; }
+    }
+
+    /// <summary>Quand l'etat de depart du defi a ete charge ; null sans session ou avant le chargement.</summary>
+    public DateTime? EtatChargeUtc
+    {
+        get { lock (_verrou) return _session is null ? null : _etatCharge; }
+    }
+
+    /// <summary>Quand l'etat de depart a ete pose dans le dossier de RetroArch, pret a charger ; null sans session ou avant.</summary>
+    public DateTime? EtatPoseUtc
+    {
+        get { lock (_verrou) return _session is null ? null : _etatPose; }
+    }
+
+    /// <summary>
+    /// La page de preparation s'efface : l'etat pose se charge dessous, et le joueur le decouvre a sa premiere image. Avant la
+    /// pose, le chargement suivra la pose ; apres le chargement, rien.
+    /// </summary>
+    public void ChargerLEtatDeDepart()
+    {
+        TaskCompletionSource? demande;
+        lock (_verrou) demande = _demandeDeChargement;
+        demande?.TrySetResult();
     }
 
     /// <summary>Le snapshot de la session en cours, ou null sans session.</summary>
@@ -162,21 +214,116 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         try { rom = Path.GetFullPath(rom); }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException) { }
 
+        // LE DEPART SUR ETAT : l'etat porte l'empreinte du reglement, sinon rien ne part.
+        byte[]? etat = null;
+        if (reglement.StartPolicy != "normal_boot")
+        {
+            if (reglement.Etat is null) return new(false, "state_missing");
+            var (octets, refus) = EtatsDesDefis.Lire(reglement.Etat);
+            if (octets is null) return new(false, refus ?? "state_missing", reglement.Etat.Fichier);
+            etat = octets;
+        }
+
         var coeur = reglement.Coeurs.FirstOrDefault() is { Length: > 0 } c ? c : null;
         var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
             RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, reglement.SystemId, "libretro", coeur, rom, retroAchievements: false);
         if (arguments is null) return new(false, "bad_rules", "systeme ou coeur illisible");
+
+        // LES VERROUS (D18) : dans certified.txt avant le lanceur, le wrapper les lit au chargement du jeu. Toujours poses,
+        // vides compris : un verrou reste d'un autre defi ne doit pas tenir celui-ci.
+        var nomDeLaRom = Path.GetFileNameWithoutExtension(rom);
+        VerrousDuLancement.Poser(nomDeLaRom, reglement.Verrous.Select(v => v.Ligne).ToList());
+        if (reglement.Verrous.Count > 0)
+        {
+            try { RetroBat.Api.Infrastructure.CertifiedSettingsService.PoserLesVerrous(nomDeLaRom); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                VerrousDuLancement.Retirer();
+                return new(false, "locks_unwritable", ex.Message);
+            }
+        }
 
         AttendreLeLancement(reglement, rom);
         _partie?.AnnoncerLancement(PartieNelfePlayService.OrigineSpeedrun);
         if (LancementDirect.Lancer(arguments, reglement.SystemId, rom, _contexte, _bus, _journal) is null)
         {
             lock (_verrou) _lancement = null;
+            VerrousDuLancement.Retirer();
             return new(false, "launcher_failed");
         }
 
         _journal.LogInformation("Speedrun : lancement de {Defi} ({Rom}, coeur {Coeur}, sans RetroAchievements).", reglement.ChallengeId, rom, coeur ?? "auto");
+        if (etat is not null) PartirSurLEtat(reglement, etat, Path.GetFileNameWithoutExtension(rom));
         return new(true, null);
+    }
+
+    /// <summary>Le jeu lance, son etat de depart attend : rien ne compte avant son chargement.</summary>
+    internal void PartirSurLEtat(Reglement reglement, byte[] etat, string nomDuContenu)
+    {
+        var demande = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        lock (_verrou)
+        {
+            _etatAttendu = true;
+            _etatPose = _etatCharge = null;
+            _demandeDeChargement = demande;
+        }
+
+        _ = _bus.PublishAsync(new EventEnvelope { Type = "speedrun.etat.attendu", Payload = new { defi = reglement.ChallengeId } });
+        _ = Task.Run(() => PoserLEtatAsync(reglement, etat, nomDuContenu, demande));
+    }
+
+    /// <summary>
+    /// La pose de l'etat de depart, des que RetroArch joue le jeu, puis son chargement a la demande de la page de preparation.
+    /// Jusque-la, le demarrage du jeu (BIOS, titre) n'arme rien : les images et les releves attendent le chargement. Le replay
+    /// aussi, pour partir de l'etat charge.
+    /// </summary>
+    private async Task PoserLEtatAsync(Reglement reglement, byte[] etat, string nomDuContenu, TaskCompletionSource demande)
+    {
+        var raison = await EtatsDesDefis.PoserAsync(_commandes, etat, nomDuContenu, TimeSpan.FromSeconds(90), CancellationToken.None)
+            .ConfigureAwait(false);
+        if (raison is not null)
+        {
+            lock (_verrou)
+            {
+                if (!ReferenceEquals(_demandeDeChargement, demande)) return;
+                _etatAttendu = false;
+                _demandeDeChargement = null;
+            }
+
+            _journal.LogWarning("Speedrun : etat de depart de {Defi} non charge ({Raison}).", reglement.ChallengeId, raison);
+            _ = AfficherAsync(new MessageJoueur("speedrun.msg.state_failed", "The challenge could not start: starting state not loaded."));
+            return;
+        }
+
+        lock (_verrou)
+        {
+            if (!ReferenceEquals(_demandeDeChargement, demande)) return;
+            _etatPose = DateTime.UtcNow;
+        }
+
+        await Task.WhenAny(demande.Task, Task.Delay(ChargementDeSecours)).ConfigureAwait(false);
+        lock (_verrou)
+        {
+            // Un autre lancement depuis, ou le jeu deja ferme : cet etat ne vaut plus rien.
+            if (!ReferenceEquals(_demandeDeChargement, demande) || _contexte.Ui.Running is null) return;
+            _demandeDeChargement = null;
+        }
+
+        if (!demande.Task.IsCompleted) _journal.LogWarning("Speedrun : aucune demande de chargement pour {Defi}, l'etat se charge seul.", reglement.ChallengeId);
+        await EtatsDesDefis.ChargerAsync(_commandes, CancellationToken.None).ConfigureAwait(false);
+
+        // Le chargement se lit un instant apres la commande : les images d'avant ne disent plus rien du jeu.
+        await Task.Delay(500).ConfigureAwait(false);
+        lock (_verrou)
+        {
+            _image.Clear();
+            _frameDeLImage = _horlogeDeLImage = null;
+            _etatAttendu = false;
+            _etatCharge = DateTime.UtcNow;
+        }
+
+        _journal.LogInformation("Speedrun : etat de depart {Etat} charge pour {Defi}.", reglement.Etat?.Nom, reglement.ChallengeId);
+        await _bus.PublishAsync(new EventEnvelope { Type = "speedrun.etat.charge", Payload = new { defi = reglement.ChallengeId } }).ConfigureAwait(false);
     }
 
     /// <summary>Le prochain jeu qui demarre sur cette ROM ouvre une session de ce defi.</summary>
@@ -209,15 +356,32 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     /// <summary>
     /// RELANCER UN DEPART NORMAL : commande RESET de RetroArch (§10). RetroArch ne repond pas a RESET ; une
     /// lecture juste avant prouve qu'il ecoute. Sans reponse, la relance est refusee et le jeu reste ou il est.
+    /// Un defi parti sur un etat (D19) recharge cet etat, toujours pose dans le dossier de RetroArch : un RESET le
+    /// renverrait au demarrage du jeu (BIOS, titre, choix du soldat).
     /// </summary>
     private async Task RelancerAsync(long sonde)
     {
         string? raison = null;
+        Reglement? surEtat;
+        lock (_verrou) surEtat = _session?.Reglement is { Etat: not null } r ? r : null;
         try
         {
             using var delai = new CancellationTokenSource(TimeSpan.FromSeconds(3));
             if (await _commandes.DemanderAsync($"READ_CORE_RAM {sonde:x} 1", delai.Token).ConfigureAwait(false) is null) raison = "retroarch_unreachable";
-            else await _commandes.EnvoyerAsync("RESET", delai.Token).ConfigureAwait(false);
+            else if (surEtat is null) await _commandes.EnvoyerAsync("RESET", delai.Token).ConfigureAwait(false);
+            else
+            {
+                // Comme au depart : rien ne compte entre la commande et l'etat charge, le replay repart de l'etat.
+                lock (_verrou) _etatAttendu = true;
+                await _bus.PublishAsync(new EventEnvelope { Type = "speedrun.etat.attendu", Payload = new { defi = surEtat.ChallengeId } }).ConfigureAwait(false);
+                // Le replay de la tentative s'arrete AVANT le chargement : un etat charge pendant l'enregistrement deregle
+                // RetroArch (essai du 01/11, sauvegarde rechargee par Hotkey + X : un millier d'erreurs STATESTREAM par
+                // image, 261 Mo de journal, plus de reponse aux commandes). L'enregistreur en ouvre un neuf sur l'etat.
+                await _commandes.EnvoyerAsync("HALT_REPLAY", delai.Token).ConfigureAwait(false);
+                await Task.Delay(200, delai.Token).ConfigureAwait(false);
+                await EtatsDesDefis.ChargerAsync(_commandes, delai.Token).ConfigureAwait(false);
+                await Task.Delay(500, CancellationToken.None).ConfigureAwait(false);
+            }
         }
         catch (Exception ex)
         {
@@ -227,6 +391,14 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
         lock (_verrou)
         {
+            if (surEtat is not null)
+            {
+                _image.Clear();
+                _frameDeLImage = _horlogeDeLImage = null;
+                _etatAttendu = false;
+                if (raison is null) _etatCharge = DateTime.UtcNow;
+            }
+
             if (_session is null) return;
             ViderLImageVerrouille();
             if (raison is null) _session.RelanceFaite();
@@ -235,7 +407,11 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             Publier();
         }
 
-        _journal.LogInformation(raison is null ? "Speedrun : jeu replace au depart (RESET)." : "Speedrun : relance refusee ({Raison}).", raison);
+        if (surEtat is not null && raison is null)
+            await _bus.PublishAsync(new EventEnvelope { Type = "speedrun.etat.charge", Payload = new { defi = surEtat.ChallengeId } }).ConfigureAwait(false);
+        _journal.LogInformation(raison is null
+            ? surEtat is null ? "Speedrun : jeu replace au depart (RESET)." : "Speedrun : etat de depart recharge (relance)."
+            : "Speedrun : relance refusee ({Raison}).", raison);
     }
 
     private void SurEvenement(EventEnvelope e)
@@ -263,6 +439,9 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 case "scoring.listener.session":
                     SurBilan(e.Payload);
                     break;
+                case "scoring.listener.attestation":
+                    SurAttestation(e.Payload);
+                    break;
             }
         }
         catch (Exception ex)
@@ -289,9 +468,18 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             _tenus.Clear();
             _frameDeLImage = _horlogeDeLImage = null;
             _premiereImage = null;
+            _etatCharge = null;
+            _pausesLevees = 0;
+            _pauseDepuis = null;
+            _relanceApresLaPause = false;
             _releves?.Cancel();
             _releves = new CancellationTokenSource();
             _ = ReleverEnBoucleAsync(_session, _releves.Token);
+            if (_priorites is { } priorites)
+            {
+                var jeton = _releves.Token;
+                _ = Task.Run(() => priorites.DonnerLaMainAuJeuAsync(jeton), CancellationToken.None);
+            }
             _journal.LogInformation("Speedrun : session {Session} ouverte sur {Defi}.", _session.SessionId, _session.DefiId);
             Publier();
         }
@@ -310,6 +498,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             _ = _bus.PublishAsync(new EventEnvelope { Type = "speedrun.session.closed", Payload = new { sessionId = _session.SessionId } });
             _session = null;
         }
+
+        _priorites?.RendreLaMain();
     }
 
     private void RecevoirSignal(object? payload)
@@ -331,7 +521,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
         lock (_verrou)
         {
-            if (_session is null) return;
+            // Le demarrage du jeu avant l'etat de depart ne dit rien de l'epreuve.
+            if (_session is null || _etatAttendu) return;
             if (_frameDeLImage is { } frame && frame != signal.Frame) ViderLImageVerrouille();
             _frameDeLImage = signal.Frame;
             _horlogeDeLImage ??= horloge;
@@ -390,7 +581,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
     /// <summary>
     /// LES COMBINAISONS DE LA MANETTE (D29), lues par le lecteur d'entrees de l'API sur la manette du joueur 1 :
-    /// Hotkey + A relance (aussitot avant le depart, maintenu une seconde pendant un run) ; Hotkey + Start quitte
+    /// Hotkey + gauche relance (aussitot avant le depart, maintenu une seconde pendant un run) ; Hotkey + Start quitte
     /// le jeu dans RetroArch, la tentative en cours est close comme abandonnee avant que le jeu ne se ferme.
     /// </summary>
     private void SurBouton(bool appui, object? payload)
@@ -415,7 +606,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
             _tenus.Add(identite);
             if (!_tenus.Contains(Hotkey)) return;
-            if (identite.Equals("a", StringComparison.OrdinalIgnoreCase)) action = SessionSpeedrun.ActionRelancer;
+            if (identite.Equals(BoutonDeRelance, StringComparison.OrdinalIgnoreCase)) action = SessionSpeedrun.ActionRelancer;
             else if (identite.Equals("start", StringComparison.OrdinalIgnoreCase)) action = SessionSpeedrun.ActionAbandonner;
             enCourse = _session.Etat == SessionSpeedrun.Running;
             sessionId = _session.SessionId;
@@ -446,7 +637,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             try { await Task.Delay(MaintienDeLaRelance, maintien.Token).ConfigureAwait(false); }
             catch (OperationCanceledException) { return; }
             bool tenu;
-            lock (_verrou) tenu = _tenus.Contains(Hotkey) && _tenus.Contains("a");
+            lock (_verrou) tenu = _tenus.Contains(Hotkey) && _tenus.Contains(BoutonDeRelance);
             if (tenu) await CommanderAsync(new CommandeSpeedrun(IdDeLaManette(), sessionId, SessionSpeedrun.ActionRelancer, Confirme: true)).ConfigureAwait(false);
         });
     }
@@ -476,6 +667,23 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private string? _derniereSession;
 
     /// <summary>
+    /// LES VERROUS A L'ATTESTATION (D18), des le chargement du jeu : si le wrapper n'a pas lu ceux du reglement (wrapper
+    /// d'avant 0.343, fichier perdu), le joueur le sait avant de jouer. Le defi reste jouable : son filet (l'echec au tir de
+    /// Metal Slug 3) tient, mais aucun temps de ce lancement ne partira (bilan, <see cref="PasseportDeDefi.EcartDesVerrous"/>).
+    /// </summary>
+    private void SurAttestation(object? payload)
+    {
+        Reglement? reglement;
+        lock (_verrou) reglement = _session?.Reglement ?? _lancement?.Reglement;
+        if (reglement is null) return;
+        var racine = payload is JsonElement j ? j : JsonSerializer.SerializeToElement(payload);
+        var lus = racine.TryGetProperty("Locks", out var l) && l.ValueKind == JsonValueKind.String ? l.GetString() ?? "" : "";
+        if (string.Equals(lus, reglement.LignesDesVerrous, StringComparison.Ordinal)) return;
+        _journal.LogWarning("Speedrun : verrous lus par le wrapper « {Lus} » au lieu de « {Attendus} » pour {Defi}.", lus, reglement.LignesDesVerrous, reglement.ChallengeId);
+        _ = AfficherAsync(new MessageJoueur("speedrun.msg.locks_missing", "Challenge locks not active: no time will be sent."));
+    }
+
+    /// <summary>
     /// RELEVER CE QUE LE WRAPPER NE DIT PAS ENCORE : quatre fois par seconde, les adresses inconnues de la tentative
     /// courante et de celle qui attend, par READ_CORE_RAM. Une adresse sans reponse reste inconnue, jamais 0.
     /// </summary>
@@ -488,11 +696,16 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             catch (OperationCanceledException) { return; }
 
             IReadOnlyList<long> adresses;
+            bool etatAttendu;
             lock (_verrou)
             {
                 if (!ReferenceEquals(_session, session)) return;
-                adresses = session.AdressesInconnues;
+                // Un releve d'avant l'etat de depart resterait pour toujours : un releve ne remplace jamais une valeur connue.
+                adresses = _etatAttendu ? [] : session.AdressesInconnues;
+                etatAttendu = _etatAttendu;
             }
+
+            if (!etatAttendu) await LeverLaPauseAsync(session, ct).ConfigureAwait(false);
 
             foreach (var adresse in adresses)
             {
@@ -520,6 +733,71 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             }
         }
     }
+
+    /// <summary>
+    /// PAS DE PAUSE PENDANT UN DEFI. RetroArch ne sait l'interdire qu'en mode hardcore de RetroAchievements, qui
+    /// interdit aussi de charger l'etat de depart (D19) : la session la leve elle-meme. La touche pause et l'image par
+    /// image mettent RetroArch en pause (GET_STATUS PAUSED) ; la pause est levee au releve suivant, un quart de seconde
+    /// au plus apres. Pendant toute la session, entre deux tentatives aussi (essai du 01/11 : la pause apres un echec
+    /// surprenait), sauf quand l'etat de depart se charge. Le menu ne se voit pas ainsi (RetroArch y repond PLAYING) :
+    /// l'ecart horloge/frames le juge pendant une course.
+    ///
+    /// Un message le dit au joueur a chaque pause (demande du user, 01/11). LA PAUSE TENUE : PAUSE_TOGGLE est un appui
+    /// virtuel sur la touche pause ; tant que le joueur la tient, RetroArch ne voit pas de nouvel appui et reste en pause.
+    /// Tenue une seconde, elle vaut Hotkey + gauche (demande du user) : le joueur est prevenu, et la relance part des que
+    /// la pause est levee, la touche lachee. Pas avant : rien ne garantit qu'un etat se charge pendant une pause.
+    /// </summary>
+    private async Task LeverLaPauseAsync(SessionSpeedrun session, CancellationToken ct)
+    {
+        var statut = await _commandes.DemanderAsync("GET_STATUS", ct).ConfigureAwait(false);
+        if (statut is null) return;
+        var enPause = statut.StartsWith("GET_STATUS PAUSED", StringComparison.Ordinal);
+        bool premiere = false, tenue = false, relancer = false;
+        string sessionId;
+        lock (_verrou)
+        {
+            if (!ReferenceEquals(_session, session) || _etatAttendu) return;
+            sessionId = session.SessionId;
+            if (!enPause)
+            {
+                _pauseDepuis = null;
+                relancer = _relanceApresLaPause;
+                _relanceApresLaPause = false;
+            }
+            else
+            {
+                premiere = _pauseDepuis is null;
+                _pauseDepuis ??= DateTime.UtcNow;
+                if (!_relanceApresLaPause && DateTime.UtcNow - _pauseDepuis.Value >= PauseTenue) tenue = _relanceApresLaPause = true;
+            }
+        }
+
+        if (relancer)
+        {
+            _journal.LogInformation("Speedrun : pause tenue, le joueur repart du depart.");
+            await CommanderAsync(new CommandeSpeedrun(IdDeLaManette(), sessionId, SessionSpeedrun.ActionRelancer, Confirme: true)).ConfigureAwait(false);
+            return;
+        }
+
+        if (!enPause) return;
+        await _commandes.EnvoyerAsync("PAUSE_TOGGLE", ct).ConfigureAwait(false);
+        if (premiere)
+        {
+            _ = AfficherAsync(new MessageJoueur("speedrun.msg.no_pause", "No pause during a challenge."));
+            var levees = Interlocked.Increment(ref _pausesLevees);
+            if (levees == 1 || levees % 20 == 0)
+                _journal.LogInformation("Speedrun : pause levee pendant le defi ({Levees} depuis l'ouverture de la session).", levees);
+        }
+
+        if (tenue) _ = AfficherAsync(new MessageJoueur("speedrun.msg.pause_held", "Pause held: back to the start."));
+    }
+
+    /// <summary>Une pause tenue aussi longtemps vaut Hotkey + gauche, comme la relance pendant un run.</summary>
+    private static readonly TimeSpan PauseTenue = TimeSpan.FromSeconds(1);
+
+    private int _pausesLevees;
+    private DateTime? _pauseDepuis;
+    private bool _relanceApresLaPause;
 
     /// <summary>Publie les evenements de la session, puis son snapshot s'il a change. Sous le verrou.</summary>
     private void Publier()

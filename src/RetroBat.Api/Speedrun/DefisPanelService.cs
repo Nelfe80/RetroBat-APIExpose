@@ -572,7 +572,7 @@ public sealed partial class DefisPanelService
         {
             if (!resultat.TryGetValue(groupe.Key.Onglet, out var lignes)) resultat[groupe.Key.Onglet] = lignes = new();
             lignes.Add((new LigneDeDefi(T("speedrun.panel.group." + groupe.Key.Groupe, NomDuGroupe(groupe.Key.Groupe)), Groupe: true), null));
-            foreach (var d in groupe)
+            foreach (var d in groupe.OrderBy(d => d.Ordre).ThenBy(d => d.Titre(langue), StringComparer.CurrentCultureIgnoreCase))
             {
                 var (tentatives, meilleur) = bilan.GetValueOrDefault(d.ChallengeId);
                 var marque = meilleur is not null ? "reussi" : tentatives > 0 ? "tente" : "";

@@ -3163,11 +3163,21 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
 
         var frames = defi.Tentative.Resultat.FramesOfficielles ?? 0;
-        if (RetroBat.Api.Speedrun.PasseportDeDefi.Salissure(sessionJson) is { } motif)
+        // Un defi qui part sur un etat en charge un, nomme au passeport : ce chargement-la n'est pas une sauvegarde.
+        if (RetroBat.Api.Speedrun.PasseportDeDefi.Salissure(sessionJson, defi.Reglement.Etat is null ? 0 : 1) is { } motif)
         {
             Trace($"defi de speedrun : STOP, le bilan du wrapper signale {motif}, aucune tentative de ce lancement ne part");
             if (_esNotify is not null)
                 await _esNotify.NotifyAsync("Défi : temps non envoyé, triche ou état chargé détecté pendant ce lancement", cancellationToken).ConfigureAwait(false);
+            return;
+        }
+
+        // Les verrous du defi (D18) : exactement ceux du reglement, poses sur toutes les images.
+        if (RetroBat.Api.Speedrun.PasseportDeDefi.EcartDesVerrous(sessionJson, defi.Reglement) is { } ecart)
+        {
+            Trace($"defi de speedrun : STOP, {ecart}, aucune tentative de ce lancement ne part");
+            if (_esNotify is not null)
+                await _esNotify.NotifyAsync("Défi : temps non envoyé, les verrous du défi n'ont pas tenu pendant ce lancement", cancellationToken).ConfigureAwait(false);
             return;
         }
 
@@ -3190,6 +3200,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, frames, points, points,
             null, null, null, 1, null, null, null, replay, null);
         brouillon["defi"] = RetroBat.Api.Speedrun.PasseportDeDefi.Decrire(defi.Reglement, defi.Tentative);
+        if (RetroBat.Api.Speedrun.PasseportDeDefi.Depart(defi.Reglement) is { } departDuDefi) brouillon["depart"] = departDuDefi;
         // L'identifiant de la tentative est celui du passeport : un renvoi revient en « duplicate ».
         if (Guid.TryParse(defi.Tentative.AttemptId, out var tentative)) brouillon["id"] = tentative.ToString();
         await PoserEtEnvoyerAsync(brouillon, frames, cancellationToken).ConfigureAwait(false);

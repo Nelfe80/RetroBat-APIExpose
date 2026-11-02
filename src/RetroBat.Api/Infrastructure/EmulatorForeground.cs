@@ -78,6 +78,9 @@ public static class EmulatorForeground
         return gardes;
     }
 
+    /// <summary>Les processus dont le nom commence par ce prefixe, par le meme parcours. L'appelant les libere.</summary>
+    public static IReadOnlyList<Process> ProcessusCommencantPar(string prefixe) => Processus(prefixe).ToList();
+
     /// <summary>Le menu. Il doit avoir le focus avant qu'on lui demande de lancer quoi que ce soit.</summary>
     /// <summary>
     /// Un emulateur tourne-t-il ?

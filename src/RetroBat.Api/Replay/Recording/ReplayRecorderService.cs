@@ -64,6 +64,15 @@ public sealed class ReplayRecorderService : BackgroundService
     /// perdait celui de vingt et une.
     /// </summary>
     private volatile bool _departEnAttente;
+
+    /// <summary>
+    /// UN DEFI QUI PART SUR UN ETAT (01/11) : le film attend le chargement de l'etat. Commence au demarrage du jeu, il garderait
+    /// le BIOS et le titre, et le chargement en pleine prise ne se rejoue pas.
+    /// </summary>
+    private volatile bool _etatDeDepartAttendu;
+
+    /// <summary>Les verrous que le wrapper a attestes pour le jeu en cours (D18) ; null sans verrou. Le manifeste les garde.</summary>
+    private volatile string? _verrousAttestes;
     private string _sourceDuDepart = "";
     private string _contenuVu = "";
     private bool _dejaEnregistre;
@@ -338,6 +347,7 @@ public sealed class ReplayRecorderService : BackgroundService
         {
             case "ui.game.started":
                 _garde.JeuLance();
+                _verrousAttestes = null;   // l'attestation de ce jeu-ci les redira
                 break;
             case "ui.game.ended":
                 _garde.JeuTermine();
@@ -346,7 +356,12 @@ public sealed class ReplayRecorderService : BackgroundService
                 _garde.FinDePartieRecue();
                 break;
             case "scoring.listener.attestation":
-                try { _garde.EcouteVue(GardeDesPlantages.CoeurDeLAttestation(System.Text.Json.JsonSerializer.SerializeToElement(e.Payload))); }
+                try
+                {
+                    var attestation = System.Text.Json.JsonSerializer.SerializeToElement(e.Payload);
+                    _garde.EcouteVue(GardeDesPlantages.CoeurDeLAttestation(attestation));
+                    _verrousAttestes = VerrousDeLAttestation(attestation);
+                }
                 catch { _garde.EcouteVue("?"); }
                 break;
         }
@@ -355,6 +370,21 @@ public sealed class ReplayRecorderService : BackgroundService
         {
             _runTermine = true;
             return;
+        }
+
+        switch (e.Type)
+        {
+            case "speedrun.etat.attendu":
+                _etatDeDepartAttendu = true;
+                return;
+            case "speedrun.etat.charge":
+                _etatDeDepartAttendu = false;
+                _sourceDuDepart = "etat de depart du defi";
+                _departEnAttente = true;
+                return;
+            case "ui.game.ended":
+                _etatDeDepartAttendu = false;
+                break;
         }
 
         if (string.Equals(e.Type, "scoring.run.multi", StringComparison.Ordinal))
@@ -445,6 +475,7 @@ public sealed class ReplayRecorderService : BackgroundService
             _sourceDuDepart = "chargement du jeu";
             return true;
         }
+        if (_etatDeDepartAttendu) return false;
         if (_departEnAttente) return true;
         var cle = status.System + "/" + status.Game;
         if (!string.Equals(_attenteAnnoncee, cle, StringComparison.Ordinal))
@@ -713,6 +744,12 @@ public sealed class ReplayRecorderService : BackgroundService
         }
     }
 
+    /// <summary>Les verrous d'une attestation du wrapper (« Locks »), null s'il n'y en a pas (ou wrapper d'avant 0.343).</summary>
+    internal static string? VerrousDeLAttestation(System.Text.Json.JsonElement attestation)
+        => attestation.ValueKind == System.Text.Json.JsonValueKind.Object
+           && attestation.TryGetProperty("Locks", out var l) && l.ValueKind == System.Text.Json.JsonValueKind.String
+           && l.GetString() is { Length: > 0 } lignes ? lignes : null;
+
     private ReplayManifest BuildManifest(Recording rec, ReplayObjectRef obj, ReplayLaunchHint? hint)
     {
         var game = new ReplayGame(
@@ -742,7 +779,9 @@ public sealed class ReplayRecorderService : BackgroundService
             ReplayFormat: "bsv",
             CoreName: string.IsNullOrEmpty(hint?.Core) ? null : hint!.Core,
             // Les fichiers du zip et leurs CRC : une autre borne reconnait ainsi le meme jeu zippe autrement.
-            RomFiles: Playback.ContenuDArchive.Lire(hint?.RomPath));
+            RomFiles: Playback.ContenuDArchive.Lire(hint?.RomPath),
+            // Les verrous d'un defi : la lecture les remet, sinon la partie diverge (D18).
+            Locks: _verrousAttestes);
 
         var (fps, fpsSource) = ResolveFps(rec);
         var frames = new ReplayFrames(
