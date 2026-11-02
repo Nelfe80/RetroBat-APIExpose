@@ -461,6 +461,9 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             if (enCours is { Length: > 0 } && !string.Equals(Path.GetFullPath(enCours), Path.GetFullPath(l.Rom), StringComparison.OrdinalIgnoreCase)) return;
 
             _session = new SessionSpeedrun(l.Reglement.ChallengeId, l.Reglement) { MeilleurTemps = MeilleurTempsDuJournal(l.Reglement.ChallengeId) };
+            _etatJournalise = null;
+            _signauxRecus = _signauxAvantLEtat = 0;
+            _derniersReleves.Clear();
             _sessionDuLancement = _session;
             _sondeDeRetroArch = l.Reglement.OffsetDansLeCoeur(l.Reglement.AdressesCitees().FirstOrDefault());
             _image.Clear();
@@ -494,7 +497,9 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             _session.JeuFerme();
             Publier();
             _releves?.Cancel();
-            _journal.LogInformation("Speedrun : session {Session} close (jeu ferme).", _session.SessionId);
+            _journal.LogInformation("Speedrun : session {Session} close (jeu ferme), {Recus} signal(aux) du wrapper recu(s) apres l'etat de depart ({Avant} avant), derniers releves : {Releves}.",
+                _session.SessionId, _signauxRecus, _signauxAvantLEtat,
+                _derniersReleves.Count == 0 ? "aucun" : string.Join(", ", _derniersReleves.Select(r => Hex.Ecrire(r.Key) + "=" + Hex.Ecrire(r.Value))));
             _ = _bus.PublishAsync(new EventEnvelope { Type = "speedrun.session.closed", Payload = new { sessionId = _session.SessionId } });
             _session = null;
         }
@@ -522,7 +527,13 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         lock (_verrou)
         {
             // Le demarrage du jeu avant l'etat de depart ne dit rien de l'epreuve.
-            if (_session is null || _etatAttendu) return;
+            if (_session is null) return;
+            if (_etatAttendu)
+            {
+                _signauxAvantLEtat++;
+                return;
+            }
+            _signauxRecus++;
             if (_frameDeLImage is { } frame && frame != signal.Frame) ViderLImageVerrouille();
             _frameDeLImage = signal.Frame;
             _horlogeDeLImage ??= horloge;
@@ -727,6 +738,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 lock (_verrou)
                 {
                     if (!ReferenceEquals(_session, session)) return;
+                    _derniersReleves[adresse] = valeur;
                     session.Relever(adresse, valeur);
                     Publier();
                 }
@@ -813,6 +825,11 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
         foreach (var (attemptId, resultat) in _session.PrendreLesCloses()) EcrireTentative(_session, attemptId, resultat);
         foreach (var message in _session.PrendreLesMessages()) _ = AfficherAsync(message);
+        if (_session.Etat != _etatJournalise)
+        {
+            _journal.LogInformation("Speedrun : session {Session} {Avant} -> {Apres}.", _session.SessionId, _etatJournalise ?? "-", _session.Etat);
+            _etatJournalise = _session.Etat;
+        }
         _derniereSession = _session.SessionId;
         if (evenements.Count > 0 || _snapshotPublie != _session.Sequence)
         {
@@ -822,6 +839,13 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     }
 
     private long _snapshotPublie = -1;
+
+    // LE DIAGNOSTIC D'UNE SESSION (essai du user du 02/11, 22:56 : neuf minutes sans aucune tentative, sans rien pour dire
+    // pourquoi). Chaque changement d'etat se journalise, et la fermeture dit ce que le wrapper a envoye et ce que les releves
+    // ont lu en dernier.
+    private string? _etatJournalise;
+    private int _signauxRecus, _signauxAvantLEtat;
+    private readonly Dictionary<long, int> _derniersReleves = new();
 
     /// <summary>
     /// Le meilleur temps du lancement, une seule fois, meme apres la fermeture de la session : le bilan du wrapper

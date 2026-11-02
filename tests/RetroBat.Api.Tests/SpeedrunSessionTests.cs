@@ -200,8 +200,12 @@ public class SpeedrunSessionTests
     {
         Assert.Equal(1, GreenHill1.Version);
         Assert.Equal(["genesis_plus_gx"], GreenHill1.Coeurs);
+        // Le .MEM certifie est celui du mode Debug depuis le 02/11 (9e914108) : c'est la v2, ouverte, qui doit s'y tenir. La v1
+        // (00bf82c7) est declassee.
+        var enVigueur = Reglement.Lire(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Reglements", "sonic-the-hedgehog.green-hill-1.v2.json")));
+        Assert.Equal(2, enVigueur.Version);
         if (MemCertifie() is not { } mem) return;
-        Assert.Empty(GreenHill1.VerifierContre(File.ReadAllBytes(mem)));
+        Assert.Empty(enVigueur.VerifierContre(File.ReadAllBytes(mem)));
     }
 
     [Fact]
