@@ -46,8 +46,14 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     /// <summary>Une annonce de lancement vaut pour le jeu qui demarre dans ce delai.</summary>
     private static readonly TimeSpan ValiditeDuLancement = TimeSpan.FromMinutes(2);
 
-    /// <summary>Les evenements d'une frame arrivent ensemble ; sans suite apres ce delai, l'image est jugee.</summary>
-    private const int AttenteDeLImageMs = 40;
+    /// <summary>
+    /// Les evenements d'une frame se jugent ensemble : l'image se ferme des qu'arrive un evenement d'une frame suivante, ou sans
+    /// suite apres ce delai. LE DEPART MANQUE (03/11, Green Hill 2 pendant un direct) : la borne chargee livrait les deux
+    /// evenements de la frame du depart (chrono lance, secondes remises a 0) a 120 ms d'ecart ; a 40 ms ils faisaient deux images,
+    /// et le chrono partait quand les secondes valaient encore 2 : depart refuse, la tentative ne commencait jamais. Le temps
+    /// se compte en frames et a l'horloge du wrapper, jamais a l'arrivee : attendre ne retarde que les messages.
+    /// </summary>
+    internal const int AttenteDeLImageMs = 400;
 
     /// <summary>Hotkey + gauche pendant un run : maintenu une seconde, pour eviter la relance par accident (D29).</summary>
     private static readonly TimeSpan MaintienDeLaRelance = TimeSpan.FromSeconds(1);
