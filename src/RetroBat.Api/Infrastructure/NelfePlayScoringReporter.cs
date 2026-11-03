@@ -3195,10 +3195,33 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             return;
         }
 
+        // LE FILM DE L'EPREUVE (03/11) : l'enregistrement qui contient la tentative retenue (une relance peut en ouvrir un
+        // autre), et ses bornes, de peu avant le depart a peu apres l'arrivee. Sans elles, le rendu filmait toute la seance.
+        var resultat = defi.Tentative.Resultat;
+        var officielle = resultat.ChronoOfficiel == RetroBat.Api.Speedrun.Reglement.ChronoIndependant ? resultat.Independant : resultat.Cale;
+        (long Debut, long Fin)? bornesDuFilm = null;
+        if (officielle?.Depart is long departDuRun && officielle.Arrivee is long arriveeDuRun)
+        {
+            List<(string Id, long Debut, long? Fin)> enregistrements;
+            lock (_sync) { enregistrements = new List<(string Id, long Debut, long? Fin)>(_enregistrementsDeLaPartie); }
+            var runRetenu = new List<(long frame, long total)> { (departDuRun, 0), (arriveeDuRun, frames) };
+            if (ReplayDuMeilleurRun(enregistrements, runRetenu) is { } enregistrement)
+            {
+                replay = enregistrement;
+                var e = enregistrements.Last(x => string.Equals(x.Id, enregistrement, StringComparison.Ordinal));
+                bornesDuFilm = RetroBat.Api.Scoring.BornesVideo.DuDefi(e.Debut, e.Fin, departDuRun, arriveeDuRun);
+            }
+        }
+
         var points = new List<(long frame, long total)> { (0, 0), (frames, frames) };
         var brouillon = NouveauBrouillon("defi", systemId, romGroup, sessionJson, listenerSha, coreSha, memSha,
             contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, frames, points, points,
             null, null, null, 1, null, null, null, replay, null);
+        if (bornesDuFilm is { } bornes && replay is not null)
+        {
+            brouillon["bornes_video"] = new JsonObject { ["debut"] = bornes.Debut, ["fin"] = bornes.Fin };
+            Trace($"video : bornes de l'epreuve dans le replay {replay} : frames {bornes.Debut} a {bornes.Fin}");
+        }
         brouillon["defi"] = RetroBat.Api.Speedrun.PasseportDeDefi.Decrire(defi.Reglement, defi.Tentative);
         if (RetroBat.Api.Speedrun.PasseportDeDefi.Depart(defi.Reglement) is { } departDuDefi) brouillon["depart"] = departDuDefi;
         // L'identifiant de la tentative est celui du passeport : un renvoi revient en « duplicate ».
@@ -5701,13 +5724,39 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var respBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             Trace($"REPLAY-LINK HTTP {(int)response.StatusCode} - {respBody}");
             _logger?.LogInformation("Replay-link : {Status} - {Body}", (int)response.StatusCode, respBody);
-            if (response.IsSuccessStatusCode) NoterLeLienDansLeRecord(sessionId, body);
-            return response.IsSuccessStatusCode || (int)response.StatusCode is >= 400 and < 500 and not 408 and not 429;
+            // Le site repond 200 meme a un refus : seul « linked » pose le lien (03/11, le replay d'un speedrun noté posé alors
+            // que le site ne savait pas le rattacher). Une partie qu'il ne connait pas encore se retente, jusqu'a l'oubli des
+            // rapprochements (sept jours).
+            var issue = IssueDuLienReplay((int)response.StatusCode, respBody);
+            if (issue == IssueDuLien.Pose) NoterLeLienDansLeRecord(sessionId, body);
+            return issue != IssueDuLien.ARetenter;
         }
         catch (Exception ex)
         {
             _logger?.LogDebug(ex, "Replay-link : envoi impossible, nouvel essai plus tard.");
             return false;
+        }
+    }
+
+    internal enum IssueDuLien { Pose, Refuse, ARetenter }
+
+    /// <summary>
+    /// Ce que vaut la reponse du site a un lien replay. Pose : « linked ». A retenter : pas de reponse exploitable (408,
+    /// 429, 5xx, corps illisible) ou partie inconnue du site (« submission.unknown »). Refuse : tout autre refus, definitif.
+    /// </summary>
+    internal static IssueDuLien IssueDuLienReplay(int statut, string corps)
+    {
+        if (statut is 408 or 429 || statut >= 500) return IssueDuLien.ARetenter;
+        if (statut >= 400) return IssueDuLien.Refuse;
+        try
+        {
+            if (JsonNode.Parse(corps) is not JsonObject reponse) return IssueDuLien.ARetenter;
+            if ((string?)reponse["status"] == "linked") return IssueDuLien.Pose;
+            return (string?)reponse["reason"] == "submission.unknown" ? IssueDuLien.ARetenter : IssueDuLien.Refuse;
+        }
+        catch (JsonException)
+        {
+            return IssueDuLien.ARetenter;
         }
     }
 

@@ -62,4 +62,23 @@ public static class BornesVideo
         var finReplay = finJeu - debutEnregistrement;
         return finReplay > debut ? (debut, finReplay) : null;
     }
+
+    /// <summary>Ce qu'on garde avant le depart d'une epreuve : le niveau qui s'ouvre, environ trois secondes.</summary>
+    public const long MargeDeDebut = 180;
+
+    /// <summary>
+    /// LES BORNES D'UNE EPREUVE (speedrun, challenge ; 03/11). Une seance d'epreuve enchaine les essais ratés et les
+    /// relances : le film ne garde que la tentative retenue, de <see cref="MargeDeDebut"/> avant son depart a
+    /// <see cref="MargeDeFin"/> apres son arrivee, en frames du replay. Null quand la tentative sort de l'enregistrement.
+    /// </summary>
+    public static (long Debut, long Fin)? DuDefi(long debutEnregistrement, long? finEnregistrement, long depart, long arrivee)
+    {
+        if (arrivee <= depart || arrivee < debutEnregistrement) return null;
+        if (finEnregistrement is long finEnr && depart > finEnr) return null;
+        var debut = Math.Max(0, depart - MargeDeDebut - debutEnregistrement);
+        var finJeu = arrivee + MargeDeFin;
+        if (finEnregistrement is long fin && finJeu > fin) finJeu = fin;
+        var finReplay = finJeu - debutEnregistrement;
+        return finReplay > debut ? (debut, finReplay) : null;
+    }
 }
