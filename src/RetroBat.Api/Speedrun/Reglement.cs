@@ -31,7 +31,13 @@ public sealed record DefinitionChrono(BorneDeChrono Depart, BorneDeChrono Arrive
 /// <summary>Une plage retiree des deux chronos (Special Stage du chrono de monde « hors Special Stages », D25).</summary>
 public sealed record Exclusion(CibleEvenement De, CibleEvenement A);
 
-public sealed record Compteur(string Id, CibleEvenement Evenement, int? Maximum);
+/// <summary>
+/// Un compteur d'evenements de la tentative ; au-dela de <c>Maximum</c>, elle echoue. LES COUPS RECUS (Metal Slug 3 facilite,
+/// 03/11) : <c>GraceFrames</c>, un evenement moins de N images apres le dernier compte ne compte pas (un contact prolonge
+/// pose le drapeau du coup plusieurs images de suite) ; <c>PenaliteFrames</c>, chaque evenement compte ajoute N images au
+/// temps officiel.
+/// </summary>
+public sealed record Compteur(string Id, CibleEvenement Evenement, int? Maximum, int? GraceFrames = null, int? PenaliteFrames = null);
 
 public sealed record ValeurFinale(string Id, long Adresse, int? Egal, int? AuMoins);
 
@@ -229,7 +235,7 @@ public sealed class Reglement
                 AnnulationsJeu = Liste(r, "void").Where(e => e.ValueKind == JsonValueKind.Object).Select(EvenementDe).ToList(),
                 Compteurs = Liste(r, "counters").Select(e => new Compteur(
                     Texte(e, "id") ?? throw new ReglementInvalideException("compteur sans id"),
-                    EvenementDe(e), Entier(e, "max"))).ToList(),
+                    EvenementDe(e), Entier(e, "max"), Entier(e, "grace_frames"), Entier(e, "penalty_frames"))).ToList(),
                 ValeursFinales = Liste(r, "finish_values").Select(e => new ValeurFinale(
                     Texte(e, "id") ?? throw new ReglementInvalideException("valeur finale sans id"),
                     Adresse(e), Hexa(e, "equals"), Hexa(e, "at_least"))).ToList(),

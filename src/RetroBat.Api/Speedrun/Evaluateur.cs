@@ -67,6 +67,7 @@ public sealed class Evaluateur
     private readonly Reglement _r;
     private readonly Dictionary<long, int> _valeurs = new();
     private readonly Dictionary<string, int> _compteurs = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, long> _dernierCompte = new(StringComparer.Ordinal);
     private readonly List<EvenementCite> _journal = new();
     private readonly List<(long De, long A)> _plages = new();
     private readonly int[] _progressionEtapes;
@@ -87,6 +88,9 @@ public sealed class Evaluateur
     public EtatTentative Etat { get; private set; } = EtatTentative.Preparee;
 
     public string? Cause { get; private set; }
+
+    /// <summary>Les compteurs de la tentative, en direct (le message du coup recu, Metal Slug 3 facilite).</summary>
+    public IReadOnlyDictionary<string, int> Compteurs => _compteurs;
 
     public bool EstTerminee => Etat is EtatTentative.Finie or EtatTentative.Ratee or EtatTentative.Annulee or EtatTentative.Abandonnee;
 
@@ -234,6 +238,8 @@ public sealed class Evaluateur
 
         foreach (var c in _r.Compteurs.Where(c => Correspond(c.Evenement, s, precedente)))
         {
+            if (c.GraceFrames is { } grace && _dernierCompte.TryGetValue(c.Id, out var dernier) && s.Frame - dernier < grace) continue;
+            _dernierCompte[c.Id] = s.Frame;
             _compteurs[c.Id]++;
             if (c.Maximum is { } max && _compteurs[c.Id] > max)
             {
@@ -376,7 +382,7 @@ public sealed class Evaluateur
         var tempsDuJeu = TempsDuJeu();
         return new ResultatTentative(
             Etat, Cause, _frameDeFin, _r.ChronoOfficiel, cale, independant,
-            Etat == EtatTentative.Finie ? officiel?.Frames : null,
+            Etat == EtatTentative.Finie && officiel?.Frames is { } f ? f + FramesDePenalite() : null,
             tempsDuJeu,
             Controler(cale, tempsDuJeu),
             new Dictionary<string, int>(_compteurs),
@@ -385,6 +391,10 @@ public sealed class Evaluateur
             _journal.ToList(),
             _r.Cadence);
     }
+
+    /// <summary>Les images ajoutees au temps officiel par les compteurs a penalite (Metal Slug 3 facilite : 1 s par coup).</summary>
+    public long FramesDePenalite()
+        => _r.Compteurs.Where(c => c.PenaliteFrames is > 0).Sum(c => (long)_compteurs[c.Id] * c.PenaliteFrames!.Value);
 
     private MesureChrono? Mesurer(DefinitionChrono? chrono, long? depart, long? arriveeEvenement)
     {

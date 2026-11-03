@@ -219,7 +219,9 @@ public sealed class SessionSpeedrun
         _horlogeDeLImage = horlogeMs ?? image[0].HorlogeMs;
         if (!_courante.EstTerminee)
         {
+            var avant = _r.Compteurs.Count == 0 ? null : new Dictionary<string, int>(_courante.Compteurs);
             _courante.RecevoirImage(image);
+            if (avant is not null) AnnoncerLesCoups(avant);
             Constater();
             return;
         }
@@ -235,6 +237,26 @@ public sealed class SessionSpeedrun
         }
 
         Constater();
+    }
+
+    /// <summary>
+    /// LE COMPTEUR A L'ECRAN (Metal Slug 3 facilite, 03/11) : un compteur a maximum ou a penalite qui monte se dit au joueur,
+    /// « Touche ! 97 restants, +1 s ». Le dernier coup permis ne s'annonce pas : la tentative echoue et le dit elle-meme.
+    /// </summary>
+    private void AnnoncerLesCoups(IReadOnlyDictionary<string, int> avant)
+    {
+        foreach (var c in _r.Compteurs.Where(c => c.Maximum is not null || c.PenaliteFrames is > 0))
+        {
+            var n = _courante.Compteurs.TryGetValue(c.Id, out var v) ? v : 0;
+            if (n <= (avant.TryGetValue(c.Id, out var a) ? a : 0) || _courante.EstTerminee) continue;
+            var restants = c.Maximum is { } max ? Math.Max(0, max + 1 - n) : (int?)null;
+            var penalite = c.PenaliteFrames is { } p and > 0
+                ? (p / _r.Cadence).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture) : null;
+            _messages.Add(new MessageJoueur(
+                restants is null ? "speedrun.msg.hit_penalty" : penalite is null ? "speedrun.msg.hit_left" : "speedrun.msg.hit",
+                restants is null ? "Hit! +{penalty} s" : penalite is null ? "Hit! {left} left" : "Hit! {left} left, +{penalty} s",
+                ("left", restants?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? ""), ("penalty", penalite ?? "")));
+        }
     }
 
     /// <summary>Un controle de la borne (fast_forward, save_state_load...) : annule la tentative en course si le reglement l'interdit.</summary>

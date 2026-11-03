@@ -97,6 +97,10 @@ public static class PasseportDeDefi
                         .Select(p => (JsonNode)new JsonObject { ["from_frame"] = p.De, ["to_frame"] = p.A }).ToArray()),
                     ["game_time_seconds"] = r.TempsDuJeuSecondes,
                     ["game_time_check"] = r.ControleTempsDuJeu,
+                    // LA PENALITE (03/11) : le temps officiel est le chrono mesure plus les images ajoutees par les compteurs a
+                    // penalite (un coup recu sur Metal Slug 3 facilite) ; le site le recalcule depuis les compteurs.
+                    ["penalty_frames"] = r.FramesOfficielles is { } total && officiel?.Frames is { } mesure ? total - mesure : 0,
+                    ["counters"] = new JsonObject(r.Compteurs.Select(c => new KeyValuePair<string, JsonNode?>(c.Key, c.Value))),
                     ["clock_ms"] = t.ArriveeMs - t.DepartMs,
                     ["frame_rate_e6"] = (long)Math.Round(r.Cadence * 1_000_000, MidpointRounding.AwayFromZero),
                 },
