@@ -147,10 +147,10 @@ public sealed partial class LeaderboardOverlayService
             if (d.Bandeau.Length > 0)
             {
                 using var encre = new SolidBrush(Teinte(s.TitleColor));
-                using var aGauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter };
+                using var aGauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.Character };
                 var zone = new RectangleF(marge, y + tailleTexte * 0.2f, Width - 2 * marge, taillePetite * 2.2f);
                 Aplat(g, Color.FromArgb(120, 8, 10, 14), zone);
-                g.DrawString(d.Bandeau, policePetite, encre, new RectangleF(zone.X + taillePetite * 0.6f, zone.Y, zone.Width - taillePetite * 1.2f, zone.Height), aGauche);
+                DessinerCoupe(g, d.Bandeau, policePetite, encre, new RectangleF(zone.X + taillePetite * 0.6f, zone.Y, zone.Width - taillePetite * 1.2f, zone.Height), aGauche);
                 y = zone.Bottom + tailleTexte * 0.2f;
             }
 
@@ -230,7 +230,7 @@ public sealed partial class LeaderboardOverlayService
             var largeurColonne = Width * 0.17f;
             var couleurTexte = Teinte(s.TextColor);
             var couleurChoisi = Teinte(s.SelectedTextColor);
-            using var aGauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter, FormatFlags = StringFormatFlags.NoWrap };
+            using var aGauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.Character, FormatFlags = StringFormatFlags.NoWrap };
             using var aDroite = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Far, LineAlignment = StringAlignment.Center, FormatFlags = StringFormatFlags.NoWrap };
 
             if (d.Colonnes.Count > 0)
@@ -280,7 +280,7 @@ public sealed partial class LeaderboardOverlayService
                 DessinerLaMarque(g, l.Marque, s, new RectangleF(marge, y, taille * 1.1f, hauteur), taille);
                 using var encre = new SolidBrush(choisie ? couleurChoisi : couleurTexte);
                 var police2 = choisie ? gras : police;
-                g.DrawString(l.Nom.ToUpperInvariant(), police2, encre, new RectangleF(xNom, y, Width - marge - 2 * largeurColonne - xNom, hauteur), aGauche);
+                DessinerCoupe(g, l.Nom.ToUpperInvariant(), police2, encre, new RectangleF(xNom, y, Width - marge - 2 * largeurColonne - xNom, hauteur), aGauche);
                 g.DrawString(l.Colonne1, police2, encre, new RectangleF(Width - marge - 2 * largeurColonne, y, largeurColonne, hauteur), aDroite);
                 g.DrawString(l.Colonne2, police2, encre, new RectangleF(Width - marge - largeurColonne, y, largeurColonne, hauteur), aDroite);
                 y += hauteur;
@@ -295,7 +295,7 @@ public sealed partial class LeaderboardOverlayService
                 Aplat(g, Color.FromArgb(150, 8, 10, 14), zone);
                 using var encre = new SolidBrush(Teinte(s.TitleColor));
                 var xNom = marge + taille * 1.3f;
-                g.DrawString(l.Nom.ToUpperInvariant(), gras, encre, new RectangleF(xNom, zone.Y, Width - marge - 2 * largeurColonne - xNom, hauteur), aGauche);
+                DessinerCoupe(g, l.Nom.ToUpperInvariant(), gras, encre, new RectangleF(xNom, zone.Y, Width - marge - 2 * largeurColonne - xNom, hauteur), aGauche);
                 g.DrawString(l.Colonne1, gras, encre, new RectangleF(Width - marge - 2 * largeurColonne, zone.Y, largeurColonne, hauteur), aDroite);
                 g.DrawString(l.Colonne2, gras, encre, new RectangleF(Width - marge - largeurColonne, zone.Y, largeurColonne, hauteur), aDroite);
             }
@@ -311,7 +311,7 @@ public sealed partial class LeaderboardOverlayService
             var hauteur = taille * 3.4f;
             var ecart = taille * 0.3f;
             var hauteurGroupe = tailleGroupe * 2.0f;
-            using var aGauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter, FormatFlags = StringFormatFlags.NoWrap };
+            using var aGauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.Character, FormatFlags = StringFormatFlags.NoWrap };
             float HauteurDe(LigneDeDefi l) => l.Groupe ? hauteurGroupe : hauteur + ecart;
             var premiere = 0;
             float Etendue(int de, int a) { var h = 0f; for (var i = de; i <= a; i++) h += HauteurDe(d.Lignes[i]); return h; }
@@ -363,10 +363,10 @@ public sealed partial class LeaderboardOverlayService
                 using var encreNom = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TitleColor));
                 using var encreTexte = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TextColor));
                 var largeurBadge = l.Badge.Length > 0 ? g.MeasureString(l.Badge, petite, PointF.Empty, StringFormat.GenericTypographic).Width + taillePetite : 0f;
-                g.DrawString(l.Nom.ToUpperInvariant(), gras, encreNom, new RectangleF(x, zone.Y + hauteur * 0.06f, largeur - largeurBadge, hauteur * 0.36f), aGauche);
-                g.DrawString(l.Regle, petite, encreTexte, new RectangleF(x, zone.Y + hauteur * 0.40f, largeur, hauteur * 0.26f), aGauche);
+                DessinerCoupe(g, l.Nom.ToUpperInvariant(), gras, encreNom, new RectangleF(x, zone.Y + hauteur * 0.06f, largeur - largeurBadge, hauteur * 0.36f), aGauche);
+                DessinerCoupe(g, l.Regle, petite, encreTexte, new RectangleF(x, zone.Y + hauteur * 0.40f, largeur, hauteur * 0.26f), aGauche);
                 var bas2 = string.Join("    ", new[] { l.Mesure, l.Colonne1, l.Colonne2 }.Where(t => t.Length > 0));
-                g.DrawString(bas2, petite, encreTexte, new RectangleF(x, zone.Y + hauteur * 0.66f, largeur, hauteur * 0.28f), aGauche);
+                DessinerCoupe(g, bas2, petite, encreTexte, new RectangleF(x, zone.Y + hauteur * 0.66f, largeur, hauteur * 0.28f), aGauche);
                 if (l.Badge.Length > 0)
                 {
                     var etiquette = new RectangleF(zone.Right - largeurBadge - taille * 0.4f, zone.Y + hauteur * 0.1f, largeurBadge, taillePetite * 1.4f);
@@ -427,15 +427,22 @@ public sealed partial class LeaderboardOverlayService
 
             using var encreEtiquette = new SolidBrush(Teinte(s.GroupColor));
             using var encreValeur = new SolidBrush(Teinte(s.TitleColor));
-            using var aGauche = new StringFormat(StringFormat.GenericTypographic) { Trimming = StringTrimming.EllipsisCharacter, FormatFlags = StringFormatFlags.NoWrap };
+            using var aGauche = new StringFormat(StringFormat.GenericTypographic) { Trimming = StringTrimming.Character, FormatFlags = StringFormatFlags.NoWrap };
             var colonne = (zone.Width - taille * 1.2f) / 2f;
             for (var i = 0; i < champs.Count; i++)
             {
                 var x = zone.X + taille * 0.6f + (i % 2) * colonne;
                 var y = zone.Y + taille * 0.4f + (i / 2) * taille * 2.6f;
-                g.DrawString(champs[i].Etiquette.ToUpperInvariant(), etiquette, encreEtiquette, new RectangleF(x, y, colonne - taille * 0.4f, taille), aGauche);
-                g.DrawString(champs[i].Valeur, valeur, encreValeur, new RectangleF(x, y + taille * 1.05f, colonne - taille * 0.4f, taille * 1.4f), aGauche);
+                DessinerCoupe(g, champs[i].Etiquette.ToUpperInvariant(), etiquette, encreEtiquette, new RectangleF(x, y, colonne - taille * 0.4f, taille), aGauche);
+                DessinerCoupe(g, champs[i].Valeur, valeur, encreValeur, new RectangleF(x, y + taille * 1.05f, colonne - taille * 0.4f, taille * 1.4f), aGauche);
             }
         }
     }
+
+    /// <summary>
+    /// Un texte coupe a la largeur de sa case, termine par trois points (Couper) : la police du theme n'a pas « … », que GDI+
+    /// mettait en fin de ligne coupee (03/11, le resume du defi facile de Metal Slug 3 finissait en trois carres).
+    /// </summary>
+    private static void DessinerCoupe(Graphics g, string texte, Font police, Brush encre, RectangleF zone, StringFormat format)
+        => g.DrawString(Couper(g, texte, police, zone.Width), police, encre, zone, format);
 }

@@ -92,3 +92,21 @@ public class DefiCouteauFacileTests
         Assert.Equal(SessionSpeedrun.Invalid, s.Etat);
     }
 }
+
+/// <summary>PAS DE RALENTI EN SPEEDRUN (03/11) : la vitesse du jeu du depart a l'arrivee, a l'horloge du wrapper.</summary>
+public class VitesseDUnSpeedrunTests
+{
+    [Theory]
+    [InlineData(1800, 0, 30_040, 1.0)]       // 1800 images a 59,92 en 30,04 s : pleine vitesse
+    [InlineData(1800, 0, 54_600, 0.55)]      // le Green Hill 2 du user pendant un direct : 33 images par seconde
+    public void La_vitesse_compare_les_images_a_l_horloge(long frames, long h0, long h1, double attendu)
+        => Assert.Equal(attendu, Evaluateur.Vitesse(frames, h0, h1, 59.922743)!.Value, 2);
+
+    [Fact]
+    public void Sans_horloge_rien_ne_se_juge()
+        => Assert.Null(Evaluateur.Vitesse(1800, null, 30_000, 59.92));
+
+    [Fact]
+    public void Le_seuil_ne_couvre_que_le_grain_de_l_horloge()
+        => Assert.Equal(0.97, Evaluateur.VitesseMinimaleDUnSpeedrun);
+}

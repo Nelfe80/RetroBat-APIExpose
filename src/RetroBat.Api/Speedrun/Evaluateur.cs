@@ -77,6 +77,7 @@ public sealed class Evaluateur
     private long? _plageOuverte;
     private long? _derniereFrame, _derniereHorloge, _frameDeLHorloge;
     private long? _frameDeFin;
+    private long? _horlogeDuDepart, _horlogeDeLImage;
 
     public Evaluateur(Reglement reglement)
     {
@@ -138,6 +139,7 @@ public sealed class Evaluateur
         var premier = image[0];
         if (EnCourse && PauseRevelee(premier)) { Annuler("pause", premier.Frame); return; }
         _derniereFrame = premier.Frame;
+        _horlogeDeLImage = premier.HorlogeMs;
         if (premier.HorlogeMs is { } h) (_derniereHorloge, _frameDeLHorloge) = (h, premier.Frame);
 
         var avant = new Dictionary<long, int?>();
@@ -207,6 +209,7 @@ public sealed class Evaluateur
         if (departOfficiel is not { } frame) return;
 
         Etat = EtatTentative.EnCourse;
+        _horlogeDuDepart = s.HorlogeMs ?? _horlogeDeLImage;
         Citer("start", s);
         for (var i = 0; i < _r.Etapes.Count; i++)
         {
@@ -316,9 +319,27 @@ public sealed class Evaluateur
         return true;
     }
 
+    /// <summary>
+    /// PAS DE RALENTI EN SPEEDRUN (decision du user du 03/11) : le temps se compte en images ; un jeu qui ralentit (borne
+    /// chargee : direct, film) donne au joueur plus de temps reel par image. Sous cette part de la vitesse du jeu, mesuree
+    /// du depart a l'arrivee a l'horloge du wrapper, la tentative est annulee. Les 3 % ne couvrent que le grain de l'horloge.
+    /// </summary>
+    public const double VitesseMinimaleDUnSpeedrun = 0.97;
+
+    /// <summary>La vitesse du jeu entre deux images : temps des images a la cadence du reglement / temps de l'horloge. Pur.</summary>
+    public static double? Vitesse(long frames, long? horlogeDebut, long? horlogeFin, double cadence)
+        => horlogeDebut is { } h0 && horlogeFin is { } h1 && h1 > h0 && frames > 0 ? frames * 1000.0 / cadence / (h1 - h0) : null;
+
     private void Finir(long frame)
     {
         _frameDeFin = frame;
+        var depart = _r.ChronoOfficiel == Reglement.ChronoIndependant ? _departIndependant : _departCale;
+        if (_r.Kind.StartsWith("speedrun", StringComparison.Ordinal) && depart is { } d
+            && Vitesse(frame - d, _horlogeDuDepart, _horlogeDeLImage, _r.Cadence) is { } vitesse && vitesse < VitesseMinimaleDUnSpeedrun)
+        {
+            Annuler("slowdown", frame);
+            return;
+        }
         if (_plageOuverte is { } debut) { _plages.Add((debut, frame)); _plageOuverte = null; }
 
         for (var i = 0; i < _r.Etapes.Count; i++)
