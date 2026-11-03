@@ -17,11 +17,11 @@
     "system_id": "nes",
     "rom_group": "super-mario-bros"
   },
-  "mem_sha256": "ca45e53f62200832d5b4777c00c673e3cfdb288d1ca843a585e5420a59949301",
+  "mem_sha256": "ec849ea2f638e10ac829beae00f6e96de7c46a1fe9c98a5d2da477d7f561db6d",
   "start_policy": "canonical_state",
   "state": {
     "name": "3-3-panneau-fceumm",
-    "sha256": "81dda70984321b1a6381c42f90ad87d64058e2756e5af95cf0bb7d97733d5afc",
+    "sha256": "0e3a662eed8c2a94581d0ae3ad4c4d03f32cea2cb729b1b8fd9e449c0a8712f0",
     "file": "nes/super-mario-bros/3-3-panneau.state"
   },
   "start": [
