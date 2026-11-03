@@ -3860,6 +3860,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return max;
     }
 
+    /// <summary>Un entier d'un noeud JSON, qu'il ait ete pose en int ou en long, ou lu d'un fichier ; null sinon.</summary>
+    internal static long? EntierDuJson(JsonNode? noeud)
+        => noeud is JsonValue v
+            ? v.TryGetValue<long>(out var l) ? l : v.TryGetValue<int>(out var i) ? i : null
+            : null;
+
     private JsonObject BuildPassport(
         string systemId, string romGroup, string sessionJson, JsonElement ticket, JsonElement profile,
         string deviceId, CngDeviceKey deviceKey, string listenerSha, string? coreSha, string? memSha,
@@ -3879,7 +3885,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         long resets = (long?)session["resets"] ?? 0;
         // Les chargements du depart pret (l'hote charge l'etat de la gameroom) ne sont pas une sauvegarde : le passeport nomme
         // l'etat, la plateforme le juge.
-        long saveStateLoads = Math.Max(0, ((long?)session["save_state_loads"] ?? 0) - ((long?)depart?["chargements_permis"] ?? 0));
+        // Le nombre de chargements permis arrive en int quand le brouillon vient d'etre pose (Depart de PasseportDeDefi, depart
+        // pret de MULTIPLAYER) : « (long?) » sur un JsonValue<int> leve une exception, et le brouillon partait aux refuses
+        // (tous les defis sur etat du 02 au 03/11, Green Hill 2 en 0:35.25). EntierDuJson accepte int et long.
+        long saveStateLoads = Math.Max(0, ((long?)session["save_state_loads"] ?? 0) - (EntierDuJson(depart?["chargements_permis"]) ?? 0));
         // Anti-triche (Gap 2) : le wrapper homologué compte ces vecteurs et les émet dans
         // la session ; absents (vieux wrapper / autre backend) → 0 = neutre. Le certifié
         // n'existe QUE via un listener whitelisté (CoreVerifier profile.listener_unauthorized),
