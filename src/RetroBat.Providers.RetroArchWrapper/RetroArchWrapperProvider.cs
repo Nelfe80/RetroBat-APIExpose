@@ -376,6 +376,7 @@ public class RetroArchWrapperProvider : IProvider
         "WATCH_RESOLVE",     // comment chaque adresse surveillee s'est resolue
         "[WRAPPER ERROR]",
         "[WRAPPER WARN]",
+        "Source MEM",        // la couche du .MEM charge quand ce n'est pas l'officiel (contest, perso, defis)
     };
 
     /// <summary>
