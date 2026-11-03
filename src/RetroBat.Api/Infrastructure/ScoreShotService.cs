@@ -131,6 +131,15 @@ public sealed class ScoreShotService : BackgroundService
 
         // HORS NELFEPLAY, PAS DE PHOTO (vu le 22/10 : « Capture record » pendant une partie MULTIPLAYER de SF2CE). Une
         // partie du joueur, ou de MULTIPLAYER, ne publie aucun score : son image ne monterait jamais.
+        // UNE EPREUVE (03/11) : un speedrun se classe au temps. Avant meme son etat de depart, le demarrage de Sonic donnait un
+        // score sans objet, pris pour un record battu.
+        if (_partie is { EstSpeedrun: true })
+        {
+            lock (_gate) { _romGroup = rom; _systemId = systeme; _seuilConnu = false; _seuil = null; _arme = false; _scorePhotographie = 0; }
+            _logger.LogInformation("Capture record : {Rom} en epreuve, pas de photo de score.", rom);
+            return;
+        }
+
         if (_partie is { EstNelfePlay: false })
         {
             lock (_gate) { _romGroup = rom; _systemId = systeme; _seuilConnu = false; _seuil = null; _arme = false; _scorePhotographie = 0; }

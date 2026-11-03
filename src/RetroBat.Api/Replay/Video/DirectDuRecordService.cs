@@ -290,6 +290,9 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                 if (g != Volatile.Read(ref _generation)) return;
             }
             if (_partie?.EstNelfePlay != true) return;
+            // UNE EPREUVE (03/11) : classee au temps, elle n'a pas de record de score a approcher ; le demarrage de Sonic
+            // armait le direct de record sur un score sans objet. Son direct est le direct partage des epreuves.
+            if (_partie.EstSpeedrun) return;
             // La partie d'un autre, regardee ou rejointe en netplay : son record n'est pas celui de cette borne.
             if (!RetroBat.Api.Netplay.NetplayGuestService.PartieALaBorne) return;
             // UN FILTRE D'IMAGE DU COEUR (decision du user du 25 octobre 2026) : ni direct ni film de la partie, et le
