@@ -208,7 +208,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         if (reglement is null) return new(false, "unknown_challenge");
         if (_contexte.Ui.Running is not null) return new(false, "game_running");
 
-        var mem = RamDefinitionLayers.PickDefinitionFile(reglement.SystemId, reglement.RomGroup);
+        var mem = reglement.DefinitionAuLancement();
         if (mem.Length == 0 || !File.Exists(mem)) return new(false, "mem_missing", mem);
         var ecarts = reglement.VerifierContre(File.ReadAllBytes(mem));
         if (ecarts.Count > 0) return new(false, "mem_mismatch", string.Join(" ; ", ecarts));
@@ -238,8 +238,12 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         // LES VERROUS (D18) : dans certified.txt avant le lanceur, le wrapper les lit au chargement du jeu. Toujours poses,
         // vides compris : un verrou reste d'un autre defi ne doit pas tenir celui-ci.
         var nomDeLaRom = Path.GetFileNameWithoutExtension(rom);
-        VerrousDuLancement.Poser(nomDeLaRom, reglement.Verrous.Select(v => v.Ligne).ToList());
-        if (reglement.Verrous.Count > 0)
+        // LE .MEM DU CHALLENGE (03/11) : la consigne de couche part avec les verrous, le wrapper charge alors ram\.defis.
+        var consignes = reglement.Verrous.Select(v => v.Ligne).ToList();
+        if (reglement.EstUnChallenge && RamDefinitionLayers.DefinitionDeChallenge(reglement.SystemId, reglement.RomGroup) is not null)
+            consignes.Add(VerrousDuLancement.CoucheDesChallenges);
+        VerrousDuLancement.Poser(nomDeLaRom, consignes);
+        if (consignes.Count > 0)
         {
             try { RetroBat.Api.Infrastructure.CertifiedSettingsService.PoserLesVerrous(nomDeLaRom); }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)

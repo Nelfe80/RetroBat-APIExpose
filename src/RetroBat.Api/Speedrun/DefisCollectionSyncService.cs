@@ -209,7 +209,7 @@ public sealed class DefisCollectionSyncService : BackgroundService
     /// <summary>Le meme controle qu'au lancement (<see cref="SpeedrunSessionService.Lancer"/>) : .MEM en vigueur, empreinte et lignes.</summary>
     private static bool MemConforme(Reglement defi)
     {
-        var mem = RamDefinitionLayers.PickDefinitionFile(defi.SystemId, defi.RomGroup);
+        var mem = defi.DefinitionAuLancement();
         return mem.Length > 0 && File.Exists(mem) && defi.VerifierContre(File.ReadAllBytes(mem)).Count == 0;
     }
 

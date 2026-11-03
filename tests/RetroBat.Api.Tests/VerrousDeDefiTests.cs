@@ -137,3 +137,26 @@ public class VerrousDeDefiTests
         }
     }
 }
+
+/// <summary>LA COUCHE DES CHALLENGES (03/11) : la consigne s'ecrit telle quelle, les verrous gardent leur numero.</summary>
+public class CoucheDesChallengesTests
+{
+    [Fact]
+    public void La_consigne_de_couche_s_ecrit_sans_numero()
+    {
+        var texte = new System.Text.StringBuilder();
+        VerrousDuLancement.Ecrire(texte, ["0x100596,1,set_bits,0x01", VerrousDuLancement.CoucheDesChallenges, "0x10EAF5,1,value,0x32"]);
+        Assert.Equal("lock.00=0x100596,1,set_bits,0x01\nmem_layer=defis\nlock.01=0x10EAF5,1,value,0x32\n", texte.ToString());
+    }
+
+    [Theory]
+    [InlineData("challenge_rule", true)]
+    [InlineData("speedrun_level", false)]
+    [InlineData("speedrun_full", false)]
+    public void Seul_un_challenge_quitte_le_MEM_certifie(string kind, bool challenge)
+    {
+        var json = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Reglements", "metal-slug-3.mission-1-knife.v5.json"))
+            .Replace("\"challenge_rule\"", "\"" + kind + "\"");
+        Assert.Equal(challenge, Reglement.Lire(json).EstUnChallenge);
+    }
+}

@@ -43,7 +43,15 @@ public static class VerrousDuLancement
     /// <summary>Les lignes <c>lock.&lt;n&gt;=</c> a ajouter a certified.txt. Le n sur deux chiffres garde l'ordre du reglement.</summary>
     public static void Ecrire(StringBuilder texte, IReadOnlyList<string> lignes)
     {
-        for (var i = 0; i < lignes.Count; i++)
-            texte.Append("lock.").Append(i.ToString("D2", System.Globalization.CultureInfo.InvariantCulture)).Append('=').Append(lignes[i]).Append('\n');
+        // Une consigne (mem_layer=) s'ecrit telle quelle ; les verrous gardent leur numero dans l'ordre du reglement.
+        var n = 0;
+        foreach (var ligne in lignes)
+        {
+            if (ligne.StartsWith("mem_layer=", StringComparison.Ordinal)) { texte.Append(ligne).Append('\n'); continue; }
+            texte.Append("lock.").Append((n++).ToString("D2", System.Globalization.CultureInfo.InvariantCulture)).Append('=').Append(ligne).Append('\n');
+        }
     }
+
+    /// <summary>La consigne qui fait charger au wrapper le .MEM de la couche des challenges (ram\.defis, wrapper 0.344).</summary>
+    public const string CoucheDesChallenges = "mem_layer=defis";
 }

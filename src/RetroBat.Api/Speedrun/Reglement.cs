@@ -107,6 +107,17 @@ public sealed class Reglement
     }
 
     public string Kind { get; private init; } = "";
+
+    /// <summary>Un challenge (regles imposees), non certifie (decision du user du 03/11) ; un speedrun l'est.</summary>
+    public bool EstUnChallenge => !Kind.StartsWith("speedrun", StringComparison.Ordinal);
+
+    /// <summary>
+    /// Le .MEM que le lancement de ce defi fait charger : celui de la couche des challenges s'il en a un, sinon celui du World
+    /// Scoring. Un speedrun reste toujours sur le .MEM certifie du jeu.
+    /// </summary>
+    public string DefinitionAuLancement()
+        => EstUnChallenge && RetroBat.Domain.Paths.RamDefinitionLayers.DefinitionDeChallenge(SystemId, RomGroup) is { } defi
+            ? defi : RetroBat.Domain.Paths.RamDefinitionLayers.PickDefinitionFile(SystemId, RomGroup);
     public string SystemId { get; private init; } = "";
     public string RomGroup { get; private init; } = "";
     public string? MemSha256 { get; private init; }

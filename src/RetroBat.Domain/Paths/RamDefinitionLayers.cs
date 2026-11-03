@@ -67,6 +67,20 @@ public static class RamDefinitionLayers
         return chemin;
     }
 
+    /// <summary>
+    /// LA COUCHE DES CHALLENGES (decision du user du 03/11 : les challenges ne sont pas certifies) : un challenge peut porter
+    /// son propre .MEM (le coup recu de Metal Slug 3 facilite), sous <c>ram\.defis\&lt;systeme&gt;\&lt;jeu&gt;.MEM</c>. Le
+    /// wrapper ne le charge que pour un lancement de challenge (<c>mem_layer=defis</c> dans certified.txt, wrapper 0.344) :
+    /// le World Scoring garde son .MEM officiel. Null sans fichier.
+    /// </summary>
+    public static string? DefinitionDeChallenge(string systemId, string rom)
+    {
+        if (string.IsNullOrWhiteSpace(systemId) || string.IsNullOrWhiteSpace(rom)) return null;
+        var chemin = Path.Combine(RetroBatPaths.RamResourcesRoot, ".defis", systemId, rom + ".MEM");
+        try { return File.Exists(chemin) ? chemin : null; }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return null; }
+    }
+
     private static string Resoudre(string systemId, string rom)
     {
         var racine = RetroBatPaths.RamResourcesRoot;
