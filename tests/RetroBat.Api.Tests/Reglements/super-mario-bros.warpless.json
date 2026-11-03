@@ -1,0 +1,163 @@
+{
+  "schema": "nelfe.challenge.v2",
+  "challenge_id": "super-mario-bros.warpless",
+  "version": 1,
+  "ruleset": "ch-smb-warpless-v1",
+  "order": 2,
+  "title": {
+    "fr": "Jeu complet · Warpless",
+    "en": "Full game · Warpless"
+  },
+  "summary": {
+    "fr": "Les 32 niveaux sans tuyau de raccourci, de 1-1 à la hache de 8-4",
+    "en": "All 32 levels without warp pipes, from 1-1 to the 8-4 axe"
+  },
+  "kind": "speedrun_full",
+  "game": {
+    "system_id": "nes",
+    "rom_group": "super-mario-bros"
+  },
+  "mem_sha256": "ca45e53f62200832d5b4777c00c673e3cfdb288d1ca843a585e5420a59949301",
+  "start_policy": "normal_boot",
+  "start": [
+    {
+      "value": {
+        "address": "0x0770",
+        "equals": "0x01"
+      }
+    },
+    {
+      "value": {
+        "address": "0x075F",
+        "equals": "0x00"
+      }
+    },
+    {
+      "value": {
+        "address": "0x075C",
+        "equals": "0x00"
+      }
+    }
+  ],
+  "timing": {
+    "official": "independent",
+    "independent": {
+      "start": {
+        "event": {
+          "action": "GAME_PLAYING",
+          "address": "0x000E",
+          "value": "0x08"
+        },
+        "when": [
+          {
+            "value": {
+              "address": "0x0770",
+              "equals": "0x01"
+            }
+          },
+          {
+            "value": {
+              "address": "0x075F",
+              "equals": "0x00"
+            }
+          },
+          {
+            "value": {
+              "address": "0x075C",
+              "equals": "0x00"
+            }
+          }
+        ]
+      },
+      "finish": {
+        "event": {
+          "action": "LEVEL_CLEAR",
+          "address": "0x0770",
+          "value": "0x02"
+        }
+      }
+    }
+  },
+  "finish_confirm": {
+    "any_of": [
+      {
+        "event": {
+          "action": "EVENT_TRIGGER",
+          "address": "0x0719",
+          "value": "0x05"
+        }
+      }
+    ],
+    "cleared_by": [
+      {
+        "event": {
+          "action": "PROGRESSION_ZONE",
+          "address": "0x075F"
+        }
+      }
+    ]
+  },
+  "fail": [
+    {
+      "event": {
+        "action": "GAME_OVER",
+        "address": "0x075A",
+        "value": "0xFF"
+      }
+    }
+  ],
+  "void": [
+    "save_state_load",
+    "rewind",
+    "runahead",
+    "fast_forward",
+    "cheats",
+    "netplay",
+    "pause_clock_gap",
+    {
+      "event": {
+        "action": "PAUSE_ON",
+        "address": "0x0776"
+      }
+    },
+    {
+      "event": {
+        "address": "0x0770",
+        "to": "0x00"
+      }
+    },
+    {
+      "event": {
+        "action": "PROGRESSION_ZONE",
+        "address": "0x075C",
+        "to": "0x00",
+        "leaves": "0x01"
+      }
+    }
+  ],
+  "ranking": {
+    "metric": "frames",
+    "direction": "lower_better"
+  },
+  "cores": [
+    "fceumm"
+  ],
+  "runtime": {
+    "frame_rate": 60.098814
+  },
+  "milestones": [
+    {
+      "address": "0x075F",
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "schema": "nelfe.challenge.v2",
+  "challenge_id": "super-mario-bros.5-3",
+  "version": 1,
+  "ruleset": "ch-smb-5-3-v1",
+  "order": 21,
+  "title": {
+    "fr": "Monde 5-3",
+    "en": "World 5-3"
+  },
+  "summary": {
+    "fr": "De la main au joueur au mât",
+    "en": "From control to the flagpole"
+  },
+  "kind": "speedrun_level",
+  "game": {
+    "system_id": "nes",
+    "rom_group": "super-mario-bros"
+  },
+  "mem_sha256": "ca45e53f62200832d5b4777c00c673e3cfdb288d1ca843a585e5420a59949301",
+  "start_policy": "canonical_state",
+  "state": {
+    "name": "5-3-panneau-fceumm",
+    "sha256": "7b9bfa3adba165d9cffdc4d1cee9131c46fcebacb2ca7ad30ca3e9d4f1092aef",
+    "file": "nes/super-mario-bros/5-3-panneau.state"
+  },
+  "start": [
+    {
+      "value": {
+        "address": "0x0770",
+        "equals": "0x01"
+      }
+    },
+    {
+      "value": {
+        "address": "0x075F",
+        "equals": "0x04"
+      }
+    },
+    {
+      "value": {
+        "address": "0x075C",
+        "equals": "0x02"
+      }
+    }
+  ],
+  "timing": {
+    "official": "independent",
+    "independent": {
+      "start": {
+        "event": {
+          "action": "GAME_PLAYING",
+          "address": "0x000E",
+          "value": "0x08"
+        },
+        "when": [
+          {
+            "value": {
+              "address": "0x0770",
+              "equals": "0x01"
+            }
+          },
+          {
+            "value": {
+              "address": "0x075F",
+              "equals": "0x04"
+            }
+          },
+          {
+            "value": {
+              "address": "0x075C",
+              "equals": "0x02"
+            }
+          }
+        ]
+      },
+      "finish": {
+        "event": {
+          "action": "LEVEL_CLEAR",
+          "address": "0x000E",
+          "value": "0x04"
+        }
+      }
+    }
+  },
+  "fail": [
+    {
+      "event": {
+        "action": "LOSE_LIFE",
+        "address": "0x000E",
+        "value": "0x06"
+      }
+    }
+  ],
+  "void": [
+    "save_state_load",
+    "rewind",
+    "runahead",
+    "fast_forward",
+    "cheats",
+    "netplay",
+    "pause_clock_gap",
+    {
+      "event": {
+        "action": "PAUSE_ON",
+        "address": "0x0776"
+      }
+    },
+    {
+      "event": {
+        "address": "0x0770",
+        "to": "0x00"
+      }
+    },
+    {
+      "event": {
+        "action": "PROGRESSION_ZONE",
+        "address": "0x075F",
+        "leaves": "0x04"
+      }
+    },
+    {
+      "event": {
+        "action": "PROGRESSION_ZONE",
+        "address": "0x075C",
+        "leaves": "0x02"
+      }
+    }
+  ],
+  "ranking": {
+    "metric": "frames",
+    "direction": "lower_better"
+  },
+  "cores": [
+    "fceumm"
+  ],
+  "runtime": {
+    "frame_rate": 60.098814
+  }
+}

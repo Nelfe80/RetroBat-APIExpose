@@ -41,6 +41,10 @@
     <None Update="Reglements\*.MEM">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <!-- Les parties jouees au banc fceumm (Super Mario Bros., 03/11), au format des traces du banc des replays. -->
+    <None Update="Reglements\*.trace">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
