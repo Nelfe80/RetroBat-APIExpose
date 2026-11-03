@@ -8,8 +8,8 @@
     "en": "My ### and my knife"
   },
   "summary": {
-    "fr": "Mission 1 jusqu'à Huge Hermit, au couteau et aux grenades, invincible : 99 coups au plus, chaque coup ajoute 1 s",
-    "en": "Mission 1 up to Huge Hermit, knife and grenades only, invincible: 99 hits at most, each hit adds 1 s"
+    "fr": "Mission 1 jusqu'à Huge Hermit, au couteau et aux grenades (illimitées), invincible : 99 coups au plus, chaque coup ajoute 1 s",
+    "en": "Mission 1 up to Huge Hermit, knife and unlimited grenades only, invincible: 99 hits at most, each hit adds 1 s"
   },
   "kind": "challenge_rule",
   "game": {
@@ -98,6 +98,14 @@
       "address": "0x100581",
       "type": "u8",
       "value": "0x02",
+      "player": 1,
+      "reason": "advantage",
+      "from": "attempt_start"
+    },
+    {
+      "address": "0x10EAF5",
+      "type": "u8",
+      "value": "0x32",
       "player": 1,
       "reason": "advantage",
       "from": "attempt_start"

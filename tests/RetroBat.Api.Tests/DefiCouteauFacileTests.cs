@@ -46,7 +46,7 @@ public class DefiCouteauFacileTests
     {
         Assert.Equal("ch-ms3-m1-knife-v5", Facile.Ruleset);
         Assert.Equal(5, Facile.Version);
-        Assert.Equal("0x100596,1,set_bits,0x01;0x10EAF3,1,value,0x00;0x100581,1,value,0x02", Facile.LignesDesVerrous);
+        Assert.Equal("0x100596,1,set_bits,0x01;0x10EAF3,1,value,0x00;0x100581,1,value,0x02;0x10EAF5,1,value,0x32", Facile.LignesDesVerrous);
         var coups = Assert.Single(Facile.Compteurs);
         Assert.Equal(("hits", 98, 60, 60), (coups.Id, coups.Maximum, coups.GraceFrames, coups.PenaliteFrames));
         Assert.Empty(Facile.VerifierContre(File.ReadAllBytes(Fichier("metal-slug-3.v5.MEM"))));
