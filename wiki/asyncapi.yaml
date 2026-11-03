@@ -161,7 +161,7 @@ channels:
       Prefix `speedrun.` - speedrun challenge session, for the SpeedrunHUD:
       speedrun.session (snapshot, retained: sessionId, attemptId, attemptNumber,
       challengeId, rulesVersion, state, cause, sequence, start, official, splits,
-      comparisons, allowedActions, demo), speedrun.state, speedrun.started,
+      comparisons, allowedActions, demo, counters), speedrun.state, speedrun.started,
       speedrun.finish.provisional, speedrun.attempt.ended, speedrun.attempt.opened,
       speedrun.restart.failed, speedrun.comparison, speedrun.session.closed
       (retained after the game ends). Every event carries the session `sequence`.

@@ -71,7 +71,9 @@ public sealed record InstantaneSpeedrun(
     [property: JsonPropertyName("splits")] IReadOnlyList<object> Splits,
     [property: JsonPropertyName("comparisons")] ComparaisonsPubliees Comparaisons,
     [property: JsonPropertyName("allowedActions")] IReadOnlyList<ActionPermise> ActionsPermises,
-    [property: JsonPropertyName("demo")] DemonstrationPubliee? Demonstration);
+    [property: JsonPropertyName("demo")] DemonstrationPubliee? Demonstration,
+    // Les compteurs de la tentative (coups recus de Metal Slug 3 facilite, 03/11) ; vide sans compteur au reglement.
+    [property: JsonPropertyName("counters")] IReadOnlyDictionary<string, int>? Compteurs = null);
 
 /// <summary>
 /// UNE SESSION DE SPEEDRUN SUR LA BORNE (lot S3 du prototype Sonic) : un defi, un jeu lance, des tentatives
@@ -384,7 +386,7 @@ public sealed class SessionSpeedrun
             SessionId, AttemptId, Numero, DefiId, _r.Version, Etat, _relance ? null : res.Cause, Sequence, depart, officiel,
             [], new ComparaisonsPubliees(_comparaison, MeilleurTemps is { } pb ? Chrono(pb, false) : null),
             ActionsPermises(), res.Etat is EtatTentative.Finie or EtatTentative.Ratee or EtatTentative.Annulee or EtatTentative.Abandonnee
-                ? Demonstration(res) : null);
+                ? Demonstration(res) : null, res.Compteurs);
     }
 
     public DemonstrationPubliee Demonstration(ResultatTentative res)
