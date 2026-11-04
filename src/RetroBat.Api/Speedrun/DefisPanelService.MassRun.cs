@@ -91,7 +91,8 @@ public sealed partial class DefisPanelService
             "",
             "",
             "",
-            T("massrun.page.loading", "The game is loading…"),
+            // Le noeud ne diffuse qu'a partir de deux coureurs (essai du 04/11) : seul, le joueur doit savoir pourquoi il ne voit personne.
+            inscrits <= 1 ? T("massrun.page.alone", "You're alone in this room for now: other runners show up when they join") : T("massrun.page.loading", "The game is loading…"),
             [
                 T("massrun.page.step.joined", "SPOT TAKEN"),
                 T("massrun.page.step.loading", "LOADING THE GAME"),
@@ -208,7 +209,7 @@ public sealed partial class DefisPanelService
     internal static IssueDeCourse? IssueDe(MassRunService.SalleLocale salle)
     {
         if (salle.Arrivee > 0) return salle.Elimine ? IssueDeCourse.Elimine : IssueDeCourse.Arrive;
-        if (salle.ModeMax >= 5) return salle.Survie ? IssueDeCourse.Survivant : IssueDeCourse.TempsEcoule;
+        if (salle.ModeMax >= 5 || salle.TempsEcoule) return salle.Survie ? IssueDeCourse.Survivant : IssueDeCourse.TempsEcoule;
         if (salle.ModeMax >= 3) return IssueDeCourse.Abandon;
         return null;
     }
@@ -280,7 +281,9 @@ public sealed partial class DefisPanelService
         var ecart = b is { Issue: IssueDeCourse.Arrive, Images: { } t } && tete is not null && t > tete.Images
             ? "+" + TempsDeCourse(t - tete.Images) + " " + T("massrun.page.from_first", "from the winner")
             : "";
-        var note = b.CourseFinie
+        var note = b.Inscrits <= 1
+            ? T("massrun.page.alone_end", "You were the only runner in this room")
+            : b.CourseFinie
             ? FormatDe(b.Salle) + " · " + T("massrun.panel.level", "Level") + " " + b.Salle.Niveau
             : T("massrun.page.still_running", "Race still running: the ranking fills in as runners finish");
         return new EcranDeFin(

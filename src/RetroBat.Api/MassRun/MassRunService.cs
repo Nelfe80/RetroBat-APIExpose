@@ -36,10 +36,25 @@ public sealed class MassRunService : IDisposable
     private SalleLocale? _salle;
 
     private readonly RetroBat.Api.Reseau.ServiceDeCarte? _carte;
+    private readonly IPrioritesDuJeu? _priorites;
+
+    /// <summary>Le classement fige reste a l'ecran ce temps apres l'arrivee, puis le jeu se ferme : le bilan prend la suite.</summary>
+    private static readonly TimeSpan TenueDeLArrivee = TimeSpan.FromSeconds(10);
+
+    /// <summary>
+    /// LA COURSE S'ARRETE A L'HEURE DE LA SALLE (essai du 04/11, salle 140076) : le coeur compte sa limite en images, et une borne
+    /// a 35 images/s a couru 5 min 17 pour 3 min. Passe ce temps apres la limite, la borne ferme le jeu comme les autres.
+    /// </summary>
+    private static readonly TimeSpan GraceDeLaLimite = TimeSpan.FromSeconds(2);
+
+    /// <summary>La fin de la course a-t-elle sonne ? Pur.</summary>
+    internal static bool LimiteDepassee(DateTime? go, int limite, DateTime maintenant)
+        => go is { } depart && limite > 0 && maintenant > depart.AddSeconds(limite) + GraceDeLaLimite;
 
     public MassRunService(ApiContext contexte, IEventBus bus, ILogger<MassRunService> journal, NelfePlayAgentService? agent = null,
-        RetroBat.Api.Reseau.ServiceDeCarte? carte = null)
+        RetroBat.Api.Reseau.ServiceDeCarte? carte = null, IPrioritesDuJeu? priorites = null)
     {
+        _priorites = priorites;
         _contexte = contexte;
         _bus = bus;
         _journal = journal;
@@ -88,6 +103,9 @@ public sealed class MassRunService : IDisposable
 
         /// <summary>MASS SURVIVAL : la premiere mort a elimine le joueur.</summary>
         public bool Elimine { get; set; }
+
+        /// <summary>L'heure de la salle est passee, course en cours : la borne a ferme le jeu.</summary>
+        public bool TempsEcoule { get; set; }
     }
 
     /// <summary>
@@ -282,6 +300,12 @@ public sealed class MassRunService : IDisposable
         var pings = DateTime.UtcNow;
         var dernierClassement = DateTime.MinValue;
         var classementEnCours = false;
+        DateTime? fermerA = null;
+        var dernierQuit = DateTime.MinValue;
+        var mesure = false;
+        using var priorite = new CancellationTokenSource();
+        // ES dessine derriere le jeu : comme un speedrun, RetroArch passe devant (essai du 04/11 : 35 images/s sans cela).
+        if (avecJeu && _priorites is { } priorites) _ = Task.Run(() => priorites.DonnerLaMainAuJeuAsync(priorite.Token), CancellationToken.None);
         try
         {
             while (!_arret)
@@ -291,6 +315,26 @@ public sealed class MassRunService : IDisposable
                     controle = DateTime.UtcNow;
                     salle.Instantanes = client.InstantanesRecus;
                     salle.EcartHorlogeMs = client.EcartHorlogeMs;
+                    if (avecJeu && salle.Mode == 4 && fermerA is null && LimiteDepassee(salle.GoUtc, salle.Limite, DateTime.UtcNow))
+                    {
+                        _journal.LogInformation("MASS RUN : temps de la salle ecoule, image {Image}.", salle.ImageCourse);
+                        salle.TempsEcoule = true;
+                        fermerA = DateTime.UtcNow;
+                    }
+                    if (avecJeu && salle.Mode == 5 && fermerA is null) fermerA = DateTime.UtcNow + TenueDeLArrivee;
+                    if (fermerA is { } heure && DateTime.UtcNow >= heure && DateTime.UtcNow - dernierQuit > TimeSpan.FromSeconds(2))
+                    {
+                        // RetroArch demande parfois deux QUIT (essai du 04/11) : on insiste jusqu'a ce qu'il parte.
+                        dernierQuit = DateTime.UtcNow;
+                        _ = RetroBat.Api.Netplay.RetroArchInvite.FermerAsync();
+                    }
+                    if (avecJeu && !mesure && (salle.Mode == 5 || salle.TempsEcoule) && salle.GoUtc is { } go)
+                    {
+                        mesure = true;
+                        var duree = (DateTime.UtcNow - go).TotalSeconds;
+                        _journal.LogInformation("MASS RUN : cadence de la course {Cadence:0.0} images/s ({Images} images en {Duree:0.0} s).",
+                            duree > 0 ? salle.ImageCourse / duree : 0, salle.ImageCourse, duree);
+                    }
                     if (avecJeu)
                     {
                         var tourne = Process.GetProcessesByName("retroarch").Length > 0;
@@ -397,6 +441,8 @@ public sealed class MassRunService : IDisposable
         finally
         {
             salle.Finie = true;
+            priorite.Cancel();
+            if (avecJeu) _priorites?.RendreLaMain();
             canal.Fermer();
             client.Dispose();
             _journal.LogInformation("MASS RUN : salle {Salle} quittee, {Instantanes} instantanes recus", salle.Salle, client.InstantanesRecus);

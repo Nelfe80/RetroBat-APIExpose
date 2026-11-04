@@ -58,6 +58,24 @@ public class MassRunPagesTests
         => Assert.Equal(attendue, DefisPanelService.IssueDe(Locale(modeMax, arrivee, elimine, survie)));
 
     [Fact]
+    public void L_heure_de_la_salle_compte_pas_les_images_du_coeur()
+    {
+        Assert.False(MassRunService.LimiteDepassee(Maintenant, 180, Maintenant.AddSeconds(181)));
+        Assert.True(MassRunService.LimiteDepassee(Maintenant, 180, Maintenant.AddSeconds(183)));
+        Assert.False(MassRunService.LimiteDepassee(null, 180, Maintenant));
+        Assert.Equal(IssueDeCourse.TempsEcoule, DefisPanelService.IssueDe(Locale(4) with { TempsEcoule = true }));
+        Assert.Equal(IssueDeCourse.Survivant, DefisPanelService.IssueDe(Locale(4, survie: true) with { TempsEcoule = true }));
+    }
+
+    [Fact]
+    public void Seul_dans_la_salle_le_joueur_le_sait()
+    {
+        Assert.Contains("alone", Service().ComposerLeDepartMassRun(Salle(), "Super Mario Bros.", null, false, 1, Maintenant).Legende);
+        var seul = new BilanDeCourse(Salle(), "Super Mario Bros.", "NELFE", null, IssueDeCourse.TempsEcoule, null, null, 1, 0, [], true);
+        Assert.Contains("only runner", Service().ComposerLeBilanDeCourse(seul).Note);
+    }
+
+    [Fact]
     public void Le_depart_porte_la_fiche_de_la_salle_et_le_mot_MASS_RUN()
     {
         var page = Service().ComposerLeDepartMassRun(Salle(), "Super Mario Bros.", null, false, 12, Maintenant);
