@@ -1085,6 +1085,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var romGroup = GroupeDeLaPartie(systemId, GetString(attestation, "Rom") ?? "",
                 GetString(attestation, "ContentMd5"), GetString(attestation, "ContentSha256"));
             if (systemId.Length == 0 || romGroup.Length == 0 || _esNotify is null) return;
+            if (SurLeCoeurDesFantomes())
+            {
+                // Fantomes ou MASS RUN : jamais classe, donc jamais « certifiable » a l'ecran (essai du 04/11).
+                Trace($"prevol : {systemId}/{romGroup} sur le coeur hote des fantomes, ni annonce ni scoring");
+                return;
+            }
             if (MultiplayerDeLaPartie() is { } multiplayer && !SousAtelier())
             {
                 // En partie, rien (decision user du 2026-10-31) : l'ecran de lancement a dit que la partie concourt.
