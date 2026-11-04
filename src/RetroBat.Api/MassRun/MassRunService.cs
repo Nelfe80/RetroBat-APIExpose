@@ -7,6 +7,7 @@ using RetroBat.Api.Speedrun;
 using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Models;
 using RetroBat.Domain.Paths;
+using RetroBat.Domain.Services;
 
 namespace RetroBat.Api.MassRun;
 
@@ -37,6 +38,8 @@ public sealed class MassRunService : IDisposable
 
     private readonly RetroBat.Api.Reseau.ServiceDeCarte? _carte;
     private readonly IPrioritesDuJeu? _priorites;
+    private readonly InterfaceTextService? _textes;
+    private readonly EmulationStationSettingsService? _reglages;
 
     /// <summary>Le classement fige reste a l'ecran ce temps apres l'arrivee, puis le jeu se ferme : le bilan prend la suite.</summary>
     private static readonly TimeSpan TenueDeLArrivee = TimeSpan.FromSeconds(10);
@@ -47,14 +50,35 @@ public sealed class MassRunService : IDisposable
     /// </summary>
     private static readonly TimeSpan GraceDeLaLimite = TimeSpan.FromSeconds(2);
 
+    /// <summary>
+    /// Les textes dessines par le coeur, dans l'ordre de ses emplacements. Le coeur est en anglais par defaut (decision du user du
+    /// 04/11) : une cle sans traduction laisse son emplacement vide.
+    /// </summary>
+    internal static readonly string[] ClesDesTextes =
+    [
+        "massrun.core.time_up", "massrun.core.eliminated", "massrun.core.finish", "massrun.core.start", "massrun.core.ranking",
+        "massrun.core.you", "massrun.core.finished", "massrun.core.waiting_room", "massrun.core.explore", "massrun.core.select_back",
+    ];
+
+    private IReadOnlyList<string> TextesDuCoeur()
+    {
+        string? langue = null;
+        try { langue = _reglages?.GetScrapingSettings().Language; }
+        catch (Exception e) when (e is IOException or InvalidOperationException) { _journal.LogDebug(e, "MASS RUN : langue illisible."); }
+        return ClesDesTextes.Select(cle => _textes?.Text(cle, langue) is { Length: > 0 } t && t != cle ? t.ToUpperInvariant() : "").ToList();
+    }
+
     /// <summary>La fin de la course a-t-elle sonne ? Pur.</summary>
     internal static bool LimiteDepassee(DateTime? go, int limite, DateTime maintenant)
         => go is { } depart && limite > 0 && maintenant > depart.AddSeconds(limite) + GraceDeLaLimite;
 
     public MassRunService(ApiContext contexte, IEventBus bus, ILogger<MassRunService> journal, NelfePlayAgentService? agent = null,
-        RetroBat.Api.Reseau.ServiceDeCarte? carte = null, IPrioritesDuJeu? priorites = null)
+        RetroBat.Api.Reseau.ServiceDeCarte? carte = null, IPrioritesDuJeu? priorites = null, InterfaceTextService? textes = null,
+        EmulationStationSettingsService? reglages = null)
     {
         _priorites = priorites;
+        _textes = textes;
+        _reglages = reglages;
         _contexte = contexte;
         _bus = bus;
         _journal = journal;
@@ -198,7 +222,7 @@ public sealed class MassRunService : IDisposable
             _canal ??= new MassRunCanal();
             // Le GO! n'est fixe qu'une fois le jeu charge (le coeur passe en salle d'attente) : la salle d'attente dure alors ce
             // qui a ete demande, quel que soit le temps de chargement (12 s mesurees sur la borne le 04/11).
-            _canal.PoserSalle(CrcSmb, null, limiteSecondes, Convert.ToUInt32(couleur, 16), pseudo.Length > 10 ? pseudo[..10] : pseudo, niveau, etat);
+            _canal.PoserSalle(CrcSmb, null, limiteSecondes, Convert.ToUInt32(couleur, 16), pseudo.Length > 10 ? pseudo[..10] : pseudo, niveau, etat, textes: TextesDuCoeur());
 
             var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
                 RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, "nes", "libretro", CoeurHote, rom, null);
@@ -258,7 +282,7 @@ public sealed class MassRunService : IDisposable
             RetroBat.Api.Speedrun.FantomesDuSpeedrun.ViderLeDossier();
             Arreter();
             _canal ??= new MassRunCanal();
-            _canal.PoserSalle(CrcSmb, client.GoLocalUtc, client.Limite, Convert.ToUInt32(couleur, 16), pseudo, client.Niveau, etat, client.RegleMort);
+            _canal.PoserSalle(CrcSmb, client.GoLocalUtc, client.Limite, Convert.ToUInt32(couleur, 16), pseudo, client.Niveau, etat, client.RegleMort, TextesDuCoeur());
             var salle = new SalleLocale(client.Niveau, 0, pseudo, couleur, 0, 0, rom)
             {
                 GoUtc = client.GoLocalUtc, Noeud = noeud, Salle = client.Salle, Place = client.Place, Limite = client.Limite,

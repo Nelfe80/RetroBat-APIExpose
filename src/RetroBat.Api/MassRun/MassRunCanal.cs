@@ -36,7 +36,7 @@ public sealed class MassRunCanal : IDisposable
     public const int ImagesParFenetre = 4;
 
     private const int OffActif = 16, OffCrc = 20, OffGo = 24, OffLimite = 32, OffCouleur = 36, OffPseudo = 40, OffNiveau = 56, OffTailleEtat = 72, OffMort = 76;
-    private const int OffJoueur = 128, OffCoureurs = 256, OffEntrees = 272, TailleEntree = 192, OffClassement = 12800, OffEtat = 32768;
+    private const int OffJoueur = 128, OffCoureurs = 256, OffEntrees = 272, TailleEntree = 192, OffClassement = 12800, OffTextes = 28672, TailleTexte = 64, OffEtat = 32768;
     public const int LignesDeClassement = 16;
     private uint _sequenceClassement;
 
@@ -78,7 +78,7 @@ public sealed class MassRunCanal : IDisposable
     }
 
     /// <summary>Pose une salle : le coeur la lit au chargement du jeu. L'etat de depart est l'etat brut du coeur.</summary>
-    public void PoserSalle(uint crc, DateTime? goUtc, int limiteSecondes, uint couleur, string pseudo, string niveau, byte[] etat, uint regleMort = 1)
+    public void PoserSalle(uint crc, DateTime? goUtc, int limiteSecondes, uint couleur, string pseudo, string niveau, byte[] etat, uint regleMort = 1, IReadOnlyList<string>? textes = null)
     {
         if (etat.Length > Taille - OffEtat)
         {
@@ -98,6 +98,8 @@ public sealed class MassRunCanal : IDisposable
         _vue.Write(OffTailleEtat, (uint)etat.Length);
         _vue.Write(OffMort, regleMort);
         _vue.WriteArray(OffEtat, etat, 0, etat.Length);
+        // Les textes de l'ecran, traduits ; un emplacement vide laisse l'anglais du coeur.
+        for (var i = 0; textes is not null && i < textes.Count; i++) EcrireTexte(OffTextes + i * TailleTexte, textes[i], TailleTexte);
         _vue.Write(12, _vue.ReadUInt32(12) + 1);
         _sequenceCoureurs = 0;
         _vue.Write(OffActif, 1u);

@@ -68,6 +68,10 @@ public class MassRunPagesTests
     }
 
     [Fact]
+    public void Les_textes_du_coeur_tiennent_dans_ses_emplacements()
+        => Assert.Equal(10, MassRunService.ClesDesTextes.Length);
+
+    [Fact]
     public void Seul_dans_la_salle_le_joueur_le_sait()
     {
         Assert.Contains("alone", Service().ComposerLeDepartMassRun(Salle(), "Super Mario Bros.", null, false, 1, Maintenant).Legende);
