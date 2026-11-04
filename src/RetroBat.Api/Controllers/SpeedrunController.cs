@@ -53,14 +53,17 @@ public sealed class SpeedrunController : ControllerBase
     [HttpGet("session")]
     public IActionResult Session() => _session.Instantane() is { } s ? Ok(s) : NotFound(new { active = false });
 
-    public sealed record DemandeDeLancement(string? ChallengeId);
+    public sealed record DemandeDeLancement(string? ChallengeId, string? Rom = null);
 
     /// <summary>Lance un defi : contexte type speedrun, coeur du reglement, RetroAchievements coupe pour la seance, aucun score au World Scoring.</summary>
     [HttpPost("launch")]
     public IActionResult Lancer([FromBody] DemandeDeLancement demande)
     {
         if (!JetonLocal()) return Refus();
-        var r = _session.Lancer(demande.ChallengeId, (systeme, groupe) => RomDuGroupe.Trouver(_gamelists, _canonical, systeme, groupe));
+        // Rom : le fichier a lancer, si l'appelant le sait (essais) ; sinon celui que le groupe designe.
+        var r = _session.Lancer(demande.ChallengeId, (systeme, groupe) => demande.Rom is { Length: > 0 } rom && System.IO.File.Exists(rom)
+            ? rom
+            : RomDuGroupe.Trouver(_gamelists, _canonical, systeme, groupe));
         if (r.Lance) return Accepted(new { status = "launching", challengeId = demande.ChallengeId });
         return r.Raison switch
         {

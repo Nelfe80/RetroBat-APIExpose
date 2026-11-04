@@ -204,13 +204,16 @@ public sealed class FantomesDuSpeedrun
 
     private static string Dossier => Path.Combine(RetroBatPaths.RetroBatRoot, "bios", "nelfeplay", "ghosts", CrcDuContenu);
 
-    /// <summary>Le dossier que lit le coeur hote, vide : un fantome ne reste pas pour la partie suivante (replay, MASS RUN).</summary>
+    /// <summary>
+    /// Les fantomes poses ici sortent du dossier que lit le coeur hote : ils ne restent pas pour la partie suivante (replay,
+    /// MASS RUN). Seulement les notres (« 1-rp_….nghost ») : un fantome d'essai pose a la main ne se touche pas.
+    /// </summary>
     public static void ViderLeDossier()
     {
         try
         {
             if (!Directory.Exists(Dossier)) return;
-            foreach (var f in Directory.EnumerateFiles(Dossier, "*.nghost")) File.Delete(f);
+            foreach (var f in Directory.EnumerateFiles(Dossier, "*-rp_*.nghost")) File.Delete(f);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
