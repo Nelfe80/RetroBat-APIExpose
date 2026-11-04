@@ -190,7 +190,8 @@ public sealed class MassRunService : IDisposable
     {
         lock (_verrou)
         {
-            if (Process.GetProcessesByName("retroarch").Length > 0)
+            // Un rendu de film n'est pas un jeu (essai du 04/11) : le lancement l'annule en annoncant la partie.
+            if (EmulatorForeground.EmulateurDeJeuTourne())
             {
                 throw new InvalidOperationException("un jeu tourne deja");
             }
@@ -265,7 +266,7 @@ public sealed class MassRunService : IDisposable
         if (pseudo.Length > 10) pseudo = pseudo[..10];
         var poignee = statut?.PlayerCode is { Length: > 0 } code ? code : pseudo;
         var couleur = MultiplayerPanelService.CouleurDe(poignee);
-        if (lancerLeJeu && Process.GetProcessesByName("retroarch").Length > 0)
+        if (lancerLeJeu && EmulatorForeground.EmulateurDeJeuTourne())
         {
             throw new InvalidOperationException("un jeu tourne deja");
         }
@@ -322,6 +323,7 @@ public sealed class MassRunService : IDisposable
         var vu = false;
         var controle = DateTime.MinValue;
         var pings = DateTime.UtcNow;
+        var lanceA = DateTime.Now.AddSeconds(-2);   // seul le jeu de cette salle compte
         var dernierClassement = DateTime.MinValue;
         var classementEnCours = false;
         DateTime? fermerA = null;
@@ -361,7 +363,7 @@ public sealed class MassRunService : IDisposable
                     }
                     if (avecJeu)
                     {
-                        var tourne = Process.GetProcessesByName("retroarch").Length > 0;
+                        var tourne = EmulatorForeground.EmulateurDeJeuTourne(lanceA);
                         if (tourne) vu = true;
                         else if (vu || DateTime.UtcNow - debut > TimeSpan.FromMinutes(3)) break;
                     }
@@ -519,6 +521,7 @@ public sealed class MassRunService : IDisposable
     private void Boucle(MassRunCanal canal, SalleLocale salle, List<Simule> simules)
     {
         uint dernierMode = 0, derniereImage = uint.MaxValue, derniereImageMode = uint.MaxValue;
+        var lanceA = DateTime.Now.AddSeconds(-2);   // seul le jeu de cette salle compte
         var arriveeNotee = false;
         var debut = DateTime.UtcNow;
         var vu = false;
@@ -531,7 +534,7 @@ public sealed class MassRunService : IDisposable
                 if (DateTime.UtcNow - controle > TimeSpan.FromSeconds(1))
                 {
                     controle = DateTime.UtcNow;
-                    var tourne = Process.GetProcessesByName("retroarch").Length > 0;
+                    var tourne = EmulatorForeground.EmulateurDeJeuTourne(lanceA);
                     if (tourne) vu = true;
                     else if (vu || DateTime.UtcNow - debut > TimeSpan.FromMinutes(3)) break;
                 }
