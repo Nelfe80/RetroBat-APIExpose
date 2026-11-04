@@ -68,6 +68,14 @@ public static class LanceurDuDirect
     /// </summary>
     internal static IEnumerable<string> Crt(bool crt) => crt ? ["--crt"] : [];
 
+    /// <summary>
+    /// LE CRT PHOTOGRAPHIQUE (NelfeCRT, exe 0.8.0, demande du user du 04/11) : diffusion, fusion, saturation et lignes de
+    /// balayage, pour les films des records et des replays, fabriques hors partie. Pas sur le direct : le filtre tourne sur le
+    /// processeur (2,2 coeurs mesures sur la borne contre 1,3 pour le CRT leger) tant qu'il n'a pas son chemin Direct3D. Un exe
+    /// plus ancien ignore l'option. Pur.
+    /// </summary>
+    internal static IEnumerable<string> CrtPhotographique(bool crt) => crt ? ["--crt-photographic"] : [];
+
     /// <summary>Les systemes nes sur un ecran plat (consoles portables, machines HD) : pas d'effet CRT.</summary>
     private static readonly HashSet<string> EcransPlats = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -95,7 +103,7 @@ public static class LanceurDuDirect
         if (finS is double fin) arguments.AddRange(["--fin", fin.ToString("0.##", CultureInfo.InvariantCulture)]);
         arguments.AddRange(Forme(forme));
         arguments.AddRange(Fond(fond));
-        arguments.AddRange(Crt(crt));
+        arguments.AddRange(CrtPhotographique(crt));
         return arguments;
     }
 
