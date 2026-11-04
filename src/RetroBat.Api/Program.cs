@@ -309,6 +309,8 @@ builder.Services
 // Le jeu d'abord pendant un defi : RetroArch au-dessus de la normale, ES en dessous (mesure du 01/11).
 builder.Services.AddSingleton<RetroBat.Api.Speedrun.IPrioritesDuJeu, RetroBat.Api.Speedrun.PrioritesDuJeuWindows>();
 builder.Services.AddSingleton<RetroBat.Api.Speedrun.SpeedrunSessionService>();
+// MASS RUN (lot L2) : la salle d'essai et le canal avec le coeur hote.
+builder.Services.AddSingleton<RetroBat.Api.MassRun.MassRunService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Speedrun.SpeedrunSessionService>());
 builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardOverlayService>();
 builder.Services.AddHostedService<RetroBat.Api.Leaderboard.LeaderboardInputService>();

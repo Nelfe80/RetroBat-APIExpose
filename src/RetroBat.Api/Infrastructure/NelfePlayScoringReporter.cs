@@ -1028,6 +1028,19 @@ public sealed class NelfePlayScoringReporter : BackgroundService
            && (_partie is not { EstNelfePlay: false }
                || RetroBat.Api.Scoring.ScoreLabLabMode.IsActive(DateTime.UtcNow, out _));
 
+    /// <summary>
+    /// LE COEUR HOTE DES FANTOMES ET DE MASS RUN (NelfePlay Ghosts) N'EST PAS HOMOLOGUE (CDC MASS RUN §3, §14) : une partie
+    /// sur lui n'envoie rien, ni score, ni temps de defi, ni place de MULTIPLAYER. Il se reconnait a sa version : il garde le
+    /// nom du coeur d'origine (memes options, memes dossiers) et ajoute « NelfePlay Ghosts » a sa version.
+    /// </summary>
+    private bool SurLeCoeurDesFantomes()
+    {
+        lock (_sync)
+        {
+            return (_coreVersion ?? string.Empty).Contains("NelfePlay Ghosts", StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
     /// <summary>L'atelier de NelfeScoreLab tient sur la partie : rien ne se mesure ni ne part (APX-LAB-001).</summary>
     private bool SousAtelier()
         => _partie?.SousAtelier ?? RetroBat.Api.Scoring.ScoreLabAtelier.IsActive(DateTime.UtcNow, out _);
@@ -2979,6 +2992,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // qui decidera, un peu plus bas, s'il y avait quelque chose a mesurer.
         _sessionRecue = true;
         if (sessionJson is null) return;
+        if (SurLeCoeurDesFantomes())
+        {
+            Trace("STOP: coeur hote des fantomes (NelfePlay Ghosts), non homologue : rien n'est envoye");
+            return;
+        }
         if (_partie is { EstSpeedrun: true } && !SousAtelier())
         {
             await SoumettreDefiAsync(systemId, romGroup, sessionJson, cancellationToken).ConfigureAwait(false);
