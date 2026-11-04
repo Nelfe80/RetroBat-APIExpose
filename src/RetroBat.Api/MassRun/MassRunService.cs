@@ -213,6 +213,19 @@ public sealed class MassRunService : IDisposable
                     pings = DateTime.UtcNow;
                     client.EnvoyerPing();   // l'horloge se recale, la place reste ouverte dans le NAT
                 }
+                if (!avecJeu)
+                {
+                    // Essai du reseau sans jeu : une borne immobile au depart, a l'image de course de l'horloge.
+                    if (DateTime.UtcNow - dernierEnvoi > TimeSpan.FromMilliseconds(64))
+                    {
+                        dernierEnvoi = DateTime.UtcNow;
+                        var depuisGo = (DateTime.UtcNow - client.GoLocalUtc).TotalSeconds;
+                        client.EnvoyerPosition(depuisGo > 0 ? (uint)(depuisGo * 60.0988) : 0, depuisGo > 0 ? 4u : 2u, new byte[MassRunProtocole.ImageDePiste]);
+                        salle.CoureursVus = client.CoureursFrais().Count;
+                    }
+                    Thread.Sleep(1);
+                    continue;
+                }
                 var joueur = canal.LireJoueur();
                 if (joueur is { } j)
                 {
