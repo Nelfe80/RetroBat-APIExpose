@@ -55,6 +55,15 @@ public class FantomesDuSpeedrunTests
     }
 
     [Fact]
+    public void Mon_temps_vient_du_classement_et_un_temps_ne_compte_que_si_les_fantomes_courent()
+    {
+        using var json = JsonDocument.Parse("""{"rows":[{"player":"Ash","value":1578},{"player":"Nelfe","value":1695}]}""");
+        Assert.Equal(1695L, FantomesDuSpeedrun.MonTemps(json.RootElement, "nelfe"));
+        Assert.Null(FantomesDuSpeedrun.MonTemps(json.RootElement, "Inconnu"));
+        Assert.False(new FantomesDuSpeedrun(null!, null!, null!, null!, null!).NouveauTemps(1500));
+    }
+
+    [Fact]
     public void Le_choix_defile_et_revient()
     {
         var f = new FantomesDuSpeedrun(null!, null!, null!, null!, null!);

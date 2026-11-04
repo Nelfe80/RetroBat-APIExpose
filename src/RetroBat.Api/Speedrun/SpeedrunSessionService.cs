@@ -849,11 +849,28 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         foreach (var message in _session.PrendreLesMessages()) _ = AfficherAsync(message);
         if (_session.PrendreLaRelanceAutomatique() is { } delai)
         {
-            // Le joueur voit sa mort ou son temps, puis l'etat de depart revient et le chrono repart de 0.
+            // Le joueur voit sa mort ou son temps, puis l'etat de depart revient et le chrono repart de 0. Une arrivee qui bat
+            // son temps arrete l'enregistrement plus tot : son replay devient le fantome de ce depart.
             var sessionId = _session.SessionId;
+            var meilleur = _session.Etat == SessionSpeedrun.Finished && _fantomes?.NouveauTemps(_session.MeilleurTemps) == true;
             _ = Task.Run(async () =>
             {
-                await Task.Delay(delai).ConfigureAwait(false);
+                if (meilleur)
+                {
+                    await Task.Delay(ArretDuReplayApresLArrivee).ConfigureAwait(false);
+                    try { await _commandes.EnvoyerAsync("HALT_REPLAY", CancellationToken.None).ConfigureAwait(false); }
+                    catch (Exception ex) when (ex is IOException or System.Net.Sockets.SocketException or OperationCanceledException)
+                    {
+                        _journal.LogDebug(ex, "Speedrun : arret du replay impossible.");
+                    }
+
+                    await _fantomes!.AttendreLeFantomeAsync(AttenteDuFantome).ConfigureAwait(false);
+                }
+                else
+                {
+                    await Task.Delay(delai).ConfigureAwait(false);
+                }
+
                 await CommanderAsync(new CommandeSpeedrun(IdDeLaManette(), sessionId, SessionSpeedrun.ActionRelancer, Confirme: true)).ConfigureAwait(false);
             });
         }
@@ -873,6 +890,9 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private long _snapshotPublie = -1;
 
     private readonly FantomesDuSpeedrun? _fantomes;
+
+    private static readonly TimeSpan ArretDuReplayApresLArrivee = TimeSpan.FromSeconds(1.5);
+    private static readonly TimeSpan AttenteDuFantome = TimeSpan.FromSeconds(3);
 
 
     // LE DIAGNOSTIC D'UNE SESSION (essai du user du 02/11, 22:56 : neuf minutes sans aucune tentative, sans rien pour dire

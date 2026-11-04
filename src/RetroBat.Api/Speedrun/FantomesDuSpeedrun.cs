@@ -4,6 +4,8 @@ using RetroBat.Api.Infrastructure;
 using RetroBat.Api.Replay.Playback;
 using RetroBat.Api.Replay.Sharing;
 using RetroBat.Api.Replay.Storage;
+using RetroBat.Domain.Events;
+using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Paths;
 
 namespace RetroBat.Api.Speedrun;
@@ -26,6 +28,11 @@ public enum ChoixDesFantomes
 /// d'open-games). Sinon, hors ligne comme refuse, le speedrun part sur le coeur d'origine, sans fantome : un temps ne se perd
 /// jamais pour un fantome. Un fantome pas encore la au bout de <see cref="Budget"/> arrive pour la tentative suivante.
 /// </para>
+/// <para>
+/// LE MEILLEUR FANTOME A CHAQUE DEPART (demande du user du 04/11), meme tout juste fait : une arrivee qui bat mon temps
+/// remplace mon fantome des que son replay est finalise, et le coeur relit le dossier au rechargement de l'etat de depart.
+/// Le coeur hote part donc aussi sans aucun fantome, pour accueillir le premier.
+/// </para>
 /// </summary>
 public sealed class FantomesDuSpeedrun
 {
@@ -44,10 +51,16 @@ public sealed class FantomesDuSpeedrun
     private readonly IReplaySourceResolver _sources;
     private readonly ILogger<FantomesDuSpeedrun>? _journal;
     private (DateTime Lu, bool Admis)? _admission;
+    private readonly object _verrou = new();
+    private readonly IDisposable? _abonnement;
+    private bool _enCourse;
+    private long? _monTemps;
+    private TaskCompletionSource? _fantomeAttendu;
 
     public FantomesDuSpeedrun(IHttpClientFactory http, IReplayManifestStore manifestes, ReplayStore objets, ReplayManifestFetcher recherche,
-        IReplaySourceResolver sources, ILogger<FantomesDuSpeedrun>? journal = null)
+        IReplaySourceResolver sources, ILogger<FantomesDuSpeedrun>? journal = null, IEventBus? bus = null)
     {
+        _abonnement = bus?.Subscribe<EventEnvelope>(SurEvenement);
         _http = http;
         _manifestes = manifestes;
         _objets = objets;
@@ -80,10 +93,96 @@ public sealed class FantomesDuSpeedrun
         return voulus.OfType<string>().Where(r => r.Length > 0).Distinct(StringComparer.Ordinal).ToList();
     }
 
-    /// <summary>Vrai si le speedrun doit partir sur le coeur hote : ses fantomes sont poses. Attend <see cref="Budget"/> au plus.</summary>
+    /// <summary>Le temps du joueur sur ce classement, ou null. Pur.</summary>
+    internal static long? MonTemps(JsonElement classement, string pseudo)
+    {
+        if (pseudo.Length == 0 || !classement.TryGetProperty("rows", out var lignes) || lignes.ValueKind != JsonValueKind.Array) return null;
+        foreach (var l in lignes.EnumerateArray())
+        {
+            if (l.TryGetProperty("player", out var j) && string.Equals(j.GetString(), pseudo, StringComparison.OrdinalIgnoreCase)
+                && l.TryGetProperty("value", out var v) && v.TryGetInt64(out var temps)) return temps;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Une arrivee vient de tomber : vrai si elle bat mon temps et que mon fantome court. Son replay, finalise ensuite, le
+    /// remplacera (<see cref="AttendreLeFantomeAsync"/>).
+    /// </summary>
+    public bool NouveauTemps(long? frames)
+    {
+        lock (_verrou)
+        {
+            if (!_enCourse || frames is not { } t || (_monTemps is { } mien && t >= mien)) return false;
+            if (Choix is not (ChoixDesFantomes.MonRecordEtMondial or ChoixDesFantomes.MonRecord)) return false;
+            _monTemps = t;
+            _fantomeAttendu = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            return true;
+        }
+    }
+
+    /// <summary>Attend que le fantome tout juste fait soit pose. Au bout du delai, il arrivera pour le depart suivant.</summary>
+    public async Task AttendreLeFantomeAsync(TimeSpan delai)
+    {
+        TaskCompletionSource? attendu;
+        lock (_verrou) attendu = _fantomeAttendu;
+        if (attendu is not null) await Task.WhenAny(attendu.Task, Task.Delay(delai)).ConfigureAwait(false);
+    }
+
+    private void SurEvenement(EventEnvelope e)
+    {
+        if (e.Type != "replay.finalized") return;
+        TaskCompletionSource? attendu;
+        lock (_verrou) attendu = _fantomeAttendu;
+        if (attendu is null) return;
+        try
+        {
+            var replay = (e.Payload is JsonElement j ? j : JsonSerializer.SerializeToElement(e.Payload)).GetProperty("ReplayId").GetString();
+            if (replay is { Length: > 0 }) _ = Task.Run(() => PoserMonFantomeAsync(replay, attendu));
+        }
+        catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException or JsonException or NotSupportedException)
+        {
+            _journal?.LogDebug(ex, "Fantomes : replay.finalized illisible.");
+        }
+    }
+
+    private async Task PoserMonFantomeAsync(string replay, TaskCompletionSource attendu)
+    {
+        try
+        {
+            if (await FantomeAsync(replay, CancellationToken.None).ConfigureAwait(false) is not { } fantome) return;
+            var dossier = Directory.CreateDirectory(Dossier).FullName;
+            foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.nghost")) File.Delete(ancien);
+            await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{replay}.nghost"), fantome).ConfigureAwait(false);
+            _journal?.LogInformation("Fantomes : meilleur temps de la session, {Replay} court des le prochain depart.", replay);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or HttpRequestException or TaskCanceledException)
+        {
+            _journal?.LogWarning("Fantomes : le fantome tout juste fait n'a pas pu se poser : {Message}", e.Message);
+        }
+        finally
+        {
+            lock (_verrou)
+            {
+                if (ReferenceEquals(_fantomeAttendu, attendu)) _fantomeAttendu = null;
+            }
+
+            attendu.TrySetResult();
+        }
+    }
+
+    /// <summary>Vrai si le speedrun doit partir sur le coeur hote. Attend <see cref="Budget"/> au plus.</summary>
     public bool Preparer(Reglement r, string pseudo)
     {
         ViderLeDossier();
+        lock (_verrou)
+        {
+            _enCourse = false;
+            _monTemps = null;
+            _fantomeAttendu = null;
+        }
+
         if (!PourCeDefi(r) || Choix == ChoixDesFantomes.Aucun) return false;
         var travail = Task.Run(() => PreparerAsync(r, pseudo, CancellationToken.None));
         try
@@ -94,7 +193,8 @@ public sealed class FantomesDuSpeedrun
                 return false;
             }
 
-            return travail.Result > 0;
+            lock (_verrou) _enCourse = travail.Result;
+            return travail.Result;
         }
         catch (AggregateException e)
         {
@@ -103,26 +203,34 @@ public sealed class FantomesDuSpeedrun
         }
     }
 
-    private async Task<int> PreparerAsync(Reglement r, string pseudo, CancellationToken ct)
+    private async Task<bool> PreparerAsync(Reglement r, string pseudo, CancellationToken ct)
     {
         if (!await CoeurAdmisAsync(ct).ConfigureAwait(false))
         {
             _journal?.LogInformation("Fantomes : le coeur hote n'est pas admis par le site, {Defi} part sans.", r.ChallengeId);
-            return 0;
+            return false;
         }
 
-        var replays = Replays(await LireLeClassementAsync(r.Ruleset, ct).ConfigureAwait(false), pseudo, Choix);
+        using var client = _http.CreateClient(IndexDesDefisService.HttpClientName);
+        var url = $"{NelfePlayAgentService.BaseUrl.TrimEnd('/')}/api/v1/challenges/board?ruleset={Uri.EscapeDataString(r.Ruleset)}&limit=100";
+        using var json = JsonDocument.Parse(await client.GetStringAsync(url, ct).ConfigureAwait(false));
+        var lignes = LignesDuClassement(json.RootElement);
+        var replays = Replays(lignes, pseudo, Choix);
+        var mien = lignes.FirstOrDefault(l => pseudo.Length > 0 && string.Equals(l.Joueur, pseudo, StringComparison.OrdinalIgnoreCase)).Replay;
+        lock (_verrou) _monTemps = MonTemps(json.RootElement, pseudo);
         var poses = 0;
         foreach (var replay in replays)
         {
             if (await FantomeAsync(replay, ct).ConfigureAwait(false) is not { } fantome) continue;
             var dossier = Directory.CreateDirectory(Dossier).FullName;
-            await File.WriteAllBytesAsync(Path.Combine(dossier, $"{poses + 1}-{replay}.nghost"), fantome, ct).ConfigureAwait(false);
+            var nom = (replay == mien ? PrefixeDuMien : $"{poses + 1}-") + replay + ".nghost";
+            await File.WriteAllBytesAsync(Path.Combine(dossier, nom), fantome, ct).ConfigureAwait(false);
             poses++;
         }
 
         _journal?.LogInformation("Fantomes : {Poses} sur {Voulus} pour {Defi}.", poses, replays.Count, r.ChallengeId);
-        return poses;
+        // Sans fantome, le coeur hote part quand meme si mon record en est : le premier temps doit pouvoir courir au depart suivant.
+        return poses > 0 || Choix is ChoixDesFantomes.MonRecordEtMondial or ChoixDesFantomes.MonRecord;
     }
 
     private async Task<bool> CoeurAdmisAsync(CancellationToken ct)
@@ -150,14 +258,6 @@ public sealed class FantomesDuSpeedrun
     internal static bool Admet(JsonElement openGames, string empreinte)
         => openGames.TryGetProperty("ghost_cores", out var coeurs) && coeurs.ValueKind == JsonValueKind.Array
            && coeurs.EnumerateArray().Any(c => string.Equals(c.GetString(), empreinte, StringComparison.OrdinalIgnoreCase));
-
-    private async Task<IReadOnlyList<(string Joueur, string? Replay)>> LireLeClassementAsync(string regle, CancellationToken ct)
-    {
-        using var client = _http.CreateClient(IndexDesDefisService.HttpClientName);
-        var url = $"{NelfePlayAgentService.BaseUrl.TrimEnd('/')}/api/v1/challenges/board?ruleset={Uri.EscapeDataString(regle)}&limit=100";
-        using var json = JsonDocument.Parse(await client.GetStringAsync(url, ct).ConfigureAwait(false));
-        return LignesDuClassement(json.RootElement);
-    }
 
     /// <summary>Le joueur et le replay de chaque ligne du classement d'un defi. Pur.</summary>
     internal static IReadOnlyList<(string Joueur, string? Replay)> LignesDuClassement(JsonElement classement)
@@ -203,6 +303,9 @@ public sealed class FantomesDuSpeedrun
     }
 
     private static string Dossier => Path.Combine(RetroBatPaths.RetroBatRoot, "bios", "nelfeplay", "ghosts", CrcDuContenu);
+
+    /// <summary>Mon fantome, le seul a etre remplace en cours de session ; « -rp_ » le fait vider a la fermeture.</summary>
+    private const string PrefixeDuMien = "0-moi-";
 
     /// <summary>
     /// Les fantomes poses ici sortent du dossier que lit le coeur hote : ils ne restent pas pour la partie suivante (replay,
