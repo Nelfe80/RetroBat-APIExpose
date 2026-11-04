@@ -274,7 +274,7 @@ public sealed partial class DefisPanelService
             await Task.Delay(150).ConfigureAwait(false);
             await _es.TapAsync(new EsControllerTapRequest { Input = "back" }, CancellationToken.None).ConfigureAwait(false);
             await Task.Delay(300).ConfigureAwait(false);
-            await _massrun!.RejoindreAsync(RetroBat.Api.MassRun.MassRunService.Noeud, salle.Id, true, CancellationToken.None).ConfigureAwait(false);
+            await _massrun!.RejoindreAsync(_massrun.NoeudCourant, salle.Id, true, CancellationToken.None).ConfigureAwait(false);
         }
         catch (Exception e) when (e is InvalidOperationException or HttpRequestException or TaskCanceledException or IOException)
         {

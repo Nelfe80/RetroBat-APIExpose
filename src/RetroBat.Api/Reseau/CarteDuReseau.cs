@@ -25,7 +25,7 @@ public sealed class CarteDuReseau
 {
     public const string Genre = "nelfeplay-map";
     public const string Chemin = "/.well-known/nelfeplay-carte.json";
-    public static readonly string[] RolesConnus = ["front", "relay", "replay"];
+    public static readonly string[] RolesConnus = ["front", "relay", "replay", "massrun"];
 
     /// <summary>
     /// La cle du site statique (key_id ac42342a…0930bacd), epinglee : elle signe le manifeste des miroirs et la

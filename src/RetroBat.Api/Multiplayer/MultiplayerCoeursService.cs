@@ -72,6 +72,11 @@ public sealed class MultiplayerCoeursService : BackgroundService
         new("gb2players", "tgbdual_multi", ["tgbdual_multi_libretro.dll", "tgbdual_multi_license.txt"], "tgbdual_multi_libretro.info",
             "le coeur libretro tgbdual_multi (deux Game Boy reliees dont la memoire se lit, pour MULTIPLAYER), en dernier : "
             + "tgbdual reste le coeur des parties solo", ["gbc2players"]),
+        // FCEUMM GHOSTS (MASS RUN, 04/11) : le coeur hote des fantomes et de MASS RUN ; il charge le fceumm de la borne pour la
+        // partie du joueur (inchange) et dessine les autres coureurs. Jamais classe (NelfePlayScoringReporter).
+        new("nes", "fceumm_ghosts", ["fceumm_ghosts_libretro.dll"], "fceumm_ghosts_libretro.info",
+            "le coeur libretro fceumm_ghosts (fantomes et MASS RUN de NelfePlay), en dernier : fceumm reste le coeur des parties "
+            + "solo"),
     ];
 
     public const string FichierEs = "es_systems_nelfeplay.cfg";

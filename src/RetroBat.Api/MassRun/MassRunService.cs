@@ -35,12 +35,36 @@ public sealed class MassRunService : IDisposable
     private volatile bool _arret;
     private SalleLocale? _salle;
 
-    public MassRunService(ApiContext contexte, IEventBus bus, ILogger<MassRunService> journal, NelfePlayAgentService? agent = null)
+    private readonly RetroBat.Api.Reseau.ServiceDeCarte? _carte;
+
+    public MassRunService(ApiContext contexte, IEventBus bus, ILogger<MassRunService> journal, NelfePlayAgentService? agent = null,
+        RetroBat.Api.Reseau.ServiceDeCarte? carte = null)
     {
         _contexte = contexte;
         _bus = bus;
         _journal = journal;
         _agent = agent;
+        _carte = carte;
+    }
+
+    /// <summary>
+    /// LE NOEUD DES SALLES : NELFEPLAY_MASSRUN_NOEUD (essais), sinon le premier noeud que la carte signee du reseau arme du
+    /// role « massrun » (MASS RUN public, 04/11), sinon le noeud d'essai local.
+    /// </summary>
+    public string NoeudCourant
+    {
+        get
+        {
+            if (Environment.GetEnvironmentVariable("NELFEPLAY_MASSRUN_NOEUD") is { Length: > 0 } impose) return impose;
+            try
+            {
+                if (_carte?.Actuelle.AvecLeRole("massrun").FirstOrDefault() is { } noeud) return noeud.Url.TrimEnd('/');
+            }
+            catch (Exception e) when (e is InvalidOperationException or NullReferenceException)
+            {
+            }
+            return "http://127.0.0.1:8082";
+        }
     }
 
     public sealed record SalleLocale(string Niveau, int Attente, string Pseudo, string Couleur, int Coureurs, int Pistes, string Rom)
@@ -60,9 +84,6 @@ public sealed class MassRunService : IDisposable
 
     public SalleLocale? Salle => _salle;
 
-    /// <summary>Le noeud des salles : NELFEPLAY_MASSRUN_NOEUD, sinon le noeud d'essai local (lot L5 ; au lot L4, le
-    /// coordinateur du central dira quel noeud tient quelle salle).</summary>
-    public static string Noeud => Environment.GetEnvironmentVariable("NELFEPLAY_MASSRUN_NOEUD") is { Length: > 0 } n ? n : "http://127.0.0.1:8082";
 
     /// <summary>Une salle ouverte d'un noeud : l'heure du GO! est ramenee a l'horloge de la borne.</summary>
     public sealed record SalleOuverte(uint Id, string Jeu, string Niveau, string Mort, DateTime GoUtc, int Limite, int Inscrits, int Arrives);
@@ -74,7 +95,7 @@ public sealed class MassRunService : IDisposable
     {
         try
         {
-            var json = JsonDocument.Parse(await Http.GetStringAsync(Noeud.TrimEnd('/') + "/massrun/v1/salles", ct).ConfigureAwait(false)).RootElement;
+            var json = JsonDocument.Parse(await Http.GetStringAsync(NoeudCourant.TrimEnd('/') + "/massrun/v1/salles", ct).ConfigureAwait(false)).RootElement;
             var ecart = DateTime.UtcNow - DateTime.UnixEpoch.AddMilliseconds(json.GetProperty("maintenant_unix_ms").GetInt64());
             return json.GetProperty("salles").EnumerateArray().Select(s => new SalleOuverte(
                 s.GetProperty("salle").GetUInt32(),
