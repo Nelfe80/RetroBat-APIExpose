@@ -62,7 +62,8 @@ public sealed partial class DefisPanelService
         _glypheValider,
         _glypheAnnuler,
         SortiePossible: true,
-        Fiche: Fiche(defi),
+        // Sans les fantomes : ils se choisissent dans le panneau, et un 7e champ ferait passer la carte sur le bouton HOLD.
+        Fiche: Fiche(defi, avecFantomes: false),
         Logo: LogoDesPages);
 
     internal EcranDeFin ComposerLeBilan(BilanDEpreuve b, string langue)

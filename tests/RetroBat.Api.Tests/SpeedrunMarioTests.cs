@@ -95,6 +95,19 @@ public class SpeedrunMarioTests
     }
 
     [Fact]
+    public void La_page_de_depart_ne_porte_pas_la_ligne_des_fantomes()
+    {
+        // 04/11 : la fiche a deux colonnes ; un 7e champ ouvrait une 4e rangee et la carte passait sur le bouton HOLD.
+        var fantomes = new FantomesDuSpeedrun(null!, null!, null!, null!, null!);
+        var service = new DefisPanelService(null!, null!, null!, null!, null!, fantomes: fantomes);
+
+        var page = service.ComposerLaPreparation(Lire("1-1"), "Super Mario Bros.", null, false, "fr");
+
+        Assert.Equal(6, page.Fiche!.Count);
+        Assert.DoesNotContain(page.Fiche!, c => c.Etiquette == "Ghosts");
+    }
+
+    [Fact]
     public void Une_vie_perdue_fait_echouer_un_niveau()
     {
         var p = Assert.Single(Jouer("smb-1-1-mort", "1-1"));

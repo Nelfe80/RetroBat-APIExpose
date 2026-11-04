@@ -599,7 +599,7 @@ public sealed partial class DefisPanelService
         return aides;
     }
 
-    private IReadOnlyList<ChampDeFiche> Fiche(Reglement defi)
+    private IReadOnlyList<ChampDeFiche> Fiche(Reglement defi, bool avecFantomes = true)
     {
         var depart = defi.StartPolicy == "normal_boot"
             ? T("speedrun.panel.start.normal", "Normal boot")
@@ -611,7 +611,7 @@ public sealed partial class DefisPanelService
         if (defi.Echecs.Count > 0) interdits.Add(T("speedrun.panel.forbid.death", "dying"));
         if (defi.AnnulationsJeu.Any(e => e.Action == "PAUSE_ON") || defi.AnnulationsBorne.Contains("pause_clock_gap"))
             interdits.Add(T("speedrun.panel.forbid.pause", "pause"));
-        IEnumerable<ChampDeFiche> fantomes = _fantomes is not null && FantomesDuSpeedrun.PourCeDefi(defi)
+        IEnumerable<ChampDeFiche> fantomes = avecFantomes && _fantomes is not null && FantomesDuSpeedrun.PourCeDefi(defi)
             ? [new(T("speedrun.panel.ghosts", "Ghosts"), LibelleDesFantomes())]
             : [];
         return

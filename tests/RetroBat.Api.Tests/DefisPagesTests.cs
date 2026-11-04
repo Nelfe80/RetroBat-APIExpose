@@ -148,6 +148,10 @@ public class DefisPagesTests
             => File.WriteAllBytes(Path.Combine(Sortie, nom), L.ApercuMultiplayer(style, contenu, "", "", "", null!, temps));
 
         Page("page-preparation.png", socle with { Lancement = service.ComposerLaPreparation(GreenHill1, "Sonic the Hedgehog", fanart, false, "fr") }, 2);
+        var niveauDeMario = Reglement.Lire(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Reglements", "super-mario-bros.1-1.json")));
+        var avecFantomes = new DefisPanelService(null!, null!, null!, null!, null!, textes: new RetroBat.Api.Infrastructure.InterfaceTextService(),
+            fantomes: new FantomesDuSpeedrun(null!, null!, null!, null!, null!)) { LangueDApercu = "fr" };
+        Page("page-preparation-mario.png", socle with { Lancement = avecFantomes.ComposerLaPreparation(niveauDeMario, "Super Mario Bros.", fanart, false, "fr") }, 2);
         Page("page-bilan-classe.png", socle with { Fin = service.ComposerLeBilan(Bilan(IssueDuBilan.Classe, 2900, rang: 3, record: 2845, classes: 5, classement: classement) with { Fanart = fanart }, "fr") }, 6);
         Page("page-bilan-record.png", socle with { Fin = service.ComposerLeBilan(Bilan(IssueDuBilan.Classe, 2830, rang: 1, record: 2830, classes: 5, classement: [new TempsClasse(1, "Nelfe", 2830), .. classement.Where(l => l.Joueur != "Nelfe").Select((l, i) => l with { Rang = i + 2 })]) with { Fanart = fanart }, "fr") }, 6);
         Page("page-bilan-sans-temps.png", socle with { Fin = service.ComposerLeBilan(Bilan(IssueDuBilan.AucunTemps, temps: null, motif: "Vie perdue") with { Fanart = fanart }, "fr") }, 6);
@@ -161,6 +165,9 @@ public class DefisPagesTests
             if (Directory.Exists(candidat)) return candidat;
         }
 
+        // le dossier de travail n'a pas les polices (Data Pack) : celles de l'API installee
+        const string installees = @"E:/RetroBat/plugins/APIExpose/resources/theme/fonts";
+        if (Directory.Exists(installees)) return installees;
         throw new DirectoryNotFoundException("resources/theme/fonts introuvable");
     }
 }
