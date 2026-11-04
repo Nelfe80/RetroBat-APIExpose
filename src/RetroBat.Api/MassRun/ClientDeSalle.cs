@@ -41,6 +41,88 @@ public sealed class ClientDeSalle : IDisposable
         public string Pseudo = "";
         public uint Couleur = 0xA98BFF;
         public DateTime RecuLe;
+        /// <summary>Les dernieres positions recues (instant en images, piste), de la plus ancienne a la plus recente.</summary>
+        internal readonly List<(double T, byte[] Piste)> Echantillons = new();
+    }
+
+    /// <summary>
+    /// LE RETARD D'AFFICHAGE DES AUTRES COUREURS (retour du user du 04/11 : « saccade ») : les positions arrivent 15 fois par
+    /// seconde, le jeu tourne a 60 images. Les autres sont montres 7 images (115 ms) dans le passe, la ou deux positions
+    /// recues les encadrent, et glissent de l'une a l'autre ; au-dela de la derniere, leur mouvement est prolonge 8 images.
+    /// Les coureurs ne se touchent pas : ce retard ne change rien a la course.
+    /// </summary>
+    public const double RetardDAffichage = 7;
+    private const double Prolongement = 8;
+
+    private readonly System.Diagnostics.Stopwatch _horloge = System.Diagnostics.Stopwatch.StartNew();
+
+    /// <summary>L'horloge locale en images (60,0988 par seconde) : l'instant des positions de la salle d'attente, ou toutes
+    /// les bornes sont a l'image de course 0.</summary>
+    public double HorlogeEnImages() => _horloge.Elapsed.TotalSeconds * 60.0988;
+
+    /// <summary>La piste d'un coureur a l'instant <paramref name="cible"/> (en images), glissee entre deux positions recues.</summary>
+    public bool Composer(Coureur coureur, double cible, Span<byte> sortie)
+    {
+        lock (_verrou)
+        {
+            var e = coureur.Echantillons;
+            if (e.Count == 0)
+            {
+                return false;
+            }
+            if (cible <= e[0].T || e.Count == 1)
+            {
+                e[cible <= e[0].T ? 0 : e.Count - 1].Piste.CopyTo(sortie);
+                return true;
+            }
+            for (var i = 0; i < e.Count - 1; i++)
+            {
+                if (cible <= e[i + 1].T)
+                {
+                    var f = (cible - e[i].T) / Math.Max(1e-6, e[i + 1].T - e[i].T);
+                    Glisser(e[i].Piste, e[i + 1].Piste, f, sortie);
+                    return true;
+                }
+            }
+            // au-dela de la derniere position : le mouvement des deux dernieres, prolonge un peu
+            var (ta, a) = e[^2];
+            var (tb, b) = e[^1];
+            var depasse = Math.Min(cible - tb, Prolongement);
+            Glisser(a, b, 1 + depasse / Math.Max(1e-6, tb - ta), sortie);
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Entre deux pistes : la silhouette de la plus proche, a une position glissee. La position dans le niveau (camera + x du
+    /// premier sprite) passe par la camera de la piste rendue ; la hauteur decale tous les sprites. D'une scene a l'autre, pas
+    /// de glissement.
+    /// </summary>
+    internal static void Glisser(byte[] a, byte[] b, double f, Span<byte> sortie)
+    {
+        var reference = f < 0.5 ? a : b;
+        reference.CopyTo(sortie);
+        if (MassRunProtocole.Scene(a) != MassRunProtocole.Scene(b) || a[6] == 0 || b[6] == 0)
+        {
+            return;
+        }
+        double xa = MassRunProtocole.XDansLeNiveau(a), xb = MassRunProtocole.XDansLeNiveau(b);
+        double ya = a[8], yb = b[8];
+        if (Math.Abs(xb - xa) > 128 || Math.Abs(yb - ya) > 96)
+        {
+            return;   // une teleportation (tuyau, mort) : pas de glissement
+        }
+        var x = (int)Math.Round(xa + (xb - xa) * f);
+        var y = (int)Math.Round(ya + (yb - ya) * f);
+        var camera = x - reference[8 + 3];
+        BinaryPrimitives.WriteUInt16LittleEndian(sortie, (ushort)Math.Clamp(camera, 0, ushort.MaxValue));
+        var dy = y - reference[8];
+        for (var s = 0; s < Math.Min((int)reference[6], 8); s++)
+        {
+            var o = 8 + s * 4;
+            if (reference[o] >= 0xEF) continue;
+            sortie[o] = (byte)Math.Clamp(reference[o] + dy, 0, 0xEE);
+        }
     }
 
     private ClientDeSalle(HttpClient http, JsonElement jonction, string hote)
@@ -219,6 +301,18 @@ public sealed class ClientDeSalle : IDisposable
                 coureur.Image = image;
                 MassRunProtocole.Refaire(e, definition, coureur.Piste);
                 coureur.RecuLe = DateTime.UtcNow;
+                // l'instant de la position : son image de course ; en salle d'attente (image 0 pour tous), l'heure d'arrivee
+                var t = image > 0 ? image : HorlogeEnImages();
+                var echantillons = coureur.Echantillons;
+                if (echantillons.Count > 0 && t < echantillons[^1].T - 120)
+                {
+                    echantillons.Clear();   // passage de la salle d'attente a la course
+                }
+                if (echantillons.Count == 0 || t > echantillons[^1].T)
+                {
+                    echantillons.Add((t, (byte[])coureur.Piste.Clone()));
+                    if (echantillons.Count > 8) echantillons.RemoveAt(0);
+                }
             }
         }
     }
