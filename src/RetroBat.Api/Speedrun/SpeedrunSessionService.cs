@@ -120,8 +120,9 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     public SpeedrunSessionService(IEventBus bus, ApiContext contexte, ILogger<SpeedrunSessionService> journal,
         PartieNelfePlayService? partie = null, ICommandesRetroArch? commandes = null, string? fichierDesTentatives = null,
         InterfaceTextService? textes = null, EmulationStationSettingsService? reglages = null, CatalogueDesDefis? catalogue = null,
-        IPrioritesDuJeu? priorites = null)
+        IPrioritesDuJeu? priorites = null, FantomesDuSpeedrun? fantomes = null)
     {
+        _fantomes = fantomes;
         // Sans priorites (les tests), personne ne touche aux processus de la machine.
         _priorites = priorites;
         _catalogue = catalogue ?? new CatalogueDesDefis();
@@ -231,6 +232,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         }
 
         var coeur = reglement.Coeurs.FirstOrDefault() is { Length: > 0 } c ? c : null;
+        // Les fantomes (04/11) : le coeur hote seulement s'ils sont poses et que le site l'admet, sinon le coeur du reglement.
+        if (_fantomes?.Preparer(reglement, _contexte.PlayerPseudo ?? "") == true) coeur = FantomesDuSpeedrun.Coeur;
         var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
             RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, reglement.SystemId, "libretro", coeur, rom, retroAchievements: false);
         if (arguments is null) return new(false, "bad_rules", "systeme ou coeur illisible");
@@ -512,6 +515,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 _derniersReleves.Count == 0 ? "aucun" : string.Join(", ", _derniersReleves.Select(r => Hex.Ecrire(r.Key) + "=" + Hex.Ecrire(r.Value))));
             _ = _bus.PublishAsync(new EventEnvelope { Type = "speedrun.session.closed", Payload = new { sessionId = _session.SessionId } });
             _session = null;
+            FantomesDuSpeedrun.ViderLeDossier();
         }
 
         _priorites?.RendreLaMain();
@@ -867,6 +871,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     }
 
     private long _snapshotPublie = -1;
+
+    private readonly FantomesDuSpeedrun? _fantomes;
 
     /// <summary>Le temps entre l'echec d'un speedrun sur etat et sa relance automatique.</summary>
     private static readonly TimeSpan RelanceApresLEchec = TimeSpan.FromSeconds(1.5);

@@ -1029,9 +1029,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                || RetroBat.Api.Scoring.ScoreLabLabMode.IsActive(DateTime.UtcNow, out _));
 
     /// <summary>
-    /// LE COEUR HOTE DES FANTOMES ET DE MASS RUN (NelfePlay Ghosts) N'EST PAS HOMOLOGUE (CDC MASS RUN §3, §14) : une partie
-    /// sur lui n'envoie rien, ni score, ni temps de defi, ni place de MULTIPLAYER. Il se reconnait a sa version : il garde le
-    /// nom du coeur d'origine (memes options, memes dossiers) et ajoute « NelfePlay Ghosts » a sa version.
+    /// LE COEUR HOTE DES FANTOMES ET DE MASS RUN (NelfePlay Ghosts) N'EST HOMOLOGUE QUE POUR LES SPEEDRUNS (CDC MASS RUN §3, §14 ;
+    /// 04/11) : le site admet son empreinte pour eux, et la borne ne le lance pour un speedrun qu'a cette condition. Toute
+    /// autre partie sur lui n'envoie rien, ni score ni place de MULTIPLAYER. Il se reconnait a sa version : il garde le nom du
+    /// coeur d'origine (memes options, memes dossiers) et ajoute « NelfePlay Ghosts » a sa version.
     /// </summary>
     private bool SurLeCoeurDesFantomes()
     {
@@ -2998,9 +2999,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // qui decidera, un peu plus bas, s'il y avait quelque chose a mesurer.
         _sessionRecue = true;
         if (sessionJson is null) return;
-        if (SurLeCoeurDesFantomes())
+        if (SurLeCoeurDesFantomes() && _partie is not { EstSpeedrun: true })
         {
-            Trace("STOP: coeur hote des fantomes (NelfePlay Ghosts), non homologue : rien n'est envoye");
+            Trace("STOP: coeur hote des fantomes (NelfePlay Ghosts), non homologue hors speedrun : rien n'est envoye");
             return;
         }
         if (_partie is { EstSpeedrun: true } && !SousAtelier())

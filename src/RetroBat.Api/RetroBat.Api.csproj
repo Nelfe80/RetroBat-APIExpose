@@ -20,6 +20,7 @@
     <!-- QR 100 % managé (PngByteQRCode) : le code de réclamation encodé en QR
          sur l'overlay de fin de partie, sans dépendance native ni réseau. -->
     <PackageReference Include="QRCoder" Version="1.6.0" />
+    <PackageReference Include="ZstdSharp.Port" Version="0.8.1" />
   </ItemGroup>
 
   <ItemGroup>

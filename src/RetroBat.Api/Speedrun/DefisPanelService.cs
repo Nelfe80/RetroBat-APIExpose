@@ -40,6 +40,7 @@ public sealed partial class DefisPanelService
     private readonly RetroBat.Api.MassRun.MassRunService? _massrun;
     private IReadOnlyList<RetroBat.Api.MassRun.MassRunService.SalleOuverte> _salles = [];
     private System.Threading.Timer? _minuteurMassRun;
+    private readonly FantomesDuSpeedrun? _fantomes;
     private int _tics;
     private readonly object _verrou = new();
 
@@ -72,9 +73,11 @@ public sealed partial class DefisPanelService
         ApiContext? contexte = null,
         ClassementsDesDefis? classements = null,
         RetroBat.Domain.Interfaces.IEventBus? bus = null,
-        RetroBat.Api.MassRun.MassRunService? massrun = null)
+        RetroBat.Api.MassRun.MassRunService? massrun = null,
+        FantomesDuSpeedrun? fantomes = null)
     {
         _massrun = massrun;
+        _fantomes = fantomes;
         _options = options;
         _collection = collection;
         _session = session;
@@ -387,9 +390,34 @@ public sealed partial class DefisPanelService
     public void X()
     {
         DefisPanelModel.Effet effet;
-        lock (_verrou) effet = _modele.X();
+        lock (_verrou)
+        {
+            if (SurUnSpeedrunAFantomes())
+            {
+                _fantomes!.ChoixSuivant();
+                effet = DefisPanelModel.Effet.LigneChangee;
+            }
+            else
+            {
+                effet = _modele.X();
+            }
+        }
+
         Appliquer(effet);
     }
+
+    /// <summary>Le curseur est sur un speedrun qui se court avec des fantomes : X fait defiler leur choix (D25).</summary>
+    private bool SurUnSpeedrunAFantomes()
+        => _fantomes is not null && _modele.Etat == DefisPanelModel.Foyer.Panneau && _modele.OngletCourant == DefisPanelModel.Onglet.Speedruns
+           && DefiChoisi() is { } defi && FantomesDuSpeedrun.PourCeDefi(defi);
+
+    private string LibelleDesFantomes() => _fantomes?.Choix switch
+    {
+        ChoixDesFantomes.MonRecord => T("speedrun.panel.ghosts.mine", "My record"),
+        ChoixDesFantomes.RecordMondial => T("speedrun.panel.ghosts.world", "World record"),
+        ChoixDesFantomes.Aucun => T("speedrun.panel.ghosts.none", "None"),
+        _ => T("speedrun.panel.ghosts.both", "My record + world record"),
+    };
 
     /// <summary>
     /// Valider ne lance rien dans le panneau (essai du 01/11) : le menu d'ES se referme avant le lancement, et ES, qui
@@ -560,6 +588,7 @@ public sealed partial class DefisPanelService
             new("dpad_leftright", T("speedrun.panel.help.tab", "Tab")),
             new("dpad_updown", T("speedrun.panel.help.choose", "Choose")),
         };
+        if (SurUnSpeedrunAFantomes()) aides.Add(new Aide(_glypheX, T("speedrun.panel.ghosts", "Ghosts")));
         if (_modele.OngletCourant == DefisPanelModel.Onglet.Records && _modele.Epreuves > 1)
         {
             aides.Add(new Aide(_glypheLb, T("speedrun.panel.help.previous", "Previous")));
@@ -582,8 +611,12 @@ public sealed partial class DefisPanelService
         if (defi.Echecs.Count > 0) interdits.Add(T("speedrun.panel.forbid.death", "dying"));
         if (defi.AnnulationsJeu.Any(e => e.Action == "PAUSE_ON") || defi.AnnulationsBorne.Contains("pause_clock_gap"))
             interdits.Add(T("speedrun.panel.forbid.pause", "pause"));
+        IEnumerable<ChampDeFiche> fantomes = _fantomes is not null && FantomesDuSpeedrun.PourCeDefi(defi)
+            ? [new(T("speedrun.panel.ghosts", "Ghosts"), LibelleDesFantomes())]
+            : [];
         return
         [
+            .. fantomes,
             new(T("speedrun.panel.start", "Start"), depart),
             new(T("speedrun.panel.goal", "Goal"), Objectif(defi)),
             new(T("speedrun.panel.forbidden", "Forbidden"), LaPhrase(interdits)),

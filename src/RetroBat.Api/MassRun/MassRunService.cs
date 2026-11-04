@@ -189,6 +189,7 @@ public sealed class MassRunService : IDisposable
                 _canal.Fermer();
                 throw new InvalidOperationException("arguments du lanceur refuses");
             }
+            RetroBat.Api.Speedrun.FantomesDuSpeedrun.ViderLeDossier();
             var salle = new SalleLocale(niveau, attenteSecondes, pseudo, couleur, simules.Count, pistes.Count, rom);
             _salle = salle;
             _arret = false;
@@ -236,6 +237,7 @@ public sealed class MassRunService : IDisposable
             }
             var rom = Path.Combine(RetroBatPaths.RetroBatRoot, "roms", "nes", "Super Mario Bros. (World).zip");
             var etat = EtatRetroArch.Brut(File.ReadAllBytes(Path.Combine(EtatsDesDefis.Racine, "nes", "super-mario-bros", client.Niveau + "-panneau.state")));
+            RetroBat.Api.Speedrun.FantomesDuSpeedrun.ViderLeDossier();
             Arreter();
             _canal ??= new MassRunCanal();
             _canal.PoserSalle(CrcSmb, client.GoLocalUtc, client.Limite, Convert.ToUInt32(couleur, 16), pseudo, client.Niveau, etat, client.RegleMort);

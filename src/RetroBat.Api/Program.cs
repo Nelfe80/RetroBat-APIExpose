@@ -467,6 +467,7 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<NelfePlayScoringCo
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerCatalogueStore>();
 builder.Services.AddSingleton<RetroBat.Api.Speedrun.DefisCollectionSyncService>();
 builder.Services.AddSingleton<RetroBat.Api.Speedrun.ClassementsDesDefis>();
+builder.Services.AddSingleton<RetroBat.Api.Speedrun.FantomesDuSpeedrun>();
 builder.Services.AddSingleton<RetroBat.Api.Speedrun.DefisPanelService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Speedrun.DefisCollectionSyncService>());
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerCollectionSyncService>();
