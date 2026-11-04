@@ -69,6 +69,16 @@ public class DefisApercusTests
     }
 
     [Fact]
+    public void Onglet_MASS_RUN_salle_ouverte()
+    {
+        var salle = new L.SalleMassRun("Salle ouverte", true, "Mass Survival · Super Mario Bros. · Niveau 4-1",
+            "Coureurs inscrits", "87", "Départ dans", "1:42", "la première mort élimine · tu cours à la couleur de ton avatar");
+        var contenu = new L.ContenuDefis([.. Onglets, "MASS RUN"], 4, true, false, [], [], -1, [],
+            new(Style.HelpIcon("y"), "Rejoindre la course"), Aides, Pseudo: "Nelfe", EnLigne: true, MassRun: salle);
+        Ecrire("defis-massrun.png", L.ApercuDefis(Style, contenu, null!));
+    }
+
+    [Fact]
     public void Un_onglet_vide_dit_pourquoi()
     {
         var contenu = new L.ContenuDefis(["SPEEDRUNS"], 0, true, false, [], [], 0, [], null, Aides, Message: "Aucun défi ouvert pour ce jeu");

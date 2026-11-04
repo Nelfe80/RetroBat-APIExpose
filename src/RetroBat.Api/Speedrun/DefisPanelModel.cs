@@ -22,6 +22,8 @@ public sealed class DefisPanelModel
         Training,
         Challenges,
         Speedruns,
+        /// <summary>Une salle MASS RUN ouverte sur ce jeu (CDC MASS RUN D18) : l'onglet d'entree, contre le menu d'ES.</summary>
+        MassRun,
     }
 
     public enum Foyer
@@ -54,6 +56,7 @@ public sealed class DefisPanelModel
         Onglet.Records => "RECORDS",
         Onglet.Training => "TRAINING",
         Onglet.Challenges => "CHALLENGES",
+        Onglet.MassRun => "MASS RUN",
         _ => "SPEEDRUNS",
     };
 

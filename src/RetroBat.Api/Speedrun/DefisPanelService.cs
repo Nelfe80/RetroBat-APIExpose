@@ -37,6 +37,10 @@ public sealed partial class DefisPanelService
     private readonly ApiContext? _contexte;
     private readonly ClassementsDesDefis? _classements;
     private readonly DefisPanelModel _modele = new();
+    private readonly RetroBat.Api.MassRun.MassRunService? _massrun;
+    private IReadOnlyList<RetroBat.Api.MassRun.MassRunService.SalleOuverte> _salles = [];
+    private System.Threading.Timer? _minuteurMassRun;
+    private int _tics;
     private readonly object _verrou = new();
 
     private string _chemin = "";
@@ -67,8 +71,10 @@ public sealed partial class DefisPanelService
         ILogger<DefisPanelService>? journal = null,
         ApiContext? contexte = null,
         ClassementsDesDefis? classements = null,
-        RetroBat.Domain.Interfaces.IEventBus? bus = null)
+        RetroBat.Domain.Interfaces.IEventBus? bus = null,
+        RetroBat.Api.MassRun.MassRunService? massrun = null)
     {
+        _massrun = massrun;
         _options = options;
         _collection = collection;
         _session = session;
@@ -134,6 +140,7 @@ public sealed partial class DefisPanelService
 
         _journal?.LogInformation("Defis : panneau ouvert sur {Chemin}, {Nombre} defi(s).", chemin, _defis.Count);
         _overlay.OuvrirDefis(EsMenuStyle.Lire(_journal), Contenu());
+        DemarrerMassRun();
         if (_classements is not null && regles.Count > 0) _ = ActualiserLesClassementsAsync(_classements, chemin, regles);
     }
 
@@ -162,11 +169,128 @@ public sealed partial class DefisPanelService
         _records = ComposerLesRecords(_defis, _tableaux, langue, Pseudo);
         var onglets = _lignes.Where(p => p.Value.Any(l => l.Defi is not null)).Select(p => p.Key).ToList();
         if (_records.Count > 0) onglets.Add(DefisPanelModel.Onglet.Records);
+        if (SalleDuJeu() is not null) onglets.Add(DefisPanelModel.Onglet.MassRun);
         return onglets;
+    }
+
+    // ── MASS RUN (CDC MASS RUN, lot L5) ──
+
+    /// <summary>La salle ouverte sur ce jeu : inscriptions en cours d'abord, sinon la course en cours.</summary>
+    private RetroBat.Api.MassRun.MassRunService.SalleOuverte? SalleDuJeu()
+    {
+        var jeux = _defis.Select(d => d.SystemId + "/" + d.RomGroup).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var maintenant = DateTime.UtcNow;
+        return _salles.Where(s => jeux.Contains(s.Jeu) && maintenant < s.GoUtc.AddSeconds(s.Limite))
+            .OrderBy(s => s.GoUtc > maintenant ? 0 : 1).ThenBy(s => s.GoUtc).FirstOrDefault();
+    }
+
+    /// <summary>Le minuteur de l'onglet : le decompte chaque seconde, les salles du noeud toutes les 3 s.</summary>
+    private void DemarrerMassRun()
+    {
+        if (_massrun is null) return;
+        _tics = 0;
+        _minuteurMassRun?.Dispose();
+        _minuteurMassRun = new System.Threading.Timer(_ => _ = TicMassRunAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+    }
+
+    private async Task TicMassRunAsync()
+    {
+        if (_massrun is null) return;
+        bool ouvert;
+        lock (_verrou) ouvert = _modele.Etat != DefisPanelModel.Foyer.Ferme;
+        if (!ouvert)
+        {
+            _minuteurMassRun?.Dispose();
+            _minuteurMassRun = null;
+            return;
+        }
+        if (_tics++ % 3 == 0)
+        {
+            var salles = await _massrun.LireLesSallesAsync(CancellationToken.None).ConfigureAwait(false);
+            lock (_verrou)
+            {
+                if (_modele.Etat == DefisPanelModel.Foyer.Ferme) return;
+                _salles = salles;
+                _modele.PoserLesOnglets(Recomposer());
+                PoserLesCompteurs();
+            }
+            Rafraichir();
+            return;
+        }
+        bool surLOnglet;
+        lock (_verrou) surLOnglet = _modele.OngletCourant == DefisPanelModel.Onglet.MassRun;
+        if (surLOnglet) Rafraichir();
+    }
+
+    private ContenuDefis ContenuMassRun(RetroBat.Api.MassRun.MassRunService.SalleOuverte salle)
+    {
+        var maintenant = DateTime.UtcNow;
+        var avant = salle.GoUtc > maintenant;
+        var reste = avant ? salle.GoUtc - maintenant : TimeSpan.Zero;
+        var format = salle.Mort == "elimination" ? "Mass Survival" : "Mass Speedrun";
+        var regle = salle.Mort switch
+        {
+            "elimination" => T("massrun.panel.death.elimination", "first death eliminates"),
+            "jeu" => T("massrun.panel.death.game", "game rules on death"),
+            _ => T("massrun.panel.death.start", "death sends back to the start"),
+        };
+        var niveau = T("massrun.panel.level", "Level") + " " + salle.Niveau;
+        var vue = new SalleMassRun(
+            avant ? T("massrun.panel.open", "Room open") : T("massrun.panel.running", "Race in progress"),
+            true,
+            $"{format} · {_nomDuJeu} · {niveau}",
+            avant ? T("massrun.panel.registered", "Runners registered") : T("massrun.panel.finished", "Finished"),
+            avant ? salle.Inscrits.ToString(System.Globalization.CultureInfo.InvariantCulture) : $"{salle.Arrives}/{salle.Inscrits}",
+            avant ? T("massrun.panel.start_in", "Start in") : T("massrun.panel.race_time", "Race time"),
+            avant ? $"{(int)reste.TotalMinutes}:{reste.Seconds:00}" : $"{(int)(maintenant - salle.GoUtc).TotalMinutes}:{(maintenant - salle.GoUtc).Seconds:00}",
+            $"{regle} · " + T("massrun.panel.color", "you race in your avatar color"));
+        var peutRejoindre = avant && reste > TimeSpan.FromSeconds(6);
+        return new ContenuDefis(
+            _modele.Onglets.Select(DefisPanelModel.Titre).ToList(),
+            _modele.Onglets.ToList().IndexOf(DefisPanelModel.Onglet.MassRun),
+            _modele.Etat == DefisPanelModel.Foyer.Panneau,
+            false, [], [], -1, [],
+            peutRejoindre ? new Aide(_glypheDefier, T("massrun.panel.join", "Join the race")) : null,
+            Aides(),
+            Pseudo: Pseudo,
+            EnLigne: LiaisonNelfePlay.EnLigne,
+            MassRun: vue);
+    }
+
+    /// <summary>Rejoindre la salle : le menu d'ES se referme (comme pour une epreuve), puis la borne prend sa place et lance le jeu.</summary>
+    private async Task RejoindreLaSalleAsync()
+    {
+        RetroBat.Api.MassRun.MassRunService.SalleOuverte? salle;
+        lock (_verrou)
+        {
+            if (_lancement || _massrun is null) return;
+            salle = SalleDuJeu();
+            if (salle is null || salle.GoUtc < DateTime.UtcNow.AddSeconds(6)) return;
+            _lancement = true;
+        }
+        try
+        {
+            EmulatorForeground.FocusEmulationStation();
+            await Task.Delay(150).ConfigureAwait(false);
+            await _es.TapAsync(new EsControllerTapRequest { Input = "back" }, CancellationToken.None).ConfigureAwait(false);
+            await Task.Delay(300).ConfigureAwait(false);
+            await _massrun!.RejoindreAsync(RetroBat.Api.MassRun.MassRunService.Noeud, salle.Id, true, CancellationToken.None).ConfigureAwait(false);
+        }
+        catch (Exception e) when (e is InvalidOperationException or HttpRequestException or TaskCanceledException or IOException)
+        {
+            _journal?.LogWarning("MASS RUN : jonction refusee depuis le panneau : {Message}", e.Message);
+            lock (_verrou) _message = e.Message;
+            Rafraichir();
+        }
+        finally
+        {
+            lock (_verrou) _lancement = false;
+        }
     }
 
     private void PoserLesCompteurs()
     {
+        _modele.PoserLesLignes(DefisPanelModel.Onglet.MassRun, SalleDuJeu() is null ? 0 : 1);
         foreach (var (onglet, lignes) in _lignes) _modele.PoserLesLignes(onglet, Choisissables(lignes).Count, DebutsDeGroupe(lignes));
         _modele.PoserLesTypes(_records.Count);
         PoserLaVueDesRecords();
@@ -309,7 +433,9 @@ public sealed partial class DefisPanelService
                 lock (_verrou) PoserLaVueDesRecords();
                 break;
             case DefisPanelModel.Effet.Valider:
-                _ = LancerAsync();
+                bool massrun;
+                lock (_verrou) massrun = _modele.OngletCourant == DefisPanelModel.Onglet.MassRun;
+                _ = massrun ? RejoindreLaSalleAsync() : LancerAsync();
                 return;
         }
 
@@ -370,6 +496,7 @@ public sealed partial class DefisPanelService
         {
             var onglet = _modele.OngletCourant;
             if (onglet == DefisPanelModel.Onglet.Records && VueCourante is { } vue) return ContenuDesRecords(vue);
+            if (onglet == DefisPanelModel.Onglet.MassRun && SalleDuJeu() is { } salle) return ContenuMassRun(salle);
             var lignes = _lignes.GetValueOrDefault(onglet) ?? [];
             var choisissables = Choisissables(lignes);
             var courante = choisissables.Count == 0 ? -1 : lignes.IndexOf(choisissables[Math.Min(_modele.Ligne, choisissables.Count - 1)]);

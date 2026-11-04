@@ -51,7 +51,15 @@ public sealed partial class LeaderboardOverlayService
         int TypeCourant = 0,
         string Pseudo = "",
         bool EnLigne = false,
-        int? LigneEpinglee = null);
+        int? LigneEpinglee = null,
+        SalleMassRun? MassRun = null);
+
+    /// <summary>
+    /// L'onglet MASS RUN (style B des maquettes, sans image du niveau, D23) : deux grands compteurs, une ligne de salle, un
+    /// pied. Polices et couleurs du theme d'ES, comme les autres panneaux (retour du user du 04/11).
+    /// </summary>
+    public sealed record SalleMassRun(string Etat, bool Direct, string Ligne, string EtiquetteGauche, string ValeurGauche,
+        string EtiquetteDroite, string ValeurDroite, string Pied);
 
     private ContenuDefis? _defis;
 
@@ -154,7 +162,12 @@ public sealed partial class LeaderboardOverlayService
                 y = zone.Bottom + tailleTexte * 0.2f;
             }
 
-            if (d.Lignes.Count == 0)
+            if (d.MassRun is { } salle)
+            {
+                DessinerLaSalleMassRun(g, salle, s, policeTitre, policeTexte, policePetite, policeGroupe, tailleTitre, tailleTexte,
+                    taillePetite, marge, y, basDuContenu);
+            }
+            else if (d.Lignes.Count == 0)
             {
                 using var encre = new SolidBrush(Teinte(s.TextColor));
                 using var centre = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
@@ -172,6 +185,62 @@ public sealed partial class LeaderboardOverlayService
             DessinerLaBarre(g, socle with { Defier = d.Action?.Mot ?? "", GlypheDefier = d.Action?.Glyphe ?? "", DefierMode = "", MaPlace = "" },
                 s, policeTexte, policePetite, tailleTexte, basDeLAide);
             DessinerLAide(g, socle with { Aides = d.Aides, Pseudo = d.Pseudo, EnLigne = d.EnLigne }, s, policePied, taillePied, basDeLAide + tailleTexte * 1.9f);
+        }
+
+        /// <summary>
+        /// La salle MASS RUN : l'etat (pastille rouge en direct), deux cartes aux grands chiffres dans la police du titre du
+        /// theme (inscrits, depart), la ligne de la salle (format, niveau, regle de mort), un pied.
+        /// </summary>
+        private void DessinerLaSalleMassRun(Graphics g, SalleMassRun salle, EsMenuStyle s, Font policeTitre, Font policeTexte,
+            Font policePetite, Font policeGroupe, float tailleTitre, float tailleTexte, float taillePetite, float marge, float y, float bas)
+        {
+            using var encreTitre = new SolidBrush(Teinte(s.TitleColor));
+            using var encreTexte = new SolidBrush(Teinte(s.TextColor));
+            using var encreGroupe = new SolidBrush(Teinte(s.GroupColor));
+            using var encreAccent = new SolidBrush(Teinte(s.SelectorColor));
+            using var aGauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter };
+            using var centre = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+
+            // l'etat, avec la pastille rouge quand une course est ouverte ou en cours
+            var haut = y + tailleTexte * 0.5f;
+            var xEtat = marge;
+            if (salle.Direct)
+            {
+                using var rouge = new SolidBrush(Color.FromArgb(255, 255, 59, 59));
+                var d = taillePetite * 0.8f;
+                g.FillEllipse(rouge, xEtat, haut + (tailleTexte * 1.4f - d) / 2f, d, d);
+                xEtat += d * 1.6f;
+            }
+            g.DrawString(salle.Etat.ToUpperInvariant(), policeGroupe, encreGroupe, new RectangleF(xEtat, haut, Width - xEtat - marge, tailleTexte * 1.4f), aGauche);
+            haut += tailleTexte * 1.9f;
+
+            // deux cartes : etiquette en haut, grand chiffre dessous
+            var ecart = marge * 0.8f;
+            var largeur = (Width - 2 * marge - ecart) / 2f;
+            var hauteur = Math.Min((bas - haut) * 0.62f, largeur * 0.62f);
+            var taille = hauteur * 0.62f;
+            using var grand = new Font(policeTitre.FontFamily, Math.Max(8f, taille), policeTitre.Style, GraphicsUnit.Pixel);
+            for (var i = 0; i < 2; i++)
+            {
+                var carte = new RectangleF(marge + i * (largeur + ecart), haut, largeur, hauteur);
+                Aplat(g, Color.FromArgb(120, 8, 10, 14), carte);
+                var etiquette = i == 0 ? salle.EtiquetteGauche : salle.EtiquetteDroite;
+                var valeur = i == 0 ? salle.ValeurGauche : salle.ValeurDroite;
+                g.DrawString(etiquette.ToUpperInvariant(), policePetite, encreTexte,
+                    new RectangleF(carte.X + taillePetite, carte.Y + taillePetite * 0.4f, carte.Width - 2 * taillePetite, taillePetite * 2f), aGauche);
+                g.DrawString(valeur, grand, i == 0 ? encreTitre : encreAccent,
+                    new RectangleF(carte.X, carte.Y + taillePetite * 2f, carte.Width, carte.Height - taillePetite * 2.2f), centre);
+            }
+            haut += hauteur + tailleTexte * 0.8f;
+
+            // la ligne de la salle, puis le pied
+            Bordure(g, s, haut);
+            g.DrawString(salle.Ligne, policeTexte, encreTitre, new RectangleF(marge, haut + tailleTexte * 0.3f, Width - 2 * marge, tailleTexte * 1.8f), aGauche);
+            haut += tailleTexte * 2.3f;
+            if (salle.Pied.Length > 0 && haut + tailleTexte * 1.5f < bas)
+            {
+                g.DrawString(salle.Pied, policePetite, encreTexte, new RectangleF(marge, haut, Width - 2 * marge, taillePetite * 2f), aGauche);
+            }
         }
 
         private void DessinerLeLogoDesDefis(Graphics g, EsMenuStyle s, Font policeTitre, float hauteurTitre, float y)

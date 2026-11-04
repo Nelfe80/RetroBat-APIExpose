@@ -60,6 +60,38 @@ public sealed class MassRunService : IDisposable
 
     public SalleLocale? Salle => _salle;
 
+    /// <summary>Le noeud des salles : NELFEPLAY_MASSRUN_NOEUD, sinon le noeud d'essai local (lot L5 ; au lot L4, le
+    /// coordinateur du central dira quel noeud tient quelle salle).</summary>
+    public static string Noeud => Environment.GetEnvironmentVariable("NELFEPLAY_MASSRUN_NOEUD") is { Length: > 0 } n ? n : "http://127.0.0.1:8082";
+
+    /// <summary>Une salle ouverte d'un noeud : l'heure du GO! est ramenee a l'horloge de la borne.</summary>
+    public sealed record SalleOuverte(uint Id, string Jeu, string Niveau, string Mort, DateTime GoUtc, int Limite, int Inscrits, int Arrives);
+
+    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(1.5) };
+
+    /// <summary>Les salles ouvertes du noeud ; vide si le noeud ne repond pas (l'onglet MASS RUN n'existe alors pas).</summary>
+    public async Task<IReadOnlyList<SalleOuverte>> LireLesSallesAsync(CancellationToken ct)
+    {
+        try
+        {
+            var json = JsonDocument.Parse(await Http.GetStringAsync(Noeud.TrimEnd('/') + "/massrun/v1/salles", ct).ConfigureAwait(false)).RootElement;
+            var ecart = DateTime.UtcNow - DateTime.UnixEpoch.AddMilliseconds(json.GetProperty("maintenant_unix_ms").GetInt64());
+            return json.GetProperty("salles").EnumerateArray().Select(s => new SalleOuverte(
+                s.GetProperty("salle").GetUInt32(),
+                s.GetProperty("jeu").GetString() ?? "",
+                s.GetProperty("niveau").GetString() ?? "",
+                s.GetProperty("mort").GetString() ?? "debut",
+                DateTime.UnixEpoch.AddMilliseconds(s.GetProperty("go_unix_ms").GetInt64()) + ecart,
+                s.GetProperty("limite").GetInt32(),
+                s.GetProperty("inscrits").GetInt32(),
+                s.GetProperty("arrives").GetInt32())).ToList();
+        }
+        catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException or KeyNotFoundException or InvalidOperationException)
+        {
+            return [];
+        }
+    }
+
     /// <summary>Lance une salle d'essai sur la borne. Leve <see cref="InvalidOperationException"/> si elle ne peut pas partir.</summary>
     public SalleLocale Lancer(string niveau, int attenteSecondes, int coureurs, int limiteSecondes = 300)
     {
