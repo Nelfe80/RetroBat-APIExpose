@@ -177,6 +177,23 @@ public sealed class SessionSpeedrun
         return m;
     }
 
+    private bool _relanceAutomatique;
+
+    /// <summary>
+    /// RELANCE AUTOMATIQUE (demande du user du 04/11 : « un speedrun niveau devrait nous renvoyer au debut du niveau et
+    /// remettre le temps a 0 ») : une tentative ratee d'un speedrun parti sur un etat (niveau, boss, monde) se relance seule ;
+    /// le service la commande apres un court temps. Vrai une fois par tentative ratee.
+    /// </summary>
+    public bool PrendreLaRelanceAutomatique()
+    {
+        var r = _relanceAutomatique;
+        _relanceAutomatique = false;
+        return r;
+    }
+
+    /// <summary>Un speedrun parti sur un etat de depart : le recharger renvoie au debut de l'epreuve.</summary>
+    internal static bool SeRelanceSeul(Reglement r) => r.Kind.StartsWith("speedrun_", StringComparison.Ordinal) && r.Etat is not null;
+
     /// <summary>Les messages au joueur depuis le dernier appel : le service les affiche dans RetroArch.</summary>
     public IReadOnlyList<MessageJoueur> PrendreLesMessages()
     {
@@ -491,7 +508,12 @@ public sealed class SessionSpeedrun
         if (EstClassable(res) && res.FramesOfficielles is { } temps && (_meilleure?.Resultat.FramesOfficielles is not { } vu || temps < vu)
             && _horlogeDuDepart is { } departMs && (_horlogeDArrivee ?? _horlogeDeLImage) is { } arriveeMs)
             _meilleure = new TentativeFinie(AttemptId, Numero, res, departMs, arriveeMs);
-        if (MessageDeFin(res, precedent) is { } message) _messages.Add(message);
+        if (res.Etat == EtatTentative.Ratee && SeRelanceSeul(_r))
+        {
+            _relanceAutomatique = true;
+            _messages.Add(new MessageJoueur("speedrun.msg.failed_restart", "Attempt failed: back to the start."));
+        }
+        else if (MessageDeFin(res, precedent) is { } message) _messages.Add(message);
         Publier("speedrun.attempt.ended", new
         {
             sessionId = SessionId,

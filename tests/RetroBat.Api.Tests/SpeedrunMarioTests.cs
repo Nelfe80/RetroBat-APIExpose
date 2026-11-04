@@ -87,6 +87,14 @@ public class SpeedrunMarioTests
     }
 
     [Fact]
+    public void Un_niveau_rate_se_relance_seul_et_l_any_non()
+    {
+        // demande du user du 04/11 : une mort en speedrun de niveau renvoie au debut du niveau, chrono a 0
+        Assert.True(SessionSpeedrun.SeRelanceSeul(Lire("1-1")));
+        Assert.False(SessionSpeedrun.SeRelanceSeul(Lire("any")));
+    }
+
+    [Fact]
     public void Une_vie_perdue_fait_echouer_un_niveau()
     {
         var p = Assert.Single(Jouer("smb-1-1-mort", "1-1"));

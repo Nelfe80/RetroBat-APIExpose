@@ -843,6 +843,16 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
         foreach (var (attemptId, resultat) in _session.PrendreLesCloses()) EcrireTentative(_session, attemptId, resultat);
         foreach (var message in _session.PrendreLesMessages()) _ = AfficherAsync(message);
+        if (_session.PrendreLaRelanceAutomatique())
+        {
+            // Le joueur voit sa mort et le message, puis l'etat de depart revient et le chrono repart de 0.
+            var sessionId = _session.SessionId;
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(RelanceApresLEchec).ConfigureAwait(false);
+                await CommanderAsync(new CommandeSpeedrun(IdDeLaManette(), sessionId, SessionSpeedrun.ActionRelancer, Confirme: true)).ConfigureAwait(false);
+            });
+        }
         if (_session.Etat != _etatJournalise)
         {
             _journal.LogInformation("Speedrun : session {Session} {Avant} -> {Apres}.", _session.SessionId, _etatJournalise ?? "-", _session.Etat);
@@ -857,6 +867,9 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     }
 
     private long _snapshotPublie = -1;
+
+    /// <summary>Le temps entre l'echec d'un speedrun sur etat et sa relance automatique.</summary>
+    private static readonly TimeSpan RelanceApresLEchec = TimeSpan.FromSeconds(1.5);
 
     // LE DIAGNOSTIC D'UNE SESSION (essai du user du 02/11, 22:56 : neuf minutes sans aucune tentative, sans rien pour dire
     // pourquoi). Chaque changement d'etat se journalise, et la fermeture dit ce que le wrapper a envoye et ce que les releves
