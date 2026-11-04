@@ -45,7 +45,7 @@ public sealed class MassRunCanal : IDisposable
     }
 
     /// <summary>Pose une salle : le coeur la lit au chargement du jeu. L'etat de depart est l'etat brut du coeur.</summary>
-    public void PoserSalle(uint crc, DateTime goUtc, int limiteSecondes, uint couleur, string pseudo, string niveau, byte[] etat)
+    public void PoserSalle(uint crc, DateTime? goUtc, int limiteSecondes, uint couleur, string pseudo, string niveau, byte[] etat)
     {
         if (etat.Length > Taille - OffEtat)
         {
@@ -57,7 +57,7 @@ public sealed class MassRunCanal : IDisposable
         _vue.Write(4, 1u);
         _vue.Write(8, (uint)Taille);
         _vue.Write(OffCrc, crc);
-        _vue.Write(OffGo, goUtc.ToFileTimeUtc());
+        _vue.Write(OffGo, goUtc?.ToFileTimeUtc() ?? 0L);
         _vue.Write(OffLimite, (uint)limiteSecondes);
         _vue.Write(OffCouleur, couleur);
         EcrireTexte(OffPseudo, pseudo, 16);
@@ -68,6 +68,9 @@ public sealed class MassRunCanal : IDisposable
         _sequenceCoureurs = 0;
         _vue.Write(OffActif, 1u);
     }
+
+    /// <summary>L'heure du GO! : le coeur la relit a chaque image (0 = pas encore fixee, la salle d'attente continue).</summary>
+    public void PoserGo(DateTime goUtc) => _vue.Write(OffGo, goUtc.ToFileTimeUtc());
 
     /// <summary>Plus de salle : une partie suivante sur le coeur hote redevient une partie normale.</summary>
     public void Fermer() => _vue.Write(OffActif, 0u);

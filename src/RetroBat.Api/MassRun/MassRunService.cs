@@ -43,8 +43,9 @@ public sealed class MassRunService : IDisposable
         _agent = agent;
     }
 
-    public sealed record SalleLocale(string Niveau, DateTime GoUtc, string Pseudo, string Couleur, int Coureurs, int Pistes, string Rom)
+    public sealed record SalleLocale(string Niveau, int Attente, string Pseudo, string Couleur, int Coureurs, int Pistes, string Rom)
     {
+        public DateTime? GoUtc { get; set; }
         public uint Mode { get; set; }
         public uint ImageCourse { get; set; }
         public uint Arrivee { get; set; }
@@ -88,9 +89,9 @@ public sealed class MassRunService : IDisposable
 
             Arreter();
             _canal ??= new MassRunCanal();
-            // Le GO! tient compte du chargement du jeu (quelques secondes) : la salle d'attente dure ce qui a ete demande.
-            var go = DateTime.UtcNow.AddSeconds(attenteSecondes + 8);
-            _canal.PoserSalle(CrcSmb, go, limiteSecondes, Convert.ToUInt32(couleur, 16), pseudo.Length > 10 ? pseudo[..10] : pseudo, niveau, etat);
+            // Le GO! n'est fixe qu'une fois le jeu charge (le coeur passe en salle d'attente) : la salle d'attente dure alors ce
+            // qui a ete demande, quel que soit le temps de chargement (12 s mesurees sur la borne le 04/11).
+            _canal.PoserSalle(CrcSmb, null, limiteSecondes, Convert.ToUInt32(couleur, 16), pseudo.Length > 10 ? pseudo[..10] : pseudo, niveau, etat);
 
             var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
                 RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, "nes", "libretro", CoeurHote, rom, null);
@@ -99,20 +100,23 @@ public sealed class MassRunService : IDisposable
                 _canal.Fermer();
                 throw new InvalidOperationException("arguments du lanceur refuses");
             }
-            var lanceur = LancementDirect.Lancer(arguments, "nes", rom, _contexte, _bus, _journal);
-            if (lanceur is null)
-            {
-                _canal.Fermer();
-                throw new InvalidOperationException("emulatorLauncher n'a pas demarre");
-            }
-            var salle = new SalleLocale(niveau, go, pseudo, couleur, simules.Count, pistes.Count, rom);
+            var salle = new SalleLocale(niveau, attenteSecondes, pseudo, couleur, simules.Count, pistes.Count, rom);
             _salle = salle;
             _arret = false;
             var canal = _canal;
-            _boucle = new Thread(() => Boucle(canal, salle, simules, lanceur)) { IsBackground = true, Name = "MassRun", Priority = ThreadPriority.AboveNormal };
+            // La boucle d'abord : le lancement direct rend la main tard (30 s mesurees), le jeu tourne deja.
+            _boucle = new Thread(() => Boucle(canal, salle, simules)) { IsBackground = true, Name = "MassRun", Priority = ThreadPriority.AboveNormal };
             _boucle.Start();
-            _journal.LogInformation("MASS RUN : salle {Niveau} lancee, GO! a {Go:HH:mm:ss}, {Coureurs} coureurs simules ({Pistes} pistes), {Pseudo} #{Couleur}",
-                niveau, go.ToLocalTime(), simules.Count, pistes.Count, pseudo, couleur);
+            _ = Task.Run(() =>
+            {
+                if (LancementDirect.Lancer(arguments, "nes", rom, _contexte, _bus, _journal) is null)
+                {
+                    _journal.LogWarning("MASS RUN : emulatorLauncher n'a pas demarre");
+                    _arret = true;
+                }
+            });
+            _journal.LogInformation("MASS RUN : salle {Niveau} lancee, {Attente} s d'attente, {Coureurs} coureurs simules ({Pistes} pistes), {Pseudo} #{Couleur}",
+                niveau, attenteSecondes, simules.Count, pistes.Count, pseudo, couleur);
             return salle;
         }
     }
@@ -155,17 +159,24 @@ public sealed class MassRunService : IDisposable
     /// A chaque image publiee par le coeur : les coureurs de la fenetre qui commence a cette image. Pendant la salle d'attente,
     /// chaque coureur boucle sur sa piste ; en course, il est a son image de course.
     /// </summary>
-    private void Boucle(MassRunCanal canal, SalleLocale salle, List<Simule> simules, Process lanceur)
+    private void Boucle(MassRunCanal canal, SalleLocale salle, List<Simule> simules)
     {
         uint dernierMode = 0, derniereImage = uint.MaxValue, derniereImageMode = uint.MaxValue;
         var arriveeNotee = false;
+        var debut = DateTime.UtcNow;
+        var vu = false;
+        var controle = DateTime.MinValue;
         try
         {
             while (!_arret)
             {
-                if (lanceur.HasExited && Process.GetProcessesByName("retroarch").Length == 0)
+                // La fin : le jeu a tourne puis RetroArch a disparu, ou il n'a jamais demarre en 3 minutes.
+                if (DateTime.UtcNow - controle > TimeSpan.FromSeconds(1))
                 {
-                    break;
+                    controle = DateTime.UtcNow;
+                    var tourne = Process.GetProcessesByName("retroarch").Length > 0;
+                    if (tourne) vu = true;
+                    else if (vu || DateTime.UtcNow - debut > TimeSpan.FromMinutes(3)) break;
                 }
                 var joueur = canal.LireJoueur();
                 if (joueur is { } j)
@@ -176,6 +187,12 @@ public sealed class MassRunService : IDisposable
                     {
                         _journal.LogInformation("MASS RUN : mode {Mode}", j.Mode);
                         dernierMode = j.Mode;
+                        if (j.Mode == 2 && salle.GoUtc is null)
+                        {
+                            salle.GoUtc = DateTime.UtcNow.AddSeconds(salle.Attente + 5);
+                            canal.PoserGo(salle.GoUtc.Value);
+                            _journal.LogInformation("MASS RUN : jeu charge, GO! a {Go:HH:mm:ss}", salle.GoUtc.Value.ToLocalTime());
+                        }
                     }
                     var attente = j.Mode == 2;
                     if (attente ? j.ImageMode != derniereImageMode : j.ImageCourse != derniereImage)
