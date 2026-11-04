@@ -83,8 +83,8 @@ public sealed partial class DefisPanelService
         }
 
         _journal?.LogInformation("Defis : {Defi} lance depuis le panneau.", defi.ChallengeId);
+        // ES ne sait pas qu'un jeu tourne : sa musique se tait jusqu'a la fin du jeu (SonDEmulationStation la rend ensuite).
         _sonDEs?.Couper();
-        _sonDEs?.RendreAuProchainAppui();
         string? fanart = null;
         try { fanart = RetroBat.Api.Media.MediaDuGamelist.Resoudre(chemin, "fanart", "image"); }
         catch (Exception ex) { _journal?.LogDebug(ex, "Defis : fanart introuvable pour {Chemin}.", chemin); }

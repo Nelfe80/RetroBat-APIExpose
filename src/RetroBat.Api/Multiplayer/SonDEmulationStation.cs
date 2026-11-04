@@ -28,6 +28,11 @@ public interface ISessionsDuMelangeur
 /// garde le bouton muet d'une application d'un lancement a l'autre). Hors d'une partie MULTIPLAYER, ES n'est jamais laisse
 /// muet : a son demarrage, au retour d'un jeu et a chaque activite dans ES, toute session muette retrouve le son, y compris
 /// une session coupee a la main dans le melangeur. Couper la musique, c'est le reglage d'ES.
+///
+/// LES EPREUVES ET LES COURSES MASS RUN (04/11) : le panneau des defis lance aussi le jeu lui-meme. Il rendait le son des le
+/// lancement, et la musique d'ES revenait au premier appui en jeu, ou 20 s apres. Le son se tient coupe tant qu'un jeu tourne
+/// (emulatorLauncher ou RetroArch) ; parti depuis quelques secondes, le son revient au premier appui, comme apres une partie
+/// MULTIPLAYER. Un lancement qui ne donne aucun jeu ne laisse pas ES muet.
 /// </summary>
 [SupportedOSPlatform("windows")]
 public sealed class SonDEmulationStation : IDisposable
@@ -43,10 +48,16 @@ public sealed class SonDEmulationStation : IDisposable
     /// <summary>Le melangeur n'est pas relu plus souvent que ca, quelle que soit l'activite dans ES.</summary>
     private static readonly TimeSpan EntreDeuxControles = TimeSpan.FromSeconds(2);
 
+    /// <summary>Les processus d'un jeu en cours : le lanceur vit tant que l'emulateur tourne.</summary>
+    private static readonly string[] ProcessusDuJeu = ["emulatorLauncher", "retroarch"];
+
     private readonly ISessionsDuMelangeur _melangeur;
     private readonly TimeSpan _apresLAppui;
     private readonly TimeSpan _periode;
     private readonly TimeSpan _auPlusTard;
+    private readonly Func<bool> _jeuEnCours;
+    private readonly TimeSpan _absenceDuJeu;
+    private readonly TimeSpan _sansJeuAuDepart;
     private readonly ILogger<SonDEmulationStation>? _journal;
     private readonly IDisposable? _abonnement;
     private readonly System.Threading.Timer _minuterie;
@@ -55,6 +66,9 @@ public sealed class SonDEmulationStation : IDisposable
     private Etat _etat = Etat.Libre;
     private DateTime _rendreAvant;
     private DateTime _dernierControle;
+    private DateTime _coupeA;
+    private bool _jeuVu;
+    private DateTime? _absentDepuis;
 
     private enum Etat
     {
@@ -70,12 +84,18 @@ public sealed class SonDEmulationStation : IDisposable
     }
 
     internal SonDEmulationStation(ISessionsDuMelangeur melangeur, TimeSpan apresLAppui, IEventBus? bus = null,
-        ILogger<SonDEmulationStation>? journal = null, TimeSpan? periode = null, TimeSpan? auPlusTard = null)
+        ILogger<SonDEmulationStation>? journal = null, TimeSpan? periode = null, TimeSpan? auPlusTard = null,
+        Func<bool>? jeuEnCours = null, TimeSpan? absenceDuJeu = null, TimeSpan? sansJeuAuDepart = null)
     {
         _melangeur = melangeur;
         _apresLAppui = apresLAppui;
         _periode = periode ?? TimeSpan.FromSeconds(2);
         _auPlusTard = auPlusTard ?? TimeSpan.FromSeconds(20);
+        _jeuEnCours = jeuEnCours ?? UnJeuTourne;
+        // Plus que l'ecart entre deux lancements (une course MASS RUN qui suit la precedente) ; un lanceur part en moins d'une
+        // seconde, 90 s sans jeu veulent dire que le lancement a echoue.
+        _absenceDuJeu = absenceDuJeu ?? TimeSpan.FromSeconds(6);
+        _sansJeuAuDepart = sansJeuAuDepart ?? TimeSpan.FromSeconds(90);
         _journal = journal;
         _minuterie = new System.Threading.Timer(_ => Tenir(), null, Timeout.Infinite, Timeout.Infinite);
         _abonnement = bus?.Subscribe<EventEnvelope>(e => SurEvenement(e.Type));
@@ -103,12 +123,15 @@ public sealed class SonDEmulationStation : IDisposable
         }
     }
 
-    /// <summary>Une partie MULTIPLAYER part : ES se tait jusqu'a la fin.</summary>
+    /// <summary>Un jeu lance par l'API part (partie MULTIPLAYER, epreuve, course MASS RUN) : ES se tait jusqu'a la fin.</summary>
     public void Couper()
     {
         lock (_verrou)
         {
             _etat = Etat.Coupe;
+            _coupeA = DateTime.UtcNow;
+            _jeuVu = false;
+            _absentDepuis = null;
         }
 
         DecrireAvantLaPartie();
@@ -269,6 +292,12 @@ public sealed class SonDEmulationStation : IDisposable
                 return;
             }
 
+            if (etat == Etat.Coupe && LeJeuEstParti())
+            {
+                _journal?.LogInformation("Son d'EmulationStation : plus de jeu en cours, le son revient au premier appui");
+                RendreAuProchainAppui();
+            }
+
             foreach (var session in _melangeur.De(Processus))
             {
                 if (session.Muette)
@@ -298,6 +327,47 @@ public sealed class SonDEmulationStation : IDisposable
         {
             _journal?.LogDebug(ex, "MULTIPLAYER : melangeur de Windows injoignable");
         }
+    }
+
+    /// <summary>
+    /// Le jeu lance par l'API est-il parti ? Absent depuis <see cref="_absenceDuJeu"/>, apres avoir tourne, ou sans jamais
+    /// etre apparu depuis la coupure (lancement rate). Une absence plus courte (une relance) ne compte pas.
+    /// </summary>
+    private bool LeJeuEstParti()
+    {
+        var enCours = _jeuEnCours();
+        var maintenant = DateTime.UtcNow;
+        lock (_verrou)
+        {
+            if (enCours)
+            {
+                _jeuVu = true;
+                _absentDepuis = null;
+                return false;
+            }
+
+            _absentDepuis ??= maintenant;
+            return maintenant - _absentDepuis.Value >= _absenceDuJeu && (_jeuVu || maintenant - _coupeA >= _sansJeuAuDepart);
+        }
+    }
+
+    private static bool UnJeuTourne()
+    {
+        foreach (var nom in ProcessusDuJeu)
+        {
+            var processus = Process.GetProcessesByName(nom);
+            foreach (var p in processus)
+            {
+                p.Dispose();
+            }
+
+            if (processus.Length > 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void RendreQuandEsEstLa()

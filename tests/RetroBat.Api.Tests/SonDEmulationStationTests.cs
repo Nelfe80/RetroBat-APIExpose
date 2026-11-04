@@ -15,9 +15,11 @@ public sealed class SonDEmulationStationTests
 {
     private readonly SimpleEventBus _bus = new();
     private static readonly TimeSpan Vite = TimeSpan.FromMilliseconds(20);
+    private volatile bool _jeu = true;
 
-    private SonDEmulationStation Son(FauxMelangeur melangeur, TimeSpan? auPlusTard = null)
-        => new(melangeur, TimeSpan.FromMilliseconds(10), _bus, journal: null, periode: Vite, auPlusTard: auPlusTard ?? TimeSpan.FromMinutes(5));
+    private SonDEmulationStation Son(FauxMelangeur melangeur, TimeSpan? auPlusTard = null, TimeSpan? sansJeuAuDepart = null)
+        => new(melangeur, TimeSpan.FromMilliseconds(10), _bus, journal: null, periode: Vite, auPlusTard: auPlusTard ?? TimeSpan.FromMinutes(5),
+            jeuEnCours: () => _jeu, absenceDuJeu: TimeSpan.FromMilliseconds(100), sansJeuAuDepart: sansJeuAuDepart ?? TimeSpan.FromMinutes(5));
 
     [Fact]
     public void Une_partie_coupe_la_musique_et_les_videos_d_ES()
@@ -144,6 +146,60 @@ public sealed class SonDEmulationStationTests
         melangeur.Ajouter("musique", true);
 
         await Attendre(() => !melangeur.Muette("musique"));
+    }
+
+    [Fact]
+    public async Task Un_jeu_lance_par_l_API_garde_ES_muet_tant_qu_il_tourne()
+    {
+        // Le panneau des defis (01/11) rendait le son des le lancement : la musique d'ES revenait au premier appui en jeu.
+        var melangeur = new FauxMelangeur(("musique", false));
+        using var son = Son(melangeur);
+        son.Couper();
+
+        await Appuyer();
+        await Task.Delay(400);
+        Assert.True(melangeur.Muette("musique"));
+
+        // Le jeu est ferme : le son revient au premier appui.
+        _jeu = false;
+        await Task.Delay(400);
+        Assert.True(melangeur.Muette("musique"));
+        await Appuyer();
+        await Attendre(() => !melangeur.Muette("musique"));
+        Assert.False(son.Coupe);
+    }
+
+    [Fact]
+    public async Task Un_lancement_sans_jeu_ne_laisse_pas_ES_muet()
+    {
+        _jeu = false;
+        var melangeur = new FauxMelangeur(("musique", false));
+        using var son = Son(melangeur, auPlusTard: TimeSpan.FromMilliseconds(100), sansJeuAuDepart: TimeSpan.FromMilliseconds(200));
+        son.Couper();
+        Assert.True(melangeur.Muette("musique"));
+
+        await Attendre(() => !melangeur.Muette("musique"));
+        Assert.False(son.Coupe);
+    }
+
+    [Fact]
+    public async Task Une_relance_du_jeu_garde_ES_muet()
+    {
+        var melangeur = new FauxMelangeur(("musique", false));
+        using var son = Son(melangeur);
+        son.Couper();
+        await Task.Delay(60);
+
+        // Le lanceur d'une course se ferme, celui de la suivante part dans la foulee.
+        _jeu = false;
+        await Task.Delay(40);
+        _jeu = true;
+        await Task.Delay(300);
+        await Appuyer();
+        await Task.Delay(100);
+
+        Assert.True(melangeur.Muette("musique"));
+        Assert.True(son.Coupe);
     }
 
     /// <summary>Le vrai melangeur, en lecture seule : outil de mise au point, hors des passes ordinaires.</summary>

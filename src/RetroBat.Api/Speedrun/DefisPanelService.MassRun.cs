@@ -433,8 +433,8 @@ public sealed partial class DefisPanelService
         {
             var lanceA = DateTime.Now;
             await _massrun.RejoindreAsync(_massrun.NoeudCourant, salle.Id, true, CancellationToken.None).ConfigureAwait(false);
+            // Comme une epreuve : la musique d'ES se tait jusqu'a la fin du jeu (SonDEmulationStation la rend ensuite).
             _sonDEs?.Couper();
-            _sonDEs?.RendreAuProchainAppui();
             MontrerLeDepartMassRun(new CourseRejointe(salle, jeu, fanart, lanceA));
             return null;
         }
