@@ -103,7 +103,10 @@ public static class LanceurDuDirect
         if (finS is double fin) arguments.AddRange(["--fin", fin.ToString("0.##", CultureInfo.InvariantCulture)]);
         arguments.AddRange(Forme(forme));
         arguments.AddRange(Fond(fond));
-        arguments.AddRange(CrtPhotographique(crt));
+        // Le CRT leger, comme le direct (04/11) : le CRT photographique sur processeur rendait les films 4 fois plus lents
+        // sur la borne (0,72x le temps reel contre 2,9x), et l'exe publie (0.7.1) ignore l'option. Il reviendra avec son
+        // chemin Direct3D, au cout du CRT leger.
+        arguments.AddRange(Crt(crt));
         return arguments;
     }
 

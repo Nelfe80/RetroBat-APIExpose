@@ -219,9 +219,8 @@ public sealed class DirectDuRecordTests
     {
         Assert.Equal(attendu, LanceurDuDirect.EcranATube(systeme));
         Assert.Equal(attendu, LanceurDuDirect.Arguments("f.mkv", 0, crt: LanceurDuDirect.EcranATube(systeme)).Contains("--crt"));
-        // le film YouTube prend le CRT photographique (exe 0.8.0), le direct garde le CRT leger
-        Assert.Equal(attendu, LanceurDuDirect.ArgumentsDeLaVersion("f.mkv", "v.flv", 0, crt: LanceurDuDirect.EcranATube(systeme)).Contains("--crt-photographic"));
-        Assert.DoesNotContain("--crt", LanceurDuDirect.ArgumentsDeLaVersion("f.mkv", "v.flv", 0, crt: LanceurDuDirect.EcranATube(systeme)));
+        Assert.Equal(attendu, LanceurDuDirect.ArgumentsDeLaVersion("f.mkv", "v.flv", 0, crt: LanceurDuDirect.EcranATube(systeme)).Contains("--crt"));
+        Assert.DoesNotContain("--crt-photographic", LanceurDuDirect.ArgumentsDeLaVersion("f.mkv", "v.flv", 0, crt: true));
     }
 
     [Theory]
