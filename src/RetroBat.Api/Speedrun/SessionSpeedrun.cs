@@ -177,19 +177,28 @@ public sealed class SessionSpeedrun
         return m;
     }
 
-    private bool _relanceAutomatique;
+    private TimeSpan? _relanceAutomatique;
 
     /// <summary>
-    /// RELANCE AUTOMATIQUE (demande du user du 04/11 : « un speedrun niveau devrait nous renvoyer au debut du niveau et
-    /// remettre le temps a 0 ») : une tentative ratee d'un speedrun parti sur un etat (niveau, boss, monde) se relance seule ;
-    /// le service la commande apres un court temps. Vrai une fois par tentative ratee.
+    /// RELANCE AUTOMATIQUE (demandes du user du 04/11 : « un speedrun niveau devrait nous renvoyer au debut du niveau et remettre
+    /// le temps a 0 », et a l'arrivee aussi « un retour au debut tant que le joueur ne sort pas ») : un speedrun parti sur un
+    /// etat (niveau, boss, monde) repart seul apres un echec ou une arrivee ; le service la commande au bout de ce delai. Rendu
+    /// une fois par tentative.
     /// </summary>
-    public bool PrendreLaRelanceAutomatique()
+    public TimeSpan? PrendreLaRelanceAutomatique()
     {
         var r = _relanceAutomatique;
-        _relanceAutomatique = false;
+        _relanceAutomatique = null;
         return r;
     }
+
+    /// <summary>Le temps avant de repartir : assez pour voir sa mort, ou son temps a l'arrivee. Null : pas de relance. Pur.</summary>
+    internal static TimeSpan? DelaiDeRelance(Reglement r, EtatTentative etat) => !SeRelanceSeul(r) ? null : etat switch
+    {
+        EtatTentative.Ratee => TimeSpan.FromSeconds(1.5),
+        EtatTentative.Finie => TimeSpan.FromSeconds(3),
+        _ => null,
+    };
 
     /// <summary>Un speedrun parti sur un etat de depart : le recharger renvoie au debut de l'epreuve.</summary>
     internal static bool SeRelanceSeul(Reglement r) => r.Kind.StartsWith("speedrun_", StringComparison.Ordinal) && r.Etat is not null;
@@ -508,11 +517,9 @@ public sealed class SessionSpeedrun
         if (EstClassable(res) && res.FramesOfficielles is { } temps && (_meilleure?.Resultat.FramesOfficielles is not { } vu || temps < vu)
             && _horlogeDuDepart is { } departMs && (_horlogeDArrivee ?? _horlogeDeLImage) is { } arriveeMs)
             _meilleure = new TentativeFinie(AttemptId, Numero, res, departMs, arriveeMs);
-        if (res.Etat == EtatTentative.Ratee && SeRelanceSeul(_r))
-        {
-            _relanceAutomatique = true;
+        _relanceAutomatique = DelaiDeRelance(_r, res.Etat);
+        if (res.Etat == EtatTentative.Ratee && _relanceAutomatique is not null)
             _messages.Add(new MessageJoueur("speedrun.msg.failed_restart", "Attempt failed: back to the start."));
-        }
         else if (MessageDeFin(res, precedent) is { } message) _messages.Add(message);
         Publier("speedrun.attempt.ended", new
         {

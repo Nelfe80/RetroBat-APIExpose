@@ -95,6 +95,16 @@ public class SpeedrunMarioTests
     }
 
     [Fact]
+    public void Un_niveau_repart_apres_une_mort_et_apres_l_arrivee_tant_que_le_joueur_ne_sort_pas()
+    {
+        Assert.Equal(TimeSpan.FromSeconds(1.5), SessionSpeedrun.DelaiDeRelance(Lire("1-1"), EtatTentative.Ratee));
+        Assert.Equal(TimeSpan.FromSeconds(3), SessionSpeedrun.DelaiDeRelance(Lire("1-1"), EtatTentative.Finie));
+        Assert.Null(SessionSpeedrun.DelaiDeRelance(Lire("1-1"), EtatTentative.Annulee));
+        Assert.Null(SessionSpeedrun.DelaiDeRelance(Lire("1-1"), EtatTentative.Abandonnee));
+        Assert.Null(SessionSpeedrun.DelaiDeRelance(Lire("any"), EtatTentative.Finie));
+    }
+
+    [Fact]
     public void La_page_de_depart_ne_porte_pas_la_ligne_des_fantomes()
     {
         // 04/11 : la fiche a deux colonnes ; un 7e champ ouvrait une 4e rangee et la carte passait sur le bouton HOLD.
