@@ -88,6 +88,7 @@ public sealed partial class DefisPanelService
         _contexte = contexte;
         _classements = classements;
         _abonnement = bus?.Subscribe<RetroBat.Domain.Events.EventEnvelope>(SurEvenement);
+        if (_massrun is not null) _massrun.SalleQuittee += SurSalleQuittee;
     }
 
     public bool Actif => _options.CurrentValue.NelfePlay is { Enabled: true, ShowChallengesCollection: true };
@@ -175,13 +176,16 @@ public sealed partial class DefisPanelService
 
     // ── MASS RUN (CDC MASS RUN, lot L5) ──
 
-    /// <summary>La salle ouverte sur ce jeu : inscriptions en cours d'abord, sinon la course en cours.</summary>
+    /// <summary>
+    /// La salle ouverte sur ce jeu : celle qui prend des inscriptions d'abord, sinon celle en salle d'attente, sinon la course
+    /// en cours.
+    /// </summary>
     private RetroBat.Api.MassRun.MassRunService.SalleOuverte? SalleDuJeu()
     {
         var jeux = _defis.Select(d => d.SystemId + "/" + d.RomGroup).ToHashSet(StringComparer.OrdinalIgnoreCase);
         var maintenant = DateTime.UtcNow;
         return _salles.Where(s => jeux.Contains(s.Jeu) && maintenant < s.GoUtc.AddSeconds(s.Limite))
-            .OrderBy(s => s.GoUtc > maintenant ? 0 : 1).ThenBy(s => s.GoUtc).FirstOrDefault();
+            .OrderBy(s => s.Inscriptions(maintenant) ? 0 : s.GoUtc > maintenant ? 1 : 2).ThenBy(s => s.GoUtc).FirstOrDefault();
     }
 
     /// <summary>Le minuteur de l'onglet : le decompte chaque seconde, les salles du noeud toutes les 3 s.</summary>
@@ -222,29 +226,28 @@ public sealed partial class DefisPanelService
         if (surLOnglet) Rafraichir();
     }
 
+    /// <summary>
+    /// L'onglet d'une salle, en trois temps (04/11) : les inscriptions, decomptees jusqu'a leur fin (la salle d'attente des
+    /// derniers inscrits dure encore une minute dans le jeu, jusqu'au GO!) ; la salle d'attente, sans inscription ; la course.
+    /// </summary>
     private ContenuDefis ContenuMassRun(RetroBat.Api.MassRun.MassRunService.SalleOuverte salle)
     {
         var maintenant = DateTime.UtcNow;
+        var inscriptions = salle.Inscriptions(maintenant);
         var avant = salle.GoUtc > maintenant;
-        var reste = avant ? salle.GoUtc - maintenant : TimeSpan.Zero;
-        var format = salle.Mort == "elimination" ? "Mass Survival" : "Mass Speedrun";
-        var regle = salle.Mort switch
-        {
-            "elimination" => T("massrun.panel.death.elimination", "first death eliminates"),
-            "jeu" => T("massrun.panel.death.game", "game rules on death"),
-            _ => T("massrun.panel.death.start", "death sends back to the start"),
-        };
+        var format = FormatDe(salle);
         var niveau = T("massrun.panel.level", "Level") + " " + salle.Niveau;
+        var inscrits = salle.Inscrits.ToString(System.Globalization.CultureInfo.InvariantCulture);
         var vue = new SalleMassRun(
-            avant ? T("massrun.panel.open", "Room open") : T("massrun.panel.running", "Race in progress"),
+            inscriptions ? T("massrun.panel.open", "Room open") : avant ? T("massrun.panel.closed", "Registration closed") : T("massrun.panel.running", "Race in progress"),
             true,
             $"{format} · {_nomDuJeu} · {niveau}",
             avant ? T("massrun.panel.registered", "Runners registered") : T("massrun.panel.finished", "Finished"),
-            avant ? salle.Inscrits.ToString(System.Globalization.CultureInfo.InvariantCulture) : $"{salle.Arrives}/{salle.Inscrits}",
-            avant ? T("massrun.panel.start_in", "Start in") : T("massrun.panel.race_time", "Race time"),
-            avant ? $"{(int)reste.TotalMinutes}:{reste.Seconds:00}" : $"{(int)(maintenant - salle.GoUtc).TotalMinutes}:{(maintenant - salle.GoUtc).Seconds:00}",
-            $"{regle} · " + T("massrun.panel.color", "you race in your avatar color"));
-        var peutRejoindre = avant && reste > TimeSpan.FromSeconds(6);
+            avant ? inscrits : $"{salle.Arrives}/{salle.Inscrits}",
+            inscriptions ? T("massrun.panel.closes_in", "Registration closes in") : avant ? T("massrun.panel.start_in", "Start in") : T("massrun.panel.race_time", "Race time"),
+            Horloge(inscriptions ? salle.InscriptionsUtc - maintenant : avant ? salle.GoUtc - maintenant : maintenant - salle.GoUtc),
+            $"{RegleDe(salle)} · " + T("massrun.panel.color", "you race in your avatar color"));
+        var peutRejoindre = inscriptions;
         return new ContenuDefis(
             _modele.Onglets.Select(DefisPanelModel.Titre).ToList(),
             _modele.Onglets.ToList().IndexOf(DefisPanelModel.Onglet.MassRun),
@@ -257,30 +260,37 @@ public sealed partial class DefisPanelService
             MassRun: vue);
     }
 
-    /// <summary>Rejoindre la salle : le menu d'ES se referme (comme pour une epreuve), puis la borne prend sa place et lance le jeu.</summary>
+    /// <summary>
+    /// Rejoindre la salle : le menu d'ES se referme (comme pour une epreuve), puis la borne prend sa place, lance le jeu et
+    /// montre le depart.
+    /// </summary>
     private async Task RejoindreLaSalleAsync()
     {
         RetroBat.Api.MassRun.MassRunService.SalleOuverte? salle;
+        string jeu, chemin;
         lock (_verrou)
         {
             if (_lancement || _massrun is null) return;
             salle = SalleDuJeu();
-            if (salle is null || salle.GoUtc < DateTime.UtcNow.AddSeconds(6)) return;
+            if (salle is null || !salle.Inscriptions(DateTime.UtcNow)) return;
             _lancement = true;
+            jeu = _nomDuJeu;
+            chemin = _chemin;
         }
         try
         {
+            string? fanart = null;
+            try { fanart = RetroBat.Api.Media.MediaDuGamelist.Resoudre(chemin, "fanart", "image"); }
+            catch (Exception ex) { _journal?.LogDebug(ex, "MASS RUN : fanart introuvable pour {Chemin}.", chemin); }
             EmulatorForeground.FocusEmulationStation();
             await Task.Delay(150).ConfigureAwait(false);
             await _es.TapAsync(new EsControllerTapRequest { Input = "back" }, CancellationToken.None).ConfigureAwait(false);
             await Task.Delay(300).ConfigureAwait(false);
-            await _massrun!.RejoindreAsync(_massrun.NoeudCourant, salle.Id, true, CancellationToken.None).ConfigureAwait(false);
-        }
-        catch (Exception e) when (e is InvalidOperationException or HttpRequestException or TaskCanceledException or IOException)
-        {
-            _journal?.LogWarning("MASS RUN : jonction refusee depuis le panneau : {Message}", e.Message);
-            lock (_verrou) _message = e.Message;
-            Rafraichir();
+            if (await RejoindreAsync(salle, jeu, fanart).ConfigureAwait(false) is { } refus)
+            {
+                lock (_verrou) _message = refus;
+                Rafraichir();
+            }
         }
         finally
         {

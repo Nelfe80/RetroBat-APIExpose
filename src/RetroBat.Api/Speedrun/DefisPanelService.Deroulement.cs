@@ -100,6 +100,8 @@ public sealed partial class DefisPanelService
             _modele.Fermer();
             _page = PageDEpreuve.Preparation;
             _epreuve = epreuve;
+            _course = null;
+            _bilanDeCourse = null;
             _bilanAffiche = null;
             _verdictEnAttente = null;
             _validerDepuis = _annulerDepuis = null;
@@ -171,19 +173,23 @@ public sealed partial class DefisPanelService
     private void QuitterLaPreparation()
     {
         EpreuveLancee? epreuve;
+        CourseRejointe? course;
         lock (_verrou)
         {
             if (_page != PageDEpreuve.Preparation) return;
             epreuve = _epreuve;
+            course = _course;
             _page = PageDEpreuve.Aucune;
             _epreuve = null;
+            _course = null;
             _suiteDeLaPage?.Cancel();
         }
 
-        _journal?.LogInformation("Defis : le joueur quitte la preparation de {Defi}.", epreuve?.Defi.ChallengeId);
+        _journal?.LogInformation("Defis : le joueur quitte la preparation de {Defi}.", epreuve?.Defi.ChallengeId ?? "MASS RUN");
         _overlay.Fermer();
         EmulatorForeground.FocusEmulationStation();
         if (epreuve is not null) _ = Task.Run(() => FermerLeJeuAsync(epreuve.LanceALocal));
+        if (course is not null) _ = Task.Run(() => FermerLeJeuAsync(course.LanceALocal));
     }
 
     /// <summary>RetroArch n'entend QUIT qu'une fois charge : on insiste jusqu'a ce que le jeu de ce lancement soit parti.</summary>
@@ -415,6 +421,8 @@ public sealed partial class DefisPanelService
             _page = PageDEpreuve.Aucune;
             _bilanAffiche = null;
             _epreuve = null;
+            _bilanDeCourse = null;
+            _course = null;
             _suiteDeLaPage?.Cancel();
         }
 
@@ -424,6 +432,14 @@ public sealed partial class DefisPanelService
 
     private void RelancerDepuisLeBilan()
     {
+        bool course;
+        lock (_verrou) course = _page == PageDEpreuve.Bilan && _course is not null;
+        if (course)
+        {
+            CourseSuivante();
+            return;
+        }
+
         EpreuveLancee? epreuve;
         lock (_verrou)
         {

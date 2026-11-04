@@ -73,6 +73,8 @@ public sealed class MassRunService : IDisposable
         public string? Noeud { get; init; }
         public uint Salle { get; init; }
         public ushort Place { get; init; }
+        public int Limite { get; init; }
+        public bool Survie { get; init; }
         public long Instantanes { get; set; }
         public long EcartHorlogeMs { get; set; }
         public int CoureursVus { get; set; }
@@ -80,13 +82,33 @@ public sealed class MassRunService : IDisposable
         public uint ImageCourse { get; set; }
         public uint Arrivee { get; set; }
         public bool Finie { get; set; }
+
+        /// <summary>Le mode le plus avance que le coeur a atteint (2 salle d'attente, 4 course, 5 arrivee ou temps ecoule).</summary>
+        public uint ModeMax { get; set; }
+
+        /// <summary>MASS SURVIVAL : la premiere mort a elimine le joueur.</summary>
+        public bool Elimine { get; set; }
     }
+
+    /// <summary>
+    /// La salle du reseau est quittee (RetroArch ferme) : le panneau des defis ouvre la page de bilan de la course. Seulement
+    /// pour une salle jouee (pas l'essai du reseau sans jeu).
+    /// </summary>
+    public event Action<SalleLocale>? SalleQuittee;
 
     public SalleLocale? Salle => _salle;
 
 
-    /// <summary>Une salle ouverte d'un noeud : l'heure du GO! est ramenee a l'horloge de la borne.</summary>
-    public sealed record SalleOuverte(uint Id, string Jeu, string Niveau, string Mort, DateTime GoUtc, int Limite, int Inscrits, int Arrives);
+    /// <summary>
+    /// Une salle ouverte d'un noeud : les heures sont ramenees a l'horloge de la borne. <c>InscriptionsUtc</c> : la fin des
+    /// inscriptions, que l'onglet d'ES decompte ; le GO! part une minute apres pour les salles du programme (noeud 0.5.1),
+    /// 6 s avant le GO! pour un noeud plus ancien.
+    /// </summary>
+    public sealed record SalleOuverte(uint Id, string Jeu, string Niveau, string Mort, DateTime GoUtc, int Limite, int Inscrits, int Arrives,
+        DateTime InscriptionsUtc)
+    {
+        public bool Inscriptions(DateTime maintenant) => maintenant < InscriptionsUtc;
+    }
 
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(1.5) };
 
@@ -97,15 +119,23 @@ public sealed class MassRunService : IDisposable
         {
             var json = JsonDocument.Parse(await Http.GetStringAsync(NoeudCourant.TrimEnd('/') + "/massrun/v1/salles", ct).ConfigureAwait(false)).RootElement;
             var ecart = DateTime.UtcNow - DateTime.UnixEpoch.AddMilliseconds(json.GetProperty("maintenant_unix_ms").GetInt64());
-            return json.GetProperty("salles").EnumerateArray().Select(s => new SalleOuverte(
-                s.GetProperty("salle").GetUInt32(),
-                s.GetProperty("jeu").GetString() ?? "",
-                s.GetProperty("niveau").GetString() ?? "",
-                s.GetProperty("mort").GetString() ?? "debut",
-                DateTime.UnixEpoch.AddMilliseconds(s.GetProperty("go_unix_ms").GetInt64()) + ecart,
-                s.GetProperty("limite").GetInt32(),
-                s.GetProperty("inscrits").GetInt32(),
-                s.GetProperty("arrives").GetInt32())).ToList();
+            return json.GetProperty("salles").EnumerateArray().Select(s =>
+            {
+                var go = DateTime.UnixEpoch.AddMilliseconds(s.GetProperty("go_unix_ms").GetInt64()) + ecart;
+                var inscriptions = s.TryGetProperty("inscriptions_unix_ms", out var fin) && fin.TryGetInt64(out var ms)
+                    ? DateTime.UnixEpoch.AddMilliseconds(ms) + ecart
+                    : go.AddSeconds(-6);
+                return new SalleOuverte(
+                    s.GetProperty("salle").GetUInt32(),
+                    s.GetProperty("jeu").GetString() ?? "",
+                    s.GetProperty("niveau").GetString() ?? "",
+                    s.GetProperty("mort").GetString() ?? "debut",
+                    go,
+                    s.GetProperty("limite").GetInt32(),
+                    s.GetProperty("inscrits").GetInt32(),
+                    s.GetProperty("arrives").GetInt32(),
+                    inscriptions);
+            }).ToList();
         }
         catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException or KeyNotFoundException or InvalidOperationException)
         {
@@ -209,7 +239,11 @@ public sealed class MassRunService : IDisposable
             Arreter();
             _canal ??= new MassRunCanal();
             _canal.PoserSalle(CrcSmb, client.GoLocalUtc, client.Limite, Convert.ToUInt32(couleur, 16), pseudo, client.Niveau, etat, client.RegleMort);
-            var salle = new SalleLocale(client.Niveau, 0, pseudo, couleur, 0, 0, rom) { GoUtc = client.GoLocalUtc, Noeud = noeud, Salle = client.Salle, Place = client.Place };
+            var salle = new SalleLocale(client.Niveau, 0, pseudo, couleur, 0, 0, rom)
+            {
+                GoUtc = client.GoLocalUtc, Noeud = noeud, Salle = client.Salle, Place = client.Place, Limite = client.Limite,
+                Survie = client.RegleMort == 2,
+            };
             _salle = salle;
             _arret = false;
             var canal = _canal;
@@ -306,6 +340,7 @@ public sealed class MassRunService : IDisposable
                 {
                     salle.Mode = j.Mode;
                     salle.ImageCourse = j.ImageCourse;
+                    if (j.Mode > salle.ModeMax) salle.ModeMax = j.Mode;
                     if (j.Mode != dernierMode)
                     {
                         _journal.LogInformation("MASS RUN : mode {Mode}", j.Mode);
@@ -345,6 +380,7 @@ public sealed class MassRunService : IDisposable
                         if (arriveeEnvoyee == 1)
                         {
                             salle.Arrivee = j.Arrivee;
+                            salle.Elimine = j.Elimine;
                             NoterLArrivee(salle);
                         }
                     }
@@ -362,6 +398,11 @@ public sealed class MassRunService : IDisposable
             canal.Fermer();
             client.Dispose();
             _journal.LogInformation("MASS RUN : salle {Salle} quittee, {Instantanes} instantanes recus", salle.Salle, client.InstantanesRecus);
+            if (avecJeu)
+            {
+                try { SalleQuittee?.Invoke(salle); }
+                catch (Exception e) { _journal.LogWarning(e, "MASS RUN : le bilan de la salle n'a pas pu s'ouvrir"); }
+            }
         }
     }
 

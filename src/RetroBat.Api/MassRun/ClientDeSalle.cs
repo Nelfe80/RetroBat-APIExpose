@@ -339,6 +339,23 @@ public sealed class ClientDeSalle : IDisposable
 
     public sealed record EtatDeLaSalle(List<MassRunCanal.LigneDeClassement> Lignes, int MonRang, int Arrives, int Inscrits);
 
+    private static readonly HttpClient Lecteur = new() { Timeout = TimeSpan.FromSeconds(3) };
+
+    /// <summary>Le classement complet d'une salle, pour la page de bilan (la salle est deja quittee) ; null si le noeud ne repond pas.</summary>
+    public static async Task<EtatDeLaSalle?> LireLeClassementAsync(string noeud, uint salle, ushort place, CancellationToken ct)
+    {
+        try
+        {
+            var json = JsonDocument.Parse(await Lecteur.GetStringAsync(noeud.TrimEnd('/') + $"/massrun/v1/salles/{salle}", ct).ConfigureAwait(false)).RootElement;
+            return Classement(json, place, int.MaxValue);
+        }
+        catch (Exception e) when (e is HttpRequestException or JsonException or TaskCanceledException or FormatException or KeyNotFoundException
+            or InvalidOperationException)
+        {
+            return null;
+        }
+    }
+
     /// <summary>
     /// Le classement de l'arrivee (CDC : « au fur et a mesure des arrivees ») : les arrives dans l'ordre ; en Mass Survival,
     /// les elimines du dernier au premier, sous les joueurs encore en vie.
@@ -348,6 +365,21 @@ public sealed class ClientDeSalle : IDisposable
         try
         {
             var json = JsonDocument.Parse(await _http.GetStringAsync($"/massrun/v1/salles/{Salle}").ConfigureAwait(false)).RootElement;
+            return Classement(json, Place, MassRunCanal.LignesDeClassement);
+        }
+        catch (Exception e) when (e is HttpRequestException or JsonException or TaskCanceledException or FormatException or KeyNotFoundException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Le classement d'apres la salle du noeud : les <paramref name="nombre"/> premieres lignes, puis celle du joueur s'il est
+    /// plus loin. Pur.
+    /// </summary>
+    internal static EtatDeLaSalle Classement(JsonElement json, ushort maPlace, int nombre)
+    {
+        {
             var inscrits = json.GetProperty("inscrits").GetInt32();
             var lignes = new List<MassRunCanal.LigneDeClassement>();
             var monRang = 0;
@@ -355,7 +387,7 @@ public sealed class ClientDeSalle : IDisposable
             void Ajouter(JsonElement e, int rang, bool elimine)
             {
                 var place = (ushort)e.GetProperty("place").GetInt32();
-                var moi = place == Place;
+                var moi = place == maPlace;
                 if (moi) monRang = rang;
                 lignes.Add(new MassRunCanal.LigneDeClassement(rang, moi, elimine, e.GetProperty("images").GetUInt32(),
                     Convert.ToUInt32(e.TryGetProperty("couleur", out var c) ? c.GetString() ?? "A98BFF" : "A98BFF", 16),
@@ -380,16 +412,12 @@ public sealed class ClientDeSalle : IDisposable
                 }
             }
             // les premieres lignes, puis celle du joueur s'il est plus loin
-            var montrees = lignes.Take(MassRunCanal.LignesDeClassement).ToList();
+            var montrees = lignes.Take(nombre).ToList();
             if (monRang > 0 && !montrees.Any(l => l.Moi))
             {
                 montrees[^1] = lignes.First(l => l.Moi);
             }
             return new EtatDeLaSalle(montrees, monRang, arrives, inscrits);
-        }
-        catch (Exception e) when (e is HttpRequestException or JsonException or TaskCanceledException or FormatException or KeyNotFoundException)
-        {
-            return null;
         }
     }
 
