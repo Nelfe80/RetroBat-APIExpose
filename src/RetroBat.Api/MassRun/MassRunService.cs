@@ -46,6 +46,12 @@ public sealed class MassRunService : IDisposable
     public sealed record SalleLocale(string Niveau, int Attente, string Pseudo, string Couleur, int Coureurs, int Pistes, string Rom)
     {
         public DateTime? GoUtc { get; set; }
+        public string? Noeud { get; init; }
+        public uint Salle { get; init; }
+        public ushort Place { get; init; }
+        public long Instantanes { get; set; }
+        public long EcartHorlogeMs { get; set; }
+        public int CoureursVus { get; set; }
         public uint Mode { get; set; }
         public uint ImageCourse { get; set; }
         public uint Arrivee { get; set; }
@@ -118,6 +124,150 @@ public sealed class MassRunService : IDisposable
             _journal.LogInformation("MASS RUN : salle {Niveau} lancee, {Attente} s d'attente, {Coureurs} coureurs simules ({Pistes} pistes), {Pseudo} #{Couleur}",
                 niveau, attenteSecondes, simules.Count, pistes.Count, pseudo, couleur);
             return salle;
+        }
+    }
+
+    /// <summary>
+    /// REJOINDRE UNE SALLE D'UN NOEUD (lot L3) : la borne prend sa place, cale son horloge, pose la salle dans le canal avec le
+    /// GO! du noeud, lance le jeu (sauf <paramref name="lancerLeJeu"/> = false, pour verifier le reseau sans ecran), envoie ses
+    /// positions et ecrit les coureurs recus.
+    /// </summary>
+    public async Task<SalleLocale> RejoindreAsync(string noeud, uint id, bool lancerLeJeu, CancellationToken ct)
+    {
+        var statut = _agent?.Status;
+        var pseudo = (statut?.Pseudo is { Length: > 0 } p ? p : "JOUEUR").ToUpperInvariant();
+        if (pseudo.Length > 10) pseudo = pseudo[..10];
+        var poignee = statut?.PlayerCode is { Length: > 0 } code ? code : pseudo;
+        var couleur = MultiplayerPanelService.CouleurDe(poignee);
+        if (lancerLeJeu && Process.GetProcessesByName("retroarch").Length > 0)
+        {
+            throw new InvalidOperationException("un jeu tourne deja");
+        }
+        var client = await ClientDeSalle.RejoindreAsync(noeud, id, pseudo, couleur, ct).ConfigureAwait(false);
+        lock (_verrou)
+        {
+            if (!System.Text.RegularExpressions.Regex.IsMatch(client.Niveau, "^[1-8]-[1-4]$"))
+            {
+                client.Dispose();
+                throw new InvalidOperationException("niveau inconnu : " + client.Niveau);
+            }
+            var rom = Path.Combine(RetroBatPaths.RetroBatRoot, "roms", "nes", "Super Mario Bros. (World).zip");
+            var etat = EtatRetroArch.Brut(File.ReadAllBytes(Path.Combine(EtatsDesDefis.Racine, "nes", "super-mario-bros", client.Niveau + "-panneau.state")));
+            Arreter();
+            _canal ??= new MassRunCanal();
+            _canal.PoserSalle(CrcSmb, client.GoLocalUtc, client.Limite, Convert.ToUInt32(couleur, 16), pseudo, client.Niveau, etat);
+            var salle = new SalleLocale(client.Niveau, 0, pseudo, couleur, 0, 0, rom) { GoUtc = client.GoLocalUtc, Noeud = noeud, Salle = client.Salle, Place = client.Place };
+            _salle = salle;
+            _arret = false;
+            var canal = _canal;
+            _boucle = new Thread(() => BoucleReseau(canal, salle, client, lancerLeJeu)) { IsBackground = true, Name = "MassRun", Priority = ThreadPriority.AboveNormal };
+            _boucle.Start();
+            if (lancerLeJeu)
+            {
+                var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
+                    RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, "nes", "libretro", CoeurHote, rom, null);
+                if (arguments is not null)
+                {
+                    _ = Task.Run(() => LancementDirect.Lancer(arguments, "nes", rom, _contexte, _bus, _journal));
+                }
+            }
+            _journal.LogInformation("MASS RUN : salle {Salle} du noeud {Noeud} rejointe, place {Place}, {Niveau}, GO! a {Go:HH:mm:ss.fff} (ecart d'horloge {Ecart} ms)",
+                client.Salle, noeud, client.Place, client.Niveau, client.GoLocalUtc.ToLocalTime(), client.EcartHorlogeMs);
+            return salle;
+        }
+    }
+
+    /// <summary>
+    /// La boucle d'une salle du reseau : a chaque image publiee par le coeur, la fenetre des coureurs (leur derniere position
+    /// recue, tenue sur les 4 images) ; 15 fois par seconde au plus, la position du joueur ; l'arrivee, trois fois.
+    /// Sans jeu (essai du reseau), la boucle tourne 60 s et compte les instantanes recus.
+    /// </summary>
+    private void BoucleReseau(MassRunCanal canal, SalleLocale salle, ClientDeSalle client, bool avecJeu)
+    {
+        uint derniere = uint.MaxValue, dernierMode = 0;
+        var arriveeEnvoyee = 0;
+        var dernierEnvoi = DateTime.MinValue;
+        var debut = DateTime.UtcNow;
+        var vu = false;
+        var controle = DateTime.MinValue;
+        var pings = DateTime.UtcNow;
+        try
+        {
+            while (!_arret)
+            {
+                if (DateTime.UtcNow - controle > TimeSpan.FromSeconds(1))
+                {
+                    controle = DateTime.UtcNow;
+                    salle.Instantanes = client.InstantanesRecus;
+                    salle.EcartHorlogeMs = client.EcartHorlogeMs;
+                    if (avecJeu)
+                    {
+                        var tourne = Process.GetProcessesByName("retroarch").Length > 0;
+                        if (tourne) vu = true;
+                        else if (vu || DateTime.UtcNow - debut > TimeSpan.FromMinutes(3)) break;
+                    }
+                    else if (DateTime.UtcNow - debut > TimeSpan.FromSeconds(60)) break;
+                }
+                if (DateTime.UtcNow - pings > TimeSpan.FromSeconds(30))
+                {
+                    pings = DateTime.UtcNow;
+                    client.EnvoyerPing();   // l'horloge se recale, la place reste ouverte dans le NAT
+                }
+                var joueur = canal.LireJoueur();
+                if (joueur is { } j)
+                {
+                    salle.Mode = j.Mode;
+                    salle.ImageCourse = j.ImageCourse;
+                    if (j.Mode != dernierMode)
+                    {
+                        _journal.LogInformation("MASS RUN : mode {Mode}", j.Mode);
+                        dernierMode = j.Mode;
+                    }
+                    var attente = j.Mode == 2;
+                    var image = attente ? j.ImageMode : j.ImageCourse;
+                    if (image != derniere)
+                    {
+                        derniere = image;
+                        var coureurs = client.CoureursFrais();
+                        var liste = new List<MassRunCanal.Coureur>(coureurs.Count);
+                        foreach (var (_, c) in coureurs.Take(MassRunCanal.MaxCoureurs))
+                        {
+                            var fenetre = new byte[]?[MassRunCanal.ImagesParFenetre];
+                            for (var k = 0; k < fenetre.Length; k++) fenetre[k] = c.Piste;
+                            liste.Add(new MassRunCanal.Coureur(c.Couleur, c.Pseudo.Length > 10 ? c.Pseudo[..10] : c.Pseudo, false, fenetre));
+                        }
+                        canal.EcrireCoureurs(image, liste);
+                        salle.CoureursVus = liste.Count;
+                    }
+                    if ((j.Mode == 2 || j.Mode == 4 || j.Mode == 5) && DateTime.UtcNow - dernierEnvoi > TimeSpan.FromMilliseconds(64))
+                    {
+                        dernierEnvoi = DateTime.UtcNow;
+                        client.EnvoyerPosition(j.ImageCourse, j.Mode, j.Piste);
+                    }
+                    if (j.Arrivee > 0 && arriveeEnvoyee < 3)
+                    {
+                        arriveeEnvoyee++;
+                        client.EnvoyerArrivee(j.Arrivee);
+                        if (arriveeEnvoyee == 1)
+                        {
+                            salle.Arrivee = j.Arrivee;
+                            NoterLArrivee(salle);
+                        }
+                    }
+                }
+                Thread.Sleep(1);
+            }
+        }
+        catch (Exception e)
+        {
+            _journal.LogWarning(e, "MASS RUN : la boucle de la salle du reseau s'arrete");
+        }
+        finally
+        {
+            salle.Finie = true;
+            canal.Fermer();
+            client.Dispose();
+            _journal.LogInformation("MASS RUN : salle {Salle} quittee, {Instantanes} instantanes recus", salle.Salle, client.InstantanesRecus);
         }
     }
 
