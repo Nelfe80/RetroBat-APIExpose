@@ -11,12 +11,16 @@ namespace RetroBat.Api.MassRun;
 /// <code>
 ///      0  'NMRS' (u32), version (u32 = 1), taille (u32), generation (u32)
 ///     16  actif (u32), crc32 du contenu (u32), GO! (FILETIME UTC, i64), limite en s (u32), couleur 0RGB (u32),
-///         pseudo (16 octets UTF-8), niveau (16), taille de l'etat de depart (u32)
+///         pseudo (16 octets UTF-8), niveau (16), taille de l'etat de depart (u32), regle de mort (u32 : 0 celle du jeu,
+///         1 retour au debut, 2 elimination)
 ///    128  joueur, ecrit par le coeur : sequence (u32, impaire pendant l'ecriture), mode, image de course, arrivee (images,
-///         0 = pas encore), image du mode, puis l'image de piste courante (40 octets)
+///         0 = pas encore), image du mode, puis l'image de piste courante (40 octets), elimine (u32, a 128+60)
 ///    256  coureurs, ecrits par l'API : sequence (u32), nombre (u32), image de la premiere fenetre (u32), reserve (u32),
 ///         puis 64 entrees de 192 octets : couleur 0RGB (u32), pseudo (16), drapeaux (u32, bit 0 = fantome), reserve (8),
 ///         4 images de piste consecutives (4 x 40) a partir de l'image de la fenetre
+///  12800  classement en direct, ecrit par l'API : sequence (u32), nombre de lignes (u32), mon rang (u32, 0 = pas encore),
+///         arrives (u32), inscrits (u32), reserve (u32 x 3), puis 16 lignes de 32 octets : rang (u16), drapeaux (u16, bit 0 =
+///         moi, bit 1 = elimine), images (u32), couleur 0RGB (u32), pseudo (16), reserve (4)
 ///  32768  etat de depart brut du coeur
 /// </code>
 /// Les blocs ecrits par l'un et lus par l'autre sont proteges par leur sequence : paire = stable.
@@ -31,8 +35,37 @@ public sealed class MassRunCanal : IDisposable
     public const int MaxCoureurs = 64;
     public const int ImagesParFenetre = 4;
 
-    private const int OffActif = 16, OffCrc = 20, OffGo = 24, OffLimite = 32, OffCouleur = 36, OffPseudo = 40, OffNiveau = 56, OffTailleEtat = 72;
-    private const int OffJoueur = 128, OffCoureurs = 256, OffEntrees = 272, TailleEntree = 192, OffEtat = 32768;
+    private const int OffActif = 16, OffCrc = 20, OffGo = 24, OffLimite = 32, OffCouleur = 36, OffPseudo = 40, OffNiveau = 56, OffTailleEtat = 72, OffMort = 76;
+    private const int OffJoueur = 128, OffCoureurs = 256, OffEntrees = 272, TailleEntree = 192, OffClassement = 12800, OffEtat = 32768;
+    public const int LignesDeClassement = 16;
+    private uint _sequenceClassement;
+
+    public sealed record LigneDeClassement(int Rang, bool Moi, bool Elimine, uint Images, uint Couleur, string Pseudo);
+
+    /// <summary>Le classement de l'arrivee, au fil des arrivees : les premieres lignes, et celle du joueur s'il est plus loin.</summary>
+    public void EcrireClassement(IReadOnlyList<LigneDeClassement> lignes, int monRang, int arrives, int inscrits)
+    {
+        var n = Math.Min(lignes.Count, LignesDeClassement);
+        _sequenceClassement += 1;
+        if ((_sequenceClassement & 1) == 0) _sequenceClassement += 1;
+        _vue.Write(OffClassement, _sequenceClassement);
+        _vue.Write(OffClassement + 4, (uint)n);
+        _vue.Write(OffClassement + 8, (uint)monRang);
+        _vue.Write(OffClassement + 12, (uint)arrives);
+        _vue.Write(OffClassement + 16, (uint)inscrits);
+        for (var i = 0; i < n; i++)
+        {
+            var l = lignes[i];
+            var o = OffClassement + 32 + i * 32;
+            _vue.Write(o, (ushort)l.Rang);
+            _vue.Write(o + 2, (ushort)((l.Moi ? 1 : 0) | (l.Elimine ? 2 : 0)));
+            _vue.Write(o + 4, l.Images);
+            _vue.Write(o + 8, l.Couleur);
+            EcrireTexte(o + 12, l.Pseudo, 16);
+        }
+        _sequenceClassement += 1;
+        _vue.Write(OffClassement, _sequenceClassement);
+    }
 
     private readonly MemoryMappedFile _fichier;
     private readonly MemoryMappedViewAccessor _vue;
@@ -45,7 +78,7 @@ public sealed class MassRunCanal : IDisposable
     }
 
     /// <summary>Pose une salle : le coeur la lit au chargement du jeu. L'etat de depart est l'etat brut du coeur.</summary>
-    public void PoserSalle(uint crc, DateTime? goUtc, int limiteSecondes, uint couleur, string pseudo, string niveau, byte[] etat)
+    public void PoserSalle(uint crc, DateTime? goUtc, int limiteSecondes, uint couleur, string pseudo, string niveau, byte[] etat, uint regleMort = 1)
     {
         if (etat.Length > Taille - OffEtat)
         {
@@ -63,6 +96,7 @@ public sealed class MassRunCanal : IDisposable
         EcrireTexte(OffPseudo, pseudo, 16);
         EcrireTexte(OffNiveau, niveau, 16);
         _vue.Write(OffTailleEtat, (uint)etat.Length);
+        _vue.Write(OffMort, regleMort);
         _vue.WriteArray(OffEtat, etat, 0, etat.Length);
         _vue.Write(12, _vue.ReadUInt32(12) + 1);
         _sequenceCoureurs = 0;
@@ -75,7 +109,7 @@ public sealed class MassRunCanal : IDisposable
     /// <summary>Plus de salle : une partie suivante sur le coeur hote redevient une partie normale.</summary>
     public void Fermer() => _vue.Write(OffActif, 0u);
 
-    public readonly record struct EtatDuJoueur(uint Mode, uint ImageCourse, uint Arrivee, uint ImageMode, byte[] Piste);
+    public readonly record struct EtatDuJoueur(uint Mode, uint ImageCourse, uint Arrivee, uint ImageMode, byte[] Piste, bool Elimine = false);
 
     /// <summary>La partie du joueur, lue sous sa sequence ; null si le coeur ecrit encore apres quelques essais.</summary>
     public EtatDuJoueur? LireJoueur()
@@ -93,9 +127,10 @@ public sealed class MassRunCanal : IDisposable
             var imageMode = _vue.ReadUInt32(OffJoueur + 16);
             var piste = new byte[TailleImageDePiste];
             _vue.ReadArray(OffJoueur + 20, piste, 0, piste.Length);
+            var elimine = _vue.ReadUInt32(OffJoueur + 60) != 0;
             if (_vue.ReadUInt32(OffJoueur) == avant)
             {
-                return new EtatDuJoueur(mode, image, arrivee, imageMode, piste);
+                return new EtatDuJoueur(mode, image, arrivee, imageMode, piste, elimine);
             }
         }
         return null;

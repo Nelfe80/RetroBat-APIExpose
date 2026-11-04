@@ -155,7 +155,7 @@ public sealed class MassRunService : IDisposable
             var etat = EtatRetroArch.Brut(File.ReadAllBytes(Path.Combine(EtatsDesDefis.Racine, "nes", "super-mario-bros", client.Niveau + "-panneau.state")));
             Arreter();
             _canal ??= new MassRunCanal();
-            _canal.PoserSalle(CrcSmb, client.GoLocalUtc, client.Limite, Convert.ToUInt32(couleur, 16), pseudo, client.Niveau, etat);
+            _canal.PoserSalle(CrcSmb, client.GoLocalUtc, client.Limite, Convert.ToUInt32(couleur, 16), pseudo, client.Niveau, etat, client.RegleMort);
             var salle = new SalleLocale(client.Niveau, 0, pseudo, couleur, 0, 0, rom) { GoUtc = client.GoLocalUtc, Noeud = noeud, Salle = client.Salle, Place = client.Place };
             _salle = salle;
             _arret = false;
@@ -191,6 +191,8 @@ public sealed class MassRunService : IDisposable
         var vu = false;
         var controle = DateTime.MinValue;
         var pings = DateTime.UtcNow;
+        var dernierClassement = DateTime.MinValue;
+        var classementEnCours = false;
         try
         {
             while (!_arret)
@@ -207,6 +209,26 @@ public sealed class MassRunService : IDisposable
                         else if (vu || DateTime.UtcNow - debut > TimeSpan.FromMinutes(3)) break;
                     }
                     else if (DateTime.UtcNow - debut > TimeSpan.FromSeconds(60)) break;
+                }
+                if (avecJeu && salle.Mode >= 4 && DateTime.UtcNow - dernierClassement > TimeSpan.FromSeconds(1) && !classementEnCours)
+                {
+                    // le classement en direct, relu chaque seconde pendant la course et apres l'arrivee
+                    dernierClassement = DateTime.UtcNow;
+                    classementEnCours = true;
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            if (await client.ClassementAsync().ConfigureAwait(false) is { } c)
+                            {
+                                canal.EcrireClassement(c.Lignes, c.MonRang, c.Arrives, c.Inscrits);
+                            }
+                        }
+                        finally
+                        {
+                            classementEnCours = false;
+                        }
+                    });
                 }
                 if (DateTime.UtcNow - pings > TimeSpan.FromSeconds(30))
                 {
@@ -266,7 +288,7 @@ public sealed class MassRunService : IDisposable
                     if (j.Arrivee > 0 && arriveeEnvoyee < 3)
                     {
                         arriveeEnvoyee++;
-                        client.EnvoyerArrivee(j.Arrivee);
+                        client.EnvoyerArrivee(j.Arrivee, j.Elimine);
                         if (arriveeEnvoyee == 1)
                         {
                             salle.Arrivee = j.Arrivee;

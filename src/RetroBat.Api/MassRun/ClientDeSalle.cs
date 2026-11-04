@@ -30,6 +30,8 @@ public sealed class ClientDeSalle : IDisposable
     public string Jeu { get; }
     public long GoUnixMs { get; }
     public int Limite { get; }
+    /// <summary>La regle de mort de la salle : 0 celle du jeu, 1 retour au debut, 2 elimination.</summary>
+    public uint RegleMort { get; }
     public long InstantanesRecus;
     public long OctetsRecus;
     public long OctetsEnvoyes;
@@ -135,6 +137,7 @@ public sealed class ClientDeSalle : IDisposable
         Limite = jonction.GetProperty("limite").GetInt32();
         Niveau = jonction.GetProperty("niveau").GetString() ?? "1-1";
         Jeu = jonction.GetProperty("jeu").GetString() ?? "";
+        RegleMort = jonction.TryGetProperty("mort", out var mort) ? mort.GetString() switch { "jeu" => 0u, "elimination" => 2u, _ => 1u } : 1u;
         var adresse = Dns.GetHostAddresses(hote).First(a => a.AddressFamily == AddressFamily.InterNetwork);
         _noeud = new IPEndPoint(adresse, jonction.GetProperty("port_udp").GetInt32());
         _udp = new UdpClient(new IPEndPoint(IPAddress.Loopback.Equals(adresse) ? IPAddress.Loopback : IPAddress.Any, 0));
@@ -192,8 +195,10 @@ public sealed class ClientDeSalle : IDisposable
         Envoyer(MassRunProtocole.Pos, contenu);
     }
 
-    public void EnvoyerArrivee(uint images)
+    /// <summary>L'arrivee, ou l'elimination (bit de poids fort) en MASS SURVIVAL.</summary>
+    public void EnvoyerArrivee(uint images, bool elimine = false)
     {
+        if (elimine) images |= 0x80000000u;
         Span<byte> contenu = stackalloc byte[4];
         BinaryPrimitives.WriteUInt32LittleEndian(contenu, images);
         Envoyer(MassRunProtocole.Arrivee, contenu);
@@ -329,6 +334,62 @@ public sealed class ClientDeSalle : IDisposable
         {
             var limite = DateTime.UtcNow.AddSeconds(-1);
             return _coureurs.Where(c => c.Value.RecuLe > limite).Select(c => (c.Key, c.Value)).ToList();
+        }
+    }
+
+    public sealed record EtatDeLaSalle(List<MassRunCanal.LigneDeClassement> Lignes, int MonRang, int Arrives, int Inscrits);
+
+    /// <summary>
+    /// Le classement de l'arrivee (CDC : « au fur et a mesure des arrivees ») : les arrives dans l'ordre ; en Mass Survival,
+    /// les elimines du dernier au premier, sous les joueurs encore en vie.
+    /// </summary>
+    public async Task<EtatDeLaSalle?> ClassementAsync()
+    {
+        try
+        {
+            var json = JsonDocument.Parse(await _http.GetStringAsync($"/massrun/v1/salles/{Salle}").ConfigureAwait(false)).RootElement;
+            var inscrits = json.GetProperty("inscrits").GetInt32();
+            var lignes = new List<MassRunCanal.LigneDeClassement>();
+            var monRang = 0;
+            var arrives = 0;
+            void Ajouter(JsonElement e, int rang, bool elimine)
+            {
+                var place = (ushort)e.GetProperty("place").GetInt32();
+                var moi = place == Place;
+                if (moi) monRang = rang;
+                lignes.Add(new MassRunCanal.LigneDeClassement(rang, moi, elimine, e.GetProperty("images").GetUInt32(),
+                    Convert.ToUInt32(e.TryGetProperty("couleur", out var c) ? c.GetString() ?? "A98BFF" : "A98BFF", 16),
+                    e.GetProperty("pseudo").GetString() ?? ""));
+            }
+            var rang = 0;
+            foreach (var e in json.GetProperty("arrivees").EnumerateArray())
+            {
+                Ajouter(e, ++rang, false);
+                arrives++;
+            }
+            if (json.TryGetProperty("eliminations", out var eliminations))
+            {
+                var elimines = eliminations.EnumerateArray().ToList();
+                // le dernier elimine est derriere tous ceux encore en vie
+                var enVie = inscrits - elimines.Count - arrives;
+                rang += Math.Max(0, enVie);
+                foreach (var e in elimines)
+                {
+                    Ajouter(e, ++rang, true);
+                    arrives++;
+                }
+            }
+            // les premieres lignes, puis celle du joueur s'il est plus loin
+            var montrees = lignes.Take(MassRunCanal.LignesDeClassement).ToList();
+            if (monRang > 0 && !montrees.Any(l => l.Moi))
+            {
+                montrees[^1] = lignes.First(l => l.Moi);
+            }
+            return new EtatDeLaSalle(montrees, monRang, arrives, inscrits);
+        }
+        catch (Exception e) when (e is HttpRequestException or JsonException or TaskCanceledException or FormatException or KeyNotFoundException)
+        {
+            return null;
         }
     }
 
