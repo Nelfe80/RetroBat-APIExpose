@@ -4483,7 +4483,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
             if (passport["challenge"] is not null)
             {
-                await _esNotify.NotifyAsync(RetroBat.Api.Speedrun.PasseportDeDefi.TexteDuVerdict(passport, status, (int?)(obj?["rank"]), ReasonToText(reason)), cancellationToken).ConfigureAwait(false);
+                await _esNotify.NotifyAsync(RetroBat.Api.Speedrun.PasseportDeDefi.TexteDuVerdict(passport, status, (int?)(obj?["rank"]), ReasonToText(reason), Langue()), cancellationToken).ConfigureAwait(false);
                 return;
             }
 

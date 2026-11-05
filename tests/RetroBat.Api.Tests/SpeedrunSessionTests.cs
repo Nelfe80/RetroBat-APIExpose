@@ -192,6 +192,11 @@ public class SpeedrunSessionTests
         PasseportDeDefi.Appliquer(p, PasseportDeDefi.Decrire(GreenHill1, s.PrendreLaMeilleure()!), EntreeGH1);
         Assert.Equal("Défi : 0:47.48 classé, 9e", PasseportDeDefi.TexteDuVerdict(p, "published", 9, ""));
         Assert.Equal("Défi : 0:47.48 classé, 1er", PasseportDeDefi.TexteDuVerdict(p, "published", 1, ""));
+        // dans la langue de la borne (05/11)
+        Assert.Equal("Challenge: 0:47.48 ranked 1st", PasseportDeDefi.TexteDuVerdict(p, "published", 1, "", "en_US"));
+        Assert.Equal("Challenge: 0:47.48 ranked 12th", PasseportDeDefi.TexteDuVerdict(p, "published", 12, "", "en"));
+        Assert.Equal("Challenge: 0:47.48 ranked 23rd", PasseportDeDefi.TexteDuVerdict(p, "published", 23, "", "en"));
+        Assert.Equal("Desafío: 0:47.48 clasificado, puesto 3", PasseportDeDefi.TexteDuVerdict(p, "published", 3, "", "es"));
         Assert.StartsWith("Défi : 0:47.48 non classé", PasseportDeDefi.TexteDuVerdict(p, "refused", null, "raison"));
     }
 

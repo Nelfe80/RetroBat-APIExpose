@@ -88,6 +88,11 @@ public static class CabinetAnnounceText
     {
         ["fr"] = new()
         {
+            ["challenge_verdict_ranked"] = "Défi : {0} classé, {1}",
+            ["challenge_verdict_published"] = "Défi : {0} classé",
+            ["challenge_verdict_held"] = "Défi : {0} signalé, non classé : {1}",
+            ["challenge_verdict_quarantined"] = "Défi : {0} enregistré, en attente de conformité",
+            ["challenge_verdict_refused"] = "Défi : {0} non classé : {1}",
             ["start_title"] = "Appuyez sur START pour commencer la partie",
             ["start_sub"] = "Elle sera mise en pause automatiquement - prête pour le départ",
             ["hold_title"] = "Ne touchez plus à rien !",
@@ -193,6 +198,11 @@ public static class CabinetAnnounceText
         },
         ["en"] = new()
         {
+            ["challenge_verdict_ranked"] = "Challenge: {0} ranked {1}",
+            ["challenge_verdict_published"] = "Challenge: {0} ranked",
+            ["challenge_verdict_held"] = "Challenge: {0} flagged, not ranked: {1}",
+            ["challenge_verdict_quarantined"] = "Challenge: {0} recorded, pending compliance",
+            ["challenge_verdict_refused"] = "Challenge: {0} not ranked: {1}",
             ["start_title"] = "Press START to begin",
             ["start_sub"] = "It will pause on its own - ready for the countdown",
             ["hold_title"] = "Hands off!",
@@ -298,6 +308,11 @@ public static class CabinetAnnounceText
         },
         ["es"] = new()
         {
+            ["challenge_verdict_ranked"] = "Desafío: {0} clasificado, puesto {1}",
+            ["challenge_verdict_published"] = "Desafío: {0} clasificado",
+            ["challenge_verdict_held"] = "Desafío: {0} señalado, sin clasificar: {1}",
+            ["challenge_verdict_quarantined"] = "Desafío: {0} registrado, pendiente de conformidad",
+            ["challenge_verdict_refused"] = "Desafío: {0} sin clasificar: {1}",
             ["start_title"] = "Pulsa START para empezar la partida",
             ["start_sub"] = "Se pausará sola - lista para la salida",
             ["hold_title"] = "¡No toques nada!",
@@ -403,6 +418,11 @@ public static class CabinetAnnounceText
         },
         ["ja"] = new()
         {
+            ["challenge_verdict_ranked"] = "チャレンジ: {0} {1}位",
+            ["challenge_verdict_published"] = "チャレンジ: {0} ランクイン",
+            ["challenge_verdict_held"] = "チャレンジ: {0} 保留、ランク外: {1}",
+            ["challenge_verdict_quarantined"] = "チャレンジ: {0} 記録済み、適合確認待ち",
+            ["challenge_verdict_refused"] = "チャレンジ: {0} ランク外: {1}",
             ["start_title"] = "START を押してプレイ開始",
             ["start_sub"] = "自動で一時停止します - スタートの準備へ",
             ["hold_title"] = "そのままお待ちください",
@@ -508,6 +528,11 @@ public static class CabinetAnnounceText
         },
         ["zh"] = new()
         {
+            ["challenge_verdict_ranked"] = "挑战: {0} 排名第{1}",
+            ["challenge_verdict_published"] = "挑战: {0} 已上榜",
+            ["challenge_verdict_held"] = "挑战: {0} 已标记，未上榜: {1}",
+            ["challenge_verdict_quarantined"] = "挑战: {0} 已记录，等待合规确认",
+            ["challenge_verdict_refused"] = "挑战: {0} 未上榜: {1}",
             ["start_title"] = "按 START 开始游戏",
             ["start_sub"] = "它会自动暂停 - 等待发车",
             ["hold_title"] = "请勿操作！",
@@ -613,6 +638,11 @@ public static class CabinetAnnounceText
         },
         ["ko"] = new()
         {
+            ["challenge_verdict_ranked"] = "챌린지: {0} {1}위",
+            ["challenge_verdict_published"] = "챌린지: {0} 순위 등록",
+            ["challenge_verdict_held"] = "챌린지: {0} 보류, 순위 외: {1}",
+            ["challenge_verdict_quarantined"] = "챌린지: {0} 기록됨, 적합성 확인 대기",
+            ["challenge_verdict_refused"] = "챌린지: {0} 순위 외: {1}",
             ["scoring_clear_title"] = "✓1CC",
             ["scoring_clear_sub"] = "One-Credit Clear: 크레딧 하나로 게임 클리어",
             ["start_title"] = "START를 눌러 시작하세요",

@@ -193,10 +193,14 @@ public sealed class SessionSpeedrun
     }
 
     /// <summary>Le temps avant de repartir : assez pour voir sa mort, ou son temps a l'arrivee. Null : pas de relance. Pur.</summary>
-    internal static TimeSpan? DelaiDeRelance(Reglement r, EtatTentative etat) => !SeRelanceSeul(r) ? null : etat switch
+    /// <remarks>Une tentative annulee (ralentissement, avance rapide, mode Debug...) repart aussi, apres que son message a ete lu
+    /// (05/11 : annulee pour ralentissement, la partie avait enchaine sur le niveau suivant) ; pas apres une pause : la relance
+    /// se ferait dans RetroArch en pause, le joueur la commande en revenant.</remarks>
+    internal static TimeSpan? DelaiDeRelance(Reglement r, EtatTentative etat, string? cause = null) => !SeRelanceSeul(r) ? null : etat switch
     {
         EtatTentative.Ratee => TimeSpan.FromSeconds(1.5),
         EtatTentative.Finie => TimeSpan.FromSeconds(3),
+        EtatTentative.Annulee when cause != "pause" => TimeSpan.FromSeconds(3),
         _ => null,
     };
 
@@ -517,7 +521,7 @@ public sealed class SessionSpeedrun
         if (EstClassable(res) && res.FramesOfficielles is { } temps && (_meilleure?.Resultat.FramesOfficielles is not { } vu || temps < vu)
             && _horlogeDuDepart is { } departMs && (_horlogeDArrivee ?? _horlogeDeLImage) is { } arriveeMs)
             _meilleure = new TentativeFinie(AttemptId, Numero, res, departMs, arriveeMs);
-        _relanceAutomatique = DelaiDeRelance(_r, res.Etat);
+        _relanceAutomatique = DelaiDeRelance(_r, res.Etat, res.Cause);
         if (res.Etat == EtatTentative.Ratee && _relanceAutomatique is not null)
             _messages.Add(new MessageJoueur("speedrun.msg.failed_restart", "Attempt failed: back to the start."));
         else if (MessageDeFin(res, precedent) is { } message) _messages.Add(message);

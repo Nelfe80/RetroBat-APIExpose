@@ -181,18 +181,35 @@ public static class PasseportDeDefi
     }
 
     /// <summary>Le verdict du site, dit en temps et non en points : la notification que le joueur lit en revenant sur ES.</summary>
-    public static string TexteDuVerdict(JsonObject passeport, string statut, int? rang, string raison)
+    public static string TexteDuVerdict(JsonObject passeport, string statut, int? rang, string raison, string langue = "fr")
     {
         var frames = long.TryParse((string?)passeport["metric"]?["value"], NumberStyles.None, CultureInfo.InvariantCulture, out var f) ? f : 0;
         var cadence = ((long?)passeport["challenge"]?["timing"]?["frame_rate_e6"] ?? 60_000_000) / 1_000_000.0;
         var temps = Chronometrage.Afficher(frames, cadence);
+        // Dans la langue de la borne (05/11, retour du user : « Defi ... classe » en francais sur une borne en anglais).
+        string T(string cle) => RetroBat.Api.Infrastructure.CabinetAnnounceText.Get(cle, langue);
         return statut switch
         {
-            "published" => rang is { } r ? $"Défi : {temps} classé, {r}{(r == 1 ? "er" : "e")}" : $"Défi : {temps} classé",
-            "held" => $"Défi : {temps} signalé, non classé : {raison}",
-            "quarantined" => $"Défi : {temps} enregistré, en attente de conformité",
-            _ => $"Défi : {temps} non classé : {raison}",
+            "published" => rang is { } r
+                ? string.Format(CultureInfo.InvariantCulture, T("challenge_verdict_ranked"), temps, Rang(r, langue))
+                : string.Format(CultureInfo.InvariantCulture, T("challenge_verdict_published"), temps),
+            "held" => string.Format(CultureInfo.InvariantCulture, T("challenge_verdict_held"), temps, raison),
+            "quarantined" => string.Format(CultureInfo.InvariantCulture, T("challenge_verdict_quarantined"), temps),
+            _ => string.Format(CultureInfo.InvariantCulture, T("challenge_verdict_refused"), temps, raison),
         };
+    }
+
+    /// <summary>Le rang ecrit comme dans la langue : 1er, 9e ; 1st, 2nd, 3rd, 11th ; ailleurs le nombre seul. Pur.</summary>
+    internal static string Rang(int r, string langue)
+    {
+        var code = (langue ?? "").ToLowerInvariant();
+        if (code.StartsWith("fr", StringComparison.Ordinal)) return r == 1 ? "1er" : r + "e";
+        if (code.StartsWith("en", StringComparison.Ordinal) || code.Length == 0)
+        {
+            var suffixe = (r % 100) is 11 or 12 or 13 ? "th" : (r % 10) switch { 1 => "st", 2 => "nd", 3 => "rd", _ => "th" };
+            return r + suffixe;
+        }
+        return r.ToString(CultureInfo.InvariantCulture);
     }
 
     private static string Date(long unixMs) => DateTimeOffset.FromUnixTimeMilliseconds(unixMs).UtcDateTime

@@ -99,7 +99,8 @@ public class SpeedrunMarioTests
     {
         Assert.Equal(TimeSpan.FromSeconds(1.5), SessionSpeedrun.DelaiDeRelance(Lire("1-1"), EtatTentative.Ratee));
         Assert.Equal(TimeSpan.FromSeconds(3), SessionSpeedrun.DelaiDeRelance(Lire("1-1"), EtatTentative.Finie));
-        Assert.Null(SessionSpeedrun.DelaiDeRelance(Lire("1-1"), EtatTentative.Annulee));
+        Assert.Null(SessionSpeedrun.DelaiDeRelance(Lire("1-1"), EtatTentative.Annulee, "pause"));
+        Assert.Equal(TimeSpan.FromSeconds(3), SessionSpeedrun.DelaiDeRelance(Lire("1-1"), EtatTentative.Annulee, "slowdown"));   // 05/11
         Assert.Null(SessionSpeedrun.DelaiDeRelance(Lire("1-1"), EtatTentative.Abandonnee));
         Assert.Null(SessionSpeedrun.DelaiDeRelance(Lire("any"), EtatTentative.Finie));
     }
