@@ -557,7 +557,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// </summary>
     private List<string> Intersecter(OpenGamesManifest manifeste, out int candidatsLocaux)
     {
-        var systemes = manifeste.Games
+        var systemes = manifeste.Games.Concat(manifeste.SpeedrunGames)
             .Select(jeu => jeu.SystemId)
             .Where(systeme => !string.IsNullOrWhiteSpace(systeme))
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -584,7 +584,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         // Trois conditions, trois manques possibles, et ils appellent trois gestes differents.
         var manques = new List<string>();
 
-        foreach (var jeu in manifeste.Games)
+        var speedrunsSeuls = manifeste.SpeedrunGames.Select(j => j.SystemId + "/" + j.RomGroup).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var jeu in manifeste.Games.Concat(manifeste.SpeedrunGames.Where(j => !manifeste.Games.Any(g =>
+                     string.Equals(g.SystemId + "/" + g.RomGroup, j.SystemId + "/" + j.RomGroup, StringComparison.OrdinalIgnoreCase)))))
         {
             var cle = jeu.SystemId + "/" + jeu.RomGroup;
             if (!parGroupe.TryGetValue(cle, out var candidats) || candidats.Count == 0)
@@ -659,7 +661,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             var choisi = Choisir(mesurables, jeu, precedents, Lancement);
             if (choisi is { Length: > 0 })
             {
-                retenus.Add(choisi);
+                // Un jeu ouvert aux seuls speedruns : sa ROM pour les epreuves, pas d'entree au World Scoring.
+                if (!speedrunsSeuls.Contains(cle) || manifeste.Games.Any(g => string.Equals(g.SystemId + "/" + g.RomGroup, cle, StringComparison.OrdinalIgnoreCase)))
+                    retenus.Add(choisi);
                 cheminsParJeu[jeu.SystemId + "/" + jeu.RomGroup] = choisi;
                 var retenu = candidats.FirstOrDefault(candidat =>
                     string.Equals(candidat.AbsolutePath, choisi, StringComparison.OrdinalIgnoreCase));
@@ -1208,6 +1212,13 @@ public sealed record OpenGamesManifest
 
     [JsonPropertyName("games")]
     public IReadOnlyList<OpenGame> Games { get; init; } = [];
+
+    /// <summary>
+    /// Les jeux ouverts aux SEULS speedruns (05/11, Super Metroid, sans score) : leur ROM se cherche comme celle d'un jeu du
+    /// World Scoring, pour « Challenges & Speedruns », mais ils n'entrent pas dans la collection World Scoring.
+    /// </summary>
+    [JsonPropertyName("speedrun_games")]
+    public IReadOnlyList<OpenGame> SpeedrunGames { get; init; } = [];
 }
 
 public sealed record OpenGame

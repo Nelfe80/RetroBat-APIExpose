@@ -86,3 +86,20 @@ public class SpeedrunMetroidTests
         Assert.NotEqual(SessionSpeedrun.Finished, s.Etat);
     }
 }
+
+/// <summary>Les jeux ouverts aux seuls speedruns arrivent a part dans l'index du site.</summary>
+public class JeuxDesSpeedrunsSeulsTests
+{
+    [Fact]
+    public void L_index_du_site_porte_les_jeux_des_speedruns_a_part()
+    {
+        const string json = """
+            {"ok":true,"games":[{"system_id":"nes","rom_group":"super-mario-bros","rulesets":[{"id":"1cc","profile_version":1}]}],
+             "speedrun_games":[{"system_id":"snes","rom_group":"super-metroid","mem_sha256":"f8","rulesets":[{"id":"speedrun","profile_version":1}]}]}
+            """;
+        var index = System.Text.Json.JsonSerializer.Deserialize<RetroBat.Api.Infrastructure.OpenGamesManifest>(json)!;
+        Assert.Equal(["super-mario-bros"], index.Games.Select(g => g.RomGroup));
+        Assert.Equal(["super-metroid"], index.SpeedrunGames.Select(g => g.RomGroup));
+        Assert.Empty(System.Text.Json.JsonSerializer.Deserialize<RetroBat.Api.Infrastructure.OpenGamesManifest>("""{"games":[]}""")!.SpeedrunGames);
+    }
+}
