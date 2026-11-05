@@ -306,13 +306,14 @@ public sealed class FantomesDuSpeedrun
         var local = Choix is ChoixDesFantomes.MonRecordEtMondial or ChoixDesFantomes.MonRecord ? LireLeRecordLocal(r.ChallengeId) : null;
         // un record local garde avant la garde du 05/11 peut ne pas contenir son run : il ne court pas
         if (local is { } court && ImagesDuFantome(court.Fantome) is { } n && n < (court.Duree ?? court.Images)) local = null;
-        if (local is { } l && (monTempsPublie is not { } publie || l.Images <= publie))
+        // (05/11) mon temps publie sans replay valide (retire : il ne contenait pas son run) : mon record local court a sa place
+        if (local is { } l && (monTempsPublie is not { } publie || l.Images <= publie || mien is null))
         {
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
             await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{l.Replay}.nghost"), l.Fantome, ct).ConfigureAwait(false);
             // mon record local est aussi le record mondial quand personne ne fait mieux au classement
             EcrireLEtiquette(dossier, $"{PrefixeDuMien}{l.Replay}",
-                Etiquette(pseudo, MeilleurQueLeMondial(l.Images, lignes, tempsDesReplays, pseudo)));
+                Etiquette(pseudo, MeilleurQueLeMondial(l.Images, lignes, tempsDesReplays, pseudo, monTempsPublie)));
             EcrireLaDuree(dossier, $"{PrefixeDuMien}{l.Replay}", l.Duree);
             poses++;
             if (mien is not null) replays.Remove(mien);
@@ -474,11 +475,13 @@ public sealed class FantomesDuSpeedrun
 
     /// <summary>Mon temps bat (ou egale) tout le classement : mon fantome est le record mondial. Pur.</summary>
     internal static bool MeilleurQueLeMondial(long monTemps, IReadOnlyList<(string Joueur, string? Replay)> lignes,
-        IReadOnlyDictionary<string, long> tempsDesReplays, string pseudo)
+        IReadOnlyDictionary<string, long> tempsDesReplays, string pseudo, long? monTempsPublie = null)
     {
         if (lignes.Count == 0) return false;
         var premier = lignes[0];
-        if (pseudo.Length > 0 && string.Equals(premier.Joueur, pseudo, StringComparison.OrdinalIgnoreCase)) return true;
+        // le record mondial est le mien : ce fantome l'est s'il est ce temps-la (pas un temps plus lent garde sur la borne)
+        if (pseudo.Length > 0 && string.Equals(premier.Joueur, pseudo, StringComparison.OrdinalIgnoreCase))
+            return monTempsPublie is not { } publie || monTemps <= publie;
         return premier.Replay is { } r && tempsDesReplays.TryGetValue(r, out var t) && monTemps <= t;
     }
 
