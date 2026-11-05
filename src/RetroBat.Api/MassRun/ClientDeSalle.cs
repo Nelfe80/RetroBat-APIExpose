@@ -45,22 +45,62 @@ public sealed class ClientDeSalle : IDisposable
         public DateTime RecuLe;
         /// <summary>Les dernieres positions recues (instant en images, piste), de la plus ancienne a la plus recente.</summary>
         internal readonly List<(double T, byte[] Piste)> Echantillons = new();
+
+        /// <summary>Les ecarts recents entre l'instant d'une position et l'horloge locale a sa reception (en images).</summary>
+        internal readonly Queue<(double L, double Ecart)> Ecarts = new();
+
+        /// <summary>Le decalage d'affichage du coureur : il est montre a l'instant « horloge locale + decalage ».</summary>
+        internal double? Decalage;
     }
 
     /// <summary>
-    /// LE RETARD D'AFFICHAGE DES AUTRES COUREURS (retour du user du 04/11 : « saccade ») : les positions arrivent 15 fois par
-    /// seconde, le jeu tourne a 60 images. Les autres sont montres 7 images (115 ms) dans le passe, la ou deux positions
-    /// recues les encadrent, et glissent de l'une a l'autre ; au-dela de la derniere, leur mouvement est prolonge 8 images.
-    /// Les coureurs ne se touchent pas : ce retard ne change rien a la course.
+    /// LE RETARD D'AFFICHAGE PROPRE A CHAQUE COUREUR (essai du user du 05/11 sur Sonic : « les bots sont tres saccades ») :
+    /// avec un retard fixe de 7 images sur l'image de course de la borne, une position recue en retard (borne chargee, reseau)
+    /// laissait le coureur depasser sa derniere position connue, se figer, puis sauter. Chaque coureur est montre a l'horloge
+    /// locale plus son decalage, regle sur la position la plus en retard des 2 dernieres secondes moins une marge : il reste
+    /// entre deux positions recues. Le decalage recule vite (une bouffee de retard) et avance doucement (au plus 0,25 image par
+    /// position, 6 % de vitesse). Pur.
     /// </summary>
-    public const double RetardDAffichage = 7;
+    internal static void NoterLEcart(Coureur coureur, double t, double maintenant)
+    {
+        var ecarts = coureur.Ecarts;
+        ecarts.Enqueue((maintenant, t - maintenant));
+        while (ecarts.Count > 0 && ecarts.Peek().L < maintenant - FenetreDesEcarts) ecarts.Dequeue();
+        var voulu = ecarts.Min(e => e.Ecart) - MargeDAffichage;
+        coureur.Decalage = coureur.Decalage is { } d ? d + Math.Clamp(voulu - d, -1.0, 0.25) : voulu;
+    }
+
+    internal const double FenetreDesEcarts = 120;
+    internal const double MargeDAffichage = 2;
+
+    /// <summary>La piste d'un coureur pour l'image qui sera dessinee dans <paramref name="images"/> images.</summary>
+    public bool ComposerA(Coureur coureur, int images, Span<byte> sortie)
+    {
+        double cible;
+        lock (_verrou)
+        {
+            if (coureur.Decalage is not { } decalage) return false;
+            cible = HorlogeEnImages() + images + decalage;
+        }
+        return Composer(coureur, cible, sortie);
+    }
+
+    /// <summary>
+    /// LES AUTRES COUREURS DANS LE PASSE (retour du user du 04/11 : « saccade ») : les positions arrivent 15 fois par seconde,
+    /// le jeu tourne a 60 images. Les autres sont montres un peu dans le passe (leur retard propre, voir
+    /// <see cref="NoterLEcart"/>), la ou deux positions recues les encadrent, et glissent de l'une a l'autre ; au-dela de la
+    /// derniere, leur mouvement est prolonge 8 images. Les coureurs ne se touchent pas : ce retard ne change rien a la course.
+    /// </summary>
     private const double Prolongement = 8;
 
     private readonly System.Diagnostics.Stopwatch _horloge = System.Diagnostics.Stopwatch.StartNew();
 
     /// <summary>L'horloge locale en images (60,0988 par seconde) : l'instant des positions de la salle d'attente, ou toutes
     /// les bornes sont a l'image de course 0.</summary>
-    public double HorlogeEnImages() => _horloge.Elapsed.TotalSeconds * 60.0988;
+    public double HorlogeEnImages() => _horloge.Elapsed.TotalSeconds * ImagesParSeconde;
+
+    /// <summary>La cadence du jeu de la salle : 60,0988 sur NES, 59,9227 sur Mega Drive.</summary>
+    public double ImagesParSeconde => JeuxMassRun.FormatMegaDrive(Jeu) ? 59.922743 : 60.0988;
 
     /// <summary>La piste d'un coureur a l'instant <paramref name="cible"/> (en images), glissee entre deux positions recues.</summary>
     public bool Composer(Coureur coureur, double cible, Span<byte> sortie)
@@ -339,11 +379,14 @@ public sealed class ClientDeSalle : IDisposable
                 if (echantillons.Count > 0 && t < echantillons[^1].T - 120)
                 {
                     echantillons.Clear();   // passage de la salle d'attente a la course
+                    coureur.Ecarts.Clear();
+                    coureur.Decalage = null;
                 }
                 if (echantillons.Count == 0 || t > echantillons[^1].T)
                 {
                     echantillons.Add((t, (byte[])coureur.Piste.Clone()));
-                    if (echantillons.Count > 8) echantillons.RemoveAt(0);
+                    if (echantillons.Count > 24) echantillons.RemoveAt(0);
+                    NoterLEcart(coureur, t, HorlogeEnImages());
                 }
             }
         }

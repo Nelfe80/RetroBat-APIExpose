@@ -459,15 +459,15 @@ public sealed class MassRunService : IDisposable
                         derniere = image;
                         var coureurs = client.CoureursFrais();
                         var liste = new List<MassRunCanal.Coureur>(coureurs.Count);
-                        // l'instant de la premiere image de la fenetre, moins le retard d'affichage (voir ClientDeSalle)
-                        var instant = (attente ? client.HorlogeEnImages() : image) - ClientDeSalle.RetardDAffichage;
+                        // chaque coureur a son propre retard d'affichage, cale sur l'horloge (voir ClientDeSalle.NoterLEcart) : la
+                        // fenetre porte ses positions pour cette image et les 3 suivantes
                         foreach (var (_, c) in coureurs.Take(MassRunCanal.MaxCoureurs))
                         {
                             var fenetre = new byte[]?[MassRunCanal.ImagesParFenetre];
                             for (var k = 0; k < fenetre.Length; k++)
                             {
                                 var piste = new byte[MassRunProtocole.ImageDePiste];
-                                fenetre[k] = client.Composer(c, instant + k, piste) ? piste : null;
+                                fenetre[k] = client.ComposerA(c, k, piste) ? piste : null;
                             }
                             liste.Add(new MassRunCanal.Coureur(c.Couleur, c.Pseudo.Length > 10 ? c.Pseudo[..10] : c.Pseudo, false, fenetre));
                         }

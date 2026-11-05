@@ -69,6 +69,26 @@ public class JeuxMassRunTests
         }
     }
 
+    [Fact]
+    public void Le_retard_d_un_coureur_suit_ses_positions_les_plus_en_retard()
+    {
+        var c = new ClientDeSalle.Coureur();
+        // une position toutes les 4 images, recue 3 images apres son instant : montre 5 images dans le passe
+        for (var l = 100.0; l < 200; l += 4) ClientDeSalle.NoterLEcart(c, l - 3, l);
+        Assert.Equal(-5, c.Decalage!.Value, 3);
+        // une bouffee de retard (20 images) : le decalage recule d'au plus une image par position
+        ClientDeSalle.NoterLEcart(c, 204 - 20, 204);
+        Assert.Equal(-6, c.Decalage!.Value, 3);
+        for (var l = 208.0; l < 260; l += 4) ClientDeSalle.NoterLEcart(c, l - 3, l);
+        Assert.Equal(-19, c.Decalage!.Value, 3);
+        Assert.True(c.Decalage <= -19);
+        // la bouffee sortie de la fenetre de 2 s, il revient doucement (0,25 image par position)
+        for (var l = 260.0; l < 340; l += 4) ClientDeSalle.NoterLEcart(c, l - 3, l);
+        var avant = c.Decalage!.Value;
+        ClientDeSalle.NoterLEcart(c, 340 - 3, 340);
+        Assert.Equal(avant + 0.25, c.Decalage!.Value, 3);
+    }
+
     private static byte[] Image(int x, int y, byte zone, byte acte, byte pose, byte drapeaux)
     {
         var im = new byte[MassRunProtocole.ImageDePiste];
