@@ -289,10 +289,6 @@ public sealed class FantomesDuSpeedrun
     private static string? Id(JsonElement ligne, string champ)
         => ligne.TryGetProperty(champ, out var r) && r.ValueKind == JsonValueKind.Object && r.TryGetProperty("id", out var id) ? id.GetString() : null;
 
-    private static void Rien()
-    {
-    }
-
     /// <summary>Le .nghost d'un replay : converti une fois, garde ensuite ; null si le replay n'est pas joignable.</summary>
     private async Task<byte[]?> FantomeAsync(string replay, CancellationToken ct)
     {
