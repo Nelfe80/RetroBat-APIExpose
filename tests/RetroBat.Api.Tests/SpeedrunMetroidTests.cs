@@ -43,6 +43,55 @@ public class SpeedrunMetroidTests
     public void Le_reglement_ne_cite_que_des_lignes_du_MEM(string nom)
         => Assert.Empty(Lire(nom).VerifierContre(File.ReadAllBytes(Fichier("super-metroid.MEM"))));
 
+    [Theory]
+    [InlineData("kraid", 0xA59F, "BOSS_HIT", "0xD829", 0x01)]
+    [InlineData("phantoon", 0xCD13, "BOSS_HIT", "0xD82B", 0x01)]
+    [InlineData("draygon", 0xDA60, "BOSS_DEFEATED", "0xD82C", 0x03)]
+    [InlineData("ridley", 0xB32E, "BOSS_DEFEATED", "0xD82A", 0x01)]
+    public void Un_boss_part_a_l_entree_de_sa_salle_et_finit_a_sa_mort(string nom, int salle, string action, string drapeau, int vaincu)
+    {
+        var r = Lire(nom);
+        Assert.Equal("speedrun_boss", r.Kind);
+        Assert.Empty(r.VerifierContre(File.ReadAllBytes(Fichier("super-metroid.MEM"))));
+        Assert.True(SessionSpeedrun.SeRelanceSeul(r));
+        var s = Session(nom);
+        Image(s, 100, S(100, 0x08), Salle(100, 0x1234));
+        Image(s, 900, Salle(900, salle));
+        Assert.Equal(SessionSpeedrun.Running, s.Etat);
+        Image(s, 5000, Signal.Depuis(5000, action, drapeau, vaincu, 1_000_000 + 5000 * 1000 / 60));
+        Assert.Equal(SessionSpeedrun.Finished, s.Etat);
+    }
+
+    [Fact]
+    public void Une_mort_contre_un_boss_fait_echouer()
+    {
+        var s = Session("kraid");
+        Image(s, 100, S(100, 0x08), Salle(100, 0x1234));
+        Image(s, 900, Salle(900, 0xA59F));
+        Image(s, 3000, S(3000, 0x13));
+        Assert.NotEqual(SessionSpeedrun.Running, s.Etat);
+        Assert.NotEqual(SessionSpeedrun.Finished, s.Etat);
+    }
+
+    [Fact]
+    public void Mother_Brain_va_jusqu_a_la_fin_du_jeu()
+    {
+        var s = Session("mother-brain");
+        Image(s, 100, S(100, 0x08), Salle(100, 0xDDF3));
+        Image(s, 900, Salle(900, 0xDD58));
+        Image(s, 30000, S(30000, 0x26));
+        Assert.Equal(SessionSpeedrun.Finished, s.Etat);
+    }
+
+    private static Signal Salle(long frame, int salle)
+        => Signal.Depuis(frame, "PROGRESSION_ZONE", "0x079B", salle, 1_000_000 + (long)(frame * 1000 / 60.098812));
+
+    private static void Image(SessionSpeedrun s, long frame, params Signal[] signaux)
+    {
+        s.RecevoirImage(signaux);
+        foreach (var a in s.AdressesInconnues) s.Relever(a, 0);
+    }
+
     [Fact]
     public void Ceres_part_sur_son_etat_et_se_relance_seul_l_any_part_du_demarrage()
     {

@@ -4,7 +4,7 @@
     "system_id": "snes",
     "rom_group": "super-metroid"
   },
-  "mem_sha256": "f8fc19c4f8ebb0bdb7397a9b3505102aa27a2e5a4c2cbc01840bb1476ee22ed6",
+  "mem_sha256": "bf133ced4ed15df10b4e584e8991d89e2ac2aa5fb0fb8103a269e7fe911c4853",
   "start": [],
   "void": [
     "save_state_load",
