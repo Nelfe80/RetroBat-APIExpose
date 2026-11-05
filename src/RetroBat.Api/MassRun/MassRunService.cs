@@ -42,6 +42,7 @@ public sealed class MassRunService : IDisposable
     private readonly InterfaceTextService? _textes;
     private readonly EmulationStationSettingsService? _reglages;
     private readonly IGamelistStore? _gamelists;
+    private readonly NelfePlayDeviceStore? _appareil;
     private readonly RomCanonicalResolver? _canonique;
 
     /// <summary>
@@ -105,9 +106,10 @@ public sealed class MassRunService : IDisposable
 
     public MassRunService(ApiContext contexte, IEventBus bus, ILogger<MassRunService> journal, NelfePlayAgentService? agent = null,
         RetroBat.Api.Reseau.ServiceDeCarte? carte = null, IPrioritesDuJeu? priorites = null, InterfaceTextService? textes = null,
-        EmulationStationSettingsService? reglages = null, IGamelistStore? gamelists = null, RomCanonicalResolver? canonique = null)
+        EmulationStationSettingsService? reglages = null, IGamelistStore? gamelists = null, RomCanonicalResolver? canonique = null, NelfePlayDeviceStore? appareil = null)
     {
         _gamelists = gamelists;
+        _appareil = appareil;
         _canonique = canonique;
         _priorites = priorites;
         _textes = textes;
@@ -303,7 +305,11 @@ public sealed class MassRunService : IDisposable
         {
             throw new InvalidOperationException("un jeu tourne deja");
         }
-        var client = await ClientDeSalle.RejoindreAsync(noeud, id, pseudo, couleur, ct).ConfigureAwait(false);
+        // la borne signe son billet de coureur (cote MASS RUN) pour une vraie course, pas pour l'essai du reseau
+        var appareil = lancerLeJeu ? _appareil?.DeviceId : null;
+        var client = await ClientDeSalle.RejoindreAsync(noeud, id, pseudo, couleur, ct, appareil is null ? null : (jeu, niveau) =>
+            BilletDeCoureur.Signer(appareil, id, jeu, niveau, pseudo, BilletDeCoureur.EmpreinteDuCoeur(JeuxMassRun.Trouver(jeu)?.Coeur ?? "")))
+            .ConfigureAwait(false);
         lock (_verrou)
         {
             // Le jeu de la salle (05/11 : Super Mario Bros. ou Sonic) ; un noeud plus ancien ne nommait que Super Mario Bros.

@@ -115,6 +115,21 @@ public class JeuxMassRunTests
         }
     }
 
+    [Fact]
+    public void Le_billet_de_coureur_dit_la_salle_le_jeu_l_appareil_et_le_coeur()
+    {
+        var quand = new DateTime(2026, 11, 5, 13, 48, 15, DateTimeKind.Utc);
+        var corps = BilletDeCoureur.Corps(140651, "nes/super-mario-bros", "4-1", "NELFE80", "d1", "k1", "c1", quand);
+        Assert.Equal(BilletDeCoureur.Genre, (string?)corps["kind"]);
+        Assert.Equal(140651u, (uint)corps["room"]!);
+        Assert.Equal("2026-11-05T13:48:15Z", (string?)corps["signed_at"]);
+        // la signature se verifie comme celle d'un passeport : ECDSA P-256 sur le JCS du corps
+        using var ecdsa = System.Security.Cryptography.ECDsa.Create(System.Security.Cryptography.ECCurve.NamedCurves.nistP256);
+        var signature = RetroBat.Api.Scoring.Crypto.SignB64Url(ecdsa, RetroBat.Api.Scoring.Jcs.CanonicalBytes(corps));
+        Assert.True(RetroBat.Api.Scoring.Crypto.Verify(ecdsa.ExportSubjectPublicKeyInfo(), RetroBat.Api.Scoring.Jcs.CanonicalBytes(corps), signature));
+        Assert.Null(BilletDeCoureur.Signer(null, 1, "j", "n", "p", null));
+    }
+
     private static byte[] Image(int x, int y, byte zone, byte acte, byte pose, byte drapeaux)
     {
         var im = new byte[MassRunProtocole.ImageDePiste];

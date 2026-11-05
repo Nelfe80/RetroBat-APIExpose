@@ -211,10 +211,27 @@ public sealed class ClientDeSalle : IDisposable
     }
 
     /// <summary>Rejoint la salle : place et cle de session, puis horloge calee sur celle du noeud.</summary>
-    public static async Task<ClientDeSalle> RejoindreAsync(string noeud, uint salle, string pseudo, string couleur, CancellationToken ct)
+    public static async Task<ClientDeSalle> RejoindreAsync(string noeud, uint salle, string pseudo, string couleur, CancellationToken ct,
+        Func<string, string, System.Text.Json.Nodes.JsonObject?>? billet = null)
     {
         var http = new HttpClient { BaseAddress = new Uri(noeud), Timeout = TimeSpan.FromSeconds(10) };
-        var reponse = await http.PostAsJsonAsync($"/massrun/v1/salles/{salle}/rejoindre", new { pseudo, couleur }, ct).ConfigureAwait(false);
+        // le billet de coureur (cote MASS RUN) : signe pour le jeu et le niveau de la salle, relus au noeud avant la jonction
+        System.Text.Json.Nodes.JsonObject? signe = null;
+        if (billet is not null)
+        {
+            try
+            {
+                var etat = JsonDocument.Parse(await http.GetStringAsync($"/massrun/v1/salles/{salle}", ct).ConfigureAwait(false)).RootElement;
+                signe = billet(etat.GetProperty("jeu").GetString() ?? "", etat.GetProperty("niveau").GetString() ?? "");
+            }
+            catch (Exception e) when (e is HttpRequestException or JsonException or KeyNotFoundException or InvalidOperationException
+                or System.Security.Cryptography.CryptographicException)
+            {
+                signe = null;   // sans billet, la borne court sans cote
+            }
+        }
+        var reponse = await http.PostAsJsonAsync($"/massrun/v1/salles/{salle}/rejoindre",
+            new System.Text.Json.Nodes.JsonObject { ["pseudo"] = pseudo, ["couleur"] = couleur, ["billet"] = signe }, ct).ConfigureAwait(false);
         var json = JsonDocument.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false)).RootElement;
         if (!json.TryGetProperty("ok", out var ok) || !ok.GetBoolean())
         {
