@@ -70,6 +70,7 @@ public sealed class FantomesDuSpeedrun
     private bool _enCourse;
     private long? _monTemps;
     private long? _tempsAttendu;
+    private long? _dureeAttendue;
     private string? _defi;
     private string _pseudo = "";
     private TaskCompletionSource? _fantomeAttendu;
@@ -133,7 +134,7 @@ public sealed class FantomesDuSpeedrun
     /// Une arrivee vient de tomber : vrai si elle bat mon temps et que mon fantome court. Son replay, finalise ensuite, le
     /// remplacera (<see cref="AttendreLeFantomeAsync"/>).
     /// </summary>
-    public bool NouveauTemps(long? frames)
+    public bool NouveauTemps(long? frames, long? independant = null)
     {
         lock (_verrou)
         {
@@ -141,6 +142,7 @@ public sealed class FantomesDuSpeedrun
             if (Choix is not (ChoixDesFantomes.MonRecordEtMondial or ChoixDesFantomes.MonRecord)) return false;
             _monTemps = t;
             _tempsAttendu = t;
+            _dureeAttendue = independant;
             _fantomeAttendu = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             return true;
         }
@@ -177,13 +179,13 @@ public sealed class FantomesDuSpeedrun
         {
             Hote? hote;
             string? defi;
-            long? temps;
+            long? temps, dureeDuRun;
             string pseudo;
-            lock (_verrou) { hote = _hote; defi = _defi; temps = _tempsAttendu; pseudo = _pseudo; }
+            lock (_verrou) { hote = _hote; defi = _defi; temps = _tempsAttendu; dureeDuRun = _dureeAttendue; pseudo = _pseudo; }
             if (hote is null || await FantomeAsync(replay, CancellationToken.None).ConfigureAwait(false) is not { } fantome) return;
             // UN REPLAY PLUS COURT QUE LE RUN NE LE CONTIENT PAS (05/11, Green Hill 1 : 1232 images pour un temps de 1925, le
             // replay parti en retard montrait le debut de la tentative suivante). Ni fantome, ni record local.
-            if (temps is { } duree && ImagesDuFantome(fantome) is { } images && images < duree)
+            if ((dureeDuRun ?? temps) is { } duree && ImagesDuFantome(fantome) is { } images && images < duree)
             {
                 _journal?.LogWarning("Fantomes : {Replay} ne contient pas le run ({Images} images pour {Temps}), il ne devient pas un fantome.",
                     replay, images, duree);
@@ -193,9 +195,11 @@ public sealed class FantomesDuSpeedrun
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.nghost")) File.Delete(ancien);
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.label")) File.Delete(ancien);
+            foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.duree")) File.Delete(ancien);
             await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{replay}.nghost"), fantome).ConfigureAwait(false);
             EcrireLEtiquette(dossier, $"{PrefixeDuMien}{replay}", Etiquette(pseudo, false));
-            if (defi is not null && temps is { } t) EcrireLeRecordLocal(defi, t, replay, fantome);
+            EcrireLaDuree(dossier, $"{PrefixeDuMien}{replay}", dureeDuRun);
+            if (defi is not null && temps is { } t) EcrireLeRecordLocal(defi, t, replay, fantome, dureeDuRun);
             _journal?.LogInformation("Fantomes : meilleur temps de la session, {Replay} court des le prochain depart.", replay);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or HttpRequestException or TaskCanceledException)
@@ -277,6 +281,7 @@ public sealed class FantomesDuSpeedrun
         IReadOnlyList<(string Joueur, string? Replay)> lignes = [];
         long? monTempsPublie = null;
         IReadOnlyDictionary<string, long> tempsDesReplays = new Dictionary<string, long>();
+        IReadOnlyDictionary<string, long> dureesDesReplays = new Dictionary<string, long>();
         try
         {
             using var client = _http.CreateClient(IndexDesDefisService.HttpClientName);
@@ -285,6 +290,7 @@ public sealed class FantomesDuSpeedrun
             lignes = LignesDuClassement(json.RootElement);
             monTempsPublie = MonTemps(json.RootElement, pseudo);
             tempsDesReplays = TempsDesReplays(json.RootElement);
+            dureesDesReplays = TempsDesReplays(json.RootElement, "independent_frames");
         }
         catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException)
         {
@@ -299,12 +305,15 @@ public sealed class FantomesDuSpeedrun
         // remplace que s'il est meilleur (un temps fait sur une autre borne).
         var local = Choix is ChoixDesFantomes.MonRecordEtMondial or ChoixDesFantomes.MonRecord ? LireLeRecordLocal(r.ChallengeId) : null;
         // un record local garde avant la garde du 05/11 peut ne pas contenir son run : il ne court pas
-        if (local is { } court && ImagesDuFantome(court.Fantome) is { } n && n < court.Images) local = null;
+        if (local is { } court && ImagesDuFantome(court.Fantome) is { } n && n < (court.Duree ?? court.Images)) local = null;
         if (local is { } l && (monTempsPublie is not { } publie || l.Images <= publie))
         {
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
             await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{l.Replay}.nghost"), l.Fantome, ct).ConfigureAwait(false);
-            EcrireLEtiquette(dossier, $"{PrefixeDuMien}{l.Replay}", Etiquette(pseudo, false));
+            // mon record local est aussi le record mondial quand personne ne fait mieux au classement
+            EcrireLEtiquette(dossier, $"{PrefixeDuMien}{l.Replay}",
+                Etiquette(pseudo, MeilleurQueLeMondial(l.Images, lignes, tempsDesReplays, pseudo)));
+            EcrireLaDuree(dossier, $"{PrefixeDuMien}{l.Replay}", l.Duree);
             poses++;
             if (mien is not null) replays.Remove(mien);
             mien = null;
@@ -319,7 +328,9 @@ public sealed class FantomesDuSpeedrun
         {
             if (await FantomeAsync(replay, ct).ConfigureAwait(false) is not { } fantome) continue;
             // le replay d'un temps publie qui ne contient pas son run (parti en retard, avant le 05/11) ne court pas
-            if (tempsDesReplays.TryGetValue(replay, out var duree) && ImagesDuFantome(fantome) is { } images && images < duree)
+            var dureeDuRun = dureesDesReplays.TryGetValue(replay, out var di) ? di : (long?)null;
+            if ((dureeDuRun ?? (tempsDesReplays.TryGetValue(replay, out var dv) ? dv : null)) is { } duree
+                && ImagesDuFantome(fantome) is { } images && images < duree)
             {
                 _journal?.LogWarning("Fantomes : {Replay} ne contient pas le run publie ({Images} images pour {Temps}), il ne court pas.",
                     replay, images, duree);
@@ -329,7 +340,10 @@ public sealed class FantomesDuSpeedrun
             var nom = (replay == mien ? PrefixeDuMien : $"{poses + 1}-") + replay;
             await File.WriteAllBytesAsync(Path.Combine(dossier, nom + ".nghost"), fantome, ct).ConfigureAwait(false);
             var detenteur = lignes.FirstOrDefault(x => x.Replay == replay).Joueur ?? "";
-            EcrireLEtiquette(dossier, nom, replay == mien ? Etiquette(pseudo, false) : Etiquette(detenteur, true));
+            // (05/11) mon record qui est aussi le record mondial : dore, « PSEUDO (WR) »
+            var mondial = lignes.Count > 0 && lignes[0].Replay == replay;
+            EcrireLEtiquette(dossier, nom, replay == mien ? Etiquette(pseudo, mondial) : Etiquette(detenteur, true));
+            EcrireLaDuree(dossier, nom, dureeDuRun);
             poses++;
         }
 
@@ -379,13 +393,13 @@ public sealed class FantomesDuSpeedrun
     }
 
     /// <summary>Le temps publie (images) de chaque replay du classement. Pur.</summary>
-    internal static IReadOnlyDictionary<string, long> TempsDesReplays(JsonElement classement)
+    internal static IReadOnlyDictionary<string, long> TempsDesReplays(JsonElement classement, string champ = "value")
     {
         var temps = new Dictionary<string, long>(StringComparer.Ordinal);
         if (!classement.TryGetProperty("rows", out var lignes) || lignes.ValueKind != JsonValueKind.Array) return temps;
         foreach (var l in lignes.EnumerateArray())
         {
-            if ((Id(l, "ghost") ?? Id(l, "replay")) is { Length: > 0 } replay && l.TryGetProperty("value", out var v) && v.TryGetInt64(out var t))
+            if ((Id(l, "ghost") ?? Id(l, "replay")) is { Length: > 0 } replay && l.TryGetProperty(champ, out var v) && v.TryGetInt64(out var t))
                 temps.TryAdd(replay, t);
         }
 
@@ -440,6 +454,34 @@ public sealed class FantomesDuSpeedrun
         return mondial ? (nom.Length > 0 ? nom + " (WR)" : "WR") : nom;
     }
 
+    /// <summary>
+    /// (05/11) La duree du run, du depart a l'arrivee (chrono independant), a cote du fantome : le coeur hote l'arrete a
+    /// l'arrivee, et ecarte un replay qui ne contient pas tout le run. Inconnue : aucun fichier.
+    /// </summary>
+    private void EcrireLaDuree(string dossier, string nom, long? duree)
+    {
+        try
+        {
+            var chemin = Path.Combine(dossier, nom + ".duree");
+            if (duree is > 0) File.WriteAllText(chemin, duree.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            else if (File.Exists(chemin)) File.Delete(chemin);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            _journal?.LogDebug(e, "Fantomes : duree de {Nom} non ecrite.", nom);
+        }
+    }
+
+    /// <summary>Mon temps bat (ou egale) tout le classement : mon fantome est le record mondial. Pur.</summary>
+    internal static bool MeilleurQueLeMondial(long monTemps, IReadOnlyList<(string Joueur, string? Replay)> lignes,
+        IReadOnlyDictionary<string, long> tempsDesReplays, string pseudo)
+    {
+        if (lignes.Count == 0) return false;
+        var premier = lignes[0];
+        if (pseudo.Length > 0 && string.Equals(premier.Joueur, pseudo, StringComparison.OrdinalIgnoreCase)) return true;
+        return premier.Replay is { } r && tempsDesReplays.TryGetValue(r, out var t) && monTemps <= t;
+    }
+
     private void EcrireLEtiquette(string dossier, string nom, string etiquette)
     {
         try
@@ -455,12 +497,12 @@ public sealed class FantomesDuSpeedrun
     /// <summary>Le dossier des records locaux : un .nghost et un .json (temps en images, replay) par defi.</summary>
     internal static string DossierDesRecordsLocaux { get; set; } = Path.Combine(RetroBatPaths.PluginRoot, "state", "speedrun", "fantomes", "locaux");
 
-    internal sealed record RecordLocal(long Images, string Replay, byte[] Fantome);
+    internal sealed record RecordLocal(long Images, string Replay, byte[] Fantome, long? Duree = null);
 
     private static string? NomSur(string defi) => System.Text.RegularExpressions.Regex.IsMatch(defi, "^[a-z0-9][a-z0-9.\\-]{0,95}$") ? defi : null;
 
     /// <summary>Garde mon meilleur temps sur cette borne, s'il bat celui qui y est deja.</summary>
-    internal static void EcrireLeRecordLocal(string defi, long images, string replay, byte[] fantome)
+    internal static void EcrireLeRecordLocal(string defi, long images, string replay, byte[] fantome, long? duree = null)
     {
         if (NomSur(defi) is not { } nom) return;
         if (LireLeRecordLocal(defi) is { } deja && deja.Images <= images) return;
@@ -468,7 +510,7 @@ public sealed class FantomesDuSpeedrun
         var chemin = Path.Combine(DossierDesRecordsLocaux, nom);
         File.WriteAllBytes(chemin + ".nghost.tmp", fantome);
         File.Move(chemin + ".nghost.tmp", chemin + ".nghost", true);
-        File.WriteAllText(chemin + ".json", JsonSerializer.Serialize(new { images, replay, le = DateTime.UtcNow }));
+        File.WriteAllText(chemin + ".json", JsonSerializer.Serialize(new { images, replay, duree, le = DateTime.UtcNow }));
     }
 
     internal static RecordLocal? LireLeRecordLocal(string defi)
@@ -480,7 +522,8 @@ public sealed class FantomesDuSpeedrun
             if (!File.Exists(chemin + ".json") || !File.Exists(chemin + ".nghost")) return null;
             using var doc = JsonDocument.Parse(File.ReadAllText(chemin + ".json"));
             return new RecordLocal(doc.RootElement.GetProperty("images").GetInt64(), doc.RootElement.GetProperty("replay").GetString() ?? "",
-                File.ReadAllBytes(chemin + ".nghost"));
+                File.ReadAllBytes(chemin + ".nghost"),
+                doc.RootElement.TryGetProperty("duree", out var d) && d.ValueKind == JsonValueKind.Number ? d.GetInt64() : null);
         }
         catch (Exception e) when (e is IOException or JsonException or KeyNotFoundException or InvalidOperationException or UnauthorizedAccessException)
         {
@@ -507,6 +550,7 @@ public sealed class FantomesDuSpeedrun
                 if (!Directory.Exists(dossier)) continue;
                 foreach (var f in Directory.EnumerateFiles(dossier, "*-rp_*.nghost")) File.Delete(f);
                 foreach (var f in Directory.EnumerateFiles(dossier, "*-rp_*.label")) File.Delete(f);
+                foreach (var f in Directory.EnumerateFiles(dossier, "*-rp_*.duree")) File.Delete(f);
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException)
             {

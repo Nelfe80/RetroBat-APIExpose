@@ -142,6 +142,72 @@ public sealed class ReplayRecorderService : BackgroundService
         _ra = ra; _store = store; _timing = timing; _bus = bus; _playback = playback; _logger = logger;
         _config = config; _catalogue = catalogue; _partie = partie;
         _garde = new GardeDesPlantages(Path.Combine(Path.GetDirectoryName(store.ActiveRecordingPath) ?? ".", "sans-enregistrement.json"));
+        Courant = this;
+    }
+
+    /// <summary>L'enregistreur en service : la session d'un speedrun lui ouvre le replay d'une relance (<see cref="OuvrirApresRelanceAsync"/>).</summary>
+    internal static ReplayRecorderService? Courant { get; private set; }
+
+    /// <summary>Un seul tour a la fois : la boucle, ou l'ouverture demandee par une relance.</summary>
+    private readonly SemaphoreSlim _tour = new(1, 1);
+
+    /// <summary>Le dernier etat de RetroArch vu avec un jeu charge : la relance ouvre son replay sans le redemander.</summary>
+    private RaStatus? _dernierStatut;
+
+    /// <summary>Quand une relance a ouvert son replay elle-meme : l'evenement qui suit ne la rejoue pas.</summary>
+    private DateTime _ouvertALaRelance = DateTime.MinValue;
+
+    /// <summary>
+    /// LA SESSION OUVRE LE REPLAY DE SA RELANCE (05/11, ta course de 25,66 s : replay ouvert 1,75 s apres l'etat recharge, le
+    /// depart de Mario etait deja passe). Appele juste apres l'etat de depart, sans attendre le tour de la boucle ni redemander
+    /// l'etat de RetroArch : l'ancien replay se repere, le neuf s'ouvre, l'ancien se scelle ensuite.
+    /// </summary>
+    public async Task OuvrirApresRelanceAsync(CancellationToken ct)
+    {
+        if (!await _tour.WaitAsync(TimeSpan.FromSeconds(1), ct).ConfigureAwait(false)) return;   // l'evenement prendra le relais
+        try
+        {
+            _speedrun = true;
+            _etatDeDepartAttendu = false;
+            _runTermine = false;
+            _arretParBaisse = false;
+            _relanceDuDefi = false;
+            _sourceDuDepart = "etat de depart du defi";
+            _departEnAttente = true;
+            var precedent = _current;
+            var statut = _dernierStatut;
+            string? fichier = null;
+            if (precedent is not null)
+            {
+                await _ra.HaltAsync(ct).ConfigureAwait(false);
+                fichier = FindReplayFile(precedent.StartedAtUtc);
+                _current = null;
+                await PublishAsync("replay.recording.stopped", new { precedent.ReplayId, precedent.SessionId, precedent.LastFrame }, ct).ConfigureAwait(false);
+                _logger.LogInformation("Replay : {ReplayId} arrete a la relance du defi, le suivant s'ouvre sur l'etat de depart.", precedent.ReplayId);
+            }
+
+            if (statut is { ContentLoaded: true } && !_playback.IsBusy)
+            {
+                _attenteAnnoncee = "";
+                await StartAsync(statut, ct).ConfigureAwait(false);
+                if (_current is not null) _ouvertALaRelance = DateTime.UtcNow;
+            }
+
+            if (precedent is not null)
+            {
+                // le scellement de l'ancien (jusqu'a une dizaine de secondes) ne retient ni la session ni la relance suivante :
+                // il ne touche plus au replay en cours (FinalizeAsync ne vide _current que s'il est encore le sien)
+                _ = Task.Run(async () =>
+                {
+                    try { await FinalizeAsync(precedent, recovered: false, CancellationToken.None, fichier, dejaArrete: true).ConfigureAwait(false); }
+                    catch (Exception ex) { _logger.LogWarning(ex, "Replay : scellement de {ReplayId} en echec", precedent.ReplayId); }
+                });
+            }
+        }
+        finally
+        {
+            _tour.Release();
+        }
     }
 
     /// <summary>
@@ -399,6 +465,8 @@ public sealed class ReplayRecorderService : BackgroundService
                 _speedrun = true;
                 return;
             case "speedrun.etat.charge":
+                // la relance a deja ouvert son replay (OuvrirApresRelanceAsync) : rien a rejouer
+                if (DateTime.UtcNow - _ouvertALaRelance < TimeSpan.FromSeconds(10)) return;
                 _etatDeDepartAttendu = false;
                 _speedrun = true;
                 _sourceDuDepart = "etat de depart du defi";
@@ -529,7 +597,12 @@ public sealed class ReplayRecorderService : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            try { await TickAsync(stoppingToken).ConfigureAwait(false); }
+            try
+            {
+                await _tour.WaitAsync(stoppingToken).ConfigureAwait(false);
+                try { await TickAsync(stoppingToken).ConfigureAwait(false); }
+                finally { _tour.Release(); }
+            }
             catch (OperationCanceledException) { break; }
             catch (Exception ex) { _logger.LogDebug(ex, "Replay recorder : tick en erreur"); }
             try { await _reveil.WaitAsync(PollInterval, stoppingToken).ConfigureAwait(false); }
@@ -556,6 +629,7 @@ public sealed class ReplayRecorderService : BackgroundService
 
         if (status is { ContentLoaded: true })
         {
+            _dernierStatut = status;
             var contenu = status.System + "/" + status.Game;
             if (!string.Equals(_contenuVu, contenu, StringComparison.Ordinal))
             {

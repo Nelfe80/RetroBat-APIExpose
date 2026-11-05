@@ -394,6 +394,9 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 await Task.Delay(200, delai.Token).ConfigureAwait(false);
                 await EtatsDesDefis.ChargerAsync(_commandes, delai.Token).ConfigureAwait(false);
                 await Task.Delay(500, CancellationToken.None).ConfigureAwait(false);
+                // (05/11) le replay de la tentative s'ouvre tout de suite sur l'etat charge, avant que le joueur ait la main
+                if (RetroBat.Api.Replay.Recording.ReplayRecorderService.Courant is { } enregistreur)
+                    await enregistreur.OuvrirApresRelanceAsync(CancellationToken.None).ConfigureAwait(false);
             }
         }
         catch (Exception ex)
@@ -852,7 +855,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             // Le joueur voit sa mort ou son temps, puis l'etat de depart revient et le chrono repart de 0. Une arrivee qui bat
             // son temps arrete l'enregistrement plus tot : son replay devient le fantome de ce depart.
             var sessionId = _session.SessionId;
-            var meilleur = _session.Etat == SessionSpeedrun.Finished && _fantomes?.NouveauTemps(_session.MeilleurTemps) == true;
+            var meilleur = _session.Etat == SessionSpeedrun.Finished && _fantomes?.NouveauTemps(_session.MeilleurTemps, _session.MeilleurIndependant) == true;
             _ = Task.Run(async () =>
             {
                 if (meilleur)

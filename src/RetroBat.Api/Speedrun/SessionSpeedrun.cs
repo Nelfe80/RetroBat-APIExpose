@@ -149,6 +149,9 @@ public sealed class SessionSpeedrun
     /// <summary>Le meilleur temps du joueur sur ce defi, en frames (journal local) ; null sans temps fini.</summary>
     public long? MeilleurTemps { get; set; }
 
+    /// <summary>(05/11) Le chrono independant de ce meilleur temps : du depart a l'arrivee du run, la duree de son fantome.</summary>
+    public long? MeilleurIndependant { get; private set; }
+
     public string Etat => _relance ? Restarting : EtatHud(_courante.Etat);
 
     public static string EtatHud(EtatTentative etat) => etat switch
@@ -517,7 +520,10 @@ public sealed class SessionSpeedrun
         _closes.Add((AttemptId, res));
         var precedent = MeilleurTemps;
         if (EstClassable(res) && res.FramesOfficielles is { } frames && (precedent is not { } pb || frames < pb))
+        {
             MeilleurTemps = frames;
+            MeilleurIndependant = res.Independant?.Frames;
+        }
         if (EstClassable(res) && res.FramesOfficielles is { } temps && (_meilleure?.Resultat.FramesOfficielles is not { } vu || temps < vu)
             && _horlogeDuDepart is { } departMs && (_horlogeDArrivee ?? _horlogeDeLImage) is { } arriveeMs)
             _meilleure = new TentativeFinie(AttemptId, Numero, res, departMs, arriveeMs);
