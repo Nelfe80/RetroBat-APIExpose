@@ -77,9 +77,7 @@ public sealed class MultiplayerCoeursService : BackgroundService
         new("nes", "fceumm_ghosts", ["fceumm_ghosts_libretro.dll"], "fceumm_ghosts_libretro.info",
             "le coeur libretro fceumm_ghosts (fantomes et MASS RUN de NelfePlay), en dernier : fceumm reste le coeur des parties "
             + "solo"),
-        new("snes", "snes9x_ghosts", ["snes9x_ghosts_libretro.dll"], "snes9x_ghosts_libretro.info",
-            "le coeur libretro snes9x_ghosts (fantomes des speedruns de NelfePlay), en dernier : snes9x reste le coeur des parties "
-            + "solo"),
+        // SNES9X GHOSTS (Super Metroid) : livre avec l'ouverture de Super Metroid, pas avant (empreinte a admettre au site).
         new("megadrive", "genesis_plus_gx_ghosts", ["genesis_plus_gx_ghosts_libretro.dll"], "genesis_plus_gx_ghosts_libretro.info",
             "le coeur libretro genesis_plus_gx_ghosts (fantomes des speedruns de NelfePlay), en dernier : genesis_plus_gx reste le "
             + "coeur des parties solo"),
