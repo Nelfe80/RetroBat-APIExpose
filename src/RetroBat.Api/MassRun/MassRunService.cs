@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Text.Json;
 using RetroBat.Api.Infrastructure;
+using RetroBat.Api.Media;
 using RetroBat.Api.Multiplayer;
 using RetroBat.Api.Speedrun;
 using RetroBat.Domain.Interfaces;
@@ -40,6 +41,27 @@ public sealed class MassRunService : IDisposable
     private readonly IPrioritesDuJeu? _priorites;
     private readonly InterfaceTextService? _textes;
     private readonly EmulationStationSettingsService? _reglages;
+    private readonly IGamelistStore? _gamelists;
+    private readonly RomCanonicalResolver? _canonique;
+
+    /// <summary>La ROM du jeu : celle que le groupe de scoring designe (comme un speedrun), sinon le nom d'usage.</summary>
+    private string? RomDe(JeuxMassRun.Jeu jeu)
+    {
+        try
+        {
+            if (_gamelists is not null && _canonique is not null
+                && RomDuGroupe.Trouver(_gamelists, _canonique, jeu.Systeme, jeu.RomGroup) is { } trouvee && File.Exists(trouvee))
+            {
+                return trouvee;
+            }
+        }
+        catch (Exception e) when (e is IOException or InvalidOperationException or UnauthorizedAccessException)
+        {
+            _journal.LogDebug(e, "MASS RUN : ROM du groupe illisible.");
+        }
+        var parDefaut = Path.Combine(RetroBatPaths.RetroBatRoot, "roms", jeu.Systeme, jeu.RomParDefaut);
+        return File.Exists(parDefaut) ? parDefaut : null;
+    }
 
     /// <summary>Le classement fige reste a l'ecran ce temps apres l'arrivee, puis le jeu se ferme : le bilan prend la suite.</summary>
     private static readonly TimeSpan TenueDeLArrivee = TimeSpan.FromSeconds(10);
@@ -74,8 +96,10 @@ public sealed class MassRunService : IDisposable
 
     public MassRunService(ApiContext contexte, IEventBus bus, ILogger<MassRunService> journal, NelfePlayAgentService? agent = null,
         RetroBat.Api.Reseau.ServiceDeCarte? carte = null, IPrioritesDuJeu? priorites = null, InterfaceTextService? textes = null,
-        EmulationStationSettingsService? reglages = null)
+        EmulationStationSettingsService? reglages = null, IGamelistStore? gamelists = null, RomCanonicalResolver? canonique = null)
     {
+        _gamelists = gamelists;
+        _canonique = canonique;
         _priorites = priorites;
         _textes = textes;
         _reglages = reglages;
@@ -273,17 +297,27 @@ public sealed class MassRunService : IDisposable
         var client = await ClientDeSalle.RejoindreAsync(noeud, id, pseudo, couleur, ct).ConfigureAwait(false);
         lock (_verrou)
         {
-            if (!System.Text.RegularExpressions.Regex.IsMatch(client.Niveau, "^[1-8]-[1-4]$"))
+            // Le jeu de la salle (05/11 : Super Mario Bros. ou Sonic) ; un noeud plus ancien ne nommait que Super Mario Bros.
+            var jeu = JeuxMassRun.Trouver(client.Jeu) ?? (client.Jeu.Length == 0 ? JeuxMassRun.ParDefaut : null);
+            if (jeu is null || !jeu.Niveaux.IsMatch(client.Niveau))
             {
                 client.Dispose();
-                throw new InvalidOperationException("niveau inconnu : " + client.Niveau);
+                throw new InvalidOperationException("jeu ou niveau inconnu : " + client.Jeu + " " + client.Niveau);
             }
-            var rom = Path.Combine(RetroBatPaths.RetroBatRoot, "roms", "nes", "Super Mario Bros. (World).zip");
-            var etat = EtatRetroArch.Brut(File.ReadAllBytes(Path.Combine(EtatsDesDefis.Racine, "nes", "super-mario-bros", client.Niveau + "-panneau.state")));
+            var rom = RomDe(jeu);
+            var cheminEtat = JeuxMassRun.CheminDeLEtat(jeu, client.Niveau);
+            if (rom is null || !File.Exists(cheminEtat))
+            {
+                client.Dispose();
+                throw new InvalidOperationException(rom is null ? "ROM absente : " + jeu.Id : "etat de depart absent : " + cheminEtat);
+            }
+            var etat = EtatRetroArch.Brut(File.ReadAllBytes(cheminEtat));
             RetroBat.Api.Speedrun.FantomesDuSpeedrun.ViderLeDossier();
+            FichiersDesCoeursHotes.PoserLesProfils();
+            FichiersDesCoeursHotes.PoserLesPoses(jeu);
             Arreter();
             _canal ??= new MassRunCanal();
-            _canal.PoserSalle(CrcSmb, client.GoLocalUtc, client.Limite, Convert.ToUInt32(couleur, 16), pseudo, client.Niveau, etat, client.RegleMort, TextesDuCoeur());
+            _canal.PoserSalle(jeu.Crc, client.GoLocalUtc, client.Limite, Convert.ToUInt32(couleur, 16), pseudo, client.Niveau, etat, client.RegleMort, TextesDuCoeur());
             var salle = new SalleLocale(client.Niveau, 0, pseudo, couleur, 0, 0, rom)
             {
                 GoUtc = client.GoLocalUtc, Noeud = noeud, Salle = client.Salle, Place = client.Place, Limite = client.Limite,
@@ -297,14 +331,14 @@ public sealed class MassRunService : IDisposable
             if (lancerLeJeu)
             {
                 var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
-                    RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, "nes", "libretro", CoeurHote, rom, null);
+                    RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, jeu.Systeme, "libretro", jeu.Coeur, rom, null);
                 if (arguments is not null)
                 {
-                    _ = Task.Run(() => LancementDirect.Lancer(arguments, "nes", rom, _contexte, _bus, _journal));
+                    _ = Task.Run(() => LancementDirect.Lancer(arguments, jeu.Systeme, rom, _contexte, _bus, _journal));
                 }
             }
-            _journal.LogInformation("MASS RUN : salle {Salle} du noeud {Noeud} rejointe, place {Place}, {Niveau}, GO! a {Go:HH:mm:ss.fff} (ecart d'horloge {Ecart} ms)",
-                client.Salle, noeud, client.Place, client.Niveau, client.GoLocalUtc.ToLocalTime(), client.EcartHorlogeMs);
+            _journal.LogInformation("MASS RUN : salle {Salle} du noeud {Noeud} rejointe, place {Place}, {Jeu} {Niveau}, GO! a {Go:HH:mm:ss.fff} (ecart d'horloge {Ecart} ms)",
+                client.Salle, noeud, client.Place, jeu.Id, client.Niveau, client.GoLocalUtc.ToLocalTime(), client.EcartHorlogeMs);
             return salle;
         }
     }

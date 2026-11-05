@@ -82,7 +82,7 @@ public sealed class ClientDeSalle : IDisposable
                 if (cible <= e[i + 1].T)
                 {
                     var f = (cible - e[i].T) / Math.Max(1e-6, e[i + 1].T - e[i].T);
-                    Glisser(e[i].Piste, e[i + 1].Piste, f, sortie);
+                    GlisserSelonLeJeu(e[i].Piste, e[i + 1].Piste, f, sortie);
                     return true;
                 }
             }
@@ -90,9 +90,36 @@ public sealed class ClientDeSalle : IDisposable
             var (ta, a) = e[^2];
             var (tb, b) = e[^1];
             var depasse = Math.Min(cible - tb, Prolongement);
-            Glisser(a, b, 1 + depasse / Math.Max(1e-6, tb - ta), sortie);
+            GlisserSelonLeJeu(a, b, 1 + depasse / Math.Max(1e-6, tb - ta), sortie);
             return true;
         }
+    }
+
+    private void GlisserSelonLeJeu(byte[] a, byte[] b, double f, Span<byte> sortie)
+    {
+        if (JeuxMassRun.FormatMegaDrive(Jeu)) GlisserMegaDrive(a, b, f, sortie);
+        else Glisser(a, b, f, sortie);
+    }
+
+    /// <summary>
+    /// L'image de piste d'un coureur Mega Drive (voir <see cref="JeuxMassRun"/>) : x dans le niveau aux octets 0-1, y en deux
+    /// octets (8 et 11), la pose (numero d'image de Sonic et retournement) aux octets 9 et 10. Entre deux positions : la pose de
+    /// la plus proche, a une position glissee ; d'un acte a l'autre ou sur un saut (mort, retour au depart), pas de glissement.
+    /// </summary>
+    internal static void GlisserMegaDrive(byte[] a, byte[] b, double f, Span<byte> sortie)
+    {
+        var reference = f < 0.5 ? a : b;
+        reference.CopyTo(sortie);
+        if (MassRunProtocole.Scene(a) != MassRunProtocole.Scene(b) || a[6] == 0 || b[6] == 0)
+        {
+            return;
+        }
+        int xa = JeuxMassRun.XMegaDrive(a), xb = JeuxMassRun.XMegaDrive(b), ya = JeuxMassRun.YMegaDrive(a), yb = JeuxMassRun.YMegaDrive(b);
+        if (Math.Abs(xb - xa) > 256 || Math.Abs(yb - ya) > 256)
+        {
+            return;
+        }
+        JeuxMassRun.PlacerMegaDrive(sortie, (int)Math.Round(xa + (xb - xa) * f), (int)Math.Round(ya + (yb - ya) * f));
     }
 
     /// <summary>

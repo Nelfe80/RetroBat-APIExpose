@@ -21,7 +21,7 @@ namespace RetroBat.Api.MassRun;
 ///  12800  classement en direct, ecrit par l'API : sequence (u32), nombre de lignes (u32), mon rang (u32, 0 = pas encore),
 ///         arrives (u32), inscrits (u32), reserve (u32 x 3), puis 16 lignes de 32 octets : rang (u16), drapeaux (u16, bit 0 =
 ///         moi, bit 1 = elimine), images (u32), couleur 0RGB (u32), pseudo (16), reserve (4)
-///  32768  etat de depart brut du coeur
+///  32768  etat de depart brut du coeur (jusqu'a la fin du canal : 2 Mo depuis le 05/11, pour la Mega Drive)
 /// </code>
 /// Les blocs ecrits par l'un et lus par l'autre sont proteges par leur sequence : paire = stable.
 /// </summary>
@@ -29,7 +29,7 @@ namespace RetroBat.Api.MassRun;
 public sealed class MassRunCanal : IDisposable
 {
     public const string Nom = @"Local\NelfePlay.MassRun";
-    public const int Taille = 65536;
+    public const int Taille = 2 * 1024 * 1024;   // 05/11 : l'etat de Genesis Plus GX fait 1 036 288 octets (le coeur NES n'en voit que 64 Ko)
     public const uint Signature = 0x53524D4E; // "NMRS"
     public const int TailleImageDePiste = 40;
     public const int MaxCoureurs = 64;

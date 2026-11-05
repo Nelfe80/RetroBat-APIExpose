@@ -85,7 +85,7 @@ public sealed partial class DefisPanelService
             MotMassRun,
             jeu,
             T("massrun.page.public", "PUBLIC RACE"),
-            FormatDe(s) + " · " + T("massrun.panel.level", "Level") + " " + s.Niveau,
+            FormatDe(s) + " · " + T("massrun.panel.level", "Level") + " " + RetroBat.Api.MassRun.JeuxMassRun.NomDuNiveau(s.Niveau),
             fanart,
             [],
             "",
@@ -111,7 +111,7 @@ public sealed partial class DefisPanelService
             Fiche:
             [
                 new(T("massrun.page.format", "Format"), FormatDe(s)),
-                new(T("massrun.panel.level", "Level"), s.Niveau),
+                new(T("massrun.panel.level", "Level"), RetroBat.Api.MassRun.JeuxMassRun.NomDuNiveau(s.Niveau)),
                 new(T("massrun.page.death", "Death"), RegleDe(s)),
                 new(T("massrun.panel.registered", "Runners registered"), inscrits.ToString(CultureInfo.InvariantCulture)),
                 new(T("massrun.panel.start_in", "Start in"), Horloge(avantLeGo)),
@@ -284,7 +284,7 @@ public sealed partial class DefisPanelService
         var note = b.Inscrits <= 1
             ? T("massrun.page.alone_end", "You were the only runner in this room")
             : b.CourseFinie
-            ? FormatDe(b.Salle) + " · " + T("massrun.panel.level", "Level") + " " + b.Salle.Niveau
+            ? FormatDe(b.Salle) + " · " + T("massrun.panel.level", "Level") + " " + RetroBat.Api.MassRun.JeuxMassRun.NomDuNiveau(b.Salle.Niveau)
             : T("massrun.page.still_running", "Race still running: the ranking fills in as runners finish");
         return new EcranDeFin(
             // L'issue et le rang changent la cle : le titre se rejoue quand la place arrive.
@@ -302,7 +302,7 @@ public sealed partial class DefisPanelService
                 T("speedrun.page.quit", "QUIT")),
             _glypheValider,
             _glypheAnnuler,
-            MonScore: new ScoreDeFin(FormatDe(b.Salle) + " · " + b.Salle.Niveau, valeur, ruban, ecart, premier),
+            MonScore: new ScoreDeFin(FormatDe(b.Salle) + " · " + RetroBat.Api.MassRun.JeuxMassRun.NomDuNiveau(b.Salle.Niveau), valeur, ruban, ecart, premier),
             Logo: LogoDesPages,
             Classement: AutourDuJoueur(b.Classement)
                 .Select(l => new LigneDeDefi($"{l.Rang}   {l.Pseudo}", "", l.Elimine ? "✕ " + TempsDeCourse(l.Images) : TempsDeCourse(l.Images),

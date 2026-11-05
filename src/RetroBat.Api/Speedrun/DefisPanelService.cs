@@ -239,7 +239,7 @@ public sealed partial class DefisPanelService
         var inscriptions = salle.Inscriptions(maintenant);
         var avant = salle.GoUtc > maintenant;
         var format = FormatDe(salle);
-        var niveau = T("massrun.panel.level", "Level") + " " + salle.Niveau;
+        var niveau = T("massrun.panel.level", "Level") + " " + RetroBat.Api.MassRun.JeuxMassRun.NomDuNiveau(salle.Niveau);
         var inscrits = salle.Inscrits.ToString(System.Globalization.CultureInfo.InvariantCulture);
         var vue = new SalleMassRun(
             inscriptions ? T("massrun.panel.open", "Room open") : avant ? T("massrun.panel.closed", "Registration closed") : T("massrun.panel.running", "Race in progress"),

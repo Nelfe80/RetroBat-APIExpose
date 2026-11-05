@@ -198,6 +198,7 @@ public sealed class FantomesDuSpeedrun
         }
 
         if (HoteDe(r) is not { } hote || Choix == ChoixDesFantomes.Aucun) return false;
+        RetroBat.Api.MassRun.FichiersDesCoeursHotes.PoserLesProfils();
         lock (_verrou) _hote = hote;
         var travail = Task.Run(() => PreparerAsync(r, hote, pseudo, CancellationToken.None));
         try
