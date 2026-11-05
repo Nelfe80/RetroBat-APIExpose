@@ -282,7 +282,15 @@ public sealed class FantomesDuSpeedrun
         if (!classement.TryGetProperty("rows", out var lignes) || lignes.ValueKind != JsonValueKind.Array) return [];
         return lignes.EnumerateArray().Select(l => (
             l.TryGetProperty("player", out var j) ? j.GetString() ?? "" : "",
-            l.TryGetProperty("replay", out var r) && r.ValueKind == JsonValueKind.Object && r.TryGetProperty("id", out var id) ? id.GetString() : null)).ToList();
+            // « ghost » : le replay public meme hors du miroir (site du 05/11) ; « replay » : seulement s'il est sur le miroir
+            Id(l, "ghost") ?? Id(l, "replay"))).ToList();
+    }
+
+    private static string? Id(JsonElement ligne, string champ)
+        => ligne.TryGetProperty(champ, out var r) && r.ValueKind == JsonValueKind.Object && r.TryGetProperty("id", out var id) ? id.GetString() : null;
+
+    private static void Rien()
+    {
     }
 
     /// <summary>Le .nghost d'un replay : converti une fois, garde ensuite ; null si le replay n'est pas joignable.</summary>

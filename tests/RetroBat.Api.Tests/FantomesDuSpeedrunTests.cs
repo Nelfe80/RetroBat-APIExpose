@@ -47,8 +47,8 @@ public class FantomesDuSpeedrunTests
     [Fact]
     public void Le_classement_du_site_donne_le_joueur_et_son_replay()
     {
-        using var json = JsonDocument.Parse("""{"rows":[{"player":"Ash","replay":{"id":"rp_1"}},{"player":"Ben","replay":null},{"player":"Cid"}]}""");
-        Assert.Equal([("Ash", "rp_1"), ("Ben", null), ("Cid", null)], FantomesDuSpeedrun.LignesDuClassement(json.RootElement));
+        using var json = JsonDocument.Parse("""{"rows":[{"player":"Ash","replay":{"id":"rp_1"}},{"player":"Ben","replay":null},{"player":"Cid"},{"player":"Dan","replay":null,"ghost":{"id":"rp_4"}}]}""");
+        Assert.Equal([("Ash", "rp_1"), ("Ben", null), ("Cid", null), ("Dan", "rp_4")], FantomesDuSpeedrun.LignesDuClassement(json.RootElement));
     }
 
     [Fact]
