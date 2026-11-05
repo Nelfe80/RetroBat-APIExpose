@@ -27,6 +27,14 @@ public class FantomesDuSpeedrunTests
         Assert.Equal("fceumm_ghosts", FantomesDuSpeedrun.CoeurDe(Lire("super-mario-bros.1-1.json")));
     }
 
+    [Fact]
+    public void Un_niveau_de_Sonic_se_court_sur_le_coeur_hote_Mega_Drive_pas_l_any()
+    {
+        Assert.Equal("genesis_plus_gx_ghosts", FantomesDuSpeedrun.CoeurDe(Lire("sonic-the-hedgehog.green-hill-1.v2.json")));
+        Assert.Equal("genesis_plus_gx_ghosts", FantomesDuSpeedrun.CoeurDe(Lire("sonic-the-hedgehog.final-zone.json")));
+        Assert.Null(FantomesDuSpeedrun.CoeurDe(Lire("sonic-the-hedgehog.any.json")));
+    }
+
     [Theory]
     [InlineData("super-metroid.any.json")]
     [InlineData("super-metroid.ceres.json")]

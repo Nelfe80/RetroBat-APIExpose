@@ -80,6 +80,9 @@ public sealed class MultiplayerCoeursService : BackgroundService
         new("snes", "snes9x_ghosts", ["snes9x_ghosts_libretro.dll"], "snes9x_ghosts_libretro.info",
             "le coeur libretro snes9x_ghosts (fantomes des speedruns de NelfePlay), en dernier : snes9x reste le coeur des parties "
             + "solo"),
+        new("megadrive", "genesis_plus_gx_ghosts", ["genesis_plus_gx_ghosts_libretro.dll"], "genesis_plus_gx_ghosts_libretro.info",
+            "le coeur libretro genesis_plus_gx_ghosts (fantomes des speedruns de NelfePlay), en dernier : genesis_plus_gx reste le "
+            + "coeur des parties solo"),
     ];
 
     public const string FichierEs = "es_systems_nelfeplay.cfg";

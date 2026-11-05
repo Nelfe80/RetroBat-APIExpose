@@ -163,7 +163,8 @@ public class MultiplayerCoeursTests : IDisposable
             "tools/cores/ppsspp_netplay_libretro.dll", "tools/cores/ppsspp_netplay_license.txt", "tools/cores/ppsspp_netplay_libretro.info",
             "tools/cores/tgbdual_multi_libretro.dll", "tools/cores/tgbdual_multi_license.txt", "tools/cores/tgbdual_multi_libretro.info",
             "tools/cores/fceumm_ghosts_libretro.dll", "tools/cores/fceumm_ghosts_libretro.info",
-            "tools/cores/snes9x_ghosts_libretro.dll", "tools/cores/snes9x_ghosts_libretro.info"], livres);
+            "tools/cores/snes9x_ghosts_libretro.dll", "tools/cores/snes9x_ghosts_libretro.info",
+            "tools/cores/genesis_plus_gx_ghosts_libretro.dll", "tools/cores/genesis_plus_gx_ghosts_libretro.info"], livres);
         var json = "{\"outils\":[" + string.Join(",", livres.Append("tools/cores/fbneo_libretro.dll").Select(Outil)) + "]}";
         var retenus = SelfUpdateService.LireOutils(json, "Nelfe80/RetroBat-APIExpose").Select(o => o.Fichier).ToArray();
         Assert.Equal(livres, retenus);

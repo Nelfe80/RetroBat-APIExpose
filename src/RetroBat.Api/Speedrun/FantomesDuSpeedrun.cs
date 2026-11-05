@@ -44,6 +44,8 @@ public sealed class FantomesDuSpeedrun
         new("nes", "super-mario-bros", "fceumm", "fceumm_ghosts", "393a432f", true),
         // Super Metroid : aussi le jeu complet, parti du demarrage ; le coeur hote aligne le fantome sur le debut de la partie.
         new("snes", "super-metroid", "snes9x", "snes9x_ghosts", "d63ed5f8", false),
+        // Sonic : les niveaux seulement (etat du panneau) ; l'Any% change de niveau, et chaque niveau rearme le depart.
+        new("megadrive", "sonic-the-hedgehog", "genesis_plus_gx", "genesis_plus_gx_ghosts", "f9394e97", true),
     ];
 
     private static Hote? HoteDe(Reglement r) => Hotes.FirstOrDefault(h => h.Systeme == r.SystemId && h.Groupe == r.RomGroup && r.Coeurs.Contains(h.Origine)
