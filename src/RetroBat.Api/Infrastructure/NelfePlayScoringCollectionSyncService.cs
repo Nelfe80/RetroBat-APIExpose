@@ -589,7 +589,11 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                      string.Equals(g.SystemId + "/" + g.RomGroup, j.SystemId + "/" + j.RomGroup, StringComparison.OrdinalIgnoreCase)))))
         {
             var cle = jeu.SystemId + "/" + jeu.RomGroup;
-            if (!parGroupe.TryGetValue(cle, out var candidats) || candidats.Count == 0)
+            // Un jeu ouvert aux seuls speedruns a un .MEM sans score : l'inventaire ne lui donne pas de groupe (05/11, Super
+            // Metroid « ROM absente » alors que la borne l'a). Ses dumps se reconnaissent par leur .MEM.
+            if ((!parGroupe.TryGetValue(cle, out var candidats) || candidats.Count == 0) && speedrunsSeuls.Contains(cle))
+                candidats = [.. _catalog.DumpsPourLesSpeedruns(jeu.SystemId, jeu.RomGroup)];
+            if (candidats is null || candidats.Count == 0)
             {
                 manques.Add(jeu.RomGroup + " : ROM absente");
                 continue;

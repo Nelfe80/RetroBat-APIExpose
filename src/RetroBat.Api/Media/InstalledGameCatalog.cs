@@ -274,6 +274,25 @@ public sealed class InstalledGameCatalog
             .ToList();
     }
 
+    /// <summary>
+    /// Les dumps installes d'un jeu ouvert aux SEULS SPEEDRUNS (05/11, Super Metroid « ROM absente ») : son .MEM n'a pas de
+    /// score, l'inventaire ne lui donne donc pas de groupe. Ils sont reconnus ici par leur .MEM, avec ou sans score.
+    /// </summary>
+    public IReadOnlyList<InstalledGame> DumpsPourLesSpeedruns(string canonicalSystemId, string romGroup)
+    {
+        if (string.IsNullOrWhiteSpace(canonicalSystemId) || string.IsNullOrWhiteSpace(romGroup))
+        {
+            return [];
+        }
+
+        var groupe = romGroup.Trim();
+        return Enumerate([canonicalSystemId], avecGroupe: false)
+            .Where(jeu => string.Equals(_canonical.ResolveDefinitionSlug(jeu.FrontendSystemId, Path.GetFileName(jeu.AbsolutePath),
+                jeu.Md5, jeu.CheevosHash), groupe, StringComparison.OrdinalIgnoreCase))
+            .Select(jeu => jeu with { RomGroup = groupe, OfficialDefinitionPath = OfficialDefinitionPath(jeu.CanonicalSystemId, groupe) })
+            .ToList();
+    }
+
     private static IEnumerable<XElement> ReadGamelist(string path)
     {
         try
@@ -361,6 +380,10 @@ public sealed class InstalledGameCatalog
 public interface IScoreSlugResolver
 {
     string? ResolveScoreSlug(string systemId, string? romFileName, string? md5, string? cheevosHash);
+
+    /// <summary>Le slug du .MEM de ce dump, avec ou sans score (jeu ouvert aux seuls speedruns). Par defaut : celui du score.</summary>
+    string? ResolveDefinitionSlug(string systemId, string? romFileName, string? md5, string? cheevosHash)
+        => ResolveScoreSlug(systemId, romFileName, md5, cheevosHash);
 }
 
 /// <summary>

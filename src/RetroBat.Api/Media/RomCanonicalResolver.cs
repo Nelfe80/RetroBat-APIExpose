@@ -332,7 +332,9 @@ public sealed class RomCanonicalResolver : IScoreSlugResolver
 
     // ── capture de score disponible ? ────────────────────────────────────────
 
-    private sealed record ScoreIndex(Dictionary<string, string> AliasToSlug, HashSet<string> MemStems);
+    /// <param name="MemStems">Les .MEM qui definissent un score (le jeu est scorable).</param>
+    /// <param name="DefinitionStems">Tous les .MEM, avec ou sans score (un jeu ouvert aux seuls speedruns).</param>
+    private sealed record ScoreIndex(Dictionary<string, string> AliasToSlug, HashSet<string> MemStems, HashSet<string> DefinitionStems);
 
     private readonly ConcurrentDictionary<string, Lazy<ScoreIndex>> _scoreIndexes =
         new(StringComparer.OrdinalIgnoreCase);
@@ -383,15 +385,26 @@ public sealed class RomCanonicalResolver : IScoreSlugResolver
     /// couche salle (HubScore) et la couche certifiée s'alignent sur une seule clé (sinon
     /// « sonic-the-hedgehog-rev-0 » côté salle vs « sonic-the-hedgehog » côté certifié).</summary>
     public string? ResolveScoreSlug(string systemId, string? romFileName, string? md5, string? cheevosHash)
+        => ResoudreLeSlug(systemId, romFileName, md5, cheevosHash, index => index.MemStems);
+
+    /// <summary>
+    /// Le slug du .MEM de ce dump, AVEC OU SANS score (05/11) : un jeu ouvert aux seuls speedruns (Super Metroid) a un .MEM
+    /// sans SCORE_STATE, qui ne le rend pas scorable, mais qui l'identifie pour ses epreuves. Null si aucun .MEM ne le connait.
+    /// </summary>
+    public string? ResolveDefinitionSlug(string systemId, string? romFileName, string? md5, string? cheevosHash)
+        => ResoudreLeSlug(systemId, romFileName, md5, cheevosHash, index => index.DefinitionStems);
+
+    private string? ResoudreLeSlug(string systemId, string? romFileName, string? md5, string? cheevosHash, Func<ScoreIndex, HashSet<string>> stems)
     {
         if (string.IsNullOrWhiteSpace(systemId))
         {
             return null;
         }
 
-        var index = _scoreIndexes.GetOrAdd(
+        var tout = _scoreIndexes.GetOrAdd(
             systemId.Trim().ToLowerInvariant(),
             key => new Lazy<ScoreIndex>(() => LoadScoreIndex(key), LazyThreadSafetyMode.ExecutionAndPublication)).Value;
+        var index = new { tout.AliasToSlug, MemStems = stems(tout) };
         if (index.MemStems.Count == 0)
         {
             return null;
@@ -428,12 +441,13 @@ public sealed class RomCanonicalResolver : IScoreSlugResolver
     {
         var aliasToSlug = new Dictionary<string, string>(StringComparer.Ordinal);
         var memStems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var definitions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         var folder = CanonicalScoringSystem(normalizedSystem);
         var ramRoot = Path.Combine(RetroBatPaths.PluginRoot, "resources", "ram", folder);
         if (!Directory.Exists(ramRoot))
         {
-            return new ScoreIndex(aliasToSlug, memStems);
+            return new ScoreIndex(aliasToSlug, memStems, definitions);
         }
 
         try
@@ -454,6 +468,7 @@ public sealed class RomCanonicalResolver : IScoreSlugResolver
                     continue;
                 }
 
+                definitions.Add(Path.GetFileNameWithoutExtension(file));
                 if (content.Contains("SCORE_STATE", StringComparison.OrdinalIgnoreCase) ||
                     content.Contains("is_score", StringComparison.OrdinalIgnoreCase))
                 {
@@ -487,7 +502,7 @@ public sealed class RomCanonicalResolver : IScoreSlugResolver
             _logger?.LogWarning(ex, "Index .MEM illisible pour {System}.", normalizedSystem);
         }
 
-        return new ScoreIndex(aliasToSlug, memStems);
+        return new ScoreIndex(aliasToSlug, memStems, definitions);
     }
 
     /// <summary>Identites DAT d'une entree (fn/id/set + alias aka). Le nom

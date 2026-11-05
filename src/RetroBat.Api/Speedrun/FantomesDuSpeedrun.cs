@@ -108,6 +108,14 @@ public sealed class FantomesDuSpeedrun
         return voulus.OfType<string>().Where(r => r.Length > 0).Distinct(StringComparer.Ordinal).ToList();
     }
 
+    /// <summary>Le nombre d'images d'un .nghost (docs/FORMAT.md de NelfePlay-Ghosts), ou null s'il est illisible. Pur.</summary>
+    internal static long? ImagesDuFantome(byte[] fantome)
+    {
+        if (fantome.Length < 20 || !fantome.AsSpan(0, 8).SequenceEqual("NGHOST1\0"u8)) return null;
+        var etat = (long)BitConverter.ToUInt32(fantome, 16);
+        return 20 + etat + 4 <= fantome.Length ? BitConverter.ToUInt32(fantome, (int)(20 + etat)) : null;
+    }
+
     /// <summary>Le temps du joueur sur ce classement, ou null. Pur.</summary>
     internal static long? MonTemps(JsonElement classement, string pseudo)
     {
@@ -173,6 +181,15 @@ public sealed class FantomesDuSpeedrun
             string pseudo;
             lock (_verrou) { hote = _hote; defi = _defi; temps = _tempsAttendu; pseudo = _pseudo; }
             if (hote is null || await FantomeAsync(replay, CancellationToken.None).ConfigureAwait(false) is not { } fantome) return;
+            // UN REPLAY PLUS COURT QUE LE RUN NE LE CONTIENT PAS (05/11, Green Hill 1 : 1232 images pour un temps de 1925, le
+            // replay parti en retard montrait le debut de la tentative suivante). Ni fantome, ni record local.
+            if (temps is { } duree && ImagesDuFantome(fantome) is { } images && images < duree)
+            {
+                _journal?.LogWarning("Fantomes : {Replay} ne contient pas le run ({Images} images pour {Temps}), il ne devient pas un fantome.",
+                    replay, images, duree);
+                return;
+            }
+
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.nghost")) File.Delete(ancien);
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.label")) File.Delete(ancien);
@@ -210,11 +227,27 @@ public sealed class FantomesDuSpeedrun
         if (HoteDe(r) is not { } hote || Choix == ChoixDesFantomes.Aucun) return false;
         RetroBat.Api.MassRun.FichiersDesCoeursHotes.PoserLesProfils();
         lock (_verrou) { _hote = hote; _defi = r.ChallengeId; _tempsAttendu = null; _pseudo = pseudo; }
-        var travail = Task.Run(() => PreparerAsync(r, hote, pseudo, CancellationToken.None));
+        var admis = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var travail = Task.Run(() => PreparerAsync(r, hote, pseudo, CancellationToken.None, admis));
         try
         {
             if (!travail.Wait(Budget))
             {
+                // EN RETARD, PAS SANS (05/11, Mario 1-1 sans aucun fantome : prets 0,2 s apres le delai, la partie etait deja
+                // partie sur le coeur d'origine, et le meilleur temps de la session n'est pas devenu un fantome). Le coeur hote
+                // admis part quand meme : il relit le dossier au chargement de l'etat de depart, et les fantomes le rejoignent.
+                if (admis.Task is { IsCompletedSuccessfully: true, Result: true })
+                {
+                    _journal?.LogInformation("Fantomes : pas prets en {Budget} s pour {Defi}, ils rejoindront la partie a l'etat de depart.",
+                        Budget.TotalSeconds, r.ChallengeId);
+                    lock (_verrou) _enCourse = true;
+                    _ = travail.ContinueWith(t =>
+                    {
+                        if (t.IsCompletedSuccessfully && !t.Result) lock (_verrou) _enCourse = false;
+                    }, TaskScheduler.Default);
+                    return true;
+                }
+
                 _journal?.LogInformation("Fantomes : pas prets en {Budget} s pour {Defi}, ce depart se fait sans.", Budget.TotalSeconds, r.ChallengeId);
                 return false;
             }
@@ -229,9 +262,12 @@ public sealed class FantomesDuSpeedrun
         }
     }
 
-    private async Task<bool> PreparerAsync(Reglement r, Hote hote, string pseudo, CancellationToken ct)
+    private async Task<bool> PreparerAsync(Reglement r, Hote hote, string pseudo, CancellationToken ct, TaskCompletionSource<bool>? admis = null)
     {
-        if (!await CoeurAdmisAsync(hote.Coeur, ct).ConfigureAwait(false))
+        var coeurAdmis = false;
+        try { coeurAdmis = await CoeurAdmisAsync(hote.Coeur, ct).ConfigureAwait(false); }
+        finally { admis?.TrySetResult(coeurAdmis); }
+        if (!coeurAdmis)
         {
             _journal?.LogInformation("Fantomes : le coeur hote n'est pas admis par le site, {Defi} part sans.", r.ChallengeId);
             return false;
@@ -260,6 +296,8 @@ public sealed class FantomesDuSpeedrun
         // chaque meilleur temps, il court tout de suite, sans attendre que le site propose son replay ; le record publie ne le
         // remplace que s'il est meilleur (un temps fait sur une autre borne).
         var local = Choix is ChoixDesFantomes.MonRecordEtMondial or ChoixDesFantomes.MonRecord ? LireLeRecordLocal(r.ChallengeId) : null;
+        // un record local garde avant la garde du 05/11 peut ne pas contenir son run : il ne court pas
+        if (local is { } court && ImagesDuFantome(court.Fantome) is { } n && n < court.Images) local = null;
         if (local is { } l && (monTempsPublie is not { } publie || l.Images <= publie))
         {
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;

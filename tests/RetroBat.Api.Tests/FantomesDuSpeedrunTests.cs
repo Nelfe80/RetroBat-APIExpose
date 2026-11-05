@@ -19,6 +19,21 @@ public class FantomesDuSpeedrunTests
     private static readonly (string, string?)[] Classement = [("Ash", "rp_ash"), ("Ben", null), ("Nelfe", "rp_nelfe")];
 
     [Fact]
+    public void La_longueur_d_un_fantome_se_lit_apres_son_etat_de_depart()
+    {
+        // NGHOST1\0, crc, decalage, taille de l'etat (3), l'etat, puis le nombre d'images (1232)
+        var f = new List<byte>("NGHOST1\0"u8.ToArray());
+        f.AddRange(BitConverter.GetBytes(0xF9394E97u));
+        f.AddRange(BitConverter.GetBytes(0));
+        f.AddRange(BitConverter.GetBytes(3u));
+        f.AddRange(new byte[] { 1, 2, 3 });
+        f.AddRange(BitConverter.GetBytes(1232u));
+        Assert.Equal(1232, FantomesDuSpeedrun.ImagesDuFantome(f.ToArray()));
+        Assert.Null(FantomesDuSpeedrun.ImagesDuFantome(f.Take(20).ToArray()));
+        Assert.Null(FantomesDuSpeedrun.ImagesDuFantome("PASUNFANTOME_________"u8.ToArray()));
+    }
+
+    [Fact]
     public void Un_niveau_de_Mario_se_court_avec_des_fantomes_pas_l_any_ni_un_autre_jeu()
     {
         Assert.True(FantomesDuSpeedrun.PourCeDefi(Lire("super-mario-bros.1-1.json")));

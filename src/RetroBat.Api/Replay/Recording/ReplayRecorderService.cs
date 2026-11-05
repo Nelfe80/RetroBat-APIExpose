@@ -71,6 +71,26 @@ public sealed class ReplayRecorderService : BackgroundService
     /// </summary>
     private volatile bool _etatDeDepartAttendu;
 
+    /// <summary>
+    /// LA RELANCE D'UN DEFI OUVRE SON REPLAY TOUT DE SUITE (05/11). Le replay de la tentative suivante attendait la fin de la
+    /// precedente (deux sondages), sa finalisation (jusqu'a 13 s sur Sonic), puis un sondage : il partait 4 a 13 s apres le
+    /// depart du run. Sans le debut, il n'est ni une preuve complete ni un fantome (le replay du record de Green Hill 1
+    /// montrait le debut de la tentative suivante). L'etat recharge reveille la boucle ; le neuf s'ouvre, l'ancien se scelle
+    /// ensuite.
+    /// </summary>
+    private volatile bool _relanceDuDefi;
+
+    /// <summary>Un speedrun est en cours : ses relances decoupent les replays, pas la baisse du score.</summary>
+    private volatile bool _speedrun;
+
+    private readonly SemaphoreSlim _reveil = new(0, 1);
+
+    private void Reveiller()
+    {
+        try { if (_reveil.CurrentCount == 0) _reveil.Release(); }
+        catch (SemaphoreFullException) { }
+    }
+
     /// <summary>Les verrous que le wrapper a attestes pour le jeu en cours (D18) ; null sans verrou. Le manifeste les garde.</summary>
     private volatile string? _verrousAttestes;
     private string _sourceDuDepart = "";
@@ -376,16 +396,30 @@ public sealed class ReplayRecorderService : BackgroundService
         {
             case "speedrun.etat.attendu":
                 _etatDeDepartAttendu = true;
+                _speedrun = true;
                 return;
             case "speedrun.etat.charge":
                 _etatDeDepartAttendu = false;
+                _speedrun = true;
                 _sourceDuDepart = "etat de depart du defi";
                 _departEnAttente = true;
+                // l'etat recharge ouvre une nouvelle tentative : rien de la precedente (fin, baisse du score) ne la retient
+                _runTermine = false;
+                _arretParBaisse = false;
+                _relanceDuDefi = true;
+                Reveiller();
                 return;
             case "ui.game.ended":
                 _etatDeDepartAttendu = false;
+                _speedrun = false;
+                break;
+            case "ui.game.started":
+                _speedrun = false;
                 break;
         }
+
+        // La baisse du score d'un speedrun vient de sa relance (l'etat recharge), qui a deja ouvert le replay suivant.
+        if (_speedrun && string.Equals(e.Type, "scoring.replay.stop", StringComparison.Ordinal)) return;
 
         if (string.Equals(e.Type, "scoring.run.multi", StringComparison.Ordinal))
         {
@@ -498,7 +532,7 @@ public sealed class ReplayRecorderService : BackgroundService
             try { await TickAsync(stoppingToken).ConfigureAwait(false); }
             catch (OperationCanceledException) { break; }
             catch (Exception ex) { _logger.LogDebug(ex, "Replay recorder : tick en erreur"); }
-            try { await Task.Delay(PollInterval, stoppingToken).ConfigureAwait(false); }
+            try { await _reveil.WaitAsync(PollInterval, stoppingToken).ConfigureAwait(false); }
             catch (OperationCanceledException) { break; }
         }
 
@@ -530,6 +564,30 @@ public sealed class ReplayRecorderService : BackgroundService
                 if (_contenuVu.Length > 0) _departEnAttente = false;
                 _contenuVu = contenu;
                 _dejaEnregistre = false;
+            }
+        }
+
+        if (_relanceDuDefi)
+        {
+            _relanceDuDefi = false;
+            if (_current is { } precedent)
+            {
+                // La session a deja arrete le replay de la tentative (HALT_REPLAY avant l'etat) ; son fichier se repere
+                // AVANT d'en ouvrir un autre (le plus recent du dossier), puis le neuf s'ouvre, et l'ancien se scelle apres.
+                await _ra.HaltAsync(ct).ConfigureAwait(false);
+                var fichier = FindReplayFile(precedent.StartedAtUtc);
+                _current = null;
+                // la capture video de la tentative s'arrete avant que celle de la suivante demarre (ReplayCaptureService)
+                await PublishAsync("replay.recording.stopped", new { precedent.ReplayId, precedent.SessionId, precedent.LastFrame }, ct).ConfigureAwait(false);
+                _logger.LogInformation("Replay : {ReplayId} arrete a la relance du defi, le suivant s'ouvre sur l'etat de depart.", precedent.ReplayId);
+                if (status is { ContentLoaded: true } && !_playback.IsBusy && StartRecent(status))
+                {
+                    _attenteAnnoncee = "";
+                    await StartAsync(status, ct).ConfigureAwait(false);
+                }
+
+                await FinalizeAsync(precedent, recovered: false, ct, fichier, dejaArrete: true).ConfigureAwait(false);
+                return;
             }
         }
 
@@ -702,27 +760,39 @@ public sealed class ReplayRecorderService : BackgroundService
             new { rec.ReplayId, rec.SessionId, rec.System, rec.Game }, ct).ConfigureAwait(false);
     }
 
-    private async Task FinalizeAsync(Recording rec, bool recovered, CancellationToken ct)
+    /// <param name="fichier">Le fichier deja repere (relance d'un defi : le replay suivant est ouvert, le plus recent n'est plus lui).</param>
+    /// <param name="dejaArrete">RetroArch ne l'enregistre plus et la capture a ete prevenue (relance d'un defi).</param>
+    /// <summary>L'enregistrement en cours sur disque (reprise apres un arret brutal) n'est plus : sauf s'il est deja celui d'un replay ouvert depuis.</summary>
+    private void OublierLEnregistrementActif()
     {
-        _current = null; // on sort de l'état "en cours" immédiatement (idempotence)
+        if (_current is null) _store.DeleteQuiet(_store.ActiveRecordingPath);
+    }
+
+    private async Task FinalizeAsync(Recording rec, bool recovered, CancellationToken ct, string? fichier = null, bool dejaArrete = false)
+    {
+        // on sort de l'état "en cours" immédiatement (idempotence) ; un replay ouvert depuis (relance d'un defi) reste le sien
+        if (ReferenceEquals(_current, rec)) _current = null;
         try
         {
-            await _ra.HaltAsync(ct).ConfigureAwait(false);
-            // La capture video de la partie s'arrete avec son replay (ReplayCaptureService).
-            await PublishAsync("replay.recording.stopped", new { rec.ReplayId, rec.SessionId, rec.LastFrame }, ct).ConfigureAwait(false);
+            if (!dejaArrete)
+            {
+                await _ra.HaltAsync(ct).ConfigureAwait(false);
+                // La capture video de la partie s'arrete avec son replay (ReplayCaptureService).
+                await PublishAsync("replay.recording.stopped", new { rec.ReplayId, rec.SessionId, rec.LastFrame }, ct).ConfigureAwait(false);
+            }
 
-            var file = FindReplayFile(rec.StartedAtUtc);
+            var file = fichier ?? FindReplayFile(rec.StartedAtUtc);
             if (file is null)
             {
                 _logger.LogWarning("Replay : aucun fichier .replay trouvé pour {ReplayId} — abandon.", rec.ReplayId);
-                _store.DeleteQuiet(_store.ActiveRecordingPath);
+                OublierLEnregistrementActif();
                 return;
             }
 
             if (!await StabilizeAsync(file, ct).ConfigureAwait(false))
             {
                 _logger.LogWarning("Replay : fichier {File} non stabilisé — conservé pour diagnostic.", file);
-                _store.DeleteQuiet(_store.ActiveRecordingPath);
+                OublierLEnregistrementActif();
                 return;
             }
 
@@ -732,7 +802,7 @@ public sealed class ReplayRecorderService : BackgroundService
             _store.SaveManifest(manifest);
             _store.SaveMeta(ReplayLocalMetadata.Fresh(rec.ReplayId, hint) with { Categorie = rec.Categorie });
             _store.RebuildIndex();
-            _store.DeleteQuiet(_store.ActiveRecordingPath);
+            OublierLEnregistrementActif();
 
             _logger.LogInformation("Replay finalisé {ReplayId} : sha256={Sha} taille={Size} frames={Frames}{Rec}.",
                 rec.ReplayId, obj.Sha256, obj.Size, rec.LastFrame, recovered ? " (recovery)" : "");

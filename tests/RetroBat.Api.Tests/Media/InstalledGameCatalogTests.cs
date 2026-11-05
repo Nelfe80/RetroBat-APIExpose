@@ -247,4 +247,28 @@ public class InstalledGameCatalogTests : IDisposable
         public string? ResolveScoreSlug(string systemId, string? romFileName, string? md5, string? cheevosHash)
             => romFileName is { Length: > 0 } && _slugs.TryGetValue(romFileName, out var slug) ? slug : null;
     }
+
+    /// <summary>Un .MEM sans score (jeu ouvert aux seuls speedruns) : connu de la definition, pas du score.</summary>
+    private sealed class ResolveurSansScore : IScoreSlugResolver
+    {
+        public string? ResolveScoreSlug(string systemId, string? romFileName, string? md5, string? cheevosHash) => null;
+
+        public string? ResolveDefinitionSlug(string systemId, string? romFileName, string? md5, string? cheevosHash)
+            => romFileName == "Super Metroid (Japan, USA) (En,Ja).zip" ? "super-metroid" : null;
+    }
+
+    [Fact]
+    public void Un_jeu_ouvert_aux_seuls_speedruns_se_reconnait_par_son_mem_sans_score()
+    {
+        PoserRom("snes", "Super Metroid (Japan, USA) (En,Ja).zip");
+        PoserRom("snes", "Autre Jeu.zip");
+        var catalogue = new InstalledGameCatalog(new ResolveurSansScore(), logger: null, romsRoot: Roms, ramRoot: Ram);
+
+        // l'inventaire ne lui donne pas de groupe (pas de score) : c'etait la « ROM absente » du 05/11
+        Assert.All(catalogue.Enumerate(["snes"]), jeu => Assert.False(jeu.ScorableLocal));
+
+        var dump = Assert.Single(catalogue.DumpsPourLesSpeedruns("snes", "super-metroid"));
+        Assert.Equal("super-metroid", dump.RomGroup);
+        Assert.EndsWith(Path.Combine("snes", "super-metroid.MEM"), dump.OfficialDefinitionPath);
+    }
 }
