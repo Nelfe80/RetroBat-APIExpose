@@ -276,6 +276,7 @@ public sealed class FantomesDuSpeedrun
         // Le classement du site (record mondial, mon record publie) ; injoignable, mon record local suffit.
         IReadOnlyList<(string Joueur, string? Replay)> lignes = [];
         long? monTempsPublie = null;
+        IReadOnlyDictionary<string, long> tempsDesReplays = new Dictionary<string, long>();
         try
         {
             using var client = _http.CreateClient(IndexDesDefisService.HttpClientName);
@@ -283,6 +284,7 @@ public sealed class FantomesDuSpeedrun
             using var json = JsonDocument.Parse(await client.GetStringAsync(url, ct).ConfigureAwait(false));
             lignes = LignesDuClassement(json.RootElement);
             monTempsPublie = MonTemps(json.RootElement, pseudo);
+            tempsDesReplays = TempsDesReplays(json.RootElement);
         }
         catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException)
         {
@@ -316,6 +318,13 @@ public sealed class FantomesDuSpeedrun
         foreach (var replay in replays)
         {
             if (await FantomeAsync(replay, ct).ConfigureAwait(false) is not { } fantome) continue;
+            // le replay d'un temps publie qui ne contient pas son run (parti en retard, avant le 05/11) ne court pas
+            if (tempsDesReplays.TryGetValue(replay, out var duree) && ImagesDuFantome(fantome) is { } images && images < duree)
+            {
+                _journal?.LogWarning("Fantomes : {Replay} ne contient pas le run publie ({Images} images pour {Temps}), il ne court pas.",
+                    replay, images, duree);
+                continue;
+            }
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
             var nom = (replay == mien ? PrefixeDuMien : $"{poses + 1}-") + replay;
             await File.WriteAllBytesAsync(Path.Combine(dossier, nom + ".nghost"), fantome, ct).ConfigureAwait(false);
@@ -367,6 +376,20 @@ public sealed class FantomesDuSpeedrun
             l.TryGetProperty("player", out var j) ? j.GetString() ?? "" : "",
             // « ghost » : le replay public meme hors du miroir (site du 05/11) ; « replay » : seulement s'il est sur le miroir
             Id(l, "ghost") ?? Id(l, "replay"))).ToList();
+    }
+
+    /// <summary>Le temps publie (images) de chaque replay du classement. Pur.</summary>
+    internal static IReadOnlyDictionary<string, long> TempsDesReplays(JsonElement classement)
+    {
+        var temps = new Dictionary<string, long>(StringComparer.Ordinal);
+        if (!classement.TryGetProperty("rows", out var lignes) || lignes.ValueKind != JsonValueKind.Array) return temps;
+        foreach (var l in lignes.EnumerateArray())
+        {
+            if ((Id(l, "ghost") ?? Id(l, "replay")) is { Length: > 0 } replay && l.TryGetProperty("value", out var v) && v.TryGetInt64(out var t))
+                temps.TryAdd(replay, t);
+        }
+
+        return temps;
     }
 
     private static string? Id(JsonElement ligne, string champ)
