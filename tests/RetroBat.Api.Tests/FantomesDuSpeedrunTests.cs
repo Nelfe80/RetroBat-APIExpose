@@ -19,6 +19,37 @@ public class FantomesDuSpeedrunTests
     private static readonly (string, string?)[] Classement = [("Ash", "rp_ash"), ("Ben", null), ("Nelfe", "rp_nelfe")];
 
     [Fact]
+    public void La_duree_d_un_fantome_est_le_chrono_independant_du_classement()
+    {
+        // Sonic : temps officiel cale sur le chrono du jeu (2289), duree du run du depart a l'arrivee (2387)
+        using var json = JsonDocument.Parse("""
+            {"rows":[{"player":"Nelfe80","value":2289,"independent_frames":2387,"ghost":{"id":"rp_A"}},
+                     {"player":"Ash","value":2400,"independent_frames":2500,"replay":{"id":"rp_B"}},
+                     {"player":"Ben","value":2500}]}
+            """);
+        var durees = FantomesDuSpeedrun.TempsDesReplays(json.RootElement, "independent_frames");
+        Assert.Equal(2387, durees["rp_A"]);
+        Assert.Equal(2500, durees["rp_B"]);
+        Assert.Equal(2, durees.Count);
+        Assert.Equal(2289, FantomesDuSpeedrun.TempsDesReplays(json.RootElement)["rp_A"]);
+    }
+
+    [Fact]
+    public void Mon_fantome_n_est_le_record_mondial_que_s_il_en_a_le_temps()
+    {
+        var temps = new Dictionary<string, long> { ["rp_ash"] = 1500 };
+        // je suis premier du classement : mon fantome local est le WR s'il a ce temps-la, pas un temps plus lent
+        IReadOnlyList<(string, string?)> moiPremier = [("Nelfe80", null), ("Ash", "rp_ash")];
+        Assert.True(FantomesDuSpeedrun.MeilleurQueLeMondial(1423, moiPremier, temps, "Nelfe80", 1423));
+        Assert.False(FantomesDuSpeedrun.MeilleurQueLeMondial(2088, moiPremier, temps, "nelfe80", 1925));
+        // un autre est premier : mon temps doit egaler ou battre le sien
+        IReadOnlyList<(string, string?)> ashPremier = [("Ash", "rp_ash"), ("Nelfe80", null)];
+        Assert.False(FantomesDuSpeedrun.MeilleurQueLeMondial(1600, ashPremier, temps, "Nelfe80"));
+        Assert.True(FantomesDuSpeedrun.MeilleurQueLeMondial(1500, ashPremier, temps, "Nelfe80"));
+        Assert.False(FantomesDuSpeedrun.MeilleurQueLeMondial(1, [], temps, "Nelfe80"));
+    }
+
+    [Fact]
     public void La_longueur_d_un_fantome_se_lit_apres_son_etat_de_depart()
     {
         // NGHOST1\0, crc, decalage, taille de l'etat (3), l'etat, puis le nombre d'images (1232)
