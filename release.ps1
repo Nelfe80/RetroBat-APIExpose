@@ -160,7 +160,8 @@ $outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.e
     'tools/cores/fbneo_multi32_libretro.dll', 'tools/cores/fbneo_multi32_license.txt', 'tools/cores/fbneo_multi32_libretro.info',
     'tools/cores/ppsspp_netplay_libretro.dll', 'tools/cores/ppsspp_netplay_license.txt', 'tools/cores/ppsspp_netplay_libretro.info',
     'tools/cores/tgbdual_multi_libretro.dll', 'tools/cores/tgbdual_multi_license.txt', 'tools/cores/tgbdual_multi_libretro.info',
-    'tools/cores/fceumm_ghosts_libretro.dll', 'tools/cores/fceumm_ghosts_libretro.info')
+    'tools/cores/fceumm_ghosts_libretro.dll', 'tools/cores/fceumm_ghosts_libretro.info',
+    'tools/cores/snes9x_ghosts_libretro.dll', 'tools/cores/snes9x_ghosts_libretro.info')
 $exclusOutils = @($outilsHorsArchive | ForEach-Object { "-x!$name\$($_ -replace '/', '\')" })
 & $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" @exclusOutils -mx=5 -bsp0 -bso0
 

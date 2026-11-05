@@ -24,7 +24,14 @@ public class FantomesDuSpeedrunTests
         Assert.True(FantomesDuSpeedrun.PourCeDefi(Lire("super-mario-bros.1-1.json")));
         Assert.False(FantomesDuSpeedrun.PourCeDefi(Lire("super-mario-bros.any.json")));
         Assert.False(FantomesDuSpeedrun.PourCeDefi(Lire("sonic-the-hedgehog.green-hill-1.json")));
+        Assert.Equal("fceumm_ghosts", FantomesDuSpeedrun.CoeurDe(Lire("super-mario-bros.1-1.json")));
     }
+
+    [Theory]
+    [InlineData("super-metroid.any.json")]
+    [InlineData("super-metroid.ceres.json")]
+    public void Super_Metroid_se_court_sur_le_coeur_hote_SNES(string reglement)
+        => Assert.Equal("snes9x_ghosts", FantomesDuSpeedrun.CoeurDe(Lire(reglement)));
 
     [Theory]
     [InlineData(ChoixDesFantomes.MonRecordEtMondial, "Nelfe", "rp_nelfe,rp_ash")]

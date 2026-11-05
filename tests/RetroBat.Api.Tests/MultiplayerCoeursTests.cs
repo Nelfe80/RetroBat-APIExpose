@@ -66,8 +66,9 @@ public class MultiplayerCoeursTests : IDisposable
         var sortie = MultiplayerCoeursService.EsSystemsNelfePlay(EsSystems, MultiplayerCoeursService.Coeurs);
         Assert.NotNull(sortie);
         var doc = System.Xml.Linq.XDocument.Parse(sortie!);
-        var systemes = doc.Root!.Elements("system").ToArray();
+        var systemes = doc.Root!.Elements("system").Where(s => (string?) s.Element("name") != "snes").ToArray();
         Assert.Equal(["gba", "ngpc", "fbneo"], systemes.Select(s => (string?) s.Element("name")));
+        Assert.Equal(["snes9x", "snes9x_ghosts"], CoeursDe(doc.Root!.Elements("system").Single(s => (string?) s.Element("name") == "snes")));
         var emulateurs = systemes[0].Element("emulators")!.Elements("emulator").Select(e => e.Attribute("name")!.Value).ToArray();
         Assert.Equal(["libretro", "mgba", "nosgba"], emulateurs);
         Assert.Equal(["mgba", "gpsp", "mgba_splitscreen"], CoeursDe(systemes[0]));
@@ -161,7 +162,8 @@ public class MultiplayerCoeursTests : IDisposable
             "tools/cores/fbneo_multi32_libretro.dll", "tools/cores/fbneo_multi32_license.txt", "tools/cores/fbneo_multi32_libretro.info",
             "tools/cores/ppsspp_netplay_libretro.dll", "tools/cores/ppsspp_netplay_license.txt", "tools/cores/ppsspp_netplay_libretro.info",
             "tools/cores/tgbdual_multi_libretro.dll", "tools/cores/tgbdual_multi_license.txt", "tools/cores/tgbdual_multi_libretro.info",
-            "tools/cores/fceumm_ghosts_libretro.dll", "tools/cores/fceumm_ghosts_libretro.info"], livres);
+            "tools/cores/fceumm_ghosts_libretro.dll", "tools/cores/fceumm_ghosts_libretro.info",
+            "tools/cores/snes9x_ghosts_libretro.dll", "tools/cores/snes9x_ghosts_libretro.info"], livres);
         var json = "{\"outils\":[" + string.Join(",", livres.Append("tools/cores/fbneo_libretro.dll").Select(Outil)) + "]}";
         var retenus = SelfUpdateService.LireOutils(json, "Nelfe80/RetroBat-APIExpose").Select(o => o.Fichier).ToArray();
         Assert.Equal(livres, retenus);

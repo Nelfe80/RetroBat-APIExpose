@@ -36,10 +36,21 @@ public enum ChoixDesFantomes
 /// </summary>
 public sealed class FantomesDuSpeedrun
 {
-    public const string Coeur = "fceumm_ghosts";
+    /// <summary>Un jeu dont un coeur hote a le profil : son coeur d'origine, le coeur hote, le crc32 du contenu.</summary>
+    private sealed record Hote(string Systeme, string Groupe, string Origine, string Coeur, string Crc, bool SurEtatSeulement);
 
-    /// <summary>Super Mario Bros. (World) : le seul contenu dont le coeur hote a le profil.</summary>
-    private const string CrcDuContenu = "393a432f";
+    private static readonly Hote[] Hotes =
+    [
+        new("nes", "super-mario-bros", "fceumm", "fceumm_ghosts", "393a432f", true),
+        // Super Metroid : aussi le jeu complet, parti du demarrage ; le coeur hote aligne le fantome sur le debut de la partie.
+        new("snes", "super-metroid", "snes9x", "snes9x_ghosts", "d63ed5f8", false),
+    ];
+
+    private static Hote? HoteDe(Reglement r) => Hotes.FirstOrDefault(h => h.Systeme == r.SystemId && h.Groupe == r.RomGroup && r.Coeurs.Contains(h.Origine)
+        && r.Kind.StartsWith("speedrun_", StringComparison.Ordinal) && (r.Etat is not null || !h.SurEtatSeulement));
+
+    /// <summary>Le coeur hote de ce speedrun, ou null. Pur.</summary>
+    public static string? CoeurDe(Reglement r) => HoteDe(r)?.Coeur;
 
     private static readonly TimeSpan Budget = TimeSpan.FromSeconds(2.5);
     private static readonly TimeSpan FraicheurDeLAdmission = TimeSpan.FromMinutes(10);
@@ -50,7 +61,8 @@ public sealed class FantomesDuSpeedrun
     private readonly ReplayManifestFetcher _recherche;
     private readonly IReplaySourceResolver _sources;
     private readonly ILogger<FantomesDuSpeedrun>? _journal;
-    private (DateTime Lu, bool Admis)? _admission;
+    private readonly Dictionary<string, (DateTime Lu, bool Admis)> _admissions = new(StringComparer.Ordinal);
+    private Hote? _hote;
     private readonly object _verrou = new();
     private readonly IDisposable? _abonnement;
     private bool _enCourse;
@@ -73,10 +85,8 @@ public sealed class FantomesDuSpeedrun
 
     public void ChoixSuivant() => Choix = (ChoixDesFantomes)(((int)Choix + 1) % 4);
 
-    /// <summary>Un speedrun parti sur un etat, sur le coeur d'origine du coeur hote, d'un jeu dont il a le profil. Pur.</summary>
-    public static bool PourCeDefi(Reglement r)
-        => r.Kind.StartsWith("speedrun_", StringComparison.Ordinal) && r.Etat is not null
-           && r.SystemId == "nes" && r.RomGroup == "super-mario-bros" && r.Coeurs.Contains("fceumm");
+    /// <summary>Un speedrun sur le coeur d'origine d'un coeur hote, d'un jeu dont il a le profil. Pur.</summary>
+    public static bool PourCeDefi(Reglement r) => HoteDe(r) is not null;
 
     /// <summary>Les replays a courir, du classement du niveau : le mien, puis le record, sans doublon. Pur.</summary>
     public static IReadOnlyList<string> Replays(IReadOnlyList<(string Joueur, string? Replay)> lignes, string pseudo, ChoixDesFantomes choix)
@@ -151,8 +161,10 @@ public sealed class FantomesDuSpeedrun
     {
         try
         {
-            if (await FantomeAsync(replay, CancellationToken.None).ConfigureAwait(false) is not { } fantome) return;
-            var dossier = Directory.CreateDirectory(Dossier).FullName;
+            Hote? hote;
+            lock (_verrou) hote = _hote;
+            if (hote is null || await FantomeAsync(replay, CancellationToken.None).ConfigureAwait(false) is not { } fantome) return;
+            var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.nghost")) File.Delete(ancien);
             await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{replay}.nghost"), fantome).ConfigureAwait(false);
             _journal?.LogInformation("Fantomes : meilleur temps de la session, {Replay} court des le prochain depart.", replay);
@@ -183,8 +195,9 @@ public sealed class FantomesDuSpeedrun
             _fantomeAttendu = null;
         }
 
-        if (!PourCeDefi(r) || Choix == ChoixDesFantomes.Aucun) return false;
-        var travail = Task.Run(() => PreparerAsync(r, pseudo, CancellationToken.None));
+        if (HoteDe(r) is not { } hote || Choix == ChoixDesFantomes.Aucun) return false;
+        lock (_verrou) _hote = hote;
+        var travail = Task.Run(() => PreparerAsync(r, hote, pseudo, CancellationToken.None));
         try
         {
             if (!travail.Wait(Budget))
@@ -203,9 +216,9 @@ public sealed class FantomesDuSpeedrun
         }
     }
 
-    private async Task<bool> PreparerAsync(Reglement r, string pseudo, CancellationToken ct)
+    private async Task<bool> PreparerAsync(Reglement r, Hote hote, string pseudo, CancellationToken ct)
     {
-        if (!await CoeurAdmisAsync(ct).ConfigureAwait(false))
+        if (!await CoeurAdmisAsync(hote.Coeur, ct).ConfigureAwait(false))
         {
             _journal?.LogInformation("Fantomes : le coeur hote n'est pas admis par le site, {Defi} part sans.", r.ChallengeId);
             return false;
@@ -222,7 +235,7 @@ public sealed class FantomesDuSpeedrun
         foreach (var replay in replays)
         {
             if (await FantomeAsync(replay, ct).ConfigureAwait(false) is not { } fantome) continue;
-            var dossier = Directory.CreateDirectory(Dossier).FullName;
+            var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
             var nom = (replay == mien ? PrefixeDuMien : $"{poses + 1}-") + replay + ".nghost";
             await File.WriteAllBytesAsync(Path.Combine(dossier, nom), fantome, ct).ConfigureAwait(false);
             poses++;
@@ -233,10 +246,14 @@ public sealed class FantomesDuSpeedrun
         return poses > 0 || Choix is ChoixDesFantomes.MonRecordEtMondial or ChoixDesFantomes.MonRecord;
     }
 
-    private async Task<bool> CoeurAdmisAsync(CancellationToken ct)
+    private async Task<bool> CoeurAdmisAsync(string nom, CancellationToken ct)
     {
-        if (_admission is { } connue && DateTime.UtcNow - connue.Lu < FraicheurDeLAdmission) return connue.Admis;
-        var coeur = CheminDuCoeur();
+        lock (_verrou)
+        {
+            if (_admissions.TryGetValue(nom, out var connue) && DateTime.UtcNow - connue.Lu < FraicheurDeLAdmission) return connue.Admis;
+        }
+
+        var coeur = CheminDuCoeur(nom);
         if (coeur is null) return false;
         var empreinte = Convert.ToHexString(SHA256.HashData(await File.ReadAllBytesAsync(coeur, ct).ConfigureAwait(false))).ToLowerInvariant();
         try
@@ -244,7 +261,7 @@ public sealed class FantomesDuSpeedrun
             using var client = _http.CreateClient(IndexDesDefisService.HttpClientName);
             using var json = JsonDocument.Parse(await client.GetStringAsync($"{NelfePlayAgentService.BaseUrl.TrimEnd('/')}/api/v1/scores/open-games", ct).ConfigureAwait(false));
             var admis = Admet(json.RootElement, empreinte);
-            _admission = (DateTime.UtcNow, admis);
+            lock (_verrou) _admissions[nom] = (DateTime.UtcNow, admis);
             return admis;
         }
         catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException)
@@ -302,7 +319,7 @@ public sealed class FantomesDuSpeedrun
         }
     }
 
-    private static string Dossier => Path.Combine(RetroBatPaths.RetroBatRoot, "bios", "nelfeplay", "ghosts", CrcDuContenu);
+    private static string DossierDe(Hote h) => Path.Combine(RetroBatPaths.RetroBatRoot, "bios", "nelfeplay", "ghosts", h.Crc);
 
     /// <summary>Mon fantome, le seul a etre remplace en cours de session ; « -rp_ » le fait vider a la fermeture.</summary>
     private const string PrefixeDuMien = "0-moi-";
@@ -313,20 +330,24 @@ public sealed class FantomesDuSpeedrun
     /// </summary>
     public static void ViderLeDossier()
     {
-        try
+        foreach (var hote in Hotes)
         {
-            if (!Directory.Exists(Dossier)) return;
-            foreach (var f in Directory.EnumerateFiles(Dossier, "*-rp_*.nghost")) File.Delete(f);
-        }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
-        {
-            // un coeur encore ouvert : le prochain depart videra
+            try
+            {
+                var dossier = DossierDe(hote);
+                if (!Directory.Exists(dossier)) continue;
+                foreach (var f in Directory.EnumerateFiles(dossier, "*-rp_*.nghost")) File.Delete(f);
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                // un coeur encore ouvert : le prochain depart videra
+            }
         }
     }
 
-    private static string? CheminDuCoeur()
+    private static string? CheminDuCoeur(string nom)
     {
         var retroarch = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch");
-        return new[] { "cores_real", "cores" }.Select(d => Path.Combine(retroarch, d, Coeur + "_libretro.dll")).FirstOrDefault(File.Exists);
+        return new[] { "cores_real", "cores" }.Select(d => Path.Combine(retroarch, d, nom + "_libretro.dll")).FirstOrDefault(File.Exists);
     }
 }
