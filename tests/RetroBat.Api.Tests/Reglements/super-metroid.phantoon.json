@@ -41,7 +41,7 @@
   "start_policy": "canonical_state",
   "state": {
     "name": "phantoon-snes9x",
-    "sha256": "968f85e7bb36ed089b9b6a900ce89a96fdb46307d491e4ad4d6092e6bc738529",
+    "sha256": "c33312e5cad57cf323b4fa6da6d3855cc254be5d7167962916779e7c29f8555e",
     "file": "snes/super-metroid/phantoon.state"
   },
   "timing": {

@@ -41,7 +41,7 @@
   "start_policy": "canonical_state",
   "state": {
     "name": "draygon-snes9x",
-    "sha256": "9cc6f1dabe3badb81cd56a32d00e584bc1eafcb964444ec52e07f202e9d116ee",
+    "sha256": "8d8aa9daf17199f57c0a9f8a2f2e99d49cf52a841be2f02b9146a3f3c51aa572",
     "file": "snes/super-metroid/draygon.state"
   },
   "timing": {

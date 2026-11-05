@@ -41,7 +41,7 @@
   "start_policy": "canonical_state",
   "state": {
     "name": "kraid-snes9x",
-    "sha256": "6a1e10bc8dad59e096825bf191b5a2af565e1ee09c353facc1687aea9491d6c2",
+    "sha256": "3aebadd1c99f1786876cefee22ca4acc4fbeb236e75576091debd49035d55de4",
     "file": "snes/super-metroid/kraid.state"
   },
   "timing": {

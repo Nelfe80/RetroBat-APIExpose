@@ -41,7 +41,7 @@
   "start_policy": "canonical_state",
   "state": {
     "name": "mother-brain-snes9x",
-    "sha256": "e00181e3e8652ecc23489db9cd3a99de5b3514d20131e56206ec643be41d2ba3",
+    "sha256": "6b04e17180ab0490cd7dc0e80d5f9f4f5198d496ae2fd4557c7cfa758f7036f6",
     "file": "snes/super-metroid/mother-brain.state"
   },
   "timing": {
