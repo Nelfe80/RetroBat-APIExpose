@@ -49,6 +49,44 @@ public static class JeuxMassRun
             .Select(m => char.ToUpper(m[0], CultureInfo.InvariantCulture) + m[1..]));
     }
 
+    /// <summary>
+    /// Le crc32 du contenu tel que le coeur le calcule : le fichier lui-meme, ou l'unique jeu d'une archive .zip (le crc de
+    /// son entree). Null si illisible ou si l'archive en porte plusieurs.
+    /// </summary>
+    public static uint? ContenuDe(string chemin)
+    {
+        try
+        {
+            if (!File.Exists(chemin)) return null;
+            if (chemin.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+            {
+                using var zip = System.IO.Compression.ZipFile.OpenRead(chemin);
+                var entrees = zip.Entries.Where(e => e.Length > 0).ToList();
+                return entrees.Count == 1 ? entrees[0].Crc32 : null;
+            }
+            return Crc32(File.ReadAllBytes(chemin));
+        }
+        catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
+    private static readonly uint[] TableCrc = Enumerable.Range(0, 256).Select(n =>
+    {
+        var c = (uint)n;
+        for (var k = 0; k < 8; k++) c = (c & 1) != 0 ? 0xEDB88320u ^ (c >> 1) : c >> 1;
+        return c;
+    }).ToArray();
+
+    /// <summary>Le crc32 (zip, png) d'un contenu. Pur.</summary>
+    public static uint Crc32(ReadOnlySpan<byte> donnees)
+    {
+        var c = 0xFFFFFFFFu;
+        foreach (var o in donnees) c = TableCrc[(c ^ o) & 0xFF] ^ (c >> 8);
+        return c ^ 0xFFFFFFFFu;
+    }
+
     public static int XMegaDrive(ReadOnlySpan<byte> image) => BinaryPrimitives.ReadUInt16LittleEndian(image);
 
     public static int YMegaDrive(ReadOnlySpan<byte> image) => image[8] | (image[11] << 8);

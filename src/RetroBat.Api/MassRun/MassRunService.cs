@@ -44,23 +44,32 @@ public sealed class MassRunService : IDisposable
     private readonly IGamelistStore? _gamelists;
     private readonly RomCanonicalResolver? _canonique;
 
-    /// <summary>La ROM du jeu : celle que le groupe de scoring designe (comme un speedrun), sinon le nom d'usage.</summary>
+    /// <summary>
+    /// La ROM du jeu : le nom d'usage, sinon celle que le groupe de scoring designe, et seulement si son contenu est celui que
+    /// le coeur attend (crc32). Le groupe peut designer une autre version du jeu (essai du user du 05/11 : une autre ROM de
+    /// Super Mario Bros., le coeur sans profil lancait une partie normale et la page de depart attendait la salle d'attente).
+    /// </summary>
     private string? RomDe(JeuxMassRun.Jeu jeu)
     {
+        var candidates = new List<string> { Path.Combine(RetroBatPaths.RetroBatRoot, "roms", jeu.Systeme, jeu.RomParDefaut) };
         try
         {
             if (_gamelists is not null && _canonique is not null
-                && RomDuGroupe.Trouver(_gamelists, _canonique, jeu.Systeme, jeu.RomGroup) is { } trouvee && File.Exists(trouvee))
+                && RomDuGroupe.Trouver(_gamelists, _canonique, jeu.Systeme, jeu.RomGroup) is { } trouvee)
             {
-                return trouvee;
+                candidates.Add(trouvee);
             }
         }
         catch (Exception e) when (e is IOException or InvalidOperationException or UnauthorizedAccessException)
         {
             _journal.LogDebug(e, "MASS RUN : ROM du groupe illisible.");
         }
-        var parDefaut = Path.Combine(RetroBatPaths.RetroBatRoot, "roms", jeu.Systeme, jeu.RomParDefaut);
-        return File.Exists(parDefaut) ? parDefaut : null;
+        foreach (var rom in candidates.Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            if (JeuxMassRun.ContenuDe(rom) == jeu.Crc) return rom;
+        }
+        _journal.LogWarning("MASS RUN : aucune ROM de {Jeu} au contenu {Crc:x8} ({Candidates}).", jeu.Id, jeu.Crc, string.Join(" ; ", candidates));
+        return null;
     }
 
     /// <summary>Le classement fige reste a l'ecran ce temps apres l'arrivee, puis le jeu se ferme : le bilan prend la suite.</summary>

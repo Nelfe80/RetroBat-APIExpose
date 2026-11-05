@@ -89,6 +89,32 @@ public class JeuxMassRunTests
         Assert.Equal(avant + 0.25, c.Decalage!.Value, 3);
     }
 
+    [Fact]
+    public void Le_contenu_d_une_rom_est_le_crc_du_fichier_ou_de_l_unique_jeu_de_son_archive()
+    {
+        Assert.Equal(0xCBF43926u, JeuxMassRun.Crc32("123456789"u8));
+        var dossier = Path.Combine(Path.GetTempPath(), "nelfe-rom-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dossier);
+        try
+        {
+            var brut = Path.Combine(dossier, "jeu.md");
+            File.WriteAllBytes(brut, "123456789"u8.ToArray());
+            Assert.Equal(0xCBF43926u, JeuxMassRun.ContenuDe(brut));
+            var zip = Path.Combine(dossier, "jeu.zip");
+            using (var archive = System.IO.Compression.ZipFile.Open(zip, System.IO.Compression.ZipArchiveMode.Create))
+            {
+                using var s = archive.CreateEntry("jeu.nes").Open();
+                s.Write("123456789"u8);
+            }
+            Assert.Equal(0xCBF43926u, JeuxMassRun.ContenuDe(zip));
+            Assert.Null(JeuxMassRun.ContenuDe(Path.Combine(dossier, "absent.zip")));
+        }
+        finally
+        {
+            Directory.Delete(dossier, true);
+        }
+    }
+
     private static byte[] Image(int x, int y, byte zone, byte acte, byte pose, byte drapeaux)
     {
         var im = new byte[MassRunProtocole.ImageDePiste];
