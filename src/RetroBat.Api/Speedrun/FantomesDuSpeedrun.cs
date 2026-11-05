@@ -69,6 +69,8 @@ public sealed class FantomesDuSpeedrun
     private readonly IDisposable? _abonnement;
     private bool _enCourse;
     private long? _monTemps;
+    private long? _tempsAttendu;
+    private string? _defi;
     private TaskCompletionSource? _fantomeAttendu;
 
     public FantomesDuSpeedrun(IHttpClientFactory http, IReplayManifestStore manifestes, ReplayStore objets, ReplayManifestFetcher recherche,
@@ -129,6 +131,7 @@ public sealed class FantomesDuSpeedrun
             if (!_enCourse || frames is not { } t || (_monTemps is { } mien && t >= mien)) return false;
             if (Choix is not (ChoixDesFantomes.MonRecordEtMondial or ChoixDesFantomes.MonRecord)) return false;
             _monTemps = t;
+            _tempsAttendu = t;
             _fantomeAttendu = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             return true;
         }
@@ -164,11 +167,14 @@ public sealed class FantomesDuSpeedrun
         try
         {
             Hote? hote;
-            lock (_verrou) hote = _hote;
+            string? defi;
+            long? temps;
+            lock (_verrou) { hote = _hote; defi = _defi; temps = _tempsAttendu; }
             if (hote is null || await FantomeAsync(replay, CancellationToken.None).ConfigureAwait(false) is not { } fantome) return;
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.nghost")) File.Delete(ancien);
             await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{replay}.nghost"), fantome).ConfigureAwait(false);
+            if (defi is not null && temps is { } t) EcrireLeRecordLocal(defi, t, replay, fantome);
             _journal?.LogInformation("Fantomes : meilleur temps de la session, {Replay} court des le prochain depart.", replay);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or HttpRequestException or TaskCanceledException)
@@ -199,7 +205,7 @@ public sealed class FantomesDuSpeedrun
 
         if (HoteDe(r) is not { } hote || Choix == ChoixDesFantomes.Aucun) return false;
         RetroBat.Api.MassRun.FichiersDesCoeursHotes.PoserLesProfils();
-        lock (_verrou) _hote = hote;
+        lock (_verrou) { _hote = hote; _defi = r.ChallengeId; _tempsAttendu = null; }
         var travail = Task.Run(() => PreparerAsync(r, hote, pseudo, CancellationToken.None));
         try
         {
@@ -227,14 +233,43 @@ public sealed class FantomesDuSpeedrun
             return false;
         }
 
-        using var client = _http.CreateClient(IndexDesDefisService.HttpClientName);
-        var url = $"{NelfePlayAgentService.BaseUrl.TrimEnd('/')}/api/v1/challenges/board?ruleset={Uri.EscapeDataString(r.Ruleset)}&limit=100";
-        using var json = JsonDocument.Parse(await client.GetStringAsync(url, ct).ConfigureAwait(false));
-        var lignes = LignesDuClassement(json.RootElement);
-        var replays = Replays(lignes, pseudo, Choix);
+        // Le classement du site (record mondial, mon record publie) ; injoignable, mon record local suffit.
+        IReadOnlyList<(string Joueur, string? Replay)> lignes = [];
+        long? monTempsPublie = null;
+        try
+        {
+            using var client = _http.CreateClient(IndexDesDefisService.HttpClientName);
+            var url = $"{NelfePlayAgentService.BaseUrl.TrimEnd('/')}/api/v1/challenges/board?ruleset={Uri.EscapeDataString(r.Ruleset)}&limit=100";
+            using var json = JsonDocument.Parse(await client.GetStringAsync(url, ct).ConfigureAwait(false));
+            lignes = LignesDuClassement(json.RootElement);
+            monTempsPublie = MonTemps(json.RootElement, pseudo);
+        }
+        catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            _journal?.LogInformation("Fantomes : classement de {Defi} injoignable, mon record local seulement.", r.ChallengeId);
+        }
+
+        var replays = Replays(lignes, pseudo, Choix).ToList();
         var mien = lignes.FirstOrDefault(l => pseudo.Length > 0 && string.Equals(l.Joueur, pseudo, StringComparison.OrdinalIgnoreCase)).Replay;
-        lock (_verrou) _monTemps = MonTemps(json.RootElement, pseudo);
         var poses = 0;
+        // MON RECORD LOCAL (05/11, demande du user : « un ghost local independant d'un replay distant ») : garde sur la borne a
+        // chaque meilleur temps, il court tout de suite, sans attendre que le site propose son replay ; le record publie ne le
+        // remplace que s'il est meilleur (un temps fait sur une autre borne).
+        var local = Choix is ChoixDesFantomes.MonRecordEtMondial or ChoixDesFantomes.MonRecord ? LireLeRecordLocal(r.ChallengeId) : null;
+        if (local is { } l && (monTempsPublie is not { } publie || l.Images <= publie))
+        {
+            var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
+            await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{l.Replay}.nghost"), l.Fantome, ct).ConfigureAwait(false);
+            poses++;
+            if (mien is not null) replays.Remove(mien);
+            mien = null;
+            lock (_verrou) _monTemps = l.Images;
+        }
+        else
+        {
+            lock (_verrou) _monTemps = monTempsPublie;
+        }
+
         foreach (var replay in replays)
         {
             if (await FantomeAsync(replay, ct).ConfigureAwait(false) is not { } fantome) continue;
@@ -322,6 +357,42 @@ public sealed class FantomesDuSpeedrun
         catch (InvalidDataException e)
         {
             _journal?.LogWarning("Fantomes : replay {Replay} illisible : {Message}", replay, e.Message);
+            return null;
+        }
+    }
+
+    /// <summary>Le dossier des records locaux : un .nghost et un .json (temps en images, replay) par defi.</summary>
+    internal static string DossierDesRecordsLocaux { get; set; } = Path.Combine(RetroBatPaths.PluginRoot, "state", "speedrun", "fantomes", "locaux");
+
+    internal sealed record RecordLocal(long Images, string Replay, byte[] Fantome);
+
+    private static string? NomSur(string defi) => System.Text.RegularExpressions.Regex.IsMatch(defi, "^[a-z0-9][a-z0-9.\\-]{0,95}$") ? defi : null;
+
+    /// <summary>Garde mon meilleur temps sur cette borne, s'il bat celui qui y est deja.</summary>
+    internal static void EcrireLeRecordLocal(string defi, long images, string replay, byte[] fantome)
+    {
+        if (NomSur(defi) is not { } nom) return;
+        if (LireLeRecordLocal(defi) is { } deja && deja.Images <= images) return;
+        Directory.CreateDirectory(DossierDesRecordsLocaux);
+        var chemin = Path.Combine(DossierDesRecordsLocaux, nom);
+        File.WriteAllBytes(chemin + ".nghost.tmp", fantome);
+        File.Move(chemin + ".nghost.tmp", chemin + ".nghost", true);
+        File.WriteAllText(chemin + ".json", JsonSerializer.Serialize(new { images, replay, le = DateTime.UtcNow }));
+    }
+
+    internal static RecordLocal? LireLeRecordLocal(string defi)
+    {
+        if (NomSur(defi) is not { } nom) return null;
+        try
+        {
+            var chemin = Path.Combine(DossierDesRecordsLocaux, nom);
+            if (!File.Exists(chemin + ".json") || !File.Exists(chemin + ".nghost")) return null;
+            using var doc = JsonDocument.Parse(File.ReadAllText(chemin + ".json"));
+            return new RecordLocal(doc.RootElement.GetProperty("images").GetInt64(), doc.RootElement.GetProperty("replay").GetString() ?? "",
+                File.ReadAllBytes(chemin + ".nghost"));
+        }
+        catch (Exception e) when (e is IOException or JsonException or KeyNotFoundException or InvalidOperationException or UnauthorizedAccessException)
+        {
             return null;
         }
     }

@@ -5753,7 +5753,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // que le site ne savait pas le rattacher). Une partie qu'il ne connait pas encore se retente, jusqu'a l'oubli des
             // rapprochements (sept jours).
             var issue = IssueDuLienReplay((int)response.StatusCode, respBody);
-            if (issue == IssueDuLien.Pose) NoterLeLienDansLeRecord(sessionId, body);
+            if (issue == IssueDuLien.Pose)
+            {
+                NoterLeLienDansLeRecord(sessionId, body);
+                // Le site ne propose un replay (et son fantome) que s'il est detenu quelque part : la borne le declare tout
+                // de suite, sans attendre son recensement de 6 h (05/11, fantome de Sonic introuvable apres un record).
+                RetroBat.Api.Replay.Sharing.ReplayHoldingsReporter.DeclarerBientot();
+            }
             return issue != IssueDuLien.ARetenter;
         }
         catch (Exception ex)

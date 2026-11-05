@@ -133,4 +133,30 @@ public class FantomesDuSpeedrunTests
         var chemins = essai.Split('|');
         Assert.Equal(File.ReadAllBytes(chemins[1]), ReplayVersFantome.Convertir(File.ReadAllBytes(chemins[0])));
     }
+
+    [Fact]
+    public void Mon_record_local_garde_le_meilleur_temps_et_son_fantome()
+    {
+        var avant = FantomesDuSpeedrun.DossierDesRecordsLocaux;
+        FantomesDuSpeedrun.DossierDesRecordsLocaux = Path.Combine(Path.GetTempPath(), "nelfe-records-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            const string defi = "sonic-the-hedgehog.green-hill-2";
+            Assert.Null(FantomesDuSpeedrun.LireLeRecordLocal(defi));
+            FantomesDuSpeedrun.EcrireLeRecordLocal(defi, 2300, "rp_A", [1, 2]);
+            FantomesDuSpeedrun.EcrireLeRecordLocal(defi, 2400, "rp_B", [3]);   // moins bon : garde rp_A
+            Assert.Equal((2300L, "rp_A"), (FantomesDuSpeedrun.LireLeRecordLocal(defi)!.Images, FantomesDuSpeedrun.LireLeRecordLocal(defi)!.Replay));
+            FantomesDuSpeedrun.EcrireLeRecordLocal(defi, 2200, "rp_C", [4, 5, 6]);
+            var r = FantomesDuSpeedrun.LireLeRecordLocal(defi)!;
+            Assert.Equal(2200L, r.Images);
+            Assert.Equal(new byte[] { 4, 5, 6 }, r.Fantome);
+            FantomesDuSpeedrun.EcrireLeRecordLocal("../echappe", 1, "rp_D", [7]);
+            Assert.Null(FantomesDuSpeedrun.LireLeRecordLocal("../echappe"));
+        }
+        finally
+        {
+            if (Directory.Exists(FantomesDuSpeedrun.DossierDesRecordsLocaux)) Directory.Delete(FantomesDuSpeedrun.DossierDesRecordsLocaux, true);
+            FantomesDuSpeedrun.DossierDesRecordsLocaux = avant;
+        }
+    }
 }

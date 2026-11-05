@@ -72,9 +72,30 @@ public sealed class ReplayHoldingsReporter : BackgroundService
             catch (OperationCanceledException) { break; }
             catch (Exception ex) { _logger.LogDebug(ex, "Replay : déclaration de conservation en erreur."); }
 
-            try { await Task.Delay(Cadence, stoppingToken).ConfigureAwait(false); }
+            try
+            {
+                // la cadence, ou un replay qui vient d'etre lie a un score : on le declare 15 s apres (les liens d'une
+                // meme partie partent ensemble)
+                if (await Reveil.WaitAsync(Cadence, stoppingToken).ConfigureAwait(false))
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken).ConfigureAwait(false);
+                    while (Reveil.CurrentCount > 0) Reveil.Wait(0, CancellationToken.None);
+                }
+            }
             catch (OperationCanceledException) { break; }
         }
+    }
+
+    private static readonly SemaphoreSlim Reveil = new(0, 1);
+
+    /// <summary>
+    /// UN REPLAY QUI VIENT D'ETRE LIE A UN SCORE (05/11) : le site ne le propose, ni en lecture ni en fantome, que si une
+    /// borne a declare le detenir ; sans ce reveil, un record attendait le recensement suivant (jusqu'a 6 h).
+    /// </summary>
+    public static void DeclarerBientot()
+    {
+        try { Reveil.Release(); }
+        catch (SemaphoreFullException) { }
     }
 
     public sealed record ReportResult(bool Sent, int Declared, string? Reason);
