@@ -71,6 +71,7 @@ public sealed class FantomesDuSpeedrun
     private long? _monTemps;
     private long? _tempsAttendu;
     private string? _defi;
+    private string _pseudo = "";
     private TaskCompletionSource? _fantomeAttendu;
 
     public FantomesDuSpeedrun(IHttpClientFactory http, IReplayManifestStore manifestes, ReplayStore objets, ReplayManifestFetcher recherche,
@@ -169,11 +170,14 @@ public sealed class FantomesDuSpeedrun
             Hote? hote;
             string? defi;
             long? temps;
-            lock (_verrou) { hote = _hote; defi = _defi; temps = _tempsAttendu; }
+            string pseudo;
+            lock (_verrou) { hote = _hote; defi = _defi; temps = _tempsAttendu; pseudo = _pseudo; }
             if (hote is null || await FantomeAsync(replay, CancellationToken.None).ConfigureAwait(false) is not { } fantome) return;
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.nghost")) File.Delete(ancien);
+            foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.label")) File.Delete(ancien);
             await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{replay}.nghost"), fantome).ConfigureAwait(false);
+            EcrireLEtiquette(dossier, $"{PrefixeDuMien}{replay}", Etiquette(pseudo, false));
             if (defi is not null && temps is { } t) EcrireLeRecordLocal(defi, t, replay, fantome);
             _journal?.LogInformation("Fantomes : meilleur temps de la session, {Replay} court des le prochain depart.", replay);
         }
@@ -205,7 +209,7 @@ public sealed class FantomesDuSpeedrun
 
         if (HoteDe(r) is not { } hote || Choix == ChoixDesFantomes.Aucun) return false;
         RetroBat.Api.MassRun.FichiersDesCoeursHotes.PoserLesProfils();
-        lock (_verrou) { _hote = hote; _defi = r.ChallengeId; _tempsAttendu = null; }
+        lock (_verrou) { _hote = hote; _defi = r.ChallengeId; _tempsAttendu = null; _pseudo = pseudo; }
         var travail = Task.Run(() => PreparerAsync(r, hote, pseudo, CancellationToken.None));
         try
         {
@@ -260,6 +264,7 @@ public sealed class FantomesDuSpeedrun
         {
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
             await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{l.Replay}.nghost"), l.Fantome, ct).ConfigureAwait(false);
+            EcrireLEtiquette(dossier, $"{PrefixeDuMien}{l.Replay}", Etiquette(pseudo, false));
             poses++;
             if (mien is not null) replays.Remove(mien);
             mien = null;
@@ -274,8 +279,10 @@ public sealed class FantomesDuSpeedrun
         {
             if (await FantomeAsync(replay, ct).ConfigureAwait(false) is not { } fantome) continue;
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
-            var nom = (replay == mien ? PrefixeDuMien : $"{poses + 1}-") + replay + ".nghost";
-            await File.WriteAllBytesAsync(Path.Combine(dossier, nom), fantome, ct).ConfigureAwait(false);
+            var nom = (replay == mien ? PrefixeDuMien : $"{poses + 1}-") + replay;
+            await File.WriteAllBytesAsync(Path.Combine(dossier, nom + ".nghost"), fantome, ct).ConfigureAwait(false);
+            var detenteur = lignes.FirstOrDefault(x => x.Replay == replay).Joueur ?? "";
+            EcrireLEtiquette(dossier, nom, replay == mien ? Etiquette(pseudo, false) : Etiquette(detenteur, true));
             poses++;
         }
 
@@ -361,6 +368,29 @@ public sealed class FantomesDuSpeedrun
         }
     }
 
+    /// <summary>
+    /// L'ETIQUETTE D'UN FANTOME (05/11, demande du user) : le pseudo du joueur pour son record, le pseudo du detenteur suivi de
+    /// « (WR) » pour le record mondial ; le coeur la dessine au-dessus du personnage (dore pour le record mondial, gris clair
+    /// pour le mien). En majuscules, 20 caracteres au plus. Pur.
+    /// </summary>
+    internal static string Etiquette(string pseudo, bool mondial)
+    {
+        var nom = new string((pseudo ?? "").Where(c => !char.IsControl(c)).Take(20).ToArray()).Trim().ToUpperInvariant();
+        return mondial ? (nom.Length > 0 ? nom + " (WR)" : "WR") : nom;
+    }
+
+    private void EcrireLEtiquette(string dossier, string nom, string etiquette)
+    {
+        try
+        {
+            File.WriteAllText(Path.Combine(dossier, nom + ".label"), etiquette, new System.Text.UTF8Encoding(false));
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            _journal?.LogDebug(e, "Fantomes : etiquette de {Nom} non ecrite.", nom);
+        }
+    }
+
     /// <summary>Le dossier des records locaux : un .nghost et un .json (temps en images, replay) par defi.</summary>
     internal static string DossierDesRecordsLocaux { get; set; } = Path.Combine(RetroBatPaths.PluginRoot, "state", "speedrun", "fantomes", "locaux");
 
@@ -415,6 +445,7 @@ public sealed class FantomesDuSpeedrun
                 var dossier = DossierDe(hote);
                 if (!Directory.Exists(dossier)) continue;
                 foreach (var f in Directory.EnumerateFiles(dossier, "*-rp_*.nghost")) File.Delete(f);
+                foreach (var f in Directory.EnumerateFiles(dossier, "*-rp_*.label")) File.Delete(f);
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException)
             {

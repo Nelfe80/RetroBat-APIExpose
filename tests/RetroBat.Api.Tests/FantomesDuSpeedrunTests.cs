@@ -159,4 +159,12 @@ public class FantomesDuSpeedrunTests
             FantomesDuSpeedrun.DossierDesRecordsLocaux = avant;
         }
     }
+
+    [Theory]
+    [InlineData("Nelfe80", false, "NELFE80")]
+    [InlineData("NeoGeoff", true, "NEOGEOFF (WR)")]
+    [InlineData("", true, "WR")]
+    [InlineData("un pseudo vraiment tres long", false, "UN PSEUDO VRAIMENT T")]
+    public void L_etiquette_d_un_fantome_est_le_pseudo_et_WR_pour_le_record_mondial(string pseudo, bool mondial, string attendu)
+        => Assert.Equal(attendu, FantomesDuSpeedrun.Etiquette(pseudo, mondial));
 }
