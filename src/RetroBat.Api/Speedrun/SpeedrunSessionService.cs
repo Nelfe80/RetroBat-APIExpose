@@ -394,9 +394,11 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 await Task.Delay(200, delai.Token).ConfigureAwait(false);
                 await EtatsDesDefis.ChargerAsync(_commandes, delai.Token).ConfigureAwait(false);
                 await Task.Delay(500, CancellationToken.None).ConfigureAwait(false);
-                // (05/11) le replay de la tentative s'ouvre tout de suite sur l'etat charge, avant que le joueur ait la main
+                // (05/11) le replay de la tentative s'ouvre tout de suite sur l'etat charge, avant que le joueur ait la main. A cote :
+                // la session ne l'attend pas pour se rearmer (23:26, 12 s d'attente sous charge : le depart du joueur etait passe,
+                // et l'entree dans la salle souterraine de Mario a ete prise pour le depart, 0:14.93).
                 if (RetroBat.Api.Replay.Recording.ReplayRecorderService.Courant is { } enregistreur)
-                    await enregistreur.OuvrirApresRelanceAsync(CancellationToken.None).ConfigureAwait(false);
+                    _ = Task.Run(() => enregistreur.OuvrirApresRelanceAsync(CancellationToken.None));
             }
         }
         catch (Exception ex)
