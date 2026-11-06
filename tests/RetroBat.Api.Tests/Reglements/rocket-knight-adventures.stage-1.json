@@ -1,0 +1,110 @@
+{
+  "schema": "nelfe.challenge.v2",
+  "challenge_id": "rocket-knight-adventures.stage-1",
+  "version": 1,
+  "ruleset": "ch-rka-stage-1-v1",
+  "order": 2,
+  "title": {
+    "fr": "Stage 1",
+    "en": "Stage 1"
+  },
+  "summary": {
+    "fr": "Du portrait du stage au stage suivant, en Easy, sans mourir",
+    "en": "From the stage portrait to the next stage, on Easy, without dying"
+  },
+  "kind": "speedrun_level",
+  "game": {
+    "system_id": "megadrive",
+    "rom_group": "rocket-knight-adventures"
+  },
+  "mem_sha256": "2305b0901ecd92b8b0f30cce6735fbc728d2ad1102bfeaa63b74c26cfef1fa9e",
+  "start_policy": "canonical_state",
+  "state": {
+    "name": "stage-1-panneau-genesis",
+    "sha256": "753956594d41beae878d915174e284ee0ec02d0dafacc9dace0fdc2d0553777f",
+    "file": "megadrive/rocket-knight-adventures/stage-1-panneau.state"
+  },
+  "start": [
+    {
+      "value": {
+        "address": "0xB088",
+        "equals": "0x01"
+      }
+    },
+    {
+      "value": {
+        "address": "0xFB16",
+        "equals": "0x01"
+      }
+    }
+  ],
+  "timing": {
+    "official": "independent",
+    "independent": {
+      "start": {
+        "event": {
+          "action": "GAME_PLAYING",
+          "address": "0xB028",
+          "value": "0x03",
+          "leaves": "0x02"
+        },
+        "when": [
+          {
+            "value": {
+              "address": "0xB088",
+              "equals": "0x01"
+            }
+          }
+        ]
+      },
+      "finish": {
+        "event": {
+          "action": "PROGRESSION_STAGE",
+          "address": "0xFB12",
+          "value": "0x05"
+        }
+      }
+    }
+  },
+  "fail": [
+    {
+      "event": {
+        "action": "LOSE_LIFE",
+        "address": "0xFB0C"
+      }
+    }
+  ],
+  "void": [
+    "save_state_load",
+    "rewind",
+    "runahead",
+    "fast_forward",
+    "cheats",
+    "netplay",
+    "pause_clock_gap",
+    {
+      "event": {
+        "action": "PAUSE_ON",
+        "address": "0xB015",
+        "value": "0xFF"
+      }
+    },
+    {
+      "event": {
+        "action": "DEMO_MODE",
+        "address": "0xB002",
+        "value": "0x07"
+      }
+    }
+  ],
+  "ranking": {
+    "metric": "frames",
+    "direction": "lower_better"
+  },
+  "cores": [
+    "genesis_plus_gx"
+  ],
+  "runtime": {
+    "frame_rate": 59.922743
+  }
+}

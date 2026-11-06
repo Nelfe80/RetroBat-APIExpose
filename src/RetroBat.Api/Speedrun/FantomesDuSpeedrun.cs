@@ -54,6 +54,8 @@ public sealed class FantomesDuSpeedrun
         new("snes", "super-mario-world", "snes9x", "snes9x_ghosts", "b19ed489", true),
         // Sonic 2 (06/11) : comme Sonic, les niveaux seulement ; profil du coeur en fichier (24ab4c3a.ini du Data Pack).
         new("megadrive", "sonic-the-hedgehog-2", "genesis_plus_gx", "genesis_plus_gx_ghosts", "24ab4c3a", true),
+        // Rocket Knight Adventures (06/11) : les stages seulement (etat du portrait) ; profil en fichier (a6efec47.ini).
+        new("megadrive", "rocket-knight-adventures", "genesis_plus_gx", "genesis_plus_gx_ghosts", "a6efec47", true),
     ];
 
     private static Hote? HoteDe(Reglement r) => Hotes.FirstOrDefault(h => h.Systeme == r.SystemId && h.Groupe == r.RomGroup && r.Coeurs.Contains(h.Origine)

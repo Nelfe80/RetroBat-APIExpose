@@ -1,0 +1,91 @@
+{
+  "schema": "nelfe.challenge.v2",
+  "challenge_id": "rocket-knight-adventures.any-easy",
+  "version": 1,
+  "ruleset": "ch-rka-any-easy-v1",
+  "order": 1,
+  "title": {
+    "fr": "Jeu complet · Any% (Easy)",
+    "en": "Full game · Any% (Easy)"
+  },
+  "summary": {
+    "fr": "Du stage 1 à la fin du jeu, en Easy, morts et continues permis",
+    "en": "From stage 1 to the ending, on Easy, deaths and continues allowed"
+  },
+  "kind": "speedrun_full",
+  "game": {
+    "system_id": "megadrive",
+    "rom_group": "rocket-knight-adventures"
+  },
+  "mem_sha256": "2305b0901ecd92b8b0f30cce6735fbc728d2ad1102bfeaa63b74c26cfef1fa9e",
+  "start_policy": "normal_boot",
+  "start": [
+    {
+      "value": {
+        "address": "0xFB16",
+        "equals": "0x01"
+      }
+    }
+  ],
+  "timing": {
+    "official": "independent",
+    "independent": {
+      "start": {
+        "event": {
+          "action": "GAME_PLAYING",
+          "address": "0xB028",
+          "value": "0x03",
+          "leaves": "0x02"
+        },
+        "when": [
+          {
+            "value": {
+              "address": "0xB088",
+              "equals": "0x01"
+            }
+          }
+        ]
+      },
+      "finish": {
+        "event": {
+          "action": "PROGRESSION_STAGE",
+          "address": "0xFB12",
+          "value": "0x21"
+        }
+      }
+    }
+  },
+  "void": [
+    "save_state_load",
+    "rewind",
+    "runahead",
+    "fast_forward",
+    "cheats",
+    "netplay",
+    "pause_clock_gap",
+    {
+      "event": {
+        "action": "PAUSE_ON",
+        "address": "0xB015",
+        "value": "0xFF"
+      }
+    },
+    {
+      "event": {
+        "action": "DEMO_MODE",
+        "address": "0xB002",
+        "value": "0x07"
+      }
+    }
+  ],
+  "ranking": {
+    "metric": "frames",
+    "direction": "lower_better"
+  },
+  "cores": [
+    "genesis_plus_gx"
+  ],
+  "runtime": {
+    "frame_rate": 59.922743
+  }
+}
