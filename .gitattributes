@@ -1,0 +1,2 @@
+# Les .MEM sont compares par leur SHA-256 (profils, reglements) : jamais de conversion des fins de ligne.
+*.MEM -text
