@@ -17,7 +17,7 @@
     "system_id": "nes",
     "rom_group": "super-mario-bros-3"
   },
-  "mem_sha256": "6827480ed518b4d55bf19d46769d1e712239d7951fd6cf4f81760c1d94ea733e",
+  "mem_sha256": "dbeb8d3da48cd8ae5fd4f4aaa9ce5429715d8ed8d8868b3281220d106fde8bbc",
   "start_policy": "canonical_state",
   "state": {
     "name": "1-6-entree-fceumm",

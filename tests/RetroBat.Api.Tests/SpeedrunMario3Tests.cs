@@ -5,7 +5,7 @@ namespace RetroBat.Api.Tests;
 
 /// <summary>
 /// LES SPEEDRUNS DE SUPER MARIO BROS. 3 (NES, (USA) (Rev 1), prepares la nuit du 06/11, NON ouverts) : les six niveaux du
-/// monde 1 en depart direct sur l'etat d'entree (A sur le panneau de la carte, 4 images apres). Les parties viennent du banc
+/// monde 1 et sa forteresse en depart direct sur l'etat d'entree (A sur le panneau de la carte, 4 images apres). Les parties viennent du banc
 /// fceumm sans fenetre du 06/11 (un joueur automatique qui court) : chaque trace porte, image par image depuis le chargement
 /// de l'etat, les adresses du .MEM (.user) qui ont change ; le banc des replays les fait passer par le wrapper simule et
 /// l'evaluateur, comme sur la borne.
@@ -19,7 +19,7 @@ public class SpeedrunMario3Tests
     private static byte[] Mem => File.ReadAllBytes(Fichier("super-mario-bros-3.MEM"));
 
     public static IEnumerable<object[]> Niveaux()
-        => new[] { ("1-1", 0x01), ("1-2", 0x03), ("1-3", 0x01), ("1-4", 0x04), ("1-5", 0x0E), ("1-6", 0x04) }
+        => new[] { ("1-1", 0x01), ("1-2", 0x03), ("1-3", 0x01), ("1-4", 0x04), ("1-5", 0x0E), ("1-6", 0x04), ("1-f", 0x02) }
             .Select(n => new object[] { n.Item1, n.Item2 });
 
     private static List<PassageMesure> Jouer(string trace, params string[] slugs)
@@ -39,17 +39,18 @@ public class SpeedrunMario3Tests
         Assert.Contains(r.Depart, c => c.Adresse == 0x0727 && c.Egal == 0);
         var depart = Assert.Single(r.Independant!.Depart.Evenements);
         Assert.Equal((0x070AL, tuiles), (depart.Adresse!.Value, depart.Valeur!.Value));
+        // Un niveau finit a la carte (0x05F3 = 0x81), la forteresse a l'orbe de Boom-Boom (0x04E4 = 0x04).
         var arrivee = Assert.Single(r.Arrivee);
-        Assert.Equal((0x05F3L, 0x81), (arrivee.Adresse!.Value, arrivee.Valeur!.Value));
+        Assert.Equal(slug == "1-f" ? (0x04E4L, 0x04) : (0x05F3L, 0x81), (arrivee.Adresse!.Value, arrivee.Valeur!.Value));
     }
 
     [Fact]
-    public void Les_six_epreuves_ont_chacune_leur_classement_dans_l_ordre_du_jeu()
+    public void Les_sept_epreuves_ont_chacune_leur_classement_dans_l_ordre_du_jeu()
     {
         var reglements = Niveaux().Select(n => Lire((string)n[0])).ToList();
-        Assert.Equal(6, reglements.Select(r => r.Ruleset).Distinct().Count());
-        Assert.Equal(Enumerable.Range(1, 6), reglements.Select(r => r.Ordre));
-        Assert.Equal(6, reglements.Select(r => r.Etat!.Sha256).Distinct().Count());
+        Assert.Equal(7, reglements.Select(r => r.Ruleset).Distinct().Count());
+        Assert.Equal(Enumerable.Range(1, 7), reglements.Select(r => r.Ordre));
+        Assert.Equal(7, reglements.Select(r => r.Etat!.Sha256).Distinct().Count());
     }
 
     [Fact]
@@ -60,6 +61,18 @@ public class SpeedrunMario3Tests
         Assert.Equal(EtatTentative.Finie, p.Resultat.Etat);
         Assert.Equal(DEPART_1_1, p.Depart);
         Assert.Equal(ARRIVEE_1_1 - DEPART_1_1, p.Resultat.FramesOfficielles);
+    }
+
+    [Fact]
+    public void La_forteresse_finit_a_l_orbe_pas_a_la_defaite_de_Boom_Boom()
+    {
+        // Trace assemblee de deux morceaux mesures : le depart (0x070A 0 -> 2, image 44), puis Boom-Boom battu (0x05F3 = 1,
+        // image 121) et l'orbe touchee (0x04E4 = 4, image 202).
+        var p = Assert.Single(Jouer("smb3-1-f-assemblee", "1-f", "1-1"));
+        Assert.Equal("1-f", p.Defi);
+        Assert.Equal(EtatTentative.Finie, p.Resultat.Etat);
+        Assert.Equal(44, p.Depart);
+        Assert.Equal(202 - 44, p.Resultat.FramesOfficielles);
     }
 
     [Fact]
