@@ -1,0 +1,97 @@
+{
+  "schema": "nelfe.challenge.v2",
+  "challenge_id": "super-mario-world.dp3",
+  "version": 1,
+  "ruleset": "ch-smw-dp3-v1",
+  "order": 6,
+  "title": {
+    "fr": "Donut Plains 3",
+    "en": "Donut Plains 3"
+  },
+  "summary": {
+    "fr": "De l'ouverture du niveau au ruban d'arrivée, sans mourir, Mario petit au départ",
+    "en": "From the level fade-in to the goal tape, without dying, starting as small Mario"
+  },
+  "kind": "speedrun_level",
+  "game": {
+    "system_id": "snes",
+    "rom_group": "super-mario-world"
+  },
+  "mem_sha256": "6e6a18037382d9ea23b202a48891c9e6374f316180d0c8b923df2885565ecd0e",
+  "start_policy": "canonical_state",
+  "state": {
+    "name": "dp3-entree-snes9x",
+    "sha256": "008df6b7fb9008be36b631f9a72b019605f61d6c0008465aaa0c37b04a3bf4d5",
+    "file": "snes/super-mario-world/dp3-entree.state"
+  },
+  "start": [
+    {
+      "value": {
+        "address": "0x13BF",
+        "equals": "0x05"
+      }
+    }
+  ],
+  "timing": {
+    "official": "independent",
+    "independent": {
+      "start": {
+        "event": {
+          "action": "GAME_PLAYING",
+          "address": "0x0100",
+          "value": "0x14"
+        },
+        "when": [
+          {
+            "value": {
+              "address": "0x13BF",
+              "equals": "0x05"
+            }
+          }
+        ]
+      },
+      "finish": {
+        "event": {
+          "action": "LEVEL_CLEAR",
+          "address": "0x1493",
+          "value": "0xFF"
+        }
+      }
+    }
+  },
+  "fail": [
+    {
+      "event": {
+        "action": "LOSE_LIFE",
+        "address": "0x0071",
+        "value": "0x09"
+      }
+    }
+  ],
+  "void": [
+    "save_state_load",
+    "rewind",
+    "runahead",
+    "fast_forward",
+    "cheats",
+    "netplay",
+    "pause_clock_gap",
+    {
+      "event": {
+        "action": "PAUSE_ON",
+        "address": "0x13D4",
+        "value": "0x01"
+      }
+    }
+  ],
+  "ranking": {
+    "metric": "frames",
+    "direction": "lower_better"
+  },
+  "cores": [
+    "snes9x"
+  ],
+  "runtime": {
+    "frame_rate": 60.098812
+  }
+}

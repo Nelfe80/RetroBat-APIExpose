@@ -50,6 +50,8 @@ public sealed class FantomesDuSpeedrun
         new("nes", "mega-man-2", "fceumm", "fceumm_ghosts", "a9bd44bc", true),
         // Super Mario Bros. 3 (USA) (Rev 1) : le monde 1 (etat d'entree de chaque niveau) ; profil compile dans le coeur 0.7.
         new("nes", "super-mario-bros-3", "fceumm", "fceumm_ghosts", "0b742b33", true),
+        // (06/11, jour) Super Mario World (USA) : les niveaux seulement (etat d'ouverture du niveau), profil en fichier b19ed489.ini.
+        new("snes", "super-mario-world", "snes9x", "snes9x_ghosts", "b19ed489", true),
     ];
 
     private static Hote? HoteDe(Reglement r) => Hotes.FirstOrDefault(h => h.Systeme == r.SystemId && h.Groupe == r.RomGroup && r.Coeurs.Contains(h.Origine)

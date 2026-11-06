@@ -26,7 +26,7 @@ public class JeuxMassRunTests
     {
         Assert.Equal("fceumm_ghosts", JeuxMassRun.ParDefaut.Coeur);
         Assert.Same(JeuxMassRun.ParDefaut, JeuxMassRun.Trouver("NES/super-mario-bros"));
-        Assert.Null(JeuxMassRun.Trouver("snes/super-mario-world"));
+        Assert.Null(JeuxMassRun.Trouver("snes/jeu-inconnu"));   // (06/11) super-mario-world est maintenant un jeu de MASS RUN
         Assert.False(JeuxMassRun.FormatMegaDrive("nes/super-mario-bros"));
         Assert.True(JeuxMassRun.FormatMegaDrive("megadrive/sonic-the-hedgehog"));
         Assert.False(JeuxMassRun.FormatAUnSprite("nes/super-mario-bros"));

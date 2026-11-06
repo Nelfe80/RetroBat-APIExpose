@@ -47,6 +47,11 @@ public static class JeuxMassRun
         new("snes/super-metroid", "snes", "super-metroid", 0xd63ed5f8, "snes9x_ghosts", "Super Metroid (Japan, USA) (En,Ja).zip",
             new Regex("^(kraid|phantoon|draygon|ridley|mother-brain)$", RegexOptions.CultureInvariant),
             SuffixeDeLEtat: "", ImagesParSeconde: 60.098812, PosesEnImages: true),
+        // (06/11, jour) Super Mario World (USA) : les niveaux de Yoshi's Island et de Donut Plains, du chargement du niveau a
+        // l'arrivee (etats d'epreuve « yi2-entree.state », ...) ; meme coeur hote, poses en images comme Super Metroid
+        new("snes/super-mario-world", "snes", "super-mario-world", 0xb19ed489, "snes9x_ghosts", "Super Mario World (USA).zip",
+            new Regex("^(yi[1-4]|dp[134]|ds1)$", RegexOptions.CultureInvariant),
+            SuffixeDeLEtat: "-entree", ImagesParSeconde: 60.098812, PosesEnImages: true),
     ];
 
     /// <summary>
@@ -65,6 +70,8 @@ public static class JeuxMassRun
             "mother-brain" => (0x0998u, 0x26u),
             _ => null,
         },
+        // Super Mario World : $1493 (minuterie de fin de niveau) prend 0xFF a l'image du ruban d'arrivee (banc du 06/11)
+        "snes/super-mario-world" => (0x1493u, 0xFFu),
         _ => null,
     };
 
