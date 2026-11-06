@@ -1,9 +1,9 @@
 -- .user 2026-11-06 (nuit, speedruns, banc fceumm sans fenetre, ROM (USA) (Rev 1) : md5 sans en-tete 55b71115..., crc32 du
 -- .nes entier 0b742b33). Lignes ajoutees pour les speedruns par niveau, rien d'autre de change :
---   0x05F3 passe de 0 a 0x81 a l'image ou Mario touche la carte de fin d'un niveau (la meme valeur quelle que soit la carte,
+--   0x05F3 passe de 0 a 0x81 a l'image ou Mario touche la carte de fin d'un niveau (1-1 et 1-2 ; la meme valeur quelle que soit la carte,
 --     champignon, fleur ou etoile ; 0x079C porte la carte) ; il revient a 0 au retour sur la carte du monde (1-1, 400 images
 --     plus tard). Ligne LEVEL_CLEAR ajoutee.
---   0x00F1 (mort de Mario) quitte 0 a la mort : 1 ennemi, 3 temps ecoule (2 chute, attendu) ; il revient a 0 au retour sur la
+--   0x00F1 (mort de Mario) quitte 0 a la mort : 1 ennemi, 2 chute dans un trou (1-2), 3 temps ecoule ; il revient a 0 au retour sur la
 --     carte, ou les vies 0x0736 baissent alors, 200 images plus tard. Ligne LOSE_LIFE ajoutee.
 -- Mesures citees telles quelles : 0x070A (jeu de tuiles du niveau, ligne GAME_PLAYING) vaut 0 sur la carte et prend celui du
 -- niveau au chargement (1 plaine pour 1-1 et 1-3, 3 collines 1-2, 4 ciel 1-4 et 1-6, 14 souterrain 1-5, 2 forteresse),
