@@ -1,0 +1,103 @@
+{
+  "schema": "nelfe.challenge.v2",
+  "challenge_id": "super-mario-bros-3.1-5",
+  "version": 1,
+  "ruleset": "ch-smb3-1-5-v1",
+  "order": 5,
+  "title": {
+    "fr": "Monde 1-5",
+    "en": "World 1-5"
+  },
+  "summary": {
+    "fr": "Du chargement du niveau à la carte de fin",
+    "en": "From the level load to the goal card"
+  },
+  "kind": "speedrun_level",
+  "game": {
+    "system_id": "nes",
+    "rom_group": "super-mario-bros-3"
+  },
+  "mem_sha256": "f3327a718d10932e7a7098d3778709ef186324f8d3baebef8fc5c5bef02b61f0",
+  "start_policy": "canonical_state",
+  "state": {
+    "name": "1-5-entree-fceumm",
+    "sha256": "5cbb5319e48ed2a579e4306e637ef57e6e6ca404a7da27be1d35abfdd16c4af5",
+    "file": "nes/super-mario-bros-3/1-5-entree.state"
+  },
+  "start": [
+    {
+      "value": {
+        "address": "0x0727",
+        "equals": "0x00"
+      }
+    }
+  ],
+  "timing": {
+    "official": "independent",
+    "independent": {
+      "start": {
+        "event": {
+          "action": "GAME_PLAYING",
+          "address": "0x070A",
+          "value": "0x0E"
+        },
+        "when": [
+          {
+            "value": {
+              "address": "0x0727",
+              "equals": "0x00"
+            }
+          }
+        ]
+      },
+      "finish": {
+        "event": {
+          "action": "LEVEL_CLEAR",
+          "address": "0x05F3",
+          "value": "0x81"
+        }
+      }
+    }
+  },
+  "fail": [
+    {
+      "event": {
+        "action": "LOSE_LIFE",
+        "address": "0x00F1"
+      }
+    }
+  ],
+  "void": [
+    "save_state_load",
+    "rewind",
+    "runahead",
+    "fast_forward",
+    "cheats",
+    "netplay",
+    "pause_clock_gap",
+    {
+      "event": {
+        "action": "PAUSE_ON",
+        "address": "0x0376",
+        "value": "0x01"
+      }
+    },
+    {
+      "event": {
+        "action": "PROGRESSION_ZONE",
+        "address": "0x0727",
+        "leaves": "0x00"
+      }
+    }
+  ],
+  "ranking": {
+    "metric": "frames",
+    "direction": "lower_better"
+  },
+  "cores": [
+    "fceumm"
+  ],
+  "runtime": {
+    "frame_rate": 60.098814
+  }
+}
