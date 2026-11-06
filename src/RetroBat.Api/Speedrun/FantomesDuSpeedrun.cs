@@ -46,6 +46,8 @@ public sealed class FantomesDuSpeedrun
         new("snes", "super-metroid", "snes9x", "snes9x_ghosts", "d63ed5f8", false),
         // Sonic : les niveaux seulement (etat du panneau) ; l'Any% change de niveau, et chaque niveau rearme le depart.
         new("megadrive", "sonic-the-hedgehog", "genesis_plus_gx", "genesis_plus_gx_ghosts", "f9394e97", true),
+        // Mega Man 2 (USA) : les huit stages des Robot Masters (etat d'entree, READY) ; profil en fichier (a9bd44bc.ini).
+        new("nes", "mega-man-2", "fceumm", "fceumm_ghosts", "a9bd44bc", true),
     ];
 
     private static Hote? HoteDe(Reglement r) => Hotes.FirstOrDefault(h => h.Systeme == r.SystemId && h.Groupe == r.RomGroup && r.Coeurs.Contains(h.Origine)

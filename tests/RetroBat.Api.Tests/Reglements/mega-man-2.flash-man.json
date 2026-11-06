@@ -1,0 +1,134 @@
+{
+  "schema": "nelfe.challenge.v2",
+  "challenge_id": "mega-man-2.flash-man",
+  "version": 1,
+  "ruleset": "ch-mm2-flash-man-v1",
+  "order": 6,
+  "title": {
+    "fr": "Flash Man",
+    "en": "Flash Man"
+  },
+  "summary": {
+    "fr": "Du début du stage à la défaite de Flash Man, en Difficult, au Mega Buster seul",
+    "en": "From the start of the stage to Flash Man's defeat, on Difficult, Mega Buster only"
+  },
+  "kind": "speedrun_level",
+  "game": {
+    "system_id": "nes",
+    "rom_group": "mega-man-2"
+  },
+  "mem_sha256": "faf9d715ff3df387fbf2ab08d9a3afb38dd9dcd63289fd9cc6bd27d406d0098a",
+  "start_policy": "canonical_state",
+  "state": {
+    "name": "flash-man-entree-fceumm",
+    "sha256": "4f60dd1cd9f631f3985f0c991c9fa98236eddd94ff95753ceb82e0aeccb4ee05",
+    "file": "nes/mega-man-2/flash-man-entree.state"
+  },
+  "start": [
+    {
+      "value": {
+        "address": "0x002A",
+        "equals": "0x05"
+      }
+    },
+    {
+      "value": {
+        "address": "0x00CB",
+        "equals": "0x01"
+      }
+    }
+  ],
+  "timing": {
+    "official": "independent",
+    "independent": {
+      "start": {
+        "event": {
+          "action": "GAME_PLAYING",
+          "address": "0x0400",
+          "value": "0x1A"
+        },
+        "when": [
+          {
+            "value": {
+              "address": "0x002A",
+              "equals": "0x05"
+            }
+          },
+          {
+            "value": {
+              "address": "0x00CB",
+              "equals": "0x01"
+            }
+          },
+          {
+            "value": {
+              "address": "0x00AA",
+              "equals": "0x00"
+            }
+          }
+        ]
+      },
+      "finish": {
+        "event": {
+          "action": "BOSS_DEFEATED",
+          "address": "0x00BD",
+          "value": "0x01"
+        }
+      }
+    }
+  },
+  "fail": [
+    {
+      "event": {
+        "action": "LOSE_LIFE",
+        "address": "0x06C0",
+        "value": "0x00"
+      }
+    },
+    {
+      "event": {
+        "action": "LOSE_LIFE",
+        "address": "0x0420"
+      }
+    },
+    {
+      "event": {
+        "action": "LOSE_LIFE",
+        "address": "0x00A8"
+      }
+    }
+  ],
+  "void": [
+    "save_state_load",
+    "rewind",
+    "runahead",
+    "fast_forward",
+    "cheats",
+    "netplay",
+    "pause_clock_gap",
+    {
+      "event": {
+        "action": "PAUSE_ON",
+        "address": "0x0580",
+        "value": "0x32"
+      }
+    },
+    {
+      "event": {
+        "action": "PAUSE_OFF",
+        "address": "0x00AA",
+        "value": "0x03"
+      }
+    }
+  ],
+  "ranking": {
+    "metric": "frames",
+    "direction": "lower_better"
+  },
+  "cores": [
+    "fceumm"
+  ],
+  "runtime": {
+    "frame_rate": 60.098814
+  }
+}
