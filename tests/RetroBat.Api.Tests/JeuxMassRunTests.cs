@@ -26,9 +26,130 @@ public class JeuxMassRunTests
     {
         Assert.Equal("fceumm_ghosts", JeuxMassRun.ParDefaut.Coeur);
         Assert.Same(JeuxMassRun.ParDefaut, JeuxMassRun.Trouver("NES/super-mario-bros"));
-        Assert.Null(JeuxMassRun.Trouver("snes/super-metroid"));
+        Assert.Null(JeuxMassRun.Trouver("snes/super-mario-world"));
         Assert.False(JeuxMassRun.FormatMegaDrive("nes/super-mario-bros"));
         Assert.True(JeuxMassRun.FormatMegaDrive("megadrive/sonic-the-hedgehog"));
+        Assert.False(JeuxMassRun.FormatAUnSprite("nes/super-mario-bros"));
+        Assert.True(JeuxMassRun.FormatAUnSprite("megadrive/sonic-the-hedgehog"));
+        Assert.True(JeuxMassRun.FormatAUnSprite("snes/super-metroid"));
+    }
+
+    [Fact]
+    public void Super_Metroid_court_ses_segments_de_boss_sur_snes9x_ghosts()
+    {
+        var sm = JeuxMassRun.Trouver("snes/super-metroid")!;
+        Assert.Equal("snes9x_ghosts", sm.Coeur);
+        Assert.Equal(0xd63ed5f8u, sm.Crc);
+        Assert.True(sm.PosesEnImages);
+        Assert.Equal(60.098812, sm.ImagesParSeconde, 6);
+        Assert.All(new[] { "kraid", "phantoon", "draygon", "ridley", "mother-brain" }, n => Assert.Matches(sm.Niveaux, n));
+        Assert.DoesNotMatch(sm.Niveaux, "ceres");
+        Assert.DoesNotMatch(sm.Niveaux, "../kraid");
+        // les etats d'epreuve du Data Pack : snes/super-metroid/kraid.state
+        Assert.EndsWith(Path.Combine("snes", "super-metroid", "kraid.state"), JeuxMassRun.CheminDeLEtat(sm, "kraid", "r"));
+        // l'arrivee de chaque segment, comme ses reglements
+        Assert.Equal((0xD829u, 0x01u), JeuxMassRun.ArriveeDuNiveau(sm, "kraid"));
+        Assert.Equal((0xD82Cu, 0x03u), JeuxMassRun.ArriveeDuNiveau(sm, "draygon"));
+        Assert.Equal((0x0998u, 0x26u), JeuxMassRun.ArriveeDuNiveau(sm, "mother-brain"));
+        Assert.Null(JeuxMassRun.ArriveeDuNiveau(sm, "ceres"));
+        Assert.Null(JeuxMassRun.ArriveeDuNiveau(JeuxMassRun.ParDefaut, "1-1"));
+        Assert.Equal("Mother Brain", JeuxMassRun.NomDuNiveau("mother-brain"));
+    }
+
+    /// <summary>Une pose SNES : une image de 64 x 64 (index de palette), tassee a deux pixels par octet.</summary>
+    private static byte[] PoseTassee(int graine)
+    {
+        var r = new Random(graine);
+        var t = new byte[MassRunProtocole.PoseTassee];
+        for (var i = 600; i < 1400; i++) t[i] = (byte)r.Next(256);
+        return t;
+    }
+
+    [Fact]
+    public void L_empreinte_d_une_pose_est_celle_du_coeur_sur_l_image_detassee()
+    {
+        var t = PoseTassee(1);
+        var image = new byte[MassRunProtocole.PoseTassee * 2];
+        for (var i = 0; i < t.Length; i++) { image[2 * i] = (byte)(t[i] >> 4); image[2 * i + 1] = (byte)(t[i] & 15); }
+        Assert.Equal(JeuxMassRun.Crc32(image) & 0xFFFFFFu, MassRunProtocole.EmpreinteDeLaPose(t));
+        Assert.InRange(MassRunProtocole.EmpreinteDeLaPose(t), 1u, 0xFFFFFFu);
+    }
+
+    [Fact]
+    public void Les_poses_en_images_voyagent_compressees_et_une_fausse_empreinte_est_ecartee()
+    {
+        var a = PoseTassee(2);
+        var b = PoseTassee(3);
+        var ea = MassRunProtocole.EmpreinteDeLaPose(a);
+        var eb = MassRunProtocole.EmpreinteDeLaPose(b);
+        var paquet = MassRunProtocole.PosesEnPaquet(7, [(ea, a), (eb ^ 1, b)]);
+        Assert.True(paquet.Length < 2 * MassRunProtocole.PoseTassee);   // compresse
+        var lues = MassRunProtocole.PosesDuPaquet(paquet, out var place);
+        Assert.Equal(7, place);
+        var seule = Assert.Single(lues);            // b est annoncee sous une autre empreinte : ecartee
+        Assert.Equal(ea, seule.Empreinte);
+        Assert.Equal(a, seule.Tassee);
+        Assert.Throws<InvalidDataException>(() => MassRunProtocole.PosesDuPaquet(paquet.AsSpan(0, paquet.Length - 3), out _));
+        // le sceau d'un corps depend de la cle de la place
+        var cle = new byte[32];
+        cle[0] = 1;
+        Assert.Equal(8, MassRunProtocole.SceauDuCorps(paquet, cle).Length);
+        Assert.NotEqual(MassRunProtocole.SceauDuCorps(paquet, cle), MassRunProtocole.SceauDuCorps(paquet, new byte[32]));
+    }
+
+    [Fact]
+    public void Une_image_de_piste_snes_porte_l_empreinte_de_sa_pose_aux_octets_5_9_et_10()
+    {
+        var im = new byte[MassRunProtocole.ImageDePiste];
+        Assert.Equal(0u, JeuxMassRun.EmpreinteDeLaPose(im));      // rien a dessiner
+        im[6] = 1; im[9] = 0x56; im[10] = 0x34; im[5] = 0x12;
+        im[2] = 0x9F; im[3] = 0xA5;                                // la salle de Kraid
+        JeuxMassRun.PlacerMegaDrive(im, 300, 0x18B);
+        Assert.Equal(0x123456u, JeuxMassRun.EmpreinteDeLaPose(im));
+        // le dictionnaire du noeud numerote la pose (octets 9 et 10) ; l'octet 5 passe par l'entree compacte (« controle »)
+        var pose = MassRunProtocole.Pose(im);
+        var entree = new byte[MassRunProtocole.EntreeCompacte];
+        im.AsSpan(0, 2).CopyTo(entree.AsSpan(3));
+        im.AsSpan(2, 3).CopyTo(entree.AsSpan(5));
+        entree[8] = im[5];
+        entree[9] = im[11];
+        entree[10] = im[8];
+        var refaite = new byte[MassRunProtocole.ImageDePiste];
+        MassRunProtocole.Refaire(entree, pose, refaite);
+        Assert.Equal(0x123456u, JeuxMassRun.EmpreinteDeLaPose(refaite));
+        Assert.Equal(300, JeuxMassRun.XMegaDrive(refaite));
+        Assert.Equal(0x18B, JeuxMassRun.YMegaDrive(refaite));
+        Assert.Equal(MassRunProtocole.Scene(im), MassRunProtocole.Scene(refaite));
+        // entre deux positions : celle de la plus proche garde son empreinte
+        var b = (byte[])im.Clone();
+        b[9] = 0x77;
+        JeuxMassRun.PlacerMegaDrive(b, 320, 0x18B);
+        var sortie = new byte[MassRunProtocole.ImageDePiste];
+        ClientDeSalle.GlisserMegaDrive(im, b, 0.25, sortie);
+        Assert.Equal(305, JeuxMassRun.XMegaDrive(sortie));
+        Assert.Equal(0x123456u, JeuxMassRun.EmpreinteDeLaPose(sortie));
+    }
+
+    [Fact]
+    public void Les_poses_snes_du_Data_Pack_vont_dans_le_dossier_systeme()
+    {
+        var racine = Path.Combine(Path.GetTempPath(), "nelfe-snposes-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var etats = Path.Combine(racine, "etats");
+            var systeme = Path.Combine(racine, "bios");
+            var sm = JeuxMassRun.Trouver("snes/super-metroid")!;
+            Directory.CreateDirectory(Path.Combine(etats, "snes", "super-metroid"));
+            File.WriteAllBytes(Path.Combine(etats, "snes", "super-metroid", "poses.mdposes"), [9]);
+            Assert.False(FichiersDesCoeursHotes.PoserLesPoses(sm, etats, systeme));   // pas le format de la SNES
+            File.WriteAllBytes(Path.Combine(etats, "snes", "super-metroid", "poses.snposes"), [4, 5]);
+            Assert.True(FichiersDesCoeursHotes.PoserLesPoses(sm, etats, systeme));
+            Assert.Equal([4, 5], File.ReadAllBytes(Path.Combine(systeme, "nelfeplay", "massrun", "d63ed5f8", "poses-datapack.snposes")));
+        }
+        finally
+        {
+            Directory.Delete(racine, true);
+        }
     }
 
     [Theory]

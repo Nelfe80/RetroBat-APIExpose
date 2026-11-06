@@ -7,7 +7,7 @@ namespace RetroBat.Api.MassRun;
 /// <list type="bullet">
 /// <item>les PROFILS DES JEUX (un coeur par emulateur, decision du user du 05/11) : <c>resources/challenges/profils/&lt;crc32&gt;.ini</c>
 /// vers <c>bios/nelfeplay/profils/</c> ; un jeu s'ajoute sans recompiler le coeur ;</item>
-/// <item>le DICTIONNAIRE DES POSES d'un jeu Mega Drive en MASS RUN : <c>resources/challenges/states/&lt;systeme&gt;/&lt;groupe&gt;/poses.mdposes</c>
+/// <item>le DICTIONNAIRE DES POSES d'un jeu Mega Drive ou SNES en MASS RUN : <c>resources/challenges/states/&lt;systeme&gt;/&lt;groupe&gt;/poses.mdposes</c>
 /// vers <c>bios/nelfeplay/massrun/&lt;crc32&gt;/poses-datapack.mdposes</c> (le coeur lit celui-la d'abord, puis le sien, appris en jouant).</item>
 /// </list>
 /// Un fichier identique n'est pas recopie ; une erreur d'ecriture n'empeche pas le lancement (le coeur garde ce qu'il a).
@@ -34,12 +34,16 @@ public static class FichiersDesCoeursHotes
         return n;
     }
 
-    /// <summary>Le dictionnaire des poses du jeu, s'il y en a un au Data Pack ; vrai s'il a ete recopie.</summary>
+    /// <summary>
+    /// Le dictionnaire des poses du jeu, s'il y en a un au Data Pack ; vrai s'il a ete recopie. Mega Drive : « poses.mdposes »
+    /// (une image par numero d'image de Sonic) ; SNES (06/11) : « poses.snposes » (une image par empreinte).
+    /// </summary>
     public static bool PoserLesPoses(JeuxMassRun.Jeu jeu, string? racineDesEtats = null, string? systeme = null)
     {
-        var source = Path.Combine(racineDesEtats ?? RetroBat.Api.Speedrun.EtatsDesDefis.Racine, jeu.Systeme, jeu.RomGroup, "poses.mdposes");
+        var extension = jeu.PosesEnImages ? "snposes" : "mdposes";
+        var source = Path.Combine(racineDesEtats ?? RetroBat.Api.Speedrun.EtatsDesDefis.Racine, jeu.Systeme, jeu.RomGroup, "poses." + extension);
         if (!File.Exists(source)) return false;
-        return Copier(source, Path.Combine(systeme ?? Systeme, "nelfeplay", "massrun", jeu.Crc.ToString("x8"), "poses-datapack.mdposes"));
+        return Copier(source, Path.Combine(systeme ?? Systeme, "nelfeplay", "massrun", jeu.Crc.ToString("x8"), "poses-datapack." + extension));
     }
 
     private static bool Copier(string source, string cible)

@@ -332,7 +332,8 @@ public sealed class MassRunService : IDisposable
             FichiersDesCoeursHotes.PoserLesPoses(jeu);
             Arreter();
             _canal ??= new MassRunCanal();
-            _canal.PoserSalle(jeu.Crc, client.GoLocalUtc, client.Limite, Convert.ToUInt32(couleur, 16), pseudo, client.Niveau, etat, client.RegleMort, TextesDuCoeur());
+            _canal.PoserSalle(jeu.Crc, client.GoLocalUtc, client.Limite, Convert.ToUInt32(couleur, 16), pseudo, client.Niveau, etat, client.RegleMort, TextesDuCoeur(),
+                JeuxMassRun.ArriveeDuNiveau(jeu, client.Niveau));
             var salle = new SalleLocale(client.Niveau, 0, pseudo, couleur, 0, 0, rom)
             {
                 GoUtc = client.GoLocalUtc, Noeud = noeud, Salle = client.Salle, Place = client.Place, Limite = client.Limite,
@@ -378,6 +379,7 @@ public sealed class MassRunService : IDisposable
         DateTime? fermerA = null;
         var dernierQuit = DateTime.MinValue;
         var mesure = false;
+        var poses = JeuxMassRun.Trouver(client.Jeu)?.PosesEnImages == true ? new EchangeDesPoses(canal, client) : null;
         using var priorite = new CancellationTokenSource();
         // ES dessine derriere le jeu : comme un speedrun, RetroArch passe devant (essai du 04/11 : 35 images/s sans cela).
         if (avecJeu && _priorites is { } priorites) _ = Task.Run(() => priorites.DonnerLaMainAuJeuAsync(priorite.Token), CancellationToken.None);
@@ -483,6 +485,7 @@ public sealed class MassRunService : IDisposable
                             {
                                 var piste = new byte[MassRunProtocole.ImageDePiste];
                                 fenetre[k] = client.ComposerA(c, k, piste) ? piste : null;
+                                if (fenetre[k] is { } vue) poses?.Vue(JeuxMassRun.EmpreinteDeLaPose(vue));
                             }
                             liste.Add(new MassRunCanal.Coureur(c.Couleur, c.Pseudo.Length > 10 ? c.Pseudo[..10] : c.Pseudo, false, fenetre));
                         }
@@ -494,6 +497,7 @@ public sealed class MassRunService : IDisposable
                         dernierEnvoi = DateTime.UtcNow;
                         client.EnvoyerPosition(j.ImageCourse, j.Mode, j.Piste);
                     }
+                    poses?.Avancer();
                     if (j.Arrivee > 0 && arriveeEnvoyee < 3)
                     {
                         arriveeEnvoyee++;
@@ -521,10 +525,112 @@ public sealed class MassRunService : IDisposable
             canal.Fermer();
             client.Dispose();
             _journal.LogInformation("MASS RUN : salle {Salle} quittee, {Instantanes} instantanes recus", salle.Salle, client.InstantanesRecus);
+            if (poses is not null)
+            {
+                _journal.LogInformation("MASS RUN : poses en images, {Envoyees} envoyees au dictionnaire de la salle, {Recues} recues", poses.Envoyees, poses.Recues);
+            }
             if (avecJeu)
             {
                 try { SalleQuittee?.Invoke(salle); }
                 catch (Exception e) { _journal.LogWarning(e, "MASS RUN : le bilan de la salle n'a pas pu s'ouvrir"); }
+            }
+        }
+    }
+
+    /// <summary>
+    /// LES POSES EN IMAGES D'UNE SALLE (SNES, 06/11) : chaque pose que le coeur publie (une fois par salle) part au dictionnaire
+    /// de la salle du noeud ; chaque empreinte qu'un coureur montre et que la borne n'a pas encore passee au coeur est demandee
+    /// au noeud, puis ecrite dans l'anneau des poses recues. Un envoi et une demande a la fois, quatre par seconde au plus ;
+    /// une empreinte que le noeud n'a toujours pas apres 20 demandes est abandonnee (le coeur la dessine en boule).
+    /// </summary>
+    internal sealed class EchangeDesPoses(MassRunCanal canal, ClientDeSalle client)
+    {
+        private uint _lues;
+        private readonly List<(uint, byte[])> _aEnvoyer = new();
+        private readonly HashSet<uint> _passees = new();
+        private readonly Dictionary<uint, int> _aChercher = new();
+        private volatile bool _envoi, _recherche;
+        private DateTime _dernierEnvoi = DateTime.MinValue, _derniereRecherche = DateTime.MinValue;
+        public int Envoyees, Recues;
+
+        public void Vue(uint empreinte)
+        {
+            if (empreinte == 0) return;
+            lock (_passees)
+            {
+                if (!_passees.Contains(empreinte)) _aChercher.TryAdd(empreinte, 0);
+            }
+        }
+
+        public void Avancer()
+        {
+            foreach (var p in canal.LireLesPosesDuJoueur(ref _lues))
+            {
+                lock (_aEnvoyer) _aEnvoyer.Add(p);
+                lock (_passees) _passees.Add(p.Item1);   // la sienne, le coeur l'a
+                _aChercher.Remove(p.Item1);
+            }
+            var maintenant = DateTime.UtcNow;
+            List<(uint, byte[])>? lot = null;
+            if (!_envoi && maintenant - _dernierEnvoi > TimeSpan.FromMilliseconds(250))
+            {
+                lock (_aEnvoyer)
+                {
+                    if (_aEnvoyer.Count > 0)
+                    {
+                        lot = _aEnvoyer.Take(64).ToList();
+                        _aEnvoyer.RemoveRange(0, lot.Count);
+                    }
+                }
+            }
+            if (lot is not null)
+            {
+                _dernierEnvoi = maintenant;
+                _envoi = true;
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        if (await client.EnvoyerLesPosesAsync(lot).ConfigureAwait(false) < 0)
+                        {
+                            lock (_aEnvoyer) _aEnvoyer.InsertRange(0, lot);   // reessaye au tour suivant
+                        }
+                        else Interlocked.Add(ref Envoyees, lot.Count);
+                    }
+                    finally { _envoi = false; }
+                });
+            }
+            if (!_recherche && _aChercher.Count > 0 && maintenant - _derniereRecherche > TimeSpan.FromMilliseconds(250))
+            {
+                _derniereRecherche = maintenant;
+                var cherchees = _aChercher.Keys.Take(64).ToList();
+                foreach (var e in cherchees)
+                {
+                    if (++_aChercher[e] > 20) _aChercher.Remove(e);
+                }
+                _recherche = true;
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var recues = await client.ChercherLesPosesAsync(cherchees).ConfigureAwait(false);
+                        lock (_passees)
+                        {
+                            foreach (var (e, tassee) in recues)
+                            {
+                                canal.EcrirePoseRecue(e, tassee);
+                                _passees.Add(e);
+                                Recues++;
+                            }
+                        }
+                    }
+                    finally { _recherche = false; }
+                });
+            }
+            // une empreinte passee entre-temps n'est plus a chercher
+            lock (_passees)
+            {
+                foreach (var e in _aChercher.Keys.Where(_passees.Contains).ToList()) _aChercher.Remove(e);
             }
         }
     }

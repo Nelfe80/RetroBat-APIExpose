@@ -99,8 +99,8 @@ public sealed class ClientDeSalle : IDisposable
     /// les bornes sont a l'image de course 0.</summary>
     public double HorlogeEnImages() => _horloge.Elapsed.TotalSeconds * ImagesParSeconde;
 
-    /// <summary>La cadence du jeu de la salle : 60,0988 sur NES, 59,9227 sur Mega Drive.</summary>
-    public double ImagesParSeconde => JeuxMassRun.FormatMegaDrive(Jeu) ? 59.922743 : 60.0988;
+    /// <summary>La cadence du jeu de la salle : 60,0988 sur NES, 59,9227 sur Mega Drive, 60,0988 sur SNES.</summary>
+    public double ImagesParSeconde => JeuxMassRun.Trouver(Jeu)?.ImagesParSeconde ?? 60.0988;
 
     /// <summary>La piste d'un coureur a l'instant <paramref name="cible"/> (en images), glissee entre deux positions recues.</summary>
     public bool Composer(Coureur coureur, double cible, Span<byte> sortie)
@@ -137,13 +137,14 @@ public sealed class ClientDeSalle : IDisposable
 
     private void GlisserSelonLeJeu(byte[] a, byte[] b, double f, Span<byte> sortie)
     {
-        if (JeuxMassRun.FormatMegaDrive(Jeu)) GlisserMegaDrive(a, b, f, sortie);
+        if (JeuxMassRun.FormatAUnSprite(Jeu)) GlisserMegaDrive(a, b, f, sortie);
         else Glisser(a, b, f, sortie);
     }
 
     /// <summary>
-    /// L'image de piste d'un coureur Mega Drive (voir <see cref="JeuxMassRun"/>) : x dans le niveau aux octets 0-1, y en deux
-    /// octets (8 et 11), la pose (numero d'image de Sonic et retournement) aux octets 9 et 10. Entre deux positions : la pose de
+    /// L'image de piste d'un coureur Mega Drive ou SNES (voir <see cref="JeuxMassRun"/>) : x dans le niveau aux octets 0-1, y en
+    /// deux octets (8 et 11), la pose (numero d'image de Sonic et retournement, ou empreinte de l'image de Samus avec l'octet 5)
+    /// aux octets 9 et 10. Entre deux positions : la pose de
     /// la plus proche, a une position glissee ; d'un acte a l'autre ou sur un saut (mort, retour au depart), pas de glissement.
     /// </summary>
     internal static void GlisserMegaDrive(byte[] a, byte[] b, double f, Span<byte> sortie)
@@ -421,6 +422,59 @@ public sealed class ClientDeSalle : IDisposable
         {
             var limite = DateTime.UtcNow.AddSeconds(-1);
             return _coureurs.Where(c => c.Value.RecuLe > limite).Select(c => (c.Key, c.Value)).ToList();
+        }
+    }
+
+    // ── Les poses en images (SNES, 06/11) : le dictionnaire de la salle du noeud ──
+
+    /// <summary>
+    /// Une pose du joueur, envoyee une fois au dictionnaire de la salle : son empreinte (24 bits) et son image tassee (64 x 64,
+    /// deux pixels par octet, 2 048 octets), compressee pour le voyage. Le corps est scelle par la cle de session de la place
+    /// (HMAC-SHA256, 8 octets, en-tete <c>X-Sceau</c>) : personne d'autre n'ecrit sous son nom.
+    /// <code>
+    ///   corps : place (u16), nombre (u16), puis par pose : empreinte (u32), longueur (u16), l'image tassee en Deflate
+    /// </code>
+    /// Rend le nombre de poses que le noeud a gardees (deja connues comprises), ou -1.
+    /// </summary>
+    public async Task<int> EnvoyerLesPosesAsync(IReadOnlyList<(uint Empreinte, byte[] Tassee)> poses, CancellationToken ct = default)
+    {
+        if (poses.Count == 0) return 0;
+        var corps = MassRunProtocole.PosesEnPaquet(Place, poses);
+        using var requete = new HttpRequestMessage(HttpMethod.Post, $"/massrun/v1/salles/{Salle}/poses") { Content = new ByteArrayContent(corps) };
+        requete.Headers.Add("X-Sceau", Convert.ToHexString(MassRunProtocole.SceauDuCorps(corps, _cle)));
+        try
+        {
+            using var reponse = await _http.SendAsync(requete, ct).ConfigureAwait(false);
+            Interlocked.Add(ref OctetsEnvoyes, corps.Length);
+            if (!reponse.IsSuccessStatusCode) return -1;
+            var json = JsonDocument.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false)).RootElement;
+            return json.TryGetProperty("gardees", out var g) ? g.GetInt32() : poses.Count;
+        }
+        catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException or InvalidOperationException)
+        {
+            return -1;
+        }
+    }
+
+    /// <summary>Les images de poses de la salle que d'autres bornes ont envoyees (au plus 64 empreintes par demande) ; celles que
+    /// le noeud n'a pas encore manquent a la reponse (<c>{"ok":true,"poses":"&lt;paquet en base64&gt;"}</c>).</summary>
+    public async Task<List<(uint Empreinte, byte[] Tassee)>> ChercherLesPosesAsync(IReadOnlyCollection<uint> empreintes, CancellationToken ct = default)
+    {
+        if (empreintes.Count == 0) return [];
+        var liste = string.Join(',', empreintes.Take(64).Select(e => e.ToString("x6", System.Globalization.CultureInfo.InvariantCulture)));
+        try
+        {
+            var texte = await _http.GetStringAsync($"/massrun/v1/salles/{Salle}/poses?e={liste}", ct).ConfigureAwait(false);
+            Interlocked.Add(ref OctetsRecus, texte.Length);
+            var json = JsonDocument.Parse(texte).RootElement;
+            return json.TryGetProperty("poses", out var p) && p.GetString() is { } b64
+                ? MassRunProtocole.PosesDuPaquet(Convert.FromBase64String(b64), out _)
+                : [];
+        }
+        catch (Exception e) when (e is HttpRequestException or TaskCanceledException or InvalidDataException or JsonException or FormatException
+            or InvalidOperationException)
+        {
+            return [];
         }
     }
 

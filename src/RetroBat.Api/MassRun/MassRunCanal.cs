@@ -12,7 +12,7 @@ namespace RetroBat.Api.MassRun;
 ///      0  'NMRS' (u32), version (u32 = 1), taille (u32), generation (u32)
 ///     16  actif (u32), crc32 du contenu (u32), GO! (FILETIME UTC, i64), limite en s (u32), couleur 0RGB (u32),
 ///         pseudo (16 octets UTF-8), niveau (16), taille de l'etat de depart (u32), regle de mort (u32 : 0 celle du jeu,
-///         1 retour au debut, 2 elimination)
+///         1 retour au debut, 2 elimination), arrivee (06/11, SNES : adresse u32, 0 = la regle du coeur ; valeur u32)
 ///    128  joueur, ecrit par le coeur : sequence (u32, impaire pendant l'ecriture), mode, image de course, arrivee (images,
 ///         0 = pas encore), image du mode, puis l'image de piste courante (40 octets), elimine (u32, a 128+60)
 ///    256  coureurs, ecrits par l'API : sequence (u32), nombre (u32), image de la premiere fenetre (u32), reserve (u32),
@@ -21,8 +21,12 @@ namespace RetroBat.Api.MassRun;
 ///  12800  classement en direct, ecrit par l'API : sequence (u32), nombre de lignes (u32), mon rang (u32, 0 = pas encore),
 ///         arrives (u32), inscrits (u32), reserve (u32 x 3), puis 16 lignes de 32 octets : rang (u16), drapeaux (u16, bit 0 =
 ///         moi, bit 1 = elimine), images (u32), couleur 0RGB (u32), pseudo (16), reserve (4)
-///  32768  etat de depart brut du coeur (jusqu'a la fin du canal : 2 Mo depuis le 05/11, pour la Mega Drive)
+///  32768  etat de depart brut du coeur (2 Mo de canal depuis le 05/11, pour la Mega Drive : 1 036 288 octets)
+/// 0x110000  (06/11, SNES) les poses du joueur, ecrites par le coeur : nombre de poses ecrites (u32), reserve (12), puis un
+///         anneau de 128 emplacements de 2 056 octets : empreinte (u32), reserve (u32), image tassee (2 048)
+/// 0x158000  les poses recues de la salle, ecrites par l'API : meme forme
 /// </code>
+/// L'etat de depart ne doit pas atteindre les anneaux : 1 081 344 octets au plus (l'etat de snes9x en fait 823 407).
 /// Les blocs ecrits par l'un et lus par l'autre sont proteges par leur sequence : paire = stable.
 /// </summary>
 [SupportedOSPlatform("windows")]
@@ -37,6 +41,39 @@ public sealed class MassRunCanal : IDisposable
 
     private const int OffActif = 16, OffCrc = 20, OffGo = 24, OffLimite = 32, OffCouleur = 36, OffPseudo = 40, OffNiveau = 56, OffTailleEtat = 72, OffMort = 76;
     private const int OffJoueur = 128, OffCoureurs = 256, OffEntrees = 272, TailleEntree = 192, OffClassement = 12800, OffTextes = 28672, TailleTexte = 64, OffEtat = 32768;
+    private const int OffArrivee = 80, OffPosesJoueur = 0x110000, OffPosesRecues = 0x158000, Anneau = 128, Emplacement = 8 + MassRunProtocole.PoseTassee;
+    private uint _posesEcrites;
+
+    /// <summary>
+    /// Les poses que le coeur a publiees depuis <paramref name="lues"/> (le nombre deja lu, avance) ; si le coeur a pris plus
+    /// d'un anneau d'avance, les plus anciennes sont perdues.
+    /// </summary>
+    public List<(uint Empreinte, byte[] Tassee)> LireLesPosesDuJoueur(ref uint lues)
+    {
+        var n = _vue.ReadUInt32(OffPosesJoueur);
+        if (n - lues > Anneau) lues = n - Anneau;
+        var poses = new List<(uint, byte[])>();
+        for (; lues != n; lues++)
+        {
+            var o = OffPosesJoueur + 16 + (int)(lues % Anneau) * Emplacement;
+            var tassee = new byte[MassRunProtocole.PoseTassee];
+            _vue.ReadArray(o + 8, tassee, 0, tassee.Length);
+            poses.Add((_vue.ReadUInt32(o), tassee));
+        }
+        return poses;
+    }
+
+    /// <summary>Une pose recue de la salle, pour le dictionnaire du coeur (il la lit a l'image suivante).</summary>
+    public void EcrirePoseRecue(uint empreinte, byte[] tassee)
+    {
+        var o = OffPosesRecues + 16 + (int)(_posesEcrites % Anneau) * Emplacement;
+        _vue.Write(o, empreinte);
+        _vue.Write(o + 4, 0u);
+        _vue.WriteArray(o + 8, tassee, 0, Math.Min(tassee.Length, MassRunProtocole.PoseTassee));
+        _posesEcrites++;
+        System.Threading.Thread.MemoryBarrier();
+        _vue.Write(OffPosesRecues, _posesEcrites);
+    }
     public const int LignesDeClassement = 16;
     private uint _sequenceClassement;
 
@@ -78,9 +115,10 @@ public sealed class MassRunCanal : IDisposable
     }
 
     /// <summary>Pose une salle : le coeur la lit au chargement du jeu. L'etat de depart est l'etat brut du coeur.</summary>
-    public void PoserSalle(uint crc, DateTime? goUtc, int limiteSecondes, uint couleur, string pseudo, string niveau, byte[] etat, uint regleMort = 1, IReadOnlyList<string>? textes = null)
+    public void PoserSalle(uint crc, DateTime? goUtc, int limiteSecondes, uint couleur, string pseudo, string niveau, byte[] etat, uint regleMort = 1, IReadOnlyList<string>? textes = null,
+        (uint Adresse, uint Valeur)? arrivee = null)
     {
-        if (etat.Length > Taille - OffEtat)
+        if (etat.Length > OffPosesJoueur - OffEtat)
         {
             throw new ArgumentException("etat de depart trop grand pour le canal", nameof(etat));
         }
@@ -97,7 +135,13 @@ public sealed class MassRunCanal : IDisposable
         EcrireTexte(OffNiveau, niveau, 16);
         _vue.Write(OffTailleEtat, (uint)etat.Length);
         _vue.Write(OffMort, regleMort);
+        _vue.Write(OffArrivee, arrivee?.Adresse ?? 0u);
+        _vue.Write(OffArrivee + 4, arrivee?.Valeur ?? 0u);
         _vue.WriteArray(OffEtat, etat, 0, etat.Length);
+        // les anneaux des poses repartent de zero avec la salle
+        _vue.Write(OffPosesJoueur, 0u);
+        _vue.Write(OffPosesRecues, 0u);
+        _posesEcrites = 0;
         // Les textes de l'ecran, traduits ; un emplacement vide laisse l'anglais du coeur.
         for (var i = 0; textes is not null && i < textes.Count; i++) EcrireTexte(OffTextes + i * TailleTexte, textes[i], TailleTexte);
         _vue.Write(12, _vue.ReadUInt32(12) + 1);
