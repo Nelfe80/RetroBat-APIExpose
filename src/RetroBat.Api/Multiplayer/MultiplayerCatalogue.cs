@@ -387,6 +387,14 @@ public sealed record MultiplayerGame
     [JsonPropertyName("ranking_end_by_content")]
     public IReadOnlyDictionary<string, MultiplayerRankingEnd>? RankingEndByContent { get; init; }
 
+    /// <summary>
+    /// LA FIN D'UNE COOP (V24-16, V24-18 ; nuit du 06/11) : mission accomplie ou GAME OVER, lus chez l'hote ; la plateforme
+    /// ferme alors le jeu et l'ecran de fin le dit (<see cref="MultiplayerMissionEnd"/>). Une cle a part : une API d'avant
+    /// l'ignore et laisse la coop aller jusqu'a ce qu'on la quitte.
+    /// </summary>
+    [JsonPropertyName("mission_end")]
+    public MultiplayerMissionEnd? MissionEnd { get; init; }
+
     /// <summary>Le jeu sur ce contenu : avec <see cref="RankingEndByContent"/>, la fin de ce contenu, ou aucune.</summary>
     public MultiplayerGame PourLeContenu(string contenu)
     {
@@ -1911,7 +1919,7 @@ public sealed class MultiplayerCatalogueStore
         }
 
         return ValiderLesVues(jeu) ?? ValiderLeDepart(jeu) ?? ValiderLeDepartDuCoeur(jeu) ?? ValiderLeClassement(jeu) ?? ValiderLOrdreDesPlaces(jeu)
-            ?? ValiderLeRelais(jeu) ?? ValiderLaManetteDEquipe(jeu);
+            ?? ValiderLeRelais(jeu) ?? ValiderLaManetteDEquipe(jeu) ?? MultiplayerMissionEnd.Valider(jeu);
     }
 
     /// <summary>

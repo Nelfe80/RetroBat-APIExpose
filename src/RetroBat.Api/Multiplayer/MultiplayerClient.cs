@@ -92,7 +92,8 @@ public sealed class MultiplayerClient
 
     /// <summary>L'hote annonce la fin de la partie.</summary>
     public Task<MultiplayerReponse?> TerminerAsync(string room, string raison, int? dureeSecondes, CancellationToken ct, int? placeGagnante = null,
-        IReadOnlyDictionary<int, StatsDeLaPlace>? stats = null, object? mesures = null, IReadOnlyList<MultiplayerRang>? rangs = null)
+        IReadOnlyDictionary<int, StatsDeLaPlace>? stats = null, object? mesures = null, IReadOnlyList<MultiplayerRang>? rangs = null,
+        MultiplayerFinDeMission? mission = null)
         => EnvoyerAsync("ended", new
         {
             room, reason = raison, duration_s = dureeSecondes, winner_seat = placeGagnante,
@@ -102,6 +103,8 @@ public sealed class MultiplayerClient
             metrics = mesures,
             // Le rang de chaque humain d'une fin a plusieurs (CDC Classements v1.0 §6) ; un site plus ancien l'ignore.
             ranks = Rangs(rangs),
+            // L'etape de la fin d'une coop a fin lue (06/11) ; un site plus ancien l'ignore.
+            stage = mission?.NomDeLEtape is { Length: > 0 } nom ? new { name = nom, cleared = mission.Franchies } : null,
         }, ct);
 
     /// <summary>NIVEAU NELFEPLAY : un invite rapporte la place gagnante qu'il a vue ; le resultat est valide s'il concorde avec l'hote.</summary>
@@ -366,12 +369,26 @@ public sealed record MultiplayerJoueur
     [JsonPropertyName("onecc_multi")]
     public MultiplayerUnCreditMulti? UnCreditMulti { get; init; }
 
+    /// <summary>Une coop a fin lue (06/11) : la partie ou il a franchi le plus d'etapes sur ce jeu. Null sans partie lue.</summary>
+    [JsonPropertyName("best_stage")]
+    public MultiplayerEtape? BestStage { get; init; }
+
     /// <summary>Il regle la gameroom d'amis (28/10).</summary>
     [JsonPropertyName("owner")]
     public bool Owner { get; init; }
 }
 
 /// <summary>Le meilleur 1CC MULTI d'un joueur sur le jeu de la gameroom, et sa place au classement (tous mondes).</summary>
+/// <summary>L'etape d'une coop a fin lue : son nom a l'ecran (« MISSION 3 ») et le nombre d'etapes franchies.</summary>
+public sealed record MultiplayerEtape
+{
+    [JsonPropertyName("name")]
+    public string Name { get; init; } = string.Empty;
+
+    [JsonPropertyName("cleared")]
+    public int Cleared { get; init; }
+}
+
 public sealed record MultiplayerUnCreditMulti
 {
     [JsonPropertyName("score")]
@@ -527,6 +544,10 @@ public sealed record MultiplayerFin
 
     [JsonPropertyName("reason")]
     public string? Reason { get; init; }
+
+    /// <summary>Une coop a fin lue (06/11) : l'etape de la fin, envoyee par l'hote. Un site plus ancien ne la rend pas.</summary>
+    [JsonPropertyName("stage")]
+    public MultiplayerEtape? Stage { get; init; }
 
     [JsonPropertyName("duration_s")]
     public int? DurationS { get; init; }

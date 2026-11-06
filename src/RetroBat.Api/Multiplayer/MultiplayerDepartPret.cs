@@ -615,6 +615,60 @@ public sealed class MultiplayerFinDeRencontre
     }
 
     /// <summary>
+    /// LA FIN D'UNE COOP (V24-16, nuit du 06/11) : la garde, les signaux, l'etape et la sortie de chaque humain lus a chaque
+    /// passe, confies a <see cref="MultiplayerMissionEnCours"/> jusqu'a l'issue. Null si la partie se ferme avant.
+    /// </summary>
+    public async Task<MultiplayerFinDeMission?> AttendreLaMissionAsync(MultiplayerMissionEnd fin, IReadOnlyCollection<int> humains, CancellationToken ct)
+    {
+        var enCours = new MultiplayerMissionEnCours(fin, humains);
+        var horloge = System.Diagnostics.Stopwatch.StartNew();
+        var carte = fin.ParLaCarteDuCoeur;
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                var garde = await LireLeSignalAsync(fin.Guard, ct, carte).ConfigureAwait(false);
+                MultiplayerReleveDeMission releve;
+                if (fin.Guard is null || garde is { } g && fin.Guard.Vaut(g))
+                {
+                    long? etape = null;
+                    if (fin.Stage is { Decalage: { } adresse } suivie
+                        && await LireLesOctetsAsync(adresse, suivie.Bytes, ct, carte).ConfigureAwait(false) is { } octets)
+                    {
+                        etape = suivie.Valeur(octets);
+                    }
+
+                    var sorties = new Dictionary<int, long?>();
+                    foreach (var humain in humains)
+                    {
+                        sorties[humain] = await LireLeSignalAsync(fin.SortieDe(humain), ct, carte).ConfigureAwait(false);
+                    }
+
+                    releve = new MultiplayerReleveDeMission(garde, await LireLeSignalAsync(fin.Cleared, ct, carte).ConfigureAwait(false),
+                        await LireLeSignalAsync(fin.Over, ct, carte).ConfigureAwait(false), etape, sorties);
+                }
+                else
+                {
+                    // Hors de la garde, rien d'autre ne se lit : le moteur ignore ce releve.
+                    releve = new MultiplayerReleveDeMission(garde, null, null, null, new Dictionary<int, long?>());
+                }
+
+                if (enCours.Observer(releve, horloge.ElapsedMilliseconds) is { } issue)
+                {
+                    return issue;
+                }
+
+                await Task.Delay(_periodeDuClassement, ct).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// LA FIN AU SCORE (score_final, 23/10) : le signal de fin, deja vu retombe au moins une fois sous la garde, puis le
     /// score de chaque place. Le plus haut, seul, gagne ; une egalite est un match nul. Deux lectures de suite concordent.
     /// </summary>

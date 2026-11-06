@@ -89,6 +89,9 @@ public sealed partial class MultiplayerPanelService
     /// </summary>
     private IReadOnlyList<MultiplayerRang>? _rangsVus;
 
+    /// <summary>L'issue d'une coop a fin lue sur cette borne (mission accomplie ou GAME OVER), ou null.</summary>
+    private MultiplayerFinDeMission? _missionVue;
+
     /// <summary>Les statistiques d'une rencontre finie : celles de la plateforme (l'hote), sinon celles vues ici.</summary>
     private IReadOnlyDictionary<string, MultiplayerStatsPlace>? StatsDeLaRencontre(MultiplayerRoom? room)
         => room?.Ended?.Stats is { Count: > 0 } envoyees ? envoyees
@@ -751,13 +754,14 @@ public sealed partial class MultiplayerPanelService
     /// duree. Il se ferme de lui-meme au bout de 12 s ; A maintenu relance le meme jeu.
     /// </summary>
     public void MontrerLeResultat(string room, int? dureeSecondes, IReadOnlyDictionary<int, StatsDeLaPlace>? statsVues = null,
-        MultiplayerStatsResultat? mesuresVues = null, IReadOnlyList<MultiplayerRang>? rangsVus = null)
+        MultiplayerStatsResultat? mesuresVues = null, IReadOnlyList<MultiplayerRang>? rangsVus = null, MultiplayerFinDeMission? missionVue = null)
     {
         lock (_verrou)
         {
             _statsVues = statsVues;
             _mesuresVues = mesuresVues;
             _rangsVus = rangsVus is { Count: > 0 } ? rangsVus : null;
+            _missionVue = missionVue;
         }
 
         _ = Task.Run(async () =>
@@ -1690,6 +1694,8 @@ public sealed partial class MultiplayerPanelService
             => place is not null && elo is not null && elo.TryGetValue(place.Value.ToString(CultureInfo.InvariantCulture), out var e) ? e : null;
         // L'ABANDON : celui qui part prend la defaite et perd des points, l'autre ne gagne ni ne perd rien.
         var abandon = classe ? finie?.Ended?.AbandonedSeat : null;
+        // UNE COOP A FIN LUE (06/11) : mission accomplie ou GAME OVER, lus ici, sinon la raison de fin que l'hote a donnee.
+        var mission = MissionDuResultat(finie);
         // RANK-03 : la cote ne s'affiche qu'une fois le resultat valide, avec « Verification en cours » avant.
         var bandeauDuResultat = finie?.Ended?.Result switch
         {
@@ -1756,6 +1762,7 @@ public sealed partial class MultiplayerPanelService
             : rangs is not null && rangDe(maPlace) is { } monRang ? IssueDuRang(monRang with { Camp = null }, rangs, gagnante, T)
             : gagnante == MultiplayerResultats.MatchNul ? T("multiplayer.result.draw")
             : gagnante is not null && maPlace is not null ? T(maPlace == gagnante ? "multiplayer.result.victory" : "multiplayer.result.defeat")
+            : mission is not null ? MotDeLaMission(mission)
             : T("multiplayer.result.title");
         if (abandon is not null && maPlace is not null)
         {
@@ -1777,7 +1784,8 @@ public sealed partial class MultiplayerPanelService
             annulee || nonDisputee || (classique && !classe) || (abandon is not null && maPlace is not null) ? titre : null, titre,
             concourt ? MultiplayerScoring.Etiquette : classique ? T("multiplayer.badge.classic") : string.Empty,
             concourt ? Texte("multiplayer.end.onecc_note", "Each score counts up to its player's first continue.")
-                : classique && !classe && !annulee && !nonDisputee ? T("multiplayer.result.classic_note") : bandeauDuResultat, duree, T, rangs);
+                : classique && !classe && !annulee && !nonDisputee ? T("multiplayer.result.classic_note") : bandeauDuResultat, duree, T, rangs,
+            annulee || nonDisputee ? null : mission);
 
         return new LeaderboardOverlayService.ContenuMultiplayer(
             [titre],
@@ -1808,7 +1816,7 @@ public sealed partial class MultiplayerPanelService
     /// </summary>
     private LeaderboardOverlayService.EcranDeFin ComposerLEcranDeFin(MultiplayerRoom? finie, IReadOnlyList<MultiplayerJoueur> joueurs, int? gagnante,
         Func<int?, MultiplayerEvolution?> eloDe, string? titreImpose, string titre, string badge, string note, int? duree, Func<string, string> T,
-        IReadOnlyList<MultiplayerRang>? rangs = null)
+        IReadOnlyList<MultiplayerRang>? rangs = null, MultiplayerFinDeMission? mission = null)
     {
         var jeu = _jeu?.Game;
         var maPlace = finie?.Players.FirstOrDefault(j => j.You)?.Seat;
@@ -1879,6 +1887,8 @@ public sealed partial class MultiplayerPanelService
                 mien.Status == "published" && mien.Rank == 1);
         }
 
+        monScore = AvecLEtape(mission, monScore, Texte);
+        var coop = string.Equals(jeu?.Family, "coop", StringComparison.Ordinal);
         return new LeaderboardOverlayService.EcranDeFin(
             _roomDuResultat,
             StylesDesEcrans.TypeDe(jeu?.EloType, jeu?.Family),
@@ -1890,14 +1900,81 @@ public sealed partial class MultiplayerPanelService
             calcul?.Jauge,
             note,
             badge,
-            new(T("multiplayer.end.over"), T("multiplayer.end.winner"), T("multiplayer.end.tagline"), T("multiplayer.end.hold"),
-                T("multiplayer.end.rematch"), T("multiplayer.end.quit")),
+            // En coop, REJOUER au lieu de REVANCHE (CDC Ecrans v1.0, §2.1) et sa propre phrase, des que le Data Pack a leurs
+            // textes : sans eux, les mots d'avant, dans la langue de la borne.
+            new(T("multiplayer.end.over"), T("multiplayer.end.winner"),
+                coop ? Texte("multiplayer.end.tagline_coop", T("multiplayer.end.tagline")) : T("multiplayer.end.tagline"), T("multiplayer.end.hold"),
+                coop ? Texte("multiplayer.end.replay", T("multiplayer.end.rematch")) : T("multiplayer.end.rematch"), T("multiplayer.end.quit")),
             _glypheValider,
             _glypheAnnuler,
             // E4 (26/10) : une police imposee par le catalogue l'emporte sur celle du type.
             jeu?.Ecran?.Police is { Length: > 0 } police ? police : null,
             monScore);
     }
+
+    /// <summary>
+    /// L'issue d'une coop a fin lue : celle lue sur cette borne (avec l'etape), l'issue de l'hote l'emportant quand la
+    /// plateforme l'a ; sinon celle que dit la raison de fin de l'hote ; null hors d'une coop ou sans fin lue.
+    /// </summary>
+    private MultiplayerFinDeMission? MissionDuResultat(MultiplayerRoom? finie)
+    {
+        if (_jeu?.Game is not { Family: "coop" })
+        {
+            return null;
+        }
+
+        MultiplayerFinDeMission? vue;
+        lock (_verrou)
+        {
+            vue = _missionVue;
+        }
+
+        return Combiner(vue, finie?.Ended);
+    }
+
+    /// <summary>
+    /// L'issue d'une coop a montrer : celle de l'hote quand la plateforme la rend avec son etape ; sinon celle lue ici,
+    /// l'issue de l'hote l'emportant ; sinon la seule raison de fin de l'hote (sans etape) ; null sans rien de tout cela.
+    /// </summary>
+    internal static MultiplayerFinDeMission? Combiner(MultiplayerFinDeMission? vue, MultiplayerFin? fin)
+    {
+        var deLHote = MultiplayerFinDeMission.DeLaRaison(fin?.Reason);
+        if (deLHote is not null && fin?.Stage is { Name.Length: > 0 } etape)
+        {
+            return new MultiplayerFinDeMission(deLHote.Accomplie, vue?.Etape, etape.Name, etape.Cleared);
+        }
+
+        return vue is not null && deLHote is not null ? vue with { Accomplie = deLHote.Accomplie } : vue ?? deLHote;
+    }
+
+    /// <summary>
+    /// UNE COOP A FIN LUE (06/11, V24-18 « meilleur stage ») : l'etape de la fin en grand, a la place du vainqueur, et les
+    /// etapes franchies en ruban ; une coop qui concourt garde son score, l'etape passe dans sa ligne du dessous si elle est
+    /// libre. Sans etape nommee, rien ne change. <paramref name="texte"/> : la cle, et son texte par defaut.
+    /// </summary>
+    internal static LeaderboardOverlayService.ScoreDeFin? AvecLEtape(MultiplayerFinDeMission? mission, LeaderboardOverlayService.ScoreDeFin? monScore,
+        Func<string, string, string> texte)
+    {
+        if (mission?.NomDeLEtape is not { Length: > 0 } etape)
+        {
+            return monScore;
+        }
+
+        // Le ruban ne repete pas le titre : une seule etape accomplie (une partie = une mission) n'en a pas.
+        var franchies = mission.Franchies <= 0 || (mission.Accomplie && mission.Franchies == 1) ? string.Empty
+            : texte("multiplayer.end.stages_cleared", "STAGES CLEARED: {n}").Replace("{n}", mission.Franchies.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
+        var libelle = mission.Accomplie ? texte("multiplayer.end.stage_cleared", "Stage cleared") : texte("multiplayer.end.stage_reached", "Stage reached");
+        return monScore is null
+            ? new LeaderboardOverlayService.ScoreDeFin(libelle, etape, franchies, string.Empty, false)
+            : monScore with { Second = monScore.Second.Length > 0 ? monScore.Second : libelle.ToUpperInvariant() + "  " + etape };
+    }
+
+    /// <summary>« MEILLEUR STAGE » (CDC Ecrans v1.0, §3.2), en anglais tant que le Data Pack n'a pas son texte.</summary>
+    private string MeilleurStage() => Texte("multiplayer.panel.best_stage", "BEST STAGE");
+
+    /// <summary>Le mot de fin d'une coop : « MISSION ACCOMPLIE ! » ou « GAME OVER » (CDC Ecrans v1.0, §1.1).</summary>
+    private string MotDeLaMission(MultiplayerFinDeMission mission)
+        => mission.Accomplie ? Texte("multiplayer.end.mission_complete", "MISSION COMPLETE!") : Texte("multiplayer.end.game_over", "GAME OVER");
 
     /// <summary>Les rangs d'une fin a plusieurs : ceux que le site a recus de l'hote, sinon ceux lus sur cette borne ; null en duel.</summary>
     private IReadOnlyList<MultiplayerRang>? RangsDuResultat(MultiplayerRoom? finie)
@@ -2027,6 +2104,8 @@ public sealed partial class MultiplayerPanelService
             // Coop qui concourt (31/10) : son meilleur 1CC MULTI et sa place, a la place de la cote.
             Cote: joueur.Rating is { } cote ? cote.Lettre + " · ELO " + Math.Round(cote.Value).ToString(CultureInfo.InvariantCulture)
                 : joueur.UnCreditMulti is { } score ? MultiplayerScoring.Etiquette + " " + MultiplayerScoring.ScoreEtRang(score)
+                // Coop a fin lue (06/11, V24-18) : son meilleur stage sur ce jeu.
+                : joueur.BestStage is { Name.Length: > 0 } etape ? MeilleurStage() + " " + etape.Name
                 : string.Empty,
             Provisoire: joueur.Rating is { Provisional: true } ? T("multiplayer.rating.provisional") : string.Empty);
 

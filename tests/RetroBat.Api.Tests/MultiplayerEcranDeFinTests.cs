@@ -349,6 +349,30 @@ public class MultiplayerEcranDeFinTests
             MonScore = new L.ScoreDeFin("Ton score", "212 400", "1CC MULTI · #1", "1LC MULTI  61 200 · #3", true),
         };
         File.WriteAllBytes(Path.Combine(Sortie, "fin-coop-1cc-multi-trois.png"), L.ApercuMultiplayer(style, socle with { Fin = coopTrois }, "", "", "", null!, 6));
+        // UNE COOP A FIN LUE (06/11) : la mission accomplie, puis le GAME OVER et l'etape atteinte, REJOUER au lieu de REVANCHE.
+        var textesCoop = textes with { Revanche = "REJOUER", Phrase = "GG ! Une autre partie est à un bouton." };
+        var mission = new L.EcranDeFin("salle-7", "coop", "MISSION ACCOMPLIE !", "Metal Slug 3", "6:48", Fanart("arcade", "mslug3"),
+        [
+            new(1, "NELFE", "FIO", Image("arcade/mslug3/character/fio.png"), "", "", "", false, null, "", []),
+            new(2, "AKIRA", "MARCO", Image("arcade/mslug3/character/marco.png"), "", "", "", false, null, "", []),
+        ], null, "", "", textesCoop, "button_a", "button_b",
+            MonScore: new L.ScoreDeFin("Étape franchie", "MISSION 1", "", "", false));
+        File.WriteAllBytes(Path.Combine(Sortie, "fin-coop-mission.png"), L.ApercuMultiplayer(style, socle with { Fin = mission }, "", "", "", null!, 6));
+        var gameOver = mission with
+        {
+            Cle = "salle-8", Titre = "GAME OVER", Duree = "21:05",
+            MonScore = new L.ScoreDeFin("Étape atteinte", "MISSION 3", "2 FRANCHIES", "", false),
+        };
+        File.WriteAllBytes(Path.Combine(Sortie, "fin-coop-game-over.png"), L.ApercuMultiplayer(style, socle with { Fin = gameOver }, "", "", "", null!, 6));
+        var sansFranchie = mission with { Cle = "salle-9", Titre = "GAME OVER", MonScore = new L.ScoreDeFin("Étape atteinte", "MISSION 1", "", "", false) };
+        File.WriteAllBytes(Path.Combine(Sortie, "fin-coop-game-over-mission-1.png"), L.ApercuMultiplayer(style, socle with { Fin = sansFranchie }, "", "", "", null!, 6));
+        // Une coop qui concourt et lit sa fin : son score reste en grand, l'etape passe dans la ligne du dessous.
+        var concourtEtMission = coop with
+        {
+            Cle = "salle-10", Titre = "GAME OVER", Textes = textesCoop,
+            MonScore = coop.MonScore! with { Second = "ÉTAPE ATTEINTE  ROUND 4" },
+        };
+        File.WriteAllBytes(Path.Combine(Sortie, "fin-coop-1cc-multi-game-over.png"), L.ApercuMultiplayer(style, socle with { Fin = concourtEtMission }, "", "", "", null!, 6));
         File.WriteAllBytes(Path.Combine(Sortie, "fin-sans-fanart.png"), L.ApercuMultiplayer(style, socle with { Fin = duel with { Fanart = null, Cle = "x" } }, "", "", "", null!, 6));
         // Un pseudo long ne mord pas sur les cartes (vu a la borne le 26/10).
         foreach (var (nom, pseudo) in new[] { ("fin-pseudo-long.png", "LORENZOLAMAS"), ("fin-pseudo-tres-long.png", "MEGAWARRIOR_MAXIMUS24") })

@@ -380,13 +380,18 @@ public sealed partial class MultiplayerPanelService
                 j.Country,
                 cote is null ? string.Empty : cote.Lettre,
                 cote is null ? string.Empty : Math.Round(cote.Value).ToString("#,0", milliers),
-                // Coop qui concourt (31/10) : le trophee porte son meilleur 1CC MULTI et sa place.
-                cote is null && j.UnCreditMulti is not null ? MultiplayerScoring.Etiquette : T("multiplayer.launch.wins"),
+                // Coop qui concourt (31/10) : le trophee porte son meilleur 1CC MULTI et sa place. Coop a fin lue (06/11) : son
+                // meilleur stage, au trophee sans 1CC MULTI, sinon a la place de la serie.
+                cote is null && j.UnCreditMulti is not null ? MultiplayerScoring.Etiquette
+                    : cote is null && j.BestStage is not null ? MeilleurStage() : T("multiplayer.launch.wins"),
                 cote?.Wins is { } victoires ? victoires.ToString(CultureInfo.InvariantCulture)
                     : j.UnCreditMulti is { } score ? MultiplayerScoring.ScoreEtRang(score)
+                    : cote is null && j.BestStage is { } etape ? etape.Name
                     : string.Empty,
-                T("multiplayer.launch.streak"),
-                cote?.Streak is { } serie and > 0 ? (serie == 1 ? T("multiplayer.launch.streak_one") : Nombre("multiplayer.launch.streak_value", serie)) : string.Empty,
+                cote is null && j.UnCreditMulti is not null && j.BestStage is not null ? MeilleurStage() : T("multiplayer.launch.streak"),
+                cote?.Streak is { } serie and > 0 ? (serie == 1 ? T("multiplayer.launch.streak_one") : Nombre("multiplayer.launch.streak_value", serie))
+                    : cote is null && j.UnCreditMulti is not null && j.BestStage is { } meilleure ? meilleure.Name
+                    : string.Empty,
                 etat,
                 TexteDe(etat),
                 j.RttMs,

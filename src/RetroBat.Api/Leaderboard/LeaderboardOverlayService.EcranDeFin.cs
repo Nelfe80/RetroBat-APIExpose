@@ -576,7 +576,14 @@ public sealed partial class LeaderboardOverlayService
                 TraitsDesEcrans.TexteEspace(g, score.Libelle.ToUpperInvariant(), libelle, TraitsDesEcrans.Alpha(Dore, opacite), gauche + 6, rendu.Y - 48, 5);
             }
 
-            // Le ruban du classement, penche comme VAINQUEUR, sous le score.
+            // Le ruban du classement, penche comme VAINQUEUR, sous le score. Sans mot (l'etape d'une coop sans etape franchie),
+            // ni ruban ni ligne du dessous.
+            if (score.Ruban.Length == 0)
+            {
+                g.Restore(etat);
+                return;
+            }
+
             var mot = score.Ruban.ToUpperInvariant();
             var boiteMot = TraitsDesEcrans.BoiteDuTexte(mot, famille, 46);
             var ruban = new RectangleF(gauche + 8, basDuScore + 26, boiteMot.Width + 48, 60);

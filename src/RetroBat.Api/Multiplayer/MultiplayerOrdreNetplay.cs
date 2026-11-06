@@ -63,6 +63,9 @@ public static class MultiplayerOrdreNetplay
                 ? classement with { Seats = classement.Seats.Select(s => s with { Seat = Place(s.Seat) }).ToList() }
                 : null,
             CoreStart = jeu.CoreStart is { } depart ? depart with { Seats = depart.Seats.Select(s => s with { Seat = Place(s.Seat) }).ToList() } : null,
+            MissionEnd = jeu.MissionEnd is { Seats: { Count: > 0 } sorties } mission
+                ? mission with { Seats = sorties.Select(s => s with { Seat = Place(s.Seat) }).ToList() }
+                : jeu.MissionEnd,
             PlacesDuNetplay = permutation,
         };
     }

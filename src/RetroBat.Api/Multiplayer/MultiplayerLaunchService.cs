@@ -88,6 +88,11 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// <summary>La meme, lue chez l'invite : son ecran de fin classe les joueurs avant que le site reponde.</summary>
     private MultiplayerIssue? _issueInvite;
 
+    /// <summary>L'issue d'une coop a fin lue (mission accomplie ou GAME OVER), chez l'hote puis chez l'invite.</summary>
+    private MultiplayerFinDeMission? _mission;
+
+    private MultiplayerFinDeMission? _missionInvite;
+
     /// <summary>L'issue dite au journal : « la place 2 gagne », « match nul », ou les rangs (« 1:1 3:2 2:3 »).</summary>
     private static string DireLIssue(MultiplayerIssue issue)
         => issue.Rangs.Count > 0
@@ -270,6 +275,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             dureeJouee = duree;
             RetirerLEtatPose();
             MultiplayerIssue? issue;
+            MultiplayerFinDeMission? mission;
             MultiplayerStatsSuivi? suivi;
             lock (_verrou)
             {
@@ -287,6 +293,8 @@ public sealed class MultiplayerLaunchService : IHostedService
                 _relaisDeLaManette = null;
                 issue = _issue;
                 _issue = null;
+                mission = _mission;
+                _mission = null;
                 suivi = _suiviDesStats;
                 _suiviDesStats = null;
             }
@@ -300,11 +308,12 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
             else
             {
-                await _client.TerminerAsync(room.Room, issue is null ? "game_closed" : "match_over", duree, CancellationToken.None, issue?.Gagnante,
-                    issue is null ? null : stats, issue is null ? null : mesures?.PourLeSite(), issue?.Rangs).ConfigureAwait(false);
+                // Une coop a fin lue (06/11) : « mission_cleared » ou « game_over », que la plateforme garde comme raison de fin.
+                await _client.TerminerAsync(room.Room, issue is not null ? "match_over" : mission?.Raison ?? "game_closed", duree, CancellationToken.None,
+                    issue?.Gagnante, issue is null ? null : stats, issue is null ? null : mesures?.PourLeSite(), issue?.Rangs, mission).ConfigureAwait(false);
             }
 
-            _panneau.MontrerLeResultat(room.Room, duree, stats, mesures, issue?.Rangs);
+            _panneau.MontrerLeResultat(room.Room, duree, stats, mesures, issue?.Rangs, mission);
         }
         catch (Exception ex)
         {
@@ -435,6 +444,11 @@ public sealed class MultiplayerLaunchService : IHostedService
             if (reponse?.Ok == true && jeu.Game.ClassePour(PlacesDe(room)))
             {
                 _ = Task.Run(() => GuetterLaFinAsync(room, jeu.Game));
+            }
+            else if (reponse?.Ok == true && jeu.Game.MissionEnd is not null)
+            {
+                // Une coop a fin lue (V24-16, 06/11) : l'hote ferme le jeu a la mission accomplie ou au GAME OVER.
+                _ = Task.Run(() => GuetterLaMissionAsync(room, jeu.Game));
             }
         }
         catch (Exception ex)
@@ -615,6 +629,80 @@ public sealed class MultiplayerLaunchService : IHostedService
         // Le noir monte sur le jeu, puis RetroArch se ferme : l'ecran de fin sortira du noir (retour du user du 23/10).
         await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
         await RetroArchInvite.FermerPourDeBonAsync().ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// LA FIN D'UNE COOP, CHEZ L'HOTE (V24-16, V24-18 ; 06/11) : mission accomplie ou GAME OVER, lus par le catalogue
+    /// (<c>mission_end</c>) ; le jeu se ferme quelques secondes plus tard, comme a la fin d'une rencontre, et l'ecran de fin
+    /// dit l'issue et l'etape atteinte.
+    /// </summary>
+    private async Task GuetterLaMissionAsync(MultiplayerRoom room, MultiplayerGame jeu)
+    {
+        CancellationToken jeton;
+        lock (_verrou)
+        {
+            _guet?.Cancel();
+            _guet = new CancellationTokenSource();
+            jeton = _guet.Token;
+        }
+
+        var places = room.Players.Where(joueur => joueur.Seat is not null).Select(joueur => joueur.Seat!.Value).Distinct().ToList();
+        var mission = await _fin.AttendreLaMissionAsync(jeu.MissionEnd!, places, jeton).ConfigureAwait(false);
+        if (mission is null)
+        {
+            return;
+        }
+
+        lock (_verrou)
+        {
+            _mission = mission;
+        }
+
+        _journal.LogInformation("MULTIPLAYER : coop de {Jeu} finie, {Issue} ; le jeu se ferme dans {Delai} s", jeu.Id, mission, jeu.MissionEnd!.CloseAfterS);
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(jeu.MissionEnd.CloseAfterS), jeton).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            return;   // la partie s'est fermee avant
+        }
+
+        await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
+        await RetroArchInvite.FermerPourDeBonAsync().ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// La fin d'une coop vue chez l'invite, pour son propre ecran de fin : l'etape atteinte n'est pas envoyee a la plateforme,
+    /// qui ne garde que la raison de fin de l'hote. Le guet attend que l'etat de l'hote soit arrive (sa demo d'abord).
+    /// </summary>
+    private async Task SuivreLaMissionEnInviteAsync(MultiplayerRoom room, MultiplayerGame jeu, CancellationToken ct)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(10), ct).ConfigureAwait(false);
+            var places = room.Players.Where(joueur => joueur.Seat is not null).Select(joueur => joueur.Seat!.Value).Distinct().ToList();
+            var mission = await _fin.AttendreLaMissionAsync(jeu.MissionEnd!, places, ct).ConfigureAwait(false);
+            if (mission is null)
+            {
+                return;
+            }
+
+            lock (_verrou)
+            {
+                _missionInvite = mission;
+            }
+
+            _journal.LogInformation("MULTIPLAYER : coop de {Jeu} vue finie chez l'invite, {Issue}", jeu.Id, mission);
+        }
+        catch (OperationCanceledException)
+        {
+            // La partie s'est fermee avant.
+        }
+        catch (Exception ex)
+        {
+            _journal.LogWarning(ex, "MULTIPLAYER : fin de la coop de {Room} non suivie chez l'invite", room.Room);
+        }
     }
 
     /// <summary>
@@ -881,6 +969,10 @@ public sealed class MultiplayerLaunchService : IHostedService
             {
                 _ = Task.Run(() => RapporterEnInviteAsync(room, jeu.Game, guetInvite.Token));
             }
+            else if (jeu.Game.MissionEnd is not null)
+            {
+                _ = Task.Run(() => SuivreLaMissionEnInviteAsync(room, jeu.Game, guetInvite.Token));
+            }
 
             // RetroArch demande le mot de passe a l'ecran : la borne le tape. Si l'hote part, la partie se ferme.
             var hoteParti = false;
@@ -914,12 +1006,15 @@ public sealed class MultiplayerLaunchService : IHostedService
             await _client.QuitterAsync(room.Room, CancellationToken.None, hoteParti ? "host_gone" : null).ConfigureAwait(false);
             MultiplayerStatsSuivi? suiviInvite;
             MultiplayerIssue? issueInvite;
+            MultiplayerFinDeMission? missionInvite;
             lock (_verrou)
             {
                 suiviInvite = _suiviDesStatsInvite;
                 _suiviDesStatsInvite = null;
                 issueInvite = _issueInvite;
                 _issueInvite = null;
+                missionInvite = _missionInvite;
+                _missionInvite = null;
             }
 
             guetInvite.Cancel();
@@ -931,7 +1026,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
 
             var mesuresInvite = suiviInvite is null ? null : await suiviInvite.Fin.ConfigureAwait(false);
-            _panneau.MontrerLeResultat(room.Room, duree, mesuresInvite?.AncienDesPlaces(), mesuresInvite, issueInvite?.Rangs);
+            _panneau.MontrerLeResultat(room.Room, duree, mesuresInvite?.AncienDesPlaces(), mesuresInvite, issueInvite?.Rangs, missionInvite);
         }
         catch (Exception ex)
         {
