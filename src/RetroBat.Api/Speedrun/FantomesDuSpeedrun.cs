@@ -52,6 +52,8 @@ public sealed class FantomesDuSpeedrun
         new("nes", "super-mario-bros-3", "fceumm", "fceumm_ghosts", "0b742b33", true),
         // (06/11, jour) Super Mario World (USA) : les niveaux seulement (etat d'ouverture du niveau), profil en fichier b19ed489.ini.
         new("snes", "super-mario-world", "snes9x", "snes9x_ghosts", "b19ed489", true),
+        // Sonic 2 (06/11) : comme Sonic, les niveaux seulement ; profil du coeur en fichier (24ab4c3a.ini du Data Pack).
+        new("megadrive", "sonic-the-hedgehog-2", "genesis_plus_gx", "genesis_plus_gx_ghosts", "24ab4c3a", true),
     ];
 
     private static Hote? HoteDe(Reglement r) => Hotes.FirstOrDefault(h => h.Systeme == r.SystemId && h.Groupe == r.RomGroup && r.Coeurs.Contains(h.Origine)

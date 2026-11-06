@@ -1,0 +1,129 @@
+{
+  "schema": "nelfe.challenge.v2",
+  "challenge_id": "sonic-the-hedgehog-2.any",
+  "version": 1,
+  "ruleset": "ch-sonic2-any-v1",
+  "order": 1,
+  "title": {
+    "fr": "Jeu complet · Any%",
+    "en": "Full game · Any%"
+  },
+  "summary": {
+    "fr": "D'Emerald Hill 1 à la fin du jeu, morts et continues permis",
+    "en": "From Emerald Hill 1 to the ending, deaths and continues allowed"
+  },
+  "kind": "speedrun_full",
+  "game": {
+    "system_id": "megadrive",
+    "rom_group": "sonic-the-hedgehog-2"
+  },
+  "mem_sha256": "edddac4f5650d1e2f9db12394d600acfc13353ca0956d252d6b3caf9c27e17bf",
+  "start_policy": "normal_boot",
+  "start": [
+    {
+      "value": {
+        "address": "0xFE11",
+        "equals": "0x00"
+      }
+    },
+    {
+      "value": {
+        "address": "0xFE10",
+        "equals": "0x00"
+      }
+    },
+    {
+      "value": {
+        "address": "0xFFF7",
+        "equals": "0x00"
+      }
+    }
+  ],
+  "timing": {
+    "official": "independent",
+    "independent": {
+      "start": {
+        "event": {
+          "action": "GAME_PLAYING",
+          "address": "0xF601",
+          "value": "0x0C",
+          "leaves": "0x8C"
+        },
+        "when": [
+          {
+            "value": {
+              "address": "0xFE11",
+              "equals": "0x00"
+            }
+          },
+          {
+            "value": {
+              "address": "0xFE10",
+              "equals": "0x00"
+            }
+          }
+        ]
+      },
+      "finish": {
+        "event": {
+          "action": "GAME_OVER",
+          "address": "0xF601",
+          "value": "0x20"
+        }
+      }
+    }
+  },
+  "void": [
+    "save_state_load",
+    "rewind",
+    "runahead",
+    "fast_forward",
+    "cheats",
+    "netplay",
+    "pause_clock_gap",
+    {
+      "event": {
+        "action": "PAUSE_ON",
+        "address": "0xF63A",
+        "value": "0x01"
+      }
+    },
+    {
+      "event": {
+        "action": "LEVEL_CHEAT_ACTIVATED",
+        "address": "0xFFF7"
+      }
+    },
+    {
+      "event": {
+        "action": "STAGE_SELECT",
+        "address": "0xF601",
+        "value": "0x28"
+      }
+    },
+    {
+      "event": {
+        "action": "TITLE_SCREEN",
+        "address": "0xF601",
+        "value": "0x04"
+      }
+    },
+    {
+      "event": {
+        "action": "CORPORATE_SCREEN",
+        "address": "0xF601",
+        "value": "0x00"
+      }
+    }
+  ],
+  "ranking": {
+    "metric": "frames",
+    "direction": "lower_better"
+  },
+  "cores": [
+    "genesis_plus_gx"
+  ],
+  "runtime": {
+    "frame_rate": 59.922743
+  }
+}

@@ -52,6 +52,14 @@ public static class JeuxMassRun
         new("snes/super-mario-world", "snes", "super-mario-world", 0xb19ed489, "snes9x_ghosts", "Super Mario World (USA).zip",
             new Regex("^(yi[1-4]|dp[134]|ds1)$", RegexOptions.CultureInvariant),
             SuffixeDeLEtat: "-entree", ImagesParSeconde: 60.098812, PosesEnImages: true),
+        // Sonic 2 (06/11, ouverture preparee le 07/11), version (World) : le coeur lit son profil dans
+        // bios/nelfeplay/profils/24ab4c3a.ini (Data Pack). Les actes a panneau et a capsule et le Death Egg, arrivees vues au
+        // banc ; ni Wing Fortress (arrivee non vue, retiree) ni Sky Chase (pilotage automatique, aucune epreuve).
+        new("megadrive/sonic-the-hedgehog-2", "megadrive", "sonic-the-hedgehog-2", 0x24ab4c3a, "genesis_plus_gx_ghosts",
+            "Sonic The Hedgehog 2 (World).zip",
+            new Regex("^((emerald-hill|chemical-plant|aquatic-ruin|casino-night|hill-top|mystic-cave|oil-ocean)-[12]|metropolis-[1-3]|death-egg)$",
+                RegexOptions.CultureInvariant),
+            ImagesParSeconde: 59.922743),
     ];
 
     /// <summary>

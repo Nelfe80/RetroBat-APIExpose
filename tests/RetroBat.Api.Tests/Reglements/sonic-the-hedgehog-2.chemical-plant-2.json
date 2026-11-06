@@ -1,0 +1,229 @@
+{
+  "schema": "nelfe.challenge.v2",
+  "challenge_id": "sonic-the-hedgehog-2.chemical-plant-2",
+  "version": 1,
+  "ruleset": "ch-sonic2-chemical-plant-2-v1",
+  "order": 5,
+  "title": {
+    "fr": "Chemical Plant Zone · Acte 2",
+    "en": "Chemical Plant Zone · Act 2"
+  },
+  "summary": {
+    "fr": "Du carton du niveau à la capsule, boss compris, Sonic seul, sans mourir",
+    "en": "From the title card to the capsule, boss included, Sonic alone, without dying"
+  },
+  "kind": "speedrun_level",
+  "game": {
+    "system_id": "megadrive",
+    "rom_group": "sonic-the-hedgehog-2"
+  },
+  "mem_sha256": "edddac4f5650d1e2f9db12394d600acfc13353ca0956d252d6b3caf9c27e17bf",
+  "start_policy": "canonical_state",
+  "state": {
+    "name": "chemical-plant-2-panneau-genesis",
+    "sha256": "ca41ef874ac7530c3790f8fe8fd330c5c3ca9d75ba7604f69f358e762651d067",
+    "file": "megadrive/sonic-the-hedgehog-2/chemical-plant-2-panneau.state"
+  },
+  "start": [
+    {
+      "value": {
+        "address": "0xFE11",
+        "equals": "0x0D"
+      }
+    },
+    {
+      "value": {
+        "address": "0xFE10",
+        "equals": "0x01"
+      }
+    },
+    {
+      "value": {
+        "address": "0xFF70",
+        "equals": "0x01"
+      }
+    },
+    {
+      "value": {
+        "address": "0xFFF7",
+        "equals": "0x00"
+      }
+    }
+  ],
+  "timing": {
+    "official": "game_timer_aligned",
+    "game_timer_aligned": {
+      "start": {
+        "event": {
+          "action": "GAME_PLAYING",
+          "address": "0xF601",
+          "value": "0x0C",
+          "leaves": "0x8C"
+        },
+        "when": [
+          {
+            "value": {
+              "address": "0xFE22",
+              "equals": "0x00"
+            }
+          },
+          {
+            "value": {
+              "address": "0xFE25",
+              "equals": "0x00"
+            }
+          }
+        ]
+      },
+      "finish": {
+        "event": {
+          "action": "GENERAL_TIMER",
+          "address": "0xFE1F",
+          "to": "0x00"
+        }
+      }
+    },
+    "independent": {
+      "start": {
+        "event": {
+          "action": "GAME_PLAYING",
+          "address": "0xF601",
+          "value": "0x0C",
+          "leaves": "0x8C"
+        }
+      },
+      "finish": {
+        "event": {
+          "action": "GENERAL_TIMER",
+          "address": "0xFE1F",
+          "to": "0x00"
+        }
+      }
+    },
+    "game_time": [
+      {
+        "address": "0xFE22",
+        "unit": "minute"
+      },
+      {
+        "address": "0xFE25",
+        "unit": "second"
+      }
+    ],
+    "game_timer_period_frames": 60
+  },
+  "finish_confirm": {
+    "any_of": [
+      {
+        "event": {
+          "action": "PROGRESSION_STAGE",
+          "address": "0xFE10",
+          "leaves": "0x01"
+        }
+      },
+      {
+        "event": {
+          "action": "PROGRESSION_ZONE",
+          "address": "0xFE11",
+          "leaves": "0x0D"
+        }
+      }
+    ],
+    "cleared_by": [
+      {
+        "event": {
+          "action": "LOSE_LIFE",
+          "address": "0xFE13"
+        }
+      }
+    ]
+  },
+  "fail": [
+    {
+      "event": {
+        "action": "LOSE_LIFE",
+        "address": "0xFE13"
+      }
+    },
+    {
+      "event": {
+        "action": "GAME_PLAYING",
+        "address": "0xF601",
+        "value": "0x10"
+      }
+    }
+  ],
+  "void": [
+    "save_state_load",
+    "rewind",
+    "runahead",
+    "fast_forward",
+    "cheats",
+    "netplay",
+    "pause_clock_gap",
+    {
+      "event": {
+        "action": "PAUSE_ON",
+        "address": "0xF63A",
+        "value": "0x01"
+      }
+    },
+    {
+      "event": {
+        "action": "LEVEL_CHEAT_ACTIVATED",
+        "address": "0xFFF7"
+      }
+    },
+    {
+      "event": {
+        "action": "STAGE_SELECT",
+        "address": "0xF601",
+        "value": "0x28"
+      }
+    },
+    {
+      "event": {
+        "action": "TITLE_SCREEN",
+        "address": "0xF601",
+        "value": "0x04"
+      }
+    },
+    {
+      "event": {
+        "action": "CORPORATE_SCREEN",
+        "address": "0xF601",
+        "value": "0x00"
+      }
+    },
+    {
+      "event": {
+        "action": "TRANSFORMATION_SUPER",
+        "address": "0xFE18"
+      }
+    },
+    {
+      "event": {
+        "action": "PROGRESSION_STAGE",
+        "address": "0xFE10",
+        "leaves": "0x01"
+      }
+    },
+    {
+      "event": {
+        "action": "PROGRESSION_ZONE",
+        "address": "0xFE11",
+        "leaves": "0x0D"
+      }
+    }
+  ],
+  "ranking": {
+    "metric": "frames",
+    "direction": "lower_better"
+  },
+  "cores": [
+    "genesis_plus_gx"
+  ],
+  "runtime": {
+    "frame_rate": 59.922743
+  }
+}
