@@ -17,7 +17,7 @@
     "system_id": "megadrive",
     "rom_group": "rocket-knight-adventures"
   },
-  "mem_sha256": "2305b0901ecd92b8b0f30cce6735fbc728d2ad1102bfeaa63b74c26cfef1fa9e",
+  "mem_sha256": "b70bb964efe230ffeb14367c2453712ce7aa90d6425997924be7fb587b33eb3c",
   "start_policy": "canonical_state",
   "state": {
     "name": "stage-1-panneau-genesis",

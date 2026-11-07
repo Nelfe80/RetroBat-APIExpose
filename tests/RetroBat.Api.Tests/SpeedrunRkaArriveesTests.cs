@@ -6,7 +6,7 @@ namespace RetroBat.Api.Tests;
 /// <summary>
 /// LES ARRIVEES DES STAGES DE ROCKET KNIGHT ADVENTURES vues au banc sans fenetre (07/11, verification avant ouverture). Suite des
 /// scenes lue dans la ROM (table « scene suivante » a 0x8322) : stage 1 : 1 2 3 11 4 -> 5 ; stage 3 : 40 41 42 43 45 46 -> 13 ;
-/// stage 4 : 13 12 14 15 48 -> 23 ; stage 6 : 25 26 47 -> 27 ; stage 7 : 27 ... 35 -> 50 (sequence de fin). AIDES DE MESURE :
+/// stage 4 : 13 12 14 15 48 -> 23 ; stage 7 : 27 ... 35 -> 50 (sequence de fin). Stages 2, 5 et 6 retires (arrivee non vue). AIDES DE MESURE :
 /// la scene de reprise est ecrite pendant le portrait de l'etat propose (le jeu la charge, 0xB088 garde le numero du stage), vie
 /// de Sparkster remise pleine sous la moitie, joueur automatique. Chaque trace commence au chargement de l'etat (image 1 : portrait).
 /// </summary>
@@ -24,8 +24,8 @@ public class SpeedrunRkaArriveesTests
     public static readonly TheoryData<int, long, long> Arrivees = new()
     {
         { 1, 79, 1600 },    // boss de la tour et cinematique du dirigeable (scene 4) -> 5
-        { 3, 55, 985 },     // scene 45 -> 46 (cinematique) a l'image 658 -> 13
-        { 6, 68, 447 },     // la seule cinematique 47 -> 27 ; le combat de la scene 26 n'est PAS vu
+        { 3, 55, 985 },     // scene 45 -> 46 (cinematique) -> 13
+        { 4, 70, 6771 },    // scene 15 -> 48 (cinematique) -> 23 ; des degats continus en scene 15 (voir plus bas)
         { 7, 69, 4205 },    // dernier boss (scene 35) battu, ecran blanc -> 50
     };
 
@@ -41,17 +41,13 @@ public class SpeedrunRkaArriveesTests
     }
 
     [Fact]
-    public void Stage_4_la_ligne_u32be_0xFB12_du_MEM_suit_la_vie_et_se_fait_couper()
+    public void Le_MEM_n_a_plus_de_ligne_u32be_sur_la_scene()
     {
-        // DEFAUT DU .MEM A CORRIGER (07/11) : la ligne « 0xFB12 u32be change » lit aussi l'octet 0xFB14, qui suit la vie de
-        // Sparkster. Des degats continus (un point toutes les 4 images, scene 15 du stage 4) la font couper par le wrapper
-        // (8 emissions a moins de 20 images d'ecart) ; le reglement cite 0xFB12 (la scene) et la tentative est annulee. Au banc,
-        // l'arrivee du stage 4 est pourtant vue (scene 15 -> 48 a l'image 5987, -> 23 a l'image 6771). Quand le .MEM sera
-        // corrige, cet essai devra montrer l'arrivee : { 4, 70, 6771 }.
-        var p = Jouer(4);
-        Assert.Equal(EtatTentative.Annulee, p.Resultat.Etat);
-        Assert.Equal("sensor_muted", p.Resultat.Cause);
-        Assert.Equal(5441, p.Resultat.FrameDeFin);
+        // 07/11 : les lignes « 0xFB12 u32be » lisaient aussi 0xFB14, qui suit la vie ; des degats continus (scene 15 du stage 4,
+        // un point toutes les 4 images) les faisaient couper par le wrapper et annulaient l'epreuve (sensor_muted). Retirees :
+        // la scene se lit par la seule ligne u8.
+        Assert.DoesNotContain(File.ReadAllLines(Fichier("rocket-knight-adventures.MEM")),
+            l => l.Contains("address=0XFB12", StringComparison.OrdinalIgnoreCase) && l.Contains("type=\"u32be\""));
     }
 
     [Fact]

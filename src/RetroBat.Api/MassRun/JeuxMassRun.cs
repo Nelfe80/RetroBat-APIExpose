@@ -61,9 +61,11 @@ public static class JeuxMassRun
                 RegexOptions.CultureInvariant),
             ImagesParSeconde: 59.922743),
         // Rocket Knight Adventures (06/11, ouverture preparee le 07/11), version USA : profil du coeur en fichier
-        // (a6efec47.ini). Les stages en Easy dont l'arrivee est vue au banc : 1, 3, 4, 7 (2, 5 et 6 retires).
+        // (a6efec47.ini). Le stage 1 seulement : le coeur prend l'arrivee quand l'etat du jeu $B029 tombe de 3 a 0 et une
+        // mort quand il passe a 4 ; a la fin des stages 3, 4 et 7 (banc du 07/11) il passe par 4 (3 -> 4 -> 5 -> 0) une image
+        // apres le changement de scene : le coureur y serait compte mort. Stages 2, 5, 6 : arrivee non vue.
         new("megadrive/rocket-knight-adventures", "megadrive", "rocket-knight-adventures", 0xa6efec47, "genesis_plus_gx_ghosts",
-            "Rocket Knight Adventures (USA).zip", new Regex("^stage-[1347]$", RegexOptions.CultureInvariant),
+            "Rocket Knight Adventures (USA).zip", new Regex("^stage-1$", RegexOptions.CultureInvariant),
             ImagesParSeconde: 59.922743),
     ];
 

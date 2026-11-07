@@ -9,8 +9,8 @@
     "en": "Full game · Any%"
   },
   "summary": {
-    "fr": "D'Emerald Hill 1 à la fin du jeu, morts et continues permis",
-    "en": "From Emerald Hill 1 to the ending, deaths and continues allowed"
+    "fr": "D'Emerald Hill 1 à la fin du jeu, Sonic seul, morts et continues permis",
+    "en": "From Emerald Hill 1 to the ending, Sonic alone, deaths and continues allowed"
   },
   "kind": "speedrun_full",
   "game": {
@@ -36,6 +36,12 @@
       "value": {
         "address": "0xFFF7",
         "equals": "0x00"
+      }
+    },
+    {
+      "value": {
+        "address": "0xFF70",
+        "equals": "0x01"
       }
     }
   ],
@@ -113,6 +119,12 @@
         "action": "CORPORATE_SCREEN",
         "address": "0xF601",
         "value": "0x00"
+      }
+    },
+    {
+      "event": {
+        "action": "CHARACTER_SELECTED",
+        "address": "0xFF70"
       }
     }
   ],

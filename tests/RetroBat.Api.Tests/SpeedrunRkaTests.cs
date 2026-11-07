@@ -22,7 +22,7 @@ public class SpeedrunRkaTests
             slugs.Select(s => (s, Lire(s))).ToList());
 
     [Theory]
-    [InlineData(1, 0x05)] [InlineData(2, 0x28)] [InlineData(3, 0x0D)] [InlineData(4, 0x17)] [InlineData(5, 0x19)] [InlineData(6, 0x1B)] [InlineData(7, 0x32)]
+    [InlineData(1, 0x05)] [InlineData(3, 0x0D)] [InlineData(4, 0x17)] [InlineData(7, 0x32)]
     public void Chaque_stage_cite_seulement_des_lignes_du_MEM_et_part_de_son_etat(int n, int sceneDArrivee)
     {
         var r = Lire($"stage-{n}");
@@ -44,7 +44,7 @@ public class SpeedrunRkaTests
     public void Le_stage_1_finit_au_premier_ecran_du_stage_2()
     {
         // main au joueur a l'image 85, l'etat du jeu tombe a 0 et la scene passe a 5 a l'image 1609
-        var p = Jouer("rka-stage-1-fin", "stage-1", "stage-2")[0];
+        var p = Jouer("rka-stage-1-fin", "stage-1")[0];
         Assert.Equal("stage-1", p.Defi);
         Assert.Equal(EtatTentative.Finie, p.Resultat.Etat);
         Assert.Equal(85, p.Depart);
