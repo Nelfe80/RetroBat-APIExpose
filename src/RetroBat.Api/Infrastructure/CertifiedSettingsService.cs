@@ -205,10 +205,19 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         NeutraliserPlusieurs(JeuxDeLaCollectionSurLeDisque());
     }
 
+    /// <summary>
+    /// Les jeux de la collection World Scoring ET de la collection des defis (07/11) : un jeu ouvert seulement aux speedruns
+    /// (Super Metroid, Super Mario World, Mega Man 2, SMB3) n'est pas dans la premiere. Sans ses cles, le rembobinage « auto »
+    /// de RetroBat restait allume, et chaque temps fini partait en STOP « rewind » sans que le joueur ait rien fait.
+    /// </summary>
     private static IReadOnlyList<(string Systeme, string Fichier)> JeuxDeLaCollectionSurLeDisque()
-        => JeuxDeLaCollection(Path.Combine(RetroBatPaths.EmulationStationConfigRoot, "collections",
-                "custom-" + NelfePlayScoringCollectionSyncService.CollectionName + ".cfg"), RetroBatPaths.RomsRoot,
-            Path.GetDirectoryName(RetroBatPaths.EmulationStationConfigRoot) ?? RetroBatPaths.EmulationStationConfigRoot);
+    {
+        var home = Path.GetDirectoryName(RetroBatPaths.EmulationStationConfigRoot) ?? RetroBatPaths.EmulationStationConfigRoot;
+        string Fichier(string nom) => Path.Combine(RetroBatPaths.EmulationStationConfigRoot, "collections", "custom-" + nom + ".cfg");
+        return JeuxDeLaCollection(Fichier(NelfePlayScoringCollectionSyncService.CollectionName), RetroBatPaths.RomsRoot, home)
+            .Concat(JeuxDeLaCollection(Fichier(RetroBat.Api.Speedrun.DefisCollectionSyncService.CollectionName), RetroBatPaths.RomsRoot, home))
+            .Distinct().ToList();
+    }
 
     /// <summary>
     /// AU LANCEMENT, AVANT LE LANCEUR (2026-10-18, Turbo). Le crochet game-start d'EmulationStation attend la reponse de
