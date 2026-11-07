@@ -242,21 +242,21 @@ public sealed partial class DefisPanelService
         var niveau = T("massrun.panel.level", "Level") + " " + RetroBat.Api.MassRun.JeuxMassRun.NomDuNiveau(salle.Niveau);
         var inscrits = salle.Inscrits.ToString(System.Globalization.CultureInfo.InvariantCulture);
         var vue = new SalleMassRun(
-            inscriptions ? T("massrun.panel.open", "Room open") : avant ? T("massrun.panel.closed", "Registration closed") : T("massrun.panel.running", "Race in progress"),
+            inscriptions ? T("massrun.panel.open", "Room open") : avant ? T("massrun.panel.closed", "Registration closed") : T("massrun.panel.running", "Run in progress"),
             true,
             $"{format} · {_nomDuJeu} · {niveau}",
             avant ? T("massrun.panel.registered", "Runners registered") : T("massrun.panel.finished", "Finished"),
             avant ? inscrits : $"{salle.Arrives}/{salle.Inscrits}",
-            inscriptions ? T("massrun.panel.closes_in", "Registration closes in") : avant ? T("massrun.panel.start_in", "Start in") : T("massrun.panel.race_time", "Race time"),
+            inscriptions ? T("massrun.panel.closes_in", "Registration closes in") : avant ? T("massrun.panel.start_in", "Start in") : T("massrun.panel.race_time", "Run time"),
             Horloge(inscriptions ? salle.InscriptionsUtc - maintenant : avant ? salle.GoUtc - maintenant : maintenant - salle.GoUtc),
-            $"{RegleDe(salle)} · " + T("massrun.panel.color", "you race in your avatar color"));
+            $"{RegleDe(salle)} · " + T("massrun.panel.color", "you run in your avatar color"));
         var peutRejoindre = inscriptions;
         return new ContenuDefis(
             _modele.Onglets.Select(DefisPanelModel.Titre).ToList(),
             _modele.Onglets.ToList().IndexOf(DefisPanelModel.Onglet.MassRun),
             _modele.Etat == DefisPanelModel.Foyer.Panneau,
             false, [], [], -1, [],
-            peutRejoindre ? new Aide(_glypheDefier, T("massrun.panel.join", "Join the race")) : null,
+            peutRejoindre ? new Aide(_glypheDefier, T("massrun.panel.join", "Join the run")) : null,
             Aides(),
             Pseudo: Pseudo,
             EnLigne: LiaisonNelfePlay.EnLigne,

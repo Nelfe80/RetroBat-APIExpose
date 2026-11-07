@@ -531,6 +531,7 @@ public sealed class SessionSpeedrun
         if (res.Etat == EtatTentative.Ratee && _relanceAutomatique is not null)
             _messages.Add(new MessageJoueur("speedrun.msg.failed_restart", "Attempt failed: back to the start."));
         else if (MessageDeFin(res, precedent) is { } message) _messages.Add(message);
+        if (AvertissementDeRalenti(_r, res, _horlogeDuDepart, _horlogeDArrivee ?? _horlogeDeLImage) is { } lent) _messages.Add(lent);
         Publier("speedrun.attempt.ended", new
         {
             sessionId = SessionId,
@@ -576,6 +577,27 @@ public sealed class SessionSpeedrun
             return new MessageJoueur("speedrun.msg.finish", "Finish {time} (best {best}). Ranking when you quit the game.",
                 temps, ("best", Chronometrage.Afficher(pb, r.Cadence)));
         return new MessageJoueur("speedrun.msg.finish_best", "Finish {time}: new best time. Ranking when you quit the game.", temps);
+    }
+
+    /// <summary>Au-dessus, la vitesse du jeu ne merite pas d'avertissement (le grain de l'horloge).</summary>
+    public const double VitesseSansAvertissement = 0.99;
+
+    /// <summary>
+    /// UN JEU QUI TOURNE LENTEMENT (decision du user du 07/11) : sous 97 %, la tentative est annulee ; entre 97 et 99 %, le
+    /// temps compte (le site tolere 3 %), mais le joueur est prevenu. Un ecran a 59 Hz ralentit le jeu de 1,5 % : chaque
+    /// image lui coute du temps reel, et un niveau long peut finir au-dela de la tolerance. Pur.
+    /// </summary>
+    public static MessageJoueur? AvertissementDeRalenti(Reglement r, ResultatTentative res, long? departMs, long? arriveeMs)
+    {
+        if (!r.Kind.StartsWith("speedrun", StringComparison.Ordinal) || !EstClassable(res)) return null;
+        var chrono = res.ChronoOfficiel == Reglement.ChronoIndependant ? res.Independant : res.Cale;
+        if (chrono?.Depart is not { } d || chrono.Arrivee is not { } a
+            || Evaluateur.Vitesse(a - d, departMs, arriveeMs, res.Cadence) is not { } vitesse || vitesse >= VitesseSansAvertissement)
+            return null;
+        var pourcent = ((1 - vitesse) * 100).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
+        return new MessageJoueur("speedrun.msg.slow_game",
+            "Warning: the game ran {percent}% slow. Set your screen to 60 Hz (a 59 Hz screen slows the game down).",
+            ("percent", pourcent));
     }
 
     private void Publier(string type, object donnees) => _aPublier.Add(new EvenementSession(type, ++Sequence, donnees));

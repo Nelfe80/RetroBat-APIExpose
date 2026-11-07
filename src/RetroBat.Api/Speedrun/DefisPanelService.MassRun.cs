@@ -285,7 +285,7 @@ public sealed partial class DefisPanelService
             ? T("massrun.page.alone_end", "You were the only runner in this room")
             : b.CourseFinie
             ? FormatDe(b.Salle) + " · " + T("massrun.panel.level", "Level") + " " + RetroBat.Api.MassRun.JeuxMassRun.NomDuNiveau(b.Salle.Niveau)
-            : T("massrun.page.still_running", "Race still running: the ranking fills in as runners finish");
+            : T("massrun.page.still_running", "Run still running: the ranking fills in as runners finish");
         return new EcranDeFin(
             // L'issue et le rang changent la cle : le titre se rejoue quand la place arrive.
             "massrun-bilan-" + b.Salle.Id.ToString(CultureInfo.InvariantCulture) + "-" + b.Issue + "-" + (b.Rang?.ToString(CultureInfo.InvariantCulture) ?? ""),
