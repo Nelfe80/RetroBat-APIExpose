@@ -114,7 +114,8 @@ public class SpeedrunMarioTests
 
         var page = service.ComposerLaPreparation(Lire("1-1"), "Super Mario Bros.", null, false, "fr");
 
-        Assert.Equal(6, page.Fiche!.Count);
+        // 07/11 : la ligne « Timing » est retiree (demande du user : redondante) ; depart, objectif, interdits, record, moi.
+        Assert.Equal(5, page.Fiche!.Count);
         Assert.DoesNotContain(page.Fiche!, c => c.Etiquette == "Ghosts");
     }
 

@@ -604,9 +604,6 @@ public sealed partial class DefisPanelService
         var depart = defi.StartPolicy == "normal_boot"
             ? T("speedrun.panel.start.normal", "Normal boot")
             : T("speedrun.panel.start.state", "Signed starting state");
-        var chrono = defi.ChronoOfficiel == Reglement.ChronoIndependant
-            ? T("speedrun.panel.timing.independent", "Frames between two game events")
-            : T("speedrun.panel.timing.aligned", "Aligned on the game timer");
         var interdits = new List<string>();
         if (defi.Echecs.Count > 0) interdits.Add(T("speedrun.panel.forbid.death", "dying"));
         if (defi.AnnulationsJeu.Any(e => e.Action == "PAUSE_ON") || defi.AnnulationsBorne.Contains("pause_clock_gap"))
@@ -620,7 +617,6 @@ public sealed partial class DefisPanelService
             new(T("speedrun.panel.start", "Start"), depart),
             new(T("speedrun.panel.goal", "Goal"), Objectif(defi)),
             new(T("speedrun.panel.forbidden", "Forbidden"), LaPhrase(interdits)),
-            new(T("speedrun.panel.timing", "Timing"), chrono),
             new(T("speedrun.panel.record", "Record"), LeRecord(defi, _tableaux) is { } record
                 ? Chronometrage.Afficher(record.Valeur, defi.Cadence) + " · " + record.Joueur : SansTemps),
             new(T("speedrun.panel.you", "You"), MaPlace(defi, _tableaux, Pseudo) is { } place
