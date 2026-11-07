@@ -211,6 +211,17 @@ public class JeuxMassRunTests
     }
 
     [Fact]
+    public void L_image_de_salle_d_attente_est_commune_et_reste_au_dessus_des_images_de_course()
+    {
+        var go = new DateTime(2026, 11, 7, 21, 0, 0, DateTimeKind.Utc);
+        Assert.Equal(1_000_000u, ClientDeSalle.ImageDAttente(go, go, 60.0988));
+        Assert.Equal(1_000_000u - 601u, ClientDeSalle.ImageDAttente(go.AddSeconds(-10), go, 60.0988));
+        Assert.Equal(1_000_060u, ClientDeSalle.ImageDAttente(go.AddSeconds(1), go, 60.0988));
+        // deux bornes a 50 ms d'ecart d'horloge : 3 images, dans l'octet du noeud
+        Assert.InRange(ClientDeSalle.ImageDAttente(go.AddSeconds(-30), go, 60.0988) - ClientDeSalle.ImageDAttente(go.AddSeconds(-30.05), go, 60.0988), 2u, 4u);
+    }
+
+    [Fact]
     public void En_salle_d_attente_un_coureur_reste_entre_deux_positions_recues()
     {
         // des positions toutes les 4 images environ, datees a leur arrivee, avec des retards de 0 a 5 images (07/11)

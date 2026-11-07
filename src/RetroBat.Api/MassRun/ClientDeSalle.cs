@@ -291,6 +291,7 @@ public sealed class ClientDeSalle : IDisposable
 
     public void EnvoyerPosition(uint image, uint mode, ReadOnlySpan<byte> piste)
     {
+        if (mode == 2 && image == 0 && GoUnixMs > 0) image = ImageDAttente(DateTime.UtcNow, GoLocalUtc, ImagesParSeconde);
         Span<byte> contenu = stackalloc byte[8 + MassRunProtocole.ImageDePiste];
         contenu.Clear();
         BinaryPrimitives.WriteUInt32LittleEndian(contenu, image);
@@ -298,6 +299,20 @@ public sealed class ClientDeSalle : IDisposable
         piste[..MassRunProtocole.ImageDePiste].CopyTo(contenu[8..]);
         Envoyer(MassRunProtocole.Pos, contenu);
     }
+
+    /// <summary>
+    /// L'HORLOGE DE LA SALLE D'ATTENTE (07/11, « encore saccade dans la waiting ») : toutes les bornes y etaient a l'image 0, et
+    /// la borne qui recoit datait chaque position a son arrivee ; le noeud renvoyant a chaque battement la derniere position
+    /// connue, une repetition passait pour une position nouvelle. Une image commune a toutes les bornes, comptee depuis le GO!
+    /// du noeud (horloge recalee par les pings) et decalee d'un million pour rester positive avant le GO! : la reception la
+    /// traite comme en course. Les bornes d'une meme salle restent a quelques images l'une de l'autre (l'ecart tient dans
+    /// l'octet du noeud). Pur.
+    /// </summary>
+    public static uint ImageDAttente(DateTime maintenantUtc, DateTime goUtc, double imagesParSeconde)
+        => (uint)Math.Max(1, DebutDAttente + Math.Round((maintenantUtc - goUtc).TotalSeconds * imagesParSeconde));
+
+    /// <summary>L'image de salle d'attente au GO! ; une image de course est toujours tres en dessous.</summary>
+    public const long DebutDAttente = 1_000_000;
 
     /// <summary>L'arrivee, ou l'elimination (bit de poids fort) en MASS SURVIVAL.</summary>
     public void EnvoyerArrivee(uint images, bool elimine = false)
@@ -403,13 +418,21 @@ public sealed class ClientDeSalle : IDisposable
                     _coureurs[place] = coureur;
                 }
                 var image = base_ - e[2];
-                if (image < coureur.Image && coureur.RecuLe > DateTime.UtcNow.AddSeconds(-2))
+                // plus ancien que ce qu'on a deja ; mais une image qui retombe de la salle d'attente (un million) a la course
+                // (quelques images) est le depart, pas une position ancienne
+                if (image < coureur.Image && coureur.Image - image < DebutDAttente / 2 && coureur.RecuLe > DateTime.UtcNow.AddSeconds(-2))
                 {
-                    continue;   // plus ancien que ce qu'on a deja
+                    continue;
                 }
                 coureur.Image = image;
                 MassRunProtocole.Refaire(e, definition, coureur.Piste);
                 coureur.RecuLe = DateTime.UtcNow;
+                // une borne d'avant le 07/11 en salle d'attente (image 0) : le noeud renvoie sa derniere position a chaque
+                // battement ; une position identique a la precedente n'est pas une position nouvelle
+                if (image == 0 && coureur.Echantillons.Count > 0 && coureur.Piste.AsSpan().SequenceEqual(coureur.Echantillons[^1].Piste))
+                {
+                    continue;
+                }
                 // l'instant de la position : son image de course ; en salle d'attente (image 0 pour tous), l'heure d'arrivee
                 var t = image > 0 ? image : HorlogeEnImages();
                 var echantillons = coureur.Echantillons;
