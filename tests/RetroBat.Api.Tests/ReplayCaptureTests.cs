@@ -329,6 +329,16 @@ public sealed class ReplayCaptureTests
     }
 
     [Fact]
+    public void Un_film_de_moins_de_dix_secondes_ne_part_pas()
+    {
+        // 07/11 : 9,9 s a 60 i/s non, 10 s oui ; cadence inconnue = 60 i/s.
+        Assert.True(ReplayVideoPublisher.TropCourt(1_000, 1_594, 60));
+        Assert.False(ReplayVideoPublisher.TropCourt(1_000, 1_600, 60));
+        Assert.True(ReplayVideoPublisher.TropCourt(0, 500, 0));
+        Assert.False(ReplayVideoPublisher.TropCourt(0, 1_423, 60.0988));
+    }
+
+    [Fact]
     public void Une_station_ne_rend_que_la_fin_du_run_trois_minutes_au_plus()
     {
         // Run de 20 min a 60 i/s : les 3 dernieres minutes, et 2 s apres sa fin.

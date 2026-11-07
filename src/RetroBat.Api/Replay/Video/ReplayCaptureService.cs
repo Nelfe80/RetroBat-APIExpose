@@ -924,6 +924,13 @@ public sealed class ReplayCaptureService : BackgroundService
                         var (debutS, finS) = SequenceDuRecord(courante.Courbe, finDuRunS);
                         courante = courante with { DebutSequenceS = debutS, FinSequenceS = finS };
                     }
+                    // Moins de 10 s (07/11) : ni sur le site ni sur YouTube ; la capture s'oublie, rien ne part.
+                    var dureeDuFilmS = courante.DebutSequenceS is double ds && courante.FinSequenceS is double fs ? fs - ds : courante.DureeS;
+                    if (dureeDuFilmS is double duree && duree < ReplayVideoPublisher.DureeMinimaleS)
+                    {
+                        Oublier(courante, fiche, "moins de " + ReplayVideoPublisher.DureeMinimaleS + " s (" + duree.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) + " s)");
+                        continue;
+                    }
                     // Jamais un film deforme sur YouTube (25/10) : la video du record se fera depuis son replay.
                     if (FormeRefusee(courante.Largeur, courante.Hauteur, courante.Rotation, courante.Forme,
                             ExeSaitLaForme(LanceurDuDirect.Chemin(AppContext.BaseDirectory))) is { } refus)

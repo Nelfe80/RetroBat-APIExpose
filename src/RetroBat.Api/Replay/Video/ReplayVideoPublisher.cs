@@ -60,6 +60,15 @@ public sealed class ReplayVideoPublisher
     /// Une borne occupee n'est pas un echec du replay : ces rendus-la ne se signalent pas, le prochain passage
     /// reprendra.
     /// </summary>
+    /// <summary>
+    /// UN FILM DE RECORD DURE AU MOINS 10 SECONDES (demande du user du 07/11 : en dessous, il n'a d'interet ni pour le site
+    /// ni pour YouTube). Plus court, la sequence ne se rend pas : le site l'apprend (« trop_court ») et ne la repropose pas.
+    /// </summary>
+    internal const double DureeMinimaleS = 10;
+
+    /// <summary>La sequence [debut, fin] (frames, a <paramref name="fps"/>) dure moins de <see cref="DureeMinimaleS"/>. Pur.</summary>
+    internal static bool TropCourt(long debut, long fin, double fps) => (fin - debut) / (fps > 1 ? fps : 60) < DureeMinimaleS;
+
     private static readonly HashSet<string> RaisonsPassageres = new(StringComparer.Ordinal)
     {
         "lecture_en_cours", "emulateur_en_cours", "rendu_en_cours",
@@ -111,11 +120,18 @@ public sealed class ReplayVideoPublisher
                 }
             }
 
+            var (debut, fin) = SequenceDuReplay(cible.Debut, cible.Fin, manifest.Frames.ReplayEnd, manifest.Frames.NominalFps);
+            if (TropCourt(debut, fin, manifest.Frames.NominalFps))
+            {
+                details.Add(cible.ReplayId + " : moins de " + DureeMinimaleS + " s, pas de film");
+                await SignalerEchecAsync(credential, cible.ReplayId, "trop_court", ct).ConfigureAwait(false);
+                continue;
+            }
+
             rendus++;
             var dossier = Path.Combine(_objects.TempRoot, "video", cible.ReplayId);
             try
             {
-                var (debut, fin) = SequenceDuReplay(cible.Debut, cible.Fin, manifest.Frames.ReplayEnd, manifest.Frames.NominalFps);
                 var film = await _rendu.RendreAsync(cible.ReplayId, debut, fin, ct).ConfigureAwait(false);
                 if (!film.Ok || film.Fichier is null)
                 {
