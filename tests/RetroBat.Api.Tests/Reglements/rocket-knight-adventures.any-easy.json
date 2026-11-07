@@ -50,7 +50,7 @@
         "event": {
           "action": "PROGRESSION_STAGE",
           "address": "0xFB12",
-          "value": "0x21"
+          "value": "0x32"
         }
       }
     }

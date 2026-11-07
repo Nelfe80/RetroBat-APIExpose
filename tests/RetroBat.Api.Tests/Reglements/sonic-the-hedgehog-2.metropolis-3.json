@@ -21,20 +21,20 @@
   "start_policy": "canonical_state",
   "state": {
     "name": "metropolis-3-panneau-genesis",
-    "sha256": "8110c8538c576c356c414224b113c0044f29b2b77394679faf3bc9d410860c39",
+    "sha256": "066cbabcefe68c1012a8d7aee2a1c1ce459c32495714f2f89a3649883b5c7097",
     "file": "megadrive/sonic-the-hedgehog-2/metropolis-3-panneau.state"
   },
   "start": [
     {
       "value": {
         "address": "0xFE11",
-        "equals": "0x04"
+        "equals": "0x05"
       }
     },
     {
       "value": {
         "address": "0xFE10",
-        "equals": "0x02"
+        "equals": "0x00"
       }
     },
     {
@@ -116,16 +116,9 @@
     "any_of": [
       {
         "event": {
-          "action": "PROGRESSION_STAGE",
-          "address": "0xFE10",
-          "leaves": "0x02"
-        }
-      },
-      {
-        "event": {
           "action": "PROGRESSION_ZONE",
           "address": "0xFE11",
-          "leaves": "0x04"
+          "leaves": "0x05"
         }
       }
     ],
@@ -205,14 +198,14 @@
       "event": {
         "action": "PROGRESSION_STAGE",
         "address": "0xFE10",
-        "leaves": "0x02"
+        "leaves": "0x00"
       }
     },
     {
       "event": {
         "action": "PROGRESSION_ZONE",
         "address": "0xFE11",
-        "leaves": "0x04"
+        "leaves": "0x05"
       }
     }
   ],

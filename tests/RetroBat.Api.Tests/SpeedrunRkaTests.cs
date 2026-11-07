@@ -22,7 +22,7 @@ public class SpeedrunRkaTests
             slugs.Select(s => (s, Lire(s))).ToList());
 
     [Theory]
-    [InlineData(1, 0x05)] [InlineData(2, 0x28)] [InlineData(3, 0x0D)] [InlineData(4, 0x17)] [InlineData(5, 0x19)] [InlineData(6, 0x1B)] [InlineData(7, 0x21)]
+    [InlineData(1, 0x05)] [InlineData(2, 0x28)] [InlineData(3, 0x0D)] [InlineData(4, 0x17)] [InlineData(5, 0x19)] [InlineData(6, 0x1B)] [InlineData(7, 0x32)]
     public void Chaque_stage_cite_seulement_des_lignes_du_MEM_et_part_de_son_etat(int n, int sceneDArrivee)
     {
         var r = Lire($"stage-{n}");

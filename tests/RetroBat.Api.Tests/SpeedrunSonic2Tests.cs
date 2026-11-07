@@ -26,7 +26,7 @@ public class SpeedrunSonic2Tests
         { "aquatic-ruin-1", 0x0F, 0 }, { "aquatic-ruin-2", 0x0F, 1 }, { "casino-night-1", 0x0C, 0 }, { "casino-night-2", 0x0C, 1 },
         { "hill-top-1", 0x07, 0 }, { "hill-top-2", 0x07, 1 }, { "mystic-cave-1", 0x0B, 0 }, { "mystic-cave-2", 0x0B, 1 },
         { "oil-ocean-1", 0x0A, 0 }, { "oil-ocean-2", 0x0A, 1 }, { "metropolis-1", 0x04, 0 }, { "metropolis-2", 0x04, 1 },
-        { "metropolis-3", 0x04, 2 }, { "wing-fortress", 0x06, 0 }, { "death-egg", 0x0E, 0 },
+        { "metropolis-3", 0x05, 0 }, { "wing-fortress", 0x06, 0 }, { "death-egg", 0x0E, 0 },
     };
 
     private static List<PassageMesure> Jouer(string trace, params string[] slugs)

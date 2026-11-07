@@ -9,8 +9,8 @@
     "en": "Stage 7"
   },
   "summary": {
-    "fr": "Du portrait du stage au stage suivant, en Easy, sans mourir",
-    "en": "From the stage portrait to the next stage, on Easy, without dying"
+    "fr": "Du portrait du stage à la séquence de fin, en Easy, sans mourir",
+    "en": "From the stage portrait to the ending, on Easy, without dying"
   },
   "kind": "speedrun_level",
   "game": {
@@ -61,7 +61,7 @@
         "event": {
           "action": "PROGRESSION_STAGE",
           "address": "0xFB12",
-          "value": "0x21"
+          "value": "0x32"
         }
       }
     }
