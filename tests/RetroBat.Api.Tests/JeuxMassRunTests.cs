@@ -211,6 +211,35 @@ public class JeuxMassRunTests
     }
 
     [Fact]
+    public void En_salle_d_attente_un_coureur_reste_entre_deux_positions_recues()
+    {
+        // des positions toutes les 4 images environ, datees a leur arrivee, avec des retards de 0 a 5 images (07/11)
+        var c = new ClientDeSalle.Coureur();
+        var hasard = new Random(7);
+        var arrivees = new List<double>();
+        for (var k = 0; k < 120; k++) arrivees.Add(k * 3.85 + hasard.Next(0, 6));
+        arrivees.Sort();
+        var prochaine = 0;
+        var depasse = 0;
+        for (var maintenant = 0.0; maintenant < arrivees[^1]; maintenant += 1)
+        {
+            while (prochaine < arrivees.Count && arrivees[prochaine] <= maintenant)
+            {
+                var t = arrivees[prochaine++];
+                if (c.Echantillons.Count == 0 || t > c.Echantillons[^1].T)
+                {
+                    c.Echantillons.Add((t, new byte[1]));
+                    if (c.Echantillons.Count > 24) c.Echantillons.RemoveAt(0);
+                    ClientDeSalle.NoterLAttente(c);
+                }
+            }
+            if (maintenant > 60 && maintenant + c.Decalage!.Value > c.Echantillons[^1].T) depasse++;
+        }
+        Assert.Equal(0, depasse);
+        Assert.InRange(-c.Decalage!.Value, ClientDeSalle.RetardMinimalDAttente, ClientDeSalle.RetardMaximalDAttente);
+    }
+
+    [Fact]
     public void Le_contenu_d_une_rom_est_le_crc_du_fichier_ou_de_l_unique_jeu_de_son_archive()
     {
         Assert.Equal(0xCBF43926u, JeuxMassRun.Crc32("123456789"u8));

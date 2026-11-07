@@ -70,6 +70,25 @@ public sealed class ClientDeSalle : IDisposable
         coureur.Decalage = coureur.Decalage is { } d ? d + Math.Clamp(voulu - d, -1.0, 0.25) : voulu;
     }
 
+    /// <summary>
+    /// LE RETARD EN SALLE D'ATTENTE (retour du user du 07/11 sur la video : « hyper saccade dans la waiting room ») : toutes les
+    /// bornes y sont a l'image 0, une position est datee a son arrivee. Le coureur est montre en retard du plus grand ecart
+    /// recent entre deux de ses positions, plus la marge : il reste entre deux positions recues au lieu de depasser la
+    /// derniere puis de sauter en arriere. Borne : de 6 a 30 images (un dixieme a une demi-seconde, sans enjeu avant le GO!).
+    /// Le retard recule vite et revient doucement, comme en course. Pur.
+    /// </summary>
+    internal static void NoterLAttente(Coureur coureur)
+    {
+        var e = coureur.Echantillons;
+        double ecartMax = 0;
+        for (var i = 1; i < e.Count; i++) ecartMax = Math.Max(ecartMax, e[i].T - e[i - 1].T);
+        var voulu = -Math.Clamp(ecartMax + MargeDAffichage, RetardMinimalDAttente, RetardMaximalDAttente);
+        coureur.Decalage = coureur.Decalage is { } d ? d + Math.Clamp(voulu - d, -4.0, 0.25) : voulu;
+    }
+
+    internal const double RetardMinimalDAttente = 6;
+    internal const double RetardMaximalDAttente = 30;
+
     internal const double FenetreDesEcarts = 120;
     internal const double MargeDAffichage = 2;
 
@@ -404,7 +423,8 @@ public sealed class ClientDeSalle : IDisposable
                 {
                     echantillons.Add((t, (byte[])coureur.Piste.Clone()));
                     if (echantillons.Count > 24) echantillons.RemoveAt(0);
-                    NoterLEcart(coureur, t, HorlogeEnImages());
+                    if (image > 0) NoterLEcart(coureur, t, HorlogeEnImages());
+                    else NoterLAttente(coureur);
                 }
             }
         }
