@@ -48,6 +48,8 @@ public sealed class FantomesDuSpeedrun
         new("megadrive", "sonic-the-hedgehog", "genesis_plus_gx", "genesis_plus_gx_ghosts", "f9394e97", true),
         // Mega Man 2 (USA) : les huit stages des Robot Masters (etat d'entree, READY) ; profil en fichier (a9bd44bc.ini).
         new("nes", "mega-man-2", "fceumm", "fceumm_ghosts", "a9bd44bc", true),
+        // Super Mario Bros. 3 (USA) (Rev 1) : le monde 1 (etat d'entree de chaque niveau) ; profil compile dans le coeur 0.7.
+        new("nes", "super-mario-bros-3", "fceumm", "fceumm_ghosts", "0b742b33", true),
     ];
 
     private static Hote? HoteDe(Reglement r) => Hotes.FirstOrDefault(h => h.Systeme == r.SystemId && h.Groupe == r.RomGroup && r.Coeurs.Contains(h.Origine)
