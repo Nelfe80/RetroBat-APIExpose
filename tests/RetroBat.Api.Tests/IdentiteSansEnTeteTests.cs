@@ -135,6 +135,9 @@ public sealed class IdentiteSansEnTeteTests : IDisposable
         // Le crc du contenu (MASS RUN, coeur hote des fantomes) : celui du fichier, pas de l'archive.
         var nu = Ecrire("nu.nes", Nes2);
         Assert.Equal(JeuxMassRun.ContenuDe(nu), JeuxMassRun.ContenuDe(septZip));
+        // La ROM n'est pas gardee ouverte : le joueur peut la deplacer ou la supprimer (SharpCompress ne la refermait pas).
+        File.Delete(septZip);
+        Assert.False(File.Exists(septZip));
     }
 
     [Fact]

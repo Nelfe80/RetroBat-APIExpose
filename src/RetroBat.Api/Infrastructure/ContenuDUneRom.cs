@@ -70,21 +70,28 @@ public sealed class ContenuDUneRom : IDisposable
 
         if (string.Equals(info.Extension, ".7z", StringComparison.OrdinalIgnoreCase))
         {
-            var archive = SevenZipArchive.OpenArchive(info.FullName);
+            // SharpCompress ne referme pas le fichier qu'il ouvre de lui-meme : la ROM restait verrouillee tant que l'API
+            // tournait. Le flux s'ouvre ici, et se referme avec l'archive.
+            var fichier = new FileStream(info.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            SharpCompress.Archives.IArchive? archive = null;
             try
             {
+                archive = SevenZipArchive.OpenArchive(fichier);
                 var fichiers = archive.Entries.Where(entree => !entree.IsDirectory && entree.Size > 0).ToList();
                 if (fichiers.Count != 1 || fichiers[0].Size > plafond)
                 {
                     archive.Dispose();
+                    fichier.Dispose();
                     return null;
                 }
                 var crc = fichiers[0].Crc is long c and >= 0 and <= uint.MaxValue ? (uint?)c : null;
-                return new ContenuDUneRom(fichiers[0].OpenEntryStream(), fichiers[0].Size, crc == 0 ? null : crc, archive);
+                return new ContenuDUneRom(fichiers[0].OpenEntryStream(), fichiers[0].Size, crc == 0 ? null : crc,
+                    new Fermetures(archive, fichier));
             }
             catch
             {
-                archive.Dispose();
+                archive?.Dispose();
+                fichier.Dispose();
                 throw;
             }
         }
@@ -103,5 +110,15 @@ public sealed class ContenuDUneRom : IDisposable
     {
         Flux.Dispose();
         _archive?.Dispose();
+    }
+
+    /// <summary>L'archive puis son fichier, dans cet ordre.</summary>
+    private sealed class Fermetures(IDisposable archive, IDisposable fichier) : IDisposable
+    {
+        public void Dispose()
+        {
+            archive.Dispose();
+            fichier.Dispose();
+        }
     }
 }
