@@ -491,9 +491,17 @@ public class CommandsController : ControllerBase
             retroAchievements == false ? "-retroachievements 0" : string.Empty,
         }.Concat(ajouts).Concat(new[]
         {
-            "-rom", '"' + romPath.Replace("\"", "") + '"',
+            "-rom", '"' + CheminWindows(romPath).Replace("\"", "") + '"',
         }).Where(x => x.Length > 0));
     }
+
+    /// <summary>
+    /// Le chemin de la ROM avec des separateurs Windows. ES donne ses chemins avec « / » (game-selected) ; FBNeo cherche le
+    /// dossier du jeu apres le dernier « \ » : avec « / » il ne trouve ni le zip ni son parent et affiche « romset missing
+    /// files » (09/11, CHALLENGE avec le Deck de Battle Garegga et Metal Slug 3). Pur.
+    /// </summary>
+    internal static string CheminWindows(string chemin)
+        => string.IsNullOrEmpty(chemin) ? chemin : chemin.Replace('/', '\\');
 }
 
 public class LaunchPayload
