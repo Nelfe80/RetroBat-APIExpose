@@ -119,6 +119,29 @@ public sealed class FilmsDesRencontresDirectTests
     }
 
     [Fact]
+    public async Task La_version_YouTube_prend_les_ecrans_du_film_et_le_direct_ceux_de_l_hote()
+    {
+        // Decision du user du 08/11 : la version YouTube en anglais et vue du vainqueur ; le direct garde l'ecran de l'hote.
+        var rendu = new Rendu();
+        var cartes = new MultiplayerCartesDuFilm(rendu.Dessiner);
+        var dossier = Dossier();
+        var depart = DateTime.UtcNow.AddSeconds(-90);
+        var lancementDuFilm = Lancement(Room, depart) with { Legende = "RANKED MATCH" };
+        cartes.NoterLeLancement(Room, Contenu(Lancement(Room, depart)), Contenu(lancementDuFilm));
+        var finDuFilm = Fin(Room) with { Titre = "VICTORY!" };
+        cartes.AttendreLaFinPourLeDirect(Room, Path.Combine(dossier, "direct-fin.png"));
+        cartes.NoterLaFin(Room, Contenu(fin: Fin(Room) with { Titre = "DEFAITE" }), Contenu(fin: finDuFilm));
+        await Task.Delay(300);
+        var (avant, apres) = await cartes.RendreLesCartesDeLaVersionAsync(Room, Path.Combine(dossier, "vs.png"),
+            Path.Combine(dossier, "fin.png"), TimeSpan.FromSeconds(2), CancellationToken.None);
+        Assert.NotNull(avant);
+        Assert.NotNull(apres);
+        Assert.Contains(rendu.Dessins, d => d.Contenu.Fin?.Titre == "DEFAITE");
+        Assert.Contains(rendu.Dessins, d => d.Contenu.Fin?.Titre == "VICTORY!");
+        Assert.Contains(rendu.Dessins, d => d.Contenu.Lancement?.Legende == "RANKED MATCH");
+    }
+
+    [Fact]
     public async Task Sans_ecran_de_fin_le_film_finit_sur_le_jeu()
     {
         var cartes = new MultiplayerCartesDuFilm(new Rendu().Dessiner);

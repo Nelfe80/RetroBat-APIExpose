@@ -36,7 +36,8 @@ public sealed class MultiplayerCartesDuFilm
     private readonly ILogger? _journal;
     private (string Room, C Contenu)? _lancement;
     private (string Room, C Contenu)? _depart;
-    private (string Room, C Contenu)? _fin;
+    // Contenu : l'ecran tel que l'hote le montre (le direct) ; Film : en anglais et vu du vainqueur (la version YouTube).
+    private (string Room, C Contenu, C Film)? _fin;
     private (string Room, string Chemin, bool Rendue)? _finDuDirect;
     private TaskCompletionSource _finNotee = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -57,7 +58,7 @@ public sealed class MultiplayerCartesDuFilm
     /// L'ecran de lancement de cette gameroom, tel qu'il parait (le panneau le recompose toutes les demi-secondes). Celui du
     /// depart donne (<c>DepartUtc</c>) se garde a part : c'est la carte VS du film.
     /// </summary>
-    public void NoterLeLancement(string room, C contenu)
+    public void NoterLeLancement(string room, C contenu, C? film = null)
     {
         if (string.IsNullOrWhiteSpace(room) || contenu.Lancement is null) return;
         lock (_verrou)
@@ -70,7 +71,7 @@ public sealed class MultiplayerCartesDuFilm
                 _finNotee = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             }
             _lancement = (room, contenu);
-            if (contenu.Lancement.DepartUtc is not null) _depart = (room, contenu);
+            if (contenu.Lancement.DepartUtc is not null) _depart = (room, film is { Lancement: not null } ? film : contenu);
         }
     }
 
@@ -78,14 +79,14 @@ public sealed class MultiplayerCartesDuFilm
     /// L'ecran de fin de cette gameroom, tel qu'il parait (le resultat se recompose quand les cotes arrivent : le dernier
     /// compte). Le direct qui l'attend le recoit aussitot.
     /// </summary>
-    public void NoterLaFin(string room, C contenu)
+    public void NoterLaFin(string room, C contenu, C? film = null)
     {
         if (string.IsNullOrWhiteSpace(room) || contenu.Fin is null) return;
         string? chemin = null;
         lock (_verrou)
         {
             var premiere = _fin is not { } deja || deja.Room != room;
-            _fin = (room, contenu);
+            _fin = (room, contenu, film is { Fin: not null } ? film : contenu);
             if (premiere) _finNotee.TrySetResult();
             if (_finDuDirect is { Rendue: false } direct && direct.Room == room)
             {
@@ -160,7 +161,7 @@ public sealed class MultiplayerCartesDuFilm
             catch (TimeoutException) { /* pas d'ecran de fin : le film finit sur le jeu */ }
         }
         C? fin;
-        lock (_verrou) fin = _fin is { } f && f.Room == room ? f.Contenu : null;
+        lock (_verrou) fin = _fin is { } f && f.Room == room ? f.Film : null;
         var ecranDeFin = fin is not null && Rendre(PourLeFilm(fin), TempsDeLaFin, apres, "ecran de fin du film") ? apres : null;
         return (vs, ecranDeFin);
     }

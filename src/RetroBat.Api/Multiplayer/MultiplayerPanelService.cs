@@ -794,7 +794,7 @@ public sealed partial class MultiplayerPanelService
             // avant que RetroArch ait fini de sortir ; il prend la manette une fois l'emulateur parti, sinon le « valider »
             // du bouton OK irait aussi a ES, qui lancerait le jeu selectionne.
             var resultat = Composer();
-            _cartesDuFilm?.NoterLaFin(room, resultat);
+            _cartesDuFilm?.NoterLaFin(room, resultat, _cartesDuFilm is null ? null : ComposerLaFinDuFilm());
             _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal), resultat);
             try
             {
@@ -1305,7 +1305,7 @@ public sealed partial class MultiplayerPanelService
         // Le resultat se recompose quand les cotes arrivent : la carte de fin du film prend le dernier.
         if (roomDuResultat is { Length: > 0 })
         {
-            _cartesDuFilm?.NoterLaFin(roomDuResultat, contenu);
+            _cartesDuFilm?.NoterLaFin(roomDuResultat, contenu, _cartesDuFilm is null ? null : ComposerLaFinDuFilm());
         }
 
         _overlay.MontrerMultiplayer(contenu);
@@ -1839,8 +1839,12 @@ public sealed partial class MultiplayerPanelService
         IReadOnlyList<MultiplayerRang>? rangs = null, MultiplayerFinDeMission? mission = null)
     {
         var jeu = _jeu?.Game;
-        var maPlace = finie?.Players.FirstOrDefault(j => j.You)?.Seat;
         var nul = gagnante == MultiplayerResultats.MatchNul;
+        // La version du film se lit du point de vue du vainqueur (le rang 1, sinon la place gagnante) ; sans vainqueur, d'aucune
+        // place : le titre du resultat.
+        var maPlace = _vuDuVainqueur
+            ? (nul ? null : rangs?.FirstOrDefault(r => r.Rank == 1)?.Seat ?? gagnante)
+            : finie?.Players.FirstOrDefault(j => j.You)?.Seat;
         var monRang = rangs?.FirstOrDefault(r => r.Seat == maPlace);
         // A plusieurs (CDC Classements v1.0 §7) : VICTOIRE au rang 1, sinon le rang de cette borne (« 3E PLACE »).
         var mot = titreImpose
@@ -2363,8 +2367,40 @@ public sealed partial class MultiplayerPanelService
         return Couleurs[(int)((uint)somme % (uint)Couleurs.Length)];
     }
 
+    /// <summary>
+    /// LA VERSION DU FILM (decision du user du 08/11) : les cartes de la version YouTube d'une rencontre sont en anglais et
+    /// vues du vainqueur (« VICTORY! » pour le gagnant), quel que soit l'hote ; le direct garde l'ecran de l'hote. Le temps
+    /// d'une composition, sur ce fil seulement.
+    /// </summary>
+    [ThreadStatic] private static string? _langueImposee;
+    [ThreadStatic] private static bool _vuDuVainqueur;
+
+    /// <summary>Compose sur ce fil en anglais, et vu du vainqueur si demande ; l'etat d'avant revient ensuite.</summary>
+    internal static TR PourLeFilm<TR>(Func<TR> composer, bool vuDuVainqueur)
+    {
+        var (langue, vu) = (_langueImposee, _vuDuVainqueur);
+        _langueImposee = "en";
+        _vuDuVainqueur = vuDuVainqueur;
+        try
+        {
+            return composer();
+        }
+        finally
+        {
+            (_langueImposee, _vuDuVainqueur) = (langue, vu);
+        }
+    }
+
+    /// <summary>L'ecran de fin de la rencontre, version du film : en anglais, vu du vainqueur.</summary>
+    internal LeaderboardOverlayService.ContenuMultiplayer ComposerLaFinDuFilm() => PourLeFilm(Composer, vuDuVainqueur: true);
+
     private string Langue()
     {
+        if (_langueImposee is { Length: > 0 } imposee)
+        {
+            return imposee;
+        }
+
         if (_langue.Length > 0)
         {
             return _langue;

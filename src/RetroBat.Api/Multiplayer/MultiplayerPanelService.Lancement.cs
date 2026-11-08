@@ -292,8 +292,16 @@ public sealed partial class MultiplayerPanelService
         if (ComposerLEcranDeLancement() is { } ecran)
         {
             var contenu = ContenuDuLancement(ecran);
-            // La carte VS du film de la rencontre (lot M4, 08/11) : l'ecran tel qu'il parait, celui du depart a part.
-            _cartesDuFilm?.NoterLeLancement(ecran.Cle, contenu);
+            // La carte VS du film de la rencontre (lot M4, 08/11) : l'ecran tel qu'il parait, celui du depart a part. La version
+            // du film est en anglais (decision du user du 08/11), composee seulement au depart pose (une fois).
+            LeaderboardOverlayService.ContenuMultiplayer? film = null;
+            if (_cartesDuFilm is not null && ecran.DepartUtc is not null
+                && PourLeFilm(ComposerLEcranDeLancement, vuDuVainqueur: false) is { } ecranDuFilm)
+            {
+                film = ContenuDuLancement(ecranDuFilm);
+            }
+
+            _cartesDuFilm?.NoterLeLancement(ecran.Cle, contenu, film);
             _overlay.MontrerMultiplayer(contenu);
         }
     }
