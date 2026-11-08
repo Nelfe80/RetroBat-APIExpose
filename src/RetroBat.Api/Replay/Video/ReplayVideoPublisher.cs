@@ -441,7 +441,7 @@ public sealed class ReplayVideoPublisher
         FilmIncomplet,
         // (08/11) le film d'une rencontre MULTIPLAYER que le site ne prendra jamais.
         "pas_l_hote", "sans_vrai_depart", "un_seul_humain", "partie_libre", "rencontre_annulee", "rencontre_inconnue",
-        "portion_decalee", "portion_inconnue", "trop_court", "trop_long",
+        "portion_decalee", "portion_inconnue", "trop_court", "trop_long", "joueur_retire", "pas_une_rencontre",
     };
 
     /// <summary>Le refus du site pour un film d'epreuve plus court que son run (08/11).</summary>
