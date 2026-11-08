@@ -363,6 +363,9 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.
 // Le lancement avec le PlayerDeck (H-D15 a H-D20) : decor nelfeplay-deck, choix en jeu retenu par joueur, jeu et mode.
 builder.Services.AddSingleton<RetroBat.Api.Deck.DeckLaunchService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>());
+// Le rang en direct du PlayerDeck (H-D21) : classement lu au lancement, rang recalcule en local a chaque valeur.
+builder.Services.AddSingleton<RetroBat.Api.Deck.DeckRankService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckRankService>());
 // Les fondations du reseau (CDC infra §15) : la carte signee (cles de verdict, relais) et les relais, par ou
 // passent les requetes de la borne quand elle ne joint pas le central.
 builder.Services.AddSingleton<RetroBat.Api.Reseau.ServiceDeCarte>();
@@ -770,6 +773,9 @@ var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
     // Le Deck dans une room MULTIPLAYER (H-D17) : son decor remplace les panneaux des joueurs pour le joueur local.
     app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerLaunchService>().Deck =
         app.Services.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>();
+    // Le rang en direct (H-D21) s'arme a chaque lancement avec Deck ; il se pose aussi dans l'instantane du Deck.
+    app.Services.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>().Rang =
+        app.Services.GetRequiredService<RetroBat.Api.Deck.DeckRankService>();
 }
 eventBus.Subscribe<EventEnvelope>(evt => 
 {

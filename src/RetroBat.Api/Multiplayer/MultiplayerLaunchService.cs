@@ -1092,7 +1092,8 @@ public sealed class MultiplayerLaunchService : IHostedService
             return null;
         }
 
-        var deck = Deck.Preparer(RetroBat.Api.Deck.DeckModes.Multiplayer, systeme, jeu.Path);
+        // Le rang en direct se classe au 1CC MULTI du jeu (s'il en a un), avec le score de la place du joueur local
+        var deck = Deck.Preparer(RetroBat.Api.Deck.DeckModes.Multiplayer, systeme, jeu.Path, place: place);
         if (deck.Status != "posed") return null;
         _journal.LogInformation("MULTIPLAYER : le Deck {Deck} remplace les panneaux en jeu", deck.DeckId);
         return RetroBat.Api.Deck.DeckDecor.Nom;

@@ -68,6 +68,9 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
 
     public DeckChoix Choix { get; }
 
+    /// <summary>Le rang en direct (H-D21), arme a chaque lancement avec Deck ; pose par Program.cs.</summary>
+    public DeckRankService? Rang { get; set; }
+
     // Coutures pour les essais (sans exe, sans ecran, sans processus)
     internal Func<DeckCatalogue>? Catalogue { get; set; }
     internal Func<DeckCatalogue.Entree, int, int, DeckRendu?>? Rendeur { get; set; }
@@ -125,9 +128,28 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     /// <summary>
     /// Avant le lanceur : le Deck de ce lancement, son decor pose et les arguments a ajouter. Jamais bloquant : sans Deck,
     /// sans exe, sur un echec, le lancement part comme avant (arguments vides). <paramref name="romGroup"/> : le rom_group
-    /// s'il est deja connu (reglement d'un defi), sinon resolu par le referentiel.
+    /// s'il est deja connu (reglement d'un defi), sinon resolu par le referentiel. <paramref name="classement"/> : le
+    /// classement du rang en direct (regle de l'onglet, epreuve) ; null : celui du mode par defaut. <paramref name="place"/> :
+    /// la place du joueur local (MULTIPLAYER), dont le score se classe.
     /// </summary>
-    public DeckLancement Preparer(string mode, string systeme, string cheminRom, string? romGroup = null)
+    public DeckLancement Preparer(string mode, string systeme, string cheminRom, string? romGroup = null, DeckRankBoard? classement = null, int place = 1)
+    {
+        var lancement = PreparerLeDeck(mode, systeme, cheminRom, romGroup, classement);
+        if (place != 1) lancement = lancement with { Seat = place };
+        // Le rang en direct se prepare avec le lancement (lecture du classement en fond, jamais bloquante)
+        try
+        {
+            Rang?.Armer(lancement);
+        }
+        catch (Exception ex)
+        {
+            _journal?.LogInformation(ex, "PlayerDeck : rang en direct non prepare.");
+        }
+
+        return lancement;
+    }
+
+    private DeckLancement PreparerLeDeck(string mode, string systeme, string cheminRom, string? romGroup, DeckRankBoard? classement)
     {
         var rom = Path.GetFileNameWithoutExtension(cheminRom ?? string.Empty).Trim().ToLowerInvariant();
         var joueur = Joueur();
@@ -148,7 +170,10 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
 
             var choix = installes.Select(e => e.Id).Append(DeckChoix.Off).ToList();
             var decision = Choix.Resoudre(joueur, jeu, mode, installes);
-            var lancement = new DeckLancement(mode, systeme, rom, groupe, jeu, joueur, cheminRom!, "off", null, null, null, decision.Source, choix, null, null, DateTime.UtcNow);
+            var lancement = new DeckLancement(mode, systeme, rom, groupe, jeu, joueur, cheminRom!, "off", null, null, null, decision.Source, choix, null, null, DateTime.UtcNow)
+            {
+                Board = classement,
+            };
             if (decision.DeckId is null || catalogue.Trouver(decision.DeckId) is not { } entree)
             {
                 _journal?.LogInformation("PlayerDeck : {Jeu} ({Mode}) lance sans Deck ({Source}).", jeu, mode, decision.Source);
@@ -211,25 +236,19 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     private string Joueur()
         => _contexte.SessionPseudo is { Length: > 0 } s ? s : _contexte.PlayerPseudo is { Length: > 0 } p ? p : "local";
 
-    /// <summary>Le jeu = systeme + jeu (« arcade/19xx »), par le referentiel ; sinon le systeme du lanceur et la ROM.</summary>
+    /// <summary>
+    /// Le jeu = systeme + rom_group des classements (« arcade/metal-slug-3 ») : le .MEM qui connait ce dump d'abord, le nom du
+    /// fichier en repli (<see cref="DeckIdentite"/>). Couture des essais : <see cref="Identite"/>.
+    /// </summary>
     private (string Jeu, string? Groupe) CleDuJeu(string systeme, string chemin, string? romGroup)
     {
-        try
-        {
-            if (_canonique?.ResolveByRomName(systeme, chemin) is { GameKey: { Length: > 0 } cle } fiche)
-            {
-                var barre = cle.IndexOf('/');
-                return (cle.ToLowerInvariant(), barre >= 0 ? cle[(barre + 1)..] : romGroup);
-            }
-        }
-        catch (Exception ex)
-        {
-            _journal?.LogDebug(ex, "PlayerDeck : rom_group non resolu pour {Chemin}.", chemin);
-        }
-
-        var groupe = romGroup is { Length: > 0 } g ? g : GamelistIdentity.Slugifier(Path.GetFileNameWithoutExtension(chemin));
-        return ((RomCanonicalResolver.CanonicalScoringSystem(systeme) + "/" + groupe).ToLowerInvariant(), groupe);
+        var cle = Identite?.Invoke(systeme, chemin, romGroup) ?? DeckIdentite.Resoudre(_canonique, systeme, chemin, romGroup);
+        _journal?.LogDebug("PlayerDeck : {Chemin} = {Jeu} ({Source}).", chemin, cle.Jeu, cle.Source);
+        return (cle.Jeu, cle.Groupe);
     }
+
+    /// <summary>Couture des essais : l'identite du jeu sans referentiel.</summary>
+    internal Func<string, string, string?, DeckIdentite.Cle>? Identite { get; set; }
 
     private static (int, int) EcranPrincipal()
     {
@@ -505,6 +524,12 @@ public sealed record DeckLancement(
     /// <summary>Les arguments a ajouter a la ligne du lanceur (vides sans decor pose).</summary>
     [JsonIgnore]
     public IReadOnlyList<string> Arguments { get; init; } = [];
+
+    /// <summary>Le classement du rang en direct demande par le bouton (null : celui du mode, choisi par le rang).</summary>
+    public DeckRankBoard? Board { get; init; }
+
+    /// <summary>La place du joueur local (1 ; en MULTIPLAYER, sa place dans la room) : son score se classe.</summary>
+    public int Seat { get; init; } = 1;
 }
 
 /// <summary>

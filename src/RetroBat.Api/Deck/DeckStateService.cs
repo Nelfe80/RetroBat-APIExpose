@@ -26,7 +26,8 @@ namespace RetroBat.Api.Deck;
 /// - les cadres demandes par un theme du Deck (pour information : le cadre s'impose par le decor du lancement,
 ///   <see cref="DeckLaunchService"/>, H-D15 ; la voie A, un fichier ajoute par le lanceur, est abandonnee) ;
 /// - le Deck du lancement en cours (champ <c>Deck</c> de <c>deck.game</c>) ;
-/// - le sens des signaux du .MEM, lu dans son compagnon .SMEM (<c>deck.semantics</c>, voir <see cref="Smem"/>).
+/// - le sens des signaux du .MEM, lu dans son compagnon .SMEM (<c>deck.semantics</c>, voir <see cref="Smem"/>) ;
+/// - le rang en direct de la partie (<c>deck.rank</c>, tenu par <see cref="DeckRankService"/>).
 ///
 /// <c>deck.snapshot</c> reunit tout, envoye a la connexion (<c>/ws</c> et <c>/ws/deck</c>) et sur demande
 /// (message <c>deck.snapshot.request</c>, ou <c>GET /api/v1/deck/snapshot</c>). L'API lit la manette ; le Deck jamais
@@ -59,6 +60,15 @@ public sealed class DeckStateService : IHostedService, IDisposable
 
     /// <summary>Les messages du choix du Deck en jeu (deck.choice.*), traites par <see cref="DeckLaunchService"/>.</summary>
     public Func<string, JsonElement, string?>? CommandesDuChoix { get; set; }
+
+    /// <summary>Le rang en direct de la partie (<see cref="DeckRankService"/>, H-D21), repris dans l'instantane.</summary>
+    public Func<DeckRank?>? Rang { get; set; }
+
+    /// <summary>L'identifiant du lancement en cours ; null hors d'une partie.</summary>
+    public string? LaunchIdCourant
+    {
+        get { lock (_verrou) return _partie is { } p && p.Etat != "ended" ? p.LaunchId : null; }
+    }
 
     /// <summary>Le Deck du prochain lancement, prepare avant le lanceur ; rattache a la partie a son depart.</summary>
     private DeckLancement? _lancementPrepare;
@@ -431,15 +441,15 @@ public sealed class DeckStateService : IHostedService, IDisposable
         if (_canonique is null) return;
         try
         {
-            var fiche = _canonique.ResolveByRomName(partie.SystemId, partie.GamePath);
-            if (fiche?.GameKey is { Length: > 0 } cle)
+            // La cle des classements (le .MEM d'abord) : la fiche par nom de fichier se trompe en arcade (DeckIdentite)
+            var cle = DeckIdentite.Resoudre(_canonique, partie.SystemId, partie.GamePath, partie.Deck?.RomGroup);
+            if (cle.Source != "file")
             {
-                var barre = cle.IndexOf('/');
                 lock (_verrou)
                 {
-                    partie.RomGroup = barre >= 0 ? cle[(barre + 1)..] : cle;
-                    partie.RomGroupSource = "catalog";
-                    if (!string.IsNullOrWhiteSpace(fiche.CanonicalSystem)) partie.CanonicalSystem = fiche.CanonicalSystem;
+                    partie.RomGroup = cle.Groupe;
+                    partie.RomGroupSource = cle.Source;
+                    if (!string.IsNullOrWhiteSpace(cle.SystemeCanonique)) partie.CanonicalSystem = cle.SystemeCanonique;
                     _revision++;
                 }
             }
@@ -745,7 +755,8 @@ public sealed class DeckStateService : IHostedService, IDisposable
                 Controls: partie?.Etat == "ended" ? null : partie?.Controls,
                 Frame: partie?.Etat == "ended" ? null : partie?.Cadre,
                 FramePlans: Cadres.Tous(),
-                Semantics: partie?.Etat == "ended" ? null : partie?.Semantique);
+                Semantics: partie?.Etat == "ended" ? null : partie?.Semantique,
+                Rank: partie?.Etat == "ended" ? null : Rang?.Invoke());
         }
     }
 
@@ -1016,4 +1027,5 @@ public sealed record DeckSnapshot(
     DeckControlsPayload? Controls,
     DeckFramePayload? Frame,
     IReadOnlyList<DeckFramePlan> FramePlans,
-    DeckSemantics? Semantics = null);
+    DeckSemantics? Semantics = null,
+    DeckRank? Rank = null);

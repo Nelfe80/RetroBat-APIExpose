@@ -1599,6 +1599,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             ? ModeCourant()
             : ModeDuDefiPour(false, reglages.ChallengeShareLive, reglages.ChallengeJoinPolicy ?? "none", _reglesDuJeu.Contains("1cc-multi"));
         _logger.LogInformation("Classement : defi {Mode} ({Libelle}).", mode, LibelleDuMode(mode, _reglesDuJeu));
+        // Le rang en direct du Deck (H-D21) se classe dans le classement de l'onglet regarde a l'appui (1LC, un mode...),
+        // sinon la regle principale ; jamais un 1CC MULTI pour un defi seul.
+        var classementDuRang = ClassementDuRang();
         _ = Task.Run(async () =>
         {
             try
@@ -1616,7 +1619,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 }
                 // LE PLAYERDECK (H-D15, H-D20) : un jeu dont le Deck est retenu part par l'API, avec son decor. L'API d'ES ne
                 // prend qu'un chemin de ROM, aucune option : seul un lancement direct porte « -bezel nelfeplay-deck -ratio custom ».
-                if (mode == ModeDuDefi.Prive && await LancerAvecLeDeckAsync(chemin).ConfigureAwait(false))
+                if (mode == ModeDuDefi.Prive && await LancerAvecLeDeckAsync(chemin, classementDuRang).ConfigureAwait(false))
                 {
                     await AttendreLeJeuPuisSEffacerAsync("defi avec le Deck").ConfigureAwait(false);
                     return;
@@ -1657,14 +1660,14 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// Le decor et le cadre sont des reglages d'affichage : ni l'empreinte des options du coeur, ni le .MEM, ni le coeur,
     /// ni le contenu ne changent ; le prevol et le passeport sont les memes.
     /// </summary>
-    private async Task<bool> LancerAvecLeDeckAsync(string chemin)
+    private async Task<bool> LancerAvecLeDeckAsync(string chemin, Deck.DeckRankBoard? classementDuRang)
     {
         if (_deck is null) return false;
         try
         {
             var resolution = await _hote.ResoudreLancementAsync(chemin).ConfigureAwait(false);
             if (resolution is null) return false;
-            var deck = _deck.Preparer(Deck.DeckModes.WorldScoring, resolution.Systeme, chemin);
+            var deck = _deck.Preparer(Deck.DeckModes.WorldScoring, resolution.Systeme, chemin, classement: classementDuRang);
             if (deck.Status != "posed" || deck.Arguments.Count == 0) return false;
 
             var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
@@ -1691,6 +1694,14 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             _logger.LogWarning(ex, "Classement : defi avec le Deck non lance, il part par ES.");
             return false;
         }
+    }
+
+    /// <summary>Le classement du rang en direct : la regle de l'onglet regarde (hors 1CC MULTI), sinon la regle principale.</summary>
+    private Deck.DeckRankBoard? ClassementDuRang()
+    {
+        if (_romGroup.Length == 0) return null;
+        var regle = RegleDeLaVue(_modele.VueCourante) is { } r && FamilleEtMode(r).Famille != "1cc-multi" ? r : _reglePrincipale;
+        return Deck.DeckRankBoard.DuJeu(_romGroup, regle, _reglesDuJeu);
     }
 
     /// <summary>Les fonctions du frontend qui feraient refuser le score, coupees pour ce lancement (meme liste que les reglages certifies).</summary>

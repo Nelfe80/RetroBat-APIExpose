@@ -1,7 +1,7 @@
 asyncapi: 3.0.0
 info:
   title: APIExpose Real-time Events
-  version: 1.6.0
+  version: 1.7.0
   description: |
     WebSocket event surface of the APIExpose plugin for RetroBat / EmulationStation.
     Local only (127.0.0.1). Connect to `/ws` for the unfiltered firehose or to
@@ -234,13 +234,15 @@ channels:
       player), `Signals` (last value of every .MEM signal seen this game, one entry
       per channel/name/address/player), `HeldInputs` (panel inputs currently held),
       `Controls` (as deck.controls), `Frame` (as deck.frame), `FramePlans`,
-      `Semantics` (as deck.semantics, or null). Events that follow carry a higher
-      `Revision`.
+      `Semantics` (as deck.semantics, or null), `Rank` (as deck.rank, or null).
+      Events that follow carry a higher `Revision`.
 
 
       `deck.game`: the launched game, from the game-start hook on, before any .MEM
       signal. `State` = launching | running | ended. `SystemId`, `CanonicalSystem`,
-      `Rom`, `RomGroup` (+ `RomGroupSource`: catalog | file), `Name`, `Core`,
+      `Rom`, `RomGroup` (+ `RomGroupSource`: mem-score | mem-definition | caller |
+      catalog | file: the .MEM that knows this dump first, the file name last),
+      `Name`, `Core`,
       `Video` once RetroArch logged the core geometry (`BaseWidth`/`BaseHeight` =
       unrotated buffer, `Rotation` in quarter turns, `Width`/`Height` = displayed
       image, `Aspect` given by the core, `Fps`, `Orientation`), `Orientation`,
@@ -262,7 +264,38 @@ channels:
       (system/rom_group), `Player`, `Decor` (`Screen`, `Hole` = where the game is
       drawn in screen pixels, `LauncherViewport` = the custom_viewport the RetroBat
       launcher derives from the .info, equal to `Hole`, `Png`, `Cached`,
-      `RenderMs`). Display only: the certified fingerprint does not change.
+      `RenderMs`), `Board` (the leaderboard of the live rank asked by the button:
+      `Board` = scores | challenges, `RomGroup`, `Ruleset`, `Key` = score | time,
+      `LowerIsBetter`, `Place`, `FrameRate`, `Label`; null = the default of the mode),
+      `Seat` (the local player's place, 1 outside MULTIPLAYER). Display only: the
+      certified fingerprint does not change.
+
+
+      `deck.rank` (CDC PlayerDeck H-D21): the place the running game would take in the
+      NelfePlay leaderboard of the game and mode played, always PROVISIONAL
+      (`Provisional` = true: only the certified score enters the leaderboard). The
+      leaderboard is read once at launch (scores board of the game rule, or board of
+      the challenge, through the same clients and caches as the ES panels); the rank is
+      then recomputed locally on every ranked value (score.live of `Place`, or the
+      official time of a finished challenge attempt), with no network call during the
+      game, and published on change. Same rule as the site: one line per account and
+      per world, `Rank` = 1 + lines strictly better (the player's own line included),
+      so a tie shares the rank. `Mode` (deck mode), `Game`, `Player`, `Board`,
+      `Ruleset`, `Label` (1CC, 1LC, 1CC MULTI, SPEEDRUN...), `Key` = score | time,
+      `Better` = higher | lower, `State` = loading | ranked | first_score (empty
+      leaderboard) | racing (time key, attempt running: `Target` and `PersonalBest`,
+      no rank until the finish) | offline (nothing known, no rank) | no_board (no
+      leaderboard for this game and mode) | ended, `Source` = fresh | stale (last known
+      copy, the site did not answer) | offline | none, `BoardReadAtUtc`, `Rows`,
+      `World` (home | station | stream), `Value` (+ `ValueText` for a time), `Rank`,
+      `RankAtLeast` (beyond the lines read), `Of` (lines including this game,
+      `OfAtLeast` when the list is truncated), `Tied`, `Above` (the line just above:
+      `Rank`, `Player`, `Value`, `World`, `IsMe`, `Text`), `Gap` (to equal it, always
+      positive; `GapText` for a time), `Target` (time key: the line just above the
+      personal best, else the 10th place), `PersonalBest`, `NewPersonalBest`,
+      `Final` (rank fixed at the finish of a challenge attempt), `FrameRate`,
+      `Revision`. Reads a public leaderboard only: the certified fingerprint, the
+      preflight, the passport and the locks do not change.
 
 
       `deck.choice`: the player picked another Deck or Off in game (gamepad:
@@ -341,6 +374,8 @@ channels:
         $ref: '#/components/messages/deckLaunch'
       deckChoice:
         $ref: '#/components/messages/deckChoice'
+      deckRank:
+        $ref: '#/components/messages/deckRank'
       deckAck:
         $ref: '#/components/messages/deckAck'
       deckClientRequest:
@@ -445,8 +480,8 @@ components:
                 Name: nelfeplay-deck
                 Version: 1
                 Screen: { Width: 1920, Height: 1200 }
-                Hole: { X: 476, Y: 58, Width: 1444, Height: 1083 }
-                LauncherViewport: { X: 476, Y: 58, Width: 1444, Height: 1083 }
+                Hole: { X: 320, Y: 0, Width: 1600, Height: 1200 }
+                LauncherViewport: { X: 320, Y: 0, Width: 1600, Height: 1200 }
                 Png: 'E:\RetroBat\plugins\APIExpose\state\deck\decors\metal-slug-3-pixel-0123456789abcdef.png'
                 Cached: false
                 RenderMs: 160
@@ -535,6 +570,20 @@ components:
               Instruments:
                 - { Id: p1.bombs, Label: Bombs, Player: 1, Show: counter, Signals: [ players.1.resources.bombs ] }
                 - { Id: stage, Label: Stage, Player: null, Show: level, Signals: [ progress.stageId ] }
+    deckRank:
+      name: DeckRank
+      title: deck.rank (live provisional rank, H-D21)
+      payload:
+        $ref: '#/components/schemas/Envelope'
+      examples:
+        - name: 19xx-1cc-ranked
+          payload:
+            Type: deck.rank
+            Payload: { LaunchId: 5d1c, Mode: world-scoring, Game: arcade/19xx, Player: nelfe, Board: scores, Ruleset: 1cc, Label: 1CC, Key: score, Better: higher, Provisional: true, State: ranked, Source: fresh, BoardReadAtUtc: '2026-11-08T16:05:20Z', Rows: 37, World: home, Value: 2614300, ValueText: null, Rank: 12, RankAtLeast: false, Of: 38, OfAtLeast: false, Tied: false, Above: { Rank: 11, Player: ace, Value: 2690000, World: home, IsMe: false, Text: null }, Gap: 75700, GapText: null, Target: null, PersonalBest: { Rank: 15, Player: nelfe, Value: 2410800, World: home, IsMe: true, Text: null }, NewPersonalBest: true, Final: false, FrameRate: null, Revision: 88 }
+        - name: mslug3-speedrun-racing
+          payload:
+            Type: deck.rank
+            Payload: { LaunchId: 7a20, Mode: speedrun, Game: arcade/metal-slug-3, Player: nelfe, Board: challenges, Ruleset: mslug3-speedrun-m1, Label: SPEEDRUN, Key: time, Better: lower, Provisional: true, State: racing, Source: stale, Rows: 9, World: home, Rank: null, Target: { Rank: 4, Player: bob, Value: 21540, Text: '6:03.97' }, PersonalBest: { Rank: 6, Player: nelfe, Value: 22102, IsMe: true, Text: '6:13.47' }, Final: false, FrameRate: 59.18, Revision: 3 }
     deckAck:
       name: DeckAck
       title: deck.ack (reply to a client message, to that client only)

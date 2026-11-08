@@ -34,6 +34,12 @@ public sealed class ClassementsDesDefis
         lock (_connus) return regles.Where(_connus.ContainsKey).Distinct().ToDictionary(r => r, r => _connus[r].Classement);
     }
 
+    /// <summary>Le dernier classement connu d'une epreuve et l'heure de sa lecture (null : jamais lu).</summary>
+    public (ClassementDEpreuve? Classement, DateTime? Lu) Dernier(string regle)
+    {
+        lock (_connus) return _connus.TryGetValue(regle, out var c) ? (c.Classement, c.Lu) : (null, null);
+    }
+
     /// <summary><paramref name="forcer"/> : apres un verdict, le classement d'il y a moins d'une minute ne compte plus.</summary>
     public async Task<IReadOnlyDictionary<string, ClassementDEpreuve>> ChargerAsync(IReadOnlyCollection<string> regles, CancellationToken ct, bool forcer = false)
     {

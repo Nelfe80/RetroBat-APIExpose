@@ -56,6 +56,9 @@ public sealed class LeaderboardClient
     /// <summary>Profondeur du classement demande : de quoi tailler les vues locales.</summary>
     private const int Profondeur = 200;
 
+    /// <summary>Au-dela de ce nombre de lignes, le classement lu est tronque (le rang en direct le dit).</summary>
+    public const int ProfondeurDuClassement = Profondeur;
+
     /// <summary>Le client HTTP du classement, qui demande des reponses compressees (Program.cs).</summary>
     public const string HttpClientName = "nelfeplay-classement";
 
