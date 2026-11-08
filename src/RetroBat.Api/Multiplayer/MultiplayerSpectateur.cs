@@ -89,8 +89,10 @@ public static class MultiplayerSpectateur
     /// connecte et filme : les invites ne peuvent pas arriver avant lui, le vrai depart tombe dans son film. A verifier au banc
     /// (m6_spike\spectateur_banc.py --boucle) : le depart pret se recharge alors avec un spectateur connecte. Faux : l'ordre
     /// d'avant (spectateur lance apres l'arrivee des invites, sans film de la rencontre).
+    /// BANC DU 08/11 : NON, deux passages sur gba (spectateur deconnecte et desynchronise pendant les rechargements du depart
+    /// pret, film vide). Hors service tant qu'une autre facon de tenir le depart n'est pas trouvee.
     /// </summary>
-    public static bool AvantLesInvites { get; } = true;
+    public static bool AvantLesInvites { get; } = false;
 
     private static volatile bool _filme;
 

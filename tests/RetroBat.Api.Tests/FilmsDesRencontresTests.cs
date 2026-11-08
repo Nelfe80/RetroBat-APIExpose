@@ -188,8 +188,8 @@ public sealed class FilmsDesRencontresTests
         Assert.False(MultiplayerLaunchService.SpectateurAvantLesInvites(prevu: false, vueDuSpectateur: true, enService: true));
         Assert.False(MultiplayerLaunchService.SpectateurAvantLesInvites(prevu: true, vueDuSpectateur: false, enService: true));
         Assert.False(MultiplayerLaunchService.SpectateurAvantLesInvites(prevu: true, vueDuSpectateur: true, enService: false));
-        // L'interrupteur est en service : les consoles reliees ont leur film des la v1 (D-M9).
-        Assert.True(MultiplayerSpectateur.AvantLesInvites);
+        // Hors service depuis le banc du 08/11 (spectateur perdu pendant les rechargements du depart pret) : l'ordre d'avant.
+        Assert.False(MultiplayerSpectateur.AvantLesInvites);
     }
 
     [Fact]
