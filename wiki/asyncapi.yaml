@@ -240,7 +240,9 @@ channels:
 
       `deck.game`: the launched game, from the game-start hook on, before any .MEM
       signal. `State` = launching | running | ended. `SystemId`, `CanonicalSystem`,
-      `Rom`, `RomGroup` (+ `RomGroupSource`: catalog | file), `Name`, `Core`,
+      `Rom`, `RomGroup` (+ `RomGroupSource`: mem-score | mem-definition | caller |
+      catalog | file: the .MEM that knows this dump first, the file name last),
+      `Name`, `Core`,
       `Video` once RetroArch logged the core geometry (`BaseWidth`/`BaseHeight` =
       unrotated buffer, `Rotation` in quarter turns, `Width`/`Height` = displayed
       image, `Aspect` given by the core, `Fps`, `Orientation`), `Orientation`,

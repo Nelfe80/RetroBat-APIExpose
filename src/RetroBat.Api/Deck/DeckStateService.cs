@@ -441,15 +441,15 @@ public sealed class DeckStateService : IHostedService, IDisposable
         if (_canonique is null) return;
         try
         {
-            var fiche = _canonique.ResolveByRomName(partie.SystemId, partie.GamePath);
-            if (fiche?.GameKey is { Length: > 0 } cle)
+            // La cle des classements (le .MEM d'abord) : la fiche par nom de fichier se trompe en arcade (DeckIdentite)
+            var cle = DeckIdentite.Resoudre(_canonique, partie.SystemId, partie.GamePath, partie.Deck?.RomGroup);
+            if (cle.Source != "file")
             {
-                var barre = cle.IndexOf('/');
                 lock (_verrou)
                 {
-                    partie.RomGroup = barre >= 0 ? cle[(barre + 1)..] : cle;
-                    partie.RomGroupSource = "catalog";
-                    if (!string.IsNullOrWhiteSpace(fiche.CanonicalSystem)) partie.CanonicalSystem = fiche.CanonicalSystem;
+                    partie.RomGroup = cle.Groupe;
+                    partie.RomGroupSource = cle.Source;
+                    if (!string.IsNullOrWhiteSpace(cle.SystemeCanonique)) partie.CanonicalSystem = cle.SystemeCanonique;
                     _revision++;
                 }
             }

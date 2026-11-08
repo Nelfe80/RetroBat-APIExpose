@@ -236,25 +236,19 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     private string Joueur()
         => _contexte.SessionPseudo is { Length: > 0 } s ? s : _contexte.PlayerPseudo is { Length: > 0 } p ? p : "local";
 
-    /// <summary>Le jeu = systeme + jeu (« arcade/19xx »), par le referentiel ; sinon le systeme du lanceur et la ROM.</summary>
+    /// <summary>
+    /// Le jeu = systeme + rom_group des classements (« arcade/metal-slug-3 ») : le .MEM qui connait ce dump d'abord, le nom du
+    /// fichier en repli (<see cref="DeckIdentite"/>). Couture des essais : <see cref="Identite"/>.
+    /// </summary>
     private (string Jeu, string? Groupe) CleDuJeu(string systeme, string chemin, string? romGroup)
     {
-        try
-        {
-            if (_canonique?.ResolveByRomName(systeme, chemin) is { GameKey: { Length: > 0 } cle } fiche)
-            {
-                var barre = cle.IndexOf('/');
-                return (cle.ToLowerInvariant(), barre >= 0 ? cle[(barre + 1)..] : romGroup);
-            }
-        }
-        catch (Exception ex)
-        {
-            _journal?.LogDebug(ex, "PlayerDeck : rom_group non resolu pour {Chemin}.", chemin);
-        }
-
-        var groupe = romGroup is { Length: > 0 } g ? g : GamelistIdentity.Slugifier(Path.GetFileNameWithoutExtension(chemin));
-        return ((RomCanonicalResolver.CanonicalScoringSystem(systeme) + "/" + groupe).ToLowerInvariant(), groupe);
+        var cle = Identite?.Invoke(systeme, chemin, romGroup) ?? DeckIdentite.Resoudre(_canonique, systeme, chemin, romGroup);
+        _journal?.LogDebug("PlayerDeck : {Chemin} = {Jeu} ({Source}).", chemin, cle.Jeu, cle.Source);
+        return (cle.Jeu, cle.Groupe);
     }
+
+    /// <summary>Couture des essais : l'identite du jeu sans referentiel.</summary>
+    internal Func<string, string, string?, DeckIdentite.Cle>? Identite { get; set; }
 
     private static (int, int) EcranPrincipal()
     {
