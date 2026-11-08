@@ -398,7 +398,7 @@ public sealed class DeckPlayerDeckTests
         {
             Assert.Contains("address: /ws/" + flux + "\n", contrat.Replace("\r\n", "\n"));
         }
-        foreach (var message in new[] { "deck.snapshot", "deck.game", "deck.controls", "deck.frame", "deck.ack", "deck.snapshot.request", "deck.frame.request", "deck.frame.clear" })
+        foreach (var message in new[] { "deck.snapshot", "deck.game", "deck.controls", "deck.frame", "deck.ack", "deck.rank", "deck.snapshot.request", "deck.frame.request", "deck.frame.clear" })
         {
             Assert.Contains(message, contrat);
         }
