@@ -479,6 +479,8 @@ builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerSessionService
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>());
 // Le panneau MULTIPLAYER d'ES : la fenetre du classement, un autre contenu (lot M3).
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerToastOverlay>();
+// Les cartes du film d'une rencontre (lot M4, 08/11) : l'ecran de lancement VS et l'ecran de fin, rendus pour l'exe du direct.
+builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerCartesDuFilm>();
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerPanelService>();
 // Les jeux restes dans les paquets du gestionnaire de ROM, reconnus a leur contenu par la collection MULTIPLAYER (26/10).
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerContenusDesPaquets>();

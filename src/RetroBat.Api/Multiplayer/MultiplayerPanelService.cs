@@ -117,6 +117,9 @@ public sealed partial class MultiplayerPanelService
     public Func<bool>? RencontreClasseeEnCours { get; set; }
 
     private readonly IServiceProvider? _services;
+
+    /// <summary>Les cartes du film de la rencontre (lot M4, 08/11) : l'ecran de lancement et l'ecran de fin, notes tels qu'ils paraissent.</summary>
+    private readonly MultiplayerCartesDuFilm? _cartesDuFilm;
     private string _roomDuResultat = "";
     private int? _dureeDuResultat;
     private DateTime _resultatDepuis;
@@ -149,8 +152,10 @@ public sealed partial class MultiplayerPanelService
         RetroAchievementsService? retroAchievements = null,
         RetroBat.Domain.Interfaces.IEventBus? bus = null,
         RetroBat.Domain.Interfaces.IEmulationStationNotificationService? notifications = null,
-        IServiceProvider? services = null)
+        IServiceProvider? services = null,
+        MultiplayerCartesDuFilm? cartesDuFilm = null)
     {
+        _cartesDuFilm = cartesDuFilm;
         _services = services;
         _notifications = notifications;
         _planches = planches;
@@ -788,7 +793,9 @@ public sealed partial class MultiplayerPanelService
             // EN PLEIN ECRAN, JUSQU'A OK (retour du user du 23/10). Le resultat parait des que le coeur est decharge, souvent
             // avant que RetroArch ait fini de sortir ; il prend la manette une fois l'emulateur parti, sinon le « valider »
             // du bouton OK irait aussi a ES, qui lancerait le jeu selectionne.
-            _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal), Composer());
+            var resultat = Composer();
+            _cartesDuFilm?.NoterLaFin(room, resultat);
+            _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal), resultat);
             try
             {
                 var limite = DateTime.UtcNow + PatienceDeLaSortie;
@@ -1288,7 +1295,20 @@ public sealed partial class MultiplayerPanelService
             return;
         }
 
-        _overlay.MontrerMultiplayer(Composer());
+        var contenu = Composer();
+        string? roomDuResultat;
+        lock (_verrou)
+        {
+            roomDuResultat = _mode == Mode.Resultat ? _roomDuResultat : null;
+        }
+
+        // Le resultat se recompose quand les cotes arrivent : la carte de fin du film prend le dernier.
+        if (roomDuResultat is { Length: > 0 })
+        {
+            _cartesDuFilm?.NoterLaFin(roomDuResultat, contenu);
+        }
+
+        _overlay.MontrerMultiplayer(contenu);
     }
 
     /// <summary>

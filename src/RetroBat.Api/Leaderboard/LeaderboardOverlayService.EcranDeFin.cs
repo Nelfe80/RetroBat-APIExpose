@@ -43,7 +43,8 @@ public sealed partial class LeaderboardOverlayService
         string? Police = null,
         ScoreDeFin? MonScore = null,
         string? Logo = null,
-        IReadOnlyList<LigneDeDefi>? Classement = null);
+        IReadOnlyList<LigneDeDefi>? Classement = null,
+        bool SansBoutons = false);
 
     /// <summary>
     /// UNE COOP QUI CONCOURT (31/10/2026) : le score de ce joueur, mis en avant a la place du vainqueur. <c>Ruban</c> : le
@@ -196,7 +197,11 @@ public sealed partial class LeaderboardOverlayService
                 }
 
                 DessinerLesConfettis(g, t);
-                DessinerLesBoutons(g, fin, titre, secours, k, t);
+                // La carte de fin d'un film (lot M4, 08/11) : personne ne peut presser REJOUER ni QUITTER.
+                if (!fin.SansBoutons)
+                {
+                    DessinerLesBoutons(g, fin, titre, secours, k, t);
+                }
             }
             finally
             {

@@ -41,6 +41,8 @@ public sealed class DirectPartageService : IHostedService
     private readonly NelfePlayScoringReporter? _rapporteur;
     private readonly RetroBat.Api.Speedrun.SpeedrunSessionService? _epreuves;
     private readonly RetroBat.Api.Speedrun.ClassementsDesDefis? _tableaux;
+    // Les cartes d'une rencontre (lot M4, 08/11) : l'ecran de lancement avant le jeu, l'ecran de fin apres.
+    private readonly RetroBat.Api.Multiplayer.MultiplayerCartesDuFilm? _cartes;
 
     /// <summary>La partie en cours, et ce que son passage en sait.</summary>
     private sealed class Partie
@@ -70,6 +72,9 @@ public sealed class DirectPartageService : IHostedService
         public readonly string Cle = Guid.NewGuid().ToString("N");
         // LE DIRECT D'UNE PARTIE MULTIPLAYER (27/10) : la gameroom que cette borne heberge, ses joueurs sur la bande.
         public RetroBat.Api.Multiplayer.MultiplayerPartieDeLHote? Multi;
+        // LE VRAI DEPART DE LA RENCONTRE (multiplayer.match.started, lot M4 du 08/11) : dit au site (guests_in), qui garde le
+        // direct d'une rencontre dont les invites n'arrivent pas et la fait passer devant une partie solo.
+        public volatile bool InvitesArrives;
         // LE DIRECT D'UNE EPREUVE (demande du user, 02/11) : un speedrun ou un defi se classe au temps, sans score ; la bande
         // dit l'epreuve et son meilleur temps.
         public string? ModeImpose;
@@ -87,8 +92,9 @@ public sealed class DirectPartageService : IHostedService
         ReplayVideoPublisher site, IConfiguration configuration, ILogger<DirectPartageService> journal,
         NelfePlayScoringCollectionSyncService? collection = null, PartieNelfePlayService? partie = null,
         NelfePlayScoringReporter? rapporteur = null, RetroBat.Api.Speedrun.SpeedrunSessionService? epreuves = null,
-        RetroBat.Api.Speedrun.ClassementsDesDefis? tableaux = null)
+        RetroBat.Api.Speedrun.ClassementsDesDefis? tableaux = null, RetroBat.Api.Multiplayer.MultiplayerCartesDuFilm? cartes = null)
     {
+        _cartes = cartes;
         _epreuves = epreuves;
         _tableaux = tableaux;
         _bus = bus;
@@ -135,6 +141,10 @@ public sealed class DirectPartageService : IHostedService
     private static string Dossier => Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, "state", "nelfenet", "replay");
     internal static string CheminDeLaCommande => Path.Combine(Dossier, "partage-commande.json");
     internal static string CheminDuBandeau => Path.Combine(Dossier, "partage-bandeau.json");
+    // Les cartes d'un direct MULTIPLAYER (lot M4) : l'ecran de lancement, lu par l'exe a son lancement, et l'ecran de fin, lu a
+    // la fin du jeu (ecrit quand il parait).
+    internal static string CheminDeLaCarteAvant => Path.Combine(Dossier, "partage-vs.png");
+    internal static string CheminDeLaCarteApres => Path.Combine(Dossier, "partage-fin.png");
 
     /// <summary>
     /// Un clip livre par le Data Pack (resources/live) : seulement un nom de fichier, jamais un chemin, et seulement un
@@ -279,6 +289,13 @@ public sealed class DirectPartageService : IHostedService
                     if (Nombre(e.Payload, "Score") is not { } score || (Nombre(e.Payload, "Player") ?? 1) != 1) return;
                     lock (_verrou) if (_enCours is { } p) p.MeilleurScore = Math.Max(p.MeilleurScore, score);
                     break;
+                case RetroBat.Api.Multiplayer.MultiplayerLaunchService.EvenementRencontreCommencee:
+                    var salleCommencee = Chaine(e.Payload, "Room");
+                    lock (_verrou)
+                        if (_enCours is { Multi: { } rencontre } enCours
+                            && string.Equals(rencontre.Room, salleCommencee, StringComparison.OrdinalIgnoreCase))
+                            enCours.InvitesArrives = true;
+                    break;
                 case "video.live.record.started":
                     // L'alert de cette borne prend le relais : son passage partage se termine.
                     lock (_verrou) if (_enCours is { } a) a.Alert = true;
@@ -381,6 +398,15 @@ public sealed class DirectPartageService : IHostedService
             // Les joueurs a gauche ; a droite, nelfeplay.com (pas de record a battre).
             p.BandeJoueur = TexteDeLaBande(mp.Players, mp.Family);
             p.RecordTexte = "";
+            // LE FILM D'ABORD (B.2, lot M4 du 08/11, comme une epreuve le 02/11) : le site elit une rencontre 3 s apres sa
+            // candidature, pour que son test de connexion tourne pendant le depart pret ; elue sans film, elle perdait son passage
+            // (« aucun film ne tourne »). Le spectateur cache (consoles reliees) enregistre tard. Le debut de la partie, pour le
+            // site, est celui du film.
+            if (!await AttendreLeFilmAsync(p).ConfigureAwait(false))
+            {
+                _journal.LogInformation("Direct partage : partie MULTIPLAYER {Jeu} sans film, pas de candidature.", mp.Game);
+                return;
+            }
             _journal.LogInformation("Direct partage : partie MULTIPLAYER {Jeu} ({Room}), la borne se porte candidate.", mp.Game, mp.Room);
             await PasserAsync(p, RomGroupMultiplayer(mp.Game), RegleMultiplayer, mp.System.Trim().ToLowerInvariant(), aModes: false)
                 .ConfigureAwait(false);
@@ -437,6 +463,25 @@ public sealed class DirectPartageService : IHostedService
 
     /// <summary>Le plus long qu'on attende le film et l'etat de depart d'une epreuve : un lancement de RetroArch, avec marge.</summary>
     internal static readonly TimeSpan AttenteDuDepart = TimeSpan.FromMinutes(3);
+
+    /// <summary>
+    /// Attend le film d'une rencontre (AttenteDuDepart au plus) ; le debut de la partie se recale sur lui. Faux si la partie
+    /// finit avant, ou sans film.
+    /// </summary>
+    private async Task<bool> AttendreLeFilmAsync(Partie p)
+    {
+        var limite = DateTime.UtcNow + AttenteDuDepart;
+        while (!p.Finie && DateTime.UtcNow < limite)
+        {
+            if (_capture.FilmEnCours() is not null)
+            {
+                p.Debut = DateTime.UtcNow;
+                return true;
+            }
+            await Task.Delay(500).ConfigureAwait(false);
+        }
+        return false;
+    }
 
     /// <summary>
     /// Attend que l'epreuve puisse passer a l'antenne : le film tourne et, si elle part d'un etat, cet etat est charge. Le
@@ -510,6 +555,9 @@ public sealed class DirectPartageService : IHostedService
         CancellationTokenSource? secours = null;
         var finAnnoncee = false;
         var essai = _essai;
+        // B.4 (lot M4) : l'exe de cette borne lit-il le film jusqu'au bout a la fin d'une partie (0.7.2) ? Le site ne tient
+        // alors la fin de passage 40 s que pour lui ; un exe plus ancien garde ses 14 a 20 s.
+        var exeFinitLeFilm = LanceurDuDirect.SaitLesCartes(LanceurDuDirect.Chemin(AppContext.BaseDirectory));
         try
         {
             while (true)
@@ -538,9 +586,16 @@ public sealed class DirectPartageService : IHostedService
                     ["game_key"] = p.Cle,
                     // Le film de la partie tourne : elle peut reprendre tout de suite le direct de la precedente.
                     ["film"] = _capture.FilmEnCours() is not null,
+                    ["finishes_film"] = exeFinitLeFilm,
                 };
-                // Le site verifie que cette borne heberge la gameroom, et que la partie s'y joue encore.
-                if (p.Multi is { } mp) demande["multiplayer_room"] = mp.Room;
+
+                // Le site verifie que cette borne heberge la gameroom, et que la partie s'y joue encore. Le vrai depart (B.2) :
+                // un site plus ancien ignore le champ ; un site recent elit une rencontre qui le dit 3 s apres sa candidature.
+                if (p.Multi is { } mp)
+                {
+                    demande["multiplayer_room"] = mp.Room;
+                    demande["guests_in"] = p.InvitesArrives;
+                }
                 var r = await _site.SonderLePartageAsync(demande, CancellationToken.None).ConfigureAwait(false);
                 var role = (string?)r?["role"];
                 var attente = TimeSpan.FromSeconds(Math.Clamp((int?)r?["poll_after"] ?? 10, 3, 60));
@@ -582,8 +637,11 @@ public sealed class DirectPartageService : IHostedService
                         p.CarteEcrite = true;
                         EcrireLaCarte(p, romGroup);
                     }
+                    // LA FIN QUI NE COUPE PAS (B.4, lot M4 du 08/11 ; Bomberman du 29/10, 30 s de fin jamais parties) : la partie
+                    // finie, l'exe 0.7.2 lit d'abord le film deja ecrit (30 s au plus). Jamais quand le passage cede l'antenne en
+                    // pleine partie : le film grandirait encore. Reecrit a chaque relecture, le champ reste.
                     EcrireLaCommande(p, fin: true, arret: false, (string?)suivante?["player"], (string?)suivante?["game"],
-                        recordBattu, relance, (bool?)suivante?["record"] == true);
+                        recordBattu, relance, (bool?)suivante?["record"] == true, FinirLeFilm(p.Finie, p.Alert));
                 }
                 else if (role == "stop" || (role == "none" && exe is not null))
                 {
@@ -606,6 +664,7 @@ public sealed class DirectPartageService : IHostedService
         }
         finally
         {
+            if (p.Multi is { } rencontre) _cartes?.OublierLeDirect(rencontre.Room);
             if (exe is not null)
             {
                 // L'exe s'arrete sur l'ordre ecrit ; au-dela de deux minutes, on l'arrete.
@@ -702,9 +761,10 @@ public sealed class DirectPartageService : IHostedService
             EcrireLeBandeau(p, ModeDeLaBande(p, regleParDefaut));
             // La carte d'un passage precedent ne se montre jamais : elle s'ecrit au moment ou le record tombe.
             try { File.Delete(CheminDeLaCarte); } catch (Exception) { /* absente */ }
+            var cartes = CartesDuDirect(p, exe);
             Ecrire(CheminDeLaCommande, CommandeJson(fin: false, arret: false, null, null, false, false));
             return await LanceurDuDirect.DiffuserAsync(exe, film.Fichier, adresse, film.Rotation ?? 0, _journal, jeton,
-                annonce: annonce, classement: CheminDeLaCarte, options: options, delaiDeFin: TimeSpan.FromSeconds(10),
+                annonce: annonce, classement: CheminDeLaCarte, options: [.. options, .. cartes], delaiDeFin: TimeSpan.FromSeconds(10),
                 forme: film.Forme, fond: film.Fond, crt: film.Crt).ConfigureAwait(false);
         });
         lock (_verrou)
@@ -714,6 +774,39 @@ public sealed class DirectPartageService : IHostedService
         }
         return tache;
     }
+
+    /// <summary>
+    /// LES CARTES D'UN DIRECT MULTIPLAYER (D-M4, lot M4 du 08/11, exe 0.7.2) : l'ecran de lancement avant le jeu, seulement si
+    /// l'exe part avant le vrai depart (sinon il retarderait le direct de 3 s en pleine rencontre) ; l'ecran de fin apres le
+    /// jeu, ecrit quand il parait (le jeu ferme). Celles d'un passage precedent s'effacent. Rien pour une partie solo, ni pour
+    /// un exe plus ancien.
+    /// </summary>
+    private IReadOnlyList<string> CartesDuDirect(Partie p, string exe)
+    {
+        if (p.Multi is not { } mp || _cartes is null || !LanceurDuDirect.SaitLesCartes(exe)) return [];
+        foreach (var ancienne in new[] { CheminDeLaCarteAvant, CheminDeLaCarteApres })
+        {
+            try { File.Delete(ancienne); } catch (Exception) { /* absente */ }
+        }
+        var avant = !p.InvitesArrives && _cartes.RendreLeLancementDuDirect(mp.Room, CheminDeLaCarteAvant);
+        _cartes.AttendreLaFinPourLeDirect(mp.Room, CheminDeLaCarteApres);
+        return OptionsDesCartes(avant, p.InvitesArrives);
+    }
+
+    /// <summary>
+    /// Les options des cartes d'un direct MULTIPLAYER : l'ecran de lancement quand il est rendu et que les invites ne sont pas
+    /// encore la, l'ecran de fin toujours (absent a la fin du jeu, l'exe finit sans lui). Pur.
+    /// </summary>
+    internal static IReadOnlyList<string> OptionsDesCartes(bool carteAvantRendue, bool invitesArrives)
+        => LanceurDuDirect.Cartes(carteAvantRendue && !invitesArrives ? CheminDeLaCarteAvant : null,
+            RetroBat.Api.Multiplayer.MultiplayerCartesDuFilm.DureeAvantS, CheminDeLaCarteApres,
+            RetroBat.Api.Multiplayer.MultiplayerCartesDuFilm.DureeApresS).ToList();
+
+    /// <summary>
+    /// L'exe lit-il le film jusqu'au bout avant sa fin de passage (B.4) ? Seulement pour une partie finie, et pas quand un
+    /// direct de record la prend (son passage cede l'antenne). Pur.
+    /// </summary>
+    internal static bool FinirLeFilm(bool finie, bool alert) => finie && !alert;
 
     /// <summary>L'exe relit la commande au plus une fois par seconde : la fin d'un relais tient un peu plus avant l'arret.</summary>
     internal static readonly TimeSpan LectureDeLaCommande = TimeSpan.FromMilliseconds(1500);
@@ -755,14 +848,14 @@ public sealed class DirectPartageService : IHostedService
 
     /// <summary>La commande de l'exe ; seule la partie a qui l'exe appartient l'ecrit (une ancienne partie se tait).</summary>
     private void EcrireLaCommande(Partie p, bool fin, bool arret, string? joueur, string? jeu, bool recordBattu = false, bool relance = false,
-        bool suivanteRecord = false)
+        bool suivanteRecord = false, bool finirLeFilm = false)
     {
         lock (_verrou) if (_aLAntenne != p) return;
-        Ecrire(CheminDeLaCommande, CommandeJson(fin, arret, joueur, jeu, recordBattu, relance, suivanteRecord));
+        Ecrire(CheminDeLaCommande, CommandeJson(fin, arret, joueur, jeu, recordBattu, relance, suivanteRecord, finirLeFilm));
     }
 
     internal static string CommandeJson(bool fin, bool arret, string? joueur, string? jeu, bool recordBattu, bool relance,
-        bool suivanteRecord = false)
+        bool suivanteRecord = false, bool finirLeFilm = false)
     {
         var commande = new JsonObject
         {
@@ -772,6 +865,8 @@ public sealed class DirectPartageService : IHostedService
             ["recordBattu"] = recordBattu,
             ["relance"] = relance,
         };
+        // B.4 (exe 0.7.2) : la fin de passage d'une partie finie laisse partir le film deja ecrit ; un exe 0.7.1 ignore le champ.
+        if (finirLeFilm) commande["finirLeFilm"] = true;
         return commande.ToJsonString();
     }
 
@@ -883,8 +978,22 @@ public sealed class DirectPartageService : IHostedService
         }
     }
 
+    private static string? Chaine(object? payload, string nom)
+    {
+        try
+        {
+            var el = payload is JsonElement j ? j : JsonSerializer.SerializeToElement(payload);
+            return el.ValueKind == JsonValueKind.Object && el.TryGetProperty(nom, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
     private static long? Nombre(object? payload, string nom)
     {
+
         try
         {
             var el = payload is JsonElement j ? j : JsonSerializer.SerializeToElement(payload);

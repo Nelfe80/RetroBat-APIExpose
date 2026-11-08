@@ -76,6 +76,42 @@ public static class LanceurDuDirect
     /// </summary>
     internal static IEnumerable<string> CrtPhotographique(bool crt) => crt ? ["--crt-photographic"] : [];
 
+    /// <summary>
+    /// LES CARTES D'UNE RENCONTRE (decision D-M4, lot M4 du 08/11, exe 0.7.2) : l'ecran de lancement VS avant le jeu et l'ecran
+    /// de fin apres, chacun avec sa duree (le nombre suit le chemin). Une carte sans chemin ou sans duree ne part pas. Pur.
+    /// </summary>
+    internal static IEnumerable<string> Cartes(string? avant, double avantS, string? apres, double apresS)
+    {
+        static string S(double s) => s.ToString("0.##", CultureInfo.InvariantCulture);
+        var a = new List<string>();
+        if (!string.IsNullOrWhiteSpace(avant) && avantS > 0) a.AddRange(["--carte-avant", avant, S(avantS)]);
+        if (!string.IsNullOrWhiteSpace(apres) && apresS > 0) a.AddRange(["--carte-apres", apres, S(apresS)]);
+        return a;
+    }
+
+    /// <summary>La premiere version de l'exe qui pose les cartes et laisse finir le film (0.7.2, 08/11).</summary>
+    internal static readonly Version VersionDesCartes = new(0, 7, 2);
+
+    /// <summary>
+    /// L'exe pose-t-il les cartes ? Un exe plus ancien les ignore en silence : la version YouTube serait plus courte de 9 s que
+    /// ce que la borne annonce au site.
+    /// </summary>
+    internal static bool SaitLesCartes(string? exe) => VersionDe(exe) is { } v && v >= VersionDesCartes;
+
+    private static Version? VersionDe(string? exe)
+    {
+        if (exe is null || !File.Exists(exe)) return null;
+        try
+        {
+            var v = FileVersionInfo.GetVersionInfo(exe);
+            return new Version(v.FileMajorPart, v.FileMinorPart, v.FileBuildPart);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
     /// <summary>Les systemes nes sur un ecran plat (consoles portables, machines HD) : pas d'effet CRT.</summary>
     private static readonly HashSet<string> EcransPlats = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -93,7 +129,8 @@ public static class LanceurDuDirect
     /// (secondes du film) quand elle est connue. Pur.
     /// </summary>
     internal static IReadOnlyList<string> ArgumentsDeLaVersion(string film, string sortie, int rotation, double? debutS = null,
-        double? finS = null, double? forme = null, string? fond = null, bool crt = false)
+        double? finS = null, double? forme = null, string? fond = null, bool crt = false, string? carteAvant = null,
+        double carteAvantS = 0, string? carteApres = null, double carteApresS = 0)
     {
         var arguments = new List<string>
         {
@@ -107,6 +144,8 @@ public static class LanceurDuDirect
         // sur la borne (0,72x le temps reel contre 2,9x), et l'exe publie (0.7.1) ignore l'option. Il reviendra avec son
         // chemin Direct3D, au cout du CRT leger.
         arguments.AddRange(Crt(crt));
+        // Le film d'une rencontre (lot M4) : 3 s d'ecran VS, la portion, puis 6 s d'ecran de fin.
+        arguments.AddRange(Cartes(carteAvant, carteAvantS, carteApres, carteApresS));
         return arguments;
     }
 
@@ -117,7 +156,8 @@ public static class LanceurDuDirect
     /// fichier inacheve s'efface et l'annulation remonte. Code 0 : le fichier est complet.
     /// </summary>
     public static async Task<Rapport> FabriquerLaVersionAsync(string exe, string film, string sortie, int rotation, ILogger journal,
-        CancellationToken ct, double? debutS = null, double? finS = null, double? forme = null, string? fond = null, bool crt = false)
+        CancellationToken ct, double? debutS = null, double? finS = null, double? forme = null, string? fond = null, bool crt = false,
+        string? carteAvant = null, double carteAvantS = 0, string? carteApres = null, double carteApresS = 0)
     {
         var info = new ProcessStartInfo(exe)
         {
@@ -127,7 +167,9 @@ public static class LanceurDuDirect
             RedirectStandardError = true,
             WorkingDirectory = Path.GetDirectoryName(exe) ?? AppContext.BaseDirectory,
         };
-        foreach (var a in ArgumentsDeLaVersion(film, sortie, rotation, debutS, finS, forme, fond, crt)) info.ArgumentList.Add(a);
+        foreach (var a in ArgumentsDeLaVersion(film, sortie, rotation, debutS, finS, forme, fond, crt, carteAvant, carteAvantS, carteApres,
+                     carteApresS))
+            info.ArgumentList.Add(a);
 
         var chrono = Stopwatch.StartNew();
         using var p = Process.Start(info) ?? throw new InvalidOperationException("l'exe du direct ne demarre pas");

@@ -103,6 +103,8 @@ public sealed class ReplayCaptureService : BackgroundService
 
     /// <summary>Les films des rencontres MULTIPLAYER se gardent et partent (D-M2, 08/11) ; faux : effaces comme avant.</summary>
     private readonly bool _rencontres;
+    // Les cartes du film d'une rencontre (lot M4, 08/11) : ecran de lancement VS et ecran de fin, rendus par l'API.
+    private readonly RetroBat.Api.Multiplayer.MultiplayerCartesDuFilm? _cartes;
 
     private readonly InterfaceTextService? _textes;
     private readonly EmulationStationSettingsService? _reglagesEs;
@@ -446,8 +448,10 @@ public sealed class ReplayCaptureService : BackgroundService
 
     public ReplayCaptureService(IEventBus bus, RetroArchReplayClient ra, ReplayVideoPublisher publication,
         IReplayManifestStore manifests, IReplayObjectStore objects, ReplayCoreTimingProbe coeur, IConfiguration configuration,
-        ILogger<ReplayCaptureService> logger, InterfaceTextService? textes = null, EmulationStationSettingsService? reglagesEs = null)
+        ILogger<ReplayCaptureService> logger, InterfaceTextService? textes = null, EmulationStationSettingsService? reglagesEs = null,
+        RetroBat.Api.Multiplayer.MultiplayerCartesDuFilm? cartes = null)
     {
+        _cartes = cartes;
         _bus = bus; _ra = ra; _publication = publication; _manifests = manifests; _coeur = coeur; _logger = logger;
         _textes = textes; _reglagesEs = reglagesEs;
         _actif = configuration.GetValue("Video:Capture:Enabled", true);
@@ -855,8 +859,12 @@ public sealed class ReplayCaptureService : BackgroundService
     /// </summary>
     private async Task GarderLaRencontreAsync(CaptureEnCours c, PortionDeRencontre portion, double dureeDuFilmS)
     {
+        string? carteAvant = null, carteApres = null;
         try
         {
+            // LES CARTES DU FILM (D-M4, lot M4) : le jeu vient de se fermer, l'ecran de fin parait dans les secondes qui
+            // suivent. Rendues tout de suite (une revanche peut suivre), avant d'attendre la fin de passage du direct.
+            (carteAvant, carteApres) = await RendreLesCartesAsync(c).ConfigureAwait(false);
             var limite = DateTime.UtcNow + FinDePassageAuPlus;
             while (DirectEnCours() && DateTime.UtcNow < limite)
                 await Task.Delay(TimeSpan.FromSeconds(5), _arret).ConfigureAwait(false);
@@ -879,6 +887,7 @@ public sealed class ReplayCaptureService : BackgroundService
             if (entete is null || (entete.Couchee && !(origine && c.Rotation is 1 or 3)))
             {
                 Effacer(destination);
+                EffacerLesCartes(carteAvant, carteApres);
                 _logger.LogInformation("Capture : rencontre {Room} non gardee ({Raison}).", c.Room ?? c.ReplayId,
                     entete is null ? "film illisible" : "jeu vertical, film couche");
                 return;
@@ -889,12 +898,15 @@ public sealed class ReplayCaptureService : BackgroundService
                 Forme: c.DuSpectateur ? null : c.Forme, Largeur: (int)entete.Largeur, Hauteur: (int)entete.Hauteur, Fond: c.Fond,
                 Crt: c.Crt, Room: c.Room, DebutUtc: c.DebutUtc, VraiDepartS: SecondesDuFilm(c.DebutUtc, c.VraiDepartUtc),
                 FinLueS: SecondesDuFilm(c.DebutUtc, c.FinLueUtc), RencontreComplete: portion.Complete, Coop: c.Coop, Issue: c.Issue,
-                DuSpectateur: c.DuSpectateur);
+                DuSpectateur: c.DuSpectateur,
+                CarteAvant: carteAvant, CarteAvantS: carteAvant is null ? 0 : RetroBat.Api.Multiplayer.MultiplayerCartesDuFilm.DureeAvantS,
+                CarteApres: carteApres, CarteApresS: carteApres is null ? 0 : RetroBat.Api.Multiplayer.MultiplayerCartesDuFilm.DureeApresS);
             await SauverAsync(gardee, Path.Combine(_dossier, c.ReplayId + ".json"), _arret).ConfigureAwait(false);
             _logger.LogInformation(
-                "Capture : rencontre {Room} gardee, portion {Debut} s a {Fin} s du film ({Duree} s, {Complete}{Spectateur}), en attente de la decision du site.",
+                "Capture : rencontre {Room} gardee, portion {Debut} s a {Fin} s du film ({Duree} s, {Complete}{Spectateur}), cartes {Cartes}, en attente de la decision du site.",
                 c.Room ?? "?", Texte(portion.DebutS), Texte(portion.FinS), Texte(portion.DureeS),
-                portion.Complete ? "rencontre complete" : "sans fin lue", c.DuSpectateur ? ", film du spectateur" : "");
+                portion.Complete ? "rencontre complete" : "sans fin lue", c.DuSpectateur ? ", film du spectateur" : "",
+                TexteDesCartes(carteAvant, carteApres));
             _reveil.Release();
         }
         catch (OperationCanceledException) { /* arret de l'API : le film reste ou il est */ }
@@ -902,7 +914,66 @@ public sealed class ReplayCaptureService : BackgroundService
         {
             _logger.LogWarning(ex, "Capture : rencontre {Room} non gardee.", c.Room ?? c.ReplayId);
             Effacer(c.Fichier);
+            EffacerLesCartes(carteAvant, carteApres);
         }
+    }
+
+    /// <summary>« VS 3 s et fin 6 s », « VS 3 s, sans ecran de fin », « aucune ». Pur.</summary>
+    internal static string TexteDesCartes(string? avant, string? apres)
+        => (avant, apres) switch
+        {
+            (not null, not null) => "VS 3 s et fin 6 s",
+            (not null, null) => "VS 3 s, sans ecran de fin",
+            (null, not null) => "fin 6 s, sans VS",
+            _ => "aucune",
+        };
+
+    /// <summary>
+    /// Les cartes du film d'une rencontre, a cote de sa fiche : seulement avec un exe qui les pose (0.7.2), sinon la version
+    /// YouTube durerait 9 s de moins que ce que la borne annonce.
+    /// </summary>
+    private async Task<(string? Avant, string? Apres)> RendreLesCartesAsync(CaptureEnCours c)
+    {
+        if (_cartes is null || c.Room is not { Length: > 0 } room || !LanceurDuDirect.SaitLesCartes(LanceurDuDirect.Chemin(AppContext.BaseDirectory)))
+            return (null, null);
+        try
+        {
+            Directory.CreateDirectory(_dossier);
+            return await _cartes.RendreLesCartesDeLaVersionAsync(room, Path.Combine(_dossier, c.ReplayId + ".vs.png"),
+                Path.Combine(_dossier, c.ReplayId + ".fin.png"), RetroBat.Api.Multiplayer.MultiplayerCartesDuFilm.AttenteDeLaFin, _arret)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation("Capture : cartes de la rencontre {Room} non rendues ({Message}).", room, ex.Message);
+            return (null, null);
+        }
+    }
+
+    private static void EffacerLesCartes(string? avant, string? apres)
+    {
+        if (avant is not null) Effacer(avant);
+        if (apres is not null) Effacer(apres);
+    }
+
+    /// <summary>
+    /// Les cartes d'une capture gardee, telles qu'elles partiront : une carte dont l'image manque, ou un exe qui ne les pose
+    /// pas, compte 0 s (le site l'apprend avant l'envoi). Une version deja fabriquee les porte deja : rien ne change. Pur.
+    /// </summary>
+    internal static CaptureGardee CartesQuiPartent(CaptureGardee g, bool exeSaitLesCartes, Func<string, bool> existe)
+    {
+        if (g.Version is not null) return g;
+        var avant = exeSaitLesCartes && g.CarteAvant is { } a && g.CarteAvantS > 0 && existe(a);
+        var apres = exeSaitLesCartes && g.CarteApres is { } b && g.CarteApresS > 0 && existe(b);
+        return g with
+        {
+            CarteAvant = avant ? g.CarteAvant : null, CarteAvantS = avant ? g.CarteAvantS : 0,
+            CarteApres = apres ? g.CarteApres : null, CarteApresS = apres ? g.CarteApresS : 0,
+        };
     }
 
     private static string Texte(double secondes) => secondes.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
@@ -1251,6 +1322,9 @@ public sealed class ReplayCaptureService : BackgroundService
             var courante = g;
             if (courante.Version is null || !File.Exists(courante.Version))
             {
+                // Les cartes qui partiront vraiment : le site compte leurs secondes dans la duree du film.
+                courante = CartesQuiPartent(courante with { Version = null },
+                    LanceurDuDirect.SaitLesCartes(LanceurDuDirect.Chemin(AppContext.BaseDirectory)), File.Exists);
                 var voulue = await _publication.RencontreVoulueAsync(courante.ReplayId, TailleEstimee(courante, _tailleMax),
                     ChampsDeLaRencontre(courante, DateTime.UtcNow), envoi.Token).ConfigureAwait(false);
                 if (voulue.Issue != ReplayVideoPublisher.IssueDeCapture.Voulue)
@@ -1385,7 +1459,8 @@ public sealed class ReplayCaptureService : BackgroundService
             EstUnFilmMultiplayer(g.ReplayId) ? "une rencontre voulue par le site" : "un record",
             g.DebutSequenceS is double d && g.FinSequenceS is double f ? "sequence de " + d + " a " + f + " s du film" : "film entier");
         var r = await LanceurDuDirect.FabriquerLaVersionAsync(exe, g.Fichier, version, g.Rotation ?? 0, _logger, ct,
-            g.DebutSequenceS, g.FinSequenceS, g.Forme, g.Fond, g.Crt).ConfigureAwait(false);
+            g.DebutSequenceS, g.FinSequenceS, g.Forme, g.Fond, g.Crt, g.CarteAvant, g.CarteAvantS, g.CarteApres, g.CarteApresS)
+            .ConfigureAwait(false);
         if (r.Code == 0 && TailleDe(version) > 0)
         {
             var faite = g with { Version = version };
@@ -1418,7 +1493,9 @@ public sealed class ReplayCaptureService : BackgroundService
     {
         Effacer(g.Fichier);
         if (g.Version is not null) Effacer(g.Version);
+        EffacerLesCartes(g.CarteAvant, g.CarteApres);
         Effacer(fiche);
+
         OublierLesSessions(g.ReplayId);
         _logger.LogInformation("Capture : {ReplayId} {Pourquoi}, film efface de la borne.", g.ReplayId, pourquoi);
     }
