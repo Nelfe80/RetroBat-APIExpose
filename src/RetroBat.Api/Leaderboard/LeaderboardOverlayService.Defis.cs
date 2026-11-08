@@ -418,7 +418,7 @@ public sealed partial class LeaderboardOverlayService
                 }
 
                 var image = new RectangleF(zone.X, zone.Y, hauteur * 16f / 9f, hauteur);
-                if (l.Image is { } chemin && File.Exists(chemin) && _service._glyphes?.Glyphe(chemin, (int)hauteur) is { } vignette)
+                if (l.Image is { } chemin && File.Exists(chemin) && _service._glyphes?.Vignette(chemin, (int)hauteur) is { } vignette)
                 {
                     g.DrawImage(vignette, image);
                 }

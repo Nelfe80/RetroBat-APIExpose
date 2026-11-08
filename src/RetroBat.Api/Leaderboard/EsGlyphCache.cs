@@ -110,6 +110,64 @@ public sealed class EsGlyphCache : IDisposable
     }
 
     /// <summary>
+    /// La vignette 16:9 d'une image du disque (capture, fanart, image d'epreuve), a cette hauteur. L'image est RECADREE au
+    /// centre pour remplir le cadre sans deformation (une capture 4:3 perd le haut et le bas, une capture plus large perd
+    /// les cotes). Lue et reduite en arriere-plan : null tout de suite, puis <see cref="Pret"/> quand elle est prete.
+    /// </summary>
+    public Image? Vignette(string chemin, int hauteur)
+    {
+        hauteur = Math.Max(1, hauteur);
+        var cle = "vignette|" + chemin + "|" + hauteur;
+        lock (_gate)
+        {
+            if (_images.TryGetValue(cle, out var deja)) return deja;
+            if (!_enCours.Add(cle)) return null;
+        }
+
+        _ = Task.Run(() =>
+        {
+            Image? vignette = null;
+            try { vignette = Recadrer169(chemin, hauteur); }
+            catch (Exception ex) { _logger?.LogDebug(ex, "Defis : image {Nom} illisible.", Path.GetFileName(chemin)); }
+            lock (_gate)
+            {
+                _images[cle] = vignette;
+                _enCours.Remove(cle);
+            }
+            if (vignette is not null) Pret?.Invoke();
+        });
+        return null;
+    }
+
+    /// <summary>Le recadrage centre en 16:9 puis la reduction a cette hauteur.</summary>
+    internal static Bitmap Recadrer169(string chemin, int hauteur)
+    {
+        using var flux = new MemoryStream(File.ReadAllBytes(chemin));
+        using var source = Image.FromStream(flux);
+        var zone = Zone169(source.Width, source.Height);
+        var largeur = (int)Math.Round(hauteur * 16d / 9d);
+        var sortie = new Bitmap(largeur, hauteur);
+        using var g = Graphics.FromImage(sortie);
+        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+        g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+        g.DrawImage(source, new Rectangle(0, 0, largeur, hauteur), zone, GraphicsUnit.Pixel);
+        return sortie;
+    }
+
+    /// <summary>La zone centrale 16:9 d'une image de cette taille.</summary>
+    internal static Rectangle Zone169(int largeur, int hauteur)
+    {
+        if ((long)largeur * 9 > (long)hauteur * 16)
+        {
+            var l = (int)Math.Round(hauteur * 16d / 9d);
+            return new Rectangle((largeur - l) / 2, 0, l, hauteur);
+        }
+
+        var h = (int)Math.Round(largeur * 9d / 16d);
+        return new Rectangle(0, (hauteur - h) / 2, largeur, h);
+    }
+
+    /// <summary>
     /// Le nombre de pictogrammes PRETS SUR LE DISQUE. C'est ce qui compte : la preparation
     /// ecrit des fichiers sans les charger, et ce sont eux qui evitent toute conversion plus
     /// tard. Compter les images en memoire aurait annonce zero apres un prechauffage reussi.

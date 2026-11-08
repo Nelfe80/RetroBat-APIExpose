@@ -48,6 +48,8 @@ public sealed partial class DefisPanelService
     private IReadOnlyList<Reglement> _defis = [];
     private Dictionary<DefisPanelModel.Onglet, List<(LigneDeDefi Ligne, Reglement? Defi)>> _lignes = new();
     private IReadOnlyDictionary<string, (int Tentatives, long? Meilleur)> _bilan = new Dictionary<string, (int, long?)>();
+    /// <summary>Le chemin de l'image de chaque challenge du jeu, resolu une fois a l'ouverture.</summary>
+    private IReadOnlyDictionary<string, string> _images = new Dictionary<string, string>();
     private IReadOnlyDictionary<string, ClassementDEpreuve> _tableaux = new Dictionary<string, ClassementDEpreuve>();
     private IReadOnlyList<TypeDeRecords> _records = [];
     private string _glypheValider = "a";
@@ -127,6 +129,7 @@ public sealed partial class DefisPanelService
                 ? choisi.GameName
                 : NomDuFichier(chemin);
             _defis = _collection.DefisDuJeu(chemin);
+            _images = ImagesDesDefis.Pour(_defis, chemin);
             _bilan = _session.BilanDuJournal();
             _glypheValider = glypheValider.Length > 0 ? glypheValider : "a";
             _glypheDefier = glypheDefier.Length > 0 ? glypheDefier : "y";
@@ -169,7 +172,7 @@ public sealed partial class DefisPanelService
     private List<DefisPanelModel.Onglet> Recomposer()
     {
         var langue = Langue();
-        _lignes = Composer(_defis, _bilan, langue, _tableaux, Pseudo);
+        _lignes = Composer(_defis, _bilan, langue, _tableaux, Pseudo, _images);
         _records = ComposerLesRecords(_defis, _tableaux, langue, Pseudo);
         var onglets = _lignes.Where(p => p.Value.Any(l => l.Defi is not null)).Select(p => p.Key).ToList();
         if (_records.Count > 0) onglets.Add(DefisPanelModel.Onglet.Records);
@@ -728,7 +731,8 @@ public sealed partial class DefisPanelService
     /// </summary>
     internal Dictionary<DefisPanelModel.Onglet, List<(LigneDeDefi Ligne, Reglement? Defi)>> Composer(
         IReadOnlyList<Reglement> defis, IReadOnlyDictionary<string, (int Tentatives, long? Meilleur)> bilan, string langue,
-        IReadOnlyDictionary<string, ClassementDEpreuve>? classements = null, string pseudo = "")
+        IReadOnlyDictionary<string, ClassementDEpreuve>? classements = null, string pseudo = "",
+        IReadOnlyDictionary<string, string>? images = null)
     {
         var tableaux = classements ?? new Dictionary<string, ClassementDEpreuve>();
         var resultat = new Dictionary<DefisPanelModel.Onglet, List<(LigneDeDefi, Reglement?)>>();
@@ -748,7 +752,8 @@ public sealed partial class DefisPanelService
                     : tentatives > 0 ? T("speedrun.panel.tried", "TRIED") + " × " + tentatives : "";
                 lignes.Add((groupe.Key.Onglet == DefisPanelModel.Onglet.Challenges
                     ? new LigneDeDefi(d.Titre(langue), T("speedrun.panel.record", "RECORD") + " " + record, T("speedrun.panel.you", "YOU") + " " + toi,
-                        Marque: marque, Regle: Objectif(d), Mesure: T("speedrun.panel.by_time", "BY TIME"), Badge: badge)
+                        Marque: marque, Regle: Objectif(d), Mesure: T("speedrun.panel.by_time", "BY TIME"), Badge: badge,
+                        Image: images is not null && images.TryGetValue(d.ChallengeId, out var image) ? image : null)
                     : new LigneDeDefi(d.Titre(langue), record, toi, Marque: marque), d));
             }
         }
