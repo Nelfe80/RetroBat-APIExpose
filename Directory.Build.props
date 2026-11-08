@@ -1,8 +1,8 @@
 ﻿<Project>
   <PropertyGroup>
-    <Version>1.9.159</Version>
-    <AssemblyVersion>1.9.159.0</AssemblyVersion>
-    <FileVersion>1.9.159.0</FileVersion>
-    <InformationalVersion>1.9.159+20261107.202941</InformationalVersion>
+    <Version>1.9.160</Version>
+    <AssemblyVersion>1.9.160.0</AssemblyVersion>
+    <FileVersion>1.9.160.0</FileVersion>
+    <InformationalVersion>1.9.160+20261108.124408</InformationalVersion>
   </PropertyGroup>
 </Project>
