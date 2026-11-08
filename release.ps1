@@ -91,6 +91,8 @@ New-Item -ItemType Directory -Force $out | Out-Null
 # Exclusions communes : jamais de secrets, ROMs, sources, docs internes ni runtime.
 $ex = @(
     "-x!$name\.git", "-x!$name\.gitignore", "-x!$name\.github",
+    # .gitattributes (06/11, *.MEM -text) : arrive avec cette branche ; le controle anti-fuite (\.git) l'arreterait.
+    "-x!$name\.gitattributes",
     "-x!$name\.env", "-x!$name\events.ini",
     "-x!$name\.log", "-x!$name\.temp", "-x!$name\.cache",
     "-x!$name\.archive", "-x!$name\.versioning",
