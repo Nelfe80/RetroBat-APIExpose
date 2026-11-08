@@ -126,6 +126,13 @@ public sealed class ReplayCaptureService : BackgroundService
         public long FrameDebut;
         /// <summary>La rotation annoncee par le coeur (quarts de tour antihoraires), null si inconnue.</summary>
         public int? Rotation;
+        /// <summary>
+        /// UN JEU VERTICAL DONT LE SENS N'EST PAS LU (08/11, Contra de Getupor publie couche) : le referentiel dit le jeu
+        /// vertical, le journal de lancement ne dit pas sa rotation. Le film d'origine n'est pas « couche » dans son en-tete
+        /// (l'image et l'affichage y ont la meme forme) : sans ce drapeau il partait sur YouTube sans etre redresse. Il est
+        /// abandonne ; la station le rend depuis le replay, en lisant la rotation que le coeur annonce.
+        /// </summary>
+        public bool VerticalSansSens;
         /// <summary>La forme de l'image annoncee par le coeur (libretro « Aspect »), null si inconnue.</summary>
         public double? Forme;
         /// <summary>Le fanart du jeu (sinon sa capture), fond du cadre 16:9 du direct et de la video ; null sans image.</summary>
@@ -664,6 +671,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 _enCours = new CaptureEnCours
                 {
                     ReplayId = replayId, Fichier = fichier, FrameDebut = frame, Rotation = rotation, SansReplay = sansReplay,
+                    VerticalSansSens = !duSpectateur && rotation is null && JeuVertical(_cheminDuJeu),
                     Forme = forme, Fond = FondDuJeu(_cheminDuJeu), DuSpectateur = duSpectateur,
                     Crt = LanceurDuDirect.EcranATube(_cheminDuJeu is { Length: > 0 } cheminDuJeu
                         ? RetroBat.Api.Netplay.NetplayHostService.SystemeDuChemin(cheminDuJeu, RetroBatPaths.RomsRoot) : null),
@@ -1075,11 +1083,36 @@ public sealed class ReplayCaptureService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// Le jeu de ce chemin est-il vertical selon le referentiel (dossier du systeme, nom du set) ? Faux sans chemin ou pour un
+    /// jeu inconnu : rien n'est abandonne au hasard.
+    /// </summary>
+    internal static bool JeuVertical(string? cheminDuJeu)
+    {
+        if (string.IsNullOrWhiteSpace(cheminDuJeu)) return false;
+        try
+        {
+            var systeme = RetroBat.Api.Netplay.NetplayHostService.SystemeDuChemin(cheminDuJeu, RetroBatPaths.RomsRoot);
+            var set = Path.GetFileNameWithoutExtension(cheminDuJeu);
+            return RetroBat.Api.Infrastructure.GamelistIdentity.EstVertical(systeme, null, set);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
     /// <summary>Pendant la capture : l'en-tete (jeu vertical ?) puis la cadence du jeu.</summary>
     private async Task SurveillerAsync(CancellationToken ct)
     {
         var c = _enCours;
         if (c is null) return;
+
+        if (c.VerticalSansSens)
+        {
+            await ArreterAsync(c.ReplayId, null, abandon: true, "jeu vertical, sens de rotation inconnu").ConfigureAwait(false);
+            return;
+        }
 
         if (!c.EnteteVerifiee && MatroskaEntete.Lire(c.Fichier) is { } entete)
         {
