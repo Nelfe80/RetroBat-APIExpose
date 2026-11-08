@@ -45,6 +45,10 @@
     <None Update="Reglements\*.trace">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <!-- Le .SMEM de 19XX et les deux .MEM qu'il peut accompagner (couche de test du 08/11, officiel) : copies. -->
+    <None Update="Smem\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

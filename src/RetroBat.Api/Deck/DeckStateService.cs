@@ -23,7 +23,8 @@ namespace RetroBat.Api.Deck;
 ///   le dernier score de chaque joueur (<c>score.live.changed</c>) et les entrees tenues (<c>panel.input.*</c>) ;
 /// - la correspondance effective des boutons du jeu lance : <c>deck.controls</c> ;
 /// - le cadre reel ou RetroArch dessine le jeu, en pixels de l'ecran : <c>deck.frame</c> ;
-/// - les cadres demandes par un theme du Deck, et la configuration de session qui les imposerait au lancement.
+/// - les cadres demandes par un theme du Deck, et la configuration de session qui les imposerait au lancement ;
+/// - le sens des signaux du .MEM, lu dans son compagnon .SMEM (<c>deck.semantics</c>, voir <see cref="Smem"/>).
 ///
 /// <c>deck.snapshot</c> reunit tout, envoye a la connexion (<c>/ws</c> et <c>/ws/deck</c>) et sur demande
 /// (message <c>deck.snapshot.request</c>, ou <c>GET /api/v1/deck/snapshot</c>). L'API lit la manette ; le Deck jamais
@@ -163,6 +164,7 @@ public sealed class DeckStateService : IHostedService, IDisposable
             DefinitionFile: Texte(p, "DefinitionFile"),
             Ts: e.Ts);
 
+        Partie? aChercher = null;
         lock (_verrou)
         {
             var cle = (canal ?? "") + "." + (nom ?? "") + "@" + (adresse ?? "") + "#" + (signal.Player?.ToString() ?? "");
@@ -176,9 +178,38 @@ public sealed class DeckStateService : IHostedService, IDisposable
             {
                 partie.MemRom = signal.Rom;
                 partie.DefinitionFile = signal.DefinitionFile;
+                if (!partie.SemantiqueCherchee && !string.IsNullOrEmpty(partie.DefinitionFile))
+                {
+                    partie.SemantiqueCherchee = true;
+                    aChercher = partie;
+                }
             }
             _revision++;
         }
+
+        if (aChercher is not null) ChargerLaSemantique(aChercher);
+    }
+
+    /// <summary>
+    /// Le sens des signaux (.SMEM) du .MEM que le wrapper a charge, publie en deck.semantics une fois par lancement,
+    /// des que le premier signal nomme son fichier de definition. Lecture seule : rien ici ne touche au score.
+    /// </summary>
+    private void ChargerLaSemantique(Partie partie)
+    {
+        var semantique = Smem.Semantique(partie.LaunchId, partie.SystemId, partie.Rom, partie.MemRom, partie.DefinitionFile,
+            RetroBatPaths.RamResourcesRoot, 0);
+        lock (_verrou)
+        {
+            if (!ReferenceEquals(_partie, partie) || partie.Etat == "ended") return;
+            _revision++;
+            semantique = semantique with { Revision = _revision };
+            partie.Semantique = semantique;
+        }
+        if (semantique.Status == "invalid")
+        {
+            _journal?.LogWarning("Deck : .SMEM {Fichier} invalide : {Erreurs}", semantique.SmemFile, string.Join(" ; ", semantique.Errors));
+        }
+        Publier("deck.semantics", semantique);
     }
 
     private void NoterScore(EventEnvelope e)
@@ -727,7 +758,8 @@ public sealed class DeckStateService : IHostedService, IDisposable
                 HeldInputs: _tenues.Values.OrderBy(t => t.Player).ThenBy(t => t.Identity, StringComparer.Ordinal).ToList(),
                 Controls: partie?.Etat == "ended" ? null : partie?.Controls,
                 Frame: partie?.Etat == "ended" ? null : partie?.Cadre,
-                FramePlans: Cadres.Tous());
+                FramePlans: Cadres.Tous(),
+                Semantics: partie?.Etat == "ended" ? null : partie?.Semantique);
         }
     }
 
@@ -855,6 +887,8 @@ public sealed class DeckStateService : IHostedService, IDisposable
         public DeckLaunchLog.Lecture? Journal;
         public DeckControlsPayload? Controls;
         public DeckFramePayload? Cadre;
+        public DeckSemantics? Semantique;
+        public bool SemantiqueCherchee;
         public readonly CancellationTokenSource Arret = new();
     }
 }
@@ -989,4 +1023,5 @@ public sealed record DeckSnapshot(
     IReadOnlyList<DeckHeldInput> HeldInputs,
     DeckControlsPayload? Controls,
     DeckFramePayload? Frame,
-    IReadOnlyList<DeckFramePlan> FramePlans);
+    IReadOnlyList<DeckFramePlan> FramePlans,
+    DeckSemantics? Semantics = null);

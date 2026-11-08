@@ -1,0 +1,118 @@
+-- 19XX: The War Against Destiny : le SENS des signaux de 19xx-the-war-against-destiny.MEM pour l'affichage.
+-- Lu par APIExpose et le PlayerDeck seulement. Ne declare aucune adresse a surveiller : chaque signal cite des
+-- lignes du .MEM (adresse, action, joueur). N'entre ni dans le score ni dans l'empreinte certifiee.
+-- Preuves : rejeu de 17 replays de la borne dans fbneo_libretro (E:\claude_travail\smem_19xx\RAPPORT.md, 08/11).
+-- Format : CDC-NelfePlay-PlayerDeck-Annexe-SMEM.md (schema 1).
+return {
+  schema = 1,
+  kind = "semantics",
+  version = 1,
+  game = { system = "arcade", slug = "19xx-the-war-against-destiny", title = "19XX: The War Against Destiny" },
+  mem = { file = "19xx-the-war-against-destiny.MEM" },
+
+  signals = {
+    -- Bombes : baisse = bombe lancee (ligne d'origine), hausse = objet B ou vaisseau suivant (remise a 3).
+    { id = "players.1.resources.bombs", player = 1, kind = "counter", unit = "bomb", label = "Bombs", short = "BOMB",
+      from = {
+        { address = 0XFF8305, action = "BOMB_FIRED" },
+        { address = 0XFF8305, action = "AMMO_GAIN", player = 1 },
+      },
+      min = 0, initial = 3, quality = "qualified",
+      proof = "17 replays : 3 au depart et a chaque vaisseau, +1 a l'objet B, vu de 0 a 4 ; maximum du jeu non atteint" },
+    { id = "players.2.resources.bombs", player = 2, kind = "counter", unit = "bomb", label = "Bombs", short = "BOMB",
+      from = {
+        { address = 0XFF8405, action = "BOMB_FIRED", player = 2 },
+        { address = 0XFF8405, action = "AMMO_GAIN", player = 2 },
+      },
+      min = 0, initial = 3, quality = "partial",
+      proof = "fiche du joueur 1 decalee de 0x100 (labo MAME du 20/10, demo a deux avions) ; aucune partie a deux rejouee" },
+
+    -- Tir : deux etats seulement (0x00 normal, 0xFF renforce), pas un niveau gradue.
+    { id = "players.1.power.level", player = 1, kind = "level", label = "Shot", short = "SHOT",
+      from = {
+        { address = 0XFF8337, action = "WEAPON_STATE", player = 1 },
+        { address = 0XFF8337, action = "WEAPON_UPGRADE", player = 1 },
+      },
+      values = {
+        { raw = 0X00, value = 1, label = "Normal" },
+        { raw = 0XFF, value = 2, label = "Boosted" },
+      },
+      min = 1, max = 2, initial = 1, quality = "qualified",
+      proof = "17 replays : 0x00 ou 0xFF seulement ; 0xFF a la seconde prise de la meme arme (vulcan 3 puis 5 jets), 0 au vaisseau perdu" },
+    { id = "players.2.power.level", player = 2, kind = "level", label = "Shot", short = "SHOT",
+      from = {
+        { address = 0XFF8437, action = "WEAPON_STATE", player = 2 },
+        { address = 0XFF8437, action = "WEAPON_UPGRADE", player = 2 },
+      },
+      values = {
+        { raw = 0X00, value = 1, label = "Normal" },
+        { raw = 0XFF, value = 2, label = "Boosted" },
+      },
+      min = 1, max = 2, initial = 1, quality = "partial",
+      proof = "fiche du joueur 1 decalee de 0x100 ; montee jamais vue pour le joueur 2" },
+
+    -- Arme portee.
+    { id = "players.1.weapon.id", player = 1, kind = "enum", label = "Weapon", short = "WPN",
+      from = { { address = 0XFF82F1, action = "WEAPON_SELECTED", player = 1 } },
+      values = {
+        { raw = 0, label = "Base" },
+        { raw = 4, label = "Vulcan" },
+        { raw = 8, label = "Homing" },
+        { raw = 12, label = "Laser" },
+      },
+      initial = 0, quality = "qualified",
+      proof = "images du rejeu : 8 missiles, 12 laser, 4 vulcan, 0 tir de base ; 0 aussi pendant l'explosion du vaisseau" },
+    { id = "players.2.weapon.id", player = 2, kind = "enum", label = "Weapon", short = "WPN",
+      from = { { address = 0XFF83F1, action = "WEAPON_SELECTED", player = 2 } },
+      values = {
+        { raw = 0, label = "Base" },
+        { raw = 4, label = "Vulcan" },
+        { raw = 8, label = "Homing" },
+        { raw = 12, label = "Laser" },
+      },
+      initial = 0, quality = "partial",
+      proof = "meme fiche + 0x100, vu bouger dans la demo a deux avions" },
+
+    -- Puissance de la bombe : ligne d'origine du .MEM, jamais vue bouger. Declaree, non qualifiee.
+    { id = "players.1.bomb.power", player = 1, kind = "level", label = "Bomb power", short = "BPWR",
+      from = { { address = 0XFF830F, action = "RESOURCE_LOSE" } },
+      quality = "unproven",
+      proof = "0xFF830F n'a bouge dans aucun des 17 replays : sens et echelle a trouver" },
+
+    -- Stage : indice 0 pour le stage 1, monte au briefing PRIMARY TARGET.
+    { id = "progress.stageId", kind = "level", label = "Stage", short = "STG",
+      from = { { address = 0XFF4DD4, action = "PROGRESSION_STAGE" } },
+      scale = { num = 1, den = 1, add = 1 },
+      min = 1, max = 7, initial = 1, quality = "qualified",
+      proof = "constant par stage sur 3 parties, remis a 0 a une nouvelle partie ; 7 stages au tableau SCORE RANKING ; vus 1 a 3" },
+
+    -- Boss de stage : etat (aucun, arrivee, combat) et points de vie de depart. Les points de vie courants ne sont pas
+    -- publies : une ligne change serait coupee par l'auto-mute du wrapper.
+    { id = "bosses.stage.state", kind = "enum", label = "Boss", short = "BOSS",
+      from = {
+        { address = 0XFF51F4, action = "BATTLE_START" },
+        { address = 0XFF51F4, action = "BATTLE_END" },
+      },
+      values = {
+        { raw = 0, value = 0, label = "None" },
+        { raw = 0X7FFF, value = 1, label = "Arriving" },
+        { min = 1, max = 0X7FFE, value = 2, label = "Fighting" },
+      },
+      initial = 0, quality = "qualified",
+      proof = "0 sans boss, 0x7FFF a l'arrivee, puis les points de vie ; 6 replays image par image" },
+    { id = "bosses.stage.hp.start", kind = "counter", unit = "hp", label = "Boss HP", short = "HP",
+      from = { { address = 0XFF51F4, action = "BATTLE_START" } },
+      min = 1, max = 0X7FFE, quality = "qualified",
+      proof = "valeur a la fin de 0x7FFF ou a l'arrivee : 500, 530 ou 550 au stage 1, 910 au stage 2 ; variable d'une partie a l'autre" },
+  },
+
+  instruments = {
+    { id = "p1.bombs", label = "Bombs", player = 1, show = "counter", signals = { "players.1.resources.bombs" } },
+    { id = "p1.shot", label = "Shot", player = 1, show = "level", signals = { "players.1.power.level", "players.1.weapon.id" } },
+    { id = "p1.bomb_power", label = "Bomb power", player = 1, show = "level", signals = { "players.1.bomb.power" } },
+    { id = "p2.bombs", label = "Bombs", player = 2, show = "counter", signals = { "players.2.resources.bombs" } },
+    { id = "p2.shot", label = "Shot", player = 2, show = "level", signals = { "players.2.power.level", "players.2.weapon.id" } },
+    { id = "stage", label = "Stage", show = "level", signals = { "progress.stageId" } },
+    { id = "boss", label = "Boss", show = "state", signals = { "bosses.stage.state", "bosses.stage.hp.start" } },
+  },
+}

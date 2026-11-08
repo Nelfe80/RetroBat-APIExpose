@@ -1,7 +1,7 @@
 asyncapi: 3.0.0
 info:
   title: APIExpose Real-time Events
-  version: 1.4.0
+  version: 1.5.0
   description: |
     WebSocket event surface of the APIExpose plugin for RetroBat / EmulationStation.
     Local only (127.0.0.1). Connect to `/ws` for the unfiltered firehose or to
@@ -233,8 +233,9 @@ channels:
       state at revision N - `Game` (as deck.game), `Scores` (last score.live per
       player), `Signals` (last value of every .MEM signal seen this game, one entry
       per channel/name/address/player), `HeldInputs` (panel inputs currently held),
-      `Controls` (as deck.controls), `Frame` (as deck.frame), `FramePlans`.
-      Events that follow carry a higher `Revision`.
+      `Controls` (as deck.controls), `Frame` (as deck.frame), `FramePlans`,
+      `Semantics` (as deck.semantics, or null). Events that follow carry a higher
+      `Revision`.
 
 
       `deck.game`: the launched game, from the game-start hook on, before any .MEM
@@ -262,6 +263,26 @@ channels:
       `Status` applied | not-applied with `Reason`). Published on change only.
 
 
+      `deck.semantics`: what the .MEM signals of the launched game mean for display,
+      read from the companion `.SMEM` file next to the .MEM in effect (same layer:
+      official, .user, .contest; else the official layer). Published once per launch,
+      as soon as the first .MEM signal names its definition file. The .SMEM declares
+      no address to watch and never enters scoring nor the certified fingerprint.
+      `Status` = loaded | absent (no .SMEM: keep address bindings) | invalid
+      (`Errors` say why; no signal published). `Signals[]`: `Id` (canonical, e.g.
+      players.1.resources.bombs), `Player`, `Kind` (counter | level | enum | flag |
+      gauge), `Unit`, `Label`, `Short` (English), `From[]` = the .MEM lines that carry
+      its value (`Address` hex, `Action`, `Player`; null = the line has no player and
+      matches any signal player), `Values[]` (enumeration: `Raw` or `RawMin`..`RawMax`
+      -> `Value`, `Label`), `Scale` (displayed = raw * `Num` / `Den` + `Add`), `Min`,
+      `Max` (out of bounds = invalid, never shown), `Initial` (before any event),
+      `Quality` (qualified | partial | unproven), `Available` (false = show as
+      unavailable). The current value of a signal is the raw value of the LAST event
+      of any of its `From` lines. `Instruments[]`: `Id`, `Label`, `Player`, `Show`,
+      `Signals` (ids). `SmemSha256`/`MemSha256`: bytes read (information only).
+      Format: CDC-NelfePlay-PlayerDeck-Annexe-SMEM.md (schema 1).
+
+
       Client messages (JSON text, envelope `Type` [+ `Payload`]):
       `deck.snapshot.request` -> deck.snapshot to this client only;
       `deck.frame.request` (`Frame`: `SystemId`, `Rom` (empty = any game), `X`, `Y`,
@@ -279,6 +300,8 @@ channels:
         $ref: '#/components/messages/deckControls'
       deckFrame:
         $ref: '#/components/messages/deckFrame'
+      deckSemantics:
+        $ref: '#/components/messages/deckSemantics'
       deckAck:
         $ref: '#/components/messages/deckAck'
       deckClientRequest:
@@ -399,6 +422,36 @@ components:
               Approximate: false
               PixelScale: { X: 4.0179, Y: 3.125 }
               Source: window+config
+    deckSemantics:
+      name: DeckSemantics
+      title: deck.semantics
+      payload:
+        $ref: '#/components/schemas/Envelope'
+      examples:
+        - name: 19xx-test-layer
+          payload:
+            Type: deck.semantics
+            Payload:
+              Schema: nelfeplay.deck.semantics/1
+              LaunchId: 5d1c
+              SystemId: fbneo
+              Rom: 19xx
+              MemRom: 19xx-the-war-against-destiny
+              DefinitionFile: 'E:/RetroBat/plugins/APIExpose/resources/ram/.user/arcade/19xx-the-war-against-destiny.MEM'
+              SmemFile: 'E:/RetroBat/plugins/APIExpose/resources/ram/.user/arcade/19xx-the-war-against-destiny.SMEM'
+              Status: loaded
+              Version: 1
+              Game: { System: arcade, Slug: 19xx-the-war-against-destiny, Title: '19XX: The War Against Destiny' }
+              Errors: []
+              Warnings: []
+              Signals:
+                - { Id: players.1.resources.bombs, Player: 1, Kind: counter, Unit: bomb, Label: Bombs, Short: BOMB, From: [ { Address: '0xFF8305', Action: BOMB_FIRED, Player: null }, { Address: '0xFF8305', Action: AMMO_GAIN, Player: 1 } ], Values: [], Scale: { Num: 1, Den: 1, Add: 0 }, Min: 0, Max: null, Initial: 3, Quality: qualified, Available: true }
+                - { Id: players.1.power.level, Player: 1, Kind: level, Label: Shot, Short: SHOT, From: [ { Address: '0xFF8337', Action: WEAPON_STATE, Player: 1 }, { Address: '0xFF8337', Action: WEAPON_UPGRADE, Player: 1 } ], Values: [ { Raw: 0, Value: 1, Label: Normal }, { Raw: 255, Value: 2, Label: Boosted } ], Scale: { Num: 1, Den: 1, Add: 0 }, Min: 1, Max: 2, Initial: 1, Quality: qualified, Available: true }
+                - { Id: progress.stageId, Player: null, Kind: level, Label: Stage, Short: STG, From: [ { Address: '0xFF4DD4', Action: PROGRESSION_STAGE, Player: null } ], Values: [], Scale: { Num: 1, Den: 1, Add: 1 }, Min: 1, Max: 7, Initial: 1, Quality: qualified, Available: true }
+                - { Id: players.1.bomb.power, Player: 1, Kind: level, Label: Bomb power, Short: BPWR, From: [ { Address: '0xFF830F', Action: RESOURCE_LOSE, Player: null } ], Values: [], Scale: { Num: 1, Den: 1, Add: 0 }, Quality: unproven, Available: false }
+              Instruments:
+                - { Id: p1.bombs, Label: Bombs, Player: 1, Show: counter, Signals: [ players.1.resources.bombs ] }
+                - { Id: stage, Label: Stage, Player: null, Show: level, Signals: [ progress.stageId ] }
     deckAck:
       name: DeckAck
       title: deck.ack (reply to a client message, to that client only)
