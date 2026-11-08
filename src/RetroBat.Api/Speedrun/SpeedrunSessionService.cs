@@ -398,7 +398,11 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 // la session ne l'attend pas pour se rearmer (23:26, 12 s d'attente sous charge : le depart du joueur etait passe,
                 // et l'entree dans la salle souterraine de Mario a ete prise pour le depart, 0:14.93).
                 if (RetroBat.Api.Replay.Recording.ReplayRecorderService.Courant is { } enregistreur)
+                {
+                    // annoncee AVANT la tache (08/11) : sinon « speedrun.etat.charge », publie juste apres, arretait le replay neuf
+                    enregistreur.AnnoncerRelance();
                     _ = Task.Run(() => enregistreur.OuvrirApresRelanceAsync(CancellationToken.None));
+                }
             }
         }
         catch (Exception ex)

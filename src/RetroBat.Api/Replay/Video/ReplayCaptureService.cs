@@ -192,6 +192,26 @@ public sealed class ReplayCaptureService : BackgroundService
     }
 
     /// <summary>
+    /// LE FILM D'UNE EPREUVE (speedrun, challenge ; 08/11). Le relevé du 08/11 : 1-1 de SMB en 4 s pour 29,77 s de run, Green
+    /// Hill 1 en 15 s pour 39,78 s. <see cref="SequenceDuRecord"/> part de 90 % du score de fin, et le score d'un jeu saute a
+    /// l'arrivee (drapeau et decompte du temps, bilan de fin d'acte, bilan de mission) : il ne restait que la fin. Le film
+    /// d'une epreuve va du depart a l'arrivee : les bornes du run que le site designe (frames du replay, deja avec 3 s de marge
+    /// de chaque cote), ramenees en secondes du film, et 2 s apres. Null sans fin connue (tout le film part) ; le debut manque,
+    /// le film part de son debut. <paramref name="dureeS"/> borne la fin quand elle est connue. Pur.
+    /// </summary>
+    internal static (double DebutS, double FinS)? SequenceDEpreuve(long debutFilm, long? runDebut, long? runFin, double fps,
+        double? dureeS)
+    {
+        const double Apres = 2;
+        if (fps <= 1 || runFin is not long fin || fin <= debutFilm) return null;
+        var debutS = runDebut is long debut && debut > debutFilm ? (debut - debutFilm) / fps : 0;
+        var finS = (fin - debutFilm) / fps + Apres;
+        if (dureeS is double duree && duree > 0 && finS > duree) finS = duree;
+        if (finS <= debutS) return null;
+        return (Math.Round(debutS, 2), Math.Round(finS, 2));
+    }
+
+    /// <summary>
     /// Une capture gardee sur la borne : en attente de la decision du site, en cours d'envoi (<paramref name="Session"/>,
     /// pour reprendre la ou l'envoi s'est arrete), puis envoyee (<paramref name="VideoId"/>) jusqu'a ce que la video
     /// soit prete chez YouTube. Le film d'une partie sans replay (<paramref name="SansReplay"/>) porte les sessions de
@@ -919,7 +939,13 @@ public sealed class ReplayCaptureService : BackgroundService
                     var finRunS = voulue.RunFinFrame is long finRun && finRun > courante.DebutFilm && fps > 1
                         ? (finRun - courante.DebutFilm) / fps
                         : courante.FinDuRunS ?? courante.DureeS;
-                    if (finRunS is double finDuRunS)
+                    if (voulue.Epreuve)
+                    {
+                        // Une epreuve (08/11) : du depart a l'arrivee que le site designe, jamais la coupe au score.
+                        if (SequenceDEpreuve(courante.DebutFilm, voulue.RunDebutFrame, voulue.RunFinFrame, fps, courante.DureeS) is { } epreuve)
+                            courante = courante with { DebutSequenceS = epreuve.DebutS, FinSequenceS = epreuve.FinS };
+                    }
+                    else if (finRunS is double finDuRunS)
                     {
                         var (debutS, finS) = SequenceDuRecord(courante.Courbe, finDuRunS);
                         courante = courante with { DebutSequenceS = debutS, FinSequenceS = finS };

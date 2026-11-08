@@ -158,13 +158,43 @@ public sealed class ReplayRecorderService : BackgroundService
     private DateTime _ouvertALaRelance = DateTime.MinValue;
 
     /// <summary>
+    /// LA RELANCE ANNONCEE (08/11). La session lance <see cref="OuvrirApresRelanceAsync"/> en tache detachee puis publie
+    /// aussitot « speedrun.etat.charge » ; <see cref="_ouvertALaRelance"/> n'etait pose qu'une fois le replay ouvert, 150 a
+    /// 500 ms plus tard. L'evenement passait avant, et le tour suivant de la boucle arretait le replay qui venait de s'ouvrir
+    /// (journal d'un joueur du 07/11 : ouvert a 16:01:05.296, « arrete a la relance » a 16:01:05.377, puis « en attente du
+    /// depart ») : la tentative suivante n'etait enregistree qu'en partie, ou pas du tout, et une meilleure tentative tombee
+    /// dans ce trou repartait avec le dernier replay ouvert, un bout de 29 images, sans bornes ni film. La session l'annonce
+    /// ici AVANT de lancer la tache : l'evenement qui suit laisse la relance faire.
+    /// </summary>
+    private DateTime _relanceAnnoncee = DateTime.MinValue;
+
+    /// <summary>Le temps pendant lequel une relance annoncee ou ouverte couvre l'evenement « speedrun.etat.charge ».</summary>
+    internal static readonly TimeSpan RelanceCouvreLEvenement = TimeSpan.FromSeconds(10);
+
+    /// <summary>La session va ouvrir le replay de sa relance (<see cref="OuvrirApresRelanceAsync"/>) : a appeler avant.</summary>
+    public void AnnoncerRelance() => _relanceAnnoncee = DateTime.UtcNow;
+
+    /// <summary>
+    /// L'evenement « speedrun.etat.charge » est-il deja pris en charge par la relance ? Oui si elle a ete annoncee ou a ouvert
+    /// son replay il y a moins de <see cref="RelanceCouvreLEvenement"/>. Pur.
+    /// </summary>
+    internal static bool RelanceCouvreLEtatCharge(DateTime maintenant, DateTime annoncee, DateTime ouverte)
+        => maintenant - annoncee < RelanceCouvreLEvenement || maintenant - ouverte < RelanceCouvreLEvenement;
+
+    /// <summary>
     /// LA SESSION OUVRE LE REPLAY DE SA RELANCE (05/11, ta course de 25,66 s : replay ouvert 1,75 s apres l'etat recharge, le
     /// depart de Mario etait deja passe). Appele juste apres l'etat de depart, sans attendre le tour de la boucle ni redemander
     /// l'etat de RetroArch : l'ancien replay se repere, le neuf s'ouvre, l'ancien se scelle ensuite.
     /// </summary>
     public async Task OuvrirApresRelanceAsync(CancellationToken ct)
     {
-        if (!await _tour.WaitAsync(TimeSpan.FromSeconds(1), ct).ConfigureAwait(false)) return;   // l'evenement prendra le relais
+        if (!await _tour.WaitAsync(TimeSpan.FromSeconds(1), ct).ConfigureAwait(false))
+        {
+            // la boucle prend le relais, une seule fois : l'annonce couvre encore l'evenement (passe ou a venir), et on fait
+            // ici ce qu'il aurait fait
+            NoterLEtatCharge();
+            return;
+        }
         try
         {
             _speedrun = true;
@@ -465,17 +495,9 @@ public sealed class ReplayRecorderService : BackgroundService
                 _speedrun = true;
                 return;
             case "speedrun.etat.charge":
-                // la relance a deja ouvert son replay (OuvrirApresRelanceAsync) : rien a rejouer
-                if (DateTime.UtcNow - _ouvertALaRelance < TimeSpan.FromSeconds(10)) return;
-                _etatDeDepartAttendu = false;
-                _speedrun = true;
-                _sourceDuDepart = "etat de depart du defi";
-                _departEnAttente = true;
-                // l'etat recharge ouvre une nouvelle tentative : rien de la precedente (fin, baisse du score) ne la retient
-                _runTermine = false;
-                _arretParBaisse = false;
-                _relanceDuDefi = true;
-                Reveiller();
+                // la relance ouvre (ou a deja ouvert) son replay (OuvrirApresRelanceAsync) : rien a rejouer
+                if (RelanceCouvreLEtatCharge(DateTime.UtcNow, _relanceAnnoncee, _ouvertALaRelance)) return;
+                NoterLEtatCharge();
                 return;
             case "ui.game.ended":
                 _etatDeDepartAttendu = false;
@@ -567,6 +589,20 @@ public sealed class ReplayRecorderService : BackgroundService
             _sourceDuDepart = "bouton du panel";
             _departEnAttente = true;
         }
+    }
+
+    /// <summary>L'etat de depart recharge sans relance ouverte par la session : le tour suivant arrete l'ancien replay et ouvre le neuf.</summary>
+    private void NoterLEtatCharge()
+    {
+        _etatDeDepartAttendu = false;
+        _speedrun = true;
+        _sourceDuDepart = "etat de depart du defi";
+        _departEnAttente = true;
+        // l'etat recharge ouvre une nouvelle tentative : rien de la precedente (fin, baisse du score) ne la retient
+        _runTermine = false;
+        _arretParBaisse = false;
+        _relanceDuDefi = true;
+        Reveiller();
     }
 
     /// <summary>Un START assez recent pour qu'on enregistre. Le dit une fois par attente.</summary>
