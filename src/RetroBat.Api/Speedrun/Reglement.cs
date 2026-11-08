@@ -157,6 +157,13 @@ public sealed class Reglement
     public IReadOnlyList<CritereDeRang> Rang { get; private init; } = [new("frames", true)];
     public IReadOnlyList<string> Coeurs { get; private init; } = [];
 
+    /// <summary>
+    /// L'AFFICHAGE DE L'EPREUVE (« display », facultatif, CDC PlayerDeck H-D23) : libelles, instruments du Deck qui cedent leur
+    /// place, compteurs d'affichage et efficacite. Gardé en texte JSON brut, lu par le Deck seulement : il n'entre ni dans la
+    /// validation, ni dans l'evaluation, ni dans le passeport (rien n'y est certifie). Null : pas de bloc.
+    /// </summary>
+    public string? AffichageJson { get; private init; }
+
     /// <summary>La cadence reelle du coeur, pour afficher le temps (D30) et juger l'ecart horloge/frames.</summary>
     public double Cadence { get; private init; } = 60;
 
@@ -259,6 +266,7 @@ public sealed class Reglement
                 TolerancePauseMs = r.TryGetProperty("runtime", out var rt3) && rt3.TryGetProperty("pause_tolerance_ms", out var tol) ? tol.GetInt32() : 1000,
                 Verrous = Liste(r, "locks").Select(LireVerrou).ToList(),
                 Ordre = Entier(r, "order") ?? 0,
+                AffichageJson = r.TryGetProperty("display", out var aff) && aff.ValueKind == JsonValueKind.Object ? aff.GetRawText() : null,
             };
             reglement.ControlerLesVerrous();
             return reglement;

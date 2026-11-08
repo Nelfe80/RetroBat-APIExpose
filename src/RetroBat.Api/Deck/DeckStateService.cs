@@ -64,6 +64,9 @@ public sealed class DeckStateService : IHostedService, IDisposable
     /// <summary>Le rang en direct de la partie (<see cref="DeckRankService"/>, H-D21), repris dans l'instantane.</summary>
     public Func<DeckRank?>? Rang { get; set; }
 
+    /// <summary>L'epreuve en cours (<see cref="DeckTrialService"/>, H-D23), reprise dans l'instantane.</summary>
+    public Func<DeckTrial?>? Epreuve { get; set; }
+
     /// <summary>L'identifiant du lancement en cours ; null hors d'une partie.</summary>
     public string? LaunchIdCourant
     {
@@ -756,7 +759,8 @@ public sealed class DeckStateService : IHostedService, IDisposable
                 Frame: partie?.Etat == "ended" ? null : partie?.Cadre,
                 FramePlans: Cadres.Tous(),
                 Semantics: partie?.Etat == "ended" ? null : partie?.Semantique,
-                Rank: partie?.Etat == "ended" ? null : Rang?.Invoke());
+                Rank: partie?.Etat == "ended" ? null : Rang?.Invoke(),
+                Trial: partie?.Etat == "ended" ? null : Epreuve?.Invoke());
         }
     }
 
@@ -1028,4 +1032,5 @@ public sealed record DeckSnapshot(
     DeckFramePayload? Frame,
     IReadOnlyList<DeckFramePlan> FramePlans,
     DeckSemantics? Semantics = null,
-    DeckRank? Rank = null);
+    DeckRank? Rank = null,
+    DeckTrial? Trial = null);

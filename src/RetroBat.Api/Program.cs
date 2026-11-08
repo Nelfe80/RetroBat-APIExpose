@@ -366,6 +366,9 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.
 // Le rang en direct du PlayerDeck (H-D21) : classement lu au lancement, rang recalcule en local a chaque valeur.
 builder.Services.AddSingleton<RetroBat.Api.Deck.DeckRankService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckRankService>());
+// L'epreuve en cours pour le PlayerDeck (H-D23) : deck.trial, tire du reglement et de la session, sans reseau en course.
+builder.Services.AddSingleton<RetroBat.Api.Deck.DeckTrialService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckTrialService>());
 // Les fondations du reseau (CDC infra §15) : la carte signee (cles de verdict, relais) et les relais, par ou
 // passent les requetes de la borne quand elle ne joint pas le central.
 builder.Services.AddSingleton<RetroBat.Api.Reseau.ServiceDeCarte>();
@@ -776,6 +779,9 @@ var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
     // Le rang en direct (H-D21) s'arme a chaque lancement avec Deck ; il se pose aussi dans l'instantane du Deck.
     app.Services.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>().Rang =
         app.Services.GetRequiredService<RetroBat.Api.Deck.DeckRankService>();
+    // L'epreuve en cours (H-D23) s'arme a chaque lancement d'epreuve avec Deck ; elle se pose aussi dans l'instantane.
+    app.Services.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>().Epreuve =
+        app.Services.GetRequiredService<RetroBat.Api.Deck.DeckTrialService>();
 }
 eventBus.Subscribe<EventEnvelope>(evt => 
 {

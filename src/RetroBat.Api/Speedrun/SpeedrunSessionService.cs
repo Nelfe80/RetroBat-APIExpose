@@ -239,7 +239,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         // LE PLAYERDECK (H-D20) : LAUNCH THE SPEEDRUN / LAUNCH THE CHALLENGE part avec le Deck du jeu, s'il en a un. Le decor
         // est un reglage d'affichage : il ne touche ni au coeur, ni au .MEM, ni aux verrous, ni a l'empreinte des options.
         var deck = _deck?.Preparer(RetroBat.Api.Deck.DeckModes.Speedrun, reglement.SystemId, rom, reglement.RomGroup,
-            RetroBat.Api.Deck.DeckRankBoard.DeLEpreuve(reglement));
+            RetroBat.Api.Deck.DeckRankBoard.DeLEpreuve(reglement), epreuve: RetroBat.Api.Deck.DeckTrialPlan.De(reglement));
         var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
             RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, reglement.SystemId, "libretro", coeur, rom, retroAchievements: false,
             deck?.Arguments);

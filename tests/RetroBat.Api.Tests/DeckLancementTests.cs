@@ -298,7 +298,7 @@ public sealed class DeckLancementTests : IDisposable
             RacineDuDecor = Path.Combine(_dossier, "decorations", DeckDecor.Nom),
             DemarrerLeHost = false,
             // 19XX centre en 3:4, comme le rendu du Deck
-            Rendeur = (e, l, h) => new DeckRendu(png, new DeckDecor.Trou((l - h * 3 / 4) / 2, 0, h * 3 / 4, h), l, h, false, 1),
+            Rendeur = (e, l, h, _) => new DeckRendu(png, new DeckDecor.Trou((l - h * 3 / 4) / 2, 0, h * 3 / 4, h), l, h, false, 1),
         };
     }
 
