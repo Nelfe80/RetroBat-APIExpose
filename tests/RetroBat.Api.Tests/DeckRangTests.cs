@@ -359,7 +359,7 @@ public sealed class DeckRangTests
                 Ecran = () => (1920, 1200),
                 RacineDuDecor = Path.Combine(dossier, "decorations", DeckDecor.Nom),
                 DemarrerLeHost = false,
-                Rendeur = (e, l, h) => new DeckRendu(png, new DeckDecor.Trou(510, 0, 900, 1200), l, h, false, 1),
+                Rendeur = (e, l, h, _) => new DeckRendu(png, new DeckDecor.Trou(510, 0, 900, 1200), l, h, false, 1),
                 Rang = rang,
             };
 

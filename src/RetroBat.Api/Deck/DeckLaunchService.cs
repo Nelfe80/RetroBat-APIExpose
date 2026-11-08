@@ -71,9 +71,12 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     /// <summary>Le rang en direct (H-D21), arme a chaque lancement avec Deck ; pose par Program.cs.</summary>
     public DeckRankService? Rang { get; set; }
 
+    /// <summary>L'epreuve en cours (H-D23), armee a chaque lancement d'epreuve avec Deck ; pose par Program.cs.</summary>
+    public DeckTrialService? Epreuve { get; set; }
+
     // Coutures pour les essais (sans exe, sans ecran, sans processus)
     internal Func<DeckCatalogue>? Catalogue { get; set; }
-    internal Func<DeckCatalogue.Entree, int, int, DeckRendu?>? Rendeur { get; set; }
+    internal Func<DeckCatalogue.Entree, int, int, DeckTrialPlan?, DeckRendu?>? Rendeur { get; set; }
     internal Func<(int Largeur, int Hauteur)>? Ecran { get; set; }
     internal string? RacineDuDecor { get; set; }
     internal bool DemarrerLeHost { get; set; } = true;
@@ -132,9 +135,10 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     /// classement du rang en direct (regle de l'onglet, epreuve) ; null : celui du mode par defaut. <paramref name="place"/> :
     /// la place du joueur local (MULTIPLAYER), dont le score se classe.
     /// </summary>
-    public DeckLancement Preparer(string mode, string systeme, string cheminRom, string? romGroup = null, DeckRankBoard? classement = null, int place = 1)
+    public DeckLancement Preparer(string mode, string systeme, string cheminRom, string? romGroup = null, DeckRankBoard? classement = null, int place = 1,
+        DeckTrialPlan? epreuve = null)
     {
-        var lancement = PreparerLeDeck(mode, systeme, cheminRom, romGroup, classement);
+        var lancement = PreparerLeDeck(mode, systeme, cheminRom, romGroup, classement, epreuve);
         if (place != 1) lancement = lancement with { Seat = place };
         // Le rang en direct se prepare avec le lancement (lecture du classement en fond, jamais bloquante)
         try
@@ -146,10 +150,20 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
             _journal?.LogInformation(ex, "PlayerDeck : rang en direct non prepare.");
         }
 
+        // L'epreuve en cours (H-D23) : le plan du reglement, pour la couche epreuve du Deck
+        try
+        {
+            Epreuve?.Armer(lancement, epreuve);
+        }
+        catch (Exception ex)
+        {
+            _journal?.LogInformation(ex, "PlayerDeck : epreuve non preparee.");
+        }
+
         return lancement;
     }
 
-    private DeckLancement PreparerLeDeck(string mode, string systeme, string cheminRom, string? romGroup, DeckRankBoard? classement)
+    private DeckLancement PreparerLeDeck(string mode, string systeme, string cheminRom, string? romGroup, DeckRankBoard? classement, DeckTrialPlan? epreuve)
     {
         var rom = Path.GetFileNameWithoutExtension(cheminRom ?? string.Empty).Trim().ToLowerInvariant();
         var joueur = Joueur();
@@ -182,7 +196,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
 
             lancement = lancement with { DeckId = entree.Id, DeckName = entree.Name, Official = entree.Official };
             var (largeur, hauteur) = Ecran?.Invoke() ?? EcranPrincipal();
-            var rendu = (Rendeur ?? RendreParLeDeck).Invoke(entree, largeur, hauteur);
+            var rendu = (Rendeur ?? RendreParLeDeck).Invoke(entree, largeur, hauteur, epreuve);
             if (rendu is null)
             {
                 return Retenir(lancement with { Status = "window", Reason = "decor_not_rendered" }, publier: true);
@@ -264,7 +278,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     /// jeu, jamais pendant une partie (budgets du §0.4 : rien a la charge du Host en jeu). Garde en cache par Deck (empreinte
     /// du fichier), exe et taille d'ecran : un relancement du meme jeu ne coute qu'une copie de fichier.
     /// </summary>
-    private DeckRendu? RendreParLeDeck(DeckCatalogue.Entree entree, int largeur, int hauteur)
+    private DeckRendu? RendreParLeDeck(DeckCatalogue.Entree entree, int largeur, int hauteur, DeckTrialPlan? epreuve)
     {
         var exe = Path.Combine(DossierDuDeck, NomDuHost + ".exe");
         if (!File.Exists(exe))
@@ -275,9 +289,11 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
 
         var infoExe = new FileInfo(exe);
         var cle = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(
-            $"{entree.Sha256}|{infoExe.Length}|{infoExe.LastWriteTimeUtc.Ticks}|{largeur}x{hauteur}")))[..16].ToLowerInvariant();
+            $"{entree.Sha256}|{infoExe.Length}|{infoExe.LastWriteTimeUtc.Ticks}|{largeur}x{hauteur}|{epreuve?.ToJson()}")))[..16].ToLowerInvariant();
         var cache = Path.Combine(DossierEtat, "decors");
         var png = Path.Combine(cache, entree.Id + "-" + cle + ".png");
+        // La couche epreuve (H-D23) est dans le decor : ses plaques font partie du fond pose par RetroArch
+        var plan = epreuve is null ? null : Path.ChangeExtension(png, ".trial.json");
         var json = Path.ChangeExtension(png, ".json");
         if (File.Exists(png) && File.Exists(json) && LireLeRendu(File.ReadAllText(json), largeur, hauteur) is { } garde)
         {
@@ -285,11 +301,12 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         }
 
         Directory.CreateDirectory(cache);
+        if (plan is not null) File.WriteAllText(plan, epreuve!.ToJson());
         var chrono = Stopwatch.StartNew();
         using var processus = Process.Start(new ProcessStartInfo
         {
             FileName = exe,
-            Arguments = $"--render-decor \"{png}\" --theme {entree.Id} --render-size {largeur}x{hauteur}",
+            Arguments = $"--render-decor \"{png}\" --theme {entree.Id} --render-size {largeur}x{hauteur}" + (plan is null ? "" : $" --trial \"{plan}\""),
             WorkingDirectory = DossierDuDeck,
             UseShellExecute = false,
             CreateNoWindow = true,

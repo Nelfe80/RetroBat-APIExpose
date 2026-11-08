@@ -1,7 +1,7 @@
 asyncapi: 3.0.0
 info:
   title: APIExpose Real-time Events
-  version: 1.7.0
+  version: 1.8.0
   description: |
     WebSocket event surface of the APIExpose plugin for RetroBat / EmulationStation.
     Local only (127.0.0.1). Connect to `/ws` for the unfiltered firehose or to
@@ -169,7 +169,10 @@ channels:
       challengeId, rulesVersion, state, cause, sequence, start, official, splits,
       comparisons, allowedActions, demo, counters), speedrun.state, speedrun.started,
       speedrun.finish.provisional, speedrun.attempt.ended, speedrun.attempt.opened,
-      speedrun.restart.failed, speedrun.comparison, speedrun.session.closed
+      speedrun.restart.failed, speedrun.comparison, speedrun.counter (a rule
+      counter went up during the attempt: `id`, `value`, `max`, `left` = counts
+      before the failing one, `penaltyFrames` = cumulated penalty; the snapshot
+      follows with the new `counters`), speedrun.session.closed
       (retained after the game ends). Every event carries the session `sequence`.
       Commands go through POST /api/v1/speedrun/commands (local token).
     messages:
@@ -234,7 +237,8 @@ channels:
       player), `Signals` (last value of every .MEM signal seen this game, one entry
       per channel/name/address/player), `HeldInputs` (panel inputs currently held),
       `Controls` (as deck.controls), `Frame` (as deck.frame), `FramePlans`,
-      `Semantics` (as deck.semantics, or null), `Rank` (as deck.rank, or null).
+      `Semantics` (as deck.semantics, or null), `Rank` (as deck.rank, or null),
+      `Trial` (as deck.trial, or null).
       Events that follow carry a higher `Revision`.
 
 
@@ -296,6 +300,41 @@ channels:
       `Final` (rank fixed at the finish of a challenge attempt), `FrameRate`,
       `Revision`. Reads a public leaderboard only: the certified fingerprint, the
       preflight, the passport and the locks do not change.
+
+
+      `deck.trial` (CDC PlayerDeck H-D23): the challenge or speedrun attempt in
+      progress, for the trial layer of the Deck (LAUNCH THE SPEEDRUN / LAUNCH THE
+      CHALLENGE with a Deck). Built from the rules (fixed at launch) and from the
+      speedrun session, plus the target and personal best of deck.rank (leaderboard
+      read at launch): no network call during the attempt. Published on change (state,
+      counter, tally, milestone, target). `ChallengeId`, `Ruleset`, `Category` =
+      challenge | speedrun, `Kind`, `Title` (English), `SessionId`, `AttemptId`,
+      `AttemptNumber`, `State` = IDLE | ARMED | RUNNING | FINISHED | ABORTED |
+      INVALID | RESTARTING, `Cause` (fail action or counter id). `Clock`: `FrameRate`,
+      `StartClockMs` (cabinet clock at the start, same clock as the Deck), `Running`
+      (the Deck runs the clock itself: now - StartClockMs + PenaltyFrames),
+      `Frames` + `Text` (frozen time: finish, provisional finish or failed attempt;
+      penalties included), `Provisional`, `PenaltyFrames`, `PenaltyText` (+3 s).
+      `Counters[]` (rules `counters`): `Id`, `Label`, `Value`, `Max` (most allowed),
+      `FailsAt` (= Max + 1), `Left` (FailsAt - Value), `Warn` (Left <= max(3,
+      FailsAt / 10)), `PenaltyFramesEach`, `PenaltyFrames`, `PenaltyText`, `Tripped`.
+      `Fails[]` (rules `fail`): `Id`, `Label` (NO DEATH, NO AMMO SPENT...), `Action`,
+      `State` = idle | ok | tripped. `Efficiency[]` (rules `display.efficiency`):
+      `Id`, `Label`, `Format` = percent | ratio, `ActionsLabel`, `ResultsLabel`,
+      `Actions`, `Results`, `Percent` (results * 100 / actions), `Text`, `History`
+      (last closed attempts of the session, most recent first, 5 at most).
+      `Comparisons`: `PersonalBest` (best of the local journal and of the leaderboard
+      read: `Frames`, `Text`, `Rank`, `Player`, `Source` = local | board), `Target`
+      (time of the targeted rank), `FinalRank` (rank fixed at the finish),
+      `NewPersonalBest`. `Milestones` (rules `milestones`, else null): `Total`,
+      `Reached`, `SplitsMs`, `BestSplitsMs` (best finished attempt of the session).
+      `Locked` (addresses held by the rules `locks`: a theme instrument bound to one
+      of them may yield its place, if the theme says so), `Yields` (instruments the
+      rules remove, `display.yields`), `Revision`. The optional rules block `display`
+      (`labels`, `yields`, `tallies` = .MEM events counted for display during the
+      attempt, `efficiency` = ratio of two counters or tallies) is display only: it is
+      neither evaluated, nor certified, nor part of the passport. The certified
+      fingerprint, the preflight, the passport and the locks do not change.
 
 
       `deck.choice`: the player picked another Deck or Off in game (gamepad:
@@ -376,6 +415,8 @@ channels:
         $ref: '#/components/messages/deckChoice'
       deckRank:
         $ref: '#/components/messages/deckRank'
+      deckTrial:
+        $ref: '#/components/messages/deckTrial'
       deckAck:
         $ref: '#/components/messages/deckAck'
       deckClientRequest:
@@ -584,6 +625,16 @@ components:
           payload:
             Type: deck.rank
             Payload: { LaunchId: 7a20, Mode: speedrun, Game: arcade/metal-slug-3, Player: nelfe, Board: challenges, Ruleset: mslug3-speedrun-m1, Label: SPEEDRUN, Key: time, Better: lower, Provisional: true, State: racing, Source: stale, Rows: 9, World: home, Rank: null, Target: { Rank: 4, Player: bob, Value: 21540, Text: '6:03.97' }, PersonalBest: { Rank: 6, Player: nelfe, Value: 22102, IsMe: true, Text: '6:13.47' }, Final: false, FrameRate: 59.18, Revision: 3 }
+    deckTrial:
+      name: DeckTrial
+      title: deck.trial (challenge or speedrun attempt in progress, H-D23)
+      payload:
+        $ref: '#/components/schemas/Envelope'
+      examples:
+        - name: mslug3-knife-running
+          payload:
+            Type: deck.trial
+            Payload: { LaunchId: 7a20, ChallengeId: metal-slug-3.mission-1-knife, Ruleset: ch-ms3-m1-knife-v7, Category: challenge, Kind: challenge_rule, Title: 'My ### and my knife', SessionId: 3f1e, AttemptId: 9c2d, AttemptNumber: 4, State: RUNNING, Cause: null, Clock: { FrameRate: 59.185606, StartClockMs: 1794301200123, Running: true, Frames: null, Text: null, Provisional: false, PenaltyFrames: 420, PenaltyText: '+7 s' }, Counters: [ { Id: hits, Label: HITS, Value: 7, Max: 98, FailsAt: 99, Left: 92, Warn: false, PenaltyFramesEach: 60, PenaltyFrames: 420, PenaltyText: '+7 s', Tripped: false } ], Fails: [ { Id: AMMO_LOSE, Label: NO AMMO SPENT, Action: AMMO_LOSE, State: ok }, { Id: LOSE_LIFE, Label: NO DEATH, Action: LOSE_LIFE, State: ok } ], Efficiency: [], Comparisons: { PersonalBest: { Frames: 22102, Text: '6:13.47', Rank: 6, Player: nelfe, Source: board }, Target: { Frames: 21540, Text: '6:03.97', Rank: 4, Player: bob, Source: board }, FinalRank: null, NewPersonalBest: false }, Milestones: null, Locked: ['0x100596', '0x10EAF3', '0x100581', '0x10EAF5'], Yields: [], Revision: 12 }
     deckAck:
       name: DeckAck
       title: deck.ack (reply to a client message, to that client only)

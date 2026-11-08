@@ -280,10 +280,20 @@ public sealed class SessionSpeedrun
     /// </summary>
     private void AnnoncerLesCoups(IReadOnlyDictionary<string, int> avant)
     {
-        foreach (var c in _r.Compteurs.Where(c => c.Maximum is not null || c.PenaliteFrames is > 0))
+        foreach (var c in _r.Compteurs)
         {
             var n = _courante.Compteurs.TryGetValue(c.Id, out var v) ? v : 0;
             if (n <= (avant.TryGetValue(c.Id, out var a) ? a : 0) || _courante.EstTerminee) continue;
+            // LE COMPTEUR EN DIRECT (PlayerDeck H-D23, 08/11) : un evenement de la session, donc un instantane republie ; sans
+            // lui, « counters » ne changeait dans l'instantane qu'au changement d'etat. Affichage seulement : rien n'est
+            // ecrit dans le resultat de la tentative ni dans le passeport.
+            Publier("speedrun.counter", new
+            {
+                sessionId = SessionId, attemptId = AttemptId, id = c.Id, value = n, max = c.Maximum,
+                left = c.Maximum is { } m ? Math.Max(0, m + 1 - n) : (int?)null,
+                penaltyFrames = c.PenaliteFrames is { } pf and > 0 ? (long)pf * n : 0L,
+            });
+            if (c.Maximum is null && c.PenaliteFrames is not > 0) continue;
             var restants = c.Maximum is { } max ? Math.Max(0, max + 1 - n) : (int?)null;
             var penalite = c.PenaliteFrames is { } p and > 0
                 ? (p / _r.Cadence).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture) : null;
