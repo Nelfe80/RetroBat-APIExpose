@@ -39,22 +39,34 @@ public sealed class FantomesDuSpeedrun
     /// <summary>
     /// Un jeu dont un coeur hote a le profil : son coeur d'origine, le coeur hote, le crc32 du contenu (EN-TETE COMPRIS : c'est
     /// celui que calcule le coeur hote) et le nom du dump que ce crc designe, pour le dire au joueur.
+    /// <para>
+    /// <paramref name="SansEnTete"/> (08/11) : le md5 du dump classe SANS SON EN-TETE (regle rcheevos), quand le coeur hote sait
+    /// reconnaitre le meme jeu sous un autre en-tete (coeur fceumm_ghosts de la branche en-tete-nes : « crc_sans_en_tete » du
+    /// profil). Un tel dump (le No-Intro en NES 2.0) part alors sur le coeur hote, et le jeu y garde le crc <paramref name="Crc"/>
+    /// (dossier des fantomes, profil). Null : seul le crc du fichier entier compte.
+    /// </para>
     /// </summary>
-    public sealed record Hote(string Systeme, string Groupe, string Origine, string Coeur, string Crc, bool SurEtatSeulement, string Dump);
+    public sealed record Hote(string Systeme, string Groupe, string Origine, string Coeur, string Crc, bool SurEtatSeulement, string Dump,
+        string? SansEnTete = null);
 
     private static readonly Hote[] Hotes =
     [
-        new("nes", "super-mario-bros", "fceumm", "fceumm_ghosts", "393a432f", true, "Super Mario Bros. (World)"),
+        // (08/11) le meme jeu sans son en-tete : un GoodNES « Super Mario Bros. (JU) [!] » (iNES 1.0) court aussi sur le coeur hote.
+        new("nes", "super-mario-bros", "fceumm", "fceumm_ghosts", "393a432f", true, "Super Mario Bros. (World)",
+            "8e3630186e35d477231bf8fd50e54cdd"),
         // Super Metroid : aussi le jeu complet, parti du demarrage ; le coeur hote aligne le fantome sur le debut de la partie.
         new("snes", "super-metroid", "snes9x", "snes9x_ghosts", "d63ed5f8", false, "Super Metroid (Japan, USA) (En,Ja)"),
         // Sonic : les niveaux seulement (etat du panneau) ; l'Any% change de niveau, et chaque niveau rearme le depart.
         new("megadrive", "sonic-the-hedgehog", "genesis_plus_gx", "genesis_plus_gx_ghosts", "f9394e97", true, "Sonic The Hedgehog (USA, Europe)"),
         // Mega Man 2 (USA) : les huit stages des Robot Masters (etat d'entree, READY) ; profil en fichier (a9bd44bc.ini).
         // Le dump d'ouverture est le GoodNES « Mega Man 2 (U) » (en-tete iNES 1.0).
-        new("nes", "mega-man-2", "fceumm", "fceumm_ghosts", "a9bd44bc", true, "Mega Man 2 (USA)"),
+        // (08/11) le No-Intro « Mega Man 2 (USA) » (NES 2.0) aussi, par le md5 sans en-tete (cle crc_sans_en_tete de a9bd44bc.ini).
+        new("nes", "mega-man-2", "fceumm", "fceumm_ghosts", "a9bd44bc", true, "Mega Man 2 (USA)", "0527a0ee512f69e08b8db6dc97964632"),
         // Super Mario Bros. 3 (USA) (Rev 1) : le monde 1 (etat d'entree de chaque niveau) ; profil compile dans le coeur 0.7.
         // Le dump d'ouverture est le GoodNES « Super Mario Bros 3 (U) (PRG 1) » (en-tete iNES 1.0).
-        new("nes", "super-mario-bros-3", "fceumm", "fceumm_ghosts", "0b742b33", true, "Super Mario Bros. 3 (USA) (Rev 1)"),
+        // (08/11) le No-Intro (NES 2.0) aussi, par le md5 sans en-tete (crc_sans_en_tete du profil compile).
+        new("nes", "super-mario-bros-3", "fceumm", "fceumm_ghosts", "0b742b33", true, "Super Mario Bros. 3 (USA) (Rev 1)",
+            "55b7111567c1709e849c574078699577"),
         // (06/11, jour) Super Mario World (USA) : les niveaux seulement (etat d'ouverture du niveau), profil en fichier b19ed489.ini.
         new("snes", "super-mario-world", "snes9x", "snes9x_ghosts", "b19ed489", true, "Super Mario World (USA)"),
         // Sonic 2 (06/11) : comme Sonic, les niveaux seulement ; profil du coeur en fichier (24ab4c3a.ini du Data Pack).
@@ -214,7 +226,7 @@ public sealed class FantomesDuSpeedrun
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.nghost")) File.Delete(ancien);
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.label")) File.Delete(ancien);
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.duree")) File.Delete(ancien);
-            await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{replay}.nghost"), fantome).ConfigureAwait(false);
+            await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{replay}.nghost"), AuCrcDuJeu(fantome, hote.Crc)).ConfigureAwait(false);
             EcrireLEtiquette(dossier, $"{PrefixeDuMien}{replay}", Etiquette(pseudo, false));
             EcrireLaDuree(dossier, $"{PrefixeDuMien}{replay}", dureeDuRun);
             if (defi is not null && temps is { } t) EcrireLeRecordLocal(defi, t, replay, fantome, dureeDuRun);
@@ -237,14 +249,44 @@ public sealed class FantomesDuSpeedrun
 
     /// <summary>
     /// Le coeur hote reconnaitrait-il ce contenu ? Il retrouve son profil (et ses fantomes) au crc32 du contenu ENTIER, en-tete
-    /// compris : un « Super Mario Bros. 3 (USA) (Rev 1) » No-Intro (en-tete NES 2.0) est le meme jeu pour l'identite, mais pas
-    /// pour lui. Inconnu (fichier illisible) : on ne bloque pas. Pur hors lecture du fichier.
+    /// compris, et depuis le 08/11 au crc sans en-tete quand son profil le declare : un « Super Mario Bros. 3 (USA) (Rev 1) »
+    /// No-Intro (en-tete NES 2.0) a le meme md5 sans en-tete que le dump classe (<see cref="Hote.SansEnTete"/>). Inconnu (fichier
+    /// illisible) : on ne bloque pas. Pur hors lecture du fichier.
     /// </summary>
     public static bool ContenuDuCoeurHote(Reglement r, string? rom)
+        => HoteDe(r) is not { } hote || string.IsNullOrEmpty(rom) || ContenuDuHote(hote, rom);
+
+    /// <summary>Le contenu de ce fichier est-il celui du coeur hote : meme crc32 entier, ou meme md5 sans en-tete. Pur hors lecture.</summary>
+    internal static bool ContenuDuHote(Hote hote, string rom)
     {
-        if (HoteDe(r) is not { } hote || string.IsNullOrEmpty(rom)) return true;
-        return RetroBat.Api.MassRun.JeuxMassRun.ContenuDe(rom) is not { } crc
-            || string.Equals(crc.ToString("x8"), hote.Crc, StringComparison.OrdinalIgnoreCase);
+        if (RetroBat.Api.MassRun.JeuxMassRun.ContenuDe(rom) is not { } crc
+            || string.Equals(crc.ToString("x8"), hote.Crc, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return hote.SansEnTete is { Length: > 0 } attendu
+            && NelfePlayScoringCollectionSyncService.SansEnTeteDuContenu(rom, hote.Systeme) is { } sansEnTete
+            && string.Equals(sansEnTete, attendu, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// LE FANTOME AU CRC DU JEU (08/11) : un replay porte le crc32 du fichier sur lequel il a ete fait (en-tete compris) ; fait sur
+    /// le No-Intro, il ne serait pas lu par le coeur hote d'un joueur du dump classe (le coeur ecarte un fantome d'un autre
+    /// contenu). Le replay vient du classement de ce defi, donc de ce jeu : son .nghost prend le crc du coeur hote, celui du
+    /// dossier ou il est pose. Une copie ; un contenu qui n'est pas un .nghost est rendu tel quel. Pur.
+    /// </summary>
+    internal static byte[] AuCrcDuJeu(byte[] fantome, string crc)
+    {
+        if (fantome.Length < 12 || !fantome.AsSpan(0, 8).SequenceEqual("NGHOST1\0"u8)
+            || !uint.TryParse(crc, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out var valeur))
+        {
+            return fantome;
+        }
+
+        var copie = (byte[])fantome.Clone();
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(copie.AsSpan(8, 4), valeur);
+        return copie;
     }
 
     /// <summary>
@@ -349,7 +391,7 @@ public sealed class FantomesDuSpeedrun
         if (local is { } l && (monTempsPublie is not { } publie || l.Images <= publie || mien is null))
         {
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
-            await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{l.Replay}.nghost"), l.Fantome, ct).ConfigureAwait(false);
+            await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{l.Replay}.nghost"), AuCrcDuJeu(l.Fantome, hote.Crc), ct).ConfigureAwait(false);
             // mon record local est aussi le record mondial quand personne ne fait mieux au classement
             EcrireLEtiquette(dossier, $"{PrefixeDuMien}{l.Replay}",
                 Etiquette(pseudo, MeilleurQueLeMondial(l.Images, lignes, tempsDesReplays, pseudo, monTempsPublie)));
@@ -378,7 +420,7 @@ public sealed class FantomesDuSpeedrun
             }
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
             var nom = (replay == mien ? PrefixeDuMien : $"{poses + 1}-") + replay;
-            await File.WriteAllBytesAsync(Path.Combine(dossier, nom + ".nghost"), fantome, ct).ConfigureAwait(false);
+            await File.WriteAllBytesAsync(Path.Combine(dossier, nom + ".nghost"), AuCrcDuJeu(fantome, hote.Crc), ct).ConfigureAwait(false);
             var detenteur = lignes.FirstOrDefault(x => x.Replay == replay).Joueur ?? "";
             // (05/11) mon record qui est aussi le record mondial : dore, « PSEUDO (WR) »
             var mondial = lignes.Count > 0 && lignes[0].Replay == replay;

@@ -51,7 +51,7 @@ public sealed class SpeedrunController : ControllerBase
 
     /// <summary>
     /// Les jeux a coeur hote des fantomes (08/11) : systeme, jeu, coeur d'origine, coeur hote, crc32 du contenu que le coeur hote
-    /// reconnait (en-tete compris), fantomes sur etat seulement, nom du dump. L'outil de diagnostic les lit ici plutot que d'en
+    /// reconnait (en-tete compris), fantomes sur etat seulement, nom du dump ; et (08/11) le md5 sans en-tete qu'il reconnait aussi. L'outil de diagnostic les lit ici plutot que d'en
     /// garder une copie. Lecture seule, sans jeton : rien que la borne ne publie deja.
     /// </summary>
     [HttpGet("ghost-hosts")]
@@ -64,6 +64,8 @@ public sealed class SpeedrunController : ControllerBase
         crc32 = h.Crc,
         stateOnly = h.SurEtatSeulement,
         dump = h.Dump,
+        // (08/11) le md5 du dump classe sans son en-tete, quand le coeur hote reconnait aussi le meme jeu sous un autre en-tete
+        rhashMd5 = h.SansEnTete,
     }));
 
     /// <summary>Le snapshot de la session en cours (§11 bis.5) ; 404 sans session.</summary>
