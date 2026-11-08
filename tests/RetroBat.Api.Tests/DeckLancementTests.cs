@@ -338,6 +338,132 @@ public sealed class DeckLancementTests : IDisposable
         Assert.Empty(service.Preparer(DeckModes.Adventure, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip").Arguments);
     }
 
+    // ─────────────────────────── la securite : sans Deck, le jeu part comme avant ───────────────────────────
+
+    /// <summary>Le service tel qu'en jeu (rendu par l'exe du dossier du Deck), sans demarrer de fenetre ni lire d'options.</summary>
+    private DeckLaunchService ServiceReel(string dossierDuDeck, SimpleEventBus? bus = null, TimeSpan? attente = null)
+    {
+        var service = new DeckLaunchService(bus ?? new SimpleEventBus(), new ApiContext { PlayerPseudo = "player" },
+            fichierDesChoix: Path.Combine(_dossier, "choix.json"), commandes: new CommandesMuettes())
+        {
+            Ecran = () => (1920, 1200),
+            RacineDuDecor = Path.Combine(_dossier, "decorations", DeckDecor.Nom),
+            DemarrerLeHost = false,
+            DossierImpose = dossierDuDeck,
+            Identite = (s, c, g) => new DeckIdentite.Cle("fbneo/19xx", "19xx", "essai"),
+        };
+        if (attente is { } a) service.Attente = a;
+        return service;
+    }
+
+    private static void SansDecor(DeckLancement l)
+    {
+        Assert.Empty(l.Arguments);
+        Assert.Null(l.Decor);
+        Assert.NotEqual("posed", l.Status);
+    }
+
+    [Fact]
+    public void Sans_dossier_du_Deck_le_jeu_part_comme_avant()
+    {
+        var l = ServiceReel(Path.Combine(_dossier, "absent")).Preparer(DeckModes.WorldScoring, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip");
+        SansDecor(l);
+        Assert.Equal("none", l.Status);
+        Assert.Equal("no_deck_installed", l.Reason);
+    }
+
+    [Fact]
+    public void Des_Decks_sans_exe_ne_posent_aucun_decor()
+    {
+        Catalogue();
+        var l = ServiceReel(Path.Combine(_dossier, "deck")).Preparer(DeckModes.Speedrun, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip");
+        SansDecor(l);
+        Assert.Equal("window", l.Status);
+        Assert.Equal("decor_not_rendered", l.Reason);
+        Assert.False(Directory.Exists(Path.Combine(_dossier, "decorations", DeckDecor.Nom)));
+    }
+
+    [Fact]
+    public void Un_exe_du_Deck_qui_echoue_ou_ne_repond_pas_a_temps_ne_pose_aucun_decor()
+    {
+        Catalogue();
+        // Un exe qui n'est pas le Deck : il refuse --render-decor (code d'erreur) sans rien ecrire.
+        var exe = Path.Combine(_dossier, "deck", DeckLaunchService.NomDuHost + ".exe");
+        File.Copy(Path.Combine(Environment.SystemDirectory, "where.exe"), exe);
+
+        var echec = ServiceReel(Path.Combine(_dossier, "deck")).Preparer(DeckModes.WorldScoring, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip");
+        SansDecor(echec);
+        Assert.Equal("decor_not_rendered", echec.Reason);
+
+        // Un rendu qui depasse le delai est abandonne (le processus est arrete) : le jeu part sans decor.
+        var lent = ServiceReel(Path.Combine(_dossier, "deck"), attente: TimeSpan.Zero)
+            .Preparer(DeckModes.WorldScoring, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip");
+        SansDecor(lent);
+    }
+
+    [Fact]
+    public void Un_rendu_qui_leve_une_exception_ne_remonte_jamais_au_lanceur()
+    {
+        var service = Service(new SimpleEventBus(), new ApiContext { PlayerPseudo = "player" });
+        service.Rendeur = (_, _, _, _) => throw new InvalidOperationException("rendu casse");
+        var l = service.Preparer(DeckModes.WorldScoring, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip");
+        SansDecor(l);
+
+        // Meme un catalogue illisible (exception) laisse partir le jeu
+        service.Catalogue = () => throw new IOException("disque");
+        SansDecor(service.Preparer(DeckModes.Multiplayer, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip", place: 2));
+    }
+
+    [Fact]
+    public void Enabled_faux_coupe_tout_decor_choix_et_geste()
+    {
+        var bus = new SimpleEventBus();
+        var publies = new List<EventEnvelope>();
+        bus.Subscribe<EventEnvelope>(e => { if (e.Type?.StartsWith("deck.") == true) publies.Add(e); });
+        var options = new OptionsFixes(new ApiExposeOptions { PlayerDeck = { Enabled = false } });
+        var catalogue = Catalogue();
+        var service = new DeckLaunchService(bus, new ApiContext { PlayerPseudo = "player" }, options: options,
+            fichierDesChoix: Path.Combine(_dossier, "choix.json"), commandes: new CommandesMuettes())
+        {
+            Catalogue = () => catalogue,
+            Ecran = () => (1920, 1200),
+            RacineDuDecor = Path.Combine(_dossier, "decorations", DeckDecor.Nom),
+            DemarrerLeHost = false,
+            Rendeur = (_, _, _, _) => throw new InvalidOperationException("le rendu ne doit pas etre demande"),
+        };
+
+        var l = service.Preparer(DeckModes.WorldScoring, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip");
+        SansDecor(l);
+        Assert.Equal("disabled", l.Reason);
+        Assert.Null(service.EnCours);
+        Assert.Null(service.Choisir(null, "keyboard"));
+        Assert.Empty(publies);
+    }
+
+    private sealed class OptionsFixes(ApiExposeOptions valeur) : Microsoft.Extensions.Options.IOptionsMonitor<ApiExposeOptions>
+    {
+        public ApiExposeOptions CurrentValue => valeur;
+        public ApiExposeOptions Get(string? name) => valeur;
+        public IDisposable? OnChange(Action<ApiExposeOptions, string?> listener) => null;
+    }
+
+    [Theory]
+    [InlineData(@"D:\mon\deck", true, true, @"D:\mon\deck")]   // configure : il l'emporte toujours
+    [InlineData(null, true, true, "livre")]                    // le Deck livre avant celui de developpement
+    [InlineData("", false, true, "dev")]                       // borne de developpement sans Deck livre
+    [InlineData("  ", false, false, "livre")]                  // aucun Deck : le dossier livre, vide
+    public void Le_dossier_configure_l_emporte_puis_le_livre_puis_celui_de_developpement(string? configure, bool livre, bool dev, string attendu)
+    {
+        Assert.Equal(attendu, DeckCatalogue.Choisir(configure, "livre", "dev", d => d == "livre" ? livre : dev));
+    }
+
+    [Fact]
+    public void Le_dossier_livre_est_tools_playerdeck_d_APIExpose()
+    {
+        Assert.Equal(Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, "tools", "playerdeck"), DeckCatalogue.DossierLivre);
+        Assert.EndsWith(Path.Combine("NelfePlay-PlayerDeck", "bin"), DeckCatalogue.DossierDeDeveloppement);
+    }
+
     [Fact]
     public void Le_choix_en_jeu_fait_le_tour_et_Off_retire_le_decor_au_lancement_suivant()
     {

@@ -99,7 +99,14 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
 
     private ApiExposeOptions.PlayerDeckOptions Reglages => _options?.CurrentValue.PlayerDeck ?? new ApiExposeOptions.PlayerDeckOptions();
 
-    private string DossierDuDeck => Reglages.Directory is { Length: > 0 } d ? d : DeckCatalogue.DossierParDefaut;
+    /// <summary>Le dossier configure, puis le Deck livre (tools/playerdeck), puis celui de developpement (<see cref="DeckCatalogue.Dossier"/>).</summary>
+    private string DossierDuDeck => DossierImpose ?? DeckCatalogue.Dossier(Reglages.Directory);
+
+    /// <summary>Couture des essais : le dossier du Deck, sans options.</summary>
+    internal string? DossierImpose { get; set; }
+
+    /// <summary>Couture des essais : l'attente du rendu du decor (<see cref="AttenteDuRendu"/> en jeu).</summary>
+    internal TimeSpan Attente { get; set; } = AttenteDuRendu;
 
     /// <summary>Le lancement en cours (ou le dernier prepare), avec son Deck ; null hors d'un lancement des boutons speciaux.</summary>
     public DeckLancement? EnCours
@@ -138,7 +145,18 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     public DeckLancement Preparer(string mode, string systeme, string cheminRom, string? romGroup = null, DeckRankBoard? classement = null, int place = 1,
         DeckTrialPlan? epreuve = null)
     {
-        var lancement = PreparerLeDeck(mode, systeme, cheminRom, romGroup, classement, epreuve);
+        DeckLancement lancement;
+        try
+        {
+            lancement = PreparerLeDeck(mode, systeme, cheminRom, romGroup, classement, epreuve);
+        }
+        catch (Exception ex)
+        {
+            // JAMAIS D'ERREUR VISIBLE (1.9.163) : quoi qu'il arrive au Deck, le jeu part comme avant, sans decor ni argument.
+            _journal?.LogWarning(ex, "PlayerDeck : lancement prepare sans Deck.");
+            lancement = Aucun(mode, systeme, Path.GetFileNameWithoutExtension(cheminRom ?? string.Empty), "", "local", cheminRom ?? "", "error");
+        }
+
         if (place != 1) lancement = lancement with { Seat = place };
         // Le rang en direct se prepare avec le lancement (lecture du classement en fond, jamais bloquante)
         try
@@ -314,9 +332,9 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         });
         if (processus is null) return null;
         var sortie = processus.StandardOutput.ReadToEndAsync();
-        if (!processus.WaitForExit((int)AttenteDuRendu.TotalMilliseconds))
+        if (!processus.WaitForExit((int)Attente.TotalMilliseconds))
         {
-            try { processus.Kill(); } catch (InvalidOperationException) { }
+            try { processus.Kill(entireProcessTree: true); } catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception) { }
             _journal?.LogWarning("PlayerDeck : rendu du decor {Deck} trop long, abandonne.", entree.Id);
             return null;
         }

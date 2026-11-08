@@ -5,6 +5,12 @@
 #   .\release.ps1 -PackageOnly  # construit seulement les archives
 #   .\release.ps1 -SansInstalleur  # publie sans l'installeur de borne (voir plus bas)
 #   .\release.ps1 -Rapide -Publish  # programme seul (update.7z) : les bornes a jour en deux minutes
+#   .\release.ps1 -PlayerDeck D:\chemin\bin   # prend le PlayerDeck ailleurs que dans ..\NelfePlay-PlayerDeck\bin
+#
+# LE PLAYERDECK (1.9.163) : le script le prend dans -PlayerDeck (par defaut <plugins>\NelfePlay-PlayerDeck\bin, la sortie
+# du depot prive NelfePlay-PlayerDeck : NelfePlay.PlayerDeck.exe, PlayerDeck.ini, themes\*.json, fonts\*.ttf et leurs
+# licences OFL-*.txt ; jamais le .pdb), le recopie sous tools\playerdeck d'APIExpose (full.7z, installeur) et declare
+# chaque fichier dans outils.json, comme l'exe du direct. Sans dossier source, la release part sans Deck (avertissement).
 #
 # QUAND PRENDRE LE MODE RAPIDE (regle user 2026-09-27) : des qu'on n'a modifie que le programme
 # (src, wrapper, .installer). Les bornes ne lisent que -update.7z et SHA256SUMS.txt de la derniere
@@ -16,7 +22,8 @@ param(
     [switch]$Publish,
     [switch]$PackageOnly,
     [switch]$SansInstalleur,
-    [switch]$Rapide
+    [switch]$Rapide,
+    [string]$PlayerDeck = ''
 )
 $ErrorActionPreference = 'Stop'
 $sz = @('C:\Program Files\7-Zip\7z.exe','C:\Program Files (x86)\7-Zip\7z.exe') | Where-Object { Test-Path $_ } | Select-Object -First 1
@@ -24,6 +31,55 @@ if (-not $sz) { throw '7-Zip introuvable.' }
 
 $root = Split-Path $PSScriptRoot -Parent   # ...\plugins
 $name = Split-Path $PSScriptRoot -Leaf     # APIExpose
+
+# ── LE PLAYERDECK : recopie du dossier source sous tools\playerdeck, AVANT les archives ─────────────────────────────
+if (-not $PlayerDeck) { $PlayerDeck = Join-Path $root 'NelfePlay-PlayerDeck\bin' }
+$deckCible = Join-Path $PSScriptRoot 'tools\playerdeck'
+$fichiersDuDeck = @()
+if (Test-Path -LiteralPath (Join-Path $PlayerDeck 'NelfePlay.PlayerDeck.exe')) {
+    $PlayerDeck = (Resolve-Path -LiteralPath $PlayerDeck).Path.TrimEnd('\')
+    if ($PlayerDeck -eq $deckCible) { throw "PlayerDeck : la source ne peut pas etre tools\playerdeck lui-meme." }
+    $sourcesDuDeck = @(
+        @(Get-Item -LiteralPath (Join-Path $PlayerDeck 'NelfePlay.PlayerDeck.exe'), (Join-Path $PlayerDeck 'PlayerDeck.ini') -ErrorAction Stop) +
+        @(Get-ChildItem -LiteralPath (Join-Path $PlayerDeck 'themes') -Filter '*.json' -File) +
+        @(Get-ChildItem -LiteralPath (Join-Path $PlayerDeck 'fonts') -File | Where-Object { $_.Extension -in '.ttf', '.otf' -or $_.Name -like 'OFL*.txt' }))
+    $themesDuDeck = @($sourcesDuDeck | Where-Object { $_.Extension -eq '.json' })
+    $policesDuDeck = @($sourcesDuDeck | Where-Object { $_.Extension -in '.ttf', '.otf' })
+    if ($themesDuDeck.Count -eq 0) { throw "PlayerDeck : aucun Deck dans $PlayerDeck\themes." }
+    if ($policesDuDeck.Count -eq 0 -or -not ($sourcesDuDeck | Where-Object { $_.Name -like 'OFL*.txt' })) {
+        throw "PlayerDeck : polices ou licences OFL absentes de $PlayerDeck\fonts."
+    }
+    # Le dossier livre est le reflet exact de la source : un Deck ou une police retires ne restent pas dans les archives.
+    foreach ($sous in @('themes', 'fonts')) {
+        $ici = Join-Path $deckCible $sous
+        New-Item -ItemType Directory -Force $ici | Out-Null
+        $voulus = @($sourcesDuDeck | Where-Object { $_.DirectoryName -eq (Join-Path $PlayerDeck $sous) } | ForEach-Object { $_.Name })
+        Get-ChildItem -LiteralPath $ici -File | Where-Object { $voulus -notcontains $_.Name } |
+            Remove-Item -Force -Confirm:$false
+    }
+    Get-ChildItem -LiteralPath $deckCible -File | Where-Object { @('NelfePlay.PlayerDeck.exe', 'PlayerDeck.ini') -notcontains $_.Name } |
+        Remove-Item -Force -Confirm:$false -ErrorAction SilentlyContinue
+    foreach ($source in $sourcesDuDeck) {
+        $relatif = $source.FullName.Substring($PlayerDeck.Length + 1)
+        $cible = Join-Path $deckCible $relatif
+        if (-not (Test-Path -LiteralPath $cible) -or
+            (Get-FileHash -LiteralPath $cible).Hash -ne (Get-FileHash -LiteralPath $source.FullName).Hash) {
+            try {
+                Copy-Item -LiteralPath $source.FullName -Destination $cible -Force
+            } catch {
+                # Le Deck de cette machine tourne : son exe ne s'ecrase pas mais se renomme (comme SelfUpdateService.Poser).
+                Move-Item -LiteralPath $cible -Destination "$cible.old" -Force
+                Copy-Item -LiteralPath $source.FullName -Destination $cible -Force
+            }
+        }
+        $fichiersDuDeck += 'tools/playerdeck/' + ($relatif -replace '\\', '/')
+    }
+    $versionDuDeck = "$((Get-Item -LiteralPath (Join-Path $deckCible 'NelfePlay.PlayerDeck.exe')).VersionInfo.ProductVersion)".Trim()
+    Write-Host "PlayerDeck $versionDuDeck : $($fichiersDuDeck.Count) fichiers pris dans $PlayerDeck ($($themesDuDeck.Count) Decks, $($policesDuDeck.Count) polices)."
+} else {
+    Write-Warning "PlayerDeck absent ($PlayerDeck) : la release part sans lui. -PlayerDeck <dossier> pour le donner."
+    $versionDuDeck = ''
+}
 $exe  = Join-Path $PSScriptRoot 'RetroBat.Api.exe'
 $verFull = (Get-Item $exe).VersionInfo.ProductVersion
 $ver = ($verFull -split '\+')[0]
@@ -100,6 +156,9 @@ $ex = @(
     "-x!$name\tools\ffmpeg", "-x!$name\tools\imagemagick", "-x!$name\tools\translateLocally",
     # L'archive de RetroArch NelfePlay (nocturne retiree en 1.9.61) ne part ni dans le full.7z ni dans l'installeur.
     "-x!$name\tools\retroarch-nelfeplay",
+    # Les Decks des joueurs de la machine qui publie (tools\playerdeck\decks) ne partent jamais ; ni les .old laisses par
+    # un remplacement d'exe ouvert (SelfUpdateService.Poser, recopie du PlayerDeck ci-dessus).
+    "-x!$name\tools\playerdeck\decks", '-xr!*.old',
     # resources\ra : donnees RetroAchievements personnelles de la borne (leaderboards).
     "-x!$name\resources\ra",
     # resources\ram\.user : definitions .MEM PERSONNELLES (couche perso, pre-integration
@@ -163,6 +222,10 @@ $outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.e
     'tools/cores/fceumm_ghosts_libretro.dll', 'tools/cores/fceumm_ghosts_libretro.info',
     'tools/cores/snes9x_ghosts_libretro.dll', 'tools/cores/snes9x_ghosts_libretro.info',
     'tools/cores/genesis_plus_gx_ghosts_libretro.dll', 'tools/cores/genesis_plus_gx_ghosts_libretro.info')
+# LE PLAYERDECK (1.9.163) : chaque fichier recopie plus haut (exe, ini, Decks, polices, licences). SelfUpdateService les
+# accepte par leur dossier et leur extension (FichierDuPlayerDeck), arrete le Deck avant de les poser hors partie, et ne
+# pose PlayerDeck.ini que s'il manque.
+$outilsHorsArchive = @($outilsHorsArchive) + @($fichiersDuDeck)
 $exclusOutils = @($outilsHorsArchive | ForEach-Object { "-x!$name\$($_ -replace '/', '\')" })
 & $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" @exclusOutils -mx=5 -bsp0 -bso0
 
@@ -188,7 +251,7 @@ $listing = & $sz l $controlee
 # tools\*.py, resources\ra et ScreenScraper.html sont passes au travers. Il couvre
 # desormais ce que les exclusions ci-dessus retirent, pour que les deux listes se
 # contredisent bruyamment si l'une d'elles derive.
-$leaks = $listing | Select-String '\.env|\.bak|\.ps1$|\.py$|\\media\\|\\src\\|\\tests\\|\\docs\\|\\dist\\|package-installer|projects-source|\.git|panel_curator|profiles_db|\\resources\\ra\\|\\resources\\ram\\\.user\\|\\resources\\gamelist\\localized\\|\\resources\\gamelist\\media-sidecar\\|\.avant-|\\wrapper\\certified\.txt|ScreenScraper\.html|\\tools\\(ffmpeg|imagemagick|translateLocally|mem-curator|libretro-probe)\\'
+$leaks = $listing | Select-String '\.env|\.bak|\.pdb$|\.old$|\\tools\\playerdeck\\decks\\|\.ps1$|\.py$|\\media\\|\\src\\|\\tests\\|\\docs\\|\\dist\\|package-installer|projects-source|\.git|panel_curator|profiles_db|\\resources\\ra\\|\\resources\\ram\\\.user\\|\\resources\\gamelist\\localized\\|\\resources\\gamelist\\media-sidecar\\|\.avant-|\\wrapper\\certified\.txt|ScreenScraper\.html|\\tools\\(ffmpeg|imagemagick|translateLocally|mem-curator|libretro-probe)\\'
 if ($leaks) { throw "FUITE DETECTEE dans l'archive : $($leaks[0])" }
 # La cle API de la borne ne doit JAMAIS etre committee/distribuee : le defaut reste vide
 # (chaque borne genere la sienne au 1er run). On bloque si une valeur traine.
@@ -218,6 +281,10 @@ $autorises = @(
     # images et profils de statistiques, copie du dossier multiplayer du Data Pack public ; et les coeurs relies
     # (FBNeo Multi 32, NGP Link, mGBA Splitscreen), publies a part en release rapide (outils.json).
     'resources/multiplayer/', 'tools/cores/',
+    # Le PlayerDeck (1.9.163), recopie depuis -PlayerDeck : son exe, sa configuration, ses Decks officiels et ses polices
+    # avec leurs licences. Jamais tools/playerdeck/decks (Decks des joueurs) ni un .pdb.
+    'tools/playerdeck/NelfePlay.PlayerDeck.exe', 'tools/playerdeck/PlayerDeck.ini', 'tools/playerdeck/themes/',
+    'tools/playerdeck/fonts/',
     # Le verificateur de score (APIExposeOCR), construit depuis son propre depot et
     # depose ici par APIExposeOCR\tools\release.ps1, comme mem-explorer.
     'tools/score-verifier/',
@@ -268,6 +335,15 @@ if ($inconnus) {
     throw "FUITE POSSIBLE : $($inconnus.Count) fichier(s) ni versionne(s) ni autorise(s), dont $($inconnus[0])"
 }
 Write-Host "Controle liste blanche : OK ($($suivis.Count) versionnes + chemins autorises)"
+
+# Le PlayerDeck doit etre DANS le full.7z (premiere installation) : chacun des fichiers recopies, rien de plus.
+if ($fichiersDuDeck -and -not $Rapide) {
+    $dansLeFull = @(& $sz l -slt $full | Where-Object { $_ -like "Path = $name\tools\playerdeck\*" } |
+        ForEach-Object { $_.Substring(7 + $name.Length + 1).Replace('\', '/') })
+    $manquants = @($fichiersDuDeck | Where-Object { $dansLeFull -notcontains $_ })
+    if ($manquants) { throw "PlayerDeck absent du full.7z : $($manquants -join ', ')" }
+    Write-Host "Controle du PlayerDeck : OK ($($fichiersDuDeck.Count) fichiers dans le full.7z)"
+}
 
 # Tout executable applicatif livre a la racine doit etre DECLARE dans executables.manifest.json,
 # avec son contrat d'auto-test : l'outil de diagnostic ne teste que ce que le manifeste nomme.
@@ -380,7 +456,10 @@ foreach ($nomOutil in $outilsHorsArchive) {
     [void]$outils.Add([pscustomobject]@{
         fichier = $nomOutil
         # Une archive n'a pas de version de fichier : sa date, prise dans son nom (les bornes la comparent sur son empreinte).
-        version = if ($estExe) { "$($fichierOutil.VersionInfo.ProductVersion)".Trim() } else { ($nomActif -replace '^.*?(\d{4})-(\d{2})-(\d{2}).*$', '$1.$2.$3') }
+        # Un fichier du PlayerDeck (Deck, police, configuration) porte la version de son exe.
+        version = if ($estExe) { "$($fichierOutil.VersionInfo.ProductVersion)".Trim() }
+                  elseif ($nomOutil -like 'tools/playerdeck/*') { $versionDuDeck }
+                  else { ($nomActif -replace '^.*?(\d{4})-(\d{2})-(\d{2}).*$', '$1.$2.$3') }
         sha256  = $shaOutil
         taille  = $fichierOutil.Length
         url     = $urlOutil
@@ -466,8 +545,9 @@ Voir le wiki pour l'installation : https://nelfe80.github.io/RetroBat-APIExpose/
 $(if (-not $Rapide) { "| ``$name-$ver-full.7z`` | Programme + tools + Data Pack complet (premiere installation) |
 " })| ``$name-$ver-update.7z`` | Programme seul (mise a jour) |
 | ``SHA256SUMS.txt`` | Empreintes, lues par ``RetroBat.Api.Update.exe`` |
-| ``outils.json`` | Outils hors archive (outil de diagnostic) : version, empreinte, adresse. L'API de la borne ne telecharge que ce qui a change |$(foreach ($joint in $outilsJoints) { "
-| ``$(Split-Path $joint -Leaf)`` | Nouvelle version de l'outil |" })$(if ($setupFile) { "
+| ``outils.json`` | Outils hors archive (outil de diagnostic) : version, empreinte, adresse. L'API de la borne ne telecharge que ce qui a change |$(foreach ($joint in @($outilsJoints | Where-Object { -not $_.StartsWith("$deckCible\") })) { "
+| ``$(Split-Path $joint -Leaf)`` | Nouvelle version de l'outil |" })$(if ($deckJoints = @($outilsJoints | Where-Object { $_.StartsWith("$deckCible\") })) { "
+| PlayerDeck $versionDuDeck ($($deckJoints.Count) fichiers) | Exe, configuration, Decks officiels et polices, poses dans ``tools\playerdeck`` |" })$(if ($setupFile) { "
 | ``APIExpose-Cabinet-Setup.exe`` | Installeur de borne (c'est ce que sert https://nelfeplay.com/download/apiexpose) |" })
 
 Mise a jour depuis la borne : lancer ``RetroBat.Api.Update.exe`` a la racine d'APIExpose.

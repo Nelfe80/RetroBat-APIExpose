@@ -763,10 +763,16 @@ public class ApiExposeOptions
     /// </summary>
     public class PlayerDeckOptions
     {
-        /// <summary>Le Deck part avec les lancements des boutons speciaux quand le jeu a un Deck installe. Vrai par defaut.</summary>
+        /// <summary>
+        /// Le Deck part avec les lancements des boutons speciaux quand le jeu a un Deck installe. Vrai par defaut. Faux : ni
+        /// decor, ni fenetre du Deck, ni rang en direct, ni couche epreuve, ni geste ; les jeux partent comme sans Deck.
+        /// </summary>
         public bool Enabled { get; set; } = true;
 
-        /// <summary>Le dossier de l'exe du PlayerDeck (themes/ et decks/ a cote). Vide : plugins/NelfePlay-PlayerDeck/bin.</summary>
+        /// <summary>
+        /// Le dossier de l'exe du PlayerDeck (themes/ et decks/ a cote). Vide : tools/playerdeck d'APIExpose (le Deck livre),
+        /// sinon plugins/NelfePlay-PlayerDeck/bin (developpement).
+        /// </summary>
         public string Directory { get; set; } = string.Empty;
 
         /// <summary>Demarrer le PlayerDeck (--deck --follow-launch) s'il ne tourne pas, au lancement d'un jeu qui a un Deck.</summary>

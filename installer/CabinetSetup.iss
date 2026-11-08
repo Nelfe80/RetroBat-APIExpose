@@ -8,7 +8,7 @@
 ; ─────────────────────────────────────────────────────────────────────────────
 
 #define AppName "APIExpose (borne RetroBat)"
-#define AppVersion "1.9.118"
+#define AppVersion "1.9.163"
 #define AppExe "RetroBat.Api.exe"
 
 [Setup]
@@ -102,7 +102,7 @@ english.ActionEchec=The uninstall could not be done: %1.
 ; Les scripts .ps1/.py de tools/ sont de l'outillage interne (curation, exploitation,
 ; sondes) : ni le runtime ni l'utilisateur n'en a besoin, et ils ne sont pas publics.
 Source: "..\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; \
-    Excludes: "\src\*,\tests\*,\docs\*,\wiki\*,\media\*,\state\*,\artifacts\*,\dist\*,\installer\*,\.git\*,\.github\*,\.log\*,\.temp\*,\.cache\*,\.archive\*,\.versioning\*,\site\*,\package-installer\*,\projects-source\*,\resources\outputs\*,\resources\panels\*,\resources\gamelist\localized\*,\resources\gamelist\media-sidecar\*,\resources\controls\retroarch\mame\*,\resources\ra\*,\resources\ram\.user\*,\resources\history\history.db,\resources\colors\colors.ini,\resources\command\command.dat,\tools\mem-curator\*,\tools\libretro-probe\*,\.env,\wrapper\.env,\wrapper\certified.txt,\events.ini,\appsettings.json,\mkdocs.yml,\build.bat,\release.ps1,\CabinetSetup.iss,\publish-tmp\*,\panel_curator*,\profiles_db*,*.log,*.pdb,*.g.cs,__pycache__\*,*.pyc,*.ps1,*.py,*.bak,*.avant-*,ScreenScraper.html,\tools\retroarch-nelfeplay\*,\tools\ffmpeg\*,\tools\translateLocally\*.exe,\tools\translateLocally\models\*"
+    Excludes: "\src\*,\tests\*,\docs\*,\wiki\*,\media\*,\state\*,\artifacts\*,\dist\*,\installer\*,\.git\*,\.github\*,\.log\*,\.temp\*,\.cache\*,\.archive\*,\.versioning\*,\site\*,\package-installer\*,\projects-source\*,\resources\outputs\*,\resources\panels\*,\resources\gamelist\localized\*,\resources\gamelist\media-sidecar\*,\resources\controls\retroarch\mame\*,\resources\ra\*,\resources\ram\.user\*,\resources\history\history.db,\resources\colors\colors.ini,\resources\command\command.dat,\tools\mem-curator\*,\tools\libretro-probe\*,\.env,\wrapper\.env,\wrapper\certified.txt,\events.ini,\appsettings.json,\mkdocs.yml,\build.bat,\release.ps1,\CabinetSetup.iss,\publish-tmp\*,\panel_curator*,\profiles_db*,*.log,*.pdb,*.g.cs,__pycache__\*,*.pyc,*.ps1,*.py,*.bak,*.avant-*,ScreenScraper.html,\tools\retroarch-nelfeplay\*,\tools\ffmpeg\*,\tools\translateLocally\*.exe,\tools\translateLocally\models\*,\tools\playerdeck\PlayerDeck.ini,\tools\playerdeck\decks\*,*.old"
 ; L'etat de la borne n'est JAMAIS ecrase : ni appsettings.json (cle API, options), ni
 ; wrapper\.env (drapeaux DISCOVERY et PERSO - PERSO=1 = test de .MEM perso en cours ;
 ; APIExpose recree ce fichier au demarrage). Meme regle que l'archive .7z.
@@ -114,6 +114,10 @@ Source: "..\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createalls
 ; `appsettings.default.json` est produit par tools\build-default-settings.ps1, qui le tire de
 ; HEAD : il ne peut donc pas deriver en silence.
 Source: "appsettings.default.json"; DestDir: "{app}"; DestName: "appsettings.json"; Flags: onlyifdoesntexist uninsneveruninstall
+; LE PLAYERDECK (1.9.163) part avec le reste de tools\ (exe, themes, polices et leurs licences OFL, jamais le .pdb). Sa
+; configuration n'est posee que si elle manque : le joueur peut l'avoir reglee. L'exe est arrete avant la copie
+; (PlayerDeckPrepareToInstall) ; il repart au prochain lancement d'un jeu avec Deck.
+Source: "..\tools\playerdeck\PlayerDeck.ini"; DestDir: "{app}\tools\playerdeck"; Flags: onlyifdoesntexist skipifsourcedoesntexist
 ; Le choix « Desinstaller » de l'installeur (2026-10-17) : l'exe de CET installeur fait le nettoyage, meme pour une
 ; installation plus ancienne qui ne connait pas --desinstaller. Extrait dans {tmp}, jamais copie.
 ; Meme nom que celui du plugin : le nettoyage garde alors l'exe en place pour le desinstalleur de Windows.
@@ -139,6 +143,8 @@ Filename: "{app}\RetroBat.ApiConnect.exe"; WorkingDir: "{app}"; StatusMsg: "Conn
 [UninstallRun]
 Filename: "taskkill"; Parameters: "/f /im {#AppExe}"; Flags: runhidden; RunOnceId: "StopApi"
 Filename: "taskkill"; Parameters: "/f /im RetroBat.ApiConnect.exe"; Flags: runhidden; RunOnceId: "StopApiConnect"
+; Le PlayerDeck (tools\playerdeck) tient son exe et ses polices tant qu'il tourne.
+Filename: "taskkill"; Parameters: "/f /im NelfePlay.PlayerDeck.exe"; Flags: runhidden; RunOnceId: "StopPlayerDeck"
 ; LA DESINSTALLATION PROPRE (2026-10-17) : avant que les fichiers partent, l'exe retire la collection World Scoring, ses
 ; images, les reglages d'APIExpose dans ES, ses dossiers dans les themes et les donnees du dossier ; il garde media,
 ; l'identite de la borne et les replays (src/RetroBat.Api/Infrastructure/Desinstallation.cs).
@@ -190,6 +196,18 @@ begin
     Log('Hook EmulationStation pose : ' + Target)
   else
     Log('Hook EmulationStation NON pose : copie impossible vers ' + Target);
+end;
+
+// LE PLAYERDECK OUVERT (1.9.163) : son exe et ses polices sont tenus tant qu'il tourne, la copie echouerait. On l'arrete
+// avant l'installation ; l'API le relance au prochain lancement d'un jeu avec Deck.
+<event('PrepareToInstall')>
+function PlayerDeckPrepareToInstall(var NeedsRestart: Boolean): String;
+var
+  Code: Integer;
+begin
+  Result := '';
+  if Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /im NelfePlay.PlayerDeck.exe', '', SW_HIDE, ewWaitUntilTerminated, Code) then
+    Log('PlayerDeck : taskkill, code ' + IntToStr(Code));
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -484,6 +502,7 @@ begin
   Result := '';
   Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /im RetroBat.Api.exe', '', SW_HIDE, ewWaitUntilTerminated, Code);
   Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /im NelfePlay.LiveStreaming.exe', '', SW_HIDE, ewWaitUntilTerminated, Code);
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /im NelfePlay.PlayerDeck.exe', '', SW_HIDE, ewWaitUntilTerminated, Code);
   try
     ExtractTemporaryFile('RetroBat.Api.exe');
   except

@@ -147,6 +147,8 @@ public static class Desinstallation
             if (File.Exists(menu)) { File.Delete(menu); faits.Add("menu d'ES"); }
             var proxy = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "core_proxy");
             if (Directory.Exists(proxy)) { Directory.Delete(proxy, true); faits.Add("core_proxy"); }
+            // Le decor du PlayerDeck (decorations/nelfeplay-deck), qu'un arret brutal de l'API peut laisser.
+            if (Directory.Exists(Deck.DeckDecor.Dossier)) { Directory.Delete(Deck.DeckDecor.Dossier, true); faits.Add("decor du PlayerDeck"); }
             return faits.Count == 0 ? "aucun" : string.Join(", ", faits) + " retire(s)";
         });
 
@@ -188,7 +190,22 @@ public static class Desinstallation
         Etape(Dire, "reglages global.apiexpose.*", () =>
             new EsSettingsStore().Update(RetirerLesReglages) ? "retires d'es_settings.cfg" : "aucun");
 
-        // 4. Le dossier du plugin, sauf les medias, l'identite de la borne et les replays.
+        // 4. Le dossier du plugin, sauf les medias, l'identite de la borne et les replays. Le PlayerDeck (tools/playerdeck)
+        // tient son exe et ses polices tant qu'il tourne : il s'arrete d'abord.
+        Etape(Dire, "PlayerDeck", () =>
+        {
+            var arretes = 0;
+            foreach (var p in Process.GetProcessesByName(Deck.DeckLaunchService.NomDuHost))
+            {
+                using (p)
+                {
+                    try { p.Kill(); p.WaitForExit(5000); arretes++; }
+                    catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception) { }
+                }
+            }
+            return arretes == 0 ? "ne tournait pas" : "arrete";
+        });
+
         Etape(Dire, "dossier du plugin", () =>
         {
             var exe = Path.GetFileName(Environment.ProcessPath);

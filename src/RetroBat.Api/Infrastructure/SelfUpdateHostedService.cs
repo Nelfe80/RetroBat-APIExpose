@@ -114,11 +114,14 @@ public sealed class SelfUpdateHostedService : IHostedService
                     _logger.LogInformation("APIExpose {Version} : deja a jour.", etat.Installed);
                     // L'outil de diagnostic voyage hors de l'update.7z : on le prend a part, une fois
                     // la version de l'API a jour (sinon c'est la mise a jour qui passe d'abord).
-                    if (etat.ToolsManifestUrl is { Length: > 0 } outils)
+                    if (etat.ToolsManifestUrl is { Length: > 0 } outils
+                        && await _update.MettreLesOutilsAJourAsync(outils, ct).ConfigureAwait(false))
                     {
-                        await _update.MettreLesOutilsAJourAsync(outils, ct).ConfigureAwait(false);
+                        // Le PlayerDeck habillait la partie en cours : ses fichiers passent a la fermeture du jeu.
+                        remise = true;
+                        _remise = true;
                     }
-                    if (opt.IntervalHours <= 0) return;
+                    if (opt.IntervalHours <= 0 && !remise) return;
                 }
             }
             catch (OperationCanceledException) { return; }

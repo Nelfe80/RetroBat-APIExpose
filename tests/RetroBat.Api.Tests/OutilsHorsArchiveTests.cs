@@ -82,6 +82,47 @@ public class OutilsHorsArchiveTests
         Assert.Equal(attendu, RetroArchNelfePlayService.ARetirer(marque, desinstalleur, jeu));
     }
 
+    [Theory]
+    [InlineData("tools/playerdeck/NelfePlay.PlayerDeck.exe")]
+    [InlineData("tools/playerdeck/PlayerDeck.ini")]
+    [InlineData("tools/playerdeck/themes/19xx-hangar.json")]
+    [InlineData("tools/playerdeck/themes/sf2ce-world-warrior.json")]
+    [InlineData("tools/playerdeck/fonts/PressStart2P-Regular.ttf")]
+    [InlineData("tools/playerdeck/fonts/OFL-pressstart2p.txt")]
+    public void Les_fichiers_du_PlayerDeck_sont_retenus_par_leur_dossier(string fichier)
+    {
+        // 1.9.163 : le Deck voyage comme l'exe du direct, sous tools/playerdeck (exe, configuration, Decks, polices).
+        var outil = Assert.Single(SelfUpdateService.LireOutils($"{{\"outils\":[{Outil(fichier, Sha,
+            "https://github.com/Nelfe80/RetroBat-APIExpose/releases/download/v1.9.163/x", 1000)}]}}", Depot));
+        Assert.Equal(fichier, outil.Fichier);
+        Assert.True(SelfUpdateService.EstDuPlayerDeck(outil.Fichier));
+    }
+
+    [Theory]
+    [InlineData("tools/playerdeck/NelfePlay.PlayerDeck.pdb")]          // jamais le .pdb
+    [InlineData("tools/playerdeck/themes/../../../RetroBat.Api.exe")]  // jamais hors du dossier
+    [InlineData("tools/playerdeck/themes/sous/x.json")]
+    [InlineData("tools/playerdeck/decks/x.json")]                      // les Decks des joueurs ne viennent pas de la release
+    [InlineData("tools/playerdeck/fonts/x.dll")]
+    [InlineData("tools/playerdeck/autre.exe")]
+    [InlineData("tools/playerdeck/themes/.json")]
+    [InlineData("TOOLS/PLAYERDECK/themes/x.json")]
+    public void Un_autre_fichier_sous_tools_playerdeck_est_ignore(string fichier)
+    {
+        Assert.Empty(SelfUpdateService.LireOutils($"{{\"outils\":[{Outil(fichier, Sha,
+            "https://github.com/Nelfe80/RetroBat-APIExpose/releases/download/v1.9.163/x", 1000)}]}}", Depot));
+    }
+
+    [Theory]
+    [InlineData(false, false, SelfUpdateService.DecisionDeck.Poser)]
+    [InlineData(false, true, SelfUpdateService.DecisionDeck.Poser)]              // le Deck ne tourne pas : rien n'est tenu
+    [InlineData(true, false, SelfUpdateService.DecisionDeck.ArreterPuisPoser)]   // hors partie : arrete, il repart au lancement suivant
+    [InlineData(true, true, SelfUpdateService.DecisionDeck.Remettre)]            // il habille la partie : a la fin du jeu
+    public void Le_PlayerDeck_ouvert_s_arrete_hors_partie_et_attend_la_fin_d_une_partie(bool deckTourne, bool partie, SelfUpdateService.DecisionDeck attendue)
+    {
+        Assert.Equal(attendue, SelfUpdateService.DecisionDuDeck(deckTourne, partie));
+    }
+
     [Fact]
     public void Sans_liste_rien_n_est_retenu()
     {

@@ -53,6 +53,32 @@ public sealed class SelfUpdateService
         // et leurs fiches, que MultiplayerCoeursService pose chez RetroArch. Ni RetroBat ni libretro ne les distribuent.
         .. RetroBat.Api.Multiplayer.MultiplayerCoeursService.Coeurs.SelectMany(c => c.CheminsDesOutils)];
 
+    /// <summary>
+    /// LE PLAYERDECK (1.9.163) : son exe, sa configuration, ses Decks officiels et ses polices, sous <c>tools/playerdeck</c>.
+    /// Les Decks et les polices changent de nom d'une version a l'autre : la liste ne les enumere pas, elle les prend par
+    /// leur dossier et leur extension (un nom simple, sans sous-dossier ni « .. »).
+    /// </summary>
+    internal const string DossierDuDeck = "tools/playerdeck";
+
+    internal const string ExeDuDeck = DossierDuDeck + "/NelfePlay.PlayerDeck.exe";
+
+    /// <summary>La configuration du Deck : posee seulement si elle manque (le joueur peut l'avoir reglee).</summary>
+    internal const string ConfigurationDuDeck = DossierDuDeck + "/PlayerDeck.ini";
+
+    private static readonly Regex FichierDuDeck = new(
+        @"^tools/playerdeck/(NelfePlay\.PlayerDeck\.exe|PlayerDeck\.ini|themes/[A-Za-z0-9][A-Za-z0-9._-]*\.json|fonts/[A-Za-z0-9][A-Za-z0-9._-]*\.(ttf|otf|txt))$",
+        RegexOptions.CultureInvariant);
+
+    /// <summary>Un chemin d'outils.json est-il un fichier du PlayerDeck ? Rend son nom canonique (separateur « / »), ou null.</summary>
+    internal static string? FichierDuPlayerDeck(string chemin)
+    {
+        var c = (chemin ?? "").Replace('\\', '/');
+        if (c.Contains("..", StringComparison.Ordinal) || !FichierDuDeck.IsMatch(c)) return null;
+        return c;
+    }
+
+    internal static bool EstDuPlayerDeck(string fichier) => fichier.StartsWith(DossierDuDeck + "/", StringComparison.OrdinalIgnoreCase);
+
     /// <summary>Plafond d'un outil : l'outil de diagnostic pese ~66 Mo.</summary>
     private const long TailleMaxOutil = 512L * 1024 * 1024;
 
@@ -221,7 +247,8 @@ public sealed class SelfUpdateService
         {
             if (o.ValueKind != JsonValueKind.Object) continue;
             string Texte(string cle) => o.TryGetProperty(cle, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : "";
-            var fichier = OutilsHorsArchive.FirstOrDefault(connu => string.Equals(connu, Texte("fichier"), StringComparison.OrdinalIgnoreCase));
+            var fichier = OutilsHorsArchive.FirstOrDefault(connu => string.Equals(connu, Texte("fichier"), StringComparison.OrdinalIgnoreCase))
+                ?? FichierDuPlayerDeck(Texte("fichier"));
             var sha = Texte("sha256").ToLowerInvariant();
             var url = Texte("url");
             var taille = o.TryGetProperty("taille", out var t) && t.ValueKind == JsonValueKind.Number && t.TryGetInt64(out var n) ? n : 0;
@@ -245,7 +272,8 @@ public sealed class SelfUpdateService
     /// est renomme en .old et le suivant sera le nouveau. Une erreur n'empeche rien : on repasse au
     /// prochain tour.
     /// </summary>
-    public async Task MettreLesOutilsAJourAsync(string urlOutils, CancellationToken ct)
+    /// <returns>Vrai si des fichiers du PlayerDeck sont remis a la fin de la partie en cours (le Deck l'habille).</returns>
+    public async Task<bool> MettreLesOutilsAJourAsync(string urlOutils, CancellationToken ct)
     {
         var depot = _options.CurrentValue.SelfUpdate.Repository;
         using var client = _httpFactory.CreateClient();
@@ -259,15 +287,40 @@ public sealed class SelfUpdateService
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             _logger.LogDebug(ex, "Outils : outils.json illisible.");
-            return;
+            return false;
         }
 
+        var aPoser = new List<OutilPublie>();
         foreach (var outil in outils)
         {
             var cible = Path.Combine(RetroBatPaths.PluginRoot, outil.Fichier);
             try { File.Delete(cible + ".old"); } catch { }
-            // Un exe se compare par sa version ; une archive (sans version) par son empreinte.
-            if (EstUnExe(outil.Fichier) ? !AMettreAJour(VersionLocale(cible), outil.Version) : MemeEmpreinte(cible, outil.Sha256)) continue;
+            if (!APrendre(outil, cible)) continue;
+            aPoser.Add(outil);
+        }
+
+        // LE PLAYERDECK OUVERT (1.9.163) : son exe et ses polices (chargees par GDI) sont tenus tant qu'il tourne. Hors partie,
+        // on l'arrete : il repartira au prochain lancement avec Deck. Pendant une partie, il habille l'ecran du joueur : ses
+        // fichiers attendent la fin du jeu (le service rappelle a la fermeture), les autres outils passent tout de suite.
+        var remis = false;
+        if (aPoser.Any(o => EstDuPlayerDeck(o.Fichier)))
+        {
+            switch (DecisionDuDeck(LeDeckTourne(), Occupe().Length > 0))
+            {
+                case DecisionDeck.Remettre:
+                    aPoser.RemoveAll(o => EstDuPlayerDeck(o.Fichier));
+                    remis = true;
+                    _logger.LogInformation("PlayerDeck : mise a jour remise a la fin de la partie.");
+                    break;
+                case DecisionDeck.ArreterPuisPoser:
+                    ArreterLeDeck();
+                    break;
+            }
+        }
+
+        foreach (var outil in aPoser)
+        {
+            var cible = Path.Combine(RetroBatPaths.PluginRoot, outil.Fichier);
             // PARTIE EN COURS OU PAS (demande user, 2026-10-16 : « une mise a jour devrait tout faire
             // immediatement »). Un outil n'est pas charge par l'API : le remplacer ne coupe rien, et un
             // outil ouvert est renomme puis remplace (Poser). Il attendait la fin de la partie, puis la
@@ -292,6 +345,53 @@ public sealed class SelfUpdateService
             finally
             {
                 try { File.Delete(partiel); } catch { }
+            }
+        }
+
+        return remis;
+    }
+
+    /// <summary>
+    /// Faut-il prendre cet outil ? Un exe se compare par sa version ; une archive ou un fichier du Deck (sans version) par son
+    /// empreinte. La configuration du Deck n'est posee que si elle manque : le joueur peut l'avoir reglee.
+    /// </summary>
+    private static bool APrendre(OutilPublie outil, string cible)
+    {
+        if (string.Equals(outil.Fichier, ConfigurationDuDeck, StringComparison.OrdinalIgnoreCase)) return !File.Exists(cible);
+        return EstUnExe(outil.Fichier) ? AMettreAJour(VersionLocale(cible), outil.Version) : !MemeEmpreinte(cible, outil.Sha256);
+    }
+
+    public enum DecisionDeck { Poser, ArreterPuisPoser, Remettre }
+
+    /// <summary>Que faire des fichiers du Deck : les poser, arreter le Deck d'abord, ou attendre la fin de la partie. Pur.</summary>
+    internal static DecisionDeck DecisionDuDeck(bool deckTourne, bool partieEnCours)
+        => !deckTourne ? DecisionDeck.Poser : partieEnCours ? DecisionDeck.Remettre : DecisionDeck.ArreterPuisPoser;
+
+    private static bool LeDeckTourne()
+    {
+        var p = Process.GetProcessesByName(Deck.DeckLaunchService.NomDuHost);
+        foreach (var x in p) x.Dispose();
+        return p.Length > 0;
+    }
+
+    /// <summary>Arrete le PlayerDeck (fenetre et rendu) avant de remplacer ses fichiers ; il repartira au prochain lancement.</summary>
+    internal void ArreterLeDeck()
+    {
+        foreach (var p in Process.GetProcessesByName(Deck.DeckLaunchService.NomDuHost))
+        {
+            try
+            {
+                p.Kill();
+                p.WaitForExit(5000);
+                _logger.LogInformation("PlayerDeck arrete pour sa mise a jour (pid {Pid}).", p.Id);
+            }
+            catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception)
+            {
+                _logger.LogDebug(ex, "PlayerDeck : arret impossible.");
+            }
+            finally
+            {
+                p.Dispose();
             }
         }
     }

@@ -1,7 +1,7 @@
 asyncapi: 3.0.0
 info:
   title: APIExpose Real-time Events
-  version: 1.8.0
+  version: 1.8.1
   description: |
     WebSocket event surface of the APIExpose plugin for RetroBat / EmulationStation.
     Local only (127.0.0.1). Connect to `/ws` for the unfiltered firehose or to
@@ -272,7 +272,19 @@ channels:
       `Board` = scores | challenges, `RomGroup`, `Ruleset`, `Key` = score | time,
       `LowerIsBetter`, `Place`, `FrameRate`, `Label`; null = the default of the mode),
       `Seat` (the local player's place, 1 outside MULTIPLAYER). Display only: the
-      certified fingerprint does not change.
+      certified fingerprint does not change. `Reason` (window and none only):
+      decor_not_rendered | decor_not_written | no_deck_installed | disabled |
+      mode_not_wired | error.
+
+      Installed Decks (since 1.9.163): the PlayerDeck ships with APIExpose in
+      `tools/playerdeck` (`NelfePlay.PlayerDeck.exe`, `PlayerDeck.ini`, official Decks in
+      `themes/`, fonts with their OFL licences in `fonts/`), kept up to date through
+      `outils.json` like the other tools; player Decks go to `decks/` next to them.
+      `ApiExpose:PlayerDeck:Directory` points elsewhere; `ApiExpose:PlayerDeck:Enabled`
+      = false turns the whole feature off (no decoration, no Deck window, no live
+      rank, no trial layer, no gesture). Without a Deck, or when its rendering fails
+      or takes more than 5 s, the game launches exactly as before, without
+      decoration and without any error shown.
 
 
       `deck.rank` (CDC PlayerDeck H-D21): the place the running game would take in the
@@ -509,7 +521,7 @@ components:
               Rom: mslug3
               RomGroup: metal-slug-3
               Game: arcade/metal-slug-3
-              Player: nelfe
+              Player: player
               GamePath: 'E:\RetroBat\roms\fbneo\mslug3.zip'
               Status: posed
               DeckId: metal-slug-3-pixel
@@ -536,7 +548,7 @@ components:
         - name: off-in-game
           payload:
             Type: deck.choice
-            Payload: { Mode: world-scoring, Game: arcade/19xx, Player: nelfe, DeckId: null, DeckName: null, Off: true, Now: hide, PosedDeckId: 19xx-hangar, Label: 'PlayerDeck off (frame stays until next launch)', Source: gamepad, Choices: [ 19xx-hangar, 19xx, off ] }
+            Payload: { Mode: world-scoring, Game: arcade/19xx, Player: player, DeckId: null, DeckName: null, Off: true, Now: hide, PosedDeckId: 19xx-hangar, Label: 'PlayerDeck off (frame stays until next launch)', Source: gamepad, Choices: [ 19xx-hangar, 19xx, off ] }
     deckControls:
       name: DeckControls
       title: deck.controls
@@ -620,11 +632,11 @@ components:
         - name: 19xx-1cc-ranked
           payload:
             Type: deck.rank
-            Payload: { LaunchId: 5d1c, Mode: world-scoring, Game: arcade/19xx, Player: nelfe, Board: scores, Ruleset: 1cc, Label: 1CC, Key: score, Better: higher, Provisional: true, State: ranked, Source: fresh, BoardReadAtUtc: '2026-11-08T16:05:20Z', Rows: 37, World: home, Value: 2614300, ValueText: null, Rank: 12, RankAtLeast: false, Of: 38, OfAtLeast: false, Tied: false, Above: { Rank: 11, Player: ace, Value: 2690000, World: home, IsMe: false, Text: null }, Gap: 75700, GapText: null, Target: null, PersonalBest: { Rank: 15, Player: nelfe, Value: 2410800, World: home, IsMe: true, Text: null }, NewPersonalBest: true, Final: false, FrameRate: null, Revision: 88 }
+            Payload: { LaunchId: 5d1c, Mode: world-scoring, Game: arcade/19xx, Player: player, Board: scores, Ruleset: 1cc, Label: 1CC, Key: score, Better: higher, Provisional: true, State: ranked, Source: fresh, BoardReadAtUtc: '2026-11-08T16:05:20Z', Rows: 37, World: home, Value: 2614300, ValueText: null, Rank: 12, RankAtLeast: false, Of: 38, OfAtLeast: false, Tied: false, Above: { Rank: 11, Player: ace, Value: 2690000, World: home, IsMe: false, Text: null }, Gap: 75700, GapText: null, Target: null, PersonalBest: { Rank: 15, Player: player, Value: 2410800, World: home, IsMe: true, Text: null }, NewPersonalBest: true, Final: false, FrameRate: null, Revision: 88 }
         - name: mslug3-speedrun-racing
           payload:
             Type: deck.rank
-            Payload: { LaunchId: 7a20, Mode: speedrun, Game: arcade/metal-slug-3, Player: nelfe, Board: challenges, Ruleset: mslug3-speedrun-m1, Label: SPEEDRUN, Key: time, Better: lower, Provisional: true, State: racing, Source: stale, Rows: 9, World: home, Rank: null, Target: { Rank: 4, Player: bob, Value: 21540, Text: '6:03.97' }, PersonalBest: { Rank: 6, Player: nelfe, Value: 22102, IsMe: true, Text: '6:13.47' }, Final: false, FrameRate: 59.18, Revision: 3 }
+            Payload: { LaunchId: 7a20, Mode: speedrun, Game: arcade/metal-slug-3, Player: player, Board: challenges, Ruleset: mslug3-speedrun-m1, Label: SPEEDRUN, Key: time, Better: lower, Provisional: true, State: racing, Source: stale, Rows: 9, World: home, Rank: null, Target: { Rank: 4, Player: bob, Value: 21540, Text: '6:03.97' }, PersonalBest: { Rank: 6, Player: player, Value: 22102, IsMe: true, Text: '6:13.47' }, Final: false, FrameRate: 59.18, Revision: 3 }
     deckTrial:
       name: DeckTrial
       title: deck.trial (challenge or speedrun attempt in progress, H-D23)
@@ -634,7 +646,7 @@ components:
         - name: mslug3-knife-running
           payload:
             Type: deck.trial
-            Payload: { LaunchId: 7a20, ChallengeId: metal-slug-3.mission-1-knife, Ruleset: ch-ms3-m1-knife-v7, Category: challenge, Kind: challenge_rule, Title: 'My ### and my knife', SessionId: 3f1e, AttemptId: 9c2d, AttemptNumber: 4, State: RUNNING, Cause: null, Clock: { FrameRate: 59.185606, StartClockMs: 1794301200123, Running: true, Frames: null, Text: null, Provisional: false, PenaltyFrames: 420, PenaltyText: '+7 s' }, Counters: [ { Id: hits, Label: HITS, Value: 7, Max: 98, FailsAt: 99, Left: 92, Warn: false, PenaltyFramesEach: 60, PenaltyFrames: 420, PenaltyText: '+7 s', Tripped: false } ], Fails: [ { Id: AMMO_LOSE, Label: NO AMMO SPENT, Action: AMMO_LOSE, State: ok }, { Id: LOSE_LIFE, Label: NO DEATH, Action: LOSE_LIFE, State: ok } ], Efficiency: [], Comparisons: { PersonalBest: { Frames: 22102, Text: '6:13.47', Rank: 6, Player: nelfe, Source: board }, Target: { Frames: 21540, Text: '6:03.97', Rank: 4, Player: bob, Source: board }, FinalRank: null, NewPersonalBest: false }, Milestones: null, Locked: ['0x100596', '0x10EAF3', '0x100581', '0x10EAF5'], Yields: [], Revision: 12 }
+            Payload: { LaunchId: 7a20, ChallengeId: metal-slug-3.mission-1-knife, Ruleset: ch-ms3-m1-knife-v7, Category: challenge, Kind: challenge_rule, Title: 'My ### and my knife', SessionId: 3f1e, AttemptId: 9c2d, AttemptNumber: 4, State: RUNNING, Cause: null, Clock: { FrameRate: 59.185606, StartClockMs: 1794301200123, Running: true, Frames: null, Text: null, Provisional: false, PenaltyFrames: 420, PenaltyText: '+7 s' }, Counters: [ { Id: hits, Label: HITS, Value: 7, Max: 98, FailsAt: 99, Left: 92, Warn: false, PenaltyFramesEach: 60, PenaltyFrames: 420, PenaltyText: '+7 s', Tripped: false } ], Fails: [ { Id: AMMO_LOSE, Label: NO AMMO SPENT, Action: AMMO_LOSE, State: ok }, { Id: LOSE_LIFE, Label: NO DEATH, Action: LOSE_LIFE, State: ok } ], Efficiency: [], Comparisons: { PersonalBest: { Frames: 22102, Text: '6:13.47', Rank: 6, Player: player, Source: board }, Target: { Frames: 21540, Text: '6:03.97', Rank: 4, Player: bob, Source: board }, FinalRank: null, NewPersonalBest: false }, Milestones: null, Locked: ['0x100596', '0x10EAF3', '0x100581', '0x10EAF5'], Yields: [], Revision: 12 }
     deckAck:
       name: DeckAck
       title: deck.ack (reply to a client message, to that client only)

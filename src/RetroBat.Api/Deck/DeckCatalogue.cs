@@ -34,9 +34,47 @@ public sealed class DeckCatalogue
 
     public IReadOnlyList<Entree> Tous => _entrees;
 
-    /// <summary>Le dossier de l'exe du PlayerDeck sur la borne : <c>plugins\NelfePlay-PlayerDeck\bin</c>.</summary>
-    public static string DossierParDefaut
+    /// <summary>
+    /// LE DOSSIER LIVRE (1.9.163) : <c>plugins\APIExpose\tools\playerdeck</c>, avec <c>themes\</c> et <c>fonts\</c>. Le PlayerDeck
+    /// y arrive comme l'exe du direct : par outils.json (<see cref="Infrastructure.SelfUpdateService"/>), le full.7z et
+    /// l'installeur.
+    /// </summary>
+    public static string DossierLivre => Path.Combine(RetroBatPaths.PluginRoot, "tools", "playerdeck");
+
+    /// <summary>Le dossier de developpement : <c>plugins\NelfePlay-PlayerDeck\bin</c> (la sortie du depot du PlayerDeck).</summary>
+    public static string DossierDeDeveloppement
         => Path.Combine(Path.GetDirectoryName(RetroBatPaths.PluginRoot.TrimEnd('\\', '/')) ?? RetroBatPaths.PluginRoot, "NelfePlay-PlayerDeck", "bin");
+
+    /// <summary>Le dossier du PlayerDeck quand rien n'est configure : le dossier livre, sinon celui de developpement.</summary>
+    public static string DossierParDefaut => Dossier(null);
+
+    /// <summary>
+    /// Le dossier du PlayerDeck : le dossier configure (<c>ApiExpose:PlayerDeck:Directory</c>) l'emporte, puis le dossier
+    /// livre s'il porte le Deck, puis le dossier de developpement s'il le porte. Sans Deck nulle part : le dossier livre
+    /// (vide, donc aucun Deck installe : les jeux partent comme avant).
+    /// </summary>
+    public static string Dossier(string? configure) => Choisir(configure, DossierLivre, DossierDeDeveloppement, PorteLeDeck);
+
+    /// <summary>La regle de <see cref="Dossier(string?)"/>, sans disque. Pur.</summary>
+    internal static string Choisir(string? configure, string livre, string developpement, Func<string, bool> porteLeDeck)
+    {
+        if (!string.IsNullOrWhiteSpace(configure)) return configure.Trim();
+        if (porteLeDeck(livre)) return livre;
+        return porteLeDeck(developpement) ? developpement : livre;
+    }
+
+    /// <summary>Un dossier porte le Deck s'il a son exe ou ses Decks officiels.</summary>
+    private static bool PorteLeDeck(string dossier)
+    {
+        try
+        {
+            return File.Exists(Path.Combine(dossier, "NelfePlay.PlayerDeck.exe")) || Directory.Exists(Path.Combine(dossier, "themes"));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            return false;
+        }
+    }
 
     /// <summary>Lit les Decks installes a cote de l'exe (themes/ puis decks/). Un fichier illisible est ignore.</summary>
     public static DeckCatalogue Lire(string dossierDuDeck)
