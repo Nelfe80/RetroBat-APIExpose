@@ -127,12 +127,12 @@ public sealed class ReplayCaptureService : BackgroundService
         /// <summary>La rotation annoncee par le coeur (quarts de tour antihoraires), null si inconnue.</summary>
         public int? Rotation;
         /// <summary>
-        /// UN JEU VERTICAL DONT LE SENS N'EST PAS LU (08/11, Contra de Getupor publie couche) : le referentiel dit le jeu
-        /// vertical, le journal de lancement ne dit pas sa rotation. Le film d'origine n'est pas « couche » dans son en-tete
-        /// (l'image et l'affichage y ont la meme forme) : sans ce drapeau il partait sur YouTube sans etre redresse. Il est
-        /// abandonne ; la station le rend depuis le replay, en lisant la rotation que le coeur annonce.
+        /// UN JEU VERTICAL SELON LE REFERENTIEL (08/11, Contra de Getupor publie couche sur YouTube). Le film d'origine n'est
+        /// pas « couche » dans son en-tete (l'image et l'affichage y ont la meme forme) : une rotation inconnue, ou fausse
+        /// (un coeur regle pour un ecran tourne), le laissait partir couche. Son image, une fois tournee comme le coeur
+        /// l'annonce, doit etre en portrait ; sinon le film est abandonne et la station le rend depuis le replay, redresse.
         /// </summary>
-        public bool VerticalSansSens;
+        public bool Verticale;
         /// <summary>La forme de l'image annoncee par le coeur (libretro « Aspect »), null si inconnue.</summary>
         public double? Forme;
         /// <summary>Le fanart du jeu (sinon sa capture), fond du cadre 16:9 du direct et de la video ; null sans image.</summary>
@@ -671,7 +671,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 _enCours = new CaptureEnCours
                 {
                     ReplayId = replayId, Fichier = fichier, FrameDebut = frame, Rotation = rotation, SansReplay = sansReplay,
-                    VerticalSansSens = !duSpectateur && rotation is null && JeuVertical(_cheminDuJeu),
+                    Verticale = !duSpectateur && JeuVertical(_cheminDuJeu),
                     Forme = forme, Fond = FondDuJeu(_cheminDuJeu), DuSpectateur = duSpectateur,
                     Crt = LanceurDuDirect.EcranATube(_cheminDuJeu is { Length: > 0 } cheminDuJeu
                         ? RetroBat.Api.Netplay.NetplayHostService.SystemeDuChemin(cheminDuJeu, RetroBatPaths.RomsRoot) : null),
@@ -1102,13 +1102,20 @@ public sealed class ReplayCaptureService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// L'image du film, tournee de <paramref name="rotation"/> quarts de tour comme le coeur l'annonce, est-elle en portrait ?
+    /// Faux sans rotation connue. Pur, pour etre teste.
+    /// </summary>
+    internal static bool PortraitUneFoisTourne(long largeur, long hauteur, int? rotation)
+        => rotation is { } r && largeur != hauteur && (largeur > hauteur) == (r is 1 or 3);
+
     /// <summary>Pendant la capture : l'en-tete (jeu vertical ?) puis la cadence du jeu.</summary>
     private async Task SurveillerAsync(CancellationToken ct)
     {
         var c = _enCours;
         if (c is null) return;
 
-        if (c.VerticalSansSens)
+        if (c.Verticale && c.Rotation is null)
         {
             await ArreterAsync(c.ReplayId, null, abandon: true, "jeu vertical, sens de rotation inconnu").ConfigureAwait(false);
             return;
@@ -1117,6 +1124,12 @@ public sealed class ReplayCaptureService : BackgroundService
         if (!c.EnteteVerifiee && MatroskaEntete.Lire(c.Fichier) is { } entete)
         {
             c.EnteteVerifiee = true;
+            if (c.Verticale && !PortraitUneFoisTourne(entete.Largeur, entete.Hauteur, c.Rotation))
+            {
+                await ArreterAsync(c.ReplayId, null, abandon: true, "jeu vertical, image couchee meme tournee (rotation "
+                    + (c.Rotation?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "inconnue") + ")").ConfigureAwait(false);
+                return;
+            }
             // Un film couche se redresse a la fin (ou dans sa version YouTube), si l'on sait dans quel sens. Un film a la
             // taille d'origine est petit par nature.
             var redressable = entete.Couchee && c.Rotation is 1 or 3;
