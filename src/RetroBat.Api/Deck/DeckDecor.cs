@@ -29,6 +29,36 @@ public static class DeckDecor
     /// </summary>
     public static readonly IReadOnlyList<string> ArgumentsDuLanceur = ["-bezel", Nom, "-ratio", "custom", "-integerscale", "0"];
 
+    /// <summary>
+    /// LES NOTIFICATIONS DE RETROARCH COUPEES POUR CE LANCEMENT (demande du user du 08/11) : la fonction « OnScreenMsg » d'ES,
+    /// que le lanceur lit en dernier (arguments de la ligne) et ecrit dans video_font_enable (LibRetroGenerator,
+    /// BindBoolFeatureOn ; declaree pour libretro dans es_features.cfg). RetroArch 1.22.2 n'active ses widgets que si
+    /// video_font_enable est vrai (retroarch.c, « global notifications on/off toggle switch ») et ne tire plus sa file de
+    /// messages sans lui (video_driver.c) : plus rien ne parait, ni SHOW_MSG, ni etat, ni netplay, ni succes. Le compteur
+    /// d'images et les statistiques restent (reglages a part). Le lancement suivant par ES rend la valeur d'ES.
+    /// </summary>
+    public static readonly IReadOnlyList<string> ArgumentsSansNotifications = ["-OnScreenMsg", "0"];
+
+    /// <summary>
+    /// La valeur de video_font_enable que le lanceur ecrirait sans le Deck : « false » si ES coupe les notifications
+    /// (global.OnScreenMsg a faux), « true » sinon (BindBoolFeatureOn : allume par defaut). Pour ce qui lance RetroArch sans le
+    /// lanceur (lecture d'un replay) et heriterait sinon de « false » apres une partie avec le Deck. Lecture seule.
+    /// </summary>
+    public static string NotificationsDEs(string? fichier = null)
+    {
+        try
+        {
+            var doc = System.Xml.Linq.XDocument.Load(fichier ?? RetroBatPaths.EmulationStationSettingsPath);
+            var v = doc.Root?.Elements().FirstOrDefault(e => (string?)e.Attribute("name") == "global.OnScreenMsg")?.Attribute("value")?.Value;
+            return v is null || v.Length == 0 || v == "1" || v.Equals("true", StringComparison.OrdinalIgnoreCase)
+                || v.Equals("on", StringComparison.OrdinalIgnoreCase) || v.Equals("enabled", StringComparison.OrdinalIgnoreCase) ? "true" : "false";
+        }
+        catch (Exception)
+        {
+            return "true";
+        }
+    }
+
     public static string Dossier => Path.Combine(RetroBatPaths.RetroBatRoot, "decorations", Nom);
 
     /// <summary>Le trou du decor : la ou le jeu s'affiche, en pixels de l'ecran (origine en haut a gauche).</summary>

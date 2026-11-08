@@ -498,7 +498,7 @@ public sealed class DeckLancementTests : IDisposable
         Assert.NotNull(service.EnCours);
         var c = service.Choisir(null, "gamepad")!;
         Assert.Equal("19xx-hangar", c.DeckId);
-        Assert.Equal("switch", c.Now);
+        Assert.Equal("next-launch", c.Now);   // charte du 08/11 : sans decor pose, le Deck vaut au lancement suivant
 
         // un autre mode reprend ce choix ; un autre joueur garde le Deck officiel
         Assert.Equal("posed", service.Preparer(DeckModes.WorldScoring, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip").Status);

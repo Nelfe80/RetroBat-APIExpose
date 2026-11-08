@@ -1434,6 +1434,12 @@ public sealed partial class MultiplayerPanelService
         var texte = Texte("multiplayer.invitation.ingame", "{player} invites you to {game}: whenever you're ready!")
             .Replace("{player}", invitation.From?.Pseudo ?? string.Empty, StringComparison.Ordinal)
             .Replace("{game}", NomDuJeu(invitation.Game), StringComparison.Ordinal);
+        if (RetroBat.Api.Deck.DeckSilence.DireSiPose(RetroBat.Api.Deck.DeckNotices.Message("multiplayer.invitation", RetroBat.Api.Deck.DeckSeverity.Info,
+                "INVITATION", (invitation.From?.Pseudo ?? "A FRIEND") + " INVITES YOU", "multiplayer")))
+        {
+            _journal.LogInformation("MULTIPLAYER : invitation de {Ami} annoncee dans le Deck", invitation.From?.Pseudo);
+            return;
+        }
         await new CommandesRetroArchUdp().EnvoyerAsync("SHOW_MSG " + texte.ReplaceLineEndings(" ").Trim(), CancellationToken.None).ConfigureAwait(false);
         _journal.LogInformation("MULTIPLAYER : invitation de {Ami} annoncee dans le jeu", invitation.From?.Pseudo);
     }

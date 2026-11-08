@@ -127,11 +127,18 @@ public sealed class NetplayHostService
         return ouverte >= debut - TimeSpan.FromMinutes(5) && ouverte <= fin;
     }
 
+    /// <param name="lancementDirect">
+    /// LE DEFI DIFFUSE AVEC LE PLAYERDECK (08/11) : le lancement se fait par l'API, decor du Deck compris, au lieu d'ES (dont
+    /// l'API ne prend aucune option). Recoit les arguments netplay de l'hote (« -netplaymode host ») a ajouter a la ligne du
+    /// lanceur ; rend vrai si le jeu est parti. Les reglages d'hebergement (pseudo, mots de passe, relais) restent dans
+    /// es_settings.cfg, ou le lanceur les lit comme pour le repli direct d'avant. Null : par ES, comme avant.
+    /// </param>
     public async Task<Echec> HebergerAsync(
         string cheminRom,
         string pseudoJoueur,
         bool autoriserAJouer,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        Func<IReadOnlyList<string>, bool>? lancementDirect = null)
     {
         var resolution = await ResoudreLancementAsync(cheminRom, ct).ConfigureAwait(false);
         if (resolution is null)
@@ -158,9 +165,20 @@ public sealed class NetplayHostService
             return Echec.ReglagesRefuses;
         }
 
-        // Par ES de preference : lui seul cesse de dessiner pendant la partie (voir NetplayLaunch).
-        var lancement = await NetplayLaunch.LancerAsync(
-            cheminRom, () => Arguments(resolution, cheminRom, EsManettes.PourLancer(_logger).Arguments), _httpFactory, _logger, ct).ConfigureAwait(false);
+        // Par ES de preference : lui seul cesse de dessiner pendant la partie (voir NetplayLaunch). Avec le Deck, par l'API : les
+        // cles de lancement d'ES ne servent pas, la ligne porte tout (comme le repli direct de NetplayLaunch).
+        NetplayLaunch.Resultat lancement;
+        if (lancementDirect is not null)
+        {
+            NetplaySettings.EffacerLancement(_logger);
+            lancement = new NetplayLaunch.Resultat(lancementDirect(ArgumentsDeLHote), false);
+        }
+        else
+        {
+            lancement = await NetplayLaunch.LancerAsync(
+                cheminRom, () => Arguments(resolution, cheminRom, EsManettes.PourLancer(_logger).Arguments), _httpFactory, _logger, ct).ConfigureAwait(false);
+        }
+
         if (!lancement.Ok)
         {
             return Echec.LancementRefuse;
@@ -556,6 +574,9 @@ public sealed class NetplayHostService
         }
         return (Valeur("netplay_password"), Valeur("netplay_spectate_password"));
     }
+
+    /// <summary>Les arguments netplay de l'hote, a ajouter a la ligne d'un lancement direct.</summary>
+    public static readonly IReadOnlyList<string> ArgumentsDeLHote = ["-netplaymode", "host"];
 
     private static string Arguments(EsLaunchArguments.Resolution r, string cheminRom, string manettes)
         => string.Join(' ', new[]

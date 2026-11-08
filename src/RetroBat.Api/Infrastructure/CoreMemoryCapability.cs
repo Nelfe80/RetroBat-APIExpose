@@ -104,7 +104,8 @@ public sealed class CoreMemoryCapability
                     CabinetAnnounceText.Get("scoring_nothing_measured", langue),
                     string.Format(CabinetAnnounceText.Get("scoring_core_blind", langue), verdict.Core),
                     8000,
-                    alerte: true);
+                    alerte: true,
+                    auDeck: RetroBat.Api.Deck.DeckNotices.Scoring("scoring_nothing_measured", detail: "CORE EXPOSES NO MEMORY"));
             }
             else if (verdict is { Measures: true })
             {

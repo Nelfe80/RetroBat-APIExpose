@@ -369,6 +369,9 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.
 // L'epreuve en cours pour le PlayerDeck (H-D23) : deck.trial, tire du reglement et de la session, sans reseau en course.
 builder.Services.AddSingleton<RetroBat.Api.Deck.DeckTrialService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckTrialService>());
+// Ce qui se tait quand le PlayerDeck est pose (demande du user du 08/11) : doublons coupes, messages au Deck (deck.notice).
+builder.Services.AddSingleton<RetroBat.Api.Deck.DeckSilence>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckSilence>());
 // Les fondations du reseau (CDC infra §15) : la carte signee (cles de verdict, relais) et les relais, par ou
 // passent les requetes de la borne quand elle ne joint pas le central.
 builder.Services.AddSingleton<RetroBat.Api.Reseau.ServiceDeCarte>();
@@ -782,6 +785,10 @@ var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
     // L'epreuve en cours (H-D23) s'arme a chaque lancement d'epreuve avec Deck ; elle se pose aussi dans l'instantane.
     app.Services.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>().Epreuve =
         app.Services.GetRequiredService<RetroBat.Api.Deck.DeckTrialService>();
+    // Le Deck pose fait taire ce qui passe devant lui : le message du choix en jeu et les bandeaux du haut vont a sa plaque.
+    var silence = app.Services.GetRequiredService<RetroBat.Api.Deck.DeckSilence>();
+    app.Services.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>().Silence = silence;
+    app.Services.GetRequiredService<RetroBat.Api.Infrastructure.LiveContestOverlayService>().Silence = silence;
 }
 eventBus.Subscribe<EventEnvelope>(evt => 
 {

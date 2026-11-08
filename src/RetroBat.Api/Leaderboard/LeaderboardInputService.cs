@@ -55,6 +55,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     private readonly RetroBat.Api.Netplay.NetplayHostService _hote;
     private readonly Deck.DeckLaunchService? _deck;
     private readonly Multiplayer.SonDEmulationStation? _sonDEs;
+    private readonly Speedrun.IPrioritesDuJeu? _priorites;
     private readonly ChallengeHudService _defi;
     private readonly Replay.Storage.ReplayStore _replays;
     private readonly LeaderboardRankHistory _historique;
@@ -157,8 +158,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         Multiplayer.MultiplayerPanelService? multiplayer = null,
         Speedrun.DefisPanelService? defis = null,
         Deck.DeckLaunchService? deck = null,
-        Multiplayer.SonDEmulationStation? sonDEs = null)
+        Multiplayer.SonDEmulationStation? sonDEs = null,
+        Speedrun.IPrioritesDuJeu? priorites = null)
     {
+        _priorites = priorites;
         _deck = deck;
         _sonDEs = sonDEs;
         _collection = collection;
@@ -1611,11 +1614,23 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 // acceptait la demande sans jamais lancer (2026-10-01, defi bloque sur
                 // « Lancement de la partie », emulateur jamais apparu).
                 await FermerLeMenuEsAsync().ConfigureAwait(false);
-                if (mode != ModeDuDefi.Prive
-                    && await DiffuserLeDefiAsync(chemin, mode == ModeDuDefi.Multi ? reglages.ChallengeJoinPolicy : "none").ConfigureAwait(false))
+                if (mode != ModeDuDefi.Prive)
                 {
-                    await AttendreLeJeuPuisSEffacerAsync("defi en direct").ConfigureAwait(false);
-                    return;
+                    // LE DEFI DIFFUSE AVEC LE DECK (essai du user du 08/11 : 1CC LIVE est le reglage par defaut) : le decor se
+                    // prepare avant l'hebergement ; le jeu part alors par l'API, netplay de l'hote compris.
+                    var avecDeck = await PreparerLeDeckDuDefiAsync(chemin, classementDuRang).ConfigureAwait(false);
+                    if (await DiffuserLeDefiAsync(chemin, mode == ModeDuDefi.Multi ? reglages.ChallengeJoinPolicy : "none", avecDeck).ConfigureAwait(false))
+                    {
+                        await AttendreLeJeuPuisSEffacerAsync(avecDeck is null ? "defi en direct" : "defi en direct avec le Deck").ConfigureAwait(false);
+                        return;
+                    }
+                    // Diffusion impossible : un defi prive, avec le meme Deck s'il est pret
+                    if (avecDeck is not null && LancerLeDefiAvecLeDeck(chemin, avecDeck, []))
+                    {
+                        await AttendreLeJeuPuisSEffacerAsync("defi avec le Deck").ConfigureAwait(false);
+                        return;
+                    }
+                    if (avecDeck is not null) _deck?.Abandonner("live_launch_failed");
                 }
                 // LE PLAYERDECK (H-D15, H-D20) : un jeu dont le Deck est retenu part par l'API, avec son decor. L'API d'ES ne
                 // prend qu'un chemin de ROM, aucune option : seul un lancement direct porte « -bezel nelfeplay-deck -ratio custom ».
@@ -1662,31 +1677,73 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// </summary>
     private async Task<bool> LancerAvecLeDeckAsync(string chemin, Deck.DeckRankBoard? classementDuRang)
     {
-        if (_deck is null) return false;
+        var avecDeck = await PreparerLeDeckDuDefiAsync(chemin, classementDuRang).ConfigureAwait(false);
+        if (avecDeck is null) return false;
+        if (LancerLeDefiAvecLeDeck(chemin, avecDeck, [])) return true;
+        // Le jeu part par ES, sans decor : le Deck ne doit pas s'y croire pose (charte du 08/11)
+        _deck?.Abandonner("direct_launch_failed");
+        return false;
+    }
+
+    /// <summary>Un defi pret a partir avec son decor : le lancement d'ES resolu et le Deck pose.</summary>
+    internal sealed record DefiAvecDeck(RetroBat.Api.Netplay.EsLaunchArguments.Resolution Resolution, Deck.DeckLancement Deck);
+
+    /// <summary>
+    /// Le Deck du defi, decor pose ; null pour tout le reste (jeu sans Deck, Off, decor impossible, lancement non resolu) : le
+    /// defi part alors comme avant, par ES.
+    /// </summary>
+    private async Task<DefiAvecDeck?> PreparerLeDeckDuDefiAsync(string chemin, Deck.DeckRankBoard? classementDuRang)
+    {
+        if (_deck is null) return null;
         try
         {
             var resolution = await _hote.ResoudreLancementAsync(chemin).ConfigureAwait(false);
-            if (resolution is null) return false;
+            if (resolution is null) return null;
             var deck = _deck.Preparer(Deck.DeckModes.WorldScoring, resolution.Systeme, chemin, classement: classementDuRang);
-            if (deck.Status != "posed" || deck.Arguments.Count == 0) return false;
+            return deck.Status == "posed" && deck.Arguments.Count > 0 ? new DefiAvecDeck(resolution, deck) : null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Classement : Deck du defi non prepare, il part par ES.");
+            return null;
+        }
+    }
 
-            var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
-                RetroBat.Api.Netplay.EsManettes.PourLancer(_logger).Arguments, resolution.Systeme, resolution.Emulateur,
-                resolution.Coeur.Length > 0 ? resolution.Coeur : null, chemin, retroAchievements: null,
-                deck.Arguments.Concat(FonctionsNeutraliseesDuDefi));
+    /// <summary>
+    /// Lance le defi par l'API, decor du Deck compris ; <paramref name="netplay"/> : les arguments de l'hote d'un defi diffuse
+    /// (vide pour un defi prive). Rend vrai si le lanceur est parti.
+    /// </summary>
+    private bool LancerLeDefiAvecLeDeck(string chemin, DefiAvecDeck defi, IReadOnlyList<string> netplay)
+    {
+        try
+        {
+            var (resolution, deck) = (defi.Resolution, defi.Deck);
+            var arguments = ArgumentsDuDefiAvecLeDeck(RetroBat.Api.Netplay.EsManettes.PourLancer(_logger).Arguments, resolution, chemin, deck.Arguments, netplay);
             if (arguments is null) return false;
 
             // ES ne sait pas qu'un jeu tourne : sa musique se tait jusqu'a la fin du jeu (SonDEmulationStation la rend ensuite)
             _sonDEs?.Couper();
             _partie?.AnnoncerLancement("defi");
-            if (Infrastructure.LancementDirect.Lancer(arguments, resolution.Systeme, chemin, _context, _bus, _logger) is null)
+            var lanceur = Infrastructure.LancementDirect.Lancer(arguments, resolution.Systeme, chemin, _context, _bus, _logger);
+            if (lanceur is null)
             {
                 _sonDEs?.Rendre();
                 return false;
             }
 
-            _logger.LogInformation("Classement : defi lance avec le Deck {Deck} ({Systeme}, {Emulateur}, {Coeur}).",
-                deck.DeckId, resolution.Systeme, resolution.Emulateur, resolution.Coeur);
+            // ES dessine son menu derriere le jeu (il ne sait pas qu'un jeu tourne) : le jeu passe devant, comme un speedrun
+            // (mesure du 01/11 : 41-43 images/s sans, 52-55 avec), et ES retrouve sa priorite quand le lanceur rend la main.
+            if (_priorites is { } p)
+            {
+                _ = p.DonnerLaMainAuJeuAsync(CancellationToken.None);
+                _ = Task.Run(async () =>
+                {
+                    try { await lanceur.WaitForExitAsync().ConfigureAwait(false); } catch (Exception) { /* parti */ }
+                    p.RendreLaMain();
+                });
+            }
+            _logger.LogInformation("Classement : defi lance avec le Deck {Deck} ({Systeme}, {Emulateur}, {Coeur}{Netplay}).",
+                deck.DeckId, resolution.Systeme, resolution.Emulateur, resolution.Coeur, netplay.Count > 0 ? ", hote netplay" : "");
             return true;
         }
         catch (Exception ex)
@@ -1695,6 +1752,16 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             return false;
         }
     }
+
+    /// <summary>
+    /// La ligne du lanceur d'un defi avec le Deck : systeme, emulateur et coeur que World Scoring impose a la fiche, manettes
+    /// comme ES, decor du Deck, fonctions qui feraient refuser le score coupees, et le netplay de l'hote s'il est diffuse. Pur.
+    /// </summary>
+    internal static string? ArgumentsDuDefiAvecLeDeck(string manettes, RetroBat.Api.Netplay.EsLaunchArguments.Resolution resolution, string chemin,
+        IReadOnlyList<string> argumentsDuDeck, IReadOnlyList<string> netplay)
+        => RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(manettes, resolution.Systeme, resolution.Emulateur,
+            resolution.Coeur.Length > 0 ? resolution.Coeur : null, chemin, retroAchievements: null,
+            argumentsDuDeck.Concat(FonctionsNeutraliseesDuDefi).Concat(netplay));
 
     /// <summary>Le classement du rang en direct : la regle de l'onglet regarde (hors 1CC MULTI), sinon la regle principale.</summary>
     private Deck.DeckRankBoard? ClassementDuRang()
@@ -1808,7 +1875,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// hebergement netplay, le chemin du site quand on coche « Diffuser en live ». Rend faux si
     /// la diffusion n'a pas pu se faire : le defi se lance alors normalement.
     /// </summary>
-    private async Task<bool> DiffuserLeDefiAsync(string chemin, string politique)
+    private async Task<bool> DiffuserLeDefiAsync(string chemin, string politique, DefiAvecDeck? avecDeck = null)
     {
         var join = politique is "followed" or "everyone" ? politique : "none";
         try
@@ -1829,7 +1896,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 return false;
             }
             _directAnnonceParLeDefi = true;
-            var echec = await _hote.HebergerAsync(chemin, _agent.Status.Pseudo ?? "", join != "none").ConfigureAwait(false);
+            var echec = await _hote.HebergerAsync(chemin, _agent.Status.Pseudo ?? "", join != "none",
+                lancementDirect: avecDeck is null ? null : netplay => LancerLeDefiAvecLeDeck(chemin, avecDeck, netplay)).ConfigureAwait(false);
             if (echec != RetroBat.Api.Netplay.NetplayHostService.Echec.Aucun)
             {
                 _logger.LogWarning("Classement : hebergement du defi impossible ({Raison}), defi joue sans diffusion.", echec);

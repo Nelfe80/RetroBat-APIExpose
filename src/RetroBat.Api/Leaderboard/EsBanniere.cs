@@ -82,8 +82,11 @@ internal sealed class EsBanniereForm : Form
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int value, int size);
 
-    /// <summary>Montre le bandeau en haut de l'ecran, centre, pour la duree donnee.</summary>
-    public void Presenter(string marque, string titre, string detail, int? dureeMs, bool alerte = false)
+    /// <summary>
+    /// Montre le bandeau en haut de l'ecran, centre, pour la duree donnee. <paramref name="zone"/> : le trou du decor du
+    /// PlayerDeck (ecran principal) ; le bandeau s'y tient, centre en haut du jeu, sans deborder sur les rails (08/11).
+    /// </summary>
+    public void Presenter(string marque, string titre, string detail, int? dureeMs, bool alerte = false, Rectangle? zone = null)
     {
         _alerte = alerte;
         _style = EsMenuStyle.Lire();
@@ -97,9 +100,10 @@ internal sealed class EsBanniereForm : Form
         _titre = titre.ToUpperInvariant();   // ES met ses entrees de menu en majuscules
         _detail = detail;
 
-        var ecran = Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080);
-        _hauteurEcran = ecran.Height;
-        var largeur = (int) Math.Clamp(ecran.Width * 0.46f, 560f, 1100f);
+        var principal = Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080);
+        _hauteurEcran = principal.Height;
+        var ecran = zone is { Width: > 0, Height: > 0 } z ? new Rectangle(principal.Left + z.X, principal.Top + z.Y, z.Width, z.Height) : principal;
+        var largeur = Largeur(principal.Width, zone?.Width);
         var (hGroupe, hTitre, tPetit) = (Taille(_style.GroupFontSize) * 1.9f, TailleTitre() * 1.5f, Taille(_style.SmallFontSize));
         var lignesDetail = 0;
         if (_detail.Length > 0)
@@ -125,6 +129,13 @@ internal sealed class EsBanniereForm : Form
             _masquer.Interval = dureeMs.Value;
             _masquer.Start();
         }
+    }
+
+    /// <summary>La largeur du bandeau : 46 % de l'ecran (560 a 1100 px), sans depasser le trou du decor du Deck. Pur.</summary>
+    internal static int Largeur(int largeurEcran, int? largeurDuTrou)
+    {
+        var largeur = (int) Math.Clamp(largeurEcran * 0.46f, 560f, 1100f);
+        return largeurDuTrou is int t && t > 0 ? Math.Min(largeur, (int) (t * 0.94f)) : largeur;
     }
 
     public void Masquer()

@@ -211,7 +211,7 @@ public static class MultiplayerLaunchPlan
     /// decor qui porte les panneaux en jeu (<see cref="MultiplayerDecor"/>), ou null.
     /// </summary>
     public static string? Arguments(string manettes, string systeme, string coeur, string rom, MultiplayerGame jeu, int place, IEnumerable<string> netplay,
-        int joueurs = 2, string? decor = null)
+        int joueurs = 2, string? decor = null, IReadOnlyList<string>? argumentsDuDeck = null)
     {
         if (!CommandsController.NomDeLanceur(systeme) || !CommandsController.NomDeLanceur(coeur))
         {
@@ -233,7 +233,8 @@ public static class MultiplayerLaunchPlan
         {
             // Les panneaux en jeu : le lanceur affiche notre decor et cale le jeu dans son trou (CDC Ecrans v1.0, 3.6). Le decor
             // du PlayerDeck (H-D17) demande en plus « -ratio custom » : sans lui, fbneo et mame resteraient centres.
-            morceaux.AddRange(decor == RetroBat.Api.Deck.DeckDecor.Nom ? RetroBat.Api.Deck.DeckDecor.ArgumentsDuLanceur : ["-bezel", decor]);
+            // Le Deck donne ses arguments (avec « -OnScreenMsg 0 » s'il montre les messages dans ses rails, 08/11).
+            morceaux.AddRange(decor == RetroBat.Api.Deck.DeckDecor.Nom ? argumentsDuDeck ?? RetroBat.Api.Deck.DeckDecor.ArgumentsDuLanceur : ["-bezel", decor]);
         }
 
         morceaux.AddRange(netplay);

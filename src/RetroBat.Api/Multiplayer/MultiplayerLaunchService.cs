@@ -1085,8 +1085,9 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// ecran seulement : un jeu dont la place a sa vue (ecran partage, moniteurs cote a cote) garde son cadre a lui. Les
     /// spectateurs du direct et des films ne le voient pas : ils recoivent l'image du jeu, sans decor.
     /// </summary>
-    private string? PoserLeDeck(MultiplayerInstalledGame jeu, string systeme, int place, int joueurs)
+    private string? PoserLeDeck(MultiplayerInstalledGame jeu, string systeme, int place, int joueurs, out IReadOnlyList<string>? argumentsDuDeck)
     {
+        argumentsDuDeck = null;
         if (Deck is null || jeu.Game.VueDeLaPlace(place, joueurs) is not null || MultiplayerLaunchPlan.ShaderDeLaPlace(jeu.Game, place, joueurs) is not null)
         {
             return null;
@@ -1095,6 +1096,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         // Le rang en direct se classe au 1CC MULTI du jeu (s'il en a un), avec le score de la place du joueur local
         var deck = Deck.Preparer(RetroBat.Api.Deck.DeckModes.Multiplayer, systeme, jeu.Path, place: place);
         if (deck.Status != "posed") return null;
+        argumentsDuDeck = deck.Arguments;
         _journal.LogInformation("MULTIPLAYER : le Deck {Deck} remplace les panneaux en jeu", deck.DeckId);
         return RetroBat.Api.Deck.DeckDecor.Nom;
     }
@@ -1213,8 +1215,8 @@ public sealed class MultiplayerLaunchService : IHostedService
         var joueurs = Math.Max(2, lancement.Players);
         // Les panneaux en jeu (CDC Ecrans v1.0, lot E3) : un decor que RetroArch affiche lui-meme, dans les bandes.
         // LE PLAYERDECK (H-D17) : pour le joueur local, le Deck remplace les panneaux des joueurs (un seul decor).
-        var decor = PoserLeDeck(jeu, systeme, lancement.Seat, joueurs) ?? PoserLesPanneaux(room, jeu, systeme, joueurs);
-        var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeu.Game, lancement.Seat, netplay, joueurs, decor);
+        var decor = PoserLeDeck(jeu, systeme, lancement.Seat, joueurs, out var argumentsDuDeck) ?? PoserLesPanneaux(room, jeu, systeme, joueurs);
+        var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeu.Game, lancement.Seat, netplay, joueurs, decor, argumentsDuDeck);
         if (arguments is null)
         {
             _journal.LogWarning("MULTIPLAYER : lancement de {Jeu} refuse (systeme « {Systeme} », coeur « {Coeur} »)", jeu.Game.Id, systeme, coeur);
@@ -1578,6 +1580,13 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
 
         var texte = _panneau.Texte("multiplayer.no_controller", MessageSansManetteParDefaut);
+        // Le Deck pose : la plaque de ses rails le dit (une fois, elle reste plus longtemps que RetroArch)
+        if (RetroBat.Api.Deck.DeckSilence.DireSiPose(RetroBat.Api.Deck.DeckNotices.Message("multiplayer.no_controller", RetroBat.Api.Deck.DeckSeverity.Alert,
+                "NO CONTROLLER", "CHECK YOUR GAMEPAD", "multiplayer", RetroBat.Api.Deck.DeckNotices.Long)))
+        {
+            _journal.LogWarning("MULTIPLAYER : aucune manette pour cette partie, le joueur est prevenu dans le Deck");
+            return;
+        }
         _journal.LogWarning("MULTIPLAYER : aucune manette pour cette partie, le joueur est prevenu dans RetroArch");
         for (var i = 0; i < 3; i++)
         {

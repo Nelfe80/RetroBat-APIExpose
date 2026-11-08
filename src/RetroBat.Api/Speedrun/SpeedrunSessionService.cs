@@ -934,6 +934,14 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     /// <summary>Un message au joueur dans RetroArch, dans la langue d'ES. Tant que le SpeedrunHUD n'est pas la, c'est son seul retour a l'ecran.</summary>
     private async Task AfficherAsync(MessageJoueur message)
     {
+        // LE DECK POSE (08/11) : le message va a sa plaque, en anglais court ; un coup recu ne se dit pas (la couche epreuve
+        // le montre deja), RetroArch, muet pour ce lancement, ne le montrerait de toute facon pas.
+        if (RetroBat.Api.Deck.DeckSilence.Courante is { AuDeck: true } silence)
+        {
+            silence.Dire(RetroBat.Api.Deck.DeckNotices.DuSpeedrun(message), true);
+            return;
+        }
+
         try
         {
             var texte = TexteDe(message);

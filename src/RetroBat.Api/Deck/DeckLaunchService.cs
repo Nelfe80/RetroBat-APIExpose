@@ -74,6 +74,9 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     /// <summary>L'epreuve en cours (H-D23), armee a chaque lancement d'epreuve avec Deck ; pose par Program.cs.</summary>
     public DeckTrialService? Epreuve { get; set; }
 
+    /// <summary>Ce qui se tait quand le Deck est pose (demande du user du 08/11) ; pose par Program.cs.</summary>
+    public DeckSilence? Silence { get; set; }
+
     // Coutures pour les essais (sans exe, sans ecran, sans processus)
     internal Func<DeckCatalogue>? Catalogue { get; set; }
     internal Func<DeckCatalogue.Entree, int, int, DeckTrialPlan?, DeckRendu?>? Rendeur { get; set; }
@@ -233,7 +236,12 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
             _journal?.LogInformation(
                 "PlayerDeck : decor {Deck} pose pour {Jeu} ({Mode}, {Source}) : ecran {L} x {H}, trou {X},{Y} {W} x {Ht}, rendu {Ms} ms{Cache}.",
                 entree.Id, jeu, mode, decision.Source, largeur, hauteur, t.X, t.Y, t.Width, t.Height, rendu.Ms, rendu.Cache ? " (cache)" : "");
-            return Retenir(lancement with { Status = "posed", Decor = pose, Arguments = DeckDecor.ArgumentsDuLanceur }, publier: true);
+            // LES NOTIFICATIONS DE RETROARCH (demande du user du 08/11) : un Deck qui sait montrer les messages dans ses rails
+            // (deck.notice, annonce par son rendu) les fait couper pour ce lancement, par l'argument du lanceur « -OnScreenMsg 0 »
+            // (video_font_enable, qui eteint aussi les widgets de RetroArch 1.22). Un Deck plus ancien les laisse a RetroArch.
+            var arguments = rendu.Notices ? DeckDecor.ArgumentsDuLanceur.Concat(DeckDecor.ArgumentsSansNotifications).ToList() : DeckDecor.ArgumentsDuLanceur;
+            return Retenir(lancement with { Status = "posed", Decor = pose, Arguments = arguments, Notices = rendu.Notices, RetroArchMuet = rendu.Notices },
+                publier: true);
         }
         catch (Exception ex)
         {
@@ -262,6 +270,22 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         }
 
         return lancement;
+    }
+
+    /// <summary>
+    /// LE LANCEMENT PART SANS LE DECOR (lancement direct refuse, repli par ES) : le lancement prepare perd son decor. Sans cela,
+    /// la partie lancee par ES recevait un Deck « pose » alors que RetroArch n'avait aucun decor (charte du 08/11). Le choix en
+    /// jeu reste possible (il vaudra au lancement suivant).
+    /// </summary>
+    public void Abandonner(string raison)
+    {
+        DeckLancement? l;
+        lock (_verrou) l = _enCours;
+        if (l is null || l.Status != "posed") return;
+        var sans = l with { Status = "none", Decor = null, Reason = raison, Arguments = [], Notices = false, RetroArchMuet = false };
+        _journal?.LogInformation("PlayerDeck : lancement de {Jeu} sans decor ({Raison}) : Deck cache.", l.Game, raison);
+        Retenir(sans, publier: true);
+        DeckDecor.Effacer(RacineDuDecor);
     }
 
     /// <summary>Le joueur : celui qui est enregistre en salle, sinon le compte de la borne, sinon « local ». Jamais reecrit.</summary>
@@ -313,9 +337,9 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         // La couche epreuve (H-D23) est dans le decor : ses plaques font partie du fond pose par RetroArch
         var plan = epreuve is null ? null : Path.ChangeExtension(png, ".trial.json");
         var json = Path.ChangeExtension(png, ".json");
-        if (File.Exists(png) && File.Exists(json) && LireLeRendu(File.ReadAllText(json), largeur, hauteur) is { } garde)
+        if (File.Exists(png) && File.Exists(json) && File.ReadAllText(json) is var lu && LireLeRendu(lu, largeur, hauteur) is { } garde)
         {
-            return new DeckRendu(png, garde, largeur, hauteur, true, 0);
+            return new DeckRendu(png, garde, largeur, hauteur, true, 0) { Notices = PorteLesNotices(lu) };
         }
 
         Directory.CreateDirectory(cache);
@@ -347,7 +371,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         }
 
         File.WriteAllText(json, texte);
-        return new DeckRendu(png, trou, largeur, hauteur, false, chrono.ElapsedMilliseconds);
+        return new DeckRendu(png, trou, largeur, hauteur, false, chrono.ElapsedMilliseconds) { Notices = PorteLesNotices(texte) };
     }
 
     /// <summary>La ligne JSON de <c>--render-decor</c> : le trou, s'il est rendu pour cet ecran et tient dedans. Pur.</summary>
@@ -366,7 +390,21 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         }
     }
 
-    private sealed record SortieDuRendu(string? Deck, int Version, DeckEcran? Screen, DeckDecor.Trou? Hole);
+    private sealed record SortieDuRendu(string? Deck, int Version, DeckEcran? Screen, DeckDecor.Trou? Hole, string[]? Features = null);
+
+    /// <summary>Le Deck sait-il montrer les messages dans ses rails (« Features » de --render-decor contient « notice ») ? Pur.</summary>
+    internal static bool PorteLesNotices(string texte)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<SortieDuRendu>(texte.Trim(), Json)?.Features is { } f
+                && f.Any(x => string.Equals(x, "notice", StringComparison.OrdinalIgnoreCase));
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
 
     /// <summary>
     /// Le PlayerDeck tourne-t-il ? Sinon on le demarre, cache (<c>--follow-launch</c>) : il se montre pour ce lancement et
@@ -509,18 +547,23 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         var off = suivant == DeckChoix.Off;
         var entree = off ? null : installes.First(e => e.Id.Equals(suivant, StringComparison.OrdinalIgnoreCase));
         var pose = lancement.Status == "posed" ? lancement.DeckId : null;
+        // LA CHARTE (08/11) : sans decor pose, le Deck ne se dessine pas en entier par-dessus le cadre du jeu ; le Deck choisi
+        // vaut au lancement suivant (« switch » n'est plus publie).
         var maintenant = off ? "hide"
-            : pose is null ? "switch"
-            : pose.Equals(suivant, StringComparison.OrdinalIgnoreCase) ? "show"
+            : pose is not null && pose.Equals(suivant, StringComparison.OrdinalIgnoreCase) ? "show"
             : "next-launch";
         var texte = off
             ? pose is null ? "PlayerDeck off" : "PlayerDeck off (frame stays until next launch)"
             : maintenant == "next-launch" ? $"PlayerDeck: {entree!.Name} from next launch" : $"PlayerDeck: {entree!.Name}";
+        // La route se decide AVANT de publier le choix : Off retire le Deck, mais le message « PlayerDeck off » doit encore s'y voir
+        // (le Deck montre la plaque seule, puis se cache), puisque RetroArch, muet pour ce lancement, ne le montrerait pas.
+        var auDeck = Silence?.AuDeck ?? false;
         var publie = new DeckChoixPublie(lancement.Mode, lancement.Game, lancement.Player, off ? null : entree!.Id, off ? null : entree!.Name, off,
             maintenant, pose, texte, source, lancement.Choices);
         _journal?.LogInformation("PlayerDeck : choix {Deck} pour {Jeu} ({Mode}, {Joueur}) par {Source}, maintenant : {Maintenant}.",
             suivant, lancement.Game, lancement.Mode, lancement.Player, source, maintenant);
         _ = _bus.PublishAsync(new EventEnvelope { Type = "deck.choice", Payload = publie });
+        if (Silence?.Dire(DeckNotices.DuChoix(off, pose is not null, entree?.Name, maintenant), auDeck) == true) return publie;
         _ = Task.Run(async () =>
         {
             try { await _commandes.EnvoyerAsync("SHOW_MSG " + texte, CancellationToken.None).ConfigureAwait(false); }
@@ -565,6 +608,12 @@ public sealed record DeckLancement(
 
     /// <summary>La place du joueur local (1 ; en MULTIPLAYER, sa place dans la room) : son score se classe.</summary>
     public int Seat { get; init; } = 1;
+
+    /// <summary>Le Deck de ce lancement montre les messages du joueur dans ses rails (deck.notice).</summary>
+    public bool Notices { get; init; }
+
+    /// <summary>Les notifications de RetroArch sont coupees pour ce lancement (-OnScreenMsg 0) : les messages vont au Deck.</summary>
+    public bool RetroArchMuet { get; init; }
 }
 
 /// <summary>
@@ -576,7 +625,11 @@ public sealed record DeckDecorPose(string Name, int Version, DeckEcran Screen, D
 public sealed record DeckEcran(int Width, int Height);
 
 /// <summary>Un decor rendu : le PNG (cache), son trou, la taille d'ecran, et le temps du rendu.</summary>
-public sealed record DeckRendu(string Png, DeckDecor.Trou Trou, int Largeur, int Hauteur, bool Cache, long Ms);
+public sealed record DeckRendu(string Png, DeckDecor.Trou Trou, int Largeur, int Hauteur, bool Cache, long Ms)
+{
+    /// <summary>Le Deck qui l'a rendu sait montrer les messages dans ses rails (deck.notice).</summary>
+    public bool Notices { get; init; }
+}
 
 /// <summary>
 /// deck.choice : le choix du joueur en jeu. <c>Now</c> : hide (Off : la fenetre se cache, le decor reste jusqu'au lancement

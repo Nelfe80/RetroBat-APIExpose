@@ -1,7 +1,7 @@
 asyncapi: 3.0.0
 info:
   title: APIExpose Real-time Events
-  version: 1.8.1
+  version: 1.9.0
   description: |
     WebSocket event surface of the APIExpose plugin for RetroBat / EmulationStation.
     Local only (127.0.0.1). Connect to `/ws` for the unfiltered firehose or to
@@ -271,8 +271,13 @@ channels:
       `RenderMs`), `Board` (the leaderboard of the live rank asked by the button:
       `Board` = scores | challenges, `RomGroup`, `Ruleset`, `Key` = score | time,
       `LowerIsBetter`, `Place`, `FrameRate`, `Label`; null = the default of the mode),
-      `Seat` (the local player's place, 1 outside MULTIPLAYER). Display only: the
-      certified fingerprint does not change. `Reason` (window and none only):
+      `Seat` (the local player's place, 1 outside MULTIPLAYER), `Notices` (the Deck
+      shows player messages in its rails, see deck.notice), `RetroArchMuet` (true:
+      `-OnScreenMsg 0` was added too, RetroArch notifications are off for this
+      launch only). Since 1.9.0 the Deck is drawn only on its decoration: `window`,
+      `off` and `none` keep it hidden, and an in-game choice without a posed
+      decoration applies from the next launch (`Now` = next-launch, `switch` is no
+      longer published). Display only: the certified fingerprint does not change. `Reason` (window and none only):
       decor_not_rendered | decor_not_written | no_deck_installed | disabled |
       mode_not_wired | error.
 
@@ -312,6 +317,18 @@ channels:
       `Final` (rank fixed at the finish of a challenge attempt), `FrameRate`,
       `Revision`. Reads a public leaderboard only: the certified fingerprint, the
       preflight, the passport and the locks do not change.
+
+
+      `deck.notice` (08/11, 1.9.0): a message for the player, shown by the Deck in
+      a plate of its rails instead of RetroArch or an API window, while the Deck is
+      posed (or turned off in game while RetroArch notifications are muted for the
+      launch). `Kind` (message key: speedrun.msg.finish_best, scoring_continue,
+      deck.choice...), `Severity` = info | good | warn | alert | record, `Title`
+      (short English, upper case), `Text` (one short English line), `Value` (big
+      digits: score, time, percent; may be null), `DurationMs`, `Source` = speedrun |
+      scoring | deck | multiplayer | video, `Sequence` (a newer notice replaces the
+      shown one). Not published when no Deck is posed: RetroArch and the API windows
+      show the message as before.
 
 
       `deck.trial` (CDC PlayerDeck H-D23): the challenge or speedrun attempt in
@@ -429,6 +446,8 @@ channels:
         $ref: '#/components/messages/deckRank'
       deckTrial:
         $ref: '#/components/messages/deckTrial'
+      deckNotice:
+        $ref: '#/components/messages/deckNotice'
       deckAck:
         $ref: '#/components/messages/deckAck'
       deckClientRequest:
@@ -647,6 +666,20 @@ components:
           payload:
             Type: deck.trial
             Payload: { LaunchId: 7a20, ChallengeId: metal-slug-3.mission-1-knife, Ruleset: ch-ms3-m1-knife-v7, Category: challenge, Kind: challenge_rule, Title: 'My ### and my knife', SessionId: 3f1e, AttemptId: 9c2d, AttemptNumber: 4, State: RUNNING, Cause: null, Clock: { FrameRate: 59.185606, StartClockMs: 1794301200123, Running: true, Frames: null, Text: null, Provisional: false, PenaltyFrames: 420, PenaltyText: '+7 s' }, Counters: [ { Id: hits, Label: HITS, Value: 7, Max: 98, FailsAt: 99, Left: 92, Warn: false, PenaltyFramesEach: 60, PenaltyFrames: 420, PenaltyText: '+7 s', Tripped: false } ], Fails: [ { Id: AMMO_LOSE, Label: NO AMMO SPENT, Action: AMMO_LOSE, State: ok }, { Id: LOSE_LIFE, Label: NO DEATH, Action: LOSE_LIFE, State: ok } ], Efficiency: [], Comparisons: { PersonalBest: { Frames: 22102, Text: '6:13.47', Rank: 6, Player: player, Source: board }, Target: { Frames: 21540, Text: '6:03.97', Rank: 4, Player: bob, Source: board }, FinalRank: null, NewPersonalBest: false }, Milestones: null, Locked: ['0x100596', '0x10EAF3', '0x100581', '0x10EAF5'], Yields: [], Revision: 12 }
+    deckNotice:
+      name: DeckNotice
+      title: deck.notice (player message shown in a plate of the Deck rails)
+      payload:
+        $ref: '#/components/schemas/Envelope'
+      examples:
+        - name: speedrun-new-best
+          payload:
+            Type: deck.notice
+            Payload: { Kind: speedrun.msg.finish_best, Severity: record, Title: NEW BEST, Text: RANKED WHEN YOU QUIT, Value: '6:04.95', DurationMs: 8000, Source: speedrun, Sequence: 3 }
+        - name: scoring-continue
+          payload:
+            Type: deck.notice
+            Payload: { Kind: scoring_continue, Severity: warn, Title: CONTINUE, Text: CERTIFIED SCORE, Value: '412,300', DurationMs: 8000, Source: scoring, Sequence: 4 }
     deckAck:
       name: DeckAck
       title: deck.ack (reply to a client message, to that client only)

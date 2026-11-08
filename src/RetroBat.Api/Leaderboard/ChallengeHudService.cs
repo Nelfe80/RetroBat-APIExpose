@@ -46,6 +46,8 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
     private readonly object _verrou = new();
 
     private IDisposable? _abonnement;
+    private readonly RetroBat.Api.Deck.DeckSilence? _silence;
+    private Rectangle _ecran;
     private Thread? _fil;
     private Cartouche? _forme;
 
@@ -58,8 +60,11 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
     private long _score;
     private EsMenuStyle _style = new();
 
-    public ChallengeHudService(IEventBus bus, ILogger<ChallengeHudService> journal, RetroBat.Api.Infrastructure.CabinetLocale? locale = null)
+    public ChallengeHudService(IEventBus bus, ILogger<ChallengeHudService> journal, RetroBat.Api.Infrastructure.CabinetLocale? locale = null,
+        RetroBat.Api.Deck.DeckSilence? silence = null)
     {
+        _silence = silence;
+        if (silence is not null) silence.Change += SurChangeDuDeck;
         _locale = locale;
         _bus = bus;
         _journal = journal;
@@ -210,7 +215,42 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
             if (!_arme) return;
             _affiche = true;
         }
-        var ecran = fenetre != IntPtr.Zero ? Screen.FromHandle(fenetre).Bounds : (Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080));
+        _ecran = fenetre != IntPtr.Zero ? Screen.FromHandle(fenetre).Bounds : (Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080));
+        Appliquer();
+    }
+
+    /// <summary>
+    /// LE DECK POSE A DEJA LE RANG (demande du user du 08/11) : le cartouche passait devant le rail droit du Deck. Il suit
+    /// donc le defi (cible, rangs gagnes) sans paraitre tant que le Deck est la, et parait si le joueur retire le Deck en jeu.
+    /// Pur : le cartouche se montre-t-il ?
+    /// </summary>
+    internal static bool DoitSeMontrer(bool defiEnCours, bool deckVisible) => defiEnCours && !deckVisible;
+
+    /// <summary>Le cartouche se montre-t-il maintenant (defi en cours, Deck absent) ?</summary>
+    internal bool SeMontrerait()
+    {
+        bool enCours;
+        lock (_verrou) enCours = _arme && _affiche;
+        return DoitSeMontrer(enCours, _silence?.DeckVisible ?? false);
+    }
+
+    private void SurChangeDuDeck()
+    {
+        bool enCours;
+        lock (_verrou) enCours = _arme && _affiche;
+        if (enCours) Appliquer();
+    }
+
+    private void Appliquer()
+    {
+        if (!SeMontrerait())
+        {
+            _forme?.Disparaitre();
+            _journal.LogInformation("Defi : cartouche tenu cache, le PlayerDeck est pose (son rang le remplace).");
+            return;
+        }
+
+        var ecran = _ecran;
         if (_fil is null)
         {
             _fil = new Thread(() => OverlayUiGuard.Run("ChallengeHudService", () =>
@@ -284,6 +324,7 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
 
     public void Dispose()
     {
+        if (_silence is not null) _silence.Change -= SurChangeDuDeck;
         _abonnement?.Dispose();
         try { _forme?.Disparaitre(); } catch { }
     }

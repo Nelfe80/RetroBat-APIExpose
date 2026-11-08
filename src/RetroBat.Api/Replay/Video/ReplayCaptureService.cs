@@ -369,6 +369,9 @@ public sealed class ReplayCaptureService : BackgroundService
         try { langue = _reglagesEs?.GetScrapingSettings().Language ?? "en"; } catch (Exception) { langue = "en"; }
         var texte = _textes?.Text("video.filter.no_live", langue) is { Length: > 0 } t && t != "video.filter.no_live"
             ? t : MessageDuFiltreParDefaut;
+        if (RetroBat.Api.Deck.DeckSilence.DireSiPose(RetroBat.Api.Deck.DeckNotices.Message("video.filter.no_live", RetroBat.Api.Deck.DeckSeverity.Warn,
+                "NO LIVE", "IMAGE FILTER (NTSC) ON", "video", RetroBat.Api.Deck.DeckNotices.Long)))
+            return;
         for (var i = 0; i < 3 && !ct.IsCancellationRequested; i++)
         {
             await _ra.ShowMessageAsync(texte, ct).ConfigureAwait(false);

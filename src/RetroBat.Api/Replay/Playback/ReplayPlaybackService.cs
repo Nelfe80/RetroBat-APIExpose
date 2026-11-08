@@ -390,6 +390,9 @@ public sealed class ReplayPlaybackService
                 // passe pas par le lanceur de RetroBat (qui ne sait pas lancer une lecture) : on
                 // repart donc d'une presentation neutre, celle que le coeur annonce.
                 "input_overlay_enable = \"false\"",
+                // Les notifications de RetroArch telles qu'ES les veut : une partie avec le PlayerDeck les a coupees pour
+                // elle seule (-OnScreenMsg 0), et retroarch.cfg le garde jusqu'au prochain lancement par le lanceur (08/11).
+                "video_font_enable = \"" + RetroBat.Api.Deck.DeckDecor.NotificationsDEs() + "\"",
                 "aspect_ratio_index = \"22\"",
                 "video_aspect_ratio_auto = \"true\"",
                 "video_rotation = \"0\"",

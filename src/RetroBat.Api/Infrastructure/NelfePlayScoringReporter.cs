@@ -772,7 +772,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                             Texte("scoring_none_measured"),
                             Texte("scoring_none_measured_sub"),
                             9000,
-                            alerte: true);
+                            alerte: true, auDeck: RetroBat.Api.Deck.DeckNotices.Scoring("scoring_none_measured"));
                         Trace("fin de partie : prevol certifiable mais AUCUNE session recue");
                         _logger?.LogWarning(
                             "Scoring : partie annoncee certifiable terminee sans aucune session. "
@@ -1297,7 +1297,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     Texte("scoring_nothing_measured"),
                     Texte(wrapper == "missing" ? "scoring_module_missing" : "scoring_module_idle"),
                     8000,
-                    alerte: true);
+                    alerte: true, auDeck: RetroBat.Api.Deck.DeckNotices.Scoring("scoring_nothing_measured", detail: wrapper == "missing" ? "SCORING MODULE MISSING" : "SCORING MODULE IDLE"));
                 Trace($"prévol : wrapper {wrapper}, rien ne sera mesuré");
 
                 return;   // le reste du prevol parlerait de certification : il n'y a rien a certifier
@@ -1338,7 +1338,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     Texte("scoring_nothing_measured"),
                     string.Format(Texte("scoring_core_blind"), coeur),
                     8000,
-                    alerte: true);
+                    alerte: true, auDeck: RetroBat.Api.Deck.DeckNotices.Scoring("scoring_nothing_measured", detail: "CORE EXPOSES NO MEMORY"));
                 Trace(verdictArcade == false
                     ? $"prévol : {coeur} n'est pas dans la liste blanche des cœurs qui mesurent, rien ne sera mesuré"
                     : $"prévol : {coeur} est connu pour ne rien exposer, rien ne sera mesuré");
@@ -1428,7 +1428,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 // du joueur, et passe en orange quand la partie ne sera pas classee.
                 var (titreAffiche, detailAffiche) = AnnonceLocalisee(Langue(), certifiable, reason, dangers, force, remisDUsine);
                 if (horsLigne && certifiable && dangers.Count == 0) detailAffiche = Texte("scoring_offline_certifiable_sub");
-                _overlay.ShowTop("SCORING", titreAffiche, detailAffiche, 6000, alerte: !(certifiable && dangers.Count == 0));
+                _overlay.ShowTop("SCORING", titreAffiche, detailAffiche, 6000, alerte: !(certifiable && dangers.Count == 0), auDeck: NoticeDuPrevol(certifiable, reason, dangers, force, remisDUsine, horsLigne));
             }
             else
             {
@@ -1450,7 +1450,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         _prevolCertifiable = true;
         _prevolAt = DateTime.UtcNow;
         Trace($"prévol : NelfePlay injoignable, {systemId}/{romGroup} se joue normalement, score gardé sur la borne");
-        _overlay?.ShowTop("SCORING", Texte("scoring_offline"), Texte("scoring_offline_sub"), 6000, alerte: false);
+        _overlay?.ShowTop("SCORING", Texte("scoring_offline"), Texte("scoring_offline_sub"), 6000, alerte: false, auDeck: RetroBat.Api.Deck.DeckNotices.Scoring("scoring_offline"));
     }
 
     private static string CheminDuPrevol(string cle)
@@ -1940,7 +1940,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         Trace($"✓1CC : fin du jeu atteinte ({regle.Action}) a la frame {frame}, score {score}");
         if (annoncer)
         {
-            _overlay?.ShowTop("SCORING", Texte("scoring_clear_title"), Texte("scoring_clear_sub"), 9000);
+            _overlay?.ShowTop("SCORING", Texte("scoring_clear_title"), Texte("scoring_clear_sub"), 9000, auDeck: RetroBat.Api.Deck.DeckNotices.Scoring("scoring_clear", score));
         }
     }
 
@@ -2143,7 +2143,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             string.Format(CabinetAnnounceText.Get("scoring_joined_title", langue), ScoreAffiche(avant, langue)),
             CabinetAnnounceText.Get("scoring_joined_sub", langue),
             8000,
-            alerte: true);
+            alerte: true, auDeck: RetroBat.Api.Deck.DeckNotices.Scoring("scoring_joined", avant));
         Trace($"bandeau : un joueur arrive, score solo certifie {avant}, la suite a plusieurs");
     }
 
@@ -2159,7 +2159,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             CabinetAnnounceText.Get(cle + "_title", langue),
             CabinetAnnounceText.Get(cle + "_sub", langue),
             8000,
-            alerte: true);
+            alerte: true, auDeck: RetroBat.Api.Deck.DeckNotices.Scoring(cle));
         Trace($"bandeau : {trace}");
     }
 
@@ -2928,7 +2928,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             string.Format(CabinetAnnounceText.Get(cle + "_title", langue), ScoreAffiche(avant, langue)),
             CabinetAnnounceText.Get(cle + "_sub", langue),
             8000,
-            alerte: true);
+            alerte: true, auDeck: RetroBat.Api.Deck.DeckNotices.Scoring(cle, avant));
         Trace($"continue detecte ({(parCredit ? "credit consomme" : "chiffre des credits")}) : score certifie {avant}, la partie continue");
     }
 
@@ -3820,7 +3820,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     Texte("scoring_none_measured"),
                     Texte("scoring_none_measured_sub"),
                     9000,
-                    alerte: true);
+                    alerte: true, auDeck: RetroBat.Api.Deck.DeckNotices.Scoring("scoring_none_measured"));
                 _logger?.LogWarning(
                     "Scoring : partie annoncee certifiable terminee sans aucun score mesure "
                     + "(listener={Listener}, total={Total}). Le coeur employe n'expose probablement rien a lire.",
@@ -4684,6 +4684,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     private string Texte(string cle) => CabinetAnnounceText.Get(cle, Langue());
+
+    /// <summary>
+    /// LE PREVOL DANS LA PLAQUE DU PLAYERDECK (08/11) : la meme annonce, courte et en anglais, quand le Deck est pose. Pur.
+    /// </summary>
+    internal static RetroBat.Api.Deck.DeckNotice NoticeDuPrevol(bool certifiable, string reason, IReadOnlyList<string> dangers, bool force,
+        IReadOnlyList<string>? remisDUsine, bool horsLigne)
+    {
+        if (!certifiable && reason == "profile.core_mismatch") return RetroBat.Api.Deck.DeckNotices.Scoring("scoring_emulator_pending");
+        if (!certifiable && reason == "profile.core_options_mismatch") return RetroBat.Api.Deck.DeckNotices.Scoring("scoring_settings_pending");
+        if (!certifiable) return RetroBat.Api.Deck.DeckNotices.Scoring("scoring_not_certifiable", detail: AnnonceLocalisee("en", false, reason, dangers, force).Detail);
+        if (dangers.Count > 0)
+            return RetroBat.Api.Deck.DeckNotices.Scoring("scoring_not_certifiable",
+                detail: "TURN OFF " + string.Join(", ", dangers.Select(d => CabinetAnnounceText.Get("scoring_danger_" + d, "en"))));
+        if (horsLigne) return RetroBat.Api.Deck.DeckNotices.Scoring("scoring_offline_certifiable");
+        return RetroBat.Api.Deck.DeckNotices.Scoring("scoring_certifiable",
+            detail: remisDUsine is { Count: > 0 } ? "GAME SETTINGS RESET" : force ? "CERTIFIED SETTINGS" : "FOR THE LEADERBOARD");
+    }
 
     /// <summary>
     /// L'annonce au lancement dans la langue donnee. En francais, elle redonne mot pour mot ce que

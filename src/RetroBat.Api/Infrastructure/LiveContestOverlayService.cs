@@ -55,16 +55,35 @@ public sealed class LiveContestOverlayService : IDisposable
             "LIVE CONTEST", text, sub ?? "", durationMs, center: true));
     }
 
+    /// <summary>Ce qui se tait quand le PlayerDeck est pose (demande du user du 08/11) ; pose par Program.cs.</summary>
+    public RetroBat.Api.Deck.DeckSilence? Silence { get; set; }
+
+    /// <summary>
+    /// Ou va un bandeau du haut quand le Deck est pose : au Deck (plaque de ses rails) s'il a un texte anglais, sinon confine
+    /// au trou du decor (un message traduit par la plateforme ne se reecrit pas), sinon comme avant. Pur.
+    /// </summary>
+    internal enum RouteDuBandeau { CommeAvant, AuDeck, DansLeJeu }
+
+    internal static RouteDuBandeau Router(bool auDeck, bool deckVisible, bool aUnTexteAnglais)
+        => auDeck && aUnTexteAnglais ? RouteDuBandeau.AuDeck
+            : deckVisible ? RouteDuBandeau.DansLeJeu
+            : RouteDuBandeau.CommeAvant;
+
     /// <summary>Bandeau HAUT d'écran (challenge de salle) : « Appuyez sur
-    /// START… », « Ne touchez plus à rien ! » - centré en haut du jeu.</summary>
-    public void ShowTop(string? title, string text, string? sub, int? durationMs, bool alerte = false)
+    /// START… », « Ne touchez plus à rien ! » - centré en haut du jeu. <paramref name="auDeck"/> : le meme message, court et
+    /// en anglais, pour la plaque du PlayerDeck quand il est pose (rien ne passe alors devant ses rails).</summary>
+    public void ShowTop(string? title, string text, string? sub, int? durationMs, bool alerte = false, RetroBat.Api.Deck.DeckNotice? auDeck = null)
     {
+        var silence = Silence;
+        var route = silence is null ? RouteDuBandeau.CommeAvant : Router(silence.AuDeck, silence.DeckVisible, auDeck is not null);
+        if (route == RouteDuBandeau.AuDeck && silence!.Dire(auDeck, true)) return;
+        var zone = route == RouteDuBandeau.DansLeJeu && silence!.ZoneDuJeu is { } t ? new Rectangle(t.X, t.Y, t.Width, t.Height) : (Rectangle?)null;
         Poster(form =>
         {
             var marque = string.IsNullOrWhiteSpace(title) ? "CHALLENGE" : title!;
             if (_banniere is { IsDisposed: false } banniere)
             {
-                banniere.Presenter(marque, text, sub ?? "", durationMs, alerte);
+                banniere.Presenter(marque, text, sub ?? "", durationMs, alerte, zone);
             }
             else
             {
