@@ -82,6 +82,24 @@ public static class MultiplayerSpectateur
 
     private static volatile bool _connecte;
 
+    /// <summary>
+    /// LE SPECTATEUR AVANT LES INVITES (decision du user D-M9, 08/11 : les consoles reliees ont leur film des la v1). Son film
+    /// commencait apres le vrai depart (invites arrives, puis lui, plus 3 s) : le debut de la rencontre y manquait. L'hote le
+    /// lance maintenant des que sa session parait au lobby, et ne publie la session a la gameroom qu'une fois le spectateur
+    /// connecte et filme : les invites ne peuvent pas arriver avant lui, le vrai depart tombe dans son film. A verifier au banc
+    /// (m6_spike\spectateur_banc.py --boucle) : le depart pret se recharge alors avec un spectateur connecte. Faux : l'ordre
+    /// d'avant (spectateur lance apres l'arrivee des invites, sans film de la rencontre).
+    /// </summary>
+    public static bool AvantLesInvites { get; } = true;
+
+    private static volatile bool _filme;
+
+    /// <summary>La capture a pris son film (ReplayCaptureService) : la session peut partir a la gameroom.</summary>
+    public static bool Filme => _filme && Connecte;
+
+    /// <summary>La capture filme le spectateur (appele par ReplayCaptureService).</summary>
+    public static void NoterFilme() => _filme = true;
+
     /// <summary>Son journal dit-il qu'il a rejoint la partie ?</summary>
     private static bool AJoint(string journal)
     {
@@ -334,6 +352,7 @@ public static class MultiplayerSpectateur
             _processus = null;
             if (!garderLaPrevision) _prevu = false;
             _connecte = false;
+            _filme = false;
         }
         if (p is null) return;
         try

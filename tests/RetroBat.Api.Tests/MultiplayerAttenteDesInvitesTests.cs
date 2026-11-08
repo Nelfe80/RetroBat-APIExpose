@@ -259,6 +259,52 @@ public class MultiplayerAttenteDesInvitesTests
     }
 
     [Fact]
+    public async Task Le_tunnel_du_spectateur_connecte_avant_la_publication_n_arrete_pas_la_boucle()
+    {
+        // D-M9 (08/11) : le spectateur cache des consoles reliees rejoint la session AVANT que la gameroom la recoive. Ses lignes
+        // du tunnel sont deja au journal quand la boucle du depart commence : elles ne sont pas l'arrivee d'un invite.
+        MultiplayerAttenteDesInvites.RythmeDeLaBoucle = TimeSpan.FromMilliseconds(20);
+        var journal = Path.Combine(Path.GetTempPath(), "nelfe-boucle-spect-" + Guid.NewGuid().ToString("N") + ".log");
+        try
+        {
+            File.WriteAllText(journal, "[INFO] [Netplay] You have joined as player 1\n"
+                                       + "[INFO] [Netplay] Queued tunnel link connection.\n"
+                                       + "[INFO] [Netplay] Tunnel link connection completed.\n"
+                                       + "[INFO] [Netplay] \"NelfePlayTV\" has joined as spectator\n");
+            var marque = MultiplayerAttenteDesInvites.NombreDeLignes(journal);
+            Assert.Equal(4, marque);
+            var attente = new MultiplayerAttenteDesInvites(new RetroArchSimule("PLAYING"));
+
+            // Sans la marque, le tunnel du spectateur arreterait la boucle tout de suite (aucune reprise du depart).
+            Assert.Equal(0, await attente.BouclerLeDepartAsync(_ => Task.FromResult(true), journal, () => 0, TimeSpan.FromSeconds(10),
+                CancellationToken.None));
+
+            // Avec elle, la boucle reprend le depart jusqu'au tunnel du premier invite.
+            var reprises = 0;
+            Task<bool> Reprendre(CancellationToken _)
+            {
+                if (++reprises == 4)
+                {
+                    File.AppendAllText(journal, "[INFO] [Netplay] Queued tunnel link connection.\n");
+                }
+
+                return Task.FromResult(true);
+            }
+
+            Assert.Equal(4, await attente.BouclerLeDepartAsync(Reprendre, journal, () => 0, TimeSpan.FromSeconds(10), CancellationToken.None,
+                marque));
+        }
+        finally
+        {
+            File.Delete(journal);
+        }
+    }
+
+    [Fact]
+    public void Le_nombre_de_lignes_d_un_journal_absent_est_zero()
+        => Assert.Equal(0, MultiplayerAttenteDesInvites.NombreDeLignes(Path.Combine(Path.GetTempPath(), "nelfe-absent-" + Guid.NewGuid().ToString("N"))));
+
+    [Fact]
     public async Task Un_ralenti_qui_dure_pendant_la_partie_est_leve()
     {
         var ra = new RetroArchSimule("PLAYING") { AuRalenti = true };

@@ -380,6 +380,56 @@ public sealed class ReplayVideoPublisher
     }
 
     /// <summary>
+    /// LE FILM D'UNE RENCONTRE EST-IL VOULU ? (CDC films MULTIPLAYER, lot M2, 08/11) Comme pour un record, la borne demande avant
+    /// de fabriquer la version YouTube (<c>check</c>, aucune session ouverte) : le site verifie l'hote, le vrai depart, la fin
+    /// lue, la portion et le plafond des rencontres. <paramref name="rencontre"/> : <see cref="ReplayCaptureService.ChampsDeLaRencontre"/>.
+    /// </summary>
+    public async Task<ResultatDeCapture> RencontreVoulueAsync(string replayId, long taille, JsonObject rencontre, CancellationToken ct)
+    {
+        var credential = _devices.GetCredential();
+        if (string.IsNullOrEmpty(credential)) return new(IssueDeCapture.PlusTard, "borne non appairee");
+        var demande = AvecLaRencontre(new JsonObject
+        {
+            ["replay_id"] = replayId,
+            ["size"] = taille,
+            ["type"] = "video/x-flv",
+            ["check"] = true,
+        }, rencontre);
+        try
+        {
+            using var client = Client(credential, TimeSpan.FromSeconds(60));
+            using var contenu = new StringContent(demande.ToJsonString(), Encoding.UTF8, "application/json");
+            using var reponse = await client.PostAsync("/api/v1/agent/videos/upload-session", contenu, ct).ConfigureAwait(false);
+            var corps = JsonNode.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false)) as JsonObject;
+            if (reponse.IsSuccessStatusCode && corps?["wanted"] is JsonValue voulu && voulu.TryGetValue<bool>(out var oui) && oui)
+                return new(IssueDeCapture.Voulue, "rencontre");
+            // Un site d'avant les films de rencontres repond comme a une capture sans score : « pas_encore » ou
+            // « replay.not_owned », que la borne retente, puis oublie au bout de trois heures.
+            var raison = (string?)corps?["reason"] ?? "http_" + (int)reponse.StatusCode;
+            return new(RefusDefinitifs.Contains(raison) ? IssueDeCapture.Inutile : IssueDeCapture.PlusTard, raison);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
+        {
+            _logger.LogWarning(ex, "Video : site injoignable pour la decision de la rencontre {ReplayId}.", replayId);
+            return new(IssueDeCapture.PlusTard, "site injoignable");
+        }
+    }
+
+    /// <summary>
+    /// La demande avec les champs de la rencontre : la source « multiplayer » remplace « capture », et les frames d'un replay
+    /// n'ont pas de sens pour elle. Pur.
+    /// </summary>
+    internal static JsonObject AvecLaRencontre(JsonObject demande, JsonObject rencontre)
+    {
+        demande.Remove("run_start_frame");
+        demande.Remove("run_end_frame");
+        demande.Remove("fps");
+        foreach (var (cle, valeur) in rencontre) demande[cle] = valeur?.DeepClone();
+        demande["source"] = "multiplayer";
+        return demande;
+    }
+
+    /// <summary>
     /// Les refus qui rendent une capture inutile pour toujours. « replay.not_owned » n'en est pas un : juste
     /// apres la partie, le replay n'est pas encore relie au score (vecu le 14 octobre, Metal Slug 3 : demande
     /// 0,2 s apres la fin, replay finalise 5 s plus tard).
@@ -389,6 +439,9 @@ public sealed class ReplayVideoPublisher
         "pas_un_record", "deja_filme", "taille",
         // (08/11) le film d'une epreuve coupe plus court que son run : la station le refera depuis le replay.
         FilmIncomplet,
+        // (08/11) le film d'une rencontre MULTIPLAYER que le site ne prendra jamais.
+        "pas_l_hote", "sans_vrai_depart", "un_seul_humain", "partie_libre", "rencontre_annulee", "rencontre_inconnue",
+        "portion_decalee", "portion_inconnue", "trop_court", "trop_long",
     };
 
     /// <summary>Le refus du site pour un film d'epreuve plus court que son run (08/11).</summary>
@@ -429,7 +482,8 @@ public sealed class ReplayVideoPublisher
     /// qu'une partie lancee, une borne eteinte ou une coupure du reseau ne perdent rien.</para>
     /// </summary>
     public async Task<ResultatDeCapture> EnvoyerCaptureAsync(string replayId, string fichier, long debutFilm, long finFilm,
-        double fps, IReadOnlyList<string>? sessions, string? session, Func<string?, Task> memoriser, CancellationToken ct)
+        double fps, IReadOnlyList<string>? sessions, string? session, Func<string?, Task> memoriser, CancellationToken ct,
+        JsonObject? rencontre = null)
     {
         var credential = _devices.GetCredential();
         if (string.IsNullOrEmpty(credential)) return new(IssueDeCapture.PlusTard, "borne non appairee");
@@ -473,6 +527,8 @@ public sealed class ReplayVideoPublisher
             // Le film d'une partie sans replay : le site retrouve la partie par les sessions de ses scores.
             if (sessions is { Count: > 0 })
                 demande["sessions"] = new JsonArray(sessions.Select(s => (JsonNode?)JsonValue.Create(s)).ToArray());
+            // Le film d'une rencontre MULTIPLAYER (08/11) : sa gameroom et sa portion, a la place des frames d'un replay.
+            if (rencontre is not null) demande = AvecLaRencontre(demande, rencontre);
             var (adresse, raison) = await OuvrirSessionAsync(credential, demande, ct).ConfigureAwait(false);
             if (adresse is null)
                 return new(raison is not null && RefusDefinitifs.Contains(raison) ? IssueDeCapture.Inutile : IssueDeCapture.PlusTard,

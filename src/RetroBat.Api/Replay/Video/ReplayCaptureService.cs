@@ -101,6 +101,9 @@ public sealed class ReplayCaptureService : BackgroundService
     private readonly long _tailleLocaleMax;
     private readonly string _dossier;
 
+    /// <summary>Les films des rencontres MULTIPLAYER se gardent et partent (D-M2, 08/11) ; faux : effaces comme avant.</summary>
+    private readonly bool _rencontres;
+
     private readonly InterfaceTextService? _textes;
     private readonly EmulationStationSettingsService? _reglagesEs;
     private readonly SemaphoreSlim _operation = new(1, 1);
@@ -145,6 +148,22 @@ public sealed class ReplayCaptureService : BackgroundService
         public readonly List<double[]> Courbe = new();
         /// <summary>La fin du run certifie (continue, mort du 1LC, fin de partie), en secondes du film.</summary>
         public double? FinDuRunS;
+
+        /// <summary>
+        /// L'heure UTC du debut du film (sa creation par RetroArch) : les reperes d'une rencontre MULTIPLAYER s'y ramenent. Le
+        /// film du spectateur cache commence a son lancement, bien avant que la capture le prenne (08/11).
+        /// </summary>
+        public DateTime DebutUtc = DateTime.UtcNow;
+        /// <summary>La gameroom d'un film MULTIPLAYER (mp_), sinon null.</summary>
+        public string? Room;
+        /// <summary>Le vrai depart de la rencontre (multiplayer.match.started), en heure UTC.</summary>
+        public DateTime? VraiDepartUtc;
+        /// <summary>La fin lue de la rencontre ou de la coop (multiplayer.match.ended), en heure UTC.</summary>
+        public DateTime? FinLueUtc;
+        /// <summary>Le delai entre la fin lue et la fermeture du jeu (5 ou 8 s) : l'ecran de victoire du jeu.</summary>
+        public double? FermetureS;
+        public string? Issue;
+        public bool Coop;
 
         public void NoterScore(long score)
         {
@@ -225,7 +244,74 @@ public sealed class ReplayCaptureService : BackgroundService
         bool Origine = false, int? Rotation = null, string? Version = null, int EchecsDeVersion = 0,
         IReadOnlyList<double[]>? Courbe = null, double? FinDuRunS = null, double? DureeS = null,
         double? DebutSequenceS = null, double? FinSequenceS = null, double? Forme = null,
-        int Largeur = 0, int Hauteur = 0, string? Fond = null, bool Crt = false);
+        int Largeur = 0, int Hauteur = 0, string? Fond = null, bool Crt = false,
+        string? Room = null, DateTime? DebutUtc = null, double? VraiDepartS = null, double? FinLueS = null,
+        bool RencontreComplete = false, bool Coop = false, string? Issue = null, bool DuSpectateur = false,
+        string? CarteAvant = null, double CarteAvantS = 0, string? CarteApres = null, double CarteApresS = 0);
+
+    /// <summary>
+    /// LA PORTION D'UNE RENCONTRE MULTIPLAYER (CDC films MULTIPLAYER, 08/11), en secondes du film : du vrai depart moins
+    /// <see cref="ElanDeLaRencontreS"/> (la boucle du depart pret d'avant ne part pas) a la fin lue plus le delai de fermeture
+    /// (l'ecran de victoire du jeu), bornee par la fin du film. <paramref name="Complete"/> : le vrai depart et la fin lue sont
+    /// tous deux dans le film.
+    /// </summary>
+    public sealed record PortionDeRencontre(double DebutS, double FinS, bool Complete)
+    {
+        public double DureeS => Math.Round(FinS - DebutS, 2);
+    }
+
+    /// <summary>Le film d'une rencontre commence 2 s avant son vrai depart.</summary>
+    internal const double ElanDeLaRencontreS = 2;
+
+    /// <summary>Sans fin lue (jeu libre, partie fermee, invites partis), le film s'arrete 1 s avant sa fin.</summary>
+    internal const double FinSansIssueS = 1;
+
+    /// <summary>Une rencontre plus longue ne part pas (decision D-M3 du 08/11 : 6 minutes au plus).</summary>
+    internal const double DureeMaxDUneRencontreS = 360;
+
+    /// <summary>
+    /// La portion d'une rencontre (<see cref="PortionDeRencontre"/>), ou null et la raison. Sans vrai depart (invite jamais
+    /// arrive, partie a un seul humain), ou un vrai depart avant le debut du film : pas de film. Une portion incomplete (sans
+    /// fin lue) de moins de 20 s non plus ; une portion de plus de 6 minutes non plus. Les reperes sont en secondes du film.
+    /// Pur.
+    /// </summary>
+    internal static (PortionDeRencontre? Portion, string Raison) PortionDeLaRencontre(double? vraiDepartS, double? finLueS,
+        double? fermetureS, double dureeS)
+    {
+        if (dureeS <= 0) return (null, "film vide");
+        if (vraiDepartS is not double depart) return (null, "sans vrai depart");
+        if (depart < 0) return (null, "le film commence apres le vrai depart");
+        if (depart >= dureeS) return (null, "vrai depart apres la fin du film");
+        var debut = Math.Max(0, depart - ElanDeLaRencontreS);
+        double fin;
+        var complete = false;
+        if (finLueS is double finLue && finLue > depart && finLue <= dureeS)
+        {
+            fin = Math.Min(dureeS, finLue + Math.Max(0, fermetureS ?? 5));
+            complete = true;
+        }
+        else
+        {
+            fin = dureeS - FinSansIssueS;
+        }
+        if (fin <= debut) return (null, "portion vide");
+        var duree = fin - debut;
+        if (!complete && duree < ReplayVideoPublisher.DureeMinimaleS)
+            return (null, "moins de " + ReplayVideoPublisher.DureeMinimaleS + " s sans fin lue");
+        if (duree > DureeMaxDUneRencontreS) return (null, "plus de " + DureeMaxDUneRencontreS / 60 + " min");
+        return (new PortionDeRencontre(Math.Round(debut, 2), Math.Round(fin, 2), complete), "rencontre");
+    }
+
+    /// <summary>Un instant UTC en secondes du film qui commence a <paramref name="debutDuFilm"/> ; null sans instant. Pur.</summary>
+    internal static double? SecondesDuFilm(DateTime debutDuFilm, DateTime? instant)
+        => instant is DateTime t ? Math.Round((t - debutDuFilm).TotalSeconds, 2) : null;
+
+    /// <summary>
+    /// Le debut du film a l'heure UTC : sa creation, si elle est plausible (dans les 10 dernieres minutes, pas dans le futur),
+    /// sinon <paramref name="maintenant"/>. Pur.
+    /// </summary>
+    internal static DateTime DebutDuFilm(DateTime? creeUtc, DateTime maintenant)
+        => creeUtc is DateTime cree && cree <= maintenant && maintenant - cree < TimeSpan.FromMinutes(10) ? cree : maintenant;
 
     /// <summary>
     /// LE GARDE-FOU DE LA FORME (decision du user du 25 octobre 2026) : un film dont l'image n'a pas la forme du jeu ne part
@@ -375,6 +461,7 @@ public sealed class ReplayCaptureService : BackgroundService
         _tailleMax = Math.Max(1, configuration.GetValue("Video:Capture:MaxMb", 300)) * 1_000_000L;
         _tailleLocaleMax = Math.Max(_tailleMax / 1_000_000L, configuration.GetValue("Video:Capture:MaxLocalMb", 4000L)) * 1_000_000L;
         _dossier = Path.GetFullPath(Path.Combine(objects.TempRoot, "..", "captures"));
+        _rencontres = configuration.GetValue("Video:Capture:Multiplayer", true);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -443,7 +530,24 @@ public sealed class ReplayCaptureService : BackgroundService
                     break;
                 // La borne qui heberge une partie MULTIPLAYER la filme pour le direct (aucun replay : pas de score).
                 case RetroBat.Api.Multiplayer.MultiplayerLaunchService.EvenementPartieDeLHote:
-                    _ = Task.Run(FilmerLaPartieMultiplayerAsync);
+                    var salle = Chaine(e.Payload, "Room");
+                    _ = Task.Run(() => FilmerLaPartieMultiplayerAsync(salle));
+                    break;
+                // LES REPERES DE LA RENCONTRE (CDC films MULTIPLAYER, 08/11) : le vrai depart puis la fin lue, dans le film
+                // MULTIPLAYER en cours. Un vrai depart arrive sans film ne donne pas de film (rien a couper).
+                case RetroBat.Api.Multiplayer.MultiplayerLaunchService.EvenementRencontreCommencee:
+                    if (_enCours is { } debutMp && EstUnFilmMultiplayer(debutMp.ReplayId) && MemeSalle(debutMp.Room, Chaine(e.Payload, "Room")))
+                        debutMp.VraiDepartUtc ??= Instant(e.Payload, "Utc") ?? DateTime.UtcNow;
+                    break;
+                case RetroBat.Api.Multiplayer.MultiplayerLaunchService.EvenementRencontreFinie:
+                    if (_enCours is { } finMp && EstUnFilmMultiplayer(finMp.ReplayId) && MemeSalle(finMp.Room, Chaine(e.Payload, "Room"))
+                        && finMp.FinLueUtc is null)
+                    {
+                        finMp.FermetureS = Entier(e.Payload, "FermetureS") ?? 5;
+                        finMp.Issue = Chaine(e.Payload, "Issue");
+                        finMp.Coop = Booleen(e.Payload, "Coop") ?? false;
+                        finMp.FinLueUtc = Instant(e.Payload, "Utc") ?? DateTime.UtcNow;
+                    }
                     break;
                 case "score.live.changed":
                     // La courbe du score du joueur 1, pour la sequence du record.
@@ -489,7 +593,7 @@ public sealed class ReplayCaptureService : BackgroundService
     /// Le replay de la partie demarre : la capture aussi, si la borne le peut. <paramref name="sansReplay"/> : la partie
     /// part sans replay, le film porte alors son propre identifiant.
     /// </summary>
-    private async Task DemarrerAsync(string replayId, bool sansReplay = false, bool duSpectateur = false)
+    private async Task DemarrerAsync(string replayId, bool sansReplay = false, bool duSpectateur = false, string? room = null)
     {
         await _operation.WaitAsync(_arret).ConfigureAwait(false);
         try
@@ -559,8 +663,14 @@ public sealed class ReplayCaptureService : BackgroundService
                     Forme = forme, Fond = FondDuJeu(_cheminDuJeu), DuSpectateur = duSpectateur,
                     Crt = LanceurDuDirect.EcranATube(_cheminDuJeu is { Length: > 0 } cheminDuJeu
                         ? RetroBat.Api.Netplay.NetplayHostService.SystemeDuChemin(cheminDuJeu, RetroBatPaths.RomsRoot) : null),
+                    // Le film d'une rencontre : sa gameroom, et l'heure de sa premiere image (le spectateur filme depuis son
+                    // lancement, la capture le prend plus tard).
+                    Room = room,
+                    DebutUtc = EstUnFilmMultiplayer(replayId) ? DebutDuFilm(CreationUtc(fichier), DateTime.UtcNow) : DateTime.UtcNow,
                 };
             }
+            // Le spectateur cache est filme : l'hote peut donner sa session aux invites (D-M9).
+            if (duSpectateur) RetroBat.Api.Multiplayer.MultiplayerSpectateur.NoterFilme();
             if (sansReplay)
                 _logger.LogInformation("Capture : partie sans replay filmee sous {ReplayId} (rotation du coeur : {Rotation}).",
                     replayId, rotation?.ToString() ?? "inconnue");
@@ -587,7 +697,7 @@ public sealed class ReplayCaptureService : BackgroundService
     /// <summary>L'attente du spectateur cache : l'arrivee des invites (le depart les attend 150 s au plus), puis la sienne.</summary>
     private const int AttenteDuSpectateurS = 240;
 
-    private async Task FilmerLaPartieMultiplayerAsync()
+    private async Task FilmerLaPartieMultiplayerAsync(string? room)
     {
         try
         {
@@ -610,7 +720,7 @@ public sealed class ReplayCaptureService : BackgroundService
             }
             var duSpectateur = RetroBat.Api.Multiplayer.MultiplayerSpectateur.Connecte;
             if (duSpectateur) await Task.Delay(3000, _arret).ConfigureAwait(false);
-            await DemarrerAsync(PrefixeMultiplayer + Ulid.New(), sansReplay: true, duSpectateur: duSpectateur).ConfigureAwait(false);
+            await DemarrerAsync(PrefixeMultiplayer + Ulid.New(), sansReplay: true, duSpectateur: duSpectateur, room: room).ConfigureAwait(false);
         }
         catch (OperationCanceledException) { /* arret de l'API */ }
     }
@@ -647,6 +757,18 @@ public sealed class ReplayCaptureService : BackgroundService
 
             if (EstUnFilmMultiplayer(c.ReplayId) && !abandon)
             {
+                // LE FILM DE LA RENCONTRE (CDC films MULTIPLAYER, 08/11) : une rencontre a vrai depart se garde, portion notee ;
+                // elle partira hors partie si le site la veut. La duree du film va de sa premiere image a sa derniere ecriture
+                // (RetroArch ferme, le lanceur rend la main jusqu'a dix secondes plus tard).
+                var finDuFilm = DerniereEcritureUtc(c.Fichier) is DateTime ecrit && ecrit < DateTime.UtcNow ? ecrit : DateTime.UtcNow;
+                var dureeDuFilmS = Math.Round((finDuFilm - c.DebutUtc).TotalSeconds, 2);
+                var (portion, raison) = PortionDeLaRencontre(SecondesDuFilm(c.DebutUtc, c.VraiDepartUtc),
+                    SecondesDuFilm(c.DebutUtc, c.FinLueUtc), c.FermetureS, dureeDuFilmS);
+                if (portion is not null && _rencontres)
+                {
+                    _ = Task.Run(() => GarderLaRencontreAsync(c, portion, dureeDuFilmS));
+                    return;
+                }
                 // Aucun site ne le demandera : il s'efface une fois la fin de passage jouee.
                 var film = c.Fichier;
                 _ = Task.Run(async () =>
@@ -655,8 +777,8 @@ public sealed class ReplayCaptureService : BackgroundService
                     catch (OperationCanceledException) { /* arret de l'API : efface tout de suite */ }
                     Effacer(film);
                 });
-                _logger.LogInformation("Capture : partie MULTIPLAYER {ReplayId} finie, film efface dans {Minutes} min.", c.ReplayId,
-                    GardeDuFilmMultiplayer.TotalMinutes);
+                _logger.LogInformation("Capture : partie MULTIPLAYER {ReplayId} finie ({Raison}), film efface dans {Minutes} min.", c.ReplayId,
+                    _rencontres ? raison : "films des rencontres coupes", GardeDuFilmMultiplayer.TotalMinutes);
                 return;
             }
 
@@ -723,6 +845,82 @@ public sealed class ReplayCaptureService : BackgroundService
     {
         var c = _enCours;
         return c is null ? null : (c.Fichier, c.Rotation, c.Forme, c.Fond, c.DuSpectateur, c.Crt);
+    }
+
+    /// <summary>
+    /// GARDER LE FILM D'UNE RENCONTRE (CDC films MULTIPLAYER, 08/11). L'exe du direct rouvre le film par son chemin a chaque
+    /// lecture : il se range dans le dossier des captures une fois la fin de passage jouee (l'exe sorti, deux minutes au plus).
+    /// Sa fiche dit la gameroom, la portion (du vrai depart moins 2 s a la fin lue plus le delai de fermeture) et l'heure de sa
+    /// premiere image ; le site verifie la portion contre le vrai depart et la fin qu'il a notes. Gardee 48 h au plus.
+    /// </summary>
+    private async Task GarderLaRencontreAsync(CaptureEnCours c, PortionDeRencontre portion, double dureeDuFilmS)
+    {
+        try
+        {
+            var limite = DateTime.UtcNow + FinDePassageAuPlus;
+            while (DirectEnCours() && DateTime.UtcNow < limite)
+                await Task.Delay(TimeSpan.FromSeconds(5), _arret).ConfigureAwait(false);
+            var destination = Path.Combine(_dossier, c.ReplayId + ".mkv");
+            for (var essai = 1; ; essai++)
+            {
+                try
+                {
+                    Effacer(destination);
+                    File.Move(c.Fichier, destination);
+                    break;
+                }
+                catch (IOException) when (essai < 12)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(10), _arret).ConfigureAwait(false);
+                }
+            }
+            var entete = MatroskaEntete.Lire(destination);
+            var origine = entete is { Origine: true };
+            if (entete is null || (entete.Couchee && !(origine && c.Rotation is 1 or 3)))
+            {
+                Effacer(destination);
+                _logger.LogInformation("Capture : rencontre {Room} non gardee ({Raison}).", c.Room ?? c.ReplayId,
+                    entete is null ? "film illisible" : "jeu vertical, film couche");
+                return;
+            }
+            var gardee = new CaptureGardee(c.ReplayId, destination, 0, 0, DateTime.UtcNow, SansReplay: true, Origine: origine,
+                Rotation: c.Rotation, DureeS: dureeDuFilmS, DebutSequenceS: portion.DebutS, FinSequenceS: portion.FinS,
+                // Le spectateur montre deux ou quatre consoles cote a cote : la forme d'une seule ne vaut pas pour son image.
+                Forme: c.DuSpectateur ? null : c.Forme, Largeur: (int)entete.Largeur, Hauteur: (int)entete.Hauteur, Fond: c.Fond,
+                Crt: c.Crt, Room: c.Room, DebutUtc: c.DebutUtc, VraiDepartS: SecondesDuFilm(c.DebutUtc, c.VraiDepartUtc),
+                FinLueS: SecondesDuFilm(c.DebutUtc, c.FinLueUtc), RencontreComplete: portion.Complete, Coop: c.Coop, Issue: c.Issue,
+                DuSpectateur: c.DuSpectateur);
+            await SauverAsync(gardee, Path.Combine(_dossier, c.ReplayId + ".json"), _arret).ConfigureAwait(false);
+            _logger.LogInformation(
+                "Capture : rencontre {Room} gardee, portion {Debut} s a {Fin} s du film ({Duree} s, {Complete}{Spectateur}), en attente de la decision du site.",
+                c.Room ?? "?", Texte(portion.DebutS), Texte(portion.FinS), Texte(portion.DureeS),
+                portion.Complete ? "rencontre complete" : "sans fin lue", c.DuSpectateur ? ", film du spectateur" : "");
+            _reveil.Release();
+        }
+        catch (OperationCanceledException) { /* arret de l'API : le film reste ou il est */ }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Capture : rencontre {Room} non gardee.", c.Room ?? c.ReplayId);
+            Effacer(c.Fichier);
+        }
+    }
+
+    private static string Texte(double secondes) => secondes.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
+
+    /// <summary>L'exe du direct joue sa fin de passage deux minutes au plus apres la fin de la partie.</summary>
+    private static readonly TimeSpan FinDePassageAuPlus = TimeSpan.FromMinutes(2);
+
+    /// <summary>L'exe du direct tourne-t-il (direct, fin de passage, ou version YouTube d'un film) ?</summary>
+    private static bool DirectEnCours()
+    {
+        try { return Process.GetProcessesByName(Path.GetFileNameWithoutExtension(LanceurDuDirect.Exe)).Length > 0; }
+        catch (Exception) { return false; }
+    }
+
+    private static DateTime? DerniereEcritureUtc(string fichier)
+    {
+        try { return File.Exists(fichier) ? File.GetLastWriteTimeUtc(fichier) : null; }
+        catch (Exception) { return null; }
     }
 
     /// <summary>
@@ -853,7 +1051,8 @@ public sealed class ReplayCaptureService : BackgroundService
     private async Task EnvoyerLesCapturesAsync(CancellationToken stoppingToken)
     {
         if (_enCours is not null || EmulatorForeground.EmulateurTourne()) return;
-        var fiches = FichesDesFilms(_dossier);
+        // Les records passent avant les rencontres (D-M8, 08/11) : leur part du plafond d'envois reste la leur.
+        var fiches = FichesDesFilms(_dossier).OrderBy(f => EstUnFilmMultiplayer(Path.GetFileNameWithoutExtension(f))).ToList();
         foreach (var fiche in fiches)
         {
             if (_enCours is not null || EmulatorForeground.EmulateurTourne()) return;
@@ -863,6 +1062,11 @@ public sealed class ReplayCaptureService : BackgroundService
             if (g is null || !File.Exists(g.Fichier))
             {
                 Effacer(fiche);
+                continue;
+            }
+            if (EstUnFilmMultiplayer(g.ReplayId))
+            {
+                if (!await EnvoyerLaRencontreAsync(g, fiche, stoppingToken).ConfigureAwait(false)) return;
                 continue;
             }
 
@@ -1002,6 +1206,155 @@ public sealed class ReplayCaptureService : BackgroundService
     }
 
     /// <summary>
+    /// LE FILM D'UNE RENCONTRE PART (CDC films MULTIPLAYER, lot M3, 08/11). Hors partie, la borne hote demande au site s'il le
+    /// veut (<c>source = multiplayer</c>, la gameroom, la portion et ses heures) ; oui, l'exe du direct fabrique la version
+    /// YouTube de la portion, puis la borne l'envoie chez Google et le confirme. Un jeu qui demarre interrompt l'envoi, qui
+    /// reprend apres (la session d'envoi est gardee). Rend faux quand une partie a commence.
+    /// </summary>
+    private async Task<bool> EnvoyerLaRencontreAsync(CaptureGardee g, string fiche, CancellationToken stoppingToken)
+    {
+        var nom = "rencontre " + (g.Room ?? g.ReplayId);
+        if (g.VideoId is not null)
+        {
+            var etat = await _publication.EtatDuFilmAsync(g.ReplayId, stoppingToken).ConfigureAwait(false);
+            if (etat == "ready")
+            {
+                Oublier(g, fiche, "prete sur YouTube (" + g.VideoId + ")");
+                return true;
+            }
+            if (etat is "failed" or "none")
+            {
+                _logger.LogInformation("Capture : {Nom} refusee ou perdue par YouTube, renvoyee.", nom);
+                await SauverAsync(g with { VideoId = null, Session = null, EnvoyeeUtc = null }, fiche, stoppingToken).ConfigureAwait(false);
+                return true;
+            }
+            if (etat == "uploading")
+                await _publication.ConfirmerAsync(g.ReplayId, g.VideoId, 0, 0, 0, stoppingToken).ConfigureAwait(false);
+            if (DateTime.UtcNow - (g.EnvoyeeUtc ?? g.CreeeUtc) > PreteAuPlus)
+                Oublier(g, fiche, "envoyee il y a plus de 24 heures (" + g.VideoId + ")");
+            return true;
+        }
+
+        var age = DateTime.UtcNow - g.CreeeUtc;
+        // Trop tot : la plateforme n'a pas encore la fin de la gameroom (l'hote l'envoie apres la fermeture du jeu).
+        if (age < PremiereDemandeApres) return true;
+        if (age > _ageMax)
+        {
+            Oublier(g, fiche, "trop ancienne");
+            return true;
+        }
+
+        using var envoi = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+        lock (_verrou) _envoiEnCours = envoi;
+        try
+        {
+            var courante = g;
+            if (courante.Version is null || !File.Exists(courante.Version))
+            {
+                var voulue = await _publication.RencontreVoulueAsync(courante.ReplayId, TailleEstimee(courante, _tailleMax),
+                    ChampsDeLaRencontre(courante, DateTime.UtcNow), envoi.Token).ConfigureAwait(false);
+                if (voulue.Issue != ReplayVideoPublisher.IssueDeCapture.Voulue)
+                {
+                    SuivreLeRefusDeLaRencontre(courante, fiche, voulue, age);
+                    return true;
+                }
+                // Jamais un film deforme sur YouTube (25/10). Le film du spectateur montre plusieurs consoles a pixels carres :
+                // sa forme est celle de son image.
+                if (!courante.DuSpectateur && FormeRefusee(courante.Largeur, courante.Hauteur, courante.Rotation, courante.Forme,
+                        ExeSaitLaForme(LanceurDuDirect.Chemin(AppContext.BaseDirectory))) is { } refus)
+                {
+                    Oublier(courante, fiche, "forme de l'image : " + refus);
+                    return true;
+                }
+                courante = await FabriquerLaVersionAsync(courante, fiche, envoi.Token).ConfigureAwait(false);
+                if (courante.Version is null) return true;
+                if (TailleDe(courante.Version) > _tailleMax)
+                {
+                    Oublier(courante, fiche, "version YouTube plus grosse que " + _tailleMax / 1_000_000 + " Mo");
+                    return true;
+                }
+            }
+            var resultat = await _publication.EnvoyerCaptureAsync(courante.ReplayId, courante.Version!, 0, 0, 0, null, courante.Session,
+                async session =>
+                {
+                    courante = courante with { Session = session };
+                    await SauverAsync(courante, fiche, stoppingToken).ConfigureAwait(false);
+                }, envoi.Token, ChampsDeLaRencontre(courante, DateTime.UtcNow)).ConfigureAwait(false);
+            if (resultat.Issue == ReplayVideoPublisher.IssueDeCapture.Envoyee)
+            {
+                await SauverAsync(courante with { Session = null, VideoId = resultat.VideoId, EnvoyeeUtc = DateTime.UtcNow },
+                    fiche, stoppingToken).ConfigureAwait(false);
+                _logger.LogInformation("Capture : {Nom} envoyee ({Detail}, {Taille} octets), film garde jusqu'a la video prete.",
+                    nom, resultat.Detail, TailleDe(courante.Version!));
+            }
+            else SuivreLeRefusDeLaRencontre(courante, fiche, resultat, age);
+            return true;
+        }
+        catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
+        {
+            _logger.LogInformation("Capture : envoi de la {Nom} interrompu, une partie commence.", nom);
+            return false;
+        }
+        finally
+        {
+            lock (_verrou) _envoiEnCours = null;
+        }
+    }
+
+    /// <summary>
+    /// Ce que le site n'accepte pas d'une rencontre : un refus definitif (pas l'hote, sans vrai depart, partie libre, portion
+    /// decalee, trop courte ou trop longue, deja filmee) efface le film ; une gameroom toujours pas finie au site apres trois
+    /// heures aussi ; le reste (quota, reseau) attend le prochain passage.
+    /// </summary>
+    private void SuivreLeRefusDeLaRencontre(CaptureGardee g, string fiche, ReplayVideoPublisher.ResultatDeCapture r, TimeSpan age)
+    {
+        var nom = "rencontre " + (g.Room ?? g.ReplayId);
+        if (r.Issue == ReplayVideoPublisher.IssueDeCapture.Inutile) Oublier(g, fiche, "refusee par le site (" + r.Detail + ")");
+        else if (r.Detail == "pas_encore" && age > PasEncoreAuPlus) Oublier(g, fiche, "gameroom toujours pas finie au site");
+        else _logger.LogInformation("Capture : {Nom} attend ({Detail}).", nom, r.Detail);
+    }
+
+    /// <summary>
+    /// La taille annoncee au site avant la fabrication de la version YouTube : environ 1 Mo par seconde de portion (le cadre
+    /// 1280 x 720, a mesurer au lot M3), jamais plus que le plafond d'envoi ; la vraie taille se verifie apres. Pur.
+    /// </summary>
+    internal static long TailleEstimee(CaptureGardee g, long plafond)
+    {
+        var duree = g.DebutSequenceS is double d && g.FinSequenceS is double f && f > d ? f - d : g.DureeS ?? 60;
+        return Math.Max(1, Math.Min(plafond, (long)Math.Round((duree + g.CarteAvantS + g.CarteApresS) * 1_000_000)));
+    }
+
+    /// <summary>
+    /// Ce que la demande d'envoi d'une rencontre dit au site : la gameroom, la portion en secondes du film et en heures UTC de
+    /// la borne, l'heure de la borne a l'envoi (le site corrige ainsi son horloge), la rencontre complete ou non, et les
+    /// cartes d'avant et d'apres (ecran de lancement VS et ecran de fin, lot M4 ; 0 tant que l'exe ne les pose pas). Pur.
+    /// </summary>
+    internal static System.Text.Json.Nodes.JsonObject ChampsDeLaRencontre(CaptureGardee g, DateTime maintenant)
+    {
+        static string Iso(DateTime t) => t.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'", System.Globalization.CultureInfo.InvariantCulture);
+        var champs = new System.Text.Json.Nodes.JsonObject
+        {
+            ["source"] = "multiplayer",
+            ["room"] = g.Room,
+            ["start_s"] = g.DebutSequenceS,
+            ["end_s"] = g.FinSequenceS,
+            ["film_s"] = g.DureeS,
+            ["complete"] = g.RencontreComplete,
+            ["coop"] = g.Coop,
+            ["spectator"] = g.DuSpectateur,
+            ["intro_s"] = g.CarteAvantS,
+            ["outro_s"] = g.CarteApresS,
+            ["device_now_utc"] = Iso(maintenant),
+        };
+        if (g.DebutUtc is DateTime debut && g.DebutSequenceS is double ds && g.FinSequenceS is double fs)
+        {
+            champs["portion_start_utc"] = Iso(debut.AddMilliseconds(Math.Round(ds * 1000)));
+            champs["portion_end_utc"] = Iso(debut.AddMilliseconds(Math.Round(fs * 1000)));
+        }
+        return champs;
+    }
+
+    /// <summary>
     /// Ce que le site n'accepte pas encore : un refus definitif efface le film ; une partie toujours pas reliee a un
     /// score classe apres trois heures aussi ; le reste attend le prochain passage.
     /// </summary>
@@ -1028,7 +1381,8 @@ public sealed class ReplayCaptureService : BackgroundService
         }
         var version = Path.ChangeExtension(g.Fichier, ".flv");
         Effacer(version);
-        _logger.LogInformation("Capture : {ReplayId} est un record, fabrication de sa version YouTube ({Sequence}).", g.ReplayId,
+        _logger.LogInformation("Capture : {ReplayId} est {Quoi}, fabrication de sa version YouTube ({Sequence}).", g.ReplayId,
+            EstUnFilmMultiplayer(g.ReplayId) ? "une rencontre voulue par le site" : "un record",
             g.DebutSequenceS is double d && g.FinSequenceS is double f ? "sequence de " + d + " a " + f + " s du film" : "film entier");
         var r = await LanceurDuDirect.FabriquerLaVersionAsync(exe, g.Fichier, version, g.Rotation ?? 0, _logger, ct,
             g.DebutSequenceS, g.FinSequenceS, g.Forme, g.Fond, g.Crt).ConfigureAwait(false);
@@ -1275,6 +1629,45 @@ public sealed class ReplayCaptureService : BackgroundService
         {
             using var doc = JsonDocument.Parse(JsonSerializer.Serialize(payload));
             return doc.RootElement.TryGetProperty(nom, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>Le meme salon, ou un des deux inconnu (une API qui ne dit pas la gameroom). Pur.</summary>
+    internal static bool MemeSalle(string? filmee, string? annoncee)
+        => string.IsNullOrEmpty(filmee) || string.IsNullOrEmpty(annoncee) || string.Equals(filmee, annoncee, StringComparison.Ordinal);
+
+    private static DateTime? CreationUtc(string fichier)
+    {
+        try { return File.GetCreationTimeUtc(fichier); }
+        catch (Exception) { return null; }
+    }
+
+    /// <summary>Un instant d'une charge du bus (ISO 8601), en UTC ; null s'il manque. Pur.</summary>
+    internal static DateTime? Instant(object? payload, string nom)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(JsonSerializer.Serialize(payload));
+            return doc.RootElement.TryGetProperty(nom, out var v) && v.ValueKind == JsonValueKind.String && v.TryGetDateTime(out var t)
+                ? t.ToUniversalTime() : null;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    private static bool? Booleen(object? payload, string nom)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(JsonSerializer.Serialize(payload));
+            return doc.RootElement.TryGetProperty(nom, out var v) && v.ValueKind is JsonValueKind.True or JsonValueKind.False
+                ? v.GetBoolean() : null;
         }
         catch (Exception)
         {

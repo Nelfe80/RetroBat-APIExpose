@@ -336,6 +336,9 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// <summary>La session parait au lobby une quarantaine de secondes apres le lancement : on la publie a la gameroom.</summary>
     private async Task PublierLaSessionAsync(MultiplayerRoom room, MultiplayerInstalledGame jeu, string jeton, string motJoueur, string motSpectateur)
     {
+        // La plateforme rend la gameroom a l'attente 90 s apres le lancement sans session publiee : le spectateur cache, lance
+        // avant la publication (D-M9), ne doit jamais la faire attendre au-dela.
+        var limiteDePublication = DateTime.UtcNow + PatienceLobby;
         try
         {
             var session = await _lobby.AttendreAsync(jeton, PatienceLobby).ConfigureAwait(false);
@@ -391,6 +394,18 @@ public sealed class MultiplayerLaunchService : IHostedService
                 CoreVersion = session.VersionCoeur,
                 Crc = NetplayContent.Empreinte(jeu.Path),
             };
+            // LE SPECTATEUR AVANT LES INVITES (D-M9, 08/11) : sur des consoles reliees, le spectateur cache rejoint la session
+            // et la capture prend son film AVANT que la session parte a la gameroom. Les invites ne la recoivent qu'ensuite :
+            // le vrai depart tombe dans son film. Les lignes du journal ecrites jusque-la (son tunnel) ne sont pas des invites.
+            var spectateurAvant = SpectateurAvantLesInvites(MultiplayerSpectateur.Prevu, jeu.Core?.Spectator is not null,
+                MultiplayerSpectateur.AvantLesInvites);
+            var lignesDuSpectateur = 0;
+            if (spectateurAvant)
+            {
+                await PrendreLeSpectateurAvantLesInvitesAsync(room, jeu, publiee, limiteDePublication).ConfigureAwait(false);
+                lignesDuSpectateur = MultiplayerAttenteDesInvites.NombreDeLignes(MultiplayerAttenteDesInvites.CheminDuJournal);
+            }
+
             // La plateforme rend le meme 409 pour une salle quittee et pour une base occupee un instant : trois essais avant de
             // conclure au refus.
             var reponse = await _client.PublierNetplayAsync(room.Room, publiee, CancellationToken.None).ConfigureAwait(false);
@@ -416,7 +431,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             // journal de RetroArch (27/10, deux bornes de langues differentes).
             // Le spectateur cache ajoute deux connexions au relais : elles ne comptent jamais pour des invites.
             var liens = MultiplayerSpectateur.Corriger(await RetroArchInvite.LiensDesInvitesAsync(publiee.Relay, publiee.Port).ConfigureAwait(false));
-            if (reponse?.Ok == true && jeu.Core?.Spectator is not null && MultiplayerSpectateur.Prevu)
+            if (reponse?.Ok == true && jeu.Core?.Spectator is not null && MultiplayerSpectateur.Prevu && !spectateurAvant)
             {
                 _ = Task.Run(() => LancerLeSpectateurAsync(room, jeu, publiee, liens));
             }
@@ -426,7 +441,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
             else if (depart is { } departPose && reponse?.Ok == true && MultiplayerAttenteDesInvites.BoucleEnService)
             {
-                _ = Task.Run(() => BouclerLeDepartAsync(room, jeu.Game, liens, departPose));
+                _ = Task.Run(() => BouclerLeDepartAsync(room, jeu.Game, liens, departPose, lignesDuSpectateur));
             }
             else
             {
@@ -479,8 +494,16 @@ public sealed class MultiplayerLaunchService : IHostedService
                 .ConfigureAwait(false);
             if (vus >= attendus)
             {
+                // L'heure du vrai depart, prise avant l'appel a la plateforme : son « guests_in_at » tombe juste apres.
+                var vraiDepart = DateTime.UtcNow;
                 await _client.CommenceeAsync(room.Room, jeton).ConfigureAwait(false);
                 _journal.LogInformation("MULTIPLAYER : les {Attendus} invite(s) de {Room} sont a leur place, la rencontre commence", attendus, room.Room);
+                // LE FILM DE LA RENCONTRE (CDC films MULTIPLAYER, 08/11) : la capture note le vrai depart dans son film.
+                await _bus.PublishAsync(new EventEnvelope
+                {
+                    Type = EvenementRencontreCommencee,
+                    Payload = new { room.Room, Invites = vus, Utc = vraiDepart },
+                }).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)
@@ -617,6 +640,8 @@ public sealed class MultiplayerLaunchService : IHostedService
 
         _journal.LogInformation("MULTIPLAYER : rencontre de {Jeu} finie, {Issue} ; le jeu se ferme dans {Delai} s",
             jeu.Id, DireLIssue(issue), jeu.DelaiDeFermeture);
+        // La fin lue : le film garde encore l'ecran de victoire du jeu, jusqu'a la fermeture.
+        await PublierLaFinAsync(room, DireLIssue(issue), coop: false, jeu.DelaiDeFermeture).ConfigureAwait(false);
         try
         {
             await Task.Delay(TimeSpan.FromSeconds(jeu.DelaiDeFermeture), jeton).ConfigureAwait(false);
@@ -659,6 +684,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
 
         _journal.LogInformation("MULTIPLAYER : coop de {Jeu} finie, {Issue} ; le jeu se ferme dans {Delai} s", jeu.Id, mission, jeu.MissionEnd!.CloseAfterS);
+        await PublierLaFinAsync(room, mission.Raison, coop: true, jeu.MissionEnd.CloseAfterS).ConfigureAwait(false);
         try
         {
             await Task.Delay(TimeSpan.FromSeconds(jeu.MissionEnd.CloseAfterS), jeton).ConfigureAwait(false);
@@ -849,7 +875,8 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// LA BOUCLE DU DEPART (1.9.112) : tant qu'aucun invite ne se connecte, l'hote reprend son depart pret, choix compris
     /// (MultiplayerAttenteDesInvites.BouclerLeDepartAsync) ; le match ne file pas avant l'arrivee du premier invite.
     /// </summary>
-    private async Task BouclerLeDepartAsync(MultiplayerRoom room, MultiplayerGame jeu, Func<int?> liens, MultiplayerStart depart)
+    private async Task BouclerLeDepartAsync(MultiplayerRoom room, MultiplayerGame jeu, Func<int?> liens, MultiplayerStart depart,
+        int depuisLaLigne = 0)
     {
         CancellationToken jeton;
         lock (_verrou)
@@ -864,7 +891,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             var (choix, pseudos) = ChoixEtPseudos(room);
             var debut = DateTime.UtcNow;
             var tours = await _attente.BouclerLeDepartAsync(ct => _depart.ReappliquerAsync(jeu, choix, ct, pseudos, depart),
-                MultiplayerAttenteDesInvites.CheminDuJournal, liens, PatienceDesInvites, jeton).ConfigureAwait(false);
+                MultiplayerAttenteDesInvites.CheminDuJournal, liens, PatienceDesInvites, jeton, depuisLaLigne).ConfigureAwait(false);
             _journal.LogInformation("MULTIPLAYER : depart pret de {Jeu} repris {Tours} fois en {Secondes:F0} s en attendant le premier invite ({Room})",
                 jeu.Id, tours, (DateTime.UtcNow - debut).TotalSeconds, room.Room);
             // Le premier invite arrive, la partie part : « A VOUS DE JOUER ! » sur l'ecran de lancement.
@@ -1377,6 +1404,118 @@ public sealed class MultiplayerLaunchService : IHostedService
     public const string EvenementPartieDeLHote = "multiplayer.host.started";
 
     /// <summary>
+    /// Tous les invites sont a leur place : la rencontre commence (repere du film de la rencontre, CDC films MULTIPLAYER du
+    /// 08/11). Charge : <c>Room</c>, <c>Invites</c>, <c>Utc</c> (l'heure du vrai depart).
+    /// </summary>
+    public const string EvenementRencontreCommencee = "multiplayer.match.started";
+
+    /// <summary>
+    /// La fin de la rencontre (ou de la coop) est lue ; le jeu se ferme dans <c>FermetureS</c> secondes. Charge : <c>Room</c>,
+    /// <c>Issue</c>, <c>Coop</c>, <c>FermetureS</c>, <c>Utc</c> (l'heure de la fin lue).
+    /// </summary>
+    public const string EvenementRencontreFinie = "multiplayer.match.ended";
+
+    /// <summary>La fin lue, sur le bus : la capture borne le film de la rencontre (fin lue plus le delai de fermeture).</summary>
+    private async Task PublierLaFinAsync(MultiplayerRoom room, string issue, bool coop, int fermetureS)
+    {
+        try
+        {
+            await _bus.PublishAsync(new EventEnvelope
+            {
+                Type = EvenementRencontreFinie,
+                Payload = new { room.Room, Issue = issue, Coop = coop, FermetureS = fermetureS, Utc = DateTime.UtcNow },
+            }).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _journal.LogDebug(ex, "MULTIPLAYER : fin de {Room} non publiee sur le bus", room.Room);
+        }
+    }
+
+    /// <summary>
+    /// Le spectateur cache passe-t-il avant les invites (D-M9) ? Une partie de consoles reliees (bloc <c>spectator</c> du
+    /// coeur) dont l'hote l'a prevu, l'interrupteur en service. Pur.
+    /// </summary>
+    internal static bool SpectateurAvantLesInvites(bool prevu, bool vueDuSpectateur, bool enService)
+        => prevu && vueDuSpectateur && enService;
+
+    /// <summary>Le temps laisse au spectateur pour se connecter, au plus (comme MultiplayerSpectateur.LancerAsync).</summary>
+    internal static readonly TimeSpan ConnexionDuSpectateurAuPlus = TimeSpan.FromSeconds(60);
+
+    /// <summary>Le temps laisse a la capture pour prendre son film une fois le spectateur connecte (elle attend 3 s).</summary>
+    internal static readonly TimeSpan FilmDuSpectateurAuPlus = TimeSpan.FromSeconds(15);
+
+    /// <summary>La marge gardee avant la limite de publication de la plateforme.</summary>
+    internal static readonly TimeSpan MargeDePublication = TimeSpan.FromSeconds(5);
+
+    /// <summary>
+    /// Le temps que le spectateur peut prendre avant la publication de la session : 60 s au plus, et jamais au-dela de la
+    /// limite de la plateforme moins 5 s ; zero si elle est deja passee. Pur.
+    /// </summary>
+    internal static TimeSpan AttenteDuSpectateur(DateTime maintenant, DateTime limiteDePublication)
+    {
+        var reste = limiteDePublication - MargeDePublication - maintenant;
+        if (reste <= TimeSpan.Zero) return TimeSpan.Zero;
+        return reste < ConnexionDuSpectateurAuPlus + FilmDuSpectateurAuPlus ? reste : ConnexionDuSpectateurAuPlus + FilmDuSpectateurAuPlus;
+    }
+
+    /// <summary>
+    /// LE SPECTATEUR AVANT LES INVITES (D-M9, 08/11) : l'hote lance son spectateur cache sur la session du lobby, attend qu'il ait
+    /// rejoint la partie, puis que la capture ait pris son film (MultiplayerSpectateur.Filme). Borne par la limite de publication
+    /// de la plateforme. Sans connexion a temps, le spectateur s'arrete : la capture filme alors l'hote, comme avant. Les invites
+    /// recoivent la session ensuite seulement.
+    /// </summary>
+    private async Task PrendreLeSpectateurAvantLesInvitesAsync(MultiplayerRoom room, MultiplayerInstalledGame jeu,
+        MultiplayerSessionNetplay session, DateTime limiteDePublication)
+    {
+        if (jeu.Core is not { Spectator: { } vue } coeur) return;
+        var attente = AttenteDuSpectateur(DateTime.UtcNow, limiteDePublication);
+        var debut = DateTime.UtcNow;
+        using var delai = new CancellationTokenSource(attente);
+        var connecte = false;
+        try
+        {
+            if (attente > TimeSpan.Zero)
+            {
+                var joueurs = Math.Max(2, room.Players.Count(j => j.Seat is not null));
+                var options = MultiplayerSpectateur.OptionsDuSpectateur(coeur, vue, joueurs);
+                connecte = await MultiplayerSpectateur.LancerAsync(session, coeur.Core, jeu.Path, options, _journal, delai.Token)
+                    .ConfigureAwait(false);
+            }
+            // Connecte : la capture prend son film 3 s plus tard ; une capture coupee (reglage, borne modeste) ne fait pas
+            // attendre les invites plus de 15 s.
+            var connecteA = DateTime.UtcNow;
+            while (connecte && !MultiplayerSpectateur.Filme && DateTime.UtcNow - connecteA < FilmDuSpectateurAuPlus
+                   && DateTime.UtcNow - debut < attente)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(500), delai.Token).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // La limite de publication : la session part sans attendre davantage.
+        }
+        catch (Exception ex)
+        {
+            _journal.LogInformation("Spectateur : lancement avant les invites interrompu ({Message}).", ex.Message);
+        }
+
+        if (!MultiplayerSpectateur.Connecte)
+        {
+            // Jamais connecte : il s'arrete, la capture filme l'hote (sa console seule), et la session part.
+            MultiplayerSpectateur.Arreter();
+            _journal.LogInformation("Spectateur : pas connecte en {Secondes:F0} s, la session de {Room} part sans lui ; l'hote filme sa console",
+                (DateTime.UtcNow - debut).TotalSeconds, room.Room);
+            return;
+        }
+
+        _journal.LogInformation(MultiplayerSpectateur.Filme
+                ? "Spectateur : connecte et filme en {Secondes:F0} s, la session de {Room} part aux invites"
+                : "Spectateur : connecte en {Secondes:F0} s, film pas encore pris ; la session de {Room} part aux invites",
+            (DateTime.UtcNow - debut).TotalSeconds, room.Room);
+    }
+
+    /// <summary>
     /// Ce que le direct d'une partie MULTIPLAYER a besoin d'en savoir : la gameroom (le site verifie que cette borne
     /// l'heberge), le jeu, et chaque place avec son joueur et sa cote. Pur.
     /// </summary>
@@ -1518,7 +1657,8 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// <summary>
     /// LE SPECTATEUR CACHE (28/10) : une fois les invites arrives (au plus 150 s), l'hote lance son spectateur sur sa propre
     /// session, avec les options de la partie et la vue de toutes les consoles. Il vient apres le depart : sa connexion ne
-    /// passe jamais pour l'arrivee d'un invite.
+    /// passe jamais pour l'arrivee d'un invite. Depuis D-M9 (08/11), seulement quand MultiplayerSpectateur.AvantLesInvites est
+    /// hors service : sinon il passe avant les invites (PrendreLeSpectateurAvantLesInvitesAsync).
     /// </summary>
     private async Task LancerLeSpectateurAsync(MultiplayerRoom room, MultiplayerInstalledGame jeu, MultiplayerSessionNetplay session,
         Func<int?> liens)

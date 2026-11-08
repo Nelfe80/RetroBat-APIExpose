@@ -133,15 +133,21 @@ public sealed class MultiplayerAttenteDesInvites
     /// ne se connecte : ni dans le journal (<see cref="UnInviteSeConnecte"/>), ni au relais (<paramref name="liens"/>). Un
     /// depart qui ne se reprend pas arrete la boucle (la partie continue telle quelle). Rend le nombre de reprises.
     /// </summary>
+    /// <remarks>
+    /// <paramref name="depuisLaLigne"/> (D-M9, 08/11) : les lignes du journal d'avant ne comptent pas. Le spectateur cache des
+    /// consoles reliees se connecte AVANT que la session parte a la gameroom ; ses lignes du tunnel (« Queued tunnel link
+    /// connection ») ne sont pas l'arrivee d'un invite. Ses deux liens au relais sont deja retires par
+    /// <see cref="MultiplayerSpectateur.Corriger"/>.
+    /// </remarks>
     public async Task<int> BouclerLeDepartAsync(Func<CancellationToken, Task<bool>> reprendre, string journal, Func<int?>? liens,
-        TimeSpan patience, CancellationToken ct)
+        TimeSpan patience, CancellationToken ct, int depuisLaLigne = 0)
     {
         var limite = DateTime.UtcNow + patience;
         var tours = 0;
         while (DateTime.UtcNow < limite)
         {
             ct.ThrowIfCancellationRequested();
-            if (UnInviteSeConnecte(LireLesLignes(journal).ToList()) || liens?.Invoke() > 0)
+            if (UnInviteSeConnecte(LireLesLignes(journal).Skip(Math.Max(0, depuisLaLigne)).ToList()) || liens?.Invoke() > 0)
             {
                 return tours;
             }
@@ -322,6 +328,12 @@ public sealed class MultiplayerAttenteDesInvites
             await Task.Delay(rythme, ct).ConfigureAwait(false);
         }
     }
+
+    /// <summary>
+    /// Le nombre de lignes completes du journal a cet instant (0 s'il n'existe pas encore) : la marque d'ou la boucle du
+    /// depart lit les arrivees (D-M9).
+    /// </summary>
+    public static int NombreDeLignes(string journal) => Math.Max(0, LireLesLignes(journal).Count() - 1);
 
     /// <summary>Le journal en cours d'ecriture, lu sans gener RetroArch ; vide s'il n'existe pas encore.</summary>
     private static IEnumerable<string> LireLesLignes(string journal)
