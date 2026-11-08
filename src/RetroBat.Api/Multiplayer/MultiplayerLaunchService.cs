@@ -1582,7 +1582,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         var texte = _panneau.Texte("multiplayer.no_controller", MessageSansManetteParDefaut);
         // Le Deck pose : la plaque de ses rails le dit (une fois, elle reste plus longtemps que RetroArch)
         if (RetroBat.Api.Deck.DeckSilence.DireSiPose(RetroBat.Api.Deck.DeckNotices.Message("multiplayer.no_controller", RetroBat.Api.Deck.DeckSeverity.Alert,
-                "NO CONTROLLER", "CHECK YOUR GAMEPAD", "multiplayer", RetroBat.Api.Deck.DeckNotices.Long)))
+                "NO PAD", "CHECK YOUR CONTROLLER", "multiplayer", RetroBat.Api.Deck.DeckNotices.Long)))
         {
             _journal.LogWarning("MULTIPLAYER : aucune manette pour cette partie, le joueur est prevenu dans le Deck");
             return;

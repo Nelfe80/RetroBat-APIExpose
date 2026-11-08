@@ -204,12 +204,22 @@ public sealed class DeckSilenceTests : IDisposable
         Assert.Equal("CERTIFIED SETTINGS", NelfePlayScoringReporter.NoticeDuPrevol(true, "", [], true, null, false).Text);
         Assert.Equal("SENT WHEN NELFEPLAY IS BACK", NelfePlayScoringReporter.NoticeDuPrevol(true, "", [], false, null, true).Text);
         var rembobinage = NelfePlayScoringReporter.NoticeDuPrevol(true, "", ["rewind"], false, null, false);
-        Assert.Equal(("NOT CERTIFIABLE", DeckSeverity.Alert, "TURN OFF REWIND"), (rembobinage.Title, rembobinage.Severity, rembobinage.Text));
-        Assert.Equal("EMULATOR PENDING", NelfePlayScoringReporter.NoticeDuPrevol(false, "profile.core_mismatch", [], false, null, false).Title);
-        Assert.Equal("NOT CERTIFIABLE", NelfePlayScoringReporter.NoticeDuPrevol(false, "content.bootleg_unnamed", [], false, null, false).Title);
+        Assert.Equal(("UNCERTIFIED", DeckSeverity.Alert, "TURN OFF REWIND"), (rembobinage.Title, rembobinage.Severity, rembobinage.Text));
+        Assert.Equal("PENDING", NelfePlayScoringReporter.NoticeDuPrevol(false, "profile.core_mismatch", [], false, null, false).Title);
+        Assert.Equal("UNCERTIFIED", NelfePlayScoringReporter.NoticeDuPrevol(false, "content.bootleg_unnamed", [], false, null, false).Title);
 
         foreach (var cle in new[] { "scoring_continue", "scoring_credit", "scoring_joined", "scoring_clear", "scoring_uncertified", "scoring_credits_muted",
-                     "scoring_multiplayer", "scoring_offline", "scoring_nothing_measured", "scoring_none_measured", "scoring_emulator_pending" })
+                     "scoring_multiplayer", "scoring_offline", "scoring_nothing_measured", "scoring_none_measured", "scoring_emulator_pending", "scoring_settings_pending", "scoring_not_certifiable", "scoring_certifiable" })
+        {
+            Court(DeckNotices.Scoring(cle, 412300));
+        }
+
+        foreach (var (titre, texte) in new[] { (DeckNotices.DuChoix(true, true, null, "hide").Title, ""), (DeckNotices.Message("multiplayer.no_controller", "alert", "NO PAD", "CHECK YOUR CONTROLLER", "multiplayer").Title, "") })
+        {
+            Assert.InRange(titre.Length, 1, 12);
+        }
+
+        foreach (var cle in Array.Empty<string>())
         {
             Court(DeckNotices.Scoring(cle, 412300));
         }
@@ -220,17 +230,17 @@ public sealed class DeckSilenceTests : IDisposable
     [Fact]
     public void Le_choix_du_Deck_se_dit_en_plaque()
     {
-        Assert.Equal(("PLAYERDECK OFF", "FRAME STAYS TILL RELAUNCH"), T(DeckNotices.DuChoix(true, true, null, "hide")));
-        Assert.Equal(("PLAYERDECK OFF", ""), T(DeckNotices.DuChoix(true, false, null, "hide")));
+        Assert.Equal(("DECK OFF", "FRAME STAYS TILL RELAUNCH"), T(DeckNotices.DuChoix(true, true, null, "hide")));
+        Assert.Equal(("DECK OFF", ""), T(DeckNotices.DuChoix(true, false, null, "hide")));
         Assert.Equal(("19XX", "FROM NEXT LAUNCH"), T(DeckNotices.DuChoix(false, true, "19XX", "next-launch")));
         Assert.Equal(("19XX HANGAR", "PLAYERDECK ON"), T(DeckNotices.DuChoix(false, true, "19XX Hangar", "show")));
         static (string, string) T(DeckNotice n) => (n.Title, n.Text);
     }
 
-    /// <summary>Une plaque de rail : titre de 16 caracteres au plus, detail de 40, en majuscules ASCII (polices pixel du Deck).</summary>
+    /// <summary>Une plaque de rail : titre de 12 caracteres au plus, detail de 40, en majuscules ASCII (polices pixel du Deck).</summary>
     private static void Court(DeckNotice n)
     {
-        Assert.InRange(n.Title.Length, 1, 16);
+        Assert.InRange(n.Title.Length, 1, 12);
         Assert.InRange(n.Text.Length, 0, 40);
         Assert.Equal(n.Title.ToUpperInvariant(), n.Title);
         Assert.Equal(n.Text.ToUpperInvariant(), n.Text);
@@ -293,7 +303,7 @@ public sealed class DeckSilenceTests : IDisposable
         var off = service.Choisir(DeckChoix.Off, "gamepad")!;
         Assert.Equal("hide", off.Now);
         Assert.Single(notices);
-        Assert.Equal("PLAYERDECK OFF", notices[0].Title);
+        Assert.Equal("DECK OFF", notices[0].Title);
         Assert.Empty(commandes.Envoyees);   // pas de SHOW_MSG : RetroArch est muet pour ce lancement
     }
 

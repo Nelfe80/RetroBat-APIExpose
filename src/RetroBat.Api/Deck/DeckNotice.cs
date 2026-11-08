@@ -31,7 +31,7 @@ public static class DeckSeverity
 
 /// <summary>
 /// CE QUE LE DECK DIT A LA PLACE DE RETROARCH ET DES FENETRES DE L'API. Des textes courts, en anglais, ecrits pour une plaque
-/// de rail (titre de 16 caracteres au plus, une ligne de detail) ; les longues phrases de RetroArch restent a RetroArch quand
+/// de rail (titre de 12 caracteres au plus, une ligne de detail) ; les longues phrases de RetroArch restent a RetroArch quand
 /// le Deck n'est pas la. Pur : tout se teste sans machine.
 /// </summary>
 public static class DeckNotices
@@ -80,7 +80,7 @@ public static class DeckNotices
     public static DeckNotice DuChoix(bool off, bool decorPose, string? nom, string maintenant)
     {
         var (titre, texte) = off
-            ? ("PLAYERDECK OFF", decorPose ? "FRAME STAYS TILL RELAUNCH" : "")
+            ? ("DECK OFF", decorPose ? "FRAME STAYS TILL RELAUNCH" : "")
             : maintenant == "next-launch" ? (Court16(nom ?? "PLAYERDECK"), "FROM NEXT LAUNCH") : (Court16(nom ?? "PLAYERDECK"), "PLAYERDECK ON");
         return new DeckNotice("deck.choice", DeckSeverity.Info, titre, texte, null, Court) { Source = "deck" };
     }
@@ -97,18 +97,18 @@ public static class DeckNotices
         {
             "scoring_certifiable" => new DeckNotice(cle, DeckSeverity.Good, "CERTIFIABLE", Court40(detail ?? "FOR THE LEADERBOARD"), null, Moyen),
             "scoring_offline_certifiable" => new DeckNotice(cle, DeckSeverity.Good, "CERTIFIABLE", "SENT WHEN NELFEPLAY IS BACK", null, Moyen),
-            "scoring_not_certifiable" => new DeckNotice(cle, DeckSeverity.Alert, "NOT CERTIFIABLE", Court40(detail ?? ""), null, Long),
-            "scoring_emulator_pending" => new DeckNotice(cle, DeckSeverity.Warn, "EMULATOR PENDING", "SCORE KEPT, RANKED LATER", null, Long),
-            "scoring_settings_pending" => new DeckNotice(cle, DeckSeverity.Warn, "SETTINGS PENDING", "SCORE KEPT, RANKED LATER", null, Long),
+            "scoring_not_certifiable" => new DeckNotice(cle, DeckSeverity.Alert, "UNCERTIFIED", Court40(detail ?? ""), null, Long),
+            "scoring_emulator_pending" => new DeckNotice(cle, DeckSeverity.Warn, "PENDING", "EMULATOR NOT RECOGNIZED YET", null, Long),
+            "scoring_settings_pending" => new DeckNotice(cle, DeckSeverity.Warn, "PENDING", "SETTINGS NOT RECOGNIZED YET", null, Long),
             "scoring_offline" => new DeckNotice(cle, DeckSeverity.Info, "OFFLINE", "SCORE SENT LATER", null, Moyen),
             "scoring_nothing_measured" => new DeckNotice(cle, DeckSeverity.Alert, "NO SCORE", Court40(detail ?? "NOTHING WILL BE MEASURED"), null, Long),
             "scoring_none_measured" => new DeckNotice(cle, DeckSeverity.Alert, "NO SCORE", "NOTHING WAS MEASURED", null, Long),
             "scoring_continue" => new DeckNotice(cle, DeckSeverity.Warn, "CONTINUE", "CERTIFIED SCORE", valeur, Long),
             "scoring_credit" => new DeckNotice(cle, DeckSeverity.Warn, "CREDIT USED", "CERTIFIED SCORE", valeur, Long),
-            "scoring_joined" => new DeckNotice(cle, DeckSeverity.Warn, "PLAYER JOINED", "SOLO SCORE KEPT", valeur, Long),
+            "scoring_joined" => new DeckNotice(cle, DeckSeverity.Warn, "2P JOINED", "SOLO SCORE KEPT", valeur, Long),
             "scoring_clear" => new DeckNotice(cle, DeckSeverity.Record, "1CC", "ONE-CREDIT CLEAR", valeur, Long),
-            "scoring_uncertified" => new DeckNotice(cle, DeckSeverity.Alert, "NOT CERTIFIABLE", "QUIT AND RELAUNCH", null, Long),
-            "scoring_credits_muted" => new DeckNotice(cle, DeckSeverity.Alert, "CREDITS UNREAD", "QUIT AND RELAUNCH", null, Long),
+            "scoring_uncertified" => new DeckNotice(cle, DeckSeverity.Alert, "UNCERTIFIED", "QUIT AND RELAUNCH", null, Long),
+            "scoring_credits_muted" => new DeckNotice(cle, DeckSeverity.Alert, "UNCERTIFIED", "CREDITS UNREADABLE", null, Long),
             "scoring_multiplayer" => new DeckNotice(cle, DeckSeverity.Warn, "MULTIPLAYER", "OUT OF SOLO RANKING", null, Long),
             _ => new DeckNotice(cle, DeckSeverity.Info, "SCORING", Court40(detail ?? ""), valeur, Moyen),
         };
@@ -135,6 +135,7 @@ public static class DeckNotices
         return (coupe > max / 2 ? t[..coupe] : t[..max]).TrimEnd(',', ';', ':', '.');
     }
 
-    private static string Court16(string t) => Couper(t, 16);
+    /// <summary>Un titre de plaque : 12 caracteres, ce qui tient dans le bandeau du rail le plus etroit (Street Fighter II, 1920 x 1200).</summary>
+    private static string Court16(string t) => Couper(t, 12);
     private static string Court40(string t) => Couper(t, 40);
 }
