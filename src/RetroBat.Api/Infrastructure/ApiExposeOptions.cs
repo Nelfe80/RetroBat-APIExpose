@@ -43,6 +43,7 @@ public class ApiExposeOptions
     public DataPackOptions DataPack { get; set; } = new();
     public SelfUpdateOptions SelfUpdate { get; set; } = new();
     public LeaderboardOptions Leaderboard { get; set; } = new();
+    public PlayerDeckOptions PlayerDeck { get; set; } = new();
 
     public class TestModeOptions
     {
@@ -754,6 +755,25 @@ public class ApiExposeOptions
         public bool SendF5AfterEsApiReady { get; set; } = true;
         public int F5AfterEsApiReadyDelayMilliseconds { get; set; } = 5000;
         public int F5AfterEsApiReadyHoldMilliseconds { get; set; } = 80;
+    }
+
+    /// <summary>
+    /// LE LANCEMENT AVEC LE PLAYERDECK (CDC PlayerDeck H-D15 a H-D20, voir <see cref="Deck.DeckLaunchService"/>).
+    /// Section de configuration : <c>ApiExpose:PlayerDeck</c>.
+    /// </summary>
+    public class PlayerDeckOptions
+    {
+        /// <summary>Le Deck part avec les lancements des boutons speciaux quand le jeu a un Deck installe. Vrai par defaut.</summary>
+        public bool Enabled { get; set; } = true;
+
+        /// <summary>Le dossier de l'exe du PlayerDeck (themes/ et decks/ a cote). Vide : plugins/NelfePlay-PlayerDeck/bin.</summary>
+        public string Directory { get; set; } = string.Empty;
+
+        /// <summary>Demarrer le PlayerDeck (--deck --follow-launch) s'il ne tourne pas, au lancement d'un jeu qui a un Deck.</summary>
+        public bool StartHost { get; set; } = true;
+
+        /// <summary>Le geste du choix en jeu (Select + A, appui court), lu par l'API.</summary>
+        public bool Gesture { get; set; } = true;
     }
 
     /// <summary>

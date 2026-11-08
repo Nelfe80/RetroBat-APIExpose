@@ -23,7 +23,9 @@ namespace RetroBat.Api.Deck;
 ///   le dernier score de chaque joueur (<c>score.live.changed</c>) et les entrees tenues (<c>panel.input.*</c>) ;
 /// - la correspondance effective des boutons du jeu lance : <c>deck.controls</c> ;
 /// - le cadre reel ou RetroArch dessine le jeu, en pixels de l'ecran : <c>deck.frame</c> ;
-/// - les cadres demandes par un theme du Deck, et la configuration de session qui les imposerait au lancement ;
+/// - les cadres demandes par un theme du Deck (pour information : le cadre s'impose par le decor du lancement,
+///   <see cref="DeckLaunchService"/>, H-D15 ; la voie A, un fichier ajoute par le lanceur, est abandonnee) ;
+/// - le Deck du lancement en cours (champ <c>Deck</c> de <c>deck.game</c>) ;
 /// - le sens des signaux du .MEM, lu dans son compagnon .SMEM (<c>deck.semantics</c>, voir <see cref="Smem"/>).
 ///
 /// <c>deck.snapshot</c> reunit tout, envoye a la connexion (<c>/ws</c> et <c>/ws/deck</c>) et sur demande
@@ -55,8 +57,24 @@ public sealed class DeckStateService : IHostedService, IDisposable
 
     public DeckFramePlanStore Cadres { get; }
 
-    /// <summary>Le fichier de configuration de session (cadre impose), pour un lanceur qui l'ajouterait.</summary>
-    public static string FichierDeSession => Path.Combine(DossierDeck, "cadre-session.cfg");
+    /// <summary>Les messages du choix du Deck en jeu (deck.choice.*), traites par <see cref="DeckLaunchService"/>.</summary>
+    public Func<string, JsonElement, string?>? CommandesDuChoix { get; set; }
+
+    /// <summary>Le Deck du prochain lancement, prepare avant le lanceur ; rattache a la partie a son depart.</summary>
+    private DeckLancement? _lancementPrepare;
+
+    /// <summary>
+    /// Le Deck du lancement que l'API va faire (null : lancement sans Deck). Rattache a la partie au crochet de depart si
+    /// c'est le meme jeu et que la preparation date de moins de deux minutes.
+    /// </summary>
+    public void PoserLeLancement(DeckLancement? lancement)
+    {
+        lock (_verrou)
+        {
+            _lancementPrepare = lancement;
+            _revision++;
+        }
+    }
 
     private static string DossierDeck => Path.Combine(RetroBatPaths.PluginRoot, "state", "deck");
 
@@ -71,8 +89,16 @@ public sealed class DeckStateService : IHostedService, IDisposable
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        // Un fichier de session laisse par un arret brutal ne doit pas imposer un cadre au prochain jeu.
-        EffacerSession();
+        // La voie A (cadre-session.cfg ajoute par le lanceur) est abandonnee (H-D15) : un reste d'une version d'essai part.
+        try
+        {
+            var ancien = Path.Combine(DossierDeck, "cadre-session.cfg");
+            if (File.Exists(ancien)) File.Delete(ancien);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+
         _abonnement = _bus.Subscribe<EventEnvelope>(Recevoir);
         return Task.CompletedTask;
     }
@@ -85,7 +111,6 @@ public sealed class DeckStateService : IHostedService, IDisposable
         {
             _partie?.Arret.Cancel();
         }
-        EffacerSession();
         return Task.CompletedTask;
     }
 
@@ -120,9 +145,6 @@ public sealed class DeckStateService : IHostedService, IDisposable
                     {
                         if (_tenues.Count > 0) { _tenues.Clear(); _revision++; }
                     }
-                    break;
-                case "ui.game.selected":
-                    PreparerSession(_contexte.Ui.Selected);
                     break;
                 case "ui.game.started":
                     Demarrer(e);
@@ -278,6 +300,9 @@ public sealed class DeckStateService : IHostedService, IDisposable
             _signaux.Clear();
             _scores.Clear();
             var rom = NomDeRom(chemin);
+            // Le Deck prepare pour ce jeu par les boutons speciaux ; un autre lancement (ES) n'en a pas (H-D20)
+            var deck = _lancementPrepare is { } l && DateTime.UtcNow - l.PreparedAtUtc < TimeSpan.FromMinutes(2) && MemeChemin(l.GamePath, chemin) ? l : null;
+            _lancementPrepare = null;
             partie = new Partie
             {
                 LaunchId = Guid.NewGuid().ToString("N"),
@@ -292,12 +317,12 @@ public sealed class DeckStateService : IHostedService, IDisposable
                 RomGroupSource = "file",
                 StartedUtc = DateTime.UtcNow,
                 Etat = "launching",
+                Deck = deck,
             };
             _partie = partie;
             _revision++;
         }
 
-        PreparerSession(jeu ?? new GameReference { SystemId = systeme, GamePath = chemin });
         Publier("deck.game", JeuDe(partie));
         _ = Task.Run(() => SuivreAsync(partie, partie.Arret.Token));
     }
@@ -318,7 +343,6 @@ public sealed class DeckStateService : IHostedService, IDisposable
             _revision++;
         }
 
-        EffacerSession();
         Publier("deck.game", JeuDe(partie));
     }
 
@@ -571,7 +595,7 @@ public sealed class DeckStateService : IHostedService, IDisposable
             (largeur, hauteur, _) = DeckLaunchLog.Affichage(bw, bh, lecture.Rotation, lecture.Aspect);
         }
 
-        var plan = Cadres.Pour(partie.SystemId, partie.Rom);
+        var plan = PlanDuDecor(partie) ?? Cadres.Pour(partie.SystemId, partie.Rom);
         if (reglages is null)
         {
             return new DeckFramePayload(partie.LaunchId, partie.SystemId, partie.Rom, m.Client, null, null, "unknown", null, null,
@@ -601,7 +625,19 @@ public sealed class DeckStateService : IHostedService, IDisposable
             Revision: Interlocked.Read(ref _revision));
     }
 
-    private static DeckFramePlanStatus? PlanDe(DeckFramePlan? plan, DeckRect? obtenu, DeckRect fenetre, DeckLaunchLog.Lecture? lecture)
+    /// <summary>Le cadre impose par le decor du lancement (son trou), s'il est pose.</summary>
+    private static DeckFramePlan? PlanDuDecor(Partie partie)
+        => partie.Deck is { Status: "posed", Decor: { } d } l
+            ? new DeckFramePlan { SystemId = partie.SystemId, Rom = partie.Rom, X = d.Hole.X, Y = d.Hole.Y, Width = d.Hole.Width, Height = d.Hole.Height,
+                ScreenWidth = d.Screen.Width, ScreenHeight = d.Screen.Height, Theme = l.DeckId }
+            : null;
+
+    /// <summary>
+    /// Le sort du cadre demande : applied (le viewport recalcule tombe sur le cadre a un pixel pres), sinon screen_mismatch
+    /// (zone de RetroArch d'une autre taille que l'ecran du decor) ou decor_not_posed (aucun decor de ce lancement ne
+    /// l'impose : un cadre demande par le Deck hors d'un lancement des boutons speciaux reste une information). Pur.
+    /// </summary>
+    internal static DeckFramePlanStatus? PlanDe(DeckFramePlan? plan, DeckRect? obtenu, DeckRect fenetre, DeckLaunchLog.Lecture? lecture)
     {
         if (plan is null) return null;
         string etat, raison;
@@ -614,75 +650,26 @@ public sealed class DeckStateService : IHostedService, IDisposable
         {
             (etat, raison) = ("not-applied", "screen_mismatch");
         }
-        else if (lecture?.AppendedConfigs?.Any(a => string.Equals(Path.GetFullPath(a), Path.GetFullPath(FichierDeSession), StringComparison.OrdinalIgnoreCase)) == true)
-        {
-            (etat, raison) = ("not-applied", "overridden");
-        }
         else
         {
-            // le lanceur de RetroBat n'a pas ajoute la configuration de session : rien ne l'impose encore
-            (etat, raison) = ("not-applied", "launcher_hook_missing");
+            (etat, raison) = ("not-applied", "decor_not_posed");
         }
         return new DeckFramePlanStatus(plan.Rect, plan.Theme, etat, raison);
     }
 
-    // ─────────────────────────────── cadre impose ───────────────────────────────
-
-    /// <summary>
-    /// Ecrit la configuration de session du jeu designe s'il a un cadre demande, l'efface sinon. Appele a la selection
-    /// dans le menu (avant le lanceur) et au depart. Le fichier ne vit que le temps d'une partie.
-    /// </summary>
-    private void PreparerSession(GameReference? jeu)
-    {
-        var chemin = jeu?.GamePath;
-        if (string.IsNullOrWhiteSpace(chemin)) return;
-        var systeme = jeu!.SystemId ?? "";
-        var rom = NomDeRom(chemin);
-        var plan = Cadres.Pour(systeme, rom);
-        try
-        {
-            if (plan is null)
-            {
-                EffacerSession();
-                return;
-            }
-
-            var texte = DeckSessionConfig.Construire(plan, systeme, rom);
-            if (File.Exists(FichierDeSession) && File.ReadAllText(FichierDeSession) == texte) return;
-            Directory.CreateDirectory(DossierDeck);
-            var provisoire = FichierDeSession + ".tmp";
-            File.WriteAllText(provisoire, texte);
-            File.Move(provisoire, FichierDeSession, overwrite: true);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            _journal?.LogDebug(ex, "Deck : configuration de session non ecrite.");
-        }
-    }
-
-    private static void EffacerSession()
+    private static bool MemeChemin(string a, string b)
     {
         try
         {
-            if (File.Exists(FichierDeSession)) File.Delete(FichierDeSession);
+            return string.Equals(Path.GetFullPath(a.Trim('"')), Path.GetFullPath(b.Trim('"')), StringComparison.OrdinalIgnoreCase);
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
         {
+            return string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
         }
     }
 
-    /// <summary>Le texte de la configuration de session en vigueur, ou null.</summary>
-    public static string? SessionEnVigueur()
-    {
-        try
-        {
-            return File.Exists(FichierDeSession) ? File.ReadAllText(FichierDeSession) : null;
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            return null;
-        }
-    }
+    // ─────────────────────────────── (voie A abandonnee) ───────────────────────────────
 
     // ─────────────────────────────── commandes du Deck ───────────────────────────────
 
@@ -697,6 +684,10 @@ public sealed class DeckStateService : IHostedService, IDisposable
             case "deck.snapshot.request":
                 return SnapshotJson("request");
 
+            case "deck.choice.next":
+            case "deck.choice.set":
+                return CommandesDuChoix?.Invoke(type, corps);
+
             case "deck.frame.request":
             {
                 DeckFramePlan? plan = null;
@@ -710,7 +701,6 @@ public sealed class DeckStateService : IHostedService, IDisposable
                 }
 
                 var refus = plan is null ? "invalid_frame" : Cadres.Poser(plan with { RequestedAtUtc = DateTime.UtcNow, Persist = false }, connexion);
-                if (refus is null) PreparerSession(_contexte.Ui.Running ?? _contexte.Ui.Selected);
                 return Accuse("deck.frame.request", refus, plan);
             }
 
@@ -719,7 +709,6 @@ public sealed class DeckStateService : IHostedService, IDisposable
                 var systeme = corps.TryGetProperty("SystemId", out var s) || corps.TryGetProperty("systemId", out s) ? s.GetString() : null;
                 var rom = corps.TryGetProperty("Rom", out var r) || corps.TryGetProperty("rom", out r) ? r.GetString() : null;
                 Cadres.Retirer(systeme, rom, connexion);
-                PreparerSession(_contexte.Ui.Running ?? _contexte.Ui.Selected);
                 return Accuse("deck.frame.clear", null, null);
             }
         }
@@ -728,16 +717,13 @@ public sealed class DeckStateService : IHostedService, IDisposable
     }
 
     /// <summary>La connexion d'un Deck s'est fermee : ses cadres (non gardes) partent avec elle.</summary>
-    public void ConnexionFermee(object connexion)
-    {
-        if (Cadres.Oublier(connexion)) PreparerSession(_contexte.Ui.Running ?? _contexte.Ui.Selected);
-    }
+    public void ConnexionFermee(object connexion) => Cadres.Oublier(connexion);
 
     private static string Accuse(string type, string? refus, DeckFramePlan? plan)
         => JsonSerializer.Serialize(new EventEnvelope
         {
             Type = "deck.ack",
-            Payload = new { Request = type, Accepted = refus is null, Reason = refus, Plan = plan, SessionConfig = FichierDeSession }
+            Payload = new { Request = type, Accepted = refus is null, Reason = refus, Plan = plan }
         });
 
     // ─────────────────────────────── instantane ───────────────────────────────
@@ -809,7 +795,8 @@ public sealed class DeckStateService : IHostedService, IDisposable
             Video: video,
             Orientation: video?.Orientation ?? orientationDeclaree,
             OrientationSource: video is not null ? "core" : orientationDeclaree is not null ? "catalog" : null,
-            Revision: _revision);
+            Revision: _revision,
+            Deck: partie.Deck);
     }
 
     private static string NomDeRom(string chemin) => Path.GetFileNameWithoutExtension(chemin).Trim().ToLowerInvariant();
@@ -889,13 +876,17 @@ public sealed class DeckStateService : IHostedService, IDisposable
         public DeckFramePayload? Cadre;
         public DeckSemantics? Semantique;
         public bool SemantiqueCherchee;
+        public DeckLancement? Deck;
         public readonly CancellationTokenSource Arret = new();
     }
 }
 
 // ─────────────────────────────── messages (contrat additif : on ajoute, on ne renomme jamais) ───────────────────────────────
 
-/// <summary>deck.game : le jeu lance. <c>State</c> = launching (crochet game-start), running (RetroArch a annonce sa geometrie, ou 60 s sans journal), ended.</summary>
+/// <summary>
+/// deck.game : le jeu lance. <c>State</c> = launching (crochet game-start), running (RetroArch a annonce sa geometrie, ou
+/// 60 s sans journal), ended. <c>Deck</c> : le Deck de ce lancement (decor pose, Off...), null pour un lancement sans Deck.
+/// </summary>
 public sealed record DeckGame(
     string LaunchId,
     string State,
@@ -915,7 +906,8 @@ public sealed record DeckGame(
     DeckVideo? Video,
     string? Orientation,
     string? OrientationSource,
-    long Revision);
+    long Revision,
+    DeckLancement? Deck = null);
 
 /// <summary>
 /// La geometrie annoncee par le coeur. <c>BaseWidth</c>/<c>BaseHeight</c> : le tampon tel que le coeur le rend (non

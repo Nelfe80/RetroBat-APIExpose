@@ -17,8 +17,15 @@ namespace RetroBat.Api.Controllers;
 public sealed class DeckController : ControllerBase
 {
     private readonly DeckStateService _deck;
+    private readonly DeckLaunchService _lancement;
+    private readonly Microsoft.Extensions.Options.IOptionsMonitor<ApiExposeOptions> _options;
 
-    public DeckController(DeckStateService deck) => _deck = deck;
+    public DeckController(DeckStateService deck, DeckLaunchService lancement, Microsoft.Extensions.Options.IOptionsMonitor<ApiExposeOptions> options)
+    {
+        _deck = deck;
+        _lancement = lancement;
+        _options = options;
+    }
 
     /// <summary>
     /// L'instantane du Deck (meme contenu que le message <c>deck.snapshot</c>) : jeu lance, score de chaque joueur,
@@ -41,7 +48,7 @@ public sealed class DeckController : ControllerBase
     {
         if (!JetonLocal()) return Refus();
         var refus = _deck.Cadres.Poser(plan with { Persist = true, RequestedAtUtc = DateTime.UtcNow }, connexion: null);
-        return refus is null ? Ok(new { accepted = true, sessionConfig = DeckStateService.FichierDeSession }) : BadRequest(new { accepted = false, reason = refus });
+        return refus is null ? Ok(new { accepted = true }) : BadRequest(new { accepted = false, reason = refus });
     }
 
     /// <summary>Retire le cadre garde d'un jeu (systeme et rom vides : tous les cadres gardes).</summary>
@@ -53,12 +60,20 @@ public sealed class DeckController : ControllerBase
     }
 
     /// <summary>
-    /// La configuration de session qui imposerait le cadre au lancement en cours (texte a ajouter avec
-    /// <c>--appendconfig</c>), 204 s'il n'y en a pas. Elle porte toujours <c>config_save_on_exit = "false"</c>.
+    /// Les Decks installes (officiels dans themes/, ceux des joueurs dans decks/) et, pour un jeu (<c>rom</c>), ceux qui lui
+    /// conviennent dans l'ordre du choix en jeu.
     /// </summary>
-    [HttpGet("frame-plan/session")]
-    public IActionResult Session()
-        => DeckStateService.SessionEnVigueur() is { } texte ? Content(texte, "text/plain") : NoContent();
+    [HttpGet("installed")]
+    public IActionResult Installes([FromQuery] string? rom, [FromQuery] string? romGroup)
+    {
+        var catalogue = DeckCatalogue.Lire(_options.CurrentValue.PlayerDeck.Directory is { Length: > 0 } d ? d : DeckCatalogue.DossierParDefaut);
+        var liste = string.IsNullOrWhiteSpace(rom) && string.IsNullOrWhiteSpace(romGroup) ? catalogue.Tous : catalogue.PourLeJeu(rom, romGroup);
+        return Ok(liste.Select(e => new { e.Id, e.Name, e.Version, e.Official, e.Default, e.VariantOf, e.Roms }));
+    }
+
+    /// <summary>Les choix retenus (joueur, jeu, mode, Deck ou off) et le Deck du lancement en cours.</summary>
+    [HttpGet("choices")]
+    public IActionResult Choix() => Ok(new { choices = _lancement.Choix.Tous(), launch = _lancement.EnCours });
 
     private bool JetonLocal() => LocalWriteToken.Matches(Request.Headers[LocalWriteToken.HeaderName].FirstOrDefault());
 

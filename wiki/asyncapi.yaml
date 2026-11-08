@@ -1,7 +1,7 @@
 asyncapi: 3.0.0
 info:
   title: APIExpose Real-time Events
-  version: 1.5.0
+  version: 1.6.0
   description: |
     WebSocket event surface of the APIExpose plugin for RetroBat / EmulationStation.
     Local only (127.0.0.1). Connect to `/ws` for the unfiltered firehose or to
@@ -243,7 +243,35 @@ channels:
       `Rom`, `RomGroup` (+ `RomGroupSource`: catalog | file), `Name`, `Core`,
       `Video` once RetroArch logged the core geometry (`BaseWidth`/`BaseHeight` =
       unrotated buffer, `Rotation` in quarter turns, `Width`/`Height` = displayed
-      image, `Aspect` given by the core, `Fps`, `Orientation`), `Orientation`.
+      image, `Aspect` given by the core, `Fps`, `Orientation`), `Orientation`,
+      `Deck` (the Deck of this launch, as deck.launch; null for a launch without
+      Deck: only the API launches from the special panel buttons carry one).
+
+
+      `deck.launch`: published before the launcher, for a launch from a special
+      panel button (CHALLENGE in World Scoring, LAUNCH THE SPEEDRUN / LAUNCH THE
+      CHALLENGE in Challenges & Speedruns, a MULTIPLAYER room) of a game that has an
+      installed Deck. `Mode` = world-scoring | speedrun | multiplayer | adventure
+      (planned, not wired). `Status` = posed (RetroBat decoration `nelfeplay-deck`
+      written and `-bezel nelfeplay-deck -ratio custom -integerscale 0` added to the
+      launcher: RetroArch draws the Deck background, the Deck window writes the
+      values only) | window (Deck chosen, no decoration: the window draws all) | off
+      (the player turned it off for this game and mode) | none. `DeckId`,
+      `DeckName`, `Official`, `Source` = choice | choice-other-mode |
+      official-default | none, `Choices` (in-game order, `off` last), `Game`
+      (system/rom_group), `Player`, `Decor` (`Screen`, `Hole` = where the game is
+      drawn in screen pixels, `LauncherViewport` = the custom_viewport the RetroBat
+      launcher derives from the .info, equal to `Hole`, `Png`, `Cached`,
+      `RenderMs`). Display only: the certified fingerprint does not change.
+
+
+      `deck.choice`: the player picked another Deck or Off in game (gamepad:
+      Select then A, short press, read by the API; keyboard: Ctrl+Alt+D in the
+      Deck). Kept per player, game and mode. `DeckId` (null = off), `Off`, `Now` =
+      hide (window hidden now, decoration stays until the next launch) | show (the
+      Deck of the posed decoration) | switch (no decoration: the window draws this
+      Deck now) | next-launch, `PosedDeckId`, `Label` (also shown by RetroArch),
+      `Source` = gamepad | keyboard, `Choices`.
 
 
       `deck.controls`: what each panel button really does in the launched game.
@@ -259,8 +287,10 @@ channels:
       (physical screen pixels), `Viewport` = image rectangle on screen,
       `ViewportInWindow` = same, relative to the client area, computed from the
       settings RetroArch read (retroarch.cfg + appended files); `Mode`, `Aspect`,
-      `PixelScale` (screen pixels per game pixel), `Plan` (requested frame and
-      `Status` applied | not-applied with `Reason`). Published on change only.
+      `PixelScale` (screen pixels per game pixel), `Plan` (the hole of the posed
+      decoration, else a frame requested by a Deck theme for information; `Status`
+      applied | not-applied with `Reason` screen_mismatch | decor_not_posed).
+      Published on change only.
 
 
       `deck.semantics`: what the .MEM signals of the launched game mean for display,
@@ -288,9 +318,14 @@ channels:
       `deck.frame.request` (`Frame`: `SystemId`, `Rom` (empty = any game), `X`, `Y`,
       `Width`, `Height` in physical pixels of the RetroArch client area,
       `ScreenWidth`, `ScreenHeight`, `Theme`) -> `deck.ack`; the frame lives as long
-      as the connection; `deck.frame.clear` (`SystemId`, `Rom`) -> `deck.ack`.
+      as the connection (information only: the frame is imposed by the decoration
+      of the launch); `deck.frame.clear` (`SystemId`, `Rom`) -> `deck.ack`;
+      `deck.choice.next` -> the next Deck or off for the running launch, `deck.ack`
+      (`Choice` as deck.choice, or `Reason` no_deck_launch); `deck.choice.set`
+      (`DeckId`: an installed Deck id, or `off`) -> `deck.ack`.
       REST twin: GET /api/v1/deck/snapshot, GET|PUT|DELETE /api/v1/deck/frame-plan
-      (writes need the local token), GET /api/v1/deck/frame-plan/session.
+      (writes need the local token), GET /api/v1/deck/installed[?rom=],
+      GET /api/v1/deck/choices.
     messages:
       deckSnapshot:
         $ref: '#/components/messages/deckSnapshot'
@@ -302,6 +337,10 @@ channels:
         $ref: '#/components/messages/deckFrame'
       deckSemantics:
         $ref: '#/components/messages/deckSemantics'
+      deckLaunch:
+        $ref: '#/components/messages/deckLaunch'
+      deckChoice:
+        $ref: '#/components/messages/deckChoice'
       deckAck:
         $ref: '#/components/messages/deckAck'
       deckClientRequest:
@@ -378,6 +417,50 @@ components:
               Video: { BaseWidth: 384, BaseHeight: 224, Rotation: 1, RotationDegrees: 90, Width: 224, Height: 384, Aspect: 0.75, Fps: 59.63, Orientation: vertical, Source: retroarch.log, Crc32: a3ddb605 }
               Orientation: vertical
               OrientationSource: core
+              Deck: { Mode: world-scoring, Status: posed, DeckId: 19xx-hangar, DeckName: 19XX Hangar, Official: true, Source: official-default }
+    deckLaunch:
+      name: DeckLaunch
+      title: deck.launch (before the launcher, special panel buttons only)
+      payload:
+        $ref: '#/components/schemas/Envelope'
+      examples:
+        - name: mslug3-cabinet-1920x1200
+          payload:
+            Type: deck.launch
+            Payload:
+              Mode: speedrun
+              SystemId: fbneo
+              Rom: mslug3
+              RomGroup: metal-slug-3
+              Game: arcade/metal-slug-3
+              Player: nelfe
+              GamePath: 'E:\RetroBat\roms\fbneo\mslug3.zip'
+              Status: posed
+              DeckId: metal-slug-3-pixel
+              DeckName: Metal Slug 3 Rebel Iron
+              Official: true
+              Source: official-default
+              Choices: [ metal-slug-3-pixel, metal-slug-3, off ]
+              Decor:
+                Name: nelfeplay-deck
+                Version: 1
+                Screen: { Width: 1920, Height: 1200 }
+                Hole: { X: 476, Y: 58, Width: 1444, Height: 1083 }
+                LauncherViewport: { X: 476, Y: 58, Width: 1444, Height: 1083 }
+                Png: 'E:\RetroBat\plugins\APIExpose\state\deck\decors\metal-slug-3-pixel-0123456789abcdef.png'
+                Cached: false
+                RenderMs: 160
+              Reason: null
+    deckChoice:
+      name: DeckChoice
+      title: deck.choice (in-game choice of the Deck)
+      payload:
+        $ref: '#/components/schemas/Envelope'
+      examples:
+        - name: off-in-game
+          payload:
+            Type: deck.choice
+            Payload: { Mode: world-scoring, Game: arcade/19xx, Player: nelfe, DeckId: null, DeckName: null, Off: true, Now: hide, PosedDeckId: 19xx-hangar, Label: 'PlayerDeck off (frame stays until next launch)', Source: gamepad, Choices: [ 19xx-hangar, 19xx, off ] }
     deckControls:
       name: DeckControls
       title: deck.controls
@@ -464,11 +547,11 @@ components:
             Payload: { Request: deck.frame.request, Accepted: true, Reason: null }
     deckClientRequest:
       name: DeckClientRequest
-      title: Client to server - deck.snapshot.request, deck.frame.request, deck.frame.clear
+      title: Client to server - deck.snapshot.request, deck.frame.request, deck.frame.clear, deck.choice.next, deck.choice.set
       payload:
         type: object
         properties:
-          Type: { type: string, enum: [deck.snapshot.request, deck.frame.request, deck.frame.clear] }
+          Type: { type: string, enum: [deck.snapshot.request, deck.frame.request, deck.frame.clear, deck.choice.next, deck.choice.set] }
           Payload: { type: object }
       examples:
         - name: frame-request

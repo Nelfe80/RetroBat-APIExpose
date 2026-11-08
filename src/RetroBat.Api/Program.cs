@@ -360,6 +360,9 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infra
 // L'etat du jeu pour le PlayerDeck (instantane, identite au lancement, boutons, cadre).
 builder.Services.AddSingleton<RetroBat.Api.Deck.DeckStateService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckStateService>());
+// Le lancement avec le PlayerDeck (H-D15 a H-D20) : decor nelfeplay-deck, choix en jeu retenu par joueur, jeu et mode.
+builder.Services.AddSingleton<RetroBat.Api.Deck.DeckLaunchService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>());
 // Les fondations du reseau (CDC infra §15) : la carte signee (cles de verdict, relais) et les relais, par ou
 // passent les requetes de la borne quand elle ne joint pas le central.
 builder.Services.AddSingleton<RetroBat.Api.Reseau.ServiceDeCarte>();
@@ -762,6 +765,9 @@ var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
     wsManager.DeckSnapshotJson = deck.SnapshotJson;
     wsManager.DeckCommand = deck.Commande;
     wsManager.DeckConnectionClosed = deck.ConnexionFermee;
+    // Le Deck dans une room MULTIPLAYER (H-D17) : son decor remplace les panneaux des joueurs pour le joueur local.
+    app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerLaunchService>().Deck =
+        app.Services.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>();
 }
 eventBus.Subscribe<EventEnvelope>(evt => 
 {

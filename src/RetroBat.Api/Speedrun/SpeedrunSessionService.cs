@@ -120,9 +120,10 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     public SpeedrunSessionService(IEventBus bus, ApiContext contexte, ILogger<SpeedrunSessionService> journal,
         PartieNelfePlayService? partie = null, ICommandesRetroArch? commandes = null, string? fichierDesTentatives = null,
         InterfaceTextService? textes = null, EmulationStationSettingsService? reglages = null, CatalogueDesDefis? catalogue = null,
-        IPrioritesDuJeu? priorites = null, FantomesDuSpeedrun? fantomes = null)
+        IPrioritesDuJeu? priorites = null, FantomesDuSpeedrun? fantomes = null, RetroBat.Api.Deck.DeckLaunchService? deck = null)
     {
         _fantomes = fantomes;
+        _deck = deck;
         // Sans priorites (les tests), personne ne touche aux processus de la machine.
         _priorites = priorites;
         _catalogue = catalogue ?? new CatalogueDesDefis();
@@ -235,8 +236,12 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         // Les fantomes (04/11) : le coeur hote seulement s'ils sont poses et que le site l'admet, sinon le coeur du reglement.
         // Un dump que le coeur hote ne reconnait pas (autre en-tete, 08/11) part sur le coeur d'origine.
         if (_fantomes?.Preparer(reglement, _contexte.PlayerPseudo ?? "", rom) == true) coeur = FantomesDuSpeedrun.CoeurDe(reglement);
+        // LE PLAYERDECK (H-D20) : LAUNCH THE SPEEDRUN / LAUNCH THE CHALLENGE part avec le Deck du jeu, s'il en a un. Le decor
+        // est un reglage d'affichage : il ne touche ni au coeur, ni au .MEM, ni aux verrous, ni a l'empreinte des options.
+        var deck = _deck?.Preparer(RetroBat.Api.Deck.DeckModes.Speedrun, reglement.SystemId, rom, reglement.RomGroup);
         var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
-            RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, reglement.SystemId, "libretro", coeur, rom, retroAchievements: false);
+            RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, reglement.SystemId, "libretro", coeur, rom, retroAchievements: false,
+            deck?.Arguments);
         if (arguments is null) return new(false, "bad_rules", "systeme ou coeur illisible");
 
         // LES VERROUS (D18) : dans certified.txt avant le lanceur, le wrapper les lit au chargement du jeu. Toujours poses,
@@ -900,6 +905,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private long _snapshotPublie = -1;
 
     private readonly FantomesDuSpeedrun? _fantomes;
+    private readonly RetroBat.Api.Deck.DeckLaunchService? _deck;
 
     private static readonly TimeSpan ArretDuReplayApresLArrivee = TimeSpan.FromSeconds(1.5);
     private static readonly TimeSpan AttenteDuFantome = TimeSpan.FromSeconds(3);

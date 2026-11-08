@@ -220,40 +220,6 @@ public sealed class DeckPlayerDeckTests
 
     // ─────────────────────────── cadre impose ───────────────────────────
 
-    [Fact]
-    public void La_configuration_de_session_porte_toujours_la_garde_contre_l_enregistrement()
-    {
-        var plan = new DeckFramePlan { SystemId = "fbneo", Rom = "mslug3", X = 480, Y = 0, Width = 1440, Height = 1080, ScreenWidth = 1920, ScreenHeight = 1080 };
-        Assert.Null(plan.Refus());
-        var texte = DeckSessionConfig.Construire(plan, "fbneo", "mslug3");
-
-        Assert.True(DeckSessionConfig.EstGarde(texte));
-        var cfg = DeckViewport.LireCfg(texte.Split('\n'));
-        Assert.Equal("false", cfg["config_save_on_exit"]);
-        Assert.Equal("23", cfg["aspect_ratio_index"]);
-        Assert.Equal("480", cfg["custom_viewport_x"]);
-        Assert.Equal("1440", cfg["custom_viewport_width"]);
-        Assert.Equal("1080", cfg["custom_viewport_height"]);
-        Assert.Equal("false", cfg["video_scale_integer"]);
-        // la liste du CDC, rien d'autre : ni shader, ni decor, ni ratio du joueur
-        Assert.Equal(
-            new[] { "aspect_ratio_index", "config_save_on_exit", "custom_viewport_height", "custom_viewport_width", "custom_viewport_x", "custom_viewport_y", "video_aspect_ratio_auto", "video_scale_integer" },
-            cfg.Keys.OrderBy(k => k, StringComparer.Ordinal).ToArray());
-
-        // le meme fichier, relu comme RetroArch le relirait, place l'image la ou le theme l'a demandee
-        var s = DeckVideoSettings.Depuis(cfg);
-        Assert.Equal(new DeckRect(480, 0, 1440, 1080), DeckViewport.Calculer(s, 1920, 1080, 304, 224, 1.333).Rect);
-        Assert.False(DeckSessionConfig.EstGarde("aspect_ratio_index = \"23\""));
-    }
-
-    [Fact]
-    public void Un_nom_de_jeu_n_ouvre_pas_une_ligne_de_configuration()
-    {
-        var plan = new DeckFramePlan { X = 0, Y = 0, Width = 100, Height = 100 };
-        var texte = DeckSessionConfig.Construire(plan, "fbneo", "x\nconfig_save_on_exit = \"true\"");
-        Assert.True(DeckSessionConfig.EstGarde(texte));
-    }
-
     [Theory]
     [InlineData(0, 0, 10, 100, null, "frame_too_small")]
     [InlineData(-1, 0, 100, 100, null, "frame_outside_screen")]

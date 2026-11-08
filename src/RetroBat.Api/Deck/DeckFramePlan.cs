@@ -7,7 +7,8 @@ namespace RetroBat.Api.Deck;
 
 /// <summary>
 /// LE CADRE QU'UN THEME DU DECK DEMANDE POUR LE JEU : ou l'image doit tomber dans la fenetre de RetroArch, en pixels
-/// physiques relatifs a sa zone cliente (en plein ecran, l'ecran du jeu ; CDC PlayerDeck B §10.3).
+/// physiques relatifs a sa zone cliente (en plein ecran, l'ecran du jeu ; CDC PlayerDeck B §10.3). Information seulement :
+/// le cadre s'impose par le trou du decor que l'API pose au lancement (H-D15, <see cref="DeckLaunchService"/>).
 /// <c>SystemId</c> et <c>Rom</c> vides valent « tout jeu » ; <c>ScreenWidth</c>/<c>ScreenHeight</c> disent la taille
 /// de zone cliente pour laquelle le cadre a ete calcule : sur un autre ecran, le cadre ne s'applique pas.
 /// </summary>
@@ -50,51 +51,6 @@ public sealed record DeckFramePlan
     /// <summary>Plus le cadre nomme precisement le jeu, plus il gagne : systeme et rom, puis rom, puis systeme, puis tout.</summary>
     [JsonIgnore]
     public int Precision => (string.IsNullOrWhiteSpace(Rom) ? 0 : 2) + (string.IsNullOrWhiteSpace(SystemId) ? 0 : 1);
-}
-
-/// <summary>
-/// LA CONFIGURATION DE SESSION QUI IMPOSE LE CADRE A RETROARCH (CDC PlayerDeck B §10.1). Un fichier a AJOUTER a la
-/// configuration de RetroArch pour un seul lancement (<c>--appendconfig</c>), jamais a recopier dans retroarch.cfg.
-///
-/// LA GARDE : la borne a <c>config_save_on_exit = "true"</c>, et RetroArch ecrit a la fermeture tout ce qu'il a en
-/// memoire, fichiers ajoutes compris : sans garde, le viewport du Deck se retrouverait dans retroarch.cfg et suivrait
-/// tous les jeux suivants. Le fichier porte donc TOUJOURS <c>config_save_on_exit = "false"</c>, en premiere ligne utile,
-/// et <see cref="Construire"/> est le seul endroit qui l'ecrit. Les cles sont la liste du CDC, rien d'autre : format
-/// personnalise, viewport, pas d'agrandissement entier. Ni shader, ni decor, ni ratio du joueur ne sont touches.
-/// </summary>
-public static class DeckSessionConfig
-{
-    public const string GardeEnregistrement = "config_save_on_exit";
-
-    /// <summary>Le texte du fichier ; pur. Le cadre doit etre recevable (<see cref="DeckFramePlan.Refus"/>).</summary>
-    public static string Construire(DeckFramePlan plan, string systemId, string rom)
-    {
-        static string L(string cle, string valeur) => cle + " = \"" + valeur + "\"";
-        static string N(int n) => n.ToString(CultureInfo.InvariantCulture);
-
-        var sb = new StringBuilder();
-        sb.AppendLine("# NelfePlay PlayerDeck : cadre de session pour " + Propre(systemId) + "/" + Propre(rom) + ".");
-        sb.AppendLine("# Ecrit par APIExpose pour UN lancement (--appendconfig). Ne pas recopier dans retroarch.cfg.");
-        sb.AppendLine(L(GardeEnregistrement, "false"));
-        sb.AppendLine(L("video_aspect_ratio_auto", "false"));
-        sb.AppendLine(L("aspect_ratio_index", N(DeckViewport.IndexCustom)));
-        sb.AppendLine(L("custom_viewport_x", N(plan.X)));
-        sb.AppendLine(L("custom_viewport_y", N(plan.Y)));
-        sb.AppendLine(L("custom_viewport_width", N(plan.Width)));
-        sb.AppendLine(L("custom_viewport_height", N(plan.Height)));
-        sb.AppendLine(L("video_scale_integer", "false"));
-        return sb.ToString();
-
-        // un nom de jeu n'ouvre pas une ligne de configuration
-        static string Propre(string valeur) => (valeur ?? string.Empty).Replace("\r", " ").Replace("\n", " ");
-    }
-
-    /// <summary>Vrai si le texte porte la garde contre l'enregistrement a la fermeture. Pur.</summary>
-    public static bool EstGarde(string texte)
-    {
-        var cfg = DeckViewport.LireCfg(texte.Split('\n'));
-        return cfg.TryGetValue(GardeEnregistrement, out var valeur) && string.Equals(valeur, "false", StringComparison.OrdinalIgnoreCase);
-    }
 }
 
 /// <summary>
