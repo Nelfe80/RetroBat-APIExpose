@@ -1,0 +1,69 @@
+-- .user 2026-10-20 (coop, pre-labo MAME sans fenetre a deux) : la fiche du joueur 2 est celle du joueur 1 decalee de
+-- 0x100 (score 0xFF8406 deja la). Vies 0xFF83EC : 2 a l'arrivee, 2 -> 1 -> 0 -> 0xFF a ses morts, a d'autres images que
+-- celles du joueur 1 (joueur 2 : 3900, 4200, 4800 ; joueur 1 : 3900, 4500, 5100). Bombes 0xFF8405 : 3 -> 2 a chaque bombe du
+-- joueur 2 seul (3302, 3902), remises a 3 a sa mort. Power-up 0xFF8437 : meme fiche, baisse pas vue.
+-- .user 2026-09-30 : ligne de score du joueur 2 (1CC MULTI, sonde MAME du 2026-09-30) ; le profil
+-- qui l'epingle exige APIExpose 1.9.14 (min_api_version).
+-- .user 2026-09-30 : ligne CREDITS verifiee sous MAME (sonde), a essayer au labo.
+-- mem-curator v5.0.0 (2026-07-12) profile=wrapper
+return {
+  game = {
+    title = "19XX: The War Against Destiny",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "19xx-the-war-against-destiny",
+    hashes = {
+      { hash = "33a48137bd598345260024f173986b35", label = "19xx.7z <19XX - the war against destiny (960104 Euro)>" },
+    }
+  },
+
+  events = {
+    resources = {
+      -- Le compteur de credits (charte de la partie certifiee : le credit fait foi). Verifie sous
+      -- MAME le 2026-09-30 : 0, 1, 2, 3 aux pieces, -1 au depart, +1 a une piece en partie, -1 a l'arrivee du joueur 2.
+      credits = {
+        { address=0XFF4D15, type="u8", condition="change", action="CREDITS", desc="Credits" },
+      },
+      lives = {
+        { address=0XFF82EC, type="u8", condition="decrease", action="LOSE_LIFE", player=1, desc="player1_die: lives" },
+        { address=0XFF82EC, type="u8", condition="increase", action="GAIN_LIFE", player=1, desc="player1 : vies remontees (continue ou nouvelle partie)" },
+        { address=0XFF8337, type="u8", condition="decrease", action="WEAPON_STATE", player=1, desc="player1 : power-up perdu" },
+        { address=0XFF83EC, type="u8", condition="decrease", action="LOSE_LIFE", player=2, desc="player2_die: lives" },
+        { address=0XFF83EC, type="u8", condition="increase", action="GAIN_LIFE", player=2, desc="player2 : vies remontees (continue ou nouvelle partie)" },
+        { address=0XFF8437, type="u8", condition="decrease", action="WEAPON_STATE", player=2, desc="player2 : power-up perdu" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XFF8306, type="u32be", condition="change", action="TREASURE", color="silver", min=10000, max=10000, desc="Score delta 10000-10000: Score 10000" },
+        { address=0XFF8306, type="u32be", condition="change", action="TREASURE", color="blue", min=5000, max=5000, desc="Score delta 5000-5000: Score 5000" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFF8306, type="u32be", condition="change", action="SCORE_STATE", score_kind="game", score_encoding="bcd", desc="Player 1 score" },
+        { address=0XFF8406, type="u32be", condition="change", action="SCORE_STATE", score_kind="game", score_encoding="bcd", player=2, desc="Player 2 score" },
+      },
+      collectibles = {
+        { address=0XFF4D15, type="u8", condition="change", action="MONEY_STATE", desc="coin: credits" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XFF8305, type="u8", condition="decrease", action="BOMB_FIRED", desc="bomb: bombs" },
+        { address=0XFF830F, type="u8", condition="decrease", action="BOMB_FIRED", desc="bomb: have max bomb power" },
+        { address=0XFF8405, type="u8", condition="decrease", action="BOMB_FIRED", player=2, desc="player2 bomb: bombs" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XFF8306, type="u32be", condition="change", action="OBJECT_DESTROYED", color="silver", min=100, max=100, desc="Score delta 100-100: Planes" },
+        { address=0XFF8306, type="u32be", condition="change", action="OBJECT_DESTROYED", color="white", min=2000, max=2000, desc="Score delta 2000-2000: Ships, big planes etc" },
+      },
+    },
+  },
+}

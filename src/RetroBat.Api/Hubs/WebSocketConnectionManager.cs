@@ -36,6 +36,71 @@ public class WebSocketConnectionManager
         _options = options;
     }
 
+    /// <summary>
+    /// L'instantane du PlayerDeck (<c>deck.snapshot</c>), pose au demarrage par le service du Deck. Envoye a la
+    /// connexion du flux global et de <c>/ws/deck</c>, et sur demande (<c>deck.snapshot.request</c>). L'argument dit
+    /// pourquoi il part (« connect », « request »).
+    /// </summary>
+    public Func<string, string?>? DeckSnapshotJson { get; set; }
+
+    /// <summary>Un message d'un client (connexion, type, corps) ; rend le JSON a lui repondre, ou null.</summary>
+    public Func<object, string, JsonElement, string?>? DeckCommand { get; set; }
+
+    /// <summary>Une connexion s'est fermee : ce qu'elle avait demande (un cadre) part avec elle.</summary>
+    public Action<object>? DeckConnectionClosed { get; set; }
+
+    /// <summary>Les flux qui recoivent l'instantane du Deck a la connexion.</summary>
+    private static bool RecoitLInstantaneDuDeck(string stream)
+        => stream.Length == 0 || string.Equals(stream, "deck", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// UN MESSAGE ENVOYE PAR UN CLIENT. Le flux etait a sens unique ; le PlayerDeck y demande son instantane
+    /// (<c>{"Type":"deck.snapshot.request"}</c>) et le cadre de son theme (<c>deck.frame.request</c>,
+    /// <c>deck.frame.clear</c>). Tout autre message est ignore, comme avant. La reponse ne part qu'a ce client.
+    /// </summary>
+    public async Task HandleClientMessageAsync(WebSocket socket, string text)
+    {
+        if (string.IsNullOrWhiteSpace(text) || text.Length > 65536) return;
+        string type;
+        JsonElement corps;
+        try
+        {
+            using var document = JsonDocument.Parse(text);
+            corps = document.RootElement.Clone();
+            if (corps.ValueKind != JsonValueKind.Object) return;
+            type = corps.TryGetProperty("Type", out var t) || corps.TryGetProperty("type", out t)
+                ? (t.GetString() ?? string.Empty).Trim()
+                : string.Empty;
+        }
+        catch (JsonException)
+        {
+            return;
+        }
+
+        if (!type.StartsWith("deck.", StringComparison.OrdinalIgnoreCase)) return;
+        if (corps.TryGetProperty("Payload", out var charge) || corps.TryGetProperty("payload", out charge))
+        {
+            corps = charge;
+        }
+
+        string? reponse = null;
+        try
+        {
+            reponse = string.Equals(type, "deck.snapshot.request", StringComparison.OrdinalIgnoreCase)
+                ? DeckSnapshotJson?.Invoke("request")
+                : DeckCommand?.Invoke(socket, type, corps);
+        }
+        catch (Exception)
+        {
+            // une commande qui echoue ne ferme pas la connexion
+        }
+
+        if (!string.IsNullOrWhiteSpace(reponse))
+        {
+            await TrySendJsonAsync(socket, reponse);
+        }
+    }
+
     public async Task AddSocketAsync(WebSocket socket)
     {
         await AddSocketAsync(socket, string.Empty);
@@ -50,6 +115,17 @@ public class WebSocketConnectionManager
         {
             _sockets.Add(new WebSocketSubscription(socket, normalizedStream));
             retainedMessages = GetRetainedMessagesForStream(normalizedStream);
+
+            // L'instantane du Deck se prend dans la meme section que l'abonnement : rien de ce qui suit ne lui echappe.
+            if (RecoitLInstantaneDuDeck(normalizedStream) && DeckSnapshotJson is { } instantane)
+            {
+                string? json = null;
+                try { json = instantane("connect"); } catch (Exception) { /* l'instantane manque, la connexion reste */ }
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    retainedMessages = new[] { json! }.Concat(retainedMessages).ToArray();
+                }
+            }
         }
         finally
         {
@@ -78,6 +154,8 @@ public class WebSocketConnectionManager
         {
             _lock.Release();
         }
+
+        try { DeckConnectionClosed?.Invoke(socket); } catch (Exception) { /* rien a rendre */ }
     }
 
     public async Task BroadcastAsync<T>(T message)
@@ -156,6 +234,11 @@ public class WebSocketConnectionManager
         finally
         {
             _lock.Release();
+        }
+
+        foreach (var socket in disconnected)
+        {
+            try { DeckConnectionClosed?.Invoke(socket); } catch (Exception) { /* rien a rendre */ }
         }
     }
 
@@ -656,7 +739,9 @@ public class WebSocketConnectionManager
             ["media"] = ["media."],
             ["roms"] = ["roms.", "rom-pack.", "romset."],
             ["system"] = ["startup.", "health.", "version.", "hub.", "config.", "maintenance.", "rules.", "notifications."],
-            ["control"] = ["commands.", "intent.", "es-control."]
+            ["control"] = ["commands.", "intent.", "es-control."],
+            // Le PlayerDeck : ses messages, plus ce qu'il affiche (score, signaux du .MEM, entrees, debut et fin de partie)
+            ["deck"] = ["deck.", "score.live.", "retroarch.memory.", "ingame.memory.", "panel.input.", "ui.game.started", "ui.game.ended"]
         };
 
     /// <summary>
@@ -670,7 +755,9 @@ public class WebSocketConnectionManager
             ["score"] = ["score.live.changed"],
             ["timer"] = ["timer.live.changed"],
             ["speedrun"] = ["speedrun.session"],
-            ["retroachievements"] = ["retroachievements.catalog.updated", "retroachievements.session.updated"]
+            ["retroachievements"] = ["retroachievements.catalog.updated", "retroachievements.session.updated"],
+            // construit a la connexion (aussi sur le flux global /ws), et sur demande
+            ["deck"] = ["deck.snapshot"]
         };
 
     /// <summary>Accepted aliases for stream names (see NormalizeStream).</summary>

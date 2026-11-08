@@ -470,12 +470,17 @@ public class CommandsController : ControllerBase
     /// Les arguments du lanceur pour un lancement direct, ou null si un nom n'en est pas un (<see cref="NomDeLanceur"/>).
     /// <paramref name="retroAchievements"/> a faux coupe RetroAchievements pour cette seance seulement : le lanceur ecrit
     /// <c>cheevos_enable = "false"</c> pour elle, et le reglage d'EmulationStation ne change pas (mesure pendant H0).
+    /// <paramref name="supplements"/> : des paires « -cle valeur » posees avant la ROM (le decor du PlayerDeck,
+    /// <see cref="Deck.DeckDecor.ArgumentsDuLanceur"/>) ; le lanceur lit ses arguments en dernier, apres es_settings.cfg.
+    /// Une valeur qui n'est pas un nom rend null, comme le reste.
     /// </summary>
     internal static string? ArgumentsDuLanceur(string manettes, string systeme, string emulateur, string? coeur, string romPath,
-        bool? retroAchievements)
+        bool? retroAchievements, IEnumerable<string>? supplements = null)
     {
         var avecCoeur = !string.IsNullOrEmpty(coeur);
         if (!NomDeLanceur(systeme) || !NomDeLanceur(emulateur) || (avecCoeur && !NomDeLanceur(coeur))) return null;
+        var ajouts = (supplements ?? []).ToList();
+        if (ajouts.Any(a => !(a.Length > 1 && a[0] == '-' && NomDeLanceur(a[1..])) && !NomDeLanceur(a))) return null;
         return string.Join(' ', new[]
         {
             manettes,
@@ -484,8 +489,10 @@ public class CommandsController : ControllerBase
             avecCoeur ? "-core" : string.Empty,
             avecCoeur ? coeur! : string.Empty,
             retroAchievements == false ? "-retroachievements 0" : string.Empty,
+        }.Concat(ajouts).Concat(new[]
+        {
             "-rom", '"' + romPath.Replace("\"", "") + '"',
-        }.Where(x => x.Length > 0));
+        }).Where(x => x.Length > 0));
     }
 }
 

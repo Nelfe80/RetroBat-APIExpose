@@ -53,6 +53,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     private readonly LeaderboardSocialClient _social;
     private readonly RetroBat.Api.Netplay.NetplayGuestService _invite;
     private readonly RetroBat.Api.Netplay.NetplayHostService _hote;
+    private readonly Deck.DeckLaunchService? _deck;
+    private readonly Multiplayer.SonDEmulationStation? _sonDEs;
     private readonly ChallengeHudService _defi;
     private readonly Replay.Storage.ReplayStore _replays;
     private readonly LeaderboardRankHistory _historique;
@@ -153,8 +155,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         Infrastructure.NelfePlayScoringCollectionSyncService? collection = null,
         Infrastructure.PartieNelfePlayService? partie = null,
         Multiplayer.MultiplayerPanelService? multiplayer = null,
-        Speedrun.DefisPanelService? defis = null)
+        Speedrun.DefisPanelService? defis = null,
+        Deck.DeckLaunchService? deck = null,
+        Multiplayer.SonDEmulationStation? sonDEs = null)
     {
+        _deck = deck;
+        _sonDEs = sonDEs;
         _collection = collection;
         _partie = partie;
         _multiplayer = multiplayer;
@@ -1608,6 +1614,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     await AttendreLeJeuPuisSEffacerAsync("defi en direct").ConfigureAwait(false);
                     return;
                 }
+                // LE PLAYERDECK (H-D15, H-D20) : un jeu dont le Deck est retenu part par l'API, avec son decor. L'API d'ES ne
+                // prend qu'un chemin de ROM, aucune option : seul un lancement direct porte « -bezel nelfeplay-deck -ratio custom ».
+                if (mode == ModeDuDefi.Prive && await LancerAvecLeDeckAsync(chemin).ConfigureAwait(false))
+                {
+                    await AttendreLeJeuPuisSEffacerAsync("defi avec le Deck").ConfigureAwait(false);
+                    return;
+                }
                 EmulatorForeground.FocusEmulationStation();
                 using var client = _httpFactory.CreateClient();
                 client.BaseAddress = new Uri("http://127.0.0.1:1234");
@@ -1632,6 +1645,56 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             }
         });
     }
+
+    /// <summary>
+    /// LE DEFI AVEC LE PLAYERDECK. Vrai si le jeu est parti, decor pose ; faux pour tout le reste (jeu sans Deck, Deck
+    /// retire par le joueur, decor impossible, lancement non resolu) : le defi part alors par ES, comme avant, et le Deck du
+    /// lancement (Off, ou dessine en entier dans sa fenetre) reste rattache a la partie.
+    ///
+    /// Le lancement direct refait ce qu'ES aurait fait (systeme, emulateur et coeur du jeu, ceux que World Scoring impose a
+    /// la fiche ; manettes calculees comme ES), sans le crochet de depart d'ES : les cles qui font refuser un score
+    /// (rembobinage, run-ahead, sauvegarde auto), qu'il reposait, partent donc en arguments, comme pour le MULTIPLAYER.
+    /// Le decor et le cadre sont des reglages d'affichage : ni l'empreinte des options du coeur, ni le .MEM, ni le coeur,
+    /// ni le contenu ne changent ; le prevol et le passeport sont les memes.
+    /// </summary>
+    private async Task<bool> LancerAvecLeDeckAsync(string chemin)
+    {
+        if (_deck is null) return false;
+        try
+        {
+            var resolution = await _hote.ResoudreLancementAsync(chemin).ConfigureAwait(false);
+            if (resolution is null) return false;
+            var deck = _deck.Preparer(Deck.DeckModes.WorldScoring, resolution.Systeme, chemin);
+            if (deck.Status != "posed" || deck.Arguments.Count == 0) return false;
+
+            var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
+                RetroBat.Api.Netplay.EsManettes.PourLancer(_logger).Arguments, resolution.Systeme, resolution.Emulateur,
+                resolution.Coeur.Length > 0 ? resolution.Coeur : null, chemin, retroAchievements: null,
+                deck.Arguments.Concat(FonctionsNeutraliseesDuDefi));
+            if (arguments is null) return false;
+
+            // ES ne sait pas qu'un jeu tourne : sa musique se tait jusqu'a la fin du jeu (SonDEmulationStation la rend ensuite)
+            _sonDEs?.Couper();
+            _partie?.AnnoncerLancement("defi");
+            if (Infrastructure.LancementDirect.Lancer(arguments, resolution.Systeme, chemin, _context, _bus, _logger) is null)
+            {
+                _sonDEs?.Rendre();
+                return false;
+            }
+
+            _logger.LogInformation("Classement : defi lance avec le Deck {Deck} ({Systeme}, {Emulateur}, {Coeur}).",
+                deck.DeckId, resolution.Systeme, resolution.Emulateur, resolution.Coeur);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Classement : defi avec le Deck non lance, il part par ES.");
+            return false;
+        }
+    }
+
+    /// <summary>Les fonctions du frontend qui feraient refuser le score, coupees pour ce lancement (meme liste que les reglages certifies).</summary>
+    internal static readonly IReadOnlyList<string> FonctionsNeutraliseesDuDefi = ["-rewind", "0", "-runahead", "0", "-autosave", "0"];
 
     /// <summary>
     /// Rejoindre la ligne choisie. Un DIRECT passe par le service d'invite deja eprouve depuis

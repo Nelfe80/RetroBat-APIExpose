@@ -6,10 +6,11 @@ namespace RetroBat.Api.Speedrun;
 /// <summary>
 /// Une ligne d'evenement du .MEM, telle que le wrapper la surveille. <paramref name="Type"/> : u8, u16le,
 /// u16be... ; <paramref name="Masque"/> : applique a la valeur lue (bit_true) ; <paramref name="Score"/> : une
-/// ligne de la section « scoring » (ou is_score=true), que l'auto-mute du wrapper ne coupe jamais.
+/// ligne de la section « scoring » (ou is_score=true), que l'auto-mute du wrapper ne coupe jamais ;
+/// <paramref name="Joueur"/> : le champ player de la ligne (null sans champ), que le wrapper publie en PLAYER:n.
 /// </summary>
 public sealed record LigneDuMem(long Adresse, string Condition, int? Valeur, string Action, bool Muette,
-    string Type = "u8", long? Masque = null, bool Score = false);
+    string Type = "u8", long? Masque = null, bool Score = false, int? Joueur = null);
 
 /// <summary>
 /// LES LIGNES DU .MEM QU'UN REGLEMENT PEUT CITER (CDC Speedruns v1.4, D7 et 3.2). Un defi ne lit que des
@@ -26,6 +27,7 @@ public sealed class LignesDuMem
     private static readonly Regex Muette = new(@"\bno_(log|survey)\s*=\s*true", RegexOptions.IgnoreCase);
     private static readonly Regex Type = new(@"\btype\s*=\s*[""'](u(?:8|16|32)(?:le|be)?)[""']", RegexOptions.IgnoreCase);
     private static readonly Regex Masque = new(@"\bmask\s*=\s*(0[xX][0-9A-Fa-f]+|\d+)");
+    private static readonly Regex Joueur = new(@"\bplayer\s*=\s*(\d+)");
     private static readonly Regex EstScore = new(@"\bis_score\s*=\s*true", RegexOptions.IgnoreCase);
     private static readonly Regex Section = new(@"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\{\s*$");
 
@@ -61,7 +63,8 @@ public sealed class LignesDuMem
                 Muette.IsMatch(ligne),
                 type.Success ? type.Groups[1].Value.ToLowerInvariant() : "u8",
                 masque.Success ? Hex.Lire(masque.Groups[1].Value) : null,
-                EstScore.IsMatch(ligne) || categorie == "scoring"));
+                EstScore.IsMatch(ligne) || categorie == "scoring",
+                Joueur.Match(ligne) is { Success: true } joueur ? int.Parse(joueur.Groups[1].Value, CultureInfo.InvariantCulture) : null));
         }
 
         return new LignesDuMem(lignes);

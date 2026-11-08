@@ -1076,6 +1076,28 @@ public sealed class MultiplayerLaunchService : IHostedService
     private sealed record Partie(Process Lanceur, Dictionary<string, Dictionary<string, string?>> ARendre, DateTime Debut, GameReference Jeu,
         string? DepartDuCoeur = null);
 
+    /// <summary>Le lancement avec le PlayerDeck (pose par Program.cs : pas de changement du constructeur).</summary>
+    public RetroBat.Api.Deck.DeckLaunchService? Deck { get; set; }
+
+    /// <summary>
+    /// LE DECK DANS UNE ROOM MULTIPLAYER (CDC PlayerDeck H-D17, H-D20) : si le jeu a un Deck retenu pour ce joueur en
+    /// MULTIPLAYER, son decor remplace les panneaux des joueurs ; rend son nom, ou null (les panneaux, comme avant). Un seul
+    /// ecran seulement : un jeu dont la place a sa vue (ecran partage, moniteurs cote a cote) garde son cadre a lui. Les
+    /// spectateurs du direct et des films ne le voient pas : ils recoivent l'image du jeu, sans decor.
+    /// </summary>
+    private string? PoserLeDeck(MultiplayerInstalledGame jeu, string systeme, int place, int joueurs)
+    {
+        if (Deck is null || jeu.Game.VueDeLaPlace(place, joueurs) is not null || MultiplayerLaunchPlan.ShaderDeLaPlace(jeu.Game, place, joueurs) is not null)
+        {
+            return null;
+        }
+
+        var deck = Deck.Preparer(RetroBat.Api.Deck.DeckModes.Multiplayer, systeme, jeu.Path);
+        if (deck.Status != "posed") return null;
+        _journal.LogInformation("MULTIPLAYER : le Deck {Deck} remplace les panneaux en jeu", deck.DeckId);
+        return RetroBat.Api.Deck.DeckDecor.Nom;
+    }
+
     /// <summary>
     /// Dessine les panneaux des joueurs (pseudo, personnage choisi, lettre et cote, ping) et les ecrit comme un decor de
     /// RetroBat ; rend le nom du decor a passer au lanceur, ou null (jeu non concerne, ecran sans bandes, echec). Jamais
@@ -1189,7 +1211,8 @@ public sealed class MultiplayerLaunchService : IHostedService
         _journal.LogInformation("MULTIPLAYER : manettes transmises au lanceur ({Source}) : {Manettes}", choix.Source, MultiplayerLaunchPlan.NomsDesManettes(manettes));
         var joueurs = Math.Max(2, lancement.Players);
         // Les panneaux en jeu (CDC Ecrans v1.0, lot E3) : un decor que RetroArch affiche lui-meme, dans les bandes.
-        var decor = PoserLesPanneaux(room, jeu, systeme, joueurs);
+        // LE PLAYERDECK (H-D17) : pour le joueur local, le Deck remplace les panneaux des joueurs (un seul decor).
+        var decor = PoserLeDeck(jeu, systeme, lancement.Seat, joueurs) ?? PoserLesPanneaux(room, jeu, systeme, joueurs);
         var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeu.Game, lancement.Seat, netplay, joueurs, decor);
         if (arguments is null)
         {

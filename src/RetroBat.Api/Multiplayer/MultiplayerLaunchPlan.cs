@@ -231,8 +231,9 @@ public static class MultiplayerLaunchPlan
         }
         else if (decor is not null && CommandsController.NomDeLanceur(decor))
         {
-            // Les panneaux en jeu : le lanceur affiche notre decor et cale le jeu dans son trou (CDC Ecrans v1.0, 3.6).
-            morceaux.AddRange(["-bezel", decor]);
+            // Les panneaux en jeu : le lanceur affiche notre decor et cale le jeu dans son trou (CDC Ecrans v1.0, 3.6). Le decor
+            // du PlayerDeck (H-D17) demande en plus « -ratio custom » : sans lui, fbneo et mame resteraient centres.
+            morceaux.AddRange(decor == RetroBat.Api.Deck.DeckDecor.Nom ? RetroBat.Api.Deck.DeckDecor.ArgumentsDuLanceur : ["-bezel", decor]);
         }
 
         morceaux.AddRange(netplay);
