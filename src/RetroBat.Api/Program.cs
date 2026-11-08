@@ -357,6 +357,9 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infra
 // Reglages certifies poses avant le chargement du jeu (option NelfePlay.ForceCertifiedSettings).
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.CertifiedSettingsService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.CertifiedSettingsService>());
+// L'etat du jeu pour le PlayerDeck (instantane, identite au lancement, boutons, cadre).
+builder.Services.AddSingleton<RetroBat.Api.Deck.DeckStateService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckStateService>());
 // Les fondations du reseau (CDC infra §15) : la carte signee (cles de verdict, relais) et les relais, par ou
 // passent les requetes de la borne quand elle ne joint pas le central.
 builder.Services.AddSingleton<RetroBat.Api.Reseau.ServiceDeCarte>();
@@ -753,6 +756,13 @@ RetroBat.Api.Infrastructure.OverlayUiGuard.Journal(
 
 // Setup internal event subscriber to broadcast via WebSockets
 var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
+// Le PlayerDeck : instantane a la connexion et sur demande, cadres demandes par ses themes.
+{
+    var deck = app.Services.GetRequiredService<RetroBat.Api.Deck.DeckStateService>();
+    wsManager.DeckSnapshotJson = deck.SnapshotJson;
+    wsManager.DeckCommand = deck.Commande;
+    wsManager.DeckConnectionClosed = deck.ConnexionFermee;
+}
 eventBus.Subscribe<EventEnvelope>(evt => 
 {
     _ = wsManager.BroadcastAsync(evt);
@@ -1091,13 +1101,43 @@ static async Task HandleWebSocketAsync(HttpContext context, string stream)
     await wsManager.AddSocketAsync(webSocket, stream);
 
     var buffer = new byte[1024 * 4];
-    var receiveResult = await webSocket.ReceiveAsync(
+    // Les messages du client (le PlayerDeck demande son instantane, ou le cadre de son theme) : un texte entier, borne a
+    // 64 Kio ; au-dela il est lu puis ignore. Les autres clients n'envoyaient rien et ne voient aucune difference.
+    var recu = new MemoryStream();
+    var tropLong = false;
+    WebSocketReceiveResult receiveResult;
+    try
+    {
+    receiveResult = await webSocket.ReceiveAsync(
         new ArraySegment<byte>(buffer), CancellationToken.None);
 
     while (!receiveResult.CloseStatus.HasValue)
     {
+        if (receiveResult.MessageType == WebSocketMessageType.Text && !tropLong)
+        {
+            if (recu.Length + receiveResult.Count <= 65536) recu.Write(buffer, 0, receiveResult.Count);
+            else tropLong = true;
+        }
+
+        if (receiveResult.EndOfMessage)
+        {
+            if (receiveResult.MessageType == WebSocketMessageType.Text && !tropLong && recu.Length > 0)
+            {
+                await wsManager.HandleClientMessageAsync(webSocket, System.Text.Encoding.UTF8.GetString(recu.GetBuffer(), 0, (int)recu.Length));
+            }
+            recu.SetLength(0);
+            tropLong = false;
+        }
+
         receiveResult = await webSocket.ReceiveAsync(
             new ArraySegment<byte>(buffer), CancellationToken.None);
+    }
+    }
+    catch
+    {
+        // connexion coupee sans fermeture : on la retire quand meme (un cadre demande par un Deck tombe part avec elle)
+        await wsManager.RemoveSocketAsync(webSocket);
+        throw;
     }
 
     await wsManager.RemoveSocketAsync(webSocket);

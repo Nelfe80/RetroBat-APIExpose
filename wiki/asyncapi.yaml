@@ -1,7 +1,7 @@
 asyncapi: 3.0.0
 info:
   title: APIExpose Real-time Events
-  version: 1.3.3
+  version: 1.4.0
   description: |
     WebSocket event surface of the APIExpose plugin for RetroBat / EmulationStation.
     Local only (127.0.0.1). Connect to `/ws` for the unfiltered firehose or to
@@ -23,10 +23,16 @@ servers:
 channels:
   firehose:
     address: /ws
-    description: Every event except esevent.* (raw EmulationStation hook traffic).
+    description: >
+      Every event except esevent.* (raw EmulationStation hook traffic). On connect,
+      the firehose sends one `deck.snapshot` first (see /ws/deck), so a PlayerDeck
+      reading the firehose knows the current game state without waiting for changes.
+      The firehose also accepts the client messages documented on /ws/deck.
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
+      deckSnapshot:
+        $ref: '#/components/messages/deckSnapshot'
   frontend:
     address: /ws/frontend
     description: >
@@ -215,6 +221,68 @@ channels:
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
+  deck:
+    address: /ws/deck
+    description: >
+      The PlayerDeck feed. Prefixes `deck.`, `score.live.`, `retroarch.memory.`,
+      `ingame.memory.`, `panel.input.`, `ui.game.started`, `ui.game.ended` - what
+      the Deck displays, without the rest of the firehose.
+
+
+      `deck.snapshot` (sent on connect, here and on /ws, and on request): the whole
+      state at revision N - `Game` (as deck.game), `Scores` (last score.live per
+      player), `Signals` (last value of every .MEM signal seen this game, one entry
+      per channel/name/address/player), `HeldInputs` (panel inputs currently held),
+      `Controls` (as deck.controls), `Frame` (as deck.frame), `FramePlans`.
+      Events that follow carry a higher `Revision`.
+
+
+      `deck.game`: the launched game, from the game-start hook on, before any .MEM
+      signal. `State` = launching | running | ended. `SystemId`, `CanonicalSystem`,
+      `Rom`, `RomGroup` (+ `RomGroupSource`: catalog | file), `Name`, `Core`,
+      `Video` once RetroArch logged the core geometry (`BaseWidth`/`BaseHeight` =
+      unrotated buffer, `Rotation` in quarter turns, `Width`/`Height` = displayed
+      image, `Aspect` given by the core, `Fps`, `Orientation`), `Orientation`.
+
+
+      `deck.controls`: what each panel button really does in the launched game.
+      Per player, per RetroPad identity read by the API (`Identity`, the same as
+      panel.input.*): `RetroPad` sent to the core after the remap RetroArch really
+      loaded, `Remapped`, `Disabled`, `GameButton`, `Function`, `Descriptor` (core
+      probe), `Color`. `Remap.Source` = retroarch.log (file read) | none (RetroArch
+      loaded no remap) | core-default (unknown, `Assumed` true). `Functions.Source` =
+      dynpanel.probe | none (no function is guessed).
+
+
+      `deck.frame`: where RetroArch draws the game. `Window` = measured client area
+      (physical screen pixels), `Viewport` = image rectangle on screen,
+      `ViewportInWindow` = same, relative to the client area, computed from the
+      settings RetroArch read (retroarch.cfg + appended files); `Mode`, `Aspect`,
+      `PixelScale` (screen pixels per game pixel), `Plan` (requested frame and
+      `Status` applied | not-applied with `Reason`). Published on change only.
+
+
+      Client messages (JSON text, envelope `Type` [+ `Payload`]):
+      `deck.snapshot.request` -> deck.snapshot to this client only;
+      `deck.frame.request` (`Frame`: `SystemId`, `Rom` (empty = any game), `X`, `Y`,
+      `Width`, `Height` in physical pixels of the RetroArch client area,
+      `ScreenWidth`, `ScreenHeight`, `Theme`) -> `deck.ack`; the frame lives as long
+      as the connection; `deck.frame.clear` (`SystemId`, `Rom`) -> `deck.ack`.
+      REST twin: GET /api/v1/deck/snapshot, GET|PUT|DELETE /api/v1/deck/frame-plan
+      (writes need the local token), GET /api/v1/deck/frame-plan/session.
+    messages:
+      deckSnapshot:
+        $ref: '#/components/messages/deckSnapshot'
+      deckGame:
+        $ref: '#/components/messages/deckGame'
+      deckControls:
+        $ref: '#/components/messages/deckControls'
+      deckFrame:
+        $ref: '#/components/messages/deckFrame'
+      deckAck:
+        $ref: '#/components/messages/deckAck'
+      deckClientRequest:
+        $ref: '#/components/messages/deckClientRequest'
 
 components:
   messages:
@@ -245,6 +313,116 @@ components:
               SystemId: mame
               Rom: flagrall
               Scope: game
+    deckSnapshot:
+      name: DeckSnapshot
+      title: deck.snapshot (on connect to /ws and /ws/deck, and on request)
+      payload:
+        $ref: '#/components/schemas/Envelope'
+      examples:
+        - name: 19xx-in-game
+          payload:
+            Type: deck.snapshot
+            Ts: '2026-11-08T16:06:30.0000000Z'
+            Payload:
+              Schema: nelfeplay.deck.snapshot/1
+              Revision: 412
+              Reason: connect
+              Game: { LaunchId: 5d1c, State: running, SystemId: fbneo, CanonicalSystem: arcade, Rom: 19xx, RomGroup: 19xx, Name: '19XX: The War Against Destiny', Core: fbneo }
+              Scores: [ { Player: 1, Score: 123450, ScoreKind: game, Source: retroarch.wrapper } ]
+              Signals: [ { Key: ACTION.LOSE_LIFE, Channel: ACTION, Name: LOSE_LIFE, Address: '0xFF82EC', Value: 2, Player: 1, Frame: 5400 } ]
+              HeldInputs: [ { Player: 1, Identity: b, Slot: 1, Device: 0 } ]
+              FramePlans: []
+    deckGame:
+      name: DeckGame
+      title: deck.game
+      payload:
+        $ref: '#/components/schemas/Envelope'
+      examples:
+        - name: 19xx-running
+          payload:
+            Type: deck.game
+            Ts: '2026-11-08T16:05:24.0000000Z'
+            Payload:
+              LaunchId: 5d1c
+              State: running
+              SystemId: fbneo
+              CanonicalSystem: arcade
+              Rom: 19xx
+              RomGroup: 19xx
+              RomGroupSource: catalog
+              Name: '19XX: The War Against Destiny'
+              Core: fbneo
+              Video: { BaseWidth: 384, BaseHeight: 224, Rotation: 1, RotationDegrees: 90, Width: 224, Height: 384, Aspect: 0.75, Fps: 59.63, Orientation: vertical, Source: retroarch.log, Crc32: a3ddb605 }
+              Orientation: vertical
+              OrientationSource: core
+    deckControls:
+      name: DeckControls
+      title: deck.controls
+      payload:
+        $ref: '#/components/schemas/Envelope'
+      examples:
+        - name: 19xx
+          payload:
+            Type: deck.controls
+            Payload:
+              SystemId: fbneo
+              Rom: 19xx
+              Core: fbneo
+              CoreLibrary: FinalBurn Neo
+              Remap: { Source: retroarch.log, Scope: game, Path: 'E:/RetroBat/emulators/retroarch/config/remaps/FinalBurn Neo/19xx.rmp', Assumed: false }
+              Functions: { Source: dynpanel.probe, File: 19xx.json }
+              Players:
+                - Player: 1
+                  Buttons:
+                    - { Identity: b, RetroPad: b, Remapped: false, Disabled: false, GameButton: '1', Function: Shoot, Descriptor: Shot, Color: Red }
+                    - { Identity: a, RetroPad: a, Remapped: false, Disabled: false, GameButton: '2', Function: Bomb, Descriptor: Bomb, Color: Blue }
+                    - { Identity: x, RetroPad: r3, Remapped: true, Disabled: true }
+    deckFrame:
+      name: DeckFrame
+      title: deck.frame
+      payload:
+        $ref: '#/components/schemas/Envelope'
+      examples:
+        - name: 19xx-cabinet-1920x1200
+          payload:
+            Type: deck.frame
+            Payload:
+              SystemId: fbneo
+              Rom: 19xx
+              Window: { X: 0, Y: 0, Width: 1920, Height: 1200 }
+              Viewport: { X: 510, Y: 0, Width: 900, Height: 1200 }
+              ViewportInWindow: { X: 510, Y: 0, Width: 900, Height: 1200 }
+              Mode: core
+              AspectRatioIndex: 22
+              Aspect: 0.75
+              ScaleInteger: false
+              Approximate: false
+              PixelScale: { X: 4.0179, Y: 3.125 }
+              Source: window+config
+    deckAck:
+      name: DeckAck
+      title: deck.ack (reply to a client message, to that client only)
+      payload:
+        $ref: '#/components/schemas/Envelope'
+      examples:
+        - name: frame-accepted
+          payload:
+            Type: deck.ack
+            Payload: { Request: deck.frame.request, Accepted: true, Reason: null }
+    deckClientRequest:
+      name: DeckClientRequest
+      title: Client to server - deck.snapshot.request, deck.frame.request, deck.frame.clear
+      payload:
+        type: object
+        properties:
+          Type: { type: string, enum: [deck.snapshot.request, deck.frame.request, deck.frame.clear] }
+          Payload: { type: object }
+      examples:
+        - name: frame-request
+          payload:
+            Type: deck.frame.request
+            Payload:
+              Frame: { SystemId: fbneo, Rom: mslug3, X: 480, Y: 0, Width: 1440, Height: 1080, ScreenWidth: 1920, ScreenHeight: 1080, Theme: metal-slug-3 }
   schemas:
     Envelope:
       type: object
