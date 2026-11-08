@@ -480,8 +480,8 @@ components:
                 Name: nelfeplay-deck
                 Version: 1
                 Screen: { Width: 1920, Height: 1200 }
-                Hole: { X: 476, Y: 58, Width: 1444, Height: 1083 }
-                LauncherViewport: { X: 476, Y: 58, Width: 1444, Height: 1083 }
+                Hole: { X: 320, Y: 0, Width: 1600, Height: 1200 }
+                LauncherViewport: { X: 320, Y: 0, Width: 1600, Height: 1200 }
                 Png: 'E:\RetroBat\plugins\APIExpose\state\deck\decors\metal-slug-3-pixel-0123456789abcdef.png'
                 Cached: false
                 RenderMs: 160

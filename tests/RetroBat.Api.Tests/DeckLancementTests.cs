@@ -33,7 +33,7 @@ public sealed class DeckLancementTests : IDisposable
         // jeu, ecran, trou, taille native du jeu (tournee)
         { "19xx", 1920, 1200, 510, 0, 900, 1200, 224, 384 },
         { "19xx", 1920, 1080, 555, 0, 810, 1080, 224, 384 },
-        { "mslug3", 1920, 1200, 476, 58, 1444, 1083, 304, 224 },
+        { "mslug3", 1920, 1200, 320, 0, 1600, 1200, 304, 224 },   // pleine hauteur depuis le 08/11 (plus de bandes noires)
         { "mslug3", 1920, 1080, 480, 0, 1440, 1080, 304, 224 },
     };
 
