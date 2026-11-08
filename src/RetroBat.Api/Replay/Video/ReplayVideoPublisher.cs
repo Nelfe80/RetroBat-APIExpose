@@ -65,10 +65,12 @@ public sealed class ReplayVideoPublisher
     /// reprendra.
     /// </summary>
     /// <summary>
-    /// UN FILM DE RECORD DURE AU MOINS 10 SECONDES (demande du user du 07/11 : en dessous, il n'a d'interet ni pour le site
-    /// ni pour YouTube). Plus court, la sequence ne se rend pas : le site l'apprend (« trop_court ») et ne la repropose pas.
+    /// UN FILM DE RECORD DURE AU MOINS 20 SECONDES (demande du user du 07/11, 10 s, porte a 20 s le 08/11 : « un record a
+    /// besoin d'un minimum de duree »). Plus court, la sequence ne se rend pas : le site l'apprend (« trop_court ») et ne la
+    /// repropose pas. EXCEPTION (08/11) : le film d'une epreuve, du depart a l'arrivee de son run, part quelle que soit sa
+    /// duree (SMB 1-4 en 15,59 s) ; le site refuse celui qui est plus court que son run.
     /// </summary>
-    internal const double DureeMinimaleS = 10;
+    internal const double DureeMinimaleS = 20;
 
     /// <summary>La sequence [debut, fin] (frames, a <paramref name="fps"/>) dure moins de <see cref="DureeMinimaleS"/>. Pur.</summary>
     internal static bool TropCourt(long debut, long fin, double fps) => (fin - debut) / (fps > 1 ? fps : 60) < DureeMinimaleS;
@@ -127,7 +129,7 @@ public sealed class ReplayVideoPublisher
             var (debut, fin) = cible.Epreuve
                 ? SequenceDEpreuveDuReplay(cible.Debut, cible.Fin, manifest.Frames.ReplayEnd, manifest.Frames.NominalFps)
                 : SequenceDuReplay(cible.Debut, cible.Fin, manifest.Frames.ReplayEnd, manifest.Frames.NominalFps);
-            if (TropCourt(debut, fin, manifest.Frames.NominalFps))
+            if (!cible.Epreuve && TropCourt(debut, fin, manifest.Frames.NominalFps))
             {
                 details.Add(cible.ReplayId + " : moins de " + DureeMinimaleS + " s, pas de film");
                 await SignalerEchecAsync(credential, cible.ReplayId, "trop_court", ct).ConfigureAwait(false);

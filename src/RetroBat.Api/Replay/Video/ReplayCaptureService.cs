@@ -950,9 +950,10 @@ public sealed class ReplayCaptureService : BackgroundService
                         var (debutS, finS) = SequenceDuRecord(courante.Courbe, finDuRunS);
                         courante = courante with { DebutSequenceS = debutS, FinSequenceS = finS };
                     }
-                    // Moins de 10 s (07/11) : ni sur le site ni sur YouTube ; la capture s'oublie, rien ne part.
+                    // Moins de 20 s (07/11, 20 s depuis le 08/11) : ni sur le site ni sur YouTube ; la capture s'oublie, rien ne
+                    // part. Sauf une epreuve, coupee du depart a l'arrivee de son run : elle part quelle que soit sa duree.
                     var dureeDuFilmS = courante.DebutSequenceS is double ds && courante.FinSequenceS is double fs ? fs - ds : courante.DureeS;
-                    if (dureeDuFilmS is double duree && duree < ReplayVideoPublisher.DureeMinimaleS)
+                    if (!voulue.Epreuve && dureeDuFilmS is double duree && duree < ReplayVideoPublisher.DureeMinimaleS)
                     {
                         Oublier(courante, fiche, "moins de " + ReplayVideoPublisher.DureeMinimaleS + " s (" + duree.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) + " s)");
                         continue;
