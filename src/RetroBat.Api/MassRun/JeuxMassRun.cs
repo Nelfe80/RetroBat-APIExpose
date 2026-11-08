@@ -117,23 +117,27 @@ public static class JeuxMassRun
     }
 
     /// <summary>
-    /// Le crc32 du contenu tel que le coeur le calcule : le fichier lui-meme, ou l'unique jeu d'une archive .zip (le crc de
-    /// son entree). Null si illisible ou si l'archive en porte plusieurs.
+    /// Le crc32 du contenu tel que le coeur le calcule : le fichier lui-meme, ou l'unique jeu d'une archive .zip ou .7z (le crc
+    /// que l'archive declare pour son entree, sinon celui de son contenu). Null si illisible, au-dela de 64 Mo ou si l'archive
+    /// en porte plusieurs. Le coeur hote des fantomes reconnait son jeu a ce crc, EN-TETE COMPRIS.
     /// </summary>
     public static uint? ContenuDe(string chemin)
     {
         try
         {
-            if (!File.Exists(chemin)) return null;
-            if (chemin.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+            using var contenu = RetroBat.Api.Infrastructure.ContenuDUneRom.Ouvrir(chemin, 64L * 1024 * 1024);
+            if (contenu is null) return null;
+            if (contenu.Crc32 is { } declare) return declare;
+            var c = 0xFFFFFFFFu;
+            var tampon = new byte[64 * 1024];
+            int lu;
+            while ((lu = contenu.Flux.Read(tampon, 0, tampon.Length)) > 0)
             {
-                using var zip = System.IO.Compression.ZipFile.OpenRead(chemin);
-                var entrees = zip.Entries.Where(e => e.Length > 0).ToList();
-                return entrees.Count == 1 ? entrees[0].Crc32 : null;
+                foreach (var o in tampon.AsSpan(0, lu)) c = TableCrc[(c ^ o) & 0xFF] ^ (c >> 8);
             }
-            return Crc32(File.ReadAllBytes(chemin));
+            return c ^ 0xFFFFFFFFu;
         }
-        catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException)
+        catch (Exception e) when (RetroBat.Api.Infrastructure.ContenuDUneRom.EstUneLectureRatee(e))
         {
             return null;
         }

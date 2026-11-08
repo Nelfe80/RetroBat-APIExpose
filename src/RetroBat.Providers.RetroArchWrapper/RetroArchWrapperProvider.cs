@@ -716,6 +716,9 @@ public class RetroArchWrapperProvider : IProvider
                     // Le SET lance (« ddragon », « doubledr ») : pour l'arcade, c'est lui qui dit
                     // quel jeu tourne. Le nom du groupe ne le dit pas, deux jeux peuvent le partager.
                     ContentSet = SetDuJeuEnCours(),
+                    // Le fichier lance (08/11) : l'API en tire l'empreinte sans en-tete du contenu, a la RetroAchievements,
+                    // et ne la joint au passeport que si son md5 est celui que le wrapper a mesure.
+                    ContentPath = CheminDuJeuEnCours(),
                     WrapperVersion = Get("wrapper_version"),
                     // Ce que le coeur declare de lui-meme : sans ce couple, la plateforme voit
                     // une empreinte opaque et ne peut que refuser un binaire qu'elle ne connait
@@ -776,6 +779,14 @@ public class RetroArchWrapperProvider : IProvider
         {
             _logger?.LogDebug(ex, "Scoring : session JSON illisible : {Json}", json);
         }
+    }
+
+    private string? CheminDuJeuEnCours()
+    {
+        var chemin = (_context.Ui.Running ?? _context.Ui.Selected)?.GamePath;
+        if (string.IsNullOrWhiteSpace(chemin)) return null;
+        try { return Path.GetFullPath(chemin); }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException) { return null; }
     }
 
     private string SetDuJeuEnCours()

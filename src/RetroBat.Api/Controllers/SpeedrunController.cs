@@ -49,6 +49,23 @@ public sealed class SpeedrunController : ControllerBase
         rate = r.Cadence,
     }));
 
+    /// <summary>
+    /// Les jeux a coeur hote des fantomes (08/11) : systeme, jeu, coeur d'origine, coeur hote, crc32 du contenu que le coeur hote
+    /// reconnait (en-tete compris), fantomes sur etat seulement, nom du dump. L'outil de diagnostic les lit ici plutot que d'en
+    /// garder une copie. Lecture seule, sans jeton : rien que la borne ne publie deja.
+    /// </summary>
+    [HttpGet("ghost-hosts")]
+    public IActionResult CoeursHotes() => Ok(FantomesDuSpeedrun.Liste.Select(h => new
+    {
+        systemId = h.Systeme,
+        romGroup = h.Groupe,
+        originCore = h.Origine,
+        core = h.Coeur,
+        crc32 = h.Crc,
+        stateOnly = h.SurEtatSeulement,
+        dump = h.Dump,
+    }));
+
     /// <summary>Le snapshot de la session en cours (§11 bis.5) ; 404 sans session.</summary>
     [HttpGet("session")]
     public IActionResult Session() => _session.Instantane() is { } s ? Ok(s) : NotFound(new { active = false });

@@ -66,6 +66,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     private string? _enrolledKeyId;
     private string? _listenerSha256, _coreSha256, _memSha256, _contentSha256, _contentMd5, _contentSha1, _contentSet, _wrapperVersion;
+    /// <summary>
+    /// L'empreinte sans en-tete du dernier contenu mesure (08/11), avec le md5 du wrapper qu'elle accompagne : elle ne se joint
+    /// qu'au passeport de CE contenu, et un brouillon assemble plus tard la retrouve par ce md5. Jamais remise a zero : un autre
+    /// contenu a un autre md5.
+    /// </summary>
+    private (string Md5, string SansEnTete)? _sansEnTeteDuContenu;
     // Ce que le coeur declare de lui-meme : « FinalBurn Neo », « 0.289 (eb342748) ». Indice,
     // jamais preuve - c'est l'empreinte qui tranche. Il dit QUELLE source verifier.
     private string? _coreName, _coreVersion;
@@ -965,12 +971,41 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return o;
     }
 
-    private static JsonObject ContentArtifact(string? sha, string? md5, string? sha1)
+    internal static JsonObject ContentArtifact(string? sha, string? md5, string? sha1, string? sansEnTete = null)
     {
         var o = Triple(sha);
         if (md5 is not null) o["md5"] = md5;     // Voie A : md5 No-Intro de la ROM (consoles)
         if (sha1 is not null) o["sha1"] = sha1;  // MAME : sha1 du set (gamelist), MAME vérifiant le romset
+        // Le md5 sans en-tete, a la RetroAchievements (08/11) : le meme jeu sous un autre en-tete (iNES, NES 2.0, copieur).
+        // Absent hors console a regle ; le site l'accepte en plus du md5, jamais a sa place.
+        if (sansEnTete is not null) o["rhash_md5"] = sansEnTete;
         return o;
+    }
+
+    /// <summary>
+    /// L'EMPREINTE SANS EN-TETE DU CONTENU LANCE (08/11), calculee par l'API sur le fichier lance, ou null. Elle ne vaut que si
+    /// le md5 que l'API mesure sur ce fichier est celui que le wrapper a mesure sur ce qu'il a charge : sans cette egalite, rien
+    /// ne dit que c'est le meme contenu. Jamais pour l'arcade, ni pour une console sans regle (Mega Drive, Game Boy...).
+    /// </summary>
+    internal static string? SansEnTeteMesure(string? chemin, string? systemId, string? md5DuWrapper)
+    {
+        if (string.IsNullOrWhiteSpace(chemin) || string.IsNullOrWhiteSpace(md5DuWrapper)) return null;
+        if (string.Equals(RomCanonicalResolver.CanonicalScoringSystem(systemId ?? ""), "arcade", StringComparison.Ordinal)) return null;
+        var regle = EmpreinteSansEnTete.RegleDu(systemId);
+        if (regle == RegleSansEnTete.Aucune) return null;
+        var (md5, sansEnTete) = NelfePlayScoringCollectionSyncService.EmpreintesDuContenu(chemin, regle, EmpreinteSansEnTete.FenetreMaximale);
+        return md5 is not null && string.Equals(md5, md5DuWrapper.Trim(), StringComparison.OrdinalIgnoreCase) ? sansEnTete : null;
+    }
+
+    /// <summary>L'empreinte sans en-tete du contenu de ce md5, s'il est celui de la derniere mesure ; null sinon.</summary>
+    private string? SansEnTetePour(string? md5)
+    {
+        lock (_sync)
+        {
+            return md5 is not null && _sansEnTeteDuContenu is { } connu && string.Equals(connu.Md5, md5, StringComparison.OrdinalIgnoreCase)
+                ? connu.SansEnTete
+                : null;
+        }
     }
 
     /// <summary>Le plus long qu'on attende le proces-verbal d'un coeur jamais vu avant d'annoncer.</summary>
@@ -1048,8 +1083,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     private void CaptureAttestation(JsonElement root)
     {
+        // Hors verrou : une lecture de fichier (en cache tant qu'il ne change pas ; aucune pour un systeme sans regle).
+        string? md5DuWrapper = GetString(root, "ContentMd5");
+        string? sansEnTete = null;
+        try { sansEnTete = SansEnTeteMesure(GetString(root, "ContentPath"), GetString(root, "SystemId"), md5DuWrapper); }
+        catch (Exception ex) when (ContenuDUneRom.EstUneLectureRatee(ex)) { }
         lock (_sync)
         {
+            if (sansEnTete is not null && md5DuWrapper is not null) _sansEnTeteDuContenu = (md5DuWrapper.Trim(), sansEnTete);
             _listenerSha256 = GetString(root, "ListenerSha256");
             _coreSha256 = GetString(root, "CoreSha256");
             _memSha256 = GetString(root, "MemSha256");
@@ -1084,7 +1125,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             var systemId = GetString(attestation, "SystemId") ?? "";
             var romGroup = GroupeDeLaPartie(systemId, GetString(attestation, "Rom") ?? "",
-                GetString(attestation, "ContentMd5"), GetString(attestation, "ContentSha256"));
+                GetString(attestation, "ContentMd5"), GetString(attestation, "ContentSha256"),
+                sansEnTete: SansEnTetePour(GetString(attestation, "ContentMd5")));
             if (systemId.Length == 0 || romGroup.Length == 0 || _esNotify is null) return;
             if (SurLeCoeurDesFantomes())
             {
@@ -1159,7 +1201,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 {
                     ["core"] = CoreArtifact(GetString(attestation, "CoreSha256"),
                         GetString(attestation, "CoreName"), GetString(attestation, "CoreVersion")),
-                    ["content"] = ContentArtifact(GetString(attestation, "ContentSha256"), GetString(attestation, "ContentMd5"), contentSha1),
+                    ["content"] = ContentArtifact(GetString(attestation, "ContentSha256"), GetString(attestation, "ContentMd5"), contentSha1,
+                        SansEnTetePour(GetString(attestation, "ContentMd5"))),
                     ["mem"] = Triple(GetString(attestation, "MemSha256")),
                     ["core_options_digest"] = digest,
                     ["bios"] = _bios?.PourLePasseport(profile.Value) ?? new JsonObject { ["mode"] = "none" },
@@ -1703,8 +1746,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// nom du fichier, que le wrapper reduit en slug, ne fait pas l'identite. Sinon (arcade, contenu inconnu), celui du
     /// wrapper. Voir NelfePlayScoringCollectionSyncService.GroupeOuvertDuContenu.
     /// </summary>
-    internal static string GroupeDeLaPartie(string systemId, string romGroupDuWrapper, string? md5, string? sha256, string? stateRoot = null)
-        => NelfePlayScoringCollectionSyncService.GroupeOuvertDuContenu(systemId, md5, sha256, stateRoot) ?? romGroupDuWrapper;
+    internal static string GroupeDeLaPartie(string systemId, string romGroupDuWrapper, string? md5, string? sha256, string? stateRoot = null,
+        string? sansEnTete = null)
+        => NelfePlayScoringCollectionSyncService.GroupeOuvertDuContenu(systemId, md5, sha256, stateRoot, sansEnTete) ?? romGroupDuWrapper;
 
     internal static bool BootlegHorsDefinition(string? systemId, string? romGroup, string? contentSet,
         ContentHashes? empreintes = null, Func<string?, string?, bool>? bootlegOuHack = null)
@@ -2983,7 +3027,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var romDuFichier = GetString(payload, "Rom") ?? "";
         string? md5DuContenu, sha256DuContenu;
         lock (_sync) { md5DuContenu = _contentMd5; sha256DuContenu = _contentSha256; }
-        var romGroup = GroupeDeLaPartie(systemId, romDuFichier, md5DuContenu, sha256DuContenu);
+        var romGroup = GroupeDeLaPartie(systemId, romDuFichier, md5DuContenu, sha256DuContenu, sansEnTete: SansEnTetePour(md5DuContenu));
         var sessionJson = GetString(payload, "Session");
         Trace($"session reçue sys={systemId} rom={romGroup} sessionLen={sessionJson?.Length ?? -1}"
               + (string.Equals(romGroup, romDuFichier, StringComparison.Ordinal) ? "" : $" (fichier {romDuFichier} : groupe trouve par le contenu)"));
@@ -3925,7 +3969,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         string? sessionId = null, DateTime? finUtc = null,
         (NelfePlayScoringSessionService.SessionPlayer? Joueur, bool Fige)? joueurFige = null,
         bool? labo = null, string? versionApi = null, string? etatWrapper = null, long? arretDuReplay = null,
-        JsonObject? clear = null, JsonObject? depart = null, bool tricheDuJeu = false)
+        JsonObject? clear = null, JsonObject? depart = null, bool tricheDuJeu = false, string? contentSansEnTete = null)
     {
         var session = JsonNode.Parse(sessionJson)!.AsObject();
         long frameCount = (long?)session["frame_count"] ?? 0;
@@ -4117,7 +4161,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             },
             ["artifacts"] = new JsonObject
             {
-                ["core"] = CoreArtifact(coreSha, coreName, coreVersion), ["content"] = ContentArtifact(contentSha, contentMd5, contentSha1), ["mem"] = Triple(memSha),
+                ["core"] = CoreArtifact(coreSha, coreName, coreVersion), ["content"] = ContentArtifact(contentSha, contentMd5, contentSha1, contentSansEnTete), ["mem"] = Triple(memSha),
                 ["core_options_digest"] = coreOptionsDigest,
                 ["bios"] = bios ?? new JsonObject { ["mode"] = "none" },
                 ["forced_options"] = forcedOptions,
@@ -5093,7 +5137,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             ["listener"] = listenerSha,
             ["coeur"] = coreSha,
             ["mem"] = memSha,
-            ["contenu"] = new JsonObject { ["sha256"] = contentSha, ["md5"] = contentMd5, ["sha1"] = contentSha1 },
+            ["contenu"] = new JsonObject { ["sha256"] = contentSha, ["md5"] = contentMd5, ["sha1"] = contentSha1, ["rhash_md5"] = SansEnTetePour(contentMd5) },
             ["wrapper"] = wrapperVersion,
             ["coeur_nom"] = coreName,
             ["coeur_version"] = coreVersion,
@@ -5372,7 +5416,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 sessionId: id, finUtc: fin, joueurFige: (joueur, true), labo: (bool?)brouillon["labo"] == true,
                 versionApi: (string?)brouillon["apiexpose"], etatWrapper: (string?)brouillon["etat_wrapper"],
                 arretDuReplay: (long?)brouillon["arret_du_replay"], clear: brouillon["clear"] as JsonObject,
-                depart: brouillon["depart"] as JsonObject, tricheDuJeu: (bool?)brouillon["triche_du_jeu"] == true);
+                depart: brouillon["depart"] as JsonObject, tricheDuJeu: (bool?)brouillon["triche_du_jeu"] == true,
+                contentSansEnTete: (string?)contenu?["rhash_md5"]);
             if (defi is not null) RetroBat.Api.Speedrun.PasseportDeDefi.Appliquer(passport, defi, entreeDuDefi!);
             var corps = passport.DeepClone()!.AsObject();
             corps.Remove("signature");

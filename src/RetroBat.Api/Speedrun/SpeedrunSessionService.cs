@@ -233,7 +233,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
         var coeur = reglement.Coeurs.FirstOrDefault() is { Length: > 0 } c ? c : null;
         // Les fantomes (04/11) : le coeur hote seulement s'ils sont poses et que le site l'admet, sinon le coeur du reglement.
-        if (_fantomes?.Preparer(reglement, _contexte.PlayerPseudo ?? "") == true) coeur = FantomesDuSpeedrun.CoeurDe(reglement);
+        // Un dump que le coeur hote ne reconnait pas (autre en-tete, 08/11) part sur le coeur d'origine.
+        if (_fantomes?.Preparer(reglement, _contexte.PlayerPseudo ?? "", rom) == true) coeur = FantomesDuSpeedrun.CoeurDe(reglement);
         var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
             RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, reglement.SystemId, "libretro", coeur, rom, retroAchievements: false);
         if (arguments is null) return new(false, "bad_rules", "systeme ou coeur illisible");

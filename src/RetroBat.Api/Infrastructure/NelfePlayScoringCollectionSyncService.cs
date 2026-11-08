@@ -152,7 +152,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         _emulateurTourne = emulateurTourne ?? EmulatorForeground.EmulateurTourne;
         _contenuConfirme = contenuConfirme
             ?? ((candidat, jeu) => ContenuConfirme(candidat, jeu, GamelistIdentity.DeclaredSha1, Md5DuContenu,
-                GamelistIdentity.DeclaredBootlegOrHack));
+                GamelistIdentity.DeclaredBootlegOrHack, c => SansEnTeteDuContenu(c.AbsolutePath, c.FrontendSystemId)));
     }
 
     /// <summary>Le dernier etat connu, tel que l'endpoint de statut le publie.</summary>
@@ -862,7 +862,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
 
         var reconnus = jeu.ContentHashes ?? new ContentHashes();
         var connus = new HashSet<string>(
-            (reconnus.Md5 ?? []).Concat(reconnus.Sha1 ?? []).Concat(reconnus.Sha256 ?? []),
+            (reconnus.Md5 ?? []).Concat(reconnus.Sha1 ?? []).Concat(reconnus.Sha256 ?? []).Concat(reconnus.Rhash ?? []),
             StringComparer.OrdinalIgnoreCase);
 
         return candidats
@@ -901,7 +901,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         OpenGame jeu,
         Func<string?, string?, string?, string?> sha1DuSet,
         Func<string, string?> md5DuContenu,
-        Func<string?, string?, bool>? bootlegOuHack = null)
+        Func<string?, string?, bool>? bootlegOuHack = null,
+        Func<InstalledGame, string?>? sansEnTeteDuContenu = null)
     {
         var hashes = jeu.ContentHashes;
         if (hashes is null) return false;
@@ -909,12 +910,15 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         var connus = new HashSet<string>(
             (hashes.Md5 ?? []).Concat(hashes.Sha1 ?? []).Concat(hashes.Sha256 ?? []).Where(h => h.Length > 0),
             StringComparer.OrdinalIgnoreCase);
-        if (connus.Count == 0) return false;
+        var arcade = string.Equals(candidat.CanonicalSystemId, "arcade", StringComparison.OrdinalIgnoreCase);
+        var sansEnTete = arcade ? new HashSet<string>(StringComparer.OrdinalIgnoreCase) : EmpreintesSansEnTete(hashes);
+        if (connus.Count == 0 && sansEnTete.Count == 0) return false;
 
         if (candidat.Md5 is { Length: > 0 } md5 && connus.Contains(md5)) return true;
-        if (candidat.CheevosHash is { Length: > 0 } ra && connus.Contains(ra)) return true;
+        // Le hash RetroAchievements de la gamelist EST l'empreinte sans en-tete (rcheevos).
+        if (candidat.CheevosHash is { Length: > 0 } ra && (connus.Contains(ra) || sansEnTete.Contains(ra))) return true;
 
-        if (string.Equals(candidat.CanonicalSystemId, "arcade", StringComparison.OrdinalIgnoreCase))
+        if (arcade)
         {
             var set = Path.GetFileNameWithoutExtension(candidat.AbsolutePath);
             var sha1 = set.Length == 0 ? null : sha1DuSet(candidat.CanonicalSystemId, jeu.RomGroup, set);
@@ -922,9 +926,20 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             return bootlegOuHack?.Invoke(candidat.CanonicalSystemId, set) != true || connus.Contains(Md5DuNomDeSet(set));
         }
 
+        // L'empreinte sans en-tete d'abord : elle se calcule dans la meme lecture que le md5, que l'appel suivant trouve en cache.
+        var mesureeSansEnTete = sansEnTete.Count > 0 ? sansEnTeteDuContenu?.Invoke(candidat) : null;
         var calcule = md5DuContenu(candidat.AbsolutePath);
-        return calcule is { Length: > 0 } && connus.Contains(calcule);
+        if (calcule is { Length: > 0 } && connus.Contains(calcule)) return true;
+        return mesureeSansEnTete is { Length: > 0 } && sansEnTete.Contains(mesureeSansEnTete);
     }
+
+    /// <summary>
+    /// LES EMPREINTES SANS EN-TETE QU'UN JEU OUVERT ACCEPTE (08/11) : celles que le site publie (<c>content_hashes.rhash</c>)
+    /// et ses md5, car le md5 d'un fichier sans en-tete EST son empreinte sans en-tete (un .sfc No-Intro, un .nes sans
+    /// en-tete du referentiel). Console seulement : l'appelant ne la demande jamais pour l'arcade. Pur.
+    /// </summary>
+    internal static HashSet<string> EmpreintesSansEnTete(ContentHashes? hashes)
+        => new((hashes?.Rhash ?? []).Concat(hashes?.Md5 ?? []).Where(h => h.Length > 0), StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Les empreintes du profil ouvert d'un jeu, d'apres le dernier index des jeux ouverts garde sur disque (celui de la
@@ -952,12 +967,13 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// par son contenu et la partie cherchait le profil « sonic-the-hedgehog-japan-en-virtual-console ». Arcade : null,
     /// le set y est l'identite. Null aussi sans index ou sans empreinte qui corresponde.
     /// </summary>
-    internal static string? GroupeOuvertDuContenu(string? systemId, string? md5, string? sha256, string? stateRoot = null)
+    internal static string? GroupeOuvertDuContenu(string? systemId, string? md5, string? sha256, string? stateRoot = null, string? sansEnTete = null)
     {
         try
         {
             var systeme = RomCanonicalResolver.CanonicalScoringSystem(systemId ?? string.Empty);
-            if (string.IsNullOrEmpty(systeme) || systeme == "arcade" || (string.IsNullOrWhiteSpace(md5) && string.IsNullOrWhiteSpace(sha256)))
+            if (string.IsNullOrEmpty(systeme) || systeme == "arcade"
+                || (string.IsNullOrWhiteSpace(md5) && string.IsNullOrWhiteSpace(sha256) && string.IsNullOrWhiteSpace(sansEnTete)))
             {
                 return null;
             }
@@ -968,7 +984,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             return manifeste?.Games?.FirstOrDefault(g =>
                     string.Equals(RomCanonicalResolver.CanonicalScoringSystem(g.SystemId), systeme, StringComparison.Ordinal)
                     && ((!string.IsNullOrWhiteSpace(md5) && (g.ContentHashes?.Md5 ?? []).Contains(md5.Trim(), StringComparer.OrdinalIgnoreCase))
-                        || (!string.IsNullOrWhiteSpace(sha256) && (g.ContentHashes?.Sha256 ?? []).Contains(sha256.Trim(), StringComparer.OrdinalIgnoreCase))))
+                        || (!string.IsNullOrWhiteSpace(sha256) && (g.ContentHashes?.Sha256 ?? []).Contains(sha256.Trim(), StringComparer.OrdinalIgnoreCase))
+                        // Le meme jeu sous un autre en-tete (08/11) : son empreinte sans en-tete.
+                        || (!string.IsNullOrWhiteSpace(sansEnTete) && EmpreintesSansEnTete(g.ContentHashes).Contains(sansEnTete.Trim()))))
                 ?.RomGroup;
         }
         catch (Exception)
@@ -985,47 +1003,57 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// <summary>Au-dela, ce n'est plus une cartouche : on ne lit pas un disque entier pour une collection.</summary>
     private const long PlafondMd5 = 64L * 1024 * 1024;
 
-    private static readonly ConcurrentDictionary<string, string?> Md5Calcules = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>Les empreintes d'un contenu, par « chemin|taille|date|regle » : relues seulement quand le fichier change.</summary>
+    private static readonly ConcurrentDictionary<string, (string? Md5, string? SansEnTete)> Md5Calcules = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Le md5 du CONTENU : celui du fichier, ou du fichier unique d'un zip (une cartouche zippee a le
+    /// Le md5 du CONTENU : celui du fichier, ou du fichier unique d'un .zip ou d'un .7z (une cartouche en archive a le
     /// md5 de sa ROM, pas celui de son emballage). Garde en memoire tant que le fichier ne change pas. Le plafond se
     /// releve pour un appelant qui ne lit que des candidats deja reconnus (MULTIPLAYER : un disque PSP).
     /// </summary>
     internal static string? Md5DuContenu(string chemin) => Md5DuContenu(chemin, PlafondMd5);
 
-    internal static string? Md5DuContenu(string chemin, long plafond)
+    internal static string? Md5DuContenu(string chemin, long plafond) => EmpreintesDuContenu(chemin, RegleSansEnTete.Aucune, plafond).Md5;
+
+    /// <summary>
+    /// Le md5 du contenu SANS SON EN-TETE, a la RetroAchievements (<see cref="EmpreinteSansEnTete"/>), pour un fichier de ce
+    /// systeme ; null pour un systeme sans regle (arcade comprise : le set y est l'identite) ou un contenu illisible.
+    /// </summary>
+    internal static string? SansEnTeteDuContenu(string chemin, string? systemId)
+        => EmpreinteSansEnTete.RegleDu(systemId) is var regle and not RegleSansEnTete.Aucune
+            ? EmpreintesDuContenu(chemin, regle, PlafondMd5).SansEnTete
+            : null;
+
+    /// <summary>
+    /// Le md5 du contenu et, si la regle en a une, son md5 sans en-tete : une seule lecture pour les deux. Le md5 seul est
+    /// garde aussi sous la regle « Aucune », pour que l'appelant qui ne demande que lui ne relise pas le fichier.
+    /// </summary>
+    internal static (string? Md5, string? SansEnTete) EmpreintesDuContenu(string chemin, RegleSansEnTete regle, long plafond)
     {
         try
         {
             var info = new FileInfo(chemin);
-            if (!info.Exists || info.Length > plafond) return null;
-            var cle = info.FullName + "|" + info.Length + "|" + info.LastWriteTimeUtc.Ticks;
-            if (Md5Calcules.TryGetValue(cle, out var connu)) return connu;
+            if (!info.Exists) return (null, null);
+            // Le plafond fait partie de la cle : un contenu refuse sous 64 Mo peut etre lu par MULTIPLAYER, au plafond releve.
+            var cle = info.FullName + "|" + info.Length + "|" + info.LastWriteTimeUtc.Ticks + "|" + plafond + "|";
+            if (Md5Calcules.TryGetValue(cle + regle, out var connu)) return connu;
 
-            string? md5 = null;
-            if (string.Equals(info.Extension, ".zip", StringComparison.OrdinalIgnoreCase))
+            (string? Md5, string? SansEnTete) empreintes = (null, null);
+            using (var contenu = ContenuDUneRom.Ouvrir(info.FullName, plafond))
             {
-                using var zip = ZipFile.OpenRead(info.FullName);
-                var fichiers = zip.Entries.Where(entree => entree.Length > 0).ToList();
-                if (fichiers.Count == 1 && fichiers[0].Length <= plafond)
+                if (contenu is not null)
                 {
-                    using var flux = fichiers[0].Open();
-                    md5 = Convert.ToHexString(MD5.HashData(flux)).ToLowerInvariant();
+                    empreintes = EmpreinteSansEnTete.Empreintes(regle, contenu.Flux, contenu.Taille);
                 }
             }
-            else
-            {
-                using var flux = File.OpenRead(info.FullName);
-                md5 = Convert.ToHexString(MD5.HashData(flux)).ToLowerInvariant();
-            }
 
-            Md5Calcules[cle] = md5;
-            return md5;
+            Md5Calcules[cle + regle] = empreintes;
+            if (regle != RegleSansEnTete.Aucune) Md5Calcules.TryAdd(cle + RegleSansEnTete.Aucune, (empreintes.Md5, null));
+            return empreintes;
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
+        catch (Exception ex) when (ContenuDUneRom.EstUneLectureRatee(ex))
         {
-            return null;
+            return (null, null);
         }
     }
 
@@ -1255,6 +1283,13 @@ public sealed record ContentHashes
 
     [JsonPropertyName("sha256")]
     public IReadOnlyList<string>? Sha256 { get; init; }
+
+    /// <summary>
+    /// Les md5 SANS EN-TETE, a la RetroAchievements (08/11) : le site les publie a part, une API plus ancienne les ignore.
+    /// Absents d'un index plus ancien.
+    /// </summary>
+    [JsonPropertyName("rhash")]
+    public IReadOnlyList<string>? Rhash { get; init; }
 }
 
 public sealed record OpenRuleset

@@ -21,6 +21,8 @@
          sur l'overlay de fin de partie, sans dépendance native ni réseau. -->
     <PackageReference Include="QRCoder" Version="1.6.0" />
     <PackageReference Include="ZstdSharp.Port" Version="0.8.1" />
+    <!-- Le contenu d'une ROM en .7z (identite des jeux, 08/11) : la bibliotheque de l'updater, sans 7za.exe ni fichier temporaire. -->
+    <PackageReference Include="SharpCompress" Version="0.48.0" />
   </ItemGroup>
 
   <ItemGroup>

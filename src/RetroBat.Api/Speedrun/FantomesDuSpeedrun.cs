@@ -36,27 +36,35 @@ public enum ChoixDesFantomes
 /// </summary>
 public sealed class FantomesDuSpeedrun
 {
-    /// <summary>Un jeu dont un coeur hote a le profil : son coeur d'origine, le coeur hote, le crc32 du contenu.</summary>
-    private sealed record Hote(string Systeme, string Groupe, string Origine, string Coeur, string Crc, bool SurEtatSeulement);
+    /// <summary>
+    /// Un jeu dont un coeur hote a le profil : son coeur d'origine, le coeur hote, le crc32 du contenu (EN-TETE COMPRIS : c'est
+    /// celui que calcule le coeur hote) et le nom du dump que ce crc designe, pour le dire au joueur.
+    /// </summary>
+    public sealed record Hote(string Systeme, string Groupe, string Origine, string Coeur, string Crc, bool SurEtatSeulement, string Dump);
 
     private static readonly Hote[] Hotes =
     [
-        new("nes", "super-mario-bros", "fceumm", "fceumm_ghosts", "393a432f", true),
+        new("nes", "super-mario-bros", "fceumm", "fceumm_ghosts", "393a432f", true, "Super Mario Bros. (World)"),
         // Super Metroid : aussi le jeu complet, parti du demarrage ; le coeur hote aligne le fantome sur le debut de la partie.
-        new("snes", "super-metroid", "snes9x", "snes9x_ghosts", "d63ed5f8", false),
+        new("snes", "super-metroid", "snes9x", "snes9x_ghosts", "d63ed5f8", false, "Super Metroid (Japan, USA) (En,Ja)"),
         // Sonic : les niveaux seulement (etat du panneau) ; l'Any% change de niveau, et chaque niveau rearme le depart.
-        new("megadrive", "sonic-the-hedgehog", "genesis_plus_gx", "genesis_plus_gx_ghosts", "f9394e97", true),
+        new("megadrive", "sonic-the-hedgehog", "genesis_plus_gx", "genesis_plus_gx_ghosts", "f9394e97", true, "Sonic The Hedgehog (USA, Europe)"),
         // Mega Man 2 (USA) : les huit stages des Robot Masters (etat d'entree, READY) ; profil en fichier (a9bd44bc.ini).
-        new("nes", "mega-man-2", "fceumm", "fceumm_ghosts", "a9bd44bc", true),
+        // Le dump d'ouverture est le GoodNES « Mega Man 2 (U) » (en-tete iNES 1.0).
+        new("nes", "mega-man-2", "fceumm", "fceumm_ghosts", "a9bd44bc", true, "Mega Man 2 (USA)"),
         // Super Mario Bros. 3 (USA) (Rev 1) : le monde 1 (etat d'entree de chaque niveau) ; profil compile dans le coeur 0.7.
-        new("nes", "super-mario-bros-3", "fceumm", "fceumm_ghosts", "0b742b33", true),
+        // Le dump d'ouverture est le GoodNES « Super Mario Bros 3 (U) (PRG 1) » (en-tete iNES 1.0).
+        new("nes", "super-mario-bros-3", "fceumm", "fceumm_ghosts", "0b742b33", true, "Super Mario Bros. 3 (USA) (Rev 1)"),
         // (06/11, jour) Super Mario World (USA) : les niveaux seulement (etat d'ouverture du niveau), profil en fichier b19ed489.ini.
-        new("snes", "super-mario-world", "snes9x", "snes9x_ghosts", "b19ed489", true),
+        new("snes", "super-mario-world", "snes9x", "snes9x_ghosts", "b19ed489", true, "Super Mario World (USA)"),
         // Sonic 2 (06/11) : comme Sonic, les niveaux seulement ; profil du coeur en fichier (24ab4c3a.ini du Data Pack).
-        new("megadrive", "sonic-the-hedgehog-2", "genesis_plus_gx", "genesis_plus_gx_ghosts", "24ab4c3a", true),
+        new("megadrive", "sonic-the-hedgehog-2", "genesis_plus_gx", "genesis_plus_gx_ghosts", "24ab4c3a", true, "Sonic The Hedgehog 2 (World)"),
         // Rocket Knight Adventures (06/11) : les stages seulement (etat du portrait) ; profil en fichier (a6efec47.ini).
-        new("megadrive", "rocket-knight-adventures", "genesis_plus_gx", "genesis_plus_gx_ghosts", "a6efec47", true),
+        new("megadrive", "rocket-knight-adventures", "genesis_plus_gx", "genesis_plus_gx_ghosts", "a6efec47", true, "Rocket Knight Adventures (USA)"),
     ];
+
+    /// <summary>Les jeux a coeur hote, tels que l'API les connait : l'outil de diagnostic les lit ici (GET /api/v1/speedrun/ghost-hosts).</summary>
+    public static IReadOnlyList<Hote> Liste => Hotes;
 
     private static Hote? HoteDe(Reglement r) => Hotes.FirstOrDefault(h => h.Systeme == r.SystemId && h.Groupe == r.RomGroup && r.Coeurs.Contains(h.Origine)
         && r.Kind.StartsWith("speedrun_", StringComparison.Ordinal) && (r.Etat is not null || !h.SurEtatSeulement));
@@ -227,8 +235,23 @@ public sealed class FantomesDuSpeedrun
         }
     }
 
-    /// <summary>Vrai si le speedrun doit partir sur le coeur hote. Attend <see cref="Budget"/> au plus.</summary>
-    public bool Preparer(Reglement r, string pseudo)
+    /// <summary>
+    /// Le coeur hote reconnaitrait-il ce contenu ? Il retrouve son profil (et ses fantomes) au crc32 du contenu ENTIER, en-tete
+    /// compris : un « Super Mario Bros. 3 (USA) (Rev 1) » No-Intro (en-tete NES 2.0) est le meme jeu pour l'identite, mais pas
+    /// pour lui. Inconnu (fichier illisible) : on ne bloque pas. Pur hors lecture du fichier.
+    /// </summary>
+    public static bool ContenuDuCoeurHote(Reglement r, string? rom)
+    {
+        if (HoteDe(r) is not { } hote || string.IsNullOrEmpty(rom)) return true;
+        return RetroBat.Api.MassRun.JeuxMassRun.ContenuDe(rom) is not { } crc
+            || string.Equals(crc.ToString("x8"), hote.Crc, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Vrai si le speedrun doit partir sur le coeur hote. Attend <see cref="Budget"/> au plus. Un contenu que le coeur hote ne
+    /// reconnaitrait pas (<see cref="ContenuDuCoeurHote"/>) part sur le coeur d'origine, sans fantome, comme hors ligne.
+    /// </summary>
+    public bool Preparer(Reglement r, string pseudo, string? rom = null)
     {
         ViderLeDossier();
         lock (_verrou)
@@ -239,6 +262,12 @@ public sealed class FantomesDuSpeedrun
         }
 
         if (HoteDe(r) is not { } hote || Choix == ChoixDesFantomes.Aucun) return false;
+        if (!ContenuDuCoeurHote(r, rom))
+        {
+            _journal?.LogInformation("Fantomes : {Rom} n'est pas le dump du coeur hote (crc {Crc}) pour {Defi}, depart sur le coeur d'origine.",
+                Path.GetFileName(rom), hote.Crc, r.ChallengeId);
+            return false;
+        }
         RetroBat.Api.MassRun.FichiersDesCoeursHotes.PoserLesProfils();
         lock (_verrou) { _hote = hote; _defi = r.ChallengeId; _tempsAttendu = null; _pseudo = pseudo; }
         var admis = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
