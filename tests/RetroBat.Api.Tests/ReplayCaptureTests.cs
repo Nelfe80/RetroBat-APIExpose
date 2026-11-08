@@ -329,13 +329,14 @@ public sealed class ReplayCaptureTests
     }
 
     [Fact]
-    public void Un_film_de_moins_de_dix_secondes_ne_part_pas()
+    public void Un_film_de_moins_de_vingt_secondes_ne_part_pas()
     {
-        // 07/11 : 9,9 s a 60 i/s non, 10 s oui ; cadence inconnue = 60 i/s.
-        Assert.True(ReplayVideoPublisher.TropCourt(1_000, 1_594, 60));
-        Assert.False(ReplayVideoPublisher.TropCourt(1_000, 1_600, 60));
-        Assert.True(ReplayVideoPublisher.TropCourt(0, 500, 0));
-        Assert.False(ReplayVideoPublisher.TropCourt(0, 1_423, 60.0988));
+        // 07/11 a 10 s, 20 s depuis le 08/11 : 19,9 s a 60 i/s non, 20 s oui ; cadence inconnue = 60 i/s.
+        Assert.True(ReplayVideoPublisher.TropCourt(1_000, 2_194, 60));
+        Assert.False(ReplayVideoPublisher.TropCourt(1_000, 2_200, 60));
+        Assert.True(ReplayVideoPublisher.TropCourt(0, 1_100, 0));
+        Assert.False(ReplayVideoPublisher.TropCourt(0, 1_203, 60.0988));
+        Assert.True(ReplayVideoPublisher.TropCourt(0, 1_100, 60.0988));
     }
 
     [Fact]

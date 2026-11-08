@@ -3280,6 +3280,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 var e = enregistrements.Last(x => string.Equals(x.Id, enregistrement, StringComparison.Ordinal));
                 bornesDuFilm = RetroBat.Api.Scoring.BornesVideo.DuDefi(e.Debut, e.Fin, departDuRun, arriveeDuRun);
             }
+            else if (enregistrements.Count > 0)
+            {
+                // (08/11) aucun enregistrement ne contient l'arrivee : le dernier replay ouvert n'est pas celui du run (07/11, un
+                // bout de 29 images pour 2038 de run, relie au resultat, puis filme et propose en fantome). Le temps part sans replay.
+                Trace($"video : aucun des {enregistrements.Count} enregistrement(s) de la seance ne contient l'arrivee du run (frame {arriveeDuRun}), le temps part sans replay");
+                replay = null;
+            }
         }
 
         var points = new List<(long frame, long total)> { (0, 0), (frames, frames) };

@@ -44,7 +44,11 @@ public sealed class ReplayVideoPublisher
         _sources = sources; _devices = devices; _httpFactory = httpFactory; _logger = logger;
     }
 
-    public sealed record Cible(string ReplayId, long? Debut, long? Fin);
+    /// <summary>
+    /// Un replay a filmer et les bornes de sa performance (frames du replay). <paramref name="Epreuve"/> : un speedrun ou un
+    /// challenge, dont le film va du depart a l'arrivee (08/11), sans la coupe des 3 dernieres minutes d'un score.
+    /// </summary>
+    public sealed record Cible(string ReplayId, long? Debut, long? Fin, bool Epreuve = false);
 
     /// <summary>Ce que le site demande a cette borne.</summary>
     /// <param name="Role"><see cref="RoleStation"/>, <see cref="RoleJoueur"/> ou <see cref="RoleAucun"/> ; null
@@ -61,10 +65,12 @@ public sealed class ReplayVideoPublisher
     /// reprendra.
     /// </summary>
     /// <summary>
-    /// UN FILM DE RECORD DURE AU MOINS 10 SECONDES (demande du user du 07/11 : en dessous, il n'a d'interet ni pour le site
-    /// ni pour YouTube). Plus court, la sequence ne se rend pas : le site l'apprend (« trop_court ») et ne la repropose pas.
+    /// UN FILM DE RECORD DURE AU MOINS 20 SECONDES (demande du user du 07/11, 10 s, porte a 20 s le 08/11 : « un record a
+    /// besoin d'un minimum de duree »). Plus court, la sequence ne se rend pas : le site l'apprend (« trop_court ») et ne la
+    /// repropose pas. EXCEPTION (08/11) : le film d'une epreuve, du depart a l'arrivee de son run, part quelle que soit sa
+    /// duree (SMB 1-4 en 15,59 s) ; le site refuse celui qui est plus court que son run.
     /// </summary>
-    internal const double DureeMinimaleS = 10;
+    internal const double DureeMinimaleS = 20;
 
     /// <summary>La sequence [debut, fin] (frames, a <paramref name="fps"/>) dure moins de <see cref="DureeMinimaleS"/>. Pur.</summary>
     internal static bool TropCourt(long debut, long fin, double fps) => (fin - debut) / (fps > 1 ? fps : 60) < DureeMinimaleS;
@@ -120,8 +126,10 @@ public sealed class ReplayVideoPublisher
                 }
             }
 
-            var (debut, fin) = SequenceDuReplay(cible.Debut, cible.Fin, manifest.Frames.ReplayEnd, manifest.Frames.NominalFps);
-            if (TropCourt(debut, fin, manifest.Frames.NominalFps))
+            var (debut, fin) = cible.Epreuve
+                ? SequenceDEpreuveDuReplay(cible.Debut, cible.Fin, manifest.Frames.ReplayEnd, manifest.Frames.NominalFps)
+                : SequenceDuReplay(cible.Debut, cible.Fin, manifest.Frames.ReplayEnd, manifest.Frames.NominalFps);
+            if (!cible.Epreuve && TropCourt(debut, fin, manifest.Frames.NominalFps))
             {
                 details.Add(cible.ReplayId + " : moins de " + DureeMinimaleS + " s, pas de film");
                 await SignalerEchecAsync(credential, cible.ReplayId, "trop_court", ct).ConfigureAwait(false);
@@ -144,7 +152,16 @@ public sealed class ReplayVideoPublisher
                     continue;
                 }
 
-                var videoId = await EnvoyerAsync(credential, cible.ReplayId, film.Fichier, ct).ConfigureAwait(false);
+                var (videoId, refus) = await EnvoyerAsync(credential, cible.ReplayId, film.Fichier, film.Debut, film.Fin,
+                    manifest.Frames.NominalFps, ct).ConfigureAwait(false);
+                if (videoId is null && refus == FilmIncomplet)
+                {
+                    // (08/11) le site refuse ce film d'epreuve, plus court que son run : c'est un essai de ce replay, la file
+                    // continue.
+                    details.Add(cible.ReplayId + " : film plus court que son run, refuse par le site");
+                    await SignalerEchecAsync(credential, cible.ReplayId, FilmIncomplet, ct).ConfigureAwait(false);
+                    continue;
+                }
                 if (videoId is null)
                 {
                     // Session refusee par le site ou envoi refuse par Google : on s'arrete la, le prochain
@@ -188,6 +205,20 @@ public sealed class ReplayVideoPublisher
         var finDuRun = runFin is long f && f > 0 ? Math.Min(f, finDuReplay) : finDuReplay;
         var debut = Math.Max(Math.Max(0, runDebut ?? 0), finDuRun - (long)Math.Round(180 * ips));
         var fin = Math.Min(finDuRun + (long)Math.Round(2 * ips), finDuReplay);
+        return (Math.Min(debut, fin), fin);
+    }
+
+    /// <summary>
+    /// LE FILM D'UNE EPREUVE RENDU DEPUIS SON REPLAY (08/11, demande du user : du depart a l'arrivee du run, jamais un bout de
+    /// fin). Les bornes que la borne du joueur a posees (3 s avant le depart, 3 s apres l'arrivee), et 2 s de plus a la fin,
+    /// sans plafond de 3 minutes. Sans bornes, tout le replay. En frames du replay. Pur.
+    /// </summary>
+    internal static (long Debut, long Fin) SequenceDEpreuveDuReplay(long? runDebut, long? runFin, long finDuReplay, double fps)
+    {
+        var ips = fps > 1 ? fps : 60;
+        var finDuRun = runFin is long f && f > 0 ? Math.Min(f, finDuReplay) : finDuReplay;
+        var fin = Math.Min(finDuRun + (long)Math.Round(2 * ips), finDuReplay);
+        var debut = Math.Max(0, runDebut ?? 0);
         return (Math.Min(debut, fin), fin);
     }
 
@@ -250,7 +281,8 @@ public sealed class ReplayVideoPublisher
             {
                 var id = c.TryGetProperty("replay_id", out var i) && i.ValueKind == JsonValueKind.String ? i.GetString() : null;
                 if (string.IsNullOrEmpty(id)) continue;
-                sortie.Add(new Cible(id!, Nombre(c, "run_start_frame"), Nombre(c, "run_end_frame")));
+                sortie.Add(new Cible(id!, Nombre(c, "run_start_frame"), Nombre(c, "run_end_frame"),
+                    c.TryGetProperty("challenge", out var ep) && ep.ValueKind == JsonValueKind.True));
             }
         }
         return new Liste(role, sortie);
@@ -334,7 +366,7 @@ public sealed class ReplayVideoPublisher
                 // Les bornes du run qui fait le record (absentes pour un film sans replay ou un score sans bornes).
                 var run = corps["run"] as JsonObject;
                 return new(IssueDeCapture.Voulue, "record", RunDebutFrame: EntierJson(run?["start_frame"]),
-                    RunFinFrame: EntierJson(run?["end_frame"]));
+                    RunFinFrame: EntierJson(run?["end_frame"]), Epreuve: EstUneEpreuve(run));
             }
             // Un site d'avant cette question ouvrirait une session : il n'en rend pas ici (le FLV lui est inconnu).
             var raison = (string?)corps?["reason"] ?? "http_" + (int)reponse.StatusCode;
@@ -355,14 +387,31 @@ public sealed class ReplayVideoPublisher
     private static readonly HashSet<string> RefusDefinitifs = new(StringComparer.Ordinal)
     {
         "pas_un_record", "deja_filme", "taille",
+        // (08/11) le film d'une epreuve coupe plus court que son run : la station le refera depuis le replay.
+        FilmIncomplet,
     };
+
+    /// <summary>Le refus du site pour un film d'epreuve plus court que son run (08/11).</summary>
+    internal const string FilmIncomplet = "film_incomplet";
 
     /// <summary>
     /// Ce que donne une demande d'envoi de capture : l'issue, son detail, la video si elle existe, et pour une capture
     /// voulue les bornes (frames du replay) du run qui fait le record, d'ou se tire sa sequence.
     /// </summary>
     public sealed record ResultatDeCapture(IssueDeCapture Issue, string Detail, string? VideoId = null, bool Confirmee = false,
-        long? RunDebutFrame = null, long? RunFinFrame = null);
+        long? RunDebutFrame = null, long? RunFinFrame = null, bool Epreuve = false);
+
+    /// <summary>
+    /// Le run designe par le site est-il celui d'une epreuve (speedrun, challenge) ? Le site le dit (« challenge »), et a
+    /// defaut son reglement le dit (« ch-... », site d'avant le 08/11). Pur.
+    /// </summary>
+    internal static bool EstUneEpreuve(JsonObject? run)
+    {
+        if (run is null) return false;
+        if (run["challenge"] is JsonValue v && v.TryGetValue<bool>(out var oui)) return oui;
+        return run["ruleset"] is JsonValue r && r.TryGetValue<string>(out var regle)
+            && regle.StartsWith("ch-", StringComparison.Ordinal);
+    }
 
     /// <summary>Un entier d'une reponse JSON, ou null s'il manque ou n'en est pas un. Pur.</summary>
     internal static long? EntierJson(JsonNode? n)
@@ -416,6 +465,10 @@ public sealed class ReplayVideoPublisher
                 ["size"] = taille,
                 ["type"] = TypeDuFilm(fichier),
                 ["source"] = "capture",
+                // La portion filmee (08/11) : le site refuse un film d'epreuve plus court que son run.
+                ["run_start_frame"] = debutFilm,
+                ["run_end_frame"] = finFilm,
+                ["fps"] = fps,
             };
             // Le film d'une partie sans replay : le site retrouve la partie par les sessions de ses scores.
             if (sessions is { Count: > 0 })
@@ -574,17 +627,22 @@ public sealed class ReplayVideoPublisher
     }
 
     /// <summary>Ouvre la session, envoie le film chez Google, rend l'identifiant YouTube (ou null).</summary>
-    private async Task<string?> EnvoyerAsync(string credential, string replayId, string fichier, CancellationToken ct)
+    private async Task<(string? VideoId, string? Refus)> EnvoyerAsync(string credential, string replayId, string fichier,
+        long debut, long fin, double fps, CancellationToken ct)
     {
         var taille = new FileInfo(fichier).Length;
-        var (adresse, _) = await OuvrirSessionAsync(credential, new JsonObject
+        // La portion filmee part avec la demande (08/11) : le site refuse un film d'epreuve plus court que son run.
+        var (adresse, raison) = await OuvrirSessionAsync(credential, new JsonObject
         {
             ["replay_id"] = replayId,
             ["size"] = taille,
             ["type"] = "video/x-matroska",
+            ["run_start_frame"] = debut,
+            ["run_end_frame"] = fin,
+            ["fps"] = fps,
         }, ct).ConfigureAwait(false);
-        if (adresse is null) return null;
-        return await EnvoyerChezGoogleAsync(adresse, replayId, fichier, taille, ct).ConfigureAwait(false);
+        if (adresse is null) return (null, raison);
+        return (await EnvoyerChezGoogleAsync(adresse, replayId, fichier, taille, ct).ConfigureAwait(false), null);
     }
 
     /// <summary>Le fichier, directement chez Google, a l'adresse de session. Rend l'identifiant YouTube (ou null).</summary>
