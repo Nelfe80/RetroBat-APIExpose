@@ -28,7 +28,16 @@ public sealed class NvramSnapshotService : IHostedService, IDisposable
     private static readonly string[] Extensions = [".nv", ".nvram", ".eeprom", ".fs"];
 
     /// <summary>Au-dela, ce n'est plus une EEPROM de reglages : on ne l'embarque pas dans un passeport.</summary>
-    private const int TailleMax = 65536;
+    internal const int TailleMax = 65536;
+
+    /// <summary>
+    /// Sauf quand le profil l'EPINGLE (2026-11-09) : sur PGM (Ketsui, DaiOuJou), FBNeo sauve la RAM 68000 entiere
+    /// (128 Ko), et les reglages du menu de test y vivent (ket.fs 0x1000-0x1009). Lue jusqu'a 64 Ko seulement, l'epingle
+    /// partait sans octet et le serveur ne pouvait rien juger. Une NVRAM epinglee se lit donc jusqu'a 256 Ko ; une autre
+    /// reste a 64 Ko, et le passeport des jeux sans epingle reste celui d'avant. Au-dela de 256 Ko, rien n'est joint :
+    /// le serveur refuse faute d'octets (jamais d'acceptation par defaut).
+    /// </summary>
+    internal const int TailleEpingleeMax = 262144;
 
     private readonly IEventBus _bus;
     private readonly ApiContext _context;
@@ -72,7 +81,9 @@ public sealed class NvramSnapshotService : IHostedService, IDisposable
             var rom = Path.GetFileNameWithoutExtension(jeu?.GamePath ?? "");
             foreach (var chemin in Chercher(systeme, rom))
             {
-                var octets = Lire(chemin);
+                // Jusqu'a 256 Ko : les epingles du profil ne sont pas encore connues ici. Ce qui depasse 64 Ko
+                // n'entre au passeport que s'il est epingle (EntreesDuPasseport).
+                var octets = Lire(chemin, TailleEpingleeMax);
                 if (octets is not null) trouves.Add((Relatif(chemin), chemin, octets));
             }
         }
@@ -127,10 +138,29 @@ public sealed class NvramSnapshotService : IHostedService, IDisposable
             await Task.Delay(250, ct).ConfigureAwait(false);
         }
 
+        var entrees = EntreesDuPasseport(lancement, pins, systeme);
+        lock (_verrou) _lancement = new();
+        if (pins.Count > 0) EffacerEpinglees(systeme, rom, pins);
+        return entrees.Count > 0 ? entrees : null;
+    }
+
+    /// <summary>
+    /// Les entrees du passeport, une fois l'emulateur parti. Une NVRAM lue au lancement part avec son depart et sa fin ;
+    /// au-dela de 64 Ko, seulement si le profil l'epingle (sinon le passeport reste celui d'avant le 2026-11-09). Une
+    /// NVRAM epinglee absente au lancement (effacee a la selection) part avec un depart VIDE, la verite : le jeu a
+    /// demarre sur ses reglages d'usine. Une NVRAM epinglee presente au lancement part TOUJOURS avec son vrai depart :
+    /// le serveur juge alors le depart et la fin.
+    /// </summary>
+    internal static JsonArray EntreesDuPasseport(IReadOnlyList<(string Relatif, string Chemin, byte[] Debut)> lancement,
+        IReadOnlyList<string> pins, string systeme, string? racineSaves = null)
+    {
         var entrees = new JsonArray();
+        var joints = new List<string>();
         foreach (var (relatif, chemin, debut) in lancement)
         {
-            var fin = Lire(chemin) ?? Array.Empty<byte>();
+            var epinglee = EstEpinglee(chemin, pins);
+            if (!epinglee && debut.Length > TailleMax) continue;
+            var fin = Lire(chemin, epinglee ? TailleEpingleeMax : TailleMax) ?? Array.Empty<byte>();
             entrees.Add(new JsonObject
             {
                 ["file"] = relatif,
@@ -138,24 +168,31 @@ public sealed class NvramSnapshotService : IHostedService, IDisposable
                 ["start"] = Convert.ToBase64String(debut),
                 ["end"] = Convert.ToBase64String(fin),
             });
+            joints.Add(chemin);
         }
         foreach (var epingle in pins)
         {
             if (!SystemeSur(systeme)) break;
-            var canonique = Canonique(systeme, epingle);
-            if (lancement.Any(l => string.Equals(l.Chemin, canonique, StringComparison.OrdinalIgnoreCase))) continue;
-            var fin = Lire(canonique) ?? Array.Empty<byte>();
+            var canonique = Canonique(systeme, epingle, racineSaves);
+            if (joints.Any(j => string.Equals(j, canonique, StringComparison.OrdinalIgnoreCase))) continue;
+            var fin = Lire(canonique, TailleEpingleeMax) ?? Array.Empty<byte>();
             entrees.Add(new JsonObject
             {
-                ["file"] = Relatif(canonique),
+                ["file"] = Relatif(canonique, racineSaves),
                 ["size"] = 0,
                 ["start"] = "",
                 ["end"] = Convert.ToBase64String(fin),
             });
         }
-        lock (_verrou) _lancement = new();
-        if (pins.Count > 0) EffacerEpinglees(systeme, rom, pins);
-        return entrees.Count > 0 ? entrees : null;
+        return entrees;
+    }
+
+    /// <summary>Ce fichier est-il une NVRAM que le profil epingle (« fbneo/ket.fs ») ?</summary>
+    internal static bool EstEpinglee(string chemin, IReadOnlyList<string> epingles)
+    {
+        if (epingles.Count == 0) return false;
+        var normal = chemin.Replace('\\', '/');
+        return epingles.Any(e => normal.EndsWith("/" + e, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
@@ -273,15 +310,15 @@ public sealed class NvramSnapshotService : IHostedService, IDisposable
         }
     }
 
-    private static string Relatif(string chemin)
-        => ("saves/" + Path.GetRelativePath(RetroBatPaths.SavesRoot, chemin)).Replace('\\', '/');
+    private static string Relatif(string chemin, string? racineSaves = null)
+        => ("saves/" + Path.GetRelativePath(racineSaves ?? RetroBatPaths.SavesRoot, chemin)).Replace('\\', '/');
 
-    private static byte[]? Lire(string chemin)
+    internal static byte[]? Lire(string chemin, int tailleMax = TailleMax)
     {
         try
         {
             var info = new FileInfo(chemin);
-            if (!info.Exists || info.Length > TailleMax) return null;
+            if (!info.Exists || info.Length > tailleMax) return null;
             using var flux = new FileStream(chemin, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             var octets = new byte[info.Length];
             var lu = 0;
