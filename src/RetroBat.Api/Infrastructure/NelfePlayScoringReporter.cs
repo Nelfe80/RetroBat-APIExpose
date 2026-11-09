@@ -4568,9 +4568,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     : "Score";
 
             // Un reglage du menu de test hors usine, nomme : le joueur sait lequel (« DIFFICULTY »).
+            // Retire dans tous les cas : un passeport publie ne laisse rien derriere lui.
+            _reglagesRefuses.TryRemove(((string?)passport["session_id"] ?? "") + "|" + (regle ?? ""), out var noms);
             if (status is "refused" or "held" or "expired"
                 && reason is "game.difficulty_not_allowed" or "profile.nvram_mismatch"
-                && _reglagesRefuses.TryRemove(((string?)passport["session_id"] ?? "") + "|" + (regle ?? ""), out var noms) && noms.Count > 0)
+                && noms is { Count: > 0 })
             {
                 await _esNotify.NotifyAsync($"{quoi} {score:N0} refusé : {RetroBat.Api.Scoring.ReglagesDuMenu.Motif(noms, "fr")}", cancellationToken).ConfigureAwait(false);
                 return;
