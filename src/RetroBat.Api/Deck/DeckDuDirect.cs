@@ -8,7 +8,9 @@ namespace RetroBat.Api.Deck;
 /// Deck est pose chez le joueur, le direct montre ce que voit le joueur : le PlayerDeck (le meme exe, le meme theme, les memes
 /// messages deck.*) tourne une seconde fois, sans fenetre, en mode direct (<c>--direct-out</c>) : il rend son image a la taille
 /// du cadre du direct (1280 x 720), trou du jeu calcule pour ce cadre, et la depose dans une memoire partagee. L'exe du direct
-/// (<c>--deck-memoire</c>, 0.7.3) pose le jeu du film de la borne dans le trou.
+/// (<c>--deck-memoire</c>, 0.7.3) pose le jeu du film de la borne dans le trou. Le Deck du direct part avec la partie (le defi
+/// diffuse), pas avec le passage a l'antenne : ses instruments qui s'accumulent sont ceux du Deck de la borne ; il s'arrete a la
+/// fin de la partie (<see cref="DeckLaunchService"/>).
 ///
 /// L'API ne calcule rien de plus : le Deck du direct lit le flux /ws comme celui de la borne (deck.snapshot a la connexion, puis
 /// deck.game, deck.rank, deck.notice, signaux...). Ni film, ni MULTIPLAYER, ni speedrun : seulement ce lancement. Sans Deck, ou
@@ -23,12 +25,13 @@ public sealed class DeckDuDirect : IDisposable
     /// <summary>Au plus 10 images du Deck par seconde dans le direct (le Deck de la borne en fait 20).</summary>
     public const int ImagesParSeconde = 10;
 
-    private readonly Process _processus;
+    private readonly Process? _processus;
+    private bool _arrete;
 
     /// <summary>Le nom de la memoire partagee, passe aux deux exe.</summary>
     public string Memoire { get; }
 
-    private DeckDuDirect(Process processus, string memoire)
+    private DeckDuDirect(Process? processus, string memoire)
     {
         _processus = processus;
         Memoire = memoire;
@@ -55,14 +58,14 @@ public sealed class DeckDuDirect : IDisposable
     /// Demarre le Deck du direct si ce direct doit le montrer ; null sinon (sans Deck, Deck retire, defi prive, MULTIPLAYER,
     /// exe du direct trop ancien, PlayerDeck absent, echec). Jamais bloquant ni visible.
     /// </summary>
-    public static DeckDuDirect? Demarrer(DeckLaunchService? deck, string? exeDuDirect, ILogger journal)
+    public static DeckDuDirect? Demarrer(DeckLaunchService? deck, string? exeDuDirect, ILogger? journal)
     {
         try
         {
             if (deck is null || !PourCeLancement(deck.EnCours)) return null;
             if (!Replay.Video.LanceurDuDirect.SaitLeDeck(exeDuDirect))
             {
-                journal.LogInformation("Direct : l'exe du direct ne sait pas poser le PlayerDeck (0.7.3 requis), direct sans Deck.");
+                journal?.LogInformation("PlayerDeck : l'exe du direct ne sait pas poser le Deck (0.7.3 requis), direct sans Deck.");
                 return null;
             }
 
@@ -78,25 +81,46 @@ public sealed class DeckDuDirect : IDisposable
             });
             if (p is null) return null;
             try { p.PriorityClass = ProcessPriorityClass.BelowNormal; } catch (Exception) { /* le Deck se met lui-meme en dessous */ }
-            journal.LogInformation("Direct : PlayerDeck du direct demarre ({Deck}, {L} x {H}, {Ips} images/s au plus).",
+            journal?.LogInformation("PlayerDeck : Deck du direct demarre pour le CHALLENGE diffuse ({Deck}, {L} x {H}, {Ips} images/s au plus).",
                 deck.EnCours?.DeckId, Largeur, Hauteur, ImagesParSeconde);
             return new DeckDuDirect(p, memoire);
         }
         catch (Exception ex)
         {
-            journal.LogInformation(ex, "Direct : PlayerDeck du direct non demarre, direct sans Deck.");
+            journal?.LogInformation(ex, "PlayerDeck : Deck du direct non demarre, direct sans Deck.");
             return null;
         }
     }
 
-    /// <summary>Arrete le Deck du direct (fin du passage) ; il s'arrete aussi seul si l'API s'arrete.</summary>
+    /// <summary>Le Deck du direct tourne-t-il encore ?</summary>
+    public bool Vivant
+    {
+        get
+        {
+            if (_processus is null) return !_arrete;
+            try { return !_processus.HasExited; }
+            catch (Exception) { return false; }
+        }
+    }
+
+    /// <summary>Arrete le Deck du direct (fin de la partie) ; il s'arrete aussi seul si l'API s'arrete.</summary>
     public void Dispose()
     {
+        _arrete = true;
+        if (_processus is null) return;
         try
         {
-            if (!_processus.HasExited) _processus.Kill();
+            // attendu : le Deck de la borne porte le meme nom de processus, et DemarrerLeDeck ne le relance pas s'il en voit un
+            if (!_processus.HasExited)
+            {
+                _processus.Kill();
+                _processus.WaitForExit(2000);
+            }
         }
         catch (Exception) { /* deja parti */ }
         _processus.Dispose();
     }
+
+    /// <summary>Couture des essais : un Deck du direct sans processus, vivant jusqu'a son arret.</summary>
+    internal static DeckDuDirect PourEssai(string memoire) => new(null, memoire);
 }

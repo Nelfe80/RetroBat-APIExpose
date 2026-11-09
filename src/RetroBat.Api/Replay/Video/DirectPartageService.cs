@@ -849,10 +849,11 @@ public sealed class DirectPartageService : IHostedService
             var cartes = CartesDuDirect(p, exe);
             Ecrire(CheminDeLaCommande, CommandeJson(fin: false, arret: false, null, null, false, false));
             // LE DECK DU JOUEUR (H-D28) : un CHALLENGE diffuse en LIVE, Deck pose, le montre ; jamais une partie MULTIPLAYER
-            using var deckDuDirect = p.Multi is null ? RetroBat.Api.Deck.DeckDuDirect.Demarrer(_deck, exe, _journal) : null;
+            var deckDuDirect = p.Multi is null ? _deck?.OptionsDuDirect(exe) ?? [] : [];
+            if (deckDuDirect.Count > 0) _journal.LogInformation("Direct partage : le PlayerDeck du joueur est dans le direct.");
             return await LanceurDuDirect.DiffuserAsync(exe, film.Fichier, adresse, film.Rotation ?? 0, _journal, jeton,
                 annonce: annonce, classement: CheminDeLaCarte,
-                options: [.. options, .. cartes, .. deckDuDirect?.OptionsDuDirect ?? []], delaiDeFin: TimeSpan.FromSeconds(10),
+                options: [.. options, .. cartes, .. deckDuDirect], delaiDeFin: TimeSpan.FromSeconds(10),
                 forme: film.Forme, fond: film.Fond, crt: film.Crt, surLigne: SurLigne).ConfigureAwait(false);
         });
         lock (_verrou)

@@ -140,10 +140,15 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         _abonnement?.Dispose();
         _abonnement = null;
         DeckDecor.Effacer(RacineDuDecor);
+        ArreterLeDeckDuDirect("api stopping");
         return Task.CompletedTask;
     }
 
-    public void Dispose() => _abonnement?.Dispose();
+    public void Dispose()
+    {
+        _abonnement?.Dispose();
+        ArreterLeDeckDuDirect("disposed");
+    }
 
     // ─────────────────────────────── preparation du lancement ───────────────────────────────
 
@@ -157,6 +162,8 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     public DeckLancement Preparer(string mode, string systeme, string cheminRom, string? romGroup = null, DeckRankBoard? classement = null, int place = 1,
         DeckTrialPlan? epreuve = null, string cartes = DeckCartes.Deck)
     {
+        // Le Deck du direct d'une partie precedente ne survit pas a un nouveau lancement (H-D28)
+        ArreterLeDeckDuDirect("new launch");
         DeckLancement lancement;
         try
         {
@@ -330,6 +337,46 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         {
             if (_enCours is { Status: "posed" } l) _enCours = l with { Diffuse = true };
         }
+
+        // LE DECK DU DIRECT PART AVEC LA PARTIE, pas avec le passage a l'antenne : ses instruments qui s'accumulent (NO MISS,
+        // FIRE MIX, scores par stage, graphe) sont alors ceux du Deck de la borne quand la partie passe a l'antenne. Il ne
+        // part que si l'exe du direct sait le poser (0.7.3).
+        ArreterLeDeckDuDirect("new live challenge");
+        var nouveau = DemarrerDeckDuDirect?.Invoke(this)
+                      ?? DeckDuDirect.Demarrer(this, Replay.Video.LanceurDuDirect.Chemin(AppContext.BaseDirectory), _journal);
+        lock (_verrou) _duDirect = nouveau;
+    }
+
+    private DeckDuDirect? _duDirect;
+
+    /// <summary>Couture des essais : le demarrage du Deck du direct.</summary>
+    internal Func<DeckLaunchService, DeckDuDirect?>? DemarrerDeckDuDirect { get; set; }
+
+    /// <summary>
+    /// Les options de l'exe du direct pour montrer le Deck (H-D28) : la memoire du Deck du direct s'il tourne pour la partie en
+    /// cours (CHALLENGE diffuse, Deck pose) et si cet exe sait le poser ; vide sinon (le direct reste comme avant).
+    /// </summary>
+    public IReadOnlyList<string> OptionsDuDirect(string? exeDuDirect) => OptionsDuDirect(Replay.Video.LanceurDuDirect.SaitLeDeck(exeDuDirect));
+
+    internal IReadOnlyList<string> OptionsDuDirect(bool exeSaitLeDeck)
+    {
+        DeckDuDirect? d;
+        lock (_verrou) d = _duDirect;
+        return exeSaitLeDeck && d is { Vivant: true } && DeckDuDirect.PourCeLancement(EnCours) ? d.OptionsDuDirect : [];
+    }
+
+    private void ArreterLeDeckDuDirect(string pourquoi)
+    {
+        DeckDuDirect? d;
+        lock (_verrou)
+        {
+            d = _duDirect;
+            _duDirect = null;
+        }
+
+        if (d is null) return;
+        d.Dispose();
+        _journal?.LogInformation("PlayerDeck : Deck du direct arrete ({Pourquoi}).", pourquoi);
     }
 
     /// <summary>L'exe du PlayerDeck (le meme que celui de la borne), ou null s'il n'est pas installe.</summary>
@@ -625,6 +672,8 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
                     // Le decor s'efface une fois la partie finie : il n'apparait pas parmi les decors d'ES
                     if (effacer) DeckDecor.Effacer(RacineDuDecor);
                     RemplacerApresLaPartie();
+                    // Le Deck du direct (H-D28) s'arrete avec la partie (pas celui d'un lancement qui vient d'etre prepare)
+                    if (effacer) ArreterLeDeckDuDirect("game ended");
                     break;
                 }
             }

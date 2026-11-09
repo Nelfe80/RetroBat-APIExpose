@@ -303,6 +303,58 @@ public sealed class DeckLancementTests : IDisposable
         };
     }
 
+    [Fact]
+    public void Le_Deck_du_direct_part_avec_le_CHALLENGE_diffuse_et_s_arrete_avec_la_partie()
+    {
+        var bus = new SimpleEventBus();
+        var service = Service(bus, new ApiContext { PlayerPseudo = "nelfe" });
+        var demarres = new List<DeckDuDirect>();
+        service.DemarrerDeckDuDirect = s =>
+        {
+            if (!DeckDuDirect.PourCeLancement(s.EnCours)) return null;
+            var d = DeckDuDirect.PourEssai("m" + demarres.Count);
+            demarres.Add(d);
+            return d;
+        };
+        service.StartAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+        // un CHALLENGE prive : pas de Deck dans le direct
+        var l = service.Preparer(DeckModes.WorldScoring, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip");
+        Assert.Equal("posed", l.Status);
+        Assert.Empty(service.OptionsDuDirect(exeSaitLeDeck: true));
+
+        // diffuse en LIVE : le Deck du direct part avec la partie ; un exe du direct trop ancien n'en recoit rien
+        service.MarquerLeDirect();
+        Assert.True(service.EnCours!.Diffuse);
+        Assert.Single(demarres);
+        Assert.Equal(["--deck-memoire", "m0"], service.OptionsDuDirect(exeSaitLeDeck: true));
+        Assert.Empty(service.OptionsDuDirect(exeSaitLeDeck: false));
+
+        // un nouveau defi diffuse remplace l'ancien Deck du direct
+        service.MarquerLeDirect();
+        Assert.False(demarres[0].Vivant);
+        Assert.Equal(["--deck-memoire", "m1"], service.OptionsDuDirect(exeSaitLeDeck: true));
+
+        // la fin de la partie (hors de la garde du decor) l'arrete
+        typeof(DeckLaunchService).GetField("_preparation", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .SetValue(service, DateTime.UtcNow.AddMinutes(-5));
+        bus.PublishAsync(new EventEnvelope { Type = "ui.game.ended", Payload = new { } }).GetAwaiter().GetResult();
+        Assert.False(demarres[1].Vivant);
+        Assert.Empty(service.OptionsDuDirect(exeSaitLeDeck: true));
+        service.StopAsync(CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    [Fact]
+    public void Un_jeu_sans_Deck_ne_lance_aucun_Deck_dans_le_direct()
+    {
+        var service = Service(new SimpleEventBus(), new ApiContext { PlayerPseudo = "nelfe" });
+        service.DemarrerDeckDuDirect = s => DeckDuDirect.PourCeLancement(s.EnCours) ? DeckDuDirect.PourEssai("x") : null;
+        var sans = service.Preparer(DeckModes.WorldScoring, "megadrive", @"E:\RetroBat\roms\megadrive\sonic.zip");
+        Assert.Equal("none", sans.Status);
+        service.MarquerLeDirect();
+        Assert.Empty(service.OptionsDuDirect(exeSaitLeDeck: true));
+    }
+
     private sealed class CommandesMuettes : ICommandesRetroArch
     {
         public readonly List<string> Envoyees = new();

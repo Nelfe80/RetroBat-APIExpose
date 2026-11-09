@@ -469,9 +469,9 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                 // empreinte attendue, que le site donne.
                 var (annonce, optionsDesClips) = Clips(ouvert.Clips);
                 // LE DECK DU JOUEUR (H-D28) : un CHALLENGE diffuse en LIVE, Deck pose, le montre aussi dans le direct du record
-                using var deckDuDirect = RetroBat.Api.Deck.DeckDuDirect.Demarrer(_deck, exe, _journal);
+                var deckDuDirect = _deck?.OptionsDuDirect(exe) ?? [];
                 var r = await LanceurDuDirect.DiffuserAsync(exe!, film.Fichier, ouvert.Ingest, film.Rotation ?? 0, _journal, arret.Token,
-                        annonce: annonce, classement: CheminDeLaCarte, options: [.. optionsDesClips, .. deckDuDirect?.OptionsDuDirect ?? []],
+                        annonce: annonce, classement: CheminDeLaCarte, options: [.. optionsDesClips, .. deckDuDirect],
                         forme: film.Forme, fond: film.Fond, crt: film.Crt)
                     .ConfigureAwait(false);
                 _journal.LogInformation("Direct : {Direct} fini ({Fin}, code {Code}, {Secondes:F0} s).", ouvert.LiveId, r.Fin, r.Code,
