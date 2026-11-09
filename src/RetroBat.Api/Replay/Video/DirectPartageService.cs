@@ -43,6 +43,8 @@ public sealed class DirectPartageService : IHostedService
     private readonly RetroBat.Api.Speedrun.ClassementsDesDefis? _tableaux;
     // Les cartes d'une rencontre (lot M4, 08/11) : l'ecran de lancement avant le jeu, l'ecran de fin apres.
     private readonly RetroBat.Api.Multiplayer.MultiplayerCartesDuFilm? _cartes;
+    // LE DECK DANS LE DIRECT (H-D28) : le lancement en cours dit si ce CHALLENGE diffuse montre le Deck du joueur.
+    private readonly RetroBat.Api.Deck.DeckLaunchService? _deck;
 
     /// <summary>La partie en cours, et ce que son passage en sait.</summary>
     private sealed class Partie
@@ -94,8 +96,10 @@ public sealed class DirectPartageService : IHostedService
         ReplayVideoPublisher site, IConfiguration configuration, ILogger<DirectPartageService> journal,
         NelfePlayScoringCollectionSyncService? collection = null, PartieNelfePlayService? partie = null,
         NelfePlayScoringReporter? rapporteur = null, RetroBat.Api.Speedrun.SpeedrunSessionService? epreuves = null,
-        RetroBat.Api.Speedrun.ClassementsDesDefis? tableaux = null, RetroBat.Api.Multiplayer.MultiplayerCartesDuFilm? cartes = null)
+        RetroBat.Api.Speedrun.ClassementsDesDefis? tableaux = null, RetroBat.Api.Multiplayer.MultiplayerCartesDuFilm? cartes = null,
+        RetroBat.Api.Deck.DeckLaunchService? deck = null)
     {
+        _deck = deck;
         _cartes = cartes;
         _epreuves = epreuves;
         _tableaux = tableaux;
@@ -844,8 +848,11 @@ public sealed class DirectPartageService : IHostedService
             try { File.Delete(CheminDeLaCarte); } catch (Exception) { /* absente */ }
             var cartes = CartesDuDirect(p, exe);
             Ecrire(CheminDeLaCommande, CommandeJson(fin: false, arret: false, null, null, false, false));
+            // LE DECK DU JOUEUR (H-D28) : un CHALLENGE diffuse en LIVE, Deck pose, le montre ; jamais une partie MULTIPLAYER
+            using var deckDuDirect = p.Multi is null ? RetroBat.Api.Deck.DeckDuDirect.Demarrer(_deck, exe, _journal) : null;
             return await LanceurDuDirect.DiffuserAsync(exe, film.Fichier, adresse, film.Rotation ?? 0, _journal, jeton,
-                annonce: annonce, classement: CheminDeLaCarte, options: [.. options, .. cartes], delaiDeFin: TimeSpan.FromSeconds(10),
+                annonce: annonce, classement: CheminDeLaCarte,
+                options: [.. options, .. cartes, .. deckDuDirect?.OptionsDuDirect ?? []], delaiDeFin: TimeSpan.FromSeconds(10),
                 forme: film.Forme, fond: film.Fond, crt: film.Crt, surLigne: SurLigne).ConfigureAwait(false);
         });
         lock (_verrou)

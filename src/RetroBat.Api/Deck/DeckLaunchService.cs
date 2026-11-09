@@ -320,6 +320,25 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         if (avait) _journal?.LogInformation("PlayerDeck : lancement sans Deck ({Raison}).", raison);
     }
 
+    /// <summary>
+    /// LE CHALLENGE DIFFUSE EN LIVE (H-D28) : le lancement en cours, Deck pose, part en hote netplay ; le direct YouTube de cette
+    /// partie montrera le Deck. Rien ne change pour le joueur ni pour le Deck de la borne.
+    /// </summary>
+    public void MarquerLeDirect()
+    {
+        lock (_verrou)
+        {
+            if (_enCours is { Status: "posed" } l) _enCours = l with { Diffuse = true };
+        }
+    }
+
+    /// <summary>L'exe du PlayerDeck (le meme que celui de la borne), ou null s'il n'est pas installe.</summary>
+    public string? ExeDuDeck()
+    {
+        var exe = Path.Combine(DossierDuDeck, NomDuHost + ".exe");
+        return File.Exists(exe) ? exe : null;
+    }
+
     /// <summary>Le joueur : celui qui est enregistre en salle, sinon le compte de la borne, sinon « local ». Jamais reecrit.</summary>
     private string Joueur()
         => _contexte.SessionPseudo is { Length: > 0 } s ? s : _contexte.PlayerPseudo is { Length: > 0 } p ? p : "local";
@@ -761,6 +780,13 @@ public sealed record DeckLancement(
 
     /// <summary>Qui montre les ecrans de depart et de bilan : deck | api (<see cref="DeckCartes"/>).</summary>
     public string Cards { get; init; } = DeckCartes.Deck;
+
+    /// <summary>
+    /// Le CHALLENGE est diffuse en LIVE (hote netplay, direct annonce) : seul ce lancement montre le Deck dans le direct YouTube
+    /// (H-D28). Interne a l'API, hors des messages.
+    /// </summary>
+    [JsonIgnore]
+    public bool Diffuse { get; init; }
 }
 
 /// <summary>

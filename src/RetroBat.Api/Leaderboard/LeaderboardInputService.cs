@@ -1947,6 +1947,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     p.RendreLaMain();
                 });
             }
+            // LE DECK DANS LE DIRECT YOUTUBE (H-D28) : seul un defi diffuse (hote netplay) le montre dans le direct
+            if (netplay.Count > 0) _deck?.MarquerLeDirect();
             _logger.LogInformation("Classement : defi lance avec le Deck {Deck} ({Systeme}, {Emulateur}, {Coeur}{Netplay}).",
                 deck.DeckId, resolution.Systeme, resolution.Emulateur, resolution.Coeur, netplay.Count > 0 ? ", hote netplay" : "");
             progression?.Finir(ProgressionDuLancement.Lanceur);

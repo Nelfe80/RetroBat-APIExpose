@@ -98,6 +98,12 @@ public static class LanceurDuDirect
     /// </summary>
     internal static bool SaitLesCartes(string? exe) => VersionDe(exe) is { } v && v >= VersionDesCartes;
 
+    /// <summary>La premiere version de l'exe qui pose le PlayerDeck du joueur dans le direct (0.7.3, H-D28).</summary>
+    internal static readonly Version VersionDuDeck = new(0, 7, 3);
+
+    /// <summary>L'exe pose-t-il le PlayerDeck (--deck-memoire) ? Un exe plus ancien l'ignorerait : le Deck du direct tournerait pour rien.</summary>
+    internal static bool SaitLeDeck(string? exe) => VersionDe(exe) is { } v && v >= VersionDuDeck;
+
     private static Version? VersionDe(string? exe)
     {
         if (exe is null || !File.Exists(exe)) return null;

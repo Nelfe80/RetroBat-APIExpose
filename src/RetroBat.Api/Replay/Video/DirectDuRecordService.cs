@@ -42,6 +42,8 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
     private readonly ReplayVideoPublisher _site;
     private readonly ILogger<DirectDuRecordService> _journal;
     private readonly RetroBat.Api.Infrastructure.NelfePlayScoringReporter? _rapporteur;
+    // LE DECK DANS LE DIRECT (H-D28)
+    private readonly RetroBat.Api.Deck.DeckLaunchService? _deck;
     private readonly bool _actif;
     private readonly bool _exe;
     private volatile bool _essai;
@@ -76,8 +78,9 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
         RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider wrapper, ReplayCaptureService capture,
         ReplayVideoPublisher site, IConfiguration configuration, ILogger<DirectDuRecordService> journal,
         NelfePlayScoringCollectionSyncService? collection = null, PartieNelfePlayService? partie = null,
-        RetroBat.Api.Infrastructure.NelfePlayScoringReporter? rapporteur = null)
+        RetroBat.Api.Infrastructure.NelfePlayScoringReporter? rapporteur = null, RetroBat.Api.Deck.DeckLaunchService? deck = null)
     {
+        _deck = deck;
         _rapporteur = rapporteur;
         _bus = bus;
         _contexte = contexte;
@@ -465,8 +468,11 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
                 // la fin quand le record est tombe (l'exe ne le joue qu'avec la carte du classement). Jamais sans leur
                 // empreinte attendue, que le site donne.
                 var (annonce, optionsDesClips) = Clips(ouvert.Clips);
+                // LE DECK DU JOUEUR (H-D28) : un CHALLENGE diffuse en LIVE, Deck pose, le montre aussi dans le direct du record
+                using var deckDuDirect = RetroBat.Api.Deck.DeckDuDirect.Demarrer(_deck, exe, _journal);
                 var r = await LanceurDuDirect.DiffuserAsync(exe!, film.Fichier, ouvert.Ingest, film.Rotation ?? 0, _journal, arret.Token,
-                        annonce: annonce, classement: CheminDeLaCarte, options: optionsDesClips, forme: film.Forme, fond: film.Fond, crt: film.Crt)
+                        annonce: annonce, classement: CheminDeLaCarte, options: [.. optionsDesClips, .. deckDuDirect?.OptionsDuDirect ?? []],
+                        forme: film.Forme, fond: film.Fond, crt: film.Crt)
                     .ConfigureAwait(false);
                 _journal.LogInformation("Direct : {Direct} fini ({Fin}, code {Code}, {Secondes:F0} s).", ouvert.LiveId, r.Fin, r.Code,
                     r.Duree.TotalSeconds);
