@@ -238,7 +238,12 @@ channels:
       per channel/name/address/player), `HeldInputs` (panel inputs currently held),
       `Controls` (as deck.controls), `Frame` (as deck.frame), `FramePlans`,
       `Semantics` (as deck.semantics, or null), `Rank` (as deck.rank, or null),
-      `Trial` (as deck.trial, or null).
+      `Trial` (as deck.trial, or null), `Launch` (as deck.launch: a launch with a
+      Deck decided less than 2 minutes ago and not yet started, so a Deck that has
+      just started can put up its start screen; null otherwise), `Page` (as
+      deck.page, while an API full-screen page is open; null otherwise), `Result`
+      (as deck.result, the last verdict of the game played with a Deck; null
+      otherwise).
       Events that follow carry a higher `Revision`.
 
 
@@ -277,7 +282,16 @@ channels:
       `Seat` (always 1: no Deck in MULTIPLAYER), `Notices` (the Deck
       shows player messages in its rails, see deck.notice), `RetroArchMuet` (true:
       `-OnScreenMsg 0` was added too, RetroArch notifications are off for this
-      launch only). Since 1.9.0 the Deck is drawn only on its decoration: `window`,
+      launch only), `Cards` = deck | api: who shows the start and end screens of
+      this launch. `deck`: the Deck puts up its own full-screen start screen, in the
+      colours and lettering of the game, from this message until the game image is
+      on screen (RetroArch window up and the core running), then its end screen when
+      the game ends (CHALLENGE of World Scoring, private or streamed; a challenge or
+      speedrun launched by the REST route). `api`: the API full-screen pages keep
+      their role (preparation and summary of a challenge launched from the
+      Challenges & Speedruns panel, with their HOLD / RETRY buttons); the Deck shows
+      no screen of its own and no value while deck.page says a page is open. One
+      system per launch, never two screens. Since 1.9.0 the Deck is drawn only on its decoration: `window`,
       `off` and `none` keep it hidden, and an in-game choice without a posed
       decoration applies from the next launch (`Now` = next-launch, `switch` is no
       longer published). Display only: the certified fingerprint does not change. `Reason` (window and none only):
@@ -315,11 +329,33 @@ channels:
       `RankAtLeast` (beyond the lines read), `Of` (lines including this game,
       `OfAtLeast` when the list is truncated), `Tied`, `Above` (the line just above:
       `Rank`, `Player`, `Value`, `World`, `IsMe`, `Text`), `Gap` (to equal it, always
-      positive; `GapText` for a time), `Target` (time key: the line just above the
-      personal best, else the 10th place), `PersonalBest`, `NewPersonalBest`,
+      positive; `GapText` for a time), `Target` (the line just above the personal
+      best, else the 10th place: while racing for a time key, and since 2026-11-09
+      also with a rank for a score key, for the Deck start screen), `PersonalBest`, `NewPersonalBest`,
       `Final` (rank fixed at the finish of a challenge attempt), `FrameRate`,
       `Revision`. Reads a public leaderboard only: the certified fingerprint, the
       preflight, the passport and the locks do not change.
+
+
+      `deck.page` (2026-11-09): an API full-screen page opens or closes. `Page`
+      (preparation), `Open`, `Owner` = api, `AtUtc`. While it is open the Deck shows
+      nothing (launches with `Cards` = api).
+
+
+      `deck.result` (2026-11-09): the site verdict on the game played with a posed
+      Deck, for the Deck end screen; published during the game or up to 10 minutes
+      after its end. `LaunchId`, `Ruleset`, `Status` (published | held | quarantined
+      | rejected...), `Certified` (Status = published), `Score`, `Rank` (certified
+      rank, or null), `Continues` and `DurationMs` (read from the passport already
+      signed and sent, never written into it), `Revision`. Read only: the certified
+      fingerprint, the preflight and the passport do not change.
+
+
+      `deck.card` (2026-11-09, sent by the Deck on this socket, no reply): the Deck
+      start screen (`Kind` = start) or end screen (`Kind` = recap) is now on screen
+      (`State` = shown) or gone (`State` = hidden), `LaunchId`. Republished on the
+      bus: when the start screen is shown, the World Scoring "Starting the game"
+      box closes underneath it (no double screen).
 
 
       `deck.notice` (08/11, 1.9.0): a message for the player, shown by the Deck in

@@ -92,6 +92,7 @@ public sealed partial class DefisPanelService
         _journal = journal;
         _contexte = contexte;
         _classements = classements;
+        _bus = bus;
         _abonnement = bus?.Subscribe<RetroBat.Domain.Events.EventEnvelope>(SurEvenement);
         if (_massrun is not null) _massrun.SalleQuittee += SurSalleQuittee;
     }

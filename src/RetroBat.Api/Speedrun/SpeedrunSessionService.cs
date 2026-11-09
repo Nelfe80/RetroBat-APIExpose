@@ -204,7 +204,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     /// .MEM en vigueur identique a celui que cite le reglement. Puis lancement direct, coeur du reglement impose,
     /// RetroAchievements coupe pour la seance.
     /// </summary>
-    public ReponseLancement Lancer(string? defiId, Func<string, string, string?> trouverLaRom)
+    public ReponseLancement Lancer(string? defiId, Func<string, string, string?> trouverLaRom, bool pages = false)
     {
         var reglement = _catalogue.Trouver(defiId);
         if (reglement is null) return new(false, "unknown_challenge");
@@ -239,7 +239,10 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         // LE PLAYERDECK (H-D20) : LAUNCH THE SPEEDRUN / LAUNCH THE CHALLENGE part avec le Deck du jeu, s'il en a un. Le decor
         // est un reglage d'affichage : il ne touche ni au coeur, ni au .MEM, ni aux verrous, ni a l'empreinte des options.
         var deck = _deck?.Preparer(RetroBat.Api.Deck.DeckModes.Speedrun, reglement.SystemId, rom, reglement.RomGroup,
-            RetroBat.Api.Deck.DeckRankBoard.DeLEpreuve(reglement), epreuve: RetroBat.Api.Deck.DeckTrialPlan.De(reglement));
+            RetroBat.Api.Deck.DeckRankBoard.DeLEpreuve(reglement), epreuve: RetroBat.Api.Deck.DeckTrialPlan.De(reglement),
+            // Lancee depuis le panneau, l'epreuve a ses pages de preparation et de bilan (interactives) : le Deck s'efface devant
+            // elles ; lancee par la route REST, sans page, le Deck pose ses propres ecrans
+            cartes: pages ? RetroBat.Api.Deck.DeckCartes.Api : RetroBat.Api.Deck.DeckCartes.Deck);
         var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
             RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, reglement.SystemId, "libretro", coeur, rom, retroAchievements: false,
             deck?.Arguments);

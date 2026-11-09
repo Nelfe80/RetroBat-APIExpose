@@ -75,7 +75,7 @@ public sealed partial class DefisPanelService
     {
         var lanceA = DateTime.UtcNow;
         var lanceALocal = DateTime.Now;
-        var reponse = _session.Lancer(defi.ChallengeId, (_, _) => File.Exists(chemin) ? chemin : null);
+        var reponse = _session.Lancer(defi.ChallengeId, (_, _) => File.Exists(chemin) ? chemin : null, pages: true);
         if (!reponse.Lance)
         {
             _journal?.LogInformation("Defis : lancement de {Defi} refuse ({Raison} {Detail}).", defi.ChallengeId, reponse.Raison, reponse.Detail);
@@ -90,6 +90,28 @@ public sealed partial class DefisPanelService
         catch (Exception ex) { _journal?.LogDebug(ex, "Defis : fanart introuvable pour {Chemin}.", chemin); }
         MontrerLaPreparation(new EpreuveLancee(defi, chemin, jeu, fanart, lanceA, lanceALocal));
         return null;
+    }
+
+    private RetroBat.Domain.Interfaces.IEventBus? _bus;
+
+    /// <summary>
+    /// LA PAGE PLEIN ECRAN ANNONCEE AU PLAYERDECK (deck.page, 09/11) : tant que la preparation est la, le Deck ne montre aucune
+    /// valeur ; les epreuves du panneau gardent leurs pages (DeckCartes.Api), le Deck n'y ajoute pas son ecran de depart.
+    /// </summary>
+    private void AnnoncerLaPage(string page, bool ouverte)
+    {
+        try
+        {
+            _ = _bus?.PublishAsync(new RetroBat.Domain.Events.EventEnvelope
+            {
+                Type = "deck.page",
+                Payload = new RetroBat.Api.Deck.DeckPage(page, ouverte, "api", DateTime.UtcNow),
+            });
+        }
+        catch (Exception ex)
+        {
+            _journal?.LogDebug(ex, "Defis : page {Page} non annoncee au Deck.", page);
+        }
     }
 
     private void MontrerLaPreparation(EpreuveLancee epreuve)
@@ -112,6 +134,7 @@ public sealed partial class DefisPanelService
 
         _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal),
             PleinEcran(lancement: ComposerLaPreparation(epreuve.Defi, epreuve.Jeu, epreuve.Fanart, false, Langue())));
+        AnnoncerLaPage("preparation", true);
         _ = Task.Run(() => TenirLaPreparationAsync(epreuve, jeton));
     }
 
@@ -154,6 +177,7 @@ public sealed partial class DefisPanelService
             // Le depart sur etat se charge ici, sous la page qui s'efface : le joueur le decouvre a sa premiere image, et le
             // chrono (2,7 s plus tard sur Green Hill 1, 1,75 s sur Metal Slug 3) ne part jamais derriere la page.
             if (epreuve.Defi.Etat is not null) _session.ChargerLEtatDeDepart();
+            AnnoncerLaPage("preparation", false);
             _overlay.Estomper(DureeDeLEffacement);
             await Task.Delay(DureeDeLEffacement, jeton).ConfigureAwait(false);
             lock (_verrou)
@@ -186,6 +210,7 @@ public sealed partial class DefisPanelService
         }
 
         _journal?.LogInformation("Defis : le joueur quitte la preparation de {Defi}.", epreuve?.Defi.ChallengeId ?? "MASS RUN");
+        AnnoncerLaPage("preparation", false);
         _overlay.Fermer();
         EmulatorForeground.FocusEmulationStation();
         if (epreuve is not null) _ = Task.Run(() => FermerLeJeuAsync(epreuve.LanceALocal));
@@ -261,6 +286,7 @@ public sealed partial class DefisPanelService
                 _suiteDeLaPage?.Cancel();
             }
 
+            AnnoncerLaPage("preparation", false);
             _overlay.Fermer();
         }
 

@@ -4518,6 +4518,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     Status = (string?)(obj?["status"] ?? obj?["verdict"]) ?? "",
                     Score = score,
                     Rank = (int?)(obj?["rank"]),
+                    // Pour l'ecran de bilan du PlayerDeck (09/11) : lus dans le passeport deja signe, jamais ecrits dedans
+                    Continues = (long?)((passport["sensitive"] as JsonObject)?["continues"]),
+                    DurationMs = (long?)((passport["timing"] as JsonObject)?["monotonic_ms"]),
                 },
             });
         }

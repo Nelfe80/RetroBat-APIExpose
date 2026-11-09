@@ -56,6 +56,15 @@ public sealed class DeckStateService : IHostedService, IDisposable
     private Partie? _partie;
     private long _revision;
 
+    /// <summary>La page plein ecran de l'API en cours (preparation d'une epreuve) : le Deck ne montre rien tant qu'elle est la.</summary>
+    private DeckPage? _page;
+
+    /// <summary>Le verdict du site sur la derniere partie avec Deck, pour l'ecran de bilan (deck.result).</summary>
+    private DeckResult? _resultat;
+
+    /// <summary>Un verdict plus tardif que cela apres la fin de la partie n'est plus montre par le bilan.</summary>
+    private static readonly TimeSpan VerdictTardif = TimeSpan.FromMinutes(10);
+
     public DeckFramePlanStore Cadres { get; }
 
     /// <summary>Les messages du choix du Deck en jeu (deck.choice.*), traites par <see cref="DeckLaunchService"/>.</summary>
@@ -136,6 +145,17 @@ public sealed class DeckStateService : IHostedService, IDisposable
         try
         {
             var type = e.Type ?? string.Empty;
+            if (type == "deck.page" && e.Payload is DeckPage page)
+            {
+                // publiee par les pages de l'API, gardee pour l'instantane (un Deck qui se connecte pendant la page)
+                lock (_verrou)
+                {
+                    _page = page.Open ? page : null;
+                    _revision++;
+                }
+                return;
+            }
+
             if (type.StartsWith("deck.", StringComparison.OrdinalIgnoreCase)) return; // les notres
 
             switch (type)
@@ -164,6 +184,9 @@ public sealed class DeckStateService : IHostedService, IDisposable
                     break;
                 case "ui.game.ended":
                     Terminer();
+                    break;
+                case "scoring.verdict":
+                    NoterLeVerdict(e);
                     break;
             }
         }
@@ -247,6 +270,36 @@ public sealed class DeckStateService : IHostedService, IDisposable
         Publier("deck.semantics", semantique);
     }
 
+    /// <summary>
+    /// LE VERDICT DU SITE POUR L'ECRAN DE BILAN DU DECK (deck.result, 09/11) : seulement pour une partie lancee avec un Deck
+    /// pose, pendant la partie ou dans les dix minutes qui suivent sa fin. Lecture seule de ce que le rapporteur a deja
+    /// envoye et recu : rien ici ne touche au score ni au passeport.
+    /// </summary>
+    private void NoterLeVerdict(EventEnvelope e)
+    {
+        var p = e.Payload;
+        DeckResult resultat;
+        lock (_verrou)
+        {
+            if (_partie is not { Deck.Status: "posed" } partie) return;
+            if (partie.EndedUtc is { } fin && DateTime.UtcNow - fin > VerdictTardif) return;
+            var statut = Texte(p, "Status") ?? "";
+            resultat = new DeckResult(
+                LaunchId: partie.LaunchId,
+                Ruleset: Texte(p, "Ruleset"),
+                Status: statut,
+                Certified: statut == "published",
+                Score: Entier(Champ(p, "Score")),
+                Rank: (int?)Entier(Champ(p, "Rank")),
+                Continues: Entier(Champ(p, "Continues")),
+                DurationMs: Entier(Champ(p, "DurationMs")),
+                Revision: ++_revision);
+            _resultat = resultat;
+        }
+
+        Publier("deck.result", resultat);
+    }
+
     private void NoterScore(EventEnvelope e)
     {
         var p = e.Payload;
@@ -312,6 +365,8 @@ public sealed class DeckStateService : IHostedService, IDisposable
             _partie?.Arret.Cancel();
             _signaux.Clear();
             _scores.Clear();
+            _resultat = null;
+            _page = _page is { } pg && DateTime.UtcNow - pg.AtUtc < TimeSpan.FromMinutes(3) ? pg : null;
             var rom = NomDeRom(chemin);
             // Le Deck prepare pour ce jeu par les boutons speciaux ; un autre lancement (ES) n'en a pas (H-D20)
             var deck = _lancementPrepare is { } l && DateTime.UtcNow - l.PreparedAtUtc < TimeSpan.FromMinutes(2) && MemeChemin(l.GamePath, chemin) ? l : null;
@@ -697,6 +752,20 @@ public sealed class DeckStateService : IHostedService, IDisposable
             case "deck.snapshot.request":
                 return SnapshotJson("request");
 
+            case "deck.card":
+            {
+                // L'ecran de depart ou de bilan du Deck parait ou s'efface : la boite « Lancement de la partie » s'efface dessous
+                string? Lire(string n) => corps.ValueKind == JsonValueKind.Object && (corps.TryGetProperty(n, out var v) || corps.TryGetProperty(char.ToLowerInvariant(n[0]) + n[1..], out v))
+                    && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
+                var carte = new DeckCard(Lire("Kind") ?? "", Lire("State") ?? "", Lire("LaunchId") ?? LaunchIdCourant ?? "");
+                if (carte.Kind is "start" or "recap" && carte.State is "shown" or "hidden")
+                {
+                    _journal?.LogInformation("PlayerDeck : ecran {Kind} {State}.", carte.Kind == "start" ? "de depart" : "de bilan", carte.State == "shown" ? "a l'ecran" : "efface");
+                    Publier("deck.card", carte);
+                }
+                return null;
+            }
+
             case "deck.choice.next":
             case "deck.choice.set":
                 return CommandesDuChoix?.Invoke(type, corps);
@@ -760,7 +829,13 @@ public sealed class DeckStateService : IHostedService, IDisposable
                 FramePlans: Cadres.Tous(),
                 Semantics: partie?.Etat == "ended" ? null : partie?.Semantique,
                 Rank: partie?.Etat == "ended" ? null : Rang?.Invoke(),
-                Trial: partie?.Etat == "ended" ? null : Epreuve?.Invoke());
+                Trial: partie?.Etat == "ended" ? null : Epreuve?.Invoke())
+            {
+                // Le lancement decide mais pas encore parti (Deck demarre a l'instant : il pose son ecran de depart)
+                Launch = _lancementPrepare is { } l && DateTime.UtcNow - l.PreparedAtUtc < TimeSpan.FromMinutes(2) ? l : null,
+                Page = _page,
+                Result = _resultat,
+            };
         }
     }
 
@@ -1018,6 +1093,23 @@ public sealed record DeckFramePayload(
     internal string Cle => $"{Window}|{Viewport}|{Mode}|{Aspect}|{Plan?.Status}|{Plan?.Requested}";
 }
 
+/// <summary>
+/// deck.page : une page plein ecran de l'API (preparation d'une epreuve du panneau) parait ou s'efface. <c>Owner</c> = api.
+/// Tant qu'elle est ouverte, le Deck ne montre aucune valeur et ne pose pas son ecran de depart (DeckCartes.Api).
+/// </summary>
+public sealed record DeckPage(string Page, bool Open, string Owner, DateTime AtUtc);
+
+/// <summary>
+/// deck.result : le verdict du site sur la partie lancee avec un Deck, pour l'ecran de bilan. <c>Status</c> : published | held |
+/// quarantined | rejected... ; <c>Certified</c> : publie au classement ; <c>Rank</c> : le rang certifie ; <c>Continues</c> et
+/// <c>DurationMs</c> : lus dans le passeport (jamais ecrits).
+/// </summary>
+public sealed record DeckResult(string LaunchId, string? Ruleset, string Status, bool Certified, long? Score, int? Rank, long? Continues, long? DurationMs,
+    long Revision);
+
+/// <summary>deck.card : l'ecran de depart (start) ou de bilan (recap) du Deck parait (shown) ou s'efface (hidden).</summary>
+public sealed record DeckCard(string Kind, string State, string LaunchId);
+
 /// <summary>deck.snapshot : tout l'etat du Deck a un instant, avec sa revision.</summary>
 public sealed record DeckSnapshot(
     string Schema,
@@ -1033,4 +1125,14 @@ public sealed record DeckSnapshot(
     IReadOnlyList<DeckFramePlan> FramePlans,
     DeckSemantics? Semantics = null,
     DeckRank? Rank = null,
-    DeckTrial? Trial = null);
+    DeckTrial? Trial = null)
+{
+    /// <summary>Le lancement avec Deck decide, pas encore parti (deck.launch) ; null sinon.</summary>
+    public DeckLancement? Launch { get; init; }
+
+    /// <summary>La page plein ecran de l'API ouverte (deck.page) ; null sinon.</summary>
+    public DeckPage? Page { get; init; }
+
+    /// <summary>Le dernier verdict de la partie avec Deck (deck.result) ; null sinon.</summary>
+    public DeckResult? Result { get; init; }
+}

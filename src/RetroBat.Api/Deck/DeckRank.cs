@@ -644,6 +644,7 @@ public static class DeckRankCalcul
         }
 
         var place = Classer(lignes, v, plusBas, monde, table.Truncated, table.Total);
+        // Le rang vise (ecran de depart du Deck, 09/11) : comme en course, la ligne juste au-dessus du record perso, sinon la 10e
         // sans record lu, toute valeur classee en est un (un score nul n'en est pas un)
         var nouveau = record is null ? cle == DeckRankBoard.CleTemps || v > 0 : Mieux(v, record.Value, plusBas);
         return etat with
@@ -661,6 +662,7 @@ public static class DeckRankCalcul
             GapText = cle == DeckRankBoard.CleTemps ? Temps(place.Ecart, cadence) : null,
             NewPersonalBest = nouveau,
             Final = arrivee is not null,
+            Target = Entree(Cible(lignes, monde, plusBas), cadence),
         };
     }
 

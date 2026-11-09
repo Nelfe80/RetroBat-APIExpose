@@ -257,6 +257,20 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     {
         try
         {
+            // L'ECRAN DE DEPART DU PLAYERDECK EST LA (09/11) : il couvre l'ecran, aux couleurs du jeu, jusqu'a l'image du jeu.
+            // La boite « Lancement de la partie » doublerait l'ecran : elle s'efface dessous.
+            if (string.Equals(e.Type, "deck.card", StringComparison.Ordinal))
+            {
+                if (Deck.DeckStateService.Texte(e.Payload, "Kind") == "start" && Deck.DeckStateService.Texte(e.Payload, "State") == "shown"
+                    && _overlay.EnAttente)
+                {
+                    _modele.Fermer();
+                    _overlay.FermerPourLeJeu();
+                    _logger.LogInformation("Classement : l'ecran de depart du Deck est la, la boite d'attente s'efface.");
+                }
+                return;
+            }
+
             // Un jeu demarre : le panneau n'a plus rien a faire la, et rien ne doit passer
             // devant l'ecran de jeu.
             // SECURITE : si la selection change sous nos pieds (le joueur est ressorti dans la

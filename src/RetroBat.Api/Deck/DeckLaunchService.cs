@@ -146,11 +146,12 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     /// la place du joueur local (MULTIPLAYER), dont le score se classe.
     /// </summary>
     public DeckLancement Preparer(string mode, string systeme, string cheminRom, string? romGroup = null, DeckRankBoard? classement = null, int place = 1,
-        DeckTrialPlan? epreuve = null)
+        DeckTrialPlan? epreuve = null, string cartes = DeckCartes.Deck)
     {
         DeckLancement lancement;
         try
         {
+            _cartes = DeckCartes.Connu(cartes) ? cartes : DeckCartes.Deck;
             lancement = PreparerLeDeck(mode, systeme, cheminRom, romGroup, classement, epreuve);
         }
         catch (Exception ex)
@@ -253,8 +254,12 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     private static DeckLancement Aucun(string mode, string systeme, string rom, string jeu, string joueur, string chemin, string raison)
         => new(mode, systeme, rom, null, jeu, joueur, chemin, "none", null, null, null, "none", [], null, raison, DateTime.UtcNow);
 
+    /// <summary>Qui montre les ecrans de depart et de bilan du lancement en preparation (<see cref="DeckCartes"/>).</summary>
+    private string _cartes = DeckCartes.Deck;
+
     private DeckLancement Retenir(DeckLancement lancement, bool publier)
     {
+        lancement = lancement with { Cards = _cartes };
         lock (_verrou)
         {
             // un jeu qui a des Decks garde son lancement, meme sans Deck retenu : le choix en jeu reste possible
@@ -633,6 +638,9 @@ public sealed record DeckLancement(
 
     /// <summary>Les notifications de RetroArch sont coupees pour ce lancement (-OnScreenMsg 0) : les messages vont au Deck.</summary>
     public bool RetroArchMuet { get; init; }
+
+    /// <summary>Qui montre les ecrans de depart et de bilan : deck | api (<see cref="DeckCartes"/>).</summary>
+    public string Cards { get; init; } = DeckCartes.Deck;
 }
 
 /// <summary>
@@ -648,6 +656,26 @@ public sealed record DeckRendu(string Png, DeckDecor.Trou Trou, int Largeur, int
 {
     /// <summary>Le Deck qui l'a rendu sait montrer les messages dans ses rails (deck.notice).</summary>
     public bool Notices { get; init; }
+}
+
+/// <summary>
+/// QUI MONTRE LES ECRANS DE DEPART ET DE BILAN D'UN LANCEMENT AVEC DECK (demande du user du 09/11 : « l'ecran start et recap
+/// stats au debut et a la fin du world scoring comme pour les challenges/speedruns »). Un seul systeme, jamais deux ecrans :
+/// <list type="bullet">
+/// <item><see cref="Deck"/> : le PlayerDeck pose son ecran de depart plein ecran, aux couleurs du jeu, de la decision du
+/// lancement jusqu'a l'image du jeu, puis son ecran de bilan a la fin (CHALLENGE de World Scoring, prive ou diffuse ; epreuve
+/// lancee sans panneau, par la route REST) ;</item>
+/// <item><see cref="Api"/> : les pages plein ecran de l'API (preparation et bilan des epreuves du panneau Challenges &amp;
+/// Speedruns, interactives : quitter, rejouer) restent ; le Deck ne montre aucune valeur tant que la page est la
+/// (<c>deck.page</c>).</item>
+/// </list>
+/// </summary>
+public static class DeckCartes
+{
+    public const string Deck = "deck";
+    public const string Api = "api";
+
+    public static bool Connu(string? c) => c is Deck or Api;
 }
 
 /// <summary>
