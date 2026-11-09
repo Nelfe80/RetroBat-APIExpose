@@ -303,6 +303,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly RetroBat.Api.Replay.Storage.ReplayStore? _replayStore;
     /// <summary>Les NVRAM du jeu (reglages des jeux sans DIP switches), jointes au passeport.</summary>
     private readonly NvramSnapshotService? _nvram;
+    /// <summary>
+    /// Les reglages nommes du menu de test refuses par passeport (session|regle) : dits au joueur avec le verdict
+    /// (« test menu settings changed: DIFFICULTY »). Rempli seulement pour un profil a champs « name » (ReglagesDuMenu).
+    /// </summary>
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, IReadOnlyList<string>> _reglagesRefuses = new(StringComparer.Ordinal);
     private readonly RetroBat.Domain.Interfaces.IEsSettingsStore? _esSettings;
     private readonly BiosFingerprintService? _bios;   // pour estampiller score/rang sur la méta du replay
     private readonly RetroBat.Api.Replay.Sharing.ReplaySeedQueue? _semis;
@@ -4106,6 +4111,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             ["manifest_commit"] = manifestCommit, ["profile_document_sha256"] = profileDocSha,
         };
         var ctx = contexte ?? RetroBat.Api.Scoring.ContexteDeJeu.Vide;
+        // Les reglages du menu de test gardes dans une NVRAM epinglee (PGM : ket.fs) : une valeur hors usine au depart ou a
+        // la fin devient la valeur signee de son champ (ReglagesDuMenu). Sans champ « nvram » au profil, rien ne change.
+        var horsUsine = RetroBat.Api.Scoring.ReglagesDuMenu.HorsUsineDansLaNvram(profile, nvram);
+        if (horsUsine.Count > 0)
+        {
+            ctx = RetroBat.Api.Scoring.ReglagesDuMenu.Appliquer(ctx, horsUsine);
+            Trace("reglages du menu de test hors usine dans la NVRAM : " + string.Join(", ", horsUsine.Select(r => $"{r.Nom}={r.Valeur}")));
+        }
         if (RetroBat.Api.Scoring.ModesDeJeu.ModePourLePasseport(profile, ctx) is { } modeJoue) jeu["mode"] = modeJoue;
         // Une partie a plusieurs n'entre pas au classement solo (charte, decision du 2026-09-30).
         if (joueurs > 1) jeu["players"] = joueurs;
@@ -4133,10 +4146,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // L'heure de fin est celle de la PARTIE (brouillon), pas celle de l'assemblage : un brouillon
         // envoye au retour du site garde sa date.
         var finDeLaPartie = finUtc ?? DateTime.UtcNow;
+        var idDeSession = sessionId ?? Guid.NewGuid().ToString();
+        if (RetroBat.Api.Scoring.ReglagesDuMenu.NomsRefuses(profile, jeu["difficulty"] as JsonObject) is { Count: > 0 } refuses)
+        {
+            _reglagesRefuses[idDeSession + "|" + ruleset] = refuses;
+        }
         var document = new JsonObject
         {
             ["protocol"] = 1,
-            ["session_id"] = sessionId ?? Guid.NewGuid().ToString(),
+            ["session_id"] = idDeSession,
             ["ticket"] = JsonNode.Parse(ticket.GetRawText()),
             ["game"] = jeu,
             ["device"] = new JsonObject { ["device_id"] = deviceId, ["key_id"] = deviceKey.KeyId, ["key_type"] = "ecdsa_p256" },
@@ -4549,6 +4567,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     ? "Score 1LC"
                     : "Score";
 
+            // Un reglage du menu de test hors usine, nomme : le joueur sait lequel (« DIFFICULTY »).
+            // Retire dans tous les cas : un passeport publie ne laisse rien derriere lui.
+            _reglagesRefuses.TryRemove(((string?)passport["session_id"] ?? "") + "|" + (regle ?? ""), out var noms);
+            if (status is "refused" or "held" or "expired"
+                && reason is "game.difficulty_not_allowed" or "profile.nvram_mismatch"
+                && noms is { Count: > 0 })
+            {
+                await _esNotify.NotifyAsync($"{quoi} {score:N0} refusé : {RetroBat.Api.Scoring.ReglagesDuMenu.Motif(noms, "fr")}", cancellationToken).ConfigureAwait(false);
+                return;
+            }
             var message = status switch
             {
                 "published" => TexteDuScorePublie(score, rank, regle),
