@@ -48,7 +48,10 @@ public sealed class ReplayVideoPublisher
     /// Un replay a filmer et les bornes de sa performance (frames du replay). <paramref name="Epreuve"/> : un speedrun ou un
     /// challenge, dont le film va du depart a l'arrivee (08/11), sans la coupe des 3 dernieres minutes d'un score.
     /// </summary>
-    public sealed record Cible(string ReplayId, long? Debut, long? Fin, bool Epreuve = false);
+    /// <param name="Controles">Les scores certifies du replay et la fin de leur run (<c>checks</c> du site, 09/11) : le score lu
+    /// pendant le rendu doit les retrouver (<see cref="ControleDeFidelite"/>).</param>
+    public sealed record Cible(string ReplayId, long? Debut, long? Fin, bool Epreuve = false,
+        IReadOnlyList<PointDuScore>? Controles = null);
 
     /// <summary>Ce que le site demande a cette borne.</summary>
     /// <param name="Role"><see cref="RoleStation"/>, <see cref="RoleJoueur"/> ou <see cref="RoleAucun"/> ; null
@@ -111,6 +114,12 @@ public sealed class ReplayVideoPublisher
             // La limite compte les rendus TENTES, pas les envois reussis : un site qui refuse ne doit pas
             // faire filmer toute la liste (vecu le 14 octobre, une erreur du site et dix rendus de suite).
             if (rendus >= limite) break;
+            // La capture de cette partie attend encore la decision du site ou son envoi : la borne ne la rend pas en double.
+            if (liste.Role != RoleStation && CaptureEnAttente(cible.ReplayId))
+            {
+                details.Add(cible.ReplayId + " : capture en attente sur cette borne");
+                continue;
+            }
             var manifest = _manifests.GetManifest(cible.ReplayId);
             if (manifest is null || !_objects.HasObject(manifest.Object.Sha256))
             {
@@ -140,7 +149,7 @@ public sealed class ReplayVideoPublisher
             var dossier = Path.Combine(_objects.TempRoot, "video", cible.ReplayId);
             try
             {
-                var film = await _rendu.RendreAsync(cible.ReplayId, debut, fin, ct).ConfigureAwait(false);
+                var film = await _rendu.RendreAsync(cible.ReplayId, debut, fin, ct, cible.Controles).ConfigureAwait(false);
                 if (!film.Ok || film.Fichier is null)
                 {
                     var raison = film.Raison ?? "incomplet";
@@ -149,6 +158,16 @@ public sealed class ReplayVideoPublisher
                     // le compte comme un essai, le repropose plus tard, puis l'abandonne.
                     if (!RaisonsPassageres.Contains(raison))
                         await SignalerEchecAsync(credential, cible.ReplayId, "rendu_" + raison, ct).ConfigureAwait(false);
+                    continue;
+                }
+                // LE CONTROLE DE FIDELITE (09/11) : un replay qui ne rejoue pas la partie ne part jamais ; la station ne
+                // filme que ce qu'elle a verifie, la borne du joueur (meme ROM, meme coeur, memes reglages) envoie aussi un
+                // film qu'elle n'a pas pu verifier, en le disant.
+                if (RefusDeFidelite(film.Fidelite, liste.Role == RoleStation) is { } refusFidelite)
+                {
+                    details.Add(cible.ReplayId + " : " + refusFidelite + " (" + film.DetailFidelite + "), pas d'envoi");
+                    _logger.LogWarning("Video : {ReplayId} non envoye, {Refus} ({Detail}).", cible.ReplayId, refusFidelite, film.DetailFidelite);
+                    await SignalerEchecAsync(credential, cible.ReplayId, refusFidelite, ct).ConfigureAwait(false);
                     continue;
                 }
 
@@ -177,6 +196,7 @@ public sealed class ReplayVideoPublisher
                     ["run_start_frame"] = film.Debut,
                     ["run_end_frame"] = film.Fin,
                     ["fps"] = manifest.Frames.NominalFps,
+                    ["fidelity"] = film.Fidelite,
                 }, ct).ConfigureAwait(false);
                 details.Add(cible.ReplayId + " : envoyee (" + videoId + ")" + (confirme is null ? ", confirmation refusee" : ""));
                 if (confirme is not null) envoyees++;
@@ -191,6 +211,60 @@ public sealed class ReplayVideoPublisher
         _logger.LogInformation("Video : {Envoyees} film(s) envoye(s) sur {Cibles} cible(s). {Details}",
             envoyees, cibles.Count, string.Join(" | ", details));
         return new Rapport(cibles.Count, rendus, envoyees, details, refuse);
+    }
+
+    /// <summary>
+    /// La raison de ne pas envoyer un film rendu, selon son controle de fidelite, ou null pour l'envoyer. « desync » : le replay
+    /// ne rejoue pas la partie, refus definitif au site. « non_verifie » : refuse a une station seulement (dernier recours,
+    /// 09/11). Pur.
+    /// </summary>
+    internal static string? RefusDeFidelite(string? fidelite, bool station)
+        => fidelite switch
+        {
+            ControleDeFidelite.Fidele => null,
+            ControleDeFidelite.Desync => ControleDeFidelite.Desync,
+            _ => station ? ControleDeFidelite.NonVerifie : null,
+        };
+
+    /// <summary>
+    /// Une capture de ce replay est-elle gardee sur cette borne (fiche <c>captures\&lt;replay&gt;.json</c>), en attente de la
+    /// decision du site ou de son envoi ?
+    /// </summary>
+    private bool CaptureEnAttente(string replayId)
+    {
+        try
+        {
+            return File.Exists(Path.Combine(Path.GetFullPath(Path.Combine(_objects.TempRoot, "..", "captures")), replayId + ".json"));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// POURQUOI LA BORNE N'A PAS FILME CETTE PARTIE (decision du user du 09/11) : la capture n'a pas eu lieu ou a ete
+    /// abandonnee (filtre d'image, place, borne modeste, rotation...). Le site le note (exploitation) et la borne du joueur
+    /// rendra le film depuis son replay, au repos, sans attendre. Seulement pour une partie avec replay ; jamais bloquant.
+    /// </summary>
+    public async Task SignalerNonCaptureAsync(string replayId, string raison, string? detail, CancellationToken ct)
+    {
+        if (!replayId.StartsWith("rp_", StringComparison.Ordinal)) return;
+        var credential = _devices.GetCredential();
+        if (string.IsNullOrEmpty(credential)) return;
+        try
+        {
+            await PosterAsync(credential, "videos/no-capture", new JsonObject
+            {
+                ["replay_id"] = replayId,
+                ["reason"] = raison,
+                ["detail"] = detail is { Length: > 200 } ? detail[..200] : detail,
+            }, ct).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
+        {
+            _logger.LogInformation("Video : raison de non-capture de {ReplayId} non transmise ({Message}).", replayId, ex.Message);
+        }
     }
 
     /// <summary>
@@ -281,8 +355,17 @@ public sealed class ReplayVideoPublisher
             {
                 var id = c.TryGetProperty("replay_id", out var i) && i.ValueKind == JsonValueKind.String ? i.GetString() : null;
                 if (string.IsNullOrEmpty(id)) continue;
+                var controles = new List<PointDuScore>();
+                if (c.TryGetProperty("checks", out var points) && points.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var p in points.EnumerateArray())
+                    {
+                        if (p.ValueKind == JsonValueKind.Object && Nombre(p, "end_frame") is long finFrame && Nombre(p, "score") is long score)
+                            controles.Add(new PointDuScore(finFrame, score));
+                    }
+                }
                 sortie.Add(new Cible(id!, Nombre(c, "run_start_frame"), Nombre(c, "run_end_frame"),
-                    c.TryGetProperty("challenge", out var ep) && ep.ValueKind == JsonValueKind.True));
+                    c.TryGetProperty("challenge", out var ep) && ep.ValueKind == JsonValueKind.True, controles.Count > 0 ? controles : null));
             }
         }
         return new Liste(role, sortie);

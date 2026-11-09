@@ -303,15 +303,18 @@ public sealed class ReplayCaptureTests
     [Fact]
     public void La_sequence_du_record_part_de_90_pourcent_du_score_de_fin_de_run()
     {
-        // Le score atteint 900 (90 % de 1 000) a 100 s : 3 s d'elan, 2 s apres la fin du run.
+        // Le score atteint 900 (90 % de 1 000) a 100 s, mais le film montre au moins la minute avant la fin du run (09/11).
         double[][] courbe = [[10, 100], [20, 500], [100, 900], [110, 1000]];
-        Assert.Equal((97.0, 117.0), ReplayCaptureService.SequenceDuRecord(courbe, 115));
+        Assert.Equal((55.0, 117.0), ReplayCaptureService.SequenceDuRecord(courbe, 115));
+        // 90 % atteints plus d'une minute avant la fin : 3 s d'elan avant ce moment, 2 s apres la fin du run.
+        double[][] lente = [[10, 100], [100, 900], [200, 1000]];
+        Assert.Equal((97.0, 202.0), ReplayCaptureService.SequenceDuRecord(lente, 200));
         // 3 minutes au plus : les dernieres.
         double[][] longue = [[10, 100], [500, 9000], [1000, 10000]];
         Assert.Equal((820.0, 1002.0), ReplayCaptureService.SequenceDuRecord(longue, 1000));
         // Ce qui suit la fin du run (un continue) ne compte pas.
         double[][] apres = [[50, 100], [200, 5000]];
-        Assert.Equal((47.0, 102.0), ReplayCaptureService.SequenceDuRecord(apres, 100));
+        Assert.Equal((40.0, 102.0), ReplayCaptureService.SequenceDuRecord(apres, 100));
         // Sans courbe : les 3 dernieres minutes, jamais avant le debut du film.
         Assert.Equal((120.0, 302.0), ReplayCaptureService.SequenceDuRecord(null, 300));
         Assert.Equal((0.0, 62.0), ReplayCaptureService.SequenceDuRecord([], 60));

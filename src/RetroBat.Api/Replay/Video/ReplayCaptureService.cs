@@ -133,6 +133,8 @@ public sealed class ReplayCaptureService : BackgroundService
         /// l'annonce, doit etre en portrait ; sinon le film est abandonne et la station le rend depuis le replay, redresse.
         /// </summary>
         public bool Verticale;
+        /// <summary>Le nom du set du jeu (fichier lance), pour lire son sens dans la base de MAME (09/11).</summary>
+        public string? Set;
         /// <summary>La forme de l'image annoncee par le coeur (libretro « Aspect »), null si inconnue.</summary>
         public double? Forme;
         /// <summary>Le fanart du jeu (sinon sa capture), fond du cadre 16:9 du direct et de la video ; null sans image.</summary>
@@ -199,6 +201,9 @@ public sealed class ReplayCaptureService : BackgroundService
         }
     }
 
+    /// <summary>Ce que montre au moins le film d'un score avant la fin de son run, en secondes (09/11).</summary>
+    internal const double AuMoinsAvantLaFinS = 60;
+
     /// <summary>
     /// LA SEQUENCE DU RECORD (decision du 15 octobre 2026) : seule elle part sur YouTube, la partie complete se regarde
     /// avec le replay. Du moment ou le score atteint 90 % de celui de la fin du run jusqu'a cette fin, 3 minutes au plus,
@@ -215,6 +220,9 @@ public sealed class ReplayCaptureService : BackgroundService
             var seuil = points.Max(p => p[1]) * 0.9;
             debut = points.First(p => p[1] >= seuil)[0] - Elan;
         }
+        // AU MOINS UNE MINUTE AVANT LA FIN DU RUN (demande du user du 09/11 : les films de record etaient trop courts quand le
+        // score bondissait a la fin) ; tout le film s'il est plus court.
+        debut = Math.Min(debut, finRunS - AuMoinsAvantLaFinS);
         debut = Math.Max(Math.Max(0, debut), finRunS - Max);
         return (Math.Round(debut, 2), Math.Round(finRunS + Apres, 2));
     }
@@ -584,7 +592,13 @@ public sealed class ReplayCaptureService : BackgroundService
                         SuivreLaCadence(suivi, trame.Source, trame.Frame);
                     break;
                 case "ui.game.ended":
-                    _ = Task.Run(() => ArreterAsync(null, null, abandon: false, "fin de partie"));
+                    _ = Task.Run(async () =>
+                    {
+                        await ArreterAsync(null, null, abandon: false, "fin de partie").ConfigureAwait(false);
+                        // Un dossier des films absent se pose hors partie, pour la suivante (09/11).
+                        await Task.Delay(TimeSpan.FromSeconds(5), _arret).ConfigureAwait(false);
+                        PreparerRetroArch();
+                    });
                     break;
                 case "ui.game.started":
                     // Le jeu lance, pour le fond du cadre de son film (fanart).
@@ -612,11 +626,17 @@ public sealed class ReplayCaptureService : BackgroundService
         await _operation.WaitAsync(_arret).ConfigureAwait(false);
         try
         {
-            if (_enCours is not null || EstModeste()) return;
+            if (_enCours is not null) return;
+            if (EstModeste())
+            {
+                SignalerNonCapture(replayId, "borne_modeste", "le jeu ralentissait pendant une capture, pause de " + ModesteDurant.TotalDays + " jours");
+                return;
+            }
             var reglages = LireRetroArch();
             if (string.Equals(Valeur(reglages, "video_gpu_record"), "true", StringComparison.OrdinalIgnoreCase))
             {
                 _logger.LogInformation("Capture : RetroArch filme l'image affichee (video_gpu_record), partie non filmee.");
+                SignalerNonCapture(replayId, "gpu_record", "video_gpu_record actif dans retroarch.cfg");
                 return;
             }
             // Un filtre d'image du coeur (NTSC) ne se diffuse pas bien (25/10) : ni film ni direct ; la video d'un record
@@ -624,19 +644,23 @@ public sealed class ReplayCaptureService : BackgroundService
             if (FiltreActif() is { } filtre)
             {
                 _logger.LogInformation("Capture : filtre d'image du coeur actif ({Filtre}), partie non filmee.", filtre);
+                SignalerNonCapture(replayId, "filtre_image", filtre);
                 return;
             }
             // Le spectateur cache d'une partie MULTIPLAYER filme dans son propre dossier (MultiplayerSpectateur).
             var dossier = duSpectateur ? RetroBat.Api.Multiplayer.MultiplayerSpectateur.DossierDesFilms : Valeur(reglages, "recording_output_directory");
             if (string.IsNullOrWhiteSpace(dossier))
             {
-                _logger.LogInformation("Capture : aucun dossier de films dans retroarch.cfg, partie non filmee.");
+                // RetroArch tourne deja avec ce retroarch.cfg : le dossier sera pose pour la partie suivante (PreparerRetroArch).
+                _logger.LogInformation("Capture : aucun dossier de films dans retroarch.cfg, partie non filmee ; il sera pose apres la partie.");
+                SignalerNonCapture(replayId, "dossier_films", "recording_output_directory absent, pose pour la partie suivante");
                 return;
             }
             Directory.CreateDirectory(dossier);
             if (EspaceLibreGo(dossier) is { } libre && libre < _espaceLibreMinGo)
             {
                 _logger.LogInformation("Capture : {Libre:F1} Go libres, partie non filmee.", libre);
+                SignalerNonCapture(replayId, "place_disque", libre.ToString("F1", System.Globalization.CultureInfo.InvariantCulture) + " Go libres");
                 return;
             }
 
@@ -658,6 +682,7 @@ public sealed class ReplayCaptureService : BackgroundService
             if (fichier is null)
             {
                 _logger.LogInformation("Capture : RetroArch n'a pas commence a filmer {ReplayId}.", replayId);
+                SignalerNonCapture(replayId, "retroarch_sans_film", "aucun film apparu en 5 s dans " + dossier);
                 return;
             }
             var statut = duSpectateur ? null : await _ra.GetStatusAsync(_arret).ConfigureAwait(false);
@@ -675,6 +700,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 {
                     ReplayId = replayId, Fichier = fichier, FrameDebut = frame, Rotation = rotation, SansReplay = sansReplay,
                     Verticale = !duSpectateur && JeuVertical(_cheminDuJeu),
+                    Set = string.IsNullOrWhiteSpace(_cheminDuJeu) ? null : Path.GetFileNameWithoutExtension(_cheminDuJeu),
                     Forme = forme, Fond = FondDuJeu(_cheminDuJeu), DuSpectateur = duSpectateur,
                     Crt = LanceurDuDirect.EcranATube(_cheminDuJeu is { Length: > 0 } cheminDuJeu
                         ? RetroBat.Api.Netplay.NetplayHostService.SystemeDuChemin(cheminDuJeu, RetroBatPaths.RomsRoot) : null),
@@ -744,7 +770,7 @@ public sealed class ReplayCaptureService : BackgroundService
     /// Arrete la capture en cours : RetroArch ferme le film, la borne le range (ou l'efface s'il est
     /// <paramref name="abandon"/>ne). <paramref name="replayId"/> null : quelle que soit la capture.
     /// </summary>
-    private async Task ArreterAsync(string? replayId, long? derniereFrame, bool abandon, string pourquoi)
+    private async Task ArreterAsync(string? replayId, long? derniereFrame, bool abandon, string pourquoi, string? code = null)
     {
         await _operation.WaitAsync(_arret).ConfigureAwait(false);
         try
@@ -802,6 +828,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 Effacer(c.Fichier);
                 OublierLesSessions(c.ReplayId);
                 _logger.LogInformation("Capture : {ReplayId} abandonnee ({Pourquoi}), film efface.", c.ReplayId, pourquoi);
+                if (code is not null) SignalerNonCapture(c.ReplayId, code, pourquoi);
                 return;
             }
             var entete = MatroskaEntete.Lire(c.Fichier);
@@ -822,6 +849,8 @@ public sealed class ReplayCaptureService : BackgroundService
                 OublierLesSessions(c.ReplayId);
                 _logger.LogInformation("Capture : {ReplayId} non gardee ({Raison}).", c.ReplayId,
                     entete is null ? "film illisible" : entete.Couchee ? "jeu vertical, film couche" : "image trop petite");
+                SignalerNonCapture(c.ReplayId, entete is null ? "film_illisible" : entete.Couchee ? "image_couchee" : "echelle_absente",
+                    entete is null ? "en-tete du film illisible" : entete.Largeur + "x" + entete.Hauteur);
                 return;
             }
 
@@ -1063,7 +1092,7 @@ public sealed class ReplayCaptureService : BackgroundService
         }
         MarquerModeste();
         _ = Task.Run(() => ArreterAsync(c.ReplayId, null, abandon: true,
-            "le jeu ralentissait (reference " + c.Garde.Reference.ToString("F1") + " images/s)"));
+            "le jeu ralentissait (reference " + c.Garde.Reference.ToString("F1") + " images/s)", "jeu_ralenti"));
     }
 
     /// <summary>L'emetteur et la trame emulee d'un signal du jeu (<c>ingame.memory.changed</c>), ou null. Pur.</summary>
@@ -1118,19 +1147,28 @@ public sealed class ReplayCaptureService : BackgroundService
         var c = _enCours;
         if (c is null) return;
 
-        if (c.Verticale && c.Rotation is null)
-        {
-            await ArreterAsync(c.ReplayId, null, abandon: true, "jeu vertical, sens de rotation inconnu").ConfigureAwait(false);
-            return;
-        }
-
         if (!c.EnteteVerifiee && MatroskaEntete.Lire(c.Fichier) is { } entete)
         {
             c.EnteteVerifiee = true;
+            // LE SENS D'UN JEU VERTICAL QUE LE COEUR N'A PAS ANNONCE (09/11) : l'image du film, puis la base de MAME.
+            if (c.Verticale && c.Rotation is null)
+            {
+                c.Rotation = SensDesJeuxVerticaux.QuartsDeTour(entete.Largeur, entete.Hauteur,
+                    entete.Hauteur > entete.Largeur ? null : SensDesJeuxVerticaux.SensDeMame(c.Set));
+                _logger.LogInformation("Capture : {ReplayId}, jeu vertical sans sens annonce par le coeur : {Sens} (image {Largeur}x{Hauteur}, set {Set}).",
+                    c.ReplayId, c.Rotation?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "inconnu",
+                    entete.Largeur, entete.Hauteur, c.Set ?? "?");
+                if (c.Rotation is null)
+                {
+                    await ArreterAsync(c.ReplayId, null, abandon: true, "jeu vertical, sens de rotation inconnu (ni coeur ni base MAME)",
+                        "rotation_inconnue").ConfigureAwait(false);
+                    return;
+                }
+            }
             if (c.Verticale && !PortraitUneFoisTourne(entete.Largeur, entete.Hauteur, c.Rotation))
             {
                 await ArreterAsync(c.ReplayId, null, abandon: true, "jeu vertical, image couchee meme tournee (rotation "
-                    + (c.Rotation?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "inconnue") + ")").ConfigureAwait(false);
+                    + (c.Rotation?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "inconnue") + ")", "image_couchee").ConfigureAwait(false);
                 return;
             }
             // Un film couche se redresse a la fin (ou dans sa version YouTube), si l'on sait dans quel sens. Un film a la
@@ -1139,7 +1177,8 @@ public sealed class ReplayCaptureService : BackgroundService
             if ((entete.Couchee && !redressable) || (!entete.Origine && entete.Largeur < LargeurMinimale))
             {
                 await ArreterAsync(c.ReplayId, null, abandon: true,
-                    entete.Couchee ? "jeu vertical, sens de rotation inconnu" : "image de " + entete.Largeur + " pixels, echelle x4 absente").ConfigureAwait(false);
+                    entete.Couchee ? "jeu vertical, sens de rotation inconnu" : "image de " + entete.Largeur + " pixels, echelle x4 absente",
+                    entete.Couchee ? "rotation_inconnue" : "echelle_absente").ConfigureAwait(false);
                 return;
             }
         }
@@ -1148,12 +1187,12 @@ public sealed class ReplayCaptureService : BackgroundService
         // tardif en est la copie. Seuls le plafond local et l'espace libre du disque l'arretent.
         if (TailleDe(c.Fichier) > _tailleLocaleMax)
         {
-            await ArreterAsync(c.ReplayId, null, abandon: true, "film plus gros que " + _tailleLocaleMax / 1_000_000 + " Mo").ConfigureAwait(false);
+            await ArreterAsync(c.ReplayId, null, abandon: true, "film plus gros que " + _tailleLocaleMax / 1_000_000 + " Mo", "film_trop_gros").ConfigureAwait(false);
             return;
         }
         if (EspaceLibreGo(Path.GetDirectoryName(c.Fichier) ?? _dossier) is { } libre && libre < _espaceLibreMinGo)
         {
-            await ArreterAsync(c.ReplayId, null, abandon: true, "plus que " + libre.ToString("F1") + " Go libres").ConfigureAwait(false);
+            await ArreterAsync(c.ReplayId, null, abandon: true, "plus que " + libre.ToString("F1") + " Go libres", "place_disque").ConfigureAwait(false);
             return;
         }
 
@@ -1163,7 +1202,7 @@ public sealed class ReplayCaptureService : BackgroundService
         {
             MarquerModeste();
             await ArreterAsync(c.ReplayId, null, abandon: true,
-                "le jeu ralentissait (reference " + c.Garde.Reference.ToString("F1") + " images/s)").ConfigureAwait(false);
+                "le jeu ralentissait (reference " + c.Garde.Reference.ToString("F1") + " images/s)", "jeu_ralenti").ConfigureAwait(false);
         }
     }
 
@@ -1522,6 +1561,7 @@ public sealed class ReplayCaptureService : BackgroundService
         var ratee = g with { EchecsDeVersion = g.EchecsDeVersion + 1 };
         if (ratee.EchecsDeVersion >= EchecsDeVersionMax)
         {
+            SignalerNonCapture(ratee.ReplayId, "version_youtube", r.DerniereLigne ?? "code " + r.Code);
             Oublier(ratee, fiche, "version YouTube impossible (" + (r.DerniereLigne ?? "code " + r.Code) + ")");
             return ratee;
         }
@@ -1572,6 +1612,15 @@ public sealed class ReplayCaptureService : BackgroundService
                 if (!(int.TryParse(ValeurDans(courant, "video_record_scale_factor"), out var actuel) && actuel >= 2))
                     nouveau = AvecReglage(courant, "video_record_scale_factor", EchelleVoulue) ?? nouveau;
             }
+            // PAS DE DOSSIER DES FILMS (09/11, decision du user) : l'API le cree et le donne a RetroArch, comme les autres
+            // reglages qu'elle lui impose ; jamais une option native d'ES.
+            if (AvecDossierDesFilms(nouveau ?? contenu, DossierDesFilmsParDefaut) is { } avecDossier)
+            {
+                nouveau = avecDossier;
+                Directory.CreateDirectory(DossierDesFilmsParDefaut);
+                _logger.LogInformation("Capture : aucun dossier des films dans retroarch.cfg, {Dossier} cree et donne a RetroArch.",
+                    DossierDesFilmsParDefaut);
+            }
             if (nouveau is null) return;
             File.WriteAllText(chemin, nouveau, new UTF8Encoding(false));
             _logger.LogInformation("Capture : RetroArch filmera {Format}.",
@@ -1581,6 +1630,30 @@ public sealed class ReplayCaptureService : BackgroundService
         {
             _logger.LogWarning(ex, "Capture : reglages des films non poses.");
         }
+    }
+
+    /// <summary>
+    /// Dit au site pourquoi cette partie n'a pas de film capte (09/11) : il le note pour l'exploitation, et la borne rendra le
+    /// film de son record depuis le replay, au repos. Jamais bloquant ; seulement pour une partie avec replay.
+    /// </summary>
+    private void SignalerNonCapture(string replayId, string code, string? detail)
+    {
+        if (!replayId.StartsWith("rp_", StringComparison.Ordinal)) return;
+        _ = Task.Run(() => _publication.SignalerNonCaptureAsync(replayId, code, detail, _arret));
+    }
+
+    /// <summary>Le dossier des films que l'API donne a RetroArch quand retroarch.cfg n'en a pas : celui de RetroBat.</summary>
+    internal static string DossierDesFilmsParDefaut => Path.Combine(RetroBatPaths.RetroBatRoot, "records", "output");
+
+    /// <summary>
+    /// Le contenu de retroarch.cfg avec <c>recording_output_directory</c> = <paramref name="dossier"/> quand il n'y est pas ou
+    /// est vide (ou « default ») ; null s'il en a deja un. Pur, pour etre teste.
+    /// </summary>
+    internal static string? AvecDossierDesFilms(string contenu, string dossier)
+    {
+        var actuel = ValeurDans(contenu, "recording_output_directory");
+        if (!string.IsNullOrWhiteSpace(actuel) && !string.Equals(actuel, "default", StringComparison.OrdinalIgnoreCase)) return null;
+        return AvecReglage(contenu, "recording_output_directory", dossier);
     }
 
     /// <summary>Le fichier de reglages du film a la taille d'origine, reecrit s'il manque ou differe.</summary>

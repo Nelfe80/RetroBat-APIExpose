@@ -32,6 +32,7 @@ public sealed class ReplayVideoScheduler : BackgroundService
     private readonly TimeSpan _sansRole;
 
     private readonly object _verrou = new();
+    private readonly SemaphoreSlim _reveil = new(0, 1);
     private DateTime _derniereActivite = DateTime.UtcNow;
     private bool _partieEnCours;
     private CancellationTokenSource? _renduEnCours;
@@ -44,8 +45,11 @@ public sealed class ReplayVideoScheduler : BackgroundService
     {
         _bus = bus; _publication = publication; _playback = playback; _logger = logger;
         _actif = configuration.GetValue("Video:Render:Enabled", true);
-        _repos = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Render:IdleMinutes", 15)));
-        _intervalle = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Render:IntervalMinutes", 5)));
+        // LA BORNE DU JOUEUR REND SES RECORDS AU REPOS (decision du user du 09/11) : elle s'eteint souvent peu apres la
+        // partie, le repos passe de 15 a 3 minutes ; le moindre jeu lance, la moindre touche, manette comprise, arrete le rendu.
+        _repos = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Render:IdleMinutes", 3)));
+        // Un passage par minute : le repos se juge sur la borne, le site n'est appele qu'au repos.
+        _intervalle = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Render:IntervalMinutes", 1)));
         _rienAFilmer = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Render:NothingToDoMinutes", 60)));
         _sansRole = TimeSpan.FromHours(Math.Max(1, configuration.GetValue("Video:Render:NoRoleHours", 6)));
     }
@@ -98,9 +102,12 @@ public sealed class ReplayVideoScheduler : BackgroundService
             _intervalle.TotalMinutes, _repos.TotalMinutes);
 
         var attente = _intervalle;
+        var manettes = Task.Run(() => SurveillerLesManettesAsync(stoppingToken), stoppingToken);
         while (!stoppingToken.IsCancellationRequested)
         {
-            try { await Task.Delay(attente, stoppingToken).ConfigureAwait(false); }
+            // Une partie qui finit reveille le planificateur : son record peut etre a rendre avant que la borne s'eteigne,
+            // meme si le dernier passage n'avait rien trouve (attente d'une heure).
+            try { await _reveil.WaitAsync(attente, stoppingToken).ConfigureAwait(false); }
             catch (OperationCanceledException) { break; }
             try
             {
@@ -118,7 +125,90 @@ public sealed class ReplayVideoScheduler : BackgroundService
                 attente = _intervalle;
             }
         }
+        try { await manettes.ConfigureAwait(false); } catch (Exception) { /* arret */ }
     }
+
+    /// <summary>
+    /// LES MANETTES COMPTENT COMME ACTIVITE (09/11) : Windows ne les voit pas dans GetLastInputInfo. Une manette XInput qui
+    /// change d'etat (paquet different) vaut une touche : l'activite est notee et un rendu chez un joueur s'arrete.
+    /// </summary>
+    private async Task SurveillerLesManettesAsync(CancellationToken ct)
+    {
+        var etats = new EtatDeManette?[4];
+        while (!ct.IsCancellationRequested)
+        {
+            try { await Task.Delay(TimeSpan.FromSeconds(1), ct).ConfigureAwait(false); }
+            catch (OperationCanceledException) { return; }
+            if (ManettesActives(etats)) NoterActivite(arreterLeRendu: true);
+        }
+    }
+
+    /// <summary>Ce qui compte d'une manette : ses boutons, ses gachettes, ses deux sticks.</summary>
+    internal readonly record struct EtatDeManette(ushort Boutons, byte GachetteG, byte GachetteD, short GX, short GY, short DX, short DY);
+
+    /// <summary>
+    /// Une manette XInput a-t-elle servi depuis le dernier releve ? Le premier releve d'une manette ne compte pas (etat de
+    /// depart) ; une manette qui disparait non plus.
+    /// </summary>
+    private static bool ManettesActives(EtatDeManette?[] etats)
+    {
+        var active = false;
+        for (var i = 0; i < etats.Length; i++)
+        {
+            EtatDeManette? etat;
+            try
+            {
+                etat = XInputGetState((uint)i, out var e) == 0
+                    ? new EtatDeManette(e.Boutons, e.GachetteGauche, e.GachetteDroite, e.GaucheX, e.GaucheY, e.DroiteX, e.DroiteY)
+                    : null;
+            }
+            catch (Exception) { return false; }
+            active |= ChangementDeManette(etats[i], etat);
+            etats[i] = etat;
+        }
+        return active;
+    }
+
+    /// <summary>
+    /// La manette a-t-elle servi entre deux releves (presente aux deux) ? Un bouton, une gachette enfoncee de plus de 40, un
+    /// stick pousse hors de sa zone morte (10 000) ; le leger tremblement d'un stick au repos ne compte pas, sinon une manette
+    /// fatiguee empecherait tout rendu. Pur.
+    /// </summary>
+    internal static bool ChangementDeManette(EtatDeManette? avant, EtatDeManette? apres)
+    {
+        if (avant is not { } a || apres is not { } b) return false;
+        static bool Pousse(short x) => Math.Abs((int)x) > 10_000;
+        static bool Bouge(short x, short y) => Math.Abs(x - y) > 4_000;
+        return a.Boutons != b.Boutons
+            || Math.Abs(a.GachetteG - b.GachetteG) > 40 || Math.Abs(a.GachetteD - b.GachetteD) > 40
+            || ((Pousse(b.GX) || Pousse(b.GY)) && (Bouge(a.GX, b.GX) || Bouge(a.GY, b.GY) || !(Pousse(a.GX) || Pousse(a.GY))))
+            || ((Pousse(b.DX) || Pousse(b.DY)) && (Bouge(a.DX, b.DX) || Bouge(a.DY, b.DY) || !(Pousse(a.DX) || Pousse(a.DY))));
+    }
+
+    /// <summary>Note une activite ; chez un joueur (ou pour une partie), le rendu en cours s'arrete.</summary>
+    private void NoterActivite(bool arreterLeRendu)
+    {
+        lock (_verrou)
+        {
+            _derniereActivite = DateTime.UtcNow;
+            if (arreterLeRendu && _role != ReplayVideoPublisher.RoleStation)
+            {
+                try { _renduEnCours?.Cancel(); } catch (Exception) { /* deja termine */ }
+            }
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct EtatXInput
+    {
+        public uint Paquet;
+        public ushort Boutons;
+        public byte GachetteGauche, GachetteDroite;
+        public short GaucheX, GaucheY, DroiteX, DroiteY;
+    }
+
+    [DllImport("xinput1_4.dll", EntryPoint = "XInputGetState")]
+    private static extern uint XInputGetState(uint index, out EtatXInput etat);
 
     /// <summary>Un passage : filme un record si le role et l'etat de la borne le permettent. Rend le delai avant le suivant.</summary>
     private async Task<TimeSpan> PasserAsync(CancellationToken stoppingToken)
@@ -196,7 +286,10 @@ public sealed class ReplayVideoScheduler : BackgroundService
             switch (e.Type)
             {
                 case "ui.game.started": _partieEnCours = true; break;
-                case "ui.game.ended": _partieEnCours = false; break;
+                case "ui.game.ended":
+                    _partieEnCours = false;
+                    try { if (_reveil.CurrentCount == 0) _reveil.Release(); } catch (SemaphoreFullException) { /* deja reveille */ }
+                    break;
                 case "ui.game.selected":
                 case "ui.system.selected":
                 case "panel.input.pressed":

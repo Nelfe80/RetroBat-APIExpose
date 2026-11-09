@@ -30,34 +30,46 @@ public sealed class ReplayVideoRenderer
     private readonly IReplayObjectStore _objects;
     private readonly IReplayMetadataStore _meta;
     private readonly IReplayRuntimeResolver _resolver;
-    private readonly ReplayPlaybackService _playback;
+    private readonly Func<string> _etatDeLaLecture;
     private readonly ILogger<ReplayVideoRenderer> _logger;
     private readonly SemaphoreSlim _unSeulRendu = new(1, 1);
 
     public ReplayVideoRenderer(IReplayManifestStore manifests, IReplayObjectStore objects, IReplayMetadataStore meta,
         IReplayRuntimeResolver resolver, ReplayPlaybackService playback, ILogger<ReplayVideoRenderer> logger)
+        : this(manifests, objects, meta, resolver, () => playback.GetState().State, logger)
     {
-        _manifests = manifests; _objects = objects; _meta = meta; _resolver = resolver; _playback = playback;
+    }
+
+    /// <summary>Sans le lecteur de replays : <paramref name="etatDeLaLecture"/> dit « idle » quand aucune lecture ne tourne (essais).</summary>
+    internal ReplayVideoRenderer(IReplayManifestStore manifests, IReplayObjectStore objects, IReplayMetadataStore meta,
+        IReplayRuntimeResolver resolver, Func<string> etatDeLaLecture, ILogger<ReplayVideoRenderer> logger)
+    {
+        _manifests = manifests; _objects = objects; _meta = meta; _resolver = resolver; _etatDeLaLecture = etatDeLaLecture;
         _logger = logger;
     }
 
     /// <param name="Ok">Le film couvre toute la performance demandee.</param>
     /// <param name="Raison">Pourquoi il n'y a pas de film complet, sinon null.</param>
     /// <param name="Fichier">Le film, s'il en existe un (meme incomplet).</param>
+    /// <param name="Fidelite">Le controle de fidelite (<see cref="ControleDeFidelite"/>) : fidele, desync ou non_verifie.</param>
     public sealed record RenduVideo(bool Ok, string? Raison, string? Fichier, long Debut, long Fin, long FrameAtteinte,
-        double Secondes);
+        double Secondes, string Fidelite = ControleDeFidelite.NonVerifie, string? DetailFidelite = null,
+        IReadOnlyList<(long Frame, long Score)>? Releves = null);
 
     /// <summary>
     /// Rend la performance d'un replay. <paramref name="debut"/> et <paramref name="fin"/> sont en frames du
     /// replay (les bornes du score, CDC video V2 §4.4) ; sans elles, tout le replay.
     /// </summary>
-    public async Task<RenduVideo> RendreAsync(string replayId, long? debut, long? fin, CancellationToken ct)
+    /// <param name="controles">Les scores certifies et la fin de leur run, que le score lu pendant le rendu doit retrouver
+    /// (controle de fidelite, 09/11) ; sans eux, le film est « non verifie ».</param>
+    public async Task<RenduVideo> RendreAsync(string replayId, long? debut, long? fin, CancellationToken ct,
+        IReadOnlyList<PointDuScore>? controles = null)
     {
         if (!await _unSeulRendu.WaitAsync(0, ct).ConfigureAwait(false))
             return Echec("rendu_en_cours");
         try
         {
-            return await RendreSeulAsync(replayId, debut, fin, ct).ConfigureAwait(false);
+            return await RendreSeulAsync(replayId, debut, fin, controles, ct).ConfigureAwait(false);
         }
         finally
         {
@@ -65,10 +77,11 @@ public sealed class ReplayVideoRenderer
         }
     }
 
-    private async Task<RenduVideo> RendreSeulAsync(string replayId, long? debutDemande, long? finDemandee, CancellationToken ct)
+    private async Task<RenduVideo> RendreSeulAsync(string replayId, long? debutDemande, long? finDemandee,
+        IReadOnlyList<PointDuScore>? controles, CancellationToken ct)
     {
         // Jamais pendant une partie ni une lecture : on lance notre propre RetroArch.
-        if (_playback.GetState().State != "idle") return Echec("lecture_en_cours");
+        if (_etatDeLaLecture() != "idle") return Echec("lecture_en_cours");
         if (Process.GetProcessesByName("retroarch").Length > 0) return Echec("emulateur_en_cours");
 
         var manifest = _manifests.GetManifest(replayId);
@@ -79,6 +92,9 @@ public sealed class ReplayVideoRenderer
 
         var resolution = _resolver.Resolve(manifest, _meta.GetMeta(replayId)?.Launch);
         if (resolution.Runtime is null) return Echec("runtime_" + resolution.Failure.ToString().ToLowerInvariant());
+        // UN FILM SE REND SUR LA ROM ET LE COEUR EXACTS (09/11) : le 1-1 de SMB d'un autre joueur, rendu sur la version
+        // Europe au lieu de la World, ne montrait pas sa partie. La lecture humaine garde son « au plus pres ».
+        if (RefusDuRuntime(resolution.Runtime) is { } refus) return Echec(refus);
 
         var finDuReplay = manifest.Frames.ReplayEnd;
         var debut = Math.Clamp(debutDemande ?? 0, 0, Math.Max(0, finDuReplay));
@@ -133,6 +149,9 @@ public sealed class ReplayVideoRenderer
         var plafond = TimeSpan.FromSeconds((fin - debut + debut / 2.0) / fps * 2.5 + 120);
         var pilote = new PiloteDuRendu(debut, fin);
         using var udp = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+        // Le score lu dans la memoire du coeur pendant la portion filmee (controle de fidelite).
+        using var lecteur = controles is { Count: > 0 } ? LecteurDuScore.Pour(manifest) : null;
+        var releves = new List<(long Frame, long Score)>();
 
         Process process;
         try { process = Process.Start(psi)!; }
@@ -157,9 +176,16 @@ public sealed class ReplayVideoRenderer
                     RetroBat.Api.Infrastructure.EmulatorForeground.RendreAEsSiLeRenduEstDevant(process);
                 }
 
-                var action = chrono.Elapsed > plafond
-                    ? pilote.Abandonner()
-                    : pilote.Decider(await ReleverAsync(udp, chrono.Elapsed.TotalSeconds, ct).ConfigureAwait(false));
+                PiloteDuRendu.Action action;
+                if (chrono.Elapsed > plafond) action = pilote.Abandonner();
+                else
+                {
+                    var releve = await ReleverAsync(udp, chrono.Elapsed.TotalSeconds, ct).ConfigureAwait(false);
+                    action = pilote.Decider(releve);
+                    if (lecteur is not null && releve.Drapeaux > 0 && releve.Frame >= debut && releve.Frame <= fin
+                        && await LireLeScoreAsync(udp, lecteur, ct).ConfigureAwait(false) is long score)
+                        releves.Add((releve.Frame, score));
+                }
                 switch (action)
                 {
                     case PiloteDuRendu.Action.AvanceRapide: await EnvoyerAsync(udp, "FAST_FORWARD", ct).ConfigureAwait(false); break;
@@ -192,9 +218,14 @@ public sealed class ReplayVideoRenderer
             .OrderByDescending(f => f.LastWriteTimeUtc).FirstOrDefault()?.FullName;
         var ok = pilote.Complet && film is not null;
         var raison = pilote.Raison ?? (film is null ? "aucun_film" : null);
-        _logger.LogInformation("Video : {ReplayId} {Issue} en {Secondes:F1} s (frame {Frame} sur {Fin}).",
-            replayId, ok ? "rendu" : "incomplet (" + raison + ")", chrono.Elapsed.TotalSeconds, pilote.FrameAtteinte, fin);
-        return new RenduVideo(ok, ok ? null : raison, film, debut, fin, pilote.FrameAtteinte, chrono.Elapsed.TotalSeconds);
+        var verdict = controles is { Count: > 0 } && lecteur is null
+            ? new ControleDeFidelite.Verdict(ControleDeFidelite.NonVerifie, "score non lisible sous ce coeur ou sans .MEM")
+            : ControleDeFidelite.Juger(controles, releves, fps);
+        _logger.LogInformation("Video : {ReplayId} {Issue} en {Secondes:F1} s (frame {Frame} sur {Fin}) ; fidelite {Fidelite} ({Detail}, {Lectures} lectures).",
+            replayId, ok ? "rendu" : "incomplet (" + raison + ")", chrono.Elapsed.TotalSeconds, pilote.FrameAtteinte, fin,
+            verdict.Issue, verdict.Detail, releves.Count);
+        return new RenduVideo(ok, ok ? null : raison, film, debut, fin, pilote.FrameAtteinte, chrono.Elapsed.TotalSeconds,
+            verdict.Issue, verdict.Detail, releves);
     }
 
     /// <summary>
@@ -228,6 +259,10 @@ public sealed class ReplayVideoRenderer
             Ligne("quit_press_twice", "false"),
             Ligne("cheevos_enable", "false"),
             Ligne("rewind_enable", "false"),
+            // SANS RECALAGE (09/11) : avec replay_checkpoint_deserialize, RetroArch recharge l'etat de chaque point de controle
+            // (toutes les 5 s) ; un replay qui derive se recale alors en sautant, et le score de fin reste juste alors que la
+            // partie filmee est fausse. Sans recalage, une derive se voit au score, et le film ne part pas.
+            Ligne("replay_checkpoint_deserialize", "false"),
             Ligne("input_overlay_enable", "false"),
             Ligne("video_shader_enable", "false"),
             Ligne("aspect_ratio_index", "22"),
@@ -270,6 +305,25 @@ public sealed class ReplayVideoRenderer
         })) + "\n";
     }
 
+    /// <summary>
+    /// Pourquoi ce runtime ne sert pas a un film : « rom_inexacte » ou « coeur_inexact », sinon null (09/11). Pur.
+    /// </summary>
+    internal static string? RefusDuRuntime(ResolvedRuntime runtime)
+        => !runtime.ExactRom ? "rom_inexacte" : !runtime.ExactCore ? "coeur_inexact" : null;
+
+    /// <summary>Le score compose a partir des lignes du .MEM, lues par READ_CORE_RAM ; null s'il ne se compose pas.</summary>
+    private static async Task<long?> LireLeScoreAsync(UdpClient udp, LecteurDuScore lecteur, CancellationToken ct)
+    {
+        var valeurs = new List<long?>(lecteur.Lignes.Count);
+        foreach (var l in lecteur.Lignes)
+        {
+            var commande = "READ_CORE_RAM " + l.Adresse.ToString("x", System.Globalization.CultureInfo.InvariantCulture) + " " + l.Octets;
+            var octets = LecteurDuScore.OctetsDeLaReponse(await DemanderAsync(udp, commande, ct, "READ_CORE_RAM").ConfigureAwait(false), l.Octets);
+            valeurs.Add(octets is null ? null : LecteurDuScore.Valeur(l, octets));
+        }
+        return valeurs.Any(v => v is not null) ? lecteur.Composer(valeurs) : null;
+    }
+
     /// <summary>Un reglage de retroarch.cfg, ou null.</summary>
     private static string? ValeurDeRetroArch(string cle)
     {
@@ -283,7 +337,7 @@ public sealed class ReplayVideoRenderer
 
     private static async Task<PiloteDuRendu.Releve> ReleverAsync(UdpClient udp, double secondes, CancellationToken ct)
     {
-        var reponse = await DemanderAsync(udp, "GET_CONFIG_PARAM active_replay", ct).ConfigureAwait(false);
+        var reponse = await DemanderAsync(udp, "GET_CONFIG_PARAM active_replay", ct, "GET_CONFIG_PARAM").ConfigureAwait(false);
         // « GET_CONFIG_PARAM active_replay <id> <drapeaux> <frame> »
         var champs = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (champs is { Length: >= 5 }
@@ -295,15 +349,24 @@ public sealed class ReplayVideoRenderer
         return new PiloteDuRendu.Releve(secondes, -1, 0);
     }
 
-    private static async Task<string?> DemanderAsync(UdpClient udp, string commande, CancellationToken ct)
+    /// <summary>
+    /// Une commande et sa reponse. <paramref name="prefixe"/> : une reponse en retard d'une commande precedente (vu a la
+    /// sonde du 09/11, la reponse d'active_replay arrivait a la lecture suivante) est ecartee.
+    /// </summary>
+    private static async Task<string?> DemanderAsync(UdpClient udp, string commande, CancellationToken ct, string? prefixe = null)
     {
         try
         {
             await EnvoyerAsync(udp, commande, ct).ConfigureAwait(false);
             using var delai = CancellationTokenSource.CreateLinkedTokenSource(ct);
             delai.CancelAfter(TimeSpan.FromMilliseconds(300));
-            var recu = await udp.ReceiveAsync(delai.Token).ConfigureAwait(false);
-            return Encoding.ASCII.GetString(recu.Buffer).Trim();
+            for (var i = 0; i < 8; i++)
+            {
+                var recu = await udp.ReceiveAsync(delai.Token).ConfigureAwait(false);
+                var texte = Encoding.ASCII.GetString(recu.Buffer).Trim();
+                if (prefixe is null || texte.StartsWith(prefixe, StringComparison.Ordinal)) return texte;
+            }
+            return null;
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {

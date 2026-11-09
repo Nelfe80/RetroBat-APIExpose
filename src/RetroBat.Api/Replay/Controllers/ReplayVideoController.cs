@@ -66,18 +66,27 @@ public sealed class ReplayVideoController : ControllerBase
     public sealed record RenduRequest(
         [property: JsonPropertyName("replay_id")] string? ReplayId,
         [property: JsonPropertyName("run_start_frame")] long? Debut,
-        [property: JsonPropertyName("run_end_frame")] long? Fin);
+        [property: JsonPropertyName("run_end_frame")] long? Fin,
+        [property: JsonPropertyName("checks")] IReadOnlyList<ControleRequest>? Controles = null);
+
+    /// <summary>Un score certifie et la fin de son run (frames du replay), pour le controle de fidelite du rendu (09/11).</summary>
+    public sealed record ControleRequest(
+        [property: JsonPropertyName("end_frame")] long FinFrame,
+        [property: JsonPropertyName("score")] long Score);
 
     [HttpPost("render")]
     public async Task<IActionResult> Render([FromBody] RenduRequest? req, CancellationToken ct)
     {
         if (!IsLocalCaller()) return NotFound();
         if (string.IsNullOrWhiteSpace(req?.ReplayId)) return BadRequest(new { error = "replay_id" });
-        var r = await _rendu.RendreAsync(req.ReplayId.Trim(), req.Debut, req.Fin, ct).ConfigureAwait(false);
+        var controles = req.Controles?.Select(c => new PointDuScore(c.FinFrame, c.Score)).ToList();
+        var r = await _rendu.RendreAsync(req.ReplayId.Trim(), req.Debut, req.Fin, ct, controles).ConfigureAwait(false);
         return Ok(new
         {
             ok = r.Ok,
             reason = r.Raison,
+            fidelity = r.Fidelite,
+            fidelity_detail = r.DetailFidelite,
             file = r.Fichier,
             run_start_frame = r.Debut,
             run_end_frame = r.Fin,

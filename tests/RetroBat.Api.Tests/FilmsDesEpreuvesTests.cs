@@ -14,14 +14,16 @@ public sealed class FilmsDesEpreuvesTests
     private const double Nes = 60.0988;
 
     [Fact]
-    public void La_coupe_au_score_ne_garde_que_la_fin_d_une_epreuve()
+    public void La_coupe_au_score_garde_au_moins_la_minute_avant_la_fin()
     {
         // Le cas du releve : run 1-1 de 1789 images, film commence a la frame 23 du replay, bornes 0 a 2082. Le score ne
-        // monte qu'a l'arrivee (drapeau puis decompte du temps) : la coupe des scores ne garde que quelques secondes.
+        // monte qu'a l'arrivee (drapeau puis decompte du temps) : la coupe des scores ne gardait que quelques secondes ; depuis
+        // le 09/11, elle garde la minute qui precede la fin du run, ici tout le film.
         var finRunS = (2082 - 23) / Nes;
         var courbe = new List<double[]> { new[] { 2.0, 0 }, new[] { 12.0, 200 }, new[] { 31.0, 5_200 }, new[] { 34.0, 21_200 } };
         var (debut, fin) = ReplayCaptureService.SequenceDuRecord(courbe, finRunS);
-        Assert.True(fin - debut < 6, $"la coupe au score garde {fin - debut} s");
+        Assert.Equal(0, debut);
+        Assert.Equal(Math.Round(finRunS + 2, 2), fin);
     }
 
     [Fact]
