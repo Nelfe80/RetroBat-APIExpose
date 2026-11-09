@@ -95,11 +95,12 @@ public sealed class DeckLancementTests : IDisposable
     }
 
     [Fact]
-    public void En_MULTIPLAYER_le_decor_du_Deck_demande_le_ratio_custom_et_les_panneaux_non()
+    public void En_MULTIPLAYER_seuls_les_panneaux_passent_jamais_le_decor_du_Deck()
     {
         var jeu = new MultiplayerGame { Id = "19xx", System = "fbneo" };
         var avecDeck = MultiplayerLaunchPlan.Arguments("", "fbneo", "fbneo", "19xx.zip", jeu, 1, [], decor: DeckDecor.Nom)!;
-        Assert.Contains("-bezel nelfeplay-deck -ratio custom -integerscale 0", avecDeck);
+        Assert.DoesNotContain("-bezel", avecDeck);
+        Assert.DoesNotContain("-ratio", avecDeck);
         var avecPanneaux = MultiplayerLaunchPlan.Arguments("", "fbneo", "fbneo", "19xx.zip", jeu, 1, [], decor: "nelfeplay-multiplayer")!;
         Assert.Contains("-bezel nelfeplay-multiplayer", avecPanneaux);
         Assert.DoesNotContain("-ratio", avecPanneaux);
@@ -336,6 +337,46 @@ public sealed class DeckLancementTests : IDisposable
 
         // Adventure est prevu, non branche
         Assert.Empty(service.Preparer(DeckModes.Adventure, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip").Arguments);
+    }
+
+    [Fact]
+    public void Une_room_MULTIPLAYER_ne_pose_jamais_de_Deck()
+    {
+        // Decision du user du 09/11 (remplace H-D17) : « on annule les player decks en multi, on reste sur notre interface »
+        var bus = new SimpleEventBus();
+        var publies = new List<EventEnvelope>();
+        bus.Subscribe<EventEnvelope>(e => { if (e.Type?.StartsWith("deck.") == true) publies.Add(e); });
+        var etat = new DeckStateService(bus, new ApiContext());
+        var service = Service(bus, new ApiContext { PlayerPseudo = "nelfe" }, etat);
+
+        // Le meme jeu, avec un Deck officiel : en World Scoring il est pose, en MULTIPLAYER jamais
+        Assert.Equal("posed", service.Preparer(DeckModes.WorldScoring, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip").Status);
+        publies.Clear();
+        foreach (var place in new[] { 1, 2 })
+        {
+            var mp = service.Preparer(DeckModes.Multiplayer, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip", place: place);
+            SansDecor(mp);
+            Assert.Empty(mp.Choices);
+        }
+        Assert.DoesNotContain(publies, e => e.Type == "deck.launch");
+        Assert.Null(service.EnCours);
+
+        // Un defi prepare plus tot ne se rattache pas a la room, et Select + A ne propose rien
+        service.Preparer(DeckModes.WorldScoring, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip");
+        service.Retirer("multiplayer");
+        Assert.Null(service.EnCours);
+        Assert.Null(service.Choisir(null, "gamepad"));
+
+        // La ligne du lanceur d'une room ne porte jamais le decor du Deck : sans decor de panneaux, aucun -bezel
+        var jeu = new MultiplayerGame { Id = "19xx" };
+        var ligne = MultiplayerLaunchPlan.Arguments("", "fbneo", "fbneo", "19xx.zip", jeu, 1, [], decor: DeckDecor.Nom)!;
+        Assert.DoesNotContain(DeckDecor.Nom, ligne);
+        Assert.DoesNotContain("-ratio custom", ligne);
+        Assert.Contains("-bezel nelfeplay-multiplayer", MultiplayerLaunchPlan.Arguments("", "fbneo", "fbneo", "19xx.zip", jeu, 1, [], decor: "nelfeplay-multiplayer")!);
+
+        Assert.False(DeckModes.PoseUnDeck(DeckModes.Multiplayer));
+        Assert.True(DeckModes.PoseUnDeck(DeckModes.WorldScoring));
+        Assert.True(DeckModes.PoseUnDeck(DeckModes.Speedrun));
     }
 
     // ─────────────────────────── la securite : sans Deck, le jeu part comme avant ───────────────────────────

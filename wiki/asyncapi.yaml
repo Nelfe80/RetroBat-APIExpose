@@ -256,9 +256,12 @@ channels:
 
       `deck.launch`: published before the launcher, for a launch from a special
       panel button (CHALLENGE in World Scoring, LAUNCH THE SPEEDRUN / LAUNCH THE
-      CHALLENGE in Challenges & Speedruns, a MULTIPLAYER room) of a game that has an
-      installed Deck. `Mode` = world-scoring | speedrun | multiplayer | adventure
-      (planned, not wired). `Status` = posed (RetroBat decoration `nelfeplay-deck`
+      CHALLENGE in Challenges & Speedruns) of a game that has an installed Deck.
+      `Mode` = world-scoring | speedrun. A MULTIPLAYER room never carries a Deck
+      (since 2026-11-09): it keeps its own player panels, no deck.launch is published,
+      the in-game choice (Select + A) offers nothing and deck.notice stays silent;
+      `multiplayer` and `adventure` (planned) only appear as `Reason` = mode_not_wired
+      in a returned launch, never on the feed. `Status` = posed (RetroBat decoration `nelfeplay-deck`
       written and `-bezel nelfeplay-deck -ratio custom -integerscale 0` added to the
       launcher: RetroArch draws the Deck background, the Deck window writes the
       values only) | window (Deck chosen, no decoration: the window draws all) | off
@@ -271,7 +274,7 @@ channels:
       `RenderMs`), `Board` (the leaderboard of the live rank asked by the button:
       `Board` = scores | challenges, `RomGroup`, `Ruleset`, `Key` = score | time,
       `LowerIsBetter`, `Place`, `FrameRate`, `Label`; null = the default of the mode),
-      `Seat` (the local player's place, 1 outside MULTIPLAYER), `Notices` (the Deck
+      `Seat` (always 1: no Deck in MULTIPLAYER), `Notices` (the Deck
       shows player messages in its rails, see deck.notice), `RetroArchMuet` (true:
       `-OnScreenMsg 0` was added too, RetroArch notifications are off for this
       launch only). Since 1.9.0 the Deck is drawn only on its decoration: `window`,

@@ -15,7 +15,10 @@ public static class DeckModes
     /// <summary>LAUNCH THE SPEEDRUN et LAUNCH THE CHALLENGE du panneau Challenges &amp; Speedruns.</summary>
     public const string Speedrun = "speedrun";
 
-    /// <summary>La presence dans une room MULTIPLAYER (le joueur local ; les spectateurs ne voient rien du Deck).</summary>
+    /// <summary>
+    /// La presence dans une room MULTIPLAYER. Decision du user du 09/11 (remplace H-D17) : « on annule les player decks en
+    /// multi, on reste sur notre interface ». Une room ne pose JAMAIS de Deck : les panneaux de joueurs restent.
+    /// </summary>
     public const string Multiplayer = "multiplayer";
 
     /// <summary>Prevu, non branche (H-D18).</summary>
@@ -24,6 +27,9 @@ public static class DeckModes
     public static readonly IReadOnlyList<string> Tous = [WorldScoring, Speedrun, Multiplayer, Adventure];
 
     public static bool Connu(string? mode) => mode is not null && Tous.Contains(mode);
+
+    /// <summary>Les modes ou un lancement peut poser un Deck : World Scoring et les epreuves. Ni MULTIPLAYER (09/11) ni Adventure.</summary>
+    public static bool PoseUnDeck(string? mode) => mode is WorldScoring or Speedrun;
 }
 
 /// <summary>

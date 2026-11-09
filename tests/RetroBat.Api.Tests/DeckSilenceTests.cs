@@ -353,17 +353,6 @@ public sealed class DeckSilenceTests : IDisposable
         Assert.DoesNotContain("-netplaymode", prive);
     }
 
-    [Fact]
-    public void En_MULTIPLAYER_le_Deck_donne_ses_arguments_au_lanceur()
-    {
-        var jeu = new MultiplayerGame { Id = "19xx" };
-        var avec = MultiplayerLaunchPlan.Arguments("", "fbneo", "fbneo", "19xx.zip", jeu, 1, [], decor: DeckDecor.Nom,
-            argumentsDuDeck: [.. DeckDecor.ArgumentsDuLanceur, .. DeckDecor.ArgumentsSansNotifications])!;
-        Assert.Contains("-bezel nelfeplay-deck -ratio custom -integerscale 0 -OnScreenMsg 0", avec);
-        var ancien = MultiplayerLaunchPlan.Arguments("", "fbneo", "fbneo", "19xx.zip", jeu, 1, [], decor: DeckDecor.Nom)!;
-        Assert.DoesNotContain("OnScreenMsg", ancien);
-    }
-
     [Theory]
     [InlineData(null, "true")]
     [InlineData("1", "true")]

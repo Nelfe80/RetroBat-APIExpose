@@ -190,7 +190,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         var joueur = Joueur();
         try
         {
-            if (!Reglages.Enabled || mode == DeckModes.Adventure || !DeckModes.Connu(mode) || rom.Length == 0)
+            if (!Reglages.Enabled || !DeckModes.PoseUnDeck(mode) || rom.Length == 0)
             {
                 return Retenir(Aucun(mode, systeme, rom, "", joueur, cheminRom ?? "", Reglages.Enabled ? "mode_not_wired" : "disabled"), publier: false);
             }
@@ -286,6 +286,24 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         _journal?.LogInformation("PlayerDeck : lancement de {Jeu} sans decor ({Raison}) : Deck cache.", l.Game, raison);
         Retenir(sans, publier: true);
         DeckDecor.Effacer(RacineDuDecor);
+    }
+
+    /// <summary>
+    /// UN LANCEMENT SANS DECK (room MULTIPLAYER, decision du user du 09/11) : le lancement prepare plus tot (un defi de World
+    /// Scoring du meme jeu) ne se rattache pas a cette partie, et le choix en jeu (Select + A) ne propose rien.
+    /// </summary>
+    public void Retirer(string raison)
+    {
+        bool avait;
+        lock (_verrou)
+        {
+            avait = _enCours is not null;
+            _enCours = null;
+            _preparation = DateTime.UtcNow;
+        }
+
+        _etat?.PoserLeLancement(null);
+        if (avait) _journal?.LogInformation("PlayerDeck : lancement sans Deck ({Raison}).", raison);
     }
 
     /// <summary>Le joueur : celui qui est enregistre en salle, sinon le compte de la borne, sinon « local ». Jamais reecrit.</summary>
@@ -525,7 +543,8 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     {
         DeckLancement? lancement;
         lock (_verrou) lancement = _enCours;
-        if (lancement is null || lancement.Choices.Count == 0) return null;
+        // MULTIPLAYER (decision du user du 09/11, remplace H-D17) : aucun Deck en room, rien a choisir
+        if (lancement is null || lancement.Choices.Count == 0 || !DeckModes.PoseUnDeck(lancement.Mode)) return null;
 
         var catalogue = Catalogue?.Invoke() ?? DeckCatalogue.Lire(DossierDuDeck);
         var installes = catalogue.PourLeJeu(lancement.Rom, lancement.RomGroup);

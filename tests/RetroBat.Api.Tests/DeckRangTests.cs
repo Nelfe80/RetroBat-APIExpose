@@ -370,8 +370,8 @@ public sealed class DeckRangTests
             Assert.Equal("offline", rang.Courant!.State);
             Assert.Equal("1CC", rang.Courant.Label);
 
-            // MULTIPLAYER : la place du joueur local suit le lancement
-            Assert.Equal(3, service.Preparer(DeckModes.Multiplayer, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip", place: 3).Seat);
+            // MULTIPLAYER : aucun Deck en room (decision du user du 09/11)
+            Assert.Equal("none", service.Preparer(DeckModes.Multiplayer, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip", place: 3).Status);
         }
         finally
         {
