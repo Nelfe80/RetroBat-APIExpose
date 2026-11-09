@@ -26,6 +26,13 @@ public sealed class ReplayVideoPublisher
     public const string RoleJoueur = "player";
     public const string RoleAucun = "none";
 
+    /// <summary>
+    /// Ce que la borne sait faire d'un film rendu (09/11) : ROM et coeur exacts, rendu sans recalage, controle de fidelite.
+    /// Le site ne donne un role de rendu (station, borne du joueur) qu'a une borne qui le dit : une API plus ancienne
+    /// rendrait encore au plus pres, avec recalage.
+    /// </summary>
+    internal const string CapaciteDesFilms = "fidelity=1";
+
     private readonly ReplayVideoRenderer _rendu;
     private readonly IReplayManifestStore _manifests;
     private readonly IReplayObjectStore _objects;
@@ -321,7 +328,7 @@ public sealed class ReplayVideoPublisher
         try
         {
             using var client = Client(credential, TimeSpan.FromSeconds(60));
-            using var reponse = await client.GetAsync("/api/v1/agent/videos/targets", ct).ConfigureAwait(false);
+            using var reponse = await client.GetAsync("/api/v1/agent/videos/targets?" + CapaciteDesFilms, ct).ConfigureAwait(false);
             if (!reponse.IsSuccessStatusCode) return new Liste(null, Array.Empty<Cible>());
             return LireLaListe(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
         }
