@@ -316,11 +316,21 @@ public sealed class InstalledGameCatalog
 
         var noms = System.Text.RegularExpressions.Regex.Matches(texte, @"label\s*=\s*""([A-Za-z0-9_.\-]+\.(?:zip|7z))")
             .Select(m => m.Groups[1].Value).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        if (noms.Count == 0) return [];
-        return Enumerate([canonicalSystemId], avecGroupe: false)
-            .Where(jeu => noms.Contains(Path.GetFileName(jeu.AbsolutePath)))
-            .Select(jeu => jeu with { RomGroup = groupe, OfficialDefinitionPath = OfficialDefinitionPath(jeu.CanonicalSystemId, groupe) })
-            .ToList();
+        if (noms.Count == 0 || !Directory.Exists(_romsRoot)) return [];
+        // Le fichier lui-meme, dans chaque dossier du systeme : l'inventaire ne voit que ce que la gamelist nomme.
+        var trouves = new List<InstalledGame>();
+        foreach (var frontend in RomCanonicalResolver.FrontendSystemsFor(canonicalSystemId).Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            foreach (var nom in noms)
+            {
+                var chemin = Path.Combine(_romsRoot, frontend, nom);
+                if (!File.Exists(chemin)) continue;
+                trouves.Add(new InstalledGame(frontend, RomCanonicalResolver.CanonicalScoringSystem(frontend), groupe, chemin,
+                    Path.GetFileNameWithoutExtension(nom), null, null, false, OfficialDefinitionPath(canonicalSystemId, groupe)));
+            }
+        }
+
+        return trouves;
     }
 
     private static IEnumerable<XElement> ReadGamelist(string path)
