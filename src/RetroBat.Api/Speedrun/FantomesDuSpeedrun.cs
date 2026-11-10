@@ -128,7 +128,11 @@ public sealed class FantomesDuSpeedrun
     public static IReadOnlyList<string> Replays(IReadOnlyList<(string Joueur, string? Replay)> lignes, string pseudo, ChoixDesFantomes choix)
     {
         var mien = lignes.FirstOrDefault(l => pseudo.Length > 0 && string.Equals(l.Joueur, pseudo, StringComparison.OrdinalIgnoreCase)).Replay;
-        var mondial = lignes.Count > 0 ? lignes[0].Replay : null;
+        // LE MEILLEUR FANTOME DISPONIBLE (10/11, demande du user) : un record du monde sans replay (retire, ou d'avant le
+        // 08/11) ne laisse plus la course sans reference : le meilleur temps du classement qui a un fantome le remplace.
+        var mondial = lignes.Count > 0 && lignes[0].Replay is { Length: > 0 } wr ? wr
+            : lignes.FirstOrDefault(l => l.Replay is { Length: > 0 }
+                && !(pseudo.Length > 0 && string.Equals(l.Joueur, pseudo, StringComparison.OrdinalIgnoreCase))).Replay;
         IEnumerable<string?> voulus = choix switch
         {
             ChoixDesFantomes.MonRecordEtMondial => [mien, mondial],
@@ -424,7 +428,10 @@ public sealed class FantomesDuSpeedrun
             var detenteur = lignes.FirstOrDefault(x => x.Replay == replay).Joueur ?? "";
             // (05/11) mon record qui est aussi le record mondial : dore, « PSEUDO (WR) »
             var mondial = lignes.Count > 0 && lignes[0].Replay == replay;
-            EcrireLEtiquette(dossier, nom, replay == mien ? Etiquette(pseudo, mondial) : Etiquette(detenteur, true));
+            // un fantome qui remplace un record du monde sans replay dit son rang : « NEOGEOFF (#2) »
+            var rang = lignes.ToList().FindIndex(x => x.Replay == replay) + 1;
+            EcrireLEtiquette(dossier, nom, replay == mien ? Etiquette(pseudo, mondial)
+                : mondial || rang <= 0 ? Etiquette(detenteur, true) : EtiquetteDuRang(detenteur, rang));
             EcrireLaDuree(dossier, nom, dureeDuRun);
             poses++;
         }
@@ -530,6 +537,12 @@ public sealed class FantomesDuSpeedrun
     /// « (WR) » pour le record mondial ; le coeur la dessine au-dessus du personnage (dore pour le record mondial, gris clair
     /// pour le mien). En majuscules, 20 caracteres au plus. Pur.
     /// </summary>
+    internal static string EtiquetteDuRang(string pseudo, int rang)
+    {
+        var nom = Etiquette(pseudo, false);
+        return nom.Length > 0 ? $"{nom} (#{rang})" : $"#{rang}";
+    }
+
     internal static string Etiquette(string pseudo, bool mondial)
     {
         var nom = new string((pseudo ?? "").Where(c => !char.IsControl(c)).Take(20).ToArray()).Trim().ToUpperInvariant();

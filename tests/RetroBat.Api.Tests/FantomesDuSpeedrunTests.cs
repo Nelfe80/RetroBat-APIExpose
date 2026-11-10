@@ -98,6 +98,17 @@ public class FantomesDuSpeedrunTests
     public void Les_replays_viennent_du_classement_sans_doublon(ChoixDesFantomes choix, string pseudo, string attendus)
         => Assert.Equal(attendus, string.Join(",", FantomesDuSpeedrun.Replays(Classement, pseudo, choix)));
 
+    [Theory]
+    // (10/11) record du monde sans replay (SMB 1-2 : Old AF Gamer) : le meilleur temps qui a un fantome le remplace, jamais le mien
+    [InlineData("Nelfe", "rp_neo")]
+    [InlineData("Neo", "rp_neo,rp_ben")]
+    public void Un_record_du_monde_sans_fantome_laisse_courir_le_meilleur_fantome_disponible(string pseudo, string attendus)
+    {
+        IReadOnlyList<(string Joueur, string? Replay)> lignes = [("Old", null), ("Neo", "rp_neo"), ("Ben", "rp_ben")];
+        Assert.Equal(attendus, string.Join(",", FantomesDuSpeedrun.Replays(lignes, pseudo, ChoixDesFantomes.MonRecordEtMondial)));
+        Assert.Equal("NEO (#2)", FantomesDuSpeedrun.EtiquetteDuRang("Neo", 2));
+    }
+
     [Fact]
     public void Le_classement_du_site_donne_le_joueur_et_son_replay()
     {
