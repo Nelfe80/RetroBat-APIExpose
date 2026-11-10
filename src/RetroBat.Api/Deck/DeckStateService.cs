@@ -766,6 +766,18 @@ public sealed class DeckStateService : IHostedService, IDisposable
                 return null;
             }
 
+            case "deck.recap":
+            {
+                // LES STATS DU DECK POUR LE BILAN DE L'API (P-D7, 10/11) : quand l'API dessine le bilan du World Scoring
+                // (Cards = api), le Deck lui donne les lignes de son bilan (recipe.recap), deja ecrites, et les vies perdues.
+                if (DeckRecap.Lire(corps, LaunchIdCourant) is { } recap)
+                {
+                    _journal?.LogInformation("PlayerDeck : stats du bilan recues ({Lignes} ligne(s), vies perdues {Vies}).", recap.Rows.Count, recap.LivesLost);
+                    Publier("deck.recap", recap);
+                }
+                return null;
+            }
+
             case "deck.choice.next":
             case "deck.choice.set":
                 return CommandesDuChoix?.Invoke(type, corps);
@@ -1109,6 +1121,48 @@ public sealed record DeckResult(string LaunchId, string? Ruleset, string Status,
 
 /// <summary>deck.card : l'ecran de depart (start) ou de bilan (recap) du Deck parait (shown) ou s'efface (hidden).</summary>
 public sealed record DeckCard(string Kind, string State, string LaunchId);
+
+/// <summary>
+/// deck.recap (Deck vers API, P-D7) : les lignes du bilan du Deck (recipe.recap de son theme), deja ecrites (« 268 »,
+/// « 2:14 »), son nom, et les vies perdues (-1 : le theme ne les lit pas). Rien n'est invente : seulement les valeurs vues
+/// pendant la partie.
+/// </summary>
+public sealed record DeckRecap(string LaunchId, string DeckId, string DeckName, IReadOnlyList<DeckRecapRow> Rows, int LivesLost, long PlayMs)
+{
+    /// <summary>Au plus 12 lignes, libelles et valeurs de 32 caracteres au plus : un client ne fait pas grossir le bilan.</summary>
+    internal static DeckRecap? Lire(JsonElement corps, string? launchIdCourant)
+    {
+        if (corps.ValueKind != JsonValueKind.Object) return null;
+        static JsonElement? Champ(JsonElement o, string n)
+            => o.TryGetProperty(n, out var v) || o.TryGetProperty(char.ToLowerInvariant(n[0]) + n[1..], out v) ? v : null;
+        static string Texte(JsonElement o, string n, int max)
+        {
+            var t = Champ(o, n) is { ValueKind: JsonValueKind.String } v ? (v.GetString() ?? "").Trim() : "";
+            return t.Length > max ? t[..max] : t;
+        }
+        static long Nombre(JsonElement o, string n, long defaut)
+            => Champ(o, n) is { ValueKind: JsonValueKind.Number } v && v.TryGetInt64(out var x) ? x : defaut;
+
+        var lignes = new List<DeckRecapRow>();
+        if (Champ(corps, "Rows") is { ValueKind: JsonValueKind.Array } rows)
+        {
+            foreach (var row in rows.EnumerateArray())
+            {
+                if (row.ValueKind != JsonValueKind.Object || lignes.Count >= 12) continue;
+                var libelle = Texte(row, "Label", 32);
+                var valeur = Texte(row, "Value", 32);
+                if (libelle.Length > 0 && valeur.Length > 0) lignes.Add(new DeckRecapRow(libelle, valeur));
+            }
+        }
+
+        var launch = Texte(corps, "LaunchId", 64);
+        return new DeckRecap(launch.Length > 0 ? launch : launchIdCourant ?? "", Texte(corps, "DeckId", 64), Texte(corps, "DeckName", 48), lignes,
+            (int)Math.Clamp(Nombre(corps, "LivesLost", -1), -1, 999), Math.Max(0, Nombre(corps, "PlayMs", 0)));
+    }
+}
+
+/// <summary>Une ligne du bilan du Deck : son libelle et sa valeur deja ecrite.</summary>
+public sealed record DeckRecapRow(string Label, string Value);
 
 /// <summary>deck.snapshot : tout l'etat du Deck a un instant, avec sa revision.</summary>
 public sealed record DeckSnapshot(

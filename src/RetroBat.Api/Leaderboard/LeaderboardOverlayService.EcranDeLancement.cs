@@ -59,7 +59,27 @@ public sealed partial class LeaderboardOverlayService
         string? Police = null,
         bool SortiePossible = false,
         IReadOnlyList<ChampDeFiche>? Fiche = null,
-        string? Logo = null);
+        string? Logo = null,
+        CarteDeLaCible? Cible = null);
+
+    /// <summary>
+    /// LE SCORE A BATTRE DU WORLD SCORING (P-D7, 10/11) : la carte de droite, face au joueur, a la place de l'adversaire du VS.
+    /// <c>Rang</c> : « #3 » (en grand, a la place de « P2 ») ; <c>Pastille</c> : « SCORE TO BEAT » ; <c>Libelle</c> : ce que
+    /// la cible est (« LIVE RANK TARGET », « WORLD RECORD ») ; <c>Joueur</c>, <c>Pays</c> : qui la tient (vides : le record du
+    /// joueur, ou personne) ; <c>Chiffres</c> : la ligne du bas (icone, libelle, valeur), comme les victoires du VS.
+    /// </summary>
+    public sealed record CarteDeLaCible(
+        string Rang,
+        string Pastille,
+        string Libelle,
+        string Valeur,
+        string Joueur,
+        string Pays,
+        IReadOnlyList<ChiffreCle> Chiffres,
+        bool Couronne = false);
+
+    /// <summary>Une valeur de la ligne du bas d'une carte : son icone (IconesPixel), son libelle, sa valeur.</summary>
+    public sealed record ChiffreCle(string Icone, string Libelle, string Valeur);
 
     /// <summary>
     /// Un joueur au lancement. <c>Portrait</c> : l'image du personnage choisi, ou null (le pseudo remonte). <c>Lettre</c>,
@@ -83,7 +103,15 @@ public sealed partial class LeaderboardOverlayService
         int? PingMs,
         int? Barres,
         DateTime ChangeUtc,
-        IReadOnlyList<string?>? Coequipiers = null);
+        IReadOnlyList<string?>? Coequipiers = null,
+        string IconeVictoires = "trophee",
+        string IconeSerie = "flamme");
+
+    /// <summary>
+    /// Deux cartes face a face : deux ou quatre joueurs, ou un joueur et le score a battre (World Scoring, P-D7). Le mot est
+    /// alors au centre, entre les cartes ; sinon, en grand a gauche.
+    /// </summary>
+    internal static bool FaceAFace(EcranDeLancement l) => l.Joueurs.Count is 2 or 4 || (l.Joueurs.Count == 1 && l.Cible is not null);
 
     /// <summary>Un mot de plus de huit lettres en deux lignes, coupe a l'espace le plus proche du milieu (ON FAIT / EQUIPE !).</summary>
     internal static string[] MotEnDeuxLignes(string mot)
@@ -219,7 +247,11 @@ public sealed partial class LeaderboardOverlayService
             var famille = TraitsDesEcrans.Famille(l.Police ?? style.Police, secours);
             // Le depart donne : « A VOUS DE JOUER ! » tient 1,2 s, puis tout s'efface en 0,35 s.
             var depuisLeDepart = l.DepartUtc is { } depart ? Math.Max(0, (DateTime.UtcNow - depart).TotalSeconds) : -1;
-            if (_service._tempsDApercu is { } fige && l.DepartUtc is not null)
+            if (_service._tempsDuDepartDApercu is { } departFige && l.DepartUtc is not null)
+            {
+                depuisLeDepart = departFige;
+            }
+            else if (_service._tempsDApercu is { } fige && l.DepartUtc is not null)
             {
                 depuisLeDepart = fige;
             }
@@ -228,10 +260,16 @@ public sealed partial class LeaderboardOverlayService
             {
                 DessinerLeLogo(g, k, l.Logo);
                 DessinerLEnTeteDuLancement(g, l, secours);
-                var liste = l.Joueurs.Count is not (2 or 4);
+                var liste = !FaceAFace(l);
                 if (l.Fiche is { Count: > 0 } fiche)
                 {
                     DessinerLaFicheDeLEpreuve(g, l.SousTitre, fiche, famille, secours, t);
+                }
+                else if (l.Joueurs.Count == 1 && l.Cible is { } cible)
+                {
+                    // World Scoring (P-D7) : le joueur a gauche, comme P1 au VS ; le score a battre a droite, a la place de P2.
+                    DessinerLaCarteDuJoueurSeul(g, l.Joueurs[0], famille, secours, new PointF(96, 150), t);
+                    DessinerLaCarteDeLaCible(g, cible, famille, secours, new PointF(1124, 150), t);
                 }
                 else if (l.Joueurs.Count == 2)
                 {
@@ -280,7 +318,7 @@ public sealed partial class LeaderboardOverlayService
         private void PreparerLeFondDuLancement(EcranDeLancement l, StyleDEcran style)
         {
             var places = string.Join(",", l.Joueurs.Select(j => j.Place));
-            var cle = $"{l.Fanart}|{Width}x{Height}|{l.Type}|{places}|{l.Joueurs.Count}";
+            var cle = $"{l.Fanart}|{Width}x{Height}|{l.Type}|{places}|{l.Joueurs.Count}|{l.Cible is not null}";
             if (cle == _cleDuFondDuLancement && _fondDuLancement is not null)
             {
                 return;
@@ -306,10 +344,12 @@ public sealed partial class LeaderboardOverlayService
 
             try
             {
-                var (titre, relief) = CouleurDuTitre.Choisir(fanart, l.Joueurs.Where(j => j.Place is not null).Select(j => j.Place!.Value), style.Couleur);
+                // La carte de la cible porte la couleur de P2 : le titre s'en ecarte comme d'un adversaire.
+                var placesVues = l.Joueurs.Where(j => j.Place is not null).Select(j => j.Place!.Value).Concat(l.Cible is not null ? [2] : []);
+                var (titre, relief) = CouleurDuTitre.Choisir(fanart, placesVues, style.Couleur);
                 _accent = TraitsDesEcrans.Hex(titre);
                 _relief = TraitsDesEcrans.Hex(relief);
-                _fondDuLancement = DessinerLeFondDuLancement(fanart, l.Type, l.Joueurs.Count is 2 or 4, Math.Max(1, Width), Math.Max(1, Height));
+                _fondDuLancement = DessinerLeFondDuLancement(fanart, l.Type, FaceAFace(l), Math.Max(1, Width), Math.Max(1, Height));
             }
             finally
             {
@@ -692,10 +732,17 @@ public sealed partial class LeaderboardOverlayService
         /// <summary>Les victoires et la serie, chacune avec son icone, a la suite. Rend la largeur.</summary>
         private static float DessinerLesVictoires(Graphics g, JoueurDeLancement j, Font secours, PointF coin, float taille, double opacite, bool mesurer = false)
         {
+            return DessinerLesChiffres(g, [new ChiffreCle(j.IconeVictoires, j.LibelleVictoires, j.Victoires), new ChiffreCle(j.IconeSerie, j.LibelleSerie, j.Serie)],
+                secours, coin, taille, opacite, mesurer);
+        }
+
+        /// <summary>Une ligne de chiffres cles, chacun avec son icone, son libelle au-dessus et sa valeur. Rend la largeur.</summary>
+        private static float DessinerLesChiffres(Graphics g, IReadOnlyList<ChiffreCle> chiffres, Font secours, PointF coin, float taille, double opacite, bool mesurer = false)
+        {
             using var libelle = TraitsDesEcrans.Libelles(taille * 0.5f, secours);
             using var valeur = TraitsDesEcrans.Chiffres(taille, secours);
             var x = coin.X;
-            foreach (var (icone, nom, texte) in new[] { ("trophee", j.LibelleVictoires, j.Victoires), ("flamme", j.LibelleSerie, j.Serie) })
+            foreach (var (icone, nom, texte) in chiffres.Select(c => (c.Icone, c.Libelle, c.Valeur)))
             {
                 if (texte.Length == 0)
                 {
@@ -905,7 +952,7 @@ public sealed partial class LeaderboardOverlayService
 
             using var encre = new SolidBrush(TraitsDesEcrans.Alpha(Color.FromArgb(232, 228, 255), opacite));
             using var aGauche = new StringFormat(TraitsDesEcrans.Typo) { Trimming = StringTrimming.EllipsisWord, FormatFlags = StringFormatFlags.NoWrap };
-            g.DrawString(l.Conseil, texte, encre, new RectangleF(gauche, y, l.Joueurs.Count == 2 || l.Joueurs.Count == 4 ? 980 : 760, 40), aGauche);
+            g.DrawString(l.Conseil, texte, encre, new RectangleF(gauche, y, FaceAFace(l) ? 980 : 760, 40), aGauche);
         }
 
         /// <summary>« On attend AKIRA… », puis les trois etapes : JOUEURS REUNIS, SYNCHRONISATION, C'EST PARTI !</summary>

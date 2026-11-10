@@ -64,6 +64,12 @@ public sealed class LiveContestOverlayService : IDisposable
     /// </summary>
     internal enum RouteDuBandeau { CommeAvant, AuDeck, DansLeJeu }
 
+    /// <summary>Chaque bandeau du scoring (prevol, continue...), pour les ecrans du World Scoring (P-D7).</summary>
+    public static event Action<RetroBat.Api.Deck.DeckNotice>? AnnonceDuScoring;
+
+    /// <summary>L'ecran de depart du World Scoring tient l'ecran : il dit deja la certification.</summary>
+    public static Func<bool>? PageDuScoringDevant { get; set; }
+
     internal static RouteDuBandeau Router(bool auDeck, bool deckVisible, bool aUnTexteAnglais)
         => auDeck && aUnTexteAnglais ? RouteDuBandeau.AuDeck
             : deckVisible ? RouteDuBandeau.DansLeJeu
@@ -76,6 +82,17 @@ public sealed class LiveContestOverlayService : IDisposable
     {
         var silence = Silence;
         var route = silence is null ? RouteDuBandeau.CommeAvant : Router(silence.AuDeck, silence.DeckVisible, auDeck is not null);
+        if (auDeck is { Source: "scoring" } annonce)
+        {
+            // LES ECRANS DU WORLD SCORING (P-D7) : l'ecran de depart dit la certification ; il apprend chaque bandeau du scoring.
+            try { AnnonceDuScoring?.Invoke(annonce); }
+            catch (Exception) { /* un ecran ne fait jamais tomber le scoring */ }
+
+            // La bonne nouvelle (CERTIFIABLE) est deja sur l'ecran de depart : pas de bandeau par-dessus. Une partie non
+            // certifiable garde son bandeau, qui en dit la raison.
+            if (route != RouteDuBandeau.AuDeck && annonce.Kind is "scoring_certifiable" or "scoring_offline_certifiable" && PageDuScoringDevant?.Invoke() == true) return;
+        }
+
         if (route == RouteDuBandeau.AuDeck && silence!.Dire(auDeck, true)) return;
         var zone = route == RouteDuBandeau.DansLeJeu && silence!.ZoneDuJeu is { } t ? new Rectangle(t.X, t.Y, t.Width, t.Height) : (Rectangle?)null;
         Poster(form =>

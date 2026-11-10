@@ -313,6 +313,9 @@ builder.Services.AddSingleton<RetroBat.Api.Speedrun.SpeedrunSessionService>();
 builder.Services.AddSingleton<RetroBat.Api.MassRun.MassRunService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Speedrun.SpeedrunSessionService>());
 builder.Services.AddSingleton<RetroBat.Api.Leaderboard.LeaderboardOverlayService>();
+// LES ECRANS DU WORLD SCORING (P-D7, 10/11) : le depart et le bilan d'un defi, dans la famille des ecrans MULTIPLAYER.
+builder.Services.AddSingleton<RetroBat.Api.Leaderboard.WorldScoringEcransService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Leaderboard.WorldScoringEcransService>());
 builder.Services.AddHostedService<RetroBat.Api.Leaderboard.LeaderboardInputService>();
 // LE LECTEUR DE MANETTES DEMARRE AVEC LE PANNEAU (2026-10-04). Les services demarrent l'un apres
 // l'autre ; place apres les deploiements de fichiers, il ne lisait le panel que onze secondes

@@ -813,6 +813,14 @@ public class ApiExposeOptions
         public int LongPressMs { get; set; } = 600;
 
         /// <summary>
+        /// LES ECRANS DU WORLD SCORING (decision P-D7 du 10/11, choix (a) du user) : un defi lance depuis le panneau montre
+        /// l'ecran de depart et le bilan de l'API, dans la famille des ecrans MULTIPLAYER, avec ou sans Deck (le Deck s'efface
+        /// devant eux, comme devant les pages des epreuves). Faux : comme avant (les cartes du Deck s'il est pose, sinon la
+        /// boite d'attente et aucun bilan).
+        /// </summary>
+        public bool WorldScoringScreens { get; set; } = true;
+
+        /// <summary>
         /// Une fenetre de 2 pixels au-dessus d'EmulationStation, hors des parties : sans elle, l'apparition du panneau fait
         /// recomposer l'ecran par Windows, et certains ecrans s'eteignent une seconde (30/10/2026, Intel UHD).
         /// </summary>

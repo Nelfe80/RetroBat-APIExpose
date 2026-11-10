@@ -85,6 +85,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     private bool _menuEsConnu;
     private System.Diagnostics.Stopwatch? _depuisLAppui;
     private IReadOnlyList<LeaderboardClient.Ligne> _monde = Array.Empty<LeaderboardClient.Ligne>();
+
+    /// <summary>Les ecrans de depart et de bilan du World Scoring (P-D7) ; null : comme avant.</summary>
+    private readonly WorldScoringEcransService? _ecransWs;
     private string _etatDuMonde = LeaderboardClient.EtatAucunScore;
 
     /// <summary>La regle des onglets ordinaires (« 1cc », sinon la premiere ouverte) ; vide : toutes.</summary>
@@ -159,8 +162,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         Speedrun.DefisPanelService? defis = null,
         Deck.DeckLaunchService? deck = null,
         Multiplayer.SonDEmulationStation? sonDEs = null,
-        Speedrun.IPrioritesDuJeu? priorites = null)
+        Speedrun.IPrioritesDuJeu? priorites = null,
+        WorldScoringEcransService? ecransWs = null)
     {
+        _ecransWs = ecransWs;
         _priorites = priorites;
         _deck = deck;
         _sonDEs = sonDEs;
@@ -370,6 +375,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     return;
                 }
 
+                // L'ecran de depart du World Scoring (P-D7) : c'est lui qui s'effacera, quand le jeu sera la.
+                if (_ecransWs is { TientLeDepart: true })
+                {
+                    return;
+                }
+
                 // L'emulateur prend le premier plan : on s'efface sans le disputer a ES.
                 if (_multiplayer is { Ouvert: true } panneauMultiplayer)
                 {
@@ -414,6 +425,14 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // joueur a la manette, « a » configure sur le bouton de droite, ne voyait jamais le panneau s'ouvrir.
             var valider = roleEs is not null ? roleEs == "valider" : slot == SlotValider;
             var annuler = roleEs is not null ? roleEs == "retour" : slot == SlotAnnuler;
+
+            // Un ecran du World Scoring (depart, bilan) : Valider et Retour sont a lui.
+            if (_ecransWs is { EnPage: true } ecranWs)
+            {
+                if (valider) ecranWs.ValiderSurLaPage(appuye);
+                else if (annuler) ecranWs.AnnulerSurLaPage(appuye);
+                return;
+            }
 
             // Une page d'epreuve (preparation, bilan) : Valider et Retour sont a elle.
             if (_panneauDesDefis is { EnPage: true } page)
@@ -1596,7 +1615,19 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     ("rank", cible.Rang), ("player", cible.Joueur),
                     ("score", cible.Valeur.ToString("N0", System.Globalization.CultureInfo.CurrentCulture)))
             : _textes.Text("leaderboard.challenge_goal_top", langue);
-        _overlay.Attendre(_textes.Text("leaderboard.starting_game", langue), _textes.Text("leaderboard.challenge_title", langue), objectif);
+        // L'ECRAN DE DEPART DU WORLD SCORING (P-D7, 10/11) : a la place de la boite d'attente, dans la famille des ecrans
+        // MULTIPLAYER ; il tient jusqu'au jeu et dit « YOUR TURN! ». Le panneau, lui, se ferme : sa veille du premier plan
+        // fermerait l'ecran quand l'emulateur passe devant.
+        var ecransWs = _ecransWs is { Actifs: true } ? _ecransWs : null;
+        if (ecransWs is not null)
+        {
+            _modele.Fermer();
+            OuvrirLEcranDeDepart(ecransWs, chemin, jeu, monde, contest);
+        }
+        else
+        {
+            _overlay.Attendre(_textes.Text("leaderboard.starting_game", langue), _textes.Text("leaderboard.challenge_title", langue), objectif);
+        }
 
         // EmulationStation doit avoir le premier plan AVANT /launch : sa requete ne lance rien
         // elle-meme, elle attend le prochain tour de sa boucle d'interface, qui ne tourne pas
@@ -1664,6 +1695,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 if (!reponse.IsSuccessStatusCode)
                 {
                     _logger.LogWarning("Classement : EmulationStation a refuse le lancement ({Statut}).", (int) reponse.StatusCode);
+                    ecransWs?.Abandonner("lancement refuse par ES");
                     Fermer();
                     return;
                 }
@@ -1673,9 +1705,62 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Classement : le defi n'a pas demarre.");
+                ecransWs?.Abandonner("defi non demarre");
                 Fermer();
             }
         });
+    }
+
+    /// <summary>
+    /// L'ecran de depart du World Scoring (P-D7) : le jeu, le mode, le joueur (record, place), le score a battre (la cible
+    /// du cartouche du defi), les regles et l'etat de la certification, d'apres le classement que le panneau montrait.
+    /// </summary>
+    private void OuvrirLEcranDeDepart(WorldScoringEcransService ecrans, string chemin, string jeu, IReadOnlyList<LeaderboardClient.Ligne> monde,
+        LeaderboardSocialClient.Contest? contest)
+    {
+        try
+        {
+            var reglages = _options.CurrentValue.Leaderboard;
+            var mode = contest is null
+                ? ModeCourant()
+                : ModeDuDefiPour(false, reglages.ChallengeShareLive, reglages.ChallengeJoinPolicy ?? "none", _reglesDuJeu.Contains("1cc-multi"));
+            var classement = ClassementDuRang();
+            var libelle = mode == ModeDuDefi.Multi ? LibelleDuMode(mode, _reglesDuJeu) : classement?.Label ?? LibelleDuMode(ModeDuDefi.Prive, _reglesDuJeu);
+            var mienne = monde.FirstOrDefault(l => l.CestMoi);
+            var cible = _defi.Objectif().Cible ?? ChallengeHudService.CibleInitiale(monde);
+            string? fanart = null;
+            try
+            {
+                fanart = RetroBat.Api.Media.MediaDuGamelist.Resoudre(chemin, "fanart", "image")
+                    ?? RetroBat.Api.Media.MediaDuGamelist.Resoudre(chemin, "screenshot", "image");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "World Scoring : fanart introuvable pour {Chemin}.", chemin);
+            }
+
+            var depart = new DepartDuScore(
+                DateTime.UtcNow.Ticks.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                jeu,
+                fanart,
+                libelle,
+                mode != ModeDuDefi.Prive,
+                (mienne?.Joueur is { Length: > 0 } nom ? nom : _context.PlayerPseudo) ?? "",
+                mienne?.Pays ?? "",
+                mienne?.Valeur,
+                mienne?.Rang,
+                monde.Count,
+                cible is null ? null : new CibleDuScore(cible.Rang, cible.Joueur, cible.Pays, cible.Valeur, cible.CestMoi));
+            ecrans.Ouvrir(depart, monde, classement?.Ruleset ?? _reglePrincipale, Glyphe(SlotValider), Glyphe(SlotAnnuler),
+                rejouer: contest is null ? () => Defier() : null);
+        }
+        catch (Exception ex)
+        {
+            // Jamais d'ecran plutot qu'un defi qui ne part pas : la boite d'attente d'avant.
+            _logger.LogWarning(ex, "World Scoring : ecran de depart impossible, la boite d'attente le remplace.");
+            ecrans.Abandonner("ecran de depart impossible");
+            _overlay.Attendre(_textes.Text("leaderboard.starting_game", Langue()), _textes.Text("leaderboard.challenge_title", Langue()));
+        }
     }
 
     /// <summary>
@@ -1713,7 +1798,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         {
             var resolution = await _hote.ResoudreLancementAsync(chemin).ConfigureAwait(false);
             if (resolution is null) return null;
-            var deck = _deck.Preparer(Deck.DeckModes.WorldScoring, resolution.Systeme, chemin, classement: classementDuRang);
+            // Les ecrans du World Scoring dessines par l'API (P-D7) : le Deck s'efface devant eux (Cards = api).
+            var deck = _deck.Preparer(Deck.DeckModes.WorldScoring, resolution.Systeme, chemin, classement: classementDuRang,
+                cartes: _ecransWs is { Actifs: true } ? Deck.DeckCartes.Api : Deck.DeckCartes.Deck);
             return deck.Status == "posed" && deck.Arguments.Count > 0 ? new DefiAvecDeck(resolution, deck) : null;
         }
         catch (Exception ex)

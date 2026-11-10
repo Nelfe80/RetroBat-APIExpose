@@ -44,7 +44,8 @@ public sealed partial class LeaderboardOverlayService
         ScoreDeFin? MonScore = null,
         string? Logo = null,
         IReadOnlyList<LigneDeDefi>? Classement = null,
-        bool SansBoutons = false);
+        bool SansBoutons = false,
+        ProgressionDeFin? Progression = null);
 
     /// <summary>
     /// UNE COOP QUI CONCOURT (31/10/2026) : le score de ce joueur, mis en avant a la place du vainqueur. <c>Ruban</c> : le
@@ -73,11 +74,15 @@ public sealed partial class LeaderboardOverlayService
         IReadOnlyList<MesureDeFin> Mesures,
         IReadOnlyList<string?>? Coequipiers = null,
         string PrefixeCote = "ELO ",
-        bool EcartDore = false);
+        bool EcartDore = false,
+        string? Pastille = null);
 
-    /// <summary>Une mesure d'un joueur : <c>Valeur</c> null = non mesuree ; <c>Part</c> de 0 a 1, relative au meilleur.</summary>
+    /// <summary>
+    /// Une mesure d'un joueur : <c>Valeur</c> null = non mesuree ; <c>Part</c> de 0 a 1, relative au meilleur (negative : pas
+    /// de barre, rien a comparer) ; <c>Texte</c> : la valeur deja ecrite (une duree « 12:34 »), sans decompte.
+    /// </summary>
     public sealed record MesureDeFin(string Icone, string Libelle, long? Valeur, double Part, bool Meilleure, bool Milliers = false,
-        string Suffixe = "");
+        string Suffixe = "", string? Texte = null);
 
     public sealed record JaugeDeFin(string Libelle, IReadOnlyList<PartDeLaJauge> Parts);
 
@@ -85,6 +90,9 @@ public sealed partial class LeaderboardOverlayService
 
     /// <summary>APERCU : le temps fige de l'animation, en secondes ; null, l'horloge de l'ecran.</summary>
     internal double? _tempsDApercu;
+
+    /// <summary>APERCU : le temps fige depuis le depart (« YOUR TURN! »), separe de celui de l'entree ; null, celui de l'entree.</summary>
+    internal double? _tempsDuDepartDApercu;
 
     private sealed partial class Panneau
     {
@@ -650,7 +658,8 @@ public sealed partial class LeaderboardOverlayService
         {
             if (fin.Jauge is not { Parts.Count: >= 2 } jauge)
             {
-                return 230;
+                // Le World Scoring (P-D7) : la barre de progression vers le record, a la place de la jauge.
+                return fin.Progression is { } progression ? DessinerLaProgression(g, progression, famille, secours, t) : 230;
             }
 
             var apparition = Sortie(Entre(t, 1.2, 1.49));
@@ -731,7 +740,12 @@ public sealed partial class LeaderboardOverlayService
         private void DessinerLesJoueursDeFin(Graphics g, EcranDeFin fin, StyleDEcran style, FontFamily famille, Font secours, float haut, double t)
         {
             var joueurs = fin.Joueurs;
-            if (joueurs.Count == 2)
+            if (joueurs.Count == 1 && fin.Progression is not null)
+            {
+                // Un joueur seul (World Scoring) : sa grande carte, a la place de P1.
+                DessinerUneCarteDeFin(g, joueurs[0], style, famille, secours, new PointF(840, haut), t, 0);
+            }
+            else if (joueurs.Count == 2)
             {
                 for (var i = 0; i < 2; i++)
                 {
@@ -765,7 +779,8 @@ public sealed partial class LeaderboardOverlayService
 
         /// <summary>La valeur d'une mesure a l'instant t ; un score a ses milliers separes (« 120 000 »), comme partout ailleurs.</summary>
         private static string TexteDeMesure(MesureDeFin m, double t)
-            => m.Valeur is { } v
+            => m.Texte is { Length: > 0 } ecrit ? ecrit
+            : m.Valeur is { } v
                 ? m.Milliers ? Decompte(v, t).ToString("#,0", SeparateurDeMilliers) : Decompte(v, t).ToString(CultureInfo.InvariantCulture)
                 : "-";
 
@@ -906,9 +921,15 @@ public sealed partial class LeaderboardOverlayService
             return image;
         }
 
-        private static void DessinerLaPastilleDeFin(Graphics g, int? place, Font police, PointF coin, double opacite)
+        private static void DessinerLaPastilleDeFin(Graphics g, int? place, Font police, PointF coin, double opacite, string? marque = null)
         {
-            var texte = "P" + (place?.ToString(CultureInfo.InvariantCulture) ?? "?");
+            // Une carte qui n'est pas un joueur (le PLAYER DECK du World Scoring) porte sa propre marque, ou aucune.
+            if (marque is { Length: 0 })
+            {
+                return;
+            }
+
+            var texte = marque ?? "P" + (place?.ToString(CultureInfo.InvariantCulture) ?? "?");
             var taille = TraitsDesEcrans.Mesure(g, texte, police);
             var zone = new RectangleF(coin.X, coin.Y, taille.Width + 18, taille.Height + 8);
             using var forme = FormesDesEcrans.Arrondi(zone, 4);
@@ -1057,7 +1078,7 @@ public sealed partial class LeaderboardOverlayService
 
             using (var pastille = TraitsDesEcrans.Chiffres(21, secours))
             {
-                DessinerLaPastilleDeFin(g, j.Place, pastille, new PointF(x, y + hautEntete - 76), opacite);
+                DessinerLaPastilleDeFin(g, j.Place, pastille, new PointF(x, y + hautEntete - 76), opacite, j.Pastille);
             }
 
             if (j.Personnage.Length > 0)
@@ -1123,13 +1144,14 @@ public sealed partial class LeaderboardOverlayService
                 }
 
                 var piste = new RectangleF(carte.X + 28, y + 58, largeur - 56, 12);
-                using (var fondDePiste = FormesDesEcrans.Arrondi(piste, 6))
-                using (var gris = new SolidBrush(TraitsDesEcrans.Alpha(Color.FromArgb(20, 255, 255, 255), opacite)))
+                if (m.Part >= 0)
                 {
+                    using var fondDePiste = FormesDesEcrans.Arrondi(piste, 6);
+                    using var gris = new SolidBrush(TraitsDesEcrans.Alpha(Color.FromArgb(20, 255, 255, 255), opacite));
                     g.FillPath(gris, fondDePiste);
                 }
 
-                var largeurPleine = (float)(piste.Width * m.Part * remplissage);
+                var largeurPleine = (float)(piste.Width * Math.Max(0, m.Part) * remplissage);
                 if (largeurPleine > 1)
                 {
                     using var plein = FormesDesEcrans.Arrondi(new RectangleF(piste.X, piste.Y, Math.Max(12, largeurPleine), piste.Height), 6);
