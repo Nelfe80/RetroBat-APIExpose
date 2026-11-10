@@ -644,6 +644,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             // Un fichier n'est desormais candidat que si son contenu est CONFIRME. La collection se
             // reconstruit ainsi d'elle-meme a chaque passe : ce qui n'est pas confirme en sort.
             var confirmes = candidats.Where(candidat => _contenuConfirme(candidat, jeu)).ToList();
+            // (10/11) un set d'arcade d'exception que le .MEM nomme, hors gamelist et hors nom du jeu (DaiOuJou Black Label)
+            if (confirmes.Count == 0 && string.Equals(jeu.SystemId, "arcade", StringComparison.OrdinalIgnoreCase))
+                confirmes = _catalog.DumpsNommesParLeMem(jeu.SystemId, jeu.RomGroup).Where(candidat => _contenuConfirme(candidat, jeu)).ToList();
             if (confirmes.Count == 0)
             {
                 manques.Add(jeu.RomGroup + " : ROM non reconnue (ce n'est pas la version classée)");

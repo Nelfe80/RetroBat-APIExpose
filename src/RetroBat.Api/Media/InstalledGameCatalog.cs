@@ -293,6 +293,36 @@ public sealed class InstalledGameCatalog
             .ToList();
     }
 
+    /// <summary>
+    /// (10/11) Les dumps d'arcade que le .MEM officiel NOMME dans ses empreintes (<c>label = "ddpdojblka.zip &lt;...&gt;"</c>) :
+    /// un set d'exception (DaiOuJou Black Label) n'est rattache au jeu ni par la gamelist ni par son nom ; l'appelant confirme
+    /// ensuite son contenu. Vide sans .MEM ou sans set nomme present sur la machine.
+    /// </summary>
+    public IReadOnlyList<InstalledGame> DumpsNommesParLeMem(string canonicalSystemId, string romGroup)
+    {
+        if (string.IsNullOrWhiteSpace(canonicalSystemId) || string.IsNullOrWhiteSpace(romGroup)) return [];
+        var groupe = romGroup.Trim();
+        string texte;
+        try
+        {
+            var chemin = OfficialDefinitionPath(canonicalSystemId, groupe);
+            if (!File.Exists(chemin)) return [];
+            texte = File.ReadAllText(chemin);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return [];
+        }
+
+        var noms = System.Text.RegularExpressions.Regex.Matches(texte, @"label\s*=\s*""([A-Za-z0-9_.\-]+\.(?:zip|7z))")
+            .Select(m => m.Groups[1].Value).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        if (noms.Count == 0) return [];
+        return Enumerate([canonicalSystemId], avecGroupe: false)
+            .Where(jeu => noms.Contains(Path.GetFileName(jeu.AbsolutePath)))
+            .Select(jeu => jeu with { RomGroup = groupe, OfficialDefinitionPath = OfficialDefinitionPath(jeu.CanonicalSystemId, groupe) })
+            .ToList();
+    }
+
     private static IEnumerable<XElement> ReadGamelist(string path)
     {
         try
