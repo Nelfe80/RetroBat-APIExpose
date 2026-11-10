@@ -437,8 +437,27 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     {
         try
         {
-            if (Process.GetProcessesByName(NomDuHost).Length > 0) return;
             var exe = Path.Combine(DossierDuDeck, NomDuHost + ".exe");
+            var enCours = Process.GetProcessesByName(NomDuHost);
+            if (enCours.Length > 0)
+            {
+                // UN DECK D'AVANT LA MISE A JOUR (10/11) : il reste resident apres son lancement, et une borne mise a jour gardait
+                // l'ancien Deck jusqu'au redemarrage du PC (19XX du 09/11 encore en 0.1.6 le 10/11 apres la 1.9.167). Un Deck lance
+                // avant que son exe ne change sur le disque est arrete ici, au lancement d'un jeu, et le nouveau demarre.
+                var ecrit = File.Exists(exe) ? File.GetLastWriteTimeUtc(exe) : DateTime.MinValue;
+                var perimes = enCours.Where(p => { try { return p.StartTime.ToUniversalTime() < ecrit; } catch { return false; } }).ToList();
+                if (perimes.Count < enCours.Length)
+                {
+                    foreach (var p in enCours) p.Dispose();
+                    return;
+                }
+                foreach (var p in perimes)
+                {
+                    try { p.Kill(); p.WaitForExit(3000); } catch { /* deja parti */ }
+                    p.Dispose();
+                }
+                _journal?.LogInformation("PlayerDeck : Deck d'avant la mise a jour arrete ({Exe}).", exe);
+            }
             if (!File.Exists(exe)) return;
             Process.Start(new ProcessStartInfo
             {
