@@ -143,6 +143,15 @@ public sealed class FantomesDuSpeedrun
         return voulus.OfType<string>().Where(r => r.Length > 0).Distinct(StringComparer.Ordinal).ToList();
     }
 
+    /// <summary>
+    /// (10/11) Les fantomes de reference a essayer, dans l'ordre : le record du monde, puis chaque temps du classement qui a un
+    /// replay, jamais le mien. Le premier qui se pose court ; un replay introuvable ou trop court laisse sa place au suivant
+    /// (SMB 1-2 : le 2e, NeoGeoff, n'avait qu'un replay de 16 images, parti nulle part). Pur.
+    /// </summary>
+    public static IReadOnlyList<string> CandidatsDeReference(IReadOnlyList<(string Joueur, string? Replay)> lignes, string pseudo)
+        => lignes.Where(l => l.Replay is { Length: > 0 } && !(pseudo.Length > 0 && string.Equals(l.Joueur, pseudo, StringComparison.OrdinalIgnoreCase)))
+            .Select(l => l.Replay!).Distinct(StringComparer.Ordinal).ToList();
+
     /// <summary>Le nombre d'images d'un .nghost (docs/FORMAT.md de NelfePlay-Ghosts), ou null s'il est illisible. Pur.</summary>
     internal static long? ImagesDuFantome(byte[] fantome)
     {
@@ -410,8 +419,14 @@ public sealed class FantomesDuSpeedrun
             lock (_verrou) _monTemps = monTempsPublie;
         }
 
-        foreach (var replay in replays)
+        // le mien d'abord, puis la reference : le record du monde, ou a defaut le meilleur fantome qui se pose vraiment
+        var avecReference = Choix is ChoixDesFantomes.MonRecordEtMondial or ChoixDesFantomes.RecordMondial;
+        var aEssayer = replays.Where(x => x == mien).Concat(avecReference ? CandidatsDeReference(lignes, pseudo) : [])
+            .Concat(replays.Where(x => x != mien)).Distinct(StringComparer.Ordinal).ToList();
+        var referencePosee = false;
+        foreach (var replay in aEssayer)
         {
+            if (replay != mien && referencePosee) continue;
             if (await FantomeAsync(replay, ct).ConfigureAwait(false) is not { } fantome) continue;
             // le replay d'un temps publie qui ne contient pas son run (parti en retard, avant le 05/11) ne court pas
             var dureeDuRun = dureesDesReplays.TryGetValue(replay, out var di) ? di : (long?)null;
@@ -434,6 +449,7 @@ public sealed class FantomesDuSpeedrun
                 : mondial || rang <= 0 ? Etiquette(detenteur, true) : EtiquetteDuRang(detenteur, rang));
             EcrireLaDuree(dossier, nom, dureeDuRun);
             poses++;
+            if (replay != mien) referencePosee = true;
         }
 
         _journal?.LogInformation("Fantomes : {Poses} sur {Voulus} pour {Defi}.", poses, replays.Count, r.ChallengeId);

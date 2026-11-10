@@ -920,6 +920,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
 
         if (arcade)
         {
+            // (10/11) LE FICHIER LUI-MEME : un jeu ouvert d'exception publie l'empreinte du zip qui a servi a l'ouvrir (DaiOuJou
+            // Black Label, ddpdojblka) ; absent de la gamelist et inconnu du referentiel, il restait hors de la collection.
+            if (md5DuContenu(candidat.AbsolutePath) is { Length: > 0 } duZip && connus.Contains(duZip)) return true;
             var set = Path.GetFileNameWithoutExtension(candidat.AbsolutePath);
             var sha1 = set.Length == 0 ? null : sha1DuSet(candidat.CanonicalSystemId, jeu.RomGroup, set);
             if (sha1 is not { Length: > 0 } || !sha1s.Contains(sha1)) return false;

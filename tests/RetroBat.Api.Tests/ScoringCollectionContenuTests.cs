@@ -47,6 +47,18 @@ public class ScoringCollectionContenuTests
     }
 
     [Fact]
+    public void Le_zip_dont_le_site_publie_l_empreinte_est_confirme_hors_gamelist_et_hors_referentiel()
+    {
+        // (10/11) DaiOuJou Black Label (ddpdojblka), ouvert d'exception : ni la gamelist ni le referentiel ne le connaissent,
+        // mais son zip a l'empreinte publiee par le site.
+        var fichier = Arcade("E:/roms/fbneo/ddpdojblka.zip");
+        Assert.True(NelfePlayScoringCollectionSyncService.ContenuConfirme(fichier, DoubleDragon, (_, _, _) => null,
+            _ => "22beac4a170b45ed13da71baa1426074"));
+        Assert.False(NelfePlayScoringCollectionSyncService.ContenuConfirme(fichier, DoubleDragon, (_, _, _) => null,
+            _ => "00000000000000000000000000000000"));
+    }
+
+    [Fact]
     public void Le_Double_Dragon_Neo_Geo_n_entre_pas_sous_le_meme_nom()
     {
         var fichier = Arcade("E:/roms/fbneo/doubledr.zip");

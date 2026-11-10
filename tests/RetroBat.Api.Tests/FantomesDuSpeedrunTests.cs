@@ -107,6 +107,9 @@ public class FantomesDuSpeedrunTests
         IReadOnlyList<(string Joueur, string? Replay)> lignes = [("Old", null), ("Neo", "rp_neo"), ("Ben", "rp_ben")];
         Assert.Equal(attendus, string.Join(",", FantomesDuSpeedrun.Replays(lignes, pseudo, ChoixDesFantomes.MonRecordEtMondial)));
         Assert.Equal("NEO (#2)", FantomesDuSpeedrun.EtiquetteDuRang("Neo", 2));
+        // les suivants a essayer si le premier ne se pose pas (replay introuvable ou trop court), jamais le mien
+        Assert.Equal("rp_neo,rp_ben", string.Join(",", FantomesDuSpeedrun.CandidatsDeReference(lignes, "Nelfe")));
+        Assert.Equal("rp_ben", string.Join(",", FantomesDuSpeedrun.CandidatsDeReference(lignes, "Neo")));
     }
 
     [Fact]
