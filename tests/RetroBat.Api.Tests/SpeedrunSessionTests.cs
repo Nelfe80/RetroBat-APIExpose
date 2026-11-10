@@ -83,6 +83,10 @@ public class SpeedrunSessionTests
         Assert.Equal("speedrun.msg.finish", second.Cle);
         Assert.Contains(second.Valeurs, v => v.Nom == "best" && v.Valeur == "0:33.38");
         Assert.Equal(2000, s.MeilleurTemps);
+        // (10/11) le fantome part du temps de CETTE arrivee, jamais du meilleur temps du journal (Green Hill 1 : un 35.78 range
+        // sous le 32.13 du joueur, puis son 34.24 refuse)
+        Assert.NotNull(s.DerniereArrivee);
+        Assert.NotEqual(2000, s.DerniereArrivee!.Value.Images);
     }
 
     [Fact]

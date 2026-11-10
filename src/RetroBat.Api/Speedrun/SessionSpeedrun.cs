@@ -152,6 +152,13 @@ public sealed class SessionSpeedrun
     /// <summary>(05/11) Le chrono independant de ce meilleur temps : du depart a l'arrivee du run, la duree de son fantome.</summary>
     public long? MeilleurIndependant { get; private set; }
 
+    /// <summary>
+    /// (10/11) L'arrivee de la tentative qui vient de se fermer (frames officielles, chrono independant) ; null si elle n'est pas
+    /// arrivee ou pas classable. C'est elle qui devient un fantome, jamais le meilleur temps du journal (MeilleurTemps) :
+    /// depuis le 05/11, le temps du journal etait passe a la place, et le replay d'une course plus lente devenait « mon record ».
+    /// </summary>
+    public (long Images, long? Independant)? DerniereArrivee { get; private set; }
+
     public string Etat => _relance ? Restarting : EtatHud(_courante.Etat);
 
     public static string EtatHud(EtatTentative etat) => etat switch
@@ -528,6 +535,7 @@ public sealed class SessionSpeedrun
         }
 
         _closes.Add((AttemptId, res));
+        DerniereArrivee = EstClassable(res) && res.FramesOfficielles is { } arrivee ? (arrivee, res.Independant?.Frames) : null;
         var precedent = MeilleurTemps;
         if (EstClassable(res) && res.FramesOfficielles is { } frames && (precedent is not { } pb || frames < pb))
         {

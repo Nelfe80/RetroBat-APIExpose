@@ -871,7 +871,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             // Le joueur voit sa mort ou son temps, puis l'etat de depart revient et le chrono repart de 0. Une arrivee qui bat
             // son temps arrete l'enregistrement plus tot : son replay devient le fantome de ce depart.
             var sessionId = _session.SessionId;
-            var meilleur = _session.Etat == SessionSpeedrun.Finished && _fantomes?.NouveauTemps(_session.MeilleurTemps, _session.MeilleurIndependant) == true;
+            var meilleur = _session.Etat == SessionSpeedrun.Finished && _session.DerniereArrivee is { } arrivee
+                && _fantomes?.NouveauTemps(arrivee.Images, arrivee.Independant) == true;
             _ = Task.Run(async () =>
             {
                 if (meilleur)
