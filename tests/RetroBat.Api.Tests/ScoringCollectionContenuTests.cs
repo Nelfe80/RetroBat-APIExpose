@@ -53,9 +53,9 @@ public class ScoringCollectionContenuTests
         // mais son zip a l'empreinte publiee par le site.
         var fichier = Arcade("E:/roms/fbneo/ddpdojblka.zip");
         Assert.True(NelfePlayScoringCollectionSyncService.ContenuConfirme(fichier, DoubleDragon, (_, _, _) => null,
-            _ => "22beac4a170b45ed13da71baa1426074"));
+            _ => null, md5DuFichier: _ => "22beac4a170b45ed13da71baa1426074"));
         Assert.False(NelfePlayScoringCollectionSyncService.ContenuConfirme(fichier, DoubleDragon, (_, _, _) => null,
-            _ => "00000000000000000000000000000000"));
+            _ => null, md5DuFichier: _ => "00000000000000000000000000000000"));
     }
 
     [Fact]

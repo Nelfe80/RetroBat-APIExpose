@@ -905,7 +905,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         Func<string?, string?, string?, string?> sha1DuSet,
         Func<string, string?> md5DuContenu,
         Func<string?, string?, bool>? bootlegOuHack = null,
-        Func<InstalledGame, string?>? sansEnTeteDuContenu = null)
+        Func<InstalledGame, string?>? sansEnTeteDuContenu = null,
+        Func<string, string?>? md5DuFichier = null)
     {
         var hashes = jeu.ContentHashes;
         if (hashes is null) return false;
@@ -925,7 +926,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         {
             // (10/11) LE FICHIER LUI-MEME : un jeu ouvert d'exception publie l'empreinte du zip qui a servi a l'ouvrir (DaiOuJou
             // Black Label, ddpdojblka) ; absent de la gamelist et inconnu du referentiel, il restait hors de la collection.
-            if (md5DuContenu(candidat.AbsolutePath) is { Length: > 0 } duZip && connus.Contains(duZip)) return true;
+            // le md5 du FICHIER zip tel quel (le md5 « du contenu » hache ce qu'il y a dedans)
+            if ((md5DuFichier ?? Md5DuFichier)(candidat.AbsolutePath) is { Length: > 0 } duZip && connus.Contains(duZip)) return true;
             var set = Path.GetFileNameWithoutExtension(candidat.AbsolutePath);
             var sha1 = set.Length == 0 ? null : sha1DuSet(candidat.CanonicalSystemId, jeu.RomGroup, set);
             if (sha1 is not { Length: > 0 } || !sha1s.Contains(sha1)) return false;
@@ -1018,6 +1020,22 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// releve pour un appelant qui ne lit que des candidats deja reconnus (MULTIPLAYER : un disque PSP).
     /// </summary>
     internal static string? Md5DuContenu(string chemin) => Md5DuContenu(chemin, PlafondMd5);
+
+    /// <summary>(10/11) Le md5 du fichier tel quel (un zip d'arcade entier), sous le plafond ; null s'il manque ou depasse.</summary>
+    internal static string? Md5DuFichier(string chemin)
+    {
+        try
+        {
+            var info = new FileInfo(chemin);
+            if (!info.Exists || info.Length > PlafondMd5) return null;
+            using var flux = File.Open(chemin, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            return Convert.ToHexString(System.Security.Cryptography.MD5.HashData(flux)).ToLowerInvariant();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
 
     internal static string? Md5DuContenu(string chemin, long plafond) => EmpreintesDuContenu(chemin, RegleSansEnTete.Aucune, plafond).Md5;
 
