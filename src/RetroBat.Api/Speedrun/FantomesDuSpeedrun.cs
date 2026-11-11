@@ -34,7 +34,7 @@ public enum ChoixDesFantomes
 /// Le coeur hote part donc aussi sans aucun fantome, pour accueillir le premier.
 /// </para>
 /// </summary>
-public sealed class FantomesDuSpeedrun
+public sealed partial class FantomesDuSpeedrun
 {
     /// <summary>
     /// Un jeu dont un coeur hote a le profil : son coeur d'origine, le coeur hote, le crc32 du contenu (EN-TETE COMPRIS : c'est
@@ -186,6 +186,7 @@ public sealed class FantomesDuSpeedrun
             _monTemps = t;
             _tempsAttendu = t;
             _dureeAttendue = independant;
+            _splitsDuRunRecord = LireLesSplitsDuJoueur();
             _fantomeAttendu = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             return true;
         }
@@ -239,9 +240,13 @@ public sealed class FantomesDuSpeedrun
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.nghost")) File.Delete(ancien);
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.label")) File.Delete(ancien);
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.duree")) File.Delete(ancien);
+            foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.splits")) File.Delete(ancien);
             await File.WriteAllBytesAsync(Path.Combine(dossier, $"{PrefixeDuMien}{replay}.nghost"), AuCrcDuJeu(fantome, hote.Crc)).ConfigureAwait(false);
             EcrireLEtiquette(dossier, $"{PrefixeDuMien}{replay}", Etiquette(pseudo, false));
             EcrireLaDuree(dossier, $"{PrefixeDuMien}{replay}", dureeDuRun);
+            // (11/11) les splits du run qui vient de battre le record : ceux du joueur, gardes a l'arrivee
+            PoserLesSplitsDuRun(dossier, $"{PrefixeDuMien}{replay}", replay);
+            Poser(new FantomePose($"{PrefixeDuMien}{replay}", replay, Etiquette(pseudo, false), RoleMien, dureeDuRun ?? temps), remplacerLeMien: true);
             if (defi is not null && temps is { } t) EcrireLeRecordLocal(defi, t, replay, fantome, dureeDuRun);
             _journal?.LogInformation("Fantomes : meilleur temps de la session, {Replay} court des le prochain depart.", replay);
         }
@@ -314,6 +319,7 @@ public sealed class FantomesDuSpeedrun
             _enCourse = false;
             _monTemps = null;
             _fantomeAttendu = null;
+            OublierLesPoses();
         }
 
         if (HoteDe(r) is not { } hote || Choix == ChoixDesFantomes.Aucun) return false;
@@ -409,6 +415,9 @@ public sealed class FantomesDuSpeedrun
             EcrireLEtiquette(dossier, $"{PrefixeDuMien}{l.Replay}",
                 Etiquette(pseudo, MeilleurQueLeMondial(l.Images, lignes, tempsDesReplays, pseudo, monTempsPublie)));
             EcrireLaDuree(dossier, $"{PrefixeDuMien}{l.Replay}", l.Duree);
+            PoserLesSplits(dossier, $"{PrefixeDuMien}{l.Replay}", l.Replay);
+            Poser(new FantomePose($"{PrefixeDuMien}{l.Replay}", l.Replay,
+                Etiquette(pseudo, MeilleurQueLeMondial(l.Images, lignes, tempsDesReplays, pseudo, monTempsPublie)), RoleMien, l.Duree ?? l.Images));
             poses++;
             if (mien is not null) replays.Remove(mien);
             mien = null;
@@ -448,6 +457,11 @@ public sealed class FantomesDuSpeedrun
             EcrireLEtiquette(dossier, nom, replay == mien ? Etiquette(pseudo, mondial)
                 : mondial || rang <= 0 ? Etiquette(detenteur, true) : EtiquetteDuRang(detenteur, rang));
             EcrireLaDuree(dossier, nom, dureeDuRun);
+            PoserLesSplits(dossier, nom, replay);
+            Poser(new FantomePose(nom, replay, File.Exists(Path.Combine(dossier, nom + ".label"))
+                    ? File.ReadAllText(Path.Combine(dossier, nom + ".label")).Trim() : "",
+                replay == mien ? (mondial ? RoleMondial : RoleMien) : mondial || rang <= 0 ? RoleMondial : RoleReference,
+                dureeDuRun ?? (tempsDesReplays.TryGetValue(replay, out var tr) ? tr : null)));
             poses++;
             if (replay != mien) referencePosee = true;
         }
@@ -664,6 +678,8 @@ public sealed class FantomesDuSpeedrun
                 foreach (var f in Directory.EnumerateFiles(dossier, "*-rp_*.nghost")) File.Delete(f);
                 foreach (var f in Directory.EnumerateFiles(dossier, "*-rp_*.label")) File.Delete(f);
                 foreach (var f in Directory.EnumerateFiles(dossier, "*-rp_*.duree")) File.Delete(f);
+                // (11/11) les splits que le coeur a ecrits pour un fantome restent avec son .nghost dans le cache
+                GarderLesSplits(dossier);
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException)
             {
