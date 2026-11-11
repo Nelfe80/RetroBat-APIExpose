@@ -31,7 +31,11 @@ public sealed class ReplayVideoPublisher
     /// Le site ne donne un role de rendu (station, borne du joueur) qu'a une borne qui le dit : une API plus ancienne
     /// rendrait encore au plus pres, avec recalage.
     /// </summary>
-    internal const string CapaciteDesFilms = "fidelity=1";
+    /// <remarks>
+    /// « fidelity=2 » (11/11, 1.9.169) : le score se lit aussi sous Genesis Plus GX et snes9x, et un replay enregistre touche par
+    /// touche se relit par le wrapper sans masque. Le site ne propose de replay Mega Drive ou SNES qu'a une borne qui le dit.
+    /// </remarks>
+    internal const string CapaciteDesFilms = "fidelity=2";
 
     private readonly ReplayVideoRenderer _rendu;
     private readonly IReplayManifestStore _manifests;

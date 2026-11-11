@@ -168,7 +168,10 @@ public sealed class FilmsDeLaBorneDuJoueurTests
     {
         Assert.True(LecteurDuScore.CoeurReleve("fbneo"));
         Assert.True(LecteurDuScore.CoeurReleve("fceumm"));
-        Assert.False(LecteurDuScore.CoeurReleve("genesis_plus_gx"));
+        Assert.True(LecteurDuScore.CoeurReleve("genesis_plus_gx"));
+        Assert.True(LecteurDuScore.CoeurReleve("snes9x_ghosts"));
+        Assert.True(LecteurDuScore.CoeurReleve("fceumm_ghosts"));
+        Assert.False(LecteurDuScore.CoeurReleve("mame"));
         Assert.False(LecteurDuScore.CoeurReleve(null));
         Assert.Equal(["arcade"], LecteurDuScore.SystemesDuMem("fbneo", "fb_alpha"));
         Assert.Equal(["nes"], LecteurDuScore.SystemesDuMem("nes", "nes"));
