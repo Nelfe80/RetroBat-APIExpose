@@ -944,7 +944,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         Func<string, string?> md5DuContenu,
         Func<string?, string?, bool>? bootlegOuHack = null,
         Func<InstalledGame, string?>? sansEnTeteDuContenu = null,
-        Func<string, string?>? md5DuFichier = null)
+        Func<string, string?>? md5DuFichier = null,
+        Func<string, bool>? cloneOfficiel = null)
     {
         var hashes = jeu.ContentHashes;
         if (hashes is null) return false;
@@ -972,7 +973,13 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             // partie sur un clone).
             if ((md5DuFichier ?? Md5DuFichier)(candidat.AbsolutePath) is { Length: > 0 } duZip && connus.Contains(duZip)
                 && (duMem.Count == 0 || duMem.ContainsKey(duZip))) return true;
-            if (!connus.Contains(nomDuSet) && !duMem.ContainsKey(nomDuSet)) return false;
+            if (!connus.Contains(nomDuSet) && !duMem.ContainsKey(nomDuSet))
+            {
+                // (11/11, decision du user) le clone OFFICIEL d'un set nomme, du meme titre (19xxu, tokiu, mslug3h) : la famille
+                // vient du referentiel, l'emulateur verifie le romset, le site juge le sha1 du set par son groupe canonique.
+                return (cloneOfficiel ?? (s => RomAdmission.JugerCloneArcade(s, n => SetNommeParLeMem(n, connus, duMem),
+                    RomAdmission.ReferentielArcadeSurDisque.Borne).Admise))(set);
+            }
             if (candidat.Md5 is { Length: > 0 } md5Zip && connus.Contains(md5Zip)) return true;
             var sha1 = sha1DuSet(candidat.CanonicalSystemId, jeu.RomGroup, set);
             return sha1 is { Length: > 0 } && sha1s.Contains(sha1);
@@ -1098,6 +1105,17 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         {
             return null;
         }
+    }
+
+    /// <summary>
+    /// Le .MEM nomme-t-il ce set ? Le md5 de son nom de set publie par le profil ou ecrit au .MEM, ou un libelle « set.zip ».
+    /// Pur.
+    /// </summary>
+    internal static bool SetNommeParLeMem(string set, ICollection<string> publies, IReadOnlyDictionary<string, string> duMem)
+    {
+        var nom = Md5DuNomDeSet(set);
+        return publies.Contains(nom) || duMem.ContainsKey(nom)
+            || duMem.Values.Any(l => l.StartsWith(set + ".zip", StringComparison.OrdinalIgnoreCase) || l.StartsWith(set + ".7z", StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>L'empreinte arcade d'un set dans un .MEM : le md5 de son nom, en minuscules. Pur.</summary>

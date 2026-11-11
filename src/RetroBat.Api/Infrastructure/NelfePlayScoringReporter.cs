@@ -1814,17 +1814,19 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// et son sha1 declare n'est souvent que celui d'un fichier partage (19xxu sous 19xx, mslug3h, doubledr au BIOS Neo-Geo).
     /// Faux pour une console, un set inconnu, ou un jeu dont l'index des jeux ouverts manque (le site tranchera).
     /// </summary>
-    internal static bool SetNonNomme(string? systemId, string? romGroup, string? contentSet, ContentHashes? empreintes = null, string? cheminMem = null)
+    internal static bool SetNonNomme(string? systemId, string? romGroup, string? contentSet, ContentHashes? empreintes = null, string? cheminMem = null,
+        RomAdmission.IReferentielArcade? referentiel = null)
     {
         var set = SetArcade(systemId, contentSet);
         if (set is null || string.IsNullOrEmpty(romGroup)) return false;
         var publies = (empreintes ?? NelfePlayScoringCollectionSyncService.EmpreintesOuvertes(romGroup))?.Md5;
         if (publies is null) return false;
-        var nom = NelfePlayScoringCollectionSyncService.Md5DuNomDeSet(set);
-        if (publies.Contains(nom, StringComparer.OrdinalIgnoreCase)) return false;
+        var connus = new HashSet<string>(publies, StringComparer.OrdinalIgnoreCase);
         var duMem = RomAdmission.DumpsDuMem(cheminMem ?? Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.RamResourcesRoot, "arcade", romGroup + ".MEM"));
-        if (duMem.ContainsKey(nom)) return false;
-        return !duMem.Values.Any(l => l.StartsWith(set + ".zip", StringComparison.OrdinalIgnoreCase) || l.StartsWith(set + ".7z", StringComparison.OrdinalIgnoreCase));
+        if (NelfePlayScoringCollectionSyncService.SetNommeParLeMem(set, connus, duMem)) return false;
+        // (11/11) le clone officiel d'un set nomme, du meme titre, est soumis.
+        return !RomAdmission.JugerCloneArcade(set, n => NelfePlayScoringCollectionSyncService.SetNommeParLeMem(n, connus, duMem),
+            referentiel ?? RomAdmission.ReferentielArcadeSurDisque.Borne).Admise;
     }
 
     internal static string? Sha1Declare(string? systemId, string? romGroup, string? contentSet)
@@ -3752,6 +3754,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             Trace($"STOP: ROM exclue du scoring, rien n'est envoye : {exclu.Message}");
             return;
         }
+        // LE JEU RALENTI PAR L'AFFICHAGE (11/11, option A du user) : une ROM NTSC sur un ecran a 50 Hz tourne a 83 %.
+        if (RetroBat.Api.Replay.Recording.ReplayRecorderService.CadenceDeLaPartie(TimeSpan.FromMinutes(2)) is { } cadence
+            && RalentiDeLAffichage.Vitesse(cadence.CoeurFps, cadence.Mediane, cadence.Echantillons) is { } vitesse
+            && RalentiDeLAffichage.Ralenti(vitesse))
+        {
+            Trace($"STOP: {RalentiDeLAffichage.Raison}, jeu a {vitesse:P1} de sa vitesse (coeur {cadence.CoeurFps:0.###} img/s, "
+                + $"mesure {cadence.Mediane:0.##} img/s sur {cadence.Echantillons} mesures, {cadence.Jeu}) : rien n'est envoye");
+            if (_esNotify is not null)
+                await _esNotify.NotifyAsync(RalentiDeLAffichage.Message(vitesse, cadence.Mediane), cancellationToken).ConfigureAwait(false);
+            return;
+        }
 
         // Phase D : le score soumis = le MEILLEUR run. On segmente la trajectoire aux CHUTES
         // de score (un score qui retombe = le joueur a relancé une partie) et on garde le
@@ -4901,6 +4914,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "metric.single_sample" => "une seule lecture du score sur toute la partie : mets APIExpose à jour",
         "profile.content_mismatch" => "ROM non reconnue",
         "content.bootleg_unnamed" => "version bootleg ou hack",
+        "runtime.slow_motion" => "jeu ralenti par l'affichage (écran à 50 Hz) : passe en 60 Hz (PAL60) ou joue la version PAL",
+        "video.pal_pending" => "version PAL : score gardé pour le classement PAL à venir, hors du classement principal",
         "content.set_unnamed" => "set d'arcade que la définition du jeu ne nomme pas (clone non prouvé)",
         "content.excluded_dump" => "ROM exclue du scoring (hack, pirate, traduction, réédition ou version non prouvée)",
         "profile.mem_mismatch" => "définition mémoire non reconnue",

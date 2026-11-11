@@ -15,6 +15,7 @@ public class RomsAdmisesTests
     private static readonly string Racine = Path.Combine(AppContext.BaseDirectory, "RomsAdmises");
     private static readonly RomAdmission.ReferentielSurDisque Referentiel = new(Path.Combine(Racine, "systems"));
     private static readonly string Etats = Path.Combine(Racine, "states");
+    private static readonly RomAdmission.ReferentielArcadeSurDisque Arcades = new(Path.Combine(Racine, "systems"));
 
     // Les empreintes du rapport (md5 No-Intro ; celui des cartouches NES sans leur en-tete).
     private const string SmbPirateAsie = "ba9917f659693e2549677f0cc1f6c723";   // Super Mario Bros. (Asia) (En) (Pirate)
@@ -179,14 +180,52 @@ public class RomsAdmisesTests
         "fbneo", "arcade", groupe, $"I:/RetroBat/roms/fbneo/{set}.zip", set, null, null, true, mem);
 
     [Fact]
-    public void Un_clone_que_le_MEM_ne_nomme_pas_n_entre_plus_meme_avec_le_sha1_du_parent()
+    public void Un_clone_officiel_du_set_nomme_entre_et_un_set_hors_famille_non()
     {
-        // 19xxu porte le sha1 declare de 19xx (premier fichier partage) ; seul 19xx est nomme (md5 de « 19xx »).
+        // (11/11, decision du user) 19xxu, clone officiel de 19xx (le set nomme), entre ; un set d'une autre famille, non.
         const string sha1 = "813f465f2d392f6abeadbf661c54cf51171fa006";
         var jeu = Arcade("19xx-the-war-against-destiny", [NelfePlayScoringCollectionSyncService.Md5DuNomDeSet("19xx")], [sha1]);
         Func<string?, string?, string?, string?> referentiel = (_, _, _) => sha1;
-        Assert.True(NelfePlayScoringCollectionSyncService.ContenuConfirme(Set(jeu.RomGroup, "19xx"), jeu, referentiel, _ => null, md5DuFichier: _ => null));
-        Assert.False(NelfePlayScoringCollectionSyncService.ContenuConfirme(Set(jeu.RomGroup, "19xxu"), jeu, referentiel, _ => null, md5DuFichier: _ => null));
+        bool Clone(string set) => RomAdmission.JugerCloneArcade(set, n => n == "19xx", Arcades).Admise;
+        Assert.True(NelfePlayScoringCollectionSyncService.ContenuConfirme(Set(jeu.RomGroup, "19xx"), jeu, referentiel, _ => null, md5DuFichier: _ => null, cloneOfficiel: Clone));
+        Assert.True(NelfePlayScoringCollectionSyncService.ContenuConfirme(Set(jeu.RomGroup, "19xxu"), jeu, referentiel, _ => null, md5DuFichier: _ => null, cloneOfficiel: Clone));
+        Assert.False(NelfePlayScoringCollectionSyncService.ContenuConfirme(Set(jeu.RomGroup, "tokiu"), jeu, referentiel, _ => null, md5DuFichier: _ => null, cloneOfficiel: Clone));
+    }
+
+    [Theory]
+    [InlineData("19xxu", "19xx")]
+    [InlineData("19xxj", "19xx")]
+    [InlineData("tokiu", "toki")]
+    [InlineData("mslug3h", "mslug3")]
+    [InlineData("mslug3a", "mslug3")]
+    [InlineData("ddragonu", "ddragon")]
+    [InlineData("1942a", "1942")]
+    [InlineData("ddpdojblkb", "ddpdojblk")]
+    public void Les_clones_officiels_du_meme_titre_entrent(string clone, string nomme)
+    {
+        var d = RomAdmission.JugerCloneArcade(clone, n => n == nomme, Arcades);
+        Assert.True(d.Admise, d.Raison);
+    }
+
+    [Theory]
+    [InlineData("doubledr", "ddragon", "autre jeu")]          // Double Dragon Neo-Geo : son propre groupe, pas un clone
+    [InlineData("pc_ddrgn", "ddragon", "autre jeu")]          // PlayChoice-10
+    [InlineData("mt_beast", "altbeast", "autre jeu")]         // Mega-Tech
+    [InlineData("mspacmab", "mspacman", "bootleg")]
+    [InlineData("1942h", "1942", "bootleg")]                  // Supercharger 1942
+    [InlineData("1942c64", "1942", "bootleg")]                // C64 Music
+    [InlineData("bublboblb", "bublbobl", "bootleg")]          // for Bobble Bobble PCB
+    [InlineData("tokip", "toki", "bootleg")]                  // prototype
+    [InlineData("mslug3unity", "mslug3", "titre")]
+    [InlineData("juju", "toki", "titre")]                     // JuJu Densetsu, version japonaise
+    [InlineData("altbeastj", "altbeast", "titre")]            // Juuouki
+    [InlineData("ddpdoj", "ddpdojblk", "titre")]              // DaiOuJou sans Black Label sous un .MEM de Black Label
+    [InlineData("mspacpls", "mspacman", "titre")]             // Ms. Pac-Man Plus
+    public void Restent_dehors_les_bootlegs_les_autres_machines_et_les_titres_differents(string set, string nomme, string pourquoi)
+    {
+        var d = RomAdmission.JugerCloneArcade(set, n => n == nomme, Arcades);
+        Assert.False(d.Admise);
+        Assert.Contains(pourquoi switch { "autre jeu" => "autre jeu", "bootleg" => "bootleg", _ => "titre différent" }, d.Raison);
     }
 
     [Fact]
@@ -246,13 +285,15 @@ public class RomsAdmisesTests
     }
 
     [Fact]
-    public void Une_partie_sur_un_clone_que_le_MEM_ne_nomme_pas_n_est_pas_soumise()
+    public void Une_partie_sur_un_set_hors_famille_n_est_pas_soumise_un_clone_officiel_si()
     {
         var mem = Path.Combine(Path.GetTempPath(), "roms-admises-19xx.MEM");
         File.WriteAllText(mem, "rom = { hashes = { } }");
         var profil = new ContentHashes { Md5 = [NelfePlayScoringCollectionSyncService.Md5DuNomDeSet("19xx")] };
-        Assert.True(NelfePlayScoringReporter.SetNonNomme("arcade", "19xx-the-war-against-destiny", "19xxu", profil, mem));
-        Assert.False(NelfePlayScoringReporter.SetNonNomme("arcade", "19xx-the-war-against-destiny", "19xx", profil, mem));
+        Assert.True(NelfePlayScoringReporter.SetNonNomme("arcade", "19xx-the-war-against-destiny", "tokiu", profil, mem, Arcades));
+        Assert.False(NelfePlayScoringReporter.SetNonNomme("arcade", "19xx-the-war-against-destiny", "19xx", profil, mem, Arcades));
+        // (11/11) le clone officiel 19xxu est soumis.
+        Assert.False(NelfePlayScoringReporter.SetNonNomme("arcade", "19xx-the-war-against-destiny", "19xxu", profil, mem, Arcades));
         // Le set nomme par un libelle du .MEM (DaiOuJou Black Label) reste soumis.
         File.WriteAllText(mem, "{ hash = \"dd65cecc2d83132cb7ccb764e6b384f8\", label = \"ddpdojblka.zip <DoDonPachi Dai-Ou-Jou Black Label>\" },");
         Assert.False(NelfePlayScoringReporter.SetNonNomme("arcade", "dodonpachi-daioujou", "ddpdojblka",
@@ -294,4 +335,24 @@ public class RomsAdmisesTests
     [InlineData("Super Metroid (Japan, USA) (En,Ja)")]
     public void Un_dump_officiel_n_a_aucune_etiquette(string nom)
         => Assert.Empty(RomAdmission.EtiquettesDuNom(nom));
+
+    // ── Le jeu ralenti par l'affichage (option A du user) ──────────────────────────────────
+
+    [Theory]
+    [InlineData(60.0988, 50.0, 600, true)]     // ROM NTSC sur un ecran a 50 Hz : 83 %
+    [InlineData(50.0070, 50.0, 600, false)]    // ROM PAL a 50 Hz
+    [InlineData(59.1854, 60.0, 600, false)]    // arcade a 59,18 Hz calee sur un ecran a 60 Hz : un peu plus vite
+    [InlineData(60.0988, 60.0, 600, false)]    // NTSC a 60 Hz (PAL60 compris)
+    [InlineData(60.0988, 50.0, 5, false)]      // trop peu de mesures : on ne sait pas
+    public void Le_jeu_ralenti_par_l_affichage_est_refuse(double coeur, double mediane, int mesures, bool ralenti)
+        => Assert.Equal(ralenti, RetroBat.Api.Scoring.RalentiDeLAffichage.Ralenti(RetroBat.Api.Scoring.RalentiDeLAffichage.Vitesse(coeur, mediane, mesures)));
+
+    [Fact]
+    public void Le_message_du_ralenti_conseille_le_60_Hz_ou_la_version_PAL()
+    {
+        var m = RetroBat.Api.Scoring.RalentiDeLAffichage.Message(50.0 / 60.0988, 50.0);
+        Assert.Contains("60 Hz", m);
+        Assert.Contains("PAL60", m);
+        Assert.Contains("version PAL", m);
+    }
 }

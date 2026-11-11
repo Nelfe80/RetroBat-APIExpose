@@ -580,7 +580,7 @@ public sealed class SessionSpeedrun
             {
                 "pause" or "PAUSE_ON" => new MessageJoueur("speedrun.msg.voided_pause", "Attempt voided: pause. " + Relancer),
                 "fast_forward" => new MessageJoueur("speedrun.msg.voided_fast_forward", "Attempt voided: fast forward. " + Relancer),
-                "slowdown" => new MessageJoueur("speedrun.msg.voided_slowdown", "Attempt voided: the game slowed down. " + Relancer),
+                "slowdown" => new MessageJoueur("speedrun.msg.voided_slowdown", "Attempt voided: the game slowed down (display at 50 Hz? set 60 Hz, PAL60 in RGB). " + Relancer),
                 var c when c?.StartsWith("LEVEL_CHEAT", StringComparison.Ordinal) == true
                     => new MessageJoueur("speedrun.msg.voided_debug", "Attempt voided: debug mode. Go back to the title screen."),
                 _ => new MessageJoueur("speedrun.msg.voided", "Attempt voided. " + Relancer),

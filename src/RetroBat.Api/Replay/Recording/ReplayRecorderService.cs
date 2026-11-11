@@ -1020,16 +1020,39 @@ public sealed class ReplayRecorderService : BackgroundService
         return s.Length is > 0 and <= 8 && s.All(Uri.IsHexDigit) ? s.PadLeft(8, '0') : null;
     }
 
+    /// <summary>Le dernier enregistrement echantillonne, pour la cadence de la partie (<see cref="CadenceDeLaPartie"/>).</summary>
+    private static Recording? _derniereCadence;
+    private static DateTime _derniereCadenceUtc;
+
+    /// <summary>
+    /// LA VITESSE REELLE DE LA PARTIE (11/11, ROM NTSC forcee a 50 Hz par l'affichage) : la cadence annoncee par le coeur et la
+    /// mediane de la cadence observee (images emulees par seconde reelle, une mesure par tick, pauses ecartees). Null sans
+    /// enregistrement echantillonne depuis <paramref name="fraicheur"/>.
+    /// </summary>
+    public static (double? CoeurFps, double? Mediane, int Echantillons, string Jeu)? CadenceDeLaPartie(TimeSpan fraicheur)
+    {
+        var rec = _derniereCadence;
+        if (rec is null || DateTime.UtcNow - _derniereCadenceUtc > fraicheur) return null;
+        List<double> copie;
+        lock (rec.RateSamples) copie = [.. rec.RateSamples];
+        if (copie.Count == 0) return (rec.CoreFps, null, 0, rec.Game);
+        copie.Sort();
+        var mediane = copie.Count % 2 == 1 ? copie[copie.Count / 2] : (copie[copie.Count / 2 - 1] + copie[copie.Count / 2]) / 2;
+        return (rec.CoreFps, mediane, copie.Count, rec.Game);
+    }
+
     /// <summary>Un échantillon de cadence par tick : combien de frames émulées par seconde réelle.</summary>
     private static void SampleRate(Recording rec, long frame)
     {
+        _derniereCadence = rec;
+        _derniereCadenceUtc = DateTime.UtcNow;
         var now = DateTime.UtcNow;
         var dt = (now - rec.LastSampleUtc).TotalSeconds;
         var df = frame - rec.LastFrame;
         rec.LastSampleUtc = now;
         if (dt <= 0.5 || dt > 10 || df <= 0) return; // tick anormal, jeu en pause, ou compteur remis à zéro
         var rate = df / dt;
-        if (rate is > MinPlausibleFps and < MaxPlausibleFps) rec.RateSamples.Add(rate);
+        if (rate is > MinPlausibleFps and < MaxPlausibleFps) lock (rec.RateSamples) rec.RateSamples.Add(rate);
     }
 
     /// <summary>

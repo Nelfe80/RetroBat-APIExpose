@@ -29,7 +29,7 @@ namespace RetroBat.Api.Infrastructure;
 /// L'arcade garde sa regle (le set nomme par le .MEM, jamais un bootleg ni un hack) : voir
 /// <see cref="NelfePlayScoringCollectionSyncService.ContenuConfirme"/>.
 /// </summary>
-public static class RomAdmission
+public static partial class RomAdmission
 {
     public enum Statut
     {
