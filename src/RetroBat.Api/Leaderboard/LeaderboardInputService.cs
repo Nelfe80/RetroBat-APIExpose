@@ -1659,6 +1659,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 // acceptait la demande sans jamais lancer (2026-10-01, defi bloque sur
                 // « Lancement de la partie », emulateur jamais apparu).
                 await FermerLeMenuEsAsync().ConfigureAwait(false);
+                // Le coeur de la collection (FBNeo pour un set qu'il connait), avant que le Deck, la diffusion ou ES ne lisent
+                // la fiche du jeu (11/11).
+                if (_partie is not null)
+                {
+                    await _partie.ImposerLeCoeurAsync(chemin).ConfigureAwait(false);
+                }
                 if (mode != ModeDuDefi.Prive)
                 {
                     // LE DEFI DIFFUSE AVEC LE DECK (essai du user du 08/11 : 1CC LIVE est le reglage par defaut) : le decor se

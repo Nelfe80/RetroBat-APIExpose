@@ -40,6 +40,7 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable, RetroB
     private readonly MediaRuntimeState _media;
     private readonly ApiContext? _contexte;
     private readonly NelfePlayScoringCollectionSyncService? _collection;
+    private readonly WorldScoringLancementService? _lancement;
     private readonly ILogger<PartieNelfePlayService>? _logger;
     private readonly object _verrou = new();
     private IDisposable? _abonnement;
@@ -50,8 +51,10 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable, RetroB
     private bool _atelier;
 
     public PartieNelfePlayService(IEventBus bus, MediaRuntimeState media, ILogger<PartieNelfePlayService>? logger = null,
-        ApiContext? contexte = null, NelfePlayScoringCollectionSyncService? collection = null)
+        ApiContext? contexte = null, NelfePlayScoringCollectionSyncService? collection = null,
+        WorldScoringLancementService? lancement = null)
     {
+        _lancement = lancement;
         _bus = bus;
         _media = media;
         _logger = logger;
@@ -119,6 +122,16 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable, RetroB
             return true;
         }
     }
+
+    /// <summary>
+    /// LE COEUR D'UNE PARTIE NELFEPLAY LANCEE HORS DE LA COLLECTION (11/11) : site, commands/launch, concours, defi. La fiche du
+    /// jeu recoit, juste avant le lancement, le coeur que la collection lui impose (FBNeo pour un set qu'il connait) ; sinon ES
+    /// lancait avec la fiche du systeme, MAME pour un jeu du dossier mame, et la partie etait classee sous un autre moteur.
+    /// </summary>
+    public Task<string?> ImposerLeCoeurAsync(string? cheminRom, CancellationToken cancellationToken = default)
+        => _lancement is null || string.IsNullOrWhiteSpace(cheminRom)
+            ? Task.FromResult<string?>(null)
+            : _lancement.ImposerPourUnLancementAsync(cheminRom, cancellationToken);
 
     /// <summary>Le prochain lancement est une partie NelfePlay, quel que soit le carrousel.</summary>
     public void AnnoncerLancement(string origine)

@@ -31,6 +31,7 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
     private readonly EmulationStationSettingsService _reglages;
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly ILogger<WorldScoringLancementService>? _logger;
+    private readonly IEmulationStationNotificationService? _notifications;
     private readonly SemaphoreSlim _porte = new(1, 1);
     private readonly HttpClient _es = new() { BaseAddress = new Uri("http://127.0.0.1:1234"), Timeout = TimeSpan.FromSeconds(15) };
     private readonly string _etatPath;
@@ -42,8 +43,10 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
         EmulationStationSystemConfigService systemes,
         EmulationStationSettingsService reglages,
         IOptionsMonitor<ApiExposeOptions> options,
-        ILogger<WorldScoringLancementService>? logger = null)
+        ILogger<WorldScoringLancementService>? logger = null,
+        IEmulationStationNotificationService? notifications = null)
     {
+        _notifications = notifications;
         _bus = bus;
         _systemes = systemes;
         _reglages = reglages;
@@ -127,17 +130,20 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
     /// <summary>
     /// UN SET MAME SOUS FBNEO (25/10) : le systeme mame de RetroBat ne declare pas FBNeo, alors qu'il lit les sets MAME des
     /// jeux classes (les onze d'arcade de World Scoring, essayes sur la borne) et qu'il est le seul a rendre un replay. Un
-    /// jeu d'un systeme MAME passe donc sous FBNeo si FBNeo connait son set et ne l'a pas deja refuse sur cette borne.
+    /// jeu d'un systeme MAME passe donc sous FBNeo si FBNeo connait son set.
+    /// <para>PLUS DE REPLI SOUS MAME (regle du user du 11/11 : « jamais de MAME pour une partie classee quand FBNeo sait faire
+    /// tourner le jeu »). Un set que FBNeo avait refuse sur une borne y repartait sous MAME pour toujours, sans un mot au
+    /// joueur, et ses parties etaient classees sous un autre moteur. FBNeo reste impose ; le joueur apprend quel set
+    /// remplacer (VerifierLeRefusAsync).</para>
     /// Pur.
     /// </summary>
     internal static (string Emulator, string Core)? FbneoPourUnSetMame(
         EmulationStationLaunchConfig lancement,
         IReadOnlyList<EmulationStationSystemEmulatorCore> coeursDuSysteme,
-        bool fbneoConnaitLeSet,
-        bool refuseIci)
+        bool fbneoConnaitLeSet)
     {
         static bool Libretro(EmulationStationSystemEmulatorCore e) => e.Emulator.Equals("libretro", StringComparison.OrdinalIgnoreCase);
-        if (!fbneoConnaitLeSet || refuseIci
+        if (!fbneoConnaitLeSet
             || coeursDuSysteme.Any(e => Libretro(e) && e.Core.Equals("fbneo", StringComparison.OrdinalIgnoreCase))
             || !coeursDuSysteme.Any(e => Libretro(e) && e.Core.StartsWith("mame", StringComparison.OrdinalIgnoreCase)))
         {
@@ -172,6 +178,10 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
         }
         return fbneo && refus && set is { Length: > 0 } s ? s + ".zip" : null;
     }
+
+    /// <summary>FBNeo connait-il ce set (fbneo_lt.json du Data Pack) ? C'est ce qui oblige une partie classee a tourner sous FBNeo.</summary>
+    internal static bool FbneoConnaitLeSet(string? set)
+        => !string.IsNullOrWhiteSpace(set) && SetsFbneo.Value.Contains(set.Trim());
 
     /// <summary>Les sets que FBNeo connait, tires de la liste des titres du Data Pack (fbneo_lt.json), une fois.</summary>
     private static readonly Lazy<HashSet<string>> SetsFbneo = new(() =>
@@ -304,70 +314,122 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
                 return;
             }
 
-            var reglages = _reglages.GetAllSettings();
-            var etat = LireEtat();
-            var imposes = new List<string>();
-            foreach (var groupe in jeux.GroupBy(jeu => jeu.Systeme, StringComparer.OrdinalIgnoreCase))
-            {
-                var fiches = await LireFichesAsync(groupe.Key, cancellationToken).ConfigureAwait(false);
-                if (fiches == null)
-                {
-                    continue;
-                }
-
-                var coeurs = _systemes.GetEmulatorCores(groupe.Key);
-                var fragments = new List<XElement>();
-                var cles = new List<(string Cle, Confort Confort)>();
-                var refus = LireLesRefus();
-                foreach (var (systeme, fichier) in groupe)
-                {
-                    fiches.TryGetValue(fichier, out var actuel);
-                    var (lancement, coeurChoisi) = _systemes.ResolveGameLaunchConfig(systeme, actuel.Emulator, actuel.Core, reglages);
-                    var cle = systeme + "/" + fichier;
-                    var impose = FbneoPourUnSetMame(lancement, coeurs, SetsFbneo.Value.Contains(Path.GetFileNameWithoutExtension(fichier)),
-                            refus.Contains(cle))
-                        ?? AImposer(lancement, coeurChoisi, coeurs);
-                    if (impose is not { } voulu || (string.Equals(voulu.Emulator, lancement.Emulator, StringComparison.OrdinalIgnoreCase)
-                            && string.Equals(voulu.Core, lancement.Core, StringComparison.OrdinalIgnoreCase) && coeurChoisi))
-                    {
-                        continue;
-                    }
-
-                    var confort = ConfortARendre(etat.GetValueOrDefault(cle), actuel.Emulator ?? string.Empty, actuel.Core ?? string.Empty, voulu);
-                    // Un jeu en automatique sous FBNeo : en sortant, il retrouve le coeur MAME qu'il aurait eu (ES ne sait
-                    // pas vider le champ, FBNeo resterait hors de World Scoring).
-                    if (confort.Emulator.Length == 0 && confort.Core.Length == 0
-                        && string.Equals(voulu.Core, "fbneo", StringComparison.OrdinalIgnoreCase)
-                        && !coeurs.Any(e => e.Core.Equals("fbneo", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        confort = confort with { Emulator = lancement.Emulator ?? "libretro", Core = lancement.Core ?? "mame" };
-                    }
-
-                    cles.Add((cle, confort));
-                    fragments.Add(Fragment(fichier, voulu.Emulator, voulu.Core));
-                }
-
-                if (fragments.Count > 0 && await EnvoyerAsync(groupe.Key, fragments, cancellationToken).ConfigureAwait(false))
-                {
-                    foreach (var (cle, confort) in cles)
-                    {
-                        etat[cle] = confort;
-                        imposes.Add($"{cle} → {confort.ImposeCore}");
-                    }
-                }
-            }
-
-            if (imposes.Count > 0)
-            {
-                EcrireEtat(etat);
-                _logger?.LogInformation("World Scoring : coeur fonctionnel impose pour {Nombre} jeu(x) : {Detail}",
-                    imposes.Count, string.Join(", ", imposes));
-            }
+            await ImposerAuxJeuxAsync(jeux.Select(jeu => (jeu.Systeme, jeu.Fichier)).ToList(), cancellationToken).ConfigureAwait(false);
         }
         finally
         {
             _porte.Release();
         }
+    }
+
+    /// <summary>
+    /// LES AUTRES LANCEMENTS NELFEPLAY (11/11). Le coeur n'etait impose qu'a l'ENTREE dans la collection : le bouton du site,
+    /// commands/launch, un concours et le defi du panneau lancent par ES /launch avec la fiche du systeme, donc sous MAME pour
+    /// un jeu du dossier mame, et ces parties etaient classees (Bubble Bobble, Bomb Jack, TGM2 apres le 25/10). Chacun de ces
+    /// lancements passe ici juste avant : la fiche du jeu recoit le meme coeur que dans la collection, et le choix du joueur
+    /// lui est rendu a la sortie, comme pour la collection. Rend « systeme/fichier → coeur », ou null si rien n'a change.
+    /// </summary>
+    public async Task<string?> ImposerPourUnLancementAsync(string cheminRom, CancellationToken cancellationToken = default)
+    {
+        if (!_options.CurrentValue.NelfePlay.Enabled || JeuDuLancement(RetroBatPaths.RomsRoot, cheminRom) is not { } jeu)
+        {
+            return null;
+        }
+
+        await _porte.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var faits = await ImposerAuxJeuxAsync([jeu], cancellationToken).ConfigureAwait(false);
+            return faits.Count > 0 ? faits[0] : null;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger?.LogWarning(ex, "World Scoring : coeur du lancement non ajuste pour {Rom}.", cheminRom);
+            return null;
+        }
+        finally
+        {
+            _porte.Release();
+        }
+    }
+
+    /// <summary>Le systeme (dossier sous roms) et le fichier d'une ROM lancee ; null hors du dossier des ROM. Pur.</summary>
+    internal static (string Systeme, string Fichier)? JeuDuLancement(string racineRoms, string? cheminRom)
+    {
+        if (string.IsNullOrWhiteSpace(cheminRom) || string.IsNullOrWhiteSpace(racineRoms))
+        {
+            return null;
+        }
+
+        var relatif = Path.GetRelativePath(racineRoms, cheminRom).Replace('\\', '/');
+        var morceaux = relatif.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        return morceaux.Length < 2 || morceaux[0] == ".." || Path.IsPathRooted(relatif)
+            ? null
+            : (morceaux[0], Path.GetFileName(cheminRom));
+    }
+
+    /// <summary>Impose le coeur fonctionnel a ces jeux (porte tenue par l'appelant). Rend « systeme/fichier → coeur » par jeu change.</summary>
+    private async Task<List<string>> ImposerAuxJeuxAsync(IReadOnlyList<(string Systeme, string Fichier)> jeux, CancellationToken cancellationToken)
+    {
+        var reglages = _reglages.GetAllSettings();
+        var etat = LireEtat();
+        var imposes = new List<string>();
+        foreach (var groupe in jeux.GroupBy(jeu => jeu.Systeme, StringComparer.OrdinalIgnoreCase))
+        {
+            var fiches = await LireFichesAsync(groupe.Key, cancellationToken).ConfigureAwait(false);
+            if (fiches == null)
+            {
+                continue;
+            }
+
+            var coeurs = _systemes.GetEmulatorCores(groupe.Key);
+            var fragments = new List<XElement>();
+            var cles = new List<(string Cle, Confort Confort)>();
+            foreach (var (systeme, fichier) in groupe)
+            {
+                fiches.TryGetValue(fichier, out var actuel);
+                var (lancement, coeurChoisi) = _systemes.ResolveGameLaunchConfig(systeme, actuel.Emulator, actuel.Core, reglages);
+                var cle = systeme + "/" + fichier;
+                var impose = FbneoPourUnSetMame(lancement, coeurs, FbneoConnaitLeSet(Path.GetFileNameWithoutExtension(fichier)))
+                    ?? AImposer(lancement, coeurChoisi, coeurs);
+                if (impose is not { } voulu || (string.Equals(voulu.Emulator, lancement.Emulator, StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(voulu.Core, lancement.Core, StringComparison.OrdinalIgnoreCase) && coeurChoisi))
+                {
+                    continue;
+                }
+
+                var confort = ConfortARendre(etat.GetValueOrDefault(cle), actuel.Emulator ?? string.Empty, actuel.Core ?? string.Empty, voulu);
+                // Un jeu en automatique sous FBNeo : en sortant, il retrouve le coeur MAME qu'il aurait eu (ES ne sait
+                // pas vider le champ, FBNeo resterait hors de World Scoring).
+                if (confort.Emulator.Length == 0 && confort.Core.Length == 0
+                    && string.Equals(voulu.Core, "fbneo", StringComparison.OrdinalIgnoreCase)
+                    && !coeurs.Any(e => e.Core.Equals("fbneo", StringComparison.OrdinalIgnoreCase)))
+                {
+                    confort = confort with { Emulator = lancement.Emulator ?? "libretro", Core = lancement.Core ?? "mame" };
+                }
+
+                cles.Add((cle, confort));
+                fragments.Add(Fragment(fichier, voulu.Emulator, voulu.Core));
+            }
+
+            if (fragments.Count > 0 && await EnvoyerAsync(groupe.Key, fragments, cancellationToken).ConfigureAwait(false))
+            {
+                foreach (var (cle, confort) in cles)
+                {
+                    etat[cle] = confort;
+                    imposes.Add($"{cle} → {confort.ImposeCore}");
+                }
+            }
+        }
+
+        if (imposes.Count > 0)
+        {
+            EcrireEtat(etat);
+            _logger?.LogInformation("World Scoring : coeur fonctionnel impose pour {Nombre} jeu(x) : {Detail}",
+                imposes.Count, string.Join(", ", imposes));
+        }
+
+        return imposes;
     }
 
     /// <summary>
@@ -538,28 +600,31 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
             }
 
             var refus = LireLesRefus();
-            foreach (var (cle, confort) in concernes)
+            foreach (var (cle, _) in concernes)
             {
+                // Le refus reste note (le rapport de support le lit), mais il ne ramene plus le jeu sous MAME : une partie
+                // classee ne tourne que sous FBNeo quand FBNeo connait le set. Le joueur sait quoi faire.
                 refus.Add(cle);
-                var systeme = cle[..cle.IndexOf('/')];
-                var fichier = cle[(cle.IndexOf('/') + 1)..];
-                var mame = confort.Core.Length > 0 ? confort : confort with { Emulator = "libretro", Core = "mame" };
-                if (await EnvoyerAsync(systeme, [Fragment(fichier, mame.Emulator, mame.Core)], cancellationToken).ConfigureAwait(false))
-                {
-                    etat.Remove(cle);
-                }
+                _logger?.LogWarning("World Scoring : FBNeo refuse le set {Cle} de cette borne ; FBNeo reste impose, le joueur est prevenu.", cle);
+            }
 
-                _logger?.LogWarning("World Scoring : FBNeo refuse le set {Cle} de cette borne, retour sous {Coeur}.", cle, mame.Core);
+            if (_notifications is not null)
+            {
+                await _notifications.NotifyAsync(MessageDuRefus(refuse), cancellationToken).ConfigureAwait(false);
             }
 
             EcrireLesRefus(refus);
-            EcrireEtat(etat);
         }
         finally
         {
             _porte.Release();
         }
     }
+
+    /// <summary>Ce que le joueur lit quand FBNeo ne charge pas son set (11/11). Pur.</summary>
+    internal static string MessageDuRefus(string fichier)
+        => $"World Scoring : FBNeo ne charge pas ton set {fichier} (fichier manquant ou version différente). "
+           + "Remplace-le par le set FBNeo de ce jeu : sous un autre émulateur, la partie ne compte pas au classement.";
 
     private string CheminDesRefus => Path.Combine(Path.GetDirectoryName(_etatPath)!, "world-scoring-fbneo-refus.json");
 

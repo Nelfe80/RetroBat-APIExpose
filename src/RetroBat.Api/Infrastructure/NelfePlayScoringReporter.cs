@@ -1306,6 +1306,15 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 reason = "content.set_unnamed";
                 Trace($"prevol : le set {GetString(attestation, "ContentSet")} n'est pas nommé par la définition de score, non certifiable");
             }
+            // UNE PARTIE CLASSEE TOURNE SOUS FBNEO QUAND FBNEO CONNAIT LE SET (regle du user du 11/11). MAME de RetroArch, MAME
+            // autonome et FB Alpha faisaient classer des parties que FBNeo sait jouer (Bubble Bobble, Bomb Jack, TGM2, Final
+            // Fight), avec une EEPROM et des reglages que personne ne verifiait sous ces moteurs.
+            if (certifiable && HorsFbneoAlorsQueFbneoSait(systemId, GetString(attestation, "CoreName"), GetString(attestation, "ContentSet")))
+            {
+                certifiable = false;
+                reason = "core.fbneo_required";
+                Trace($"prevol : {GetString(attestation, "ContentSet")} tourne sous {GetString(attestation, "CoreName")} alors que FBNeo connait ce set, non certifiable");
+            }
             // UN CLONE ADMIS SANS EPINGLE D'EEPROM (11/11, Progear de neogeoff) : l'EEPROM d'usine porte la region, celle du
             // clone ne repond jamais a l'epingle du parent et le site refusait APRES la partie. Le joueur l'apprend ici, avec
             // le set a lancer.
@@ -1842,6 +1851,21 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             cheminMem ?? Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.RamResourcesRoot, systeme, romGroup + ".MEM"));
         return NelfePlayScoringCollectionSyncService.JugerLeDump(dump, jeu, speedrun, referentiel ?? RomAdmission.ReferentielSurDisque.Borne,
             _ => md5, _ => sansEnTete, racineEtats);
+    }
+
+    /// <summary>
+    /// JAMAIS UN AUTRE MOTEUR QUAND FBNEO SAIT FAIRE (regle du user du 11/11). Une partie d'arcade dont FBNeo connait le set
+    /// (fbneo_lt.json) et qui a tourne sous un autre coeur (MAME de RetroArch, MAME autonome, FB Alpha) n'est pas classee : la
+    /// mesure, le replay, l'EEPROM et les reglages d'usine ne sont prouves que sous FBNeo. Faux pour une console, un set
+    /// inconnu de FBNeo, ou un coeur que l'attestation ne nomme pas (rien n'est refuse sur une supposition). Pur hors de
+    /// <paramref name="fbneoConnait"/>.
+    /// </summary>
+    internal static bool HorsFbneoAlorsQueFbneoSait(string? systemId, string? coreName, string? contentSet, Func<string, bool>? fbneoConnait = null)
+    {
+        var set = SetArcade(systemId, contentSet);
+        var coeur = (coreName ?? string.Empty).Trim();
+        if (set is null || coeur.Length == 0 || coeur.Contains("FinalBurn Neo", StringComparison.OrdinalIgnoreCase)) return false;
+        return (fbneoConnait ?? WorldScoringLancementService.FbneoConnaitLeSet)(set);
     }
 
     internal static bool BootlegHorsDefinition(string? systemId, string? romGroup, string? contentSet,
@@ -3570,6 +3594,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             Trace($"1CC MULTI : STOP, {contentSet} est un bootleg ou un hack que le .MEM ne nomme pas");
             return;
         }
+        if (HorsFbneoAlorsQueFbneoSait(systemId, coreName, contentSet))
+        {
+            Trace($"1CC MULTI : STOP, {contentSet} a tourne sous {coreName} alors que FBNeo connait ce set");
+            return;
+        }
 
         var (profils, profilsDuSite) = await ProfilsAsync(credential, systemId, romGroup, cancellationToken).ConfigureAwait(false);
         // LE MODE DE LA PARTIE A PLUSIEURS (2026-10-06) : un jeu a modes peut avoir un 1CC MULTI par
@@ -3791,6 +3820,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (SetNonNomme(systemId, romGroup, contentSet))
         {
             Trace($"STOP: le set {contentSet} n'est pas nomme par la definition de score (clone non prouve), rien n'est envoye");
+            return;
+        }
+        if (HorsFbneoAlorsQueFbneoSait(systemId, coreName, contentSet))
+        {
+            Trace($"STOP: {contentSet} a tourne sous {coreName} alors que FBNeo connait ce set : une partie classee ne tourne que sous FBNeo, rien n'est envoye");
             return;
         }
         var verdictDuContenu = VerdictDuContenu(systemId, romGroup, contentMd5, SansEnTetePour(contentMd5), speedrun: false);
@@ -4981,6 +5015,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "runtime.slow_motion" => "jeu ralenti par l'affichage (écran à 50 Hz) : passe en 60 Hz (PAL60) ou joue la version PAL",
         "video.pal_pending" => "version PAL : score gardé pour le classement PAL à venir, hors du classement principal",
         "content.set_unnamed" => "set d'arcade que la définition du jeu ne nomme pas (clone non prouvé)",
+        "core.fbneo_required" => "partie classée sous FBNeo seulement : ce jeu a tourné sous un autre émulateur",
         "profile.nvram_set_unpinned" => "version régionale sans réglages d'usine connus (EEPROM) : lance le set épinglé",
         "content.excluded_dump" => "ROM exclue du scoring (hack, pirate, traduction, réédition ou version non prouvée)",
         "profile.mem_mismatch" => "définition mémoire non reconnue",

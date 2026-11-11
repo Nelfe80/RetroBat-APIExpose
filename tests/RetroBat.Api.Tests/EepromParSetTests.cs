@@ -90,6 +90,27 @@ public class EepromParSetTests
     public void Le_motif_se_dit_dans_les_six_langues()
     {
         foreach (var langue in new[] { "fr", "en", "es", "ja", "zh", "ko" })
+        {
             Assert.False(string.IsNullOrWhiteSpace(CabinetAnnounceText.Find("reason_profile_nvram_set_unpinned", langue)));
+            Assert.False(string.IsNullOrWhiteSpace(CabinetAnnounceText.Find("reason_core_fbneo_required", langue)));
+        }
+    }
+
+    [Theory]
+    // Final Fight de Lorenzo (11/11), Bubble Bobble, TGM2 : MAME de RetroArch, MAME autonome, FB Alpha sur un set que FBNeo connait.
+    [InlineData("arcade", "MAME", "ffight", true)]
+    [InlineData("arcade", "mame_standalone", "bublbobl", true)]
+    [InlineData("arcade", "FB Alpha", "tgm2", true)]
+    // FBNeo, et le coeur a fantomes qui garde son nom.
+    [InlineData("arcade", "FinalBurn Neo", "ffight", false)]
+    [InlineData("arcade", "FinalBurn Neo (NelfePlay Ghosts)", "ffight", false)]
+    // Un set que FBNeo ne connait pas, une console, un coeur que l'attestation ne nomme pas : rien n'est refuse sur une supposition.
+    [InlineData("arcade", "MAME", "inconnu_de_fbneo", false)]
+    [InlineData("nes", "FCEUmm", "smb", false)]
+    [InlineData("arcade", null, "ffight", false)]
+    public void Une_partie_classee_ne_tourne_que_sous_FBNeo_quand_FBNeo_connait_le_set(string systeme, string? coeur, string set, bool refusee)
+    {
+        static bool Connus(string s) => s is "ffight" or "bublbobl" or "tgm2";
+        Assert.Equal(refusee, NelfePlayScoringReporter.HorsFbneoAlorsQueFbneoSait(systeme, coeur, set, Connus));
     }
 }
