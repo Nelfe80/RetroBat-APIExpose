@@ -410,7 +410,11 @@ public sealed class ReplayPlaybackService
         var exe = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "retroarch.exe");
         var psi = new ProcessStartInfo { FileName = exe, WorkingDirectory = Path.GetDirectoryName(exe)!, UseShellExecute = false };
         // Un replay de defi a verrous se relit par le wrapper, qui remet les memes verrous (D18).
-        var (coeurDeLecture, refusDesVerrous) = LectureAvecVerrous.Preparer(manifest, coreDll, resolved.RomPath, psi);
+        // Un replay enregistre touche par touche se relit par le wrapper, masque refuse (11/11).
+        var modeDesEntrees = ModeDesEntrees.Lire(objectPath);
+        if (modeDesEntrees == ModeDesEntrees.Mode.Touches)
+            _logger.LogInformation("Replay {ReplayId} : enregistre touche par touche, relu par le wrapper sans masque.", replayId);
+        var (coeurDeLecture, refusDesVerrous) = LectureAvecVerrous.Preparer(manifest, coreDll, resolved.RomPath, psi, mode: modeDesEntrees);
         if (refusDesVerrous != ReplayErrorCode.None)
         {
             _logger.LogWarning("Replay : {ReplayId} tient des verrous ({Verrous}) que le wrapper de cette borne ne sait pas poser.", replayId, manifest.Runtime.Locks);
