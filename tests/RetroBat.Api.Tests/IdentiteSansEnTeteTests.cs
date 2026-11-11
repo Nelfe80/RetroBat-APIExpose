@@ -188,10 +188,11 @@ public sealed class IdentiteSansEnTeteTests : IDisposable
     }
 
     [Fact]
-    public void Les_huit_coeurs_hotes_se_publient_avec_le_crc_et_le_nom_de_leur_dump()
+    public void Les_coeurs_hotes_se_publient_avec_le_crc_et_le_nom_de_leur_dump()
     {
+        // Neuf depuis Mega Man X (1.9.170)
         var hotes = RetroBat.Api.Speedrun.FantomesDuSpeedrun.Liste;
-        Assert.Equal(8, hotes.Count);
+        Assert.Equal(9, hotes.Count);
         Assert.All(hotes, h =>
         {
             Assert.Matches("^[0-9a-f]{8}$", h.Crc);
@@ -199,6 +200,7 @@ public sealed class IdentiteSansEnTeteTests : IDisposable
         });
         Assert.Contains(hotes, h => h.Groupe == "super-mario-bros-3" && h.Crc == "0b742b33");
         Assert.Contains(hotes, h => h.Groupe == "mega-man-2" && h.Crc == "a9bd44bc");
+        Assert.Contains(hotes, h => h.Groupe == "mega-man-x" && h.Crc == "ded53c64" && h.Dump == "Mega Man X (USA) (Rev 1)");
     }
 
     [Fact]
