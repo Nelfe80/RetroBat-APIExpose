@@ -629,14 +629,14 @@ public sealed class ReplayCaptureService : BackgroundService
             if (_enCours is not null) return;
             if (EstModeste())
             {
-                SignalerNonCapture(replayId, "borne_modeste", "le jeu ralentissait pendant une capture, pause de " + ModesteDurant.TotalDays + " jours");
+                SignalerNonCapture(replayId, "borne_modeste", "le jeu ralentissait pendant une capture, pause de " + ModesteDurant.TotalDays + " jours", room);
                 return;
             }
             var reglages = LireRetroArch();
             if (string.Equals(Valeur(reglages, "video_gpu_record"), "true", StringComparison.OrdinalIgnoreCase))
             {
                 _logger.LogInformation("Capture : RetroArch filme l'image affichee (video_gpu_record), partie non filmee.");
-                SignalerNonCapture(replayId, "gpu_record", "video_gpu_record actif dans retroarch.cfg");
+                SignalerNonCapture(replayId, "gpu_record", "video_gpu_record actif dans retroarch.cfg", room);
                 return;
             }
             // Un filtre d'image du coeur (NTSC) ne se diffuse pas bien (25/10) : ni film ni direct ; la video d'un record
@@ -644,7 +644,7 @@ public sealed class ReplayCaptureService : BackgroundService
             if (FiltreActif() is { } filtre)
             {
                 _logger.LogInformation("Capture : filtre d'image du coeur actif ({Filtre}), partie non filmee.", filtre);
-                SignalerNonCapture(replayId, "filtre_image", filtre);
+                SignalerNonCapture(replayId, "filtre_image", filtre, room);
                 return;
             }
             // Le spectateur cache d'une partie MULTIPLAYER filme dans son propre dossier (MultiplayerSpectateur).
@@ -653,14 +653,14 @@ public sealed class ReplayCaptureService : BackgroundService
             {
                 // RetroArch tourne deja avec ce retroarch.cfg : le dossier sera pose pour la partie suivante (PreparerRetroArch).
                 _logger.LogInformation("Capture : aucun dossier de films dans retroarch.cfg, partie non filmee ; il sera pose apres la partie.");
-                SignalerNonCapture(replayId, "dossier_films", "recording_output_directory absent, pose pour la partie suivante");
+                SignalerNonCapture(replayId, "dossier_films", "recording_output_directory absent, pose pour la partie suivante", room);
                 return;
             }
             Directory.CreateDirectory(dossier);
             if (EspaceLibreGo(dossier) is { } libre && libre < _espaceLibreMinGo)
             {
                 _logger.LogInformation("Capture : {Libre:F1} Go libres, partie non filmee.", libre);
-                SignalerNonCapture(replayId, "place_disque", libre.ToString("F1", System.Globalization.CultureInfo.InvariantCulture) + " Go libres");
+                SignalerNonCapture(replayId, "place_disque", libre.ToString("F1", System.Globalization.CultureInfo.InvariantCulture) + " Go libres", room);
                 return;
             }
 
@@ -682,7 +682,7 @@ public sealed class ReplayCaptureService : BackgroundService
             if (fichier is null)
             {
                 _logger.LogInformation("Capture : RetroArch n'a pas commence a filmer {ReplayId}.", replayId);
-                SignalerNonCapture(replayId, "retroarch_sans_film", "aucun film apparu en 5 s dans " + dossier);
+                SignalerNonCapture(replayId, "retroarch_sans_film", "aucun film apparu en 5 s dans " + dossier, room);
                 return;
             }
             var statut = duSpectateur ? null : await _ra.GetStatusAsync(_arret).ConfigureAwait(false);
@@ -828,7 +828,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 Effacer(c.Fichier);
                 OublierLesSessions(c.ReplayId);
                 _logger.LogInformation("Capture : {ReplayId} abandonnee ({Pourquoi}), film efface.", c.ReplayId, pourquoi);
-                if (code is not null) SignalerNonCapture(c.ReplayId, code, pourquoi);
+                if (code is not null) SignalerNonCapture(c.ReplayId, code, pourquoi, c.Room);
                 return;
             }
             var entete = MatroskaEntete.Lire(c.Fichier);
@@ -850,7 +850,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 _logger.LogInformation("Capture : {ReplayId} non gardee ({Raison}).", c.ReplayId,
                     entete is null ? "film illisible" : entete.Couchee ? "jeu vertical, film couche" : "image trop petite");
                 SignalerNonCapture(c.ReplayId, entete is null ? "film_illisible" : entete.Couchee ? "image_couchee" : "echelle_absente",
-                    entete is null ? "en-tete du film illisible" : entete.Largeur + "x" + entete.Hauteur);
+                    entete is null ? "en-tete du film illisible" : entete.Largeur + "x" + entete.Hauteur, c.Room);
                 return;
             }
 
@@ -1561,7 +1561,7 @@ public sealed class ReplayCaptureService : BackgroundService
         var ratee = g with { EchecsDeVersion = g.EchecsDeVersion + 1 };
         if (ratee.EchecsDeVersion >= EchecsDeVersionMax)
         {
-            SignalerNonCapture(ratee.ReplayId, "version_youtube", r.DerniereLigne ?? "code " + r.Code);
+            SignalerNonCapture(ratee.ReplayId, "version_youtube", r.DerniereLigne ?? "code " + r.Code, ratee.Room);
             Oublier(ratee, fiche, "version YouTube impossible (" + (r.DerniereLigne ?? "code " + r.Code) + ")");
             return ratee;
         }
@@ -1634,12 +1634,14 @@ public sealed class ReplayCaptureService : BackgroundService
 
     /// <summary>
     /// Dit au site pourquoi cette partie n'a pas de film capte (09/11) : il le note pour l'exploitation, et la borne rendra le
-    /// film de son record depuis le replay, au repos. Jamais bloquant ; seulement pour une partie avec replay.
+    /// film de son record depuis le replay, au repos. Jamais bloquant. Les films sans replay (<c>fm_</c>) et ceux des
+    /// rencontres MULTIPLAYER (<c>mp_</c>, avec leur gameroom dans le detail) le disent aussi (11/11) : eux n'ont pas de
+    /// replay pour se rattraper, leur film est perdu.
     /// </summary>
-    private void SignalerNonCapture(string replayId, string code, string? detail)
+    private void SignalerNonCapture(string replayId, string code, string? detail, string? room = null)
     {
-        if (!replayId.StartsWith("rp_", StringComparison.Ordinal)) return;
-        _ = Task.Run(() => _publication.SignalerNonCaptureAsync(replayId, code, detail, _arret));
+        if (ReplayVideoPublisher.DetailDeNonCapture(replayId, detail, room) is not { } texte) return;
+        _ = Task.Run(() => _publication.SignalerNonCaptureAsync(replayId, code, texte.Length == 0 ? null : texte, _arret));
     }
 
     /// <summary>Le dossier des films que l'API donne a RetroArch quand retroarch.cfg n'en a pas : celui de RetroBat.</summary>

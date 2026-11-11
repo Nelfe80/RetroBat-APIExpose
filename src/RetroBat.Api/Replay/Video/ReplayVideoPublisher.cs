@@ -188,6 +188,17 @@ public sealed class ReplayVideoPublisher
                     await SignalerEchecAsync(credential, cible.ReplayId, FilmIncomplet, ct).ConfigureAwait(false);
                     continue;
                 }
+                if (videoId is null && refus is not null && RefusDefinitifs.Contains(refus))
+                {
+                    // (11/11) UN REFUS DEFINITIF N'ARRETE PAS LA FILE : « pas_un_record » (le record a ete battu pendant le
+                    // rendu), « deja_filme » (une autre borne l'a envoye) ne se retentent jamais, et ne valent pas l'heure
+                    // d'attente d'un quota. Le site ne les repropose plus ; « taille » se compte comme un essai, sinon le
+                    // meme film trop gros se rendrait a chaque passage.
+                    details.Add(cible.ReplayId + " : refus definitif du site (" + refus + ")");
+                    if (RefusACompter(refus))
+                        await SignalerEchecAsync(credential, cible.ReplayId, refus, ct).ConfigureAwait(false);
+                    continue;
+                }
                 if (videoId is null)
                 {
                     // Session refusee par le site ou envoi refuse par Google : on s'arrete la, le prochain
@@ -256,7 +267,7 @@ public sealed class ReplayVideoPublisher
     /// </summary>
     public async Task SignalerNonCaptureAsync(string replayId, string raison, string? detail, CancellationToken ct)
     {
-        if (!replayId.StartsWith("rp_", StringComparison.Ordinal)) return;
+        if (!FilmSignalable(replayId)) return;
         var credential = _devices.GetCredential();
         if (string.IsNullOrEmpty(credential)) return;
         try
@@ -272,6 +283,28 @@ public sealed class ReplayVideoPublisher
         {
             _logger.LogInformation("Video : raison de non-capture de {ReplayId} non transmise ({Message}).", replayId, ex.Message);
         }
+    }
+
+    /// <summary>
+    /// Les films dont la non-capture se dit au site (11/11) : une partie avec replay (<c>rp_</c>), un film sans replay
+    /// (<c>fm_</c>, MAME) et une rencontre MULTIPLAYER (<c>mp_</c>). Pur.
+    /// </summary>
+    internal static bool FilmSignalable(string? replayId)
+        => replayId is { Length: > 3 } id && (id.StartsWith("rp_", StringComparison.Ordinal)
+            || id.StartsWith(ReplayCaptureService.PrefixeSansReplay, StringComparison.Ordinal)
+            || id.StartsWith(ReplayCaptureService.PrefixeMultiplayer, StringComparison.Ordinal));
+
+    /// <summary>
+    /// Le detail envoye avec une non-capture, ou null si ce film ne se signale pas : celui d'une rencontre porte sa gameroom
+    /// (le site ne la retrouve pas autrement, aucun film ne la relie), le tout en 200 caracteres. Pur.
+    /// </summary>
+    internal static string? DetailDeNonCapture(string? replayId, string? detail, string? room)
+    {
+        if (!FilmSignalable(replayId)) return null;
+        var texte = replayId!.StartsWith(ReplayCaptureService.PrefixeMultiplayer, StringComparison.Ordinal) && !string.IsNullOrWhiteSpace(room)
+            ? "gameroom " + room.Trim() + (string.IsNullOrWhiteSpace(detail) ? "" : " : " + detail)
+            : detail ?? "";
+        return texte.Length > 200 ? texte[..200] : texte;
     }
 
     /// <summary>
@@ -533,6 +566,15 @@ public sealed class ReplayVideoPublisher
         "pas_l_hote", "sans_vrai_depart", "un_seul_humain", "partie_libre", "rencontre_annulee", "rencontre_inconnue",
         "portion_decalee", "portion_inconnue", "trop_court", "trop_long", "joueur_retire", "pas_une_rencontre",
     };
+
+    /// <summary>
+    /// Un refus definitif a dire au site comme un essai rate du replay : le site ne le repropose plus de lui-meme que pour
+    /// « pas_un_record » et « deja_filme » (sa liste les ecarte deja). Pur.
+    /// </summary>
+    internal static bool RefusACompter(string refus) => refus is not ("pas_un_record" or "deja_filme");
+
+    /// <summary>Le refus est-il definitif (jamais retente) ? Pur.</summary>
+    internal static bool RefusDefinitif(string? refus) => refus is not null && RefusDefinitifs.Contains(refus);
 
     /// <summary>Le refus du site pour un film d'epreuve plus court que son run (08/11).</summary>
     internal const string FilmIncomplet = "film_incomplet";
