@@ -35,7 +35,9 @@ public sealed class PiloteDuRendu
     /// <param name="immobiliteMax">Secondes sans progression au-dela desquelles la lecture est finie.</param>
     /// <param name="finDesLectures">Apres la fin du film, la lecture continue jusqu'a cette frame sans filmer : l'arrivee d'une
     /// epreuve se confirme parfois apres ses 3 s de marge (controle de fidelite, 11/11). Par defaut, la fin du film.</param>
-    public PiloteDuRendu(long debut, long fin, double attenteDemarrage = 60, double immobiliteMax = 5, long? finDesLectures = null)
+    /// <remarks>(11/11) 30 s d'immobilite, plus 5 : une borne chargee fige la lecture plusieurs secondes (Streets of Rage 2 en
+    /// 1.9.170, « fin_prematuree » a l'image 1 766 alors que le replay continuait).</remarks>
+    public PiloteDuRendu(long debut, long fin, double attenteDemarrage = 60, double immobiliteMax = 30, long? finDesLectures = null)
     {
         _debut = Math.Max(0, debut);
         _fin = fin;

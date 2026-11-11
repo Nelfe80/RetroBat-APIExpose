@@ -128,7 +128,7 @@ public sealed class ReplayVideoRenderer
         {
             optionsDesCoeurs = null;
         }
-        await File.WriteAllTextAsync(session, ProfilDeRendu(sauvegardes, films, optionsDesCoeurs), ct).ConfigureAwait(false);
+        await File.WriteAllTextAsync(session, ProfilDeRendu(sauvegardes, films, optionsDesCoeurs) + (ReglagesDEssai ?? ""), ct).ConfigureAwait(false);
 
         var exe = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "retroarch.exe");
         var psi = new ProcessStartInfo
@@ -156,7 +156,11 @@ public sealed class ReplayVideoRenderer
         // Le temps accorde : la capture de l'image affichee tourne entre une et une fois et demie le temps reel
         // de la performance (mesure du 14 octobre) ; ce plafond ne sert qu'a ne jamais rester bloque.
         var fps = manifest.Frames.NominalFps > 1 ? manifest.Frames.NominalFps : 60;
-        var plafond = TimeSpan.FromSeconds((fin - debut + debut / 2.0) / fps * 2.5 + 120);
+        // LE PLAFOND SUIT LA BORNE (11/11) : le meme rendu va de 4 a 47 images/s selon la charge de la machine (Alex Kidd sous
+        // Genesis Plus GX, FBNeo et fceumm de meme ; 576 Mo libres sur 7,8 Go). A 2,5 fois le temps reel, Garegga, Streets of
+        // Rage 2 et Alex Kidd s'arretaient en route. Le plafond ne sert qu'a ne jamais rester bloque : c'est l'immobilite de la
+        // lecture (PiloteDuRendu) qui dit qu'un RetroArch ne progresse plus.
+        var plafond = PlafondDuRendu(fin - debut + debut / 2.0, fps);
         // L'arrivee d'une epreuve (11/11) : toutes les adresses du .MEM lues a chaque releve, du debut du replay, et les
         // lectures continuent 10 s apres le film (une arrivee se confirme parfois apres ses 3 s de marge).
         var epreuve = epreuves is { Count: > 0 } ? epreuves[0] : null;
@@ -249,8 +253,9 @@ public sealed class ReplayVideoRenderer
             : controles is { Count: > 0 } && lecteur is null
                 ? new ControleDeFidelite.Verdict(ControleDeFidelite.NonVerifie, "score non lisible sous ce coeur ou sans .MEM")
                 : ControleDeFidelite.Juger(controles, releves, fps);
-        _logger.LogInformation("Video : {ReplayId} {Issue} en {Secondes:F1} s (frame {Frame} sur {Fin}) ; fidelite {Fidelite} ({Detail}, {Lectures} lectures).",
+        _logger.LogInformation("Video : {ReplayId} {Issue} en {Secondes:F1} s (frame {Frame} sur {Fin}, {Cadence:F1} images/s) ; fidelite {Fidelite} ({Detail}, {Lectures} lectures).",
             replayId, ok ? "rendu" : "incomplet (" + raison + ")", chrono.Elapsed.TotalSeconds, pilote.FrameAtteinte, fin,
+            chrono.Elapsed.TotalSeconds > 0 ? Math.Max(0, pilote.FrameAtteinte) / chrono.Elapsed.TotalSeconds : 0,
             verdict.Issue, verdict.Detail, releves.Count);
         return new RenduVideo(ok, ok ? null : raison, film, debut, fin, pilote.FrameAtteinte, chrono.Elapsed.TotalSeconds,
             verdict.Issue, verdict.Detail, releves, controleDEpreuve?.Trace);
@@ -332,6 +337,16 @@ public sealed class ReplayVideoRenderer
             Ligne("fastforward_frameskip", "false"),
         })) + "\n";
     }
+
+    /// <summary>
+    /// Le temps accorde a un rendu de <paramref name="images"/> images : 8 fois leur duree a la cadence du jeu (4 images/s
+    /// pour un jeu a 60, la borne la plus chargee mesuree le 11/11), plus 5 minutes pour lancer et fermer RetroArch. Pur.
+    /// </summary>
+    internal static TimeSpan PlafondDuRendu(double images, double fps)
+        => TimeSpan.FromSeconds(Math.Max(0, images) / (fps > 1 ? fps : 60) * 8 + 300);
+
+    /// <summary>Pour les essais de mesure seulement : des lignes ajoutees au profil de rendu (null en service).</summary>
+    internal static string? ReglagesDEssai { get; set; }
 
     /// <summary>
     /// Pourquoi ce runtime ne sert pas a un film : « rom_inexacte » ou « coeur_inexact », sinon null (09/11). Pur.

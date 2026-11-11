@@ -99,4 +99,24 @@ public sealed class ProfilDeRenduTests
         Assert.Contains("config_save_on_exit = \"false\"", profil);
         Assert.Contains(@"savefile_directory = ""C:\rendu\sauvegardes""", profil);
     }
+
+    [Fact]
+    public void Le_plafond_laisse_finir_un_rendu_sur_une_borne_chargee()
+    {
+        // 11/11 : 4 images/s mesurees sous charge. Garegga, 4 785 images a 59,63 : plus de 21 minutes accordees.
+        Assert.True(ReplayVideoRenderer.PlafondDuRendu(4785, 59.63) > TimeSpan.FromSeconds(4785 / 4.0));
+        Assert.Equal(TimeSpan.FromSeconds(300), ReplayVideoRenderer.PlafondDuRendu(0, 60));
+    }
+
+    [Fact]
+    public void Une_lecture_figee_quelques_secondes_n_est_pas_une_fin()
+    {
+        var p = new PiloteDuRendu(0, 5000);
+        p.Decider(new PiloteDuRendu.Releve(1, 4, 10));
+        p.Decider(new PiloteDuRendu.Releve(1.2, 4, 20));
+        p.Decider(new PiloteDuRendu.Releve(1.4, 4, 30));
+        // 20 s sans progression (borne qui pagine) : on attend encore.
+        Assert.Equal(PiloteDuRendu.Action.Rien, p.Decider(new PiloteDuRendu.Releve(21.4, 4, 30)));
+        Assert.Null(p.Raison);
+    }
 }

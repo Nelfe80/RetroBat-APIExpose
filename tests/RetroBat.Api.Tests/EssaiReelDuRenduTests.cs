@@ -44,6 +44,11 @@ public sealed class EssaiReelDuRenduTests
         var magasin = new ReplayStore(NullLogger<ReplayStore>.Instance);
         var resolveur = new ReplayRuntimeResolver(new EsSystemsRomPaths(NullLogger<EsSystemsRomPaths>.Instance), magasin, magasin,
             journaux.CreateLogger<ReplayRuntimeResolver>());
+        // NELFE_RENDU_CFG = « cle=valeur;cle=valeur » : reglages ajoutes au profil de rendu, pour mesurer une piste a la fois.
+        ReplayVideoRenderer.ReglagesDEssai = Environment.GetEnvironmentVariable("NELFE_RENDU_CFG") is { Length: > 0 } cfg
+            ? string.Concat(cfg.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(kv => kv.Split('=', 2))
+                .Select(kv => kv[0].Trim() + " = \"" + kv[1].Trim() + "\"\n"))
+            : null;
         var rendu = new ReplayVideoRenderer(magasin, magasin, magasin, resolveur, () => "idle", journaux.CreateLogger<ReplayVideoRenderer>(), catalogue);
         var r = await rendu.RendreAsync(replayId, debut, fin, CancellationToken.None, controles, epreuves);
 
