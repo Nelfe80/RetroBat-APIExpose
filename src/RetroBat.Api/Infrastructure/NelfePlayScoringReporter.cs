@@ -34,6 +34,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly IEventBus _eventBus;
     private readonly IHttpClientFactory _httpFactory;
     private readonly RetroBat.Api.Speedrun.SpeedrunSessionService? _speedrun;
+    private readonly InterfaceTextService? _textes;
     private readonly NelfePlayDeviceStore _devices;
     /// <summary>La carte du reseau (CDC infra §15.4) : les cles qui signent les verdicts, les relais.</summary>
     private readonly RetroBat.Api.Reseau.ServiceDeCarte? _cartes;
@@ -358,8 +359,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         PartieNelfePlayService? partie = null,
         RetroBat.Api.Reseau.ServiceDeCarte? cartes = null,
         RetroBat.Api.Reseau.ClientDeRelais? relais = null,
-        RetroBat.Api.Speedrun.SpeedrunSessionService? speedrun = null)
+        RetroBat.Api.Speedrun.SpeedrunSessionService? speedrun = null,
+        InterfaceTextService? textes = null)
     {
+        _textes = textes;
         _speedrun = speedrun;
         _cartes = cartes;
         _relais = relais;
@@ -3776,7 +3779,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             Trace($"STOP: {RalentiDeLAffichage.Raison}, jeu a {vitesse:P1} de sa vitesse (coeur {cadence.CoeurFps:0.###} img/s, "
                 + $"mesure {cadence.Mediane:0.##} img/s sur {cadence.Echantillons} mesures, {cadence.Jeu}) : rien n'est envoye");
             if (_esNotify is not null)
-                await _esNotify.NotifyAsync(RalentiDeLAffichage.Message(vitesse, cadence.Mediane), cancellationToken).ConfigureAwait(false);
+                await _esNotify.NotifyAsync(RalentiDeLAffichage.Message(vitesse, cadence.Mediane, _textes, LangueDuDictionnaire()), cancellationToken).ConfigureAwait(false);
             return;
         }
 
@@ -4825,6 +4828,25 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     private string Texte(string cle) => CabinetAnnounceText.Get(cle, Langue());
+
+    /// <summary>
+    /// La langue pour le dictionnaire d'interface (Data Pack) : celle du joueur identifie, sinon celle d'EmulationStation
+    /// (« fr_FR », « it_IT »...), sinon l'anglais. Pas ramenee aux six langues des annonces : le dictionnaire en a plus.
+    /// </summary>
+    private string LangueDuDictionnaire()
+    {
+        if (_scoringSession?.Get()?.Locale is { Length: > 0 } joueur) return joueur;
+        try
+        {
+            if (_esSettings is not null && _esSettings.ReadAllSettings().TryGetValue("Language", out var langue) && !string.IsNullOrWhiteSpace(langue))
+                return langue;
+        }
+        catch (Exception)
+        {
+            // Des reglages illisibles : l'anglais.
+        }
+        return "en";
+    }
 
     /// <summary>
     /// LE PREVOL DANS LA PLAQUE DU PLAYERDECK (08/11) : la meme annonce, courte et en anglais, quand le Deck est pose. Pur.

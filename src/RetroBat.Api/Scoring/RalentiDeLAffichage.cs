@@ -1,3 +1,5 @@
+using RetroBat.Api.Infrastructure;
+
 namespace RetroBat.Api.Scoring;
 
 /// <summary>
@@ -23,10 +25,24 @@ public static class RalentiDeLAffichage
 
     public static bool Ralenti(double? vitesse) => vitesse is { } v && v < VitesseMinimale;
 
-    /// <summary>Ce que le joueur lit : la vitesse mesuree, et les deux gestes qui le remettent au classement.</summary>
-    public static string Message(double vitesse, double? mediane)
-        => $"Score non envoyé : le jeu a tourné à {vitesse:P0} de sa vitesse"
-           + (mediane is { } m ? $" ({m:0.#} images/s)" : "")
-           + ". Ton affichage est sans doute réglé sur 50 Hz : passe-le en 60 Hz (PAL60, la plupart des TV PAL l'acceptent en "
-           + "péritel RGB), ou joue la version PAL du jeu.";
+    /// <summary>La cle du message dans le dictionnaire d'interface (Data Pack, locales/interface-texts.json).</summary>
+    public const string Cle = "scoring.msg.slow_motion";
+
+    /// <summary>Le message en anglais, quand le dictionnaire de la borne n'a pas encore la cle (Data Pack en retard).</summary>
+    public const string TexteParDefaut = "Score not sent: the game ran at {speed} of its speed ({fps} frames/s). Your display is "
+        + "probably set to 50 Hz: switch it to 60 Hz (PAL60, which most PAL TVs accept over RGB SCART), or play the PAL version of the game.";
+
+    /// <summary>
+    /// Ce que le joueur lit : la vitesse mesuree, et les deux gestes qui le remettent au classement. Le texte vient du
+    /// dictionnaire d'interface dans <paramref name="langue"/> (celle du joueur, sinon celle de la borne), l'anglais sinon ;
+    /// la vitesse et la cadence s'ecrivent a la facon de cette langue.
+    /// </summary>
+    public static string Message(double vitesse, double? mediane, InterfaceTextService? textes = null, string? langue = null)
+    {
+        var culture = CabinetLocale.CultureDe(langue ?? "en");
+        var modele = textes?.Text(Cle, langue);
+        if (string.IsNullOrWhiteSpace(modele) || modele == Cle) modele = TexteParDefaut;
+        return modele.Replace("{speed}", vitesse.ToString("P0", culture))
+            .Replace("{fps}", mediane is { } m ? m.ToString("0.#", culture) : "?");
+    }
 }

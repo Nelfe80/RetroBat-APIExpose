@@ -350,9 +350,16 @@ public class RomsAdmisesTests
     [Fact]
     public void Le_message_du_ralenti_conseille_le_60_Hz_ou_la_version_PAL()
     {
+        // Sans dictionnaire (ou sans la cle) : l'anglais, la vitesse et la cadence posees dans le texte
         var m = RetroBat.Api.Scoring.RalentiDeLAffichage.Message(50.0 / 60.0988, 50.0);
         Assert.Contains("60 Hz", m);
         Assert.Contains("PAL60", m);
-        Assert.Contains("version PAL", m);
+        Assert.Contains("PAL version", m);
+        Assert.Contains("83%", m);
+        Assert.Contains("(50 frames/s)", m);
+        Assert.DoesNotContain("{", m);
+        Assert.Equal("scoring.msg.slow_motion", RetroBat.Api.Scoring.RalentiDeLAffichage.Cle);
+        // La langue ecrit les nombres a sa facon
+        Assert.Contains("(50,5 frames/s)", RetroBat.Api.Scoring.RalentiDeLAffichage.Message(0.84, 50.5, null, "fr_FR"));
     }
 }
