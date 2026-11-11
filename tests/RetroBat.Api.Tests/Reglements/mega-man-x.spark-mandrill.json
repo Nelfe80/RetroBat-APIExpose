@@ -9,8 +9,8 @@
     "en": "Spark Mandrill"
   },
   "summary": {
-    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Spark Mandrill, sans mourir, partie neuve sans armure ni arme",
-    "en": "From X landing in the stage to the final hit on Spark Mandrill, without dying, new game with no armor or weapons"
+    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Spark Mandrill, sans mourir, sans armure, sans arme, aucun Maverick vaincu",
+    "en": "From X landing in the stage to the final hit on Spark Mandrill, without dying, with no armor, no weapons and no Maverick defeated"
   },
   "kind": "speedrun_level",
   "game": {
@@ -21,7 +21,7 @@
   "start_policy": "canonical_state",
   "state": {
     "name": "spark-mandrill-entree-snes9x",
-    "sha256": "8a38cae75f0a305f9ae2a5977df19f8ae1f547394fdb1ae53b08e4451206d268",
+    "sha256": "c1dd32a661dc2f092839a13029fc38fc250f6b921aefd5ecc132388ee97f0934",
     "file": "snes/mega-man-x/spark-mandrill-entree.state"
   },
   "start": [

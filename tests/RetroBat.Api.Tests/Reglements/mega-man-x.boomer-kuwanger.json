@@ -9,8 +9,8 @@
     "en": "Boomer Kuwanger"
   },
   "summary": {
-    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Boomer Kuwanger, sans mourir, partie neuve sans armure ni arme",
-    "en": "From X landing in the stage to the final hit on Boomer Kuwanger, without dying, new game with no armor or weapons"
+    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Boomer Kuwanger, sans mourir, sans armure, sans arme, aucun Maverick vaincu",
+    "en": "From X landing in the stage to the final hit on Boomer Kuwanger, without dying, with no armor, no weapons and no Maverick defeated"
   },
   "kind": "speedrun_level",
   "game": {
@@ -21,7 +21,7 @@
   "start_policy": "canonical_state",
   "state": {
     "name": "boomer-kuwanger-entree-snes9x",
-    "sha256": "d30cfc992d36d3bb32611e9245359814b4afe846c94587282b43fcc7722afa70",
+    "sha256": "c12ef7c25120df6d98e5e7990ca0c1fe64998ef5b8ba507cef504011046615ca",
     "file": "snes/mega-man-x/boomer-kuwanger-entree.state"
   },
   "start": [

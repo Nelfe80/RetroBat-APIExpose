@@ -9,8 +9,8 @@
     "en": "Chill Penguin"
   },
   "summary": {
-    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Chill Penguin, sans mourir, partie neuve sans armure ni arme",
-    "en": "From X landing in the stage to the final hit on Chill Penguin, without dying, new game with no armor or weapons"
+    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Chill Penguin, sans mourir, sans armure, sans arme, aucun Maverick vaincu",
+    "en": "From X landing in the stage to the final hit on Chill Penguin, without dying, with no armor, no weapons and no Maverick defeated"
   },
   "kind": "speedrun_level",
   "game": {
@@ -21,7 +21,7 @@
   "start_policy": "canonical_state",
   "state": {
     "name": "chill-penguin-entree-snes9x",
-    "sha256": "c02b16e7781d3d1018ffe5856155e2f91e515f44b9ece6079dbae3c1a91b819c",
+    "sha256": "ad89b72573a2190097a7c273ac1aaceb67895f24d35bde23c04cec01057bffa9",
     "file": "snes/mega-man-x/chill-penguin-entree.state"
   },
   "start": [

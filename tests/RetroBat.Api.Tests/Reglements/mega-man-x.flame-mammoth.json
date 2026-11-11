@@ -9,8 +9,8 @@
     "en": "Flame Mammoth"
   },
   "summary": {
-    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Flame Mammoth, sans mourir, partie neuve sans armure ni arme",
-    "en": "From X landing in the stage to the final hit on Flame Mammoth, without dying, new game with no armor or weapons"
+    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Flame Mammoth, sans mourir, sans armure, sans arme, aucun Maverick vaincu",
+    "en": "From X landing in the stage to the final hit on Flame Mammoth, without dying, with no armor, no weapons and no Maverick defeated"
   },
   "kind": "speedrun_level",
   "game": {
@@ -21,7 +21,7 @@
   "start_policy": "canonical_state",
   "state": {
     "name": "flame-mammoth-entree-snes9x",
-    "sha256": "054ceee790743b4495cb399b6e17fab6fcebb46459fda96edd296c243716f546",
+    "sha256": "66db72541c45a5cb2a9fd9c8a13fe29f029a145ef4cbe957c52dfc393bf165ce",
     "file": "snes/mega-man-x/flame-mammoth-entree.state"
   },
   "start": [

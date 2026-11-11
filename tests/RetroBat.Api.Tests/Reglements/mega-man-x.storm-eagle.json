@@ -9,8 +9,8 @@
     "en": "Storm Eagle"
   },
   "summary": {
-    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Storm Eagle, sans mourir, partie neuve sans armure ni arme",
-    "en": "From X landing in the stage to the final hit on Storm Eagle, without dying, new game with no armor or weapons"
+    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Storm Eagle, sans mourir, sans armure, sans arme, aucun Maverick vaincu",
+    "en": "From X landing in the stage to the final hit on Storm Eagle, without dying, with no armor, no weapons and no Maverick defeated"
   },
   "kind": "speedrun_level",
   "game": {
@@ -21,7 +21,7 @@
   "start_policy": "canonical_state",
   "state": {
     "name": "storm-eagle-entree-snes9x",
-    "sha256": "561fa1e6f7401e77a4a78b289c912d4c9ca26ab390925bde38bd1b0541dfa811",
+    "sha256": "58e566f8a098701a4a8fc2e3f40bb0eb1e3d63dc289aa7653e8ea6d7bb1c8b37",
     "file": "snes/mega-man-x/storm-eagle-entree.state"
   },
   "start": [

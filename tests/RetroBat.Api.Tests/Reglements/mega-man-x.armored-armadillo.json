@@ -9,8 +9,8 @@
     "en": "Armored Armadillo"
   },
   "summary": {
-    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Armored Armadillo, sans mourir, partie neuve sans armure ni arme",
-    "en": "From X landing in the stage to the final hit on Armored Armadillo, without dying, new game with no armor or weapons"
+    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Armored Armadillo, sans mourir, sans armure, sans arme, aucun Maverick vaincu",
+    "en": "From X landing in the stage to the final hit on Armored Armadillo, without dying, with no armor, no weapons and no Maverick defeated"
   },
   "kind": "speedrun_level",
   "game": {
@@ -21,7 +21,7 @@
   "start_policy": "canonical_state",
   "state": {
     "name": "armored-armadillo-entree-snes9x",
-    "sha256": "b5dfdef28797f3d57b85e25fe87ff6ff73422780640a5495fa301dc66aa5d4ac",
+    "sha256": "d6ebab18f740555436a622f7dcc40870f0083fd4cefbeff936cf5bfba867c2ea",
     "file": "snes/mega-man-x/armored-armadillo-entree.state"
   },
   "start": [

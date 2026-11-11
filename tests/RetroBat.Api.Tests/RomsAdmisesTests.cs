@@ -284,6 +284,26 @@ public class RomsAdmisesTests
         Assert.False(verdict!.Admise);
     }
 
+    // (11/11 soir) Mega Man X : la reference du speedrun est la (USA) (Rev 1), celle des etats de depart ; la Rev 0 est refusee.
+    private const string MmxRev1 = "df1cc0c8c8c4b61e3b834cc03366611c";
+    private const string MmxRev0 = "a10071fa78554b57538d0b459e00d224";
+
+    [Fact]
+    public void Mega_Man_X_en_speedrun_admet_la_Rev_1_et_refuse_la_Rev_0()
+    {
+        var mem = Path.Combine(Racine, "ram", "mega-man-x.MEM");
+        var reference = RomAdmission.ReferenceDuSpeedrun("snes", "mega-man-x", Referentiel, Etats);
+        Assert.Equal("Mega Man X (USA) (Rev 1)", reference!.Nom);
+        Assert.Contains(MmxRev1, reference.Empreintes);
+        Assert.DoesNotContain(MmxRev0, reference.Empreintes);
+        var rev1 = NelfePlayScoringReporter.VerdictDuContenu("snes", "mega-man-x", MmxRev1, null, speedrun: true, null, Referentiel, mem, Etats);
+        Assert.True(rev1!.Admise);
+        Assert.Equal(RomAdmission.Statut.Reference, rev1.Statut);
+        var rev0 = NelfePlayScoringReporter.VerdictDuContenu("snes", "mega-man-x", MmxRev0, null, speedrun: true, null, Referentiel, mem, Etats);
+        Assert.False(rev0!.Admise);
+        Assert.Equal("Mega Man X (USA) (Rev 1)", rev0.RomAttendue);
+    }
+
     [Fact]
     public void Une_partie_sur_un_set_hors_famille_n_est_pas_soumise_un_clone_officiel_si()
     {

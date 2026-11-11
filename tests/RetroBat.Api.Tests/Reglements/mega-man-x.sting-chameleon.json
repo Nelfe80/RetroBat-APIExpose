@@ -9,8 +9,8 @@
     "en": "Sting Chameleon"
   },
   "summary": {
-    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Sting Chameleon, sans mourir, partie neuve sans armure ni arme",
-    "en": "From X landing in the stage to the final hit on Sting Chameleon, without dying, new game with no armor or weapons"
+    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Sting Chameleon, sans mourir, sans armure, sans arme, aucun Maverick vaincu",
+    "en": "From X landing in the stage to the final hit on Sting Chameleon, without dying, with no armor, no weapons and no Maverick defeated"
   },
   "kind": "speedrun_level",
   "game": {
@@ -21,7 +21,7 @@
   "start_policy": "canonical_state",
   "state": {
     "name": "sting-chameleon-entree-snes9x",
-    "sha256": "41f310a7b9549be1f44a9fd946a9dc60a775682e60110f3963398b169ef7cbdb",
+    "sha256": "a39eb073534dc7741f7110225e2090bafc8dbf94da6c343f4451b727d3da4db2",
     "file": "snes/mega-man-x/sting-chameleon-entree.state"
   },
   "start": [

@@ -9,8 +9,8 @@
     "en": "Launch Octopus"
   },
   "summary": {
-    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Launch Octopus, sans mourir, partie neuve sans armure ni arme",
-    "en": "From X landing in the stage to the final hit on Launch Octopus, without dying, new game with no armor or weapons"
+    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Launch Octopus, sans mourir, sans armure, sans arme, aucun Maverick vaincu",
+    "en": "From X landing in the stage to the final hit on Launch Octopus, without dying, with no armor, no weapons and no Maverick defeated"
   },
   "kind": "speedrun_level",
   "game": {
@@ -21,7 +21,7 @@
   "start_policy": "canonical_state",
   "state": {
     "name": "launch-octopus-entree-snes9x",
-    "sha256": "bba4c534c61a1360485ef0a7c8ae7bd345932312c45dadf88e06a4746dfca23c",
+    "sha256": "1039496e70ded9e5e6316c50fdfce510fa45b86d58be3feb8f9e25d2b6aefd6f",
     "file": "snes/mega-man-x/launch-octopus-entree.state"
   },
   "start": [
