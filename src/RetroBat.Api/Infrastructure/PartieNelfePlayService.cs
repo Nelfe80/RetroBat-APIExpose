@@ -130,6 +130,29 @@ public sealed class PartieNelfePlayService : IHostedService, IDisposable, RetroB
     }
 
     /// <summary>
+    /// LE VERDICT PREVU AU CROCHET GAME-START D'ES (11/11, notifications de RetroArch) : ce que <c>ui.game.started</c> jugera
+    /// pour le jeu qui va partir, sans consommer l'annonce. Null : une partie du joueur (ou l'atelier de NelfeScoreLab).
+    /// </summary>
+    public string? Prevoir(string? cheminDuJeu)
+    {
+        if (RetroBat.Api.Scoring.ScoreLabAtelier.IsActive(DateTime.UtcNow, out _)) return null;
+        var carrousel = _media.CarouselSystemIdConfirme;
+        bool? dansLaCollection = null;
+        if (carrousel.Length == 0 && !string.IsNullOrWhiteSpace(cheminDuJeu))
+        {
+            dansLaCollection = _collection?.EstOuvertAuScoring(cheminDuJeu);
+        }
+
+        string? annonce;
+        lock (_verrou)
+        {
+            annonce = _annonce is { } a && DateTime.UtcNow - a.At <= ValiditeAnnonce ? a.Origine : null;
+        }
+
+        return Juger(carrousel, annonce, dansLaCollection);
+    }
+
+    /// <summary>
     /// L'origine d'une partie NelfePlay, ou null pour une partie du joueur. `dansLaCollection` ne
     /// sert que si le carrousel est inconnu.
     /// </summary>

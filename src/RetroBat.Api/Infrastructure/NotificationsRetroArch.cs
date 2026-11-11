@@ -18,9 +18,10 @@ namespace RetroBat.Api.Infrastructure;
 ///
 /// QUI LE PORTE : les lancements que l'API fait elle-meme (emulatorLauncher sans ES) pour une partie NelfePlay : epreuves de
 /// speedrun et challenges (fantomes compris), MASS RUN, MULTIPLAYER (hote et invites), defi du World Scoring parti par l'API
-/// (avec le Deck), netplay de l'hote et de l'invite quand ES ne repond pas. Une partie lancee par ES (carrousel du World
-/// Scoring, defi sans Deck) garde les notifications : l'API d'ES ne prend qu'un chemin de ROM, et le seul moyen de les couper
-/// serait une cle d'es_settings.cfg (interdite hors <c>global.apiexpose.*</c>). Une partie hors NelfePlay n'est pas touchee.
+/// (avec le Deck), netplay de l'hote et de l'invite quand ES ne repond pas. Une partie NelfePlay lancee par ES (carrousel du
+/// World Scoring, defi sans Deck, site, concours) : l'API d'ES ne prend qu'un chemin de ROM, la fonction se pose donc par jeu
+/// dans es_settings.cfg au crochet game-start et se rend des que l'emulateur parait (<see cref="NotificationsDesLancementsEs"/>,
+/// exception autorisee par le user le 11/11). Une partie hors NelfePlay n'est pas touchee.
 ///
 /// LES MESSAGES DE NELFEPLAY RESTENT VISIBLES : un message que l'API envoyait par SHOW_MSG (speedrun, MULTIPLAYER, filtre
 /// d'image, choix du Deck) passe au Deck s'il est la (deck.notice), sinon au bandeau du haut de l'API
@@ -86,8 +87,27 @@ public static partial class NotificationsRetroArch
         });
     }
 
+    /// <summary>
+    /// Un lancement par ES va couper les notifications (cle par jeu posee au crochet game-start,
+    /// <see cref="NotificationsDesLancementsEs"/>) : les messages de NelfePlay passent au bandeau. Rend la generation, que
+    /// <see cref="FinirAsync"/> attend a la fin de la partie.
+    /// </summary>
+    internal static long Couper()
+    {
+        var generation = Interlocked.Increment(ref _generation);
+        _coupees = true;
+        return generation;
+    }
+
+    /// <summary>Un lancement par ES qui garde les notifications (partie du joueur) : RetroArch parle.</summary>
+    internal static void Parler()
+    {
+        Interlocked.Increment(ref _generation);
+        _coupees = false;
+    }
+
     /// <summary>Le lanceur est sorti : plus rien de coupe, et la valeur d'ES rendue a retroarch.cfg une fois RetroArch ferme.</summary>
-    private static async Task FinirAsync(long generation, ILogger? journal)
+    internal static async Task FinirAsync(long generation, ILogger? journal)
     {
         // Le lanceur rend la main jusqu'a 48 s apres RetroArch (09/11), rarement avant : on laisse RetroArch finir d'ecrire.
         var limite = DateTime.UtcNow.AddSeconds(60);
