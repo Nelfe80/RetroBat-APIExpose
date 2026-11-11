@@ -31,21 +31,24 @@ public sealed class ReplayVideoRenderer
     private readonly IReplayMetadataStore _meta;
     private readonly IReplayRuntimeResolver _resolver;
     private readonly Func<string> _etatDeLaLecture;
+    private readonly RetroBat.Api.Speedrun.CatalogueDesDefis? _defis;
     private readonly ILogger<ReplayVideoRenderer> _logger;
     private readonly SemaphoreSlim _unSeulRendu = new(1, 1);
 
     public ReplayVideoRenderer(IReplayManifestStore manifests, IReplayObjectStore objects, IReplayMetadataStore meta,
-        IReplayRuntimeResolver resolver, ReplayPlaybackService playback, ILogger<ReplayVideoRenderer> logger)
-        : this(manifests, objects, meta, resolver, () => playback.GetState().State, logger)
+        IReplayRuntimeResolver resolver, ReplayPlaybackService playback, ILogger<ReplayVideoRenderer> logger,
+        RetroBat.Api.Speedrun.CatalogueDesDefis? defis = null)
+        : this(manifests, objects, meta, resolver, () => playback.GetState().State, logger, defis)
     {
     }
 
     /// <summary>Sans le lecteur de replays : <paramref name="etatDeLaLecture"/> dit « idle » quand aucune lecture ne tourne (essais).</summary>
     internal ReplayVideoRenderer(IReplayManifestStore manifests, IReplayObjectStore objects, IReplayMetadataStore meta,
-        IReplayRuntimeResolver resolver, Func<string> etatDeLaLecture, ILogger<ReplayVideoRenderer> logger)
+        IReplayRuntimeResolver resolver, Func<string> etatDeLaLecture, ILogger<ReplayVideoRenderer> logger,
+        RetroBat.Api.Speedrun.CatalogueDesDefis? defis = null)
     {
         _manifests = manifests; _objects = objects; _meta = meta; _resolver = resolver; _etatDeLaLecture = etatDeLaLecture;
-        _logger = logger;
+        _logger = logger; _defis = defis;
     }
 
     /// <param name="Ok">Le film couvre toute la performance demandee.</param>
@@ -54,7 +57,7 @@ public sealed class ReplayVideoRenderer
     /// <param name="Fidelite">Le controle de fidelite (<see cref="ControleDeFidelite"/>) : fidele, desync ou non_verifie.</param>
     public sealed record RenduVideo(bool Ok, string? Raison, string? Fichier, long Debut, long Fin, long FrameAtteinte,
         double Secondes, string Fidelite = ControleDeFidelite.NonVerifie, string? DetailFidelite = null,
-        IReadOnlyList<(long Frame, long Score)>? Releves = null);
+        IReadOnlyList<(long Frame, long Score)>? Releves = null, string? TraceDEpreuve = null);
 
     /// <summary>
     /// Rend la performance d'un replay. <paramref name="debut"/> et <paramref name="fin"/> sont en frames du
@@ -62,14 +65,16 @@ public sealed class ReplayVideoRenderer
     /// </summary>
     /// <param name="controles">Les scores certifies et la fin de leur run, que le score lu pendant le rendu doit retrouver
     /// (controle de fidelite, 09/11) ; sans eux, le film est « non verifie ».</param>
+    /// <param name="epreuves">L'epreuve certifiee du replay (speedrun, challenge ; 11/11) : son arrivee doit tomber a la bonne
+    /// image (<see cref="ControleDEpreuve"/>) ; sans elle, un film d'epreuve est « non verifie ».</param>
     public async Task<RenduVideo> RendreAsync(string replayId, long? debut, long? fin, CancellationToken ct,
-        IReadOnlyList<PointDuScore>? controles = null)
+        IReadOnlyList<PointDuScore>? controles = null, IReadOnlyList<EpreuveCertifiee>? epreuves = null)
     {
         if (!await _unSeulRendu.WaitAsync(0, ct).ConfigureAwait(false))
             return Echec("rendu_en_cours");
         try
         {
-            return await RendreSeulAsync(replayId, debut, fin, controles, ct).ConfigureAwait(false);
+            return await RendreSeulAsync(replayId, debut, fin, controles, epreuves, ct).ConfigureAwait(false);
         }
         finally
         {
@@ -78,7 +83,7 @@ public sealed class ReplayVideoRenderer
     }
 
     private async Task<RenduVideo> RendreSeulAsync(string replayId, long? debutDemande, long? finDemandee,
-        IReadOnlyList<PointDuScore>? controles, CancellationToken ct)
+        IReadOnlyList<PointDuScore>? controles, IReadOnlyList<EpreuveCertifiee>? epreuves, CancellationToken ct)
     {
         // Jamais pendant une partie ni une lecture : on lance notre propre RetroArch.
         if (_etatDeLaLecture() != "idle") return Echec("lecture_en_cours");
@@ -147,7 +152,12 @@ public sealed class ReplayVideoRenderer
         // de la performance (mesure du 14 octobre) ; ce plafond ne sert qu'a ne jamais rester bloque.
         var fps = manifest.Frames.NominalFps > 1 ? manifest.Frames.NominalFps : 60;
         var plafond = TimeSpan.FromSeconds((fin - debut + debut / 2.0) / fps * 2.5 + 120);
-        var pilote = new PiloteDuRendu(debut, fin);
+        // L'arrivee d'une epreuve (11/11) : toutes les adresses du .MEM lues a chaque releve, du debut du replay, et les
+        // lectures continuent 10 s apres le film (une arrivee se confirme parfois apres ses 3 s de marge).
+        var epreuve = epreuves is { Count: > 0 } ? epreuves[0] : null;
+        var (controleDEpreuve, raisonEpreuve) = epreuve is null ? (null, null) : ControleDEpreuve.Pour(epreuve, _defis);
+        var finDesLectures = controleDEpreuve is null ? fin : Math.Min(finDuReplay - MargeAvantLaFin, fin + (long)Math.Round(10 * fps));
+        var pilote = new PiloteDuRendu(debut, fin, finDesLectures: finDesLectures);
         using var udp = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
         // Le score lu dans la memoire du coeur pendant la portion filmee (controle de fidelite).
         using var lecteur = controles is { Count: > 0 } ? LecteurDuScore.Pour(manifest) : null;
@@ -178,6 +188,14 @@ public sealed class ReplayVideoRenderer
 
                 PiloteDuRendu.Action action;
                 if (chrono.Elapsed > plafond) action = pilote.Abandonner();
+                else if (controleDEpreuve is not null)
+                {
+                    // Une epreuve : la frame et toute la memoire du .MEM dans un seul datagramme, sans pause entre deux releves
+                    // (RetroArch y repond une fois par image : on lit a chaque image ou presque).
+                    var (releve, blocs) = await ReleverAvecMemoireAsync(udp, controleDEpreuve, chrono.Elapsed.TotalSeconds, ct).ConfigureAwait(false);
+                    action = pilote.Decider(releve);
+                    if (releve.Drapeaux > 0 && blocs is { Count: > 0 }) controleDEpreuve.Noter(releve.Frame, blocs);
+                }
                 else
                 {
                     var releve = await ReleverAsync(udp, chrono.Elapsed.TotalSeconds, ct).ConfigureAwait(false);
@@ -197,7 +215,7 @@ public sealed class ReplayVideoRenderer
                         await EnvoyerAsync(udp, "QUIT", ct).ConfigureAwait(false);
                         break;
                 }
-                await Task.Delay(200, ct).ConfigureAwait(false);
+                if (controleDEpreuve is null || action != PiloteDuRendu.Action.Rien) await Task.Delay(200, ct).ConfigureAwait(false);
             }
 
             // RetroArch se ferme seul apres QUIT (et plante parfois en sortant, sans abimer le film).
@@ -218,14 +236,18 @@ public sealed class ReplayVideoRenderer
             .OrderByDescending(f => f.LastWriteTimeUtc).FirstOrDefault()?.FullName;
         var ok = pilote.Complet && film is not null;
         var raison = pilote.Raison ?? (film is null ? "aucun_film" : null);
-        var verdict = controles is { Count: > 0 } && lecteur is null
-            ? new ControleDeFidelite.Verdict(ControleDeFidelite.NonVerifie, "score non lisible sous ce coeur ou sans .MEM")
-            : ControleDeFidelite.Juger(controles, releves, fps);
+        var verdict = epreuve is not null
+            ? controleDEpreuve is null
+                ? new ControleDeFidelite.Verdict(ControleDeFidelite.NonVerifie, raisonEpreuve ?? "epreuve non controlable")
+                : controleDEpreuve.Juger(epreuve, debut, fin)
+            : controles is { Count: > 0 } && lecteur is null
+                ? new ControleDeFidelite.Verdict(ControleDeFidelite.NonVerifie, "score non lisible sous ce coeur ou sans .MEM")
+                : ControleDeFidelite.Juger(controles, releves, fps);
         _logger.LogInformation("Video : {ReplayId} {Issue} en {Secondes:F1} s (frame {Frame} sur {Fin}) ; fidelite {Fidelite} ({Detail}, {Lectures} lectures).",
             replayId, ok ? "rendu" : "incomplet (" + raison + ")", chrono.Elapsed.TotalSeconds, pilote.FrameAtteinte, fin,
             verdict.Issue, verdict.Detail, releves.Count);
         return new RenduVideo(ok, ok ? null : raison, film, debut, fin, pilote.FrameAtteinte, chrono.Elapsed.TotalSeconds,
-            verdict.Issue, verdict.Detail, releves);
+            verdict.Issue, verdict.Detail, releves, controleDEpreuve?.Trace);
     }
 
     /// <summary>
@@ -322,6 +344,52 @@ public sealed class ReplayVideoRenderer
             valeurs.Add(octets is null ? null : LecteurDuScore.Valeur(l, octets));
         }
         return valeurs.Any(v => v is not null) ? lecteur.Composer(valeurs) : null;
+    }
+
+    /// <summary>
+    /// Un releve d'epreuve : la frame (active_replay) et les octets de chaque bloc, d'un seul datagramme. Les reponses arrivent
+    /// une par commande ; une reponse en retard d'un releve precedent est jetee avant la demande.
+    /// </summary>
+    private static async Task<(PiloteDuRendu.Releve Releve, IReadOnlyDictionary<long, IReadOnlyList<int>>? Blocs)> ReleverAvecMemoireAsync(
+        UdpClient udp, ControleDEpreuve controle, double secondes, CancellationToken ct)
+    {
+        var sansReponse = new PiloteDuRendu.Releve(secondes, -1, 0);
+        try
+        {
+            while (udp.Available > 0) await udp.ReceiveAsync(ct).ConfigureAwait(false);
+            await EnvoyerAsync(udp, controle.Datagramme, ct).ConfigureAwait(false);
+            using var delai = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            delai.CancelAfter(TimeSpan.FromMilliseconds(300));
+            PiloteDuRendu.Releve? releve = null;
+            var blocs = new Dictionary<long, IReadOnlyList<int>>();
+            var attendus = controle.Blocs.ToDictionary(b => b.Adresse, b => b.Octets);
+            for (var i = 0; i < controle.Blocs.Count + 4 && (releve is null || blocs.Count < attendus.Count); i++)
+            {
+                var texte = Encoding.ASCII.GetString((await udp.ReceiveAsync(delai.Token).ConfigureAwait(false)).Buffer).Trim();
+                var champs = texte.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (texte.StartsWith("GET_CONFIG_PARAM", StringComparison.Ordinal))
+                {
+                    releve = champs.Length >= 5 && int.TryParse(champs[^2], out var d) && long.TryParse(champs[^1], out var f)
+                        ? new PiloteDuRendu.Releve(secondes, d, f) : sansReponse;
+                }
+                else if (champs.Length >= 2 && champs[0] == "READ_CORE_RAM"
+                    && long.TryParse(champs[1], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out var adresse)
+                    && attendus.TryGetValue(adresse, out var n)
+                    && LecteurDuScore.OctetsDeLaReponse(texte, n) is { } octets)
+                {
+                    blocs[adresse] = octets;
+                }
+            }
+            return (releve ?? sansReponse, blocs);
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            return (sansReponse, null);
+        }
+        catch (SocketException)
+        {
+            return (sansReponse, null);
+        }
     }
 
     /// <summary>Un reglage de retroarch.cfg, ou null.</summary>
