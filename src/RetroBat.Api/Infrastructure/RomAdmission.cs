@@ -44,7 +44,7 @@ public static partial class RomAdmission
     }
 
     /// <summary>Le verdict sur un dump, avec ce qu'il faut dire au joueur.</summary>
-    public sealed record Decision(Statut Statut, string Raison, string? NomDuDump, string? RomAttendue)
+    public sealed record Decision(Statut Statut, string Raison, string? NomDuDump, string? RomAttendue, string? Conseil = null)
     {
         public bool Admise => Statut != Statut.Exclue;
 
@@ -171,6 +171,16 @@ public static partial class RomAdmission
         "homebrew" or "aftermarket" => "homebrew",
         _ => drapeau.ToLowerInvariant().Replace('_', ' '),
     };
+
+    /// <summary>
+    /// LES MARQUES QUI DISENT LA QUALITE DU DUMP, PAS UN AUTRE JEU (11/11, decision du user, option A) : un mauvais dump ou un
+    /// overdump d'une cartouche officielle reste ce jeu. Deja certifie, il reste admis ; aucun NOUVEAU n'entre.
+    /// </summary>
+    private static readonly HashSet<string> MarquesDeQualite = new(StringComparer.OrdinalIgnoreCase) { "mauvais dump", "overdump" };
+
+    /// <summary>Les marques d'un dump ne disent-elles QUE la qualite du dump (aucun hack, pirate, traduction, reedition) ?</summary>
+    public static bool SeulementQualiteDuDump(IReadOnlyList<string> marques)
+        => marques.Count > 0 && marques.All(MarquesDeQualite.Contains);
 
     public static bool EstPal(IReadOnlyList<string> regions)
         => regions.Count > 0 && regions.All(r => RegionsPal.Contains(r.Trim()));
@@ -304,8 +314,18 @@ public static partial class RomAdmission
         var hashes = empreintes.Where(h => !string.IsNullOrWhiteSpace(h)).Select(h => h!.Trim().ToLowerInvariant()).Distinct().ToList();
         var fiche = FicheDe(systeme, hashes, dumpsDuMem, referentiel);
         var attendue = speedrun?.Nom ?? reference?.Nom;
+        // LES VERSIONS DEJA CERTIFIEES (11/11, option A, bug de Lorenzolamas) : le site publie a part (`certified`) les md5 d'un
+        // jeu qui portent une partie publiee et que sa regle garde. Le jeu y a tourne et ete mesure : la version reste admise,
+        // meme marquee mauvais dump (« Super Mario Bros (JU) (PRG 1) », [b4] au referentiel), ou officielle sans que le .MEM la
+        // nomme (Sonic « (Japan, Europe, Korea) »). Jamais un hack, un pirate, une traduction ni une reedition, meme certifies ;
+        // jamais pour un speedrun (la ROM des etats seulement).
+        var certifiee = speedrun is null && hashes.Any(Certifiees(profil).Contains);
         if (!fiche.Propre)
+        {
+            if (certifiee && SeulementQualiteDuDump(fiche.Marques) && hashes.Any(Publiees(profil).Contains))
+                return Certifiee(fiche, attendue, "version déjà certifiée au classement (" + string.Join(", ", fiche.Marques) + " selon le référentiel)");
             return new Decision(Statut.Exclue, "ROM exclue (" + string.Join(", ", fiche.Marques) + ")", fiche.Nom, attendue);
+        }
 
         if (speedrun is not null)
         {
@@ -323,6 +343,8 @@ public static partial class RomAdmission
         var prouvee = hashes.Any(dumpsDuMem.ContainsKey)
             || (fiche.Nom is { Length: > 0 } nom && dumpsDuMem.Keys.Any(h =>
                 FicheDe(systeme, [h], dumpsDuMem, referentiel) is { Propre: true } f && string.Equals(f.Nom, nom, StringComparison.OrdinalIgnoreCase)));
+        if (!prouvee && certifiee)
+            return Certifiee(fiche, null, "version officielle déjà certifiée au classement");
         if (!prouvee)
             return new Decision(Statut.Exclue, "version officielle non prouvée par la définition de score du jeu", fiche.Nom, attendue);
         return fiche.Pal
@@ -330,14 +352,36 @@ public static partial class RomAdmission
             : new Decision(Statut.Admise, "version officielle prouvée", fiche.Nom, attendue);
     }
 
-    /// <summary>Le rang d'un verdict pour choisir LA ROM d'un jeu : la reference, puis une version admise, puis PAL.</summary>
+    /// <summary>
+    /// Une version deja certifiee, admise. Marquee pour la qualite du dump, elle porte un CONSEIL (la version propre), que le
+    /// diagnostic et le prevol montrent sans bloquer le joueur.
+    /// </summary>
+    private static Decision Certifiee(Fiche fiche, string? attendue, string raison)
+    {
+        var conseil = attendue is { Length: > 0 } a && !string.Equals(a, fiche.Nom, StringComparison.OrdinalIgnoreCase)
+            ? $"ta ROM est admise parce que des parties y sont déjà certifiées, mais le référentiel la marque {string.Join(", ", fiche.Marques)} ; "
+              + $"version conseillée : « {a} »"
+            : null;
+        return fiche.Pal
+            ? new Decision(Statut.Pal, raison + ", version PAL (50 Hz) : classement PAL", fiche.Nom, attendue, conseil)
+            : new Decision(Statut.Admise, raison, fiche.Nom, attendue, conseil);
+    }
+
+    /// <summary>
+    /// Le rang d'un verdict pour choisir LA ROM d'un jeu : la reference, puis une version admise, puis une version certifiee
+    /// qui porte un conseil (mauvais dump deja certifie), puis PAL.
+    /// </summary>
     public static int Rang(Decision d) => d.Statut switch
     {
         Statut.Reference => 0,
-        Statut.Admise => 1,
-        Statut.Pal => 2,
+        Statut.Admise => d.Conseil is null ? 1 : 2,
+        Statut.Pal => 3,
         _ => 9,
     };
+
+    /// <summary>Les versions deja certifiees que le site garde admises (`content_hashes.certified`, 11/11, option A).</summary>
+    public static HashSet<string> Certifiees(ContentHashes? profil)
+        => new((profil?.Certified ?? []).Where(h => h.Length > 0), StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Toutes les empreintes que le profil publie (md5, sha256, sans en-tete).</summary>
     public static HashSet<string> Publiees(ContentHashes? profil)
