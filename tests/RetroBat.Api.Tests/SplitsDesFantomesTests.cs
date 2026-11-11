@@ -84,4 +84,39 @@ public class SplitsDesFantomesTests
             if (Directory.Exists(dossier)) Directory.Delete(dossier, true);
         }
     }
+
+    [Fact]
+    public void Chaque_segment_atteint_publie_un_ecart_par_fantome_une_fois()
+    {
+        var dossier = Path.Combine(Path.GetTempPath(), "nelfe-ecarts-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dossier);
+        try
+        {
+            var f = new FantomesDuSpeedrun(null!, null!, null!, null!, null!);
+            f.Poser(new FantomesDuSpeedrun.FantomePose("1-rp_ASH", "rp_ASH", "ASHTASTE92 (WR)", FantomesDuSpeedrun.RoleMondial, 1578));
+            File.WriteAllText(Path.Combine(dossier, "1-rp_ASH.splits"), Ash);
+            var joueur = Path.Combine(dossier, SplitsDesFantomes.NomDuJoueur);
+
+            // deux segments atteints : deux ecarts (le premier, image 0 contre 0, puis 215 contre 211)
+            File.WriteAllText(joueur, "NSPLITS1 512\nrun 1\n00000040:0 0\n00000040:1 215\n");
+            var e = f.LireLesEcartsDans(dossier, 60);
+            Assert.Equal(2, e.Count);
+            Assert.Equal(new EcartAuFantome("ASHTASTE92 (WR)", "rp_ASH", true, "00000040:1", 1, 7, 3583, 67), e[1]);
+            Assert.Empty(f.LireLesEcartsDans(dossier, 60));                                   // rien de neuf
+
+            // la salle du tuyau (le fantome n'y est pas passe), puis la sortie : un seul ecart, en avance
+            File.WriteAllText(joueur, "NSPLITS1 512\nrun 1\n00000040:0 0\n00000040:1 215\n00000080:0 565\n00000040:5 961\n");
+            e = f.LireLesEcartsDans(dossier, 60);
+            Assert.Single(e);
+            Assert.Equal(-2983, e[0].GapMs);
+
+            // un run neuf repart du premier segment
+            File.WriteAllText(joueur, "NSPLITS1 512\nrun 2\n00000040:0 0\n");
+            Assert.Single(f.LireLesEcartsDans(dossier, 60));
+        }
+        finally
+        {
+            Directory.Delete(dossier, true);
+        }
+    }
 }

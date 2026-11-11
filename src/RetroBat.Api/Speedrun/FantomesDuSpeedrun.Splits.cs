@@ -64,7 +64,7 @@ public sealed partial class FantomesDuSpeedrun
         _splitsDuRunRecord = null;
     }
 
-    private void Poser(FantomePose pose, bool remplacerLeMien = false)
+    internal void Poser(FantomePose pose, bool remplacerLeMien = false)
     {
         lock (_verrou)
         {
@@ -178,10 +178,10 @@ public sealed partial class FantomesDuSpeedrun
     /// Les ecarts nouveaux depuis le dernier appel : chaque segment que le joueur vient d'atteindre (fichier du coeur hote),
     /// compare a chaque fantome qui y est passe. Un run neuf (autre numero) repart du premier segment.
     /// </summary>
-    public IReadOnlyList<EcartAuFantome> LireLesEcarts(double cadence)
+    public IReadOnlyList<EcartAuFantome> LireLesEcarts(double cadence) => DossierCourant() is { } d ? LireLesEcartsDans(d, cadence) : [];
+
+    internal IReadOnlyList<EcartAuFantome> LireLesEcartsDans(string dossier, double cadence)
     {
-        var dossier = DossierCourant();
-        if (dossier is null) return [];
         string? texte;
         try
         {
