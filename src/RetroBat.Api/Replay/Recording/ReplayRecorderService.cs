@@ -916,6 +916,12 @@ public sealed class ReplayRecorderService : BackgroundService
 
             _logger.LogInformation("Replay finalisé {ReplayId} : sha256={Sha} taille={Size} frames={Frames}{Rec}.",
                 rec.ReplayId, obj.Sha256, obj.Size, rec.LastFrame, recovered ? " (recovery)" : "");
+            // (11/11) LE MODE DES ENTREES : un replay enregistre touche par touche (le coeur n'a pas eu le masque) se relit par le
+            // wrapper sans masque. Le declencheur n'est pas encore connu : la trace le relie a son lancement.
+            if (Playback.ModeDesEntrees.Lire(_store.ObjectPath(obj.Sha256)) == Playback.ModeDesEntrees.Mode.Touches)
+                _logger.LogWarning("Replay {ReplayId} enregistre TOUCHE PAR TOUCHE (le coeur {Coeur} n'a pas eu le masque des touches) : "
+                    + "relu par le wrapper sans masque. Jeu {Jeu}, lancement {Lancement}.", rec.ReplayId, manifest.Runtime.CoreName,
+                    manifest.Game.RomGroup ?? manifest.Game.GameId, hint?.CoreDll ?? "?");
             await PublishAsync("replay.finalized", new { rec.ReplayId, rec.SessionId, obj.Sha256, obj.Size }, ct).ConfigureAwait(false);
         }
         catch (Exception ex)
