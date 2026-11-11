@@ -207,6 +207,11 @@ public sealed class GameLaunchController : ControllerBase
         }
 
         _partie?.AnnoncerLancement("site");
+        // Le coeur de la collection (FBNeo pour un set qu'il connait), diffusion comprise : l'hebergement lit la meme fiche.
+        if (_partie is not null)
+        {
+            await _partie.ImposerLeCoeurAsync(rom, ct).ConfigureAwait(false);
+        }
 
         // DIFFUSION : on heberge, au lieu de passer par le lancement ordinaire d'ES. C'est le
         // seul chemin possible — l'API HTTP d'EmulationStation ne prend qu'un chemin de ROM et

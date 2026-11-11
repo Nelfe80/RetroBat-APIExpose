@@ -367,6 +367,10 @@ public sealed class LiveContestClientService : BackgroundService
                 using var content = new StringContent(romPath, Encoding.UTF8, "text/plain");
                 // Une partie de concours est une partie NelfePlay, d'ou que le carrousel la lance.
                 _partie?.AnnoncerLancement("concours");
+                if (_partie is not null)
+                {
+                    await _partie.ImposerLeCoeurAsync(romPath, cancellationToken);
+                }
                 var res = await es.PostAsync("/launch", content, cancellationToken);
                 if (!res.IsSuccessStatusCode)
                 {

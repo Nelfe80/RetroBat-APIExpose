@@ -1377,6 +1377,8 @@ public sealed class MameLuaIngameProvider : IProvider
                     // deux moteurs qui ne se comportent pas pareil.
                     CoreName = coreName,
                     CoreVersion = coreVersion,
+                    // (11/11) Le SET MAME lance : une partie classee ne tourne que sous FBNeo quand FBNeo connait ce set.
+                    ContentSet = definition.RawRom,
                     MemSha256 = memSha,
                     ContentSha256 = (string?)null,
                     ContentMd5 = (string?)null,

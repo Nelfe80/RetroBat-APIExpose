@@ -89,6 +89,11 @@ public class CommandsController : ControllerBase
         if (_collection?.EstOuvertAuScoring(romPath) == true)
         {
             _partie?.AnnoncerLancement("api");
+            // Le coeur de la collection (FBNeo pour un set qu'il connait), sauf quand l'appelant impose le sien (le labo).
+            if (_partie is not null && string.IsNullOrWhiteSpace(payload.Emulator))
+            {
+                await _partie.ImposerLeCoeurAsync(romPath, HttpContext?.RequestAborted ?? CancellationToken.None).ConfigureAwait(false);
+            }
         }
 
         // MOTEUR IMPOSE : l'API HTTP d'EmulationStation ne prend qu'un chemin de ROM, et c'est ES

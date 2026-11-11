@@ -113,15 +113,39 @@ public class WorldScoringLancementTests
     {
         // 25/10 : les records sous MAME (RA) n'ont pas de replay ; FBNeo lit les sets MAME des jeux classes.
         var automatique = new EmulationStationLaunchConfig("mame", "libretro", "mame");
-        Assert.Equal(("libretro", "fbneo"), FbneoPourUnSetMame(automatique, Mame, fbneoConnaitLeSet: true, refuseIci: false));
+        Assert.Equal(("libretro", "fbneo"), FbneoPourUnSetMame(automatique, Mame, fbneoConnaitLeSet: true));
         Assert.Equal(("libretro", "fbneo"),
-            FbneoPourUnSetMame(new EmulationStationLaunchConfig("mame", "mame64", ""), Mame, fbneoConnaitLeSet: true, refuseIci: false));
-        // Un set que FBNeo ne connait pas, ou qu'il a deja refuse ici, reste sous MAME.
-        Assert.Null(FbneoPourUnSetMame(automatique, Mame, fbneoConnaitLeSet: false, refuseIci: false));
-        Assert.Null(FbneoPourUnSetMame(automatique, Mame, fbneoConnaitLeSet: true, refuseIci: true));
+            FbneoPourUnSetMame(new EmulationStationLaunchConfig("mame", "mame64", ""), Mame, fbneoConnaitLeSet: true));
+        // Un set que FBNeo ne connait pas reste sous MAME.
+        Assert.Null(FbneoPourUnSetMame(automatique, Mame, fbneoConnaitLeSet: false));
         // Un systeme qui declare FBNeo passe par la regle commune ; hors arcade, rien.
-        Assert.Null(FbneoPourUnSetMame(new EmulationStationLaunchConfig("fbneo", "libretro", "fbneo"), Fbneo, true, false));
-        Assert.Null(FbneoPourUnSetMame(new EmulationStationLaunchConfig("megadrive", "libretro", "genesis_plus_gx"), Megadrive, true, false));
+        Assert.Null(FbneoPourUnSetMame(new EmulationStationLaunchConfig("fbneo", "libretro", "fbneo"), Fbneo, true));
+        Assert.Null(FbneoPourUnSetMame(new EmulationStationLaunchConfig("megadrive", "libretro", "genesis_plus_gx"), Megadrive, true));
+    }
+
+    [Fact]
+    public void Un_set_que_FBNeo_a_refuse_ne_repart_plus_sous_MAME()
+    {
+        // 11/11 (regle du user) : le refus noté sur la borne ne ramene plus le jeu sous MAME, ou ses parties etaient
+        // classees sous un autre moteur. FBNeo reste impose, et le joueur apprend quel set remplacer.
+        var automatique = new EmulationStationLaunchConfig("mame", "libretro", "mame");
+        Assert.Equal(("libretro", "fbneo"), FbneoPourUnSetMame(automatique, Mame, fbneoConnaitLeSet: true));
+        var message = MessageDuRefus("ffight.zip");
+        Assert.Contains("ffight.zip", message);
+        Assert.Contains("set FBNeo", message);
+        Assert.Contains("ne compte pas", message);
+    }
+
+    [Theory]
+    [InlineData(@"D:\RetroBat\roms\mame\ffight.zip", "mame", "ffight.zip")]
+    [InlineData(@"D:\RetroBat\roms\fbneo\progearj.zip", "fbneo", "progearj.zip")]
+    [InlineData(@"D:\RetroBat\roms\ffight.zip", null, null)]
+    [InlineData(@"C:\autre\mame\ffight.zip", null, null)]
+    public void Un_lancement_hors_collection_se_rattache_a_son_systeme(string chemin, string? systeme, string? fichier)
+    {
+        var jeu = JeuDuLancement(@"D:\RetroBat\roms", chemin);
+        Assert.Equal(systeme, jeu?.Systeme);
+        Assert.Equal(fichier, jeu?.Fichier);
     }
 
     [Fact]
