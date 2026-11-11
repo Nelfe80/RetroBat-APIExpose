@@ -27,7 +27,9 @@ namespace RetroBat.Api.Deck;
 ///   <see cref="DeckLaunchService"/>, H-D15 ; la voie A, un fichier ajoute par le lanceur, est abandonnee) ;
 /// - le Deck du lancement en cours (champ <c>Deck</c> de <c>deck.game</c>) ;
 /// - le sens des signaux du .MEM, lu dans son compagnon .SMEM (<c>deck.semantics</c>, voir <see cref="Smem"/>) ;
-/// - le rang en direct de la partie (<c>deck.rank</c>, tenu par <see cref="DeckRankService"/>).
+/// - le rang en direct de la partie (<c>deck.rank</c>, tenu par <see cref="DeckRankService"/>) ;
+/// - la partie en cours dans le lancement (<c>deck.run</c>, <see cref="DeckNouvellePartie"/>) : une nouvelle partie jouee
+///   sans quitter le jeu (game over puis START, tentative d'epreuve relancee) remet les cumuls du Deck a zero.
 ///
 /// <c>deck.snapshot</c> reunit tout, envoye a la connexion (<c>/ws</c> et <c>/ws/deck</c>) et sur demande
 /// (message <c>deck.snapshot.request</c>, ou <c>GET /api/v1/deck/snapshot</c>). L'API lit la manette ; le Deck jamais
@@ -188,6 +190,12 @@ public sealed class DeckStateService : IHostedService, IDisposable
                 case "scoring.verdict":
                     NoterLeVerdict(e);
                     break;
+                case "scoring.partie.depart":
+                    NoterUnePartie((p, maintenant) => p.Depart(Texte(e.Payload, "Source"), maintenant));
+                    break;
+                case "speedrun.attempt.opened":
+                    NoterUnePartie((p, maintenant) => p.Tentative(maintenant));
+                    break;
             }
         }
         catch (Exception ex)
@@ -319,6 +327,70 @@ public sealed class DeckStateService : IHostedService, IDisposable
             _scores[score.Player] = score;
             _revision++;
         }
+
+        NoterUnePartie((p, maintenant) => p.Score(score.Player, score.Score, score.Source, maintenant));
+    }
+
+    /// <summary>
+    /// LA NOUVELLE PARTIE DANS LE LANCEMENT (deck.run, 11/11) : la regle de <see cref="DeckNouvellePartie"/> lit le score,
+    /// les departs et les tentatives ; une nouvelle partie part au Deck, qui remet ses cumuls a zero. Un zero du score en
+    /// attente se juge apres sa fenetre.
+    /// </summary>
+    private void NoterUnePartie(Func<DeckNouvellePartie, DateTime, bool> lire)
+    {
+        Partie? partie;
+        DeckRun? run = null;
+        var attendre = false;
+        lock (_verrou)
+        {
+            partie = _partie;
+            if (partie is null || partie.Etat == "ended") return;
+            var enAttente = partie.Parties.ZeroEnAttente;
+            if (lire(partie.Parties, DateTime.UtcNow)) run = NouveauRun(partie);
+            attendre = !enAttente && partie.Parties.ZeroEnAttente;
+        }
+
+        if (run is not null) PublierLeRun(run);
+        if (attendre) _ = JugerLeZeroAsync(partie);
+    }
+
+    private async Task JugerLeZeroAsync(Partie partie)
+    {
+        try
+        {
+            await Task.Delay(FenetreDuZero + TimeSpan.FromMilliseconds(50), partie.Arret.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        DeckRun? run = null;
+        lock (_verrou)
+        {
+            if (!ReferenceEquals(_partie, partie) || partie.Etat == "ended") return;
+            if (partie.Parties.Echeance(DateTime.UtcNow)) run = NouveauRun(partie);
+        }
+
+        if (run is not null) PublierLeRun(run);
+    }
+
+    /// <summary>La fenetre du zero (celle de la regle ; reduite par les tests).</summary>
+    internal TimeSpan FenetreDuZero { get; set; } = DeckNouvellePartie.FenetreDuZero;
+
+    private DeckRun NouveauRun(Partie partie)
+    {
+        var p = partie.Parties;
+        _revision++;
+        partie.Run = new DeckRun(partie.LaunchId, p.Run, p.Raison, p.DebutUtc, p.PicPrecedent, _revision);
+        return partie.Run;
+    }
+
+    private void PublierLeRun(DeckRun run)
+    {
+        _journal?.LogInformation("Deck : nouvelle partie {Run} dans le lancement {Lancement} ({Raison}, score d'avant {Pic}).",
+            run.Run, run.LaunchId, run.Reason, run.PreviousPeak);
+        Publier("deck.run", run);
     }
 
     private void NoterEntree(EventEnvelope e, bool tenue)
@@ -386,6 +458,7 @@ public sealed class DeckStateService : IHostedService, IDisposable
                 StartedUtc = DateTime.UtcNow,
                 Etat = "launching",
                 Deck = deck,
+                Parties = new DeckNouvellePartie(DateTime.UtcNow) { Fenetre = FenetreDuZero },
             };
             _partie = partie;
             _revision++;
@@ -858,6 +931,8 @@ public sealed class DeckStateService : IHostedService, IDisposable
                 Launch = _lancementPrepare is { } l && DateTime.UtcNow - l.PreparedAtUtc < TimeSpan.FromMinutes(2) ? l : null,
                 Page = _page,
                 Result = _resultat,
+                Run = partie is null || partie.Etat == "ended" ? null
+                    : partie.Run ?? new DeckRun(partie.LaunchId, 0, "", partie.StartedUtc, 0, _revision),
             };
         }
     }
@@ -991,6 +1066,10 @@ public sealed class DeckStateService : IHostedService, IDisposable
         public bool SemantiqueCherchee;
         public DeckLancement? Deck;
         public readonly CancellationTokenSource Arret = new();
+
+        /// <summary>Les parties jouees dans ce lancement (deck.run) : la regle, et la partie en cours telle que publiee.</summary>
+        public required DeckNouvellePartie Parties;
+        public DeckRun? Run;
     }
 }
 
@@ -1200,4 +1279,15 @@ public sealed record DeckSnapshot(
 
     /// <summary>Le dernier verdict de la partie avec Deck (deck.result) ; null sinon.</summary>
     public DeckResult? Result { get; init; }
+
+    /// <summary>La partie en cours dans le lancement (deck.run) ; null hors d'un lancement.</summary>
+    public DeckRun? Run { get; init; }
 }
+
+/// <summary>
+/// deck.run : une nouvelle partie commence dans le meme lancement (11/11). <c>Run</c> : 0 pour la premiere, +1 a chaque
+/// nouvelle partie ; <c>Reason</c> : score-zero (le score du joueur 1 retombe a zero), start (credit consomme ou GAME_START
+/// alors que rien n'etait marque), attempt (tentative d'epreuve ouverte). Le Deck remet ses cumuls a zero a sa reception.
+/// <c>PreviousPeak</c> : le plus haut score de la partie d'avant.
+/// </summary>
+public sealed record DeckRun(string LaunchId, int Run, string Reason, DateTime StartedAtUtc, long PreviousPeak, long Revision);
