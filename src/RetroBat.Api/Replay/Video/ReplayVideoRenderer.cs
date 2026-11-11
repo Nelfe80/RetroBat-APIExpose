@@ -339,11 +339,14 @@ public sealed class ReplayVideoRenderer
     }
 
     /// <summary>
-    /// Le temps accorde a un rendu de <paramref name="images"/> images : 8 fois leur duree a la cadence du jeu (4 images/s
-    /// pour un jeu a 60, la borne la plus chargee mesuree le 11/11), plus 5 minutes pour lancer et fermer RetroArch. Pur.
+    /// Le temps accorde a un rendu de <paramref name="images"/> images : 15 fois leur duree a la cadence du jeu, soit 4 images/s
+    /// tenues pour un jeu a 60 (la borne la plus chargee mesuree le 11/11), plus 5 minutes pour lancer et fermer RetroArch. Pur.
     /// </summary>
     internal static TimeSpan PlafondDuRendu(double images, double fps)
-        => TimeSpan.FromSeconds(Math.Max(0, images) / (fps > 1 ? fps : 60) * 8 + 300);
+        => TimeSpan.FromSeconds(Math.Max(0, images) / (fps > 1 ? fps : 60) * FacteurDuPlafond + 300);
+
+    /// <summary>Le plafond en multiple de la duree du film : 60 / 4, pour tenir 4 images/s d'un jeu a 60.</summary>
+    internal const double FacteurDuPlafond = 15;
 
     /// <summary>Pour les essais de mesure seulement : des lignes ajoutees au profil de rendu (null en service).</summary>
     internal static string? ReglagesDEssai { get; set; }
