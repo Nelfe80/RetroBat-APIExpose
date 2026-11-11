@@ -34,6 +34,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <!-- Le reglement de Green Hill 1 tel qu'il est depose sur le site : les tests partent de lui. -->
+    <!-- Les ROMs admises (11/11) : un extrait reel du referentiel, des .MEM et de l'index des jeux ouverts. -->
+    <None Include="RomsAdmises\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Reglements\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

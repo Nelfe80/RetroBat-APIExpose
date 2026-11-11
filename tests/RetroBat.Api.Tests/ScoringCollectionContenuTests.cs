@@ -31,7 +31,8 @@ public class ScoringCollectionContenuTests
     {
         SystemId = "arcade",
         RomGroup = "double-dragon",
-        ContentHashes = new ContentHashes { Md5 = ["22beac4a170b45ed13da71baa1426074"], Sha1 = [Sha1Technos] },
+        // (11/11) le profil reel publie aussi le md5 du nom de set « ddragon » : c'est lui qui NOMME le set.
+        ContentHashes = new ContentHashes { Md5 = ["22beac4a170b45ed13da71baa1426074", NelfePlayScoringCollectionSyncService.Md5DuNomDeSet("ddragon")], Sha1 = [Sha1Technos] },
     };
 
     private static InstalledGame Arcade(string chemin, string? md5 = null) => new(
@@ -75,11 +76,13 @@ public class ScoringCollectionContenuTests
     }
 
     [Fact]
-    public void Un_zip_identique_a_celui_du_profil_suffit()
+    public void Un_zip_identique_a_celui_du_profil_ne_suffit_plus_sous_un_autre_nom_de_set()
     {
+        // (11/11) le set NOMME fait l'identite : un zip renomme n'est plus le set (FBNeo ne le chargerait d'ailleurs pas).
         var fichier = Arcade("E:/roms/fbneo/renomme.zip", md5: "22beac4a170b45ed13da71baa1426074");
-
-        Assert.True(NelfePlayScoringCollectionSyncService.ContenuConfirme(fichier, DoubleDragon, Referentiel, AucunCalcul));
+        Assert.False(NelfePlayScoringCollectionSyncService.ContenuConfirme(fichier, DoubleDragon, Referentiel, AucunCalcul));
+        Assert.True(NelfePlayScoringCollectionSyncService.ContenuConfirme(Arcade("E:/roms/fbneo/ddragon.zip", md5: "22beac4a170b45ed13da71baa1426074"),
+            DoubleDragon, Referentiel, AucunCalcul));
     }
 
     // mspacmab (2026-10-18, chez un joueur) : bootleg de Ms. Pac-Man, meme sha1 declare que mspacman (un fichier partage).
@@ -112,10 +115,11 @@ public class ScoringCollectionContenuTests
     }
 
     [Fact]
-    public void Un_bootleg_nomme_par_le_MEM_entre()
+    public void Un_bootleg_nomme_par_le_MEM_n_entre_plus()
     {
+        // (11/11, regle des ROMs admises) : jamais un bootleg ni un hack.
         var jeu = MsPacMan("01052a074f9e7ce8dc823a5dd2155d14", NelfePlayScoringCollectionSyncService.Md5DuNomDeSet("mspacmab"));
-        Assert.True(NelfePlayScoringCollectionSyncService.ContenuConfirme(
+        Assert.False(NelfePlayScoringCollectionSyncService.ContenuConfirme(
             Arcade("E:/roms/mame/MSPACMAB.zip"), jeu, ReferentielPacMan, AucunCalcul, Bootlegs));
     }
 
@@ -126,8 +130,9 @@ public class ScoringCollectionContenuTests
         var empreintes = new ContentHashes { Md5 = ["01052a074f9e7ce8dc823a5dd2155d14"], Sha1 = [Sha1MsPacMan] };
         Assert.True(NelfePlayScoringReporter.BootlegHorsDefinition("arcade", "ms-pac-man", "mspacmab", empreintes, Bootlegs));
         Assert.False(NelfePlayScoringReporter.BootlegHorsDefinition("arcade", "ms-pac-man", "mspacman", empreintes, Bootlegs));
+        // (11/11) meme nomme, un bootleg n'est jamais soumis.
         var nomme = new ContentHashes { Md5 = [NelfePlayScoringCollectionSyncService.Md5DuNomDeSet("mspacmab")] };
-        Assert.False(NelfePlayScoringReporter.BootlegHorsDefinition("arcade", "ms-pac-man", "mspacmab", nomme, Bootlegs));
+        Assert.True(NelfePlayScoringReporter.BootlegHorsDefinition("arcade", "ms-pac-man", "mspacmab", nomme, Bootlegs));
         // Une console s'identifie par son contenu mesure : la regle ne la touche pas.
         Assert.False(NelfePlayScoringReporter.BootlegHorsDefinition("megadrive", "sonic", "mspacmab", empreintes, Bootlegs));
     }

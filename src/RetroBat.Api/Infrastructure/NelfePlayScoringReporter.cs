@@ -976,9 +976,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return o;
     }
 
-    internal static JsonObject ContentArtifact(string? sha, string? md5, string? sha1, string? sansEnTete = null)
+    internal static JsonObject ContentArtifact(string? sha, string? md5, string? sha1, string? sansEnTete = null, string? standardVideo = null)
     {
         var o = Triple(sha);
+        // (11/11) La version PAL (50 Hz) d'un jeu console, prouvee par son .MEM : le site la classera a part (classement PAL),
+        // jamais avec la version NTSC. Absent pour une version NTSC ; un site qui ne le connait pas l'ignore.
+        if (standardVideo is not null) o["video_standard"] = standardVideo;
         if (md5 is not null) o["md5"] = md5;     // Voie A : md5 No-Intro de la ROM (consoles)
         if (sha1 is not null) o["sha1"] = sha1;  // MAME : sha1 du set (gamelist), MAME vérifiant le romset
         // Le md5 sans en-tete, a la RetroAchievements (08/11) : le meme jeu sous un autre en-tete (iNES, NES 2.0, copieur).
@@ -1274,7 +1277,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 certifiable = false;
                 reason = "content.bootleg_unnamed";
-                Trace($"prevol : {GetString(attestation, "ContentSet")} est un bootleg ou un hack que le .MEM ne nomme pas, non certifiable");
+                Trace($"prevol : {GetString(attestation, "ContentSet")} est un bootleg ou un hack, non certifiable");
+            }
+            else if (SetNonNomme(systemId, romGroup, GetString(attestation, "ContentSet")))
+            {
+                certifiable = false;
+                reason = "content.set_unnamed";
+                Trace($"prevol : le set {GetString(attestation, "ContentSet")} n'est pas nommé par la définition de score, non certifiable");
+            }
+            // LA ROM ADMISE (11/11) : le site accepte encore les hacks du meme groupe du referentiel ; la borne le dit avant.
+            RomAdmission.Decision? romExclue = null;
+            if (VerdictDuContenu(systemId, romGroup, GetString(attestation, "ContentMd5"), SansEnTetePour(GetString(attestation, "ContentMd5")),
+                    speedrun: false) is { Admise: false } exclu)
+            {
+                certifiable = false;
+                reason = "content.excluded_dump";
+                romExclue = exclu;
+                Trace($"prevol : ROM exclue du scoring : {exclu.Message}");
             }
             var force = (GetString(attestation, "ForcedOptions") ?? "").Length > 0;
             // Les reglages du JEU que le forcage a remis d'usine (DIP), nommes au joueur : il les avait
@@ -1433,6 +1452,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 // du joueur, et passe en orange quand la partie ne sera pas classee.
                 var (titreAffiche, detailAffiche) = AnnonceLocalisee(Langue(), certifiable, reason, dangers, force, remisDUsine);
                 if (horsLigne && certifiable && dangers.Count == 0) detailAffiche = Texte("scoring_offline_certifiable_sub");
+                // La ROM exclue se dit avec la ROM attendue (11/11) : le joueur sait quoi changer.
+                if (romExclue is { RomAttendue: { Length: > 0 } attendue }) detailAffiche = $"{detailAffiche}. ROM attendue : {attendue}";
                 _overlay.ShowTop("SCORING", titreAffiche, detailAffiche, 6000, alerte: !(certifiable && dangers.Count == 0), auDeck: NoticeDuPrevol(certifiable, reason, dangers, force, remisDUsine, horsLigne));
             }
             else
@@ -1755,14 +1776,55 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         string? sansEnTete = null)
         => NelfePlayScoringCollectionSyncService.GroupeOuvertDuContenu(systemId, md5, sha256, stateRoot, sansEnTete) ?? romGroupDuWrapper;
 
+    /// <summary>
+    /// LA ROM ADMISE (11/11, rapport de Gogerad) : le verdict de la regle des ROMs admises (<see cref="RomAdmission"/>) sur le
+    /// contenu MESURE d'une partie console. Exclu (hack, pirate, traduction, Virtual Console, version non prouvee, pas la ROM
+    /// des etats d'un speedrun), il n'est jamais soumis : le site acceptait ces dumps, parce qu'il les range sous le meme groupe
+    /// du referentiel. Null pour l'arcade (le set y est l'identite, BootlegHorsDefinition) ou sans md5 mesure.
+    /// </summary>
+    internal static RomAdmission.Decision? VerdictDuContenu(string? systemId, string? romGroup, string? md5, string? sansEnTete, bool speedrun,
+        ContentHashes? empreintes = null, RomAdmission.IReferentiel? referentiel = null, string? cheminMem = null, string? racineEtats = null)
+    {
+        var systeme = RomCanonicalResolver.CanonicalScoringSystem(systemId ?? string.Empty);
+        if (string.IsNullOrEmpty(systeme) || systeme == "arcade" || string.IsNullOrEmpty(romGroup) || string.IsNullOrWhiteSpace(md5)) return null;
+        var jeu = new OpenGame
+        {
+            SystemId = systeme, RomGroup = romGroup,
+            ContentHashes = empreintes ?? NelfePlayScoringCollectionSyncService.EmpreintesOuvertes(romGroup),
+        };
+        if (!speedrun && jeu.ContentHashes is null) return null;   // jeu non ouvert ou index absent : le site tranchera
+        var dump = new InstalledGame(systeme, systeme, romGroup, string.Empty, romGroup, md5, null, false,
+            cheminMem ?? Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.RamResourcesRoot, systeme, romGroup + ".MEM"));
+        return NelfePlayScoringCollectionSyncService.JugerLeDump(dump, jeu, speedrun, referentiel ?? RomAdmission.ReferentielSurDisque.Borne,
+            _ => md5, _ => sansEnTete, racineEtats);
+    }
+
     internal static bool BootlegHorsDefinition(string? systemId, string? romGroup, string? contentSet,
         ContentHashes? empreintes = null, Func<string?, string?, bool>? bootlegOuHack = null)
     {
         var set = SetArcade(systemId, contentSet);
         if (set is null || string.IsNullOrEmpty(romGroup)) return false;
-        if (!(bootlegOuHack ?? GamelistIdentity.DeclaredBootlegOrHack)(systemId, set)) return false;
-        var md5 = (empreintes ?? NelfePlayScoringCollectionSyncService.EmpreintesOuvertes(romGroup))?.Md5 ?? [];
-        return !md5.Contains(NelfePlayScoringCollectionSyncService.Md5DuNomDeSet(set), StringComparer.OrdinalIgnoreCase);
+        // (11/11, regle des ROMs admises) jamais un bootleg ni un hack, meme nomme par le .MEM.
+        return (bootlegOuHack ?? GamelistIdentity.DeclaredBootlegOrHack)(systemId, set);
+    }
+
+    /// <summary>
+    /// LE SET NOMME (11/11) : un set d'arcade ne vaut que si le .MEM le nomme (md5 de son nom de set publie par le profil ou
+    /// ecrit au .MEM, ou zip « set.zip » nomme par un libelle du .MEM). Sinon c'est un clone que la definition n'a pas prouve,
+    /// et son sha1 declare n'est souvent que celui d'un fichier partage (19xxu sous 19xx, mslug3h, doubledr au BIOS Neo-Geo).
+    /// Faux pour une console, un set inconnu, ou un jeu dont l'index des jeux ouverts manque (le site tranchera).
+    /// </summary>
+    internal static bool SetNonNomme(string? systemId, string? romGroup, string? contentSet, ContentHashes? empreintes = null, string? cheminMem = null)
+    {
+        var set = SetArcade(systemId, contentSet);
+        if (set is null || string.IsNullOrEmpty(romGroup)) return false;
+        var publies = (empreintes ?? NelfePlayScoringCollectionSyncService.EmpreintesOuvertes(romGroup))?.Md5;
+        if (publies is null) return false;
+        var nom = NelfePlayScoringCollectionSyncService.Md5DuNomDeSet(set);
+        if (publies.Contains(nom, StringComparer.OrdinalIgnoreCase)) return false;
+        var duMem = RomAdmission.DumpsDuMem(cheminMem ?? Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.RamResourcesRoot, "arcade", romGroup + ".MEM"));
+        if (duMem.ContainsKey(nom)) return false;
+        return !duMem.Values.Any(l => l.StartsWith(set + ".zip", StringComparison.OrdinalIgnoreCase) || l.StartsWith(set + ".7z", StringComparison.OrdinalIgnoreCase));
     }
 
     internal static string? Sha1Declare(string? systemId, string? romGroup, string? contentSet)
@@ -3268,6 +3330,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             Trace("defi de speedrun : STOP, pas d'attestation");
             return;
         }
+        // LA ROM DES ETATS DE DEPART (11/11) : un speedrun ne vaut que sur la version de reference du jeu.
+        if (VerdictDuContenu(systemId, romGroup, contentMd5, SansEnTetePour(contentMd5), speedrun: true) is { Admise: false } horsReference)
+        {
+            Trace($"defi de speedrun : STOP, {horsReference.Message}");
+            if (_esNotify is not null)
+                await _esNotify.NotifyAsync("Défi : temps non envoyé. " + horsReference.Message, cancellationToken).ConfigureAwait(false);
+            return;
+        }
 
         // LE FILM DE L'EPREUVE (03/11) : l'enregistrement qui contient la tentative retenue (une relance peut en ouvrir un
         // autre), et ses bornes, de peu avant le depart a peu apres l'arrivee. Sans elles, le rendu filmait toute la seance.
@@ -3668,7 +3738,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
         if (BootlegHorsDefinition(systemId, romGroup, contentSet))
         {
-            Trace($"STOP: {contentSet} est un bootleg ou un hack que le .MEM ne nomme pas : aucune identite certifiable");
+            Trace($"STOP: {contentSet} est un bootleg ou un hack : aucune identite certifiable");
+            return;
+        }
+        if (SetNonNomme(systemId, romGroup, contentSet))
+        {
+            Trace($"STOP: le set {contentSet} n'est pas nomme par la definition de score (clone non prouve), rien n'est envoye");
+            return;
+        }
+        var verdictDuContenu = VerdictDuContenu(systemId, romGroup, contentMd5, SansEnTetePour(contentMd5), speedrun: false);
+        if (verdictDuContenu is { Admise: false } exclu)
+        {
+            Trace($"STOP: ROM exclue du scoring, rien n'est envoye : {exclu.Message}");
             return;
         }
 
@@ -4186,7 +4267,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             },
             ["artifacts"] = new JsonObject
             {
-                ["core"] = CoreArtifact(coreSha, coreName, coreVersion), ["content"] = ContentArtifact(contentSha, contentMd5, contentSha1, contentSansEnTete), ["mem"] = Triple(memSha),
+                ["core"] = CoreArtifact(coreSha, coreName, coreVersion), ["content"] = ContentArtifact(contentSha, contentMd5, contentSha1, contentSansEnTete,
+                    VerdictDuContenu(systemId, romGroup, contentMd5, contentSansEnTete, speedrun: false)?.Statut == RomAdmission.Statut.Pal ? "pal" : null),
+                ["mem"] = Triple(memSha),
                 ["core_options_digest"] = coreOptionsDigest,
                 ["bios"] = bios ?? new JsonObject { ["mode"] = "none" },
                 ["forced_options"] = forcedOptions,
@@ -4817,7 +4900,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "metric.spike" => "lecture isolée : le score ne suit pas la partie, à vérifier",
         "metric.single_sample" => "une seule lecture du score sur toute la partie : mets APIExpose à jour",
         "profile.content_mismatch" => "ROM non reconnue",
-        "content.bootleg_unnamed" => "version bootleg ou hack, absente de la définition du jeu",
+        "content.bootleg_unnamed" => "version bootleg ou hack",
+        "content.set_unnamed" => "set d'arcade que la définition du jeu ne nomme pas (clone non prouvé)",
+        "content.excluded_dump" => "ROM exclue du scoring (hack, pirate, traduction, réédition ou version non prouvée)",
         "profile.mem_mismatch" => "définition mémoire non reconnue",
         "profile.core_options_mismatch" => "réglages en attente de conformité",
         "profile.listener_unauthorized" => "listener non homologué (wrapper ou plugin MAME)",

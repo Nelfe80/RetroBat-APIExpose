@@ -1,0 +1,150 @@
+-- 2026-11-09 : options en GAME_DIFFICULTY a " neq " sur la valeur d usine : seule une valeur changee parle, et le
+-- contexte ne revient jamais a l usine par un signal (une coupure automatique apres des allers-retours ne peut rien cacher).
+-- vies sans jauge ni boss (0xEF82 joueur 1, 0xF082 joueur 2, max=1 : 255 au game over, 255 -> 2 au continue) ;
+-- les compteurs de vie des boss passent en BOSS_HIT ; drapeaux "Dead" de la jauge de vie retires ; 0xF099 est le score
+-- du joueur 2 ; options du menu (difficulte, vies, round) en GAME_DIFFICULTY ; CONTINUES sur les credits 0xEFA4 (le
+-- continue remet le score a 0 et repart du stage en cours). Mesures sous Genesis Plus GX.
+-- mem-curator v5.0.0 (2026-07-12) profile=wrapper
+return {
+  game = {
+    title = "Streets of Rage 2",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "streets-of-rage-2",
+    hashes = {
+      { hash = "782c722ecc60d00456869563acba23e9", label = "Streets of Rage 2 (USA) (Ru) (Shedevr).md" },
+      { hash = "c53faea21ca58de2282a8f1a210527ba", label = "Streets of Rage II (Japan, Europe) (En,Ja).md" },
+      { hash = "cb75d5a6919b61efe917bea5762c1cb7", label = "Streets of Rage 2 (USA).md" },
+      { hash = "f22b80a555d989119286ab5bc9bd0a24", label = "Streets of Rage 2 (USA) (Ru) (Shedevr) (f1).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      settings = {
+        { address=0XFD04, type="u8", condition="neq", value=0X04, action="GAME_DIFFICULTY", desc="Options: difficulty other than normal (0 very easy, 2 easy, 4 normal, 6 hard, 8 hardest, 10 mania)" },
+        { address=0XFD06, type="u8", condition="neq", value=0X02, action="GAME_DIFFICULTY", desc="Options: lives per credit other than 3 (value = lives minus one)" },
+        { address=0XFD0E, type="u8", condition="neq", value=0X00, action="GAME_DIFFICULTY", desc="Round select other than round 1" },
+      },
+      lifecycle = {
+        { address=0XEFA4, type="u8", condition="change", action="CONTINUES", player=1, desc="P1 credits left (3 at START, -1 at each game over, before the continue choice)" },
+        { address=0XEF82, type="u8", condition="eq", value=0XFF, action="CONTINUE_SCREEN", desc="Game Over/Continue" },
+        { address=0XEFA4, type="u8", condition="eq", value=0X00, action="GAME_OVER", desc="Game Over" },
+        { address=0XEFA4, type="u8", condition="eq", value=0X01, action="CREDITS_SCREEN", desc="Final Credit" },
+        { address=0XF082, type="u8", condition="eq", value=0XFF, action="CONTINUE_SCREEN", desc="Game Over/Continue" },
+        { address=0XF0A4, type="u8", condition="eq", value=0X00, action="GAME_OVER", desc="Game Over" },
+        { address=0XF0A4, type="u8", condition="eq", value=0X01, action="CREDITS_SCREEN", desc="Final Credit" },
+        { address=0XFC02, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", desc="Title Screen" },
+        { address=0XFC02, type="u8", condition="eq", value=0X08, action="DEMO_MODE", desc="Demo" },
+        { address=0XFC02, type="u8", condition="eq", value=0X28, action="CREDITS_SCREEN", desc="Credits/Best 10 Players" },
+        { address=0XFC42, type="u8", condition="eq", value=0X10, action="CREDITS_SCREEN", desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA20F, type="u8", condition="change", action="LEVEL_CLEAR", desc="Level Complete :e0" },
+        { address=0XFCC8, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", desc="False" },
+        { address=0XFCC8, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", desc="True" },
+        { address=0XFD04, type="u8", condition="change", action="NEW_LEVEL", desc="Options: Difficulty Level" },
+        { address=0XFD04, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", desc="Very Easy //cheat" },
+        { address=0XFD04, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", desc="Easy" },
+        { address=0XFD04, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", desc="Normal" },
+        { address=0XFD04, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", desc="Hard" },
+        { address=0XFD04, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", desc="Hardest" },
+        { address=0XFD04, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", desc="Mania //cheat" },
+      },
+      stage = {
+        { address=0XF578, type="u32be", condition="change", action="PROGRESSION_STAGE", desc="[32-bit BE] Stage 6 - Hakuyo Name 1/2" },
+        { address=0XF578, type="u32be", condition="eq", value=0X4148554B, action="PROGRESSION_STAGE", desc="AHUK" },
+        { address=0XF57C, type="u16be", condition="change", action="PROGRESSION_STAGE", desc="[16-bit BE] Stage 6 - Hakuyo Name 2/2" },
+        { address=0XF57C, type="u16be", condition="eq", value=0X4F59, action="PROGRESSION_STAGE", desc="OY" },
+        { address=0XF580, type="u8", condition="change", action="PROGRESSION_STAGE", desc="Stage 6 - Hakuyo Health" },
+        { address=0XF580, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", desc="Dead" },
+        { address=0XF580, type="u8", condition="eq", value=0X50, action="PROGRESSION_STAGE", desc="Max" },
+        { address=0XFC42, type="u8", condition="change", action="PROGRESSION_STAGE", desc="Stage ID" },
+        { address=0XFC42, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", desc="Stage 1" },
+        { address=0XFC42, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", desc="Stage 2" },
+        { address=0XFC42, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", desc="Stage 3" },
+        { address=0XFC42, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", desc="Stage 4" },
+        { address=0XFC42, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", desc="Stage 5" },
+        { address=0XFC42, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", desc="Stage 6" },
+        { address=0XFC42, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", desc="Stage 7" },
+        { address=0XFC42, type="u8", condition="eq", value=0X0E, action="PROGRESSION_STAGE", desc="Stage 8" },
+        { address=0XFC44, type="u8", condition="change", action="PROGRESSION_STAGE", desc="Sub-Stage ID" },
+        { address=0XFD0E, type="u8", condition="change", action="PROGRESSION_STAGE", desc="Options: Round Selected (Stage)" },
+        { address=0XFD0E, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", desc="Round 1 //Mem : 0 to block cheat" },
+        { address=0XFD0E, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", desc="Round 8" },
+        { address=0XFD12, type="u8", condition="change", action="PROGRESSION_STAGE", desc="Stage Selected in Duel Game" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XEF82, type="u8", condition="increase", action="GAIN_LIFE", player=1, max=1, desc="Player 1 Lives Remaining increased" },
+        { address=0XEF82, type="u8", condition="decrease", action="LOSE_LIFE", player=1, max=1, desc="Player 1 Lives Remaining decreased" },
+        { address=0XEF82, type="u8", condition="eq", value=0X00, action="LIVES_STATE", desc="1" },
+        { address=0XF082, type="u8", condition="increase", action="GAIN_LIFE", player=2, max=1, desc="Player 2 Lives Remaining increased" },
+        { address=0XF082, type="u8", condition="decrease", action="LOSE_LIFE", player=2, max=1, desc="Player 2 Lives Remaining decreased" },
+        { address=0XF082, type="u8", condition="eq", value=0X00, action="LIVES_STATE", desc="1" },
+        { address=0XF180, type="u8", condition="change", action="BOSS_HIT", desc="Boss life" },
+        { address=0XF182, type="u8", condition="change", action="BOSS_HIT", desc="Boss lifebar number count" },
+        { address=0XF282, type="u8", condition="change", action="BOSS_HIT", desc="Boss lifebar number count" },
+        { address=0XF382, type="u8", condition="change", action="BOSS_HIT", desc="Boss lifebar number count" },
+        { address=0XF482, type="u8", condition="change", action="BOSS_HIT", desc="Boss 3 lifebar number count" },
+        { address=0XF582, type="u8", condition="change", action="BOSS_HIT", desc="Boss 2 lifebar number count" },
+      },
+      health = {
+        { address=0XEF00, type="u8", condition="eq", value=0X04, action="HIT", desc="Take Damage" },
+        { address=0XEF80, type="u8", condition="change", action="HEALTH_STATE", desc="Player 1 Health" },
+        { address=0XEF80, type="u8", condition="eq", value=0X68, action="HEALTH_STATE", desc="Max" },
+        { address=0XF080, type="u8", condition="change", action="HEALTH_STATE", desc="Player 2 Health" },
+        { address=0XF080, type="u8", condition="eq", value=0X68, action="HEALTH_STATE", desc="Max" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XEF00, type="u8", condition="eq", value=0X2E, action="WEAPON_STATE", desc="Throw Weapon" },
+        { address=0XEF00, type="u8", condition="eq", value=0X30, action="WEAPON_STATE", desc="Hit with Weapon" },
+        { address=0XEF33, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", desc="Yes" },
+        { address=0XEF38, type="u8", condition="eq", value=0X3C, action="WEAPON_STATE", desc="Knife" },
+        { address=0XEF38, type="u8", condition="eq", value=0X3E, action="WEAPON_STATE", desc="Pipe" },
+        { address=0XEF38, type="u8", condition="eq", value=0X46, action="WEAPON_STATE", desc="Bomb" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XEF96, type="u8", condition="change", action="SCORE_STATE", player=1, score_kind="game", score_mask="00XX00", score_encoding="bcd", desc="[8-bit BCD] Player 1 Score: 00XX00" },
+        { address=0XEF97, type="u8", condition="change", action="SCORE_STATE", player=1, score_kind="game", score_mask="XX0000", score_encoding="bcd", desc="[8-bit BCD] Player 1 Score: XX0000" },
+        { address=0XEF99, type="u8", condition="change", action="SCORE_STATE", player=1, score_kind="game", score_mask="0000XX", score_encoding="bcd", desc="[8-bit BCD] Player 1 Score: 0000XX" },
+        { address=0XF096, type="u8", condition="change", action="SCORE_STATE", player=2, score_kind="game", score_mask="00XX00", score_encoding="bcd", desc="[8-bit BCD] Player 2 Score: 00XX00" },
+        { address=0XF097, type="u8", condition="change", action="SCORE_STATE", player=2, score_kind="game", score_mask="XX0000", score_encoding="bcd", desc="[8-bit BCD] Player 2 Score: XX0000" },
+        { address=0XF099, type="u8", condition="change", action="SCORE_STATE", player=2, score_kind="game", score_mask="0000XX", score_encoding="bcd", desc="[8-bit BCD] Player 2 Score: 0000XX" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XF10C, type="u8", condition="change", action="BOSS_HIT", desc="Boss enemy type" },
+        { address=0XF110, type="u8", condition="change", action="BOSS_HIT", desc="Boss/enemy behavior" },
+        { address=0XF40C, type="u8", condition="change", action="BOSS_HIT", desc="Boss 3 type" },
+        { address=0XF480, type="u8", condition="change", action="BOSS_HIT", desc="Boss 3 HP" },
+        { address=0XF50C, type="u8", condition="change", action="BOSS_HIT", desc="Boss 2 type" },
+        { address=0XF5DF, type="u8", condition="eq", value=0X08, action="BOSS_HIT", desc="active;" },
+        { address=0XF5DF, type="u8", condition="eq", value=0X09, action="BOSS_HIT", desc="before fight;" },
+        { address=0XF5DF, type="u8", condition="eq", value=0X0A, action="BOSS_DEFEATED", desc="defeated" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XEF00, type="u8", condition="eq", value=0X18, action="JUMPING", no_log=true, no_survey=true, desc="Jumping" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XFC3D, type="u8", condition="change", action="GENERAL_TIMER", timer_kind="game", timer_role="level", timer_direction="countdown", timer_unit="second", desc="Time Remaining, secs" },
+      },
+    },
+  },
+}
