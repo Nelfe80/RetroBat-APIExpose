@@ -4196,6 +4196,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             : Crypto.Sha256Hex("core-options@default");
         if (!string.IsNullOrEmpty(coreOptions))
             _logger?.LogInformation("Scoring Phase E : réglages gameplay = [{Options}] → core_options_digest={Digest} (à épingler ; brut = [{Raw}])", coreOptions, coreOptionsDigest, coreOptionsRaw);
+        // DANS LE JOURNAL DU SUPPORT AUSSI (11/11, Blazing Star de neogeoff en `settings.unknown`) : le rapport de support joint
+        // nelfe_scoring.log, pas le journal de l'API ; sans cette ligne, impossible de dire quel reglage differait de l'usine.
+        Trace($"réglages gameplay : [{coreOptions}] → {coreOptionsDigest[..16]}");
 
         string ruleset = profile.GetProperty("ruleset").GetString() ?? "";
         long profileVersion = profile.GetProperty("profile_version").GetInt64();
