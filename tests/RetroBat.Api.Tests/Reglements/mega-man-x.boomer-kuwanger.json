@@ -1,0 +1,131 @@
+{
+  "schema": "nelfe.challenge.v2",
+  "challenge_id": "mega-man-x.boomer-kuwanger",
+  "version": 1,
+  "ruleset": "ch-mmx-boomer-kuwanger-v1",
+  "order": 5,
+  "title": {
+    "fr": "Boomer Kuwanger",
+    "en": "Boomer Kuwanger"
+  },
+  "summary": {
+    "fr": "De l'arrivée de X dans le stage au dernier coup porté à Boomer Kuwanger, sans mourir, partie neuve sans armure ni arme",
+    "en": "From X landing in the stage to the final hit on Boomer Kuwanger, without dying, new game with no armor or weapons"
+  },
+  "kind": "speedrun_level",
+  "game": {
+    "system_id": "snes",
+    "rom_group": "mega-man-x"
+  },
+  "mem_sha256": "8c9e54040f23fe4f64796f21699fc11d547c6f0897c3830bad58401d9bea98d2",
+  "start_policy": "canonical_state",
+  "state": {
+    "name": "boomer-kuwanger-entree-snes9x",
+    "sha256": "d30cfc992d36d3bb32611e9245359814b4afe846c94587282b43fcc7722afa70",
+    "file": "snes/mega-man-x/boomer-kuwanger-entree.state"
+  },
+  "start": [
+    {
+      "value": {
+        "address": "0x1F7A",
+        "equals": "0x07"
+      }
+    },
+    {
+      "value": {
+        "address": "0x1F81",
+        "equals": "0x00"
+      }
+    }
+  ],
+  "timing": {
+    "official": "independent",
+    "independent": {
+      "start": {
+        "event": {
+          "action": "GAME_PLAYING",
+          "address": "0x0BAA",
+          "value": "0x00"
+        },
+        "when": [
+          {
+            "value": {
+              "address": "0x1F7A",
+              "equals": "0x07"
+            }
+          },
+          {
+            "value": {
+              "address": "0x1F81",
+              "equals": "0x00"
+            }
+          },
+          {
+            "value": {
+              "address": "0x0BCF",
+              "equals": "0x10"
+            }
+          }
+        ]
+      },
+      "finish": {
+        "event": {
+          "action": "BOSS_HIT",
+          "address": "0x0E68",
+          "value": "0xFF"
+        }
+      }
+    }
+  },
+  "finish_confirm": {
+    "event": {
+      "action": "WEAPON_STATE",
+      "address": "0x1F94",
+      "value": "0x40"
+    },
+    "cleared_by": [
+      {
+        "event": {
+          "action": "LOSE_LIFE",
+          "address": "0x0BAA",
+          "value": "0x0C"
+        }
+      }
+    ]
+  },
+  "fail": [
+    {
+      "event": {
+        "action": "LOSE_LIFE",
+        "address": "0x0BAA",
+        "value": "0x0C"
+      }
+    }
+  ],
+  "void": [
+    "save_state_load",
+    "rewind",
+    "runahead",
+    "fast_forward",
+    "cheats",
+    "netplay",
+    "pause_clock_gap",
+    {
+      "event": {
+        "action": "PAUSE_ON",
+        "address": "0x00C9",
+        "value": "0x20"
+      }
+    }
+  ],
+  "ranking": {
+    "metric": "frames",
+    "direction": "lower_better"
+  },
+  "cores": [
+    "snes9x"
+  ],
+  "runtime": {
+    "frame_rate": 60.098812
+  }
+}

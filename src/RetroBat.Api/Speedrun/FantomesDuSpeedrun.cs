@@ -73,6 +73,8 @@ public sealed partial class FantomesDuSpeedrun
         new("megadrive", "sonic-the-hedgehog-2", "genesis_plus_gx", "genesis_plus_gx_ghosts", "24ab4c3a", true, "Sonic The Hedgehog 2 (World)"),
         // Rocket Knight Adventures (06/11) : les stages seulement (etat du portrait) ; profil en fichier (a6efec47.ini).
         new("megadrive", "rocket-knight-adventures", "genesis_plus_gx", "genesis_plus_gx_ghosts", "a6efec47", true, "Rocket Knight Adventures (USA)"),
+        // Mega Man X (USA) (Rev 1) (11/11) : les huit stages des Mavericks (etat d'entree, READY) ; profil en fichier (ded53c64.ini).
+        new("snes", "mega-man-x", "snes9x", "snes9x_ghosts", "ded53c64", true, "Mega Man X (USA) (Rev 1)"),
     ];
 
     /// <summary>Les jeux a coeur hote, tels que l'API les connait : l'outil de diagnostic les lit ici (GET /api/v1/speedrun/ghost-hosts).</summary>
