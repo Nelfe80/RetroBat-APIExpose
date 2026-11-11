@@ -734,13 +734,27 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
     }
 
+    /// <summary>
+    /// CE QUE LE SCORING IGNORE PENDANT LA LECTURE D'UN REPLAY. Le filet d'origine ignorait TOUT tant que le lecteur etait
+    /// occupe, y compris pendant qu'il telechargeait : le 11/11 (support de neogeoff), le lancement de Ketsui et l'attestation
+    /// du wrapper sont tombes dans ces secondes-la, et le record (1 133 103) est parti avec l'identite du jeu d'avant
+    /// (profile.content_mismatch). Le lancement et la fin d'une partie viennent d'ES ou de l'API, jamais d'une lecture : ils
+    /// passent toujours. Et une fois qu'une partie du joueur a commence, ce qui arrive est a elle (le lecteur lui cede). Pur.
+    /// </summary>
+    internal static bool IgnorePendantUneLecture(bool lectureOccupee, bool partieDuJoueur, string? type)
+    {
+        if (!lectureOccupee || partieDuJoueur) return false;
+        var t = type?.ToLowerInvariant();
+        return t is not ("ui.game.started" or "ui.game.ended");
+    }
+
     private void HandleEvent(EventEnvelope envelope)
     {
         if (!Enabled) return;
         // La lecture d'un replay n'est pas une partie : rien de ce qui arrive pendant qu'elle
         // tourne (attestation, scores, session) ne doit ni prevenir le joueur ni soumettre quoi
         // que ce soit. Le lecteur emploie le vrai core, sans wrapper ; ceci est le filet.
-        if (_playback?.IsBusy == true) return;
+        if (IgnorePendantUneLecture(_playback?.IsBusy == true, _playback?.PartieEnCours == true, envelope.Type)) return;
         try
         {
             switch (envelope.Type?.ToLowerInvariant())

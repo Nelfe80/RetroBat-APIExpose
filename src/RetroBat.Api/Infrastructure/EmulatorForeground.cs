@@ -110,6 +110,9 @@ public static class EmulatorForeground
     /// </summary>
     private static string FichierDuRendu => Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay", "rendu-en-cours.txt");
 
+    /// <summary>Le processus du RetroArch de rendu en cours, ou 0.</summary>
+    public static int ProcessusDuRendu => _processusDuRendu;
+
     public static void NoterLeRendu(int processus)
     {
         _processusDuRendu = processus;

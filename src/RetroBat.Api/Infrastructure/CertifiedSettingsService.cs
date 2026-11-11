@@ -320,8 +320,10 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
                 EffacerSaufVerrous();
                 return;
             }
-            // La lecture d'un replay n'est pas une partie : rien a forcer, rien a neutraliser.
-            if (_playback?.IsBusy == true) return;
+            // La lecture d'un replay n'est pas une partie : rien a forcer, rien a neutraliser. Le lancement d'un jeu, lui, vient
+            // toujours d'ES ou de l'API, jamais d'une lecture : il se prepare meme quand une lecture se prepare encore (11/11,
+            // Ketsui de neogeoff lance pendant le telechargement d'un replay ; la lecture lui cede).
+            if (selection && _playback?.IsBusy == true) return;
 
             var jeu = selection ? _context.Ui.Selected : (_context.Ui.Running ?? _context.Ui.Selected);
             var chemin = jeu?.GamePath;

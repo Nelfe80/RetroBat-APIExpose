@@ -83,6 +83,140 @@ public sealed class ReplayPlaybackService
         _ra = ra; _manifests = manifests; _objects = objects; _meta = meta; _source = source; _resolver = resolver;
         _bus = bus; _agent = agent; _devices = devices; _httpFactory = httpFactory; _logger = logger;
         _manifestFetcher = manifestFetcher; _network = network;
+        _abonnement = _bus.Subscribe<EventEnvelope>(SurEvenement);
+    }
+
+    // ── LA PARTIE DU JOUEUR PASSE AVANT LA LECTURE (11/11, support de neogeoff) ─────────────────────────────────────
+    //
+    // Une lecture demandee depuis le panneau de classement telechargeait son replay (5 s) quand le joueur a lance Ketsui
+    // depuis ES. Sa garde (« pas de jeu en cours ») ne regardait qu'au moment de lancer, 1,5 s apres le lancement du jeu :
+    // le RetroArch du joueur ne repondait pas encore, la lecture a ouvert un second RetroArch. Pendant ces huit secondes,
+    // IsBusy a fait ignorer au scoring le lancement du jeu ET l'attestation du wrapper : la partie record (1 133 103) est
+    // partie avec l'identite du jeu d'avant et a ete refusee (profile.content_mismatch).
+    //
+    // Desormais : une partie qui commence (ES, lancement direct, MULTIPLAYER) annule la lecture qui se prepare et ferme
+    // le RetroArch d'une lecture deja lancee (son propre processus, sans commande reseau : le port 55355 est celui du jeu) ;
+    // aucune lecture ne part pendant une partie ni quand un autre RetroArch tourne.
+
+    private readonly IDisposable _abonnement;
+
+    /// <summary>Une partie du joueur est en cours (ui.game.started vu, pas encore ui.game.ended).</summary>
+    private volatile bool _partieEnCours;
+
+    /// <summary>La lecture en preparation a ete annulee par une partie : sa suite de fond ne lance plus rien.</summary>
+    private bool _cedee;
+
+    /// <summary>Vrai pendant une partie du joueur (pour le scoring : ce qui arrive alors est a lui).</summary>
+    public bool PartieEnCours => _partieEnCours;
+
+    internal void SurEvenement(EventEnvelope e)
+    {
+        switch (e.Type)
+        {
+            case "ui.game.started":
+                _partieEnCours = true;
+                _partieDepuis = DateTime.UtcNow;
+                CederALaPartie();
+                break;
+            case "ui.game.ended":
+                _partieEnCours = false;
+                break;
+        }
+    }
+
+    /// <summary>Ce qu'une partie qui commence fait d'une lecture dans cet etat. Pur.</summary>
+    internal static string? DecisionALaPartie(ReplayPlaybackState etat) => etat switch
+    {
+        ReplayPlaybackState.Resolving or ReplayPlaybackState.Replicating or ReplayPlaybackState.Verifying
+            or ReplayPlaybackState.Preparing => "annuler",
+        ReplayPlaybackState.Launching or ReplayPlaybackState.Playing or ReplayPlaybackState.Paused
+            or ReplayPlaybackState.Stopping => "fermer",
+        _ => null,
+    };
+
+    private void CederALaPartie()
+    {
+        Process? proc = null;
+        string? replayId;
+        string? decision;
+        lock (_gate)
+        {
+            decision = DecisionALaPartie(_state);
+            if (decision is null) return;
+            replayId = _replayId;
+            _cedee = true;
+            if (decision == "annuler")
+            {
+                _state = ReplayPlaybackState.Error;
+                _error = ReplayErrorCode.GameAlreadyRunning;
+                _errorDetail = "une partie commence";
+            }
+            else
+            {
+                proc = _process;
+                _process = null;
+                _state = ReplayPlaybackState.Idle;
+                _replayId = null; _frame = 0; _card = null; _paused = false;
+            }
+        }
+        _monitorCts?.Cancel();
+        // Son propre processus seulement : jamais de commande reseau, elle irait au RetroArch du joueur.
+        try { if (proc is { HasExited: false }) proc.Kill(entireProcessTree: true); } catch { /* deja parti */ }
+        _logger.LogWarning("Replay : une partie commence, lecture de {ReplayId} {Decision}.", replayId,
+            decision == "annuler" ? "annulee avant son lancement" : "fermee");
+        _ = Publish(decision == "annuler" ? "replay.failed" : "replay.finished",
+            decision == "annuler"
+                ? new { ReplayId = replayId, Code = ReplayErrorCode.GameAlreadyRunning.ToString() }
+                : new { replayId, reason = "game_started" });
+    }
+
+    private bool Cedee() { lock (_gate) return _cedee; }
+
+    private DateTime _partieDepuis;
+
+    /// <summary>
+    /// Une partie est-elle vraiment en cours ? La fin d'une partie peut manquer (ES qui plante) : passe 30 s apres son
+    /// annonce, sans lanceur ni RetroArch vivant, elle est finie.
+    /// </summary>
+    private bool PartieVivante()
+    {
+        if (!_partieEnCours) return false;
+        if (DateTime.UtcNow - _partieDepuis < TimeSpan.FromSeconds(30)) return true;
+        if (UnRetroArchTourne(RetroBat.Api.Infrastructure.EmulatorForeground.ProcessusDuRendu) || LanceurVivant()) return true;
+        _partieEnCours = false;
+        _logger.LogInformation("Replay : la partie annoncee n'a plus ni lanceur ni RetroArch, elle est tenue pour finie.");
+        return false;
+    }
+
+    private static bool LanceurVivant()
+    {
+        var lanceurs = Process.GetProcessesByName("emulatorLauncher");
+        foreach (var p in lanceurs) p.Dispose();
+        return lanceurs.Length > 0;
+    }
+
+    /// <summary>
+    /// Un RetroArch tourne deja (le jeu du joueur, un banc), hors celui du rendu video d'un film (port 55400, cache) : une
+    /// lecture ne doit pas en ouvrir un second, qui partagerait le port des commandes du jeu.
+    /// </summary>
+    internal static bool UnRetroArchTourne(int processusDuRendu)
+    {
+        foreach (var p in Process.GetProcesses())
+        {
+            try
+            {
+                if (p.ProcessName.StartsWith("retroarch", StringComparison.OrdinalIgnoreCase) && p.Id != processusDuRendu) return true;
+            }
+            catch (InvalidOperationException) { /* parti entre-temps */ }
+            finally { p.Dispose(); }
+        }
+        return false;
+    }
+
+    /// <summary>Pour les essais : pose l'etat d'une lecture sans rien lancer.</summary>
+    internal void PoserEtatPourEssai(ReplayPlaybackState etat, string? replayId = null)
+    {
+        lock (_gate) { _state = etat; _replayId = replayId; _cedee = false; }
     }
 
     /// <summary>Vrai pendant qu'une lecture est en cours (le recorder s'abstient d'enregistrer).</summary>
@@ -171,9 +305,16 @@ public sealed class ReplayPlaybackService
 
     public async Task<PlayResult> PlayAsync(string replayId, CancellationToken ct, string? regle = null)
     {
+        // Pendant une partie du joueur, aucune lecture (11/11) : elle prendrait son ecran et ferait taire son scoring.
+        if (PartieVivante())
+        {
+            _logger.LogInformation("Replay : lecture de {ReplayId} refusee, une partie est en cours.", replayId);
+            return new PlayResult(false, "error", ReplayErrorCode.GameAlreadyRunning);
+        }
         lock (_gate)
         {
             if (IsBusy) return new PlayResult(false, _state.ToString().ToLowerInvariant(), ReplayErrorCode.ReplayAlreadyRunning);
+            _cedee = false;
             _state = ReplayPlaybackState.Resolving; _replayId = replayId; _error = ReplayErrorCode.None; _errorDetail = null; _warning = null;
             _frame = 0; _paused = false; _card = null;
             _regle = RetroBat.Api.Scoring.ModesDeJeu.Est1LC(regle) ? regle : null;
@@ -299,6 +440,8 @@ public sealed class ReplayPlaybackService
     {
         var hint = meta?.Launch;
         var objectPath = _objects.ObjectPath(manifest.Object.Sha256);
+        // Une partie a commence pendant le telechargement : la lecture lui a cede, sa suite ne fait plus rien.
+        if (Cedee()) return new PlayResult(false, "error", ReplayErrorCode.GameAlreadyRunning);
 
         // R6 : intégrité (taille + SHA-256 == manifeste) AVANT lecture — un hash au LANCEMENT (une
         // fois), négligeable devant le démarrage RetroArch ; détecte corruption/altération.
@@ -315,7 +458,10 @@ public sealed class ReplayPlaybackService
         else _logger.LogInformation("Replay {ReplayId} : {Points} point(s) de contrôle.", replayId, points.Count);
 
         // ── vérification runtime (R2 MVP : présence ; empreintes strictes quand le manifeste les portera) ──
-        lock (_gate) { _state = ReplayPlaybackState.Verifying; _replayEnd = manifest.Frames.ReplayEnd;
+        lock (_gate)
+        {
+            if (_cedee) return new PlayResult(false, "error", ReplayErrorCode.GameAlreadyRunning);
+            _state = ReplayPlaybackState.Verifying; _replayEnd = manifest.Frames.ReplayEnd;
             _runStart = manifest.Frames.RunStart; _runEnd = manifest.Frames.RunEnd; _nominalFps = manifest.Frames.NominalFps;
             // Manifeste d'avant R3.2 : pas de provenance => la cadence n'a pas été vérifiée.
             _fpsSource = manifest.Frames.FpsSource ?? "default"; }
@@ -339,6 +485,11 @@ public sealed class ReplayPlaybackService
         lock (_gate) { _warning = resolved.Avertissement; }
 
         // ── pas de jeu déjà en cours (on lance notre propre RetroArch) ──
+        // Le port des commandes ne suffit pas (11/11) : un jeu lance a l'instant ne repond pas encore. Une partie annoncee
+        // (ui.game.started) ou un RetroArch vivant suffisent a refuser.
+        if (Cedee()) return new PlayResult(false, "error", ReplayErrorCode.GameAlreadyRunning);
+        if (PartieVivante() || UnRetroArchTourne(RetroBat.Api.Infrastructure.EmulatorForeground.ProcessusDuRendu))
+            return Fail(ReplayErrorCode.GameAlreadyRunning, "une partie ou un autre RetroArch tourne");
         var status = await _ra.GetStatusAsync(ct).ConfigureAwait(false);
         if (status is { ContentLoaded: true }) return Fail(ReplayErrorCode.GameAlreadyRunning);
 
@@ -406,7 +557,11 @@ public sealed class ReplayPlaybackService
         catch (Exception ex) { _logger.LogWarning(ex, "Replay : écriture du profil de session échouée (hotkeys non neutralisées)"); }
 
         // ── lancement ──
-        lock (_gate) _state = ReplayPlaybackState.Launching;
+        lock (_gate)
+        {
+            if (_cedee || _partieEnCours) return new PlayResult(false, "error", ReplayErrorCode.GameAlreadyRunning);
+            _state = ReplayPlaybackState.Launching;
+        }
         var exe = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "retroarch.exe");
         var psi = new ProcessStartInfo { FileName = exe, WorkingDirectory = Path.GetDirectoryName(exe)!, UseShellExecute = false };
         // Un replay de defi a verrous se relit par le wrapper, qui remet les memes verrous (D18).
@@ -426,7 +581,20 @@ public sealed class ReplayPlaybackService
         Process proc;
         try { proc = Process.Start(psi)!; }
         catch (Exception ex) { _logger.LogWarning(ex, "Replay : lancement RetroArch échoué"); return Fail(ReplayErrorCode.RetroArchUnavailable); }
-        lock (_gate) _process = proc;
+        bool cedeeAuLancement;
+        lock (_gate)
+        {
+            // Une partie a commence entre la garde et le demarrage : ce RetroArch-la se ferme aussitot.
+            cedeeAuLancement = _cedee || _partieEnCours;
+            if (!cedeeAuLancement) _process = proc;
+        }
+        if (cedeeAuLancement)
+        {
+            try { proc.Kill(entireProcessTree: true); } catch { /* deja parti */ }
+            proc.Dispose();
+            lock (_gate) { if (_state == ReplayPlaybackState.Launching) { _state = ReplayPlaybackState.Idle; _replayId = null; } }
+            return new PlayResult(false, "error", ReplayErrorCode.GameAlreadyRunning);
+        }
         LectureAvecVerrous.EffacerALaFin(manifest, proc);
         // Une lecture demandee depuis le web part derriere le navigateur : c'est lui qui a le
         // premier plan au moment ou RetroArch demarre. On le ramene devant des que sa fenetre
