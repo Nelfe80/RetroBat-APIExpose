@@ -139,7 +139,12 @@ public sealed class ReplayVideoRenderer
             WindowStyle = ProcessWindowStyle.Minimized,
         };
         // Un replay de defi a verrous se rend par le wrapper, qui remet les memes verrous (D18).
-        var (coeurDuRendu, refusDesVerrous) = RetroBat.Api.Replay.Playback.LectureAvecVerrous.Preparer(manifest, resolution.Runtime.CoreDll, resolution.Runtime.RomPath, psi);
+        // Un replay enregistre touche par touche se rend par le wrapper, masque refuse (11/11) : sinon le film derive.
+        var modeDesEntrees = RetroBat.Api.Replay.Playback.ModeDesEntrees.Lire(objet);
+        var (coeurDuRendu, refusDesVerrous) = RetroBat.Api.Replay.Playback.LectureAvecVerrous.Preparer(manifest, resolution.Runtime.CoreDll,
+            resolution.Runtime.RomPath, psi, mode: modeDesEntrees);
+        _logger.LogInformation("Video : {ReplayId}, entrees enregistrees en mode {Mode}, coeur du rendu {Coeur}.", replayId, modeDesEntrees,
+            Path.GetFileName(Path.GetDirectoryName(coeurDuRendu)) + "\\" + Path.GetFileName(coeurDuRendu));
         if (refusDesVerrous != RetroBat.Api.Replay.Models.ReplayErrorCode.None) return Echec("verrous_non_tenus");
         psi.ArgumentList.Add("-L"); psi.ArgumentList.Add(coeurDuRendu);
         psi.ArgumentList.Add(resolution.Runtime.RomPath);
