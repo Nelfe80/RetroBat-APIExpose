@@ -73,7 +73,10 @@ public sealed record InstantaneSpeedrun(
     [property: JsonPropertyName("allowedActions")] IReadOnlyList<ActionPermise> ActionsPermises,
     [property: JsonPropertyName("demo")] DemonstrationPubliee? Demonstration,
     // Les compteurs de la tentative (coups recus de Metal Slug 3 facilite, 03/11) ; vide sans compteur au reglement.
-    [property: JsonPropertyName("counters")] IReadOnlyDictionary<string, int>? Compteurs = null);
+    [property: JsonPropertyName("counters")] IReadOnlyDictionary<string, int>? Compteurs = null,
+    // (11/11, lot LS2 du Deck) les fantomes qui courent : { next, reference, list[{ id, label, tint, time_ms, status, role,
+    // splits[{ segment, ms }] }] } ; null sans fantome. Pose par le service, pas par la session.
+    [property: JsonPropertyName("ghosts")] FantomesPublies? Fantomes = null);
 
 /// <summary>
 /// UNE SESSION DE SPEEDRUN SUR LA BORNE (lot S3 du prototype Sonic) : un defi, un jeu lance, des tentatives

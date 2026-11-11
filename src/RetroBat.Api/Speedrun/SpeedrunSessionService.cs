@@ -141,6 +141,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     {
         _abonnement = _bus.Subscribe<EventEnvelope>(SurEvenement);
         _vidage = new System.Threading.Timer(_ => ViderLImage(), null, Timeout.Infinite, Timeout.Infinite);
+        // (11/11) les ecarts aux fantomes, segment par segment : le fichier du coeur hote relu quatre fois par seconde
+        if (_fantomes is not null) _ecarts = new System.Threading.Timer(_ => PublierLesEcarts(), null, PeriodeDesEcarts, PeriodeDesEcarts);
         // Une API arretee en plein defi a laisse ES en retrait.
         if (_priorites is { } priorites) _ = Task.Run(priorites.RendreLaMain, CancellationToken.None);
         return Task.CompletedTask;
@@ -149,6 +151,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     public Task StopAsync(CancellationToken cancellationToken)
     {
         _abonnement?.Dispose();
+        _ecarts?.Dispose();
         _releves?.Cancel();
         _priorites?.RendreLaMain();
         return Task.CompletedTask;
@@ -158,6 +161,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     {
         _abonnement?.Dispose();
         _vidage?.Dispose();
+        _ecarts?.Dispose();
         _releves?.Cancel();
     }
 
@@ -903,11 +907,51 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         if (evenements.Count > 0 || _snapshotPublie != _session.Sequence)
         {
             _snapshotPublie = _session.Sequence;
-            _ = _bus.PublishAsync(new EventEnvelope { Type = "speedrun.session", Payload = JsonSerializer.SerializeToNode(_session.Instantane(), Json) });
+            var instantane = _session.Instantane();
+            if (_fantomes?.Publies(_session.Reglement.Cadence) is { } fantomes) instantane = instantane with { Fantomes = fantomes };
+            _ = _bus.PublishAsync(new EventEnvelope { Type = "speedrun.session", Payload = JsonSerializer.SerializeToNode(instantane, Json) });
         }
     }
 
     private long _snapshotPublie = -1;
+
+    private System.Threading.Timer? _ecarts;
+    private static readonly TimeSpan PeriodeDesEcarts = TimeSpan.FromMilliseconds(250);
+    private int _ecartsEnCours;
+
+    /// <summary>
+    /// (11/11, lot L5 du CDC Player Deck Patterns) Pendant un run a fantomes, chaque segment que le joueur atteint donne un
+    /// « speedrun.ghost.gap » par fantome passe par ce segment (ecart negatif : en avance). Le Deck l'affiche segment par segment.
+    /// </summary>
+    private void PublierLesEcarts()
+    {
+        if (Interlocked.Exchange(ref _ecartsEnCours, 1) == 1) return;
+        try
+        {
+            double cadence;
+            string? sessionId;
+            lock (_verrou)
+            {
+                if (_session is null || _session.Etat != SessionSpeedrun.Running) return;
+                cadence = _session.Reglement.Cadence;
+                sessionId = _session.SessionId;
+            }
+            foreach (var e in _fantomes!.LireLesEcarts(cadence))
+            {
+                var donnees = JsonSerializer.SerializeToNode(e, Json) as System.Text.Json.Nodes.JsonObject ?? new System.Text.Json.Nodes.JsonObject();
+                donnees["sessionId"] = sessionId;
+                _ = _bus.PublishAsync(new EventEnvelope { Type = "speedrun.ghost.gap", Payload = donnees });
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
+        {
+            _journal.LogDebug(ex, "Speedrun : ecarts aux fantomes illisibles.");
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _ecartsEnCours, 0);
+        }
+    }
 
     private readonly FantomesDuSpeedrun? _fantomes;
     private readonly RetroBat.Api.Deck.DeckLaunchService? _deck;
