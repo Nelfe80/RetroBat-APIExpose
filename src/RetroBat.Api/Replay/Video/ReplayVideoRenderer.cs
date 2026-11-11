@@ -322,9 +322,13 @@ public sealed class ReplayVideoRenderer
         var valeurs = new List<long?>(lecteur.Lignes.Count);
         foreach (var l in lecteur.Lignes)
         {
-            var commande = "READ_CORE_RAM " + l.Adresse.ToString("x", System.Globalization.CultureInfo.InvariantCulture) + " " + l.Octets;
-            var octets = LecteurDuScore.OctetsDeLaReponse(await DemanderAsync(udp, commande, ct, "READ_CORE_RAM").ConfigureAwait(false), l.Octets);
-            valeurs.Add(octets is null ? null : LecteurDuScore.Valeur(l, octets));
+            // Les index de la ligne (mots inverses de FBNeo compris), lus d'un bloc puis remis dans l'ordre de l'adresse.
+            var index = l.Index;
+            var bas = index.Min();
+            var n = (int)(index.Max() - bas + 1);
+            var commande = "READ_CORE_RAM " + bas.ToString("x", System.Globalization.CultureInfo.InvariantCulture) + " " + n;
+            var bloc = LecteurDuScore.OctetsDeLaReponse(await DemanderAsync(udp, commande, ct, "READ_CORE_RAM").ConfigureAwait(false), n);
+            valeurs.Add(bloc is null ? null : LecteurDuScore.Valeur(l, index.Select(i => bloc[(int)(i - bas)]).ToList()));
         }
         return valeurs.Any(v => v is not null) ? lecteur.Composer(valeurs) : null;
     }
