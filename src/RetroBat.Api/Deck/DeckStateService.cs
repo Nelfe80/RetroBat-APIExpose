@@ -783,19 +783,12 @@ public sealed class DeckStateService : IHostedService, IDisposable
                 return CommandesDuChoix?.Invoke(type, corps);
 
             case "deck.splits.pb":
-            {
-                // LES SPLITS DU RECORD PERSO (pattern F) : le Deck les envoie a l'arrivee d'un nouveau record ; gardes sur la
-                // borne, ils reviennent dans deck.trial comme reference au lancement suivant (DeckPbSplits)
-                var (gardee, refus) = DeckPbSplits.Recevoir(corps, Epreuve?.Invoke(), DateTime.UtcNow);
-                if (gardee is not null)
-                {
-                    _journal?.LogInformation("PlayerDeck : splits du record perso gardes ({Defi}, {Segments} segment(s), {Images} images).",
-                        gardee.ChallengeId, gardee.Segments.Count, gardee.Frames);
-                    Publier("deck.splits.pb.saved", gardee);
-                }
-
-                return Accuse("deck.splits.pb", refus, null);
-            }
+                // (11/11, 1.9.169) UNE SEULE SOURCE DE SPLITS : ceux que le coeur hote mesure, a l'image, pour le joueur et pour
+                // chacun de ses fantomes (memes segments de 512 px), gardes a cote du fantome (FantomesDuSpeedrun.Splits) et
+                // publies au Deck par speedrun.session (ghosts.list[].splits) et speedrun.ghost.gap. Mon record a ses splits
+                // par son fantome (« me »), le record du monde par le sien (« world »). Les splits mesures par le Deck ne se
+                // gardent plus : la commande est refusee avec ce motif (aucun Deck publie ne l'envoie).
+                return Accuse("deck.splits.pb", RefusDesSplitsDuDeck, null);
 
             case "deck.frame.request":
             {
@@ -827,6 +820,9 @@ public sealed class DeckStateService : IHostedService, IDisposable
 
     /// <summary>La connexion d'un Deck s'est fermee : ses cadres (non gardes) partent avec elle.</summary>
     public void ConnexionFermee(object connexion) => Cadres.Oublier(connexion);
+
+    /// <summary>Le motif du refus de <c>deck.splits.pb</c> : les splits de reference sont ceux des fantomes.</summary>
+    public const string RefusDesSplitsDuDeck = "ghost_splits_are_the_reference";
 
     private static string Accuse(string type, string? refus, DeckFramePlan? plan)
         => JsonSerializer.Serialize(new EventEnvelope

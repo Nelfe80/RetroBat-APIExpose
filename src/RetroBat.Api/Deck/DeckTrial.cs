@@ -209,12 +209,10 @@ public sealed record DeckTrialComparisons(DeckTrialMark? PersonalBest, DeckTrial
 
 /// <summary>
 /// Les points de passage : combien, combien atteints, et le temps de chacun (ms du chrono) ; les meilleurs de la session.
-/// <c>PbSplitsMs</c> / <c>PbSegments</c> : les temps de passage cumules du record perso et la valeur de chaque segment, tels
-/// que le Deck les a mesures a l'arrivee de ce record sur cette borne (<see cref="DeckPbSplits"/>) ; absents sinon. Affichage
-/// seulement, jamais certifie.
+/// Les splits du record perso et du record du monde ne passent pas ici : leur seule source est le coeur hote des fantomes
+/// (speedrun.session, bloc ghosts, et speedrun.ghost.gap ; integration 1.9.169).
 /// </summary>
-public sealed record DeckTrialMilestones(int Total, int Reached, IReadOnlyList<long> SplitsMs, IReadOnlyList<long> BestSplitsMs,
-    IReadOnlyList<long>? PbSplitsMs = null, IReadOnlyList<long>? PbSegments = null);
+public sealed record DeckTrialMilestones(int Total, int Reached, IReadOnlyList<long> SplitsMs, IReadOnlyList<long> BestSplitsMs);
 
 /// <summary>
 /// deck.trial (CDC PlayerDeck H-D23) : l'epreuve en cours, pour la couche epreuve du Deck. Tout est tire du reglement et de la
@@ -297,7 +295,7 @@ public static class DeckTrialCalcul
 
     public static DeckTrial Composer(DeckTrialPlan plan, string? launchId, DeckTrialSession s, DeckRank? rang, DeckTrialMark? cibleRetenue,
         IReadOnlyDictionary<string, int> comptes, IReadOnlyDictionary<string, IReadOnlyList<int>> historiques, int etapesAtteintes,
-        IReadOnlyList<long> temps, IReadOnlyList<long> meilleursTemps, DeckPbSplits.Trace? splitsDuRecord = null)
+        IReadOnlyList<long> temps, IReadOnlyList<long> meilleursTemps)
     {
         var cadence = plan.FrameRate > 0 ? plan.FrameRate : 60;
         var partie = s.StartClockMs is not null || s.StartFrame is not null;
@@ -357,10 +355,6 @@ public static class DeckTrialCalcul
         var nouveau = s.State == SessionSpeedrun.Finished && s.OfficialFrames is { } ff && (pb is null || DeckRankCalcul.Mieux(ff, pb.Frames, plan.LowerIsBetter) || ff == pb.Frames && pb.Source == "local");
 
         var etapes = plan.Milestones > 0 ? new DeckTrialMilestones(plan.Milestones, etapesAtteintes, temps, meilleursTemps) : null;
-        // Les splits du record perso gardes sur la borne (segments du Deck) : ils voyagent avec les points de passage, tant
-        // qu'ils sont ceux du meilleur temps du journal local (un record plus ancien, sans splits, ne prend pas leur nom)
-        if (splitsDuRecord is { } sr && (s.PersonalBestFrames is not { } pbl || sr.Frames <= pbl))
-            etapes = (etapes ?? new DeckTrialMilestones(0, 0, [], [])) with { PbSplitsMs = sr.SplitsMs, PbSegments = sr.Segments };
         return new DeckTrial(launchId, plan.ChallengeId, plan.Ruleset, plan.Category, plan.Kind, plan.Title, s.SessionId, s.AttemptId, s.AttemptNumber,
             s.State, s.Cause, chrono, compteurs, echecs, efficacite, new DeckTrialComparisons(pb, cible, final, nouveau, record), etapes,
             plan.Locked, plan.Yields, 0);

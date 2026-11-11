@@ -77,7 +77,6 @@ public sealed class DeckTrialService : IHostedService, IDisposable
         lock (_verrou)
         {
             _arme = plan is null || lancement.Choices.Count == 0 ? null : new Arme(plan, DateTime.UtcNow);
-            if (_arme is not null) _arme.SplitsDuRecord = DeckPbSplits.Lire(plan!.ChallengeId);
             _publie = null;
         }
 
@@ -104,9 +103,6 @@ public sealed class DeckTrialService : IHostedService, IDisposable
                     break;
                 case "deck.rank":
                     Rang(e.Payload);
-                    break;
-                case "deck.splits.pb.saved":
-                    SplitsGardes(e.Payload);
                     break;
                 case "retroarch.memory.changed":
                     Signal(e.Payload);
@@ -195,20 +191,6 @@ public sealed class DeckTrialService : IHostedService, IDisposable
     }
 
     /// <summary>Un signal du .MEM : les comptes d'affichage et les points de passage, pendant la course seulement.</summary>
-    /// <summary>Le Deck vient de faire garder les splits d'un nouveau record perso : ils deviennent la reference de la suite.</summary>
-    private void SplitsGardes(object? payload)
-    {
-        var t = payload as DeckPbSplits.Trace ?? Element(payload).Deserialize<DeckPbSplits.Trace>();
-        if (t is null) return;
-        lock (_verrou)
-        {
-            if (_arme is not { } a || !string.Equals(a.Plan.ChallengeId, t.ChallengeId, StringComparison.OrdinalIgnoreCase)) return;
-            a.SplitsDuRecord = t;
-        }
-
-        Calculer();
-    }
-
     private void Signal(object? payload)
     {
         Arme? a;
@@ -280,7 +262,7 @@ public sealed class DeckTrialService : IHostedService, IDisposable
             if (_arme is not { } a) return;
             var historiques = a.Historiques.ToDictionary(k => k.Key, k => (IReadOnlyList<int>)k.Value.ToList());
             message = DeckTrialCalcul.Composer(a.Plan, _etat?.LaunchIdCourant, a.Session, a.Rang, a.Cible,
-                new Dictionary<string, int>(a.Comptes), historiques, a.Etapes, a.Temps.ToList(), a.MeilleursTemps.ToList(), a.SplitsDuRecord);
+                new Dictionary<string, int>(a.Comptes), historiques, a.Etapes, a.Temps.ToList(), a.MeilleursTemps.ToList());
             if (_publie is not null && Pareil(_publie, message)) return;
             message = message with { Revision = ++_revision };
             _publie = message;
@@ -300,7 +282,6 @@ public sealed class DeckTrialService : IHostedService, IDisposable
         public DeckTrialSession Session = DeckTrialSession.Avant;
         public DeckRank? Rang;
         public DeckTrialMark? Cible;
-        public DeckPbSplits.Trace? SplitsDuRecord;
         public readonly Dictionary<string, int> Comptes = new(StringComparer.Ordinal);
         public readonly Dictionary<string, List<int>> Historiques = new(StringComparer.Ordinal);
         public readonly int[] Progression = new int[plan.Steps.Count];
