@@ -1304,13 +1304,21 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
             // LA ROM ADMISE (11/11) : le site accepte encore les hacks du meme groupe du referentiel ; la borne le dit avant.
             RomAdmission.Decision? romExclue = null;
-            if (VerdictDuContenu(systemId, romGroup, GetString(attestation, "ContentMd5"), SansEnTetePour(GetString(attestation, "ContentMd5")),
-                    speedrun: false) is { Admise: false } exclu)
+            string? conseilDeRom = null;
+            var verdictDeRom = VerdictDuContenu(systemId, romGroup, GetString(attestation, "ContentMd5"),
+                SansEnTetePour(GetString(attestation, "ContentMd5")), speedrun: false);
+            if (verdictDeRom is { Admise: false } exclu)
             {
                 certifiable = false;
                 reason = "content.excluded_dump";
                 romExclue = exclu;
                 Trace($"prevol : ROM exclue du scoring : {exclu.Message}");
+            }
+            else if (verdictDeRom is { Conseil: { Length: > 0 } conseil })
+            {
+                // (11/11, option A) une version deja certifiee, marquee mauvais dump : la partie compte, on conseille la propre.
+                conseilDeRom = conseil;
+                Trace($"prevol : {verdictDeRom.Raison} ; {conseil}");
             }
             var force = (GetString(attestation, "ForcedOptions") ?? "").Length > 0;
             // Les reglages du JEU que le forcage a remis d'usine (DIP), nommes au joueur : il les avait
@@ -1471,6 +1479,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 if (horsLigne && certifiable && dangers.Count == 0) detailAffiche = Texte("scoring_offline_certifiable_sub");
                 // La ROM exclue se dit avec la ROM attendue (11/11) : le joueur sait quoi changer.
                 if (romExclue is { RomAttendue: { Length: > 0 } attendue }) detailAffiche = $"{detailAffiche}. ROM attendue : {attendue}";
+                // Une version deja certifiee marquee mauvais dump : la version propre, conseillee sans bloquer (11/11).
+                else if (conseilDeRom is { Length: > 0 } && certifiable && verdictDeRom?.RomAttendue is { Length: > 0 } propre)
+                    detailAffiche = $"{detailAffiche}. Version conseillée : {propre}";
                 _overlay.ShowTop("SCORING", titreAffiche, detailAffiche, 6000, alerte: !(certifiable && dangers.Count == 0), auDeck: NoticeDuPrevol(certifiable, reason, dangers, force, remisDUsine, horsLigne));
             }
             else

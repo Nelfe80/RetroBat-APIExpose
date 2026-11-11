@@ -343,6 +343,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 RemoteGames = manifeste.Games.Count,
                 LocalReadyGames = chemins.Count,
                 Missing = [.. _manques],
+                Advice = [.. _conseils],
                 LastSuccessUtc = maintenant,
                 LastAttemptUtc = maintenant,
                 LastError = null,
@@ -587,6 +588,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         // journal de debogage : un exploitant voyait le chiffre sans pouvoir agir (2026-09-23).
         // Trois conditions, trois manques possibles, et ils appellent trois gestes differents.
         var manques = new List<string>();
+        // (11/11, option A) Ce que l'API conseille sans bloquer : la version propre d'un jeu retenu sur une version deja
+        // certifiee que le referentiel marque mauvais dump (« Super Mario Bros (JU) (PRG 1) » de Lorenzolamas).
+        var conseils = new List<string>();
 
         var speedrunsSeuls = manifeste.SpeedrunGames.Select(j => j.SystemId + "/" + j.RomGroup).ToHashSet(StringComparer.OrdinalIgnoreCase);
         foreach (var jeu in manifeste.Games.Concat(manifeste.SpeedrunGames.Where(j => !manifeste.Games.Any(g =>
@@ -692,6 +696,12 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                     retenus.Add(choisi);
                 var retenu = mesurables.FirstOrDefault(candidat =>
                     string.Equals(candidat.AbsolutePath, choisi, StringComparison.OrdinalIgnoreCase));
+                if (retenu is not null && verdicts[retenu].Conseil is { Length: > 0 } conseil)
+                {
+                    conseils.Add(jeu.RomGroup + " : " + conseil);
+                    _logger?.LogInformation("World Scoring : {Fichier} retenu pour {Cle} : {Raison} ; {Conseil}", retenu.AbsolutePath, cle,
+                        verdicts[retenu].Raison, conseil);
+                }
                 // Les defis (collection Challenges & Speedruns) partent de ce chemin. Un jeu qui a des speedruns (coeur hote des
                 // fantomes, etats de depart) n'y entre qu'avec SA ROM de reference : un etat de depart charge sur une autre
                 // version (Super Mario World (Europe) (Rev 1) chez Gogerad, sur des etats faits sur la version USA) n'est pas la
@@ -714,6 +724,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         }
 
         _manques = manques;
+        _conseils = conseils;
         _aDeclarer = aDeclarer;
         _definitionsPerimees = perimees;
         CheminsParJeu = cheminsParJeu;
@@ -768,6 +779,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
 
     /// <summary>Pourquoi chaque jeu ouvert n'est pas dans la collection de cette borne.</summary>
     private IReadOnlyList<string> _manques = [];
+    private IReadOnlyList<string> _conseils = [];
 
     /// <summary>Un coeur qui mesure peut-il etre impose a ce jeu dans World Scoring ?</summary>
     private bool Imposable(InstalledGame candidat)
@@ -1347,7 +1359,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             etat.LastSuccessUtc,
             stale,
             etat.LastError,
-            etat.Missing);
+            etat.Missing,
+            etat.Advice);
     }
 
     private void EcrireJson<T>(string chemin, T valeur)
@@ -1429,6 +1442,13 @@ public sealed record ContentHashes
     /// </summary>
     [JsonPropertyName("rhash")]
     public IReadOnlyList<string>? Rhash { get; init; }
+
+    /// <summary>
+    /// LES VERSIONS DEJA CERTIFIEES (11/11, option A) : les md5 de ce jeu qui portent une partie publiee et que le site garde
+    /// admis (une version officielle que le .MEM ne nomme pas, ou un mauvais dump deja mesure). Absents d'un index plus ancien.
+    /// </summary>
+    [JsonPropertyName("certified")]
+    public IReadOnlyList<string>? Certified { get; init; }
 }
 
 public sealed record OpenRuleset
@@ -1457,6 +1477,13 @@ public sealed record ScoringCollectionState
     /// <summary>Pourquoi chaque jeu ouvert n'entre pas ici : « 19xx : ROM absente ».</summary>
     [JsonPropertyName("missing")]
     public IReadOnlyList<string> Missing { get; init; } = [];
+
+    /// <summary>
+    /// (11/11) Ce qui est conseille sans bloquer, « groupe : conseil » : la version propre d'un jeu retenu sur une version deja
+    /// certifiee que le referentiel marque mauvais dump.
+    /// </summary>
+    [JsonPropertyName("advice")]
+    public IReadOnlyList<string> Advice { get; init; } = [];
 
     [JsonPropertyName("collection_sha256")]
     public string? CollectionSha256 { get; init; }
@@ -1492,7 +1519,9 @@ public sealed record ScoringCollectionStatus(
     bool Stale,
     string? LastError,
     /// <summary>Pourquoi chaque jeu ouvert n'est pas dans la collection de cette borne.</summary>
-    IReadOnlyList<string>? Missing = null)
+    IReadOnlyList<string>? Missing = null,
+    /// <summary>Ce qui est conseille sans bloquer (la version propre d'une version deja certifiee).</summary>
+    IReadOnlyList<string>? Advice = null)
 {
     public static ScoringCollectionStatus Initial => new(true, true, "error", null, 0, 0, null, false, null);
 }
@@ -1502,5 +1531,5 @@ internal static class ScoringCollectionStateExtensions
 {
     public static ScoringCollectionStatus EnStale(this ScoringCollectionState etat)
         => new(true, true, etat.LastSuccessUtc == null ? "error" : "stale", etat.RemoteRevision,
-            etat.RemoteGames, etat.LocalReadyGames, etat.LastSuccessUtc, true, etat.LastError, etat.Missing);
+            etat.RemoteGames, etat.LocalReadyGames, etat.LastSuccessUtc, true, etat.LastError, etat.Missing, etat.Advice);
 }

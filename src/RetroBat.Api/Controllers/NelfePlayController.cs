@@ -63,6 +63,8 @@ public sealed class NelfePlayController : ControllerBase
             // Pourquoi chaque jeu ouvert n'est pas la : « 19xx : ROM absente ». Sans cette
             // liste, « 2 sur 6 » ne dit ni lesquels ni quoi faire.
             missing = statut.Missing ?? [],
+            // (11/11) Ce qui est conseille sans bloquer : « super-mario-bros : ... version conseillée : « Super Mario Bros. (World) » ».
+            advice = statut.Advice ?? [],
             last_success_utc = statut.LastSuccessUtc,
             stale = statut.Stale,
             last_error = statut.LastError,
