@@ -364,16 +364,19 @@ public sealed class ReplayVideoRenderer
         UdpClient udp, ControleDEpreuve controle, double secondes, CancellationToken ct)
     {
         var sansReponse = new PiloteDuRendu.Releve(secondes, -1, 0);
+        PiloteDuRendu.Releve? releve = null;
+        var blocs = new Dictionary<long, IReadOnlyList<int>>();
         try
         {
             while (udp.Available > 0) await udp.ReceiveAsync(ct).ConfigureAwait(false);
             await EnvoyerAsync(udp, controle.Datagramme, ct).ConfigureAwait(false);
             using var delai = CancellationTokenSource.CreateLinkedTokenSource(ct);
             delai.CancelAfter(TimeSpan.FromMilliseconds(300));
-            PiloteDuRendu.Releve? releve = null;
-            var blocs = new Dictionary<long, IReadOnlyList<int>>();
             var attendus = controle.Blocs.ToDictionary(b => b.Adresse, b => b.Octets);
-            for (var i = 0; i < controle.Blocs.Count + 4 && (releve is null || blocs.Count < attendus.Count); i++)
+            // Une reponse par commande, lisible ou non (« -1 » : adresse hors de la memoire exposee) : on s'arrete quand toutes
+            // sont la, sans attendre le delai pour une adresse illisible.
+            var reponsesMemoire = 0;
+            for (var i = 0; i < controle.Blocs.Count + 4 && (releve is null || reponsesMemoire < attendus.Count); i++)
             {
                 var texte = Encoding.ASCII.GetString((await udp.ReceiveAsync(delai.Token).ConfigureAwait(false)).Buffer).Trim();
                 var champs = texte.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -384,22 +387,22 @@ public sealed class ReplayVideoRenderer
                 }
                 else if (champs.Length >= 2 && champs[0] == "READ_CORE_RAM"
                     && long.TryParse(champs[1], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out var adresse)
-                    && attendus.TryGetValue(adresse, out var n)
-                    && LecteurDuScore.OctetsDeLaReponse(texte, n) is { } octets)
+                    && attendus.TryGetValue(adresse, out var n))
                 {
-                    blocs[adresse] = octets;
+                    reponsesMemoire++;
+                    if (LecteurDuScore.OctetsDeLaReponse(texte, n) is { } octets) blocs[adresse] = octets;
                 }
             }
-            return (releve ?? sansReponse, blocs);
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
-            return (sansReponse, null);
+            // Le delai : on garde ce qui est arrive (la frame surtout, sans laquelle le pilote croirait la lecture arretee).
         }
         catch (SocketException)
         {
             return (sansReponse, null);
         }
+        return (releve ?? sansReponse, blocs);
     }
 
     /// <summary>Un reglage de retroarch.cfg, ou null.</summary>
