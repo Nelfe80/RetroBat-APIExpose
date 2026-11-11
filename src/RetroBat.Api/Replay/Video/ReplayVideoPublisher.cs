@@ -61,8 +61,10 @@ public sealed class ReplayVideoPublisher
     /// </summary>
     /// <param name="Controles">Les scores certifies du replay et la fin de leur run (<c>checks</c> du site, 09/11) : le score lu
     /// pendant le rendu doit les retrouver (<see cref="ControleDeFidelite"/>).</param>
+    /// <param name="Epreuves">L'epreuve certifiee du replay (11/11) : son defi, sa version et son temps officiel ; l'arrivee
+    /// rejouee doit tomber a la bonne image (<see cref="ControleDEpreuve"/>).</param>
     public sealed record Cible(string ReplayId, long? Debut, long? Fin, bool Epreuve = false,
-        IReadOnlyList<PointDuScore>? Controles = null);
+        IReadOnlyList<PointDuScore>? Controles = null, IReadOnlyList<EpreuveCertifiee>? Epreuves = null);
 
     /// <summary>Ce que le site demande a cette borne.</summary>
     /// <param name="Role"><see cref="RoleStation"/>, <see cref="RoleJoueur"/> ou <see cref="RoleAucun"/> ; null
@@ -160,7 +162,7 @@ public sealed class ReplayVideoPublisher
             var dossier = Path.Combine(_objects.TempRoot, "video", cible.ReplayId);
             try
             {
-                var film = await _rendu.RendreAsync(cible.ReplayId, debut, fin, ct, cible.Controles).ConfigureAwait(false);
+                var film = await _rendu.RendreAsync(cible.ReplayId, debut, fin, ct, cible.Controles, cible.Epreuves).ConfigureAwait(false);
                 if (!film.Ok || film.Fichier is null)
                 {
                     var raison = film.Raison ?? "incomplet";
@@ -190,6 +192,17 @@ public sealed class ReplayVideoPublisher
                     // continue.
                     details.Add(cible.ReplayId + " : film plus court que son run, refuse par le site");
                     await SignalerEchecAsync(credential, cible.ReplayId, FilmIncomplet, ct).ConfigureAwait(false);
+                    continue;
+                }
+                if (videoId is null && refus is not null && RefusDefinitifs.Contains(refus))
+                {
+                    // (11/11) UN REFUS DEFINITIF N'ARRETE PAS LA FILE : « pas_un_record » (le record a ete battu pendant le
+                    // rendu), « deja_filme » (une autre borne l'a envoye) ne se retentent jamais, et ne valent pas l'heure
+                    // d'attente d'un quota. Le site ne les repropose plus ; « taille » se compte comme un essai, sinon le
+                    // meme film trop gros se rendrait a chaque passage.
+                    details.Add(cible.ReplayId + " : refus definitif du site (" + refus + ")");
+                    if (RefusACompter(refus))
+                        await SignalerEchecAsync(credential, cible.ReplayId, refus, ct).ConfigureAwait(false);
                     continue;
                 }
                 if (videoId is null)
@@ -260,7 +273,7 @@ public sealed class ReplayVideoPublisher
     /// </summary>
     public async Task SignalerNonCaptureAsync(string replayId, string raison, string? detail, CancellationToken ct)
     {
-        if (!replayId.StartsWith("rp_", StringComparison.Ordinal)) return;
+        if (!FilmSignalable(replayId)) return;
         var credential = _devices.GetCredential();
         if (string.IsNullOrEmpty(credential)) return;
         try
@@ -276,6 +289,28 @@ public sealed class ReplayVideoPublisher
         {
             _logger.LogInformation("Video : raison de non-capture de {ReplayId} non transmise ({Message}).", replayId, ex.Message);
         }
+    }
+
+    /// <summary>
+    /// Les films dont la non-capture se dit au site (11/11) : une partie avec replay (<c>rp_</c>), un film sans replay
+    /// (<c>fm_</c>, MAME) et une rencontre MULTIPLAYER (<c>mp_</c>). Pur.
+    /// </summary>
+    internal static bool FilmSignalable(string? replayId)
+        => replayId is { Length: > 3 } id && (id.StartsWith("rp_", StringComparison.Ordinal)
+            || id.StartsWith(ReplayCaptureService.PrefixeSansReplay, StringComparison.Ordinal)
+            || id.StartsWith(ReplayCaptureService.PrefixeMultiplayer, StringComparison.Ordinal));
+
+    /// <summary>
+    /// Le detail envoye avec une non-capture, ou null si ce film ne se signale pas : celui d'une rencontre porte sa gameroom
+    /// (le site ne la retrouve pas autrement, aucun film ne la relie), le tout en 200 caracteres. Pur.
+    /// </summary>
+    internal static string? DetailDeNonCapture(string? replayId, string? detail, string? room)
+    {
+        if (!FilmSignalable(replayId)) return null;
+        var texte = replayId!.StartsWith(ReplayCaptureService.PrefixeMultiplayer, StringComparison.Ordinal) && !string.IsNullOrWhiteSpace(room)
+            ? "gameroom " + room.Trim() + (string.IsNullOrWhiteSpace(detail) ? "" : " : " + detail)
+            : detail ?? "";
+        return texte.Length > 200 ? texte[..200] : texte;
     }
 
     /// <summary>
@@ -367,16 +402,26 @@ public sealed class ReplayVideoPublisher
                 var id = c.TryGetProperty("replay_id", out var i) && i.ValueKind == JsonValueKind.String ? i.GetString() : null;
                 if (string.IsNullOrEmpty(id)) continue;
                 var controles = new List<PointDuScore>();
+                var epreuves = new List<EpreuveCertifiee>();
                 if (c.TryGetProperty("checks", out var points) && points.ValueKind == JsonValueKind.Array)
                 {
                     foreach (var p in points.EnumerateArray())
                     {
-                        if (p.ValueKind == JsonValueKind.Object && Nombre(p, "end_frame") is long finFrame && Nombre(p, "score") is long score)
+                        if (p.ValueKind != JsonValueKind.Object) continue;
+                        // (11/11) une epreuve : son defi, sa version et son temps officiel (images, penalites comprises).
+                        if (p.TryGetProperty("challenge_id", out var defi) && defi.ValueKind == JsonValueKind.String
+                            && Nombre(p, "version") is long version && Nombre(p, "frames") is long images)
+                        {
+                            epreuves.Add(new EpreuveCertifiee(defi.GetString()!, (int)version, images, Nombre(p, "end_frame")));
+                            continue;
+                        }
+                        if (Nombre(p, "end_frame") is long finFrame && Nombre(p, "score") is long score)
                             controles.Add(new PointDuScore(finFrame, score));
                     }
                 }
                 sortie.Add(new Cible(id!, Nombre(c, "run_start_frame"), Nombre(c, "run_end_frame"),
-                    c.TryGetProperty("challenge", out var ep) && ep.ValueKind == JsonValueKind.True, controles.Count > 0 ? controles : null));
+                    c.TryGetProperty("challenge", out var ep) && ep.ValueKind == JsonValueKind.True, controles.Count > 0 ? controles : null,
+                    epreuves.Count > 0 ? epreuves : null));
             }
         }
         return new Liste(role, sortie);
@@ -537,6 +582,15 @@ public sealed class ReplayVideoPublisher
         "pas_l_hote", "sans_vrai_depart", "un_seul_humain", "partie_libre", "rencontre_annulee", "rencontre_inconnue",
         "portion_decalee", "portion_inconnue", "trop_court", "trop_long", "joueur_retire", "pas_une_rencontre",
     };
+
+    /// <summary>
+    /// Un refus definitif a dire au site comme un essai rate du replay : le site ne le repropose plus de lui-meme que pour
+    /// « pas_un_record » et « deja_filme » (sa liste les ecarte deja). Pur.
+    /// </summary>
+    internal static bool RefusACompter(string refus) => refus is not ("pas_un_record" or "deja_filme");
+
+    /// <summary>Le refus est-il definitif (jamais retente) ? Pur.</summary>
+    internal static bool RefusDefinitif(string? refus) => refus is not null && RefusDefinitifs.Contains(refus);
 
     /// <summary>Le refus du site pour un film d'epreuve plus court que son run (08/11).</summary>
     internal const string FilmIncomplet = "film_incomplet";

@@ -21,6 +21,7 @@ public sealed class PiloteDuRendu
 
     private readonly long _debut;
     private readonly long _fin;
+    private readonly long _finDesLectures;
     private readonly double _attenteDemarrage;
     private readonly double _immobiliteMax;
 
@@ -32,10 +33,13 @@ public sealed class PiloteDuRendu
     /// <param name="fin">Derniere frame a filmer : doit tomber avant la fin reelle du replay.</param>
     /// <param name="attenteDemarrage">Secondes accordees a RetroArch pour commencer la lecture.</param>
     /// <param name="immobiliteMax">Secondes sans progression au-dela desquelles la lecture est finie.</param>
-    public PiloteDuRendu(long debut, long fin, double attenteDemarrage = 60, double immobiliteMax = 5)
+    /// <param name="finDesLectures">Apres la fin du film, la lecture continue jusqu'a cette frame sans filmer : l'arrivee d'une
+    /// epreuve se confirme parfois apres ses 3 s de marge (controle de fidelite, 11/11). Par defaut, la fin du film.</param>
+    public PiloteDuRendu(long debut, long fin, double attenteDemarrage = 60, double immobiliteMax = 5, long? finDesLectures = null)
     {
         _debut = Math.Max(0, debut);
         _fin = fin;
+        _finDesLectures = Math.Max(fin, finDesLectures ?? fin);
         _attenteDemarrage = attenteDemarrage;
         _immobiliteMax = immobiliteMax;
     }
@@ -94,6 +98,9 @@ public sealed class PiloteDuRendu
 
         if (_arrete)
         {
+            // Le film est clos ; les lectures continuent jusqu'a leur fin, tant que la lecture avance.
+            if (Raison is null && _derniereFrame < _finDesLectures && r.Secondes - _derniereProgression <= _immobiliteMax)
+                return Action.Rien;
             _quitte = true;
             return Action.Quitter;
         }
