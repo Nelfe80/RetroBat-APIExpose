@@ -30,6 +30,9 @@ public static class ControleDeFidelite
     /// <summary>La fenetre de lecture avant la fin d'un run, en secondes.</summary>
     public const double FenetreS = 15;
 
+    /// <summary>La marge figee apres la fin d'un run (BornesVideo.MargeDeFin, 3 s) : une lecture doit y tomber pour conclure.</summary>
+    public const double MargeFigeeS = 3;
+
     /// <summary>Le verdict et son detail lisible (journal, raison envoyee au site).</summary>
     public sealed record Verdict(string Issue, string Detail);
 
@@ -51,6 +54,15 @@ public static class ControleDeFidelite
             if (dans.Any(r => r.Score == p.Score))
             {
                 verifies.Add(p.Score + " lu avant la frame " + p.FinFrame);
+                continue;
+            }
+            // (11/11) LA FIN DU RUN DOIT ETRE ATTEINTE : un rendu arrete en route (plafond de temps, replay coupe) n'a lu que le
+            // debut de la fenetre, et la derniere lecture d'un RetroArch qu'on arrete peut valoir 0. Sans lecture dans les 3 s
+            // de marge qui suivent la mort (score fige), on ne conclut pas : vu sur Garegga, rendu arrete a l'image 3 728 pour
+            // une fin a 4 470, « desync » alors que les scores lus etaient ceux de la partie.
+            if (dans[^1].Frame < p.FinFrame - (long)Math.Round(MargeFigeeS * ips))
+            {
+                doutes.Add("fin du run " + p.FinFrame + " pas atteinte (derniere lecture a la frame " + dans[^1].Frame + ")");
                 continue;
             }
             var franchi = false;

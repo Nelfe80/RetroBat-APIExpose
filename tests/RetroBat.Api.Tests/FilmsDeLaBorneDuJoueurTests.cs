@@ -52,6 +52,21 @@ public sealed class FilmsDeLaBorneDuJoueurTests
     }
 
     [Fact]
+    public void Un_rendu_arrete_avant_la_fin_du_run_n_est_pas_une_desync()
+    {
+        // Rendu du 11/11 (1.9.169) du Garegga rp_06GVY9TE, relu sans masque par le wrapper 0.345 : arrete au plafond a l'image
+        // 3 728, les scores lus (13 340, 13 360...) etaient ceux de la partie, puis 0 a l'arret de RetroArch. La fin du 1CC
+        // (19 050) etait a 4 470 (fenetre de 15 s : 3 576 a 4 470) : pas atteinte, rien a conclure.
+        var releves = new List<(long, long)> { (3581, 13_340), (3600, 13_360), (3700, 14_170), (3728, 0) };
+        var v = ControleDeFidelite.Juger([new PointDuScore(4470, 19_050)], releves, Fps);
+        Assert.Equal(ControleDeFidelite.NonVerifie, v.Issue);
+        Assert.Contains("pas atteinte", v.Detail);
+        // La fin atteinte, le meme ecart reste une derive.
+        releves.Add((4460, 14_170));
+        Assert.Equal(ControleDeFidelite.Desync, ControleDeFidelite.Juger([new PointDuScore(4470, 19_050)], releves, Fps).Issue);
+    }
+
+    [Fact]
     public void Un_score_franchi_entre_deux_lectures_reste_un_doute()
     {
         var releves = new List<(long, long)> { (1000, 5_000), (1012, 7_000) };
