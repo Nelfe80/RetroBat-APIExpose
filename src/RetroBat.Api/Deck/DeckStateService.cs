@@ -782,6 +782,21 @@ public sealed class DeckStateService : IHostedService, IDisposable
             case "deck.choice.set":
                 return CommandesDuChoix?.Invoke(type, corps);
 
+            case "deck.splits.pb":
+            {
+                // LES SPLITS DU RECORD PERSO (pattern F) : le Deck les envoie a l'arrivee d'un nouveau record ; gardes sur la
+                // borne, ils reviennent dans deck.trial comme reference au lancement suivant (DeckPbSplits)
+                var (gardee, refus) = DeckPbSplits.Recevoir(corps, Epreuve?.Invoke(), DateTime.UtcNow);
+                if (gardee is not null)
+                {
+                    _journal?.LogInformation("PlayerDeck : splits du record perso gardes ({Defi}, {Segments} segment(s), {Images} images).",
+                        gardee.ChallengeId, gardee.Segments.Count, gardee.Frames);
+                    Publier("deck.splits.pb.saved", gardee);
+                }
+
+                return Accuse("deck.splits.pb", refus, null);
+            }
+
             case "deck.frame.request":
             {
                 DeckFramePlan? plan = null;

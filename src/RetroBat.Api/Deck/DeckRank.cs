@@ -473,7 +473,8 @@ public sealed record DeckRankEntry(int Rank, string Player, long Value, string? 
 /// au-dela de la liste lue ; <c>Of</c> : lignes du classement, la partie comprise (<c>OfAtLeast</c> : liste tronquee) ;
 /// <c>Tied</c> : un autre a la meme valeur. <c>Above</c> : la ligne juste au-dessus (a egaler pour prendre son rang),
 /// <c>Gap</c> : l'ecart avec elle, toujours positif. <c>Target</c> : en course, le temps du rang vise (juste au-dessus du
-/// record perso, sinon la 10e place). <c>NewPersonalBest</c> : la valeur classee bat le record perso lu.
+/// record perso, sinon la 10e place). <c>NewPersonalBest</c> : la valeur classee bat le record perso lu. <c>Leader</c> : le
+/// premier du classement lu (record du monde d'une epreuve, meilleur score d'un jeu), pour la ligne WR du Deck.
 /// </summary>
 public sealed record DeckRank(
     string? LaunchId,
@@ -506,7 +507,8 @@ public sealed record DeckRank(
     bool NewPersonalBest,
     bool Final,
     double? FrameRate,
-    long Revision);
+    long Revision,
+    DeckRankEntry? Leader = null);
 
 /// <summary>Le calcul du rang, pur : il se teste sans reseau ni bus.</summary>
 public static class DeckRankCalcul
@@ -579,6 +581,18 @@ public static class DeckRankCalcul
     }
 
     /// <summary>
+    /// Le premier du classement lu (record du monde de l'epreuve, ou meilleur score du jeu) : la meilleure valeur, a valeur
+    /// egale la plus haute place du site. Null : classement vide.
+    /// </summary>
+    public static DeckRankRow? Premier(IReadOnlyList<DeckRankRow> lignes, bool plusBasEstMieux)
+    {
+        DeckRankRow? premier = null;
+        foreach (var l in lignes)
+            if (premier is null || Mieux(l.Value, premier.Value, plusBasEstMieux) || (l.Value == premier.Value && l.Rank < premier.Rank)) premier = l;
+        return premier;
+    }
+
+    /// <summary>
     /// Le rang vise pendant une course (classement au temps) : la ligne juste au-dessus du record perso (une autre que la
     /// sienne) ; deja premier, son record ; sans record, la 10e place (ou la derniere). Null : classement vide.
     /// </summary>
@@ -622,7 +636,7 @@ public static class DeckRankCalcul
 
         var lignes = table.Rows;
         var record = Record(lignes, monde, plusBas);
-        var etat = vide with { Source = table.Source, PersonalBest = Entree(record, cadence) };
+        var etat = vide with { Source = table.Source, PersonalBest = Entree(record, cadence), Leader = Entree(Premier(lignes, plusBas), cadence) };
         if (fini) return etat with { State = "ended" };
         if (lignes.Count == 0)
         {
