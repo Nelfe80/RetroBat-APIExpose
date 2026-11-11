@@ -57,7 +57,8 @@ public static partial class RomAdmission
         var reference = famille.FirstOrDefault(f => nomme(f.Set));
         if (reference is null)
             return new Decision(Statut.Exclue, "clone d'un set que la définition de score ne nomme pas", set, null);
-        if (!string.Equals(reference.Titre, s.Titre, StringComparison.OrdinalIgnoreCase))
+        // Le titre, une fois slugifie : « Ketsui: Kizuna Jigoku Tachi » et « Ketsui Kizuna Jigoku Tachi » sont le meme.
+        if (!string.Equals(GamelistIdentity.Slugifier(reference.Titre), GamelistIdentity.Slugifier(s.Titre), StringComparison.Ordinal))
             return new Decision(Statut.Exclue, $"version au titre différent (« {s.Titre} » face à « {reference.Titre} ») : elle peut jouer "
                 + "autrement, elle n'entre que prouvée sur la définition de score", set, reference.Set);
         return new Decision(Statut.Admise, $"clone officiel de {reference.Set}", set, reference.Set);
