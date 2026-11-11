@@ -45,9 +45,25 @@ public static class LectureAvecVerrous
     public static (string Coeur, ReplayErrorCode Erreur) Preparer(ReplayManifest manifest, string coeurReel, string rom, ProcessStartInfo psi,
         string? dossierDesProxys = null, string? fichierCertifie = null, ModeDesEntrees.Mode mode = ModeDesEntrees.Mode.Inconnu)
     {
+        var (coeur, erreur, _) = PreparerLaLecture(manifest, coeurReel, rom, psi, dossierDesProxys, fichierCertifie, mode);
+        return (coeur, erreur);
+    }
+
+    /// <summary>
+    /// Comme <see cref="Preparer"/>, et la ROM a donner a RetroArch. LE NOM QUE LE WRAPPER VOIT (11/11) : RetroArch charge un .zip
+    /// de console depuis l'archive et passe au coeur « …\Jeu.zip#Jeu.md » ; le wrapper en tire « Jeu.zip#Jeu », qui n'est pas
+    /// le « rom=Jeu » de certified.txt : « pipe=off » ne s'appliquait pas, le wrapper tournait en partie (tube ouvert,
+    /// rendu de Streets of Rage 2 a 11 images/s puis arrete). La lecture par le wrapper d'un .zip console passe donc par le
+    /// fichier de la ROM, extrait dans <paramref name="dossierDesRoms"/> : son nom est celui du certified.txt. L'arcade garde son
+    /// .zip (FBNeo et MAME lisent le set dans l'archive, et le wrapper y voit bien son nom).
+    /// </summary>
+    public static (string Coeur, ReplayErrorCode Erreur, string Rom) PreparerLaLecture(ReplayManifest manifest, string coeurReel, string rom,
+        ProcessStartInfo psi, string? dossierDesProxys = null, string? fichierCertifie = null, ModeDesEntrees.Mode mode = ModeDesEntrees.Mode.Inconnu,
+        string? dossierDesRoms = null)
+    {
         var lignes = Lignes(manifest);
         var sansMasque = mode == ModeDesEntrees.Mode.Touches;
-        if (lignes.Count == 0 && !sansMasque) return (coeurReel, ReplayErrorCode.None);
+        if (lignes.Count == 0 && !sansMasque) return (coeurReel, ReplayErrorCode.None, rom);
 
         var proxys = dossierDesProxys ?? Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "core_proxy");
         var wrapper = Path.Combine(proxys, Path.GetFileName(coeurReel));
@@ -56,13 +72,15 @@ public static class LectureAvecVerrous
         {
             // Pas de wrapper qui sache refuser le masque : sans verrou, la lecture garde le vrai coeur, comme avant ; un film
             // en sortira faux, et son controle de fidelite le refusera.
-            if (lignes.Count == 0) return (coeurReel, ReplayErrorCode.None);
+            if (lignes.Count == 0) return (coeurReel, ReplayErrorCode.None, rom);
             sansMasque = false;
         }
-        if (version < VersionMinimale) return (coeurReel, ReplayErrorCode.RuntimeIncompatible);
+        if (version < VersionMinimale) return (coeurReel, ReplayErrorCode.RuntimeIncompatible, rom);
 
+        var romDeLecture = RomExtraite(manifest, coeurReel, rom,
+            dossierDesRoms ?? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfenet", "replay", "temp", "rom-de-lecture")) ?? rom;
         var texte = new StringBuilder();
-        texte.Append("rom=").Append(Path.GetFileNameWithoutExtension(rom)).Append('\n');
+        texte.Append("rom=").Append(Path.GetFileNameWithoutExtension(romDeLecture)).Append('\n');
         texte.Append("pipe=off\n");
         RetroBat.Api.Speedrun.VerrousDuLancement.Ecrire(texte, lignes);
         var chemin = fichierCertifie ?? CertifiedSettingsService.FilePath;
@@ -71,7 +89,35 @@ public static class LectureAvecVerrous
 
         psi.Environment["RETROBAT_LIBRETRO_REAL_CORE"] = coeurReel;
         if (sansMasque) psi.Environment[VariableSansMasque] = "off";
-        return (wrapper, ReplayErrorCode.None);
+        return (wrapper, ReplayErrorCode.None, romDeLecture);
+    }
+
+    /// <summary>
+    /// Le fichier de la ROM d'un .zip console, extrait dans <paramref name="dossier"/> (meme contenu, nom de son entree), ou null :
+    /// pas un .zip, coeur d'arcade, entree introuvable ou illisible (la lecture garde alors le .zip, comme avant).
+    /// </summary>
+    internal static string? RomExtraite(ReplayManifest manifest, string coeur, string rom, string dossier)
+    {
+        if (!string.Equals(Path.GetExtension(rom), ".zip", StringComparison.OrdinalIgnoreCase)) return null;
+        var nom = Path.GetFileNameWithoutExtension(coeur).ToLowerInvariant();
+        if (nom.Contains("fbneo") || nom.Contains("fbalpha") || nom.Contains("mame")) return null;
+        try
+        {
+            using var zip = System.IO.Compression.ZipFile.OpenRead(rom);
+            var fichiers = zip.Entries.Where(e => e.Length > 0 && !e.FullName.EndsWith('/')).ToList();
+            var voulu = manifest.Runtime.RomFiles is { Count: > 0 } r ? r[0].Name : null;
+            var entree = (voulu is null ? null : fichiers.FirstOrDefault(e => string.Equals(e.Name, voulu, StringComparison.OrdinalIgnoreCase)))
+                ?? (fichiers.Count == 1 ? fichiers[0] : null);
+            if (entree is null || entree.Name.Length == 0 || entree.Name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0) return null;
+            Directory.CreateDirectory(dossier);
+            var chemin = Path.Combine(dossier, entree.Name);
+            if (!File.Exists(chemin) || new FileInfo(chemin).Length != entree.Length) System.IO.Compression.ZipFileExtensions.ExtractToFile(entree, chemin, overwrite: true);
+            return chemin;
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or NotSupportedException)
+        {
+            return null;
+        }
     }
 
     /// <summary>
