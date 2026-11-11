@@ -94,6 +94,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// </summary>
     private readonly Func<bool> _emulateurTourne;
     private readonly Func<InstalledGame, OpenGame, bool> _contenuConfirme;
+    /// <summary>La regle des ROMs admises (11/11) sur un candidat confirme ; le booleen dit « jeu ouvert aux seuls speedruns ».</summary>
+    private readonly Func<InstalledGame, OpenGame, bool, RomAdmission.Decision> _admission;
     private readonly DataPackSyncService? _dataPack;
     private DateTime _dernierRattrapageUtc = DateTime.MinValue;
     private int _definitionsPerimees;
@@ -129,9 +131,11 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         GamelistUpdateService? gamelists = null,
         DataPackSyncService? dataPack = null,
         Func<DateTime>? horloge = null,
-        CabinetLocale? locale = null)
+        CabinetLocale? locale = null,
+        Func<InstalledGame, OpenGame, bool, RomAdmission.Decision>? admission = null)
     {
         _locale = locale;
+        _admission = admission ?? ((candidat, jeu, speedrunSeul) => JugerLeDump(candidat, jeu, speedrunSeul, RomAdmission.ReferentielSurDisque.Borne));
         _horloge = horloge ?? (() => DateTime.UtcNow);
         _gamelists = gamelists;
         _dataPack = dataPack;
@@ -649,9 +653,24 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 confirmes = _catalog.DumpsNommesParLeMem(jeu.SystemId, jeu.RomGroup).Where(candidat => _contenuConfirme(candidat, jeu)).ToList();
             if (confirmes.Count == 0)
             {
-                manques.Add(jeu.RomGroup + " : ROM non reconnue (ce n'est pas la version classée)");
+                manques.Add(jeu.RomGroup + " : ROM non reconnue (ce n'est pas la version classée)"
+                    + (RomAttendue(jeu, speedrunsSeuls.Contains(cle)) is { Length: > 0 } attendue ? $". ROM attendue : « {attendue} »" : ""));
                 continue;
             }
+
+            // LES ROMS ADMISES (11/11, rapport de Gogerad) : un contenu publie par le site n'est pas forcement un dump propre.
+            // Les `content_hashes` d'un jeu console rangent sous lui les hacks, pirates et traductions du meme groupe du
+            // referentiel (« Super Mario Bros. (Asia) (En) (Pirate) », un hack de couleurs de Streets of Rage 2) : ils sortent ici.
+            var verdicts = confirmes.ToDictionary(c => c, c => _admission(c, jeu, speedrunsSeuls.Contains(cle)));
+            var admis = confirmes.Where(c => verdicts[c].Admise).ToList();
+            foreach (var exclu in confirmes.Where(c => !verdicts[c].Admise))
+                _logger?.LogInformation("World Scoring : {Fichier} ecarte de {Cle} : {Raison}", exclu.AbsolutePath, cle, verdicts[exclu].Message);
+            if (admis.Count == 0)
+            {
+                manques.Add(jeu.RomGroup + " : " + verdicts[confirmes[0]].Message);
+                continue;
+            }
+            confirmes = admis;
 
             // CE QUI SE MESURE, ET RIEN D'AUTRE. Un dump reconnu lance par un coeur qui ne lit rien
             // (MAME 2003-Plus choisi en automatique pour 19xx, 2026-09-26) promettait une partie
@@ -665,15 +684,23 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 continue;
             }
 
-            var choisi = Choisir(mesurables, jeu, precedents, Lancement);
+            var choisi = Choisir(mesurables, jeu, precedents, Lancement, c => RomAdmission.Rang(verdicts[c]));
             if (choisi is { Length: > 0 })
             {
                 // Un jeu ouvert aux seuls speedruns : sa ROM pour les epreuves, pas d'entree au World Scoring.
                 if (!speedrunsSeuls.Contains(cle) || manifeste.Games.Any(g => string.Equals(g.SystemId + "/" + g.RomGroup, cle, StringComparison.OrdinalIgnoreCase)))
                     retenus.Add(choisi);
-                cheminsParJeu[jeu.SystemId + "/" + jeu.RomGroup] = choisi;
-                var retenu = candidats.FirstOrDefault(candidat =>
+                var retenu = mesurables.FirstOrDefault(candidat =>
                     string.Equals(candidat.AbsolutePath, choisi, StringComparison.OrdinalIgnoreCase));
+                // Les defis (collection Challenges & Speedruns) partent de ce chemin. Un jeu qui a des speedruns (coeur hote des
+                // fantomes, etats de depart) n'y entre qu'avec SA ROM de reference : un etat de depart charge sur une autre
+                // version (Super Mario World (Europe) (Rev 1) chez Gogerad, sur des etats faits sur la version USA) n'est pas la
+                // meme epreuve.
+                if (retenu is null || speedrunsSeuls.Contains(cle) || !AUnSpeedrun(jeu)
+                    || _admission(retenu, jeu, true).Statut == RomAdmission.Statut.Reference)
+                    cheminsParJeu[jeu.SystemId + "/" + jeu.RomGroup] = choisi;
+                else
+                    manques.Add(jeu.RomGroup + " : speedruns indisponibles avec ce fichier. " + _admission(retenu, jeu, true).Message);
                 if (retenu is { FromGamelist: false })
                 {
                     aDeclarer.Add((retenu, jeu.RomGroup));
@@ -840,11 +867,22 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         List<InstalledGame> candidats,
         OpenGame jeu,
         HashSet<string> precedents,
-        Func<string, EmulationStationLaunchConfig?>? lancement = null)
+        Func<string, EmulationStationLaunchConfig?>? lancement = null,
+        Func<InstalledGame, int>? rangDAdmission = null)
     {
         if (candidats.Count == 0)
         {
             return null;
+        }
+
+        // LA REFERENCE D'ABORD (11/11) : la version de reference, puis une version admise, puis une version PAL. Avant meme le
+        // fichier deja choisi, qui gardait sinon un dump de second rang (le pirate de Super Mario Bros. chez Gogerad) apres
+        // l'arrivee de la reference sur le disque.
+        if (rangDAdmission != null)
+        {
+            var rangs = candidats.ToDictionary(candidat => candidat, rangDAdmission);
+            var meilleur = rangs.Values.Min();
+            candidats = candidats.Where(candidat => rangs[candidat] == meilleur).ToList();
         }
 
         if (lancement != null)
@@ -892,12 +930,12 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     ///   BIOS Neo-Geo : le second n'entre jamais, meme sous le meme nom.
     /// - Une console sans hash dans sa gamelist (jeu jamais scrape) : la borne calcule le md5 du
     ///   fichier, ou du fichier unique d'un zip, plutot que de l'exclure a tort.
-    /// - LES BOOTLEGS ET LES HACKS (2026-10-18) : un set que le referentiel marque ainsi n'entre que si
-    ///   le .MEM le nomme, c'est-a-dire porte le md5 de son nom de set (l'empreinte arcade des .MEM,
-    ///   « mspacman.zip » = md5 de « mspacman »). Le sha1 declare d'un set est souvent celui d'un
-    ///   fichier qu'il partage avec son parent : mspacmab, bootleg de Ms. Pac-Man, porte le meme que
-    ///   mspacman et entrait dans la collection, alors que sa memoire ne suit pas la definition (score
-    ///   qui ne monte pas, faux credits au demarrage, chez un joueur).
+    /// - LES BOOTLEGS ET LES HACKS (2026-10-18, durci le 11/11) : un set que le referentiel marque ainsi
+    ///   n'entre jamais. mspacmab, bootleg de Ms. Pac-Man, porte le meme sha1 que mspacman et entrait
+    ///   dans la collection, alors que sa memoire ne suit pas la definition.
+    /// - LE SET NOMME (11/11) : un set d'arcade n'entre que si le .MEM le nomme (md5 de son nom de set
+    ///   publie ou ecrit au .MEM) : le parent classe, ou un clone que le .MEM a prouve.
+    /// - CONSOLE : ce contenu confirme passe ENSUITE la regle des ROMs admises (<see cref="RomAdmission"/>).
     /// </summary>
     internal static bool ContenuConfirme(
         InstalledGame candidat,
@@ -918,27 +956,86 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         var sansEnTete = arcade ? new HashSet<string>(StringComparer.OrdinalIgnoreCase) : EmpreintesSansEnTete(hashes);
         if (connus.Count == 0 && sansEnTete.Count == 0) return false;
 
+        if (arcade)
+        {
+            // L'ARCADE (11/11, regle des ROMs admises) : le SET que le .MEM NOMME, jamais un bootleg ni un hack. Nomme = le md5 de
+            // son nom de set publie (l'empreinte arcade des .MEM, « mspacman.zip » = md5 de « mspacman ») ou ecrit au .MEM, ou le
+            // zip lui-meme nomme par le .MEM (DaiOuJou Black Label : « ddpdojblka.zip », md5 du fichier). Le sha1 declare d'un
+            // set ne suffit plus : c'est souvent celui d'un fichier partage (le BIOS Neo-Geo de 285 sets, la PROM de 118 sets
+            // System 16), si bien que 19xxu, mslug3h, doubledr ou pc_ddrgn (PlayChoice-10) entraient sous le jeu classe.
+            var set = Path.GetFileNameWithoutExtension(candidat.AbsolutePath);
+            if (set.Length == 0 || bootlegOuHack?.Invoke(candidat.CanonicalSystemId, set) == true) return false;
+            var duMem = RomAdmission.DumpsDuMem(candidat.OfficialDefinitionPath);
+            var nomDuSet = Md5DuNomDeSet(set);
+            // (10/11) LE FICHIER LUI-MEME : le zip qui a servi a ouvrir un jeu d'exception, absent de la gamelist et du
+            // referentiel. Il ne vaut que si le .MEM le nomme (avant le 11/11 : tout md5 publie, y compris un zip appris d'une
+            // partie sur un clone).
+            if ((md5DuFichier ?? Md5DuFichier)(candidat.AbsolutePath) is { Length: > 0 } duZip && connus.Contains(duZip)
+                && (duMem.Count == 0 || duMem.ContainsKey(duZip))) return true;
+            if (!connus.Contains(nomDuSet) && !duMem.ContainsKey(nomDuSet)) return false;
+            if (candidat.Md5 is { Length: > 0 } md5Zip && connus.Contains(md5Zip)) return true;
+            var sha1 = sha1DuSet(candidat.CanonicalSystemId, jeu.RomGroup, set);
+            return sha1 is { Length: > 0 } && sha1s.Contains(sha1);
+        }
+
         if (candidat.Md5 is { Length: > 0 } md5 && connus.Contains(md5)) return true;
         // Le hash RetroAchievements de la gamelist EST l'empreinte sans en-tete (rcheevos).
         if (candidat.CheevosHash is { Length: > 0 } ra && (connus.Contains(ra) || sansEnTete.Contains(ra))) return true;
-
-        if (arcade)
-        {
-            // (10/11) LE FICHIER LUI-MEME : un jeu ouvert d'exception publie l'empreinte du zip qui a servi a l'ouvrir (DaiOuJou
-            // Black Label, ddpdojblka) ; absent de la gamelist et inconnu du referentiel, il restait hors de la collection.
-            // le md5 du FICHIER zip tel quel (le md5 « du contenu » hache ce qu'il y a dedans)
-            if ((md5DuFichier ?? Md5DuFichier)(candidat.AbsolutePath) is { Length: > 0 } duZip && connus.Contains(duZip)) return true;
-            var set = Path.GetFileNameWithoutExtension(candidat.AbsolutePath);
-            var sha1 = set.Length == 0 ? null : sha1DuSet(candidat.CanonicalSystemId, jeu.RomGroup, set);
-            if (sha1 is not { Length: > 0 } || !sha1s.Contains(sha1)) return false;
-            return bootlegOuHack?.Invoke(candidat.CanonicalSystemId, set) != true || connus.Contains(Md5DuNomDeSet(set));
-        }
 
         // L'empreinte sans en-tete d'abord : elle se calcule dans la meme lecture que le md5, que l'appel suivant trouve en cache.
         var mesureeSansEnTete = sansEnTete.Count > 0 ? sansEnTeteDuContenu?.Invoke(candidat) : null;
         var calcule = md5DuContenu(candidat.AbsolutePath);
         if (calcule is { Length: > 0 } && connus.Contains(calcule)) return true;
         return mesureeSansEnTete is { Length: > 0 } && sansEnTete.Contains(mesureeSansEnTete);
+    }
+
+    /// <summary>
+    /// LA REGLE DES ROMS ADMISES SUR UN CANDIDAT CONFIRME (11/11). Arcade : la regle du set est deja passee dans
+    /// <see cref="ContenuConfirme"/>, le set est sa propre reference. Console : <see cref="RomAdmission.JugerConsole"/> sur
+    /// tout ce qui est connu du fichier (md5 de la gamelist, md5 mesure, md5 sans en-tete, hash RetroAchievements).
+    /// <paramref name="speedrun"/> : seule la ROM des etats de depart passe.
+    /// </summary>
+    internal static RomAdmission.Decision JugerLeDump(InstalledGame candidat, OpenGame jeu, bool speedrun, RomAdmission.IReferentiel referentiel,
+        Func<string, string?>? md5DuContenu = null, Func<InstalledGame, string?>? sansEnTete = null, string? racineEtats = null)
+    {
+        if (string.Equals(candidat.CanonicalSystemId, "arcade", StringComparison.OrdinalIgnoreCase))
+            return new RomAdmission.Decision(RomAdmission.Statut.Reference, "set nommé par la définition de score",
+                Path.GetFileNameWithoutExtension(candidat.AbsolutePath), null);
+        var systeme = candidat.CanonicalSystemId;
+        var duMem = RomAdmission.DumpsDuMem(candidat.OfficialDefinitionPath);
+        var empreintes = new[]
+        {
+            candidat.Md5, candidat.CheevosHash,
+            (md5DuContenu ?? Md5DuContenu)(candidat.AbsolutePath),
+            (sansEnTete ?? (c => SansEnTeteDuContenu(c.AbsolutePath, c.FrontendSystemId)))(candidat),
+        };
+        var reference = RomAdmission.ReferenceDuScore(systeme, duMem, jeu.ContentHashes, referentiel);
+        var refSpeedrun = speedrun ? RomAdmission.ReferenceDuSpeedrun(systeme, jeu.RomGroup, referentiel, racineEtats) ?? reference : null;
+        // Un jeu ouvert aux seuls speedruns sans reference connue : la regle du score s'applique (dump propre, prouve, publie).
+        return RomAdmission.JugerConsole(systeme, empreintes, duMem, jeu.ContentHashes, reference, refSpeedrun, referentiel);
+    }
+
+    /// <summary>Un coeur hote des fantomes ou des etats de depart designent-ils la ROM des speedruns de ce jeu ?</summary>
+    internal static bool AUnSpeedrun(OpenGame jeu)
+        => !string.Equals(jeu.SystemId, "arcade", StringComparison.OrdinalIgnoreCase)
+           && RomAdmission.ReferenceDuSpeedrun(jeu.SystemId, jeu.RomGroup, RomAdmission.ReferentielSurDisque.Borne) is not null;
+
+    /// <summary>LA ROM qu'il faut au joueur pour ce jeu, a lui dire quand la sienne n'entre pas ; null si on ne sait pas.</summary>
+    internal string? RomAttendue(OpenGame jeu, bool speedrun)
+    {
+        try
+        {
+            if (string.Equals(jeu.SystemId, "arcade", StringComparison.OrdinalIgnoreCase))
+                return GamelistIdentity.DeclaredName(jeu.SystemId, jeu.RomGroup) is { Length: > 0 } nom ? $"{nom}, set MAME/FBNeo nommé par la définition de score" : null;
+            var referentiel = RomAdmission.ReferentielSurDisque.Borne;
+            if (speedrun && RomAdmission.ReferenceDuSpeedrun(jeu.SystemId, jeu.RomGroup, referentiel) is { } r) return r.Nom;
+            return RomAdmission.ReferenceDuScore(jeu.SystemId, RomAdmission.DumpsDuMem(_catalog.OfficialDefinitionPath(jeu.SystemId, jeu.RomGroup)),
+                jeu.ContentHashes, referentiel)?.Nom;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
     }
 
     /// <summary>
