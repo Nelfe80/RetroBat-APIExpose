@@ -35,7 +35,7 @@ public sealed class ControleDEpreuve
 
     private readonly Reglement _reglement;
     private readonly LignesDuMem _lignes;
-    private readonly IReadOnlyList<(long Adresse, string Type, int Octets)> _lectures;
+    private readonly IReadOnlyList<(long Adresse, string Type, int Octets, long[] Index)> _lectures;
     private readonly Dictionary<(long, string), long> _dernieres = new();
     private readonly StringBuilder _trace = new();
     private readonly List<long> _releves = new();
@@ -47,12 +47,19 @@ public sealed class ControleDEpreuve
 
     public Reglement Reglement => _reglement;
 
-    private ControleDEpreuve(Reglement reglement, LignesDuMem lignes)
+    private ControleDEpreuve(Reglement reglement, LignesDuMem lignes, string? coeur)
     {
         _reglement = reglement;
         _lignes = lignes;
-        _lectures = lignes.Lignes.Select(l => (l.Adresse, l.Type, LecteurDuScore.Octets(l.Type))).Distinct().ToList();
-        Blocs = Regrouper(_lectures.Select(l => (l.Adresse, l.Octets)));
+        // (11/11) chaque adresse la ou le coeur la range (adresses MAME de l'arcade sous FBNeo) ; une adresse qu'on ne sait pas
+        // placer n'est pas lue, et l'evaluateur la tient pour inconnue.
+        var banques = AdressesDuCoeur.FamilleFbneo(coeur) ? AdressesDuCoeur.BanquesDe(reglement.RomGroup) : [];
+        _lectures = lignes.Lignes.Select(l => (l.Adresse, l.Type, LecteurDuScore.Octets(l.Type))).Distinct()
+            .Select(l => (l.Adresse, l.Type, l.Item3, Index: AdressesDuCoeur.Places(coeur, l.Adresse, l.Item3, banques)))
+            .Where(l => l.Index is not null)
+            .Select(l => (l.Adresse, l.Type, l.Item3, l.Index!))
+            .ToList();
+        Blocs = Regrouper(_lectures.SelectMany(l => l.Index).Distinct().Select(i => (i, 1)));
         Datagramme = DatagrammeDe(Blocs);
     }
 
@@ -61,7 +68,7 @@ public sealed class ControleDEpreuve
     /// autre version, .MEM introuvable ou different de celui que le reglement epingle, datagramme trop gros.
     /// </summary>
     public static (ControleDEpreuve? Controle, string? Raison) Pour(EpreuveCertifiee epreuve, CatalogueDesDefis? catalogue,
-        Func<Reglement, byte[]?>? lireLeMem = null)
+        Func<Reglement, byte[]?>? lireLeMem = null, string? coeur = null)
     {
         var reglement = catalogue?.Trouver(epreuve.ChallengeId);
         if (reglement is null) return (null, "reglement " + epreuve.ChallengeId + " absent de cette borne");
@@ -75,14 +82,15 @@ public sealed class ControleDEpreuve
         if (reglement.MemSha256 is { Length: > 0 } epingle
             && !string.Equals(Convert.ToHexString(SHA256.HashData(mem)), epingle, StringComparison.OrdinalIgnoreCase))
             return (null, ".MEM de la borne different de celui du reglement");
-        return Depuis(reglement, Encoding.UTF8.GetString(mem));
+        return Depuis(reglement, Encoding.UTF8.GetString(mem), coeur);
     }
 
-    internal static (ControleDEpreuve? Controle, string? Raison) Depuis(Reglement reglement, string mem)
+    internal static (ControleDEpreuve? Controle, string? Raison) Depuis(Reglement reglement, string mem, string? coeur = null)
     {
         var lignes = LignesDuMem.Lire(mem);
         if (lignes.Lignes.Count == 0) return (null, ".MEM sans ligne");
-        var c = new ControleDEpreuve(reglement, lignes);
+        var c = new ControleDEpreuve(reglement, lignes, coeur);
+        if (c._lectures.Count == 0) return (null, "aucune adresse du .MEM lisible sous ce coeur");
         return Encoding.ASCII.GetByteCount(c.Datagramme) > DatagrammeMax ? (null, "trop d'adresses a lire en une image") : (c, null);
     }
 
@@ -128,13 +136,18 @@ public sealed class ControleDEpreuve
     {
         if (_releves.Count > 0 && frame <= _releves[^1]) return;
         _releves.Add(frame);
-        foreach (var (adresse, type, n) in _lectures)
+        foreach (var (adresse, type, n, index) in _lectures)
         {
-            var bloc = Blocs.LastOrDefault(b => b.Adresse <= adresse && adresse + n <= b.Adresse + b.Octets);
-            if (bloc is null || !octetsParBloc.TryGetValue(bloc.Adresse, out var octets)) continue;
-            var debut = (int)(adresse - bloc.Adresse);
-            if (debut + n > octets.Count) continue;
-            var valeur = Valeur(type, octets, debut, n);
+            // Les octets de l'adresse, chacun la ou il est (mots inverses de FBNeo compris), dans l'ordre de l'adresse.
+            var dans = new List<int>(n);
+            foreach (var i in index)
+            {
+                var bloc = Blocs.LastOrDefault(b => b.Adresse <= i && i < b.Adresse + b.Octets);
+                if (bloc is null || !octetsParBloc.TryGetValue(bloc.Adresse, out var octets) || i - bloc.Adresse >= octets.Count) break;
+                dans.Add(octets[(int)(i - bloc.Adresse)]);
+            }
+            if (dans.Count != n) continue;
+            var valeur = Valeur(type, dans, 0, n);
             if (_dernieres.TryGetValue((adresse, type), out var avant) && avant == valeur) continue;
             _dernieres[(adresse, type)] = valeur;
             _trace.Append(frame.ToString(CultureInfo.InvariantCulture)).Append(' ').Append(Hex.Ecrire(adresse)).Append(' ')

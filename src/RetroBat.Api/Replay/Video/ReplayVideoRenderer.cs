@@ -160,7 +160,8 @@ public sealed class ReplayVideoRenderer
         // L'arrivee d'une epreuve (11/11) : toutes les adresses du .MEM lues a chaque releve, du debut du replay, et les
         // lectures continuent 10 s apres le film (une arrivee se confirme parfois apres ses 3 s de marge).
         var epreuve = epreuves is { Count: > 0 } ? epreuves[0] : null;
-        var (controleDEpreuve, raisonEpreuve) = epreuve is null ? (null, null) : ControleDEpreuve.Pour(epreuve, _defis);
+        var (controleDEpreuve, raisonEpreuve) = epreuve is null ? (null, null)
+            : ControleDEpreuve.Pour(epreuve, _defis, coeur: manifest.Runtime.CoreName);
         var finDesLectures = controleDEpreuve is null ? fin : Math.Min(finDuReplay - MargeAvantLaFin, fin + (long)Math.Round(10 * fps));
         var pilote = new PiloteDuRendu(debut, fin, finDesLectures: finDesLectures);
         using var udp = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
@@ -344,9 +345,13 @@ public sealed class ReplayVideoRenderer
         var valeurs = new List<long?>(lecteur.Lignes.Count);
         foreach (var l in lecteur.Lignes)
         {
-            var commande = "READ_CORE_RAM " + l.Adresse.ToString("x", System.Globalization.CultureInfo.InvariantCulture) + " " + l.Octets;
-            var octets = LecteurDuScore.OctetsDeLaReponse(await DemanderAsync(udp, commande, ct, "READ_CORE_RAM").ConfigureAwait(false), l.Octets);
-            valeurs.Add(octets is null ? null : LecteurDuScore.Valeur(l, octets));
+            // Les index de la ligne (mots inverses de FBNeo compris), lus d'un bloc puis remis dans l'ordre de l'adresse.
+            var index = l.Index;
+            var bas = index.Min();
+            var n = (int)(index.Max() - bas + 1);
+            var commande = "READ_CORE_RAM " + bas.ToString("x", System.Globalization.CultureInfo.InvariantCulture) + " " + n;
+            var bloc = LecteurDuScore.OctetsDeLaReponse(await DemanderAsync(udp, commande, ct, "READ_CORE_RAM").ConfigureAwait(false), n);
+            valeurs.Add(bloc is null ? null : LecteurDuScore.Valeur(l, index.Select(i => bloc[(int)(i - bas)]).ToList()));
         }
         return valeurs.Any(v => v is not null) ? lecteur.Composer(valeurs) : null;
     }
