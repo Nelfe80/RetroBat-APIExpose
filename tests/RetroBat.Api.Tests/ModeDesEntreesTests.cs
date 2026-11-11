@@ -128,4 +128,37 @@ public sealed class ModeDesEntreesTests : IDisposable
         if (File.Exists(sor2)) Assert.Equal(ModeDesEntrees.Mode.Touches, ModeDesEntrees.Lire(sor2));
         if (sonic is not null) Assert.Equal(ModeDesEntrees.Mode.Masque, ModeDesEntrees.Lire(sonic));
     }
+
+    [Fact]
+    public void Un_zip_console_relu_par_le_wrapper_passe_par_le_fichier_de_sa_rom()
+    {
+        // RetroArch passerait « Jeu.zip#Jeu.md » au coeur : le wrapper n'y reconnaitrait pas « rom=Jeu », et pipe=off ne
+        // s'appliquerait pas (rendu de Streets of Rage 2 du 11/11 en 1.9.170 : tube ouvert, 11 images/s, arrete a 1 766).
+        var zip = Path.Combine(_dossier, "Streets of Rage 2 (USA).zip");
+        using (var z = System.IO.Compression.ZipFile.Open(zip, System.IO.Compression.ZipArchiveMode.Create))
+        using (var e = z.CreateEntry("Streets of Rage 2 (USA).md").Open())
+            e.Write(new byte[] { 1, 2, 3, 4 });
+        var roms = Path.Combine(_dossier, "roms");
+        var extraite = LectureAvecVerrous.RomExtraite(Manifeste(), @"E:\cores\genesis_plus_gx_libretro.dll", zip, roms);
+        Assert.Equal(Path.Combine(roms, "Streets of Rage 2 (USA).md"), extraite);
+        Assert.Equal(new byte[] { 1, 2, 3, 4 }, File.ReadAllBytes(extraite!));
+        // L'arcade garde son .zip : FBNeo lit le set dans l'archive, et le wrapper y voit bien son nom.
+        Assert.Null(LectureAvecVerrous.RomExtraite(Manifeste(), @"E:\cores\fbneo_libretro.dll", zip, roms));
+        // Pas un .zip, ou un .zip absent : la ROM telle quelle.
+        Assert.Null(LectureAvecVerrous.RomExtraite(Manifeste(), @"E:\cores\genesis_plus_gx_libretro.dll", extraite!, roms));
+        Assert.Null(LectureAvecVerrous.RomExtraite(Manifeste(), @"E:\cores\genesis_plus_gx_libretro.dll", Path.Combine(_dossier, "absent.zip"), roms));
+
+        // Par le wrapper 0.345 : la ROM de lecture est le fichier extrait, et certified.txt porte son nom.
+        var wrapper = Environment.GetEnvironmentVariable("NELFE_WRAPPER_345") ?? @"E:\RetroBat\plugins\APIExpose\wrapper\wrapper.dll";
+        if (!File.Exists(wrapper) || LectureAvecVerrous.VersionDuWrapper(wrapper) < LectureAvecVerrous.VersionSansMasque) return;
+        var proxys = Path.Combine(_dossier, "proxys");
+        Directory.CreateDirectory(proxys);
+        File.Copy(wrapper, Path.Combine(proxys, "genesis_plus_gx_libretro.dll"), true);
+        var certifie = Path.Combine(_dossier, "certified.txt");
+        var (_, erreur, rom) = LectureAvecVerrous.PreparerLaLecture(Manifeste(), @"E:\cores\genesis_plus_gx_libretro.dll", zip, new ProcessStartInfo(),
+            proxys, certifie, ModeDesEntrees.Mode.Touches, roms);
+        Assert.Equal(ReplayErrorCode.None, erreur);
+        Assert.Equal(Path.Combine(roms, "Streets of Rage 2 (USA).md"), rom);
+        Assert.Contains("rom=Streets of Rage 2 (USA)", File.ReadAllLines(certifie));
+    }
 }

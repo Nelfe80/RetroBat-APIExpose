@@ -569,14 +569,14 @@ public sealed class ReplayPlaybackService
         var modeDesEntrees = ModeDesEntrees.Lire(objectPath);
         if (modeDesEntrees == ModeDesEntrees.Mode.Touches)
             _logger.LogInformation("Replay {ReplayId} : enregistre touche par touche, relu par le wrapper sans masque.", replayId);
-        var (coeurDeLecture, refusDesVerrous) = LectureAvecVerrous.Preparer(manifest, coreDll, resolved.RomPath, psi, mode: modeDesEntrees);
+        var (coeurDeLecture, refusDesVerrous, romDeLecture) = LectureAvecVerrous.PreparerLaLecture(manifest, coreDll, resolved.RomPath, psi, mode: modeDesEntrees);
         if (refusDesVerrous != ReplayErrorCode.None)
         {
             _logger.LogWarning("Replay : {ReplayId} tient des verrous ({Verrous}) que le wrapper de cette borne ne sait pas poser.", replayId, manifest.Runtime.Locks);
             return Fail(refusDesVerrous);
         }
         psi.ArgumentList.Add("-L"); psi.ArgumentList.Add(coeurDeLecture);
-        psi.ArgumentList.Add(resolved.RomPath);
+        psi.ArgumentList.Add(romDeLecture);
         psi.ArgumentList.Add("-P"); psi.ArgumentList.Add(objectPath);
         psi.ArgumentList.Add("--config"); psi.ArgumentList.Add(RetroBatPaths.RetroArchConfigPath);
         psi.ArgumentList.Add("--appendconfig"); psi.ArgumentList.Add(sessionCfg);
