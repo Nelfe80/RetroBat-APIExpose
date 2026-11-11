@@ -30,12 +30,22 @@ public sealed class EssaiReelDuRenduTests
             ? champs[3].Split(',').Select(p => p.Split(':')).Select(p => new PointDuScore(long.Parse(p[0]), long.Parse(p[1]))).ToList()
             : null;
 
+        // L'epreuve (11/11) : NELFE_ESSAI_EPREUVE = « defi|version|images[|fin_du_film] », reglements de la copie locale de l'index.
+        IReadOnlyList<EpreuveCertifiee>? epreuves = null;
+        var catalogue = new RetroBat.Api.Speedrun.CatalogueDesDefis();
+        if (Environment.GetEnvironmentVariable("NELFE_ESSAI_EPREUVE") is { Length: > 0 } ep)
+        {
+            var e = ep.Split('|');
+            epreuves = [new EpreuveCertifiee(e[0], int.Parse(e[1]), long.Parse(e[2]), e.Length > 3 && long.TryParse(e[3], out var ff) ? ff : null)];
+            new RetroBat.Api.Speedrun.IndexDesDefisService(null!, catalogue).ChargerDuDisque();
+        }
+
         using var journaux = LoggerFactory.Create(b => b.AddSimpleConsole().SetMinimumLevel(LogLevel.Information));
         var magasin = new ReplayStore(NullLogger<ReplayStore>.Instance);
         var resolveur = new ReplayRuntimeResolver(new EsSystemsRomPaths(NullLogger<EsSystemsRomPaths>.Instance), magasin, magasin,
             journaux.CreateLogger<ReplayRuntimeResolver>());
-        var rendu = new ReplayVideoRenderer(magasin, magasin, magasin, resolveur, () => "idle", journaux.CreateLogger<ReplayVideoRenderer>());
-        var r = await rendu.RendreAsync(replayId, debut, fin, CancellationToken.None, controles);
+        var rendu = new ReplayVideoRenderer(magasin, magasin, magasin, resolveur, () => "idle", journaux.CreateLogger<ReplayVideoRenderer>(), catalogue);
+        var r = await rendu.RendreAsync(replayId, debut, fin, CancellationToken.None, controles, epreuves);
 
         var sortie = Environment.GetEnvironmentVariable("NELFE_ESSAI_SORTIE") ?? Path.GetTempPath();
         Directory.CreateDirectory(sortie);
@@ -46,11 +56,13 @@ public sealed class EssaiReelDuRenduTests
             copie = Path.Combine(sortie, replayId + ".mkv");
             File.Copy(r.Fichier, copie, overwrite: true);
         }
+        if (r.TraceDEpreuve is { } trace) File.WriteAllText(Path.Combine(sortie, replayId + ".trace"), trace);
         File.WriteAllText(Path.Combine(sortie, replayId + ".json"), JsonSerializer.Serialize(new
         {
             replay = replayId, ok = r.Ok, raison = r.Raison, debut = r.Debut, fin = r.Fin, frame = r.FrameAtteinte,
             secondes = Math.Round(r.Secondes, 1), fidelite = r.Fidelite, detail = r.DetailFidelite, film = copie, taille,
             releves = r.Releves?.Select(x => new[] { x.Frame, x.Score }).ToList(),
+            trace_epreuve_lignes = r.TraceDEpreuve?.Length,
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
