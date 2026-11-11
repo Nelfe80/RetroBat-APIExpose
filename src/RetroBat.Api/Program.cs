@@ -363,6 +363,10 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infra
 // L'etat du jeu pour le PlayerDeck (instantane, identite au lancement, boutons, cadre).
 builder.Services.AddSingleton<RetroBat.Api.Deck.DeckStateService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckStateService>());
+// La boite noire de chaque partie enregistree (signaux du .MEM, sens du .SMEM, image du coeur), gardee avec le replay ;
+// lecture seule du bus. Replay:BlackBox:Enabled = false la coupe.
+builder.Services.AddSingleton<RetroBat.Api.Replay.BoiteNoire.BoiteNoireService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Replay.BoiteNoire.BoiteNoireService>());
 // Le lancement avec le PlayerDeck (H-D15 a H-D20) : decor nelfeplay-deck, choix en jeu retenu par joueur, jeu et mode.
 builder.Services.AddSingleton<RetroBat.Api.Deck.DeckLaunchService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>());
