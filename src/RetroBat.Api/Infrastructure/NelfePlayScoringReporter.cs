@@ -993,9 +993,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return o;
     }
 
-    internal static JsonObject ContentArtifact(string? sha, string? md5, string? sha1, string? sansEnTete = null, string? standardVideo = null)
+    internal static JsonObject ContentArtifact(string? sha, string? md5, string? sha1, string? sansEnTete = null, string? standardVideo = null,
+        string? set = null)
     {
         var o = Triple(sha);
+        // (11/11) Le SET d'arcade lance, au prevol : le site sait alors dire, avant la partie, qu'aucune EEPROM d'usine n'est
+        // epinglee pour lui. Absent hors arcade ; un site qui ne le connait pas l'ignore.
+        if (!string.IsNullOrWhiteSpace(set)) o["set"] = set.Trim().ToLowerInvariant();
         // (11/11) La version PAL (50 Hz) d'un jeu console, prouvee par son .MEM : le site la classera a part (classement PAL),
         // jamais avec la version NTSC. Absent pour une version NTSC ; un site qui ne le connait pas l'ignore.
         if (standardVideo is not null) o["video_standard"] = standardVideo;
@@ -1227,7 +1231,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     ["core"] = CoreArtifact(GetString(attestation, "CoreSha256"),
                         GetString(attestation, "CoreName"), GetString(attestation, "CoreVersion")),
                     ["content"] = ContentArtifact(GetString(attestation, "ContentSha256"), GetString(attestation, "ContentMd5"), contentSha1,
-                        SansEnTetePour(GetString(attestation, "ContentMd5"))),
+                        SansEnTetePour(GetString(attestation, "ContentMd5")), set: SetArcade(systemId, GetString(attestation, "ContentSet"))),
                     ["mem"] = Triple(GetString(attestation, "MemSha256")),
                     ["core_options_digest"] = digest,
                     ["bios"] = _bios?.PourLePasseport(profile.Value) ?? new JsonObject { ["mode"] = "none" },
@@ -1301,6 +1305,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 certifiable = false;
                 reason = "content.set_unnamed";
                 Trace($"prevol : le set {GetString(attestation, "ContentSet")} n'est pas nommé par la définition de score, non certifiable");
+            }
+            // UN CLONE ADMIS SANS EPINGLE D'EEPROM (11/11, Progear de neogeoff) : l'EEPROM d'usine porte la region, celle du
+            // clone ne repond jamais a l'epingle du parent et le site refusait APRES la partie. Le joueur l'apprend ici, avec
+            // le set a lancer.
+            IReadOnlyList<string>? setsEpingles = null;
+            if (certifiable && NvramSnapshotService.SetsEpinglesSansCeluiCi(profile, GetString(attestation, "CoreSha256"),
+                    SetArcade(systemId, GetString(attestation, "ContentSet"))) is { } attendus)
+            {
+                certifiable = false;
+                reason = "profile.nvram_set_unpinned";
+                setsEpingles = attendus;
+                Trace($"prevol : le set {GetString(attestation, "ContentSet")} n'a pas d'EEPROM d'usine épinglée (sets épinglés : {string.Join(", ", attendus)}), non certifiable");
             }
             // LA ROM ADMISE (11/11) : le site accepte encore les hacks du meme groupe du referentiel ; la borne le dit avant.
             RomAdmission.Decision? romExclue = null;
@@ -1482,6 +1498,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 // Une version deja certifiee marquee mauvais dump : la version propre, conseillee sans bloquer (11/11).
                 else if (conseilDeRom is { Length: > 0 } && certifiable && verdictDeRom?.RomAttendue is { Length: > 0 } propre)
                     detailAffiche = $"{detailAffiche}. Version conseillée : {propre}";
+                if (setsEpingles is { Count: > 0 }) detailAffiche = $"{detailAffiche} {string.Join(", ", setsEpingles.Select(s => s + ".zip"))}";
                 _overlay.ShowTop("SCORING", titreAffiche, detailAffiche, 6000, alerte: !(certifiable && dangers.Count == 0), auDeck: NoticeDuPrevol(certifiable, reason, dangers, force, remisDUsine, horsLigne));
             }
             else
@@ -4964,6 +4981,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "runtime.slow_motion" => "jeu ralenti par l'affichage (écran à 50 Hz) : passe en 60 Hz (PAL60) ou joue la version PAL",
         "video.pal_pending" => "version PAL : score gardé pour le classement PAL à venir, hors du classement principal",
         "content.set_unnamed" => "set d'arcade que la définition du jeu ne nomme pas (clone non prouvé)",
+        "profile.nvram_set_unpinned" => "version régionale sans réglages d'usine connus (EEPROM) : lance le set épinglé",
         "content.excluded_dump" => "ROM exclue du scoring (hack, pirate, traduction, réédition ou version non prouvée)",
         "profile.mem_mismatch" => "définition mémoire non reconnue",
         "profile.core_options_mismatch" => "réglages en attente de conformité",

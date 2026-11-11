@@ -239,6 +239,49 @@ public sealed class NvramSnapshotService : IHostedService, IDisposable
         return liste;
     }
 
+    /// <summary>
+    /// LE SET D'UNE EPINGLE (11/11, Progear de neogeoff). Une EEPROM se range au nom du SET lance : « fbneo/progear.nv »,
+    /// « fbneo/progearj.nv », « nvram/19xx/eeprom » (MAME autonome, un dossier par set). Le champ « set » du profil, s'il
+    /// est la ; sinon le dossier sous « nvram/ », sinon le nom du fichier sans extension. Null si rien ne s'en deduit.
+    /// </summary>
+    internal static string? SetDeLEpingle(string? fichier, string? setDeclare = null)
+    {
+        if (!string.IsNullOrWhiteSpace(setDeclare)) return setDeclare.Trim().ToLowerInvariant();
+        var e = EpingleSure(fichier);
+        if (e is null) return null;
+        var parties = e.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (parties.Length >= 3 && string.Equals(parties[0], "nvram", StringComparison.OrdinalIgnoreCase)) return parties[1].ToLowerInvariant();
+        var nom = Path.GetFileNameWithoutExtension(parties[^1]);
+        return nom.Length > 0 ? nom.ToLowerInvariant() : null;
+    }
+
+    /// <summary>
+    /// UN CLONE SANS EPINGLE SE DIT AU PREVOL (11/11). L'EEPROM d'usine porte la region (« PROGEEUR » dans celle de
+    /// progear) : celle d'un clone admis (progeara, progearu, gigawingj...) ne peut jamais repondre a l'epingle du parent,
+    /// et le site refusait la partie APRES qu'elle avait ete jouee. Rend les sets que le profil epingle pour ce coeur quand
+    /// le set lance n'en fait pas partie (le joueur sait lequel lancer) ; null si le profil n'epingle rien pour ce coeur,
+    /// si le set lance est epingle, ou si le set n'est pas connu (le site jugera). Pur.
+    /// </summary>
+    internal static IReadOnlyList<string>? SetsEpinglesSansCeluiCi(JsonElement? profil, string? coeurSha, string? set)
+    {
+        if (string.IsNullOrWhiteSpace(set) || profil is not { ValueKind: JsonValueKind.Object } p) return null;
+        var racine = p.TryGetProperty("profile", out var interne) && interne.ValueKind == JsonValueKind.Object ? interne : p;
+        if (!racine.TryGetProperty("nvram_pins", out var pins) || pins.ValueKind != JsonValueKind.Array) return null;
+        var sets = new List<string>();
+        foreach (var pin in pins.EnumerateArray())
+        {
+            if (pin.ValueKind != JsonValueKind.Object) continue;
+            if (pin.TryGetProperty("cores", out var coeurs) && coeurs.ValueKind == JsonValueKind.Array && coeurs.GetArrayLength() > 0
+                && !coeurs.EnumerateArray().Any(c => c.ValueKind == JsonValueKind.String
+                    && string.Equals(c.GetString(), coeurSha, StringComparison.OrdinalIgnoreCase))) continue;
+            var fichier = pin.TryGetProperty("file", out var f) && f.ValueKind == JsonValueKind.String ? f.GetString() : null;
+            var declare = pin.TryGetProperty("set", out var s) && s.ValueKind == JsonValueKind.String ? s.GetString() : null;
+            if (SetDeLEpingle(fichier, declare) is { } nom && !sets.Contains(nom)) sets.Add(nom);
+        }
+        if (sets.Count == 0) return null;
+        return sets.Contains(set.Trim().ToLowerInvariant()) ? null : sets;
+    }
+
     /// <summary>Un chemin relatif, sans remontee ni racine : une epingle ne designe jamais rien hors des sauvegardes.</summary>
     internal static string? EpingleSure(string? epingle)
     {
