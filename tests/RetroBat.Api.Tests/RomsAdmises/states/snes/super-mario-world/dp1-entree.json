@@ -1,0 +1,29 @@
+{
+ "schema": "nelfe.scorelab.state-artifact.v1",
+ "game": "snes/super-mario-world",
+ "situation": "dp1-entree",
+ "description": "Donut Plains 1 : ouverture du niveau (mode $0100 = 0x13), partie neuve (5 vies, Mario petit, reserve vide, sans Yoshi, aucun palais), la main a Mario 30 images apres le chargement (mode 0x14).",
+ "state_file": "dp1-entree.state",
+ "state_sha256": "a97302a4b2ef98304cf1202a9f0120a6e429c74df87ce601e1ce374ec52c6824",
+ "core": "snes9x",
+ "core_sha256": "c0ea65d8af6b8a8d99d63c391f5077d1bde4086c78e212790e41cdeb18db6c09",
+ "rom": "Super Mario World (USA).sfc",
+ "rom_sha256": "0838e531fe22c077528febe14cb3ff7c492f1f5fa8de354192bdff7137c27f5b",
+ "rom_md5": "cdd3c8c37322978ca8669b34bc89c804",
+ "values_at_save": {
+  "mode_0100": 19,
+  "niveau_13BF": 21,
+  "vies_0DBE": 4,
+  "puissance_0019": 0,
+  "reserve_0DC2": 0,
+  "yoshi_187A": 0,
+  "pause_13D4": 0,
+  "anim_0071": 0,
+  "fin_1493": 0,
+  "evenements_1F02": "000000000000000000000000000000",
+  "palais_1F27": "00000000"
+ },
+ "bench_verification": "banc snes9x sans fenetre : etat recharge a froid, depart (0x13 -> 0x14) a +30 images",
+ "certified": false,
+ "made_utc": "2026-11-06T07:17:01Z"
+}
