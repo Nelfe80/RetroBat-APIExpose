@@ -61,8 +61,10 @@ public sealed class ReplayVideoPublisher
     /// </summary>
     /// <param name="Controles">Les scores certifies du replay et la fin de leur run (<c>checks</c> du site, 09/11) : le score lu
     /// pendant le rendu doit les retrouver (<see cref="ControleDeFidelite"/>).</param>
+    /// <param name="Epreuves">L'epreuve certifiee du replay (11/11) : son defi, sa version et son temps officiel ; l'arrivee
+    /// rejouee doit tomber a la bonne image (<see cref="ControleDEpreuve"/>).</param>
     public sealed record Cible(string ReplayId, long? Debut, long? Fin, bool Epreuve = false,
-        IReadOnlyList<PointDuScore>? Controles = null);
+        IReadOnlyList<PointDuScore>? Controles = null, IReadOnlyList<EpreuveCertifiee>? Epreuves = null);
 
     /// <summary>Ce que le site demande a cette borne.</summary>
     /// <param name="Role"><see cref="RoleStation"/>, <see cref="RoleJoueur"/> ou <see cref="RoleAucun"/> ; null
@@ -160,7 +162,7 @@ public sealed class ReplayVideoPublisher
             var dossier = Path.Combine(_objects.TempRoot, "video", cible.ReplayId);
             try
             {
-                var film = await _rendu.RendreAsync(cible.ReplayId, debut, fin, ct, cible.Controles).ConfigureAwait(false);
+                var film = await _rendu.RendreAsync(cible.ReplayId, debut, fin, ct, cible.Controles, cible.Epreuves).ConfigureAwait(false);
                 if (!film.Ok || film.Fichier is null)
                 {
                     var raison = film.Raison ?? "incomplet";
@@ -400,16 +402,26 @@ public sealed class ReplayVideoPublisher
                 var id = c.TryGetProperty("replay_id", out var i) && i.ValueKind == JsonValueKind.String ? i.GetString() : null;
                 if (string.IsNullOrEmpty(id)) continue;
                 var controles = new List<PointDuScore>();
+                var epreuves = new List<EpreuveCertifiee>();
                 if (c.TryGetProperty("checks", out var points) && points.ValueKind == JsonValueKind.Array)
                 {
                     foreach (var p in points.EnumerateArray())
                     {
-                        if (p.ValueKind == JsonValueKind.Object && Nombre(p, "end_frame") is long finFrame && Nombre(p, "score") is long score)
+                        if (p.ValueKind != JsonValueKind.Object) continue;
+                        // (11/11) une epreuve : son defi, sa version et son temps officiel (images, penalites comprises).
+                        if (p.TryGetProperty("challenge_id", out var defi) && defi.ValueKind == JsonValueKind.String
+                            && Nombre(p, "version") is long version && Nombre(p, "frames") is long images)
+                        {
+                            epreuves.Add(new EpreuveCertifiee(defi.GetString()!, (int)version, images, Nombre(p, "end_frame")));
+                            continue;
+                        }
+                        if (Nombre(p, "end_frame") is long finFrame && Nombre(p, "score") is long score)
                             controles.Add(new PointDuScore(finFrame, score));
                     }
                 }
                 sortie.Add(new Cible(id!, Nombre(c, "run_start_frame"), Nombre(c, "run_end_frame"),
-                    c.TryGetProperty("challenge", out var ep) && ep.ValueKind == JsonValueKind.True, controles.Count > 0 ? controles : null));
+                    c.TryGetProperty("challenge", out var ep) && ep.ValueKind == JsonValueKind.True, controles.Count > 0 ? controles : null,
+                    epreuves.Count > 0 ? epreuves : null));
             }
         }
         return new Liste(role, sortie);

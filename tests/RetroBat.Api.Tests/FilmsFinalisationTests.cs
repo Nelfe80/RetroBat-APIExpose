@@ -71,4 +71,19 @@ return {
         var neogeoff = new Dictionary<long, int> { [0xEF96] = 0x75, [0xEF97] = 0x10, [0xEF99] = 0x80 };
         Assert.Equal(107580, lecteur.Composer(lecteur.Lignes.Select(l => (long?)neogeoff[l.Adresse]).ToList()));
     }
+
+    [Fact]
+    public void La_liste_du_site_porte_les_epreuves_a_controler()
+    {
+        var liste = ReplayVideoPublisher.LireLaListe("""
+{"ok":true,"role":"player","targets":[{"replay_id":"rp_1","run_start_frame":0,"run_end_frame":1603,"challenge":true,
+"checks":[{"challenge_id":"super-mario-bros.1-1","version":1,"frames":1423,"end_frame":1603}]},
+{"replay_id":"rp_2","run_start_frame":10,"run_end_frame":900,"checks":[{"end_frame":900,"score":12345}]}]}
+""");
+        var epreuve = Assert.Single(liste.Cibles[0].Epreuves!);
+        Assert.Equal(new EpreuveCertifiee("super-mario-bros.1-1", 1, 1423, 1603), epreuve);
+        Assert.Null(liste.Cibles[0].Controles);
+        Assert.Null(liste.Cibles[1].Epreuves);
+        Assert.Equal(new PointDuScore(900, 12345), Assert.Single(liste.Cibles[1].Controles!));
+    }
 }
