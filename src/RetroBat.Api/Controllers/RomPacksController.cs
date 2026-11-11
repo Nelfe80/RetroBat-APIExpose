@@ -12,14 +12,17 @@ public sealed class RomPacksController : ControllerBase
     private readonly RomPackInstallerService _romPackInstaller;
     private readonly RetroBat.Api.Replay.Video.EchelleDesFilms? _echelle;
     private readonly RetroBat.Api.Infrastructure.CertifiedSettingsService? _certifies;
+    private readonly RetroBat.Api.Infrastructure.NotificationsDesLancementsEs? _notifications;
 
     public RomPacksController(RomPackInstallerService romPackInstaller,
         RetroBat.Api.Replay.Video.EchelleDesFilms? echelle = null,
-        RetroBat.Api.Infrastructure.CertifiedSettingsService? certifies = null)
+        RetroBat.Api.Infrastructure.CertifiedSettingsService? certifies = null,
+        RetroBat.Api.Infrastructure.NotificationsDesLancementsEs? notifications = null)
     {
         _romPackInstaller = romPackInstaller;
         _echelle = echelle;
         _certifies = certifies;
+        _notifications = notifications;
     }
 
     /// <summary>
@@ -36,6 +39,8 @@ public sealed class RomPacksController : ControllerBase
         _echelle?.PoserPourLeLancement(rawArguments);
         // Et les reglages certifies du jeu (rembobinage, run-ahead, sauvegarde auto), que le lanceur lit juste apres.
         _certifies?.NeutraliserAvantLeLancement(rawArguments);
+        // Les notifications de RetroArch d'une partie NelfePlay lancee par ES : la cle par jeu, rendue des que l'emulateur parait (11/11)
+        _notifications?.PoserAvantLeLancement(rawArguments);
         var result = await _romPackInstaller.EnsureLaunchRomAsync(rawArguments, cancellationToken);
         return Ok(result);
     }

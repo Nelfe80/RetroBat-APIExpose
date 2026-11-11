@@ -592,5 +592,7 @@ public sealed class NetplayGuestService
             "-netplayport", infos.Port.ToString(),
             "-netplaysession", '"' + infos.Session + '"',
             "-netplaypass", '"' + infos.MotDePasse + '"',
+            // Le repli direct d'une partie NelfePlay : notifications de RetroArch coupees (11/11)
+            "-OnScreenMsg", "0",
         }.Where(x => x.Length > 0));
 }

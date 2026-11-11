@@ -273,7 +273,8 @@ public sealed class MultiplayerRelaisDeLaManette
                     annonces++;
                     _journal?.LogInformation("MULTIPLAYER : manette d'equipe, la main est a la place {Place} (valeur {Valeur})", place, valeur);
                     if (!RetroBat.Api.Deck.DeckSilence.DireSiPose(RetroBat.Api.Deck.DeckNotices.Message("multiplayer.team_hand", RetroBat.Api.Deck.DeckSeverity.Info,
-                            "YOUR TURN", "TAKE THE PAD", "multiplayer", RetroBat.Api.Deck.DeckNotices.Court)))
+                            "YOUR TURN", "TAKE THE PAD", "multiplayer", RetroBat.Api.Deck.DeckNotices.Court))
+                        && !RetroBat.Api.Infrastructure.NotificationsRetroArch.AuBandeau("MULTIPLAYER", message, 3000))
                         await _commandes.EnvoyerAsync("SHOW_MSG " + message.ReplaceLineEndings(" ").Trim(), ct).ConfigureAwait(false);
                 }
 

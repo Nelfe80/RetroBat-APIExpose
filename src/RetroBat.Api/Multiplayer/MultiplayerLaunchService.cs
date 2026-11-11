@@ -1567,6 +1567,12 @@ public sealed class MultiplayerLaunchService : IHostedService
             _journal.LogWarning("MULTIPLAYER : aucune manette pour cette partie, le joueur est prevenu dans le Deck");
             return;
         }
+        // RetroArch muet pour la partie (11/11) : le bandeau de l'API, une fois, tenu plus longtemps que RetroArch
+        if (NotificationsRetroArch.AuBandeau("MULTIPLAYER", texte, 10000, alerte: true))
+        {
+            _journal.LogWarning("MULTIPLAYER : aucune manette pour cette partie, le joueur est prevenu par le bandeau");
+            return;
+        }
         _journal.LogWarning("MULTIPLAYER : aucune manette pour cette partie, le joueur est prevenu dans RetroArch");
         for (var i = 0; i < 3; i++)
         {

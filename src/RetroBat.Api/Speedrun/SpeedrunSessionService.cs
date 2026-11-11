@@ -249,7 +249,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             cartes: pages ? RetroBat.Api.Deck.DeckCartes.Api : RetroBat.Api.Deck.DeckCartes.Deck);
         var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
             RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, reglement.SystemId, "libretro", coeur, rom, retroAchievements: false,
-            deck?.Arguments);
+            // Les notifications de RetroArch coupees (11/11), avec ou sans Deck : les messages du speedrun vont au Deck ou au bandeau
+            NotificationsRetroArch.Ajouter(deck?.Arguments));
         if (arguments is null) return new(false, "bad_rules", "systeme ou coeur illisible");
 
         // LES VERROUS (D18) : dans certified.txt avant le lanceur, le wrapper les lit au chargement du jeu. Toujours poses,
@@ -994,6 +995,10 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         {
             var texte = TexteDe(message);
             foreach (var (nom, valeur) in message.Valeurs) texte = texte.Replace("{" + nom + "}", valeur, StringComparison.Ordinal);
+            // RETROARCH MUET SANS DECK (11/11) : le bandeau du haut de l'API dit le message, RetroArch ne le montrerait pas
+            SessionSpeedrun? session;
+            lock (_verrou) session = _sessionDuLancement;
+            if (NotificationsRetroArch.AuBandeau(session?.Reglement.EstUnChallenge == true ? "CHALLENGE" : "SPEEDRUN", texte)) return;
             await _commandes.EnvoyerAsync("SHOW_MSG " + texte.ReplaceLineEndings(" ").Trim(), CancellationToken.None).ConfigureAwait(false);
         }
         catch (Exception ex)

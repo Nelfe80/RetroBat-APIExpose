@@ -33,7 +33,7 @@ public class MultiplayerLaunchPlanTests : IDisposable
         var ligne = MultiplayerLaunchPlan.Arguments("-p1index 0", "fbneo", "fbneo", @"E:\RetroBat\roms\fbneo\mslug3.zip", Mslug3, 2, netplay);
 
         Assert.Equal(
-            "-p1index 0 -system fbneo -emulator libretro -core fbneo -retroachievements 0"
+            "-p1index 0 -system fbneo -emulator libretro -core fbneo -retroachievements 0 -OnScreenMsg 0"
             + " -rewind 0 -autosave 0 -runahead 0 -fastforward_ratio 1.000000 -netplay true -netplaymode host"
             + " -netplay.nickname NELFEPLAY_player_ab12cd34 -netplay.password aaaa1111 -netplay.spectatepassword bbbb2222"
             + " -netplay.relay madrid -netplay.port 55435 -netplay_public_announce true -rom \"E:\\RetroBat\\roms\\fbneo\\mslug3.zip\"",
