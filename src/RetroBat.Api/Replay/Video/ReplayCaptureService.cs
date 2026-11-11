@@ -380,6 +380,8 @@ public sealed class ReplayCaptureService : BackgroundService
         if (RetroBat.Api.Deck.DeckSilence.DireSiPose(RetroBat.Api.Deck.DeckNotices.Message("video.filter.no_live", RetroBat.Api.Deck.DeckSeverity.Warn,
                 "NO LIVE", "IMAGE FILTER (NTSC) ON", "video", RetroBat.Api.Deck.DeckNotices.Long)))
             return;
+        // RetroArch muet pour ce lancement (11/11) : le bandeau de l'API, une fois, aussi long que les trois messages
+        if (RetroBat.Api.Infrastructure.NotificationsRetroArch.AuBandeau("VIDEO", texte, 9600, alerte: true)) return;
         for (var i = 0; i < 3 && !ct.IsCancellationRequested; i++)
         {
             await _ra.ShowMessageAsync(texte, ct).ConfigureAwait(false);

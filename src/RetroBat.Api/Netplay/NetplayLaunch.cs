@@ -100,13 +100,17 @@ public static class NetplayLaunch
         }
         try
         {
-            return Process.Start(new ProcessStartInfo
+            var lanceur = Process.Start(new ProcessStartInfo
             {
                 FileName = exe,
                 Arguments = arguments,
                 WorkingDirectory = Path.GetDirectoryName(exe)!,
                 UseShellExecute = false,
             });
+            // Tout lancement direct passe ici : on sait s'il coupe les notifications de RetroArch (-OnScreenMsg 0), donc si
+            // les messages de NelfePlay doivent passer au bandeau de l'API (NotificationsRetroArch, 11/11).
+            NotificationsRetroArch.Suivre(arguments, lanceur, logger);
+            return lanceur;
         }
         catch (Exception ex)
         {

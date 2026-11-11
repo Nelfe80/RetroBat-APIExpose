@@ -797,6 +797,8 @@ var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
     app.Services.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>().Silence = silence;
     app.Services.GetRequiredService<RetroBat.Api.Infrastructure.LiveContestOverlayService>().Silence = silence;
 }
+// RetroArch muet pour une partie lancee par NelfePlay (11/11) : les messages de NelfePlay passent par ce bandeau.
+RetroBat.Api.Infrastructure.NotificationsRetroArch.Bandeau = app.Services.GetService<RetroBat.Api.Infrastructure.LiveContestOverlayService>();
 eventBus.Subscribe<EventEnvelope>(evt => 
 {
     _ = wsManager.BroadcastAsync(evt);

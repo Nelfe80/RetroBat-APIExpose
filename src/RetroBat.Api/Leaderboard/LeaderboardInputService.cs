@@ -1862,7 +1862,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         IReadOnlyList<string> argumentsDuDeck, IReadOnlyList<string> netplay)
         => RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(manettes, resolution.Systeme, resolution.Emulateur,
             resolution.Coeur.Length > 0 ? resolution.Coeur : null, chemin, retroAchievements: null,
-            argumentsDuDeck.Concat(FonctionsNeutraliseesDuDefi).Concat(netplay));
+            Infrastructure.NotificationsRetroArch.Ajouter(argumentsDuDeck).Concat(FonctionsNeutraliseesDuDefi).Concat(netplay));
 
     /// <summary>Le classement du rang en direct : la regle de l'onglet regarde (hors 1CC MULTI), sinon la regle principale.</summary>
     private Deck.DeckRankBoard? ClassementDuRang()

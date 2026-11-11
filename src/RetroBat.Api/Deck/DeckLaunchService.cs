@@ -607,6 +607,8 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
             suivant, lancement.Game, lancement.Mode, lancement.Player, source, maintenant);
         _ = _bus.PublishAsync(new EventEnvelope { Type = "deck.choice", Payload = publie });
         if (Silence?.Dire(DeckNotices.DuChoix(off, pose is not null, entree?.Name, maintenant), auDeck) == true) return publie;
+        // RetroArch muet pour ce lancement, sans plaque du Deck : le bandeau de l'API (11/11)
+        if (Infrastructure.NotificationsRetroArch.AuBandeau("PLAYERDECK", texte, 4000)) return publie;
         _ = Task.Run(async () =>
         {
             try { await _commandes.EnvoyerAsync("SHOW_MSG " + texte, CancellationToken.None).ConfigureAwait(false); }

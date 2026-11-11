@@ -1440,7 +1440,9 @@ public sealed partial class MultiplayerPanelService
             _journal.LogInformation("MULTIPLAYER : invitation de {Ami} annoncee dans le Deck", invitation.From?.Pseudo);
             return;
         }
-        await new CommandesRetroArchUdp().EnvoyerAsync("SHOW_MSG " + texte.ReplaceLineEndings(" ").Trim(), CancellationToken.None).ConfigureAwait(false);
+        // RetroArch muet pour la partie (11/11) : le bandeau de l'API
+        if (!NotificationsRetroArch.AuBandeau("MULTIPLAYER", texte, 5000))
+            await new CommandesRetroArchUdp().EnvoyerAsync("SHOW_MSG " + texte.ReplaceLineEndings(" ").Trim(), CancellationToken.None).ConfigureAwait(false);
         _journal.LogInformation("MULTIPLAYER : invitation de {Ami} annoncee dans le jeu", invitation.From?.Pseudo);
     }
 

@@ -219,6 +219,8 @@ public static class MultiplayerLaunchPlan
         }
 
         var morceaux = new List<string> { manettes, "-system", systeme, "-emulator", "libretro", "-core", coeur, "-retroachievements", "0" };
+        // Les notifications de RetroArch coupees pour la partie (11/11) : les messages de NelfePlay vont au bandeau de l'API
+        morceaux.AddRange(RetroBat.Api.Infrastructure.NotificationsRetroArch.Arguments);
         morceaux.AddRange(ArgumentsDuTempsPartage);
         morceaux.AddRange(ArgumentsDuJeu(jeu));
         if (ShaderDeLaPlace(jeu, place, joueurs) is { } shader)

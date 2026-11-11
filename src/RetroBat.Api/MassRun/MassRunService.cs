@@ -261,7 +261,7 @@ public sealed class MassRunService : IDisposable
             _canal.PoserSalle(CrcSmb, null, limiteSecondes, Convert.ToUInt32(couleur, 16), pseudo.Length > 10 ? pseudo[..10] : pseudo, niveau, etat, textes: TextesDuCoeur());
 
             var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
-                RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, "nes", "libretro", CoeurHote, rom, null);
+                RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, "nes", "libretro", CoeurHote, rom, null, NotificationsRetroArch.Arguments);
             if (arguments is null)
             {
                 _canal.Fermer();
@@ -347,7 +347,7 @@ public sealed class MassRunService : IDisposable
             if (lancerLeJeu)
             {
                 var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
-                    RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, jeu.Systeme, "libretro", jeu.Coeur, rom, null);
+                    RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, jeu.Systeme, "libretro", jeu.Coeur, rom, null, NotificationsRetroArch.Arguments);
                 if (arguments is not null)
                 {
                     _ = Task.Run(() => LancementDirect.Lancer(arguments, jeu.Systeme, rom, _contexte, _bus, _journal));

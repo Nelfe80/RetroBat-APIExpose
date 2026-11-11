@@ -587,6 +587,8 @@ public sealed class NetplayHostService
             "-core", r.Coeur,
             "-rom", Guillemets(cheminRom),
             "-netplaymode", "host",
+            // Le repli direct d'une partie NelfePlay : notifications de RetroArch coupees (11/11)
+            "-OnScreenMsg", "0",
         }.Where(x => x.Length > 0));
 
     /// <summary>Un chemin contient des espaces : sans guillemets, le lanceur ne recoit qu'un morceau.</summary>
