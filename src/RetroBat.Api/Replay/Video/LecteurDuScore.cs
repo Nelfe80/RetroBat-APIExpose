@@ -17,8 +17,8 @@ namespace RetroBat.Api.Replay.Video;
 ///
 /// L'ADRESSE DANS LE COEUR : READ_CORE_RAM lit la memoire systeme que le coeur expose, la meme que lit le wrapper sous
 /// FBNeo (sonde du 09/11 : Battle Garegga, 0x166C a 0x166F = 01 00 4C 71, soit 94 540, le score certifie) et sous les coeurs
-/// NES (memoire de la console a partir de 0). Les autres coeurs ne sont pas encore releves : pas de lecteur, le film est
-/// alors « non verifie ».
+/// NES (memoire de la console a partir de 0), Genesis Plus GX et snes9x (11/11, voir <see cref="CoeurReleve"/>). Les autres
+/// coeurs ne sont pas encore releves : pas de lecteur, le film est alors « non verifie ».
 /// </summary>
 public sealed class LecteurDuScore : IDisposable
 {
@@ -76,8 +76,19 @@ public sealed class LecteurDuScore : IDisposable
     /// Les coeurs dont l'adresse du .MEM est celle de READ_CORE_RAM : FBNeo (memoire systeme, mots 68000 deja dans l'ordre
     /// que lit le wrapper) et les coeurs NES. Pur.
     /// </summary>
+    /// <remarks>
+    /// (11/11) Genesis Plus GX et snes9x : sans succes, READ_CORE_RAM lit la memoire systeme du coeur a l'adresse 0
+    /// (rcheevos, console 0), le meme repere que les .MEM (index bruts de GPGX, sans ^1 ; WRAM du SNES). Prouve sur la
+    /// borne : Streets of Rage 2, 0xEF96/97/99 = 3 960 exact ; Super Metroid, 0x0998 = 0x08 en jeu, salle 0x079B = 0xA59F
+    /// (Kraid), energie 0x09C2 jusqu'a la mort. Les coeurs des fantomes (_ghosts) ont la meme memoire que leur coeur
+    /// d'origine. MAME n'expose aucune memoire a READ_CORE_RAM et n'enregistre pas de replay (RetroArch 1.22.2 plante en
+    /// encodant son etat) : rien a lire.
+    /// </remarks>
     internal static bool CoeurReleve(string? coeur)
-        => (coeur ?? "").Trim().ToLowerInvariant() is "fbneo" or "fbalpha" or "fbalpha2012" or "fceumm" or "nestopia" or "mesen";
+        => (coeur ?? "").Trim().ToLowerInvariant() is "fbneo" or "fbalpha" or "fbalpha2012"
+            or "fceumm" or "fceumm_ghosts" or "nestopia" or "mesen"
+            or "genesis_plus_gx" or "genesis_plus_gx_ghosts" or "genesis_plus_gx_wide" or "genesis_plus_gx_expanded"
+            or "snes9x" or "snes9x_ghosts";
 
     /// <summary>Les dossiers de .MEM ou chercher le jeu : l'arcade pour les dossiers d'arcade, sinon le dossier lui-meme. Pur.</summary>
     internal static IEnumerable<string> SystemesDuMem(string? dossier, string? systeme)
