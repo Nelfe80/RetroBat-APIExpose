@@ -70,26 +70,83 @@ public sealed partial class DefisPanelService
 
     // ── Le lancement ─────────────────────────────────────────────────────────────
 
-    /// <summary>Lance l'epreuve et montre la preparation ; rend la raison d'un refus, ou null.</summary>
+    /// <summary>
+    /// Lance l'epreuve et montre la preparation ; rend la raison d'un refus, ou null.
+    /// <para>
+    /// LA PAGE D'ABORD (13/11, « l'ecran d'intro des speedruns met du temps a s'afficher ») : elle attendait tout le lancement
+    /// (fantomes, Deck, manettes d'ES, lanceur, abonnes de ui.game.started), de 7 a 26 s mesures sur la borne le 12/11, le
+    /// panneau fige pendant ce temps. Les controles rapides passent d'abord (un refus se dit encore dans le panneau), la page
+    /// s'ouvre, et le jeu part dessous (<see cref="PartirSousLaPage"/>) : elle tenait deja jusqu'a la premiere image.
+    /// </para>
+    /// </summary>
     private string? LancerLEpreuve(Reglement defi, string chemin, string jeu)
     {
         var lanceA = DateTime.UtcNow;
         var lanceALocal = DateTime.Now;
-        var reponse = _session.Lancer(defi.ChallengeId, (_, _) => File.Exists(chemin) ? chemin : null, pages: true);
-        if (!reponse.Lance)
+        var (verifie, refus) = _session.Verifier(defi.ChallengeId, (_, _) => File.Exists(chemin) ? chemin : null);
+        if (verifie is null)
         {
-            _journal?.LogInformation("Defis : lancement de {Defi} refuse ({Raison} {Detail}).", defi.ChallengeId, reponse.Raison, reponse.Detail);
-            return reponse.Raison ?? "launcher_failed";
+            _journal?.LogInformation("Defis : lancement de {Defi} refuse ({Raison} {Detail}).", defi.ChallengeId, refus?.Raison, refus?.Detail);
+            return refus?.Raison ?? "launcher_failed";
         }
 
-        _journal?.LogInformation("Defis : {Defi} lance depuis le panneau.", defi.ChallengeId);
-        // ES ne sait pas qu'un jeu tourne : sa musique se tait jusqu'a la fin du jeu (SonDEmulationStation la rend ensuite).
-        _sonDEs?.Couper();
         string? fanart = null;
         try { fanart = RetroBat.Api.Media.MediaDuGamelist.Resoudre(chemin, "fanart", "image"); }
         catch (Exception ex) { _journal?.LogDebug(ex, "Defis : fanart introuvable pour {Chemin}.", chemin); }
-        MontrerLaPreparation(new EpreuveLancee(defi, chemin, jeu, fanart, lanceA, lanceALocal));
+        var epreuve = new EpreuveLancee(defi, chemin, jeu, fanart, lanceA, lanceALocal);
+        MontrerLaPreparation(epreuve);
+        _journal?.LogInformation("Defis : preparation de {Defi} a l'ecran en {Ms:0} ms, le jeu part dessous.", defi.ChallengeId,
+            (DateTime.UtcNow - lanceA).TotalMilliseconds);
+        _ = Task.Run(() => PartirSousLaPage(verifie, epreuve));
         return null;
+    }
+
+    /// <summary>
+    /// Le jeu part sous la page de preparation. Un refus tardif (verrous non ecrits, lanceur introuvable, jeu parti entre-temps)
+    /// efface la page et rend ES : rien n'a ete lance.
+    /// </summary>
+    private void PartirSousLaPage(LancementVerifie verifie, EpreuveLancee epreuve)
+    {
+        var debut = DateTime.UtcNow;
+        ReponseLancement reponse;
+        try
+        {
+            reponse = _session.Partir(verifie, pages: true);
+        }
+        catch (Exception ex)
+        {
+            _journal?.LogWarning(ex, "Defis : lancement de {Defi} en echec sous la page.", epreuve.Defi.ChallengeId);
+            reponse = new ReponseLancement(false, "launcher_failed", ex.Message);
+        }
+
+        if (reponse.Lance)
+        {
+            _journal?.LogInformation("Defis : {Defi} lance depuis le panneau ({Ms:0} ms sous la page).", epreuve.Defi.ChallengeId,
+                (DateTime.UtcNow - debut).TotalMilliseconds);
+            // ES ne sait pas qu'un jeu tourne : sa musique se tait jusqu'a la fin du jeu (SonDEmulationStation la rend ensuite).
+            _sonDEs?.Couper();
+            return;
+        }
+
+        _journal?.LogInformation("Defis : lancement de {Defi} refuse sous la page ({Raison} {Detail}), ES revient.", epreuve.Defi.ChallengeId,
+            reponse.Raison, reponse.Detail);
+        if (!LacherLaPreparation(epreuve)) return;
+        AnnoncerLaPage("preparation", false);
+        _overlay.Fermer();
+        EmulatorForeground.FocusEmulationStation();
+    }
+
+    /// <summary>La preparation de cette epreuve, encore a l'ecran, s'en va (vrai) ; une autre page ou une autre epreuve reste (faux).</summary>
+    private bool LacherLaPreparation(EpreuveLancee epreuve)
+    {
+        lock (_verrou)
+        {
+            if (_page != PageDEpreuve.Preparation || !ReferenceEquals(_epreuve, epreuve)) return false;
+            _page = PageDEpreuve.Aucune;
+            _epreuve = null;
+            _suiteDeLaPage?.Cancel();
+            return true;
+        }
     }
 
     private RetroBat.Domain.Interfaces.IEventBus? _bus;
