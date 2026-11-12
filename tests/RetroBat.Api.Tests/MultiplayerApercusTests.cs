@@ -155,5 +155,20 @@ public class MultiplayerApercusTests
             Assert.True(png.Length > 0, nom);
             File.WriteAllBytes(Path.Combine(Sortie, nom + ".png"), png);
         }
+
+        // LE VOCAL DISCORD (lot B, 12/11) : la pastille en haut a droite, sur le panneau et sur l'ecran de fin.
+        var vocaux = new Dictionary<string, (L.ContenuMultiplayer Contenu, L.VoixADessiner Voix)>
+        {
+            ["vocal-propose"] = (vues["np-2-plein"], new("VOICE CHAT AVAILABLE", "A98BFF", "Y: JOIN VOICE CHAT")),
+            ["vocal-connecte"] = (vues["np-2-plein"], new("VOICE: CONNECTED · 2  ·  MIC OFF", "78E5A3", "Y: MIC  ·  HOLD Y: SOUND")),
+            ["vocal-fin"] = (vues["np-2-resultat-plein"], new("VOICE: CONNECTED · 2", "78E5A3", "Y: MIC  ·  HOLD Y: SOUND")),
+            ["vocal-indisponible"] = (vues["np-2-attente"], new("VOICE UNAVAILABLE", "B8C7D9", "")),
+        };
+        foreach (var (nom, (contenu, voix)) in vocaux)
+        {
+            var png = L.ApercuMultiplayer(style, contenu, "", "", "", null!, vocal: voix);
+            Assert.True(png.Length > 0, nom);
+            File.WriteAllBytes(Path.Combine(Sortie, nom + ".png"), png);
+        }
     }
 }

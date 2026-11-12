@@ -1503,7 +1503,7 @@ public sealed partial class LeaderboardOverlayService
     /// sans borne devant soi). Aucune fenetre n'est montree. <paramref name="attente"/> dessine la presentation.
     /// </summary>
     internal static byte[] ApercuMultiplayer(EsMenuStyle style, ContenuMultiplayer contenu, string attente, string attenteTitre,
-        string attenteDetail, ILogger<LeaderboardOverlayService> logger, double? temps = null, double? depart = null)
+        string attenteDetail, ILogger<LeaderboardOverlayService> logger, double? temps = null, double? depart = null, VoixADessiner? vocal = null)
     {
         byte[] png = [];
         Exception? erreur = null;
@@ -1517,6 +1517,8 @@ public sealed partial class LeaderboardOverlayService
                 service._multiplayer = contenu;
                 service._tempsDApercu = temps;
                 service._tempsDuDepartDApercu = depart;
+                // La pastille du vocal n'est dessinee qu'a la demande de l'outil de mise au point (jamais dans les cartes du film).
+                service.VocalEnDirect = vocal is null ? null : () => vocal;
                 service._glyphes = new EsGlyphCache(style, logger);
                 service.ChargerLesPolices(style);
                 using var forme = new Panneau(service);
