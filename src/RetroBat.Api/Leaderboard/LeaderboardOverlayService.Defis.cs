@@ -28,6 +28,15 @@ public sealed partial class LeaderboardOverlayService
 
     public sealed record ChampDeFiche(string Etiquette, string Valeur);
 
+    /// <summary>Une ligne du selecteur de reglages : son nom, sa valeur, et si elle joue (inactive : grisee).</summary>
+    public sealed record LigneDeReglage(string Etiquette, string Valeur, bool Active = true);
+
+    /// <summary>
+    /// (12/11) Le selecteur de reglages, en surimpression de la liste : un titre, des lignes generiques, la ligne choisie. La
+    /// fiche reste visible dessous (son resume suit les changements).
+    /// </summary>
+    public sealed record SelecteurAffiche(string Titre, IReadOnlyList<LigneDeReglage> Lignes, int Courante);
+
     /// <summary>
     /// Ce que le panneau des defis montre. <c>LigneCourante</c> : l'index dans <c>Lignes</c>, surtitres compris. <c>Types</c> :
     /// la rangee de RECORDS (GLOBAL, ANY%...), vide ailleurs. <c>LigneEpinglee</c> : la ligne du joueur, qui reste en bas de la
@@ -52,7 +61,8 @@ public sealed partial class LeaderboardOverlayService
         string Pseudo = "",
         bool EnLigne = false,
         int? LigneEpinglee = null,
-        SalleMassRun? MassRun = null);
+        SalleMassRun? MassRun = null,
+        SelecteurAffiche? Selecteur = null);
 
     /// <summary>
     /// L'onglet MASS RUN (style B des maquettes, sans image du niveau, D23) : deux grands compteurs, une ligne de salle, un
@@ -180,6 +190,11 @@ public sealed partial class LeaderboardOverlayService
             else
             {
                 DessinerLaListeDesDefis(g, d, s, policeTexte, policeGras, policeGroupe, policePetite, tailleTexte, tailleGroupe, marge, y, basDuContenu);
+            }
+
+            if (d.Selecteur is { } selecteur)
+            {
+                DessinerLeSelecteur(g, selecteur, s, policeGroupe, policeTexte, policeGras, tailleTexte, marge, y, basDuContenu);
             }
 
             DessinerLaBarre(g, socle with { Defier = d.Action?.Mot ?? "", GlypheDefier = d.Action?.Glyphe ?? "", DefierMode = "", MaPlace = "" },
@@ -483,6 +498,73 @@ public sealed partial class LeaderboardOverlayService
             var hauteurCurseur = Math.Max(taille, piste.Height * part);
             var progres = total <= 1 ? 0f : (float) courante / (total - 1);
             Aplat(g, Teinte(s.SelectorColor), new RectangleF(piste.X, piste.Y + (piste.Height - hauteurCurseur) * progres, piste.Width, hauteurCurseur));
+        }
+
+        /// <summary>
+        /// (12/11) Le selecteur de reglages : la liste assombrie, une carte au milieu, une ligne par reglage (nom a gauche,
+        /// valeur entre deux fleches a droite), la ligne choisie dans le degrade du curseur d'ES, une ligne inactive grisee sans
+        /// fleches. Les fleches sont dessinees : la police du theme n'a pas toujours les triangles.
+        /// </summary>
+        private void DessinerLeSelecteur(Graphics g, SelecteurAffiche sel, EsMenuStyle s, Font titre, Font police, Font gras,
+            float taille, float marge, float haut, float bas)
+        {
+            if (bas <= haut) return;
+            Aplat(g, Color.FromArgb(170, 8, 10, 14), new RectangleF(0, haut, Width, bas - haut));
+            var hauteurLigne = taille * 2.0f;
+            var enTete = taille * 2.4f;
+            var hauteur = Math.Min(bas - haut, enTete + sel.Lignes.Count * hauteurLigne + taille * 0.8f);
+            var zone = new RectangleF(marge * 2f, haut + Math.Max(0f, (bas - haut - hauteur) / 2f), Width - marge * 4f, hauteur);
+            using (var forme = FormesDesEcrans.Arrondi(zone, taille * 0.4f))
+            using (var fond = new SolidBrush(Color.FromArgb(240, 16, 18, 24)))
+            using (var bord = new Pen(Teinte(s.SelectorColor), Math.Max(1.5f, taille * 0.08f)))
+            {
+                g.FillPath(fond, forme);
+                g.DrawPath(bord, forme);
+            }
+
+            using var aGauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.Character, FormatFlags = StringFormatFlags.NoWrap };
+            using var aDroite = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Far, LineAlignment = StringAlignment.Center, FormatFlags = StringFormatFlags.NoWrap };
+            using (var encreTitre = new SolidBrush(Teinte(s.GroupColor)))
+            {
+                g.DrawString(sel.Titre.ToUpperInvariant(), titre, encreTitre, new RectangleF(zone.X + taille * 0.8f, zone.Y, zone.Width - taille * 1.6f, enTete), aGauche);
+            }
+
+            var interieur = zone.Width - taille * 1.6f;
+            for (var i = 0; i < sel.Lignes.Count; i++)
+            {
+                var l = sel.Lignes[i];
+                var y = zone.Y + enTete + i * hauteurLigne;
+                if (y + hauteurLigne > zone.Bottom + 0.5f) break;
+                var choisie = i == sel.Courante && l.Active;
+                var rangee = new RectangleF(zone.X + taille * 0.3f, y, zone.Width - taille * 0.6f, hauteurLigne);
+                if (choisie)
+                {
+                    using var degrade = new LinearGradientBrush(rangee, Teinte(s.SelectorColor), Teinte(s.SelectorColorEnd), 0f);
+                    g.FillRectangle(degrade, rangee);
+                }
+
+                var couleur = !l.Active ? Teinte(s.TextColor, 90) : choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TextColor);
+                using var encre = new SolidBrush(couleur);
+                var p = choisie ? gras : police;
+                var x = zone.X + taille * 0.8f;
+                DessinerCoupe(g, l.Etiquette.ToUpperInvariant(), p, encre, new RectangleF(x, y, interieur * 0.34f, hauteurLigne), aGauche);
+
+                // la valeur, entre deux fleches quand elle se change
+                var fleche = taille * 0.55f;
+                var droite = zone.Right - taille * 0.8f;
+                var largeurValeur = Math.Min(interieur * 0.6f, g.MeasureString(l.Valeur, p, PointF.Empty, StringFormat.GenericTypographic).Width);
+                var cy = y + hauteurLigne / 2f;
+                if (l.Active)
+                {
+                    using var pointe = new SolidBrush(couleur);
+                    g.FillPolygon(pointe, [new PointF(droite - fleche, cy - fleche * 0.6f), new PointF(droite, cy), new PointF(droite - fleche, cy + fleche * 0.6f)]);
+                    var gaucheFleche = droite - fleche - taille * 0.5f - largeurValeur - taille * 0.5f;
+                    g.FillPolygon(pointe, [new PointF(gaucheFleche, cy - fleche * 0.6f), new PointF(gaucheFleche - fleche, cy), new PointF(gaucheFleche, cy + fleche * 0.6f)]);
+                }
+
+                var finValeur = droite - fleche - taille * 0.5f;
+                DessinerCoupe(g, l.Valeur, p, encre, new RectangleF(finValeur - interieur * 0.6f, y, interieur * 0.6f, hauteurLigne), aDroite);
+            }
         }
 
         /// <summary>La fiche calee en bas (maquette 1) : deux colonnes d'etiquettes et de valeurs.</summary>

@@ -8,6 +8,13 @@ public sealed class InterfaceTextService
     private const string DefaultLanguage = "en";
     private readonly object _lock = new();
     private readonly string _dictionaryPath = Path.Combine(RetroBatPaths.PluginRoot, "resources", "locales", "interface-texts.json");
+
+    public InterfaceTextService()
+    {
+    }
+
+    /// <summary>Essais et apercus : un autre dictionnaire (celui d'un Data Pack en cours).</summary>
+    internal InterfaceTextService(string dictionnaire) => _dictionaryPath = dictionnaire;
     private Dictionary<string, Dictionary<string, string>> _texts = new(StringComparer.OrdinalIgnoreCase);
     private DateTime _lastWriteUtc = DateTime.MinValue;
 

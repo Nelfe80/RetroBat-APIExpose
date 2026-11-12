@@ -41,6 +41,8 @@ public sealed partial class DefisPanelService
     private IReadOnlyList<RetroBat.Api.MassRun.MassRunService.SalleOuverte> _salles = [];
     private System.Threading.Timer? _minuteurMassRun;
     private readonly FantomesDuSpeedrun? _fantomes;
+    /// <summary>(12/11) Le selecteur des fantomes (X) : leur choix, l'opacite, les pseudos.</summary>
+    private readonly SelecteurDeReglages _selecteur = new();
     private int _tics;
     private readonly object _verrou = new();
 
@@ -140,6 +142,7 @@ public sealed partial class DefisPanelService
             _glypheRb = glypheRb.Length > 0 ? glypheRb : "r";
             _message = "";
             _lancement = false;
+            _selecteur.Fermer();
             regles = _defis.Select(d => d.Ruleset).ToList();
             _tableaux = _classements?.Connus(regles) ?? new Dictionary<string, ClassementDEpreuve>();
             _modele.Ouvrir(Recomposer());
@@ -327,6 +330,7 @@ public sealed partial class DefisPanelService
     {
         lock (_verrou)
         {
+            _selecteur.Fermer();
             if (_modele.Etat == DefisPanelModel.Foyer.Ferme) return;
             _modele.Fermer();
         }
@@ -339,6 +343,7 @@ public sealed partial class DefisPanelService
     {
         lock (_verrou)
         {
+            _selecteur.Fermer();
             if (_modele.Etat == DefisPanelModel.Foyer.Ferme) return;
             _modele.Fermer();
         }
@@ -351,6 +356,7 @@ public sealed partial class DefisPanelService
     {
         lock (_verrou)
         {
+            _selecteur.Fermer();
             if (_modele.Etat != DefisPanelModel.Foyer.Panneau) return;
             _modele.Annuler();
         }
@@ -364,7 +370,22 @@ public sealed partial class DefisPanelService
         DefisPanelModel.Effet effet;
         lock (_verrou)
         {
-            effet = (identite ?? "").ToLowerInvariant() switch
+            // (12/11) le selecteur ouvert garde les directions : haut et bas choisissent la ligne, gauche et droite la valeur ;
+            // ni l'onglet ni le curseur des defis ne bougent
+            if (SelecteurOuvert())
+            {
+                var reglages = ReglagesDesFantomes();
+                var change = (identite ?? "").ToLowerInvariant() switch
+                {
+                    "left" => _selecteur.Gauche(reglages),
+                    "right" => _selecteur.Droite(reglages),
+                    "up" => _selecteur.Haut(reglages),
+                    "down" => _selecteur.Bas(reglages),
+                    _ => false,
+                };
+                effet = change ? DefisPanelModel.Effet.LigneChangee : DefisPanelModel.Effet.Rien;
+            }
+            else effet = (identite ?? "").ToLowerInvariant() switch
             {
                 "left" => _modele.Gauche(),
                 "right" => _modele.Droite(),
@@ -380,14 +401,14 @@ public sealed partial class DefisPanelService
     public void GroupeSuivant()
     {
         DefisPanelModel.Effet effet;
-        lock (_verrou) effet = _modele.GroupeSuivant();
+        lock (_verrou) effet = SelecteurOuvert() ? DefisPanelModel.Effet.Rien : _modele.GroupeSuivant();
         Appliquer(effet);
     }
 
     public void GroupePrecedent()
     {
         DefisPanelModel.Effet effet;
-        lock (_verrou) effet = _modele.GroupePrecedent();
+        lock (_verrou) effet = SelecteurOuvert() ? DefisPanelModel.Effet.Rien : _modele.GroupePrecedent();
         Appliquer(effet);
     }
 
@@ -396,9 +417,15 @@ public sealed partial class DefisPanelService
         DefisPanelModel.Effet effet;
         lock (_verrou)
         {
-            if (SurUnSpeedrunAFantomes())
+            // (12/11, decision du user) X ouvre le selecteur des fantomes, et le referme
+            if (SelecteurOuvert())
             {
-                _fantomes!.ChoixSuivant();
+                _selecteur.Fermer();
+                effet = DefisPanelModel.Effet.LigneChangee;
+            }
+            else if (SurUnSpeedrunAFantomes())
+            {
+                _selecteur.Ouvrir(ReglagesDesFantomes());
                 effet = DefisPanelModel.Effet.LigneChangee;
             }
             else
@@ -415,13 +442,71 @@ public sealed partial class DefisPanelService
         => _fantomes is not null && _modele.Etat == DefisPanelModel.Foyer.Panneau && _modele.OngletCourant == DefisPanelModel.Onglet.Speedruns
            && DefiChoisi() is { } defi && FantomesDuSpeedrun.PourCeDefi(defi);
 
-    private string LibelleDesFantomes() => _fantomes?.Choix switch
+    /// <summary>
+    /// (12/11) Le resume de la fiche : le choix, puis l'opacite et les pseudos quand ils ne sont pas ceux d'origine
+    /// (« Les deux · 50 % · sans pseudos »). Sans fantome, le choix seul.
+    /// </summary>
+    private string LibelleDesFantomes()
     {
-        ChoixDesFantomes.MonRecord => T("speedrun.panel.ghosts.mine", "My record"),
-        ChoixDesFantomes.RecordMondial => T("speedrun.panel.ghosts.world", "World record"),
-        ChoixDesFantomes.Aucun => T("speedrun.panel.ghosts.none", "None"),
-        _ => T("speedrun.panel.ghosts.both", "My record + world record"),
-    };
+        var choix = _fantomes?.Choix ?? ChoixDesFantomes.MonRecordEtMondial;
+        var suite = new List<string>();
+        if (_fantomes is not null && choix != ChoixDesFantomes.Aucun)
+        {
+            if (_fantomes.OpaciteReduite) suite.Add(T("speedrun.panel.ghosts.opacity.half", "50%"));
+            if (_fantomes.PseudosMasques) suite.Add(T("speedrun.panel.ghosts.summary.no_names", "no names"));
+        }
+
+        var nom = choix switch
+        {
+            ChoixDesFantomes.MonRecord => T("speedrun.panel.ghosts.mine", "My record"),
+            ChoixDesFantomes.RecordMondial => T("speedrun.panel.ghosts.world", "World record"),
+            ChoixDesFantomes.Aucun => T("speedrun.panel.ghosts.none", "None"),
+            // la case de la fiche est une demi-largeur : le nom court quand la suite s'y ajoute
+            _ => suite.Count > 0 ? T("speedrun.panel.ghosts.both.short", "Both") : T("speedrun.panel.ghosts.both", "My record + world record"),
+        };
+        return string.Join(" · ", [nom, .. suite]);
+    }
+
+    /// <summary>(12/11) Le selecteur est ouvert, sur un speedrun a fantomes ; sinon il se referme.</summary>
+    private bool SelecteurOuvert()
+    {
+        if (!_selecteur.Ouvert) return false;
+        if (SurUnSpeedrunAFantomes()) return true;
+        _selecteur.Fermer();
+        return false;
+    }
+
+    /// <summary>
+    /// Les reglages du selecteur des fantomes, dans l'ordre des lignes : leur choix (celui de toujours, dans le meme ordre),
+    /// l'opacite et les pseudos. Ces deux-la ne jouent pas sans fantome : grises, le curseur les saute.
+    /// </summary>
+    internal IReadOnlyList<ReglageDuSelecteur> ReglagesDesFantomes()
+    {
+        var f = _fantomes!;
+        bool AvecFantomes() => f.Choix != ChoixDesFantomes.Aucun;
+        return
+        [
+            new(T("speedrun.panel.ghosts", "Ghosts"),
+                [T("speedrun.panel.ghosts.both", "My record + world record"), T("speedrun.panel.ghosts.mine", "My record"),
+                 T("speedrun.panel.ghosts.world", "World record"), T("speedrun.panel.ghosts.none", "None")],
+                () => (int)f.Choix, i => f.Choisir((ChoixDesFantomes)i)),
+            new(T("speedrun.panel.ghosts.opacity", "Opacity"),
+                [T("speedrun.panel.ghosts.opacity.normal", "Normal"), T("speedrun.panel.ghosts.opacity.half", "50%")],
+                () => f.OpaciteReduite ? 1 : 0, i => f.ReduireLOpacite(i == 1), AvecFantomes),
+            new(T("speedrun.panel.ghosts.names", "Names"),
+                [T("speedrun.panel.ghosts.names.shown", "Shown"), T("speedrun.panel.ghosts.names.hidden", "Hidden, arrow at the edge")],
+                () => f.PseudosMasques ? 1 : 0, i => f.MasquerLesPseudos(i == 1), AvecFantomes),
+        ];
+    }
+
+    private SelecteurAffiche SelecteurAfficheDesFantomes()
+    {
+        var reglages = ReglagesDesFantomes();
+        _selecteur.Recaler(reglages);
+        return new SelecteurAffiche(T("speedrun.panel.ghosts.settings", "Ghost settings"),
+            reglages.Select(r => new LigneDeReglage(r.Etiquette, r.Valeurs[Math.Clamp(r.Lire(), 0, r.Valeurs.Count - 1)], r.EstActif)).ToList(),
+            _selecteur.Ligne);
+    }
 
     /// <summary>
     /// Valider ne lance rien dans le panneau (essai du 01/11) : le menu d'ES se referme avant le lancement, et ES, qui
@@ -429,13 +514,23 @@ public sealed partial class DefisPanelService
     /// </summary>
     public void Valider(bool appuye)
     {
+        // (12/11) A referme le selecteur des fantomes et revient a la fiche, sans rien lancer
+        if (!appuye) return;
+        bool ferme;
+        lock (_verrou)
+        {
+            ferme = SelecteurOuvert();
+            if (ferme) _selecteur.Fermer();
+        }
+
+        if (ferme) Rafraichir();
     }
 
     /// <summary>LE BOUTON CHALLENGE (le « y » d'ES), comme au World Scoring : il lance l'epreuve choisie, a l'appui.</summary>
     public void Defier()
     {
         DefisPanelModel.Effet effet;
-        lock (_verrou) effet = _modele.Valider();
+        lock (_verrou) effet = SelecteurOuvert() ? DefisPanelModel.Effet.Rien : _modele.Valider();
         Appliquer(effet);
     }
 
@@ -445,6 +540,22 @@ public sealed partial class DefisPanelService
         if (!appuye) return;
         bool fermer;
         DefisPanelModel.Effet effet = DefisPanelModel.Effet.Rien;
+        lock (_verrou)
+        {
+            // (12/11) B referme d'abord le selecteur des fantomes
+            if (SelecteurOuvert())
+            {
+                _selecteur.Fermer();
+                effet = DefisPanelModel.Effet.LigneChangee;
+            }
+        }
+
+        if (effet != DefisPanelModel.Effet.Rien)
+        {
+            Appliquer(effet);
+            return;
+        }
+
         lock (_verrou)
         {
             fermer = _modele.Etat == DefisPanelModel.Foyer.MenuEs;
@@ -544,6 +655,8 @@ public sealed partial class DefisPanelService
             var courante = choisissables.Count == 0 ? -1 : lignes.IndexOf(choisissables[Math.Min(_modele.Ligne, choisissables.Count - 1)]);
             var defi = courante >= 0 ? lignes[courante].Defi : null;
             var bandeaux = onglet == DefisPanelModel.Onglet.Challenges;
+            // (12/11) le selecteur ouvert ne lance rien : Y n'y fait rien, le bouton du bas s'efface
+            var selecteur = SelecteurOuvert() ? SelecteurAfficheDesFantomes() : null;
             var action = onglet == DefisPanelModel.Onglet.Challenges
                 ? T("speedrun.panel.launch_challenge", "Launch the challenge")
                 : T("speedrun.panel.launch_speedrun", "Launch the speedrun");
@@ -556,11 +669,12 @@ public sealed partial class DefisPanelService
                 lignes.Select(l => l.Ligne).ToList(),
                 courante,
                 bandeaux || defi is null ? [] : Fiche(defi),
-                defi is null ? null : new Aide(_glypheDefier, action),
+                defi is null || selecteur is not null ? null : new Aide(_glypheDefier, action),
                 Aides(),
                 Message: _message.Length > 0 ? _message : T("speedrun.panel.empty", "No open challenge for this game"),
                 Pseudo: Pseudo,
-                EnLigne: LiaisonNelfePlay.EnLigne);
+                EnLigne: LiaisonNelfePlay.EnLigne,
+                Selecteur: selecteur);
         }
     }
 
@@ -587,6 +701,16 @@ public sealed partial class DefisPanelService
     {
         if (_modele.Etat != DefisPanelModel.Foyer.Panneau)
             return [new Aide("dpad_left", T("speedrun.panel.help.open", "Open")), new Aide(_glypheAnnuler, T("speedrun.panel.help.close", "Close"))];
+        if (SelecteurOuvert())
+        {
+            return
+            [
+                new Aide("dpad_updown", T("speedrun.panel.help.line", "Line")),
+                new Aide("dpad_leftright", T("speedrun.panel.help.change", "Change")),
+                new Aide(_glypheAnnuler, T("speedrun.panel.help.close", "Close")),
+            ];
+        }
+
         var aides = new List<Aide>
         {
             new("dpad_leftright", T("speedrun.panel.help.tab", "Tab")),
@@ -804,6 +928,27 @@ public sealed partial class DefisPanelService
 
     /// <summary>Les apercus se dessinent dans une langue choisie, sans reglages d'ES.</summary>
     internal string? LangueDApercu { get; init; }
+
+    /// <summary>
+    /// Essais et apercus : le panneau ouvert sur ces defis et entre (le joueur a la main), sans ES ni collection. Rend ce que
+    /// la fenetre recevrait.
+    /// </summary>
+    internal ContenuDefis OuvrirPourEssai(IReadOnlyList<Reglement> defis)
+    {
+        lock (_verrou)
+        {
+            _defis = defis;
+            _selecteur.Fermer();
+            _modele.Ouvrir(Recomposer());
+            PoserLesCompteurs();
+            _modele.Gauche();
+        }
+
+        return Contenu();
+    }
+
+    /// <summary>Essais et apercus : ce que la fenetre montre maintenant.</summary>
+    internal ContenuDefis ContenuPourEssai() => Contenu();
 
     private string Langue()
     {

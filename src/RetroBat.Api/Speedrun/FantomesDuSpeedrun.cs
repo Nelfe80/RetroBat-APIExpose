@@ -325,6 +325,8 @@ public sealed partial class FantomesDuSpeedrun
         }
 
         if (HoteDe(r) is not { } hote || Choix == ChoixDesFantomes.Aucun) return false;
+        // (12/11) l'opacite et les pseudos choisis au selecteur : le coeur hote les lit au chargement des fantomes
+        EcrireLeFichierDuCoeur();
         if (!ContenuDuCoeurHote(r, rom))
         {
             _journal?.LogInformation("Fantomes : {Rom} n'est pas le dump du coeur hote (crc {Crc}) pour {Defi}, depart sur le coeur d'origine.",
