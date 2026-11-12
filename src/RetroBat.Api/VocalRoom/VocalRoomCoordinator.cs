@@ -164,7 +164,7 @@ public sealed class VocalRoomCoordinator : BackgroundService
             {
                 // Pas de liaison, pas de consentement, preference « off », site sans vocal : rien, et on ne redemande pas
                 // pour cette room.
-                _ecartees.Add(candidate.Room);
+                Ecarter(candidate.Room);
                 _journal?.LogInformation("VOCAL : pas de vocal pour la room {Room} ({Raison})", candidate.Room, RaisonDuProfil(profil));
                 return;
             }
@@ -490,7 +490,7 @@ public sealed class VocalRoomCoordinator : BackgroundService
 
         s.Phase = Phase.Terminee;
         lock (_verrou) _session = null;
-        _ecartees.Add(s.Room);
+        Ecarter(s.Room);
         _journal?.LogInformation("VOCAL : session vocale de la room {Room} terminee ({Raison})", s.Room, raison);
         await _processus.ArreterAsync("session_end").ConfigureAwait(false);
         Signaler();
@@ -670,6 +670,13 @@ public sealed class VocalRoomCoordinator : BackgroundService
         _profil = lu;
         _profilLuUtc = Maintenant();
         return lu;
+    }
+
+    /// <summary>Une room qu'on ne suit plus (finie, refusee) ; la liste ne grandit pas sans fin sur une borne allumee des jours.</summary>
+    private void Ecarter(string room)
+    {
+        if (_ecartees.Count >= 256) _ecartees.Clear();
+        _ecartees.Add(room);
     }
 
     private static string RaisonDuProfil(VocalProfil p)
