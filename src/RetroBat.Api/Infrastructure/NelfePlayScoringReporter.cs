@@ -211,6 +211,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private bool _startVu;
     private bool _enJeu;
 
+    /// <summary>
+    /// Le depart que la memoire du jeu dit (GAME_START du .MEM), et celui qu'impose le labo (START force a travers le
+    /// pont) : ce que <see cref="DepartReel"/> demande, en plus d'un credit consomme, pour certifier (12/11, DaiOuJou).
+    /// </summary>
+    private bool _gameStartVu;
+    private bool _departDuLabo;
+
     /// <summary>La derniere valeur du score du joueur 1 recue, demo comprise.</summary>
     private long? _dernierTotalVu;
 
@@ -847,6 +854,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     CaptureSurveillanceCoupee(ToJson(envelope.Payload));
                     break;
                 case "scoring.lab.start":
+                    lock (_sync) _departDuLabo = true;
                     SortirDeDemo();
                     break;
                 case "netplay.guest.host_left":
@@ -923,6 +931,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _horsJeu.Clear();
             _startVu = false;
             _enJeu = false;
+            _gameStartVu = false;
+            _departDuLabo = false;
             _dernierTotalVu = null;
             _scoreAuDepart = null;
             _systemeDuJeu = "";
@@ -1657,6 +1667,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (action.Length == 0) return;
         if (action == JeuCommence)
         {
+            lock (_sync) _gameStartVu = true;
             AnnoncerLeDepart("GAME_START");
             SortirDeDemo();
             return;
@@ -1958,7 +1969,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     ///
     /// Limite connue : sur une borne à pièces, un START pressé pendant la démo SANS crédit la fait
     /// sortir de la démo alors que l'attract continue. La démo suivante la ré-arme, et le score
-    /// retenu reste le meilleur run.
+    /// retenu reste le meilleur run. Ce n'était pas vrai : passé le START, les DEMO_MODE sont ignorés,
+    /// et la démonstration de DaiOuJou a été publiée (12/11). La fin de session la refuse
+    /// désormais (<see cref="DepartReel"/> : aucun crédit consommé, presque aucun appui).
     ///
     /// UN CREDIT CONSOMME FAIT AUSSI SORTIR DE LA DEMO (2026-10-02). Sans START lu au panel (borne
     /// jouee au clavier, manette non lue, manette reseau du labo) ni GAME_START dans le .MEM, toute
@@ -1976,6 +1989,24 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _gameOverDansLaPartie = false;
             _demoEnSuspens = null;
         }
+    }
+
+    /// <summary>
+    /// Le bilan du depart de la session (<see cref="DepartReel"/>) : la raison de ne rien certifier, ou null.
+    /// </summary>
+    private string? RefusDuDepart(string sessionJson, IReadOnlyList<EvenementDeCredit> credits, IReadOnlyList<DepartDeJoueur> departs,
+        string? definitionChargee, IReadOnlyList<(long frame, long total)> run)
+    {
+        bool gameStartVu, impose;
+        lock (_sync)
+        {
+            gameStartVu = _gameStartVu;
+            impose = _departDuLabo || _multiplayer?.EtatDeDepart is not null;
+        }
+        var (ligneDeCredits, ligneGameStart) = DepartReel.LignesDeDepart(LireMem(definitionChargee));
+        var bilan = new DepartReel.Bilan(ligneDeCredits || credits.Count > 0, ligneGameStart, credits, departs, gameStartVu, impose,
+            DepartReel.DeLaSession(sessionJson), DepartReel.ImagesDuRun(run));
+        return DepartReel.Refus(bilan);
     }
 
     /// <summary>Une seconde d'appuis par port, du wrapper (0.340) : de quoi retrouver le port local.</summary>
@@ -3957,6 +3988,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
         long runPeak = bestRun.Count > 0 ? bestRun[^1].total : (finalTotal ?? 0);
         Trace($"segmentation : meilleur run {bestRun.Count}/{trajectory.Count} pts, pic={runPeak} (total global {finalTotal})");
+
+        // LA DEMO N'EST JAMAIS UNE PARTIE (12/11, DaiOuJou : la demonstration publiee a 2 554 070, sans piece ni appui).
+        // Un depart reel (credit consomme, GAME_START, ou START suivi des appuis d'une partie) et des appuis de joueur.
+        // Jugee ici, appliquee une fois le profil connu : la tentative de laboratoire (profil non ouvert) part quand meme.
+        var refusDuDepart = RefusDuDepart(sessionJson, credits, departs, definitionChargee, bestRun);
         var contexteRun = RetroBat.Api.Scoring.ModesDeJeu.ContexteDuRun(lecturesBrutes, contextes, bestRun, contexteCourant);
         if (contexteRun.Mode is not null || contexteRun.Difficulte.Count > 0)
         {
@@ -4024,6 +4060,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 Trace($"{pourquoi}, soumission de laboratoire ({labo})");
                 profile = RetroBat.Api.Scoring.ScoreLabLabMode.PlaceholderProfile();
+                if (refusDuDepart is not null)
+                {
+                    // La plateforme refuse la tentative de labo (profil non ouvert) et la garde : rien ne classe.
+                    Trace($"information (labo) : hors laboratoire, ce run serait refuse : {refusDuDepart}");
+                    refusDuDepart = null;
+                }
             }
             else if (profilsDuSite)
             {
@@ -4036,6 +4078,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 // collection World Scoring), sans epingles de NVRAM ni BIOS. Le site jugera.
                 Trace($"{pourquoi} : site injoignable et aucune copie gardee, brouillon sans profil");
             }
+        }
+        if (refusDuDepart is not null)
+        {
+            Trace($"STOP: {refusDuDepart}");
+            return;
         }
 
         if (runPeak <= 0) runPeak = finalTotal.Value;   // filet : aucun segment exploitable
