@@ -256,6 +256,72 @@ public sealed class DeckStateService : IHostedService, IDisposable
         if (aChercher is not null) ChargerLaSemantique(aChercher);
     }
 
+    /// <summary>Ce que la lecture des valeurs de depart doit savoir du lancement en cours ; null hors d'une partie.</summary>
+    public sealed record DepartDuLancement(string LaunchId, string SystemId, string Rom, string? Core, string? DefinitionFile,
+        DeckSemantics? Semantique, bool AvecDeck);
+
+    /// <summary>Le lancement en cours, pour <see cref="DeckValeursDeDepartService"/> ; null hors d'une partie.</summary>
+    public DepartDuLancement? ContexteDeDepart()
+    {
+        lock (_verrou)
+        {
+            if (_partie is not { } p || p.Etat == "ended") return null;
+            return new DepartDuLancement(p.LaunchId, p.SystemId, p.Rom, p.Core, p.DefinitionFile, p.Semantique,
+                p.Deck is { Status: not "none" });
+        }
+    }
+
+    /// <summary>
+    /// LES VALEURS DE DEPART LUES PAR L'API (<see cref="DeckValeursDeDepart"/>) : elles entrent dans l'instantane a la place de
+    /// la derniere valeur de leur ligne, puis partent en <c>deck.signals</c>. Une ligne dont le wrapper a parle depuis
+    /// <paramref name="depuis"/> (debut de la lecture) garde la valeur du wrapper : elle est plus fraiche. Rend le nombre publie.
+    /// </summary>
+    public int PoserLesValeursDeDepart(string launchId, IReadOnlyList<DeckSignal> lus, DateTime depuis, string raison)
+    {
+        var publies = new List<DeckSignal>(lus.Count);
+        DeckSignals message;
+        lock (_verrou)
+        {
+            if (_partie is not { } partie || partie.Etat == "ended" || partie.LaunchId != launchId) return 0;
+            foreach (var s in lus)
+            {
+                var adresse = AdresseDe(s.Address);
+                string? cle = null;
+                DeckSignal? connu = null;
+                foreach (var (k, v) in _signaux)
+                {
+                    if (adresse is null || AdresseDe(v.Address) != adresse || !string.Equals(v.Name, s.Name, StringComparison.OrdinalIgnoreCase)
+                        || v.Player != s.Player) continue;
+                    cle = k;
+                    connu = v;
+                    break;
+                }
+
+                // le wrapper a parle pendant la lecture : sa valeur est plus recente que la notre
+                if (connu is not null && connu.Source != DeckValeursDeDepart.Source && connu.Ts >= depuis) continue;
+                var signal = connu is null ? s : s with { Key = connu.Key, Channel = connu.Channel, Address = connu.Address };
+                cle ??= (signal.Channel ?? "") + "." + (signal.Name ?? "") + "@" + (signal.Address ?? "") + "#" + (signal.Player?.ToString() ?? "");
+                if (!_signaux.ContainsKey(cle) && _signaux.Count >= SignauxMax) _signaux.Remove(_signaux.MinBy(kv => kv.Value.Ts).Key);
+                _signaux[cle] = signal;
+                publies.Add(signal);
+            }
+
+            if (publies.Count == 0) return 0;
+            _revision++;
+            message = new DeckSignals(launchId, raison, publies, _revision);
+        }
+
+        Publier("deck.signals", message);
+        return publies.Count;
+    }
+
+    private static long? AdresseDe(string? texte)
+    {
+        if (string.IsNullOrWhiteSpace(texte)) return null;
+        try { return RetroBat.Api.Speedrun.Hex.Lire(texte); }
+        catch (Exception ex) when (ex is FormatException or OverflowException or ArgumentException) { return null; }
+    }
+
     /// <summary>
     /// Le sens des signaux (.SMEM) du .MEM que le wrapper a charge, publie en deck.semantics une fois par lancement,
     /// des que le premier signal nomme son fichier de definition. Lecture seule : rien ici ne touche au score.

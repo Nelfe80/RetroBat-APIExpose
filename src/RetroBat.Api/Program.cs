@@ -376,6 +376,9 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.
 // L'epreuve en cours pour le PlayerDeck (H-D23) : deck.trial, tire du reglement et de la session, sans reseau en course.
 builder.Services.AddSingleton<RetroBat.Api.Deck.DeckTrialService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckTrialService>());
+// Les valeurs de depart d'une epreuve (12/11) : lues par READ_CORE_RAM a l'etat charge et au depart, en deck.signals.
+builder.Services.AddSingleton<RetroBat.Api.Deck.DeckValeursDeDepartService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckValeursDeDepartService>());
 // Ce qui se tait quand le PlayerDeck est pose (demande du user du 08/11) : doublons coupes, messages au Deck (deck.notice).
 builder.Services.AddSingleton<RetroBat.Api.Deck.DeckSilence>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckSilence>());
