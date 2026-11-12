@@ -731,7 +731,7 @@ public sealed partial class DefisPanelService
     {
         var depart = defi.StartPolicy == "normal_boot"
             ? T("speedrun.panel.start.normal", "Normal boot")
-            : T("speedrun.panel.start.state", "Signed starting state");
+            : T("speedrun.panel.start.state", "Verified starting state");
         var interdits = new List<string>();
         if (defi.Echecs.Count > 0) interdits.Add(T("speedrun.panel.forbid.death", "dying"));
         if (defi.AnnulationsJeu.Any(e => e.Action == "PAUSE_ON") || defi.AnnulationsBorne.Contains("pause_clock_gap"))
