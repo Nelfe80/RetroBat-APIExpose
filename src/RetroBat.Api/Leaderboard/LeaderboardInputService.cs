@@ -504,6 +504,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                     // FOR FRIENDS : X regle le nombre de joueurs attendus (28/10).
                     panneau.Joueurs();
                 }
+                else if (slot is not null && slot == SlotDeLIdentite("y"))
+                {
+                    // LE VOCAL (lot B, 12/11) : Y rejoint le vocal propose ou coupe le micro ; maintenu, coupe le son.
+                    panneau.GesteVocal(appuye);
+                }
                 return;
             }
             if (_modele.Etat != LeaderboardPanelModel.Foyer.Ferme)

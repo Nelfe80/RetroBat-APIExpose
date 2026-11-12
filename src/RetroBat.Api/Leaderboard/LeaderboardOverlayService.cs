@@ -1071,6 +1071,11 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             {
                 DessinerLeMultiplayer(g, multiplayer, c, s, policeTitre, policeTexte, policePetite, policeGras, policePied,
                     tailleTitre, tailleTexte, taillePetite, taillePied);
+                // Le vocal Discord (lot B) : la fenetre en direct seulement, jamais les apercus ni les cartes du film.
+                if (_service.VocalEnDirect?.Invoke() is { } voix)
+                {
+                    DessinerLeVocal(g, voix, policePetite, taillePetite);
+                }
                 if (_voile > 0)
                 {
                     using var voile = new SolidBrush(Color.FromArgb(_voile, 0, 0, 0));
