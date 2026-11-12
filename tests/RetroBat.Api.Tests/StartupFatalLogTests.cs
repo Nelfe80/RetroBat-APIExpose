@@ -54,7 +54,9 @@ public class StartupFatalLogTests
         Assert.NotNull(manifeste);
         using var doc = JsonDocument.Parse(File.ReadAllText(manifeste!));
         var fichiers = doc.RootElement.EnumerateArray().Select(e => e.GetProperty("file").GetString()).ToArray();
-        Assert.Equal(new[] { "RetroBat.Api.exe", "RetroBat.Api.Update.exe", "RetroBat.Api.Diagnostic.exe", "NelfePlay.LiveStreaming.exe", "RetroBat.ApiConnect.exe" }, fichiers);
+        Assert.Equal(new[] { "RetroBat.Api.exe", "RetroBat.Api.Update.exe", "RetroBat.Api.Diagnostic.exe", "NelfePlay.LiveStreaming.exe", "RetroBat.ApiConnect.exe",
+            // Le vocal Discord (lot F, 12/11) : un nom sans chemin, l'outil de diagnostic n'accepte rien d'autre.
+            "NelfePlay-VocalRoom.exe" }, fichiers);
         Assert.All(doc.RootElement.EnumerateArray(), e => Assert.InRange(e.GetProperty("timeoutSeconds").GetInt32(), 1, 600));
     }
 }

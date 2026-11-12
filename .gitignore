@@ -88,6 +88,12 @@ logs/
 /RetroBat.Api.Diagnostic.exe
 # Construit par le depot prive NelfePlay-LiveStreaming et depose ici a chaque compilation Release.
 /NelfePlay.LiveStreaming.exe
+# Le vocal Discord (depot prive NelfePlay-VocalRoom), recopie a la racine par release.ps1 -AvecVocalRoom (lot F).
+/NelfePlay-VocalRoom.exe
+/discord_partner_sdk.dll
+/Discord-Social-SDK-License-Notices.txt
+/discord_krisp.dll
+/krisp-*.kef
 # Construit par le depot prive APIExposeConnect et depose ici a chaque compilation Release.
 /RetroBat.ApiConnect.exe
 /RetroBat.ApiConnect.exe.old

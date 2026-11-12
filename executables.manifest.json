@@ -30,5 +30,11 @@
     "arguments": "--self-test",
     "timeoutSeconds": 15,
     "expectedExitCode": 0
+  },
+  {
+    "file": "NelfePlay-VocalRoom.exe",
+    "arguments": "--self-test",
+    "timeoutSeconds": 20,
+    "expectedExitCode": 0
   }
 ]
