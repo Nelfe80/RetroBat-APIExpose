@@ -42,8 +42,8 @@ public class JeuxMassRunTests
         Assert.Equal(0xd63ed5f8u, sm.Crc);
         Assert.True(sm.PosesEnImages);
         Assert.Equal(60.098812, sm.ImagesParSeconde, 6);
-        Assert.All(new[] { "kraid", "phantoon", "draygon", "ridley", "mother-brain" }, n => Assert.Matches(sm.Niveaux, n));
-        Assert.DoesNotMatch(sm.Niveaux, "ceres");
+        Assert.All(new[] { "kraid", "phantoon", "draygon", "ridley", "mother-brain", "ceres" }, n => Assert.Matches(sm.Niveaux, n));
+        Assert.DoesNotMatch(sm.Niveaux, "tourian");
         Assert.DoesNotMatch(sm.Niveaux, "../kraid");
         // les etats d'epreuve du Data Pack : snes/super-metroid/kraid.state
         Assert.EndsWith(Path.Combine("snes", "super-metroid", "kraid.state"), JeuxMassRun.CheminDeLEtat(sm, "kraid", "r"));
@@ -51,7 +51,7 @@ public class JeuxMassRunTests
         Assert.Equal((0xD829u, 0x01u), JeuxMassRun.ArriveeDuNiveau(sm, "kraid"));
         Assert.Equal((0xD82Cu, 0x03u), JeuxMassRun.ArriveeDuNiveau(sm, "draygon"));
         Assert.Equal((0x0998u, 0x26u), JeuxMassRun.ArriveeDuNiveau(sm, "mother-brain"));
-        Assert.Null(JeuxMassRun.ArriveeDuNiveau(sm, "ceres"));
+        Assert.Equal((0x0998u, 0x20u), JeuxMassRun.ArriveeDuNiveau(sm, "ceres"));
         Assert.Null(JeuxMassRun.ArriveeDuNiveau(JeuxMassRun.ParDefaut, "1-1"));
         Assert.Equal("Mother Brain", JeuxMassRun.NomDuNiveau("mother-brain"));
     }
@@ -157,6 +157,11 @@ public class JeuxMassRunTests
     [InlineData("green-hill-2", "Green Hill 2")]
     [InlineData("final-zone", "Final Zone")]
     [InlineData("", "")]
+    [InlineData("1-f", "1-F")]
+    [InlineData("yi2", "Yoshi's Island 2")]
+    [InlineData("ds1", "Donut Secret 1")]
+    [InlineData("air-man", "Air Man")]
+    [InlineData("stage-3", "Stage 3")]
     public void Le_niveau_se_dit_en_clair(string niveau, string attendu) => Assert.Equal(attendu, JeuxMassRun.NomDuNiveau(niveau));
 
     [Fact]
@@ -344,5 +349,48 @@ public class JeuxMassRunTests
         Assert.Equal(new byte[] { 3, 2 }, refaite[2..4]);
         Assert.Equal(0x2A, refaite[9]);
         Assert.Equal(1, refaite[10]);
+    }
+
+    [Theory]
+    [InlineData("nes/super-mario-bros-3", "fceumm_ghosts", 0x0b742b33u, "1-f", "1-7", "1-1-entree.state")]
+    [InlineData("nes/mega-man-2", "fceumm_ghosts", 0xa9bd44bcu, "air-man", "dr-wily-1", "air-man-entree.state")]
+    [InlineData("snes/mega-man-x", "snes9x_ghosts", 0xded53c64u, "chill-penguin", "sigma", "chill-penguin-entree.state")]
+    [InlineData("megadrive/rocket-knight-adventures", "genesis_plus_gx_ghosts", 0xa6efec47u, "stage-7", "stage-2", "stage-1-panneau.state")]
+    [InlineData("megadrive/sonic-the-hedgehog-2", "genesis_plus_gx_ghosts", 0x24ab4c3au, "death-egg", "wing-fortress", "emerald-hill-1-panneau.state")]
+    [InlineData("snes/super-mario-world", "snes9x_ghosts", 0xb19ed489u, "ds1", "dp2", "yi1-entree.state")]
+    public void Les_jeux_ouverts_en_speedrun_ont_leur_salle(string id, string coeur, uint crc, string admis, string refuse, string etat)
+    {
+        var jeu = JeuxMassRun.Trouver(id)!;
+        Assert.Equal(coeur, jeu.Coeur);
+        Assert.Equal(crc, jeu.Crc);
+        Assert.Matches(jeu.Niveaux, admis);
+        Assert.DoesNotMatch(jeu.Niveaux, refuse);
+        var niveauDeLEtat = etat[..etat.IndexOf(jeu.SuffixeDeLEtat + ".state", StringComparison.Ordinal)];
+        Assert.EndsWith(Path.Combine(jeu.Systeme, jeu.RomGroup, etat), JeuxMassRun.CheminDeLEtat(jeu, niveauDeLEtat, "r"));
+        Assert.Equal(jeu.Systeme == "snes", jeu.PosesEnImages);
+    }
+
+    [Fact]
+    public void Un_autre_dump_de_la_meme_rom_est_admis()
+    {
+        var smb3 = JeuxMassRun.Trouver("nes/super-mario-bros-3")!;
+        Assert.True(smb3.Admet(0x0b742b33));
+        Assert.True(smb3.Admet(0xe8c3af69));   // No-Intro, en-tete NES 2.0
+        Assert.False(smb3.Admet(0x12345678));
+        Assert.False(smb3.Admet(null));
+        Assert.True(JeuxMassRun.Trouver("nes/mega-man-2")!.Admet(0x80e08660));
+        Assert.False(JeuxMassRun.ParDefaut.Admet(0xe8c3af69));
+    }
+
+    [Fact]
+    public void Rka_et_Mega_Man_X_donnent_leur_arrivee_au_coeur()
+    {
+        var rka = JeuxMassRun.Trouver("megadrive/rocket-knight-adventures")!;
+        Assert.Null(JeuxMassRun.ArriveeDuNiveau(rka, "stage-1"));
+        Assert.Equal((0xFB13u, 0x2Eu), JeuxMassRun.ArriveeDuNiveau(rka, "stage-3"));
+        Assert.Equal((0xFB13u, 0x30u), JeuxMassRun.ArriveeDuNiveau(rka, "stage-4"));
+        Assert.Equal((0xFB13u, 0x32u), JeuxMassRun.ArriveeDuNiveau(rka, "stage-7"));
+        Assert.Equal((0x0E68u, 0xFFu), JeuxMassRun.ArriveeDuNiveau(JeuxMassRun.Trouver("snes/mega-man-x")!, "storm-eagle"));
+        Assert.Null(JeuxMassRun.ArriveeDuNiveau(JeuxMassRun.Trouver("nes/mega-man-2")!, "air-man"));
     }
 }
