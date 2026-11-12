@@ -828,7 +828,7 @@ public sealed class ReplayRecorderService : BackgroundService
         if (_runTermine)
         {
             _logger.LogInformation("Replay : {ReplayId} arrete au continue, la suite de la partie ne compte pas.", _current.ReplayId);
-            await FinalizeAsync(_current, recovered: false, ct).ConfigureAwait(false);
+            await ArreterPuisScellerAsync(_current, ct).ConfigureAwait(false);
             return;
         }
 
@@ -836,7 +836,7 @@ public sealed class ReplayRecorderService : BackgroundService
         {
             _arretParBaisse = false;
             _logger.LogInformation("Replay : {ReplayId} arrete, le score a baisse (nouvelle partie ou remise a zero).", _current.ReplayId);
-            await FinalizeAsync(_current, recovered: false, ct).ConfigureAwait(false);
+            await ArreterPuisScellerAsync(_current, ct).ConfigureAwait(false);
             return;
         }
 
@@ -863,8 +863,29 @@ public sealed class ReplayRecorderService : BackgroundService
                 _current.ReplayId);
             _finsVues = 0;
             _sansReponse = 0;
-            await FinalizeAsync(_current, recovered: false, ct).ConfigureAwait(false);
+            await ArreterPuisScellerAsync(_current, ct).ConfigureAwait(false);
         }
+    }
+
+    /// <summary>
+    /// ARRETER DANS LE TOUR, SCELLER A COTE (12/11). Le scellement (stabilisation du fichier, import) tient jusqu'a une dizaine
+    /// de secondes ; fait dans le tour de la boucle, il retenait le semaphore, et la relance d'un defi, qui ne l'attend qu'une
+    /// seconde, laissait la boucle ouvrir son replay apres : le 12/11 a 09:22, ouvert a 23,4 s pour un depart pris a 22,2 s.
+    /// L'arret et le reperage du fichier restent ici (avant tout autre enregistrement) ; le reste part en tache, comme a la
+    /// relance.
+    /// </summary>
+    private async Task ArreterPuisScellerAsync(Recording rec, CancellationToken ct)
+    {
+        await _ra.HaltAsync(ct).ConfigureAwait(false);
+        // La capture video de la partie s'arrete avec son replay (ReplayCaptureService).
+        await PublishAsync("replay.recording.stopped", new { rec.ReplayId, rec.SessionId, rec.LastFrame }, ct).ConfigureAwait(false);
+        var fichier = FindReplayFile(rec.StartedAtUtc);
+        if (ReferenceEquals(_current, rec)) _current = null;
+        _ = Task.Run(async () =>
+        {
+            try { await FinalizeAsync(rec, recovered: false, CancellationToken.None, fichier, dejaArrete: true).ConfigureAwait(false); }
+            catch (Exception ex) { _logger.LogWarning(ex, "Replay : scellement de {ReplayId} en echec", rec.ReplayId); }
+        });
     }
 
     private async Task StartAsync(RaStatus status, CancellationToken ct)
