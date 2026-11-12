@@ -134,6 +134,48 @@ public sealed class ReplayRecorderService : BackgroundService
 
     private Recording? _current;
 
+    /// <summary>
+    /// L'ENREGISTREMENT DEMANDE, PAS ENCORE CONFIRME (12/11). Le 12/11 a 09:23:04, RetroArch a ouvert le replay de la relance
+    /// environ 0,9 s apres RECORD_REPLAY ; le controle unique a 300 ms l'a dit « non confirme » (journal de debogage, muet), le
+    /// replay courant est reste vide, et la boucle, qui n'ouvre rien tant que RetroArch enregistre, ne l'a jamais repris : le
+    /// fichier (2353 images, le run de 0:32.56 entier) est reste orphelin dans saves, et le temps est parti sans replay
+    /// (« aucun des 13 enregistrement(s) »). L'heure de la demande permet d'adopter ensuite l'enregistrement qu'elle a ouvert.
+    /// </summary>
+    private DateTime? _recordDemandeUtc;
+
+    /// <summary>Combien de temps on attend que RetroArch confirme un enregistrement demande.</summary>
+    internal static readonly TimeSpan AttenteDeLaConfirmation = TimeSpan.FromSeconds(3);
+    internal static readonly TimeSpan PasDeLaConfirmation = TimeSpan.FromMilliseconds(150);
+
+    /// <summary>Au-dela, un enregistrement que RetroArch tient n'est plus attribue a notre demande.</summary>
+    internal static readonly TimeSpan FenetreDAdoption = TimeSpan.FromSeconds(30);
+
+    /// <summary>
+    /// Attend que RetroArch confirme l'enregistrement (active_replay en enregistrement), un sondage par <paramref name="pas"/>,
+    /// au plus <paramref name="max"/>. Rend la derniere lecture (confirmee ou non).
+    /// </summary>
+    internal static async Task<RaActiveReplay?> AttendreLaConfirmationAsync(Func<CancellationToken, Task<RaActiveReplay?>> lire,
+        TimeSpan pas, TimeSpan max, CancellationToken ct)
+    {
+        var chrono = System.Diagnostics.Stopwatch.StartNew();
+        RaActiveReplay? lu;
+        do
+        {
+            await Task.Delay(pas, ct).ConfigureAwait(false);
+            lu = await lire(ct).ConfigureAwait(false);
+            if (lu is { Recording: true }) return lu;
+        }
+        while (chrono.Elapsed < max);
+        return lu;
+    }
+
+    /// <summary>
+    /// RetroArch enregistre, aucun replay n'est suivi, et notre demande date de moins de <paramref name="fenetre"/> : c'est
+    /// l'enregistrement qu'elle a ouvert, en retard. Pur.
+    /// </summary>
+    internal static bool EnregistrementAAdopter(RaActiveReplay? active, DateTime? demandeUtc, DateTime maintenant, TimeSpan fenetre)
+        => active is { Recording: true } && demandeUtc is { } demande && maintenant >= demande && maintenant - demande <= fenetre;
+
     public ReplayRecorderService(RetroArchReplayClient ra, ReplayStore store, ReplayCoreTimingProbe timing,
         IEventBus bus, RetroBat.Api.Replay.Playback.ReplayPlaybackService playback, ILogger<ReplayRecorderService> logger,
         IConfiguration config, RetroBat.Api.Media.InstalledGameCatalog? catalogue = null,
@@ -672,6 +714,7 @@ public sealed class ReplayRecorderService : BackgroundService
                 // Un AUTRE jeu que celui qu'on suivait : son depart ne vaut pas pour celui-ci. Le
                 // premier jeu vu apres un lancement garde le sien (il ne peut venir que de lui).
                 if (_contenuVu.Length > 0) _departEnAttente = false;
+                if (_contenuVu.Length > 0) _recordDemandeUtc = null;
                 _contenuVu = contenu;
                 _dejaEnregistre = false;
             }
@@ -703,6 +746,17 @@ public sealed class ReplayRecorderService : BackgroundService
 
         if (_current is null)
         {
+            // L'enregistrement demande et confirme en retard (12/11) : on le suit au lieu de l'ignorer.
+            if (status is { ContentLoaded: true } && EnregistrementAAdopter(active, _recordDemandeUtc, DateTime.UtcNow, FenetreDAdoption))
+            {
+                var version = await _ra.GetVersionAsync(ct).ConfigureAwait(false) ?? "unknown";
+                var demande = _recordDemandeUtc!.Value;
+                _logger.LogWarning("Replay : RetroArch a ouvert l'enregistrement demande {Secondes:0.0} s plus tot sans le confirmer a temps ; il est repris ({Frames} images deja enregistrees).",
+                    (DateTime.UtcNow - demande).TotalSeconds, active!.Frame);
+                await OuvrirAsync(status, version, active.Frame, demande, adopte: true, ct).ConfigureAwait(false);
+                return;
+            }
+
             // Démarrage : un jeu RetroArch est chargé, aucun replay actif, on n'est pas en lecture,
             // et le joueur vient d'appuyer sur START (sinon on enregistrerait la demo).
             // Hors NelfePlay, on ne guette meme pas le START : le journal le dit une fois par jeu,
@@ -820,17 +874,27 @@ public sealed class ReplayRecorderService : BackgroundService
         // confirmation ; armee apres elle, la garde ne voyait rien et le jeu replantait a chaque partie. Un arret normal
         // garde sa fin de session (rien a juger) ; seul un plantage fait renoncer au replay de ce jeu.
         _garde.EnregistrementLance(CleDuJeu(status, version), status.Game, EmpreinteDeRetroArch(version));
+        var demande = DateTime.UtcNow;
+        _recordDemandeUtc = demande;
         await _ra.RecordAsync(ct).ConfigureAwait(false);
 
-        // Confirmer que l'enregistrement a bien démarré (active_replay flags=8).
-        await Task.Delay(300, ct).ConfigureAwait(false);
-        var check = await _ra.GetActiveReplayAsync(ct).ConfigureAwait(false);
+        // Confirmer que l'enregistrement a bien démarré (active_replay flags=8). Une seule lecture a 300 ms ne suffisait pas sur
+        // une borne chargee (12/11 : 0,9 s) ; au-dela de l'attente, la boucle reprend l'enregistrement s'il s'ouvre (adoption).
+        var check = await AttendreLaConfirmationAsync(_ra.GetActiveReplayAsync, PasDeLaConfirmation, AttenteDeLaConfirmation, ct).ConfigureAwait(false);
         if (check is not { Recording: true })
         {
-            _logger.LogDebug("Replay : RECORD_REPLAY non confirmé (active={Active}), on réessaiera au prochain tick.", check);
+            _logger.LogWarning("Replay : RECORD_REPLAY non confirme apres {Secondes} s (active={Active}) ; repris s'il s'ouvre, sinon redemande au prochain tour.",
+                AttenteDeLaConfirmation.TotalSeconds, check);
             return;
         }
 
+        await OuvrirAsync(status, version, check.Frame, demande, adopte: false, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>Le replay que RetroArch enregistre devient le replay courant (ouvert par nous, ou adopte en retard).</summary>
+    private async Task OuvrirAsync(RaStatus status, string version, long imagesDejaEnregistrees, DateTime demandeUtc, bool adopte, CancellationToken ct)
+    {
+        _recordDemandeUtc = null;
         var rec = new Recording
         {
             ReplayId = Ulid.NewReplayId(),
@@ -838,8 +902,9 @@ public sealed class ReplayRecorderService : BackgroundService
             System = status.System,
             Game = status.Game,
             Crc32 = status.Crc32,
-            StartedAtUtc = DateTime.UtcNow,
-            LastFrame = check.Frame,
+            // l'heure de la demande : le fichier se cherche a partir d'elle (FindReplayFile), meme adopte plus tard
+            StartedAtUtc = demandeUtc,
+            LastFrame = imagesDejaEnregistrees,
             RetroArchVersion = version.Trim(),
             Categorie = _categorieSuivante,
         };
@@ -852,9 +917,9 @@ public sealed class ReplayRecorderService : BackgroundService
             "nelfe.replay.active-recording.v1", rec.ReplayId, rec.SessionId, rec.System, rec.Game,
             rec.Crc32, rec.StartedAtUtc, rec.RetroArchVersion));
 
-        _logger.LogInformation("Replay : enregistrement démarré {ReplayId} ({System}/{Game}{Categorie}), départ : {Source}.",
+        _logger.LogInformation("Replay : enregistrement démarré {ReplayId} ({System}/{Game}{Categorie}), départ : {Source}{Adopte}.",
             rec.ReplayId, rec.System, rec.Game, rec.Categorie is null ? "" : ", " + rec.Categorie,
-            _sourceDuDepart.Length > 0 ? _sourceDuDepart : "START");
+            _sourceDuDepart.Length > 0 ? _sourceDuDepart : "START", adopte ? " (repris en retard)" : "");
         // Le depart est consomme : il ne relancera pas un enregistrement apres un arret. Et ce jeu a
         // eu le sien : un bouton ne rearme plus.
         _departEnAttente = false;
@@ -866,8 +931,9 @@ public sealed class ReplayRecorderService : BackgroundService
         // Objet anonyme (propriétés) et non `rec` (champs) : le payload doit rester
         // sérialisable pour les abonnés qui le lisent en JSON (ex. le reporter, qui
         // retient l'id du replay actif pour le lien replay↔score).
+        // Frame : les images deja enregistrees a l'annonce ; le rapporteur en recale le debut dans l'horloge du wrapper.
         await PublishAsync("replay.recording.started",
-            new { rec.ReplayId, rec.SessionId, rec.System, rec.Game }, ct).ConfigureAwait(false);
+            new { rec.ReplayId, rec.SessionId, rec.System, rec.Game, Frame = rec.LastFrame }, ct).ConfigureAwait(false);
     }
 
     /// <param name="fichier">Le fichier deja repere (relance d'un defi : le replay suivant est ouvert, le plus recent n'est plus lui).</param>

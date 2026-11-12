@@ -877,6 +877,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 case "replay.recording.started":
                     CaptureActiveReplay(ToJson(envelope.Payload));
                     break;
+                case "replay.recording.stopped":
+                    CaptureArretDuReplay(ToJson(envelope.Payload));
+                    break;
                 case "replay.finalized":
                     OnReplayFinalized(ToJson(envelope.Payload));
                     break;
@@ -3450,11 +3453,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             List<(string Id, long Debut, long? Fin)> enregistrements;
             lock (_sync) { enregistrements = new List<(string Id, long Debut, long? Fin)>(_enregistrementsDeLaPartie); }
-            var runRetenu = new List<(long frame, long total)> { (departDuRun, 0), (arriveeDuRun, frames) };
-            if (ReplayDuMeilleurRun(enregistrements, runRetenu) is { } enregistrement)
+            if (ReplayDuDefi(enregistrements, departDuRun, arriveeDuRun) is { } enregistrement)
             {
                 replay = enregistrement;
                 var e = enregistrements.Last(x => string.Equals(x.Id, enregistrement, StringComparison.Ordinal));
+                if (e.Debut > departDuRun)
+                    Trace($"video : le replay {enregistrement} contient l'arrivee mais commence apres le depart du run (frame {e.Debut} > {departDuRun})");
                 bornesDuFilm = RetroBat.Api.Scoring.BornesVideo.DuDefi(e.Debut, e.Fin, departDuRun, arriveeDuRun);
             }
             else if (enregistrements.Count > 0)
@@ -5782,8 +5786,35 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _monteeDansLEnregistrement = false;
             _attenteMontee = false;
             _baisse.Oublier();
-            _enregistrements.Add((id!, _lastFrame, null));
+            _enregistrements.Add((id!, DebutDeLEnregistrement(_lastFrame, GetLong(payload, "Frame")), null));
             if (_enregistrements.Count > 20) _enregistrements.RemoveAt(0);
+        }
+    }
+
+    /// <summary>
+    /// LE DEBUT D'UN ENREGISTREMENT DANS L'HORLOGE DU WRAPPER (12/11). L'annonce arrive quand RetroArch a confirme
+    /// l'enregistrement, parfois une seconde apres son debut reel (borne chargee), ou plus tard encore quand l'enregistreur
+    /// adopte un enregistrement qu'il n'avait pas vu partir. L'annonce dit combien d'images il compte deja : on les retire.
+    /// </summary>
+    internal static long DebutDeLEnregistrement(long imageDuWrapper, long? imagesDejaEnregistrees)
+        => imagesDejaEnregistrees is > 0 ? Math.Max(0, imageDuWrapper - imagesDejaEnregistrees.Value) : imageDuWrapper;
+
+    /// <summary>
+    /// LA FIN D'UN ENREGISTREMENT, A SON ARRET (12/11). Le scellement qui suit prend jusqu'a une dizaine de secondes : la fin
+    /// lue a « replay.finalized » debordait sur la tentative suivante, et un replay arrete avant une arrivee pouvait passer
+    /// pour la contenir.
+    /// </summary>
+    private void CaptureArretDuReplay(JsonElement payload)
+    {
+        var id = GetString(payload, "ReplayId");
+        if (string.IsNullOrEmpty(id)) return;
+        lock (_sync)
+        {
+            for (var i = 0; i < _enregistrements.Count; i++)
+            {
+                if (string.Equals(_enregistrements[i].Id, id, StringComparison.Ordinal) && _enregistrements[i].Fin is null)
+                    _enregistrements[i] = (_enregistrements[i].Id, _enregistrements[i].Debut, _lastFrame);
+            }
         }
     }
 
@@ -5814,6 +5845,20 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     // sur le classement). On rattache le score au replay ACTIF (celui de cette partie).
     /// <summary>Le replay du meilleur run du passeport solo, choisi a la soumission.</summary>
     private string? _replayDuMeilleurRun;
+
+    /// <summary>
+    /// LE REPLAY D'UNE EPREUVE (12/11) : le dernier enregistrement qui contient le depart ET l'arrivee du run ; a defaut,
+    /// celui qui contient l'arrivee (<see cref="ReplayDuMeilleurRun"/>). Null si aucun ne contient l'arrivee.
+    /// </summary>
+    internal static string? ReplayDuDefi(IReadOnlyList<(string Id, long Debut, long? Fin)> enregistrements, long depart, long arrivee)
+    {
+        string? complet = null;
+        foreach (var e in enregistrements)
+        {
+            if (e.Debut <= depart && (e.Fin is null || arrivee <= e.Fin)) complet = e.Id;
+        }
+        return complet ?? ReplayDuMeilleurRun(enregistrements, new List<(long frame, long total)> { (depart, 0), (arrivee, 0) });
+    }
 
     /// <summary>
     /// L'enregistrement qui contient le pic du run (le run est monotone : son pic est sa derniere
@@ -6164,6 +6209,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     private static string? GetString(JsonElement el, string name)
         => el.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
+
+    private static long? GetLong(JsonElement el, string name)
+        => el.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.Number && v.TryGetInt64(out var n) ? n : null;
 
 
 }
