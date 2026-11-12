@@ -325,7 +325,7 @@ public class VocalRoomTests
         Assert.Equal(Lobby, Messages.Str(attache, "lobby_id"));
         Assert.True(Messages.Bool(attache, "auto_join"));
         Assert.True(Messages.Bool(attache, "mic_muted"));
-        Assert.Equal(EtatDeLaVoix.Connexion, b.Coordinateur.Affichage!.Etat);
+        Assert.Contains(b.Coordinateur.Affichage!.Etat, new[] { EtatDeLaVoix.Connexion, EtatDeLaVoix.Pret });
 
         await b.Exe.Dernier!.EmettreAsync("IN_CALL", 2);
         await Attendre.QueAsync(() => b.Coordinateur.Affichage?.Etat == EtatDeLaVoix.Connecte);
@@ -370,23 +370,6 @@ public class VocalRoomTests
         await b.TourAsync();
         Assert.Empty(b.Site.Appels);
         Assert.Equal(0, b.Exe.Lancements);
-    }
-
-    [Fact]
-    public async Task Lobby_en_creation_on_attend_sans_lancer()
-    {
-        await using var b = new Banc();
-        b.Site.Session = room => FauxSiteVocal.Voix(room, 1, "pending", "auto");
-        b.Rooms.Add(Salle("launching"));
-        await b.TourAsync();
-        Assert.Equal(0, b.Exe.Lancements);
-        Assert.Equal(EtatDeLaVoix.Connexion, b.Coordinateur.Affichage!.Etat);
-
-        b.Site.Session = room => FauxSiteVocal.Voix(room, 1, "ready", "auto");
-        b.Heure = b.Heure.AddSeconds(3);
-        await b.TourAsync();
-        Assert.Equal(1, b.Exe.Lancements);
-        Assert.Contains("session.attach", b.CommandesRecues);
     }
 
     [Fact]
@@ -578,6 +561,83 @@ public class VocalRoomTests
         Assert.Contains(b.Site.Appels, a => a.Route == "leave");
     }
 
+    // ── lot D : jeton des pending, identite verifiee ───────────────────────────────────────────────
+
+    [Fact]
+    public async Task Lobby_en_creation_le_compte_se_connecte_deja_puis_l_appel_part_a_ready()
+    {
+        await using var b = new Banc();
+        b.Site.Session = room => FauxSiteVocal.Voix(room, 1, "pending", "auto");
+        b.Rooms.Add(Salle("launching"));
+        await b.TourAsync();
+        Assert.Equal(1, b.Exe.Lancements);
+        Assert.Equal(1, b.Site.Nombre("token"));
+        Assert.Contains("auth.apply_token", b.CommandesRecues);
+        Assert.DoesNotContain("session.attach", b.CommandesRecues);
+
+        // Toujours pending : pas de second jeton.
+        b.Heure = b.Heure.AddSeconds(3);
+        await b.TourAsync();
+        Assert.Equal(1, b.Site.Nombre("token"));
+
+        b.Site.Session = room => FauxSiteVocal.Voix(room, 1, "ready", "auto");
+        b.Heure = b.Heure.AddSeconds(3);
+        await b.TourAsync();
+        Assert.Contains("session.attach", b.CommandesRecues);
+        Assert.Equal(1, b.Site.Nombre("token"));
+        Assert.Equal(1, b.Exe.Lancements);
+    }
+
+    [Fact]
+    public async Task Vocal_propose_en_creation_rien_ne_se_connecte_sans_le_joueur()
+    {
+        await using var b = new Banc();
+        b.Site.Session = room => FauxSiteVocal.Voix(room, 1, "pending", "offer");
+        b.Rooms.Add(Salle("playing"));
+        await b.TourAsync();
+        Assert.Equal(0, b.Exe.Lancements);
+        Assert.Equal(0, b.Site.Nombre("token"));
+    }
+
+    [Fact]
+    public async Task L_identite_verifiee_par_le_site_part_avec_le_jeton()
+    {
+        await using var b = new Banc();
+        b.Rooms.Add(Salle("playing"));
+        await b.TourAsync();
+        var jeton = b.Exe.Commandes.First(c => c.Commande == "auth.apply_token").Charge;
+        Assert.Equal("123456789012345678", Messages.Str(jeton, "expected_user_id"));
+        Assert.Contains("session.attach", b.CommandesRecues);
+    }
+
+    [Fact]
+    public async Task Un_autre_compte_Discord_le_vocal_est_refuse_et_le_site_le_sait()
+    {
+        await using var b = new Banc();
+        b.Exe.UtilisateurDiscord = "999999999999999999";
+        b.Rooms.Add(Salle("playing"));
+        await b.TourAsync();
+        await Attendre.QueAsync(() => b.Processus.Etat.DerniereErreur == "user_mismatch");
+        b.Heure = b.Heure.AddSeconds(3);
+        await b.TourAsync();
+        Assert.Equal(EtatDeLaVoix.Indisponible, b.Coordinateur.Affichage!.Etat);
+        Assert.Equal("user_mismatch", b.Coordinateur.Affichage.Raison);
+        Assert.False(b.Processus.Tourne);
+        Assert.Equal(1, b.Site.Nombre("token"));   // pas de second essai
+        Assert.Contains(b.Site.Appels, a => a.Route == "leave");
+    }
+
+    [Fact]
+    public async Task Sans_identite_du_site_le_jeton_part_sans_attente()
+    {
+        await using var b = new Banc();
+        b.Site.Jeton.Remove("discord_user_id");
+        b.Rooms.Add(Salle("playing"));
+        await b.TourAsync();
+        var jeton = b.Exe.Commandes.First(c => c.Commande == "auth.apply_token").Charge;
+        Assert.Null(Messages.Str(jeton, "expected_user_id"));
+    }
+
     [Fact]
     public void L_indicateur_suit_l_exe()
     {
@@ -662,7 +722,7 @@ public class VocalRoomTests
         try
         {
             Assert.True(await service.DemarrerAsync(CancellationToken.None), service.Etat.Raison);
-            Assert.StartsWith("0.2.", service.Etat.VersionExe);
+            Assert.True(VocalRoomProcessService.VersionDe(service.Etat.VersionExe) >= VocalRoomProtocolSource.VersionMinimale, service.Etat.VersionExe);
             Assert.Equal("1.10.19337", service.Etat.VersionSdk);
             Assert.Equal("AUTH_REQUIRED", service.Etat.Voix);
 

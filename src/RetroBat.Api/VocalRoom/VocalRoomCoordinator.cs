@@ -215,8 +215,17 @@ public sealed class VocalRoomCoordinator : BackgroundService
             await PerdreLeVocalAsync(s, _processus.Etat.Raison ?? "crashed", ct).ConfigureAwait(false);
         }
 
+        // Le compte connecte n'est pas celui que le site a lie (lot D) : jamais d'appel, pas de second essai.
+        if (s.Phase is Phase.Attente or Phase.Attachee && s.JetonDonne
+            && _processus.Etat.DerniereErreur is "user_mismatch" or "user_unverified" && JetonValable(s))
+        {
+            await PerdreLeVocalAsync(s, _processus.Etat.DerniereErreur!, ct).ConfigureAwait(false);
+            return;
+        }
+
         // Le jeton refuse par Discord : un second essai par generation, pas plus.
-        if (s.Phase == Phase.Attachee && _processus.Etat.Voix == "AUTH_REQUIRED" && _processus.Etat.DerniereErreur == "token_rejected")
+        if (s.Phase is Phase.Attachee or Phase.Attente && JetonValable(s) && _processus.Etat.Voix == "AUTH_REQUIRED"
+            && _processus.Etat.DerniereErreur == "token_rejected")
         {
             if (s.JetonsRedonnes < 1)
             {
@@ -301,6 +310,13 @@ public sealed class VocalRoomCoordinator : BackgroundService
         switch (voix.Status)
         {
             case "pending":
+                // LE JETON DES PENDING (contrat §3) : le SDK se connecte pendant que le site cree le lobby ; l'appel partira
+                // des ready. Seulement si le joueur est deja d'accord (auto, ou offre acceptee).
+                if (s.Phase == Phase.Attente && (voix.Join == "auto" || s.Accepte) && !JetonValable(s))
+                {
+                    await PreconnecterAsync(s, ct).ConfigureAwait(false);
+                }
+
                 break;
             case "ready":
                 s.Lobby = voix.LobbyId;
@@ -353,7 +369,7 @@ public sealed class VocalRoomCoordinator : BackgroundService
             return;
         }
 
-        if (!await DonnerLeJetonAsync(s, ct).ConfigureAwait(false))
+        if (!JetonValable(s) && !await DonnerLeJetonAsync(s, ct).ConfigureAwait(false))
         {
             return;
         }
@@ -390,6 +406,25 @@ public sealed class VocalRoomCoordinator : BackgroundService
             micro ? "coupe" : "ouvert");
     }
 
+    /// <summary>Le jeton a-t-il ete donne a l'exe qui tourne maintenant ? (un exe relance a perdu son compte)</summary>
+    private bool JetonValable(SessionVocale s) => s.JetonDonne && s.JetonLancement == _processus.Lancement && _processus.Tourne;
+
+    /// <summary>Lobby encore en creation : l'exe se lance et se connecte au compte, sans salon.</summary>
+    private async Task PreconnecterAsync(SessionVocale s, CancellationToken ct)
+    {
+        if (!await _processus.DemarrerAsync(ct).ConfigureAwait(false))
+        {
+            await PerdreLeVocalAsync(s, _processus.Etat.Raison ?? "exe_unavailable", ct).ConfigureAwait(false);
+            return;
+        }
+
+        if (await DonnerLeJetonAsync(s, ct).ConfigureAwait(false))
+        {
+            _journal?.LogInformation("VOCAL : room {Room} generation {Generation}, compte connecte pendant la creation du lobby",
+                s.Room, s.Generation);
+        }
+    }
+
     /// <summary>Demande le jeton au site et le passe a l'exe ; il n'est garde nulle part ensuite.</summary>
     private async Task<bool> DonnerLeJetonAsync(SessionVocale s, CancellationToken ct)
     {
@@ -400,11 +435,19 @@ public sealed class VocalRoomCoordinator : BackgroundService
             return false;
         }
 
-        var reponse = await _processus.CommanderAsync(Commands.AuthApplyToken, new JsonObject
+        var charge = new JsonObject
         {
             ["access_token"] = jeton.AccessToken,
             ["token_type"] = jeton.TokenType,
-        }).ConfigureAwait(false);
+        };
+        // L'identite que le site a verifiee a la liaison (contrat §3) : l'exe refuse tout appel si le compte connecte en
+        // est un autre (voice.error user_mismatch).
+        if (Messages.TryParseLobbyId(jeton.DiscordUserId, out _))
+        {
+            charge["expected_user_id"] = jeton.DiscordUserId;
+        }
+
+        var reponse = await _processus.CommanderAsync(Commands.AuthApplyToken, charge).ConfigureAwait(false);
         if (Messages.Bool(reponse, "ok") != true)
         {
             await PerdreLeVocalAsync(s, Messages.Str(Messages.Obj(reponse, "error"), "code") ?? "token_not_applied", ct).ConfigureAwait(false);
@@ -412,6 +455,7 @@ public sealed class VocalRoomCoordinator : BackgroundService
         }
 
         s.JetonDonne = true;
+        s.JetonLancement = _processus.Lancement;
         return true;
     }
 
@@ -443,6 +487,7 @@ public sealed class VocalRoomCoordinator : BackgroundService
     {
         var etaitAttachee = s.Phase == Phase.Attachee;
         s.Phase = Phase.Indisponible;
+        s.JetonDonne = false;
         s.Raison = raison;
         _journal?.LogInformation("VOCAL : vocal indisponible pour la room {Room} ({Raison}) ; la partie continue", s.Room, raison);
         if (etaitAttachee)
@@ -740,6 +785,9 @@ public sealed class VocalRoomCoordinator : BackgroundService
         public string? Raison { get; set; }
         public bool Accepte { get; set; }
         public bool JetonDonne { get; set; }
+
+        /// <summary>Le lancement de l'exe qui a recu le jeton (voir <see cref="VocalRoomProcessService.Lancement"/>).</summary>
+        public int JetonLancement { get; set; }
 
         /// <summary>Le salon a ete attache au moins une fois dans cette generation (le site le compte comme membre venu).</summary>
         public bool AEteAttachee { get; set; }

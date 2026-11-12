@@ -42,6 +42,7 @@ public sealed class VocalRoomProcessService : IHostedService, IAsyncDisposable
     private bool _voulu;
     private int _relances;
     private bool _arretDeLApi;
+    private int _lancements;
 
     public VocalRoomProcessService(
         IOptionsMonitor<ApiExposeOptions> options,
@@ -91,6 +92,15 @@ public sealed class VocalRoomProcessService : IHostedService, IAsyncDisposable
     }
 
     private int MaxRelances => Math.Max(0, _options?.CurrentValue.NelfePlay.Voice.MaxRestarts ?? 3);
+
+    /// <summary>
+    /// Le numero du lancement en cours (augmente a chaque exe lance et appaire). Un jeton donne a un lancement ne vaut pas
+    /// pour le suivant : l'exe relance a perdu son compte.
+    /// </summary>
+    public int Lancement
+    {
+        get { lock (_verrou) return _lancements; }
+    }
 
     /// <summary>Une nouvelle session vocale commence : le compte des relances repart de zero.</summary>
     public void NouvelleSession()
@@ -240,6 +250,7 @@ public sealed class VocalRoomProcessService : IHostedService, IAsyncDisposable
             {
                 _processus = p;
                 numero = ++_numero;
+                _lancements++;
             }
 
             p.Connexion.EventReceived += e => SurEvenement(numero, e);
@@ -251,6 +262,7 @@ public sealed class VocalRoomProcessService : IHostedService, IAsyncDisposable
                 Processus = VocalRoomEtat.EnMarche,
                 Voix = Messages.Str(Messages.Obj(sante, "result"), "state") ?? Messages.Str(resultat, "state") ?? "STARTING",
                 Raison = null,
+                DerniereErreur = null,
                 VersionExe = Messages.Str(resultat, "app_version"),
                 VersionSdk = Messages.Str(resultat, "sdk_version"),
             });

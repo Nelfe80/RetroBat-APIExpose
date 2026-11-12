@@ -25,6 +25,9 @@ internal sealed class FauxVocalRoom : IVocalRoomLanceur
     public bool SansJeton { get; set; }
     public string? SdkVersion { get; set; } = "1.10.19337";
 
+    /// <summary>Le compte Discord que « le SDK » connecte ; un expected_user_id different donne user_mismatch.</summary>
+    public string UtilisateurDiscord { get; set; } = "123456789012345678";
+
     /// <summary>Le faux exe « plante » (ferme le pipe et sort) a cette commande, une fois par lancement si demande.</summary>
     public string? PlanterA { get; set; }
 
@@ -210,8 +213,18 @@ internal sealed class FauxVocalRoom : IVocalRoomLanceur
                     r = Messages.Ok(id, new JsonObject { ["alive"] = true, ["state"] = _etat, ["sdk_available"] = true });
                     break;
                 case Commands.AuthApplyToken:
-                    r = Messages.Ok(id, new JsonObject { ["accepted"] = true, ["state"] = _etat });
-                    break;
+                    await EcrireAsync(Messages.Ok(id, new JsonObject { ["accepted"] = true, ["state"] = _etat })).ConfigureAwait(false);
+                    if (Messages.Str(charge, "expected_user_id") is { } attendu && attendu != _faux.UtilisateurDiscord)
+                    {
+                        await ErreurAsync("user_mismatch").ConfigureAwait(false);
+                        await EmettreAsync("AUTH_REQUIRED").ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await EmettreAsync("READY").ConfigureAwait(false);
+                    }
+
+                    return;
                 case Commands.SessionAttach:
                     _micro = Messages.Bool(charge, "mic_muted") ?? _micro;
                     r = Messages.Ok(id, new JsonObject { ["accepted"] = true, ["state"] = _etat });
