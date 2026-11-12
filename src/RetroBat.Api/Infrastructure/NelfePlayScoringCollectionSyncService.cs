@@ -983,7 +983,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             // (10/11) LE FICHIER LUI-MEME : le zip qui a servi a ouvrir un jeu d'exception, absent de la gamelist et du
             // referentiel. Il ne vaut que si le .MEM le nomme (avant le 11/11 : tout md5 publie, y compris un zip appris d'une
             // partie sur un clone).
-            if ((md5DuFichier ?? Md5DuFichier)(candidat.AbsolutePath) is { Length: > 0 } duZip && connus.Contains(duZip)
+            var duZip = (md5DuFichier ?? Md5DuFichier)(candidat.AbsolutePath);
+            if (duZip is { Length: > 0 } && connus.Contains(duZip)
                 && (duMem.Count == 0 || duMem.ContainsKey(duZip))) return true;
             if (!connus.Contains(nomDuSet) && !duMem.ContainsKey(nomDuSet))
             {
@@ -993,6 +994,12 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                     RomAdmission.ReferentielArcadeSurDisque.Borne).Admise))(set);
             }
             if (candidat.Md5 is { Length: > 0 } md5Zip && connus.Contains(md5Zip)) return true;
+            // (12/11) LE SET EST NOMME (par le .MEM ou par son md5 de nom publie) : le md5 CALCULE du zip, s'il est publie, le
+            // confirme aussi. Batsugun Special, Dangun Feveron, Gradius II et RayForce n'annoncent que l'empreinte du zip appris
+            // d'une partie (le grp de leur referentiel n'est pas leur rom_group, le site n'y joint pas le sha1 declare du set) : sans
+            // cela, la borne les ecartait. Le md5 est deja calcule plus haut, le fichier n'est pas relu. Un set non nomme n'arrive
+            // jamais ici (clone officiel ou refus), un bootleg ou un hack est refuse en tete.
+            if (duZip is { Length: > 0 } && connus.Contains(duZip)) return true;
             var sha1 = sha1DuSet(candidat.CanonicalSystemId, jeu.RomGroup, set);
             return sha1 is { Length: > 0 } && sha1s.Contains(sha1);
         }
