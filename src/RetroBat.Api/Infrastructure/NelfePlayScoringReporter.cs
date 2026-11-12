@@ -870,6 +870,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     lock (_sync)
                     {
                         _replayDeLaPartie = _replayDuSolo ?? _activeReplayId;
+                        AppliquerLesArrets(_enregistrements, _arretsEnAttente);
                         _enregistrementsDeLaPartie = new List<(string Id, long Debut, long? Fin)>(_enregistrements);
                     }
                     _ = OnSessionAsync(ToJson(envelope.Payload), CancellationToken.None);
@@ -946,6 +947,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _salves = new RetroBat.Api.Scoring.SalvesDeScore();
             _baisse.Oublier();
             _enregistrements.Clear();
+            _arretsEnAttente.Clear();
             _vies.Clear();
             _contexte = RetroBat.Api.Scoring.ContexteDeJeu.Vide;
             _contexteDeLaPartieJouee = null;
@@ -5786,6 +5788,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _monteeDansLEnregistrement = false;
             _attenteMontee = false;
             _baisse.Oublier();
+            AppliquerLesArrets(_enregistrements, _arretsEnAttente);
             _enregistrements.Add((id!, DebutDeLEnregistrement(_lastFrame, GetLong(payload, "Frame")), null));
             if (_enregistrements.Count > 20) _enregistrements.RemoveAt(0);
         }
@@ -5808,12 +5811,24 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     {
         var id = GetString(payload, "ReplayId");
         if (string.IsNullOrEmpty(id)) return;
-        lock (_sync)
+        // (12/11 soir) SANS VERROU : l'annonce passait par le fil de la relance, et _sync peut etre tenu longtemps ailleurs.
+        // L'image d'arret est lue tout de suite ; ceux qui lisent les enregistrements l'appliquent sous verrou.
+        _arretsEnAttente.Enqueue((id!, Interlocked.Read(ref _lastFrame)));
+    }
+
+    /// <summary>Les arrets de replay notes sans verrou (<see cref="CaptureArretDuReplay"/>), a appliquer sous _sync.</summary>
+    private readonly System.Collections.Concurrent.ConcurrentQueue<(string Id, long Fin)> _arretsEnAttente = new();
+
+    /// <summary>Pose la fin des enregistrements arretes, sans toucher a une fin deja connue. Appele sous _sync.</summary>
+    internal static void AppliquerLesArrets(List<(string Id, long Debut, long? Fin)> enregistrements,
+        System.Collections.Concurrent.ConcurrentQueue<(string Id, long Fin)> arrets)
+    {
+        while (arrets.TryDequeue(out var a))
         {
-            for (var i = 0; i < _enregistrements.Count; i++)
+            for (var i = 0; i < enregistrements.Count; i++)
             {
-                if (string.Equals(_enregistrements[i].Id, id, StringComparison.Ordinal) && _enregistrements[i].Fin is null)
-                    _enregistrements[i] = (_enregistrements[i].Id, _enregistrements[i].Debut, _lastFrame);
+                if (string.Equals(enregistrements[i].Id, a.Id, StringComparison.Ordinal) && enregistrements[i].Fin is null)
+                    enregistrements[i] = (enregistrements[i].Id, enregistrements[i].Debut, a.Fin);
             }
         }
     }
@@ -5827,6 +5842,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(sha)) return;
         lock (_sync)
         {
+            AppliquerLesArrets(_enregistrements, _arretsEnAttente);
             if (string.Equals(id, _activeReplayId, StringComparison.Ordinal)) _enregistrementEnCours = false;
             for (var i = 0; i < _enregistrements.Count; i++)
             {

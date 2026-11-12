@@ -120,6 +120,8 @@ public sealed class ReplayRecorderService : BackgroundService
         public DateTime StartedAtUtc;
         public long LastFrame;
         public required string RetroArchVersion;
+        /// <summary>Le dossier de sauvegarde de RetroArch a l'ouverture (celui du coeur) : le .replay s'y cherche.</summary>
+        public string? Dossier;
         /// <summary>« 1cc-multi » pour la partie a plusieurs ; null pour le 1CC solo.</summary>
         public string? Categorie;
 
@@ -133,6 +135,9 @@ public sealed class ReplayRecorderService : BackgroundService
     }
 
     private Recording? _current;
+
+    /// <summary>Les annonces de l'enregistreur, en file : un abonne lent ne retient plus la relance (<see cref="FileDEvenements"/>).</summary>
+    private readonly FileDEvenements _annonces;
 
     /// <summary>
     /// L'ENREGISTREMENT DEMANDE, PAS ENCORE CONFIRME (12/11). Le 12/11 a 09:23:04, RetroArch a ouvert le replay de la relance
@@ -184,6 +189,7 @@ public sealed class ReplayRecorderService : BackgroundService
         _ra = ra; _store = store; _timing = timing; _bus = bus; _playback = playback; _logger = logger;
         _config = config; _catalogue = catalogue; _partie = partie;
         _garde = new GardeDesPlantages(Path.Combine(Path.GetDirectoryName(store.ActiveRecordingPath) ?? ".", "sans-enregistrement.json"));
+        _annonces = new FileDEvenements(bus, logger);
         Courant = this;
     }
 
@@ -230,7 +236,10 @@ public sealed class ReplayRecorderService : BackgroundService
     /// </summary>
     public async Task OuvrirApresRelanceAsync(CancellationToken ct)
     {
-        if (!await _tour.WaitAsync(TimeSpan.FromSeconds(1), ct).ConfigureAwait(false))
+        var etapes = new EtapesDeLaRelance();
+        var tourPris = await _tour.WaitAsync(TimeSpan.FromSeconds(1), ct).ConfigureAwait(false);
+        etapes.Noter("tour");
+        if (!tourPris)
         {
             // la boucle prend le relais, une seule fois : l'annonce couvre encore l'evenement (passe ou a venir), et on fait
             // ici ce qu'il aurait fait
@@ -254,9 +263,12 @@ public sealed class ReplayRecorderService : BackgroundService
             if (precedent is not null)
             {
                 await _ra.HaltAsync(ct).ConfigureAwait(false);
-                fichier = FindReplayFile(precedent.StartedAtUtc);
+                etapes.Noter("arret");
+                fichier = FindReplayFile(precedent);
+                etapes.Noter("fichier");
                 _current = null;
                 await PublishAsync("replay.recording.stopped", new { precedent.ReplayId, precedent.SessionId, precedent.LastFrame }, ct).ConfigureAwait(false);
+                etapes.Noter("annonce");
                 _logger.LogInformation("Replay : {ReplayId} arrete a la relance du defi, le suivant s'ouvre sur l'etat de depart.", precedent.ReplayId);
             }
 
@@ -264,6 +276,7 @@ public sealed class ReplayRecorderService : BackgroundService
             {
                 _attenteAnnoncee = "";
                 await StartAsync(statut, ct).ConfigureAwait(false);
+                etapes.Noter("ouverture");
                 if (_current is not null) _ouvertALaRelance = DateTime.UtcNow;
             }
             else
@@ -287,7 +300,49 @@ public sealed class ReplayRecorderService : BackgroundService
         finally
         {
             _tour.Release();
+            if (tourPris)
+            {
+                if (etapes.Lente() is { } lente)
+                    _logger.LogWarning("Replay : relance du defi lente, etape {Etape} en {Ms} ms ({Detail}).", lente.Nom, lente.Ms, etapes.Detail());
+                else
+                    _logger.LogInformation("Replay : relance du defi en {Ms} ms ({Detail}).", etapes.TotalMs, etapes.Detail());
+            }
         }
+    }
+
+    /// <summary>
+    /// LES ETAPES CHRONOMETREES DE LA RELANCE (12/11) : le banc de 18:17 a montre 34 s entre l'entree et l'arret de l'ancien
+    /// replay, sans dire ou. Chaque etape est mesuree ; une etape au-dela de <see cref="FileDEvenements.SeuilDeLenteur"/> est
+    /// signalee.
+    /// </summary>
+    internal sealed class EtapesDeLaRelance
+    {
+        private readonly System.Diagnostics.Stopwatch _chrono = System.Diagnostics.Stopwatch.StartNew();
+        private readonly List<(string Nom, long Ms)> _etapes = new();
+        private long _precedent;
+
+        public void Noter(string nom)
+        {
+            var maintenant = _chrono.ElapsedMilliseconds;
+            _etapes.Add((nom, maintenant - _precedent));
+            _precedent = maintenant;
+        }
+
+        public long TotalMs => _chrono.ElapsedMilliseconds;
+
+        public IReadOnlyList<(string Nom, long Ms)> Etapes => _etapes;
+
+        /// <summary>La plus longue etape au-dela du seuil, ou null.</summary>
+        public (string Nom, long Ms)? Lente()
+        {
+            var seuil = (long)FileDEvenements.SeuilDeLenteur.TotalMilliseconds;
+            (string Nom, long Ms)? pire = null;
+            foreach (var e in _etapes)
+                if (e.Ms > seuil && (pire is null || e.Ms > pire.Value.Ms)) pire = e;
+            return pire;
+        }
+
+        public string Detail() => string.Join(", ", _etapes.Select(e => $"{e.Nom} {e.Ms} ms"));
     }
 
     /// <summary>
@@ -699,6 +754,7 @@ public sealed class ReplayRecorderService : BackgroundService
         if (_current is not null)
             try { await FinalizeAsync(_current, recovered: false, CancellationToken.None).ConfigureAwait(false); }
             catch (Exception ex) { _logger.LogWarning(ex, "Replay : finalisation à l'arrêt échouée"); }
+        await _annonces.ViderAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
     }
 
     private async Task TickAsync(CancellationToken ct)
@@ -736,7 +792,7 @@ public sealed class ReplayRecorderService : BackgroundService
                 // La session a deja arrete le replay de la tentative (HALT_REPLAY avant l'etat) ; son fichier se repere
                 // AVANT d'en ouvrir un autre (le plus recent du dossier), puis le neuf s'ouvre, et l'ancien se scelle apres.
                 await _ra.HaltAsync(ct).ConfigureAwait(false);
-                var fichier = FindReplayFile(precedent.StartedAtUtc);
+                var fichier = FindReplayFile(precedent);
                 _current = null;
                 // la capture video de la tentative s'arrete avant que celle de la suivante demarre (ReplayCaptureService)
                 await PublishAsync("replay.recording.stopped", new { precedent.ReplayId, precedent.SessionId, precedent.LastFrame }, ct).ConfigureAwait(false);
@@ -887,7 +943,7 @@ public sealed class ReplayRecorderService : BackgroundService
         await _ra.HaltAsync(ct).ConfigureAwait(false);
         // La capture video de la partie s'arrete avec son replay (ReplayCaptureService).
         await PublishAsync("replay.recording.stopped", new { rec.ReplayId, rec.SessionId, rec.LastFrame }, ct).ConfigureAwait(false);
-        var fichier = FindReplayFile(rec.StartedAtUtc);
+        var fichier = FindReplayFile(rec);
         if (ReferenceEquals(_current, rec)) _current = null;
         _ = Task.Run(async () =>
         {
@@ -963,6 +1019,8 @@ public sealed class ReplayRecorderService : BackgroundService
         // Frame : les images deja enregistrees a l'annonce ; le rapporteur en recale le debut dans l'horloge du wrapper.
         await PublishAsync("replay.recording.started",
             new { rec.ReplayId, rec.SessionId, rec.System, rec.Game, Frame = rec.LastFrame }, ct).ConfigureAwait(false);
+        // apres l'annonce : RetroArch enregistre deja, une question de plus ne retarde rien
+        rec.Dossier = await _ra.GetSavestateDirectoryAsync(ct).ConfigureAwait(false);
     }
 
     /// <param name="fichier">Le fichier deja repere (relance d'un defi : le replay suivant est ouvert, le plus recent n'est plus lui).</param>
@@ -986,7 +1044,7 @@ public sealed class ReplayRecorderService : BackgroundService
                 await PublishAsync("replay.recording.stopped", new { rec.ReplayId, rec.SessionId, rec.LastFrame }, ct).ConfigureAwait(false);
             }
 
-            var file = fichier ?? FindReplayFile(rec.StartedAtUtc);
+            var file = fichier ?? FindReplayFile(rec);
             if (file is null)
             {
                 _logger.LogWarning("Replay : aucun fichier .replay trouvé pour {ReplayId} — abandon.", rec.ReplayId);
@@ -1195,17 +1253,37 @@ public sealed class ReplayRecorderService : BackgroundService
         catch (Exception ex) { _logger.LogDebug(ex, "Replay : hash empreinte {Path} échoué", path); return null; }
     }
 
-    /// <summary>Le fichier .replay le plus récent écrit depuis le début de l'enregistrement.</summary>
+    /// <summary>Le fichier .replay le plus récent écrit depuis le début de l'enregistrement, dans tout saves (reprise apres un arret brutal).</summary>
     private static string? FindReplayFile(DateTime startedAtUtc)
+        => LePlusRecent(RetroBatPaths.SavesRoot, startedAtUtc);
+
+    /// <summary>
+    /// LE FICHIER D'UN ENREGISTREMENT, DANS LE DOSSIER DU COEUR (12/11). Le parcours de tout saves, fait pendant la relance
+    /// d'un defi, ne sert qu'en repli : le dossier de sauvegarde retenu a l'ouverture suffit.
+    /// </summary>
+    private string? FindReplayFile(Recording rec)
     {
-        var margin = startedAtUtc.AddSeconds(-2);
+        if (rec.Dossier is { Length: > 0 } dossier && LePlusRecent(dossier, rec.StartedAtUtc) is { } trouve) return trouve;
+        _logger.LogInformation("Replay : {ReplayId} cherche dans tout saves (dossier du coeur {Dossier} vide ou inconnu).",
+            rec.ReplayId, rec.Dossier ?? "inconnu");
+        return FindReplayFile(rec.StartedAtUtc);
+    }
+
+    /// <summary>Le .replay le plus recent d'un dossier (et de ses sous-dossiers), ecrit au plus 2 s avant <paramref name="depuisUtc"/>.</summary>
+    internal static string? LePlusRecent(string dossier, DateTime depuisUtc)
+    {
+        var margin = depuisUtc.AddSeconds(-2);
         string? best = null; DateTime bestTime = DateTime.MinValue;
-        if (!Directory.Exists(RetroBatPaths.SavesRoot)) return null;
-        foreach (var f in Directory.EnumerateFiles(RetroBatPaths.SavesRoot, "*.replay*", SearchOption.AllDirectories))
+        if (!Directory.Exists(dossier)) return null;
+        try
         {
-            var t = File.GetLastWriteTimeUtc(f);
-            if (t >= margin && t > bestTime) { best = f; bestTime = t; }
+            foreach (var f in Directory.EnumerateFiles(dossier, "*.replay*", SearchOption.AllDirectories))
+            {
+                var t = File.GetLastWriteTimeUtc(f);
+                if (t >= margin && t > bestTime) { best = f; bestTime = t; }
+            }
         }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { return best; }
         return best;
     }
 
@@ -1301,11 +1379,12 @@ public sealed class ReplayRecorderService : BackgroundService
         _logger.LogInformation("Replay recovery OK {ReplayId} (sha256={Sha}).", rec.ReplayId, obj.Sha256);
     }
 
-    private async Task PublishAsync(string type, object payload, CancellationToken ct)
+    /// <summary>En file, dans l'ordre : rend la main tout de suite (<see cref="FileDEvenements"/>).</summary>
+    private Task PublishAsync(string type, object payload, CancellationToken ct)
     {
-        try { await _bus.PublishAsync(new EventEnvelope { Type = type, Payload = payload }).ConfigureAwait(false); }
-        catch (Exception ex) { _logger.LogDebug(ex, "Replay : publication event {Type} échouée", type); }
         _ = ct;
+        _annonces.Publier(type, payload);
+        return Task.CompletedTask;
     }
 
     private string? RomGroupDe(ReplayLaunchHint? hint)
