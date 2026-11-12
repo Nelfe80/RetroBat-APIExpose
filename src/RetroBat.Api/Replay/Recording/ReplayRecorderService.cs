@@ -234,6 +234,7 @@ public sealed class ReplayRecorderService : BackgroundService
         {
             // la boucle prend le relais, une seule fois : l'annonce couvre encore l'evenement (passe ou a venir), et on fait
             // ici ce qu'il aurait fait
+            _logger.LogInformation("Replay : relance du defi, la boucle tient son tour depuis plus d'une seconde ; elle ouvrira le replay.");
             NoterLEtatCharge();
             return;
         }
@@ -249,6 +250,7 @@ public sealed class ReplayRecorderService : BackgroundService
             var precedent = _current;
             var statut = _dernierStatut;
             string? fichier = null;
+            _logger.LogInformation("Replay : relance du defi, ouverture du replay (en cours : {Precedent}).", precedent?.ReplayId ?? "aucun");
             if (precedent is not null)
             {
                 await _ra.HaltAsync(ct).ConfigureAwait(false);
@@ -263,6 +265,12 @@ public sealed class ReplayRecorderService : BackgroundService
                 _attenteAnnoncee = "";
                 await StartAsync(statut, ct).ConfigureAwait(false);
                 if (_current is not null) _ouvertALaRelance = DateTime.UtcNow;
+            }
+            else
+            {
+                // (12/11) une relance qui n'ouvrait rien ne le disait nulle part
+                _logger.LogWarning("Replay : relance du defi sans replay ouvert (RetroArch {Etat}, lecture en cours {Lecture}).",
+                    statut?.State ?? "jamais vu", _playback.IsBusy);
             }
 
             if (precedent is not null)

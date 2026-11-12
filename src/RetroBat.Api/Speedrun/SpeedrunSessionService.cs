@@ -416,7 +416,12 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 {
                     // annoncee AVANT la tache (08/11) : sinon « speedrun.etat.charge », publie juste apres, arretait le replay neuf
                     enregistreur.AnnoncerRelance();
-                    _ = Task.Run(() => enregistreur.OuvrirApresRelanceAsync(CancellationToken.None));
+                    // (12/11) une exception de la tache se perdait sans trace : la relance restait sans replay, en silence
+                    _ = Task.Run(async () =>
+                    {
+                        try { await enregistreur.OuvrirApresRelanceAsync(CancellationToken.None).ConfigureAwait(false); }
+                        catch (Exception ex) { _journal.LogWarning(ex, "Speedrun : ouverture du replay de la relance en echec."); }
+                    });
                 }
             }
         }
