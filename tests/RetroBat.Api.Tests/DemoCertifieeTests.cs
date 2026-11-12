@@ -74,13 +74,63 @@ public class DemoCertifieeTests
     }
 
     [Fact]
-    public void Une_piece_lue_puis_jamais_consommee_n_est_pas_un_depart()
+    public void Une_piece_lue_jamais_consommee_avec_les_appuis_de_l_attract_n_est_pas_un_depart()
     {
-        // Une piece mise pendant la demo, START jamais presse au bon moment : la ligne parle, rien ne la consomme.
+        // Une piece mise pendant la demo, des START tapes sans lancer de partie : la ligne parle, rien ne la consomme,
+        // et 120 images tenues sur 2 446 ne sont pas une partie.
         var credits = new List<EvenementDeCredit> { new(1, 2500) };
-        var refus = DepartReel.Refus(Demo(appuis: 400, tenues: 1500, credits: credits));
+        var refus = DepartReel.Refus(Demo(appuis: 12, tenues: 120, credits: credits));
         Assert.NotNull(refus);
         Assert.Contains("ligne des credits est lue", refus);
+    }
+
+    [Fact]
+    public void Une_piece_de_plus_ne_refuse_pas_ce_qu_une_ligne_muette_accepte()
+    {
+        // Les memes appuis, avec ou sans une piece lue jamais consommee : le meme verdict (en 1.9.172 et 1.9.173, la piece
+        // seule faisait le refus).
+        var credits = new List<EvenementDeCredit> { new(1, 2500) };
+        Assert.Null(DepartReel.Refus(Demo(appuis: 400, tenues: 1500)));
+        Assert.Null(DepartReel.Refus(Demo(appuis: 400, tenues: 1500, credits: credits)));
+        Assert.NotNull(DepartReel.Refus(Demo(appuis: 12, tenues: 120)));
+        Assert.NotNull(DepartReel.Refus(Demo(appuis: 12, tenues: 120, credits: credits)));
+    }
+
+    private const string MemAlteredBeast = """
+        credits = {
+          { address=0XFFF000, type="u8", condition="change", action="CREDITS", desc="Credits" },
+        },
+        """;
+
+    [Fact]
+    public void Altered_Beast_217500_depart_dans_la_chauffe_et_piece_au_raccourci_de_sortie_est_certifiee()
+    {
+        // Borne d'Ash, 12/11 20:48-20:53 (API 1.9.172) : START 2,9 s apres le prevol, dans la chauffe du wrapper, aucun
+        // « credit consomme » ; 5 min de partie, 820 appuis, pic 217 500 ; le SELECT du raccourci de sortie (SELECT +
+        // START) met une piece que le jeu ne consomme pas, plus d'une seconde avant le START de sortie.
+        var departs = new List<DepartDeJoueur> { new(1, 0), new(1, 18150) };
+        var credits = new List<EvenementDeCredit> { new(1, 18000) };
+        var run = new List<(long, long)> { (150, 0), (18100, 217500) };
+        var (c, g) = DepartReel.LignesDeDepart(MemAlteredBeast);
+        Assert.True(c);
+        Assert.False(g);
+        Assert.False(DepartReel.CreditConsomme(credits, departs));
+        var bilan = new DepartReel.Bilan(c, g, credits, departs, false, false,
+            new DepartReel.Appuis(820, 9000), DepartReel.ImagesDuRun(run));
+        Assert.Null(DepartReel.Refus(bilan));
+    }
+
+    [Fact]
+    public void Altered_Beast_piece_en_cours_de_partie_sans_START_suivi_d_appuis_reste_refusee()
+    {
+        // La meme ligne, une piece jamais jouee, mais des appuis d'attract : refus.
+        var departs = new List<DepartDeJoueur> { new(1, 0) };
+        var credits = new List<EvenementDeCredit> { new(1, 6000) };
+        var run = new List<(long, long)> { (150, 0), (18100, 217500) };
+        var (c, g) = DepartReel.LignesDeDepart(MemAlteredBeast);
+        var bilan = new DepartReel.Bilan(c, g, credits, departs, false, false,
+            new DepartReel.Appuis(40, 300), DepartReel.ImagesDuRun(run));
+        Assert.NotNull(DepartReel.Refus(bilan));
     }
 
     [Fact]

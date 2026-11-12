@@ -14,11 +14,16 @@ namespace RetroBat.Api.Infrastructure;
 /// Deux portes, sur ce que la session prouve, pas sur ce que la borne a cru en direct :
 /// <list type="number">
 /// <item>LE DEPART REEL : un jeu dont le .MEM sait lire le depart (une ligne CREDITS, ou GAME_START) doit l'avoir lu :
-/// un credit consomme, le GAME_START, ou un depart impose (etat de depart du MULTIPLAYER, START du labo). Une ligne de
-/// credits qui a parle sans que rien ne la consomme (une piece mise, jamais jouee) : refus. Une ligne qui n'a jamais
-/// parle (piece et START pendant les 120 images de chauffe du wrapper) : le START du panel ne vaut depart que suivi des
-/// appuis d'une partie, assez d'appuis ET des touches tenues (<see cref="StartSuiviDAppuis"/>), car des START tapes
-/// pendant l'attract font le nombre, jamais la duree tenue.</item>
+/// un credit consomme, le GAME_START, ou un depart impose (etat de depart du MULTIPLAYER, START du labo). Sans credit
+/// consomme lu (piece et START pendant les 120 images de chauffe du wrapper, que la ligne ait parle ensuite ou non) : le
+/// START du panel ne vaut depart que suivi des appuis d'une partie, assez d'appuis ET des touches tenues
+/// (<see cref="StartSuiviDAppuis"/>), car des START tapes pendant l'attract font le nombre, jamais la duree tenue.
+/// <para>UNE PIECE DE PLUS NE REND PAS UNE PARTIE MOINS VRAIE (12/11, Altered Beast, 217 500 et 219 100, 820 et 724
+/// appuis, refuses en 1.9.172). Le depart tombe dans la chauffe (START 2,6 a 2,9 s apres le prevol), la ligne des credits
+/// se tait ; puis une piece arrive en cours de partie, ou au SELECT du raccourci de sortie (SELECT = piece sous FBNeo),
+/// et le jeu ne la consomme pas. La ligne avait parle sans baisser : refus sec, alors que la meme partie sans cette
+/// piece passait par le START suivi des appuis. Une ligne qui ne fait que monter ne dit rien de plus qu'une ligne
+/// muette : meme repli. La demo n'y gagne rien, puisqu'elle passait deja ce repli sans piece.</para></item>
 /// <item>PRESQUE AUCUN APPUI : quel que soit le jeu, un run certifie demande au moins un appui toutes les
 /// <see cref="SecondesParAppui"/> secondes de run, ou des touches tenues au moins <see cref="PartTenueMin"/> du run.
 /// Une demo ne recoit du joueur que des START et des pieces tapes pendant l'attract (une dizaine d'images chacun) ; un
@@ -166,17 +171,18 @@ public static class DepartReel
         if (b.LigneDeCredits)
         {
             if (CreditConsomme(b.Credits, b.Departs)) return null;
-            // La ligne des credits a parle (une piece, une lecture) et rien ne l'a consommee : aucun START n'a lance de partie.
-            if (b.Credits.Count > 0)
-                return "aucun credit consomme alors que la ligne des credits est lue : le START n'a lance aucune partie (demo d'attract)";
+            // Des pieces lues, aucune consommee : le depart a pu tomber dans la chauffe, et la piece venir apres (en
+            // partie, au raccourci de sortie). Comme une ligne muette : le START suivi des appuis d'une partie tranche.
         }
         else if (!b.LigneGameStart)
         {
             return null;   // le .MEM ne sait pas lire le depart : la porte 2 seule
         }
         if (StartSuiviDAppuis(b.StartVu, b.Appuis, b.ImagesDuRun)) return null;
-        return b.LigneDeCredits
-            ? "aucun credit consomme, et pas de START suivi des appuis d'une partie : la partie n'a jamais commence (demo d'attract)"
-            : "ni GAME_START, ni START suivi des appuis d'une partie : la partie n'a jamais commence (demo d'attract)";
+        if (!b.LigneDeCredits)
+            return "ni GAME_START, ni START suivi des appuis d'une partie : la partie n'a jamais commence (demo d'attract)";
+        return b.Credits.Count > 0
+            ? "aucun credit consomme alors que la ligne des credits est lue (piece jamais jouee), et pas de START suivi des appuis d'une partie : le START n'a lance aucune partie (demo d'attract)"
+            : "aucun credit consomme, et pas de START suivi des appuis d'une partie : la partie n'a jamais commence (demo d'attract)";
     }
 }
