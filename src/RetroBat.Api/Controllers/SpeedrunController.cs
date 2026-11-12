@@ -25,9 +25,12 @@ public sealed class SpeedrunController : ControllerBase
     private readonly IGamelistStore _gamelists;
     private readonly RomCanonicalResolver _canonical;
     private readonly CatalogueDesDefis _catalogue;
+    private readonly NelfePlayScoringCollectionSyncService? _scoring;
 
-    public SpeedrunController(SpeedrunSessionService session, IGamelistStore gamelists, RomCanonicalResolver canonical, CatalogueDesDefis catalogue)
+    public SpeedrunController(SpeedrunSessionService session, IGamelistStore gamelists, RomCanonicalResolver canonical, CatalogueDesDefis catalogue,
+        NelfePlayScoringCollectionSyncService? scoring = null)
     {
+        _scoring = scoring;
         _catalogue = catalogue;
         _session = session;
         _gamelists = gamelists;
@@ -79,10 +82,14 @@ public sealed class SpeedrunController : ControllerBase
     public IActionResult Lancer([FromBody] DemandeDeLancement demande)
     {
         if (!JetonLocal()) return Refus();
-        // Rom : le fichier a lancer, si l'appelant le sait (essais) ; sinon celui que le groupe designe.
+        // Rom : le fichier a lancer, si l'appelant le sait (essais) ; sinon celui du panneau : le fichier que World Scoring a
+        // retenu, la ROM de reference d'un jeu a speedruns (RomDeLEpreuve, 12/11 : la route prenait la version PAL de SMB)
         var r = _session.Lancer(demande.ChallengeId, (systeme, groupe) => demande.Rom is { Length: > 0 } rom && System.IO.File.Exists(rom)
             ? rom
-            : RomDuGroupe.Trouver(_gamelists, _canonical, systeme, groupe));
+            : RomDeLEpreuve.Choisir(_scoring?.CheminsParJeu, systeme, groupe,
+                () => RomAdmission.ReferenceDuSpeedrun(systeme, groupe, RomAdmission.ReferentielSurDisque.Borne) is not null,
+                () => RomDuGroupe.Trouver(_gamelists, _canonical, systeme, groupe),
+                f => System.IO.File.Exists(f) || System.IO.Directory.Exists(f)));
         if (r.Lance) return Accepted(new { status = "launching", challengeId = demande.ChallengeId });
         return r.Raison switch
         {
