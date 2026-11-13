@@ -206,6 +206,23 @@ public static class Desinstallation
             return arretes == 0 ? "ne tournait pas" : "arrete";
         });
 
+        // Le vocal Discord (NelfePlay-VocalRoom, 1.9.177) tient discord_partner_sdk.dll et Krisp tant qu'il tourne. Sans l'API
+        // il s'arrete seul en 2 s, mais le desinstalleur des installeurs d'avant la 1.9.177 enchaine aussitot : on l'arrete ici,
+        // sinon ses fichiers resteraient a la racine.
+        Etape(Dire, "vocal Discord", () =>
+        {
+            var arretes = 0;
+            foreach (var p in Process.GetProcessesByName(RetroBat.Api.VocalRoom.VocalRoomFichiers.Processus))
+            {
+                using (p)
+                {
+                    try { p.Kill(); p.WaitForExit(5000); arretes++; }
+                    catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception) { }
+                }
+            }
+            return arretes == 0 ? "ne tournait pas" : "arrete";
+        });
+
         Etape(Dire, "dossier du plugin", () =>
         {
             var exe = Path.GetFileName(Environment.ProcessPath);
