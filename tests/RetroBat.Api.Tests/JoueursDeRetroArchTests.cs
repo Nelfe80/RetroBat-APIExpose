@@ -147,6 +147,42 @@ public class JoueursDeRetroArchTests
         => Assert.Equal(attendu, PlayerNumbering.MemeAppareil(a, b));
 
     [Fact]
+    public void Prend_la_ligne_de_commande_pas_la_version_du_lanceur()
+    {
+        // Le journal reel d'un lancement : la ligne de version suit la ligne de commande, et contient aussi « EmulatorLauncher.exe ».
+        var chemin = Path.Combine(Path.GetTempPath(), "nelfe-joueurs-" + Guid.NewGuid().ToString("N") + ".log");
+        try
+        {
+            File.WriteAllText(chemin, string.Join(Environment.NewLine, new[]
+            {
+                "2026-11-13 21:30:00.000 [INFO]      [Startup] \"E:/RetroBat/emulationstation/emulatorLauncher.exe\" -p1index 0 -p1guid 030000005e040000fd02000003097200 -p1name \"Xbox One S Controller\" -system fbneo -rom \"a.zip\"",
+                LigneDu13,
+                "2026-11-13 21:34:12.660 [INFO]      [Startup] Loading configuration.",
+                "2026-11-13 21:34:12.756 [INFO]      [Startup] EmulatorLauncher.exe version : 10/10/2026 22:26:32",
+                "2026-11-13 21:34:13.661 [INFO]      [Startup] Loading Controller configuration.",
+                "2026-11-13 21:34:19.692 [INFO]      [Running] E:/RetroBat/emulators/retroarch/retroarch.exe -L core.dll",
+                "",
+            }));
+            var ligne = JoueursDeRetroArch.DernierLancement(chemin);
+            Assert.NotNull(ligne);
+            Assert.Equal(2, JoueursDeRetroArch.ManettesDuLancement(ligne!).Count);
+            Assert.Equal(new DateTime(2026, 11, 13, 21, 34, 12, 657), JoueursDeRetroArch.HeureDeLaLigne(ligne!));
+        }
+        finally
+        {
+            File.Delete(chemin);
+        }
+    }
+
+    [Theory]
+    [InlineData("2026-11-13 21:34:12.756 [INFO]      [Startup] EmulatorLauncher.exe version : 10/10/2026 22:26:32", false)]
+    [InlineData("2026-11-13 21:34:12.657 [INFO]      [Startup] \"E:/RetroBat/emulationstation/emulatorLauncher.exe\" -system fbneo -rom \"x.zip\"", true)]
+    [InlineData("2026-11-13 21:34:12.657 [INFO]      [Startup] \"E:/RetroBat/emulationstation/emulatorLauncher.exe\"  -gameinfo \"g.xml\" -p1index 0 -system nes -rom \"x.nes\"", true)]
+    [InlineData("2026-11-13 21:34:19.692 [INFO]      [Running] E:/RetroBat/emulators/retroarch/retroarch.exe -system x", false)]
+    public void Reconnait_une_ligne_de_lancement(string ligne, bool attendu)
+        => Assert.Equal(attendu, JoueursDeRetroArch.EstUneLigneDeLancement(ligne));
+
+    [Fact]
     public void Lit_l_heure_d_une_ligne_du_lanceur()
     {
         Assert.Equal(new DateTime(2026, 11, 13, 21, 34, 12, 657), JoueursDeRetroArch.HeureDeLaLigne(LigneDu13));

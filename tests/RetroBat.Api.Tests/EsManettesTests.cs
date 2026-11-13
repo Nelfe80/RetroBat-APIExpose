@@ -178,4 +178,34 @@ public sealed class EsLaunchArgumentsJournalDuLanceurTests : IDisposable
         Assert.True(EsManettes.EstVirtuelle("vJoy Device", string.Empty));
         Assert.False(EsManettes.EstVirtuelle("Xbox 360 Controller", "030000005e0400008e02000000007200"));
     }
+    // Borne du user, 13/11 : la Xbox (mappage SDL) a l'index 0, le panel (sans mappage) a l'index 1, ES met le panel en p1.
+    private static readonly EsManettes.Appareil XboxDu13 = new(0, "030000005e040000fd02000003097200", "Xbox One S Controller",
+        "USB\\VID_18D1&PID_9400&MI_01\\8&276CE642&0&0001", 16, 1, 6, true);
+    private static readonly EsManettes.Appareil PanelDu13 = new(1, "03000000790000000600000000000000", "Generic USB Joystick",
+        "USB\\VID_0079&PID_0006\\8&3A944CE5&0&1", 12, 1, 5, false);
+
+    [Fact]
+    public void Panel_sans_mappage_en_p1_la_manette_mappee_passe_devant_pour_le_lanceur()
+    {
+        var joueurs = EsManettes.AttribuerLesJoueurs([XboxDu13, PanelDu13], _ => string.Empty);
+        Assert.Same(PanelDu13, joueurs[0]);   // l'ordre d'ES : chemins tries, le panel d'abord
+
+        var lanceur = EsManettes.MappeesDAbord(joueurs);
+        Assert.Same(XboxDu13, lanceur[0]);
+        Assert.Same(PanelDu13, lanceur[1]);
+        Assert.Equal(joueurs.Length, lanceur.Length);
+        Assert.StartsWith("-p1index 0 -p1guid 030000005e040000fd02000003097200", EsManettes.Composer(lanceur));
+        Assert.Contains("-p2index 1 -p2guid 03000000790000000600000000000000", EsManettes.Composer(lanceur));
+    }
+
+    [Fact]
+    public void Sans_manette_mappee_derriere_une_autre_rien_ne_bouge()
+    {
+        var seul = EsManettes.AttribuerLesJoueurs([PanelDu13], _ => string.Empty);
+        Assert.Equal(seul, EsManettes.MappeesDAbord(seul));
+        var xboxDevant = new EsManettes.Appareil?[] { XboxDu13, PanelDu13, null };
+        Assert.Equal(xboxDevant, EsManettes.MappeesDAbord(xboxDevant));
+        var deuxPanels = new EsManettes.Appareil?[] { PanelDu13, PanelDu13 with { Index = 2, Nom = "USB Gamepad" } };
+        Assert.Equal(deuxPanels, EsManettes.MappeesDAbord(deuxPanels));
+    }
 }

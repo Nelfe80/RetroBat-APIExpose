@@ -110,7 +110,32 @@ public static class EsManettes
 
         var reglages = LireReglages(RetroBatPaths.EmulationStationSettingsPath);
         var joueurs = AttribuerLesJoueurs(Configurees(appareils, esInput), cle => reglages.GetValueOrDefault(cle, string.Empty));
-        return Composer(joueurs);
+        var pourLeLanceur = MappeesDAbord(joueurs);
+        if (!pourLeLanceur.SequenceEqual(joueurs))
+        {
+            journal.LogInformation("Manettes : {Mappees} passee(s) devant {Autres} pour le lanceur (sans mappage SDL, il les resout sur l'index d'une autre manette)",
+                string.Join(", ", pourLeLanceur.Where(a => a is { MappageSdl: true }).Select(a => a!.Nom)),
+                string.Join(", ", pourLeLanceur.Where(a => a is { MappageSdl: false }).Select(a => a!.Nom)));
+        }
+        return Composer(pourLeLanceur);
+    }
+
+    /// <summary>
+    /// LES MANETTES QUE SDL CONNAIT AVANT LES AUTRES, pour le lanceur (essai sur la borne du user, 13/11). Un appareil sans
+    /// mappage SDL (un panel « Generic USB Joystick », VID 0079 PID 0006) n'est pas dans la liste SDL du lanceur : il le resout
+    /// sur l'index SDL d'une autre manette (« Value 0 is duplicated for keys: 1, 2 »), et sa correction des doublons laisse
+    /// l'index au PREMIER joueur de la liste. Panel en p1 (ordre d'ES) : RetroArch donne le port 1 a la Xbox, avec les
+    /// numeros de boutons du panel (A et X muets dans 19XX, Back = START). Xbox en p1 : port 1 = Xbox avec SES boutons, le
+    /// panel repart de son propre index (port 2). Le port 1 revient a la manette dans les deux cas ; seul cet ordre lui
+    /// garde ses boutons. Ordre stable dans chaque groupe ; rien ne bouge sans manette mappee derriere une non mappee.
+    /// </summary>
+    internal static Appareil?[] MappeesDAbord(IReadOnlyList<Appareil?> joueurs)
+    {
+        var presents = joueurs.Where(a => a is not null).ToList();
+        var ordre = presents.Where(a => a!.MappageSdl).Concat(presents.Where(a => !a!.MappageSdl)).ToList();
+        var resultat = new Appareil?[joueurs.Count];
+        for (var i = 0; i < ordre.Count; i++) resultat[i] = ordre[i];
+        return resultat;
     }
 
     /// <summary>Lance le processus enfant et lit sa liste. Null hors de RetroBat.Api.exe (tests) ou s'il echoue.</summary>
