@@ -33,7 +33,14 @@ public static class JeuxMassRun
     /// de la piste est l'empreinte d'une image qui passe par le dictionnaire de la salle (SNES).
     /// </summary>
     public sealed record Jeu(string Id, string Systeme, string RomGroup, uint Crc, string Coeur, string RomParDefaut, Regex Niveaux,
-        string SuffixeDeLEtat = "-panneau", double ImagesParSeconde = 60.0988, bool PosesEnImages = false);
+        string SuffixeDeLEtat = "-panneau", double ImagesParSeconde = 60.0988, bool PosesEnImages = false, uint[]? AutresContenus = null)
+    {
+        /// <summary>
+        /// Le contenu est-il celui de ce jeu ? Son crc32, ou celui d'un autre dump de la meme ROM que le coeur hote ramene a ce
+        /// jeu (13/11 : le No-Intro a en-tete NES 2.0 de Super Mario Bros. 3 et de Mega Man 2, regle rcheevos du coeur 08/11).
+        /// </summary>
+        public bool Admet(uint? contenu) => contenu is { } c && (c == Crc || (AutresContenus?.Contains(c) ?? false));
+    }
 
     public static readonly IReadOnlyList<Jeu> Tous =
     [
@@ -44,8 +51,9 @@ public static class JeuxMassRun
             new Regex("^((green-hill|marble|spring-yard|labyrinth|star-light|scrap-brain)-[1-3]|final-zone)$", RegexOptions.CultureInvariant),
             ImagesParSeconde: 59.922743),
         // Super Metroid : un segment par boss, de la porte du boss a sa mort (les etats d'epreuve « kraid.state », ...)
+        // (13/11) et Ceres, l'epreuve ouverte ch-sm-ceres-v1 (etat « ceres.state », arrivee a la fuite de la station)
         new("snes/super-metroid", "snes", "super-metroid", 0xd63ed5f8, "snes9x_ghosts", "Super Metroid (Japan, USA) (En,Ja).zip",
-            new Regex("^(kraid|phantoon|draygon|ridley|mother-brain)$", RegexOptions.CultureInvariant),
+            new Regex("^(ceres|kraid|phantoon|draygon|ridley|mother-brain)$", RegexOptions.CultureInvariant),
             SuffixeDeLEtat: "", ImagesParSeconde: 60.098812, PosesEnImages: true),
         // (06/11, jour) Super Mario World (USA) : les niveaux de Yoshi's Island et de Donut Plains, du chargement du niveau a
         // l'arrivee (etats d'epreuve « yi2-entree.state », ...) ; meme coeur hote, poses en images comme Super Metroid
@@ -61,18 +69,35 @@ public static class JeuxMassRun
                 RegexOptions.CultureInvariant),
             ImagesParSeconde: 59.922743),
         // Rocket Knight Adventures (06/11, ouverture preparee le 07/11), version USA : profil du coeur en fichier
-        // (a6efec47.ini). Le stage 1 seulement : le coeur prend l'arrivee quand l'etat du jeu $B029 tombe de 3 a 0 et une
-        // mort quand il passe a 4 ; a la fin des stages 3, 4 et 7 (banc du 07/11) il passe par 4 (3 -> 4 -> 5 -> 0) une image
-        // apres le changement de scene : le coureur y serait compte mort. Stages 2, 5, 6 : arrivee non vue.
+        // (a6efec47.ini). L'etat du jeu $B029 passe par 4 (une mort pour le coeur) puis 0 (l'arrivee du profil) a CHAQUE
+        // changement de scene, une image apres que la scene $FB13 a change (bancs du 07/11 et du 13/11). Depuis le 13/11, la
+        // salle donne l'arrivee des quatre stages (scene $FB13, voir ArriveeDuNiveau) et le profil la scene (« sous_scene ») :
+        // le coeur genesis_plus_gx_ghosts du 13/11 ne compte plus un changement de scene pour une mort. Stages 2, 5, 6 :
+        // arrivee non vue, pas d'epreuve.
         new("megadrive/rocket-knight-adventures", "megadrive", "rocket-knight-adventures", 0xa6efec47, "genesis_plus_gx_ghosts",
-            "Rocket Knight Adventures (USA).zip", new Regex("^stage-1$", RegexOptions.CultureInvariant),
+            "Rocket Knight Adventures (USA).zip", new Regex("^stage-[1347]$", RegexOptions.CultureInvariant),
             ImagesParSeconde: 59.922743),
+        // (13/11) Super Mario Bros. 3 (USA) (Rev 1) : les sept niveaux du monde 1 ouverts en speedrun (etats d'epreuve
+        // « 1-1-entree.state », ...). Profil du coeur compile (0b742b33, sans en-tete 2e6301ed) ; le No-Intro (en-tete NES 2.0,
+        // e8c3af69) est le meme jeu.
+        new("nes/super-mario-bros-3", "nes", "super-mario-bros-3", 0x0b742b33, "fceumm_ghosts", "Super Mario Bros 3 (U) (PRG 1).nes",
+            new Regex("^1-([1-6]|f)$", RegexOptions.CultureInvariant), SuffixeDeLEtat: "-entree", AutresContenus: [0xe8c3af69]),
+        // (13/11) Mega Man 2 (USA) : les huit stages, de l'entree a la defaite du Robot Master (le coeur lit l'arrivee $00BD dans
+        // le profil a9bd44bc.ini du Data Pack) ; le No-Intro (80e08660) est le meme jeu.
+        new("nes/mega-man-2", "nes", "mega-man-2", 0xa9bd44bc, "fceumm_ghosts", "Mega Man 2 (U).nes",
+            new Regex("^(air|bubble|crash|flash|heat|metal|quick|wood)-man$", RegexOptions.CultureInvariant), SuffixeDeLEtat: "-entree",
+            AutresContenus: [0x80e08660]),
+        // (13/11) Mega Man X (USA) (Rev 1) : les huit stages des Mavericks (profil ded53c64.ini du Data Pack), poses en images
+        new("snes/mega-man-x", "snes", "mega-man-x", 0xded53c64, "snes9x_ghosts", "Mega Man X (USA) (Rev 1).zip",
+            new Regex("^(armored-armadillo|boomer-kuwanger|chill-penguin|flame-mammoth|launch-octopus|spark-mandrill|sting-chameleon|storm-eagle)$",
+                RegexOptions.CultureInvariant),
+            SuffixeDeLEtat: "-entree", ImagesParSeconde: 60.098812, PosesEnImages: true),
     ];
 
     /// <summary>
     /// L'arrivee d'un segment de Super Metroid, comme ses reglements (ch-sm-*-v1) : l'octet du drapeau du boss vaut sa valeur
     /// (Kraid D829 = 1, Phantoon D82B = 1, Draygon D82C = 3, Ridley D82A = 1), ou l'etat du jeu $0998 vaut 0x26 (fin de la
-    /// fuite apres Mother Brain). Null : le coeur suit sa propre regle (NES, Mega Drive). Pur.
+    /// fuite apres Mother Brain). Null : le coeur suit sa propre regle (profil). Pur.
     /// </summary>
     public static (uint Adresse, uint Valeur)? ArriveeDuNiveau(Jeu jeu, string niveau) => jeu.Id switch
     {
@@ -83,8 +108,28 @@ public static class JeuxMassRun
             "draygon" => (0xD82Cu, 0x03u),
             "ridley" => (0xD82Au, 0x01u),
             "mother-brain" => (0x0998u, 0x26u),
+            "ceres" => (0x0998u, 0x20u),
             _ => null,
         },
+        // Rocket Knight Adventures (13/11) : la scene $FB13 (adresse 68000, l'octet 0xFB12 des reglements) quitte la derniere
+        // scene du stage, une image AVANT que l'etat du jeu $B029 passe par 4 (que le coeur prendrait pour une mort) puis 0
+        // (que le profil prendrait pour l'arrivee, a CHAQUE changement de scene d'un stage). L'arrivee de la salle remplace la
+        // regle du profil (coeur du 13/11). Stage 1 : la scene 5 (premiere du stage 2, meme image que $B029 a 0, comme son
+        // reglement) ; stages 3, 4, 7 : la cinematique de fin (le reglement arrete le chrono plus tard, a la premiere scene du
+        // stage suivant : MASS RUN n'est pas certifie, tous les coureurs ont la meme arrivee).
+        "megadrive/rocket-knight-adventures" => niveau switch
+        {
+            "stage-1" => (0xFB13u, 0x05u),
+            "stage-3" => (0xFB13u, 0x2Eu),
+            "stage-4" => (0xFB13u, 0x30u),
+            "stage-7" => (0xFB13u, 0x32u),
+            _ => null,
+        },
+        // Mega Man X (13/11) : le dernier coup au Maverick, comme les reglements (BOSS_HIT, $0E68 = 0xFF)
+        "snes/mega-man-x" => (0x0E68u, 0xFFu),
+        // Super Mario Bros. 3 (13/11) : comme ses reglements, la carte de fin $05F3 = 0x81, la forteresse $04E4 = 4 (le profil
+        // du coeur n'a pas d'arrivee ; le coeur fceumm_ghosts du 13/11 lit celle de la salle)
+        "nes/super-mario-bros-3" => niveau == "1-f" ? (0x04E4u, 0x04u) : (0x05F3u, 0x81u),
         // Super Mario World : $1493 (minuterie de fin de niveau) prend 0xFF a l'image du ruban d'arrivee (banc du 06/11)
         "snes/super-mario-world" => (0x1493u, 0xFFu),
         _ => null,
@@ -111,7 +156,14 @@ public static class JeuxMassRun
     /// <summary>Le niveau tel qu'on le dit : « 1-1 » reste, « green-hill-2 » devient « Green Hill 2 ». Pur.</summary>
     public static string NomDuNiveau(string niveau)
     {
-        if (string.IsNullOrEmpty(niveau) || Regex.IsMatch(niveau, "^[0-9]")) return niveau ?? "";
+        if (string.IsNullOrEmpty(niveau)) return "";
+        // Super Mario Bros. 3 : « 1-f » est la forteresse ; Super Mario World : les niveaux portent le nom du monde (13/11)
+        if (Regex.Match(niveau, "^([0-9])-f$") is { Success: true } forteresse) return forteresse.Groups[1].Value + "-F";
+        if (Regex.Match(niveau, "^(yi|dp|ds)([0-9])$") is { Success: true } smw)
+        {
+            return (smw.Groups[1].Value switch { "yi" => "Yoshi's Island", "dp" => "Donut Plains", _ => "Donut Secret" }) + " " + smw.Groups[2].Value;
+        }
+        if (Regex.IsMatch(niveau, "^[0-9]")) return niveau;
         return string.Join(' ', niveau.Split('-', StringSplitOptions.RemoveEmptyEntries)
             .Select(m => char.ToUpper(m[0], CultureInfo.InvariantCulture) + m[1..]));
     }

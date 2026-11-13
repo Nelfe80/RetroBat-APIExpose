@@ -70,7 +70,9 @@ public sealed partial class DefisPanelService
         return $"{(int)duree.TotalMinutes}:{duree.Seconds:00}";
     }
 
-    private static string TempsDeCourse(uint images) => Chronometrage.Afficher(images, ImagesParSecondeNes);
+    /// <summary>(13/11) Le temps a la cadence du jeu de la salle (Mega Drive : 59,92 images/s), NES par defaut.</summary>
+    private static string TempsDeCourse(uint images, string jeu)
+        => Chronometrage.Afficher(images, RetroBat.Api.MassRun.JeuxMassRun.Trouver(jeu)?.ImagesParSeconde ?? ImagesParSecondeNes);
 
     // ── Le depart ────────────────────────────────────────────────────────────────
 
@@ -275,11 +277,11 @@ public sealed partial class DefisPanelService
             mesures.Add(new MesureDeFin("trophee", T("massrun.page.rank", "RANK"), rang, Math.Clamp(part, 0, 1), premier));
         }
 
-        var valeur = b.Images is { } images ? TempsDeCourse(images) : SansTemps;
+        var valeur = b.Images is { } images ? TempsDeCourse(images, b.Salle.Jeu) : SansTemps;
         var ruban = MotMassRun + (b.Rang is { } place ? " · #" + place.ToString(CultureInfo.InvariantCulture) : "");
         var tete = b.Classement.FirstOrDefault(l => !l.Elimine);
         var ecart = b is { Issue: IssueDeCourse.Arrive, Images: { } t } && tete is not null && t > tete.Images
-            ? "+" + TempsDeCourse(t - tete.Images) + " " + T("massrun.page.from_first", "from the winner")
+            ? "+" + TempsDeCourse(t - tete.Images, b.Salle.Jeu) + " " + T("massrun.page.from_first", "from the winner")
             : "";
         var note = b.Inscrits <= 1
             ? T("massrun.page.alone_end", "You were the only runner in this room")
@@ -305,7 +307,7 @@ public sealed partial class DefisPanelService
             MonScore: new ScoreDeFin(FormatDe(b.Salle) + " · " + RetroBat.Api.MassRun.JeuxMassRun.NomDuNiveau(b.Salle.Niveau), valeur, ruban, ecart, premier),
             Logo: LogoDesPages,
             Classement: AutourDuJoueur(b.Classement)
-                .Select(l => new LigneDeDefi($"{l.Rang}   {l.Pseudo}", "", l.Elimine ? "✕ " + TempsDeCourse(l.Images) : TempsDeCourse(l.Images),
+                .Select(l => new LigneDeDefi($"{l.Rang}   {l.Pseudo}", "", l.Elimine ? "✕ " + TempsDeCourse(l.Images, b.Salle.Jeu) : TempsDeCourse(l.Images, b.Salle.Jeu),
                     Marque: l.Moi ? "moi" : ""))
                 .ToList());
     }
@@ -347,7 +349,7 @@ public sealed partial class DefisPanelService
         }
 
         _journal?.LogInformation("MASS RUN : bilan de la salle {Salle} : {Issue}{Temps}.", b.Salle.Id, b.Issue,
-            b.Images is { } i ? " en " + TempsDeCourse(i) : "");
+            b.Images is { } i ? " en " + TempsDeCourse(i, b.Salle.Jeu) : "");
         _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal), PleinEcran(fin: ComposerLeBilanDeCourse(b)));
         _ = Task.Run(async () =>
         {

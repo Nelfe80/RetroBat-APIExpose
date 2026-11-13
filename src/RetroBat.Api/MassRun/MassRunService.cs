@@ -67,7 +67,7 @@ public sealed class MassRunService : IDisposable
         }
         foreach (var rom in candidates.Distinct(StringComparer.OrdinalIgnoreCase))
         {
-            if (JeuxMassRun.ContenuDe(rom) == jeu.Crc) return rom;
+            if (jeu.Admet(JeuxMassRun.ContenuDe(rom))) return rom;
         }
         _journal.LogWarning("MASS RUN : aucune ROM de {Jeu} au contenu {Crc:x8} ({Candidates}).", jeu.Id, jeu.Crc, string.Join(" ; ", candidates));
         return null;

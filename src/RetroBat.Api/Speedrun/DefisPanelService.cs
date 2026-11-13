@@ -194,7 +194,9 @@ public sealed partial class DefisPanelService
     {
         var jeux = _defis.Select(d => d.SystemId + "/" + d.RomGroup).ToHashSet(StringComparer.OrdinalIgnoreCase);
         var maintenant = DateTime.UtcNow;
-        return _salles.Where(s => jeux.Contains(s.Jeu) && maintenant < s.GoUtc.AddSeconds(s.Limite))
+        // (13/11) une salle d'un jeu ou d'un niveau que cette API ne sait pas lancer (un noeud plus recent) n'ouvre pas d'onglet
+        return _salles.Where(s => jeux.Contains(s.Jeu) && maintenant < s.GoUtc.AddSeconds(s.Limite)
+                && RetroBat.Api.MassRun.JeuxMassRun.Trouver(s.Jeu) is { } connu && connu.Niveaux.IsMatch(s.Niveau))
             .OrderBy(s => s.Inscriptions(maintenant) ? 0 : s.GoUtc > maintenant ? 1 : 2).ThenBy(s => s.GoUtc).FirstOrDefault();
     }
 
