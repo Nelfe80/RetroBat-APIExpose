@@ -10,7 +10,7 @@ Installing APIExpose is a single **installer**: download, run, activate.
 
 ## Installation
 
-1. Download **[`APIExpose-Cabinet-Setup.exe`](https://github.com/Nelfe80/RetroBat-APIExpose/releases/latest/download/APIExpose-Cabinet-Setup.exe)** from the releases page - it contains the program, the tools (ImageMagick, translateLocally) and the full Data Pack.
+1. Download **[`APIExpose-Cabinet-Setup.exe`](https://nelfeplay.com/download/apiexpose)** - it contains the program, the tools (ImageMagick, translateLocally) and the full Data Pack.
 2. Run the installer: it checks .NET 8, installs the plugin into `RetroBat\plugins\` and places the EmulationStation start hook - you get:
 
     ```text
