@@ -97,7 +97,7 @@ public static class JeuxMassRun
     /// <summary>
     /// L'arrivee d'un segment de Super Metroid, comme ses reglements (ch-sm-*-v1) : l'octet du drapeau du boss vaut sa valeur
     /// (Kraid D829 = 1, Phantoon D82B = 1, Draygon D82C = 3, Ridley D82A = 1), ou l'etat du jeu $0998 vaut 0x26 (fin de la
-    /// fuite apres Mother Brain). Null : le coeur suit sa propre regle (NES, Mega Drive). Pur.
+    /// fuite apres Mother Brain). Null : le coeur suit sa propre regle (profil). Pur.
     /// </summary>
     public static (uint Adresse, uint Valeur)? ArriveeDuNiveau(Jeu jeu, string niveau) => jeu.Id switch
     {
@@ -127,6 +127,9 @@ public static class JeuxMassRun
         },
         // Mega Man X (13/11) : le dernier coup au Maverick, comme les reglements (BOSS_HIT, $0E68 = 0xFF)
         "snes/mega-man-x" => (0x0E68u, 0xFFu),
+        // Super Mario Bros. 3 (13/11) : comme ses reglements, la carte de fin $05F3 = 0x81, la forteresse $04E4 = 4 (le profil
+        // du coeur n'a pas d'arrivee ; le coeur fceumm_ghosts du 13/11 lit celle de la salle)
+        "nes/super-mario-bros-3" => niveau == "1-f" ? (0x04E4u, 0x04u) : (0x05F3u, 0x81u),
         // Super Mario World : $1493 (minuterie de fin de niveau) prend 0xFF a l'image du ruban d'arrivee (banc du 06/11)
         "snes/super-mario-world" => (0x1493u, 0xFFu),
         _ => null,

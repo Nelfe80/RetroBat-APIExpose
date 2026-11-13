@@ -392,5 +392,8 @@ public class JeuxMassRunTests
         Assert.Equal((0xFB13u, 0x32u), JeuxMassRun.ArriveeDuNiveau(rka, "stage-7"));
         Assert.Equal((0x0E68u, 0xFFu), JeuxMassRun.ArriveeDuNiveau(JeuxMassRun.Trouver("snes/mega-man-x")!, "storm-eagle"));
         Assert.Null(JeuxMassRun.ArriveeDuNiveau(JeuxMassRun.Trouver("nes/mega-man-2")!, "air-man"));
+        var smb3 = JeuxMassRun.Trouver("nes/super-mario-bros-3")!;
+        Assert.Equal((0x05F3u, 0x81u), JeuxMassRun.ArriveeDuNiveau(smb3, "1-4"));
+        Assert.Equal((0x04E4u, 0x04u), JeuxMassRun.ArriveeDuNiveau(smb3, "1-f"));
     }
 }
