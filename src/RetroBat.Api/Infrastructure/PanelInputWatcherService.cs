@@ -47,6 +47,16 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
     private volatile bool _gameActive;
     private IDisposable? _busSub;
 
+    // LES JOUEURS DE RETROARCH PENDANT UNE PARTIE (13/11) : au depart annonce, on lit ce que le lanceur a REELLEMENT
+    // donne a RetroArch (JoueursDeRetroArch) et la numerotation le suit jusqu'a la fin de la partie. Tout se fait sur le
+    // thread de SDL (les appareils y vivent) : le bus ne fait que poser ces drapeaux.
+    private volatile IReadOnlyDictionary<int, string>? _joueursDuLancement;
+    private volatile bool _renumeroter;
+    private DateTime? _lancementAttenduDepuis;   // heure locale ; non null tant qu'on cherche les joueurs du lancement
+    private DateTime _derniereLectureDuLancement = DateTime.MinValue;
+    private readonly object _verrouLancement = new();
+    private static readonly TimeSpan PatienceDuLancement = TimeSpan.FromSeconds(60);
+
     public PanelInputWatcherService(IEventBus eventBus, ILogger<PanelInputWatcherService>? logger = null)
     {
         _eventBus = eventBus;
@@ -69,11 +79,110 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
         // Lecture replay (lancée par nous) ET session de jeu (ES : game-start/game-end → ui.game.*).
         if (string.Equals(e.Type, "replay.started", StringComparison.Ordinal)) _replayActive = true;
         else if (string.Equals(e.Type, "replay.finished", StringComparison.Ordinal)) _replayActive = false;
-        else if (string.Equals(e.Type, "ui.game.started", StringComparison.Ordinal)) _gameActive = true;
-        else if (string.Equals(e.Type, "ui.game.ended", StringComparison.Ordinal)) _gameActive = false;
+        else if (string.Equals(e.Type, "ui.game.started", StringComparison.Ordinal))
+        {
+            _gameActive = true;
+            AttendreLesJoueursDuLancement();
+        }
+        else if (string.Equals(e.Type, "ui.game.ended", StringComparison.Ordinal))
+        {
+            _gameActive = false;
+            OublierLesJoueursDuLancement();
+        }
         // Filet : si un game-end se perd (ES tué/crash), naviguer dans le menu prouve qu'aucun jeu
         // ne tourne → on ré-arme le hotplug (sinon un panel rebranché ne serait plus jamais détecté).
-        else if (string.Equals(e.Type, "ui.game.selected", StringComparison.Ordinal)) _gameActive = false;
+        else if (string.Equals(e.Type, "ui.game.selected", StringComparison.Ordinal))
+        {
+            _gameActive = false;
+            OublierLesJoueursDuLancement();
+        }
+    }
+
+    /// <summary>Un depart : on cherchera ce que RetroArch a recu (le lanceur l'ecrit dans les secondes qui suivent).</summary>
+    private void AttendreLesJoueursDuLancement()
+    {
+        lock (_verrouLancement)
+        {
+            // ES annonce parfois deux fois le meme depart : on ne recule pas le debut de l'attente.
+            if (_lancementAttenduDepuis is null || _joueursDuLancement is not null)
+            {
+                // Une petite marge : la ligne du lanceur suit le depart annonce (ES ou lancement direct), jamais de beaucoup avant.
+                _lancementAttenduDepuis = DateTime.Now - TimeSpan.FromSeconds(5);
+            }
+            _joueursDuLancement = null;
+            _derniereLectureDuLancement = DateTime.MinValue;
+            _renumeroter = true;
+        }
+    }
+
+    /// <summary>Fin de partie : la regle hors partie (<see cref="PlayerNumbering"/>) reprend.</summary>
+    private void OublierLesJoueursDuLancement()
+    {
+        lock (_verrouLancement)
+        {
+            if (_lancementAttenduDepuis is null && _joueursDuLancement is null) return;
+            _lancementAttenduDepuis = null;
+            _joueursDuLancement = null;
+            _renumeroter = true;
+        }
+    }
+
+    /// <summary>
+    /// Sur le thread de SDL, une fois par seconde au plus tant qu'on l'attend : lit les joueurs que RetroArch a recus,
+    /// et renumerote quand ils changent. Abandonne apres <see cref="PatienceDuLancement"/>, la regle hors partie reste.
+    /// </summary>
+    private void SuivreLesJoueursDuLancement(CabinetInputReader reader)
+    {
+        DateTime? depuis;
+        lock (_verrouLancement) depuis = _lancementAttenduDepuis;
+        if (depuis is { } d && _joueursDuLancement is null && DateTime.UtcNow - _derniereLectureDuLancement >= TimeSpan.FromSeconds(1))
+        {
+            _derniereLectureDuLancement = DateTime.UtcNow;
+            JoueursDeRetroArch.Attribution? attribution = null;
+            var abandon = false;
+            string raison;
+            try
+            {
+                attribution = JoueursDeRetroArch.LireDuLancement(d, out raison);
+            }
+            catch (Exception ex)
+            {
+                raison = "lecture impossible (" + ex.Message + ")";
+            }
+            lock (_verrouLancement)
+            {
+                if (_lancementAttenduDepuis != d)
+                {
+                    return;   // la partie s'est terminee pendant la lecture
+                }
+                if (attribution is not null)
+                {
+                    _joueursDuLancement = attribution.Guids;
+                    _lancementAttenduDepuis = null;
+                    _renumeroter = true;
+                }
+                else if (DateTime.Now - d > PatienceDuLancement || JoueursDeRetroArch.RaisonDefinitive(raison))
+                {
+                    _lancementAttenduDepuis = null;
+                    abandon = true;
+                }
+            }
+            if (attribution is not null)
+            {
+                _logger?.LogInformation("Manettes : joueurs de RetroArch pour ce lancement (pilote {Pilote}) : {Joueurs}{Ecart}",
+                    attribution.Pilote, attribution.Decrire(), attribution.DiffereDEs ? " ; le lanceur n'a pas suivi l'ordre d'ES" : "");
+            }
+            else if (abandon)
+            {
+                _logger?.LogInformation("Manettes : joueurs de RetroArch inconnus pour ce lancement ({Raison}), la regle hors partie reste", raison);
+            }
+        }
+
+        if (_renumeroter)
+        {
+            _renumeroter = false;
+            NumberPlayers(reader);
+        }
     }
 
     // Boucle SYNCHRONE sur le thread dédié : aucun await (qui migrerait le thread et
@@ -112,6 +221,9 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
                     // Pomper les événements SDL sur CE thread (celui de SDL_Init) est ce qui
                     // fait voir un branchement/débranchement — impossible depuis un autre thread.
                     _reader!.Pump();
+
+                    // Les joueurs que RetroArch a recus pour la partie en cours (13/11).
+                    SuivreLesJoueursDuLancement(_reader!);
 
                     // PAS DE REENUMERATION SOUS LE DOIGT DU JOUEUR. Pendant qu'elle se fait,
                     // l'instantane est vide : un bouton tenu parait relache puis de nouveau appuye,
@@ -214,7 +326,7 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
     private void NumberPlayers(CabinetInputReader reader)
     {
         var devices = reader.Devices;
-        var players = PlayerNumbering.Assign(devices, PlayerNumbering.ReadPins());
+        var players = PlayerNumbering.Assign(devices, PlayerNumbering.ReadPins(), _joueursDuLancement);
         _players = players;
         var key = PlayerNumbering.Describe(devices, players);
         if (key == _lastPlayersKey) return;
