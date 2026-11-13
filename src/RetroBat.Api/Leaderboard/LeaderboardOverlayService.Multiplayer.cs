@@ -1446,7 +1446,8 @@ public sealed partial class LeaderboardOverlayService
     /// sans borne devant soi). Aucune fenetre n'est montree. <paramref name="attente"/> dessine la presentation.
     /// </summary>
     internal static byte[] ApercuMultiplayer(EsMenuStyle style, ContenuMultiplayer contenu, string attente, string attenteTitre,
-        string attenteDetail, ILogger<LeaderboardOverlayService> logger, double? temps = null, double? depart = null)
+        string attenteDetail, ILogger<LeaderboardOverlayService> logger, double? temps = null, double? depart = null,
+        ProgressionDuLancement? progressionDAttente = null)
     {
         byte[] png = [];
         Exception? erreur = null;
@@ -1457,6 +1458,7 @@ public sealed partial class LeaderboardOverlayService
                 var service = new LeaderboardOverlayService(logger);
                 service._style = style;
                 service._contenu = service._contenu with { Attente = attente, AttenteTitre = attenteTitre, AttenteDetail = attenteDetail };
+                service._progressionDAttente = progressionDAttente;
                 service._multiplayer = contenu;
                 service._tempsDApercu = temps;
                 service._tempsDuDepartDApercu = depart;

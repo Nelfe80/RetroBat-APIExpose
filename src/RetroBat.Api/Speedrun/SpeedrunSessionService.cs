@@ -10,6 +10,7 @@ using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Models;
 using RetroBat.Domain.Paths;
 using RetroBat.Domain.Services;
+using ProgressionDuLancement = RetroBat.Api.Leaderboard.ProgressionDuLancement;
 
 namespace RetroBat.Api.Speedrun;
 
@@ -262,8 +263,12 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     /// de 7 a 26 s entre l'appui sur « Lancer » et la page de preparation, quand elle attendait tout cela. Les trois preparations
     /// independantes (fantomes, Deck, manettes) partent ENSEMBLE (<see cref="PreparerEnsemble"/>) : le lancement attend la plus
     /// longue, plus leur somme.
+    /// <para>
+    /// <paramref name="progression"/> : la barre de la page de preparation (13/11) ; chaque etape la fait avancer quand elle finit
+    /// vraiment. Marquer une etape ne fait rien attendre.
+    /// </para>
     /// </summary>
-    public ReponseLancement Partir(LancementVerifie verifie, bool pages = false)
+    public ReponseLancement Partir(LancementVerifie verifie, bool pages = false, ProgressionDuLancement? progression = null)
     {
         var (reglement, rom, etat) = (verifie.Reglement, verifie.Rom, verifie.Etat);
         // La page de preparation a pu tenir quelques secondes : un jeu parti entre-temps (par ES) passe avant.
@@ -271,27 +276,34 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
         var coeur = reglement.Coeurs.FirstOrDefault() is { Length: > 0 } c ? c : null;
         var pseudo = _contexte.PlayerPseudo ?? "";
+        T Etape<T>(string id, Func<T> travail) => progression is null ? travail() : progression.Mesurer(id, travail);
         var (fantomesPoses, deck, manettes) = PreparerEnsemble(
             // Les fantomes (04/11) : le coeur hote seulement s'ils sont poses et que le site l'admet, sinon le coeur du reglement.
             // Un dump que le coeur hote ne reconnait pas (autre en-tete, 08/11) part sur le coeur d'origine. Jusqu'a 2,5 s.
-            () => _fantomes?.Preparer(reglement, pseudo, rom) == true,
+            () => Etape(ProgressionDuLancement.Fantomes, () => _fantomes?.Preparer(reglement, pseudo, rom) == true),
             // LE PLAYERDECK (H-D20) : LAUNCH THE SPEEDRUN / LAUNCH THE CHALLENGE part avec le Deck du jeu, s'il en a un. Le decor
             // est un reglage d'affichage : il ne touche ni au coeur, ni au .MEM, ni aux verrous, ni a l'empreinte des options.
             // Son rendu, hors cache, prend jusqu'a 5 s (4,1 s le 12/11 a 09:19).
-            () => _deck?.Preparer(RetroBat.Api.Deck.DeckModes.Speedrun, reglement.SystemId, rom, reglement.RomGroup,
+            () => Etape(ProgressionDuLancement.Deck, () => _deck?.Preparer(RetroBat.Api.Deck.DeckModes.Speedrun, reglement.SystemId, rom, reglement.RomGroup,
                 RetroBat.Api.Deck.DeckRankBoard.DeLEpreuve(reglement), epreuve: RetroBat.Api.Deck.DeckTrialPlan.De(reglement),
                 // Lancee depuis le panneau, l'epreuve a ses pages de preparation et de bilan (interactives) : le Deck s'efface devant
                 // elles ; lancee par la route REST, sans page, le Deck pose ses propres ecrans
-                cartes: pages ? RetroBat.Api.Deck.DeckCartes.Api : RetroBat.Api.Deck.DeckCartes.Deck),
+                cartes: pages ? RetroBat.Api.Deck.DeckCartes.Api : RetroBat.Api.Deck.DeckCartes.Deck)),
             // Le calcul d'ES, dans un processus enfant (RetroBat.Api.exe --manettes-es) : 1,2 a 4,3 s borne au repos (13/11),
             // jusqu'a une douzaine de secondes borne chargee (12/11 a 09:19).
-            () => RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments);
+            () => Etape(ProgressionDuLancement.Manettes, () => RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments));
         if (fantomesPoses) coeur = FantomesDuSpeedrun.CoeurDe(reglement);
+        // Les verrous et le lanceur : jusqu'au retour du lanceur (le jeu demarre, ses abonnes de ui.game.started servis).
+        progression?.Commencer(ProgressionDuLancement.Lanceur);
         var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
             manettes, reglement.SystemId, "libretro", coeur, rom, retroAchievements: false,
             // Les notifications de RetroArch coupees (11/11), avec ou sans Deck : les messages du speedrun vont au Deck ou au bandeau
             NotificationsRetroArch.Ajouter(deck?.Arguments));
-        if (arguments is null) return new(false, "bad_rules", "systeme ou coeur illisible");
+        if (arguments is null)
+        {
+            progression?.Echouer(ProgressionDuLancement.Lanceur);
+            return new(false, "bad_rules", "systeme ou coeur illisible");
+        }
 
         // LES VERROUS (D18) : dans certified.txt avant le lanceur, le wrapper les lit au chargement du jeu. Toujours poses,
         // vides compris : un verrou reste d'un autre defi ne doit pas tenir celui-ci.
@@ -307,6 +319,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
                 VerrousDuLancement.Retirer();
+                progression?.Echouer(ProgressionDuLancement.Lanceur);
                 return new(false, "locks_unwritable", ex.Message);
             }
         }
@@ -317,8 +330,11 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         {
             lock (_verrou) _lancement = null;
             VerrousDuLancement.Retirer();
+            progression?.Echouer(ProgressionDuLancement.Lanceur);
             return new(false, "launcher_failed");
         }
+
+        progression?.Finir(ProgressionDuLancement.Lanceur);
 
         _journal.LogInformation("Speedrun : lancement de {Defi} ({Rom}, coeur {Coeur}, sans RetroAchievements).", reglement.ChallengeId, rom, coeur ?? "auto");
         if (etat is not null) PartirSurLEtat(reglement, etat, Path.GetFileNameWithoutExtension(rom));

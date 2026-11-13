@@ -130,10 +130,10 @@ public static class WorldScoringEcrans
 
     /// <summary>
     /// L'ECRAN DE DEPART. <paramref name="jeuPret"/> : le jeu est a l'ecran (etape 2) ; <paramref name="depart"/> : « YOUR
-    /// TURN! » est donne.
+    /// TURN! » est donne. <paramref name="progression"/> : les etapes du lancement, la barre du bas (13/11).
     /// </summary>
     public static EcranDeLancement ComposerLeDepart(DepartDuScore d, Func<string, string, string> t, bool jeuPret, DateTime? depart,
-        string glypheQuitter = "b", string glypheValider = "a")
+        string glypheQuitter = "b", string glypheValider = "a", ProgressionDuLancement? progression = null)
     {
         var (etiquette, phrase) = Regles(d.Mode, t);
         var (etat, texteEtat) = Certification(d.Prevol, t);
@@ -186,7 +186,8 @@ public static class WorldScoringEcrans
             glypheQuitter,
             SortiePossible: true,
             Logo: Logo,
-            Cible: CarteDe(d, t));
+            Cible: CarteDe(d, t),
+            Progression: progression);
     }
 
     /// <summary>

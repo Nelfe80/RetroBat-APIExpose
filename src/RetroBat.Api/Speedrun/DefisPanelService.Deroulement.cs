@@ -42,6 +42,9 @@ public sealed partial class DefisPanelService
         public DateTime LanceA { get; } = lanceA;
         public DateTime LanceALocal { get; } = lanceALocal;
 
+        /// <summary>Les etapes du lancement, la barre du bas de la page (13/11).</summary>
+        public ProgressionDuLancement Progression { get; } = ProgressionDuLancement.Epreuve("epreuve-" + defi.ChallengeId, defi.Etat is not null);
+
         /// <summary>Le bilan du wrapper signale une triche ou un etat charge : rien de ce lancement ne part.</summary>
         public bool Sale { get; set; }
     }
@@ -94,6 +97,8 @@ public sealed partial class DefisPanelService
         try { fanart = RetroBat.Api.Media.MediaDuGamelist.Resoudre(chemin, "fanart", "image"); }
         catch (Exception ex) { _journal?.LogDebug(ex, "Defis : fanart introuvable pour {Chemin}.", chemin); }
         var epreuve = new EpreuveLancee(defi, chemin, jeu, fanart, lanceA, lanceALocal);
+        // Les controles rapides sont passes : la barre part d'une etape faite, la page le dit.
+        epreuve.Progression.Finir(ProgressionDuLancement.Regles);
         MontrerLaPreparation(epreuve);
         _journal?.LogInformation("Defis : preparation de {Defi} a l'ecran en {Ms:0} ms, le jeu part dessous.", defi.ChallengeId,
             (DateTime.UtcNow - lanceA).TotalMilliseconds);
@@ -111,7 +116,7 @@ public sealed partial class DefisPanelService
         ReponseLancement reponse;
         try
         {
-            reponse = _session.Partir(verifie, pages: true);
+            reponse = _session.Partir(verifie, pages: true, epreuve.Progression);
         }
         catch (Exception ex)
         {
@@ -121,8 +126,10 @@ public sealed partial class DefisPanelService
 
         if (reponse.Lance)
         {
-            _journal?.LogInformation("Defis : {Defi} lance depuis le panneau ({Ms:0} ms sous la page).", epreuve.Defi.ChallengeId,
-                (DateTime.UtcNow - debut).TotalMilliseconds);
+            // Le lanceur a rendu la main : reste la premiere image (ou l'etat pose), que la tenue de la page guette.
+            epreuve.Progression.Commencer(ProgressionDuLancement.PremiereImage);
+            _journal?.LogInformation("Defis : {Defi} lance depuis le panneau ({Ms:0} ms sous la page ; {Etapes}).", epreuve.Defi.ChallengeId,
+                (DateTime.UtcNow - debut).TotalMilliseconds, epreuve.Progression.Resume());
             // ES ne sait pas qu'un jeu tourne : sa musique se tait jusqu'a la fin du jeu (SonDEmulationStation la rend ensuite).
             _sonDEs?.Couper();
             return;
@@ -190,7 +197,7 @@ public sealed partial class DefisPanelService
         }
 
         _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal),
-            PleinEcran(lancement: ComposerLaPreparation(epreuve.Defi, epreuve.Jeu, epreuve.Fanart, false, Langue())));
+            PleinEcran(lancement: ComposerLaPreparation(epreuve.Defi, epreuve.Jeu, epreuve.Fanart, false, Langue(), progression: epreuve.Progression)));
         AnnoncerLaPage("preparation", true);
         _ = Task.Run(() => TenirLaPreparationAsync(epreuve, jeton));
     }
@@ -214,6 +221,7 @@ public sealed partial class DefisPanelService
                 if (arrivee is { } image && image >= epreuve.LanceA)
                 {
                     arrive = true;
+                    epreuve.Progression.Finir(ProgressionDuLancement.PremiereImage);
                     break;
                 }
 
@@ -229,7 +237,7 @@ public sealed partial class DefisPanelService
             }
 
             _overlay.GarderDevantLeJeu();
-            _overlay.MontrerMultiplayer(PleinEcran(lancement: ComposerLaPreparation(epreuve.Defi, epreuve.Jeu, epreuve.Fanart, true, Langue(), DateTime.UtcNow)));
+            _overlay.MontrerMultiplayer(PleinEcran(lancement: ComposerLaPreparation(epreuve.Defi, epreuve.Jeu, epreuve.Fanart, true, Langue(), DateTime.UtcNow, epreuve.Progression)));
             await Task.Delay(DureeDuDepart, jeton).ConfigureAwait(false);
             // Le depart sur etat se charge ici, sous la page qui s'efface : le joueur le decouvre a sa premiere image, et le
             // chrono (2,7 s plus tard sur Green Hill 1, 1,75 s sur Metal Slug 3) ne part jamais derriere la page.

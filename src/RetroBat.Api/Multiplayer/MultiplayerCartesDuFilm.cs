@@ -176,7 +176,8 @@ public sealed class MultiplayerCartesDuFilm
         if (carte.Fin is { } fin) carte = carte with { Fin = fin with { SansBoutons = true } };
         if (carte.Lancement is { } l)
         {
-            l = l with { SortiePossible = false, AttenteLongue = false };
+            // La barre du lancement (13/11) dit l'etat de cette borne a cet instant : elle n'a pas sa place dans le film.
+            l = l with { SortiePossible = false, AttenteLongue = false, Progression = null };
             if (depart && l.DepartUtc is null)
             {
                 // Le texte « PRET ! » d'un joueur deja pret (l'hote l'est des l'arrivee du jeu) vaut pour tous.

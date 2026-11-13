@@ -33,8 +33,12 @@ public sealed partial class DefisPanelService
 
     private const string LogoDesPages = "nelfeplay-challenges.png";
 
-    /// <summary><paramref name="depart"/> : le jeu est la, « A TOI ! » s'affiche.</summary>
-    internal EcranDeLancement ComposerLaPreparation(Reglement defi, string jeu, string? fanart, bool jeuPret, string langue, DateTime? depart = null) => new(
+    /// <summary>
+    /// <paramref name="depart"/> : le jeu est la, « A TOI ! » s'affiche. <paramref name="progression"/> : les etapes du lancement,
+    /// la barre du bas (13/11).
+    /// </summary>
+    internal EcranDeLancement ComposerLaPreparation(Reglement defi, string jeu, string? fanart, bool jeuPret, string langue, DateTime? depart = null,
+        ProgressionDuLancement? progression = null) => new(
         "epreuve-" + defi.ChallengeId,
         StylesDesEcrans.Course,
         MotDe(defi),
@@ -64,7 +68,8 @@ public sealed partial class DefisPanelService
         SortiePossible: true,
         // Sans les fantomes : ils se choisissent dans le panneau, et un 7e champ ferait passer la carte sur le bouton HOLD.
         Fiche: Fiche(defi, avecFantomes: false),
-        Logo: LogoDesPages);
+        Logo: LogoDesPages,
+        Progression: progression);
 
     internal EcranDeFin ComposerLeBilan(BilanDEpreuve b, string langue)
     {

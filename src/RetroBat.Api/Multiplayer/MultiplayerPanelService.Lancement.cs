@@ -34,6 +34,43 @@ public sealed partial class MultiplayerPanelService
     private DateTime _attenteRelanceeA;
     private DateTime? _departDuLancement;
     private CancellationTokenSource? _suiteDuLancement;
+    private ProgressionDuLancement? _progression;
+    private string? _salleDeLaProgression;
+
+    /// <summary>
+    /// LA BARRE DU BAS DU VS (13/11) : les etapes reelles du lancement de cette salle, que le lancement (hote ou invite) marque a
+    /// mesure et que l'ecran relit a chaque image. La meme pour la presentation et le lancement, qui que soit le premier a la
+    /// demander ; une progression finie ne resert pas (une revanche dans la meme salle repart de zero).
+    /// </summary>
+    public ProgressionDuLancement ProgressionDe(MultiplayerRoom room)
+    {
+        lock (_verrou)
+        {
+            if (_progression is { } p && _salleDeLaProgression == room.Room && !p.Lire().Finie)
+            {
+                return p;
+            }
+
+            return NouvelleProgression(room);
+        }
+    }
+
+    /// <summary>
+    /// Un lancement qui commence (hebergement ou jonction) : une progression neuve pour cette salle, que la presentation reprend.
+    /// Une progression restee d'un lancement echoue dans la meme salle ne sert donc jamais.
+    /// </summary>
+    public ProgressionDuLancement NouvelleProgression(MultiplayerRoom room)
+    {
+        lock (_verrou)
+        {
+            var hote = room.Launch?.Role != "guest";
+            _progression = ProgressionDuLancement.Multiplayer("mp-" + room.Room, hote);
+            _salleDeLaProgression = room.Room;
+            // L'invite attend d'abord la session de l'hote : elle commence avec la presentation.
+            if (!hote) _progression.Commencer(ProgressionDuLancement.Session);
+            return _progression;
+        }
+    }
 
     /// <summary>L'ecran de lancement tient-il au-dessus du jeu ? Tant qu'il tient, l'arrivee du jeu ne l'efface pas.</summary>
     public bool TientLeLancement
@@ -70,6 +107,8 @@ public sealed partial class MultiplayerPanelService
             _jeuArrive = false;
             _roomDuLancement = null;
             _departDuLancement = null;
+            _progression = null;
+            _salleDeLaProgression = null;
         }
     }
 
@@ -186,6 +225,9 @@ public sealed partial class MultiplayerPanelService
             {
                 Noter(place, Etat.Pret);
             }
+
+            // Le depart : les invites sont la (hote), la connexion est faite (invite).
+            _progression?.Finir(ProgressionDuLancement.Joueurs, ProgressionDuLancement.Hote);
         }
 
         MontrerLeLancement();
@@ -451,6 +493,16 @@ public sealed partial class MultiplayerPanelService
             _glypheValider,
             _glypheAnnuler,
             jeu.Ecran?.Police is { Length: > 0 } police ? police : null,
-            sortie);
+            sortie,
+            Progression: ProgressionAffichee(room));
+    }
+
+    /// <summary>La progression de la salle a l'ecran, finie comprise (le depart donne) ; une autre salle en prend une neuve.</summary>
+    private ProgressionDuLancement ProgressionAffichee(MultiplayerRoom room)
+    {
+        lock (_verrou)
+        {
+            return _progression is { } p && _salleDeLaProgression == room.Room ? p : ProgressionDe(room);
+        }
     }
 }

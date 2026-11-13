@@ -50,7 +50,9 @@ public sealed partial class DefisPanelService
 
     private const double ImagesParSecondeNes = 60.0988;
 
-    private sealed record CourseRejointe(MassRunService.SalleOuverte Salle, string Jeu, string? Fanart, DateTime LanceALocal);
+    /// <summary>Une course rejointe ; <c>Progression</c> : les etapes du depart, la barre du bas (13/11).</summary>
+    private sealed record CourseRejointe(MassRunService.SalleOuverte Salle, string Jeu, string? Fanart, DateTime LanceALocal,
+        ProgressionDuLancement? Progression = null);
 
     private CourseRejointe? _course;
     private BilanDeCourse? _bilanDeCourse;
@@ -76,9 +78,12 @@ public sealed partial class DefisPanelService
 
     // ── Le depart ────────────────────────────────────────────────────────────────
 
-    /// <summary><paramref name="salleDAttente"/> : le coeur est en salle d'attente ; <paramref name="depart"/> : « EN PISTE ! ».</summary>
+    /// <summary>
+    /// <paramref name="salleDAttente"/> : le coeur est en salle d'attente ; <paramref name="depart"/> : « EN PISTE ! » ;
+    /// <paramref name="progression"/> : les etapes du depart, la barre du bas (13/11).
+    /// </summary>
     internal EcranDeLancement ComposerLeDepartMassRun(MassRunService.SalleOuverte s, string jeu, string? fanart, bool salleDAttente, int inscrits,
-        DateTime maintenant, DateTime? depart = null)
+        DateTime maintenant, DateTime? depart = null, ProgressionDuLancement? progression = null)
     {
         var avantLeGo = s.GoUtc - maintenant;
         return new EcranDeLancement(
@@ -119,7 +124,8 @@ public sealed partial class DefisPanelService
                 new(T("massrun.panel.start_in", "Start in"), Horloge(avantLeGo)),
                 new(T("massrun.page.limit", "Time limit"), Horloge(TimeSpan.FromSeconds(s.Limite))),
             ],
-            Logo: LogoDesPages);
+            Logo: LogoDesPages,
+            Progression: progression);
     }
 
     private void MontrerLeDepartMassRun(CourseRejointe course)
@@ -140,7 +146,8 @@ public sealed partial class DefisPanelService
         }
 
         _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal),
-            PleinEcran(lancement: ComposerLeDepartMassRun(course.Salle, course.Jeu, course.Fanart, false, course.Salle.Inscrits, DateTime.UtcNow)));
+            PleinEcran(lancement: ComposerLeDepartMassRun(course.Salle, course.Jeu, course.Fanart, false, course.Salle.Inscrits, DateTime.UtcNow,
+                progression: course.Progression)));
         _ = Task.Run(() => TenirLeDepartMassRunAsync(course, jeton));
     }
 
@@ -162,6 +169,8 @@ public sealed partial class DefisPanelService
                 if (_massrun?.Salle is { Salle: var id, Mode: >= 2 } && id == course.Salle.Id)
                 {
                     arrive = true;
+                    course.Progression?.Finir(ProgressionDuLancement.SalleDAttente);
+                    _journal?.LogInformation("MASS RUN : salle d'attente atteinte ({Etapes}).", course.Progression?.Resume() ?? "");
                     break;
                 }
 
@@ -178,7 +187,8 @@ public sealed partial class DefisPanelService
                 }
 
                 _overlay.GarderDevantLeJeu();
-                _overlay.MontrerMultiplayer(PleinEcran(lancement: ComposerLeDepartMassRun(course.Salle, course.Jeu, course.Fanart, false, inscrits, DateTime.UtcNow)));
+                _overlay.MontrerMultiplayer(PleinEcran(lancement: ComposerLeDepartMassRun(course.Salle, course.Jeu, course.Fanart, false, inscrits, DateTime.UtcNow,
+                    progression: course.Progression)));
             }
 
             if (!arrive) _journal?.LogWarning("MASS RUN : le jeu n'est pas arrive en salle d'attente en {Secondes:F0} s, le depart s'efface.", TenueMax.TotalSeconds);
@@ -188,7 +198,8 @@ public sealed partial class DefisPanelService
             }
 
             _overlay.GarderDevantLeJeu();
-            _overlay.MontrerMultiplayer(PleinEcran(lancement: ComposerLeDepartMassRun(course.Salle, course.Jeu, course.Fanart, true, inscrits, DateTime.UtcNow, DateTime.UtcNow)));
+            _overlay.MontrerMultiplayer(PleinEcran(lancement: ComposerLeDepartMassRun(course.Salle, course.Jeu, course.Fanart, true, inscrits, DateTime.UtcNow, DateTime.UtcNow,
+                course.Progression)));
             await Task.Delay(DureeDuDepart, jeton).ConfigureAwait(false);
             _overlay.Estomper(DureeDeLEffacement);
             await Task.Delay(DureeDeLEffacement, jeton).ConfigureAwait(false);
@@ -437,10 +448,11 @@ public sealed partial class DefisPanelService
         try
         {
             var lanceA = DateTime.Now;
-            await _massrun.RejoindreAsync(_massrun.NoeudCourant, salle.Id, true, CancellationToken.None).ConfigureAwait(false);
+            var progression = ProgressionDuLancement.MassRun("massrun-" + salle.Id.ToString(CultureInfo.InvariantCulture));
+            await _massrun.RejoindreAsync(_massrun.NoeudCourant, salle.Id, true, CancellationToken.None, progression).ConfigureAwait(false);
             // Comme une epreuve : la musique d'ES se tait jusqu'a la fin du jeu (SonDEmulationStation la rend ensuite).
             _sonDEs?.Couper();
-            MontrerLeDepartMassRun(new CourseRejointe(salle, jeu, fanart, lanceA));
+            MontrerLeDepartMassRun(new CourseRejointe(salle, jeu, fanart, lanceA, progression));
             return null;
         }
         catch (Exception e) when (e is InvalidOperationException or HttpRequestException or TaskCanceledException or IOException

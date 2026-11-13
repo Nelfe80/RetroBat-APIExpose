@@ -294,8 +294,15 @@ public sealed class MassRunService : IDisposable
     /// GO! du noeud, lance le jeu (sauf <paramref name="lancerLeJeu"/> = false, pour verifier le reseau sans ecran), envoie ses
     /// positions et ecrit les coureurs recus.
     /// </summary>
-    public async Task<SalleLocale> RejoindreAsync(string noeud, uint id, bool lancerLeJeu, CancellationToken ct)
+    /// <summary>
+    /// <paramref name="progression"/> : la barre du depart (13/11). La place prise et la course preparee avant le retour ; les
+    /// manettes et le lanceur ensuite, sur un fil a part : la page n'attend plus le calcul des manettes d'ES (1 a 12 s), et le
+    /// lancement partait deja sur un fil a part.
+    /// </summary>
+    public async Task<SalleLocale> RejoindreAsync(string noeud, uint id, bool lancerLeJeu, CancellationToken ct,
+        RetroBat.Api.Leaderboard.ProgressionDuLancement? progression = null)
     {
+        progression?.Commencer(RetroBat.Api.Leaderboard.ProgressionDuLancement.Place);
         var statut = _agent?.Status;
         var pseudo = (statut?.Pseudo is { Length: > 0 } p ? p : "JOUEUR").ToUpperInvariant();
         if (pseudo.Length > 10) pseudo = pseudo[..10];
@@ -310,6 +317,8 @@ public sealed class MassRunService : IDisposable
         var client = await ClientDeSalle.RejoindreAsync(noeud, id, pseudo, couleur, ct, appareil is null ? null : (jeu, niveau) =>
             BilletDeCoureur.Signer(appareil, id, jeu, niveau, pseudo, BilletDeCoureur.EmpreinteDuCoeur(JeuxMassRun.Trouver(jeu)?.Coeur ?? "")))
             .ConfigureAwait(false);
+        progression?.Finir(RetroBat.Api.Leaderboard.ProgressionDuLancement.Place);
+        progression?.Commencer(RetroBat.Api.Leaderboard.ProgressionDuLancement.Course);
         lock (_verrou)
         {
             // Le jeu de la salle (05/11 : Super Mario Bros. ou Sonic) ; un noeud plus ancien ne nommait que Super Mario Bros.
@@ -344,18 +353,44 @@ public sealed class MassRunService : IDisposable
             var canal = _canal;
             _boucle = new Thread(() => BoucleReseau(canal, salle, client, lancerLeJeu)) { IsBackground = true, Name = "MassRun", Priority = ThreadPriority.AboveNormal };
             _boucle.Start();
+            progression?.Finir(RetroBat.Api.Leaderboard.ProgressionDuLancement.Course);
             if (lancerLeJeu)
             {
-                var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
-                    RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments, jeu.Systeme, "libretro", jeu.Coeur, rom, null, NotificationsRetroArch.Arguments);
-                if (arguments is not null)
-                {
-                    _ = Task.Run(() => LancementDirect.Lancer(arguments, jeu.Systeme, rom, _contexte, _bus, _journal));
-                }
+                _ = Task.Run(() => LancerLaCourse(jeu, rom, progression));
             }
             _journal.LogInformation("MASS RUN : salle {Salle} du noeud {Noeud} rejointe, place {Place}, {Jeu} {Niveau}, GO! a {Go:HH:mm:ss.fff} (ecart d'horloge {Ecart} ms)",
                 client.Salle, noeud, client.Place, jeu.Id, client.Niveau, client.GoLocalUtc.ToLocalTime(), client.EcartHorlogeMs);
             return salle;
+        }
+    }
+
+    /// <summary>
+    /// Le jeu de la course : les manettes comme ES, puis le lanceur. Sur un fil a part (le calcul d'ES passe par un processus
+    /// enfant) ; chaque etape marque la barre du depart a sa fin.
+    /// </summary>
+    private void LancerLaCourse(JeuxMassRun.Jeu jeu, string rom, RetroBat.Api.Leaderboard.ProgressionDuLancement? progression)
+    {
+        try
+        {
+            progression?.Commencer(RetroBat.Api.Leaderboard.ProgressionDuLancement.Manettes);
+            var manettes = RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments;
+            progression?.Finir(RetroBat.Api.Leaderboard.ProgressionDuLancement.Manettes);
+            progression?.Commencer(RetroBat.Api.Leaderboard.ProgressionDuLancement.Lanceur);
+            var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
+                manettes, jeu.Systeme, "libretro", jeu.Coeur, rom, null, NotificationsRetroArch.Arguments);
+            if (arguments is null || LancementDirect.Lancer(arguments, jeu.Systeme, rom, _contexte, _bus, _journal) is null)
+            {
+                progression?.Echouer(RetroBat.Api.Leaderboard.ProgressionDuLancement.Lanceur);
+                return;
+            }
+
+            progression?.Finir(RetroBat.Api.Leaderboard.ProgressionDuLancement.Lanceur);
+            progression?.Commencer(RetroBat.Api.Leaderboard.ProgressionDuLancement.SalleDAttente);
+        }
+        catch (Exception ex)
+        {
+            progression?.Echouer(RetroBat.Api.Leaderboard.ProgressionDuLancement.Lanceur);
+            _journal.LogWarning(ex, "MASS RUN : le jeu de la course n'a pas demarre.");
         }
     }
 

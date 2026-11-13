@@ -751,7 +751,8 @@ public sealed partial class MultiplayerPanelService
         _overlay.Attendre(
             _textes.Text("multiplayer.syncing", langue),
             jeu?.Game.Name ?? string.Empty,
-            classique ? _textes.Text("multiplayer.classic.message", langue) : personnages);
+            classique ? _textes.Text("multiplayer.classic.message", langue) : personnages,
+            ProgressionDe(room));
     }
 
     /// <summary>

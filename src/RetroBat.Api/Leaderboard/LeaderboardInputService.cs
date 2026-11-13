@@ -1619,14 +1619,16 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         // MULTIPLAYER ; il tient jusqu'au jeu et dit « YOUR TURN! ». Le panneau, lui, se ferme : sa veille du premier plan
         // fermerait l'ecran quand l'emulateur passe devant.
         var ecransWs = _ecransWs is { Actifs: true } ? _ecransWs : null;
+        // LA BARRE DU BAS (13/11) : les etapes reelles du defi, sur l'ecran de depart comme sur la boite d'attente.
+        var progression = ProgressionDuLancement.WorldScoring("defi-" + jeu);
         if (ecransWs is not null)
         {
             _modele.Fermer();
-            OuvrirLEcranDeDepart(ecransWs, chemin, jeu, monde, contest);
+            OuvrirLEcranDeDepart(ecransWs, chemin, jeu, monde, contest, progression);
         }
         else
         {
-            _overlay.Attendre(_textes.Text("leaderboard.starting_game", langue), _textes.Text("leaderboard.challenge_title", langue), objectif);
+            _overlay.Attendre(_textes.Text("leaderboard.starting_game", langue), _textes.Text("leaderboard.challenge_title", langue), objectif, progression);
         }
 
         // EmulationStation doit avoir le premier plan AVANT /launch : sa requete ne lance rien
@@ -1647,6 +1649,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             ? ModeCourant()
             : ModeDuDefiPour(false, reglages.ChallengeShareLive, reglages.ChallengeJoinPolicy ?? "none", _reglesDuJeu.Contains("1cc-multi"));
         _logger.LogInformation("Classement : defi {Mode} ({Libelle}).", mode, LibelleDuMode(mode, _reglesDuJeu));
+        if (mode == ModeDuDefi.Prive) progression.Retirer(ProgressionDuLancement.Direct);
         // Le rang en direct du Deck (H-D21) se classe dans le classement de l'onglet regarde a l'appui (1LC, un mode...),
         // sinon la regle principale ; jamais un 1CC MULTI pour un defi seul.
         var classementDuRang = ClassementDuRang();
@@ -1658,26 +1661,35 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 // diffuse lance lui aussi par `/launch` (NetplayLaunch), et sous le menu ES
                 // acceptait la demande sans jamais lancer (2026-10-01, defi bloque sur
                 // « Lancement de la partie », emulateur jamais apparu).
-                await FermerLeMenuEsAsync().ConfigureAwait(false);
+                await progression.MesurerAsync(ProgressionDuLancement.Menu, FermerLeMenuEsAsync).ConfigureAwait(false);
                 // Le coeur de la collection (FBNeo pour un set qu'il connait), avant que le Deck, la diffusion ou ES ne lisent
                 // la fiche du jeu (11/11).
-                if (_partie is not null)
+                if (_partie is { } partie)
                 {
-                    await _partie.ImposerLeCoeurAsync(chemin).ConfigureAwait(false);
+                    await progression.MesurerAsync(ProgressionDuLancement.Coeur, () => partie.ImposerLeCoeurAsync(chemin)).ConfigureAwait(false);
                 }
+                progression.Finir(ProgressionDuLancement.Coeur);
                 if (mode != ModeDuDefi.Prive)
                 {
                     // LE DEFI DIFFUSE AVEC LE DECK (essai du user du 08/11 : 1CC LIVE est le reglage par defaut) : le decor se
                     // prepare avant l'hebergement ; le jeu part alors par l'API, netplay de l'hote compris.
-                    var avecDeck = await PreparerLeDeckDuDefiAsync(chemin, classementDuRang).ConfigureAwait(false);
-                    if (await DiffuserLeDefiAsync(chemin, mode == ModeDuDefi.Multi ? reglages.ChallengeJoinPolicy : "none", avecDeck).ConfigureAwait(false))
+                    var avecDeck = await progression.MesurerAsync(ProgressionDuLancement.Deck,
+                        () => PreparerLeDeckDuDefiAsync(chemin, classementDuRang)).ConfigureAwait(false);
+                    var diffuse = await progression.MesurerAsync(ProgressionDuLancement.Direct,
+                        () => DiffuserLeDefiAsync(chemin, mode == ModeDuDefi.Multi ? reglages.ChallengeJoinPolicy : "none", avecDeck, progression)).ConfigureAwait(false);
+                    if (diffuse)
                     {
+                        // L'hebergement a lance le jeu : par l'API avec le Deck (manettes et lanceur marques), sinon lui-meme.
+                        progression.Retirer(ProgressionDuLancement.Manettes);
+                        progression.Finir(ProgressionDuLancement.Lanceur);
+                        progression.Commencer(ProgressionDuLancement.Jeu);
                         await AttendreLeJeuPuisSEffacerAsync(avecDeck is null ? "defi en direct" : "defi en direct avec le Deck").ConfigureAwait(false);
                         return;
                     }
                     // Diffusion impossible : un defi prive, avec le meme Deck s'il est pret
-                    if (avecDeck is not null && LancerLeDefiAvecLeDeck(chemin, avecDeck, []))
+                    if (avecDeck is not null && LancerLeDefiAvecLeDeck(chemin, avecDeck, [], progression))
                     {
+                        progression.Commencer(ProgressionDuLancement.Jeu);
                         await AttendreLeJeuPuisSEffacerAsync("defi avec le Deck").ConfigureAwait(false);
                         return;
                     }
@@ -1685,11 +1697,16 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 }
                 // LE PLAYERDECK (H-D15, H-D20) : un jeu dont le Deck est retenu part par l'API, avec son decor. L'API d'ES ne
                 // prend qu'un chemin de ROM, aucune option : seul un lancement direct porte « -bezel nelfeplay-deck -ratio custom ».
-                if (mode == ModeDuDefi.Prive && await LancerAvecLeDeckAsync(chemin, classementDuRang).ConfigureAwait(false))
+                if (mode == ModeDuDefi.Prive && await LancerAvecLeDeckAsync(chemin, classementDuRang, progression).ConfigureAwait(false))
                 {
+                    progression.Commencer(ProgressionDuLancement.Jeu);
                     await AttendreLeJeuPuisSEffacerAsync("defi avec le Deck").ConfigureAwait(false);
                     return;
                 }
+                // Par ES : il calcule ses manettes lui-meme, et le lanceur, c'est sa requete /launch.
+                progression.Finir(ProgressionDuLancement.Deck);
+                progression.Retirer(ProgressionDuLancement.Manettes);
+                progression.Commencer(ProgressionDuLancement.Lanceur);
                 EmulatorForeground.FocusEmulationStation();
                 using var client = _httpFactory.CreateClient();
                 client.BaseAddress = new Uri("http://127.0.0.1:1234");
@@ -1701,10 +1718,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 if (!reponse.IsSuccessStatusCode)
                 {
                     _logger.LogWarning("Classement : EmulationStation a refuse le lancement ({Statut}).", (int) reponse.StatusCode);
+                    progression.Echouer(ProgressionDuLancement.Lanceur);
                     ecransWs?.Abandonner("lancement refuse par ES");
                     Fermer();
                     return;
                 }
+                progression.Finir(ProgressionDuLancement.Lanceur);
+                progression.Commencer(ProgressionDuLancement.Jeu);
                 // Le depart du jeu ferme le panneau par `ui.game.started` ; le filet fait le reste.
                 await AttendreLeJeuPuisSEffacerAsync("defi").ConfigureAwait(false);
             }
@@ -1722,7 +1742,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// du cartouche du defi), les regles et l'etat de la certification, d'apres le classement que le panneau montrait.
     /// </summary>
     private void OuvrirLEcranDeDepart(WorldScoringEcransService ecrans, string chemin, string jeu, IReadOnlyList<LeaderboardClient.Ligne> monde,
-        LeaderboardSocialClient.Contest? contest)
+        LeaderboardSocialClient.Contest? contest, ProgressionDuLancement? progression = null)
     {
         try
         {
@@ -1758,14 +1778,14 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 monde.Count,
                 cible is null ? null : new CibleDuScore(cible.Rang, cible.Joueur, cible.Pays, cible.Valeur, cible.CestMoi));
             ecrans.Ouvrir(depart, monde, classement?.Ruleset ?? _reglePrincipale, Glyphe(SlotValider), Glyphe(SlotAnnuler),
-                rejouer: contest is null ? () => Defier() : null);
+                rejouer: contest is null ? () => Defier() : null, progression: progression);
         }
         catch (Exception ex)
         {
             // Jamais d'ecran plutot qu'un defi qui ne part pas : la boite d'attente d'avant.
             _logger.LogWarning(ex, "World Scoring : ecran de depart impossible, la boite d'attente le remplace.");
             ecrans.Abandonner("ecran de depart impossible");
-            _overlay.Attendre(_textes.Text("leaderboard.starting_game", Langue()), _textes.Text("leaderboard.challenge_title", Langue()));
+            _overlay.Attendre(_textes.Text("leaderboard.starting_game", Langue()), _textes.Text("leaderboard.challenge_title", Langue()), progression: progression);
         }
     }
 
@@ -1780,11 +1800,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// Le decor et le cadre sont des reglages d'affichage : ni l'empreinte des options du coeur, ni le .MEM, ni le coeur,
     /// ni le contenu ne changent ; le prevol et le passeport sont les memes.
     /// </summary>
-    private async Task<bool> LancerAvecLeDeckAsync(string chemin, Deck.DeckRankBoard? classementDuRang)
+    private async Task<bool> LancerAvecLeDeckAsync(string chemin, Deck.DeckRankBoard? classementDuRang, ProgressionDuLancement? progression = null)
     {
-        var avecDeck = await PreparerLeDeckDuDefiAsync(chemin, classementDuRang).ConfigureAwait(false);
+        var avecDeck = progression is null
+            ? await PreparerLeDeckDuDefiAsync(chemin, classementDuRang).ConfigureAwait(false)
+            : await progression.MesurerAsync(ProgressionDuLancement.Deck, () => PreparerLeDeckDuDefiAsync(chemin, classementDuRang)).ConfigureAwait(false);
         if (avecDeck is null) return false;
-        if (LancerLeDefiAvecLeDeck(chemin, avecDeck, [])) return true;
+        if (LancerLeDefiAvecLeDeck(chemin, avecDeck, [], progression)) return true;
         // Le jeu part par ES, sans decor : le Deck ne doit pas s'y croire pose (charte du 08/11)
         _deck?.Abandonner("direct_launch_failed");
         return false;
@@ -1820,12 +1842,15 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// Lance le defi par l'API, decor du Deck compris ; <paramref name="netplay"/> : les arguments de l'hote d'un defi diffuse
     /// (vide pour un defi prive). Rend vrai si le lanceur est parti.
     /// </summary>
-    private bool LancerLeDefiAvecLeDeck(string chemin, DefiAvecDeck defi, IReadOnlyList<string> netplay)
+    private bool LancerLeDefiAvecLeDeck(string chemin, DefiAvecDeck defi, IReadOnlyList<string> netplay, ProgressionDuLancement? progression = null)
     {
         try
         {
             var (resolution, deck) = (defi.Resolution, defi.Deck);
-            var arguments = ArgumentsDuDefiAvecLeDeck(RetroBat.Api.Netplay.EsManettes.PourLancer(_logger).Arguments, resolution, chemin, deck.Arguments, netplay);
+            string Manettes() => RetroBat.Api.Netplay.EsManettes.PourLancer(_logger).Arguments;
+            var manettes = progression is null ? Manettes() : progression.Mesurer(ProgressionDuLancement.Manettes, Manettes);
+            progression?.Commencer(ProgressionDuLancement.Lanceur);
+            var arguments = ArgumentsDuDefiAvecLeDeck(manettes, resolution, chemin, deck.Arguments, netplay);
             if (arguments is null) return false;
 
             // ES ne sait pas qu'un jeu tourne : sa musique se tait jusqu'a la fin du jeu (SonDEmulationStation la rend ensuite)
@@ -1851,6 +1876,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             }
             _logger.LogInformation("Classement : defi lance avec le Deck {Deck} ({Systeme}, {Emulateur}, {Coeur}{Netplay}).",
                 deck.DeckId, resolution.Systeme, resolution.Emulateur, resolution.Coeur, netplay.Count > 0 ? ", hote netplay" : "");
+            progression?.Finir(ProgressionDuLancement.Lanceur);
             return true;
         }
         catch (Exception ex)
@@ -1908,20 +1934,26 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         if (!regarder && !Joignabilite(direct).Joignable) regarder = true;
 
         _logger.LogInformation("Classement : {Geste} le direct de {Joueur} ({Session}).", regarder ? "regarder" : "rejoindre en joueur", direct.Pseudo, direct.Session);
-        _overlay.Attendre(_textes.Text("leaderboard.starting_game", Langue()));
+        // La barre sous la boite (13/11) : le menu ferme, la session rejointe, puis le jeu.
+        var progression = ProgressionDuLancement.RejoindreUnDirect("direct-" + direct.Session);
+        _overlay.Attendre(_textes.Text("leaderboard.starting_game", Langue()), progression: progression);
         _ = Task.Run(async () =>
         {
             try
             {
                 // Meme raison que pour un defi : l'invite lance par `/launch`, qui attend sous le menu.
-                await FermerLeMenuEsAsync().ConfigureAwait(false);
+                await progression.MesurerAsync(ProgressionDuLancement.Menu, FermerLeMenuEsAsync).ConfigureAwait(false);
+                progression.Commencer(ProgressionDuLancement.Session);
                 var echec = await _invite.RejoindreAsync(direct.Session, hote: direct.Pseudo.Length > 0 ? direct.Pseudo : direct.Poignee, regarderSeulement: regarder).ConfigureAwait(false);
                 if (echec != RetroBat.Api.Netplay.NetplayGuestService.Echec.Aucun)
                 {
+                    progression.Echouer(ProgressionDuLancement.Session);
                     _logger.LogWarning("Classement : impossible de rejoindre ({Raison}).", echec);
                     Fermer();
                     return;
                 }
+                progression.Finir(ProgressionDuLancement.Session);
+                progression.Commencer(ProgressionDuLancement.Jeu);
                 await AttendreLeJeuPuisSEffacerAsync("direct rejoint").ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -1982,7 +2014,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// hebergement netplay, le chemin du site quand on coche « Diffuser en live ». Rend faux si
     /// la diffusion n'a pas pu se faire : le defi se lance alors normalement.
     /// </summary>
-    private async Task<bool> DiffuserLeDefiAsync(string chemin, string politique, DefiAvecDeck? avecDeck = null)
+    private async Task<bool> DiffuserLeDefiAsync(string chemin, string politique, DefiAvecDeck? avecDeck = null, ProgressionDuLancement? progression = null)
     {
         var join = politique is "followed" or "everyone" ? politique : "none";
         try
@@ -2004,7 +2036,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             }
             _directAnnonceParLeDefi = true;
             var echec = await _hote.HebergerAsync(chemin, _agent.Status.Pseudo ?? "", join != "none",
-                lancementDirect: avecDeck is null ? null : netplay => LancerLeDefiAvecLeDeck(chemin, avecDeck, netplay)).ConfigureAwait(false);
+                lancementDirect: avecDeck is null ? null : netplay => LancerLeDefiAvecLeDeck(chemin, avecDeck, netplay, progression)).ConfigureAwait(false);
             if (echec != RetroBat.Api.Netplay.NetplayHostService.Echec.Aucun)
             {
                 _logger.LogWarning("Classement : hebergement du defi impossible ({Raison}), defi joue sans diffusion.", echec);
@@ -2075,7 +2107,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         _logger.LogInformation("Classement : lecture du replay {Replay} demandee.", replay);
         // La boite « WORKING… » d'ES, le temps que l'emulateur demarre : sans elle, le panneau
         // disparait et rien ne se passe pendant plusieurs secondes, ce qui se lit comme une panne.
-        _overlay.Attendre(_textes.Text("leaderboard.launching", Langue()));
+        // La barre sous la boite (13/11) : la seance du spectateur, la preparation du replay, le jeu.
+        var progression = ProgressionDuLancement.RegarderUnReplay("replay-" + replay);
+        _overlay.Attendre(_textes.Text("leaderboard.launching", Langue()), progression: progression);
         _replayLance = replay;
         // L'onglet 1LC lit le replay jusqu'a la premiere vie perdue (2026-10-09).
         var regle = RegleDeLaVue(_modele.VueCourante);
@@ -2083,8 +2117,19 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         {
             try
             {
-                await OuvrirLaSeanceDuSpectateurAsync(replay).ConfigureAwait(false);
-                await _playback.PlayAsync(replay, CancellationToken.None, regle).ConfigureAwait(false);
+                await progression.MesurerAsync(ProgressionDuLancement.Spectateur, () => OuvrirLaSeanceDuSpectateurAsync(replay)).ConfigureAwait(false);
+                progression.Commencer(ProgressionDuLancement.Replay);
+                var lecture = await _playback.PlayAsync(replay, CancellationToken.None, regle).ConfigureAwait(false);
+                // Un replay a recopier d'abord se prepare encore en arriere-plan : l'etape reste en cours jusqu'au jeu.
+                if (!lecture.Accepted)
+                {
+                    progression.Echouer(ProgressionDuLancement.Replay);
+                }
+                else if (!string.Equals(lecture.State, nameof(RetroBat.Api.Replay.Models.ReplayPlaybackState.Replicating), StringComparison.OrdinalIgnoreCase))
+                {
+                    progression.Finir(ProgressionDuLancement.Replay);
+                    progression.Commencer(ProgressionDuLancement.Jeu);
+                }
                 // Le filet : si le lecteur n'a rien lance en 45 s, la boite ne reste pas, et
                 // ES reprend la main (il n'y a pas d'emulateur a qui la disputer).
                 await Task.Delay(TimeSpan.FromSeconds(45)).ConfigureAwait(false);

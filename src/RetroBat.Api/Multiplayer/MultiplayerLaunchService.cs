@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using RetroBat.Api.Infrastructure;
 using RetroBat.Api.Netplay;
+using ProgressionDuLancement = RetroBat.Api.Leaderboard.ProgressionDuLancement;
 using RetroBat.Domain.Events;
 using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Models;
@@ -239,7 +240,9 @@ public sealed class MultiplayerLaunchService : IHostedService
                 return;
             }
 
-            if (!await SortirDuPaquetAsync(jeu).ConfigureAwait(false))
+            // La barre du bas du VS (13/11) : chaque etape de l'hote la fait avancer a sa fin.
+            var progression = _panneau.NouvelleProgression(room);
+            if (!await progression.MesurerAsync(ProgressionDuLancement.Paquet, () => SortirDuPaquetAsync(jeu)).ConfigureAwait(false))
             {
                 await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
                 return;
@@ -248,7 +251,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             // Un jeu qui numerote ses joueurs dans l'ordre du netplay (l'hote d'abord) : ses places remises dans celles de la
             // plateforme, pour toute la partie (MultiplayerOrdreNetplay).
             jeu = MultiplayerOrdreNetplay.PourLaRoom(jeu, room);
-            var relais = await _relais.ChoisirAsync().ConfigureAwait(false);
+            var relais = await progression.MesurerAsync(ProgressionDuLancement.Relais, () => _relais.ChoisirAsync()).ConfigureAwait(false);
             var jeton = Hex(4);
             var motJoueur = Hex(4);
             var motSpectateur = Hex(4);
@@ -259,7 +262,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             {
                 MultiplayerSpectateur.Prevoir();
             }
-            var partie = Lancer(room, jeu, MultiplayerLaunchPlan.ArgumentsHote(pseudo, motJoueur, motSpectateur, relais));
+            var partie = Lancer(room, jeu, MultiplayerLaunchPlan.ArgumentsHote(pseudo, motJoueur, motSpectateur, relais), progression);
             if (partie is null)
             {
                 MultiplayerSpectateur.Arreter();
@@ -269,7 +272,7 @@ public sealed class MultiplayerLaunchService : IHostedService
 
             // Une partie ouverte a d'autres joueurs n'entre pas au classement solo (charte de la partie certifiee).
             NetplayHostService.NoterOuverteAuxJoueurs();
-            _ = Task.Run(() => PublierLaSessionAsync(room, jeu, jeton, motJoueur, motSpectateur));
+            _ = Task.Run(() => PublierLaSessionAsync(room, jeu, jeton, motJoueur, motSpectateur, progression));
             RelayerLaManette(jeu.Game, room.Launch!.Seat, PlacesDe(room));
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
             dureeJouee = duree;
@@ -334,8 +337,11 @@ public sealed class MultiplayerLaunchService : IHostedService
     }
 
     /// <summary>La session parait au lobby une quarantaine de secondes apres le lancement : on la publie a la gameroom.</summary>
-    private async Task PublierLaSessionAsync(MultiplayerRoom room, MultiplayerInstalledGame jeu, string jeton, string motJoueur, string motSpectateur)
+    private async Task PublierLaSessionAsync(MultiplayerRoom room, MultiplayerInstalledGame jeu, string jeton, string motJoueur, string motSpectateur,
+        ProgressionDuLancement? progression = null)
     {
+        // La session au lobby (une quarantaine de secondes), le depart pret, la publication : « Opening the session… ».
+        progression?.Commencer(ProgressionDuLancement.Session);
         // La plateforme rend la gameroom a l'attente 90 s apres le lancement sans session publiee : le spectateur cache, lance
         // avant la publication (D-M9), ne doit jamais la faire attendre au-dela.
         var limiteDePublication = DateTime.UtcNow + PatienceLobby;
@@ -346,6 +352,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             {
                 // Sans session, personne ne rejoindra : l'hote ne joue pas seul en croyant qu'on va venir. La partie
                 // se ferme, la gameroom est quittee, et les autres retrouvent l'attente.
+                progression?.Echouer(ProgressionDuLancement.Session);
                 _journal.LogWarning("MULTIPLAYER : aucune session au lobby pour {Room} : la partie se ferme", room.Room);
                 await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
                 await RetroArchInvite.FermerPourDeBonAsync().ConfigureAwait(false);
@@ -364,6 +371,7 @@ public sealed class MultiplayerLaunchService : IHostedService
 
             if (depart is not null && !await PreparerLeDepartAsync(room, jeu, depart).ConfigureAwait(false))
             {
+                progression?.Echouer(ProgressionDuLancement.Session);
                 await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
                 await RetroArchInvite.FermerPourDeBonAsync().ConfigureAwait(false);
                 return;
@@ -422,11 +430,15 @@ public sealed class MultiplayerLaunchService : IHostedService
                 // La plateforme refuse la session : la salle n'est plus en lancement (quittee, abandonnee). Personne ne pourra
                 // rejoindre (25/10 : l'hote restait seul sur l'ecran des bolides, START sans effet). Comme sans session au
                 // lobby, la partie se ferme.
+                progression?.Echouer(ProgressionDuLancement.Session);
                 _journal.LogWarning("MULTIPLAYER : la plateforme refuse la session de {Room} : la partie se ferme", room.Room);
                 await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
                 await RetroArchInvite.FermerPourDeBonAsync().ConfigureAwait(false);
                 return;
             }
+            // La session est a la gameroom : reste l'arrivee des invites, que le depart donne termine.
+            progression?.Finir(ProgressionDuLancement.Session);
+            progression?.Commencer(ProgressionDuLancement.Joueurs);
             // Les liens des invites au relais : leur arrivee et leur depart vus par le reseau, quelle que soit la langue du
             // journal de RetroArch (27/10, deux bornes de langues differentes).
             // Le spectateur cache ajoute deux connexions au relais : elles ne comptent jamais pour des invites.
@@ -971,7 +983,10 @@ public sealed class MultiplayerLaunchService : IHostedService
                 return;
             }
 
-            if (!await SortirDuPaquetAsync(jeu).ConfigureAwait(false))
+            // La barre du bas du VS (13/11) : la session de l'hote est la, l'invite prepare son jeu.
+            var progression = _panneau.NouvelleProgression(room);
+            progression.Finir(ProgressionDuLancement.Session);
+            if (!await progression.MesurerAsync(ProgressionDuLancement.Paquet, () => SortirDuPaquetAsync(jeu)).ConfigureAwait(false))
             {
                 await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
                 return;
@@ -981,7 +996,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             // La borne invitee joue la partie de l'hote : le rapporteur ne soumettra pas le score du P1 sous son nom.
             NetplayGuestService.NoterInviteMultiplayer(room.Launch.Seat);
             var pseudo = MultiplayerLaunchPlan.Pseudo(MonPseudo(room), Hex(2));
-            var partie = Lancer(room, jeu, MultiplayerLaunchPlan.ArgumentsInvite(pseudo, session));
+            var partie = Lancer(room, jeu, MultiplayerLaunchPlan.ArgumentsInvite(pseudo, session), progression);
             if (partie is null)
             {
                 NetplayGuestService.OublierInviteMultiplayer();
@@ -1173,14 +1188,16 @@ public sealed class MultiplayerLaunchService : IHostedService
     }
 
     /// <summary>Pose les reglages, lance, et annonce la partie quand l'emulateur est la.</summary>
-    private Partie? Lancer(MultiplayerRoom room, MultiplayerInstalledGame jeu, IReadOnlyList<string> netplay)
+    private Partie? Lancer(MultiplayerRoom room, MultiplayerInstalledGame jeu, IReadOnlyList<string> netplay, ProgressionDuLancement? progression = null)
     {
         var lancement = room.Launch!;
         var systeme = MultiplayerCollectionSyncService.SystemeDuLancement(jeu.Game.System,
             NetplayHostService.SystemeDuChemin(jeu.Path, RetroBatPaths.RomsRoot));
         var coeur = jeu.Core?.Core ?? string.Empty;
         // Sans ES, les manettes se calculent comme ES le ferait : le lanceur n'en cherche aucune lui-meme (EsManettes).
+        progression?.Commencer(ProgressionDuLancement.Manettes);
         var choix = EsManettes.PourLancer(_journal);
+        progression?.Finir(ProgressionDuLancement.Manettes);
         // Le joueur 1 de la borne est une vraie manette : un vJoy passe derriere (27/10).
         var manettes = EsManettes.VirtuellesEnDernier(choix.Arguments);
         if (manettes != choix.Arguments)
@@ -1195,10 +1212,15 @@ public sealed class MultiplayerLaunchService : IHostedService
         // PAS DE PLAYERDECK EN MULTIPLAYER (decision du user du 09/11, remplace H-D17) : les panneaux des joueurs, toujours. Un
         // lancement prepare plus tot avec un Deck ne se rattache pas a la room.
         Deck?.Retirer("multiplayer");
+        progression?.Commencer(ProgressionDuLancement.Panneaux);
         var decor = PoserLesPanneaux(room, jeu, systeme, joueurs);
+        progression?.Finir(ProgressionDuLancement.Panneaux);
+        // Le depart par place, les reglages de la place, le lanceur : jusqu'au demarrage de RetroArch.
+        progression?.Commencer(ProgressionDuLancement.Lanceur);
         var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeu.Game, lancement.Seat, netplay, joueurs, decor);
         if (arguments is null)
         {
+            progression?.Echouer(ProgressionDuLancement.Lanceur);
             _journal.LogWarning("MULTIPLAYER : lancement de {Jeu} refuse (systeme « {Systeme} », coeur « {Coeur} »)", jeu.Game.Id, systeme, coeur);
             return null;
         }
@@ -1209,6 +1231,7 @@ public sealed class MultiplayerLaunchService : IHostedService
             Path.Combine(RetroBatPaths.PluginRoot, "resources", "multiplayer"), MultiplayerDepartDuCoeur.DossierSysteme);
         if (!departDuCoeur.Ok)
         {
+            progression?.Echouer(ProgressionDuLancement.Lanceur);
             _journal.LogWarning("MULTIPLAYER : depart par place de {Jeu} non pose ({Raison}) : lancement annule", jeu.Game.Id, departDuCoeur.Raison);
             return null;
         }
@@ -1316,6 +1339,7 @@ public sealed class MultiplayerLaunchService : IHostedService
         var lanceur = NetplayLaunch.DemarrerDirectement(arguments, _journal);
         if (lanceur is null)
         {
+            progression?.Echouer(ProgressionDuLancement.Lanceur);
             MultiplayerScoring.Oublier();
             _sonDEs?.Rendre();
             FinDuLancement(room.Room);
@@ -1325,9 +1349,11 @@ public sealed class MultiplayerLaunchService : IHostedService
             return null;
         }
 
+        progression?.Finir(ProgressionDuLancement.Lanceur);
+        progression?.Commencer(ProgressionDuLancement.Jeu);
         var reference = new GameReference { SystemId = systeme, GamePath = jeu.Path, GameName = jeu.Game.Name };
         _ = Task.Run(() => AnnoncerQuandLEmulateurEstLaAsync(reference, room.Room, lanceA, sansManette: manettes.Length == 0,
-            hote: lancement.Role == "host" ? (room, jeu) : null));
+            hote: lancement.Role == "host" ? (room, jeu) : null, progression: progression));
         return new Partie(lanceur, aRendre, DateTime.UtcNow, reference, departDuCoeur.Fichier);
     }
 
@@ -1371,12 +1397,20 @@ public sealed class MultiplayerLaunchService : IHostedService
     /// lancement : un RetroArch deja ouvert (un banc, le 25/10) effacait la presentation 48 s avant le vrai jeu.
     /// </summary>
     private async Task AnnoncerQuandLEmulateurEstLaAsync(GameReference jeu, string room, DateTime lanceA, bool sansManette,
-        (MultiplayerRoom Room, MultiplayerInstalledGame Jeu)? hote = null)
+        (MultiplayerRoom Room, MultiplayerInstalledGame Jeu)? hote = null, ProgressionDuLancement? progression = null)
     {
         var limite = DateTime.UtcNow.AddSeconds(60);
         while (DateTime.UtcNow < limite && !EmulatorForeground.EmulateurDeJeuTourne(lanceA.AddSeconds(-1)))
         {
             await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+        }
+
+        // L'emulateur est la (ou le delai passe) ; l'invite rejoint alors l'hote, que le depart donne termine.
+        progression?.Finir(ProgressionDuLancement.Jeu);
+        if (hote is null) progression?.Commencer(ProgressionDuLancement.Hote);
+        if (progression is not null)
+        {
+            _journal.LogInformation("MULTIPLAYER : le jeu est la ({Etapes})", progression.Resume());
         }
 
         FinDuLancement(room);

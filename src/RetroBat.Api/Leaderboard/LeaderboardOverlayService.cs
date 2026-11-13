@@ -317,6 +317,7 @@ public sealed partial class LeaderboardOverlayService : IDisposable
         lock (_gate)
         {
             _contenu = _contenu with { Attente = "", AttenteTitre = "", AttenteDetail = "" };
+            _progressionDAttente = null;
             _multiplayer = null;
             _defis = null;
             _noir = false;
@@ -334,6 +335,7 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             if (!Affiche) return;
             Affiche = false;
             _contenu = _contenu with { Attente = "", AttenteTitre = "", AttenteDetail = "" };
+            _progressionDAttente = null;
             _multiplayer = null;
             _defis = null;
             _noir = false;
@@ -343,6 +345,9 @@ public sealed partial class LeaderboardOverlayService : IDisposable
         _forme?.Cacher();
         _forme?.SEtendre(false);
     }
+
+    /// <summary>Les etapes du lancement que la boite d'attente montre sous elle (la barre discrete, 13/11) ; null, pas de barre.</summary>
+    private ProgressionDuLancement? _progressionDAttente;
 
     /// <summary>La boite d'attente est-elle a l'ecran ?</summary>
     public bool EnAttente
@@ -354,11 +359,12 @@ public sealed partial class LeaderboardOverlayService : IDisposable
     /// L'attente d'un replay : la boite « WORKING… » d'ES, plein ecran floute. Le panneau
     /// s'etend a tout l'ecran d'ES le temps que le jeu demarre.
     /// </summary>
-    public void Attendre(string message, string titre = "", string detail = "")
+    public void Attendre(string message, string titre = "", string detail = "", ProgressionDuLancement? progression = null)
     {
         lock (_gate)
         {
             _contenu = _contenu with { Attente = message, AttenteTitre = titre, AttenteDetail = detail };
+            _progressionDAttente = progression;
             _dernierGeste = DateTime.UtcNow;
         }
         _forme?.SEtendre(true);
@@ -1272,6 +1278,23 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             using var centre = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center };
             g.DrawString(texte, police, encre, new RectangleF(x, zone.Y, largeurTexte + 4, hauteur), centre);
             _imageAttente++;
+
+            // La barre discrete sous la boite (13/11) : la meme que celle des ecrans de lancement, aux couleurs du menu d'ES.
+            ProgressionDuLancement? progression;
+            lock (_service._gate) progression = _service._progressionDAttente;
+            if (progression is not null)
+            {
+                var largeurBarre = Math.Max(zone.Width, taille * 22);
+                var hauteurPolice = Math.Max(11f, taille * 0.62f);
+                using var policeBarre = new Font(police.FontFamily, hauteurPolice, FontStyle.Bold, GraphicsUnit.Pixel);
+                var epaisseur = Math.Max(2f, taille * 0.14f);
+                var ligne = new RectangleF((Width - largeurBarre) / 2f, zone.Bottom + taille * 0.9f, largeurBarre, hauteurPolice * 1.25f + taille * 0.5f + epaisseur);
+                var teintes = new BarreDeLancement.Teintes(Teinte(s.TextColor), Color.FromArgb(60, Teinte(s.TextColor)), Teinte(s.SelectorColor),
+                    Color.FromArgb(229, 83, 75));
+                var vue = progression.Lire();
+                BarreDeLancement.Dessiner(g, vue, vue.Part, ligne, policeBarre, teintes, 1, _imageAttente * 0.5,
+                    epaisseur, Math.Max(1f, taille * 0.08f));
+            }
         }
 
         /// <summary>La bordure d'une grille d'ES : 1 px, couleur menugrid. Transparente = rien.</summary>

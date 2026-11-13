@@ -34,9 +34,12 @@ public sealed class WorldScoringEcransService : IHostedService, IDisposable
     private enum Page { Aucune, Depart, Bilan }
 
     /// <summary>Un defi suivi, de l'appui sur CHALLENGE a la fermeture de son bilan.</summary>
-    private sealed class Suivi(DepartDuScore depart, IReadOnlyList<LeaderboardClient.Ligne> monde, string regle, Action? rejouer)
+    private sealed class Suivi(DepartDuScore depart, IReadOnlyList<LeaderboardClient.Ligne> monde, string regle, Action? rejouer,
+        ProgressionDuLancement? progression)
     {
         public DepartDuScore Depart { get; set; } = depart;
+        /// <summary>Les etapes du lancement du defi, la barre du bas (13/11).</summary>
+        public ProgressionDuLancement? Progression { get; } = progression;
         public IReadOnlyList<LeaderboardClient.Ligne> Monde { get; } = monde;
         public string Regle { get; } = regle;
         public Action? Rejouer { get; } = rejouer;
@@ -125,12 +128,12 @@ public sealed class WorldScoringEcransService : IHostedService, IDisposable
     /// <summary>
     /// L'appui sur CHALLENGE : l'ecran de depart paraît a la place de la boite d'attente. <paramref name="regle"/> : la regle
     /// du classement vise (1cc...), pour reconnaitre son verdict ; <paramref name="rejouer"/> : relancer le meme defi depuis le
-    /// bilan.
+    /// bilan. <paramref name="progression"/> : les etapes du lancement, que le defi marque a mesure (la barre du bas, 13/11).
     /// </summary>
     public void Ouvrir(DepartDuScore depart, IReadOnlyList<LeaderboardClient.Ligne> monde, string regle, string glypheValider, string glypheAnnuler,
-        Action? rejouer = null)
+        Action? rejouer = null, ProgressionDuLancement? progression = null)
     {
-        var suivi = new Suivi(depart, monde, regle, rejouer);
+        var suivi = new Suivi(depart, monde, regle, rejouer, progression);
         CancellationToken jeton;
         lock (_verrou)
         {
@@ -169,7 +172,7 @@ public sealed class WorldScoringEcransService : IHostedService, IDisposable
     }
 
     private EcranDeLancement ComposerLeDepart(Suivi s, bool jeuPret, DateTime? depart)
-        => WorldScoringEcrans.ComposerLeDepart(s.Depart, T, jeuPret, depart, _glypheAnnuler, _glypheValider);
+        => WorldScoringEcrans.ComposerLeDepart(s.Depart, T, jeuPret, depart, _glypheAnnuler, _glypheValider, s.Progression);
 
     /// <summary>
     /// Devant le jeu jusqu'a ce qu'il soit la (150 s au plus), en repassant devant chaque demi-seconde : la fenetre de l'emulateur
@@ -188,6 +191,8 @@ public sealed class WorldScoringEcransService : IHostedService, IDisposable
                 if (suivi.PremierSignal is not null && EmulatorForeground.EmulateurDeJeuTourne(suivi.LanceALocal.AddSeconds(-1)))
                 {
                     arrive = true;
+                    suivi.Progression?.Finir(ProgressionDuLancement.Jeu);
+                    _journal?.LogInformation("World Scoring : le jeu est la ({Etapes}).", suivi.Progression?.Resume() ?? "");
                     break;
                 }
 

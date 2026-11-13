@@ -32,6 +32,7 @@ public sealed partial class LeaderboardOverlayService
     /// Ce que l'ecran de lancement montre. <c>Cle</c> designe la rencontre : une autre cle relance l'entree. <c>DepartUtc</c> :
     /// le depart est donne (« A VOUS DE JOUER ! »). <c>Etape</c> : 1 pendant la synchronisation, 2 quand tout le monde est pret.
     /// <c>Fiche</c> : la preparation d'une epreuve en solo, a la place des joueurs (CDC du panneau, §8.1).
+    /// <c>Progression</c> : les etapes reelles du lancement, la barre discrete du bas (13/11) ; null, pas de barre.
     /// </summary>
     public sealed record EcranDeLancement(
         string Cle,
@@ -60,7 +61,8 @@ public sealed partial class LeaderboardOverlayService
         bool SortiePossible = false,
         IReadOnlyList<ChampDeFiche>? Fiche = null,
         string? Logo = null,
-        CarteDeLaCible? Cible = null);
+        CarteDeLaCible? Cible = null,
+        ProgressionDuLancement? Progression = null);
 
     /// <summary>
     /// LE SCORE A BATTRE DU WORLD SCORING (P-D7, 10/11) : la carte de droite, face au joueur, a la place de l'adversaire du VS.
@@ -300,6 +302,12 @@ public sealed partial class LeaderboardOverlayService
                 if ((l.AttenteLongue || l.SortiePossible) && l.DepartUtc is null)
                 {
                     DessinerLesBoutonsDuLancement(g, l, famille, secours, k);
+                }
+
+                // La barre du bas tant que le jeu n'est pas parti : elle s'en va avec « A TOI ! ».
+                if (depuisLeDepart < 0 && l.Progression is { } progression)
+                {
+                    DessinerLaBarreDuLancement(g, progression, secours, t);
                 }
 
                 if (depuisLeDepart >= 0)
@@ -918,7 +926,31 @@ public sealed partial class LeaderboardOverlayService
             }
         }
 
-        // ── En bas : le conseil, les etapes, les boutons ─────────────────────
+        // ── En bas : le conseil, les etapes, les boutons, la barre ─────────────────────
+
+        private ProgressionDuLancement? _progressionDessinee;
+        private double _partDessinee;
+        private double _barreDessineeA;
+
+        /// <summary>
+        /// La barre discrete du bas (13/11) : l'etape en cours, en anglais, et la part des etapes finies. La part montree rejoint
+        /// la vraie en quelques images, sans jamais la depasser ; l'apercu montre la vraie.
+        /// </summary>
+        private void DessinerLaBarreDuLancement(Graphics g, ProgressionDuLancement progression, Font secours, double t)
+        {
+            var vue = progression.Lire();
+            if (!ReferenceEquals(progression, _progressionDessinee))
+            {
+                _progressionDessinee = progression;
+                _partDessinee = vue.Part;
+                _barreDessineeA = t;
+            }
+
+            _partDessinee = _service._tempsDApercu is not null ? vue.Part : BarreDeLancement.Lisser(_partDessinee, vue.Part, t - _barreDessineeA);
+            _barreDessineeA = t;
+            using var police = TraitsDesEcrans.Libelles(16, secours);
+            BarreDeLancement.Dessiner(g, vue, _partDessinee, BarreDeLancement.ZoneDesEcrans, police, BarreDeLancement.DesEcrans, Entre(t, 0.3, 0.6), t);
+        }
 
         private void DessinerLeConseil(Graphics g, EcranDeLancement l, FontFamily famille, Font secours, double t)
         {
