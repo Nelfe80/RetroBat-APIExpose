@@ -514,6 +514,17 @@ builder.Services.AddSingleton<RetroBat.Api.Multiplayer.SonDEmulationStation>();
 // Le lancement d'une partie MULTIPLAYER sur l'ordre de la plateforme : hote ou invite, coeur impose (lot M4).
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerLaunchService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerLaunchService>());
+// LE VOCAL DISCORD DES PARTIES MULTIPLAYER (lot B, 12/11) : NelfePlay-VocalRoom.exe, lance seulement pour une session vocale
+// autorisee par le site, pilote sur un named pipe ; le coordinateur suit le cycle (lancement, ecran de fin, detach). Le
+// processus est enregistre AVANT le coordinateur : a l'arret, le coordinateur part d'abord (leave au site), puis l'exe.
+builder.Services.AddSingleton<RetroBat.Api.VocalRoom.IVocalRoomLanceur, RetroBat.Api.VocalRoom.VocalRoomLanceur>();
+builder.Services.AddSingleton<RetroBat.Api.VocalRoom.VocalRoomProcessService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.VocalRoom.VocalRoomProcessService>());
+builder.Services.AddSingleton<RetroBat.Api.VocalRoom.VocalRoomSiteClient>();
+builder.Services.AddSingleton<RetroBat.Api.VocalRoom.VocalRoomCoordinator>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.VocalRoom.VocalRoomCoordinator>());
+// Rich Presence Discord (CDC §11 bis, lot H avance a la demande du user) : SQUELETTE DESACTIVE, RetroArch garde la presence.
+builder.Services.AddSingleton<RetroBat.Api.VocalRoom.DiscordPresenceCoordinator>();
 // Dans World Scoring, notre coeur fonctionnel ; dans le systeme du jeu, le choix de confort du joueur.
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.PartieNelfePlayService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.PartieNelfePlayService>());
@@ -802,6 +813,10 @@ var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
     var silence = app.Services.GetRequiredService<RetroBat.Api.Deck.DeckSilence>();
     app.Services.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>().Silence = silence;
     app.Services.GetRequiredService<RetroBat.Api.Infrastructure.LiveContestOverlayService>().Silence = silence;
+    // Le vocal : l'ecran de fin le tient (§9.2), la touche Y du panneau le regle, l'indicateur se dessine en direct (jamais
+    // dans les cartes du film).
+    var vocal = app.Services.GetRequiredService<RetroBat.Api.VocalRoom.VocalRoomCoordinator>();
+    app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerPanelService>().Vocal = vocal;
 }
 // RetroArch muet pour une partie lancee par NelfePlay (11/11) : les messages de NelfePlay passent par ce bandeau.
 RetroBat.Api.Infrastructure.NotificationsRetroArch.Bandeau = app.Services.GetService<RetroBat.Api.Infrastructure.LiveContestOverlayService>();

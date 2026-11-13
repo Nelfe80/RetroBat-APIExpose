@@ -105,6 +105,25 @@ public sealed partial class LeaderboardOverlayService
 
     private ContenuMultiplayer? _multiplayer;
 
+    /// <summary>
+    /// L'INDICATEUR DU VOCAL DISCORD (lot B, CDC NelfeVoice §10, 12/11) : lu au moment du dessin, sur la fenetre en direct
+    /// seulement. Les apercus et les cartes du film (<see cref="ApercuMultiplayer"/>) creent leur propre service, sans lui :
+    /// l'etat du vocal prive ne part jamais dans une video publique.
+    /// </summary>
+    public Func<VoixADessiner?>? VocalEnDirect { get; set; }
+
+    /// <summary>Une pastille en haut a droite : son texte, sa teinte (hexadecimal), et l'aide de la touche Y.</summary>
+    public sealed record VoixADessiner(string Texte, string Teinte, string Aide);
+
+    /// <summary>L'etat du vocal a change : la fenetre se redessine si elle montre MULTIPLAYER.</summary>
+    public void RedessinerLeVocal()
+    {
+        if (AfficheMultiplayer)
+        {
+            _forme?.Rafraichir();
+        }
+    }
+
     /// <summary>Le panneau montre-t-il MULTIPLAYER ?</summary>
     public bool AfficheMultiplayer
     {
@@ -247,6 +266,44 @@ public sealed partial class LeaderboardOverlayService
             }
 
             DessinerLAide(g, socle with { Aides = c.Aides, Pseudo = c.Pseudo, EnLigne = c.EnLigne }, s, policePied, taillePied, basDeLAide + tailleTexte * 1.9f);
+        }
+
+        /// <summary>
+        /// LA PASTILLE DU VOCAL (lot B) : en haut a droite, par-dessus le panneau, l'ecran de lancement ou l'ecran de fin ;
+        /// discrete, jamais modale. L'aide de Y dessous, en plus petit.
+        /// </summary>
+        private void DessinerLeVocal(Graphics g, VoixADessiner voix, Font policePetite, float taillePetite)
+        {
+            using var format = new StringFormat(StringFormat.GenericTypographic);
+            var marge = _largeurEcran * 0.012f;
+            var largeurDuTexte = g.MeasureString(voix.Texte, policePetite, PointF.Empty, format).Width;
+            var hauteur = taillePetite * 1.7f;
+            var pastille = new RectangleF(Width - marge - largeurDuTexte - hauteur * 1.4f, marge, largeurDuTexte + hauteur * 1.4f, hauteur);
+            using (var contour = Arrondi(pastille, hauteur / 2f))
+            using (var fond = new SolidBrush(Color.FromArgb(170, 8, 10, 14)))
+            using (var bord = new Pen(Teinte(voix.Teinte), Math.Max(1f, taillePetite * 0.08f)))
+            {
+                g.FillPath(fond, contour);
+                g.DrawPath(bord, contour);
+            }
+
+            var point = hauteur * 0.32f;
+            using (var pinceau = new SolidBrush(Teinte(voix.Teinte)))
+            {
+                g.FillEllipse(pinceau, pastille.X + hauteur * 0.4f, pastille.Y + (hauteur - point) / 2f, point, point);
+            }
+
+            using (var encre = new SolidBrush(Color.FromArgb(235, 240, 244, 250)))
+            {
+                g.DrawString(voix.Texte, policePetite, encre, pastille.X + hauteur * 0.95f, pastille.Y + (hauteur - taillePetite * 1.15f) / 2f, format);
+            }
+
+            if (voix.Aide.Length > 0)
+            {
+                using var aide = new SolidBrush(Color.FromArgb(190, 240, 244, 250));
+                var largeurDeLAide = g.MeasureString(voix.Aide, policePetite, PointF.Empty, format).Width;
+                g.DrawString(voix.Aide, policePetite, aide, Width - marge - largeurDeLAide, pastille.Bottom + taillePetite * 0.25f, format);
+            }
         }
 
         /// <summary>
@@ -1446,7 +1503,7 @@ public sealed partial class LeaderboardOverlayService
     /// sans borne devant soi). Aucune fenetre n'est montree. <paramref name="attente"/> dessine la presentation.
     /// </summary>
     internal static byte[] ApercuMultiplayer(EsMenuStyle style, ContenuMultiplayer contenu, string attente, string attenteTitre,
-        string attenteDetail, ILogger<LeaderboardOverlayService> logger, double? temps = null, double? depart = null)
+        string attenteDetail, ILogger<LeaderboardOverlayService> logger, double? temps = null, double? depart = null, VoixADessiner? vocal = null)
     {
         byte[] png = [];
         Exception? erreur = null;
@@ -1460,6 +1517,8 @@ public sealed partial class LeaderboardOverlayService
                 service._multiplayer = contenu;
                 service._tempsDApercu = temps;
                 service._tempsDuDepartDApercu = depart;
+                // La pastille du vocal n'est dessinee qu'a la demande de l'outil de mise au point (jamais dans les cartes du film).
+                service.VocalEnDirect = vocal is null ? null : () => vocal;
                 service._glyphes = new EsGlyphCache(style, logger);
                 service.ChargerLesPolices(style);
                 using var forme = new Panneau(service);

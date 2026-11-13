@@ -610,6 +610,7 @@ public sealed partial class MultiplayerPanelService
     /// <summary>Fermer sans quitter : le jeu reste dans « Votre selection » (V24-09).</summary>
     public void Fermer()
     {
+        FinDuResultatPourLeVocal(Interlocked.Exchange(ref _raisonDeFermeture, null) ?? "ok");
         OublierLeLancement();
         lock (_verrou)
         {
@@ -652,6 +653,7 @@ public sealed partial class MultiplayerPanelService
         if (resultat)
         {
             _journal.LogInformation("MULTIPLAYER : le resultat perd la manette, il se ferme.");
+            _raisonDeFermeture = "lost";
             Fermer();
             return;
         }
@@ -671,6 +673,7 @@ public sealed partial class MultiplayerPanelService
             return;
         }
 
+        FinDuResultatPourLeVocal("lost");
         OublierLeLancement();
         lock (_verrou)
         {
@@ -706,6 +709,7 @@ public sealed partial class MultiplayerPanelService
     /// </summary>
     public void AnnoncerLeLancement(MultiplayerRoom room, MultiplayerInstalledGame? jeu, bool tenir = false)
     {
+        FinDuResultatPourLeVocal("replay");
         var langue = Langue();
         bool deja;
         lock (_verrou)
@@ -787,7 +791,14 @@ public sealed partial class MultiplayerPanelService
                 _dureeDuResultat = dureeSecondes;
                 _resultatDepuis = DateTime.UtcNow;
                 _resultatALaMain = false;
+                _vocalPrevenu = false;
                 _modele.Fermer();
+            }
+
+            // LE VOCAL RESTE PENDANT L'ECRAN DE FIN (CDC NelfeVoice §9.2) : le site compte les joueurs encore devant.
+            if (Vocal is { } vocal)
+            {
+                _ = vocal.EcranDeFinMontreAsync(room);
             }
 
             // EN PLEIN ECRAN, JUSQU'A OK (retour du user du 23/10). Le resultat parait des que le coeur est decharge, souvent
@@ -1012,6 +1023,10 @@ public sealed partial class MultiplayerPanelService
             if (_mode == Mode.Resultat)
             {
                 effet = ResultatGarde() ? MultiplayerPanelModel.Effet.Fermer : MultiplayerPanelModel.Effet.Rien;
+                if (effet == MultiplayerPanelModel.Effet.Fermer)
+                {
+                    _raisonDeFermeture = "cancel";
+                }
             }
             else if (_mode == Mode.Panneau)
             {
@@ -1139,6 +1154,7 @@ public sealed partial class MultiplayerPanelService
 
     private async Task RejouerAsync()
     {
+        FinDuResultatPourLeVocal("replay");
         var jeu = _jeu;
         if (jeu is null)
         {
@@ -2424,6 +2440,110 @@ public sealed partial class MultiplayerPanelService
         }
 
         return _langue;
+    }
+
+    // ── le vocal Discord (lot B, 12/11) ────────────────────────────────────────────────────────────
+
+    private RetroBat.Api.VocalRoom.VocalRoomCoordinator? _vocal;
+
+    /// <summary>La raison de la prochaine fermeture du resultat (<c>cancel</c>, <c>lost</c>) ; <c>ok</c> par defaut.</summary>
+    private string? _raisonDeFermeture;
+
+    /// <summary>Le vocal a-t-il deja su la fin de ce resultat ? (une fois par ecran de fin)</summary>
+    private bool _vocalPrevenu;
+
+    private DateTime? _yDepuis;
+
+    /// <summary>
+    /// LE VOCAL DISCORD DES PARTIES (CDC NelfeVoice §9.2, §10) : l'ecran de fin le tient, la touche Y le regle, la pastille
+    /// en haut a droite le montre (fenetre en direct seulement). Pose au demarrage (Program.cs).
+    /// </summary>
+    public RetroBat.Api.VocalRoom.VocalRoomCoordinator? Vocal
+    {
+        get => _vocal;
+        set
+        {
+            _vocal = value;
+            if (value is null)
+            {
+                _overlay.VocalEnDirect = null;
+                return;
+            }
+
+            _overlay.VocalEnDirect = () => VoixADessiner(value.Affichage);
+            value.AffichageChange += _overlay.RedessinerLeVocal;
+        }
+    }
+
+    /// <summary>L'ecran de fin se ferme : le vocal le dit au site (stats closed), une fois.</summary>
+    private void FinDuResultatPourLeVocal(string raison)
+    {
+        string room;
+        lock (_verrou)
+        {
+            if (_mode != Mode.Resultat || _vocalPrevenu)
+            {
+                return;
+            }
+
+            _vocalPrevenu = true;
+            room = _roomDuResultat;
+        }
+
+        if (room.Length > 0 && Vocal is { } vocal)
+        {
+            _ = vocal.EcranDeFinFermeAsync(room, raison);
+        }
+    }
+
+    /// <summary>
+    /// LA TOUCHE Y (vocal) : courte, rejoindre le vocal propose ou couper/rouvrir le micro ; maintenue, couper/rendre le son
+    /// du vocal (casque). Sans session vocale, rien.
+    /// </summary>
+    public void GesteVocal(bool appuye)
+    {
+        if (Vocal is not { } vocal)
+        {
+            return;
+        }
+
+        bool maintenu;
+        lock (_verrou)
+        {
+            if (appuye)
+            {
+                _yDepuis = DateTime.UtcNow;
+                return;
+            }
+
+            maintenu = Maintenu(_yDepuis);
+            _yDepuis = null;
+        }
+
+        _ = vocal.GesteAsync(maintenu);
+    }
+
+    /// <summary>Le texte et la teinte de la pastille du vocal, dans la langue de la borne (anglais par defaut).</summary>
+    private LeaderboardOverlayService.VoixADessiner? VoixADessiner(RetroBat.Api.VocalRoom.VoixAffichee? voix)
+    {
+        if (voix is null)
+        {
+            return null;
+        }
+
+        var reglages = (voix.MicroCoupe ? "  ·  " + Texte("multiplayer.voice.mic_off", "MIC OFF") : string.Empty)
+            + (voix.CasqueCoupe ? "  ·  " + Texte("multiplayer.voice.sound_off", "SOUND OFF") : string.Empty);
+        var aideReglages = Texte("multiplayer.voice.help_controls", "Y: MIC  ·  HOLD Y: SOUND");
+        return voix.Etat switch
+        {
+            RetroBat.Api.VocalRoom.EtatDeLaVoix.Propose => new(Texte("multiplayer.voice.offer", "VOICE CHAT AVAILABLE"), "A98BFF",
+                Texte("multiplayer.voice.help_join", "Y: JOIN VOICE CHAT")),
+            RetroBat.Api.VocalRoom.EtatDeLaVoix.Connexion => new(Texte("multiplayer.voice.connecting", "VOICE: CONNECTING…") + reglages, "FFD37A", string.Empty),
+            RetroBat.Api.VocalRoom.EtatDeLaVoix.Pret => new(Texte("multiplayer.voice.ready", "VOICE: READY") + reglages, "FFD37A", aideReglages),
+            RetroBat.Api.VocalRoom.EtatDeLaVoix.Connecte => new(Texte("multiplayer.voice.connected", "VOICE: CONNECTED")
+                + (voix.Participants > 0 ? " · " + voix.Participants.ToString(CultureInfo.InvariantCulture) : string.Empty) + reglages, "78E5A3", aideReglages),
+            _ => new(Texte("multiplayer.voice.unavailable", "VOICE UNAVAILABLE"), "B8C7D9", string.Empty),
+        };
     }
 
     /// <summary>Un texte de l'interface dans la langue d'ES, ou `parDefaut` si le dictionnaire ne l'a pas encore.</summary>
