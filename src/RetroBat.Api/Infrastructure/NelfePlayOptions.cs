@@ -53,6 +53,9 @@ public sealed class NelfePlayOptions
     /// <summary>Decouverte silencieuse du scoring : voir <see cref="ScoringDiscoveryOptions"/>.</summary>
     public ScoringDiscoveryOptions ScoringDiscovery { get; set; } = new();
 
+    /// <summary>Le vocal Discord des parties MULTIPLAYER (NelfePlay-VocalRoom.exe) : voir <see cref="RetroBat.Api.VocalRoom.VocalRoomOptions"/>.</summary>
+    public RetroBat.Api.VocalRoom.VocalRoomOptions Voice { get; set; } = new();
+
     /// <summary>
     /// Forcer la certification : avant un jeu ouvert au scoring, la borne applique les reglages
     /// certifies publies par son profil (difficulte, vies, vitesse, cheats), au lieu de laisser le

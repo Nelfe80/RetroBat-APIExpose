@@ -248,7 +248,9 @@ public sealed class SelfUpdateService
             if (o.ValueKind != JsonValueKind.Object) continue;
             string Texte(string cle) => o.TryGetProperty(cle, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : "";
             var fichier = OutilsHorsArchive.FirstOrDefault(connu => string.Equals(connu, Texte("fichier"), StringComparison.OrdinalIgnoreCase))
-                ?? FichierDuPlayerDeck(Texte("fichier"));
+                ?? FichierDuPlayerDeck(Texte("fichier"))
+                // LE VOCAL DISCORD (lot B, 12/11) : l'exe, la DLL du SDK, ses notices et Krisp, a la racine, par leur nom.
+                ?? RetroBat.Api.VocalRoom.VocalRoomFichiers.FichierDuVocal(Texte("fichier"));
             var sha = Texte("sha256").ToLowerInvariant();
             var url = Texte("url");
             var taille = o.TryGetProperty("taille", out var t) && t.ValueKind == JsonValueKind.Number && t.TryGetInt64(out var n) ? n : 0;
@@ -318,6 +320,24 @@ public sealed class SelfUpdateService
             }
         }
 
+        // LE LOT DU VOCAL (lot B, 12/11 ; CDC NelfeVoice §5) : l'exe, discord_partner_sdk.dll, ses notices et Krisp se posent
+        // ENSEMBLE, jamais pendant que l'exe tourne (il tient la DLL du SDK : une session vocale est en cours). Tout est
+        // telecharge d'abord ; un seul echec, et rien n'est pose : l'ancien lot reste entier.
+        var vocaux = aPoser.Where(o => RetroBat.Api.VocalRoom.VocalRoomFichiers.EstDuVocal(o.Fichier)).ToList();
+        if (vocaux.Count > 0)
+        {
+            aPoser.RemoveAll(o => RetroBat.Api.VocalRoom.VocalRoomFichiers.EstDuVocal(o.Fichier));
+            if (DecisionDuVocal(LeVocalTourne(), sessionVocale: false) == DecisionVocal.Remettre)
+            {
+                remis = true;
+                _logger.LogInformation("Vocal : mise a jour remise a la fin de la session vocale.");
+            }
+            else
+            {
+                await PoserLeLotDuVocalAsync(client, vocaux, ct).ConfigureAwait(false);
+            }
+        }
+
         foreach (var outil in aPoser)
         {
             var cible = Path.Combine(RetroBatPaths.PluginRoot, outil.Fichier);
@@ -362,6 +382,59 @@ public sealed class SelfUpdateService
     }
 
     public enum DecisionDeck { Poser, ArreterPuisPoser, Remettre }
+
+    public enum DecisionVocal { Poser, Remettre }
+
+    /// <summary>
+    /// Le lot du vocal se pose-t-il maintenant ? Jamais sous une session vocale ni pendant que l'exe tourne : il tient la DLL
+    /// du SDK et l'appel des joueurs. Pur.
+    /// </summary>
+    internal static DecisionVocal DecisionDuVocal(bool exeOuvert, bool sessionVocale)
+        => exeOuvert || sessionVocale ? DecisionVocal.Remettre : DecisionVocal.Poser;
+
+    private static bool LeVocalTourne()
+    {
+        var p = Process.GetProcessesByName(RetroBat.Api.VocalRoom.VocalRoomFichiers.Processus);
+        foreach (var x in p) x.Dispose();
+        return p.Length > 0;
+    }
+
+    /// <summary>Telecharge tout le lot du vocal, puis le pose en entier ; au premier echec, rien n'est pose.</summary>
+    private async Task PoserLeLotDuVocalAsync(HttpClient client, IReadOnlyList<OutilPublie> lot, CancellationToken ct)
+    {
+        var partiels = new List<(OutilPublie Outil, string Partiel)>();
+        try
+        {
+            foreach (var outil in lot)
+            {
+                var partiel = Path.Combine(RetroBatPaths.PluginRoot, ".temp", "outils", outil.Fichier + ".part");
+                Directory.CreateDirectory(Path.GetDirectoryName(partiel)!);
+                partiels.Add((outil, partiel));
+                await TelechargerAsync(client, outil, partiel, ct).ConfigureAwait(false);
+            }
+
+            foreach (var (outil, partiel) in partiels)
+            {
+                Poser(partiel, Path.Combine(RetroBatPaths.PluginRoot, outil.Fichier));
+                _logger.LogInformation("Vocal : {Outil} mis a jour : {Version}.", outil.Fichier, outil.Version);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning("Vocal : lot {Version} pas mis a jour, l'ancien reste ({Erreur}).", lot[0].Version, ex.Message);
+        }
+        finally
+        {
+            foreach (var (_, partiel) in partiels)
+            {
+                try { File.Delete(partiel); } catch { }
+            }
+        }
+    }
 
     /// <summary>Que faire des fichiers du Deck : les poser, arreter le Deck d'abord, ou attendre la fin de la partie. Pur.</summary>
     internal static DecisionDeck DecisionDuDeck(bool deckTourne, bool partieEnCours)

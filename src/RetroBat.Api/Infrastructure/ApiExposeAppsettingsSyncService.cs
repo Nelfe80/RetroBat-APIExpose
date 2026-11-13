@@ -174,6 +174,9 @@ public sealed class ApiExposeAppsettingsSyncService
             ["global.apiexpose.nelfeplay.show_multiplayer_collection"] = Bool("NelfePlay", "ShowMultiplayerCollection"),
             // La collection « NELFEPLAY CHALLENGES & SPEEDRUNS », dans GAME EVENTS MANAGER ; visible par defaut.
             ["global.apiexpose.nelfeplay.show_challenges_collection"] = Bool("NelfePlay", "ShowChallengesCollection"),
+            // Le vocal Discord des parties MULTIPLAYER (lot B, 12/11) : allume par defaut ; sans liaison ni consentement sur
+            // le site il ne se passe rien. L'entree du menu d'ES reste a poser (config-ESmenus du Data Pack).
+            ["global.apiexpose.nelfeplay.voice_chat"] = Bool("NelfePlay", "Voice", "Enabled"),
             // Bouton maitre des surfaces NelfePlay. Pas d'entree de menu : aujourd'hui il ne
             // coupe que la collection, et un interrupteur qui promet plus qu'il ne fait est un
             // mensonge. Il reste reglable dans appsettings et se synchronise si la cle existe.

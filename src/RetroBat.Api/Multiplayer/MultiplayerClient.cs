@@ -321,6 +321,13 @@ public sealed record MultiplayerRoom
 
     [JsonPropertyName("ended")]
     public MultiplayerFin? Ended { get; init; }
+
+    /// <summary>
+    /// LE VOCAL (lot B, contrat site §7, 12/11) : l'etat vocal de cette borne pour cette room, sans jeton ; null d'un site
+    /// sans vocal ou d'une room sans lobby. Jamais republie sur le bus (voir <see cref="MultiplayerEtat.SansSecrets"/>).
+    /// </summary>
+    [JsonPropertyName("voice")]
+    public RetroBat.Api.VocalRoom.MultiplayerVoix? Voice { get; init; }
 }
 
 public sealed record MultiplayerJoueur
