@@ -10,7 +10,7 @@ Installation pas-à-pas, tous les menus et options expliqués, médias, packs de
 
 ## ⬇ Installation rapide
 
-1. Téléchargez et lancez **[`APIExpose-Cabinet-Setup.exe`](https://github.com/Nelfe80/RetroBat-APIExpose/releases/latest/download/APIExpose-Cabinet-Setup.exe)** : il installe le plugin dans `RetroBat\plugins\APIExpose\` et enregistre le hook de démarrage EmulationStation.
+1. Téléchargez et lancez **[`APIExpose-Cabinet-Setup.exe`](https://nelfeplay.com/download/apiexpose)** : il installe le plugin dans `RetroBat\plugins\APIExpose\` et enregistre le hook de démarrage EmulationStation.
 2. Relancez RetroBat : APIExpose démarre automatiquement.
 
 Vérification : `http://127.0.0.1:12345/api/v1/health` doit répondre `healthy`.
@@ -37,7 +37,7 @@ Usage personnel et non commercial libre. Toute utilisation commerciale nécessit
 
 ## ⬇ Quick install
 
-1. Download and run **[`APIExpose-Cabinet-Setup.exe`](https://github.com/Nelfe80/RetroBat-APIExpose/releases/latest/download/APIExpose-Cabinet-Setup.exe)**: it installs the plugin into `RetroBat\plugins\APIExpose\` and registers the EmulationStation start hook.
+1. Download and run **[`APIExpose-Cabinet-Setup.exe`](https://nelfeplay.com/download/apiexpose)**: it installs the plugin into `RetroBat\plugins\APIExpose\` and registers the EmulationStation start hook.
 2. Start RetroBat: APIExpose starts automatically.
 
 Check: `http://127.0.0.1:12345/api/v1/health` should answer `healthy`.
