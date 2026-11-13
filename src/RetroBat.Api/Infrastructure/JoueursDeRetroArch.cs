@@ -114,6 +114,20 @@ public static class JoueursDeRetroArch
         return parJoueur.Count == 0 ? null : new Attribution(pilote!, parJoueur);
     }
 
+    /// <summary>
+    /// La ligne de commande d'un lancement dans le journal du lanceur : « [Startup] "...emulatorLauncher.exe" ... -system ... ».
+    /// PAS « [Startup] EmulatorLauncher.exe version : ... », ecrite juste apres a chaque lancement (essai du 13/11 : la
+    /// premiere version prenait cette ligne-la et ne trouvait aucune manette).
+    /// </summary>
+    public static bool EstUneLigneDeLancement(string ligne)
+        => ligne.Contains("[Startup]", StringComparison.Ordinal)
+           && ligne.Contains("emulatorLauncher.exe", StringComparison.OrdinalIgnoreCase)
+           && ligne.Contains(" -system ", StringComparison.Ordinal);
+
+    /// <summary>La derniere ligne de commande du journal du lanceur, lu par la fin ; null s'il n'y en a pas.</summary>
+    public static string? DernierLancement(string journal)
+        => EsLaunchArguments.LancementsDepuisLaFin(journal, filtre: EstUneLigneDeLancement).FirstOrDefault();
+
     /// <summary>L'heure (locale) en tete d'une ligne du journal du lanceur, « 2026-11-13 21:34:12.657 [INFO] ... ».</summary>
     public static DateTime? HeureDeLaLigne(string ligne)
         => ligne is { Length: >= 23 }
@@ -129,7 +143,7 @@ public static class JoueursDeRetroArch
     public static Attribution? LireDuLancement(DateTime depuis, out string raison)
     {
         var journal = Path.Combine(RetroBatPaths.RetroBatRoot, "emulationstation", "emulatorLauncher.log");
-        var ligne = EsLaunchArguments.LancementsDepuisLaFin(journal).FirstOrDefault();
+        var ligne = DernierLancement(journal);
         if (ligne is null)
         {
             raison = "aucun lancement dans le journal du lanceur";
