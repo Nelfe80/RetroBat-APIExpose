@@ -20,6 +20,7 @@ if not exist "RetroBat.Api.exe" (
 taskkill /f /im RetroBat.Api.exe >nul 2>&1
 taskkill /f /im NelfePlay.LiveStreaming.exe >nul 2>&1
 taskkill /f /im NelfePlay.PlayerDeck.exe >nul 2>&1
+taskkill /f /im NelfePlay-VocalRoom.exe >nul 2>&1
 echo Nettoyage d'APIExpose...
 "RetroBat.Api.exe" --desinstaller
 if exist "unins000.exe" (

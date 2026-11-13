@@ -91,6 +91,16 @@ english.ActionFermerES=Close RetroBat (EmulationStation) before uninstalling API
 english.ActionFait=APIExpose is uninstalled from %1.%n%nMedia, the cabinet identity and replays stay in plugins\APIExpose.%nLog: %2
 english.ActionEchec=The uninstall could not be done: %1.
 
+; LE VOCAL DISCORD (NelfePlay-VocalRoom, lot F prepare le 12/11) : l'exe, discord_partner_sdk.dll, ses notices et Krisp, a
+; la racine. Ils ne partent dans l'installeur qu'avec /DAvecVocalRoom (ISCC /DAvecVocalRoom installer\CabinetSetup.iss),
+; comme dans les archives avec release.ps1 -AvecVocalRoom : sinon, des fichiers d'essai a la racine de la machine qui
+; compile partiraient chez tout le monde.
+#ifdef AvecVocalRoom
+  #define ExclusDuVocal ""
+#else
+  #define ExclusDuVocal ",\NelfePlay-VocalRoom.exe,\discord_partner_sdk.dll,\Discord-Social-SDK-License-Notices.txt,\discord_krisp.dll,\krisp-*.kef"
+#endif
+
 [Files]
 ; APIExpose COMPLET (= contenu de full.7z) : moteur + .installer (hooks ES) +
 ; resources (packs gamelist « Data Pack » + lighting) + wrapper + tools utilisés
@@ -102,7 +112,7 @@ english.ActionEchec=The uninstall could not be done: %1.
 ; Les scripts .ps1/.py de tools/ sont de l'outillage interne (curation, exploitation,
 ; sondes) : ni le runtime ni l'utilisateur n'en a besoin, et ils ne sont pas publics.
 Source: "..\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; \
-    Excludes: "\src\*,\tests\*,\docs\*,\wiki\*,\media\*,\state\*,\artifacts\*,\dist\*,\installer\*,\.git\*,\.git,\.gitattributes,\.github\*,\.log\*,\.temp\*,\.cache\*,\.archive\*,\.versioning\*,\site\*,\package-installer\*,\projects-source\*,\resources\outputs\*,\resources\panels\*,\resources\gamelist\localized\*,\resources\gamelist\media-sidecar\*,\resources\controls\retroarch\mame\*,\resources\ra\*,\resources\ram\.user\*,\resources\history\history.db,\resources\colors\colors.ini,\resources\command\command.dat,\tools\mem-curator\*,\tools\libretro-probe\*,\.env,\wrapper\.env,\wrapper\certified.txt,\events.ini,\appsettings.json,\mkdocs.yml,\build.bat,\release.ps1,\CabinetSetup.iss,\publish-tmp\*,\panel_curator*,\profiles_db*,*.log,*.pdb,*.g.cs,__pycache__\*,*.pyc,*.ps1,*.py,*.bak,*.avant-*,ScreenScraper.html,\tools\retroarch-nelfeplay\*,\tools\ffmpeg\*,\tools\translateLocally\*.exe,\tools\translateLocally\models\*,\tools\playerdeck\PlayerDeck.ini,\tools\playerdeck\decks\*,*.old"
+    Excludes: "\src\*,\tests\*,\docs\*,\wiki\*,\media\*,\state\*,\artifacts\*,\dist\*,\installer\*,\.git\*,\.git,\.gitattributes,\.github\*,\.log\*,\.temp\*,\.cache\*,\.archive\*,\.versioning\*,\site\*,\package-installer\*,\projects-source\*,\resources\outputs\*,\resources\panels\*,\resources\gamelist\localized\*,\resources\gamelist\media-sidecar\*,\resources\controls\retroarch\mame\*,\resources\ra\*,\resources\ram\.user\*,\resources\history\history.db,\resources\colors\colors.ini,\resources\command\command.dat,\tools\mem-curator\*,\tools\libretro-probe\*,\.env,\wrapper\.env,\wrapper\certified.txt,\events.ini,\appsettings.json,\mkdocs.yml,\build.bat,\release.ps1,\CabinetSetup.iss,\publish-tmp\*,\panel_curator*,\profiles_db*,*.log,*.pdb,*.g.cs,__pycache__\*,*.pyc,*.ps1,*.py,*.bak,*.avant-*,ScreenScraper.html,\tools\retroarch-nelfeplay\*,\tools\ffmpeg\*,\tools\translateLocally\*.exe,\tools\translateLocally\models\*,\tools\playerdeck\PlayerDeck.ini,\tools\playerdeck\decks\*,*.old{#ExclusDuVocal}"
 ; L'etat de la borne n'est JAMAIS ecrase : ni appsettings.json (cle API, options), ni
 ; wrapper\.env (drapeaux DISCOVERY et PERSO - PERSO=1 = test de .MEM perso en cours ;
 ; APIExpose recree ce fichier au demarrage). Meme regle que l'archive .7z.
@@ -145,6 +155,8 @@ Filename: "taskkill"; Parameters: "/f /im {#AppExe}"; Flags: runhidden; RunOnceI
 Filename: "taskkill"; Parameters: "/f /im RetroBat.ApiConnect.exe"; Flags: runhidden; RunOnceId: "StopApiConnect"
 ; Le PlayerDeck (tools\playerdeck) tient son exe et ses polices tant qu'il tourne.
 Filename: "taskkill"; Parameters: "/f /im NelfePlay.PlayerDeck.exe"; Flags: runhidden; RunOnceId: "StopPlayerDeck"
+; Le vocal Discord tient discord_partner_sdk.dll tant qu'il tourne (sans l'API, il s'arrete seul en 2 s).
+Filename: "taskkill"; Parameters: "/f /im NelfePlay-VocalRoom.exe"; Flags: runhidden; RunOnceId: "StopVocalRoom"
 ; LA DESINSTALLATION PROPRE (2026-10-17) : avant que les fichiers partent, l'exe retire la collection World Scoring, ses
 ; images, les reglages d'APIExpose dans ES, ses dossiers dans les themes et les donnees du dossier ; il garde media,
 ; l'identite de la borne et les replays (src/RetroBat.Api/Infrastructure/Desinstallation.cs).
@@ -208,6 +220,18 @@ begin
   Result := '';
   if Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /im NelfePlay.PlayerDeck.exe', '', SW_HIDE, ewWaitUntilTerminated, Code) then
     Log('PlayerDeck : taskkill, code ' + IntToStr(Code));
+end;
+
+// LE VOCAL DISCORD OUVERT (lot F prepare le 12/11) : NelfePlay-VocalRoom.exe tient discord_partner_sdk.dll (et Krisp) tant
+// qu'il tourne, la copie echouerait. On l'arrete ; l'API le relance a la prochaine session vocale.
+<event('PrepareToInstall')>
+function VocalRoomPrepareToInstall(var NeedsRestart: Boolean): String;
+var
+  Code: Integer;
+begin
+  Result := '';
+  if Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /im NelfePlay-VocalRoom.exe', '', SW_HIDE, ewWaitUntilTerminated, Code) then
+    Log('VocalRoom : taskkill, code ' + IntToStr(Code));
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -503,6 +527,7 @@ begin
   Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /im RetroBat.Api.exe', '', SW_HIDE, ewWaitUntilTerminated, Code);
   Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /im NelfePlay.LiveStreaming.exe', '', SW_HIDE, ewWaitUntilTerminated, Code);
   Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /im NelfePlay.PlayerDeck.exe', '', SW_HIDE, ewWaitUntilTerminated, Code);
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /im NelfePlay-VocalRoom.exe', '', SW_HIDE, ewWaitUntilTerminated, Code);
   try
     ExtractTemporaryFile('RetroBat.Api.exe');
   except

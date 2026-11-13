@@ -6,6 +6,15 @@
 #   .\release.ps1 -SansInstalleur  # publie sans l'installeur de borne (voir plus bas)
 #   .\release.ps1 -Rapide -Publish  # programme seul (update.7z) : les bornes a jour en deux minutes
 #   .\release.ps1 -PlayerDeck D:\chemin\bin   # prend le PlayerDeck ailleurs que dans ..\NelfePlay-PlayerDeck\bin
+#   .\release.ps1 -AvecVocalRoom [-VocalRoom D:\publish]   # livre le vocal Discord (NelfePlay-VocalRoom, lot F)
+#
+# LE VOCAL DISCORD (lot F, prepare le 12/11) : avec -AvecVocalRoom seulement, le script prend la publication Release du
+# depot prive NelfePlay-VocalRoom (par defaut <plugins>\NelfePlay-VocalRoom\src\NelfePlay.VocalRoom\bin\Release\
+# net8.0-windows\win-x64\publish) : NelfePlay-VocalRoom.exe, discord_partner_sdk.dll, Discord-Social-SDK-License-
+# Notices.txt et Krisp (discord_krisp.dll et ses modeles krisp-*.kef, voulus par le user le 12/11). Il les recopie a la
+# RACINE d'APIExpose (l'outil de diagnostic n'accepte qu'un nom sans chemin dans executables.manifest.json) et declare
+# chacun dans outils.json : les bornes posent le lot ENTIER (SelfUpdateService). Sans le commutateur, ces fichiers ne
+# partent dans aucune archive, meme s'ils trainent a la racine.
 #
 # LE PLAYERDECK (1.9.163) : le script le prend dans -PlayerDeck (par defaut <plugins>\NelfePlay-PlayerDeck\bin, la sortie
 # du depot prive NelfePlay-PlayerDeck : NelfePlay.PlayerDeck.exe, PlayerDeck.ini, themes\*.json, fonts\*.ttf et leurs
@@ -23,7 +32,9 @@ param(
     [switch]$PackageOnly,
     [switch]$SansInstalleur,
     [switch]$Rapide,
-    [string]$PlayerDeck = ''
+    [string]$PlayerDeck = '',
+    [switch]$AvecVocalRoom,
+    [string]$VocalRoom = ''
 )
 $ErrorActionPreference = 'Stop'
 $sz = @('C:\Program Files\7-Zip\7z.exe','C:\Program Files (x86)\7-Zip\7z.exe') | Where-Object { Test-Path $_ } | Select-Object -First 1
@@ -80,6 +91,48 @@ if (Test-Path -LiteralPath (Join-Path $PlayerDeck 'NelfePlay.PlayerDeck.exe')) {
     Write-Warning "PlayerDeck absent ($PlayerDeck) : la release part sans lui. -PlayerDeck <dossier> pour le donner."
     $versionDuDeck = ''
 }
+# ── LE VOCAL DISCORD (NelfePlay-VocalRoom) : -AvecVocalRoom seulement, recopie a la racine AVANT les archives ──────────
+$motifKrisp = '^krisp-[a-z0-9][a-z0-9-]*\.kef$'
+$fichiersDuVocal = @()
+$versionDuVocal = ''
+if ($AvecVocalRoom) {
+    if (-not $VocalRoom) { $VocalRoom = Join-Path $root 'NelfePlay-VocalRoom\src\NelfePlay.VocalRoom\bin\Release\net8.0-windows\win-x64\publish' }
+    $obligatoiresDuVocal = @('NelfePlay-VocalRoom.exe', 'discord_partner_sdk.dll', 'Discord-Social-SDK-License-Notices.txt')
+    foreach ($f in $obligatoiresDuVocal) {
+        if (-not (Test-Path -LiteralPath (Join-Path $VocalRoom $f))) { throw "VocalRoom : $f absent de $VocalRoom (construire le depot en Release)." }
+    }
+    $krisp = @(Get-ChildItem -LiteralPath $VocalRoom -File | Where-Object { $_.Name -eq 'discord_krisp.dll' -or $_.Name -match $motifKrisp } |
+        ForEach-Object { $_.Name })
+    if ($krisp.Count -eq 0) { Write-Warning "VocalRoom : Krisp absent de $VocalRoom, le vocal part sans reduction de bruit." }
+    elseif ($krisp -notcontains 'discord_krisp.dll') { throw "VocalRoom : modeles Krisp sans discord_krisp.dll dans $VocalRoom." }
+    # Les modeles Krisp qu'un SDK plus recent a retires ne restent pas a la racine.
+    Get-ChildItem -LiteralPath $PSScriptRoot -File -Filter 'krisp-*.kef' | Where-Object { $krisp -notcontains $_.Name } |
+        Remove-Item -Force -Confirm:$false
+    foreach ($f in @($obligatoiresDuVocal) + @($krisp)) {
+        $source = Join-Path $VocalRoom $f
+        $cible = Join-Path $PSScriptRoot $f
+        if (-not (Test-Path -LiteralPath $cible) -or (Get-FileHash -LiteralPath $cible).Hash -ne (Get-FileHash -LiteralPath $source).Hash) {
+            try {
+                Copy-Item -LiteralPath $source -Destination $cible -Force
+            } catch {
+                # Le vocal de cette machine tourne : son exe ne s'ecrase pas mais se renomme (comme SelfUpdateService.Poser).
+                Move-Item -LiteralPath $cible -Destination "$cible.old" -Force
+                Copy-Item -LiteralPath $source -Destination $cible -Force
+            }
+        }
+        $fichiersDuVocal += $f
+    }
+    $versionDuVocal = "$((Get-Item -LiteralPath (Join-Path $PSScriptRoot 'NelfePlay-VocalRoom.exe')).VersionInfo.ProductVersion)".Trim()
+    Write-Host "VocalRoom $versionDuVocal : $($fichiersDuVocal.Count) fichiers pris dans $VocalRoom (Krisp : $($krisp.Count) fichiers)."
+} else {
+    Write-Host 'VocalRoom : pas dans cette release (-AvecVocalRoom pour livrer le vocal Discord).'
+}
+# Sans le commutateur, aucun fichier du vocal ne part, meme s'il traine a la racine (machine de developpement).
+$exclusDuVocal = if ($AvecVocalRoom) { @() } else {
+    @("-x!$name\NelfePlay-VocalRoom.exe", "-x!$name\discord_partner_sdk.dll", "-x!$name\Discord-Social-SDK-License-Notices.txt",
+      "-x!$name\discord_krisp.dll", "-x!$name\krisp-*.kef")
+}
+
 $exe  = Join-Path $PSScriptRoot 'RetroBat.Api.exe'
 $verFull = (Get-Item $exe).VersionInfo.ProductVersion
 $ver = ($verFull -split '\+')[0]
@@ -175,6 +228,8 @@ $ex = @(
     # machine qui publie, et quiconque installait depuis le full.7z les recevait (2026-09-27).
     "-x!$name\appsettings.json"
 )
+# Le vocal Discord ne part qu'avec -AvecVocalRoom (voir plus haut) : ni dans le full.7z ni dans l'update.7z sans lui.
+$ex += $exclusDuVocal
 
 # LA CONFIGURATION LIVREE EST CELLE DU DEPOT, comme pour l'installeur : relue et commitee,
 # jamais celle de la borne qui publie. build-default-settings la tire de HEAD.
@@ -228,6 +283,9 @@ $outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.e
 # accepte par leur dossier et leur extension (FichierDuPlayerDeck), arrete le Deck avant de les poser hors partie, et ne
 # pose PlayerDeck.ini que s'il manque.
 $outilsHorsArchive = @($outilsHorsArchive) + @($fichiersDuDeck)
+# LE VOCAL DISCORD (lot F) : chaque fichier du lot, a la racine ; SelfUpdateService les reconnait par leur nom
+# (VocalRoomFichiers.FichierDuVocal) et les pose ensemble, jamais pendant une session vocale.
+$outilsHorsArchive = @($outilsHorsArchive) + @($fichiersDuVocal)
 $exclusOutils = @($outilsHorsArchive | ForEach-Object { "-x!$name\$($_ -replace '/', '\')" })
 & $sz a -t7z $update "$name\" @ex "-x!$name\resources" "-x!$name\tools" @exclusOutils -mx=5 -bsp0 -bso0
 
@@ -300,7 +358,9 @@ $autorises = @(
     'NelfePlay.LiveStreaming.exe',
     # La liaison au compte, construite par le depot prive APIExposeConnect. Quelques centaines de
     # Ko : elle voyage dans l'archive de mise a jour, contrairement aux deux outils ci-dessus.
-    'RetroBat.ApiConnect.exe'
+    'RetroBat.ApiConnect.exe',
+    # Le vocal Discord (depot prive NelfePlay-VocalRoom), avec -AvecVocalRoom : l'exe, le SDK Discord, ses notices et Krisp.
+    'NelfePlay-VocalRoom.exe', 'discord_partner_sdk.dll', 'Discord-Social-SDK-License-Notices.txt', 'discord_krisp.dll', 'krisp-'
 )
 $suivis = @{}
 Push-Location $PSScriptRoot
@@ -352,6 +412,10 @@ if ($fichiersDuDeck -and -not $Rapide) {
 $manifestePath = Join-Path $PSScriptRoot 'executables.manifest.json'
 if (-not (Test-Path -LiteralPath $manifestePath)) { throw "executables.manifest.json absent : il doit etre livre avec les executables." }
 $declares = @((Get-Content -LiteralPath $manifestePath -Raw -Encoding UTF8 | ConvertFrom-Json) | ForEach-Object { $_.file })
+# Le manifeste qui declare le vocal le fait tester sur chaque borne : il ne part qu'avec le vocal.
+if ($declares -contains 'NelfePlay-VocalRoom.exe' -and -not $AvecVocalRoom) {
+    throw "executables.manifest.json declare NelfePlay-VocalRoom.exe : publier avec -AvecVocalRoom (sinon l'outil de diagnostic des bornes echoue sur un fichier absent)."
+}
 $exesLivres = @()
 foreach ($ligne in (& $sz l -slt $controlee)) {
     if ($ligne -like 'Path = *') {
@@ -461,6 +525,8 @@ foreach ($nomOutil in $outilsHorsArchive) {
         # Un fichier du PlayerDeck (Deck, police, configuration) porte la version de son exe.
         version = if ($estExe) { "$($fichierOutil.VersionInfo.ProductVersion)".Trim() }
                   elseif ($nomOutil -like 'tools/playerdeck/*') { $versionDuDeck }
+                  # Les fichiers du vocal (DLL, notices, Krisp) portent la version de leur exe : un lot, une version.
+                  elseif ($fichiersDuVocal -contains $nomOutil) { $versionDuVocal }
                   else { ($nomActif -replace '^.*?(\d{4})-(\d{2})-(\d{2}).*$', '$1.$2.$3') }
         sha256  = $shaOutil
         taille  = $fichierOutil.Length
@@ -523,7 +589,8 @@ if ($Rapide) {
 } elseif ($SansInstalleur) {
     Write-Warning "Publication SANS installeur de borne : /setup servira la version precedente."
 } else {
-    $commande = '& "C:\Program Files\Inno Setup 7\ISCC.exe" installer\CabinetSetup.iss'
+    $commande = if ($AvecVocalRoom) { '& "C:\Program Files\Inno Setup 7\ISCC.exe" /DAvecVocalRoom installer\CabinetSetup.iss' }
+                else { '& "C:\Program Files\Inno Setup 7\ISCC.exe" installer\CabinetSetup.iss' }
     if (-not (Test-Path $setup)) {
         throw "Installeur de borne absent ($setup).`nLe compiler puis relancer :`n    $commande`nSinon : .\release.ps1 -SansInstalleur"
     }
