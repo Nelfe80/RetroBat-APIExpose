@@ -48,6 +48,22 @@ public class DefisPanelServiceTests
         Assert.Equal("0:47.48", ligne.Colonne2);
     }
 
+    /// <summary>Metal Slug 3 (13/11) : les challenges d'abord, puis le Boss Rush dans son groupe, ses boss dans l'ordre du jeu.</summary>
+    [Fact]
+    public void Le_Boss_Rush_a_son_groupe_sous_les_challenges()
+    {
+        static Reglement L(string f) => Reglement.Lire(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Reglements", f)));
+        var lignes = Service().Composer(
+            [L("metal-slug-3.boss-rootmars.json"), L("metal-slug-3.mission-1-rambo.json"), L("metal-slug-3.boss-m1.json"),
+             L("metal-slug-3.mission-1-knife.v7.json")],
+            new Dictionary<string, (int, long?)>(), "en");
+
+        var onglet = Assert.Single(lignes);
+        Assert.Equal(DefisPanelModel.Onglet.Challenges, onglet.Key);
+        Assert.Equal(["Challenges", "My ### and my knife", "Rambo", "Boss Rush", "Mission 1: Huge Hermit", "Final mission: Rootmars"],
+            onglet.Value.Select(l => l.Ligne.Nom));
+    }
+
     [Fact]
     public void Sans_defi_aucun_onglet_n_existe()
         => Assert.Empty(Service().Composer([], new Dictionary<string, (int, long?)>(), "en"));

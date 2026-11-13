@@ -847,6 +847,7 @@ public sealed partial class DefisPanelService
         "speedrun_boss" => T("speedrun.panel.goal.boss", "Defeat the boss alive"),
         "speedrun_world" => T("speedrun.panel.goal.world", "Finish the world in order"),
         "speedrun_full" => T("speedrun.panel.goal.full", "Reach the ending"),
+        "challenge_boss" => T("speedrun.panel.goal.boss_rush", "Defeat the boss"),
         _ => T("speedrun.panel.goal.challenge", "Complete the challenge"),
     };
 
@@ -892,10 +893,15 @@ public sealed partial class DefisPanelService
         "speedrun_boss" => "bosses",
         "speedrun_world" => "worlds",
         "speedrun_full" => "full",
+        // Le Boss Rush d'un jeu (Metal Slug 3, 13/11) : une epreuve par boss, sous les autres challenges du jeu.
+        "challenge_boss" => "boss_rush",
         _ => "challenges",
     };
 
-    private static int OrdreDuGroupe(string groupe) => groupe switch { "levels" => 0, "bosses" => 1, "worlds" => 2, "full" => 3, _ => 4 };
+    private static int OrdreDuGroupe(string groupe) => groupe switch
+    {
+        "levels" => 0, "bosses" => 1, "worlds" => 2, "full" => 3, "boss_rush" => 5, _ => 4,
+    };
 
     private static string NomDuGroupe(string groupe) => groupe switch
     {
@@ -903,6 +909,7 @@ public sealed partial class DefisPanelService
         "bosses" => "Bosses",
         "worlds" => "Worlds",
         "full" => "Full game",
+        "boss_rush" => "Boss Rush",
         _ => "Challenges",
     };
 
