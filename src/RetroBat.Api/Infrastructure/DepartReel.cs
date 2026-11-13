@@ -30,6 +30,15 @@ namespace RetroBat.Api.Infrastructure;
 /// joueur, meme dans un jeu lent, tape souvent ou tient une direction, un tir. Mesure sur les 167 passeports publies de
 /// la borne : la regle n'en refuse aucun autre que la demo (voir RAPPORT.md du 12/11).</item>
 /// </list>
+/// <para>LE RACCOURCI DE SORTIE N'EST PAS UNE PARTIE (13/11, DaiOuJou de Gogerad : 11 822 230 publie, jeu quitte en 15,5 s).
+/// Sur 931 images, la porte 2 ne demandait que 2 appuis ; SELECT+START (le raccourci de sortie de RetroBat) en fait 2, et
+/// SELECT met une piece sous FBNeo, que le START du raccourci consomme : porte 1 et porte 2 passaient. Desormais
+/// (<see cref="RaccourciDeSortie"/>) : le START du raccourci n'est pas un depart, la piece qu'il consomme n'est pas un
+/// credit de depart, et ses deux appuis ne comptent pas. Et un PLANCHER : jamais moins de <see cref="PlancherAppuis"/> appuis,
+/// quelle que soit la duree (les touches tenues du raccourci suffisaient a un run de quelques images).</para>
+/// <para>LA PARTIE COURTE PROUVE SA PROGRESSION : une session de moins de <see cref="PartieCourteSecondes"/> s doit montrer au
+/// moins <see cref="HaussesMinPartieCourte"/> hausses du score dans son run (<see cref="PartieTropCourte"/>). La plus courte
+/// des vraies parties publiees de la borne, Ms. Pac-Man 150 en 17 s, en a 15 ; un score venu d'un coup, une ou deux.</para>
 /// Appuis inconnus (pont MAME, listener d'avant 0.336, champ absent) : la porte 2 ne dit rien, et la porte 1 demande
 /// alors le depart lu par la memoire du jeu. La tentative de laboratoire (profil non ouvert, jamais classee) n'est pas
 /// arretee : le refus y est seulement trace, la plateforme a besoin de la tentative pour ouvrir un profil.
@@ -45,8 +54,72 @@ public static class DepartReel
     /// <summary>Les images d'une seconde, a peu pres : a 50 Hz, le run parait plus court, la regle plus clemente.</summary>
     public const double ImagesParSeconde = 60;
 
+    /// <summary>Jamais moins de trois appuis comptes, raccourci de sortie retire (il en fait deux a lui seul).</summary>
+    public const long PlancherAppuis = 3;
+
+    /// <summary>Une session de moins de 30 s...</summary>
+    public const double PartieCourteSecondes = 30;
+
+    /// <summary>... doit montrer au moins trois hausses du score dans son run.</summary>
+    public const int HaussesMinPartieCourte = 3;
+
+    /// <summary>Le SELECT (ou la touche hotkey) du raccourci precede son START d'une seconde et demie au plus.</summary>
+    public const long RaccourciFenetreImages = 90;
+
+    /// <summary>Et la session s'arrete dans les cinq secondes qui suivent ce START.</summary>
+    public const long RaccourciFinImages = 300;
+
+    /// <summary>Les appuis du raccourci : SELECT (ou hotkey) et START.</summary>
+    public const long AppuisDuRaccourci = 2;
+
     /// <summary>Les appuis que le wrapper a comptes sur la session, et leurs images tenues ; null si non comptes.</summary>
-    public readonly record struct Appuis(long? Nombre, long? ImagesTenues);
+    public readonly record struct Appuis(long? Nombre, long? ImagesTenues)
+    {
+        /// <summary>Les appuis sans ceux du raccourci de sortie, et sans ses images tenues (SELECT tenu jusqu'a la sortie).</summary>
+        public Appuis SansLeRaccourci(Raccourci? raccourci, long imageDeFin)
+        {
+            if (raccourci is not { } r || Nombre is not { } n) return this;
+            var tenues = Math.Max(1, imageDeFin - r.ImageSelect + 1) * AppuisDuRaccourci;
+            return new Appuis(Math.Max(0, n - AppuisDuRaccourci), ImagesTenues is { } t ? Math.Max(0, t - tenues) : null);
+        }
+    }
+
+    /// <summary>Le raccourci de sortie vu au panel : l'image de son SELECT (ou hotkey) et celle de son START.</summary>
+    public readonly record struct Raccourci(long ImageSelect, long ImageStart);
+
+    /// <summary>
+    /// LE RACCOURCI DE SORTIE (SELECT+START de RetroBat, ou hotkey+START) : le dernier START du joueur 1, precede d'au plus
+    /// <see cref="RaccourciFenetreImages"/> images par un SELECT ou une touche hotkey, et suivi de la fin de session dans les
+    /// <see cref="RaccourciFinImages"/> images. Null : la session ne s'est pas terminee ainsi (ou le panel ne l'a pas lu).
+    /// </summary>
+    public static Raccourci? RaccourciDeSortie(IReadOnlyList<long> selects, IReadOnlyList<DepartDeJoueur> departs, long imageDeFin)
+    {
+        var starts = departs.Where(d => d.Player == 1).Select(d => d.Frame).ToList();
+        if (starts.Count == 0 || selects.Count == 0) return null;
+        var start = starts.Max();
+        if (imageDeFin - start > RaccourciFinImages) return null;
+        var avant = selects.Where(s => s <= start && start - s <= RaccourciFenetreImages).ToList();
+        return avant.Count == 0 ? null : new Raccourci(avant.Max(), start);
+    }
+
+    /// <summary>Les START sans celui du raccourci : rien a partir de son SELECT.</summary>
+    public static List<DepartDeJoueur> DepartsSansLeRaccourci(IReadOnlyList<DepartDeJoueur> departs, Raccourci? raccourci)
+        => raccourci is { } r ? departs.Where(d => d.Frame < r.ImageSelect).ToList() : departs.ToList();
+
+    /// <summary>Les lectures des credits sans la piece du raccourci ni sa consommation : rien a partir de son SELECT.</summary>
+    public static List<EvenementDeCredit> CreditsSansLeRaccourci(IReadOnlyList<EvenementDeCredit> credits, Raccourci? raccourci)
+        => raccourci is { } r ? credits.Where(c => c.Frame < r.ImageSelect).ToList() : credits.ToList();
+
+    /// <summary>
+    /// La partie trop courte pour prouver sa progression : moins de <see cref="PartieCourteSecondes"/> s de session (images du
+    /// wrapper) et moins de <see cref="HaussesMinPartieCourte"/> hausses du score dans son run. Null : rien a redire, ou duree
+    /// inconnue.
+    /// </summary>
+    public static string? PartieTropCourte(long imagesDeSession, int hausses)
+        => imagesDeSession > 0 && imagesDeSession < PartieCourteSecondes * ImagesParSeconde && hausses < HaussesMinPartieCourte
+            ? $"partie de {imagesDeSession / ImagesParSeconde:0} s et {hausses} hausse(s) du score : trop courte pour prouver sa progression "
+              + $"(moins de {PartieCourteSecondes:0} s, il en faut {HaussesMinPartieCourte})"
+            : null;
 
     /// <summary>Le proces-verbal du wrapper : press_count et press_frames_sum, absents avant le listener 0.336.</summary>
     public static Appuis DeLaSession(string? sessionJson)
@@ -77,7 +150,7 @@ public static class DepartReel
     public static bool? AppuisSuffisants(Appuis appuis, long imagesDuRun)
     {
         if (appuis.Nombre is not { } n) return null;
-        if (n <= 0) return false;
+        if (n < PlancherAppuis) return false;
         var images = Math.Max(0, imagesDuRun);
         if (n >= AppuisRequis(images)) return true;
         return images > 0 && (appuis.ImagesTenues ?? 0) >= PartTenueMin * images;
@@ -144,6 +217,8 @@ public static class DepartReel
     /// <param name="DepartImpose">Un depart que la memoire du jeu ne dit pas : etat de depart du MULTIPLAYER, START du labo.</param>
     /// <param name="Appuis">Les appuis comptes par le wrapper.</param>
     /// <param name="ImagesDuRun">La duree du run certifie.</param>
+    /// <param name="ImagesDeSession">La duree de la session (images du wrapper) ; 0 si inconnue.</param>
+    /// <param name="Hausses">Les hausses du score dans les checkpoints signes du run.</param>
     public sealed record Bilan(
         bool LigneDeCredits,
         bool LigneGameStart,
@@ -152,7 +227,9 @@ public static class DepartReel
         bool GameStartVu,
         bool DepartImpose,
         Appuis Appuis,
-        long ImagesDuRun)
+        long ImagesDuRun,
+        long ImagesDeSession = 0,
+        int Hausses = int.MaxValue)
     {
         public bool StartVu => Departs.Any(d => d.Player == 1);
     }
@@ -164,9 +241,10 @@ public static class DepartReel
         if (AppuisSuffisants(b.Appuis, b.ImagesDuRun) == false)
         {
             return $"presque aucun appui du joueur : {b.Appuis.Nombre} appui(s), {b.Appuis.ImagesTenues ?? 0} image(s) tenue(s), "
-                + $"pour {secondes:0} s de run (il en faut {AppuisRequis(b.ImagesDuRun)}, ou des touches tenues {PartTenueMin:P0} du run) : "
+                + $"pour {secondes:0} s de run (il en faut {PlancherAppuis} au moins, et {AppuisRequis(b.ImagesDuRun)} ou des touches tenues {PartTenueMin:P0} du run) : "
                 + "la demo d'attract, ou un jeu laisse la";
         }
+        if (PartieTropCourte(b.ImagesDeSession, b.Hausses) is { } courte) return courte;
         if (b.DepartImpose || b.GameStartVu) return null;
         if (b.LigneDeCredits)
         {
