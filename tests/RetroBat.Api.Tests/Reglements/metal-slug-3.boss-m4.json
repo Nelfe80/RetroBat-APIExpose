@@ -6,12 +6,12 @@
   "order": 4,
   "kind": "challenge_boss",
   "title": {
-    "fr": "Boss de la mission 4",
-    "en": "Mission 4 boss",
-    "es": "Jefe de la misión 4",
-    "ja": "ミッション4のボス",
-    "ko": "미션 4 보스",
-    "zh": "任务4首领"
+    "fr": "Mission 4 : Sol Dae Rokker",
+    "en": "Mission 4: Sol Dae Rokker",
+    "es": "Misión 4: Sol Dae Rokker",
+    "ja": "ミッション4：Sol Dae Rokker",
+    "ko": "미션 4: Sol Dae Rokker",
+    "zh": "任务4：Sol Dae Rokker"
   },
   "summary": {
     "fr": "Départ juste avant le combat, chrono jusqu'à la fin de l'aire après la victoire ; morts permises, un continue annule",

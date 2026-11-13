@@ -6,12 +6,12 @@
   "order": 5,
   "kind": "challenge_boss",
   "title": {
-    "fr": "Mission finale : le faux dernier boss",
-    "en": "Final mission: the fake final boss",
-    "es": "Misión final: el falso jefe final",
-    "ja": "ファイナルミッション：偽のラスボス",
-    "ko": "파이널 미션: 가짜 최종 보스",
-    "zh": "最终任务：假最终首领"
+    "fr": "Mission finale : Fake Rootmars",
+    "en": "Final mission: Fake Rootmars",
+    "es": "Misión final: Fake Rootmars",
+    "ja": "ファイナルミッション：Fake Rootmars",
+    "ko": "파이널 미션: Fake Rootmars",
+    "zh": "最终任务：Fake Rootmars"
   },
   "summary": {
     "fr": "Départ juste avant le combat, chrono jusqu'à la fin de l'aire après la victoire ; morts permises, un continue annule",

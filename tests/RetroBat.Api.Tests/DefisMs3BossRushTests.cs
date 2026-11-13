@@ -86,6 +86,11 @@ public class DefisMs3BossRushTests
         Assert.Equal(6, boss.Select(b => b.Etat!.Sha256).Distinct().Count());
         Assert.All(boss, b => Assert.Equal(couteau.MemSha256, b.MemSha256));
         Assert.Equal([1, 2, 3, 4, 5, 6], boss.Select(b => b.Ordre));
+        // Noms officiels (wiki Metal Slug, decision du user du 13/11) : des noms propres, jamais traduits.
+        var noms = new[] { "Huge Hermit", "Monoeye UFO", "Jupiter King", "Sol Dae Rokker", "Fake Rootmars", "Rootmars" };
+        for (var i = 0; i < 6; i++)
+            foreach (var langue in new[] { "fr", "en", "es", "ja", "ko", "zh" })
+                Assert.EndsWith(noms[i], boss[i].Titre(langue));
         foreach (var langue in new[] { "fr", "en", "es", "ja", "ko", "zh" })
             Assert.All(boss, b => Assert.False(string.IsNullOrWhiteSpace(b.Resume(langue))));
     }

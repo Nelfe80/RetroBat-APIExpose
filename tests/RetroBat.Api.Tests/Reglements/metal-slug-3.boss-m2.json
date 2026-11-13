@@ -6,12 +6,12 @@
   "order": 2,
   "kind": "challenge_boss",
   "title": {
-    "fr": "Boss de la mission 2",
-    "en": "Mission 2 boss",
-    "es": "Jefe de la misión 2",
-    "ja": "ミッション2のボス",
-    "ko": "미션 2 보스",
-    "zh": "任务2首领"
+    "fr": "Mission 2 : Monoeye UFO",
+    "en": "Mission 2: Monoeye UFO",
+    "es": "Misión 2: Monoeye UFO",
+    "ja": "ミッション2：Monoeye UFO",
+    "ko": "미션 2: Monoeye UFO",
+    "zh": "任务2：Monoeye UFO"
   },
   "summary": {
     "fr": "Départ juste avant le combat, chrono jusqu'à la fin de l'aire après la victoire ; morts permises, un continue annule",
