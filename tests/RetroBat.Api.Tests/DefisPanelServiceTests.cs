@@ -64,6 +64,28 @@ public class DefisPanelServiceTests
             onglet.Value.Select(l => l.Ligne.Nom));
     }
 
+    /// <summary>
+    /// Les mondes a l'envers (Metal Slug 3, 13/11) : un mode de jeu (kind challenge_mode), classe a part ; au panneau, son
+    /// groupe vient apres le Boss Rush, et son objectif par defaut est celui d'un mode.
+    /// </summary>
+    [Fact]
+    public void Un_mode_de_jeu_a_son_groupe_sous_le_Boss_Rush()
+    {
+        static Reglement L(string f) => Reglement.Lire(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Reglements", f)));
+        var mondes = L("metal-slug-3.mondes-a-l-envers.json");
+        Assert.Equal("challenge_mode", mondes.Kind);
+        var lignes = Service().Composer(
+            [mondes, L("metal-slug-3.boss-m1.json"), L("metal-slug-3.mission-1-rambo.json")],
+            new Dictionary<string, (int, long?)>(), "en");
+
+        var onglet = Assert.Single(lignes);
+        Assert.Equal(DefisPanelModel.Onglet.Challenges, onglet.Key);
+        Assert.Equal(["Challenges", "Rambo", "Boss Rush", "Mission 1: Huge Hermit", "Game modes", "Upside-Down Worlds"],
+            onglet.Value.Select(l => l.Ligne.Nom));
+        Assert.True(onglet.Value[4].Ligne.Groupe);
+        Assert.Same(mondes, onglet.Value[5].Defi);
+    }
+
     [Fact]
     public void Sans_defi_aucun_onglet_n_existe()
         => Assert.Empty(Service().Composer([], new Dictionary<string, (int, long?)>(), "en"));

@@ -35,7 +35,7 @@ public class DefiMondesALEnversTests
     [Fact]
     public void Meme_depart_meme_arrivee_meme_MEM_que_Rambo()
     {
-        Assert.Equal(("metal-slug-3.mondes-a-l-envers", "ch-ms3-mondes-v1", 1, 3, "challenge_rule"),
+        Assert.Equal(("metal-slug-3.mondes-a-l-envers", "ch-ms3-mondes-v1", 1, 3, "challenge_mode"),
             (Mondes.ChallengeId, Mondes.Ruleset, Mondes.Version, Mondes.Ordre, Mondes.Kind));
         Assert.True(Mondes.EstUnChallenge);
         Assert.Equal(Rambo.MemSha256, Mondes.MemSha256);

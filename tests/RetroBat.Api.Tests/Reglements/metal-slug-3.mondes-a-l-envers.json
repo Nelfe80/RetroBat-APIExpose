@@ -4,7 +4,7 @@
   "version": 1,
   "ruleset": "ch-ms3-mondes-v1",
   "order": 3,
-  "kind": "challenge_rule",
+  "kind": "challenge_mode",
   "game": {
     "rom_group": "metal-slug-3",
     "system_id": "arcade"
