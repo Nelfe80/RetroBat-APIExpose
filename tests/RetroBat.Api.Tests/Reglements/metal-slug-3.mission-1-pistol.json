@@ -1,0 +1,169 @@
+{
+  "schema": "nelfe.challenge.v2",
+  "challenge_id": "metal-slug-3.mission-1-pistol",
+  "version": 1,
+  "ruleset": "ch-ms3-m1-pistol-v1",
+  "order": 2,
+  "kind": "challenge_rule",
+  "game": {
+    "rom_group": "metal-slug-3",
+    "system_id": "arcade"
+  },
+  "mem_sha256": "0fb6762a946cb3844633b5e57ba15c0c08a1a37f34ad8d57bbdc2e744a514084",
+  "start_policy": "canonical_state",
+  "state": {
+    "file": "arcade/metal-slug-3/mission-1-pistolet.state",
+    "name": "mission-1-pistolet-fbneo",
+    "sha256": "1cd550ac12226e043eefbc61b6c23ee37a6c6abdd2e0601440ec8f74186ed981"
+  },
+  "start": [
+    {
+      "value": {
+        "address": "0x10FDB6",
+        "equals": "0x01"
+      }
+    },
+    {
+      "value": {
+        "address": "0x10040C",
+        "equals": "0x00"
+      }
+    },
+    {
+      "value": {
+        "address": "0x10040D",
+        "equals": "0x00"
+      }
+    }
+  ],
+  "timing": {
+    "independent": {
+      "finish": {
+        "event": {
+          "action": "PROGRESSION_STAGE",
+          "address": "0x10040C",
+          "leaves": "0x00"
+        }
+      },
+      "start": {
+        "event": {
+          "action": "MOUNT_STATE",
+          "address": "0x1002C1",
+          "leaves": "0x00",
+          "value": "0x01"
+        },
+        "when": [
+          {
+            "value": {
+              "address": "0x10040C",
+              "equals": "0x00"
+            }
+          },
+          {
+            "value": {
+              "address": "0x10040D",
+              "equals": "0x00"
+            }
+          }
+        ]
+      }
+    },
+    "official": "independent"
+  },
+  "void": [
+    "save_state_load",
+    "rewind",
+    "runahead",
+    "fast_forward",
+    "cheats",
+    "netplay",
+    "pause_clock_gap",
+    {
+      "event": {
+        "action": "CONTINUE_SCREEN",
+        "address": "0x10FDB6",
+        "value": "0x02"
+      }
+    }
+  ],
+  "ranking": {
+    "direction": "lower_better",
+    "metric": "frames"
+  },
+  "cores": [
+    "fbneo"
+  ],
+  "runtime": {
+    "core_ram": {
+      "base": "0x100000",
+      "swap16": true
+    },
+    "frame_rate": 59.185606
+  },
+  "title": {
+    "fr": "Pistolet pur",
+    "en": "Pistol only",
+    "es": "Solo pistola",
+    "ja": "ピストル一筋",
+    "ko": "권총 한 자루",
+    "zh": "纯手枪"
+  },
+  "summary": {
+    "fr": "Mission 1 jusqu'à Huge Hermit vaincu, au pistolet de base : les caisses d'armes ne changent rien, au chrono",
+    "en": "Mission 1 until Huge Hermit is defeated, starting pistol only: weapon crates change nothing, against the clock",
+    "es": "Misión 1 hasta derrotar a Huge Hermit, solo la pistola inicial: las cajas de armas no cambian nada, contra el reloj",
+    "ja": "ミッション1をHuge Hermit撃破まで、初期ピストルのみ（武器アイテムは無効）でタイムアタック",
+    "ko": "미션 1 Huge Hermit 격파까지, 기본 권총만 사용 (무기 상자는 효과 없음), 타임 어택",
+    "zh": "任务1直到击败Huge Hermit，仅限初始手枪（武器箱无效），计时挑战"
+  },
+  "locks": [
+    {
+      "address": "0x10EAF2",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "value": "0xFF"
+    },
+    {
+      "address": "0x10EAF3",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "value": "0x00"
+    },
+    {
+      "address": "0x10EAFA",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "value": "0xFF"
+    },
+    {
+      "address": "0x10EAFB",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "value": "0xFF"
+    },
+    {
+      "address": "0x10058F",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "clear_bits": "0x01"
+    },
+    {
+      "address": "0x10058E",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "clear_bits": "0x01"
+    }
+  ]
+}

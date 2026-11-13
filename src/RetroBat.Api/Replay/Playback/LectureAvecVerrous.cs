@@ -29,11 +29,15 @@ public static class LectureAvecVerrous
     /// <summary>La variable d'environnement que le wrapper 0.345 lit pour refuser le masque.</summary>
     public const string VariableSansMasque = "RETROBAT_INPUT_BITMASKS";
 
-    /// <summary>Les lignes de verrou du manifeste, vide sans verrou.</summary>
+    /// <summary>Les lignes de verrou du manifeste, et la ligne de ses regles (wrapper 0.346) ; vide sans verrou ni regle.</summary>
     public static IReadOnlyList<string> Lignes(ReplayManifest manifest)
-        => manifest.Runtime.Locks is { Length: > 0 } l
-            ? l.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            : [];
+    {
+        var lignes = manifest.Runtime.Locks is { Length: > 0 } l
+            ? l.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList()
+            : new List<string>();
+        if (manifest.Runtime.Rules is { Length: > 0 } r) lignes.Add("rules=" + r);
+        return lignes;
+    }
 
     /// <summary>
     /// Le coeur a charger pour lire ce replay et, s'il tient des verrous, la preparation faite (certified.txt ecrit, variable
@@ -76,6 +80,9 @@ public static class LectureAvecVerrous
             sansMasque = false;
         }
         if (version < VersionMinimale) return (coeurReel, ReplayErrorCode.RuntimeIncompatible, rom);
+        // Des regles demandent le wrapper qui sait les jouer : sans lui la lecture diverge, mieux vaut ne pas lire.
+        if (manifest.Runtime.Rules is { Length: > 0 } && version < RetroBat.Api.Speedrun.ReglesDuChallenge.VersionMinimale)
+            return (coeurReel, ReplayErrorCode.RuntimeIncompatible, rom);
 
         var romDeLecture = RomExtraite(manifest, coeurReel, rom,
             dossierDesRoms ?? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfenet", "replay", "temp", "rom-de-lecture")) ?? rom;

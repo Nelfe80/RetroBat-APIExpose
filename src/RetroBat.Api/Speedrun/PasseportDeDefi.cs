@@ -35,12 +35,31 @@ public static class PasseportDeDefi
     /// avoir ete arme au chargement de l'etat de depart (« from_frame ») et pose sur toutes les images jouees depuis, aucune
     /// manquee. Rend le motif, ou null si le bilan est conforme.
     /// </summary>
+    /// <summary>
+    /// LES REGLES AU BILAN DU WRAPPER (0.346) : l'empreinte rendue est celle du reglement (aucune sans regle), le bloc a compile,
+    /// et il a ete arme au chargement de l'etat de depart. Rend le motif, ou null.
+    /// </summary>
+    public static string? EcartDesRegles(JsonObject? session, Reglement reglement)
+    {
+        var lues = session?["rules_sha256"] is JsonValue r && r.TryGetValue<string>(out var t) ? t : "";
+        if (!string.Equals(lues, reglement.ReglesSha256, StringComparison.Ordinal))
+            return reglement.Regles is null ? $"regles lues ({lues}) sans regle au reglement" : $"regles lues « {lues} » au lieu de « {reglement.ReglesSha256} »";
+        if (reglement.Regles is null) return null;
+        if (session?["rules_valid"] is not JsonValue v || !v.TryGetValue<bool>(out var valides) || !valides)
+            return "regles refusees par le wrapper : " + ((string?)session?["rules_error"] ?? "?");
+        var depuis = (long?)session?["rules_from_frame"] ?? -1;
+        if (depuis < 0) return "regles jamais armees (aucun etat de depart charge)";
+        if ((long?)session?["rules_missed"] is > 0 and var manques) return $"regles : {manques} octet(s) hors de la memoire";
+        return null;
+    }
+
     public static string? EcartDesVerrous(string sessionJson, Reglement reglement)
     {
         var session = JsonNode.Parse(sessionJson) as JsonObject;
         var lus = session?["locks"] is JsonValue l && l.TryGetValue<string>(out var s) ? s : "";
         if (!string.Equals(lus, reglement.LignesDesVerrous, StringComparison.Ordinal))
             return $"verrous lus « {lus} » au lieu de « {reglement.LignesDesVerrous} »";
+        if (EcartDesRegles(session, reglement) is { } ecartRegles) return ecartRegles;
         if (reglement.Verrous.Count == 0) return null;
 
         var images = session?["frame_count"] is JsonValue f && f.TryGetValue<long>(out var n) ? n : -1;

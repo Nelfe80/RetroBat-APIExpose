@@ -137,6 +137,18 @@ public sealed class Reglement
 
     /// <summary>Les verrous tels que le wrapper les rend (« locks » de l'attestation et du bilan) : « » sans verrou.</summary>
     public string LignesDesVerrous => string.Join(";", Verrous.Select(v => v.Ligne));
+
+    /// <summary>
+    /// LES REGLES (« rules », wrapper 0.346) : le bloc en JSON compact tel qu'il part dans certified.txt (« rules= »), null sans
+    /// regle. Voir <see cref="ReglesDuChallenge"/>.
+    /// </summary>
+    public string? Regles { get; private init; }
+
+    /// <summary>L'empreinte des regles, celle que le wrapper rend a l'attestation et au bilan ; « » sans regle.</summary>
+    public string ReglesSha256 => ReglesDuChallenge.Empreinte(Regles);
+
+    /// <summary>La ligne de certified.txt qui porte les regles, null sans regle.</summary>
+    public string? LigneDesRegles => Regles is null ? null : "rules=" + Regles;
     public IReadOnlyList<ConditionValeur> Depart { get; private init; } = [];
     public IReadOnlyList<CibleEvenement> Arrivee { get; private init; } = [];
     /// <summary>Les evenements qui confirment l'arrivee provisoire (« finish_confirm », un seul ou « any_of ») ; vide : aucune confirmation.</summary>
@@ -265,10 +277,12 @@ public sealed class Reglement
                     : r.TryGetProperty("runtime", out var rt2) && rt2.TryGetProperty("refresh_hz", out var hz) ? hz.GetDouble() : 60,
                 TolerancePauseMs = r.TryGetProperty("runtime", out var rt3) && rt3.TryGetProperty("pause_tolerance_ms", out var tol) ? tol.GetInt32() : 1000,
                 Verrous = Liste(r, "locks").Select(LireVerrou).ToList(),
+                Regles = r.TryGetProperty("rules", out var rg) ? LireRegles(rg) : null,
                 Ordre = Entier(r, "order") ?? 0,
                 AffichageJson = r.TryGetProperty("display", out var aff) && aff.ValueKind == JsonValueKind.Object ? aff.GetRawText() : null,
             };
             reglement.ControlerLesVerrous();
+            if (r.TryGetProperty("rules", out var rg2)) reglement.ControlerLesRegles(rg2);
             return reglement;
         }
     }
@@ -292,6 +306,37 @@ public sealed class Reglement
 
         if (Verrous.Select(v => v.Adresse).Distinct().Count() != Verrous.Count)
             throw new ReglementInvalideException("deux verrous sur la meme adresse");
+    }
+
+    private static string LireRegles(JsonElement e)
+    {
+        if (e.ValueKind != JsonValueKind.Object) throw new ReglementInvalideException("rules : objet attendu");
+        if (!e.TryGetProperty("rules", out var l) || l.ValueKind != JsonValueKind.Array)
+            throw new ReglementInvalideException("rules : la liste « rules » manque");
+        var texte = ReglesDuChallenge.Compacter(e);
+        if (texte.Length > ReglesDuChallenge.TailleMaximale)
+            throw new ReglementInvalideException($"rules : {texte.Length} octets, {ReglesDuChallenge.TailleMaximale} au plus");
+        return texte;
+    }
+
+    /// <summary>
+    /// LES LIMITES DES REGLES, celles d'un verrou : elles partent de l'etat de depart (seul instant que le wrapper connait), et
+    /// n'ecrivent jamais une adresse que le reglement lit (le depart, l'arrivee, une annulation se decideraient par elles).
+    /// </summary>
+    private void ControlerLesRegles(JsonElement bloc)
+    {
+        if (StartPolicy == "normal_boot" || Etat is null)
+            throw new ReglementInvalideException("un defi a regles part d'un etat (start_policy canonical_state et « state »)");
+        if (!EstUnChallenge) throw new ReglementInvalideException("des regles ne vont qu'a un challenge (jamais a un speedrun certifie)");
+        var plages = ReglesDuChallenge.PlagesEcrites(bloc);
+        foreach (var lue in AdressesCitees())
+        {
+            foreach (var (de, a) in plages)
+            {
+                if (lue >= de && lue <= a)
+                    throw new ReglementInvalideException($"regle qui ecrit {Hex.Ecrire(lue)} : le reglement lit cette adresse");
+            }
+        }
     }
 
     private static VerrouDeDefi LireVerrou(JsonElement e)

@@ -43,11 +43,12 @@ public static class VerrousDuLancement
     /// <summary>Les lignes <c>lock.&lt;n&gt;=</c> a ajouter a certified.txt. Le n sur deux chiffres garde l'ordre du reglement.</summary>
     public static void Ecrire(StringBuilder texte, IReadOnlyList<string> lignes)
     {
-        // Une consigne (mem_layer=) s'ecrit telle quelle ; les verrous gardent leur numero dans l'ordre du reglement.
+        // Une consigne (mem_layer=, rules=) s'ecrit telle quelle ; les verrous gardent leur numero dans l'ordre du reglement.
         var n = 0;
         foreach (var ligne in lignes)
         {
-            if (ligne.StartsWith("mem_layer=", StringComparison.Ordinal)) { texte.Append(ligne).Append('\n'); continue; }
+            if (ligne.StartsWith("mem_layer=", StringComparison.Ordinal) || ligne.StartsWith("rules=", StringComparison.Ordinal))
+            { texte.Append(ligne).Append('\n'); continue; }
             texte.Append("lock.").Append((n++).ToString("D2", System.Globalization.CultureInfo.InvariantCulture)).Append('=').Append(ligne).Append('\n');
         }
     }

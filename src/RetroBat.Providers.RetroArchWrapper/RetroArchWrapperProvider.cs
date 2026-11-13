@@ -730,6 +730,11 @@ public class RetroArchWrapperProvider : IProvider
                     ForcedOptions = Get("forced_options"),
                     // Les verrous du defi lus par le wrapper 0.343 (D18) ; null avec un wrapper plus ancien.
                     Locks = Get("locks"),
+                    // Les regles du challenge lues par le wrapper 0.346 : leur texte (un replay les reprend), leur empreinte,
+                    // et si elles compilent ; null avec un wrapper plus ancien.
+                    Rules = Get("rules"),
+                    RulesSha256 = Get("rules_sha256"),
+                    RulesValid = root.TryGetProperty("rules_valid", out var rulesValid) && rulesValid.ValueKind == JsonValueKind.True,
                     SessionNonce = Get("session_nonce"),
                 }
             });
