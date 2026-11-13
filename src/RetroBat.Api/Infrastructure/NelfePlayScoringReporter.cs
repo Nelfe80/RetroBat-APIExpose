@@ -298,6 +298,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     // Les pieces mises au panel (SELECT), par frame : une piece mise pendant la chauffe du wrapper
     // ne se voit pas sur la ligne CREDITS (ContinuesParCredits.DepartAvantLaPremiereLecture).
     private readonly List<long> _pieces = new();
+    // Les touches qui ouvrent le raccourci de sortie (SELECT, ou la touche hotkey), par image (DepartReel.RaccourciDeSortie).
+    private readonly List<long> _touchesDeSortie = new();
     // Le depart suppose (frame du START et ligne de credit rendue), tant qu'un vrai credit du depart peut encore le
     // remplacer (ContinuesParCredits.DepartReelApresLeSuppose).
     private (long Start, EvenementDeCredit Ligne)? _departSuppose;
@@ -955,6 +957,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _credits.Clear();
             _departs.Clear();
             _pieces.Clear();
+            _touchesDeSortie.Clear();
             _departSuppose = null;
         }
     }
@@ -2000,7 +2003,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// Le bilan du depart de la session (<see cref="DepartReel"/>) : la raison de ne rien certifier, ou null.
     /// </summary>
     private string? RefusDuDepart(string sessionJson, IReadOnlyList<EvenementDeCredit> credits, IReadOnlyList<DepartDeJoueur> departs,
-        string? definitionChargee, IReadOnlyList<(long frame, long total)> run)
+        string? definitionChargee, IReadOnlyList<(long frame, long total)> run, DepartReel.Raccourci? raccourci = null, long imageDeFin = 0,
+        long imagesDeSession = 0, long scoreDuRun = 0)
     {
         bool gameStartVu, impose;
         lock (_sync)
@@ -2009,9 +2013,53 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             impose = _departDuLabo || _multiplayer?.EtatDeDepart is not null;
         }
         var (ligneDeCredits, ligneGameStart) = DepartReel.LignesDeDepart(LireMem(definitionChargee));
-        var bilan = new DepartReel.Bilan(ligneDeCredits || credits.Count > 0, ligneGameStart, credits, departs, gameStartVu, impose,
-            DepartReel.DeLaSession(sessionJson), DepartReel.ImagesDuRun(run));
+        // Le raccourci de sortie (SELECT+START) ne fait ni depart, ni credit de depart, ni appuis (13/11, DaiOuJou de Gogerad).
+        var creditsDuJeu = DepartReel.CreditsSansLeRaccourci(credits, raccourci);
+        var departsDuJeu = DepartReel.DepartsSansLeRaccourci(departs, raccourci);
+        var hausses = run.Count > 0 ? ProgressionDuScore.Hausses(ProgressionDuScore.PointsSignes(run, scoreDuRun > 0 ? scoreDuRun : run[^1].total)) : 0;
+        var bilan = new DepartReel.Bilan(ligneDeCredits || creditsDuJeu.Count > 0, ligneGameStart, creditsDuJeu, departsDuJeu, gameStartVu, impose,
+            DepartReel.DeLaSession(sessionJson).SansLeRaccourci(raccourci, imageDeFin), DepartReel.ImagesDuRun(run), imagesDeSession, hausses);
         return DepartReel.Refus(bilan);
+    }
+
+    /// <summary>La duree de la session en images du wrapper (<c>frame_count</c>), 0 si inconnue.</summary>
+    internal static long ImagesDeLaSession(string sessionJson)
+    {
+        try { return EntierDuJson(JsonNode.Parse(sessionJson)?["frame_count"]) ?? 0; }
+        catch { return 0; }
+    }
+
+    /// <summary>
+    /// La session avec les appuis du raccourci de sortie nommes (<c>exit_presses</c>) : le passeport les signe, et le site les
+    /// retire du compte comme la borne. Sans raccourci, la session reste identique.
+    /// </summary>
+    internal static string AvecLesAppuisDeSortie(string sessionJson, DepartReel.Raccourci? raccourci)
+    {
+        if (raccourci is null) return sessionJson;
+        try
+        {
+            var session = JsonNode.Parse(sessionJson)!.AsObject();
+            session["exit_presses"] = DepartReel.AppuisDuRaccourci;
+            return session.ToJsonString();
+        }
+        catch
+        {
+            return sessionJson;
+        }
+    }
+
+    /// <summary>Les reperes de progression du jeu (record publie, gain appris), lus dans la copie gardee de sa reponse de profil.</summary>
+    private ProgressionDuScore.Reperes ReperesDuJeu(string systemId, string romGroup)
+    {
+        try
+        {
+            var copie = CheminDuProfil(systemId, romGroup);
+            return File.Exists(copie) ? ProgressionDuScore.DuCorpsDuProfil(File.ReadAllText(copie)) : ProgressionDuScore.Reperes.Aucun;
+        }
+        catch
+        {
+            return ProgressionDuScore.Reperes.Aucun;
+        }
     }
 
     /// <summary>Une seconde d'appuis par port, du wrapper (0.340) : de quoi retrouver le port local.</summary>
@@ -2051,12 +2099,24 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if ((Entier(root, "Player") ?? Entier(root, "player") ?? 1) == 1) _portLocal.AppuiDuPanel();
         NoterAppui();
         var systeme = GetString(root, "System") ?? GetString(root, "system") ?? "";
+        var identite = GetString(root, "Identity") ?? GetString(root, "identity") ?? "";
+        if (string.Equals(identite, "hotkey", StringComparison.OrdinalIgnoreCase))
+        {
+            lock (_sync)
+            {
+                _touchesDeSortie.Add(_lastFrame);
+                if (_touchesDeSortie.Count > MaxTrajectory) _touchesDeSortie.RemoveAt(0);
+            }
+            return;
+        }
         if (string.Equals(systeme, "SELECT", StringComparison.OrdinalIgnoreCase))
         {
             lock (_sync)
             {
                 _pieces.Add(_lastFrame);
                 if (_pieces.Count > MaxTrajectory) _pieces.RemoveAt(0);
+                _touchesDeSortie.Add(_lastFrame);
+                if (_touchesDeSortie.Count > MaxTrajectory) _touchesDeSortie.RemoveAt(0);
             }
             return;
         }
@@ -3982,6 +4042,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             Trace("partie ouverte aux joueurs, restee seule : 1CC");
         }
 
+        // LES LECTURES D'AVANT L'INITIALISATION DU SCORE NE COMPTENT PAS (13/11, DaiOuJou de Gogerad) : un premier segment
+        // deja haut sans montee, ou impossible, suivi de la remise a zero du jeu, est ecarte avant le choix du meilleur run.
+        var imagesDeSession = ImagesDeLaSession(sessionJson);
+        var reperes = ReperesDuJeu(systemId, romGroup);
+        var (sansParasite, parasites, raisonDuParasite) = ProgressionDuScore.SansParasiteDeDemarrage(trajectory, imagesDeSession, reperes);
+        if (parasites > 0 && sansParasite.Count > 0)
+        {
+            Trace($"lectures d'avant l'initialisation du score : {parasites} lecture(s) ecartee(s) ({raisonDuParasite})");
+            trajectory = sansParasite;
+        }
         var bestRun = SelectBestRun(trajectory, finsDeRun);
         // LE REPLAY DU MEILLEUR RUN (2026-10-02) : une partie peut en avoir plusieurs (arret a la
         // baisse du score, rearmement). Le score certifie se rattache a celui qui le contient.
@@ -3998,7 +4068,24 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // LA DEMO N'EST JAMAIS UNE PARTIE (12/11, DaiOuJou : la demonstration publiee a 2 554 070, sans piece ni appui).
         // Un depart reel (credit consomme, GAME_START, ou START suivi des appuis d'une partie) et des appuis de joueur.
         // Jugee ici, appliquee une fois le profil connu : la tentative de laboratoire (profil non ouvert) part quand meme.
-        var refusDuDepart = RefusDuDepart(sessionJson, credits, departs, definitionChargee, bestRun);
+        List<long> touchesDeSortie;
+        long derniereImage;
+        lock (_sync) { touchesDeSortie = new List<long>(_touchesDeSortie); derniereImage = _lastFrame; }
+        var imageDeFin = Math.Max(imagesDeSession, derniereImage);
+        var raccourci = DepartReel.RaccourciDeSortie(touchesDeSortie, departs, imageDeFin);
+        if (raccourci is { } sortie)
+        {
+            Trace($"raccourci de sortie (SELECT ou hotkey a la frame {sortie.ImageSelect}, START a la frame {sortie.ImageStart}) : "
+                + "ni depart, ni credit de depart, ni appuis");
+            sessionJson = AvecLesAppuisDeSortie(sessionJson, raccourci);
+        }
+        var refusDuDepart = RefusDuDepart(sessionJson, credits, departs, definitionChargee, bestRun, raccourci, imageDeFin, imagesDeSession, runPeak);
+        // LE SCORE PROGRESSE (13/11) : un saut impossible ne s'arrete pas ici, le site met la partie en quarantaine.
+        if (bestRun.Count > 0
+            && ProgressionDuScore.Juger(ProgressionDuScore.PointsSignes(bestRun, runPeak), runPeak, PlusGrandPas(bestRun), imagesDeSession, reperes) is { } saut)
+        {
+            Trace($"progression : saut invraisemblable ({saut}) ; la partie part, le site la mettra en quarantaine ({ProgressionDuScore.Code})");
+        }
         var contexteRun = RetroBat.Api.Scoring.ModesDeJeu.ContexteDuRun(lecturesBrutes, contextes, bestRun, contexteCourant);
         if (contexteRun.Mode is not null || contexteRun.Difficulte.Count > 0)
         {
@@ -4179,16 +4266,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     /// <summary>Le plus grand ecart entre deux lectures consecutives du run retenu : un saut
     /// isole se voit la, sans rien savoir du jeu.</summary>
-    private static long PlusGrandPas(List<(long frame, long total)> run)
-    {
-        long max = 0;
-        for (var i = 1; i < run.Count; i++)
-        {
-            var pas = run[i].total - run[i - 1].total;
-            if (pas > max) max = pas;
-        }
-        return max;
-    }
+    private static long PlusGrandPas(List<(long frame, long total)> run) => ProgressionDuScore.PlusGrandPas(run);
 
     /// <summary>Un entier d'un noeud JSON, qu'il ait ete pose en int ou en long, ou lu d'un fichier ; null sinon.</summary>
     internal static long? EntierDuJson(JsonNode? noeud)
@@ -4233,6 +4311,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // d'appui. Absents avec un listener plus ancien : le verifieur compte 0.
         long impossibleInputs = (long?)session["impossible_inputs"] ?? 0;
         long pressCount = (long?)session["press_count"] ?? 0;
+        long exitPresses = (long?)session["exit_presses"] ?? 0;
         long pressSum = (long?)session["press_frames_sum"] ?? 0;
         long pressSq = (long?)session["press_frames_sq"] ?? 0;
         string forcedOptions = (string?)session["forced_options"] ?? "";
@@ -4273,11 +4352,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var checkpoints = new JsonArray();
         long endMs = monotonicMs > 0 ? monotonicMs : frameCount;
         int n = trajectory.Count;
-        int step = n > 96 ? (n / 96) + 1 : 1;
-        for (var i = 0; i < n; i += step)
+        var signes = ProgressionDuScore.IndicesSignes(n);
+        for (var k = 0; k < signes.Count; k++)
         {
+            var i = signes[k];
             var (f, t) = trajectory[i];
-            var last = i + step >= n;
+            var last = k == signes.Count - 1;
             long ms = n > 1 ? (long)((double)i / (n - 1) * endMs) : endMs;
             var node = new JsonObject { ["monotonic_ms"] = ms, ["frame"] = f, ["metric"] = (last ? finalTotal : t).ToString() };
             if (last) node["event"] = "game_end";
@@ -4470,6 +4550,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // Les NVRAM du jeu (EEPROM, RAM de sauvegarde) : jointes seulement quand le jeu en a, pour
         // qu'un passeport sans NVRAM reste identique. Le profil dit ou sont les reglages.
         if (nvram is { Count: > 0 }) document["artifacts"]!["nvram"] = nvram;
+        // Les appuis du raccourci de sortie (SELECT+START), signes quand la borne l'a vu : le site les retire du compte comme
+        // elle (13/11). Absents, le passeport reste identique a celui d'avant.
+        if (exitPresses > 0) document["sensitive"]!["exit_presses"] = exitPresses;
         // Le ✓1CC, signe avec le reste : absent, le passeport reste identique a celui d'avant.
         if (clear is not null) document["progression"]!["clear"] = clear.DeepClone();
         return document;
