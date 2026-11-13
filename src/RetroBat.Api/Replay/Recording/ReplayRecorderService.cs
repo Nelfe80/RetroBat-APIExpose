@@ -93,6 +93,7 @@ public sealed class ReplayRecorderService : BackgroundService
 
     /// <summary>Les verrous que le wrapper a attestes pour le jeu en cours (D18) ; null sans verrou. Le manifeste les garde.</summary>
     private volatile string? _verrousAttestes;
+    private volatile string? _reglesAttestees;
     private string _sourceDuDepart = "";
     private string _contenuVu = "";
     private bool _dejaEnregistre;
@@ -569,6 +570,7 @@ public sealed class ReplayRecorderService : BackgroundService
             case "ui.game.started":
                 _garde.JeuLance();
                 _verrousAttestes = null;   // l'attestation de ce jeu-ci les redira
+                _reglesAttestees = null;
                 break;
             case "ui.game.ended":
                 _garde.JeuTermine();
@@ -582,6 +584,7 @@ public sealed class ReplayRecorderService : BackgroundService
                     var attestation = System.Text.Json.JsonSerializer.SerializeToElement(e.Payload);
                     _garde.EcouteVue(GardeDesPlantages.CoeurDeLAttestation(attestation));
                     _verrousAttestes = VerrousDeLAttestation(attestation);
+                    _reglesAttestees = ReglesDeLAttestation(attestation);
                 }
                 catch { _garde.EcouteVue("?"); }
                 break;
@@ -1089,6 +1092,12 @@ public sealed class ReplayRecorderService : BackgroundService
            && attestation.TryGetProperty("Locks", out var l) && l.ValueKind == System.Text.Json.JsonValueKind.String
            && l.GetString() is { Length: > 0 } lignes ? lignes : null;
 
+    /// <summary>Les regles d'une attestation du wrapper (« Rules », 0.346), null s'il n'y en a pas.</summary>
+    internal static string? ReglesDeLAttestation(System.Text.Json.JsonElement attestation)
+        => attestation.ValueKind == System.Text.Json.JsonValueKind.Object
+           && attestation.TryGetProperty("Rules", out var r) && r.ValueKind == System.Text.Json.JsonValueKind.String
+           && r.GetString() is { Length: > 0 } regles ? regles : null;
+
     private ReplayManifest BuildManifest(Recording rec, ReplayObjectRef obj, ReplayLaunchHint? hint)
     {
         var game = new ReplayGame(
@@ -1120,7 +1129,9 @@ public sealed class ReplayRecorderService : BackgroundService
             // Les fichiers du zip et leurs CRC : une autre borne reconnait ainsi le meme jeu zippe autrement.
             RomFiles: Playback.ContenuDArchive.Lire(hint?.RomPath),
             // Les verrous d'un defi : la lecture les remet, sinon la partie diverge (D18).
-            Locks: _verrousAttestes);
+            Locks: _verrousAttestes,
+            // Les regles d'un challenge : la lecture les remet aussi (wrapper 0.346).
+            Rules: _reglesAttestees);
 
         var (fps, fpsSource) = ResolveFps(rec);
         var frames = new ReplayFrames(

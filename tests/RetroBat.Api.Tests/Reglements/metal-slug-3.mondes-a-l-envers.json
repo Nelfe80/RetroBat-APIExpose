@@ -1,0 +1,1621 @@
+{
+  "schema": "nelfe.challenge.v2",
+  "challenge_id": "metal-slug-3.mondes-a-l-envers",
+  "version": 1,
+  "ruleset": "ch-ms3-mondes-v1",
+  "order": 3,
+  "kind": "challenge_rule",
+  "game": {
+    "rom_group": "metal-slug-3",
+    "system_id": "arcade"
+  },
+  "mem_sha256": "0fb6762a946cb3844633b5e57ba15c0c08a1a37f34ad8d57bbdc2e744a514084",
+  "start_policy": "canonical_state",
+  "state": {
+    "file": "arcade/metal-slug-3/mission-1-mondes.state",
+    "name": "mission-1-mondes-fbneo",
+    "sha256": "1cd550ac12226e043eefbc61b6c23ee37a6c6abdd2e0601440ec8f74186ed981"
+  },
+  "start": [
+    {
+      "value": {
+        "address": "0x10FDB6",
+        "equals": "0x01"
+      }
+    },
+    {
+      "value": {
+        "address": "0x10040C",
+        "equals": "0x00"
+      }
+    },
+    {
+      "value": {
+        "address": "0x10040D",
+        "equals": "0x00"
+      }
+    }
+  ],
+  "timing": {
+    "independent": {
+      "finish": {
+        "event": {
+          "action": "PROGRESSION_STAGE",
+          "address": "0x10040C",
+          "leaves": "0x00"
+        }
+      },
+      "start": {
+        "event": {
+          "action": "MOUNT_STATE",
+          "address": "0x1002C1",
+          "leaves": "0x00",
+          "value": "0x01"
+        },
+        "when": [
+          {
+            "value": {
+              "address": "0x10040C",
+              "equals": "0x00"
+            }
+          },
+          {
+            "value": {
+              "address": "0x10040D",
+              "equals": "0x00"
+            }
+          }
+        ]
+      }
+    },
+    "official": "independent"
+  },
+  "void": [
+    "save_state_load",
+    "rewind",
+    "runahead",
+    "fast_forward",
+    "cheats",
+    "netplay",
+    "pause_clock_gap",
+    {
+      "event": {
+        "action": "CONTINUE_SCREEN",
+        "address": "0x10FDB6",
+        "value": "0x02"
+      }
+    }
+  ],
+  "ranking": {
+    "direction": "lower_better",
+    "metric": "frames"
+  },
+  "cores": [
+    "fbneo"
+  ],
+  "runtime": {
+    "core_ram": {
+      "base": "0x100000",
+      "swap16": true
+    },
+    "frame_rate": 59.185606
+  },
+  "title": {
+    "fr": "Les mondes à l'envers",
+    "en": "Upside-Down Worlds",
+    "es": "Los mundos al revés",
+    "ja": "さかさまの世界",
+    "ko": "뒤집힌 세계",
+    "zh": "颠倒的世界"
+  },
+  "summary": {
+    "fr": "Mission 1 jusqu'à Huge Hermit vaincu, au chrono : chaque caillou lancé à pied fait passer au monde suivant (Rage rouge, Mars attaque, Grand froid, puis retour au normal), avec ses monstres, son arme et son personnage",
+    "en": "Mission 1 until Huge Hermit is defeated, against the clock: every rock thrown on foot shifts to the next world (Red Rage, Mars Attack, Big Freeze, then back to normal), each with its own monsters, weapon and character",
+    "es": "Misión 1 hasta derrotar a Huge Hermit, contra el reloj: cada piedra lanzada a pie pasa al mundo siguiente (Furia roja, Ataque de Marte, Gran helada y vuelta a lo normal), cada uno con sus monstruos, su arma y su personaje",
+    "ja": "ミッション1をHuge Hermit撃破までタイムアタック。徒歩で石を投げるたびに次の世界へ（レッドレイジ、マーズアタック、大寒波、そして元の世界）。世界ごとに敵・武器・キャラクターが変わる",
+    "ko": "미션 1 Huge Hermit 격파까지 타임 어택. 걸어서 돌을 던질 때마다 다음 세계로 (레드 레이지, 마스 어택, 대한파, 그리고 원래 세계). 세계마다 적, 무기, 캐릭터가 바뀐다",
+    "zh": "任务1直到击败Huge Hermit，计时挑战：每次徒步扔出石头便进入下一个世界（红色狂怒、火星进攻、大寒潮，再回到正常世界），每个世界都有各自的怪物、武器和角色"
+  },
+  "locks": [
+    {
+      "address": "0x10EAF4",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "value": "0x03"
+    },
+    {
+      "address": "0x10EAF5",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "advantage",
+      "type": "u8",
+      "value": "0x0A"
+    },
+    {
+      "address": "0x10EAF6",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "value": "0x00"
+    },
+    {
+      "address": "0x10EAF7",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "value": "0x00"
+    }
+  ],
+  "rules": {
+    "version": 1,
+    "endian": "big",
+    "seed": 1311,
+    "consts": {
+      "SOLDAT": 1,
+      "MONSTRE": 2,
+      "K_SOLDAT": 1,
+      "K_CRABE": 2,
+      "K_ZOMBIE": 3,
+      "K_HOMME_VERT": 4,
+      "K_YETI": 5,
+      "K_MARTIEN": 6,
+      "K_JAPONAIS": 7
+    },
+    "vars": {
+      "monde": 0,
+      "monde_avant": 0,
+      "boss": 0,
+      "musique_aire": 0,
+      "arme_avant": -1,
+      "mun_avant": 0,
+      "perso_en_attente": -1,
+      "arme_a_rendre": 0,
+      "choix": 0,
+      "depart_fait": 0
+    },
+    "tables": {
+      "teinte": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          "0x0C00",
+          "0xF400",
+          "0xF400"
+        ],
+        [
+          "0x0800",
+          "0xF000",
+          "0x0C00"
+        ],
+        [
+          "0xFA00",
+          "0xFE00",
+          "0x0800"
+        ]
+      ],
+      "musique": [
+        0,
+        "0x002B",
+        "0x0032",
+        "0x0029"
+      ],
+      "arme": [
+        0,
+        "0x0102",
+        "0xFF06",
+        "0x0104"
+      ],
+      "perso": [
+        0,
+        1,
+        3,
+        2
+      ],
+      "dessins": [
+        "0x00324D3A",
+        "0x00324EFA",
+        "0x003250BA",
+        "0x0032527A"
+      ],
+      "soldats": [
+        "0x0298BE",
+        "0x0298CC",
+        "0x0298DA",
+        "0x0298E8",
+        "0x0298F6",
+        "0x029904",
+        "0x029912",
+        "0x029920"
+      ],
+      "monstres": [
+        [],
+        [
+          [
+            "0x03FB86",
+            "0x0100",
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            "0x03FB90",
+            "0x0100",
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            "0x03FB9A",
+            "0x0100",
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            "0x03FBA4",
+            "0x0100",
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            "0x03FBAE",
+            "0x0100",
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            "0x03FBB8",
+            "0x0100",
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            "0x03FBC2",
+            "0x0100",
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            "0x081B98",
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            "0x081B98",
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            "0x092C5C",
+            "0x0010",
+            "0x04FC",
+            0,
+            0,
+            0
+          ],
+          [
+            "0x0926A8",
+            "0x0010",
+            "0x04FC",
+            0,
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            "0x09BB3E",
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      ]
+    },
+    "objects": {
+      "base": "0x10070C",
+      "stride": "0xB0",
+      "count": 112,
+      "routine_offset": 0,
+      "routine_type": "u32",
+      "free": "0x0000567A"
+    },
+    "whitelists": {
+      "transformables": [
+        {
+          "from": "0x029000",
+          "to": "0x02AFFF",
+          "kind": "K_SOLDAT"
+        },
+        {
+          "from": "0x0A0000",
+          "to": "0x0A1FFF",
+          "kind": "K_CRABE",
+          "when": {
+            "read": "u8",
+            "address": "0x10040C",
+            "equals": 0
+          }
+        },
+        {
+          "from": "0x03FB86",
+          "to": "0x03FBC2",
+          "kind": "K_ZOMBIE"
+        },
+        {
+          "from": "0x03FCE6",
+          "kind": "K_ZOMBIE"
+        },
+        {
+          "from": "0x03FE3E",
+          "kind": "K_ZOMBIE"
+        },
+        {
+          "from": "0x081B98",
+          "kind": "K_HOMME_VERT"
+        },
+        {
+          "from": "0x09BB3E",
+          "kind": "K_YETI"
+        },
+        {
+          "from": "0x09BC84",
+          "kind": "K_YETI"
+        },
+        {
+          "from": "0x092C5C",
+          "kind": "K_MARTIEN"
+        },
+        {
+          "from": "0x0926A8",
+          "kind": "K_MARTIEN"
+        },
+        {
+          "from": "0x06F5A8",
+          "kind": "K_JAPONAIS",
+          "when": {
+            "read": "u8",
+            "address": "0x10040C",
+            "equals": 3
+          }
+        },
+        {
+          "from": "0x06F7CA",
+          "kind": "K_JAPONAIS",
+          "when": {
+            "read": "u8",
+            "address": "0x10040C",
+            "equals": 3
+          }
+        }
+      ]
+    },
+    "conditions": {
+      "en_jeu": {
+        "read": "u8",
+        "address": "0x10FDB6",
+        "equals": 1
+      },
+      "a_pied": {
+        "read": "u8",
+        "address": "0x1002C1",
+        "between": [
+          1,
+          3
+        ]
+      },
+      "hors_transformation": {
+        "read": "u8",
+        "address": "0x10058F",
+        "equals": {
+          "read": "u8",
+          "address": "0x10058E"
+        }
+      },
+      "boss_brut": {
+        "all": [
+          {
+            "read": "u8",
+            "address": "0x10ED7B",
+            "equals": "0xFF"
+          },
+          {
+            "read": "u8",
+            "address": "0x10ED7D",
+            "bit_clear": "0x10"
+          }
+        ]
+      },
+      "boss": {
+        "any": [
+          {
+            "held_frames": 120,
+            "of": "boss_brut"
+          },
+          {
+            "all": [
+              {
+                "read": "u8",
+                "address": "0x10ED7B",
+                "equals": "0xFF"
+              },
+              {
+                "read": "u16",
+                "address": "0x10ED80",
+                "mask": "0xFF",
+                "in": [
+                  "0x24",
+                  "0x33",
+                  "0x30"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "macros": {
+      "teinte_du_monde": [
+        {
+          "write": "u16",
+          "address": "0x108DA4",
+          "value": {
+            "table": "teinte",
+            "index": [
+              {
+                "var": "monde"
+              },
+              0
+            ]
+          }
+        },
+        {
+          "write": "u16",
+          "address": "0x108DA6",
+          "value": {
+            "table": "teinte",
+            "index": [
+              {
+                "var": "monde"
+              },
+              1
+            ]
+          }
+        },
+        {
+          "write": "u16",
+          "address": "0x108DA8",
+          "value": {
+            "table": "teinte",
+            "index": [
+              {
+                "var": "monde"
+              },
+              2
+            ]
+          }
+        },
+        {
+          "write": "u8",
+          "address": "0x108DB0",
+          "value": 4
+        }
+      ],
+      "greffe_soldat": [
+        {
+          "slot_write": "u16",
+          "offset": "0x6A",
+          "value": 0
+        },
+        {
+          "slot_write": "u16",
+          "offset": "0x6C",
+          "value": 0
+        },
+        {
+          "slot_write": "u16",
+          "offset": "0x6E",
+          "value": 0
+        },
+        {
+          "slot_write": "u16",
+          "offset": "0x70",
+          "value": 0
+        },
+        {
+          "slot_write": "u16",
+          "offset": "0x72",
+          "value": 0
+        },
+        {
+          "slot_write": "u16",
+          "offset": "0x74",
+          "value": 0
+        },
+        {
+          "slot_write": "u32",
+          "offset": "0x00",
+          "value": {
+            "slot_tag": "type"
+          }
+        },
+        {
+          "tag": "genre",
+          "value": "SOLDAT"
+        },
+        {
+          "tag": "zombie",
+          "value": 0
+        },
+        {
+          "tag": "init",
+          "value": 0
+        }
+      ],
+      "greffe_monstre": [
+        {
+          "set": "choix",
+          "value": {
+            "random": {
+              "len": "monstres",
+              "index": [
+                {
+                  "var": "monde"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "slot_write": "u16",
+          "offset": "0x6A",
+          "value": {
+            "table": "monstres",
+            "index": [
+              {
+                "var": "monde"
+              },
+              {
+                "var": "choix"
+              },
+              1
+            ]
+          }
+        },
+        {
+          "slot_write": "u16",
+          "offset": "0x6C",
+          "value": {
+            "table": "monstres",
+            "index": [
+              {
+                "var": "monde"
+              },
+              {
+                "var": "choix"
+              },
+              2
+            ]
+          }
+        },
+        {
+          "slot_write": "u16",
+          "offset": "0x6E",
+          "value": {
+            "table": "monstres",
+            "index": [
+              {
+                "var": "monde"
+              },
+              {
+                "var": "choix"
+              },
+              3
+            ]
+          }
+        },
+        {
+          "slot_write": "u16",
+          "offset": "0x70",
+          "value": {
+            "table": "monstres",
+            "index": [
+              {
+                "var": "monde"
+              },
+              {
+                "var": "choix"
+              },
+              4
+            ]
+          }
+        },
+        {
+          "slot_write": "u32",
+          "offset": "0x00",
+          "value": {
+            "table": "monstres",
+            "index": [
+              {
+                "var": "monde"
+              },
+              {
+                "var": "choix"
+              },
+              0
+            ]
+          }
+        },
+        {
+          "tag": "genre",
+          "value": "MONSTRE"
+        },
+        {
+          "tag": "init",
+          "value": {
+            "table": "monstres",
+            "index": [
+              {
+                "var": "monde"
+              },
+              {
+                "var": "choix"
+              },
+              0
+            ]
+          }
+        },
+        {
+          "tag": "zombie",
+          "value": {
+            "table": "monstres",
+            "index": [
+              {
+                "var": "monde"
+              },
+              {
+                "var": "choix"
+              },
+              5
+            ]
+          }
+        }
+      ],
+      "changer_monde": [
+        {
+          "call": "teinte_du_monde"
+        },
+        {
+          "if": {
+            "all": [
+              {
+                "var": "monde_avant",
+                "equals": 0
+              },
+              {
+                "var": "monde",
+                "not_equals": 0
+              }
+            ]
+          },
+          "then": [
+            {
+              "set": "musique_aire",
+              "value": {
+                "read": "u16",
+                "address": "0x10ED80"
+              }
+            },
+            {
+              "set": "arme_avant",
+              "value": {
+                "read": "u16",
+                "address": "0x10EAF2"
+              }
+            },
+            {
+              "set": "mun_avant",
+              "value": {
+                "read": "u16",
+                "address": "0x10EAFA"
+              }
+            }
+          ]
+        },
+        {
+          "if": {
+            "var": "monde",
+            "not_equals": 0
+          },
+          "then": [
+            {
+              "write": "u16",
+              "address": "0x10ED82",
+              "value": {
+                "table": "musique",
+                "index": {
+                  "var": "monde"
+                }
+              }
+            },
+            {
+              "write": "u16",
+              "address": "0x10ED84",
+              "value": 0
+            }
+          ],
+          "else": [
+            {
+              "if": {
+                "all": [
+                  {
+                    "var": "boss",
+                    "equals": 0
+                  },
+                  {
+                    "var": "musique_aire",
+                    "not_equals": 0
+                  }
+                ]
+              },
+              "then": [
+                {
+                  "write": "u16",
+                  "address": "0x10ED82",
+                  "value": {
+                    "var": "musique_aire"
+                  }
+                },
+                {
+                  "write": "u16",
+                  "address": "0x10ED84",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "set": "arme_a_rendre",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "set": "perso_en_attente",
+          "value": {
+            "table": "perso",
+            "index": {
+              "var": "monde"
+            }
+          }
+        },
+        {
+          "for_each_tagged": {
+            "all": [
+              {
+                "slot_tag": "mort",
+                "equals": 0
+              },
+              {
+                "slot_routine": true,
+                "not_equals": "0x0000567A"
+              },
+              {
+                "any": [
+                  {
+                    "all": [
+                      {
+                        "slot_tag": "genre",
+                        "equals": "SOLDAT"
+                      },
+                      {
+                        "slot_routine": true,
+                        "between": [
+                          "0x029000",
+                          "0x02AFFF"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "all": [
+                      {
+                        "slot_tag": "genre",
+                        "equals": "MONSTRE"
+                      },
+                      {
+                        "slot_tag": "zombie",
+                        "equals": 1
+                      },
+                      {
+                        "slot_routine": true,
+                        "between": [
+                          "0x03FB86",
+                          "0x0411FF"
+                        ]
+                      },
+                      {
+                        "not": {
+                          "slot_routine": true,
+                          "between": [
+                            "0x040434",
+                            "0x04074F"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "all": [
+                      {
+                        "slot_tag": "genre",
+                        "equals": "MONSTRE"
+                      },
+                      {
+                        "slot_tag": "zombie",
+                        "equals": 0
+                      },
+                      {
+                        "any": [
+                          {
+                            "shr": [
+                              {
+                                "slot_routine": true
+                              },
+                              12
+                            ],
+                            "equals": {
+                              "shr": [
+                                {
+                                  "slot_tag": "init"
+                                },
+                                12
+                              ]
+                            }
+                          },
+                          {
+                            "slot_read": "u8",
+                            "offset": "0x5B",
+                            "bit_set": "0x80"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "do": [
+            {
+              "if": {
+                "var": "monde",
+                "equals": 0
+              },
+              "then": [
+                {
+                  "if": {
+                    "slot_tag": "genre",
+                    "equals": "MONSTRE"
+                  },
+                  "then": [
+                    {
+                      "call": "greffe_soldat"
+                    }
+                  ]
+                }
+              ],
+              "else": [
+                {
+                  "call": "greffe_monstre"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "rules": [
+      {
+        "id": "depart",
+        "when": {
+          "var": "depart_fait",
+          "equals": 0
+        },
+        "do": [
+          {
+            "set": "depart_fait",
+            "value": 1
+          },
+          {
+            "if": {
+              "read": "u8",
+              "address": "0x1002BA",
+              "not_equals": 0
+            },
+            "then": [
+              {
+                "set": "perso_en_attente",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "section",
+        "when": {
+          "signal": "changes",
+          "of": {
+            "read": "u16",
+            "address": "0x10040C"
+          }
+        },
+        "do": [
+          {
+            "reset_tags": true
+          }
+        ]
+      },
+      {
+        "id": "fin_partie",
+        "when": {
+          "all": [
+            {
+              "not": "en_jeu"
+            },
+            {
+              "var": "monde",
+              "not_equals": 0
+            }
+          ]
+        },
+        "do": [
+          {
+            "set": "monde_avant",
+            "value": {
+              "var": "monde"
+            }
+          },
+          {
+            "set": "monde",
+            "value": 0
+          },
+          {
+            "call": "changer_monde"
+          }
+        ]
+      },
+      {
+        "id": "boss",
+        "when": {
+          "signal": "becomes_true",
+          "of": "boss"
+        },
+        "do": [
+          {
+            "set": "boss",
+            "value": 1
+          },
+          {
+            "if": {
+              "var": "monde",
+              "not_equals": 0
+            },
+            "then": [
+              {
+                "set": "monde_avant",
+                "value": {
+                  "var": "monde"
+                }
+              },
+              {
+                "set": "monde",
+                "value": 0
+              },
+              {
+                "call": "changer_monde"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fin_boss",
+        "when": {
+          "signal": "becomes_false",
+          "of": "boss"
+        },
+        "do": [
+          {
+            "set": "boss",
+            "value": 0
+          }
+        ]
+      },
+      {
+        "id": "coup",
+        "when": {
+          "read": "u8",
+          "address": "0x100554",
+          "in": [
+            "0x13",
+            "0x14",
+            "0x16"
+          ]
+        },
+        "do": [
+          {
+            "write": "u8",
+            "address": "0x100554",
+            "value": 0
+          }
+        ]
+      },
+      {
+        "id": "corps",
+        "when": {
+          "read": "u8",
+          "address": "0x10058F",
+          "in": [
+            "0x02",
+            "0x03",
+            "0x06",
+            "0x07"
+          ]
+        },
+        "do": [
+          {
+            "write": "u8",
+            "address": "0x10058F",
+            "value": {
+              "if": {
+                "read": "u16",
+                "address": "0x10EAF2",
+                "not_equals": "0xFF00"
+              },
+              "then": 1,
+              "else": 0
+            }
+          }
+        ]
+      },
+      {
+        "id": "lancer",
+        "when": {
+          "all": [
+            {
+              "signal": "decreases",
+              "of": {
+                "read": "u8",
+                "address": "0x10EAF5"
+              }
+            },
+            "a_pied",
+            {
+              "var": "boss",
+              "equals": 0
+            }
+          ]
+        },
+        "do": [
+          {
+            "set": "monde_avant",
+            "value": {
+              "var": "monde"
+            }
+          },
+          {
+            "set": "monde",
+            "value": {
+              "mod": [
+                {
+                  "add": [
+                    {
+                      "var": "monde"
+                    },
+                    1
+                  ]
+                },
+                4
+              ]
+            }
+          },
+          {
+            "call": "changer_monde"
+          }
+        ]
+      },
+      {
+        "id": "naissance",
+        "for": "births",
+        "when": {
+          "all": [
+            {
+              "var": "boss",
+              "equals": 0
+            },
+            {
+              "whitelist": "transformables",
+              "not_equals": 0
+            }
+          ]
+        },
+        "do": [
+          {
+            "tag": "mort",
+            "value": 0
+          },
+          {
+            "tag": "type",
+            "value": {
+              "if": {
+                "whitelist": "transformables",
+                "equals": "K_SOLDAT"
+              },
+              "then": {
+                "map": {
+                  "slot_read": "u8",
+                  "offset": "0x7B"
+                },
+                "keys": [
+                  "0x02",
+                  "0x10",
+                  "0x12",
+                  "0xE0",
+                  "0x04",
+                  "0x08",
+                  "0x0C",
+                  "0x0E"
+                ],
+                "values": [
+                  "0x0298BE",
+                  "0x0298CC",
+                  "0x0298DA",
+                  "0x0298E8",
+                  "0x0298F6",
+                  "0x029904",
+                  "0x029912",
+                  "0x029920"
+                ],
+                "default": {
+                  "table": "soldats",
+                  "index": {
+                    "random": 8
+                  }
+                }
+              },
+              "else": {
+                "table": "soldats",
+                "index": {
+                  "random": 8
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "var": "monde",
+              "equals": 0
+            },
+            "then": [
+              {
+                "if": {
+                  "whitelist": "transformables",
+                  "equals": "K_SOLDAT"
+                },
+                "then": [
+                  {
+                    "tag": "genre",
+                    "value": "SOLDAT"
+                  },
+                  {
+                    "tag": "zombie",
+                    "value": 0
+                  },
+                  {
+                    "tag": "init",
+                    "value": 0
+                  }
+                ],
+                "else": [
+                  {
+                    "call": "greffe_soldat"
+                  }
+                ]
+              }
+            ],
+            "else": [
+              {
+                "call": "greffe_monstre"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mort_soldat",
+        "for": "tagged",
+        "when": {
+          "all": [
+            {
+              "slot_tag": "genre",
+              "equals": "SOLDAT"
+            },
+            {
+              "slot_routine": true,
+              "between": [
+                "0x096000",
+                "0x096FFF"
+              ]
+            }
+          ]
+        },
+        "do": [
+          {
+            "tag": "mort",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "id": "mort_zombie",
+        "for": "tagged",
+        "when": {
+          "all": [
+            {
+              "slot_tag": "zombie",
+              "equals": 1
+            },
+            {
+              "slot_routine": true,
+              "between": [
+                "0x040434",
+                "0x04074F"
+              ]
+            }
+          ]
+        },
+        "do": [
+          {
+            "tag": "mort",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "id": "teinte_tenue",
+        "when": {
+          "all": [
+            {
+              "var": "monde",
+              "not_equals": 0
+            },
+            {
+              "any": [
+                {
+                  "read": "u16",
+                  "address": "0x108DA4",
+                  "not_equals": {
+                    "table": "teinte",
+                    "index": [
+                      {
+                        "var": "monde"
+                      },
+                      0
+                    ]
+                  }
+                },
+                {
+                  "read": "u16",
+                  "address": "0x108DA6",
+                  "not_equals": {
+                    "table": "teinte",
+                    "index": [
+                      {
+                        "var": "monde"
+                      },
+                      1
+                    ]
+                  }
+                },
+                {
+                  "read": "u16",
+                  "address": "0x108DA8",
+                  "not_equals": {
+                    "table": "teinte",
+                    "index": [
+                      {
+                        "var": "monde"
+                      },
+                      2
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "do": [
+          {
+            "call": "teinte_du_monde"
+          }
+        ]
+      },
+      {
+        "id": "musique_tenue",
+        "when": {
+          "all": [
+            {
+              "var": "monde",
+              "not_equals": 0
+            },
+            {
+              "read": "u16",
+              "address": "0x10ED80",
+              "not_equals": {
+                "table": "musique",
+                "index": {
+                  "var": "monde"
+                }
+              }
+            },
+            {
+              "read": "u16",
+              "address": "0x10ED82",
+              "not_equals": {
+                "table": "musique",
+                "index": {
+                  "var": "monde"
+                }
+              }
+            },
+            {
+              "not": {
+                "read": "u16",
+                "address": "0x10ED80",
+                "mask": "0xFF",
+                "in": [
+                  "0x24",
+                  "0x33",
+                  "0x30"
+                ]
+              }
+            }
+          ]
+        },
+        "do": [
+          {
+            "if": {
+              "all": [
+                {
+                  "read": "u16",
+                  "address": "0x10ED80",
+                  "not_equals": 0
+                },
+                {
+                  "read": "u16",
+                  "address": "0x10ED80",
+                  "mask": "0xFF00",
+                  "equals": 0
+                }
+              ]
+            },
+            "then": [
+              {
+                "set": "musique_aire",
+                "value": {
+                  "read": "u16",
+                  "address": "0x10ED80"
+                }
+              }
+            ]
+          },
+          {
+            "write": "u16",
+            "address": "0x10ED82",
+            "value": {
+              "table": "musique",
+              "index": {
+                "var": "monde"
+              }
+            }
+          },
+          {
+            "write": "u16",
+            "address": "0x10ED84",
+            "value": 0
+          }
+        ]
+      },
+      {
+        "id": "arme_tenue",
+        "when": {
+          "all": [
+            {
+              "var": "monde",
+              "not_equals": 0
+            },
+            "a_pied"
+          ]
+        },
+        "do": [
+          {
+            "write": "u16",
+            "address": "0x10EAF2",
+            "value": {
+              "table": "arme",
+              "index": {
+                "var": "monde"
+              }
+            }
+          },
+          {
+            "write": "u16",
+            "address": "0x10EAFA",
+            "value": "0x03E7"
+          },
+          {
+            "write": "u8",
+            "address": "0x10058F",
+            "set_bits": 1
+          },
+          {
+            "write": "u8",
+            "address": "0x10058E",
+            "set_bits": 1
+          }
+        ]
+      },
+      {
+        "id": "arme_rendue",
+        "when": {
+          "all": [
+            {
+              "var": "monde",
+              "equals": 0
+            },
+            {
+              "var": "arme_a_rendre",
+              "equals": 1
+            },
+            "a_pied"
+          ]
+        },
+        "do": [
+          {
+            "set": "arme_a_rendre",
+            "value": 0
+          },
+          {
+            "if": {
+              "var": "arme_avant",
+              "not_equals": -1
+            },
+            "then": [
+              {
+                "write": "u16",
+                "address": "0x10EAF2",
+                "value": {
+                  "var": "arme_avant"
+                }
+              },
+              {
+                "write": "u16",
+                "address": "0x10EAFA",
+                "value": {
+                  "var": "mun_avant"
+                }
+              },
+              {
+                "if": {
+                  "var": "arme_avant",
+                  "not_equals": "0xFF00"
+                },
+                "then": [
+                  {
+                    "write": "u8",
+                    "address": "0x10058F",
+                    "set_bits": 1
+                  },
+                  {
+                    "write": "u8",
+                    "address": "0x10058E",
+                    "set_bits": 1
+                  }
+                ],
+                "else": [
+                  {
+                    "write": "u8",
+                    "address": "0x10058F",
+                    "clear_bits": 1
+                  },
+                  {
+                    "write": "u8",
+                    "address": "0x10058E",
+                    "clear_bits": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "personnage",
+        "when": {
+          "all": [
+            {
+              "var": "perso_en_attente",
+              "not_equals": -1
+            },
+            "a_pied",
+            "hors_transformation"
+          ]
+        },
+        "do": [
+          {
+            "write": "u8",
+            "address": "0x1002BA",
+            "value": {
+              "var": "perso_en_attente"
+            }
+          },
+          {
+            "write": "u8",
+            "address": "0x100567",
+            "value": {
+              "var": "perso_en_attente"
+            }
+          },
+          {
+            "write": "u32",
+            "address": "0x100584",
+            "value": {
+              "table": "dessins",
+              "index": {
+                "var": "perso_en_attente"
+              }
+            }
+          },
+          {
+            "write": "u8",
+            "address": "0x10058E",
+            "value": 3
+          },
+          {
+            "set": "perso_en_attente",
+            "value": -1
+          }
+        ]
+      }
+    ]
+  }
+}

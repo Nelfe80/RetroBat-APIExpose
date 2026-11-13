@@ -312,6 +312,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         var consignes = reglement.Verrous.Select(v => v.Ligne).ToList();
         if (reglement.EstUnChallenge && RamDefinitionLayers.DefinitionDeChallenge(reglement.SystemId, reglement.RomGroup) is not null)
             consignes.Add(VerrousDuLancement.CoucheDesChallenges);
+        // LES REGLES (wrapper 0.346) : le bloc du reglement sur une ligne, lu par le wrapper avec les verrous.
+        if (reglement.LigneDesRegles is { } regles) consignes.Add(regles);
         VerrousDuLancement.Poser(nomDeLaRom, consignes);
         if (consignes.Count > 0)
         {
@@ -811,6 +813,16 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         if (reglement is null) return;
         var racine = payload is JsonElement j ? j : JsonSerializer.SerializeToElement(payload);
         var lus = racine.TryGetProperty("Locks", out var l) && l.ValueKind == JsonValueKind.String ? l.GetString() ?? "" : "";
+        // Les regles (wrapper 0.346) : la meme empreinte, et un bloc qui compile. Un wrapper plus ancien n'en dit rien.
+        var regles = racine.TryGetProperty("RulesSha256", out var rs) && rs.ValueKind == JsonValueKind.String ? rs.GetString() ?? "" : "";
+        var reglesValides = racine.TryGetProperty("RulesValid", out var rv) && rv.ValueKind == JsonValueKind.True;
+        if (!string.Equals(regles, reglement.ReglesSha256, StringComparison.Ordinal) || (reglement.Regles is not null && !reglesValides))
+        {
+            _journal.LogWarning("Speedrun : regles lues par le wrapper ({Lues}, valides {Valides}) au lieu de {Attendues} pour {Defi}.",
+                regles, reglesValides, reglement.ReglesSha256, reglement.ChallengeId);
+            _ = AfficherAsync(new MessageJoueur("speedrun.msg.locks_missing", "Challenge locks not active: no time will be sent."));
+            return;
+        }
         if (string.Equals(lus, reglement.LignesDesVerrous, StringComparison.Ordinal)) return;
         _journal.LogWarning("Speedrun : verrous lus par le wrapper « {Lus} » au lieu de « {Attendus} » pour {Defi}.", lus, reglement.LignesDesVerrous, reglement.ChallengeId);
         _ = AfficherAsync(new MessageJoueur("speedrun.msg.locks_missing", "Challenge locks not active: no time will be sent."));

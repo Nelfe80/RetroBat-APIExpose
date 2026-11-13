@@ -39,7 +39,10 @@ public sealed record ReplayRuntime(
     // LES VERROUS D'UN DEFI (D18, wrapper 0.343) : les lignes que le wrapper a tenues pendant l'enregistrement, telles
     // qu'il les a attestees (« 0x100596,1,set_bits,0x01 », separees par « ; »). Le replay ne garde que les appuis : sans
     // les memes verrous a la lecture, la partie diverge. Null hors defi a verrous et dans les manifestes anterieurs.
-    string? Locks = null);
+    string? Locks = null,
+    // LES REGLES D'UN CHALLENGE (wrapper 0.346) : le bloc tel que le wrapper l'a atteste (JSON compact). Sans elles a la lecture,
+    // les monstres, l'arme et le personnage ne changent plus et la partie diverge. Null hors challenge a regles.
+    string? Rules = null);
 
 /// <summary>Un fichier de l'archive de la ROM : son nom dans le zip et son CRC (8 chiffres hexadecimaux).</summary>
 public sealed record ReplayRomFile(string Name, string Crc32);
