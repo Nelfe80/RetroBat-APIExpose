@@ -386,7 +386,7 @@ public class JeuxMassRunTests
     public void Rka_et_Mega_Man_X_donnent_leur_arrivee_au_coeur()
     {
         var rka = JeuxMassRun.Trouver("megadrive/rocket-knight-adventures")!;
-        Assert.Null(JeuxMassRun.ArriveeDuNiveau(rka, "stage-1"));
+        Assert.Equal((0xFB13u, 0x05u), JeuxMassRun.ArriveeDuNiveau(rka, "stage-1"));
         Assert.Equal((0xFB13u, 0x2Eu), JeuxMassRun.ArriveeDuNiveau(rka, "stage-3"));
         Assert.Equal((0xFB13u, 0x30u), JeuxMassRun.ArriveeDuNiveau(rka, "stage-4"));
         Assert.Equal((0xFB13u, 0x32u), JeuxMassRun.ArriveeDuNiveau(rka, "stage-7"));

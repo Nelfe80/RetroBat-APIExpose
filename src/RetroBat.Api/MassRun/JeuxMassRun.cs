@@ -69,10 +69,11 @@ public static class JeuxMassRun
                 RegexOptions.CultureInvariant),
             ImagesParSeconde: 59.922743),
         // Rocket Knight Adventures (06/11, ouverture preparee le 07/11), version USA : profil du coeur en fichier
-        // (a6efec47.ini). Stage 1 : le coeur prend l'arrivee quand l'etat du jeu $B029 tombe de 3 a 0 et une mort quand il
-        // passe a 4. A la fin des stages 3, 4 et 7 (banc du 07/11) il passe par 4 (3 -> 4 -> 5 -> 0) une image apres le
-        // changement de scene : depuis le 13/11 la salle y donne l'arrivee (scene $FB13, voir ArriveeDuNiveau), que le coeur
-        // genesis_plus_gx_ghosts lit avant la mort. Stages 2, 5, 6 : arrivee non vue, pas d'epreuve.
+        // (a6efec47.ini). L'etat du jeu $B029 passe par 4 (une mort pour le coeur) puis 0 (l'arrivee du profil) a CHAQUE
+        // changement de scene, une image apres que la scene $FB13 a change (bancs du 07/11 et du 13/11). Depuis le 13/11, la
+        // salle donne l'arrivee des quatre stages (scene $FB13, voir ArriveeDuNiveau) et le profil la scene (« sous_scene ») :
+        // le coeur genesis_plus_gx_ghosts du 13/11 ne compte plus un changement de scene pour une mort. Stages 2, 5, 6 :
+        // arrivee non vue, pas d'epreuve.
         new("megadrive/rocket-knight-adventures", "megadrive", "rocket-knight-adventures", 0xa6efec47, "genesis_plus_gx_ghosts",
             "Rocket Knight Adventures (USA).zip", new Regex("^stage-[1347]$", RegexOptions.CultureInvariant),
             ImagesParSeconde: 59.922743),
@@ -111,11 +112,14 @@ public static class JeuxMassRun
             _ => null,
         },
         // Rocket Knight Adventures (13/11) : la scene $FB13 (adresse 68000, l'octet 0xFB12 des reglements) quitte la derniere
-        // scene du stage pour la cinematique de fin, une image AVANT que l'etat du jeu $B029 passe par 4 (que le coeur prend
-        // pour une mort). Le reglement arrete le chrono plus tard (premiere scene du stage suivant) : MASS RUN n'est pas
-        // certifie, tous les coureurs ont la meme arrivee. Stage 1 : la regle du coeur ($B029 tombe a 0).
+        // scene du stage, une image AVANT que l'etat du jeu $B029 passe par 4 (que le coeur prendrait pour une mort) puis 0
+        // (que le profil prendrait pour l'arrivee, a CHAQUE changement de scene d'un stage). L'arrivee de la salle remplace la
+        // regle du profil (coeur du 13/11). Stage 1 : la scene 5 (premiere du stage 2, meme image que $B029 a 0, comme son
+        // reglement) ; stages 3, 4, 7 : la cinematique de fin (le reglement arrete le chrono plus tard, a la premiere scene du
+        // stage suivant : MASS RUN n'est pas certifie, tous les coureurs ont la meme arrivee).
         "megadrive/rocket-knight-adventures" => niveau switch
         {
+            "stage-1" => (0xFB13u, 0x05u),
             "stage-3" => (0xFB13u, 0x2Eu),
             "stage-4" => (0xFB13u, 0x30u),
             "stage-7" => (0xFB13u, 0x32u),
