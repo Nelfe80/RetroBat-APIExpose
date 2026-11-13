@@ -291,13 +291,13 @@ internal sealed class FauxSiteVocal : HttpMessageHandler
 
     public HttpStatusCode? Statut { get; set; }
 
-    public static JsonObject Voix(string room, long generation, string statut, string join, string? raison = null) => new()
+    public static JsonObject Voix(string room, long generation, string statut, string join, string? raison = null, bool micro = true) => new()
     {
         ["ok"] = true,
         ["voice"] = new JsonObject
         {
             ["room"] = room, ["generation"] = generation, ["status"] = statut,
-            ["lobby_id"] = statut == "ready" ? "123456789012345678" : null, ["join"] = join, ["mic_muted"] = true, ["reason"] = raison,
+            ["lobby_id"] = statut == "ready" ? "123456789012345678" : null, ["join"] = join, ["mic_muted"] = micro, ["reason"] = raison,
         },
     };
 

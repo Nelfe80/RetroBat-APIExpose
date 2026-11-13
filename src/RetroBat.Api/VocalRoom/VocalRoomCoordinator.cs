@@ -45,6 +45,13 @@ public sealed class VocalRoomCoordinator : BackgroundService
     private VocalProfil? _profil;
     private DateTime _profilLuUtc = DateTime.MinValue;
     private bool _microCoupe = true;
+
+    /// <summary>
+    /// Le dernier choix explicite du joueur pendant cette session (Y, reglage local) a ete de couper le micro : il passe
+    /// avant le micro ouvert du site a chaque salon de la session, jusqu'a sa fin.
+    /// </summary>
+    private bool _coupeParLeJoueur;
+
     private bool _casqueCoupe;
 
     public VocalRoomCoordinator(
@@ -174,6 +181,7 @@ public sealed class VocalRoomCoordinator : BackgroundService
             {
                 _session = s;
                 _microCoupe = true;
+                _coupeParLeJoueur = false;
             }
 
             _processus.NouvelleSession();
@@ -362,7 +370,9 @@ public sealed class VocalRoomCoordinator : BackgroundService
             return;
         }
 
-        lock (_verrou) _microCoupe = microCoupeDuSite || _microCoupe;
+        // A chaque salon, le micro prend la valeur du site (micro ouvert des l'arrivee si le joueur l'a choisi sur /account),
+        // sauf si le joueur l'a coupe pendant cette session ; jamais plus permissif que le site.
+        lock (_verrou) _microCoupe = MicroAuSalon(microCoupeDuSite, _coupeParLeJoueur);
         if (!await _processus.DemarrerAsync(ct).ConfigureAwait(false))
         {
             await PerdreLeVocalAsync(s, _processus.Etat.Raison ?? "exe_unavailable", ct).ConfigureAwait(false);
@@ -393,6 +403,20 @@ public sealed class VocalRoomCoordinator : BackgroundService
         {
             await PerdreLeVocalAsync(s, Messages.Str(Messages.Obj(attache, "error"), "code") ?? "attach_failed", ct).ConfigureAwait(false);
             return;
+        }
+
+        // Le micro dit de nouveau, explicitement, au salon qui vient d'etre attache (l'exe l'a deja pris de session.attach ;
+        // voice.mute garantit l'etat meme si l'exe en avait un autre).
+        var muet = await _processus.CommanderAsync(Commands.VoiceMute, new JsonObject
+        {
+            ["muted"] = micro,
+            ["room_id"] = s.Room,
+            ["generation"] = s.Generation,
+        }).ConfigureAwait(false);
+        if (Messages.Bool(muet, "ok") != true)
+        {
+            _journal?.LogWarning("VOCAL : room {Room} generation {Generation}, voice.mute refuse a l'attachement ({Code})", s.Room,
+                s.Generation, Messages.Str(Messages.Obj(muet, "error"), "code") ?? "sans reponse");
         }
 
         if (casque)
@@ -617,7 +641,7 @@ public sealed class VocalRoomCoordinator : BackgroundService
         else
         {
             bool micro;
-            lock (_verrou) micro = _microCoupe = !_microCoupe;
+            lock (_verrou) micro = _coupeParLeJoueur = _microCoupe = !_microCoupe;
             await _processus.CommanderAsync(Commands.VoiceMute, new JsonObject { ["muted"] = micro }).ConfigureAwait(false);
         }
 
@@ -630,7 +654,7 @@ public sealed class VocalRoomCoordinator : BackgroundService
     {
         if (microCoupe is { } m)
         {
-            lock (_verrou) _microCoupe = m;
+            lock (_verrou) _coupeParLeJoueur = _microCoupe = m;
             await _processus.CommanderAsync(Commands.VoiceMute, new JsonObject { ["muted"] = m }).ConfigureAwait(false);
         }
 
@@ -663,6 +687,12 @@ public sealed class VocalRoomCoordinator : BackgroundService
             return s is null ? null : Afficher(s.Phase, s.Raison, _processus.Etat, micro, casque);
         }
     }
+
+    /// <summary>
+    /// Le micro a l'attachement d'un salon : coupe si le site le dit coupe, ou si le joueur l'a coupe pendant la session ;
+    /// ouvert seulement si le site l'ouvre et que le joueur ne l'a pas coupe. Pur.
+    /// </summary>
+    internal static bool MicroAuSalon(bool microCoupeDuSite, bool coupeParLeJoueur) => microCoupeDuSite || coupeParLeJoueur;
 
     /// <summary>L'indicateur pour une phase de session et un etat de l'exe. Pur.</summary>
     internal static VoixAffichee? Afficher(Phase phase, string? raison, VocalRoomEtat exe, bool microCoupe, bool casqueCoupe) => phase switch

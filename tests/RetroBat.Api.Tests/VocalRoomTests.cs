@@ -316,7 +316,7 @@ public class VocalRoomTests
         await b.TourAsync();
 
         Assert.Equal(1, b.Exe.Lancements);
-        Assert.Equal(["hello", "health", "auth.apply_token", "session.attach"], b.CommandesRecues.ToArray());
+        Assert.Equal(["hello", "health", "auth.apply_token", "session.attach", "voice.mute"], b.CommandesRecues.ToArray());
         var jeton = b.Exe.Commandes.First(c => c.Commande == "auth.apply_token").Charge;
         Assert.Equal("jeton-secret-de-test-123", Messages.Str(jeton, "access_token"));
         var attache = b.Exe.Commandes.First(c => c.Commande == "session.attach").Charge;
@@ -325,6 +325,9 @@ public class VocalRoomTests
         Assert.Equal(Lobby, Messages.Str(attache, "lobby_id"));
         Assert.True(Messages.Bool(attache, "auto_join"));
         Assert.True(Messages.Bool(attache, "mic_muted"));
+        var muet = b.Exe.Commandes.First(c => c.Commande == "voice.mute").Charge;
+        Assert.True(Messages.Bool(muet, "muted"));
+        Assert.Equal(1, Messages.Long(muet, "generation"));
         Assert.Contains(b.Coordinateur.Affichage!.Etat, new[] { EtatDeLaVoix.Connexion, EtatDeLaVoix.Pret });
 
         await b.Exe.Dernier!.EmettreAsync("IN_CALL", 2);
@@ -561,6 +564,146 @@ public class VocalRoomTests
         Assert.Contains(b.Site.Appels, a => a.Route == "leave");
     }
 
+    // ── le micro a l'arrivee (preference open_with_prior_opt_in de /account) ──────────────────────
+
+    [Theory]
+    [InlineData(true, false, true)]
+    [InlineData(false, false, false)]
+    [InlineData(true, true, true)]
+    [InlineData(false, true, true)]
+    public void Le_micro_au_salon_n_est_jamais_plus_ouvert_que_le_site(bool site, bool joueur, bool attendu)
+        => Assert.Equal(attendu, VocalRoomCoordinator.MicroAuSalon(site, joueur));
+
+    private static bool? MicroAttache(Banc b, long generation)
+        => Messages.Bool(b.Exe.Commandes.Last(c => c.Commande == "session.attach" && Messages.Long(c.Charge, "generation") == generation).Charge, "mic_muted");
+
+    private static JsonObject MuetAttache(Banc b, long generation)
+        => b.Exe.Commandes.Last(c => c.Commande == "voice.mute" && Messages.Long(c.Charge, "generation") == generation).Charge;
+
+    [Fact]
+    public async Task Le_site_ouvre_le_micro_il_s_ouvre_a_l_arrivee_dans_le_salon()
+    {
+        await using var b = new Banc();
+        b.Site.Session = room => FauxSiteVocal.Voix(room, 1, "ready", "auto", micro: false);
+        b.Rooms.Add(Salle("launching"));
+        await b.TourAsync();
+
+        Assert.Equal(["hello", "health", "auth.apply_token", "session.attach", "voice.mute"], b.CommandesRecues.ToArray());
+        Assert.False(MicroAttache(b, 1));
+        var muet = MuetAttache(b, 1);
+        Assert.False(Messages.Bool(muet, "muted"));
+        Assert.Equal(Room, Messages.Str(muet, "room_id"));
+        Assert.False(b.Coordinateur.MicroCoupe);
+        Assert.Contains(b.Journal.Lignes, l => l.Contains("attachee (micro ouvert)", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task Le_site_ouvre_le_micro_par_le_sondage_aussi()
+    {
+        await using var b = new Banc();
+        b.Rooms.Add(Salle("playing", new MultiplayerVoix { Generation = 1, Status = "ready", LobbyId = Lobby, Join = "auto", MicMuted = false }));
+        await b.TourAsync();
+        Assert.False(MicroAttache(b, 1));
+        Assert.False(Messages.Bool(MuetAttache(b, 1), "muted"));
+        Assert.False(b.Coordinateur.MicroCoupe);
+    }
+
+    [Fact]
+    public async Task Le_joueur_coupe_avec_Y_le_salon_suivant_reste_coupe_malgre_le_site()
+    {
+        await using var b = new Banc();
+        b.Site.Session = room => FauxSiteVocal.Voix(room, 1, "ready", "auto", micro: false);
+        b.Rooms.Add(Salle("playing"));
+        await b.TourAsync();
+        Assert.False(b.Coordinateur.MicroCoupe);
+
+        Assert.True(await b.Coordinateur.GesteAsync(maintenu: false));   // Y : le joueur coupe
+        Assert.True(b.Coordinateur.MicroCoupe);
+
+        // Nouvelle generation de la meme room (nouveau salon), le site dit toujours « ouvert » : le choix du joueur passe avant.
+        b.Site.Session = room => FauxSiteVocal.Voix(room, 2, "ready", "auto", micro: false);
+        b.Heure = b.Heure.AddSeconds(3);
+        await b.TourAsync();
+        Assert.True(MicroAttache(b, 2));
+        Assert.True(Messages.Bool(MuetAttache(b, 2), "muted"));
+        Assert.True(b.Coordinateur.MicroCoupe);
+    }
+
+    [Fact]
+    public async Task Le_joueur_rouvre_avec_Y_le_salon_suivant_suit_le_site()
+    {
+        await using var b = new Banc();
+        b.Site.Session = room => FauxSiteVocal.Voix(room, 1, "ready", "auto", micro: false);
+        b.Rooms.Add(Salle("playing"));
+        await b.TourAsync();
+        await b.Coordinateur.GesteAsync(maintenu: false);   // coupe
+        await b.Coordinateur.GesteAsync(maintenu: false);   // rouvre : son dernier choix n'est plus « coupe »
+        Assert.False(b.Coordinateur.MicroCoupe);
+
+        b.Site.Session = room => FauxSiteVocal.Voix(room, 2, "ready", "auto", micro: false);
+        b.Heure = b.Heure.AddSeconds(3);
+        await b.TourAsync();
+        Assert.False(MicroAttache(b, 2));
+        Assert.False(b.Coordinateur.MicroCoupe);
+    }
+
+    [Fact]
+    public async Task Le_site_recoupe_le_micro_au_salon_suivant_meme_rouvert_par_le_joueur()
+    {
+        await using var b = new Banc();
+        b.Rooms.Add(Salle("playing"));
+        await b.TourAsync();
+        Assert.True(MicroAttache(b, 1));
+        await b.Coordinateur.ReglerAsync(microCoupe: false, casqueCoupe: null);   // le joueur ouvre pendant la generation 1
+        Assert.False(b.Coordinateur.MicroCoupe);
+
+        b.Site.Session = room => FauxSiteVocal.Voix(room, 2, "ready", "auto");   // le site dit coupe
+        b.Heure = b.Heure.AddSeconds(3);
+        await b.TourAsync();
+        Assert.True(MicroAttache(b, 2));
+        Assert.True(Messages.Bool(MuetAttache(b, 2), "muted"));
+        Assert.True(b.Coordinateur.MicroCoupe);
+    }
+
+    [Fact]
+    public async Task Le_mute_du_joueur_s_arrete_avec_sa_session()
+    {
+        const string autre = "fedcba9876543210fedcba9876543210";
+        await using var b = new Banc();
+        b.Site.Session = room => FauxSiteVocal.Voix(room, 1, "ready", "auto", micro: false);
+        b.Rooms.Add(Salle("playing"));
+        await b.TourAsync();
+        await b.Coordinateur.GesteAsync(maintenu: false);   // coupe pendant cette session
+        Assert.True(b.Coordinateur.MicroCoupe);
+
+        b.Rooms.Clear();   // la room est partie : la session aussi
+        await b.TourAsync();
+        Assert.Null(b.Coordinateur.Session);
+
+        b.Rooms.Add(Salle("playing", room: autre));   // nouvelle session, le site ouvre : le micro s'ouvre
+        await b.TourAsync();
+        var attache = b.Exe.Commandes.Last(c => c.Commande == "session.attach").Charge;
+        Assert.Equal(autre, Messages.Str(attache, "room_id"));
+        Assert.False(Messages.Bool(attache, "mic_muted"));
+        Assert.False(Messages.Bool(b.Exe.Commandes.Last(c => c.Commande == "voice.mute").Charge, "muted"));
+        Assert.False(b.Coordinateur.MicroCoupe);
+    }
+
+    [Fact]
+    public async Task Apres_un_plantage_le_micro_repart_coupe_meme_si_le_site_l_ouvrait()
+    {
+        await using var b = new Banc();
+        b.Site.Session = room => FauxSiteVocal.Voix(room, 1, "ready", "auto", micro: false);
+        b.Rooms.Add(Salle("playing"));
+        await b.TourAsync();
+        Assert.False(b.Coordinateur.MicroCoupe);
+        b.Exe.Dernier!.Planter();
+        await Attendre.QueAsync(() => b.Exe.Commandes.Count(c => c.Commande == "voice.mute") == 2);
+        Assert.True(Messages.Bool(b.Exe.Commandes.Last(c => c.Commande == "session.attach").Charge, "mic_muted"));
+        Assert.True(Messages.Bool(b.Exe.Commandes.Last(c => c.Commande == "voice.mute").Charge, "muted"));
+        Assert.True(b.Coordinateur.MicroCoupe);
+    }
+
     // ── lot D : jeton des pending, identite verifiee ───────────────────────────────────────────────
 
     [Fact]
@@ -731,6 +874,10 @@ public class VocalRoomTests
                 ["room_id"] = Room, ["generation"] = 1, ["lobby_id"] = Lobby, ["auto_join"] = true, ["mic_muted"] = true,
             });
             Assert.True(Messages.Bool(attache, "ok"));
+            // Le micro redit au salon attache, comme le coordinateur le fait (room et generation de la session courante).
+            var muet = await service.CommanderAsync(Commands.VoiceMute, new JsonObject { ["muted"] = false, ["room_id"] = Room, ["generation"] = 1 });
+            Assert.True(Messages.Bool(muet, "ok"));
+            Assert.False(Messages.Bool(Messages.Obj(muet, "result"), "mic_muted"));
             var sansJeton = await service.CommanderAsync(Commands.AuthApplyToken, new JsonObject());
             Assert.Equal(ErrorCodes.InvalidPayload, Messages.Str(Messages.Obj(sansJeton, "error"), "code"));
             var creer = await service.CommanderAsync("lobby.create", new JsonObject());
