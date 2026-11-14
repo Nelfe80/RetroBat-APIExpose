@@ -94,6 +94,9 @@ public sealed class LeaderboardClient
     /// </summary>
     public TimeSpan Fraicheur { get; init; } = TimeSpan.FromSeconds(30);
 
+    /// <summary>Les empreintes et corps deja recus, par adresse (C-11) : partages par defaut avec le reste de l'API.</summary>
+    public LecturesConditionnelles Lectures { get; init; } = LecturesConditionnelles.Partagees;
+
     /// <summary>Oublie le classement en memoire : apres une partie, il a pu changer.</summary>
     public void Oublier()
     {
@@ -140,7 +143,8 @@ public sealed class LeaderboardClient
             {
                 using var client = _httpFactory.CreateClient(HttpClientName);
                 client.Timeout = TimeSpan.FromSeconds(6);
-                var corps = await client.GetStringAsync(url, ct).ConfigureAwait(false);
+                // L'empreinte du dernier classement recu repart (C-11, 14/11) : sans changement, 304 sans corps.
+                var corps = await Lectures.LireAsync(client, url, ct).ConfigureAwait(false);
                 var lignes = Lire(corps, monPseudo);
                 var etat = lignes.Count == 0 ? EtatAucunScore : EtatOk;
                 lock (_caches) _caches[cle] = (DateTime.UtcNow + Fraicheur, lignes, etat);
