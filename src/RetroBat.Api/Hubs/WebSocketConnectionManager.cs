@@ -49,6 +49,16 @@ public class WebSocketConnectionManager
     /// <summary>Une connexion s'est fermee : ce qu'elle avait demande (un cadre) part avec elle.</summary>
     public Action<object>? DeckConnectionClosed { get; set; }
 
+    /// <summary>
+    /// Le sens des signaux du lancement en cours (<c>deck.semantics</c>), pose au demarrage par le service du Deck : envoye
+    /// a la connexion des flux <c>ingame</c> et <c>arcade</c> (API-6), qui portent les signaux du .MEM. Null hors partie.
+    /// </summary>
+    public Func<string?>? DeckSemanticsJson { get; set; }
+
+    /// <summary>Les flux qui recoivent le sens des signaux a la connexion (ceux qui portent les signaux du .MEM).</summary>
+    private static bool RecoitLeSensDesSignaux(string stream)
+        => string.Equals(stream, "ingame", StringComparison.OrdinalIgnoreCase) || string.Equals(stream, "arcade", StringComparison.OrdinalIgnoreCase);
+
     /// <summary>Les flux qui recoivent l'instantane du Deck a la connexion.</summary>
     private static bool RecoitLInstantaneDuDeck(string stream)
         => stream.Length == 0 || string.Equals(stream, "deck", StringComparison.OrdinalIgnoreCase);
@@ -124,6 +134,16 @@ public class WebSocketConnectionManager
                 if (!string.IsNullOrWhiteSpace(json))
                 {
                     retainedMessages = new[] { json! }.Concat(retainedMessages).ToArray();
+                }
+            }
+
+            if (RecoitLeSensDesSignaux(normalizedStream) && DeckSemanticsJson is { } sens)
+            {
+                string? json = null;
+                try { json = sens(); } catch (Exception) { /* le sens manque, la connexion reste */ }
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    retainedMessages = retainedMessages.Concat(new[] { json! }).ToArray();
                 }
             }
         }
@@ -729,8 +749,9 @@ public class WebSocketConnectionManager
             ["instruction-card"] = ["instruction-card."],
             ["screen"] = ["screen."],
             ["panel"] = ["panel.", "theme."],
-            ["ingame"] = ["ingame.", "retroarch.", "wrapper."],
-            ["arcade"] = ["arcade.", "mame.", "fbneo.", "outputs."],
+            // deck.semantics (API-6) : le sens des signaux du .MEM voyage avec eux, pour tout jeu, Deck ou non
+            ["ingame"] = ["ingame.", "retroarch.", "wrapper.", "deck.semantics"],
+            ["arcade"] = ["arcade.", "mame.", "fbneo.", "outputs.", "deck.semantics"],
             ["score"] = ["score.live."],
             ["timer"] = ["timer.live."],
             ["speedrun"] = ["speedrun."],

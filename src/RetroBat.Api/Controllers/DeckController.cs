@@ -35,6 +35,37 @@ public sealed class DeckController : ControllerBase
     [ProducesResponseType(typeof(DeckSnapshot), StatusCodes.Status200OK)]
     public ActionResult<DeckSnapshot> Snapshot() => Ok(_deck.Snapshot("rest"));
 
+    /// <summary>
+    /// LE SENS DES SIGNAUX D'UN JEU (.SMEM), POUR TOUT JEU ET TOUT CLIENT (API-6, 14/11) : meme contenu que le message
+    /// <c>deck.semantics</c>. Avec <c>system</c> et <c>rom</c>, celui de ce jeu, lance ou non. Sans eux, celui du jeu lance
+    /// (lu au depart), sinon celui du jeu selectionne dans ES. <c>Status</c> : <c>loaded</c>, <c>absent</c> (pas de .SMEM),
+    /// <c>invalid</c> (avec <c>Errors</c>). 404 quand aucun .MEM n'est connu pour le jeu, ou sans jeu. Lecture seule.
+    /// </summary>
+    [HttpGet("semantics")]
+    [ProducesResponseType(typeof(DeckSemantics), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult Semantique([FromQuery] string? system, [FromQuery] string? rom, [FromServices] RetroBat.Domain.Models.ApiContext contexte)
+    {
+        if (!string.IsNullOrWhiteSpace(system) && !string.IsNullOrWhiteSpace(rom))
+        {
+            return _deck.SemantiqueDuJeu(system, rom) is { } duJeu
+                ? Ok(duJeu)
+                : NotFound(new { message = "No RAM definition (.MEM) resolved for this game.", system, rom });
+        }
+
+        if (_deck.SemantiqueCourante() is { } courante) return Ok(courante);
+        var jeu = contexte.Ui.Running ?? contexte.Ui.Selected;
+        var brut = jeu is null ? "" : Path.GetFileNameWithoutExtension(!string.IsNullOrEmpty(jeu.GamePath) ? jeu.GamePath : jeu.GameName ?? "");
+        if (jeu is null || brut.Length == 0 || string.IsNullOrEmpty(jeu.SystemId))
+        {
+            return NotFound(new { message = "No running or selected game." });
+        }
+
+        return _deck.SemantiqueDuJeu(jeu.SystemId, brut) is { } duCourant
+            ? Ok(duCourant)
+            : NotFound(new { message = "No RAM definition (.MEM) resolved for this game.", system = jeu.SystemId, rom = brut });
+    }
+
     /// <summary>Les cadres demandes (ceux d'un Deck connecte et ceux gardes).</summary>
     [HttpGet("frame-plan")]
     public IActionResult Plans() => Ok(_deck.Cadres.Tous());

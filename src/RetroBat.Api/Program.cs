@@ -800,6 +800,19 @@ var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
     wsManager.DeckSnapshotJson = deck.SnapshotJson;
     wsManager.DeckCommand = deck.Commande;
     wsManager.DeckConnectionClosed = deck.ConnexionFermee;
+    // Le sens des signaux (.SMEM) pour tout jeu (API-6) : lu des le depart avec le .MEM que le wrapper chargerait, rejoue a
+    // la connexion des flux ingame et arcade.
+    wsManager.DeckSemanticsJson = deck.SemantiqueJson;
+    {
+        var wrapperDuDeck = app.Services.GetRequiredService<RetroArchWrapperProvider>();
+        deck.DefinitionDuJeu = (rom, systeme) =>
+        {
+            var def = wrapperDuDeck.ResolveDefinitionFor(rom, systeme);
+            return def.DefinitionExists && !string.IsNullOrWhiteSpace(def.DefinitionFile) && File.Exists(def.DefinitionFile)
+                ? (def.DefinitionFile, def.Rom)
+                : (null, null);
+        };
+    }
     // Le Deck dans une room MULTIPLAYER (H-D17) : son decor remplace les panneaux des joueurs pour le joueur local.
     app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerLaunchService>().Deck =
         app.Services.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>();
