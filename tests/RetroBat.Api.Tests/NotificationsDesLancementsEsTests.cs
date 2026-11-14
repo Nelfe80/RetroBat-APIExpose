@@ -36,7 +36,7 @@ public sealed class NotificationsDesLancementsEsTests : IDisposable
     public void Dispose()
     {
         NotificationsRetroArch.PoserPourEssai(false);
-        NotificationsDesLancementsEs.SuccesParLesClesDuJeu = false;
+        NotificationsDesLancementsEs.SuccesParLesClesDuJeu = true;
         NotificationsRetroArch.JournalDesSuccesDEssai = null;
         NotificationsRetroArch.RetroArchCfgDEssai = null;
         NotificationsRetroArch.RetroArchTourneDEssai = null;
@@ -184,10 +184,14 @@ public sealed class NotificationsDesLancementsEsTests : IDisposable
     }
 
     [Fact]
-    public void Sans_l_accord_du_user_une_partie_du_World_Scoring_lancee_par_ES_reste_toute_coupee()
+    public void L_exception_elargie_par_le_user_est_en_service()
+        => Assert.True(NotificationsDesLancementsEs.SuccesParLesClesDuJeu);
+
+    [Fact]
+    public void Commutateur_coupe_une_partie_du_World_Scoring_lancee_par_ES_reste_toute_coupee()
     {
         AvecRetroAchievements();
-        Assert.False(NotificationsDesLancementsEs.SuccesParLesClesDuJeu);
+        NotificationsDesLancementsEs.SuccesParLesClesDuJeu = false;
         Assert.True(Service("collection", emulateur: false).PoserAvantLeLancement(Script));
         Assert.Equal("0", _es.Valeur(Cle));
         Assert.DoesNotContain(".retroarch.", _es.Texte());
@@ -238,6 +242,30 @@ public sealed class NotificationsDesLancementsEsTests : IDisposable
         Assert.True(Service("collection", emulateur: false).PoserAvantLeLancement(Script));
         Assert.Equal("0", _es.Valeur(Cle));
         Assert.DoesNotContain(".retroarch.", _es.Texte());
+    }
+
+    [Fact]
+    public async Task Au_demarrage_de_l_API_apres_un_plantage_tout_est_rendu_es_settings_et_retroarch_cfg()
+    {
+        AvecRetroAchievements();
+        _es.Poser("fbneo[\"19xx.zip\"].retroarch.notification_show_refresh_rate", "true"); // une valeur du joueur
+        var avant = _es.Texte();
+        var cfg = NotificationsRetroArch.RetroArchCfgDEssai!;
+        File.WriteAllText(cfg, "notification_show_refresh_rate = \"true\"\nnotification_show_screenshot_flash = \"0\"\n");
+        Assert.True(Service("collection", emulateur: false).PoserAvantLeLancement(Script));
+        Assert.Equal("false", _es.Valeur("fbneo[\"19xx.zip\"].retroarch.notification_show_refresh_rate"));
+        Assert.Null(_es.Valeur(Cle));
+        // le lanceur a ecrit les valeurs de la partie, puis l'API tombe (RetroArch ferme ensuite)
+        File.WriteAllText(cfg, "notification_show_refresh_rate = \"false\"\nnotification_show_screenshot_flash = \"2\"\n");
+
+        var redemarree = Service(null);
+        await redemarree.StartAsync(CancellationToken.None);
+        Assert.Equal(avant, _es.Texte());
+        Assert.False(File.Exists(Journal));
+        Assert.Equal("true", RetroBat.Api.Multiplayer.RetroArchConfigEdit.Lire(cfg, "notification_show_refresh_rate"));
+        Assert.Equal("0", RetroBat.Api.Multiplayer.RetroArchConfigEdit.Lire(cfg, "notification_show_screenshot_flash"));
+        Assert.False(File.Exists(NotificationsRetroArch.JournalDesSuccesDEssai!));
+        await redemarree.StopAsync(CancellationToken.None);
     }
 
     [Fact]

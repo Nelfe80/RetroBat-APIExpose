@@ -25,7 +25,7 @@ namespace RetroBat.Api.Infrastructure;
 /// sans emulateur, rendue quand meme ;</item>
 /// <item>une API arretee entre-temps : le journal est rendu a son demarrage, avant qu'ES s'ouvre (il attend l'API).</item>
 /// </list>
-/// Aucune autre cle n'est touchee (sauf <see cref="SuccesParLesClesDuJeu"/>, en attente de l'accord du user). Pas de
+/// Aucune autre cle n'est touchee (sauf les notification_show_* par jeu, <see cref="SuccesParLesClesDuJeu"/>). Pas de
 /// rechargement demande a ES : l'ecriture se fait au lancement (ES lance, il ne navigue pas) et le rendu pendant la partie (ES
 /// attend le lanceur) ; rien ne peut declencher un reloadgames en pleine navigation.
 /// </summary>
@@ -79,14 +79,15 @@ public sealed class NotificationsDesLancementsEs : IHostedService, IDisposable
     internal sealed record Note(string Cle, string? Avant, IReadOnlyList<Note>? Autres = null);
 
     /// <summary>
-    /// RETROACHIEVEMENTS VISIBLES EN WORLD SCORING PAR ES (14/11) : EN ATTENTE DE L'ACCORD DU USER, donc FAUX. L'exception du
-    /// 11/11 ne couvre que la cle <c>OnScreenMsg</c> par jeu. Ce qu'il faudrait de plus pour une partie du World Scoring lancee
-    /// par ES (carrousel, defi sans Deck, site) d'un joueur qui a RetroAchievements : au lieu de <c>OnScreenMsg = 0</c>, les cles
-    /// par jeu <c>systeme["rom"].retroarch.notification_show_*</c> (<see cref="NotificationsRetroArch.AutresNotifications"/>),
-    /// que le lanceur ecrit dans retroarch.cfg (« Custom overrides » de LibRetroGenerator), posees et rendues exactement comme
-    /// OnScreenMsg (meme crochet, meme journal, meme reparation). Faux : ces parties gardent tout coupe, succes compris.
+    /// RETROACHIEVEMENTS VISIBLES EN WORLD SCORING PAR ES (14/11). EXCEPTION ELARGIE PAR LE USER LE 14/11 (« oui, elargis
+    /// l'exception aux reglages de notification de RetroArch ») : pour une partie du World Scoring lancee par ES (carrousel,
+    /// defi sans Deck, site) d'un joueur qui a RetroAchievements, au lieu de <c>OnScreenMsg = 0</c>, les cles par jeu
+    /// <c>systeme["rom"].retroarch.notification_show_*</c> (<see cref="NotificationsRetroArch.AutresNotifications"/>), que le
+    /// lanceur ecrit dans retroarch.cfg (« Custom overrides » de LibRetroGenerator), posees et rendues exactement comme
+    /// OnScreenMsg (meme crochet, meme journal, meme reparation au demarrage). Aucune autre cle. Faux (couture des essais) :
+    /// ces parties gardent tout coupe, succes compris.
     /// </summary>
-    internal static bool SuccesParLesClesDuJeu { get; set; }
+    internal static bool SuccesParLesClesDuJeu { get; set; } = true;
 
     /// <summary>Le prefixe des cles par jeu du lanceur : <c>fbneo["19xx.zip"].</c> (Program.cs : « = » et « # » retires). Pur.</summary>
     private static string PrefixeDuJeu(string systeme, string fichier)
