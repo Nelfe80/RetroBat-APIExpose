@@ -15,6 +15,22 @@ public sealed class IndexDesDefisService : BackgroundService
 {
     public const string HttpClientName = "nelfeplay-challenges";
 
+    /// <summary>
+    /// LA BORNE DIT SA VERSION A L'INDEX DES DEFIS (1.9.179) : le site ne sert un reglement a `rules` (moteur de regles du
+    /// wrapper 0.346) qu'a une API connue et au moins 1.9.178. Sans cet en-tete, la borne n'est pas reconnue et ne recoit
+    /// pas ces defis. Meme en-tete que le releve de l'agent (NelfePlayAgentService).
+    /// </summary>
+    public const string EnTeteDeVersion = "X-NelfePlay-Version";
+
+    /// <summary>La requete de l'index, avec la version de la borne (le releve de l'agent dit la meme).</summary>
+    internal static HttpRequestMessage RequeteDeLIndex()
+    {
+        var requete = new HttpRequestMessage(HttpMethod.Get, "/api/v1/challenges/open");
+        requete.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        if (!string.IsNullOrEmpty(CabinetState.Version)) requete.Headers.TryAddWithoutValidation(EnTeteDeVersion, CabinetState.Version);
+        return requete;
+    }
+
     private static readonly TimeSpan PremierDelai = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan Periode = TimeSpan.FromMinutes(5);
 
@@ -99,8 +115,7 @@ public sealed class IndexDesDefisService : BackgroundService
         using var client = _http.CreateClient(HttpClientName);
         client.BaseAddress ??= new Uri(NelfePlayAgentService.BaseUrl.TrimEnd('/'));
 
-        using var requete = new HttpRequestMessage(HttpMethod.Get, "/api/v1/challenges/open");
-        requete.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        using var requete = RequeteDeLIndex();
         if (!string.IsNullOrEmpty(_etag)) requete.Headers.TryAddWithoutValidation("If-None-Match", _etag);
 
         using var reponse = await client.SendAsync(requete, ct).ConfigureAwait(false);

@@ -164,6 +164,32 @@ public class SpeedrunIndexTests
     }
 
     [Fact]
+    public async Task La_borne_dit_sa_version_a_l_index_des_defis()
+    {
+        // Le site ne sert un reglement a `rules` qu'a une API connue et au moins 1.9.178 (14/11).
+        var dossier = Dossier();
+        try
+        {
+            string? version = null;
+            var site = new Site(r =>
+            {
+                if (r.RequestUri!.AbsolutePath == "/api/v1/challenges/open"
+                    && r.Headers.TryGetValues(IndexDesDefisService.EnTeteDeVersion, out var valeurs)) version = valeurs.Single();
+                return SiteOuvert()(r);
+            });
+            await new IndexDesDefisService(new Fabrique(site), new CatalogueDesDefis(), dossier: dossier).SynchroniserAsync(default);
+
+            Assert.False(string.IsNullOrEmpty(version));
+            Assert.Equal(RetroBat.Api.Infrastructure.CabinetState.Version, version);
+            Assert.Equal("X-NelfePlay-Version", IndexDesDefisService.EnTeteDeVersion);
+        }
+        finally
+        {
+            if (Directory.Exists(dossier)) Directory.Delete(dossier, true);
+        }
+    }
+
+    [Fact]
     public async Task Le_document_n_est_repris_qu_une_fois_et_un_304_ne_change_rien()
     {
         var dossier = Dossier();

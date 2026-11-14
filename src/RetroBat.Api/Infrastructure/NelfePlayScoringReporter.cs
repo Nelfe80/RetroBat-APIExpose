@@ -3555,7 +3555,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         try
         {
             using var client = CreateClient(credential);
-            using var reponse = await client.GetAsync("/api/v1/challenges/open", ct).ConfigureAwait(false);
+            // Avec la version de la borne, comme la synchronisation des defis : un reglement a `rules` n'est dans l'index
+            // que pour une borne en 1.9.178 ou plus (sans elle, le site prend la version du dernier releve).
+            using var requete = RetroBat.Api.Speedrun.IndexDesDefisService.RequeteDeLIndex();
+            using var reponse = await client.SendAsync(requete, ct).ConfigureAwait(false);
             if (!reponse.IsSuccessStatusCode)
             {
                 Trace($"index des defis : HTTP {(int)reponse.StatusCode}");
