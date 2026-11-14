@@ -327,6 +327,90 @@ public sealed class NotificationsRetroArchTests : IDisposable
         Assert.False(NotificationsRetroArch.RendreLesAutresNotifications());
     }
 
+    // ───────────── Option « NOTIFICATIONS EN WORLD SCORING » (14/11) ─────────────
+
+    [Theory]
+    [InlineData(null, false)]
+    [InlineData("", false)]
+    [InlineData("ra_only", false)]
+    [InlineData("auto", false)]
+    [InlineData("0", false)]
+    [InlineData("inconnue", false)]
+    [InlineData("none", true)]
+    [InlineData(" None ", true)]
+    public void Option_seul_none_masque_tout_une_valeur_inconnue_vaut_le_defaut(string? brute, bool attendu)
+        => Assert.Equal(attendu, NotificationsWorldScoringPreference.ToutMasquer(brute));
+
+    [Fact]
+    public void Option_la_cle_est_une_cle_apiexpose()
+        => Assert.StartsWith("global.apiexpose.", NotificationsWorldScoringPreference.EsKey);
+
+    private string EsSettings(bool retroAchievements, string? option)
+    {
+        var reglages = new List<(string, string)>();
+        if (retroAchievements)
+        {
+            reglages.Add(("global.retroachievements", "true"));
+            reglages.Add(("global.retroachievements.username", "Snapouille"));
+        }
+
+        if (option is not null) reglages.Add((NotificationsWorldScoringPreference.EsKey, option));
+        var doc = new System.Xml.Linq.XDocument(new System.Xml.Linq.XElement("config", reglages.Select(r =>
+            new System.Xml.Linq.XElement("string", new System.Xml.Linq.XAttribute("name", r.Item1), new System.Xml.Linq.XAttribute("value", r.Item2)))));
+        var chemin = Path.Combine(_dossier, "es_settings-" + Guid.NewGuid().ToString("N") + ".cfg");
+        doc.Save(chemin);
+        return chemin;
+    }
+
+    [Theory]
+    [InlineData(true, null, true)]
+    [InlineData(true, "", true)]
+    [InlineData(true, "ra_only", true)]
+    [InlineData(true, "inconnue", true)]
+    [InlineData(true, "none", false)]
+    [InlineData(false, null, false)]
+    [InlineData(false, "ra_only", false)]
+    [InlineData(false, "none", false)]
+    public void Option_le_defi_lance_par_l_API_garde_les_succes_selon_RetroAchievements_et_l_option(bool ra, string? option, bool attendu)
+    {
+        const string rom = @"E:\RetroBat\roms\fbneo\shinobi.zip";
+        var es = EsSettings(ra, option);
+        var octets = File.ReadAllBytes(es);
+        Assert.Equal(attendu, LeaderboardInputService.GarderLesSuccesDuDefi([], "fbneo", rom, es));
+        // un defi diffuse garde tout coupe, quelle que soit l'option
+        Assert.False(LeaderboardInputService.GarderLesSuccesDuDefi(["-netplaymode", "host"], "fbneo", rom, es));
+        Assert.Equal(octets, File.ReadAllBytes(es)); // lecture seule
+
+        var resolution = new RetroBat.Api.Netplay.EsLaunchArguments.Resolution("fbneo", "libretro", "fbneo");
+        var ligne = LeaderboardInputService.ArgumentsDuDefiAvecLeDeck("", resolution, rom,
+            [.. DeckDecor.ArgumentsDuLanceur, .. DeckDecor.ArgumentsSansNotifications], [],
+            LeaderboardInputService.GarderLesSuccesDuDefi([], "fbneo", rom, es))!;
+        if (attendu)
+        {
+            Assert.DoesNotContain("-OnScreenMsg", ligne);
+            Assert.True(NotificationsRetroArch.LigneGardeLesSucces(ligne));
+        }
+        else
+        {
+            // « TOUT MASQUER » avec RetroAchievements, ou pas de RetroAchievements : OnScreenMsg = 0, aucune notification_show_*
+            Assert.True(NotificationsRetroArch.LigneCoupe(ligne));
+            Assert.Equal(1, Occurrences(ligne, "-OnScreenMsg 0"));
+            Assert.DoesNotContain("notification_show_", ligne);
+            Assert.False(NotificationsRetroArch.LigneGardeLesSucces(ligne));
+        }
+    }
+
+    [Fact]
+    public void Option_tout_masquer_lue_dans_es_settings_la_cle_globale_seule()
+    {
+        var doc = System.Xml.Linq.XDocument.Load(EsSettings(true, "none"));
+        Assert.True(NotificationsWorldScoringPreference.ToutMasquer(doc));
+        Assert.False(NotificationsRetroArch.GarderLesSucces(doc, "fbneo", "shinobi.zip"));
+        Assert.True(NotificationsRetroArch.SuccesActifs(doc, "fbneo", "shinobi.zip")); // le joueur a bien RetroAchievements
+        Assert.False(NotificationsWorldScoringPreference.ToutMasquer(System.Xml.Linq.XDocument.Load(EsSettings(true, null))));
+        Assert.False(NotificationsRetroArch.GarderLesSucces("fbneo", "shinobi.zip", Path.Combine(_dossier, "absent.cfg")));
+    }
+
     private static int Occurrences(string texte, string motif)
     {
         var n = 0;
