@@ -266,7 +266,57 @@ public sealed class ReplayCaptureService : BackgroundService
         int Largeur = 0, int Hauteur = 0, string? Fond = null, bool Crt = false,
         string? Room = null, DateTime? DebutUtc = null, double? VraiDepartS = null, double? FinLueS = null,
         bool RencontreComplete = false, bool Coop = false, string? Issue = null, bool DuSpectateur = false,
-        string? CarteAvant = null, double CarteAvantS = 0, string? CarteApres = null, double CarteApresS = 0);
+        string? CarteAvant = null, double CarteAvantS = 0, string? CarteApres = null, double CarteApresS = 0,
+        int RefusDeSuite = 0, string? DernierRefus = null, DateTime? ProchainEssaiUtc = null);
+
+    /// <summary>
+    /// LE RECUL DES DEMANDES D'ENVOI (lot 4 bis C-2, 14/11 : 2 785 refus 409 par jour, un toutes les 30 s) : apres un refus
+    /// « plus tard » du site, la demande suivante attend le double de la precedente (2 min, 4, 8… jusqu'a une heure).
+    /// </summary>
+    internal static readonly TimeSpan ReculMaxDesEnvois = TimeSpan.FromHours(1);
+
+    /// <summary>Apres tant de refus identiques du site d'affilee, le film n'est plus garde (le site ne le prendra pas).</summary>
+    internal const int RefusIdentiquesAvantAbandon = 10;
+
+    /// <summary>
+    /// Les echecs qui ne viennent pas du site (reseau, borne non appairee, envoi chez Google coupe) reculent aussi, mais ne
+    /// font jamais oublier un film : une coupure de quelques heures ne doit pas perdre un record.
+    /// </summary>
+    internal static bool RefusDuSite(string? detail)
+        => detail is { Length: > 0 }
+           && detail is not ("site injoignable" or "borne non appairee")
+           && !detail.StartsWith("envoi incomplet", StringComparison.Ordinal)
+           && !detail.StartsWith("http_5", StringComparison.Ordinal);
+
+    /// <summary>
+    /// Un refus « plus tard » de plus : le compte des refus identiques d'affilee et l'heure de la prochaine demande. Pur.
+    /// </summary>
+    internal static CaptureGardee NoterLeRefus(CaptureGardee g, string? detail, DateTime maintenantUtc, TimeSpan intervalle)
+    {
+        var suite = detail is not null && string.Equals(detail, g.DernierRefus, StringComparison.Ordinal) ? g.RefusDeSuite + 1 : 1;
+        var base_ = intervalle > TimeSpan.Zero ? intervalle : TimeSpan.FromMinutes(2);
+        var attente = TimeSpan.FromTicks(Math.Min(ReculMaxDesEnvois.Ticks, base_.Ticks * (1L << Math.Min(suite - 1, 16))));
+        return g with { RefusDeSuite = suite, DernierRefus = detail, ProchainEssaiUtc = maintenantUtc + attente };
+    }
+
+    /// <summary>La demande de ce film attend-elle encore son recul ? Pur.</summary>
+    internal static bool EnRecul(CaptureGardee g, DateTime maintenantUtc)
+        => g.ProchainEssaiUtc is { } prochain && maintenantUtc < prochain;
+
+    /// <summary>
+    /// UN FILM SANS REPLAY QU'AUCUN SCORE NE REJOINDRA (cause des 409 du 13/11) : le site ne retrouve un film « fm_ » que par
+    /// les sessions de ses scores, et un verdict ne le rejoint que dans les dix minutes qui suivent sa fin. Sans session, le
+    /// site ne peut repondre que « pas_encore » : la borne ne lui demande rien, et oublie le film apres ce delai (une partie
+    /// non classee, un entrainement, un mode sans score). Pur : null tant qu'il faut attendre, vrai pour l'oublier.
+    /// </summary>
+    internal static bool? FilmSansScore(CaptureGardee g, TimeSpan age)
+    {
+        if (!g.SansReplay || EstUnFilmMultiplayer(g.ReplayId) || g.Sessions is { Count: > 0 }) return false;
+        return age > SessionsTardivesPendant + MargeDesSessionsTardives ? true : null;
+    }
+
+    /// <summary>Le verdict d'un score peut arriver un peu apres les dix minutes (central lent, brouillon renvoye).</summary>
+    private static readonly TimeSpan MargeDesSessionsTardives = TimeSpan.FromMinutes(5);
 
     /// <summary>
     /// LA PORTION D'UNE RENCONTRE MULTIPLAYER (CDC films MULTIPLAYER, 08/11), en secondes du film : du vrai depart moins
@@ -1295,6 +1345,16 @@ public sealed class ReplayCaptureService : BackgroundService
                 g = g with { Sessions = sessions };
                 await SauverAsync(g, fiche, stoppingToken).ConfigureAwait(false);
             }
+            // Sans session de score, le site ne peut que dire « pas_encore » : rien ne part (C-2, 14/11).
+            switch (FilmSansScore(g, age))
+            {
+                case true:
+                    Oublier(g, fiche, "aucun score relie a ce film sans replay");
+                    continue;
+                case null:
+                    continue;
+            }
+            if (EnRecul(g, DateTime.UtcNow)) continue;
 
             using var envoi = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
             lock (_verrou) _envoiEnCours = envoi;
@@ -1308,7 +1368,7 @@ public sealed class ReplayCaptureService : BackgroundService
                         courante.Sessions, envoi.Token).ConfigureAwait(false);
                     if (voulue.Issue != ReplayVideoPublisher.IssueDeCapture.Voulue)
                     {
-                        SuivreLeRefus(courante, fiche, voulue, age);
+                        await SuivreLeRefusAsync(courante, fiche, voulue, age, stoppingToken).ConfigureAwait(false);
                         continue;
                     }
                     // Seule la sequence du record part (decision du 15 octobre 2026) : elle finit avec le run que le site
@@ -1364,7 +1424,7 @@ public sealed class ReplayCaptureService : BackgroundService
                     _logger.LogInformation("Capture : {ReplayId} envoyee ({Detail}), film garde jusqu'a la video prete.",
                         courante.ReplayId, resultat.Detail);
                 }
-                else SuivreLeRefus(courante, fiche, resultat, age);
+                else await SuivreLeRefusAsync(courante, fiche, resultat, age, stoppingToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
             {
@@ -1416,6 +1476,7 @@ public sealed class ReplayCaptureService : BackgroundService
             Oublier(g, fiche, "trop ancienne");
             return true;
         }
+        if (EnRecul(g, DateTime.UtcNow)) return true;
 
         using var envoi = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
         lock (_verrou) _envoiEnCours = envoi;
@@ -1431,7 +1492,7 @@ public sealed class ReplayCaptureService : BackgroundService
                     ChampsDeLaRencontre(courante, DateTime.UtcNow), envoi.Token).ConfigureAwait(false);
                 if (voulue.Issue != ReplayVideoPublisher.IssueDeCapture.Voulue)
                 {
-                    SuivreLeRefusDeLaRencontre(courante, fiche, voulue, age);
+                    await SuivreLeRefusDeLaRencontreAsync(courante, fiche, voulue, age, stoppingToken).ConfigureAwait(false);
                     return true;
                 }
                 // Jamais un film deforme sur YouTube (25/10). Le film du spectateur montre plusieurs consoles a pixels carres :
@@ -1463,7 +1524,7 @@ public sealed class ReplayCaptureService : BackgroundService
                 _logger.LogInformation("Capture : {Nom} envoyee ({Detail}, {Taille} octets), film garde jusqu'a la video prete.",
                     nom, resultat.Detail, TailleDe(courante.Version!));
             }
-            else SuivreLeRefusDeLaRencontre(courante, fiche, resultat, age);
+            else await SuivreLeRefusDeLaRencontreAsync(courante, fiche, resultat, age, stoppingToken).ConfigureAwait(false);
             return true;
         }
         catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
@@ -1482,12 +1543,38 @@ public sealed class ReplayCaptureService : BackgroundService
     /// decalee, trop courte ou trop longue, deja filmee) efface le film ; une gameroom toujours pas finie au site apres trois
     /// heures aussi ; le reste (quota, reseau) attend le prochain passage.
     /// </summary>
-    private void SuivreLeRefusDeLaRencontre(CaptureGardee g, string fiche, ReplayVideoPublisher.ResultatDeCapture r, TimeSpan age)
+    private async Task SuivreLeRefusDeLaRencontreAsync(CaptureGardee g, string fiche, ReplayVideoPublisher.ResultatDeCapture r, TimeSpan age,
+        CancellationToken ct)
     {
         var nom = "rencontre " + (g.Room ?? g.ReplayId);
         if (r.Issue == ReplayVideoPublisher.IssueDeCapture.Inutile) Oublier(g, fiche, "refusee par le site (" + r.Detail + ")");
         else if (r.Detail == "pas_encore" && age > PasEncoreAuPlus) Oublier(g, fiche, "gameroom toujours pas finie au site");
-        else _logger.LogInformation("Capture : {Nom} attend ({Detail}).", nom, r.Detail);
+        else await ReculerAsync(g, fiche, r.Detail, nom, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Un refus « plus tard » : la prochaine demande recule (<see cref="NoterLeRefus"/>) ; apres
+    /// <see cref="RefusIdentiquesAvantAbandon"/> refus identiques du site, le film n'est plus garde.
+    /// </summary>
+    private async Task ReculerAsync(CaptureGardee g, string fiche, string? detail, string nom, CancellationToken ct)
+    {
+        // La fiche du disque a la session d'envoi la plus recente : on n'y touche que pour le recul.
+        var notee = NoterLeRefus(g, detail, DateTime.UtcNow, _intervalleEnvoi);
+        if (RefusDuSite(detail) && notee.RefusDeSuite >= RefusIdentiquesAvantAbandon)
+        {
+            Oublier(notee, fiche, notee.RefusDeSuite + " refus identiques du site (" + detail + ")");
+            return;
+        }
+        try
+        {
+            await SauverAsync(notee, fiche, ct).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger.LogDebug(ex, "Capture : recul de {Nom} non garde.", nom);
+        }
+        _logger.LogInformation("Capture : {Nom} attend ({Detail}), redemande dans {Minutes} min.", nom, detail,
+            Math.Round(((notee.ProchainEssaiUtc ?? DateTime.UtcNow) - DateTime.UtcNow).TotalMinutes));
     }
 
     /// <summary>
@@ -1534,12 +1621,13 @@ public sealed class ReplayCaptureService : BackgroundService
     /// Ce que le site n'accepte pas encore : un refus definitif efface le film ; une partie toujours pas reliee a un
     /// score classe apres trois heures aussi ; le reste attend le prochain passage.
     /// </summary>
-    private void SuivreLeRefus(CaptureGardee g, string fiche, ReplayVideoPublisher.ResultatDeCapture r, TimeSpan age)
+    private async Task SuivreLeRefusAsync(CaptureGardee g, string fiche, ReplayVideoPublisher.ResultatDeCapture r, TimeSpan age,
+        CancellationToken ct)
     {
         if (r.Issue == ReplayVideoPublisher.IssueDeCapture.Inutile) Oublier(g, fiche, r.Detail);
         else if (r.Detail is "pas_encore" or "replay.not_owned" && age > PasEncoreAuPlus)
             Oublier(g, fiche, "toujours pas reliee a un score classe");
-        else _logger.LogInformation("Capture : {ReplayId} attend ({Detail}).", g.ReplayId, r.Detail);
+        else await ReculerAsync(g, fiche, r.Detail, g.ReplayId, ct).ConfigureAwait(false);
     }
 
     /// <summary>
