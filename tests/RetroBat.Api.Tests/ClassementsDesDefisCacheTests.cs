@@ -41,7 +41,8 @@ public sealed class ClassementsDesDefisCacheTests
         await classements.ChargerAsync(regles, CancellationToken.None, fraicheur: ClassementsDesDefis.FraicheurDuPanneau);
         await classements.ChargerAsync(regles, CancellationToken.None, fraicheur: ClassementsDesDefis.FraicheurDuPanneau);
 
-        Assert.Equal(3, site.Appels);
+        // Ce faux site ne connait pas la lecture groupee (point 4 du 14/11) : un essai groupe, puis un appel par epreuve.
+        Assert.Equal(4, site.Appels);
         Assert.True(classements.AJour("a", ClassementsDesDefis.FraicheurDuPanneau, DateTime.UtcNow.AddMinutes(4)));
         Assert.False(classements.AJour("a", ClassementsDesDefis.FraicheurDuPanneau, DateTime.UtcNow.AddMinutes(6)));
         // Le Deck et le direct : 60 s.

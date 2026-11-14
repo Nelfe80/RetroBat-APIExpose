@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 using RetroBat.Api.Infrastructure;
 
@@ -57,8 +58,109 @@ public sealed class ClassementsDesDefis
     public async Task<IReadOnlyDictionary<string, ClassementDEpreuve>> ChargerAsync(IReadOnlyCollection<string> regles, CancellationToken ct,
         bool forcer = false, TimeSpan? fraicheur = null)
     {
-        await Task.WhenAll(regles.Distinct().Select(r => ChargerAsync(r, ct, forcer, fraicheur ?? Fraicheur))).ConfigureAwait(false);
+        var age = fraicheur ?? Fraicheur;
+        var aLire = regles.Distinct(StringComparer.Ordinal).Where(r => forcer || !AJour(r, age, DateTime.UtcNow)).ToList();
+        if (aLire.Count == 0) return Connus(regles);
+
+        // UNE LECTURE GROUPEE (charge du 14/11, point 4 du site) : le panneau de Super Mario Bros. faisait 34 appels. Une
+        // seule epreuve, ou un site qui ne connait pas `rulesets` : un appel par epreuve, comme avant.
+        var restantes = aLire;
+        if (aLire.Count > 1 && LectureGroupeePossible(DateTime.UtcNow))
+        {
+            restantes = [];
+            foreach (var paquet in aLire.Chunk(ParLectureGroupee))
+            {
+                var nonLues = await ChargerGroupeAsync(paquet, ct).ConfigureAwait(false);
+                if (nonLues is null)
+                {
+                    // Site d'avant la lecture groupee : ce paquet et les suivants, un par un.
+                    restantes = aLire.Skip(aLire.IndexOf(paquet[0])).ToList();
+                    break;
+                }
+            }
+        }
+
+        await Task.WhenAll(restantes.Select(r => ChargerUneAsync(r, ct))).ConfigureAwait(false);
         return Connus(regles);
+    }
+
+    /// <summary>Au plus 64 epreuves par lecture groupee (le site refuse au-dela).</summary>
+    internal const int ParLectureGroupee = 64;
+
+    /// <summary>Un site qui ne connait pas `rulesets` n'est pas redemande avant une heure : il est peut-etre mis a jour depuis.</summary>
+    internal static readonly TimeSpan OubliDuSiteAncien = TimeSpan.FromHours(1);
+
+    private DateTime _siteSansLectureGroupee = DateTime.MinValue;
+
+    /// <summary>La lecture groupee vaut-elle d'etre tentee ? Non pendant une heure apres un site qui ne la connaissait pas.</summary>
+    internal bool LectureGroupeePossible(DateTime maintenantUtc)
+    {
+        lock (_connus) return maintenantUtc - _siteSansLectureGroupee >= OubliDuSiteAncien;
+    }
+
+    /// <summary>
+    /// <c>challenges/board?rulesets=a,b,c</c> : chaque classement de <c>boards</c> se lit comme la lecture seule ; <c>missing</c>
+    /// (epreuve inconnue) ne donne rien, comme un 404. Null : le site ne connait pas la lecture groupee (400, 404, 405, ou
+    /// une reponse sans <c>boards</c>) ; l'appelant lit alors une epreuve par appel. Une panne (reseau, 5xx) n'est pas un
+    /// site ancien : le dernier classement connu reste, sans 64 appels de plus vers un site qui va mal.
+    /// </summary>
+    private async Task<IReadOnlyList<string>?> ChargerGroupeAsync(IReadOnlyList<string> regles, CancellationToken ct)
+    {
+        try
+        {
+            using var client = _http.CreateClient(IndexDesDefisService.HttpClientName);
+            var url = $"{NelfePlayAgentService.BaseUrl.TrimEnd('/')}/api/v1/challenges/board?rulesets="
+                + string.Join(",", regles.Select(Uri.EscapeDataString)) + $"&limit={Profondeur}";
+            var corps = await Lectures.LireAsync(client, url, ct).ConfigureAwait(false);
+            var lus = LireGroupe(corps);
+            if (lus is null)
+            {
+                SiteSansLectureGroupee();
+                return null;
+            }
+
+            var maintenant = DateTime.UtcNow;
+            lock (_connus)
+            {
+                foreach (var (regle, classement) in lus) _connus[regle] = (maintenant, classement);
+            }
+
+            return regles.Where(r => !lus.ContainsKey(r)).ToList();
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.NotFound or HttpStatusCode.MethodNotAllowed)
+        {
+            SiteSansLectureGroupee();
+            return null;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            _journal?.LogDebug(ex, "Classements groupes des epreuves injoignables.");
+            return [];
+        }
+    }
+
+    private void SiteSansLectureGroupee()
+    {
+        lock (_connus) _siteSansLectureGroupee = DateTime.UtcNow;
+        _journal?.LogDebug("Classements des epreuves : le site ne connait pas la lecture groupee, un appel par epreuve.");
+    }
+
+    /// <summary>
+    /// Le corps d'une lecture groupee : chaque classement de <c>boards</c>, lu par <see cref="Lire(string)"/>. Null sans
+    /// <c>boards</c> (site d'avant la lecture groupee). Pur.
+    /// </summary>
+    internal static IReadOnlyDictionary<string, ClassementDEpreuve>? LireGroupe(string json)
+    {
+        using var document = JsonDocument.Parse(json);
+        if (!document.RootElement.TryGetProperty("boards", out var boards) || boards.ValueKind != JsonValueKind.Object) return null;
+        var lus = new Dictionary<string, ClassementDEpreuve>(StringComparer.Ordinal);
+        foreach (var tableau in boards.EnumerateObject())
+        {
+            if (tableau.Value.ValueKind != JsonValueKind.Object) continue;
+            lus[tableau.Name] = Lire(tableau.Value.GetRawText());
+        }
+
+        return lus;
     }
 
     /// <summary>Le classement connu de cette epreuve est-il plus jeune que <paramref name="fraicheur"/> ? Pur pour les tests.</summary>
@@ -67,10 +169,8 @@ public sealed class ClassementsDesDefis
         lock (_connus) return _connus.TryGetValue(regle, out var deja) && maintenantUtc - deja.Lu < fraicheur;
     }
 
-    private async Task ChargerAsync(string regle, CancellationToken ct, bool forcer, TimeSpan fraicheur)
+    private async Task ChargerUneAsync(string regle, CancellationToken ct)
     {
-        if (!forcer && AJour(regle, fraicheur, DateTime.UtcNow)) return;
-
         try
         {
             using var client = _http.CreateClient(IndexDesDefisService.HttpClientName);
