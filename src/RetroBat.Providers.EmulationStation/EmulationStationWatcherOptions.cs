@@ -24,6 +24,12 @@ public class EmulationStationWatcherOptions
 
     public int SelectionBurstProgressMs { get; set; } = 800;
 
+    /// <summary>(brief 13/11, PERF-API-08) Shortest quiet wait before a parked selection is published. The wait follows
+    /// the burst's own spacing (1.5x the largest of the last three gaps), between this value and SelectionBurstQuietMs:
+    /// a fast scroll settles in 300 ms instead of 600, a slow ES script-queue drain keeps 600 ms and is not replayed.
+    /// Set it to SelectionBurstQuietMs (or above) to restore the fixed 600 ms wait.</summary>
+    public int SelectionBurstSettleMinMs { get; set; } = 300;
+
     public bool LocalProjectionOnGameSelected { get; set; } = false;
     public bool PrefetchOnGameSelected { get; set; } = false;
 
