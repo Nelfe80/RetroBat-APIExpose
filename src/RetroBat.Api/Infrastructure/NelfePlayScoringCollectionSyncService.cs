@@ -232,7 +232,8 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             while (!stoppingToken.IsCancellationRequested)
             {
                 await SynchroniserAsync("periodique", stoppingToken);
-                await Task.Delay(Periode, stoppingToken);
+                // Dispersion de 10 % (C-9, 14/11) : les bornes ne relisent pas toutes l'index a la meme seconde.
+                await Task.Delay(CadenceDeFond.Prochaine(Periode, 0, Periode), stoppingToken);
             }
         }
         catch (OperationCanceledException)

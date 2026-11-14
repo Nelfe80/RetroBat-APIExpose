@@ -413,10 +413,19 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // Marche pour les machines ANONYMES (contrairement à /agent/work lié à un
             // compte) car ResolveCredential retombe sur le credential anonyme.
             var delay = TimeSpan.FromSeconds(20); // premier contrôle peu après le boot
+            var prochainRecovery = DateTime.MinValue;
+            var echecsRecovery = 0;
             while (!stoppingToken.IsCancellationRequested)
             {
                 await Task.Delay(delay, stoppingToken).ConfigureAwait(false);
-                await RecoveryCheckAsync(stoppingToken).ConfigureAwait(false);
+                // Le statut recovery une fois par heure (C-6, 14/11 : 20 lectures par heure et 418 échecs sans recul) ;
+                // pendant une reconstruction armee, a chaque tour ; apres un echec, le tour suivant recule.
+                if (DateTime.UtcNow >= prochainRecovery)
+                {
+                    var issue = await RecoveryCheckAsync(stoppingToken).ConfigureAwait(false);
+                    echecsRecovery = issue == IssueDuRecovery.Echec ? echecsRecovery + 1 : 0;
+                    prochainRecovery = DateTime.UtcNow + ProchainRecovery(issue, echecsRecovery, Random.Shared.NextDouble());
+                }
                 await ClaimCheckAsync(stoppingToken).ConfigureAwait(false);
                 RessayerLesLiens();
                 delay = TimeSpan.FromSeconds(180);
@@ -432,20 +441,55 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// spontanément - uniquement quand le site a armé une reconstruction (le script de
     /// restauration le fait seul). Voir RecuperationDesParties.
     /// </summary>
-    private async Task RecoveryCheckAsync(CancellationToken cancellationToken)
+    /// <summary>Ce qu'a donne une lecture du statut recovery.</summary>
+    internal enum IssueDuRecovery
     {
-        if (!Enabled) return;
+        /// <summary>Le site n'a pas repondu, ou a repondu en erreur.</summary>
+        Echec,
+        /// <summary>Rien d'arme : la base du site va bien.</summary>
+        Calme,
+        /// <summary>Une reconstruction est armee : la borne re-verse ses records.</summary>
+        Armee,
+    }
+
+    /// <summary>Le statut recovery se relit une fois par heure quand tout est calme (C-6, 14/11).</summary>
+    internal static readonly TimeSpan RecoveryAuCalme = TimeSpan.FromHours(1);
+
+    /// <summary>Pendant une reconstruction armee, comme avant : a chaque tour de 3 minutes.</summary>
+    internal static readonly TimeSpan RecoveryArmee = TimeSpan.FromSeconds(180);
+
+    /// <summary>
+    /// L'attente avant la prochaine lecture du statut recovery. Pur. Calme : une heure (plus ou moins 10 %) ; armee : 3 min ;
+    /// apres <paramref name="echecs"/> echecs d'affilee : 3 min, 6, 12... jusqu'a une heure.
+    /// </summary>
+    internal static TimeSpan ProchainRecovery(IssueDuRecovery issue, int echecs, double alea)
+    {
+        var attente = issue switch
+        {
+            IssueDuRecovery.Armee => RecoveryArmee,
+            IssueDuRecovery.Echec => TimeSpan.FromTicks(Math.Min(RecoveryAuCalme.Ticks,
+                RecoveryArmee.Ticks * (1L << Math.Clamp(echecs - 1, 0, 10)))),
+            _ => RecoveryAuCalme,
+        };
+        return attente >= TimeSpan.FromMinutes(10)
+            ? TimeSpan.FromTicks((long)(attente.Ticks * (0.9 + 0.2 * Math.Clamp(alea, 0, 1))))
+            : attente;
+    }
+
+    private async Task<IssueDuRecovery> RecoveryCheckAsync(CancellationToken cancellationToken)
+    {
+        if (!Enabled) return IssueDuRecovery.Calme;
         try
         {
             // Le statut est public : pas besoin d'un secret valide pour le lire, et c'est
             // justement quand la base restauree ne connait plus la borne qu'il compte.
             using var client = CreateClient(ResolveCredential() ?? "");
             using var response = await client.GetAsync("/api/v1/scores/recovery-status", cancellationToken).ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode) return;
+            if (!response.IsSuccessStatusCode) return IssueDuRecovery.Echec;
             var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var root = JsonNode.Parse(body) as JsonObject;
             var contribute = (bool?)root?["contribute"] ?? false;
-            if (!contribute) return;
+            if (!contribute) return IssueDuRecovery.Calme;
 
             // NOUVEL ÉPISODE : une époque inédite (nouvel armement) → on RÉ-ARME les records
             // déjà versés DE LA FENÊTRE (*.sent → *.json) pour que cette récupération les
@@ -464,10 +508,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
 
             await ContributeCertifiedAsync(epoch, fenetre, cancellationToken).ConfigureAwait(false);
+            return IssueDuRecovery.Armee;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception ex)
         {
             Trace($"recovery-check échec : {ex.Message}");
+            return IssueDuRecovery.Echec;
         }
     }
 

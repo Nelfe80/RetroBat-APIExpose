@@ -80,6 +80,9 @@ public sealed class NelfePlayAgentService : BackgroundService
     /// <summary>Dernier resultat connu, expose par le controleur.</summary>
     public AgentStatus Status { get; private set; } = new();
 
+    /// <summary>Le dernier releve de <c>agent/work</c> a-t-il rate (reseau, erreur du site, reponse illisible) ?</summary>
+    private volatile bool _releveRate;
+
     private string LabelPath => Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "label.txt");
 
     /// <summary>
@@ -147,6 +150,7 @@ public sealed class NelfePlayAgentService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         RetablirLePseudo();
+        var echecs = 0;
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -154,9 +158,10 @@ public sealed class NelfePlayAgentService : BackgroundService
                 if (_device.IsPaired)
                 {
                     await PollAsync(stoppingToken);
+                    echecs = _releveRate ? echecs + 1 : 0;
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
                 return;
             }
@@ -164,9 +169,12 @@ public sealed class NelfePlayAgentService : BackgroundService
             {
                 _logger.LogWarning(exception, "Nelfe Play : releve impossible.");
                 Status = Status with { LastError = exception.Message };
+                echecs++;
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(Math.Max(30, PollSeconds)), stoppingToken);
+            // Recul apres echec (30 min au plus) et dispersion de 10 % (C-9, 14/11).
+            await Task.Delay(CadenceDeFond.Prochaine(TimeSpan.FromSeconds(Math.Max(30, PollSeconds)), echecs, TimeSpan.FromMinutes(30)),
+                stoppingToken);
         }
     }
 
@@ -218,6 +226,8 @@ public sealed class NelfePlayAgentService : BackgroundService
         }
 
         using var client = CreateClient(credential);   // le nom machine (X-Nelfeplay-Label) est déjà posé par CreateClient
+        // Rate jusqu'a preuve du contraire : la boucle recule apres un releve rate (C-9).
+        _releveRate = true;
         using var response = await client.GetAsync("/api/v1/agent/work", cancellationToken);
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
@@ -248,6 +258,8 @@ public sealed class NelfePlayAgentService : BackgroundService
         {
             return;
         }
+
+        _releveRate = false;
 
         await RemettreLesMessagesAsync(client, payload, cancellationToken).ConfigureAwait(false);
 

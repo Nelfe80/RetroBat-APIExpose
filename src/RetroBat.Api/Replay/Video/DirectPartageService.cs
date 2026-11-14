@@ -484,6 +484,26 @@ public sealed class DirectPartageService : IHostedService
         }
     }
 
+    /// <summary>
+    /// LA CADENCE DU PARTAGE (lot 4 bis C-5, 14/11 : 4 031 appels par jour) : celle que le site donne (<c>poll_after</c>,
+    /// bornee de 3 a 60 s) ; sans elle, 30 s au lieu de 10 ; le site muet <paramref name="sansReponse"/> fois d'affilee,
+    /// l'attente double jusqu'a 60 s. Pur.
+    /// </summary>
+    internal static TimeSpan AttenteDuPartage(int? pollAfter, int sansReponse)
+    {
+        if (pollAfter is { } s) return TimeSpan.FromSeconds(Math.Clamp(s, 3, 60));
+        var secondes = sansReponse <= 1 ? 30 : 60;
+        return TimeSpan.FromSeconds(secondes);
+    }
+
+    /// <summary>Le <c>poll_after</c> d'une reponse du site, entier ou decimal ; null s'il manque ou ne se lit pas. Pur.</summary>
+    internal static int? PollAfter(JsonObject? reponse)
+    {
+        if (reponse?["poll_after"] is not JsonValue v) return null;
+        if (v.TryGetValue<int>(out var entier)) return entier;
+        return v.TryGetValue<double>(out var d) && double.IsFinite(d) ? (int)Math.Round(d) : null;
+    }
+
     /// <summary>Faux, avec sa raison au journal, quand la borne ne filmera pas la partie : sans film, pas de passage.</summary>
     private bool PeutFilmer()
     {
@@ -599,6 +619,7 @@ public sealed class DirectPartageService : IHostedService
         // B.4 (lot M4) : l'exe de cette borne lit-il le film jusqu'au bout a la fin d'une partie (0.7.2) ? Le site ne tient
         // alors la fin de passage 40 s que pour lui ; un exe plus ancien garde ses 14 a 20 s.
         var exeFinitLeFilm = LanceurDuDirect.SaitLesCartes(LanceurDuDirect.Chemin(AppContext.BaseDirectory));
+        var sansReponse = 0;
         // LA CONNEXION SUR L'INSTANT (14/11) : sans reseau, ou le site trop lent a joindre, cette partie ne se presente pas ;
         // la suivante se verifie a nouveau.
         if (!essai && await ControleAvantFilm.VerifierLaConnexionAsync(NelfePlayAgentService.BaseUrl, CancellationToken.None)
@@ -649,7 +670,8 @@ public sealed class DirectPartageService : IHostedService
                 }
                 var r = await _site.SonderLePartageAsync(demande, CancellationToken.None).ConfigureAwait(false);
                 var role = (string?)r?["role"];
-                var attente = TimeSpan.FromSeconds(Math.Clamp((int?)r?["poll_after"] ?? 10, 3, 60));
+                sansReponse = r is null ? sansReponse + 1 : 0;
+                var attente = AttenteDuPartage(PollAfter(r), sansReponse);
                 // LA GREFFE : la partie approche le record, la bande sous le jeu le dit (l'exe la relit toutes les 2 s).
                 if (role == "on_air" && ((bool?)r!["record_alert"] == true) != p.AlerteRecord)
                 {

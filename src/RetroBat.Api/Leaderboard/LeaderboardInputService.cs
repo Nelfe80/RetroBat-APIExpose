@@ -1101,8 +1101,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     {
         var connus = new HashSet<string>(StringComparer.Ordinal);
         var premierTour = true;
+        var echecs = 0;
         while (!ct.IsCancellationRequested)
         {
+            // PAS EN PARTIE (lot 4 bis C-4, 14/11 : 7 040 appels par jour) : aucune notification ne parait pendant une
+            // partie ; un direct lance pendant la partie s'annonce au tour qui suit le retour dans ES.
+            var enPartie = _context.Ui.Running is not null || EmulatorForeground.EmulateurDeJeuTourne();
+            if (!enPartie)
             try
             {
                 var directs = await _social.DirectsSuivisAsync(ct).ConfigureAwait(false);
@@ -1119,11 +1124,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 }
                 connus.IntersectWith(enCours);   // un direct fini pourra etre reannonce s'il reprend
                 premierTour = false;
+                echecs = 0;
             }
-            catch (OperationCanceledException) { return; }
-            catch (Exception ex) { _logger.LogDebug(ex, "Classement : guet des directs suivis en echec."); }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested) { return; }
+            catch (Exception ex) { _logger.LogDebug(ex, "Classement : guet des directs suivis en echec."); echecs++; }
 
-            try { await Task.Delay(TimeSpan.FromSeconds(60), ct).ConfigureAwait(false); }
+            // Recul apres echec (15 min au plus) et dispersion de 10 % (C-9, 14/11).
+            try { await Task.Delay(CadenceDeFond.Prochaine(TimeSpan.FromSeconds(60), echecs, TimeSpan.FromMinutes(15)), ct).ConfigureAwait(false); }
             catch (OperationCanceledException) { return; }
         }
     }

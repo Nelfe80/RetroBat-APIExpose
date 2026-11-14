@@ -32,13 +32,48 @@ namespace RetroBat.Api.Replay.Sharing;
 /// </summary>
 public sealed class ReplayRelayService : BackgroundService
 {
-    private static readonly TimeSpan Cadence = TimeSpan.FromSeconds(60);
+    /// <summary>
+    /// AU REPOS (lot 4 bis C-3, 14/11 : 9 422 releves par jour) : la boite aux lettres se releve toutes les 5 min. Une partie
+    /// en solo ou la lecture d'un replay ne l'accelerent plus.
+    /// </summary>
+    internal static readonly TimeSpan Cadence = TimeSpan.FromMinutes(5);
 
-    /// <summary>Pendant une partie, ou tant que des planches d'avatar sont attendues. Une foule se
+    /// <summary>Cette borne attend un replay demande au relais : elle va le chercher chaque minute, comme avant.</summary>
+    internal static readonly TimeSpan CadenceDemandeEnCours = TimeSpan.FromSeconds(60);
+
+    /// <summary>Spectateur d'un direct, salle MULTIPLAYER, ou planches d'avatar attendues. Une foule se
     /// remplit en quelques secondes : une planche arrivee apres la fin du direct n'a plus personne
     /// a qui se montrer.</summary>
-    private static readonly TimeSpan CadenceAvatars = TimeSpan.FromSeconds(15);
+    internal static readonly TimeSpan CadenceAvatars = TimeSpan.FromSeconds(15);
     private static readonly TimeSpan PremierEssai = TimeSpan.FromSeconds(45);
+
+    /// <summary>Apres des releves rates d'affilee, l'attente double, jusqu'a 30 min.</summary>
+    internal static readonly TimeSpan PlafondDuRecul = TimeSpan.FromMinutes(30);
+
+    /// <summary>
+    /// L'attente avant le prochain releve. Pur. 15 s pour un spectateur d'un direct, une borne dans une salle MULTIPLAYER
+    /// (la planche de l'adversaire) ou des planches attendues ; 60 s si un replay demande au relais est attendu ; 5 min
+    /// sinon, partie en solo comprise. Apres <paramref name="echecs"/> releves rates, l'attente double (30 min au plus).
+    /// Les attentes d'au moins 60 s sont dispersees de plus ou moins 10 % (<paramref name="alea"/> de 0 a 1).
+    /// </summary>
+    internal static TimeSpan Delai(bool spectateur, bool salleMultiplayer, bool planchesAttendues, bool replayAttendu, int echecs, double alea)
+    {
+        var attente = spectateur || salleMultiplayer || planchesAttendues ? CadenceAvatars
+            : replayAttendu ? CadenceDemandeEnCours
+            : Cadence;
+        if (echecs > 0)
+        {
+            var recul = TimeSpan.FromTicks(attente.Ticks * (1L << Math.Min(echecs, 10)));
+            attente = recul > PlafondDuRecul ? PlafondDuRecul : recul;
+        }
+
+        if (attente >= TimeSpan.FromSeconds(60))
+        {
+            attente = TimeSpan.FromTicks((long)(attente.Ticks * (0.9 + 0.2 * Math.Clamp(alea, 0, 1))));
+        }
+
+        return attente;
+    }
 
     /// <summary>Au-delà, on cesse de réclamer : le pont d'en face a expiré depuis longtemps et
     /// personne n'a déposé. Redemander se fera naturellement à la prochaine lecture.</summary>
@@ -63,14 +98,23 @@ public sealed class ReplayRelayService : BackgroundService
     private readonly object _gate = new();
     private volatile bool _gameActive;
     private volatile bool _replayActive;
+    private volatile bool _salleMultiplayer;
+    private volatile bool _releveRate;
+    private int _echecs;
+    private readonly RetroBat.Api.Netplay.LiveSpectateState? _seance;
 
     public ReplayRelayService(ReplayStore store, AvatarSheetStore avatars, ReplaySharePolicy policy,
         RetroBat.Api.Infrastructure.NelfePlayDeviceStore devices, IHttpClientFactory httpFactory,
-        IConfiguration config, IEventBus bus, ILogger<ReplayRelayService> logger)
+        IConfiguration config, IEventBus bus, ILogger<ReplayRelayService> logger,
+        RetroBat.Api.Netplay.LiveSpectateState? seance = null)
     {
         _store = store; _avatars = avatars; _policy = policy; _devices = devices;
         _httpFactory = httpFactory; _config = config; _bus = bus; _logger = logger;
+        _seance = seance;
     }
+
+    /// <summary>Cette borne regarde-t-elle un direct ? Sa planche et celles de la foule passent par le relais.</summary>
+    private bool Spectateur => _seance is not null && _seance.Courant.Session.Length > 0;
 
     public sealed record RelayState(long Since, IReadOnlyList<RelayPending> Pending);
     /// <summary>`Kind` vaut « avatar » pour une planche. Absent, c'est un replay : les états écrits
@@ -94,7 +138,10 @@ public sealed class ReplayRelayService : BackgroundService
             catch (OperationCanceledException) { break; }
             catch (Exception ex) { _logger.LogDebug(ex, "Relais : passage en erreur."); }
 
-            var delai = _gameActive || _replayActive || Etat().Pending.Any(EstAvatar) ? CadenceAvatars : Cadence;
+            var attente = Etat().Pending;
+            _echecs = _releveRate ? _echecs + 1 : 0;
+            var delai = Delai(Spectateur, _salleMultiplayer, attente.Any(EstAvatar), attente.Any(p => !EstAvatar(p)), _echecs,
+                Random.Shared.NextDouble());
             try { await Task.Delay(delai, stoppingToken).ConfigureAwait(false); }
             catch (OperationCanceledException) { break; }
         }
@@ -129,6 +176,8 @@ public sealed class ReplayRelayService : BackgroundService
         var etat = Etat();
         var doc = await LireJsonAsync("/api/v1/agent/relay/inbox?limit=20&since=" + etat.Since, credential, ct)
             .ConfigureAwait(false);
+        // Un releve rate fait reculer le suivant (C-9) ; un releve abouti efface le recul.
+        _releveRate = doc is null;
         if (doc is null) return 0;
 
         var suivant = doc["next"]?.GetValue<long>() ?? etat.Since;
@@ -452,6 +501,23 @@ public sealed class ReplayRelayService : BackgroundService
             case "replay.launching":
             case "replay.started": _replayActive = true; break;
             case "replay.finished": _replayActive = false; break;
+            // La borne attend ou joue dans une salle MULTIPLAYER : la planche de l'adversaire passe par le relais.
+            case RetroBat.Api.Multiplayer.MultiplayerSessionService.EvenementEtat: _salleMultiplayer = SalleDans(e.Payload); break;
+        }
+    }
+
+    /// <summary>L'etat MULTIPLAYER publie sur le bus porte-t-il une salle ? Tolerant : un etat illisible n'en porte pas.</summary>
+    internal static bool SalleDans(object? etat)
+    {
+        try
+        {
+            var element = etat is JsonElement j ? j : JsonSerializer.SerializeToElement(etat);
+            return element.ValueKind == JsonValueKind.Object && element.TryGetProperty("rooms", out var rooms)
+                && rooms.ValueKind == JsonValueKind.Array && rooms.GetArrayLength() > 0;
+        }
+        catch (Exception)
+        {
+            return false;
         }
     }
 

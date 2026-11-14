@@ -40,25 +40,42 @@ public sealed class ClassementsDesDefis
         lock (_connus) return _connus.TryGetValue(regle, out var c) ? (c.Classement, c.Lu) : (null, null);
     }
 
-    /// <summary><paramref name="forcer"/> : apres un verdict, le classement d'il y a moins d'une minute ne compte plus.</summary>
-    public async Task<IReadOnlyDictionary<string, ClassementDEpreuve>> ChargerAsync(IReadOnlyCollection<string> regles, CancellationToken ct, bool forcer = false)
+    /// <summary>
+    /// LE PANNEAU DES DEFIS (lot 4 bis C-10, 14/11) : il lit d'un coup le classement de CHAQUE epreuve du jeu (34 pour Super
+    /// Mario Bros.) a chaque ouverture ; avec 60 s de fraicheur, rouvrir le panneau relisait tout. Pour lui, 5 min : un
+    /// verdict force la relecture (<c>forcer</c>), le Deck et le direct gardent 60 s.
+    /// </summary>
+    public static readonly TimeSpan FraicheurDuPanneau = TimeSpan.FromMinutes(5);
+
+    /// <summary>Les empreintes deja recues (C-11) : un site qui en donne repond 304 sans corps.</summary>
+    public LecturesConditionnelles Lectures { get; init; } = LecturesConditionnelles.Partagees;
+
+    /// <summary>
+    /// <paramref name="forcer"/> : apres un verdict, le classement d'il y a moins d'une minute ne compte plus.
+    /// <paramref name="fraicheur"/> : l'age au-dela duquel un classement se relit (60 s par defaut).
+    /// </summary>
+    public async Task<IReadOnlyDictionary<string, ClassementDEpreuve>> ChargerAsync(IReadOnlyCollection<string> regles, CancellationToken ct,
+        bool forcer = false, TimeSpan? fraicheur = null)
     {
-        await Task.WhenAll(regles.Distinct().Select(r => ChargerAsync(r, ct, forcer))).ConfigureAwait(false);
+        await Task.WhenAll(regles.Distinct().Select(r => ChargerAsync(r, ct, forcer, fraicheur ?? Fraicheur))).ConfigureAwait(false);
         return Connus(regles);
     }
 
-    private async Task ChargerAsync(string regle, CancellationToken ct, bool forcer)
+    /// <summary>Le classement connu de cette epreuve est-il plus jeune que <paramref name="fraicheur"/> ? Pur pour les tests.</summary>
+    internal bool AJour(string regle, TimeSpan fraicheur, DateTime maintenantUtc)
     {
-        lock (_connus)
-        {
-            if (!forcer && _connus.TryGetValue(regle, out var deja) && DateTime.UtcNow - deja.Lu < Fraicheur) return;
-        }
+        lock (_connus) return _connus.TryGetValue(regle, out var deja) && maintenantUtc - deja.Lu < fraicheur;
+    }
+
+    private async Task ChargerAsync(string regle, CancellationToken ct, bool forcer, TimeSpan fraicheur)
+    {
+        if (!forcer && AJour(regle, fraicheur, DateTime.UtcNow)) return;
 
         try
         {
             using var client = _http.CreateClient(IndexDesDefisService.HttpClientName);
             var url = $"{NelfePlayAgentService.BaseUrl.TrimEnd('/')}/api/v1/challenges/board?ruleset={Uri.EscapeDataString(regle)}&limit={Profondeur}";
-            var classement = Lire(await client.GetStringAsync(url, ct).ConfigureAwait(false));
+            var classement = Lire(await Lectures.LireAsync(client, url, ct).ConfigureAwait(false));
             lock (_connus) _connus[regle] = (DateTime.UtcNow, classement);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)

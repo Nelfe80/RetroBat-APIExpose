@@ -50,6 +50,16 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
     private readonly object _verrou = new();
     private string _dernierPrepare = "";
 
+    /// <summary>
+    /// L'ANTI-REBOND DE LA SELECTION (lot 4 bis C-7, 14/11 : 2 238 lectures de profil par jour, une par jeu effleure) : un
+    /// jeu dont le profil n'est pas deja connu attend 400 ms avant de le demander au site ; si le joueur est passe a un
+    /// autre jeu entre-temps, rien ne part. Comme le prechargement du classement (LeaderboardInputService). Le lancement,
+    /// lui, n'attend jamais.
+    /// </summary>
+    internal static readonly TimeSpan AntiRebond = TimeSpan.FromMilliseconds(400);
+
+    private readonly AntiRebondDeSelection _rebond = new();
+
     public CertifiedSettingsService(
         IEventBus bus,
         IHttpClientFactory httpFactory,
@@ -340,16 +350,36 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             var fichier = Path.GetFileName(chemin);
             // Une selection qui ne change pas de jeu ne refait rien : le menu en emet beaucoup.
             var empreinte = systemeEs + "|" + fichier;
+            long ticket;
             lock (_verrou)
             {
                 if (selection && _dernierPrepare == empreinte) return;
                 _dernierPrepare = empreinte;
+                ticket = selection ? _rebond.Prendre() : 0;
             }
+            // Un jeu se lance : la selection qui attend son anti-rebond part tout de suite (la NVRAM epinglee s'efface a la
+            // selection, avant que l'emulateur ne la lise).
+            if (!selection) _rebond.Presser();
             var romGroup = _canonical.ResolveScoreSlug(systeme, fichier, null, null);
             if (string.IsNullOrWhiteSpace(romGroup))
             {
                 _logger?.LogInformation("Reglages certifies : {Fichier} ({Systeme}) sans groupe de score, rien a forcer.", fichier, systeme);
                 return;
+            }
+
+            if (selection && !EnCache(systeme, romGroup!))
+            {
+                await _rebond.AttendreAsync(AntiRebond, ct).ConfigureAwait(false);
+                if (!_rebond.ToujoursLeDernier(ticket))
+                {
+                    // Le joueur est passe a un autre jeu : celui-ci ne se prepare pas. S'il revient dessus, sa selection le
+                    // preparera.
+                    lock (_verrou)
+                    {
+                        if (_dernierPrepare == empreinte) _dernierPrepare = "";
+                    }
+                    return;
+                }
             }
 
             var attendus = await ValeursAttenduesEnCacheAsync(systeme, romGroup!, ct).ConfigureAwait(false);
@@ -385,6 +415,15 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             // Jamais au prix de la partie : sans fichier, le listener ne force rien.
             _logger?.LogWarning(ex, "Reglages certifies : preparation impossible.");
             EffacerSaufVerrous();
+        }
+    }
+
+    /// <summary>Le profil de ce jeu est-il deja connu et frais ? Alors rien ne part au site, inutile d'attendre.</summary>
+    private bool EnCache(string systemId, string romGroup)
+    {
+        lock (_verrou)
+        {
+            return _cache.TryGetValue(systemId + "|" + romGroup, out var entree) && entree.Jusqua > DateTime.UtcNow;
         }
     }
 

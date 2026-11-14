@@ -300,13 +300,10 @@ public sealed class NelfePlayController : ControllerBase
             var url = $"/api/v1/scores/leaderboard?rom_group={Uri.EscapeDataString(romGroup)}"
                     + $"&ruleset={Uri.EscapeDataString(rule)}&limit={n}"
                     + ParametreSysteme(systeme);
-            using var response = await client.GetAsync(url, cancellationToken);
-            if (!response.IsSuccessStatusCode)
-            {
-                return Ok(new { present = false, paired = _device.IsPaired, rom_group = romGroup, ruleset = rule, identify_url = identifyUrl });
-            }
-
-            using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
+            // L'empreinte du dernier classement recu repart (C-11, 14/11) : sans changement, 304 sans corps. Une erreur du
+            // site leve, et tombe dans le « present = false » ci-dessous comme avant.
+            var corps = await LecturesConditionnelles.Partagees.LireAsync(client, url, cancellationToken);
+            using var doc = JsonDocument.Parse(corps);
             JsonElement board = default;
             if (doc.RootElement.TryGetProperty("leaderboard", out var lb) && lb.ValueKind == JsonValueKind.Array)
             {

@@ -159,7 +159,8 @@ public sealed partial class DefisPanelService
     /// <summary>Le frais arrive apres l'ouverture : le panneau se recompose s'il montre toujours ce jeu, le joueur reste ou il est.</summary>
     private async Task ActualiserLesClassementsAsync(ClassementsDesDefis classements, string chemin, IReadOnlyList<string> regles)
     {
-        var tableaux = await classements.ChargerAsync(regles, CancellationToken.None).ConfigureAwait(false);
+        // 5 min pour le panneau (C-10, 14/11) : rouvrir le panneau ne relit plus les classements de toutes les epreuves.
+        var tableaux = await classements.ChargerAsync(regles, CancellationToken.None, fraicheur: ClassementsDesDefis.FraicheurDuPanneau).ConfigureAwait(false);
         lock (_verrou)
         {
             if (_modele.Etat == DefisPanelModel.Foyer.Ferme || _chemin != chemin) return;

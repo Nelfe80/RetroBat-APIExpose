@@ -11,7 +11,9 @@ namespace RetroBat.Api.Multiplayer;
 /// jour (CDC MULTIPLAYER v2.5, lot M3).
 ///
 /// Le sondage part toutes les 2 s tant que le joueur attend, decompte ou joue (l'hote qui se tait
-/// deux minutes perd sa partie), toutes les 10 s sinon, pour recevoir une invitation. Il dit a la
+/// deux minutes perd sa partie), toutes les 5 s dans la collection MULTIPLAYER, toutes les 10 s quand
+/// quelqu'un est devant la borne, toutes les 5 min quand personne n'y est, une fois par minute pendant
+/// une partie en solo ; le site peut imposer sa cadence (<c>poll_after</c>), voir <see cref="Cadence"/>. Il dit a la
 /// plateforme si le joueur a appuye sur un bouton depuis le dernier sondage : une minute sans appui
 /// et il ne compte plus dans ses gamerooms (V24-10).
 ///
@@ -22,11 +24,41 @@ public sealed class MultiplayerSessionService : BackgroundService
 {
     public const string EvenementEtat = "multiplayer.state";
 
-    private static readonly TimeSpan PeriodeActive = TimeSpan.FromSeconds(2);
-    private static readonly TimeSpan PeriodeAuRepos = TimeSpan.FromSeconds(10);
+    internal static readonly TimeSpan PeriodeActive = TimeSpan.FromSeconds(2);
+
+    /// <summary>
+    /// Quelqu'un est devant la borne (un geste depuis moins de <see cref="AbsenceAvantLeRepos"/>) : le site le montre « en
+    /// ligne » a ses amis tant qu'il a sonde depuis moins de 30 s (GameroomRules::SILENCE_SECONDES), d'ou 10 s.
+    /// </summary>
+    internal static readonly TimeSpan PeriodeJoueurPresent = TimeSpan.FromSeconds(10);
+
+    /// <summary>
+    /// AU REPOS (charge du 14/11 : 98,6 % des 41 000 sondages du jour partaient toutes les 10 s d'une borne ou personne ne
+    /// jouait) : personne devant la borne, ni salle ni invitation. Le premier geste reveille le sondage tout de suite :
+    /// une invitation d'ami (valable 24 h) parait des que quelqu'un touche la borne.
+    /// </summary>
+    internal static readonly TimeSpan PeriodeAuRepos = TimeSpan.FromMinutes(5);
+
+    /// <summary>Sans geste depuis ce temps, personne n'est devant la borne.</summary>
+    internal static readonly TimeSpan AbsenceAvantLeRepos = TimeSpan.FromMinutes(5);
+
+    /// <summary>
+    /// UNE PARTIE EN SOLO, sans salle ni invitation : un sondage au depart (le site sait le joueur en partie et met
+    /// l'echeance de ses invitations en pause), puis un par minute seulement, pour garder le message discret d'une
+    /// invitation recue en partie (decision du user du 28/10) ; un sondage des la fin de la partie.
+    /// </summary>
+    internal static readonly TimeSpan PeriodeEnPartieSolo = TimeSpan.FromSeconds(60);
 
     /// <summary>Dans la collection MULTIPLAYER, sans salle : une proposition d'un joueur suivi arrive vite.</summary>
-    private static readonly TimeSpan PeriodeDansLaCollection = TimeSpan.FromSeconds(5);
+    internal static readonly TimeSpan PeriodeDansLaCollection = TimeSpan.FromSeconds(5);
+
+    /// <summary>La cadence que le site peut demander (<c>poll_after</c>, en secondes) est bornee ici.</summary>
+    internal static readonly TimeSpan PlancherDuSite = TimeSpan.FromSeconds(2);
+    internal static readonly TimeSpan PlafondDuSite = TimeSpan.FromMinutes(10);
+
+    /// <summary>Le recul apres des echecs : jamais plus de 20 s quand une salle attend (l'hote muet 2 min la perd).</summary>
+    internal static readonly TimeSpan PlafondDuReculOccupe = TimeSpan.FromSeconds(20);
+    internal static readonly TimeSpan PlafondDuRecul = TimeSpan.FromMinutes(5);
 
     private readonly MultiplayerClient _client;
     private readonly MultiplayerCollectionSyncService _collection;
@@ -40,6 +72,18 @@ public sealed class MultiplayerSessionService : BackgroundService
     private volatile bool _appui;
     private MultiplayerEtat _etat = MultiplayerEtat.Vide;
     private CancellationTokenSource _reveil = new();
+
+    /// <summary>Le dernier geste devant la borne (appui, jeu ou systeme choisi dans ES). Au demarrage : quelqu'un vient de l'allumer.</summary>
+    private long _dernierGesteTicks = DateTime.UtcNow.Ticks;
+
+    /// <summary>La cadence demandee par le site au dernier sondage (<c>poll_after</c>), ou null.</summary>
+    private TimeSpan? _cadenceDuSite;
+
+    /// <summary>Les sondages rates d'affilee : le suivant recule.</summary>
+    private int _echecs;
+
+    /// <summary>L'heure du dernier sondage parti pendant une partie en solo, ou null hors partie.</summary>
+    private DateTime? _sondeEnPartieUtc;
 
     public MultiplayerSessionService(
         MultiplayerClient client,
@@ -58,11 +102,86 @@ public sealed class MultiplayerSessionService : BackgroundService
         // Tout appui sur la borne compte comme presence : le joueur est la.
         _abonnement = _bus?.Subscribe<EventEnvelope>(e =>
         {
-            if (string.Equals(e.Type, "panel.input.pressed", StringComparison.Ordinal))
+            switch (e.Type)
             {
-                _appui = true;
+                case "panel.input.pressed":
+                    _appui = true;
+                    Geste(DateTime.UtcNow);
+                    break;
+                case "ui.game.selected.raw" or "ui.system.selected.raw":
+                    Geste(DateTime.UtcNow);
+                    break;
+                case "ui.game.ended":
+                    // La partie finie : un sondage tout de suite, le site sait le joueur revenu.
+                    _ = Task.Run(Reveiller);
+                    break;
             }
         });
+    }
+
+    /// <summary>
+    /// Un geste devant la borne. Si elle etait au repos (personne depuis 5 min), le sondage part tout de suite : une
+    /// invitation qui attendait parait sans attendre le tic suivant.
+    /// </summary>
+    internal void Geste(DateTime maintenantUtc)
+    {
+        var avant = new DateTime(Interlocked.Exchange(ref _dernierGesteTicks, maintenantUtc.Ticks), DateTimeKind.Utc);
+        if (maintenantUtc - avant >= AbsenceAvantLeRepos)
+        {
+            // Hors du fil du bus : le sondage ne part pas depuis le fil des manettes.
+            _ = Task.Run(Reveiller);
+        }
+    }
+
+    /// <summary>Quelqu'un est-il devant la borne ? Un geste depuis moins de 5 min, ou un panneau MULTIPLAYER ouvert.</summary>
+    internal bool JoueurPresent(DateTime maintenantUtc)
+        => PanneauOuvert || maintenantUtc - new DateTime(Interlocked.Read(ref _dernierGesteTicks), DateTimeKind.Utc) < AbsenceAvantLeRepos;
+
+    /// <summary>Une partie tourne sur la borne (solo ou non : une salle se lit a part, par <see cref="MultiplayerEtat.Occupe"/>).</summary>
+    private bool PartieEnCours() => EnPartie?.Invoke() ?? UnJeuTourne();
+
+    /// <summary>
+    /// L'ATTENTE AVANT LE PROCHAIN SONDAGE (lot 4 bis C-1, 14/11). Dans l'ordre : une partie en solo sans salle (1 par
+    /// minute), la cadence demandee par le site (bornee de 2 s a 10 min), une salle (2 s), la collection MULTIPLAYER ou une
+    /// invitation devant quelqu'un (5 s), quelqu'un devant la borne (10 s), personne (5 min). Apres des echecs, le recul double l'attente,
+    /// jusqu'a 20 s avec une salle et 5 min sinon. Les attentes d'au moins 30 s sont dispersees de plus ou moins 10 %
+    /// (<paramref name="alea"/> de 0 a 1) : les bornes ne repartent pas toutes ensemble apres une coupure du site.
+    /// </summary>
+    internal static TimeSpan Cadence(bool salle, bool invitation, bool enPartieSolo, bool dansLaCollection, bool joueurPresent,
+        TimeSpan? duSite, int echecs, double alea)
+    {
+        TimeSpan attente;
+        if (enPartieSolo && !salle)
+        {
+            attente = PeriodeEnPartieSolo;
+        }
+        else if (duSite is { } demandee)
+        {
+            attente = demandee < PlancherDuSite ? PlancherDuSite : demandee > PlafondDuSite ? PlafondDuSite : demandee;
+        }
+        else
+        {
+            // Une invitation sans salle (une invitation d'ami vit 24 h) ne garde plus la borne a 2 s : 5 s si quelqu'un
+            // est la (repondre fait partir un sondage tout de suite), le repos sinon, le premier geste reveille.
+            attente = salle ? PeriodeActive
+                : dansLaCollection || (invitation && joueurPresent) ? PeriodeDansLaCollection
+                : joueurPresent ? PeriodeJoueurPresent
+                : PeriodeAuRepos;
+        }
+
+        if (echecs > 0)
+        {
+            var plafond = salle ? PlafondDuReculOccupe : PlafondDuRecul;
+            var recul = TimeSpan.FromTicks(attente.Ticks * (1L << Math.Min(echecs, 8)));
+            attente = recul > plafond ? (attente > plafond ? attente : plafond) : recul;
+        }
+
+        if (attente >= TimeSpan.FromSeconds(30))
+        {
+            attente = TimeSpan.FromTicks((long)(attente.Ticks * (0.9 + 0.2 * Math.Clamp(alea, 0, 1))));
+        }
+
+        return attente;
     }
 
     /// <summary>L'etat courant, mots de passe compris : pour le panneau et le lancement, jamais pour le bus.</summary>
@@ -115,18 +234,30 @@ public sealed class MultiplayerSessionService : BackgroundService
             var aVide = false;
             while (!stoppingToken.IsCancellationRequested)
             {
+                var solo = false;
                 if (Active)
                 {
-                    aVide = aVide || await RepartirAVideAsync(stoppingToken).ConfigureAwait(false);
-                    if (aVide)
+                    // Une partie en solo : un sondage au depart, puis un par minute (Cadence). Le tic local qui suit un
+                    // reveil (fin de partie, geste) ne fait pas partir un sondage de plus tant que la partie dure.
+                    solo = Etat.Rooms.Count == 0 && PartieEnCours();
+                    var maintenant = DateTime.UtcNow;
+                    if (!solo || _sondeEnPartieUtc is not { } sonde || maintenant - sonde >= PeriodeEnPartieSolo - TimeSpan.FromSeconds(1))
                     {
-                        await SonderAsync(stoppingToken).ConfigureAwait(false);
+                        aVide = aVide || await RepartirAVideAsync(stoppingToken).ConfigureAwait(false);
+                        if (aVide)
+                        {
+                            await SonderAsync(stoppingToken).ConfigureAwait(false);
+                        }
+
+                        _sondeEnPartieUtc = solo ? maintenant : null;
                     }
                 }
 
-                var attente = Active && Etat.Occupe ? PeriodeActive
-                    : Active && DansLaCollection?.Invoke() == true ? PeriodeDansLaCollection
-                    : PeriodeAuRepos;
+                // L'etat d'apres le sondage : une salle rejointe pendant la partie fait repasser a 2 s.
+                var etat = Etat;
+                var attente = !Active ? PeriodeJoueurPresent
+                    : Cadence(etat.Rooms.Count > 0, etat.Invitations.Count > 0, solo, DansLaCollection?.Invoke() == true,
+                        JoueurPresent(DateTime.UtcNow), _cadenceDuSite, _echecs, Random.Shared.NextDouble());
                 using var lie = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, _reveil.Token);
                 try
                 {
@@ -187,10 +318,13 @@ public sealed class MultiplayerSessionService : BackgroundService
             EnPartie?.Invoke()).ConfigureAwait(false);
         if (reponse is null || !reponse.Ok)
         {
+            _echecs++;
             Poser(Etat with { Erreur = reponse?.Reason ?? "offline" });
             return false;
         }
 
+        _echecs = 0;
+        _cadenceDuSite = CadenceDemandee(reponse);
         if (UnJeuTourne())
         {
             return true;
@@ -447,10 +581,13 @@ public sealed class MultiplayerSessionService : BackgroundService
             {
                 // L'appui n'est pas perdu : il partira au sondage suivant.
                 _appui = _appui || appui;
+                _echecs++;
                 Poser(Etat with { Erreur = reponse?.Reason ?? "offline" });
                 return;
             }
 
+            _echecs = 0;
+            _cadenceDuSite = CadenceDemandee(reponse);
             Poser(new MultiplayerEtat(reponse.Rooms, reponse.Invitations, null, DateTime.UtcNow, reponse.Conduct,
                 reponse.Conduct is { SuspendedMs: > 0 } c ? DateTime.UtcNow.AddMilliseconds(c.SuspendedMs) : null));
             if (reponse.Proposals.Count > 0)
@@ -463,6 +600,13 @@ public sealed class MultiplayerSessionService : BackgroundService
             _sondage.Release();
         }
     }
+
+    /// <summary>La cadence que le site demande (<c>poll_after</c>, en secondes), ou null s'il n'en dit rien ou une valeur absurde.</summary>
+    internal static TimeSpan? CadenceDemandee(MultiplayerReponse reponse)
+        => reponse.PollAfter is { } secondes && double.IsFinite(secondes) && secondes > 0 ? TimeSpan.FromSeconds(Math.Min(secondes, 86400)) : null;
+
+    /// <summary>Pour les tests : la cadence retenue du dernier sondage et le nombre d'echecs d'affilee.</summary>
+    internal (TimeSpan? DuSite, int Echecs) EtatDuSondage => (_cadenceDuSite, _echecs);
 
     private void Poser(MultiplayerEtat etat)
     {

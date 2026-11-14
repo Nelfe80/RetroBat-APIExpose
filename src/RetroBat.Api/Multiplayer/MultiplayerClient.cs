@@ -255,6 +255,13 @@ public sealed record MultiplayerReponse
     /// <summary>Un refus « suspended » : le temps qui reste, en millisecondes.</summary>
     [JsonPropertyName("retry_in_ms")]
     public long? RetryInMs { get; init; }
+
+    /// <summary>
+    /// La cadence du prochain sondage que le site demande, en secondes (lot 4 bis C-1, 14/11). Absente d'un site qui ne la
+    /// donne pas : la borne garde la sienne. Bornee par la borne de 2 s a 10 min.
+    /// </summary>
+    [JsonPropertyName("poll_after")]
+    public double? PollAfter { get; init; }
 }
 
 /// <summary>
