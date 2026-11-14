@@ -136,6 +136,12 @@ public sealed partial class LeaderboardOverlayService
             {
                 return;
             }
+
+            // (brief 13/11, ECR-09) une page tenue devant le jeu n'est pas une manette oubliee : sans cela, une preparation de
+            // speedrun de plus de 45 s faisait tomber le filet « 45 s sans geste », qui rendait la main a ES au moment ou le
+            // jeu arrivait (journal du 13/11, 10:05:28). Le filet repart de zero quand la page s'en va (FermerPourLeJeu
+            // rend de toute facon la main au jeu).
+            _dernierGeste = DateTime.UtcNow;
         }
 
         _forme?.RefuserLActivation();
