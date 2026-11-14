@@ -189,7 +189,7 @@ public sealed class ObsController : ControllerBase
             return NotFound(new { error = "OBS non installé sur cette borne." });
         }
 
-        if (string.IsNullOrWhiteSpace(request.SrtUrl) || !request.SrtUrl.StartsWith("srt://"))
+        if (!IsValidSrtUrl(request.SrtUrl))
         {
             return BadRequest(new { error = "srtUrl requis (srt://…)." });
         }
@@ -248,6 +248,37 @@ public sealed class ObsController : ControllerBase
         return Ok(new { ok = true, profile = "RetroBorne" });
     }
 
+    /// <summary>
+    /// An SRT address written into OBS's basic.ini: one line (no control character, so no other
+    /// INI key can be injected), and a parseable srt:// URI with a host.
+    /// </summary>
+    internal static bool IsValidSrtUrl(string? url)
+        => !string.IsNullOrWhiteSpace(url)
+           && url.StartsWith("srt://", StringComparison.Ordinal)
+           && !url.Any(char.IsControl)
+           && Uri.TryCreate(url, UriKind.Absolute, out var parsed)
+           && parsed.Scheme == "srt"
+           && parsed.Host.Length > 0;
+
+    /// <summary>OBS command line, one entry per argument (profile and collection never add options).</summary>
+    internal static IReadOnlyList<string> LaunchArguments(string? profile, string? collection)
+    {
+        var args = new List<string> { "--minimize-to-tray", "--disable-shutdown-check", "--multi" };
+        if (!string.IsNullOrWhiteSpace(profile))
+        {
+            args.Add("--profile");
+            args.Add(profile);
+        }
+
+        if (!string.IsNullOrWhiteSpace(collection))
+        {
+            args.Add("--collection");
+            args.Add(collection);
+        }
+
+        return args;
+    }
+
     /// <summary>Starts OBS minimized on the dedicated profile/collection -
     /// never the machine's default setup. No-op when already running.</summary>
     [HttpPost("launch")]
@@ -266,22 +297,17 @@ public sealed class ObsController : ControllerBase
             return Ok(new { started = false, running = true });
         }
 
-        var args = "--minimize-to-tray --disable-shutdown-check --multi";
-        if (!string.IsNullOrWhiteSpace(request?.Profile))
-        {
-            args += $" --profile \"{request.Profile}\"";
-        }
-
-        if (!string.IsNullOrWhiteSpace(request?.Collection))
-        {
-            args += $" --collection \"{request.Collection}\"";
-        }
-
-        Process.Start(new ProcessStartInfo(obs, args)
+        var startInfo = new ProcessStartInfo(obs)
         {
             WorkingDirectory = Path.GetDirectoryName(obs)!,
             UseShellExecute = false
-        });
+        };
+        foreach (var argument in LaunchArguments(request?.Profile, request?.Collection))
+        {
+            startInfo.ArgumentList.Add(argument);
+        }
+
+        Process.Start(startInfo);
         return Ok(new { started = true, running = true });
     }
 

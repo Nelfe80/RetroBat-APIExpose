@@ -141,6 +141,37 @@ public sealed class MassRunService : IDisposable
         }
     }
 
+    /// <summary>
+    /// Un noeud que la route publique de jonction peut rejoindre : un noeud de la machine (http ou https), le noeud impose
+    /// par NELFEPLAY_MASSRUN_NOEUD, ou un noeud « massrun » de la carte signee en https. Le billet signe de la borne part
+    /// vers ce noeud : jamais vers une adresse fournie par l'appelant seul.
+    /// </summary>
+    public bool NoeudAdmis(Uri noeud)
+    {
+        var carte = new List<string>();
+        try
+        {
+            if (_carte is not null) carte.AddRange(_carte.Actuelle.AvecLeRole("massrun").Select(n => n.Url));
+        }
+        catch (Exception e) when (e is InvalidOperationException or NullReferenceException)
+        {
+        }
+        return NoeudAdmis(noeud, Environment.GetEnvironmentVariable("NELFEPLAY_MASSRUN_NOEUD"), carte);
+    }
+
+    /// <summary>La regle de <see cref="NoeudAdmis(Uri)"/>. Pur.</summary>
+    internal static bool NoeudAdmis(Uri noeud, string? impose, IEnumerable<string> noeudsDeLaCarte)
+    {
+        if (!noeud.IsAbsoluteUri || (noeud.Scheme != Uri.UriSchemeHttp && noeud.Scheme != Uri.UriSchemeHttps)) return false;
+        if (noeud.IsLoopback) return true;
+        var autorite = noeud.GetLeftPart(UriPartial.Authority);
+        static bool Meme(string? connu, string autorite)
+            => Uri.TryCreate(connu?.Trim(), UriKind.Absolute, out var u)
+               && string.Equals(u.GetLeftPart(UriPartial.Authority), autorite, StringComparison.OrdinalIgnoreCase);
+        if (Meme(impose, autorite)) return true;
+        return noeud.Scheme == Uri.UriSchemeHttps && noeudsDeLaCarte.Any(c => Meme(c, autorite));
+    }
+
     public sealed record SalleLocale(string Niveau, int Attente, string Pseudo, string Couleur, int Coureurs, int Pistes, string Rom)
     {
         public DateTime? GoUtc { get; set; }

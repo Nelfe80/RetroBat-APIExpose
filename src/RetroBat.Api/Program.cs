@@ -833,6 +833,66 @@ app.Services.GetRequiredService<RetroBat.Api.Infrastructure.CoreMemoryCapability
     app.Services.GetService<RetroBat.Api.Infrastructure.CabinetLocale>(),
     app.Services.GetService<RetroBat.Api.Infrastructure.PartieNelfePlayService>());
 
+var cabinetApiKey = app.Configuration["Security:ApiKey"] ?? string.Empty;
+if (cabinetApiKey.Length == 0)
+{
+    cabinetApiKey = RetroBat.Api.Infrastructure.CabinetApiKeyStore.GetOrCreate();
+}
+
+// ── Garde de l'HOTE : contre le rebond DNS ─────────────────────────────────
+// En tete de chaine, pour toutes les routes (/api, /ws, /swagger, /nelfeplay,
+// /dorequest.php). Detail dans GardeDeLHote. Seules les connexions de la boucle
+// locale sont controlees : celles du reseau passent par la cle de borne.
+// Security:HostCheck = "log" journalise sans refuser, "off" coupe la garde ;
+// Security:AllowedHosts ajoute des noms (separes par des virgules).
+{
+    var modeHote = RetroBat.Api.Infrastructure.GardeDeLHote.LireMode(app.Configuration["Security:HostCheck"]);
+    var nomsAcceptes = RetroBat.Api.Infrastructure.GardeDeLHote.NomsAcceptes(
+        app.Configuration["Security:AllowedHosts"],
+        app.Configuration["Urls"]);
+    var journalHote = app.Logger;
+    if (modeHote != RetroBat.Api.Infrastructure.GardeDeLHote.Mode.Arret)
+    {
+        app.Use(async (context, next) =>
+        {
+            var remote = context.Connection.RemoteIpAddress;
+            var depuisLaBoucle = remote is null || System.Net.IPAddress.IsLoopback(remote);
+            var hote = context.Request.Headers.Host.ToString();
+            if (!depuisLaBoucle || RetroBat.Api.Infrastructure.GardeDeLHote.EstAccepte(hote, nomsAcceptes))
+            {
+                await next();
+                return;
+            }
+
+            // Une page qui rebondit ne peut lire ni la cle de borne ni le jeton local.
+            if (GardeDeLHote.MemeCle(context.Request.Headers["X-Api-Key"].FirstOrDefault(), cabinetApiKey)
+                || LocalWriteToken.Matches(context.Request.Headers[LocalWriteToken.HeaderName].FirstOrDefault()))
+            {
+                await next();
+                return;
+            }
+
+            var bloque = modeHote == RetroBat.Api.Infrastructure.GardeDeLHote.Mode.Bloquer;
+            var nomJournal = hote.Length > 80 ? hote[..80] : hote;
+            if (RetroBat.Api.Infrastructure.GardeDeLHote.PremierSignalement(nomJournal))
+            {
+                journalHote.LogWarning(
+                    "Garde de l'hote : Host inattendu {Host} sur {Path} ({Action}). Ajouter le nom a Security:AllowedHosts s'il est legitime.",
+                    nomJournal, context.Request.Path.Value, bloque ? "refuse" : "journalise seulement");
+            }
+
+            if (!bloque)
+            {
+                await next();
+                return;
+            }
+
+            context.Response.StatusCode = StatusCodes.Status421MisdirectedRequest;
+            await context.Response.WriteAsJsonAsync(new { error = "Hote non reconnu.", host = nomJournal });
+        });
+    }
+}
+
 app.Use(async (context, next) =>
 {
     if (context.Request.Path.StartsWithSegments("/swagger") &&
@@ -863,11 +923,7 @@ app.UseRouting();
 // LAN.
 // Empty in appsettings (no secret in the repo) → generate a unique per-cabinet key on
 // first run, so non-loopback access stays gated with a key that differs per machine.
-var cabinetApiKey = app.Configuration["Security:ApiKey"] ?? string.Empty;
-if (cabinetApiKey.Length == 0)
-{
-    cabinetApiKey = RetroBat.Api.Infrastructure.CabinetApiKeyStore.GetOrCreate();
-}
+// (cabinetApiKey est calculee plus haut, avant la garde de l'hote.)
 // NelfeNet : clé de PARTAGE, volontairement distincte de celle ci-dessus. La clé de borne
 // administre la machine (lancer une lecture, deployer une configuration, tout lire) ; c'est ce
 // qu'il faut au hub de flotte, ce n'est pas ce qu'on donne a une borne voisine qui veut recuperer
@@ -924,9 +980,11 @@ if (cabinetApiKey.Length > 0)
             var provided = context.Request.Headers["X-Api-Key"].FirstOrDefault()
                 ?? context.Request.Query["apiKey"].FirstOrDefault();
 
-            var isCabinetKey = string.Equals(provided, cabinetApiKey, StringComparison.Ordinal);
+            // Comparaisons en temps constant. La cle reste acceptee en parametre d'adresse : un
+            // WebSocket ouvert par un navigateur ne peut pas poser d'en-tete.
+            var isCabinetKey = GardeDeLHote.MemeCle(provided, cabinetApiKey);
             var isShareKey = replayShareKey.Length > 0
-                             && string.Equals(provided, replayShareKey, StringComparison.Ordinal)
+                             && GardeDeLHote.MemeCle(provided, replayShareKey)
                              && IsShareSurface(context.Request);
 
             // Une machine qui nous administre depuis le reseau est une ANCRE (en pratique, un hub
@@ -1005,46 +1063,27 @@ app.Logger.LogInformation(
 // page distante ne peut ni le lire ni le deviner.
 app.Use(async (context, next) =>
 {
-    var method = context.Request.Method;
-    var writes = HttpMethods.IsPost(method) || HttpMethods.IsPut(method)
-        || HttpMethods.IsPatch(method) || HttpMethods.IsDelete(method);
-
-    // Le préflight doit passer : c'est lui qui demande l'autorisation, et le
-    // refuser ferait échouer des requêtes qu'on aurait acceptées.
-    if (!writes || !context.Request.Path.StartsWithSegments("/api"))
-    {
-        await next();
-        return;
-    }
-
-    var fetchSite = context.Request.Headers["Sec-Fetch-Site"].ToString();
-    if (fetchSite.Length == 0)
-    {
-        // Pas un navigateur : client natif, script, hub. Les autres gardes
-        // (cle API hors loopback) s'appliquent toujours.
-        await next();
-        return;
-    }
-
-    // Une page servie par APIExpose lui-meme reste chez elle.
-    if (string.Equals(fetchSite, "same-origin", StringComparison.OrdinalIgnoreCase))
-    {
-        await next();
-        return;
-    }
-
-    // Inscription Live Contest : ecriture cross-site LEGITIME depuis la page de
-    // participation de la plateforme (elle remet le playToken a cet APIExpose).
-    // Le navigateur envoie Sec-Fetch-Site: cross-site et n'a PAS le jeton local -
-    // on ne l'exige donc pas ici. La garde d'ORIGINE juste en dessous valide que
-    // l'appelant est bien la plateforme officielle (ou le loopback).
-    if (context.Request.Path.StartsWithSegments("/api/v1/livecontest"))
-    {
-        await next();
-        return;
-    }
-
-    if (LocalWriteToken.Matches(context.Request.Headers[LocalWriteToken.HeaderName].FirstOrDefault()))
+    // La regle est dans GardeDeLHote.EcritureAdmise (testee) :
+    //   - lecture, preflight : passe ;
+    //   - toutes les routes, pas seulement /api : /nelfeplay/* et /dorequest.php
+    //     ecrivent aussi ; leurs appelants legitimes sont des pages de l'API (meme
+    //     origine) ou des clients natifs (sans Sec-Fetch-Site ni Origin) ;
+    //   - sans Sec-Fetch-Site (navigateur ancien, origine http non sure), une
+    //     Origin etrangere compte pour cross-site : aucun client natif n'en envoie ;
+    //   - client natif, script, hub : passe (la cle API hors loopback s'applique) ;
+    //   - page servie par APIExpose lui-meme (same-origin) : passe ;
+    //   - inscription Live Contest : ecriture cross-site LEGITIME de la page de la
+    //     plateforme, sans jeton local ; la garde d'ORIGINE juste en dessous valide
+    //     que l'appelant est la plateforme officielle (ou le loopback) ;
+    //   - sinon le jeton local est exige.
+    var request = context.Request;
+    if (GardeDeLHote.EcritureAdmise(
+            request.Method,
+            request.Path,
+            request.Headers["Sec-Fetch-Site"].ToString(),
+            request.Headers.Origin.ToString(),
+            request.Headers.Host.ToString(),
+            LocalWriteToken.Matches(request.Headers[LocalWriteToken.HeaderName].FirstOrDefault())))
     {
         await next();
         return;

@@ -369,6 +369,25 @@ public sealed class NelfePlayAgentService : BackgroundService
     }
 
 
+    /// <summary>Un nom de fichier ou de dossier simple : ni separateur, ni « . » ou « .. », ni caractere interdit. Pur.</summary>
+    internal static bool NomSimple(string? nom)
+        => !string.IsNullOrWhiteSpace(nom)
+           && nom.Length <= 200
+           && nom is not "." and not ".."
+           && nom.IndexOfAny(Path.GetInvalidFileNameChars()) < 0
+           && nom.IndexOfAny(['/', '\\', ':']) < 0
+           && nom == nom.Trim()
+           && !nom.EndsWith('.');
+
+    private static readonly HashSet<string> ExtensionsExecutables = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".bat", ".cmd", ".com", ".exe", ".ps1", ".psm1", ".vbs", ".vbe", ".js", ".jse", ".wsf", ".wsh",
+        ".hta", ".lnk", ".url", ".scr", ".pif", ".msi", ".dll", ".cpl", ".reg", ".jar",
+    };
+
+    /// <summary>Une extension que Windows execute : jamais pour un fichier ecrit dans le dossier des roms. Pur.</summary>
+    internal static bool ExtensionExecutable(string nom) => ExtensionsExecutables.Contains(Path.GetExtension(nom));
+
     private async Task<bool> TryInstallAsync(HttpClient client, WorkIntent intent, CancellationToken cancellationToken)
     {
         if (intent.Package is not { } package || intent.License is not { } license)
@@ -382,6 +401,15 @@ public sealed class NelfePlayAgentService : BackgroundService
         var systemId = intent.SystemId;
         if (string.IsNullOrWhiteSpace(systemId) || string.IsNullOrWhiteSpace(package.TargetFileName))
         {
+            return false;
+        }
+
+        // Ces noms viennent de la reponse du serveur et deviennent des chemins : des noms simples,
+        // jamais un dossier parent, un chemin absolu ni un script.
+        if (!NomSimple(intent.Slug) || !NomSimple(systemId) || !NomSimple(package.Version)
+            || !NomSimple(package.TargetFileName) || ExtensionExecutable(package.TargetFileName))
+        {
+            _logger.LogWarning("Nelfe Play : paquet {Slug} refuse (nom de fichier, systeme ou version invalide).", intent.Slug);
             return false;
         }
 

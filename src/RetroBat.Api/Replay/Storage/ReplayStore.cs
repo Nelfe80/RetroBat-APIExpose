@@ -103,7 +103,21 @@ public sealed class ReplayStore : IReplayManifestStore, IReplayObjectStore, IRep
         return new ReplayObjectRef(sha, size);
     }
 
-    public string ObjectPath(string sha256) => Path.Combine(_objects, sha256[..2], sha256 + ".replay");
+    public string ObjectPath(string sha256) => EmpreinteSure(sha256)
+        ? Path.Combine(_objects, sha256[..2], sha256 + ".replay")
+        : throw new ArgumentException("Empreinte d'objet invalide.", nameof(sha256));
+
+    /// <summary>
+    /// Un identifiant de replay qui peut servir de nom de fichier : lettres et chiffres ASCII,
+    /// « _ » et « - », 64 caracteres au plus. Les identifiants venus du site ou d'un pair passent
+    /// par la avant tout chemin (jamais de « . », de separateur ni de chemin absolu). Pur.
+    /// </summary>
+    public static bool IdentifiantSur(string? replayId)
+        => replayId is { Length: > 0 and <= 64 } && replayId.All(c => char.IsAsciiLetterOrDigit(c) || c == '_' || c == '-');
+
+    /// <summary>Une empreinte SHA-256 en hexadecimal (64 caracteres). Pur.</summary>
+    public static bool EmpreinteSure(string? sha256)
+        => sha256 is { Length: 64 } && sha256.All(char.IsAsciiHexDigit);
 
     // ── compression AU REPOS (2026-09-25) ───────────────────────────────────
     //
@@ -250,7 +264,9 @@ public sealed class ReplayStore : IReplayManifestStore, IReplayObjectStore, IRep
     }
 
     // ── manifests (immuables) ───────────────────────────────────────────────
-    public string ManifestPath(string replayId) => Path.Combine(_manifests, replayId + ".json");
+    public string ManifestPath(string replayId) => IdentifiantSur(replayId)
+        ? Path.Combine(_manifests, replayId + ".json")
+        : throw new ArgumentException("Identifiant de replay invalide.", nameof(replayId));
 
     public void SaveManifest(ReplayManifest m)
     {

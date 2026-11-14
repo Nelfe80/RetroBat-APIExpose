@@ -187,6 +187,18 @@ public class CommandsController : ControllerBase
         });
     }
 
+    /// <summary>The target of a RetroArch command: a loopback name or address only.</summary>
+    internal static bool IsLocalRetroArchHost(string? host)
+    {
+        var h = (host ?? string.Empty).Trim().Trim('[', ']');
+        if (string.Equals(h, "localhost", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return System.Net.IPAddress.TryParse(h, out var address) && System.Net.IPAddress.IsLoopback(address);
+    }
+
     /// <summary>
     /// Sends a UDP command to a running RetroArch instance.
     /// </summary>
@@ -203,7 +215,7 @@ public class CommandsController : ControllerBase
     /// <param name="payload">RetroArch command payload.</param>
     /// <response code="200">Command sent and response received or timeout reported.</response>
     /// <response code="202">Command sent without waiting for a response.</response>
-    /// <response code="400">Missing command.</response>
+    /// <response code="400">Missing command, or a host other than this machine.</response>
     /// <response code="502">RetroArch UDP command failed.</response>
     [HttpPost("retroarch/command")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -218,6 +230,12 @@ public class CommandsController : ControllerBase
         }
 
         var host = string.IsNullOrWhiteSpace(payload.Host) ? RetroArchHost : payload.Host.Trim();
+        if (!IsLocalRetroArchHost(host))
+        {
+            // RetroArch runs on this machine: the route is never a UDP relay towards the network.
+            return BadRequest(new { message = "host: this machine only (127.0.0.1, localhost, ::1)." });
+        }
+
         var port = payload.Port > 0 ? payload.Port : RetroArchPort;
         var commandText = payload.Command.Trim();
         // GET_STATUS fait planter RetroArch 1.22.2 avec un coeur sans identifiant de systeme.

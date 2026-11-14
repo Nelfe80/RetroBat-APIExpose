@@ -100,6 +100,30 @@ public sealed class RetroAchievementsProxyController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task Proxy(CancellationToken cancellationToken)
     {
+        if (!IsLocalNativeCaller(HttpContext))
+        {
+            // The proxy completes requests with the player's RetroAchievements credentials:
+            // only RetroArch on this machine may use it, never the network nor a web page.
+            HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await HttpContext.Response.WriteAsJsonAsync(new { message = "RetroAchievements proxy: local client only" }, cancellationToken);
+            return;
+        }
+
         await _service.ProxyAsync(HttpContext, cancellationToken);
+    }
+
+    /// <summary>
+    /// A loopback connection without any browser mark (Sec-Fetch-*, Origin).
+    /// </summary>
+    public static bool IsLocalNativeCaller(HttpContext context)
+    {
+        var remote = context.Connection.RemoteIpAddress;
+        if (remote is not null && !System.Net.IPAddress.IsLoopback(remote))
+        {
+            return false;
+        }
+
+        var headers = context.Request.Headers;
+        return !GardeDeLHote.MarqueDeNavigateur(name => headers.TryGetValue(name, out var value) ? value.ToString() : null);
     }
 }
