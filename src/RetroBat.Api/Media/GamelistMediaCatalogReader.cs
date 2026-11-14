@@ -58,9 +58,82 @@ public sealed class GamelistMediaCatalogReader
     public GamelistGameMedia? GetGameMedia(string systemId, string romPath)
     {
         var index = GetSystemIndex(systemId);
-        return index != null && index.TryGetValue(NormalizeRomPath(systemId, romPath), out var media)
-            ? media
+        var media = index != null && index.TryGetValue(NormalizeRomPath(systemId, romPath), out var found)
+            ? found
             : null;
+        // API-7 : les fichiers des dossiers de type que la gamelist ne cite pas (fanart de Skraper, souvent sans balise)
+        var dansLesDossiers = TypeFolderCandidates(Path.Combine(RetroBatPaths.RomsRoot, systemId), romPath, media);
+        if (dansLesDossiers.Count == 0) return media;
+        return media is null
+            ? new GamelistGameMedia(Array.Empty<MediaBinding>(), dansLesDossiers)
+            : new GamelistGameMedia(media.Bindings, media.Candidates.Concat(dansLesDossiers).ToList());
+    }
+
+    private static readonly string[] TypeFolderExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".mp4", ".mkv", ".avi", ".webm", ".pdf"];
+    private static readonly TimeSpan TypeFolderListingTtl = TimeSpan.FromSeconds(60);
+    private readonly ConcurrentDictionary<string, (DateTime AtUtc, IReadOnlyList<string> Folders)> _typeFolders = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// API-7 - the files a scraper filed by kind next to the roms, <c>roms/&lt;system&gt;/media/&lt;type&gt;/&lt;rom&gt;.&lt;ext&gt;</c>,
+    /// typed by their folder (folder-convention), whether or not the gamelist references them. A file the gamelist
+    /// already bound is not repeated. The list of type folders of a system is cached a minute; each game then costs a
+    /// handful of existence checks. Read-only.
+    /// </summary>
+    internal IReadOnlyList<QualifiedMediaCandidate> TypeFolderCandidates(string systemRoot, string? romPath, GamelistGameMedia? already)
+    {
+        var stem = string.IsNullOrWhiteSpace(romPath) ? string.Empty : Path.GetFileNameWithoutExtension(romPath.Trim().TrimEnd('/', '\\'));
+        if (stem.Length == 0) return Array.Empty<QualifiedMediaCandidate>();
+
+        var mediaRoot = Path.Combine(systemRoot, "media");
+        var folders = TypeFoldersOf(mediaRoot);
+        if (folders.Count == 0) return Array.Empty<QualifiedMediaCandidate>();
+
+        var bound = new HashSet<string>(
+            (already?.Candidates ?? []).Select(c => c.Asset.Path)
+                .Concat((already?.Bindings ?? []).Select(b => b.Asset.Path)),
+            StringComparer.OrdinalIgnoreCase);
+        var found = new List<QualifiedMediaCandidate>();
+        foreach (var folder in folders)
+        {
+            foreach (var ext in TypeFolderExtensions)
+            {
+                var file = Path.Combine(mediaRoot, folder, stem + ext);
+                if (!MediaQualificationService.TryQualifyByTypeFolder(folder, ext, out var kind) || !File.Exists(file)) continue;
+                var asset = ToAssetRef(file);
+                if (bound.Contains(asset.Path)) continue;
+                found.Add(new QualifiedMediaCandidate(kind, asset, MediaQualifications.FolderConvention, 70, null, null, null, false));
+                break;   // one file per kind and game: the first extension wins
+            }
+        }
+
+        return found;
+    }
+
+    private IReadOnlyList<string> TypeFoldersOf(string mediaRoot)
+    {
+        if (_typeFolders.TryGetValue(mediaRoot, out var cached) && DateTime.UtcNow - cached.AtUtc < TypeFolderListingTtl)
+        {
+            return cached.Folders;
+        }
+
+        IReadOnlyList<string> folders;
+        try
+        {
+            folders = Directory.Exists(mediaRoot)
+                ? Directory.EnumerateDirectories(mediaRoot, "*", SearchOption.TopDirectoryOnly)
+                    .Select(Path.GetFileName)
+                    .Where(name => name is not null && MediaQualificationService.TypeFolderNames.Contains(name, StringComparer.OrdinalIgnoreCase))
+                    .Select(name => name!)
+                    .ToList()
+                : Array.Empty<string>();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            folders = Array.Empty<string>();
+        }
+
+        _typeFolders[mediaRoot] = (DateTime.UtcNow, folders);
+        return folders;
     }
 
     private IReadOnlyDictionary<string, GamelistGameMedia>? GetSystemIndex(string systemId)
@@ -149,7 +222,15 @@ public sealed class GamelistMediaCatalogReader
                     tagKind, asset, MediaQualifications.ExplicitGamelist, 100, null, null, null, true));
             }
 
-            if (qualification.TryQualifyByFilename(Path.GetFileNameWithoutExtension(absolute), out var fileKind))
+            // API-7 : un fichier range dans un dossier de type (media/box3d/<rom>.png) prend le type du dossier, quel que soit
+            // le creneau qui le designe ; son nom n'y ajoute rien (un « -thumb » dans box3d/ reste une boite 3D).
+            if (MediaQualificationService.TryQualifyByTypeFolder(
+                    Path.GetFileName(Path.GetDirectoryName(absolute)), Path.GetExtension(absolute), out var folderKind))
+            {
+                candidates.Add(new QualifiedMediaCandidate(
+                    folderKind, asset, MediaQualifications.FolderConvention, 80, null, null, null, true));
+            }
+            else if (qualification.TryQualifyByFilename(Path.GetFileNameWithoutExtension(absolute), out var fileKind))
             {
                 candidates.Add(new QualifiedMediaCandidate(
                     fileKind, asset, MediaQualifications.FilenameConvention, 60, null, null, null, true));
