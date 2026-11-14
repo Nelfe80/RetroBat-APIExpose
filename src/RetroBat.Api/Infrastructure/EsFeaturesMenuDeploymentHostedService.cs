@@ -16,31 +16,44 @@ public sealed class EsFeaturesMenuDeploymentHostedService : IHostedService, IDis
     private readonly SemaphoreSlim _porte = new(1, 1);
     private IDisposable? _abonnement;
     private string _langueEcrite = "";
+    private readonly IHostApplicationLifetime? _vie;
 
     public EsFeaturesMenuDeploymentHostedService(
         EsFeaturesMenuDeploymentService deploymentService,
         IOptionsMonitor<ApiExposeOptions> options,
         ILogger<EsFeaturesMenuDeploymentHostedService> logger,
-        RetroBat.Domain.Interfaces.IEsSettingsChangeBus? reglages = null)
+        RetroBat.Domain.Interfaces.IEsSettingsChangeBus? reglages = null,
+        IHostApplicationLifetime? vie = null)
     {
         _deploymentService = deploymentService;
         _options = options;
         _logger = logger;
         _reglages = reglages;
+        _vie = vie;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         var options = _options.CurrentValue.EsFeaturesMenu;
         _deploymentService.PrepareLogFilesOnStartup();
 
         if (!options.Enabled || !options.InstallOnStartup)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         _abonnement = _reglages?.Subscribe((_, token) => SuivreLaLangueAsync(token));
 
+        // (brief 13/11, PERF-API-01) 1,3 a 1,5 s pour « Changed=False » a chaque demarrage : l'ecriture ne retarde plus
+        // l'ecoute d'ES, elle part une fois l'hote demarre (a peu pres l'heure ou elle se faisait avant, ES ne relit ce
+        // fichier qu'a son propre demarrage). Sous la porte : un changement de langue arrive apres elle.
+        ApresLeDemarrage.Lancer(_vie, _logger, "le menu d'ES", arret => DeployerAuDemarrageAsync(options, arret));
+        return Task.CompletedTask;
+    }
+
+    private async Task DeployerAuDemarrageAsync(ApiExposeOptions.EsFeaturesMenuOptions options, CancellationToken cancellationToken)
+    {
+        await _porte.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
             _langueEcrite = _deploymentService.LangueDES();
@@ -61,6 +74,10 @@ public sealed class EsFeaturesMenuDeploymentHostedService : IHostedService, IDis
         catch (Exception exception)
         {
             _logger.LogWarning(exception, "ES features menu deployment failed.");
+        }
+        finally
+        {
+            _porte.Release();
         }
     }
 

@@ -330,6 +330,9 @@ public sealed class MassRunService : IDisposable
     /// manettes et le lanceur ensuite, sur un fil a part : la page n'attend plus le calcul des manettes d'ES (1 a 12 s), et le
     /// lancement partait deja sur un fil a part.
     /// </summary>
+    /// <summary>Au-dela de cet aller-retour (ms), le calage de l'horloge est dit douteux au journal (MASS-02).</summary>
+    internal const long AllerRetourDouteux = 500;
+
     public async Task<SalleLocale> RejoindreAsync(string noeud, uint id, bool lancerLeJeu, CancellationToken ct,
         RetroBat.Api.Leaderboard.ProgressionDuLancement? progression = null)
     {
@@ -389,8 +392,14 @@ public sealed class MassRunService : IDisposable
             {
                 _ = Task.Run(() => LancerLaCourse(jeu, rom, progression));
             }
-            _journal.LogInformation("MASS RUN : salle {Salle} du noeud {Noeud} rejointe, place {Place}, {Jeu} {Niveau}, GO! a {Go:HH:mm:ss.fff} (ecart d'horloge {Ecart} ms)",
-                client.Salle, noeud, client.Place, jeu.Id, client.Niveau, client.GoLocalUtc.ToLocalTime(), client.EcartHorlogeMs);
+            _journal.LogInformation("MASS RUN : salle {Salle} du noeud {Noeud} rejointe, place {Place}, {Jeu} {Niveau}, GO! a {Go:HH:mm:ss.fff} (ecart d'horloge {Ecart} ms, aller-retour {AllerRetour} ms)",
+                client.Salle, noeud, client.Place, jeu.Id, client.Niveau, client.GoLocalUtc.ToLocalTime(), client.EcartHorlogeMs, client.MeilleurAllerRetourMs);
+            if (client.MeilleurAllerRetourMs > AllerRetourDouteux)
+            {
+                // (MASS-02) l'ecart est mesure a la moitie de l'aller-retour pres : au-dela, le GO! local peut partir decale.
+                _journal.LogWarning("MASS RUN : horloge calee a {Incertitude} ms pres seulement (meilleur aller-retour {AllerRetour} ms).",
+                    client.MeilleurAllerRetourMs / 2, client.MeilleurAllerRetourMs);
+            }
             return salle;
         }
     }
@@ -540,11 +549,12 @@ public sealed class MassRunService : IDisposable
                     if (image != derniere)
                     {
                         derniere = image;
-                        var coureurs = client.CoureursFrais();
+                        // (MASS-03) au-dela de 64, les plus proches du joueur, pas les premiers inscrits
+                        var coureurs = client.CoureursFrais(j.Piste, MassRunCanal.MaxCoureurs);
                         var liste = new List<MassRunCanal.Coureur>(coureurs.Count);
                         // chaque coureur a son propre retard d'affichage, cale sur l'horloge (voir ClientDeSalle.NoterLEcart) : la
                         // fenetre porte ses positions pour cette image et les 3 suivantes
-                        foreach (var (_, c) in coureurs.Take(MassRunCanal.MaxCoureurs))
+                        foreach (var (_, c) in coureurs)
                         {
                             var fenetre = new byte[]?[MassRunCanal.ImagesParFenetre];
                             for (var k = 0; k < fenetre.Length; k++)

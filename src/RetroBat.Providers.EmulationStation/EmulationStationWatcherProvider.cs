@@ -380,8 +380,8 @@ public class EmulationStationWatcherProvider : IProvider
     private readonly object _selectionBurstLock = new();
     private readonly List<string> _recentSelectionKeys = new();
     private (string[] Args, long Sequence)? _pendingBurstSelection;
-    private DateTime _lastGameSelectedArrivalUtc = DateTime.MinValue;
-    private DateTime _lastBurstPublishUtc = DateTime.MinValue;
+    // (brief 13/11, PERF-API-08) decision de la porte : premier jeu, echantillon, ou accalmie qui suit l'espacement de la rafale
+    private readonly SelectionBurstGate _selectionBurstGate = new();
     private CancellationTokenSource? _burstCloseCts;
 
     /// <summary>
@@ -413,6 +413,7 @@ public class EmulationStationWatcherProvider : IProvider
 
         var quiet = TimeSpan.FromMilliseconds(Math.Max(50, options.SelectionBurstQuietMs));
         var progress = TimeSpan.FromMilliseconds(Math.Max(options.SelectionBurstQuietMs, options.SelectionBurstProgressMs));
+        var settleMin = TimeSpan.FromMilliseconds(Math.Clamp(options.SelectionBurstSettleMinMs, 50, Math.Max(50, options.SelectionBurstQuietMs)));
 
         // after APIExpose pushes addgames/reloadgames, ES re-fires game-selected
         // for every refreshed view - first the stale cursors of non-visible views,
@@ -435,14 +436,11 @@ public class EmulationStationWatcherProvider : IProvider
             }
 
             RecordRecentSelectionKey(selectionKey);
-            var nowUtc = DateTime.UtcNow;
-            var sinceLastArrival = nowUtc - _lastGameSelectedArrivalUtc;
-            _lastGameSelectedArrivalUtc = nowUtc;
+            var verdict = _selectionBurstGate.OnArrival(DateTime.UtcNow, quiet, progress, settleMin, deferLeadingEdge);
 
-            if (sinceLastArrival >= quiet && !deferLeadingEdge)
+            if (verdict.Decision == SelectionBurstGate.Decision.Immediate)
             {
                 // leading edge: a quiet gap means a deliberate selection
-                _lastBurstPublishUtc = nowUtc;
                 _pendingBurstSelection = null;
                 _burstCloseCts?.Cancel();
                 _burstCloseCts = null;
@@ -452,10 +450,9 @@ public class EmulationStationWatcherProvider : IProvider
 
             _pendingBurstSelection = (args, sequence);
 
-            if (!deferLeadingEdge && nowUtc - _lastBurstPublishUtc >= progress)
+            if (verdict.Decision == SelectionBurstGate.Decision.Sample)
             {
                 // periodic sample: the display follows a long burst loosely
-                _lastBurstPublishUtc = nowUtc;
                 _pendingBurstSelection = null;
                 _ = Task.Run(() => ProcessEventAsync(sequence, "game-selected", args), CancellationToken.None);
                 return;
@@ -468,7 +465,7 @@ public class EmulationStationWatcherProvider : IProvider
             {
                 try
                 {
-                    await Task.Delay(quiet, closeCts.Token);
+                    await Task.Delay(verdict.Settle, closeCts.Token);
                 }
                 catch (OperationCanceledException)
                 {
@@ -485,7 +482,7 @@ public class EmulationStationWatcherProvider : IProvider
 
                     pending = _pendingBurstSelection;
                     _pendingBurstSelection = null;
-                    _lastBurstPublishUtc = DateTime.UtcNow;
+                    _selectionBurstGate.OnPublished(DateTime.UtcNow);
                     if (ReferenceEquals(_burstCloseCts, closeCts))
                     {
                         _burstCloseCts = null;

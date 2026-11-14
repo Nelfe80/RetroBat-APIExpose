@@ -83,13 +83,15 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     internal Func<(int Largeur, int Hauteur)>? Ecran { get; set; }
     internal string? RacineDuDecor { get; set; }
     internal bool DemarrerLeHost { get; set; } = true;
+    private readonly IHostApplicationLifetime? _vie;
 
     public static string DossierEtat => Path.Combine(RetroBatPaths.PluginRoot, "state", "deck");
 
     public DeckLaunchService(IEventBus bus, ApiContext contexte, DeckStateService? etat = null, IOptionsMonitor<ApiExposeOptions>? options = null,
         RomCanonicalResolver? canonique = null, ICommandesRetroArch? commandes = null, ILogger<DeckLaunchService>? journal = null,
-        string? fichierDesChoix = null)
+        string? fichierDesChoix = null, IHostApplicationLifetime? vie = null)
     {
+        _vie = vie;
         _bus = bus;
         _contexte = contexte;
         _etat = etat;
@@ -123,6 +125,13 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         DeckDecor.Effacer(RacineDuDecor);
         _abonnement = _bus.Subscribe<EventEnvelope>(Recevoir);
         if (_etat is not null) _etat.CommandesDuChoix = Commande;
+        // (ECR-03) le Deck d'avant une mise a jour est remplace au demarrage, pas au premier lancement
+        if (_vie is not null && DemarrerLeHost && Reglages.StartHost)
+        {
+            ApresLeDemarrage.Lancer(_vie, _journal, "le remplacement du Deck d'avant la mise a jour",
+                _ => { RemplacerLeDeckPerime("au demarrage de l'API"); return Task.CompletedTask; });
+        }
+
         return Task.CompletedTask;
     }
 
@@ -429,50 +438,139 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         }
     }
 
+    /// <summary>Un Deck en cours : l'heure de son demarrage et de quoi l'arreter (couture des essais : aucun processus).</summary>
+    internal sealed record DeckResident(DateTime DemarreUtc, Action Arreter);
+
+    /// <summary>Couture des essais : les Decks residents (par defaut, les processus <see cref="NomDuHost"/>).</summary>
+    internal Func<IReadOnlyList<DeckResident>>? DecksResidents { get; set; }
+
+    /// <summary>Couture des essais : demarrer le Deck (par defaut, le processus, cache et a la suite des lancements).</summary>
+    internal Action<string>? LancerLeDeck { get; set; }
+
+    /// <summary>Couture des essais : la date d'ecriture de l'exe du Deck.</summary>
+    internal Func<string, DateTime>? DateDeLExe { get; set; }
+
+    /// <summary>Apres la fin d'une partie, le Deck d'avant la mise a jour est remplace ce temps-la plus tard : il a envoye son bilan.</summary>
+    internal TimeSpan AttenteApresLaPartie { get; set; } = TimeSpan.FromSeconds(10);
+
+    private int _remplacementPrevu;
+
+    private IReadOnlyList<DeckResident> Residents()
+    {
+        if (DecksResidents is { } couture) return couture();
+        var liste = new List<DeckResident>();
+        foreach (var p in Process.GetProcessesByName(NomDuHost))
+        {
+            DateTime debut;
+            try { debut = p.StartTime.ToUniversalTime(); }
+            catch (Exception) { debut = DateTime.MaxValue; }   // illisible : jamais tenu pour perime
+            var processus = p;
+            liste.Add(new DeckResident(debut, () =>
+            {
+                try { processus.Kill(); processus.WaitForExit(3000); } catch { /* deja parti */ }
+                processus.Dispose();
+            }));
+        }
+
+        return liste;
+    }
+
+    private string ExeDuDeck => Path.Combine(DossierDuDeck, NomDuHost + ".exe");
+
+    private DateTime EcritureDeLExe(string exe)
+        => DateDeLExe?.Invoke(exe) ?? (File.Exists(exe) ? File.GetLastWriteTimeUtc(exe) : DateTime.MinValue);
+
+    private void Lancer(string exe)
+    {
+        if (LancerLeDeck is { } couture)
+        {
+            couture(exe);
+            return;
+        }
+
+        if (!File.Exists(exe)) return;
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = exe,
+            Arguments = "--deck --follow-launch",
+            WorkingDirectory = DossierDuDeck,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        })?.Dispose();
+        _journal?.LogInformation("PlayerDeck : Deck demarre ({Exe}).", exe);
+    }
+
     /// <summary>
     /// Le PlayerDeck tourne-t-il ? Sinon on le demarre, cache (<c>--follow-launch</c>) : il se montre pour ce lancement et
     /// tient le raccourci Ctrl+Alt+D. Une seule instance : un Deck deja lance par le joueur n'est pas double.
+    ///
+    /// (brief 13/11, ECR-03) Un Deck d'avant la mise a jour n'est plus arrete ICI : on etait au milieu d'un lancement, la
+    /// page de depart ouverte depuis 3 s, et sa fenetre disparaissait puis revenait (journal du 13/11, 20:41:44). Il sert
+    /// ce lancement ; il est remplace au demarrage de l'API, et sinon apres la partie (<see cref="RemplacerLeDeckPerime"/>).
     /// </summary>
-    private void DemarrerLeDeck()
+    internal void DemarrerLeDeck()
     {
         try
         {
-            var exe = Path.Combine(DossierDuDeck, NomDuHost + ".exe");
-            var enCours = Process.GetProcessesByName(NomDuHost);
-            if (enCours.Length > 0)
+            var exe = ExeDuDeck;
+            var enCours = Residents();
+            if (enCours.Count > 0)
             {
-                // UN DECK D'AVANT LA MISE A JOUR (10/11) : il reste resident apres son lancement, et une borne mise a jour gardait
-                // l'ancien Deck jusqu'au redemarrage du PC (19XX du 09/11 encore en 0.1.6 le 10/11 apres la 1.9.167). Un Deck lance
-                // avant que son exe ne change sur le disque est arrete ici, au lancement d'un jeu, et le nouveau demarre.
-                var ecrit = File.Exists(exe) ? File.GetLastWriteTimeUtc(exe) : DateTime.MinValue;
-                var perimes = enCours.Where(p => { try { return p.StartTime.ToUniversalTime() < ecrit; } catch { return false; } }).ToList();
-                if (perimes.Count < enCours.Length)
+                if (enCours.Any(d => d.DemarreUtc < EcritureDeLExe(exe)) && Interlocked.Exchange(ref _remplacementPrevu, 1) == 0)
                 {
-                    foreach (var p in enCours) p.Dispose();
-                    return;
+                    _journal?.LogInformation("PlayerDeck : Deck d'avant la mise a jour garde pour ce lancement, remplace apres la partie ({Exe}).", exe);
                 }
-                foreach (var p in perimes)
-                {
-                    try { p.Kill(); p.WaitForExit(3000); } catch { /* deja parti */ }
-                    p.Dispose();
-                }
-                _journal?.LogInformation("PlayerDeck : Deck d'avant la mise a jour arrete ({Exe}).", exe);
+
+                return;
             }
-            if (!File.Exists(exe)) return;
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = exe,
-                Arguments = "--deck --follow-launch",
-                WorkingDirectory = DossierDuDeck,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            })?.Dispose();
-            _journal?.LogInformation("PlayerDeck : Deck demarre ({Exe}).", exe);
+
+            Lancer(exe);
         }
         catch (Exception ex)
         {
             _journal?.LogInformation(ex, "PlayerDeck : le Deck n'a pas demarre.");
         }
+    }
+
+    /// <summary>
+    /// UN DECK D'AVANT LA MISE A JOUR (10/11) : il reste resident apres son lancement, et une borne mise a jour gardait l'ancien
+    /// Deck jusqu'au redemarrage du PC (19XX du 09/11 encore en 0.1.6 le 10/11 apres la 1.9.167). Un Deck lance avant que son
+    /// exe ne change sur le disque est arrete, et le nouveau demarre, cache. Hors d'un lancement seulement : au demarrage de
+    /// l'API, ou apres la partie qui l'a vu. Rend vrai si un Deck a ete remplace.
+    /// </summary>
+    internal bool RemplacerLeDeckPerime(string quand)
+    {
+        try
+        {
+            var exe = ExeDuDeck;
+            var enCours = Residents();
+            if (enCours.Count == 0) return false;
+            var ecrit = EcritureDeLExe(exe);
+            var perimes = enCours.Where(d => d.DemarreUtc < ecrit).ToList();
+            if (perimes.Count == 0 || perimes.Count < enCours.Count) return false;   // un Deck a jour tourne deja : on n'en double pas
+            foreach (var d in perimes) d.Arreter();
+            _journal?.LogInformation("PlayerDeck : Deck d'avant la mise a jour arrete {Quand} ({Exe}).", quand, exe);
+            Lancer(exe);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _journal?.LogInformation(ex, "PlayerDeck : remplacement du Deck d'avant la mise a jour impossible.");
+            return false;
+        }
+    }
+
+    /// <summary>Apres la partie, le remplacement prevu pendant le lancement, si aucun jeu n'a repris entre-temps.</summary>
+    private void RemplacerApresLaPartie()
+    {
+        if (Volatile.Read(ref _remplacementPrevu) == 0) return;
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(AttenteApresLaPartie).ConfigureAwait(false);
+            if (_contexte.Ui.Running is not null) return;   // une nouvelle partie : ce sera apres elle
+            if (Interlocked.Exchange(ref _remplacementPrevu, 0) == 0) return;
+            RemplacerLeDeckPerime("apres la partie");
+        });
     }
 
     // ─────────────────────────────── choix en jeu ───────────────────────────────
@@ -507,6 +605,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
 
                     // Le decor s'efface une fois la partie finie : il n'apparait pas parmi les decors d'ES
                     if (effacer) DeckDecor.Effacer(RacineDuDecor);
+                    RemplacerApresLaPartie();
                     break;
                 }
             }

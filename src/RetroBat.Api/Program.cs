@@ -500,6 +500,9 @@ builder.Services.AddHostedService<RetroBat.Api.Multiplayer.MultiplayerCoeursServ
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerCollectionSyncService>());
 // Les gamerooms du joueur : le client de la plateforme et le sondage qui les tient a jour.
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerClient>();
+// La fin, le rapport et l'annulation d'une rencontre sont gardes sur le disque si le site ne repond pas, et renvoyes (MULTI-05).
+builder.Services.AddSingleton<RetroBat.Api.Multiplayer.FileDesResultatsMultiplayer>(_ => new RetroBat.Api.Multiplayer.FileDesResultatsMultiplayer());
+builder.Services.AddHostedService<RetroBat.Api.Multiplayer.RepriseDesResultatsMultiplayer>();
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerSessionService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>());
 // Le panneau MULTIPLAYER d'ES : la fenetre du classement, un autre contenu (lot M3).
@@ -791,6 +794,8 @@ builder.Services.ProtegerLesServicesHeberges();
 var app = builder.Build();
 RetroBat.Api.Infrastructure.OverlayUiGuard.Journal(
     app.Services.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>().CreateLogger("RetroBat.Api.Infrastructure.OverlayUiGuard"));
+// Le bus est cree avant le journal : ses pannes d'abonnes (un try par abonne, ROB-01) sont journalisees des maintenant.
+eventBus.Journal = app.Services.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>().CreateLogger("RetroBat.Api.Infrastructure.SimpleEventBus");
 
 // Setup internal event subscriber to broadcast via WebSockets
 var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
@@ -1286,6 +1291,16 @@ public class ProviderHostedService : IHostedService
         }
 
         _startupReadiness.MarkReady();
+        // (brief 13/11, PERF-API-01) la mesure qui compte : du lancement du processus a l'ecoute d'ES.
+        try
+        {
+            var depuisLeLancement = DateTime.Now - System.Diagnostics.Process.GetCurrentProcess().StartTime;
+            _logger.LogInformation("Demarrage : ecoute d'EmulationStation prete {Ms} ms apres le lancement du processus.",
+                (long)depuisLeLancement.TotalMilliseconds);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception or NotSupportedException)
+        {
+        }
 
         foreach (var provider in providers.Where(provider => provider is not EmulationStationWatcherProvider))
         {

@@ -260,18 +260,54 @@ public sealed class ClientDeSalle : IDisposable
         }
         var client = new ClientDeSalle(http, json.Clone(), new Uri(noeud).Host);
         _ = Task.Run(() => client.RecevoirAsync(client._arret.Token));
-        await client.CalerLHorlogeAsync(ct).ConfigureAwait(false);
+        try
+        {
+            await client.CalerLHorlogeAsync(ct).ConfigureAwait(false);
+        }
+        catch
+        {
+            client.Dispose();
+            throw;
+        }
         return client;
     }
 
-    /// <summary>Dix PING ; l'echange le plus court donne l'ecart d'horloge (CDC §10).</summary>
+    /// <summary>Le temps laisse aux PONG apres une serie de PING.</summary>
+    internal static TimeSpan AttenteDesPong = TimeSpan.FromSeconds(2);
+
+    /// <summary>Vrai des qu'un PONG est revenu : l'ecart d'horloge est mesure (MASS-02).</summary>
+    public bool HorlogeCalee => Interlocked.Read(ref _meilleurAllerRetour) != long.MaxValue;
+
+    /// <summary>Le meilleur aller-retour mesure, en millisecondes (l'incertitude du calage en est la moitie) ; -1 sans PONG.</summary>
+    public long MeilleurAllerRetourMs => HorlogeCalee ? Interlocked.Read(ref _meilleurAllerRetour) / 1000 : -1;
+
+    /// <summary>
+    /// Dix PING ; l'echange le plus court donne l'ecart d'horloge (CDC §10). (brief 13/11, MASS-02) L'ecart n'etait jamais
+    /// verifie : sans aucun PONG (UDP retour bloque par un pare-feu ou un routeur), il restait a 0 et une horloge Windows en
+    /// avance de 3 s faisait partir le GO! local 3 s trop tot, sans un mot. Sans PONG apres la serie, on attend
+    /// <see cref="AttenteDesPong"/>, puis une seconde serie ; toujours rien : la jonction echoue, avec sa raison.
+    /// </summary>
     private async Task CalerLHorlogeAsync(CancellationToken ct)
     {
-        _meilleurAllerRetour = long.MaxValue;
-        for (var i = 0; i < 10; i++)
+        Interlocked.Exchange(ref _meilleurAllerRetour, long.MaxValue);
+        for (var serie = 0; serie < 2 && !HorlogeCalee; serie++)
         {
-            EnvoyerPing();
-            await Task.Delay(60, ct).ConfigureAwait(false);
+            for (var i = 0; i < 10; i++)
+            {
+                EnvoyerPing();
+                await Task.Delay(60, ct).ConfigureAwait(false);
+            }
+
+            var limite = DateTime.UtcNow + AttenteDesPong;
+            while (!HorlogeCalee && DateTime.UtcNow < limite)
+            {
+                await Task.Delay(50, ct).ConfigureAwait(false);
+            }
+        }
+
+        if (!HorlogeCalee)
+        {
+            throw new InvalidOperationException("horloge non calee : le noeud n'a repondu a aucun des 20 PING (UDP bloque par un pare-feu ou un routeur ?)");
         }
     }
 
@@ -467,6 +503,38 @@ public sealed class ClientDeSalle : IDisposable
             return _coureurs.Where(c => c.Value.RecuLe > limite).Select(c => (c.Key, c.Value)).ToList();
         }
     }
+
+    /// <summary>
+    /// (brief 13/11, MASS-03) Les coureurs frais, au plus <paramref name="max"/> : quand la salle en a plus que le coeur n'en
+    /// dessine (64), ceux qui sont le plus pres du joueur (meme scene d'abord, puis l'ecart de position dans le niveau),
+    /// au lieu des premiers inscrits. Les retenus gardent l'ordre de la liste complete (celui d'avant) : un tri par distance
+    /// ferait changer d'emplacement dans le canal a chaque image.
+    /// </summary>
+    public List<(ushort Place, Coureur Coureur)> CoureursFrais(ReadOnlySpan<byte> pisteDuJoueur, int max)
+    {
+        var frais = CoureursFrais();
+        if (frais.Count <= max || pisteDuJoueur.Length < MassRunProtocole.ImageDePiste) return frais;
+        var scene = MassRunProtocole.Scene(pisteDuJoueur);
+        var x = MassRunProtocole.XDansLeNiveau(pisteDuJoueur);
+        List<(ushort Place, int Scene, int X)> positions;
+        lock (_verrou)
+        {
+            positions = frais.Select(c => (c.Place, MassRunProtocole.Scene(c.Coureur.Piste), MassRunProtocole.XDansLeNiveau(c.Coureur.Piste))).ToList();
+        }
+
+        var retenus = LesPlusProches(positions, scene, x, max);
+        return frais.Where(c => retenus.Contains(c.Place)).ToList();
+    }
+
+    /// <summary>Les places des <paramref name="max"/> coureurs les plus proches : meme scene d'abord, puis l'ecart en x. Pur.</summary>
+    public static HashSet<ushort> LesPlusProches(IReadOnlyList<(ushort Place, int Scene, int X)> coureurs, int sceneDuJoueur, int xDuJoueur, int max)
+        => coureurs
+            .OrderBy(c => c.Scene == sceneDuJoueur ? 0 : 1)
+            .ThenBy(c => Math.Abs((long)c.X - xDuJoueur))
+            .ThenBy(c => c.Place)
+            .Take(Math.Max(0, max))
+            .Select(c => c.Place)
+            .ToHashSet();
 
     // ── Les poses en images (SNES, 06/11) : le dictionnaire de la salle du noeud ──
 

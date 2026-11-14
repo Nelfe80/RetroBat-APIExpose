@@ -66,11 +66,21 @@ public static class HostedServiceGuard
             _logger = fabrique?.CreateLogger("RetroBat.Api.Demarrage");
         }
 
+        /// <summary>(brief 13/11, PERF-API-01) Un StartAsync plus long que ca est nomme au journal : les services
+        /// demarrent l'un apres l'autre, et chacun retarde tous les suivants, dont l'ecoute d'EmulationStation.</summary>
+        internal static readonly TimeSpan DemarrageLent = TimeSpan.FromMilliseconds(250);
+
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            var chrono = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 await _vrai.StartAsync(cancellationToken).ConfigureAwait(false);
+                if (chrono.Elapsed >= DemarrageLent)
+                {
+                    _logger?.LogInformation("Demarrage : {Service} a tenu {Ms} ms avant de rendre la main aux services suivants.",
+                        _vrai.GetType().Name, chrono.ElapsedMilliseconds);
+                }
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {

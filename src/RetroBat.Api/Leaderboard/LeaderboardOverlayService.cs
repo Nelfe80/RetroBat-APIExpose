@@ -437,6 +437,17 @@ public sealed partial class LeaderboardOverlayService : IDisposable
     /// <summary>Le handle de la fenetre, retenu a sa creation.</summary>
     private IntPtr _handle;
 
+    /// <summary>Tests : une page affichee, la manette prise, le dernier geste a cette heure (aucune fenetre n'est creee).</summary>
+    internal void SimulerUnePageTenue(DateTime dernierGeste)
+    {
+        lock (_gate)
+        {
+            Affiche = true;
+            _dernierGeste = dernierGeste;
+        }
+        ANousLaMain = true;
+    }
+
     public bool TropLongSilence()
     {
         if (!ANousLaMain) return false;
