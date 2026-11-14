@@ -763,8 +763,9 @@ public sealed partial class DefisPanelService
     }
 
     /// <summary>
-    /// LA FICHE D'UN POINT D'ENTRAINEMENT (14/11) : le depart, ce qu'on y fait, les aides tenues (vies infinies : un verrou
-    /// « advantage » du reglement) et les seances de cette borne. Ni record ni place : rien n'est classe.
+    /// LA FICHE D'UN POINT D'ENTRAINEMENT (14/11) : le depart, ce qu'on y fait, la partie (normale, decision du user du 14/11 :
+    /// vies et continues du jeu ; vies infinies si le reglement tenait un verrou « advantage ») et les seances de cette borne.
+    /// Ni record ni place : rien n'est classe.
     /// </summary>
     internal IReadOnlyList<ChampDeFiche> FicheDEntrainement(Reglement defi)
     {
@@ -774,8 +775,8 @@ public sealed partial class DefisPanelService
         [
             new(T("speedrun.panel.start", "Start"), T("speedrun.panel.start.state", "Verified starting state")),
             new(T("speedrun.panel.goal", "Goal"), Objectif(defi)),
-            new(T("speedrun.panel.training.aids", "Aids"), aides.Count > 0
-                ? T("speedrun.panel.training.infinite_lives", "Infinite lives") : T("speedrun.panel.training.no_aid", "None")),
+            new(T("speedrun.panel.training.game", "Game"), aides.Count > 0
+                ? T("speedrun.panel.training.infinite_lives", "Infinite lives") : T("speedrun.panel.training.normal_game", "Normal: lives and continues")),
             new(T("speedrun.panel.restart", "Restart"), T("speedrun.panel.training.restart", "Hotkey + Left")),
             new(T("speedrun.panel.training.sessions", "Sessions"), seances.ToString(System.Globalization.CultureInfo.InvariantCulture)),
         ];

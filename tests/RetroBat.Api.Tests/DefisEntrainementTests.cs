@@ -36,11 +36,10 @@ public class DefisEntrainementTests
           "state": { "file": "arcade/metal-slug-3/{{id}}.state", "name": "{{id}}-fbneo", "sha256": "{{new string('a', 64)}}" },
           "start": [ { "value": { "address": "0x10FDB6", "equals": "0x01" } },
                      { "value": { "address": "0x10040C", "equals": "0x{{mission:X2}}" } } ],
-          "locks": [ { "address": "0x1002BB", "type": "u8", "value": "0x02", "reason": "advantage", "from": "attempt_start", "player": 1 } ],
           "timing": { "official": "independent", "independent": {
             "start": { "event": { "action": "MOUNT_STATE", "address": "0x1002C1", "leaves": "0x00" },
                        "when": [ { "value": { "address": "0x10040C", "equals": "0x{{mission:X2}}" } } ] },
-            "finish": { "event": { "action": "PROGRESSION_STAGE", "address": "0x10040C", "leaves": "0x{{mission:X2}}" } } } },
+            "finish": { "event": { "action": "PROGRESSION_STAGE", "address": "0x10040C", "leaves": "0x{{mission:X2}}", "value": "0x{{mission + 1:X2}}" } } } },
           "void": [],
           "ranking": { "direction": "lower_better", "metric": "frames" },
           "cores": [ "fbneo" ],
@@ -66,8 +65,8 @@ public class DefisEntrainementTests
         Assert.True(r.EstUnChallenge);
         Assert.Equal("Mission 1", r.Groupe("fr"));
         Assert.Equal("Mission 1", r.Groupe("de"));
-        var v = Assert.Single(r.Verrous);
-        Assert.Equal(("0x1002BB,1,value,0x02", "advantage"), (v.Ligne, v.Raison));
+        // partie normale (decision du user du 14/11) : aucun verrou
+        Assert.Empty(r.Verrous);
     }
 
     [Fact]
@@ -76,7 +75,7 @@ public class DefisEntrainementTests
         var r = Point("training-m1-03", 105, 0, 3);
         var s = Partir(r, 0, 3, 91);
         Assert.Equal(SessionSpeedrun.Running, s.Etat);
-        // une mort (vies tenues par le verrou) ne fait rien echouer, un continue non plus : rien n'est interdit
+        // une mort ne fait rien echouer, un continue non plus : rien n'est interdit
         s.RecevoirImage([S(400, "LOSE_LIFE", "0x1002BB", 0x01)]);
         s.RecevoirImage([S(500, "CONTINUE_SCREEN", "0x10FDB6", 0x02)]);
         Assert.Equal(SessionSpeedrun.Running, s.Etat);
@@ -89,6 +88,38 @@ public class DefisEntrainementTests
         Assert.DoesNotContain(messages, m => m.Cle is "speedrun.msg.ready" or "speedrun.msg.finish_best" or "speedrun.msg.finish");
         // le temps reste au joueur, a titre d'information
         Assert.Equal(4000, s.MeilleurTemps);
+    }
+
+    /// <summary>
+    /// UNE PARTIE NORMALE JUSQU'AU GAME OVER (banc du 14/11, Sol Dae Rokker, vrai coeur, aucun appui) : morts 2 -> 1 -> 0, ecran
+    /// de continue (0x10FDB6 = 02), game over (03), puis le titre (mission 00) et les demos (06, 07, 05). Rien ne finit la
+    /// seance : ni le game over, ni le retour au titre, ni les demos ; la fermeture du jeu l'abandonne. Avec un continue, la
+    /// mission reprend et sa vraie fin (03 -> 04) finit la seance.
+    /// </summary>
+    [Fact]
+    public void Un_game_over_ne_finit_pas_la_seance_seule_la_vraie_fin_de_mission()
+    {
+        var r = Reglement.Lire(File.ReadAllText(Path.Combine(Dossier, "metal-slug-3.training-m4-02.json")));
+        var s = Partir(r, 3, 2, 91);
+        Assert.Equal(SessionSpeedrun.Running, s.Etat);
+        foreach (var (image, action, adresse, valeur) in new[]
+                 {
+                     (995L, "LOSE_LIFE", "0x1002BB", 1), (1600L, "LOSE_LIFE", "0x1002BB", 0), (2072L, "CONTINUE_SCREEN", "0x10FDB6", 2),
+                     (3350L, "CONTINUE_SCREEN", "0x10FDB6", 3), (4496L, "PROGRESSION_STAGE", "0x10040C", 0), (4971L, "CONTINUE_SCREEN", "0x10FDB6", 0),
+                     (5290L, "PROGRESSION_STAGE", "0x10040C", 6), (8020L, "PROGRESSION_STAGE", "0x10040C", 0), (8238L, "PROGRESSION_STAGE", "0x10040C", 5),
+                 })
+            s.RecevoirImage([S(image, action, adresse, valeur)]);
+        Assert.Equal(SessionSpeedrun.Running, s.Etat);
+        s.JeuFerme();
+        Assert.Equal(SessionSpeedrun.Aborted, s.Etat);
+        Assert.Null(s.PrendreLaMeilleure());
+
+        var c = Partir(r, 3, 2, 91);
+        c.RecevoirImage([S(2072, "CONTINUE_SCREEN", "0x10FDB6", 2)]);
+        c.RecevoirImage([S(2163, "CONTINUE_SCREEN", "0x10FDB6", 1)]);
+        c.RecevoirImage([S(3800, "PROGRESSION_STAGE", "0x10040C", 4)]);
+        Assert.Equal(SessionSpeedrun.Finished, c.Etat);
+        Assert.Null(c.PrendreLaMeilleure());
     }
 
     [Fact]
@@ -152,7 +183,7 @@ public class DefisEntrainementTests
         var service = Service();
         var preparation = service.ComposerLaPreparation(r, "Metal Slug 3", null, false, "en");
         Assert.Equal(("TRAINING", "FREE PRACTICE"), (preparation.Mot, preparation.Entete));
-        Assert.Contains(preparation.Fiche!, c => c is { Etiquette: "Aids", Valeur: "Infinite lives" });
+        Assert.Contains(preparation.Fiche!, c => c is { Etiquette: "Game", Valeur: "Normal: lives and continues" });
         Assert.DoesNotContain(preparation.Fiche!, c => c.Etiquette is "Record" or "You");
 
         // un temps fini : affiche, jamais envoye ; le bilan n'attend aucun verdict
@@ -228,7 +259,9 @@ public class DefisEntrainementTests
         Assert.NotNull(r.Etat);
         Assert.StartsWith("arcade/metal-slug-3/entrainement-", r.Etat!.Fichier);
         Assert.Empty(r.VerifierContre(File.ReadAllBytes(Path.Combine(Dossier, "metal-slug-3.v5.MEM"))));
-        Assert.Equal("0x1002BB,1,value,0x02", Assert.Single(r.Verrous).Ligne);
+        Assert.Empty(r.Verrous);
+        var fin = Assert.Single(r.Independant!.Arrivee.Evenements);
+        Assert.Equal((0x10040CL, r.Depart[1].Egal + 1, r.Depart[1].Egal), (fin.Adresse!.Value, fin.Valeur, fin.Quitte));
         Assert.Empty(r.Echecs);
         Assert.Empty(r.AnnulationsJeu);
         Assert.Empty(r.AnnulationsBorne);
