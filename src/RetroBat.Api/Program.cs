@@ -1275,6 +1275,16 @@ public class ProviderHostedService : IHostedService
         }
 
         _startupReadiness.MarkReady();
+        // (brief 13/11, PERF-API-01) la mesure qui compte : du lancement du processus a l'ecoute d'ES.
+        try
+        {
+            var depuisLeLancement = DateTime.Now - System.Diagnostics.Process.GetCurrentProcess().StartTime;
+            _logger.LogInformation("Demarrage : ecoute d'EmulationStation prete {Ms} ms apres le lancement du processus.",
+                (long)depuisLeLancement.TotalMilliseconds);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception or NotSupportedException)
+        {
+        }
 
         foreach (var provider in providers.Where(provider => provider is not EmulationStationWatcherProvider))
         {
