@@ -150,4 +150,30 @@ public class DefiDepartPerduTests
             if (File.Exists(journal)) File.Delete(journal);
         }
     }
+
+    /// <summary>
+    /// « LES MONDES A L'ENVERS » NE PARTAIT JAMAIS (v1, 14/11) : le mode tient le type de bombe 0x10EAF4 a 03 (caillou), et
+    /// 0x1002C1 recopie le type de bombe quand le soldat est a pied : il se pose a 03, jamais a 01 (sessions du user a 09:53,
+    /// 10:02 et 15:28 : « arme, image 261 : MOUNT_STATE 0x1002C1 = 0x3 », jamais RUNNING). La v2 part sur 00 quitte.
+    /// </summary>
+    [Theory]
+    [InlineData("metal-slug-3.mondes-a-l-envers.json", false)]
+    [InlineData("metal-slug-3.mondes-a-l-envers.v2.json", true)]
+    public void Le_soldat_des_mondes_se_pose_a_03(string fichier, bool part)
+    {
+        var e = new Evaluateur(Reglement.Lire(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Reglements", fichier))));
+        e.Relever(0x10FDB6, 0x01);
+        e.Relever(0x10040C, 0x00);
+        e.Relever(0x10040D, 0x00);
+        e.Relever(0x1002C1, 0x00);
+        Assert.Equal(EtatTentative.Armee, e.Etat);
+
+        e.Recevoir(Signal.Depuis(261, "MOUNT_STATE", "0x1002C1", 0x03));
+
+        Assert.Equal(part ? EtatTentative.EnCourse : EtatTentative.Armee, e.Etat);
+        if (!part) return;
+        e.Recevoir(Signal.Depuis(9000, "PROGRESSION_STAGE", "0x10040C", 0x01));
+        Assert.Equal(EtatTentative.Finie, e.Etat);
+        Assert.Equal(9000 - 261, e.Resultat().FramesOfficielles);
+    }
 }
