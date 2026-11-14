@@ -99,7 +99,13 @@ public sealed class RetroAchievementsService : IDisposable, IProvider
 
     public async Task EndSessionAsync(string reason, CancellationToken cancellationToken = default)
     {
-        if (_session.GameId == null && string.IsNullOrWhiteSpace(_session.GameTitle)) return;
+        if (_session.GameId == null && string.IsNullOrWhiteSpace(_session.GameTitle))
+        {
+            // Sans jeu, plus de mode hardcore non plus (brief du 13/11, remarque du point 1.4).
+            if (_session.Hardcore) await UpdateSessionAsync(OublierLaPartie, cancellationToken);
+            return;
+        }
+
         var ended = _session.Clone();
         await PublishAsync("retroachievements.session.ended", new
         {
@@ -110,24 +116,33 @@ public sealed class RetroAchievementsService : IDisposable, IProvider
 
         _recentLeaderboardSubmissions.Clear();
 
-        await UpdateSessionAsync(snapshot =>
-        {
-            snapshot.GameId = null;
-            snapshot.GameTitle = string.Empty;
-            snapshot.GameHash = string.Empty;
-            snapshot.GameImageIconUrl = string.Empty;
-            snapshot.GameImageIconRemoteUrl = string.Empty;
-            snapshot.Score = null;
-            snapshot.SoftcoreScore = null;
-            snapshot.RichPresence = string.Empty;
-            snapshot.AchievementCount = null;
-            snapshot.AchievementsById.Clear();
-            snapshot.LeaderboardCount = null;
-            snapshot.LeaderboardsById.Clear();
-            snapshot.CatalogRevision = string.Empty;
-            snapshot.SessionUnlockedAchievements.Clear();
-            snapshot.LastEventAt = DateTime.UtcNow;
-        }, cancellationToken);
+        await UpdateSessionAsync(OublierLaPartie, cancellationToken);
+    }
+
+    /// <summary>
+    /// Ce que la fin d'une partie efface de la session. Le mode hardcore en fait partie (brief du 13/11, remarque du point
+    /// 1.4) : il restait vrai sans jeu en cours dans /api/retroachievements/status, alors que retroarch.cfg porte
+    /// cheevos_hardcore_mode_enable = false, et le marquee affichait son bloc de mode d'apres lui. La partie suivante le
+    /// redonne avec sa premiere requete (parametre h de startsession, ping, awardachievement).
+    /// </summary>
+    internal static void OublierLaPartie(RetroAchievementsSessionSnapshot snapshot)
+    {
+        snapshot.GameId = null;
+        snapshot.GameTitle = string.Empty;
+        snapshot.GameHash = string.Empty;
+        snapshot.GameImageIconUrl = string.Empty;
+        snapshot.GameImageIconRemoteUrl = string.Empty;
+        snapshot.Hardcore = false;
+        snapshot.Score = null;
+        snapshot.SoftcoreScore = null;
+        snapshot.RichPresence = string.Empty;
+        snapshot.AchievementCount = null;
+        snapshot.AchievementsById.Clear();
+        snapshot.LeaderboardCount = null;
+        snapshot.LeaderboardsById.Clear();
+        snapshot.CatalogRevision = string.Empty;
+        snapshot.SessionUnlockedAchievements.Clear();
+        snapshot.LastEventAt = DateTime.UtcNow;
     }
 
     public Task PublishChallengeAsync(RetroAchievementsChallengeEvent value, string? correlationId = null, CancellationToken cancellationToken = default)

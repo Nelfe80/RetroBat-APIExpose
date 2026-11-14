@@ -17,10 +17,11 @@ public enum IssueDuBilan
 /// <summary>
 /// Ce que la page de bilan sait a la fermeture du jeu. <c>Temps</c> : le meilleur de la seance, en images. <c>Rang</c>,
 /// <c>Record</c> et <c>Classes</c> : la reponse du site. <c>Motif</c> : la raison d'un temps retenu, refuse ou absent.
-/// <c>Finies</c> : les tentatives allees jusqu'a l'arrivee.
+/// <c>Finies</c> : les tentatives allees jusqu'a l'arrivee. <c>Ouverture</c> : l'instant ou le bilan s'est ouvert, la cle de l'ecran.
 /// </summary>
 public sealed record BilanDEpreuve(Reglement Defi, string Jeu, string Joueur, string? Fanart, IssueDuBilan Issue, long? Temps, int Tentatives,
-    int Finies = 0, int? Rang = null, long? Record = null, int? Classes = null, string Motif = "", IReadOnlyList<TempsClasse>? Classement = null);
+    int Finies = 0, int? Rang = null, long? Record = null, int? Classes = null, string Motif = "", IReadOnlyList<TempsClasse>? Classement = null,
+    long Ouverture = 0);
 
 /// <summary>
 /// LES PAGES PLEIN ECRAN D'UNE EPREUVE (CDC du panneau, §8), sur les patrons MULTIPLAYER : la preparation reprend l'ecran de
@@ -93,8 +94,8 @@ public sealed partial class DefisPanelService
             ? "+" + Chronometrage.Afficher(t - record, b.Defi.Cadence) + " " + T("speedrun.page.from_record", "from the record")
             : "";
         return new EcranDeFin(
-            // Le verdict change la cle : le titre se rejoue quand le temps est classe.
-            "bilan-" + b.Defi.ChallengeId + "-" + b.Issue,
+            // Une cle par bilan ouvert (brief du 13/11, point 1.1) : le verdict ne relance pas l'animation, seul le titre se rejoue.
+            "bilan-" + b.Defi.ChallengeId + "-" + b.Ouverture.ToString(System.Globalization.CultureInfo.InvariantCulture),
             StylesDesEcrans.Course,
             TitreDuBilan(b.Issue, premier),
             b.Jeu,

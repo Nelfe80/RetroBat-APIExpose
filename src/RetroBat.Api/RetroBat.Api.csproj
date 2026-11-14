@@ -6,6 +6,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+    <!-- Ramasse-miettes en mode poste de travail (brief du 13/11, point 1.2) : le SDK Web met le mode serveur par defaut, un
+         tas par coeur, 539 Mo prives apres 3 h sur une borne de 7,6 Go ou il restait 0,6 Go. L'API sert une seule borne. Ces
+         valeurs vont dans le runtimeconfig embarque par la publication en un seul fichier (tools/release-framework-dependent.ps1). -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>

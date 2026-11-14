@@ -56,6 +56,20 @@ public class DefisPagesTests
         => Assert.Equal(titre, Service().ComposerLeBilan(Bilan(issue), "fr").Titre);
 
     [Fact]
+    public void Le_verdict_garde_la_cle_du_bilan_et_une_autre_ouverture_en_change()
+    {
+        var ouvert = Bilan(IssueDuBilan.EnVerification) with { Ouverture = 638_000_000_000_000_000 };
+        var classe = DefisPanelService.AvecLeVerdict(ouvert, IssueDuBilan.Classe, 3, 2900, null);
+        var service = Service();
+
+        // Brief du 13/11, point 1.1 : le verdict change le titre, pas la cle (l'animation ne repart pas).
+        Assert.Equal(service.ComposerLeBilan(ouvert, "fr").Cle, service.ComposerLeBilan(classe, "fr").Cle);
+        Assert.NotEqual(service.ComposerLeBilan(ouvert, "fr").Titre, service.ComposerLeBilan(classe, "fr").Titre);
+        // Une autre tentative de la meme epreuve ouvre un autre bilan : son animation part.
+        Assert.NotEqual(service.ComposerLeBilan(ouvert, "fr").Cle, service.ComposerLeBilan(ouvert with { Ouverture = 638_000_000_000_000_001 }, "fr").Cle);
+    }
+
+    [Fact]
     public void Un_temps_classe_donne_son_rang_et_son_ecart_au_record()
     {
         var fin = Service().ComposerLeBilan(Bilan(IssueDuBilan.Classe, 2900, rang: 3, record: 2845, classes: 12), "fr");

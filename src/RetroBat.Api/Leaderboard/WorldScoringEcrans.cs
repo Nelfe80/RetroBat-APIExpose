@@ -314,8 +314,8 @@ public static class WorldScoringEcrans
             cartes.Add(new JoueurDeFin(2, "PLAYER DECK", b.DeckNom.ToUpperInvariant(), null, "", "", "", false, null, "", deck.Take(3).ToList(), Pastille: ""));
 
         return new EcranDeFin(
-            // Le verdict change la cle : le titre se rejoue quand le score est classe.
-            "ws-bilan-" + b.Cle + "-" + (b.Verdict.Length > 0 ? b.Verdict : "provisoire"),
+            // Une cle par partie (brief du 13/11, point 1.1) : le verdict ne relance pas l'animation, seul le titre se rejoue s'il change.
+            "ws-bilan-" + b.Cle,
             Type,
             titre,
             b.Jeu,
