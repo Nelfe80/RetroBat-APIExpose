@@ -61,6 +61,11 @@ public sealed class MassRunController : ControllerBase
         {
             return BadRequest(new { message = "noeud : une adresse http(s) absolue" });
         }
+        if (!_massrun.NoeudAdmis(noeud))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new { message = "noeud : seulement un noeud de la machine, celui de NELFEPLAY_MASSRUN_NOEUD ou un noeud MASS RUN du reseau en https" });
+        }
         try
         {
             return Accepted(Vue(await _massrun.RejoindreAsync(noeud.GetLeftPart(UriPartial.Authority), demande.Salle, demande.Jeu, ct)));
