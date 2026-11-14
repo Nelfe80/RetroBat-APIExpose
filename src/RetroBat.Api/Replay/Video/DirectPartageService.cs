@@ -51,6 +51,8 @@ public sealed class DirectPartageService : IHostedService
         public volatile bool Alert;
         // La partie certifiee s'est fermee (un continue, l'arrivee d'un joueur) : elle cede l'antenne a qui la demande.
         public volatile bool NonCertifiable;
+        /// <summary>L'emission a patine : la borne a rendu l'antenne pour ce passage (14/11).</summary>
+        public string? RaisonDeCeder;
         public long MeilleurScore;
         // Le record a battre (rang 1 du classement du mode joue), quand plus haut est mieux : rien sinon, ni quand le mode
         // d'un jeu a modes n'est pas connu.
@@ -339,9 +341,8 @@ public sealed class DirectPartageService : IHostedService
                 _journal.LogInformation("Direct partage : l'exe du direct manque, la borne ne se porte pas candidate.");
                 return;
             }
-            // PAS DE CANDIDATURE SANS FILM POSSIBLE (14/11) : la borne du user, en pause de film depuis le 04/11 (modeste), se
-            // presentait a chaque partie World Scoring ; elue, « aucun film ne tourne : pas de passage », et la place a
-            // l'antenne etait perdue. Ses epreuves attendaient 3 minutes un film qui ne pouvait pas venir.
+            // PAS DE CANDIDATURE SANS FILM POSSIBLE (14/11) : capture coupee ici ; le refus d'une partie par le controle
+            // d'avant le film arrete l'attente du film plus loin.
             if (!PeutFilmer()) return;
             if (_contexte.Ui.Running is not { } jeu) return;
             var brut = Path.GetFileNameWithoutExtension(jeu.GamePath.Length > 0 ? jeu.GamePath : jeu.GameName);
@@ -363,6 +364,14 @@ public sealed class DirectPartageService : IHostedService
                 _journal.LogInformation("Direct partage : epreuve {Defi}, la borne se porte candidate.", epreuve.ChallengeId);
                 await PasserAsync(p, romGroup, epreuve.Ruleset, (def.SystemId ?? "").Trim().ToLowerInvariant(), aModes: false)
                     .ConfigureAwait(false);
+                return;
+            }
+            // LE FILM D'ABORD, EN WORLD SCORING AUSSI (14/11) : la borne du user se presentait des le lancement ; elue, « aucun
+            // film ne tourne : pas de passage », la place a l'antenne etait perdue. Comme une epreuve (02/11), la partie ne se
+            // presente qu'une fois son film lance ; elle ne se presente pas du tout si le controle d'avant le film la refuse.
+            if (!await AttendreLeFilmAsync(p, sansLimite: true).ConfigureAwait(false))
+            {
+                if (!p.Finie) _journal.LogInformation("Direct partage : {Jeu} sans film, pas de candidature.", romGroup);
                 return;
             }
             var regles = _collection?.ReglesOuvertes(romGroup) ?? Array.Empty<string>();
@@ -399,9 +408,8 @@ public sealed class DirectPartageService : IHostedService
                 _journal.LogInformation("Direct partage : l'exe du direct manque, la borne ne se porte pas candidate.");
                 return;
             }
-            // PAS DE CANDIDATURE SANS FILM POSSIBLE (14/11) : la borne du user, en pause de film depuis le 04/11 (modeste), se
-            // presentait a chaque partie World Scoring ; elue, « aucun film ne tourne : pas de passage », et la place a
-            // l'antenne etait perdue. Ses epreuves attendaient 3 minutes un film qui ne pouvait pas venir.
+            // PAS DE CANDIDATURE SANS FILM POSSIBLE (14/11) : capture coupee ici ; le refus d'une partie par le controle
+            // d'avant le film arrete l'attente du film plus loin.
             if (!PeutFilmer()) return;
             // Les joueurs a gauche ; a droite, nelfeplay.com (pas de record a battre).
             p.BandeJoueur = TexteDeLaBande(mp.Players, mp.Family);
@@ -484,19 +492,28 @@ public sealed class DirectPartageService : IHostedService
     /// Attend le film d'une rencontre (AttenteDuDepart au plus) ; le debut de la partie se recale sur lui. Faux si la partie
     /// finit avant, ou sans film.
     /// </summary>
-    private async Task<bool> AttendreLeFilmAsync(Partie p)
+    private async Task<bool> AttendreLeFilmAsync(Partie p, bool sansLimite = false)
     {
         var limite = DateTime.UtcNow + AttenteDuDepart;
-        while (!p.Finie && DateTime.UtcNow < limite)
+        while (!p.Finie && (sansLimite || DateTime.UtcNow < limite))
         {
             if (_capture.FilmEnCours() is not null)
             {
                 p.Debut = DateTime.UtcNow;
                 return true;
             }
+            if (PartieSansFilm()) return false;
             await Task.Delay(500).ConfigureAwait(false);
         }
         return false;
+    }
+
+    /// <summary>La capture a refuse de filmer cette partie (controle d'avant le film) : inutile d'attendre son film.</summary>
+    private bool PartieSansFilm()
+    {
+        if (_capture.PourquoiPasDeFilm() is not { } raison) return false;
+        _journal.LogInformation("Direct partage : pas de film pour cette partie ({Raison}), pas de candidature.", raison);
+        return true;
     }
 
     /// <summary>
@@ -513,6 +530,7 @@ public sealed class DirectPartageService : IHostedService
                 p.Debut = DateTime.UtcNow;
                 return true;
             }
+            if (PartieSansFilm()) return false;
             await Task.Delay(500).ConfigureAwait(false);
         }
         _journal.LogInformation("Direct partage : epreuve {Defi} sans film ou sans etat de depart, pas de candidature.", epreuve.ChallengeId);
@@ -574,6 +592,14 @@ public sealed class DirectPartageService : IHostedService
         // B.4 (lot M4) : l'exe de cette borne lit-il le film jusqu'au bout a la fin d'une partie (0.7.2) ? Le site ne tient
         // alors la fin de passage 40 s que pour lui ; un exe plus ancien garde ses 14 a 20 s.
         var exeFinitLeFilm = LanceurDuDirect.SaitLesCartes(LanceurDuDirect.Chemin(AppContext.BaseDirectory));
+        // LA CONNEXION SUR L'INSTANT (14/11) : sans reseau, ou le site trop lent a joindre, cette partie ne se presente pas ;
+        // la suivante se verifie a nouveau.
+        if (!essai && await ControleAvantFilm.VerifierLaConnexionAsync(NelfePlayAgentService.BaseUrl, CancellationToken.None)
+                .ConfigureAwait(false) is { } connexion)
+        {
+            _journal.LogInformation("Direct partage : pas de candidature pour cette partie : {Raison}.", connexion);
+            return;
+        }
         try
         {
             while (true)
@@ -604,6 +630,8 @@ public sealed class DirectPartageService : IHostedService
                     ["film"] = _capture.FilmEnCours() is not null,
                     ["finishes_film"] = exeFinitLeFilm,
                 };
+                // L'emission a patine : le site peut clore le passage sans fin de passage (aucune image n'en partirait).
+                if (p.RaisonDeCeder is { } cede) demande["yield_reason"] = "emission : " + cede;
 
                 // Le site verifie que cette borne heberge la gameroom, et que la partie s'y joue encore. Le vrai depart (B.2) :
                 // un site plus ancien ignore le champ ; un site recent elit une rencontre qui le dit 3 s apres sa candidature.
@@ -751,6 +779,14 @@ public sealed class DirectPartageService : IHostedService
             empreinteDeLAnnonce);
         secours = new CancellationTokenSource();
         var jeton = secours.Token;
+        // LA SANTE DE L'EMISSION (14/11) : une emission qui patine durablement coupe sa transmission et rend l'antenne.
+        var sante = new SanteDeLEmission();
+        var horloge = System.Diagnostics.Stopwatch.StartNew();
+        var coupure = secours;
+        void SurLigne(string ligne)
+        {
+            if (sante.Observer(horloge.Elapsed.TotalSeconds, ligne) is { } raison) RendreLAntenne(p, raison, coupure);
+        }
         var tache = Task.Run(async () =>
         {
             if (precedent is not null)
@@ -781,7 +817,7 @@ public sealed class DirectPartageService : IHostedService
             Ecrire(CheminDeLaCommande, CommandeJson(fin: false, arret: false, null, null, false, false));
             return await LanceurDuDirect.DiffuserAsync(exe, film.Fichier, adresse, film.Rotation ?? 0, _journal, jeton,
                 annonce: annonce, classement: CheminDeLaCarte, options: [.. options, .. cartes], delaiDeFin: TimeSpan.FromSeconds(10),
-                forme: film.Forme, fond: film.Fond, crt: film.Crt).ConfigureAwait(false);
+                forme: film.Forme, fond: film.Fond, crt: film.Crt, surLigne: SurLigne).ConfigureAwait(false);
         });
         lock (_verrou)
         {
@@ -789,6 +825,24 @@ public sealed class DirectPartageService : IHostedService
             _secoursCourant = secours;
         }
         return tache;
+    }
+
+    /// <summary>
+    /// L'emission patine durablement (<see cref="SanteDeLEmission"/>) : l'exe recoit l'ordre d'arret (son lanceur l'arrete
+    /// 10 s plus tard s'il ne l'a pas lu), et la partie se dit finie au site, qui clot le passage et elit la suivante, comme
+    /// quand l'exe s'arrete seul. Seul ce passage est perdu : la partie suivante se presente normalement.
+    /// </summary>
+    private void RendreLAntenne(Partie p, string raison, CancellationTokenSource? coupure)
+    {
+        lock (_verrou)
+        {
+            if (p.RaisonDeCeder is not null) return;
+            p.RaisonDeCeder = raison;
+        }
+        _journal.LogInformation("Direct partage : l'emission patine ({Raison}), la borne coupe sa transmission et rend l'antenne.", raison);
+        EcrireLaCommande(p, fin: true, arret: true, null, null);
+        p.Finie = true;
+        try { coupure?.Cancel(); } catch (ObjectDisposedException) { /* deja fini */ }
     }
 
     /// <summary>
