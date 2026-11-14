@@ -46,6 +46,9 @@ public class RetroArchWrapperProvider : IProvider
 
     private readonly System.Collections.Concurrent.ConcurrentDictionary<string, AliasIndex> _aliasIndexes =
         new(StringComparer.OrdinalIgnoreCase);
+    // Un verrou par fichier : le prechauffage et une selection ne chargent pas deux fois le meme index en meme temps.
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, object> _aliasLoadLocks =
+        new(StringComparer.OrdinalIgnoreCase);
 
     private AliasIndex? LoadAliasIndex(string aliasFile)
     {
@@ -62,6 +65,21 @@ public class RetroArchWrapperProvider : IProvider
             return connu;
         }
 
+        lock (_aliasLoadLocks.GetOrAdd(aliasFile, _ => new object()))
+        {
+            if (_aliasIndexes.TryGetValue(aliasFile, out var chargeEntreTemps)
+                && chargeEntreTemps.WriteUtc == info.LastWriteTimeUtc
+                && chargeEntreTemps.Length == info.Length)
+            {
+                return chargeEntreTemps;
+            }
+
+            return ChargerLIndexDAlias(aliasFile, info);
+        }
+    }
+
+    private AliasIndex ChargerLIndexDAlias(string aliasFile, FileInfo info)
+    {
         var chrono = System.Diagnostics.Stopwatch.StartNew();
         var exact = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(aliasFile))
             ?? new Dictionary<string, string>();
@@ -104,12 +122,15 @@ public class RetroArchWrapperProvider : IProvider
     {
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _workerTask = RunAsync(_cts.Token);
+        SuivreLeChoixDuSysteme();
         _logger?.LogInformation("RetroArchWrapperProvider started for pipe {PipeName}", GetPipePath());
         return Task.CompletedTask;
     }
 
     public async Task StopAsync(CancellationToken cancellationToken = default)
     {
+        _selectionSystemeAbonnement?.Dispose();
+        _selectionSystemeAbonnement = null;
         if (_cts != null)
         {
             _cts.Cancel();
@@ -961,16 +982,118 @@ public class RetroArchWrapperProvider : IProvider
         });
     }
 
-    private static string NormalizeRomName(string rawRom)
+    public static string NormalizeRomName(string rawRom)
     {
         if (string.IsNullOrWhiteSpace(rawRom))
         {
             return string.Empty;
         }
 
-        var normalized = rawRom.Trim().ToLowerInvariant();
-        normalized = Regex.Replace(normalized, @"[^a-z0-9]+", "-");
-        return normalized.Trim('-');
+        // (brief 13/11, PERF-API-06) meme resultat que Regex.Replace(minuscules, "[^a-z0-9]+", "-").Trim('-'), sans
+        // expression reguliere : appelee pour chaque entree d'un alias.json (37 648 pour la Super Nintendo), elle faisait
+        // l'essentiel du chargement de l'index.
+        var minuscules = rawRom.Trim().ToLowerInvariant();
+        var resultat = new System.Text.StringBuilder(minuscules.Length);
+        var tiretEnAttente = false;
+        foreach (var c in minuscules)
+        {
+            if (c is >= 'a' and <= 'z' or >= '0' and <= '9')
+            {
+                if (tiretEnAttente && resultat.Length > 0) resultat.Append('-');
+                tiretEnAttente = false;
+                resultat.Append(c);
+            }
+            else
+            {
+                tiretEnAttente = true;
+            }
+        }
+
+        return resultat.ToString();
+    }
+
+    /// <summary>
+    /// (brief du 13/11, PERF-API-06) Prechauffe l'index d'alias d'un systeme en arriere-plan, des que le systeme est choisi
+    /// dans ES : le premier jeu selectionne ne paie plus son chargement (1 052 ms mesurees pour la Super Nintendo le 13/11,
+    /// pendant la projection du marquee). Une selection qui arrive pendant le chargement l'attend au lieu de le refaire.
+    /// </summary>
+    public void PrechaufferLeSysteme(string systemId)
+    {
+        if (string.IsNullOrWhiteSpace(systemId)) return;
+        lock (_systemesPrechauffes)
+        {
+            _systemesPrechauffes.Add(systemId);
+            if (_systemesPrechauffes.Count > 64) _systemesPrechauffes.RemoveAt(0);
+        }
+
+        foreach (var candidat in ResolveDefinitionSystemCandidates(systemId))
+        {
+            PrechaufferLeFichierDAlias(Path.Combine(RetroBatPaths.RamResourcesRoot, candidat, "alias.json"));
+        }
+    }
+
+    /// <summary>Le carrousel doit rester sur le systeme ce temps-la : un defilement des systemes ne charge pas tous les index.</summary>
+    public static readonly TimeSpan AttenteAvantPrechauffage = TimeSpan.FromMilliseconds(400);
+    private IDisposable? _selectionSystemeAbonnement;
+    private long _dernierSystemeChoisi;
+    private readonly List<string> _systemesPrechauffes = new();
+
+    /// <summary>Systemes dont l'index a ete prechauffe depuis le demarrage (tests, diagnostic).</summary>
+    public IReadOnlyList<string> SystemesPrechauffes
+    {
+        get { lock (_systemesPrechauffes) return _systemesPrechauffes.ToList(); }
+    }
+
+    /// <summary>Abonne le prechauffage au choix du systeme dans ES (fait au demarrage du fournisseur).</summary>
+    public IDisposable SuivreLeChoixDuSysteme() =>
+        _selectionSystemeAbonnement ??= _eventBus.Subscribe<EventEnvelope>(SurSystemeChoisi);
+
+    private void SurSystemeChoisi(EventEnvelope evenement)
+    {
+        if (!string.Equals(evenement.Type, "ui.system.selected.raw", StringComparison.Ordinal)) return;
+        string systeme;
+        try
+        {
+            var charge = JsonSerializer.SerializeToElement(evenement.Payload);
+            systeme = charge.TryGetProperty("Selection", out var selection) && selection.ValueKind == JsonValueKind.Object
+                      && selection.TryGetProperty("SystemId", out var id) && id.ValueKind == JsonValueKind.String
+                ? id.GetString() ?? string.Empty
+                : string.Empty;
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException or InvalidOperationException)
+        {
+            return;
+        }
+
+        if (systeme.Length == 0) return;
+        var tour = Interlocked.Increment(ref _dernierSystemeChoisi);
+        var jeton = _cts?.Token ?? CancellationToken.None;
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(AttenteAvantPrechauffage, jeton).ConfigureAwait(false);
+                if (Interlocked.Read(ref _dernierSystemeChoisi) != tour) return;   // le carrousel a bouge
+                PrechaufferLeSysteme(systeme);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }, CancellationToken.None);
+    }
+
+    /// <summary>Charge (ou garde) l'index d'un alias.json donne. Rend le nombre d'entrees, 0 si le fichier manque.</summary>
+    public int PrechaufferLeFichierDAlias(string aliasFile)
+    {
+        try
+        {
+            return LoadAliasIndex(aliasFile)?.Exact.Count ?? 0;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
+        {
+            _logger?.LogDebug(ex, "Index d'alias non prechauffe : {Fichier}.", aliasFile);
+            return 0;
+        }
     }
 
     private static IReadOnlyList<string> ResolveDefinitionSystemCandidates(string systemId)
