@@ -182,6 +182,14 @@ public static class GardeDeLHote
            || !string.IsNullOrEmpty(enTete("Sec-Fetch-Dest"))
            || !string.IsNullOrEmpty(enTete("Origin"));
 
+    /// <summary>
+    /// Deux cles egales, comparees en temps constant. Une cle attendue vide n'est jamais egale. Pur.
+    /// </summary>
+    public static bool MemeCle(string? fournie, string? attendue)
+        => fournie is { Length: > 0 } && attendue is { Length: > 0 }
+           && System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(
+               System.Text.Encoding.UTF8.GetBytes(fournie), System.Text.Encoding.UTF8.GetBytes(attendue));
+
     /// <summary>Hotes refuses deja signales, pour ne journaliser chacun qu'une fois.</summary>
     private static readonly HashSet<string> Signales = new(StringComparer.OrdinalIgnoreCase);
 

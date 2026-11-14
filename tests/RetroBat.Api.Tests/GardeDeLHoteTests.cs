@@ -91,6 +91,18 @@ public class GardeDeLHoteTests
     }
 
     [Fact]
+    public void Cles_comparees_sans_jamais_accepter_le_vide()
+    {
+        Assert.True(GardeDeLHote.MemeCle("ABCDEF0123", "ABCDEF0123"));
+        Assert.False(GardeDeLHote.MemeCle("ABCDEF0124", "ABCDEF0123"));
+        Assert.False(GardeDeLHote.MemeCle("abcdef0123", "ABCDEF0123"));
+        Assert.False(GardeDeLHote.MemeCle("ABCDEF012", "ABCDEF0123"));
+        Assert.False(GardeDeLHote.MemeCle("", ""));
+        Assert.False(GardeDeLHote.MemeCle(null, "ABC"));
+        Assert.False(GardeDeLHote.MemeCle("ABC", ""));
+    }
+
+    [Fact]
     public void Marques_de_navigateur()
     {
         Assert.False(GardeDeLHote.MarqueDeNavigateur(_ => null));

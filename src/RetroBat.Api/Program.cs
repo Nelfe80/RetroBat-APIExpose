@@ -865,10 +865,7 @@ if (cabinetApiKey.Length == 0)
             }
 
             // Une page qui rebondit ne peut lire ni la cle de borne ni le jeton local.
-            var cle = context.Request.Headers["X-Api-Key"].FirstOrDefault();
-            if ((cabinetApiKey.Length > 0 && cle is { Length: > 0 }
-                    && System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(
-                        System.Text.Encoding.UTF8.GetBytes(cle), System.Text.Encoding.UTF8.GetBytes(cabinetApiKey)))
+            if (GardeDeLHote.MemeCle(context.Request.Headers["X-Api-Key"].FirstOrDefault(), cabinetApiKey)
                 || LocalWriteToken.Matches(context.Request.Headers[LocalWriteToken.HeaderName].FirstOrDefault()))
             {
                 await next();
@@ -983,9 +980,11 @@ if (cabinetApiKey.Length > 0)
             var provided = context.Request.Headers["X-Api-Key"].FirstOrDefault()
                 ?? context.Request.Query["apiKey"].FirstOrDefault();
 
-            var isCabinetKey = string.Equals(provided, cabinetApiKey, StringComparison.Ordinal);
+            // Comparaisons en temps constant. La cle reste acceptee en parametre d'adresse : un
+            // WebSocket ouvert par un navigateur ne peut pas poser d'en-tete.
+            var isCabinetKey = GardeDeLHote.MemeCle(provided, cabinetApiKey);
             var isShareKey = replayShareKey.Length > 0
-                             && string.Equals(provided, replayShareKey, StringComparison.Ordinal)
+                             && GardeDeLHote.MemeCle(provided, replayShareKey)
                              && IsShareSurface(context.Request);
 
             // Une machine qui nous administre depuis le reseau est une ANCRE (en pratique, un hub
