@@ -390,7 +390,8 @@ public sealed partial class FantomesDuSpeedrun
         {
             using var client = _http.CreateClient(IndexDesDefisService.HttpClientName);
             var url = $"{NelfePlayAgentService.BaseUrl.TrimEnd('/')}/api/v1/challenges/board?ruleset={Uri.EscapeDataString(r.Ruleset)}&limit=100";
-            using var json = JsonDocument.Parse(await client.GetStringAsync(url, ct).ConfigureAwait(false));
+            // L'empreinte deja recue repart (C-10, C-11) ; l'agent de l'API est pose par le relais de liaison.
+            using var json = JsonDocument.Parse(await LecturesConditionnelles.Partagees.LireAsync(client, url, ct).ConfigureAwait(false));
             lignes = LignesDuClassement(json.RootElement);
             monTempsPublie = MonTemps(json.RootElement, pseudo);
             tempsDesReplays = TempsDesReplays(json.RootElement);

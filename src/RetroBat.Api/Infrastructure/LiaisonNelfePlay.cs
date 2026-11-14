@@ -80,9 +80,29 @@ public sealed class LiaisonNelfePlayHandler : DelegatingHandler
         _baseUrl = baseUrl;
     }
 
+    /// <summary>
+    /// L'AGENT DE LA BORNE (lot 4 bis C-10, 14/11) : 13 784 appels a <c>challenges/board</c> par jour arrivaient sans agent
+    /// declare, et le site ne savait pas qui les faisait. Tout appel au site sans agent porte desormais celui de l'API
+    /// (« NelfePlay-APIExpose/1.9.183 ») ; un agent deja pose ne change pas. Le site ne s'en sert que pour compter.
+    /// </summary>
+    internal static readonly string Agent = AgentDeLaBorne(CabinetState.Version);
+
+    /// <summary>« NelfePlay-APIExpose/1.9.183 » : la version sans son suffixe de build (« +abc »). Pur.</summary>
+    internal static string AgentDeLaBorne(string? version)
+    {
+        var propre = (version ?? "").Split('+')[0].Trim();
+        propre = new string(propre.Where(c => char.IsAsciiLetterOrDigit(c) || c is '.' or '-').ToArray());
+        return propre.Length > 0 ? "NelfePlay-APIExpose/" + propre : "NelfePlay-APIExpose";
+    }
+
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var suivi = LiaisonNelfePlay.EstNelfePlay(request.RequestUri, _baseUrl());
+        if (suivi && request.Headers.UserAgent.Count == 0)
+        {
+            request.Headers.UserAgent.TryParseAdd(Agent);
+        }
+
         try
         {
             var reponse = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
