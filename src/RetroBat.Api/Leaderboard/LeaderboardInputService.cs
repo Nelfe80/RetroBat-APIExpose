@@ -1109,8 +1109,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         {
             // PAS EN PARTIE (lot 4 bis C-4, 14/11 : 7 040 appels par jour) : aucune notification ne parait pendant une
             // partie ; un direct lance pendant la partie s'annonce au tour qui suit le retour dans ES.
-            // COUVERT (point 5 du 14/11) : le releve de l'agent porte deja la liste, toutes les 5 min ; le guet se tait.
-            if (!EnPartiePourLesDirects() && _suivi?.Couvert(Infrastructure.SuiviDuSite.DirectsSuivis, DateTime.UtcNow) != true)
+            // COUVERT (point 5 du 14/11) : le releve de l'agent porte deja la liste, toutes les 5 min ; le guet se tait,
+            // SAUF QUAND QUELQU'UN EST DEVANT LA BORNE (decision du user du 14/11) : un direct suivi s'annonce alors en 60 s.
+            if (!EnPartiePourLesDirects()
+                && (_suivi?.Couvert(Infrastructure.SuiviDuSite.DirectsSuivis, DateTime.UtcNow) != true || _multiplayer?.JoueurPresent == true))
             try
             {
                 await AnnoncerLesDirectsSuivisAsync(await _social.DirectsSuivisAsync(ct).ConfigureAwait(false), ct).ConfigureAwait(false);

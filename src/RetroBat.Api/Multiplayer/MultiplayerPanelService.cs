@@ -49,6 +49,9 @@ public sealed partial class MultiplayerPanelService
     }
 
     private readonly MultiplayerSessionService _session;
+
+    /// <summary>Quelqu'un est-il devant la borne (un geste depuis moins de 5 min, ou le panneau ouvert) ?</summary>
+    internal bool JoueurPresent => _session.JoueurPresent(DateTime.UtcNow);
     private readonly LeaderboardOverlayService _overlay;
     private readonly InterfaceTextService _textes;
     private readonly EmulationStationSettingsService _reglages;
