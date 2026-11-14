@@ -144,7 +144,7 @@ public static class GamelistIdentity
     }
 
     /// <summary>« bootleg » ou « hack » si le referentiel le dit de ce set, sinon "" (connu, sans marque).</summary>
-    private static string Marque(JsonElement root)
+    internal static string Marque(JsonElement root)
     {
         if (root.TryGetProperty("t", out var t) && string.Equals(t.GetString(), "hack", StringComparison.OrdinalIgnoreCase))
             return "hack";
@@ -199,7 +199,7 @@ public static class GamelistIdentity
         => string.Equals(DeclaredOrientation(systemId, nomOuGroupe, setOuFichier), "vertical",
             StringComparison.OrdinalIgnoreCase);
 
-    private static string? PremierSha1(JsonElement root)
+    internal static string? PremierSha1(JsonElement root)
     {
         if (root.TryGetProperty("hsh", out var hsh) && hsh.ValueKind == JsonValueKind.Array)
         {
@@ -212,10 +212,10 @@ public static class GamelistIdentity
         return null;
     }
 
-    private static string? Orientation(JsonElement root)
+    internal static string? Orientation(JsonElement root)
         => root.TryGetProperty("ori", out var v) && v.GetString() is { Length: > 0 } o ? o : null;
 
-    private static string? Nom(JsonElement root)
+    internal static string? Nom(JsonElement root)
         => root.TryGetProperty("n", out var v) && v.ValueKind == JsonValueKind.String && v.GetString() is { Length: > 0 } n ? n.Trim() : null;
 
     /// <summary>
@@ -224,7 +224,67 @@ public static class GamelistIdentity
     /// l'ont pas sous la main. Un filtre bon marché sur le premier segment évite de parser
     /// 55 000 lignes de JSON pour rien.
     /// </summary>
-    private static string? Chercher(string chemin, string slug, string set,
+    internal static string? Chercher(string chemin, string slug, string set,
+        Func<JsonElement, string?> extraire)
+    {
+        if (!File.Exists(chemin)) return null;
+
+        var tete = set.Length > 0 ? set : slug.Split('-')[0];
+        if (tete.Length == 0) return null;
+
+        // (brief 13/11, PERF-API-07) l'index du fichier donne les lignes candidates ; le test de chaque ligne est celui du
+        // balayage. Sans index (fichier trop gros, ou qu'il ne sait pas lire), on balaie comme avant.
+        var index = ReferentielDeJeuxIndex.Pour(chemin, Journal);
+        if (index is not null)
+        {
+            try
+            {
+                foreach (var ligne in ReferentielDeJeuxIndex.LireLesLignes(chemin, index.Candidates(slug, set)))
+                {
+                    if (LigneCorrespond(ligne, tete, slug, set, extraire, out var resultat)) return resultat;
+                }
+            }
+            catch
+            {
+                // Une gamelist illisible ne doit jamais faire échouer une partie.
+            }
+
+            return null;
+        }
+
+        return ChercherParBalayage(chemin, slug, set, extraire);
+    }
+
+    /// <summary>
+    /// Le test d'une ligne, commun au balayage et a l'index : filtre bon marche sur le texte, puis set ou id exact, puis
+    /// groupe slugifie. Vrai si la ligne est celle du jeu (le resultat peut alors etre null). Peut lever (ligne illisible).
+    /// </summary>
+    private static bool LigneCorrespond(string ligne, string tete, string slug, string set,
+        Func<JsonElement, string?> extraire, out string? resultat)
+    {
+        resultat = null;
+        if (ligne.Length == 0 || ligne.IndexOf(tete, StringComparison.OrdinalIgnoreCase) < 0) return false;
+
+        using var doc = JsonDocument.Parse(ligne);
+        var root = doc.RootElement;
+
+        var correspond = false;
+        if (set.Length > 0)
+        {
+            correspond = Egal(root, "set", set) || Egal(root, "id", set);
+        }
+        if (!correspond && slug.Length > 0 && root.TryGetProperty("grp", out var grp))
+        {
+            correspond = string.Equals(Slugifier(grp.GetString()), slug, StringComparison.OrdinalIgnoreCase);
+        }
+        if (!correspond) return false;
+
+        resultat = extraire(root);
+        return true;
+    }
+
+    /// <summary>Le balayage complet du fichier, tel qu'avant l'index (reference des tests, et repli).</summary>
+    internal static string? ChercherParBalayage(string chemin, string slug, string set,
         Func<JsonElement, string?> extraire)
     {
         if (!File.Exists(chemin)) return null;
@@ -241,24 +301,10 @@ public static class GamelistIdentity
             foreach (var ligne in File.ReadLines(chemin))
             {
                 lues += ligne.Length + 1;
-                if (ligne.Length == 0 || ligne.IndexOf(tete, StringComparison.OrdinalIgnoreCase) < 0) continue;
-
-                using var doc = JsonDocument.Parse(ligne);
-                var root = doc.RootElement;
-
-                var correspond = false;
-                if (set.Length > 0)
-                {
-                    correspond = Egal(root, "set", set) || Egal(root, "id", set);
-                }
-                if (!correspond && slug.Length > 0 && root.TryGetProperty("grp", out var grp))
-                {
-                    correspond = string.Equals(Slugifier(grp.GetString()), slug, StringComparison.OrdinalIgnoreCase);
-                }
-                if (!correspond) continue;
+                if (!LigneCorrespond(ligne, tete, slug, set, extraire, out var resultat)) continue;
 
                 IoTrace.Balayage(Journal, chemin, lues, chrono.ElapsedMilliseconds);
-                return extraire(root); // le jeu est là : inutile de continuer ce fichier
+                return resultat; // le jeu est là : inutile de continuer ce fichier
             }
         }
         catch
