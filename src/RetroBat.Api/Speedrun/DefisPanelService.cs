@@ -776,7 +776,7 @@ public sealed partial class DefisPanelService
             new(T("speedrun.panel.goal", "Goal"), Objectif(defi)),
             new(T("speedrun.panel.training.aids", "Aids"), aides.Count > 0
                 ? T("speedrun.panel.training.infinite_lives", "Infinite lives") : T("speedrun.panel.training.no_aid", "None")),
-            new(T("speedrun.panel.restart", "Restart"), T("speedrun.panel.training.restart", "Hotkey + Left: back to this point")),
+            new(T("speedrun.panel.restart", "Restart"), T("speedrun.panel.training.restart", "Hotkey + Left")),
             new(T("speedrun.panel.training.sessions", "Sessions"), seances.ToString(System.Globalization.CultureInfo.InvariantCulture)),
         ];
     }
@@ -908,7 +908,7 @@ public sealed partial class DefisPanelService
                 if (groupe.Key.Onglet == DefisPanelModel.Onglet.Training)
                 {
                     // TRAINING (14/11) : ni record ni temps, le nombre de seances de cette borne seulement
-                    lignes.Add((new LigneDeDefi(d.Titre(langue), "", tentatives > 0 ? tentatives.ToString(System.Globalization.CultureInfo.InvariantCulture) : "",
+                    lignes.Add((new LigneDeDefi(SansLeGroupe(d.Titre(langue), d.Groupe(langue)), "", tentatives > 0 ? tentatives.ToString(System.Globalization.CultureInfo.InvariantCulture) : "",
                         Marque: tentatives > 0 ? "tente" : ""), d));
                     continue;
                 }
@@ -927,6 +927,17 @@ public sealed partial class DefisPanelService
         }
 
         return resultat;
+    }
+
+    /// <summary>
+    /// Le titre sous son surtitre (14/11) : « Mission 1 · Route du bateau » se lit « Route du bateau » sous « Mission 1 ». Le
+    /// titre complet reste celui des pages et du Deck. Sans groupe, ou si le titre ne commence pas par lui, le titre entier.
+    /// </summary>
+    internal static string SansLeGroupe(string titre, string? groupe)
+    {
+        if (groupe is not { Length: > 0 } g || !titre.StartsWith(g, StringComparison.Ordinal)) return titre;
+        var reste = titre[g.Length..].TrimStart(' ', '·', '・', ':', '：', '-');
+        return reste.Length > 0 ? reste : titre;
     }
 
     /// <summary>L'onglet d'une epreuve : SPEEDRUNS pour un speedrun, TRAINING pour un point d'entrainement, CHALLENGES sinon.</summary>

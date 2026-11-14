@@ -120,6 +120,11 @@ public class DefisEntrainementTests
         var training = lignes[DefisPanelModel.Onglet.Training];
         Assert.Equal(["Mission 1", "Point training-m1-00", "Point training-m1-04", "Mission 2", "Point training-m2-00"],
             training.Select(l => l.Ligne.Nom));
+        // sous son surtitre, un titre « Mission 1 · ... » perd sa mission
+        Assert.Equal("Route du bateau", DefisPanelService.SansLeGroupe("Mission 1 · Route du bateau", "Mission 1"));
+        Assert.Equal("マリンダイバー", DefisPanelService.SansLeGroupe("ミッション1・マリンダイバー", "ミッション1"));
+        Assert.Equal("Mission 1", DefisPanelService.SansLeGroupe("Mission 1", "Mission 1"));
+        Assert.Equal("Rambo", DefisPanelService.SansLeGroupe("Rambo", null));
         Assert.Equal([true, false, false, true, false], training.Select(l => l.Ligne.Groupe));
         // ni record ni temps : le nombre de seances, et la marque « tente » (jamais « reussi »)
         var m104 = training[2].Ligne;
@@ -172,6 +177,33 @@ public class DefisEntrainementTests
 
     public static IEnumerable<object[]> PointsDuDataPack()
         => Directory.GetFiles(Dossier, "metal-slug-3.training-*.json").Order(StringComparer.Ordinal).Select(f => new object[] { Path.GetFileName(f) });
+
+    /// <summary>
+    /// L'APERCU DE L'ONGLET TRAINING (vrai rendu GDI+) : ecrit dans NELFEPLAY_APERCUS s'il est donne, avec les textes fr de
+    /// NELFEPLAY_APERCUS_TEXTES (interface-texts.json du Data Pack) ; sinon, verifie seulement que le dessin aboutit.
+    /// </summary>
+    [Fact]
+    public void Apercu_de_l_onglet_TRAINING_avec_les_points_du_Data_Pack()
+    {
+        var points = PointsDuDataPack().Select(o => Reglement.Lire(File.ReadAllText(Path.Combine(Dossier, (string)o[0])))).ToList();
+        var textes = Environment.GetEnvironmentVariable("NELFEPLAY_APERCUS_TEXTES") is { Length: > 0 } chemin
+            ? new RetroBat.Api.Infrastructure.InterfaceTextService(chemin)
+            : null;
+        var panneau = new DefisPanelService(null!, null!, null!,
+            new RetroBat.Api.Leaderboard.LeaderboardOverlayService(Microsoft.Extensions.Logging.Abstractions.NullLogger<RetroBat.Api.Leaderboard.LeaderboardOverlayService>.Instance),
+            null!, textes: textes)
+        {
+            LangueDApercu = textes is null ? "en" : "fr",
+        };
+        var contenu = panneau.OuvrirPourEssai(points);
+        Assert.Equal("TRAINING", contenu.Onglets[contenu.OngletCourant]);
+        Assert.False(contenu.Bandeaux);
+        Assert.NotEmpty(contenu.Bandeau);
+        var png = RetroBat.Api.Leaderboard.LeaderboardOverlayService.ApercuDefis(RetroBat.Api.Leaderboard.EsMenuStyle.Lire(null), contenu, null!);
+        Assert.NotEmpty(png);
+        if (Environment.GetEnvironmentVariable("NELFEPLAY_APERCUS") is { Length: > 0 } sortie)
+            File.WriteAllBytes(Path.Combine(Directory.CreateDirectory(sortie).FullName, "entrainement-ms3.png"), png);
+    }
 
     [Fact]
     public void Le_Data_Pack_a_les_points_d_entree_des_cinq_missions()
