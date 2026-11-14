@@ -70,6 +70,10 @@ public sealed class LiveContestOverlayService : IDisposable
     /// <summary>L'ecran de depart du World Scoring tient l'ecran : il dit deja la certification.</summary>
     public static Func<bool>? PageDuScoringDevant { get; set; }
 
+    /// <summary>La certification d'une partie, deja dite par l'ecran de depart qui tient l'ecran : ni bandeau ni plaque du Deck. Pur.</summary>
+    internal static bool TaireLaBonneNouvelle(string? kind, bool pageDuScoringDevant)
+        => pageDuScoringDevant && kind is "scoring_certifiable" or "scoring_offline_certifiable";
+
     internal static RouteDuBandeau Router(bool auDeck, bool deckVisible, bool aUnTexteAnglais)
         => auDeck && aUnTexteAnglais ? RouteDuBandeau.AuDeck
             : deckVisible ? RouteDuBandeau.DansLeJeu
@@ -89,8 +93,9 @@ public sealed class LiveContestOverlayService : IDisposable
             catch (Exception) { /* un ecran ne fait jamais tomber le scoring */ }
 
             // La bonne nouvelle (CERTIFIABLE) est deja sur l'ecran de depart : pas de bandeau par-dessus. Une partie non
-            // certifiable garde son bandeau, qui en dit la raison.
-            if (route != RouteDuBandeau.AuDeck && annonce.Kind is "scoring_certifiable" or "scoring_offline_certifiable" && PageDuScoringDevant?.Invoke() == true) return;
+            // certifiable garde son bandeau, qui en dit la raison. (brief 13/11, ECR-02) Le Deck aussi : sa plaque
+            // « CERTIFIABLE FOR THE LEADERBOARD » arrivait pendant la page, ou juste apres elle, la meme annonce deux fois.
+            if (TaireLaBonneNouvelle(annonce.Kind, PageDuScoringDevant?.Invoke() == true)) return;
         }
 
         if (route == RouteDuBandeau.AuDeck && silence!.Dire(auDeck, true)) return;

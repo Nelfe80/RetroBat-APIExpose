@@ -27,3 +27,16 @@ public class FiletDuSilenceTests
         Assert.True(overlay.TropLongSilence());
     }
 }
+
+/// <summary>Brief du 13/11, ECR-02 : « CERTIFIABLE » n'est plus dit deux fois, ni en bandeau ni a la plaque du Deck.</summary>
+public class CertifiableDitUneFoisTests
+{
+    [Theory]
+    [InlineData("scoring_certifiable", true, true)]
+    [InlineData("scoring_offline_certifiable", true, true)]
+    [InlineData("scoring_certifiable", false, false)]      // page partie : la plaque du Deck ou le bandeau le dit
+    [InlineData("scoring_not_certifiable", true, false)]   // une raison de refus se dit toujours
+    [InlineData(null, true, false)]
+    public void La_certification_se_tait_seulement_devant_la_page_de_depart(string? kind, bool page, bool tait)
+        => Assert.Equal(tait, RetroBat.Api.Infrastructure.LiveContestOverlayService.TaireLaBonneNouvelle(kind, page));
+}
