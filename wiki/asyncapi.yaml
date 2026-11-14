@@ -227,6 +227,29 @@ channels:
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
+  scoring:
+    address: /ws/scoring
+    description: >
+      Prefix `scoring.` - certified scoring of the game in progress (no secrets):
+      scoring.verdict (`SessionId`, `RomGroup`, `SystemId`, `Ruleset`, `Status` =
+      published | held | quarantined | rejected, `Score`, `Rank`, `Continues`,
+      `DurationMs`), scoring.partie.depart, scoring.run.ended, scoring.run.reset,
+      scoring.run.multi, scoring.listener.attestation, scoring.listener.session,
+      scoring.replay.stop, scoring.lab.start. Up to 1.9.183 these events were only on /ws.
+    messages:
+      envelope:
+        $ref: '#/components/messages/envelope'
+  multiplayer:
+    address: /ws/multiplayer
+    description: >
+      Prefixes `multiplayer.`, `netplay.` - MULTIPLAYER gamerooms and matches:
+      multiplayer.state (retained, sent on connect: `rooms[]`, `invitations`, `error`;
+      never any netplay password), multiplayer.host.started, multiplayer.match.started,
+      multiplayer.match.ended, netplay.guest.host_left. Up to 1.9.183 these events
+      were only on /ws.
+    messages:
+      envelope:
+        $ref: '#/components/messages/envelope'
   deck:
     address: /ws/deck
     description: >

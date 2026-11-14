@@ -51,6 +51,8 @@ Chaque flux ne délivre que les types d'événements de ses préfixes ; certains
 | `/ws/score`, `/ws/timer` | Score et timer temps réel normalisés (retenus) |
 | `/ws/retroachievements` | Session RA : rich presence, unlocks, défis, leaderboards |
 | `/ws/hiscore` | Captures et mises à jour de high scores |
+| `/ws/scoring` | Scoring certifié de la partie : verdict du site (`scoring.verdict`), départ et fin de run |
+| `/ws/multiplayer` | Gamerooms et rencontres MULTIPLAYER (`multiplayer.state` retenu, `multiplayer.match.*`, `netplay.*`) |
 | `/ws/media`, `/ws/roms`, `/ws/system`, `/ws/control`, `/ws/esevent` | Store médias, Roms Manager, service, commandes, hooks ES bruts |
 
 Les instantanes de surface portent `Media` (champs historiques, inchanges) et, en plus, `Assets` - une table indexee sur le type de media canonique (`box-3d`, `mixrbv2`, `wheel`…) ne contenant que ce que l'entree possede vraiment. En portee jeu, `SystemAssets` porte la meme table pour son systeme : c'est ce qui permet de distinguer le fanart du jeu de celui du systeme, la ou les champs historiques replient silencieusement de l'un sur l'autre. **Une cle n'existe que si le fichier existe.**

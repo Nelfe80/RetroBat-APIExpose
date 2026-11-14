@@ -30,6 +30,7 @@ public class WebSocketConnectionManager
     private string? _retainedSpeedrunJson;
     private string? _retainedRetroAchievementsSessionJson;
     private string? _retainedRetroAchievementsCatalogJson;
+    private string? _retainedMultiplayerStateJson;
 
     public WebSocketConnectionManager(IOptionsMonitor<ApiExposeOptions> options)
     {
@@ -508,6 +509,11 @@ public class WebSocketConnectionManager
             return One(_retainedSpeedrunJson);
         }
 
+        if (string.Equals(stream, "multiplayer", StringComparison.OrdinalIgnoreCase))
+        {
+            return One(_retainedMultiplayerStateJson);
+        }
+
         if (string.Equals(stream, "retroachievements", StringComparison.OrdinalIgnoreCase))
         {
             return new[] { _retainedRetroAchievementsCatalogJson, _retainedRetroAchievementsSessionJson }
@@ -569,6 +575,13 @@ public class WebSocketConnectionManager
             string.Equals(raEndedEnvelope.Type, "retroachievements.session.ended", StringComparison.OrdinalIgnoreCase))
         {
             _retainedRetroAchievementsSessionJson = null;
+        }
+
+        // L'etat des gamerooms (API-2) : un ecran d'attente qui se (re)connecte sait aussitot qui est la.
+        if (message is EventEnvelope multiplayerEnvelope &&
+            string.Equals(multiplayerEnvelope.Type, "multiplayer.state", StringComparison.OrdinalIgnoreCase))
+        {
+            _retainedMultiplayerStateJson = json;
         }
 
         if (message is EventEnvelope raCatalogEnvelope &&
@@ -761,6 +774,9 @@ public class WebSocketConnectionManager
             ["roms"] = ["roms.", "rom-pack.", "romset."],
             ["system"] = ["startup.", "health.", "version.", "hub.", "config.", "maintenance.", "rules.", "notifications."],
             ["control"] = ["commands.", "intent.", "es-control."],
+            // API-2 (14/11) : ces evenements ne sortaient que sur le flux global /ws
+            ["scoring"] = ["scoring."],
+            ["multiplayer"] = ["multiplayer.", "netplay."],
             // Le PlayerDeck : ses messages, plus ce qu'il affiche (score, signaux du .MEM, entrees, debut et fin de partie)
             ["deck"] = ["deck.", "score.live.", "retroarch.memory.", "ingame.memory.", "panel.input.", "ui.game.started", "ui.game.ended"]
         };
@@ -777,6 +793,8 @@ public class WebSocketConnectionManager
             ["timer"] = ["timer.live.changed"],
             ["speedrun"] = ["speedrun.session"],
             ["retroachievements"] = ["retroachievements.catalog.updated", "retroachievements.session.updated"],
+            // l'etat des gamerooms, publie a chaque changement (sans mots de passe)
+            ["multiplayer"] = ["multiplayer.state"],
             // construit a la connexion (aussi sur le flux global /ws), et sur demande
             ["deck"] = ["deck.snapshot"]
         };
