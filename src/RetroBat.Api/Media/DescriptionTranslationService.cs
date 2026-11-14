@@ -397,11 +397,22 @@ public sealed class DescriptionTranslationService : BackgroundService
     /// Returns true only once the expected executable exists. Any failure (no URL, network, bad archive,
     /// wrong layout) leaves things as-is and returns false, so translation degrades gracefully. A plain
     /// HttpClient - no shell - keeps it within the antivirus/ClickFix rules.</summary>
+    /// <summary>The downloaded engine archive is accepted only with a configured SHA-256 that matches. Pure.</summary>
+    internal static bool EngineArchiveAccepted(string? expectedHash, string? actualHash)
+        => !string.IsNullOrWhiteSpace(expectedHash) && !string.IsNullOrWhiteSpace(actualHash)
+           && string.Equals(expectedHash.Trim(), actualHash.Trim(), StringComparison.OrdinalIgnoreCase);
+
     private async Task<bool> TryProvisionEngineAsync(string toolsRoot, string executablePath, CancellationToken cancellationToken)
     {
         var url = _options.CurrentValue.Scraping.TranslateLocallyEngineDownloadUrl?.Trim();
         if (string.IsNullOrWhiteSpace(url))
         {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_options.CurrentValue.Scraping.TranslateLocallyEngineDownloadSha256))
+        {
+            _logger?.LogWarning("translateLocally engine download URL set without TranslateLocallyEngineDownloadSha256: not downloaded.");
             return false;
         }
 
@@ -426,15 +437,14 @@ public sealed class DescriptionTranslationService : BackgroundService
                     await response.Content.CopyToAsync(fileStream, cancellationToken);
                 }
 
+                // The archive holds an executable that will run: never extracted without a known SHA-256.
                 var expectedHash = _options.CurrentValue.Scraping.TranslateLocallyEngineDownloadSha256?.Trim();
-                if (!string.IsNullOrWhiteSpace(expectedHash))
+                var actualHash = await JsonMediaAliasStore.ComputeSha256Async(tempZip, cancellationToken);
+                if (!EngineArchiveAccepted(expectedHash, actualHash))
                 {
-                    var actualHash = await JsonMediaAliasStore.ComputeSha256Async(tempZip, cancellationToken);
-                    if (!string.Equals(expectedHash, actualHash, StringComparison.OrdinalIgnoreCase))
-                    {
-                        _logger?.LogWarning("translateLocally engine SHA-256 mismatch (expected {Expected}, got {Actual}); aborting.", expectedHash, actualHash);
-                        return false;
-                    }
+                    _logger?.LogWarning("translateLocally engine refused: SHA-256 {State} (expected {Expected}, got {Actual}).",
+                        string.IsNullOrWhiteSpace(expectedHash) ? "not configured" : "mismatch", expectedHash, actualHash);
+                    return false;
                 }
 
                 ZipFile.ExtractToDirectory(tempZip, toolsRoot, overwriteFiles: true);
