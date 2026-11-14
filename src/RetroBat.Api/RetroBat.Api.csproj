@@ -11,6 +11,12 @@
          valeurs vont dans le runtimeconfig embarque par la publication en un seul fichier (tools/release-framework-dependent.ps1). -->
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <!-- Precompilation ReadyToRun (brief du 13/11, PERF-API-02) : le code est livre deja compile pour x64, le demarrage ne le
+         compile plus a la volee (environ 7 s avant le premier service sur la borne). Ne joue qu'a la publication avec un
+         runtime (tools/release-framework-dependent.ps1 : -r win-x64, un seul fichier, framework requis) ; la compilation de
+         travail et les tests ne changent pas. La compilation a plusieurs niveaux reste active : le code chaud est
+         recompile ensuite comme avant. -->
+    <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
 
   <ItemGroup>
