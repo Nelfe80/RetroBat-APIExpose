@@ -112,6 +112,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private DateTime? _premiereImage;
     private DateTime? _etatCharge;
     private DateTime? _etatPose;
+    private DateTime? _etatEchoue;
     private TaskCompletionSource? _demandeDeChargement;
     private bool _etatAttendu;
 
@@ -185,6 +186,20 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     public DateTime? EtatChargeUtc
     {
         get { lock (_verrou) return _session is null ? null : _etatCharge; }
+    }
+
+    /// <summary>
+    /// LE LANCEMENT QUI RESTE DERRIERE (14/11, Ash : « on attend le jeu en arriere-plan et rien ne se passe ») : l'etat ne se pose
+    /// que quand RetroArch joue le jeu. Le budget etait de 90 s ; le lanceur a mis 90 s a demarrer RetroArch sur la borne du user
+    /// le 13/11 (93 % de memoire), et la lecture des manettes attend deja 3 min depuis c089d5c9. Au-dela, l'etat n'etait jamais
+    /// pose et la page de preparation restait devant le jeu jusqu'a 150 s.
+    /// </summary>
+    internal TimeSpan AttenteDeRetroArch { get; set; } = TimeSpan.FromMinutes(3);
+
+    /// <summary>Quand la pose de l'etat de depart a echoue (RetroArch injoignable, ecriture refusee) ; null sinon. Hors session.</summary>
+    public DateTime? EtatEchoueUtc
+    {
+        get { lock (_verrou) return _etatEchoue; }
     }
 
     /// <summary>Quand l'etat de depart a ete pose dans le dossier de RetroArch, pret a charger ; null sans session ou avant.</summary>
@@ -365,7 +380,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         lock (_verrou)
         {
             _etatAttendu = true;
-            _etatPose = _etatCharge = null;
+            _etatPose = _etatCharge = _etatEchoue = null;
             _demandeDeChargement = demande;
         }
 
@@ -380,7 +395,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     /// </summary>
     private async Task PoserLEtatAsync(Reglement reglement, byte[] etat, string nomDuContenu, TaskCompletionSource demande)
     {
-        var raison = await EtatsDesDefis.PoserAsync(_commandes, etat, nomDuContenu, TimeSpan.FromSeconds(90), CancellationToken.None)
+        var depuis = DateTime.UtcNow;
+        var raison = await EtatsDesDefis.PoserAsync(_commandes, etat, nomDuContenu, AttenteDeRetroArch, CancellationToken.None)
             .ConfigureAwait(false);
         if (raison is not null)
         {
@@ -389,9 +405,11 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 if (!ReferenceEquals(_demandeDeChargement, demande)) return;
                 _etatAttendu = false;
                 _demandeDeChargement = null;
+                _etatEchoue = DateTime.UtcNow;
             }
 
-            _journal.LogWarning("Speedrun : etat de depart de {Defi} non charge ({Raison}).", reglement.ChallengeId, raison);
+            _journal.LogWarning("Speedrun : etat de depart de {Defi} non charge ({Raison}, {Secondes:0} s d'attente).", reglement.ChallengeId, raison,
+                (DateTime.UtcNow - depuis).TotalSeconds);
             _ = AfficherAsync(new MessageJoueur("speedrun.msg.state_failed", "The challenge could not start: starting state not loaded."));
             return;
         }
@@ -401,6 +419,10 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             if (!ReferenceEquals(_demandeDeChargement, demande)) return;
             _etatPose = DateTime.UtcNow;
         }
+
+        // (14/11) le temps que RetroArch a mis a jouer le jeu : 27 a 57 s sur la borne du user ce jour-la, 90 s le 13/11 au soir
+        _journal.LogInformation("Speedrun : etat de depart de {Defi} pose en {Secondes:0} s (RetroArch pret).", reglement.ChallengeId,
+            (DateTime.UtcNow - depuis).TotalSeconds);
 
         await Task.WhenAny(demande.Task, Task.Delay(ChargementDeSecours)).ConfigureAwait(false);
         lock (_verrou)

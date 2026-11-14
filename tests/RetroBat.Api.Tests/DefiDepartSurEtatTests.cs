@@ -222,6 +222,28 @@ public class DefiDepartSurEtatTests
         Assert.Equal(["LOAD_STATE_SLOT 96"], borne.RetroArch.Lues());
     }
 
+    /// <summary>
+    /// (14/11, Ash : « on attend le jeu en arriere-plan et rien ne se passe ») RetroArch qui ne joue pas le jeu dans le budget :
+    /// l'etat n'est pas pose, et l'echec est date pour que la page de preparation s'en aille au lieu de tenir jusqu'a sa limite.
+    /// </summary>
+    [Fact]
+    public async Task Un_RetroArch_qui_ne_joue_pas_le_jeu_date_l_echec_de_l_etat()
+    {
+        var reglement = AvecEtat("arcade/m1.state");
+        using var borne = await SessionSurEtat(reglement);
+        borne.RetroArch.Statut = "GET_STATUS CONTENTLESS";
+        borne.S.AttenteDeRetroArch = TimeSpan.FromMilliseconds(300);
+        var avant = DateTime.UtcNow;
+
+        borne.S.PartirSurLEtat(reglement, Octets, "mslug3");
+        await Attendre(() => borne.S.EtatEchoueUtc is not null);
+
+        Assert.True(borne.S.EtatEchoueUtc >= avant);
+        Assert.Null(borne.S.EtatPoseUtc);
+        Assert.False(File.Exists(Path.Combine(borne.Dossier, "mslug3.state96")));
+        Assert.Empty(borne.RetroArch.Lues().Where(c => c.StartsWith("LOAD_STATE", StringComparison.Ordinal)));
+    }
+
     [Fact]
     public async Task Une_relance_recharge_l_etat_au_lieu_d_un_RESET()
     {

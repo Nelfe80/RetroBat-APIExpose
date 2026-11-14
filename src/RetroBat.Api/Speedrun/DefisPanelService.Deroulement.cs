@@ -26,7 +26,9 @@ public enum PageDEpreuve
 /// </summary>
 public sealed partial class DefisPanelService
 {
-    private static readonly TimeSpan TenueMax = TimeSpan.FromSeconds(150);
+    // (14/11) 4 min : l'etat de depart attend RetroArch jusqu'a 3 min (SpeedrunSessionService.AttenteDeRetroArch, 3 min), apres les
+    // preparations du lancement (Deck, manettes : jusqu'a 25 s sur une borne chargee). A 150 s, la page abandonnait avant l'etat.
+    private static readonly TimeSpan TenueMax = TimeSpan.FromMinutes(4);
     private static readonly TimeSpan GraceApresLaPremiereImage = TimeSpan.FromMilliseconds(600);
     private static readonly TimeSpan DureeDuDepart = TimeSpan.FromMilliseconds(1300);
     private static readonly TimeSpan DureeDeLEffacement = TimeSpan.FromMilliseconds(350);
@@ -225,11 +227,27 @@ public sealed partial class DefisPanelService
                     break;
                 }
 
+                // (14/11) l'etat de depart n'a pas pu etre pose : sans lui l'epreuve ne partira pas. La page ne tient plus le jeu
+                // devant le joueur jusqu'a la limite : elle s'en va, le jeu se ferme, ES revient.
+                if (epreuve.Defi.Etat is not null && _session.EtatEchoueUtc is { } echec && echec >= epreuve.LanceA)
+                {
+                    _journal?.LogWarning("Defis : etat de depart de {Defi} non pose, la preparation s'efface et le jeu se ferme ({Etapes}).",
+                        epreuve.Defi.ChallengeId, epreuve.Progression.Resume());
+                    epreuve.Progression.Echouer(ProgressionDuLancement.PremiereImage);
+                    if (!LacherLaPreparation(epreuve)) return;
+                    AnnoncerLaPage("preparation", false);
+                    _overlay.Fermer();
+                    EmulatorForeground.FocusEmulationStation();
+                    _ = Task.Run(() => FermerLeJeuAsync(epreuve.LanceALocal));
+                    return;
+                }
+
                 _overlay.GarderDevantLeJeu();
             }
 
             if (arrive) await Task.Delay(GraceApresLaPremiereImage, jeton).ConfigureAwait(false);
-            else _journal?.LogWarning("Defis : aucune image du jeu en {Secondes:F0} s, la preparation s'efface.", TenueMax.TotalSeconds);
+            else _journal?.LogWarning("Defis : aucune image du jeu en {Secondes:F0} s, la preparation s'efface ({Etapes}).", TenueMax.TotalSeconds,
+                epreuve.Progression.Resume());
 
             lock (_verrou)
             {
