@@ -32,6 +32,28 @@ public class WebSocketConnectionManager
     private string? _retainedRetroAchievementsCatalogJson;
     private string? _retainedMultiplayerStateJson;
 
+    /// <summary>
+    /// LE DERNIER ETAT DES SURFACES ET DE LA SELECTION (API-3, 14/11), par case : le marquee, le topper, la carte
+    /// d'instructions et l'ecran gardent leur dernier instantane ; le flux frontend sa derniere selection. Un plugin qui se
+    /// (re)connecte affiche aussitot le jeu ou le systeme en cours au lieu d'attendre la selection suivante. Une case ne
+    /// recule jamais : un instantane d'une sequence plus ancienne que celui garde ne le remplace pas.
+    /// </summary>
+    private readonly object _retainedSurfacesLock = new();
+    private readonly Dictionary<string, (string Json, long Sequence, long Order)> _retainedSurfaces = new(StringComparer.Ordinal);
+    private long _retainedSurfacesOrder;
+
+    /// <summary>La case de rejeu d'un type (API-3), ou null s'il ne se garde pas.</summary>
+    internal static string? RetainedSurfaceSlot(string? type) => (type ?? string.Empty).Trim().ToLowerInvariant() switch
+    {
+        "marquee.snapshot" or "marquee.snapshot.updated" => "marquee",
+        "topper.snapshot" => "topper",
+        "instruction-card.snapshot" => "instruction-card",
+        "screen.snapshot" => "screen",
+        "ui.game.selected" or "ui.system.selected" => "frontend.selection",
+        "ui.game.selected.raw" or "ui.system.selected.raw" => "frontend.selection.raw",
+        _ => null,
+    };
+
     public WebSocketConnectionManager(IOptionsMonitor<ApiExposeOptions> options)
     {
         _options = options;
@@ -514,6 +536,28 @@ public class WebSocketConnectionManager
             return One(_retainedMultiplayerStateJson);
         }
 
+        if (stream is "marquee" or "topper" or "instruction-card" or "screen")
+        {
+            lock (_retainedSurfacesLock)
+            {
+                return _retainedSurfaces.TryGetValue(stream, out var surface) ? new[] { surface.Json } : Array.Empty<string>();
+            }
+        }
+
+        if (string.Equals(stream, "frontend", StringComparison.OrdinalIgnoreCase))
+        {
+            // La selection enrichie suffit ; la brute ne repart que si elle est plus recente (enrichie pas encore venue).
+            lock (_retainedSurfacesLock)
+            {
+                var enrichie = _retainedSurfaces.TryGetValue("frontend.selection", out var e) ? e : default;
+                var brute = _retainedSurfaces.TryGetValue("frontend.selection.raw", out var r) ? r : default;
+                if (enrichie.Json is null) return One(brute.Json);
+                return brute.Json is not null && brute.Order > enrichie.Order
+                    ? new[] { brute.Json }
+                    : new[] { enrichie.Json };
+            }
+        }
+
         if (string.Equals(stream, "retroachievements", StringComparison.OrdinalIgnoreCase))
         {
             return new[] { _retainedRetroAchievementsCatalogJson, _retainedRetroAchievementsSessionJson }
@@ -577,6 +621,11 @@ public class WebSocketConnectionManager
             _retainedRetroAchievementsSessionJson = null;
         }
 
+        if (message is EventEnvelope surfaceEnvelope)
+        {
+            RetainSurface(surfaceEnvelope, json);
+        }
+
         // L'etat des gamerooms (API-2) : un ecran d'attente qui se (re)connecte sait aussitot qui est la.
         if (message is EventEnvelope multiplayerEnvelope &&
             string.Equals(multiplayerEnvelope.Type, "multiplayer.state", StringComparison.OrdinalIgnoreCase))
@@ -588,6 +637,26 @@ public class WebSocketConnectionManager
             string.Equals(raCatalogEnvelope.Type, "retroachievements.catalog.updated", StringComparison.OrdinalIgnoreCase))
         {
             _retainedRetroAchievementsCatalogJson = json;
+        }
+    }
+
+    private void RetainSurface(EventEnvelope envelope, string json)
+    {
+        var type = (envelope.Type ?? string.Empty).Trim().ToLowerInvariant();
+        lock (_retainedSurfacesLock)
+        {
+            // ES s'est arrete : sa derniere selection ne dit plus rien
+            if (type == "ui.frontend.stopped")
+            {
+                _retainedSurfaces.Remove("frontend.selection");
+                _retainedSurfaces.Remove("frontend.selection.raw");
+                return;
+            }
+
+            if (RetainedSurfaceSlot(type) is not { } slot) return;
+            var sequence = ReadLongProperty(envelope.Payload, "Sequence");
+            if (sequence > 0 && _retainedSurfaces.TryGetValue(slot, out var garde) && garde.Sequence > sequence) return;
+            _retainedSurfaces[slot] = (json, sequence, ++_retainedSurfacesOrder);
         }
     }
 
@@ -792,6 +861,12 @@ public class WebSocketConnectionManager
             ["score"] = ["score.live.changed"],
             ["timer"] = ["timer.live.changed"],
             ["speedrun"] = ["speedrun.session"],
+            // API-3 (14/11) : le dernier instantane de chaque surface, et la derniere selection d'ES
+            ["marquee"] = ["marquee.snapshot", "marquee.snapshot.updated"],
+            ["topper"] = ["topper.snapshot"],
+            ["instruction-card"] = ["instruction-card.snapshot"],
+            ["screen"] = ["screen.snapshot"],
+            ["frontend"] = ["ui.game.selected", "ui.system.selected", "ui.game.selected.raw", "ui.system.selected.raw"],
             ["retroachievements"] = ["retroachievements.catalog.updated", "retroachievements.session.updated"],
             // l'etat des gamerooms, publie a chaque changement (sans mots de passe)
             ["multiplayer"] = ["multiplayer.state"],

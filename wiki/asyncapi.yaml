@@ -40,6 +40,9 @@ channels:
       ui.system.selected, ui.game.selected, ui.game.started, ui.game.ended,
       ui.event, ui.frontend.started, ui.frontend.stopped (frontend process
       lifecycle - replaces polling the emulationstation process).
+      On connect, the last selection is replayed (ui.game.selected or
+      ui.system.selected, else its .raw form; forgotten on ui.frontend.stopped).
+      A running game is never replayed (ui.game.started would retrigger start effects).
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
@@ -59,6 +62,7 @@ channels:
       Payload carries `Media` (legacy named fields, kept as-is) plus `Assets` and,
       in game scope, `SystemAssets`: tables keyed by canonical media kind holding
       only what THAT scope really owns. A key is present only when the file is.
+      Retained: the last snapshot is replayed on connect (never an older `Sequence`).
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
@@ -69,6 +73,7 @@ channels:
       `Media.Topper` plus `Assets`/`SystemAssets`: the game identity and printed matter
       a topper can show (flyer, box art, wheel, fanart, screenshot), and `Text`:
       description, genre, players, rating in the language EmulationStation is set to.
+      Retained: the last snapshot is replayed on connect.
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
@@ -81,7 +86,7 @@ channels:
       `Text` (description, genre, players, rating in the EmulationStation language) and
       `Controls`: what each button DOES and its colour, from resources/dynpanels -
       enough to compose a card, not only to show one. The full panel geometry stays on
-      /ws/panel.
+      /ws/panel. Retained: the last snapshot is replayed on connect.
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
@@ -91,6 +96,7 @@ channels:
       Prefixes `screen.` - secondary screen snapshots (screen.snapshot). Payload carries
       `Media` plus `Assets`/`SystemAssets`: screen-shaped media, with the title screen
       (`image`) and the in-game capture (`thumbnail`) kept apart.
+      Retained: the last snapshot is replayed on connect.
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
