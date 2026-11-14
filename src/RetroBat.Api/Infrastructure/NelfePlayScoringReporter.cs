@@ -287,6 +287,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private RetroBat.Api.Scoring.ContexteDeJeu? _contexteDeLaPartieJouee;
     // Les profils lus au lancement, et leurs modes par drapeaux : le direct y lit le mode joue (RegleDuModeEnCours).
     private (string RomGroup, List<JsonElement> Profils, List<RetroBat.Api.Scoring.ModesDeJeu.ModeParDrapeaux> Modes)? _profilsDuLancement;
+    // Le lancement (_lancement) pour lequel _profilsDuLancement a ete lu : un lancement hors NelfePlay ne les relit pas.
+    private long _lancementDesProfils = -1;
     private readonly List<RetroBat.Api.Scoring.ContexteDeJeu> _contextes = new();
 
     /// <summary>
@@ -1218,6 +1220,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private async Task PreflightAsync(JsonElement attestation, CancellationToken ct)
     {
+        // Le lancement que ce prevol sert : les profils lus plus bas ne valent que pour lui (ModeDuLancementEnCours).
+        var lancementDuPrevol = Interlocked.Read(ref _lancement);
         try
         {
             var systemId = GetString(attestation, "SystemId") ?? "";
@@ -1273,7 +1277,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             if (profilsDuJeu.Count > 0)
             {
                 var modesDuJeu = RetroBat.Api.Scoring.ModesDeJeu.ModesParDrapeaux(profilsDuJeu);
-                lock (_sync) _profilsDuLancement = (romGroup.Trim(), profilsDuJeu, modesDuJeu);
+                lock (_sync)
+                {
+                    _profilsDuLancement = (romGroup.Trim(), profilsDuJeu, modesDuJeu);
+                    _lancementDesProfils = lancementDuPrevol;
+                }
             }
             // Le profil d'une partie seule : jamais le 1CC MULTI, ni le 1LC, meme s'ils venaient en tete.
             var seules = RetroBat.Api.Scoring.ModesDeJeu.DuSolo(profilsDuJeu);
@@ -2754,6 +2762,33 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             return RetroBat.Api.Scoring.ModesDeJeu.RegleDuMode(p.Profils, p.Modes, contexte);
         }
     }
+
+    /// <summary>
+    /// LE MODE DU LANCEMENT EN COURS, POUR LES PLUGINS (API-1, 14/11) : le groupe du jeu tel que le site le connait, le
+    /// classement du mode lu jusqu'ici (null : mode sans classement ou pas encore connu) et la difficulte du profil de ce
+    /// mode. Null quand les profils lus ne sont pas ceux de CE lancement (jeu lance hors NelfePlay, prevol pas encore
+    /// fait) : jamais le mode d'une partie precedente. Lecture seule.
+    /// </summary>
+    public ModeDuLancement? ModeDuLancementEnCours()
+    {
+        lock (_sync)
+        {
+            if (_profilsDuLancement is not { } p || _lancementDesProfils != Interlocked.Read(ref _lancement)) return null;
+            var contexte = RetroBat.Api.Scoring.ModesDeJeu.ContexteDuDirect(_enJeu, _contexte, _contexteDeLaPartieJouee);
+            var resolu = RetroBat.Api.Scoring.ModesDeJeu.Resoudre(contexte, p.Modes);
+            var regle = RetroBat.Api.Scoring.ModesDeJeu.RegleDuMode(p.Profils, p.Modes, contexte);
+            var profil = resolu.Mode == RetroBat.Api.Scoring.ModesDeJeu.SansClassement
+                ? null
+                : RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil(p.Profils, resolu.Mode);
+            var difficulte = profil is { } choisi
+                ? RetroBat.Api.Scoring.ModesDeJeu.DifficulteAffichee(choisi, resolu)
+                : Array.Empty<RetroBat.Api.Scoring.DifficulteAffichee>();
+            return new ModeDuLancement(p.RomGroup, regle, difficulte);
+        }
+    }
+
+    /// <summary>Le mode du lancement en cours (voir <see cref="ModeDuLancementEnCours"/>).</summary>
+    public sealed record ModeDuLancement(string RomGroup, string? Regle, IReadOnlyList<RetroBat.Api.Scoring.DifficulteAffichee> Difficulte);
 
     /// <summary>
     /// Le mode et la difficulte choisis. Pris en demo comme en jeu : c'est la valeur en vigueur au

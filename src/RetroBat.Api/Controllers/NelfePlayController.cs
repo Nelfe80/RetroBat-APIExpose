@@ -23,6 +23,8 @@ public sealed class NelfePlayController : ControllerBase
     private readonly NelfePlayScoringSessionService _scoringSession;
     private readonly RetroBat.Domain.Models.ApiContext _context;
     private readonly NelfePlayScoringCollectionSyncService _scoringCollection;
+    private readonly NelfePlayScoringReporter? _reporter;
+    private readonly RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider? _wrapper;
 
     public NelfePlayController(
         NelfePlayDeviceStore device,
@@ -30,7 +32,9 @@ public sealed class NelfePlayController : ControllerBase
         IHttpClientFactory httpFactory,
         NelfePlayScoringSessionService scoringSession,
         RetroBat.Domain.Models.ApiContext context,
-        NelfePlayScoringCollectionSyncService scoringCollection)
+        NelfePlayScoringCollectionSyncService scoringCollection,
+        NelfePlayScoringReporter? reporter = null,
+        RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider? wrapper = null)
     {
         _device = device;
         _agent = agent;
@@ -38,6 +42,8 @@ public sealed class NelfePlayController : ControllerBase
         _scoringSession = scoringSession;
         _context = context;
         _scoringCollection = scoringCollection;
+        _reporter = reporter;
+        _wrapper = wrapper;
     }
 
     /// <summary>
@@ -273,7 +279,10 @@ public sealed class NelfePlayController : ControllerBase
 
     /// <summary>Classement MONDIAL (records certifiés) du jeu COURANT - proxy public de
     /// /api/v1/scores/leaderboard, sans paramètre : la borne résout elle-même le rom_group
-    /// du jeu sélectionné. Sert la source « nelfeplay » du composant leaderboard.</summary>
+    /// du jeu sélectionné. Sert la source « nelfeplay » du composant leaderboard.
+    /// Sans <c>ruleset</c> (API-1, 14/11) : le classement du mode JOUE quand un jeu tourne, sinon la regle
+    /// principale du jeu, sinon « 1cc » (voir <see cref="RetroBat.Api.Leaderboard.ModesDuClassement"/>).
+    /// La reponse dit d'ou vient la regle (<c>ruleset_source</c>) et liste les classements du jeu (<c>modes</c>).</summary>
     [HttpGet("records/leaderboard")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> RecordsLeaderboard(
@@ -283,7 +292,9 @@ public sealed class NelfePlayController : ControllerBase
     {
         var identifyUrl = "http://127.0.0.1:12345/link";
         var jeuCourant = _context.Ui.Running ?? _context.Ui.Selected;
-        var romGroup = RomGroupSlug(jeuCourant);
+        // Le mode du jeu QUI TOURNE, lu par le rapporteur pour CE lancement (null : rien de lu, ou jeu seulement selectionne).
+        var enCours = _context.Ui.Running is not null ? _reporter?.ModeDuLancementEnCours() : null;
+        var romGroup = GroupeDuJeuCourant(jeuCourant, enCours);
         // La machine du jeu : un jeu = systeme + contenu, et deux Tetris ont deux classements.
         var systeme = jeuCourant?.SystemId ?? string.Empty;
         if (string.IsNullOrEmpty(romGroup))
@@ -291,7 +302,11 @@ public sealed class NelfePlayController : ControllerBase
             return Ok(new { present = false, paired = _device.IsPaired, identify_url = identifyUrl });
         }
 
-        var rule = string.IsNullOrWhiteSpace(ruleset) ? "1cc" : ruleset.Trim();
+        var ouvertes = _scoringCollection.ReglesOuvertes(romGroup);
+        var (rule, source) = RetroBat.Api.Leaderboard.ModesDuClassement.Choisir(ruleset, enCours?.Regle, ouvertes);
+        var modes = RetroBat.Api.Leaderboard.ModesDuClassement.Liste(ouvertes, rule, enCours?.Regle);
+        var libelle = RetroBat.Api.Leaderboard.LeaderboardInputService.LibelleDeRegle(rule, ouvertes);
+        var difficulte = enCours?.Difficulte;
         var n = Math.Clamp(limit ?? 100, 1, 100);
         try
         {
@@ -322,12 +337,53 @@ public sealed class NelfePlayController : ControllerBase
                 leaderboard = hasBoard ? (object)board : Array.Empty<object>(),
                 me,
                 identify_url = identifyUrl,
+                system = systeme,
+                ruleset_source = source,
+                ruleset_label = libelle,
+                played_ruleset = enCours?.Regle,
+                modes,
+                difficulty = difficulte,
             });
         }
         catch
         {
-            return Ok(new { present = false, paired = _device.IsPaired, rom_group = romGroup, ruleset = rule, identify_url = identifyUrl });
+            return Ok(new
+            {
+                present = false, paired = _device.IsPaired, rom_group = romGroup, ruleset = rule, identify_url = identifyUrl,
+                system = systeme, ruleset_source = source, ruleset_label = libelle, played_ruleset = enCours?.Regle, modes,
+                difficulty = difficulte,
+            });
         }
+    }
+
+    /// <summary>
+    /// Le groupe du jeu courant tel que le site le connait (API-1, 14/11). Le jeu qui tourne : celui que le rapporteur a lu
+    /// pour ce lancement (le contenu mesure fait l'identite d'une console). Sinon, la definition que le wrapper resout,
+    /// quand l'index des jeux ouverts la connait (« 19xx » plutot que « 19xx-the-war-against-destiny »). Sinon, comme
+    /// avant, le nom du jeu reduit en slug.
+    /// </summary>
+    private string GroupeDuJeuCourant(RetroBat.Domain.Models.GameReference? jeu, NelfePlayScoringReporter.ModeDuLancement? enCours)
+    {
+        if (enCours is { RomGroup.Length: > 0 }) return enCours.RomGroup;
+        if (jeu is not null && _wrapper is not null)
+        {
+            try
+            {
+                var brut = System.IO.Path.GetFileNameWithoutExtension(!string.IsNullOrEmpty(jeu.GamePath) ? jeu.GamePath : jeu.GameName ?? string.Empty);
+                if (brut.Length > 0 && !string.IsNullOrEmpty(jeu.SystemId))
+                {
+                    var def = _wrapper.ResolveDefinitionFor(brut, jeu.SystemId);
+                    var groupe = (def.Rom ?? string.Empty).Trim().ToLowerInvariant();
+                    if ((def.AliasMatched || def.DefinitionExists) && groupe.Length > 0 && _scoringCollection.ReglesOuvertes(groupe).Count > 0)
+                        return groupe;
+                }
+            }
+            catch (Exception)
+            {
+                // une definition illisible ne coupe pas le classement : le slug du nom, comme avant
+            }
+        }
+        return RomGroupSlug(jeu);
     }
 
     /// <summary>Meilleur rang du joueur courant (appairé ?? anonyme) pour ce jeu, ou null
