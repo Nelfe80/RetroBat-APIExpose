@@ -39,6 +39,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
     };
     private readonly object _latestSelectionLock = new();
     private long _latestSelectionSequence;
+    private readonly PassesDeSelection _passes = new();
     private IDisposable? _subscription;
     private IDisposable? _optionsChange;
 
@@ -130,7 +131,9 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         if (string.Equals(envelope.Type, "ui.game.selected.raw", StringComparison.OrdinalIgnoreCase))
         {
             var sequence = MarkLatestSelectionSequence(envelope);
-            _ = PublishGameSnapshotsAsync(envelope, _context.Ui.Selected, "game-selected", sequence);
+            // Une passe par publication brute : la seconde (details d'ES) remplace la premiere encore en cours.
+            var passe = _passes.Ouvrir(sequence);
+            _ = PublishGameSnapshotsAsync(envelope, _context.Ui.Selected, "game-selected", sequence, passe);
             return;
         }
 
@@ -190,6 +193,9 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             var roots = ResolveSystemRoots(systemId).ToList();
             var selection = BuildSystemSelection(selectionSequence, frontendSystemId, systemId, "system-selected");
             var marquee = BuildSystemMarqueeMedia(frontendSystemId, systemId, selectedSystem, roots);
+            // La table des medias du systeme, calculee une fois pour la passe (brief du 13/11, point 1.3) : marquee et topper
+            // la calculaient quatre fois.
+            var systemAssets = BuildSystemAssetTable(frontendSystemId, systemId, roots, DisplayableMediaKinds);
 
             await _eventBus.PublishAsync(new EventEnvelope
             {
@@ -210,8 +216,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     // asset table (its layer key is "wheel", not "systemwheel"), so the
                     // per-frontend pin must sit on BOTH tables - otherwise fbneo's gabarit
                     // reads the shared arcade wheel and overwrites the correct logo.
-                    Assets = BuildSystemAssetTable(frontendSystemId, systemId, roots, DisplayableMediaKinds),
-                    SystemAssets = BuildSystemAssetTable(frontendSystemId, systemId, roots, DisplayableMediaKinds),
+                    Assets = systemAssets,
+                    SystemAssets = systemAssets,
                     Generation = ResolveSystemGenerationState(roots),
                     Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "projection")
                 }
@@ -238,8 +244,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     {
                         marquee.Topper
                     },
-                    Assets = BuildSystemAssetTable(frontendSystemId, systemId, roots, DisplayableMediaKinds),
-                    SystemAssets = BuildSystemAssetTable(frontendSystemId, systemId, roots, DisplayableMediaKinds),
+                    Assets = systemAssets,
+                    SystemAssets = systemAssets,
                     Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "projection")
                 }
             });
@@ -262,7 +268,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         EventEnvelope trigger,
         GameReference? selected,
         string state,
-        long selectionSequence = 0)
+        long selectionSequence = 0,
+        long passe = 0)
     {
         var perf = Stopwatch.StartNew();
         try
@@ -284,7 +291,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
 
             await DelayLatestSelectionSnapshotAsync(selectionSequence);
 
-            if (IsStaleSelectionSequence(selectionSequence))
+            if (IsStaleSelectionSequence(selectionSequence) || _passes.Depassee(selectionSequence, passe))
             {
                 _logger?.LogDebug(
                     "stale game media snapshot skipped after debounce: state={State}, sequence={Sequence}",
@@ -333,6 +340,55 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             // {desc} drew the tag itself.
             var text = await BuildTextBlockAsync(systemId, gameSlug, selected.Details, roots);
 
+            // Tout ce que la passe publie, calcule une fois avant la premiere publication (brief du 13/11, point 1.3) : la table
+            // du systeme servait deux fois, celle des cartes et de l'ecran deux fois aussi.
+            var generation = ResolveGameGenerationState(roots);
+            var systemAssets = BuildSystemAssetTable(frontendSystemId, systemId, fallbackSystemRoots, DisplayableMediaKinds);
+            var plainSystemAssets = BuildAssetTable(fallbackSystemRoots, DisplayableMediaKinds);
+            var screenAssets = BuildAssetTable(roots, DisplayableMediaKinds);
+            var topper = FindFirstAsset(roots, "artwork", "marquee", "topper.*");
+            var cards = FindInstructionCards(roots).ToList();
+            var controls = BuildControlsBlock(frontendSystemId, Path.GetFileNameWithoutExtension(selected.GamePath ?? string.Empty));
+
+            // UNE SEULE PROJECTION PAR SELECTION : ES publie la selection deux fois sous la meme sequence (tout de suite, puis
+            // avec les details du jeu). Une passe remplacee par une plus recente de la meme selection s'efface ; une seconde
+            // passe qui donnerait exactement la meme chose ne republie rien.
+            if (passe > 0)
+            {
+                if (_passes.Depassee(selectionSequence, passe))
+                {
+                    _logger?.LogDebug(
+                        "game media snapshot superseded by a later pass of the same selection: sequence={Sequence}, pass={Pass}, game={GameSlug}",
+                        selectionSequence,
+                        passe,
+                        gameSlug);
+                    return;
+                }
+
+                var empreinte = PassesDeSelection.Empreinte(new
+                {
+                    selection,
+                    marquee,
+                    gameAssets,
+                    systemAssets,
+                    plainSystemAssets,
+                    screenAssets,
+                    text,
+                    generation,
+                    topper,
+                    cards,
+                    controls,
+                });
+                if (!_passes.Retenir(selectionSequence, empreinte))
+                {
+                    _logger?.LogDebug(
+                        "game media snapshot unchanged by the second pass, not republished: sequence={Sequence}, game={GameSlug}",
+                        selectionSequence,
+                        gameSlug);
+                    return;
+                }
+            }
+
             await _eventBus.PublishAsync(new EventEnvelope
             {
                 Type = "marquee.snapshot",
@@ -352,15 +408,14 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     // only what that scope really owns, and a key is absent when the file
                     // is. The legacy fields are untouched.
                     Assets = gameAssets,
-                    SystemAssets = BuildSystemAssetTable(frontendSystemId, systemId, fallbackSystemRoots, DisplayableMediaKinds),
+                    SystemAssets = systemAssets,
                     Text = text,
-                    Generation = ResolveGameGenerationState(roots),
+                    Generation = generation,
                     Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "projection")
                 }
             });
-            await PublishScreenSnapshotAsync(trigger, selection, marquee, perf, "projection", roots, fallbackSystemRoots);
+            await PublishScreenSnapshotAsync(trigger, selection, marquee, perf, "projection", roots, fallbackSystemRoots, screenAssets, plainSystemAssets);
 
-            var topper = FindFirstAsset(roots, "artwork", "marquee", "topper.*");
             await _eventBus.PublishAsync(new EventEnvelope
             {
                 Type = "topper.snapshot",
@@ -381,13 +436,12 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     // printed matter that used to sit above the cabinet. Self-sufficient
                     // stream - no second subscription to dress this surface.
                     Assets = gameAssets,
-                    SystemAssets = BuildSystemAssetTable(frontendSystemId, systemId, fallbackSystemRoots, DisplayableMediaKinds),
+                    SystemAssets = systemAssets,
                     Text = text,
                     Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "projection")
                 }
             });
 
-            var cards = FindInstructionCards(roots).ToList();
             await _eventBus.PublishAsync(new EventEnvelope
             {
                 Type = "instruction-card.snapshot",
@@ -413,11 +467,11 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     // Composing a card takes more than the cards: the logo, the box, a
                     // fanart to sit behind them, and what the buttons DO.
                     Assets = gameAssets,
-                    SystemAssets = BuildAssetTable(fallbackSystemRoots, DisplayableMediaKinds),
+                    SystemAssets = plainSystemAssets,
                     // keyed by ROM NAME, not by the media slug: dynpanels are named after
                     // the rom file ("1943.json"), and a media folder is a slug that often
                     // differs ("sonic_the_hedgehog" for "Sonic The Hedgehog (USA)")
-                    Controls = BuildControlsBlock(frontendSystemId, Path.GetFileNameWithoutExtension(selected.GamePath ?? string.Empty)),
+                    Controls = controls,
                     Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "projection")
                 }
             });
@@ -440,7 +494,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     cache.Hits, cache.Misses, cache.Enumerations, cache.Invalidations, cache.Entries);
             }
 
-            _ = GenerateGameMediaAndPublishAsync(trigger, selected, frontendSystemId, systemId, gameSlug, state, selectionSequence);
+            _ = GenerateGameMediaAndPublishAsync(trigger, selected, frontendSystemId, systemId, gameSlug, state, selectionSequence, passe);
         }
         catch (Exception ex)
         {
@@ -787,7 +841,9 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         Stopwatch perf,
         string phase,
         IReadOnlyList<string> roots,
-        IReadOnlyList<string>? systemRoots = null)
+        IReadOnlyList<string>? systemRoots = null,
+        IReadOnlyDictionary<string, MediaStreamAsset>? assets = null,
+        IReadOnlyDictionary<string, MediaStreamAsset>? systemAssets = null)
     {
         await _eventBus.PublishAsync(new EventEnvelope
         {
@@ -807,10 +863,10 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     marquee.ScreenMarqueeSmall,
                     marquee.Fanart
                 },
-                Assets = BuildAssetTable(roots, DisplayableMediaKinds),
+                Assets = assets ?? BuildAssetTable(roots, DisplayableMediaKinds),
                 SystemAssets = systemRoots is null
                     ? null
-                    : BuildAssetTable(systemRoots, DisplayableMediaKinds),
+                    : systemAssets ?? BuildAssetTable(systemRoots, DisplayableMediaKinds),
                 Latency = BuildSnapshotLatency(trigger, selection.Sequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, phase)
             }
         });
@@ -913,6 +969,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
 
             var selection = BuildSystemSelection(selectionSequence, frontendSystemId, systemId, "system-selected");
             var marquee = BuildSystemMarqueeMedia(frontendSystemId, systemId, selectedSystem, roots);
+            var systemAssets = BuildSystemAssetTable(frontendSystemId, systemId, roots, DisplayableMediaKinds);
 
             await _eventBus.PublishAsync(new EventEnvelope
             {
@@ -933,8 +990,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     // asset table (its layer key is "wheel", not "systemwheel"), so the
                     // per-frontend pin must sit on BOTH tables - otherwise fbneo's gabarit
                     // reads the shared arcade wheel and overwrites the correct logo.
-                    Assets = BuildSystemAssetTable(frontendSystemId, systemId, roots, DisplayableMediaKinds),
-                    SystemAssets = BuildSystemAssetTable(frontendSystemId, systemId, roots, DisplayableMediaKinds),
+                    Assets = systemAssets,
+                    SystemAssets = systemAssets,
                     Generation = ResolveSystemGenerationState(roots),
                     Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "background-generation")
                 }
@@ -959,12 +1016,13 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         string systemId,
         string gameSlug,
         string state,
-        long selectionSequence)
+        long selectionSequence,
+        long passe = 0)
     {
         var perf = Stopwatch.StartNew();
         try
         {
-            if (IsStaleSelectionSequence(selectionSequence))
+            if (IsStaleSelectionSequence(selectionSequence) || _passes.Depassee(selectionSequence, passe))
             {
                 return;
             }
@@ -973,7 +1031,8 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             var fallbackSystemRoots = ResolveSystemRoots(systemId).ToList();
             await EnsureGameDmdGeneratedAsync(systemId, gameSlug, roots);
 
-            if (IsStaleSelectionSequence(selectionSequence))
+            // La generation d'une premiere passe ne republie pas le texte sans details par-dessus la seconde.
+            if (IsStaleSelectionSequence(selectionSequence) || _passes.Depassee(selectionSequence, passe))
             {
                 _logger?.LogDebug(
                     "stale generated game media update skipped: state={State}, sequence={Sequence}, system={SystemId}, game={GameSlug}",
@@ -2818,6 +2877,88 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         MediaStreamAsset? Fanart,
         MediaStreamAsset? Logo,
         MediaStreamAsset? Video);
+
+    /// <summary>
+    /// LES PASSES D'UNE SELECTION (brief du 13/11, point 1.3). ES publie <c>ui.game.selected.raw</c> deux fois sous la meme
+    /// sequence : tout de suite, puis avec les details du jeu (genre, annee). Le filtre par sequence laisse passer l'egalite
+    /// (<c>sequence &lt; latest</c>) pour que les details arrivent ; il ne savait pas qu'une passe en remplace une autre. Ici :
+    /// une passe est DEPASSEE quand une passe plus recente de la meme sequence est arrivee (une sequence plus basse arrivee
+    /// en retard ne depasse rien), et une passe ne se publie que si son empreinte differe de la derniere publiee pour cette
+    /// sequence. Une sequence nulle (lancement, fin de partie) n'est jamais filtree.
+    /// </summary>
+    internal sealed class PassesDeSelection
+    {
+        private readonly object _verrou = new();
+        private long _compteur;
+        private long _dernierePasse;
+        private long _derniereSequence;
+        private long _sequencePubliee;
+        private string? _empreintePubliee;
+
+        /// <summary>Ouvre une passe pour cette sequence ; rend son numero.</summary>
+        public long Ouvrir(long sequence)
+        {
+            lock (_verrou)
+            {
+                var passe = ++_compteur;
+                if (sequence > 0 && sequence >= _derniereSequence)
+                {
+                    _derniereSequence = sequence;
+                    _dernierePasse = passe;
+                }
+
+                return passe;
+            }
+        }
+
+        /// <summary>Vrai si une passe plus recente de la meme selection est arrivee : elle publiera a la place.</summary>
+        public bool Depassee(long sequence, long passe)
+        {
+            if (sequence <= 0 || passe <= 0)
+            {
+                return false;
+            }
+
+            lock (_verrou)
+            {
+                return _derniereSequence == sequence && _dernierePasse > passe;
+            }
+        }
+
+        /// <summary>Retient l'empreinte d'une passe qui va publier ; faux si cette selection a deja publie exactement cela.</summary>
+        public bool Retenir(long sequence, string empreinte)
+        {
+            if (sequence <= 0)
+            {
+                return true;
+            }
+
+            lock (_verrou)
+            {
+                if (_sequencePubliee == sequence && string.Equals(_empreintePubliee, empreinte, StringComparison.Ordinal))
+                {
+                    return false;
+                }
+
+                _sequencePubliee = sequence;
+                _empreintePubliee = empreinte;
+                return true;
+            }
+        }
+
+        /// <summary>L'empreinte de ce qu'une passe publie (sans la latence) ; un contenu illisible n'est jamais egal a un autre.</summary>
+        public static string Empreinte(object contenu)
+        {
+            try
+            {
+                return JsonSerializer.Serialize(contenu);
+            }
+            catch (Exception)
+            {
+                return Guid.NewGuid().ToString("N");
+            }
+        }
+    }
 
     private sealed record PhysicalMediaSelectionSnapshot(
         long Sequence,
