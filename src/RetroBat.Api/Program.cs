@@ -791,6 +791,8 @@ builder.Services.ProtegerLesServicesHeberges();
 var app = builder.Build();
 RetroBat.Api.Infrastructure.OverlayUiGuard.Journal(
     app.Services.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>().CreateLogger("RetroBat.Api.Infrastructure.OverlayUiGuard"));
+// Le bus est cree avant le journal : ses pannes d'abonnes (un try par abonne, ROB-01) sont journalisees des maintenant.
+eventBus.Journal = app.Services.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>().CreateLogger("RetroBat.Api.Infrastructure.SimpleEventBus");
 
 // Setup internal event subscriber to broadcast via WebSockets
 var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
