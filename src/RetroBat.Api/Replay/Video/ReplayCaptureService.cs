@@ -629,8 +629,12 @@ public sealed class ReplayCaptureService : BackgroundService
         try
         {
             if (_enCours is not null) return;
-            if (EstModeste())
+            if (ModesteJusquA() is { } finDeLaPause)
             {
+                // LA PAUSE SE DIT SUR LA BORNE (14/11) : marquee le 04/11, la borne du user n'a plus filme pendant dix jours
+                // sans une ligne a son journal ; ses directs attendaient un film qui ne venait pas.
+                _logger.LogInformation("Capture : la borne ne filme plus jusqu'au {Fin} (le jeu ralentissait pendant une capture), partie non filmee ; pour reessayer, supprimer {Fichier} hors partie.",
+                    finDeLaPause.ToLocalTime().ToString("dd/MM HH:mm", System.Globalization.CultureInfo.InvariantCulture), CheminDeCapacite);
                 SignalerNonCapture(replayId, "borne_modeste", "le jeu ralentissait pendant une capture, pause de " + ModesteDurant.TotalDays + " jours", room);
                 return;
             }
@@ -1787,20 +1791,50 @@ public sealed class ReplayCaptureService : BackgroundService
                 .OrderBy(File.GetCreationTimeUtc).ToList()
             : new List<string>();
 
-    /// <summary>La borne a ralenti en filmant : elle ne filme plus pendant 30 jours.</summary>
-    private bool EstModeste()
+    /// <summary>La borne a ralenti en filmant : elle ne filme plus pendant 30 jours. La fin de cette pause (UTC), ou null.</summary>
+    private DateTime? ModesteJusquA()
     {
         try
         {
-            if (!File.Exists(CheminDeCapacite)) return false;
-            using var doc = JsonDocument.Parse(File.ReadAllText(CheminDeCapacite));
-            return doc.RootElement.TryGetProperty("modeste_depuis", out var d) && d.TryGetDateTime(out var depuis)
-                && DateTime.UtcNow - depuis.ToUniversalTime() < ModesteDurant;
+            return File.Exists(CheminDeCapacite) ? FinDeLaPause(File.ReadAllText(CheminDeCapacite), DateTime.UtcNow) : null;
         }
         catch (Exception)
         {
-            return false;
+            return null;
         }
+    }
+
+    /// <summary>
+    /// La fin de la pause d'une borne modeste d'apres sa fiche <c>capacite.json</c> (UTC), ou null si elle filme. Une fiche
+    /// illisible ne retient pas la borne. Pur.
+    /// </summary>
+    internal static DateTime? FinDeLaPause(string fiche, DateTime maintenantUtc)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(fiche);
+            if (doc.RootElement.ValueKind != JsonValueKind.Object
+                || !doc.RootElement.TryGetProperty("modeste_depuis", out var d) || !d.TryGetDateTime(out var depuis)) return null;
+            var fin = depuis.ToUniversalTime() + ModesteDurant;
+            return maintenantUtc < fin ? fin : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Pourquoi cette borne ne filmera pas la prochaine partie, quoi qu'il arrive (capture coupee, borne modeste) ; null si
+    /// elle peut filmer. Le direct ne se porte pas candidat sans film (DirectPartageService).
+    /// </summary>
+    public string? PourquoiPasDeFilm()
+    {
+        if (!_actif) return "la capture est coupee (Video:Capture:Enabled)";
+        return ModesteJusquA() is { } fin
+            ? "la borne ne filme plus jusqu'au " + fin.ToLocalTime().ToString("dd/MM HH:mm", System.Globalization.CultureInfo.InvariantCulture)
+              + " (le jeu ralentissait pendant une capture ; supprimer " + CheminDeCapacite + " pour reessayer)"
+            : null;
     }
 
     private void MarquerModeste()

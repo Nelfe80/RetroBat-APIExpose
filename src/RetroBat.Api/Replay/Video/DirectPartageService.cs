@@ -339,6 +339,10 @@ public sealed class DirectPartageService : IHostedService
                 _journal.LogInformation("Direct partage : l'exe du direct manque, la borne ne se porte pas candidate.");
                 return;
             }
+            // PAS DE CANDIDATURE SANS FILM POSSIBLE (14/11) : la borne du user, en pause de film depuis le 04/11 (modeste), se
+            // presentait a chaque partie World Scoring ; elue, « aucun film ne tourne : pas de passage », et la place a
+            // l'antenne etait perdue. Ses epreuves attendaient 3 minutes un film qui ne pouvait pas venir.
+            if (!PeutFilmer()) return;
             if (_contexte.Ui.Running is not { } jeu) return;
             var brut = Path.GetFileNameWithoutExtension(jeu.GamePath.Length > 0 ? jeu.GamePath : jeu.GameName);
             if (brut.Length == 0 || jeu.SystemId.Length == 0) return;
@@ -395,6 +399,10 @@ public sealed class DirectPartageService : IHostedService
                 _journal.LogInformation("Direct partage : l'exe du direct manque, la borne ne se porte pas candidate.");
                 return;
             }
+            // PAS DE CANDIDATURE SANS FILM POSSIBLE (14/11) : la borne du user, en pause de film depuis le 04/11 (modeste), se
+            // presentait a chaque partie World Scoring ; elue, « aucun film ne tourne : pas de passage », et la place a
+            // l'antenne etait perdue. Ses epreuves attendaient 3 minutes un film qui ne pouvait pas venir.
+            if (!PeutFilmer()) return;
             // Les joueurs a gauche ; a droite, nelfeplay.com (pas de record a battre).
             p.BandeJoueur = TexteDeLaBande(mp.Players, mp.Family);
             p.RecordTexte = "";
@@ -459,6 +467,14 @@ public sealed class DirectPartageService : IHostedService
         {
             // Sans classement, la bande dit nelfeplay.com.
         }
+    }
+
+    /// <summary>Faux, avec sa raison au journal, quand la borne ne filmera pas la partie : sans film, pas de passage.</summary>
+    private bool PeutFilmer()
+    {
+        if (_capture.PourquoiPasDeFilm() is not { } raison) return true;
+        _journal.LogInformation("Direct partage : {Raison}, la borne ne se porte pas candidate.", raison);
+        return false;
     }
 
     /// <summary>Le plus long qu'on attende le film et l'etat de depart d'une epreuve : un lancement de RetroArch, avec marge.</summary>
