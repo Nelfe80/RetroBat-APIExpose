@@ -258,7 +258,8 @@ public sealed class NelfePlayController : ControllerBase
 
             using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
             var root = doc.RootElement;
-            int? Rank(string k) => root.TryGetProperty(k, out var e) && e.ValueKind == JsonValueKind.Number ? e.GetInt32() : null;
+            // En long (API-4, 14/11) : au-dela de 2 147 483 647, GetInt32 levait et la route repondait « pas de rang ».
+            long? Rank(string k) => NombreEntier(root, k);
 
             return Ok(new
             {
@@ -386,6 +387,17 @@ public sealed class NelfePlayController : ControllerBase
         return RomGroupSlug(jeu);
     }
 
+    /// <summary>
+    /// Un nombre entier du site, en long (API-4, 14/11) : un score depasse souvent 2 147 483 647 (DoDonPachi DaiOuJou,
+    /// Ketsui). Un nombre a virgule entier (« 1.5e10 ») passe aussi ; null pour tout le reste, jamais d'exception.
+    /// </summary>
+    internal static long? NombreEntier(JsonElement racine, string cle)
+    {
+        if (racine.ValueKind != JsonValueKind.Object || !racine.TryGetProperty(cle, out var e) || e.ValueKind != JsonValueKind.Number) return null;
+        if (e.TryGetInt64(out var entier)) return entier;
+        return e.TryGetDouble(out var d) && d == Math.Floor(d) && Math.Abs(d) < 9.0e18 ? (long)d : null;
+    }
+
     /// <summary>Meilleur rang du joueur courant (appairé ?? anonyme) pour ce jeu, ou null
     /// s'il n'y a pas de credential ou pas encore de score classé. Sert le bloc « me » du
     /// classement mondial ET reste la brique de records/me.</summary>
@@ -406,7 +418,7 @@ public sealed class NelfePlayController : ControllerBase
 
             using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
             var root = doc.RootElement;
-            int? Num(string k) => root.TryGetProperty(k, out var e) && e.ValueKind == JsonValueKind.Number ? e.GetInt32() : null;
+            long? Num(string k) => NombreEntier(root, k);
             var rank = Num("rank");
             if (rank == null) return null; // pas encore classé
             return new
