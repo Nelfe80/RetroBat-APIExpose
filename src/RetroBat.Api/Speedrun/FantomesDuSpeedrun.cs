@@ -529,8 +529,10 @@ public sealed partial class FantomesDuSpeedrun
         return temps;
     }
 
+    // L'identifiant sert de nom de fichier (.nghost, cache, manifeste) : un identifiant qui n'en ferait pas un sur est ignore.
     private static string? Id(JsonElement ligne, string champ)
-        => ligne.TryGetProperty(champ, out var r) && r.ValueKind == JsonValueKind.Object && r.TryGetProperty("id", out var id) ? id.GetString() : null;
+        => ligne.TryGetProperty(champ, out var r) && r.ValueKind == JsonValueKind.Object && r.TryGetProperty("id", out var id)
+           && id.ValueKind == JsonValueKind.String && ReplayStore.IdentifiantSur(id.GetString()) ? id.GetString() : null;
 
     /// <summary>Le .nghost d'un replay : converti une fois, garde ensuite ; null si le replay n'est pas joignable.</summary>
     private async Task<byte[]?> FantomeAsync(string replay, CancellationToken ct)

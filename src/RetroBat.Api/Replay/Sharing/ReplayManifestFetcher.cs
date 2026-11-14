@@ -36,7 +36,7 @@ public sealed class ReplayManifestFetcher
     /// <summary>Le manifeste, ou null si la plateforme ne le connait pas ou ne repond pas.</summary>
     public async Task<ReplayManifest?> FetchAsync(string replayId, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(replayId) || replayId.Length > 40)
+        if (string.IsNullOrWhiteSpace(replayId) || replayId.Length > 40 || !RetroBat.Api.Replay.Storage.ReplayStore.IdentifiantSur(replayId))
         {
             return null;
         }
