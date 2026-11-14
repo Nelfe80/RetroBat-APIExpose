@@ -108,6 +108,36 @@ public class ThemeSystemArtIndexTests
     }
 
     [Fact]
+    public void Collection_logo_and_background_are_found_in_the_collections_folder()
+    {
+        // Brief du 13/11, point 1.5 : EsCollectionThemeAssets pose le logo World Scoring dans art/logos/collections ;
+        // l'index ne lisait que art/logos, et le cache du logo devenait sa propre source.
+        using var tree = new MediaTree();
+        tree.With("es-theme-carbon/art/logos/snes.svg")
+            .With("es-theme-carbon/art/logos/collections/nelfeplay-scoring.png")
+            .With("es-theme-carbon/art/background/collections/nelfeplay-scoring.jpg");
+        var index = ThemeSystemArtIndex.Build(new[] { Path.Combine(tree.Root, "es-theme-carbon") });
+
+        Assert.EndsWith(Path.Combine("art", "logos", "collections", "nelfeplay-scoring.png"),
+            index.ResolveLogoPath(new[] { "nelfeplay-scoring", null, "nelfeplay-scoring", "World Scoring" }, "fr"));
+        Assert.EndsWith(Path.Combine("art", "background", "collections", "nelfeplay-scoring.jpg"),
+            index.ResolveFanartPath(new[] { "nelfeplay-scoring" }));
+    }
+
+    [Fact]
+    public void The_system_folder_wins_over_the_collections_folder_for_every_candidate()
+    {
+        // Un nom de collection du theme (« Batman.svg ») ne prend jamais la place du logo d'un systeme, meme si ce nom
+        // passe avant dans la liste des candidats.
+        using var tree = new MediaTree();
+        tree.With("es-theme-carbon/art/logos/snes.svg")
+            .With("es-theme-carbon/art/logos/collections/Super Nintendo.svg");
+        var index = ThemeSystemArtIndex.Build(new[] { Path.Combine(tree.Root, "es-theme-carbon") });
+
+        Assert.EndsWith(Path.Combine("art", "logos", "snes.svg"), index.ResolveLogoPath(new[] { "Super Nintendo", "snes" }, null));
+    }
+
+    [Fact]
     public void Empty_theme_set_resolves_to_null_without_throwing()
     {
         var index = ThemeSystemArtIndex.Build(Array.Empty<string>());

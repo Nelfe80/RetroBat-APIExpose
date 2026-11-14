@@ -14,6 +14,11 @@ namespace RetroBat.Api.Infrastructure;
 /// the <c>-w</c> (white) variant; collections (auto-verticalarcade, auto-favorites,
 /// lightgun, custom-collections…) carry a UI-language suffix (<c>-fr</c>, <c>-de</c>…) with
 /// the base name as the English fallback. Fanart has neither white nor language variants.
+///
+/// The COLLECTIONS sub-folders (<c>art/logos/collections</c>, <c>art/background/collections</c>) come after the system
+/// folders of the same theme (brief du 13/11, point 1.5) : that is where EsCollectionThemeAssets puts the logo and the
+/// background of the NelfePlay collections (nelfeplay-scoring, nelfeplay-challenges, nelfeplay-multiplayer). Without them
+/// the World Scoring logo was never found in the theme, and the API cache of the logo became its own source.
 /// </summary>
 internal sealed class ThemeSystemArtIndex
 {
@@ -47,7 +52,9 @@ internal sealed class ThemeSystemArtIndex
         {
             themes.Add(new ThemeArt(
                 IndexDirectory(Path.Combine(themeRoot, "art", "logos")),
-                IndexDirectory(Path.Combine(themeRoot, "art", "background"))));
+                IndexDirectory(Path.Combine(themeRoot, "art", "background")),
+                IndexDirectory(Path.Combine(themeRoot, "art", "logos", "collections")),
+                IndexDirectory(Path.Combine(themeRoot, "art", "background", "collections"))));
         }
 
         return new ThemeSystemArtIndex(themes);
@@ -61,13 +68,17 @@ internal sealed class ThemeSystemArtIndex
     {
         foreach (var theme in _themes)
         {
-            foreach (var name in AliasedDistinct(names))
+            // The system folder first, for every name ; the collections folder only after.
+            foreach (var logos in new[] { theme.Logos, theme.CollectionLogos })
             {
-                foreach (var key in LogoKeys(name, language))
+                foreach (var name in AliasedDistinct(names))
                 {
-                    if (theme.Logos.TryGetValue(key, out var path))
+                    foreach (var key in LogoKeys(name, language))
                     {
-                        return path;
+                        if (logos.TryGetValue(key, out var path))
+                        {
+                            return path;
+                        }
                     }
                 }
             }
@@ -82,11 +93,14 @@ internal sealed class ThemeSystemArtIndex
     {
         foreach (var theme in _themes)
         {
-            foreach (var name in AliasedDistinct(names))
+            foreach (var fanart in new[] { theme.Fanart, theme.CollectionFanart })
             {
-                if (theme.Fanart.TryGetValue(name, out var path))
+                foreach (var name in AliasedDistinct(names))
                 {
-                    return path;
+                    if (fanart.TryGetValue(name, out var path))
+                    {
+                        return path;
+                    }
                 }
             }
         }
@@ -157,5 +171,7 @@ internal sealed class ThemeSystemArtIndex
 
     private sealed record ThemeArt(
         IReadOnlyDictionary<string, string> Logos,
-        IReadOnlyDictionary<string, string> Fanart);
+        IReadOnlyDictionary<string, string> Fanart,
+        IReadOnlyDictionary<string, string> CollectionLogos,
+        IReadOnlyDictionary<string, string> CollectionFanart);
 }

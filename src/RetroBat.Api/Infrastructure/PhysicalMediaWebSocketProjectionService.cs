@@ -1517,10 +1517,19 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         var markerPath = destinationPath + ".apiexpose-cache";
 
         var roots = ResolveSystemRoots(systemId).ToList();
-        var sourcePath = ResolveSystemLogoPath(frontendSystemId, systemId, selectedSystem, roots);
+        // LA VRAIE SOURCE (brief du 13/11, point 1.5) : jamais un logo deja mis en cache par l'API (le sien ou celui d'un
+        // autre frontal). Le logo World Scoring, introuvable dans le theme, se resolvait sur ce cache : le marqueur le
+        // comparait a lui-meme et le logo du 18/09 ne changeait plus.
+        var sourcePath = ResolveSystemLogoSourcePath(frontendSystemId, systemId, selectedSystem, roots);
         var deleteSourcePath = false;
         if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath))
         {
+            // Aucune source hors du cache : le cache sert tel quel, sans retelecharger le logo d'ES a chaque selection.
+            if (File.Exists(destinationPath))
+            {
+                return destinationPath;
+            }
+
             sourcePath = await DownloadEsSystemLogoAsync(frontendSystemId, selectedSystem, cancellationToken);
             deleteSourcePath = !string.IsNullOrWhiteSpace(sourcePath);
         }
@@ -1535,6 +1544,10 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             return destinationPath;
         }
 
+        // Un logo qui REMPLACE un cache existant a change : le marquee et le DMD generes avec l'ancien sont perimes.
+        var logoChange = File.Exists(destinationPath) &&
+            !deleteSourcePath &&
+            !string.Equals(Path.GetFullPath(sourcePath), Path.GetFullPath(destinationPath), StringComparison.OrdinalIgnoreCase);
         Directory.CreateDirectory(destinationDirectory);
         try
         {
@@ -1568,6 +1581,16 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             }
 
             WriteSystemLogoCacheMarker(markerPath, sourcePath);
+            DirectoryCache.InvalidatePath(destinationPath);
+            if (logoChange)
+            {
+                ForgetGeneratedSystemMedia(frontendSystemId, systemId);
+                _logger?.LogInformation(
+                    "system logo changed, cache refreshed from {Source} and generated marquee/DMD dropped: system={SystemId}",
+                    sourcePath,
+                    systemId);
+            }
+
             return destinationPath;
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException)
@@ -2501,6 +2524,78 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             ?? ThemeArt.ResolveLogoPath(SystemLogoNames(frontendSystemId, systemId, selectedSystem), ResolveEsLanguage())
             ?? FindFirstPhysicalPath(roots, SystemLogoSearches);
     }
+
+    /// <summary>
+    /// The SOURCE of the system logo cache (brief du 13/11, point 1.5) : the operator override, then the theme (collections
+    /// included), then the system roots, but never a file the API cached itself (any file with a <c>.apiexpose-cache</c>
+    /// marker next to it, whatever the frontend). A cache is not a source : compared to itself, it never changed.
+    /// </summary>
+    private string? ResolveSystemLogoSourcePath(string frontendSystemId, string systemId, SystemDetails? selectedSystem, IReadOnlyList<string> roots)
+    {
+        var userRoots = UserRootsOf(roots);
+        return (userRoots.Count > 0 ? FindFirstLogoSource(userRoots) : null)
+            ?? ThemeArt.ResolveLogoPath(SystemLogoNames(frontendSystemId, systemId, selectedSystem), ResolveEsLanguage())
+            ?? FindFirstLogoSource(roots);
+    }
+
+    private static string? FindFirstLogoSource(IReadOnlyList<string> roots)
+    {
+        foreach (var search in SystemLogoSearches)
+        {
+            foreach (var root in roots)
+            {
+                var directory = CombineRelative(root, search.RelativeDirectory);
+                var path = DirectoryCache.List(directory)
+                    .Where(candidate => FileSystemName.MatchesSimpleExpression(search.Pattern, Path.GetFileName(candidate)))
+                    .Where(candidate => !IsApiLogoCache(candidate))
+                    .OrderBy(candidate => candidate, StringComparer.OrdinalIgnoreCase)
+                    .FirstOrDefault();
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    return Path.GetFullPath(path);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>A logo the API rasterised itself (its marker sits next to it), or that marker.</summary>
+    internal static bool IsApiLogoCache(string path)
+        => path.EndsWith(".apiexpose-cache", StringComparison.OrdinalIgnoreCase) ||
+            File.Exists(path + ".apiexpose-cache");
+
+    /// <summary>
+    /// The system marquee and DMD the API generated from the previous logo go : the generation (when it is on) makes them
+    /// again from the new one in the same pass ; when it is off, the surfaces fall back to the fresh logo instead of the
+    /// old one. Only the API's own generated files (generated-system-*), never a marquee or a DMD provided by the user.
+    /// </summary>
+    private void ForgetGeneratedSystemMedia(string frontendSystemId, string systemId)
+    {
+        var directory = Path.Combine(RetroBatPaths.MediaSystemsRoot, systemId, "artwork", "marquee");
+        foreach (var name in GeneratedSystemMediaNames(frontendSystemId, systemId))
+        {
+            var path = Path.Combine(directory, name);
+            if (!File.Exists(path))
+            {
+                continue;
+            }
+
+            try
+            {
+                File.Delete(path);
+                DirectoryCache.InvalidatePath(path);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                _logger?.LogWarning(ex, "Unable to drop the outdated generated media {Path}.", path);
+            }
+        }
+    }
+
+    /// <summary>The files EnsureSystemMarqueeGeneratedAsync and EnsureSystemDmdGeneratedAsync write for this system.</summary>
+    internal static IReadOnlyList<string> GeneratedSystemMediaNames(string frontendSystemId, string systemId)
+        => [FrontendScopedFileName("generated-system-marquee", ".png", frontendSystemId, systemId), "generated-system-dmd.png"];
 
     /// <summary>The operator-override roots (media/user/systems/…) among a system's roots,
     /// identified by prefix so it does not depend on their order.</summary>
