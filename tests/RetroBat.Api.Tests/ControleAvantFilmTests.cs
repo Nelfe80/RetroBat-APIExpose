@@ -16,11 +16,30 @@ public sealed class ControleAvantFilmTests
     }
 
     [Fact]
+    public void Le_processeur_au_plus_haut_au_lancement_ne_retient_jamais_le_film()
+    {
+        // La borne du user le 14/11 a 09:54 : 99,8 % pendant le lancement de RetroArch et du Deck, jeu a sa cadence.
+        Assert.Null(ControleAvantFilm.RaisonMachine(99.8, 900, 59.6, 59.63));
+        Assert.Null(ControleAvantFilm.RaisonMachine(100, 900, 60, 60));
+        // Cadence pas encore mesuree : le film part (le garde-fou du film jugera la cadence une fois la partie stabilisee).
+        Assert.Null(ControleAvantFilm.RaisonMachine(100, 900, null, 59.63));
+        Assert.Null(ControleAvantFilm.RaisonMachine(100, 900, 42, null));
+    }
+
+    [Fact]
+    public void Un_jeu_a_70_pour_cent_de_sa_cadence_ne_filme_pas()
+    {
+        Assert.StartsWith("jeu ralenti", ControleAvantFilm.RaisonMachine(40, 900, 42, 60));
+        Assert.StartsWith("jeu ralenti", ControleAvantFilm.RaisonMachine(null, null, 0.7 * 59.63, 59.63));
+        // 92 % de la cadence annoncee : la machine suit, le film part.
+        Assert.Null(ControleAvantFilm.RaisonMachine(null, null, 0.92 * 59.63, 59.63));
+    }
+
+    [Fact]
     public void Une_machine_saturee_ne_filme_pas_cette_partie_et_filme_la_suivante()
     {
-        Assert.StartsWith("processeur sature", ControleAvantFilm.RaisonMachine(99.2, 900, 60, 60));
         Assert.StartsWith("memoire presque pleine", ControleAvantFilm.RaisonMachine(50, 120, 60, 60));
-        Assert.StartsWith("jeu deja ralenti", ControleAvantFilm.RaisonMachine(50, 900, 48, 59.63));
+        Assert.StartsWith("jeu ralenti", ControleAvantFilm.RaisonMachine(50, 900, 48, 59.63));
         // La partie suivante, la machine revenue : le film repart (aucune trace de la precedente).
         Assert.Null(ControleAvantFilm.RaisonMachine(70, 900, 59.6, 59.63));
     }
@@ -30,6 +49,53 @@ public sealed class ControleAvantFilmTests
     [InlineData(120)]  // avance rapide
     public void Une_cadence_hors_jeu_ne_juge_rien(double cadence)
         => Assert.Null(ControleAvantFilm.RaisonMachine(50, 900, cadence, 60));
+
+    [Theory]
+    [InlineData(59.63, 59.63)]
+    [InlineData(50.0, 50.0)]
+    [InlineData(null, null)]
+    [InlineData(0.0, null)]     // pas d'av_info
+    [InlineData(120.0, null)]   // cadence hors des machines suivies
+    public void La_cadence_annoncee_ne_sert_de_reference_qu_entre_40_et_75(double? annoncee, double? attendue)
+        => Assert.Equal(attendue, ControleAvantFilm.CadenceDeReference(annoncee));
+
+    [Fact]
+    public void Le_garde_fou_laisse_filmer_une_borne_a_100_pour_cent_qui_tient_sa_cadence()
+    {
+        // Chargement lent (premieres secondes a 30 images/s), puis le jeu a 59,6 pour 59,63 annoncees : film garde.
+        var garde = new GardeDeCapture(59.63);
+        long frame = 0;
+        var t = 0.0;
+        Assert.False(garde.Relever(t, frame));
+        for (var i = 0; i < 2; i++) { t += 2; frame += 60; Assert.False(garde.Relever(t, frame)); }
+        for (var i = 0; i < 30; i++) { t += 2; frame += 119; Assert.False(garde.Relever(t, frame)); }
+    }
+
+    [Fact]
+    public void Le_garde_fou_arrete_le_film_d_un_jeu_stabilise_sous_90_pour_cent_de_sa_cadence_annoncee()
+    {
+        // 52 images/s des le depart pour 59,63 annoncees (87 %) : la meilleure cadence vue (52) ne le trahit pas, la
+        // cadence annoncee si, une fois la partie stabilisee.
+        var sansAnnonce = new GardeDeCapture();
+        var garde = new GardeDeCapture(59.63);
+        long frame = 0;
+        var t = 0.0;
+        sansAnnonce.Relever(t, frame);
+        garde.Relever(t, frame);
+        var arretSansAnnonce = false;
+        double? arret = null;
+        for (var i = 0; i < 20 && arret is null; i++)
+        {
+            t += 2; frame += 104;
+            arretSansAnnonce |= sansAnnonce.Relever(t, frame);
+            if (garde.Relever(t, frame)) arret = t;
+        }
+        Assert.False(arretSansAnnonce);
+        Assert.NotNull(arret);
+        // Rien n'est juge avant la stabilisation : trois releves lents apres elle.
+        Assert.True(arret >= ControleAvantFilm.StabilisationS + 2 * 2);
+        Assert.Equal(52, garde.DerniereCadence!.Value, 1);
+    }
 
     [Fact]
     public void La_cadence_se_lit_entre_deux_releves()

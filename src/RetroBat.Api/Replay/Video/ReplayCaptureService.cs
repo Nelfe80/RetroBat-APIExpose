@@ -23,9 +23,10 @@ namespace RetroBat.Api.Replay.Video;
 /// film x4.</item>
 /// <item>Un film a la taille d'origine ne part pas tel quel sur YouTube : pour un record, la borne fabrique d'abord sa
 /// version YouTube (redressee, agrandie sans lissage, FLV) avec NelfePlay.LiveStreaming.exe, hors partie.</item>
-/// <item>Avant chaque film, la machine se verifie sur l'instant (<see cref="ControleAvantFilm"/>) ; un garde-fou
-/// (<see cref="GardeDeCapture"/>) coupe la capture si le jeu ralentit pendant. Ni l'un ni l'autre ne dure au-dela de la
-/// partie (decision du user, 14/11 : plus de pause de 30 jours).</item>
+/// <item>Avant chaque film, la machine se verifie sur l'instant (<see cref="ControleAvantFilm"/> : la memoire ; jamais
+/// le processeur, toujours au plus haut pendant le lancement) ; un garde-fou (<see cref="GardeDeCapture"/>) coupe la
+/// capture si le jeu, une fois stabilise, tourne sous 90 % de sa cadence annoncee ou ralentit pendant. Ni l'un ni
+/// l'autre ne dure au-dela de la partie (decision du user, 14/11 : plus de pause de 30 jours).</item>
 /// <item>Un jeu vertical sort couche (RetroArch 1.22 filme avant de tourner l'image) : il se reconnait a l'en-tete
 /// du film (<see cref="MatroskaEntete"/>). Le sens de rotation, annonce par le coeur dans le journal de lancement,
 /// permet de le redresser a la fin en corrigeant l'en-tete, sans reencoder (<see cref="MatroskaRotation"/>) ;
@@ -149,7 +150,8 @@ public sealed class ReplayCaptureService : BackgroundService
         /// <summary>D'ou viennent les trames qui suivent sa cadence (un seul emetteur, sinon les compteurs se melent).</summary>
         public string? SourceDesTrames;
         public bool Lent;
-        public readonly GardeDeCapture Garde = new();
+        /// <summary>Le garde-fou de cadence, avec la cadence annoncee par le coeur pour ce jeu quand elle est connue (14/11).</summary>
+        public GardeDeCapture Garde { get; init; } = new();
         public readonly Stopwatch Chrono = Stopwatch.StartNew();
 
         /// <summary>
@@ -666,9 +668,10 @@ public sealed class ReplayCaptureService : BackgroundService
                 return;
             }
 
-            // LA MACHINE SUR L'INSTANT (14/11) : processeur sature, memoire epuisee ou jeu deja ralenti, pas de film pour cette
-            // partie seulement ; la suivante se verifie a nouveau.
-            if (!duSpectateur && await RaisonDeLaMachineAsync(sansReplay).ConfigureAwait(false) is { } machine)
+            // LA MACHINE SUR L'INSTANT (14/11, 1.9.181) : memoire epuisee, pas de film pour cette partie seulement ; la suivante
+            // se verifie a nouveau. Ni le processeur (toujours au plus haut pendant le lancement) ni la cadence du lancement :
+            // la cadence se juge une fois la partie stabilisee, par le garde-fou du film (GardeDeCapture).
+            if (!duSpectateur && RaisonDeLaMachine() is { } machine)
             {
                 _logger.LogInformation("Capture : pas de film pour cette partie : {Raison}.", machine);
                 RefuserLaPartie(replayId, "machine", machine, room);
@@ -701,8 +704,7 @@ public sealed class ReplayCaptureService : BackgroundService
             // La forme de l'image du coeur, si le journal parle bien de ce contenu. Jamais pour le spectateur : la forme
             // annoncee est celle d'UNE console (3:2), son image en montre deux ou quatre.
             var cadence = duSpectateur ? null : _coeur.ReadLatest();
-            var forme = cadence is { Aspect: double a } && (statut?.Crc32 is not { Length: > 0 } crc || cadence.Crc32 is null
-                || string.Equals(cadence.Crc32, crc.Trim().ToLowerInvariant().PadLeft(8, '0'), StringComparison.Ordinal)) ? a : (double?)null;
+            var forme = cadence is { Aspect: double a } && DuMemeContenu(cadence, statut?.Crc32) ? a : (double?)null;
             lock (_verrouSessions)
             {
                 // Une autre partie commence : les verdicts qui suivent ne sont plus ceux du film d'avant.
@@ -713,6 +715,7 @@ public sealed class ReplayCaptureService : BackgroundService
                     Verticale = !duSpectateur && JeuVertical(_cheminDuJeu),
                     Set = string.IsNullOrWhiteSpace(_cheminDuJeu) ? null : Path.GetFileNameWithoutExtension(_cheminDuJeu),
                     Forme = forme, Fond = FondDuJeu(_cheminDuJeu), DuSpectateur = duSpectateur,
+                    Garde = new GardeDeCapture(CadenceAnnoncee(cadence, statut?.Crc32)),
                     Crt = LanceurDuDirect.EcranATube(_cheminDuJeu is { Length: > 0 } cheminDuJeu
                         ? RetroBat.Api.Netplay.NetplayHostService.SystemeDuChemin(cheminDuJeu, RetroBatPaths.RomsRoot) : null),
                     // Le film d'une rencontre : sa gameroom, et l'heure de sa premiere image (le spectateur filme depuis son
@@ -1811,30 +1814,49 @@ public sealed class ReplayCaptureService : BackgroundService
         SignalerNonCapture(replayId, code, detail, room);
     }
 
-    /// <summary>La machine, sur l'instant : processeur (1 s), memoire libre et cadence du jeu pendant cette seconde.</summary>
-    private async Task<string?> RaisonDeLaMachineAsync(bool sansReplay)
+    /// <summary>
+    /// La machine, sur l'instant, sans attendre (14/11, 1.9.181) : la memoire libre seulement. La cadence du jeu n'est pas
+    /// encore mesurable au lancement (inconnue : le film part) ; le garde-fou du film la juge une fois la partie stabilisee.
+    /// </summary>
+    private static string? RaisonDeLaMachine()
     {
         try
         {
-            var avant = sansReplay ? null : (await _ra.GetActiveReplayAsync(_arret).ConfigureAwait(false))?.Frame;
-            var chrono = Stopwatch.StartNew();
-            var processeur = await ControleAvantFilm.ChargeDuProcesseurAsync(ControleAvantFilm.MesureDuProcesseur, _arret).ConfigureAwait(false);
-            var apres = sansReplay ? null : (await _ra.GetActiveReplayAsync(_arret).ConfigureAwait(false))?.Frame;
-            var cadence = ControleAvantFilm.Cadence(avant, apres, chrono.Elapsed.TotalSeconds);
-            return ControleAvantFilm.RaisonMachine(processeur, ControleAvantFilm.MemoireLibreMo(), cadence, _coeur.ReadLatest()?.Fps);
+            return ControleAvantFilm.RaisonMachine(null, ControleAvantFilm.MemoireLibreMo(), null, null);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception)
         {
             return null;
         }
     }
 
+    /// <summary>La cadence annoncee par le coeur pour le jeu en cours (le journal parle bien de ce contenu), ou null. Pur.</summary>
+    internal static double? CadenceAnnoncee(CoreTiming? cadence, string? crc)
+        => cadence is { Fps: > 0 } && DuMemeContenu(cadence, crc) ? cadence.Fps : null;
+
+    /// <summary>Le journal du coeur parle du contenu de ce CRC (sans CRC d'un cote ou de l'autre : au benefice du doute). Pur.</summary>
+    private static bool DuMemeContenu(CoreTiming cadence, string? crc)
+        => crc is not { Length: > 0 } || cadence.Crc32 is null
+            || string.Equals(cadence.Crc32, crc.Trim().ToLowerInvariant().PadLeft(8, '0'), StringComparison.Ordinal);
+
     /// <summary>Le jeu ralentit pendant le film : seul le film de cette partie s'arrete (14/11).</summary>
     private void NoterLeRalenti(CaptureEnCours c)
     {
         _refusDeLaPartie = "le jeu ralentissait pendant le film";
-        _logger.LogInformation("Capture : le jeu ralentissait pendant le film de {ReplayId} (reference {Reference:F1} images/s), film arrete pour cette partie seulement.",
-            c.ReplayId, c.Garde.Reference);
+        _logger.LogInformation("Capture : le jeu ralentissait pendant le film de {ReplayId} ({Cadence} images/s ; reference {Reference:F1}, annoncee {Annoncee}), film arrete pour cette partie seulement.",
+            c.ReplayId, c.Garde.DerniereCadence?.ToString("F1", System.Globalization.CultureInfo.InvariantCulture) ?? "?",
+            c.Garde.Reference, c.Garde.Annoncee?.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) ?? "inconnue");
+        // Le processeur au moment du ralenti, pour le journal seulement (il ne decide de rien).
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var cpu = await ControleAvantFilm.ChargeDuProcesseurAsync(ControleAvantFilm.MesureDuProcesseur, _arret).ConfigureAwait(false);
+                _logger.LogInformation("Capture : processeur a {Processeur} pendant le ralenti de {ReplayId} (information).",
+                    ControleAvantFilm.TexteDuProcesseur(cpu), c.ReplayId);
+            }
+            catch (Exception) { /* arret de l'API, ou mesure impossible */ }
+        });
     }
 
     /// <summary>

@@ -12,27 +12,26 @@ namespace RetroBat.Api.Replay.Video;
 /// machine et la connexion se verifient sur l'instant, avant chaque film et avant chaque candidature au direct ; une partie
 /// refusee ne retient jamais la suivante.
 /// <list type="bullet">
-/// <item>La machine (avant le film) : processeur sature, memoire presque epuisee, ou jeu deja ralenti au depart.</item>
+/// <item>La machine (avant le film) : memoire presque epuisee, ou jeu deja ralenti une fois la partie stabilisee. Le
+/// processeur ne retient jamais un film (14/11, 1.9.181) : mesure pendant le lancement (RetroArch, le Deck), il est
+/// toujours au plus haut, et la borne de reference (i3-N305) joue normalement entre 80 et 100 %. Seule une vraie baisse
+/// de cadence du jeu dit que la machine ne suit pas.</item>
 /// <item>La connexion (avant la candidature au direct) : pas de reseau, ou le site trop lent a repondre. Le debit montant
 /// n'est pas mesure par l'API : le site choisit le debit du passage (bitrate_kbps) et l'exe du direct s'y tient.</item>
 /// </list>
-/// Seuils prudents : ils n'arretent que les cas nets, une borne chargee mais jouable filme (le garde-fou de cadence coupe
-/// encore le film de la partie si le jeu ralentit pendant).
+/// Seuils prudents : ils n'arretent que les cas nets, une borne chargee mais jouable filme. Une cadence pas encore mesuree
+/// ne retient rien : le film part, et le garde-fou de cadence (<see cref="GardeDeCapture"/>) coupe le film de la partie
+/// si le jeu, une fois stabilise, tourne sous 90 % de sa cadence annoncee ou ralentit pendant.
 /// </summary>
 public static class ControleAvantFilm
 {
-    /// <summary>
-    /// Processeur occupe en moyenne sur la mesure, au-dela : pas de film. La borne de reference joue a 80-100 % (01/11) ;
-    /// seule la saturation franche arrete le film.
-    /// </summary>
-    public const double ProcesseurMaxPct = 98;
-
     /// <summary>Memoire physique libre minimale (Mo) : en dessous, l'encodeur du film ferait echanger la machine sur disque.</summary>
     public const double MemoireLibreMinMo = 300;
 
     /// <summary>
-    /// Le jeu deja ralenti au depart : cadence mesuree sous 90 % de la cadence annoncee par le coeur (le garde-fou de la
-    /// capture coupe a 92 % de la meilleure cadence vue ; filmer un jeu deja sous ce seuil ne ferait que le couper aussitot).
+    /// Le jeu ralenti une fois la partie stabilisee : cadence mesuree sous 90 % de la cadence annoncee par le coeur. Le
+    /// garde-fou de la capture applique le meme seuil pendant le film (<see cref="GardeDeCapture"/>), en plus de ses 92 % de
+    /// la meilleure cadence vue.
     /// </summary>
     public const double CadenceMinRatio = 0.90;
 
@@ -45,19 +44,29 @@ public static class ControleAvantFilm
     /// <summary>Ouverture d'une connexion vers le site (ms) : au-dela, le direct partirait saccade.</summary>
     public const double LatenceMaxMs = 1500;
 
-    /// <summary>Duree de la mesure du processeur.</summary>
+    /// <summary>
+    /// Le temps de jeu avant de juger la cadence : les premieres secondes d'une partie (chargement du coeur, du Deck, premiere
+    /// image) ne disent rien de la machine.
+    /// </summary>
+    public const double StabilisationS = 6;
+
+    /// <summary>Duree de la mesure du processeur (journal seulement).</summary>
     public static readonly TimeSpan MesureDuProcesseur = TimeSpan.FromSeconds(1);
 
-    /// <summary>Pourquoi la machine ne filmera pas cette partie, ou null. Une mesure absente (null) ne retient rien. Pur.</summary>
+    /// <summary>
+    /// Pourquoi la machine ne filmera pas cette partie, ou null. Une mesure absente (null) ne retient rien : une cadence pas
+    /// encore mesuree laisse partir le film. <paramref name="processeurPct"/> ne retient jamais rien (14/11, 1.9.181) : il
+    /// n'est la que pour le journal. <paramref name="cadence"/> est celle du jeu stabilise (<see cref="StabilisationS"/>),
+    /// jamais celle du lancement. Pur.
+    /// </summary>
     public static string? RaisonMachine(double? processeurPct, double? memoireLibreMo, double? cadence, double? cadenceAnnoncee)
     {
-        if (processeurPct is { } cpu && cpu >= ProcesseurMaxPct)
-            return "processeur sature (" + Texte(cpu) + " %, seuil " + Texte(ProcesseurMaxPct) + " %)";
+        _ = processeurPct;
         if (memoireLibreMo is { } libre && libre < MemoireLibreMinMo)
             return "memoire presque pleine (" + Texte(libre) + " Mo libres, seuil " + Texte(MemoireLibreMinMo) + " Mo)";
         if (cadence is { } c && cadenceAnnoncee is { } annoncee && annoncee > 0
             && c >= CadencePause && c <= CadenceAvanceRapide && c < annoncee * CadenceMinRatio)
-            return "jeu deja ralenti au depart (" + Texte(c) + " images/s pour " + Texte(annoncee) + ")";
+            return "jeu ralenti (" + Texte(c) + " images/s pour " + Texte(annoncee) + ")";
         return null;
     }
 
@@ -70,6 +79,17 @@ public static class ControleAvantFilm
             return "site trop lent (" + Texte(ms) + " ms, seuil " + Texte(LatenceMaxMs) + " ms)";
         return null;
     }
+
+    /// <summary>
+    /// La cadence annoncee par le coeur, si elle peut servir de reference : entre la cadence de pause et l'avance rapide, et
+    /// au moins celle des machines PAL (40 a 75 images/s) ; null sinon. Pur.
+    /// </summary>
+    public static double? CadenceDeReference(double? cadenceAnnoncee)
+        => cadenceAnnoncee is { } a && a >= 40 && a <= CadenceAvanceRapide ? a : null;
+
+    /// <summary>La charge du processeur pour le journal : « 99.8 % » ou « inconnue ». Pur.</summary>
+    public static string TexteDuProcesseur(double? processeurPct)
+        => processeurPct is { } p ? Texte(p) + " %" : "inconnue";
 
     /// <summary>La cadence mesuree entre deux releves de frames, ou null si elle ne se lit pas. Pur.</summary>
     public static double? Cadence(long? frameAvant, long? frameApres, double secondes)
