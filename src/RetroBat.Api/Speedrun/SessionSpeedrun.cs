@@ -522,8 +522,11 @@ public sealed class SessionSpeedrun
             if (etat == EtatTentative.Armee && !_departAnnonce)
             {
                 _departAnnonce = true;
-                _messages.Add(new MessageJoueur("speedrun.msg.ready",
-                    "Challenge ready. Your best time is sent when you quit the game. Hotkey + Left: restart. Hotkey + Start: quit."));
+                _messages.Add(_r.EstUnEntrainement
+                    ? new MessageJoueur("speedrun.msg.training_ready",
+                        "Training: nothing is ranked or sent. Hotkey + Left: back to this point. Hotkey + Start: quit.")
+                    : new MessageJoueur("speedrun.msg.ready",
+                        "Challenge ready. Your best time is sent when you quit the game. Hotkey + Left: restart. Hotkey + Start: quit."));
             }
 
             Publier("speedrun.state", new { sessionId = SessionId, attemptId = AttemptId, state = Etat });
@@ -545,13 +548,14 @@ public sealed class SessionSpeedrun
             MeilleurTemps = frames;
             MeilleurIndependant = res.Independant?.Frames;
         }
-        if (EstClassable(res) && res.FramesOfficielles is { } temps && (_meilleure?.Resultat.FramesOfficielles is not { } vu || temps < vu)
+        // L'ENTRAINEMENT (14/11) : aucun temps ne part au site, la meilleure tentative n'est jamais retenue pour l'envoi
+        if (!_r.EstUnEntrainement && EstClassable(res) && res.FramesOfficielles is { } temps && (_meilleure?.Resultat.FramesOfficielles is not { } vu || temps < vu)
             && _horlogeDuDepart is { } departMs && (_horlogeDArrivee ?? _horlogeDeLImage) is { } arriveeMs)
             _meilleure = new TentativeFinie(AttemptId, Numero, res, departMs, arriveeMs);
         _relanceAutomatique = DelaiDeRelance(_r, res.Etat, res.Cause);
         if (res.Etat == EtatTentative.Ratee && _relanceAutomatique is not null)
             _messages.Add(new MessageJoueur("speedrun.msg.failed_restart", "Attempt failed: back to the start."));
-        else if (MessageDeFin(res, precedent) is { } message) _messages.Add(message);
+        else if ((_r.EstUnEntrainement ? MessageDEntrainement(res) : MessageDeFin(res, precedent)) is { } message) _messages.Add(message);
         if (AvertissementDeRalenti(_r, res, _horlogeDuDepart, _horlogeDArrivee ?? _horlogeDeLImage) is { } lent) _messages.Add(lent);
         Publier("speedrun.attempt.ended", new
         {
@@ -599,6 +603,16 @@ public sealed class SessionSpeedrun
                 temps, ("best", Chronometrage.Afficher(pb, r.Cadence)));
         return new MessageJoueur("speedrun.msg.finish_best", "Finish {time}: new best time. Ranking when you quit the game.", temps);
     }
+
+    /// <summary>
+    /// LA FIN D'UNE SEANCE D'ENTRAINEMENT (14/11) : le temps jusqu'a la fin de la mission, a titre d'information ; ni meilleur
+    /// temps annonce ni classement. Un abandon ne dit rien.
+    /// </summary>
+    private static MessageJoueur? MessageDEntrainement(ResultatTentative r)
+        => r.Etat == EtatTentative.Finie && r.FramesOfficielles is { } frames
+            ? new MessageJoueur("speedrun.msg.training_finish", "Mission complete in {time} (training, not sent). Hotkey + Left: back to the start point.",
+                ("time", Chronometrage.Afficher(frames, r.Cadence)))
+            : null;
 
     /// <summary>Au-dessus, la vitesse du jeu ne merite pas d'avertissement (le grain de l'horloge).</summary>
     public const double VitesseSansAvertissement = 0.99;

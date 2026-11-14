@@ -3465,6 +3465,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             return;
         }
 
+        // L'ENTRAINEMENT (14/11) : jamais envoye (la session ne retient deja aucun temps ; ceinture et bretelles)
+        if (defi.Reglement.EstUnEntrainement)
+        {
+            Trace("defi : entrainement, aucun temps n'est envoye");
+            return;
+        }
+
         var frames = defi.Tentative.Resultat.FramesOfficielles ?? 0;
         // Un defi qui part sur un etat en charge un, nomme au passeport : ce chargement-la n'est pas une sauvegarde.
         if (RetroBat.Api.Speedrun.PasseportDeDefi.Salissure(sessionJson, defi.Reglement.Etat is null ? 0 : 1) is { } motif)

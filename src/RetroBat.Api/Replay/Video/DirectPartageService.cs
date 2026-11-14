@@ -352,6 +352,13 @@ public sealed class DirectPartageService : IHostedService
             var romGroup = def.Rom.Trim().ToLowerInvariant();
             if (_epreuves?.EpreuveEnCours is { } epreuve)
             {
+                // L'ENTRAINEMENT (14/11) ne passe pas a l'antenne : rien n'y est classe, aucun film d'epreuve n'en sort
+                if (epreuve.EstUnEntrainement)
+                {
+                    _journal.LogInformation("Direct partage : entrainement {Defi}, la borne ne se porte pas candidate.", epreuve.ChallengeId);
+                    return;
+                }
+
                 // L'ANTENNE EN 3 SECONDES (essai du user, 02/11 22:56) : elue 3 s apres le lancement par ES, la partie n'avait
                 // ni film ni etat de depart (RetroArch demarrait encore) et le passage tombait aussitot (« aucun film ne
                 // tourne »). Une epreuve ne se presente qu'une fois le film lance et son etat de depart charge, et ses 3

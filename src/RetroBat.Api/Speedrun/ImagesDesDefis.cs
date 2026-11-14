@@ -41,7 +41,8 @@ public static class ImagesDesDefis
         var duJeuCherchee = false;
         foreach (var defi in defis)
         {
-            if (defi.Kind.StartsWith("speedrun_", StringComparison.Ordinal)) continue;
+            // l'entrainement (14/11) est une liste (onglet TRAINING), sans bandeau
+            if (defi.Kind.StartsWith("speedrun_", StringComparison.Ordinal) || defi.EstUnEntrainement) continue;
             var image = DeLEpreuve(defi, racineDesEtats);
             if (image is null)
             {

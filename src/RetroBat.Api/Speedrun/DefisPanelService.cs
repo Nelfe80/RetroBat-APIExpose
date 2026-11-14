@@ -143,7 +143,8 @@ public sealed partial class DefisPanelService
             _message = "";
             _lancement = false;
             _selecteur.Fermer();
-            regles = _defis.Select(d => d.Ruleset).ToList();
+            // l'entrainement (14/11) n'a pas de classement : on ne le demande pas au site
+            regles = _defis.Where(d => !d.EstUnEntrainement).Select(d => d.Ruleset).ToList();
             _tableaux = _classements?.Connus(regles) ?? new Dictionary<string, ClassementDEpreuve>();
             _modele.Ouvrir(Recomposer());
             PoserLesCompteurs();
@@ -659,20 +660,26 @@ public sealed partial class DefisPanelService
             var bandeaux = onglet == DefisPanelModel.Onglet.Challenges;
             // (12/11) le selecteur ouvert ne lance rien : Y n'y fait rien, le bouton du bas s'efface
             var selecteur = SelecteurOuvert() ? SelecteurAfficheDesFantomes() : null;
+            var entrainement = onglet == DefisPanelModel.Onglet.Training;
             var action = onglet == DefisPanelModel.Onglet.Challenges
                 ? T("speedrun.panel.launch_challenge", "Launch the challenge")
+                : entrainement ? T("speedrun.panel.launch_training", "Launch the training")
                 : T("speedrun.panel.launch_speedrun", "Launch the speedrun");
             return new ContenuDefis(
                 _modele.Onglets.Select(DefisPanelModel.Titre).ToList(),
                 _modele.Onglets.ToList().IndexOf(onglet),
                 _modele.Etat == DefisPanelModel.Foyer.Panneau,
                 bandeaux,
-                bandeaux ? [] : [T("speedrun.panel.record", "RECORD"), T("speedrun.panel.you", "YOU")],
+                bandeaux ? []
+                    : entrainement ? ["", T("speedrun.panel.played", "PLAYED")]
+                    : [T("speedrun.panel.record", "RECORD"), T("speedrun.panel.you", "YOU")],
                 lignes.Select(l => l.Ligne).ToList(),
                 courante,
-                bandeaux || defi is null ? [] : Fiche(defi),
+                bandeaux || defi is null ? [] : entrainement ? FicheDEntrainement(defi) : Fiche(defi),
                 defi is null || selecteur is not null ? null : new Aide(_glypheDefier, action),
                 Aides(),
+                // TRAINING (14/11) : la ligne au-dessus de la liste dit qu'ici rien n'est classe
+                Bandeau: entrainement ? T("speedrun.panel.training.banner", "Free practice: no ranking, nothing is sent") : "",
                 Message: _message.Length > 0 ? _message : T("speedrun.panel.empty", "No open challenge for this game"),
                 Pseudo: Pseudo,
                 EnLigne: LiaisonNelfePlay.EnLigne,
@@ -755,6 +762,25 @@ public sealed partial class DefisPanelService
         ];
     }
 
+    /// <summary>
+    /// LA FICHE D'UN POINT D'ENTRAINEMENT (14/11) : le depart, ce qu'on y fait, les aides tenues (vies infinies : un verrou
+    /// « advantage » du reglement) et les seances de cette borne. Ni record ni place : rien n'est classe.
+    /// </summary>
+    internal IReadOnlyList<ChampDeFiche> FicheDEntrainement(Reglement defi)
+    {
+        var aides = defi.Verrous.Where(v => v.Raison == "advantage").ToList();
+        var seances = _bilan.GetValueOrDefault(defi.ChallengeId).Tentatives;
+        return
+        [
+            new(T("speedrun.panel.start", "Start"), T("speedrun.panel.start.state", "Verified starting state")),
+            new(T("speedrun.panel.goal", "Goal"), Objectif(defi)),
+            new(T("speedrun.panel.training.aids", "Aids"), aides.Count > 0
+                ? T("speedrun.panel.training.infinite_lives", "Infinite lives") : T("speedrun.panel.training.no_aid", "None")),
+            new(T("speedrun.panel.restart", "Restart"), T("speedrun.panel.training.restart", "Hotkey + Left: back to this point")),
+            new(T("speedrun.panel.training.sessions", "Sessions"), seances.ToString(System.Globalization.CultureInfo.InvariantCulture)),
+        ];
+    }
+
     private const string SansTemps = "--:--.--";
 
     private static string LaPhrase(IReadOnlyList<string> mots)
@@ -787,7 +813,8 @@ public sealed partial class DefisPanelService
     internal IReadOnlyList<TypeDeRecords> ComposerLesRecords(IReadOnlyList<Reglement> defis,
         IReadOnlyDictionary<string, ClassementDEpreuve> tableaux, string langue, string pseudo)
     {
-        var classees = defis.Where(d => LeRecord(d, tableaux) is not null).ToList();
+        // l'entrainement (14/11) n'a jamais de record : il ne compte nulle part, meme si un classement portait son nom
+        var classees = defis.Where(d => !d.EstUnEntrainement && LeRecord(d, tableaux) is not null).ToList();
         if (classees.Count == 0) return [];
 
         VueDeRecords Vue(Reglement d) => VueDe(d, tableaux[d.Ruleset], langue, pseudo);
@@ -851,6 +878,7 @@ public sealed partial class DefisPanelService
         "speedrun_full" => T("speedrun.panel.goal.full", "Reach the ending"),
         "challenge_boss" => T("speedrun.panel.goal.boss_rush", "Defeat the boss"),
         "challenge_mode" => T("speedrun.panel.goal.mode", "Play the mode to the finish"),
+        Reglement.KindEntrainement => T("speedrun.panel.goal.training", "Practice freely, nothing is ranked"),
         _ => T("speedrun.panel.goal.challenge", "Complete the challenge"),
     };
 
@@ -865,15 +893,26 @@ public sealed partial class DefisPanelService
     {
         var tableaux = classements ?? new Dictionary<string, ClassementDEpreuve>();
         var resultat = new Dictionary<DefisPanelModel.Onglet, List<(LigneDeDefi, Reglement?)>>();
-        foreach (var groupe in defis.GroupBy(d => (Onglet: d.Kind.StartsWith("speedrun_", StringComparison.Ordinal)
-                     ? DefisPanelModel.Onglet.Speedruns : DefisPanelModel.Onglet.Challenges, Groupe: Groupe(d.Kind)))
-                     .OrderBy(g => g.Key.Onglet).ThenBy(g => OrdreDuGroupe(g.Key.Groupe)))
+        // (14/11) un reglement peut nommer son groupe (« group » : Mission 1, Mission 2... de l'entrainement de Metal Slug 3) :
+        // un surtitre par nom, ranges par la plus petite place (« order ») de leurs epreuves, sous le genre
+        foreach (var groupe in defis.GroupBy(d => (Onglet: OngletDe(d), Groupe: Groupe(d.Kind), Nom: d.Groupe("en") ?? ""))
+                     .OrderBy(g => g.Key.Onglet).ThenBy(g => OrdreDuGroupe(g.Key.Groupe)).ThenBy(g => g.Min(d => d.Ordre))
+                     .ThenBy(g => g.Key.Nom, StringComparer.Ordinal))
         {
             if (!resultat.TryGetValue(groupe.Key.Onglet, out var lignes)) resultat[groupe.Key.Onglet] = lignes = new();
-            lignes.Add((new LigneDeDefi(T("speedrun.panel.group." + groupe.Key.Groupe, NomDuGroupe(groupe.Key.Groupe)), Groupe: true), null));
+            var surtitre = groupe.First().Groupe(langue) ?? T("speedrun.panel.group." + groupe.Key.Groupe, NomDuGroupe(groupe.Key.Groupe));
+            lignes.Add((new LigneDeDefi(surtitre, Groupe: true), null));
             foreach (var d in groupe.OrderBy(d => d.Ordre).ThenBy(d => d.Titre(langue), StringComparer.CurrentCultureIgnoreCase))
             {
                 var (tentatives, meilleur) = bilan.GetValueOrDefault(d.ChallengeId);
+                if (groupe.Key.Onglet == DefisPanelModel.Onglet.Training)
+                {
+                    // TRAINING (14/11) : ni record ni temps, le nombre de seances de cette borne seulement
+                    lignes.Add((new LigneDeDefi(d.Titre(langue), "", tentatives > 0 ? tentatives.ToString(System.Globalization.CultureInfo.InvariantCulture) : "",
+                        Marque: tentatives > 0 ? "tente" : ""), d));
+                    continue;
+                }
+
                 var marque = meilleur is not null ? "reussi" : tentatives > 0 ? "tente" : "";
                 var toi = MonTemps(d, bilan, tableaux, pseudo);
                 var record = LeRecord(d, tableaux) is { } r ? Chronometrage.Afficher(r.Valeur, d.Cadence) : SansTemps;
@@ -890,8 +929,16 @@ public sealed partial class DefisPanelService
         return resultat;
     }
 
+    /// <summary>L'onglet d'une epreuve : SPEEDRUNS pour un speedrun, TRAINING pour un point d'entrainement, CHALLENGES sinon.</summary>
+    internal static DefisPanelModel.Onglet OngletDe(Reglement d)
+        => d.Kind.StartsWith("speedrun_", StringComparison.Ordinal) ? DefisPanelModel.Onglet.Speedruns
+            : d.EstUnEntrainement ? DefisPanelModel.Onglet.Training
+            : DefisPanelModel.Onglet.Challenges;
+
     private static string Groupe(string kind) => kind switch
     {
+        // L'entrainement (Metal Slug 3, 14/11) : son propre onglet ; ses groupes sont les missions (« group » du reglement).
+        Reglement.KindEntrainement => "training",
         "speedrun_level" => "levels",
         "speedrun_boss" => "bosses",
         "speedrun_world" => "worlds",
@@ -917,6 +964,7 @@ public sealed partial class DefisPanelService
         "full" => "Full game",
         "boss_rush" => "Boss Rush",
         "modes" => "Game modes",
+        "training" => "Training",
         _ => "Challenges",
     };
 

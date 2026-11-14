@@ -111,6 +111,32 @@ public sealed class Reglement
     /// <summary>Un challenge (regles imposees), non certifie (decision du user du 03/11) ; un speedrun l'est.</summary>
     public bool EstUnChallenge => !Kind.StartsWith("speedrun", StringComparison.Ordinal);
 
+    /// <summary>Le genre d'un point d'entrainement (Metal Slug 3, 14/11).</summary>
+    public const string KindEntrainement = "training";
+
+    /// <summary>
+    /// UN POINT D'ENTRAINEMENT (« kind » training, Metal Slug 3, 14/11) : un etat de depart pour s'exercer sur une mission, une
+    /// zone ou un boss. Il a la famille d'un challenge (non certifie, .MEM de la couche des challenges), mais il n'est jamais
+    /// classe : aucun temps n'en part au site, il ne passe pas a l'antenne, il n'a ni record ni place au panneau (onglet
+    /// TRAINING). Son chrono reste, a titre d'information pour le joueur.
+    /// </summary>
+    public bool EstUnEntrainement => Kind == KindEntrainement;
+
+    /// <summary>
+    /// LE GROUPE DU PANNEAU (« group », facultatif, texte ou texte par langue, 14/11) : le surtitre sous lequel le panneau range
+    /// l'epreuve dans son onglet (« Mission 1 »), a la place du nom du genre. Vide : le groupe du genre.
+    /// </summary>
+    public IReadOnlyDictionary<string, string> Groupes { get; private init; } = new Dictionary<string, string>();
+
+    /// <summary>Le groupe dans cette langue, sinon en anglais, sinon le premier ; null sans groupe.</summary>
+    public string? Groupe(string? langue)
+    {
+        var court = (langue ?? "").Split('_', '-')[0].ToLowerInvariant();
+        return Groupes.TryGetValue(court, out var g) ? g
+            : Groupes.TryGetValue("en", out var en) ? en
+            : Groupes.Values.FirstOrDefault();
+    }
+
     /// <summary>
     /// Le .MEM que le lancement de ce defi fait charger : celui de la couche des challenges s'il en a un, sinon celui du World
     /// Scoring. Un speedrun reste toujours sur le .MEM certifie du jeu.
@@ -244,6 +270,7 @@ public sealed class Reglement
                 Ruleset = Texte(r, "ruleset") ?? "",
                 Titres = LireTitres(r),
                 Resumes = LireTitres(r, "summary"),
+                Groupes = LireTitres(r, "group"),
                 Etat = LireEtat(r),
                 Kind = Texte(r, "kind") ?? "",
                 SystemId = r.TryGetProperty("game", out var g) ? Texte(g, "system_id") ?? "" : "",

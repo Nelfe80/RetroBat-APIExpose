@@ -29,7 +29,7 @@ public sealed record BilanDEpreuve(Reglement Defi, string Jeu, string Joueur, st
 public sealed partial class DefisPanelService
 {
     /// <summary>Le mot central (decision P12) : il ne se traduit pas, comme les onglets.</summary>
-    internal static string MotDe(Reglement defi) => EstUnSpeedrun(defi) ? "SPEEDRUN" : "CHALLENGE";
+    internal static string MotDe(Reglement defi) => EstUnSpeedrun(defi) ? "SPEEDRUN" : defi.EstUnEntrainement ? "TRAINING" : "CHALLENGE";
 
     private const string LogoDesPages = "nelfeplay-challenges.png";
 
@@ -43,7 +43,8 @@ public sealed partial class DefisPanelService
         StylesDesEcrans.Course,
         MotDe(defi),
         jeu,
-        T("speedrun.page.ranked", "RANKED ATTEMPT"),
+        // l'entrainement (14/11) n'est pas une tentative classee
+        defi.EstUnEntrainement ? T("speedrun.page.training", "FREE PRACTICE") : T("speedrun.page.ranked", "RANKED ATTEMPT"),
         defi.Titre(langue),
         fanart,
         [],
@@ -67,7 +68,7 @@ public sealed partial class DefisPanelService
         _glypheAnnuler,
         SortiePossible: true,
         // Sans les fantomes : ils se choisissent dans le panneau, et un 7e champ ferait passer la carte sur le bouton HOLD.
-        Fiche: Fiche(defi, avecFantomes: false),
+        Fiche: defi.EstUnEntrainement ? FicheDEntrainement(defi) : Fiche(defi, avecFantomes: false),
         Logo: LogoDesPages,
         Progression: progression);
 

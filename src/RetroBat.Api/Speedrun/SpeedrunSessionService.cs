@@ -1086,7 +1086,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             // RETROARCH MUET SANS DECK (11/11) : le bandeau du haut de l'API dit le message, RetroArch ne le montrerait pas
             SessionSpeedrun? session;
             lock (_verrou) session = _sessionDuLancement;
-            if (NotificationsRetroArch.AuBandeau(session?.Reglement.EstUnChallenge == true ? "CHALLENGE" : "SPEEDRUN", texte)) return;
+            var genre = session?.Reglement is not { } r ? "SPEEDRUN" : r.EstUnEntrainement ? "TRAINING" : r.EstUnChallenge ? "CHALLENGE" : "SPEEDRUN";
+            if (NotificationsRetroArch.AuBandeau(genre, texte)) return;
             await _commandes.EnvoyerAsync("SHOW_MSG " + texte.ReplaceLineEndings(" ").Trim(), CancellationToken.None).ConfigureAwait(false);
         }
         catch (Exception ex)

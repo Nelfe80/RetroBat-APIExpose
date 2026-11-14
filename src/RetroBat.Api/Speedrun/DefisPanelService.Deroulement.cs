@@ -376,6 +376,10 @@ public sealed partial class DefisPanelService
     internal BilanDEpreuve BilanDe(Reglement defi, string jeu, string? fanart, BilanDeSession s, bool sale)
     {
         var joueur = Pseudo.Length > 0 ? Pseudo : T("speedrun.page.player", "PLAYER");
+        // L'ENTRAINEMENT (14/11) : rien n'est envoye, le bilan ne l'attend pas ; le meilleur temps de la seance reste affiche
+        if (defi.EstUnEntrainement)
+            return new BilanDEpreuve(defi, jeu, joueur, fanart, s.Meilleur is null ? IssueDuBilan.AucunTemps : IssueDuBilan.NonEnvoye, s.Meilleur,
+                s.Tentatives, s.Finies, Motif: T("speedrun.page.reason.training", "Training: nothing is ranked or sent"));
         if (s.Meilleur is not { } temps)
             return new BilanDEpreuve(defi, jeu, joueur, fanart, IssueDuBilan.AucunTemps, null, s.Tentatives, s.Finies, Motif: MotifDeFin(s.DernierEtat, s.DerniereCause));
         return new BilanDEpreuve(defi, jeu, joueur, fanart, sale ? IssueDuBilan.NonEnvoye : IssueDuBilan.EnVerification, temps, s.Tentatives, s.Finies,
