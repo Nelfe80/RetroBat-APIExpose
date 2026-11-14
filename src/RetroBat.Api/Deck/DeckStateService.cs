@@ -591,7 +591,8 @@ public sealed class DeckStateService : IHostedService, IDisposable
             _lancementPrepare = null;
             partie = new Partie
             {
-                LaunchId = Guid.NewGuid().ToString("N"),
+                // ECR-08 : l'identifiant du lancement annonce par ui.game.started, pour que deck.* et ui.game.* le partagent
+                LaunchId = FirstNonEmpty(Texte(e.Payload, "LaunchId"), jeu?.LaunchId, Guid.NewGuid().ToString("N")),
                 SystemId = systeme,
                 GamePath = chemin,
                 Rom = rom,

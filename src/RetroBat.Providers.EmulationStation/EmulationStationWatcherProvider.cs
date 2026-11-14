@@ -692,6 +692,8 @@ public class EmulationStationWatcherProvider : IProvider
         _mediaRuntimeState.SetLastFrontendEvent(eventName);
         var eventType = "ui.event";
         var eventPublished = false;
+        // L'identifiant du lancement (ECR-08) : pose au game-start, rendu au game-end ; null pour les autres evenements.
+        string? launchId = null;
 
         if (eventName == "game-selected")
         {
@@ -925,13 +927,15 @@ public class EmulationStationWatcherProvider : IProvider
                 var gameDetails = await FetchGameDetailsAsync(sysId, path);
                 var gameId = gameDetails?.Id ?? gameDetails?.Md5 ?? "";
 
+                launchId = LaunchIdentity.Open(path);
                 _context.Ui.Running = new GameReference 
                 { 
                     SystemId = sysId, 
                     GamePath = path, 
                     GameName = shortName,
                     GameId = gameId,
-                    Details = gameDetails
+                    Details = gameDetails,
+                    LaunchId = launchId
                 };
 
                 if (launch != null)
@@ -953,6 +957,7 @@ public class EmulationStationWatcherProvider : IProvider
         {
             var finishedGame = _context.Ui.Running ?? _context.Ui.Selected;
             eventType = "ui.game.ended";
+            launchId = LaunchIdentity.Close() ?? _context.Ui.Running?.LaunchId;
             await PublishRawFrontendEventAsync(
                 "ui.game.ended.raw",
                 eventName,
@@ -1006,7 +1011,10 @@ public class EmulationStationWatcherProvider : IProvider
         var envelope = new EventEnvelope
         {
             Type = eventType,
-            Payload = new { EventName = eventName, RawArgs = args, Context = _context.Ui }
+            // LaunchId seulement au depart et a la fin d'un jeu : les autres evenements gardent leur forme
+            Payload = launchId is null
+                ? new { EventName = eventName, RawArgs = args, Context = _context.Ui }
+                : (object)new { EventName = eventName, RawArgs = args, Context = _context.Ui, LaunchId = launchId }
         };
         
         if (!eventPublished)

@@ -43,6 +43,9 @@ channels:
       On connect, the last selection is replayed (ui.game.selected or
       ui.system.selected, else its .raw form; forgotten on ui.frontend.stopped).
       A running game is never replayed (ui.game.started would retrigger start effects).
+      ui.game.started and ui.game.ended carry `LaunchId` (32 hex chars): the same id
+      for a second start of the same game before its end (direct launch then ES hook),
+      a new one after the end; deck.game `LaunchId` is the same.
     messages:
       envelope:
         $ref: '#/components/messages/envelope'

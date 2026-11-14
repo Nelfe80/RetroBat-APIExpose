@@ -1414,13 +1414,14 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
 
         FinDuLancement(room);
+        jeu.LaunchId ??= LaunchIdentity.Open(jeu.GamePath);   // ECR-08
         _contexte.Ui.Running = jeu;
         _contexte.Ui.State = "playing";
         _panneau.EffacerPourLeJeu();
         await _bus.PublishAsync(new EventEnvelope
         {
             Type = "ui.game.started",
-            Payload = new { Source = "multiplayer", jeu.SystemId, jeu.GamePath, jeu.GameName, Direct = true },
+            Payload = new { Source = "multiplayer", jeu.SystemId, jeu.GamePath, jeu.GameName, Direct = true, jeu.LaunchId },
         }).ConfigureAwait(false);
         // LE DIRECT D'UNE PARTIE MULTIPLAYER (27/10) : l'hote voit toute la partie ; sa borne la filme et se porte candidate
         // au direct partage, avec les joueurs de chaque place (voir DirectPartageService).
@@ -1756,11 +1757,12 @@ public sealed class MultiplayerLaunchService : IHostedService
             _contexte.Ui.Running = null;
             _contexte.Ui.State = "browsing";
         }
+        if (partie.Jeu.LaunchId is { } lancement && LaunchIdentity.Current == lancement) LaunchIdentity.Close();
 
         await _bus.PublishAsync(new EventEnvelope
         {
             Type = "ui.game.ended",
-            Payload = new { Source = "multiplayer", partie.Jeu.SystemId, partie.Jeu.GamePath, partie.Jeu.GameName, Direct = true },
+            Payload = new { Source = "multiplayer", partie.Jeu.SystemId, partie.Jeu.GamePath, partie.Jeu.GameName, Direct = true, partie.Jeu.LaunchId },
         }).ConfigureAwait(false);
     }
 
