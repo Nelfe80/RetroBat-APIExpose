@@ -244,6 +244,60 @@ public sealed class NotificationsDesLancementsEsTests : IDisposable
         Assert.DoesNotContain(".retroarch.", _es.Texte());
     }
 
+    // ───────────── Option « NOTIFICATIONS EN WORLD SCORING » (14/11) ─────────────
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("ra_only")]
+    [InlineData("RA_ONLY")]
+    [InlineData("inconnue")]
+    public void Option_par_defaut_un_joueur_RetroAchievements_garde_ses_succes(string? option)
+    {
+        AvecRetroAchievements();
+        if (option is not null) _es.Poser(NotificationsWorldScoringPreference.EsKey, option);
+        Assert.True(Service("collection", emulateur: false).PoserAvantLeLancement(Script));
+        Assert.Null(_es.Valeur(Cle));
+        foreach (var (cle, valeur) in NotificationsRetroArch.AutresNotifications)
+            Assert.Equal(valeur, _es.Valeur(NotificationsDesLancementsEs.CleRetroArchDuJeu("fbneo", "19xx.zip", cle)));
+        if (option is not null) Assert.Equal(option, _es.Valeur(NotificationsWorldScoringPreference.EsKey)); // jamais reecrite
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("ra_only")]
+    [InlineData("none")]
+    public void Option_quelle_qu_elle_soit_un_joueur_sans_RetroAchievements_reste_tout_coupe(string? option)
+    {
+        if (option is not null) _es.Poser(NotificationsWorldScoringPreference.EsKey, option);
+        Assert.True(Service("collection", emulateur: false).PoserAvantLeLancement(Script));
+        Assert.Equal("0", _es.Valeur(Cle));
+        Assert.DoesNotContain("notification_show_", _es.Texte());
+    }
+
+    [Theory]
+    [InlineData("collection", "none")]
+    [InlineData("defi", "none")]
+    [InlineData("site", " NONE ")]
+    public async Task Option_tout_masquer_meme_avec_RetroAchievements_OnScreenMsg_0_et_aucune_cle_notification_show(string origine, string option)
+    {
+        AvecRetroAchievements();
+        _es.Poser(NotificationsWorldScoringPreference.EsKey, option);
+        var avant = _es.Texte();
+        var service = Service(origine, emulateur: false);
+        Assert.True(service.PoserAvantLeLancement(Script));
+
+        Assert.Equal("0", _es.Valeur(Cle));
+        Assert.DoesNotContain("notification_show_", _es.Texte());
+        Assert.False(File.Exists(NotificationsRetroArch.JournalDesSuccesDEssai!)); // retroarch.cfg pas touche
+        Assert.True(NotificationsRetroArch.Coupees);
+        Assert.Equal(option, _es.Valeur(NotificationsWorldScoringPreference.EsKey));
+
+        service.EmulateurLa = _ => true;
+        await service.RendreQuandLEmulateurParaitAsync(DateTime.Now, 1);
+        Assert.Equal(avant, _es.Texte());
+    }
+
     [Fact]
     public async Task Au_demarrage_de_l_API_apres_un_plantage_tout_est_rendu_es_settings_et_retroarch_cfg()
     {

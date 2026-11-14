@@ -1856,8 +1856,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             var manettes = progression is null ? Manettes() : progression.Mesurer(ProgressionDuLancement.Manettes, Manettes);
             progression?.Commencer(ProgressionDuLancement.Lanceur);
             // RETROACHIEVEMENTS VISIBLES EN WORLD SCORING (14/11) : un joueur qui a RetroAchievements garde ses succes, le reste des
-            // notifications de RetroArch est coupe ; un defi diffuse (netplay de l'hote) garde tout coupe.
-            var succes = netplay.Count == 0 && Infrastructure.NotificationsRetroArch.SuccesActifs(resolution.Systeme, chemin);
+            // notifications de RetroArch est coupe ; un defi diffuse (netplay de l'hote) garde tout coupe, comme l'option d'ES
+            // « NOTIFICATIONS EN WORLD SCORING » a « TOUT MASQUER » (14/11).
+            var succes = GarderLesSuccesDuDefi(netplay, resolution.Systeme, chemin);
             var arguments = ArgumentsDuDefiAvecLeDeck(manettes, resolution, chemin, deck.Arguments, netplay, succes);
             if (arguments is null) return false;
             if (succes) Infrastructure.NotificationsRetroArch.NoterAvantLesSucces(_logger);
@@ -1906,6 +1907,13 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             (succes
                 ? Infrastructure.NotificationsRetroArch.AjouterSaufSucces(argumentsDuDeck)
                 : Infrastructure.NotificationsRetroArch.Ajouter(argumentsDuDeck)).Concat(FonctionsNeutraliseesDuDefi).Concat(netplay));
+
+    /// <summary>
+    /// Le defi garde-t-il les succes de RetroAchievements ? Defi prive (pas de netplay de l'hote), joueur RetroAchievements et
+    /// option d'ES « NOTIFICATIONS EN WORLD SCORING » hors « TOUT MASQUER ». <paramref name="esSettings"/> : couture des essais.
+    /// </summary>
+    internal static bool GarderLesSuccesDuDefi(IReadOnlyList<string> netplay, string systeme, string chemin, string? esSettings = null)
+        => netplay.Count == 0 && Infrastructure.NotificationsRetroArch.GarderLesSucces(systeme, chemin, esSettings);
 
     /// <summary>Le classement du rang en direct : la regle de l'onglet regarde (hors 1CC MULTI), sinon la regle principale.</summary>
     private Deck.DeckRankBoard? ClassementDuRang()

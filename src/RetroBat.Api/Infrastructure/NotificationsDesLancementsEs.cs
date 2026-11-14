@@ -168,8 +168,9 @@ public sealed class NotificationsDesLancementsEs : IHostedService, IDisposable
             {
                 avant = Valeur(doc, cle);
                 avants = cles.Select(c => new Note(c.Cle, Valeur(doc, c.Cle))).ToList();
+                // L'option « TOUT MASQUER » (14/11) : meme avec RetroAchievements, OnScreenMsg = 0 comme sans.
                 succes = SuccesParLesClesDuJeu && NotificationsRetroArch.EstDuWorldScoring(origine)
-                         && NotificationsRetroArch.SuccesActifs(doc, systeme, fichier);
+                         && NotificationsRetroArch.GarderLesSucces(doc, systeme, fichier);
                 lue = true;
                 return false;
             });

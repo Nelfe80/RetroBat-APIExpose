@@ -33,6 +33,8 @@ namespace RetroBat.Api.Infrastructure;
 /// SAUF RETROACHIEVEMENTS EN WORLD SCORING (14/11) : un joueur qui a RetroAchievements garde ses succes (fenetre de
 /// deblocage, indicateurs de challenge, progression) ; tout le reste est coupe par <see cref="AutresNotifications"/> au lieu
 /// de -OnScreenMsg 0 (<see cref="AjouterSaufSucces"/>). Les messages de NelfePlay vont toujours au Deck ou au bandeau.
+/// L'option d'ES « NOTIFICATIONS EN WORLD SCORING » a « TOUT MASQUER » (<see cref="NotificationsWorldScoringPreference"/>,
+/// 14/11) ramene ces parties a -OnScreenMsg 0, succes compris (<see cref="GarderLesSucces(string, string?, string?)"/>).
 /// </summary>
 public static partial class NotificationsRetroArch
 {
@@ -182,6 +184,27 @@ public static partial class NotificationsRetroArch
         try
         {
             return SuccesActifs(System.Xml.Linq.XDocument.Load(esSettings ?? RetroBatPaths.EmulationStationSettingsPath), systeme, fichier);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Une partie du World Scoring garde-t-elle les succes ? Le joueur a RetroAchievements (<see cref="SuccesActifs(System.Xml.Linq.XDocument, string, string?)"/>)
+    /// et l'option « NOTIFICATIONS EN WORLD SCORING » ne veut pas tout masquer (<see cref="NotificationsWorldScoringPreference"/>,
+    /// 14/11). Faux : <c>OnScreenMsg = 0</c>, comme pour un joueur sans RetroAchievements. Pur.
+    /// </summary>
+    internal static bool GarderLesSucces(System.Xml.Linq.XDocument es, string systeme, string? fichier)
+        => !NotificationsWorldScoringPreference.ToutMasquer(es) && SuccesActifs(es, systeme, fichier);
+
+    /// <summary>Comme <see cref="GarderLesSucces(System.Xml.Linq.XDocument, string, string?)"/>, lu sur le disque. Faux si illisible.</summary>
+    public static bool GarderLesSucces(string systeme, string? fichier, string? esSettings = null)
+    {
+        try
+        {
+            return GarderLesSucces(System.Xml.Linq.XDocument.Load(esSettings ?? RetroBatPaths.EmulationStationSettingsPath), systeme, fichier);
         }
         catch (Exception)
         {
