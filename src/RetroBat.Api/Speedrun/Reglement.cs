@@ -488,12 +488,26 @@ public sealed class Reglement
     /// evenement de depart qui porte un « leaves ». Metal Slug 3 part quand le vehicule passe de 00 a 01 : ce 00 ne change pas
     /// depuis l'allumage, aucun evenement ne le dit, il se releve.
     /// </summary>
+    /// <remarks>
+    /// (14/11, Rambo d'Ash) L'adresse quittee vient EN PREMIER : les conditions d'armement ne bougent pas pendant le parachute,
+    /// elle si. Relevee en dernier sur une borne chargee (1,8 s pour les trois autres), elle valait deja 01 : depart perdu.
+    /// </remarks>
     public IEnumerable<long> AdressesDeDepart()
-        => Depart.Select(c => c.Adresse)
+        => ValeursQuitteesAuDepart().Select(q => q.Adresse)
+            .Concat(Depart.Select(c => c.Adresse))
             .Concat(new[] { Cale, Independant }.Where(c => c is not null).SelectMany(c => c!.Depart.Quand).Select(q => q.Adresse))
-            .Concat(new[] { Cale, Independant }.Where(c => c is not null).SelectMany(c => c!.Depart.Evenements)
-                .Where(e => e.Quitte is not null && e.Adresse is not null).Select(e => e.Adresse!.Value))
             .Distinct();
+
+    /// <summary>
+    /// Les valeurs que quitte un evenement de depart (« leaves »), avec leur adresse : la valeur d'AVANT que l'evaluateur doit
+    /// connaitre pour voir partir le chrono (Metal Slug 3 : 0x1002C1 a 00, soldat en l'air). Une par adresse, la premiere.
+    /// </summary>
+    public IReadOnlyList<(long Adresse, int Valeur)> ValeursQuitteesAuDepart()
+        => new[] { Cale, Independant }.Where(c => c is not null).SelectMany(c => c!.Depart.Evenements)
+            .Where(e => e.Quitte is not null && e.Adresse is not null)
+            .Select(e => (e.Adresse!.Value, e.Quitte!.Value))
+            .DistinctBy(q => q.Item1)
+            .ToList();
 
     /// <summary>Toutes les adresses citees, pour reconnaitre un capteur coupe par le wrapper.</summary>
     public IEnumerable<long> AdressesCitees()

@@ -412,6 +412,10 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
         if (!demande.Task.IsCompleted) _journal.LogWarning("Speedrun : aucune demande de chargement pour {Defi}, l'etat se charge seul.", reglement.ChallengeId);
         await EtatsDesDefis.ChargerAsync(_commandes, CancellationToken.None).ConfigureAwait(false);
+        // La valeur que quitte le depart se releve tout de suite, en parallele de l'attente qui suit (Rambo d'Ash, 14/11).
+        SessionSpeedrun? semee;
+        lock (_verrou) semee = _session;
+        var semis = semee is null ? Task.CompletedTask : SemerLeDepartAsync(semee);
 
         // Le chargement se lit un instant apres la commande : les images d'avant ne disent plus rien du jeu.
         await Task.Delay(500).ConfigureAwait(false);
@@ -425,6 +429,64 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
         _journal.LogInformation("Speedrun : etat de depart {Etat} charge pour {Defi}.", reglement.Etat?.Nom, reglement.ChallengeId);
         await _bus.PublishAsync(new EventEnvelope { Type = "speedrun.etat.charge", Payload = new { defi = reglement.ChallengeId } }).ConfigureAwait(false);
+        await semis.ConfigureAwait(false);
+    }
+
+    /// <summary>Le temps laisse au releve de la valeur que quitte le depart, apres le chargement de l'etat.</summary>
+    internal static readonly TimeSpan BudgetDuSemis = TimeSpan.FromSeconds(2);
+
+    /// <summary>
+    /// LE DEPART PERDU (14/11, Rambo d'Ash ; entrainement M3-04 sur la borne du user) : un depart « leaves 00 » a besoin de la
+    /// valeur d'AVANT, que rien ne dit (elle ne change pas depuis l'etat) et que la boucle des releves lisait en dernier, apres un
+    /// GET_STATUS et les conditions d'armement. Borne chargee : 1,8 s de releves, le soldat pose apres 2,4 s, et les signaux du
+    /// wrapper en retard d'une seconde sur la memoire lue : le releve rendait 01, l'atterrissage arrivait avec 01 pour valeur
+    /// d'avant, et le chrono ne partait jamais. Juste apres le chargement de l'etat, chaque adresse quittee se lit ici, en boucle
+    /// serree, jusqu'a valoir la valeur quittee (l'etat la porte : le soldat est en l'air) ; une autre valeur n'est pas retenue,
+    /// la boucle des releves garde la main.
+    /// </summary>
+    private async Task SemerLeDepartAsync(SessionSpeedrun session)
+    {
+        var restantes = session.Reglement.ValeursQuitteesAuDepart().ToList();
+        if (restantes.Count == 0) return;
+        var limite = DateTime.UtcNow + BudgetDuSemis;
+        var lues = new Dictionary<long, int>();
+        try
+        {
+            while (restantes.Count > 0 && DateTime.UtcNow < limite)
+            {
+                foreach (var (adresse, quittee) in restantes.ToList())
+                {
+                    var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {session.Reglement.OffsetDansLeCoeur(adresse):x} 1", CancellationToken.None)
+                        .ConfigureAwait(false);
+                    var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (morceaux is not { Length: >= 3 } || morceaux[0] != "READ_CORE_RAM"
+                        || !int.TryParse(morceaux[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var valeur)) continue;
+                    lues[adresse] = valeur;
+                    if (valeur != quittee) continue;
+                    restantes.Remove((adresse, quittee));
+                    lock (_verrou)
+                    {
+                        if (!ReferenceEquals(_session, session)) return;
+                        _derniersReleves[adresse] = valeur;
+                        session.Relever(adresse, valeur);
+                        Publier();
+                    }
+                }
+
+                if (restantes.Count > 0) await Task.Delay(40).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            _journal.LogDebug(ex, "Speedrun : releve du depart interrompu.");
+            return;
+        }
+
+        foreach (var (adresse, quittee) in restantes)
+        {
+            _journal.LogWarning("Speedrun : {Adresse} ne vaut pas {Quittee} apres le chargement de l'etat ({Lue}) : le depart de {Defi} risque de ne pas etre vu.",
+                Hex.Ecrire(adresse), Hex.Ecrire(quittee), lues.TryGetValue(adresse, out var l) ? Hex.Ecrire(l) : "sans reponse", session.DefiId);
+        }
     }
 
     /// <summary>Le prochain jeu qui demarre sur cette ROM ouvre une session de ce defi.</summary>
@@ -523,7 +585,13 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         }
 
         if (surEtat is not null && raison is null)
+        {
             await _bus.PublishAsync(new EventEnvelope { Type = "speedrun.etat.charge", Payload = new { defi = surEtat.ChallengeId } }).ConfigureAwait(false);
+            // La tentative neuve ne connait rien : la valeur que quitte son depart se releve d'abord (Rambo d'Ash, 14/11).
+            SessionSpeedrun? semee;
+            lock (_verrou) semee = _session;
+            if (semee is not null) _ = Task.Run(() => SemerLeDepartAsync(semee));
+        }
         _journal.LogInformation(raison is null
             ? surEtat is null ? "Speedrun : jeu replace au depart (RESET)." : "Speedrun : etat de depart recharge (relance)."
             : "Speedrun : relance refusee ({Raison}).", raison);
