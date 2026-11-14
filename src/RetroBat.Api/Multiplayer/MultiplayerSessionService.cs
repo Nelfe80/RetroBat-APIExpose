@@ -43,9 +43,8 @@ public sealed class MultiplayerSessionService : BackgroundService
     internal static readonly TimeSpan AbsenceAvantLeRepos = TimeSpan.FromMinutes(5);
 
     /// <summary>
-    /// UNE PARTIE EN SOLO, sans salle ni invitation : un sondage au depart (le site sait le joueur en partie et met
-    /// l'echeance de ses invitations en pause), puis un par minute seulement, pour garder le message discret d'une
-    /// invitation recue en partie (decision du user du 28/10) ; un sondage des la fin de la partie.
+    /// UNE PARTIE EN SOLO, sans salle : AUCUN sondage tant qu'elle dure (decision du user du 14/11, qui remplace le
+    /// message d'invitation en partie du 28/10) ; la boucle ne fait que patienter a ce rythme, et sonde des la fin.
     /// </summary>
     internal static readonly TimeSpan PeriodeEnPartieSolo = TimeSpan.FromSeconds(60);
 
@@ -82,8 +81,6 @@ public sealed class MultiplayerSessionService : BackgroundService
     /// <summary>Les sondages rates d'affilee : le suivant recule.</summary>
     private int _echecs;
 
-    /// <summary>L'heure du dernier sondage parti pendant une partie en solo, ou null hors partie.</summary>
-    private DateTime? _sondeEnPartieUtc;
 
     public MultiplayerSessionService(
         MultiplayerClient client,
@@ -237,19 +234,16 @@ public sealed class MultiplayerSessionService : BackgroundService
                 var solo = false;
                 if (Active)
                 {
-                    // Une partie en solo : un sondage au depart, puis un par minute (Cadence). Le tic local qui suit un
-                    // reveil (fin de partie, geste) ne fait pas partir un sondage de plus tant que la partie dure.
                     solo = Etat.Rooms.Count == 0 && PartieEnCours();
-                    var maintenant = DateTime.UtcNow;
-                    if (!solo || _sondeEnPartieUtc is not { } sonde || maintenant - sonde >= PeriodeEnPartieSolo - TimeSpan.FromSeconds(1))
+                    // JAMAIS DE SONDAGE PENDANT UNE PARTIE EN SOLO (decision du user du 14/11, remplace celle du 28/10) :
+                    // le tic continue, mais rien ne part au site avant la fin de la partie, qui reveille la boucle.
+                    if (!solo)
                     {
                         aVide = aVide || await RepartirAVideAsync(stoppingToken).ConfigureAwait(false);
                         if (aVide)
                         {
                             await SonderAsync(stoppingToken).ConfigureAwait(false);
                         }
-
-                        _sondeEnPartieUtc = solo ? maintenant : null;
                     }
                 }
 

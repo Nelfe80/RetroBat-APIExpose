@@ -39,9 +39,11 @@ public static class GardeDeLHote
 
     public static Mode LireMode(string? valeur) => (valeur ?? string.Empty).Trim().ToLowerInvariant() switch
     {
-        "log" or "journal" or "observe" => Mode.Journaliser,
+        "block" or "bloquer" or "on" or "true" or "1" => Mode.Bloquer,
         "off" or "none" or "false" or "0" => Mode.Arret,
-        _ => Mode.Bloquer,
+        // PAR DEFAUT, JOURNAL SEULEMENT (decision du user du 14/11, 1.9.183) : on relit les journaux des bornes avant
+        // de passer au blocage.
+        _ => Mode.Journaliser,
     };
 
     /// <summary>Noms acceptes : machine, ecoute configuree, liste de la configuration.</summary>

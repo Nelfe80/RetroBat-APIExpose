@@ -843,7 +843,7 @@ if (cabinetApiKey.Length == 0)
 // En tete de chaine, pour toutes les routes (/api, /ws, /swagger, /nelfeplay,
 // /dorequest.php). Detail dans GardeDeLHote. Seules les connexions de la boucle
 // locale sont controlees : celles du reseau passent par la cle de borne.
-// Security:HostCheck = "log" journalise sans refuser, "off" coupe la garde ;
+// Security:HostCheck : par defaut (ou "log") journalise sans refuser (1.9.183), "block" refuse, "off" coupe la garde ;
 // Security:AllowedHosts ajoute des noms (separes par des virgules).
 {
     var modeHote = RetroBat.Api.Infrastructure.GardeDeLHote.LireMode(app.Configuration["Security:HostCheck"]);

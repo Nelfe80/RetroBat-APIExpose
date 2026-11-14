@@ -62,9 +62,11 @@ public class GardeDeLHoteTests
     }
 
     [Theory]
-    [InlineData(null, GardeDeLHote.Mode.Bloquer)]
-    [InlineData("", GardeDeLHote.Mode.Bloquer)]
-    [InlineData("enforce", GardeDeLHote.Mode.Bloquer)]
+    [InlineData(null, GardeDeLHote.Mode.Journaliser)]
+    [InlineData("", GardeDeLHote.Mode.Journaliser)]
+    [InlineData("inconnu", GardeDeLHote.Mode.Journaliser)]
+    [InlineData("block", GardeDeLHote.Mode.Bloquer)]
+    [InlineData("on", GardeDeLHote.Mode.Bloquer)]
     [InlineData("log", GardeDeLHote.Mode.Journaliser)]
     [InlineData("LOG", GardeDeLHote.Mode.Journaliser)]
     [InlineData("off", GardeDeLHote.Mode.Arret)]

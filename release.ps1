@@ -146,6 +146,9 @@ $ex = @(
     "-x!$name\.git", "-x!$name\.gitignore", "-x!$name\.github",
     # .gitattributes (06/11, *.MEM -text) : arrive avec cette branche ; le controle anti-fuite (\.git) l'arreterait.
     "-x!$name\.gitattributes",
+    # Le vieux runtimeconfig.json du 12/09 (GC serveur) : l'exe en un seul fichier porte le sien, celui-ci ne faisait que
+    # tromper qui le lisait (decision du user du 14/11, 1.9.183).
+    "-x!$name\RetroBat.Api.runtimeconfig.json",
     "-x!$name\.env", "-x!$name\events.ini",
     "-x!$name\.log", "-x!$name\.temp", "-x!$name\.cache",
     "-x!$name\.archive", "-x!$name\.versioning",
@@ -348,7 +351,7 @@ $autorises = @(
     # Le verificateur de score (APIExposeOCR), construit depuis son propre depot et
     # depose ici par APIExposeOCR\tools\release.ps1, comme mem-explorer.
     'tools/score-verifier/',
-    'RetroBat.Api.exe', 'RetroBat.Api.deps.json', 'RetroBat.Api.runtimeconfig.json',
+    'RetroBat.Api.exe', 'RetroBat.Api.deps.json',
     'RetroBat.Api.xml', 'web.config', 'tools/listen_api_ws.README.md',
     # Le self-updater, a la racine comme l'API (voir src/RetroBat.Api.Update).
     'RetroBat.Api.Update.exe',
