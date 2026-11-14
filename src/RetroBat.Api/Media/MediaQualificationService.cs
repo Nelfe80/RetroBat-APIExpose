@@ -192,6 +192,70 @@ public sealed class MediaQualificationService
         return false;
     }
 
+    // API-7 (14/11) - the folders a scraper (Skraper, RetroBat) files ONE kind of media in, one file per
+    // game named after the rom: roms/<system>/media/fanart/<rom>.png, media/box3d/<rom>.png... The
+    // folder names the kind; the generic gamelist slot (<image>, <thumbnail>) that points at the file
+    // does not. Mixed legacy folders (images, downloaded_images, thumbnails) are deliberately ABSENT:
+    // they hold every kind and only the file name can tell.
+    private static readonly IReadOnlyDictionary<string, string> TypeFolderKinds =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["box3d"] = MediaKinds.Box3d, ["box-3d"] = MediaKinds.Box3d, ["3dboxes"] = MediaKinds.Box3d,
+            ["box2d"] = MediaKinds.BoxFront, ["box-2d"] = MediaKinds.BoxFront, ["boxfront"] = MediaKinds.BoxFront,
+            ["box-front"] = MediaKinds.BoxFront, ["covers"] = MediaKinds.BoxFront, ["boxart"] = MediaKinds.BoxFront,
+            ["boxback"] = MediaKinds.BoxBack, ["box-back"] = MediaKinds.BoxBack, ["backcovers"] = MediaKinds.BoxBack,
+            ["boxside"] = MediaKinds.BoxSide, ["box-side"] = MediaKinds.BoxSide,
+            ["boxtexture"] = MediaKinds.BoxTexture, ["box-texture"] = MediaKinds.BoxTexture,
+            ["fanart"] = MediaKinds.Fanart, ["fanarts"] = MediaKinds.Fanart,
+            ["screenshot"] = MediaKinds.Thumbnail, ["screenshots"] = MediaKinds.Thumbnail, ["ss"] = MediaKinds.Thumbnail,
+            ["snap"] = MediaKinds.Thumbnail, ["snaps"] = MediaKinds.Thumbnail,
+            ["titlescreen"] = MediaKinds.Image, ["titlescreens"] = MediaKinds.Image, ["sstitle"] = MediaKinds.Image,
+            ["screenshottitle"] = MediaKinds.Image, ["titleshot"] = MediaKinds.Image, ["titles"] = MediaKinds.Image,
+            ["wheel"] = MediaKinds.Wheel, ["wheels"] = MediaKinds.Wheel, ["logo"] = MediaKinds.Wheel, ["logos"] = MediaKinds.Wheel,
+            ["wheelcarbon"] = MediaKinds.WheelCarbon, ["wheel-carbon"] = MediaKinds.WheelCarbon,
+            ["wheelsteel"] = MediaKinds.WheelSteel, ["wheel-steel"] = MediaKinds.WheelSteel,
+            ["marquee"] = MediaKinds.Marquee, ["marquees"] = MediaKinds.Marquee,
+            ["screenmarquee"] = MediaKinds.ScreenMarquee, ["screenmarqueesmall"] = MediaKinds.ScreenMarqueeSmall,
+            ["steamgrid"] = MediaKinds.SteamGrid,
+            ["mix"] = MediaKinds.MixRbv2, ["mixrbv2"] = MediaKinds.MixRbv2, ["miximage"] = MediaKinds.MixRbv2,
+            ["miximages"] = MediaKinds.MixRbv2, ["mixrbv1"] = MediaKinds.MixRbv1,
+            ["cartridge"] = MediaKinds.Cartridge, ["cartridges"] = MediaKinds.Cartridge, ["support"] = MediaKinds.Cartridge,
+            ["support2d"] = MediaKinds.Cartridge, ["label"] = MediaKinds.Label, ["supporttexture"] = MediaKinds.Label,
+            ["flyer"] = MediaKinds.Flyer, ["flyers"] = MediaKinds.Flyer,
+            ["figurine"] = MediaKinds.Figurine, ["figurines"] = MediaKinds.Figurine,
+            ["bezel"] = MediaKinds.Bezel, ["bezels"] = MediaKinds.Bezel,
+            ["map"] = MediaKinds.Map, ["maps"] = MediaKinds.Map,
+            ["manual"] = MediaKinds.Manual, ["manuals"] = MediaKinds.Manual,
+            ["magazine"] = MediaKinds.Magazine, ["magazines"] = MediaKinds.Magazine,
+            ["video"] = MediaKinds.Video, ["videos"] = MediaKinds.Video,
+            ["videonormalized"] = MediaKinds.VideoNormalized, ["video-normalized"] = MediaKinds.VideoNormalized,
+        };
+
+    /// <summary>The type folders (API-7), for a caller that looks for a game's files in them.</summary>
+    public static IEnumerable<string> TypeFolderNames => TypeFolderKinds.Keys;
+
+    /// <summary>
+    /// The KIND a type folder names (API-7): <c>media/box3d/&lt;rom&gt;.png</c> is a 3D box whatever gamelist slot
+    /// points at it. The extension must suit the kind (a video kind wants a video file, a manual a PDF, every other kind
+    /// an image). False for a mixed folder (images, downloaded_images) or an unknown one.
+    /// </summary>
+    public static bool TryQualifyByTypeFolder(string? folderName, string? extension, out string kind)
+    {
+        kind = string.Empty;
+        if (string.IsNullOrWhiteSpace(folderName) || !TypeFolderKinds.TryGetValue(folderName.Trim(), out var found)) return false;
+        var ext = extension ?? string.Empty;
+        var suits = found switch
+        {
+            MediaKinds.Video or MediaKinds.VideoNormalized => VideoExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase),
+            MediaKinds.Manual or MediaKinds.Magazine => ext.Equals(".pdf", StringComparison.OrdinalIgnoreCase)
+                || ImageExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase),
+            _ => ImageExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase),
+        };
+        if (!suits) return false;
+        kind = found;
+        return true;
+    }
+
     /// <summary>The KIND a file name suffix implies, IGNORING the folder - for a gamelist medium
     /// that can live in any folder (downloaded_images, media, …) where the tag is the authority and
     /// the file name is only a secondary signal. Shares the same suffix table (and its precedence)

@@ -31,13 +31,15 @@ public static class LancementDirect
             SystemId = systeme,
             GamePath = romPath,
             GameName = Path.GetFileNameWithoutExtension(romPath),
+            // ECR-08 : le meme identifiant que le crochet d'ES donnera s'il annonce ce jeu ensuite
+            LaunchId = LaunchIdentity.Open(romPath),
         };
         contexte.Ui.Running = jeu;
         contexte.Ui.State = "playing";
         _ = bus.PublishAsync(new EventEnvelope
         {
             Type = "ui.game.started",
-            Payload = new { Source = "commands.launch", SystemId = systeme, GamePath = romPath, GameName = jeu.GameName, Direct = true },
+            Payload = new { Source = "commands.launch", SystemId = systeme, GamePath = romPath, GameName = jeu.GameName, Direct = true, jeu.LaunchId },
         });
         _ = Task.Run(async () =>
         {
@@ -73,12 +75,14 @@ public static class LancementDirect
                 contexte.Ui.Running = null;
                 contexte.Ui.State = "browsing";
             }
+            // ferme seulement si c'est encore ce lancement (un autre jeu a pu partir entre-temps)
+            if (LaunchIdentity.Current == jeu.LaunchId) LaunchIdentity.Close();
             try
             {
                 await bus.PublishAsync(new EventEnvelope
                 {
                     Type = "ui.game.ended",
-                    Payload = new { Source = "commands.launch", SystemId = systeme, GamePath = romPath, GameName = jeu.GameName, Direct = true, EndedBy = raison },
+                    Payload = new { Source = "commands.launch", SystemId = systeme, GamePath = romPath, GameName = jeu.GameName, Direct = true, EndedBy = raison, jeu.LaunchId },
                 }).ConfigureAwait(false);
             }
             catch { /* rien a faire de plus */ }

@@ -30,6 +30,29 @@ public class WebSocketConnectionManager
     private string? _retainedSpeedrunJson;
     private string? _retainedRetroAchievementsSessionJson;
     private string? _retainedRetroAchievementsCatalogJson;
+    private string? _retainedMultiplayerStateJson;
+
+    /// <summary>
+    /// LE DERNIER ETAT DES SURFACES ET DE LA SELECTION (API-3, 14/11), par case : le marquee, le topper, la carte
+    /// d'instructions et l'ecran gardent leur dernier instantane ; le flux frontend sa derniere selection. Un plugin qui se
+    /// (re)connecte affiche aussitot le jeu ou le systeme en cours au lieu d'attendre la selection suivante. Une case ne
+    /// recule jamais : un instantane d'une sequence plus ancienne que celui garde ne le remplace pas.
+    /// </summary>
+    private readonly object _retainedSurfacesLock = new();
+    private readonly Dictionary<string, (string Json, long Sequence, long Order)> _retainedSurfaces = new(StringComparer.Ordinal);
+    private long _retainedSurfacesOrder;
+
+    /// <summary>La case de rejeu d'un type (API-3), ou null s'il ne se garde pas.</summary>
+    internal static string? RetainedSurfaceSlot(string? type) => (type ?? string.Empty).Trim().ToLowerInvariant() switch
+    {
+        "marquee.snapshot" or "marquee.snapshot.updated" => "marquee",
+        "topper.snapshot" => "topper",
+        "instruction-card.snapshot" => "instruction-card",
+        "screen.snapshot" => "screen",
+        "ui.game.selected" or "ui.system.selected" => "frontend.selection",
+        "ui.game.selected.raw" or "ui.system.selected.raw" => "frontend.selection.raw",
+        _ => null,
+    };
 
     public WebSocketConnectionManager(IOptionsMonitor<ApiExposeOptions> options)
     {
@@ -48,6 +71,16 @@ public class WebSocketConnectionManager
 
     /// <summary>Une connexion s'est fermee : ce qu'elle avait demande (un cadre) part avec elle.</summary>
     public Action<object>? DeckConnectionClosed { get; set; }
+
+    /// <summary>
+    /// Le sens des signaux du lancement en cours (<c>deck.semantics</c>), pose au demarrage par le service du Deck : envoye
+    /// a la connexion des flux <c>ingame</c> et <c>arcade</c> (API-6), qui portent les signaux du .MEM. Null hors partie.
+    /// </summary>
+    public Func<string?>? DeckSemanticsJson { get; set; }
+
+    /// <summary>Les flux qui recoivent le sens des signaux a la connexion (ceux qui portent les signaux du .MEM).</summary>
+    private static bool RecoitLeSensDesSignaux(string stream)
+        => string.Equals(stream, "ingame", StringComparison.OrdinalIgnoreCase) || string.Equals(stream, "arcade", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Les flux qui recoivent l'instantane du Deck a la connexion.</summary>
     private static bool RecoitLInstantaneDuDeck(string stream)
@@ -124,6 +157,16 @@ public class WebSocketConnectionManager
                 if (!string.IsNullOrWhiteSpace(json))
                 {
                     retainedMessages = new[] { json! }.Concat(retainedMessages).ToArray();
+                }
+            }
+
+            if (RecoitLeSensDesSignaux(normalizedStream) && DeckSemanticsJson is { } sens)
+            {
+                string? json = null;
+                try { json = sens(); } catch (Exception) { /* le sens manque, la connexion reste */ }
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    retainedMessages = retainedMessages.Concat(new[] { json! }).ToArray();
                 }
             }
         }
@@ -488,6 +531,33 @@ public class WebSocketConnectionManager
             return One(_retainedSpeedrunJson);
         }
 
+        if (string.Equals(stream, "multiplayer", StringComparison.OrdinalIgnoreCase))
+        {
+            return One(_retainedMultiplayerStateJson);
+        }
+
+        if (stream is "marquee" or "topper" or "instruction-card" or "screen")
+        {
+            lock (_retainedSurfacesLock)
+            {
+                return _retainedSurfaces.TryGetValue(stream, out var surface) ? new[] { surface.Json } : Array.Empty<string>();
+            }
+        }
+
+        if (string.Equals(stream, "frontend", StringComparison.OrdinalIgnoreCase))
+        {
+            // La selection enrichie suffit ; la brute ne repart que si elle est plus recente (enrichie pas encore venue).
+            lock (_retainedSurfacesLock)
+            {
+                var enrichie = _retainedSurfaces.TryGetValue("frontend.selection", out var e) ? e : default;
+                var brute = _retainedSurfaces.TryGetValue("frontend.selection.raw", out var r) ? r : default;
+                if (enrichie.Json is null) return One(brute.Json);
+                return brute.Json is not null && brute.Order > enrichie.Order
+                    ? new[] { brute.Json }
+                    : new[] { enrichie.Json };
+            }
+        }
+
         if (string.Equals(stream, "retroachievements", StringComparison.OrdinalIgnoreCase))
         {
             return new[] { _retainedRetroAchievementsCatalogJson, _retainedRetroAchievementsSessionJson }
@@ -551,10 +621,42 @@ public class WebSocketConnectionManager
             _retainedRetroAchievementsSessionJson = null;
         }
 
+        if (message is EventEnvelope surfaceEnvelope)
+        {
+            RetainSurface(surfaceEnvelope, json);
+        }
+
+        // L'etat des gamerooms (API-2) : un ecran d'attente qui se (re)connecte sait aussitot qui est la.
+        if (message is EventEnvelope multiplayerEnvelope &&
+            string.Equals(multiplayerEnvelope.Type, "multiplayer.state", StringComparison.OrdinalIgnoreCase))
+        {
+            _retainedMultiplayerStateJson = json;
+        }
+
         if (message is EventEnvelope raCatalogEnvelope &&
             string.Equals(raCatalogEnvelope.Type, "retroachievements.catalog.updated", StringComparison.OrdinalIgnoreCase))
         {
             _retainedRetroAchievementsCatalogJson = json;
+        }
+    }
+
+    private void RetainSurface(EventEnvelope envelope, string json)
+    {
+        var type = (envelope.Type ?? string.Empty).Trim().ToLowerInvariant();
+        lock (_retainedSurfacesLock)
+        {
+            // ES s'est arrete : sa derniere selection ne dit plus rien
+            if (type == "ui.frontend.stopped")
+            {
+                _retainedSurfaces.Remove("frontend.selection");
+                _retainedSurfaces.Remove("frontend.selection.raw");
+                return;
+            }
+
+            if (RetainedSurfaceSlot(type) is not { } slot) return;
+            var sequence = ReadLongProperty(envelope.Payload, "Sequence");
+            if (sequence > 0 && _retainedSurfaces.TryGetValue(slot, out var garde) && garde.Sequence > sequence) return;
+            _retainedSurfaces[slot] = (json, sequence, ++_retainedSurfacesOrder);
         }
     }
 
@@ -729,8 +831,9 @@ public class WebSocketConnectionManager
             ["instruction-card"] = ["instruction-card."],
             ["screen"] = ["screen."],
             ["panel"] = ["panel.", "theme."],
-            ["ingame"] = ["ingame.", "retroarch.", "wrapper."],
-            ["arcade"] = ["arcade.", "mame.", "fbneo.", "outputs."],
+            // deck.semantics (API-6) : le sens des signaux du .MEM voyage avec eux, pour tout jeu, Deck ou non
+            ["ingame"] = ["ingame.", "retroarch.", "wrapper.", "deck.semantics"],
+            ["arcade"] = ["arcade.", "mame.", "fbneo.", "outputs.", "deck.semantics"],
             ["score"] = ["score.live."],
             ["timer"] = ["timer.live."],
             ["speedrun"] = ["speedrun."],
@@ -740,6 +843,9 @@ public class WebSocketConnectionManager
             ["roms"] = ["roms.", "rom-pack.", "romset."],
             ["system"] = ["startup.", "health.", "version.", "hub.", "config.", "maintenance.", "rules.", "notifications."],
             ["control"] = ["commands.", "intent.", "es-control."],
+            // API-2 (14/11) : ces evenements ne sortaient que sur le flux global /ws
+            ["scoring"] = ["scoring."],
+            ["multiplayer"] = ["multiplayer.", "netplay."],
             // Le PlayerDeck : ses messages, plus ce qu'il affiche (score, signaux du .MEM, entrees, debut et fin de partie)
             ["deck"] = ["deck.", "score.live.", "retroarch.memory.", "ingame.memory.", "panel.input.", "ui.game.started", "ui.game.ended"]
         };
@@ -755,7 +861,15 @@ public class WebSocketConnectionManager
             ["score"] = ["score.live.changed"],
             ["timer"] = ["timer.live.changed"],
             ["speedrun"] = ["speedrun.session"],
+            // API-3 (14/11) : le dernier instantane de chaque surface, et la derniere selection d'ES
+            ["marquee"] = ["marquee.snapshot", "marquee.snapshot.updated"],
+            ["topper"] = ["topper.snapshot"],
+            ["instruction-card"] = ["instruction-card.snapshot"],
+            ["screen"] = ["screen.snapshot"],
+            ["frontend"] = ["ui.game.selected", "ui.system.selected", "ui.game.selected.raw", "ui.system.selected.raw"],
             ["retroachievements"] = ["retroachievements.catalog.updated", "retroachievements.session.updated"],
+            // l'etat des gamerooms, publie a chaque changement (sans mots de passe)
+            ["multiplayer"] = ["multiplayer.state"],
             // construit a la connexion (aussi sur le flux global /ws), et sur demande
             ["deck"] = ["deck.snapshot"]
         };

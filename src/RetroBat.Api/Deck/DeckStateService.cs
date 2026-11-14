@@ -244,16 +244,94 @@ public sealed class DeckStateService : IHostedService, IDisposable
             {
                 partie.MemRom = signal.Rom;
                 partie.DefinitionFile = signal.DefinitionFile;
-                if (!partie.SemantiqueCherchee && !string.IsNullOrEmpty(partie.DefinitionFile))
+                // Le .MEM que le wrapper a vraiment charge fait foi : relu seulement s'il n'est pas celui du prechargement.
+                if (!string.IsNullOrEmpty(partie.DefinitionFile) && !MemeFichier(partie.SemantiqueDe, partie.DefinitionFile))
                 {
-                    partie.SemantiqueCherchee = true;
+                    partie.SemantiqueDe = partie.DefinitionFile;
                     aChercher = partie;
                 }
             }
             _revision++;
         }
 
-        if (aChercher is not null) ChargerLaSemantique(aChercher);
+        if (aChercher is not null) ChargerLaSemantique(aChercher, aChercher.DefinitionFile!, aChercher.MemRom);
+    }
+
+    /// <summary>
+    /// LE .MEM D'UN JEU, SANS LE LANCER (API-6, 14/11) : (rom brute, systeme) donne le fichier de definition que le wrapper
+    /// chargerait et le nom du jeu qu'il porte, ou (null, null). Pose au demarrage (Program.cs) avec la resolution du wrapper
+    /// (alias.json, couches, repli arcade). Null : pas de prechargement, le sens arrive avec le premier signal, comme avant.
+    /// </summary>
+    public Func<string, string, (string? DefinitionFile, string? MemRom)>? DefinitionDuJeu { get; set; }
+
+    /// <summary>
+    /// LE SENS DES SIGNAUX POUR TOUT JEU (API-6, 14/11). Le sens n'arrivait qu'avec le premier signal du wrapper : un .MEM
+    /// dont les lignes ne parlent qu'au changement laissait les instruments vides tant que rien ne bougeait. Il se lit
+    /// maintenant des le depart, avec le .MEM que le wrapper chargerait ; le premier signal le relit seulement s'il nomme un
+    /// autre .MEM (couche .user ou .contest). Lecture seule, rien ici ne touche au score ni a l'empreinte.
+    /// </summary>
+    private void Precharger(Partie partie)
+    {
+        if (DefinitionDuJeu is not { } resoudre) return;
+        (string? DefinitionFile, string? MemRom) def;
+        try
+        {
+            def = resoudre(partie.Rom, partie.SystemId);
+        }
+        catch (Exception ex)
+        {
+            _journal?.LogDebug(ex, "Deck : .MEM de {Rom} introuvable au depart, sens attendu du premier signal.", partie.Rom);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(def.DefinitionFile)) return;
+        lock (_verrou)
+        {
+            if (!ReferenceEquals(_partie, partie) || partie.Etat == "ended" || partie.SemantiqueDe is not null) return;
+            partie.SemantiqueDe = def.DefinitionFile;
+        }
+
+        ChargerLaSemantique(partie, def.DefinitionFile, def.MemRom);
+    }
+
+    /// <summary>Le sens des signaux du lancement en cours ; null hors d'une partie ou tant qu'il n'est pas lu.</summary>
+    public DeckSemantics? SemantiqueCourante()
+    {
+        lock (_verrou) return _partie is { Etat: not "ended" } p ? p.Semantique : null;
+    }
+
+    /// <summary>
+    /// Le sens des signaux d'un jeu qui ne tourne pas forcement (selectionne dans ES, choisi par un plugin) : le .SMEM du .MEM
+    /// que le wrapper chargerait. Null quand aucun .MEM n'est connu pour ce jeu ; Status « absent » sans .SMEM. LaunchId vide.
+    /// </summary>
+    public DeckSemantics? SemantiqueDuJeu(string systemId, string rom)
+    {
+        if (DefinitionDuJeu is not { } resoudre || string.IsNullOrWhiteSpace(systemId) || string.IsNullOrWhiteSpace(rom)) return null;
+        var def = resoudre(rom.Trim(), systemId.Trim());
+        if (string.IsNullOrWhiteSpace(def.DefinitionFile)) return null;
+        return Smem.Semantique("", systemId.Trim(), NomDeRom(rom), def.MemRom, def.DefinitionFile, RetroBatPaths.RamResourcesRoot, 0);
+    }
+
+    /// <summary>
+    /// Le dernier <c>deck.semantics</c> du lancement en cours, en enveloppe JSON, pour un client qui se connecte aux flux
+    /// <c>ingame</c> ou <c>arcade</c> (API-6) ; null hors d'une partie ou tant qu'il n'est pas lu.
+    /// </summary>
+    public string? SemantiqueJson()
+        => SemantiqueCourante() is { } s
+            ? JsonSerializer.Serialize(new EventEnvelope { Type = "deck.semantics", Payload = s }, Json)
+            : null;
+
+    private static bool MemeFichier(string? a, string? b)
+    {
+        if (a is null || b is null) return false;
+        try
+        {
+            return string.Equals(Path.GetFullPath(a), Path.GetFullPath(b), StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
+        }
     }
 
     /// <summary>Ce que la lecture des valeurs de depart doit savoir du lancement en cours ; null hors d'une partie.</summary>
@@ -326,13 +404,15 @@ public sealed class DeckStateService : IHostedService, IDisposable
     /// Le sens des signaux (.SMEM) du .MEM que le wrapper a charge, publie en deck.semantics une fois par lancement,
     /// des que le premier signal nomme son fichier de definition. Lecture seule : rien ici ne touche au score.
     /// </summary>
-    private void ChargerLaSemantique(Partie partie)
+    private void ChargerLaSemantique(Partie partie, string definitionFile, string? memRom)
     {
-        var semantique = Smem.Semantique(partie.LaunchId, partie.SystemId, partie.Rom, partie.MemRom, partie.DefinitionFile,
+        var semantique = Smem.Semantique(partie.LaunchId, partie.SystemId, partie.Rom, memRom, definitionFile,
             RetroBatPaths.RamResourcesRoot, 0);
         lock (_verrou)
         {
             if (!ReferenceEquals(_partie, partie) || partie.Etat == "ended") return;
+            // un .MEM plus juste (celui du premier signal) a pris la place pendant la lecture : ce sens-ci ne part pas
+            if (!MemeFichier(partie.SemantiqueDe, definitionFile)) return;
             _revision++;
             semantique = semantique with { Revision = _revision };
             partie.Semantique = semantique;
@@ -511,7 +591,8 @@ public sealed class DeckStateService : IHostedService, IDisposable
             _lancementPrepare = null;
             partie = new Partie
             {
-                LaunchId = Guid.NewGuid().ToString("N"),
+                // ECR-08 : l'identifiant du lancement annonce par ui.game.started, pour que deck.* et ui.game.* le partagent
+                LaunchId = FirstNonEmpty(Texte(e.Payload, "LaunchId"), jeu?.LaunchId, Guid.NewGuid().ToString("N")),
                 SystemId = systeme,
                 GamePath = chemin,
                 Rom = rom,
@@ -532,6 +613,7 @@ public sealed class DeckStateService : IHostedService, IDisposable
 
         Publier("deck.game", JeuDe(partie));
         _ = Task.Run(() => SuivreAsync(partie, partie.Arret.Token));
+        if (DefinitionDuJeu is not null) _ = Task.Run(() => Precharger(partie));
     }
 
     private void Terminer()
@@ -1129,7 +1211,8 @@ public sealed class DeckStateService : IHostedService, IDisposable
         public DeckControlsPayload? Controls;
         public DeckFramePayload? Cadre;
         public DeckSemantics? Semantique;
-        public bool SemantiqueCherchee;
+        /// <summary>Le .MEM dont le sens a ete (ou est en train d'etre) lu ; null tant qu'aucun.</summary>
+        public string? SemantiqueDe;
         public DeckLancement? Deck;
         public readonly CancellationTokenSource Arret = new();
 

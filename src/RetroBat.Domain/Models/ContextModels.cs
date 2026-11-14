@@ -17,6 +17,9 @@ public class GameReference
     public string GameName { get; set; } = string.Empty;
     public GameDetails? Details { get; set; }
     public LaunchDetails? Launch { get; set; }
+
+    /// <summary>L'identifiant du lancement (ECR-08) pour le jeu en cours ; null pour un jeu seulement selectionne.</summary>
+    public string? LaunchId { get; set; }
 }
 
 public class LaunchDetails

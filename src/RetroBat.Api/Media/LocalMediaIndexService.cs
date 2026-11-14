@@ -245,14 +245,22 @@ public partial class LocalMediaIndexService
         var fileStem = Path.GetFileNameWithoutExtension(parts[^1]);
         var directoryParts = parts.Take(parts.Length - 1).ToArray();
         var gameSlug = ResolveGameSlugFromPath(parts, fileStem);
-        if (string.IsNullOrWhiteSpace(gameSlug))
+        var parsed = string.IsNullOrWhiteSpace(gameSlug)
+            ? null
+            : TryParseRegionalKind(fileStem, gameSlug) ?? TryParsePathKind(directoryParts, fileStem);
+
+        // API-7 (14/11) : rien d'autre ne l'a reconnu, mais le fichier est range par type, un par jeu au nom de la rom :
+        // <systeme>/fanart/<rom>.png, <systeme>/box3d/<rom>.png. Le dossier dit le type, le nom du fichier dit le jeu.
+        if (parsed == null
+            && parts.Length == 3
+            && MediaQualificationService.TryQualifyByTypeFolder(parts[1], Path.GetExtension(parts[^1]), out var folderKind)
+            && NormalizeSlug(fileStem) is { Length: > 0 } slugDuFichier)
         {
-            return false;
+            gameSlug = slugDuFichier;
+            parsed = new ParsedMediaName(folderKind, string.Empty, string.Empty);
         }
 
-        var parsed = TryParseRegionalKind(fileStem, gameSlug)
-            ?? TryParsePathKind(directoryParts, fileStem);
-        if (parsed == null)
+        if (parsed == null || string.IsNullOrWhiteSpace(gameSlug))
         {
             return false;
         }

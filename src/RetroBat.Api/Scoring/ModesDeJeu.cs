@@ -68,6 +68,14 @@ public sealed record ContexteDeJeu(int? Mode, IReadOnlyDictionary<string, int> D
     }
 }
 
+/// <summary>Un champ de difficulte tel qu'un plugin l'affiche (voir <see cref="ModesDeJeu.DifficulteAffichee"/>).</summary>
+public sealed record DifficulteAffichee(
+    [property: System.Text.Json.Serialization.JsonPropertyName("address")] string Adresse,
+    [property: System.Text.Json.Serialization.JsonPropertyName("name")] string? Nom,
+    [property: System.Text.Json.Serialization.JsonPropertyName("value")] int Valeur,
+    [property: System.Text.Json.Serialization.JsonPropertyName("initial")] int? Initiale,
+    [property: System.Text.Json.Serialization.JsonPropertyName("measured")] bool Mesuree);
+
 /// <summary>
 /// Les lectures d'un seul mode : celles prises pendant qu'il etait en vigueur. Une lecture sans
 /// mode mesure appartient au mode de demarrage (<paramref name="ParDefaut"/>).
@@ -353,6 +361,32 @@ public static class ModesDeJeu
             foreach (var (cle, valeur) in contexte.Difficulte.OrderBy(p => p.Key, StringComparer.Ordinal)) sortie[cle] = valeur;
         }
         return sortie.Count > 0 ? sortie : null;
+    }
+
+    /// <summary>
+    /// LA DIFFICULTE A AFFICHER (API-1, 14/11) : chaque champ que le profil declare, avec son nom (« DIFFICULTY ») quand il
+    /// en a un, la valeur mesuree ou, a defaut, la valeur de demarrage, et si elle a ete mesuree. Vide sans champ. Pur.
+    /// </summary>
+    public static IReadOnlyList<DifficulteAffichee> DifficulteAffichee(JsonElement profil, ContexteDeJeu contexte)
+    {
+        var sortie = new List<DifficulteAffichee>();
+        if (profil.ValueKind != JsonValueKind.Object
+            || !profil.TryGetProperty("difficulty", out var d) || d.ValueKind != JsonValueKind.Object
+            || !d.TryGetProperty("fields", out var champs) || champs.ValueKind != JsonValueKind.Array) return sortie;
+        foreach (var champ in champs.EnumerateArray())
+        {
+            if (champ.ValueKind != JsonValueKind.Object
+                || !champ.TryGetProperty("address", out var a) || a.ValueKind != JsonValueKind.String) continue;
+            var cle = Adresse(a.GetString() ?? "");
+            int? initiale = champ.TryGetProperty("initial", out var i) && i.TryGetInt32(out var x) ? x : null;
+            var nom = champ.TryGetProperty("name", out var n) && n.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(n.GetString())
+                ? n.GetString()!.Trim()
+                : null;
+            var mesuree = contexte.Difficulte.TryGetValue(cle, out var lue);
+            if (!mesuree && initiale is null) continue;
+            sortie.Add(new DifficulteAffichee(cle, nom, mesuree ? lue : initiale!.Value, initiale, mesuree));
+        }
+        return sortie;
     }
 
     /// <summary>

@@ -51,9 +51,13 @@ Chaque flux ne délivre que les types d'événements de ses préfixes ; certains
 | `/ws/score`, `/ws/timer` | Score et timer temps réel normalisés (retenus) |
 | `/ws/retroachievements` | Session RA : rich presence, unlocks, défis, leaderboards |
 | `/ws/hiscore` | Captures et mises à jour de high scores |
+| `/ws/scoring` | Scoring certifié de la partie : verdict du site (`scoring.verdict`), départ et fin de run |
+| `/ws/multiplayer` | Gamerooms et rencontres MULTIPLAYER (`multiplayer.state` retenu, `multiplayer.match.*`, `netplay.*`) |
 | `/ws/media`, `/ws/roms`, `/ws/system`, `/ws/control`, `/ws/esevent` | Store médias, Roms Manager, service, commandes, hooks ES bruts |
 
 Les instantanes de surface portent `Media` (champs historiques, inchanges) et, en plus, `Assets` - une table indexee sur le type de media canonique (`box-3d`, `mixrbv2`, `wheel`…) ne contenant que ce que l'entree possede vraiment. En portee jeu, `SystemAssets` porte la meme table pour son systeme : c'est ce qui permet de distinguer le fanart du jeu de celui du systeme, la ou les champs historiques replient silencieusement de l'un sur l'autre. **Une cle n'existe que si le fichier existe.**
+
+D'ou viennent les medias : d'abord le magasin d'APIExpose (`plugins\APIExpose\media\systems` et `media\user\systems`, rempli par le scraping et l'import), dont les chemins portent `PathRoot = "apiexpose"`. Les medias de RetroBat lui-meme (`roms\<systeme>\...`, cites par la gamelist ou ranges par type dans `roms\<systeme>\media\<type>\<rom>.png` : `fanart`, `box3d`, `screenshot`, `wheel`...) ne comblent un type manquant que si `Media:GamelistMediaEnabled` vaut `true` (eteint par defaut) ; leurs chemins portent alors `PathRoot = "retrobat"`. Le type d'un fichier vient de sa balise durable (`<fanart>`, `<boxback>`...), puis de son dossier de type, puis du suffixe de son nom ; jamais d'une balise generique (`<image>`, `<thumbnail>`, `<marquee>`).
 
 Les flux qui impriment quelque chose sur un jeu - topper, carte d'instructions - portent en plus `Text` : description, genre, nombre de joueurs, note, dans la langue reglee dans EmulationStation, avec la liste des langues disponibles pour cette entree.
 

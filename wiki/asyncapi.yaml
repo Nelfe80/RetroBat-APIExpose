@@ -40,6 +40,12 @@ channels:
       ui.system.selected, ui.game.selected, ui.game.started, ui.game.ended,
       ui.event, ui.frontend.started, ui.frontend.stopped (frontend process
       lifecycle - replaces polling the emulationstation process).
+      On connect, the last selection is replayed (ui.game.selected or
+      ui.system.selected, else its .raw form; forgotten on ui.frontend.stopped).
+      A running game is never replayed (ui.game.started would retrigger start effects).
+      ui.game.started and ui.game.ended carry `LaunchId` (32 hex chars): the same id
+      for a second start of the same game before its end (direct launch then ES hook),
+      a new one after the end; deck.game `LaunchId` is the same.
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
@@ -59,6 +65,7 @@ channels:
       Payload carries `Media` (legacy named fields, kept as-is) plus `Assets` and,
       in game scope, `SystemAssets`: tables keyed by canonical media kind holding
       only what THAT scope really owns. A key is present only when the file is.
+      Retained: the last snapshot is replayed on connect (never an older `Sequence`).
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
@@ -69,6 +76,7 @@ channels:
       `Media.Topper` plus `Assets`/`SystemAssets`: the game identity and printed matter
       a topper can show (flyer, box art, wheel, fanart, screenshot), and `Text`:
       description, genre, players, rating in the language EmulationStation is set to.
+      Retained: the last snapshot is replayed on connect.
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
@@ -81,7 +89,7 @@ channels:
       `Text` (description, genre, players, rating in the EmulationStation language) and
       `Controls`: what each button DOES and its colour, from resources/dynpanels -
       enough to compose a card, not only to show one. The full panel geometry stays on
-      /ws/panel.
+      /ws/panel. Retained: the last snapshot is replayed on connect.
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
@@ -91,6 +99,7 @@ channels:
       Prefixes `screen.` - secondary screen snapshots (screen.snapshot). Payload carries
       `Media` plus `Assets`/`SystemAssets`: screen-shaped media, with the title screen
       (`image`) and the in-game capture (`thumbnail`) kept apart.
+      Retained: the last snapshot is replayed on connect.
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
@@ -134,6 +143,8 @@ channels:
     description: >
       Prefixes `ingame.`, `retroarch.`, `wrapper.` - in-game memory events:
       ingame.memory.changed, retroarch.memory.changed, ingame.mame.session.started/stopped.
+      Also `deck.semantics` (what the .MEM signals mean, any game, with or without a
+      Deck; see /ws/deck), sent on connect while a game runs.
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
@@ -142,6 +153,7 @@ channels:
     description: >
       Prefixes `arcade.`, `mame.`, `fbneo.`, `outputs.` - arcade outputs (lamps)
       and sessions: mame.session.started, mame.output.changed.
+      Also `deck.semantics` (see /ws/deck), sent on connect while a game runs.
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
@@ -226,6 +238,29 @@ channels:
     description: >
       Prefixes `commands.`, `intent.`, `es-control.` - command and navigation
       acknowledgements.
+    messages:
+      envelope:
+        $ref: '#/components/messages/envelope'
+  scoring:
+    address: /ws/scoring
+    description: >
+      Prefix `scoring.` - certified scoring of the game in progress (no secrets):
+      scoring.verdict (`SessionId`, `RomGroup`, `SystemId`, `Ruleset`, `Status` =
+      published | held | quarantined | rejected, `Score`, `Rank`, `Continues`,
+      `DurationMs`), scoring.partie.depart, scoring.run.ended, scoring.run.reset,
+      scoring.run.multi, scoring.listener.attestation, scoring.listener.session,
+      scoring.replay.stop, scoring.lab.start. Up to 1.9.183 these events were only on /ws.
+    messages:
+      envelope:
+        $ref: '#/components/messages/envelope'
+  multiplayer:
+    address: /ws/multiplayer
+    description: >
+      Prefixes `multiplayer.`, `netplay.` - MULTIPLAYER gamerooms and matches:
+      multiplayer.state (retained, sent on connect: `rooms[]`, `invitations`, `error`;
+      never any netplay password), multiplayer.host.started, multiplayer.match.started,
+      multiplayer.match.ended, netplay.guest.host_left. Up to 1.9.183 these events
+      were only on /ws.
     messages:
       envelope:
         $ref: '#/components/messages/envelope'
@@ -440,8 +475,11 @@ channels:
 
       `deck.semantics`: what the .MEM signals of the launched game mean for display,
       read from the companion `.SMEM` file next to the .MEM in effect (same layer:
-      official, .user, .contest; else the official layer). Published once per launch,
-      as soon as the first .MEM signal names its definition file. The .SMEM declares
+      official, .user, .contest; else the official layer). Published for every game,
+      with or without a Deck: at game start with the .MEM the wrapper would load, and
+      again if the first .MEM signal names another definition file. Also carried by
+      /ws/ingame and /ws/arcade (sent on connect while a game runs), and served by
+      GET /api/v1/deck/semantics (?system=&rom= for a game not running). The .SMEM declares
       no address to watch and never enters scoring nor the certified fingerprint.
       `Status` = loaded | absent (no .SMEM: keep address bindings) | invalid
       (`Errors` say why; no signal published). `Signals[]`: `Id` (canonical, e.g.

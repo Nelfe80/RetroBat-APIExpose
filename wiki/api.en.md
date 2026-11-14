@@ -51,9 +51,13 @@ Each stream only delivers the event types of its prefixes; some replay their las
 | `/ws/score`, `/ws/timer` | Normalized live score and timer (retained) |
 | `/ws/retroachievements` | RA session: rich presence, unlocks, challenges, leaderboards |
 | `/ws/hiscore` | High score captures and updates |
+| `/ws/scoring` | Certified scoring of the game: site verdict (`scoring.verdict`), run start and end |
+| `/ws/multiplayer` | MULTIPLAYER gamerooms and matches (retained `multiplayer.state`, `multiplayer.match.*`, `netplay.*`) |
 | `/ws/media`, `/ws/roms`, `/ws/system`, `/ws/control`, `/ws/esevent` | Media store, Roms Manager, service, commands, raw ES hooks |
 
 Surface snapshots carry `Media` (legacy fields, unchanged) and, in addition, `Assets` - a table keyed by canonical media kind (`box-3d`, `mixrbv2`, `wheel`…) holding only what the entry really owns. In game scope, `SystemAssets` carries the same table for its system: that is what tells the game's fanart apart from the system's, where the legacy fields silently fall back from one to the other. **A key exists only when the file does.**
+
+Where media come from: first the APIExpose store (`plugins\APIExpose\media\systems` and `media\user\systems`, filled by scraping and import), whose paths carry `PathRoot = "apiexpose"`. RetroBat's own media (`roms\<system>\...`, referenced by the gamelist or filed by type in `roms\<system>\media\<type>\<rom>.png`: `fanart`, `box3d`, `screenshot`, `wheel`...) only fill a missing kind when `Media:GamelistMediaEnabled` is `true` (off by default); their paths then carry `PathRoot = "retrobat"`. A file's kind comes from its durable tag (`<fanart>`, `<boxback>`...), then its type folder, then its file-name suffix; never from a generic tag (`<image>`, `<thumbnail>`, `<marquee>`).
 
 Streams that print something about a game - topper, instruction card - also carry `Text`: description, genre, player count and rating in the language EmulationStation is set to, with the languages available for that entry.
 
