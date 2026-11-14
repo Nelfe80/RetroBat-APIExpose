@@ -549,11 +549,12 @@ public sealed class MassRunService : IDisposable
                     if (image != derniere)
                     {
                         derniere = image;
-                        var coureurs = client.CoureursFrais();
+                        // (MASS-03) au-dela de 64, les plus proches du joueur, pas les premiers inscrits
+                        var coureurs = client.CoureursFrais(j.Piste, MassRunCanal.MaxCoureurs);
                         var liste = new List<MassRunCanal.Coureur>(coureurs.Count);
                         // chaque coureur a son propre retard d'affichage, cale sur l'horloge (voir ClientDeSalle.NoterLEcart) : la
                         // fenetre porte ses positions pour cette image et les 3 suivantes
-                        foreach (var (_, c) in coureurs.Take(MassRunCanal.MaxCoureurs))
+                        foreach (var (_, c) in coureurs)
                         {
                             var fenetre = new byte[]?[MassRunCanal.ImagesParFenetre];
                             for (var k = 0; k < fenetre.Length; k++)

@@ -504,6 +504,38 @@ public sealed class ClientDeSalle : IDisposable
         }
     }
 
+    /// <summary>
+    /// (brief 13/11, MASS-03) Les coureurs frais, au plus <paramref name="max"/> : quand la salle en a plus que le coeur n'en
+    /// dessine (64), ceux qui sont le plus pres du joueur (meme scene d'abord, puis l'ecart de position dans le niveau),
+    /// au lieu des premiers inscrits. Les retenus gardent l'ordre de la liste complete (celui d'avant) : un tri par distance
+    /// ferait changer d'emplacement dans le canal a chaque image.
+    /// </summary>
+    public List<(ushort Place, Coureur Coureur)> CoureursFrais(ReadOnlySpan<byte> pisteDuJoueur, int max)
+    {
+        var frais = CoureursFrais();
+        if (frais.Count <= max || pisteDuJoueur.Length < MassRunProtocole.ImageDePiste) return frais;
+        var scene = MassRunProtocole.Scene(pisteDuJoueur);
+        var x = MassRunProtocole.XDansLeNiveau(pisteDuJoueur);
+        List<(ushort Place, int Scene, int X)> positions;
+        lock (_verrou)
+        {
+            positions = frais.Select(c => (c.Place, MassRunProtocole.Scene(c.Coureur.Piste), MassRunProtocole.XDansLeNiveau(c.Coureur.Piste))).ToList();
+        }
+
+        var retenus = LesPlusProches(positions, scene, x, max);
+        return frais.Where(c => retenus.Contains(c.Place)).ToList();
+    }
+
+    /// <summary>Les places des <paramref name="max"/> coureurs les plus proches : meme scene d'abord, puis l'ecart en x. Pur.</summary>
+    public static HashSet<ushort> LesPlusProches(IReadOnlyList<(ushort Place, int Scene, int X)> coureurs, int sceneDuJoueur, int xDuJoueur, int max)
+        => coureurs
+            .OrderBy(c => c.Scene == sceneDuJoueur ? 0 : 1)
+            .ThenBy(c => Math.Abs((long)c.X - xDuJoueur))
+            .ThenBy(c => c.Place)
+            .Take(Math.Max(0, max))
+            .Select(c => c.Place)
+            .ToHashSet();
+
     // ── Les poses en images (SNES, 06/11) : le dictionnaire de la salle du noeud ──
 
     /// <summary>
