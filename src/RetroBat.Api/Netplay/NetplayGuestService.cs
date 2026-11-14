@@ -586,13 +586,28 @@ public sealed class NetplayGuestService
             "-system", r.Systeme,
             "-emulator", r.Emulateur,
             "-core", r.Coeur,
-            "-rom", '"' + rom + '"',
+            "-rom", EntreGuillemets(rom),
             "-netplaymode", mode,
-            "-netplayip", infos.Relais,
+            "-netplayip", AdresseSure(infos.Relais),
             "-netplayport", infos.Port.ToString(),
-            "-netplaysession", '"' + infos.Session + '"',
-            "-netplaypass", '"' + infos.MotDePasse + '"',
+            "-netplaysession", EntreGuillemets(infos.Session),
+            "-netplaypass", EntreGuillemets(infos.MotDePasse),
             // Le repli direct d'une partie NelfePlay : notifications de RetroArch coupees (11/11)
             "-OnScreenMsg", "0",
         }.Where(x => x.Length > 0));
+
+    /// <summary>
+    /// Une valeur venue de la plateforme ou de l'hote, en UN argument : sans guillemet ni caractere de controle, et
+    /// les barres obliques inverses de fin doublees (sinon elles echapperaient le guillemet fermant). Pur.
+    /// </summary>
+    internal static string EntreGuillemets(string? valeur)
+    {
+        var propre = new string((valeur ?? string.Empty).Where(c => c != '"' && !char.IsControl(c)).ToArray());
+        var fin = propre.Length - propre.TrimEnd('\\').Length;
+        return '"' + propre + new string('\\', fin) + '"';
+    }
+
+    /// <summary>L'adresse du relais : lettres, chiffres, « . », « - », « : », crochets ; le reste est retire. Pur.</summary>
+    internal static string AdresseSure(string? adresse)
+        => new((adresse ?? string.Empty).Where(c => char.IsAsciiLetterOrDigit(c) || c is '.' or '-' or ':' or '[' or ']').ToArray());
 }
