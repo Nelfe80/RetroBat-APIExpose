@@ -172,7 +172,12 @@ channels:
       speedrun.restart.failed, speedrun.comparison, speedrun.counter (a rule
       counter went up during the attempt: `id`, `value`, `max`, `left` = counts
       before the failing one, `penaltyFrames` = cumulated penalty; the snapshot
-      follows with the new `counters`), speedrun.session.closed
+      follows with the new `counters`), speedrun.challenge.finished (a challenge
+      reached its finish and is closed: `sessionId`, `challengeId`, `attemptId`,
+      `frames`, `display`, `rate`, `ranked`, `score` = player 1 score at the
+      finish or null, `counters`, `penaltyFrames`; the game is then paused and
+      closed, the time is sent with the end-of-game report; no new attempt opens
+      and run.restart is refused with `challenge_over`), speedrun.session.closed
       (retained after the game ends). Every event carries the session `sequence`.
       Commands go through POST /api/v1/speedrun/commands (local token).
     messages:

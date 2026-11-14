@@ -18,10 +18,12 @@ public enum IssueDuBilan
 /// Ce que la page de bilan sait a la fermeture du jeu. <c>Temps</c> : le meilleur de la seance, en images. <c>Rang</c>,
 /// <c>Record</c> et <c>Classes</c> : la reponse du site. <c>Motif</c> : la raison d'un temps retenu, refuse ou absent.
 /// <c>Finies</c> : les tentatives allees jusqu'a l'arrivee. <c>Ouverture</c> : l'instant ou le bilan s'est ouvert, la cle de l'ecran.
+/// <c>ALArrivee</c> (14/11) : le bilan d'un challenge clos a son arrivee, ouvert devant le jeu en pause ; <c>Score</c> : le score de la
+/// partie a l'arrivee (.MEM du jeu), <c>Compteurs</c> et <c>PenaliteFrames</c> : ceux du reglement (coups du couteau, +1 s chacun).
 /// </summary>
 public sealed record BilanDEpreuve(Reglement Defi, string Jeu, string Joueur, string? Fanart, IssueDuBilan Issue, long? Temps, int Tentatives,
     int Finies = 0, int? Rang = null, long? Record = null, int? Classes = null, string Motif = "", IReadOnlyList<TempsClasse>? Classement = null,
-    long Ouverture = 0);
+    long Ouverture = 0, long? Score = null, IReadOnlyDictionary<string, int>? Compteurs = null, long PenaliteFrames = 0, bool ALArrivee = false);
 
 /// <summary>
 /// LES PAGES PLEIN ECRAN D'UNE EPREUVE (CDC du panneau, §8), sur les patrons MULTIPLAYER : la preparation reprend l'ecran de
@@ -77,7 +79,7 @@ public sealed partial class DefisPanelService
     {
         var premier = b.Issue == IssueDuBilan.Classe && b.Rang == 1;
         // Les barres disent quelque chose : la part des tentatives finies, et la place parmi les joueurs classes.
-        var mesures = new List<MesureDeFin>
+        var mesures = b.ALArrivee ? MesuresALArrivee(b) : new List<MesureDeFin>
         {
             new("chevrons", T("speedrun.page.attempts", "ATTEMPTS"), b.Tentatives, 1, false),
             new("chrono", T("speedrun.page.finished", "FINISHED"), b.Finies, b.Tentatives > 0 ? (double)b.Finies / b.Tentatives : 0, false),
@@ -97,7 +99,8 @@ public sealed partial class DefisPanelService
             // Une cle par bilan ouvert (brief du 13/11, point 1.1) : le verdict ne relance pas l'animation, seul le titre se rejoue.
             "bilan-" + b.Defi.ChallengeId + "-" + b.Ouverture.ToString(System.Globalization.CultureInfo.InvariantCulture),
             StylesDesEcrans.Course,
-            TitreDuBilan(b.Issue, premier),
+            // (14/11) l'arrivee d'un challenge : le temps part quand le jeu s'est ferme, le verdict change ensuite le titre
+            b is { ALArrivee: true, Issue: IssueDuBilan.EnVerification } ? T("speedrun.page.title.complete", "CHALLENGE COMPLETE") : TitreDuBilan(b.Issue, premier),
             b.Jeu,
             "",
             b.Fanart,
@@ -114,6 +117,32 @@ public sealed partial class DefisPanelService
             Classement: AutourDe(b.Classement ?? [], b.Rang)
                 .Select(l => new LigneDeDefi($"{l.Rang}   {l.Joueur}", "", Chronometrage.Afficher(l.Valeur, b.Defi.Cadence), Marque: l.Rang == b.Rang ? "moi" : ""))
                 .ToList());
+    }
+
+    /// <summary>Au plus deux compteurs du reglement a l'ecran : la ligne du joueur garde la place de son pseudo.</summary>
+    internal const int CompteursAuBilan = 2;
+
+    /// <summary>
+    /// LES MESURES DU BILAN DE L'ARRIVEE (14/11) : le score de la partie, les compteurs du reglement (coups recus du couteau) et la
+    /// penalite qu'ils ont ajoutee au temps. Les tentatives viennent en tete quand il reste de la place (trois colonnes au plus avant
+    /// celle des joueurs classes, que le verdict ajoute).
+    /// </summary>
+    internal List<MesureDeFin> MesuresALArrivee(BilanDEpreuve b)
+    {
+        var mesures = new List<MesureDeFin>();
+        if (b.Score is { } score) mesures.Add(new MesureDeFin("etoile", T("speedrun.page.score", "SCORE"), score, -1, false, Milliers: true));
+        foreach (var (id, n) in (b.Compteurs ?? new Dictionary<string, int>()).Take(CompteursAuBilan))
+        {
+            var compteur = b.Defi.Compteurs.FirstOrDefault(c => c.Id == id);
+            var part = compteur?.Maximum is { } max and > 0 ? Math.Clamp((double)n / (max + 1), 0, 1) : -1;
+            mesures.Add(new MesureDeFin("coeur", T("speedrun.page.counter." + id, id.Replace('_', ' ').ToUpperInvariant()), n, part, false));
+        }
+
+        if (b.PenaliteFrames > 0)
+            mesures.Add(new MesureDeFin("chrono", T("speedrun.page.penalty", "PENALTY"), b.PenaliteFrames, -1, false,
+                Texte: "+" + Chronometrage.Afficher(b.PenaliteFrames, b.Defi.Cadence)));
+        if (mesures.Count < 3) mesures.Insert(0, new MesureDeFin("chevrons", T("speedrun.page.attempts", "ATTEMPTS"), b.Tentatives, 1, false));
+        return mesures;
     }
 
     /// <summary>Le record, puis la place du joueur et ses voisins : le joueur voit qui il suit et qui il devance.</summary>
