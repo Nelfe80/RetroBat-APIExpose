@@ -260,18 +260,54 @@ public sealed class ClientDeSalle : IDisposable
         }
         var client = new ClientDeSalle(http, json.Clone(), new Uri(noeud).Host);
         _ = Task.Run(() => client.RecevoirAsync(client._arret.Token));
-        await client.CalerLHorlogeAsync(ct).ConfigureAwait(false);
+        try
+        {
+            await client.CalerLHorlogeAsync(ct).ConfigureAwait(false);
+        }
+        catch
+        {
+            client.Dispose();
+            throw;
+        }
         return client;
     }
 
-    /// <summary>Dix PING ; l'echange le plus court donne l'ecart d'horloge (CDC §10).</summary>
+    /// <summary>Le temps laisse aux PONG apres une serie de PING.</summary>
+    internal static TimeSpan AttenteDesPong = TimeSpan.FromSeconds(2);
+
+    /// <summary>Vrai des qu'un PONG est revenu : l'ecart d'horloge est mesure (MASS-02).</summary>
+    public bool HorlogeCalee => Interlocked.Read(ref _meilleurAllerRetour) != long.MaxValue;
+
+    /// <summary>Le meilleur aller-retour mesure, en millisecondes (l'incertitude du calage en est la moitie) ; -1 sans PONG.</summary>
+    public long MeilleurAllerRetourMs => HorlogeCalee ? Interlocked.Read(ref _meilleurAllerRetour) / 1000 : -1;
+
+    /// <summary>
+    /// Dix PING ; l'echange le plus court donne l'ecart d'horloge (CDC §10). (brief 13/11, MASS-02) L'ecart n'etait jamais
+    /// verifie : sans aucun PONG (UDP retour bloque par un pare-feu ou un routeur), il restait a 0 et une horloge Windows en
+    /// avance de 3 s faisait partir le GO! local 3 s trop tot, sans un mot. Sans PONG apres la serie, on attend
+    /// <see cref="AttenteDesPong"/>, puis une seconde serie ; toujours rien : la jonction echoue, avec sa raison.
+    /// </summary>
     private async Task CalerLHorlogeAsync(CancellationToken ct)
     {
-        _meilleurAllerRetour = long.MaxValue;
-        for (var i = 0; i < 10; i++)
+        Interlocked.Exchange(ref _meilleurAllerRetour, long.MaxValue);
+        for (var serie = 0; serie < 2 && !HorlogeCalee; serie++)
         {
-            EnvoyerPing();
-            await Task.Delay(60, ct).ConfigureAwait(false);
+            for (var i = 0; i < 10; i++)
+            {
+                EnvoyerPing();
+                await Task.Delay(60, ct).ConfigureAwait(false);
+            }
+
+            var limite = DateTime.UtcNow + AttenteDesPong;
+            while (!HorlogeCalee && DateTime.UtcNow < limite)
+            {
+                await Task.Delay(50, ct).ConfigureAwait(false);
+            }
+        }
+
+        if (!HorlogeCalee)
+        {
+            throw new InvalidOperationException("horloge non calee : le noeud n'a repondu a aucun des 20 PING (UDP bloque par un pare-feu ou un routeur ?)");
         }
     }
 
