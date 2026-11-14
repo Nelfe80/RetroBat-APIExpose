@@ -1063,54 +1063,27 @@ app.Logger.LogInformation(
 // page distante ne peut ni le lire ni le deviner.
 app.Use(async (context, next) =>
 {
-    var method = context.Request.Method;
-    var writes = HttpMethods.IsPost(method) || HttpMethods.IsPut(method)
-        || HttpMethods.IsPatch(method) || HttpMethods.IsDelete(method);
-
-    // Le préflight doit passer : c'est lui qui demande l'autorisation, et le
-    // refuser ferait échouer des requêtes qu'on aurait acceptées.
-    if (!writes || !context.Request.Path.StartsWithSegments("/api"))
-    {
-        await next();
-        return;
-    }
-
-    var fetchSite = context.Request.Headers["Sec-Fetch-Site"].ToString();
-    if (fetchSite.Length == 0
-        && GardeDeLHote.EcritureDePageEtrangere(context.Request.Headers.Origin.ToString(), context.Request.Headers.Host.ToString()))
-    {
-        // Sec-Fetch-Site manque (navigateur ancien, ou origine http non sure),
-        // mais Origin trahit une page etrangere : aucun client natif ne l'envoie.
-        fetchSite = "cross-site";
-    }
-
-    if (fetchSite.Length == 0)
-    {
-        // Pas un navigateur : client natif, script, hub. Les autres gardes
-        // (cle API hors loopback) s'appliquent toujours.
-        await next();
-        return;
-    }
-
-    // Une page servie par APIExpose lui-meme reste chez elle.
-    if (string.Equals(fetchSite, "same-origin", StringComparison.OrdinalIgnoreCase))
-    {
-        await next();
-        return;
-    }
-
-    // Inscription Live Contest : ecriture cross-site LEGITIME depuis la page de
-    // participation de la plateforme (elle remet le playToken a cet APIExpose).
-    // Le navigateur envoie Sec-Fetch-Site: cross-site et n'a PAS le jeton local -
-    // on ne l'exige donc pas ici. La garde d'ORIGINE juste en dessous valide que
-    // l'appelant est bien la plateforme officielle (ou le loopback).
-    if (context.Request.Path.StartsWithSegments("/api/v1/livecontest"))
-    {
-        await next();
-        return;
-    }
-
-    if (LocalWriteToken.Matches(context.Request.Headers[LocalWriteToken.HeaderName].FirstOrDefault()))
+    // La regle est dans GardeDeLHote.EcritureAdmise (testee) :
+    //   - lecture, preflight : passe ;
+    //   - toutes les routes, pas seulement /api : /nelfeplay/* et /dorequest.php
+    //     ecrivent aussi ; leurs appelants legitimes sont des pages de l'API (meme
+    //     origine) ou des clients natifs (sans Sec-Fetch-Site ni Origin) ;
+    //   - sans Sec-Fetch-Site (navigateur ancien, origine http non sure), une
+    //     Origin etrangere compte pour cross-site : aucun client natif n'en envoie ;
+    //   - client natif, script, hub : passe (la cle API hors loopback s'applique) ;
+    //   - page servie par APIExpose lui-meme (same-origin) : passe ;
+    //   - inscription Live Contest : ecriture cross-site LEGITIME de la page de la
+    //     plateforme, sans jeton local ; la garde d'ORIGINE juste en dessous valide
+    //     que l'appelant est la plateforme officielle (ou le loopback) ;
+    //   - sinon le jeton local est exige.
+    var request = context.Request;
+    if (GardeDeLHote.EcritureAdmise(
+            request.Method,
+            request.Path,
+            request.Headers["Sec-Fetch-Site"].ToString(),
+            request.Headers.Origin.ToString(),
+            request.Headers.Host.ToString(),
+            LocalWriteToken.Matches(request.Headers[LocalWriteToken.HeaderName].FirstOrDefault())))
     {
         await next();
         return;

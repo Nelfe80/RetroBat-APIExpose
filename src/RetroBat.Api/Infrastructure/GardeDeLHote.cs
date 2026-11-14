@@ -175,6 +175,36 @@ public static class GardeDeLHote
         return !string.Equals(o.Host.Trim('[', ']'), appele, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// La garde d'ecriture : une ecriture (POST, PUT, PATCH, DELETE) passe-t-elle ? Les lectures et
+    /// le preflight passent toujours. Un navigateur (Sec-Fetch-Site, ou a defaut une Origin
+    /// etrangere) n'ecrit que depuis une page de l'API (same-origin), vers l'inscription Live
+    /// Contest, ou avec le jeton local. Toutes les routes, pas seulement /api. Pur.
+    /// </summary>
+    public static bool EcritureAdmise(string methode, Microsoft.AspNetCore.Http.PathString chemin,
+        string? secFetchSite, string? origine, string? hote, bool jetonLocal)
+    {
+        var ecrit = Microsoft.AspNetCore.Http.HttpMethods.IsPost(methode) || Microsoft.AspNetCore.Http.HttpMethods.IsPut(methode)
+            || Microsoft.AspNetCore.Http.HttpMethods.IsPatch(methode) || Microsoft.AspNetCore.Http.HttpMethods.IsDelete(methode);
+        if (!ecrit)
+        {
+            return true;
+        }
+
+        var site = secFetchSite ?? string.Empty;
+        if (site.Length == 0 && EcritureDePageEtrangere(origine, hote))
+        {
+            site = "cross-site";
+        }
+
+        if (site.Length == 0 || string.Equals(site, "same-origin", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return chemin.StartsWithSegments("/api/v1/livecontest") || jetonLocal;
+    }
+
     /// <summary>La requete porte-t-elle une marque de navigateur (Sec-Fetch-*, Origin) ?</summary>
     public static bool MarqueDeNavigateur(Func<string, string?> enTete)
         => !string.IsNullOrEmpty(enTete("Sec-Fetch-Site"))

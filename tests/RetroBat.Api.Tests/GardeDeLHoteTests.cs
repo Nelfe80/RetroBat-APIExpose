@@ -102,6 +102,34 @@ public class GardeDeLHoteTests
         Assert.False(GardeDeLHote.MemeCle("ABC", ""));
     }
 
+    [Theory]
+    // Lectures et preflight : toujours.
+    [InlineData("GET", "/api/v1/status", "cross-site", "https://evil.example", false, true)]
+    [InlineData("OPTIONS", "/api/v1/commands/launch", "cross-site", "https://evil.example", false, true)]
+    // Clients natifs (Marquee, Led, hub, scripts, RetroArch) : ni Sec-Fetch-Site ni Origin.
+    [InlineData("POST", "/api/v1/panels/preview", "", "", false, true)]
+    [InlineData("POST", "/dorequest.php", "", "", false, true)]
+    [InlineData("POST", "/nelfeplay/dev/avatar", "", "", false, true)]
+    // Pages de l'API (meme origine), sur /api comme hors /api.
+    [InlineData("POST", "/api/v1/nelfeplay/link/start", "same-origin", "http://127.0.0.1:12345", false, true)]
+    [InlineData("POST", "/nelfeplay/avatar/import", "same-origin", "http://127.0.0.1:12345", false, true)]
+    // Live Contest depuis la plateforme.
+    [InlineData("POST", "/api/v1/livecontest/enroll", "cross-site", "https://nelfetech.com", false, true)]
+    // Page etrangere : refusee partout, sauf avec le jeton local.
+    [InlineData("POST", "/api/v1/commands/launch", "cross-site", "https://evil.example", false, false)]
+    [InlineData("POST", "/nelfeplay/avatar/import", "cross-site", "https://evil.example", false, false)]
+    [InlineData("POST", "/dorequest.php", "cross-site", "https://evil.example", false, false)]
+    [InlineData("DELETE", "/api/v1/deck/frame-plan", "same-site", "http://127.0.0.1:19780", false, false)]
+    [InlineData("POST", "/api/v1/commands/launch", "cross-site", "null", true, true)]
+    // Sans Sec-Fetch-Site, Origin etrangere : traitee en cross-site.
+    [InlineData("POST", "/api/v1/commands/launch", "", "http://evil.example", false, false)]
+    [InlineData("POST", "/dorequest.php", "", "null", false, false)]
+    [InlineData("POST", "/api/v1/commands/launch", "", "http://localhost:3000", false, true)]
+    public void Garde_d_ecriture(string methode, string chemin, string site, string origine, bool jeton, bool admise)
+    {
+        Assert.Equal(admise, GardeDeLHote.EcritureAdmise(methode, new Microsoft.AspNetCore.Http.PathString(chemin), site, origine, "127.0.0.1:12345", jeton));
+    }
+
     [Fact]
     public void Marques_de_navigateur()
     {
