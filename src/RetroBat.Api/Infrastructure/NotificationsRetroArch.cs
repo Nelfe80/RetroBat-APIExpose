@@ -29,6 +29,10 @@ namespace RetroBat.Api.Infrastructure;
 ///
 /// LA VALEUR DU JOUEUR EST RENDUE : le lanceur a ecrit video_font_enable = false dans retroarch.cfg ; RetroArch ferme (et le
 /// lanceur sorti), la valeur d'ES y revient, pour un RetroArch ouvert ensuite sans le lanceur.
+///
+/// SAUF RETROACHIEVEMENTS EN WORLD SCORING (14/11) : un joueur qui a RetroAchievements garde ses succes (fenetre de
+/// deblocage, indicateurs de challenge, progression) ; tout le reste est coupe par <see cref="AutresNotifications"/> au lieu
+/// de -OnScreenMsg 0 (<see cref="AjouterSaufSucces"/>). Les messages de NelfePlay vont toujours au Deck ou au bandeau.
 /// </summary>
 public static partial class NotificationsRetroArch
 {
@@ -68,6 +72,182 @@ public static partial class NotificationsRetroArch
     [GeneratedRegex(@"(^|\s)-OnScreenMsg\s+(0|false|off)(\s|$)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex Coupe();
 
+    // ─────────────────────────── RetroAchievements visibles en World Scoring (14/11) ───────────────────────────
+
+    /// <summary>
+    /// RETROACHIEVEMENTS VISIBLES EN WORLD SCORING (demande du user du 14/11, retour de Snapouille sur Shinobi : « petit son
+    /// de declenchement de l'achievement mais aucune icone ni pour le deblocage ni indicateur de challenge »). Couper
+    /// video_font_enable eteint les widgets de RetroArch 1.22.2, donc aussi la fenetre d'un succes, les indicateurs de
+    /// challenge du mode hardcore et la progression (retroarch.c : les widgets ne s'ouvrent que si video_font_enable est vrai).
+    /// Pour une partie du World Scoring d'un joueur qui a RetroAchievements, video_font_enable garde la valeur du joueur et ce
+    /// sont les reglages notification_show_* de RetroArch qui coupent le reste, un a un (configuration.c, 1.22.2).
+    /// notification_show_when_menu_is_alive n'en est pas : vrai, il cache TOUT en jeu, succes compris (video_driver.c).
+    /// La valeur 2 de notification_show_screenshot_flash est « OFF » (gfx_widgets.h).
+    /// </summary>
+    public static readonly IReadOnlyList<KeyValuePair<string, string>> AutresNotifications =
+    [
+        new("notification_show_autoconfig", "false"),
+        new("notification_show_autoconfig_fails", "false"),
+        new("notification_show_cheats_applied", "false"),
+        new("notification_show_patch_applied", "false"),
+        new("notification_show_remap_load", "false"),
+        new("notification_show_config_override_load", "false"),
+        new("notification_show_set_initial_disk", "false"),
+        new("notification_show_disk_control", "false"),
+        new("notification_show_save_state", "false"),
+        new("notification_show_fast_forward", "false"),
+        new("notification_show_screenshot", "false"),
+        new("notification_show_screenshot_flash", "2"),
+        new("notification_show_refresh_rate", "false"),
+        new("notification_show_netplay_extra", "false"),
+    ];
+
+    /// <summary>
+    /// Les arguments du lanceur qui coupent tout sauf RetroAchievements : « -retroarch.cle valeur », que le lanceur ecrit tel
+    /// quel dans retroarch.cfg APRES ses propres valeurs (LibRetroGenerator, « Custom overrides » : toute cle « retroarch.* »
+    /// de sa configuration, ligne de commande comprise). Aucune cle d'ES n'est ecrite.
+    /// </summary>
+    public static IReadOnlyList<string> ArgumentsSaufSucces { get; } =
+        AutresNotifications.SelectMany(r => new[] { "-retroarch." + r.Key, r.Value }).ToList();
+
+    /// <summary>
+    /// <paramref name="supplements"/> sans « -OnScreenMsg 0 » (celui du Deck compris), plus les arguments qui coupent tout
+    /// sauf RetroAchievements. Pur.
+    /// </summary>
+    public static IReadOnlyList<string> AjouterSaufSucces(IEnumerable<string>? supplements)
+    {
+        var source = (supplements ?? []).ToList();
+        var liste = new List<string>(source.Count + ArgumentsSaufSucces.Count);
+        for (var i = 0; i < source.Count; i++)
+        {
+            if (source[i].Equals(Arguments[0], StringComparison.OrdinalIgnoreCase))
+            {
+                if (i + 1 < source.Count && !source[i + 1].StartsWith('-')) i++; // sa valeur part avec lui
+                continue;
+            }
+
+            liste.Add(source[i]);
+        }
+
+        liste.AddRange(ArgumentsSaufSucces);
+        return liste;
+    }
+
+    /// <summary>La ligne du lanceur coupe-t-elle tout sauf RetroAchievements ? Pur.</summary>
+    public static bool LigneGardeLesSucces(string? arguments)
+        => !string.IsNullOrEmpty(arguments) && SaufSucces().IsMatch(arguments);
+
+    [GeneratedRegex(@"(^|\s)-retroarch\.notification_show_save_state\s+(0|false)(\s|$)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    private static partial Regex SaufSucces();
+
+    /// <summary>
+    /// Les parties du World Scoring (<see cref="PartieNelfePlayService.Origine"/>) : carrousel de la collection, defi du panneau
+    /// de classement, bouton du site, commands/launch. Les epreuves (speedrun, challenges), le concours, le MASS RUN et le
+    /// MULTIPLAYER gardent tout coupe. Pur.
+    /// </summary>
+    public static bool EstDuWorldScoring(string? origine)
+        => origine is not null
+           && (origine.StartsWith("collection", StringComparison.Ordinal) || origine is "defi" or "site" or "api");
+
+    /// <summary>
+    /// Le joueur a-t-il RetroAchievements pour ce jeu ? Comme le lanceur (SystemConfig) : la cle du jeu, sinon celle du
+    /// systeme, sinon la globale, pour « retroachievements » (allume) et « retroachievements.username » (non vide). Lecture
+    /// seule d'es_settings.cfg. Pur.
+    /// </summary>
+    internal static bool SuccesActifs(System.Xml.Linq.XDocument es, string systeme, string? fichier)
+    {
+        var valeurs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var e in es.Root?.Elements() ?? [])
+        {
+            if ((string?)e.Attribute("name") is { } nom && (string?)e.Attribute("value") is { } valeur) valeurs[nom] = valeur;
+        }
+
+        var jeu = string.IsNullOrWhiteSpace(fichier)
+            ? null
+            : systeme + "[\"" + Path.GetFileName(fichier).Replace("=", "").Replace("#", "") + "\"].";
+        string? Lire(string cle)
+            => (jeu is not null && valeurs.TryGetValue(jeu + cle, out var j) ? j : null)
+               ?? (valeurs.TryGetValue(systeme + "." + cle, out var s) ? s : null)
+               ?? (valeurs.TryGetValue("global." + cle, out var g) ? g : null);
+
+        var allume = Lire("retroachievements") is { } v
+                     && (v == "1" || v.Equals("true", StringComparison.OrdinalIgnoreCase) || v.Equals("on", StringComparison.OrdinalIgnoreCase)
+                         || v.Equals("enabled", StringComparison.OrdinalIgnoreCase));
+        return allume && !string.IsNullOrWhiteSpace(Lire("retroachievements.username"));
+    }
+
+    /// <summary>Comme <see cref="SuccesActifs(System.Xml.Linq.XDocument, string, string?)"/>, lu sur le disque. Faux si illisible.</summary>
+    public static bool SuccesActifs(string systeme, string? fichier, string? esSettings = null)
+    {
+        try
+        {
+            return SuccesActifs(System.Xml.Linq.XDocument.Load(esSettings ?? RetroBatPaths.EmulationStationSettingsPath), systeme, fichier);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>Le journal des valeurs de retroarch.cfg a rendre apres une partie qui a garde les succes.</summary>
+    internal static string JournalDesSucces
+        => JournalDesSuccesDEssai ?? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay", "notifications-retroarch.json");
+
+    /// <summary>Coutures des essais : le journal, retroarch.cfg et « RetroArch tourne-t-il ? » (jamais ceux de la borne).</summary>
+    internal static string? JournalDesSuccesDEssai { get; set; }
+
+    /// <inheritdoc cref="JournalDesSuccesDEssai"/>
+    internal static string? RetroArchCfgDEssai { get; set; }
+
+    /// <inheritdoc cref="JournalDesSuccesDEssai"/>
+    internal static Func<bool>? RetroArchTourneDEssai { get; set; }
+
+    /// <summary>
+    /// AVANT un lancement qui garde les succes : les valeurs de <see cref="AutresNotifications"/> dans retroarch.cfg sont notees.
+    /// Le lanceur reecrit a chaque lancement une partie de ces cles (notification_show_save_state, screenshot...), pas les
+    /// autres (autoconfig_fails, refresh_rate, netplay_extra, set_initial_disk, screenshot_flash) : sans rendu, une partie du
+    /// joueur lancee ensuite les garderait coupees. Un journal deja la (partie precedente non rendue) est garde : il porte la
+    /// valeur du joueur. Jamais d'exception.
+    /// </summary>
+    public static void NoterAvantLesSucces(ILogger? journal = null)
+    {
+        var cfg = RetroArchCfgDEssai ?? RetroBatPaths.RetroArchConfigPath;
+        var chemin = JournalDesSucces;
+        try
+        {
+            if (File.Exists(chemin) || !File.Exists(cfg)) return;
+            var avant = AutresNotifications.ToDictionary(r => r.Key,
+                r => RetroBat.Api.Multiplayer.RetroArchConfigEdit.Lire(cfg, r.Key), StringComparer.Ordinal);
+            RetroBat.Api.Multiplayer.RetroArchConfigEdit.Noter(chemin,
+                new Dictionary<string, Dictionary<string, string?>>(StringComparer.OrdinalIgnoreCase) { [cfg] = avant });
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            journal?.LogDebug(ex, "Notifications de RetroArch : valeurs de retroarch.cfg non notees.");
+        }
+    }
+
+    /// <summary>
+    /// Rend a retroarch.cfg les valeurs notees par <see cref="NoterAvantLesSucces"/>, si RetroArch est ferme (il reecrit son
+    /// fichier en sortant). Rend vrai si un journal a ete rendu. Jamais d'exception.
+    /// </summary>
+    public static bool RendreLesAutresNotifications(ILogger? journal = null)
+    {
+        var chemin = JournalDesSucces;
+        try
+        {
+            if (!File.Exists(chemin) || (RetroArchTourneDEssai ?? RetroArchTourne)()) return false;
+            if (RetroBat.Api.Multiplayer.RetroArchConfigEdit.RendreLeJournal(chemin) == 0) return false;
+            journal?.LogInformation("Notifications de RetroArch : les reglages notification_show_* du joueur rendus a retroarch.cfg.");
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            journal?.LogDebug(ex, "Notifications de RetroArch : notification_show_* non rendus, nouvel essai plus tard.");
+            return false;
+        }
+    }
+
     /// <summary>
     /// Un lancement direct vient de partir (<see cref="RetroBat.Api.Netplay.NetplayLaunch.DemarrerDirectement"/>) : il coupe ou
     /// non les notifications. Coupees, elles le restent jusqu'a la sortie du lanceur ; RetroArch ferme, la valeur d'ES revient
@@ -76,9 +256,13 @@ public static partial class NotificationsRetroArch
     internal static void Suivre(string arguments, Process? lanceur, ILogger? journal)
     {
         var generation = Interlocked.Increment(ref _generation);
-        _coupees = lanceur is not null && LigneCoupe(arguments);
+        var saufSucces = LigneGardeLesSucces(arguments) && !LigneCoupe(arguments);
+        _coupees = lanceur is not null && (LigneCoupe(arguments) || saufSucces);
         if (!_coupees) return;
-        journal?.LogInformation("Notifications de RetroArch coupees pour ce lancement (-OnScreenMsg 0) : les messages de NelfePlay vont au Deck ou au bandeau.");
+        if (saufSucces)
+            journal?.LogInformation("Notifications de RetroArch coupees pour ce lancement sauf RetroAchievements (notification_show_*) : les messages de NelfePlay vont au Deck ou au bandeau.");
+        else
+            journal?.LogInformation("Notifications de RetroArch coupees pour ce lancement (-OnScreenMsg 0) : les messages de NelfePlay vont au Deck ou au bandeau.");
         _ = Task.Run(async () =>
         {
             try { await lanceur!.WaitForExitAsync().ConfigureAwait(false); }
@@ -120,6 +304,7 @@ public static partial class NotificationsRetroArch
         if (Interlocked.Read(ref _generation) != generation) return;
         _coupees = false;
         if (RetroArchTourne()) return; // un RetroArch d'ailleurs : le prochain lancement par le lanceur rendra la valeur
+        RendreLesAutresNotifications(journal);
         try
         {
             if (Rendre(RetroBatPaths.RetroArchConfigPath, RetroBat.Api.Deck.DeckDecor.NotificationsDEs()))

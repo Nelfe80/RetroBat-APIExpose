@@ -1855,8 +1855,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             string Manettes() => RetroBat.Api.Netplay.EsManettes.PourLancer(_logger).Arguments;
             var manettes = progression is null ? Manettes() : progression.Mesurer(ProgressionDuLancement.Manettes, Manettes);
             progression?.Commencer(ProgressionDuLancement.Lanceur);
-            var arguments = ArgumentsDuDefiAvecLeDeck(manettes, resolution, chemin, deck.Arguments, netplay);
+            // RETROACHIEVEMENTS VISIBLES EN WORLD SCORING (14/11) : un joueur qui a RetroAchievements garde ses succes, le reste des
+            // notifications de RetroArch est coupe ; un defi diffuse (netplay de l'hote) garde tout coupe.
+            var succes = netplay.Count == 0 && Infrastructure.NotificationsRetroArch.SuccesActifs(resolution.Systeme, chemin);
+            var arguments = ArgumentsDuDefiAvecLeDeck(manettes, resolution, chemin, deck.Arguments, netplay, succes);
             if (arguments is null) return false;
+            if (succes) Infrastructure.NotificationsRetroArch.NoterAvantLesSucces(_logger);
 
             // ES ne sait pas qu'un jeu tourne : sa musique se tait jusqu'a la fin du jeu (SonDEmulationStation la rend ensuite)
             _sonDEs?.Couper();
@@ -1896,10 +1900,12 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// comme ES, decor du Deck, fonctions qui feraient refuser le score coupees, et le netplay de l'hote s'il est diffuse. Pur.
     /// </summary>
     internal static string? ArgumentsDuDefiAvecLeDeck(string manettes, RetroBat.Api.Netplay.EsLaunchArguments.Resolution resolution, string chemin,
-        IReadOnlyList<string> argumentsDuDeck, IReadOnlyList<string> netplay)
+        IReadOnlyList<string> argumentsDuDeck, IReadOnlyList<string> netplay, bool succes = false)
         => RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(manettes, resolution.Systeme, resolution.Emulateur,
             resolution.Coeur.Length > 0 ? resolution.Coeur : null, chemin, retroAchievements: null,
-            Infrastructure.NotificationsRetroArch.Ajouter(argumentsDuDeck).Concat(FonctionsNeutraliseesDuDefi).Concat(netplay));
+            (succes
+                ? Infrastructure.NotificationsRetroArch.AjouterSaufSucces(argumentsDuDeck)
+                : Infrastructure.NotificationsRetroArch.Ajouter(argumentsDuDeck)).Concat(FonctionsNeutraliseesDuDefi).Concat(netplay));
 
     /// <summary>Le classement du rang en direct : la regle de l'onglet regarde (hors 1CC MULTI), sinon la regle principale.</summary>
     private Deck.DeckRankBoard? ClassementDuRang()

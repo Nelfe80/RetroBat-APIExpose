@@ -25,8 +25,9 @@ namespace RetroBat.Api.Infrastructure;
 /// sans emulateur, rendue quand meme ;</item>
 /// <item>une API arretee entre-temps : le journal est rendu a son demarrage, avant qu'ES s'ouvre (il attend l'API).</item>
 /// </list>
-/// Aucune autre cle n'est touchee. Pas de rechargement demande a ES : l'ecriture se fait au lancement (ES lance, il ne navigue
-/// pas) et le rendu pendant la partie (ES attend le lanceur) ; rien ne peut declencher un reloadgames en pleine navigation.
+/// Aucune autre cle n'est touchee (sauf <see cref="SuccesParLesClesDuJeu"/>, en attente de l'accord du user). Pas de
+/// rechargement demande a ES : l'ecriture se fait au lancement (ES lance, il ne navigue pas) et le rendu pendant la partie (ES
+/// attend le lanceur) ; rien ne peut declencher un reloadgames en pleine navigation.
 /// </summary>
 public sealed class NotificationsDesLancementsEs : IHostedService, IDisposable
 {
@@ -71,17 +72,45 @@ public sealed class NotificationsDesLancementsEs : IHostedService, IDisposable
     /// <summary>Couture des essais : le verdict NelfePlay du jeu qui part (par defaut celui de PartieNelfePlayService).</summary>
     internal Func<string?, string?>? Verdict { get; set; }
 
-    /// <summary>Ce qui est note sur disque : la cle posee et sa valeur d'avant (null : elle n'existait pas).</summary>
-    internal sealed record Note(string Cle, string? Avant);
+    /// <summary>
+    /// Ce qui est note sur disque : la cle posee et sa valeur d'avant (null : elle n'existait pas) ; <paramref name="Autres"/>,
+    /// les cles posees avec elle (RetroAchievements gardes, <see cref="SuccesParLesClesDuJeu"/>).
+    /// </summary>
+    internal sealed record Note(string Cle, string? Avant, IReadOnlyList<Note>? Autres = null);
+
+    /// <summary>
+    /// RETROACHIEVEMENTS VISIBLES EN WORLD SCORING PAR ES (14/11) : EN ATTENTE DE L'ACCORD DU USER, donc FAUX. L'exception du
+    /// 11/11 ne couvre que la cle <c>OnScreenMsg</c> par jeu. Ce qu'il faudrait de plus pour une partie du World Scoring lancee
+    /// par ES (carrousel, defi sans Deck, site) d'un joueur qui a RetroAchievements : au lieu de <c>OnScreenMsg = 0</c>, les cles
+    /// par jeu <c>systeme["rom"].retroarch.notification_show_*</c> (<see cref="NotificationsRetroArch.AutresNotifications"/>),
+    /// que le lanceur ecrit dans retroarch.cfg (« Custom overrides » de LibRetroGenerator), posees et rendues exactement comme
+    /// OnScreenMsg (meme crochet, meme journal, meme reparation). Faux : ces parties gardent tout coupe, succes compris.
+    /// </summary>
+    internal static bool SuccesParLesClesDuJeu { get; set; }
+
+    /// <summary>Le prefixe des cles par jeu du lanceur : <c>fbneo["19xx.zip"].</c> (Program.cs : « = » et « # » retires). Pur.</summary>
+    private static string PrefixeDuJeu(string systeme, string fichier)
+        => systeme + "[\"" + fichier.Replace("=", "").Replace("#", "") + "\"].";
 
     /// <summary>La cle par jeu du lanceur : <c>fbneo["19xx.zip"].OnScreenMsg</c> (meme forme que les reglages certifies). Pur.</summary>
-    internal static string CleDuJeu(string systeme, string fichier)
-        => systeme + "[\"" + fichier.Replace("=", "").Replace("#", "") + "\"]." + Fonction;
+    internal static string CleDuJeu(string systeme, string fichier) => PrefixeDuJeu(systeme, fichier) + Fonction;
+
+    /// <summary>Une cle par jeu de RetroArch, que le lanceur ecrit dans retroarch.cfg : <c>fbneo["19xx.zip"].retroarch.cle</c>. Pur.</summary>
+    internal static string CleRetroArchDuJeu(string systeme, string fichier, string cleRetroArch)
+        => PrefixeDuJeu(systeme, fichier) + "retroarch." + cleRetroArch;
+
+    /// <summary>Une cle que ce service a le droit de poser et de rendre (journal) : OnScreenMsg par jeu, ou une des notification_show_*. Pur.</summary>
+    internal static bool ClePermise(string? cle)
+        => !string.IsNullOrEmpty(cle)
+           && (cle.EndsWith("\"]." + Fonction, StringComparison.Ordinal)
+               || NotificationsRetroArch.AutresNotifications.Any(r => cle.EndsWith("\"].retroarch." + r.Key, StringComparison.Ordinal)));
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        // Avant l'ouverture d'ES (il attend l'API) : une cle laissee par une API arretee en pleine partie est rendue.
+        // Avant l'ouverture d'ES (il attend l'API) : une cle laissee par une API arretee en pleine partie est rendue, comme
+        // les notification_show_* laisses dans retroarch.cfg.
         Reparer();
+        NotificationsRetroArch.RendreLesAutresNotifications(_journal);
         _abonnement = _bus.Subscribe<EventEnvelope>(e =>
         {
             if (e.Type is "ui.game.ended" or "ui.game.ended.raw") Terminer();
@@ -122,14 +151,24 @@ public sealed class NotificationsDesLancementsEs : IHostedService, IDisposable
                 return false;
             }
 
-            // Une cle d'un lancement precedent encore la (emulateur jamais apparu) : rendue d'abord.
+            // Une cle d'un lancement precedent encore la (emulateur jamais apparu) : rendue d'abord, comme les
+            // notification_show_* de retroarch.cfg laisses par une partie qui gardait les succes.
             Reparer();
-            var cle = CleDuJeu(systeme, Path.GetFileName(chemin));
+            NotificationsRetroArch.RendreLesAutresNotifications(_journal);
+            var fichier = Path.GetFileName(chemin);
+            var cle = CleDuJeu(systeme, fichier);
+            var cles = NotificationsRetroArch.AutresNotifications
+                .Select(r => (Cle: CleRetroArchDuJeu(systeme, fichier, r.Key), r.Value)).ToList();
             string? avant = null;
+            var avants = new List<Note>();
+            var succes = false;
             var lue = false;
             _es.Update(doc =>
             {
                 avant = Valeur(doc, cle);
+                avants = cles.Select(c => new Note(c.Cle, Valeur(doc, c.Cle))).ToList();
+                succes = SuccesParLesClesDuJeu && NotificationsRetroArch.EstDuWorldScoring(origine)
+                         && NotificationsRetroArch.SuccesActifs(doc, systeme, fichier);
                 lue = true;
                 return false;
             });
@@ -139,6 +178,28 @@ public sealed class NotificationsDesLancementsEs : IHostedService, IDisposable
                 // Le joueur coupe deja les notifications de ce jeu : rien a poser ni a rendre.
                 MarquerCoupe();
                 return false;
+            }
+
+            if (succes)
+            {
+                // RetroAchievements gardes : video_font_enable reste au joueur, les notification_show_* par jeu coupent le reste.
+                long j;
+                lock (_verrou) j = ++_pose;
+                EcrireLeJournal(new Note(avants[0].Cle, avants[0].Avant, avants.Skip(1).ToList()));
+                NotificationsRetroArch.NoterAvantLesSucces(_journal);
+                var poseesSaufSucces = _es.Update(doc =>
+                {
+                    var change = false;
+                    foreach (var c in cles) change |= Poser(doc, c.Cle, c.Value);
+                    return change;
+                });
+                _journal?.LogInformation(
+                    "Notifications de RetroArch : {Nombre} cles notification_show_* par jeu ({Prefixe}) pour ce lancement par ES (partie du World Scoring, {Origine}) : RetroAchievements reste visible.",
+                    cles.Count, PrefixeDuJeu(systeme, fichier), origine);
+                MarquerCoupe();
+                var departSucces = DateTime.Now.AddSeconds(-2);
+                _ = Task.Run(() => RendreQuandLEmulateurParaitAsync(departSucces, j));
+                return poseesSaufSucces;
             }
 
             // Le journal AVANT la cle : une API qui tombe entre les deux rend une cle qui n'a pas change, sans dommage.
@@ -216,7 +277,12 @@ public sealed class NotificationsDesLancementsEs : IHostedService, IDisposable
             if (note is null) return false;
             try
             {
-                _es.Update(doc => Rendre(doc, note.Cle, note.Avant));
+                _es.Update(doc =>
+                {
+                    var change = Rendre(doc, note.Cle, note.Avant);
+                    foreach (var autre in note.Autres ?? []) change |= Rendre(doc, autre.Cle, autre.Avant);
+                    return change;
+                });
                 File.Delete(_cheminDuJournal);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -226,7 +292,8 @@ public sealed class NotificationsDesLancementsEs : IHostedService, IDisposable
             }
         }
 
-        _journal?.LogInformation("Notifications de RetroArch : {Cle} rendue ({Avant}).", note.Cle, note.Avant ?? "retiree");
+        _journal?.LogInformation("Notifications de RetroArch : {Cle} rendue ({Avant}){Autres}.", note.Cle, note.Avant ?? "retiree",
+            note.Autres is { Count: > 0 } a ? " et " + a.Count + " autres cles du jeu" : "");
         return true;
     }
 
@@ -295,8 +362,8 @@ public sealed class NotificationsDesLancementsEs : IHostedService, IDisposable
         {
             if (!File.Exists(_cheminDuJournal)) return null;
             var note = JsonSerializer.Deserialize<Note>(File.ReadAllText(_cheminDuJournal));
-            // Un journal qui ne nomme pas une cle de cette fonction ne touche rien
-            return note is { Cle.Length: > 0 } && note.Cle.EndsWith("\"]." + Fonction, StringComparison.Ordinal) ? note : null;
+            // Un journal qui ne nomme pas une cle de cette fonction (ou des notification_show_* par jeu) ne touche rien
+            return note is not null && ClePermise(note.Cle) && (note.Autres ?? []).All(a => ClePermise(a.Cle)) ? note : null;
         }
         catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
         {

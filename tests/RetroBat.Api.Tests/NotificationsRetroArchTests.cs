@@ -23,12 +23,22 @@ public sealed class NotificationsRetroArchTests : IDisposable
 {
     private readonly string _dossier = Path.Combine(Path.GetTempPath(), "sans-notif-" + Guid.NewGuid().ToString("N"));
 
-    public NotificationsRetroArchTests() => Directory.CreateDirectory(_dossier);
+    public NotificationsRetroArchTests()
+    {
+        Directory.CreateDirectory(_dossier);
+        // Jamais le journal ni le retroarch.cfg de la borne
+        NotificationsRetroArch.JournalDesSuccesDEssai = Path.Combine(_dossier, "notifications-retroarch.json");
+        NotificationsRetroArch.RetroArchCfgDEssai = Path.Combine(_dossier, "retroarch.cfg");
+        NotificationsRetroArch.RetroArchTourneDEssai = () => false;
+    }
 
     public void Dispose()
     {
         NotificationsRetroArch.PoserPourEssai(false);
         NotificationsRetroArch.BandeauDEssai = null;
+        NotificationsRetroArch.JournalDesSuccesDEssai = null;
+        NotificationsRetroArch.RetroArchCfgDEssai = null;
+        NotificationsRetroArch.RetroArchTourneDEssai = null;
         try { Directory.Delete(_dossier, recursive: true); } catch (IOException) { }
     }
 
@@ -176,6 +186,145 @@ public sealed class NotificationsRetroArchTests : IDisposable
         // le lanceur n'a pas demarre : rien de coupe
         NotificationsRetroArch.Suivre("-system nes -OnScreenMsg 0 -rom x", null, null);
         Assert.False(NotificationsRetroArch.Coupees);
+    }
+
+    // ─────────────── RetroAchievements visibles en World Scoring (14/11) ───────────────
+
+    [Fact]
+    public void Sauf_succes_les_widgets_restent_et_seuls_les_autres_messages_sont_coupes()
+    {
+        var cles = NotificationsRetroArch.AutresNotifications.Select(r => r.Key).ToList();
+        // le commutateur general et les widgets ne sont jamais touches : ce sont eux qui portent les succes
+        Assert.DoesNotContain(NotificationsRetroArch.CleRetroArch, cles);
+        Assert.DoesNotContain("menu_enable_widgets", cles);
+        // vrai, il cacherait TOUT en jeu, succes compris
+        Assert.DoesNotContain("notification_show_when_menu_is_alive", cles);
+        Assert.DoesNotContain(cles, c => c.StartsWith("cheevos_", StringComparison.Ordinal));
+        Assert.Contains("notification_show_save_state", cles);
+        Assert.Contains("notification_show_screenshot", cles);
+        Assert.Contains("notification_show_fast_forward", cles);
+        Assert.Equal(cles.Count, cles.Distinct().Count());
+        // le flash de la capture : 2 = OFF ; les autres a faux
+        Assert.All(NotificationsRetroArch.AutresNotifications,
+            r => Assert.Equal(r.Key == "notification_show_screenshot_flash" ? "2" : "false", r.Value));
+    }
+
+    [Fact]
+    public void Sauf_succes_l_argument_du_Deck_qui_coupe_tout_part_et_la_ligne_reste_valide()
+    {
+        var avecDeck = NotificationsRetroArch.AjouterSaufSucces([.. DeckDecor.ArgumentsDuLanceur, .. DeckDecor.ArgumentsSansNotifications]);
+        Assert.DoesNotContain("-OnScreenMsg", avecDeck);
+        Assert.Equal([.. DeckDecor.ArgumentsDuLanceur, .. NotificationsRetroArch.ArgumentsSaufSucces], avecDeck);
+        Assert.Equal(NotificationsRetroArch.ArgumentsSaufSucces, NotificationsRetroArch.AjouterSaufSucces(null));
+
+        var ligne = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur("-p1index 0", "fbneo", "libretro", "fbneo",
+            @"E:\RetroBat\roms\fbneo\shinobi.zip", null, avecDeck);
+        Assert.NotNull(ligne);
+        Assert.Contains("-retroarch.notification_show_save_state false", ligne);
+        Assert.Contains("-retroarch.notification_show_screenshot_flash 2", ligne);
+        Assert.False(NotificationsRetroArch.LigneCoupe(ligne));
+        Assert.True(NotificationsRetroArch.LigneGardeLesSucces(ligne));
+    }
+
+    [Fact]
+    public void Le_defi_du_World_Scoring_d_un_joueur_RetroAchievements_garde_les_succes()
+    {
+        var resolution = new RetroBat.Api.Netplay.EsLaunchArguments.Resolution("fbneo", "libretro", "fbneo");
+        var ligne = LeaderboardInputService.ArgumentsDuDefiAvecLeDeck("", resolution, @"E:\RetroBat\roms\fbneo\shinobi.zip",
+            [.. DeckDecor.ArgumentsDuLanceur, .. DeckDecor.ArgumentsSansNotifications], [], succes: true)!;
+        Assert.DoesNotContain("-OnScreenMsg", ligne);
+        Assert.Contains("-bezel nelfeplay-deck -ratio custom -integerscale 0 -retroarch.notification_show_autoconfig false", ligne);
+        // les fonctions qui font refuser un score restent coupees
+        Assert.Contains("-retroarch.notification_show_netplay_extra false -rewind 0 -runahead 0 -autosave 0", ligne);
+        Assert.True(NotificationsRetroArch.LigneGardeLesSucces(ligne));
+
+        // sans RetroAchievements : comme avant, tout coupe
+        var sans = LeaderboardInputService.ArgumentsDuDefiAvecLeDeck("", resolution, @"E:\RetroBat\roms\fbneo\shinobi.zip",
+            [.. DeckDecor.ArgumentsDuLanceur, .. DeckDecor.ArgumentsSansNotifications], [])!;
+        Assert.True(NotificationsRetroArch.LigneCoupe(sans));
+        Assert.DoesNotContain("-retroarch.", sans);
+    }
+
+    [Theory]
+    [InlineData("-system fbneo -retroarch.notification_show_save_state false -rom x", true)]
+    [InlineData("-retroarch.notification_show_save_state 0", true)]
+    [InlineData("-system fbneo -retroarch.notification_show_save_state true -rom x", false)]
+    [InlineData("-system fbneo -retroarch.notification_show_save_states false -rom x", false)]
+    [InlineData("-system fbneo -OnScreenMsg 0 -rom x", false)]
+    [InlineData(null, false)]
+    public void La_ligne_du_lanceur_dit_si_les_succes_restent(string? ligne, bool attendu)
+        => Assert.Equal(attendu, NotificationsRetroArch.LigneGardeLesSucces(ligne));
+
+    [Theory]
+    [InlineData("collection", true)]
+    [InlineData("collection (carrousel inconnu)", true)]
+    [InlineData("defi", true)]
+    [InlineData("site", true)]
+    [InlineData("api", true)]
+    [InlineData("speedrun", false)]
+    [InlineData("concours", false)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public void Seules_les_parties_du_World_Scoring_gardent_les_succes(string? origine, bool attendu)
+        => Assert.Equal(attendu, NotificationsRetroArch.EstDuWorldScoring(origine));
+
+    [Theory]
+    [InlineData("global.retroachievements=true;global.retroachievements.username=Snap", true)]
+    [InlineData("global.retroachievements=1;global.retroachievements.username=Snap", true)]
+    [InlineData("global.retroachievements=true", false)]
+    [InlineData("global.retroachievements=true;global.retroachievements.username= ", false)]
+    [InlineData("global.retroachievements=false;global.retroachievements.username=Snap", false)]
+    [InlineData("global.retroachievements.username=Snap", false)]
+    [InlineData("global.retroachievements=true;global.retroachievements.username=Snap;fbneo.retroachievements=false", false)]
+    [InlineData("global.retroachievements=false;global.retroachievements.username=Snap;fbneo[\"shinobi.zip\"].retroachievements=true", true)]
+    [InlineData("global.retroachievements=true;global.retroachievements.username=Snap;fbneo[\"shinobi.zip\"].retroachievements=0", false)]
+    [InlineData("global.retroachievements=true;global.retroachievements.username=Snap;mame.retroachievements=false", true)]
+    [InlineData("", false)]
+    public void Le_joueur_a_RetroAchievements_comme_le_lanceur_le_lit(string reglages, bool attendu)
+    {
+        var doc = new System.Xml.Linq.XDocument(new System.Xml.Linq.XElement("config",
+            reglages.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(r => r.Split('=', 2)).Select(kv =>
+                new System.Xml.Linq.XElement("string", new System.Xml.Linq.XAttribute("name", kv[0]), new System.Xml.Linq.XAttribute("value", kv[1])))));
+        Assert.Equal(attendu, NotificationsRetroArch.SuccesActifs(doc, "fbneo", @"E:\RetroBat\roms\fbneo\shinobi.zip"));
+
+        // lu sur le disque, en lecture seule ; un fichier absent ne vaut pas RetroAchievements
+        var es = Path.Combine(_dossier, "es_settings.cfg");
+        doc.Save(es);
+        var octets = File.ReadAllBytes(es);
+        Assert.Equal(attendu, NotificationsRetroArch.SuccesActifs("fbneo", @"E:\RetroBat\roms\fbneo\shinobi.zip", es));
+        Assert.Equal(octets, File.ReadAllBytes(es));
+        Assert.False(NotificationsRetroArch.SuccesActifs("fbneo", "shinobi.zip", Path.Combine(_dossier, "absent.cfg")));
+    }
+
+    [Fact]
+    public void Les_reglages_du_joueur_reviennent_dans_retroarch_cfg_RetroArch_ferme()
+    {
+        var cfg = NotificationsRetroArch.RetroArchCfgDEssai!;
+        var journal = NotificationsRetroArch.JournalDesSuccesDEssai!;
+        File.WriteAllText(cfg, "video_font_enable = \"true\"\nnotification_show_save_state = \"true\"\n"
+            + "notification_show_refresh_rate = \"true\"\nnotification_show_screenshot_flash = \"0\"\n");
+        NotificationsRetroArch.NoterAvantLesSucces();
+        Assert.True(File.Exists(journal));
+
+        // le lanceur ecrit les valeurs de la partie (et une cle que le joueur n'avait pas)
+        RetroArchConfigEdit.Poser(cfg, NotificationsRetroArch.AutresNotifications.ToDictionary(r => r.Key, r => r.Value));
+        // une seconde note (partie suivante avant le rendu) ne remplace pas la valeur du joueur
+        NotificationsRetroArch.NoterAvantLesSucces();
+
+        // RetroArch tourne encore : rien
+        NotificationsRetroArch.RetroArchTourneDEssai = () => true;
+        Assert.False(NotificationsRetroArch.RendreLesAutresNotifications());
+        Assert.Equal("false", RetroArchConfigEdit.Lire(cfg, "notification_show_save_state"));
+
+        NotificationsRetroArch.RetroArchTourneDEssai = () => false;
+        Assert.True(NotificationsRetroArch.RendreLesAutresNotifications());
+        Assert.Equal("true", RetroArchConfigEdit.Lire(cfg, "notification_show_save_state"));
+        Assert.Equal("true", RetroArchConfigEdit.Lire(cfg, "notification_show_refresh_rate"));
+        Assert.Equal("0", RetroArchConfigEdit.Lire(cfg, "notification_show_screenshot_flash"));
+        Assert.Null(RetroArchConfigEdit.Lire(cfg, "notification_show_netplay_extra"));
+        Assert.Equal("true", RetroArchConfigEdit.Lire(cfg, "video_font_enable"));
+        Assert.False(File.Exists(journal));
+        Assert.False(NotificationsRetroArch.RendreLesAutresNotifications());
     }
 
     private static int Occurrences(string texte, string motif)
