@@ -88,6 +88,54 @@ public sealed partial class LeaderboardOverlayService
 
     public sealed record PartDeLaJauge(int Place, double Part);
 
+    /// <summary>
+    /// LE TITRE SEUL SE REJOUE (brief du 13/11, point 1.1) : la cle d'un bilan reste la meme pour toute la partie ; quand le
+    /// verdict du site change le titre (GAME OVER puis SCORE RANKED), seul le titre refait son impact, a partir de l'instant du
+    /// changement. Les cartes, le score et les confettis ne repartent pas. Un titre change avant le debut de l'animation part
+    /// avec elle.
+    /// </summary>
+    internal sealed class RejeuDuTitre
+    {
+        /// <summary>La duree de l'impact du titre (agrandi, pose, secousse), en secondes.</summary>
+        public const double Duree = 0.6;
+
+        private string? _texte;
+
+        /// <summary>L'instant, sur l'horloge de l'ecran, ou le titre a commence son impact.</summary>
+        public double Depart { get; private set; }
+
+        /// <summary>L'instant ou le rejeu du titre est fini.</summary>
+        public double Fin => Depart > 0 ? Depart + Duree : 0;
+
+        public void Oublier()
+        {
+            _texte = null;
+            Depart = 0;
+        }
+
+        /// <summary>Retient le titre montre a l'instant <paramref name="t"/> ; vrai s'il vient de changer et se rejoue.</summary>
+        public bool Noter(string titre, double t)
+        {
+            if (_texte is null || t <= 0)
+            {
+                _texte = titre;
+                return false;
+            }
+
+            if (string.Equals(_texte, titre, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            _texte = titre;
+            Depart = t;
+            return true;
+        }
+
+        /// <summary>Le temps propre du titre.</summary>
+        public double Temps(double t) => t - Depart;
+    }
+
     /// <summary>APERCU : le temps fige de l'animation, en secondes ; null, l'horloge de l'ecran.</summary>
     internal double? _tempsDApercu;
 
@@ -106,6 +154,7 @@ public sealed partial class LeaderboardOverlayService
 
         private readonly Stopwatch _horlogeDeLaFin = new();
         private string? _cleDeLaFin;
+        private readonly RejeuDuTitre _rejeuDuTitre = new();
         private System.Windows.Forms.Timer? _imagesDeLaFin;
         private Bitmap? _fondDeFin;
         private string? _cleDuFond;
@@ -130,6 +179,7 @@ public sealed partial class LeaderboardOverlayService
             {
                 _cleDeLaFin = fin.Cle;
                 _horlogeDeLaFin.Reset();
+                _rejeuDuTitre.Oublier();
             }
 
             if (!_horlogeDeLaFin.IsRunning && _voile < 255)
@@ -141,7 +191,7 @@ public sealed partial class LeaderboardOverlayService
                     _imagesDeLaFin.Tick += (_, _) =>
                     {
                         Invalidate();
-                        if (_horlogeDeLaFin.Elapsed.TotalSeconds > FinDeLAnimation)
+                        if (_horlogeDeLaFin.Elapsed.TotalSeconds > Math.Max(FinDeLAnimation, _rejeuDuTitre.Fin))
                         {
                             _imagesDeLaFin.Stop();
                         }
@@ -151,7 +201,14 @@ public sealed partial class LeaderboardOverlayService
                 _imagesDeLaFin.Start();
             }
 
-            return _horlogeDeLaFin.IsRunning ? _horlogeDeLaFin.Elapsed.TotalSeconds : 0;
+            var t = _horlogeDeLaFin.IsRunning ? _horlogeDeLaFin.Elapsed.TotalSeconds : 0;
+            // Le verdict change le titre (GAME OVER puis SCORE RANKED) : lui seul se rejoue, les images reprennent le temps de son impact.
+            if (_rejeuDuTitre.Noter(fin.Titre, t))
+            {
+                _imagesDeLaFin?.Start();
+            }
+
+            return t;
         }
 
         private static double Entre(double t, double debut, double fin) => fin <= debut ? (t >= fin ? 1 : 0) : Math.Clamp((t - debut) / (fin - debut), 0, 1);
@@ -194,7 +251,7 @@ public sealed partial class LeaderboardOverlayService
                 DessinerLeDecor(g, fin.Type, t);
                 DessinerLeLogo(g, k, fin.Logo);
                 DessinerLEnTete(g, fin, secours);
-                DessinerLeTitre(g, fin.Titre, titre, t);
+                DessinerLeTitre(g, fin.Titre, titre, _service._tempsDApercu is null ? _rejeuDuTitre.Temps(t) : t);
                 DessinerLeVainqueur(g, fin, titre, secours, t);
                 DessinerLaPhrase(g, fin.Textes.Phrase, secours);
                 var haut = DessinerLaJauge(g, fin, titre, secours, t);

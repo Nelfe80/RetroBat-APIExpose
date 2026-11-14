@@ -144,12 +144,16 @@ public class WorldScoringEcransTests
     }
 
     [Fact]
-    public void Le_verdict_rend_le_rang_certifie_et_rejoue_le_titre()
+    public void Le_verdict_rend_le_rang_certifie_et_garde_la_cle_de_la_partie()
     {
         var provisoire = WorldScoringEcrans.ComposerLeBilan(Bilan(), Anglais);
         var certifie = WorldScoringEcrans.ComposerLeBilan(Bilan("published", 4), Anglais);
 
-        Assert.NotEqual(provisoire.Cle, certifie.Cle);
+        // Brief du 13/11, point 1.1 : une cle par partie, l'animation ne repart pas ; seul le titre change (et se rejoue).
+        Assert.Equal(provisoire.Cle, certifie.Cle);
+        Assert.Equal("ws-bilan-ket-1", certifie.Cle);
+        Assert.Equal("GAME OVER", WorldScoringEcrans.ComposerLeBilan(Bilan() with { Score = 900_000 }, Anglais).Titre);
+        Assert.Equal("SCORE RANKED", WorldScoringEcrans.ComposerLeBilan(Bilan("published", 4) with { Score = 900_000 }, Anglais).Titre);
         Assert.Equal("CERTIFIED", certifie.MonScore!.Second);
         Assert.Equal("Certified: rank #4.", certifie.Note);
         Assert.Contains(certifie.Joueurs[0].Mesures, m => m.Libelle == "CONTINUES" && m.Valeur == 0 && m.Meilleure);
@@ -159,6 +163,34 @@ public class WorldScoringEcransTests
         Assert.True(record.MonScore!.Premier);
         Assert.True(record.Progression!.Atteint);
         Assert.Equal(1, record.Progression.Part);
+    }
+
+    [Fact]
+    public void Seul_le_titre_se_rejoue_quand_le_verdict_le_change()
+    {
+        var rejeu = new L.RejeuDuTitre();
+
+        // Avant que l'animation parte, un titre change part avec elle.
+        Assert.False(rejeu.Noter("GAME OVER", 0));
+        Assert.False(rejeu.Noter("SCORE RANKED", 0));
+        Assert.Equal(0, rejeu.Depart);
+        Assert.Equal(1.2, rejeu.Temps(1.2), 6);
+
+        // Pendant l'animation, le meme titre ne change rien.
+        Assert.False(rejeu.Noter("SCORE RANKED", 1.5));
+        Assert.Equal(1.5, rejeu.Temps(1.5), 6);
+
+        // Le verdict arrive a 2,1 s : le titre repart de zero, le reste garde son horloge.
+        Assert.True(rejeu.Noter("NEW BEST!", 2.1));
+        Assert.Equal(2.1, rejeu.Depart, 6);
+        Assert.Equal(0.4, rejeu.Temps(2.5), 6);
+        Assert.Equal(2.1 + L.RejeuDuTitre.Duree, rejeu.Fin, 6);
+        Assert.False(rejeu.Noter("NEW BEST!", 3));
+
+        // Un autre bilan (une autre cle) repart propre.
+        rejeu.Oublier();
+        Assert.Equal(0, rejeu.Depart);
+        Assert.Equal(0, rejeu.Fin);
     }
 
     [Fact]

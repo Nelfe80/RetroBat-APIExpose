@@ -420,6 +420,8 @@ public sealed partial class DefisPanelService
     {
         CancellationToken jeton;
         (string Regle, string Statut, int? Rang, long? Score)? enAttente;
+        // L'instant d'ouverture fait la cle de l'ecran : le verdict garde la meme, une autre tentative en prend une autre.
+        if (b.Ouverture == 0) b = b with { Ouverture = DateTime.UtcNow.Ticks };
         lock (_verrou)
         {
             _page = PageDEpreuve.Bilan;

@@ -541,7 +541,7 @@ public sealed class WorldScoringEcransService : IHostedService, IDisposable
         return BilanDe(s.Depart, s.Monde, s.ScoreCertifie ?? s.ScoreLu, duree, s.Verdict, s.Prevol, s.DeckNom, s.Deck, s.ViesPerdues);
     }
 
-    /// <summary>Le bilan a l'ecran se redessine (verdict, stats du Deck) ; sa cle change avec le verdict : le titre se rejoue.</summary>
+    /// <summary>Le bilan a l'ecran se redessine (verdict, stats du Deck) ; sa cle reste celle de la partie : seul le titre se rejoue s'il change.</summary>
     private void Recomposer()
     {
         EcranDeFin? fin;
