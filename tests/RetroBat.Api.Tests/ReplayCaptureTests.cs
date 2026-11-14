@@ -155,6 +155,26 @@ public sealed class ReplayCaptureTests
     }
 
     [Fact]
+    public void Une_borne_modeste_ne_filme_plus_pendant_30_jours()
+    {
+        // La fiche de la borne du user (marquee le 04/11 a 06:48, heure de Paris).
+        const string fiche = """{"modeste_depuis": "2026-11-04T05:48:29.870405Z"}""";
+        var fin = new DateTime(2026, 12, 4, 5, 48, 29, DateTimeKind.Utc).AddTicks(8704050);
+        Assert.Equal(fin, ReplayCaptureService.FinDeLaPause(fiche, new DateTime(2026, 11, 14, 0, 27, 0, DateTimeKind.Utc)));
+        Assert.Null(ReplayCaptureService.FinDeLaPause(fiche, fin));
+        Assert.Null(ReplayCaptureService.FinDeLaPause(fiche, new DateTime(2026, 12, 5, 0, 0, 0, DateTimeKind.Utc)));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("{")]
+    [InlineData("[]")]
+    [InlineData("{}")]
+    [InlineData("""{"modeste_depuis":"hier"}""")]
+    public void Une_fiche_de_capacite_illisible_ne_retient_pas_la_borne(string fiche)
+        => Assert.Null(ReplayCaptureService.FinDeLaPause(fiche, new DateTime(2026, 11, 14, 0, 0, 0, DateTimeKind.Utc)));
+
+    [Fact]
     public void Une_fiche_d_avant_la_reprise_se_relit_sans_session_ni_video()
     {
         const string ancienne = """{"ReplayId":"rp_A","Fichier":"C:\\captures\\rp_A.mkv","DebutFilm":12,"FinFilm":9000,"CreeeUtc":"2026-10-14T16:00:00Z"}""";
