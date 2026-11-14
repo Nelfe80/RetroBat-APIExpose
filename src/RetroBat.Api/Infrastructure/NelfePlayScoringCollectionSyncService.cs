@@ -132,8 +132,13 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         DataPackSyncService? dataPack = null,
         Func<DateTime>? horloge = null,
         CabinetLocale? locale = null,
-        Func<InstalledGame, OpenGame, bool, RomAdmission.Decision>? admission = null)
+        Func<InstalledGame, OpenGame, bool, RomAdmission.Decision>? admission = null,
+        SuiviDuSite? suivi = null)
     {
+        _suivi = suivi;
+        // QUOI DE NEUF (point 6 du 14/11) : une revision de l'index qui n'est pas celle gardee fait relire tout de suite.
+        _suivi?.SurRevision(SuiviDuSite.JeuxOuverts, (revision, ct) =>
+            revision == SuiviDuSite.Normaliser(LireEtat()?.RemoteEtag) ? Task.CompletedTask : SynchroniserAsync("quoi de neuf", ct));
         _locale = locale;
         _admission = admission ?? ((candidat, jeu, speedrunSeul) => JugerLeDump(candidat, jeu, speedrunSeul, RomAdmission.ReferentielSurDisque.Borne));
         _horloge = horloge ?? (() => DateTime.UtcNow);
@@ -1234,9 +1239,17 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         }
     }
 
+    private readonly SuiviDuSite? _suivi;
+
     private async Task<TelechargementResultat> TelechargerAsync(string? etag, CancellationToken cancellationToken)
     {
         if (DateTime.UtcNow - _dernierAppelUtc < _minimumEntreDeuxAppels)
+        {
+            return new TelechargementResultat(null, etag, null);
+        }
+
+        // La revision que donne agent/whats-new est celle de l'index garde : c'est un 304 sans appel (point 6 du 14/11).
+        if (_suivi?.RevisionAJour(SuiviDuSite.JeuxOuverts, etag, DateTime.UtcNow) == true)
         {
             return new TelechargementResultat(null, etag, null);
         }

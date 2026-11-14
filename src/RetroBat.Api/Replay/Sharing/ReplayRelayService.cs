@@ -106,12 +106,32 @@ public sealed class ReplayRelayService : BackgroundService
     public ReplayRelayService(ReplayStore store, AvatarSheetStore avatars, ReplaySharePolicy policy,
         RetroBat.Api.Infrastructure.NelfePlayDeviceStore devices, IHttpClientFactory httpFactory,
         IConfiguration config, IEventBus bus, ILogger<ReplayRelayService> logger,
-        RetroBat.Api.Netplay.LiveSpectateState? seance = null)
+        RetroBat.Api.Netplay.LiveSpectateState? seance = null,
+        RetroBat.Api.Infrastructure.SuiviDuSite? suivi = null)
     {
         _store = store; _avatars = avatars; _policy = policy; _devices = devices;
         _httpFactory = httpFactory; _config = config; _bus = bus; _logger = logger;
         _seance = seance;
+        _suivi = suivi;
+        if (_suivi is not null)
+        {
+            // LA BOITE JOINTE AU RELEVE DE L'AGENT (point 5 du 14/11) : le site la donne a partir du curseur de cette borne.
+            _suivi.CurseurDeLaBoite = () => Etat().Since;
+            _suivi.Traiter(RetroBat.Api.Infrastructure.SuiviDuSite.BoiteDuRelais, (boite, ct) => TraiterLaBoiteAsync(boite, ct));
+        }
     }
+
+    private readonly RetroBat.Api.Infrastructure.SuiviDuSite? _suivi;
+
+    /// <summary>Le minuteur et le releve de l'agent ne traitent pas la boite en meme temps.</summary>
+    private readonly SemaphoreSlim _boite = new(1, 1);
+
+    /// <summary>
+    /// Le releve du minuteur peut-il se taire ? Oui AU REPOS (ni spectateur, ni salle, ni planche ni replay attendus) quand
+    /// le releve de l'agent porte deja la boite. Les modes rapides gardent leur cadence : 15 s, 60 s. Pur.
+    /// </summary>
+    internal static bool ReleveCouvert(bool couvert, bool spectateur, bool salleMultiplayer, bool planchesAttendues, bool replayAttendu)
+        => couvert && !spectateur && !salleMultiplayer && !planchesAttendues && !replayAttendu;
 
     /// <summary>Cette borne regarde-t-elle un direct ? Sa planche et celles de la foule passent par le relais.</summary>
     private bool Spectateur => _seance is not null && _seance.Courant.Session.Length > 0;
@@ -134,9 +154,18 @@ public sealed class ReplayRelayService : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            try { await TickAsync(stoppingToken).ConfigureAwait(false); }
-            catch (OperationCanceledException) { break; }
-            catch (Exception ex) { _logger.LogDebug(ex, "Relais : passage en erreur."); }
+            var avant = Etat().Pending;
+            if (ReleveCouvert(_suivi?.Couvert(RetroBat.Api.Infrastructure.SuiviDuSite.BoiteDuRelais, DateTime.UtcNow) == true,
+                    Spectateur, _salleMultiplayer, avant.Any(EstAvatar), avant.Any(p => !EstAvatar(p))))
+            {
+                _releveRate = false;
+            }
+            else
+            {
+                try { await TickAsync(stoppingToken).ConfigureAwait(false); }
+                catch (OperationCanceledException) { break; }
+                catch (Exception ex) { _logger.LogDebug(ex, "Relais : passage en erreur."); }
+            }
 
             var attente = Etat().Pending;
             _echecs = _releveRate ? _echecs + 1 : 0;
@@ -173,14 +202,47 @@ public sealed class ReplayRelayService : BackgroundService
     /// </summary>
     private async Task<int> DeposerAsync(string credential, bool avatarsSeulement, CancellationToken ct)
     {
-        var etat = Etat();
-        var doc = await LireJsonAsync("/api/v1/agent/relay/inbox?limit=20&since=" + etat.Since, credential, ct)
+        var doc = await LireJsonAsync("/api/v1/agent/relay/inbox?limit=20&since=" + Etat().Since, credential, ct)
             .ConfigureAwait(false);
         // Un releve rate fait reculer le suivant (C-9) ; un releve abouti efface le recul.
         _releveRate = doc is null;
         if (doc is null) return 0;
+        return await DeposerDepuisAsync(credential, avatarsSeulement, doc, ct).ConfigureAwait(false);
+    }
 
-        var suivant = doc["next"]?.GetValue<long>() ?? etat.Since;
+    /// <summary>
+    /// La boite <c>relay_inbox</c> jointe au releve de l'agent, meme forme que <c>relay/inbox</c> (<c>{ok, next, requests}</c>).
+    /// Partie ou lecture en cours : seules les planches partent, comme au passage du minuteur.
+    /// </summary>
+    internal async Task<int> TraiterLaBoiteAsync(JsonElement boite, CancellationToken ct)
+    {
+        var credential = _devices.GetCredential();
+        if (string.IsNullOrEmpty(credential)) return 0;
+        if (JsonNode.Parse(boite.GetRawText()) is not JsonObject doc) return 0;
+        return await DeposerDepuisAsync(credential, _gameActive || _replayActive, doc, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Depose ce que demande une boite lue. Une demande deja passee sous le curseur (la meme boite lue par le minuteur et
+    /// par le releve de l'agent) est sautee ; le curseur ne recule jamais.
+    /// </summary>
+    private async Task<int> DeposerDepuisAsync(string credential, bool avatarsSeulement, JsonObject doc, CancellationToken ct)
+    {
+        await _boite.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            return await DeposerDepuisSeulAsync(credential, avatarsSeulement, doc, ct).ConfigureAwait(false);
+        }
+        finally
+        {
+            _boite.Release();
+        }
+    }
+
+    private async Task<int> DeposerDepuisSeulAsync(string credential, bool avatarsSeulement, JsonObject doc, CancellationToken ct)
+    {
+        var etat = Etat();
+        var suivant = Math.Max(etat.Since, doc["next"]?.GetValue<long>() ?? etat.Since);
         var demandes = doc["requests"] as JsonArray ?? new JsonArray();
         var deposes = 0;
         long? premiereLaissee = null;
@@ -190,6 +252,7 @@ public sealed class ReplayRelayService : BackgroundService
             if (ct.IsCancellationRequested) break;
             var sha = demande?["object_sha256"]?.GetValue<string>() ?? string.Empty;
             if (sha.Length != 64) continue;
+            if (demande?["id"]?.GetValue<long>() is { } id && id <= etat.Since) continue;
 
             string chemin;
             if (_avatars.Has(sha))

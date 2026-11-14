@@ -282,6 +282,10 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<LiveContestClientS
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.NelfePlayDeviceStore>();
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.NelfePlayAgentService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.NelfePlayAgentService>());
+// Charge du 14/11 (points 5 et 6 du site) : ce que le site joint au releve, et le quoi de neuf qui remplace sept minuteurs.
+builder.Services.AddSingleton<RetroBat.Api.Infrastructure.SuiviDuSite>();
+builder.Services.AddSingleton<RetroBat.Api.Infrastructure.QuoiDeNeufService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.QuoiDeNeufService>());
 // Canal RAM communautaire : pull périodique des .MEM publiés sur RetroBat-RAM-Community
 // vers le dossier RAM local (lecture seule, n'écrase pas l'officiel). Réglages : ApiExpose:CommunityRam.
 builder.Services.AddHostedService<RetroBat.Api.Infrastructure.CommunityRamSyncService>();

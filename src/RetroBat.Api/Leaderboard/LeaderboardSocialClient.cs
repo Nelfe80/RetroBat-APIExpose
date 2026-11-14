@@ -165,29 +165,36 @@ public sealed class LeaderboardSocialClient
         if (doc is null) return Array.Empty<Direct>();
         try
         {
-            if (!doc.RootElement.TryGetProperty(champ, out var liste) || liste.ValueKind != JsonValueKind.Array)
-            {
-                return Array.Empty<Direct>();
-            }
-            var directs = new List<Direct>();
-            foreach (var d in liste.EnumerateArray())
-            {
-                string Texte(string nom) => d.TryGetProperty(nom, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : "";
-                var session = Texte("session");
-                if (session.Length == 0) continue;
-                // La liste publique nomme le joueur « pseudo », celle des suivis « player ».
-                var pseudo = Texte("pseudo");
-                if (pseudo.Length == 0) pseudo = Texte("player");
-                directs.Add(new Direct(
-                    session, Texte("handle"), pseudo, Texte("game"), Texte("game_name"),
-                    Texte("system"), Texte("kind"), Texte("type"), Texte("since")));
-            }
-            return directs;
+            return doc.RootElement.TryGetProperty(champ, out var liste) ? LireDirects(liste) : Array.Empty<Direct>();
         }
         finally
         {
             doc.Dispose();
         }
+    }
+
+    /// <summary>
+    /// Une liste de directs (<c>live</c> de live/following, <c>lives</c> de live/for-game, <c>live_following</c> joint au
+    /// releve de l'agent) ; vide si ce n'est pas une liste. Pur.
+    /// </summary>
+    public static IReadOnlyList<Direct> LireDirects(JsonElement liste)
+    {
+        if (liste.ValueKind != JsonValueKind.Array) return Array.Empty<Direct>();
+        var directs = new List<Direct>();
+        foreach (var d in liste.EnumerateArray())
+        {
+            if (d.ValueKind != JsonValueKind.Object) continue;
+            string Texte(string nom) => d.TryGetProperty(nom, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : "";
+            var session = Texte("session");
+            if (session.Length == 0) continue;
+            // La liste publique nomme le joueur « pseudo », celle des suivis « player ».
+            var pseudo = Texte("pseudo");
+            if (pseudo.Length == 0) pseudo = Texte("player");
+            directs.Add(new Direct(
+                session, Texte("handle"), pseudo, Texte("game"), Texte("game_name"),
+                Texte("system"), Texte("kind"), Texte("type"), Texte("since")));
+        }
+        return directs;
     }
 
     /// <summary>

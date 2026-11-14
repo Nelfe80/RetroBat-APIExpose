@@ -371,8 +371,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         RetroBat.Api.Reseau.ServiceDeCarte? cartes = null,
         RetroBat.Api.Reseau.ClientDeRelais? relais = null,
         RetroBat.Api.Speedrun.SpeedrunSessionService? speedrun = null,
-        InterfaceTextService? textes = null)
+        InterfaceTextService? textes = null,
+        SuiviDuSite? suivi = null)
     {
+        _suivi = suivi;
+        // L'etat de la reconstruction joint au releve de l'agent (point 5 du 14/11).
+        _suivi?.Traiter(SuiviDuSite.Reconstruction, (etat, _) =>
+        {
+            SignalerLaReconstruction(etat);
+            return Task.CompletedTask;
+        });
         _textes = textes;
         _speedrun = speedrun;
         _cartes = cartes;
@@ -415,18 +423,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // Marche pour les machines ANONYMES (contrairement à /agent/work lié à un
             // compte) car ResolveCredential retombe sur le credential anonyme.
             var delay = TimeSpan.FromSeconds(20); // premier contrôle peu après le boot
-            var prochainRecovery = DateTime.MinValue;
             var echecsRecovery = 0;
+            IssueDuRecovery? derniereIssue = null;
             while (!stoppingToken.IsCancellationRequested)
             {
                 await Task.Delay(delay, stoppingToken).ConfigureAwait(false);
                 // Le statut recovery une fois par heure (C-6, 14/11 : 20 lectures par heure et 418 échecs sans recul) ;
                 // pendant une reconstruction armee, a chaque tour ; apres un echec, le tour suivant recule.
-                if (DateTime.UtcNow >= prochainRecovery)
+                // COUVERT (point 5 du 14/11) : le releve de l'agent porte deja l'etat ; une reconstruction armee qu'il
+                // signale fait relire ici tout de suite, et le tour de 3 min reprend pendant l'episode.
+                if (DateTime.UtcNow >= _prochainRecovery
+                    && !RecoveryCouvert(_suivi?.Couvert(SuiviDuSite.Reconstruction, DateTime.UtcNow) == true, _reconstructionSignalee, derniereIssue))
                 {
+                    _reconstructionSignalee = false;
                     var issue = await RecoveryCheckAsync(stoppingToken).ConfigureAwait(false);
+                    derniereIssue = issue;
                     echecsRecovery = issue == IssueDuRecovery.Echec ? echecsRecovery + 1 : 0;
-                    prochainRecovery = DateTime.UtcNow + ProchainRecovery(issue, echecsRecovery, Random.Shared.NextDouble());
+                    _prochainRecovery = DateTime.UtcNow + ProchainRecovery(issue, echecsRecovery, Random.Shared.NextDouble());
                 }
                 await ClaimCheckAsync(stoppingToken).ConfigureAwait(false);
                 RessayerLesLiens();
@@ -453,6 +466,34 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         /// <summary>Une reconstruction est armee : la borne re-verse ses records.</summary>
         Armee,
     }
+
+    private readonly SuiviDuSite? _suivi;
+    private DateTime _prochainRecovery = DateTime.MinValue;
+    private volatile bool _reconstructionSignalee;
+
+    /// <summary>
+    /// La lecture de <c>scores/recovery-status</c> peut-elle se taire ? Oui si le releve de l'agent porte l'etat, qu'il ne
+    /// signale pas de reconstruction armee et que la derniere lecture d'ici n'en a pas trouve. Pur.
+    /// </summary>
+    internal static bool RecoveryCouvert(bool couvert, bool reconstructionSignalee, IssueDuRecovery? derniereIssue)
+        => couvert && !reconstructionSignalee && derniereIssue != IssueDuRecovery.Armee;
+
+    /// <summary>
+    /// L'etat de la reconstruction recu avec le releve (meme forme que <c>scores/recovery-status</c>). Arme : le battement
+    /// relit lui-meme au tour suivant (3 min au plus) et fait le re-versement, comme s'il l'avait lu seul.
+    /// </summary>
+    internal void SignalerLaReconstruction(System.Text.Json.JsonElement etat)
+    {
+        if (etat.ValueKind == System.Text.Json.JsonValueKind.Object
+            && etat.TryGetProperty("contribute", out var c) && c.ValueKind == System.Text.Json.JsonValueKind.True)
+        {
+            _reconstructionSignalee = true;
+            _prochainRecovery = DateTime.MinValue;
+        }
+    }
+
+    /// <summary>Une reconstruction signalee par le releve attend-elle sa lecture (tests) ?</summary>
+    internal bool ReconstructionSignalee => _reconstructionSignalee;
 
     /// <summary>Le statut recovery se relit une fois par heure quand tout est calme (C-6, 14/11).</summary>
     internal static readonly TimeSpan RecoveryAuCalme = TimeSpan.FromHours(1);

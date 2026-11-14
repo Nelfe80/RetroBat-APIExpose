@@ -40,10 +40,17 @@ public sealed class IndexDesDefisService : BackgroundService
     private readonly ILogger<IndexDesDefisService>? _journal;
     private readonly string _dossier;
     private string? _etag;
+    private readonly SuiviDuSite? _suivi;
+    /// <summary>Le minuteur et le quoi de neuf ne synchronisent pas en meme temps.</summary>
+    private readonly SemaphoreSlim _porte = new(1, 1);
 
     public IndexDesDefisService(IHttpClientFactory http, CatalogueDesDefis catalogue, ApiContext? contexte = null,
-        ILogger<IndexDesDefisService>? journal = null, string? dossier = null)
+        ILogger<IndexDesDefisService>? journal = null, string? dossier = null, SuiviDuSite? suivi = null)
     {
+        _suivi = suivi;
+        // QUOI DE NEUF (point 6 du 14/11) : une revision de l'index qui n'est pas celle gardee fait relire tout de suite.
+        _suivi?.SurRevision(SuiviDuSite.DefisOuverts, (revision, ct) =>
+            revision == SuiviDuSite.Normaliser(_etag) ? Task.CompletedTask : SynchroniserAsync(ct));
         _http = http;
         _catalogue = catalogue;
         _contexte = contexte;
@@ -118,6 +125,22 @@ public sealed class IndexDesDefisService : BackgroundService
     internal async Task SynchroniserAsync(CancellationToken ct)
     {
         if (_contexte?.Ui.Running is not null) return;
+        // La revision que donne agent/whats-new est celle de l'index garde : rien a demander (point 6 du 14/11).
+        if (_suivi?.RevisionAJour(SuiviDuSite.DefisOuverts, _etag, DateTime.UtcNow) == true) return;
+
+        await _porte.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            await SynchroniserSeulAsync(ct).ConfigureAwait(false);
+        }
+        finally
+        {
+            _porte.Release();
+        }
+    }
+
+    private async Task SynchroniserSeulAsync(CancellationToken ct)
+    {
 
         using var client = _http.CreateClient(HttpClientName);
         client.BaseAddress ??= new Uri(NelfePlayAgentService.BaseUrl.TrimEnd('/'));

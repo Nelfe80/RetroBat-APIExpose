@@ -52,6 +52,8 @@ public sealed class NelfePlayAgentService : BackgroundService
     /// <summary>D'ou vient la langue de la borne. Absent, on annonce l'anglais.</summary>
     private readonly RetroBat.Domain.Services.EmulationStationSettingsService? _reglages;
     private string _langue = "";
+    /// <summary>Ou deposer ce que le site joint au releve (points 5 et 6 du 14/11). Absent : rien ne change.</summary>
+    private readonly SuiviDuSite? _suivi;
     private readonly string _packageRoot =
         Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "packages");
 
@@ -61,8 +63,10 @@ public sealed class NelfePlayAgentService : BackgroundService
         ILogger<NelfePlayAgentService> logger,
         RetroBat.Domain.Models.ApiContext context,
         NelfePlayMessageRouter? routeur = null,
-        RetroBat.Domain.Services.EmulationStationSettingsService? reglages = null)
+        RetroBat.Domain.Services.EmulationStationSettingsService? reglages = null,
+        SuiviDuSite? suivi = null)
     {
+        _suivi = suivi;
         _reglages = reglages;
         _device = device;
         _httpFactory = httpFactory;
@@ -82,6 +86,37 @@ public sealed class NelfePlayAgentService : BackgroundService
 
     /// <summary>Le dernier releve de <c>agent/work</c> a-t-il rate (reseau, erreur du site, reponse illisible) ?</summary>
     private volatile bool _releveRate;
+
+    /// <summary>L'heure du dernier releve <c>agent/work</c> abouti (ticks UTC, 0 : aucun).</summary>
+    private long _dernierReleveReussiTicks;
+
+    /// <summary>
+    /// QUAND <c>agent/whats-new</c> FAIT FOI (point 6 du 14/11), le releve ne part plus toutes les 5 min : le quoi de neuf le
+    /// demande quand la revision du travail change. Il en garde un au demarrage et un par heure : c'est lui qui dit au site
+    /// la version, le nom et les coeurs de la borne, et les coeurs peuvent changer sans redemarrage.
+    /// </summary>
+    internal static readonly TimeSpan ReleveMinimal = TimeSpan.FromHours(1);
+
+    /// <summary>Le releve periodique peut-il se taire ? Oui si le quoi de neuf suit la revision du travail et qu'un releve a abouti depuis moins d'une heure. Pur.</summary>
+    internal static bool ReleveCouvert(bool travailSuivi, DateTime? dernierReleveReussiUtc, DateTime maintenantUtc)
+        => travailSuivi && dernierReleveReussiUtc is { } dernier && maintenantUtc - dernier < ReleveMinimal;
+
+    /// <summary>L'heure du dernier releve abouti, ou null.</summary>
+    internal DateTime? DernierReleveReussiUtc
+    {
+        get
+        {
+            var ticks = Interlocked.Read(ref _dernierReleveReussiTicks);
+            return ticks == 0 ? null : new DateTime(ticks, DateTimeKind.Utc);
+        }
+    }
+
+    /// <summary>
+    /// L'adresse du releve : avec le curseur de la boite du relais, le site y joint la boite (point 5 du 14/11) ; un site
+    /// d'avant ignore le parametre. Pur.
+    /// </summary>
+    internal static string AdresseDuReleve(long? curseurDeLaBoite)
+        => curseurDeLaBoite is { } curseur ? "/api/v1/agent/work?inbox_since=" + Math.Max(0, curseur) : "/api/v1/agent/work";
 
     private string LabelPath => Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "label.txt");
 
@@ -155,7 +190,8 @@ public sealed class NelfePlayAgentService : BackgroundService
         {
             try
             {
-                if (_device.IsPaired)
+                if (_device.IsPaired
+                    && !ReleveCouvert(_suivi?.Revision(SuiviDuSite.Travail, DateTime.UtcNow) is not null, DernierReleveReussiUtc, DateTime.UtcNow))
                 {
                     await PollAsync(stoppingToken);
                     echecs = _releveRate ? echecs + 1 : 0;
@@ -216,8 +252,27 @@ public sealed class NelfePlayAgentService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// Un releve a la fois : la boucle, le quoi de neuf et l'appairage peuvent le demander ensemble, et deux releves
+    /// paralleles installeraient deux fois le meme paquet.
+    /// </summary>
+    private readonly SemaphoreSlim _unReleveALaFois = new(1, 1);
+
     /// <summary>Releve immediat (appele aussi juste apres un appairage).</summary>
     public async Task PollAsync(CancellationToken cancellationToken)
+    {
+        await _unReleveALaFois.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await ReleverAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _unReleveALaFois.Release();
+        }
+    }
+
+    private async Task ReleverAsync(CancellationToken cancellationToken)
     {
         var credential = _device.GetCredential();
         if (credential is null)
@@ -228,7 +283,7 @@ public sealed class NelfePlayAgentService : BackgroundService
         using var client = CreateClient(credential);   // le nom machine (X-Nelfeplay-Label) est déjà posé par CreateClient
         // Rate jusqu'a preuve du contraire : la boucle recule apres un releve rate (C-9).
         _releveRate = true;
-        using var response = await client.GetAsync("/api/v1/agent/work", cancellationToken);
+        using var response = await client.GetAsync(AdresseDuReleve(_suivi?.Curseur()), cancellationToken);
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
             // Le compte a revoque cette machine (perdue, revendue, ou dont il
@@ -253,13 +308,31 @@ public sealed class NelfePlayAgentService : BackgroundService
             return;
         }
 
-        var payload = await response.Content.ReadFromJsonAsync<WorkResponse>(JsonOptions, cancellationToken);
+        var corps = await response.Content.ReadAsStringAsync(cancellationToken);
+        var payload = JsonSerializer.Deserialize<WorkResponse>(corps, JsonOptions);
         if (payload is null || !payload.Ok)
         {
             return;
         }
 
         _releveRate = false;
+        Interlocked.Exchange(ref _dernierReleveReussiTicks, DateTime.UtcNow.Ticks);
+
+        // CE QUE LE SITE JOINT AU RELEVE (point 5 du 14/11) : directs suivis, avatars en attente, reconstruction, boite du
+        // relais. Chaque champ traite fait taire son minuteur ; un champ absent (site d'avant) le laisse tourner.
+        if (_suivi is not null)
+        {
+            try
+            {
+                using var document = JsonDocument.Parse(corps);
+                await _suivi.DistribuerAsync(document.RootElement, SuiviDuSite.Validite(TimeSpan.FromSeconds(Math.Max(30, PollSeconds))),
+                    cancellationToken).ConfigureAwait(false);
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogDebug(ex, "Nelfe Play : suivi joint au releve illisible.");
+            }
+        }
 
         await RemettreLesMessagesAsync(client, payload, cancellationToken).ConfigureAwait(false);
 
@@ -611,6 +684,15 @@ public sealed class NelfePlayAgentService : BackgroundService
         using var response = await client.PostAsync("/api/v1/agent/mem-candidate-test", content, ct);
         return ((int)response.StatusCode, await response.Content.ReadAsStringAsync(ct));
     }
+
+    /// <summary>Le credential de la borne pour le quoi de neuf : appairage, sinon installation anonyme ; null sans l'un ni l'autre.</summary>
+    internal string? CredentialDeLaBorne() => ResolveMemCredential();
+
+    /// <summary>Un client vers le site avec les en-tetes du releve (nom, version, wrapper, coeurs, langue).</summary>
+    internal HttpClient ClientDuSite(string? credential) => CreateClient(credential);
+
+    /// <summary>La borne est-elle appairee a un compte ?</summary>
+    internal bool Appairee => _device.IsPaired;
 
     /// <summary>Credential pour les actions .MEM : appairage compte SINON install anonyme (records-claim).</summary>
     private string? ResolveMemCredential()

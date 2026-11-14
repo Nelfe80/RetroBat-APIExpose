@@ -39,11 +39,17 @@ public sealed class AvatarDepositCollector : BackgroundService
     private readonly IHttpClientFactory _httpFactory;
     private readonly IConfiguration _config;
     private readonly ILogger<AvatarDepositCollector> _logger;
+    private readonly SuiviDuSite? _suivi;
+    /// <summary>Le minuteur et le releve de l'agent ne prennent pas la meme planche en meme temps.</summary>
+    private readonly SemaphoreSlim _prise = new(1, 1);
 
     public AvatarDepositCollector(AvatarSheetStore magasin, NelfePlayDeviceStore machine,
         ReplayHoldingsReporter recensement, IHttpClientFactory httpFactory, IConfiguration config,
-        ILogger<AvatarDepositCollector> logger)
+        ILogger<AvatarDepositCollector> logger, SuiviDuSite? suivi = null)
     {
+        _suivi = suivi;
+        // Les planches jointes au releve de l'agent (point 5 du 14/11) : meme traitement que le releve du minuteur.
+        _suivi?.Traiter(SuiviDuSite.AvatarsEnAttente, (liste, ct) => TraiterLaListeAsync(liste, ct));
         _magasin = magasin;
         _machine = machine;
         _recensement = recensement;
@@ -62,7 +68,10 @@ public sealed class AvatarDepositCollector : BackgroundService
         {
             try
             {
-                var r = await RelevereAsync(stoppingToken).ConfigureAwait(false);
+                // COUVERT (point 5 du 14/11) : le releve de l'agent porte deja la liste ; le minuteur se tait.
+                var r = _suivi?.Couvert(SuiviDuSite.AvatarsEnAttente, DateTime.UtcNow) == true
+                    ? new Resultat(false, 0, "covered")
+                    : await RelevereAsync(stoppingToken).ConfigureAwait(false);
                 echecs = r.Reason is "unreachable" || r.Reason?.StartsWith("http_", StringComparison.Ordinal) == true ? echecs + 1 : 0;
             }
             catch (OperationCanceledException) { break; }
@@ -78,13 +87,8 @@ public sealed class AvatarDepositCollector : BackgroundService
 
     public async Task<Resultat> RelevereAsync(CancellationToken ct)
     {
-        var credential = _machine.GetCredential();
-        if (string.IsNullOrWhiteSpace(credential)) return new Resultat(false, 0, "device_not_paired");
-
-        var client = _httpFactory.CreateClient();
-        client.BaseAddress = new Uri(BaseUrl);
-        client.Timeout = TimeSpan.FromSeconds(30);
-        client.DefaultRequestHeaders.Add("X-NelfePlay-Device", credential);
+        var client = Client();
+        if (client is null) return new Resultat(false, 0, "device_not_paired");
 
         List<Depot> depots;
         try
@@ -92,7 +96,7 @@ public sealed class AvatarDepositCollector : BackgroundService
             using var reponse = await client.GetAsync(CheminAttente, ct).ConfigureAwait(false);
             if (!reponse.IsSuccessStatusCode) return new Resultat(false, 0, "http_" + (int) reponse.StatusCode);
             using var doc = JsonDocument.Parse(await reponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
-            depots = Lire(doc.RootElement);
+            depots = doc.RootElement.TryGetProperty("sheets", out var liste) ? Lire(liste) : [];
         }
         catch (Exception ex)
         {
@@ -100,8 +104,46 @@ public sealed class AvatarDepositCollector : BackgroundService
             return new Resultat(false, 0, "unreachable");
         }
 
-        if (depots.Count == 0) return new Resultat(true, 0, null);
+        return await PrendreLesDepotsAsync(client, depots, ct).ConfigureAwait(false);
+    }
 
+    /// <summary>La liste <c>avatar_pending</c> jointe au releve de l'agent, meme forme que <c>sheets</c>.</summary>
+    internal async Task<Resultat> TraiterLaListeAsync(JsonElement liste, CancellationToken ct)
+    {
+        var depots = Lire(liste);
+        if (depots.Count == 0) return new Resultat(true, 0, null);
+        var client = Client();
+        if (client is null) return new Resultat(false, 0, "device_not_paired");
+        return await PrendreLesDepotsAsync(client, depots, ct).ConfigureAwait(false);
+    }
+
+    private HttpClient? Client()
+    {
+        var credential = _machine.GetCredential();
+        if (string.IsNullOrWhiteSpace(credential)) return null;
+        var client = _httpFactory.CreateClient();
+        client.BaseAddress = new Uri(BaseUrl);
+        client.Timeout = TimeSpan.FromSeconds(30);
+        client.DefaultRequestHeaders.Add("X-NelfePlay-Device", credential);
+        return client;
+    }
+
+    private async Task<Resultat> PrendreLesDepotsAsync(HttpClient client, List<Depot> depots, CancellationToken ct)
+    {
+        if (depots.Count == 0) return new Resultat(true, 0, null);
+        await _prise.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            return await PrendreLesDepotsSeulAsync(client, depots, ct).ConfigureAwait(false);
+        }
+        finally
+        {
+            _prise.Release();
+        }
+    }
+
+    private async Task<Resultat> PrendreLesDepotsSeulAsync(HttpClient client, List<Depot> depots, CancellationToken ct)
+    {
         var recues = 0;
         foreach (var depot in depots)
         {
@@ -190,12 +232,14 @@ public sealed class AvatarDepositCollector : BackgroundService
 
     private sealed record Depot(string Sha256, string Pseudo, string Famille, string Generateur, int Variation);
 
-    private static List<Depot> Lire(JsonElement racine)
+    /// <summary>Une liste de depots (<c>sheets</c> d'avatar/pending, <c>avatar_pending</c> du releve). Pur.</summary>
+    private static List<Depot> Lire(JsonElement liste)
     {
         var sortie = new List<Depot>();
-        if (!racine.TryGetProperty("sheets", out var liste) || liste.ValueKind != JsonValueKind.Array) return sortie;
+        if (liste.ValueKind != JsonValueKind.Array) return sortie;
         foreach (var e in liste.EnumerateArray())
         {
+            if (e.ValueKind != JsonValueKind.Object) continue;
             var sha = Texte(e, "sha256");
             var pseudo = Texte(e, "pseudo");
             var famille = Texte(e, "family");

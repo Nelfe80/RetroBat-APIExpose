@@ -163,8 +163,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         Deck.DeckLaunchService? deck = null,
         Multiplayer.SonDEmulationStation? sonDEs = null,
         Speedrun.IPrioritesDuJeu? priorites = null,
-        WorldScoringEcransService? ecransWs = null)
+        WorldScoringEcransService? ecransWs = null,
+        Infrastructure.SuiviDuSite? suivi = null)
     {
+        _suivi = suivi;
         _ecransWs = ecransWs;
         _priorites = priorites;
         _deck = deck;
@@ -204,6 +206,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         _abonnement = _bus.Subscribe<EventEnvelope>(SurEvenement);
         _arret = new CancellationTokenSource();
         _ = Task.Run(() => ChienDeGardeAsync(_arret.Token), CancellationToken.None);
+        // Les directs suivis joints au releve de l'agent (point 5 du 14/11) passent par la meme annonce que le guet.
+        _suivi?.Traiter(Infrastructure.SuiviDuSite.DirectsSuivis,
+            (liste, ct) => AnnoncerLesDirectsSuivisAsync(LeaderboardSocialClient.LireDirects(liste), ct));
         _ = Task.Run(() => GuetterLesDirectsSuivisAsync(_arret.Token), CancellationToken.None);
         // Les parties et les replays se lisent ici une fois : la premiere ouverture du panneau ne l'attend pas. Elle
         // bloquait le chien de garde, et un appui long tombe pendant cette lecture se perdait (30/10/2026).
@@ -1099,31 +1104,16 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// </summary>
     private async Task GuetterLesDirectsSuivisAsync(CancellationToken ct)
     {
-        var connus = new HashSet<string>(StringComparer.Ordinal);
-        var premierTour = true;
         var echecs = 0;
         while (!ct.IsCancellationRequested)
         {
             // PAS EN PARTIE (lot 4 bis C-4, 14/11 : 7 040 appels par jour) : aucune notification ne parait pendant une
             // partie ; un direct lance pendant la partie s'annonce au tour qui suit le retour dans ES.
-            var enPartie = _context.Ui.Running is not null || EmulatorForeground.EmulateurDeJeuTourne();
-            if (!enPartie)
+            // COUVERT (point 5 du 14/11) : le releve de l'agent porte deja la liste, toutes les 5 min ; le guet se tait.
+            if (!EnPartiePourLesDirects() && _suivi?.Couvert(Infrastructure.SuiviDuSite.DirectsSuivis, DateTime.UtcNow) != true)
             try
             {
-                var directs = await _social.DirectsSuivisAsync(ct).ConfigureAwait(false);
-                var enCours = new HashSet<string>(directs.Select(d => d.Session), StringComparer.Ordinal);
-                foreach (var d in directs)
-                {
-                    if (!connus.Add(d.Session) || premierTour) continue;
-                    var message = _textes.Format("leaderboard.live_notice", Langue(),
-                        ("player", d.Pseudo.Length > 0 ? d.Pseudo : d.Poignee),
-                        ("game", d.NomDuJeu.Length > 0 ? d.NomDuJeu : d.Jeu),
-                        ("system", NomDuSysteme(d.Systeme)));
-                    _logger.LogInformation("Classement : {Message}", message);
-                    await _notifications.NotifyAsync(message, ct).ConfigureAwait(false);
-                }
-                connus.IntersectWith(enCours);   // un direct fini pourra etre reannonce s'il reprend
-                premierTour = false;
+                await AnnoncerLesDirectsSuivisAsync(await _social.DirectsSuivisAsync(ct).ConfigureAwait(false), ct).ConfigureAwait(false);
                 echecs = 0;
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested) { return; }
@@ -1132,6 +1122,38 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // Recul apres echec (15 min au plus) et dispersion de 10 % (C-9, 14/11).
             try { await Task.Delay(CadenceDeFond.Prochaine(TimeSpan.FromSeconds(60), echecs, TimeSpan.FromMinutes(15)), ct).ConfigureAwait(false); }
             catch (OperationCanceledException) { return; }
+        }
+    }
+
+    private bool EnPartiePourLesDirects() => _context.Ui.Running is not null || EmulatorForeground.EmulateurDeJeuTourne();
+
+    private readonly Infrastructure.SuiviDuSite? _suivi;
+    private readonly SemaphoreSlim _annonceDesDirects = new(1, 1);
+    private readonly GuetDesDirectsSuivis _guetDesDirects = new();
+
+    /// <summary>
+    /// Annonce les directs suivis nouveaux, qu'ils viennent du guet ou du releve de l'agent. En partie, rien : la liste
+    /// n'est pas retenue, le prochain passage apres la partie annoncera ce qui a commence pendant.
+    /// </summary>
+    private async Task AnnoncerLesDirectsSuivisAsync(IReadOnlyList<LeaderboardSocialClient.Direct> directs, CancellationToken ct)
+    {
+        if (EnPartiePourLesDirects()) return;
+        await _annonceDesDirects.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            foreach (var d in _guetDesDirects.Nouveaux(directs))
+            {
+                var message = _textes.Format("leaderboard.live_notice", Langue(),
+                    ("player", d.Pseudo.Length > 0 ? d.Pseudo : d.Poignee),
+                    ("game", d.NomDuJeu.Length > 0 ? d.NomDuJeu : d.Jeu),
+                    ("system", NomDuSysteme(d.Systeme)));
+                _logger.LogInformation("Classement : {Message}", message);
+                await _notifications.NotifyAsync(message, ct).ConfigureAwait(false);
+            }
+        }
+        finally
+        {
+            _annonceDesDirects.Release();
         }
     }
 
