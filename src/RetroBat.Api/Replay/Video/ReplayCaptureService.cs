@@ -23,8 +23,9 @@ namespace RetroBat.Api.Replay.Video;
 /// film x4.</item>
 /// <item>Un film a la taille d'origine ne part pas tel quel sur YouTube : pour un record, la borne fabrique d'abord sa
 /// version YouTube (redressee, agrandie sans lissage, FLV) avec NelfePlay.LiveStreaming.exe, hors partie.</item>
-/// <item>Un garde-fou (<see cref="GardeDeCapture"/>) coupe la capture si le jeu ralentit ; la borne ne filme
-/// alors plus pendant 30 jours.</item>
+/// <item>Avant chaque film, la machine se verifie sur l'instant (<see cref="ControleAvantFilm"/>) ; un garde-fou
+/// (<see cref="GardeDeCapture"/>) coupe la capture si le jeu ralentit pendant. Ni l'un ni l'autre ne dure au-dela de la
+/// partie (decision du user, 14/11 : plus de pause de 30 jours).</item>
 /// <item>Un jeu vertical sort couche (RetroArch 1.22 filme avant de tourner l'image) : il se reconnait a l'en-tete
 /// du film (<see cref="MatroskaEntete"/>). Le sens de rotation, annonce par le coeur dans le journal de lancement,
 /// permet de le redresser a la fin en corrigeant l'en-tete, sans reencoder (<see cref="MatroskaRotation"/>) ;
@@ -49,7 +50,6 @@ public sealed class ReplayCaptureService : BackgroundService
     /// le miroir, sans quoi il ne s'affiche pas encore au classement. Quelques secondes a une minute.
     /// </summary>
     private static readonly TimeSpan PremiereDemandeApres = TimeSpan.FromSeconds(60);
-    private static readonly TimeSpan ModesteDurant = TimeSpan.FromDays(30);
     private const string EchelleVoulue = "4";
 
     /// <summary>En dessous, un film agrandi est trop petit pour YouTube : l'echelle x4 n'a pas pris.</summary>
@@ -499,6 +499,7 @@ public sealed class ReplayCaptureService : BackgroundService
         try
         {
             Directory.CreateDirectory(_dossier);
+            OublierLAnciennePause();
             PreparerRetroArch();
             _abonnement = _bus.Subscribe<EventEnvelope>(SurEvenement);
         }
@@ -605,6 +606,8 @@ public sealed class ReplayCaptureService : BackgroundService
                 case "ui.game.started":
                     // Le jeu lance, pour le fond du cadre de son film (fanart).
                     _cheminDuJeu = Chaine(e.Payload, "GamePath");
+                    // Une partie neuve : le refus de la precedente ne la suit pas.
+                    _refusDeLaPartie = null;
                     // Le joueur passe avant : un envoi en cours s'arrete, il reprendra apres la partie.
                     lock (_verrou)
                     {
@@ -629,20 +632,13 @@ public sealed class ReplayCaptureService : BackgroundService
         try
         {
             if (_enCours is not null) return;
-            if (ModesteJusquA() is { } finDeLaPause)
-            {
-                // LA PAUSE SE DIT SUR LA BORNE (14/11) : marquee le 04/11, la borne du user n'a plus filme pendant dix jours
-                // sans une ligne a son journal ; ses directs attendaient un film qui ne venait pas.
-                _logger.LogInformation("Capture : la borne ne filme plus jusqu'au {Fin} (le jeu ralentissait pendant une capture), partie non filmee ; pour reessayer, supprimer {Fichier} hors partie.",
-                    finDeLaPause.ToLocalTime().ToString("dd/MM HH:mm", System.Globalization.CultureInfo.InvariantCulture), CheminDeCapacite);
-                SignalerNonCapture(replayId, "borne_modeste", "le jeu ralentissait pendant une capture, pause de " + ModesteDurant.TotalDays + " jours", room);
-                return;
-            }
+            _refusDeLaPartie = null;
+            OublierLAnciennePause();
             var reglages = LireRetroArch();
             if (string.Equals(Valeur(reglages, "video_gpu_record"), "true", StringComparison.OrdinalIgnoreCase))
             {
                 _logger.LogInformation("Capture : RetroArch filme l'image affichee (video_gpu_record), partie non filmee.");
-                SignalerNonCapture(replayId, "gpu_record", "video_gpu_record actif dans retroarch.cfg", room);
+                RefuserLaPartie(replayId, "gpu_record", "video_gpu_record actif dans retroarch.cfg", room);
                 return;
             }
             // Un filtre d'image du coeur (NTSC) ne se diffuse pas bien (25/10) : ni film ni direct ; la video d'un record
@@ -650,7 +646,7 @@ public sealed class ReplayCaptureService : BackgroundService
             if (FiltreActif() is { } filtre)
             {
                 _logger.LogInformation("Capture : filtre d'image du coeur actif ({Filtre}), partie non filmee.", filtre);
-                SignalerNonCapture(replayId, "filtre_image", filtre, room);
+                RefuserLaPartie(replayId, "filtre_image", filtre, room);
                 return;
             }
             // Le spectateur cache d'une partie MULTIPLAYER filme dans son propre dossier (MultiplayerSpectateur).
@@ -659,14 +655,23 @@ public sealed class ReplayCaptureService : BackgroundService
             {
                 // RetroArch tourne deja avec ce retroarch.cfg : le dossier sera pose pour la partie suivante (PreparerRetroArch).
                 _logger.LogInformation("Capture : aucun dossier de films dans retroarch.cfg, partie non filmee ; il sera pose apres la partie.");
-                SignalerNonCapture(replayId, "dossier_films", "recording_output_directory absent, pose pour la partie suivante", room);
+                RefuserLaPartie(replayId, "dossier_films", "recording_output_directory absent, pose pour la partie suivante", room);
                 return;
             }
             Directory.CreateDirectory(dossier);
             if (EspaceLibreGo(dossier) is { } libre && libre < _espaceLibreMinGo)
             {
                 _logger.LogInformation("Capture : {Libre:F1} Go libres, partie non filmee.", libre);
-                SignalerNonCapture(replayId, "place_disque", libre.ToString("F1", System.Globalization.CultureInfo.InvariantCulture) + " Go libres", room);
+                RefuserLaPartie(replayId, "place_disque", libre.ToString("F1", System.Globalization.CultureInfo.InvariantCulture) + " Go libres", room);
+                return;
+            }
+
+            // LA MACHINE SUR L'INSTANT (14/11) : processeur sature, memoire epuisee ou jeu deja ralenti, pas de film pour cette
+            // partie seulement ; la suivante se verifie a nouveau.
+            if (!duSpectateur && await RaisonDeLaMachineAsync(sansReplay).ConfigureAwait(false) is { } machine)
+            {
+                _logger.LogInformation("Capture : pas de film pour cette partie : {Raison}.", machine);
+                RefuserLaPartie(replayId, "machine", machine, room);
                 return;
             }
 
@@ -688,7 +693,7 @@ public sealed class ReplayCaptureService : BackgroundService
             if (fichier is null)
             {
                 _logger.LogInformation("Capture : RetroArch n'a pas commence a filmer {ReplayId}.", replayId);
-                SignalerNonCapture(replayId, "retroarch_sans_film", "aucun film apparu en 5 s dans " + dossier, room);
+                RefuserLaPartie(replayId, "retroarch_sans_film", "aucun film apparu en 5 s dans " + dossier, room);
                 return;
             }
             var statut = duSpectateur ? null : await _ra.GetStatusAsync(_arret).ConfigureAwait(false);
@@ -1096,7 +1101,7 @@ public sealed class ReplayCaptureService : BackgroundService
             if (!c.Garde.Relever(c.Chrono.Elapsed.TotalSeconds, frame)) return;
             c.Lent = true;
         }
-        MarquerModeste();
+        NoterLeRalenti(c);
         _ = Task.Run(() => ArreterAsync(c.ReplayId, null, abandon: true,
             "le jeu ralentissait (reference " + c.Garde.Reference.ToString("F1") + " images/s)", "jeu_ralenti"));
     }
@@ -1206,7 +1211,7 @@ public sealed class ReplayCaptureService : BackgroundService
         if (actif is not { Recording: true }) return;
         if (c.Garde.Relever(c.Chrono.Elapsed.TotalSeconds, actif.Frame))
         {
-            MarquerModeste();
+            NoterLeRalenti(c);
             await ArreterAsync(c.ReplayId, null, abandon: true,
                 "le jeu ralentissait (reference " + c.Garde.Reference.ToString("F1") + " images/s)", "jeu_ralenti").ConfigureAwait(false);
         }
@@ -1791,61 +1796,69 @@ public sealed class ReplayCaptureService : BackgroundService
                 .OrderBy(File.GetCreationTimeUtc).ToList()
             : new List<string>();
 
-    /// <summary>La borne a ralenti en filmant : elle ne filme plus pendant 30 jours. La fin de cette pause (UTC), ou null.</summary>
-    private DateTime? ModesteJusquA()
+    /// <summary>
+    /// Pourquoi cette borne ne filme pas la partie en cours : capture coupee, ou partie refusee par le controle d'avant le
+    /// film ; null sinon. Rien ne dure au-dela de la partie. Le direct ne se porte pas candidat sans film.
+    /// </summary>
+    public string? PourquoiPasDeFilm() => _actif ? _refusDeLaPartie : "la capture est coupee (Video:Capture:Enabled)";
+
+    private volatile string? _refusDeLaPartie;
+
+    /// <summary>Cette partie ne sera pas filmee : le site le sait, le direct aussi (PourquoiPasDeFilm).</summary>
+    private void RefuserLaPartie(string replayId, string code, string? detail, string? room)
+    {
+        _refusDeLaPartie = string.IsNullOrWhiteSpace(detail) ? code : detail;
+        SignalerNonCapture(replayId, code, detail, room);
+    }
+
+    /// <summary>La machine, sur l'instant : processeur (1 s), memoire libre et cadence du jeu pendant cette seconde.</summary>
+    private async Task<string?> RaisonDeLaMachineAsync(bool sansReplay)
     {
         try
         {
-            return File.Exists(CheminDeCapacite) ? FinDeLaPause(File.ReadAllText(CheminDeCapacite), DateTime.UtcNow) : null;
+            var avant = sansReplay ? null : (await _ra.GetActiveReplayAsync(_arret).ConfigureAwait(false))?.Frame;
+            var chrono = Stopwatch.StartNew();
+            var processeur = await ControleAvantFilm.ChargeDuProcesseurAsync(ControleAvantFilm.MesureDuProcesseur, _arret).ConfigureAwait(false);
+            var apres = sansReplay ? null : (await _ra.GetActiveReplayAsync(_arret).ConfigureAwait(false))?.Frame;
+            var cadence = ControleAvantFilm.Cadence(avant, apres, chrono.Elapsed.TotalSeconds);
+            return ControleAvantFilm.RaisonMachine(processeur, ControleAvantFilm.MemoireLibreMo(), cadence, _coeur.ReadLatest()?.Fps);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>Le jeu ralentit pendant le film : seul le film de cette partie s'arrete (14/11).</summary>
+    private void NoterLeRalenti(CaptureEnCours c)
+    {
+        _refusDeLaPartie = "le jeu ralentissait pendant le film";
+        _logger.LogInformation("Capture : le jeu ralentissait pendant le film de {ReplayId} (reference {Reference:F1} images/s), film arrete pour cette partie seulement.",
+            c.ReplayId, c.Garde.Reference);
+    }
+
+    /// <summary>
+    /// L'ancienne pause de 30 jours (capacite.json, jusqu'a la 1.9.178) ne vaut plus rien : la fiche est ignoree et effacee.
+    /// </summary>
+    private void OublierLAnciennePause()
+    {
+        if (OublierLaFiche(CheminDeCapacite))
+            _logger.LogInformation("Capture : ancienne pause de film effacee ({Fichier}), la borne filme a nouveau.", CheminDeCapacite);
+    }
+
+    /// <summary>Efface la fiche de l'ancienne pause si elle existe ; vrai si elle a ete effacee.</summary>
+    internal static bool OublierLaFiche(string chemin)
+    {
+        try
+        {
+            if (!File.Exists(chemin)) return false;
+            File.Delete(chemin);
+            return true;
         }
         catch (Exception)
         {
-            return null;
+            return false;
         }
-    }
-
-    /// <summary>
-    /// La fin de la pause d'une borne modeste d'apres sa fiche <c>capacite.json</c> (UTC), ou null si elle filme. Une fiche
-    /// illisible ne retient pas la borne. Pur.
-    /// </summary>
-    internal static DateTime? FinDeLaPause(string fiche, DateTime maintenantUtc)
-    {
-        try
-        {
-            using var doc = JsonDocument.Parse(fiche);
-            if (doc.RootElement.ValueKind != JsonValueKind.Object
-                || !doc.RootElement.TryGetProperty("modeste_depuis", out var d) || !d.TryGetDateTime(out var depuis)) return null;
-            var fin = depuis.ToUniversalTime() + ModesteDurant;
-            return maintenantUtc < fin ? fin : null;
-        }
-        catch (JsonException)
-        {
-            return null;
-        }
-    }
-
-    /// <summary>
-    /// Pourquoi cette borne ne filmera pas la prochaine partie, quoi qu'il arrive (capture coupee, borne modeste) ; null si
-    /// elle peut filmer. Le direct ne se porte pas candidat sans film (DirectPartageService).
-    /// </summary>
-    public string? PourquoiPasDeFilm()
-    {
-        if (!_actif) return "la capture est coupee (Video:Capture:Enabled)";
-        return ModesteJusquA() is { } fin
-            ? "la borne ne filme plus jusqu'au " + fin.ToLocalTime().ToString("dd/MM HH:mm", System.Globalization.CultureInfo.InvariantCulture)
-              + " (le jeu ralentissait pendant une capture ; supprimer " + CheminDeCapacite + " pour reessayer)"
-            : null;
-    }
-
-    private void MarquerModeste()
-    {
-        try
-        {
-            File.WriteAllText(CheminDeCapacite, JsonSerializer.Serialize(new { modeste_depuis = DateTime.UtcNow }, Json));
-            _logger.LogWarning("Capture : le jeu ralentissait pendant la capture, cette borne ne filme plus pendant {Jours} jours.",
-                ModesteDurant.TotalDays);
-        }
-        catch (Exception) { /* au pire, elle retentera */ }
     }
 
     private static long TailleDe(string chemin)

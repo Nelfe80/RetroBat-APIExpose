@@ -155,24 +155,24 @@ public sealed class ReplayCaptureTests
     }
 
     [Fact]
-    public void Une_borne_modeste_ne_filme_plus_pendant_30_jours()
+    public void L_ancienne_pause_de_30_jours_est_ignoree_et_effacee()
     {
-        // La fiche de la borne du user (marquee le 04/11 a 06:48, heure de Paris).
-        const string fiche = """{"modeste_depuis": "2026-11-04T05:48:29.870405Z"}""";
-        var fin = new DateTime(2026, 12, 4, 5, 48, 29, DateTimeKind.Utc).AddTicks(8704050);
-        Assert.Equal(fin, ReplayCaptureService.FinDeLaPause(fiche, new DateTime(2026, 11, 14, 0, 27, 0, DateTimeKind.Utc)));
-        Assert.Null(ReplayCaptureService.FinDeLaPause(fiche, fin));
-        Assert.Null(ReplayCaptureService.FinDeLaPause(fiche, new DateTime(2026, 12, 5, 0, 0, 0, DateTimeKind.Utc)));
+        // La fiche de la borne du user (marquee le 04/11 a 06:48) : plus rien ne la lit, elle s'efface.
+        var dossier = Path.Combine(Path.GetTempPath(), "capacite-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dossier);
+        try
+        {
+            var fiche = Path.Combine(dossier, "capacite.json");
+            File.WriteAllText(fiche, """{"modeste_depuis": "2026-11-04T05:48:29.870405Z"}""");
+            Assert.True(ReplayCaptureService.OublierLaFiche(fiche));
+            Assert.False(File.Exists(fiche));
+            Assert.False(ReplayCaptureService.OublierLaFiche(fiche));
+        }
+        finally
+        {
+            Directory.Delete(dossier, recursive: true);
+        }
     }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("{")]
-    [InlineData("[]")]
-    [InlineData("{}")]
-    [InlineData("""{"modeste_depuis":"hier"}""")]
-    public void Une_fiche_de_capacite_illisible_ne_retient_pas_la_borne(string fiche)
-        => Assert.Null(ReplayCaptureService.FinDeLaPause(fiche, new DateTime(2026, 11, 14, 0, 0, 0, DateTimeKind.Utc)));
 
     [Fact]
     public void Une_fiche_d_avant_la_reprise_se_relit_sans_session_ni_video()

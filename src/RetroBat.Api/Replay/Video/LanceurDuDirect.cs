@@ -213,7 +213,7 @@ public static class LanceurDuDirect
     /// </summary>
     public static async Task<Rapport> DiffuserAsync(string exe, string film, string adresse, int rotation, ILogger journal,
         CancellationToken ct, string? annonce = null, string? classement = null, IReadOnlyList<string>? options = null,
-        TimeSpan? delaiDeFin = null, double? forme = null, string? fond = null, bool crt = false)
+        TimeSpan? delaiDeFin = null, double? forme = null, string? fond = null, bool crt = false, Action<string>? surLigne = null)
     {
         var info = new ProcessStartInfo(exe)
         {
@@ -234,6 +234,8 @@ public static class LanceurDuDirect
             if (string.IsNullOrWhiteSpace(e.Data)) return;
             derniere = Masquer(e.Data, adresse);
             journal.LogInformation("Direct (exe) : {Ligne}", derniere);
+            // La sante de l'emission (14/11) : l'appelant lit la regulation et les points de l'exe.
+            try { surLigne?.Invoke(derniere); } catch (Exception) { /* la lecture ne coupe jamais l'exe */ }
         };
         p.ErrorDataReceived += (_, e) =>
         {
