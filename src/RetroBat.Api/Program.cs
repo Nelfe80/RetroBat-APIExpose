@@ -833,6 +833,69 @@ app.Services.GetRequiredService<RetroBat.Api.Infrastructure.CoreMemoryCapability
     app.Services.GetService<RetroBat.Api.Infrastructure.CabinetLocale>(),
     app.Services.GetService<RetroBat.Api.Infrastructure.PartieNelfePlayService>());
 
+var cabinetApiKey = app.Configuration["Security:ApiKey"] ?? string.Empty;
+if (cabinetApiKey.Length == 0)
+{
+    cabinetApiKey = RetroBat.Api.Infrastructure.CabinetApiKeyStore.GetOrCreate();
+}
+
+// ── Garde de l'HOTE : contre le rebond DNS ─────────────────────────────────
+// En tete de chaine, pour toutes les routes (/api, /ws, /swagger, /nelfeplay,
+// /dorequest.php). Detail dans GardeDeLHote. Seules les connexions de la boucle
+// locale sont controlees : celles du reseau passent par la cle de borne.
+// Security:HostCheck = "log" journalise sans refuser, "off" coupe la garde ;
+// Security:AllowedHosts ajoute des noms (separes par des virgules).
+{
+    var modeHote = RetroBat.Api.Infrastructure.GardeDeLHote.LireMode(app.Configuration["Security:HostCheck"]);
+    var nomsAcceptes = RetroBat.Api.Infrastructure.GardeDeLHote.NomsAcceptes(
+        app.Configuration["Security:AllowedHosts"],
+        app.Configuration["Urls"]);
+    var journalHote = app.Logger;
+    if (modeHote != RetroBat.Api.Infrastructure.GardeDeLHote.Mode.Arret)
+    {
+        app.Use(async (context, next) =>
+        {
+            var remote = context.Connection.RemoteIpAddress;
+            var depuisLaBoucle = remote is null || System.Net.IPAddress.IsLoopback(remote);
+            var hote = context.Request.Headers.Host.ToString();
+            if (!depuisLaBoucle || RetroBat.Api.Infrastructure.GardeDeLHote.EstAccepte(hote, nomsAcceptes))
+            {
+                await next();
+                return;
+            }
+
+            // Une page qui rebondit ne peut lire ni la cle de borne ni le jeton local.
+            var cle = context.Request.Headers["X-Api-Key"].FirstOrDefault();
+            if ((cabinetApiKey.Length > 0 && cle is { Length: > 0 }
+                    && System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(
+                        System.Text.Encoding.UTF8.GetBytes(cle), System.Text.Encoding.UTF8.GetBytes(cabinetApiKey)))
+                || LocalWriteToken.Matches(context.Request.Headers[LocalWriteToken.HeaderName].FirstOrDefault()))
+            {
+                await next();
+                return;
+            }
+
+            var bloque = modeHote == RetroBat.Api.Infrastructure.GardeDeLHote.Mode.Bloquer;
+            var nomJournal = hote.Length > 80 ? hote[..80] : hote;
+            if (RetroBat.Api.Infrastructure.GardeDeLHote.PremierSignalement(nomJournal))
+            {
+                journalHote.LogWarning(
+                    "Garde de l'hote : Host inattendu {Host} sur {Path} ({Action}). Ajouter le nom a Security:AllowedHosts s'il est legitime.",
+                    nomJournal, context.Request.Path.Value, bloque ? "refuse" : "journalise seulement");
+            }
+
+            if (!bloque)
+            {
+                await next();
+                return;
+            }
+
+            context.Response.StatusCode = StatusCodes.Status421MisdirectedRequest;
+            await context.Response.WriteAsJsonAsync(new { error = "Hote non reconnu.", host = nomJournal });
+        });
+    }
+}
+
 app.Use(async (context, next) =>
 {
     if (context.Request.Path.StartsWithSegments("/swagger") &&
@@ -863,11 +926,7 @@ app.UseRouting();
 // LAN.
 // Empty in appsettings (no secret in the repo) → generate a unique per-cabinet key on
 // first run, so non-loopback access stays gated with a key that differs per machine.
-var cabinetApiKey = app.Configuration["Security:ApiKey"] ?? string.Empty;
-if (cabinetApiKey.Length == 0)
-{
-    cabinetApiKey = RetroBat.Api.Infrastructure.CabinetApiKeyStore.GetOrCreate();
-}
+// (cabinetApiKey est calculee plus haut, avant la garde de l'hote.)
 // NelfeNet : clé de PARTAGE, volontairement distincte de celle ci-dessus. La clé de borne
 // administre la machine (lancer une lecture, deployer une configuration, tout lire) ; c'est ce
 // qu'il faut au hub de flotte, ce n'est pas ce qu'on donne a une borne voisine qui veut recuperer
@@ -1018,6 +1077,14 @@ app.Use(async (context, next) =>
     }
 
     var fetchSite = context.Request.Headers["Sec-Fetch-Site"].ToString();
+    if (fetchSite.Length == 0
+        && GardeDeLHote.EcritureDePageEtrangere(context.Request.Headers.Origin.ToString(), context.Request.Headers.Host.ToString()))
+    {
+        // Sec-Fetch-Site manque (navigateur ancien, ou origine http non sure),
+        // mais Origin trahit une page etrangere : aucun client natif ne l'envoie.
+        fetchSite = "cross-site";
+    }
+
     if (fetchSite.Length == 0)
     {
         // Pas un navigateur : client natif, script, hub. Les autres gardes
