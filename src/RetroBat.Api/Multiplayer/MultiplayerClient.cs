@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using RetroBat.Api.Infrastructure;
 
@@ -24,17 +25,23 @@ public sealed class MultiplayerClient
     private readonly NelfePlayDeviceStore _machine;
     private readonly ILogger<MultiplayerClient>? _journal;
     private readonly Func<HttpClient?>? _clientDeTest;
+    private readonly FileDesResultatsMultiplayer? _resultats;
+
+    /// <summary>Les corps des envois gardes : tels que PostAsJsonAsync les ecrit (noms laisses tels quels, nuls compris).</summary>
+    private static readonly JsonSerializerOptions Ecriture = new(JsonSerializerDefaults.Web);
 
     public MultiplayerClient(
         IHttpClientFactory fabrique,
         NelfePlayDeviceStore machine,
         ILogger<MultiplayerClient>? journal = null,
-        Func<HttpClient?>? clientDeTest = null)
+        Func<HttpClient?>? clientDeTest = null,
+        FileDesResultatsMultiplayer? resultats = null)
     {
         _fabrique = fabrique;
         _machine = machine;
         _journal = journal;
         _clientDeTest = clientDeTest;
+        _resultats = resultats;
     }
 
     /// <summary>
@@ -94,7 +101,7 @@ public sealed class MultiplayerClient
     public Task<MultiplayerReponse?> TerminerAsync(string room, string raison, int? dureeSecondes, CancellationToken ct, int? placeGagnante = null,
         IReadOnlyDictionary<int, StatsDeLaPlace>? stats = null, object? mesures = null, IReadOnlyList<MultiplayerRang>? rangs = null,
         MultiplayerFinDeMission? mission = null)
-        => EnvoyerAsync("ended", new
+        => EnvoyerOuGarderAsync("ended", room, new
         {
             room, reason = raison, duration_s = dureeSecondes, winner_seat = placeGagnante,
             stats = stats?.ToDictionary(p => p.Key.ToString(System.Globalization.CultureInfo.InvariantCulture),
@@ -110,7 +117,7 @@ public sealed class MultiplayerClient
     /// <summary>NIVEAU NELFEPLAY : un invite rapporte la place gagnante qu'il a vue ; le resultat est valide s'il concorde avec l'hote.</summary>
     public Task<MultiplayerReponse?> RapporterAsync(string room, int placeGagnante, CancellationToken ct, object? mesures = null,
         IReadOnlyList<MultiplayerRang>? rangs = null)
-        => EnvoyerAsync("report", new { room, winner_seat = placeGagnante, metrics = mesures, ranks = Rangs(rangs) }, ct);
+        => EnvoyerOuGarderAsync("report", room, new { room, winner_seat = placeGagnante, metrics = mesures, ranks = Rangs(rangs) }, ct);
 
     /// <summary>Les rangs tels que le site les lit, ou null sans classement a plusieurs (un duel lu par end ou match_end).</summary>
     private static object? Rangs(IReadOnlyList<MultiplayerRang>? rangs)
@@ -118,7 +125,33 @@ public sealed class MultiplayerClient
 
     /// <summary>Un invite annule la rencontre : son bilan du wrapper montre une triche (22/10). La cote ne bouge pas.</summary>
     public Task<MultiplayerReponse?> AnnulerAsync(string room, string motif, CancellationToken ct)
-        => EnvoyerAsync("report", new { room, voided = true, reason = motif }, ct);
+        => EnvoyerOuGarderAsync("report", room, new { room, voided = true, reason = motif }, ct);
+
+    /// <summary>
+    /// (brief 13/11, MULTI-05) Un resultat (fin, rapport, annulation) : envoye tout de suite ; sans reponse du site, garde sur
+    /// le disque et renvoye par <see cref="RepriseDesResultatsMultiplayer"/>. Le corps garde est celui qui vient de partir.
+    /// </summary>
+    private async Task<MultiplayerReponse?> EnvoyerOuGarderAsync(string action, string room, object corps, CancellationToken ct)
+    {
+        var json = JsonSerializer.SerializeToNode(corps, Ecriture) ?? new JsonObject();
+        var reponse = await EnvoyerAsync(action, json, ct).ConfigureAwait(false);
+        if (_resultats is not null && FileDesResultatsMultiplayer.ARetenter(reponse) && Lie)
+        {
+            var id = _resultats.Poser(action, room, json);
+            _journal?.LogInformation(id is null
+                ? "MULTIPLAYER : {Action} de {Room} sans reponse du site, et impossible a garder sur le disque."
+                : "MULTIPLAYER : {Action} de {Room} sans reponse du site, garde et renvoye des qu'il repond.", action, room);
+        }
+
+        return reponse;
+    }
+
+    /// <summary>Le renvoi d'un resultat garde, corps identique.</summary>
+    public Task<MultiplayerReponse?> RenvoyerAsync(string action, JsonNode corps, CancellationToken ct)
+        => EnvoyerAsync(action, corps, ct);
+
+    /// <summary>La borne parle au site au nom d'un compte (sans lien, rien a garder : personne ne recevrait le resultat).</summary>
+    private bool Lie => _clientDeTest is not null || !string.IsNullOrEmpty(_machine.GetCredential());
 
     public Task<MultiplayerReponse?> InviterAsync(string room, string poignee, CancellationToken ct)
         => EnvoyerAsync("invite", new { room, handle = poignee }, ct);
@@ -185,7 +218,7 @@ public sealed class MultiplayerClient
                 _journal?.LogInformation("MULTIPLAYER : {Action} refuse ({Statut}, {Raison})", action, (int)reponse.StatusCode, lu?.Reason ?? "-");
             }
 
-            return lu ?? new MultiplayerReponse { Ok = false, Reason = "empty" };
+            return (lu ?? new MultiplayerReponse { Ok = false, Reason = "empty" }) with { Statut = (int)reponse.StatusCode };
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
         {
@@ -227,6 +260,10 @@ public sealed record MultiplayerReponse
 
     [JsonPropertyName("reason")]
     public string? Reason { get; init; }
+
+    /// <summary>Le statut HTTP de la reponse (jamais lu du corps) : un 5xx, 408 ou 429 fait garder un resultat (MULTI-05).</summary>
+    [JsonIgnore]
+    public int Statut { get; init; }
 
     [JsonPropertyName("room")]
     public string? Room { get; init; }

@@ -500,6 +500,9 @@ builder.Services.AddHostedService<RetroBat.Api.Multiplayer.MultiplayerCoeursServ
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerCollectionSyncService>());
 // Les gamerooms du joueur : le client de la plateforme et le sondage qui les tient a jour.
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerClient>();
+// La fin, le rapport et l'annulation d'une rencontre sont gardes sur le disque si le site ne repond pas, et renvoyes (MULTI-05).
+builder.Services.AddSingleton<RetroBat.Api.Multiplayer.FileDesResultatsMultiplayer>(_ => new RetroBat.Api.Multiplayer.FileDesResultatsMultiplayer());
+builder.Services.AddHostedService<RetroBat.Api.Multiplayer.RepriseDesResultatsMultiplayer>();
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerSessionService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>());
 // Le panneau MULTIPLAYER d'ES : la fenetre du classement, un autre contenu (lot M3).
