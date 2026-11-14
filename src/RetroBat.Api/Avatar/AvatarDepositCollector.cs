@@ -57,13 +57,19 @@ public sealed class AvatarDepositCollector : BackgroundService
         try { await Task.Delay(PremierEssai, stoppingToken).ConfigureAwait(false); }
         catch (OperationCanceledException) { return; }
 
+        var echecs = 0;
         while (!stoppingToken.IsCancellationRequested)
         {
-            try { await RelevereAsync(stoppingToken).ConfigureAwait(false); }
+            try
+            {
+                var r = await RelevereAsync(stoppingToken).ConfigureAwait(false);
+                echecs = r.Reason is "unreachable" || r.Reason?.StartsWith("http_", StringComparison.Ordinal) == true ? echecs + 1 : 0;
+            }
             catch (OperationCanceledException) { break; }
-            catch (Exception ex) { _logger.LogDebug(ex, "Avatars : releve des depots en erreur."); }
+            catch (Exception ex) { _logger.LogDebug(ex, "Avatars : releve des depots en erreur."); echecs++; }
 
-            try { await Task.Delay(Cadence, stoppingToken).ConfigureAwait(false); }
+            // Recul apres echec (2 h au plus) et dispersion de 10 % (C-9, 14/11).
+            try { await Task.Delay(CadenceDeFond.Prochaine(Cadence, echecs, TimeSpan.FromHours(2)), stoppingToken).ConfigureAwait(false); }
             catch (OperationCanceledException) { break; }
         }
     }

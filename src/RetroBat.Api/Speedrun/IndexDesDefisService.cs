@@ -61,15 +61,22 @@ public sealed class IndexDesDefisService : BackgroundService
         try
         {
             await Task.Delay(PremierDelai, stoppingToken).ConfigureAwait(false);
+            var echecs = 0;
             while (!stoppingToken.IsCancellationRequested)
             {
-                try { await SynchroniserAsync(stoppingToken).ConfigureAwait(false); }
-                catch (Exception ex) when (ex is not OperationCanceledException)
+                try
+                {
+                    await SynchroniserAsync(stoppingToken).ConfigureAwait(false);
+                    echecs = 0;
+                }
+                catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
                 {
                     _journal?.LogWarning(ex, "Defis : synchronisation impossible.");
+                    echecs++;
                 }
 
-                await Task.Delay(Periode, stoppingToken).ConfigureAwait(false);
+                // Recul apres echec (1 h au plus) et dispersion de 10 % (C-9, 14/11).
+                await Task.Delay(CadenceDeFond.Prochaine(Periode, echecs, TimeSpan.FromHours(1)), stoppingToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
