@@ -48,6 +48,16 @@ public sealed class MultiplayerSessionService : BackgroundService
     /// </summary>
     internal static readonly TimeSpan PeriodeEnPartieSolo = TimeSpan.FromSeconds(60);
 
+    /// <summary>
+    /// UN SONDAGE AU DEPART D'UNE PARTIE SOLO (point 3 du site, 14/11) : DESACTIVE, a la decision du user (« aucun sondage
+    /// pendant une partie solo »). Le site garde un ami « en partie » sur le prevol World Scoring ou la candidature au direct
+    /// partage ; une partie hors World Scoring et hors direct ne lui donne aucun signal, et l'ami disparait de INVITE FRIENDS
+    /// 75 s apres son dernier sondage d'ES. L'activer couterait un appel par partie : a l'evenement <c>ui.game.started</c>,
+    /// un seul <c>SonderAsync</c> avec <c>playing=true</c> (la boucle ne sonde plus ensuite jusqu'a la fin de partie).
+    /// Rien ne le lit pour l'instant.
+    /// </summary>
+    internal const bool SondageAuDepartDUnePartieSolo = false;
+
     /// <summary>Dans la collection MULTIPLAYER, sans salle : une proposition d'un joueur suivi arrive vite.</summary>
     internal static readonly TimeSpan PeriodeDansLaCollection = TimeSpan.FromSeconds(5);
 
