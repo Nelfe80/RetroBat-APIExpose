@@ -297,6 +297,11 @@ public sealed class MameCfgDeployService
     public IReadOnlyDictionary<string, IReadOnlyList<int>> CurrentWiring(string rom)
     {
         var result = new Dictionary<string, IReadOnlyList<int>>(StringComparer.OrdinalIgnoreCase);
+        if (!IsValidRomName(rom))
+        {
+            return result;
+        }
+
         var path = Path.Combine(TargetDir, rom.Trim().ToLowerInvariant() + ".cfg");
         if (!File.Exists(path))
         {
@@ -350,9 +355,51 @@ public sealed class MameCfgDeployService
     /// ports MAME silently dropped restored from the translated pack (+ overrides),
     /// user sequences kept, unknown ports removed. .bak written before saving.
     /// </summary>
+    /// <summary>
+    /// A MAME short name: lower-case letters, digits and underscore, 32 chars at most.
+    /// Anything else (spaces, dashes, quotes, dots, separators) is refused.
+    /// </summary>
+    public static bool IsValidRomName(string? rom)
+    {
+        if (string.IsNullOrEmpty(rom) || rom.Length > 32)
+        {
+            return false;
+        }
+
+        foreach (var c in rom)
+        {
+            if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_'))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>MAME arguments of the headless port dump, one entry per argument.</summary>
+    public static IReadOnlyList<string> RepairArguments(string rom, string luaScript) => new[]
+    {
+        rom,
+        "-rompath",
+        $"{Path.Combine(RetroBatPaths.RetroBatRoot, "roms", "mame")};{Path.Combine(RetroBatPaths.RetroBatRoot, "roms", "arcade")};{Path.Combine(RetroBatPaths.RetroBatRoot, "bios")}",
+        "-autoboot_script",
+        luaScript,
+        "-video", "none",
+        "-sound", "none",
+        "-skip_gameinfo",
+    };
+
     public RepairReport Repair(string rom)
     {
-        rom = rom.Trim().ToLowerInvariant();
+        rom = (rom ?? string.Empty).Trim().ToLowerInvariant();
+        if (!IsValidRomName(rom))
+        {
+            // The name goes to the MAME command line and into file paths: a MAME
+            // short name only, never options or path separators.
+            return new RepairReport(rom.Length > 64 ? rom[..64] : rom, "failed", 0, 0, 0, new[] { "nom de rom invalide" });
+        }
+
         var details = new List<string>();
         var mameExe = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "mame", "mame.exe");
         var luaScript = Path.GetFullPath(Path.Combine(RetroBatPaths.PluginRoot, "..", "LedManager", "tools", "mame-repair", "dump_ports.lua"));
@@ -380,11 +427,14 @@ public sealed class MameCfgDeployService
         var psi = new System.Diagnostics.ProcessStartInfo
         {
             FileName = mameExe,
-            Arguments = $"{rom} -rompath \"{Path.Combine(RetroBatPaths.RetroBatRoot, "roms", "mame")};{Path.Combine(RetroBatPaths.RetroBatRoot, "roms", "arcade")};{Path.Combine(RetroBatPaths.RetroBatRoot, "bios")}\" -autoboot_script \"{luaScript}\" -video none -sound none -skip_gameinfo",
             WorkingDirectory = Path.GetDirectoryName(mameExe)!,
             UseShellExecute = false,
             CreateNoWindow = true
         };
+        foreach (var argument in RepairArguments(rom, luaScript))
+        {
+            psi.ArgumentList.Add(argument);
+        }
         psi.EnvironmentVariables["LEDMANAGER_PORTS_OUT"] = dumpPath;
         using (var process = System.Diagnostics.Process.Start(psi))
         {
@@ -593,6 +643,11 @@ public sealed class MameCfgDeployService
 
     private Item DeployRom(string rom, bool replaceInputs = false)
     {
+        if (!IsValidRomName(rom))
+        {
+            return new Item(rom.Length > 64 ? rom[..64] : rom, "failed", "nom de rom invalide");
+        }
+
         var packPath = Path.Combine(PackDir, rom + ".cfg");
         if (!File.Exists(packPath))
         {
