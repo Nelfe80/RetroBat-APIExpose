@@ -55,7 +55,8 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
     private DateTime? _lancementAttenduDepuis;   // heure locale ; non null tant qu'on cherche les joueurs du lancement
     private DateTime _derniereLectureDuLancement = DateTime.MinValue;
     private readonly object _verrouLancement = new();
-    private static readonly TimeSpan PatienceDuLancement = TimeSpan.FromSeconds(60);
+    // 3 min : sur une borne a 93 % de memoire, le lanceur a mis 90 s a demarrer RetroArch (essai du 13/11, 23:33).
+    private static readonly TimeSpan PatienceDuLancement = TimeSpan.FromMinutes(3);
 
     public PanelInputWatcherService(IEventBus eventBus, ILogger<PanelInputWatcherService>? logger = null)
     {
