@@ -141,17 +141,17 @@ public sealed class MultiplayerSessionService : BackgroundService
     private bool PartieEnCours() => EnPartie?.Invoke() ?? UnJeuTourne();
 
     /// <summary>
-    /// L'ATTENTE AVANT LE PROCHAIN SONDAGE (lot 4 bis C-1, 14/11). Dans l'ordre : une partie en solo (1 par minute), la
-    /// cadence demandee par le site (bornee de 2 s a 10 min), une salle ou une invitation (2 s), la collection
-    /// MULTIPLAYER (5 s), quelqu'un devant la borne (10 s), personne (5 min). Apres des echecs, le recul double l'attente,
+    /// L'ATTENTE AVANT LE PROCHAIN SONDAGE (lot 4 bis C-1, 14/11). Dans l'ordre : une partie en solo sans salle (1 par
+    /// minute), la cadence demandee par le site (bornee de 2 s a 10 min), une salle (2 s), la collection MULTIPLAYER ou une
+    /// invitation devant quelqu'un (5 s), quelqu'un devant la borne (10 s), personne (5 min). Apres des echecs, le recul double l'attente,
     /// jusqu'a 20 s avec une salle et 5 min sinon. Les attentes d'au moins 30 s sont dispersees de plus ou moins 10 %
     /// (<paramref name="alea"/> de 0 a 1) : les bornes ne repartent pas toutes ensemble apres une coupure du site.
     /// </summary>
-    internal static TimeSpan Cadence(bool occupe, bool enPartieSolo, bool dansLaCollection, bool joueurPresent, TimeSpan? duSite,
-        int echecs, double alea)
+    internal static TimeSpan Cadence(bool salle, bool invitation, bool enPartieSolo, bool dansLaCollection, bool joueurPresent,
+        TimeSpan? duSite, int echecs, double alea)
     {
         TimeSpan attente;
-        if (enPartieSolo)
+        if (enPartieSolo && !salle)
         {
             attente = PeriodeEnPartieSolo;
         }
@@ -161,15 +161,17 @@ public sealed class MultiplayerSessionService : BackgroundService
         }
         else
         {
-            attente = occupe ? PeriodeActive
-                : dansLaCollection ? PeriodeDansLaCollection
+            // Une invitation sans salle (une invitation d'ami vit 24 h) ne garde plus la borne a 2 s : 5 s si quelqu'un
+            // est la (repondre fait partir un sondage tout de suite), le repos sinon, le premier geste reveille.
+            attente = salle ? PeriodeActive
+                : dansLaCollection || (invitation && joueurPresent) ? PeriodeDansLaCollection
                 : joueurPresent ? PeriodeJoueurPresent
                 : PeriodeAuRepos;
         }
 
         if (echecs > 0)
         {
-            var plafond = occupe ? PlafondDuReculOccupe : PlafondDuRecul;
+            var plafond = salle ? PlafondDuReculOccupe : PlafondDuRecul;
             var recul = TimeSpan.FromTicks(attente.Ticks * (1L << Math.Min(echecs, 8)));
             attente = recul > plafond ? (attente > plafond ? attente : plafond) : recul;
         }
@@ -237,7 +239,7 @@ public sealed class MultiplayerSessionService : BackgroundService
                 {
                     // Une partie en solo : un sondage au depart, puis un par minute (Cadence). Le tic local qui suit un
                     // reveil (fin de partie, geste) ne fait pas partir un sondage de plus tant que la partie dure.
-                    solo = !Etat.Occupe && PartieEnCours();
+                    solo = Etat.Rooms.Count == 0 && PartieEnCours();
                     var maintenant = DateTime.UtcNow;
                     if (!solo || _sondeEnPartieUtc is not { } sonde || maintenant - sonde >= PeriodeEnPartieSolo - TimeSpan.FromSeconds(1))
                     {
@@ -251,9 +253,11 @@ public sealed class MultiplayerSessionService : BackgroundService
                     }
                 }
 
+                // L'etat d'apres le sondage : une salle rejointe pendant la partie fait repasser a 2 s.
+                var etat = Etat;
                 var attente = !Active ? PeriodeJoueurPresent
-                    : Cadence(Etat.Occupe, solo, DansLaCollection?.Invoke() == true, JoueurPresent(DateTime.UtcNow),
-                        _cadenceDuSite, _echecs, Random.Shared.NextDouble());
+                    : Cadence(etat.Rooms.Count > 0, etat.Invitations.Count > 0, solo, DansLaCollection?.Invoke() == true,
+                        JoueurPresent(DateTime.UtcNow), _cadenceDuSite, _echecs, Random.Shared.NextDouble());
                 using var lie = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, _reveil.Token);
                 try
                 {

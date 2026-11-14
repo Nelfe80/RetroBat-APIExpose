@@ -218,8 +218,8 @@ public class MultiplayerSessionServiceTests : IDisposable
     [Fact]
     public void Personne_devant_la_borne_le_sondage_part_toutes_les_cinq_minutes()
     {
-        var attente = MultiplayerSessionService.Cadence(occupe: false, enPartieSolo: false, dansLaCollection: false, joueurPresent: false,
-            duSite: null, echecs: 0, alea: 0.5);
+        var attente = MultiplayerSessionService.Cadence(salle: false, invitation: false, enPartieSolo: false, dansLaCollection: false,
+            joueurPresent: false, duSite: null, echecs: 0, alea: 0.5);
 
         Assert.Equal(TimeSpan.FromMinutes(5), attente);
     }
@@ -227,43 +227,54 @@ public class MultiplayerSessionServiceTests : IDisposable
     [Fact]
     public void Les_cadences_d_une_salle_de_la_collection_et_d_un_joueur_present_restent()
     {
-        Assert.Equal(TimeSpan.FromSeconds(2), MultiplayerSessionService.Cadence(true, false, true, true, null, 0, 0.5));
-        Assert.Equal(TimeSpan.FromSeconds(5), MultiplayerSessionService.Cadence(false, false, true, true, null, 0, 0.5));
+        Assert.Equal(TimeSpan.FromSeconds(2), MultiplayerSessionService.Cadence(true, false, false, true, true, null, 0, 0.5));
+        Assert.Equal(TimeSpan.FromSeconds(5), MultiplayerSessionService.Cadence(false, false, false, true, true, null, 0, 0.5));
         // Le site montre un ami « en ligne » s'il a sonde depuis moins de 30 s : 10 s tant que quelqu'un est la.
-        Assert.Equal(TimeSpan.FromSeconds(10), MultiplayerSessionService.Cadence(false, false, false, true, null, 0, 0.5));
+        Assert.Equal(TimeSpan.FromSeconds(10), MultiplayerSessionService.Cadence(false, false, false, false, true, null, 0, 0.5));
+    }
+
+    [Fact]
+    public void Une_invitation_sans_salle_ne_garde_plus_la_borne_a_deux_secondes()
+    {
+        // Une invitation d'ami vit 24 h : 5 s devant quelqu'un, le repos sinon (le premier geste reveille le sondage).
+        Assert.Equal(TimeSpan.FromSeconds(5), MultiplayerSessionService.Cadence(false, true, false, false, true, null, 0, 0.5));
+        Assert.Equal(TimeSpan.FromMinutes(5), MultiplayerSessionService.Cadence(false, true, false, false, false, null, 0, 0.5));
     }
 
     [Fact]
     public void En_partie_solo_un_sondage_par_minute_meme_si_le_site_demande_plus_vite()
     {
-        Assert.Equal(TimeSpan.FromSeconds(60), MultiplayerSessionService.Cadence(false, true, false, true, TimeSpan.FromSeconds(3), 0, 0.5));
+        Assert.Equal(TimeSpan.FromSeconds(60), MultiplayerSessionService.Cadence(false, false, true, false, true, TimeSpan.FromSeconds(3), 0, 0.5));
+        Assert.Equal(TimeSpan.FromSeconds(60), MultiplayerSessionService.Cadence(false, true, true, false, true, null, 0, 0.5));
+        // Une salle rejointe pendant la partie : 2 s.
+        Assert.Equal(TimeSpan.FromSeconds(2), MultiplayerSessionService.Cadence(true, false, true, false, true, null, 0, 0.5));
     }
 
     [Fact]
     public void La_cadence_du_site_l_emporte_dans_ses_bornes()
     {
-        Assert.Equal(TimeSpan.FromSeconds(20), MultiplayerSessionService.Cadence(false, false, false, false, TimeSpan.FromSeconds(20), 0, 0.5));
-        Assert.Equal(TimeSpan.FromSeconds(2), MultiplayerSessionService.Cadence(true, false, false, true, TimeSpan.FromMilliseconds(100), 0, 0.5));
-        Assert.Equal(TimeSpan.FromMinutes(10), MultiplayerSessionService.Cadence(false, false, false, false, TimeSpan.FromHours(3), 0, 0.5));
+        Assert.Equal(TimeSpan.FromSeconds(20), MultiplayerSessionService.Cadence(false, false, false, false, false, TimeSpan.FromSeconds(20), 0, 0.5));
+        Assert.Equal(TimeSpan.FromSeconds(2), MultiplayerSessionService.Cadence(true, false, false, false, true, TimeSpan.FromMilliseconds(100), 0, 0.5));
+        Assert.Equal(TimeSpan.FromMinutes(10), MultiplayerSessionService.Cadence(false, false, false, false, false, TimeSpan.FromHours(3), 0, 0.5));
     }
 
     [Fact]
     public void Apres_des_echecs_le_sondage_recule_sans_lacher_une_salle()
     {
-        Assert.Equal(TimeSpan.FromSeconds(20), MultiplayerSessionService.Cadence(false, false, false, true, null, 1, 0.5));
-        Assert.Equal(TimeSpan.FromMinutes(5), MultiplayerSessionService.Cadence(false, false, false, true, null, 8, 0.5));
+        Assert.Equal(TimeSpan.FromSeconds(20), MultiplayerSessionService.Cadence(false, false, false, false, true, null, 1, 0.5));
+        Assert.Equal(TimeSpan.FromMinutes(5), MultiplayerSessionService.Cadence(false, false, false, false, true, null, 8, 0.5));
         // Une salle attend : jamais plus de 20 s, l'hote muet 2 min perdrait sa partie.
-        Assert.Equal(TimeSpan.FromSeconds(4), MultiplayerSessionService.Cadence(true, false, false, true, null, 1, 0.5));
-        Assert.Equal(TimeSpan.FromSeconds(20), MultiplayerSessionService.Cadence(true, false, false, true, null, 30, 0.5));
+        Assert.Equal(TimeSpan.FromSeconds(4), MultiplayerSessionService.Cadence(true, false, false, false, true, null, 1, 0.5));
+        Assert.Equal(TimeSpan.FromSeconds(20), MultiplayerSessionService.Cadence(true, false, false, false, true, null, 30, 0.5));
     }
 
     [Fact]
     public void Les_longues_attentes_sont_dispersees_de_dix_pour_cent()
     {
-        Assert.Equal(TimeSpan.FromSeconds(270), MultiplayerSessionService.Cadence(false, false, false, false, null, 0, 0));
-        Assert.Equal(TimeSpan.FromSeconds(330), MultiplayerSessionService.Cadence(false, false, false, false, null, 0, 1));
+        Assert.Equal(TimeSpan.FromSeconds(270), MultiplayerSessionService.Cadence(false, false, false, false, false, null, 0, 0));
+        Assert.Equal(TimeSpan.FromSeconds(330), MultiplayerSessionService.Cadence(false, false, false, false, false, null, 0, 1));
         // Les cadences courtes ne bougent pas : une salle reste a 2 s.
-        Assert.Equal(TimeSpan.FromSeconds(2), MultiplayerSessionService.Cadence(true, false, false, true, null, 0, 0));
+        Assert.Equal(TimeSpan.FromSeconds(2), MultiplayerSessionService.Cadence(true, false, false, false, true, null, 0, 0));
     }
 
     [Fact]
