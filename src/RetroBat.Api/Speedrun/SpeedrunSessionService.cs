@@ -342,6 +342,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         }
 
         AttendreLeLancement(reglement, rom);
+        _pagesDuLancement = pages;
         _partie?.AnnoncerLancement(PartieNelfePlayService.OrigineSpeedrun);
         if (LancementDirect.Lancer(arguments, reglement.SystemId, rom, _contexte, _bus, _journal) is null)
         {
@@ -514,7 +515,11 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     /// <summary>Le prochain jeu qui demarre sur cette ROM ouvre une session de ce defi.</summary>
     internal void AttendreLeLancement(Reglement reglement, string rom)
     {
-        lock (_verrou) _lancement = (reglement, rom, DateTime.UtcNow);
+        lock (_verrou)
+        {
+            _lancement = (reglement, rom, DateTime.UtcNow);
+            _pagesDuLancement = false;
+        }
     }
 
     /// <summary>Une commande du HUD (ou de la manette) ; la relance demandee s'execute ici, la reponse dit « pending » jusque-la.</summary>
@@ -647,6 +652,9 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 case "scoring.listener.attestation":
                     SurAttestation(e.Payload);
                     break;
+                case "score.live.changed":
+                    NoterLeScore(e.Payload);
+                    break;
             }
         }
         catch (Exception ex)
@@ -680,6 +688,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             _pausesLevees = 0;
             _pauseDepuis = null;
             _relanceApresLaPause = false;
+            _scoreLu = null;
+            _pagesDeLaSession = _pagesDuLancement;
             _releves?.Cancel();
             _releves = new CancellationTokenSource();
             _ = ReleverEnBoucleAsync(_session, _releves.Token);
@@ -985,6 +995,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     /// </summary>
     private async Task LeverLaPauseAsync(SessionSpeedrun session, CancellationToken ct)
     {
+        // Un challenge clos (14/11) : la pause est celle de l'API, le jeu va se fermer ; on ne la leve pas.
+        if (session.Close) return;
         var statut = await _commandes.DemanderAsync("GET_STATUS", ct).ConfigureAwait(false);
         if (statut is null) return;
         var enPause = statut.StartsWith("GET_STATUS PAUSED", StringComparison.Ordinal);
@@ -992,7 +1004,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         string sessionId;
         lock (_verrou)
         {
-            if (!ReferenceEquals(_session, session) || _etatAttendu) return;
+            if (!ReferenceEquals(_session, session) || _etatAttendu || session.Close) return;
             sessionId = session.SessionId;
             if (!enPause)
             {
@@ -1077,6 +1089,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 await CommanderAsync(new CommandeSpeedrun(IdDeLaManette(), sessionId, SessionSpeedrun.ActionRelancer, Confirme: true)).ConfigureAwait(false);
             });
         }
+        if (_session.PrendreLaCloture() is { } cloture) AnnoncerLaCloture(_session, cloture);
         if (_session.Etat != _etatJournalise)
         {
             _journal.LogInformation("Speedrun : session {Session} {Avant} -> {Apres}.", _session.SessionId, _etatJournalise ?? "-", _session.Etat);
@@ -1093,6 +1106,120 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     }
 
     private long _snapshotPublie = -1;
+
+    // ── La cloture d'un challenge a l'arrivee (14/11) ──────────────────────────────
+
+    /// <summary>Lance depuis le panneau, avec ses pages : le bilan couvre le jeu, il se ferme sous lui sans attendre.</summary>
+    internal TimeSpan AttenteAvantLaFermeture { get; set; } = TimeSpan.FromSeconds(2);
+
+    /// <summary>Lance sans page (route REST) : le message de l'arrivee se lit au Deck ou au bandeau avant que le jeu se ferme.</summary>
+    internal TimeSpan AttenteAvantLaFermetureSansPage { get; set; } = TimeSpan.FromSeconds(5);
+
+    /// <summary>RetroArch n'entend pas toujours le premier QUIT (confirmation de sortie, borne chargee) : il se redit.</summary>
+    internal TimeSpan IntervalleDuQuit { get; set; } = TimeSpan.FromSeconds(1.5);
+
+    private const int EssaisDuQuit = 20;
+
+    private bool _pagesDuLancement;
+    private bool _pagesDeLaSession;
+    private long? _scoreLu;
+
+    /// <summary>Le score du joueur 1 lu pendant la session (.MEM du jeu) ; fige a l'arrivee d'un challenge.</summary>
+    private void NoterLeScore(object? payload)
+    {
+        long score;
+        int joueur;
+        if (payload is ScoreLiveEvent s)
+        {
+            (score, joueur) = (s.Score, s.Player);
+        }
+        else
+        {
+            var r = payload is JsonElement j ? j : JsonSerializer.SerializeToElement(payload);
+            if (!r.TryGetProperty("Score", out var v) || !v.TryGetInt64(out score)) return;
+            joueur = r.TryGetProperty("Player", out var p) && p.TryGetInt32(out var n) ? n : 1;
+        }
+
+        if (joueur != 1) return;
+        lock (_verrou)
+        {
+            if (_session is null || _session.Close || _etatAttendu) return;
+            _scoreLu = score;
+        }
+    }
+
+    /// <summary>
+    /// LE CHALLENGE ARRIVE (decision du user du 14/11 : « on clot le challenge et on affiche les stats de temps et de score ») :
+    /// <list type="number">
+    /// <item>« speedrun.challenge.finished » part sur le bus : le temps, le score lu a cet instant, les compteurs du reglement ; le
+    /// panneau ouvre son bilan devant le jeu ;</item>
+    /// <item>RetroArch se met en pause (PAUSE_TOGGLE) : le jeu ne continue pas en mission 2 derriere le bilan, le score ne bouge
+    /// plus. La garde anti-pause de la session ne la leve pas (<see cref="SessionSpeedrun.Close"/>) ;</item>
+    /// <item>le jeu se ferme (QUIT, la meme sortie que Hotkey + Start) : le proces-verbal du wrapper, que le passeport exige,
+    /// n'existe qu'a la fermeture ; c'est lui qui fait partir le temps au site, et le verdict revient au bilan.</item>
+    /// </list>
+    /// Sous le verrou.
+    /// </summary>
+    private void AnnoncerLaCloture(SessionSpeedrun session, ClotureDuChallenge c)
+    {
+        var r = session.Reglement;
+        var score = _scoreLu;
+        var attente = _pagesDeLaSession ? AttenteAvantLaFermeture : AttenteAvantLaFermetureSansPage;
+        _journal.LogInformation("Speedrun : challenge {Defi} arrive en {Temps}{Classe}, score {Score}{Compteurs} : pause, puis le jeu se ferme dans {Attente:0.#} s.",
+            r.ChallengeId, Chronometrage.Afficher(c.Frames, r.Cadence), c.Classable ? "" : " (non classable)", score?.ToString(CultureInfo.InvariantCulture) ?? "non lu",
+            c.Compteurs.Count == 0 ? "" : ", " + string.Join(", ", c.Compteurs.Select(k => k.Key + " " + k.Value.ToString(CultureInfo.InvariantCulture))),
+            attente.TotalSeconds);
+        _ = _bus.PublishAsync(new EventEnvelope
+        {
+            Type = "speedrun.challenge.finished",
+            Payload = new
+            {
+                sessionId = session.SessionId,
+                challengeId = r.ChallengeId,
+                attemptId = c.AttemptId,
+                frames = c.Frames,
+                display = Chronometrage.Afficher(c.Frames, r.Cadence),
+                rate = r.Cadence,
+                ranked = c.Classable,
+                score,
+                counters = c.Compteurs,
+                penaltyFrames = c.PenaliteFrames,
+            },
+        });
+        _ = Task.Run(() => CloreLeJeuAsync(session, attente));
+    }
+
+    /// <summary>La pause tout de suite, puis QUIT, redit jusqu'a ce que le jeu de cette session soit ferme.</summary>
+    private async Task CloreLeJeuAsync(SessionSpeedrun session, TimeSpan attente)
+    {
+        try
+        {
+            var statut = await _commandes.DemanderAsync("GET_STATUS", CancellationToken.None).ConfigureAwait(false);
+            if (statut?.StartsWith("GET_STATUS PLAYING", StringComparison.Ordinal) == true)
+                await _commandes.EnvoyerAsync("PAUSE_TOGGLE", CancellationToken.None).ConfigureAwait(false);
+            else
+                _journal.LogInformation("Speedrun : RetroArch ne joue pas a l'arrivee ({Statut}), pas de pause.", statut?.Trim() ?? "sans reponse");
+
+            await Task.Delay(attente).ConfigureAwait(false);
+            for (var essai = 0; essai < EssaisDuQuit; essai++)
+            {
+                lock (_verrou)
+                {
+                    if (!ReferenceEquals(_session, session)) return;
+                }
+
+                if (essai == 0) _journal.LogInformation("Speedrun : challenge {Defi} clos, le jeu se ferme.", session.DefiId);
+                await _commandes.EnvoyerAsync("QUIT", CancellationToken.None).ConfigureAwait(false);
+                await Task.Delay(IntervalleDuQuit).ConfigureAwait(false);
+            }
+
+            _journal.LogWarning("Speedrun : le jeu du challenge {Defi} ne s'est pas ferme apres {Essais} QUIT.", session.DefiId, EssaisDuQuit);
+        }
+        catch (Exception ex)
+        {
+            _journal.LogWarning(ex, "Speedrun : cloture du challenge {Defi} interrompue.", session.DefiId);
+        }
+    }
 
     private System.Threading.Timer? _ecarts;
     private static readonly TimeSpan PeriodeDesEcarts = TimeSpan.FromMilliseconds(250);

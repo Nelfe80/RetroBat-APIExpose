@@ -55,7 +55,9 @@ public static class DeckNotices
         var n = m.Cle switch
         {
             "speedrun.msg.hit" or "speedrun.msg.hit_left" or "speedrun.msg.hit_penalty" => null,
-            "speedrun.msg.ready" => new DeckNotice(m.Cle, DeckSeverity.Info, "READY", "HOTKEY+LEFT: RESTART", null, Moyen),
+            "speedrun.msg.ready" or "speedrun.msg.challenge_ready" => new DeckNotice(m.Cle, DeckSeverity.Info, "READY", "HOTKEY+LEFT: RESTART", null, Moyen),
+            // (14/11) le challenge arrive : le jeu s'arrete et se ferme, le temps part tout de suite
+            "speedrun.msg.challenge_complete" => new DeckNotice(m.Cle, DeckSeverity.Record, "COMPLETE", "TIME SENT NOW", V("time"), Long),
             "speedrun.msg.failed" or "speedrun.msg.failed_restart" => new DeckNotice(m.Cle, DeckSeverity.Alert, "FAILED", "HOTKEY+LEFT: RESTART", null, Moyen),
             "speedrun.msg.voided_pause" => new DeckNotice(m.Cle, DeckSeverity.Alert, "VOIDED", "PAUSE", null, Moyen),
             "speedrun.msg.voided_fast_forward" => new DeckNotice(m.Cle, DeckSeverity.Alert, "VOIDED", "FAST FORWARD", null, Moyen),

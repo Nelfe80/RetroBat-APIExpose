@@ -33,6 +33,12 @@ public sealed partial class DefisPanelService
     private static readonly TimeSpan DureeDuDepart = TimeSpan.FromMilliseconds(1300);
     private static readonly TimeSpan DureeDeLEffacement = TimeSpan.FromMilliseconds(350);
     private static readonly TimeSpan GardeDuBilan = TimeSpan.FromSeconds(1.5);
+
+    /// <summary>
+    /// (14/11) Le bilan d'un challenge parait en pleine action : le joueur tire encore. Ses appuis des 3 premieres secondes, et
+    /// leurs relachements, ne ferment rien.
+    /// </summary>
+    private static readonly TimeSpan GardeALArrivee = TimeSpan.FromSeconds(3);
     private static readonly TimeSpan DureeDuBilan = TimeSpan.FromSeconds(45);
 
     private sealed class EpreuveLancee(Reglement defi, string chemin, string jeu, string? fanart, DateTime lanceA, DateTime lanceALocal)
@@ -49,6 +55,9 @@ public sealed partial class DefisPanelService
 
         /// <summary>Le bilan du wrapper signale une triche ou un etat charge : rien de ce lancement ne part.</summary>
         public bool Sale { get; set; }
+
+        /// <summary>(14/11) La session dont le challenge est arrive : son bilan est ouvert, le jeu se ferme dessous.</summary>
+        public string? CloseA { get; set; }
     }
 
     private readonly IDisposable? _abonnement;
@@ -332,6 +341,10 @@ public sealed partial class DefisPanelService
                     var session = Texte(Racine(e.Payload), "sessionId");
                     if (session.Length > 0) _ = Task.Run(() => QuandLaSessionSeFermeAsync(session));
                     break;
+                case "speedrun.challenge.finished":
+                    var arrivee = Racine(e.Payload);
+                    _ = Task.Run(() => QuandLeChallengeArrive(arrivee));
+                    break;
                 case "scoring.listener.session":
                     NoterLeBilanDuWrapper(Racine(e.Payload));
                     break;
@@ -359,6 +372,22 @@ public sealed partial class DefisPanelService
         }
 
         if (epreuve is null) return;
+
+        // (14/11) Le challenge est arrive : son bilan est deja la, le jeu vient de se fermer dessous. ES reprend l'ecran quand
+        // l'emulateur s'en va : le bilan repasse devant lui et reprend la manette, sans repartir de zero (meme cle).
+        if (string.Equals(epreuve.CloseA, sessionId, StringComparison.Ordinal))
+        {
+            await Task.Delay(400).ConfigureAwait(false);
+            lock (_verrou)
+            {
+                if (_page != PageDEpreuve.Bilan || !ReferenceEquals(_epreuve, epreuve)) return;
+            }
+
+            _journal?.LogInformation("Defis : le jeu de {Defi} est ferme sous le bilan de l'arrivee.", epreuve.Defi.ChallengeId);
+            _overlay.GarderDevantLeJeu();
+            if (!_overlay.PrendreLeFocus()) _journal?.LogInformation("Defis : le bilan n'a pas pu reprendre la manette, ES la garde.");
+            return;
+        }
 
         // Le jeu s'est ferme avant d'avoir paru : la preparation ne tient plus rien.
         if (preparation)
@@ -389,6 +418,55 @@ public sealed partial class DefisPanelService
         // ES reprend l'ecran quand l'emulateur s'en va : le bilan passe devant lui, pas l'inverse.
         await Task.Delay(400).ConfigureAwait(false);
         OuvrirLeBilan(BilanDe(epreuve.Defi, epreuve.Jeu, epreuve.Fanart, bilan, epreuve.Sale));
+    }
+
+    /// <summary>
+    /// LE BILAN A L'ARRIVEE D'UN CHALLENGE (decision du user du 14/11) : la session a clos la tentative, mis RetroArch en pause et
+    /// va fermer le jeu (<see cref="SpeedrunSessionService"/>) ; le bilan s'ouvre tout de suite devant le jeu fige, avec le temps,
+    /// le score de la partie et les compteurs du reglement. Le verdict du site le completera quand le temps sera parti (a la
+    /// fermeture du jeu, sous le bilan). Seulement pour l'epreuve lancee depuis ce panneau.
+    /// </summary>
+    private void QuandLeChallengeArrive(JsonElement arrivee)
+    {
+        var sessionId = Texte(arrivee, "sessionId");
+        var defiId = Texte(arrivee, "challengeId");
+        if (sessionId.Length == 0 || !arrivee.TryGetProperty("frames", out var f) || !f.TryGetInt64(out var frames)) return;
+        EpreuveLancee? epreuve;
+        lock (_verrou)
+        {
+            epreuve = _epreuve;
+            if (epreuve is null || !string.Equals(epreuve.Defi.ChallengeId, defiId, StringComparison.OrdinalIgnoreCase)
+                || _page == PageDEpreuve.Bilan) return;
+            epreuve.CloseA = sessionId;
+        }
+
+        var b = BilanALArrivee(epreuve.Defi, epreuve.Jeu, epreuve.Fanart, frames,
+            arrivee.TryGetProperty("ranked", out var r) && r.ValueKind == JsonValueKind.True,
+            arrivee.TryGetProperty("score", out var s) && s.TryGetInt64(out var score) ? score : null,
+            Compteurs(arrivee), arrivee.TryGetProperty("penaltyFrames", out var p) && p.TryGetInt64(out var penalite) ? penalite : 0,
+            _session.BilanDeLaSession(sessionId)?.Tentatives ?? 1, epreuve.Sale);
+        OuvrirLeBilan(b);
+
+        static IReadOnlyDictionary<string, int> Compteurs(JsonElement a)
+        {
+            var c = new Dictionary<string, int>(StringComparer.Ordinal);
+            if (!a.TryGetProperty("counters", out var o) || o.ValueKind != JsonValueKind.Object) return c;
+            foreach (var k in o.EnumerateObject())
+                if (k.Value.TryGetInt32(out var n)) c[k.Name] = n;
+            return c;
+        }
+    }
+
+    /// <summary>Le bilan de l'arrivee : « CHALLENGE COMPLETE » jusqu'au verdict ; un temps non classable ou un lancement sale ne part pas.</summary>
+    internal BilanDEpreuve BilanALArrivee(Reglement defi, string jeu, string? fanart, long frames, bool classable, long? score,
+        IReadOnlyDictionary<string, int> compteurs, long penalite, int tentatives, bool sale)
+    {
+        var joueur = Pseudo.Length > 0 ? Pseudo : T("speedrun.page.player", "PLAYER");
+        var (issue, motif) = !classable ? (IssueDuBilan.NonEnvoye, T("speedrun.page.reason.game_timer", "The game timer disagrees: this time is not ranked"))
+            : sale ? (IssueDuBilan.NonEnvoye, T("speedrun.page.reason.dirty", "Cheat or state load detected during this launch"))
+            : (IssueDuBilan.EnVerification, "");
+        return new BilanDEpreuve(defi, jeu, joueur, fanart, issue, frames, Math.Max(1, tentatives), 1, Motif: motif,
+            Score: score, Compteurs: compteurs, PenaliteFrames: penalite, ALArrivee: true);
     }
 
     internal BilanDEpreuve BilanDe(Reglement defi, string jeu, string? fanart, BilanDeSession s, bool sale)
@@ -453,9 +531,15 @@ public sealed partial class DefisPanelService
             _verdictEnAttente = null;
         }
 
-        _journal?.LogInformation("Defis : bilan de {Defi} : {Issue}, {Tentatives} tentative(s), meilleur {Temps}.", b.Defi.ChallengeId, b.Issue, b.Tentatives,
-            b.Temps is { } t ? Chronometrage.Afficher(t, b.Defi.Cadence) : "-");
+        _journal?.LogInformation("Defis : bilan de {Defi}{Arrivee} : {Issue}, {Tentatives} tentative(s), meilleur {Temps}.", b.Defi.ChallengeId,
+            b.ALArrivee ? " a l'arrivee" : "", b.Issue, b.Tentatives, b.Temps is { } t ? Chronometrage.Afficher(t, b.Defi.Cadence) : "-");
         _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal), PleinEcran(fin: ComposerLeBilan(b, Langue())));
+        if (b.ALArrivee)
+        {
+            // Devant le jeu fige (RetroArch en pause) : le PlayerDeck ne montre plus ses valeurs tant que la page est la.
+            AnnoncerLaPage("bilan", true);
+            _overlay.GarderDevantLeJeu();
+        }
         _ = Task.Run(async () =>
         {
             try
@@ -530,9 +614,13 @@ public sealed partial class DefisPanelService
 
     private void FermerLeBilan()
     {
+        EpreuveLancee? epreuve;
+        bool alArrivee;
         lock (_verrou)
         {
             if (_page != PageDEpreuve.Bilan) return;
+            epreuve = _epreuve;
+            alArrivee = _bilanAffiche?.ALArrivee == true;
             _page = PageDEpreuve.Aucune;
             _bilanAffiche = null;
             _epreuve = null;
@@ -541,8 +629,16 @@ public sealed partial class DefisPanelService
             _suiteDeLaPage?.Cancel();
         }
 
+        if (alArrivee) AnnoncerLaPage("bilan", false);
         _overlay.Fermer();
         EmulatorForeground.FocusEmulationStation();
+        // (14/11) Le bilan de l'arrivee quitte avant que le jeu soit ferme (RetroArch lent a sortir) : sa sortie le ferme, comme
+        // Hotkey + Start. Le temps part avec le proces-verbal du wrapper.
+        if (alArrivee && epreuve is not null && _contexte?.Ui.Running is not null)
+        {
+            _journal?.LogInformation("Defis : le bilan de {Defi} se ferme, le jeu aussi.", epreuve.Defi.ChallengeId);
+            _ = Task.Run(() => FermerLeJeuAsync(epreuve.LanceALocal));
+        }
     }
 
     private void RelancerDepuisLeBilan()
@@ -559,6 +655,8 @@ public sealed partial class DefisPanelService
         lock (_verrou)
         {
             if (_page != PageDEpreuve.Bilan || _epreuve is null) return;
+            // (14/11) Le jeu du challenge arrive se ferme encore sous le bilan : rejouer attend qu'il soit parti.
+            if (_bilanAffiche?.ALArrivee == true && _contexte?.Ui.Running is not null) return;
             epreuve = _epreuve;
             _page = PageDEpreuve.Aucune;
             _bilanAffiche = null;
@@ -591,9 +689,9 @@ public sealed partial class DefisPanelService
             }
 
             maintenu = Maintenu(_validerDepuis);
+            garde = SousLaGarde(_validerDepuis);
             _validerDepuis = null;
             page = _page;
-            garde = DateTime.UtcNow - _bilanDepuis < GardeDuBilan;
         }
 
         if (page != PageDEpreuve.Bilan || garde) return;
@@ -616,13 +714,23 @@ public sealed partial class DefisPanelService
             }
 
             maintenu = Maintenu(_annulerDepuis);
+            garde = SousLaGarde(_annulerDepuis);
             _annulerDepuis = null;
             page = _page;
-            garde = DateTime.UtcNow - _bilanDepuis < GardeDuBilan;
         }
 
         if (page == PageDEpreuve.Preparation && maintenu) QuitterLaPreparation();
         else if (page == PageDEpreuve.Bilan && !garde) FermerLeBilan();
+    }
+
+    /// <summary>
+    /// Le bilan vient de paraitre : un geste ne compte pas encore. Au bilan de l'arrivee (14/11), la garde dure 3 s et un appui
+    /// commence pendant elle ne compte pas non plus a son relachement (le joueur tirait). Sous le verrou.
+    /// </summary>
+    private bool SousLaGarde(DateTime? appui)
+    {
+        if (_bilanAffiche?.ALArrivee != true) return DateTime.UtcNow - _bilanDepuis < GardeDuBilan;
+        return DateTime.UtcNow - _bilanDepuis < GardeALArrivee || appui is not { } a || a - _bilanDepuis < GardeALArrivee;
     }
 
     private bool Maintenu(DateTime? depuis)

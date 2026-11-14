@@ -29,6 +29,12 @@ public sealed record EvenementSession(string Type, long Sequence, object Donnees
 /// <summary>Une tentative finie et classable, avec son horloge : la matiere du passeport (§11).</summary>
 public sealed record TentativeFinie(string AttemptId, int Numero, ResultatTentative Resultat, long DepartMs, long ArriveeMs);
 
+/// <summary>
+/// UN CHALLENGE ARRIVE ET CLOS (14/11) : la tentative, son temps officiel en images (penalites comprises), s'il est classable, et
+/// les compteurs du reglement (coups recus du couteau...) avec la penalite qu'ils ont ajoutee.
+/// </summary>
+public sealed record ClotureDuChallenge(string AttemptId, long Frames, bool Classable, IReadOnlyDictionary<string, int> Compteurs, long PenaliteFrames);
+
 /// <summary>Un message au joueur dans RetroArch : sa cle du dictionnaire, son texte par defaut et ses valeurs.</summary>
 public sealed record MessageJoueur(string Cle, string ParDefaut, params (string Nom, string Valeur)[] Valeurs);
 
@@ -220,6 +226,28 @@ public sealed class SessionSpeedrun
     /// <summary>Un speedrun parti sur un etat de depart : le recharger renvoie au debut de l'epreuve.</summary>
     internal static bool SeRelanceSeul(Reglement r) => r.Kind.StartsWith("speedrun_", StringComparison.Ordinal) && r.Etat is not null;
 
+    /// <summary>
+    /// LA CLOTURE A L'ARRIVEE (decision du user du 14/11, apres Ash : « quand tu termines le niveau, tu passes au niveau suivant
+    /// sans que le challenge s'arrete ») : un challenge (challenge_rule, challenge_boss, challenge_mode) qui arrive est clos. La
+    /// session n'ouvre plus de tentative, ne releve plus rien et refuse la relance ; le service met RetroArch en pause et ferme le
+    /// jeu, ce qui envoie le temps tout de suite. Ni l'entrainement (training), ni les speedruns (ils se relancent seuls ou
+    /// attendent la sortie), ni l'echec, l'annulation ou l'abandon.
+    /// </summary>
+    internal static bool SeClotALArrivee(Reglement r) => r.Kind.StartsWith("challenge_", StringComparison.Ordinal);
+
+    /// <summary>Le challenge est arrive et clos (<see cref="SeClotALArrivee"/>) : plus rien ne compte dans ce lancement.</summary>
+    public bool Close { get; private set; }
+
+    private ClotureDuChallenge? _cloture;
+
+    /// <summary>La cloture d'un challenge arrive, une seule fois : le service pause et ferme le jeu, le panneau ouvre le bilan.</summary>
+    public ClotureDuChallenge? PrendreLaCloture()
+    {
+        var c = _cloture;
+        _cloture = null;
+        return c;
+    }
+
     /// <summary>Les messages au joueur depuis le dernier appel : le service les affiche dans RetroArch.</summary>
     public IReadOnlyList<MessageJoueur> PrendreLesMessages()
     {
@@ -241,7 +269,7 @@ public sealed class SessionSpeedrun
     {
         get
         {
-            if (_relance) return [];
+            if (_relance || Close) return [];
             var a = new List<long>();
             if (!_courante.EstTerminee) a.AddRange(_courante.AdressesInconnues);
             if (_suivante is not null) a.AddRange(_suivante.AdressesInconnues);
@@ -251,7 +279,7 @@ public sealed class SessionSpeedrun
 
     public void Relever(long adresse, int valeur)
     {
-        if (_relance) return;
+        if (_relance || Close) return;
         if (!_courante.EstTerminee) _courante.Relever(adresse, valeur);
         _suivante?.Relever(adresse, valeur);
         Constater();
@@ -260,7 +288,8 @@ public sealed class SessionSpeedrun
     /// <summary>Les evenements d'une image du wrapper, d'un bloc ; <paramref name="horlogeMs"/> : l'horloge de leur emission.</summary>
     public void RecevoirImage(IReadOnlyList<Signal> image, long? horlogeMs = null)
     {
-        if (_relance || image.Count == 0) return;
+        // Un challenge clos : la mission suivante (son atterrissage) n'ouvre pas de tentative pendant que le jeu se ferme.
+        if (_relance || Close || image.Count == 0) return;
         _horlogeDeLImage = horlogeMs ?? image[0].HorlogeMs;
         if (!_courante.EstTerminee)
         {
@@ -414,7 +443,9 @@ public sealed class SessionSpeedrun
         var enCourse = _courante.Etat is EtatTentative.EnCourse or EtatTentative.ArriveeProvisoire;
         var liste = new List<ActionPermise>
         {
-            _relance
+            Close
+                ? new ActionPermise(ActionRelancer, false, "challenge_over")
+                : _relance
                 ? new ActionPermise(ActionRelancer, false, "restart_in_progress")
                 : new ActionPermise(ActionRelancer, true, null, Confirmation: enCourse),
             !_relance && enCourse
@@ -525,6 +556,9 @@ public sealed class SessionSpeedrun
                 _messages.Add(_r.EstUnEntrainement
                     ? new MessageJoueur("speedrun.msg.training_ready",
                         "Training: nothing is ranked or sent. Hotkey + Left: back to this point. Hotkey + Start: quit.")
+                    : SeClotALArrivee(_r)
+                    ? new MessageJoueur("speedrun.msg.challenge_ready",
+                        "Challenge ready. At the finish the game stops and your time is sent. Hotkey + Left: restart. Hotkey + Start: quit.")
                     : new MessageJoueur("speedrun.msg.ready",
                         "Challenge ready. Your best time is sent when you quit the game. Hotkey + Left: restart. Hotkey + Start: quit."));
             }
@@ -553,8 +587,21 @@ public sealed class SessionSpeedrun
             && _horlogeDuDepart is { } departMs && (_horlogeDArrivee ?? _horlogeDeLImage) is { } arriveeMs)
             _meilleure = new TentativeFinie(AttemptId, Numero, res, departMs, arriveeMs);
         _relanceAutomatique = DelaiDeRelance(_r, res.Etat, res.Cause);
+        // LA CLOTURE A L'ARRIVEE (14/11) : le challenge arrive, plus rien ne compte ; le service pause et ferme le jeu.
+        if (res.Etat == EtatTentative.Finie && res.FramesOfficielles is { } officiel && SeClotALArrivee(_r))
+        {
+            Close = true;
+            _suivante = null;
+            var compteurs = new Dictionary<string, int>(res.Compteurs, StringComparer.Ordinal);
+            var penalite = _r.Compteurs.Sum(c => c.PenaliteFrames is { } p and > 0 && compteurs.TryGetValue(c.Id, out var n) ? (long)p * n : 0L);
+            _cloture = new ClotureDuChallenge(AttemptId, officiel, EstClassable(res), compteurs, penalite);
+        }
+
         if (res.Etat == EtatTentative.Ratee && _relanceAutomatique is not null)
             _messages.Add(new MessageJoueur("speedrun.msg.failed_restart", "Attempt failed: back to the start."));
+        else if (Close && EstClassable(res) && res.FramesOfficielles is { } fini)
+            _messages.Add(new MessageJoueur("speedrun.msg.challenge_complete", "Challenge complete in {time}: the game stops, your time is being sent.",
+                ("time", Chronometrage.Afficher(fini, res.Cadence))));
         else if ((_r.EstUnEntrainement ? MessageDEntrainement(res) : MessageDeFin(res, precedent)) is { } message) _messages.Add(message);
         if (AvertissementDeRalenti(_r, res, _horlogeDuDepart, _horlogeDArrivee ?? _horlogeDeLImage) is { } lent) _messages.Add(lent);
         Publier("speedrun.attempt.ended", new
