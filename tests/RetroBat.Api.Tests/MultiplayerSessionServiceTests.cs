@@ -213,10 +213,102 @@ public class MultiplayerSessionServiceTests : IDisposable
         Assert.False(departs[1].TryGetProperty("reason", out _));
     }
 
+    // ── lot 4 bis C-1 (14/11) : la cadence du sondage ──────────────────────────────────────────
+
+    [Fact]
+    public void Personne_devant_la_borne_le_sondage_part_toutes_les_cinq_minutes()
+    {
+        var attente = MultiplayerSessionService.Cadence(occupe: false, enPartieSolo: false, dansLaCollection: false, joueurPresent: false,
+            duSite: null, echecs: 0, alea: 0.5);
+
+        Assert.Equal(TimeSpan.FromMinutes(5), attente);
+    }
+
+    [Fact]
+    public void Les_cadences_d_une_salle_de_la_collection_et_d_un_joueur_present_restent()
+    {
+        Assert.Equal(TimeSpan.FromSeconds(2), MultiplayerSessionService.Cadence(true, false, true, true, null, 0, 0.5));
+        Assert.Equal(TimeSpan.FromSeconds(5), MultiplayerSessionService.Cadence(false, false, true, true, null, 0, 0.5));
+        // Le site montre un ami « en ligne » s'il a sonde depuis moins de 30 s : 10 s tant que quelqu'un est la.
+        Assert.Equal(TimeSpan.FromSeconds(10), MultiplayerSessionService.Cadence(false, false, false, true, null, 0, 0.5));
+    }
+
+    [Fact]
+    public void En_partie_solo_un_sondage_par_minute_meme_si_le_site_demande_plus_vite()
+    {
+        Assert.Equal(TimeSpan.FromSeconds(60), MultiplayerSessionService.Cadence(false, true, false, true, TimeSpan.FromSeconds(3), 0, 0.5));
+    }
+
+    [Fact]
+    public void La_cadence_du_site_l_emporte_dans_ses_bornes()
+    {
+        Assert.Equal(TimeSpan.FromSeconds(20), MultiplayerSessionService.Cadence(false, false, false, false, TimeSpan.FromSeconds(20), 0, 0.5));
+        Assert.Equal(TimeSpan.FromSeconds(2), MultiplayerSessionService.Cadence(true, false, false, true, TimeSpan.FromMilliseconds(100), 0, 0.5));
+        Assert.Equal(TimeSpan.FromMinutes(10), MultiplayerSessionService.Cadence(false, false, false, false, TimeSpan.FromHours(3), 0, 0.5));
+    }
+
+    [Fact]
+    public void Apres_des_echecs_le_sondage_recule_sans_lacher_une_salle()
+    {
+        Assert.Equal(TimeSpan.FromSeconds(20), MultiplayerSessionService.Cadence(false, false, false, true, null, 1, 0.5));
+        Assert.Equal(TimeSpan.FromMinutes(5), MultiplayerSessionService.Cadence(false, false, false, true, null, 8, 0.5));
+        // Une salle attend : jamais plus de 20 s, l'hote muet 2 min perdrait sa partie.
+        Assert.Equal(TimeSpan.FromSeconds(4), MultiplayerSessionService.Cadence(true, false, false, true, null, 1, 0.5));
+        Assert.Equal(TimeSpan.FromSeconds(20), MultiplayerSessionService.Cadence(true, false, false, true, null, 30, 0.5));
+    }
+
+    [Fact]
+    public void Les_longues_attentes_sont_dispersees_de_dix_pour_cent()
+    {
+        Assert.Equal(TimeSpan.FromSeconds(270), MultiplayerSessionService.Cadence(false, false, false, false, null, 0, 0));
+        Assert.Equal(TimeSpan.FromSeconds(330), MultiplayerSessionService.Cadence(false, false, false, false, null, 0, 1));
+        // Les cadences courtes ne bougent pas : une salle reste a 2 s.
+        Assert.Equal(TimeSpan.FromSeconds(2), MultiplayerSessionService.Cadence(true, false, false, true, null, 0, 0));
+    }
+
+    [Fact]
+    public async Task Le_sondage_retient_la_cadence_du_site_et_compte_ses_echecs()
+    {
+        var plateforme = new Plateforme { PollAfter = "45" };
+        var (session, _, _) = await MonterAsync(plateforme);
+
+        await session.SonderAsync(CancellationToken.None);
+        Assert.Equal((TimeSpan.FromSeconds(45), 0), session.EtatDuSondage);
+
+        plateforme.EnPanne = true;
+        await session.SonderAsync(CancellationToken.None);
+        await session.SonderAsync(CancellationToken.None);
+        Assert.Equal(2, session.EtatDuSondage.Echecs);
+
+        // Un site qui ne dit plus rien : la borne reprend sa cadence, les echecs s'effacent.
+        plateforme.EnPanne = false;
+        plateforme.PollAfter = null;
+        await session.SonderAsync(CancellationToken.None);
+        Assert.Equal((null, 0), session.EtatDuSondage);
+    }
+
+    [Fact]
+    public async Task Sans_geste_depuis_cinq_minutes_personne_n_est_devant_la_borne()
+    {
+        var (session, _, _) = await MonterAsync();
+        var t0 = DateTime.UtcNow;
+
+        session.Geste(t0);
+        Assert.True(session.JoueurPresent(t0.AddMinutes(4)));
+        Assert.False(session.JoueurPresent(t0.AddMinutes(6)));
+
+        // Le panneau MULTIPLAYER ouvert, quelqu'un est la.
+        session.PanneauOuvert = true;
+        Assert.True(session.JoueurPresent(t0.AddMinutes(6)));
+    }
+
     /// <summary>NelfePlay en bouteille : une gameroom r1, et la trace des corps envoyes.</summary>
     private sealed class Plateforme(bool avecSession = false, bool enPanne = false) : HttpMessageHandler
     {
         public bool EnPanne { get; set; } = enPanne;
+
+        /// <summary>La cadence que le site rend au sondage (texte JSON), ou null pour un site qui n'en dit rien.</summary>
+        public string? PollAfter { get; set; }
 
         public List<(string Action, string Corps)> Appels { get; } = [];
 
@@ -240,7 +332,8 @@ public class MultiplayerSessionServiceTests : IDisposable
             var corps = action switch
             {
                 "join" => "{\"ok\": true, \"room\": \"r1\"}",
-                "poll" => "{\"ok\": true, \"rooms\": [{\"room\": \"r1\", \"game\": \"arcade/mslug3\", \"state\": \"" + (avecSession ? "playing" : "waiting") + "\", \"max\": 2, \"players\": []" + lancement + "}], \"invitations\": []}",
+                "poll" => "{\"ok\": true, \"rooms\": [{\"room\": \"r1\", \"game\": \"arcade/mslug3\", \"state\": \"" + (avecSession ? "playing" : "waiting") + "\", \"max\": 2, \"players\": []" + lancement + "}], \"invitations\": []"
+                    + (PollAfter is null ? string.Empty : ", \"poll_after\": " + PollAfter) + "}",
                 _ => "{\"ok\": true}",
             };
             return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(corps, Encoding.UTF8, "application/json") };
