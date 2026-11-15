@@ -218,7 +218,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     // reads the shared arcade wheel and overwrites the correct logo.
                     Assets = systemAssets,
                     SystemAssets = systemAssets,
-                    Generation = ResolveSystemGenerationState(roots),
+                    Generation = ResolveSystemGenerationState(frontendSystemId, systemId, roots),
                     Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "projection")
                 }
             });
@@ -541,28 +541,78 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         // and the plain glob in BuildMarqueeMedia returns the alphabetically-first sibling (fbneo).
         // Pin the same frontend-scoped assets the system snapshot uses, so a mame/arcade game with no
         // marquee of its own no longer falls back to fbneo's system marquee/logo.
-        var system = BuildMarqueeMedia(fallbackSystemRoots) with
+        var systemMedia = BuildMarqueeMedia(fallbackSystemRoots);
+        var system = systemMedia with
         {
             GeneratedMarquee = ResolveSystemGeneratedMarqueeAsset(frontendSystemId, systemId, fallbackSystemRoots),
+            // Same frontend scoping for the system DMD: the shared generated-system-dmd.png of the
+            // collapsed arcade folder was the LAST frontend generated (mame), shown on fbneo too.
+            Dmd = WithSystemGeneratedDmd((DmdMediaSnapshot)systemMedia.Dmd, frontendSystemId, systemId, fallbackSystemRoots),
             Logo = ResolveSystemLogoAsset(frontendSystemId, systemId, fallbackSystemRoots),
             Fanart = ResolveSystemFanartAsset(frontendSystemId, systemId, fallbackSystemRoots),
         };
+
+        return MergeGameOverSystem(game, system);
+    }
+
+    /// <summary>
+    /// The legacy <c>Media</c> block of a game snapshot: each slot is the game's file, else its
+    /// system's - and now SAYS which (<see cref="MediaStreamAsset.Scope"/>, and the DMD block's
+    /// own Scope since it is taken whole). The paths and the fallbacks are unchanged.
+    /// </summary>
+    internal static MarqueeMediaSnapshot MergeGameOverSystem(MarqueeMediaSnapshot game, MarqueeMediaSnapshot system)
+    {
         var gameDmd = (DmdMediaSnapshot)game.Dmd;
         var systemDmd = (DmdMediaSnapshot)system.Dmd;
 
         return new MarqueeMediaSnapshot(
-            Marquee: game.Marquee ?? system.Marquee,
-            GeneratedMarquee: game.GeneratedMarquee ?? system.GeneratedMarquee,
-            ScreenMarquee: game.ScreenMarquee ?? system.ScreenMarquee,
-            ScreenMarqueeSmall: game.ScreenMarqueeSmall ?? system.ScreenMarqueeSmall,
-            Dmd: HasDmdMedia(gameDmd) ? gameDmd : systemDmd,
-            Topper: game.Topper ?? system.Topper,
-            Fanart: game.Fanart ?? system.Fanart,
-            Logo: game.Logo ?? system.Logo,
+            Marquee: GameOrSystem(game.Marquee, system.Marquee),
+            GeneratedMarquee: GameOrSystem(game.GeneratedMarquee, system.GeneratedMarquee),
+            ScreenMarquee: GameOrSystem(game.ScreenMarquee, system.ScreenMarquee),
+            ScreenMarqueeSmall: GameOrSystem(game.ScreenMarqueeSmall, system.ScreenMarqueeSmall),
+            Dmd: HasDmdMedia(gameDmd) ? WithMediaScope(gameDmd, MediaScopeGame) : WithMediaScope(systemDmd, MediaScopeSystem),
+            Topper: GameOrSystem(game.Topper, system.Topper),
+            Fanart: GameOrSystem(game.Fanart, system.Fanart),
+            Logo: GameOrSystem(game.Logo, system.Logo),
             // Game video only: falling back to the system video would loop an
             // unrelated clip on every game of the system.
-            Video: game.Video);
+            Video: WithMediaScope(game.Video, MediaScopeGame));
     }
+
+    internal const string MediaScopeGame = "game";
+    internal const string MediaScopeSystem = "system";
+
+    private static MediaStreamAsset? GameOrSystem(MediaStreamAsset? game, MediaStreamAsset? system)
+        => game != null ? WithMediaScope(game, MediaScopeGame) : WithMediaScope(system, MediaScopeSystem);
+
+    internal static MediaStreamAsset? WithMediaScope(MediaStreamAsset? asset, string scope)
+        => asset == null ? null : asset with { Scope = scope };
+
+    internal static DmdMediaSnapshot WithMediaScope(DmdMediaSnapshot dmd, string scope)
+        => dmd with
+        {
+            Still = WithMediaScope(dmd.Still, scope),
+            Generated = WithMediaScope(dmd.Generated, scope),
+            Animations = dmd.Animations.Select(asset => asset with { Scope = scope }).ToList(),
+            Scope = scope,
+        };
+
+    /// <summary>Every slot of a SYSTEM snapshot's <c>Media</c> block is the system's.</summary>
+    internal static MarqueeMediaSnapshot WithSystemScope(MarqueeMediaSnapshot media)
+        => new(
+            Marquee: WithMediaScope(media.Marquee, MediaScopeSystem),
+            GeneratedMarquee: WithMediaScope(media.GeneratedMarquee, MediaScopeSystem),
+            ScreenMarquee: WithMediaScope(media.ScreenMarquee, MediaScopeSystem),
+            ScreenMarqueeSmall: WithMediaScope(media.ScreenMarqueeSmall, MediaScopeSystem),
+            Dmd: WithMediaScope((DmdMediaSnapshot)media.Dmd, MediaScopeSystem),
+            Topper: WithMediaScope(media.Topper, MediaScopeSystem),
+            Fanart: WithMediaScope(media.Fanart, MediaScopeSystem),
+            Logo: WithMediaScope(media.Logo, MediaScopeSystem),
+            Video: WithMediaScope(media.Video, MediaScopeSystem));
+
+    private static DmdMediaSnapshot WithSystemGeneratedDmd(
+        DmdMediaSnapshot dmd, string frontendSystemId, string systemId, IReadOnlyList<string> roots)
+        => dmd with { Generated = ResolveSystemGeneratedDmdAsset(frontendSystemId, systemId, roots) };
 
     private static bool HasDmdMedia(DmdMediaSnapshot dmd)
     {
@@ -992,7 +1042,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
                     // reads the shared arcade wheel and overwrites the correct logo.
                     Assets = systemAssets,
                     SystemAssets = systemAssets,
-                    Generation = ResolveSystemGenerationState(roots),
+                    Generation = ResolveSystemGenerationState(frontendSystemId, systemId, roots),
                     Latency = BuildSnapshotLatency(trigger, selectionSequence, selection.SelectionKey, ResolveReceivedAtUtc(trigger), DateTime.UtcNow, perf, "background-generation")
                 }
             });
@@ -1088,19 +1138,21 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         }
     }
 
-    private object ResolveSystemGenerationState(IReadOnlyList<string> roots)
+    private object ResolveSystemGenerationState(string frontendSystemId, string systemId, IReadOnlyList<string> roots)
     {
+        // The same frontend-scoped files the snapshot carries: a glob said "generated-present" for
+        // fbneo on the strength of mame's file.
         return new
         {
             Marquee = ResolveGenerationState(
                 ResolveProfile(_runtimeOptions.GetMarqueeManagerAutogenProfile()) != null &&
                     _runtimeOptions.IsRemoteMarqueeScrapingEnabled(),
                 FindFirstAsset(roots, "artwork", "marquee", "marquee.*") != null,
-                FindFirstAsset(roots, "artwork", "marquee", "generated-system-marquee.*") != null),
+                ResolveSystemGeneratedMarqueeAsset(frontendSystemId, systemId, roots) != null),
             Dmd = ResolveGenerationState(
                 ResolveDmdProfile(_runtimeOptions.GetMarqueeManagerDmdAutogenProfile()) != null,
                 FindFirstAsset(roots, "artwork", "marquee", "dmd.png") != null,
-                FindFirstAsset(roots, "artwork", "marquee", "generated-system-dmd.*") != null)
+                ResolveSystemGeneratedDmdAsset(frontendSystemId, systemId, roots) != null)
         };
     }
 
@@ -1146,16 +1198,16 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         var logo = ResolveSystemLogoAsset(frontendSystemId, systemId, roots);
         var generatedMarquee = ResolveSystemGeneratedMarqueeAsset(frontendSystemId, systemId, roots);
 
-        return new MarqueeMediaSnapshot(
+        return WithSystemScope(new MarqueeMediaSnapshot(
             media.Marquee,
             generatedMarquee,
             media.ScreenMarquee,
             media.ScreenMarqueeSmall,
-            media.Dmd,
+            WithSystemGeneratedDmd((DmdMediaSnapshot)media.Dmd, frontendSystemId, systemId, roots),
             media.Topper,
             fanart,
             logo,
-            media.Video);
+            media.Video));
     }
 
     private async Task EnsureSystemMarqueeGeneratedAsync(
@@ -1325,7 +1377,9 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
 
         var destinationDirectory = Path.Combine(RetroBatPaths.MediaSystemsRoot, systemId, "artwork", "marquee");
         Directory.CreateDirectory(destinationDirectory);
-        var outputPath = Path.Combine(destinationDirectory, "generated-system-dmd.png");
+        // Frontend-scoped like the system marquee: one shared file under the collapsed "arcade"
+        // folder was overwritten by every frontend, and fbneo showed mame's DMD.
+        var outputPath = Path.Combine(destinationDirectory, FrontendScopedFileName("generated-system-dmd", ".png", frontendSystemId, systemId));
         var tempDirectory = Path.Combine(RetroBatPaths.RuntimeTempRoot, "marquee-autogen");
         Directory.CreateDirectory(tempDirectory);
         var tempBasePath = Path.Combine(tempDirectory, Guid.NewGuid().ToString("N") + "-system-dmd-base.png");
@@ -2488,8 +2542,27 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         var table = new Dictionary<string, MediaStreamAsset>(BuildAssetTable(roots, allowed), StringComparer.OrdinalIgnoreCase);
         PinAsset(table, MediaKinds.Wheel, ResolveSystemLogoAsset(frontendSystemId, systemId, roots), allowed);
         PinAsset(table, MediaKinds.GeneratedMarquee, ResolveSystemGeneratedMarqueeAsset(frontendSystemId, systemId, roots), allowed);
+        PinAsset(table, MediaKinds.GeneratedDmd, ResolveSystemGeneratedDmdAsset(frontendSystemId, systemId, roots), allowed);
         return table;
     }
+
+    /// <summary>
+    /// The composited system DMD, scoped like the generated marquee: the exact
+    /// <c>generated-system-dmd[.frontend].png</c> EnsureSystemDmdGeneratedAsync writes. A 1:1 system
+    /// may still own an older <c>generated-dmd.*</c>; a collapsed arcade sub-system never borrows a
+    /// sibling's file, nor the shared one (that is the "arcade" aggregate's).
+    /// </summary>
+    internal static MediaStreamAsset? ResolveSystemGeneratedDmdAsset(string frontendSystemId, string systemId, IReadOnlyList<string> roots)
+    {
+        var scoped = FindFirstAsset(roots, "artwork", "marquee", FrontendScopedFileName("generated-system-dmd", ".png", frontendSystemId, systemId));
+        return scoped
+            ?? (IsOneToOneSystem(frontendSystemId, systemId)
+                ? FindFirstAsset(roots, "artwork", "marquee", "generated-dmd.*")
+                : null);
+    }
+
+    private static bool IsOneToOneSystem(string frontendSystemId, string systemId)
+        => string.IsNullOrWhiteSpace(frontendSystemId) || string.Equals(frontendSystemId, systemId, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Force one kind to a specific asset (or drop it when there is none), so the
     /// generic first-wins enumeration cannot leak a sibling frontend's file.</summary>
@@ -2595,7 +2668,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
 
     /// <summary>The files EnsureSystemMarqueeGeneratedAsync and EnsureSystemDmdGeneratedAsync write for this system.</summary>
     internal static IReadOnlyList<string> GeneratedSystemMediaNames(string frontendSystemId, string systemId)
-        => [FrontendScopedFileName("generated-system-marquee", ".png", frontendSystemId, systemId), "generated-system-dmd.png"];
+        => [FrontendScopedFileName("generated-system-marquee", ".png", frontendSystemId, systemId), FrontendScopedFileName("generated-system-dmd", ".png", frontendSystemId, systemId)];
 
     /// <summary>The operator-override roots (media/user/systems/…) among a system's roots,
     /// identified by prefix so it does not depend on their order.</summary>
@@ -2956,13 +3029,21 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
 
     private sealed record AssetSearch(string RelativeDirectory, string Pattern);
     private sealed record MarqueeAutogenProfile(int Width, int Height);
-    private sealed record DmdMediaSnapshot(
+    internal sealed record DmdMediaSnapshot(
         string Kind,
         MediaStreamAsset? Still,
         MediaStreamAsset? Generated,
-        IReadOnlyList<MediaStreamAsset> Animations);
+        IReadOnlyList<MediaStreamAsset> Animations)
+    {
+        /// <summary>The block is taken WHOLE from the game or from its system: "game" or
+        /// "system", null (omitted) until <see cref="WithMediaScope(DmdMediaSnapshot, string)"/>
+        /// tags it.</summary>
+        [System.Text.Json.Serialization.JsonIgnore(
+            Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public string? Scope { get; init; }
+    }
 
-    private sealed record MarqueeMediaSnapshot(
+    internal sealed record MarqueeMediaSnapshot(
         MediaStreamAsset? Marquee,
         MediaStreamAsset? GeneratedMarquee,
         MediaStreamAsset? ScreenMarquee,
@@ -3113,6 +3194,17 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         [System.Text.Json.Serialization.JsonIgnore(
             Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public string? PathRoot { get; init; }
+
+        /// <summary>
+        /// Whose file this is, in the legacy <c>Media</c> block: <c>"game"</c> when the entry
+        /// owns it, <c>"system"</c> when a game snapshot fell back to its system (or the snapshot
+        /// is a system's). <c>Media.GeneratedMarquee</c> of a game with no marquee of its own
+        /// carried the SYSTEM's generated marquee and nothing said so. Null - and omitted - on
+        /// the asset tables, already scoped by their name. Additive: SnapshotVersion stays 2.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore(
+            Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public string? Scope { get; init; }
     }
 
     /// <summary>
