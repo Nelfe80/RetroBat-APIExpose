@@ -626,6 +626,10 @@ public sealed record DeckSemanticSignal(
     long? Max,
     long? Initial,
     string Quality,
-    bool Available);
+    bool Available)
+{
+    /// <summary>Role normalise (lives, bombs, ammo, health, power, boss_hp, stage), deduit de l'identifiant ; null sinon.</summary>
+    public string? Role => SmemRole.Depuis(Id);
+}
 
 public sealed record DeckSemanticInstrument(string Id, string? Label, int? Player, string Show, IReadOnlyList<string> Signals);
