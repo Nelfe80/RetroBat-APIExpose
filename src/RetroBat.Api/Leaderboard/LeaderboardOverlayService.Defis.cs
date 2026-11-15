@@ -26,7 +26,13 @@ public sealed partial class LeaderboardOverlayService
         string? Image = null,
         string Badge = "");
 
-    public sealed record ChampDeFiche(string Etiquette, string Valeur);
+    /// <summary>
+    /// Un champ de la fiche. <paramref name="Large"/> (15/11, demande du user) : toute la largeur et jusqu'a
+    /// <see cref="LignesDUnChampLarge"/> lignes, pour la description du defi qu'une demi-colonne coupait sur une ligne.
+    /// </summary>
+    public sealed record ChampDeFiche(string Etiquette, string Valeur, bool Large = false);
+
+    internal const int LignesDUnChampLarge = 3;
 
     /// <summary>Une ligne du selecteur de reglages : son nom, sa valeur, et si elle joue (inactive : grisee).</summary>
     public sealed record LigneDeReglage(string Etiquette, string Valeur, bool Active = true);
@@ -151,8 +157,9 @@ public sealed partial class LeaderboardOverlayService
             var basDuContenu = basDeLAide - tailleTexte * 0.4f;
             if (d.Fiche.Count > 0)
             {
-                var hauteurFiche = (tailleTexte * 2.6f) * ((d.Fiche.Count + 1) / 2) + tailleTexte * 0.8f;
-                var fiche = new RectangleF(marge, basDuContenu - hauteurFiche, Width - 2 * marge, hauteurFiche);
+                var largeurFiche = Width - 2 * marge;
+                var hauteurFiche = PlacerLaFiche(g, d.Fiche, policeTexte, tailleTexte, largeurFiche).Hauteur + tailleTexte * 0.8f;
+                var fiche = new RectangleF(marge, basDuContenu - hauteurFiche, largeurFiche, hauteurFiche);
                 DessinerLaFiche(g, d.Fiche, s, policeGroupe, policeTexte, tailleTexte, fiche);
                 basDuContenu = fiche.Y - tailleTexte * 0.4f;
             }
@@ -579,14 +586,72 @@ public sealed partial class LeaderboardOverlayService
             using var encreEtiquette = new SolidBrush(Teinte(s.GroupColor));
             using var encreValeur = new SolidBrush(Teinte(s.TitleColor));
             using var aGauche = new StringFormat(StringFormat.GenericTypographic) { Trimming = StringTrimming.Character, FormatFlags = StringFormatFlags.NoWrap };
-            var colonne = (zone.Width - taille * 1.2f) / 2f;
-            for (var i = 0; i < champs.Count; i++)
+            using var surPlusieursLignes = new StringFormat(StringFormat.GenericTypographic) { Trimming = StringTrimming.Word, FormatFlags = StringFormatFlags.LineLimit };
+            foreach (var (champ, place, lignes) in PlacerLaFiche(g, champs, valeur, taille, zone.Width).Places)
             {
-                var x = zone.X + taille * 0.6f + (i % 2) * colonne;
-                var y = zone.Y + taille * 0.4f + (i / 2) * taille * 2.6f;
-                DessinerCoupe(g, champs[i].Etiquette.ToUpperInvariant(), etiquette, encreEtiquette, new RectangleF(x, y, colonne - taille * 0.4f, taille), aGauche);
-                DessinerCoupe(g, champs[i].Valeur, valeur, encreValeur, new RectangleF(x, y + taille * 1.05f, colonne - taille * 0.4f, taille * 1.4f), aGauche);
+                var x = zone.X + place.X;
+                var y = zone.Y + taille * 0.4f + place.Y;
+                DessinerCoupe(g, champ.Etiquette.ToUpperInvariant(), etiquette, encreEtiquette, new RectangleF(x, y, place.Width, taille), aGauche);
+                if (lignes <= 1)
+                {
+                    DessinerCoupe(g, champ.Valeur, valeur, encreValeur, new RectangleF(x, y + taille * 1.05f, place.Width, taille * 1.4f), aGauche);
+                }
+                else
+                {
+                    // Plusieurs lignes, coupees aux mots ; au-dela de la derniere, le texte s'arrete (LineLimit).
+                    g.DrawString(champ.Valeur, valeur, encreValeur, new RectangleF(x, y + taille * 1.05f, place.Width, lignes * valeur.GetHeight(g) + 1f), surPlusieursLignes);
+                }
             }
+        }
+
+        /// <summary>
+        /// La place de chaque champ de la fiche (15/11) : deux colonnes, sauf un champ large qui prend une rangee entiere et
+        /// autant de lignes que son texte en demande (au plus <see cref="LignesDUnChampLarge"/>). Le calcul sert a la hauteur
+        /// de la fiche ET a son dessin : les deux ne peuvent pas diverger.
+        /// </summary>
+        private static (float Hauteur, List<(ChampDeFiche Champ, RectangleF Place, int Lignes)> Places) PlacerLaFiche(
+            Graphics g, IReadOnlyList<ChampDeFiche> champs, Font valeur, float taille, float largeur)
+        {
+            var places = new List<(ChampDeFiche, RectangleF, int)>();
+            var interieur = largeur - taille * 1.2f;
+            var colonne = interieur / 2f;
+            var rangee = taille * 2.6f;
+            var y = 0f;
+            var colonneOuverte = 0;   // 0 : la rangee courante est vide ; 1 : sa colonne de gauche est prise
+            using var mesure = new StringFormat(StringFormat.GenericTypographic);
+            foreach (var champ in champs)
+            {
+                if (champ.Large)
+                {
+                    if (colonneOuverte == 1)
+                    {
+                        y += rangee;
+                        colonneOuverte = 0;
+                    }
+
+                    var largeurTexte = interieur - taille * 0.4f;
+                    var hauteurLigne = Math.Max(1f, valeur.GetHeight(g));
+                    var hauteurTexte = g.MeasureString(champ.Valeur, valeur, new SizeF(largeurTexte, 10_000f), mesure).Height;
+                    var lignes = Math.Clamp((int)Math.Ceiling(hauteurTexte / hauteurLigne - 0.05f), 1, LignesDUnChampLarge);
+                    places.Add((champ, new RectangleF(taille * 0.6f, y, largeurTexte, 0f), lignes));
+                    y += lignes <= 1 ? rangee : taille * 1.05f + lignes * hauteurLigne + taille * 0.3f;
+                    continue;
+                }
+
+                places.Add((champ, new RectangleF(taille * 0.6f + colonneOuverte * colonne, y, colonne - taille * 0.4f, 0f), 1));
+                if (colonneOuverte == 1)
+                {
+                    y += rangee;
+                    colonneOuverte = 0;
+                }
+                else
+                {
+                    colonneOuverte = 1;
+                }
+            }
+
+            if (colonneOuverte == 1) y += rangee;
+            return (y, places);
         }
     }
 
