@@ -53,6 +53,13 @@ public sealed class SelfUpdateHostedService : IHostedService
     /// fin, au bout de 10 minutes. Elle attendait la verification suivante, six heures plus tard.
     /// </summary>
     internal static readonly TimeSpan RelanceSiOccupee = TimeSpan.FromMinutes(10);
+
+    /// <summary>
+    /// L'INTERVALLE REEL ENTRE DEUX VERIFICATIONS, en heures (15/11) : toutes les heures. Le appsettings.json d'une borne
+    /// n'est jamais remplace par une mise a jour, et l'ancien defaut (6) y reste ecrit : il vaut donc 1 lui aussi. Une
+    /// autre valeur choisie a la main est gardee. Pur.
+    /// </summary>
+    internal static int IntervalleEffectif(int configure) => configure is <= 0 or 6 ? 1 : configure;
     internal static readonly TimeSpan ApresLaFinDuJeu = TimeSpan.FromSeconds(30);
 
     private void SurEvenement(EventEnvelope evenement)
@@ -132,7 +139,7 @@ public sealed class SelfUpdateHostedService : IHostedService
 
             // Rendez-vous plus tard : a la fermeture du jeu (ou dans 10 minutes) s'il tournait, sinon a la
             // verification suivante.
-            var heures = opt.IntervalHours <= 0 ? 6 : opt.IntervalHours;
+            var heures = IntervalleEffectif(opt.IntervalHours);
             try
             {
                 if (remise)

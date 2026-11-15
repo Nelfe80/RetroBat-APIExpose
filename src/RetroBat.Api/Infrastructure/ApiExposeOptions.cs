@@ -845,8 +845,9 @@ public class ApiExposeOptions
         /// <summary>
         /// On regarde de nouveau toutes les N heures, parce qu'une borne peut rester allumee des
         /// jours et parce qu'elle etait peut-etre occupee la fois d'avant. 0 = une seule fois.
+        /// TOUTES LES HEURES depuis le 15/11 (decision du user) : 6 h laissaient une borne allumee sans les correctifs.
         /// </summary>
-        public int IntervalHours { get; set; } = 6;
+        public int IntervalHours { get; set; } = 1;
     }
 
     public class RetroArchWrapperDeploymentOptions
