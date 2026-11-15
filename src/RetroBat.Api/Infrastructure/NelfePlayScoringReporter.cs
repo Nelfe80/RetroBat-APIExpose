@@ -2046,11 +2046,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return avec;
     }
 
+    /// <summary>
+    /// Le score est-il monte d'une image a une autre ? Les lectures d'une meme image n'en font qu'une (<see cref="ProgressionDuScore.ParImage"/>) :
+    /// un score en deux mots restaure d'un coup (hiscores de FBNeo, Dangun Feveron, 15/11 : 10 000 puis 12 989 a l'image 988) n'est
+    /// pas une montee, personne n'a joue.
+    /// </summary>
     internal static bool ScoreAMonte(IReadOnlyList<(long frame, long total)> trajectoire)
     {
-        for (var i = 1; i < trajectoire.Count; i++)
+        var parImage = ProgressionDuScore.ParImage(trajectoire);
+        for (var i = 1; i < parImage.Count; i++)
         {
-            if (trajectoire[i].total > trajectoire[i - 1].total) return true;
+            if (parImage[i].total > parImage[i - 1].total) return true;
         }
         return false;
     }

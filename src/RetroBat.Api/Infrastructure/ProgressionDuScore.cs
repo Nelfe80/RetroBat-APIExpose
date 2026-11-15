@@ -89,16 +89,42 @@ public static class ProgressionDuScore
         return points;
     }
 
-    /// <summary>Les hausses du score : chaque point plus haut que le precedent, et un depart deja au-dessus de zero.</summary>
+    /// <summary>
+    /// Les hausses du score : chaque point plus haut que le precedent, et un depart deja au-dessus de zero, COMPTEES PAR IMAGE
+    /// (<see cref="ParImage"/>) : les morceaux d'un score ecrits a la meme image ne font pas plusieurs hausses.
+    /// </summary>
     public static int Hausses(IReadOnlyList<(long frame, long total)> points)
     {
-        if (points.Count == 0) return 0;
-        var n = points[0].total > 0 ? 1 : 0;
-        for (var i = 1; i < points.Count; i++)
+        var parImage = ParImage(points);
+        if (parImage.Count == 0) return 0;
+        var n = parImage[0].total > 0 ? 1 : 0;
+        for (var i = 1; i < parImage.Count; i++)
         {
-            if (points[i].total > points[i - 1].total) n++;
+            if (parImage[i].total > parImage[i - 1].total) n++;
         }
         return n;
+    }
+
+    /// <summary>
+    /// UNE IMAGE, UNE LECTURE (15/11, Dangun Feveron de neogeoff). Un score en plusieurs morceaux (deux mots BCD) ecrit d'un coup
+    /// donne une lecture par morceau, toutes a la meme image : la restauration des hiscores de FBNeo, qui reecrit au demarrage le
+    /// score de la partie precedente, se lisait 10 000 puis 12 989 a l'image 988, et passait pour une montee (12 989 et 12 381
+    /// certifies deux fois, en 1CC et en 1LC). Les lectures qui se suivent a la meme image ne gardent que la derniere, le total
+    /// de cette image. Une image inconnue (0 ou moins : pont MAME, lecture non datee) ne regroupe rien, chaque lecture compte.
+    /// </summary>
+    public static List<(long frame, long total)> ParImage(IReadOnlyList<(long frame, long total)> points)
+    {
+        var sortie = new List<(long frame, long total)>(points.Count);
+        foreach (var p in points)
+        {
+            if (sortie.Count > 0 && p.frame > 0 && sortie[^1].frame == p.frame)
+            {
+                sortie[^1] = p;
+                continue;
+            }
+            sortie.Add(p);
+        }
+        return sortie;
     }
 
     /// <summary>Un gain du run et sa duree : un ecart entre deux points, le depart du run depuis zero, le plus grand pas.</summary>
