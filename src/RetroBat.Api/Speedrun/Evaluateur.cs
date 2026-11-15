@@ -36,13 +36,15 @@ public sealed record ResultatTentative(
     IReadOnlyDictionary<string, int?> ValeursFinales,
     IReadOnlyList<(long De, long A)> PlagesExclues,
     IReadOnlyList<EvenementCite> Journal,
-    double Cadence)
+    double Cadence,
+    long? Score = null)
 {
     /// <summary>Les valeurs du rang, dans l'ordre des criteres du reglement ; null si une valeur manque.</summary>
     public IReadOnlyList<(long? Valeur, bool PlusPetitMeilleur)> ValeursDeRang(Reglement reglement)
         => reglement.Rang.Select(c => (c.Mesure switch
         {
             "frames" => FramesOfficielles,
+            Reglement.MesureScore => Score,
             var id when Compteurs.TryGetValue(id, out var n) => n,
             var id when ValeursFinales.TryGetValue(id, out var v) => (long?)v,
             _ => null,
@@ -78,6 +80,7 @@ public sealed class Evaluateur
     private long? _derniereFrame, _derniereHorloge, _frameDeLHorloge;
     private long? _frameDeFin;
     private long? _horlogeDuDepart, _horlogeDeLImage;
+    private long? _score;
 
     public Evaluateur(Reglement reglement)
     {
@@ -126,6 +129,19 @@ public sealed class Evaluateur
     }
 
     public void Recevoir(Signal s) => RecevoirImage(new[] { s });
+
+    /// <summary>
+    /// LE SCORE DU JOUEUR 1 (15/11, challenges au score) : la derniere valeur lue par l'agregateur (score.live.changed), figee
+    /// quand la tentative se termine. Il ne passe pas par l'image du wrapper : l'agregateur decode le BCD du .MEM.
+    /// </summary>
+    public void NoterLeScore(long score)
+    {
+        if (EstTerminee || score < 0 || !_r.DemandeLeScore) return;
+        _score = score;
+    }
+
+    /// <summary>Le score connu de la tentative, en direct ; null tant qu'aucun n'est lu.</summary>
+    public long? Score => _score;
 
     /// <summary>
     /// LES EVENEMENTS D'UNE MEME IMAGE, d'un bloc : le wrapper les emet ensemble, dans l'ordre de ses lectures,
@@ -356,6 +372,13 @@ public sealed class Evaluateur
 
         Etat = EtatTentative.Finie;
         Cause = null;
+
+        // LE TEMPS MAXIMAL (15/11) : un temps officiel au-dela de la limite du reglement rate la tentative. Un chrono officiel sans
+        // arrivee (son evenement jamais vu, la mort du boss de Metal Slug 3) ne se classe pas : la tentative est annulee.
+        var officiel = Mesurer(_r.Officiel, depart, _r.ChronoOfficiel == Reglement.ChronoIndependant ? _arriveeEvenementIndependant : _arriveeEvenementCale);
+        if (officiel?.Frames is not { } images) { Annuler("finish_unmeasured", frame); return; }
+        if (_r.LimiteDeTemps is { } limite && images + FramesDePenalite() > limite) { Rater("time_limit", frame); return; }
+        if (_r.DemandeLeScore && _score is null) Annuler("score_unknown", frame);
     }
 
     private void Rater(string cause, long frame) { Etat = EtatTentative.Ratee; Cause = cause; _frameDeFin = frame; }
@@ -410,7 +433,8 @@ public sealed class Evaluateur
             _r.ValeursFinales.ToDictionary(v => v.Id, v => _valeurs.TryGetValue(v.Adresse, out var x) ? x : (int?)null),
             _plages.ToList(),
             _journal.ToList(),
-            _r.Cadence);
+            _r.Cadence,
+            _score);
     }
 
     /// <summary>Les images ajoutees au temps officiel par les compteurs a penalite (Metal Slug 3 facilite : 1 s par coup).</summary>

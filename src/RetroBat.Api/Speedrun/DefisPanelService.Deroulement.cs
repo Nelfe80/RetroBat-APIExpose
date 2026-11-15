@@ -505,7 +505,9 @@ public sealed partial class DefisPanelService
     internal static BilanDEpreuve AvecLeVerdict(BilanDEpreuve b, IssueDuBilan issue, int? rang, long? score, ClassementDEpreuve? classement) => b with
     {
         Issue = issue,
-        Temps = score ?? b.Temps,
+        // (15/11) la valeur du verdict est celle du classement : le score d'un challenge au score, sinon le temps
+        Temps = b.Defi.ClasseAuScore ? b.Temps : score ?? b.Temps,
+        Score = b.Defi.ClasseAuScore ? score ?? b.Score : b.Score,
         Rang = issue == IssueDuBilan.Classe ? rang : null,
         Record = classement?.Lignes.FirstOrDefault()?.Valeur,
         Classes = classement?.Total,

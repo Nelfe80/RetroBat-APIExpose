@@ -1,0 +1,202 @@
+{
+  "schema": "nelfe.challenge.v2",
+  "challenge_id": "metal-slug-3.mission-1-rambo",
+  "version": 2,
+  "ruleset": "ch-ms3-m1-rambo-v2",
+  "order": 1,
+  "kind": "challenge_rule",
+  "game": {
+    "rom_group": "metal-slug-3",
+    "system_id": "arcade"
+  },
+  "mem_sha256": "b752c21077cc1f8645f59a3f97ef4328230559cb38c3b7868544f096da7a47c3",
+  "min_api": "1.9.192",
+  "start_policy": "canonical_state",
+  "state": {
+    "file": "arcade/metal-slug-3/mission-1-rambo.state",
+    "name": "mission-1-rambo-fbneo",
+    "sha256": "1cd550ac12226e043eefbc61b6c23ee37a6c6abdd2e0601440ec8f74186ed981"
+  },
+  "start": [
+    {
+      "value": {
+        "address": "0x10FDB6",
+        "equals": "0x01"
+      }
+    },
+    {
+      "value": {
+        "address": "0x10040C",
+        "equals": "0x00"
+      }
+    },
+    {
+      "value": {
+        "address": "0x10040D",
+        "equals": "0x00"
+      }
+    }
+  ],
+  "timing": {
+    "independent": {
+      "finish": {
+        "event": {
+          "action": "BOSS_DEFEATED",
+          "address": "0x10ED7C",
+          "value": "0x01"
+        }
+      },
+      "start": {
+        "event": {
+          "action": "MOUNT_STATE",
+          "address": "0x1002C1",
+          "leaves": "0x00",
+          "value": "0x01"
+        },
+        "when": [
+          {
+            "value": {
+              "address": "0x10040C",
+              "equals": "0x00"
+            }
+          },
+          {
+            "value": {
+              "address": "0x10040D",
+              "equals": "0x00"
+            }
+          }
+        ]
+      }
+    },
+    "official": "independent"
+  },
+  "void": [
+    "save_state_load",
+    "rewind",
+    "runahead",
+    "fast_forward",
+    "cheats",
+    "netplay",
+    "pause_clock_gap",
+    {
+      "event": {
+        "action": "CONTINUE_SCREEN",
+        "address": "0x10FDB6",
+        "value": "0x02"
+      }
+    }
+  ],
+  "ranking": {
+    "metric": "score",
+    "direction": "higher_better",
+    "then": [
+      {
+        "metric": "frames",
+        "direction": "lower_better"
+      }
+    ]
+  },
+  "cores": [
+    "fbneo"
+  ],
+  "runtime": {
+    "core_ram": {
+      "base": "0x100000",
+      "swap16": true
+    },
+    "frame_rate": 59.185606
+  },
+  "title": {
+    "fr": "Rambo",
+    "en": "Rambo",
+    "es": "Rambo",
+    "ja": "ランボー",
+    "ko": "람보",
+    "zh": "兰博"
+  },
+  "summary": {
+    "fr": "Mission 1 jusqu'à Huge Hermit vaincu, Heavy Machine Gun imposée et munitions infinies : le plus gros score, bilan de mission compris ; à score égal, le temps jusqu'à la mort du boss départage. 6 min 30 au plus",
+    "en": "Mission 1 until Huge Hermit is defeated, Heavy Machine Gun locked with infinite ammo: highest score, mission bonus included; equal scores are split by the time to the boss kill. 6:30 at most",
+    "es": "Misión 1 hasta derrotar a Huge Hermit, Heavy Machine Gun fija y munición infinita: la mayor puntuación, bonificación de misión incluida; a igual puntuación desempata el tiempo hasta la muerte del jefe. 6:30 como máximo",
+    "ja": "ミッション1をHuge Hermit撃破まで、ヘビーマシンガン固定・弾数無限。ミッションボーナス込みのスコアで競う。同点はボス撃破までのタイムで決着。制限時間6分30秒",
+    "ko": "미션 1 Huge Hermit 격파까지, 헤비 머신건 고정에 탄약 무한. 미션 보너스를 포함한 최고 점수, 동점이면 보스 격파까지의 시간으로 가린다. 최대 6분 30초",
+    "zh": "任务1直到击败Huge Hermit，固定重机枪且弹药无限：比拼含任务奖励的最高分，同分时以击败首领的用时决胜。最多6分30秒"
+  },
+  "locks": [
+    {
+      "address": "0x10EAF2",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "value": "0xFF"
+    },
+    {
+      "address": "0x10EAF3",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "value": "0x05"
+    },
+    {
+      "address": "0x10EAFA",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "advantage",
+      "type": "u8",
+      "value": "0x03"
+    },
+    {
+      "address": "0x10EAFB",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "advantage",
+      "type": "u8",
+      "value": "0xE7"
+    },
+    {
+      "address": "0x10058F",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "set_bits": "0x01"
+    },
+    {
+      "address": "0x10058E",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "set_bits": "0x01"
+    },
+    {
+      "address": "0x10EAF6",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "value": "0x00"
+    },
+    {
+      "address": "0x10EAF7",
+      "from": "attempt_start",
+      "player": 1,
+      "reason": "constraint",
+      "type": "u8",
+      "value": "0x00"
+    }
+  ],
+  "finish": [
+    {
+      "event": {
+        "action": "PROGRESSION_STAGE",
+        "address": "0x10040C",
+        "leaves": "0x00"
+      }
+    }
+  ],
+  "time_limit_frames": 23082
+}
