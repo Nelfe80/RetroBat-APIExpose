@@ -57,15 +57,39 @@ public static class GamelistIdentity
             if (!systemes.Contains(repli, StringComparer.OrdinalIgnoreCase)) systemes.Add(repli);
         }
 
-        string? trouve = null;
-        foreach (var systeme in systemes)
-        {
-            trouve = Chercher(Path.Combine(racine, systeme + "_lt.json"), slug, set, PremierSha1);
-            if (trouve is not null) break;
-        }
-
+        // LE SET EXACT D'ABORD, DANS TOUS LES REFERENTIELS (15/11, audit des ROMs parent) : la recherche s'arretait a la
+        // premiere ligne trouvee par le set OU par le groupe. Progear tombait sur « halfway » (meme groupe, sans
+        // empreinte) et declarait un sha1 vide ; Rygar, Shinobi, Shadow Dancer et Toki declaraient celui d'un autre set
+        // (PlayChoice, Mega-Tech). Le groupe ne sert plus qu'en dernier recours, quand le set n'est dans aucun referentiel
+        // (un clone rare) : c'est ce que les profils ont appris jusqu'ici, on ne le retire pas a ces joueurs.
+        var trouve = ChercherDansLesSystemes(racine, systemes, slug, set, PremierSha1, groupeSiSet: true);
         Cache[cle] = trouve;
         return trouve;
+    }
+
+    /// <summary>
+    /// La recherche dans les referentiels des systemes, dans l'ordre : le set exact d'abord, dans TOUS les referentiels ;
+    /// puis le groupe (sans set, ou avec set seulement si <paramref name="groupeSiSet"/>). Une ligne sans valeur ne clot
+    /// pas la recherche.
+    /// </summary>
+    internal static string? ChercherDansLesSystemes(string racine, IReadOnlyList<string> systemes, string slug, string set,
+        Func<JsonElement, string?> extraire, bool groupeSiSet)
+    {
+        if (set.Length > 0)
+        {
+            foreach (var systeme in systemes)
+            {
+                var exact = Chercher(Path.Combine(racine, systeme + "_lt.json"), "", set, extraire);
+                if (exact is not null) return exact;
+            }
+            if (!groupeSiSet || slug.Length == 0) return null;
+        }
+        foreach (var systeme in systemes)
+        {
+            var parGroupe = Chercher(Path.Combine(racine, systeme + "_lt.json"), slug, "", extraire);
+            if (parGroupe is not null) return parGroupe;
+        }
+        return null;
     }
 
     /// <summary>
@@ -94,13 +118,8 @@ public static class GamelistIdentity
             if (!systemes.Contains(repli, StringComparer.OrdinalIgnoreCase)) systemes.Add(repli);
         }
 
-        string? trouve = null;
-        foreach (var systeme in systemes)
-        {
-            trouve = Chercher(Path.Combine(racine, systeme + "_lt.json"), slug, set, Orientation);
-            if (trouve is not null) break;
-        }
-
+        // Le set exact d'abord dans tous les referentiels, puis le groupe (15/11).
+        var trouve = ChercherDansLesSystemes(racine, systemes, slug, set, Orientation, groupeSiSet: true);
         CacheOrientation[cle] = trouve;
         return trouve;
     }
@@ -182,13 +201,8 @@ public static class GamelistIdentity
             if (!systemes.Contains(repli, StringComparer.OrdinalIgnoreCase)) systemes.Add(repli);
         }
 
-        string? trouve = null;
-        foreach (var systeme in systemes)
-        {
-            trouve = Chercher(Path.Combine(racine, systeme + "_lt.json"), slug, set, Nom);
-            if (trouve is not null) break;
-        }
-
+        // Le set exact d'abord dans tous les referentiels, puis le groupe (15/11 : Progear prenait le nom de « halfway »).
+        var trouve = ChercherDansLesSystemes(racine, systemes, slug, set, Nom, groupeSiSet: true);
         CacheNom[cle] = trouve;
         return trouve;
     }
@@ -241,7 +255,8 @@ public static class GamelistIdentity
             {
                 foreach (var ligne in ReferentielDeJeuxIndex.LireLesLignes(chemin, index.Candidates(slug, set)))
                 {
-                    if (LigneCorrespond(ligne, tete, slug, set, extraire, out var resultat)) return resultat;
+                    // Une ligne sans valeur ne clot pas la recherche (15/11 : « halfway » sans empreinte avant « progear »).
+                    if (LigneCorrespond(ligne, tete, slug, set, extraire, out var resultat) && resultat is not null) return resultat;
                 }
             }
             catch
@@ -301,7 +316,7 @@ public static class GamelistIdentity
             foreach (var ligne in File.ReadLines(chemin))
             {
                 lues += ligne.Length + 1;
-                if (!LigneCorrespond(ligne, tete, slug, set, extraire, out var resultat)) continue;
+                if (!LigneCorrespond(ligne, tete, slug, set, extraire, out var resultat) || resultat is null) continue;
 
                 IoTrace.Balayage(Journal, chemin, lues, chrono.ElapsedMilliseconds);
                 return resultat; // le jeu est là : inutile de continuer ce fichier
