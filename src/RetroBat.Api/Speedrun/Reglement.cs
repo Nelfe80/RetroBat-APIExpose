@@ -143,7 +143,23 @@ public sealed class Reglement
     /// </summary>
     public string DefinitionAuLancement()
         => EstUnChallenge && RetroBat.Domain.Paths.RamDefinitionLayers.DefinitionDeChallenge(SystemId, RomGroup) is { } defi
-            ? defi : RetroBat.Domain.Paths.RamDefinitionLayers.PickDefinitionFile(SystemId, RomGroup);
+            // LES VERSIONS DU .MEM DES CHALLENGES (15/11, voie B) : le fichier dont l'empreinte est celle du reglement, en vigueur
+            // ou a cote ; sans lui, le fichier en vigueur (son empreinte dira l'ecart, rien ne se lance avec)
+            ? (MemSha256 is { Length: 64 } sha ? RetroBat.Domain.Paths.RamDefinitionLayers.VersionDeChallenge(SystemId, RomGroup, sha) : null) ?? defi
+            : RetroBat.Domain.Paths.RamDefinitionLayers.PickDefinitionFile(SystemId, RomGroup);
+
+    /// <summary>
+    /// La version du .MEM des challenges que ce reglement cite manque a la borne (le Data Pack en retard) : le motif, sinon null.
+    /// Seulement pour un challenge du jeu qui a une couche des challenges et dont le reglement cite une empreinte.
+    /// </summary>
+    public string? VersionDuMemManquante()
+    {
+        if (!EstUnChallenge || MemSha256 is not { Length: 64 } sha
+            || RetroBat.Domain.Paths.RamDefinitionLayers.DefinitionDeChallenge(SystemId, RomGroup) is null) return null;
+        return RetroBat.Domain.Paths.RamDefinitionLayers.VersionDeChallenge(SystemId, RomGroup, sha) is null
+            ? $".MEM {sha[..8]} absent de ram\\.defis\\{SystemId} ({RomGroup}.{sha[..8]}.MEM) : le Data Pack de la borne est a mettre a jour"
+            : null;
+    }
     public string SystemId { get; private init; } = "";
     public string RomGroup { get; private init; } = "";
     public string? MemSha256 { get; private init; }

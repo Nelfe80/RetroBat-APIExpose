@@ -248,6 +248,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         if (reglement is null) return (null, new(false, "unknown_challenge"));
         if (_contexte.Ui.Running is not null) return (null, new(false, "game_running"));
 
+        // (15/11, voie B) la version du .MEM que cite le reglement manque : refus clair, jamais un autre .MEM
+        if (reglement.VersionDuMemManquante() is { } manque) return (null, new(false, "mem_missing", manque));
         var mem = reglement.DefinitionAuLancement();
         if (mem.Length == 0 || !File.Exists(mem)) return (null, new(false, "mem_missing", mem));
         var ecarts = reglement.VerifierContre(File.ReadAllBytes(mem));
@@ -326,7 +328,19 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         // LE .MEM DU CHALLENGE (03/11) : la consigne de couche part avec les verrous, le wrapper charge alors ram\.defis.
         var consignes = reglement.Verrous.Select(v => v.Ligne).ToList();
         if (reglement.EstUnChallenge && RamDefinitionLayers.DefinitionDeChallenge(reglement.SystemId, reglement.RomGroup) is not null)
+        {
+            // LA VERSION DU .MEM (15/11, voie B) : le wrapper n'ouvre que ram\.defis\<systeme>\<jeu>.MEM ; la version que cite
+            // le reglement y est posee juste avant le lanceur. Impossible : rien ne part (jamais avec un autre .MEM).
+            if (reglement.MemSha256 is { Length: 64 } sha
+                && RamDefinitionLayers.PoserLaVersionDeChallenge(reglement.SystemId, reglement.RomGroup, sha) is { } motif)
+            {
+                _journal.LogWarning("Speedrun : {Defi} non lance, {Motif}.", reglement.ChallengeId, motif);
+                progression?.Echouer(ProgressionDuLancement.Lanceur);
+                return new(false, "mem_missing", motif);
+            }
+
             consignes.Add(VerrousDuLancement.CoucheDesChallenges);
+        }
         // LES REGLES (wrapper 0.346) : le bloc du reglement sur une ligne, lu par le wrapper avec les verrous.
         if (reglement.LigneDesRegles is { } regles) consignes.Add(regles);
         VerrousDuLancement.Poser(nomDeLaRom, consignes);

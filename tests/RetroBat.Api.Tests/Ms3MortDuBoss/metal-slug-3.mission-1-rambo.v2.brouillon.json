@@ -10,6 +10,7 @@
     "system_id": "arcade"
   },
   "mem_sha256": "b752c21077cc1f8645f59a3f97ef4328230559cb38c3b7868544f096da7a47c3",
+  "min_api": "1.9.192",
   "start_policy": "canonical_state",
   "state": {
     "file": "arcade/metal-slug-3/mission-1-rambo.state",
