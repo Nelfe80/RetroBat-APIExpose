@@ -33,7 +33,8 @@ public sealed record TentativeFinie(string AttemptId, int Numero, ResultatTentat
 /// UN CHALLENGE ARRIVE ET CLOS (14/11) : la tentative, son temps officiel en images (penalites comprises), s'il est classable, et
 /// les compteurs du reglement (coups recus du couteau...) avec la penalite qu'ils ont ajoutee.
 /// </summary>
-public sealed record ClotureDuChallenge(string AttemptId, long Frames, bool Classable, IReadOnlyDictionary<string, int> Compteurs, long PenaliteFrames);
+public sealed record ClotureDuChallenge(string AttemptId, long Frames, bool Classable, IReadOnlyDictionary<string, int> Compteurs, long PenaliteFrames,
+    long? Score = null);
 
 /// <summary>Un message au joueur dans RetroArch : sa cle du dictionnaire, son texte par defaut et ses valeurs.</summary>
 public sealed record MessageJoueur(string Cle, string ParDefaut, params (string Nom, string Valeur)[] Valeurs);
@@ -60,7 +61,9 @@ public sealed record DemonstrationPubliee(
 /// <summary>Les comparaisons : le meilleur temps du joueur sur ce defi (journal local). Le record vient en S4.</summary>
 public sealed record ComparaisonsPubliees(
     [property: JsonPropertyName("selected")] string Choisie,
-    [property: JsonPropertyName("personalBest")] ChronoPublie? MeilleurTemps);
+    [property: JsonPropertyName("personalBest")] ChronoPublie? MeilleurTemps,
+    // (15/11) un challenge au score : le score du meilleur du journal local (son temps est « personalBest ») ; null sinon.
+    [property: JsonPropertyName("personalBestScore")] long? MeilleurScore = null);
 
 /// <summary>Le snapshot de session (§11 bis.5), a la connexion du HUD et apres chaque changement.</summary>
 public sealed record InstantaneSpeedrun(
@@ -157,6 +160,20 @@ public sealed class SessionSpeedrun
 
     /// <summary>Le meilleur temps du joueur sur ce defi, en frames (journal local) ; null sans temps fini.</summary>
     public long? MeilleurTemps { get; set; }
+
+    /// <summary>(15/11) Le score de ce meilleur, sur un challenge au score ; <see cref="MeilleurTemps"/> est alors son temps.</summary>
+    public long? MeilleurScore { get; set; }
+
+    /// <summary>
+    /// LE SCORE DU JOUEUR 1 (15/11, challenges au score) : lu par l'agregateur, il va a la tentative courante et a celle qui attend ;
+    /// une tentative terminee le garde fige.
+    /// </summary>
+    public void NoterLeScore(long score)
+    {
+        if (_relance || Close) return;
+        if (!_courante.EstTerminee) _courante.NoterLeScore(score);
+        _suivante?.NoterLeScore(score);
+    }
 
     /// <summary>(05/11) Le chrono independant de ce meilleur temps : du depart a l'arrivee du run, la duree de son fantome.</summary>
     public long? MeilleurIndependant { get; private set; }
@@ -468,7 +485,7 @@ public sealed class SessionSpeedrun
             : depart is not null && FrameDArriveeProvisoire(res) is { } arrivee ? Chrono(arrivee - depart.Frame, true) : null;
         return new InstantaneSpeedrun(
             SessionId, AttemptId, Numero, DefiId, _r.Version, Etat, _relance ? null : res.Cause, Sequence, depart, officiel,
-            [], new ComparaisonsPubliees(_comparaison, MeilleurTemps is { } pb ? Chrono(pb, false) : null),
+            [], new ComparaisonsPubliees(_comparaison, MeilleurTemps is { } pb ? Chrono(pb, false) : null, _r.ClasseAuScore ? MeilleurScore : null),
             ActionsPermises(), res.Etat is EtatTentative.Finie or EtatTentative.Ratee or EtatTentative.Annulee or EtatTentative.Abandonnee
                 ? Demonstration(res) : null, res.Compteurs);
     }
@@ -577,13 +594,15 @@ public sealed class SessionSpeedrun
         _closes.Add((AttemptId, res));
         DerniereArrivee = EstClassable(res) && res.FramesOfficielles is { } arrivee ? (arrivee, res.Independant?.Frames) : null;
         var precedent = MeilleurTemps;
-        if (EstClassable(res) && res.FramesOfficielles is { } frames && (precedent is not { } pb || frames < pb))
+        if (EstClassable(res) && res.FramesOfficielles is { } frames && MeilleureQueLeJournal(res, precedent, MeilleurScore))
         {
             MeilleurTemps = frames;
+            MeilleurScore = res.Score;
             MeilleurIndependant = res.Independant?.Frames;
         }
-        // L'ENTRAINEMENT (14/11) : aucun temps ne part au site, la meilleure tentative n'est jamais retenue pour l'envoi
-        if (!_r.EstUnEntrainement && EstClassable(res) && res.FramesOfficielles is { } temps && (_meilleure?.Resultat.FramesOfficielles is not { } vu || temps < vu)
+        // L'ENTRAINEMENT (14/11) : aucun temps ne part au site, la meilleure tentative n'est jamais retenue pour l'envoi. (15/11) La
+        // meilleure se juge selon le rang du reglement : le score d'abord sur un challenge au score, le temps ensuite.
+        if (!_r.EstUnEntrainement && EstClassable(res) && res.FramesOfficielles is not null && (_meilleure is null || _r.Comparer(res, _meilleure.Resultat) < 0)
             && _horlogeDuDepart is { } departMs && (_horlogeDArrivee ?? _horlogeDeLImage) is { } arriveeMs)
             _meilleure = new TentativeFinie(AttemptId, Numero, res, departMs, arriveeMs);
         _relanceAutomatique = DelaiDeRelance(_r, res.Etat, res.Cause);
@@ -594,14 +613,21 @@ public sealed class SessionSpeedrun
             _suivante = null;
             var compteurs = new Dictionary<string, int>(res.Compteurs, StringComparer.Ordinal);
             var penalite = _r.Compteurs.Sum(c => c.PenaliteFrames is { } p and > 0 && compteurs.TryGetValue(c.Id, out var n) ? (long)p * n : 0L);
-            _cloture = new ClotureDuChallenge(AttemptId, officiel, EstClassable(res), compteurs, penalite);
+            _cloture = new ClotureDuChallenge(AttemptId, officiel, EstClassable(res), compteurs, penalite, res.Score);
         }
 
-        if (res.Etat == EtatTentative.Ratee && _relanceAutomatique is not null)
+        // LE TEMPS MAXIMAL (15/11) : le joueur apprend pourquoi son arrivee ne compte pas.
+        if (res.Etat == EtatTentative.Ratee && res.Cause == "time_limit" && _r.LimiteDeTemps is { } limite)
+            _messages.Add(new MessageJoueur("speedrun.msg.failed_time_limit", "Time limit {limit} exceeded: this attempt is not ranked. Hotkey + Left: restart.",
+                ("limit", Chronometrage.Afficher(limite, _r.Cadence))));
+        else if (res.Etat == EtatTentative.Ratee && _relanceAutomatique is not null)
             _messages.Add(new MessageJoueur("speedrun.msg.failed_restart", "Attempt failed: back to the start."));
-        else if (Close && EstClassable(res) && res.FramesOfficielles is { } fini)
+        else if (Close && EstClassable(res) && res.FramesOfficielles is { } fini && _r.ClasseAuScore && res.Score is { } points)
+            _messages.Add(new MessageJoueur("speedrun.msg.challenge_complete_score", "Challenge complete: {score} points in {time}. The game stops, your score is being sent.",
+                ("score", Reglement.AfficherUnScore(points)), ("time", Chronometrage.Afficher(fini, res.Cadence))));
+        else if (Close && EstClassable(res) && res.FramesOfficielles is { } fini2)
             _messages.Add(new MessageJoueur("speedrun.msg.challenge_complete", "Challenge complete in {time}: the game stops, your time is being sent.",
-                ("time", Chronometrage.Afficher(fini, res.Cadence))));
+                ("time", Chronometrage.Afficher(fini2, res.Cadence))));
         else if ((_r.EstUnEntrainement ? MessageDEntrainement(res) : MessageDeFin(res, precedent)) is { } message) _messages.Add(message);
         if (AvertissementDeRalenti(_r, res, _horlogeDuDepart, _horlogeDArrivee ?? _horlogeDeLImage) is { } lent) _messages.Add(lent);
         Publier("speedrun.attempt.ended", new
@@ -612,8 +638,22 @@ public sealed class SessionSpeedrun
             cause = res.Cause,
             frame = res.FrameDeFin,
             official = res.FramesOfficielles is { } f ? Chrono(f, false) : null,
+            score = res.Score,
             demo = Demonstration(res),
         });
+    }
+
+    /// <summary>
+    /// Mieux que le meilleur du journal local ? Au temps : plus court. Au score (15/11) : plus haut, puis a egalite plus court ; un
+    /// meilleur du journal sans score (temps d'avant le score) cede la place.
+    /// </summary>
+    private bool MeilleureQueLeJournal(ResultatTentative res, long? temps, long? score)
+    {
+        if (temps is not { } pb) return true;
+        if (!_r.ClasseAuScore) return res.FramesOfficielles < pb;
+        if (res.Score is not { } s) return false;
+        if (score is not { } best) return true;
+        return s > best || (s == best && res.FramesOfficielles < pb);
     }
 
     /// <summary>Un temps fini que le temps du jeu ne contredit pas : lui seul compte comme meilleur temps et part au site.</summary>

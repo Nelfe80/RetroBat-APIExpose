@@ -673,7 +673,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             var enCours = _contexte.Ui.Running?.GamePath;
             if (enCours is { Length: > 0 } && !string.Equals(Path.GetFullPath(enCours), Path.GetFullPath(l.Rom), StringComparison.OrdinalIgnoreCase)) return;
 
-            _session = new SessionSpeedrun(l.Reglement.ChallengeId, l.Reglement) { MeilleurTemps = MeilleurTempsDuJournal(l.Reglement.ChallengeId) };
+            var meilleur = MeilleurDuJournal(l.Reglement);
+            _session = new SessionSpeedrun(l.Reglement.ChallengeId, l.Reglement) { MeilleurTemps = meilleur?.Frames, MeilleurScore = meilleur?.Score };
             _etatJournalise = null;
             _signauxRecus = _signauxAvantLEtat = _signauxArmesJournalises = 0;
             _derniersReleves.Clear();
@@ -1145,6 +1146,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         {
             if (_session is null || _session.Close || _etatAttendu) return;
             _scoreLu = score;
+            // (15/11) un challenge au score : le score entre dans la tentative, qui le fige a son arrivee
+            if (_session.Reglement.DemandeLeScore) _session.NoterLeScore(score);
         }
     }
 
@@ -1163,7 +1166,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private void AnnoncerLaCloture(SessionSpeedrun session, ClotureDuChallenge c)
     {
         var r = session.Reglement;
-        var score = _scoreLu;
+        // (15/11) le score fige dans la tentative a son arrivee ; a defaut (challenge au temps), le dernier lu
+        var score = c.Score ?? _scoreLu;
         var attente = _pagesDeLaSession ? AttenteAvantLaFermeture : AttenteAvantLaFermetureSansPage;
         _journal.LogInformation("Speedrun : challenge {Defi} arrive en {Temps}{Classe}, score {Score}{Compteurs} : pause, puis le jeu se ferme dans {Attente:0.#} s.",
             r.ChallengeId, Chronometrage.Afficher(c.Frames, r.Cadence), c.Classable ? "" : " (non classable)", score?.ToString(CultureInfo.InvariantCulture) ?? "non lu",
@@ -1182,6 +1186,9 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 rate = r.Cadence,
                 ranked = c.Classable,
                 score,
+                // (15/11) ce qui classe : « score » (le temps departage) ou « frames »
+                rankedBy = r.ClasseAuScore ? Reglement.MesureScore : "frames",
+                timeLimitFrames = r.LimiteDeTemps,
                 counters = c.Compteurs,
                 penaltyFrames = c.PenaliteFrames,
             },
@@ -1333,6 +1340,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             ["cause"] = r.Cause,
             ["officialFrames"] = r.FramesOfficielles,
             ["official"] = r.FramesOfficielles is { } f ? Chronometrage.Afficher(f, r.Cadence) : null,
+            // (15/11) le score fige a l'arrivee, sur un challenge au score
+            ["score"] = session.Reglement.DemandeLeScore ? r.Score : null,
             ["aligned"] = Mesure(r.Cale),
             ["independent"] = Mesure(r.Independant),
             ["gameTimeSeconds"] = r.TempsDuJeuSecondes,
@@ -1344,8 +1353,9 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             }).ToArray()),
         };
         Ecrire(ligne);
-        _journal.LogInformation("Speedrun : tentative {Tentative} {Etat}{Cause}{Temps}.", attemptId, SessionSpeedrun.EtatHud(r.Etat),
-            r.Cause is null ? "" : " (" + r.Cause + ")", r.FramesOfficielles is { } t ? " en " + Chronometrage.Afficher(t, r.Cadence) : "");
+        _journal.LogInformation("Speedrun : tentative {Tentative} {Etat}{Cause}{Temps}{Score}.", attemptId, SessionSpeedrun.EtatHud(r.Etat),
+            r.Cause is null ? "" : " (" + r.Cause + ")", r.FramesOfficielles is { } t ? " en " + Chronometrage.Afficher(t, r.Cadence) : "",
+            session.Reglement.DemandeLeScore && r.Score is { } sc ? ", score " + sc.ToString(CultureInfo.InvariantCulture) : "");
 
         static JsonNode? Mesure(MesureChrono? m) => m is null ? null : new JsonObject { ["start"] = m.Depart, ["end"] = m.Arrivee, ["frames"] = m.Frames };
     }
@@ -1443,6 +1453,43 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         }
 
         return defi is null ? null : new BilanDeSession(sessionId, defi, tentatives, finies, meilleur, dernierEtat, derniereCause);
+    }
+
+    /// <summary>
+    /// LE MEILLEUR DU JOURNAL LOCAL selon le rang du reglement (15/11) : au temps, le plus court ; au score, le plus haut puis le
+    /// plus court (les lignes sans score, d'avant le score, ne comptent pas). Le temps et le score de cette tentative.
+    /// </summary>
+    internal (long Frames, long? Score)? MeilleurDuJournal(Reglement reglement)
+    {
+        if (!reglement.ClasseAuScore) return MeilleurTempsDuJournal(reglement.ChallengeId) is { } t ? (t, null) : null;
+        try
+        {
+            if (!File.Exists(_fichierDesTentatives)) return null;
+            (long Frames, long? Score)? meilleur = null;
+            foreach (var ligne in File.ReadLines(_fichierDesTentatives))
+            {
+                if (ligne.Length == 0) continue;
+                using var doc = JsonDocument.Parse(ligne);
+                var r = doc.RootElement;
+                if (r.TryGetProperty("kind", out var k) && k.GetString() == "attempt"
+                    && r.TryGetProperty("challengeId", out var c) && string.Equals(c.GetString(), reglement.ChallengeId, StringComparison.OrdinalIgnoreCase)
+                    && r.TryGetProperty("rulesVersion", out var v) && v.TryGetInt32(out var version) && version == reglement.Version
+                    && r.TryGetProperty("state", out var s) && s.GetString() == SessionSpeedrun.Finished
+                    && r.TryGetProperty("officialFrames", out var f) && f.ValueKind == JsonValueKind.Number
+                    && r.TryGetProperty("score", out var p) && p.ValueKind == JsonValueKind.Number
+                    && !(r.TryGetProperty("gameTimeCheck", out var g) && g.GetString() == "ecart"))
+                {
+                    var (images, points) = (f.GetInt64(), p.GetInt64());
+                    if (meilleur is not { } m || points > m.Score || (points == m.Score && images < m.Frames)) meilleur = (images, points);
+                }
+            }
+
+            return meilleur;
+        }
+        catch (Exception ex) when (ex is IOException or JsonException)
+        {
+            return null;
+        }
     }
 
     internal long? MeilleurTempsDuJournal(string defiId)

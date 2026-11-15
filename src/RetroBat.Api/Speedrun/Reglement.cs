@@ -193,6 +193,57 @@ public sealed class Reglement
     public IReadOnlyList<ValeurFinale> ValeursFinales { get; private init; } = [];
     public IReadOnlyList<Etape> Etapes { get; private init; } = [];
     public IReadOnlyList<CritereDeRang> Rang { get; private init; } = [new("frames", true)];
+
+    /// <summary>
+    /// LA MESURE « score » (Metal Slug 3, decision du user du 15/11) : le score du joueur 1 tel que l'agregateur le lit au .MEM du
+    /// jeu (score.live.changed), fige quand la tentative finit. Ni compteur ni valeur finale : un score BCD sur 32 bits ne se lit
+    /// pas par « finish_values » (un octet).
+    /// </summary>
+    public const string MesureScore = "score";
+
+    /// <summary>Le premier critere du rang est le score : le classement est au score, le temps ne fait que departager.</summary>
+    public bool ClasseAuScore => Rang.Count > 0 && Rang[0].Mesure == MesureScore;
+
+    /// <summary>Le score fait partie du rang (premier critere ou departage) : la tentative doit le connaitre a l'arrivee.</summary>
+    public bool DemandeLeScore => Rang.Any(c => c.Mesure == MesureScore);
+
+    /// <summary>
+    /// LE TEMPS MAXIMAL (« time_limit_frames », 15/11) : au-dela de ce temps officiel, en images, la tentative est ratee
+    /// (« time_limit »). Sur un challenge au score, il borne la traite (Metal Slug 3, mission 1 : un camion de soldats se trait
+    /// ~2 min). Null : pas de limite.
+    /// </summary>
+    public long? LimiteDeTemps { get; private init; }
+
+    /// <summary>
+    /// QUI EST LA MEILLEURE DE DEUX TENTATIVES ? Critere apres critere, dans le sens du reglement (le score d'abord, puis le
+    /// temps) ; une valeur inconnue perd. Negatif si <paramref name="a"/> est meilleure, 0 a egalite. Pur.
+    /// </summary>
+    public int Comparer(ResultatTentative a, ResultatTentative b)
+    {
+        var va = a.ValeursDeRang(this);
+        var vb = b.ValeursDeRang(this);
+        for (var i = 0; i < va.Count; i++)
+        {
+            var (x, plusPetit) = va[i];
+            var y = vb[i].Valeur;
+            if (x is null && y is null) continue;
+            if (x is null) return 1;
+            if (y is null) return -1;
+            if (x.Value == y.Value) continue;
+            return (x.Value < y.Value) == plusPetit ? -1 : 1;
+        }
+
+        return 0;
+    }
+
+    /// <summary>Une valeur du classement comme le joueur la lit : un temps (m:ss.cc) ou un score (628 040). Pur.</summary>
+    public string AfficherLaValeur(long valeur)
+        => ClasseAuScore ? AfficherUnScore(valeur) : Chronometrage.Afficher(valeur, Cadence);
+
+    /// <summary>Un score avec ses milliers separes par une espace (628 040) : les polices de RetroArch et du panneau n'ont pas toutes l'espace fine. Pur.</summary>
+    public static string AfficherUnScore(long score)
+        => score.ToString("#,0", System.Globalization.CultureInfo.InvariantCulture).Replace(",", " ", StringComparison.Ordinal);
+
     public IReadOnlyList<string> Coeurs { get; private init; } = [];
 
     /// <summary>
@@ -306,6 +357,7 @@ public sealed class Reglement
                 Verrous = Liste(r, "locks").Select(LireVerrou).ToList(),
                 Regles = r.TryGetProperty("rules", out var rg) ? LireRegles(rg) : null,
                 Ordre = Entier(r, "order") ?? 0,
+                LimiteDeTemps = LireLimite(r),
                 AffichageJson = r.TryGetProperty("display", out var aff) && aff.ValueKind == JsonValueKind.Object ? aff.GetRawText() : null,
             };
             reglement.ControlerLesVerrous();
@@ -582,6 +634,13 @@ public sealed class Reglement
         if (r.TryGetProperty("metric", out var m) && m.ValueKind == JsonValueKind.Object)
             return [new CritereDeRang(Texte(m, "kind") ?? "frames", Sens(m))];
         return [new CritereDeRang("frames", true)];
+    }
+
+    private static long? LireLimite(JsonElement r)
+    {
+        if (!r.TryGetProperty("time_limit_frames", out var l)) return null;
+        var n = Nombre(l);
+        return n > 0 ? n : throw new ReglementInvalideException($"time_limit_frames : {n}, un nombre d'images positif attendu");
     }
 
     private static bool Sens(JsonElement e) => Texte(e, "direction") switch

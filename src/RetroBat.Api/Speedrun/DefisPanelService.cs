@@ -756,9 +756,9 @@ public sealed partial class DefisPanelService
             new(T("speedrun.panel.goal", "Goal"), Objectif(defi)),
             new(T("speedrun.panel.forbidden", "Forbidden"), LaPhrase(interdits)),
             new(T("speedrun.panel.record", "Record"), LeRecord(defi, _tableaux) is { } record
-                ? Chronometrage.Afficher(record.Valeur, defi.Cadence) + " · " + record.Joueur : SansTemps),
+                ? defi.AfficherLaValeur(record.Valeur) + " · " + record.Joueur : SansValeur(defi)),
             new(T("speedrun.panel.you", "You"), MaPlace(defi, _tableaux, Pseudo) is { } place
-                ? Chronometrage.Afficher(place.Valeur, defi.Cadence) + " · #" + place.Rang
+                ? defi.AfficherLaValeur(place.Valeur) + " · #" + place.Rang
                 : MonTemps(defi, _bilan, _tableaux, Pseudo)),
         ];
     }
@@ -785,6 +785,9 @@ public sealed partial class DefisPanelService
 
     private const string SansTemps = "--:--.--";
 
+    /// <summary>(15/11) Rien de classe : un temps vide, ou un score vide pour un challenge au score.</summary>
+    private static string SansValeur(Reglement defi) => defi.ClasseAuScore ? "-" : SansTemps;
+
     private static string LaPhrase(IReadOnlyList<string> mots)
     {
         var phrase = string.Join(", ", mots);
@@ -801,7 +804,10 @@ public sealed partial class DefisPanelService
     /// <summary>Le temps publie du joueur, sinon son meilleur temps du journal de cette borne.</summary>
     private static string MonTemps(Reglement defi, IReadOnlyDictionary<string, (int Tentatives, long? Meilleur)> bilan,
         IReadOnlyDictionary<string, ClassementDEpreuve> tableaux, string pseudo)
-        => (MaPlace(defi, tableaux, pseudo)?.Valeur ?? bilan.GetValueOrDefault(defi.ChallengeId).Meilleur) is { } temps
+        => defi.ClasseAuScore
+            // (15/11) au score : la place publiee seulement, le journal local ne garde pas de score par seance
+            ? MaPlace(defi, tableaux, pseudo) is { } place ? defi.AfficherLaValeur(place.Valeur) : SansValeur(defi)
+            : (MaPlace(defi, tableaux, pseudo)?.Valeur ?? bilan.GetValueOrDefault(defi.ChallengeId).Meilleur) is { } temps
             ? Chronometrage.Afficher(temps, defi.Cadence) : SansTemps;
 
     private static bool EstUnSpeedrun(Reglement defi) => defi.Kind.StartsWith("speedrun_", StringComparison.Ordinal);
@@ -864,9 +870,10 @@ public sealed partial class DefisPanelService
 
     private VueDeRecords VueDe(Reglement defi, ClassementDEpreuve classement, string langue, string pseudo)
     {
-        var lignes = classement.Lignes.Select(l => new LigneDeDefi($"{l.Rang}   {l.Joueur}", "", Chronometrage.Afficher(l.Valeur, defi.Cadence))).ToList();
+        var lignes = classement.Lignes.Select(l => new LigneDeDefi($"{l.Rang}   {l.Joueur}", "", defi.AfficherLaValeur(l.Valeur))).ToList();
         var moi = MaPlace(defi, new Dictionary<string, ClassementDEpreuve> { [defi.Ruleset] = classement }, pseudo);
-        return new VueDeRecords(defi.Titre(langue) + " · " + Objectif(defi), ["", T("speedrun.panel.time", "TIME")], lignes, moi is null ? null : moi.Rang - 1);
+        return new VueDeRecords(defi.Titre(langue) + " · " + Objectif(defi),
+            ["", defi.ClasseAuScore ? T("speedrun.panel.score", "SCORE") : T("speedrun.panel.time", "TIME")], lignes, moi is null ? null : moi.Rang - 1);
     }
 
     /// <summary>Ce que dit le defi de lui-meme, sinon ce que dit son genre.</summary>
@@ -917,12 +924,12 @@ public sealed partial class DefisPanelService
 
                 var marque = meilleur is not null ? "reussi" : tentatives > 0 ? "tente" : "";
                 var toi = MonTemps(d, bilan, tableaux, pseudo);
-                var record = LeRecord(d, tableaux) is { } r ? Chronometrage.Afficher(r.Valeur, d.Cadence) : SansTemps;
+                var record = LeRecord(d, tableaux) is { } r ? d.AfficherLaValeur(r.Valeur) : SansValeur(d);
                 var badge = meilleur is not null ? T("speedrun.panel.done", "DONE")
                     : tentatives > 0 ? T("speedrun.panel.tried", "TRIED") + " × " + tentatives : "";
                 lignes.Add((groupe.Key.Onglet == DefisPanelModel.Onglet.Challenges
                     ? new LigneDeDefi(d.Titre(langue), T("speedrun.panel.record", "RECORD") + " " + record, T("speedrun.panel.you", "YOU") + " " + toi,
-                        Marque: marque, Regle: Objectif(d), Mesure: T("speedrun.panel.by_time", "BY TIME"), Badge: badge,
+                        Marque: marque, Regle: Objectif(d), Mesure: d.ClasseAuScore ? T("speedrun.panel.by_score", "BY SCORE") : T("speedrun.panel.by_time", "BY TIME"), Badge: badge,
                         Image: images is not null && images.TryGetValue(d.ChallengeId, out var image) ? image : null)
                     : new LigneDeDefi(d.Titre(langue), record, toi, Marque: marque), d));
             }

@@ -94,7 +94,7 @@ public static class PasseportDeDefi
     {
         var r = t.Resultat;
         var officiel = r.ChronoOfficiel == Reglement.ChronoIndependant ? r.Independant : r.Cale;
-        return new JsonObject
+        var defi = new JsonObject
         {
             ["debut_ms"] = t.DepartMs,
             ["fin_ms"] = t.ArriveeMs,
@@ -131,6 +131,13 @@ public static class PasseportDeDefi
             },
         };
 
+        // LE CLASSEMENT AU SCORE (15/11) : le score fige a l'arrivee entre au bloc « challenge » (le site le compare a la metrique),
+        // et la metrique du passeport est la premiere mesure du rang. Un challenge au temps garde exactement le passeport d'avant.
+        if (reglement.DemandeLeScore) defi["challenge"]!["score_at_finish"] = r.Score;
+        if (reglement.ClasseAuScore)
+            defi["metrique"] = new JsonObject { ["type"] = "score", ["unit"] = "points", ["value"] = r.Score, ["ranking_direction"] = "higher_better" };
+        return defi;
+
         static JsonObject? Mesure(MesureChrono? m) => m is null
             ? null
             : new JsonObject { ["start_frame"] = m.Depart, ["end_frame"] = m.Arrivee, ["frames"] = m.Frames };
@@ -159,13 +166,17 @@ public static class PasseportDeDefi
             ["monotonic_ms"] = fin - debut,
             ["frame_count"] = arrivee - depart,
         };
+        // La metrique : le temps en images, ou (15/11) la premiere mesure du rang quand le brouillon la porte (le score).
+        var metrique = defi["metrique"] as JsonObject;
+        var valeur = (long?)metrique?["value"] ?? frames;
         passeport["metric"] = new JsonObject
         {
-            ["type"] = "time", ["unit"] = "frames", ["value"] = frames.ToString(CultureInfo.InvariantCulture),
-            ["ranking_direction"] = "lower_better", ["result_source"] = "final",
+            ["type"] = (string?)metrique?["type"] ?? "time", ["unit"] = (string?)metrique?["unit"] ?? "frames",
+            ["value"] = valeur.ToString(CultureInfo.InvariantCulture),
+            ["ranking_direction"] = (string?)metrique?["ranking_direction"] ?? "lower_better", ["result_source"] = "final",
         };
 
-        var points = new JsonArray(Point("run_start", depart, 0, 0), Point("game_end", arrivee, fin - debut, frames));
+        var points = new JsonArray(Point("run_start", depart, 0, 0), Point("game_end", arrivee, fin - debut, valeur));
         passeport["progression"] = new JsonObject
         {
             ["checkpoints"] = points,
@@ -202,11 +213,15 @@ public static class PasseportDeDefi
     /// <summary>Le verdict du site, dit en temps et non en points : la notification que le joueur lit en revenant sur ES.</summary>
     public static string TexteDuVerdict(JsonObject passeport, string statut, int? rang, string raison, string langue = "fr")
     {
-        var frames = long.TryParse((string?)passeport["metric"]?["value"], NumberStyles.None, CultureInfo.InvariantCulture, out var f) ? f : 0;
+        var valeur = long.TryParse((string?)passeport["metric"]?["value"], NumberStyles.None, CultureInfo.InvariantCulture, out var f) ? f : 0;
         var cadence = ((long?)passeport["challenge"]?["timing"]?["frame_rate_e6"] ?? 60_000_000) / 1_000_000.0;
-        var temps = Chronometrage.Afficher(frames, cadence);
         // Dans la langue de la borne (05/11, retour du user : « Defi ... classe » en francais sur une borne en anglais).
         string T(string cle) => RetroBat.Api.Infrastructure.CabinetAnnounceText.Get(cle, langue);
+        // (15/11) au score : « 628 040 points en 4:22.33 », le temps qui departage tire des chronos du bloc « challenge »
+        var temps = (string?)passeport["metric"]?["type"] == "score"
+            ? string.Format(CultureInfo.InvariantCulture, T("challenge_value_score"), Reglement.AfficherUnScore(valeur),
+                Chronometrage.Afficher(TempsDuBloc(passeport["challenge"] as JsonObject), cadence))
+            : Chronometrage.Afficher(valeur, cadence);
         return statut switch
         {
             "published" => rang is { } r
@@ -216,6 +231,14 @@ public static class PasseportDeDefi
             "quarantined" => string.Format(CultureInfo.InvariantCulture, T("challenge_verdict_quarantined"), temps),
             _ => string.Format(CultureInfo.InvariantCulture, T("challenge_verdict_refused"), temps, raison),
         };
+    }
+
+    /// <summary>Le temps officiel d'un bloc « challenge » : le chrono officiel plus la penalite, en images ; 0 s'il ne se lit pas. Pur.</summary>
+    internal static long TempsDuBloc(JsonObject? bloc)
+    {
+        var timing = bloc?["timing"] as JsonObject;
+        var officiel = (string?)timing?["official"] == Reglement.ChronoIndependant ? "independent" : "aligned";
+        return ((long?)timing?[officiel]?["frames"] ?? 0) + ((long?)timing?["penalty_frames"] ?? 0);
     }
 
     /// <summary>Le rang ecrit comme dans la langue : 1er, 9e ; 1st, 2nd, 3rd, 11th ; ailleurs le nombre seul. Pur.</summary>

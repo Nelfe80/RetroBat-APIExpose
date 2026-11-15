@@ -90,9 +90,16 @@ public sealed partial class DefisPanelService
             mesures.Add(new MesureDeFin("trophee", T("speedrun.page.players", "PLAYERS"), classes, part, premier));
         }
 
-        var valeur = b.Temps is { } temps ? Chronometrage.Afficher(temps, b.Defi.Cadence) : SansTemps;
+        // (15/11) un challenge au score : le score est la valeur du bilan, le temps (qui departage) passe dans les mesures
+        var auScore = b.Defi.ClasseAuScore;
+        var valeur = auScore
+            ? b.Score is { } points ? Reglement.AfficherUnScore(points) : SansValeur(b.Defi)
+            : b.Temps is { } temps ? Chronometrage.Afficher(temps, b.Defi.Cadence) : SansTemps;
         var ruban = MotDe(b.Defi) + (b.Rang is { } place ? " · #" + place : "");
-        var ecart = b is { Temps: { } t, Record: { } record } && t > record
+        var ecart = auScore
+            ? b is { Score: { } sc, Record: { } rec } && sc < rec
+                ? "-" + Reglement.AfficherUnScore(rec - sc) + " " + T("speedrun.page.from_record", "from the record") : ""
+            : b is { Temps: { } t, Record: { } record } && t > record
             ? "+" + Chronometrage.Afficher(t - record, b.Defi.Cadence) + " " + T("speedrun.page.from_record", "from the record")
             : "";
         return new EcranDeFin(
@@ -100,7 +107,8 @@ public sealed partial class DefisPanelService
             "bilan-" + b.Defi.ChallengeId + "-" + b.Ouverture.ToString(System.Globalization.CultureInfo.InvariantCulture),
             StylesDesEcrans.Course,
             // (14/11) l'arrivee d'un challenge : le temps part quand le jeu s'est ferme, le verdict change ensuite le titre
-            b is { ALArrivee: true, Issue: IssueDuBilan.EnVerification } ? T("speedrun.page.title.complete", "CHALLENGE COMPLETE") : TitreDuBilan(b.Issue, premier),
+            b is { ALArrivee: true, Issue: IssueDuBilan.EnVerification } ? T("speedrun.page.title.complete", "CHALLENGE COMPLETE")
+                : auScore ? TitreDuBilanAuScore(b.Issue, premier) : TitreDuBilan(b.Issue, premier),
             b.Jeu,
             "",
             b.Fanart,
@@ -115,7 +123,7 @@ public sealed partial class DefisPanelService
             MonScore: new ScoreDeFin(b.Defi.Titre(langue), valeur, ruban, ecart, premier),
             Logo: LogoDesPages,
             Classement: AutourDe(b.Classement ?? [], b.Rang)
-                .Select(l => new LigneDeDefi($"{l.Rang}   {l.Joueur}", "", Chronometrage.Afficher(l.Valeur, b.Defi.Cadence), Marque: l.Rang == b.Rang ? "moi" : ""))
+                .Select(l => new LigneDeDefi($"{l.Rang}   {l.Joueur}", "", b.Defi.AfficherLaValeur(l.Valeur), Marque: l.Rang == b.Rang ? "moi" : ""))
                 .ToList());
     }
 
@@ -130,7 +138,10 @@ public sealed partial class DefisPanelService
     internal List<MesureDeFin> MesuresALArrivee(BilanDEpreuve b)
     {
         var mesures = new List<MesureDeFin>();
-        if (b.Score is { } score) mesures.Add(new MesureDeFin("etoile", T("speedrun.page.score", "SCORE"), score, -1, false, Milliers: true));
+        // (15/11) au score, le score est deja la valeur du bilan : la premiere mesure est le temps, qui departage
+        if (b.Defi.ClasseAuScore && b.Temps is { } temps)
+            mesures.Add(new MesureDeFin("chrono", T("speedrun.page.time", "TIME"), temps, -1, false, Texte: Chronometrage.Afficher(temps, b.Defi.Cadence)));
+        else if (b.Score is { } score) mesures.Add(new MesureDeFin("etoile", T("speedrun.page.score", "SCORE"), score, -1, false, Milliers: true));
         foreach (var (id, n) in (b.Compteurs ?? new Dictionary<string, int>()).Take(CompteursAuBilan))
         {
             var compteur = b.Defi.Compteurs.FirstOrDefault(c => c.Id == id);
@@ -153,6 +164,18 @@ public sealed partial class DefisPanelService
         var debut = Math.Clamp((rang ?? 1) - 1 - fenetre / 2, 1, lignes.Count - fenetre);
         return [lignes[0], .. lignes.Skip(debut).Take(fenetre)];
     }
+
+    /// <summary>(15/11) Les titres d'un challenge au score : c'est le score qui est classe, retenu ou refuse.</summary>
+    private string TitreDuBilanAuScore(IssueDuBilan issue, bool premier) => issue switch
+    {
+        IssueDuBilan.Classe when premier => T("speedrun.page.title.record", "NEW RECORD!"),
+        IssueDuBilan.Classe => T("speedrun.page.title.score_ranked", "SCORE RANKED"),
+        IssueDuBilan.EnVerification => T("speedrun.page.title.score_checking", "SCORE SENT"),
+        IssueDuBilan.Retenu => T("speedrun.page.title.score_held", "SCORE ON HOLD"),
+        IssueDuBilan.Refuse => T("speedrun.page.title.score_refused", "SCORE REFUSED"),
+        IssueDuBilan.NonEnvoye => T("speedrun.page.title.not_sent", "NOT SENT"),
+        _ => T("speedrun.page.title.no_score", "NO SCORE"),
+    };
 
     private string TitreDuBilan(IssueDuBilan issue, bool premier) => issue switch
     {
