@@ -366,6 +366,20 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
                 _ = RetirerLeDirectAsync();
                 return;
             }
+            if (string.Equals(e.Type, "scoring.verdict", StringComparison.Ordinal))
+            {
+                // LE VERDICT ARRIVE APRES LA FIN DU JEU (15/11) : un panneau ouvert entre la fin de partie et le verdict
+                // gardait l'ancien classement jusqu'a 30 s. Un score publie vide le cache et relit le panneau ouvert.
+                if (VerdictPublie(e.Payload))
+                {
+                    _client.Oublier();
+                    if (_modele.Etat != LeaderboardPanelModel.Foyer.Ferme)
+                    {
+                        _ = Task.Run(() => ChargerAsync(CancellationToken.None, relecture: true));
+                    }
+                }
+                return;
+            }
             if (string.Equals(e.Type, "ui.game.started", StringComparison.Ordinal))
             {
                 // L'ECRAN DE LANCEMENT TIENT DEVANT LE JEU (28/10) : c'est lui qui s'effacera, au depart.
@@ -1128,6 +1142,23 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     }
 
     private bool EnPartiePourLesDirects() => _context.Ui.Running is not null || EmulatorForeground.EmulateurDeJeuTourne();
+
+    /// <summary>Le verdict d'un score publie (<c>Status = published</c>), quelle que soit la forme du message. Pur.</summary>
+    internal static bool VerdictPublie(object? payload)
+    {
+        try
+        {
+            var json = payload is JsonElement el ? el : JsonSerializer.SerializeToElement(payload);
+            return json.ValueKind == JsonValueKind.Object
+                && (json.TryGetProperty("Status", out var s) || json.TryGetProperty("status", out s))
+                && s.ValueKind == JsonValueKind.String
+                && string.Equals(s.GetString(), "published", StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     private readonly Infrastructure.SuiviDuSite? _suivi;
     private readonly SemaphoreSlim _annonceDesDirects = new(1, 1);
