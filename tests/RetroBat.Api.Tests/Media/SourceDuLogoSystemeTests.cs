@@ -30,6 +30,6 @@ public class SourceDuLogoSystemeTests
     public void Les_medias_generes_oublies_sont_ceux_que_la_generation_ecrit()
     {
         Assert.Equal(["generated-system-marquee.png", "generated-system-dmd.png"], P.GeneratedSystemMediaNames("nelfeplay-scoring", "nelfeplay-scoring"));
-        Assert.Equal(["generated-system-marquee.fbneo.png", "generated-system-dmd.png"], P.GeneratedSystemMediaNames("fbneo", "arcade"));
+        Assert.Equal(["generated-system-marquee.fbneo.png", "generated-system-dmd.fbneo.png"], P.GeneratedSystemMediaNames("fbneo", "arcade"));
     }
 }

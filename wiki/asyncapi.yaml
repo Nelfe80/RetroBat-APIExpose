@@ -65,6 +65,8 @@ channels:
       Payload carries `Media` (legacy named fields, kept as-is) plus `Assets` and,
       in game scope, `SystemAssets`: tables keyed by canonical media kind holding
       only what THAT scope really owns. A key is present only when the file is.
+      Each medium of `Media` (and the `Media.Dmd` block) carries `Scope`, "game" or
+      "system": in game scope, "system" means the legacy field fell back to the system.
       Retained: the last snapshot is replayed on connect (never an older `Sequence`).
     messages:
       envelope:
