@@ -19,8 +19,14 @@ namespace RetroBat.Api.Infrastructure;
 /// </summary>
 public static class LiveContestCertifie
 {
-    /// <summary>Ce que le concours demande. Les champs sont deja ramenes en minuscules, sans espaces autour.</summary>
-    public sealed record Demande(string Jeu, string Systeme, string Regle);
+    /// <summary>
+    /// Ce que le concours demande. Les champs sont deja ramenes en minuscules, sans espaces autour. <see cref="Epreuve"/> :
+    /// l'identifiant d'une epreuve (concours sur epreuve, <see cref="LiveContestEpreuve"/>), vide pour un concours sur score.
+    /// </summary>
+    public sealed record Demande(string Jeu, string Systeme, string Regle, string Epreuve = "")
+    {
+        public bool EstUneEpreuve => Epreuve.Length > 0;
+    }
 
     /// <summary>
     /// Le jeu pret a partir (<see cref="Rom"/> non nulle), ou le refus : un code stable (<see cref="Refus"/>, remonte au
@@ -54,7 +60,8 @@ public static class LiveContestCertifie
             return null;
         }
 
-        return new Demande(Texte(certifie, "game"), Texte(certifie, "system"), Texte(certifie, "ruleset"));
+        // `challenge` (15/11) : null ou absent pour un concours sur score, comme chez un LiveContest d'avant.
+        return new Demande(Texte(certifie, "game"), Texte(certifie, "system"), Texte(certifie, "ruleset"), Texte(certifie, "challenge"));
     }
 
     /// <summary>

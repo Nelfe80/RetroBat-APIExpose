@@ -24,6 +24,13 @@ namespace RetroBat.Api.Infrastructure;
 /// partie NelfePlay (cœur impose), avec la seance {stream, chaine, concours} du joueur LIE ; le client ne compte plus
 /// rien, c'est le scoring certifie qui envoie la partie. Un jeu, un mode ou un compte qui manque se refuse. Un concours
 /// declare (<c>certified</c> null) part comme avant, par son <c>gameSlug</c>.
+///
+/// UN CONCOURS SUR UNE EPREUVE (15/11) : <c>certified.challenge</c> nomme une epreuve de l'index des defis
+/// (<see cref="LiveContestEpreuve"/>). Elle se lance AU DEPART, pour tout le monde en meme temps, par le lancement type d'un defi
+/// (<see cref="RetroBat.Api.Speedrun.SpeedrunSessionService"/>) : pas de pause d'attente, la session du defi la leverait (une
+/// pause tenue relance la tentative), et le temps de l'epreuve se compte en images, pas depuis le GO. La seance du concours
+/// s'arme au lancement et tient jusqu'au verdict de l'epreuve. A la cloture, le jeu se ferme : le meilleur temps du lancement
+/// part, certifie, au classement de l'epreuve, avec le concours.
 /// </summary>
 public sealed class LiveContestClientService : BackgroundService
 {
@@ -63,6 +70,11 @@ public sealed class LiveContestClientService : BackgroundService
 
     // concours sur score certifie : le classement de NelfePlay, jamais une valeur comptee ici
     private LiveContestCertifie.Preparation? _certifie;
+    // concours sur une epreuve : l'epreuve de l'index des defis, lancee au depart
+    private LiveContestEpreuve.Preparation? _epreuve;
+    private string? _channel;
+    private readonly RetroBat.Api.Speedrun.SpeedrunSessionService? _speedrun;
+    private readonly RetroBat.Api.Speedrun.CatalogueDesDefis? _defis;
     private string? _contestId;
     private readonly SeanceDuConcoursCertifie _seanceCertifiee;
     private readonly NelfePlayScoringCollectionSyncService? _collection;
@@ -84,8 +96,12 @@ public sealed class LiveContestClientService : BackgroundService
         PartieNelfePlayService? partie = null,
         NelfePlayScoringCollectionSyncService? collection = null,
         IGamelistStore? gamelists = null,
-        RomCanonicalResolver? canonical = null)
+        RomCanonicalResolver? canonical = null,
+        RetroBat.Api.Speedrun.SpeedrunSessionService? speedrun = null,
+        RetroBat.Api.Speedrun.CatalogueDesDefis? defis = null)
     {
+        _speedrun = speedrun;
+        _defis = defis;
         _partie = partie;
         _collection = collection;
         _gamelists = gamelists;
@@ -118,11 +134,20 @@ public sealed class LiveContestClientService : BackgroundService
                 gameSlug = _slug,
                 resolvedRom = _resolvedRom,
                 lastError = _lastError,
-                // le classement NelfePlay d'un concours certifie ; null pour un concours declare
-                certified = _certifie is { } c ? new { game = c.Jeu, system = c.Systeme, ruleset = c.Regle } : null
+                // le classement NelfePlay d'un concours certifie ; null pour un concours declare. `challenge` : l'epreuve d'un
+                // concours sur epreuve, null pour un concours sur score.
+                certified = CertifiePourLeStatut(_certifie, _epreuve)
             };
         }
     }
+
+    /// <summary>Le bloc <c>certified</c> de <see cref="Status"/> : null pour un concours declare. Pur.</summary>
+    internal static object? CertifiePourLeStatut(LiveContestCertifie.Preparation? certifie, LiveContestEpreuve.Preparation? epreuve)
+        => epreuve is { } e
+            ? new { game = e.Jeu, system = e.Systeme, ruleset = e.Regle, challenge = (string?)e.Epreuve }
+            : certifie is { } c
+                ? new { game = c.Jeu, system = c.Systeme, ruleset = c.Regle, challenge = (string?)null }
+                : null;
 
     /// <summary>
     /// Option RetroBat « ENABLE LIVE CONTEST » (menus ES -> es_settings) :
@@ -195,6 +220,8 @@ public sealed class LiveContestClientService : BackgroundService
         _startAtMs = 0;
         _phase = "idle";
         _certifie = null;
+        _epreuve = null;
+        _channel = null;
         _contestId = null;
         if (garderLaSeance)
         {
@@ -315,7 +342,8 @@ public sealed class LiveContestClientService : BackgroundService
                 }
 
                 _started = true;
-                _ = CountdownAndGoAsync(cancellationToken);
+                // Une epreuve part au depart, sans pause d'attente ; un concours sur score depause le jeu deja pret.
+                _ = _epreuve is not null ? DepartDeLEpreuveAsync(cancellationToken) : CountdownAndGoAsync(cancellationToken);
                 break;
 
             case "closed":
@@ -364,19 +392,36 @@ public sealed class LiveContestClientService : BackgroundService
     /// jamais de repli sur le <c>gameSlug</c>. Un concours declare : systeme + <c>gameSlug</c>, comme avant.
     /// </summary>
     internal sealed record Plan(
-        LiveContestCertifie.Preparation? Certifie, string? System, string? Slug, string? ContestId, string? Channel)
+        LiveContestCertifie.Preparation? Certifie, string? System, string? Slug, string? ContestId, string? Channel,
+        LiveContestEpreuve.Preparation? Epreuve = null)
     {
-        public bool EstCertifie => Certifie is not null;
+        public bool EstCertifie => Certifie is not null || Epreuve is not null;
+
+        /// <summary>Un concours sur une epreuve (<c>certified.challenge</c>).</summary>
+        public bool EstUneEpreuve => Epreuve is not null;
     }
 
     internal static Plan Planifier(JsonElement contest, string? playerCode,
-        Func<LiveContestCertifie.Demande, LiveContestCertifie.Preparation> resoudre)
+        Func<LiveContestCertifie.Demande, LiveContestCertifie.Preparation> resoudre,
+        Func<LiveContestCertifie.Demande, LiveContestEpreuve.Preparation>? resoudreLEpreuve = null)
     {
         var contestId = Get(contest, "contestId");
         var channel = Get(contest, "channel");
         if (LiveContestCertifie.Lire(contest) is not { } demande)
         {
             return new Plan(null, Get(contest, "system"), Get(contest, "gameSlug"), contestId, channel);
+        }
+
+        // UN CONCOURS SUR UNE EPREUVE : memes exigences (compte lie, concours identifie), puis l'epreuve de l'index des defis.
+        if (demande.EstUneEpreuve)
+        {
+            var epreuve = string.IsNullOrWhiteSpace(playerCode)
+                ? LiveContestEpreuve.Refuser(demande, LiveContestCertifie.RefusSansCompte, "machine non liee a un compte NelfePlay")
+                : string.IsNullOrWhiteSpace(contestId)
+                    ? LiveContestEpreuve.Refuser(demande, LiveContestCertifie.RefusIncomplet, "concours sans identifiant")
+                    : resoudreLEpreuve?.Invoke(demande)
+                        ?? LiveContestEpreuve.Refuser(demande, LiveContestEpreuve.RefusPasPrete, "pas de defis sur cette borne");
+            return new Plan(null, epreuve.Systeme, epreuve.Jeu, contestId, channel, epreuve);
         }
 
         // Le compte d'abord : une partie d'une machine non liee est certifiee mais anonyme, et le classement du concours
@@ -402,6 +447,19 @@ public sealed class LiveContestClientService : BackgroundService
                 : null,
             chemin => File.Exists(chemin) || Directory.Exists(chemin),
             _collection?.Status.Missing);
+
+    /// <summary>L'epreuve du concours sur CETTE borne : l'index des defis et le fichier que World Scoring a retenu pour ses defis.</summary>
+    private LiveContestEpreuve.Preparation ResoudreLEpreuve(LiveContestCertifie.Demande demande)
+        => LiveContestEpreuve.Resoudre(demande, _defis?.Tous ?? [], RomDeLEpreuve);
+
+    /// <summary>Le fichier d'une epreuve, celui du panneau et de la route de lancement (<see cref="RetroBat.Api.Speedrun.RomDeLEpreuve"/>).</summary>
+    private string? RomDeLEpreuve(RetroBat.Api.Speedrun.Reglement reglement)
+        => RetroBat.Api.Speedrun.RomDeLEpreuve.Choisir(_collection?.CheminsParJeu, reglement.SystemId, reglement.RomGroup,
+            () => RomAdmission.ReferenceDuSpeedrun(reglement.SystemId, reglement.RomGroup, RomAdmission.ReferentielSurDisque.Borne) is not null,
+            () => _gamelists is not null && _canonical is not null
+                ? RomDuGroupe.Trouver(_gamelists, _canonical, reglement.SystemId, reglement.RomGroup)
+                : null,
+            chemin => File.Exists(chemin) || Directory.Exists(chemin));
 
     /// <summary>Le client compte-t-il lui-meme la metrique ? Jamais pour un concours certifie : le scoring envoie la partie.</summary>
     internal static bool CompteLaMetrique(bool certifie, bool demarre) => demarre && !certifie;
@@ -430,7 +488,13 @@ public sealed class LiveContestClientService : BackgroundService
     private async Task PrepareAsync(JsonElement contest, CancellationToken cancellationToken)
     {
         _phase = "preparing";
-        var plan = Planifier(contest, _agent.Status.PlayerCode, Resoudre);
+        var plan = Planifier(contest, _agent.Status.PlayerCode, Resoudre, ResoudreLEpreuve);
+        if (plan.EstUneEpreuve)
+        {
+            PrepareEpreuve(plan);
+            return;
+        }
+
         if (plan.EstCertifie)
         {
             await PrepareCertifieAsync(plan, cancellationToken);
@@ -596,6 +660,137 @@ public sealed class LiveContestClientService : BackgroundService
                 T("Le streamer doit recréer le concours (jeu ou classement manquant).", "The streamer must recreate the contest (missing game or board).")),
         };
 
+    /// <summary>
+    /// UN CONCOURS SUR UNE EPREUVE, a la preparation : les controles de l'epreuve (index des defis, compte, version, fichier,
+    /// .MEM, etat de depart), puis « pret ». Rien ne se lance avant le depart, et la seance du concours ne s'arme qu'a lui : une
+    /// partie jouee avant le GO n'entre pas au concours. Un refus se dit, au joueur et au streamer (phase <c>certified-*</c>).
+    /// </summary>
+    private void PrepareEpreuve(Plan plan)
+    {
+        var preparation = plan.Epreuve!;
+        _epreuve = preparation;
+        _contestId = plan.ContestId;
+        _channel = plan.Channel;
+        _system = preparation.Systeme;
+        _slug = preparation.Jeu;
+        _resolvedRom = preparation.Rom;
+        if (!preparation.Prete)
+        {
+            RefuserLEpreuve(preparation.Refus ?? LiveContestCertifie.RefusIncomplet, preparation.Detail, preparation.Epreuve);
+            return;
+        }
+
+        // Les controles rapides du lancement type d'un defi, deja : un .MEM ou un etat de depart qui ne correspond pas se dit
+        // pendant la preparation. Un jeu en cours ne se juge qu'au depart.
+        if (_speedrun is null)
+        {
+            RefuserLEpreuve(LiveContestEpreuve.RefusPasPrete, "pas de session de defi sur cette borne", preparation.Epreuve);
+            return;
+        }
+
+        var (_, refus) = _speedrun.Verifier(preparation.Reglement!.ChallengeId, (_, _) => preparation.Rom);
+        if (refus is not null && refus.Raison != "game_running")
+        {
+            RefuserLEpreuve(LiveContestEpreuve.PhaseDuLancement(refus.Raison),
+                refus.Raison + (string.IsNullOrEmpty(refus.Detail) ? "" : " : " + refus.Detail), preparation.Epreuve);
+            return;
+        }
+
+        DisablePauseNonactive();
+        _ready = true;
+        _phase = "ready";
+        _ = EnvoyerPretAsync();
+        var titre = preparation.Reglement.Titre(Fr ? "fr" : "en");
+        _logger.LogInformation("livecontest : concours {Contest} sur l'epreuve {Epreuve} ({Regle}), prete, lancee au depart",
+            plan.ContestId, preparation.Epreuve, preparation.Regle);
+        _overlay.Show(null, T("Épreuve : ", "Challenge: ") + titre,
+            T("Elle se lance au départ, pour tout le monde en même temps. Ton meilleur temps certifié compte.",
+              "It launches at the start, for everyone at once. Your best certified time counts."), 0);
+    }
+
+    private void RefuserLEpreuve(string phase, string? detail, string epreuve)
+    {
+        _phase = phase;
+        _lastError = detail;
+        _logger.LogWarning("livecontest : concours sur epreuve refuse ({Refus}) : {Detail}", phase, detail);
+        var (titre, sousTitre) = phase switch
+        {
+            LiveContestCertifie.RefusSansCompte => (T("Compte NelfePlay requis", "NelfePlay account required"),
+                T("Ce concours se joue sur une épreuve certifiée : lie ta borne à ton compte NelfePlay, puis rejoins-le.",
+                  "This contest is played on a certified challenge: link your machine to your NelfePlay account, then join it.")),
+            LiveContestEpreuve.RefusEpreuveFermee => (T("Épreuve non ouverte ici", "Challenge not open here"),
+                epreuve + T(" - rien n'est lancé.", " - nothing was launched.")),
+            LiveContestEpreuve.RefusEntrainement => (T("Entraînement non classé", "Training is not ranked"),
+                epreuve + T(" - rien n'est lancé.", " - nothing was launched.")),
+            LiveContestCertifie.RefusRomAbsente => (T("Jeu introuvable dans ta collection World Scoring", "Game not found in your World Scoring collection"),
+                (detail ?? epreuve) + T(" - rien n'est lancé.", " - nothing was launched.")),
+            LiveContestEpreuve.RefusJeuEnCours => (T("Un jeu tourne déjà", "A game is already running"),
+                T("Quitte ton jeu : l'épreuve n'a pas pu partir.", "Quit your game: the challenge could not start.")),
+            LiveContestEpreuve.RefusPasPrete or LiveContestEpreuve.RefusAutreJeu => (T("Épreuve impossible à lancer", "Challenge cannot be launched"),
+                (detail ?? epreuve) + T(" - rien n'est lancé.", " - nothing was launched.")),
+            _ => (T("Concours incomplet", "Incomplete contest"),
+                T("Le streamer doit recréer le concours (épreuve introuvable).", "The streamer must recreate the contest (challenge not found).")),
+        };
+        _overlay.Show(null, titre, sousTitre, 0);
+    }
+
+    /// <summary>
+    /// LE DEPART D'UNE EPREUVE : decompte, puis le lancement type du defi (cœur du reglement, verrous, etat de depart), avec la
+    /// seance du concours armee juste avant. Un refus (un jeu tourne, .MEM change entre-temps) desarme la seance et se dit.
+    /// </summary>
+    private async Task DepartDeLEpreuveAsync(CancellationToken cancellationToken)
+    {
+        var preparation = _epreuve;
+        var speedrun = _speedrun;
+        if (preparation is not { Prete: true } || speedrun is null)
+        {
+            return;
+        }
+
+        await DecompterAsync(cancellationToken);
+        lock (_gate)
+        {
+            _value = 0;
+            _lastSent = -1;
+        }
+
+        _overlay.ShowCenter("GO !", T("Ton épreuve se lance…", "Your challenge is launching…"), 1800);
+        var armee = _seanceCertifiee.Armer(_agent.Status.PlayerCode, _channel, _contestId);
+        RetroBat.Api.Speedrun.ReponseLancement reponse;
+        try
+        {
+            // Le lancement attend les fantomes, le Deck et les manettes (jusqu'a 26 s sur une borne chargee) : hors du tick.
+            reponse = await Task.Run(() =>
+            {
+                var (verifie, refus) = speedrun.Verifier(preparation.Reglement!.ChallengeId, (_, _) => preparation.Rom);
+                return verifie is null ? refus! : speedrun.Partir(verifie, pages: false);
+            }, cancellationToken);
+        }
+        catch (Exception e) when (e is not OperationCanceledException)
+        {
+            _logger.LogWarning(e, "livecontest : lancement de l'epreuve en echec");
+            reponse = new RetroBat.Api.Speedrun.ReponseLancement(false, "launcher_failed", e.Message);
+        }
+
+        if (reponse.Lance)
+        {
+            _logger.LogInformation("livecontest : epreuve {Epreuve} lancee pour le concours {Contest} (seance {Seance})",
+                preparation.Epreuve, _contestId, armee ? "armee" : "non armee");
+            _phase = "playing";
+            return;
+        }
+
+        // Rien n'est parti : la seance du concours ne doit pas suivre une autre partie.
+        _seanceCertifiee.Oublier();
+        if (_scoringSession.Get() is { World: "stream" } seance && seance.ContestId == _contestId)
+        {
+            _scoringSession.Clear();
+        }
+
+        RefuserLEpreuve(LiveContestEpreuve.PhaseDuLancement(reponse.Raison),
+            reponse.Raison + (string.IsNullOrEmpty(reponse.Detail) ? "" : " : " + reponse.Detail), preparation.Epreuve);
+    }
+
     /// <summary>Signal GAME_PLAYING : la vraie partie demarre -> pause + ready.</summary>
     private void OnBusEvent(EventEnvelope envelope)
     {
@@ -645,7 +840,7 @@ public sealed class LiveContestClientService : BackgroundService
         }
 
         // comptage de la metrique UNIQUEMENT apres le GO, et jamais pour un concours certifie
-        if (!CompteLaMetrique(_certifie is not null, _started) || actionType is null)
+        if (!CompteLaMetrique(_certifie is not null || _epreuve is not null, _started) || actionType is null)
         {
             return;
         }
@@ -693,22 +888,7 @@ public sealed class LiveContestClientService : BackgroundService
             await SendRetroArchAsync("PAUSE_TOGGLE", expectResponse: false);
         }
 
-        var enrollment = _enrollment;
-        if (enrollment is not null)
-        {
-            try
-            {
-                using var http = _httpFactory.CreateClient();
-                using var request = new HttpRequestMessage(HttpMethod.Post,
-                    enrollment.PlatformBase + "/play/ready");
-                request.Headers.Authorization = new("Bearer", enrollment.PlayToken);
-                await http.SendAsync(request, CancellationToken.None);
-            }
-            catch (Exception e)
-            {
-                _logger.LogWarning(e, "livecontest : /play/ready en echec");
-            }
-        }
+        await EnvoyerPretAsync();
 
         _ready = true;
         _phase = "ready";
@@ -717,6 +897,51 @@ public sealed class LiveContestClientService : BackgroundService
                 ? T("Le départ sera donné pour tout le monde en même temps - attends le décompte.",
                     "The start fires for everyone at once - wait for the countdown.")
                 : _brief!, 0);
+    }
+
+    /// <summary><c>/play/ready</c> : le streamer voit le joueur pret.</summary>
+    private async Task EnvoyerPretAsync()
+    {
+        var enrollment = _enrollment;
+        if (enrollment is null)
+        {
+            return;
+        }
+
+        try
+        {
+            using var http = _httpFactory.CreateClient();
+            using var request = new HttpRequestMessage(HttpMethod.Post,
+                enrollment.PlatformBase + "/play/ready");
+            request.Headers.Authorization = new("Bearer", enrollment.PlayToken);
+            await http.SendAsync(request, CancellationToken.None);
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "livecontest : /play/ready en echec");
+        }
+    }
+
+    /// <summary>Le decompte 5-4-3-2-1 jusqu'a startAt pile (deja passe : rien a attendre).</summary>
+    private async Task DecompterAsync(CancellationToken cancellationToken)
+    {
+        _phase = "countdown";
+        for (var n = 5; n >= 1; n--)
+        {
+            var wait = _startAtMs - n * 1000 - DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            if (wait > 0)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(wait), cancellationToken);
+            }
+
+            _overlay.ShowCenter(n.ToString(), T("Départ dans…", "Starting in…"), 0);
+        }
+
+        var final = _startAtMs - DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        if (final > 0)
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(final), cancellationToken);
+        }
     }
 
     /// <summary>Depart simultane : decompte 3-2-1 puis depause a startAt pile.</summary>
@@ -740,23 +965,7 @@ public sealed class LiveContestClientService : BackgroundService
             return;
         }
 
-        _phase = "countdown";
-        for (var n = 5; n >= 1; n--)
-        {
-            var wait = _startAtMs - n * 1000 - DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            if (wait > 0)
-            {
-                await Task.Delay(TimeSpan.FromMilliseconds(wait), cancellationToken);
-            }
-
-            _overlay.ShowCenter(n.ToString(), T("Départ dans…", "Starting in…"), 0);
-        }
-
-        var final = _startAtMs - DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        if (final > 0)
-        {
-            await Task.Delay(TimeSpan.FromMilliseconds(final), cancellationToken);
-        }
+        await DecompterAsync(cancellationToken);
 
         lock (_gate)
         {
@@ -919,10 +1128,13 @@ public sealed class LiveContestClientService : BackgroundService
         }
 
         var certifie = _certifie;
+        var epreuve = _epreuve;
         var concours = _contestId;
         if (_started && !_quitDone)
         {
-            _overlay.Show(null, T("BRAVO !!!", "WELL PLAYED!!!"), certifie is not null
+            _overlay.Show(null, T("BRAVO !!!", "WELL PLAYED!!!"), epreuve is not null
+                ? T("Ton meilleur temps certifié fait foi : regarde le classement sur le stream !", "Your best certified time is what counts: watch the stream for the standings!")
+                : certifie is not null
                 ? T("Ton score certifié fait foi : regarde le classement sur le stream !", "Your certified score is what counts: watch the stream for the standings!")
                 : T("Score final : ", "Final score: ") + _value, 0);
             await Task.Delay(4000, cancellationToken);
@@ -934,15 +1146,26 @@ public sealed class LiveContestClientService : BackgroundService
         _overlay.Hide();
         // Concours certifie : le score part apres la fermeture du jeu, et son brouillon lit la seance a ce moment-la. Elle
         // tient jusqu'a lui (SeanceDuConcoursCertifie) ; un concours declare la retire tout de suite, comme avant.
-        var garder = certifie is { Prete: true } && concours is { Length: > 0 }
+        // Une epreuve : le meilleur temps du lancement part a la fermeture du jeu ; la seance tient jusqu'au verdict de son ruleset.
+        var classement = ClassementDuConcours(certifie, epreuve);
+        var garder = classement is not null && concours is { Length: > 0 }
             && _scoringSession.Get() is { World: "stream" } seance && seance.ContestId == concours;
         if (garder)
         {
-            _seanceCertifiee.DesarmerApresLaPartie(concours!, certifie!.Jeu, certifie.Regle);
+            _seanceCertifiee.DesarmerApresLaPartie(concours!, classement!.Value.Jeu, classement.Value.Regle);
         }
 
         Withdraw(garder);
     }
+
+    /// <summary>
+    /// Le jeu et le ruleset dont le verdict desarme la seance d'un concours certifie clos : ceux de l'epreuve (le passeport d'un
+    /// defi porte le rom_group et le ruleset de l'epreuve), sinon ceux du concours sur score ; null pour un concours declare. Pur.
+    /// </summary>
+    internal static (string Jeu, string Regle)? ClassementDuConcours(LiveContestCertifie.Preparation? certifie, LiveContestEpreuve.Preparation? epreuve)
+        => epreuve is { Prete: true, Reglement: { } reglement }
+            ? (reglement.RomGroup, reglement.Ruleset)
+            : certifie is { Prete: true } ? (certifie.Jeu, certifie.Regle) : null;
 
     /// <summary>
     /// RetroBat/RetroArch pausent le jeu quand la fenetre perd le focus
