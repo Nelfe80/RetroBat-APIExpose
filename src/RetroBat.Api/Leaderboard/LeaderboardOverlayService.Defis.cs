@@ -26,7 +26,13 @@ public sealed partial class LeaderboardOverlayService
         string? Image = null,
         string Badge = "");
 
-    public sealed record ChampDeFiche(string Etiquette, string Valeur);
+    /// <summary>
+    /// Un champ de la fiche. <paramref name="Large"/> (15/11, demande du user) : toute la largeur et jusqu'a
+    /// <see cref="LignesDUnChampLarge"/> lignes, pour la description du defi qu'une demi-colonne coupait sur une ligne.
+    /// </summary>
+    public sealed record ChampDeFiche(string Etiquette, string Valeur, bool Large = false);
+
+    internal const int LignesDUnChampLarge = 3;
 
     /// <summary>Une ligne du selecteur de reglages : son nom, sa valeur, et si elle joue (inactive : grisee).</summary>
     public sealed record LigneDeReglage(string Etiquette, string Valeur, bool Active = true);
@@ -151,8 +157,9 @@ public sealed partial class LeaderboardOverlayService
             var basDuContenu = basDeLAide - tailleTexte * 0.4f;
             if (d.Fiche.Count > 0)
             {
-                var hauteurFiche = (tailleTexte * 2.6f) * ((d.Fiche.Count + 1) / 2) + tailleTexte * 0.8f;
-                var fiche = new RectangleF(marge, basDuContenu - hauteurFiche, Width - 2 * marge, hauteurFiche);
+                var largeurFiche = Width - 2 * marge;
+                var hauteurFiche = PlacerLaFiche(g, d.Fiche, policeTexte, tailleTexte, largeurFiche).Hauteur + tailleTexte * 0.8f;
+                var fiche = new RectangleF(marge, basDuContenu - hauteurFiche, largeurFiche, hauteurFiche);
                 DessinerLaFiche(g, d.Fiche, s, policeGroupe, policeTexte, tailleTexte, fiche);
                 basDuContenu = fiche.Y - tailleTexte * 0.4f;
             }
@@ -392,11 +399,22 @@ public sealed partial class LeaderboardOverlayService
         private void DessinerLesBandeaux(Graphics g, ContenuDefis d, EsMenuStyle s, Font gras, Font petite, Font groupe,
             float taille, float taillePetite, float tailleGroupe, float marge, float y, float bas)
         {
-            var hauteur = taille * 3.4f;
+            var hauteurDeBase = taille * 3.4f;
             var ecart = taille * 0.3f;
             var hauteurGroupe = tailleGroupe * 2.0f;
             using var aGauche = new StringFormat(StringFormat.GenericTypographic) { LineAlignment = StringAlignment.Center, Trimming = StringTrimming.Character, FormatFlags = StringFormatFlags.NoWrap };
-            float HauteurDe(LigneDeDefi l) => l.Groupe ? hauteurGroupe : hauteur + ecart;
+            using var surPlusieursLignes = new StringFormat(StringFormat.GenericTypographic) { Trimming = StringTrimming.Word, FormatFlags = StringFormatFlags.LineLimit };
+            using var mesure = new StringFormat(StringFormat.GenericTypographic);
+
+            // LA REGLE SUR PLUSIEURS LIGNES (15/11, demande du user : la description etait coupee sur une ligne). Le bandeau
+            // grandit d'autant de lignes que sa regle en demande, au plus LignesDUnChampLarge ; l'image garde sa taille.
+            var hauteurLigne = Math.Max(1f, petite.GetHeight(g));
+            var largeurDuTexte = Width - 2 * marge - hauteurDeBase * 16f / 9f - taille * 1.2f;
+            int LignesDeLaRegle(LigneDeDefi l) => l.Groupe || l.Regle.Length == 0 ? 1 : Math.Clamp(
+                (int)Math.Ceiling(g.MeasureString(l.Regle, petite, new SizeF(Math.Max(1f, largeurDuTexte), 10_000f), mesure).Height / hauteurLigne - 0.05f),
+                1, LignesDUnChampLarge);
+            float Supplement(LigneDeDefi l) => (LignesDeLaRegle(l) - 1) * hauteurLigne;
+            float HauteurDe(LigneDeDefi l) => l.Groupe ? hauteurGroupe : hauteurDeBase + Supplement(l) + ecart;
             var premiere = 0;
             float Etendue(int de, int a) { var h = 0f; for (var i = de; i <= a; i++) h += HauteurDe(d.Lignes[i]); return h; }
             while (premiere < d.LigneCourante && Etendue(premiere, d.LigneCourante) > bas - y) premiere++;
@@ -417,7 +435,10 @@ public sealed partial class LeaderboardOverlayService
                 }
 
                 var choisie = i == d.LigneCourante && d.NousAvonsLaMain;
-                var zone = new RectangleF(marge, y, Width - 2 * marge, hauteur);
+                var lignesDeLaRegle = LignesDeLaRegle(l);
+                var supplement = Supplement(l);
+                var hauteur = hauteurDeBase;
+                var zone = new RectangleF(marge, y, Width - 2 * marge, hauteurDeBase + supplement);
                 using (var forme = FormesDesEcrans.Arrondi(zone, taille * 0.3f))
                 {
                     if (choisie)
@@ -432,7 +453,7 @@ public sealed partial class LeaderboardOverlayService
                     }
                 }
 
-                var image = new RectangleF(zone.X, zone.Y, hauteur * 16f / 9f, hauteur);
+                var image = new RectangleF(zone.X, zone.Y + supplement / 2f, hauteur * 16f / 9f, hauteur);
                 if (l.Image is { } chemin && File.Exists(chemin) && _service._glyphes?.Vignette(chemin, (int)hauteur) is { } vignette)
                 {
                     g.DrawImage(vignette, image);
@@ -448,9 +469,18 @@ public sealed partial class LeaderboardOverlayService
                 using var encreTexte = new SolidBrush(choisie ? Teinte(s.SelectedTextColor) : Teinte(s.TextColor));
                 var largeurBadge = l.Badge.Length > 0 ? g.MeasureString(l.Badge, petite, PointF.Empty, StringFormat.GenericTypographic).Width + taillePetite : 0f;
                 DessinerCoupe(g, l.Nom.ToUpperInvariant(), gras, encreNom, new RectangleF(x, zone.Y + hauteur * 0.06f, largeur - largeurBadge, hauteur * 0.36f), aGauche);
-                DessinerCoupe(g, l.Regle, petite, encreTexte, new RectangleF(x, zone.Y + hauteur * 0.40f, largeur, hauteur * 0.26f), aGauche);
+                if (lignesDeLaRegle <= 1)
+                {
+                    DessinerCoupe(g, l.Regle, petite, encreTexte, new RectangleF(x, zone.Y + hauteur * 0.40f, largeur, hauteur * 0.26f), aGauche);
+                }
+                else
+                {
+                    var haut = zone.Y + hauteur * 0.40f + (hauteur * 0.26f - hauteurLigne) / 2f;
+                    g.DrawString(l.Regle, petite, encreTexte, new RectangleF(x, haut, largeur, lignesDeLaRegle * hauteurLigne + 1f), surPlusieursLignes);
+                }
+
                 var bas2 = string.Join("    ", new[] { l.Mesure, l.Colonne1, l.Colonne2 }.Where(t => t.Length > 0));
-                DessinerCoupe(g, bas2, petite, encreTexte, new RectangleF(x, zone.Y + hauteur * 0.66f, largeur, hauteur * 0.28f), aGauche);
+                DessinerCoupe(g, bas2, petite, encreTexte, new RectangleF(x, zone.Y + hauteur * 0.66f + supplement, largeur, hauteur * 0.28f), aGauche);
                 if (l.Badge.Length > 0)
                 {
                     var etiquette = new RectangleF(zone.Right - largeurBadge - taille * 0.4f, zone.Y + hauteur * 0.1f, largeurBadge, taillePetite * 1.4f);
@@ -464,7 +494,7 @@ public sealed partial class LeaderboardOverlayService
                     g.DrawString(l.Badge, petite, encreBadge, etiquette, new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
                 }
 
-                y += hauteur + ecart;
+                y += hauteur + supplement + ecart;
             }
 
             DessinerLaBarreDeDefilement(g, s, d.Lignes.Count, premiere, derniere, d.LigneCourante, yDepart, bas, taille);
@@ -579,14 +609,72 @@ public sealed partial class LeaderboardOverlayService
             using var encreEtiquette = new SolidBrush(Teinte(s.GroupColor));
             using var encreValeur = new SolidBrush(Teinte(s.TitleColor));
             using var aGauche = new StringFormat(StringFormat.GenericTypographic) { Trimming = StringTrimming.Character, FormatFlags = StringFormatFlags.NoWrap };
-            var colonne = (zone.Width - taille * 1.2f) / 2f;
-            for (var i = 0; i < champs.Count; i++)
+            using var surPlusieursLignes = new StringFormat(StringFormat.GenericTypographic) { Trimming = StringTrimming.Word, FormatFlags = StringFormatFlags.LineLimit };
+            foreach (var (champ, place, lignes) in PlacerLaFiche(g, champs, valeur, taille, zone.Width).Places)
             {
-                var x = zone.X + taille * 0.6f + (i % 2) * colonne;
-                var y = zone.Y + taille * 0.4f + (i / 2) * taille * 2.6f;
-                DessinerCoupe(g, champs[i].Etiquette.ToUpperInvariant(), etiquette, encreEtiquette, new RectangleF(x, y, colonne - taille * 0.4f, taille), aGauche);
-                DessinerCoupe(g, champs[i].Valeur, valeur, encreValeur, new RectangleF(x, y + taille * 1.05f, colonne - taille * 0.4f, taille * 1.4f), aGauche);
+                var x = zone.X + place.X;
+                var y = zone.Y + taille * 0.4f + place.Y;
+                DessinerCoupe(g, champ.Etiquette.ToUpperInvariant(), etiquette, encreEtiquette, new RectangleF(x, y, place.Width, taille), aGauche);
+                if (lignes <= 1)
+                {
+                    DessinerCoupe(g, champ.Valeur, valeur, encreValeur, new RectangleF(x, y + taille * 1.05f, place.Width, taille * 1.4f), aGauche);
+                }
+                else
+                {
+                    // Plusieurs lignes, coupees aux mots ; au-dela de la derniere, le texte s'arrete (LineLimit).
+                    g.DrawString(champ.Valeur, valeur, encreValeur, new RectangleF(x, y + taille * 1.05f, place.Width, lignes * valeur.GetHeight(g) + 1f), surPlusieursLignes);
+                }
             }
+        }
+
+        /// <summary>
+        /// La place de chaque champ de la fiche (15/11) : deux colonnes, sauf un champ large qui prend une rangee entiere et
+        /// autant de lignes que son texte en demande (au plus <see cref="LignesDUnChampLarge"/>). Le calcul sert a la hauteur
+        /// de la fiche ET a son dessin : les deux ne peuvent pas diverger.
+        /// </summary>
+        private static (float Hauteur, List<(ChampDeFiche Champ, RectangleF Place, int Lignes)> Places) PlacerLaFiche(
+            Graphics g, IReadOnlyList<ChampDeFiche> champs, Font valeur, float taille, float largeur)
+        {
+            var places = new List<(ChampDeFiche, RectangleF, int)>();
+            var interieur = largeur - taille * 1.2f;
+            var colonne = interieur / 2f;
+            var rangee = taille * 2.6f;
+            var y = 0f;
+            var colonneOuverte = 0;   // 0 : la rangee courante est vide ; 1 : sa colonne de gauche est prise
+            using var mesure = new StringFormat(StringFormat.GenericTypographic);
+            foreach (var champ in champs)
+            {
+                if (champ.Large)
+                {
+                    if (colonneOuverte == 1)
+                    {
+                        y += rangee;
+                        colonneOuverte = 0;
+                    }
+
+                    var largeurTexte = interieur - taille * 0.4f;
+                    var hauteurLigne = Math.Max(1f, valeur.GetHeight(g));
+                    var hauteurTexte = g.MeasureString(champ.Valeur, valeur, new SizeF(largeurTexte, 10_000f), mesure).Height;
+                    var lignes = Math.Clamp((int)Math.Ceiling(hauteurTexte / hauteurLigne - 0.05f), 1, LignesDUnChampLarge);
+                    places.Add((champ, new RectangleF(taille * 0.6f, y, largeurTexte, 0f), lignes));
+                    y += lignes <= 1 ? rangee : taille * 1.05f + lignes * hauteurLigne + taille * 0.3f;
+                    continue;
+                }
+
+                places.Add((champ, new RectangleF(taille * 0.6f + colonneOuverte * colonne, y, colonne - taille * 0.4f, 0f), 1));
+                if (colonneOuverte == 1)
+                {
+                    y += rangee;
+                    colonneOuverte = 0;
+                }
+                else
+                {
+                    colonneOuverte = 1;
+                }
+            }
+
+            if (colonneOuverte == 1) y += rangee;
+            return (y, places);
         }
     }
 

@@ -751,9 +751,11 @@ public sealed partial class DefisPanelService
             : [];
         return
         [
+            // La description du defi en tete, sur toute la largeur et plusieurs lignes (15/11, demande du user : elle etait
+            // coupee sur une ligne dans sa demi-colonne).
+            new(T("speedrun.panel.goal", "Goal"), Objectif(defi), Large: true),
             .. fantomes,
             new(T("speedrun.panel.start", "Start"), depart),
-            new(T("speedrun.panel.goal", "Goal"), Objectif(defi)),
             new(T("speedrun.panel.forbidden", "Forbidden"), LaPhrase(interdits)),
             new(T("speedrun.panel.record", "Record"), LeRecord(defi, _tableaux) is { } record
                 ? Chronometrage.Afficher(record.Valeur, defi.Cadence) + " · " + record.Joueur : SansTemps),
@@ -774,8 +776,8 @@ public sealed partial class DefisPanelService
         var seances = _bilan.GetValueOrDefault(defi.ChallengeId).Tentatives;
         return
         [
+            new(T("speedrun.panel.goal", "Goal"), Objectif(defi), Large: true),
             new(T("speedrun.panel.start", "Start"), T("speedrun.panel.start.state", "Verified starting state")),
-            new(T("speedrun.panel.goal", "Goal"), Objectif(defi)),
             new(T("speedrun.panel.training.game", "Game"), aides.Count > 0
                 ? T("speedrun.panel.training.infinite_lives", "Infinite lives") : T("speedrun.panel.training.normal_game", "Normal: lives and continues")),
             new(T("speedrun.panel.restart", "Restart"), T("speedrun.panel.training.restart", "Hotkey + Left")),
