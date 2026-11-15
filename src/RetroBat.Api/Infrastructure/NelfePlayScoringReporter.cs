@@ -4794,7 +4794,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
     }
 
-    private static string CheminDuProfil(string systemId, string romGroup)
+    internal static string CheminDuProfil(string systemId, string romGroup)
     {
         var cle = (systemId + "|" + romGroup).ToLowerInvariant();
         var nom = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(cle)))[..32].ToLowerInvariant();

@@ -122,6 +122,25 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
     }
 
     /// <summary>
+    /// Un concours certifie part du fichier que la collection a retenu (15/11) : la passe le garde par « systeme/jeu »,
+    /// systeme canonique, et l'index garde sur disque donne les classements ouverts.
+    /// </summary>
+    [Fact]
+    public async Task La_passe_garde_le_fichier_retenu_et_les_jeux_ouverts_pour_un_concours_certifie()
+    {
+        var service = Service(new FauxHttp(Index("sha256:aa", Jeu("arcade", "19xx", MemEmpreinte))), new FauxResolveur { ["19xx.zip"] = "19xx" });
+        Assert.Null(service.CheminsDuWorldScoring);
+        var rom = PoserRom("fbneo", "19xx.zip");
+        PoserMem("arcade", "19xx", MemContenu);
+
+        await service.SynchroniserAsync("test", CancellationToken.None);
+
+        Assert.Equal(rom, service.CheminsDuWorldScoring!["arcade/19xx"]);
+        var jeu = Assert.Single(service.JeuxOuverts()!);
+        Assert.Equal(new[] { "1cc" }, jeu.Rulesets.Select(r => r.Id));
+    }
+
+    /// <summary>
     /// La liste mise a jour recharge ES sans barre de progression, et ES l'annonce par sa propre
     /// notification une fois recharge (demande user 2026-10-10).
     /// </summary>
