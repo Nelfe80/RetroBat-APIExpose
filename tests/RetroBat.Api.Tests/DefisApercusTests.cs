@@ -49,7 +49,7 @@ public class DefisApercusTests
             => new(n, "RECORD [record]", "TOI --:--.--", Regle: regle, Mesure: mesure, Badge: badge, Marque: marque);
         var contenu = new L.ContenuDefis(Onglets, 2, true, true, [],
             [G("Boss"), B("Rootmars en une vie", "Dernier combat, 1 vie, sans grenade", "AU TEMPS", "TENTÉ × 3", "tente"),
-             B("Galerie des boss", "Accès direct aux 8 grands boss", "AU TEMPS", "RÉUSSI", "reussi"),
+             B("Les mondes à l'envers", "Chaque caillou lancé fait basculer la même scène dans une dimension parallèle, avec ses monstres, son arme et son personnage ; la mission se joue aux points, du départ à la mort du boss, bilan compris.", "AUX POINTS", "RÉUSSI", "reussi"),
              G("Règles folles"), B("Sans grenade", "Une mission sans une grenade", "AU TEMPS"),
              B("Pistolet seul", "Une mission sans ramasser d'arme", "AU TEMPS"),
              G("Montures et transformations"), B("Zombie jusqu'au bout", "Finir la mission 2 en zombie", "AU TEMPS")],
