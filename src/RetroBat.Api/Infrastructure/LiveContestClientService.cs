@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using RetroBat.Api.Media;
 using RetroBat.Domain.Events;
 using RetroBat.Domain.Interfaces;
 using RetroBat.Domain.Paths;
@@ -17,6 +18,12 @@ namespace RetroBat.Api.Infrastructure;
 /// pause au signal GAME_PLAYING (vraie partie), ready, comptage natif de la
 /// metrique sur le bus d'evenements, depart simultane a startAt, push de la
 /// progression, submit automatique, overlay in-game et fermeture de RetroArch.
+///
+/// UN CONCOURS SUR SCORE CERTIFIE (15/11) : <c>/play/contest</c> porte <c>certified {game, system, ruleset}</c>. Le jeu
+/// est alors celui de la collection World Scoring pour ce classement (<see cref="LiveContestCertifie"/>), lance comme une
+/// partie NelfePlay (cœur impose), avec la seance {stream, chaine, concours} du joueur LIE ; le client ne compte plus
+/// rien, c'est le scoring certifie qui envoie la partie. Un jeu, un mode ou un compte qui manque se refuse. Un concours
+/// declare (<c>certified</c> null) part comme avant, par son <c>gameSlug</c>.
 /// </summary>
 public sealed class LiveContestClientService : BackgroundService
 {
@@ -54,6 +61,14 @@ public sealed class LiveContestClientService : BackgroundService
     private string? _system, _slug, _resolvedRom, _lastError, _brief;
     private string _reportedPhase = "";
 
+    // concours sur score certifie : le classement de NelfePlay, jamais une valeur comptee ici
+    private LiveContestCertifie.Preparation? _certifie;
+    private string? _contestId;
+    private readonly SeanceDuConcoursCertifie _seanceCertifiee;
+    private readonly NelfePlayScoringCollectionSyncService? _collection;
+    private readonly IGamelistStore? _gamelists;
+    private readonly RomCanonicalResolver? _canonical;
+
     private readonly NelfePlayScoringSessionService _scoringSession;
     private readonly NelfePlayAgentService _agent;
 
@@ -66,9 +81,16 @@ public sealed class LiveContestClientService : BackgroundService
         NelfePlayScoringSessionService scoringSession,
         NelfePlayAgentService agent,
         ILogger<LiveContestClientService> logger,
-        PartieNelfePlayService? partie = null)
+        PartieNelfePlayService? partie = null,
+        NelfePlayScoringCollectionSyncService? collection = null,
+        IGamelistStore? gamelists = null,
+        RomCanonicalResolver? canonical = null)
     {
         _partie = partie;
+        _collection = collection;
+        _gamelists = gamelists;
+        _canonical = canonical;
+        _seanceCertifiee = new SeanceDuConcoursCertifie(scoringSession);
         _eventBus = eventBus;
         _overlay = overlay;
         _httpFactory = httpFactory;
@@ -95,7 +117,9 @@ public sealed class LiveContestClientService : BackgroundService
                 system = _system,
                 gameSlug = _slug,
                 resolvedRom = _resolvedRom,
-                lastError = _lastError
+                lastError = _lastError,
+                // le classement NelfePlay d'un concours certifie ; null pour un concours declare
+                certified = _certifie is { } c ? new { game = c.Jeu, system = c.Systeme, ruleset = c.Regle } : null
             };
         }
     }
@@ -142,19 +166,23 @@ public sealed class LiveContestClientService : BackgroundService
         _overlay.Show(null, T("Inscription reçue !", "Enrolled!"), T("Préparation de ton jeu…", "Getting your game ready…"), 6000);
     }
 
-    public void Withdraw()
+    public void Withdraw() => Withdraw(garderLaSeance: false);
+
+    /// <param name="garderLaSeance">Concours certifie clos : la seance reste armee jusqu'a son score
+    /// (<see cref="SeanceDuConcoursCertifie"/>).</param>
+    private void Withdraw(bool garderLaSeance)
     {
         lock (_gate)
         {
             _enrollment = null;
-            ResetRound();
+            ResetRound(garderLaSeance);
             SaveEnrollment();
         }
 
         _overlay.Hide();
     }
 
-    private void ResetRound()
+    private void ResetRound(bool garderLaSeance = false)
     {
         _prepared = _ready = _started = _finished = false;
         _waitingGamePlaying = false;
@@ -166,6 +194,14 @@ public sealed class LiveContestClientService : BackgroundService
         _seq = 0;
         _startAtMs = 0;
         _phase = "idle";
+        _certifie = null;
+        _contestId = null;
+        if (garderLaSeance)
+        {
+            return;
+        }
+
+        _seanceCertifiee.Oublier();
 
         // ÉTAGE 3 - on désarme la session STREAM du contest (désenrôlement /
         // ré-enrôlement). On ne touche PAS une session STATION (armée par le hub) :
@@ -191,6 +227,11 @@ public sealed class LiveContestClientService : BackgroundService
         {
             try
             {
+                if (_seanceCertifiee.Echeance())
+                {
+                    _logger.LogInformation("livecontest : concours certifie clos, seance desarmee a l'echeance");
+                }
+
                 await TickAsync(stoppingToken);
             }
             catch (OperationCanceledException)
@@ -215,24 +256,21 @@ public sealed class LiveContestClientService : BackgroundService
         }
 
         using var http = _httpFactory.CreateClient();
-        using var request = new HttpRequestMessage(HttpMethod.Get,
-            enrollment.PlatformBase + "/play/contest");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", enrollment.PlayToken);
-        using var response = await http.SendAsync(request, cancellationToken);
-        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        var (statut, doc) = await LireLeConcoursAsync(http, enrollment, cancellationToken);
+        if (statut == System.Net.HttpStatusCode.Unauthorized)
         {
             _logger.LogInformation("livecontest : playToken expire, desinscription");
             Withdraw();
             return;
         }
 
-        if (!response.IsSuccessStatusCode)
+        if (doc is null)
         {
             return;
         }
 
-        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
-        var root = doc.RootElement;
+        using var concours = doc;
+        var root = concours.RootElement;
         var status = root.TryGetProperty("status", out var st) ? st.GetString() ?? "" : "";
         _metricKind = Get(root, "objective", "metric", "kind") ?? "score";
         _metricSignal = Get(root, "objective", "metric", "signal");
@@ -297,6 +335,77 @@ public sealed class LiveContestClientService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// <c>GET /play/contest</c> : le statut, et le concours (null hors d'un 2xx lisible).
+    /// </summary>
+    internal static async Task<(System.Net.HttpStatusCode Statut, JsonDocument? Concours)> LireLeConcoursAsync(
+        HttpClient http, Enrollment enrollment, CancellationToken cancellationToken)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, enrollment.PlatformBase + "/play/contest");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", enrollment.PlayToken);
+        using var response = await http.SendAsync(request, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            return (response.StatusCode, null);
+        }
+
+        try
+        {
+            return (response.StatusCode, JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken)));
+        }
+        catch (JsonException)
+        {
+            return (response.StatusCode, null);
+        }
+    }
+
+    /// <summary>
+    /// CE QUE LA MANCHE VA LANCER. Un concours certifie (<c>certified</c> present) : le jeu du classement, ou son refus ;
+    /// jamais de repli sur le <c>gameSlug</c>. Un concours declare : systeme + <c>gameSlug</c>, comme avant.
+    /// </summary>
+    internal sealed record Plan(
+        LiveContestCertifie.Preparation? Certifie, string? System, string? Slug, string? ContestId, string? Channel)
+    {
+        public bool EstCertifie => Certifie is not null;
+    }
+
+    internal static Plan Planifier(JsonElement contest, string? playerCode,
+        Func<LiveContestCertifie.Demande, LiveContestCertifie.Preparation> resoudre)
+    {
+        var contestId = Get(contest, "contestId");
+        var channel = Get(contest, "channel");
+        if (LiveContestCertifie.Lire(contest) is not { } demande)
+        {
+            return new Plan(null, Get(contest, "system"), Get(contest, "gameSlug"), contestId, channel);
+        }
+
+        // Le compte d'abord : une partie d'une machine non liee est certifiee mais anonyme, et le classement du concours
+        // ne garde que les scores qui ont un proprietaire. Lancer quand meme ferait jouer pour rien.
+        var preparation = string.IsNullOrWhiteSpace(playerCode)
+            ? new LiveContestCertifie.Preparation(null, demande.Systeme, demande.Jeu, demande.Regle,
+                LiveContestCertifie.RefusSansCompte, "machine non liee a un compte NelfePlay")
+            : string.IsNullOrWhiteSpace(contestId)
+                ? new LiveContestCertifie.Preparation(null, demande.Systeme, demande.Jeu, demande.Regle,
+                    LiveContestCertifie.RefusIncomplet, "concours sans identifiant")
+                : resoudre(demande);
+        return new Plan(preparation, preparation.Systeme, preparation.Jeu, contestId, channel);
+    }
+
+    /// <summary>La resolution sur CETTE borne : la collection World Scoring, son index et ses manques.</summary>
+    private LiveContestCertifie.Preparation Resoudre(LiveContestCertifie.Demande demande)
+        => LiveContestCertifie.Resoudre(
+            demande,
+            _collection?.JeuxOuverts(),
+            _collection?.CheminsDuWorldScoring,
+            _gamelists is not null && _canonical is not null
+                ? (systeme, jeu) => RomDuGroupe.Trouver(_gamelists, _canonical, systeme, jeu)
+                : null,
+            chemin => File.Exists(chemin) || Directory.Exists(chemin),
+            _collection?.Status.Missing);
+
+    /// <summary>Le client compte-t-il lui-meme la metrique ? Jamais pour un concours certifie : le scoring envoie la partie.</summary>
+    internal static bool CompteLaMetrique(bool certifie, bool demarre) => demarre && !certifie;
+
     /// <summary>Le streamer voit la phase de chaque joueur (jeu introuvable...).</summary>
     private async Task ReportPhaseAsync(Enrollment enrollment, string phase, string? detail)
     {
@@ -321,6 +430,13 @@ public sealed class LiveContestClientService : BackgroundService
     private async Task PrepareAsync(JsonElement contest, CancellationToken cancellationToken)
     {
         _phase = "preparing";
+        var plan = Planifier(contest, _agent.Status.PlayerCode, Resoudre);
+        if (plan.EstCertifie)
+        {
+            await PrepareCertifieAsync(plan, cancellationToken);
+            return;
+        }
+
         var system = _system = Get(contest, "system");
         var slug = _slug = Get(contest, "gameSlug");
         if (system is null || slug is null)
@@ -360,30 +476,7 @@ public sealed class LiveContestClientService : BackgroundService
         else
         {
             _overlay.Show(null, T("Lancement du jeu…", "Launching the game…"), slug, 0);
-            FocusProcess("emulationstation"); // sinon RetroArch demarre en arriere-plan
-            try
-            {
-                using var es = new HttpClient { BaseAddress = EmulationStationBaseUri };
-                using var content = new StringContent(romPath, Encoding.UTF8, "text/plain");
-                // Une partie de concours est une partie NelfePlay, d'ou que le carrousel la lance.
-                _partie?.AnnoncerLancement("concours");
-                if (_partie is not null)
-                {
-                    await _partie.ImposerLeCoeurAsync(romPath, cancellationToken);
-                }
-                var res = await es.PostAsync("/launch", content, cancellationToken);
-                if (!res.IsSuccessStatusCode)
-                {
-                    _lastError = "launch ES HTTP " + (int)res.StatusCode;
-                }
-
-                _logger.LogInformation("livecontest : launch {Rom} -> {Status}", romPath, res.StatusCode);
-            }
-            catch (Exception e)
-            {
-                _lastError = "launch ES injoignable : " + e.Message;
-                _logger.LogWarning(e, "livecontest : launch ES en echec");
-            }
+            await LancerParEsAsync(romPath, cancellationToken);
         }
 
         _ = FocusRetroArchWhenUpAsync();
@@ -393,9 +486,139 @@ public sealed class LiveContestClientService : BackgroundService
             T("Ta partie sera mise en pause, prête pour le départ…", "Your run will be paused, ready for the countdown…"), 0);
     }
 
+    /// <summary>
+    /// Le jeu par EmulationStation, comme une partie NelfePlay : annonce « concours », cœur de la collection impose a la
+    /// fiche du jeu (FBNeo pour un set qu'il connait), puis <c>/launch</c>.
+    /// </summary>
+    private async Task LancerParEsAsync(string romPath, CancellationToken cancellationToken)
+    {
+        FocusProcess("emulationstation"); // sinon RetroArch demarre en arriere-plan
+        try
+        {
+            using var es = new HttpClient { BaseAddress = EmulationStationBaseUri };
+            using var content = new StringContent(romPath, Encoding.UTF8, "text/plain");
+            // Une partie de concours est une partie NelfePlay, d'ou que le carrousel la lance.
+            _partie?.AnnoncerLancement("concours");
+            if (_partie is not null)
+            {
+                await _partie.ImposerLeCoeurAsync(romPath, cancellationToken);
+            }
+            var res = await es.PostAsync("/launch", content, cancellationToken);
+            if (!res.IsSuccessStatusCode)
+            {
+                _lastError = "launch ES HTTP " + (int)res.StatusCode;
+            }
+
+            _logger.LogInformation("livecontest : launch {Rom} -> {Status}", romPath, res.StatusCode);
+        }
+        catch (Exception e)
+        {
+            _lastError = "launch ES injoignable : " + e.Message;
+            _logger.LogWarning(e, "livecontest : launch ES en echec");
+        }
+    }
+
+    /// <summary>
+    /// UN CONCOURS CERTIFIE : le jeu du classement, lance comme un lancement World Scoring, avec la seance du concours sur
+    /// le joueur lie. L'emulateur du systeme n'est pas force en AUTO (reglage du joueur) : le cœur est celui que la
+    /// collection impose a la fiche du jeu. Un refus se dit, et rien ne se lance.
+    /// </summary>
+    private async Task PrepareCertifieAsync(Plan plan, CancellationToken cancellationToken)
+    {
+        var preparation = plan.Certifie!;
+        _certifie = preparation;
+        _contestId = plan.ContestId;
+        _system = preparation.Systeme;
+        _slug = preparation.Jeu;
+        _resolvedRom = preparation.Rom;
+        var classement = RetroBat.Api.Scoring.ModesDeJeu.NomDuClassement(preparation.Regle);
+        if (!preparation.Prete)
+        {
+            _phase = preparation.Refus ?? LiveContestCertifie.RefusIncomplet;
+            _lastError = preparation.Detail;
+            _logger.LogWarning("livecontest : concours certifie refuse ({Refus}) : {Detail}", _phase, preparation.Detail);
+            var (titre, sousTitre) = MessageDeRefus(preparation, classement);
+            _overlay.Show(null, titre, sousTitre, 0);
+            return;
+        }
+
+        if (_seanceCertifiee.Armer(_agent.Status.PlayerCode, plan.Channel, plan.ContestId))
+        {
+            _logger.LogInformation(
+                "livecontest : concours certifie {Contest} : {Systeme}/{Jeu} en {Regle}, seance STREAM armee (channel={Channel})",
+                plan.ContestId, preparation.Systeme, preparation.Jeu, preparation.Regle, plan.Channel);
+        }
+
+        DisablePauseNonactive();
+        _overlay.Show(null, T("Lancement du jeu…", "Launching the game…"), preparation.Jeu + " · " + classement, 0);
+        await LancerParEsAsync(preparation.Rom!, cancellationToken);
+
+        string? corps = null;
+        try
+        {
+            var copie = NelfePlayScoringReporter.CheminDuProfil(preparation.Systeme, preparation.Jeu);
+            if (File.Exists(copie))
+            {
+                corps = await File.ReadAllTextAsync(copie, cancellationToken);
+            }
+        }
+        catch (IOException)
+        {
+        }
+
+        var mode = LiveContestCertifie.ModeAChoisir(corps, preparation.Regle, Fr);
+        _ = FocusRetroArchWhenUpAsync();
+        _waitingGamePlaying = true;
+        _phase = "press-start";
+        _overlay.Show(null, T("Appuie sur START !", "Press START!"),
+            mode is null
+                ? T("Classement " + classement + " : ta partie certifiée compte. Elle sera mise en pause, prête pour le départ…",
+                    classement + " board: your certified run counts. It will be paused, ready for the countdown…")
+                : T("Choisis le mode « " + mode + " » (classement " + classement + "). Ta partie sera mise en pause, prête pour le départ…",
+                    "Pick the « " + mode + " » mode (" + classement + " board). Your run will be paused, ready for the countdown…"), 0);
+    }
+
+    /// <summary>Ce que le joueur lit quand un concours certifie ne peut pas partir.</summary>
+    private static (string Titre, string SousTitre) MessageDeRefus(LiveContestCertifie.Preparation preparation, string classement)
+        => preparation.Refus switch
+        {
+            LiveContestCertifie.RefusSansCompte => (T("Compte NelfePlay requis", "NelfePlay account required"),
+                T("Ce concours se joue sur score certifié : lie ta borne à ton compte NelfePlay, puis rejoins-le.",
+                  "This contest is played on certified scores: link your machine to your NelfePlay account, then join it.")),
+            LiveContestCertifie.RefusModeInconnu or LiveContestCertifie.RefusModeNonJouable => (T("Mode introuvable", "Mode not found"),
+                T("Le classement " + classement + " de " + preparation.Jeu + " n'est pas ouvert ici. Rien n'est lancé.",
+                  "The " + classement + " board of " + preparation.Jeu + " is not open here. Nothing was launched.")),
+            LiveContestCertifie.RefusRomAbsente => (T("Jeu introuvable dans ta collection World Scoring", "Game not found in your World Scoring collection"),
+                (preparation.Detail ?? preparation.Jeu) + T(" - rien n'est lancé.", " - nothing was launched.")),
+            LiveContestCertifie.RefusJeuFerme => (T("Jeu non ouvert au World Scoring", "Game not open to World Scoring"),
+                preparation.Jeu + T(" - rien n'est lancé.", " - nothing was launched.")),
+            _ => (T("Concours incomplet", "Incomplete contest"),
+                T("Le streamer doit recréer le concours (jeu ou classement manquant).", "The streamer must recreate the contest (missing game or board).")),
+        };
+
     /// <summary>Signal GAME_PLAYING : la vraie partie demarre -> pause + ready.</summary>
     private void OnBusEvent(EventEnvelope envelope)
     {
+        // Concours certifie clos : sa seance attend le score de son classement (ou le lancement suivant).
+        if (_seanceCertifiee.EnAttente && envelope.Type is "ui.game.started" or "scoring.verdict")
+        {
+            string? jeu = null, regle = null;
+            try
+            {
+                var verdict = JsonSerializer.SerializeToElement(envelope.Payload);
+                jeu = Get(verdict, "RomGroup");
+                regle = Get(verdict, "Ruleset");
+            }
+            catch (Exception)
+            {
+            }
+
+            if (_seanceCertifiee.SurEvenement(envelope.Type, jeu, regle))
+            {
+                _logger.LogInformation("livecontest : concours certifie clos, seance desarmee ({Evenement})", envelope.Type);
+            }
+        }
+
         if (_enrollment is null || _finished ||
             !envelope.Type.StartsWith("retroarch.", StringComparison.OrdinalIgnoreCase))
         {
@@ -421,8 +644,8 @@ public sealed class LiveContestClientService : BackgroundService
             return;
         }
 
-        // comptage de la metrique UNIQUEMENT apres le GO
-        if (!_started || actionType is null)
+        // comptage de la metrique UNIQUEMENT apres le GO, et jamais pour un concours certifie
+        if (!CompteLaMetrique(_certifie is not null, _started) || actionType is null)
         {
             return;
         }
@@ -509,7 +732,10 @@ public sealed class LiveContestClientService : BackgroundService
                 ? "RetroArch injoignable (jeu non lance ?)"
                 : "RetroArch sans jeu charge";
             _overlay.Show(null, T("La manche est partie…", "The round has started…"),
-                T("Ton jeu n’était pas lancé : lance-le et joue, tes points comptent quand même !", "Your game was not running: launch it and play, your points still count!"), 8000);
+                _certifie is not null
+                    ? T("Ton jeu n’était pas lancé : lance-le depuis World Scoring, ta partie certifiée compte quand même !",
+                        "Your game was not running: launch it from World Scoring, your certified run still counts!")
+                    : T("Ton jeu n’était pas lancé : lance-le et joue, tes points comptent quand même !", "Your game was not running: launch it and play, your points still count!"), 8000);
             _phase = "playing";
             return;
         }
@@ -632,9 +858,13 @@ public sealed class LiveContestClientService : BackgroundService
             _logger.LogWarning(e, "livecontest : submit final en echec");
         }
 
+        var certifie = _certifie;
+        var concours = _contestId;
         if (_started && !_quitDone)
         {
-            _overlay.Show(null, T("BRAVO !!!", "WELL PLAYED!!!"), T("Score final : ", "Final score: ") + _value, 0);
+            _overlay.Show(null, T("BRAVO !!!", "WELL PLAYED!!!"), certifie is not null
+                ? T("Ton score certifié fait foi : regarde le classement sur le stream !", "Your certified score is what counts: watch the stream for the standings!")
+                : T("Score final : ", "Final score: ") + _value, 0);
             await Task.Delay(4000, cancellationToken);
             _overlay.Show(null, T("À toute sur Twitch !!!", "See you on Twitch!!!"), T("Le jeu va se fermer…", "The game is about to close…"), 4500);
             await Task.Delay(4500, cancellationToken);
@@ -642,7 +872,16 @@ public sealed class LiveContestClientService : BackgroundService
         }
 
         _overlay.Hide();
-        Withdraw();
+        // Concours certifie : le score part apres la fermeture du jeu, et son brouillon lit la seance a ce moment-la. Elle
+        // tient jusqu'a lui (SeanceDuConcoursCertifie) ; un concours declare la retire tout de suite, comme avant.
+        var garder = certifie is { Prete: true } && concours is { Length: > 0 }
+            && _scoringSession.Get() is { World: "stream" } seance && seance.ContestId == concours;
+        if (garder)
+        {
+            _seanceCertifiee.DesarmerApresLaPartie(concours!, certifie!.Jeu, certifie.Regle);
+        }
+
+        Withdraw(garder);
     }
 
     /// <summary>

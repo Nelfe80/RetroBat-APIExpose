@@ -173,6 +173,27 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// </summary>
     public IReadOnlyDictionary<string, string>? CheminsParJeu { get; private set; }
 
+    /// <summary>
+    /// Le fichier que la collection World Scoring a retenu pour chaque jeu ouvert au score, par « systeme/jeu » (systeme
+    /// canonique : « arcade » pour FBNeo et MAME) ; null avant la premiere passe. C'est le choix de la collection : la
+    /// version de reference d'abord, FBNeo avant MAME en arcade, un cœur qui mesure. Un concours certifie part de lui
+    /// (15/11). A la difference de <see cref="CheminsParJeu"/>, un jeu a speedruns y garde sa version admise au score.
+    /// </summary>
+    public IReadOnlyDictionary<string, string>? CheminsDuWorldScoring { get; private set; }
+
+    /// <summary>Les jeux ouverts au score, lus dans le dernier index garde sur disque ; null sans index.</summary>
+    public IReadOnlyList<OpenGame>? JeuxOuverts()
+    {
+        try
+        {
+            return LireManifeste()?.Games;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
     private string EtatPath => Path.Combine(_stateRoot, "scoring-collection.json");
 
     private string ManifestePath => Path.Combine(_stateRoot, "scoring-collection-remote.json");
@@ -587,6 +608,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         var retenus = new List<string>();
         var aDeclarer = new List<(InstalledGame Jeu, string RomGroup)>();
         var cheminsParJeu = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var cheminsDuScoring = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         _coeursParJeu.Clear();
         // POURQUOI CHAQUE JEU MANQUANT MANQUE.
         //
@@ -699,7 +721,10 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             {
                 // Un jeu ouvert aux seuls speedruns : sa ROM pour les epreuves, pas d'entree au World Scoring.
                 if (!speedrunsSeuls.Contains(cle) || manifeste.Games.Any(g => string.Equals(g.SystemId + "/" + g.RomGroup, cle, StringComparison.OrdinalIgnoreCase)))
+                {
                     retenus.Add(choisi);
+                    cheminsDuScoring[cle] = choisi;
+                }
                 var retenu = mesurables.FirstOrDefault(candidat =>
                     string.Equals(candidat.AbsolutePath, choisi, StringComparison.OrdinalIgnoreCase));
                 if (retenu is not null && verdicts[retenu].Conseil is { Length: > 0 } conseil)
@@ -734,6 +759,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         _aDeclarer = aDeclarer;
         _definitionsPerimees = perimees;
         CheminsParJeu = cheminsParJeu;
+        CheminsDuWorldScoring = cheminsDuScoring;
 
         return retenus;
     }
