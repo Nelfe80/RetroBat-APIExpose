@@ -704,6 +704,18 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             }
             confirmes = admis;
 
+            // LES CLONES SANS EPINGLE HORS DE LA COLLECTION (decision du user du 15/11) : un set que le site refuserait au prevol,
+            // faute d'EEPROM d'usine epinglee pour lui, n'est plus propose ; le joueur lit la ROM attendue.
+            var (epingles, refusEeprom) = SansSetsNonEpingles(confirmes, jeu, Md5DuFichier);
+            foreach (var ecarte in confirmes.Except(epingles))
+                _logger?.LogInformation("World Scoring : {Fichier} ecarte de {Cle} : {Raison}", ecarte.AbsolutePath, cle, refusEeprom);
+            if (epingles.Count == 0)
+            {
+                manques.Add(jeu.RomGroup + " : " + refusEeprom);
+                continue;
+            }
+            confirmes = [.. epingles];
+
             // CE QUI SE MESURE, ET RIEN D'AUTRE. Un dump reconnu lance par un coeur qui ne lit rien
             // (MAME 2003-Plus choisi en automatique pour 19xx, 2026-09-26) promettait une partie
             // classee et n'envoyait aucun score. Depuis, World Scoring impose son coeur fonctionnel
@@ -1077,6 +1089,38 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     internal static bool AUnSpeedrun(OpenGame jeu)
         => !string.Equals(jeu.SystemId, "arcade", StringComparison.OrdinalIgnoreCase)
            && RomAdmission.ReferenceDuSpeedrun(jeu.SystemId, jeu.RomGroup, RomAdmission.ReferentielSurDisque.Borne) is not null;
+
+    /// <summary>
+    /// LES CLONES SANS EPINGLE HORS DE LA COLLECTION (decision du user du 15/11, apres l'audit des ROMs parent). Quand le profil
+    /// d'un jeu d'arcade epingle une EEPROM d'usine, le site refuse au prevol un set lance sans epingle propre
+    /// (<c>profile.nvram_set_unpinned</c>) : la borne mettait pourtant ces sets dans sa collection (19xxu, espradej, gigawingj,
+    /// ket1, rayforcej, progeara, ddpdojblk...), et le joueur voyait « certifiable » puis un refus. Ils en sortent, POUR L'AVENIR :
+    /// un set deja utilise (l'un de ses ZIP sur cette borne porte un score publie, <c>published_md5</c>) reste. Le site publie
+    /// les sets epingles (<c>nvram_sets</c>, tous coeurs confondus : le prevol tranche par coeur) ; sans eux (jeu sans epingle,
+    /// index plus ancien), rien ne change. Rend les candidats gardes, et la raison a dire quand d'autres sont ecartes. Pur hors
+    /// de <paramref name="md5DuZip"/>, appele seulement pour un set non epingle.
+    /// </summary>
+    internal static (IReadOnlyList<InstalledGame> Gardes, string? Refus) SansSetsNonEpingles(
+        IReadOnlyList<InstalledGame> candidats, OpenGame jeu, Func<string, string?> md5DuZip)
+    {
+        if (!string.Equals(jeu.SystemId, "arcade", StringComparison.OrdinalIgnoreCase)
+            || jeu.NvramSets?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() is not { Count: > 0 } epingles)
+            return (candidats, null);
+        var sets = new HashSet<string>(epingles, StringComparer.OrdinalIgnoreCase);
+        var publies = new HashSet<string>((jeu.PublishedMd5 ?? []).Where(h => h.Length > 0), StringComparer.OrdinalIgnoreCase);
+        static string SetDe(InstalledGame c) => Path.GetFileNameWithoutExtension(c.AbsolutePath);
+        var utilises = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (publies.Count > 0)
+            foreach (var c in candidats.Where(c => !sets.Contains(SetDe(c))))
+                if ((c.Md5 is { Length: > 0 } connu && publies.Contains(connu)) || (md5DuZip(c.AbsolutePath) is { Length: > 0 } md5 && publies.Contains(md5)))
+                    utilises.Add(SetDe(c));
+        var gardes = candidats.Where(c => sets.Contains(SetDe(c)) || utilises.Contains(SetDe(c))).ToList();
+        if (gardes.Count == candidats.Count) return (candidats, null);
+        var ecartes = candidats.Where(c => !gardes.Contains(c)).Select(SetDe).Distinct(StringComparer.OrdinalIgnoreCase)
+            .Select(s => $"« {s} »");
+        var attendues = string.Join(", ", epingles.Distinct(StringComparer.OrdinalIgnoreCase).Order(StringComparer.Ordinal).Select(s => s + ".zip"));
+        return (gardes, $"set {string.Join(", ", ecartes)} sans EEPROM d'usine épinglée, la partie serait refusée. ROM attendue : « {attendues} »");
+    }
 
     /// <summary>LA ROM qu'il faut au joueur pour ce jeu, a lui dire quand la sienne n'entre pas ; null si on ne sait pas.</summary>
     internal string? RomAttendue(OpenGame jeu, bool speedrun)
@@ -1470,6 +1514,18 @@ public sealed record OpenGame
 
     [JsonPropertyName("rulesets")]
     public IReadOnlyList<OpenRuleset> Rulesets { get; init; } = [];
+
+    /// <summary>
+    /// (15/11) Les sets d'arcade dont le profil epingle l'EEPROM d'usine : un autre set serait refuse au prevol, il n'entre pas
+    /// dans la collection (<see cref="NelfePlayScoringCollectionSyncService.SansSetsNonEpingles"/>). Absents d'un index plus
+    /// ancien ou d'un jeu sans epingle.
+    /// </summary>
+    [JsonPropertyName("nvram_sets")]
+    public IReadOnlyList<string>? NvramSets { get; init; }
+
+    /// <summary>(15/11) Les md5 des ZIP qui portent un score publie de ce jeu : leur set reste dans la collection.</summary>
+    [JsonPropertyName("published_md5")]
+    public IReadOnlyList<string>? PublishedMd5 { get; init; }
 }
 
 public sealed record ContentHashes

@@ -122,6 +122,41 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
     }
 
     /// <summary>
+    /// LES CLONES SANS EPINGLE HORS DE LA COLLECTION (decision du user du 15/11) : le profil de 19XX epingle l'EEPROM d'usine
+    /// de 19xx ; 19xxu (clone regional admis par la regle des clones) serait refuse au prevol. Seul, il laisse le jeu dehors avec
+    /// la ROM attendue ; a cote du parent, c'est le parent qui entre. Un ZIP qui porte deja un score publie garde son set.
+    /// </summary>
+    [Fact]
+    public async Task Un_clone_sans_epingle_reste_hors_de_la_collection_avec_la_rom_attendue()
+    {
+        var clone = PoserRom("fbneo", "19xxu.zip");
+        PoserMem("arcade", "19xx", MemContenu);
+        var jeu = Jeu("arcade", "19xx", MemEmpreinte).TrimEnd('}') + ",\"nvram_sets\":[\"19xx\"],\"published_md5\":[]}";
+        var service = Service(new FauxHttp(Index("sha256:aa", jeu)), new FauxResolveur { ["19xxu.zip"] = "19xx", ["19xx.zip"] = "19xx" });
+
+        var seul = await service.SynchroniserAsync("test", CancellationToken.None);
+
+        Assert.Equal("empty", seul.State);
+        Assert.Empty(Collection());
+        Assert.Contains(seul.Missing!, m => m.StartsWith("19xx : set « 19xxu » sans EEPROM d'usine épinglée", StringComparison.Ordinal)
+            && m.EndsWith("ROM attendue : « 19xx.zip »", StringComparison.Ordinal));
+
+        var parent = PoserRom("fbneo", "19xx.zip");
+        var avecLeParent = await service.SynchroniserAsync("test", CancellationToken.None);
+        Assert.Equal("ready", avecLeParent.State);
+        Assert.Equal(new[] { parent.Replace('\\', '/') }, Collection());
+
+        // Le meme clone, dont le ZIP porte deja un score publie : son set reste (pour l'avenir seulement).
+        File.Delete(parent);
+        var deja = Jeu("arcade", "19xx", MemEmpreinte).TrimEnd('}') + ",\"nvram_sets\":[\"19xx\"],\"published_md5\":[\""
+            + NelfePlayScoringCollectionSyncService.Md5DuFichier(clone) + "\"]}";
+        var utilise = await Service(new FauxHttp(Index("sha256:bb", deja)), new FauxResolveur { ["19xxu.zip"] = "19xx" })
+            .SynchroniserAsync("test", CancellationToken.None);
+        Assert.Equal("ready", utilise.State);
+        Assert.Equal(new[] { clone.Replace('\\', '/') }, Collection());
+    }
+
+    /// <summary>
     /// Un concours certifie part du fichier que la collection a retenu (15/11) : la passe le garde par « systeme/jeu »,
     /// systeme canonique, et l'index garde sur disque donne les classements ouverts.
     /// </summary>
