@@ -833,6 +833,74 @@ public sealed class LiveContestClientService : BackgroundService
     }
 
     /// <summary>Cloture : submit transparent, bravo, et RetroArch se ferme.</summary>
+    /// <summary>L'issue d'un depot final.</summary>
+    internal enum IssueDuDepot
+    {
+        /// <summary>Recu (2xx).</summary>
+        Recu,
+        /// <summary>400 : deja depose ou trop tard (LiveContest donne volontairement la meme reponse). On s'arrete.</summary>
+        DejaDeposeOuTropTard,
+        /// <summary>Reseau, delai, 5xx, 408, 429 : un nouvel essai a un sens.</summary>
+        AReessayer,
+    }
+
+    /// <summary>Les attentes entre les essais du depot final : tous dans les 2 min de LiveContest.</summary>
+    internal static readonly TimeSpan[] AttentesDesEssais = [TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(40)];
+
+    /// <summary>Range une reponse de <c>/play/submit</c>. Pur.</summary>
+    internal static IssueDuDepot IssueDe(int? statut) => statut switch
+    {
+        >= 200 and < 300 => IssueDuDepot.Recu,
+        408 or 429 => IssueDuDepot.AReessayer,
+        >= 400 and < 500 => IssueDuDepot.DejaDeposeOuTropTard,
+        _ => IssueDuDepot.AReessayer,
+    };
+
+    private async Task<IssueDuDepot> DeposerLaValeurFinaleAsync(Enrollment enrollment, double valeur, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var http = _httpFactory.CreateClient();
+            using var request = new HttpRequestMessage(HttpMethod.Post,
+                enrollment.PlatformBase + "/play/submit");
+            request.Headers.Authorization = new("Bearer", enrollment.PlayToken);
+            request.Content = new StringContent(
+                JsonSerializer.Serialize(new { finalValue = valeur }),
+                Encoding.UTF8, "application/json");
+            using var reponse = await http.SendAsync(request, cancellationToken);
+            var issue = IssueDe((int)reponse.StatusCode);
+            if (issue == IssueDuDepot.DejaDeposeOuTropTard)
+            {
+                _logger.LogInformation("livecontest : depot final refuse ({Statut}) : deja depose ou trop tard, on s'arrete.", (int)reponse.StatusCode);
+            }
+            return issue;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return IssueDuDepot.Recu;
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "livecontest : submit final en echec");
+            return IssueDuDepot.AReessayer;
+        }
+    }
+
+    private async Task ReessayerLeDepotAsync(Enrollment enrollment, double valeur)
+    {
+        foreach (var attente in AttentesDesEssais)
+        {
+            try { await Task.Delay(attente).ConfigureAwait(false); } catch { return; }
+            var issue = await DeposerLaValeurFinaleAsync(enrollment, valeur, CancellationToken.None).ConfigureAwait(false);
+            if (issue != IssueDuDepot.AReessayer)
+            {
+                _logger.LogInformation("livecontest : depot final, nouvel essai : {Issue}.", issue);
+                return;
+            }
+        }
+        _logger.LogWarning("livecontest : depot final perdu apres {N} nouveaux essais.", AttentesDesEssais.Length);
+    }
+
     private async Task FinishAsync(Enrollment enrollment, CancellationToken cancellationToken)
     {
         if (_finished)
@@ -842,20 +910,12 @@ public sealed class LiveContestClientService : BackgroundService
 
         _finished = true;
         _phase = "finished";
-        try
+        var valeurFinale = _value;
+        if (await DeposerLaValeurFinaleAsync(enrollment, valeurFinale, cancellationToken) == IssueDuDepot.AReessayer)
         {
-            using var http = _httpFactory.CreateClient();
-            using var request = new HttpRequestMessage(HttpMethod.Post,
-                enrollment.PlatformBase + "/play/submit");
-            request.Headers.Authorization = new("Bearer", enrollment.PlayToken);
-            request.Content = new StringContent(
-                JsonSerializer.Serialize(new { finalValue = _value }),
-                Encoding.UTF8, "application/json");
-            await http.SendAsync(request, cancellationToken);
-        }
-        catch (Exception e)
-        {
-            _logger.LogWarning(e, "livecontest : submit final en echec");
+            // NOUVEAUX ESSAIS DU DEPOT FINAL (15/11) : LiveContest recoit un PREMIER depot dans les 2 min qui suivent la
+            // cloture. Les essais partent a cote, pour ne pas retarder la fin de partie a l'ecran.
+            _ = Task.Run(() => ReessayerLeDepotAsync(enrollment, valeurFinale), CancellationToken.None);
         }
 
         var certifie = _certifie;
