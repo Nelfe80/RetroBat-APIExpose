@@ -268,7 +268,7 @@ public sealed class ReplayRecorderService : BackgroundService
                 fichier = FindReplayFile(precedent);
                 etapes.Noter("fichier");
                 _current = null;
-                await PublishAsync("replay.recording.stopped", new { precedent.ReplayId, precedent.SessionId, precedent.LastFrame }, ct).ConfigureAwait(false);
+                await PublishAsync("replay.recording.stopped", new { precedent.ReplayId, precedent.SessionId, precedent.LastFrame, Raison = VoyantDuReplay.RaisonRelance }, ct).ConfigureAwait(false);
                 etapes.Noter("annonce");
                 _logger.LogInformation("Replay : {ReplayId} arrete a la relance du defi, le suivant s'ouvre sur l'etat de depart.", precedent.ReplayId);
             }
@@ -353,6 +353,10 @@ public sealed class ReplayRecorderService : BackgroundService
     private readonly GardeDesPlantages _garde;
     private string _renoncementAnnonce = "";
 
+    /// <summary>Pourquoi le dernier jeu ne s'enregistre pas (VoyantDuReplay.Motif*), et la date du plantage s'il y en a un.</summary>
+    private string _motifDuRenoncement = VoyantDuReplay.MotifRetroArch;
+    private DateTime? _plantageDuRenoncement;
+
     /// <summary>
     /// L'empreinte de RetroArch : sa version et son executable. Les nocturnes s'annoncent elles aussi
     /// « 1.22.2 » ; l'executable, lui, change a chaque mise a jour.
@@ -385,6 +389,8 @@ public sealed class ReplayRecorderService : BackgroundService
         // RETROARCH NELFEPLAY (2026-10-16) : la nocturne posee par install-retroarch-nelfeplay.bat porte le correctif de
         // l'encodeur ; sous elle, ni le coeur MAME libretro ni TGM2 ne sont ecartes. La garde des plantages veille encore.
         var corrige = RetroArchNelfePlayInstalle();
+        _motifDuRenoncement = VoyantDuReplay.MotifRetroArch;
+        _plantageDuRenoncement = null;
         if (!corrige && await CoeurSansEnregistrementAsync(status, ct).ConfigureAwait(false)) return true;
         if (!corrige && JeuSansEnregistrement(JeuxSansEnregistrement, status.Game))
         {
@@ -400,6 +406,8 @@ public sealed class ReplayRecorderService : BackgroundService
 
         var cle = CleDuJeu(status, await _ra.GetVersionAsync(ct).ConfigureAwait(false));
         if (_garde.RenoncementPour(cle) is not { } renoncement) return false;
+        _motifDuRenoncement = VoyantDuReplay.MotifPlantage;
+        _plantageDuRenoncement = renoncement.Le;
         if (!string.Equals(_renoncementAnnonce, cle, StringComparison.Ordinal))
         {
             _renoncementAnnonce = cle;
@@ -798,7 +806,7 @@ public sealed class ReplayRecorderService : BackgroundService
                 var fichier = FindReplayFile(precedent);
                 _current = null;
                 // la capture video de la tentative s'arrete avant que celle de la suivante demarre (ReplayCaptureService)
-                await PublishAsync("replay.recording.stopped", new { precedent.ReplayId, precedent.SessionId, precedent.LastFrame }, ct).ConfigureAwait(false);
+                await PublishAsync("replay.recording.stopped", new { precedent.ReplayId, precedent.SessionId, precedent.LastFrame, Raison = VoyantDuReplay.RaisonRelance }, ct).ConfigureAwait(false);
                 _logger.LogInformation("Replay : {ReplayId} arrete a la relance du defi, le suivant s'ouvre sur l'etat de depart.", precedent.ReplayId);
                 if (status is { ContentLoaded: true } && !_playback.IsBusy && StartRecent(status))
                 {
@@ -884,7 +892,7 @@ public sealed class ReplayRecorderService : BackgroundService
                     _dejaEnregistre = true;
                     // La partie se filme quand même, sans replay (ReplayCaptureService) : filmer ne
                     // passe pas par l'encodeur d'état qui plante (décision du 14 octobre 2026).
-                    await PublishAsync("replay.recording.skipped", new { status.System, status.Game }, ct).ConfigureAwait(false);
+                    await PublishAsync("replay.recording.skipped", new { status.System, status.Game, Motif = _motifDuRenoncement, Le = _plantageDuRenoncement }, ct).ConfigureAwait(false);
                     return;
                 }
                 await StartAsync(status, ct).ConfigureAwait(false);
@@ -895,15 +903,15 @@ public sealed class ReplayRecorderService : BackgroundService
         if (_runTermine)
         {
             _logger.LogInformation("Replay : {ReplayId} arrete au continue, la suite de la partie ne compte pas.", _current.ReplayId);
-            await ArreterPuisScellerAsync(_current, ct).ConfigureAwait(false);
+            await ArreterPuisScellerAsync(_current, ct, VoyantDuReplay.RaisonContinue).ConfigureAwait(false);
             return;
         }
 
         if (_arretParBaisse)
         {
             _arretParBaisse = false;
-            _logger.LogInformation("Replay : {ReplayId} arrete, le score a baisse (nouvelle partie ou remise a zero).", _current.ReplayId);
-            await ArreterPuisScellerAsync(_current, ct).ConfigureAwait(false);
+            _logger.LogInformation("Replay : {ReplayId} arrete, le score est retombe a zero (nouvelle partie).", _current.ReplayId);
+            await ArreterPuisScellerAsync(_current, ct, VoyantDuReplay.RaisonNouvellePartie).ConfigureAwait(false);
             return;
         }
 
@@ -924,13 +932,17 @@ public sealed class ReplayRecorderService : BackgroundService
 
         if (_finsVues >= 2 || _sansReponse >= 4)
         {
+            // (16/11) Le jeu toujours charge et RetroArch qui n'enregistre plus : le replay s'arrete AVANT la fin de la partie.
+            var interrompu = _finsVues >= 2 && VoyantDuReplay.Interrompu(status?.ContentLoaded, status?.Game, _current.Game, active?.Recording);
             _logger.LogInformation(_finsVues >= 2
-                    ? "Replay : {ReplayId} termine (jeu ferme ou change, ou RetroArch ne l'enregistre plus)."
+                    ? (interrompu
+                        ? "Replay : {ReplayId} interrompu : le jeu tourne encore mais RetroArch ne l'enregistre plus."
+                        : "Replay : {ReplayId} termine (jeu ferme ou change).")
                     : "Replay : {ReplayId} termine (RetroArch ne repond plus).",
                 _current.ReplayId);
             _finsVues = 0;
             _sansReponse = 0;
-            await ArreterPuisScellerAsync(_current, ct).ConfigureAwait(false);
+            await ArreterPuisScellerAsync(_current, ct, interrompu ? VoyantDuReplay.RaisonInterrompu : VoyantDuReplay.RaisonFin).ConfigureAwait(false);
         }
     }
 
@@ -941,11 +953,12 @@ public sealed class ReplayRecorderService : BackgroundService
     /// L'arret et le reperage du fichier restent ici (avant tout autre enregistrement) ; le reste part en tache, comme a la
     /// relance.
     /// </summary>
-    private async Task ArreterPuisScellerAsync(Recording rec, CancellationToken ct)
+    private async Task ArreterPuisScellerAsync(Recording rec, CancellationToken ct, string raison = VoyantDuReplay.RaisonFin)
     {
         await _ra.HaltAsync(ct).ConfigureAwait(false);
-        // La capture video de la partie s'arrete avec son replay (ReplayCaptureService).
-        await PublishAsync("replay.recording.stopped", new { rec.ReplayId, rec.SessionId, rec.LastFrame }, ct).ConfigureAwait(false);
+        // La capture video de la partie s'arrete avec son replay (ReplayCaptureService). La raison dit au voyant (VoyantDuReplay)
+        // si le replay s'arrete avant la fin de la partie.
+        await PublishAsync("replay.recording.stopped", new { rec.ReplayId, rec.SessionId, rec.LastFrame, Raison = raison }, ct).ConfigureAwait(false);
         var fichier = FindReplayFile(rec);
         if (ReferenceEquals(_current, rec)) _current = null;
         _ = Task.Run(async () =>
@@ -1021,7 +1034,7 @@ public sealed class ReplayRecorderService : BackgroundService
         // retient l'id du replay actif pour le lien replay↔score).
         // Frame : les images deja enregistrees a l'annonce ; le rapporteur en recale le debut dans l'horloge du wrapper.
         await PublishAsync("replay.recording.started",
-            new { rec.ReplayId, rec.SessionId, rec.System, rec.Game, Frame = rec.LastFrame }, ct).ConfigureAwait(false);
+            new { rec.ReplayId, rec.SessionId, rec.System, rec.Game, Frame = rec.LastFrame, Speedrun = _speedrun, rec.Categorie }, ct).ConfigureAwait(false);
         // apres l'annonce : RetroArch enregistre deja, une question de plus ne retarde rien
         rec.Dossier = await _ra.GetSavestateDirectoryAsync(ct).ConfigureAwait(false);
     }
@@ -1044,7 +1057,7 @@ public sealed class ReplayRecorderService : BackgroundService
             {
                 await _ra.HaltAsync(ct).ConfigureAwait(false);
                 // La capture video de la partie s'arrete avec son replay (ReplayCaptureService).
-                await PublishAsync("replay.recording.stopped", new { rec.ReplayId, rec.SessionId, rec.LastFrame }, ct).ConfigureAwait(false);
+                await PublishAsync("replay.recording.stopped", new { rec.ReplayId, rec.SessionId, rec.LastFrame, Raison = VoyantDuReplay.RaisonFin }, ct).ConfigureAwait(false);
             }
 
             var file = fichier ?? FindReplayFile(rec);

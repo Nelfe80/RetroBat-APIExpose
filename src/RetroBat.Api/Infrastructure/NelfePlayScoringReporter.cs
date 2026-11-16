@@ -231,6 +231,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private bool _monteeDansLEnregistrement;
     private bool _attenteMontee = true;
     private int _departsParScore;
+
+    /// <summary>
+    /// La plus basse lecture du score au debut de l'enregistrement en cours, avant toute montee (16/11) : la « valeur de depart du run »
+    /// sous laquelle une baisse est une vraie remise a zero (<see cref="RetroBat.Api.Scoring.ArretALaBaisse.EstUneRemiseAZero"/>).
+    /// </summary>
+    private long _plusBasDeLEnregistrement;
+
+    /// <summary>
+    /// Le .MEM a dit la fin de la partie (GAME_OVER) : toute baisse qui suit vaut une fin. Sous _sync. (Une lecture de demo ne
+    /// passe pas jusqu'ici ; un credit consomme pour une nouvelle partie remet le score a zero, une remise a zero ordinaire.)
+    /// </summary>
+    private bool FinDePartieVue() => _gameOverDansLaPartie;
     private const int MaxDepartsParScore = 3;
 
     /// <summary>
@@ -853,7 +865,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return t is not ("ui.game.started" or "ui.game.ended");
     }
 
-    private void HandleEvent(EventEnvelope envelope)
+    internal void HandleEvent(EventEnvelope envelope)
     {
         if (!Enabled) return;
         // La lecture d'un replay n'est pas une partie : rien de ce qui arrive pendant qu'elle
@@ -3128,13 +3140,20 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                         departParLeScore = true;
                     }
                 }
-                else if (total < avantScore)
+                else if (total < avantScore
+                         && (FinDePartieVue() || RetroBat.Api.Scoring.ArretALaBaisse.EstUneRemiseAZero(total, avantScore, _plusBasDeLEnregistrement)))
                 {
+                    // (16/11) Seule une vraie remise a zero rearme le depart au score : une fausse baisse en pleine partie
+                    // (GigaWing) relancait un enregistrement, et le run partait en morceaux.
                     _attenteMontee = true;
                 }
             }
 
-            if (_baisse.Lire(total, reference, nouvelleSalve, _enregistrementEnCours, _monteeDansLEnregistrement))
+            // La valeur de depart du run : la plus basse lecture de l'enregistrement AVANT toute montee (le score affiche au
+            // START, puis la remise a zero du jeu). Figee des que le score monte : une lecture de passage ne la deplace plus.
+            if (_enregistrementEnCours && !_monteeDansLEnregistrement && total < _plusBasDeLEnregistrement) _plusBasDeLEnregistrement = total;
+            if (_baisse.Lire(total, reference, nouvelleSalve, _enregistrementEnCours, _monteeDansLEnregistrement,
+                    _plusBasDeLEnregistrement, FinDePartieVue()))
             {
                 arretParBaisse = true;
                 _monteeDansLEnregistrement = false;
@@ -4199,11 +4218,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // baisse du score, rearmement). Le score certifie se rattache a celui qui le contient.
         List<(string Id, long Debut, long? Fin)> enregistrements;
         lock (_sync) { enregistrements = new List<(string Id, long Debut, long? Fin)>(_enregistrementsDeLaPartie); }
-        if (ReplayDuMeilleurRun(enregistrements, bestRun) is { } replayDuRun)
-        {
-            lock (_sync) { _replayDuMeilleurRun = replayDuRun; }
-            if (enregistrements.Count > 1) Trace($"replay du meilleur run : {replayDuRun} ({enregistrements.Count} enregistrements dans la partie)");
-        }
+        // LE REPLAY DOIT MONTRER LE RUN (16/11) : du depart au pic, sinon le score part sans replay (CouvertureDuReplay).
+        var replayDuRun = RetroBat.Api.Scoring.CouvertureDuReplay.DuRun(enregistrements, bestRun);
+        lock (_sync) { _replayDuMeilleurRun = replayDuRun; }
+        if (replayDuRun is not null && enregistrements.Count > 1)
+            Trace($"replay du meilleur run : {replayDuRun} ({enregistrements.Count} enregistrements dans la partie)");
+        else if (replayDuRun is null && enregistrements.Count > 0 && bestRun.Count > 0)
+            Trace($"replay : aucun des {enregistrements.Count} enregistrement(s) de la partie ne couvre le run "
+                + $"(depart {RetroBat.Api.Scoring.CouvertureDuReplay.DepartDuRun(bestRun)}, pic {bestRun[^1].frame} ; "
+                + string.Join(", ", enregistrements.Select(e => $"{e.Id} {e.Debut}..{e.Fin?.ToString() ?? "?"}"))
+                + "), le score part sans replay");
         long runPeak = bestRun.Count > 0 ? bestRun[^1].total : (finalTotal ?? 0);
         Trace($"segmentation : meilleur run {bestRun.Count}/{trajectory.Count} pts, pic={runPeak} (total global {finalTotal})");
 
@@ -4342,7 +4366,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // Le replay du meilleur run part avec le brouillon : le lien score-replay ne dependra plus de
         // la partie en cours au moment du verdict, qui peut arriver bien plus tard.
         string? replay;
-        lock (_sync) { replay = _replayDuMeilleurRun ?? _replayDeLaPartie; _replayDuMeilleurRun = null; }
+        // (16/11) Plus de repli sur le dernier replay ouvert de la partie : il ne contenait pas toujours le run.
+        lock (_sync) { replay = _replayDuMeilleurRun; _replayDuMeilleurRun = null; }
 
         var brouillon = NouveauBrouillon("solo", systemId, romGroup, sessionJson, listenerSha, coreSha, memSha,
             contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, runPeak, bestRun, trajectory,
@@ -4384,23 +4409,29 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             Trace(mort is { } perdue
                 ? $"1LC : premiere vie perdue a la frame {perdue}, score de la premiere vie {pic1lc}"
                 : $"1LC : aucune vie perdue dans le run, le 1LC est le run entier ({pic1lc})");
+            // LE REPLAY DU 1LC MONTRE LA PREMIERE VIE (16/11) : du depart du run jusqu'a la vie perdue. Le 1CC peut ne pas
+            // avoir de replay (enregistrement arrete apres la premiere vie) et le 1LC en avoir un, ou l'inverse.
+            var replay1lcChoisi = RetroBat.Api.Scoring.CouvertureDuReplay.DeLaPremiereVie(enregistrements, run1lc, mort);
+            if (replay1lcChoisi is null && enregistrements.Count > 0)
+                Trace($"1LC : aucun enregistrement ne couvre la premiere vie (depart {RetroBat.Api.Scoring.CouvertureDuReplay.DepartDuRun(run1lc)}, "
+                    + $"fin {mort ?? run1lc[^1].frame}), le 1LC part sans replay");
             // Les lectures du passeport s'arretent a la mort : rien de ce qui suit ne doit pouvoir y
             // etre retrouve par la plateforme.
             var brouillon1lc = NouveauBrouillon("1lc", systemId, romGroup, sessionJson, listenerSha, coreSha, memSha,
                 contentSha, contentMd5, contentSha1, wrapperVersion, coreName, coreVersion, pic1lc, run1lc, run1lc,
-                nvram, bios, contexteRun, 1, mort is { } m ? (RetroBat.Api.Scoring.PremiereVie.Raison, m) : finDuSolo, null, null, replay,
+                nvram, bios, contexteRun, 1, mort is { } m ? (RetroBat.Api.Scoring.PremiereVie.Raison, m) : finDuSolo, null, null, replay1lcChoisi,
                 profil1lc.TryGetProperty("ruleset", out var regle1lc) ? regle1lc.GetString() : null);
             // OU LA LECTURE DU 1LC SE FIGE, en frames du replay : la mort moins le depart de
             // l'enregistrement. Le lecteur emploie le vrai coeur, sans wrapper : il ne voit pas la mort,
             // il lui faut sa frame.
-            if (mort is { } finDeVie && replay is { } replay1lc
+            if (mort is { } finDeVie && replay1lcChoisi is { } replay1lc
                 && enregistrements.FirstOrDefault(e => string.Equals(e.Id, replay1lc, StringComparison.Ordinal)) is { Id: not null } enr
                 && finDeVie >= enr.Debut)
             {
                 brouillon1lc["arret_du_replay"] = finDeVie - enr.Debut;
                 Trace($"1LC : la lecture du replay {replay1lc} se figera a sa frame {finDeVie - enr.Debut}");
             }
-            PoserLesBornesVideo(brouillon1lc, replay, enregistrements, trajectory, run1lc,
+            PoserLesBornesVideo(brouillon1lc, replay1lcChoisi, enregistrements, trajectory, run1lc,
                 mort is { } mortDuRun ? finsDeRun.Append(mortDuRun).OrderBy(f => f).ToList() : finsDeRun);
             await PoserEtEnvoyerAsync(brouillon1lc, pic1lc, cancellationToken).ConfigureAwait(false);
         }
@@ -6011,6 +6042,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _activeReplayId = id;
             _enregistrementEnCours = true;
             _monteeDansLEnregistrement = false;
+            _plusBasDeLEnregistrement = _dernierTotalVu ?? 0;
             _attenteMontee = false;
             _baisse.Oublier();
             AppliquerLesArrets(_enregistrements, _arretsEnAttente);

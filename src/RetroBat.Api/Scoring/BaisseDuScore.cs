@@ -48,6 +48,12 @@ public sealed class SalvesDeScore
 /// sous le score d'avant la baisse ; une lecture de passage (un chiffre ecrit une image avant
 /// l'autre) est rattrapee aussitot et n'arrete plus rien. Une vraie remise a zero arrete le replay
 /// aux premiers points de la partie suivante, ou a la fin du jeu si personne ne rejoue.
+///
+/// SEULE UNE VRAIE REMISE A ZERO ARRETE LE REPLAY (16/11, GigaWing d'Old AF Gamer et de NeoGeoff). Trois « baisses » en
+/// pleine partie (1 157 820, 1 208 680, 304 719 740 pour une premiere vie finie a 246 082 370) arretaient le replay et le
+/// film, que le score relancait ensuite : un run en morceaux, et le score rattache a l'un d'eux. Une baisse ne compte plus
+/// que si le score retombe pres de zero (<see cref="EstUneRemiseAZero"/>) a la lecture qui ouvre l'attente, ou apres un GAME_OVER du .MEM
+/// (<c>finDePartieVue</c>) ; la fin d'un 1CC au credit passe, elle, par « scoring.run.ended ».
 /// </summary>
 public sealed class ArretALaBaisse
 {
@@ -57,21 +63,45 @@ public sealed class ArretALaBaisse
     public bool EnAttente => _avantLaBaisse is not null;
 
     /// <summary>
+    /// La part du score d'avant sous laquelle une baisse est une remise a zero : un millieme. Le banc du 16/11 (replay du
+    /// record GigaWing d'Old AF Gamer rejoue image par image, 0 ecart) montre un score qui ne baisse JAMAIS en memoire : la
+    /// baisse naissait du total recompose mot par mot (un mot de poids fort encore ancien, les autres deja neufs). Juste apres
+    /// la premiere retenue dans un mot (10^8 de GigaWing), ce total faux ne garde que les chiffres du bas : un dixieme le
+    /// laissait encore passer pour une remise a zero.
+    /// </summary>
+    public const long DiviseurDeLaRemiseAZero = 1000;
+
+    /// <summary>
+    /// Le score retombe-t-il a zero, ou presque ? Au plus la valeur de depart du run (<paramref name="valeurDeDepart"/>, la
+    /// plus basse lue au debut de l'enregistrement, avant toute montee), ou au plus un millieme du score d'avant. La valeur de
+    /// depart ne compte que jusqu'a la moitie du score d'avant : un enregistrement ouvert en cours de run (adopte en retard)
+    /// ne fait pas d'un creux de passage une remise a zero. Une retenue mal lue entre deux mots BCD ne retire qu'un chiffre de
+    /// poids fort a un score qui reste du meme ordre : elle n'y tombe pas. Pur.
+    /// </summary>
+    public static bool EstUneRemiseAZero(long total, long avant, long valeurDeDepart)
+        => total < avant && total <= Math.Max(Math.Min(valeurDeDepart, avant / 2), avant / DiviseurDeLaRemiseAZero);
+
+    /// <summary>
     /// Vrai quand une baisse est confirmee par cette lecture : il faut arreter le replay.
     /// <paramref name="enregistrement"/> : un replay s'enregistre ; <paramref name="monteeVue"/> :
-    /// le score y a monte.
+    /// le score y a monte ; <paramref name="valeurDeDepart"/> : la plus basse lecture de l'enregistrement ;
+    /// <paramref name="finDePartieVue"/> : le .MEM a dit GAME_OVER dans la partie, toute baisse vaut alors une fin.
     /// </summary>
-    public bool Lire(long total, long? reference, bool nouvelleSalve, bool enregistrement, bool monteeVue)
+    public bool Lire(long total, long? reference, bool nouvelleSalve, bool enregistrement, bool monteeVue,
+        long valeurDeDepart = 0, bool finDePartieVue = false)
     {
         if (_avantLaBaisse is { } avant)
         {
             // Dans la meme salve, rien n'est encore confirme ni dementi.
             if (!nouvelleSalve) return false;
             _avantLaBaisse = null;
+            // La remise a zero a ete vue en ouvrant l'attente ; la salve suivante confirme seulement que le score n'est pas revenu
+            // (une nouvelle partie a deja pu marquer ses premiers points).
             if (total < avant) return enregistrement;
         }
 
-        if (enregistrement && monteeVue && reference is { } r && total < r)
+        if (enregistrement && monteeVue && reference is { } r && total < r
+            && (finDePartieVue || EstUneRemiseAZero(total, r, valeurDeDepart)))
         {
             _avantLaBaisse = r;
         }
