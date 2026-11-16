@@ -74,6 +74,7 @@ public sealed class GardeDesPlantages
         public string? Cle;
         public string Jeu = "";
         public string RetroArch = "";
+        public DateTime DebutLe;
         public DateTime FinLe;
     }
 
@@ -85,11 +86,19 @@ public sealed class GardeDesPlantages
     private Partie? _enCours;
     private Partie? _aJuger;
     private Dictionary<string, Renoncement>? _renoncements;
+    private readonly Func<DateTime, DateTime, bool?>? _plantageWindows;
 
-    public GardeDesPlantages(string chemin, Func<DateTime>? maintenant = null, TimeSpan? delaiDeBase = null)
+    /// <param name="plantageWindows">
+    /// (17/11) Windows a-t-il vu RetroArch planter entre ces deux instants UTC (<see cref="PlantagesWindows.EnJeuEntre"/>) ?
+    /// Faux : la fin sans fin de partie n'est pas un plantage, rien n'est inscrit. Null (journal illisible) ou sans
+    /// fonction (essais) : l'ancien jugement, la fin de partie seule.
+    /// </param>
+    public GardeDesPlantages(string chemin, Func<DateTime>? maintenant = null, TimeSpan? delaiDeBase = null,
+        Func<DateTime, DateTime, bool?>? plantageWindows = null)
     {
         Chemin = chemin;
         _maintenant = maintenant ?? (() => DateTime.UtcNow);
+        _plantageWindows = plantageWindows;
         DelaiDeBase = delaiDeBase is { } d && d > TimeSpan.Zero ? (d > DelaiMaximum ? DelaiMaximum : d) : TimeSpan.FromDays(JoursParDefaut);
     }
 
@@ -100,7 +109,8 @@ public sealed class GardeDesPlantages
         try { if (config is not null) jours = config.GetValue("Replay:Record:CrashSkipDays", (double)JoursParDefaut); }
         catch (Exception) { /* valeur illisible : le defaut */ }
         return new GardeDesPlantages(Path.Combine(Path.GetDirectoryName(store.ActiveRecordingPath) ?? ".", "sans-enregistrement.json"),
-            delaiDeBase: TimeSpan.FromDays(Math.Clamp(jours, 0, DelaiMaximum.TotalDays)));
+            delaiDeBase: TimeSpan.FromDays(Math.Clamp(jours, 0, DelaiMaximum.TotalDays)),
+            plantageWindows: PlantagesWindows.EnJeuEntre);
     }
 
     /// <summary>Le fichier des jeux qu'on n'enregistre plus.</summary>
@@ -190,6 +200,7 @@ public sealed class GardeDesPlantages
             _enCours.Cle = cle;
             _enCours.Jeu = jeu;
             _enCours.RetroArch = retroArch;
+            if (_enCours.DebutLe == default) _enCours.DebutLe = _maintenant();
         }
     }
 
@@ -208,13 +219,29 @@ public sealed class GardeDesPlantages
     /// <summary>
     /// Juge le jeu termine une fois le delai passe. Rend le renoncement prononce, sinon null.
     /// </summary>
-    public Renoncement? Juger()
+    public Renoncement? Juger() => Juger(out _);
+
+    /// <summary>
+    /// Comme <see cref="Juger()"/> ; <paramref name="sortieSansPlantage"/> nomme le jeu fini sans fin de partie que le
+    /// journal Windows disculpe (aucun plantage de RetroArch pendant son enregistrement) : rien n'est inscrit.
+    /// </summary>
+    public Renoncement? Juger(out string? sortieSansPlantage)
     {
+        sortieSansPlantage = null;
         lock (_verrou)
         {
             if (_aJuger is not { } partie || _maintenant() - partie.FinLe < DelaiDeJugement) return null;
             _aJuger = null;
             if (partie.Cle is null || !partie.EcouteVue || partie.FinDePartieRecue) return null;
+            if (_plantageWindows is { } plantageWindows)
+            {
+                var debut = (partie.DebutLe == default ? partie.FinLe - FenetreSansDebut : partie.DebutLe) - TimeSpan.FromMinutes(1);
+                if (plantageWindows(debut, _maintenant()) == false)
+                {
+                    sortieSansPlantage = partie.Jeu;
+                    return null;
+                }
+            }
 
             // Une recidive (la cle a deja plante, inscription expiree ou levee) : l'historique s'allonge, le delai double.
             var maintenant = _maintenant();
@@ -228,6 +255,56 @@ public sealed class GardeDesPlantages
             Charger()[partie.Cle] = renoncement;
             Ecrire();
             return renoncement;
+        }
+    }
+
+    /// <summary>Sans heure de debut d'enregistrement, la fenetre ou chercher le plantage avant la fin vue par ES.</summary>
+    public static readonly TimeSpan FenetreSansDebut = TimeSpan.FromMinutes(30);
+
+    /// <summary>
+    /// REVOIR LES INSCRIPTIONS AU JOURNAL WINDOWS (17/11). Avant la confirmation par le journal, une sortie sans fin de
+    /// partie suffisait : les bornes portent des inscriptions sans plantage. Chaque plantage d'une inscription (active ou
+    /// non : une recidive se compte sur l'historique) se cherche dans les <see cref="FenetreSansDebut"/> qui le precedent ; ceux que le journal dement s'effacent
+    /// (un journal illisible ou trop court ne dement rien). Sans plantage restant, l'inscription disparait ; sinon son
+    /// delai se recalcule sur ce qui reste. Rend les inscriptions revues, avant revision. Sans fonction : rien.
+    /// </summary>
+    public IReadOnlyList<Renoncement> RevoirAuJournalWindows()
+    {
+        if (_plantageWindows is not { } plantageWindows) return Array.Empty<Renoncement>();
+        // Le journal se lit HORS du verrou (plusieurs secondes sur un gros journal) : la garde continue de juger.
+        List<Renoncement> inscrites;
+        lock (_verrou) inscrites = Charger().Values.ToList();
+        var dementis = new Dictionary<string, HashSet<DateTime>>(StringComparer.Ordinal);
+        foreach (var r in inscrites)
+        {
+            var faux = Historique(r).Where(le => plantageWindows(le - FenetreSansDebut, le) == false).ToHashSet();
+            if (faux.Count > 0) dementis[r.Cle] = faux;
+        }
+        if (dementis.Count == 0) return Array.Empty<Renoncement>();
+
+        lock (_verrou)
+        {
+            var revues = new List<Renoncement>();
+            foreach (var (cle, faux) in dementis)
+            {
+                if (!Charger().TryGetValue(cle, out var r)) continue;
+                var confirmes = Historique(r).Where(le => !faux.Contains(le)).ToList();
+                revues.Add(r);
+                if (confirmes.Count == 0)
+                {
+                    Charger().Remove(cle);
+                    continue;
+                }
+                var dernier = confirmes.Max();
+                // Une inscription expiree ou levee garde son prochain essai : seul son historique se corrige.
+                Charger()[cle] = r with
+                {
+                    Le = dernier, Plantages = confirmes,
+                    Jusqua = Active(r) ? dernier + Delai(DelaiDeBase, confirmes.Count) : r.Jusqua,
+                };
+            }
+            if (revues.Count > 0) Ecrire();
+            return revues;
         }
     }
 

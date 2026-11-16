@@ -229,4 +229,104 @@ public sealed class GardeDesPlantagesTests : IDisposable
         Assert.Null(second.LeveeLe);
         Assert.Equal(r.Le, second.Plantages![0]);
     }
+
+    // ---- (17/11) le journal Windows confirme le plantage ----
+
+    [Fact]
+    public void Une_fin_sans_fin_de_partie_que_Windows_dement_n_inscrit_rien()
+    {
+        (DateTime Debut, DateTime Fin)? demande = null;
+        var garde = new GardeDesPlantages(Fichier, () => _maintenant, plantageWindows: (d, f) => { demande = (d, f); return false; });
+        var debut = _maintenant;
+        Jouer(garde, propre: false);
+        _maintenant = _maintenant.AddSeconds(6);
+
+        Assert.Null(garde.Juger(out var sortie));
+        Assert.Equal("1942", sortie);
+        Assert.Null(garde.RenoncementPour(Cle()));
+        Assert.False(File.Exists(Fichier));
+        // La fenetre part une minute avant le debut de l'enregistrement et va jusqu'au jugement.
+        Assert.Equal(debut.AddMinutes(-1), demande!.Value.Debut);
+        Assert.Equal(_maintenant, demande.Value.Fin);
+    }
+
+    [Fact]
+    public void Un_plantage_que_Windows_confirme_fait_renoncer()
+    {
+        var garde = new GardeDesPlantages(Fichier, () => _maintenant, plantageWindows: (_, _) => true);
+        Jouer(garde, propre: false);
+        _maintenant = _maintenant.AddSeconds(6);
+        Assert.NotNull(garde.Juger(out var sortie));
+        Assert.Null(sortie);
+    }
+
+    [Fact]
+    public void Un_journal_illisible_garde_l_ancien_jugement()
+    {
+        var garde = new GardeDesPlantages(Fichier, () => _maintenant, plantageWindows: (_, _) => null);
+        Jouer(garde, propre: false);
+        _maintenant = _maintenant.AddSeconds(6);
+        Assert.NotNull(garde.Juger());
+    }
+
+    [Fact]
+    public void Une_partie_finie_proprement_ne_lit_pas_le_journal()
+    {
+        var lu = false;
+        var garde = new GardeDesPlantages(Fichier, () => _maintenant, plantageWindows: (_, _) => { lu = true; return true; });
+        Jouer(garde, propre: true);
+        _maintenant = _maintenant.AddSeconds(6);
+        Assert.Null(garde.Juger());
+        Assert.False(lu);
+    }
+
+    [Fact]
+    public void La_revue_efface_les_plantages_que_Windows_dement()
+    {
+        // Deux plantages inscrits sans confirmation (avant le 17/11), dont un seul vu par Windows.
+        var ancienne = Garde();
+        var premier = Planter(ancienne);
+        _maintenant = premier.Jusqua!.Value.AddHours(1);
+        var second = Planter(ancienne);
+        Assert.Equal(2, second.NombreDePlantages);
+
+        var garde = new GardeDesPlantages(Fichier, () => _maintenant,
+            plantageWindows: (debut, fin) => fin == premier.Le && debut == premier.Le - GardeDesPlantages.FenetreSansDebut);
+        var revues = garde.RevoirAuJournalWindows();
+
+        Assert.Single(revues);
+        var reste = new GardeDesPlantages(Fichier, () => _maintenant).InscriptionPour(Cle())!;
+        Assert.Equal(1, reste.NombreDePlantages);
+        Assert.Equal(premier.Le, reste.Le);
+        // Le second etait dementi : l'inscription revient au seul premier plantage, deja expire.
+        Assert.Null(garde.RenoncementPour(Cle()));
+    }
+
+    [Fact]
+    public void La_revue_retire_une_inscription_sans_aucun_plantage()
+    {
+        Planter(Garde());
+        var garde = new GardeDesPlantages(Fichier, () => _maintenant, plantageWindows: (_, _) => false);
+        Assert.Single(garde.RevoirAuJournalWindows());
+        Assert.Null(garde.InscriptionPour(Cle()));
+        Assert.Empty(garde.RevoirAuJournalWindows());
+    }
+
+    [Fact]
+    public void La_revue_ne_dement_rien_sans_journal()
+    {
+        var r = Planter(Garde());
+        var garde = new GardeDesPlantages(Fichier, () => _maintenant, plantageWindows: (_, _) => null);
+        Assert.Empty(garde.RevoirAuJournalWindows());
+        Assert.Equal(r.Le, garde.RenoncementPour(Cle())!.Le);
+    }
+
+    [Theory]
+    [InlineData("Faulting application name: retroarch.exe, version: 1.22.2.0\r\nFaulting module name: msvcrt.dll, version: 7.0\r\nException code: 0xc0000005\r\nFault offset: 0x000000000007b289", true)]
+    [InlineData("Nom de l’application défaillante : retroarch.exe, version : 1.22.2.0\r\nNom du module défaillant : msvcrt.dll\r\nCode d’exception : 0xc0000005\r\nDécalage de l’erreur : 0x000000000007b289", true)]
+    [InlineData("Faulting application name: retroarch.exe, version: 1.22.2.0\r\nFaulting module name: ntdll.dll, version: 10.0\r\nException code: 0xc0000374\r\nFault offset: 0x00000000000ffa7d", false)]
+    [InlineData("Faulting application name: emulationstation.exe, version: 2.0\r\nFaulting module name: msvcrt.dll\r\nFault offset: 0x0000000000001234", false)]
+    [InlineData("", false)]
+    public void Le_message_de_Windows_dit_un_plantage_de_RetroArch_en_jeu(string message, bool attendu)
+        => Assert.Equal(attendu, PlantagesWindows.EstUnPlantageEnJeu(message));
 }

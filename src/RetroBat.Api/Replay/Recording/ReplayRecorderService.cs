@@ -766,6 +766,7 @@ public sealed class ReplayRecorderService : BackgroundService
         try { _abonnement = _bus.Subscribe<EventEnvelope>(OnBusEvent); }
         catch (Exception ex) { _logger.LogDebug(ex, "Replay recorder : abonnement au bus impossible, START jamais vu."); }
         await TryRecoverAsync(stoppingToken).ConfigureAwait(false);
+        _ = Task.Run(RevoirLesInscriptions, CancellationToken.None);   // le journal Windows peut prendre quelques secondes
         _logger.LogInformation("Replay recorder démarré (poll RetroArch {Ms} ms).", PollInterval.TotalMilliseconds);
 
         while (!stoppingToken.IsCancellationRequested)
@@ -789,9 +790,39 @@ public sealed class ReplayRecorderService : BackgroundService
         await _annonces.ViderAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// (17/11) Les inscriptions d'avant la confirmation par le journal Windows : celles qu'il dement s'effacent au
+    /// demarrage (<see cref="GardeDesPlantages.RevoirAuJournalWindows"/>), le jeu se reenregistre des sa prochaine partie.
+    /// </summary>
+    private void RevoirLesInscriptions()
+    {
+        try
+        {
+            foreach (var r in _garde.RevoirAuJournalWindows())
+            {
+                var reste = _garde.InscriptionPour(r.Cle);
+                _logger.LogInformation(
+                    "Replay : {Jeu} etait inscrit pour {Plantages} plantage(s) de RetroArch ; le journal Windows en dement {Dementis}. {Suite}",
+                    r.Jeu, r.NombreDePlantages, r.NombreDePlantages - (reste?.NombreDePlantages ?? 0),
+                    reste is null ? "Inscription retiree : il se reenregistre des sa prochaine partie." : $"Prochain essai le {_garde.ProchainEssai(reste).ToLocalTime():yyyy-MM-dd HH:mm}.");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Replay : revue des inscriptions au journal Windows impossible");
+        }
+    }
+
     private async Task TickAsync(CancellationToken ct)
     {
-        if (_garde.Juger() is { } renoncement)
+        var renoncement = _garde.Juger(out var sortieSansPlantage);
+        if (sortieSansPlantage is not null)
+        {
+            _logger.LogInformation(
+                "Replay : {Jeu} s'est termine sans fin de partie, mais Windows n'a vu aucun plantage de RetroArch pendant son enregistrement (sortie avant l'ecoute, jeu sans definition de score) : il reste enregistre.",
+                sortieSansPlantage);
+        }
+        if (renoncement is not null)
         {
             _logger.LogWarning(
                 "Replay : RetroArch s'est arrete sans fin de partie pendant que {Jeu} s'enregistrait (coeur {Coeur}, RetroArch {RetroArch}, plantage n {Plantages}). Ce jeu ne s'enregistrera plus sur cette borne jusqu'au {Essai:yyyy-MM-dd HH:mm} (ou une mise a jour de RetroArch ou du coeur), pour ne plus perdre de partie. Liste : {Fichier}.",
