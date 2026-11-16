@@ -294,6 +294,13 @@ public sealed class SessionSpeedrun
         }
     }
 
+    /// <summary>
+    /// La valeur provisoire de la tentative courante a cette adresse (releve d'avant la premiere image du wrapper), si elle
+    /// differe de <paramref name="valeur"/> : le journal dit alors qu'un releve fait trop tot est corrige (16/11). Null sinon.
+    /// </summary>
+    public int? ProvisoireDifferente(long adresse, int valeur)
+        => !_courante.EstTerminee && _courante.EstProvisoire(adresse) && _courante.ValeurConnue(adresse) is { } v && v != valeur ? v : null;
+
     public void Relever(long adresse, int valeur)
     {
         if (_relance || Close) return;
