@@ -988,6 +988,10 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 {
                     if (!ReferenceEquals(_session, session)) return;
                     _derniersReleves[adresse] = valeur;
+                    // (16/11) un releve fait avant que le jeu n'initialise sa memoire (0xFF de fceumm), corrige ici
+                    if (session.ProvisoireDifferente(adresse, valeur) is { } avant)
+                        _journal.LogInformation("Speedrun : releve provisoire de {Adresse} corrige ({Avant} -> {Apres}), lu avant la premiere image du jeu.",
+                            Hex.Ecrire(adresse), Hex.Ecrire(avant), Hex.Ecrire(valeur));
                     session.Relever(adresse, valeur);
                     Publier();
                 }

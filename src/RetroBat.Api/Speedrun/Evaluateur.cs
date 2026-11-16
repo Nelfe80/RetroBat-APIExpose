@@ -81,6 +81,8 @@ public sealed class Evaluateur
     private long? _frameDeFin;
     private long? _horlogeDuDepart, _horlogeDeLImage;
     private long? _score;
+    private readonly HashSet<long> _relevesProvisoires = new();
+    private bool _imageRecue;
 
     public Evaluateur(Reglement reglement)
     {
@@ -100,33 +102,60 @@ public sealed class Evaluateur
 
     private bool EnCourse => Etat is EtatTentative.EnCourse or EtatTentative.ArriveeProvisoire;
 
+    /// <summary>La derniere valeur connue d'une adresse, par un evenement ou un releve ; null si on ne la connait pas.</summary>
+    public int? ValeurConnue(long adresse) => _valeurs.TryGetValue(adresse, out var v) ? v : null;
+
     /// <summary>
     /// LES ADRESSES A RELEVER DIRECTEMENT (READ_CORE_RAM), parce qu'une ligne « change » n'emet rien tant que
     /// la valeur ne bouge pas. Avant la course : celles du depart (l'acte de Green Hill 1). En course : celles
     /// du temps du jeu et des valeurs d'arrivee (les minutes restent a 0 sur un acte de moins d'une minute) ;
     /// a relever des l'arrivee provisoire, quand le timer du jeu est fige.
+    /// <para>
+    /// Avant la course, une valeur de depart connue par un releve PROVISOIRE (lu avant la premiere image du wrapper) se relit :
+    /// elle a pu etre lue avant que le jeu n'initialise sa memoire. Jamais une valeur que quitte le depart (« leaves ») : celle-la
+    /// se lit une fois, une relecture rendrait la valeur d'apres (Rambo d'Ash, 14/11).
+    /// </para>
     /// </summary>
-    /// <summary>La derniere valeur connue d'une adresse, par un evenement ou un releve ; null si on ne la connait pas.</summary>
-    public int? ValeurConnue(long adresse) => _valeurs.TryGetValue(adresse, out var v) ? v : null;
-
     public IReadOnlyList<long> AdressesInconnues
-        => (EnCourse
-                ? _r.TempsDuJeu.Select(l => l.Adresse).Concat(_r.ValeursFinales.Select(v => v.Adresse))
-                : _r.AdressesDeDepart())
-            .Distinct().Where(a => !_valeurs.ContainsKey(a)).ToList();
+    {
+        get
+        {
+            if (EnCourse)
+                return _r.TempsDuJeu.Select(l => l.Adresse).Concat(_r.ValeursFinales.Select(v => v.Adresse))
+                    .Distinct().Where(a => !_valeurs.ContainsKey(a)).ToList();
+            var quittees = _r.ValeursQuitteesAuDepart().Select(q => q.Adresse).ToHashSet();
+            return _r.AdressesDeDepart().Distinct()
+                .Where(a => !_valeurs.ContainsKey(a) || (_relevesProvisoires.Contains(a) && !quittees.Contains(a)))
+                .ToList();
+        }
+    }
 
     /// <summary>
     /// Une valeur relevee directement dans la memoire du coeur, a une adresse lue par le .MEM. Une ligne
     /// « change » n'emet rien a sa premiere lecture : sans releve, l'acte de Green Hill 1 resterait inconnu.
     /// Un releve ne remplace jamais une valeur deja connue : sur la borne, la lecture part avant que l'evenement
     /// du wrapper n'arrive et revient parfois apres lui, avec une valeur perimee.
+    /// <para>
+    /// SAUF UN RELEVE PROVISOIRE (16/11, Super Mario Bros. Any%, borne d'Old AF Gamer : le chrono ne partait jamais au premier
+    /// Start, il partait apres Hotkey + Gauche). Un releve fait avant la premiere image du wrapper a pu lire la memoire avant
+    /// que le jeu ne l'initialise : fceumm la remplit de 0xFF au demarrage, Super Mario Bros. met monde et niveau a 0 dans ses
+    /// 4 premieres images, et le prechauffage du wrapper (120 images) avale ce changement. Le 0xFF restait pour toute la
+    /// tentative et le depart (monde 0, niveau 0) n'armait jamais. Un releve provisoire est donc remplace par le releve suivant ;
+    /// il devient sur des que la tentative a recu une image du wrapper (le jeu tourne), ou qu'un evenement dit l'adresse.
+    /// </para>
     /// </summary>
     public void Relever(long adresse, int valeur)
     {
-        if (EstTerminee || _valeurs.ContainsKey(adresse)) return;
+        if (EstTerminee) return;
+        if (_valeurs.ContainsKey(adresse) && !_relevesProvisoires.Contains(adresse)) return;
         _valeurs[adresse] = valeur;
+        if (_imageRecue) _relevesProvisoires.Remove(adresse);
+        else _relevesProvisoires.Add(adresse);
         if (!EnCourse) MettreAJourArmement();
     }
+
+    /// <summary>Vrai si la valeur connue de cette adresse vient d'un releve fait avant la premiere image du wrapper.</summary>
+    public bool EstProvisoire(long adresse) => _relevesProvisoires.Contains(adresse);
 
     public void Recevoir(Signal s) => RecevoirImage(new[] { s });
 
@@ -163,7 +192,12 @@ public sealed class Evaluateur
         {
             if (!avant.ContainsKey(s.Adresse)) avant[s.Adresse] = _valeurs.TryGetValue(s.Adresse, out var p) ? p : null;
             _valeurs[s.Adresse] = s.Valeur;
+            _relevesProvisoires.Remove(s.Adresse);
         }
+
+        // Le wrapper emet apres son prechauffage : le jeu tourne, sa memoire est initialisee. Les releves suivants sont surs ;
+        // ceux d'avant restent provisoires jusqu'a leur relecture.
+        _imageRecue = true;
 
         foreach (var s in image)
         {
