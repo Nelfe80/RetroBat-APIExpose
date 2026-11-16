@@ -185,11 +185,12 @@ public sealed class ReplayRecorderService : BackgroundService
     public ReplayRecorderService(RetroArchReplayClient ra, ReplayStore store, ReplayCoreTimingProbe timing,
         IEventBus bus, RetroBat.Api.Replay.Playback.ReplayPlaybackService playback, ILogger<ReplayRecorderService> logger,
         IConfiguration config, RetroBat.Api.Media.InstalledGameCatalog? catalogue = null,
-        RetroBat.Api.Infrastructure.PartieNelfePlayService? partie = null)
+        RetroBat.Api.Infrastructure.PartieNelfePlayService? partie = null, GardeDesPlantages? garde = null)
     {
         _ra = ra; _store = store; _timing = timing; _bus = bus; _playback = playback; _logger = logger;
         _config = config; _catalogue = catalogue; _partie = partie;
-        _garde = new GardeDesPlantages(Path.Combine(Path.GetDirectoryName(store.ActiveRecordingPath) ?? ".", "sans-enregistrement.json"));
+        // La garde est partagee avec la route locale de la liste (ReplaySkipListController) : une seule copie en memoire.
+        _garde = garde ?? GardeDesPlantages.Pour(store, config);
         _annonces = new FileDEvenements(bus, logger);
         Courant = this;
     }
@@ -353,9 +354,14 @@ public sealed class ReplayRecorderService : BackgroundService
     private readonly GardeDesPlantages _garde;
     private string _renoncementAnnonce = "";
 
-    /// <summary>Pourquoi le dernier jeu ne s'enregistre pas (VoyantDuReplay.Motif*), et la date du plantage s'il y en a un.</summary>
+    /// <summary>
+    /// Pourquoi le dernier jeu ne s'enregistre pas (VoyantDuReplay.Motif*), la date du plantage s'il y en a un, et celle du
+    /// prochain essai (l'inscription expire, 16/11).
+    /// </summary>
     private string _motifDuRenoncement = VoyantDuReplay.MotifRetroArch;
     private DateTime? _plantageDuRenoncement;
+    private DateTime? _essaiDuRenoncement;
+    private string _reessaiAnnonce = "";
 
     /// <summary>
     /// L'empreinte de RetroArch : sa version et son executable. Les nocturnes s'annoncent elles aussi
@@ -391,6 +397,7 @@ public sealed class ReplayRecorderService : BackgroundService
         var corrige = RetroArchNelfePlayInstalle();
         _motifDuRenoncement = VoyantDuReplay.MotifRetroArch;
         _plantageDuRenoncement = null;
+        _essaiDuRenoncement = null;
         if (!corrige && await CoeurSansEnregistrementAsync(status, ct).ConfigureAwait(false)) return true;
         if (!corrige && JeuSansEnregistrement(JeuxSansEnregistrement, status.Game))
         {
@@ -405,15 +412,29 @@ public sealed class ReplayRecorderService : BackgroundService
         }
 
         var cle = CleDuJeu(status, await _ra.GetVersionAsync(ct).ConfigureAwait(false));
-        if (_garde.RenoncementPour(cle) is not { } renoncement) return false;
+        if (_garde.RenoncementPour(cle) is not { } renoncement)
+        {
+            // L'inscription a expire (ou a ete levee) : nouvel essai, dit une fois. S'il replante, le delai double.
+            if (_garde.InscriptionPour(cle) is { } passee && !string.Equals(_reessaiAnnonce, cle, StringComparison.Ordinal))
+            {
+                _reessaiAnnonce = cle;
+                _logger.LogInformation(
+                    "Replay : nouvel essai d'enregistrement de {Game} ({Plantages} plantage(s) de RetroArch connu(s), le dernier le {Le:yyyy-MM-dd HH:mm}). S'il replante, il ne s'enregistrera plus pendant {Jours} jours.",
+                    status.Game, passee.NombreDePlantages, passee.Le.ToLocalTime(),
+                    GardeDesPlantages.Delai(_garde.DelaiDeBase, passee.NombreDePlantages + 1).TotalDays);
+            }
+            return false;
+        }
         _motifDuRenoncement = VoyantDuReplay.MotifPlantage;
         _plantageDuRenoncement = renoncement.Le;
+        _essaiDuRenoncement = _garde.ProchainEssai(renoncement);
         if (!string.Equals(_renoncementAnnonce, cle, StringComparison.Ordinal))
         {
             _renoncementAnnonce = cle;
             _logger.LogInformation(
-                "Replay : pas d'enregistrement de {Game}. RetroArch a plante pendant son enregistrement le {Le:yyyy-MM-dd HH:mm} (coeur {Coeur}, RetroArch {RetroArch}) ; la partie compte toujours. Pour reessayer, supprimer {Fichier}.",
-                status.Game, renoncement.Le.ToLocalTime(), renoncement.Coeur, renoncement.RetroArch, _garde.Chemin);
+                "Replay : pas d'enregistrement de {Game}. RetroArch a plante pendant son enregistrement le {Le:yyyy-MM-dd HH:mm} (coeur {Coeur}, RetroArch {RetroArch}, {Plantages} plantage(s)) ; la partie compte toujours. Nouvel essai le {Essai:yyyy-MM-dd HH:mm} ; pour reessayer avant, l'outil de diagnostic (onglet Replays) ou POST /api/v1/replay/skip-list/reset.",
+                status.Game, renoncement.Le.ToLocalTime(), renoncement.Coeur, renoncement.RetroArch, renoncement.NombreDePlantages,
+                _essaiDuRenoncement.Value.ToLocalTime());
         }
         return true;
     }
@@ -773,8 +794,9 @@ public sealed class ReplayRecorderService : BackgroundService
         if (_garde.Juger() is { } renoncement)
         {
             _logger.LogWarning(
-                "Replay : RetroArch s'est arrete sans fin de partie pendant que {Jeu} s'enregistrait (coeur {Coeur}, RetroArch {RetroArch}). Ce jeu ne s'enregistrera plus sur cette borne tant que RetroArch et ce coeur restent dans ces versions, pour ne plus perdre de partie. Pour reessayer, supprimer {Fichier}.",
-                renoncement.Jeu, renoncement.Coeur, renoncement.RetroArch, _garde.Chemin);
+                "Replay : RetroArch s'est arrete sans fin de partie pendant que {Jeu} s'enregistrait (coeur {Coeur}, RetroArch {RetroArch}, plantage n {Plantages}). Ce jeu ne s'enregistrera plus sur cette borne jusqu'au {Essai:yyyy-MM-dd HH:mm} (ou une mise a jour de RetroArch ou du coeur), pour ne plus perdre de partie. Liste : {Fichier}.",
+                renoncement.Jeu, renoncement.Coeur, renoncement.RetroArch, renoncement.NombreDePlantages,
+                _garde.ProchainEssai(renoncement).ToLocalTime(), _garde.Chemin);
         }
 
         var status = await _ra.GetStatusAsync(ct).ConfigureAwait(false);
@@ -892,7 +914,7 @@ public sealed class ReplayRecorderService : BackgroundService
                     _dejaEnregistre = true;
                     // La partie se filme quand même, sans replay (ReplayCaptureService) : filmer ne
                     // passe pas par l'encodeur d'état qui plante (décision du 14 octobre 2026).
-                    await PublishAsync("replay.recording.skipped", new { status.System, status.Game, Motif = _motifDuRenoncement, Le = _plantageDuRenoncement }, ct).ConfigureAwait(false);
+                    await PublishAsync("replay.recording.skipped", new { status.System, status.Game, Motif = _motifDuRenoncement, Le = _plantageDuRenoncement, Jusqua = _essaiDuRenoncement }, ct).ConfigureAwait(false);
                     return;
                 }
                 await StartAsync(status, ct).ConfigureAwait(false);

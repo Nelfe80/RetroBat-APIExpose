@@ -144,12 +144,17 @@ public sealed class VoyantDuReplay : IHostedService, IDisposable
             RetroBat.Api.Deck.DeckNotices.Message("replay.stopped", RetroBat.Api.Deck.DeckSeverity.Warn, "REPLAY STOPPED",
                 "REST OF GAME NOT RECORDED", "replay", RetroBat.Api.Deck.DeckNotices.Long));
 
-    /// <summary>Le bandeau d'un jeu qui ne s'enregistre pas sur cette borne, avec son motif.</summary>
-    internal static Annonce SansReplay(string langue, string? motif, DateTime? plantage)
+    /// <summary>
+    /// Le bandeau d'un jeu qui ne s'enregistre pas sur cette borne, avec son motif. Apres un plantage, la date du prochain
+    /// essai (16/11 : l'inscription expire, <see cref="GardeDesPlantages"/>) quand l'enregistreur la donne.
+    /// </summary>
+    internal static Annonce SansReplay(string langue, string? motif, DateTime? plantage, DateTime? prochainEssai = null)
     {
+        static string Jour(DateTime d) => d.ToLocalTime().ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
         var detail = motif == MotifPlantage && plantage is { } le
-            ? string.Format(CultureInfo.InvariantCulture, CabinetAnnounceText.Get("replay_off_crash_sub", langue),
-                le.ToLocalTime().ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))
+            ? prochainEssai is { } essai
+                ? string.Format(CultureInfo.InvariantCulture, CabinetAnnounceText.Get("replay_off_crash_retry_sub", langue), Jour(le), Jour(essai))
+                : string.Format(CultureInfo.InvariantCulture, CabinetAnnounceText.Get("replay_off_crash_sub", langue), Jour(le))
             : CabinetAnnounceText.Get("replay_off_retroarch_sub", langue);
         return new("replay_off", CabinetAnnounceText.Get("replay_off_title", langue), detail, RetroBat.Api.Deck.DeckNotices.Long, true,
             RetroBat.Api.Deck.DeckNotices.Message("replay.off", RetroBat.Api.Deck.DeckSeverity.Warn, "NO REPLAY",
@@ -191,7 +196,7 @@ public sealed class VoyantDuReplay : IHostedService, IDisposable
                     {
                         if (!_jeuxDitsSansReplay.Add(jeu)) return;
                     }
-                    Dire(SansReplay(_langue(), Texte(p, "Motif"), Date(p, "Le")));
+                    Dire(SansReplay(_langue(), Texte(p, "Motif"), Date(p, "Le"), Date(p, "Jusqua")));
                     break;
                 }
                 case "ui.game.ended":

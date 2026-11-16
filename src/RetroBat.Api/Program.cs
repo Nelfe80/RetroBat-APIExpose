@@ -727,6 +727,10 @@ builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplaySharePolicy>();
 // Le manifeste d'un replay que la borne n'a plus : la plateforme le garde pour tout replay seme.
 builder.Services.AddSingleton<RetroBat.Api.Replay.Sharing.ReplayManifestFetcher>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Playback.ReplayPlaybackService>();
+// La liste des jeux qui ne s'enregistrent plus apres un plantage de RetroArch (16/11 : l'inscription expire) : une seule
+// instance, partagee par l'enregistreur et la route locale du diagnostic (api/v1/replay/skip-list).
+builder.Services.AddSingleton(sp => RetroBat.Api.Replay.Recording.GardeDesPlantages.Pour(
+    sp.GetRequiredService<RetroBat.Api.Replay.Storage.ReplayStore>(), sp.GetRequiredService<IConfiguration>()));
 builder.Services.AddHostedService<RetroBat.Api.Replay.Recording.ReplayRecorderService>();
 // Le voyant du replay (16/11) : bandeau au debut de l'enregistrement, a un arret avant la fin de la partie, et pour un jeu
 // qui ne s'enregistre pas sur cette borne.

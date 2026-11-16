@@ -328,6 +328,19 @@ public sealed class ReplaysCouvertureTests
         Assert.Equal(CabinetAnnounceText.Get("replay_off_retroarch_sub", "fr"), v.Montrees[1].Detail);
     }
 
+    [Fact]
+    public void Un_jeu_sans_replay_apres_un_plantage_dit_la_date_du_prochain_essai()
+    {
+        // 16/11 : l'inscription expire ; l'enregistreur publie la date du prochain essai (Jusqua) avec le motif.
+        var v = new Voyant();
+        var le = new DateTime(2026, 11, 15, 21, 4, 0, DateTimeKind.Utc);
+        var jusqua = le.AddDays(7);
+        v.Evenement("replay.recording.skipped", new { System = "fbneo", Game = "19xx", Motif = VoyantDuReplay.MotifPlantage, Le = le, Jusqua = jusqua });
+        var a = Assert.Single(v.Montrees);
+        Assert.Equal(string.Format(CabinetAnnounceText.Get("replay_off_crash_retry_sub", "fr"),
+            le.ToLocalTime().ToString("yyyy-MM-dd"), jusqua.ToLocalTime().ToString("yyyy-MM-dd")), a.Detail);
+    }
+
     [Theory]
     [InlineData(true, "gigawing", true)]
     [InlineData(false, "gigawing", false)]

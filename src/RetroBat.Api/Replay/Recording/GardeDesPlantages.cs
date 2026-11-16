@@ -22,16 +22,49 @@ namespace RetroBat.Api.Replay.Recording;
 /// LA PARADE : des le premier plantage, ce jeu ne s'enregistre plus sur cette borne, avec ce coeur
 /// et ce RetroArch. Un film qui manque ne coute presque rien ; une partie perdue coute la partie.
 /// La cle porte l'empreinte du coeur et celle de RetroArch : une mise a jour de l'un ou de l'autre
-/// fait reessayer. Pour reessayer a la main, supprimer le fichier.
+/// fait reessayer.
+///
+/// L'INSCRIPTION EXPIRE (16/11, decision user). Chez Old AF Gamer, 19XX et Gunlock sont entres le 15/11 (msvcrt.dll) alors
+/// que 19XX s'enregistre tres bien ailleurs le meme jour : le plantage tient a une machine et a un moment (Vulkan, shaders
+/// en essai). Inscrits pour une cle qui ne change jamais en pratique, ils ne s'enregistraient plus jamais. Une inscription
+/// dure maintenant <see cref="DelaiDeBase"/> (Replay:Record:CrashSkipDays, 7 jours par defaut), puis le jeu est retente.
+/// S'il replante, il revient pour un delai qui double a chaque recidive (7, 14, 28 jours...), plafonne a
+/// <see cref="DelaiMaximum"/>. Le fichier garde l'historique des plantages de chaque cle, meme une fois l'inscription
+/// expiree ou levee : une recidive se compte toujours. Une inscription se leve a la main par la route locale
+/// POST /api/v1/replay/skip-list/reset (outil de diagnostic), qui garde aussi cet historique.
 /// </summary>
 public sealed class GardeDesPlantages
 {
     /// <summary>La fin de partie arrive avant la fin du jeu vue par ES ; on lui laisse ce delai.</summary>
     public static readonly TimeSpan DelaiDeJugement = TimeSpan.FromSeconds(5);
 
-    public sealed record Renoncement(string Cle, string Jeu, string Coeur, string RetroArch, DateTime Le);
+    /// <summary>
+    /// Une inscription. <see cref="Le"/> : le dernier plantage ; <see cref="Jusqua"/> : le prochain essai (null dans un
+    /// fichier v1, lu comme <see cref="Le"/> + le delai de base) ; <see cref="Plantages"/> : chaque plantage de cette cle ;
+    /// <see cref="LeveeLe"/> : la levee a la main, s'il y en a eu une depuis le dernier plantage.
+    /// </summary>
+    public sealed record Renoncement(string Cle, string Jeu, string Coeur, string RetroArch, DateTime Le)
+    {
+        public DateTime? Jusqua { get; init; }
+        public List<DateTime>? Plantages { get; init; }
+        public DateTime? LeveeLe { get; init; }
+
+        /// <summary>Le nombre de plantages connus (un au moins : celui de <see cref="Le"/>).</summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        public int NombreDePlantages => Math.Max(1, Plantages?.Count ?? 0);
+
+        /// <summary>Le systeme, lu dans la cle (« systeme/jeu|... »).</summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        public string Systeme => Cle.IndexOf('/') is var i and > 0 ? Cle[..i] : "";
+    }
 
     private sealed record Fichier(string Schema, List<Renoncement> Jeux);
+
+    /// <summary>Le delai par defaut d'une premiere inscription, en jours (Replay:Record:CrashSkipDays).</summary>
+    public const int JoursParDefaut = 7;
+
+    /// <summary>Le plafond du delai, quelle que soit la recidive.</summary>
+    public static readonly TimeSpan DelaiMaximum = TimeSpan.FromDays(365);
 
     private sealed class Partie
     {
@@ -44,7 +77,7 @@ public sealed class GardeDesPlantages
         public DateTime FinLe;
     }
 
-    private const string Schema = "nelfe.replay.sans-enregistrement.v1";
+    private const string Schema = "nelfe.replay.sans-enregistrement.v2";
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     private readonly object _verrou = new();
@@ -53,14 +86,45 @@ public sealed class GardeDesPlantages
     private Partie? _aJuger;
     private Dictionary<string, Renoncement>? _renoncements;
 
-    public GardeDesPlantages(string chemin, Func<DateTime>? maintenant = null)
+    public GardeDesPlantages(string chemin, Func<DateTime>? maintenant = null, TimeSpan? delaiDeBase = null)
     {
         Chemin = chemin;
         _maintenant = maintenant ?? (() => DateTime.UtcNow);
+        DelaiDeBase = delaiDeBase is { } d && d > TimeSpan.Zero ? (d > DelaiMaximum ? DelaiMaximum : d) : TimeSpan.FromDays(JoursParDefaut);
+    }
+
+    /// <summary>La garde de cette borne : a cote de l'enregistrement en cours, delai lu dans Replay:Record:CrashSkipDays.</summary>
+    public static GardeDesPlantages Pour(RetroBat.Api.Replay.Storage.ReplayStore store, IConfiguration? config)
+    {
+        double jours = JoursParDefaut;
+        try { if (config is not null) jours = config.GetValue("Replay:Record:CrashSkipDays", (double)JoursParDefaut); }
+        catch (Exception) { /* valeur illisible : le defaut */ }
+        return new GardeDesPlantages(Path.Combine(Path.GetDirectoryName(store.ActiveRecordingPath) ?? ".", "sans-enregistrement.json"),
+            delaiDeBase: TimeSpan.FromDays(Math.Clamp(jours, 0, DelaiMaximum.TotalDays)));
     }
 
     /// <summary>Le fichier des jeux qu'on n'enregistre plus.</summary>
     public string Chemin { get; }
+
+    /// <summary>Le delai d'une premiere inscription ; il double a chaque recidive.</summary>
+    public TimeSpan DelaiDeBase { get; }
+
+    /// <summary>
+    /// Le delai d'une inscription apres <paramref name="plantages"/> plantages : la base, doublee a chaque recidive, au plus
+    /// <see cref="DelaiMaximum"/>. Pur.
+    /// </summary>
+    public static TimeSpan Delai(TimeSpan baseDuDelai, int plantages)
+    {
+        var delai = baseDuDelai;
+        for (var i = 1; i < plantages && delai < DelaiMaximum; i++) delai += delai;
+        return delai > DelaiMaximum ? DelaiMaximum : delai;
+    }
+
+    /// <summary>Le prochain essai d'une inscription (une inscription v1 n'en a pas : son plantage + la base).</summary>
+    public DateTime ProchainEssai(Renoncement r) => r.Jusqua ?? r.Le + DelaiDeBase;
+
+    /// <summary>L'inscription tient-elle encore a cet instant ?</summary>
+    public bool Active(Renoncement r) => _maintenant() < ProchainEssai(r);
 
     /// <summary>La cle d'un jeu sous un coeur et un RetroArch donnes.</summary>
     public static string Cle(string systeme, string jeu, string? crc, string coeur, string retroArch)
@@ -152,18 +216,60 @@ public sealed class GardeDesPlantages
             _aJuger = null;
             if (partie.Cle is null || !partie.EcouteVue || partie.FinDePartieRecue) return null;
 
-            var renoncement = new Renoncement(partie.Cle, partie.Jeu, partie.Coeur.Length > 0 ? partie.Coeur : "?", partie.RetroArch, _maintenant());
+            // Une recidive (la cle a deja plante, inscription expiree ou levee) : l'historique s'allonge, le delai double.
+            var maintenant = _maintenant();
+            var plantages = Charger().TryGetValue(partie.Cle, out var avant) ? Historique(avant) : new List<DateTime>();
+            plantages.Add(maintenant);
+            var renoncement = new Renoncement(partie.Cle, partie.Jeu, partie.Coeur.Length > 0 ? partie.Coeur : "?", partie.RetroArch, maintenant)
+            {
+                Plantages = plantages,
+                Jusqua = maintenant + Delai(DelaiDeBase, plantages.Count),
+            };
             Charger()[partie.Cle] = renoncement;
             Ecrire();
             return renoncement;
         }
     }
 
-    /// <summary>Le renoncement qui vise cette cle, s'il y en a un.</summary>
+    /// <summary>Le renoncement qui vise cette cle, s'il tient encore (une inscription expiree fait reessayer).</summary>
     public Renoncement? RenoncementPour(string cle)
+    {
+        lock (_verrou) return Charger().TryGetValue(cle, out var renoncement) && Active(renoncement) ? renoncement : null;
+    }
+
+    /// <summary>L'inscription de cette cle, qu'elle tienne encore ou non (l'historique de ses plantages).</summary>
+    public Renoncement? InscriptionPour(string cle)
     {
         lock (_verrou) return Charger().TryGetValue(cle, out var renoncement) ? renoncement : null;
     }
+
+    /// <summary>Toutes les inscriptions du fichier, actives ou non, la plus recente en tete.</summary>
+    public IReadOnlyList<Renoncement> Inscriptions()
+    {
+        lock (_verrou) return Charger().Values.OrderByDescending(r => r.Le).ToList();
+    }
+
+    /// <summary>
+    /// Leve a la main les inscriptions actives (toutes, ou celle de <paramref name="cle"/>) : le jeu se retente des sa
+    /// prochaine partie. L'historique reste, un nouveau plantage compte donc comme une recidive. Rend les inscriptions levees.
+    /// </summary>
+    public IReadOnlyList<Renoncement> Lever(string? cle = null)
+    {
+        lock (_verrou)
+        {
+            var maintenant = _maintenant();
+            var levees = Charger().Values
+                .Where(r => (cle is null || string.Equals(r.Cle, cle, StringComparison.Ordinal)) && Active(r))
+                .Select(r => r with { Jusqua = maintenant, LeveeLe = maintenant, Plantages = Historique(r) })
+                .ToList();
+            foreach (var r in levees) Charger()[r.Cle] = r;
+            if (levees.Count > 0) Ecrire();
+            return levees;
+        }
+    }
+
+    private static List<DateTime> Historique(Renoncement r)
+        => r.Plantages is { Count: > 0 } connus ? new List<DateTime>(connus) : new List<DateTime> { r.Le };
 
     private Dictionary<string, Renoncement> Charger()
     {
