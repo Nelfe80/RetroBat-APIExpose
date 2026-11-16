@@ -2207,6 +2207,41 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
     };
 
     /// <summary>
+    /// REGLE DU USER (16/11, un joueur qui avait tout scrape dans RetroBat voyait son marquee retomber sur le logo du
+    /// systeme) : quand la migration des medias vers le magasin est COUPEE (global.apiexpose.media_migration, le defaut),
+    /// les medias de roms\ que la gamelist cite sont servis, sans attendre MediaDiscovery.GamelistMediaEnabled. Le
+    /// remplissage reste additif : il n'ajoute qu'un genre que le magasin n'a pas. Le mode se relit au plus toutes les
+    /// 30 s (es_settings.cfg est un fichier).
+    /// </summary>
+    private bool LireLesMediasDesRoms()
+    {
+        if (_gamelistMediaEnabled)
+        {
+            return true;
+        }
+
+        var maintenant = Environment.TickCount64;
+        if (maintenant - Interlocked.Read(ref _migrationLueA) > 30_000)
+        {
+            try
+            {
+                _migrationCoupee = string.Equals(_runtimeOptions.GetMediaMigrationMode(), "none", StringComparison.OrdinalIgnoreCase);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
+            {
+                _migrationCoupee = true;
+            }
+
+            Interlocked.Exchange(ref _migrationLueA, maintenant);
+        }
+
+        return _migrationCoupee;
+    }
+
+    private long _migrationLueA = long.MinValue / 2;
+    private volatile bool _migrationCoupee = true;
+
+    /// <summary>
     /// LOT 7 - the game's canonical asset table, plus (only when MediaDiscovery.GamelistMediaEnabled
     /// is on) any kind the canonical store LACKS, filled from the user gamelist. So a roms/ medium the
     /// gamelist references but that was never migrated becomes visible, WITHOUT ever overriding a
@@ -2218,7 +2253,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         string systemId, string gameSlug, string? gamePath, IReadOnlyList<string> roots)
     {
         var canonical = BuildAssetTable(roots, DisplayableMediaKinds);
-        if (!_gamelistMediaEnabled || string.IsNullOrWhiteSpace(gamePath))
+        if (!LireLesMediasDesRoms() || string.IsNullOrWhiteSpace(gamePath))
         {
             return canonical;
         }
