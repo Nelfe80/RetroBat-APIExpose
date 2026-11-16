@@ -13,6 +13,9 @@ public sealed class ScoreLiveEvent
     public int Player { get; set; } = 1;
     public long Score { get; set; }
     public long? RawValue { get; set; }
+    /// <summary>L'image du wrapper dont ce total est complet (tous ses mots appliques) ; null sans image (pont MAME, sorties).
+    /// </summary>
+    public long? Frame { get; set; }
     public bool Composed { get; set; }
     public string Confidence { get; set; } = "medium";
     public string DefinitionFile { get; set; } = string.Empty;

@@ -117,6 +117,8 @@ public sealed class LiveScoreAggregatorProvider : IProvider
 
     private void ResetForFrontendEvent()
     {
+        // Le dernier total d'une image en attente part avant l'oubli : c'est souvent celui de la fin de partie.
+        ViderLesImagesEnAttente();
         lock (_sync)
         {
             _scores.Clear();
@@ -268,7 +270,9 @@ public sealed class LiveScoreAggregatorProvider : IProvider
             sourceKey,
             definitionFile,
             part,
-            confidence);
+            confidence,
+            // L'image du wrapper (signal.Frame) : le total attend les autres mots de cette image.
+            ReadLong(signal, "Frame"));
     }
 
     private void TryHandleMameOutputScore(EventEnvelope envelope)
@@ -402,6 +406,20 @@ public sealed class LiveScoreAggregatorProvider : IProvider
             "high");
     }
 
+    /// <summary>
+    /// UN TOTAL PAR IMAGE, TOUS SES MOTS APPLIQUES (16/11, Giga Wing d'Old AF Gamer, Dangun Feveron de neogeoff). Le wrapper
+    /// signale chaque mot d'un score sur son propre evenement ; quand plusieurs mots changent a la meme image (une retenue d'un
+    /// mot BCD dans le suivant, une restauration des hiscores de FBNeo), le total recompose apres le premier mot melangeait un
+    /// mot neuf et un mot ancien : Giga Wing, image 1876, 208 259 050 au lieu de 282 485 120 et plus (le score ne baisse jamais
+    /// en memoire), une fausse baisse qui arretait le replay et entrait dans la trajectoire du passeport ; Dangun Feveron,
+    /// 10 000 puis 12 989 a la meme image, une fausse montee. Un evenement qui porte son image (signal.Frame du wrapper) attend
+    /// donc les autres mots de cette image : le total part quand une autre image arrive pour ce score, ou apres
+    /// <see cref="DelaiDeLImage"/> sans rien de neuf (le dernier total d'une partie). Il part avec son image
+    /// (<see cref="ScoreLiveEvent.Frame"/>). Sans image (pont MAME, sorties, RetroAchievements, copie retroarch.score du meme
+    /// mot), rien ne change : le total part aussitot, sauf si une image du meme score attend encore (la copie ne la devance pas).
+    /// </summary>
+    internal TimeSpan DelaiDeLImage { get; set; } = TimeSpan.FromMilliseconds(100);
+
     private void PublishIfChanged(
         string source,
         string scoreKind,
@@ -411,12 +429,16 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         string sourceKey,
         string definitionFile,
         ScorePartState part,
-        string confidence)
+        string confidence,
+        long? frame = null)
     {
-        ScoreLiveEvent? scoreEvent = null;
+        var aPublier = new List<ScoreLiveEvent>(2);
+        var image = frame is > 0 ? frame : null;
+        string accumulatorKey;
+        long version = 0;
         lock (_sync)
         {
-            var accumulatorKey = BuildAccumulatorKey(source, scoreKind, systemId, rom, player, sourceKey);
+            accumulatorKey = BuildAccumulatorKey(source, scoreKind, systemId, rom, player, sourceKey);
             if (!_scores.TryGetValue(accumulatorKey, out var accumulator))
             {
                 accumulator = new ScoreAccumulator(source, systemId, rom, player, sourceKey);
@@ -424,58 +446,127 @@ public sealed class LiveScoreAggregatorProvider : IProvider
             }
 
             accumulator.DefinitionFile = definitionFile;
+            accumulator.ScoreKind = scoreKind;
             accumulator.Confidence = ChooseConfidence(accumulator.Confidence, confidence);
-            if (!TryKeepWidest(accumulator, part))
+
+            // Une autre image arrive : celle qui attendait est complete, son total part avant que ce mot ne la touche.
+            if (image is { } nouvelle && accumulator.ImageEnAttente is { } attente && attente != nouvelle)
             {
-                return;
+                if (Composer(accumulator, accumulator.DernierMot ?? part, attente) is { } complete) aPublier.Add(complete);
+                accumulator.ImageEnAttente = null;
             }
 
-            var score = accumulator.Parts.Values.Sum(item => item.Value * item.Weight);
-            if (score < 0 || score == accumulator.LastPublishedScore)
+            if (TryKeepWidest(accumulator, part))
             {
-                return;
+                accumulator.DernierMot = part;
+                if (image is { } i)
+                {
+                    accumulator.ImageEnAttente = i;
+                    version = ++accumulator.VersionDeLImage;
+                }
+                else if (accumulator.ImageEnAttente is null && Composer(accumulator, part, null) is { } aussitot)
+                {
+                    aPublier.Add(aussitot);
+                }
             }
-
-            accumulator.LastPublishedScore = score;
-            scoreEvent = new ScoreLiveEvent
-            {
-                Source = source,
-                ScoreKind = scoreKind,
-                SourceKey = sourceKey,
-                SystemId = systemId,
-                Rom = rom,
-                Player = player,
-                Score = score,
-                RawValue = part.Value,
-                Composed = accumulator.Parts.Count > 1 || accumulator.Parts.Values.Any(item => item.Weight != 1),
-                Confidence = accumulator.Confidence,
-                DefinitionFile = accumulator.DefinitionFile,
-                Ts = DateTime.UtcNow,
-                Parts = accumulator.Parts.Values
-                    .OrderBy(item => item.Address, StringComparer.OrdinalIgnoreCase)
-                    .Select(item => new ScoreLivePart
-                    {
-                        Key = item.Key,
-                        Address = item.Address,
-                        RawValueHex = item.RawValueHex,
-                        Encoding = item.Encoding,
-                        Value = item.Value,
-                        Weight = item.Weight,
-                        Contribution = item.Value * item.Weight,
-                        Description = item.Description
-                    })
-                    .ToList()
-            };
         }
 
-        if (scoreEvent is not null)
+        foreach (var scoreEvent in aPublier)
         {
-            _ = _eventBus.PublishAsync(new EventEnvelope
-            {
-                Type = "score.live.changed",
-                Payload = scoreEvent
-            });
+            Publier(scoreEvent);
         }
+
+        if (version > 0)
+        {
+            _ = Task.Delay(DelaiDeLImage).ContinueWith(_ => ViderLImage(accumulatorKey, version), TaskScheduler.Default);
+        }
+    }
+
+    /// <summary>Le total de l'image en attente part, si rien de neuf n'est arrive depuis (meme version).</summary>
+    private void ViderLImage(string accumulatorKey, long version)
+    {
+        ScoreLiveEvent? scoreEvent = null;
+        lock (_sync)
+        {
+            if (_scores.TryGetValue(accumulatorKey, out var accumulator)
+                && accumulator.ImageEnAttente is { } attente
+                && accumulator.VersionDeLImage == version
+                && accumulator.DernierMot is { } dernier)
+            {
+                scoreEvent = Composer(accumulator, dernier, attente);
+                accumulator.ImageEnAttente = null;
+            }
+        }
+
+        if (scoreEvent is not null) Publier(scoreEvent);
+    }
+
+    /// <summary>Tous les totaux d'image en attente partent maintenant (fin de partie, et les tests).</summary>
+    internal void ViderLesImagesEnAttente()
+    {
+        var aPublier = new List<ScoreLiveEvent>();
+        lock (_sync)
+        {
+            foreach (var accumulator in _scores.Values)
+            {
+                if (accumulator.ImageEnAttente is not { } attente || accumulator.DernierMot is not { } dernier) continue;
+                if (Composer(accumulator, dernier, attente) is { } scoreEvent) aPublier.Add(scoreEvent);
+                accumulator.ImageEnAttente = null;
+            }
+        }
+
+        foreach (var scoreEvent in aPublier) Publier(scoreEvent);
+    }
+
+    /// <summary>Le total des parts, s'il a change depuis le dernier publie ; appele sous _sync.</summary>
+    private static ScoreLiveEvent? Composer(ScoreAccumulator accumulator, ScorePartState part, long? frame)
+    {
+        var score = accumulator.Parts.Values.Sum(item => item.Value * item.Weight);
+        if (score < 0 || score == accumulator.LastPublishedScore)
+        {
+            return null;
+        }
+
+        accumulator.LastPublishedScore = score;
+        return new ScoreLiveEvent
+        {
+            Source = accumulator.Source,
+            ScoreKind = accumulator.ScoreKind,
+            SourceKey = accumulator.SourceKey,
+            SystemId = accumulator.SystemId,
+            Rom = accumulator.Rom,
+            Player = accumulator.Player,
+            Score = score,
+            RawValue = part.Value,
+            Frame = frame,
+            Composed = accumulator.Parts.Count > 1 || accumulator.Parts.Values.Any(item => item.Weight != 1),
+            Confidence = accumulator.Confidence,
+            DefinitionFile = accumulator.DefinitionFile,
+            Ts = DateTime.UtcNow,
+            Parts = accumulator.Parts.Values
+                .OrderBy(item => item.Address, StringComparer.OrdinalIgnoreCase)
+                .Select(item => new ScoreLivePart
+                {
+                    Key = item.Key,
+                    Address = item.Address,
+                    RawValueHex = item.RawValueHex,
+                    Encoding = item.Encoding,
+                    Value = item.Value,
+                    Weight = item.Weight,
+                    Contribution = item.Value * item.Weight,
+                    Description = item.Description
+                })
+                .ToList()
+        };
+    }
+
+    private void Publier(ScoreLiveEvent scoreEvent)
+    {
+        _ = _eventBus.PublishAsync(new EventEnvelope
+        {
+            Type = "score.live.changed",
+            Payload = scoreEvent
+        });
     }
 
     private static bool IsScoreAction(string? action, string channel, string eventType)
@@ -1431,6 +1522,13 @@ public sealed class LiveScoreAggregatorProvider : IProvider
         public string DefinitionFile { get; set; } = string.Empty;
         public string Confidence { get; set; } = "low";
         public long? LastPublishedScore { get; set; }
+        public string ScoreKind { get; set; } = "game";
+        /// <summary>L'image dont le total attend ses autres mots (null : rien n'attend).</summary>
+        public long? ImageEnAttente { get; set; }
+        /// <summary>Augmente a chaque mot d'une image : le delai ne vide que l'image qu'il a vue.</summary>
+        public long VersionDeLImage { get; set; }
+        /// <summary>Le dernier mot applique (la valeur brute du total publie).</summary>
+        public ScorePartState? DernierMot { get; set; }
         public Dictionary<string, ScorePartState> Parts { get; } = new(StringComparer.OrdinalIgnoreCase);
     }
 

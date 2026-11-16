@@ -3075,6 +3075,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private void CaptureTotal(JsonElement root)
     {
         if (!root.TryGetProperty("Score", out var s) || !s.TryGetInt64(out var total)) return;
+        // L'image dont ce total est complet (16/11, LiveScoreAggregatorProvider : tous les mots de l'image appliques) ; sans
+        // elle (pont MAME, sorties), l'image courante, comme avant.
+        long? imageDuTotal = root.TryGetProperty("Frame", out var f) && f.ValueKind == JsonValueKind.Number && f.TryGetInt64(out var fv) && fv > 0 ? fv : null;
         var joueurDuScore = JoueurDuScore(root);
         if (joueurDuScore != 1)
         {
@@ -3087,7 +3090,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 }
                 if (lectures.Count == 0 || lectures[^1].total != total)
                 {
-                    lectures.Add((_lastFrame, total));
+                    lectures.Add((imageDuTotal ?? _lastFrame, total));
                     if (lectures.Count > MaxTrajectory) lectures.RemoveAt(0);
                 }
             }
@@ -3160,7 +3163,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // Le total agrégé à la frame courante : la trajectoire vérifiable du score.
             if (_trajectory.Count == 0 || _trajectory[^1].total != total)
             {
-                _trajectory.Add((_lastFrame, total));
+                _trajectory.Add((imageDuTotal ?? _lastFrame, total));
                 _horsJeu.Add(!_enJeu);
                 _contextes.Add(_contexte);
                 if (_trajectory.Count > MaxTrajectory) { _trajectory.RemoveAt(0); _horsJeu.RemoveAt(0); _contextes.RemoveAt(0); }
