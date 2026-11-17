@@ -88,19 +88,54 @@ public sealed class ReplayStore : IReplayManifestStore, IReplayObjectStore, IRep
     }
 
     // ── objets adressés par contenu ─────────────────────────────────────────
-    public async Task<ReplayObjectRef> ImportObjectAsync(string sourcePath, CancellationToken ct)
+
+    /// <summary>
+    /// Range un replay dans le magasin, DEJA COMPRESSE (17/11/2026). Avant, l'objet entrait brut et
+    /// le compacteur le transformait ensuite sur place (lire X, ecrire X.gz, effacer X, cent fichiers
+    /// d'affilee) : c'est trait pour trait ce que guettent les antiransomwares, et Malwarebytes a mis
+    /// l'API en quarantaine chez un joueur (« Malware.Ransom.Agent.Generic »). Desormais la source
+    /// (fichier de RetroArch ou telechargement) est lue UNE fois, empreinte et compression ensemble,
+    /// et l'archive nait dans temp/ avant de prendre sa place : aucun fichier du magasin n'est
+    /// reecrit, et la source n'est jamais touchee.
+    /// </summary>
+    public Task<ReplayObjectRef> ImportObjectAsync(string sourcePath, CancellationToken ct)
+        => ImportObjectAsync(sourcePath, compresser: true, ct);
+
+    internal async Task<ReplayObjectRef> ImportObjectAsync(string sourcePath, bool compresser, CancellationToken ct)
     {
         var chrono = System.Diagnostics.Stopwatch.StartNew();
-        var (sha, size) = await HashFileAsync(sourcePath, ct).ConfigureAwait(false);
-        var dir = Path.Combine(_objects, sha[..2]);
-        Directory.CreateDirectory(dir);
-        var dest = Path.Combine(dir, sha + ".replay");
-        if (!File.Exists(dest) || new FileInfo(dest).Length != size)
-            File.Copy(sourcePath, dest, overwrite: true); // dedup : si déjà présent et bonne taille, on garde
-        // Un import lit l'objet DEUX fois (hash puis copie) : sur dix-sept mega-octets, ca se sent
-        // pendant une partie. On le dit, avec qui l'a demande.
-        RetroBat.Api.Infrastructure.IoTrace.Balayage(_logger, sourcePath, size * 2, chrono.ElapsedMilliseconds);
-        return new ReplayObjectRef(sha, size);
+        if (!compresser)
+        {
+            var (shaBrut, tailleBrut) = await HashFileAsync(sourcePath, ct).ConfigureAwait(false);
+            var dest = ObjectPath(shaBrut);
+            Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
+            if (!File.Exists(dest) || new FileInfo(dest).Length != tailleBrut)
+                File.Copy(sourcePath, dest, overwrite: true); // dedup : si déjà présent et bonne taille, on garde
+            RetroBat.Api.Infrastructure.IoTrace.Balayage(_logger, sourcePath, tailleBrut * 2, chrono.ElapsedMilliseconds);
+            return new ReplayObjectRef(shaBrut, tailleBrut);
+        }
+
+        Directory.CreateDirectory(_temp);
+        var tmp = Path.Combine(_temp, $"import-{Guid.NewGuid():N}.gz.part");
+        try
+        {
+            var (sha, size) = await ReplayCompression.CompresserEtMesurerAsync(sourcePath, tmp, ct).ConfigureAwait(false);
+            var brut = ObjectPath(sha);
+            var gz = ObjectPathGz(sha);
+            Directory.CreateDirectory(Path.GetDirectoryName(gz)!);
+            // Un brut de la mauvaise taille (copie interrompue d'une ancienne version) serait lu
+            // avant l'archive par EnsureRawAsync : il part.
+            if (File.Exists(brut) && new FileInfo(brut).Length != size) DeleteQuiet(brut);
+            // dedup : une archive deja la a le meme contenu (son nom est l'empreinte du brut)
+            try { if (!File.Exists(gz)) File.Move(tmp, gz); }
+            catch (IOException) when (File.Exists(gz)) { /* un import concurrent du meme objet */ }
+            RetroBat.Api.Infrastructure.IoTrace.Balayage(_logger, sourcePath, size, chrono.ElapsedMilliseconds);
+            return new ReplayObjectRef(sha, size);
+        }
+        finally
+        {
+            DeleteQuiet(tmp);
+        }
     }
 
     public string ObjectPath(string sha256) => EmpreinteSure(sha256)
@@ -188,7 +223,9 @@ public sealed class ReplayStore : IReplayManifestStore, IReplayObjectStore, IRep
 
         foreach (var brut in Directory.EnumerateFiles(_objects, "*.replay", SearchOption.AllDirectories))
         {
-            if (compresses >= max) break;
+            // Le plafond compte AUSSI les bruts retires : une rafale d'effacements se lit, elle
+            // aussi, comme le travail d'un rancongiciel.
+            if (compresses + retires >= max) break;
             ct.ThrowIfCancellationRequested();
             var sha = Path.GetFileNameWithoutExtension(brut);
             if (sha.Length != 64) continue;
@@ -203,13 +240,13 @@ public sealed class ReplayStore : IReplayManifestStore, IReplayObjectStore, IRep
                 }
 
                 var taille = new FileInfo(brut).Length;
-                var tmp = gz + ".part";
+                Directory.CreateDirectory(_temp);
+                var tmp = Path.Combine(_temp, $"compact-{sha}.gz.part");
                 await ReplayCompression.CompresserAsync(brut, tmp, ct).ConfigureAwait(false);
 
                 // L'aller-retour AVANT de supprimer quoi que ce soit : la forme compressee doit
                 // redonner l'empreinte qui nomme le fichier.
                 var verif = Path.Combine(_temp, $"compact-{sha}.part");
-                Directory.CreateDirectory(_temp);
                 var ecrits = await ReplayCompression.DecompresserPlafonneAsync(tmp, verif, taille, ct).ConfigureAwait(false);
                 var (relu, _) = ecrits == taille ? await HashFileAsync(verif, ct).ConfigureAwait(false) : ("", 0L);
                 DeleteQuiet(verif);
