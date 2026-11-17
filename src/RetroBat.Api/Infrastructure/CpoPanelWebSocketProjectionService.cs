@@ -24,6 +24,13 @@ public sealed class CpoPanelWebSocketProjectionService : IHostedService, IDispos
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly ILogger<CpoPanelWebSocketProjectionService>? _logger;
     private string _lastPublishedConfig = string.Empty;
+    // Les raisons deja dites de ne pas publier panel.state : chacune une fois par lancement de l'API.
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte> _raisonsDites = new(StringComparer.OrdinalIgnoreCase);
+
+    private void DireUneFois(string cle, string message)
+    {
+        if (_raisonsDites.Count < 200 && _raisonsDites.TryAdd(cle, 0)) _logger?.LogInformation("{Message}", message);
+    }
     private readonly object _publishLock = new();
     private readonly object _pendingPanelLock = new();
     private string _lastPublishedPanelKey = string.Empty;
@@ -232,6 +239,9 @@ public sealed class CpoPanelWebSocketProjectionService : IHostedService, IDispos
 
         if (!_runtimeOptions.IsCpoPanelWebSocketPushEnabled())
         {
+            // Dit une fois (support kexian7740, 17/11) : sans cette ligne, un marquee qui ne recoit jamais la fonction
+            // des boutons ne laissait aucune trace de la raison dans le journal.
+            DireUneFois("push-off", "panel.state not published: the panel push is off (global.apiexpose.datas_theme_expose.enabled, .cpo_control_panel.enabled or .cpo.websocket_push.enabled is 0)");
             return;
         }
 
@@ -413,6 +423,7 @@ public sealed class CpoPanelWebSocketProjectionService : IHostedService, IDispos
         var snapshot = _panels.GetSnapshot(systemId, rom, core, requestedLayout);
         if (snapshot.Layouts.Count == 0)
         {
+            DireUneFois("no-layout|" + systemId + "|" + rom, $"panel.state not published for {systemId}/{(rom.Length > 0 ? rom : "-")}: no panel layout found (core {(string.IsNullOrWhiteSpace(core) ? "-" : core)})");
             return;
         }
 
