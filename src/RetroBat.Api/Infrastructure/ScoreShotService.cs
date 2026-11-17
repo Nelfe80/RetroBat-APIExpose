@@ -198,6 +198,7 @@ public sealed class ScoreShotService : BackgroundService
         if (!root.TryGetProperty("Score", out var s) || !s.TryGetInt64(out var total)) return;
 
         bool photographier;
+        bool recordExistant;
         lock (_gate)
         {
             if (!_seuilConnu || _romGroup.Length == 0) return;
@@ -211,10 +212,17 @@ public sealed class ScoreShotService : BackgroundService
             if (!_arme) return;
             _scorePhotographie = total;
             photographier = true;
+            recordExistant = _seuil is not null;
             _logger.LogInformation("Capture record : {Rom} dépasse le record à {Score}.", _romGroup, total.ToString("N0"));
         }
 
-        if (photographier) await PhotographierAsync().ConfigureAwait(false);
+        if (!photographier) return;
+        await PhotographierAsync().ConfigureAwait(false);
+
+        // La plaque NEW RECORD au Deck (demande du user du 17/11) : le flash de RetroArch dit « capture », la plaque dit
+        // « record battu ». Seulement quand un record existait : le premier score d'un jeu sans record n'en bat aucun.
+        // Sans Deck pose, rien d'autre : le flash de la capture reste le signe pour tous.
+        if (recordExistant) RetroBat.Api.Deck.DeckSilence.DireSiPose(RetroBat.Api.Deck.DeckNotices.Scoring("scoring_record", total));
     }
 
     /// <summary>

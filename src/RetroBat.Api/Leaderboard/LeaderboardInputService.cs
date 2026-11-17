@@ -1921,7 +1921,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // notifications de RetroArch est coupe ; un defi diffuse (netplay de l'hote) garde tout coupe, comme l'option d'ES
             // « NOTIFICATIONS EN WORLD SCORING » a « TOUT MASQUER » (14/11).
             var succes = GarderLesSuccesDuDefi(netplay, resolution.Systeme, chemin);
-            var arguments = ArgumentsDuDefiAvecLeDeck(manettes, resolution, chemin, deck.Arguments, netplay, succes);
+            var arguments = ArgumentsDuDefiAvecLeDeck(manettes, resolution, chemin, deck.Arguments, netplay, succes,
+                flash: succes && Infrastructure.NotificationsWorldScoringPreference.FlashDuRecord());
             if (arguments is null) return false;
             if (succes) Infrastructure.NotificationsRetroArch.NoterAvantLesSucces(_logger);
 
@@ -1963,11 +1964,11 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// comme ES, decor du Deck, fonctions qui feraient refuser le score coupees, et le netplay de l'hote s'il est diffuse. Pur.
     /// </summary>
     internal static string? ArgumentsDuDefiAvecLeDeck(string manettes, RetroBat.Api.Netplay.EsLaunchArguments.Resolution resolution, string chemin,
-        IReadOnlyList<string> argumentsDuDeck, IReadOnlyList<string> netplay, bool succes = false)
+        IReadOnlyList<string> argumentsDuDeck, IReadOnlyList<string> netplay, bool succes = false, bool flash = false)
         => RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(manettes, resolution.Systeme, resolution.Emulateur,
             resolution.Coeur.Length > 0 ? resolution.Coeur : null, chemin, retroAchievements: null,
             (succes
-                ? Infrastructure.NotificationsRetroArch.AjouterSaufSucces(argumentsDuDeck)
+                ? Infrastructure.NotificationsRetroArch.AjouterSaufSucces(argumentsDuDeck, flash)
                 : Infrastructure.NotificationsRetroArch.Ajouter(argumentsDuDeck)).Concat(FonctionsNeutraliseesDuDefi).Concat(netplay));
 
     /// <summary>
