@@ -59,6 +59,32 @@ public static class ReplayCompression
     }
 
     /// <summary>
+    /// Compresse <paramref name="source"/> vers <paramref name="destination"/> en UNE lecture, et
+    /// rend l'empreinte SHA-256 et la taille du contenu BRUT lu. L'empreinte est celle des octets
+    /// effectivement compressés : un fichier qui changerait entre deux lectures ne peut pas se
+    /// retrouver rangé sous le nom d'un autre contenu.
+    /// </summary>
+    public static async Task<(string Sha256, long Taille)> CompresserEtMesurerAsync(string source, string destination, CancellationToken ct)
+    {
+        using var empreinte = System.Security.Cryptography.IncrementalHash.CreateHash(System.Security.Cryptography.HashAlgorithmName.SHA256);
+        var tampon = new byte[81920];
+        long taille = 0;
+        await using (var entree = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, useAsync: true))
+        await using (var sortie = File.Create(destination))
+        await using (var gz = new GZipStream(sortie, CompressionLevel.Optimal))
+        {
+            int lus;
+            while ((lus = await entree.ReadAsync(tampon, ct).ConfigureAwait(false)) > 0)
+            {
+                empreinte.AppendData(tampon, 0, lus);
+                taille += lus;
+                await gz.WriteAsync(tampon.AsMemory(0, lus), ct).ConfigureAwait(false);
+            }
+        }
+        return (Convert.ToHexString(empreinte.GetHashAndReset()).ToLowerInvariant(), taille);
+    }
+
+    /// <summary>
     /// Décompresse sans jamais écrire plus de <paramref name="plafond"/> octets. null si le contenu
     /// dépasse le plafond : une archive qui gonfle au-delà de la taille annoncée est rejetée avant
     /// d'avoir rempli le disque. Lève sur une archive corrompue.

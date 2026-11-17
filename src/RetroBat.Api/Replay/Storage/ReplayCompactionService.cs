@@ -17,12 +17,18 @@ namespace RetroBat.Api.Replay.Storage;
 ///
 /// `Replay:Store:CompressAtRest` (vrai par défaut) coupe le service sans rien défaire : le magasin
 /// lit les deux formes.
+///
+/// AU COMPTE-GOUTTES (17/11/2026). Cent fichiers d'affilée lus, réécrits en .gz puis effacés :
+/// Malwarebytes y a vu un rançongiciel et mis l'API en quarantaine chez un joueur. Les nouveaux
+/// replays entrent désormais compressés (<see cref="ReplayStore.ImportObjectAsync(string, CancellationToken)"/>) ;
+/// il ne reste ici que le stock brut des anciennes versions et les bruts ressortis pour une lecture,
+/// repris UN par passage, toutes les deux minutes.
 /// </summary>
 public sealed class ReplayCompactionService : BackgroundService
 {
     private static readonly TimeSpan DelaiInitial = TimeSpan.FromMinutes(3);
-    private static readonly TimeSpan Intervalle = TimeSpan.FromMinutes(15);
-    private const int ParPassage = 100;
+    private static readonly TimeSpan Intervalle = TimeSpan.FromMinutes(2);
+    private const int ParPassage = 1;
 
     private readonly ReplayStore _store;
     private readonly IConfiguration _config;
@@ -68,7 +74,7 @@ public sealed class ReplayCompactionService : BackgroundService
         var (compresses, retires, avant, apres) = await _store.CompacterAsync(ParPassage, ct).ConfigureAwait(false);
         if (compresses + retires == 0) return;
 
-        _logger.LogInformation(
+        _logger.LogDebug(
             "Replay : magasin compresse au repos, {Compresses} objet(s) {Avant} -> {Apres} octets, {Retires} brut(s) de lecture retire(s).",
             compresses, avant, apres, retires);
     }

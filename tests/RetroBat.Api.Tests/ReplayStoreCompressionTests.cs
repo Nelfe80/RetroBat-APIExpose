@@ -26,16 +26,67 @@ public class ReplayStoreCompressionTests : IDisposable
         try { Directory.Delete(_racine, recursive: true); } catch (IOException) { }
     }
 
-    /// <summary>Un objet rangé comme le fait l'enregistreur : brut, nommé par son empreinte.</summary>
+    /// <summary>Un objet rangé BRUT, nommé par son empreinte, comme le faisaient les versions d'avant le 17/11/2026.</summary>
     private async Task<ReplayObjectRef> Ranger(int taille = 200_000)
+        => await _store.ImportObjectAsync(await Source(taille), compresser: false, CancellationToken.None);
+
+    private async Task<string> Source(int taille = 200_000, string nom = "source.replay")
     {
         var octets = new byte[taille];
         var alea = new Random(7);
         for (var i = 0; i < taille; i += 3) octets[i] = (byte)alea.Next(256);   // creux, comme les vrais
-        var source = Path.Combine(_racine, "source.replay");
+        var source = Path.Combine(_racine, nom);
         Directory.CreateDirectory(_racine);
         await File.WriteAllBytesAsync(source, octets);
-        return await _store.ImportObjectAsync(source, CancellationToken.None);
+        return source;
+    }
+
+    [Fact]
+    public async Task Un_replay_entre_compresse_sans_jamais_passer_par_un_brut()
+    {
+        // Malwarebytes, 17/11/2026 : « lire X, ecrire X.gz, effacer X » en rafale = rancongiciel. Le
+        // replay doit donc naitre compresse dans le magasin, et sa source rester intacte.
+        var source = await Source();
+        var avant = await File.ReadAllBytesAsync(source);
+
+        var obj = await _store.ImportObjectAsync(source, CancellationToken.None);
+
+        Assert.Equal(Sha(source), obj.Sha256);
+        Assert.Equal(avant.Length, obj.Size);
+        Assert.False(File.Exists(_store.ObjectPath(obj.Sha256)));
+        Assert.True(ReplayCompression.EstGzip(_store.ObjectPath(obj.Sha256) + ReplayCompression.Suffixe));
+        Assert.Equal(avant, await File.ReadAllBytesAsync(source));
+        Assert.Empty(Directory.EnumerateFiles(_store.TempRoot));          // aucun reste d'import
+        var (compresses, retires, _, _) = await _store.CompacterAsync(10, CancellationToken.None);
+        Assert.Equal(0, compresses + retires);                             // rien a transformer ensuite
+        Assert.True(await _store.VerifyObjectAsync(obj, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task Importer_deux_fois_le_meme_replay_ne_le_range_qu_une_fois()
+    {
+        var a = await _store.ImportObjectAsync(await Source(nom: "a.replay"), CancellationToken.None);
+        var b = await _store.ImportObjectAsync(await Source(nom: "b.replay"), CancellationToken.None);
+
+        Assert.Equal(a, b);
+        Assert.Empty(Directory.EnumerateFiles(_store.TempRoot));
+    }
+
+    [Fact]
+    public async Task Le_compactage_ne_traite_qu_un_fichier_par_passage_effacements_compris()
+    {
+        var premier = await Ranger();
+        var second = await _store.ImportObjectAsync(await Source(150_000, "autre.replay"), compresser: false, CancellationToken.None);
+
+        var (c1, r1, _, _) = await _store.CompacterAsync(1, CancellationToken.None);
+        Assert.Equal(1, c1 + r1);
+        var (c2, r2, _, _) = await _store.CompacterAsync(1, CancellationToken.None);
+        Assert.Equal(1, c2 + r2);
+
+        await _store.EnsureRawAsync(premier.Sha256, CancellationToken.None);
+        await _store.EnsureRawAsync(second.Sha256, CancellationToken.None);
+        var (c3, r3, _, _) = await _store.CompacterAsync(1, CancellationToken.None);
+        Assert.Equal((0, 1), (c3, r3));                                    // un seul brut retire, pas deux
     }
 
     private static string Sha(string chemin) => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(chemin))).ToLowerInvariant();
