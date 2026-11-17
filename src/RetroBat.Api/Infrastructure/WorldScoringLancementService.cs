@@ -23,6 +23,14 @@ namespace RetroBat.Api.Infrastructure;
 /// /addgames ne sait pas VIDER un champ : un jeu qui etait en automatique garde notre coeur, ce qui
 /// ne retire aucun choix au joueur. Les choix a rendre sont notes sur disque, et rendus au
 /// demarrage suivant si l'API s'est arretee entre les deux.
+///
+/// FBNEO PARTOUT, SANS RETOUR (regle du user du 17/11). Un jeu dont FBNeo connait le set tourne sous
+/// FBNeo ou que soit sa ROM : sa fiche passe sous FBNeo et n'est plus jamais rendue a MAME, y compris
+/// hors de la collection. Avant, MAME revenait a la sortie, et au demarrage de l'API sans regarder ou
+/// etait le joueur : redemarree pendant qu'il etait dans la collection, l'API lui avait rendu MAME, et
+/// Blazing Star etait parti de World Scoring sous MAME (« emulateur pas encore reconnu », lorenzolamas).
+/// La fiche est donc mise sous FBNeo au demarrage de l'API et a chaque demarrage d'ES, sans attendre
+/// l'entree dans la collection (que gauche/droite entre deux listes ne signale pas).
 /// </summary>
 public sealed class WorldScoringLancementService : IHostedService, IDisposable
 {
@@ -77,6 +85,7 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
         _ = Task.Run(async () =>
         {
             await RendreAuDemarrageAsync(_arret.Token).ConfigureAwait(false);
+            await ImposerFbneoAuDemarrageAsync(_arret.Token).ConfigureAwait(false);
             await ReparerAuDemarrageAsync(_arret.Token).ConfigureAwait(false);
         });
         return Task.CompletedTask;
@@ -233,8 +242,21 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
             : Remise.RemettreConfort;
     }
 
+    /// <summary>FBNeo impose a ce jeu ne se rend jamais (regle du user du 17/11). Pur.</summary>
+    internal static bool ResteSousFbneo(Confort confort)
+        => string.Equals(confort.ImposeEmulator, "libretro", StringComparison.OrdinalIgnoreCase)
+           && string.Equals(confort.ImposeCore, "fbneo", StringComparison.OrdinalIgnoreCase);
+
     private void OnEvenement(EventEnvelope evenement)
     {
+        if (string.Equals(evenement.Type, "ui.frontend.started", StringComparison.Ordinal))
+        {
+            // ES vient de (re)demarrer : sa fiche en memoire vient du disque, FBNeo y est remis s'il manque.
+            var jetonEs = _arret?.Token ?? CancellationToken.None;
+            _ = Task.Run(() => ImposerFbneoAuDemarrageAsync(jetonEs), jetonEs);
+            return;
+        }
+
         if (string.Equals(evenement.Type, "ui.game.ended", StringComparison.Ordinal))
         {
             var fin = _arret?.Token ?? CancellationToken.None;
@@ -323,6 +345,62 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
     }
 
     /// <summary>
+    /// Met sous FBNeo chaque jeu de la collection dont FBNeo connait le set, et seulement ceux-la (17/11). Rien n'est
+    /// ecrit pour une fiche deja sous FBNeo. Faux : ES n'a pas repondu pour un systeme, a refaire.
+    /// </summary>
+    private async Task<bool> ImposerFbneoPartoutAsync(CancellationToken cancellationToken)
+    {
+        var nelfeplay = _options.CurrentValue.NelfePlay;
+        if (!nelfeplay.Enabled || !nelfeplay.ShowScoringCollection)
+        {
+            return true;
+        }
+
+        await _porte.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var collection = Path.Combine(RetroBatPaths.EmulationStationConfigRoot, "collections",
+                "custom-" + NelfePlayScoringCollectionSyncService.CollectionName + ".cfg");
+            var jeux = CertifiedSettingsService.JeuxDeLaCollection(collection, RetroBatPaths.RomsRoot,
+                Path.GetDirectoryName(RetroBatPaths.EmulationStationConfigRoot) ?? RetroBatPaths.EmulationStationConfigRoot);
+            if (jeux.Count == 0)
+            {
+                return true;
+            }
+
+            var (_, toutLu) = await ImposerAuxJeuxAsync(jeux.Select(jeu => (jeu.Systeme, jeu.Fichier)).ToList(), cancellationToken,
+                seulementFbneo: true).ConfigureAwait(false);
+            return toutLu;
+        }
+        finally
+        {
+            _porte.Release();
+        }
+    }
+
+    private async Task ImposerFbneoAuDemarrageAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            for (var essai = 0; essai < 10; essai++)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(essai == 0 ? 20 : 30), cancellationToken).ConfigureAwait(false);
+                if (await ImposerFbneoPartoutAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    return;
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "World Scoring : FBNeo non impose au demarrage.");
+        }
+    }
+
+    /// <summary>
     /// LES AUTRES LANCEMENTS NELFEPLAY (11/11). Le coeur n'etait impose qu'a l'ENTREE dans la collection : le bouton du site,
     /// commands/launch, un concours et le defi du panneau lancent par ES /launch avec la fiche du systeme, donc sous MAME pour
     /// un jeu du dossier mame, et ces parties etaient classees (Bubble Bobble, Bomb Jack, TGM2 apres le 25/10). Chacun de ces
@@ -339,7 +417,7 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
         await _porte.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            var faits = await ImposerAuxJeuxAsync([jeu], cancellationToken).ConfigureAwait(false);
+            var (faits, _) = await ImposerAuxJeuxAsync([jeu], cancellationToken).ConfigureAwait(false);
             return faits.Count > 0 ? faits[0] : null;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -368,17 +446,23 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
             : (morceaux[0], Path.GetFileName(cheminRom));
     }
 
-    /// <summary>Impose le coeur fonctionnel a ces jeux (porte tenue par l'appelant). Rend « systeme/fichier → coeur » par jeu change.</summary>
-    private async Task<List<string>> ImposerAuxJeuxAsync(IReadOnlyList<(string Systeme, string Fichier)> jeux, CancellationToken cancellationToken)
+    /// <summary>
+    /// Impose le coeur fonctionnel a ces jeux (porte tenue par l'appelant), ou seulement FBNeo. Rend « systeme/fichier →
+    /// coeur » par jeu change, et faux si ES n'a pas repondu pour un systeme.
+    /// </summary>
+    private async Task<(List<string> Imposes, bool ToutLu)> ImposerAuxJeuxAsync(IReadOnlyList<(string Systeme, string Fichier)> jeux,
+        CancellationToken cancellationToken, bool seulementFbneo = false)
     {
         var reglages = _reglages.GetAllSettings();
         var etat = LireEtat();
         var imposes = new List<string>();
+        var toutLu = true;
         foreach (var groupe in jeux.GroupBy(jeu => jeu.Systeme, StringComparer.OrdinalIgnoreCase))
         {
             var fiches = await LireFichesAsync(groupe.Key, cancellationToken).ConfigureAwait(false);
             if (fiches == null)
             {
+                toutLu = false;
                 continue;
             }
 
@@ -392,6 +476,11 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
                 var cle = systeme + "/" + fichier;
                 var impose = FbneoPourUnSetMame(lancement, coeurs, FbneoConnaitLeSet(Path.GetFileNameWithoutExtension(fichier)))
                     ?? AImposer(lancement, coeurChoisi, coeurs);
+                if (seulementFbneo && impose is { } envisage && !string.Equals(envisage.Core, "fbneo", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 if (impose is not { } voulu || (string.Equals(voulu.Emulator, lancement.Emulator, StringComparison.OrdinalIgnoreCase)
                         && string.Equals(voulu.Core, lancement.Core, StringComparison.OrdinalIgnoreCase) && coeurChoisi))
                 {
@@ -429,7 +518,7 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
                 imposes.Count, string.Join(", ", imposes));
         }
 
-        return imposes;
+        return (imposes, toutLu);
     }
 
     /// <summary>
@@ -500,14 +589,16 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
         try
         {
             var etat = LireEtat();
-            if (etat.Count == 0)
+            // FBNeo ne se rend jamais (17/11) : ces jeux restent notes (le refus de FBNeo s'y lit), mais hors du rendu.
+            var aRendre = etat.Where(entree => !ResteSousFbneo(entree.Value)).ToList();
+            if (aRendre.Count == 0)
             {
                 return true;
             }
 
             var rendus = new List<string>();
             var toutFait = true;
-            foreach (var groupe in etat.GroupBy(entree => entree.Key.Split('/')[0], StringComparer.OrdinalIgnoreCase).ToList())
+            foreach (var groupe in aRendre.GroupBy(entree => entree.Key.Split('/')[0], StringComparer.OrdinalIgnoreCase).ToList())
             {
                 var fiches = await LireFichesAsync(groupe.Key, cancellationToken).ConfigureAwait(false);
                 if (fiches == null)
