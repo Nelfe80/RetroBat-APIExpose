@@ -316,7 +316,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly List<long> _touchesDeSortie = new();
     // Le depart suppose (frame du START et ligne de credit rendue), tant qu'un vrai credit du depart peut encore le
     // remplacer (ContinuesParCredits.DepartReelApresLeSuppose).
-    private (long Start, EvenementDeCredit Ligne)? _departSuppose;
+    private (long Start, EvenementDeCredit Ligne, long Score)? _departSuppose;
 
     // ── Lien replay ↔ score (funnel « ▷ REPLAY » de /rankings) ───────────────
     // Le reporter connaît le session_id (il le génère) et le verdict ; le recorder
@@ -2324,12 +2324,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             if (valeur >= avant) return;   // pieces ajoutees
             // La piece et START ensemble : la premiere lecture etait la piece, ce credit-ci est le vrai depart. Le
             // depart suppose s'efface (sa ligne rendue disparait), et celui-ci ne se tranche pas une seconde fois.
-            if (ContinuesParCredits.DepartReelApresLeSuppose(_departSuppose?.Start, frame) && _departSuppose is { } suppose)
+            if (_departSuppose is { } suppose
+                && ContinuesParCredits.DepartReelApresLeSuppose(suppose.Start, frame, suppose.Score, _finalTotal ?? 0))
             {
                 _credits.Remove(suppose.Ligne);
                 _departSuppose = null;
-                Trace($"credit consomme a la frame {frame}, {frame - suppose.Start} images apres le START : c'est le vrai depart "
-                    + "(la premiere lecture etait la piece), le depart suppose s'efface");
+                Trace($"credit consomme a la frame {frame}, score inchange depuis le depart suppose ({suppose.Score}) : c'est le "
+                    + "vrai depart (la premiere lecture etait la piece), le depart suppose s'efface");
                 return;
             }
             scoreAvant = _finalTotal ?? 0;
@@ -2375,7 +2376,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             depart = start;
             var ligne = new EvenementDeCredit(valeur + 1, Math.Min(start, frame) - 1);
             _credits.Insert(0, ligne);
-            _departSuppose = (start, ligne);
+            _departSuppose = (start, ligne, _finalTotal ?? 0);
         }
         Trace($"credit du depart pendant la chauffe du wrapper : premiere lecture {valeur} (frame {frame}) juste apres le START "
             + $"du joueur 1 (frame {depart}), piece vue au panel avant lui : c'est le depart");

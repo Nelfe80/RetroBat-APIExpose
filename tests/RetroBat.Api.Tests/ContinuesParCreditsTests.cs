@@ -43,12 +43,17 @@ public class ContinuesParCreditsTests
     {
         // Essai du user, TGM2 (2026-10-16) : la premiere lecture (1) est la piece, lue a la frame du START (3675) ; le jeu
         // consomme le credit 60 images plus tard. Ce credit est le vrai depart, pas un continue.
-        Assert.True(ContinuesParCredits.DepartReelApresLeSuppose(3675, 3735));
-        Assert.True(ContinuesParCredits.DepartReelApresLeSuppose(3675, 3675 + ContinuesParCredits.FenetreDepartReel));
-        // Au-dela de 3 s, un credit consomme est un continue ; sans depart suppose, rien a effacer.
-        Assert.False(ContinuesParCredits.DepartReelApresLeSuppose(3675, 3675 + ContinuesParCredits.FenetreDepartReel + 1));
-        Assert.False(ContinuesParCredits.DepartReelApresLeSuppose(null, 3735));
-        Assert.False(ContinuesParCredits.DepartReelApresLeSuppose(3675, 3600));
+        Assert.True(ContinuesParCredits.DepartReelApresLeSuppose(3675, 3735, 0, 0));
+        // RayForce de lorenzolamas (17/11) : START ignore a la frame 164, vrai credit a 530, score toujours 0 : c'est le
+        // depart, quel que soit le temps passe.
+        Assert.True(ContinuesParCredits.DepartReelApresLeSuppose(164, 530, 0, 0));
+        Assert.True(ContinuesParCredits.DepartReelApresLeSuppose(164, 60_000, 0, 0));
+        // Un score de demo deja la au depart suppose ne compte pas : seul ce qui a ete gagne depuis.
+        Assert.True(ContinuesParCredits.DepartReelApresLeSuppose(164, 530, 12_300, 12_300));
+        // Le score a bouge : c'est un vrai continue ; sans depart suppose, rien a effacer.
+        Assert.False(ContinuesParCredits.DepartReelApresLeSuppose(3675, 3735, 0, 100));
+        Assert.False(ContinuesParCredits.DepartReelApresLeSuppose(null, 3735, 0, 0));
+        Assert.False(ContinuesParCredits.DepartReelApresLeSuppose(3675, 3600, 0, 0));
 
         // Le suppose efface, la ligne des credits ne garde que le vrai depart : aucun continue.
         var departs = new List<DepartDeJoueur> { new(1, 3675) };
