@@ -2865,6 +2865,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // Le joueur de la ligne : un GAME_MODE player=2 est le mode du joueur 2, pas celui de la machine (2026-10-20).
         var joueur = Entier(signal, "Player") ?? Entier(root, "player") ?? 1;
         string trace;
+        string? horsReglement = null;
         lock (_sync)
         {
             if (mode && joueur >= 2)
@@ -2889,9 +2890,48 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 if (adresse.Length == 0) return;
                 _contexte = _contexte.AvecDifficulte(adresse, valeur);
                 trace = $"difficulte : {RetroBat.Api.Scoring.ModesDeJeu.Adresse(adresse)} = {valeur}";
+                horsReglement = OptionHorsReglement(adresse, valeur);
             }
         }
         Trace(trace);
+        if (horsReglement is { } option) AnnoncerOptionHorsReglement(option);
+    }
+
+    // Le lancement deja averti d'une option hors reglement : un seul bandeau par lancement.
+    private long _lancementAvertiOptions = -1;
+
+    /// <summary>
+    /// L'OPTION DU JEU HORS REGLEMENT, DITE TOUT DE SUITE (2026-11-17). Streets of Rage 2 de snapouille : vies passees a 5
+    /// dans OPTIONS avant le depart, 1 h 35 de partie, 692 020 points refuses a la fin (game.difficulty_not_allowed) sans
+    /// qu'un mot l'ait dit. Une option du menu du jeu vit dans sa memoire : la borne ne peut pas l'imposer, elle la voit. Des
+    /// qu'une valeur n'est admise par AUCUN profil solo du lancement, le joueur l'apprend, une fois par lancement : le
+    /// contexte garde la valeur (une ligne « neq » ne parle pas au retour a l'usine), seul un nouveau lancement repart propre.
+    /// Rend le mot du champ (vide s'il n'en a pas), ou null. Appele sous _sync.
+    /// </summary>
+    private string? OptionHorsReglement(string adresse, int valeur)
+    {
+        var lancement = Interlocked.Read(ref _lancement);
+        if (_lancementAvertiOptions == lancement) return null;
+        if (_profilsDuLancement is not { } p || _lancementDesProfils != lancement) return null;
+        var solo = RetroBat.Api.Scoring.ModesDeJeu.DuSolo(p.Profils);
+        if (!RetroBat.Api.Scoring.ReglagesDuMenu.HorsReglement(solo, adresse, valeur, Langue(), out var nom)) return null;
+        _lancementAvertiOptions = lancement;
+        return nom;
+    }
+
+    private void AnnoncerOptionHorsReglement(string option)
+    {
+        Trace($"option du jeu hors reglement{(option.Length > 0 ? " (" + option + ")" : "")} : la partie ne sera pas classee, le joueur est prevenu");
+        if (!PartieNelfePlay()) return;
+        var langue = Langue();
+        var titre = CabinetAnnounceText.Get("scoring_options_changed_title", langue);
+        if (option.Length > 0) titre += " : " + option;
+        _overlay?.ShowTop(
+            "SCORING",
+            titre,
+            CabinetAnnounceText.Get("scoring_options_changed_sub", langue),
+            10000,
+            alerte: true, auDeck: RetroBat.Api.Deck.DeckNotices.Scoring("scoring_options_changed", detail: option));
     }
 
     /// <summary>Le pont MAME ecrit 0x604, le wrapper 0X0604 : la meme ligne doit se reconnaitre.</summary>

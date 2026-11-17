@@ -114,6 +114,7 @@ public static class DeckNotices
             "scoring_clear" => new DeckNotice(cle, DeckSeverity.Record, "1CC", "ONE-CREDIT CLEAR", valeur, Long),
             "scoring_uncertified" => new DeckNotice(cle, DeckSeverity.Alert, "UNCERTIFIED", "QUIT AND RELAUNCH", null, Long),
             "scoring_credits_muted" => new DeckNotice(cle, DeckSeverity.Alert, "UNCERTIFIED", "CREDITS UNREADABLE", null, Long),
+            "scoring_options_changed" => new DeckNotice(cle, DeckSeverity.Alert, "NOT RANKED", Court40((detail is { Length: > 0 } o ? o + " CHANGED" : "GAME OPTIONS CHANGED") + " · RELAUNCH"), null, Long),
             "scoring_multiplayer" => new DeckNotice(cle, DeckSeverity.Warn, "MULTIPLAYER", "OUT OF SOLO RANKING", null, Long),
             _ => new DeckNotice(cle, DeckSeverity.Info, "SCORING", Court40(detail ?? ""), valeur, Moyen),
         };
