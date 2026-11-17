@@ -150,13 +150,16 @@ public static class ContinuesParCredits
     /// peut être la pièce elle-même, lue à la frame du START, avant que le jeu ne la consomme. Le départ
     /// supposé (<see cref="DepartAvantLaPremiereLecture"/>) passait alors devant, et le vrai crédit du
     /// départ, consommé une seconde après, comptait pour un continue : « score certifié 0 », replay
-    /// arrêté. Un crédit consommé dans les 3 s qui suivent le START d'un départ supposé est le vrai
-    /// départ : le supposé s'efface. Aucun continue ne se prend 3 s après avoir commencé.
+    /// arrêté.
+    ///
+    /// PAS DE DÉLAI, LE SCORE (règle du user du 17/11). Une fenêtre de 3 s effaçait le supposé ; RayForce
+    /// ignore le START des premières secondes, le joueur a martelé START, le vrai crédit est tombé 6 s
+    /// après : continue à 0 point, bandeau « non certifiable » sur un 1CC publié, replay coupé à 9 s
+    /// (lorenzolamas). Tant que le score n'a pas bougé depuis le départ supposé, un crédit consommé est le
+    /// vrai départ, quel que soit le temps passé : avant le premier point, il n'y a rien à certifier.
     /// </summary>
-    public const long FenetreDepartReel = 180;
-
-    public static bool DepartReelApresLeSuppose(long? suppose, long frame)
-        => suppose is { } s && frame >= s && frame - s <= FenetreDepartReel;
+    public static bool DepartReelApresLeSuppose(long? suppose, long frame, long scoreAuSuppose, long scoreActuel)
+        => suppose is { } s && frame >= s && scoreActuel <= scoreAuSuppose;
 
     public enum Debit
     {

@@ -28,6 +28,17 @@ public class WorldScoringLancementTests
     };
 
     [Fact]
+    public void FBNeo_impose_ne_se_rend_jamais_les_autres_coeurs_si()
+    {
+        // Regle du user du 17/11 (Blazing Star de lorenzolamas reparti sous MAME apres un redemarrage de l'API) : un jeu
+        // passe sous FBNeo y reste, dans la collection comme hors d'elle. Les autres impositions se rendent comme avant.
+        Assert.True(WorldScoringLancementService.ResteSousFbneo(new("libretro", "mame", "libretro", "fbneo")));
+        Assert.True(WorldScoringLancementService.ResteSousFbneo(new("", "", "LIBRETRO", "FBNeo")));
+        Assert.False(WorldScoringLancementService.ResteSousFbneo(new("libretro", "mame2003_plus", "libretro", "mame")));
+        Assert.False(WorldScoringLancementService.ResteSousFbneo(new("mame64", "", "fbneo", "")));
+    }
+
+    [Fact]
     public void Un_choix_de_confort_qui_ne_mesure_pas_recoit_notre_coeur()
         => Assert.Equal(("libretro", "mame"),
             AImposer(new EmulationStationLaunchConfig("mame", "libretro", "mame2003_plus"), coeurChoisi: true, Mame));
