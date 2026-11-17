@@ -88,6 +88,8 @@ public static class CabinetAnnounceText
     {
         ["fr"] = new()
         {
+            ["scoring_options_changed_title"] = "Option du jeu changée : score non classé",
+            ["scoring_options_changed_sub"] = "le classement exige les réglages d'origine ; quitte et relance le jeu pour une partie classée",
             ["challenge_verdict_ranked"] = "Défi : {0} classé, {1}",
             ["challenge_verdict_published"] = "Défi : {0} classé",
             ["challenge_verdict_held"] = "Défi : {0} signalé, non classé : {1}",
@@ -209,6 +211,8 @@ public static class CabinetAnnounceText
         },
         ["en"] = new()
         {
+            ["scoring_options_changed_title"] = "Game option changed: score not ranked",
+            ["scoring_options_changed_sub"] = "the ranking needs the original settings; quit and relaunch the game for a ranked game",
             ["challenge_verdict_ranked"] = "Challenge: {0} ranked {1}",
             ["challenge_verdict_published"] = "Challenge: {0} ranked",
             ["challenge_verdict_held"] = "Challenge: {0} flagged, not ranked: {1}",
@@ -330,6 +334,8 @@ public static class CabinetAnnounceText
         },
         ["es"] = new()
         {
+            ["scoring_options_changed_title"] = "Opción del juego cambiada: puntuación no clasificada",
+            ["scoring_options_changed_sub"] = "la clasificación exige los ajustes de origen; sal y vuelve a lanzar el juego para una partida clasificada",
             ["challenge_verdict_ranked"] = "Desafío: {0} clasificado, puesto {1}",
             ["challenge_verdict_published"] = "Desafío: {0} clasificado",
             ["challenge_verdict_held"] = "Desafío: {0} señalado, sin clasificar: {1}",
@@ -451,6 +457,8 @@ public static class CabinetAnnounceText
         },
         ["ja"] = new()
         {
+            ["scoring_options_changed_title"] = "ゲームのオプションが変更されました：スコアはランキング対象外",
+            ["scoring_options_changed_sub"] = "ランキングには初期設定が必要です。ランキング対象のプレイにはゲームを終了して再起動してください",
             ["challenge_verdict_ranked"] = "チャレンジ: {0} {1}位",
             ["challenge_verdict_published"] = "チャレンジ: {0} ランクイン",
             ["challenge_verdict_held"] = "チャレンジ: {0} 保留、ランク外: {1}",
@@ -572,6 +580,8 @@ public static class CabinetAnnounceText
         },
         ["zh"] = new()
         {
+            ["scoring_options_changed_title"] = "游戏选项已更改：分数不计入排行榜",
+            ["scoring_options_changed_sub"] = "排行榜要求使用原始设置；请退出并重新启动游戏以进行计入排行的游戏",
             ["challenge_verdict_ranked"] = "挑战: {0} 排名第{1}",
             ["challenge_verdict_published"] = "挑战: {0} 已上榜",
             ["challenge_verdict_held"] = "挑战: {0} 已标记，未上榜: {1}",
@@ -693,6 +703,8 @@ public static class CabinetAnnounceText
         },
         ["ko"] = new()
         {
+            ["scoring_options_changed_title"] = "게임 옵션 변경됨: 점수가 랭킹에 반영되지 않습니다",
+            ["scoring_options_changed_sub"] = "랭킹에는 원래 설정이 필요합니다. 랭킹 게임을 하려면 게임을 종료하고 다시 실행하세요",
             ["challenge_verdict_ranked"] = "챌린지: {0} {1}위",
             ["challenge_verdict_published"] = "챌린지: {0} 순위 등록",
             ["challenge_verdict_held"] = "챌린지: {0} 보류, 순위 외: {1}",

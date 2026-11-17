@@ -90,6 +90,46 @@ public static class ReglagesDuMenu
         return noms;
     }
 
+    /// <summary>
+    /// UN REGLAGE HORS REGLEMENT EN COURS DE PARTIE (2026-11-17, Streets of Rage 2 de snapouille : vies passees a 5 dans
+    /// OPTIONS, 692 020 points refuses apres 1 h 35 sans un mot). Une option du menu du jeu vit dans sa memoire : la borne
+    /// ne peut pas l'imposer au lancement, seulement la voir. Rend vrai quand AU MOINS UN profil solo du lancement declare
+    /// un champ a cette adresse et qu'AUCUN n'admet la valeur : le serveur refusera la partie quel que soit le mode retenu.
+    /// <paramref name="nom"/> : le mot du champ dans la langue voulue (label, sinon name), vide s'il n'en porte pas.
+    /// </summary>
+    public static bool HorsReglement(IEnumerable<JsonElement> profils, string adresse, int valeur, string langue, out string nom)
+    {
+        nom = "";
+        var cle = ModesDeJeu.Adresse(adresse);
+        var declare = false;
+        foreach (var profil in profils)
+        {
+            foreach (var champ in Champs(profil))
+            {
+                if (!champ.TryGetProperty("address", out var a) || a.ValueKind != JsonValueKind.String) continue;
+                if (!string.Equals(ModesDeJeu.Adresse(a.GetString() ?? ""), cle, StringComparison.OrdinalIgnoreCase)) continue;
+                if (Admise(champ, valeur)) return false;
+                declare = true;
+                if (nom.Length == 0) nom = Libelle(champ, langue);
+            }
+        }
+        return declare;
+    }
+
+    /// <summary>Le mot d'un champ pour le joueur : son label dans la langue (sinon en anglais), sinon son name.</summary>
+    private static string Libelle(JsonElement champ, string langue)
+    {
+        if (champ.TryGetProperty("label", out var l) && l.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var cle in new[] { langue, "en" })
+            {
+                if (l.TryGetProperty(cle, out var t) && t.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(t.GetString()))
+                    return t.GetString()!.Trim();
+            }
+        }
+        return champ.TryGetProperty("name", out var n) && n.ValueKind == JsonValueKind.String ? (n.GetString() ?? "").Trim() : "";
+    }
+
     /// <summary>Le motif dit au joueur : « test menu settings changed: DIFFICULTY, EXTEND ».</summary>
     public static string Motif(IReadOnlyList<string> noms, string langue)
         => (string.Equals(langue, "fr", StringComparison.OrdinalIgnoreCase)
