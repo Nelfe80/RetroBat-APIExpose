@@ -112,6 +112,7 @@ public static class DeckNotices
             "scoring_credit" => new DeckNotice(cle, DeckSeverity.Warn, "CREDIT USED", "CERTIFIED SCORE", valeur, Long),
             "scoring_joined" => new DeckNotice(cle, DeckSeverity.Warn, "2P JOINED", "SOLO SCORE KEPT", valeur, Long),
             "scoring_clear" => new DeckNotice(cle, DeckSeverity.Record, "1CC", "ONE-CREDIT CLEAR", valeur, Long),
+            "scoring_record" => new DeckNotice(cle, DeckSeverity.Record, "NEW RECORD", "WORLD RECORD BEATEN", valeur, Long),
             "scoring_uncertified" => new DeckNotice(cle, DeckSeverity.Alert, "UNCERTIFIED", "QUIT AND RELAUNCH", null, Long),
             "scoring_credits_muted" => new DeckNotice(cle, DeckSeverity.Alert, "UNCERTIFIED", "CREDITS UNREADABLE", null, Long),
             "scoring_options_changed" => new DeckNotice(cle, DeckSeverity.Alert, "NOT RANKED", Court40((detail is { Length: > 0 } o ? o + " CHANGED" : "GAME OPTIONS CHANGED") + " · RELAUNCH"), null, Long),

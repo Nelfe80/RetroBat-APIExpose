@@ -332,7 +332,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
 
             // LOT 7 - one merged game asset table for all three surfaces: canonical store, plus a
             // fill from the user gamelist when the flag is on (off by default = the old table).
-            var gameAssets = BuildGameAssets(systemId, gameSlug, selected.GamePath, roots);
+            var gameAssets = BuildGameAssets(systemId, frontendSystemId, gameSlug, selected.GamePath, roots);
 
             // Built once for the whole batch, and BEFORE the first publish: a marquee
             // prints the game's name, its genre, its description. Computing it after
@@ -1095,7 +1095,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
 
             var selection = BuildGameSelection(selectionSequence, frontendSystemId, systemId, gameSlug, selected, state);
             var marquee = BuildGameMarqueeMedia(frontendSystemId, systemId, roots, fallbackSystemRoots);
-            var gameAssets = BuildGameAssets(systemId, gameSlug, selected.GamePath, roots); // LOT 7
+            var gameAssets = BuildGameAssets(systemId, frontendSystemId, gameSlug, selected.GamePath, roots); // LOT 7
             var text = await BuildTextBlockAsync(systemId, gameSlug, selected.Details, roots);
 
             await _eventBus.PublishAsync(new EventEnvelope
@@ -2250,7 +2250,7 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
     /// it against the RetroBat root (HP5).
     /// </summary>
     private IReadOnlyDictionary<string, MediaStreamAsset> BuildGameAssets(
-        string systemId, string gameSlug, string? gamePath, IReadOnlyList<string> roots)
+        string systemId, string frontendSystemId, string gameSlug, string? gamePath, IReadOnlyList<string> roots)
     {
         var canonical = BuildAssetTable(roots, DisplayableMediaKinds);
         if (!LireLesMediasDesRoms() || string.IsNullOrWhiteSpace(gamePath))
@@ -2258,15 +2258,23 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
             return canonical;
         }
 
-        GamelistGameMedia? gamelist;
-        try
+        // Le dossier des roms ou vit la gamelist du jeu (support kexian7740, 17/11) : un jeu de roms\mame est « arcade »
+        // pour l'API, et sa gamelist n'est pas dans roms\arcade. Le dossier du chemin d'abord, puis le systeme d'ES (une
+        // collection n'est pas un dossier, d'ou le chemin en premier), puis le systeme canonique.
+        GamelistGameMedia? gamelist = null;
+        foreach (var dossier in DossiersDeLaGamelist(gamePath, frontendSystemId, systemId))
         {
-            gamelist = _gamelistReader.GetGameMedia(systemId, gamePath);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            _logger?.LogDebug(ex, "Gamelist media fill skipped for {System}/{Game}.", systemId, gameSlug);
-            return canonical;
+            try
+            {
+                gamelist = _gamelistReader.GetGameMedia(dossier, gamePath);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                _logger?.LogDebug(ex, "Gamelist media fill skipped for {System}/{Game} ({Folder}).", systemId, gameSlug, dossier);
+                gamelist = null;
+            }
+
+            if (gamelist is { Candidates.Count: > 0 }) break;
         }
 
         if (gamelist == null || gamelist.Candidates.Count == 0)
@@ -2288,6 +2296,42 @@ public sealed class PhysicalMediaWebSocketProjectionService : IHostedService, ID
         }
 
         return merged;
+    }
+
+    /// <summary>
+    /// Les dossiers de roms\ ou chercher la gamelist d'un jeu, sans doublon : celui du chemin de la ROM quand elle est
+    /// rangee sous roms\, puis le systeme d'ES, puis le systeme canonique de l'API.
+    /// </summary>
+    internal static IReadOnlyList<string> DossiersDeLaGamelist(string? gamePath, string? frontendSystemId, string? systemId)
+        => DossiersDeLaGamelist(gamePath, frontendSystemId, systemId, RetroBatPaths.RomsRoot);
+
+    internal static IReadOnlyList<string> DossiersDeLaGamelist(string? gamePath, string? frontendSystemId, string? systemId, string romsRoot)
+    {
+        var dossiers = new List<string>();
+        void Ajouter(string? d)
+        {
+            d = d?.Trim();
+            if (!string.IsNullOrEmpty(d) && !dossiers.Contains(d, StringComparer.OrdinalIgnoreCase)) dossiers.Add(d);
+        }
+
+        try
+        {
+            var chemin = (gamePath ?? "").Trim();
+            if (chemin.Length > 0 && Path.IsPathRooted(chemin) && !string.IsNullOrWhiteSpace(romsRoot))
+            {
+                var relatif = Path.GetRelativePath(Path.GetFullPath(romsRoot), Path.GetFullPath(chemin));
+                var premier = relatif.Split(new[] { '\\', '/' },StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+                if (premier is not null && premier != ".." && !Path.IsPathRooted(relatif) && relatif.Contains(Path.DirectorySeparatorChar)) Ajouter(premier);
+            }
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            // un chemin illisible ne donne pas de dossier : les systemes suffisent
+        }
+
+        Ajouter(frontendSystemId);
+        Ajouter(systemId);
+        return dossiers;
     }
 
     /// <summary>A resolved catalog asset (LOT 4 <see cref="MediaAssetRef"/>) turned into the

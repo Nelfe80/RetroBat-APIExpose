@@ -1,3 +1,4 @@
+using RetroBat.Domain.Paths;
 using System.Xml.Linq;
 
 namespace RetroBat.Api.Infrastructure;
@@ -27,6 +28,39 @@ public static class NotificationsWorldScoringPreference
 
     /// <summary>La valeur du choix « Tout masquer ».</summary>
     public const string Aucune = "none";
+
+    /// <summary>
+    /// Option « FLASH AU RECORD BATTU » (demande du user du 17/11), interrupteur, ETEINT par defaut. Allumee : la partie du
+    /// World Scoring garde les widgets de RetroArch (comme avec RetroAchievements) pour son seul flash de capture, rapide,
+    /// a l'instant ou le record tombe ; tout autre message reste coupe. « TOUT MASQUER » l'emporte.
+    /// </summary>
+    public const string FlashKey = "global.apiexpose.world_scoring.record_flash";
+
+    /// <summary>L'option du flash est-elle allumee ? « 1 », « true », « on » ; vide ou absente = eteinte. Pur.</summary>
+    public static bool FlashDuRecord(XDocument es)
+    {
+        foreach (var e in es.Root?.Elements() ?? [])
+        {
+            if (!string.Equals((string?)e.Attribute("name"), FlashKey, StringComparison.OrdinalIgnoreCase)) continue;
+            var v = ((string?)e.Attribute("value") ?? "").Trim();
+            return v == "1" || v.Equals("true", StringComparison.OrdinalIgnoreCase) || v.Equals("on", StringComparison.OrdinalIgnoreCase);
+        }
+
+        return false;
+    }
+
+    /// <summary>Comme <see cref="FlashDuRecord(XDocument)"/>, lu sur le disque. Faux si illisible.</summary>
+    public static bool FlashDuRecord(string? esSettings = null)
+    {
+        try
+        {
+            return FlashDuRecord(XDocument.Load(esSettings ?? RetroBatPaths.EmulationStationSettingsPath));
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
 
     /// <summary>La valeur brute veut-elle tout masquer ? Seul <c>none</c> le veut ; vide, ra_only ou inconnu : non. Pur.</summary>
     public static bool ToutMasquer(string? brute)

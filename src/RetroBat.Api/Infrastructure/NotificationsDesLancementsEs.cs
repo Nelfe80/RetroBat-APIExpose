@@ -163,6 +163,7 @@ public sealed class NotificationsDesLancementsEs : IHostedService, IDisposable
             string? avant = null;
             var avants = new List<Note>();
             var succes = false;
+            var flash = false;
             var lue = false;
             _es.Update(doc =>
             {
@@ -171,6 +172,7 @@ public sealed class NotificationsDesLancementsEs : IHostedService, IDisposable
                 // L'option « TOUT MASQUER » (14/11) : meme avec RetroAchievements, OnScreenMsg = 0 comme sans.
                 succes = SuccesParLesClesDuJeu && NotificationsRetroArch.EstDuWorldScoring(origine)
                          && NotificationsRetroArch.GarderLesSucces(doc, systeme, fichier);
+                flash = NotificationsWorldScoringPreference.FlashDuRecord(doc);
                 lue = true;
                 return false;
             });
@@ -192,7 +194,8 @@ public sealed class NotificationsDesLancementsEs : IHostedService, IDisposable
                 var poseesSaufSucces = _es.Update(doc =>
                 {
                     var change = false;
-                    foreach (var c in cles) change |= Poser(doc, c.Cle, c.Value);
+                    foreach (var c in cles)
+                        change |= Poser(doc, c.Cle, flash && c.Cle.EndsWith("." + NotificationsRetroArch.CleDuFlash, StringComparison.Ordinal) ? "1" : c.Value);
                     return change;
                 });
                 _journal?.LogInformation(

@@ -112,14 +112,30 @@ public static partial class NotificationsRetroArch
     public static IReadOnlyList<string> ArgumentsSaufSucces { get; } =
         AutresNotifications.SelectMany(r => new[] { "-retroarch." + r.Key, r.Value }).ToList();
 
+    /// <summary>La cle du flash de capture de RetroArch.</summary>
+    public const string CleDuFlash = "notification_show_screenshot_flash";
+
+    /// <summary>
+    /// LE FLASH DU RECORD (demande du user du 17/11) : la seule capture d'une partie du World Scoring est celle de l'instant
+    /// ou le record tombe (ScoreShotService) ; avec l'option d'ES « FLASH AU RECORD BATTU », le flash rapide de RetroArch (1)
+    /// le dit au joueur, avec ou sans Deck. Le texte « capture enregistree » reste coupe. Sans l'option (defaut) : 2 = eteint.
+    /// </summary>
+    public static IReadOnlyList<KeyValuePair<string, string>> AutresNotificationsPour(bool flash)
+        => flash
+            ? AutresNotifications.Select(r => r.Key == CleDuFlash ? new KeyValuePair<string, string>(r.Key, "1") : r).ToList()
+            : AutresNotifications;
+
     /// <summary>
     /// <paramref name="supplements"/> sans « -OnScreenMsg 0 » (celui du Deck compris), plus les arguments qui coupent tout
     /// sauf RetroAchievements. Pur.
     /// </summary>
-    public static IReadOnlyList<string> AjouterSaufSucces(IEnumerable<string>? supplements)
+    public static IReadOnlyList<string> AjouterSaufSucces(IEnumerable<string>? supplements, bool flash = false)
     {
         var source = (supplements ?? []).ToList();
-        var liste = new List<string>(source.Count + ArgumentsSaufSucces.Count);
+        var arguments = flash
+            ? AutresNotificationsPour(true).SelectMany(r => new[] { "-retroarch." + r.Key, r.Value }).ToList()
+            : ArgumentsSaufSucces;
+        var liste = new List<string>(source.Count + arguments.Count);
         for (var i = 0; i < source.Count; i++)
         {
             if (source[i].Equals(Arguments[0], StringComparison.OrdinalIgnoreCase))
@@ -131,7 +147,7 @@ public static partial class NotificationsRetroArch
             liste.Add(source[i]);
         }
 
-        liste.AddRange(ArgumentsSaufSucces);
+        liste.AddRange(arguments);
         return liste;
     }
 
@@ -197,7 +213,8 @@ public static partial class NotificationsRetroArch
     /// 14/11). Faux : <c>OnScreenMsg = 0</c>, comme pour un joueur sans RetroAchievements. Pur.
     /// </summary>
     internal static bool GarderLesSucces(System.Xml.Linq.XDocument es, string systeme, string? fichier)
-        => !NotificationsWorldScoringPreference.ToutMasquer(es) && SuccesActifs(es, systeme, fichier);
+        => !NotificationsWorldScoringPreference.ToutMasquer(es)
+           && (SuccesActifs(es, systeme, fichier) || NotificationsWorldScoringPreference.FlashDuRecord(es));
 
     /// <summary>Comme <see cref="GarderLesSucces(System.Xml.Linq.XDocument, string, string?)"/>, lu sur le disque. Faux si illisible.</summary>
     public static bool GarderLesSucces(string systeme, string? fichier, string? esSettings = null)
