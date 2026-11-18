@@ -432,6 +432,8 @@ builder.Services.AddSingleton<RetroBat.Api.Infrastructure.CabinetLocale>();
 builder.Services.AddSingleton<ApiExposeTaxonomyService>();
 builder.Services.AddSingleton<RomMetadataResolver>();
 builder.Services.AddSingleton<RomCanonicalResolver>();
+// L'identite d'un jeu console par son contenu (B, 18/11) : une seule reponse pour le wrapper, le panneau, les reglages, le Deck.
+builder.Services.AddSingleton(sp => new RetroBat.Api.Infrastructure.IdentiteDesJeux(sp.GetRequiredService<RomCanonicalResolver>()));
 builder.Services.AddSingleton<SystemIdNormalizer>();
 builder.Services.AddSingleton<GameNameNormalizer>();
 builder.Services.AddSingleton<MediaSystemRules>();
@@ -821,6 +823,8 @@ var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
     wsManager.DeckSemanticsJson = deck.SemantiqueJson;
     {
         var wrapperDuDeck = app.Services.GetRequiredService<RetroArchWrapperProvider>();
+        var identiteDuDeck = app.Services.GetRequiredService<RetroBat.Api.Infrastructure.IdentiteDesJeux>();
+        deck.MemParLeContenu = (systeme, chemin) => identiteDuDeck.Pour(systeme, chemin)?.Mem;
         deck.DefinitionDuJeu = (rom, systeme) =>
         {
             var def = wrapperDuDeck.ResolveDefinitionFor(rom, systeme);
