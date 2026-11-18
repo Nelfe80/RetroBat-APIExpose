@@ -366,18 +366,6 @@ public sealed class NelfePlayController : ControllerBase
     private string GroupeDuJeuCourant(RetroBat.Domain.Models.GameReference? jeu, NelfePlayScoringReporter.ModeDuLancement? enCours)
     {
         if (enCours is { RomGroup.Length: > 0 }) return enCours.RomGroup;
-        // Le contenu d'abord (B, 18/11), comme le panneau : le .MEM que la ROM designe, s'il est ouvert.
-        try
-        {
-            var identite = HttpContext?.RequestServices?.GetService(typeof(IdentiteDesJeux)) as IdentiteDesJeux;
-            if (jeu is not null && identite?.Pour(jeu.SystemId, jeu.GamePath)?.Mem is { Length: > 0 } parLeContenu
-                && _scoringCollection.ReglesOuvertes(parLeContenu).Count > 0)
-                return parLeContenu;
-        }
-        catch (Exception)
-        {
-            // une ROM illisible ne coupe pas le classement : la suite, comme avant
-        }
         if (jeu is not null && _wrapper is not null)
         {
             try

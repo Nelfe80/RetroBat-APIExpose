@@ -1991,7 +1991,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     /// <summary>Le groupe que le referentiel des gamelists donne a une empreinte, sans le systeme ; null s'il ne la connait pas.</summary>
     private string? GroupeDuReferentiel(string systeme, string empreinte)
-        => IdentiteDesJeux.GroupeDuReferentiel(_canonique, systeme, empreinte);
+    {
+        var cle = _canonique?.Resolve(systeme, empreinte)?.GameKey;
+        var barre = cle?.IndexOf('/') ?? -1;
+        return barre > 0 && barre < cle!.Length - 1 ? cle[(barre + 1)..] : null;
+    }
 
     /// <summary>
     /// LA ROM ADMISE (11/11, rapport de Gogerad) : le verdict de la regle des ROMs admises (<see cref="RomAdmission"/>) sur le
