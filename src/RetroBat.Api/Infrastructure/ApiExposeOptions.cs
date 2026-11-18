@@ -366,7 +366,12 @@ public class ApiExposeOptions
         public bool HighScoreExposeEnabled { get; set; } = true;
         public bool LegacyHiscoreThemeExportEnabled { get; set; } = false;
         public bool CpoControlPanelExposeEnabled { get; set; } = true;
-        public bool CpoPanelWebSocketPushEnabled { get; set; } = false;
+        /// <summary>
+        /// Pousse le panneau resolu (<c>panel.state</c>) sur le flux /ws : MarqueeManager en depend pour dessiner le panneau.
+        /// ALLUME PAR DEFAUT (decision du user, 18/11) ; les bornes qui l'avaient eteint ou sans la cle sont migrees une fois
+        /// (<see cref="ReglagesPosesUneFois"/>).
+        /// </summary>
+        public bool CpoPanelWebSocketPushEnabled { get; set; } = true;
         public string GeneralPanelButtons { get; set; } = "auto";
     }
 
@@ -797,6 +802,13 @@ public class ApiExposeOptions
         /// ne met pas une partie en ligne sans que le joueur l'ait choisi.
         /// </summary>
         public bool ChallengeShareLive { get; set; }
+
+        /// <summary>
+        /// Le PlayerDeck du joueur dans le direct d'un defi diffuse (H-D28) : le Deck tourne une seconde fois sans fenetre
+        /// et l'exe du direct (0.7.3 au moins) le pose autour du jeu. ALLUME PAR DEFAUT (decision du user, 18/11) ; sans
+        /// Deck pose ou avec un exe plus ancien, le direct reste comme avant.
+        /// </summary>
+        public bool ChallengeShareLiveDeck { get; set; } = true;
 
         /// <summary>
         /// Qui peut rejoindre un defi diffuse : « none » (personne, on regarde seulement),

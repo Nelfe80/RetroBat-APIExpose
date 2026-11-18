@@ -345,6 +345,21 @@ public sealed class DeckLancementTests : IDisposable
     }
 
     [Fact]
+    public void L_option_Deck_dans_le_direct_eteinte_garde_le_direct_comme_avant()
+    {
+        var service = Service(new SimpleEventBus(), new ApiContext { PlayerPseudo = "nelfe" });
+        var demarres = 0;
+        service.DemarrerDeckDuDirect = _ => { demarres++; return DeckDuDirect.PourEssai("x"); };
+        Assert.True(service.DeckDansLeDirect); // allumee par defaut
+        service.OptionDeckDansLeDirect = () => false;
+        Assert.Equal("posed", service.Preparer(DeckModes.WorldScoring, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip").Status);
+        service.MarquerLeDirect();
+        Assert.False(service.EnCours!.Diffuse);
+        Assert.Equal(0, demarres);
+        Assert.Empty(service.OptionsDuDirect(exeSaitLeDeck: true));
+    }
+
+    [Fact]
     public void Un_jeu_sans_Deck_ne_lance_aucun_Deck_dans_le_direct()
     {
         var service = Service(new SimpleEventBus(), new ApiContext { PlayerPseudo = "nelfe" });

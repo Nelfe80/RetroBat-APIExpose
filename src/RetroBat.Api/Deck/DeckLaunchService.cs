@@ -333,6 +333,13 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     /// </summary>
     public void MarquerLeDirect()
     {
+        // L'option du menu d'ES (global.apiexpose.challenge.share_live_deck, allumee par defaut) : eteinte, le direct reste comme avant
+        if (!DeckDansLeDirect)
+        {
+            _journal?.LogInformation("PlayerDeck : option « Deck dans le direct » eteinte, direct sans Deck.");
+            return;
+        }
+
         lock (_verrou)
         {
             if (_enCours is { Status: "posed" } l) _enCours = l with { Diffuse = true };
@@ -349,6 +356,13 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
 
     private DeckDuDirect? _duDirect;
 
+    /// <summary>Couture des essais : la valeur de l'option « Deck dans le direct » (sinon les options de l'API).</summary>
+    internal Func<bool>? OptionDeckDansLeDirect { get; set; }
+
+    /// <summary>L'option « Deck dans le direct » (<c>global.apiexpose.challenge.share_live_deck</c>) : allumee par defaut.</summary>
+    public bool DeckDansLeDirect
+        => OptionDeckDansLeDirect?.Invoke() ?? _options?.CurrentValue.Leaderboard.ChallengeShareLiveDeck ?? true;
+
     /// <summary>Couture des essais : le demarrage du Deck du direct.</summary>
     internal Func<DeckLaunchService, DeckDuDirect?>? DemarrerDeckDuDirect { get; set; }
 
@@ -362,7 +376,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     {
         DeckDuDirect? d;
         lock (_verrou) d = _duDirect;
-        return exeSaitLeDeck && d is { Vivant: true } && DeckDuDirect.PourCeLancement(EnCours) ? d.OptionsDuDirect : [];
+        return exeSaitLeDeck && DeckDansLeDirect && d is { Vivant: true } && DeckDuDirect.PourCeLancement(EnCours) ? d.OptionsDuDirect : [];
     }
 
     private void ArreterLeDeckDuDirect(string pourquoi)
@@ -380,7 +394,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     }
 
     /// <summary>L'exe du PlayerDeck (le meme que celui de la borne), ou null s'il n'est pas installe.</summary>
-    public string? ExeDuDeck()
+    public string? ExeDuDeckInstalle()
     {
         var exe = Path.Combine(DossierDuDeck, NomDuHost + ".exe");
         return File.Exists(exe) ? exe : null;

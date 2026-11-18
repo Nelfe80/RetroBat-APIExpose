@@ -10,13 +10,19 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly IEsSettingsStore _settingsStore;
     private readonly ILogger<ApiExposeSettingsDefaultsHostedService>? _logger;
+    private readonly ApiExposeAppsettingsSyncService _appsettings;
+
+    /// <summary>Couture des essais : l'ecriture dans appsettings.json (sinon celle du synchroniseur).</summary>
+    internal Func<IReadOnlyList<ApiExposeSettingChange>, int>? EcrireAppsettings { get; set; }
     private IDisposable? _optionsReloadRegistration;
 
     public ApiExposeSettingsDefaultsHostedService(
         IOptionsMonitor<ApiExposeOptions> options,
         IEsSettingsStore settingsStore,
-        ILogger<ApiExposeSettingsDefaultsHostedService>? logger = null)
+        ILogger<ApiExposeSettingsDefaultsHostedService>? logger = null,
+        ApiExposeAppsettingsSyncService? appsettings = null)
     {
+        _appsettings = appsettings ?? new ApiExposeAppsettingsSyncService();
         _options = options;
         _settingsStore = settingsStore;
         _logger = logger;
@@ -55,6 +61,24 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
 
     private void EnsureDefaults(ApiExposeOptions options, CancellationToken cancellationToken)
     {
+        // Les reglages allumes une seule fois : appsettings.json d'abord (sinon le recopiage d'appsettings vers ES defait la
+        // migration au demarrage suivant), puis ES et la marque. Un echec sur appsettings repousse tout au demarrage suivant.
+        var migrer = MigrationsEnAttente();
+        if (migrer.Count > 0)
+        {
+            try
+            {
+                IReadOnlyList<ApiExposeSettingChange> changes =
+                    [.. migrer.Select(m => new ApiExposeSettingChange(m.Cle, string.Empty, m.Valeur))];
+                (EcrireAppsettings ?? _appsettings.ApplyEsSettingsChanges)(changes);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Text.Json.JsonException)
+            {
+                _logger?.LogWarning(ex, "Migration des reglages repoussee : appsettings.json illisible ou verrouille.");
+                migrer = [];
+            }
+        }
+
         var changed = _settingsStore.Update(document =>
         {
             var root = document.Root ?? throw new InvalidOperationException("es_settings.cfg root is missing.");
@@ -95,6 +119,13 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
             // equivalent dans appsettings.json. Pose a OFF seulement s'il manque (il s'affichait AUTO) :
             // le recopier a chaque demarrage le remettrait a OFF avant que la migration le lise.
             updated |= AjouterSiAbsente(root, "global.apiexpose.media_migration.enabled", "0");
+            if (migrer.Count > 0)
+            {
+                var faites = ReglagesPosesUneFois.Appliquer(root);
+                foreach (var m in faites) _logger?.LogInformation("Reglage allume une fois : {Cle} = {Valeur}.", m.Cle, m.Valeur);
+                updated |= faites.Count > 0;
+            }
+
             if (updated)
             {
                 root.Add(new XText(Environment.NewLine));
@@ -106,6 +137,20 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
         if (changed)
         {
             _logger?.LogInformation("APIExpose menu defaults initialized in es_settings.cfg.");
+        }
+    }
+
+    private IReadOnlyList<ReglagesPosesUneFois.Migration> MigrationsEnAttente()
+    {
+        try
+        {
+            return ReglagesPosesUneFois.EnAttente(
+                new Dictionary<string, string>(_settingsStore.ReadAllSettings(), StringComparer.OrdinalIgnoreCase));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Xml.XmlException)
+        {
+            _logger?.LogWarning(ex, "Migration des reglages repoussee : es_settings.cfg illisible.");
+            return [];
         }
     }
 
@@ -175,6 +220,7 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
             ("global.apiexpose.rom_set_manager.enabled", ToEsBool(options.RomSetManager.Enabled)),
             ("global.apiexpose.game_events_manager.enabled", ToEsBool(options.GameEventsManager.Enabled)),
             ("global.apiexpose.challenge.share_live", ToEsBool(options.Leaderboard.ChallengeShareLive)),
+            ("global.apiexpose.challenge.share_live_deck", ToEsBool(options.Leaderboard.ChallengeShareLiveDeck)),
             ("global.apiexpose.challenge.join_policy", options.Leaderboard.ChallengeJoinPolicy),
             ("global.apiexpose.game_events.retroarch_wrapper.enabled", ToEsBool(options.GameEventsManager.RetroArchWrapperEnabled)),
             ("global.apiexpose.game_events.console_high_score_capture.enabled", ToEsBool(options.GameEventsManager.ConsoleHighScoreCaptureEnabled)),

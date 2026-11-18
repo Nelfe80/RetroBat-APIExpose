@@ -69,7 +69,7 @@ public sealed class DeckDuDirect : IDisposable
                 return null;
             }
 
-            if (deck.ExeDuDeck() is not { } exe) return null;
+            if (deck.ExeDuDeckInstalle() is not { } exe) return null;
             var memoire = NouveauNom();
             var p = Process.Start(new ProcessStartInfo
             {
