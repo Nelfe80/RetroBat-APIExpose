@@ -345,6 +345,31 @@ public sealed class DeckLancementTests : IDisposable
     }
 
     [Fact]
+    public void Un_speedrun_ou_un_challenge_avec_le_Deck_pose_lance_le_Deck_du_direct_et_l_option_le_coupe()
+    {
+        var service = Service(new SimpleEventBus(), new ApiContext { PlayerPseudo = "nelfe" });
+        var demarres = new List<DeckDuDirect>();
+        service.DemarrerDeckDuDirect = s =>
+        {
+            if (!DeckDuDirect.PourCeLancement(s.EnCours)) return null;
+            var d = DeckDuDirect.PourEssai("s" + demarres.Count);
+            demarres.Add(d);
+            return d;
+        };
+        Assert.Equal("posed", service.Preparer(DeckModes.Speedrun, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip").Status);
+        Assert.Single(demarres);
+        Assert.Equal(["--deck-memoire", "s0"], service.OptionsDuDirect(exeSaitLeDeck: true));
+        Assert.Empty(service.OptionsDuDirect(exeSaitLeDeck: false));
+
+        // un nouveau lancement remplace l'ancien Deck du direct ; option eteinte : rien ne part
+        service.OptionDeckDansLeDirect = () => false;
+        service.Preparer(DeckModes.Speedrun, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip");
+        Assert.False(demarres[0].Vivant);
+        Assert.Single(demarres);
+        Assert.Empty(service.OptionsDuDirect(exeSaitLeDeck: true));
+    }
+
+    [Fact]
     public void L_option_Deck_dans_le_direct_eteinte_garde_le_direct_comme_avant()
     {
         var service = Service(new SimpleEventBus(), new ApiContext { PlayerPseudo = "nelfe" });

@@ -43,9 +43,10 @@ public sealed class DeckDuDirect : IDisposable
     /// <summary>« --deck-memoire &lt;nom&gt; ». Pur.</summary>
     internal static IReadOnlyList<string> Options(string memoire) => ["--deck-memoire", memoire];
 
-    /// <summary>Le lancement en cours montre-t-il le Deck dans le direct ? CHALLENGE du World Scoring, diffuse, Deck pose. Pur.</summary>
+    /// <summary>Le lancement en cours montre-t-il le Deck dans le direct ? CHALLENGE du World Scoring diffuse, ou speedrun / challenge du panneau des defis ; Deck pose. Jamais MULTIPLAYER. Pur.</summary>
     internal static bool PourCeLancement(DeckLancement? l)
-        => l is { Status: "posed", Mode: DeckModes.WorldScoring, Diffuse: true, DeckId: { Length: > 0 } };
+        => l is { Status: "posed", DeckId: { Length: > 0 } }
+            && ((l.Mode == DeckModes.WorldScoring && l.Diffuse) || l.Mode == DeckModes.Speedrun);
 
     /// <summary>La ligne du PlayerDeck du direct. Pur.</summary>
     internal static string Arguments(string memoire, int parent)

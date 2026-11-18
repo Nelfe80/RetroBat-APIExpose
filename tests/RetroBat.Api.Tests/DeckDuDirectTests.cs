@@ -22,7 +22,9 @@ public sealed class DeckDuDirectTests
         Assert.False(DeckDuDirect.PourCeLancement(Lancement(diffuse: false)));            // CHALLENGE prive
         Assert.False(DeckDuDirect.PourCeLancement(Lancement(status: "off")));             // Deck retire au lancement
         Assert.False(DeckDuDirect.PourCeLancement(Lancement(status: "window")));          // aucun decor chez le joueur
-        Assert.False(DeckDuDirect.PourCeLancement(Lancement(mode: DeckModes.Speedrun)));
+        // speedruns et challenges du panneau des defis : le direct montre aussi le Deck (decision du 18/11 nuit), sans marque de diffusion
+        Assert.True(DeckDuDirect.PourCeLancement(Lancement(mode: DeckModes.Speedrun, diffuse: false)));
+        Assert.False(DeckDuDirect.PourCeLancement(Lancement(mode: DeckModes.Speedrun, status: "off")));
         Assert.False(DeckDuDirect.PourCeLancement(Lancement(mode: DeckModes.Multiplayer)));
         Assert.False(DeckDuDirect.PourCeLancement(Lancement(deck: null)));
     }

@@ -198,6 +198,9 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
             _journal?.LogInformation(ex, "PlayerDeck : epreuve non preparee.");
         }
 
+        // LES SPEEDRUNS ET LES CHALLENGES (decision du user du 18/11 nuit) : leur direct (partage, annonce par le site) montre
+        // aussi le Deck du joueur ; il part avec le lancement, comme celui du defi diffuse. Jamais en MULTIPLAYER (pas de Deck).
+        if (lancement is { Status: "posed", Mode: DeckModes.Speedrun }) DemarrerLeDeckDuDirect("speedrun or challenge launch");
         return lancement;
     }
 
@@ -348,7 +351,13 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         // LE DECK DU DIRECT PART AVEC LA PARTIE, pas avec le passage a l'antenne : ses instruments qui s'accumulent (NO MISS,
         // FIRE MIX, scores par stage, graphe) sont alors ceux du Deck de la borne quand la partie passe a l'antenne. Il ne
         // part que si l'exe du direct sait le poser (0.7.3).
-        ArreterLeDeckDuDirect("new live challenge");
+        DemarrerLeDeckDuDirect("new live challenge");
+    }
+
+    private void DemarrerLeDeckDuDirect(string pourquoi)
+    {
+        if (!DeckDansLeDirect) return;
+        ArreterLeDeckDuDirect(pourquoi);
         var nouveau = DemarrerDeckDuDirect?.Invoke(this)
                       ?? DeckDuDirect.Demarrer(this, Replay.Video.LanceurDuDirect.Chemin(AppContext.BaseDirectory), _journal);
         lock (_verrou) _duDirect = nouveau;
