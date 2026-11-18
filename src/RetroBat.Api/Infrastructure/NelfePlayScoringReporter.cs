@@ -5941,11 +5941,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 : uneVie
                     ? RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil1LC(profils, mode)
                     : RetroBat.Api.Scoring.ModesDeJeu.ChoisirProfil(profils, mode);
+        var defi = (string?)brouillon["genre"] == "defi" ? brouillon["defi"] as JsonObject : null;
         if (profile is null)
         {
             if ((bool?)brouillon["labo"] == true)
             {
                 profile = RetroBat.Api.Scoring.ScoreLabLabMode.PlaceholderProfile();
+            }
+            else if (defi is not null)
+            {
+                // UN JEU OUVERT AUX SEULS SPEEDRUNS (18/11) : pas de classement au score, le profil du defi est compose plus bas
+                // depuis l'index des defis (PasseportDeDefi.ProfilSansClassementAuScore). C'est l'index qui dit si l'epreuve est ouverte.
             }
             else if (duSite)
             {
@@ -5959,12 +5965,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
         }
 
-        var defi = (string?)brouillon["genre"] == "defi" ? brouillon["defi"] as JsonObject : null;
         RetroBat.Api.Speedrun.EntreeDeLIndex? entreeDuDefi = null;
         if (defi is not null)
         {
             var defiId = (string?)defi["challenge"]?["challenge_id"] ?? "";
-            var (joignable, entree) = await LireLIndexDesDefisAsync(credential, defiId, (int?)defi["challenge"]?["version"] ?? 0, ct).ConfigureAwait(false);
+            var versionDuDefi = (int?)defi["challenge"]?["version"] ?? 0;
+            var (joignable, entree) = await LireLIndexDesDefisAsync(credential, defiId, versionDuDefi, ct).ConfigureAwait(false);
             if (!joignable)
             {
                 Trace($"brouillon {id} : index des defis indisponible, nouvel essai plus tard");
@@ -5976,6 +5982,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 return (RetroBat.Api.Scoring.IssueDEnvoi.Definitif, null, null);
             }
             entreeDuDefi = entree;
+            if (profile is null)
+            {
+                profile = RetroBat.Api.Speedrun.PasseportDeDefi.ProfilSansClassementAuScore(systemId, romGroup, entree, versionDuDefi);
+                Trace($"brouillon {id} : {romGroup} sans classement au score, defi {defiId} envoye sur le profil de l'epreuve");
+            }
+        }
+        if (profile is null)
+        {
+            // Ceinture et bretelles : seul un defi passe sans profil plus haut, et l'index lui en a donne un.
+            Trace($"brouillon {id} : aucun profil pour {romGroup}, retire sans envoi");
+            return (RetroBat.Api.Scoring.IssueDEnvoi.Definitif, null, null);
         }
 
         var ticket = await TicketAsync(credential, ct).ConfigureAwait(false);

@@ -184,6 +184,28 @@ public class ScoringCollectionContenuTests
         }
     }
 
+    // 18/11 (Old AF Gamer) : « Super Mario Bros. 3 (USA, Rev A)(1990)(Nintendo).nes », jeu ouvert aux seuls speedruns, gardait le
+    // groupe de son nom de fichier : le manifeste range ces jeux dans `speedrun_games`, que la recherche par contenu ignorait.
+    [Fact]
+    public void Un_jeu_ouvert_aux_seuls_speedruns_se_trouve_aussi_par_son_contenu()
+    {
+        var dossier = Path.Combine(Path.GetTempPath(), "nelfe-index-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dossier);
+        try
+        {
+            File.WriteAllText(Path.Combine(dossier, "scoring-collection-remote.json"),
+                """{"ok":true,"games":[{"system_id":"nes","rom_group":"super-mario-bros","content_hashes":{"md5":["811b027eaf99c2def7b933c5208636de"]}}],"speedrun_games":[{"system_id":"nes","rom_group":"super-mario-bros-3","content_hashes":{"md5":["86d1982fea7342c0af9679ddf3869d8d"]}}]}""");
+            Assert.Equal("super-mario-bros-3", NelfePlayScoringReporter.GroupeDeLaPartie("nes", "super-mario-bros-3-usa-rev-a-1990-nintendo",
+                "86d1982fea7342c0af9679ddf3869d8d", null, dossier));
+            // Le jeu au score n'a pas change.
+            Assert.Equal("super-mario-bros", NelfePlayScoringCollectionSyncService.GroupeOuvertDuContenu("nes", "811b027eaf99c2def7b933c5208636de", null, dossier));
+        }
+        finally
+        {
+            Directory.Delete(dossier, recursive: true);
+        }
+    }
+
     [Fact]
     public void Un_profil_sans_aucun_hash_ne_confirme_rien()
     {
