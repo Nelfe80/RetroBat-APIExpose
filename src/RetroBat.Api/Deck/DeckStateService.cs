@@ -265,6 +265,12 @@ public sealed class DeckStateService : IHostedService, IDisposable
     public Func<string, string, (string? DefinitionFile, string? MemRom)>? DefinitionDuJeu { get; set; }
 
     /// <summary>
+    /// LE .MEM QUE LE CONTENU DESIGNE (B, 18/11) : (systeme, chemin de la ROM) donne le nom du .MEM que le wrapper chargera,
+    /// ou null. Le prechargement le resout a la place du nom du fichier : un SMB3 au nom GoodNES trouve son .MEM.
+    /// </summary>
+    public Func<string, string, string?>? MemParLeContenu { get; set; }
+
+    /// <summary>
     /// LE SENS DES SIGNAUX POUR TOUT JEU (API-6, 14/11). Le sens n'arrivait qu'avec le premier signal du wrapper : un .MEM
     /// dont les lignes ne parlent qu'au changement laissait les instruments vides tant que rien ne bougeait. Il se lit
     /// maintenant des le depart, avec le .MEM que le wrapper chargerait ; le premier signal le relit seulement s'il nomme un
@@ -276,7 +282,10 @@ public sealed class DeckStateService : IHostedService, IDisposable
         (string? DefinitionFile, string? MemRom) def;
         try
         {
-            def = resoudre(partie.Rom, partie.SystemId);
+            string? parLeContenu = null;
+            try { parLeContenu = MemParLeContenu?.Invoke(partie.SystemId, partie.GamePath); }
+            catch (Exception) { /* le nom du fichier, comme avant */ }
+            def = resoudre(parLeContenu ?? partie.Rom, partie.SystemId);
         }
         catch (Exception ex)
         {

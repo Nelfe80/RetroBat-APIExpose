@@ -36,6 +36,8 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
     private readonly NelfePlayDeviceStore _devices;
     private readonly ApiContext _context;
     private readonly RomCanonicalResolver _canonical;
+    // L'identite par le contenu (B, 18/11) : le groupe du profil et la ligne mem= du wrapper. Null : par le nom, comme avant.
+    private readonly IdentiteDesJeux? _identite;
     private readonly IOptionsMonitor<ApiExposeOptions> _options;
     private readonly IEsSettingsStore _esSettings;
     private readonly RetroBat.Api.Replay.Playback.ReplayPlaybackService? _playback;
@@ -70,8 +72,10 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         IEsSettingsStore esSettings,
         ILogger<CertifiedSettingsService>? logger = null,
         RetroBat.Api.Replay.Playback.ReplayPlaybackService? playback = null,
-        NvramSnapshotService? nvram = null)
+        NvramSnapshotService? nvram = null,
+        IdentiteDesJeux? identite = null)
     {
+        _identite = identite;
         _playback = playback;
         _nvram = nvram;
         _bus = bus;
@@ -327,7 +331,8 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         {
             if (!_options.CurrentValue.NelfePlay.ForceCertifiedSettings)
             {
-                EffacerSaufVerrous();
+                // Sans reglages a forcer, le wrapper recoit quand meme le .MEM que le contenu designe (mem=).
+                EffacerSaufVerrous(selection ? _context.Ui.Selected : null);
                 return;
             }
             // La lecture d'un replay n'est pas une partie : rien a forcer, rien a neutraliser. Le lancement d'un jeu, lui, vient
@@ -360,10 +365,17 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             // Un jeu se lance : la selection qui attend son anti-rebond part tout de suite (la NVRAM epinglee s'efface a la
             // selection, avant que l'emulateur ne la lise).
             if (!selection) _rebond.Presser();
-            var romGroup = _canonical.ResolveScoreSlug(systeme, fichier, null, null);
+            // Le groupe par le CONTENU d'abord (B, 18/11) : un SMB3 au nom GoodNES n'avait aucun groupe par son nom, ses
+            // options certifiees ne se posaient pas. Sinon par le nom, comme avant.
+            // Seulement un .MEM qui porte un score, comme la recherche par le nom : un jeu sans score ne demande rien au site.
+            var parLeContenu = _identite?.Pour(systemeEs, chemin)?.Mem;
+            var romGroup = (parLeContenu is null ? null : _canonical.ResolveScoreSlug(systeme, parLeContenu, null, null))
+                           ?? _canonical.ResolveScoreSlug(systeme, fichier, null, null);
             if (string.IsNullOrWhiteSpace(romGroup))
             {
                 _logger?.LogInformation("Reglages certifies : {Fichier} ({Systeme}) sans groupe de score, rien a forcer.", fichier, systeme);
+                // Le wrapper recoit quand meme le .MEM du contenu (un jeu ouvert aux seuls speedruns n'a pas de score).
+                if (MemAImposer(jeu) is not null) EffacerSaufVerrous(jeu, effacer: false);
                 return;
             }
 
@@ -385,8 +397,8 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             var attendus = await ValeursAttenduesEnCacheAsync(systeme, romGroup!, ct).ConfigureAwait(false);
             if (attendus is null)
             {
-                // Jeu non ouvert au scoring : rien a forcer, rien a neutraliser.
-                if (!selection) EffacerSaufVerrous();
+                // Jeu non ouvert au scoring : rien a forcer, rien a neutraliser (le .MEM du contenu, s'il le faut).
+                EffacerSaufVerrous(jeu, effacer: !selection);
                 return;
             }
 
@@ -403,11 +415,11 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             }
             if (attendus.Count == 0)
             {
-                if (!selection) EffacerSaufVerrous();
+                EffacerSaufVerrous(jeu, effacer: !selection);
                 return;
             }
 
-            Ecrire(Path.GetFileNameWithoutExtension(chemin), attendus);
+            Ecrire(Path.GetFileNameWithoutExtension(chemin), attendus, MemAImposer(jeu));
             _logger?.LogInformation("Reglages certifies poses pour {Rom} : {Nombre} valeur(s).", romGroup, attendus.Count);
         }
         catch (Exception ex)
@@ -496,7 +508,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             ? "arcade" : s;
     }
 
-    private static void Ecrire(string romBasename, Dictionary<string, string> valeurs)
+    private static void Ecrire(string romBasename, Dictionary<string, string> valeurs, string? mem = null)
     {
         var texte = new StringBuilder();
         texte.Append("rom=").Append(romBasename).Append('\n');
@@ -506,6 +518,9 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             if (paire.Key.Contains('=') || paire.Value.Contains('\n') || paire.Value.Contains('\r')) continue;
             texte.Append("opt.").Append(paire.Key).Append('=').Append(paire.Value).Append('\n');
         }
+        // Le .MEM que le contenu designe quand le wrapper ne le trouverait pas seul (wrapper 0.347 ; un plus ancien ignore la
+        // ligne). Jamais un chemin : le wrapper refait le meme controle.
+        if (IdentiteDesJeux.NomDeMemSur(mem)) texte.Append("mem=").Append(mem).Append('\n');
         // Les verrous du defi qui se lance sur cette ROM (D18) : chaque reecriture les garde.
         RetroBat.Api.Speedrun.VerrousDuLancement.Ecrire(texte, RetroBat.Api.Speedrun.VerrousDuLancement.Pour(romBasename));
         var chemin = FilePath;
@@ -520,6 +535,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
     public static void PoserLesVerrous(string romBasename)
     {
         var valeurs = new Dictionary<string, string>(StringComparer.Ordinal);
+        string? mem = null;
         try
         {
             if (File.Exists(FilePath))
@@ -530,6 +546,8 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
                 {
                     foreach (var l in lignes.Where(l => l.StartsWith("opt.", StringComparison.Ordinal) && l.Contains('=')))
                         valeurs[l[4..l.IndexOf('=')]] = l[(l.IndexOf('=') + 1)..];
+                    // Le .MEM du contenu pose a la selection reste : le defi se joue sur le meme jeu.
+                    mem = lignes.FirstOrDefault(l => l.StartsWith("mem=", StringComparison.Ordinal))?[4..];
                 }
             }
         }
@@ -538,21 +556,42 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             // Le fichier se reecrit au demarrage du jeu, verrous compris.
         }
 
-        Ecrire(romBasename, valeurs);
+        Ecrire(romBasename, valeurs, mem);
     }
 
     /// <summary>Hors fin de partie : sans reglage a forcer, le fichier ne garde que les verrous du defi qui se lance, s'il y en a.</summary>
-    private void EffacerSaufVerrous()
+    /// <param name="jeuChoisi">Le jeu dont il s'agit ; null : celui qui tourne, sinon celui qui est choisi.</param>
+    /// <param name="effacer">Faux a la selection : sans rien a poser, le fichier reste tel quel, comme avant.</param>
+    private void EffacerSaufVerrous(RetroBat.Domain.Models.GameReference? jeuChoisi = null, bool effacer = true)
     {
-        var jeu = _context.Ui.Running ?? _context.Ui.Selected;
+        var jeu = jeuChoisi ?? _context.Ui.Running ?? _context.Ui.Selected;
         var rom = string.IsNullOrWhiteSpace(jeu?.GamePath) ? null : Path.GetFileNameWithoutExtension(jeu!.GamePath);
-        if (rom is not null && RetroBat.Api.Speedrun.VerrousDuLancement.Pour(rom).Count > 0)
+        var mem = MemAImposer(jeu);
+        if (rom is not null && (mem is not null || RetroBat.Api.Speedrun.VerrousDuLancement.Pour(rom).Count > 0))
         {
-            Ecrire(rom, new Dictionary<string, string>());
+            Ecrire(rom, new Dictionary<string, string>(), mem);
             return;
         }
 
-        Effacer();
+        if (effacer) Effacer();
+    }
+
+    /// <summary>
+    /// Le .MEM a dire au wrapper pour ce jeu : celui que son contenu designe, quand le wrapper ne le trouverait pas seul
+    /// (ni par le md5 dans alias.json). Null sinon, et toujours pour l'arcade.
+    /// </summary>
+    private string? MemAImposer(RetroBat.Domain.Models.GameReference? jeu)
+    {
+        if (_identite is null || string.IsNullOrWhiteSpace(jeu?.GamePath) || string.IsNullOrWhiteSpace(jeu.SystemId)) return null;
+        try
+        {
+            return _identite.Pour(jeu.SystemId, jeu.GamePath) is { AImposerAuWrapper: true } id ? id.Mem : null;
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogDebug(ex, "Reglages certifies : identite du contenu indisponible pour {Jeu}.", jeu.GamePath);
+            return null;
+        }
     }
 
     private static void Effacer()

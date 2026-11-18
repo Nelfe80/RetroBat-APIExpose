@@ -67,6 +67,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     private bool _directAnnonceParLeDefi;
     private readonly IEmulationStationNotificationService _notifications;
     private readonly RetroBat.Providers.RetroArchWrapper.RetroArchWrapperProvider _wrapper;
+    // L'identite par le contenu (B, 18/11) : la cle du panneau est le .MEM que le contenu designe, avant le nom.
+    private readonly Infrastructure.IdentiteDesJeux? _identite;
     private string _replayLance = "";
     private readonly ILogger<LeaderboardInputService> _logger;
 
@@ -164,8 +166,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         Multiplayer.SonDEmulationStation? sonDEs = null,
         Speedrun.IPrioritesDuJeu? priorites = null,
         WorldScoringEcransService? ecransWs = null,
-        Infrastructure.SuiviDuSite? suivi = null)
+        Infrastructure.SuiviDuSite? suivi = null,
+        Infrastructure.IdentiteDesJeux? identite = null)
     {
+        _identite = identite;
         _suivi = suivi;
         _ecransWs = ecransWs;
         _priorites = priorites;
@@ -2694,6 +2698,17 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
 
     private string CalculerLaCle(string cheminDuJeu, string systeme, string nomDuJeu)
     {
+        // Le contenu d'abord (B, 18/11) : 60 jeux de la borne dont le wrapper chargeait le bon .MEM par le md5 cherchaient leurs
+        // scores sous le slug de leur nom (« castlevania-2-simons-quest » pour « castlevania-ii-simons-quest »).
+        try
+        {
+            if (cheminDuJeu.Length > 0 && _identite?.Pour(systeme, cheminDuJeu)?.Mem is { Length: > 0 } parLeContenu)
+                return parLeContenu.Trim().ToLowerInvariant();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Classement : identite du contenu indisponible pour {Jeu}.", nomDuJeu);
+        }
         try
         {
             var brut = Path.GetFileNameWithoutExtension(cheminDuJeu.Length > 0 ? cheminDuJeu : nomDuJeu);
