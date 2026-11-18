@@ -385,7 +385,88 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     {
         DeckDuDirect? d;
         lock (_verrou) d = _duDirect;
-        return exeSaitLeDeck && DeckDansLeDirect && d is { Vivant: true } && DeckDuDirect.PourCeLancement(EnCours) ? d.OptionsDuDirect : [];
+        return exeSaitLeDeck && DeckDansLeDirect && d is { Vivant: true, FinDemandee: false } && DeckDuDirect.PourCeLancement(EnCours) ? d.OptionsDuDirect : [];
+    }
+
+    /// <summary>
+    /// Le bail d'un direct sur le Deck du direct (19/11) : ses options (vides sans Deck), rendu par le direct a la fin de son exe.
+    /// Tant qu'un bail court, la fin de la partie n'arrete pas le Deck du direct (<see cref="FinirLeDeckDuDirect"/>).
+    /// </summary>
+    public BailDuDirect TenirPourLeDirect(string? exeDuDirect) => TenirPourLeDirect(Replay.Video.LanceurDuDirect.SaitLeDeck(exeDuDirect));
+
+    internal BailDuDirect TenirPourLeDirect(bool exeSaitLeDeck)
+    {
+        DeckDuDirect? d;
+        IReadOnlyList<string> options;
+        lock (_verrou)
+        {
+            d = _duDirect;
+            options = OptionsDuDirect(exeSaitLeDeck);
+            if (options.Count == 0 || d is null) return BailDuDirect.Aucun;
+            d.Lecteurs++;
+        }
+
+        return new BailDuDirect(options, () => RendreLeBail(d));
+    }
+
+    private void RendreLeBail(DeckDuDirect d)
+    {
+        bool arreter;
+        lock (_verrou)
+        {
+            d.Lecteurs--;
+            arreter = d.FinDemandee && d.Lecteurs <= 0 && ReferenceEquals(_duDirect, d);
+        }
+
+        if (arreter) ArreterCeDeckDuDirect(d, "live ended");
+    }
+
+    /// <summary>Au plus ce temps apres la fin de la partie, le Deck du direct s'arrete meme si un direct le tient encore.</summary>
+    internal TimeSpan GardeApresLaPartie { get; set; } = TimeSpan.FromSeconds(60);
+
+    /// <summary>
+    /// LA FIN DE LA PARTIE (19/11) : le Deck du direct s'arrete tout de suite si aucun direct ne le montre ; sinon il sert la fin du
+    /// direct (le film arrive 5 a 19 s apres le jeu : la fin de la course garde le Deck) et s'arrete quand le dernier direct le
+    /// rend, au plus tard <see cref="GardeApresLaPartie"/> apres la partie. Aucun nouveau direct ne le prend alors.
+    /// </summary>
+    private void FinirLeDeckDuDirect()
+    {
+        DeckDuDirect? d;
+        bool garder;
+        lock (_verrou)
+        {
+            d = _duDirect;
+            if (d is null) return;
+            garder = d.Lecteurs > 0;
+            if (garder) d.FinDemandee = true;
+        }
+
+        if (!garder)
+        {
+            ArreterCeDeckDuDirect(d, "game ended");
+            return;
+        }
+
+        _journal?.LogInformation("PlayerDeck : partie finie, Deck du direct garde pour la fin du direct ({S:F0} s au plus).", GardeApresLaPartie.TotalSeconds);
+        var garde = GardeApresLaPartie;
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(garde).ConfigureAwait(false);
+            ArreterCeDeckDuDirect(d, "game ended " + garde.TotalSeconds.ToString("0", System.Globalization.CultureInfo.InvariantCulture) + " s ago");
+        });
+    }
+
+    /// <summary>Arrete ce Deck du direct s'il est encore celui de la partie (un nouveau lancement l'a peut-etre deja remplace).</summary>
+    private void ArreterCeDeckDuDirect(DeckDuDirect d, string pourquoi)
+    {
+        lock (_verrou)
+        {
+            if (!ReferenceEquals(_duDirect, d)) return;
+            _duDirect = null;
+        }
+
+        d.Dispose();
+        _journal?.LogInformation("PlayerDeck : Deck du direct arrete ({Pourquoi}).", pourquoi);
     }
 
     private void ArreterLeDeckDuDirect(string pourquoi)
@@ -550,6 +631,13 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         var liste = new List<DeckResident>();
         foreach (var p in Process.GetProcessesByName(NomDuHost))
         {
+            // le Deck du direct (meme exe, sans fenetre) n'est jamais le Deck de la borne
+            if (DeckDuDirect.EstUnDeckDuDirect(p.Id))
+            {
+                p.Dispose();
+                continue;
+            }
+
             DateTime debut;
             try { debut = p.StartTime.ToUniversalTime(); }
             catch (Exception) { debut = DateTime.MaxValue; }   // illisible : jamais tenu pour perime
@@ -695,8 +783,9 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
                     // Le decor s'efface une fois la partie finie : il n'apparait pas parmi les decors d'ES
                     if (effacer) DeckDecor.Effacer(RacineDuDecor);
                     RemplacerApresLaPartie();
-                    // Le Deck du direct (H-D28) s'arrete avec la partie (pas celui d'un lancement qui vient d'etre prepare)
-                    if (effacer) ArreterLeDeckDuDirect("game ended");
+                    // Le Deck du direct (H-D28) s'arrete avec la partie, ou avec le direct qui la montre encore (pas celui d'un
+                    // lancement qui vient d'etre prepare)
+                    if (effacer) FinirLeDeckDuDirect();
                     break;
                 }
             }

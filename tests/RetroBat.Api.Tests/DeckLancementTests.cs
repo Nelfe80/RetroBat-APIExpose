@@ -344,6 +344,90 @@ public sealed class DeckLancementTests : IDisposable
         service.StopAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
 
+    private static void PartieFinie(DeckLaunchService service, SimpleEventBus bus)
+    {
+        typeof(DeckLaunchService).GetField("_preparation", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .SetValue(service, DateTime.UtcNow.AddMinutes(-5));
+        bus.PublishAsync(new EventEnvelope { Type = "ui.game.ended", Payload = new { } }).GetAwaiter().GetResult();
+    }
+
+    private (DeckLaunchService Service, SimpleEventBus Bus, List<DeckDuDirect> Demarres) SpeedrunAvecDeckDuDirect()
+    {
+        var bus = new SimpleEventBus();
+        var service = Service(bus, new ApiContext { PlayerPseudo = "nelfe" });
+        var demarres = new List<DeckDuDirect>();
+        service.DemarrerDeckDuDirect = s =>
+        {
+            if (!DeckDuDirect.PourCeLancement(s.EnCours)) return null;
+            var d = DeckDuDirect.PourEssai("b" + demarres.Count);
+            demarres.Add(d);
+            return d;
+        };
+        service.StartAsync(CancellationToken.None).GetAwaiter().GetResult();
+        Assert.Equal("posed", service.Preparer(DeckModes.Speedrun, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip").Status);
+        Assert.Single(demarres);
+        return (service, bus, demarres);
+    }
+
+    [Fact]
+    public void Le_Deck_du_direct_tenu_par_un_direct_survit_a_la_partie_jusqu_a_la_fin_du_direct()
+    {
+        // Banc du 19/11 : le film arrive au direct 5 a 19 s apres le jeu ; la fin de la course doit garder le Deck
+        var (service, bus, demarres) = SpeedrunAvecDeckDuDirect();
+        using (var bail = service.TenirPourLeDirect(exeSaitLeDeck: true))
+        {
+            Assert.Equal(["--deck-memoire", "b0"], bail.Options);
+            PartieFinie(service, bus);
+            Assert.True(demarres[0].Vivant);                                     // le direct le montre encore
+            Assert.Empty(service.OptionsDuDirect(exeSaitLeDeck: true));         // aucun nouveau direct ne le prend
+            Assert.Empty(service.TenirPourLeDirect(exeSaitLeDeck: true).Options);
+        }
+
+        Assert.False(demarres[0].Vivant);                                        // le dernier direct l'a rendu : arrete
+        service.StopAsync(CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    [Fact]
+    public void Le_Deck_du_direct_s_arrete_au_plus_tard_apres_la_garde_qui_suit_la_partie()
+    {
+        var (service, bus, demarres) = SpeedrunAvecDeckDuDirect();
+        service.GardeApresLaPartie = TimeSpan.FromMilliseconds(50);
+        var bail = service.TenirPourLeDirect(exeSaitLeDeck: true);
+        PartieFinie(service, bus);
+        Assert.True(demarres[0].Vivant);
+        var limite = DateTime.UtcNow.AddSeconds(5);
+        while (demarres[0].Vivant && DateTime.UtcNow < limite) Thread.Sleep(20);
+        Assert.False(demarres[0].Vivant);                                        // un direct qui ne rend jamais son bail
+        bail.Dispose();                                                          // rendu apres coup : sans effet
+        bail.Dispose();
+        service.StopAsync(CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    [Fact]
+    public void Sans_direct_ou_avec_un_exe_trop_ancien_le_Deck_du_direct_s_arrete_avec_la_partie()
+    {
+        var (service, bus, demarres) = SpeedrunAvecDeckDuDirect();
+        using var ancien = service.TenirPourLeDirect(exeSaitLeDeck: false);      // exe 0.7.2 : pas de bail
+        Assert.Empty(ancien.Options);
+        PartieFinie(service, bus);
+        Assert.False(demarres[0].Vivant);
+        Assert.False(DeckDuDirect.EstUnDeckDuDirect(Environment.ProcessId));
+        service.StopAsync(CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    [Fact]
+    public void Un_nouveau_lancement_remplace_le_Deck_du_direct_meme_tenu_par_un_direct()
+    {
+        var (service, _, demarres) = SpeedrunAvecDeckDuDirect();
+        var bail = service.TenirPourLeDirect(exeSaitLeDeck: true);
+        service.Preparer(DeckModes.Speedrun, "fbneo", @"E:\RetroBat\roms\fbneo\19xx.zip");
+        Assert.False(demarres[0].Vivant);
+        Assert.True(demarres[1].Vivant);
+        bail.Dispose();                                                          // le bail de l'ancien ne touche pas au nouveau
+        Assert.True(demarres[1].Vivant);
+        Assert.Equal(["--deck-memoire", "b1"], service.OptionsDuDirect(exeSaitLeDeck: true));
+    }
+
     [Fact]
     public void Un_speedrun_ou_un_challenge_avec_le_Deck_pose_lance_le_Deck_du_direct_et_l_option_le_coupe()
     {
