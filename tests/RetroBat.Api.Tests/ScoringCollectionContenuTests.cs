@@ -206,6 +206,45 @@ public class ScoringCollectionContenuTests
         }
     }
 
+    // 18/11 (rappel du user : « on identifie un jeu par son hash via les sources gamelist ») : un contenu que le site ne liste pas
+    // encore se trouve au referentiel, par l'empreinte sans en-tete d'abord. Les deux vraies fiches de SMB3 de nes_lt.json :
+    // GoodNES « Rev PRG1 » (86d1982f, avec en-tete) a son propre groupe, la fiche No-Intro porte l'empreinte sans en-tete 55b71115.
+    [Fact]
+    public void Sans_le_site_le_referentiel_des_gamelists_donne_le_groupe_par_l_empreinte_sans_en_tete()
+    {
+        var dossier = Path.Combine(Path.GetTempPath(), "nelfe-ref-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dossier);
+        try
+        {
+            File.WriteAllLines(Path.Combine(dossier, "nes_lt.json"), new[]
+            {
+                """{"hsh": [{"crc": "0B742B33", "md5": "86d1982fea7342c0af9679ddf3869d8d"}], "n": "Super Mario Bros. 3 Rev PRG1", "sys": "nes", "t": "game", "id": "super_mario_bros_3_rev_prg1_1990_02_nintendo_us", "grp": "super_mario_bros._3_rev_prg1", "fn": "Super Mario Bros. 3 Rev PRG1 (Nintendo) (USA)"}""",
+                """{"hsh": [{"crc": "E8C3AF69", "md5": "e883e0d43448d9fdd8ce626f75fe4e5d"}, {"md5": "55b7111567c1709e849c574078699577", "crc": "2E6301ED"}], "n": "Super Mario Bros. 3", "sys": "nes", "t": "game", "id": "super_mario_bros_3_usa_rev_1", "grp": "super_mario_bros._3", "fn": "Super Mario Bros. 3 (USA) (Rev 1)"}""",
+            });
+            var referentiel = new RetroBat.Api.Media.RomCanonicalResolver(racineDuReferentiel: dossier);
+            string? Groupe(string sys, string h) => referentiel.Resolve(sys, h)?.GameKey is { } k ? k[(k.IndexOf('/') + 1)..] : null;
+            var aucunIndex = Path.Combine(dossier, "sans-index");
+
+            // Sans en-tete d'abord : la fiche No-Intro, pas le doublon GoodNES de l'en-tete.
+            Assert.Equal(("super-mario-bros-3", "referentiel, sans en-tete"), NelfePlayScoringReporter.GroupeEtSource("nes",
+                "super-mario-bros-3-usa-rev-a-1990-nintendo", "86d1982fea7342c0af9679ddf3869d8d", null, aucunIndex,
+                "55b7111567c1709e849c574078699577", Groupe));
+            // Sans empreinte sans en-tete, le md5 : la fiche du dump lui-meme, jamais le nom du fichier.
+            Assert.Equal(("super-mario-bros-3-rev-prg1", "referentiel, md5"), NelfePlayScoringReporter.GroupeEtSource("nes",
+                "super-mario-bros-3-usa-rev-a-1990-nintendo", "86d1982fea7342c0af9679ddf3869d8d", null, aucunIndex, null, Groupe));
+            // Un contenu inconnu partout : le nom du fichier, et la source le dit.
+            Assert.Equal(("rom-inconnue", "nom du fichier"), NelfePlayScoringReporter.GroupeEtSource("nes", "rom-inconnue",
+                "00000000000000000000000000000000", null, aucunIndex, null, Groupe));
+            // L'arcade garde son set : le referentiel n'y est pas consulte.
+            Assert.Equal(("mslug3", "nom du fichier"), NelfePlayScoringReporter.GroupeEtSource("arcade", "mslug3",
+                "86d1982fea7342c0af9679ddf3869d8d", null, aucunIndex, null, Groupe));
+        }
+        finally
+        {
+            Directory.Delete(dossier, recursive: true);
+        }
+    }
+
     [Fact]
     public void Un_profil_sans_aucun_hash_ne_confirme_rien()
     {

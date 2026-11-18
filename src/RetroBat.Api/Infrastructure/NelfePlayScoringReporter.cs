@@ -384,8 +384,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         RetroBat.Api.Reseau.ClientDeRelais? relais = null,
         RetroBat.Api.Speedrun.SpeedrunSessionService? speedrun = null,
         InterfaceTextService? textes = null,
-        SuiviDuSite? suivi = null)
+        SuiviDuSite? suivi = null,
+        RomCanonicalResolver? canonique = null)
     {
+        _canonique = canonique;
         _suivi = suivi;
         // L'etat de la reconstruction joint au releve de l'agent (point 5 du 14/11).
         _suivi?.Traiter(SuiviDuSite.Reconstruction, (etat, _) =>
@@ -480,6 +482,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     private readonly SuiviDuSite? _suivi;
+    /// <summary>Le referentiel des gamelists : l'identite d'une partie console par son empreinte (18/11).</summary>
+    private readonly RomCanonicalResolver? _canonique;
     private DateTime _prochainRecovery = DateTime.MinValue;
     private volatile bool _reconstructionSignalee;
 
@@ -1280,7 +1284,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var systemId = GetString(attestation, "SystemId") ?? "";
             var romGroup = GroupeDeLaPartie(systemId, GetString(attestation, "Rom") ?? "",
                 GetString(attestation, "ContentMd5"), GetString(attestation, "ContentSha256"),
-                sansEnTete: SansEnTetePour(GetString(attestation, "ContentMd5")));
+                sansEnTete: SansEnTetePour(GetString(attestation, "ContentMd5")), parLeReferentiel: GroupeDuReferentiel);
             if (systemId.Length == 0 || romGroup.Length == 0 || _esNotify is null) return;
             if (SurLeCoeurDesFantomes())
             {
@@ -1957,8 +1961,41 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// wrapper. Voir NelfePlayScoringCollectionSyncService.GroupeOuvertDuContenu.
     /// </summary>
     internal static string GroupeDeLaPartie(string systemId, string romGroupDuWrapper, string? md5, string? sha256, string? stateRoot = null,
-        string? sansEnTete = null)
-        => NelfePlayScoringCollectionSyncService.GroupeOuvertDuContenu(systemId, md5, sha256, stateRoot, sansEnTete) ?? romGroupDuWrapper;
+        string? sansEnTete = null, Func<string, string, string?>? parLeReferentiel = null)
+        => GroupeEtSource(systemId, romGroupDuWrapper, md5, sha256, stateRoot, sansEnTete, parLeReferentiel).Groupe;
+
+    /// <summary>
+    /// LE NOM DU FICHIER N'EST JAMAIS L'IDENTITE D'UNE CONSOLE (18/11, rappel du user : « on identifie un jeu par son hash via les
+    /// sources gamelist »). Dans l'ordre : les jeux ouverts du site par le contenu (au score, puis aux seuls speedruns) ; le
+    /// referentiel des gamelists (<c>resources/gamelist/systems</c>, <see cref="RomCanonicalResolver"/>) par l'empreinte SANS
+    /// EN-TETE d'abord (une meme ROM sous deux en-tetes peut y avoir deux fiches : SMB3 « Rev PRG1 » GoodNES 86d1982f et la fiche
+    /// No-Intro « (USA) (Rev 1) » ne se rejoignent que par 55b71115), puis par le md5 ; le slug du fichier que donne le wrapper
+    /// en dernier recours seulement, et la source le dit. Arcade : le set reste l'identite (regle du user, jamais le contenu du zip).
+    /// </summary>
+    internal static (string Groupe, string Source) GroupeEtSource(string systemId, string romGroupDuWrapper, string? md5, string? sha256,
+        string? stateRoot = null, string? sansEnTete = null, Func<string, string, string?>? parLeReferentiel = null)
+    {
+        if (NelfePlayScoringCollectionSyncService.GroupeOuvertDuContenu(systemId, md5, sha256, stateRoot, sansEnTete) is { } ouvert)
+            return (ouvert, "jeux ouverts");
+        var systeme = RomCanonicalResolver.CanonicalScoringSystem(systemId ?? string.Empty);
+        if (parLeReferentiel is not null && systeme.Length > 0 && systeme != "arcade")
+        {
+            foreach (var (empreinte, source) in new[] { (sansEnTete, "referentiel, sans en-tete"), (md5, "referentiel, md5") })
+            {
+                if (!string.IsNullOrWhiteSpace(empreinte) && parLeReferentiel(systeme, empreinte.Trim()) is { Length: > 0 } groupe)
+                    return (groupe, source);
+            }
+        }
+        return (romGroupDuWrapper, "nom du fichier");
+    }
+
+    /// <summary>Le groupe que le referentiel des gamelists donne a une empreinte, sans le systeme ; null s'il ne la connait pas.</summary>
+    private string? GroupeDuReferentiel(string systeme, string empreinte)
+    {
+        var cle = _canonique?.Resolve(systeme, empreinte)?.GameKey;
+        var barre = cle?.IndexOf('/') ?? -1;
+        return barre > 0 && barre < cle!.Length - 1 ? cle[(barre + 1)..] : null;
+    }
 
     /// <summary>
     /// LA ROM ADMISE (11/11, rapport de Gogerad) : le verdict de la regle des ROMs admises (<see cref="RomAdmission"/>) sur le
@@ -3456,10 +3493,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var romDuFichier = GetString(payload, "Rom") ?? "";
         string? md5DuContenu, sha256DuContenu;
         lock (_sync) { md5DuContenu = _contentMd5; sha256DuContenu = _contentSha256; }
-        var romGroup = GroupeDeLaPartie(systemId, romDuFichier, md5DuContenu, sha256DuContenu, sansEnTete: SansEnTetePour(md5DuContenu));
+        var (romGroup, sourceDuGroupe) = GroupeEtSource(systemId, romDuFichier, md5DuContenu, sha256DuContenu,
+            sansEnTete: SansEnTetePour(md5DuContenu), parLeReferentiel: GroupeDuReferentiel);
         var sessionJson = GetString(payload, "Session");
         Trace($"session reçue sys={systemId} rom={romGroup} sessionLen={sessionJson?.Length ?? -1}"
-              + (string.Equals(romGroup, romDuFichier, StringComparison.Ordinal) ? "" : $" (fichier {romDuFichier} : groupe trouve par le contenu)"));
+              + (string.Equals(romGroup, romDuFichier, StringComparison.Ordinal) ? "" : $" (fichier {romDuFichier} : groupe trouve par le contenu, {sourceDuGroupe})")
+              + (sourceDuGroupe == "nom du fichier" && !string.Equals(RomCanonicalResolver.CanonicalScoringSystem(systemId), "arcade", StringComparison.Ordinal)
+                  ? $" (contenu {md5DuContenu ?? "non mesure"} inconnu des jeux ouverts et du referentiel : groupe pris au nom du fichier)" : ""));
         int demoAuBilan;
         lock (_sync)
         {
