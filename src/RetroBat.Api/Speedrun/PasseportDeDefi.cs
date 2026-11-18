@@ -20,6 +20,33 @@ public static class PasseportDeDefi
     /// <summary>Ce qui, au bilan du wrapper, ecarte tout le lancement : ses compteurs ne distinguent pas les tentatives.</summary>
     private static readonly string[] CompteursInterdits = ["cheats", "save_state_loads", "rewind", "runahead", "fast_forward", "netplay"];
 
+    /// <summary>
+    /// LE PROFIL D'UN DEFI SUR UN JEU OUVERT AUX SEULS SPEEDRUNS (18/11, support Old AF Gamer). `scores/profile` ne rend que les
+    /// classements au score (statut « open ») : pour Mega Man 2, SMB3, Super Mario World ou Super Metroid il repond « pas
+    /// ouvert », et chaque temps etait retire sans envoi (« plus aucun classement ouvert »), pour tous les joueurs, depuis
+    /// l'ouverture de ces jeux. Le passeport n'a besoin du profil que pour ce que <see cref="Appliquer"/> recrit (reglement,
+    /// version, empreinte du document, metrique) ; le site compose lui-meme le profil de l'epreuve depuis son profil de base,
+    /// celui au statut « speedrun » compris (ScoringRepository::profilDeBaseDuDefi). Un jeu qui a un classement au score garde
+    /// le sien, comme avant.
+    /// </summary>
+    public static JsonElement ProfilSansClassementAuScore(string systemId, string romGroup, EntreeDeLIndex entree, int version)
+    {
+        var profil = new JsonObject
+        {
+            ["system_id"] = systemId,
+            ["rom_group"] = romGroup,
+            ["ruleset"] = entree.Ruleset,
+            ["profile_version"] = version,
+            ["profile_document_sha256"] = entree.DocumentSha256,
+            ["manifest_commit"] = null,
+            ["engine"] = "libretro",
+            ["metric"] = new JsonObject { ["type"] = "time", ["unit"] = "frames", ["ranking_direction"] = "lower_better", ["result_source"] = "final" },
+            ["bios"] = new JsonObject { ["mode"] = "none" },
+        };
+        using var doc = JsonDocument.Parse(profil.ToJsonString());
+        return doc.RootElement.Clone();
+    }
+
     /// <summary>Le compteur qui salit ce lancement, ou null. La relance du joueur (« resets ») n'en est pas un.</summary>
     public static string? Salissure(string sessionJson, int chargementsPermis = 0)
     {

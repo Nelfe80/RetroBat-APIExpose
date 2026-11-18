@@ -1188,7 +1188,11 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             var chemin = Path.Combine(stateRoot ?? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay"), "scoring-collection-remote.json");
             if (!File.Exists(chemin)) return null;
             var manifeste = JsonSerializer.Deserialize<OpenGamesManifest>(File.ReadAllText(chemin), JsonLecture);
-            return manifeste?.Games?.FirstOrDefault(g =>
+            // LES JEUX OUVERTS AUX SEULS SPEEDRUNS (18/11, support Old AF Gamer) : le manifeste les range a part
+            // (`speedrun_games`). Sans eux, une ROM sous un nom TOSEC (« Super Mario Bros. 3 (USA, Rev A)(1990)(Nintendo) ») gardait
+            // le groupe de son fichier : pas d'etats de depart a ce nom, et le defi etait juge comme une partie au score
+            // (« version absente du profil de classement »). Les jeux au score d'abord, comme avant.
+            return (manifeste?.Games ?? []).Concat(manifeste?.SpeedrunGames ?? []).FirstOrDefault(g =>
                     string.Equals(RomCanonicalResolver.CanonicalScoringSystem(g.SystemId), systeme, StringComparison.Ordinal)
                     && ((!string.IsNullOrWhiteSpace(md5) && (g.ContentHashes?.Md5 ?? []).Contains(md5.Trim(), StringComparer.OrdinalIgnoreCase))
                         || (!string.IsNullOrWhiteSpace(sha256) && (g.ContentHashes?.Sha256 ?? []).Contains(sha256.Trim(), StringComparer.OrdinalIgnoreCase))
