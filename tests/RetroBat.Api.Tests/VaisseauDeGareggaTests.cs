@@ -62,4 +62,31 @@ public class VaisseauDeGareggaTests
         var ctx = ModesDeJeu.ContexteDuRun(lectures, contextes, run, choix);
         Assert.Equal(0, ctx.Difficulte["0x15AA"]);
     }
+
+    // 19/11 : un champ sans « accept » est LIBRE (le serveur ne refuse que par « accept »). Avant, seule « initial » passait :
+    // changer de vaisseau annoncait « Option du jeu changee : score non classe » alors que le score etait classe.
+    [Theory]
+    [InlineData(0x10)]
+    [InlineData(0x30)]
+    [InlineData(0x72)]
+    [InlineData(0)]
+    public void Changer_de_vaisseau_n_annonce_aucune_option_hors_reglement(int valeur)
+    {
+        Assert.False(ReglagesDuMenu.HorsReglement([Profil], "0x15AA", valeur, "fr", out var nom));
+        Assert.Equal("", nom);
+        var d = ModesDeJeu.DifficultePourLePasseport(Profil, ContexteDeJeu.Vide.AvecDifficulte("0x15AA", valeur))!;
+        Assert.Empty(ReglagesDuMenu.NomsRefuses(Profil, d));
+    }
+
+    [Fact]
+    public void Un_champ_a_accept_parle_toujours_hors_de_ses_valeurs()
+    {
+        // Streets of Rage 2 (4ddf0a7a, 17/11) : vies et difficulte imposees par « accept ».
+        var sor2 = JsonDocument.Parse("""
+            {"difficulty":{"fields":[{"address":"0xFD04","initial":4,"accept":[4],"label":{"en":"Difficulty"}}]}}
+            """).RootElement.Clone();
+        Assert.True(ReglagesDuMenu.HorsReglement([sor2], "0xFD04", 6, "en", out var nom));
+        Assert.Equal("Difficulty", nom);
+        Assert.False(ReglagesDuMenu.HorsReglement([sor2], "0xFD04", 4, "en", out _));
+    }
 }

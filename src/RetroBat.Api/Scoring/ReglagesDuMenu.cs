@@ -147,7 +147,11 @@ public static class ReglagesDuMenu
         }
     }
 
-    /// <summary>Admise : dans « accept » s'il y en a une, sinon egale a « initial » ; sans l'un ni l'autre, tout passe.</summary>
+    /// <summary>
+    /// Admise : dans « accept » s'il y en a une ; SANS « accept » le champ est LIBRE (19/11, Battle Garegga : vaisseau et
+    /// type de tir affiches, jamais imposes). « initial » n'est que la valeur de depart affichee ; le serveur ne refuse que
+    /// par « accept » (ScoringRepository::difficulte, game.difficulty_not_allowed).
+    /// </summary>
     private static bool Admise(JsonElement champ, int valeur)
     {
         if (champ.TryGetProperty("accept", out var acc) && acc.ValueKind == JsonValueKind.Array)
@@ -158,7 +162,6 @@ public static class ReglagesDuMenu
             }
             return false;
         }
-        if (champ.TryGetProperty("initial", out var i) && i.TryGetInt32(out var initiale)) return initiale == valeur;
         return true;
     }
 
