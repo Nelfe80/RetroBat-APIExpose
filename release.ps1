@@ -269,8 +269,10 @@ Write-Host 'Construction update.7z...'
 # LES COEURS DE MULTIPLAYER (2026-10-23) : mGBA Splitscreen compile par NelfePlay (branche nelfeplay-build du fork) et NGP
 # Link (25/10, Beetle NGP et son cable de liaison), avec leurs fiches, poses chez RetroArch par MultiplayerCoeursService.
 # Repris sur leur empreinte, comme une archive. La liste suit MultiplayerCoeursService.Coeurs. FBNeo Multi 32 (27/10) :
-# FBNeo aux etats portables (branche nelfeplay-multi32 du fork), avec le texte de sa licence. PPSSPP Netplay (29/10) :
-# le multijoueur ad hoc de la PSP par le netplay de RetroArch (branche nelfeplay-netplay du fork), avec sa licence.
+# FBNeo aux etats portables (branche nelfeplay-multi32 du fork), avec le texte de sa licence. PPSSPP Netplay (29/10,
+# remplace en 1.9.201) : le multijoueur ad hoc de la PSP par le netplay de RetroArch (branche nelfeplay-netpacket-resume
+# du fork, coeur 579eee2784, transport Netpacket de la PR amont hrydgard/ppsspp #23107 en brouillon, points de reprise
+# propres au fork), avec sa licence.
 # TGBDual Multi (29/10) : les deux Game Boy reliees lisibles par leur carte memoire (branche nelfeplay-multi du fork), avec
 # sa licence ; FBNeo Multi 32 y gagne la memoire de travail des jeux MCR-3 (Rampage).
 $outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.exe',
