@@ -147,6 +147,13 @@ public class OutilsHorsArchiveTests
     [InlineData("1.2.0+20260930.1bf15ce", "1.2.0+20260930.1bf15ce", false)]  // le meme
     [InlineData("1.3.0+20261002.def", "1.2.0+20260930.1bf15ce", false)]      // borne de developpement : jamais redescendre
     [InlineData("1.1.0", "illisible", false)]                                // version publiee illisible : on ne touche a rien
+    // Quatrieme nombre (1.9.202, PlayerDeck 0.1.16.2) : il compte, et un nombre absent vaut 0
+    [InlineData("0.1.16+a876afa", "0.1.16.2+9ed652380c9facc0d5ac13040c7b917c5165377c", true)]
+    [InlineData("0.1.16.2+9ed652380c9facc0d5ac13040c7b917c5165377c", "0.1.16+a876afa", false)]
+    [InlineData("0.1.16.2+9ed6523", "0.1.16.2+9ed6523", false)]
+    [InlineData("0.1.16.2+9ed6523", "0.1.17+abc", true)]
+    [InlineData("0.7.3.0", "0.7.3+a0e1989", false)]                          // 0.7.3.0 = 0.7.3
+    [InlineData("0.3.0+20261112.4825568", "0.3.0+20261112.4825568", false)]  // la date apres le + ne compte pas
     public void On_ne_prend_l_outil_publie_que_s_il_manque_ou_s_il_est_plus_recent(string? locale, string publiee, bool attendu)
     {
         Assert.Equal(attendu, SelfUpdateService.AMettreAJour(locale, publiee));

@@ -474,13 +474,30 @@ public sealed class SelfUpdateService
     /// s'il est illisible, ou si le sien est plus ancien. JAMAIS pour redescendre : la borne de
     /// developpement garde l'outil qu'elle vient de construire, et release.ps1 refuse de publier un
     /// outil change sans version plus haute.
+    /// QUATRE NOMBRES (1.9.202) : la version d'un outil se lit jusqu'au quatrieme nombre (PlayerDeck 0.1.16.2, correctif
+    /// du GC), comme release.ps1 la compare ([version]) ; avant, 0.1.16.2 se lisait 0.1.16 et la borne gardait le 0.1.16.
     /// </summary>
     internal static bool AMettreAJour(string? versionLocale, string versionPubliee)
     {
-        var publiee = LireVersion(versionPubliee);
+        var publiee = LireVersionOutil(versionPubliee);
         if (publiee is null) return false;
-        var locale = versionLocale is null ? null : LireVersion(versionLocale);
+        var locale = versionLocale is null ? null : LireVersionOutil(versionLocale);
         return locale is null || locale < publiee;
+    }
+
+    /// <summary>
+    /// La version d'un outil, quatrieme nombre compris (un nombre absent vaut 0 : 0.1.16 = 0.1.16.0 &lt; 0.1.16.2). Seuls des
+    /// nombres separes par des points comptent : « 0.3.0+20261112.4825568 » se lit 0.3.0.0. La version de l'API reste lue par
+    /// <see cref="LireVersion"/> (trois nombres).
+    /// </summary>
+    internal static Version? LireVersionOutil(string texte)
+    {
+        var m = Regex.Match(texte ?? "", @"(\d+)\.(\d+)(?:\.(\d+))?(?:\.(\d+))?");
+        return m.Success
+            ? new Version(int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value),
+                m.Groups[3].Success ? int.Parse(m.Groups[3].Value) : 0,
+                m.Groups[4].Success ? int.Parse(m.Groups[4].Value) : 0)
+            : null;
     }
 
     internal static bool EstUnExe(string fichier) => fichier.EndsWith(".exe", StringComparison.OrdinalIgnoreCase);
