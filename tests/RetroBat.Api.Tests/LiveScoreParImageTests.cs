@@ -203,6 +203,14 @@ public sealed class LiveScoreParImageTests
     }
 
     [Fact]
+    public void Le_delai_par_defaut_est_de_20_ms()
+    {
+        // 20/11 : 100 ms ajoutaient 35 a 120 ms au score du Deck (banc de lenteur) ; tous les mots d'une image arrivent dans le meme tour du wrapper.
+        var provider = new LiveScoreAggregatorProvider(new SimpleEventBus(), NullLogger<LiveScoreAggregatorProvider>.Instance);
+        Assert.Equal(TimeSpan.FromMilliseconds(20), provider.DelaiDeLImage);
+    }
+
+    [Fact]
     public async Task Le_dernier_total_part_seul_apres_le_delai()
     {
         var (bus, provider, totaux) = await Monter();

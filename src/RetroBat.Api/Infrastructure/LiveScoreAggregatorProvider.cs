@@ -418,7 +418,7 @@ public sealed class LiveScoreAggregatorProvider : IProvider
     /// (<see cref="ScoreLiveEvent.Frame"/>). Sans image (pont MAME, sorties, RetroAchievements, copie retroarch.score du meme
     /// mot), rien ne change : le total part aussitot, sauf si une image du meme score attend encore (la copie ne la devance pas).
     /// </summary>
-    internal TimeSpan DelaiDeLImage { get; set; } = TimeSpan.FromMilliseconds(100);
+    internal TimeSpan DelaiDeLImage { get; set; } = TimeSpan.FromMilliseconds(20);
 
     private void PublishIfChanged(
         string source,
