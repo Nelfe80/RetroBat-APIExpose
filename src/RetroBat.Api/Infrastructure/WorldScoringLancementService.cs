@@ -174,19 +174,42 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
         var fbneo = false;
         string? set = null;
         var refus = false;
+        var demarre = false;
         foreach (var ligne in journal)
         {
             if (ligne.Contains("Loading dynamic libretro core from", StringComparison.OrdinalIgnoreCase))
+            {
+                // Un nouveau chargement de coeur = un nouveau lancement : rien de ce qui precede ne compte (20/11).
                 fbneo = ligne.Contains("fbneo_libretro.dll", StringComparison.OrdinalIgnoreCase);
+                set = null;
+                refus = false;
+                demarre = false;
+                continue;
+            }
+
             if (System.Text.RegularExpressions.Regex.Match(ligne, @"\[FBNeo\] Searching all possible locations for romset (?<s>\S+)") is { Success: true } m)
                 set = m.Groups["s"].Value;
+
+            // PREUVE QUE LE JEU A TOURNE : FBNeo a initialise le pilote. Aucun refus apres ca (20/11 : Ketsui jouee et publiee
+            // a ete annoncee « refusee » parce que FBNeo ecrit « No missing files, proceeding » a CHAQUE lancement reussi).
+            if (ligne.Contains("[FBNeo]", StringComparison.Ordinal)
+                && (ligne.Contains("Initialized driver for", StringComparison.OrdinalIgnoreCase)
+                    || ligne.Contains("was successfully started", StringComparison.OrdinalIgnoreCase)))
+                demarre = true;
+
             if (ligne.Contains("Failed to load content", StringComparison.OrdinalIgnoreCase)
-                || (ligne.Contains("[FBNeo]", StringComparison.Ordinal)
-                    && (ligne.Contains("missing", StringComparison.OrdinalIgnoreCase) || ligne.Contains(" is required", StringComparison.OrdinalIgnoreCase))))
+                || (ligne.Contains("[FBNeo]", StringComparison.Ordinal) && ReclameUnFichier(ligne)))
                 refus = true;
         }
-        return fbneo && refus && set is { Length: > 0 } s ? s + ".zip" : null;
+        return fbneo && refus && !demarre && set is { Length: > 0 } s ? s + ".zip" : null;
     }
+
+    /// <summary>Une ligne de FBNeo qui reclame un fichier. « No missing files, proceeding » dit le contraire. Pur.</summary>
+    private static bool ReclameUnFichier(string ligne)
+        => ligne.Contains(" is required", StringComparison.OrdinalIgnoreCase)
+           || (ligne.Contains("missing", StringComparison.OrdinalIgnoreCase)
+               && !ligne.Contains("No missing", StringComparison.OrdinalIgnoreCase)
+               && !ligne.Contains("0 missing", StringComparison.OrdinalIgnoreCase));
 
     /// <summary>FBNeo connait-il ce set (fbneo_lt.json du Data Pack) ? C'est ce qui oblige une partie classee a tourner sous FBNeo.</summary>
     internal static bool FbneoConnaitLeSet(string? set)
