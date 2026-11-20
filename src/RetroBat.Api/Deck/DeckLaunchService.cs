@@ -628,7 +628,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     private IReadOnlyList<DeckResident> Residents()
     {
         if (DecksResidents is { } couture) return couture();
-        var liste = new List<DeckResident>();
+        var bruts = new List<(string? Chemin, DeckResident Resident)>();
         foreach (var p in Process.GetProcessesByName(NomDuHost))
         {
             // le Deck du direct (meme exe, sans fenetre) n'est jamais le Deck de la borne
@@ -638,18 +638,45 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
                 continue;
             }
 
+            string? chemin;
+            try { chemin = p.MainModule?.FileName; }
+            catch (Exception) { chemin = null; }   // illisible (voir FiltrerLesResidents)
             DateTime debut;
             try { debut = p.StartTime.ToUniversalTime(); }
             catch (Exception) { debut = DateTime.MaxValue; }   // illisible : jamais tenu pour perime
             var processus = p;
-            liste.Add(new DeckResident(debut, () =>
+            bruts.Add((chemin, new DeckResident(debut, () =>
             {
                 try { processus.Kill(); processus.WaitForExit(3000); } catch { /* deja parti */ }
                 processus.Dispose();
-            }));
+            })));
         }
 
-        return liste;
+        var retenus = FiltrerLesResidents(bruts, ExeDuDeck);
+        // un processus ecarte n'est pas a nous : on ne le tue pas, mais on libere son handle
+        return retenus;
+    }
+
+    /// <summary>
+    /// SEUL LE DECK DU DOSSIER INSTALLE EST CELUI DE LA BORNE (20/11) : un Deck de banc (exe lance depuis un worktree, --render-deck)
+    /// portait le meme nom de processus, empechait le lancement du vrai Deck et aurait pu etre tue comme « perime ». Comparaison des
+    /// chemins complets, sans la casse. Chemin illisible : PAS le Deck de la borne (on ne tue jamais un processus qu'on ne sait
+    /// pas etre le notre ; le Deck de la borne tourne sous le meme compte, son chemin se lit). Pur.
+    /// </summary>
+    internal static IReadOnlyList<DeckResident> FiltrerLesResidents(IEnumerable<(string? Chemin, DeckResident Resident)> processus, string exeInstalle)
+    {
+        string Normal(string c)
+        {
+            try { return Path.GetFullPath(c).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar); }
+            catch (Exception) { return c; }
+        }
+
+        var attendu = Normal(exeInstalle);
+        return processus
+            .Where(x => !string.IsNullOrWhiteSpace(x.Chemin)
+                && string.Equals(Normal(x.Chemin!), attendu, StringComparison.OrdinalIgnoreCase))
+            .Select(x => x.Resident)
+            .ToList();
     }
 
     private string ExeDuDeck => Path.Combine(DossierDuDeck, NomDuHost + ".exe");
