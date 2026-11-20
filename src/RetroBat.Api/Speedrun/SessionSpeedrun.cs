@@ -610,7 +610,7 @@ public sealed class SessionSpeedrun
         // L'ENTRAINEMENT (14/11) : aucun temps ne part au site, la meilleure tentative n'est jamais retenue pour l'envoi. (15/11) La
         // meilleure se juge selon le rang du reglement : le score d'abord sur un challenge au score, le temps ensuite.
         if (!_r.EstUnEntrainement && EstClassable(res) && res.FramesOfficielles is not null && (_meilleure is null || _r.Comparer(res, _meilleure.Resultat) < 0)
-            && _horlogeDuDepart is { } departMs && (_horlogeDArrivee ?? _horlogeDeLImage) is { } arriveeMs)
+            && _horlogeDuDepart is { } departMs && (_courante.HorlogeDArriveeOfficielle ?? _horlogeDArrivee ?? _horlogeDeLImage) is { } arriveeMs)
             _meilleure = new TentativeFinie(AttemptId, Numero, res, departMs, arriveeMs);
         _relanceAutomatique = DelaiDeRelance(_r, res.Etat, res.Cause);
         // LA CLOTURE A L'ARRIVEE (14/11) : le challenge arrive, plus rien ne compte ; le service pause et ferme le jeu.
@@ -636,7 +636,7 @@ public sealed class SessionSpeedrun
             _messages.Add(new MessageJoueur("speedrun.msg.challenge_complete", "Challenge complete in {time}: the game stops, your time is being sent.",
                 ("time", Chronometrage.Afficher(fini2, res.Cadence))));
         else if ((_r.EstUnEntrainement ? MessageDEntrainement(res) : MessageDeFin(res, precedent)) is { } message) _messages.Add(message);
-        if (AvertissementDeRalenti(_r, res, _horlogeDuDepart, _horlogeDArrivee ?? _horlogeDeLImage) is { } lent) _messages.Add(lent);
+        if (AvertissementDeRalenti(_r, res, _horlogeDuDepart, _courante.HorlogeDArriveeOfficielle ?? _horlogeDArrivee ?? _horlogeDeLImage) is { } lent) _messages.Add(lent);
         Publier("speedrun.attempt.ended", new
         {
             sessionId = SessionId,
