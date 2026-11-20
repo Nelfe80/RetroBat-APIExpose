@@ -117,4 +117,46 @@ public class Ms3MortDuBossTests
         Assert.Equal("time_limit", res.Cause);
         Assert.Equal(EtatTentative.Finie, Rejouer("ms3-r2-mission-1.trace", Limite(chrono)).Resultat.Etat);
     }
+
+    /// <summary>Rejoue une trace en donnant a chaque image une horloge de 17 ms par image, et rend l'evaluateur.</summary>
+    private static Evaluateur RejouerAvecHorloge(string trace, Reglement r)
+    {
+        var t = TraceDeReplay.Lire(File.ReadAllLines(Fichier(trace)));
+        var sim = new WrapperSimule(LignesDuMem.Lire(System.Text.Encoding.UTF8.GetString(Mem)));
+        var ev = new Evaluateur(r);
+        foreach (var image in t.Lectures.GroupBy(l => l.Frame))
+        {
+            var signaux = image.SelectMany(l => sim.Lire(l.Frame, l.Adresse, l.Type, l.Valeur)).Select(s => s with { HorlogeMs = s.Frame * 17 }).ToList();
+            foreach (var a in ev.AdressesInconnues)
+                if (sim.Valeur(a) is { } v) ev.Relever(a, v);
+            if (signaux.Count > 0) ev.RecevoirImage(signaux);
+            foreach (var l in image.Where(l => l.Adresse == 0x10ED18)) ev.NoterLeScore(Bcd(l.Valeur));
+            if (ev.EstTerminee) break;
+        }
+
+        return ev;
+    }
+
+    /// <summary>20/11 : l'horloge d'arrivee est celle de la mort du boss (chrono officiel), pas celle de la sortie de mission.</summary>
+    [Fact]
+    public void L_horloge_d_arrivee_est_celle_de_la_mort_du_boss_et_non_de_la_sortie_de_mission()
+    {
+        var ev = RejouerAvecHorloge("ms3-r2-mission-1.trace", Brouillon("metal-slug-3.mission-1-pistol.v2"));
+        Assert.Equal(EtatTentative.Finie, ev.Etat);
+        Assert.Equal(12526 * 17L, ev.HorlogeDArriveeOfficielle);
+        Assert.NotEqual(14265 * 17L, ev.HorlogeDArriveeOfficielle);
+    }
+
+    /// <summary>Non-regression : un reglement dont le chrono s'arrete sur l'evenement meme de la fin garde l'horloge de la fin.</summary>
+    [Fact]
+    public void Un_chrono_qui_s_arrete_sur_l_evenement_de_fin_garde_l_horloge_de_la_fin()
+    {
+        var texte = File.ReadAllText(Fichier("metal-slug-3.mission-1-pistol.v2.brouillon.json"));
+        var r = Reglement.Lire(System.Text.RegularExpressions.Regex.Replace(texte,
+            @"""action"": ""BOSS_DEFEATED"",\s*""address"": ""0x10ED7C"",\s*""value"": ""0x01""",
+            "\"action\": \"PROGRESSION_STAGE\", \"address\": \"0x10040C\", \"leaves\": \"0x00\""));
+        var ev = RejouerAvecHorloge("ms3-r2-mission-1.trace", r);
+        Assert.Equal(EtatTentative.Finie, ev.Etat);
+        Assert.Equal(14265 * 17L, ev.HorlogeDArriveeOfficielle);
+    }
 }

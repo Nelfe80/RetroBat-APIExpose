@@ -80,6 +80,7 @@ public sealed class Evaluateur
     private long? _derniereFrame, _derniereHorloge, _frameDeLHorloge;
     private long? _frameDeFin;
     private long? _horlogeDuDepart, _horlogeDeLImage;
+    private long? _horlogeArriveeCale, _horlogeArriveeIndependant;
     private long? _score;
     private readonly HashSet<long> _relevesProvisoires = new();
     private bool _imageRecue;
@@ -90,6 +91,13 @@ public sealed class Evaluateur
         _progressionEtapes = new int[reglement.Etapes.Count];
         foreach (var c in reglement.Compteurs) _compteurs[c.Id] = 0;
     }
+
+    /// <summary>
+    /// Horloge de la borne a l'image ou le chrono OFFICIEL s'est arrete (son evenement d'arrivee), et non a celle de la fin de la
+    /// tentative : Metal Slug 3 arrete le chrono a la mort du boss, la tentative finit a la sortie de mission 15 a 29 s plus tard.
+    /// Nulle si le reglement finit sur <c>finish</c> sans evenement d'arrivee propre.
+    /// </summary>
+    public long? HorlogeDArriveeOfficielle => _r.ChronoOfficiel == Reglement.ChronoIndependant ? _horlogeArriveeIndependant : _horlogeArriveeCale;
 
     public EtatTentative Etat { get; private set; } = EtatTentative.Preparee;
 
@@ -314,8 +322,8 @@ public sealed class Evaluateur
         // Le chrono secondaire peut partir apres l'officiel (Green Hill 1 : main au joueur 25 images apres le timer).
         if (_r.Cale is { } cale && _departCale is null && Borne(cale.Depart, s, precedente)) _departCale = s.Frame;
         if (_r.Independant is { } ind && _departIndependant is null && Borne(ind.Depart, s, precedente)) _departIndependant = s.Frame;
-        if (_r.Cale is { } c2 && _departCale is not null && c2.Arrivee.Evenements.Any(f => Correspond(f, s, precedente))) _arriveeEvenementCale = s.Frame;
-        if (_r.Independant is { } i2 && _departIndependant is not null && i2.Arrivee.Evenements.Any(f => Correspond(f, s, precedente))) _arriveeEvenementIndependant = s.Frame;
+        if (_r.Cale is { } c2 && _departCale is not null && c2.Arrivee.Evenements.Any(f => Correspond(f, s, precedente))) { _arriveeEvenementCale = s.Frame; _horlogeArriveeCale = s.HorlogeMs ?? _horlogeDeLImage; }
+        if (_r.Independant is { } i2 && _departIndependant is not null && i2.Arrivee.Evenements.Any(f => Correspond(f, s, precedente))) { _arriveeEvenementIndependant = s.Frame; _horlogeArriveeIndependant = s.HorlogeMs ?? _horlogeDeLImage; }
 
         if (Etat == EtatTentative.ArriveeProvisoire && _r.EffacePar.Any(c => Correspond(c, s, precedente)))
         {
@@ -344,9 +352,9 @@ public sealed class Evaluateur
     {
         if (!_r.Confirmations.Any(c => Correspond(c, s, precedente))) return false;
         if (_r.Independant is { } ind && _departIndependant is not null && ind.Arrivee.Evenements.Any(f => Correspond(f, s, precedente)))
-            _arriveeEvenementIndependant = s.Frame;
+            { _arriveeEvenementIndependant = s.Frame; _horlogeArriveeIndependant = s.HorlogeMs ?? _horlogeDeLImage; }
         if (_r.Cale is { } cale && _departCale is not null && cale.Arrivee.Evenements.Any(f => Correspond(f, s, precedente)))
-            _arriveeEvenementCale = s.Frame;
+            { _arriveeEvenementCale = s.Frame; _horlogeArriveeCale = s.HorlogeMs ?? _horlogeDeLImage; }
         Citer("finish_confirm", s);
         _confirmation = s.Frame;
         Finir(s.Frame);
