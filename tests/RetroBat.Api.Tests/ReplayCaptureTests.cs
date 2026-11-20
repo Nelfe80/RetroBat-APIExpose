@@ -294,11 +294,11 @@ public sealed class ReplayCaptureTests
     }
 
     [Fact]
-    public void Les_reglages_du_film_a_la_taille_d_origine_sont_ceux_mesures_le_15_octobre()
+    public void Les_reglages_du_film_a_la_taille_d_origine_sont_ceux_du_20_novembre_veryfast_crf_14()
     {
         var reglages = ReplayCaptureService.ReglagesDuFilm;
         foreach (var attendu in new[] { "vcodec = \"libx264\"", "pix_fmt = \"yuv444p\"", "format = \"matroska\"", "scale_factor = \"1\"",
-                     "video_preset = \"medium\"", "video_tune = \"animation\"", "video_crf = \"14\"", "acodec = \"aac\"" })
+                     "video_preset = \"veryfast\"", "video_tune = \"animation\"", "video_crf = \"14\"", "acodec = \"aac\"" })
             Assert.Contains(attendu + "\n", reglages);
         Assert.DoesNotContain("\r", reglages);
     }

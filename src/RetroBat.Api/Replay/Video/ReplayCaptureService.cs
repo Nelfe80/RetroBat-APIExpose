@@ -18,7 +18,7 @@ namespace RetroBat.Api.Replay.Video;
 /// <list type="bullet">
 /// <item>RetroArch filme l'image du coeur A SA TAILLE D'ORIGINE (decision du 15 octobre 2026 ; avant, agrandie x4), sans
 /// les shaders ni les decors du joueur, avec nos reglages d'encodage (<see cref="ReglagesDuFilm"/> : x264 veryfast,
-/// animation, CRF 10, 4:4:4). Meme fidelite que le film x4 d'avant pour 59 % de son poids et 0,27 coeur au lieu de
+/// animation, CRF 14, 4:4:4). Meme fidelite que le film x4 d'avant pour 59 % de son poids et 0,27 coeur au lieu de
 /// 0,69. Le film demarre et s'arrete avec le replay de la partie. <c>Video:Capture:Format = "agrandi"</c> revient au
 /// film x4.</item>
 /// <item>Un film a la taille d'origine ne part pas tel quel sur YouTube : pour un record, la borne fabrique d'abord sa
@@ -57,11 +57,12 @@ public sealed class ReplayCaptureService : BackgroundService
     private const long LargeurMinimale = 512;
 
     /// <summary>
-    /// Les reglages d'encodage du film a la taille d'origine (CDC video V2 §9 bis) : x264 VERYFAST, tune animation, CRF 10, en
+    /// Les reglages d'encodage du film a la taille d'origine (CDC video V2 §9 bis) : x264 VERYFAST, tune animation, CRF 14, en
     /// 4:4:4 (la couleur de chaque pixel du jeu), son AAC a 48 kHz. 20/11/2026 : medium CRF 14 (15/10) faisait tomber Giga Wing de
     /// 55,6 a 45,5 images/s sur l'ecran direct de la borne (RetroArch 1,3 coeur, 419 a-coups > 33 ms par minute) ; veryfast garde 57
-    /// images/s (33 a-coups). A contenu identique, veryfast CRF 10 retrouve la fidelite de medium CRF 14 (PSNR 36,3 contre 36,9 dB)
-    /// pour 29 % de debit en plus ; le 4:2:0 est exclu (27,7 dB : la couleur des sprites s'abime). Aucun encodeur materiel dans le
+    /// images/s (33 a-coups). Decision du user : la FLUIDITE d'abord. A contenu identique veryfast CRF 14 est a 33,3 dB contre 36,9 dB
+    /// pour medium CRF 14 (CRF 10 retrouverait 36,3 dB mais pese 1,6 a 1,75 fois plus et coute plus de processeur) ; le 4:2:0 est
+    /// exclu (27,7 dB : la couleur des sprites s'abime). Aucun encodeur materiel dans le
     /// ffmpeg de RetroArch. Le facteur d'agrandissement de retroarch.cfg ne compte pas avec un fichier de reglages : celui-ci dit 1.
     /// </summary>
     internal const string ReglagesDuFilm =
@@ -72,7 +73,7 @@ public sealed class ReplayCaptureService : BackgroundService
         "threads = \"2\"\n" +
         "scale_factor = \"1\"\n" +
         "sample_rate = \"48000\"\n" +
-        "video_preset = \"medium\"\n" +
+        "video_preset = \"veryfast\"\n" +
         "video_tune = \"animation\"\n" +
         "video_crf = \"14\"\n" +
         "audio_b = \"128k\"\n";
