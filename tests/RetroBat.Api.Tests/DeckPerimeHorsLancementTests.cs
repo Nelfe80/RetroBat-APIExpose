@@ -81,4 +81,37 @@ public class DeckPerimeHorsLancementTests : IDisposable
         service.DemarrerLeDeck();
         Assert.Equal(new[] { "demarrage" }, _actes);
     }
+
+    private static DeckLaunchService.DeckResident R(DateTime d) => new(d, () => { });
+
+    [Fact]
+    public void Un_Deck_de_banc_ailleurs_n_est_pas_le_Deck_de_la_borne()
+    {
+        const string installe = @"E:\RetroBat\plugins\APIExpose\tools\playerdeck\NelfePlay.PlayerDeck.exe";
+        var banc = R(AvantLaMiseAJour);
+        var borne = R(ApresLaMiseAJour);
+        var retenus = DeckLaunchService.FiltrerLesResidents(new (string?, DeckLaunchService.DeckResident)[]
+        {
+            (@"E:\claude_travail\worktrees\deck\bin\NelfePlay.PlayerDeck.exe", banc),
+            (@"e:\retrobat\plugins\apiexpose\tools\playerdeck\..\playerdeck\nelfeplay.playerdeck.exe", borne),
+            (null, R(AvantLaMiseAJour)),
+        }, installe);
+        Assert.Single(retenus);
+        Assert.Same(borne, retenus[0]);
+        Assert.Empty(DeckLaunchService.FiltrerLesResidents(new (string?, DeckLaunchService.DeckResident)[] { (@"E:\x\NelfePlay.PlayerDeck.exe", banc) }, installe));
+    }
+
+    [Fact]
+    public void Un_Deck_de_banc_n_empeche_pas_le_lancement_et_le_Deck_installe_empeche_le_doublon()
+    {
+        var bus = new SimpleEventBus();
+        var contexte = new ApiContext();
+        var service = Service(bus, contexte);   // aucun resident retenu : le banc a ete ecarte
+        service.DemarrerLeDeck();
+        Assert.Equal(new[] { "demarrage" }, _actes);
+
+        _actes.Clear();
+        Service(bus, contexte, ApresLaMiseAJour).DemarrerLeDeck();
+        Assert.Empty(_actes);   // le Deck installe tourne : pas de doublon
+    }
 }
