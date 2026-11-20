@@ -186,6 +186,45 @@ public class WorldScoringLancementTests
     }
 
     [Fact]
+    public void Un_lancement_reussi_sous_FBNeo_n_est_pas_un_refus()
+    {
+        // Lignes reelles d'un lancement FBNeo reussi (es_launch_stdout.log du 20/11, FBNeo 260421) : « No missing files »
+        // contient « missing » et a fait annoncer un refus a une partie de Ketsui jouee et publiee.
+        string[] reussi =
+        [
+            "[INFO] [Core] Loading dynamic libretro core from: \"E:/RetroBat/emulators/retroarch/core_proxy/fbneo_libretro.dll\".",
+            "[libretro INFO] [FBNeo] Searching all possible locations for romset ket",
+            "[libretro INFO] [FBNeo] Romset found at E:/RetroBat/roms/mame/ket",
+            "[libretro INFO] [FBNeo] Using ROM with known crc 0xf80c2fc2 and name prg0.bin from archive E:/RetroBat/roms/mame/ket",
+            "[libretro INFO] [FBNeo] No missing files, proceeding",
+            "[libretro INFO] [FBNeo] Initialized driver for ket",
+            "[libretro INFO] [FBNeo] Driver ket was successfully started : game's full name is Ketsui",
+        ];
+        Assert.Null(SetRefuseParFbneo(reussi));
+        Assert.Null(SetRefuseParFbneo(reussi.Take(5)));
+    }
+
+    [Fact]
+    public void Un_vrai_refus_de_FBNeo_reste_un_refus_et_seul_le_lancement_courant_compte()
+    {
+        const string fbneo = "[INFO] [Core] Loading dynamic libretro core from: \"E:/RetroBat/emulators/retroarch/core_proxy/fbneo_libretro.dll\".";
+        string[] manquant =
+        [
+            fbneo,
+            "[libretro INFO] [FBNeo] Searching all possible locations for romset ket",
+            "[libretro ERROR] [FBNeo] ROM prg0.bin (crc 0x1234) is required and missing",
+            "[ERROR] [Content] Failed to load content.",
+        ];
+        Assert.Equal("ket.zip", SetRefuseParFbneo(manquant));
+        Assert.Equal("ket.zip", SetRefuseParFbneo(manquant.Take(3)));
+
+        // Un refus d'un lancement ANTERIEUR dans le meme fichier ne s'applique pas au lancement reussi qui suit.
+        string[] puisReussi = [.. manquant, fbneo, "[libretro INFO] [FBNeo] Searching all possible locations for romset bgaregga",
+            "[libretro INFO] [FBNeo] No missing files, proceeding", "[libretro INFO] [FBNeo] Initialized driver for bgaregga"];
+        Assert.Null(SetRefuseParFbneo(puisReussi));
+    }
+
+    [Fact]
     public void En_sortant_le_choix_de_confort_est_rendu()
         => Assert.Equal(Remise.RemettreConfort,
             QueRendre(new Confort("libretro", "mame2003_plus", "libretro", "mame"), "libretro", "mame"));
