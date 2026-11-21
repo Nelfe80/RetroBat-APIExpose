@@ -77,8 +77,8 @@ public sealed class DeckCatalogue
     }
 
     /// <summary>
-    /// LES THEMES DU DATA PACK (21/11) : <c>resources\playerdeck	hemes</c>, tires par <see cref="Infrastructure.DataPackSyncService"/>. Ils
-    /// passent AVANT ceux de <c>tools\playerdeck	hemes</c> (livres par outils.json) : un theme de meme identifiant est celui du
+    /// LES THEMES DU DATA PACK (21/11) : <c>resources\playerdeck\themes</c>, tires par <see cref="Infrastructure.DataPackSyncService"/>. Ils
+    /// passent AVANT ceux de <c>tools\playerdeck\themes</c> (livres par outils.json) : un theme de meme identifiant est celui du
     /// Data Pack, un theme absent du Data Pack reste celui du dossier livre.
     /// </summary>
     public static string DossierDataPack => Path.Combine(RetroBatPaths.PluginRoot, "resources", "playerdeck", "themes");
