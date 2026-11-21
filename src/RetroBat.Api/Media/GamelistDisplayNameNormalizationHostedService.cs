@@ -14,7 +14,7 @@ public sealed class GamelistDisplayNameNormalizationHostedService : IHostedServi
     private const string ProgressKey = "startup_gamelist_display_names";
     private const string PhaseName = "display-name-normalization";
     private const int StateVersion = 1;
-    private const string NormalizerVersion = "20260522-display-name-v1";
+    private const string NormalizerVersion = "20261121-display-name-v2-entrees-invalides";
     private static readonly JsonSerializerOptions LogJsonOptions = new(JsonSerializerDefaults.Web);
 
     private readonly GameNameNormalizer _gameNameNormalizer;
@@ -230,7 +230,9 @@ public sealed class GamelistDisplayNameNormalizationHostedService : IHostedServi
                 return 0;
             }
 
-            var updated = 0;
+            // Entrees sans fichier (pseudo-jeu d'une liste vide d'ES, chemin interdit) : retirees,
+            // l'ecriture centrale en garde une sauvegarde horodatee.
+            var updated = GamelistEntreesInvalides.Retirer(root);
             foreach (var gameNode in root.Elements("game"))
             {
                 cancellationToken.ThrowIfCancellationRequested();

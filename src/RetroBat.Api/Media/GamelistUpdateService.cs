@@ -788,7 +788,8 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var relativeGamePath = pendingGameNode.Element("path")?.Value;
-                if (string.IsNullOrWhiteSpace(relativeGamePath))
+                if (!GamelistEntreesInvalides.CheminDeJeuValide(relativeGamePath) ||
+                    GamelistEntreesInvalides.NomDePseudoJeu(pendingGameNode.Element("name")?.Value))
                 {
                     continue;
                 }
@@ -1218,6 +1219,12 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
         CancellationToken cancellationToken)
     {
         var relativeGamePath = ToGameRelativePath(plan.GamePath, systemRoot);
+        if (!GamelistEntreesInvalides.CheminDeJeuValide(relativeGamePath) ||
+            GamelistEntreesInvalides.NomDePseudoJeu(plan.DisplayName))
+        {
+            return GamelistEntryUpdateResult.NoChange;
+        }
+
         var gameNode = FindOrCreateGameNode(root, relativeGamePath);
         var beforeGameXml = gameNode.ToString(SaveOptions.DisableFormatting);
 
@@ -1351,6 +1358,12 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
                 "skipped-unsupported-es",
                 new { stage = "before-build" },
                 cancellationToken);
+            return false;
+        }
+
+        if (!GamelistEntreesInvalides.CheminDeJeuValide(plan.GamePath) ||
+            GamelistEntreesInvalides.NomDePseudoJeu(plan.DisplayName))
+        {
             return false;
         }
 
@@ -5575,6 +5588,11 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
     {
         cancellationToken.ThrowIfCancellationRequested();
 
+        if (!GamelistEntreesInvalides.CheminDeJeuValide(plan.GamePath))
+        {
+            return Task.FromResult(false);
+        }
+
         var placeholderPath = EnsureScrapingInProgressPlaceholderImage(plan.FrontendSystemId, plan.ProjectionBaseName);
         if (string.IsNullOrWhiteSpace(placeholderPath))
         {
@@ -5630,6 +5648,11 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
     public Task<bool> FinalizeScrapePlaceholderAsync(MediaProjectionPlan plan, bool noMediaFound, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
+        if (!GamelistEntreesInvalides.CheminDeJeuValide(plan.GamePath))
+        {
+            return Task.FromResult(false);
+        }
 
         var systemRoot = Path.Combine(RetroBatPaths.RomsRoot, plan.FrontendSystemId);
         var gamelistPath = plan.GamelistPath;
@@ -7446,6 +7469,17 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
 
     private bool SaveGamelistDocument(XDocument document, string gamelistPath, CancellationToken cancellationToken, bool allowMediaTagDrop = false)
     {
+        // Jamais de pseudo-jeu d'une liste vide d'ES ni de chemin interdit dans un gamelist.xml :
+        // emulatorLauncher (sans -gameinfo) plante dessus.
+        var invalidesRetirees = GamelistEntreesInvalides.Retirer(document.Root);
+        if (invalidesRetirees > 0)
+        {
+            _logger?.LogWarning(
+                "Entrees invalides (chemin interdit ou pseudo-jeu <...>) retirees avant ecriture de {GamelistPath}: {Count}",
+                gamelistPath,
+                invalidesRetirees);
+        }
+
         return ExecuteWithGamelistIoRetry(
             gamelistPath,
             "ecriture",
