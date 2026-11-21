@@ -98,11 +98,12 @@ public static class NetplayLaunch
             logger.LogWarning("Netplay : emulatorLauncher introuvable ({Chemin}).", exe);
             return null;
         }
+        string? fiche = null;
         try
         {
             // Une fiche -gameinfo du seul jeu, comme ES : emulatorLauncher ne relit pas la gamelist du systeme (et ne plante plus
             // sur une entree au chemin invalide, 21/11).
-            var fiche = FicheDeLancement.Ecrire(arguments, logger);
+            fiche = FicheDeLancement.Ecrire(arguments, logger);
             var lanceur = Process.Start(new ProcessStartInfo
             {
                 FileName = exe,
@@ -122,10 +123,16 @@ public static class NetplayLaunch
                     FicheDeLancement.NettoyerLesVieillesFiches();
                 });
             }
+            else if (fiche is not null)
+            {
+                FicheDeLancement.Effacer(fiche);
+            }
             return lanceur;
         }
         catch (Exception ex)
         {
+            // Lanceur refuse : sa fiche ne servira a personne.
+            if (fiche is not null) FicheDeLancement.Effacer(fiche);
             logger.LogWarning(ex, "Netplay : lancement refuse.");
             return null;
         }

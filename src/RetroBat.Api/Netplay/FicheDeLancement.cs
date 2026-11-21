@@ -51,8 +51,47 @@ public static class FicheDeLancement
 
         entree ??= new XElement("game", new XElement("name", Path.GetFileNameWithoutExtension(rom)));
         entree.Element("path")?.Remove();
+        CheminsEnAbsolu(entree, dossier);
         entree.AddFirst(new XElement("path", rom.Replace(Path.DirectorySeparatorChar, '/')));
         return new XDocument(new XDeclaration("1.0", "utf-8", null), new XElement("gameList", entree));
+    }
+
+    /// <summary>
+    /// Les medias relatifs de l'entree (« ./images/x.png », « ./../../plugins/... ») passent en absolu, comme dans le
+    /// game.xml d'ES : la fiche vit dans un dossier temporaire, et emulatorLauncher lit le bezel, l'image, la carte ou le
+    /// manuel du jeu courant (BezelFiles : <c>File.Exists(CurrentGame.Bezel)</c>) sans les resoudre par rapport a la
+    /// gamelist. Relecture de la 1.9.210.
+    /// </summary>
+    private static readonly HashSet<string> Medias = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "image", "thumbnail", "marquee", "video", "fanart", "titleshot", "map", "cartridge", "boxart", "boxback",
+        "manual", "magazine", "wheel", "mix", "bezel", "label", "extra1",
+    };
+
+    private static void CheminsEnAbsolu(XElement entree, string dossier)
+    {
+        if (string.IsNullOrEmpty(dossier))
+        {
+            return;
+        }
+
+        foreach (var element in entree.Elements().Where(e => !e.HasElements && Medias.Contains(e.Name.LocalName)))
+        {
+            var valeur = element.Value.Trim();
+            if (!valeur.StartsWith("./", StringComparison.Ordinal) && !valeur.StartsWith(".\\", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            try
+            {
+                element.Value = Path.GetFullPath(Path.Combine(dossier, valeur[2..])).Replace(Path.DirectorySeparatorChar, '/');
+            }
+            catch (Exception)
+            {
+                // chemin illisible : laisse tel quel
+            }
+        }
     }
 
     private static string Normaliser(string chemin)
@@ -103,6 +142,12 @@ public static class FicheDeLancement
             logger.LogDebug(ex, "Fiche de lancement non ecrite : le lanceur lira la gamelist du systeme.");
             return null;
         }
+    }
+
+    /// <summary>Efface une fiche (lanceur refuse) ; sans erreur.</summary>
+    public static void Effacer(string fiche)
+    {
+        try { File.Delete(fiche); } catch (Exception) { /* nettoyee au prochain lancement */ }
     }
 
     /// <summary>Efface les fiches de plus d'un jour (un lancement n'en garde aucune apres sa sortie, mais un plantage en laisse).</summary>

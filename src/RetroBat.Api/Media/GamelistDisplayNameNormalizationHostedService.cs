@@ -64,6 +64,14 @@ public sealed class GamelistDisplayNameNormalizationHostedService : IHostedServi
                 "completed",
                 result with { ElapsedMs = stopwatch.ElapsedMilliseconds },
                 cancellationToken);
+            if (result.InvalidEntriesRemoved > 0)
+            {
+                // Lu par installer_1210.ps1 (journal .log\gamelist-display-name-normalization.jsonl, invalidEntriesRemoved).
+                _logger?.LogInformation(
+                    "Startup gamelist cleanup removed {Count} invalid entries (forbidden path, ES placeholder).",
+                    result.InvalidEntriesRemoved);
+            }
+
             if (result.UpdatedGames > 0)
             {
                 _logger?.LogInformation(
@@ -100,7 +108,7 @@ public sealed class GamelistDisplayNameNormalizationHostedService : IHostedServi
         if (!Directory.Exists(RetroBatPaths.RomsRoot))
         {
             _startupOverlayService.UpdateStartupProgress(ProgressKey, 1, 1, "no roms");
-            return new StartupDisplayNameNormalizationResult(0, 0, 0, 0, 0, 0, new Dictionary<string, int>());
+            return new StartupDisplayNameNormalizationResult(0, 0, 0, 0, 0, 0, new Dictionary<string, int>(), 0);
         }
 
         var gamelistPaths = Directory.EnumerateDirectories(RetroBatPaths.RomsRoot, "*", SearchOption.TopDirectoryOnly)
@@ -112,7 +120,7 @@ public sealed class GamelistDisplayNameNormalizationHostedService : IHostedServi
         if (gamelistPaths.Length == 0)
         {
             _startupOverlayService.UpdateStartupProgress(ProgressKey, 1, 1, "no gamelist");
-            return new StartupDisplayNameNormalizationResult(0, 0, 0, 0, 0, 0, new Dictionary<string, int>());
+            return new StartupDisplayNameNormalizationResult(0, 0, 0, 0, 0, 0, new Dictionary<string, int>(), 0);
         }
 
         var processedSystems = 0;
@@ -120,6 +128,7 @@ public sealed class GamelistDisplayNameNormalizationHostedService : IHostedServi
         var updatedSystems = 0;
         var processedGames = 0;
         var updatedGames = 0;
+        var invalidEntriesRemoved = 0;
         var state = StartupGamelistPreparationStateStore.Load();
         var stateDirty = false;
         var cacheMissReasons = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -152,8 +161,9 @@ public sealed class GamelistDisplayNameNormalizationHostedService : IHostedServi
                 Increment(cacheMissReasons, cacheStatus.Reason);
             }
 
-            var systemUpdates = NormalizeGamelistDisplayNames(gamelistPath, cancellationToken, out var systemGames);
+            var systemUpdates = NormalizeGamelistDisplayNames(gamelistPath, cancellationToken, out var systemGames, out var systemInvalid);
             processedGames += systemGames;
+            invalidEntriesRemoved += systemInvalid;
             if (!string.IsNullOrWhiteSpace(systemId))
             {
                 StartupGamelistPreparationStateStore.MarkSystemPhaseClean(
@@ -193,7 +203,8 @@ public sealed class GamelistDisplayNameNormalizationHostedService : IHostedServi
             processedGames,
             updatedGames,
             0,
-            cacheMissReasons);
+            cacheMissReasons,
+            invalidEntriesRemoved);
     }
 
     private static void Increment(IDictionary<string, int> values, string key)
@@ -217,9 +228,11 @@ public sealed class GamelistDisplayNameNormalizationHostedService : IHostedServi
     private int NormalizeGamelistDisplayNames(
         string gamelistPath,
         CancellationToken cancellationToken,
-        out int processedGames)
+        out int processedGames,
+        out int invalidEntriesRemoved)
     {
         processedGames = 0;
+        invalidEntriesRemoved = 0;
         lock (_gamelistStore.GetLock(gamelistPath))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -232,7 +245,8 @@ public sealed class GamelistDisplayNameNormalizationHostedService : IHostedServi
 
             // Entrees sans fichier (pseudo-jeu d'une liste vide d'ES, chemin interdit) : retirees,
             // l'ecriture centrale en garde une sauvegarde horodatee.
-            var updated = GamelistEntreesInvalides.Retirer(root);
+            invalidEntriesRemoved = GamelistEntreesInvalides.Retirer(root);
+            var updated = invalidEntriesRemoved;
             foreach (var gameNode in root.Elements("game"))
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -301,5 +315,6 @@ public sealed class GamelistDisplayNameNormalizationHostedService : IHostedServi
         int ProcessedGames,
         int UpdatedGames,
         long ElapsedMs,
-        IReadOnlyDictionary<string, int> CacheMissReasons);
+        IReadOnlyDictionary<string, int> CacheMissReasons,
+        int InvalidEntriesRemoved);
 }

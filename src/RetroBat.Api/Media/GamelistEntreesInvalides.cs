@@ -13,23 +13,35 @@ public static class GamelistEntreesInvalides
 {
     private static readonly char[] Interdits = { '<', '>', '|', '"', '*', '?' };
 
-    /// <summary>Vrai si le chemin (relatif ES ou absolu) peut designer un fichier Windows.</summary>
+    /// <summary>
+    /// Vrai si le chemin (relatif ES ou absolu) peut designer un fichier Windows. Les blancs autour du chemin
+    /// (gamelist indentee a la main) sont toleres : seul le chemin lui-meme est juge.
+    /// </summary>
     public static bool CheminDeJeuValide(string? chemin)
+        => !string.IsNullOrWhiteSpace(chemin) && !CheminInterdit(chemin);
+
+    /// <summary>
+    /// Vrai si le chemin, blancs autour retires, porte un caractere qu'aucun fichier Windows ne peut avoir
+    /// (<c>&lt;&gt;|"*?</c> ou un caractere de controle). Un chemin vide n'est PAS interdit : il ne designe rien,
+    /// mais il ne fait pas planter emulatorLauncher et il n'est pas a nous de le retirer.
+    /// </summary>
+    public static bool CheminInterdit(string? chemin)
     {
-        if (string.IsNullOrWhiteSpace(chemin))
+        var c = chemin?.Trim();
+        if (string.IsNullOrEmpty(c))
         {
             return false;
         }
 
-        foreach (var c in chemin)
+        foreach (var x in c)
         {
-            if (c < ' ' || Array.IndexOf(Interdits, c) >= 0)
+            if (x < ' ' || Array.IndexOf(Interdits, x) >= 0)
             {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     /// <summary>Vrai pour un nom entre chevrons, comme le pseudo-jeu d'une liste vide d'ES.</summary>
@@ -39,11 +51,12 @@ public static class GamelistEntreesInvalides
         return !string.IsNullOrEmpty(n) && n.Length >= 2 && n[0] == '<' && n[^1] == '>';
     }
 
-    public static bool EntreeInvalide(XElement game)
-    {
-        var chemin = game.Element("path")?.Value;
-        return !CheminDeJeuValide(chemin) || NomDePseudoJeu(game.Element("name")?.Value);
-    }
+    /// <summary>
+    /// Entree a retirer d'une gamelist : son chemin porte un caractere interdit (c'est le cas du pseudo-jeu
+    /// d'ES, « ./&lt;Aucune entree trouvee&gt; »). Jugee par le CHEMIN SEUL : un vrai jeu dont le nom serait entre
+    /// chevrons, ou dont le chemin est entoure de blancs, n'est jamais retire (relecture de la 1.9.210).
+    /// </summary>
+    public static bool EntreeInvalide(XElement game) => CheminInterdit(game.Element("path")?.Value);
 
     /// <summary>Retire de la racine les entrees invalides ; rend leur nombre.</summary>
     public static int Retirer(XElement? root)

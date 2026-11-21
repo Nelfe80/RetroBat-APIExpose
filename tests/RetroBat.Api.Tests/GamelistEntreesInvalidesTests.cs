@@ -39,7 +39,7 @@ public sealed class GamelistEntreesInvalidesTests
             <gameList>
               <game><path>./&lt;Aucune entr?e trouv?e&gt;</path><gameid>0990</gameid><name>&lt;Aucune entr?e trouv?e&gt;</name><lang>en</lang><region>wr</region></game>
               <game><path>./ddpdojblka.zip</path><name>DoDonPachi Dai-Ou-Jou</name></game>
-              <game><path>./ok.zip</path><name>&lt;Jeu&gt;</name></game>
+              <game><path>./a|b.zip</path><name>Autre</name></game>
             </gameList>
             """);
         Assert.Equal(2, GamelistEntreesInvalides.Retirer(doc.Root));
@@ -47,6 +47,106 @@ public sealed class GamelistEntreesInvalidesTests
         Assert.Equal("./ddpdojblka.zip", restant.Element("path")!.Value);
         Assert.Equal(0, GamelistEntreesInvalides.Retirer(doc.Root));
         Assert.Equal(0, GamelistEntreesInvalides.Retirer(null));
+    }
+
+    /// <summary>Relecture de la 1.9.210 : le retrait se juge sur le chemin seul, jamais une vraie entree retiree.</summary>
+    [Fact]
+    public void Le_nettoyage_garde_les_vraies_entrees_meme_singulieres()
+    {
+        var doc = XDocument.Parse("""
+            <gameList>
+              <game><path>./ok.zip</path><name>&lt;Jeu&gt;</name></game>
+              <game><path>
+                ./indente (Europe).zip
+              </path><name>Indente</name></game>
+              <game><name>Sans chemin</name></game>
+              <game><path>./Pok\u00e9mon - \u00e9dition sp\u00e9ciale [!] (Rev 1).gb</path><name>Accents</name></game>
+            </gameList>
+            """);
+        Assert.Equal(0, GamelistEntreesInvalides.Retirer(doc.Root));
+        Assert.Equal(4, doc.Root!.Elements("game").Count());
+        Assert.True(GamelistEntreesInvalides.CheminDeJeuValide("  ./indente.zip \r\n"));
+        Assert.False(GamelistEntreesInvalides.CheminInterdit(null));
+        Assert.False(GamelistEntreesInvalides.CheminInterdit("   "));
+        Assert.True(GamelistEntreesInvalides.CheminInterdit("./a\tb.zip"));
+    }
+
+    /// <summary>Relecture de la 1.9.210 : la fiche vit dans un dossier temporaire, ses medias doivent etre absolus (comme le game.xml d'ES).</summary>
+    [Fact]
+    public void La_fiche_rend_les_medias_absolus()
+    {
+        var gamelist = XDocument.Parse("""
+            <gameList>
+              <game><path>./Dai Ou Jou é.zip</path><name>DDP</name><bezel>./../../plugins/APIExpose/media/b.png</bezel><image>./images/ddp.png</image><thumbnail>E:/x/t.png</thumbnail><desc>./ pas un chemin</desc></game>
+            </gameList>
+            """);
+        var fiche = FicheDeLancement.Construire(@"D:\Mes Jeux\RetroBat\roms\fbneo\Dai Ou Jou é.zip", gamelist);
+        var jeu = Assert.Single(fiche.Root!.Elements("game"));
+        Assert.Equal("D:/Mes Jeux/RetroBat/roms/fbneo/Dai Ou Jou é.zip", jeu.Element("path")!.Value);
+        Assert.Equal("DDP", jeu.Element("name")!.Value);
+        Assert.Equal("D:/Mes Jeux/RetroBat/plugins/APIExpose/media/b.png", jeu.Element("bezel")!.Value);
+        Assert.Equal("D:/Mes Jeux/RetroBat/roms/fbneo/images/ddp.png", jeu.Element("image")!.Value);
+        Assert.Equal("E:/x/t.png", jeu.Element("thumbnail")!.Value);
+        Assert.Equal("./ pas un chemin", jeu.Element("desc")!.Value);
+    }
+
+    /// <summary>
+    /// Relecture de la 1.9.210 : la fiche ecrite se relit comme emulatorLauncher la lit (XmlSerializer sur un FileStream,
+    /// EmulatorLauncher.Common GameList.Load), accents et espaces compris, et les arguments la designent entre guillemets.
+    /// </summary>
+    [Fact]
+    public void La_fiche_ecrite_se_relit_accents_et_espaces_compris()
+    {
+        var dossier = Path.Combine(Path.GetTempPath(), "fiche-test-" + Guid.NewGuid().ToString("N"), "Mes Jeux é", "fbneo");
+        Directory.CreateDirectory(dossier);
+        try
+        {
+            var rom = Path.Combine(dossier, "Dai Ou Jou é.zip");
+            File.WriteAllText(Path.Combine(dossier, "gamelist.xml"),
+                "<?xml version=\"1.0\"?>\n<gameList><game><path>./&lt;Aucune entrée trouvée&gt;</path><name>&lt;Aucune entrée trouvée&gt;</name></game>"
+                + "<game><path>./Dai Ou Jou é.zip</path><name>Dai-Ou-Jou é</name></game></gameList>");
+            var args = "-system fbneo -emulator libretro -core fbneo -rom \"" + rom + "\"";
+            var fiche = FicheDeLancement.Ecrire(args, Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance);
+            Assert.NotNull(fiche);
+            try
+            {
+                using (var flux = new FileStream(fiche!, FileMode.Open, FileAccess.Read))
+                {
+                    var lu = (FicheLue?) new System.Xml.Serialization.XmlSerializer(typeof(FicheLue)).Deserialize(flux);
+                    var jeu = Assert.Single(lu!.Games);
+                    Assert.Equal(rom.Replace('\\', '/'), jeu.Path);
+                    Assert.Equal("Dai-Ou-Jou é", jeu.Name);
+                }
+
+                Assert.StartsWith("-gameinfo \"" + fiche + "\" -system", FicheDeLancement.AjouterLaFiche(args, fiche!));
+            }
+            finally
+            {
+                FicheDeLancement.Effacer(fiche!);
+            }
+
+            Assert.False(File.Exists(fiche));
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(Path.GetDirectoryName(dossier))!, recursive: true);
+        }
+    }
+
+    [System.Xml.Serialization.XmlRoot("gameList")]
+    public sealed class FicheLue
+    {
+        [System.Xml.Serialization.XmlElement("game")]
+        public List<JeuLu> Games { get; set; } = new();
+    }
+
+    public sealed class JeuLu
+    {
+        [System.Xml.Serialization.XmlElement("path")]
+        public string? Path { get; set; }
+
+        [System.Xml.Serialization.XmlElement("name")]
+        public string? Name { get; set; }
     }
 
     [Fact]
