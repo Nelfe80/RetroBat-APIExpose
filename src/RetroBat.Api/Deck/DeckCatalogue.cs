@@ -76,14 +76,42 @@ public sealed class DeckCatalogue
         }
     }
 
-    /// <summary>Lit les Decks installes a cote de l'exe (themes/ puis decks/). Un fichier illisible est ignore.</summary>
-    public static DeckCatalogue Lire(string dossierDuDeck)
+    /// <summary>
+    /// LES THEMES DU DATA PACK (21/11) : <c>resources\playerdeck	hemes</c>, tires par <see cref="Infrastructure.DataPackSyncService"/>. Ils
+    /// passent AVANT ceux de <c>tools\playerdeck	hemes</c> (livres par outils.json) : un theme de meme identifiant est celui du
+    /// Data Pack, un theme absent du Data Pack reste celui du dossier livre.
+    /// </summary>
+    public static string DossierDataPack => Path.Combine(RetroBatPaths.PluginRoot, "resources", "playerdeck", "themes");
+
+    /// <summary>
+    /// L'option que l'API donne au PlayerDeck pour qu'il lise ses themes du Data Pack en priorite : <c>--themes-dir "&lt;dossier&gt;"</c>,
+    /// ou rien si le dossier n'a aucun theme (le Deck lit alors ses themes comme avant). Un exe plus ancien ignore l'option. Pur
+    /// sauf la lecture du dossier.
+    /// </summary>
+    public static string OptionThemesDuDataPack(string? dossier = null)
+    {
+        dossier ??= DossierDataPack;
+        try
+        {
+            return Directory.Exists(dossier) && Directory.EnumerateFiles(dossier, "*.json").Any() ? $" --themes-dir \"{dossier}\"" : "";
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            return "";
+        }
+    }
+
+    /// <summary>Lit les Decks installes : ceux du Data Pack (si donne), puis themes/ et decks/ a cote de l'exe. Un fichier illisible est ignore.</summary>
+    public static DeckCatalogue Lire(string dossierDuDeck, string? dossierDataPack = null)
     {
         var entrees = new List<Entree>();
         var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var (sous, officiel) in new[] { ("themes", true), ("decks", false) })
+        var sources = new List<(string Dossier, bool Officiel)>();
+        if (!string.IsNullOrWhiteSpace(dossierDataPack)) sources.Add((dossierDataPack, true));
+        sources.Add((Path.Combine(dossierDuDeck, "themes"), true));
+        sources.Add((Path.Combine(dossierDuDeck, "decks"), false));
+        foreach (var (dossier, officiel) in sources)
         {
-            var dossier = Path.Combine(dossierDuDeck, sous);
             if (!Directory.Exists(dossier)) continue;
             var fichiers = Directory.GetFiles(dossier, "*.json");
             Array.Sort(fichiers, StringComparer.OrdinalIgnoreCase);

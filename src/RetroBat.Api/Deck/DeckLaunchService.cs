@@ -216,7 +216,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
             }
 
             var (jeu, groupe) = CleDuJeu(systeme, cheminRom!, romGroup);
-            var catalogue = Catalogue?.Invoke() ?? DeckCatalogue.Lire(DossierDuDeck);
+            var catalogue = Catalogue?.Invoke() ?? DeckCatalogue.Lire(DossierDuDeck, DeckCatalogue.DossierDataPack);
             var installes = catalogue.PourLeJeu(rom, groupe);
             if (installes.Count == 0)
             {
@@ -550,7 +550,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         using var processus = Process.Start(new ProcessStartInfo
         {
             FileName = exe,
-            Arguments = $"--render-decor \"{png}\" --theme {entree.Id} --render-size {largeur}x{hauteur}" + (plan is null ? "" : $" --trial \"{plan}\""),
+            Arguments = $"--render-decor \"{png}\" --theme {entree.Id} --render-size {largeur}x{hauteur}" + DeckCatalogue.OptionThemesDuDataPack() + (plan is null ? "" : $" --trial \"{plan}\""),
             WorkingDirectory = DossierDuDeck,
             UseShellExecute = false,
             CreateNoWindow = true,
@@ -696,7 +696,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         Process.Start(new ProcessStartInfo
         {
             FileName = exe,
-            Arguments = "--deck --follow-launch",
+            Arguments = "--deck --follow-launch" + DeckCatalogue.OptionThemesDuDataPack(),
             WorkingDirectory = DossierDuDeck,
             UseShellExecute = false,
             CreateNoWindow = true,
@@ -876,7 +876,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         // MULTIPLAYER (decision du user du 09/11, remplace H-D17) : aucun Deck en room, rien a choisir
         if (lancement is null || lancement.Choices.Count == 0 || !DeckModes.PoseUnDeck(lancement.Mode)) return null;
 
-        var catalogue = Catalogue?.Invoke() ?? DeckCatalogue.Lire(DossierDuDeck);
+        var catalogue = Catalogue?.Invoke() ?? DeckCatalogue.Lire(DossierDuDeck, DeckCatalogue.DossierDataPack);
         var installes = catalogue.PourLeJeu(lancement.Rom, lancement.RomGroup);
         if (installes.Count == 0) return null;
 

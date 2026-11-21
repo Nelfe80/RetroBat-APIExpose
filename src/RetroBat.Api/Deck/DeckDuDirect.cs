@@ -97,7 +97,7 @@ public sealed class DeckDuDirect : IDisposable
             var p = Process.Start(new ProcessStartInfo
             {
                 FileName = exe,
-                Arguments = Arguments(memoire, Environment.ProcessId),
+                Arguments = Arguments(memoire, Environment.ProcessId) + DeckCatalogue.OptionThemesDuDataPack(),
                 WorkingDirectory = Path.GetDirectoryName(exe) ?? AppContext.BaseDirectory,
                 UseShellExecute = false,
                 CreateNoWindow = true,
