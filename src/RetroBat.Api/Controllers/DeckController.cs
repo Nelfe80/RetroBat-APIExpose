@@ -97,7 +97,7 @@ public sealed class DeckController : ControllerBase
     [HttpGet("installed")]
     public IActionResult Installes([FromQuery] string? rom, [FromQuery] string? romGroup)
     {
-        var catalogue = DeckCatalogue.Lire(DeckCatalogue.Dossier(_options.CurrentValue.PlayerDeck.Directory));
+        var catalogue = DeckCatalogue.Lire(DeckCatalogue.Dossier(_options.CurrentValue.PlayerDeck.Directory), DeckCatalogue.DossierDataPack);
         var liste = string.IsNullOrWhiteSpace(rom) && string.IsNullOrWhiteSpace(romGroup) ? catalogue.Tous : catalogue.PourLeJeu(rom, romGroup);
         return Ok(liste.Select(e => new { e.Id, e.Name, e.Version, e.Official, e.Default, e.VariantOf, e.Roms }));
     }

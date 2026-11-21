@@ -52,5 +52,8 @@ public class DataPackOptions
         "multiplayer",
         // Les etats de depart des defis (1er novembre 2026), verifies par l'empreinte du reglement avant chaque pose.
         "challenges",
+        // Les Player Decks (21 novembre 2026) : themes et cartes des niveaux, lus par le Deck EN PRIORITE sur tools\playerdeck	hemes.
+        // Chemins bornes par DataPackPaths.Autorise (playerdeck/themes/*.json et playerdeck/themes/atlas/<deck>/*.json|png).
+        "playerdeck",
     };
 }

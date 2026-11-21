@@ -789,8 +789,22 @@ public static class DataPackPaths
         {
             if (s.Length == 0 || s == "." || s == ".." || s.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0) return false;
         }
-        return dossiers.Contains(segments[0]);
+        if (!dossiers.Contains(segments[0])) return false;
+        // Un dossier a forme fixe (playerdeck) n'admet que sa forme : ni autre extension, ni autre profondeur.
+        return !string.Equals(segments[0], DossierPlayerDeck, StringComparison.OrdinalIgnoreCase) || FormePlayerDeck.IsMatch(path);
     }
+
+    /// <summary>Le dossier du Data Pack qui porte les Player Decks (resources/playerdeck).</summary>
+    public const string DossierPlayerDeck = "playerdeck";
+
+    /// <summary>
+    /// Les seuls fichiers admis sous <c>playerdeck/</c> : un theme (<c>themes/&lt;nom&gt;.json</c>) ou un releve de niveau d'un Deck
+    /// (<c>themes/atlas/&lt;deck&gt;/&lt;nom&gt;.json</c>, avec son fond <c>.png</c> facultatif). Rien d'autre : pas d'exe, pas de DLL, pas
+    /// de script, pas de sous-dossier de plus.
+    /// </summary>
+    private static readonly System.Text.RegularExpressions.Regex FormePlayerDeck = new(
+        @"^playerdeck/themes/([A-Za-z0-9][A-Za-z0-9._-]*\.json|atlas/[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*\.(json|png))$",
+        System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.CultureInvariant);
 
     /// <summary>Les dossiers d'un arbre deja lu sont-ils ceux d'aujourd'hui ? Un etat sans cette liste ne l'est pas.</summary>
     public static bool MemesDossiers(IReadOnlyCollection<string>? connus, ISet<string> actuels)
