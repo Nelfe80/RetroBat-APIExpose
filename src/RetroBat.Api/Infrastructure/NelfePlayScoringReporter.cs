@@ -2902,7 +2902,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // Le joueur de la ligne : un GAME_MODE player=2 est le mode du joueur 2, pas celui de la machine (2026-10-20).
         var joueur = Entier(signal, "Player") ?? Entier(root, "player") ?? 1;
         string trace;
-        string? horsReglement = null;
+        var verifierPlusTard = false;
         lock (_sync)
         {
             if (mode && joueur >= 2)
@@ -2927,33 +2927,47 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 if (adresse.Length == 0) return;
                 _contexte = _contexte.AvecDifficulte(adresse, valeur);
                 trace = $"difficulte : {RetroBat.Api.Scoring.ModesDeJeu.Adresse(adresse)} = {valeur}";
-                horsReglement = OptionHorsReglement(adresse, valeur);
+                verifierPlusTard = ObserverOption(adresse, valeur);
             }
         }
         Trace(trace);
-        if (horsReglement is { } option) AnnoncerOptionHorsReglement(option);
+        if (verifierPlusTard) _ = VerifierOptionsHorsReglementPlusTard();
     }
 
-    // Le lancement deja averti d'une option hors reglement : un seul bandeau par lancement.
+    // L'avertisseur du lancement en cours (voir AvertisseurReglages) et le lancement pour lequel il a ete cree.
+    private RetroBat.Api.Scoring.AvertisseurReglages _avertisseur = new();
     private long _lancementAvertiOptions = -1;
 
     /// <summary>
-    /// L'OPTION DU JEU HORS REGLEMENT, DITE TOUT DE SUITE (2026-11-17). Streets of Rage 2 de snapouille : vies passees a 5
-    /// dans OPTIONS avant le depart, 1 h 35 de partie, 692 020 points refuses a la fin (game.difficulty_not_allowed) sans
-    /// qu'un mot l'ait dit. Une option du menu du jeu vit dans sa memoire : la borne ne peut pas l'imposer, elle la voit. Des
-    /// qu'une valeur n'est admise par AUCUN profil solo du lancement, le joueur l'apprend, une fois par lancement : le
-    /// contexte garde la valeur (une ligne « neq » ne parle pas au retour a l'usine), seul un nouveau lancement repart propre.
-    /// Rend le mot du champ (vide s'il n'en a pas), ou null. Appele sous _sync.
+    /// L'OPTION DU JEU HORS REGLEMENT (2026-11-17, Streets of Rage 2 de snapouille : vies passees a 5 dans OPTIONS avant le
+    /// depart, 1 h 35 de partie, 692 020 points refuses a la fin sans qu'un mot l'ait dit). Une option du menu du jeu vit
+    /// dans sa memoire : la borne ne peut pas l'imposer, elle la voit. Une valeur n'admise par AUCUN profil solo du
+    /// lancement est notee ; le joueur n'est prevenu que si elle est TOUJOURS la valeur du champ apres un court delai
+    /// (AvertisseurReglages, 21/11 : Tetris type B, les valeurs traversees en faisant defiler le menu ne comptent pas).
+    /// Le contexte garde la derniere valeur lue : seul un nouveau lancement repart propre. Rend vrai s'il faut verifier
+    /// plus tard. Appele sous _sync.
     /// </summary>
-    private string? OptionHorsReglement(string adresse, int valeur)
+    private bool ObserverOption(string adresse, int valeur)
     {
         var lancement = Interlocked.Read(ref _lancement);
-        if (_lancementAvertiOptions == lancement) return null;
-        if (_profilsDuLancement is not { } p || _lancementDesProfils != lancement) return null;
+        if (_lancementAvertiOptions != lancement) { _avertisseur = new(); _lancementAvertiOptions = lancement; }
+        if (_profilsDuLancement is not { } p || _lancementDesProfils != lancement) return false;
         var solo = RetroBat.Api.Scoring.ModesDeJeu.DuSolo(p.Profils);
-        if (!RetroBat.Api.Scoring.ReglagesDuMenu.HorsReglement(solo, adresse, valeur, Langue(), out var nom)) return null;
-        _lancementAvertiOptions = lancement;
-        return nom;
+        var hors = _avertisseur.Observer(solo, adresse, valeur, Langue(), DateTime.UtcNow, out var retour);
+        if (retour is not null) Trace($"option du jeu revenue dans le reglement ({retour.Nom}) : l'avertissement est rearme");
+        return hors;
+    }
+
+    private async Task VerifierOptionsHorsReglementPlusTard()
+    {
+        try
+        {
+            await Task.Delay(RetroBat.Api.Scoring.AvertisseurReglages.Delai + TimeSpan.FromMilliseconds(250)).ConfigureAwait(false);
+            IReadOnlyList<string> echus;
+            lock (_sync) echus = _avertisseur.Echus(DateTime.UtcNow);
+            foreach (var option in echus) AnnoncerOptionHorsReglement(option);
+        }
+        catch (Exception ex) { Trace($"verification des options hors reglement : {ex.Message}"); }
     }
 
     private void AnnoncerOptionHorsReglement(string option)
