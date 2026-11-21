@@ -252,6 +252,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private RetroBat.Api.Scoring.SalvesDeScore _salves = new();
     private readonly RetroBat.Api.Scoring.ArretALaBaisse _baisse = new();
+    /// <summary>La fin de la fenetre de jeu par remise a zero du score (21/11), et l'image du dernier depart.</summary>
+    private readonly RetroBat.Api.Scoring.FinDeFenetreParBaisse _finParBaisse = new();
+    private long _imageDuDernierDepart = -1;
 
     /// <summary>Les enregistrements de la partie, en frames du rapporteur : le replay du meilleur run.</summary>
     private readonly List<(string Id, long Debut, long? Fin)> _enregistrements = new();
@@ -1057,6 +1060,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _departsParScore = 0;
             _salves = new RetroBat.Api.Scoring.SalvesDeScore();
             _baisse.Oublier();
+            _finParBaisse.Oublier();
+            _imageDuDernierDepart = -1;
             _enregistrements.Clear();
             _arretsEnAttente.Clear();
             _vies.Clear();
@@ -1849,6 +1854,27 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     internal static bool DemoConfirmee(DateTime depuis, DateTime dernierAppui, DateTime maintenant)
         => dernierAppui < depuis && maintenant - depuis > AppuiApresDemo;
 
+    /// <summary>
+    /// Le score lu en ce moment est-il hors partie : la fenetre de jeu est fermee (GAME_OVER, ou score retombe a zero sans
+    /// nouveau depart), ou le jeu est en demo ? Faux tant qu'aucun depart n'a ete vu (comportement d'avant). Le direct du record
+    /// et la capture du record s'y fient : un score de demo n'est jamais un record.
+    /// </summary>
+    /// <summary>Les lectures qui resteraient apres la fenetre de jeu (essais).</summary>
+    internal IReadOnlyList<long> TotauxEnJeuPourEssai()
+    {
+        lock (_sync)
+        {
+            var brutes = new List<(long frame, long total)>(_trajectory);
+            var gardes = FenetreDeJeu(_startVu, _horsJeu) ? FiltrerEnJeu(brutes, _horsJeu) : brutes;
+            return gardes.Select(t => t.total).ToList();
+        }
+    }
+
+    public bool ScoreHorsPartie()
+    {
+        lock (_sync) return _inDemo || (_startVu && !_enJeu);
+    }
+
     /// <summary>Un appui du joueur, de quelque source que ce soit.</summary>
     private void NoterAppui()
     {
@@ -2147,6 +2173,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             if (!_enJeu && _scoreAuDepart is null && _dernierTotalVu is { } auDepart) _scoreAuDepart = (_lastFrame, auDepart);
             _inDemo = false; _startVu = true; _enJeu = true;
+            _imageDuDernierDepart = _lastFrame;
+            _finParBaisse.Oublier();
             _gameOverVu = false;
             _gameOverDansLaPartie = false;
             _demoEnSuspens = null;
@@ -3204,6 +3232,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var nouvellePartie = false;
         var departParLeScore = false;
         var arretParBaisse = false;
+        long? finDeFenetre = null;
         lock (_sync)
         {
             _scoresRecus++;
@@ -3254,6 +3283,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 _monteeDansLEnregistrement = false;
             }
 
+            // LA FENETRE SE FERME QUAND LE SCORE RETOMBE A ZERO SANS NOUVEAU DEPART (21/11) : sans GAME_OVER dans le .MEM, la demo
+            // qui suit la partie restait « en jeu ».
+            var imageDuHautAvant = _trajectory.Count > 0 ? _trajectory[^1].frame : _lastFrame;
+            if (_finParBaisse.Lire(total, reference, nouvelleSalve, imageDuHautAvant) is { } imageDuHaut
+                && RetroBat.Api.Scoring.FinDeFenetreParBaisse.Ferme(_startVu && (_credits.Count > 0 || _gameStartVu), _enJeu,
+                    _imageDuDernierDepart, imageDuHaut))
+            {
+                _enJeu = false;
+                finDeFenetre = total;
+            }
+
             // LE SCORE RETOMBE : une nouvelle partie commence, pour un jeu a chiffre des credits
             // (le continue y garde le score). Si la partie d'avant a ete close par ce chiffre, tout
             // se rearme pour celle-ci (bandeau, fin de partie, replay). Une partie close par un
@@ -3296,6 +3336,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 _derniereLecture = total;
             }
         }
+        if (finDeFenetre is { } bas)
+            Trace($"fin de la partie : le score retombe a {bas} sans nouveau depart (credit, START, GAME_START) : ce qui suit est de la demo, hors fenetre de jeu");
         if (departParLeScore) AnnoncerLeDepart("score qui monte");
         if (arretParBaisse)
         {
@@ -4128,6 +4170,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 if (gardes.Count != trajectory.Count)
                 {
                     Trace($"fenetre de jeu : {trajectory.Count - gardes.Count} lecture(s) hors jeu ecartee(s) (demo, attract)");
+                    // Le dernier total vu est celui de la demo : le total de la partie est celui de la derniere lecture gardee.
+                    if (filtre is null) finalTotal = gardes.Count > 0 ? gardes[^1].total : null;
                 }
                 trajectory = gardes;
                 // Rien de joué : pas de filet sur le dernier total, qui serait celui de l'attract.
@@ -6160,6 +6204,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _plusBasDeLEnregistrement = _dernierTotalVu ?? 0;
             _attenteMontee = false;
             _baisse.Oublier();
+            _finParBaisse.Oublier();
+            _imageDuDernierDepart = -1;
             AppliquerLesArrets(_enregistrements, _arretsEnAttente);
             _enregistrements.Add((id!, DebutDeLEnregistrement(_lastFrame, GetLong(payload, "Frame")), null));
             if (_enregistrements.Count > 20) _enregistrements.RemoveAt(0);

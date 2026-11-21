@@ -209,6 +209,8 @@ public sealed class DirectDuRecordService : IHostedService, IDisposable
 
                 case "score.live.changed":
                     if (Nombre(e.Payload, "Score") is not { } score) return;
+                    // Un score de demo (hors de la fenetre de jeu) n'ouvre pas de direct et ne bat aucun record (21/11).
+                    if (_rapporteur?.ScoreHorsPartie() == true) return;
                     var joueur = (int)(Nombre(e.Payload, "Player") ?? 1);
                     int gen;
                     bool ouvrir, signaler, rearmer = false;
