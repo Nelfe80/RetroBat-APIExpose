@@ -1335,6 +1335,36 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
     /// <summary>Un fichier d'attente du gestionnaire : le jeu reste dans son paquet jusqu'a son extraction.</summary>
     internal static bool EstUnTemoin(string chemin) => IsOnTheFlyPlaceholder(chemin);
 
+    /// <summary>
+    /// Extrait UNE entree d'un paquet (jamais le paquet entier) : la lecture du contenu d'un fichier d'attente par la
+    /// collection World Scoring (21/11). Rend le fichier extrait, ou une chaine vide s'il n'en est pas sorti.
+    ///
+    /// tar puis 7za, SANS le balayage des en-tetes zip de <see cref="ExtractArchiveEntryAsync(string, string, string, CancellationToken)"/> :
+    /// ce balayage charge tout le paquet en memoire (jusqu'a 1 Go : 51 Mo pour gb.rar, 207 Mo pour gbc.rar) et ne limite pas ce
+    /// que l'entree decompresse ; acceptable quand le joueur lance un jeu, pas pour une passe de fond (relecture de la 1.9.208).
+    /// Une annulation (delai, partie qui commence) n'enchaine pas sur 7za.
+    /// </summary>
+    internal static async Task<string> ExtraireUneEntreeAsync(string paquet, string entree, string packRelativePath, string dossier, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await ExtractWithTarAsync(paquet, dossier, cancellationToken, entree);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException && !cancellationToken.IsCancellationRequested)
+        {
+            var sevenZipPath = GetSevenZipPath();
+            if (!File.Exists(sevenZipPath))
+            {
+                throw new InvalidOperationException($"7za.exe introuvable: {sevenZipPath}");
+            }
+
+            await ExtractWith7ZipAsync(sevenZipPath, paquet, dossier, cancellationToken, entree);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        return ResolveExtractedArchiveEntryPath(dossier, entree, packRelativePath);
+    }
+
     /// <summary>Extrait tout un paquet dans un dossier (la lecture des contenus pour MULTIPLAYER, 26/10).</summary>
     internal static Task ExtraireToutAsync(string paquet, string dossier, CancellationToken cancellationToken)
         => ExtractArchiveAsync(paquet, dossier, cancellationToken);

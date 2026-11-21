@@ -93,6 +93,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// plus rien.
     /// </summary>
     private readonly Func<bool> _emulateurTourne;
+    private readonly EmpreintesDesTemoins _temoins;
+    /// <summary>Fichiers d'attente dont le paquet a ete lu cette passe, et leur raison quand le contenu n'est pas lisible.</summary>
+    private readonly Dictionary<string, EmpreintesDuTemoin> _temoinsDeLaPasse = new(StringComparer.OrdinalIgnoreCase);
     private readonly Func<InstalledGame, OpenGame, bool> _contenuConfirme;
     /// <summary>La regle des ROMs admises (11/11) sur un candidat confirme ; le booleen dit « jeu ouvert aux seuls speedruns ».</summary>
     private readonly Func<InstalledGame, OpenGame, bool, RomAdmission.Decision> _admission;
@@ -133,8 +136,10 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         Func<DateTime>? horloge = null,
         CabinetLocale? locale = null,
         Func<InstalledGame, OpenGame, bool, RomAdmission.Decision>? admission = null,
-        SuiviDuSite? suivi = null)
+        SuiviDuSite? suivi = null,
+        EmpreintesDesTemoins? temoins = null)
     {
+        _temoins = temoins ?? new EmpreintesDesTemoins(logger);
         _suivi = suivi;
         // QUOI DE NEUF (point 6 du 14/11) : une revision de l'index qui n'est pas celle gardee fait relire tout de suite.
         _suivi?.SurRevision(SuiviDuSite.JeuxOuverts, (revision, ct) =>
@@ -584,6 +589,38 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     }
 
     /// <summary>
+    /// UN FICHIER D'ATTENTE DU GESTIONNAIRE DE ROM (jeu d'un paquet a la volee) : sa ROM est dans le paquet. Son empreinte
+    /// vient du paquet (<see cref="EmpreintesDesTemoins"/>, une entree extraite, gardee), et prend la place de celle de la
+    /// gamelist : le contenu confirme ensuite le jeu comme pour un vrai fichier. Jamais pendant une partie (une partie qui
+    /// commence pendant la lecture l'arrete) ; un autre fichier passe tel quel. Appele seulement quand aucune vraie ROM du jeu
+    /// n'est confirmee (relecture de la 1.9.208) : une borne qui a deja le bon fichier ne lit aucun paquet et garde son choix.
+    /// </summary>
+    private InstalledGame EnrichirLeTemoin(InstalledGame candidat)
+    {
+        if (!EstUnTemoinHorsArcade(candidat)) return candidat;
+        if (_emulateurTourne()) return candidat;
+        var lu = _temoins.Lire(candidat.AbsolutePath, candidat.FrontendSystemId, _emulateurTourne);
+        if (lu is null) return candidat;
+        _temoinsDeLaPasse[candidat.AbsolutePath] = lu;
+        // Le fichier d'attente n'a pas de contenu a lui : ni l'empreinte de la gamelist ni la sienne ne valent.
+        return candidat with { Md5 = lu.Md5, CheevosHash = lu.SansEnTete };
+    }
+
+    private static bool EstUnTemoinHorsArcade(InstalledGame candidat)
+        => !string.Equals(candidat.CanonicalSystemId, "arcade", StringComparison.OrdinalIgnoreCase)
+            && EmpreintesDesTemoins.EstUnTemoin(candidat.AbsolutePath);
+
+    /// <summary>Quand les candidats ne sont que des fichiers d'attente, dit ce que le paquet contient (ou n'a pas livre).</summary>
+    private string RaisonDuPaquet(IReadOnlyList<InstalledGame> candidats)
+    {
+        var temoins = candidats.Where(c => _temoinsDeLaPasse.ContainsKey(c.AbsolutePath)).ToList();
+        if (temoins.Count == 0 || temoins.Count != candidats.Count) return string.Empty;
+        return temoins.All(c => _temoinsDeLaPasse[c.AbsolutePath].Lu)
+            ? " (ROM du pack : autre version)"
+            : " (" + (_temoinsDeLaPasse[temoins[0].AbsolutePath].Raison ?? "ROM du pack illisible") + ")";
+    }
+
+    /// <summary>
     /// Croise l'index distant avec l'inventaire local. Un jeu n'est retenu que si sa
     /// definition officielle locale porte exactement l'empreinte publiee par le profil.
     /// </summary>
@@ -610,6 +647,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         var cheminsParJeu = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var cheminsDuScoring = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         _coeursParJeu.Clear();
+        _temoinsDeLaPasse.Clear();
         // POURQUOI CHAQUE JEU MANQUANT MANQUE.
         //
         // « 2 jeux sur 6 » ne dit pas lesquels ni pourquoi, et la raison n'existait qu'en
@@ -679,13 +717,24 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
             //
             // Un fichier n'est desormais candidat que si son contenu est CONFIRME. La collection se
             // reconstruit ainsi d'elle-meme a chaque passe : ce qui n'est pas confirme en sort.
-            var confirmes = candidats.Where(candidat => _contenuConfirme(candidat, jeu)).ToList();
+            //
+            // (21/11) UN FICHIER D'ATTENTE du gestionnaire de ROM (jeu d'un paquet a la volee) se prouve par le contenu de son
+            // entree dans le paquet, jamais par son nom ni par l'empreinte de la gamelist. Les vrais fichiers passent d'abord, tels
+            // qu'avant : le paquet n'est lu que si aucun d'eux n'est confirme (relecture de la 1.9.208 : pas d'extraction pour
+            // rien, et une vraie ROM deja retenue ne se voit pas preferer un fichier d'attente).
+            var vrais = candidats.Where(c => !EstUnTemoinHorsArcade(c)).ToList();
+            var confirmes = vrais.Where(candidat => _contenuConfirme(candidat, jeu)).ToList();
+            if (confirmes.Count == 0 && vrais.Count < candidats.Count)
+            {
+                candidats = [.. candidats.Select(EnrichirLeTemoin)];
+                confirmes = candidats.Where(candidat => _contenuConfirme(candidat, jeu)).ToList();
+            }
             // (10/11) un set d'arcade d'exception que le .MEM nomme, hors gamelist et hors nom du jeu (DaiOuJou Black Label)
             if (confirmes.Count == 0 && string.Equals(jeu.SystemId, "arcade", StringComparison.OrdinalIgnoreCase))
                 confirmes = _catalog.DumpsNommesParLeMem(jeu.SystemId, jeu.RomGroup).Where(candidat => _contenuConfirme(candidat, jeu)).ToList();
             if (confirmes.Count == 0)
             {
-                manques.Add(jeu.RomGroup + " : ROM non reconnue (ce n'est pas la version classée)"
+                manques.Add(jeu.RomGroup + " : ROM non reconnue (ce n'est pas la version classée)" + RaisonDuPaquet(candidats)
                     + (RomAttendue(jeu, speedrunsSeuls.Contains(cle)) is { Length: > 0 } attendue ? $". ROM attendue : « {attendue} »" : ""));
                 continue;
             }
