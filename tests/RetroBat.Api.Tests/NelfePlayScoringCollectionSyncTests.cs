@@ -47,7 +47,8 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
         collectionsRoot: Path.Combine(_racine, "collections"),
         stateRoot: Etat);
 
-    private NelfePlayScoringCollectionSyncService Service(FauxHttp http, FauxResolveur resolveur, EmpreintesDesTemoins? temoins = null, bool partieEnCours = false)
+    private NelfePlayScoringCollectionSyncService Service(FauxHttp http, FauxResolveur resolveur, EmpreintesDesTemoins? temoins = null, bool partieEnCours = false,
+        Func<bool>? emulateur = null)
         => new(
             http,
             new FauxOptions(new ApiExposeOptions { NelfePlay = _nelfeplay }),
@@ -60,7 +61,7 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
             stateRoot: Etat,
             minimumEntreDeuxAppels: TimeSpan.Zero,
             // Le test ne demande pas a Windows ce qui tourne : il le decide.
-            emulateurTourne: () => partieEnCours,
+            emulateurTourne: emulateur ?? (() => partieEnCours),
             // Les fichiers de test ne sont pas de vraies ROM : le contenu y est reconnu, sauf
             // dans les tests qui portent justement sur cette reconnaissance.
             contenuConfirme: temoins is null ? (candidat, jeu) => _confirme(candidat, jeu) : null,
@@ -119,12 +120,13 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
         var paquet = Path.Combine(_racine, "package-installer", systeme + ".rar");
         Directory.CreateDirectory(Path.GetDirectoryName(paquet)!);
         File.WriteAllText(paquet, "paquet");
+        var infoDuPaquet = new FileInfo(paquet);
         var index = new RomPackInstallerIndex
         {
             Packs = dansLIndex
                 ? [new RomPackIndexEntry
                 {
-                    PackagePath = paquet, Sha256 = "paquet-sha-1", Status = "installed", OnTheFlyMode = true, SystemId = systeme,
+                    PackagePath = paquet, Sha256 = "paquet-sha-1", Size = infoDuPaquet.Length, LastWriteTimeUtc = infoDuPaquet.LastWriteTimeUtc, Status = "installed", OnTheFlyMode = true, SystemId = systeme,
                     Roms = [new RomPackRomEntry { SystemId = systeme, GameName = "Tetris", GamePath = chemin, DestinationFileName = nom,
                         PackRelativePath = nom, ArchiveEntryPath = nom, Size = 19544 }],
                 }]
@@ -152,11 +154,13 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
             (chemin, systeme, plafond) => NelfePlayScoringCollectionSyncService.EmpreintesDuContenu(chemin,
                 EmpreinteSansEnTete.RegleDu(systeme), plafond));
 
-    private async Task<(ScoringCollectionStatus Statut, string Etat)> PasseTetris(EmpreintesDesTemoins temoins, bool partieEnCours = false)
+    private async Task<(ScoringCollectionStatus Statut, string Etat)> PasseTetris(EmpreintesDesTemoins temoins, bool partieEnCours = false,
+        Func<bool>? emulateur = null)
     {
         PoserMem("gb", "tetris", MemContenu);
         var service = Service(new FauxHttp(Index("sha256:aa", Jeu("gb", "tetris", MemEmpreinte, Md5Accepte))),
-            new FauxResolveur { ["Tetris (World) (Rev 1).zip"] = "tetris" }, temoins, partieEnCours);
+            new FauxResolveur { ["Tetris (World) (Rev 1).zip"] = "tetris", ["Tetris (World) (Rev 1).gb"] = "tetris" }, temoins, partieEnCours,
+            emulateur);
         var statut = await service.SynchroniserAsync("test", CancellationToken.None);
         var etat = File.Exists(Path.Combine(Etat, "scoring-collection.json")) ? File.ReadAllText(Path.Combine(Etat, "scoring-collection.json")) : "";
         return (statut, etat);
@@ -218,6 +222,35 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
         await PasseTetris(Temoins(DumpAccepte, () => extractions++), partieEnCours: true);
 
         Assert.Equal(0, extractions);
+    }
+
+    [Fact]
+    public async Task Un_temoin_n_est_pas_extrait_quand_une_partie_commence_pendant_la_passe()
+    {
+        // (relecture de la 1.9.208) la porte de la passe voit la borne libre, la partie commence juste apres.
+        PoserTemoin("gb", "Tetris (World) (Rev 1).zip");
+        var extractions = 0;
+        var appels = 0;
+        await PasseTetris(Temoins(DumpAccepte, () => extractions++), emulateur: () => ++appels > 1);
+
+        Assert.True(appels > 1);
+        Assert.Equal(0, extractions);
+    }
+
+    [Fact]
+    public async Task Une_vraie_rom_reconnue_ne_fait_lire_aucun_paquet_et_reste_choisie()
+    {
+        // (relecture de la 1.9.208) un vrai fichier du jeu garde exactement le comportement d'avant : le paquet n'est pas lu,
+        // et le fichier d'attente du meme jeu ne lui est pas prefere.
+        PoserTemoin("gb", "Tetris (World) (Rev 1).zip");
+        var vraie = Path.Combine(Roms, "gb", "Tetris (World) (Rev 1).gb");
+        File.WriteAllBytes(vraie, DumpAccepte);
+        var extractions = 0;
+        var (statut, _) = await PasseTetris(Temoins(DumpAccepte, () => extractions++));
+
+        Assert.Equal(0, extractions);
+        Assert.Equal(1, statut.LocalReadyGames);
+        Assert.Equal(new[] { vraie.Replace('\\', '/') }, Collection());
     }
 
     // ── cas nominal ──────────────────────────────────────────────────────────

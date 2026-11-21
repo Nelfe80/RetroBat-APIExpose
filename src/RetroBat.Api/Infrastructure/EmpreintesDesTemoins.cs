@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using RetroBat.Api.Media;
@@ -21,15 +22,36 @@ public sealed record EmpreintesDuTemoin(string? Md5, string? SansEnTete, string?
 /// console) est calcule comme pour un vrai fichier, gardes dans <c>state/nelfeplay/empreintes-des-temoins.json</c> par
 /// « sha256 du paquet + entree » : relu seulement quand le paquet change. Appele pour les seuls candidats d'un jeu OUVERT
 /// au score. Le lancement ne change pas : le .MEM et le wrapper voient la vraie ROM.
+///
+/// GARDE-FOUS (relecture de l'integrateur de la 1.9.208, 21/11) : ce code extrait des fichiers d'un paquet sur la borne
+/// d'un joueur, sans qu'il l'ait demande.
+/// - Jamais pendant une partie : l'appelant ne commence pas pendant une partie, et une partie qui commence PENDANT la lecture
+///   l'arrete (processus tue, dossier efface) ; ce n'est pas un echec, la passe suivante relira.
+/// - Le dossier provisoire est TOUJOURS efface (succes, erreur, delai depasse, partie), avec quelques reprises le temps que
+///   l'extracteur tue lache ses fichiers ; un dossier laisse par une API arretee en pleine lecture est efface au premier appel.
+/// - Un paquet enorme ou corrompu ne bloque pas la sync : 64 Mo au plus SORTIS du paquet (mesure sur disque pendant
+///   l'extraction, la taille declaree par l'index n'est pas une garantie), 5 min au plus ; toute exception de l'extracteur
+///   est un echec de cette entree, jamais une passe interrompue.
+/// - Aucun chemin d'entree ne sort du dossier provisoire : entree refusee si elle a un segment « .. », une racine, un
+///   « : » ou commence par « - » ou « @ » (pris pour une option par tar et 7za) ; le fichier rendu doit etre DANS le dossier.
+/// - Un echec n'est pas retente en boucle : garde en memoire jusqu'au prochain demarrage ; un delai depasse ou un plafond
+///   franchi (couteux et reproductible) est garde sur disque 7 jours, et un delai depasse ecarte TOUT le paquet.
+/// - Pas d'empreinte perimee : la cle est le sha256 du paquet tel que l'index le donne, et l'index n'est cru que si le
+///   fichier du paquet a encore la taille et la date que l'index a notees avec ce sha256 ; sans sha256, rien n'est lu.
 /// </summary>
 public sealed class EmpreintesDesTemoins
 {
     /// <summary>Au-dela, ce n'est plus une cartouche : on n'extrait pas un disque pour une collection.</summary>
     internal const long PlafondDeLEntree = 64L * 1024 * 1024;
 
+    /// <summary>Un echec couteux (delai, plafond) n'est retente qu'apres ce temps, ou avec une nouvelle version du paquet.</summary>
+    internal static readonly TimeSpan OubliDUnEchec = TimeSpan.FromDays(7);
+
     private static readonly JsonSerializerOptions LectureDeLIndex = new() { PropertyNameCaseInsensitive = true };
     private static readonly JsonSerializerOptions EcritureDuCache = new() { WriteIndented = true };
     private const string Marque = "APIEXPOSE_ON_THE_FLY_ROM_PLACEHOLDER_v1";
+    private const string PrefixeDuDossier = "empreinte-";
+    private const string ToutLePaquet = "*";
 
     private readonly string _index;
     private readonly string _cache;
@@ -37,12 +59,17 @@ public sealed class EmpreintesDesTemoins
     private readonly Func<string, string, long, (string? Md5, string? SansEnTete)> _empreintes;
     private readonly string _dossierProvisoire;
     private readonly ILogger? _journal;
+    private readonly TimeSpan _delai;
+    private readonly long _plafond;
+    private readonly TimeSpan _pas;
+    private readonly Func<DateTime> _horloge;
     private readonly object _verrou = new();
     private Cache? _memoire;
+    private bool _restesEffaces;
     private readonly HashSet<string> _echecs = new(StringComparer.OrdinalIgnoreCase);
     private (long Ticks, long Taille, List<RomPackIndexEntry> Paquets)? _indexLu;
 
-    public EmpreintesDesTemoins(ILogger<EmpreintesDesTemoins>? journal = null)
+    public EmpreintesDesTemoins(ILogger? journal = null)
         : this(RetroBatPaths.RomPackInstallerIndexPath,
             Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay", "empreintes-des-temoins.json"),
             Path.Combine(RetroBatPaths.PluginRoot, ".temp", "package-installer"),
@@ -55,7 +82,8 @@ public sealed class EmpreintesDesTemoins
 
     internal EmpreintesDesTemoins(string index, string cache, string dossierProvisoire,
         Func<string, string, string, string, CancellationToken, Task<string>> extraire,
-        Func<string, string, long, (string? Md5, string? SansEnTete)> empreintes, ILogger? journal = null)
+        Func<string, string, long, (string? Md5, string? SansEnTete)> empreintes, ILogger? journal = null,
+        TimeSpan? delai = null, long? plafond = null, TimeSpan? pas = null, Func<DateTime>? horloge = null)
     {
         _index = index;
         _cache = cache;
@@ -63,6 +91,10 @@ public sealed class EmpreintesDesTemoins
         _extraire = extraire;
         _empreintes = empreintes;
         _journal = journal;
+        _delai = delai ?? TimeSpan.FromMinutes(5);
+        _plafond = plafond ?? PlafondDeLEntree;
+        _pas = pas ?? TimeSpan.FromMilliseconds(250);
+        _horloge = horloge ?? (() => DateTime.UtcNow);
     }
 
     /// <summary>Vrai si ce fichier est un fichier d'attente du gestionnaire de ROM (petit, portant la marque). Pur hors lecture.</summary>
@@ -70,9 +102,11 @@ public sealed class EmpreintesDesTemoins
 
     /// <summary>
     /// L'empreinte du vrai contenu d'un fichier d'attente ; null si ce n'en est pas un. Une seule extraction a la fois ; les
-    /// empreintes lues sont gardees, un echec n'est pas retente avant le prochain demarrage ou une nouvelle version du paquet.
+    /// empreintes lues sont gardees, un echec n'est pas retente avant le prochain demarrage (7 jours pour un delai depasse ou
+    /// un plafond franchi) ou une nouvelle version du paquet. <paramref name="partieEnCours"/> est relu pendant l'extraction :
+    /// une partie qui commence l'arrete.
     /// </summary>
-    public EmpreintesDuTemoin? Lire(string chemin, string? systemeDuDossier)
+    public EmpreintesDuTemoin? Lire(string chemin, string? systemeDuDossier, Func<bool>? partieEnCours = null)
     {
         var lignes = Lignes(chemin);
         if (lignes is null) return null;
@@ -83,61 +117,232 @@ public sealed class EmpreintesDesTemoins
         var (paquet, rom) = Retrouver(systeme, packPath, fichier);
         if (paquet is null || rom is null)
             return new EmpreintesDuTemoin(null, null, "fichier d'attente sans jeu dans un paquet installé");
+        if (string.IsNullOrWhiteSpace(paquet.Sha256))
+            return new EmpreintesDuTemoin(null, null, "paquet sans empreinte dans l'index");
 
         var cle = paquet.Sha256 + "|" + rom.PackRelativePath;
+        var clePaquet = paquet.Sha256 + "|" + ToutLePaquet;
         lock (_verrou)
         {
-            if (Lire().Entrees.TryGetValue(cle, out var connu) && connu.Md5 is { Length: > 0 })
-                return new EmpreintesDuTemoin(connu.Md5, connu.SansEnTete, null);
-            if (_echecs.Contains(cle))
-                return new EmpreintesDuTemoin(null, null, "ROM du pack illisible");
-
-            var lu = Extraire(paquet, rom, systeme);
-            if (lu is null)
-            {
-                _echecs.Add(cle);
-                return new EmpreintesDuTemoin(null, null, "ROM du pack illisible");
-            }
-
+            EffacerLesRestes();
             var cache = Lire();
-            cache.Entrees[cle] = new Entree { Md5 = lu.Value.Md5, SansEnTete = lu.Value.SansEnTete, LuLe = DateTime.UtcNow, Paquet = paquet.PackagePath };
-            Enregistrer(cache);
-            return new EmpreintesDuTemoin(lu.Value.Md5, lu.Value.SansEnTete, null);
+            if (cache.Entrees.TryGetValue(cle, out var connu) && connu.Md5 is { Length: > 0 })
+                return new EmpreintesDuTemoin(connu.Md5, connu.SansEnTete, null);
+            if (_echecs.Contains(cle) || _echecs.Contains(clePaquet)
+                || EchecRecent(cache, cle) || EchecRecent(cache, clePaquet))
+                return new EmpreintesDuTemoin(null, null, "ROM du pack illisible");
+
+            // L'index n'est cru que pour le fichier qu'il a mesure : un paquet remplace depuis (meme chemin, autre contenu)
+            // garderait sinon l'empreinte de l'ancien. Le gestionnaire le relit a son prochain controle.
+            if (!PaquetInchange(paquet))
+                return new EmpreintesDuTemoin(null, null, "paquet modifié depuis son installation");
+
+            var (lu, issue) = Extraire(paquet, rom, systeme, partieEnCours);
+            switch (issue)
+            {
+                case Issue.Lue when lu is { } empreintes:
+                    cache.Entrees[cle] = new Entree
+                    {
+                        Md5 = empreintes.Md5, SansEnTete = empreintes.SansEnTete, LuLe = _horloge(), Paquet = paquet.PackagePath,
+                    };
+                    Enregistrer(cache);
+                    return new EmpreintesDuTemoin(empreintes.Md5, empreintes.SansEnTete, null);
+                case Issue.Interrompue:
+                    // Pas un echec : la passe d'apres la partie relira.
+                    return new EmpreintesDuTemoin(null, null, "lecture du pack interrompue par une partie");
+                case Issue.TropLente:
+                    // Un paquet trop lent pour une entree l'est pour les autres : tout le paquet est ecarte, et garde.
+                    _echecs.Add(clePaquet);
+                    cache.Entrees[clePaquet] = new Entree { Echec = "delai depasse", LuLe = _horloge(), Paquet = paquet.PackagePath };
+                    Enregistrer(cache);
+                    return new EmpreintesDuTemoin(null, null, "ROM du pack illisible (lecture trop longue)");
+                case Issue.TropGrosse:
+                    _echecs.Add(cle);
+                    cache.Entrees[cle] = new Entree { Echec = "plafond depasse", LuLe = _horloge(), Paquet = paquet.PackagePath };
+                    Enregistrer(cache);
+                    return new EmpreintesDuTemoin(null, null, "ROM du pack trop grosse");
+                default:
+                    _echecs.Add(cle);
+                    return new EmpreintesDuTemoin(null, null, "ROM du pack illisible");
+            }
         }
     }
 
-    private (string? Md5, string? SansEnTete)? Extraire(RomPackIndexEntry paquet, RomPackRomEntry rom, string systeme)
+    private enum Issue
     {
-        if (rom.Size > PlafondDeLEntree || !File.Exists(paquet.PackagePath)) return null;
+        Lue,
+        Echec,
+        Interrompue,
+        TropLente,
+        TropGrosse,
+    }
+
+    private ((string? Md5, string? SansEnTete)? Lu, Issue Issue) Extraire(RomPackIndexEntry paquet, RomPackRomEntry rom, string systeme,
+        Func<bool>? partieEnCours)
+    {
+        if (rom.Size > _plafond) return (null, Issue.TropGrosse);
+        if (!File.Exists(paquet.PackagePath)) return (null, Issue.Echec);
         var entree = !string.IsNullOrWhiteSpace(rom.ArchiveEntryPath) ? rom.ArchiveEntryPath : rom.PackRelativePath;
-        if (string.IsNullOrWhiteSpace(entree)) return null;
-        var dossier = Path.Combine(_dossierProvisoire, "empreinte-" + Guid.NewGuid().ToString("N"));
+        if (!EntreeSure(entree) || !EntreeSure(rom.PackRelativePath))
+        {
+            _journal?.LogWarning("World Scoring : entree {Entree} du paquet {Paquet} refusee (chemin hors du dossier provisoire)",
+                entree, Path.GetFileName(paquet.PackagePath));
+            return (null, Issue.Echec);
+        }
+
+        var dossier = Path.GetFullPath(Path.Combine(_dossierProvisoire, PrefixeDuDossier + Guid.NewGuid().ToString("N")));
+        using var arret = new CancellationTokenSource();
+        Task<string>? tache = null;
+        var issue = Issue.Echec;
         try
         {
             Directory.CreateDirectory(dossier);
-            using var delai = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+            if (partieEnCours?.Invoke() == true) return (null, Issue.Interrompue);
             _journal?.LogInformation("World Scoring : lecture de {Entree} dans {Paquet} pour reconnaitre un fichier d'attente",
                 entree, Path.GetFileName(paquet.PackagePath));
-            var extrait = _extraire(paquet.PackagePath, entree, rom.PackRelativePath, dossier, delai.Token).GetAwaiter().GetResult();
-            if (string.IsNullOrEmpty(extrait) || !File.Exists(extrait)) return null;
-            var empreintes = _empreintes(extrait, systeme, PlafondDeLEntree);
-            return empreintes.Md5 is { Length: > 0 } ? empreintes : null;
+
+            var chrono = Stopwatch.StartNew();
+            var dernierCoupDOeil = TimeSpan.Zero;
+            // Task.Run : un extracteur qui travaille avant son premier await ne bloque pas la surveillance.
+            tache = Task.Run(() => _extraire(paquet.PackagePath, entree, rom.PackRelativePath, dossier, arret.Token), arret.Token);
+            issue = Issue.Lue;
+            while (!tache.Wait(_pas))
+            {
+                if (chrono.Elapsed >= _delai) { issue = Issue.TropLente; break; }
+                if (TailleDu(dossier) > _plafond) { issue = Issue.TropGrosse; break; }
+                // La liste des processus coute quelques millisecondes : une fois par seconde suffit.
+                if (chrono.Elapsed - dernierCoupDOeil >= TimeSpan.FromSeconds(1) || dernierCoupDOeil == TimeSpan.Zero)
+                {
+                    dernierCoupDOeil = chrono.Elapsed;
+                    if (partieEnCours?.Invoke() == true) { issue = Issue.Interrompue; break; }
+                }
+            }
+
+            if (issue != Issue.Lue)
+            {
+                _journal?.LogWarning("World Scoring : lecture de {Entree} dans {Paquet} arretee ({Issue}, {Duree} s)",
+                    entree, Path.GetFileName(paquet.PackagePath), issue, (int)chrono.Elapsed.TotalSeconds);
+                return (null, issue);
+            }
+
+            var extrait = tache.GetAwaiter().GetResult();
+            if (string.IsNullOrEmpty(extrait)) return (null, Issue.Echec);
+            var complet = Path.GetFullPath(extrait);
+            if (!complet.StartsWith(dossier + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) || !File.Exists(complet))
+                return (null, Issue.Echec);
+            if (new FileInfo(complet).Length > _plafond || TailleDu(dossier) > _plafond) return (null, Issue.TropGrosse);
+            var empreintes = _empreintes(complet, systeme, _plafond);
+            return empreintes.Md5 is { Length: > 0 } ? (empreintes, Issue.Lue) : (null, Issue.Echec);
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException or OperationCanceledException)
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
+            // Toute exception de l'extracteur (archive corrompue : InvalidDataException ; 7za absent ou refuse : Win32Exception...)
+            // est l'echec de cette entree. Remontee, elle interromprait TOUTE la passe de la collection, a chaque passe.
             _journal?.LogWarning(ex, "World Scoring : entree {Entree} du paquet {Paquet} non lue", entree, Path.GetFileName(paquet.PackagePath));
-            return null;
+            return (null, issue == Issue.Lue ? Issue.Echec : issue);
         }
         finally
         {
+            if (tache is { IsCompleted: false })
+            {
+                arret.Cancel();
+                // Le processus de l'extracteur est tue par l'annulation ; on lui laisse le temps de lacher ses fichiers.
+                try { tache.Wait(TimeSpan.FromSeconds(10)); }
+                catch (Exception) { }
+            }
+
+            Effacer(dossier);
+        }
+    }
+
+    /// <summary>Une entree d'archive qui reste sous le dossier ou on l'extrait et qu'aucun extracteur ne prend pour une option.</summary>
+    internal static bool EntreeSure(string? entree)
+    {
+        if (string.IsNullOrWhiteSpace(entree)) return false;
+        var e = entree.Trim();
+        if (e.StartsWith('-') || e.StartsWith('@')) return false;
+        if (e.Contains(':') || e.Contains('\0') || e.StartsWith('/') || e.StartsWith('\\') || Path.IsPathRooted(e)) return false;
+        var segments = e.Replace('\\', '/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+        // Windows retire les points et espaces de fin d'un segment : « ... » ou « .. » suivi d'espaces vaut « .. ».
+        return segments.Length > 0 && !segments.Any(s => s != "." && s.Trim().Trim('.').Length == 0);
+    }
+
+    private bool PaquetInchange(RomPackIndexEntry paquet)
+    {
+        try
+        {
+            var info = new FileInfo(paquet.PackagePath);
+            if (!info.Exists) return false;
+            // Le critere du gestionnaire lui-meme pour reprendre un paquet sans le remesurer (FindReusableInstalledPack).
+            return info.Length == paquet.Size && info.LastWriteTimeUtc == paquet.LastWriteTimeUtc;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            return false;
+        }
+    }
+
+    private bool EchecRecent(Cache cache, string cle)
+        => cache.Entrees.TryGetValue(cle, out var e) && e.Echec is { Length: > 0 } && _horloge() - e.LuLe < OubliDUnEchec;
+
+    /// <summary>La taille de ce qui est deja sorti du paquet, fichiers en cours d'ecriture compris (taille lue sur le fichier ouvert).</summary>
+    private static long TailleDu(string dossier)
+    {
+        long total = 0;
+        try
+        {
+            foreach (var fichier in Directory.EnumerateFiles(dossier, "*", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using var flux = new FileStream(fichier, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+                    total += flux.Length;
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    try { total += new FileInfo(fichier).Length; }
+                    catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
+                }
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+
+        return total;
+    }
+
+    private void Effacer(string dossier)
+    {
+        for (var essai = 0; essai < 10; essai++)
+        {
             try
             {
-                if (Directory.Exists(dossier)) Directory.Delete(dossier, recursive: true);
+                if (!Directory.Exists(dossier)) return;
+                Directory.Delete(dossier, recursive: true);
+                return;
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
-                _journal?.LogWarning(ex, "World Scoring : dossier provisoire {Dossier} non efface", dossier);
+                if (essai == 9) _journal?.LogWarning(ex, "World Scoring : dossier provisoire {Dossier} non efface", dossier);
+                else Thread.Sleep(200);
             }
+        }
+    }
+
+    /// <summary>Les dossiers « empreinte-* » qu'une API arretee en pleine lecture aurait laisses : une fois par demarrage.</summary>
+    private void EffacerLesRestes()
+    {
+        if (_restesEffaces) return;
+        _restesEffaces = true;
+        try
+        {
+            if (!Directory.Exists(_dossierProvisoire)) return;
+            foreach (var reste in Directory.EnumerateDirectories(_dossierProvisoire, PrefixeDuDossier + "*"))
+                Effacer(reste);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
         }
     }
 
@@ -187,7 +392,7 @@ public sealed class EmpreintesDesTemoins
 
             return resultat;
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
         {
             return null;
         }
@@ -204,7 +409,7 @@ public sealed class EmpreintesDesTemoins
             _indexLu = (info.LastWriteTimeUtc.Ticks, info.Length, paquets);
             return paquets;
         }
-        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException or NotSupportedException)
         {
             return [];
         }
@@ -217,7 +422,7 @@ public sealed class EmpreintesDesTemoins
         {
             _memoire = File.Exists(_cache) ? JsonSerializer.Deserialize<Cache>(File.ReadAllText(_cache)) ?? new Cache() : new Cache();
         }
-        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException or NotSupportedException)
         {
             _memoire = new Cache();
         }
@@ -229,8 +434,18 @@ public sealed class EmpreintesDesTemoins
     {
         try
         {
+            // Les versions d'un paquet que l'index ne connait plus n'ont plus rien a dire : elles sortent du cache.
+            var connus = Paquets().Select(p => p.Sha256).Where(h => !string.IsNullOrWhiteSpace(h)).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            if (connus.Count > 0)
+            {
+                foreach (var perime in cache.Entrees.Keys.Where(k => !connus.Contains(k.Split('|')[0])).ToList())
+                    cache.Entrees.Remove(perime);
+            }
+
             Directory.CreateDirectory(Path.GetDirectoryName(_cache)!);
-            File.WriteAllText(_cache, JsonSerializer.Serialize(cache, EcritureDuCache));
+            var provisoire = _cache + ".tmp";
+            File.WriteAllText(provisoire, JsonSerializer.Serialize(cache, EcritureDuCache));
+            File.Move(provisoire, _cache, overwrite: true);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -240,7 +455,7 @@ public sealed class EmpreintesDesTemoins
 
     private sealed class Cache
     {
-        /// <summary>Par « sha256 du paquet|entree ».</summary>
+        /// <summary>Par « sha256 du paquet|entree » (« sha256|* » : tout le paquet, pour un delai depasse).</summary>
         [JsonPropertyName("entries")]
         public Dictionary<string, Entree> Entrees { get; init; } = new(StringComparer.OrdinalIgnoreCase);
     }
@@ -252,6 +467,10 @@ public sealed class EmpreintesDesTemoins
 
         [JsonPropertyName("headerless")]
         public string? SansEnTete { get; init; }
+
+        /// <summary>Un echec garde (delai, plafond) : retente apres <see cref="OubliDUnEchec"/> ou avec un autre paquet.</summary>
+        [JsonPropertyName("failure")]
+        public string? Echec { get; init; }
 
         [JsonPropertyName("package")]
         public string Paquet { get; init; } = string.Empty;
