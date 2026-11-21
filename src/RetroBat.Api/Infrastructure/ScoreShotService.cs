@@ -64,12 +64,14 @@ public sealed class ScoreShotService : BackgroundService
     private bool _plusPetitEstMeilleur;
     private bool _arme;                   // le record est tombé : la photo de cette partie est prise
     private long _scorePhotographie;
+    private readonly NelfePlayScoringReporter? _rapporteur;
     private string? _enAttente;           // le fichier gardé pour cette partie
 
     public ScoreShotService(IEventBus bus, RetroArchReplayClient retroarch,
         MameLuaIngameProvider mame, NelfePlayDeviceStore devices, IHttpClientFactory httpFactory,
-        ILogger<ScoreShotService> logger, PartieNelfePlayService? partie = null)
+        ILogger<ScoreShotService> logger, PartieNelfePlayService? partie = null, NelfePlayScoringReporter? rapporteur = null)
     {
+        _rapporteur = rapporteur;
         _bus = bus; _retroarch = retroarch; _mame = mame; _devices = devices;
         _httpFactory = httpFactory; _logger = logger; _partie = partie;
     }
@@ -196,6 +198,8 @@ public sealed class ScoreShotService : BackgroundService
     private async Task OnScoreAsync(JsonElement root)
     {
         if (!root.TryGetProperty("Score", out var s) || !s.TryGetInt64(out var total)) return;
+        // Un score vu hors de la fenetre de jeu (demo apres la partie) n'est jamais un record (21/11).
+        if (_rapporteur?.ScoreHorsPartie() == true) return;
 
         bool photographier;
         bool recordExistant;

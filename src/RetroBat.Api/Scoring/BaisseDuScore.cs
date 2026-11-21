@@ -112,3 +112,43 @@ public sealed class ArretALaBaisse
     /// <summary>Oublie une baisse en attente (nouvel enregistrement, nouvelle partie).</summary>
     public void Oublier() => _avantLaBaisse = null;
 }
+
+/// <summary>
+/// LA FIN DE LA FENETRE DE JEU PAR LA BAISSE DU SCORE (21/11, DaiOuJou de la borne du user). Un jeu dont le .MEM ne dit pas
+/// GAME_OVER n'avait aucune fin de partie : la fenetre ouverte au depart (credit consomme, START, GAME_START) ne se fermait
+/// jamais, et la demo qui suit la partie, 35 minutes de scores, passait pour du jeu (2 554 070 envoyes, « new record » dans le
+/// direct). Une vraie remise a zero (<see cref="ArretALaBaisse.EstUneRemiseAZero"/>), confirmee par la salve suivante, ferme la
+/// fenetre ; seul un nouveau depart la rouvre. Independant de l'enregistrement du replay (le replay peut etre coupe).
+/// </summary>
+public sealed class FinDeFenetreParBaisse
+{
+    private (long Avant, long ImageDuHaut)? _attente;
+
+    /// <summary>
+    /// L'image du dernier point haut quand cette lecture CONFIRME la remise a zero, sinon null.
+    /// <paramref name="imageDuHaut"/> : l'image de la derniere lecture avant la baisse. Pur.
+    /// </summary>
+    public long? Lire(long total, long? reference, bool nouvelleSalve, long imageDuHaut)
+    {
+        if (_attente is { } a)
+        {
+            if (!nouvelleSalve) return null;
+            _attente = null;
+            if (total < a.Avant) return a.ImageDuHaut;
+        }
+
+        if (reference is { } r && total < r && ArretALaBaisse.EstUneRemiseAZero(total, r, 0)) _attente = (r, imageDuHaut);
+        return null;
+    }
+
+    public void Oublier() => _attente = null;
+
+    /// <summary>
+    /// La fenetre se ferme-t-elle ? Seulement si un depart MACHINE a ete vu (un credit consomme ou GAME_START du .MEM : un START
+    /// lu au panel seul ne suffit pas, une partie lancee autrement ne rouvrirait pas la fenetre) et qu'aucun depart n'est
+    /// survenu depuis le dernier point haut (un START pendant l'ecran de fin lance la partie suivante : la remise a zero est la
+    /// sienne). Un continue (credit consomme) tombe lui aussi apres le point haut et laisse la fenetre ouverte. Pur.
+    /// </summary>
+    public static bool Ferme(bool departMachineVu, bool enJeu, long imageDuDernierDepart, long imageDuHaut)
+        => departMachineVu && enJeu && imageDuDernierDepart <= imageDuHaut;
+}
