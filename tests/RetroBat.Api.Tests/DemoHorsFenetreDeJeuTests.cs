@@ -40,6 +40,70 @@ public sealed class DemoHorsFenetreDeJeuTests
     private static void Appui(NelfePlayScoringReporter r, string bouton)
         => r.HandleEvent(new EventEnvelope { Type = "panel.input.pressed", Payload = new { System = bouton, Identity = bouton, Player = 1, Device = 0 } });
 
+    private static void Image(NelfePlayScoringReporter r, long image)
+        => r.HandleEvent(new EventEnvelope { Type = "retroarch.score", Payload = new { Frame = image } });
+
+    /// <summary>RetroArch confirme l'enregistrement du replay, environ une seconde apres le START.</summary>
+    private static void Enregistrement(NelfePlayScoringReporter r, string id)
+        => r.HandleEvent(new EventEnvelope { Type = "replay.recording.started", Payload = new { ReplayId = id, Frame = 0L } });
+
+    [Fact]
+    public async Task Avec_le_replay_annonce_au_depart_la_demo_apres_la_partie_sort_toujours_de_la_fenetre()
+    {
+        // L'incident tel qu'il s'est passe : l'enregistrement est annonce juste apres le depart.
+        var r = Rapporteur();
+        Depart(r);
+        Enregistrement(r, "rp_partie");
+        await Score(r, 0, 100);
+        await Score(r, 80_000, 900);
+        await Score(r, 172_020, 1400);
+        await Score(r, 0, 1500);
+        await Score(r, 80, 1600);
+        Enregistrement(r, "rp_demo");   // la demo qui marque relance un enregistrement (score qui monte)
+        await Score(r, 2_554_070, 2314);
+        Assert.True(r.ScoreHorsPartie());
+        Assert.Equal(172_020, r.TotauxEnJeuPourEssai().Max());
+    }
+
+    [Fact]
+    public async Task La_remise_a_zero_de_la_partie_qui_commence_apres_l_annonce_du_replay_ne_ferme_pas_la_fenetre()
+    {
+        // Relecture de la 1.9.207 : la demo d'avant la partie a marque (pas de ligne DEMO), le joueur part, RetroArch annonce
+        // l'enregistrement, puis le jeu efface le score de la demo (apres le choix du vaisseau). C'est la vraie partie.
+        var r = Rapporteur();
+        await Score(r, 0, 100);
+        await Score(r, 5_000, 400);
+        await Score(r, 12_000, 700);
+        Image(r, 800);
+        Depart(r);
+        Enregistrement(r, "rp_partie");
+        await Score(r, 0, 1100);
+        await Score(r, 100, 1200);
+        await Score(r, 5_000, 1400);
+        await Score(r, 300_000, 2000);
+        Assert.False(r.ScoreHorsPartie());
+        Assert.Contains(300_000L, r.TotauxEnJeuPourEssai());
+    }
+
+    [Fact]
+    public async Task La_partie_suivante_au_start_reste_en_jeu_meme_si_un_replay_est_annonce_avant_sa_remise_a_zero()
+    {
+        var r = Rapporteur();
+        Depart(r);
+        Enregistrement(r, "rp_1");
+        await Score(r, 0, 100);
+        await Score(r, 50_000, 800);
+        await Score(r, 172_020, 1400);   // fin de la premiere partie, le score reste affiche
+        Image(r, 1600);
+        Appui(r, "START");               // le joueur relance
+        Enregistrement(r, "rp_2");
+        await Score(r, 0, 1800);         // la deuxieme partie efface le score
+        await Score(r, 200, 1900);
+        await Score(r, 90_000, 2500);
+        Assert.False(r.ScoreHorsPartie());
+        Assert.Contains(90_000L, r.TotauxEnJeuPourEssai());
+    }
+
     [Fact]
     public async Task La_demo_apres_la_partie_sort_de_la_fenetre_meme_quand_le_joueur_appuie_sans_credit_ni_depart()
     {

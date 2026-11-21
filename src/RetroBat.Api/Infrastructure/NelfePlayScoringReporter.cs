@@ -6205,7 +6205,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _attenteMontee = false;
             _baisse.Oublier();
             _finParBaisse.Oublier();
-            _imageDuDernierDepart = -1;
+            // L'image du dernier depart RESTE (relecture de la 1.9.207) : RetroArch confirme l'enregistrement environ une seconde
+            // apres le START. L'oublier ici faisait de la remise a zero propre a la partie qui commence (score de la demo ou de
+            // la partie d'avant encore en memoire, efface apres le choix du vaisseau ou l'intro) une « fin de partie » : toute
+            // la vraie partie sortait de la fenetre de jeu.
             AppliquerLesArrets(_enregistrements, _arretsEnAttente);
             _enregistrements.Add((id!, DebutDeLEnregistrement(_lastFrame, GetLong(payload, "Frame")), null));
             if (_enregistrements.Count > 20) _enregistrements.RemoveAt(0);
