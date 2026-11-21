@@ -1335,6 +1335,16 @@ public sealed class RomPackInstallerService : IHostedService, IDisposable
     /// <summary>Un fichier d'attente du gestionnaire : le jeu reste dans son paquet jusqu'a son extraction.</summary>
     internal static bool EstUnTemoin(string chemin) => IsOnTheFlyPlaceholder(chemin);
 
+    /// <summary>
+    /// Extrait UNE entree d'un paquet (jamais le paquet entier) : la lecture du contenu d'un fichier d'attente par la
+    /// collection World Scoring (21/11). Rend le fichier extrait, ou une chaine vide s'il n'en est pas sorti.
+    /// </summary>
+    internal static async Task<string> ExtraireUneEntreeAsync(string paquet, string entree, string packRelativePath, string dossier, CancellationToken cancellationToken)
+    {
+        await ExtractArchiveEntryAsync(paquet, dossier, entree, cancellationToken);
+        return ResolveExtractedArchiveEntryPath(dossier, entree, packRelativePath);
+    }
+
     /// <summary>Extrait tout un paquet dans un dossier (la lecture des contenus pour MULTIPLAYER, 26/10).</summary>
     internal static Task ExtraireToutAsync(string paquet, string dossier, CancellationToken cancellationToken)
         => ExtractArchiveAsync(paquet, dossier, cancellationToken);

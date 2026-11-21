@@ -47,7 +47,7 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
         collectionsRoot: Path.Combine(_racine, "collections"),
         stateRoot: Etat);
 
-    private NelfePlayScoringCollectionSyncService Service(FauxHttp http, FauxResolveur resolveur)
+    private NelfePlayScoringCollectionSyncService Service(FauxHttp http, FauxResolveur resolveur, EmpreintesDesTemoins? temoins = null, bool partieEnCours = false)
         => new(
             http,
             new FauxOptions(new ApiExposeOptions { NelfePlay = _nelfeplay }),
@@ -60,11 +60,13 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
             stateRoot: Etat,
             minimumEntreDeuxAppels: TimeSpan.Zero,
             // Le test ne demande pas a Windows ce qui tourne : il le decide.
-            emulateurTourne: () => false,
+            emulateurTourne: () => partieEnCours,
             // Les fichiers de test ne sont pas de vraies ROM : le contenu y est reconnu, sauf
             // dans les tests qui portent justement sur cette reconnaissance.
-            contenuConfirme: (candidat, jeu) => _confirme(candidat, jeu),
-            horloge: () => _maintenant);
+            contenuConfirme: temoins is null ? (candidat, jeu) => _confirme(candidat, jeu) : null,
+            horloge: () => _maintenant,
+            admission: temoins is null ? null : (_, _, _) => new RomAdmission.Decision(RomAdmission.Statut.Reference, "test", "dump", null),
+            temoins: temoins);
 
     private readonly MediaRuntimeState _etat = new();
 
@@ -99,6 +101,123 @@ public class NelfePlayScoringCollectionSyncTests : IDisposable
     {
         var chemin = Writer().ConfigPath(NelfePlayScoringCollectionSyncService.CollectionName);
         return File.Exists(chemin) ? File.ReadAllLines(chemin) : [];
+    }
+
+    // ── fichiers d'attente du gestionnaire de ROM (21/11, Tetris GB) ─────────
+
+    private static readonly byte[] DumpAccepte = Encoding.ASCII.GetBytes("TETRIS-WORLD-REV1-ROM");
+    private static readonly string Md5Accepte = Convert.ToHexString(MD5.HashData(DumpAccepte)).ToLowerInvariant();
+
+    /// <summary>Un fichier d'attente « a la volee » sur disque, son paquet dans l'index du gestionnaire ; rend le chemin du temoin.</summary>
+    private string PoserTemoin(string systeme, string nom, bool dansLIndex = true)
+    {
+        var dossier = Path.Combine(Roms, systeme);
+        Directory.CreateDirectory(dossier);
+        var chemin = Path.Combine(dossier, nom);
+        File.WriteAllText(chemin, string.Join("\n", "APIEXPOSE_ON_THE_FLY_ROM_PLACEHOLDER_v1", "This lightweight file keeps ES.",
+            "The real ROM is extracted.", "system=" + systeme, "game=Tetris", "packPath=" + nom, string.Empty));
+        var paquet = Path.Combine(_racine, "package-installer", systeme + ".rar");
+        Directory.CreateDirectory(Path.GetDirectoryName(paquet)!);
+        File.WriteAllText(paquet, "paquet");
+        var index = new RomPackInstallerIndex
+        {
+            Packs = dansLIndex
+                ? [new RomPackIndexEntry
+                {
+                    PackagePath = paquet, Sha256 = "paquet-sha-1", Status = "installed", OnTheFlyMode = true, SystemId = systeme,
+                    Roms = [new RomPackRomEntry { SystemId = systeme, GameName = "Tetris", GamePath = chemin, DestinationFileName = nom,
+                        PackRelativePath = nom, ArchiveEntryPath = nom, Size = 19544 }],
+                }]
+                : [],
+        };
+        File.WriteAllText(Path.Combine(_racine, "index.json"), JsonSerializer.Serialize(index));
+        return chemin;
+    }
+
+    private EmpreintesDesTemoins Temoins(byte[] contenu, Action? surExtraction = null, bool dansUnZip = true)
+        => new(Path.Combine(_racine, "index.json"), Path.Combine(_racine, "state", "empreintes.json"), Path.Combine(_racine, "tmp"),
+            (paquet, entree, relatif, dossier, _) =>
+            {
+                surExtraction?.Invoke();
+                var sortie = Path.Combine(dossier, entree);
+                if (dansUnZip)
+                {
+                    using var zip = System.IO.Compression.ZipFile.Open(sortie, System.IO.Compression.ZipArchiveMode.Create);
+                    using var flux = zip.CreateEntry("tetris.gb").Open();
+                    flux.Write(contenu);
+                }
+                else File.WriteAllBytes(sortie, contenu);
+                return Task.FromResult(sortie);
+            },
+            (chemin, systeme, plafond) => NelfePlayScoringCollectionSyncService.EmpreintesDuContenu(chemin,
+                EmpreinteSansEnTete.RegleDu(systeme), plafond));
+
+    private async Task<(ScoringCollectionStatus Statut, string Etat)> PasseTetris(EmpreintesDesTemoins temoins, bool partieEnCours = false)
+    {
+        PoserMem("gb", "tetris", MemContenu);
+        var service = Service(new FauxHttp(Index("sha256:aa", Jeu("gb", "tetris", MemEmpreinte, Md5Accepte))),
+            new FauxResolveur { ["Tetris (World) (Rev 1).zip"] = "tetris" }, temoins, partieEnCours);
+        var statut = await service.SynchroniserAsync("test", CancellationToken.None);
+        var etat = File.Exists(Path.Combine(Etat, "scoring-collection.json")) ? File.ReadAllText(Path.Combine(Etat, "scoring-collection.json")) : "";
+        return (statut, etat);
+    }
+
+    [Fact]
+    public async Task Un_temoin_dont_le_paquet_porte_le_dump_accepte_entre_dans_la_collection()
+    {
+        var temoin = PoserTemoin("gb", "Tetris (World) (Rev 1).zip");
+        var (statut, _) = await PasseTetris(Temoins(DumpAccepte));
+
+        Assert.Equal(1, statut.LocalReadyGames);
+        Assert.Equal(new[] { temoin.Replace('\\', '/') }, Collection());
+    }
+
+    [Fact]
+    public async Task Un_temoin_dont_le_paquet_porte_un_autre_dump_reste_non_reconnu_et_le_dit()
+    {
+        PoserTemoin("gb", "Tetris (World) (Rev 1).zip");
+        var (statut, etat) = await PasseTetris(Temoins(Encoding.ASCII.GetBytes("TETRIS-AUTRE-VERSION")));
+
+        Assert.Equal(0, statut.LocalReadyGames);
+        Assert.Empty(Collection());
+        Assert.True(string.Join("|", statut.Missing ?? []).Contains("ROM du pack : autre version"), string.Join("|", statut.Missing ?? []));
+    }
+
+    [Fact]
+    public async Task Le_cache_des_empreintes_est_relu_sans_reextraire()
+    {
+        PoserTemoin("gb", "Tetris (World) (Rev 1).zip");
+        var extractions = 0;
+        await PasseTetris(Temoins(DumpAccepte, () => extractions++));
+        Assert.Equal(1, extractions);
+
+        // Un autre service (un autre demarrage) : seul le cache disque reste.
+        var (statut, _) = await PasseTetris(Temoins(DumpAccepte, () => extractions++));
+        Assert.Equal(1, extractions);
+        Assert.Equal(1, statut.LocalReadyGames);
+    }
+
+    [Fact]
+    public async Task Un_temoin_orphelin_est_non_reconnu_sans_planter()
+    {
+        PoserTemoin("gb", "Tetris (World) (Rev 1).zip", dansLIndex: false);
+        var extractions = 0;
+        var (statut, etat) = await PasseTetris(Temoins(DumpAccepte, () => extractions++));
+
+        Assert.Equal(0, extractions);
+        Assert.Equal(0, statut.LocalReadyGames);
+        Assert.Empty(Collection());
+        Assert.Contains("ROM non reconnue", etat);
+    }
+
+    [Fact]
+    public async Task Un_temoin_n_est_pas_extrait_pendant_une_partie()
+    {
+        PoserTemoin("gb", "Tetris (World) (Rev 1).zip");
+        var extractions = 0;
+        await PasseTetris(Temoins(DumpAccepte, () => extractions++), partieEnCours: true);
+
+        Assert.Equal(0, extractions);
     }
 
     // ── cas nominal ──────────────────────────────────────────────────────────

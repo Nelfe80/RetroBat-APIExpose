@@ -93,6 +93,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// plus rien.
     /// </summary>
     private readonly Func<bool> _emulateurTourne;
+    private readonly EmpreintesDesTemoins _temoins;
+    /// <summary>Fichiers d'attente dont le paquet a ete lu cette passe, et leur raison quand le contenu n'est pas lisible.</summary>
+    private readonly Dictionary<string, EmpreintesDuTemoin> _temoinsDeLaPasse = new(StringComparer.OrdinalIgnoreCase);
     private readonly Func<InstalledGame, OpenGame, bool> _contenuConfirme;
     /// <summary>La regle des ROMs admises (11/11) sur un candidat confirme ; le booleen dit « jeu ouvert aux seuls speedruns ».</summary>
     private readonly Func<InstalledGame, OpenGame, bool, RomAdmission.Decision> _admission;
@@ -133,8 +136,10 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         Func<DateTime>? horloge = null,
         CabinetLocale? locale = null,
         Func<InstalledGame, OpenGame, bool, RomAdmission.Decision>? admission = null,
-        SuiviDuSite? suivi = null)
+        SuiviDuSite? suivi = null,
+        EmpreintesDesTemoins? temoins = null)
     {
+        _temoins = temoins ?? new EmpreintesDesTemoins();
         _suivi = suivi;
         // QUOI DE NEUF (point 6 du 14/11) : une revision de l'index qui n'est pas celle gardee fait relire tout de suite.
         _suivi?.SurRevision(SuiviDuSite.JeuxOuverts, (revision, ct) =>
@@ -587,6 +592,35 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
     /// Croise l'index distant avec l'inventaire local. Un jeu n'est retenu que si sa
     /// definition officielle locale porte exactement l'empreinte publiee par le profil.
     /// </summary>
+    /// <summary>
+    /// UN FICHIER D'ATTENTE DU GESTIONNAIRE DE ROM (jeu d'un paquet a la volee) : sa ROM est dans le paquet. Son empreinte
+    /// vient du paquet (<see cref="EmpreintesDesTemoins"/>, une entree extraite, gardee), et prend la place de celle de la
+    /// gamelist : le contenu confirme ensuite le jeu comme pour un vrai fichier. Jamais pendant une partie ; un autre fichier
+    /// passe tel quel.
+    /// </summary>
+    private InstalledGame EnrichirLeTemoin(InstalledGame candidat)
+    {
+        if (string.Equals(candidat.CanonicalSystemId, "arcade", StringComparison.OrdinalIgnoreCase)
+            || !EmpreintesDesTemoins.EstUnTemoin(candidat.AbsolutePath))
+            return candidat;
+        if (_emulateurTourne()) return candidat;
+        var lu = _temoins.Lire(candidat.AbsolutePath, candidat.FrontendSystemId);
+        if (lu is null) return candidat;
+        _temoinsDeLaPasse[candidat.AbsolutePath] = lu;
+        // Le fichier d'attente n'a pas de contenu a lui : ni l'empreinte de la gamelist ni la sienne ne valent.
+        return candidat with { Md5 = lu.Md5, CheevosHash = lu.SansEnTete };
+    }
+
+    /// <summary>Quand les candidats ne sont que des fichiers d'attente, dit ce que le paquet contient (ou n'a pas livre).</summary>
+    private string RaisonDuPaquet(IReadOnlyList<InstalledGame> candidats)
+    {
+        var temoins = candidats.Where(c => _temoinsDeLaPasse.ContainsKey(c.AbsolutePath)).ToList();
+        if (temoins.Count == 0 || temoins.Count != candidats.Count) return string.Empty;
+        return temoins.All(c => _temoinsDeLaPasse[c.AbsolutePath].Lu)
+            ? " (ROM du pack : autre version)"
+            : " (" + (_temoinsDeLaPasse[temoins[0].AbsolutePath].Raison ?? "ROM du pack illisible") + ")";
+    }
+
     private List<string> Intersecter(OpenGamesManifest manifeste, out int candidatsLocaux)
     {
         var systemes = manifeste.Games.Concat(manifeste.SpeedrunGames)
@@ -610,6 +644,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
         var cheminsParJeu = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var cheminsDuScoring = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         _coeursParJeu.Clear();
+        _temoinsDeLaPasse.Clear();
         // POURQUOI CHAQUE JEU MANQUANT MANQUE.
         //
         // « 2 jeux sur 6 » ne dit pas lesquels ni pourquoi, et la raison n'existait qu'en
@@ -634,6 +669,9 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 manques.Add(jeu.RomGroup + " : ROM absente");
                 continue;
             }
+
+            // (21/11) un fichier d'attente du gestionnaire de ROM se prouve par le contenu du paquet, jamais par son nom.
+            candidats = [.. candidats.Select(EnrichirLeTemoin)];
 
             if (!empreintes.TryGetValue(cle, out var locale))
             {
@@ -685,7 +723,7 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 confirmes = _catalog.DumpsNommesParLeMem(jeu.SystemId, jeu.RomGroup).Where(candidat => _contenuConfirme(candidat, jeu)).ToList();
             if (confirmes.Count == 0)
             {
-                manques.Add(jeu.RomGroup + " : ROM non reconnue (ce n'est pas la version classée)"
+                manques.Add(jeu.RomGroup + " : ROM non reconnue (ce n'est pas la version classée)" + RaisonDuPaquet(candidats)
                     + (RomAttendue(jeu, speedrunsSeuls.Contains(cle)) is { Length: > 0 } attendue ? $". ROM attendue : « {attendue} »" : ""));
                 continue;
             }
