@@ -100,16 +100,28 @@ public static class NetplayLaunch
         }
         try
         {
+            // Une fiche -gameinfo du seul jeu, comme ES : emulatorLauncher ne relit pas la gamelist du systeme (et ne plante plus
+            // sur une entree au chemin invalide, 21/11).
+            var fiche = FicheDeLancement.Ecrire(arguments, logger);
             var lanceur = Process.Start(new ProcessStartInfo
             {
                 FileName = exe,
-                Arguments = arguments,
+                Arguments = fiche is null ? arguments : FicheDeLancement.AjouterLaFiche(arguments, fiche),
                 WorkingDirectory = Path.GetDirectoryName(exe)!,
                 UseShellExecute = false,
             });
             // Tout lancement direct passe ici : on sait s'il coupe les notifications de RetroArch (-OnScreenMsg 0), donc si
             // les messages de NelfePlay doivent passer au bandeau de l'API (NotificationsRetroArch, 11/11).
             NotificationsRetroArch.Suivre(arguments, lanceur, logger);
+            if (fiche is not null && lanceur is not null)
+            {
+                _ = Task.Run(async () =>
+                {
+                    try { await lanceur.WaitForExitAsync().ConfigureAwait(false); } catch (Exception) { /* deja parti */ }
+                    try { File.Delete(fiche); } catch (Exception) { /* nettoyee au prochain lancement */ }
+                    FicheDeLancement.NettoyerLesVieillesFiches();
+                });
+            }
             return lanceur;
         }
         catch (Exception ex)
