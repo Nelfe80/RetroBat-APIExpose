@@ -1,7 +1,7 @@
 {
-  "built_at": "2026-11-13T21:07:53Z",
-  "sha256": "f2d614187aab058b4edbb579442688a9c1095a60c29ca89f10ef6379d5e0db92",
-  "signature": "MEUCIBXYyCUpBfE-Q5sCr9h3GsFgudHksNiziEq1ka6ZzA9CAiEAmL5o1R2r_r-xUxh-C9nguSJP2ci3PzNNB3NMguEYURY",
+  "built_at": "2026-11-22T08:11:31Z",
+  "sha256": "2832117343bfd066bbace0715f137ed689a5f62c34a58eee207d83e06434627c",
+  "signature": "MEUCIQDxGAmYXxbFQNw3EzIRtkKRBfMlMK6huiey8Id1unVrSQIgHt30QRDoGvdB1XpDaiFPXHoeR7qUiHmAozR1k2a2FZM",
   "subject": "CN=nelfeTech",
-  "version": "0.346.0.0"
+  "version": "0.349.0.0"
 }
