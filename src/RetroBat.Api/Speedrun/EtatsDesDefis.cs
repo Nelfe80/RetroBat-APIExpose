@@ -35,6 +35,7 @@ public static class EtatsDesDefis
         byte[] octets;
         try { octets = File.ReadAllBytes(chemin); }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return (null, "state_missing"); }
+        if (etat.Taille is { } taille && octets.LongLength != taille) return (null, "state_mismatch");
         return string.Equals(Convert.ToHexString(SHA256.HashData(octets)), etat.Sha256, StringComparison.OrdinalIgnoreCase)
             ? (octets, null)
             : (null, "state_mismatch");

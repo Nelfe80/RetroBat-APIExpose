@@ -52,7 +52,11 @@ public sealed record CritereDeRang(string Mesure, bool PlusPetitMeilleur);
 public sealed class ReglementInvalideException(string message) : Exception(message);
 
 /// <summary>L'etat de depart d'un defi (« state ») : son nom, l'empreinte SHA-256 du fichier, le fichier sous resources/challenges/states.</summary>
-public sealed record EtatDeDepart(string Nom, string Sha256, string Fichier);
+/// <param name="Coeurs">
+/// Les empreintes SHA-256 (16 a 64 hex) des dll de coeur pour lesquelles l'etat vaut (« core_sha256 ») ; vide : tout coeur (ancien
+/// reglement). <paramref name="Taille"/> : la taille du fichier (« size »), verifiee a la lecture quand elle est donnee.
+/// </param>
+public sealed record EtatDeDepart(string Nom, string Sha256, string Fichier, IReadOnlyList<string>? Coeurs = null, long? Taille = null);
 
 /// <summary>
 /// UNE VALEUR TENUE PENDANT TOUTE LA PARTIE (« locks », D18 du CDC v1.4). Le wrapper 0.343 la pose avant chaque image ;
@@ -167,6 +171,20 @@ public sealed class Reglement
 
     /// <summary>L'etat charge au lancement ; null pour un demarrage normal.</summary>
     public EtatDeDepart? Etat { get; private init; }
+
+    /// <summary>
+    /// DEUX JEUX D'ETATS (« states », 22/11) : les etats du defi, un par famille de coeur. Vide pour un reglement ancien (un seul
+    /// « state », valable pour tout coeur). Quand « state » existe a cote, il reste l'etat du coeur d'avant (une API plus ancienne
+    /// ne lit que lui : jamais un etat d'une autre taille).
+    /// </summary>
+    public IReadOnlyList<EtatDeDepart> Etats { get; private init; } = [];
+
+    /// <summary>
+    /// L'etat a charger pour le coeur installe (empreinte de sa dll). Sans « states » : l'unique « state », sans condition.
+    /// Avec « states » : celui dont la liste nomme ce coeur ; null si aucun ne le nomme (coeur inconnu : on ne charge rien).
+    /// </summary>
+    public EtatDeDepart? EtatPour(string? empreinteDuCoeur)
+        => Etats.Count == 0 ? (Etat is { Coeurs: { Count: > 0 } } seul && !EtatsParCoeur.Correspond(seul.Coeurs, empreinteDuCoeur) ? null : Etat) : Etats.FirstOrDefault(e => e.Coeurs is { Count: > 0 } && EtatsParCoeur.Correspond(e.Coeurs, empreinteDuCoeur));
 
     /// <summary>
     /// La place du defi dans son groupe du panneau (« order », facultatif) : les niveaux de Sonic dans l'ordre du jeu. Sans
@@ -338,7 +356,8 @@ public sealed class Reglement
                 Titres = LireTitres(r),
                 Resumes = LireTitres(r, "summary"),
                 Groupes = LireTitres(r, "group"),
-                Etat = LireEtat(r),
+                Etat = LireEtat(r) ?? LireEtats(r).FirstOrDefault(),
+                Etats = LireEtats(r),
                 Kind = Texte(r, "kind") ?? "",
                 SystemId = r.TryGetProperty("game", out var g) ? Texte(g, "system_id") ?? "" : "",
                 RomGroup = r.TryGetProperty("game", out var g2) ? Texte(g2, "rom_group") ?? "" : "",
@@ -675,12 +694,40 @@ public sealed class Reglement
             : [];
 
     private static EtatDeDepart? LireEtat(JsonElement r)
+        => r.TryGetProperty("state", out var e) && e.ValueKind == JsonValueKind.Object ? LireUnEtat(e) : null;
+
+    private static EtatDeDepart? LireUnEtat(JsonElement e)
     {
-        if (!r.TryGetProperty("state", out var e) || e.ValueKind != JsonValueKind.Object) return null;
         var nom = Texte(e, "name");
         var sha = Texte(e, "sha256");
         var fichier = Texte(e, "file");
-        return nom is { Length: > 0 } && sha is { Length: 64 } && fichier is { Length: > 0 } ? new EtatDeDepart(nom, sha.ToLowerInvariant(), fichier) : null;
+        if (!(nom is { Length: > 0 } && sha is { Length: 64 } && fichier is { Length: > 0 })) return null;
+        var coeurs = e.TryGetProperty("core_sha256", out var c) && c.ValueKind == JsonValueKind.Array
+            ? c.EnumerateArray().Select(x => x.ValueKind == JsonValueKind.String ? x.GetString()!.Trim().ToLowerInvariant() : "").ToList()
+            : [];
+        if (coeurs.Any(x => !EtatsParCoeur.EstUneEmpreinte(x)))
+            throw new ReglementInvalideException($"state « {nom} » : core_sha256 attend des empreintes de 16 a 64 caracteres hexadecimaux");
+        long? taille = e.TryGetProperty("size", out var t) && t.ValueKind == JsonValueKind.Number && t.TryGetInt64(out var n) && n > 0 ? n : null;
+        return new EtatDeDepart(nom, sha.ToLowerInvariant(), fichier, coeurs.Count == 0 ? null : coeurs, taille);
+    }
+
+    /// <summary>« states » : une entree par famille de coeur, chacune avec sa liste « core_sha256 » (obligatoire ici, jamais deux fois le meme coeur).</summary>
+    private static List<EtatDeDepart> LireEtats(JsonElement r)
+    {
+        var liste = new List<EtatDeDepart>();
+        if (!r.TryGetProperty("states", out var e) || e.ValueKind != JsonValueKind.Array) return liste;
+        foreach (var x in e.EnumerateArray())
+        {
+            var etat = x.ValueKind == JsonValueKind.Object ? LireUnEtat(x) : null;
+            if (etat is null) throw new ReglementInvalideException("states : chaque entree porte name, file, sha256 (64 hex)");
+            if (etat.Coeurs is not { Count: > 0 }) throw new ReglementInvalideException($"states : « {etat.Nom} » sans core_sha256");
+            liste.Add(etat);
+        }
+
+        var tous = liste.SelectMany(s => s.Coeurs!).ToList();
+        if (tous.Count != tous.Distinct(StringComparer.OrdinalIgnoreCase).Count())
+            throw new ReglementInvalideException("states : un meme coeur nomme dans deux etats");
+        return liste;
     }
 
     private static Dictionary<string, string> LireTitres(JsonElement r, string champ = "title")

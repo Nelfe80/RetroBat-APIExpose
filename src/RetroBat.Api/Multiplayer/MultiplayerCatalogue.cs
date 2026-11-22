@@ -452,13 +452,18 @@ public sealed record MultiplayerGame
     /// celui de <see cref="Starts"/> a ce nombre, sinon <see cref="Start"/> quand il vaut pour tous les nombres ou pour
     /// celui-la. Un etat fait sur un contenu ne se charge jamais sur un autre. Null : la partie se joue en classique.
     /// </summary>
-    public MultiplayerStart? DepartPour(int joueurs, string? contenu = null)
-        => Starts?.FirstOrDefault(depart => depart.Players == joueurs && depart.VautPour(contenu))
-           ?? (Start is { } commun && (commun.Players is null || commun.Players == joueurs) && commun.VautPour(contenu) ? commun : null);
+    public MultiplayerStart? DepartPour(int joueurs, string? contenu = null, string? empreinteDuCoeur = null)
+        => Starts?.FirstOrDefault(depart => (depart.Players == joueurs || (depart.Players is null && depart.CoreSha256 is { Count: > 0 })) && depart.VautPour(contenu) && depart.VautPourLeCoeur(empreinteDuCoeur))
+           ?? (Start is { } commun && (commun.Players is null || commun.Players == joueurs) && commun.VautPour(contenu)
+               && commun.VautPourLeCoeur(empreinteDuCoeur) ? commun : null);
+
+    /// <summary>Le jeu a-t-il des etats propres a un coeur (« core_sha256 ») ? Alors l'empreinte du coeur installe se lit avant de choisir.</summary>
+    [JsonIgnore]
+    public bool ADesEtatsParCoeur => (Starts ?? []).Prepend(Start).Any(depart => depart?.CoreSha256 is { Count: > 0 });
 
     /// <summary>Un depart pret existe-t-il pour ce contenu, a un nombre de joueurs au moins ? Sinon, pas de choix a proposer.</summary>
-    public bool ADesDepartsPour(string? contenu)
-        => (Starts ?? []).Prepend(Start).Any(depart => depart is not null && depart.VautPour(contenu));
+    public bool ADesDepartsPour(string? contenu, string? empreinteDuCoeur = null)
+        => (Starts ?? []).Prepend(Start).Any(depart => depart is not null && depart.VautPour(contenu) && depart.VautPourLeCoeur(empreinteDuCoeur));
 
     /// <summary>
     /// Classe (23/10) : un jeu versus dont on lit la fin, quel que soit son niveau. Le depart pret du niveau NelfePlay
@@ -564,6 +569,17 @@ public sealed record MultiplayerStart
 
     public bool VautPour(string? contenu)
         => Content is null || string.Equals(Content, contenu, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// DEUX JEUX D'ETATS (22/11) : les empreintes SHA-256 (16 a 64 hex) des dll de coeur pour lesquelles cet etat a ete fait.
+    /// Absent : tout coeur (ancien catalogue). Present : l'etat est STRICT, un coeur qui n'y est pas ne le charge jamais (la taille
+    /// d'etat d'un autre coeur plante l'ancien et est refusee par le nouveau). Une API plus ancienne ignore la cle.
+    /// </summary>
+    [JsonPropertyName("core_sha256")]
+    public IReadOnlyList<string>? CoreSha256 { get; init; }
+
+    /// <summary>L'etat vaut-il pour le coeur installe (empreinte de sa dll) ? Sans liste : oui.</summary>
+    public bool VautPourLeCoeur(string? empreinteDuCoeur) => RetroBat.Api.Speedrun.EtatsParCoeur.Correspond(CoreSha256, empreinteDuCoeur);
 
     /// <summary>
     /// LE DELAI DES CHOIX (CDC Classements v1.1 §1, 29/10) : les images entre le chargement de l'etat et l'ecriture des
@@ -2286,6 +2302,11 @@ public sealed class MultiplayerCatalogueStore
                     return "empreinte de l'etat manquante";
                 }
 
+                if (depart.CoreSha256 is { } coeursDeLEtat && (coeursDeLEtat.Count == 0 || coeursDeLEtat.Any(c => !RetroBat.Api.Speedrun.EtatsParCoeur.EstUneEmpreinte(c))))
+                {
+                    return "core_sha256 de l'etat : des empreintes de 16 a 64 caracteres hexadecimaux";
+                }
+
                 if (depart.Players is { } joueurs && (joueurs < 2 || joueurs > jeu.Players))
                 {
                     return "etat pour " + joueurs + " joueurs hors de 2 a " + jeu.Players;
@@ -2326,21 +2347,31 @@ public sealed class MultiplayerCatalogueStore
             {
                 // Les etats propres a un nombre de joueurs couvrent chaque nombre, sans doublon : une gameroom a trois
                 // aurait sinon le panneau des choix sans depart pour les appliquer.
-                if ((jeu.Starts ?? []).Any(depart => depart.Players is null)
-                    || (jeu.Starts ?? []).Prepend(jeu.Start).Where(depart => depart.Players is not null)
-                        .GroupBy(depart => (depart.Players, Contenu: depart.Content?.ToLowerInvariant())).Any(groupe => groupe.Count() > 1))
+                // Un etat propre a un coeur (core_sha256) peut ne pas avoir de nombre (arcade) ; dans un meme groupe, ou tous nomment
+                // leurs coeurs (jamais deux fois le meme), ou aucun (un etat sans liste vaudrait pour un coeur inconnu).
+                if ((jeu.Starts ?? []).Any(depart => depart.Players is null && depart.CoreSha256 is not { Count: > 0 })
+                    || (jeu.Starts ?? []).Prepend(jeu.Start)
+                        .GroupBy(depart => (depart.Players, Contenu: depart.Content?.ToLowerInvariant()))
+                        .Any(groupe => (groupe.Count() > 1 && groupe.Any(depart => depart.CoreSha256 is not { Count: > 0 }))
+                            || groupe.SelectMany(depart => depart.CoreSha256 ?? []).GroupBy(c => c.ToLowerInvariant()).Any(m => m.Count() > 1)))
                 {
                     return "etats par nombre de joueurs sans nombre ou en double";
                 }
 
                 // Chaque contenu qui a des etats les a pour tous les nombres ; un contenu sans etat se joue en classique.
+                // Et, pour un etat propre a un coeur, pour chacun des coeurs nommes (« core_sha256 »).
                 foreach (var contenu in (jeu.Starts ?? []).Prepend(jeu.Start).Select(depart => depart.Content?.ToLowerInvariant()).Distinct())
                 {
-                    for (var joueurs = 2; joueurs <= jeu.Players; joueurs++)
+                    var coeurs = (jeu.Starts ?? []).Prepend(jeu.Start).Where(depart => depart.VautPour(contenu))
+                        .SelectMany(depart => depart.CoreSha256 is { Count: > 0 } c ? c.Cast<string?>() : [null]).Distinct().ToList();
+                    foreach (var coeur in coeurs)
                     {
-                        if (jeu.DepartPour(joueurs, contenu) is null)
+                        for (var joueurs = 2; joueurs <= jeu.Players; joueurs++)
                         {
-                            return "pas d'etat pour " + joueurs + " joueurs";
+                            if (jeu.DepartPour(joueurs, contenu, coeur) is null)
+                            {
+                                return "pas d'etat pour " + joueurs + " joueurs";
+                            }
                         }
                     }
                 }
