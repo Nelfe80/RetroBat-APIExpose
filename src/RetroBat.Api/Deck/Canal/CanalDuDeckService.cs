@@ -205,9 +205,9 @@ public sealed class CanalDuDeckService : IHostedService, IDisposable
     private static IEnumerable<int> PidsCandidats(int? simule)
     {
         if (simule is { } s) { yield return s; yield break; }
-        Process[] processus;
-        try { processus = Process.GetProcessesByName("retroarch"); }
-        catch { yield break; }
+        // Par PREFIXE (22/11) : un defi LIVE, un direct ou un hebergement netplay lancent « retroarch.patched.RETROBAT », que la
+        // recherche par nom entier ne trouve pas ; le canal n'etait jamais ouvert dans ces parties (piege connu, EmulatorForeground).
+        var processus = RetroBat.Api.Infrastructure.EmulatorForeground.ProcessusCommencantPar("retroarch");
         foreach (var p in processus)
         {
             int id;
