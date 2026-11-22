@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Outil d'essai (jamais livre) : ecrit un canal d'affichage simule Local\NelfePlay.Canal.<pid> (disposition de canal.h, wrapper 0.348). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>CanalSimulateur</AssemblyName>
+    <RootNamespace>CanalSimulateur</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src\RetroBat.Api\Deck\Canal\CanalFormat.cs" Link="CanalFormat.cs" />
+    <Compile Include="..\..\src\RetroBat.Api\Deck\Canal\CanalEcrivainSimule.cs" Link="CanalEcrivainSimule.cs" />
+    <Compile Include="..\..\src\RetroBat.Api\Deck\Canal\CanalScenarioSimule.cs" Link="CanalScenarioSimule.cs" />
+  </ItemGroup>
+</Project>
