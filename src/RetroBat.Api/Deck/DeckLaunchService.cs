@@ -287,6 +287,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         }
 
         _etat?.PoserLeLancement(lancement.Choices.Count == 0 ? null : lancement);
+        AllumerLeCanal(lancement);
         if (publier)
         {
             _ = _bus.PublishAsync(new EventEnvelope { Type = "deck.launch", Payload = lancement });
@@ -294,6 +295,33 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         }
 
         return lancement;
+    }
+
+    /// <summary>
+    /// LE CANAL D'AFFICHAGE (1.9.211, decisions du user du 22/11) : il ne s'allume que pour un Deck POSE, sur un jeu qui a un profil
+    /// d'affichage ; l'API pose « canal=on » dans certified.txt avant le lanceur. Un lancement sans Deck (ou un Deck retire) le
+    /// retire. Jamais bloquant : une erreur d'ecriture laisse le jeu partir sans canal.
+    /// </summary>
+    private void AllumerLeCanal(DeckLancement lancement)
+    {
+        try
+        {
+            if (lancement.Status == "posed")
+            {
+                if (Canal.CanalDuDeck.Demander(lancement.Rom)) RetroBat.Api.Infrastructure.CertifiedSettingsService.PoserLesVerrous(lancement.Rom);
+                return;
+            }
+
+            if (Canal.CanalDuDeck.RomDemandee() is { } rom)
+            {
+                Canal.CanalDuDeck.Retirer();
+                RetroBat.Api.Infrastructure.CertifiedSettingsService.PoserLesVerrous(rom);
+            }
+        }
+        catch (Exception ex)
+        {
+            _journal?.LogDebug(ex, "PlayerDeck : canal d'affichage non pose.");
+        }
     }
 
     /// <summary>
@@ -327,6 +355,14 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         }
 
         _etat?.PoserLeLancement(null);
+        // pas de Deck, pas de canal (MULTIPLAYER : decision 4 du 22/11)
+        if (Canal.CanalDuDeck.RomDemandee() is { } romCanal)
+        {
+            Canal.CanalDuDeck.Retirer();
+            try { RetroBat.Api.Infrastructure.CertifiedSettingsService.PoserLesVerrous(romCanal); }
+            catch (Exception ex) { _journal?.LogDebug(ex, "PlayerDeck : canal d'affichage non retire."); }
+        }
+
         if (avait) _journal?.LogInformation("PlayerDeck : lancement sans Deck ({Raison}).", raison);
     }
 
