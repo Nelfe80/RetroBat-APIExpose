@@ -116,6 +116,28 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private TaskCompletionSource? _demandeDeChargement;
     private bool _etatAttendu;
 
+    /// <summary>
+    /// LA REGLE EXACTE DU CHARGEMENT D'ETAT (22/11, Old AF Gamer, Super Mario World : le depart tombe 0,5 s apres le chargement).
+    /// Avant la commande LOAD_STATE_SLOT, tout signal est celui de l'ancienne partie (<see cref="_etatAttendu"/>). Des qu'elle part,
+    /// seul un signal emis AVANT elle (horloge de la ligne du wrapper, moins la marge) est perime ; tout signal posterieur est
+    /// accepte, meme une image apres. Les numeros d'image ne disent rien ici : le compteur du wrapper ne se remet pas a zero
+    /// au chargement. 0 : pas de seuil.
+    /// </summary>
+    private long _seuilDeLEtatMs;
+
+    /// <summary>
+    /// La marge entre l'envoi de la commande et le chargement par RetroArch, qui la lit au debut de l'image suivante (17 ms a
+    /// 60 Hz, 33 ms a 30 Hz) : un signal emis dans ce laps est encore de l'ancienne partie.
+    /// </summary>
+    internal const int MargeDuChargementMs = 50;
+
+    /// <summary>Une relance : la tentative neuve n'existe qu'apres la commande, les images recues entre-temps lui sont rendues dans l'ordre.</summary>
+    private bool _retenirLesImages;
+    private readonly List<(IReadOnlyList<Signal> Image, long? Horloge)> _imagesRetenues = new();
+
+    /// <summary>Change a chaque chargement d'etat : un releve commence avant (donc perime) ne s'applique pas.</summary>
+    private int _generationDeLEtat;
+
     /// <summary>L'epreuve de la partie en cours, que le direct partage montre ; null hors epreuve.</summary>
     public Reglement? EpreuveEnCours
     {
@@ -448,25 +470,74 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         }
 
         if (!demande.Task.IsCompleted) _journal.LogWarning("Speedrun : aucune demande de chargement pour {Defi}, l'etat se charge seul.", reglement.ChallengeId);
+        int generation;
+        lock (_verrou) generation = OuvrirLaFenetreDuChargementVerrouille(false);
         await EtatsDesDefis.ChargerAsync(_commandes, CancellationToken.None).ConfigureAwait(false);
         // La valeur que quitte le depart se releve tout de suite, en parallele de l'attente qui suit (Rambo d'Ash, 14/11).
         SessionSpeedrun? semee;
         lock (_verrou) semee = _session;
         var semis = semee is null ? Task.CompletedTask : SemerLeDepartAsync(semee);
-
-        // Le chargement se lit un instant apres la commande : les images d'avant ne disent plus rien du jeu.
-        await Task.Delay(500).ConfigureAwait(false);
-        lock (_verrou)
+        if (semee is not null)
         {
-            _image.Clear();
-            _frameDeLImage = _horlogeDeLImage = null;
-            _etatAttendu = false;
-            _etatCharge = DateTime.UtcNow;
+            // Les conditions du depart se relevent tout de suite : la lecture suit la commande, dans l'ordre de RetroArch.
+            var lues = await LireLesAdressesDeDepartAsync(reglement).ConfigureAwait(false);
+            lock (_verrou)
+            {
+                if (ReferenceEquals(_session, semee) && generation == _generationDeLEtat)
+                {
+                    foreach (var (adresse, valeur) in lues) semee.Relever(adresse, valeur);
+                    Publier();
+                }
+            }
         }
+
+        // Plus de fenetre sourde (22/11) : les signaux posterieurs a la commande sont deja acceptes. Ce delai ne sert qu'a dater
+        // « etat charge » (replay, Deck) comme avant.
+        await Task.Delay(500).ConfigureAwait(false);
+        lock (_verrou) _etatCharge = DateTime.UtcNow;
 
         _journal.LogInformation("Speedrun : etat de depart {Etat} charge pour {Defi}.", reglement.Etat?.Nom, reglement.ChallengeId);
         await _bus.PublishAsync(new EventEnvelope { Type = "speedrun.etat.charge", Payload = new { defi = reglement.ChallengeId } }).ConfigureAwait(false);
         await semis.ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// La commande de chargement va partir : les images en cours sont celles de l'ancienne partie, rien d'anterieur ne passe plus.
+    /// Sous le verrou. Rend la generation du chargement.
+    /// </summary>
+    private int OuvrirLaFenetreDuChargementVerrouille(bool retenir)
+    {
+        _image.Clear();
+        _frameDeLImage = _horlogeDeLImage = null;
+        _imagesRetenues.Clear();
+        _retenirLesImages = retenir;
+        _seuilDeLEtatMs = DateTimeOffset.Now.ToUnixTimeMilliseconds() + MargeDuChargementMs;
+        _etatAttendu = false;
+        return ++_generationDeLEtat;
+    }
+
+    /// <summary>Les adresses du depart (sauf celles que le depart quitte, que <see cref="SemerLeDepartAsync"/> traite), lues apres le chargement.</summary>
+    private async Task<Dictionary<long, int>> LireLesAdressesDeDepartAsync(Reglement reglement)
+    {
+        var lues = new Dictionary<long, int>();
+        var quittees = reglement.ValeursQuitteesAuDepart().Select(q => q.Adresse).ToHashSet();
+        using var delai = new CancellationTokenSource(TimeSpan.FromSeconds(1.5));
+        try
+        {
+            foreach (var adresse in reglement.AdressesDeDepart().Distinct().Where(a => !quittees.Contains(a)))
+            {
+                var reponse = await _commandes.DemanderAsync($"READ_CORE_RAM {reglement.OffsetDansLeCoeur(adresse):x} 1", delai.Token).ConfigureAwait(false);
+                var morceaux = reponse?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (morceaux is { Length: >= 3 } && morceaux[0] == "READ_CORE_RAM"
+                    && int.TryParse(morceaux[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var valeur)) lues[adresse] = valeur;
+            }
+        }
+        catch (Exception ex)
+        {
+            _journal.LogDebug(ex, "Speedrun : releve des conditions du depart interrompu.");
+        }
+
+        return lues;
     }
 
     /// <summary>Le temps laisse au releve de la valeur que quitte le depart, apres le chargement de l'etat.</summary>
@@ -566,6 +637,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     private async Task RelancerAsync(long sonde)
     {
         string? raison = null;
+        Dictionary<long, int>? releves = null;
         Reglement? surEtat;
         lock (_verrou) surEtat = _session?.Reglement is { Etat: not null } r ? r : null;
         try
@@ -583,8 +655,12 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 // image, 261 Mo de journal, plus de reponse aux commandes). L'enregistreur en ouvre un neuf sur l'etat.
                 await _commandes.EnvoyerAsync("HALT_REPLAY", delai.Token).ConfigureAwait(false);
                 await Task.Delay(200, delai.Token).ConfigureAwait(false);
+                // La tentative neuve n'existe qu'apres le delai qui suit (l'enregistreur et le Deck en dependent) : les images
+                // posterieures a la commande lui sont gardees, dans l'ordre, puis rendues (22/11).
+                lock (_verrou) OuvrirLaFenetreDuChargementVerrouille(true);
                 await EtatsDesDefis.ChargerAsync(_commandes, delai.Token).ConfigureAwait(false);
                 await Task.Delay(500, CancellationToken.None).ConfigureAwait(false);
+                releves = await LireLesAdressesDeDepartAsync(surEtat).ConfigureAwait(false);
                 // (05/11) le replay de la tentative s'ouvre tout de suite sur l'etat charge, avant que le joueur ait la main. A cote :
                 // la session ne l'attend pas pour se rearmer (23:26, 12 s d'attente sous charge : le depart du joueur etait passe,
                 // et l'entree dans la salle souterraine de Mario a ete prise pour le depart, 0:14.93).
@@ -611,15 +687,22 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         {
             if (surEtat is not null)
             {
-                _image.Clear();
-                _frameDeLImage = _horlogeDeLImage = null;
                 _etatAttendu = false;
                 if (raison is null) _etatCharge = DateTime.UtcNow;
             }
 
-            if (_session is null) return;
+            if (_session is null) { _retenirLesImages = false; _imagesRetenues.Clear(); return; }
             ViderLImageVerrouille();
-            if (raison is null) _session.RelanceFaite();
+            _retenirLesImages = false;
+            var retenues = _imagesRetenues.ToList();
+            _imagesRetenues.Clear();
+            if (raison is null)
+            {
+                _session.RelanceFaite();
+                // Les conditions du depart relevees apres le chargement, puis les images gardees (le depart est peut-etre parmi elles)
+                if (releves is not null) foreach (var (adresse, valeur) in releves) _session.Relever(adresse, valeur);
+                foreach (var (image, horloge) in retenues) TraiterLImageVerrouille(image, horloge);
+            }
             else _session.RelanceEchouee(raison);
             _cadence.Clear();
             Publier();
@@ -692,6 +775,9 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             _etatJournalise = null;
             _signauxRecus = _signauxAvantLEtat = _signauxArmesJournalises = 0;
             _derniersReleves.Clear();
+            _seuilDeLEtatMs = 0;
+            _retenirLesImages = false;
+            _imagesRetenues.Clear();
             _sessionDuLancement = _session;
             _sondeDeRetroArch = l.Reglement.OffsetDansLeCoeur(l.Reglement.AdressesCitees().FirstOrDefault());
             _image.Clear();
@@ -759,7 +845,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         {
             // Le demarrage du jeu avant l'etat de depart ne dit rien de l'epreuve.
             if (_session is null) return;
-            if (_etatAttendu)
+            // Avant la commande de chargement : l'ancienne partie. Apres : seul un signal emis avant la commande est perime.
+            if (_etatAttendu || (_seuilDeLEtatMs != 0 && horloge < _seuilDeLEtatMs))
             {
                 _signauxAvantLEtat++;
                 return;
@@ -785,6 +872,13 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         var horloge = _horlogeDeLImage;
         _image.Clear();
         _frameDeLImage = _horlogeDeLImage = null;
+        if (_retenirLesImages) { _imagesRetenues.Add((image, horloge)); return; }
+        TraiterLImageVerrouille(image, horloge);
+    }
+
+    private void TraiterLImageVerrouille(IReadOnlyList<Signal> image, long? horloge)
+    {
+        if (_session is null || image.Count == 0) return;
         // LE DEPART QUI NE VIENT PAS (essai du user du 03/11, Green Hill 2 : ARMED puis IDLE 47 s plus tard, jamais RUNNING ;
         // au banc, le meme defi part). Tant que l'epreuve est armee, chaque signal recu s'ecrit, 60 au plus par session.
         if (_session.Etat == SessionSpeedrun.Armed && _signauxArmesJournalises < 60)
@@ -957,9 +1051,11 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
             IReadOnlyList<long> adresses;
             bool etatAttendu;
+            int generation;
             lock (_verrou)
             {
                 if (!ReferenceEquals(_session, session)) return;
+                generation = _generationDeLEtat;
                 // Un releve d'avant l'etat de depart resterait pour toujours : un releve ne remplace jamais une valeur connue.
                 adresses = _etatAttendu ? [] : session.AdressesInconnues;
                 etatAttendu = _etatAttendu;
@@ -987,6 +1083,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
                 lock (_verrou)
                 {
                     if (!ReferenceEquals(_session, session)) return;
+                    if (generation != _generationDeLEtat) break; // un etat s'est charge pendant la lecture : valeur perimee
                     _derniersReleves[adresse] = valeur;
                     // (16/11) un releve fait avant que le jeu n'initialise sa memoire (0xFF de fceumm), corrige ici
                     if (session.ProvisoireDifferente(adresse, valeur) is { } avant)
