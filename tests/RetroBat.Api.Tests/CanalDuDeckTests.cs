@@ -344,6 +344,16 @@ public class CanalDuDeckTests
     }
 
     [Fact]
+    public void Le_data_pack_admet_un_fichier_d_affichage_voisin_du_mem()
+    {
+        // le .VIEW du canal (wrapper 0.348) se distribue comme un .MEM : ram/<systeme>/<jeu>.VIEW
+        var dossiers = new HashSet<string>(["ram"], StringComparer.OrdinalIgnoreCase);
+        Assert.True(DataPackPaths.Autorise("ram/arcade/dodonpachi-daioujou.VIEW", dossiers));
+        Assert.False(DataPackPaths.Autorise("../ram/arcade/x.VIEW", dossiers));
+        Assert.False(DataPackPaths.Autorise("autre/arcade/x.VIEW", dossiers));
+    }
+
+    [Fact]
     public void Un_vieux_wrapper_sans_canal_ne_change_pas_certified_txt_des_autres_jeux()
     {
         // aucune demande : le texte de certified.txt d'un jeu quelconque est celui d'avant

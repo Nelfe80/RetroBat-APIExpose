@@ -43,10 +43,11 @@ public sealed class CanalEcrivainSimule : IDisposable
         Ecrire32(0, CanalFormat.Signature);
         Ecrire16(4, 1);
         Ecrire16(6, CanalFormat.TailleEntete);
-        Ecrire32(8, (uint)_tampon.Length);
+        Ecrire32(8, (uint)_tampon.Length);   // taille UTILE (la vue du wrapper est arrondie a 4 Kio)
         Ecrire16(36, 1);
         Ecrire16(38, (ushort)champs.Length);
         Ecrire16(40, (ushort)tables.Length);
+        Ecrire16(42, 1);                   // preparations (resolutions des adresses)
         Ecrire32(48, CanalFormat.TailleEntete);
         Ecrire32(52, (uint)_offDonnees);
         Ecrire32(32, pid);
