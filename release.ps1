@@ -485,8 +485,15 @@ if (Test-Path $asyncapiSource) {
 # prendre. L'exe n'est joint a CETTE release que s'il a change : sinon l'adresse est celle de la
 # release qui le porte deja (GitHub publie l'empreinte de chaque actif, champ `digest`). Une borne
 # qui saute des versions le trouve donc toujours, puisqu'elle ne lit que la derniere release.
-$releasesPubliees = @((& gh api 'repos/Nelfe80/RetroBat-APIExpose/releases?per_page=100') | Out-String | ConvertFrom-Json |
-    ForEach-Object { $_ } | Where-Object { -not $_.draft })
+# TOUTES les releases, page apres page (22/11, 1.9.211) : une seule page de 100 ne voyait plus la v1.9.107, qui porte encore
+# deux fichiers du coeur fbneo_multi32 d'outils.json ; ils auraient ete joints de nouveau a la release, sous une autre adresse.
+# De meme, la derniere release complete (v1.9.118) serait sortie de la fenetre vers la 1.9.218 (« Aucune release complete »).
+function Lire-ToutesLesReleases {
+    $pages = (& gh api --paginate --slurp 'repos/Nelfe80/RetroBat-APIExpose/releases?per_page=100') | Out-String
+    if ($LASTEXITCODE -ne 0) { throw "Releases illisibles (gh api --paginate, exit $LASTEXITCODE)." }
+    @(foreach ($page in @($pages | ConvertFrom-Json)) { foreach ($r in @($page)) { $r } })
+}
+$releasesPubliees = @(Lire-ToutesLesReleases | Where-Object { -not $_.draft })
 if ($releasesPubliees.Count -eq 0) { throw "Releases illisibles (gh api) : outils.json ne peut pas etre construit." }
 # Ce que la derniere release publiait : un outil CHANGE doit y monter de version, sinon les bornes
 # qui ont deja ce numero ne le prendraient pas (l'API ne redescend jamais et ne compare que les
@@ -570,7 +577,7 @@ $setupFile = $null
 if ($Rapide) {
     # La derniere release COMPLETE : c'est son installeur que /setup sert, et c'est vers elle que
     # les notes renvoient une premiere installation.
-    $releases = (& gh api 'repos/Nelfe80/RetroBat-APIExpose/releases?per_page=100') | Out-String | ConvertFrom-Json
+    $releases = @(Lire-ToutesLesReleases)
     $complete = $releases | Where-Object {
         -not $_.draft -and ($_.assets | Where-Object { $_.name -eq 'APIExpose-Cabinet-Setup.exe' })
     } | Select-Object -First 1
