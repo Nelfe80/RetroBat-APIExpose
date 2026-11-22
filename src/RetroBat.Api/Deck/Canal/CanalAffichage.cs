@@ -246,7 +246,8 @@ public sealed class CanalAffichageCalcul
             if (cls == 2 && vie > bossVie) { bossVie = vie; bossSlot = slot; }
         }
 
-        if (bossSlot >= 0)
+        // Boss : seulement si une vie de boss est reellement lue (colonne vie du .VIEW) ; sinon le Deck retombe sur le bossValue du theme (.MEM)
+        if (bossSlot >= 0 && _cVie >= 0)
         {
             if (bossSlot != _bossSlot) { _bossSlot = bossSlot; _bossMax = 0; }
             if (bossVie > _bossMax) _bossMax = bossVie;

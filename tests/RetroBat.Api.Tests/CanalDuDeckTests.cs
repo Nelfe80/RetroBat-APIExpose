@@ -211,6 +211,26 @@ public class CanalDuDeckTests
     }
 
     [Fact]
+    public void Sans_colonne_vie_un_ennemi_special_ne_publie_pas_de_boss_et_le_deck_garde_le_bossValue_du_theme()
+    {
+        // table objets SANS colonne vie (Giga Wing, ESP Ra.De. : aucune barre de boss) : Boss absent, jamais [0, 0]
+        var e = new CanalEcrivainSimule("dodonpachi-daioujou", CanalScenarioSimule.Champs,
+            [new("objets", 48, 64, ["type"]), new("affichage", 48, 64, ["drapeau", "ay", "ax"])], 1);
+        var d = CanalFormat.LireDescripteur(e.Tampon)!;
+        var calcul = new CanalAffichageCalcul(ProfilDaiOuJou, d, "ddpdojblka");
+        var champs = new int[CanalScenarioSimule.Champs.Length];
+        champs[CanalScenarioSimule.Vies] = 2;
+        var (ay, ax) = CanalScenarioSimule.BrutDeLAffichage(112, 90);
+        e.Ecrire(1, champs, [[[41, 0x8901]], [[41, CanalScenarioSimule.Dessine, ay, ax]]]);
+        var bloc = new CanalBloc(d);
+        Assert.True(CanalFormat.Lire(e.Tampon, d, bloc));
+        var m = calcul.Convertir(bloc);
+        Assert.Equal(1, m.Enemies.Length / 5);
+        Assert.Equal(2, m.Enemies[3]);   // l'ennemi special est bien publie
+        Assert.Null(m.Boss);
+    }
+
+    [Fact]
     public void Hors_partie_le_vaisseau_n_est_pas_publie()
     {
         var (e, d) = Neuf();
