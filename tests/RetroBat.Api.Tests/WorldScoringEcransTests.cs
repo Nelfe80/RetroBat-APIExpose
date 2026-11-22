@@ -419,4 +419,24 @@ public class WorldScoringEcransTests
         for (var i = 0; i < 105; i++)
             File.WriteAllBytes(Path.Combine(dossier, $"f{n++:0000}.png"), L.ApercuMultiplayer(style, socle with { Fin = provisoire }, "", "", "", null!, i / 30.0));
     }
+
+    // ── Le jeu est la (23/11 : l'ecran de depart ne cache plus l'ecran VERSION-A / VERSION-B de DaiOuJou) ──
+
+    [Fact]
+    public void Le_jeu_est_la_des_le_premier_signal_si_l_emulateur_tourne()
+    {
+        var t = new DateTime(2026, 11, 23, 12, 0, 0, DateTimeKind.Utc);
+        Assert.True(WorldScoringEcransService.JeuEstLa(true, t, t, t));
+        Assert.False(WorldScoringEcransService.JeuEstLa(false, t, t, t.AddSeconds(30)));
+    }
+
+    [Fact]
+    public void Un_jeu_muet_est_montre_apres_le_delai_sans_signal()
+    {
+        var vu = new DateTime(2026, 11, 23, 12, 0, 0, DateTimeKind.Utc);
+        Assert.False(WorldScoringEcransService.JeuEstLa(true, null, null, vu));
+        Assert.False(WorldScoringEcransService.JeuEstLa(true, null, vu, vu.AddSeconds(3.5)));
+        Assert.True(WorldScoringEcransService.JeuEstLa(true, null, vu, vu + WorldScoringEcransService.DelaiSansSignal));
+        Assert.False(WorldScoringEcransService.JeuEstLa(false, null, vu, vu.AddSeconds(60)));
+    }
 }

@@ -185,10 +185,13 @@ public sealed class WorldScoringEcransService : IHostedService, IDisposable
         {
             var limite = DateTime.UtcNow + TenueMax;
             var arrive = false;
+            DateTime? emulateurVuA = null;
             while (DateTime.UtcNow < limite)
             {
                 await Task.Delay(500, jeton).ConfigureAwait(false);
-                if (suivi.PremierSignal is not null && EmulatorForeground.EmulateurDeJeuTourne(suivi.LanceALocal.AddSeconds(-1)))
+                var tourne = EmulatorForeground.EmulateurDeJeuTourne(suivi.LanceALocal.AddSeconds(-1));
+                if (tourne) emulateurVuA ??= DateTime.UtcNow;
+                if (JeuEstLa(tourne, suivi.PremierSignal, emulateurVuA, DateTime.UtcNow))
                 {
                     arrive = true;
                     suivi.Progression?.Finir(ProgressionDuLancement.Jeu);
@@ -230,6 +233,18 @@ public sealed class WorldScoringEcransService : IHostedService, IDisposable
         {
         }
     }
+
+    /// <summary>Delai apres lequel un jeu dont la fenetre est la est montre meme sans signal du .MEM (voir <see cref="JeuEstLa"/>).</summary>
+    internal static readonly TimeSpan DelaiSansSignal = TimeSpan.FromSeconds(4);
+
+    /// <summary>
+    /// Le jeu est la quand l'emulateur de ce lancement tourne ET que sa premiere valeur a ete lue, OU qu'il tourne depuis
+    /// <see cref="DelaiSansSignal"/> (le coeur est charge, ses images sont a l'ecran). Le second cas evite que l'ecran de
+    /// depart couvre un jeu qui reste muet : DoDonPachi Dai-Ou-Jou (23/11) n'emet son premier signal qu'a la FIN du compte a
+    /// rebours de l'ecran VERSION-A / VERSION-B (1415 images, 24 s), et l'ecran cachait ce choix au joueur.
+    /// </summary>
+    internal static bool JeuEstLa(bool emulateurTourne, DateTime? premierSignal, DateTime? emulateurVuA, DateTime maintenant)
+        => emulateurTourne && (premierSignal is not null || emulateurVuA is { } vu && maintenant - vu >= DelaiSansSignal);
 
     /// <summary>B maintenu pendant le depart : l'ecran s'en va, ES revient, et le jeu se ferme des qu'il ecoute.</summary>
     private void QuitterLeDepart()
