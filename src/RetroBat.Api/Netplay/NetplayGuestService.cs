@@ -262,6 +262,8 @@ public sealed class NetplayGuestService
             mode, infos.Value.Relais, infos.Value.Port, infos.Value.Session, infos.Value.MotDePasse, _logger);
 
         // Par ES de preference : lui seul cesse de dessiner pendant la partie (voir NetplayLaunch).
+        // Le canal d'affichage du Deck reste coupe chez un client netplay (wrapper 0.349 : sans la cle de l'hote).
+        RetroBat.Api.Deck.Canal.CanalDuDeck.InterdireLeNetplay();
         MarquerRejointe(infos.Value.PeutJouer ? Role.Joueur : Role.Spectateur);
         lock (VerrouRejointe)
         {

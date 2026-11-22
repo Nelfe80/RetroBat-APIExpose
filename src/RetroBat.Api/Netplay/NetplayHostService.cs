@@ -167,6 +167,16 @@ public sealed class NetplayHostService
 
         // Par ES de preference : lui seul cesse de dessiner pendant la partie (voir NetplayLaunch). Avec le Deck, par l'API : les
         // cles de lancement d'ES ne servent pas, la ligne porte tout (comme le repli direct de NetplayLaunch).
+        // LE CANAL D'AFFICHAGE DU DECK A L'HOTE (1.9.211, wrapper 0.349) : un hebergement d'ici n'est jamais une partie MULTIPLAYER
+        // a plusieurs (elle passe par MultiplayerLaunchService) ; c'est un defi diffuse en LIVE ou un direct par le site. Le canal y
+        // vit comme hors netplay (cle canal.netplay=hote, posee seulement si un Deck demande le canal pour cette ROM).
+        Deck.Canal.CanalDuDeck.PermettreLHoteNetplay(Path.GetFileNameWithoutExtension(cheminRom));
+        if (Deck.Canal.CanalDuDeck.HoteNetplayAdmis(Path.GetFileNameWithoutExtension(cheminRom)))
+        {
+            try { CertifiedSettingsService.PoserLesVerrous(Path.GetFileNameWithoutExtension(cheminRom)); }
+            catch (Exception ex) { _logger.LogDebug(ex, "Netplay : cle du canal de l'hote non posee."); }
+        }
+
         NetplayLaunch.Resultat lancement;
         if (lancementDirect is not null)
         {

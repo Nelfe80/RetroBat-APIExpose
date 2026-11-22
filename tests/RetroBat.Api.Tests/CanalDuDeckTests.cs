@@ -326,6 +326,53 @@ public class CanalDuDeckTests
     }
 
     [Fact]
+    public void A_l_hote_netplay_d_un_defi_diffuse_le_canal_vit_mais_jamais_chez_un_client()
+    {
+        // wrapper 0.349 : canal.netplay=hote garde le canal vivant en netplay ; sans elle (client, MULTIPLAYER) il se coupe
+        CanalDuDeck.Retirer();
+        try
+        {
+            // hebergement sans Deck : aucune ligne (la cle n'a de sens qu'avec canal=on)
+            CanalDuDeck.PermettreLHoteNetplay("ddpdojblka");
+            var sansDeck = new StringBuilder("rom=ddpdojblka\n");
+            CanalDuDeck.Ecrire(sansDeck, "ddpdojblka");
+            Assert.Equal("rom=ddpdojblka\n", sansDeck.ToString());
+            Assert.False(CanalDuDeck.HoteNetplayAdmis("ddpdojblka"));
+
+            // defi LIVE : Deck pose puis hebergement (ou l'inverse : l'ordre ne compte pas)
+            Assert.True(CanalDuDeck.Demander("ddpdojblka"));
+            var hote = new StringBuilder("rom=ddpdojblka\n");
+            CanalDuDeck.Ecrire(hote, "DDPDOJBLKA");
+            Assert.Equal("rom=ddpdojblka\ncanal=on\ncanal.netplay=hote\n", hote.ToString());
+
+            // un autre jeu heberge : la cle ne passe pas a celui du Deck
+            CanalDuDeck.PermettreLHoteNetplay("sonic");
+            var autre = new StringBuilder("rom=ddpdojblka\n");
+            CanalDuDeck.Ecrire(autre, "ddpdojblka");
+            Assert.Equal("rom=ddpdojblka\ncanal=on\n", autre.ToString());
+
+            // la borne rejoint la partie d'un autre : client netplay, le canal reste coupe
+            CanalDuDeck.PermettreLHoteNetplay("ddpdojblka");
+            CanalDuDeck.InterdireLeNetplay();
+            var client = new StringBuilder("rom=ddpdojblka\n");
+            CanalDuDeck.Ecrire(client, "ddpdojblka");
+            Assert.Equal("rom=ddpdojblka\ncanal=on\n", client.ToString());
+
+            // fin de partie, Deck retire ou MULTIPLAYER (Retirer) : plus rien, et un Deck suivant ne retrouve pas la cle
+            CanalDuDeck.PermettreLHoteNetplay("ddpdojblka");
+            CanalDuDeck.Retirer();
+            Assert.True(CanalDuDeck.Demander("ddpdojblka"));
+            var suivant = new StringBuilder("rom=ddpdojblka\n");
+            CanalDuDeck.Ecrire(suivant, "ddpdojblka");
+            Assert.Equal("rom=ddpdojblka\ncanal=on\n", suivant.ToString());
+        }
+        finally
+        {
+            CanalDuDeck.Retirer();
+        }
+    }
+
+    [Fact]
     public void La_memoire_partagee_se_lit_en_lecture_seule_et_jamais_a_moitie()
     {
         var pid = PidDEssai(1);
