@@ -15,6 +15,8 @@ public class CanalDuDeckTests
     // Un pid qui n'est celui d'aucun RetroArch : les essais de memoire partagee ne croisent jamais un vrai canal.
     private static int PidDEssai(int n) => 910_000 + n;
 
+    private static CanalProfilAffichage ProfilDaiOuJou => CanalProfilAffichage.Pour("ddpdojblka")!;
+
     private static (CanalEcrivainSimule Ecrivain, CanalDescripteur Descripteur) Neuf(uint pid = 1)
     {
         var e = CanalScenarioSimule.DaiOuJou(pid);
@@ -85,7 +87,7 @@ public class CanalDuDeckTests
     public void La_conversion_donne_des_pixels_d_ecran_du_jeu()
     {
         var (e, d) = Neuf();
-        var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
+        var calcul = new CanalAffichageCalcul(ProfilDaiOuJou, d, "ddpdojblka");
         Assert.True(calcul.Utile);
         var (champs, tables) = Bloc(321, 112, 380, (5, 0x8200, 100, 200, 9, 0xA200));
         e.Ecrire(1, champs, tables);
@@ -108,7 +110,7 @@ public class CanalDuDeckTests
         // valeurs brutes relevees par le labo (RAPPORT_LABO_VIEW, 22/11) : vaisseau x = vx / 64, y = 456 - vy / 64 (pas de +3) ;
         // ennemi x = ax / 64, y = 447 - ay / 64 (ay = mot +2, ax = mot +4)
         var (e, d) = Neuf();
-        var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
+        var calcul = new CanalAffichageCalcul(ProfilDaiOuJou, d, "ddpdojblka");
         var champs = new int[CanalScenarioSimule.Champs.Length];
         champs[CanalScenarioSimule.Vies] = 2;
         champs[CanalScenarioSimule.VaisseauX] = 6400;    // 100 px
@@ -125,7 +127,7 @@ public class CanalDuDeckTests
     public void Une_case_non_dessinee_ou_de_vie_nulle_n_est_pas_un_ennemi()
     {
         var (e, d) = Neuf();
-        var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
+        var calcul = new CanalAffichageCalcul(ProfilDaiOuJou, d, "ddpdojblka");
         var bloc = new CanalBloc(d);
         // 0xA200 et 0xA201 (les plus frequents en jeu) sont DESSINES ; 0x8200 ne l'est pas ; un ventilateur 0x0500 a une vie nulle
         var (champs, tables) = Bloc(10, 100, 380,
@@ -141,7 +143,7 @@ public class CanalDuDeckTests
         // banc d'integration (wrapper 0.348 signe, 22/11) : des cases dessinees portent ay = 64 478 ou ax = 64 980 (s16 negatifs :
         // juste sous l'ecran, juste a gauche) ; lus en u16 ils tombaient a y = -560 ou x = 1 015
         var (e, d) = Neuf();
-        var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
+        var calcul = new CanalAffichageCalcul(ProfilDaiOuJou, d, "ddpdojblka");
         var champs = new int[CanalScenarioSimule.Champs.Length];
         champs[CanalScenarioSimule.Vies] = 1;
         (champs[CanalScenarioSimule.VaisseauX], champs[CanalScenarioSimule.VaisseauY]) = CanalScenarioSimule.BrutDuVaisseau(56, 392);
@@ -164,7 +166,7 @@ public class CanalDuDeckTests
     public void Un_ennemi_detruit_disparait_et_les_effets_ne_sont_pas_des_ennemis()
     {
         var (e, d) = Neuf();
-        var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
+        var calcul = new CanalAffichageCalcul(ProfilDaiOuJou, d, "ddpdojblka");
         var bloc = new CanalBloc(d);
 
         // trois cases : un ennemi, un effet dessine SANS objet (case libre), une case non dessinee (drapeau sans 0x2000)
@@ -188,7 +190,7 @@ public class CanalDuDeckTests
     public void Le_boss_a_sa_vie_et_sa_vie_la_plus_haute_et_l_epoch_remet_tout_a_zero()
     {
         var (e, d) = Neuf();
-        var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
+        var calcul = new CanalAffichageCalcul(ProfilDaiOuJou, d, "ddpdojblka");
         var bloc = new CanalBloc(d);
         foreach (var vie in new[] { 4000, 3000, 1000 })
         {
@@ -212,7 +214,7 @@ public class CanalDuDeckTests
     public void Hors_partie_le_vaisseau_n_est_pas_publie()
     {
         var (e, d) = Neuf();
-        var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
+        var calcul = new CanalAffichageCalcul(ProfilDaiOuJou, d, "ddpdojblka");
         var bloc = new CanalBloc(d);
         var (c, t) = Bloc(0, 112, 380);
         c[CanalScenarioSimule.Vies] = 255;   // vies : 255 hors partie
@@ -227,7 +229,7 @@ public class CanalDuDeckTests
         var e = new CanalEcrivainSimule("grand.VIEW", CanalScenarioSimule.Champs,
             [new("objets", 100, 100, ["type", "vie"]), new("affichage", 100, 100, ["drapeau", "ay", "ax"])], 3);
         var d = CanalFormat.LireDescripteur(e.Tampon)!;
-        var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
+        var calcul = new CanalAffichageCalcul(ProfilDaiOuJou, d, "ddpdojblka");
         var gens = Enumerable.Range(0, 90).Select(i => (i, 0x1101, 10 + i, 50, 1, 0xA000)).ToArray();
         var (c, t) = Bloc(10, 100, 380, gens);
         e.Ecrire(1, c, t);
@@ -240,7 +242,7 @@ public class CanalDuDeckTests
     public void Un_message_identique_n_est_pas_un_changement_et_un_canal_qui_se_tait_se_dit()
     {
         var (e, d) = Neuf();
-        var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
+        var calcul = new CanalAffichageCalcul(ProfilDaiOuJou, d, "ddpdojblka");
         var bloc = new CanalBloc(d);
         var (c, t) = Bloc(10, 100, 380, (1, 0x1101, 60, 100, 1, 0xA000));
         e.Ecrire(1, c, t);
@@ -261,11 +263,11 @@ public class CanalDuDeckTests
     [Fact]
     public void Le_profil_se_trouve_par_la_rom_ou_par_la_vue_et_un_jeu_sans_profil_n_a_pas_de_canal()
     {
-        Assert.Same(CanalProfilAffichage.DaiOuJou, CanalProfilAffichage.Pour("ddpdojblka"));
-        Assert.Same(CanalProfilAffichage.DaiOuJou, CanalProfilAffichage.Pour("DDPDOJBLKA"));
+        Assert.NotNull(CanalProfilAffichage.Pour("ddpdojblka"));
+        Assert.Same(CanalProfilAffichage.Pour("ddpdojblka"), CanalProfilAffichage.Pour("DDPDOJBLKA"));
         Assert.Null(CanalProfilAffichage.Pour("sonic"));
         Assert.Null(CanalProfilAffichage.Pour(null));
-        Assert.Same(CanalProfilAffichage.DaiOuJou, CanalProfilAffichage.PourLaVue("dodonpachi-daioujou.VIEW"));
+        Assert.Same(CanalProfilAffichage.Pour("ddpdojblka"), CanalProfilAffichage.PourLaVue("dodonpachi-daioujou.VIEW"));
         Assert.False(CanalDuDeck.Demander("sonic"));
     }
 

@@ -197,8 +197,11 @@ public sealed class CanalDuDeckService : IHostedService, IDisposable
 
     private static CanalAffichageCalcul? Calcul(CanalLecteur l, string rom)
     {
-        var profil = CanalProfilAffichage.Pour(rom) ?? CanalProfilAffichage.PourLaVue(l.Descripteur.Nom);
+        var profil = CanalProfilAffichage.Pour(rom);
         if (profil is null) return null;
+        // le profil ne vaut que pour le .VIEW prouve : un autre nom, ou une autre empreinte si le profil en pinglait, ne se convertit pas
+        if (!string.Equals(profil.Vue, CanalProfils.SansExtension(l.Descripteur.Nom), StringComparison.OrdinalIgnoreCase)) return null;
+        if (profil.VueSha256 is { Count: > 0 } shas && !shas.Contains(l.Descripteur.Sha256.ToLowerInvariant())) return null;
         var c = new CanalAffichageCalcul(profil, l.Descripteur, rom);
         return c.Utile ? c : null;
     }

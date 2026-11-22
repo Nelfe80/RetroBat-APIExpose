@@ -77,6 +77,8 @@ public readonly record struct CanalAxe(double Echelle, double Decalage)
 /// <param name="VieRequise">Un ennemi doit avoir une vie non nulle (vie 0 : decor ou objet, jamais publie).</param>
 /// <param name="CoordonneesSignees">Les mots de position de la table d'affichage sont des s16 (un objet juste hors de l'ecran, a
 /// gauche ou en bas, porte un mot negatif lu 65 xxx en u16) ; un ennemi hors de l'ecran n'est jamais publie.</param>
+/// <param name="Vue">Le nom du .VIEW (sans extension) pour lequel le profil a ete prouve ; le canal d'un autre .VIEW n'est pas converti.</param>
+/// <param name="VueSha256">Facultatif : les empreintes du .VIEW prouvees (minuscules) ; vide = tout .VIEW de ce nom.</param>
 /// <param name="ComboMax">Le maximum de la jauge du combo quand le .VIEW n'a pas de champ <c>combo_max</c> (0 : inconnu).</param>
 public sealed record CanalProfilAffichage(
     string Id,
@@ -91,65 +93,15 @@ public sealed record CanalProfilAffichage(
     int ComboMax,
     double CameraEchelle,
     IReadOnlyDictionary<int, int> Classes,
-    IReadOnlyList<string> Roms)
+    IReadOnlyList<string> Roms,
+    string Vue = "",
+    IReadOnlyList<string>? VueSha256 = null)
 {
-    /// <summary>
-    /// DoDonPachi DaiOuJou Black Label (ddpdojblka, FBNeo 800f25e9) : ecran portrait 224 x 448, y vers le bas. Formules du labo du
-    /// .VIEW (22/11, <c>dodonpachi-daioujou.VIEW</c>, preuves dans RAPPORT_LABO_VIEW) : vaisseau x = vaisseau_x / 64, y = 456 -
-    /// vaisseau_y / 64 (gabarit sur 247 captures d'une partie reelle) ; ennemi x = ax / 64, y = 447 - ay / 64 (ax = mot +4, ay = mot
-    /// +2 de la table d'affichage, surimpressions des niveaux 1 et 2). Le « +3 » de l'ancien profil d'atlas n'est pas repris : aucune
-    /// mesure ne le prouve. Ennemi = case DESSINEE (drapeau &amp; 0x2000) ET occupee (type non nul) ET de vie non nulle (vie 0 :
-    /// ventilateurs, pieces du decor). La jauge du combo (champ combo, 0 a 56) a un maximum constant de 56. Camera : s16 / 64 pixels.
-    /// Classes proposees par le labo (l leger, h lourd, s special, g generique), a valider par le user.
-    /// </summary>
-    public static readonly CanalProfilAffichage DaiOuJou = new(
-        "daioujou", 224, 448,
-        VaisseauX: new(1.0 / 64.0, 0), VaisseauY: new(-1.0 / 64.0, 456),
-        ColonneX: "ax", ColonneY: "ay",
-        EnnemiX: new(1.0 / 64.0, 0), EnnemiY: new(-1.0 / 64.0, 447),
-        MasqueDessine: 0x2000,
-        VieRequise: true,
-        CoordonneesSignees: true,
-        ComboMax: 56,
-        CameraEchelle: 1.0 / 64.0,
-        Classes: ClassesDaiOuJou(),
-        Roms: ["ddpdojblka", "ddpdojblk", "ddpdoj", "ddpdojh"]);
+    /// <summary>Le profil du jeu lance (nom de ROM), ou null : un jeu sans profil n'a pas de canal publie. Voir <see cref="CanalProfils"/>.</summary>
+    public static CanalProfilAffichage? Pour(string? rom) => CanalProfils.Pour(rom);
 
-    private static Dictionary<int, int> ClassesDaiOuJou()
-    {
-        var d = new Dictionary<int, int>();
-        foreach (var t in new[] { 0x1101, 0x1001, 0x9500, 0x2500, 0x2B00, 0x2900, 0x0501 }) d[t] = 0;
-        foreach (var t in new[] { 0x8200, 0x8B01, 0x8A01, 0x8000, 0x8500, 0x8801, 0x8D01, 0x8F01, 0x9401, 0x9701, 0x9201, 0x9601, 0x9301, 0x8401, 0x9001, 0x9101, 0x8600 }) d[t] = 1;
-        foreach (var t in new[] { 0x8901, 0x0D81, 0x8C80 }) d[t] = 2;
-        foreach (var t in new[] { 0x0500, 0x0700, 0x0800, 0x0801, 0x0900, 0x0B00, 0x0B01, 0x2700, 0x4D00 }) d[t] = 3;
-        return d;
-    }
-
-    private static readonly CanalProfilAffichage[] Connus = [DaiOuJou];
-
-    /// <summary>Le profil du jeu lance (nom de ROM), ou null : un jeu sans profil n'a pas de canal publie.</summary>
-    public static CanalProfilAffichage? Pour(string? rom)
-    {
-        if (string.IsNullOrWhiteSpace(rom)) return null;
-        foreach (var p in Connus)
-            foreach (var r in p.Roms)
-                if (string.Equals(r, rom.Trim(), StringComparison.OrdinalIgnoreCase)) return p;
-        return null;
-    }
-
-    /// <summary>Le profil reconnu par le NOM du .VIEW que le wrapper a charge (repli quand la ROM n'est pas connue).</summary>
-    public static CanalProfilAffichage? PourLaVue(string? nomVue)
-    {
-        if (string.IsNullOrWhiteSpace(nomVue)) return null;
-        var n = nomVue.ToLowerInvariant();
-        foreach (var p in Connus)
-        {
-            if (n.Contains(p.Id, StringComparison.Ordinal)) return p;
-            foreach (var r in p.Roms) if (n.Contains(r, StringComparison.Ordinal)) return p;
-        }
-
-        return null;
-    }
+    /// <summary>Le profil du .VIEW que le wrapper a charge (nom sans extension), ou null. Voir <see cref="CanalProfils"/>.</summary>
+    public static CanalProfilAffichage? PourLaVue(string? nomVue) => CanalProfils.PourLaVue(nomVue);
 
     public int ClasseDe(int type) => Classes.TryGetValue(type & 0xFFFF, out var c) ? c : 3;
 }

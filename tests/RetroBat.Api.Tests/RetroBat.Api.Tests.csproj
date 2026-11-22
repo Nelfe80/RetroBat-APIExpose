@@ -47,6 +47,10 @@
     </None>
     <!-- Les reglements de challenges (nelfe.challenge.v2) tels qu'ils sont deposes sur le site : les tests partent
          d'eux. Leurs sources sont au Data Pack (challenges/rulesets), copiees sous Reglements\ a la sortie. -->
+    <!-- Les profils d'affichage du canal du Deck (ram\<systeme>\<jeu>.VIEW.json) : copie de ce que porte le Data Pack. -->
+    <None Include="Profils\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <!-- Les ROMs admises (11/11) : un extrait reel du referentiel, des .MEM et de l'index des jeux ouverts. -->
     <None Include="RomsAdmises\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -1,0 +1,29 @@
+{
+  "schema": "nelfeplay.view-profile/1",
+  "comment": "Profil d'affichage du canal du Player Deck : le sens des valeurs du dodonpachi-daioujou.VIEW (ecran, conversions, ennemis). Lu par l'API, jamais par le wrapper. Voir docs/PROFIL_AFFICHAGE.md.",
+  "id": "daioujou",
+  "view": "dodonpachi-daioujou",
+  "roms": ["ddpdojblka"],
+  "screen": { "w": 224, "h": 448 },
+  "ship": {
+    "x": { "scale": "1/64", "offset": 0 },
+    "y": { "scale": "-1/64", "offset": 456 }
+  },
+  "enemy": {
+    "column_x": "ax",
+    "column_y": "ay",
+    "x": { "scale": "1/64", "offset": 0 },
+    "y": { "scale": "-1/64", "offset": 447 },
+    "drawn_mask": "0x2000",
+    "life_required": true,
+    "signed": true,
+    "classes": {
+      "light": ["0x1101", "0x1001", "0x9500", "0x2500", "0x2B00", "0x2900", "0x0501"],
+      "heavy": ["0x8200", "0x8B01", "0x8A01", "0x8000", "0x8500", "0x8801", "0x8D01", "0x8F01", "0x9401", "0x9701", "0x9201", "0x9601", "0x9301", "0x8401", "0x9001", "0x9101", "0x8600"],
+      "special": ["0x8901", "0x0D81", "0x8C80"],
+      "generic": ["0x0500", "0x0700", "0x0800", "0x0801", "0x0900", "0x0B00", "0x0B01", "0x2700", "0x4D00"]
+    }
+  },
+  "camera_scale": "1/64",
+  "combo_max": 56
+}
