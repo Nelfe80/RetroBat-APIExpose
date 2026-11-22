@@ -374,6 +374,8 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Repla
 // Le lancement avec le PlayerDeck (H-D15 a H-D20) : decor nelfeplay-deck, choix en jeu retenu par joueur, jeu et mode.
 builder.Services.AddSingleton<RetroBat.Api.Deck.DeckLaunchService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckLaunchService>());
+// Le canal d'affichage du wrapper vers le Deck (1.9.211) : deck.live, seulement quand un Deck est lance pour un jeu a profil
+builder.Services.AddHostedService<RetroBat.Api.Deck.Canal.CanalDuDeckService>();
 // Le rang en direct du PlayerDeck (H-D21) : classement lu au lancement, rang recalcule en local a chaque valeur.
 builder.Services.AddSingleton<RetroBat.Api.Deck.DeckRankService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Deck.DeckRankService>());

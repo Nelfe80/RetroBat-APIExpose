@@ -305,6 +305,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
             else if (type == "ui.game.ended" || type == "ui.game.ended.raw")
             {
                 RetroBat.Api.Speedrun.VerrousDuLancement.Retirer();
+                RetroBat.Api.Deck.Canal.CanalDuDeck.Retirer();
                 Effacer();
                 NeutraliserLaCollection();
             }
@@ -508,6 +509,8 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         }
         // Les verrous du defi qui se lance sur cette ROM (D18) : chaque reecriture les garde.
         RetroBat.Api.Speedrun.VerrousDuLancement.Ecrire(texte, RetroBat.Api.Speedrun.VerrousDuLancement.Pour(romBasename));
+        // Le canal d'affichage du Deck (1.9.211) : « canal=on » quand un Deck est lance pour cette ROM (affichage seulement).
+        RetroBat.Api.Deck.Canal.CanalDuDeck.Ecrire(texte, romBasename);
         var chemin = FilePath;
         Directory.CreateDirectory(Path.GetDirectoryName(chemin)!);
         File.WriteAllText(chemin, texte.ToString(), new UTF8Encoding(false));
@@ -546,7 +549,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
     {
         var jeu = _context.Ui.Running ?? _context.Ui.Selected;
         var rom = string.IsNullOrWhiteSpace(jeu?.GamePath) ? null : Path.GetFileNameWithoutExtension(jeu!.GamePath);
-        if (rom is not null && RetroBat.Api.Speedrun.VerrousDuLancement.Pour(rom).Count > 0)
+        if (rom is not null && (RetroBat.Api.Speedrun.VerrousDuLancement.Pour(rom).Count > 0 || RetroBat.Api.Deck.Canal.CanalDuDeck.Voulu(rom)))
         {
             Ecrire(rom, new Dictionary<string, string>());
             return;

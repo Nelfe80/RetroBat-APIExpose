@@ -63,6 +63,8 @@ public sealed class GameSessionEventLogProvider : IProvider
 
         try
         {
+            // deck.live (canal d'affichage du Deck, 1.9.211) part jusqu'a 30 fois par seconde : jamais dans le journal de session
+            if (string.Equals(envelope.Type, "deck.live", StringComparison.OrdinalIgnoreCase)) return;
             if (string.Equals(envelope.Type, "ui.game.started", StringComparison.OrdinalIgnoreCase))
             {
                 StartSession(envelope);
