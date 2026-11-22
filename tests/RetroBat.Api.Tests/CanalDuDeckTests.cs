@@ -25,22 +25,36 @@ public class CanalDuDeckTests
 
     private static (int[] Champs, int[][][] Tables) Bloc(int distance, int sx, int sy, params (int Slot, int Type, int X, int Y, int Vie, int Drapeau)[] ennemis)
     {
-        var champs = new[] { 100, distance, 2, 1, 0, (sx - 3) * 64, (446 - sy) * 64 };
-        var objets = ennemis.Where(e => e.Type != 0).OrderBy(e => e.Slot).Select(e => new[] { e.Slot, e.Type, 0, e.Vie }).ToArray();
-        var aff = ennemis.OrderBy(e => e.Slot).Select(e => new[] { e.Slot, e.Drapeau, (446 - e.Y) * 64, (e.X - 3) * 64 }).ToArray();
-        return (champs, [objets, aff]);
+        // les bruts comme le jeu les ecrit (formules du labo du 22/11) : vaisseau x = vx / 64, y = 456 - vy / 64 ; ennemi x = ax / 64,
+        // y = 447 - ay / 64 (ay = mot +2, ax = mot +4)
+        var champs = new int[CanalScenarioSimule.Champs.Length];
+        champs[CanalScenarioSimule.Temps] = 100;
+        champs[CanalScenarioSimule.Distance] = distance;
+        champs[CanalScenarioSimule.Vies] = 2;
+        champs[CanalScenarioSimule.Niveau] = 1;
+        (champs[CanalScenarioSimule.VaisseauX], champs[CanalScenarioSimule.VaisseauY]) = CanalScenarioSimule.BrutDuVaisseau(sx, sy);
+        champs[CanalScenarioSimule.Combo] = 40;
+        var objets = ennemis.Where(e => e.Type != 0).OrderBy(e => e.Slot).Select(e => new[] { e.Slot, e.Type, e.Vie }).ToArray();
+        var aff = ennemis.OrderBy(e => e.Slot).Select(e =>
+        {
+            var (ay, ax) = CanalScenarioSimule.BrutDeLAffichage(e.X, e.Y);
+            return new[] { e.Slot, e.Drapeau, ay, ax };
+        }).ToArray();
+        return (champs, [objets, aff, []]);
     }
 
     [Fact]
     public void Le_descripteur_et_un_bloc_se_relisent_comme_le_wrapper_les_ecrit()
     {
         var (e, d) = Neuf(4242);
-        Assert.Equal("dodonpachi-daioujou.VIEW", d.Nom);
-        Assert.Equal(["temps", "distance", "vies", "niveau", "camera", "vaisseau_x", "vaisseau_y"], d.Champs.Select(c => c.Nom));
-        Assert.Equal(["objets", "affichage"], d.Tables.Select(t => t.Nom));
-        Assert.Equal(["drapeau", "x", "y"], d.Tables[1].Colonnes.Select(c => c.Nom));
+        Assert.Equal("dodonpachi-daioujou", d.Nom);
+        Assert.Equal(["temps", "distance", "defil_fin", "camera", "niveau", "vies", "vaisseau_x", "vaisseau_y", "mort_anim", "invincible", "combo", "chaine_bcd"],
+            d.Champs.Select(c => c.Nom));
+        Assert.Equal(["objets", "affichage", "tirs"], d.Tables.Select(t => t.Nom));
+        Assert.Equal(["type", "vie"], d.Tables[0].Colonnes.Select(c => c.Nom));
+        Assert.Equal(["drapeau", "ay", "ax"], d.Tables[1].Colonnes.Select(c => c.Nom));
 
-        var (champs, tables) = Bloc(321, 112, 380, (5, 0x8200, 100, 200, 9, 0xA000));
+        var (champs, tables) = Bloc(321, 112, 380, (5, 0x8200, 100, 200, 9, 0xA200));
         e.Ecrire(77, champs, tables);
         var bloc = new CanalBloc(d);
         Assert.True(CanalFormat.Lire(e.Tampon, d, bloc));
@@ -50,7 +64,7 @@ public class CanalDuDeckTests
         var aff = bloc.Tables[d.Table("affichage")];
         Assert.Equal(1, aff.Ecrites);
         Assert.Equal(5, aff.Emplacement(0));
-        Assert.Equal(0xA000, aff.Colonne(0, 0));
+        Assert.Equal(0xA200, aff.Colonne(0, 0));
         Assert.Equal(0u, CanalFormat.Sequence(e.Tampon) & 1);   // paire : stable
     }
 
@@ -63,7 +77,7 @@ public class CanalDuDeckTests
         var tronque = e.Tampon.AsSpan(0, e.Tampon.Length - 10);
         Assert.Null(CanalFormat.LireDescripteur(tronque));
         // un autre .VIEW (empreinte differente) : le bloc ne colle plus au descripteur lu avant
-        var autre = CanalScenarioSimule.DaiOuJou(2, "autre.VIEW");
+        var autre = CanalScenarioSimule.DaiOuJou(2, "autre");
         Assert.False(CanalFormat.Lire(autre.Tampon, d, new CanalBloc(d)));
     }
 
@@ -73,7 +87,7 @@ public class CanalDuDeckTests
         var (e, d) = Neuf();
         var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
         Assert.True(calcul.Utile);
-        var (champs, tables) = Bloc(321, 112, 380, (5, 0x8200, 100, 200, 9, 0xA000));
+        var (champs, tables) = Bloc(321, 112, 380, (5, 0x8200, 100, 200, 9, 0xA200));
         e.Ecrire(1, champs, tables);
         var bloc = new CanalBloc(d);
         CanalFormat.Lire(e.Tampon, d, bloc);
@@ -85,6 +99,40 @@ public class CanalDuDeckTests
         Assert.Equal(448, m.ScreenH);
         Assert.Equal([112, 380], m.Ship);
         Assert.Equal([5, 100, 200, 1, 9], m.Enemies);   // emplacement, x, y, classe lourde, vie
+        Assert.Equal([40, 56], m.Combo);                // jauge du combo : maximum du profil (le .VIEW n'a pas de combo_max)
+    }
+
+    [Fact]
+    public void Les_formules_sont_celles_mesurees_par_le_labo()
+    {
+        // valeurs brutes relevees par le labo (RAPPORT_LABO_VIEW, 22/11) : vaisseau x = vx / 64, y = 456 - vy / 64 (pas de +3) ;
+        // ennemi x = ax / 64, y = 447 - ay / 64 (ay = mot +2, ax = mot +4)
+        var (e, d) = Neuf();
+        var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
+        var champs = new int[CanalScenarioSimule.Champs.Length];
+        champs[CanalScenarioSimule.Vies] = 2;
+        champs[CanalScenarioSimule.VaisseauX] = 6400;    // 100 px
+        champs[CanalScenarioSimule.VaisseauY] = 6400;    // 456 - 100 = 356
+        e.Ecrire(1, champs, [[[3, 0x1101, 100]], [[3, 0xA201, 12800, 3200]], []]);
+        var bloc = new CanalBloc(d);
+        CanalFormat.Lire(e.Tampon, d, bloc);
+        var m = calcul.Convertir(bloc);
+        Assert.Equal([100, 356], m.Ship);
+        Assert.Equal([3, 50, 247, 0, 100], m.Enemies);   // x = 3200 / 64, y = 447 - 12800 / 64
+    }
+
+    [Fact]
+    public void Une_case_non_dessinee_ou_de_vie_nulle_n_est_pas_un_ennemi()
+    {
+        var (e, d) = Neuf();
+        var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
+        var bloc = new CanalBloc(d);
+        // 0xA200 et 0xA201 (les plus frequents en jeu) sont DESSINES ; 0x8200 ne l'est pas ; un ventilateur 0x0500 a une vie nulle
+        var (champs, tables) = Bloc(10, 100, 380,
+            (1, 0x1101, 60, 100, 1, 0xA200), (2, 0x1101, 70, 110, 1, 0xA201), (3, 0x1101, 80, 120, 1, 0x8200), (4, 0x0500, 90, 130, 0, 0xA200));
+        e.Ecrire(1, champs, tables);
+        CanalFormat.Lire(e.Tampon, d, bloc);
+        Assert.Equal([1, 60, 100, 0, 1, 2, 70, 110, 0, 1], calcul.Convertir(bloc).Enemies);
     }
 
     [Fact]
@@ -94,9 +142,9 @@ public class CanalDuDeckTests
         var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
         var bloc = new CanalBloc(d);
 
-        // trois cases affichees : un ennemi, un effet SANS objet (case libre), un drapeau cache
+        // trois cases : un ennemi, un effet dessine SANS objet (case libre), une case non dessinee (drapeau sans 0x2000)
         var (champs, tables) = Bloc(10, 100, 380,
-            (1, 0x1101, 60, 100, 1, 0xA000), (2, 0, 80, 120, 0, 0xA000), (3, 0x1101, 90, 130, 1, 0xA200));
+            (1, 0x1101, 60, 100, 1, 0xA000), (2, 0, 80, 120, 0, 0xA000), (3, 0x1101, 90, 130, 1, 0x8200));
         e.Ecrire(1, champs, tables);
         CanalFormat.Lire(e.Tampon, d, bloc);
         var avant = calcul.Convertir(bloc);
@@ -142,7 +190,7 @@ public class CanalDuDeckTests
         var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
         var bloc = new CanalBloc(d);
         var (c, t) = Bloc(0, 112, 380);
-        c[2] = 255;   // vies : 255 hors partie
+        c[CanalScenarioSimule.Vies] = 255;   // vies : 255 hors partie
         e.Ecrire(1, c, t);
         CanalFormat.Lire(e.Tampon, d, bloc);
         Assert.Null(calcul.Convertir(bloc).Ship);
@@ -152,7 +200,7 @@ public class CanalDuDeckTests
     public void Plus_de_soixante_quatre_ennemis_sont_plafonnes()
     {
         var e = new CanalEcrivainSimule("grand.VIEW", CanalScenarioSimule.Champs,
-            [new("objets", 100, 100, ["type", "script", "vie"]), new("affichage", 100, 100, ["drapeau", "x", "y"])], 3);
+            [new("objets", 100, 100, ["type", "vie"]), new("affichage", 100, 100, ["drapeau", "ay", "ax"])], 3);
         var d = CanalFormat.LireDescripteur(e.Tampon)!;
         var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
         var gens = Enumerable.Range(0, 90).Select(i => (i, 0x1101, 10 + i, 50, 1, 0xA000)).ToArray();
@@ -238,7 +286,7 @@ public class CanalDuDeckTests
         e.Creer(pid);
         using var lecteur = CanalLecteur.Ouvrir(pid);
         Assert.NotNull(lecteur);
-        Assert.Equal("dodonpachi-daioujou.VIEW", lecteur!.Descripteur.Nom);
+        Assert.Equal("dodonpachi-daioujou", lecteur!.Descripteur.Nom);
 
         // le wrapper ecrit pendant que l'API lit : chaque bloc lu est entier (le champ « temps » vaut le numero d'image)
         using var fin = new CancellationTokenSource();

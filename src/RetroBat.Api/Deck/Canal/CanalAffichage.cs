@@ -56,37 +56,59 @@ public sealed record DeckLive
     /// <summary>La vie du boss : <c>[vie, vie la plus haute vue depuis son apparition]</c>, ou null.</summary>
     public int[]? Boss { get; init; }
 
-    /// <summary>La minuterie du combo : <c>[valeur, maximum]</c> si le .VIEW la porte (champs combo et combo_max), sinon null.</summary>
+    /// <summary>La minuterie du combo : <c>[valeur, maximum]</c> si le .VIEW porte le champ combo (maximum : champ combo_max, sinon celui
+    /// du profil, 56 pour DaiOuJou), sinon null.</summary>
     public int[]? Combo { get; init; }
+}
+
+/// <summary>Un axe d'ecran : pixel = brut x echelle + decalage, arrondi. Calcul pur.</summary>
+public readonly record struct CanalAxe(double Echelle, double Decalage)
+{
+    public int Pixel(int brut) => (int)Math.Round(brut * Echelle + Decalage);
 }
 
 /// <summary>
 /// Le sens du bloc d'un jeu : comment les valeurs brutes du canal deviennent des pixels d'ecran. Un profil par jeu, ecrit avec le
-/// releve du labo (les formules viennent du profil d'atlas de ScoreLab, 19-20/11). Calcul pur.
+/// labo du jeu qui a prouve son .VIEW (noms des champs et des colonnes, formules, filtre des ennemis). Calcul pur.
 /// </summary>
+/// <param name="ColonneX">La colonne de la table d'affichage qui donne le x d'ECRAN (le jeu peut etre tourne : nommee par le .VIEW).</param>
+/// <param name="ColonneY">La colonne de la table d'affichage qui donne le y d'ECRAN.</param>
+/// <param name="MasqueDessine">Le bit du drapeau d'affichage qui dit « dessine » (0 : drapeau non controle).</param>
+/// <param name="VieRequise">Un ennemi doit avoir une vie non nulle (vie 0 : decor ou objet, jamais publie).</param>
+/// <param name="ComboMax">Le maximum de la jauge du combo quand le .VIEW n'a pas de champ <c>combo_max</c> (0 : inconnu).</param>
 public sealed record CanalProfilAffichage(
     string Id,
     int EcranL,
     int EcranH,
-    double EchelleX, double DecalageX, bool XDepuisY,
-    double EchelleY, double DecalageY,
+    CanalAxe VaisseauX, CanalAxe VaisseauY,
+    string ColonneX, string ColonneY,
+    CanalAxe EnnemiX, CanalAxe EnnemiY,
+    int MasqueDessine,
+    bool VieRequise,
+    int ComboMax,
     double CameraEchelle,
     IReadOnlyDictionary<int, int> Classes,
-    IReadOnlyList<int> Caches,
     IReadOnlyList<string> Roms)
 {
     /// <summary>
-    /// DoDonPachi DaiOuJou Black Label (ddpdojblka, FBNeo) : ecran portrait 224 x 448 ; les mots de la table d'affichage sont en 8.8 et
-    /// tournes : x_ecran = 4 x mot(+4) / 256 + 3, y_ecran = 446 - 4 x mot(+2) / 256. Le vaisseau suit la meme rotation (0x103E6 pour x,
-    /// 0x103E4 pour y). La camera : s16 / 64 pixels. Classes proposees par le labo (l leger, h lourd, s special, g generique).
+    /// DoDonPachi DaiOuJou Black Label (ddpdojblka, FBNeo 800f25e9) : ecran portrait 224 x 448, y vers le bas. Formules du labo du
+    /// .VIEW (22/11, <c>dodonpachi-daioujou.VIEW</c>, preuves dans RAPPORT_LABO_VIEW) : vaisseau x = vaisseau_x / 64, y = 456 -
+    /// vaisseau_y / 64 (gabarit sur 247 captures d'une partie reelle) ; ennemi x = ax / 64, y = 447 - ay / 64 (ax = mot +4, ay = mot
+    /// +2 de la table d'affichage, surimpressions des niveaux 1 et 2). Le « +3 » de l'ancien profil d'atlas n'est pas repris : aucune
+    /// mesure ne le prouve. Ennemi = case DESSINEE (drapeau &amp; 0x2000) ET occupee (type non nul) ET de vie non nulle (vie 0 :
+    /// ventilateurs, pieces du decor). La jauge du combo (champ combo, 0 a 56) a un maximum constant de 56. Camera : s16 / 64 pixels.
+    /// Classes proposees par le labo (l leger, h lourd, s special, g generique), a valider par le user.
     /// </summary>
     public static readonly CanalProfilAffichage DaiOuJou = new(
         "daioujou", 224, 448,
-        EchelleX: 4.0 / 256.0, DecalageX: 3, XDepuisY: true,
-        EchelleY: -4.0 / 256.0, DecalageY: 446,
+        VaisseauX: new(1.0 / 64.0, 0), VaisseauY: new(-1.0 / 64.0, 456),
+        ColonneX: "ax", ColonneY: "ay",
+        EnnemiX: new(1.0 / 64.0, 0), EnnemiY: new(-1.0 / 64.0, 447),
+        MasqueDessine: 0x2000,
+        VieRequise: true,
+        ComboMax: 56,
         CameraEchelle: 1.0 / 64.0,
         Classes: ClassesDaiOuJou(),
-        Caches: [0xA200, 0xA201],
         Roms: ["ddpdojblka", "ddpdojblk", "ddpdoj", "ddpdojh"]);
 
     private static Dictionary<int, int> ClassesDaiOuJou()
@@ -163,8 +185,8 @@ public sealed class CanalAffichageCalcul
         _tAff = d.Table("affichage");
         _tObj = d.Table("objets");
         _cDrapeau = _tAff < 0 ? -1 : d.Tables[_tAff].Colonne("drapeau");
-        _cX = _tAff < 0 ? -1 : d.Tables[_tAff].Colonne("x");
-        _cY = _tAff < 0 ? -1 : d.Tables[_tAff].Colonne("y");
+        _cX = _tAff < 0 ? -1 : d.Tables[_tAff].Colonne(profil.ColonneX);
+        _cY = _tAff < 0 ? -1 : d.Tables[_tAff].Colonne(profil.ColonneY);
         _cType = _tObj < 0 ? -1 : d.Tables[_tObj].Colonne("type");
         _cVie = _tObj < 0 ? -1 : d.Tables[_tObj].Colonne("vie");
     }
@@ -188,9 +210,9 @@ public sealed class CanalAffichageCalcul
         int[]? ship = null;
         if (_iShipX >= 0 && _iShipY >= 0 && (_iLives < 0 || b.Champs[_iLives] != 255))
         {
-            // x vient du second mot (rotation du jeu), y du premier : voir CanalProfilAffichage.DaiOuJou
-            var sx = (int)Math.Round(b.Champs[_iShipX] * p.EchelleX + p.DecalageX);
-            var sy = (int)Math.Round(b.Champs[_iShipY] * p.EchelleY + p.DecalageY);
+            // formules du vaisseau du profil (DaiOuJou : x = vaisseau_x / 64, y = 456 - vaisseau_y / 64)
+            var sx = p.VaisseauX.Pixel(b.Champs[_iShipX]);
+            var sy = p.VaisseauY.Pixel(b.Champs[_iShipY]);
             ship = [Math.Clamp(sx, 0, p.EcranL), Math.Clamp(sy, 0, p.EcranH)];
         }
 
@@ -212,14 +234,15 @@ public sealed class CanalAffichageCalcul
             Ship = ship,
             Enemies = ennemis,
             Boss = boss,
-            Combo = _iCombo >= 0 ? [b.Champs[_iCombo], _iComboMax >= 0 ? b.Champs[_iComboMax] : 0] : null,
+            Combo = _iCombo >= 0 ? [b.Champs[_iCombo], _iComboMax >= 0 ? b.Champs[_iComboMax] : p.ComboMax] : null,
         };
     }
 
     /// <summary>
-    /// Les ennemis vivants a l'ecran : une case de la table d'affichage dessinee (drapeau non cache) ET occupee dans la table des
-    /// objets (type non nul : une case libre n'est pas un ennemi). Les deux tables ont le meme rang, les deux listes sont triees par
-    /// emplacement : un seul passage.
+    /// Les ennemis vivants a l'ecran : une case de la table d'affichage DESSINEE (drapeau portant le masque du profil) ET occupee
+    /// dans la table des objets (type non nul : une case libre n'est pas un ennemi) ET, si le profil le veut, de vie non nulle (vie
+    /// 0 : decor, pieces). Les deux tables ont le meme rang, les deux listes sont triees par emplacement : un seul passage. Les
+    /// autres tables du .VIEW (les tirs de DaiOuJou) ne sont pas lues.
     /// </summary>
     private int[] Ennemis(CanalBloc b, out int[]? boss)
     {
@@ -237,7 +260,7 @@ public sealed class CanalAffichageCalcul
         for (var e = 0; e < aff.Ecrites && k < MaxEnnemis; e++)
         {
             var slot = aff.Emplacement(e);
-            if (_cDrapeau >= 0 && IndexOf(p.Caches, aff.Colonne(e, _cDrapeau) & 0xFFFF)) continue;
+            if (_cDrapeau >= 0 && p.MasqueDessine != 0 && (aff.Colonne(e, _cDrapeau) & p.MasqueDessine) == 0) continue;
             var type = -1;
             var vie = 0;
             if (obj is not null)
@@ -247,11 +270,12 @@ public sealed class CanalAffichageCalcul
                 if (_cType >= 0) type = obj.Colonne(o, _cType) & 0xFFFF;
                 if (_cVie >= 0) vie = obj.Colonne(o, _cVie) & 0xFFFF;
                 if (type == 0) continue;
+                if (p.VieRequise && _cVie >= 0 && vie == 0) continue;   // decor ou objet : jamais un ennemi
             }
 
-            // x_ecran vient du mot « y » de la table, y_ecran du mot « x » (le jeu est tourne) : voir le profil
-            var sx = (int)Math.Round(aff.Colonne(e, _cY) * p.EchelleX + p.DecalageX);
-            var sy = (int)Math.Round(aff.Colonne(e, _cX) * p.EchelleY + p.DecalageY);
+            // colonnes nommees par le .VIEW selon l'axe d'ECRAN (DaiOuJou : ax = mot +4 pour x, ay = mot +2 pour y, jeu tourne)
+            var sx = p.EnnemiX.Pixel(aff.Colonne(e, _cX));
+            var sy = p.EnnemiY.Pixel(aff.Colonne(e, _cY));
             var cls = type < 0 ? 3 : p.ClasseDe(type);
             var i = k * 5;
             sortie[i] = slot; sortie[i + 1] = sx; sortie[i + 2] = sy; sortie[i + 3] = cls; sortie[i + 4] = vie;
@@ -269,12 +293,6 @@ public sealed class CanalAffichageCalcul
 
         if (k != n) Array.Resize(ref sortie, k * 5);
         return sortie;
-    }
-
-    private static bool IndexOf(IReadOnlyList<int> l, int v)
-    {
-        for (var i = 0; i < l.Count; i++) if (l[i] == v) return true;
-        return false;
     }
 
     /// <summary>Le message a-t-il change depuis le precedent publie (hors numero et image) ? Pur, sert a ne publier que sur changement.</summary>
