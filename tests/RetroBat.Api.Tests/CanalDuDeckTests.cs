@@ -136,6 +136,31 @@ public class CanalDuDeckTests
     }
 
     [Fact]
+    public void Un_mot_negatif_est_hors_de_l_ecran_et_le_vaisseau_mort_n_est_pas_publie()
+    {
+        // banc d'integration (wrapper 0.348 signe, 22/11) : des cases dessinees portent ay = 64 478 ou ax = 64 980 (s16 negatifs :
+        // juste sous l'ecran, juste a gauche) ; lus en u16 ils tombaient a y = -560 ou x = 1 015
+        var (e, d) = Neuf();
+        var calcul = new CanalAffichageCalcul(CanalProfilAffichage.DaiOuJou, d, "ddpdojblka");
+        var champs = new int[CanalScenarioSimule.Champs.Length];
+        champs[CanalScenarioSimule.Vies] = 1;
+        (champs[CanalScenarioSimule.VaisseauX], champs[CanalScenarioSimule.VaisseauY]) = CanalScenarioSimule.BrutDuVaisseau(56, 392);
+        champs[8] = 14;   // mort_anim : le vaisseau explose
+        e.Ecrire(1, champs, [[[1, 0x1101, 100], [2, 0x1101, 100], [3, 0x1101, 100]],
+            [[1, 0xA200, 64478, 15872], [2, 0xA200, 6300, 64580], [3, 0xA200, 12800, 3200]], []]);
+        var bloc = new CanalBloc(d);
+        CanalFormat.Lire(e.Tampon, d, bloc);
+        var m = calcul.Convertir(bloc);
+        Assert.Equal([3, 50, 247, 0, 100], m.Enemies);
+        Assert.Null(m.Ship);
+
+        champs[8] = 0;
+        e.Ecrire(2, champs, [[], [], []]);
+        CanalFormat.Lire(e.Tampon, d, bloc);
+        Assert.Equal([56, 392], calcul.Convertir(bloc).Ship);
+    }
+
+    [Fact]
     public void Un_ennemi_detruit_disparait_et_les_effets_ne_sont_pas_des_ennemis()
     {
         var (e, d) = Neuf();

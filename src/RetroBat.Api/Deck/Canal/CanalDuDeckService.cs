@@ -183,6 +183,8 @@ public sealed class CanalDuDeckService : IHostedService, IDisposable
         {
             var l = CanalLecteur.Ouvrir(pid);
             if (l is null) continue;
+            // un canal FERME (jeu decharge, processus encore vivant) ne se rouvre pas : il a deja ete dit une fois
+            if (l.Lire(out var premier) && premier.Etat == CanalFormat.EtatFerme) { l.Dispose(); continue; }
             var calcul = Calcul(l, rom);
             if (calcul is null) { l.Dispose(); continue; }
             _journal?.LogInformation("Canal du Deck : ouvert pour {Rom} (pid {Pid}, vue {Vue}).", rom, pid, l.Descripteur.Nom);

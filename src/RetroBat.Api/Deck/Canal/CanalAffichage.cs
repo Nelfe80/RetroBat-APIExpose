@@ -75,6 +75,8 @@ public readonly record struct CanalAxe(double Echelle, double Decalage)
 /// <param name="ColonneY">La colonne de la table d'affichage qui donne le y d'ECRAN.</param>
 /// <param name="MasqueDessine">Le bit du drapeau d'affichage qui dit « dessine » (0 : drapeau non controle).</param>
 /// <param name="VieRequise">Un ennemi doit avoir une vie non nulle (vie 0 : decor ou objet, jamais publie).</param>
+/// <param name="CoordonneesSignees">Les mots de position de la table d'affichage sont des s16 (un objet juste hors de l'ecran, a
+/// gauche ou en bas, porte un mot negatif lu 65 xxx en u16) ; un ennemi hors de l'ecran n'est jamais publie.</param>
 /// <param name="ComboMax">Le maximum de la jauge du combo quand le .VIEW n'a pas de champ <c>combo_max</c> (0 : inconnu).</param>
 public sealed record CanalProfilAffichage(
     string Id,
@@ -85,6 +87,7 @@ public sealed record CanalProfilAffichage(
     CanalAxe EnnemiX, CanalAxe EnnemiY,
     int MasqueDessine,
     bool VieRequise,
+    bool CoordonneesSignees,
     int ComboMax,
     double CameraEchelle,
     IReadOnlyDictionary<int, int> Classes,
@@ -106,6 +109,7 @@ public sealed record CanalProfilAffichage(
         EnnemiX: new(1.0 / 64.0, 0), EnnemiY: new(-1.0 / 64.0, 447),
         MasqueDessine: 0x2000,
         VieRequise: true,
+        CoordonneesSignees: true,
         ComboMax: 56,
         CameraEchelle: 1.0 / 64.0,
         Classes: ClassesDaiOuJou(),
@@ -161,7 +165,7 @@ public sealed class CanalAffichageCalcul
     private readonly CanalProfilAffichage _profil;
     private readonly CanalDescripteur _d;
     private readonly string _rom;
-    private readonly int _iDist, _iCamera, _iShipX, _iShipY, _iStage, _iLives, _iTick, _iCombo, _iComboMax;
+    private readonly int _iDist, _iCamera, _iShipX, _iShipY, _iStage, _iLives, _iTick, _iCombo, _iComboMax, _iMort;
     private readonly int _tAff, _tObj, _cDrapeau, _cX, _cY, _cType, _cVie;
     private uint _epoch = uint.MaxValue;
     private long _seq;
@@ -181,6 +185,7 @@ public sealed class CanalAffichageCalcul
         _iLives = d.Champ("vies");
         _iTick = d.Champ("temps");
         _iCombo = d.Champ("combo");
+        _iMort = d.Champ("mort_anim");
         _iComboMax = d.Champ("combo_max");
         _tAff = d.Table("affichage");
         _tObj = d.Table("objets");
@@ -208,7 +213,9 @@ public sealed class CanalAffichageCalcul
 
         var p = _profil;
         int[]? ship = null;
-        if (_iShipX >= 0 && _iShipY >= 0 && (_iLives < 0 || b.Champs[_iLives] != 255))
+        // pas de vaisseau hors partie (vies 255), pendant l'animation de mort (mort_anim > 0, 31 images par mort au labo) ni a 0,0
+        if (_iShipX >= 0 && _iShipY >= 0 && (_iLives < 0 || b.Champs[_iLives] != 255)
+            && (_iMort < 0 || b.Champs[_iMort] == 0) && (b.Champs[_iShipX] != 0 || b.Champs[_iShipY] != 0))
         {
             // formules du vaisseau du profil (DaiOuJou : x = vaisseau_x / 64, y = 456 - vaisseau_y / 64)
             var sx = p.VaisseauX.Pixel(b.Champs[_iShipX]);
@@ -241,7 +248,7 @@ public sealed class CanalAffichageCalcul
     /// <summary>
     /// Les ennemis vivants a l'ecran : une case de la table d'affichage DESSINEE (drapeau portant le masque du profil) ET occupee
     /// dans la table des objets (type non nul : une case libre n'est pas un ennemi) ET, si le profil le veut, de vie non nulle (vie
-    /// 0 : decor, pieces). Les deux tables ont le meme rang, les deux listes sont triees par emplacement : un seul passage. Les
+    /// 0 : decor, pieces) ET a l'ecran. Les deux tables ont le meme rang, les deux listes sont triees par emplacement : un seul passage. Les
     /// autres tables du .VIEW (les tirs de DaiOuJou) ne sont pas lues.
     /// </summary>
     private int[] Ennemis(CanalBloc b, out int[]? boss)
@@ -274,8 +281,12 @@ public sealed class CanalAffichageCalcul
             }
 
             // colonnes nommees par le .VIEW selon l'axe d'ECRAN (DaiOuJou : ax = mot +4 pour x, ay = mot +2 pour y, jeu tourne)
-            var sx = p.EnnemiX.Pixel(aff.Colonne(e, _cX));
-            var sy = p.EnnemiY.Pixel(aff.Colonne(e, _cY));
+            var bx = aff.Colonne(e, _cX);
+            var by = aff.Colonne(e, _cY);
+            if (p.CoordonneesSignees) { bx = (short)bx; by = (short)by; }
+            var sx = p.EnnemiX.Pixel(bx);
+            var sy = p.EnnemiY.Pixel(by);
+            if (sx < 0 || sx > p.EcranL || sy < 0 || sy > p.EcranH) continue;   // hors de l'ecran : rien a dessiner
             var cls = type < 0 ? 3 : p.ClasseDe(type);
             var i = k * 5;
             sortie[i] = slot; sortie[i + 1] = sx; sortie[i + 2] = sy; sortie[i + 3] = cls; sortie[i + 4] = vie;
