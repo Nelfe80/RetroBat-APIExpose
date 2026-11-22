@@ -739,10 +739,17 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
 public sealed record MultiplayerInstalledGame(MultiplayerGame Game, string Path, MultiplayerCore? Core, string ContentKey)
 {
     /// <summary>Le panneau propose les choix du niveau NelfePlay quand un depart pret existe pour ce contenu.</summary>
-    public bool ChoixOuverts => Game.EstNelfePlay && Game.Choices is { Count: > 0 } && Game.ADesDepartsPour(ContentKey);
+    public bool ChoixOuverts => Game.EstNelfePlay && Game.Choices is { Count: > 0 } && Game.ADesDepartsPour(ContentKey, EmpreinteDuCoeur());
+
+    /// <summary>
+    /// DEUX JEUX D'ETATS (22/11) : l'empreinte de la dll du coeur installe, lue seulement quand le jeu a des etats propres a un
+    /// coeur (le fichier fait 60 Mo ; l'empreinte est memorisee tant qu'il ne change pas). Null sinon : tout etat vaut.
+    /// </summary>
+    private string? EmpreinteDuCoeur()
+        => Game.ADesEtatsParCoeur ? RetroBat.Api.Speedrun.EtatsParCoeur.EmpreinteDuCoeurInstalle(Core?.Core) : null;
 
     /// <summary>Le depart pret d'une partie a <paramref name="joueurs"/> sur ce contenu ; null : elle se joue en classique.</summary>
-    public MultiplayerStart? DepartPour(int joueurs) => Game.EstNelfePlay ? Game.DepartPour(joueurs, ContentKey) : null;
+    public MultiplayerStart? DepartPour(int joueurs) => Game.EstNelfePlay ? Game.DepartPour(joueurs, ContentKey, EmpreinteDuCoeur()) : null;
 
     /// <summary>Le depart par place d'une partie a <paramref name="joueurs"/> sur ce contenu, ou null.</summary>
     public MultiplayerCoreStart? DepartDuCoeurPour(int joueurs) => Game.CoreStart is { } depart && depart.VautPour(joueurs, ContentKey) ? depart : null;

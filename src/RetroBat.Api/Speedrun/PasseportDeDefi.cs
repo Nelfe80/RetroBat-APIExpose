@@ -111,8 +111,8 @@ public static class PasseportDeDefi
     /// Le depart sur etat pour le passeport, comme celui de MULTIPLAYER : l'empreinte de l'etat (game.start_state_sha256, que le
     /// site compare aux departs admis du defi) et le seul chargement qu'il explique. Null pour un demarrage normal.
     /// </summary>
-    public static JsonObject? Depart(Reglement reglement)
-        => reglement.Etat is { } etat
+    public static JsonObject? Depart(Reglement reglement, string? empreinteDuCoeur = null)
+        => (reglement.Etats.Count > 0 && empreinteDuCoeur is not null ? reglement.EtatPour(empreinteDuCoeur) ?? reglement.Etat : reglement.Etat) is { } etat
             ? new JsonObject { ["etat"] = etat.Sha256, ["choix"] = new JsonArray(), ["chargements_permis"] = 1 }
             : null;
 

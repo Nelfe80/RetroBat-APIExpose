@@ -289,8 +289,20 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         if (reglement.StartPolicy != "normal_boot")
         {
             if (reglement.Etat is null) return (null, new(false, "state_missing"));
-            var (octets, refus) = EtatsDesDefis.Lire(reglement.Etat);
-            if (octets is null) return (null, new(false, refus ?? "state_missing", reglement.Etat.Fichier));
+            // DEUX JEUX D'ETATS (22/11) : l'etat du coeur INSTALLE (empreinte de sa dll, lue avant le lancement). Un coeur que
+            // aucun etat ne nomme ne recoit rien : un etat d'une autre taille plante l'ancien coeur et est refuse par le nouveau.
+            var choisi = reglement.Etat;
+            if (reglement.Etats.Count > 0 || reglement.Etat.Coeurs is { Count: > 0 })
+            {
+                var coeur = reglement.Coeurs.FirstOrDefault(c => c.Length > 0);
+                var empreinte = EtatsParCoeur.EmpreinteDuCoeurInstalle(coeur);
+                choisi = reglement.EtatPour(empreinte);
+                if (choisi is null)
+                    return (null, new(false, empreinte is null ? "core_missing" : "core_state_unknown", coeur + " " + (empreinte is null ? "" : empreinte[..16])));
+            }
+
+            var (octets, refus) = EtatsDesDefis.Lire(choisi);
+            if (octets is null) return (null, new(false, refus ?? "state_missing", choisi.Fichier));
             etat = octets;
         }
 

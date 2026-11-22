@@ -3840,7 +3840,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             Trace($"video : bornes de l'epreuve dans le replay {replay} : frames {bornes.Debut} a {bornes.Fin}");
         }
         brouillon["defi"] = RetroBat.Api.Speedrun.PasseportDeDefi.Decrire(defi.Reglement, defi.Tentative);
-        if (RetroBat.Api.Speedrun.PasseportDeDefi.Depart(defi.Reglement) is { } departDuDefi) brouillon["depart"] = departDuDefi;
+        if (RetroBat.Api.Speedrun.PasseportDeDefi.Depart(defi.Reglement, _coreSha256) is { } departDuDefi) brouillon["depart"] = departDuDefi;
         // L'identifiant de la tentative est celui du passeport : un renvoi revient en « duplicate ».
         if (Guid.TryParse(defi.Tentative.AttemptId, out var tentative)) brouillon["id"] = tentative.ToString();
         await PoserEtEnvoyerAsync(brouillon, frames, cancellationToken).ConfigureAwait(false);
