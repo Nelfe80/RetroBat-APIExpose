@@ -177,7 +177,8 @@ public sealed class CanalDuDeckService : IHostedService, IDisposable
     private (CanalLecteur?, CanalAffichageCalcul?, string) Chercher()
     {
         var simule = Simule();
-        var rom = simule?.Rom ?? CanalDuDeck.RomDemandee();
+        // la demande vaut 10 min, mais un jeu peut arriver plus tard (22/11 : emulatorLauncher a telecharge un coeur 13 min) : la ROM du Deck pose fait foi
+        var rom = simule?.Rom ?? CanalDuDeck.RomDemandee() ?? CanalDuDeck.RomEnCours();
         if (rom is null || CanalProfilAffichage.Pour(rom) is null) return (null, null, "");
         foreach (var pid in PidsCandidats(simule?.Pid))
         {
