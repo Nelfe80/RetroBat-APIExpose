@@ -271,6 +271,28 @@ public class CanalDuDeckTests
             CanalDuDeck.Ecrire(sans, "ddpdojblka");
             Assert.Equal("rom=ddpdojblka\n", sans.ToString());
             Assert.Null(CanalDuDeck.RomDemandee());
+            Assert.Null(CanalDuDeck.RomEnCours());
+        }
+        finally
+        {
+            CanalDuDeck.Retirer();
+        }
+    }
+
+    [Fact]
+    public void Un_canal_ouvert_reste_voulu_toute_la_partie_au_dela_de_la_validite_de_la_demande()
+    {
+        // relecture d'integration 1.9.211 : la demande vaut 10 min pour la cle de certified.txt, mais une partie dure plus longtemps ;
+        // le service ne lache le canal qu'au retrait (fin de partie, Deck retire, MULTIPLAYER)
+        var t0 = DateTime.UtcNow - CanalDuDeck.Validite - TimeSpan.FromMinutes(30);
+        CanalDuDeck.Retirer();
+        try
+        {
+            Assert.True(CanalDuDeck.Demander("ddpdojblka", t0));
+            Assert.Null(CanalDuDeck.RomDemandee());                 // perimee pour la cle et la recherche au lancement
+            Assert.Equal("ddpdojblka", CanalDuDeck.RomEnCours());   // mais le canal ouvert reste lu
+            CanalDuDeck.Retirer();
+            Assert.Null(CanalDuDeck.RomEnCours());
         }
         finally
         {

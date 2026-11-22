@@ -312,7 +312,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
                 return;
             }
 
-            if (Canal.CanalDuDeck.RomDemandee() is { } rom)
+            if (Canal.CanalDuDeck.RomEnCours() is { } rom)
             {
                 Canal.CanalDuDeck.Retirer();
                 RetroBat.Api.Infrastructure.CertifiedSettingsService.PoserLesVerrous(rom);
@@ -356,7 +356,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
 
         _etat?.PoserLeLancement(null);
         // pas de Deck, pas de canal (MULTIPLAYER : decision 4 du 22/11)
-        if (Canal.CanalDuDeck.RomDemandee() is { } romCanal)
+        if (Canal.CanalDuDeck.RomEnCours() is { } romCanal)
         {
             Canal.CanalDuDeck.Retirer();
             try { RetroBat.Api.Infrastructure.CertifiedSettingsService.PoserLesVerrous(romCanal); }

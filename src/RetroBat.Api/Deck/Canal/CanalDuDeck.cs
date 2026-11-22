@@ -52,13 +52,23 @@ public static class CanalDuDeck
         }
     }
 
-    /// <summary>La ROM dont le canal est demande en ce moment, ou null.</summary>
+    /// <summary>La ROM dont le canal est demande en ce moment (demande encore valide : avant le lancement du jeu), ou null.</summary>
     public static string? RomDemandee(DateTime? maintenant = null)
     {
         lock (Verrou)
         {
             return _rom is not null && (maintenant ?? DateTime.UtcNow) <= _jusqua ? _rom : null;
         }
+    }
+
+    /// <summary>
+    /// La ROM du Deck pose tant qu'il n'est pas retire (fin de partie, Deck retire, MULTIPLAYER), SANS la validite de la demande :
+    /// un canal deja ouvert reste lu pendant toute la partie. La validite de 10 min ne vaut que pour l'ecriture de la cle et pour la
+    /// recherche du canal au lancement (relecture d'integration 1.9.211 : le canal etait lache 10 min apres la pose du Deck).
+    /// </summary>
+    public static string? RomEnCours()
+    {
+        lock (Verrou) { return _rom; }
     }
 
     /// <summary>Ajoute la cle au texte de certified.txt de cette ROM, si le canal est demande pour elle.</summary>

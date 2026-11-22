@@ -93,8 +93,9 @@ public sealed class CanalDuDeckService : IHostedService, IDisposable
                     continue;
                 }
 
-                // le Deck est retire ou la partie finie : on lache le canal (le wrapper le garde tant que le jeu tourne)
-                if (Simule() is null && CanalDuDeck.RomDemandee() is null)
+                // le Deck est retire ou la partie finie : on lache le canal (le wrapper le garde tant que le jeu tourne). Jamais
+                // sur la seule validite de la demande (10 min) : une partie dure plus longtemps.
+                if (Simule() is null && CanalDuDeck.RomEnCours() is null)
                 {
                     Publier(calcul!.Inactif("closed"), ref dernier, ref dernierAt);
                     Lacher(ref lecteur, ref calcul);
