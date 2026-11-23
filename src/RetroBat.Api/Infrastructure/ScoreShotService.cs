@@ -59,13 +59,20 @@ public sealed class ScoreShotService : BackgroundService
     // État de la partie en cours.
     private string _romGroup = "";
     private string _systemId = "";
-    private long? _seuil;                 // null = le tableau n'est pas plein, tout entre
     private bool _seuilConnu;
-    private bool _plusPetitEstMeilleur;
-    private bool _arme;                   // le record est tombé : la photo de cette partie est prise
-    private long _scorePhotographie;
+    private readonly Dictionary<string, SeuilDeRegle> _regles = new(StringComparer.OrdinalIgnoreCase);
+    private int _photosDeLaPartie;
     private readonly NelfePlayScoringReporter? _rapporteur;
-    private string? _enAttente;           // le fichier gardé pour cette partie
+
+    /// <summary>Le seuil d'UNE règle du jeu (1cc, 1lc, 1cc-extended...) et ce qu'il est devenu dans cette partie.</summary>
+    private sealed class SeuilDeRegle
+    {
+        public long? Seuil;              // null = le tableau n'est pas plein, tout entre
+        public bool PlusPetitEstMeilleur;
+        public bool Arme;                // le record de CETTE règle est tombé : sa photo est prise
+        public long ScorePhotographie;
+        public string? Fichier;          // le fichier gardé pour cette règle
+    }
 
     public ScoreShotService(IEventBus bus, RetroArchReplayClient retroarch,
         MameLuaIngameProvider mame, NelfePlayDeviceStore devices, IHttpClientFactory httpFactory,
@@ -126,7 +133,7 @@ public sealed class ScoreShotService : BackgroundService
         // L'atelier de NelfeScoreLab : rien ne sera publie, et ses captures sont celles du Lab.
         if (RetroBat.Api.Scoring.ScoreLabAtelier.IsActive(DateTime.UtcNow, out _))
         {
-            lock (_gate) { _romGroup = rom; _systemId = systeme; _seuilConnu = false; _seuil = null; _arme = false; _scorePhotographie = 0; }
+            lock (_gate) { _romGroup = rom; _systemId = systeme; _seuilConnu = false; _regles.Clear(); _photosDeLaPartie = 0; }
             _logger.LogInformation("Capture record : {Rom} sous l'atelier NelfeScoreLab, pas de photo.", rom);
             return;
         }
@@ -137,14 +144,14 @@ public sealed class ScoreShotService : BackgroundService
         // score sans objet, pris pour un record battu.
         if (_partie is { EstSpeedrun: true })
         {
-            lock (_gate) { _romGroup = rom; _systemId = systeme; _seuilConnu = false; _seuil = null; _arme = false; _scorePhotographie = 0; }
+            lock (_gate) { _romGroup = rom; _systemId = systeme; _seuilConnu = false; _regles.Clear(); _photosDeLaPartie = 0; }
             _logger.LogInformation("Capture record : {Rom} en epreuve, pas de photo de score.", rom);
             return;
         }
 
         if (_partie is { EstNelfePlay: false })
         {
-            lock (_gate) { _romGroup = rom; _systemId = systeme; _seuilConnu = false; _seuil = null; _arme = false; _scorePhotographie = 0; }
+            lock (_gate) { _romGroup = rom; _systemId = systeme; _seuilConnu = false; _regles.Clear(); _photosDeLaPartie = 0; }
             _logger.LogInformation("Capture record : {Rom} hors NelfePlay, pas de photo.", rom);
             return;
         }
@@ -153,7 +160,7 @@ public sealed class ScoreShotService : BackgroundService
         {
             if (_romGroup == rom && _seuilConnu) return;
             _romGroup = rom; _systemId = systeme;
-            _seuilConnu = false; _seuil = null; _arme = false; _scorePhotographie = 0;
+            _seuilConnu = false; _regles.Clear(); _photosDeLaPartie = 0;
         }
 
         try
@@ -161,30 +168,55 @@ public sealed class ScoreShotService : BackgroundService
             var credential = ResolveCredential();
             var client = _httpFactory.CreateClient();
             client.Timeout = TimeSpan.FromSeconds(8);
-            var url = NelfePlayAgentService.BaseUrl.TrimEnd('/')
-                + "/api/v1/scores/threshold?top=" + TailleDuTop
-                + "&rom_group=" + Uri.EscapeDataString(rom);
-            using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            if (!string.IsNullOrEmpty(credential)) request.Headers.Add("X-NelfePlay-Device", credential);
-            using var response = await client.SendAsync(request).ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode) return;
+            var racineUrl = NelfePlayAgentService.BaseUrl.TrimEnd('/');
 
-            using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
-            var racine = doc.RootElement;
-            long? seuil = racine.TryGetProperty("threshold", out var t) && t.ValueKind == JsonValueKind.Number
-                ? t.GetInt64() : null;
-            var bas = racine.TryGetProperty("direction", out var d)
-                && d.GetString() == "lower_better";
+            // CHAQUE CLASSEMENT A SA CAPTURE (decision du user du 23/11) : pas seulement le 1CC, aussi le 1LC et les modes
+            // speciaux. La regle jouee n'est connue qu'a la fin de la partie ; on demande donc le seuil de CHAQUE regle
+            // solo ouverte du jeu, et on photographie quand l'une d'elles est franchie (une photo par regle).
+            string[] regles;
+            using (var rp = new HttpRequestMessage(HttpMethod.Get, racineUrl + "/api/v1/agent/scores/profile?system_id="
+                + Uri.EscapeDataString(systeme) + "&rom_group=" + Uri.EscapeDataString(rom)))
+            {
+                if (!string.IsNullOrEmpty(credential)) rp.Headers.Add("X-NelfePlay-Device", credential);
+                using var rep = await client.SendAsync(rp).ConfigureAwait(false);
+                if (!rep.IsSuccessStatusCode) return;
+                regles = ScoreShotRegles.ReglesPhotographiables(await rep.Content.ReadAsStringAsync().ConfigureAwait(false));
+            }
+
+            var trouves = new Dictionary<string, SeuilDeRegle>(StringComparer.OrdinalIgnoreCase);
+            foreach (var regle in regles)
+            {
+                var url = racineUrl + "/api/v1/scores/threshold?top=" + TailleDuTop
+                    + "&rom_group=" + Uri.EscapeDataString(rom)
+                    + "&ruleset=" + Uri.EscapeDataString(regle)
+                    + (systeme.Length > 0 ? "&system=" + Uri.EscapeDataString(systeme) : "");
+                using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                if (!string.IsNullOrEmpty(credential)) request.Headers.Add("X-NelfePlay-Device", credential);
+                using var response = await client.SendAsync(request).ConfigureAwait(false);
+                if (!response.IsSuccessStatusCode) continue;
+
+                using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+                var racine = doc.RootElement;
+                // Le site rend une reponse « vide » (ruleset vide) quand il ne connait pas la regle : on l'ecarte.
+                if (!racine.TryGetProperty("ruleset", out var rs) || !string.Equals(rs.GetString(), regle, StringComparison.OrdinalIgnoreCase)) continue;
+                long? seuil = racine.TryGetProperty("threshold", out var t) && t.ValueKind == JsonValueKind.Number
+                    ? t.GetInt64() : null;
+                var bas = racine.TryGetProperty("direction", out var d) && d.GetString() == "lower_better";
+                trouves[regle] = new SeuilDeRegle { Seuil = seuil, PlusPetitEstMeilleur = bas };
+                _logger.LogInformation(
+                    "Capture record : {Rom} regle {Regle} : record (top {Top}) {Condition}.",
+                    rom, regle, TailleDuTop,
+                    seuil is null ? "sans condition (classement incomplet)"
+                        : (bas ? "sous " : "au-dessus de ") + seuil.Value.ToString("N0"));
+            }
 
             lock (_gate)
             {
-                _seuil = seuil; _plusPetitEstMeilleur = bas; _seuilConnu = true;
+                if (_romGroup != rom) return;   // une autre partie a commence pendant les appels
+                _regles.Clear();
+                foreach (var kv in trouves) _regles[kv.Key] = kv.Value;
+                _seuilConnu = _regles.Count > 0;
             }
-            _logger.LogInformation(
-                "Capture record : {Rom} bat le record (top {Top}) {Condition}.",
-                rom, TailleDuTop,
-                seuil is null ? "sans condition (classement incomplet)"
-                    : (bas ? "sous " : "au-dessus de ") + seuil.Value.ToString("N0"));
         }
         catch (Exception ex)
         {
@@ -201,27 +233,31 @@ public sealed class ScoreShotService : BackgroundService
         // Un score vu hors de la fenetre de jeu (demo apres la partie) n'est jamais un record (21/11).
         if (_rapporteur?.ScoreHorsPartie() == true) return;
 
-        bool photographier;
-        bool recordExistant;
+        List<string> nouvelles;
+        var recordExistant = false;
         lock (_gate)
         {
             if (!_seuilConnu || _romGroup.Length == 0) return;
 
-            // Une seule photo par partie : celle de l'instant où le record tombe. Un record
-            // déjà battu dans cette partie ne se rephotographie pas, quoi que fasse le score.
-            if (_arme) return;
-            _arme = _seuil is null
-                ? total > 0
-                : (_plusPetitEstMeilleur ? total < _seuil.Value : total > _seuil.Value);
-            if (!_arme) return;
-            _scorePhotographie = total;
-            photographier = true;
-            recordExistant = _seuil is not null;
-            _logger.LogInformation("Capture record : {Rom} dépasse le record à {Score}.", _romGroup, total.ToString("N0"));
+            // Une seule photo par REGLE et par partie : celle de l'instant où le record de cette règle tombe. Un record
+            // déjà battu dans cette partie ne se rephotographie pas, quoi que fasse le score. Une même image sert les
+            // règles qui tombent au même instant.
+            nouvelles = new List<string>();
+            foreach (var (regle, e) in _regles)
+            {
+                if (e.Arme) continue;
+                if (!ScoreShotRegles.Franchit(e.Seuil, e.PlusPetitEstMeilleur, total)) continue;
+                if (nouvelles.Count == 0 && _photosDeLaPartie >= ScoreShotRegles.PhotosMaxParPartie) continue;
+                e.Arme = true; e.ScorePhotographie = total;
+                nouvelles.Add(regle);
+                recordExistant |= e.Seuil is not null;
+                _logger.LogInformation("Capture record : {Rom} dépasse le record de {Regle} à {Score}.", _romGroup, regle, total.ToString("N0"));
+            }
+            if (nouvelles.Count == 0) return;
+            _photosDeLaPartie++;
         }
 
-        if (!photographier) return;
-        await PhotographierAsync().ConfigureAwait(false);
+        await PhotographierAsync(nouvelles, total).ConfigureAwait(false);
 
         // La plaque NEW RECORD au Deck (demande du user du 17/11) : le flash de RetroArch dit « capture », la plaque dit
         // « record battu ». Seulement quand un record existait : le premier score d'un jeu sans record n'en bat aucun.
@@ -237,7 +273,7 @@ public sealed class ScoreShotService : BackgroundService
     /// d'origine du jeu ; une capture de fenêtre rendrait ce que cet écran-là affiche, mis à
     /// l'échelle et filtré, et dépendrait de l'affichage de la borne.
     /// </summary>
-    private async Task PhotographierAsync()
+    private async Task PhotographierAsync(IReadOnlyList<string> regles, long score)
     {
         var avant = DateTime.UtcNow.AddSeconds(-1);   // marge d'horloge sur l'écriture du fichier
         var parMame = _mame.EstConnecte;
@@ -266,16 +302,28 @@ public sealed class ScoreShotService : BackgroundService
         try
         {
             Directory.CreateDirectory(DossierLocal);
-            var destination = Path.Combine(DossierLocal, "pending.png");
+            var destination = Path.Combine(DossierLocal, "pending-" + ScoreShotRegles.NomDeFichier(regles[0]) + ".png");
             // DÉPLACER, pas copier : le dossier des captures appartient au joueur, et on ne va
             // pas y laisser une image par sommet. Si la fenêtre de deux secondes nous faisait
             // adopter une capture prise à la main au même instant, elle serait ici, pas perdue.
             File.Move(apparu, destination, overwrite: true);
             // Meme raison que pour la regeneration : le tampon du coeur n'est pas oriente.
             if (OperatingSystem.IsWindows()) ScoreShotImage.Redresser(destination, _systemId, _romGroup, _logger);
-            lock (_gate) { _enAttente = destination; }
-            _logger.LogInformation("Capture record : image gardée pour {Rom} à {Score}.",
-                _romGroup, _scorePhotographie.ToString("N0"));
+            var gardes = new List<(string Regle, string Fichier)> { (regles[0], destination) };
+            // Les autres règles tombées au même instant partagent l'image (une copie chacune : elles montent et s'effacent seules).
+            for (var i = 1; i < regles.Count; i++)
+            {
+                var copie = Path.Combine(DossierLocal, "pending-" + ScoreShotRegles.NomDeFichier(regles[i]) + ".png");
+                File.Copy(destination, copie, overwrite: true);
+                gardes.Add((regles[i], copie));
+            }
+            lock (_gate)
+            {
+                foreach (var (regle, fichier) in gardes)
+                    if (_regles.TryGetValue(regle, out var e)) e.Fichier = fichier;
+            }
+            _logger.LogInformation("Capture record : image gardée pour {Rom} ({Regles}) à {Score}.",
+                _romGroup, string.Join(", ", regles), score.ToString("N0"));
         }
         catch (Exception ex) { _logger.LogWarning(ex, "Capture record : image non conservée."); }
     }
@@ -337,25 +385,30 @@ public sealed class ScoreShotService : BackgroundService
     }
 
 
-    /// <summary>Le verdict est tombé : l'image monte si le score a été publié, sinon elle part.</summary>
+    /// <summary>Le verdict est tombé : l'image de SA règle monte si le score a été publié, sinon elle part.
+    /// Une partie envoie un verdict par classement (1CC puis 1LC...) : chacun prend l'image de sa règle.</summary>
     private async Task OnVerdictAsync(JsonElement root)
     {
+        var regle = Texte(root, "Ruleset");
         string? fichier;
-        lock (_gate) { fichier = _enAttente; }
+        lock (_gate)
+        {
+            fichier = _regles.TryGetValue(regle, out var e) ? e.Fichier : null;
+        }
         if (fichier is null) return;
 
         var statut = Texte(root, "Status");
         var session = Texte(root, "SessionId");
         if (statut != "published" || session.Length == 0)
         {
-            Oublier($"verdict « {(statut.Length > 0 ? statut : "inconnu")} »");
+            OublierRegle(regle, $"verdict « {(statut.Length > 0 ? statut : "inconnu")} »");
             return;
         }
 
         try
         {
             var credential = ResolveCredential();
-            if (string.IsNullOrEmpty(credential)) { Oublier("machine non appairée"); return; }
+            if (string.IsNullOrEmpty(credential)) { OublierRegle(regle, "machine non appairée"); return; }
 
             var octets = await File.ReadAllBytesAsync(fichier).ConfigureAwait(false);
             var client = _httpFactory.CreateClient();
@@ -371,7 +424,7 @@ public sealed class ScoreShotService : BackgroundService
 
             using var response = await client.SendAsync(request).ConfigureAwait(false);
             var corps = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            _logger.LogInformation("Capture record : envoi {Code} - {Corps}", (int)response.StatusCode, corps);
+            _logger.LogInformation("Capture record : envoi {Regle} {Code} - {Corps}", regle, (int)response.StatusCode, corps);
         }
         catch (Exception ex)
         {
@@ -379,24 +432,40 @@ public sealed class ScoreShotService : BackgroundService
         }
         finally
         {
-            // Dans tous les cas on ne garde rien : l'image d'une partie finie n'a plus d'usage
+            // Dans tous les cas on ne garde rien de cette règle : l'image d'une partie finie n'a plus d'usage
             // ici, et la plateforme est la seule à décider si elle valait d'être conservée.
-            Oublier("envoi terminé");
+            OublierRegle(regle, "envoi terminé");
         }
     }
 
-    private void Oublier(string raison)
+    /// <summary>Efface l'image d'une seule règle (son verdict est tombé) ; les autres attendent le leur.</summary>
+    private void OublierRegle(string regle, string raison)
     {
-        string? fichier;
+        string? fichier = null;
         lock (_gate)
         {
-            fichier = _enAttente;
-            _enAttente = null;
-            _arme = false; _scorePhotographie = 0;
+            if (_regles.TryGetValue(regle, out var e)) { fichier = e.Fichier; e.Fichier = null; }
         }
         if (fichier is null) return;
         try { File.Delete(fichier); } catch { /* elle repartira au prochain remplacement */ }
-        _logger.LogDebug("Capture record : image écartée ({Raison}).", raison);
+        _logger.LogDebug("Capture record : image de {Regle} écartée ({Raison}).", regle, raison);
+    }
+
+    /// <summary>Nouvelle partie : toutes les images en attente partent (les verdicts de la précédente sont passés).</summary>
+    private void Oublier(string raison)
+    {
+        List<string> fichiers;
+        lock (_gate)
+        {
+            fichiers = _regles.Values.Where(e => e.Fichier is not null).Select(e => e.Fichier!).ToList();
+            foreach (var e in _regles.Values) { e.Fichier = null; e.Arme = false; e.ScorePhotographie = 0; }
+            _photosDeLaPartie = 0;
+        }
+        foreach (var f in fichiers)
+        {
+            try { File.Delete(f); } catch { /* elle repartira au prochain remplacement */ }
+        }
+        if (fichiers.Count > 0) _logger.LogDebug("Capture record : {N} image(s) écartée(s) ({Raison}).", fichiers.Count, raison);
     }
 
     private string? ResolveCredential()

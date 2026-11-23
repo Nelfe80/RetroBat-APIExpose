@@ -275,16 +275,17 @@ public sealed class ReplayPlaybackController : ControllerBase
     [HttpGet("shots/candidates")]
     public async Task<IActionResult> ShotCandidates(
         [FromServices] RetroBat.Api.Infrastructure.ScoreShotRegenerator regenerateur,
-        CancellationToken ct)
+        CancellationToken ct, [FromQuery(Name = "rom_group")] string? romGroup = null,
+        [FromQuery] string? ruleset = null, [FromQuery(Name = "missing_only")] bool missingOnly = false, [FromQuery] string? scope = null)
     {
         if (!IsLocalCaller()) return NotFound();
-        var candidats = await regenerateur.CandidatsAsync(ct);
+        var candidats = await regenerateur.CandidatsAsync(ct, new RetroBat.Api.Infrastructure.ScoreShotRegenerator.Filtre(romGroup, ruleset, missingOnly, scope == "public"));
         return Ok(new
         {
             total = candidats.Count,
             candidates = candidats.Select(c => new
             {
-                rom_group = c.RomGroup, ruleset = c.Ruleset, score = c.Score,
+                rom_group = c.RomGroup, ruleset = c.Ruleset, score = c.Score, has_shot = c.ADejaUneImage,
                 replay_id = c.ReplayId, session_id = c.SessionId, frame = c.TargetFrame,
             }),
         });
@@ -299,10 +300,11 @@ public sealed class ReplayPlaybackController : ControllerBase
     [HttpPost("shots/regenerate")]
     public async Task<IActionResult> RegenerateShots(
         [FromServices] RetroBat.Api.Infrastructure.ScoreShotRegenerator regenerateur,
-        CancellationToken ct, [FromQuery] int limit = 5)
+        CancellationToken ct, [FromQuery] int limit = 5, [FromQuery(Name = "rom_group")] string? romGroup = null,
+        [FromQuery] string? ruleset = null, [FromQuery(Name = "missing_only")] bool missingOnly = false, [FromQuery] string? scope = null)
     {
         if (!IsLocalCaller()) return NotFound();
-        var r = await regenerateur.RunAsync(limit, ct);
+        var r = await regenerateur.RunAsync(limit, ct, new RetroBat.Api.Infrastructure.ScoreShotRegenerator.Filtre(romGroup, ruleset, missingOnly, scope == "public"));
         return Ok(new
         {
             ran = r.Ran, candidates = r.Candidates, captured = r.Captured,
