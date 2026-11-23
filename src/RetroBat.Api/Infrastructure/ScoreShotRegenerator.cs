@@ -52,7 +52,22 @@ public sealed class ScoreShotRegenerator
     }
 
     public sealed record Candidat(string SessionId, string ReplayId, string RomGroup, string Ruleset,
-        string SystemId, long Score, long TargetFrame);
+        string SystemId, long Score, long TargetFrame, bool ADejaUneImage = false);
+
+    /// <summary>
+    /// Ce qu'on veut rattraper : un jeu, une regle, et seulement les classements sans image. Le rattrapage des records deja
+    /// tenus (decision du user du 23/11 : chaque classement a sa capture) se fait jeu par jeu avec ce filtre, sans refaire
+    /// les images deja bonnes ; sans filtre, l'appel garde son sens d'avant (les N meilleurs scores de la machine).
+    /// </summary>
+    public sealed record Filtre(string? RomGroup = null, string? Ruleset = null, bool SeulementSansImage = false)
+    {
+        public static readonly Filtre Aucun = new();
+
+        public bool Retient(Candidat c)
+            => (string.IsNullOrEmpty(RomGroup) || string.Equals(c.RomGroup, RomGroup, StringComparison.OrdinalIgnoreCase))
+               && (string.IsNullOrEmpty(Ruleset) || string.Equals(c.Ruleset, Ruleset, StringComparison.OrdinalIgnoreCase))
+               && (!SeulementSansImage || !c.ADejaUneImage);
+    }
 
     public sealed record Rapport(bool Ran, int Candidates, int Captured, int Sent, string? Reason,
         IReadOnlyList<string> Details);
@@ -68,8 +83,9 @@ public sealed class ScoreShotRegenerator
     /// Nous ne gardons de son avis que ce que nous détenons vraiment : un replay dont le
     /// manifeste et l'objet manquent ne se rejoue pas, quoi qu'elle en dise.
     /// </summary>
-    public async Task<IReadOnlyList<Candidat>> CandidatsAsync(CancellationToken ct)
+    public async Task<IReadOnlyList<Candidat>> CandidatsAsync(CancellationToken ct, Filtre? filtre = null)
     {
+        filtre ??= Filtre.Aucun;
         var credential = _devices.GetCredential();
         if (string.IsNullOrEmpty(credential)) return Array.Empty<Candidat>();
 
@@ -112,13 +128,14 @@ public sealed class ScoreShotRegenerator
                 Texte(cible, "session_id"), replayId,
                 Texte(cible, "rom_group"), Texte(cible, "ruleset"), Texte(cible, "system_id"),
                 Nombre(cible, "score"),
-                Math.Max(manifest.Frames.Start, fin - MargeFrames)));
+                Math.Max(manifest.Frames.Start, fin - MargeFrames),
+                cible.TryGetProperty("has_shot", out var hs) && hs.ValueKind == JsonValueKind.True));
         }
-        return sortie.OrderByDescending(c => c.Score).ToList();
+        return sortie.Where(filtre.Retient).OrderByDescending(c => c.Score).ToList();
     }
 
     /// <summary>Rejoue, photographie et envoie. Une seule à la fois, jamais pendant autre chose.</summary>
-    public async Task<Rapport> RunAsync(int limit, CancellationToken ct)
+    public async Task<Rapport> RunAsync(int limit, CancellationToken ct, Filtre? filtre = null)
     {
         if (!await _uneSeuleAlaFois.WaitAsync(0, ct).ConfigureAwait(false))
             return new Rapport(false, 0, 0, 0, "deja_en_cours", Array.Empty<string>());
@@ -133,7 +150,7 @@ public sealed class ScoreShotRegenerator
             if (System.Diagnostics.Process.GetProcessesByName("retroarch").Length > 0)
                 return new Rapport(false, 0, 0, 0, "emulateur_en_cours", Array.Empty<string>());
 
-            var candidats = (await CandidatsAsync(ct).ConfigureAwait(false)).Take(Math.Max(1, limit)).ToList();
+            var candidats = (await CandidatsAsync(ct, filtre).ConfigureAwait(false)).Take(Math.Max(1, limit)).ToList();
             var details = new List<string>();
             int captures = 0, envoyes = 0;
 
