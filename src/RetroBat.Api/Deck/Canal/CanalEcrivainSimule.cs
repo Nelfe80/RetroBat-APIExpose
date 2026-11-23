@@ -29,7 +29,7 @@ public sealed class CanalEcrivainSimule : IDisposable
     /// <summary>Le bloc tel qu'il serait en memoire (les tests le lisent directement).</summary>
     public byte[] Tampon => _tampon;
 
-    public CanalEcrivainSimule(string nomVue, string[] champs, Table[] tables, uint pid)
+    public CanalEcrivainSimule(string nomVue, string[] champs, Table[] tables, uint pid, ushort version = 1)
     {
         _champs = champs;
         _tables = tables;
@@ -41,7 +41,7 @@ public sealed class CanalEcrivainSimule : IDisposable
         _offDonnees = CanalFormat.TailleEntete + desc;
         _tampon = new byte[_offDonnees + donnees];
         Ecrire32(0, CanalFormat.Signature);
-        Ecrire16(4, 1);
+        Ecrire16(4, version);              // 1 : wrapper 0.348 et plus ; 2 : .VIEW v2 (wrapper 0.350)
         Ecrire16(6, CanalFormat.TailleEntete);
         Ecrire32(8, (uint)_tampon.Length);   // taille UTILE (la vue du wrapper est arrondie a 4 Kio)
         Ecrire16(36, 1);
