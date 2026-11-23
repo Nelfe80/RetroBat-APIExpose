@@ -126,6 +126,51 @@ public sealed class NelfePlayMessageRouter
         return remis;
     }
 
+    /// <summary>Depuis quand un canal est-il ouvert pour au moins un message retenu (null : aucun) ?</summary>
+    private DateTime? _ouvertDepuisUtc;
+
+    /// <summary>
+    /// REMISE DES MESSAGES RETENUS, sans reseau, appelee par un petit tour de la borne (quelques secondes).
+    ///
+    /// Un message differe parce que la partie etait engagee ne revenait qu'au releve suivant (5 min, voire 1 h) :
+    /// il s'affichait tard ou expirait. Ici il repart des que la partie est finie.
+    /// <paramref name="calme"/> evite l'affichage ENTRE DEUX LANCEMENTS : le canal doit rester ouvert sans
+    /// interruption ce temps-la (un jeu qui redemarre aussitot referme le canal et remet le compteur a zero).
+    /// Sans message retenu, ne fait rien (aucun cout).
+    /// </summary>
+    public IReadOnlyList<string> RemettreAuRepos(TimeSpan calme)
+    {
+        bool aucun;
+        lock (_porte)
+        {
+            var maintenant = DateTime.UtcNow;
+            _enAttente.RemoveAll(m => m.Perime(maintenant));
+            aucun = _enAttente.Count == 0;
+        }
+
+        if (aucun)
+        {
+            _ouvertDepuisUtc = null;
+            return [];
+        }
+
+        Message[] candidats;
+        lock (_porte) { candidats = [.. _enAttente]; }
+
+        var jeu = _emulateurTourne();
+        var actif = GameplayActif();
+        var seuil = _options.CurrentValue.NelfePlay.InGameMessageLevel;
+        var ouvert = candidats.Any(m => Choisir(m.Niveau, jeu, actif, seuil) != Canal.Attendre);
+        if (!ouvert)
+        {
+            _ouvertDepuisUtc = null;
+            return [];
+        }
+
+        var depuis = _ouvertDepuisUtc ??= DateTime.UtcNow;
+        return DateTime.UtcNow - depuis < calme ? [] : Remettre();
+    }
+
     /// <summary>Le choix du canal, isole pour etre teste sans machine.</summary>
     internal enum Canal
     {

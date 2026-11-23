@@ -156,6 +156,66 @@ public class NelfePlayMessageRouterTests
         Assert.Equal(1, routeur.EnAttente);
     }
 
+    // ── Remise des messages retenus a la fin de la partie (23/11) ─────────────
+
+    private sealed class FauxEs : RetroBat.Domain.Interfaces.IEmulationStationNotificationService
+    {
+        public int Envoyes;
+        public Task NotifyAsync(string message, CancellationToken cancellationToken = default) { Envoyes++; return Task.CompletedTask; }
+        public Task MessageBoxAsync(string message, CancellationToken cancellationToken = default) => Task.CompletedTask;
+    }
+
+    [Fact]
+    public void Un_message_retenu_pendant_la_partie_part_des_la_fin_apres_le_calme()
+    {
+        var jeu = true;
+        var es = new FauxEs();
+        var routeur = new NelfePlayMessageRouter(new FauxOptionsMonitor(new ApiExposeOptions()), es, null, null, null, () => jeu);
+        routeur.Recevoir([new NelfePlayMessageRouter.Message("m1", "live.beaten", "score", "Record battu", 1800)]);
+        var calme = TimeSpan.FromMilliseconds(200);
+
+        Assert.Empty(routeur.RemettreAuRepos(calme));   // partie en cours : rien
+        Assert.Equal(1, routeur.EnAttente);
+
+        jeu = false;                                      // fin de partie
+        Assert.Empty(routeur.RemettreAuRepos(calme));   // calme pas ecoule
+        Thread.Sleep(300);
+        Assert.Equal(["m1"], routeur.RemettreAuRepos(calme));
+        Assert.Equal(1, es.Envoyes);
+        Assert.Equal(0, routeur.EnAttente);
+    }
+
+    [Fact]
+    public void Entre_deux_lancements_rien_ne_parait()
+    {
+        var jeu = false;
+        var es = new FauxEs();
+        var routeur = new NelfePlayMessageRouter(new FauxOptionsMonitor(new ApiExposeOptions()), es, null, null, null, () => jeu);
+        routeur.Recevoir([new NelfePlayMessageRouter.Message("m1", "live.beaten", "score", "Record battu", 1800)]);
+        var calme = TimeSpan.FromMilliseconds(300);
+
+        Assert.Empty(routeur.RemettreAuRepos(calme));
+        Thread.Sleep(200);
+        jeu = true;                                       // une autre partie demarre aussitot
+        Assert.Empty(routeur.RemettreAuRepos(calme));
+        jeu = false;
+        Assert.Empty(routeur.RemettreAuRepos(calme));   // le compteur repart de zero
+        Assert.Equal(0, es.Envoyes);
+        Thread.Sleep(400);
+        Assert.Equal(["m1"], routeur.RemettreAuRepos(calme));
+    }
+
+    [Fact]
+    public void Un_message_expire_pendant_la_partie_ne_se_remet_pas()
+    {
+        var es = new FauxEs();
+        var routeur = new NelfePlayMessageRouter(new FauxOptionsMonitor(new ApiExposeOptions()), es, null, null, null, () => false);
+        routeur.Recevoir([new NelfePlayMessageRouter.Message("m1", "live.beaten", "score", "Record battu", 1) { RecuUtc = DateTime.UtcNow.AddSeconds(-5) }]);
+        Assert.Empty(routeur.RemettreAuRepos(TimeSpan.Zero));
+        Assert.Equal(0, routeur.EnAttente);
+        Assert.Equal(0, es.Envoyes);
+    }
+
     private static NelfePlayMessageRouter Routeur() => new(
         new FauxOptionsMonitor(new ApiExposeOptions()),
         es: null,

@@ -185,6 +185,7 @@ public sealed class NelfePlayAgentService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         RetablirLePseudo();
+        _ = Task.Run(() => BoucleDesRetenusAsync(stoppingToken), stoppingToken);
         var echecs = 0;
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -211,6 +212,60 @@ public sealed class NelfePlayAgentService : BackgroundService
             // Recul apres echec (30 min au plus) et dispersion de 10 % (C-9, 14/11).
             await Task.Delay(CadenceDeFond.Prochaine(TimeSpan.FromSeconds(Math.Max(30, PollSeconds)), echecs, TimeSpan.FromMinutes(30)),
                 stoppingToken);
+        }
+    }
+
+    /// <summary>Cadence du tour des messages retenus (sans reseau tant que rien n'est retenu).</summary>
+    internal static readonly TimeSpan TourDesRetenus = TimeSpan.FromSeconds(3);
+
+    /// <summary>Calme exige avant d'afficher un message retenu : pas d'affichage entre deux lancements.</summary>
+    internal static readonly TimeSpan CalmeAvantRemise = TimeSpan.FromSeconds(4);
+
+    /// <summary>
+    /// Remet des la fin de la partie les messages que le routeur a retenus (23/11 : un message differe attendait le releve
+    /// suivant, 5 min voire 1 h, ou expirait). Aucune requete tant que rien n'est retenu ; l'acquittement ne part que pour
+    /// ce qui a ete affiche.
+    /// </summary>
+    private async Task BoucleDesRetenusAsync(CancellationToken ct)
+    {
+        if (_routeur is null)
+        {
+            return;
+        }
+
+        while (!ct.IsCancellationRequested)
+        {
+            try
+            {
+                await Task.Delay(TourDesRetenus, ct).ConfigureAwait(false);
+                if (!_device.IsPaired || _routeur.EnAttente == 0)
+                {
+                    continue;
+                }
+
+                var remis = _routeur.RemettreAuRepos(CalmeAvantRemise);
+                if (remis.Count == 0)
+                {
+                    continue;
+                }
+
+                var credential = _device.GetCredential();
+                using var client = CreateClient(credential);
+                using var contenu = JsonContent.Create(new { ids = remis });
+                using var reponse = await client.PostAsync("/api/v1/agent/messages/ack", contenu, ct).ConfigureAwait(false);
+                if (!reponse.IsSuccessStatusCode)
+                {
+                    _logger.LogDebug("Nelfe Play : acquittement des messages retenus refuse (HTTP {Code})", (int)reponse.StatusCode);
+                }
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                return;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Nelfe Play : remise des messages retenus impossible");
+            }
         }
     }
 
