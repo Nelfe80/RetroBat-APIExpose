@@ -924,19 +924,31 @@ public sealed class ReplayCaptureService : BackgroundService
 
             var destination = Path.Combine(_dossier, c.ReplayId + ".mkv");
             Effacer(destination);
-            File.Move(c.Fichier, destination);
-            var gardee = new CaptureGardee(c.ReplayId, destination, c.FrameDebut,
-                Math.Max(c.FrameDebut, derniereFrame ?? 0), DateTime.UtcNow,
-                Sessions: c.SansReplay ? SessionsDuFilm(c.ReplayId, null) : null, SansReplay: c.SansReplay,
-                Origine: origine, Rotation: c.Rotation,
-                Courbe: c.CopieDeLaCourbe(), FinDuRunS: c.FinDuRunS, DureeS: dureeAuStop,
-                Forme: c.Forme, Largeur: (int)entete.Largeur, Hauteur: (int)entete.Hauteur, Fond: c.Fond, Crt: c.Crt);
-            await File.WriteAllTextAsync(Path.Combine(_dossier, c.ReplayId + ".json"),
-                JsonSerializer.Serialize(gardee, Json), Encoding.UTF8, _arret).ConfigureAwait(false);
-            _logger.LogInformation("Capture : {ReplayId} gardee ({Taille} octets, {Format}, {Pourquoi}), en attente de la decision du site.",
-                c.ReplayId, new FileInfo(destination).Length,
-                origine ? "taille d'origine " + entete.Largeur + "x" + entete.Hauteur : "agrandi " + entete.Largeur + "x" + entete.Hauteur, pourquoi);
-            _reveil.Release();
+            // LA RELANCE D'UNE EPREUVE (23/11) : RetroArch, tue par la relance, tient encore son film ouvert : le deplacement
+            // reessaie. Peu de temps ici (l'operation bloque le film de la partie qui demarre), le reste en fond : le film de
+            // la partie precedente survit, sous son propre nom, sans que le nouveau le touche.
+            if (!await DeplacerAvecEssaisAsync(File.Move, c.Fichier, destination, EssaisSousVerrou, PauseSousVerrou, Attendre).ConfigureAwait(false))
+            {
+                _logger.LogInformation("Capture : {ReplayId}, film encore tenu par RetroArch, rangement repris en fond.", c.ReplayId);
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        if (await DeplacerAvecEssaisAsync(File.Move, c.Fichier, destination, EssaisEnFond, PauseEnFond, Attendre).ConfigureAwait(false))
+                            await RangerLeFilmAsync(c, derniereFrame, dureeAuStop, pourquoi, entete, origine, destination).ConfigureAwait(false);
+                        else
+                        {
+                            _logger.LogWarning("Capture : {ReplayId} perdue, le film reste tenu par RetroArch apres {Essais} essais.", c.ReplayId, EssaisEnFond);
+                            OublierLesSessions(c.ReplayId);
+                            SignalerNonCapture(c.ReplayId, "film_verrouille", "film tenu par RetroArch", c.Room);
+                        }
+                    }
+                    catch (OperationCanceledException) { /* arret de l'API */ }
+                    catch (Exception ex) { _logger.LogWarning(ex, "Capture : rangement en fond en echec."); }
+                });
+                return;
+            }
+            await RangerLeFilmAsync(c, derniereFrame, dureeAuStop, pourquoi, entete, origine, destination).ConfigureAwait(false);
         }
         catch (OperationCanceledException) { /* arret de l'API */ }
         catch (Exception ex)
@@ -947,6 +959,56 @@ public sealed class ReplayCaptureService : BackgroundService
         {
             _operation.Release();
         }
+    }
+
+    internal const int EssaisSousVerrou = 4;
+    internal static readonly TimeSpan PauseSousVerrou = TimeSpan.FromMilliseconds(1500);
+    internal const int EssaisEnFond = 12;
+    internal static readonly TimeSpan PauseEnFond = TimeSpan.FromSeconds(10);
+
+    private Task Attendre(TimeSpan d) => Task.Delay(d, _arret);
+
+    /// <summary>
+    /// Deplace un film que RetroArch peut encore tenir ouvert : nouvelle tentative a chaque IOException, la derniere
+    /// echoue sans lever. Meme mecanisme que celui des rencontres MULTIPLAYER. Vrai quand le film est a sa place.
+    /// </summary>
+    internal static async Task<bool> DeplacerAvecEssaisAsync(Action<string, string> deplacer, string source, string destination,
+        int essais, TimeSpan pause, Func<TimeSpan, Task> attendre)
+    {
+        for (var essai = 1; ; essai++)
+        {
+            try
+            {
+                deplacer(source, destination);
+                return true;
+            }
+            catch (IOException) when (essai < essais)
+            {
+                await attendre(pause).ConfigureAwait(false);
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+        }
+    }
+
+    /// <summary>La fiche du film range : ce que le site decide, puis l'envoi.</summary>
+    private async Task RangerLeFilmAsync(CaptureEnCours c, long? derniereFrame, double dureeAuStop, string pourquoi,
+        EnteteVideo entete, bool origine, string destination)
+    {
+        var gardee = new CaptureGardee(c.ReplayId, destination, c.FrameDebut,
+            Math.Max(c.FrameDebut, derniereFrame ?? 0), DateTime.UtcNow,
+            Sessions: c.SansReplay ? SessionsDuFilm(c.ReplayId, null) : null, SansReplay: c.SansReplay,
+            Origine: origine, Rotation: c.Rotation,
+            Courbe: c.CopieDeLaCourbe(), FinDuRunS: c.FinDuRunS, DureeS: dureeAuStop,
+            Forme: c.Forme, Largeur: (int)entete.Largeur, Hauteur: (int)entete.Hauteur, Fond: c.Fond, Crt: c.Crt);
+        await File.WriteAllTextAsync(Path.Combine(_dossier, c.ReplayId + ".json"),
+            JsonSerializer.Serialize(gardee, Json), Encoding.UTF8, _arret).ConfigureAwait(false);
+        _logger.LogInformation("Capture : {ReplayId} gardee ({Taille} octets, {Format}, {Pourquoi}), en attente de la decision du site.",
+            c.ReplayId, new FileInfo(destination).Length,
+            origine ? "taille d'origine " + entete.Largeur + "x" + entete.Hauteur : "agrandi " + entete.Largeur + "x" + entete.Hauteur, pourquoi);
+        _reveil.Release();
     }
 
     /// <summary>
@@ -977,19 +1039,9 @@ public sealed class ReplayCaptureService : BackgroundService
             while (DirectEnCours() && DateTime.UtcNow < limite)
                 await Task.Delay(TimeSpan.FromSeconds(5), _arret).ConfigureAwait(false);
             var destination = Path.Combine(_dossier, c.ReplayId + ".mkv");
-            for (var essai = 1; ; essai++)
-            {
-                try
-                {
-                    Effacer(destination);
-                    File.Move(c.Fichier, destination);
-                    break;
-                }
-                catch (IOException) when (essai < 12)
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(10), _arret).ConfigureAwait(false);
-                }
-            }
+            Effacer(destination);
+            if (!await DeplacerAvecEssaisAsync(File.Move, c.Fichier, destination, EssaisEnFond, PauseEnFond, Attendre).ConfigureAwait(false))
+                throw new IOException("film de la rencontre tenu par RetroArch");
             var entete = MatroskaEntete.Lire(destination);
             var origine = entete is { Origine: true };
             if (entete is null || (entete.Couchee && !(origine && c.Rotation is 1 or 3)))
