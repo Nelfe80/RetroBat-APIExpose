@@ -276,10 +276,10 @@ public sealed class ReplayPlaybackController : ControllerBase
     public async Task<IActionResult> ShotCandidates(
         [FromServices] RetroBat.Api.Infrastructure.ScoreShotRegenerator regenerateur,
         CancellationToken ct, [FromQuery(Name = "rom_group")] string? romGroup = null,
-        [FromQuery] string? ruleset = null, [FromQuery(Name = "missing_only")] bool missingOnly = false)
+        [FromQuery] string? ruleset = null, [FromQuery(Name = "missing_only")] bool missingOnly = false, [FromQuery] string? scope = null)
     {
         if (!IsLocalCaller()) return NotFound();
-        var candidats = await regenerateur.CandidatsAsync(ct, new RetroBat.Api.Infrastructure.ScoreShotRegenerator.Filtre(romGroup, ruleset, missingOnly));
+        var candidats = await regenerateur.CandidatsAsync(ct, new RetroBat.Api.Infrastructure.ScoreShotRegenerator.Filtre(romGroup, ruleset, missingOnly, scope == "public"));
         return Ok(new
         {
             total = candidats.Count,
@@ -301,10 +301,10 @@ public sealed class ReplayPlaybackController : ControllerBase
     public async Task<IActionResult> RegenerateShots(
         [FromServices] RetroBat.Api.Infrastructure.ScoreShotRegenerator regenerateur,
         CancellationToken ct, [FromQuery] int limit = 5, [FromQuery(Name = "rom_group")] string? romGroup = null,
-        [FromQuery] string? ruleset = null, [FromQuery(Name = "missing_only")] bool missingOnly = false)
+        [FromQuery] string? ruleset = null, [FromQuery(Name = "missing_only")] bool missingOnly = false, [FromQuery] string? scope = null)
     {
         if (!IsLocalCaller()) return NotFound();
-        var r = await regenerateur.RunAsync(limit, ct, new RetroBat.Api.Infrastructure.ScoreShotRegenerator.Filtre(romGroup, ruleset, missingOnly));
+        var r = await regenerateur.RunAsync(limit, ct, new RetroBat.Api.Infrastructure.ScoreShotRegenerator.Filtre(romGroup, ruleset, missingOnly, scope == "public"));
         return Ok(new
         {
             ran = r.Ran, candidates = r.Candidates, captured = r.Captured,

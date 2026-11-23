@@ -52,14 +52,14 @@ public sealed class ScoreShotRegenerator
     }
 
     public sealed record Candidat(string SessionId, string ReplayId, string RomGroup, string Ruleset,
-        string SystemId, long Score, long TargetFrame, bool ADejaUneImage = false);
+        string SystemId, long Score, long TargetFrame, bool ADejaUneImage = false, string ObjectSha256 = "", bool Publique = false);
 
     /// <summary>
     /// Ce qu'on veut rattraper : un jeu, une regle, et seulement les classements sans image. Le rattrapage des records deja
     /// tenus (decision du user du 23/11 : chaque classement a sa capture) se fait jeu par jeu avec ce filtre, sans refaire
     /// les images deja bonnes ; sans filtre, l'appel garde son sens d'avant (les N meilleurs scores de la machine).
     /// </summary>
-    public sealed record Filtre(string? RomGroup = null, string? Ruleset = null, bool SeulementSansImage = false)
+    public sealed record Filtre(string? RomGroup = null, string? Ruleset = null, bool SeulementSansImage = false, bool Publics = false)
     {
         public static readonly Filtre Aucun = new();
 
@@ -67,6 +67,13 @@ public sealed class ScoreShotRegenerator
             => (string.IsNullOrEmpty(RomGroup) || string.Equals(c.RomGroup, RomGroup, StringComparison.OrdinalIgnoreCase))
                && (string.IsNullOrEmpty(Ruleset) || string.Equals(c.Ruleset, Ruleset, StringComparison.OrdinalIgnoreCase))
                && (!SeulementSansImage || !c.ADejaUneImage);
+    }
+
+    /// <summary>Ce que la relecture a releve : la frame photographiee et le score lu en memoire a la fin du rejeu.</summary>
+    private sealed class Prise
+    {
+        public long Frame;
+        public long? ScoreObserve;
     }
 
     public sealed record Rapport(bool Ran, int Candidates, int Captured, int Sent, string? Reason,
@@ -95,7 +102,7 @@ public sealed class ScoreShotRegenerator
             var client = _httpFactory.CreateClient();
             client.Timeout = TimeSpan.FromSeconds(15);
             using var request = new HttpRequestMessage(HttpMethod.Get,
-                NelfePlayAgentService.BaseUrl.TrimEnd('/') + "/api/v1/agent/scores/shot-targets?limit=50");
+                NelfePlayAgentService.BaseUrl.TrimEnd('/') + "/api/v1/agent/scores/shot-targets?limit=" + (filtre.Publics ? "200&scope=public" : "50"));
             request.Headers.Add("X-NelfePlay-Device", credential);
             using var response = await client.SendAsync(request, ct).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode) return Array.Empty<Candidat>();
@@ -115,7 +122,20 @@ public sealed class ScoreShotRegenerator
         foreach (var cible in racine.EnumerateArray())
         {
             var replayId = Texte(cible, "replay_id");
-            if (replayId.Length == 0 || !manifests.TryGetValue(replayId, out var manifest)) continue;
+            if (replayId.Length == 0) continue;
+            if (filtre.Publics)
+            {
+                // Replay d'une AUTRE machine : ni manifeste ni objet ici, la lecture les va chercher (manifeste de la plateforme,
+                // objet du miroir). La frame visee se calcule apres, sur le manifeste recu.
+                sortie.Add(new Candidat(
+                    Texte(cible, "session_id"), replayId,
+                    Texte(cible, "rom_group"), Texte(cible, "ruleset"), Texte(cible, "system_id"),
+                    Nombre(cible, "score"), 0,
+                    cible.TryGetProperty("has_shot", out var hsp) && hsp.ValueKind == JsonValueKind.True,
+                    Texte(cible, "object_sha256"), Publique: true));
+                continue;
+            }
+            if (!manifests.TryGetValue(replayId, out var manifest)) continue;
             // Les octets sont-ils là ? On regarde le fichier, sans le rehacher : la vérification
             // d'intégrité est le travail du lecteur, qui la fait déjà avant de lancer.
             if (!_store.HasObject(manifest.Object.Sha256)) continue;
@@ -157,16 +177,17 @@ public sealed class ScoreShotRegenerator
             foreach (var c in candidats)
             {
                 ct.ThrowIfCancellationRequested();
-                var image = await PhotographierAsync(c, ct).ConfigureAwait(false);
+                var prise = new Prise { Frame = c.TargetFrame };
+                var image = await PhotographierAsync(c, prise, ct).ConfigureAwait(false);
                 if (image is null)
                 {
                     details.Add($"{c.RomGroup} : aucune image");
                     continue;
                 }
                 captures++;
-                var reponse = await EnvoyerAsync(c, image, ct).ConfigureAwait(false);
+                var reponse = await EnvoyerAsync(c, image, prise, ct).ConfigureAwait(false);
                 if (reponse is not null) envoyes++;
-                details.Add($"{c.RomGroup} ({c.Score:N0}) frame {c.TargetFrame} : {reponse ?? "envoi impossible"}");
+                details.Add($"{c.RomGroup} ({c.Score:N0}) frame {prise.Frame}, score lu {(prise.ScoreObserve?.ToString("N0") ?? "-")} : {reponse ?? "envoi impossible"}");
                 try { File.Delete(image); } catch { }
             }
 
@@ -182,7 +203,7 @@ public sealed class ScoreShotRegenerator
     /// </summary>
     private const int EssaisMax = 4;
 
-    private async Task<string?> PhotographierAsync(Candidat c, CancellationToken ct)
+    private async Task<string?> PhotographierAsync(Candidat c, Prise prise, CancellationToken ct)
     {
         _logger.LogInformation("Capture record : relecture de {Rom} ({Score}) pour la frame {Frame}.",
             c.RomGroup, c.Score.ToString("N0"), c.TargetFrame);
@@ -212,6 +233,22 @@ public sealed class ScoreShotRegenerator
                 return null;
             }
 
+            // La fin de la course et la frame visee : deja connues pour un replay de cette machine ; pour un replay public,
+            // le manifeste vient d'arriver avec la lecture.
+            var manifeste = _store.GetManifest(c.ReplayId);
+            var finDeCourse = manifeste is null ? 0 : (manifeste.Frames.RunEnd ?? manifeste.Frames.ReplayEnd);
+            var cible = c.TargetFrame;
+            if (cible <= 0)
+            {
+                if (manifeste is null || finDeCourse <= 0)
+                {
+                    _logger.LogWarning("Capture record : pas de fin de course pour {ReplayId}.", c.ReplayId);
+                    return null;
+                }
+                cible = Math.Max(manifeste.Frames.Start, finDeCourse - MargeFrames);
+            }
+            prise.Frame = cible;
+
             var recul = (long)Math.Max(60, _playback.GetState().NominalFps * 5);
             var destination = Path.Combine(AppContext.BaseDirectory, "state", "nelfeplay", "scoreshots",
                 "regen-" + c.SessionId + ".png");
@@ -220,7 +257,7 @@ public sealed class ScoreShotRegenerator
 
             for (var essai = 0; essai < EssaisMax; essai++)
             {
-                var vise = Math.Max(0, c.TargetFrame - essai * recul);
+                var vise = Math.Max(0, cible - essai * recul);
 
                 // On vise la frame, puis on ATTEND de l'avoir atteinte : RetroArch rejoint le
                 // checkpoint le plus proche puis rejoue les entrées, donc l'arrivée n'est pas
@@ -272,8 +309,10 @@ public sealed class ScoreShotRegenerator
                         continue;
                     }
                 }
+                await LireLeScoreDeFinAsync(c, manifeste, finDeCourse, prise, paused, ct).ConfigureAwait(false);
                 return destination;
             }
+            await LireLeScoreDeFinAsync(c, manifeste, finDeCourse, prise, paused, ct).ConfigureAwait(false);
             return destination;
         }
         finally
@@ -283,6 +322,51 @@ public sealed class ScoreShotRegenerator
             // disputeraient le port de commande, et la seconde piloterait la première.
             try { await Task.Delay(2000, ct).ConfigureAwait(false); } catch (OperationCanceledException) { }
         }
+    }
+
+    /// <summary>
+    /// Pour un replay public rejoue ici : le score que le jeu affiche a la FIN du rejeu, lu dans la memoire du coeur (les lignes
+    /// de score du .MEM, comme le controle de fidelite des films : <see cref="Replay.Video.LecteurDuScore"/>). L'image est deja
+    /// prise ; on relance la lecture et on garde la plus haute valeur lue jusqu'a la fin. Le site compare ce score a celui du
+    /// record : c'est ce qui prouve que le replay rejoue est bien celui du record. Sans lecteur (coeur non releve), rien n'est lu
+    /// et le site refuse.
+    /// </summary>
+    private async Task LireLeScoreDeFinAsync(Candidat c, Replay.Models.ReplayManifest? manifeste, long fin, Prise prise, bool enPause, CancellationToken ct)
+    {
+        if (!c.Publique || manifeste is null) return;
+        using var lecteur = Replay.Video.LecteurDuScore.Pour(manifeste);
+        if (lecteur is null)
+        {
+            _logger.LogInformation("Capture record : coeur non releve pour {ReplayId}, score de fin non lu.", c.ReplayId);
+            return;
+        }
+        if (enPause) await _retroarch.PauseToggleAsync(ct).ConfigureAwait(false);
+        var limite = DateTime.UtcNow + TimeSpan.FromSeconds(30);
+        while (DateTime.UtcNow < limite)
+        {
+            var etat = _playback.GetState();
+            if (etat.State != "playing") break;
+            var lu = await LireLeScoreAsync(lecteur, ct).ConfigureAwait(false);
+            if (lu is { } v && (prise.ScoreObserve is null || v > prise.ScoreObserve)) prise.ScoreObserve = v;
+            if (fin > 0 && etat.Frame >= fin - 1) break;
+            await Task.Delay(120, ct).ConfigureAwait(false);
+        }
+    }
+
+    private async Task<long?> LireLeScoreAsync(Replay.Video.LecteurDuScore lecteur, CancellationToken ct)
+    {
+        var valeurs = new List<long?>(lecteur.Lignes.Count);
+        foreach (var l in lecteur.Lignes)
+        {
+            var index = l.Index;
+            var bas = index.Min();
+            var n = (int)(index.Max() - bas + 1);
+            var reponse = await _retroarch.QueryAsync("READ_CORE_RAM " + bas.ToString("x", System.Globalization.CultureInfo.InvariantCulture) + " " + n,
+                ct, 300).ConfigureAwait(false);
+            var bloc = Replay.Video.LecteurDuScore.OctetsDeLaReponse(reponse, n);
+            valeurs.Add(bloc is null ? null : Replay.Video.LecteurDuScore.Valeur(l, index.Select(i => bloc[(int)(i - bas)]).ToList()));
+        }
+        return valeurs.Any(v => v is not null) ? lecteur.Composer(valeurs) : null;
     }
 
     private async Task<bool> AttendreEtatAsync(string voulu, TimeSpan limite, CancellationToken ct)
@@ -365,7 +449,7 @@ public sealed class ScoreShotRegenerator
         return null;
     }
 
-    private async Task<string?> EnvoyerAsync(Candidat c, string fichier, CancellationToken ct)
+    private async Task<string?> EnvoyerAsync(Candidat c, string fichier, Prise prise, CancellationToken ct)
     {
         var credential = _devices.GetCredential();
         if (string.IsNullOrEmpty(credential)) return null;
@@ -377,7 +461,11 @@ public sealed class ScoreShotRegenerator
             var url = NelfePlayAgentService.BaseUrl.TrimEnd('/')
                 + "/api/v1/agent/scores/shot?origin=replay"
                 + "&session_id=" + Uri.EscapeDataString(c.SessionId)
-                + "&frame=" + c.TargetFrame;
+                + "&frame=" + prise.Frame
+                // Replay public rejoue par une autre machine que celle du record : le site verifie l'empreinte et le score lu.
+                + (c.Publique ? "&replay_id=" + Uri.EscapeDataString(c.ReplayId)
+                    + "&object_sha256=" + Uri.EscapeDataString(c.ObjectSha256)
+                    + "&observed_score=" + (prise.ScoreObserve?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "none") : "");
             using var request = new HttpRequestMessage(HttpMethod.Post, url)
             {
                 Content = new ByteArrayContent(octets),
