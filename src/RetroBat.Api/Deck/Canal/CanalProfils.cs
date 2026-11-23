@@ -16,6 +16,13 @@ namespace RetroBat.Api.Deck.Canal;
 public static class CanalProfils
 {
     public const string Schema = "nelfeplay.view-profile/1";
+
+    /// <summary>
+    /// Le schema v2 (1.9.213, wrapper 0.350) : tout le v1, plus <c>gauges</c> (jauges publiees telles quelles dans <c>deck.live</c>, ex. le rang
+    /// 24 bits de Battle Garegga), <c>distance</c> (champ et echelle de la distance precise), une table d'ennemis UNIQUE (<c>enemy.table</c> :
+    /// position, type, vie et drapeau dans la meme entree, comme les tables par pointeur du .VIEW v2) et <c>enemy</c> facultatif.
+    /// </summary>
+    public const string SchemaV2 = "nelfeplay.view-profile/2";
     public const string Extension = ".VIEW.json";
 
     private static readonly object Verrou = new();
@@ -50,7 +57,7 @@ public static class CanalProfils
             {
                 try
                 {
-                    var p = DepuisJson(File.ReadAllText(f), out var erreur);
+                    var p = DepuisJson(File.ReadAllText(f), out var erreur, f);
                     if (p is null) erreurs.Add($"{f} : {erreur}");
                     else liste.Add(p);
                 }
@@ -108,11 +115,57 @@ public static class CanalProfils
     // ---- lecture d'un fichier ------------------------------------------------------------------------------------------------------
 
     private static readonly HashSet<string> CleRacine = ["schema", "id", "view", "view_sha256", "roms", "screen", "ship", "enemy", "camera_scale", "combo_max", "comment"];
+    private static readonly HashSet<string> CleRacineV2 = [.. CleRacine, "gauges", "distance"];
     private static readonly HashSet<string> CleEnnemi = ["column_x", "column_y", "x", "y", "drawn_mask", "life_required", "signed", "classes", "comment"];
+    private static readonly HashSet<string> CleEnnemiV2 = [.. CleEnnemi, "table", "column_type", "column_life", "column_flag"];
+
+    // v2 sans « enemy » : un bloc neutre (aucune table d'ennemis n'est lue, voir SansEnnemis)
+    private static readonly JsonElement EnnemiVide =
+        JsonDocument.Parse("""{"column_x":"x","column_y":"y","x":{"scale":1,"offset":0},"y":{"scale":1,"offset":0}}""").RootElement.Clone();
+
+    /// <summary>
+    /// Le format du .VIEW que le profil decrit (1 ou 2), lu sur la premiere ligne utile du <c>&lt;view&gt;.VIEW</c> pose a cote du profil (sinon
+    /// dans le dossier officiel du meme systeme). Un .VIEW v2 n'est lu que par le wrapper 0.350 et plus : <see cref="CanalDuDeck"/> ne demande
+    /// pas le canal a un wrapper plus ancien. Sans .VIEW lisible : 1 (comportement d'avant).
+    /// </summary>
+    public static int FormatDeLaVue(string? cheminDuProfil, string vue)
+    {
+        if (string.IsNullOrEmpty(cheminDuProfil) || vue.Length == 0) return 1;
+        try
+        {
+            var dossier = Path.GetDirectoryName(cheminDuProfil) ?? "";
+            var candidats = new List<string> { Path.Combine(dossier, vue + ".VIEW") };
+            // profil d'essai dans ram/.user/<systeme> : le .VIEW peut etre celui du dossier officiel ram/<systeme>
+            var systeme = Path.GetFileName(dossier);
+            var parent = Path.GetDirectoryName(dossier) ?? "";
+            if (string.Equals(Path.GetFileName(parent), ".user", StringComparison.OrdinalIgnoreCase))
+                candidats.Add(Path.Combine(Path.GetDirectoryName(parent) ?? "", systeme, vue + ".VIEW"));
+            foreach (var c in candidats)
+            {
+                if (!File.Exists(c)) continue;
+                foreach (var brut in File.ReadLines(c))
+                {
+                    var l = brut.TrimStart('\uFEFF');
+                    var i = l.IndexOf('#');
+                    if (i >= 0) l = l[..i];
+                    i = l.IndexOf("--", StringComparison.Ordinal);
+                    if (i >= 0) l = l[..i];
+                    var mots = l.Split([' ', '\t', '\r'], StringSplitOptions.RemoveEmptyEntries);
+                    if (mots.Length == 0) continue;
+                    return mots.Length == 2 && mots[0] == "nelfeplay.view" && mots[1] == "2" ? 2 : 1;
+                }
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException) { }
+        return 1;
+    }
     private static readonly string[] NomsClasses = ["light", "heavy", "special", "generic"];
 
-    /// <summary>Lit et valide un profil. Null et le motif de refus si le fichier est faux (mot inconnu, champ manquant, valeur hors limite).</summary>
-    public static CanalProfilAffichage? DepuisJson(string json, out string erreur)
+    /// <summary>
+    /// Lit et valide un profil. Null et le motif de refus si le fichier est faux (mot inconnu, champ manquant, valeur hors limite).
+    /// <paramref name="chemin"/> : le fichier lu (pour trouver le .VIEW a cote et connaitre son format), facultatif.
+    /// </summary>
+    public static CanalProfilAffichage? DepuisJson(string json, out string erreur, string? chemin = null)
     {
         erreur = "";
         try
@@ -120,9 +173,11 @@ public static class CanalProfils
             using var doc = JsonDocument.Parse(json, new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true });
             var r = doc.RootElement;
             if (r.ValueKind != JsonValueKind.Object) return Refus(out erreur, "la racine doit etre un objet");
+            var schema = Texte(r, "schema");
+            var v2 = schema == SchemaV2;
             foreach (var c in r.EnumerateObject())
-                if (!CleRacine.Contains(c.Name)) return Refus(out erreur, $"cle inconnue « {c.Name} »");
-            if (Texte(r, "schema") != Schema) return Refus(out erreur, $"schema attendu « {Schema} »");
+                if (!(v2 ? CleRacineV2 : CleRacine).Contains(c.Name)) return Refus(out erreur, $"cle inconnue « {c.Name} »");
+            if (schema != Schema && !v2) return Refus(out erreur, $"schema attendu « {Schema} » ou « {SchemaV2} »");
 
             var id = Texte(r, "id");
             var vue = SansExtension(Texte(r, "view"));
@@ -162,9 +217,14 @@ public static class CanalProfils
             var vy = Axe(ship, "y", ref erreur);
             if (erreur.Length > 0) { erreur = "ship." + erreur; return null; }
 
-            if (!r.TryGetProperty("enemy", out var en) || en.ValueKind != JsonValueKind.Object) return Refus(out erreur, "enemy obligatoire");
+            // v2 : enemy facultatif (un jeu sans table d'ennemis prouvee publie la distance, le vaisseau et ses jauges)
+            var sansEnnemis = v2 && !r.TryGetProperty("enemy", out _);
+            JsonElement en;
+            if (sansEnnemis)
+                en = EnnemiVide;
+            else if (!r.TryGetProperty("enemy", out en) || en.ValueKind != JsonValueKind.Object) return Refus(out erreur, "enemy obligatoire");
             foreach (var c in en.EnumerateObject())
-                if (!CleEnnemi.Contains(c.Name)) return Refus(out erreur, $"enemy : cle inconnue « {c.Name} »");
+                if (!(v2 ? CleEnnemiV2 : CleEnnemi).Contains(c.Name)) return Refus(out erreur, $"enemy : cle inconnue « {c.Name} »");
             var colX = Texte(en, "column_x");
             var colY = Texte(en, "column_y");
             if (!NomValide(colX) || !NomValide(colY)) return Refus(out erreur, "enemy.column_x et enemy.column_y : noms des colonnes de la table d'affichage du .VIEW");
@@ -205,8 +265,76 @@ public static class CanalProfils
                 comboMax = (int)n;
             }
 
+            if (!v2)
+                return new CanalProfilAffichage(
+                    id, ecranL, ecranH, vx.Axe, vy.Axe, colX, colY, ex.Axe, ey.Axe, (int)masque, vieRequise, signe, comboMax, camera, classes, roms, vue, shas,
+                    FormatVue: FormatDeLaVue(chemin, vue));
+
+            // ---- v2 ----
+            string? table = null;
+            string colType = "type", colVie = "vie", colDrapeau = "drapeau";
+            if (!sansEnnemis)
+            {
+                if (en.TryGetProperty("table", out _))
+                {
+                    table = Texte(en, "table");
+                    if (!NomValide(table)) return Refus(out erreur, "enemy.table : nom d'une table du .VIEW");
+                }
+
+                foreach (var (cle, defaut) in new[] { ("column_type", "type"), ("column_life", "vie"), ("column_flag", "drapeau") })
+                {
+                    if (!en.TryGetProperty(cle, out _)) continue;
+                    var nom = Texte(en, cle);
+                    if (!NomValide(nom)) return Refus(out erreur, $"enemy.{cle} : nom d'une colonne du .VIEW");
+                    if (cle == "column_type") colType = nom; else if (cle == "column_life") colVie = nom; else colDrapeau = nom;
+                    _ = defaut;
+                }
+            }
+
+            var jauges = new List<CanalJauge>();
+            if (r.TryGetProperty("gauges", out var jg))
+            {
+                if (jg.ValueKind != JsonValueKind.Array) return Refus(out erreur, "gauges : liste attendue");
+                foreach (var g in jg.EnumerateArray())
+                {
+                    if (g.ValueKind != JsonValueKind.Object) return Refus(out erreur, "gauges : objets {id, field} attendus");
+                    foreach (var c in g.EnumerateObject())
+                        if (c.Name is not ("id" or "field" or "comment")) return Refus(out erreur, $"gauges : cle inconnue « {c.Name} »");
+                    var gid = Texte(g, "id");
+                    var champ = Texte(g, "field");
+                    if (!NomValide(gid) || !NomValide(champ)) return Refus(out erreur, "gauges : id et field (nom d'un champ du .VIEW) obligatoires");
+                    if (jauges.Any(x => x.Id == gid)) return Refus(out erreur, $"gauges : id en double « {gid} »");
+                    jauges.Add(new CanalJauge(gid, champ));
+                }
+
+                if (jauges.Count > 16) return Refus(out erreur, "gauges : 16 au plus");
+            }
+
+            var champDistance = "distance";
+            var echelleDistance = 0.0;
+            if (r.TryGetProperty("distance", out var jd))
+            {
+                if (jd.ValueKind != JsonValueKind.Object) return Refus(out erreur, "distance : objet {field, scale} attendu");
+                foreach (var c in jd.EnumerateObject())
+                    if (c.Name is not ("field" or "scale" or "comment")) return Refus(out erreur, $"distance : cle inconnue « {c.Name} »");
+                if (jd.TryGetProperty("field", out _))
+                {
+                    champDistance = Texte(jd, "field");
+                    if (!NomValide(champDistance)) return Refus(out erreur, "distance.field : nom d'un champ du .VIEW");
+                }
+
+                if (jd.TryGetProperty("scale", out var js2))
+                {
+                    echelleDistance = Reel(js2, ref erreur);
+                    if (erreur.Length > 0) { erreur = "distance.scale : " + erreur; return null; }
+                    if (echelleDistance <= 0 || double.IsInfinity(echelleDistance)) return Refus(out erreur, "distance.scale : reel positif");
+                }
+            }
+
             return new CanalProfilAffichage(
-                id, ecranL, ecranH, vx.Axe, vy.Axe, colX, colY, ex.Axe, ey.Axe, (int)masque, vieRequise, signe, comboMax, camera, classes, roms, vue, shas);
+                id, ecranL, ecranH, vx.Axe, vy.Axe, colX, colY, ex.Axe, ey.Axe, (int)masque, vieRequise, signe, comboMax, camera, classes, roms, vue, shas,
+                FormatVue: FormatDeLaVue(chemin, vue), SchemaVersion: 2, Jauges: jauges, ChampDistance: champDistance, DistanceEchelle: echelleDistance,
+                TableEnnemis: table, ColonneType: colType, ColonneVie: colVie, ColonneDrapeau: colDrapeau, SansEnnemis: sansEnnemis);
         }
         catch (JsonException ex) { return Refus(out erreur, "JSON invalide : " + ex.Message); }
     }

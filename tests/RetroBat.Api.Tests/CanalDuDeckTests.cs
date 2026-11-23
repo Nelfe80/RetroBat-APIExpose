@@ -10,6 +10,7 @@ namespace RetroBat.Api.Tests;
 /// LE CANAL D'AFFICHAGE DU DECK (1.9.211, CDC Canal v0.1, decisions du user du 22/11) : lecture du bloc du wrapper 0.348, conversion
 /// en pixels d'ecran, message deck.live, allumage par l'API. AFFICHAGE SEULEMENT.
 /// </summary>
+[Collection("CanalProfils")]
 public class CanalDuDeckTests
 {
     // Un pid qui n'est celui d'aucun RetroArch : les essais de memoire partagee ne croisent jamais un vrai canal.

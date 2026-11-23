@@ -21,6 +21,13 @@ public static class CanalFormat
     public const int TailleDescription = 32;
     public const int MaxTaille = 1 << 20;       // un canal fait quelques Ko : au-dela, ce n'est pas lui
 
+    /// <summary>
+    /// Les versions du canal lues (1.9.213) : 1 (wrapper 0.348 et plus, .VIEW v1) et 2 (wrapper 0.350, .VIEW v2 : types a mots permutes,
+    /// champs calcules, tables par pointeur, listes, parents, filtres). La disposition est LA MEME : seul le sens de certains champs et
+    /// colonnes change (le descripteur le dit). Une API 1.9.212 ne lit que la 1 : elle ignore un canal v2, sans erreur.
+    /// </summary>
+    public const ushort VersionMin = 1, VersionMax = 2;
+
     /// <summary>L'etat du canal dit par le wrapper.</summary>
     public const uint EtatActif = 0, EtatCoupeNetplay = 1, EtatFerme = 2;
 
@@ -31,10 +38,14 @@ public static class CanalFormat
     public static int TailleDeclaree(ReadOnlySpan<byte> entete)
     {
         if (entete.Length < TailleEntete || U32(entete, 0) != Signature) return -1;
-        if (U16(entete, 4) != 1) return -1;
+        var version = U16(entete, 4);
+        if (version < VersionMin || version > VersionMax) return -1;
         var taille = (int)U32(entete, OffTaille);
         return taille >= TailleEntete && taille <= MaxTaille ? taille : -1;
     }
+
+    /// <summary>La version du canal (1 ou 2), lue dans l'en-tete.</summary>
+    public static int Version(ReadOnlySpan<byte> entete) => entete.Length < TailleEntete ? 0 : U16(entete, 4);
 
     /// <summary>La sequence de l'en-tete : impaire = le wrapper ecrit, pair = bloc stable.</summary>
     public static uint Sequence(ReadOnlySpan<byte> tampon) => U32(tampon, OffSequence);
@@ -73,7 +84,7 @@ public static class CanalFormat
             tables.Add(new CanalTableDescription(nom, nombre, garder, drapeaux, colonnes));
         }
 
-        var d = new CanalDescripteur(Convert.ToHexString(b.Slice(od, 32)).ToLowerInvariant(), Texte(b, od + 32, 64), champs, tables, odon, taille);
+        var d = new CanalDescripteur(Convert.ToHexString(b.Slice(od, 32)).ToLowerInvariant(), Texte(b, od + 32, 64), champs, tables, odon, taille, Version(b));
         return d.TailleDonnees + odon <= taille ? d : null;
     }
 
@@ -128,10 +139,16 @@ public static class CanalFormat
     private static CanalDescription Description(ReadOnlySpan<byte> b, int o) => new(Texte(b, o, 24), b[o + 24], b[o + 25] != 0, U32(b, o + 28));
 }
 
-/// <summary>Un champ ou une colonne : nom, type (1 a 12 de canal.h), « resolu » (le wrapper a trouve l'adresse), masque.</summary>
+/// <summary>
+/// Un champ ou une colonne : nom, type (1 a 12 de canal.h ; v2 : 13 u32w, 14 s32w, 32 champ calcule), « resolu » (le wrapper a trouve
+/// l'adresse ; une colonne v2 se lit a chaque image et dit toujours 1), masque.
+/// </summary>
 public sealed record CanalDescription(string Nom, byte Type, bool Resolu, uint Masque);
 
-/// <summary>Une table : nombre de cases du jeu, entrees gardees au plus, colonnes (sans l'emplacement, qui ouvre chaque entree), drapeaux (1 actif, 2 proche).</summary>
+/// <summary>
+/// Une table : nombre de cases du jeu, entrees gardees au plus, colonnes (sans l'emplacement, qui ouvre chaque entree), drapeaux (1 actif,
+/// 2 proche ; v2 : 4 liste chainee, l'emplacement est alors l'ADRESSE de l'enregistrement ; 8 liens ; 16 filtres).
+/// </summary>
 public sealed record CanalTableDescription(string Nom, int Nombre, int Garder, int Drapeaux, IReadOnlyList<CanalDescription> Colonnes)
 {
     public int Largeur => 1 + Colonnes.Count;
@@ -144,7 +161,7 @@ public sealed record CanalTableDescription(string Nom, int Nombre, int Garder, i
     }
 }
 
-public sealed record CanalDescripteur(string Sha256, string Nom, IReadOnlyList<CanalDescription> Champs, IReadOnlyList<CanalTableDescription> Tables, int OffDonnees, int Taille)
+public sealed record CanalDescripteur(string Sha256, string Nom, IReadOnlyList<CanalDescription> Champs, IReadOnlyList<CanalTableDescription> Tables, int OffDonnees, int Taille, int Version = 1)
 {
     public int TailleDonnees
     {

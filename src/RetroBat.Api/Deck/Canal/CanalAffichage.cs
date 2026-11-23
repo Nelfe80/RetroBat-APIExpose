@@ -59,7 +59,26 @@ public sealed record DeckLive
     /// <summary>La minuterie du combo : <c>[valeur, maximum]</c> si le .VIEW porte le champ combo (maximum : champ combo_max, sinon celui
     /// du profil, 56 pour DaiOuJou), sinon null.</summary>
     public int[]? Combo { get; init; }
+
+    /// <summary>
+    /// 1.9.213 (profil v2) : la distance PRECISE en pixels du decor (<see cref="Dist"/> x <c>distance.scale</c> du profil, trois decimales),
+    /// ou null si le profil ne donne pas d'echelle. <see cref="Dist"/> garde la valeur brute (sur 32 bits avec un .VIEW v2 : plus de repli
+    /// a 65 536). Un Deck qui ne connait pas ce champ l'ignore. Absent du message quand il est nul : un message d'un profil v1 reste
+    /// identique a l'octet a celui de la 1.9.212.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? DistPx { get; init; }
+
+    /// <summary>
+    /// 1.9.213 (profil v2) : les jauges du profil, valeur BRUTE du champ du .VIEW a l'image du bloc (ex. <c>rank</c> : le rang 24 bits de
+    /// Battle Garegga, <c>rank_rate</c> : le rang ajoute par image). Null sans jauge. Un Deck qui ne connait pas ce champ l'ignore.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyDictionary<string, int>? Gauges { get; init; }
 }
+
+/// <summary>Une jauge du profil v2 : son nom dans <c>deck.live</c> (<c>Gauges</c>) et le champ du .VIEW qui la porte.</summary>
+public sealed record CanalJauge(string Id, string Champ);
 
 /// <summary>Un axe d'ecran : pixel = brut x echelle + decalage, arrondi. Calcul pur.</summary>
 public readonly record struct CanalAxe(double Echelle, double Decalage)
@@ -95,7 +114,17 @@ public sealed record CanalProfilAffichage(
     IReadOnlyDictionary<int, int> Classes,
     IReadOnlyList<string> Roms,
     string Vue = "",
-    IReadOnlyList<string>? VueSha256 = null)
+    IReadOnlyList<string>? VueSha256 = null,
+    int FormatVue = 1,
+    int SchemaVersion = 1,
+    IReadOnlyList<CanalJauge>? Jauges = null,
+    string ChampDistance = "distance",
+    double DistanceEchelle = 0,
+    string? TableEnnemis = null,
+    string ColonneType = "type",
+    string ColonneVie = "vie",
+    string ColonneDrapeau = "drapeau",
+    bool SansEnnemis = false)
 {
     /// <summary>Le profil du jeu lance (nom de ROM), ou null : un jeu sans profil n'a pas de canal publie. Voir <see cref="CanalProfils"/>.</summary>
     public static CanalProfilAffichage? Pour(string? rom) => CanalProfils.Pour(rom);
@@ -119,6 +148,8 @@ public sealed class CanalAffichageCalcul
     private readonly string _rom;
     private readonly int _iDist, _iCamera, _iShipX, _iShipY, _iStage, _iLives, _iTick, _iCombo, _iComboMax, _iMort;
     private readonly int _tAff, _tObj, _cDrapeau, _cX, _cY, _cType, _cVie;
+    private readonly bool _uneTable;                  // v2 : position, type, vie et drapeau dans la meme entree (enemy.table)
+    private readonly (string Id, int Champ)[] _jauges;
     private uint _epoch = uint.MaxValue;
     private long _seq;
     private int _bossMax;
@@ -129,7 +160,7 @@ public sealed class CanalAffichageCalcul
         _profil = profil;
         _d = d;
         _rom = rom;
-        _iDist = d.Champ("distance");
+        _iDist = d.Champ(profil.ChampDistance);
         _iCamera = d.Champ("camera");
         _iShipX = d.Champ("vaisseau_x");
         _iShipY = d.Champ("vaisseau_y");
@@ -139,17 +170,25 @@ public sealed class CanalAffichageCalcul
         _iCombo = d.Champ("combo");
         _iMort = d.Champ("mort_anim");
         _iComboMax = d.Champ("combo_max");
-        _tAff = d.Table("affichage");
-        _tObj = d.Table("objets");
-        _cDrapeau = _tAff < 0 ? -1 : d.Tables[_tAff].Colonne("drapeau");
+        _uneTable = profil.TableEnnemis is not null;
+        if (profil.SansEnnemis) { _tAff = _tObj = -1; }
+        else if (_uneTable) { _tAff = _tObj = d.Table(profil.TableEnnemis!); }
+        else
+        {
+            _tAff = d.Table("affichage");
+            _tObj = d.Table("objets");
+        }
+
+        _cDrapeau = _tAff < 0 ? -1 : d.Tables[_tAff].Colonne(profil.ColonneDrapeau);
         _cX = _tAff < 0 ? -1 : d.Tables[_tAff].Colonne(profil.ColonneX);
         _cY = _tAff < 0 ? -1 : d.Tables[_tAff].Colonne(profil.ColonneY);
-        _cType = _tObj < 0 ? -1 : d.Tables[_tObj].Colonne("type");
-        _cVie = _tObj < 0 ? -1 : d.Tables[_tObj].Colonne("vie");
+        _cType = _tObj < 0 ? -1 : d.Tables[_tObj].Colonne(profil.ColonneType);
+        _cVie = _tObj < 0 ? -1 : d.Tables[_tObj].Colonne(profil.ColonneVie);
+        _jauges = (profil.Jauges ?? []).Select(j => (j.Id, d.Champ(j.Champ))).Where(j => j.Item2 >= 0).ToArray();
     }
 
-    /// <summary>Ce descripteur porte-t-il de quoi publier quelque chose (au moins la distance ou la table d'affichage) ?</summary>
-    public bool Utile => _iDist >= 0 || (_tAff >= 0 && _cX >= 0 && _cY >= 0);
+    /// <summary>Ce descripteur porte-t-il de quoi publier quelque chose (la distance, la table d'affichage ou, en v2, une jauge) ?</summary>
+    public bool Utile => _iDist >= 0 || (_tAff >= 0 && _cX >= 0 && _cY >= 0) || _jauges.Length > 0;
 
     /// <summary>Le message d'un canal qui se tait.</summary>
     public DeckLive Inactif(string raison) => new() { Active = false, Reason = raison, Rom = _rom, Seq = ++_seq, ScreenW = _profil.EcranL, ScreenH = _profil.EcranH };
@@ -194,7 +233,17 @@ public sealed class CanalAffichageCalcul
             Enemies = ennemis,
             Boss = boss,
             Combo = _iCombo >= 0 ? [b.Champs[_iCombo], _iComboMax >= 0 ? b.Champs[_iComboMax] : p.ComboMax] : null,
+            DistPx = _iDist >= 0 && p.DistanceEchelle > 0 ? Math.Round(b.Champs[_iDist] * p.DistanceEchelle, 3) : null,
+            Gauges = Jauges(b),
         };
+    }
+
+    private Dictionary<string, int>? Jauges(CanalBloc b)
+    {
+        if (_jauges.Length == 0) return null;
+        var g = new Dictionary<string, int>(_jauges.Length);
+        foreach (var (id, champ) in _jauges) g[id] = b.Champs[champ];
+        return g;
     }
 
     /// <summary>
@@ -222,7 +271,15 @@ public sealed class CanalAffichageCalcul
             if (_cDrapeau >= 0 && p.MasqueDessine != 0 && (aff.Colonne(e, _cDrapeau) & p.MasqueDessine) == 0) continue;
             var type = -1;
             var vie = 0;
-            if (obj is not null)
+            if (obj is not null && _uneTable)
+            {
+                // v2 : une seule table (entites lues par pointeur) : type et vie dans l'entree meme
+                if (_cType >= 0) type = obj.Colonne(e, _cType) & 0xFFFF;
+                if (_cVie >= 0) vie = obj.Colonne(e, _cVie) & 0xFFFF;
+                if (type == 0) continue;
+                if (p.VieRequise && _cVie >= 0 && vie == 0) continue;
+            }
+            else if (obj is not null)
             {
                 while (o < obj.Ecrites && obj.Emplacement(o) < slot) o++;
                 if (o >= obj.Ecrites || obj.Emplacement(o) != slot) continue;   // case libre : pas d'ennemi
@@ -264,7 +321,16 @@ public sealed class CanalAffichageCalcul
     {
         if (a.Active != b.Active || a.Epoch != b.Epoch || a.Dist != b.Dist || a.Stage != b.Stage || a.Lives != b.Lives || a.Camera != b.Camera) return true;
         if (!Egal(a.Ship, b.Ship) || !Egal(a.Boss, b.Boss) || !Egal(a.Combo, b.Combo)) return true;
+        if (a.DistPx != b.DistPx || !EgalJauges(a.Gauges, b.Gauges)) return true;
         return !a.Enemies.AsSpan().SequenceEqual(b.Enemies);
+    }
+
+    private static bool EgalJauges(IReadOnlyDictionary<string, int>? a, IReadOnlyDictionary<string, int>? b)
+    {
+        if (a is null || b is null) return a is null && b is null;
+        if (a.Count != b.Count) return false;
+        foreach (var (k, v) in a) if (!b.TryGetValue(k, out var w) || w != v) return false;
+        return true;
     }
 
     private static bool Egal(int[]? a, int[]? b) => a is null || b is null ? a is null && b is null : a.AsSpan().SequenceEqual(b);

@@ -9,6 +9,7 @@ namespace RetroBat.Api.Tests;
 /// LES PROFILS D'AFFICHAGE DECLARATIFS (1.9.212) : le profil de DaiOuJou, code en dur en 1.9.211, vient maintenant de
 /// <c>ram/arcade/dodonpachi-daioujou.VIEW.json</c>. Preuve de non-regression : les messages deck.live sont IDENTIQUES a l'octet.
 /// </summary>
+[Collection("CanalProfils")]
 public class CanalProfilsTests
 {
     private static readonly string Fichier = Path.Combine(AppContext.BaseDirectory, "Profils", "ram", "arcade", "dodonpachi-daioujou.VIEW.json");
@@ -107,7 +108,7 @@ public class CanalProfilsTests
             Assert.Contains(motif, erreur);
         }
 
-        Refuse(bon.Replace("view-profile/1", "view-profile/2"), "schema");
+        Refuse(bon.Replace("view-profile/1", "view-profile/3"), "schema");   // la /2 existe depuis la 1.9.213 (CanalV2Tests)
         Refuse(bon.Replace("\"id\"", "\"idee\""), "cle inconnue");
         Refuse(bon.Replace("\"roms\": [\"ddpdojblka\"]", "\"roms\": []"), "roms");
         Refuse(bon.Replace("\"ddpdojblka\"", "\"ddp doj\""), "ROM invalide");

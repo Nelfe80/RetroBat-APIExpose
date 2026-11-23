@@ -34,10 +34,37 @@ public static class CanalDuDeck
     private static DateTime _jusqua;
     private static string? _hoteNetplay;
 
-    /// <summary>Un Deck se lance pour cette ROM : le canal est demande, si le jeu a un profil d'affichage. Rend vrai s'il l'est.</summary>
+    /// <summary>Le premier wrapper qui lit un .VIEW v2 (0.350). Un wrapper plus ancien refuse un .VIEW v2 (« nelfeplay.view 1 attendu ») :
+    /// on ne lui demande pas le canal, pour rien.</summary>
+    public const int WrapperV2 = 350;
+
+    /// <summary>
+    /// Le numero de version du wrapper que l'API deploie (0.350.0.0 -> 350, celui de <c>wrapper\wrapper.dll</c> de la racine, copie dans
+    /// core_proxy au demarrage), 0 s'il est illisible. Remplacable par les essais.
+    /// </summary>
+    public static Func<int> VersionDuWrapper { get; set; } = () =>
+    {
+        var chemin = Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, "wrapper", "wrapper.dll");
+        return File.Exists(chemin) ? RetroBat.Api.Replay.Playback.LectureAvecVerrous.VersionDuWrapper(chemin) : 0;
+    };
+
+    /// <summary>Les demandes refusees parce que le .VIEW du jeu est en v2 et le wrapper trop ancien (diagnostic, essais).</summary>
+    public static int RefusWrapperAncien => Volatile.Read(ref _refusWrapperAncien);
+    private static int _refusWrapperAncien;
+
+    /// <summary>
+    /// Un Deck se lance pour cette ROM : le canal est demande, si le jeu a un profil d'affichage ET si le wrapper sait lire son .VIEW
+    /// (un .VIEW v2 exige le wrapper 0.350 : la version est lue sur le fichier du wrapper que l'API deploie). Rend vrai s'il l'est.
+    /// </summary>
     public static bool Demander(string? rom, DateTime? maintenant = null)
     {
-        if (CanalProfilAffichage.Pour(rom) is null) return false;
+        var profil = CanalProfilAffichage.Pour(rom);
+        if (profil is null) return false;
+        if (profil.FormatVue >= 2 && VersionDuWrapper() < WrapperV2)
+        {
+            Interlocked.Increment(ref _refusWrapperAncien);
+            return false;
+        }
         lock (Verrou)
         {
             _rom = rom!.Trim();
