@@ -342,8 +342,13 @@ public sealed class RomCanonicalResolver : IScoreSlugResolver
     /// <summary>
     /// Les dossiers roms de RetroBat qui alimentent le systeme de scoring « arcade » : la
     /// chaine .MEM ne connait qu'un seul dossier arcade, quel que soit l'emulateur.
+    /// « neogeo » en fait partie (24/11, constat du user : RetroBat ne propose le choix du BIOS, AES ou MVS, que pour le
+    /// systeme neogeo, pas pour mame ni fbneo ; sa ROM de Blazing Star y est donc posee). Sans lui une ROM du dossier neogeo
+    /// n'entrait pas dans la collection World Scoring (FrontendSystemsFor("arcade")), le panneau Defier la refusait
+    /// (« pas ouvert au scoring mondial ») et un systeme « neogeo » se traitait en console (pas de sha1 du set, groupe
+    /// cherche au referentiel par md5). Le wrapper (IsArcadeResourceSystem) et le site (canonicalSystem) l'avaient deja.
     /// </summary>
-    public static readonly string[] ArcadeFrontendSystems = ["arcade", "fba", "fbneo", "mame", "mame64"];
+    public static readonly string[] ArcadeFrontendSystems = ["arcade", "fba", "fbneo", "mame", "mame64", "neogeo"];
 
     /// <summary>
     /// Le systeme CANONIQUE de scoring d'un dossier roms : « arcade » pour mame et FBNeo,

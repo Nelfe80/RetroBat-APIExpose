@@ -220,6 +220,31 @@ public class InstalledGameCatalogTests : IDisposable
     }
 
     [Fact]
+    public void Le_dossier_neogeo_est_de_l_arcade_pour_le_scoring()
+    {
+        // 24/11 : le BIOS (AES, MVS) ne se choisit dans RetroBat que pour le systeme neogeo ; une ROM d'arcade posee la
+        // reste un jeu d'arcade (meme systeme canonique que le site, que le wrapper et que les .MEM de ramrcade).
+        Assert.Equal("arcade", RomCanonicalResolver.CanonicalScoringSystem("neogeo"));
+        Assert.Equal("arcade", RomCanonicalResolver.CanonicalScoringSystem("NeoGeo"));
+        Assert.Contains("neogeo", RomCanonicalResolver.FrontendSystemsFor("arcade"));
+        Assert.Equal("neogeocd", RomCanonicalResolver.CanonicalScoringSystem("neogeocd"));
+    }
+
+    [Fact]
+    public void Une_rom_du_dossier_neogeo_entre_dans_l_inventaire_arcade()
+    {
+        PoserRom("neogeo", "blazstar.zip");
+        PoserMem("arcade", "blazing-star", "SCORE_STATE");
+        var resolveur = new FauxResolveur { ["blazstar.zip"] = "blazing-star" };
+
+        var jeu = Assert.Single(Catalogue(resolveur).Enumerate(new[] { "arcade" }), j => j.FrontendSystemId == "neogeo");
+
+        Assert.Equal("arcade", jeu.CanonicalSystemId);
+        Assert.Equal("blazing-star", jeu.RomGroup);
+        Assert.True(jeu.ScorableLocal);
+    }
+
+    [Fact]
     public void Le_choix_d_emulateur_de_la_fiche_est_lu()
     {
         // 2026-09-26 : « libretro : mame » choisi pour 19xx dans ES est une metadonnee de la fiche,
