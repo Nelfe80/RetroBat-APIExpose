@@ -106,6 +106,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// ce qui suit ne concourt, meme quand le jeu remet le score a zero (Double Dragon).
     /// </summary>
     private bool _closeParCredit;
+    /// <summary>
+    /// LES FINS DE PARTIE VUES depuis le lancement (GAME_OVER du .MEM, demo, score remis a zero) : ce qui separe un
+    /// continue (credit pendant l'ecran de continue) d'une NOUVELLE PARTIE (credit apres la fin, regle du user rappelee
+    /// le 24/11, ContinuesParCredits.EstNouvellePartie). Sous _sync.
+    /// </summary>
+    private readonly List<FinDePartieVue> _finsDePartie = new();
+    /// <summary>L'image du dernier credit consomme (depart, continue, nouvelle partie) : les fins vues avant elle ne comptent plus.</summary>
+    private long? _debutDePartie;
+    /// <summary>Les ✓1CC des parties d'avant la partie en cours (une partie neuve ouvre le sien).</summary>
+    private readonly List<RetroBat.Api.Scoring.FinDuJeu.Clear> _clearsDesPartiesPassees = new();
     /// <summary>Le ✓1CC de la partie : le premier signal de fin du .MEM cite par le profil, avant tout continue (FinDuJeu).</summary>
     private RetroBat.Api.Scoring.FinDuJeu.Clear? _clear;
     /// <summary>L'arrivee d'un joueur 2 a deja ete dite : la partie est hors classement solo.</summary>
@@ -1026,6 +1036,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _jetonDeSession++;
             _departAuCredit = _closeParCredit = _partieADeuxAnnoncee = false;
             _clear = null;
+            _finsDePartie.Clear();
+            _debutDePartie = null;
+            _clearsDesPartiesPassees.Clear();
             _scoresAutresJoueurs.Clear();
             _trajectoiresAutres.Clear();
             _placeInvite = null;
@@ -1818,12 +1831,25 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 // Le mode de la partie qui finit : l'ecran titre et les demos qui suivent n'y touchent plus (direct).
                 if (_enJeu && action.Contains("GAME_OVER", StringComparison.Ordinal)) _contexteDeLaPartieJouee = _contexte;
+                var demoAvant = _inDemo;
                 (_inDemo, _enJeu) = EtatsApres(_inDemo, _enJeu, action);
-                if (action.Contains("GAME_OVER", StringComparison.Ordinal)) { _gameOverVu = true; _gameOverDansLaPartie = true; _demoEnSuspens = null; }
+                if (action.Contains("GAME_OVER", StringComparison.Ordinal)) { _gameOverVu = true; _gameOverDansLaPartie = true; _demoEnSuspens = null; NoterFinDePartie(certaine: false); }
+                // La demo ne vient qu'une fois l'ecran de continue ecoule : la fin est sure.
+                else if (_inDemo && !demoAvant) NoterFinDePartie(certaine: true);
             }
         }
         if (appuiIlYA is { } s)
             Trace($"signal {action} en pleine partie (dernier appui il y a {s:0.0} s) : en attente des appuis qui suivent");
+    }
+
+    /// <summary>Appele sous _sync : la partie en cours vient d'etre vue finie (GAME_OVER, demo, score remis a zero).</summary>
+    private void NoterFinDePartie(bool certaine)
+    {
+        // Un GAME_OVER repete, ou une fin deja notee depuis le dernier credit : rien de plus (seule une fin sure ajoute).
+        if (_finsDePartie.Count > 0 && _finsDePartie[^1] is { } derniere
+            && derniere.Frame > (_debutDePartie ?? long.MinValue) && (derniere.Certaine || !certaine)) return;
+        _finsDePartie.Add(new FinDePartieVue(_lastFrame, certaine));
+        if (_finsDePartie.Count > 64) _finsDePartie.RemoveAt(0);
     }
 
     /// <summary>
@@ -1902,6 +1928,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         if (_demoEnSuspens is not { } s || !DemoConfirmee(s.Depuis, _dernierAppuiUtc, maintenant)) return -1;
         _demoEnSuspens = null;
         _inDemo = true;
+        NoterFinDePartie(certaine: true);
         var retirees = 0;
         while (_trajectory.Count > 0 && _trajectory[^1].frame >= s.Frame)
         {
@@ -2374,6 +2401,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
         int session;
         long scoreAvant;
+        var nouvellePartieVue = false;
         lock (_sync)
         {
             var avant = _credits.Count > 0 ? _credits[^1].Value : (int?)null;
@@ -2400,7 +2428,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             }
             scoreAvant = _finalTotal ?? 0;
             session = _jetonDeSession;
+            // UN CREDIT APRES LA FIN DE LA PARTIE (game over ecoule, demo, titre) : le film de la partie d'avant s'arrete
+            // et celui de la neuve commence, tout de suite (la confirmation ne vient que 3,5 s plus tard).
+            nouvellePartieVue = _departAuCredit
+                && !_departs.Any(d => d.Player >= 2 && Math.Abs(d.Frame - frame) <= ContinuesParCredits.FenetreArrivee)
+                && ContinuesParCredits.EstNouvellePartie(frame, _debutDePartie, _finsDePartie);
         }
+        if (nouvellePartieVue) OuvrirLeReplayDeLaNouvellePartie(frame);
         AnnoncerLeDepart("credit consomme");
         SortirDeDemo();
 
@@ -2450,6 +2484,20 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         await ConfirmerCreditAsync(session, 0, frame).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Une nouvelle partie commence apres un game over, sans retour au menu : le film de la partie d'avant s'arrete (comme
+    /// quand le score retombe) et celui de la neuve s'ouvre au credit (scoring.replay.stop, scoring.run.reset ; le depart
+    /// est dit juste apres par AnnoncerLeDepart). L'enregistreur n'en ouvre aucun tant que scoring.run.ended tient.
+    /// </summary>
+    private void OuvrirLeReplayDeLaNouvellePartie(long frame)
+    {
+        lock (_sync) { _finDeRunPubliee = false; }
+        if (!PartieNelfePlay()) return;
+        Trace($"credit consomme apres la fin de la partie (frame {frame}) : le replay d'avant s'arrete, celui de la nouvelle partie commence");
+        _ = _eventBus.PublishAsync(new EventEnvelope { Type = "scoring.replay.stop", Payload = new { Raison = "nouvelle partie apres game over" } });
+        _ = _eventBus.PublishAsync(new EventEnvelope { Type = "scoring.run.reset", Payload = new { Score = 0L } });
+    }
+
     private async Task ConfirmerCreditAsync(int session, long scoreAvant, long frame)
     {
         await Task.Delay(ConfirmationContinue).ConfigureAwait(false);
@@ -2467,9 +2515,35 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // Les confirmations passent dans l'ordre des credits (meme delai pour toutes) : chacune
             // voit ce que les precedentes ont tranche.
             nature = ContinuesParCredits.Nature(frame, _departAuCredit, _departs, ouverte);
+            // UNE NOUVELLE PARTIE LANCEE APRES UN GAME OVER est une partie 1CC DISTINCTE (regle du user, 24/11) : elle ferme la
+            // partie d'avant (son passeport part tel quel) et en ouvre une autre, avec ses propres continues.
+            if (nature == ContinuesParCredits.Debit.Continue
+                && ContinuesParCredits.EstNouvellePartie(frame, _debutDePartie, _finsDePartie))
+            {
+                nature = ContinuesParCredits.Debit.NouvellePartie;
+            }
             if (nature is ContinuesParCredits.Debit.Depart or ContinuesParCredits.Debit.ArriveeDUnJoueur)
             {
                 _departAuCredit = true;
+            }
+
+            // Le pic de la partie qui vient de finir (SelectBestRun jusqu'a l'image du credit), pas la derniere lecture :
+            // le jeu remet le score a zero avant que le credit ne baisse (Batsugun : 3 040 au lieu de 665 540).
+            if (nature != ContinuesParCredits.Debit.Depart) scoreAvant = PicDuRunAvant(frame, scoreAvant);
+            if (nature == ContinuesParCredits.Debit.Depart ? _debutDePartie is null
+                : nature is ContinuesParCredits.Debit.Continue or ContinuesParCredits.Debit.NouvellePartie)
+            {
+                _debutDePartie = frame;
+            }
+            if (nature == ContinuesParCredits.Debit.NouvellePartie)
+            {
+                if (_clear is not null) _clearsDesPartiesPassees.Add(_clear);
+                _clear = null;
+                _closeParCredit = false;
+                _partieADeuxAnnoncee = false;
+                _finDeRunPubliee = false;
+                _avantContinue = null;
+                _dernierPropre = null;
             }
 
             // Un continue ou l'arrivee d'un joueur ferme le 1CC solo : la premiere fois seulement.
@@ -2480,7 +2554,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 _closeParCredit = true;
             }
 
-            bandeau = QuelBandeau(nature == ContinuesParCredits.Debit.Depart, arrivee, premiereFin, _partieADeuxAnnoncee, scoreAvant > 0);
+            bandeau = QuelBandeau(nature == ContinuesParCredits.Debit.Depart, arrivee, premiereFin, _partieADeuxAnnoncee, scoreAvant > 0,
+                nature == ContinuesParCredits.Debit.NouvellePartie);
             if (arrivee) _partieADeuxAnnoncee = true;
             if (bandeau == BandeauDeCredit.JoueurRejoint) _replayDuSolo = _activeReplayId;
             multi = arrivee && premiereFin;
@@ -2500,6 +2575,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             case BandeauDeCredit.ScoreCertifie:
                 AnnoncerContinue(scoreAvant, parCredit: true);
+                break;
+            case BandeauDeCredit.NouvellePartie:
+                AnnoncerNouvellePartie(scoreAvant);
                 break;
             case BandeauDeCredit.NonCertifiable:
                 AnnoncerCredit("scoring_uncertified", "partie non certifiable");
@@ -2531,6 +2609,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         ScoreCertifie,
         /// <summary>Tout credit consomme ensuite : la partie qui vient n'est pas certifiable.</summary>
         NonCertifiable,
+        /// <summary>Un credit apres le game over : une partie a part, la precedente compte avec son pic.</summary>
+        NouvellePartie,
         /// <summary>L'arrivee d'un joueur 2 : hors classement solo, sans etre un continue.</summary>
         PartieAPlusieurs,
         /// <summary>L'arrivee d'un joueur apres un score fait seul : ce score reste un 1CC.</summary>
@@ -2538,8 +2618,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     /// <summary>Le bandeau d'un credit consomme, selon ce qu'il ouvre.</summary>
-    internal static BandeauDeCredit QuelBandeau(bool depart, bool arrivee, bool premiereFin, bool dejaADeux, bool scoreSolo)
+    internal static BandeauDeCredit QuelBandeau(bool depart, bool arrivee, bool premiereFin, bool dejaADeux, bool scoreSolo,
+        bool nouvellePartie = false)
     {
+        if (nouvellePartie) return BandeauDeCredit.NouvellePartie;
         if (arrivee)
         {
             if (dejaADeux) return BandeauDeCredit.Aucun;
@@ -2548,6 +2630,44 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
         if (depart) return BandeauDeCredit.Aucun;
         return premiereFin && !dejaADeux ? BandeauDeCredit.ScoreCertifie : BandeauDeCredit.NonCertifiable;
+    }
+
+    /// <summary>
+    /// Le pic de la partie qui vient de finir : le meilleur run de la trajectoire EN JEU de la partie, jusqu'a l'image du
+    /// credit (SelectBestRun, la fonction qui fixe le score certifie : meme chiffre que le bilan). <paramref name="repli"/>
+    /// (la derniere lecture) quand rien n'est exploitable. Appele sous _sync.
+    /// </summary>
+    private long PicDuRunAvant(long frame, long repli)
+    {
+        var brutes = new List<(long frame, long total)>();
+        var horsJeu = new List<bool>();
+        for (var i = 0; i < _trajectory.Count; i++)
+        {
+            var (f, t) = _trajectory[i];
+            if (f >= frame) break;
+            if (_debutDePartie is { } debut && f < debut) continue;
+            brutes.Add((f, t));
+            horsJeu.Add(i < _horsJeu.Count && _horsJeu[i]);
+        }
+
+        var enJeu = FenetreDeJeu(_startVu, horsJeu) ? FiltrerEnJeu(brutes, horsJeu) : brutes;
+        var meilleur = SelectBestRun(enJeu);
+        return meilleur.Count > 0 ? meilleur[^1].total : repli;
+    }
+
+    /// <summary>Un credit apres le game over : la partie d'avant est close avec son score, la neuve compte a part.</summary>
+    private void AnnoncerNouvellePartie(long avant)
+    {
+        if (!PartieNelfePlay()) return;
+        if (!PremierBandeauDeCoupe()) return;
+        var langue = Langue();
+        _overlay?.ShowTop(
+            "SCORING",
+            string.Format(CabinetAnnounceText.Get("scoring_newgame_title", langue), ScoreAffiche(avant, langue)),
+            CabinetAnnounceText.Get("scoring_newgame_sub", langue),
+            8000,
+            alerte: false, auDeck: RetroBat.Api.Deck.DeckNotices.Scoring("scoring_newgame", avant));
+        Trace($"nouvelle partie apres un game over (credit consomme) : la partie d'avant compte {avant}, celle-ci a son propre passeport");
     }
 
     /// <summary>Un joueur arrive : le score fait seul jusque-la reste un 1CC, et le joueur le voit.</summary>
@@ -3292,6 +3412,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 _enJeu = false;
                 finDeFenetre = total;
+                NoterFinDePartie(certaine: true);
             }
 
             // LE SCORE RETOMBE : une nouvelle partie commence, pour un jeu a chiffre des credits
@@ -3651,6 +3772,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             return;
         }
 
+        // UNE NOUVELLE PARTIE APRES UN GAME OVER EST UNE PARTIE A PART (regle du user, 24/11) : chaque partie de la session
+        // a son passeport, comme chaque mode. Une session sans nouvelle partie n'en forme qu'une : rien ne change.
+        var parties = PartiesDeLaSession(sessionJson);
+        if (parties.Count > 1)
+        {
+            Trace($"{parties.Count} parties dans la session (un credit consomme apres la fin d'une partie ouvre la suivante) : un passeport par partie");
+        }
+
         // LES MODES PAR DRAPEAUX (2026-10-06) : Bubble Bobble dit son mode par trois octets 0/1. Les
         // profils du jeu disent les drapeaux de chaque mode ; chaque lecture est relue avec eux avant
         // tout decoupage. Une combinaison sans classement ne se soumet pas.
@@ -3690,16 +3819,53 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 foreach (var mode in modes)
                 {
                     Trace($"mode {(mode?.ToString() ?? "non mesure")} : ses parties seules");
-                    await SoumettreAsync(systemId, romGroup, sessionJson, credential,
-                        new RetroBat.Api.Scoring.FiltreDeMode(mode, parDefaut), cancellationToken).ConfigureAwait(false);
+                    await SoumettreParPartiesAsync(systemId, romGroup, sessionJson, credential,
+                        new RetroBat.Api.Scoring.FiltreDeMode(mode, parDefaut), parties, cancellationToken).ConfigureAwait(false);
                 }
                 await SoumettreMultiSiOuverteAsync(systemId, romGroup, sessionJson, credential, cancellationToken).ConfigureAwait(false);
                 return;
             }
         }
 
-        await SoumettreAsync(systemId, romGroup, sessionJson, credential, null, cancellationToken).ConfigureAwait(false);
+        await SoumettreParPartiesAsync(systemId, romGroup, sessionJson, credential, null, parties, cancellationToken).ConfigureAwait(false);
         await SoumettreMultiSiOuverteAsync(systemId, romGroup, sessionJson, credential, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Les parties de la session : la premiere court jusqu'au premier credit consomme apres une fin de partie, chacune des
+    /// suivantes part de son credit (ContinuesParCredits.Calculer, sur les memes lectures que la soumission).
+    /// </summary>
+    private IReadOnlyList<PartieDeSession> PartiesDeLaSession(string sessionJson)
+    {
+        List<EvenementDeCredit> credits;
+        List<DepartDeJoueur> departs;
+        List<FinDePartieVue> fins;
+        lock (_sync)
+        {
+            credits = new List<EvenementDeCredit>(_credits);
+            departs = new List<DepartDeJoueur>(_departs);
+            fins = new List<FinDePartieVue>(_finsDePartie);
+        }
+
+        return ContinuesParCredits.Calculer(credits, departs, RetroBat.Api.Netplay.NetplayHostService.OuverteAuxJoueursPendant(sessionJson), fins).Parties;
+    }
+
+    /// <summary>Un passeport par partie de la session ; une seule partie : la session entiere, comme avant.</summary>
+    private async Task SoumettreParPartiesAsync(string systemId, string romGroup, string sessionJson, string credential,
+        RetroBat.Api.Scoring.FiltreDeMode? filtre, IReadOnlyList<PartieDeSession> parties, CancellationToken cancellationToken)
+    {
+        if (parties.Count <= 1)
+        {
+            await SoumettreAsync(systemId, romGroup, sessionJson, credential, filtre, cancellationToken).ConfigureAwait(false);
+            return;
+        }
+
+        for (var i = 0; i < parties.Count; i++)
+        {
+            Trace($"partie {i + 1}/{parties.Count} de la session (images {(parties[i].Debut == long.MinValue ? 0 : parties[i].Debut)} a "
+                + $"{(parties[i].Fin == long.MaxValue ? "la fin" : parties[i].Fin.ToString())})");
+            await SoumettreAsync(systemId, romGroup, sessionJson, credential, filtre, cancellationToken, parties[i]).ConfigureAwait(false);
+        }
     }
 
     /// <summary>
@@ -4129,7 +4295,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// lectures prises dans ce mode comptent, et le profil est celui de ce mode.
     /// </summary>
     private async Task SoumettreAsync(string systemId, string romGroup, string sessionJson, string credential,
-        RetroBat.Api.Scoring.FiltreDeMode? filtre, CancellationToken cancellationToken)
+        RetroBat.Api.Scoring.FiltreDeMode? filtre, CancellationToken cancellationToken, PartieDeSession? partie = null)
     {
         string? listenerSha, coreSha, memSha, contentSha, contentMd5, contentSha1, contentSet, wrapperVersion, coreName, coreVersion;
         long? finalTotal;
@@ -4140,6 +4306,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         List<EvenementDeVie> vies;
         List<EvenementDeCredit> credits;
         List<DepartDeJoueur> departs;
+        List<FinDePartieVue> fins;
         bool chiffreCredits;
         lock (_sync)
         {
@@ -4149,6 +4316,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // et leur contexte. Sans filtre, toutes.
             var retenues = Enumerable.Range(0, _trajectory.Count)
                 .Where(i => filtre is null || filtre.Garde(i < _contextes.Count ? _contextes[i] : RetroBat.Api.Scoring.ContexteDeJeu.Vide))
+                .Where(i => partie is not { } p || p.Contient(_trajectory[i].frame))
                 .ToList();
             lecturesBrutes = retenues.Select(i => _trajectory[i]).ToList();
             var horsJeu = retenues.Select(i => i < _horsJeu.Count && _horsJeu[i]).ToList();
@@ -4156,10 +4324,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             contexteCourant = _contexte;
             listenerSha = _listenerSha256; coreSha = _coreSha256; memSha = _memSha256;
             contentSha = _contentSha256; contentMd5 = _contentMd5; contentSha1 = _contentSha1; contentSet = _contentSet; wrapperVersion = _wrapperVersion;
-            finalTotal = filtre is null ? _finalTotal : (lecturesBrutes.Count > 0 ? lecturesBrutes[^1].total : null);
+            finalTotal = filtre is null && partie is null ? _finalTotal : (lecturesBrutes.Count > 0 ? lecturesBrutes[^1].total : null);
             coreName = _coreName; coreVersion = _coreVersion;
             trajectory = new List<(long, long)>(lecturesBrutes);
             vies = new List<EvenementDeVie>(_vies);
+            fins = new List<FinDePartieVue>(_finsDePartie);
             chiffreCredits = _chiffreCredits;
 
             // La fenêtre de jeu : un START a été vu, donc on sait ce qui est joué. Ce qui ne l'est
@@ -4176,8 +4345,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 trajectory = gardes;
                 // Rien de joué : pas de filet sur le dernier total, qui serait celui de l'attract.
                 if (trajectory.Count == 0) finalTotal = null;
-                // Le score au depart ouvre la partie (sans filtre de mode : son mode n'est pas connu).
-                if (filtre is null) trajectory = AvecLeScoreAuDepart(trajectory, _scoreAuDepart);
+                // Le score au depart ouvre la partie (sans filtre de mode : son mode n'est pas connu). Celui de la session
+                // est celui de la premiere partie.
+                if (filtre is null && (partie is null || partie.Value.Debut == long.MinValue)) trajectory = AvecLeScoreAuDepart(trajectory, _scoreAuDepart);
             }
         }
 
@@ -4265,7 +4435,26 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // ce qui suit le premier continue ne concourt, ni ne part dans le passeport : la session
         // fait foi, et la plateforme ne doit pas pouvoir y retrouver un « meilleur » segment.
         var ouverteAuxJoueurs = RetroBat.Api.Netplay.NetplayHostService.OuverteAuxJoueursPendant(sessionJson);
-        var bilanCredits = ContinuesParCredits.Calculer(credits, departs, ouverteAuxJoueurs);
+        var bilanTotal = ContinuesParCredits.Calculer(credits, departs, ouverteAuxJoueurs, fins);
+        var bilanCredits = bilanTotal;
+        if (partie is { } laPartie)
+        {
+            // Les continues et arrivees de CETTE partie seulement ; ses credits (avec la lecture d'avant le sien : sans elle,
+            // le credit de depart ne se voit pas) et ses START (celui d'une partie neuve tombe juste avant son credit).
+            bilanCredits = new ContinuesParCredits.Bilan(bilanTotal.Coupes.Where(laPartie.Contient).ToList(), bilanTotal.PlusieursJoueurs)
+            {
+                Arrivees = bilanTotal.Arrivees.Where(laPartie.Contient).ToList(),
+                Depart = bilanTotal.Depart,
+            };
+            var avantLaPartie = credits.Where(c => c.Frame < laPartie.Debut).OrderBy(c => c.Frame).LastOrDefault();
+            var depuis = laPartie.Debut == long.MinValue ? long.MinValue : avantLaPartie.Frame;
+            credits = credits.Where(c => c.Frame >= depuis && c.Frame < laPartie.Fin).ToList();
+            var marge = ContinuesParCredits.FenetreArrivee + 120;
+            var deDepart = laPartie.Debut == long.MinValue ? long.MinValue : laPartie.Debut - marge;
+            var jusquA = laPartie.Fin == long.MaxValue ? long.MaxValue : laPartie.Fin - marge;
+            departs = departs.Where(d => d.Frame >= deDepart && d.Frame < jusquA).ToList();
+            vies = vies.Where(v => laPartie.Contient(v.Frame)).ToList();
+        }
         // Un continue ou l'arrivee d'un joueur ferme le 1CC solo : on garde ce qui a ete fait seul
         // avant (cumulatif, decision user du 2026-09-30), la suite ne part pas.
         var finsDeRun = bilanCredits.FinsDuSolo;
@@ -4277,6 +4466,11 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             creditsMuets = _creditsMuets;
             continuesConsole = new List<LectureDeContinues>(_continuesConsole);
             definitionChargee = _definitionChargee;
+        }
+        if (partie is { } fenetre)
+        {
+            continuesConsole = continuesConsole.Where(c => fenetre.Contient(c.Frame)).ToList();
+            if (creditsMuets is { } m && m >= fenetre.Fin) creditsMuets = null;
         }
         var coupesConsole = ContinuesParCompteur.CoupesDeLaPlace(continuesConsole, 1);
         if (coupesConsole.Count > 0)
@@ -4428,7 +4622,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // ne fait pas de score en dessous, et un coeur muet, lui, se laisse decouvrir aussi
             // bien a la deuxieme minute qu'a la premiere.
             var joue = _prevolAt is { } debut && DateTime.UtcNow - debut >= TimeSpan.FromSeconds(90);
-            if (_prevolCertifiable && joue && filtre is null)
+            if (_prevolCertifiable && joue && filtre is null && partie is null)
             {
                 _overlay?.ShowTop(
                     "SCORING",
@@ -4517,7 +4711,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             profile is { } profilChoisi && profilChoisi.TryGetProperty("ruleset", out var regleChoisie) ? regleChoisie.GetString() : null);
         // Le ✓1CC s'il tombe dans le run retenu ; une partie a deux n'a pas de clear solo.
         RetroBat.Api.Scoring.FinDuJeu.Clear? clear;
-        lock (_sync) { clear = _clear; }
+        lock (_sync) { clear = partie is { } p ? TousLesClears().FirstOrDefault(c => p.Contient(c.Frame)) : _clear; }
         if (!partieADeux && clear is not null && RetroBat.Api.Scoring.FinDuJeu.DansLeRun(clear, bestRun, trajectory))
         {
             brouillon["clear"] = RetroBat.Api.Scoring.FinDuJeu.EnJson(clear);
@@ -4582,6 +4776,14 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>Le plus grand ecart entre deux lectures consecutives du run retenu : un saut
     /// isole se voit la, sans rien savoir du jeu.</summary>
     private static long PlusGrandPas(List<(long frame, long total)> run) => ProgressionDuScore.PlusGrandPas(run);
+
+    /// <summary>Les ✓1CC de la session : ceux des parties passees, puis celui de la partie en cours. Sous _sync.</summary>
+    private List<RetroBat.Api.Scoring.FinDuJeu.Clear> TousLesClears()
+    {
+        var tous = new List<RetroBat.Api.Scoring.FinDuJeu.Clear>(_clearsDesPartiesPassees);
+        if (_clear is not null) tous.Add(_clear);
+        return tous;
+    }
 
     /// <summary>Un entier d'un noeud JSON, qu'il ait ete pose en int ou en long, ou lu d'un fichier ; null sinon.</summary>
     internal static long? EntierDuJson(JsonNode? noeud)

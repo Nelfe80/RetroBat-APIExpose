@@ -110,6 +110,7 @@ public static class DeckNotices
             "scoring_none_measured" => new DeckNotice(cle, DeckSeverity.Alert, "NO SCORE", "NOTHING WAS MEASURED", null, Long),
             "scoring_continue" => new DeckNotice(cle, DeckSeverity.Warn, "CONTINUE", "CERTIFIED SCORE", valeur, Long),
             "scoring_credit" => new DeckNotice(cle, DeckSeverity.Warn, "CREDIT USED", "CERTIFIED SCORE", valeur, Long),
+            "scoring_newgame" => new DeckNotice(cle, DeckSeverity.Info, "NEW GAME", "PREVIOUS GAME COUNTS", valeur, Long),
             "scoring_joined" => new DeckNotice(cle, DeckSeverity.Warn, "2P JOINED", "SOLO SCORE KEPT", valeur, Long),
             "scoring_clear" => new DeckNotice(cle, DeckSeverity.Record, "1CC", "ONE-CREDIT CLEAR", valeur, Long),
             "scoring_record" => new DeckNotice(cle, DeckSeverity.Record, "NEW RECORD", "WORLD RECORD BEATEN", valeur, Long),

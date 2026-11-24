@@ -361,7 +361,7 @@ public sealed class WorldScoringEcransService : IHostedService, IDisposable
         lock (_verrou)
         {
             if (_suivi is not { } suivi) return;
-            if (n.Kind is "scoring_continue" or "scoring_credit" or "scoring_joined" or "scoring_clear")
+            if (n.Kind is "scoring_continue" or "scoring_credit" or "scoring_newgame" or "scoring_joined" or "scoring_clear")
             {
                 if (long.TryParse((n.Value ?? "").Replace(",", "").Replace(" ", ""), out var fige)) suivi.ScoreCertifie ??= fige;
                 return;
