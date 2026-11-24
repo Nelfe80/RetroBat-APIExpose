@@ -347,8 +347,12 @@ public sealed class RomCanonicalResolver : IScoreSlugResolver
     /// n'entrait pas dans la collection World Scoring (FrontendSystemsFor("arcade")), le panneau Defier la refusait
     /// (« pas ouvert au scoring mondial ») et un systeme « neogeo » se traitait en console (pas de sha1 du set, groupe
     /// cherche au referentiel par md5). Le wrapper (IsArcadeResourceSystem) et le site (canonicalSystem) l'avaient deja.
+    /// cps1, cps2, cps3, cave et naomi aussi (24/11, integration 1.9.214) : meme trou, memes noms de dossier dans
+    /// es_systems.cfg de RetroBat (systemes d'arcade, FBNeo d'office pour cps1/2/3 et cave, flycast pour naomi), deja de
+    /// l'arcade pour le wrapper (IsArcadeResourceSystem : .MEM de ram\arcade), pour le fournisseur du wrapper
+    /// (IsArcadeLikeSystem), pour le profil (CertifiedSettingsService.SystemeDuProfil) et pour le site (ARCADE_SYSTEMS).
     /// </summary>
-    public static readonly string[] ArcadeFrontendSystems = ["arcade", "fba", "fbneo", "mame", "mame64", "neogeo"];
+    public static readonly string[] ArcadeFrontendSystems = ["arcade", "fba", "fbneo", "mame", "mame64", "neogeo", "cps1", "cps2", "cps3", "cave", "naomi"];
 
     /// <summary>
     /// Le systeme CANONIQUE de scoring d'un dossier roms : « arcade » pour mame et FBNeo,

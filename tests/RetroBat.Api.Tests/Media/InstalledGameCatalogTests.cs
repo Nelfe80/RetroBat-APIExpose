@@ -230,6 +230,38 @@ public class InstalledGameCatalogTests : IDisposable
         Assert.Equal("neogeocd", RomCanonicalResolver.CanonicalScoringSystem("neogeocd"));
     }
 
+    [Theory]
+    [InlineData("cps1")]
+    [InlineData("cps2")]
+    [InlineData("cps3")]
+    [InlineData("cave")]
+    [InlineData("naomi")]
+    public void Les_autres_dossiers_d_arcade_de_RetroBat_sont_de_l_arcade_pour_le_scoring(string dossier)
+    {
+        // 24/11 (1.9.214) : meme trou que neogeo ; le wrapper, le profil et le site les rangeaient deja sous arcade.
+        Assert.Equal("arcade", RomCanonicalResolver.CanonicalScoringSystem(dossier));
+        Assert.Equal("arcade", RomCanonicalResolver.CanonicalScoringSystem(dossier.ToUpperInvariant()));
+        Assert.Contains(dossier, RomCanonicalResolver.FrontendSystemsFor("arcade"));
+
+        PoserRom(dossier, "jeu.zip");
+        PoserMem("arcade", "jeu-d-arcade", "SCORE_STATE");
+        var resolveur = new FauxResolveur { ["jeu.zip"] = "jeu-d-arcade" };
+        var jeu = Assert.Single(Catalogue(resolveur).Enumerate(new[] { "arcade" }), j => j.FrontendSystemId == dossier);
+        Assert.Equal("arcade", jeu.CanonicalSystemId);
+        Assert.Equal("jeu-d-arcade", jeu.RomGroup);
+        Assert.True(jeu.ScorableLocal);
+    }
+
+    [Fact]
+    public void Un_dossier_console_reste_hors_de_l_arcade()
+    {
+        foreach (var console in new[] { "neogeocd", "megadrive", "snes", "nes", "psp" })
+        {
+            Assert.Equal(console, RomCanonicalResolver.CanonicalScoringSystem(console));
+            Assert.DoesNotContain(console, RomCanonicalResolver.FrontendSystemsFor("arcade"));
+        }
+    }
+
     [Fact]
     public void Une_rom_du_dossier_neogeo_entre_dans_l_inventaire_arcade()
     {
