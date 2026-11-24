@@ -99,3 +99,37 @@ public class NvramEpingleeTests
         File.WriteAllBytes(chemin, [0xFF]);
     }
 }
+
+public class NvramAvantLeLancementTests
+{
+    [Theory]
+    [InlineData("-system fbneo -emulator libretro -core fbneo -rom \"E:/RetroBat/roms/fbneo/ddpdojblka.zip\"", "fbneo", "E:/RetroBat/roms/fbneo/ddpdojblka.zip")]
+    [InlineData("-rom \"E:/r/neogeo/mslug.zip\" -system \"neogeo\"", "neogeo", "E:/r/neogeo/mslug.zip")]
+    public void Un_lancement_direct_dit_son_systeme_et_sa_rom(string arguments, string systeme, string rom)
+    {
+        Assert.Equal(systeme, RetroBat.Api.Netplay.FicheDeLancement.SystemeDesArguments(arguments));
+        Assert.Equal(rom, RetroBat.Api.Netplay.FicheDeLancement.RomDesArguments(arguments));
+    }
+
+    [Fact]
+    public void Des_arguments_sans_systeme_n_en_inventent_pas()
+        => Assert.Null(RetroBat.Api.Netplay.FicheDeLancement.SystemeDesArguments("-rom \"E:\a\b.zip\""));
+
+    [Fact]
+    public void Une_NVRAM_epinglee_laissee_par_une_partie_sans_passeport_s_efface_et_le_hi_reste()
+    {
+        var saves = Path.Combine(Path.GetTempPath(), "nvramlancement_" + Guid.NewGuid().ToString("N"));
+        var nv = Path.Combine(saves, "fbneo", "fbneo");
+        Directory.CreateDirectory(nv);
+        var fs = Path.Combine(nv, "ddpdojblka.fs");
+        var hi = Path.Combine(nv, "ddpdojblka.hi");
+        File.WriteAllBytes(fs, new byte[] { 1 });
+        File.WriteAllBytes(hi, new byte[] { 2 });
+        try
+        {
+            var copies = NvramSnapshotService.CopiesEpinglees("fbneo", "ddpdojblka", new[] { "fbneo/ddpdojblka.fs" }, saves);
+            Assert.Equal(new[] { fs }, copies.ToArray());
+        }
+        finally { Directory.Delete(saves, true); }
+    }
+}

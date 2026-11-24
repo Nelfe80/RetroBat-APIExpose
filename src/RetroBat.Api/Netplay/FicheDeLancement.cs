@@ -19,6 +19,15 @@ public static class FicheDeLancement
     public static bool ADejaUneFiche(string arguments)
         => Regex.IsMatch(arguments, @"(?:^|\s)-gameinfo(\s|$)", RegexOptions.IgnoreCase);
 
+    private static readonly Regex Systeme = new(@"(?:^|\s)-system\s+""?([^""\s]+)""?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    /// <summary>Le systeme (<c>-system</c>) des arguments du lanceur, ou null. Pur.</summary>
+    public static string? SystemeDesArguments(string arguments)
+    {
+        var m = Systeme.Match(arguments ?? "");
+        return m.Success ? m.Groups[1].Value : null;
+    }
+
     public static string? RomDesArguments(string arguments)
     {
         var m = Rom.Match(arguments);

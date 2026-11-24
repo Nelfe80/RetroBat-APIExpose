@@ -254,6 +254,47 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
         }
     }
 
+    /// <summary>
+    /// LA NVRAM D'USINE AVANT CHAQUE LANCEMENT (24/11, DaiOuJou de NeoGeoff). Elle ne s'effacait qu'a la selection d'ES et
+    /// apres un passeport : un jeu lance puis quitte sans passeport gardait sa NVRAM, et un octet deja a sa valeur (0x3810 = 1)
+    /// ne changeait plus, donc son signal restait muet. Les deux points de passage d'un lancement l'appellent : le crochet
+    /// game-start d'ES (selection, relance, collection) et le lancement direct (Defier, fiche, MASS RUN...), TOUJOURS avant
+    /// le lanceur, donc avant la capture du depart. Effacer la veille d'un lancement plutot qu'a la fin d'une partie evite
+    /// toute course avec la lecture finale du passeport (faite apres la fermeture de l'emulateur). Jamais pendant qu'un
+    /// emulateur tourne (garde de EffacerEpinglees). Seules les epingles du profil sont touchees ; le .hi reste.
+    /// </summary>
+    public async Task EffacerLaNvramAvantLeLancementAsync(string systemeEs, string chemin)
+    {
+        try
+        {
+            if (_nvram is null || !_options.CurrentValue.NelfePlay.ForceCertifiedSettings) return;
+            if (string.IsNullOrWhiteSpace(systemeEs) || string.IsNullOrWhiteSpace(chemin)) return;
+            var fichier = Path.GetFileName(chemin);
+            var systeme = SystemeDuProfil(systemeEs);
+            var romGroup = _canonical.ResolveScoreSlug(systeme, fichier, null, null);
+            if (string.IsNullOrWhiteSpace(romGroup)) return;
+            using var delai = new CancellationTokenSource(TimeSpan.FromSeconds(4));
+            if (await ValeursAttenduesEnCacheAsync(systeme, romGroup, delai.Token).ConfigureAwait(false) is null) return;
+            IReadOnlyList<string>? epingles;
+            lock (_verrou) _epingles.TryGetValue(systeme + "|" + romGroup, out epingles);
+            if (epingles is { Count: > 0 })
+                _nvram.EffacerEpinglees(systemeEs, Path.GetFileNameWithoutExtension(fichier), epingles);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "NVRAM : effacement avant le lancement impossible.");
+        }
+    }
+
+    /// <summary>Lancement direct : le systeme et la ROM se lisent dans les arguments du lanceur.</summary>
+    private Task AvantUnLancementDirect(string arguments)
+    {
+        var systeme = RetroBat.Api.Netplay.FicheDeLancement.SystemeDesArguments(arguments);
+        var rom = RetroBat.Api.Netplay.FicheDeLancement.RomDesArguments(arguments);
+        if (systeme is null || rom is null) return Task.CompletedTask;
+        return EffacerLaNvramAvantLeLancementAsync(systeme, rom);
+    }
+
     /// <summary>Le jeu (dossier de systeme, fichier) est-il dans la collection ? Sans egard a la casse. Pur.</summary>
     internal static bool DansLaCollection(IReadOnlyList<(string Systeme, string Fichier)> jeux, string systeme, string fichier)
         => jeux.Any(j => string.Equals(j.Systeme, systeme, StringComparison.OrdinalIgnoreCase)
@@ -293,6 +334,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
     {
         // Avant l'ouverture d'EmulationStation, qui attend l'API : voir NeutraliserLaCollection.
         NeutraliserLaCollection();
+        RetroBat.Api.Netplay.NetplayLaunch.AvantLeLancement = AvantUnLancementDirect;
         _abonnement = _bus.Subscribe<EventEnvelope>(e =>
         {
             var type = e.Type?.ToLowerInvariant();
@@ -315,6 +357,7 @@ public sealed class CertifiedSettingsService : IHostedService, IDisposable
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
+        if (ReferenceEquals(RetroBat.Api.Netplay.NetplayLaunch.AvantLeLancement?.Target, this)) RetroBat.Api.Netplay.NetplayLaunch.AvantLeLancement = null;
         Effacer();
         _abonnement?.Dispose();
         return Task.CompletedTask;
