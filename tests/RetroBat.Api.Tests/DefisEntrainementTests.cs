@@ -210,13 +210,29 @@ public class DefisEntrainementTests
         => Directory.GetFiles(Dossier, "metal-slug-3.training-*.json").Order(StringComparer.Ordinal).Select(f => new object[] { Path.GetFileName(f) });
 
     /// <summary>
+    /// Le point d'un fichier, sans le suffixe de version : un reglement N+1 (`metal-slug-3.training-m1-00.v2.json`, etats du
+    /// FBNeo 261102, 23/11) garde l'identifiant de son point (`metal-slug-3.training-m1-00`), seul `version` et `ruleset` changent.
+    /// </summary>
+    private static string PointDuFichier(string fichier)
+        => System.Text.RegularExpressions.Regex.Replace(Path.GetFileNameWithoutExtension(fichier), @"\.v[0-9]+$", "");
+
+    /// <summary>Les points du Data Pack, chacun dans sa DERNIERE version (celle que le site sert) : un point v1 et son v2 ne
+    /// sont qu'un point.</summary>
+    private static List<Reglement> DernieresVersionsDuDataPack()
+        => PointsDuDataPack().Select(o => Reglement.Lire(File.ReadAllText(Path.Combine(Dossier, (string)o[0]))))
+            .GroupBy(p => p.ChallengeId, StringComparer.Ordinal)
+            .Select(g => g.OrderByDescending(p => p.Version).First())
+            .OrderBy(p => p.Ordre)
+            .ToList();
+
+    /// <summary>
     /// L'APERCU DE L'ONGLET TRAINING (vrai rendu GDI+) : ecrit dans NELFEPLAY_APERCUS s'il est donne, avec les textes fr de
     /// NELFEPLAY_APERCUS_TEXTES (interface-texts.json du Data Pack) ; sinon, verifie seulement que le dessin aboutit.
     /// </summary>
     [Fact]
     public void Apercu_de_l_onglet_TRAINING_avec_les_points_du_Data_Pack()
     {
-        var points = PointsDuDataPack().Select(o => Reglement.Lire(File.ReadAllText(Path.Combine(Dossier, (string)o[0])))).ToList();
+        var points = DernieresVersionsDuDataPack();
         var textes = Environment.GetEnvironmentVariable("NELFEPLAY_APERCUS_TEXTES") is { Length: > 0 } chemin
             ? new RetroBat.Api.Infrastructure.InterfaceTextService(chemin)
             : null;
@@ -239,7 +255,7 @@ public class DefisEntrainementTests
     [Fact]
     public void Le_Data_Pack_a_les_points_d_entree_des_cinq_missions()
     {
-        var points = PointsDuDataPack().Select(o => Reglement.Lire(File.ReadAllText(Path.Combine(Dossier, (string)o[0])))).ToList();
+        var points = DernieresVersionsDuDataPack();
         Assert.True(points.Count >= 40, $"{points.Count} points");
         Assert.Equal(5, points.Select(p => p.Groupe("en")).Distinct().Count());
         Assert.Equal(points.Count, points.Select(p => p.Ordre).Distinct().Count());
@@ -253,7 +269,7 @@ public class DefisEntrainementTests
     {
         var r = Reglement.Lire(File.ReadAllText(Path.Combine(Dossier, fichier)));
         Assert.True(r.EstUnEntrainement);
-        Assert.Equal("metal-slug-3." + Path.GetFileNameWithoutExtension(fichier)["metal-slug-3.".Length..], r.ChallengeId);
+        Assert.Equal(PointDuFichier(fichier), r.ChallengeId);
         Assert.True(r.Ruleset.Length <= 32);
         Assert.Equal("canonical_state", r.StartPolicy);
         Assert.NotNull(r.Etat);
