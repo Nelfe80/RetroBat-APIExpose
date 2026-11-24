@@ -1496,6 +1496,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 conseilDeRom = conseil;
                 Trace($"prevol : {verdictDeRom.Raison} ; {conseil}");
             }
+            // UNE OPTION DE TRICHE DU COEUR ACTIVEE (24/11, decision du user) : la partie n'est pas certifiable, et le
+            // joueur l'apprend avant de jouer, avec le nom de l'option. Elle prime sur « reglages en attente », que le
+            // site renvoie pour une empreinte inconnue (NeoGeoff, Batsugun Special, 14/11).
+            var triches = RetroBat.Api.Scoring.OptionsDeTriche.Actives(GetString(attestation, "CoreOptions"));
+            if (triches.Count > 0)
+            {
+                certifiable = false;
+                reason = RetroBat.Api.Scoring.OptionsDeTriche.Motif;
+                Trace($"prevol : option de triche du coeur active ({string.Join(", ", triches)}), non certifiable");
+            }
             var force = (GetString(attestation, "ForcedOptions") ?? "").Length > 0;
             // Les reglages du JEU que le forcage a remis d'usine (DIP), nommes au joueur : il les avait
             // changes, il doit savoir qu'ils ne comptent pas (decision user 2026-10-07).
@@ -1603,6 +1613,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             {
                 titre = "Partie non certifiable";
                 detail = ReasonToText(reason);
+                if (triches.Count > 0) detail = $"{detail} ({string.Join(", ", triches)})";
             }
             else if (dangers.Count > 0)
             {
@@ -1658,6 +1669,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 // Une version deja certifiee marquee mauvais dump : la version propre, conseillee sans bloquer (11/11).
                 else if (conseilDeRom is { Length: > 0 } && certifiable && verdictDeRom?.RomAttendue is { Length: > 0 } propre)
                     detailAffiche = $"{detailAffiche}. Version conseillée : {propre}";
+                if (triches.Count > 0) detailAffiche = $"{detailAffiche} ({string.Join(", ", triches)})";
                 if (setsEpingles is { Count: > 0 }) detailAffiche = $"{detailAffiche} {string.Join(", ", setsEpingles.Select(s => s + ".zip"))}";
                 _overlay.ShowTop("SCORING", titreAffiche, detailAffiche, 6000, alerte: !(certifiable && dangers.Count == 0), auDeck: NoticeDuPrevol(certifiable, reason, dangers, force, remisDUsine, horsLigne));
             }
@@ -3752,6 +3764,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // partie ne donne lieu à aucun passeport (pas de score), pour le diagnostic.
             var vu = JsonNode.Parse(sessionJson)!.AsObject();
             Trace($"entrées: impossible={(long?)vu["impossible_inputs"] ?? -1} appuis={(long?)vu["press_count"] ?? -1} macro={(long?)vu["macro_repeats"] ?? -1} forcé=[{(string?)vu["forced_options"] ?? ""}]");
+            // UNE OPTION DE TRICHE DU COEUR ACTIVEE : aucune soumission (24/11, decision du user). Le motif est celui du
+            // passeport (game.cheat_enabled) ; la partie ne laisse ni brouillon ni ligne dans MES RECORDS.
+            if (RetroBat.Api.Scoring.OptionsDeTriche.Actives((string?)vu["core_options"]) is { Count: > 0 } tricheDuCoeur)
+            {
+                Trace($"STOP: {RetroBat.Api.Scoring.OptionsDeTriche.Motif}, option de triche du coeur active ({string.Join(", ", tricheDuCoeur)}) : rien n'est soumis");
+                return;
+            }
             // Une partie sans le moindre appui n'est pas une partie : c'est la démo d'attract, ou
             // un jeu lancé et laissé là. Sonic a marqué 200 points tout seul et les a fait publier
             // sous le compte de la borne (2026-09-17). Le listener 0.336 compte les appuis ; un
@@ -4838,6 +4857,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // canonique triée. Absent (backend pas encore câblé) → placeholder stable. Le vérifieur ne
         // contrôle le digest QUE si le profil épingle allowed_core_options_digest (opt-in additif).
         string? coreOptionsRaw = (string?)session["core_options"];
+        // Une option de triche du coeur (24/11) : le passeport dit cheats = true, comme pour la triche integree au jeu.
+        if (RetroBat.Api.Scoring.OptionsDeTriche.Actives(coreOptionsRaw).Count > 0) tricheDuJeu = true;
         bool mameDipSwitches = string.Equals((string?)session["core_options_source"], "mame_dip", StringComparison.Ordinal);
         string? coreOptions = FilterGameplayCoreOptions(coreOptionsRaw, mameDipSwitches);
         string coreOptionsDigest = !string.IsNullOrEmpty(coreOptions)
@@ -5643,7 +5664,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         return $"Score certifié : {score:N0} publié" + (ou.Length > 0 ? $" ({ou})" : "");
     }
 
-    private static string ReasonToText(string reason) => reason switch
+    internal static string ReasonToText(string reason) => reason switch
     {
         "" => "accepté",
         "runtime.fast_forward_detected" => "avance rapide détectée",
@@ -5664,6 +5685,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         "emulator.profile_moved" => "le règlement du jeu a changé pendant l'attente",
         "emulator.rejected" => "émulateur écarté",
         "settings.unknown" => "réglages en attente de conformité",
+        "game.cheat_enabled" => "option de triche du cœur active",
         "metric.spike" => "lecture isolée : le score ne suit pas la partie, à vérifier",
         "metric.single_sample" => "une seule lecture du score sur toute la partie : mets APIExpose à jour",
         "profile.content_mismatch" => "ROM non reconnue",

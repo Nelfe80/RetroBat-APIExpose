@@ -1387,7 +1387,9 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             catch (Exception) { chemin = ""; }
             var langue = Langue();
             return LocalPlaysIndex.MesParties(_partiesLocales.Toutes(), _romGroup, _reglePrincipale,
-                _session.Get()?.PlayerCode ?? "", ReplaysDeCeJeu(chemin), utc => DateDeLaPartie(utc, langue));
+                _session.Get()?.PlayerCode ?? "", ReplaysDeCeJeu(chemin), utc => DateDeLaPartie(utc, langue),
+                raison => CabinetAnnounceText.Find("reason_" + raison.Replace('.', '_'), langue)
+                          ?? NelfePlayScoringReporter.ReasonToText(raison));
         }
         catch (Exception ex)
         {
