@@ -510,6 +510,14 @@ public sealed class WorldScoringLancementService : IHostedService, IDisposable
                     continue;
                 }
 
+                // La fiche porte deja ce coeur (ES l'ignore si le systeme ne le declare pas : voir ResolveLaunchConfig) : rien a
+                // renvoyer, ni a noter, a chaque demarrage.
+                if (string.Equals(actuel.Emulator, voulu.Emulator, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(actuel.Core, voulu.Core, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 var confort = ConfortARendre(etat.GetValueOrDefault(cle), actuel.Emulator ?? string.Empty, actuel.Core ?? string.Empty, voulu);
                 // Un jeu en automatique sous FBNeo : en sortant, il retrouve le coeur MAME qu'il aurait eu (ES ne sait
                 // pas vider le champ, FBNeo resterait hors de World Scoring).
