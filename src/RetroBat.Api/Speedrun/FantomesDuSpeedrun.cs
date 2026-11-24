@@ -97,6 +97,8 @@ public sealed partial class FantomesDuSpeedrun
     private readonly ILogger<FantomesDuSpeedrun>? _journal;
     private readonly Dictionary<string, (DateTime Lu, bool Admis)> _admissions = new(StringComparer.Ordinal);
     private Hote? _hote;
+    /// <summary>(24/11) L'empreinte du coeur hote de ce speedrun, lue a sa preparation : dit s'il retrouve le run d'un replay trop long.</summary>
+    private string? _empreinteDuCoeur;
     private readonly object _verrou = new();
     private readonly IDisposable? _abonnement;
     private bool _enCourse;
@@ -161,6 +163,60 @@ public sealed partial class FantomesDuSpeedrun
         var etat = (long)BitConverter.ToUInt32(fantome, 16);
         return 20 + etat + 4 <= fantome.Length ? BitConverter.ToUInt32(fantome, (int)(20 + etat)) : null;
     }
+
+    /// <summary>
+    /// (24/11) LES IMAGES QU'UN REPLAY PROPRE GARDE EN PLUS DE SON RUN : l'ouverture du niveau avant le depart et quelques
+    /// images apres l'arrivee (replays de Super Mario World du 20 au 24/11 : 7 a 84). Au-dela, le replay contient autre chose
+    /// que son run.
+    /// </summary>
+    internal const long ImagesEnPlusDUnReplayPropre = 240;
+
+    /// <summary>
+    /// (24/11) LE REPLAY TROP LONG : plus de <see cref="ImagesEnPlusDUnReplayPropre"/> images au-dela de la duree du run. Un
+    /// replay de record fait avant la 1.9.211 (le chrono ne partait pas depuis l'etat de l'epreuve) garde une premiere
+    /// tentative non chronometree avant le run (SMW Donut Secret 1, NeoGeoff : 4291 images pour 2749). Pur.
+    /// </summary>
+    internal static bool ReplayTropLong(long images, long duree) => duree > 0 && images - duree > ImagesEnPlusDUnReplayPropre;
+
+    /// <summary>
+    /// (24/11) LES COEURS HOTES QUI NE RETROUVENT PAS LE RUN D'UN REPLAY TROP LONG : tous ceux que le site admettait le 24/11
+    /// (<c>COEURS_DES_FANTOMES</c> de NelfePlay-Site, <c>app/ChallengeRepository.php</c>). Ils font partir le fantome du
+    /// PREMIER depart du replay : la tentative abandonnee. Depuis le coeur du 24/11 (NelfePlay-Ghosts, branche
+    /// <c>fix/fantome-dernier-depart</c>), le fantome part du dernier depart qui laisse toute la duree du run avant la fin du
+    /// replay, au meme zero que le chrono ; une empreinte absente d'ici est donc un coeur qui le sait.
+    /// </summary>
+    internal static readonly IReadOnlySet<string> CoeursQuiPartentDuPremierDepart = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        // genesis_plus_gx_ghosts 0.3 a 0.12
+        "8247886049b5af3e5c6c3c05db0ce557237e7777b8245da704c9c2a1bb6c2fdb", "f26f6cecb2699e6125a7414e140f2be95825337c3759d9b8d3382bf8e9caef52",
+        "22adddccf12e3859dca622c2585d1116f1840cb078ae08506e4b05248cd35cf0", "3d256dfdeeeb0eb2cf6bc6638a2865b24a948d5243a5adbb47e03780743d071d",
+        "42e6bd25e54b0ee24a337b92241e019d01b18b473732fc829e56a1b490221e63", "166e5e8d28a6b9e7e131f4d3ac935c79337161338126f9d6ef53625a6703fcbc",
+        "357999eddcf946f7cfe1e38e9980617b56a0d8638de22d649342880590f7bd91", "ba90cfff499baca80520ab60d42ee3adb6e0eb40f3197d34adec1f5ee0d4d044",
+        "df1969160d500596a7917ea18890108752f45064a3633ed5a52d44ae55ba35b5",
+        // snes9x_ghosts 0.4 a 0.12
+        "32fe78e111fa8b2ea922365bce063bb14c4c087f56ded99488c0b26fb7e81fac", "91d00069ac9f801c5a6bf75b0d5e9613108fcac01cc5811cf89ca83b634c2718",
+        "956b05c7fddf510da3cf57eb4c2d95868987739dff8469ebecaa8adf1a8c4eb3", "deebeed110a9b4cc316fe2ee07deee66d424fdc5fd35d8de1f8613337b45ff07",
+        "9d370d7b470c62015c0ef95ba47bcd2107433e7f563d153c3bdec3bd04067286", "9b3a013715f832bb8e16cdccd3d1a37cb59c139b2246a5ca6640c8e1a228d8d1",
+        "e345d9802f84be00a9184ebd1de29d1fe088dc476bb56c620388deb44eb0b793", "009f3e631b492d29291b8501f7f973b2accf32ae3e068cdd0fdf15397da55e23",
+        // fceumm_ghosts 0.1 a 0.13
+        "3a4d174a3d0cfcfac3315dfe1cf8f1a5a162075ae6a6320ee6ba7534c7426c43", "219809df11703a1c13be92cc8147a20536b6b8b03da340969aa21b60af98e95d",
+        "896cb0fbdb30a6e0218939a8c80d111b183700a0612c8c19e86ee98799a03a8b", "226fbc5fadbec6e02fb20fb4814cafc4076522472bc39f46052392c7cb675156",
+        "cc685386488e93fbe1d80b099b6abd90d9f448b676c43825a7dcdc9354c69e6d", "fcdfe9217b210916b1ad477f16117c453a2c7a4dbcef2555486ea307aca3acf0",
+        "68a7e021fea3cb574771951c1b8dd7fc6d9b60ae0149fd0a477f96bc7328736d", "e8bd3223a1f0b257fb8d325703bdb618bf5375cc58fde9f7d77157458431278b",
+        "39d3879822c5e5d15b607b2c107a736423b56310c82b04d5fae96072d4cbd7bb", "b0b17965f52848f9e0f77a96111fca6e1a78f7ea08d290b7e2e33de0ca31b8dc",
+        "035148cd9b4f1ea379453d12aef606a6407e7ddd9e7c59c82e664b55c2f8982f", "4f24eddda21f18aa1fa0034a0b35564b44f7d606a5900f57b291cd27eee3b2dd",
+    };
+
+    /// <summary>
+    /// (24/11) Ce replay peut-il devenir un fantome sur ce coeur ? Un replay propre, oui. Un replay trop long
+    /// (<see cref="ReplayTropLong"/>) d'une epreuve partie d'un etat, seulement sur un coeur qui retrouve son run (absent de
+    /// <see cref="CoeursQuiPartentDuPremierDepart"/>) : sur un autre, le fantome rejouerait la tentative abandonnee, et le
+    /// candidat suivant du classement prend sa place. Un coeur d'empreinte inconnue est traite comme un ancien. Le jeu complet
+    /// parti du demarrage (Super Metroid) a une longue ouverture par nature : il n'est pas concerne. Pur.
+    /// </summary>
+    internal static bool PeutCourir(Hote hote, long? images, long? duree, string? empreinteDuCoeur)
+        => !hote.SurEtatSeulement || images is not { } i || duree is not { } d || !ReplayTropLong(i, d)
+           || (empreinteDuCoeur is { Length: > 0 } e && !CoeursQuiPartentDuPremierDepart.Contains(e));
 
     /// <summary>Le temps du joueur sur ce classement, ou null. Pur.</summary>
     internal static long? MonTemps(JsonElement classement, string pseudo)
@@ -237,6 +293,11 @@ public sealed partial class FantomesDuSpeedrun
                     replay, images, duree);
                 return;
             }
+
+            // (24/11) un replay qui contient plus que son run : un coeur ancien rejouerait ce qui precede le run
+            string? empreinte;
+            lock (_verrou) empreinte = _empreinteDuCoeur;
+            if (!TropLongAdmis(hote, replay, ImagesDuFantome(fantome), dureeDuRun ?? temps, empreinte)) return;
 
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
             foreach (var ancien in Directory.EnumerateFiles(dossier, PrefixeDuMien + "*.nghost")) File.Delete(ancien);
@@ -373,6 +434,8 @@ public sealed partial class FantomesDuSpeedrun
     private async Task<bool> PreparerAsync(Reglement r, Hote hote, string pseudo, CancellationToken ct, TaskCompletionSource<bool>? admis = null)
     {
         var coeurAdmis = false;
+        var empreinteDuCoeur = await EmpreinteDuCoeurAsync(hote.Coeur, ct).ConfigureAwait(false);
+        lock (_verrou) _empreinteDuCoeur = empreinteDuCoeur;
         try { coeurAdmis = await CoeurAdmisAsync(hote.Coeur, ct).ConfigureAwait(false); }
         finally { admis?.TrySetResult(coeurAdmis); }
         if (!coeurAdmis)
@@ -411,6 +474,9 @@ public sealed partial class FantomesDuSpeedrun
         var local = Choix is ChoixDesFantomes.MonRecordEtMondial or ChoixDesFantomes.MonRecord ? LireLeRecordLocal(r.ChallengeId) : null;
         // un record local garde avant la garde du 05/11 peut ne pas contenir son run : il ne court pas
         if (local is { } court && ImagesDuFantome(court.Fantome) is { } n && n < (court.Duree ?? court.Images)) local = null;
+        // (24/11) un record local trop long (tentative abandonnee avant le run) ne court que sur un coeur qui retrouve son run
+        if (local is { } garde && !TropLongAdmis(hote, garde.Replay, ImagesDuFantome(garde.Fantome), garde.Duree ?? garde.Images, empreinteDuCoeur))
+            local = null;
         // (05/11) mon temps publie sans replay valide (retire : il ne contenait pas son run) : mon record local court a sa place
         if (local is { } l && (monTempsPublie is not { } publie || l.Images <= publie || mien is null))
         {
@@ -451,6 +517,14 @@ public sealed partial class FantomesDuSpeedrun
                     replay, images, duree);
                 continue;
             }
+
+            // (24/11) LE REPLAY TROP LONG (record d'avant la 1.9.211, tentative abandonnee avant le run) : garde (decision du
+            // user), il court sur un coeur qui retrouve son run ; sur un ancien coeur, le candidat suivant prend sa place
+            if (!TropLongAdmis(hote, replay, ImagesDuFantome(fantome),
+                    dureeDuRun ?? (tempsDesReplays.TryGetValue(replay, out var dt) ? dt : null), empreinteDuCoeur))
+            {
+                continue;
+            }
             var dossier = Directory.CreateDirectory(DossierDe(hote)).FullName;
             var nom = (replay == mien ? PrefixeDuMien : $"{poses + 1}-") + replay;
             await File.WriteAllBytesAsync(Path.Combine(dossier, nom + ".nghost"), AuCrcDuJeu(fantome, hote.Crc), ct).ConfigureAwait(false);
@@ -483,9 +557,7 @@ public sealed partial class FantomesDuSpeedrun
             if (_admissions.TryGetValue(nom, out var connue) && DateTime.UtcNow - connue.Lu < FraicheurDeLAdmission) return connue.Admis;
         }
 
-        var coeur = CheminDuCoeur(nom);
-        if (coeur is null) return false;
-        var empreinte = Convert.ToHexString(SHA256.HashData(await File.ReadAllBytesAsync(coeur, ct).ConfigureAwait(false))).ToLowerInvariant();
+        if (await EmpreinteDuCoeurAsync(nom, ct).ConfigureAwait(false) is not { } empreinte) return false;
         try
         {
             using var client = _http.CreateClient(IndexDesDefisService.HttpClientName);
@@ -499,6 +571,40 @@ public sealed partial class FantomesDuSpeedrun
             _journal?.LogDebug(e, "Fantomes : open-games injoignable.");
             return false;
         }
+    }
+
+    /// <summary>Le SHA-256 du coeur hote pose chez RetroArch, ou null s'il n'y est pas.</summary>
+    private static async Task<string?> EmpreinteDuCoeurAsync(string nom, CancellationToken ct)
+    {
+        if (CheminDuCoeur(nom) is not { } coeur) return null;
+        try
+        {
+            return Convert.ToHexString(SHA256.HashData(await File.ReadAllBytesAsync(coeur, ct).ConfigureAwait(false))).ToLowerInvariant();
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// (24/11) <see cref="PeutCourir"/>, et le journal : un replay trop long le dit toujours (combien d'images en plus), qu'il
+    /// coure (le coeur part du dernier depart) ou non (ancien coeur).
+    /// </summary>
+    private bool TropLongAdmis(Hote hote, string replay, long? images, long? duree, string? empreinteDuCoeur)
+    {
+        if (images is not { } i || duree is not { } d || !ReplayTropLong(i, d)) return true;
+        if (PeutCourir(hote, images, duree, empreinteDuCoeur))
+        {
+            _journal?.LogWarning("Fantomes : {Replay} est trop long ({Images} images pour un run de {Duree}, {EnPlus} en plus) : "
+                + "le coeur hote part du dernier depart qui laisse tout le run.", replay, i, d, i - d);
+            return true;
+        }
+
+        _journal?.LogWarning("Fantomes : {Replay} est trop long ({Images} images pour un run de {Duree}, {EnPlus} en plus : une "
+            + "tentative avant le run) et ce coeur hote ({Empreinte}) partirait de son premier depart : il ne court pas.",
+            replay, i, d, i - d, empreinteDuCoeur is { Length: >= 12 } e ? e[..12] : "inconnu");
+        return false;
     }
 
     /// <summary>L'empreinte du coeur est-elle dans `ghost_cores` ? Pur.</summary>
