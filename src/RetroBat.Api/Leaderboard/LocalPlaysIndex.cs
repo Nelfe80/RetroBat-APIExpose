@@ -28,7 +28,8 @@ public sealed class LocalPlaysIndex
         string Verdict,
         string Monde,
         string JoueurDeSession,
-        bool Labo);
+        bool Labo,
+        string Motif = "");
 
     /// <summary>Un replay enregistre sur cette borne : sa fin, sa duree, et le score qui lui a ete attache.</summary>
     public sealed record ReplayLocal(string ReplayId, DateTime FinUtc, TimeSpan Duree, long? Score);
@@ -46,6 +47,32 @@ public sealed class LocalPlaysIndex
 
     /// <summary>Le verdict d'une partie gardee sur la borne, pas encore envoyee (piste B).</summary>
     public const string EnAttente = "pending";
+
+    /// <summary>Le verdict d'une partie classee : la seule qui ne se grise pas dans MES RECORDS.</summary>
+    public const string Publiee = "published";
+
+    /// <summary>
+    /// Une partie qui n'est pas au classement (en attente d'envoi, signalee, en quarantaine, expiree) : MES RECORDS la grise
+    /// et l'ecrit en italique, pour qu'elle ne passe pas pour un record normal (24/11, NeoGeoff : 822 180 en attente de
+    /// conformite, montre comme les autres).
+    /// </summary>
+    internal static bool Grisee(Partie p) => !string.Equals(p.Verdict, Publiee, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>La raison du verdict gardee dans la reponse du site (« settings.unknown »), ou vide.</summary>
+    internal static string MotifDuVerdict(JsonElement racine)
+    {
+        try
+        {
+            if (!racine.TryGetProperty("server_response", out var brut)) return "";
+            var texte = brut.ValueKind == JsonValueKind.String ? brut.GetString() : brut.GetRawText();
+            if (string.IsNullOrWhiteSpace(texte)) return "";
+            using var reponse = JsonDocument.Parse(texte);
+            return reponse.RootElement.ValueKind == JsonValueKind.Object
+                   && reponse.RootElement.TryGetProperty("reason", out var r) && r.ValueKind == JsonValueKind.String
+                ? r.GetString() ?? "" : "";
+        }
+        catch (JsonException) { return ""; }
+    }
 
     /// <summary>Toutes les parties lisibles du dossier. Ne relit que les fichiers nouveaux ou modifies.</summary>
     public IReadOnlyList<Partie> Toutes()
@@ -173,7 +200,8 @@ public sealed class LocalPlaysIndex
                 Texte(racine, "verdict"),
                 Texte(contexte, "world"),
                 Texte(identite, "session_player_id"),
-                labo);
+                labo,
+                MotifDuVerdict(racine));
         }
         catch (JsonException)
         {
@@ -219,7 +247,8 @@ public sealed class LocalPlaysIndex
         string regle,
         string joueurDeSession,
         IReadOnlyList<ReplayLocal> replays,
-        Func<DateTime, string> date)
+        Func<DateTime, string> date,
+        Func<string, string>? motif = null)
     {
         var choisies = parties
             .Where(Retenue)
@@ -236,7 +265,9 @@ public sealed class LocalPlaysIndex
         return rangees.Select((p, i) => new LeaderboardClient.Ligne(
             Rang: i + 1,
             // Une partie gardee sur la borne le dit par un sablier, dans la colonne du sceau.
-            Joueur: date(p.DebutUtc),
+            // Le motif suit la date quand l'API le connait ; le sablier dit deja « pas encore envoyee ».
+            Joueur: Grisee(p) && p.Motif.Length > 0 && motif?.Invoke(p.Motif) is { Length: > 0 } texte
+                ? date(p.DebutUtc) + " · " + texte : date(p.DebutUtc),
             Valeur: p.Score,
             Ville: "",
             Pays: "",
@@ -248,6 +279,8 @@ public sealed class LocalPlaysIndex
             Monde: p.Monde,
             Poignee: "",
             PlusBasEstMieux: plusBas,
-            EnAttente: p.Verdict == EnAttente)).ToList();
+            EnAttente: p.Verdict == EnAttente,
+            Grise: Grisee(p),
+            Motif: p.Motif)).ToList();
     }
 }

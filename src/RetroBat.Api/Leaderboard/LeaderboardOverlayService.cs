@@ -1574,6 +1574,9 @@ public sealed partial class LeaderboardOverlayService : IDisposable
             }
 
             // A gauche : la coupe, le rang, la touche et l'etat de suivi, puis le pseudo et son monde.
+            // MES RECORDS : une partie en attente ou retenue (pas au classement) s'ecrit en italique et grisee (24/11).
+            using var policeItalique = new Font(police, police.Style | FontStyle.Italic);
+            using var grasItalique = new Font(gras, gras.Style | FontStyle.Italic);
             var xRang = marge + hauteurIcone + 10f;
             var xSuivi = xRang + largeurRang;
             var touche = suiviVisible && c.GlypheSuivre.Length > 0 ? _service._glyphes?.Glyphe(c.GlypheSuivre, (int) (taille * 0.9f), Teinte(s.SelectedTextColor)) : null;
@@ -1604,13 +1607,16 @@ public sealed partial class LeaderboardOverlayService : IDisposable
                 var choisie = i == c.LigneCourante && c.NousAvonsLaMain;
                 if (choisie) BarreDeSelection(g, s, new RectangleF(0, y, Width, hauteur));
                 var encre = choisie ? couleurChoisi : (l.CestMoi ? couleurMoi : couleurTexte);
+                if (l.Grise) encre = Color.FromArgb(choisie ? 200 : 140, encre);
                 using var pinceau = new SolidBrush(encre);
+                var policeLigne = l.Grise ? policeItalique : police;
+                var grasLigne = l.Grise ? grasItalique : gras;
 
                 // Le score en GRAS : c'est la donnee que l'oeil cherche en premier. Un ✓1CC (jeu fini sur un
                 // seul credit) passe en dore, sa marque juste devant le nombre.
                 var valeur = l.Valeur.ToString("N0", System.Globalization.CultureInfo.CurrentCulture);
                 using var pinceauScore = new SolidBrush(l.Clear && !choisie ? OrDuClear : encre);
-                g.DrawString(valeur, gras, pinceauScore, new RectangleF(0, y, xScore, hauteur), droite);
+                g.DrawString(valeur, grasLigne, pinceauScore, new RectangleF(0, y, xScore, hauteur), droite);
                 if (l.Clear)
                 {
                     var largeurValeur = g.MeasureString(valeur, gras, PointF.Empty, StringFormat.GenericTypographic).Width;
@@ -1643,7 +1649,7 @@ public sealed partial class LeaderboardOverlayService : IDisposable
                 // Le rang s'ecrit comme sur nelfeplay.com : la colonne « # ». Les trois
                 // premiers portent en plus leur ordinal, le meme mot que le podium du site.
                 var rang = "#" + l.Rang;
-                var policeRang = l.Rang <= 3 && !c.SansPodium ? gras : police;
+                var policeRang = l.Rang <= 3 && !c.SansPodium ? grasLigne : policeLigne;
                 g.DrawString(rang, policeRang, pinceau, new RectangleF(xRang, y, largeurRang, hauteur), gauche);
 
                 // Le mouvement depuis la derniere consultation : fleche BLEUE vers le haut quand le
@@ -1686,8 +1692,8 @@ public sealed partial class LeaderboardOverlayService : IDisposable
                 }
 
                 // Le pseudo en CAPITALES, comme les entrees d'ES, coupe par trois points s'il deborde.
-                var nom = Couper(g, (l.Joueur.Length > 0 ? l.Joueur : "?").ToUpperInvariant(), police, largeurNom);
-                g.DrawString(nom, police, pinceau, new RectangleF(xNom, y, largeurNom + 2, hauteur), gauche);
+                var nom = Couper(g, (l.Joueur.Length > 0 ? l.Joueur : "?").ToUpperInvariant(), policeLigne, largeurNom);
+                g.DrawString(nom, policeLigne, pinceau, new RectangleF(xNom, y, largeurNom + 2, hauteur), gauche);
 
                 // Le monde du record, par la police FontAwesome d'ES : maison, immeuble (salle
                 // verifiee) ou trophee (contest). Un pictogramme que le joueur lit sans legende.
