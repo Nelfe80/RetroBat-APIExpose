@@ -69,4 +69,18 @@ public class FantomesTropLongsTests
         Assert.Equal(29, FantomesDuSpeedrun.CoeursQuiPartentDuPremierDepart.Count);   // 9 genesis_plus_gx, 8 snes9x, 12 fceumm
         Assert.DoesNotContain(Snes9xGhostsDuDernierDepart, FantomesDuSpeedrun.CoeursQuiPartentDuPremierDepart);
     }
+
+    [Fact]
+    public void Le_coeur_snes_livre_en_1_9_215_est_reconnu_comme_un_coeur_qui_retrouve_son_run()
+    {
+        // snes9x_ghosts du 24/11 (livre par outils.json avec la 1.9.215) : seul coeur essaye, seul nomme
+        Assert.Single(FantomesDuSpeedrun.CoeursQuiRetrouventLeRun);
+        Assert.Contains(Snes9xGhostsDuDernierDepart, FantomesDuSpeedrun.CoeursQuiRetrouventLeRun);
+        Assert.True(FantomesDuSpeedrun.CoeursQuiRetrouventLeRun.Contains(Snes9xGhostsDuDernierDepart.ToUpperInvariant()));
+        Assert.Empty(FantomesDuSpeedrun.CoeursQuiRetrouventLeRun.Intersect(FantomesDuSpeedrun.CoeursQuiPartentDuPremierDepart, StringComparer.OrdinalIgnoreCase));
+        // les fceumm_ghosts et genesis_plus_gx_ghosts de la meme branche, non essayes, ne partent pas
+        Assert.DoesNotContain("b924f2686d71760ca93321bbe86711494604edd0f03bae50f7b39bd81fe79a59", FantomesDuSpeedrun.CoeursQuiRetrouventLeRun);
+        Assert.DoesNotContain("3f0a4affd375b505e74a58fb25575f66da9c9f1e2e83b6ac3c9d2cdad09bcd29", FantomesDuSpeedrun.CoeursQuiRetrouventLeRun);
+        Assert.True(FantomesDuSpeedrun.PeutCourir(Hote("super-mario-world"), 4291, 2749, Snes9xGhostsDuDernierDepart.ToUpperInvariant()));
+    }
 }

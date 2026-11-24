@@ -208,15 +208,30 @@ public sealed partial class FantomesDuSpeedrun
     };
 
     /// <summary>
+    /// (25/11, 1.9.215) LES COEURS HOTES LIVRES QUI RETROUVENT LE RUN D'UN REPLAY TROP LONG : le fantome part du dernier depart
+    /// qui laisse toute la duree du run avant la fin du replay (NelfePlay-Ghosts, branche <c>fix/fantome-dernier-depart</c>).
+    /// Seul le coeur ESSAYE au banc part : snes9x_ghosts du 24/11 (livre par outils.json avec la 1.9.215, admis au site dans
+    /// <c>COEURS_DES_FANTOMES</c>). Les fceumm_ghosts et genesis_plus_gx_ghosts de la meme branche ne sont pas essayes : ils
+    /// ne partent pas. Liste nommee pour qu'un coeur livre soit reconnu par son empreinte ; la regle reste celle de
+    /// <see cref="PeutCourir"/> (un coeur absent de <see cref="CoeursQuiPartentDuPremierDepart"/> le sait).
+    /// </summary>
+    internal static readonly IReadOnlySet<string> CoeursQuiRetrouventLeRun = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        // snes9x_ghosts du 24/11 (dernier depart, meme zero que le chrono), essaye au banc sur Donut Secret 1
+        "2a9c9e2a1987a7254971f176acddfbaaf904987a53e321fd6c461369dd87473c",
+    };
+
+    /// <summary>
     /// (24/11) Ce replay peut-il devenir un fantome sur ce coeur ? Un replay propre, oui. Un replay trop long
     /// (<see cref="ReplayTropLong"/>) d'une epreuve partie d'un etat, seulement sur un coeur qui retrouve son run (absent de
     /// <see cref="CoeursQuiPartentDuPremierDepart"/>) : sur un autre, le fantome rejouerait la tentative abandonnee, et le
-    /// candidat suivant du classement prend sa place. Un coeur d'empreinte inconnue est traite comme un ancien. Le jeu complet
+    /// candidat suivant du classement prend sa place. Un coeur dont l'empreinte n'a pas ete lue est traite comme un ancien. Le jeu complet
     /// parti du demarrage (Super Metroid) a une longue ouverture par nature : il n'est pas concerne. Pur.
     /// </summary>
     internal static bool PeutCourir(Hote hote, long? images, long? duree, string? empreinteDuCoeur)
         => !hote.SurEtatSeulement || images is not { } i || duree is not { } d || !ReplayTropLong(i, d)
-           || (empreinteDuCoeur is { Length: > 0 } e && !CoeursQuiPartentDuPremierDepart.Contains(e));
+           || (empreinteDuCoeur is { Length: > 0 } e
+               && (CoeursQuiRetrouventLeRun.Contains(e) || !CoeursQuiPartentDuPremierDepart.Contains(e)));
 
     /// <summary>Le temps du joueur sur ce classement, ou null. Pur.</summary>
     internal static long? MonTemps(JsonElement classement, string pseudo)
