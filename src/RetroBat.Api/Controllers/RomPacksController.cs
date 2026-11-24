@@ -39,6 +39,12 @@ public sealed class RomPacksController : ControllerBase
         _echelle?.PoserPourLeLancement(rawArguments);
         // Et les reglages certifies du jeu (rembobinage, run-ahead, sauvegarde auto), que le lanceur lit juste apres.
         _certifies?.NeutraliserAvantLeLancement(rawArguments);
+        // Et la NVRAM d'usine du jeu ouvert au scoring : une partie quittee sans passeport ne laisse plus rien au lancement suivant.
+        if (_certifies is not null
+            && RetroBat.Api.Replay.Video.EchelleDesFilms.LancementDuScript(rawArguments) is { Systeme: { Length: > 0 } sys, Chemin: { Length: > 0 } rom })
+        {
+            await _certifies.EffacerLaNvramAvantLeLancementAsync(sys, rom);
+        }
         // Les notifications de RetroArch d'une partie NelfePlay lancee par ES : la cle par jeu, rendue des que l'emulateur parait (11/11)
         _notifications?.PoserAvantLeLancement(rawArguments);
         var result = await _romPackInstaller.EnsureLaunchRomAsync(rawArguments, cancellationToken);

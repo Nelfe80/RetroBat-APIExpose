@@ -90,6 +90,13 @@ public static class NetplayLaunch
 
     /// <summary>Comme LancerDirectement, mais rend le processus du lanceur : il vit tant que
     /// l'emulateur tourne, ce qui permet de savoir quand la partie finit.</summary>
+    /// <summary>
+    /// Pose par CertifiedSettingsService : efface la NVRAM que le profil epingle AVANT tout lancement direct (Defier, fiche,
+    /// relance, MASS RUN, MULTIPLAYER...), pour qu'un octet laisse par une partie jamais envoyee ne reste pas (24/11, DaiOuJou).
+    /// Recoit les arguments du lanceur. Null : rien a faire.
+    /// </summary>
+    public static Func<string, Task>? AvantLeLancement { get; set; }
+
     public static Process? DemarrerDirectement(string arguments, ILogger logger)
     {
         var exe = Path.Combine(RetroBatPaths.RetroBatRoot, "emulationstation", "emulatorLauncher.exe");
@@ -97,6 +104,16 @@ public static class NetplayLaunch
         {
             logger.LogWarning("Netplay : emulatorLauncher introuvable ({Chemin}).", exe);
             return null;
+        }
+        try
+        {
+            // 5 s au plus : le profil se lit au site au premier lancement d'un jeu ; sans reponse, le lancement ne attend pas.
+            if (AvantLeLancement is { } avant && !Task.Run(() => avant(arguments)).Wait(TimeSpan.FromSeconds(5)))
+                logger.LogWarning("NVRAM : effacement avant le lancement trop long, le jeu part quand meme.");
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "NVRAM : effacement avant le lancement impossible, le jeu part quand meme.");
         }
         string? fiche = null;
         try
