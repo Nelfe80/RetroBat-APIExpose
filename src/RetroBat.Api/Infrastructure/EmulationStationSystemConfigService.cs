@@ -36,7 +36,15 @@ public sealed class EmulationStationSystemConfigService
             return new EmulationStationLaunchConfig(string.Empty, string.Empty, string.Empty);
         }
 
-        var entries = GetEmulatorCores(normalizedSystemId);
+        return Resoudre(normalizedSystemId, GetEmulatorCores(normalizedSystemId), esSettings);
+    }
+
+    /// <summary>Le lancement d'un systeme d'apres ses coeurs declares et les reglages. Pur.</summary>
+    internal static EmulationStationLaunchConfig Resoudre(
+        string normalizedSystemId,
+        IReadOnlyList<EmulationStationSystemEmulatorCore> entries,
+        IReadOnlyDictionary<string, string> esSettings)
+    {
         var configuredEmulator = ReadSetting(esSettings, $"{normalizedSystemId}.emulator");
         var configuredCore = ReadSetting(esSettings, $"{normalizedSystemId}.core");
 
@@ -54,6 +62,18 @@ public sealed class EmulationStationSystemConfigService
         var selected = !string.IsNullOrWhiteSpace(core)
             ? selectedEntries.FirstOrDefault(entry => string.Equals(entry.Core, core, StringComparison.OrdinalIgnoreCase))
             : selectedEntries.FirstOrDefault(entry => !string.IsNullOrWhiteSpace(entry.Core));
+        // UN COEUR QUE LE SYSTEME NE DECLARE PAS N'EST JAMAIS LANCE (24/11, Blazing Star) : la fiche du jeu dans roms\mame disait
+        // <core>fbneo</core>, mais es_systems.cfg du systeme mame ne liste pas FBNeo et ES a passe « -core mame » au lanceur.
+        // Le coeur reellement lance est alors celui que le systeme designe d'office, pas celui de la fiche ni du reglage.
+        var coeurDeclare = string.IsNullOrWhiteSpace(core)
+            || selectedEntries.Count == 0
+            || selectedEntries.Any(entry => string.Equals(entry.Core, core, StringComparison.OrdinalIgnoreCase));
+        if (!coeurDeclare)
+        {
+            core = string.Empty;
+            selected = selectedEntries.FirstOrDefault(entry => !string.IsNullOrWhiteSpace(entry.Core)) ?? selectedEntries.FirstOrDefault();
+        }
+
         selected ??= selectedEntries.FirstOrDefault();
 
         return new EmulationStationLaunchConfig(
@@ -75,7 +95,14 @@ public sealed class EmulationStationSystemConfigService
         IReadOnlyDictionary<string, string> esSettings)
     {
         var (reglages, coeurChoisi) = ReglagesDuJeu(systemId, emulateurDuJeu, coeurDuJeu, esSettings);
-        return (ResolveLaunchConfig(systemId, reglages), coeurChoisi);
+        var lancement = ResolveLaunchConfig(systemId, reglages);
+        // Un coeur designe mais non declare par le systeme n'est pas lance : plus un choix du joueur.
+        if (coeurChoisi && !string.Equals(NormalizeAuto(ReadSetting(reglages, $"{Normalize(systemId)}.core")), lancement.Core, StringComparison.OrdinalIgnoreCase))
+        {
+            coeurChoisi = false;
+        }
+
+        return (lancement, coeurChoisi);
     }
 
     /// <summary>

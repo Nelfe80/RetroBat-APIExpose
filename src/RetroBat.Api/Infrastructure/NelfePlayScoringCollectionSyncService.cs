@@ -788,6 +788,17 @@ public sealed class NelfePlayScoringCollectionSyncService : BackgroundService
                 }
                 var retenu = mesurables.FirstOrDefault(candidat =>
                     string.Equals(candidat.AbsolutePath, choisi, StringComparison.OrdinalIgnoreCase));
+                // (24/11) UN SET FBNEO RETENU DANS UN DOSSIER MAME : ES lance le coeur que le SYSTEME declare, jamais celui de la
+                // fiche (Blazing Star parti « -core mame », non certifiable). Le meme zip dans le dossier fbneo serait lance sous FBNeo.
+                if (retenu is not null && Lancement(retenu.FrontendSystemId) is { } lance
+                    && !lance.Core.StartsWith("fbneo", StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(retenu.CanonicalSystemId, "arcade", StringComparison.OrdinalIgnoreCase)
+                    && WorldScoringLancementService.FbneoConnaitLeSet(Path.GetFileNameWithoutExtension(retenu.AbsolutePath)))
+                {
+                    var conseilFbneo = $"{jeu.RomGroup} : lancé depuis la collection sous {lance.Core} ({retenu.FrontendSystemId}) ; "
+                        + "déposer le même jeu dans le dossier fbneo le fera lancer sous FBNeo";
+                    conseils.Add(conseilFbneo);
+                }
                 if (retenu is not null && verdicts[retenu].Conseil is { Length: > 0 } conseil)
                 {
                     conseils.Add(jeu.RomGroup + " : " + conseil);

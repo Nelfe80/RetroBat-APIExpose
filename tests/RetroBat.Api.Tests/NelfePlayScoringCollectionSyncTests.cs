@@ -968,3 +968,60 @@ public sealed class ParametreSystemeTests
     public void La_machine_canonique_ou_rien(string? systeme, string attendu)
         => Assert.Equal(attendu, RetroBat.Api.Controllers.NelfePlayController.ParametreSysteme(systeme));
 }
+
+public sealed class CoeurDeclareParLeSystemeTests
+{
+    private static readonly IReadOnlyList<EmulationStationSystemEmulatorCore> Mame =
+    [
+        new("mame", "libretro", "mame"),
+        new("mame", "libretro", "mame2016"),
+    ];
+
+    private static readonly IReadOnlyList<EmulationStationSystemEmulatorCore> Fbneo =
+    [
+        new("fbneo", "libretro", "fbneo"),
+        new("fbneo", "libretro", "fbalpha"),
+    ];
+
+    private static Dictionary<string, string> Fiche(string systeme, string coeur)
+        => new(StringComparer.OrdinalIgnoreCase) { [$"{systeme}.emulator"] = "libretro", [$"{systeme}.core"] = coeur };
+
+    [Fact]
+    public void Une_fiche_sous_fbneo_dans_le_systeme_mame_est_lancee_sous_mame()
+    {
+        // 24/11, Blazing Star : la fiche de roms\mame disait fbneo, ES a passe « -core mame ».
+        var lancement = EmulationStationSystemConfigService.Resoudre("mame", Mame, Fiche("mame", "fbneo"));
+        Assert.Equal("mame", lancement.Core);
+    }
+
+    [Fact]
+    public void Un_coeur_declare_par_le_systeme_reste_le_choix_du_joueur()
+    {
+        Assert.Equal("mame2016", EmulationStationSystemConfigService.Resoudre("mame", Mame, Fiche("mame", "mame2016")).Core);
+        Assert.Equal("fbneo", EmulationStationSystemConfigService.Resoudre("fbneo", Fbneo, Fiche("fbneo", "fbneo")).Core);
+    }
+
+    [Fact]
+    public void Sans_coeur_designe_le_premier_du_systeme_est_lance()
+    {
+        Assert.Equal("fbneo", EmulationStationSystemConfigService.Resoudre("fbneo", Fbneo, new Dictionary<string, string>()).Core);
+    }
+
+    [Fact]
+    public void Le_zip_du_dossier_fbneo_passe_devant_celui_du_dossier_mame_meme_si_la_fiche_mame_dit_fbneo()
+    {
+        var jeu = new OpenGame { SystemId = "arcade", RomGroup = "blazing-star" };
+        var candidats = new List<InstalledGame>
+        {
+            new("mame", "arcade", "blazing-star", "E:/roms/mame/blazstar.zip", "Blazing Star", null, null, true, null),
+            new("fbneo", "arcade", "blazing-star", "E:/roms/fbneo/blazstar.zip", "Blazing Star", null, null, true, null),
+        };
+        var precedent = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "E:/roms/mame/blazstar.zip" };
+        // Le reglage du systeme mame designe fbneo (hors liste) : il compte pour mame, donc rang 1 contre 0.
+        EmulationStationLaunchConfig? Lance(string systeme) => systeme == "mame"
+            ? EmulationStationSystemConfigService.Resoudre("mame", Mame, Fiche("mame", "fbneo"))
+            : EmulationStationSystemConfigService.Resoudre("fbneo", Fbneo, new Dictionary<string, string>());
+
+        Assert.Equal("E:/roms/fbneo/blazstar.zip", NelfePlayScoringCollectionSyncService.Choisir(candidats, jeu, precedent, Lance));
+    }
+}
