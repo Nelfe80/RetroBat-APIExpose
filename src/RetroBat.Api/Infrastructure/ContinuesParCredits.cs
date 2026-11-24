@@ -13,6 +13,13 @@ public readonly record struct LectureDeContinues(int Player, int Value, long Fra
 public readonly record struct DepartDeJoueur(int Player, long Frame);
 
 /// <summary>
+/// Un moment où la partie en cours a été vue FINIE : le GAME_OVER du .MEM, la démo ou le titre qui le suivent, ou le
+/// score remis à zéro qui ferme la fenêtre de jeu. <paramref name="Certaine"/> : la fin est sûre sans attendre (démo,
+/// titre, score remis à zéro) ; sinon (GAME_OVER seul) l'écran de continue peut durer encore.
+/// </summary>
+public readonly record struct FinDePartieVue(long Frame, bool Certaine);
+
+/// <summary>
 /// LE CRÉDIT FAIT FOI (charte de la partie certifiée, décision du 2026-09-30).
 ///
 /// Un continue, en arcade, c'est un crédit consommé. Les vies ne le disaient pas de façon fiable :
@@ -45,11 +52,58 @@ public readonly record struct DepartDeJoueur(int Player, long Frame);
 /// </summary>
 public static class ContinuesParCredits
 {
+    /// <summary>
+    /// UNE NOUVELLE PARTIE APRES UN GAME OVER COMPTE A PART (règle du user, rappelée le 24/11, « depuis toujours »).
+    /// Le crédit consommé PENDANT l'écran de continue prolonge la partie : un continue, qui ferme le 1CC comme avant.
+    /// Le crédit consommé APRES la fin de la partie est un nouvel essai : le joueur n'a pas à revenir au menu pour
+    /// qu'il compte ; il ferme la partie d'avant (son passeport part tel quel) et en ouvre une autre, avec son
+    /// passeport et son film. La fin est vue au GAME_OVER du .MEM, à la démo ou au titre, ou au score remis à zéro.
+    ///
+    /// Le GAME_OVER de certains jeux tombe au DEBUT de l'écran de continue (Batsugun : 0x43 = 0xE0 pendant le
+    /// « CONTINUE ? 9 »), pas à sa fin : il ne suffit pas seul. L'écran de continue dure une dizaine de secondes
+    /// (Batsugun 9 s, Double Dragon 10 s, Neo-Geo 10 s) ; passé ce délai, le crédit est une nouvelle partie. 30 s en
+    /// images à 60 Hz ; la démo ou le titre, eux, n'attendent rien : ils ne viennent qu'une fois le décompte écoulé.
+    /// </summary>
+    public const long DelaiEcranDeContinue = 1800;
+
+    /// <summary>
+    /// Ce crédit consommé à <paramref name="frame"/> ouvre-t-il une nouvelle partie ? Il faut une fin de partie vue
+    /// DEPUIS le début de la partie en cours (<paramref name="debutDePartie"/>), avant le crédit.
+    /// </summary>
+    public static bool EstNouvellePartie(long frame, long? debutDePartie, IReadOnlyList<FinDePartieVue> fins)
+        => fins.Any(f => f.Frame < frame
+            && (debutDePartie is null || f.Frame > debutDePartie)
+            && (f.Certaine || frame - f.Frame >= DelaiEcranDeContinue));
+
     /// <summary>L'écart toléré entre le START d'un joueur et le crédit qu'il consomme : 3 s.</summary>
     public const long FenetreArrivee = 180;
 
     public sealed record Bilan(IReadOnlyList<long> Coupes, bool PlusieursJoueurs)
     {
+        /// <summary>Les crédits consommés après la fin d'une partie : chacun ouvre une partie à part.</summary>
+        public IReadOnlyList<long> NouvellesParties { get; init; } = [];
+
+        /// <summary>
+        /// Les parties de la session : la première court jusqu'au premier crédit de nouvelle partie, chacune des
+        /// suivantes part de son crédit. Une session sans nouvelle partie n'en forme qu'une (rien ne change).
+        /// </summary>
+        public IReadOnlyList<PartieDeSession> Parties
+        {
+            get
+            {
+                var liste = new List<PartieDeSession>();
+                long debut = long.MinValue;
+                foreach (var f in NouvellesParties.OrderBy(f => f))
+                {
+                    liste.Add(new PartieDeSession(debut, f));
+                    debut = f;
+                }
+
+                liste.Add(new PartieDeSession(debut, long.MaxValue));
+                return liste;
+            }
+        }
+
         /// <summary>Les crédits consommés par l'arrivée d'un joueur.</summary>
         public IReadOnlyList<long> Arrivees { get; init; } = [];
 
@@ -67,8 +121,12 @@ public static class ContinuesParCredits
     public static Bilan Calculer(
         IReadOnlyList<EvenementDeCredit> credits,
         IReadOnlyList<DepartDeJoueur> departs,
-        bool ouverteAuxJoueurs = false)
+        bool ouverteAuxJoueurs = false,
+        IReadOnlyList<FinDePartieVue>? fins = null)
     {
+        fins ??= [];
+        var nouvelles = new List<long>();
+        long? debutDePartie = null;
         var coupes = new List<long>();
         var arrivees = new List<long>();
         var plusieurs = false;
@@ -79,12 +137,19 @@ public static class ContinuesParCredits
         {
             if (precedent is { } avant && credit.Value < avant)
             {
-                switch (Nature(credit.Frame, partieCommencee, departs, ouverteAuxJoueurs))
+                var nature = Nature(credit.Frame, partieCommencee, departs, ouverteAuxJoueurs);
+                if (nature == Debit.Continue && EstNouvellePartie(credit.Frame, debutDePartie, fins)) nature = Debit.NouvellePartie;
+                switch (nature)
                 {
+                    case Debit.NouvellePartie:
+                        nouvelles.Add(credit.Frame);
+                        debutDePartie = credit.Frame;
+                        break;
                     case Debit.ArriveeDUnJoueur:
                         plusieurs = true;
                         arrivees.Add(credit.Frame);
                         partieCommencee = true;   // depart a deux : le joueur 1 est parti aussi
+                        debutDePartie ??= credit.Frame;
                         break;
                     case Debit.ArriveeDistante:
                         plusieurs = true;         // le joueur de cette borne n'a peut-etre pas commence
@@ -92,10 +157,12 @@ public static class ContinuesParCredits
                         break;
                     case Debit.Continue:
                         coupes.Add(credit.Frame);
+                        debutDePartie = credit.Frame;
                         break;
                     default:
                         partieCommencee = true;
                         depart ??= credit.Frame;
+                        debutDePartie ??= credit.Frame;
                         break;
                 }
             }
@@ -103,7 +170,7 @@ public static class ContinuesParCredits
             precedent = credit.Value;
         }
 
-        return new Bilan(coupes, plusieurs) { Arrivees = arrivees, Depart = depart };
+        return new Bilan(coupes, plusieurs) { Arrivees = arrivees, Depart = depart, NouvellesParties = nouvelles };
     }
 
     /// <summary>
@@ -166,6 +233,8 @@ public static class ContinuesParCredits
         /// <summary>Le départ de la partie.</summary>
         Depart,
         Continue,
+        /// <summary>Un crédit consommé après la fin d'une partie (game over écoulé, démo, titre) : une partie à part.</summary>
+        NouvellePartie,
         /// <summary>Un START de joueur 2 ou plus sur cette borne, au moment du crédit.</summary>
         ArriveeDUnJoueur,
         /// <summary>Partie ouverte en netplay, crédit consommé sans aucun START local.</summary>
@@ -216,6 +285,13 @@ public static class ContinuesParCredits
 
         return trajectoire.ToList();
     }
+}
+
+/// <summary>Une partie de la session, de la frame de son crédit (incluse) à celle de la suivante (exclue).</summary>
+public readonly record struct PartieDeSession(long Debut, long Fin)
+{
+    public bool Contient(long frame) => frame >= Debut && frame < Fin;
+    public bool EstLaSeule => Debut == long.MinValue && Fin == long.MaxValue;
 }
 
 /// <summary>
