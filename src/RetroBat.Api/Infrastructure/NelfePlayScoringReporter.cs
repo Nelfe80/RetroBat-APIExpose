@@ -351,6 +351,8 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// (« test menu settings changed: DIFFICULTY »). Rempli seulement pour un profil a champs « name » (ReglagesDuMenu).
     /// </summary>
     private readonly System.Collections.Concurrent.ConcurrentDictionary<string, IReadOnlyList<string>> _reglagesRefuses = new(StringComparer.Ordinal);
+    // Par session : ce qui differe du profil (ReglagesDifferents), pose a l'assemblage du passeport, envoye juste avant lui.
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, JsonObject> _reglagesDifferents = new(StringComparer.Ordinal);
     private readonly RetroBat.Domain.Interfaces.IEsSettingsStore? _esSettings;
     private readonly BiosFingerprintService? _bios;   // pour estampiller score/rang sur la méta du replay
     private readonly RetroBat.Api.Replay.Sharing.ReplaySeedQueue? _semis;
@@ -1396,6 +1398,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     ["bios"] = _bios?.PourLePasseport(profile.Value) ?? new JsonObject { ["mode"] = "none" },
                     ["forced_options"] = GetString(attestation, "ForcedOptions") ?? "",
                 },
+                // LES REGLAGES QUI DIFFERENT DU PROFIL (25/11), hors passeport et hors signature : le site trie seul au lieu d'attendre
+                // un quorum. Champ ajoute, ignore par un site qui ne le connait pas (voir ReglagesDifferents).
+                ["core_options_diff"] = RetroBat.Api.Scoring.ReglagesDifferents.EnJson(coreOptions, digest, GetString(attestation, "CoreSha256"), profile.Value),
                 ["listener"] = new JsonObject { ["loaded_sha256"] = GetString(attestation, "ListenerSha256") },
                 // Un profil peut exiger une version minimale d'APIExpose : le verdict d'avant partie
                 // la compare a celle-ci (sinon a celle du dernier releve de la borne).
@@ -5015,6 +5020,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // envoye au retour du site garde sa date.
         var finDeLaPartie = finUtc ?? DateTime.UtcNow;
         var idDeSession = sessionId ?? Guid.NewGuid().ToString();
+        // Les reglages qui different du profil, gardes pour l'envoi qui suit (SubmitAsync) : le passeport est signe en entier,
+        // le champ ne peut pas y entrer. Meme chaine filtree que l'empreinte signee.
+        _reglagesDifferents[idDeSession] = RetroBat.Api.Scoring.ReglagesDifferents.EnJson(coreOptions, coreOptionsDigest, coreSha, profile);
         if (RetroBat.Api.Scoring.ReglagesDuMenu.NomsRefuses(profile, jeu["difficulty"] as JsonObject) is { Count: > 0 } refuses)
         {
             _reglagesRefuses[idDeSession + "|" + ruleset] = refuses;
@@ -5246,6 +5254,33 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// et une coupure perdait la partie. <paramref name="annoncer"/> : la partie vient de finir ;
     /// faux pour un envoi differe, qui s'annonce en groupe (voir EnvoyerLesBrouillonsAsync).
     /// </summary>
+    /// <summary>
+    /// LES REGLAGES QUI DIFFERENT DU PROFIL, JUSTE AVANT LA SOUMISSION (25/11). Best-effort : un site qui ne connait pas la
+    /// route (404) ou qui ne repond pas ne change rien, la partie part comme avant et l'empreinte seule reste son verdict.
+    /// Ni relais ni nouvel essai : la liste est aussi portee par le prevol.
+    /// </summary>
+    private async Task EnvoyerLesReglagesDifferentsAsync(string credential, string sessionId, string deviceId, CancellationToken ct)
+    {
+        if (!_reglagesDifferents.TryGetValue(sessionId, out var diff)) return;
+        try
+        {
+            var corps = new JsonObject { ["session_id"] = sessionId, ["device_id"] = deviceId, ["core_options_diff"] = diff.DeepClone() };
+            using var client = CreateClient(credential);
+            using var content = new StringContent(corps.ToJsonString(), Encoding.UTF8, "application/json");
+            using var reponse = await client.PostAsync("/api/v1/agent/scores/core-options-diff", content, ct).ConfigureAwait(false);
+            Trace($"core-options-diff HTTP {(int)reponse.StatusCode} ({diff["count"]} difference(s))");
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException && !ct.IsCancellationRequested)
+        {
+            Trace($"core-options-diff : site injoignable ({ex.GetType().Name})");
+        }
+        finally
+        {
+            // Une seule fois par envoi reussi ou non : un nouvel essai reassemble le passeport, donc la liste.
+            _reglagesDifferents.TryRemove(sessionId, out _);
+        }
+    }
+
     private async Task<(RetroBat.Api.Scoring.IssueDEnvoi Issue, string? Statut, int? Rang)> SubmitAsync(
         string credential, JsonObject passport, string? replayId, bool annoncer, CancellationToken cancellationToken,
         long? debutVideo = null, long? finVideo = null)
@@ -5265,6 +5300,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 ["score"] = (string?)(passport["metric"] as JsonObject)?["value"],
                 ["ended_at"] = (string?)(passport["timing"] as JsonObject)?["ended_at"],
             };
+            await EnvoyerLesReglagesDifferentsAsync(credential, sessionId, deviceId, cancellationToken).ConfigureAwait(false);
             var appel = await AppelerLeCentralAsync(HttpMethod.Post, "scores/submissions", null, corps, "application/json",
                 credential, garder: true, resume, cancellationToken, partie: sessionId).ConfigureAwait(false);
             if (appel is not { } reponse)
