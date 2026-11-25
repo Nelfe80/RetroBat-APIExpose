@@ -154,6 +154,7 @@ public sealed class RetroArchNelfePlayService : BackgroundService
     private int _enCours;
     private DateTime _pasAvant = DateTime.MinValue;
     private bool _restesRetires;
+    private bool? _portesLevees;
 
     public RetroArchNelfePlayService(IEventBus bus, ApiContext contexte, IConfiguration configuration, ILogger<RetroArchNelfePlayService> journal)
     {
@@ -232,6 +233,7 @@ public sealed class RetroArchNelfePlayService : BackgroundService
             if (dossierRetroArch.Length == 0) return;
             var etat = LireLEtat(racine, dossierRetroArch);
             if (etat.UnJeuTourne) return;
+            DireLesPortes(dossierRetroArch);
             var action = Decider(etat);
             if (action == ActionNelfePlay.RetirerLaNocturne)
             {
@@ -255,6 +257,7 @@ public sealed class RetroArchNelfePlayService : BackgroundService
                     await LancerEtJournaliserAsync(RetroArchNelfePlay.Desinstalleur, "/silencieux /annulation", racine, "retrait", ct).ConfigureAwait(false);
                     break;
             }
+            if (action != ActionNelfePlay.Rien) DireLesPortes(dossierRetroArch);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -264,6 +267,26 @@ public sealed class RetroArchNelfePlayService : BackgroundService
         finally
         {
             Interlocked.Exchange(ref _enCours, 0);
+        }
+    }
+
+    /// <summary>
+    /// 1.9.216 (integrateur) : dit dans le journal, a chaque changement, si les portes du replay sont levees. MEME predicat que
+    /// l'enregistreur (ReplayRecorderService.RetroArchNelfePlayInstalle : marque build.txt ET empreinte connue de l'exe en place).
+    /// </summary>
+    private void DireLesPortes(string dossierRetroArch)
+    {
+        var levees = RetroBat.Api.Replay.Recording.ReplayRecorderService.RetroArchNelfePlayInstalle(dossierRetroArch);
+        if (_portesLevees == levees) return;
+        _portesLevees = levees;
+        if (levees)
+        {
+            _journal.LogInformation("RetroArch NelfePlay : en place (marque {Marque} et empreinte connue) : portes du replay levees (coeur mame_libretro, jeux tgm2 et tgm2p ; la garde des plantages veille encore).",
+                RetroArchNelfePlay.Marque);
+        }
+        else
+        {
+            _journal.LogInformation("RetroArch NelfePlay : pas en place : portes du replay tenues (coeur mame_libretro, jeux tgm2 et tgm2p sans replay).");
         }
     }
 

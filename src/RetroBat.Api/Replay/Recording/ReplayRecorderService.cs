@@ -398,6 +398,16 @@ public sealed class ReplayRecorderService : BackgroundService
         _motifDuRenoncement = VoyantDuReplay.MotifRetroArch;
         _plantageDuRenoncement = null;
         _essaiDuRenoncement = null;
+        // 1.9.216 (integrateur) : sous notre exe, la porte d'un jeu de la liste est levee ; dit une fois par jeu, pour que
+        // l'essai se lise dans le journal (« ... s'enregistre : RetroArch NelfePlay en place »).
+        if (corrige && JeuSansEnregistrement(JeuxSansEnregistrement, status.Game)
+            && !string.Equals(_jeuLeveAnnonce, status.Game, StringComparison.OrdinalIgnoreCase))
+        {
+            _jeuLeveAnnonce = status.Game;
+            _logger.LogInformation(
+                "Replay : {Game} s'enregistre : RetroArch NelfePlay en place (marque et empreinte), la porte des gros etats est levee.",
+                status.Game);
+        }
         if (!corrige && await CoeurSansEnregistrementAsync(status, ct).ConfigureAwait(false)) return true;
         if (!corrige && JeuSansEnregistrement(JeuxSansEnregistrement, status.Game))
         {
@@ -473,6 +483,7 @@ public sealed class ReplayRecorderService : BackgroundService
     /// </summary>
     private string JeuxSansEnregistrement => _config["Replay:Record:JeuxSansEnregistrement"] ?? "tgm2,tgm2p";
     private string _jeuAnnonce = "";
+    private string _jeuLeveAnnonce = "";
 
     /// <summary>
     /// RETROARCH NELFEPLAY (1.9.216) : la marque NEUVE de install-retroarch-nelfeplay.bat (emulators\retroarch\.nelfeplay\build.txt ;
