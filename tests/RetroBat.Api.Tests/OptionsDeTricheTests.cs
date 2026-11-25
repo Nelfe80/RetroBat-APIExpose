@@ -28,6 +28,9 @@ public sealed class OptionsDeTricheTests
     [InlineData("mame_cheats_enable=off")]
     [InlineData("fbneo-cheat-1-x-Y=0")]
     [InlineData("fbneo-dipswitch-1942-Difficulty=Hard;fbneo-neogeo-mode=DIPSWITCH")]
+    [InlineData("fbneo-dipswitch-batsugunsp-Cheating=Normal game")]
+    [InlineData("fbneo-dipswitch-batsugun-Cheating=\"Normal game\"")]
+    [InlineData("fbneo-dipswitch-mspacman-Rack_Test_(Cheat)=Off")]
     [InlineData("")]
     public void Une_option_desactivee_ou_vide_ne_declenche_rien(string options)
         => Assert.Empty(OptionsDeTriche.Actives(options));
@@ -38,6 +41,8 @@ public sealed class OptionsDeTricheTests
     [InlineData("fbneo-cheat-1-x-Infinite_Lives=1 - Infinite")]
     [InlineData("fbneo-cheat-1-x-Level=05 - Stage 5")]
     [InlineData("snes9x_cheat_bidule=on")]
+    [InlineData("fbneo-dipswitch-batsugunsp-Cheating=No death & stop")]
+    [InlineData("fbneo-dipswitch-mspacman-Rack_Test_(Cheat)=On")]
     public void Une_option_activee_declenche(string options)
         => Assert.Single(OptionsDeTriche.Actives(options));
 

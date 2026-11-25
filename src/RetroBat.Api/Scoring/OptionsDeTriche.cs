@@ -33,7 +33,7 @@ public static class OptionsDeTriche
     }
 
     /// <summary>
-    /// Une valeur est ACTIVE sauf si elle est vide, « disabled », « off », « false », « no », « none », « 0 »,
+    /// Une valeur est ACTIVE sauf si elle est vide, « disabled », « off », « false », « no », « none », « 0 », « Normal ... »,
     /// ou une etiquette qui commence par 0 (« 0 - Disabled », ce que FBNeo liste : le premier choix est toujours l'arret).
     /// </summary>
     internal static bool Active(string? valeur)
@@ -42,6 +42,9 @@ public static class OptionsDeTriche
         if (v.Length == 0) return false;
         if (v is "0" or "off" or "false" or "no" or "none" or "disabled" or "disable" or "inactive") return false;
         if (v.StartsWith("disabled", StringComparison.Ordinal) || v.StartsWith("off ", StringComparison.Ordinal)) return false;
+        // (25/11) Le DIP « Cheating » de Batsugun (fbneo-dipswitch-batsugun(sp)-Cheating) vaut « Normal game » d'usine :
+        // ce n'est pas une triche (rapport d'Ash). « Normal ... » est l'arret ; l'autre valeur de ce DIP reste une triche.
+        if (v == "normal" || v.StartsWith("normal ", StringComparison.Ordinal)) return false;
         // « 0 - Disabled », « 0: Off » : un zero seul en tete d'etiquette ; « 05 - ... » n'en est pas un.
         if (v[0] == '0' && (v.Length == 1 || !char.IsDigit(v[1]))) return false;
         return true;
