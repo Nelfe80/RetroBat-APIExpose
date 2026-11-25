@@ -73,14 +73,36 @@ public class FantomesTropLongsTests
     [Fact]
     public void Le_coeur_snes_livre_en_1_9_215_est_reconnu_comme_un_coeur_qui_retrouve_son_run()
     {
-        // snes9x_ghosts du 24/11 (livre par outils.json avec la 1.9.215) : seul coeur essaye, seul nomme
-        Assert.Single(FantomesDuSpeedrun.CoeursQuiRetrouventLeRun);
+        // snes9x_ghosts du 24/11 (livre par outils.json avec la 1.9.215)
         Assert.Contains(Snes9xGhostsDuDernierDepart, FantomesDuSpeedrun.CoeursQuiRetrouventLeRun);
         Assert.True(FantomesDuSpeedrun.CoeursQuiRetrouventLeRun.Contains(Snes9xGhostsDuDernierDepart.ToUpperInvariant()));
         Assert.Empty(FantomesDuSpeedrun.CoeursQuiRetrouventLeRun.Intersect(FantomesDuSpeedrun.CoeursQuiPartentDuPremierDepart, StringComparer.OrdinalIgnoreCase));
-        // les fceumm_ghosts et genesis_plus_gx_ghosts de la meme branche, non essayes, ne partent pas
-        Assert.DoesNotContain("b924f2686d71760ca93321bbe86711494604edd0f03bae50f7b39bd81fe79a59", FantomesDuSpeedrun.CoeursQuiRetrouventLeRun);
-        Assert.DoesNotContain("3f0a4affd375b505e74a58fb25575f66da9c9f1e2e83b6ac3c9d2cdad09bcd29", FantomesDuSpeedrun.CoeursQuiRetrouventLeRun);
         Assert.True(FantomesDuSpeedrun.PeutCourir(Hote("super-mario-world"), 4291, 2749, Snes9xGhostsDuDernierDepart.ToUpperInvariant()));
+    }
+
+    private const string FceummGhostsDuDernierDepart = "b924f2686d71760ca93321bbe86711494604edd0f03bae50f7b39bd81fe79a59";
+    private const string GenesisGhostsDuDernierDepart = "3f0a4affd375b505e74a58fb25575f66da9c9f1e2e83b6ac3c9d2cdad09bcd29";
+
+    [Fact]
+    public void Les_coeurs_nes_et_mega_drive_livres_en_1_9_217_retrouvent_leur_run()
+    {
+        // fceumm_ghosts 0.14 et genesis_plus_gx_ghosts 0.13 du 24/11, essayes au banc le 25/11 (SMB 1-1, Green Hill 1) et livres
+        // par outils.json avec la 1.9.217 : les trois coeurs du dernier depart, et eux seuls
+        Assert.Equal(3, FantomesDuSpeedrun.CoeursQuiRetrouventLeRun.Count);
+        Assert.Contains(FceummGhostsDuDernierDepart, FantomesDuSpeedrun.CoeursQuiRetrouventLeRun);
+        Assert.Contains(GenesisGhostsDuDernierDepart, FantomesDuSpeedrun.CoeursQuiRetrouventLeRun);
+        Assert.Empty(FantomesDuSpeedrun.CoeursQuiRetrouventLeRun.Intersect(FantomesDuSpeedrun.CoeursQuiPartentDuPremierDepart, StringComparer.OrdinalIgnoreCase));
+        // banc du 25/11 : SMB 1291 images pour un run de 600, Sonic 1340 pour 600 (une tentative qui meurt, puis le run)
+        var smb = Hote("super-mario-bros");
+        var sonic = Hote("sonic-the-hedgehog");
+        Assert.True(FantomesDuSpeedrun.PeutCourir(smb, 1291, 600, FceummGhostsDuDernierDepart));
+        Assert.True(FantomesDuSpeedrun.PeutCourir(smb, 1291, 600, FceummGhostsDuDernierDepart.ToUpperInvariant()));
+        Assert.True(FantomesDuSpeedrun.PeutCourir(sonic, 1340, 600, GenesisGhostsDuDernierDepart));
+        // les coeurs publies avant (fceumm 0.13, genesis 0.12) rejoueraient la tentative abandonnee
+        Assert.False(FantomesDuSpeedrun.PeutCourir(smb, 1291, 600, "3a4d174a3d0cfcfac3315dfe1cf8f1a5a162075ae6a6320ee6ba7534c7426c43"));
+        Assert.False(FantomesDuSpeedrun.PeutCourir(sonic, 1340, 600, "8247886049b5af3e5c6c3c05db0ce557237e7777b8245da704c9c2a1bb6c2fdb"));
+        // un replay propre court sur les deux
+        Assert.True(FantomesDuSpeedrun.PeutCourir(smb, 724, 600, FceummGhostsDuDernierDepart));
+        Assert.True(FantomesDuSpeedrun.PeutCourir(sonic, 798, 600, "8247886049b5af3e5c6c3c05db0ce557237e7777b8245da704c9c2a1bb6c2fdb"));
     }
 }

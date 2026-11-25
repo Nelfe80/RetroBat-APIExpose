@@ -208,17 +208,22 @@ public sealed partial class FantomesDuSpeedrun
     };
 
     /// <summary>
-    /// (25/11, 1.9.215) LES COEURS HOTES LIVRES QUI RETROUVENT LE RUN D'UN REPLAY TROP LONG : le fantome part du dernier depart
-    /// qui laisse toute la duree du run avant la fin du replay (NelfePlay-Ghosts, branche <c>fix/fantome-dernier-depart</c>).
-    /// Seul le coeur ESSAYE au banc part : snes9x_ghosts du 24/11 (livre par outils.json avec la 1.9.215, admis au site dans
-    /// <c>COEURS_DES_FANTOMES</c>). Les fceumm_ghosts et genesis_plus_gx_ghosts de la meme branche ne sont pas essayes : ils
-    /// ne partent pas. Liste nommee pour qu'un coeur livre soit reconnu par son empreinte ; la regle reste celle de
+    /// (25/11, 1.9.215 puis 1.9.217) LES COEURS HOTES LIVRES QUI RETROUVENT LE RUN D'UN REPLAY TROP LONG : le fantome part du
+    /// dernier depart qui laisse toute la duree du run avant la fin du replay (NelfePlay-Ghosts, branche
+    /// <c>fix/fantome-dernier-depart</c>, origin/main ca74d1c). Seuls les coeurs ESSAYES au banc partent, admis au site dans
+    /// <c>COEURS_DES_FANTOMES</c> : snes9x_ghosts du 24/11 (livre par outils.json avec la 1.9.215, Donut Secret 1), puis
+    /// fceumm_ghosts et genesis_plus_gx_ghosts de la meme branche (essayes au banc le 25/11 sur SMB 1-1 et Green Hill 1, livres
+    /// avec la 1.9.217). Liste nommee pour qu'un coeur livre soit reconnu par son empreinte ; la regle reste celle de
     /// <see cref="PeutCourir"/> (un coeur absent de <see cref="CoeursQuiPartentDuPremierDepart"/> le sait).
     /// </summary>
     internal static readonly IReadOnlySet<string> CoeursQuiRetrouventLeRun = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         // snes9x_ghosts du 24/11 (dernier depart, meme zero que le chrono), essaye au banc sur Donut Secret 1
         "2a9c9e2a1987a7254971f176acddfbaaf904987a53e321fd6c461369dd87473c",
+        // fceumm_ghosts 0.14 du 24/11, essaye au banc le 25/11 (SMB 1-1 : replay trop long, depart du dernier run a l'image 681)
+        "b924f2686d71760ca93321bbe86711494604edd0f03bae50f7b39bd81fe79a59",
+        // genesis_plus_gx_ghosts 0.13 du 24/11, essaye au banc le 25/11 (Sonic Green Hill 1 : depart du dernier run a l'image 730)
+        "3f0a4affd375b505e74a58fb25575f66da9c9f1e2e83b6ac3c9d2cdad09bcd29",
     };
 
     /// <summary>
