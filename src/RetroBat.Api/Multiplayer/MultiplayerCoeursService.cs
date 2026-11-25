@@ -85,6 +85,12 @@ public sealed class MultiplayerCoeursService : BackgroundService
         new("megadrive", "genesis_plus_gx_ghosts", ["genesis_plus_gx_ghosts_libretro.dll"], "genesis_plus_gx_ghosts_libretro.info",
             "le coeur libretro genesis_plus_gx_ghosts (fantomes des speedruns de NelfePlay), en dernier : genesis_plus_gx reste le "
             + "coeur des parties solo"),
+        // FBNEO GHOSTS (26/11, mode TRAINING des shmups d'arcade) : UNE seule DLL, notre FBNeo patche et le code des fantomes ;
+        // le joueur joue dessus et les fantomes tournent sur des copies d'elle-meme (plus de fbneo_fantome ni de fbneo officiel
+        // requis a cote). Jamais classe : le lancement TRAINING part sous l'origine speedrun d'un point d'entrainement.
+        new("fbneo", "fbneo_ghosts", ["fbneo_ghosts_libretro.dll"], "fbneo_ghosts_libretro.info",
+            "le coeur libretro fbneo_ghosts (fantomes du mode TRAINING des shmups d'arcade de NelfePlay), en dernier : fbneo reste "
+            + "le coeur des parties"),
     ];
 
     public const string FichierEs = "es_systems_nelfeplay.cfg";
@@ -328,7 +334,9 @@ public sealed class MultiplayerCoeursService : BackgroundService
                 continue;
             }
 
-            var copie = new XElement(emulateurs);
+            // DEUX COEURS LIVRES SUR LE MEME SYSTEME (fbneo_multi32 puis fbneo_ghosts, 26/11) : un seul <system>, qui prend les deux
+            var dejaFait = systemes.FirstOrDefault(s => string.Equals((string?) s.Element("name"), nom, StringComparison.OrdinalIgnoreCase));
+            var copie = dejaFait?.Element("emulators") ?? new XElement(emulateurs);
             var libretro = copie.Elements("emulator").FirstOrDefault(e => string.Equals((string?) e.Attribute("name"), "libretro", StringComparison.OrdinalIgnoreCase));
             if (libretro is null)
             {
@@ -347,7 +355,7 @@ public sealed class MultiplayerCoeursService : BackgroundService
                 liste.Add(new XElement("core", coeur.Nom));
             }
 
-            systemes.Add(new XElement("system", new XElement("name", nom), copie));
+            if (dejaFait is null) systemes.Add(new XElement("system", new XElement("name", nom), copie));
             ajouts.Add($"systeme {nom} : {coeur.Ajout}");
         }
 

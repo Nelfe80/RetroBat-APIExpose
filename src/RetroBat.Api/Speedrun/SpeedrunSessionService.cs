@@ -327,11 +327,23 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
         var coeur = reglement.Coeurs.FirstOrDefault() is { Length: > 0 } c ? c : null;
         var pseudo = _contexte.PlayerPseudo ?? "";
+        // LE TRAINING DES SHMUPS SOUS FBNEO (26/11) : toujours sous le coeur hote fbneo_ghosts (une seule DLL, notre FBNeo et
+        // le code des fantomes), sans fantome quand aucun replay n'est admis ; jamais classe (origine speedrun, entrainement)
+        var training = FantomesDuSpeedrun.PourLeTraining(reglement);
+        if (training && !FantomesDuSpeedrun.CoeurPose(FantomesDuSpeedrun.CoeurDuTraining))
+        {
+            _journal.LogWarning("Speedrun : TRAINING {Defi} non lance, le coeur {Coeur} n'est pas pose chez RetroArch.", reglement.ChallengeId, FantomesDuSpeedrun.CoeurDuTraining);
+            return new(false, "core_missing", FantomesDuSpeedrun.CoeurDuTraining);
+        }
+
+        PreparationDuTraining? preparationDuTraining = null;
         T Etape<T>(string id, Func<T> travail) => progression is null ? travail() : progression.Mesurer(id, travail);
         var (fantomesPoses, deck, manettes) = PreparerEnsemble(
             // Les fantomes (04/11) : le coeur hote seulement s'ils sont poses et que le site l'admet, sinon le coeur du reglement.
             // Un dump que le coeur hote ne reconnait pas (autre en-tete, 08/11) part sur le coeur d'origine. Jusqu'a 2,5 s.
-            () => Etape(ProgressionDuLancement.Fantomes, () => _fantomes?.Preparer(reglement, pseudo, rom) == true),
+            () => Etape(ProgressionDuLancement.Fantomes, () => training
+                ? (preparationDuTraining = _fantomes?.PreparerLeTraining(reglement, pseudo)) is { Poses: > 0 }
+                : _fantomes?.Preparer(reglement, pseudo, rom) == true),
             // LE PLAYERDECK (H-D20) : LAUNCH THE SPEEDRUN / LAUNCH THE CHALLENGE part avec le Deck du jeu, s'il en a un. Le decor
             // est un reglage d'affichage : il ne touche ni au coeur, ni au .MEM, ni aux verrous, ni a l'empreinte des options.
             // Son rendu, hors cache, prend jusqu'a 5 s (4,1 s le 12/11 a 09:19).
@@ -343,7 +355,8 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             // Le calcul d'ES, dans un processus enfant (RetroBat.Api.exe --manettes-es) : 1,2 a 4,3 s borne au repos (13/11),
             // jusqu'a une douzaine de secondes borne chargee (12/11 a 09:19).
             () => Etape(ProgressionDuLancement.Manettes, () => RetroBat.Api.Netplay.EsManettes.PourLancer(_journal).Arguments));
-        if (fantomesPoses) coeur = FantomesDuSpeedrun.CoeurDe(reglement);
+        if (training) coeur = FantomesDuSpeedrun.CoeurDuTraining;
+        else if (fantomesPoses) coeur = FantomesDuSpeedrun.CoeurDe(reglement);
         // Les verrous et le lanceur : jusqu'au retour du lanceur (le jeu demarre, ses abonnes de ui.game.started servis).
         progression?.Commencer(ProgressionDuLancement.Lanceur);
         var arguments = RetroBat.Api.Controllers.CommandsController.ArgumentsDuLanceur(
@@ -404,6 +417,11 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
         _journal.LogInformation("Speedrun : lancement de {Defi} ({Rom}, coeur {Coeur}, sans RetroAchievements).", reglement.ChallengeId, rom, coeur ?? "auto");
         if (etat is not null) PartirSurLEtat(reglement, etat, Path.GetFileNameWithoutExtension(rom));
+        if (preparationDuTraining?.MessageSansFantome is { } sansFantome)
+        {
+            _ = AfficherAsync(new MessageJoueur("speedrun.msg.training_no_ghost." + sansFantome, MessageSansFantomeParDefaut(sansFantome)));
+        }
+
         return new(true, null);
     }
 
@@ -421,6 +439,16 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
 
         return (ta.GetAwaiter().GetResult(), tb.GetAwaiter().GetResult(), tc.GetAwaiter().GetResult());
     }
+
+    /// <summary>Le message du joueur quand le TRAINING part sans fantome, par raison (textes d'origine, anglais).</summary>
+    internal static string MessageSansFantomeParDefaut(string raison) => raison switch
+    {
+        "other_core" => "No ghost: the records were set on another FBNeo version than this one.",
+        "no_core" => "No ghost: the records do not say which FBNeo recorded them.",
+        "other_game" => "No ghost: the records were set on another version of the game files.",
+        "not_ready" => "Ghosts not ready: they will come with the next training.",
+        _ => "No ghost yet: no record with a replay for this game.",
+    };
 
     /// <summary>Le jeu lance, son etat de depart attend : rien ne compte avant son chargement.</summary>
     internal void PartirSurLEtat(Reglement reglement, byte[] etat, string nomDuContenu)

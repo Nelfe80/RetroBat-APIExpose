@@ -98,7 +98,7 @@ public sealed class LecteurDuScore : IDisposable
     /// encodant son etat) : rien a lire.
     /// </remarks>
     internal static bool CoeurReleve(string? coeur)
-        => (coeur ?? "").Trim().ToLowerInvariant() is "fbneo" or "fbalpha" or "fbalpha2012"
+        => (coeur ?? "").Trim().ToLowerInvariant() is "fbneo" or "fbneo_ghosts" or "fbalpha" or "fbalpha2012"
             or "fceumm" or "fceumm_ghosts" or "nestopia" or "mesen"
             or "genesis_plus_gx" or "genesis_plus_gx_ghosts" or "genesis_plus_gx_wide" or "genesis_plus_gx_expanded"
             or "snes9x" or "snes9x_ghosts";
