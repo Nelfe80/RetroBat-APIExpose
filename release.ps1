@@ -369,7 +369,10 @@ $autorises = @(
     # Ko : elle voyage dans l'archive de mise a jour, contrairement aux deux outils ci-dessus.
     'RetroBat.ApiConnect.exe',
     # Le vocal Discord (depot prive NelfePlay-VocalRoom), avec -AvecVocalRoom : l'exe, le SDK Discord, ses notices et Krisp.
-    'NelfePlay-VocalRoom.exe', 'discord_partner_sdk.dll', 'Discord-Social-SDK-License-Notices.txt', 'discord_krisp.dll', 'krisp-'
+    'NelfePlay-VocalRoom.exe', 'discord_partner_sdk.dll', 'Discord-Social-SDK-License-Notices.txt', 'discord_krisp.dll', 'krisp-',
+    # RetroArch NelfePlay (1.9.216) : ses scripts et sa notice a la racine. Versionnes dans la tete, mais la racine qui construit
+    # l'update.7z peut etre un checkout plus ancien qui ne les connait pas (l'exe, lui, part par outils.json).
+    'retirer-nocturne-retroarch.bat', 'README-RETROARCH-NELFEPLAY.txt'
 )
 $suivis = @{}
 Push-Location $PSScriptRoot
