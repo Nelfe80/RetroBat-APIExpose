@@ -211,20 +211,30 @@ public sealed class ReplayCaptureService : BackgroundService
     internal const double AuMoinsAvantLaFinS = 60;
 
     /// <summary>
+    /// Ce que le film montre de JEU avant le moment ou le score atteint 90 % de celui de la fin du run, en secondes (26/11,
+    /// signalement du user : les films des records Tetris Game Boy, type B surtout, n'avaient que la sequence de fin). Un jeu
+    /// dont le score saute a la fin (Tetris type B : bonus de hauteur compte apres la 25e ligne ; les decomptes d'arrivee)
+    /// atteint 90 % pendant ce bilan : la minute plancher avant la fin du run ne montrait alors que l'animation de fin, la
+    /// saisie du nom et le bilan. La coupe part donc 90 s de jeu avant ce moment (3 s jusque-la, des debuts de film la ou le
+    /// jeu etait deja fini). Toujours bornee par les 3 minutes du CDC.
+    /// </summary>
+    internal const double ElanDeJeuS = 90;
+
+    /// <summary>
     /// LA SEQUENCE DU RECORD (decision du 15 octobre 2026) : seule elle part sur YouTube, la partie complete se regarde
     /// avec le replay. Du moment ou le score atteint 90 % de celui de la fin du run jusqu'a cette fin, 3 minutes au plus,
-    /// avec 3 s d'elan avant et 2 s apres. <paramref name="finRunS"/> : la fin du run en secondes du film (sinon la fin
+    /// avec 90 s de jeu avant ce moment (<see cref="ElanDeJeuS"/>) et 2 s apres. <paramref name="finRunS"/> : la fin du run en secondes du film (sinon la fin
     /// du film). Sans courbe, les 3 dernieres minutes. Pur.
     /// </summary>
     internal static (double DebutS, double FinS) SequenceDuRecord(IReadOnlyList<double[]>? courbe, double finRunS)
     {
-        const double Max = 180, Elan = 3, Apres = 2;
+        const double Max = 180, Apres = 2;
         var points = (courbe ?? Array.Empty<double[]>()).Where(p => p.Length == 2 && p[0] <= finRunS + 1).ToList();
         var debut = finRunS - Max;
         if (points.Count > 0)
         {
             var seuil = points.Max(p => p[1]) * 0.9;
-            debut = points.First(p => p[1] >= seuil)[0] - Elan;
+            debut = points.First(p => p[1] >= seuil)[0] - ElanDeJeuS;
         }
         // AU MOINS UNE MINUTE AVANT LA FIN DU RUN (demande du user du 09/11 : les films de record etaient trop courts quand le
         // score bondissait a la fin) ; tout le film s'il est plus court.
