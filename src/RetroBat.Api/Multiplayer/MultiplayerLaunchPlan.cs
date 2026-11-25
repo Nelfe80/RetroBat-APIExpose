@@ -60,6 +60,17 @@ public static class MultiplayerLaunchPlan
             ? "fbneo-dipswitch-" + set + "-"
             : null;
 
+    /// <summary>
+    /// REPLAY EN NETPLAY (lot 3) : sous RetroArch NelfePlay nelfeplay.2, toute resynchronisation netplay (controle des images,
+    /// <c>netplay_check_frames</c>, 600 par defaut chez RetroBat) ARRETE l'enregistrement du replay (choix de l'amont). A 0, le
+    /// controle est coupe le temps de la partie : posee et rendue comme les autres reglages de la place (journal), jamais dans les
+    /// options natives d'ES. Hors exe du lot 3, rien : le reglage du joueur reste ce qu'il est.
+    /// </summary>
+    public static IReadOnlyDictionary<string, string> ReglagesDuReplayEnNetplay(bool exeDuLot3)
+        => exeDuLot3
+            ? new Dictionary<string, string>(StringComparer.Ordinal) { ["netplay_check_frames"] = "0" }
+            : new Dictionary<string, string>(StringComparer.Ordinal);
+
     public static IReadOnlyDictionary<string, string> Place(int place) => Place([place]);
 
     /// <summary>

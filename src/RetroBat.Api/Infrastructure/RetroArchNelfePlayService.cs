@@ -15,8 +15,21 @@ public static class RetroArchNelfePlay
     /// <summary>L'empreinte de cet exe, celle qui a ete essayee au banc (aucune signature : l'empreinte epinglee fait foi).</summary>
     public const string ExeNelfePlay = "aff5d5747bbaa0e533036d025b757667ee1866417b8cf8e46e803f37ca72d0cf";
 
+    /// <summary>
+    /// L'exe du lot 3 (1.22.2-nelfeplay.2, 25/11) : le lot 1 plus le replay en netplay (les entrees CONFIRMEES de tous les joueurs,
+    /// hote et invite). NON livre par outils.json tant que l'essai entre deux bornes n'est pas fait : l'API le RECONNAIT (marque
+    /// build.txt + empreinte), elle ne le pose pas. Pose a la main pour l'essai (essai_borne.py, labo).
+    /// </summary>
+    public const string ExeNelfePlay2 = "a1aff87f0c6f64d675709253067e6c6e3d79450c6ae777aa85e18beda48dbda2";
+
     /// <summary>Les exes NelfePlay reconnus : seuls leur marque ET leur empreinte levent les portes du replay.</summary>
-    public static readonly string[] ExesConnus = [ExeNelfePlay];
+    public static readonly string[] ExesConnus = [ExeNelfePlay, ExeNelfePlay2];
+
+    /// <summary>
+    /// Les exes NelfePlay dont le replay porte les entrees de TOUS les joueurs en netplay (lot 3) : seuls ils permettent d'enregistrer
+    /// le replay de l'invite. Sous le lot 1 ou la stable, le replay d'un pair netplay n'a que le port 0 : il ne se relit pas.
+    /// </summary>
+    public static readonly string[] ExesQuiEnregistrentLeNetplay = [ExeNelfePlay2];
 
     /// <summary>La seule base sur laquelle on pose : le retroarch.exe 1.22.2 du buildbot (RetroBat). Jamais de retrogradation.</summary>
     public const string Stable = "81c11b6f24932bf7918f05eee8928035bff3887335fd2a081507c75e9d94d06a";
@@ -155,6 +168,7 @@ public sealed class RetroArchNelfePlayService : BackgroundService
     private DateTime _pasAvant = DateTime.MinValue;
     private bool _restesRetires;
     private bool? _portesLevees;
+    private bool? _netplayEnregistre;
 
     public RetroArchNelfePlayService(IEventBus bus, ApiContext contexte, IConfiguration configuration, ILogger<RetroArchNelfePlayService> journal)
     {
@@ -276,6 +290,14 @@ public sealed class RetroArchNelfePlayService : BackgroundService
     /// </summary>
     private void DireLesPortes(string dossierRetroArch)
     {
+        var netplay = RetroBat.Api.Replay.Recording.ReplayRecorderService.RetroArchNelfePlayNetplay(dossierRetroArch);
+        if (_netplayEnregistre != netplay)
+        {
+            _netplayEnregistre = netplay;
+            _journal.LogInformation(netplay
+                ? "RetroArch NelfePlay : replay en netplay : exe du lot 3 en place (nelfeplay.2), le replay de l'invite joueur est enregistre ; netplay_check_frames=0 pose aux lancements MULTIPLAYER."
+                : "RetroArch NelfePlay : replay en netplay : exe du lot 3 absent, le replay de l'invite netplay n'est pas enregistre.");
+        }
         var levees = RetroBat.Api.Replay.Recording.ReplayRecorderService.RetroArchNelfePlayInstalle(dossierRetroArch);
         if (_portesLevees == levees) return;
         _portesLevees = levees;
