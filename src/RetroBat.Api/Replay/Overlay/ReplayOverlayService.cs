@@ -497,7 +497,7 @@ public sealed class ReplayOverlayService : BackgroundService
 
         private static Process[] SafeProcesses(string name)
         {
-            try { return Process.GetProcessesByName(name); } catch { return Array.Empty<Process>(); }
+            try { return name == "retroarch" ? RetroBat.Api.Infrastructure.RetroArchProcessus.Tous() : Process.GetProcessesByName(name); } catch { return Array.Empty<Process>(); }
         }
 
         // ─────────────────────────────────────────────────────────────────────────────────────

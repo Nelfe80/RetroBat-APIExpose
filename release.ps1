@@ -275,6 +275,8 @@ Write-Host 'Construction update.7z...'
 # propres au fork), avec sa licence.
 # TGBDual Multi (29/10) : les deux Game Boy reliees lisibles par leur carte memoire (branche nelfeplay-multi du fork), avec
 # sa licence ; FBNeo Multi 32 y gagne la memoire de travail des jeux MCR-3 (Rampage).
+$exeRetroArchNelfePlay = 'tools/retroarch-nelfeplay/retroarch-1.22.2-nelfeplay.1.exe'
+$sourcesRetroArchNelfePlay = 'https://github.com/Nelfe80/RetroArch/tree/v1.22.2-nelfeplay.1'
 $outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.exe',
     'tools/cores/mgba_splitscreen_libretro.dll', 'tools/cores/mgba_splitscreen_libretro.info',
     'tools/cores/mednafen_ngp_link_libretro.dll', 'tools/cores/mednafen_ngp_link_libretro.info',
@@ -283,7 +285,9 @@ $outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.e
     'tools/cores/tgbdual_multi_libretro.dll', 'tools/cores/tgbdual_multi_license.txt', 'tools/cores/tgbdual_multi_libretro.info',
     'tools/cores/fceumm_ghosts_libretro.dll', 'tools/cores/fceumm_ghosts_libretro.info',
     'tools/cores/snes9x_ghosts_libretro.dll', 'tools/cores/snes9x_ghosts_libretro.info',
-    'tools/cores/genesis_plus_gx_ghosts_libretro.dll', 'tools/cores/genesis_plus_gx_ghosts_libretro.info')
+    'tools/cores/genesis_plus_gx_ghosts_libretro.dll', 'tools/cores/genesis_plus_gx_ghosts_libretro.info',
+    # RETROARCH NELFEPLAY (1.9.216, lot 1) : le SEUL exe, sans version de fichier (repris sur son empreinte), avec le lien de ses sources (GPLv3).
+    $exeRetroArchNelfePlay)
 # LE PLAYERDECK (1.9.163) : chaque fichier recopie plus haut (exe, ini, Decks, polices, licences). SelfUpdateService les
 # accepte par leur dossier et leur extension (FichierDuPlayerDeck), arrete le Deck avant de les poser hors partie, et ne
 # pose PlayerDeck.ini que s'il manque.
@@ -508,7 +512,7 @@ $outilsJoints = @()
 foreach ($nomOutil in $outilsHorsArchive) {
     $cheminOutil = Join-Path $PSScriptRoot ($nomOutil -replace '/', '\')
     $nomActif = Split-Path $cheminOutil -Leaf
-    $estExe = $nomOutil -like '*.exe'
+    $estExe = ($nomOutil -like '*.exe') -and ($nomOutil -ne $exeRetroArchNelfePlay)
     if (-not (Test-Path -LiteralPath $cheminOutil)) {
         throw "$nomOutil absent de la racine : il ne serait ni dans l'archive ni dans outils.json."
     }
@@ -531,7 +535,7 @@ foreach ($nomOutil in $outilsHorsArchive) {
         $outilsJoints += $cheminOutil
         Write-Host ("Outil $nomOutil nouveau : joint a cette release ({0:N0} Mo)." -f ($fichierOutil.Length / 1MB))
     }
-    [void]$outils.Add([pscustomobject]@{
+    $entreeOutil = [pscustomobject]@{
         fichier = $nomOutil
         # Une archive n'a pas de version de fichier : sa date, prise dans son nom (les bornes la comparent sur son empreinte).
         # Un fichier du PlayerDeck (Deck, police, configuration) porte la version de son exe.
@@ -539,11 +543,15 @@ foreach ($nomOutil in $outilsHorsArchive) {
                   elseif ($nomOutil -like 'tools/playerdeck/*') { $versionDuDeck }
                   # Les fichiers du vocal (DLL, notices, Krisp) portent la version de leur exe : un lot, une version.
                   elseif ($fichiersDuVocal -contains $nomOutil) { $versionDuVocal }
+                  elseif ($nomOutil -eq $exeRetroArchNelfePlay) { '1.22.2-nelfeplay.1' }
                   else { ($nomActif -replace '^.*?(\d{4})-(\d{2})-(\d{2}).*$', '$1.$2.$3') }
         sha256  = $shaOutil
         taille  = $fichierOutil.Length
         url     = $urlOutil
-    })
+    }
+    # La GPL exige les sources correspondantes avec l'exe : fork et tag dans son entree.
+    if ($nomOutil -eq $exeRetroArchNelfePlay) { $entreeOutil | Add-Member -NotePropertyName sources -NotePropertyValue $sourcesRetroArchNelfePlay }
+    [void]$outils.Add($entreeOutil)
 }
 $outilsFile = Join-Path $out 'outils.json'
 [IO.File]::WriteAllText($outilsFile, ([pscustomobject]@{ outils = @($outils) } | ConvertTo-Json -Depth 4),

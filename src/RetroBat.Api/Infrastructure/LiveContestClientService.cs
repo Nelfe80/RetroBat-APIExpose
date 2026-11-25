@@ -1234,7 +1234,7 @@ public sealed class LiveContestClientService : BackgroundService
     {
         try
         {
-            foreach (var process in System.Diagnostics.Process.GetProcessesByName(processName))
+            foreach (var process in processName == "retroarch" ? RetroBat.Api.Infrastructure.RetroArchProcessus.Tous() : System.Diagnostics.Process.GetProcessesByName(processName))
             {
                 if (process.MainWindowHandle != IntPtr.Zero)
                 {
@@ -1309,7 +1309,7 @@ public sealed class LiveContestClientService : BackgroundService
         for (var i = 0; i < 30; i++)
         {
             await Task.Delay(2000);
-            if (System.Diagnostics.Process.GetProcessesByName("retroarch")
+            if (RetroBat.Api.Infrastructure.RetroArchProcessus.Tous()
                 .Any(pr => pr.MainWindowHandle != IntPtr.Zero))
             {
                 FocusRetroArch();

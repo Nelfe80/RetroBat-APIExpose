@@ -46,40 +46,89 @@ public class OutilsHorsArchiveTests
     }
 
     [Fact]
-    public void L_archive_de_retroarch_nelfeplay_est_retenue_avec_son_chemin()
+    public void L_exe_de_retroarch_nelfeplay_est_retenu_avec_son_chemin_et_repris_sur_son_empreinte()
     {
-        // 2026-10-16 : la nocturne corrigee voyage par outils.json, dans un sous-dossier, sans version de fichier.
-        var outil = Assert.Single(SelfUpdateService.LireOutils($"{{\"outils\":[{Outil(RetroArchNelfePlay.CheminDeLArchive, Sha,
-            "https://github.com/Nelfe80/RetroBat-APIExpose/releases/download/v1.9.60/RetroArch_update-2026-10-16.7z", 59264658)}]}}", Depot));
-        Assert.Equal("tools/retroarch-nelfeplay/RetroArch_update-2026-10-16.7z", outil.Fichier);
+        // 1.9.216 : le SEUL exe du lot 1 voyage par outils.json, sans version de fichier ; les sources (GPL) sont dans l'entree.
+        var outil = Assert.Single(SelfUpdateService.LireOutils($"{{\"outils\":[{Outil(RetroArchNelfePlay.CheminDeLExe, RetroArchNelfePlay.ExeNelfePlay,
+            "https://github.com/Nelfe80/RetroBat-APIExpose/releases/download/v1.9.216/retroarch-1.22.2-nelfeplay.1.exe", 18000000)}]}}", Depot));
+        Assert.Equal("tools/retroarch-nelfeplay/retroarch-1.22.2-nelfeplay.1.exe", outil.Fichier);
+        // Un exe sans version se compare par empreinte, pas par version : EstUnExe l'exclut.
         Assert.False(SelfUpdateService.EstUnExe(outil.Fichier));
         Assert.True(SelfUpdateService.EstUnExe("NelfePlay.LiveStreaming.exe"));
+        Assert.StartsWith("https://github.com/Nelfe80/RetroArch/tree/v1.22.2-nelfeplay.1", RetroArchNelfePlay.Sources);
         // Un autre chemin sous tools n'est pas prevu : il est ignore.
         Assert.Empty(SelfUpdateService.LireOutils($"{{\"outils\":[{Outil("tools/autre/x.7z", Sha,
             "https://github.com/Nelfe80/RetroBat-APIExpose/releases/download/v1/x.7z", 10)}]}}", Depot));
     }
 
-    [Theory]
-    [InlineData(true, true, false, false, false, true)]
-    [InlineData(false, true, false, false, false, false)]   // l'archive n'est pas encore arrivee
-    [InlineData(true, false, false, false, false, false)]   // l'installeur manque
-    [InlineData(true, true, true, false, false, false)]     // le joueur l'a desinstallee
-    [InlineData(true, true, false, true, false, false)]     // deja en place
-    [InlineData(true, true, false, false, true, false)]     // un jeu tourne
-    public void RetroArch_nelfeplay_ne_s_installe_que_si_tout_le_permet(bool archive, bool installeur, bool refus, bool deja, bool jeu, bool attendu)
+    private static EtatNelfePlay Etat(bool auto = true, bool refus = false, bool nocturne = false, bool marque = false,
+        string ici = "", string dansLaMarque = "", bool pret = true, bool installeur = true, bool desinstalleur = true, bool jeu = false)
+        => new(auto, refus, nocturne, marque, ici, dansLaMarque, pret, installeur, desinstalleur, jeu);
+
+    private static readonly string Notre = RetroArchNelfePlay.ExeNelfePlay;
+    private static readonly string Stable = RetroArchNelfePlay.Stable;
+    private static readonly string Autre = new('c', 64);
+
+    [Fact]
+    public void RetroArch_nelfeplay_se_pose_sur_la_stable_connue_et_sur_elle_seule()
     {
-        Assert.Equal(attendu, RetroArchNelfePlayService.AInstaller(archive, installeur, refus, deja, jeu));
+        Assert.Equal(ActionNelfePlay.Installer, RetroArchNelfePlayService.Decider(Etat(ici: Stable)));
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(ici: Autre)));           // une autre RetroArch : jamais de retrogradation
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(ici: "")));              // exe illisible
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(ici: Stable, pret: false)));        // notre exe pas encore arrive ou altere
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(ici: Stable, installeur: false)));
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(ici: Stable, refus: true)));        // le joueur l'a desinstallee
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(ici: Stable, auto: false)));        // option eteinte
+    }
+
+    [Fact]
+    public void RetroArch_nelfeplay_ne_touche_jamais_une_partie()
+    {
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(ici: Stable, jeu: true)));
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(marque: true, ici: Autre, dansLaMarque: Notre, jeu: true)));
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(nocturne: true, jeu: true)));
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(marque: true, ici: Notre, dansLaMarque: Notre, auto: false, jeu: true)));
+    }
+
+    [Fact]
+    public void RetroArch_nelfeplay_en_place_reste_ou_se_retire_selon_l_option()
+    {
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(marque: true, ici: Notre, dansLaMarque: Notre)));
+        Assert.Equal(ActionNelfePlay.Retirer, RetroArchNelfePlayService.Decider(Etat(marque: true, ici: Notre, dansLaMarque: Notre, auto: false)));
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(marque: true, ici: Notre, dansLaMarque: Notre, auto: false, desinstalleur: false)));
+    }
+
+    [Fact]
+    public void Une_mise_a_jour_de_RetroBat_ne_restaure_rien_et_repose_seulement_sur_la_stable()
+    {
+        // La marque reste, l'exe n'est plus le notre : la stable revient (meme 1.22.2) -> l'installeur ecarte la sauvegarde perimee et repose.
+        Assert.Equal(ActionNelfePlay.Installer, RetroArchNelfePlayService.Decider(Etat(marque: true, ici: Stable, dansLaMarque: Notre)));
+        // Une autre version : on se retire (sans restaurer, le script le sait) et on ne repose pas.
+        Assert.Equal(ActionNelfePlay.Retirer, RetroArchNelfePlayService.Decider(Etat(marque: true, ici: Autre, dansLaMarque: Notre)));
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(marque: true, ici: Autre, dansLaMarque: Notre, desinstalleur: false)));
+        // Option eteinte, la stable revenue : on ne repose pas, on retire la marque.
+        Assert.Equal(ActionNelfePlay.Retirer, RetroArchNelfePlayService.Decider(Etat(marque: true, ici: Stable, dansLaMarque: Notre, auto: false)));
+    }
+
+    [Fact]
+    public void La_nocturne_sdl3_de_la_1_9_60_est_toujours_retiree()
+    {
+        Assert.Equal(ActionNelfePlay.RetirerLaNocturne, RetroArchNelfePlayService.Decider(Etat(nocturne: true, ici: Autre)));
+        Assert.Equal(ActionNelfePlay.RetirerLaNocturne, RetroArchNelfePlayService.Decider(Etat(nocturne: true, auto: false)));
+        Assert.Equal(ActionNelfePlay.Rien, RetroArchNelfePlayService.Decider(Etat(nocturne: true, desinstalleur: false)));
     }
 
     [Theory]
-    [InlineData(true, true, false, true)]
-    [InlineData(false, true, false, false)]   // jamais installee ici
-    [InlineData(true, false, false, false)]   // le desinstalleur manque
-    [InlineData(true, true, true, false)]     // un jeu tourne : apres la partie
-    public void RetroArch_nelfeplay_se_retire_des_qu_aucun_jeu_ne_tourne(bool marque, bool desinstalleur, bool jeu, bool attendu)
+    [InlineData("retroarch", true)]
+    [InlineData("retroarch.patched.RETROBAT", true)]   // l'hote netplay d'emulatorLauncher
+    [InlineData("RetroArch", true)]
+    [InlineData("retroarch-spectateur", true)]
+    [InlineData("emulatorLauncher", false)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public void Les_processus_de_retroarch_se_reconnaissent_par_leur_prefixe(string? nom, bool attendu)
     {
-        // 2026-10-17 : ses manettes SDL3 ne suivaient pas les touches de RetroBat (piece sur L1, croix morte).
-        Assert.Equal(attendu, RetroArchNelfePlayService.ARetirer(marque, desinstalleur, jeu));
+        Assert.Equal(attendu, RetroArchProcessus.EstUnRetroArch(nom));
     }
 
     [Theory]

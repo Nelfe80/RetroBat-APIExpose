@@ -191,7 +191,7 @@ public sealed class ChallengeAnnounceController : ControllerBase
     {
         try
         {
-            foreach (var process in System.Diagnostics.Process.GetProcessesByName("retroarch"))
+            foreach (var process in RetroBat.Api.Infrastructure.RetroArchProcessus.Tous())
             {
                 if (process.MainWindowHandle != IntPtr.Zero)
                 {
@@ -210,7 +210,7 @@ public sealed class ChallengeAnnounceController : ControllerBase
         for (var attempt = 0; attempt < 30; attempt++)
         {
             await Task.Delay(2000);
-            if (System.Diagnostics.Process.GetProcessesByName("retroarch")
+            if (RetroBat.Api.Infrastructure.RetroArchProcessus.Tous()
                 .Any(process => process.MainWindowHandle != IntPtr.Zero))
             {
                 FocusRetroArch();

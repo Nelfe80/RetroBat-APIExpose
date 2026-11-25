@@ -475,21 +475,24 @@ public sealed class ReplayRecorderService : BackgroundService
     private string _jeuAnnonce = "";
 
     /// <summary>
-    /// La marque que pose install-retroarch-nelfeplay.bat (emulators\retroarch\.nelfeplay\installe.txt) ET un
+    /// RETROARCH NELFEPLAY (1.9.216) : la marque NEUVE de install-retroarch-nelfeplay.bat (emulators\retroarch\.nelfeplay\build.txt ;
+    /// les API anterieures retirent tout ce qui porte installe.txt), ET l'empreinte de l'exe en place dans la liste des exes
+    /// NelfePlay connus (RetroArchNelfePlay.ExesConnus, ou exesConnus aux essais), ET un
     /// retroarch.exe qui est bien celui qu'elle a installe (ligne « exe= », son SHA-256) : une mise a jour de RetroBat
     /// qui remettrait la 1.22.2 laisse la marque, jamais la bonne empreinte. Le desinstalleur retire la marque.
     /// </summary>
-    internal static bool RetroArchNelfePlayInstalle(string? dossierRetroArch = null)
+    internal static bool RetroArchNelfePlayInstalle(string? dossierRetroArch = null, IEnumerable<string>? exesConnus = null)
     {
         try
         {
             var dossier = dossierRetroArch ?? Path.GetDirectoryName(RetroBat.Domain.Paths.RetroBatPaths.RetroArchConfigPath) ?? "";
-            var marque = Path.Combine(dossier, ".nelfeplay", "installe.txt");
+            var connus = (exesConnus ?? RetroBat.Api.Infrastructure.RetroArchNelfePlay.ExesConnus).ToArray();
+            var marque = Path.Combine(dossier, ".nelfeplay", "build.txt");
             var exe = Path.Combine(dossier, "retroarch.exe");
             if (dossier.Length == 0 || !File.Exists(marque) || !File.Exists(exe)) return false;
             var attendue = File.ReadAllLines(marque).Select(l => l.Trim())
                 .FirstOrDefault(l => l.StartsWith("exe=", StringComparison.OrdinalIgnoreCase))?[4..].Trim() ?? "";
-            if (attendue.Length != 64) return false;
+            if (attendue.Length != 64 || !connus.Contains(attendue, StringComparer.OrdinalIgnoreCase)) return false;
             var info = new FileInfo(exe);
             var cle = (exe, info.Length, info.LastWriteTimeUtc);
             lock (EmpreinteVerrou)

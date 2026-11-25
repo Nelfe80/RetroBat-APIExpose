@@ -150,6 +150,7 @@ public sealed class ApiExposeAppsettingsSyncService
             ["global.apiexpose.game_events_manager.enabled"] = Bool("GameEventsManager", "Enabled"),
             ["global.apiexpose.challenge.share_live"] = Bool("Leaderboard", "ChallengeShareLive"),
             ["global.apiexpose.challenge.share_live_deck"] = Bool("Leaderboard", "ChallengeShareLiveDeck"),
+            ["global.apiexpose.retroarch_nelfeplay.enabled"] = Bool("RetroArchNelfePlay", "AutoInstall"),
             ["global.apiexpose.challenge.join_policy"] = String("Leaderboard", "ChallengeJoinPolicy"),
             ["global.apiexpose.game_events.retroarch_wrapper.enabled"] = Bool("GameEventsManager", "RetroArchWrapperEnabled"),
             ["global.apiexpose.game_events.console_high_score_capture.enabled"] = Bool("GameEventsManager", "ConsoleHighScoreCaptureEnabled"),

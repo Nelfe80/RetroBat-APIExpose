@@ -125,9 +125,10 @@ public static class Desinstallation
         Etape(Dire, "RetroArch NelfePlay", () =>
         {
             var retroarch = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch");
-            var bat = Path.Combine(racine, RetroArchNelfePlay.Desinstalleur);
-            if (!File.Exists(Path.Combine(retroarch, RetroArchNelfePlay.Marque))) return "pas installe";
-            if (!File.Exists(bat)) return "installe, mais " + RetroArchNelfePlay.Desinstalleur + " manque";
+            var nocturne = File.Exists(Path.Combine(retroarch, RetroArchNelfePlay.MarqueDeLaNocturne));
+            var bat = Path.Combine(racine, nocturne ? RetroArchNelfePlay.RetraitDeLaNocturne : RetroArchNelfePlay.Desinstalleur);
+            if (!nocturne && !File.Exists(Path.Combine(retroarch, RetroArchNelfePlay.Marque))) return "pas installe";
+            if (!File.Exists(bat)) return "installe, mais " + Path.GetFileName(bat) + " manque";
             using var p = Process.Start(new ProcessStartInfo("cmd.exe", "/c \"\"" + bat + "\" /silencieux /annulation\"")
             {
                 WorkingDirectory = racine, CreateNoWindow = true, UseShellExecute = false,

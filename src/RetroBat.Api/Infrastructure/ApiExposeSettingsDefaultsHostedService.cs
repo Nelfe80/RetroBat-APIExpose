@@ -221,6 +221,7 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
             ("global.apiexpose.game_events_manager.enabled", ToEsBool(options.GameEventsManager.Enabled)),
             ("global.apiexpose.challenge.share_live", ToEsBool(options.Leaderboard.ChallengeShareLive)),
             ("global.apiexpose.challenge.share_live_deck", ToEsBool(options.Leaderboard.ChallengeShareLiveDeck)),
+            ("global.apiexpose.retroarch_nelfeplay.enabled", ToEsBool(options.RetroArchNelfePlay.AutoInstall)),
             ("global.apiexpose.challenge.join_policy", options.Leaderboard.ChallengeJoinPolicy),
             ("global.apiexpose.game_events.retroarch_wrapper.enabled", ToEsBool(options.GameEventsManager.RetroArchWrapperEnabled)),
             ("global.apiexpose.game_events.console_high_score_capture.enabled", ToEsBool(options.GameEventsManager.ConsoleHighScoreCaptureEnabled)),

@@ -43,6 +43,7 @@ public class ApiExposeOptions
     public DataPackOptions DataPack { get; set; } = new();
     public SelfUpdateOptions SelfUpdate { get; set; } = new();
     public LeaderboardOptions Leaderboard { get; set; } = new();
+    public RetroArchNelfePlayOptions RetroArchNelfePlay { get; set; } = new();
     public PlayerDeckOptions PlayerDeck { get; set; } = new();
 
     public class TestModeOptions
@@ -993,4 +994,14 @@ public class ApiExposeOptions
         public string FilePath { get; set; } = ".log/es-flow.jsonl";
         public bool ResetOnStartup { get; set; } = true;
     }
+}
+
+/// <summary>
+/// RETROARCH NELFEPLAY (1.9.216) : la 1.22.2 de RetroBat avec trois correctifs de l'amont (replay des gros etats, GET_STATUS,
+/// hote netplay), posee par-dessus retroarch.exe quand rien ne tourne ; la stable est sauvegardee et revient en un geste.
+/// </summary>
+public sealed class RetroArchNelfePlayOptions
+{
+    /// <summary>Installation automatique, ALLUMEE par defaut (decision du user, 25/11). Eteinte (appsettings ou option d'ES), la stable est remise.</summary>
+    public bool AutoInstall { get; set; } = true;
 }

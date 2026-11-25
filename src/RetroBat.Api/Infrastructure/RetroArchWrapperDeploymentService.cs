@@ -890,7 +890,7 @@ public class RetroArchWrapperDeploymentService
     {
         try
         {
-            return Process.GetProcessesByName("retroarch").Any();
+            return RetroBat.Api.Infrastructure.RetroArchProcessus.Tous().Any();
         }
         catch
         {

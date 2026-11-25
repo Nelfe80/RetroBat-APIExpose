@@ -6,24 +6,52 @@ using RetroBat.Domain.Paths;
 
 namespace RetroBat.Api.Infrastructure;
 
-/// <summary>Les chemins de RetroArch NelfePlay, relatifs au dossier d'APIExpose.</summary>
+/// <summary>Les chemins et les empreintes de RetroArch NelfePlay, relatifs au dossier d'APIExpose ou de RetroArch.</summary>
 public static class RetroArchNelfePlay
 {
-    /// <summary>L'archive officielle de la nocturne (livree par outils.json en 1.9.60 seulement).</summary>
-    public const string CheminDeLArchive = "tools/retroarch-nelfeplay/RetroArch_update-2026-10-16.7z";
+    /// <summary>L'exe du lot 1, livre par outils.json (SEUL fichier : les DLL sont celles de RetroBat).</summary>
+    public const string CheminDeLExe = "tools/retroarch-nelfeplay/retroarch-1.22.2-nelfeplay.1.exe";
+
+    /// <summary>L'empreinte de cet exe, celle qui a ete essayee au banc (aucune signature : l'empreinte epinglee fait foi).</summary>
+    public const string ExeNelfePlay = "aff5d5747bbaa0e533036d025b757667ee1866417b8cf8e46e803f37ca72d0cf";
+
+    /// <summary>Les exes NelfePlay reconnus : seuls leur marque ET leur empreinte levent les portes du replay.</summary>
+    public static readonly string[] ExesConnus = [ExeNelfePlay];
+
+    /// <summary>La seule base sur laquelle on pose : le retroarch.exe 1.22.2 du buildbot (RetroBat). Jamais de retrogradation.</summary>
+    public const string Stable = "81c11b6f24932bf7918f05eee8928035bff3887335fd2a081507c75e9d94d06a";
+
+    /// <summary>Les sources correspondantes (GPLv3), a fournir avec l'exe : fork et tag.</summary>
+    public const string Sources = "https://github.com/Nelfe80/RetroArch/tree/v1.22.2-nelfeplay.1";
 
     public const string Installeur = "install-retroarch-nelfeplay.bat";
 
     public const string Desinstalleur = "uninstall-retroarch-nelfeplay.bat";
 
-    /// <summary>La marque de l'installeur, dans le dossier de RetroArch : la nocturne a ete posee ici.</summary>
-    public const string Marque = ".nelfeplay/installe.txt";
+    /// <summary>Retire la nocturne SDL3 de la 1.9.60 (son ancienne marque), la ou elle serait restee.</summary>
+    public const string RetraitDeLaNocturne = "retirer-nocturne-retroarch.bat";
 
-    /// <summary>Pose par le desinstalleur : le joueur est revenu a la version de RetroBat, on ne reinstalle pas.</summary>
+    /// <summary>LA MARQUE NEUVE, dans le dossier de RetroArch : build=, exe=, stable=, sources=. Jamais installe.txt.</summary>
+    public const string Marque = ".nelfeplay/build.txt";
+
+    /// <summary>L'ancienne marque de la nocturne du 16/10 : le service la retire, il ne la pose plus.</summary>
+    public const string MarqueDeLaNocturne = ".nelfeplay/installe.txt";
+
+    /// <summary>Pose par le desinstalleur lance a la main : le joueur est revenu a la stable, on ne reinstalle pas.</summary>
     public const string Refus = "state/retroarch-nelfeplay-refus.txt";
 
     /// <summary>L'empreinte du retroarch.exe de la nocturne : tant qu'il est en place, ses bibliotheques lui servent.</summary>
     public const string ExeDeLaNocturne = "cbc50e13d6a097ad7276dc40698516bf99f74d4a619a30dfbf9e849ee58d3d7b";
+
+    /// <summary>Une valeur « cle=valeur » de la marque, ou "".</summary>
+    internal static string ValeurDeLaMarque(string[] lignes, string cle)
+        => lignes.Select(l => l.Trim()).FirstOrDefault(l => l.StartsWith(cle + "=", StringComparison.OrdinalIgnoreCase))?[(cle.Length + 1)..].Trim() ?? "";
+
+    internal static string Sha256De(string chemin)
+    {
+        using var flux = File.Open(chemin, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(flux)).ToLowerInvariant();
+    }
 
     /// <summary>
     /// LES RESTES DE LA NOCTURNE (2026-10-17) : les fichiers que la nocturne ajoute a la racine de RetroArch 1.22.2, a leur
@@ -88,35 +116,40 @@ public static class RetroArchNelfePlay
         return restes;
     }
 
-    private static string Sha256De(string chemin)
-    {
-        using var flux = File.OpenRead(chemin);
-        return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(flux));
-    }
 }
 
+/// <summary>Ce que le service doit faire a ce releve.</summary>
+public enum ActionNelfePlay { Rien, Installer, Retirer, RetirerLaNocturne }
+
+/// <summary>Ce que le disque dit, ce que le joueur a choisi : l'entree de la decision. Tout est lu avant, rien ici ne touche au disque.</summary>
+public readonly record struct EtatNelfePlay(
+    bool AutoInstall, bool Refus, bool MarqueDeLaNocturne, bool Marque, string ExeEnPlace, string ExeDeLaMarque,
+    bool NotreExePret, bool InstalleurPresent, bool DesinstalleurPresent, bool UnJeuTourne);
+
 /// <summary>
-/// RETROARCH NELFEPLAY SE RETIRE (2026-10-17). La 1.9.60 installait d'elle-meme la nocturne de RetroArch du 16 octobre, qui
-/// tient le replay des gros etats (TGM2, MAME libretro). Mais elle lit les manettes par SDL3, quand RetroBat ecrit a chaque
-/// lancement des touches numerotees pour SDL2 : chez les joueurs, la piece sur L1, START sur L2, la croix morte ; on ne
-/// pouvait plus jouer, et aucune partie ne marquait de points (theJim, Gogerad, la nuit du 16 au 17).
+/// RETROARCH NELFEPLAY (1.9.216, lot 1) : le retroarch.exe 1.22.2 de RetroBat plus trois correctifs de l'amont (replay des gros
+/// etats, GET_STATUS sans systemid, hote netplay contre un pair sans compression). emulatorLauncher ne lance que
+/// <c>retroarch.exe</c> : notre exe en prend le nom, la stable est sauvegardee dans <c>.nelfeplay\sauvegarde</c> et revient en un
+/// geste. Il ne se pose QUE par-dessus la stable connue (jamais de retrogradation), hors partie, et la copie
+/// <c>retroarch.patched.RETROBAT.exe</c> d'emulatorLauncher est effacee pour qu'il la refasse depuis notre exe.
 ///
-/// Ce service la DESINSTALLE donc, la ou elle est posee, des qu'aucun jeu ne tourne (uninstall-retroarch-nelfeplay.bat
-/// /annulation : RetroArch de RetroBat remis tel qu'il etait, sans poser de refus). L'installation automatique reste
-/// possible (RetroArchNelfePlay:AutoInstall), coupee par defaut. Sous la 1.22.2, TGM2 et MAME libretro restent sans replay.
+/// La mise a jour de RetroBat ecrase retroarch.exe : on ne restaure RIEN par-dessus, on se retire (marque et sauvegarde), puis on
+/// se repose si la nouvelle base est encore la stable 1.22.2. Les scripts font le travail sur les fichiers, ce service decide
+/// (<see cref="Decider"/>, pur et teste). Installation automatique allumee par defaut (<c>ApiExpose:RetroArchNelfePlay:AutoInstall</c>,
+/// option d'ES <c>global.apiexpose.retroarch_nelfeplay.enabled</c>) ; eteinte, la stable est remise.
+/// La nocturne SDL3 de la 1.9.60 (ancienne marque installe.txt) est toujours retiree.
 /// </summary>
 public sealed class RetroArchNelfePlayService : BackgroundService
 {
     private static readonly TimeSpan PremierEssai = TimeSpan.FromSeconds(45);
     private static readonly TimeSpan Releve = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan ApresUnEchec = TimeSpan.FromMinutes(30);
-    private static readonly string[] Emulateurs = ["retroarch", "emulatorLauncher", "mame", "mame64"];
+    private static readonly string[] AutresProcessus = ["emulatorLauncher", "mame", "mame64"];
 
     private readonly IEventBus _bus;
     private readonly ApiContext _contexte;
+    private readonly IConfiguration _configuration;
     private readonly ILogger<RetroArchNelfePlayService> _journal;
-    private readonly bool _installer;
-    private readonly bool _retirer;
     private IDisposable? _abonnement;
     private int _enCours;
     private DateTime _pasAvant = DateTime.MinValue;
@@ -126,14 +159,12 @@ public sealed class RetroArchNelfePlayService : BackgroundService
     {
         _bus = bus;
         _contexte = contexte;
+        _configuration = configuration;
         _journal = journal;
-        _installer = configuration.GetValue("RetroArchNelfePlay:AutoInstall", false);
-        _retirer = !_installer && configuration.GetValue("RetroArchNelfePlay:Retrait", true);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        if (!_installer && !_retirer) return;
         try { _abonnement = _bus.Subscribe<EventEnvelope>(SurEvenement); }
         catch (Exception ex) { _journal.LogDebug(ex, "RetroArch NelfePlay : abonnement au bus impossible."); }
         try
@@ -167,12 +198,28 @@ public sealed class RetroArchNelfePlayService : BackgroundService
         }
     }
 
-    /// <summary>Faut-il installer ? Tout est la, rien n'est refuse ni deja fait, et rien ne tourne. Pur.</summary>
-    internal static bool AInstaller(bool archive, bool installeur, bool refus, bool dejaInstallee, bool unJeuTourne)
-        => archive && installeur && !refus && !dejaInstallee && !unJeuTourne;
-
-    /// <summary>Faut-il retirer la nocturne ? Elle est posee (la marque), le desinstalleur est la, et rien ne tourne. Pur.</summary>
-    internal static bool ARetirer(bool marque, bool desinstalleur, bool unJeuTourne) => marque && desinstalleur && !unJeuTourne;
+    /// <summary>
+    /// La decision, pure. Jamais rien pendant une partie. Nocturne SDL3 : toujours retiree. Marque neuve : si l'exe en place est bien
+    /// celui qu'elle nomme, on le garde (option allumee) ou on remet la stable (option eteinte) ; sinon RetroBat est passe par la :
+    /// on se retire sans rien restaurer, et le meme releve repose si la nouvelle base est la stable. Sans marque : on pose si
+    /// l'option est allumee, rien de refuse, notre exe pret (empreinte relue) ET la base exactement la stable connue.
+    /// </summary>
+    internal static ActionNelfePlay Decider(EtatNelfePlay e)
+    {
+        if (e.UnJeuTourne) return ActionNelfePlay.Rien;
+        if (e.MarqueDeLaNocturne) return e.DesinstalleurPresent ? ActionNelfePlay.RetirerLaNocturne : ActionNelfePlay.Rien;
+        var enPlace = e.ExeDeLaMarque.Length == 64 && string.Equals(e.ExeEnPlace, e.ExeDeLaMarque, StringComparison.OrdinalIgnoreCase);
+        var peutPoser = e.AutoInstall && !e.Refus && e.NotreExePret && e.InstalleurPresent
+            && string.Equals(e.ExeEnPlace, RetroArchNelfePlay.Stable, StringComparison.OrdinalIgnoreCase);
+        if (e.Marque)
+        {
+            if (enPlace) return !e.AutoInstall && e.DesinstalleurPresent ? ActionNelfePlay.Retirer : ActionNelfePlay.Rien;
+            // La stable est revenue sous notre marque : l'installeur ecarte l'ancienne sauvegarde et repose tout seul.
+            if (peutPoser) return ActionNelfePlay.Installer;
+            return e.DesinstalleurPresent ? ActionNelfePlay.Retirer : ActionNelfePlay.Rien;
+        }
+        return peutPoser ? ActionNelfePlay.Installer : ActionNelfePlay.Rien;
+    }
 
     private async Task EssayerAsync(CancellationToken ct)
     {
@@ -182,48 +229,31 @@ public sealed class RetroArchNelfePlayService : BackgroundService
             if (DateTime.UtcNow < _pasAvant) return;
             var racine = RetroBatPaths.PluginRoot;
             var dossierRetroArch = Path.GetDirectoryName(RetroBatPaths.RetroArchConfigPath) ?? "";
-            var unJeuTourne = _contexte.Ui.Running is not null
-                || Process.GetProcesses().Any(p => Emulateurs.Contains(p.ProcessName, StringComparer.OrdinalIgnoreCase));
-
-            if (_retirer)
+            if (dossierRetroArch.Length == 0) return;
+            var etat = LireLEtat(racine, dossierRetroArch);
+            if (etat.UnJeuTourne) return;
+            var action = Decider(etat);
+            if (action == ActionNelfePlay.RetirerLaNocturne)
             {
-                var desinstalleur = Path.Combine(racine, RetroArchNelfePlay.Desinstalleur);
-                var marque = File.Exists(Path.Combine(dossierRetroArch, RetroArchNelfePlay.Marque));
-                // Retiree (ou jamais posee) : ses restes partent, s'il y en a.
-                if (!marque && !unJeuTourne) RetirerLesRestes(dossierRetroArch);
-                if (!ARetirer(marque, File.Exists(desinstalleur), unJeuTourne)) return;
-                _journal.LogInformation("RetroArch NelfePlay : retrait de la nocturne (ses manettes SDL3 ne suivent pas les touches de RetroBat).");
-                var (code, texte) = await LancerAsync(desinstalleur, "/silencieux /annulation", racine, ct).ConfigureAwait(false);
-                if (code == 0 && !File.Exists(Path.Combine(dossierRetroArch, RetroArchNelfePlay.Marque)))
-                {
-                    _journal.LogInformation("RetroArch NelfePlay : retiree, RetroArch de RetroBat remis ({Sortie}).", texte);
-                    RetirerLesRestes(dossierRetroArch);
-                }
-                else
-                {
-                    _pasAvant = DateTime.UtcNow + ApresUnEchec;
-                    _journal.LogWarning("RetroArch NelfePlay : retrait non fait (code {Code}) : {Sortie}. Nouvel essai dans 30 min.", code, texte);
-                }
+                _journal.LogInformation("RetroArch NelfePlay : retrait de la nocturne SDL3 de la 1.9.60.");
+                await LancerEtJournaliserAsync(RetroArchNelfePlay.RetraitDeLaNocturne, "/silencieux /annulation", racine, "retrait de la nocturne", ct).ConfigureAwait(false);
+                RetirerLesRestes(dossierRetroArch);
                 return;
             }
-
-            var installeur = Path.Combine(racine, RetroArchNelfePlay.Installeur);
-            var refus = File.Exists(Path.Combine(racine, RetroArchNelfePlay.Refus));
-            if (!AInstaller(File.Exists(Path.Combine(racine, RetroArchNelfePlay.CheminDeLArchive)), File.Exists(installeur), refus,
-                    RetroBat.Api.Replay.Recording.ReplayRecorderService.RetroArchNelfePlayInstalle(), unJeuTourne))
+            if (!etat.Marque && !etat.MarqueDeLaNocturne) RetirerLesRestes(dossierRetroArch);
+            switch (action)
             {
-                return;
-            }
-            _journal.LogInformation("RetroArch NelfePlay : installation de la nocturne corrigee (aucun jeu ne tourne).");
-            var (codeInstall, sortie) = await LancerAsync(installeur, "/silencieux", racine, ct).ConfigureAwait(false);
-            if (codeInstall == 0 && RetroBat.Api.Replay.Recording.ReplayRecorderService.RetroArchNelfePlayInstalle())
-            {
-                _journal.LogInformation("RetroArch NelfePlay : installee ({Sortie}).", sortie);
-            }
-            else
-            {
-                _pasAvant = DateTime.UtcNow + ApresUnEchec;
-                _journal.LogWarning("RetroArch NelfePlay : installation non faite (code {Code}) : {Sortie}.", codeInstall, sortie);
+                case ActionNelfePlay.Installer:
+                    _journal.LogInformation("RetroArch NelfePlay : pose de {Exe} sur la stable 1.22.2 (aucun jeu ne tourne). Sources : {Sources}.",
+                        RetroArchNelfePlay.CheminDeLExe, RetroArchNelfePlay.Sources);
+                    await LancerEtJournaliserAsync(RetroArchNelfePlay.Installeur, "/silencieux", racine, "installation", ct).ConfigureAwait(false);
+                    break;
+                case ActionNelfePlay.Retirer:
+                    _journal.LogInformation(etat.AutoInstall
+                        ? "RetroArch NelfePlay : RetroBat a remplace retroarch.exe, retrait propre (rien n'est restaure par-dessus)."
+                        : "RetroArch NelfePlay : option eteinte, retour a la stable de RetroBat.");
+                    await LancerEtJournaliserAsync(RetroArchNelfePlay.Desinstalleur, "/silencieux /annulation", racine, "retrait", ct).ConfigureAwait(false);
+                    break;
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -235,6 +265,60 @@ public sealed class RetroArchNelfePlayService : BackgroundService
         {
             Interlocked.Exchange(ref _enCours, 0);
         }
+    }
+
+    private async Task LancerEtJournaliserAsync(string script, string arguments, string racine, string nom, CancellationToken ct)
+    {
+        var (code, texte) = await LancerAsync(Path.Combine(racine, script), arguments, racine, ct).ConfigureAwait(false);
+        if (code == 0) _journal.LogInformation("RetroArch NelfePlay : {Operation} faite ({Sortie}).", nom, texte);
+        else
+        {
+            _pasAvant = DateTime.UtcNow + ApresUnEchec;
+            _journal.LogWarning("RetroArch NelfePlay : {Operation} non faite (code {Code}) : {Sortie}. Nouvel essai dans 30 min.", nom, code, texte);
+        }
+    }
+
+    /// <summary>Lit le disque (empreintes comprises) et les reglages ; ce qui ne se lit pas vaut « absent ».</summary>
+    private EtatNelfePlay LireLEtat(string racine, string dossierRetroArch)
+    {
+        var unJeuTourne = _contexte.Ui.Running is not null || UnProcessusDeJeuTourne();
+        var exe = Path.Combine(dossierRetroArch, "retroarch.exe");
+        var marque = Path.Combine(dossierRetroArch, RetroArchNelfePlay.Marque);
+        var marqueDeLaNocturne = File.Exists(Path.Combine(dossierRetroArch, RetroArchNelfePlay.MarqueDeLaNocturne));
+        string exeIci = "", exeMarque = "";
+        try
+        {
+            if (!unJeuTourne && File.Exists(exe)) exeIci = RetroArchNelfePlay.Sha256De(exe);
+            if (File.Exists(marque)) exeMarque = RetroArchNelfePlay.ValeurDeLaMarque(File.ReadAllLines(marque), "exe");
+        }
+        catch (IOException) { }
+        var notre = Path.Combine(racine, RetroArchNelfePlay.CheminDeLExe.Replace('/', Path.DirectorySeparatorChar));
+        var notrePret = false;
+        try { notrePret = !unJeuTourne && File.Exists(notre) && string.Equals(RetroArchNelfePlay.Sha256De(notre), RetroArchNelfePlay.ExeNelfePlay, StringComparison.OrdinalIgnoreCase); }
+        catch (IOException) { }
+        return new EtatNelfePlay(
+            _configuration.GetValue("ApiExpose:RetroArchNelfePlay:AutoInstall", true),
+            File.Exists(Path.Combine(racine, RetroArchNelfePlay.Refus)),
+            marqueDeLaNocturne, File.Exists(marque), exeIci, exeMarque, notrePret,
+            File.Exists(Path.Combine(racine, RetroArchNelfePlay.Installeur)),
+            File.Exists(Path.Combine(racine, marqueDeLaNocturne ? RetroArchNelfePlay.RetraitDeLaNocturne : RetroArchNelfePlay.Desinstalleur)),
+            unJeuTourne);
+    }
+
+    /// <summary>Un jeu tourne : tout RetroArch (par PREFIXE : l'hote netplay et la copie du spectateur ont un autre nom) ou le lanceur.</summary>
+    private static bool UnProcessusDeJeuTourne()
+    {
+        var retroarch = RetroArchProcessus.Tous();
+        var tourne = retroarch.Length > 0;
+        foreach (var p in retroarch) p.Dispose();
+        if (tourne) return true;
+        foreach (var nom in AutresProcessus)
+        {
+            var ps = Process.GetProcessesByName(nom);
+            foreach (var p in ps) p.Dispose();
+            if (ps.Length > 0) return true;
+        }
+        return false;
     }
 
     /// <summary>

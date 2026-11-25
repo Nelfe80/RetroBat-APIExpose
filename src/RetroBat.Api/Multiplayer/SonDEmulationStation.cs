@@ -355,7 +355,7 @@ public sealed class SonDEmulationStation : IDisposable
     {
         foreach (var nom in ProcessusDuJeu)
         {
-            var processus = Process.GetProcessesByName(nom);
+            var processus = nom == "retroarch" ? RetroBat.Api.Infrastructure.RetroArchProcessus.Tous() : Process.GetProcessesByName(nom);
             foreach (var p in processus)
             {
                 p.Dispose();

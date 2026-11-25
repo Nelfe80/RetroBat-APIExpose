@@ -101,16 +101,22 @@ public class ReplayPorteCoeurTests
         try
         {
             var exe = Path.Combine(dossier, "retroarch.exe");
-            File.WriteAllText(exe, "la nocturne");
+            File.WriteAllText(exe, "notre exe");
             var sha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(exe))).ToLowerInvariant();
-            Assert.False(ReplayRecorderService.RetroArchNelfePlayInstalle(dossier));
+            var connus = new[] { sha };
+            Assert.False(ReplayRecorderService.RetroArchNelfePlayInstalle(dossier, connus));
             Directory.CreateDirectory(Path.Combine(dossier, ".nelfeplay"));
+            // L'ancienne marque de la nocturne (installe.txt) ne leve plus rien : seule la marque neuve compte.
             File.WriteAllText(Path.Combine(dossier, ".nelfeplay", "installe.txt"), "nocturne=2026-10-16\r\nexe=" + sha + "\r\n");
-            Assert.True(ReplayRecorderService.RetroArchNelfePlayInstalle(dossier));
+            Assert.False(ReplayRecorderService.RetroArchNelfePlayInstalle(dossier, connus));
+            File.WriteAllText(Path.Combine(dossier, ".nelfeplay", "build.txt"), "build=1.22.2-nelfeplay.1\r\nexe=" + sha + "\r\n");
+            Assert.True(ReplayRecorderService.RetroArchNelfePlayInstalle(dossier, connus));
+            // Marque ET empreinte connue : une marque qui nomme un exe inconnu de l'API ne leve rien.
+            Assert.False(ReplayRecorderService.RetroArchNelfePlayInstalle(dossier, new[] { RetroBat.Api.Infrastructure.RetroArchNelfePlay.ExeNelfePlay }));
             // Une mise a jour de RetroBat remet son exe : la marque reste, l'empreinte ne colle plus.
             File.WriteAllText(exe, "la 1.22.2 de RetroBat");
             File.SetLastWriteTimeUtc(exe, DateTime.UtcNow.AddMinutes(1));
-            Assert.False(ReplayRecorderService.RetroArchNelfePlayInstalle(dossier));
+            Assert.False(ReplayRecorderService.RetroArchNelfePlayInstalle(dossier, connus));
         }
         finally
         {

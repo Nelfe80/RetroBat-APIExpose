@@ -81,7 +81,7 @@ public sealed class ReplayCompactionService : BackgroundService
 
     private static bool RetroArchOuvert()
     {
-        var ps = Process.GetProcessesByName("retroarch");
+        var ps = RetroBat.Api.Infrastructure.RetroArchProcessus.Tous();
         try { return ps.Length > 0; }
         finally { foreach (var p in ps) p.Dispose(); }
     }
