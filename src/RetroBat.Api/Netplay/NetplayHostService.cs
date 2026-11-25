@@ -449,7 +449,42 @@ public sealed class NetplayHostService
     /// n'ecrit pas ses lancements).
     /// </summary>
     public async Task<EsLaunchArguments.Resolution?> ResoudreLancementAsync(string cheminRom, CancellationToken ct = default)
-        => EsLaunchArguments.PourRom(cheminRom) ?? await ReconstituerAsync(cheminRom, ct).ConfigureAwait(false);
+    {
+        var resolution = EsLaunchArguments.PourRom(cheminRom) ?? await ReconstituerAsync(cheminRom, ct).ConfigureAwait(false);
+        if (resolution is null) return null;
+        var dossier = SystemeDuChemin(cheminRom, RetroBatPaths.RomsRoot);
+        var corrigee = FbneoPourUnJeuQueFbneoConnait(resolution,
+            WorldScoringLancementService.FbneoConnaitLeSet(Path.GetFileNameWithoutExtension(cheminRom)),
+            dossier, dossier.Length > 0 && _systemes.GetEmulatorCores(dossier).Any(e =>
+                e.Emulator.Equals("libretro", StringComparison.OrdinalIgnoreCase) && e.Core.Equals("fbneo", StringComparison.OrdinalIgnoreCase)));
+        if (!ReferenceEquals(corrigee, resolution))
+        {
+            _logger.LogInformation("Lancement : {Rom} sous {Coeur} d'apres ES, impose sous FBNeo ({Systeme}, libretro, fbneo) : jamais de MAME pour une partie classee quand FBNeo connait le set.",
+                Path.GetFileName(cheminRom), resolution.Coeur, corrigee.Systeme);
+        }
+
+        return corrigee;
+    }
+
+    /// <summary>
+    /// (25/11) FBNEO D'ABORD, MEME QUAND LE SYSTEME LE DECLARE. Blazing Star de roms\neogeo partait par Defier sous MAME : le
+    /// systeme neogeo de RetroBat a MAME par defaut et declare aussi FBNeo, et FbneoPourUnSetMame (collection) n'impose rien
+    /// dans ce cas ; la partie etait non certifiable (« classee sous FBNeo seulement »). Un lancement par l'API (Defier, hote et
+    /// invite du netplay) d'un set que FBNeo connait, resolu sous un coeur MAME, part donc sous libretro/fbneo ; le systeme
+    /// devient celui du dossier de la ROM s'il declare FBNeo (neogeo), sinon il reste. Un joueur deja sous FBNeo, ou sous un
+    /// autre coeur que MAME, n'est pas touche. Pur.
+    /// </summary>
+    internal static EsLaunchArguments.Resolution FbneoPourUnJeuQueFbneoConnait(
+        EsLaunchArguments.Resolution resolution, bool fbneoConnaitLeSet, string systemeDuDossier, bool dossierDeclareFbneo)
+    {
+        if (!fbneoConnaitLeSet || !resolution.Coeur.StartsWith("mame", StringComparison.OrdinalIgnoreCase))
+        {
+            return resolution;
+        }
+
+        var systeme = dossierDeclareFbneo && systemeDuDossier.Length > 0 ? systemeDuDossier : resolution.Systeme;
+        return new EsLaunchArguments.Resolution(systeme, "libretro", "fbneo");
+    }
 
     /// <summary>
     /// Le lancement d'un jeu absent des journaux d'ES, reconstitue comme ES le ferait.
