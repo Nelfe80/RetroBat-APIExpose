@@ -48,7 +48,9 @@ public sealed class SelfUpdateService
     internal static readonly string[] OutilsHorsArchive = ["RetroBat.Api.Diagnostic.exe", "NelfePlay.LiveStreaming.exe",
         // RETROARCH NELFEPLAY (2026-10-16) : l'archive de la nocturne corrigee, que pose install-retroarch-nelfeplay.bat
         // (RetroArchNelfePlayService la lance). Une archive n'a pas de version : elle se reprend sur son empreinte.
-        RetroArchNelfePlay.CheminDeLArchive,
+        // 1.9.216 : l'exe du lot 1 (retroarch-1.22.2-nelfeplay.1.exe, SEUL fichier), sans version de fichier : repris sur son
+        // empreinte (EstUnExe l'exclut). Sources GPL : RetroArchNelfePlay.Sources, aussi dans son entree d'outils.json.
+        RetroArchNelfePlay.CheminDeLExe,
         // LES COEURS DE MULTIPLAYER (2026-10-23, NGP Link le 25/10) : mGBA Splitscreen et NGP Link compiles par NelfePlay,
         // et leurs fiches, que MultiplayerCoeursService pose chez RetroArch. Ni RetroBat ni libretro ne les distribuent.
         .. RetroBat.Api.Multiplayer.MultiplayerCoeursService.Coeurs.SelectMany(c => c.CheminsDesOutils)];
@@ -500,7 +502,8 @@ public sealed class SelfUpdateService
             : null;
     }
 
-    internal static bool EstUnExe(string fichier) => fichier.EndsWith(".exe", StringComparison.OrdinalIgnoreCase);
+    internal static bool EstUnExe(string fichier) => fichier.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)
+        && !string.Equals(fichier, RetroArchNelfePlay.CheminDeLExe, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Le fichier de la borne a-t-il deja l'empreinte publiee ? Faux s'il manque ou se lit mal.</summary>
     private static bool MemeEmpreinte(string chemin, string sha256)

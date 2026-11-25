@@ -167,7 +167,7 @@ public sealed class ScoreShotRegenerator
             var etat = _playback.GetState();
             if (etat.State != "idle")
                 return new Rapport(false, 0, 0, 0, "lecture_en_cours", Array.Empty<string>());
-            if (System.Diagnostics.Process.GetProcessesByName("retroarch").Length > 0)
+            if (RetroBat.Api.Infrastructure.RetroArchProcessus.Tous().Length > 0)
                 return new Rapport(false, 0, 0, 0, "emulateur_en_cours", Array.Empty<string>());
 
             var candidats = (await CandidatsAsync(ct, filtre).ConfigureAwait(false)).Take(Math.Max(1, limit)).ToList();

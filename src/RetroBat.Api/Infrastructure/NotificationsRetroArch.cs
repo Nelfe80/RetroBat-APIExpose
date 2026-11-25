@@ -372,7 +372,7 @@ public static partial class NotificationsRetroArch
     {
         try
         {
-            var p = Process.GetProcessesByName("retroarch");
+            var p = RetroBat.Api.Infrastructure.RetroArchProcessus.Tous();
             var oui = p.Length > 0;
             foreach (var x in p) x.Dispose();
             return oui;

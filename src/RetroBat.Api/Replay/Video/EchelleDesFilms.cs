@@ -131,7 +131,7 @@ public sealed class EchelleDesFilms : IHostedService, IDisposable
             if (_origine)
             {
                 var config = RetroBatPaths.RetroArchConfigPath;
-                if (!File.Exists(config) || Process.GetProcessesByName("retroarch").Length > 0) return;
+                if (!File.Exists(config) || RetroBat.Api.Infrastructure.RetroArchProcessus.Tous().Length > 0) return;
                 ReplayCaptureService.EcrireLesReglagesDuFilm();
                 if (ReplayCaptureService.ReglagesDesFilms(File.ReadAllText(config), true, ReplayCaptureService.CheminDesReglagesDuFilm)
                     is { } reglages)
@@ -148,7 +148,7 @@ public sealed class EchelleDesFilms : IHostedService, IDisposable
             var facteur = connue is { } c ? Facteur(c.L, c.H) : machine is { } mm ? Facteur(mm.L, mm.H) : FacteurParDefaut;
 
             var cfg = RetroBatPaths.RetroArchConfigPath;
-            if (!File.Exists(cfg) || Process.GetProcessesByName("retroarch").Length > 0) return;
+            if (!File.Exists(cfg) || RetroBat.Api.Infrastructure.RetroArchProcessus.Tous().Length > 0) return;
             var contenu = File.ReadAllText(cfg);
             var nouveau = ReplayCaptureService.AvecReglage(contenu, Cle, facteur.ToString(CultureInfo.InvariantCulture));
             if (nouveau is null) return;

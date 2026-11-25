@@ -1326,7 +1326,7 @@ public sealed class ReplayReactionHudService : BackgroundService
         {
             try
             {
-                foreach (var p in Process.GetProcessesByName("retroarch"))
+                foreach (var p in RetroBat.Api.Infrastructure.RetroArchProcessus.Tous())
                     using (p) { if (!p.HasExited && p.MainWindowHandle != IntPtr.Zero && GetWindowRect(p.MainWindowHandle, out var rr))
                         return Screen.FromRectangle(Rectangle.FromLTRB(rr.Left, rr.Top, rr.Right, rr.Bottom)).Bounds; }
             }

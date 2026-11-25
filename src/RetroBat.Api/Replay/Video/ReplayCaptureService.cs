@@ -1758,7 +1758,7 @@ public sealed class ReplayCaptureService : BackgroundService
         try
         {
             var chemin = RetroBatPaths.RetroArchConfigPath;
-            if (!File.Exists(chemin) || Process.GetProcessesByName("retroarch").Length > 0) return;
+            if (!File.Exists(chemin) || RetroBat.Api.Infrastructure.RetroArchProcessus.Tous().Length > 0) return;
             if (_origine) EcrireLesReglagesDuFilm();
             var contenu = File.ReadAllText(chemin);
             var nouveau = ReglagesDesFilms(contenu, _origine, CheminDesReglagesDuFilm);

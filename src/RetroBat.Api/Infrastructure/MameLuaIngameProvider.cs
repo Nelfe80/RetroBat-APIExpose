@@ -98,7 +98,7 @@ public sealed class MameLuaIngameProvider : IProvider
     {
         try
         {
-            if (System.Diagnostics.Process.GetProcessesByName("retroarch").Length == 0) return null;
+            if (RetroBat.Api.Infrastructure.RetroArchProcessus.Tous().Length == 0) return null;
             if (System.Diagnostics.Process.GetProcessesByName("mame").Length > 0
                 || System.Diagnostics.Process.GetProcessesByName("mame64").Length > 0) return null;
         }

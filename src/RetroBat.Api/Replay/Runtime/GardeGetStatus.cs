@@ -86,7 +86,7 @@ public static class GardeGetStatus
 
     private static (int Pid, DateTime? Debut) RetroArchEnCours()
     {
-        var processus = Process.GetProcessesByName("retroarch");
+        var processus = RetroBat.Api.Infrastructure.RetroArchProcessus.Tous();
         try
         {
             if (processus.Length == 0) return (0, null);

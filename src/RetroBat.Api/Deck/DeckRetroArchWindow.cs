@@ -19,7 +19,7 @@ public static class DeckRetroArchWindow
         Process[] processus;
         try
         {
-            processus = Process.GetProcessesByName("retroarch");
+            processus = RetroBat.Api.Infrastructure.RetroArchProcessus.Tous();
         }
         catch
         {

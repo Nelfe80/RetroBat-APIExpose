@@ -229,14 +229,14 @@ internal static class RetroArchInvite
 
     private static bool RetroArchTourne()
     {
-        var processus = Process.GetProcessesByName("retroarch");
+        var processus = RetroBat.Api.Infrastructure.RetroArchProcessus.Tous();
         foreach (var p in processus) p.Dispose();
         return processus.Length > 0;
     }
 
     private static IntPtr FenetreDeRetroArch()
     {
-        var processus = Process.GetProcessesByName("retroarch");
+        var processus = RetroBat.Api.Infrastructure.RetroArchProcessus.Tous();
         try
         {
             foreach (var p in processus)

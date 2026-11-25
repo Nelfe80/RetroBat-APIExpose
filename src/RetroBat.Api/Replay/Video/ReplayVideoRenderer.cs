@@ -87,7 +87,7 @@ public sealed class ReplayVideoRenderer
     {
         // Jamais pendant une partie ni une lecture : on lance notre propre RetroArch.
         if (_etatDeLaLecture() != "idle") return Echec("lecture_en_cours");
-        if (Process.GetProcessesByName("retroarch").Length > 0) return Echec("emulateur_en_cours");
+        if (RetroBat.Api.Infrastructure.RetroArchProcessus.Tous().Length > 0) return Echec("emulateur_en_cours");
 
         var manifest = _manifests.GetManifest(replayId);
         if (manifest is null) return Echec("replay_inconnu");
