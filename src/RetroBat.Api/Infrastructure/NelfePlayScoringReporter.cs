@@ -4264,6 +4264,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var compteurs = RetroBat.Api.Scoring.PremiereVie.Compteurs(LireMem(definitionChargee));
         var pertes = RetroBat.Api.Scoring.PremiereVie.SurLesCompteurs(
             PertesDuJoueur(vies, place).Select(v => (v.Address, v.Frame, 1)).ToList(), compteurs);
+        var departsVusMulti = credits.Select(c => c.Frame).Concat(departs.Select(d => d.Frame)).ToList();
+        if (RetroBat.Api.Scoring.PremiereVie.PerteSansPlace(bestRun, pertes, trajectory, departsVusMulti) is { } sansPlaceMulti)
+        {
+            Trace($"1LC MULTI : une vie perdue a la frame {sansPlaceMulti} tombe avant le run retenu sans partie neuve entre les deux, pas de 1LC soumis");
+            return;
+        }
         var (run1lc, mort) = RetroBat.Api.Scoring.PremiereVie.Couper(bestRun, pertes);
         if (!RetroBat.Api.Scoring.PremiereVie.AMarque(run1lc))
         {
@@ -4775,6 +4781,16 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             var pertes = RetroBat.Api.Scoring.PremiereVie.SurLesCompteurs(
                 vies.Where(v => v.Perte).Select(v => (v.Address, v.Frame, v.Player)).ToList(), compteurs);
             Trace($"1LC : compteurs de vies du .MEM [{string.Join(", ", compteurs)}], {pertes.Count} perte(s) retenue(s) sur {vies.Count(v => v.Perte)}");
+            // UNE PERTE D'AVANT LE RUN QU'ON NE SAIT PAS PLACER (25/11, 19XX : 1LC = 1CC apres trois vies perdues) : le run
+            // retenu peut commencer au milieu de la partie (chute de score en fin de stage), ses pertes d'avant ne sont
+            // alors pas celles d'une autre partie. Sans credit, START ni fin de partie entre elle et le run : pas de 1LC.
+            var departsVus = credits.Select(c => c.Frame).Concat(departs.Select(d => d.Frame)).Concat(fins.Select(f => f.Frame)).ToList();
+            if (RetroBat.Api.Scoring.PremiereVie.PerteSansPlace(bestRun, pertes, trajectory, departsVus) is { } sansPlace)
+            {
+                Trace($"1LC : une vie perdue a la frame {sansPlace} tombe avant le run retenu (depart {bestRun[0].frame}) sans partie neuve entre les deux : "
+                    + "la premiere vie ne peut pas etre placee, pas de 1LC soumis");
+                return;
+            }
             var (run1lc, mort) = RetroBat.Api.Scoring.PremiereVie.Couper(bestRun, pertes);
             if (!RetroBat.Api.Scoring.PremiereVie.AMarque(run1lc))
             {

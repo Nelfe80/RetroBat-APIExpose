@@ -165,4 +165,61 @@ public class PremiereVieTests
         // Le score au depart (START vu) puis les premiers points : comme avant.
         Assert.True(PremiereVie.AMarque([(50L, 0L), (100L, 200L)]));
     }
+
+    // ---- 19XX de la borne, 25/11 : 1CC ET 1LC publies a 104 600 apres trois vies perdues (replay rp_06H16PG8G14H4X85CAZN8QAN6G).
+    // Images et scores relus dans la boite noire du replay : vies 2 a l'image 736, 1 a 2541, 0 a 5087, GAME OVER a 9261 ;
+    // le score monte jusqu'a 49 900 (image ~6 700), retombe a 183 pendant l'ecran de fin de stage (lecture 183 a l'image
+    // 7 700, 84 900 entre deux), puis monte a 104 600 (image 9 115).
+    private static readonly List<(long frame, long total)> Trajectoire19xx =
+    [
+        (1707, 100), (1900, 1700), (2300, 1900), (3000, 5800), (4400, 10700), (5000, 14600), (5800, 24300), (6400, 38400),
+        (6700, 49900),
+        (7700, 183), (7701, 84900), (7702, 183), (8069, 85000), (8091, 86000), (8101, 86100), (8172, 87100), (8191, 87700),
+        (8239, 89500), (8289, 90300), (8345, 93300), (8445, 94900), (8667, 96200), (8861, 96800), (8916, 101600), (9044, 104000),
+        (9114, 104300), (9115, 104600),
+    ];
+
+    [Fact]
+    public void Le_19XX_du_25_11_le_run_retenu_commence_apres_les_deux_premieres_vies_perdues()
+    {
+        var run = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(Trajectoire19xx);
+        Assert.Equal(104600, run[^1].total);
+        Assert.True(run[0].frame > 5087, $"le run commence a l'image {run[0].frame}");
+
+        // Ce que faisait Couper : les deux pertes sont d'avant le run, donc ecartees, donc « aucune vie perdue » (le bug).
+        var (entier, mort) = PremiereVie.Couper(run, [(2541L, 1), (5087L, 1)]);
+        Assert.Null(mort);
+        Assert.Equal(104600, entier[^1].total);
+    }
+
+    [Fact]
+    public void Une_perte_d_avant_le_run_sans_partie_neuve_entre_les_deux_interdit_le_1LC()
+    {
+        var run = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(Trajectoire19xx);
+        // Un seul credit, consomme au depart (image 726) : rien ne montre une partie neuve apres la premiere perte.
+        var sansPlace = PremiereVie.PerteSansPlace(run, [(2541L, 1), (5087L, 1)], Trajectoire19xx, [726L]);
+        Assert.Equal(2541, sansPlace);
+    }
+
+    [Fact]
+    public void Un_credit_une_fin_de_partie_ou_un_START_entre_la_perte_et_le_run_la_rend_a_l_autre_partie()
+    {
+        var run = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(Trajectoire19xx);
+        Assert.Null(PremiereVie.PerteSansPlace(run, [(2541L, 1)], Trajectoire19xx, [726L, 6000L]));   // credit consomme ensuite
+        Assert.Null(PremiereVie.PerteSansPlace(run, [(2541L, 1)], Trajectoire19xx, [run[0].frame]));  // a l'image du depart du run
+        // Un depart d'AVANT la perte ne dit rien sur elle.
+        Assert.Equal(2541, PremiereVie.PerteSansPlace(run, [(2541L, 1)], Trajectoire19xx, [2000L]));
+    }
+
+    [Fact]
+    public void Une_perte_du_joueur_2_ou_posterieure_au_depart_du_run_ou_sans_point_marque_avant_elle_ne_gene_pas()
+    {
+        var run = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(Trajectoire19xx);
+        Assert.Null(PremiereVie.PerteSansPlace(run, [(2541L, 2)], Trajectoire19xx, []));            // joueur 2
+        Assert.Null(PremiereVie.PerteSansPlace(run, [(8500L, 1)], Trajectoire19xx, []));            // dans le run : Couper la place
+        // Initialisation des vies d'un depart : aucune lecture positive avant elle.
+        Assert.Null(PremiereVie.PerteSansPlace(run, [(1000L, 1)], Trajectoire19xx, []));
+        // Partie ordinaire : le run commence au debut de la partie, la premiere perte est dedans.
+        Assert.Null(PremiereVie.PerteSansPlace(Run, [(1318L, 1)], Run, [760L]));
+    }
 }
