@@ -56,6 +56,12 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private readonly CoreMemoryCapability? _coeurs;
     /// <summary>Le prevol a-t-il promis une partie certifiable ? Confronte a la fin de partie.</summary>
     private bool _prevolCertifiable;
+    /// <summary>
+    /// Le prevol a-t-il DIT « non certifiable » (option de triche du coeur, reglages, danger...) ? Different de
+    /// <c>!_prevolCertifiable</c>, faux aussi tant qu'aucun prevol n'a parle : seul un refus dit tait les bandeaux
+    /// de credit qui annoncent un score « certifie » (decision du user, 25/11).
+    /// </summary>
+    private bool _prevolRefuse;
     /// <summary>Quand la promesse a ete faite : une partie de quinze secondes n'en est pas une.</summary>
     private DateTime? _prevolAt;
     /// <summary>Une session est-elle arrivee pour cette partie ?</summary>
@@ -903,6 +909,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     ResetSession();
                     PrendreRoleInvite();
                     _prevolCertifiable = false;
+                    _prevolRefuse = false;
                     _sessionRecue = false;
                     break;
                 case "ui.game.ended":
@@ -933,6 +940,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                     }
 
                     _prevolCertifiable = false;
+                    _prevolRefuse = false;
                     _prevolAt = null;
                     _sessionRecue = false;
                     break;
@@ -1630,6 +1638,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             // On retient la PROMESSE, et QUAND elle a ete faite : c'est elle qu'on confrontera a
             // la fin de la partie, et sa date dit si le joueur a eu le temps de jouer.
             _prevolCertifiable = certifiable && dangers.Count == 0;
+            _prevolRefuse = !_prevolCertifiable;
             _prevolAt = DateTime.UtcNow;
             Trace("prévol : " + (detail is { Length: > 0 } ? titre + " : " + detail : titre));
             // LE PREVOL S'AFFICHE PENDANT QUE LE JEU TOURNE : il ne passe donc PAS par la
@@ -1691,6 +1700,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private void AnnoncerHorsLigne(string systemId, string romGroup)
     {
         _prevolCertifiable = true;
+        _prevolRefuse = false;
         _prevolAt = DateTime.UtcNow;
         Trace($"prévol : NelfePlay injoignable, {systemId}/{romGroup} se joue normalement, score gardé sur la borne");
         _overlay?.ShowTop("SCORING", Texte("scoring_offline"), Texte("scoring_offline_sub"), 6000, alerte: false, auDeck: RetroBat.Api.Deck.DeckNotices.Scoring("scoring_offline"));
@@ -2583,7 +2593,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// </summary>
     private void AppliquerBandeau(BandeauDeCredit bandeau, long scoreAvant, bool multi)
     {
-        switch (bandeau)
+        // Un prevol « non certifiable » (triche du coeur...) : aucun bandeau ne parle d'un score certifie.
+        var parle = BandeauAutorise(bandeau, _prevolRefuse);
+        if (!parle) Trace($"bandeau {bandeau} tu : le prevol a dit partie non certifiable");
+        if (parle) switch (bandeau)
         {
             case BandeauDeCredit.ScoreCertifie:
                 AnnoncerContinue(scoreAvant, parCredit: true);
@@ -2612,6 +2625,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         // devient le sien quand rien n'a ete fait seul (depart a deux).
         if (multi) PublierPartieMulti(relancer: bandeau == BandeauDeCredit.JoueurRejoint);
     }
+
+    /// <summary>
+    /// Un bandeau qui annonce un score certifie (continue, nouvelle partie, joueur qui rejoint) se tait quand le prevol a dit
+    /// « non certifiable » ; les bandeaux d'information (non certifiable, partie a plusieurs) parlent toujours.
+    /// </summary>
+    internal static bool BandeauAutorise(BandeauDeCredit bandeau, bool prevolRefuse)
+        => !prevolRefuse || bandeau is not (BandeauDeCredit.ScoreCertifie or BandeauDeCredit.NouvellePartie or BandeauDeCredit.JoueurRejoint);
 
     internal enum BandeauDeCredit
     {
@@ -3575,6 +3595,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private void AnnoncerContinue(long avant, bool parCredit = false)
     {
         if (!PartieNelfePlay()) return;
+        if (_prevolRefuse) { Trace("bandeau de continue tu : le prevol a dit partie non certifiable"); return; }
         if (!PremierBandeauDeCoupe()) return;
         var langue = Langue();
         var cle = parCredit ? "scoring_credit" : "scoring_continue";
