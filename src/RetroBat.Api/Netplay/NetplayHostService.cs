@@ -459,30 +459,51 @@ public sealed class NetplayHostService
                 e.Emulator.Equals("libretro", StringComparison.OrdinalIgnoreCase) && e.Core.Equals("fbneo", StringComparison.OrdinalIgnoreCase)));
         if (!ReferenceEquals(corrigee, resolution))
         {
-            _logger.LogInformation("Lancement : {Rom} sous {Coeur} d'apres ES, impose sous FBNeo ({Systeme}, libretro, fbneo) : jamais de MAME pour une partie classee quand FBNeo connait le set.",
-                Path.GetFileName(cheminRom), resolution.Coeur, corrigee.Systeme);
+            _logger.LogInformation("Lancement : {Rom} sous {SystemeLu}, {Emulateur}, {Coeur} d'apres le journal du lanceur, impose sous FBNeo ({Systeme}, libretro, fbneo) : jamais de MAME pour une partie classee quand FBNeo connait le set.",
+                Path.GetFileName(cheminRom), resolution.Systeme, resolution.Emulateur, resolution.Coeur.Length > 0 ? resolution.Coeur : "-", corrigee.Systeme);
         }
 
         return corrigee;
     }
 
+    /// <summary>Les emulateurs MAME autonomes de RetroBat (meme liste que CoeursObservables, plus « mame »).</summary>
+    private static readonly HashSet<string> MameAutonome = new(StringComparer.OrdinalIgnoreCase) { "mame", "mame64", "groovymame" };
+
     /// <summary>
-    /// (25/11) FBNEO D'ABORD, MEME QUAND LE SYSTEME LE DECLARE. Blazing Star de roms\neogeo partait par Defier sous MAME : le
-    /// systeme neogeo de RetroBat a MAME par defaut et declare aussi FBNeo, et FbneoPourUnSetMame (collection) n'impose rien
-    /// dans ce cas ; la partie etait non certifiable (« classee sous FBNeo seulement »). Un lancement par l'API (Defier, hote et
-    /// invite du netplay) d'un set que FBNeo connait, resolu sous un coeur MAME, part donc sous libretro/fbneo ; le systeme
-    /// devient celui du dossier de la ROM s'il declare FBNeo (neogeo), sinon il reste. Un joueur deja sous FBNeo, ou sous un
-    /// autre coeur que MAME, n'est pas touche. Pur.
+    /// (25/11) FBNEO D'ABORD, MEME QUAND LE SYSTEME LE DECLARE. Blazing Star de roms\neogeo partait par Defier sous MAME, partie
+    /// non certifiable (« classee sous FBNeo seulement »). CAUSE (journal du lanceur de la borne) : <see cref="EsLaunchArguments.PourRom"/>
+    /// reconnait une ROM a son seul NOM DE FICHIER, lancements directs de l'API compris (ils portent -gameinfo depuis la
+    /// 1.9.210) : le lancement par ES de roms\mame\blazstar.zip (24/11, -system mame -core mame) a ete repris pour
+    /// roms\neogeo\blazstar.zip (le systeme neogeo, lui, a FBNeo pour premier coeur). Et FbneoPourUnSetMame (collection) ne
+    /// regarde pas ce chemin-la. Un lancement par l'API (Defier, hote et invite du netplay) d'un set que FBNeo connait part
+    /// donc sous libretro/fbneo quand il etait resolu sous MAME (coeur libretro « mame* » ou MAME autonome) ; le systeme
+    /// devient celui du dossier de la ROM s'il declare FBNeo (neogeo : ses reglages de BIOS), sinon il reste. Un lancement
+    /// deja sous FBNeo mais repris d'un autre dossier (systeme mame pour une ROM de roms\neogeo) retrouve aussi le systeme de
+    /// son dossier (relecture de l'integrateur, 1.9.219). Un set que FBNeo ne connait pas, un coeur de console : rien. Pur.
     /// </summary>
     internal static EsLaunchArguments.Resolution FbneoPourUnJeuQueFbneoConnait(
         EsLaunchArguments.Resolution resolution, bool fbneoConnaitLeSet, string systemeDuDossier, bool dossierDeclareFbneo)
     {
-        if (!fbneoConnaitLeSet || !resolution.Coeur.StartsWith("mame", StringComparison.OrdinalIgnoreCase))
+        if (!fbneoConnaitLeSet)
+        {
+            return resolution;
+        }
+
+        var libretro = resolution.Emulateur.Equals("libretro", StringComparison.OrdinalIgnoreCase);
+        var sousMame = (libretro && resolution.Coeur.StartsWith("mame", StringComparison.OrdinalIgnoreCase))
+            || MameAutonome.Contains(resolution.Emulateur);
+        var sousFbneo = libretro && resolution.Coeur.Equals("fbneo", StringComparison.OrdinalIgnoreCase);
+        if (!sousMame && !sousFbneo)
         {
             return resolution;
         }
 
         var systeme = dossierDeclareFbneo && systemeDuDossier.Length > 0 ? systemeDuDossier : resolution.Systeme;
+        if (sousFbneo && string.Equals(systeme, resolution.Systeme, StringComparison.OrdinalIgnoreCase))
+        {
+            return resolution;
+        }
+
         return new EsLaunchArguments.Resolution(systeme, "libretro", "fbneo");
     }
 
