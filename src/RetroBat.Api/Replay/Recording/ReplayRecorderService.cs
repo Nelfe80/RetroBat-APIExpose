@@ -484,6 +484,7 @@ public sealed class ReplayRecorderService : BackgroundService
     private string JeuxSansEnregistrement => _config["Replay:Record:JeuxSansEnregistrement"] ?? "tgm2,tgm2p";
     private string _jeuAnnonce = "";
     private string _jeuLeveAnnonce = "";
+    private string _inviteAnnonce = "";
 
     /// <summary>
     /// RETROARCH NELFEPLAY (1.9.216) : la marque NEUVE de install-retroarch-nelfeplay.bat (emulators\retroarch\.nelfeplay\build.txt ;
@@ -520,6 +521,14 @@ public sealed class ReplayRecorderService : BackgroundService
             return false;
         }
     }
+
+    /// <summary>
+    /// REPLAY EN NETPLAY (lot 3, nelfeplay.2) : l'exe en place est-il un exe NelfePlay (marque, empreinte, exe nomme par la marque)
+    /// dont le replay porte les entrees de TOUS les joueurs ? Meme verification que <see cref="RetroArchNelfePlayInstalle"/>, sur la
+    /// liste plus courte <c>RetroArchNelfePlay.ExesQuiEnregistrentLeNetplay</c> (ou <paramref name="exes"/> aux essais).
+    /// </summary>
+    internal static bool RetroArchNelfePlayNetplay(string? dossierRetroArch = null, IEnumerable<string>? exes = null)
+        => RetroArchNelfePlayInstalle(dossierRetroArch, exes ?? RetroBat.Api.Infrastructure.RetroArchNelfePlay.ExesQuiEnregistrentLeNetplay);
 
     // L'empreinte de retroarch.exe, relue seulement quand l'exe change (taille ou date).
     private static readonly object EmpreinteVerrou = new();
@@ -917,29 +926,48 @@ public sealed class ReplayRecorderService : BackgroundService
                 _logger.LogInformation("Replay : un joueur a rejoint la partie, le replay du 1CC MULTI commence.");
             }
 
-            if (status is { ContentLoaded: true } && _partie is { EstNelfePlay: false } && !_playback.IsBusy)
+            // REPLAY EN NETPLAY (lot 3) : la borne qui a rejoint en JOUEUR enregistre sa partie quand l'exe NelfePlay qui sait
+            // porter les entrees de tous les joueurs est en place (ReplayNetplay.Decider, pur) ; sinon, comme avant, rien.
+            var netplay = ReplayNetplay.Decider(RetroBat.Api.Netplay.NetplayGuestService.RoleDeLaPartie,
+                RetroArchNelfePlayNetplay());
+            if (netplay == ReplayNetplay.Porte.InviteEnregistre)
             {
-                var cle = "hors:" + status.System + "/" + status.Game;
-                if (!string.Equals(_attenteAnnoncee, cle, StringComparison.Ordinal))
+                if (status is { ContentLoaded: true } && !string.Equals(_inviteAnnonce, status.Game, StringComparison.OrdinalIgnoreCase))
                 {
-                    _attenteAnnoncee = cle;
-                    _logger.LogInformation("Replay : {Game} n'est pas une partie NelfePlay, pas d'enregistrement.", status.Game);
+                    _inviteAnnonce = status.Game;
+                    _logger.LogInformation(
+                        "Replay : {Game} rejoint en joueur (netplay) : le replay est enregistre ici (RetroArch NelfePlay nelfeplay.2 : les entrees de tous les joueurs).",
+                        status.Game);
                 }
-
-                return;
             }
-
-            // La partie d'un autre, regardee ou rejointe en netplay (2026-10-16) : ni replay ni film ici.
-            if (status is { ContentLoaded: true } && !RetroBat.Api.Netplay.NetplayGuestService.PartieALaBorne)
+            else
             {
-                var cle = "netplay:" + status.System + "/" + status.Game;
-                if (!string.Equals(_attenteAnnoncee, cle, StringComparison.Ordinal))
+                if (status is { ContentLoaded: true } && _partie is { EstNelfePlay: false } && !_playback.IsBusy)
                 {
-                    _attenteAnnoncee = cle;
-                    _logger.LogInformation("Replay : {Game} est la partie de l'hote (netplay), pas d'enregistrement.", status.Game);
+                    var cle = "hors:" + status.System + "/" + status.Game;
+                    if (!string.Equals(_attenteAnnoncee, cle, StringComparison.Ordinal))
+                    {
+                        _attenteAnnoncee = cle;
+                        _logger.LogInformation("Replay : {Game} n'est pas une partie NelfePlay, pas d'enregistrement.", status.Game);
+                    }
+
+                    return;
                 }
 
-                return;
+                // La partie d'un autre, regardee ou rejointe en netplay (2026-10-16) : ni replay ni film ici.
+                if (status is { ContentLoaded: true } && !RetroBat.Api.Netplay.NetplayGuestService.PartieALaBorne)
+                {
+                    var cle = "netplay:" + status.System + "/" + status.Game;
+                    if (!string.Equals(_attenteAnnoncee, cle, StringComparison.Ordinal))
+                    {
+                        _attenteAnnoncee = cle;
+                        _logger.LogInformation(netplay == ReplayNetplay.Porte.InviteSansExe
+                            ? "Replay : {Game} est la partie de l'hote (netplay), pas d'enregistrement : sans RetroArch NelfePlay nelfeplay.2, le replay de l'invite n'aurait que le port 0."
+                            : "Replay : {Game} est la partie de l'hote (netplay), pas d'enregistrement.", status.Game);
+                    }
+
+                    return;
+                }
             }
 
             if (status is { ContentLoaded: true } && active is { Active: false } && !_playback.IsBusy

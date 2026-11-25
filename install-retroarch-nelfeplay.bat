@@ -27,7 +27,7 @@ set "BUILD=1.22.2-nelfeplay.1"
 set "SOURCES=https://github.com/Nelfe80/RetroArch/tree/v1.22.2-nelfeplay.1"
 set "EXE_SRC=%PLUGIN_DIR%tools\retroarch-nelfeplay\retroarch-1.22.2-nelfeplay.1.exe"
 set "ESSAI="
-rem Essais : NELFEPLAY_ESSAI_DOSSIER (autre dossier de RetroArch ; + _STABLE, _NOTRE, _EXE) ; NELFEPLAY_ESSAI_SANS_GARDE saute la garde
+rem Essais : NELFEPLAY_ESSAI_DOSSIER (autre dossier de RetroArch ; + _STABLE, _NOTRE, _EXE, _BUILD, _SOURCES) ; NELFEPLAY_ESSAI_SANS_GARDE saute la garde
 rem des processus (dossiers de fabrication seulement : sur la borne, la garde reste).
 if defined NELFEPLAY_ESSAI_DOSSIER (
   set "ESSAI=1"
@@ -35,6 +35,8 @@ if defined NELFEPLAY_ESSAI_DOSSIER (
   if defined NELFEPLAY_ESSAI_STABLE set "STABLE=%NELFEPLAY_ESSAI_STABLE%"
   if defined NELFEPLAY_ESSAI_NOTRE set "NOTRE=%NELFEPLAY_ESSAI_NOTRE%"
   if defined NELFEPLAY_ESSAI_EXE set "EXE_SRC=%NELFEPLAY_ESSAI_EXE%"
+  if defined NELFEPLAY_ESSAI_BUILD set "BUILD=%NELFEPLAY_ESSAI_BUILD%"
+  if defined NELFEPLAY_ESSAI_SOURCES set "SOURCES=%NELFEPLAY_ESSAI_SOURCES%"
 )
 set "ETAT=%RA%\.nelfeplay"
 set "SAUV=%ETAT%\sauvegarde"

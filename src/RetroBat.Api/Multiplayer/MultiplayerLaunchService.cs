@@ -1276,6 +1276,13 @@ public sealed class MultiplayerLaunchService : IHostedService
             }
         }
 
+        // REPLAY EN NETPLAY (lot 3) : le controle des images arreterait l'enregistrement a la premiere resynchronisation.
+        foreach (var (cle, valeur) in MultiplayerLaunchPlan.ReglagesDuReplayEnNetplay(
+                     RetroBat.Api.Replay.Recording.ReplayRecorderService.RetroArchNelfePlayNetplay()))
+        {
+            reglagesDeLaPlace[cle] = valeur;
+        }
+
         if (vue is not null)
         {
             reglagesDeLaPlace["video_aspect_ratio"] = MultiplayerLaunchPlan.FormatPourRetroArch(jeu.Game, vue);
