@@ -149,4 +149,12 @@ public sealed class ReglagesDifferentsTests
         Assert.Null(j["core_sha256"]);
         Assert.Equal(ReglagesDifferents.Version, j["v"]!.GetValue<int>());
     }
+
+    [Fact]
+    public void La_route_d_avant_la_soumission_a_un_delai_court_et_borne()
+    {
+        // 1.9.218 : la liste part AVANT la soumission ; un site muet ne doit pas retarder la fin de partie de tout le delai
+        // du client (10 s), seulement de quelques secondes.
+        Assert.InRange(NelfePlayScoringReporter.DelaiDesReglagesDifferents, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5));
+    }
 }

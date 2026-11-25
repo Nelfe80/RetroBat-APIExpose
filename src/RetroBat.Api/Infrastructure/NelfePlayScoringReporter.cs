@@ -1406,6 +1406,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
                 // la compare a celle-ci (sinon a celle du dernier releve de la borne).
                 ["software"] = new JsonObject { ["apiexpose"] = CabinetState.Version },
             };
+            Trace($"prevol : reglages differents : {mesures["core_options_diff"]?["count"]} difference(s) envoyee(s) avec le prevol");
 
             // LE PREVOL HORS LIGNE (piste B, 2026-10-04). Chaque verdict du site est garde pour CETTE
             // configuration (coeur, .MEM, reglages, ROM, version) ; site muet, la borne reprend le
@@ -5022,7 +5023,9 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         var idDeSession = sessionId ?? Guid.NewGuid().ToString();
         // Les reglages qui different du profil, gardes pour l'envoi qui suit (SubmitAsync) : le passeport est signe en entier,
         // le champ ne peut pas y entrer. Meme chaine filtree que l'empreinte signee.
-        _reglagesDifferents[idDeSession] = RetroBat.Api.Scoring.ReglagesDifferents.EnJson(coreOptions, coreOptionsDigest, coreSha, profile);
+        var reglagesDifferents = RetroBat.Api.Scoring.ReglagesDifferents.EnJson(coreOptions, coreOptionsDigest, coreSha, profile);
+        _reglagesDifferents[idDeSession] = reglagesDifferents;
+        Trace($"reglages differents : {reglagesDifferents["count"]} difference(s), entree attendue {reglagesDifferents["expected_entry"]?.ToJsonString() ?? "aucune"}, tronque {reglagesDifferents["truncated"]} (session {idDeSession})");
         if (RetroBat.Api.Scoring.ReglagesDuMenu.NomsRefuses(profile, jeu["difficulty"] as JsonObject) is { Count: > 0 } refuses)
         {
             _reglagesRefuses[idDeSession + "|" + ruleset] = refuses;
@@ -5248,16 +5251,17 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     }
 
     /// <summary>
-    /// Envoie un passeport et dit ce que vaut la reponse (piste B, 2026-10-04). Seul un verdict
-    /// definitif est range, annonce et rattache a son replay ; sans reponse, en 5xx, 429 ou sur
-    /// une page HTML, la partie reste en file. Avant, une reponse 503 etait rangee comme verdict
-    /// et une coupure perdait la partie. <paramref name="annoncer"/> : la partie vient de finir ;
-    /// faux pour un envoi differe, qui s'annonce en groupe (voir EnvoyerLesBrouillonsAsync).
+    /// Delai propre de la route des reglages qui different (1.9.218) : elle passe AVANT la soumission (le site lit la liste par
+    /// session au moment de la soumission), donc un site muet ne doit pas retarder la fin de partie de tout le delai du client
+    /// (10 s) avant que la soumission ne tente sa propre voie et ses relais.
     /// </summary>
+    internal static readonly TimeSpan DelaiDesReglagesDifferents = TimeSpan.FromSeconds(3);
+
     /// <summary>
     /// LES REGLAGES QUI DIFFERENT DU PROFIL, JUSTE AVANT LA SOUMISSION (25/11). Best-effort : un site qui ne connait pas la
     /// route (404) ou qui ne repond pas ne change rien, la partie part comme avant et l'empreinte seule reste son verdict.
-    /// Ni relais ni nouvel essai : la liste est aussi portee par le prevol.
+    /// Ni relais ni nouvel essai : la liste est aussi portee par le prevol. ORDRE : attendue (await) avant la soumission, donc
+    /// rangee par le site avant qu'il ne lise la liste de la session ; au plus <see cref="DelaiDesReglagesDifferents"/>.
     /// </summary>
     private async Task EnvoyerLesReglagesDifferentsAsync(string credential, string sessionId, string deviceId, CancellationToken ct)
     {
@@ -5265,14 +5269,18 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         try
         {
             var corps = new JsonObject { ["session_id"] = sessionId, ["device_id"] = deviceId, ["core_options_diff"] = diff.DeepClone() };
+            using var borne = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            borne.CancelAfter(DelaiDesReglagesDifferents);
             using var client = CreateClient(credential);
             using var content = new StringContent(corps.ToJsonString(), Encoding.UTF8, "application/json");
-            using var reponse = await client.PostAsync("/api/v1/agent/scores/core-options-diff", content, ct).ConfigureAwait(false);
-            Trace($"core-options-diff HTTP {(int)reponse.StatusCode} ({diff["count"]} difference(s))");
+            using var reponse = await client.PostAsync("/api/v1/agent/scores/core-options-diff", content, borne.Token).ConfigureAwait(false);
+            var texte = await reponse.Content.ReadAsStringAsync(borne.Token).ConfigureAwait(false);
+            Trace($"core-options-diff HTTP {(int)reponse.StatusCode} ({diff["count"]} difference(s)) - {(texte.Length > 200 ? texte[..200] : texte)}");
         }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException && !ct.IsCancellationRequested)
+        catch (Exception ex) when (!ct.IsCancellationRequested)
         {
-            Trace($"core-options-diff : site injoignable ({ex.GetType().Name})");
+            // Best-effort jusqu'au bout : rien de cet envoi ne doit empecher la soumission qui suit.
+            Trace($"core-options-diff : pas de reponse du site ({ex.GetType().Name}), la soumission part sans attendre");
         }
         finally
         {
@@ -5281,6 +5289,13 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         }
     }
 
+    /// <summary>
+    /// Envoie un passeport et dit ce que vaut la reponse (piste B, 2026-10-04). Seul un verdict
+    /// definitif est range, annonce et rattache a son replay ; sans reponse, en 5xx, 429 ou sur
+    /// une page HTML, la partie reste en file. Avant, une reponse 503 etait rangee comme verdict
+    /// et une coupure perdait la partie. <paramref name="annoncer"/> : la partie vient de finir ;
+    /// faux pour un envoi differe, qui s'annonce en groupe (voir EnvoyerLesBrouillonsAsync).
+    /// </summary>
     private async Task<(RetroBat.Api.Scoring.IssueDEnvoi Issue, string? Statut, int? Rang)> SubmitAsync(
         string credential, JsonObject passport, string? replayId, bool annoncer, CancellationToken cancellationToken,
         long? debutVideo = null, long? finVideo = null)
