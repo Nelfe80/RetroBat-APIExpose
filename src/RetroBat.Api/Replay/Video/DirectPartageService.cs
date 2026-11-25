@@ -728,6 +728,9 @@ public sealed class DirectPartageService : IHostedService
                 }
                 else if (role is "none" or "wait" && finie)
                 {
+                    // Dit pourquoi aucun direct (et donc aucun Deck dans le direct) n'a eu lieu (25/11) : une seule borne est a l'antenne a la fois.
+                    if (!finAnnoncee && exe is null)
+                        _journal.LogInformation("Direct partage : {Jeu} s'est presentee (reponse du site : {Role}) mais n'a jamais ete elue avant la fin de la partie : pas de direct pour cette partie, donc pas de Deck dans le direct.", romGroup, role);
                     return;
                 }
                 else if (r is null && finie && exe is null)

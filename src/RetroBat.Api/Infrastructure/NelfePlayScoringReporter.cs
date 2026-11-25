@@ -287,6 +287,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// pour le depart, et vingt minutes d'Alex Kidd sans replay.
     /// </summary>
     private volatile bool _panelLu;
+    /// <summary>Un appui du joueur a ete vu (panel, ou wrapper) depuis que le .MEM du jeu est charge : l'appui du depart (25/11).</summary>
+    private bool _appuiDepuisLeChargement;
+    /// <summary>Le wrapper a deja envoye une seconde d'appuis (listener 0.340 et apres) : il sait voir un appui.</summary>
+    private volatile bool _pressesVues;
 
     /// <summary>Le systeme du jeu charge (attestation du pont) : mastersystem, arcade...</summary>
     private string _systemeDuJeu = "";
@@ -1073,6 +1077,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _startVu = false;
             _enJeu = false;
             _gameStartVu = false;
+            _appuiDepuisLeChargement = false;
             _departDuLabo = false;
             _dernierTotalVu = null;
             _scoreAuDepart = null;
@@ -1926,8 +1931,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     public bool ScoreHorsPartie()
     {
-        lock (_sync) return _inDemo || (_startVu && !_enJeu);
+        lock (_sync)
+        {
+            return _inDemo || (_startVu && !_enJeu)
+                || !DepartVu(_startVu, _gameStartVu, _credits.Count > 0 || _departs.Count > 0, _enJeu || _departDuLabo, _appuiDepuisLeChargement,
+                    voitLesAppuis: _panelLu || _pressesVues || PanneauDeLaBorne.Appareils is { Count: > 0 });
+        }
     }
+
+    /// <summary>
+    /// LA PARTIE A-T-ELLE COMMENCE (25/11, Blazing Star sous FBNeo) ? Le test memoire du BIOS Neo Geo ecrit 0x5555 puis 0xAAAA dans le
+    /// mot du score : 55 555 555 « battait » le record du monde avant toute partie (rang du defi, capture, direct, plaque du Deck).
+    /// Le meme depart que le replay et la Partie NelfePlay : un START, un credit consomme, GAME_START, un etat de depart, ou un
+    /// appui du joueur une fois le jeu charge. Une borne dont l'API ne voit aucune manette ni aucun appui garde le
+    /// comportement d'avant : ne pas savoir ne doit pas faire perdre un record. Pur.
+    /// </summary>
+    internal static bool DepartVu(bool startVu, bool gameStartVu, bool creditOuDepart, bool etatDeDepart, bool appuiDepuisLeChargement, bool voitLesAppuis)
+        => startVu || gameStartVu || creditOuDepart || etatDeDepart || appuiDepuisLeChargement || !voitLesAppuis;
 
     /// <summary>Un appui du joueur, de quelque source que ce soit.</summary>
     private void NoterAppui()
@@ -1937,6 +1957,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             var maintenant = DateTime.UtcNow;
             _dernierAppuiUtc = maintenant;
+            if (_definitionChargee is not null) _appuiDepuisLeChargement = true;
             if (_demoEnSuspens is { } s && DemoRefutee(s.Depuis, maintenant))
             {
                 _demoEnSuspens = null;
@@ -2303,6 +2324,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private void CapturePorts(JsonElement root)
     {
         if (!root.TryGetProperty("Presses", out var p) || p.ValueKind != JsonValueKind.Array) return;
+        _pressesVues = true;
         var appuis = p.EnumerateArray().Select(v => v.TryGetInt32(out var n) ? n : 0).ToArray();
         if (appuis.Length > 0) _portLocal.SecondeDuWrapper(appuis);
         // Le wrapper voit les entrees que RetroArch donne au jeu : clavier compris, manette non lue

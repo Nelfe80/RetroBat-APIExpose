@@ -111,6 +111,37 @@ public static class DeckDecor
         return true;
     }
 
+    /// <summary>
+    /// Ce que le lanceur a ecrit pour RetroArch : le fichier de decor (overlay) et son image, l'overlay allume, le cadre du jeu.
+    /// Pour le journal : un decor pose par l'API mais ignore par le lanceur se voit ici. Lecture seule, ne leve jamais.
+    /// </summary>
+    public static string Constat(string retroarchCfg, string overlayCfg)
+    {
+        try
+        {
+            string? Cle(string nom) => File.Exists(retroarchCfg)
+                ? File.ReadLines(retroarchCfg).Select(l => l.Split('=', 2)).Where(p => p.Length == 2 && p[0].Trim() == nom)
+                    .Select(p => p[1].Trim().Trim('"')).FirstOrDefault()
+                : null;
+            string? image = null;
+            if (File.Exists(overlayCfg))
+            {
+                image = File.ReadLines(overlayCfg).Select(l => l.Split('=', 2)).Where(p => p.Length == 2 && p[0].Trim() == "overlay0_overlay")
+                    .Select(p => p[1].Trim().Trim('"')).FirstOrDefault();
+            }
+
+            var existe = image is not null && File.Exists(image);
+            var surLeDeck = image is not null && image.Contains(Nom, StringComparison.OrdinalIgnoreCase);
+            return $"overlay {Cle("input_overlay") ?? "?"} allume={Cle("input_overlay_enable") ?? "?"}, image {(image ?? "aucune")} "
+                + $"({(surLeDeck ? "du Deck" : "PAS du Deck")}, {(existe ? "presente" : "ABSENTE")}), ratio {Cle("aspect_ratio_index") ?? "?"}, "
+                + $"cadre {Cle("custom_viewport_x") ?? "?"},{Cle("custom_viewport_y") ?? "?"} {Cle("custom_viewport_width") ?? "?"}x{Cle("custom_viewport_height") ?? "?"}.";
+        }
+        catch (Exception ex)
+        {
+            return "illisible (" + ex.Message + ").";
+        }
+    }
+
     /// <summary>Retire le decor (fin de partie, demarrage de l'API) ; une erreur ne compte pas : le prochain lancement le recrira.</summary>
     public static void Effacer(string? racine = null)
     {
