@@ -76,6 +76,14 @@ public sealed record AdventureInfo
 
     [JsonPropertyName("latest")]
     public AdventureVersion? Latest { get; init; }
+
+    /// <summary>
+    /// LA LANGUE DE L'AVENTURE (1.9.223) : celle de son depart a sa creation (« fr »), gardee a chaque reprise (une partie neuve a un
+    /// autre nombre de joueurs repart dans la meme langue). Le site la rend s'il la garde (cle <c>language</c>) ; sinon la borne de
+    /// l'hote la garde dans la copie locale (<see cref="AdventureStockage.Langue"/>).
+    /// </summary>
+    [JsonPropertyName("language")]
+    public string? Language { get; init; }
 }
 
 public sealed record AdventurePlace

@@ -517,7 +517,8 @@ builder.Services.AddSingleton<RetroBat.Api.Adventure.IAdventureSite, RetroBat.Ap
 builder.Services.AddSingleton<RetroBat.Api.Adventure.AdventureSeanceService>(sp => new RetroBat.Api.Adventure.AdventureSeanceService(
     sp.GetRequiredService<RetroBat.Api.Adventure.IAdventureSite>(), sp.GetRequiredService<RetroBat.Api.Adventure.AdventureStockage>(),
     sp.GetRequiredService<RetroBat.Api.Adventure.AdventureFileDEnvoi>(), journal: sp.GetService<ILogger<RetroBat.Api.Adventure.AdventureSeanceService>>(),
-    catalogue: sp.GetRequiredService<RetroBat.Api.Adventure.AdventureCatalogueStore>()));
+    catalogue: sp.GetRequiredService<RetroBat.Api.Adventure.AdventureCatalogueStore>(),
+    langueDeLaBorne: () => sp.GetService<RetroBat.Api.Infrastructure.CabinetLocale>()?.Langue));
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Adventure.AdventureSeanceService>());
 // Les gamerooms du joueur : le client de la plateforme et le sondage qui les tient a jour.
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerClient>();
@@ -892,6 +893,12 @@ app.Services.GetRequiredService<RetroBat.Api.Infrastructure.CoreMemoryCapability
     app.Services.GetService<RetroBat.Api.Infrastructure.LiveContestOverlayService>(),
     app.Services.GetService<RetroBat.Api.Infrastructure.CabinetLocale>(),
     app.Services.GetService<RetroBat.Api.Infrastructure.PartieNelfePlayService>());
+
+// La langue d'ES et de l'API, declaree au site avec join et invitation (Adventure : un depart dans une langue que tous lisent).
+{
+    var cabinetLocale = app.Services.GetService<RetroBat.Api.Infrastructure.CabinetLocale>();
+    app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerClient>().LangueDeLaBorne = () => cabinetLocale?.Langue;
+}
 
 var cabinetApiKey = app.Configuration["Security:ApiKey"] ?? string.Empty;
 if (cabinetApiKey.Length == 0)

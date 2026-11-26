@@ -52,8 +52,35 @@ public sealed class MultiplayerClient
     public Task<MultiplayerReponse?> RejoindreAsync(string jeu, string contenu, int? rttMs, bool panneauOuvert, CancellationToken ct,
         IReadOnlyDictionary<string, int>? choix = null, string? sorte = null)
         => sorte is null
-            ? EnvoyerAsync("join", new { game = jeu, content = contenu, rtt_ms = rttMs, panel = panneauOuvert, choices = choix }, ct)
-            : EnvoyerAsync("join", new { game = jeu, content = contenu, rtt_ms = rttMs, panel = panneauOuvert, choices = choix, kind = sorte }, ct);
+            ? EnvoyerAsync("join", AvecLaLangue(new { game = jeu, content = contenu, rtt_ms = rttMs, panel = panneauOuvert, choices = choix }), ct)
+            : EnvoyerAsync("join", AvecLaLangue(new { game = jeu, content = contenu, rtt_ms = rttMs, panel = panneauOuvert, choices = choix, kind = sorte }), ct);
+
+    /// <summary>
+    /// LA LANGUE DE LA BORNE (celle d'ES et de l'API), declaree au site avec <c>join</c> et <c>invitation</c> pour qu'une aventure choisisse son
+    /// depart dans une langue que tous lisent. Null (tests, borne sans langue lue) : le corps part tel quel, sans la cle.
+    /// </summary>
+    public Func<string?>? LangueDeLaBorne { get; set; }
+
+    private object AvecLaLangue(object corps)
+    {
+        string? langue = null;
+        try
+        {
+            langue = LangueDeLaBorne?.Invoke();
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            // Une langue illisible n'empeche jamais de rejoindre.
+        }
+
+        if (string.IsNullOrWhiteSpace(langue) || JsonSerializer.SerializeToNode(corps) is not JsonObject objet)
+        {
+            return corps;
+        }
+
+        objet["language"] = langue.Trim();
+        return objet;
+    }
 
     /// <summary>FOR FRIENDS, touche X (28/10) : l'ouvreur regle le nombre de joueurs qu'il attend.</summary>
     public Task<MultiplayerReponse?> ReglerAsync(string room, int joueurs, CancellationToken ct)
@@ -157,7 +184,7 @@ public sealed class MultiplayerClient
         => EnvoyerAsync("invite", new { room, handle = poignee }, ct);
 
     public Task<MultiplayerReponse?> RepondreAsync(string invitation, bool accepte, int? rttMs, CancellationToken ct)
-        => EnvoyerAsync("invitation", new { invitation, accept = accepte, rtt_ms = rttMs }, ct);
+        => EnvoyerAsync("invitation", AvecLaLangue(new { invitation, accept = accepte, rtt_ms = rttMs }), ct);
 
     /// <summary>Les amis en ligne (INVITE FRIENDS).</summary>
     public async Task<IReadOnlyList<MultiplayerAmi>> AmisAsync(CancellationToken ct)
@@ -438,6 +465,17 @@ public sealed record MultiplayerJoueur
     /// <summary>Il regle la gameroom d'amis (28/10).</summary>
     [JsonPropertyName("owner")]
     public bool Owner { get; init; }
+
+    /// <summary>
+    /// LA LANGUE DU JOUEUR (Adventure 1.9.223) : celle de son ES et de son API, declaree par sa borne et rendue par le site (« fr », ou « fr_FR »).
+    /// Absente d'un site qui ne la donne pas : la langue du joueur est alors inconnue et ne bloque aucun choix.
+    /// </summary>
+    [JsonPropertyName("language")]
+    public string? Language { get; init; }
+
+    /// <summary>Les autres langues qu'il declare lire, quand le site les donne.</summary>
+    [JsonPropertyName("languages")]
+    public IReadOnlyList<string>? Languages { get; init; }
 }
 
 /// <summary>Le meilleur 1CC MULTI d'un joueur sur le jeu de la gameroom, et sa place au classement (tous mondes).</summary>
