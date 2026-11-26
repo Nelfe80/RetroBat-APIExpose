@@ -73,7 +73,7 @@ public class MultiplayerCoeursTests : IDisposable
         Assert.Equal(["libretro", "mgba", "nosgba"], emulateurs);
         Assert.Equal(["mgba", "gpsp", "mgba_splitscreen"], CoeursDe(systemes[0]));
         Assert.Equal(["mednafen_ngp", "race", "mednafen_ngp_link"], CoeursDe(systemes[1]));
-        Assert.Equal(["fbneo", "fbneo_multi32"], CoeursDe(systemes[2]));
+        Assert.Equal(["fbneo", "fbneo_multi32", "fbneo_ghosts"], CoeursDe(systemes[2]));
         // Rien des autres systemes, rien que RetroBat decrit ailleurs (nom complet, extensions).
         Assert.Null(systemes[0].Element("fullname"));
         // Une seconde passe ne l'ajoute pas deux fois.
@@ -164,7 +164,8 @@ public class MultiplayerCoeursTests : IDisposable
             "tools/cores/tgbdual_multi_libretro.dll", "tools/cores/tgbdual_multi_license.txt", "tools/cores/tgbdual_multi_libretro.info",
             "tools/cores/fceumm_ghosts_libretro.dll", "tools/cores/fceumm_ghosts_libretro.info",
             "tools/cores/snes9x_ghosts_libretro.dll", "tools/cores/snes9x_ghosts_libretro.info",
-            "tools/cores/genesis_plus_gx_ghosts_libretro.dll", "tools/cores/genesis_plus_gx_ghosts_libretro.info"], livres);
+            "tools/cores/genesis_plus_gx_ghosts_libretro.dll", "tools/cores/genesis_plus_gx_ghosts_libretro.info",
+            "tools/cores/fbneo_ghosts_libretro.dll", "tools/cores/fbneo_ghosts_libretro.info"], livres);
         var json = "{\"outils\":[" + string.Join(",", livres.Append("tools/cores/fbneo_libretro.dll").Select(Outil)) + "]}";
         var retenus = SelfUpdateService.LireOutils(json, "Nelfe80/RetroBat-APIExpose").Select(o => o.Fichier).ToArray();
         Assert.Equal(livres, retenus);

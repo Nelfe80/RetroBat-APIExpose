@@ -286,6 +286,7 @@ $outilsHorsArchive = @('RetroBat.Api.Diagnostic.exe', 'NelfePlay.LiveStreaming.e
     'tools/cores/fceumm_ghosts_libretro.dll', 'tools/cores/fceumm_ghosts_libretro.info',
     'tools/cores/snes9x_ghosts_libretro.dll', 'tools/cores/snes9x_ghosts_libretro.info',
     'tools/cores/genesis_plus_gx_ghosts_libretro.dll', 'tools/cores/genesis_plus_gx_ghosts_libretro.info',
+    'tools/cores/fbneo_ghosts_libretro.dll', 'tools/cores/fbneo_ghosts_libretro.info',
     # RETROARCH NELFEPLAY (1.9.216, lot 1) : le SEUL exe, sans version de fichier (repris sur son empreinte), avec le lien de ses sources (GPLv3).
     $exeRetroArchNelfePlay)
 # LE PLAYERDECK (1.9.163) : chaque fichier recopie plus haut (exe, ini, Decks, polices, licences). SelfUpdateService les

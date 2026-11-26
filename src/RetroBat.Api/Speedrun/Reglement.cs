@@ -51,6 +51,14 @@ public sealed record CritereDeRang(string Mesure, bool PlusPetitMeilleur);
 
 public sealed class ReglementInvalideException(string message) : Exception(message);
 
+/// <summary>
+/// LES FANTOMES D'UN POINT D'ENTRAINEMENT D'ARCADE SOUS FBNEO (« ghosts », 26/11, mode TRAINING des shmups) : le moteur
+/// (« fbneo »), l'identite d'arcade du jeu (crc32 de la liste triee des crc32 des fichiers du .zip, « be7be29b » pour
+/// DaiOuJou), le jeu du classement (« dodonpachi-daioujou ») et les regles dont on prend les records, une par version du jeu
+/// (« 1cc » White Label, « 1cc-black-label » Black Label). Rien n'y est classe.
+/// </summary>
+public sealed record FantomesDEntrainement(string Moteur, string Crc, string Jeu, IReadOnlyList<string> Regles);
+
 /// <summary>L'etat de depart d'un defi (« state ») : son nom, l'empreinte SHA-256 du fichier, le fichier sous resources/challenges/states.</summary>
 /// <param name="Coeurs">
 /// Les empreintes SHA-256 (16 a 64 hex) des dll de coeur pour lesquelles l'etat vaut (« core_sha256 ») ; vide : tout coeur (ancien
@@ -125,6 +133,9 @@ public sealed class Reglement
     /// TRAINING). Son chrono reste, a titre d'information pour le joueur.
     /// </summary>
     public bool EstUnEntrainement => Kind == KindEntrainement;
+
+    /// <summary>Les fantomes de ce point d'entrainement (arcade sous FBNeo), ou null.</summary>
+    public FantomesDEntrainement? FantomesDeTraining { get; private init; }
 
     /// <summary>
     /// LE GROUPE DU PANNEAU (« group », facultatif, texte ou texte par langue, 14/11) : le surtitre sous lequel le panneau range
@@ -393,6 +404,7 @@ public sealed class Reglement
                 Regles = r.TryGetProperty("rules", out var rg) ? LireRegles(rg) : null,
                 Ordre = Entier(r, "order") ?? 0,
                 LimiteDeTemps = LireLimite(r),
+                FantomesDeTraining = LireLesFantomesDEntrainement(r),
                 AffichageJson = r.TryGetProperty("display", out var aff) && aff.ValueKind == JsonValueKind.Object ? aff.GetRawText() : null,
             };
             reglement.ControlerLesVerrous();
@@ -420,6 +432,20 @@ public sealed class Reglement
 
         if (Verrous.Select(v => v.Adresse).Distinct().Count() != Verrous.Count)
             throw new ReglementInvalideException("deux verrous sur la meme adresse");
+    }
+
+    private static FantomesDEntrainement? LireLesFantomesDEntrainement(JsonElement r)
+    {
+        if (!r.TryGetProperty("ghosts", out var g) || g.ValueKind != JsonValueKind.Object) return null;
+        if (Texte(r, "kind") != KindEntrainement) throw new ReglementInvalideException("ghosts : seulement pour un point d'entrainement (kind training)");
+        var moteur = Texte(g, "engine") ?? "";
+        var crc = (Texte(g, "crc") ?? "").ToLowerInvariant();
+        var jeu = Texte(g, "game") ?? "";
+        var regles = Liste(g, "rules").Select(e => e.GetString() ?? "").Where(x => x.Length > 0).ToList();
+        if (moteur != "fbneo") throw new ReglementInvalideException($"ghosts : moteur {moteur} inconnu (fbneo)");
+        if (!System.Text.RegularExpressions.Regex.IsMatch(crc, "^[0-9a-f]{8}$")) throw new ReglementInvalideException("ghosts : crc de 8 chiffres hexadecimaux attendu");
+        if (jeu.Length == 0 || regles.Count == 0) throw new ReglementInvalideException("ghosts : « game » et « rules » attendus");
+        return new FantomesDEntrainement(moteur, crc, jeu, regles);
     }
 
     private static string LireRegles(JsonElement e)

@@ -821,6 +821,9 @@ public sealed partial class FantomesDuSpeedrun
         }
     }
 
+    /// <summary>Le coeur est-il pose chez RetroArch ? Les essais le remplacent.</summary>
+    internal static Func<string, bool> CoeurPose { get; set; } = nom => CheminDuCoeur(nom) is not null;
+
     private static string? CheminDuCoeur(string nom)
     {
         var retroarch = Path.Combine(RetroBatPaths.RetroBatRoot, "emulators", "retroarch");

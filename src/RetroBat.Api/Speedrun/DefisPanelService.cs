@@ -443,8 +443,9 @@ public sealed partial class DefisPanelService
 
     /// <summary>Le curseur est sur un speedrun qui se court avec des fantomes : X fait defiler leur choix (D25).</summary>
     private bool SurUnSpeedrunAFantomes()
-        => _fantomes is not null && _modele.Etat == DefisPanelModel.Foyer.Panneau && _modele.OngletCourant == DefisPanelModel.Onglet.Speedruns
-           && DefiChoisi() is { } defi && FantomesDuSpeedrun.PourCeDefi(defi);
+        => _fantomes is not null && _modele.Etat == DefisPanelModel.Foyer.Panneau
+           && (_modele.OngletCourant == DefisPanelModel.Onglet.Speedruns || _modele.OngletCourant == DefisPanelModel.Onglet.Training)
+           && DefiChoisi() is { } defi && (FantomesDuSpeedrun.PourCeDefi(defi) || FantomesDuSpeedrun.PourLeTraining(defi));
 
     /// <summary>
     /// (12/11) Le resume de la fiche : le choix, puis l'opacite et les pseudos quand ils ne sont pas ceux d'origine
@@ -774,13 +775,20 @@ public sealed partial class DefisPanelService
     {
         var aides = defi.Verrous.Where(v => v.Raison == "advantage").ToList();
         var seances = _bilan.GetValueOrDefault(defi.ChallengeId).Tentatives;
+        // (26/11) TRAINING des shmups sous FBNeo : la meme case « Ghosts » que les speedruns, ouverte par X sur le meme selecteur
+        IEnumerable<ChampDeFiche> fantomes = _fantomes is not null && FantomesDuSpeedrun.PourLeTraining(defi)
+            ? [new(T("speedrun.panel.ghosts", "Ghosts"), LibelleDesFantomes())]
+            : [];
         return
         [
             new(T("speedrun.panel.goal", "Goal"), Objectif(defi), Large: true),
-            new(T("speedrun.panel.start", "Start"), T("speedrun.panel.start.state", "Verified starting state")),
+            .. fantomes,
+            new(T("speedrun.panel.start", "Start"), defi.StartPolicy == "normal_boot"
+                ? T("speedrun.panel.start.normal", "Normal boot") : T("speedrun.panel.start.state", "Verified starting state")),
             new(T("speedrun.panel.training.game", "Game"), aides.Count > 0
                 ? T("speedrun.panel.training.infinite_lives", "Infinite lives") : T("speedrun.panel.training.normal_game", "Normal: lives and continues")),
-            new(T("speedrun.panel.restart", "Restart"), T("speedrun.panel.training.restart", "Hotkey + Left")),
+            .. (defi.StartPolicy == "normal_boot" ? Array.Empty<ChampDeFiche>()
+                : [new ChampDeFiche(T("speedrun.panel.restart", "Restart"), T("speedrun.panel.training.restart", "Hotkey + Left"))]),
             new(T("speedrun.panel.training.sessions", "Sessions"), seances.ToString(System.Globalization.CultureInfo.InvariantCulture)),
         ];
     }
