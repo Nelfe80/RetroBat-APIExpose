@@ -72,6 +72,80 @@ public sealed record AdventureVersionDuJeu
 
     [JsonPropertyName("adventure_override")]
     public AdventureSpec? Override { get; init; }
+
+    /// <summary>
+    /// La langue du depart <c>start</c>/<c>starts</c> de cette version (« en » d'une version Europe multilingue dont les etats sont faits
+    /// en anglais). Absente : la version n'a qu'une langue (<see cref="Languages"/>) et c'est la sienne.
+    /// </summary>
+    [JsonPropertyName("start_language")]
+    public string? StartLanguage { get; init; }
+
+    /// <summary>
+    /// LES DEPARTS PAR LANGUE (1.9.223) : pour une version multilingue, un jeu de departs par AUTRE langue que <see cref="StartLanguage"/>
+    /// (cle = code de langue : « de », « fr »...). Chaque jeu est de la meme forme que <c>start</c>/<c>starts</c> de la version (un depart
+    /// par nombre de joueurs, <c>content</c>, <c>core_sha256</c>) ; il peut ne couvrir que certains nombres.
+    /// </summary>
+    [JsonPropertyName("language_starts")]
+    public IReadOnlyDictionary<string, AdventureDepartsDeLangue>? LanguageStarts { get; init; }
+
+    /// <summary>
+    /// LES DEPARTS PAR COMBINAISON DE LANGUES (1.9.223, GBA mGBA Splitscreen, ou chaque console a sa langue) : un depart par suite de
+    /// langues de console (place 1, 2...). Utilise SEULEMENT quand toutes les places ont une langue connue et que la suite est celle d'un
+    /// depart ; sinon la regle de la machine partagee s'applique. Un catalogue ne les porte qu'une fois la liaison de consoles de langues
+    /// differentes PROUVEE au banc.
+    /// </summary>
+    [JsonPropertyName("combination_starts")]
+    public IReadOnlyList<AdventureDepartDeCombinaison>? CombinationStarts { get; init; }
+
+    /// <summary>Toutes les langues du catalogue pour cette version : <c>languages</c>, <c>start_language</c> et les cles de <c>language_starts</c>.</summary>
+    public IReadOnlyList<string> Langues()
+        => Languages.Concat([StartLanguage ?? string.Empty]).Concat((LanguageStarts ?? new Dictionary<string, AdventureDepartsDeLangue>()).Keys)
+            .Select(AdventureLangues.Normaliser).OfType<string>().Distinct(StringComparer.Ordinal).ToList();
+
+    /// <summary>La langue de la partie qui part du depart par defaut de la version, ou null (version multilingue sans <c>start_language</c>).</summary>
+    public string? LangueParDefaut
+        => AdventureLangues.Normaliser(StartLanguage) ?? (Languages.Count == 1 ? AdventureLangues.Normaliser(Languages[0]) : null);
+
+    /// <summary>Les langues dans lesquelles la version a des departs prets : celle du depart par defaut et chaque cle de <see cref="LanguageStarts"/>.</summary>
+    public IReadOnlyList<string> LanguesAvecDepart()
+        => (LanguageStarts ?? new Dictionary<string, AdventureDepartsDeLangue>())
+            .Where(l => l.Value.Tous().Any())
+            .Select(l => AdventureLangues.Normaliser(l.Key))
+            .Prepend(LangueParDefaut)
+            .OfType<string>().Distinct(StringComparer.Ordinal).ToList();
+}
+
+/// <summary>Les departs d'une langue d'une version : la meme forme que <c>start</c> et <c>starts</c>.</summary>
+public sealed record AdventureDepartsDeLangue
+{
+    [JsonPropertyName("start")]
+    public MultiplayerStart? Start { get; init; }
+
+    [JsonPropertyName("starts")]
+    public IReadOnlyList<MultiplayerStart>? Starts { get; init; }
+
+    public IEnumerable<MultiplayerStart> Tous() => (Starts ?? []).Prepend(Start!).Where(d => d is not null);
+
+    /// <summary>Le depart a ce nombre de joueurs sur ce contenu et pour ce coeur ; sans nombre, il vaut pour tous.</summary>
+    public MultiplayerStart? Pour(int joueurs, string? contenu, string? empreinteDuCoeur)
+        => Tous().FirstOrDefault(d => (d.Players == joueurs) && d.VautPour(contenu) && d.VautPourLeCoeur(empreinteDuCoeur));
+}
+
+/// <summary>Un depart pour une suite precise de langues de consoles (place 1, place 2...).</summary>
+public sealed record AdventureDepartDeCombinaison
+{
+    [JsonPropertyName("seat_languages")]
+    public IReadOnlyList<string> SeatLanguages { get; init; } = [];
+
+    [JsonPropertyName("start")]
+    public MultiplayerStart? Start { get; init; }
+
+    /// <summary>Le depart si la suite de langues est exactement celle-ci (une langue inconnue n'est jamais devinee).</summary>
+    public MultiplayerStart? Pour(IReadOnlyList<string?> langues, string? contenu, string? empreinteDuCoeur)
+        => Start is { } depart && SeatLanguages.Count == langues.Count && depart.VautPour(contenu) && depart.VautPourLeCoeur(empreinteDuCoeur)
+           && (depart.Players is null || depart.Players == langues.Count)
+           && SeatLanguages.Select(AdventureLangues.Normaliser).SequenceEqual(langues, StringComparer.Ordinal)
+            ? depart : null;
 }
 
 public sealed record AdventureCartridge
@@ -88,11 +162,18 @@ public sealed record AdventureCartridge
     public string? File { get; init; } = "{rom}.srm";
 
     /// <summary>
-    /// Ce qu'est la sauvegarde : <c>gba_srm_slots</c> (le .srm de mGBA Splitscreen : 4 emplacements de 32 768 octets, un par console),
+    /// Ce qu'est la sauvegarde : <c>gba_srm_slots</c> ou <c>gba_srm_console1</c> (le .srm de mGBA Splitscreen : la sauvegarde de la console 1 seule, 131 072 octets),
     /// <c>snes_sram</c>, ou <c>password</c> (Lost Vikings : le jeu garde un mot de passe, aucun fichier : <c>file</c> est alors null).
     /// </summary>
     [JsonPropertyName("kind")]
     public string? Kind { get; init; }
+
+    /// <summary>
+    /// Le .srm de mGBA Splitscreen : <c>gba_srm_slots</c> (nom du catalogue publie) ou <c>gba_srm_console1</c> (nom exact : c'est la
+    /// sauvegarde de la console 1 seule, 131 072 octets). Les deux se traitent a l'identique.
+    /// </summary>
+    [JsonIgnore]
+    public bool EstUnSrmGba => string.Equals(Kind, "gba_srm_slots", StringComparison.OrdinalIgnoreCase) || string.Equals(Kind, "gba_srm_console1", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Un jeu sans fichier de sauvegarde (mot de passe) : rien a poser, rien a relire, la reprise se fait par l'etat.</summary>
     [JsonIgnore]
@@ -167,6 +248,10 @@ public sealed class AdventureCatalogueStore
         foreach (var jeu in jeux.OfType<JsonObject>())
         {
             FusionnerLesVersions(jeu);
+
+            // COUVERTURE PARTIELLE (1.9.223) : une version ou une langue peut manquer de depart pour un nombre de joueurs ; ce nombre part a
+            // froid, le jeu n'est pas ecarte (la regle « un depart pour chaque nombre de 2 a players.max » reste celle de MULTIPLAYER).
+            jeu["partial_starts"] = true;
 
             // Un « core » au niveau du jeu REMPLACE le coeur du systeme, options comprises (MultiplayerCatalogue.CoreOf) : le site lit
             // ce nom, mais ici le jeu du meme coeur que son systeme reprend les options du systeme (splitscreen_players={players}...).

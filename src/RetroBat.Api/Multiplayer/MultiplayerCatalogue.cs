@@ -461,6 +461,13 @@ public sealed record MultiplayerGame
     [JsonIgnore]
     public bool ADesEtatsParCoeur => (Starts ?? []).Prepend(Start).Any(depart => depart?.CoreSha256 is { Count: > 0 });
 
+    /// <summary>
+    /// COUVERTURE PARTIELLE (Adventure, 1.9.223) : les departs prets ne couvrent pas forcement chaque nombre de 2 a <see cref="Players"/> ; un
+    /// nombre sans depart part a froid au lieu d'ecarter le jeu. Pose par le lecteur d'Adventure ; absent du catalogue MULTIPLAYER (regle inchangee).
+    /// </summary>
+    [JsonPropertyName("partial_starts")]
+    public bool PartialStarts { get; init; }
+
     /// <summary>Un depart pret existe-t-il pour ce contenu, a un nombre de joueurs au moins ? Sinon, pas de choix a proposer.</summary>
     public bool ADesDepartsPour(string? contenu, string? empreinteDuCoeur = null)
         => (Starts ?? []).Prepend(Start).Any(depart => depart is not null && depart.VautPour(contenu) && depart.VautPourLeCoeur(empreinteDuCoeur));
@@ -2376,7 +2383,7 @@ public sealed class MultiplayerCatalogueStore
                     {
                         for (var joueurs = 2; joueurs <= jeu.Players; joueurs++)
                         {
-                            if (jeu.DepartPour(joueurs, contenu, coeur) is null)
+                            if (!jeu.PartialStarts && jeu.DepartPour(joueurs, contenu, coeur) is null)
                             {
                                 return "pas d'etat pour " + joueurs + " joueurs";
                             }

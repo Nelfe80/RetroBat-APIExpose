@@ -202,6 +202,7 @@ public sealed class AdventureSiteClient : IAdventureSite
             Participants = (a["members"] as JsonArray)?.OfType<JsonObject>().Select(m => Texte(m["handle"])).OfType<string>().ToList() ?? [],
             Room = a["session"] is JsonObject s ? Texte(s["room"]) : null,
             LobbyId = a["voice"] is JsonObject voix ? Texte(voix["lobby_id"]) : null,
+            Language = AdventureLangues.Normaliser(Texte(a["language"])),
             Latest = LireVersion(a["latest_version"] ?? a["latest"], id),
         };
     }

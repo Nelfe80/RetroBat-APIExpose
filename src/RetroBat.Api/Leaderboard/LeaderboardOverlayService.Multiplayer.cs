@@ -89,7 +89,8 @@ public sealed partial class LeaderboardOverlayService
         IReadOnlyList<JeuDeMaSelection>? MaSelection = null,
         string TitreDeMaSelection = "",
         EcranDeFin? Fin = null,
-        EcranDeLancement? Lancement = null);
+        EcranDeLancement? Lancement = null,
+        string? Logo = null);
 
     /// <summary>Un jeu de « Votre selection » : son nom, le compte de ses joueurs, et s'il est celui du panneau.</summary>
     public sealed record JeuDeMaSelection(string Nom, string Compte, bool Courant);
@@ -201,7 +202,7 @@ public sealed partial class LeaderboardOverlayService
             // Le logo MULTIPLAYER tient le titre, comme celui de World Scoring.
             var hauteurTitre = tailleTitre * 1.5f;
             var y = _hauteurEcran * 0.0637f - hauteurTitre / 2f;
-            var gaucheDuLogo = DessinerLeLogoMultiplayer(g, s, policeTitre, hauteurTitre, y, Width * 0.75f);
+            var gaucheDuLogo = DessinerLeLogoMultiplayer(g, s, policeTitre, hauteurTitre, y, Width * 0.75f, c.Logo);
             y = _hauteurEcran * 0.0637f * 2f - hauteurTitre / 2f;
             var marge = _largeurEcran * 0.012f;
             DessinerMaSelection(g, c, s, policePetite, taillePetite, marge, marge * 0.4f, gaucheDuLogo - 2 * marge, y - marge * 0.3f);
@@ -310,9 +311,15 @@ public sealed partial class LeaderboardOverlayService
         /// Le logo MULTIPLAYER centre, a la hauteur du titre et jamais plus large que <paramref name="largeurMax"/>. Rend son
         /// bord gauche : « Votre selection » s'arrete avant.
         /// </summary>
-        private float DessinerLeLogoMultiplayer(Graphics g, EsMenuStyle s, Font policeTitre, float hauteurTitre, float y, float largeurMax)
+        private float DessinerLeLogoMultiplayer(Graphics g, EsMenuStyle s, Font policeTitre, float hauteurTitre, float y, float largeurMax, string? fichier = null)
         {
-            var chemin = Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", "nelfeplay-multiplayer.png");
+            // Le logo de la collection d'ou le panneau est vu (ADVENTURE) ; absent du disque : celui de MULTIPLAYER.
+            var chemin = Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", fichier ?? "nelfeplay-multiplayer.png");
+            if (fichier is not null && !File.Exists(chemin))
+            {
+                chemin = Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", "nelfeplay-multiplayer.png");
+            }
+
             var logo = File.Exists(chemin) ? _service._glyphes?.Glyphe(chemin, (int)Math.Round(hauteurTitre * 1.75f)) : null;
             if (logo is not null && logo.Width > largeurMax)
             {
@@ -381,7 +388,7 @@ public sealed partial class LeaderboardOverlayService
             var marge = (Width - colonne) / 2f;
             var hauteurTitre = tailleTitre * 1.5f;
             var y = _hauteurEcran * 0.035f;
-            DessinerLeLogoMultiplayer(g, s, policeTitre, hauteurTitre, y, colonne * 0.6f);
+            DessinerLeLogoMultiplayer(g, s, policeTitre, hauteurTitre, y, colonne * 0.6f, c.Logo);
             y += hauteurTitre + tailleTexte * 0.4f;
 
             // L'issue : VICTOIRE, DEFAITE, ABANDON, RENCONTRE ANNULEE, PARTIE TERMINEE.

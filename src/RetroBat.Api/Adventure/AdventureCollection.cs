@@ -25,6 +25,52 @@ public sealed class AdventureCollection
     public static readonly MultiplayerCollectionSyncService.ProfilDeCollection Profil
         = new(Nom, Logo, np => np.ShowAdventureCollection, "adventure-jeux.json", ToutesLesVersions: true);
 
+    /// <summary>
+    /// LE PROFIL DE LA BORNE (1.9.223, decision du user du 26/11) : la collection d'ES ne montre, pour chaque jeu, que les versions de LA
+    /// LANGUE DE LA BORNE (<paramref name="langue"/> : ES puis config de l'API). Voir <see cref="VersionsAffichees"/>.
+    /// </summary>
+    public static MultiplayerCollectionSyncService.ProfilDeCollection ProfilDeLaBorne(AdventureCatalogueStore catalogue, Func<string?> langue)
+        => Profil with { Affichees = tous => VersionsAffichees(tous, catalogue, langue()) };
+
+    /// <summary>
+    /// Pour chaque jeu dont la borne possede au moins une version : (1) les versions possedees dont les langues du catalogue contiennent la
+    /// langue de la borne ; sinon (2) celles en anglais ; sinon (3) la <c>default_version</c> si elle est possedee ; sinon (4) TOUTES les versions
+    /// possedees (une seule ROM, meme japonaise : on la montre). Un jeu possede n'est donc jamais cache. Langues d'une version : celles du catalogue
+    /// (<c>languages</c>, <c>start_language</c>, cles de <c>language_starts</c>), jamais deduites d'un nom de fichier. Ne change que ce que la collection
+    /// montre : une invitation, un join ou une reprise vers une version cachee passent par <see cref="Games"/>, qui garde tout.
+    /// </summary>
+    public static IReadOnlyList<MultiplayerInstalledGame> VersionsAffichees(IReadOnlyList<MultiplayerInstalledGame> tous, AdventureCatalogueStore catalogue, string? langueDeLaBorne)
+    {
+        var specs = catalogue.Entrees(out _).ToDictionary(e => e.Jeu.Id, e => e.Spec, StringComparer.Ordinal);
+        var langue = AdventureLangues.Normaliser(langueDeLaBorne);
+        var affichees = new List<MultiplayerInstalledGame>();
+        foreach (var groupe in tous.GroupBy(j => j.Game.Id, StringComparer.Ordinal))
+        {
+            var possedees = groupe.ToList();
+            if (!specs.TryGetValue(groupe.Key, out var spec) || possedees.Count == 1)
+            {
+                affichees.AddRange(possedees);
+                continue;
+            }
+
+            bool Parle(MultiplayerInstalledGame j, string code) => spec.VersionDuContenu(j.ContentKey)?.Langues().Contains(code, StringComparer.Ordinal) == true;
+            var choix = langue is null ? [] : possedees.Where(j => Parle(j, langue)).ToList();
+            if (choix.Count == 0)
+            {
+                choix = possedees.Where(j => Parle(j, "en")).ToList();
+            }
+
+            if (choix.Count == 0 && spec.DefaultVersion is { } parDefaut)
+            {
+                choix = possedees.Where(j => string.Equals(spec.VersionDuContenu(j.ContentKey)?.Key, parDefaut, StringComparison.Ordinal)).ToList();
+            }
+
+            affichees.AddRange(choix.Count > 0 ? choix : possedees);
+        }
+
+        return affichees;
+    }
+
     public AdventureCollection(MultiplayerCollectionSyncService service)
     {
         Service = service;
@@ -51,7 +97,7 @@ public sealed class AdventureCollection
             gamelists: sp.GetService<GamelistUpdateService>(),
             dataPack: sp.GetService<DataPackSyncService>(),
             paquets: sp.GetService<MultiplayerContenusDesPaquets>(),
-            profil: Profil);
+            profil: ProfilDeLaBorne(sp.GetRequiredService<AdventureCatalogueStore>(), () => sp.GetService<CabinetLocale>()?.Langue));
         return new AdventureCollection(service);
     }
 }

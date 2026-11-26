@@ -11,11 +11,16 @@ public static class AdventureChoix
     /// le meme contenu), de preference celle dont une seance est deja ouverte (on la rejoint), sinon la derniere jouee (le site rend
     /// les aventures par derniere activite). Aucune : null, l'appui long en cree une.
     /// </summary>
-    public static AdventureInfo? Choisir(IEnumerable<AdventureInfo> miennes, string jeu, string contenu)
+    public static AdventureInfo? Choisir(IEnumerable<AdventureInfo> miennes, string jeu, string contenu, Func<string, string, bool>? possede = null)
         => miennes.Where(a => string.Equals(a.Game, jeu, StringComparison.Ordinal)
                               && (a.Content.Length == 0 || string.Equals(a.Content, contenu, StringComparison.OrdinalIgnoreCase)))
             .OrderByDescending(a => a.Room is { Length: > 0 })
-            .FirstOrDefault();
+            .FirstOrDefault()
+        // 1.9.223 : la collection d'ES ne montre que les versions de la langue de la borne. Une aventure de ce jeu creee sur une AUTRE version
+        // que la borne possede (cachee par le filtre de langue) se reprend quand meme, plutot que d'en creer une neuve sur la version montree.
+        ?? (possede is null ? null : miennes.Where(a => string.Equals(a.Game, jeu, StringComparison.Ordinal) && a.Content.Length > 0 && possede(jeu, a.Content))
+            .OrderByDescending(a => a.Room is { Length: > 0 })
+            .FirstOrDefault());
 
     /// <summary>Le nombre de joueurs a demander : celui de la derniere version, sinon toutes les places ; de 2 a ses places.</summary>
     public static int Joueurs(AdventureInfo aventure, int placesDuJeu)
@@ -39,6 +44,9 @@ public sealed class AdventureLancement
     private readonly ILogger<AdventureLancement>? _journal;
     private readonly AdventureCatalogueStore? _catalogue;
 
+    /// <summary>Cette borne possede-t-elle ce jeu sur ce contenu (toutes versions, montrees ou non par la collection) ?</summary>
+    public Func<string, string, bool>? PossedeLeContenu { get; set; }
+
     public AdventureLancement(IAdventureSite site, Func<string?, string?>? empreinteDuCoeur = null, ILogger<AdventureLancement>? journal = null,
         AdventureCatalogueStore? catalogue = null)
     {
@@ -57,7 +65,7 @@ public sealed class AdventureLancement
             return "offline";
         }
 
-        var aventure = AdventureChoix.Choisir(miennes.Aventures, jeu.Game.Id, jeu.ContentKey);
+        var aventure = AdventureChoix.Choisir(miennes.Aventures, jeu.Game.Id, jeu.ContentKey, PossedeLeContenu);
         if (aventure is null)
         {
             aventure = await CreerAsync(jeu, ct).ConfigureAwait(false);

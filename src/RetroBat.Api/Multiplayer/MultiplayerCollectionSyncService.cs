@@ -89,7 +89,8 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     /// Ce qui distingue une collection d'une autre quand le meme calcul sert deux catalogues (NelfePlay Adventure, 26/11) : son
     /// nom d'ES, son logo, l'option qui l'allume et le fichier ou se garde sa derniere passe. Defaut : MULTIPLAYER.
     /// </summary>
-    public sealed record ProfilDeCollection(string Nom, string Logo, Func<RetroBat.Api.Infrastructure.NelfePlayOptions, bool> Visible, string Trace, bool ToutesLesVersions = false)
+    public sealed record ProfilDeCollection(string Nom, string Logo, Func<RetroBat.Api.Infrastructure.NelfePlayOptions, bool> Visible, string Trace, bool ToutesLesVersions = false,
+        Func<IReadOnlyList<MultiplayerInstalledGame>, IReadOnlyList<MultiplayerInstalledGame>>? Affichees = null)
     {
         public static ProfilDeCollection Multiplayer { get; } = new(CollectionName, LogoFile, np => np.ShowMultiplayerCollection, "multiplayer-jeux.json");
     }
@@ -396,7 +397,10 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
             }
 
             var jeux = Intersecter(catalogue);
-            var chemins = jeux.Select(jeu => jeu.Path).ToList();
+            // Ce que la collection d'ES MONTRE peut etre un sous-ensemble de ce que la borne POSSEDE (Adventure : les versions de la langue de la
+            // borne) ; Games garde tout ce qui est possede : une invitation ou une reprise vers une version cachee fonctionne toujours.
+            var affichees = _profil.Affichees is { } filtre ? filtre(jeux) : jeux;
+            var chemins = affichees.Select(jeu => jeu.Path).ToList();
             var resultat = _writer.Apply(_profil.Nom, chemins);
             var visuel = chemins.Count > 0 ? _assets.Install(_profil.Nom, _profil.Logo, FondFile) : _assets.Remove(_profil.Nom);
             if (visuel.Changed)
@@ -407,7 +411,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
             Games = jeux;
             GarderLaTrace(jeux);
             LireLesPaquetsEnAttente(catalogue, cancellationToken);
-            var inscrits = resultat.Changed || !_inscriptionsFaites ? InscrireLesJeuxInconnusDEs(jeux) : 0;
+            var inscrits = resultat.Changed || !_inscriptionsFaites ? InscrireLesJeuxInconnusDEs(affichees) : 0;
             if (resultat.Changed || visuel.Changed || inscrits > 0)
             {
                 _logger?.LogInformation(
@@ -783,7 +787,7 @@ public sealed record MultiplayerInstalledGame(MultiplayerGame Game, string Path,
     /// DEUX JEUX D'ETATS (22/11) : l'empreinte de la dll du coeur installe, lue seulement quand le jeu a des etats propres a un
     /// coeur (le fichier fait 60 Mo ; l'empreinte est memorisee tant qu'il ne change pas). Null sinon : tout etat vaut.
     /// </summary>
-    private string? EmpreinteDuCoeur()
+    internal string? EmpreinteDuCoeur()
         => Game.ADesEtatsParCoeur ? RetroBat.Api.Speedrun.EtatsParCoeur.EmpreinteDuCoeurInstalle(Core?.Core) : null;
 
     /// <summary>Le depart pret d'une partie a <paramref name="joueurs"/> sur ce contenu ; null : elle se joue en classique.</summary>

@@ -149,6 +149,50 @@ public sealed class AdventureStockage
     public AdventureVersion? Derniere(string aventure) => Versions(aventure).FirstOrDefault();
 
     /// <summary>
+    /// LA LANGUE DE L'AVENTURE gardee chez l'hote (<c>adventure\&lt;aventure&gt;\langue.txt</c>, un code de langue) : le site peut ne pas la garder.
+    /// Null : jamais fixee (ou illisible).
+    /// </summary>
+    public string? Langue(string aventure)
+    {
+        if (!NomSur(aventure))
+        {
+            return null;
+        }
+
+        try
+        {
+            var chemin = Path.Combine(Racine, aventure, "langue.txt");
+            return File.Exists(chemin) ? AdventureLangues.Normaliser(File.ReadAllText(chemin)) : null;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>Fixe la langue de l'aventure, une fois : une langue deja gardee n'est jamais remplacee.</summary>
+    public void FixerLaLangue(string aventure, string? langue)
+    {
+        if (!NomSur(aventure) || AdventureLangues.Normaliser(langue) is not { } code || Langue(aventure) is not null)
+        {
+            return;
+        }
+
+        try
+        {
+            lock (_verrou)
+            {
+                Directory.CreateDirectory(Path.Combine(Racine, aventure));
+                File.WriteAllText(Path.Combine(Racine, aventure, "langue.txt"), code);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // La langue ne se garde pas : la prochaine seance la choisira de nouveau.
+        }
+    }
+
+    /// <summary>
     /// Un identifiant de version : 32 hex minuscules (le format du site). C'est aussi le <c>version_ref</c> du depot : le meme a chaque
     /// essai, donc jamais deux versions pour une meme prise, et l'ordre des versions se lit a leur date, pas a leur nom.
     /// </summary>

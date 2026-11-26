@@ -470,6 +470,12 @@ public sealed partial class LeaderboardOverlayService
         private void DessinerLeLogo(Graphics g, float k, string? fichier = null)
         {
             var chemin = Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", fichier ?? "nelfeplay-multiplayer.png");
+            if (fichier is not null && !File.Exists(chemin))
+            {
+                // Un logo de collection que le Data Pack n'a pas livre : celui de MULTIPLAYER, jamais un en-tete vide.
+                chemin = Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", "nelfeplay-multiplayer.png");
+            }
+
             if (!File.Exists(chemin) || _service._glyphes?.Glyphe(chemin, (int)Math.Round(70 * k)) is not { } logo)
             {
                 return;

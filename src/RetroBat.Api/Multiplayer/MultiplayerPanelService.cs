@@ -1604,7 +1604,9 @@ public sealed partial class MultiplayerPanelService
                         + r.Players.Count(j => j.Present) + "/" + r.Max,
                     RoomDuJeu() is { } courante && r.Room == courante.Room))
                 .ToList(),
-            TitreDeMaSelection: T("multiplayer.selection"));
+            TitreDeMaSelection: T("multiplayer.selection"),
+            // Un jeu vu depuis la collection ADVENTURE (ou la seance d'une aventure) porte le logo d'ADVENTURE, pas celui de MULTIPLAYER.
+            Logo: jeu is not null && _session.EstUneAventure(jeu) ? RetroBat.Api.Adventure.AdventureCollection.Logo : null);
     }
 
     /// <summary>
@@ -1894,7 +1896,8 @@ public sealed partial class MultiplayerPanelService
             PleinEcran: true,
             BoutonOk: "OK",
             GlypheOk: _glypheValider,
-            Fin: ecranDeFin);
+            Fin: ecranDeFin,
+            Logo: LogoDeLaCollection());
     }
 
     /// <summary>
@@ -2001,8 +2004,13 @@ public sealed partial class MultiplayerPanelService
             _glypheAnnuler,
             // E4 (26/10) : une police imposee par le catalogue l'emporte sur celle du type.
             jeu?.Ecran?.Police is { Length: > 0 } police ? police : null,
-            monScore);
+            monScore,
+            Logo: LogoDeLaCollection());
     }
+
+    /// <summary>Le logo d'ADVENTURE quand le jeu du panneau est celui d'une aventure, sinon null (le logo de MULTIPLAYER).</summary>
+    private string? LogoDeLaCollection()
+        => _jeu is { } jeuCourant && _session.EstUneAventure(jeuCourant) ? RetroBat.Api.Adventure.AdventureCollection.Logo : null;
 
     /// <summary>
     /// L'issue d'une coop a fin lue : celle lue sur cette borne (avec l'etape), l'issue de l'hote l'emportant quand la

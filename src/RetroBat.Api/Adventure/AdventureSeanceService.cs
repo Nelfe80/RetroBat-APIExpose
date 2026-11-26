@@ -78,6 +78,7 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
     private readonly Func<ICommandesRetroArch> _commandes;
     private readonly Func<string?, string?> _empreinteDuCoeur;
     private readonly Func<DateTime> _maintenant;
+    private readonly Func<string?> _langueDeLaBorne;
     private readonly ILogger<AdventureSeanceService>? _journal;
     private readonly ConcurrentDictionary<string, Seance> _seances = new(StringComparer.Ordinal);
 
@@ -87,6 +88,9 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
         public required AdventureSauveur Sauveur { get; init; }
         public required DecisionDeReprise Decision { get; init; }
         public MultiplayerStart? Depart { get; init; }
+
+        /// <summary>La langue du depart choisi (« fr »), ou null : depart a froid ou version sans langue nommee.</summary>
+        public string? Langue { get; init; }
         public required string DossierDesSauvegardes { get; init; }
         public required string NomDeLaRom { get; init; }
         public DateTime Ouverte { get; init; }
@@ -96,8 +100,9 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
 
     public AdventureSeanceService(IAdventureSite site, AdventureStockage stockage, AdventureFileDEnvoi file,
         Func<ICommandesRetroArch>? commandes = null, Func<string?, string?>? empreinteDuCoeur = null, Func<DateTime>? maintenant = null,
-        ILogger<AdventureSeanceService>? journal = null, AdventureCatalogueStore? catalogue = null)
+        ILogger<AdventureSeanceService>? journal = null, AdventureCatalogueStore? catalogue = null, Func<string?>? langueDeLaBorne = null)
     {
+        _langueDeLaBorne = langueDeLaBorne ?? (() => null);
         _catalogue = catalogue;
         _site = site;
         _stockage = stockage;
@@ -173,6 +178,9 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
         var nomDeLaRom = Path.GetFileNameWithoutExtension(jeu.Path);
         var dossier = _stockage.DossierDesSauvegardes(id);
         var specification = Specification(jeu);
+        // La langue de l'aventure : celle que le site garde, sinon celle que cette borne a gardee a la premiere seance.
+        var langueDeLAventure = aventure.Language ?? _stockage.Langue(id);
+        string? langueDuDepart = null;
         var fichier = FichierDeLaCartouche(specification, nomDeLaRom);
         if (fichier is null)
         {
@@ -225,7 +233,7 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
                     File.WriteAllBytes(cartouche, sauvegarde);
                 }
 
-                depart = DepartDuCatalogue(jeu, joueurs);
+                (depart, langueDuDepart) = DepartDuCatalogue(jeu, joueurs, room, langueDeLAventure);
                 // CHARGER UN ETAT RESTAURE SON SAVEDATA (prouve au banc le 26/11 : la sauvegarde posee est ecrasee) : la sauvegarde de
                 // l'aventure est placee DANS le depart pret avant qu'on le charge. Impossible (autre cœur, format inconnu) : pas de depart
                 // pret, un depart a froid, et le jeu relit le .srm pose.
@@ -243,8 +251,14 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
                     SupprimerSiPresent(cartouche);
                 }
 
-                depart = DepartDuCatalogue(jeu, joueurs);
+                (depart, langueDuDepart) = DepartDuCatalogue(jeu, joueurs, room, langueDeLAventure);
                 break;
+        }
+
+        // Une aventure garde la langue de sa creation : fixee a la premiere partie neuve, jamais remplacee.
+        if (decision.Mode != ModeDeReprise.Etat && depart is not null)
+        {
+            _stockage.FixerLaLangue(id, langueDuDepart);
         }
 
         var sauveur = new AdventureSauveur(_commandes(), _stockage, _file,
@@ -257,6 +271,7 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
             Sauveur = sauveur,
             Decision = decision,
             Depart = depart,
+            Langue = langueDuDepart ?? langueDeLAventure,
             DossierDesSauvegardes = dossier,
             NomDeLaRom = nomDeLaRom,
             Ouverte = _maintenant(),
@@ -316,17 +331,36 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
     /// l'etat « en jeu » fabrique au banc, pas de l'ecran titre. Son chemin est rendu absolu (dossier du catalogue Adventure) : la
     /// pose de MULTIPLAYER le lit tel quel et verifie son empreinte. Null : le jeu n'en a pas pour ce nombre, partie neuve a l'ecran titre.
     /// </summary>
-    private MultiplayerStart? DepartDuCatalogue(MultiplayerInstalledGame jeu, int joueurs)
+    private (MultiplayerStart? Depart, string? Langue) DepartDuCatalogue(MultiplayerInstalledGame jeu, int joueurs, MultiplayerRoom room, string? langueDeLAventure)
     {
-        if (jeu.DepartPour(joueurs) is not { } depart || string.IsNullOrWhiteSpace(depart.State) || Path.IsPathRooted(depart.State))
+        if (!jeu.Game.EstNelfePlay)
         {
-            return null;
+            return (null, null);
+        }
+
+        // LA LANGUE (1.9.223) : la version du contenu lance choisit son depart selon la langue des joueurs (CDC §0, langues melees).
+        var version = (_catalogue?.Entrees(out _).FirstOrDefault(e => e.Jeu.Id == jeu.Game.Id)?.Spec ?? SpecificationParDefaut).VersionDuContenu(jeu.ContentKey);
+        var choix = AdventureLangues.ChoisirLeDepart(version, jeu.Game, joueurs, jeu.ContentKey, jeu.EmpreinteDuCoeur(), JoueursDeLaSeance(room), langueDeLAventure);
+        _journal?.LogInformation("ADVENTURE : depart de {Jeu} a {Joueurs} joueurs : {Raison}", jeu.Game.Id, joueurs, choix.Raison);
+        if (choix.Depart is not { } depart || string.IsNullOrWhiteSpace(depart.State) || Path.IsPathRooted(depart.State))
+        {
+            return (null, null);
         }
 
         var dossier = _catalogue is null ? Path.Combine(RetroBatPaths.PluginRoot, "resources", "adventure") : Path.GetDirectoryName(_catalogue.Path)!;
         var chemin = Path.GetFullPath(Path.Combine(dossier, depart.State.Replace('/', Path.DirectorySeparatorChar)));
-        return chemin.StartsWith(Path.GetFullPath(dossier), StringComparison.OrdinalIgnoreCase) ? depart with { State = chemin } : null;
+        return chemin.StartsWith(Path.GetFullPath(dossier), StringComparison.OrdinalIgnoreCase) ? (depart with { State = chemin }, choix.Langue) : (null, null);
     }
+
+    /// <summary>
+    /// Les joueurs de la seance et ce qu'ils lisent : le joueur de CETTE borne (<c>You</c>, l'hote qui prepare) par la langue d'ES et de l'API,
+    /// les autres par ce que le site rend de leur entree (<c>language</c>) ; une langue inconnue ne bloque aucun choix.
+    /// </summary>
+    internal IReadOnlyList<AdventureJoueurLangue> JoueursDeLaSeance(MultiplayerRoom room)
+        => room.Players.Where(j => j.Seat is not null || j.You || j.Host).Select(j => new AdventureJoueurLangue(
+            j.Seat,
+            j.You || (j.Host && !room.Players.Any(p => p.You)),
+            j.You ? AdventureLangues.LanguesDe(_langueDeLaBorne(), j.Languages) : AdventureLangues.LanguesDe(j.Language, j.Languages))).ToList();
 
     /// <summary>
     /// Le depart pret dont le SAVEDATA de la console de la cartouche est celui de l'aventure : un fichier derive, range dans le dossier
@@ -334,7 +368,7 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
     /// </summary>
     private MultiplayerStart? DepartAvecLaSauvegarde(MultiplayerStart depart, byte[] sauvegarde, string aventure, AdventureSpec spec)
     {
-        if (!string.Equals(spec.Cartridge?.Kind, "gba_srm_slots", StringComparison.OrdinalIgnoreCase))
+        if (spec.Cartridge?.EstUnSrmGba != true)
         {
             _journal?.LogInformation("ADVENTURE : sauvegarde de {Aventure} non placee dans le depart (format {Format}) : depart a froid", aventure, spec.Cartridge?.Kind ?? "inconnu");
             return null;
