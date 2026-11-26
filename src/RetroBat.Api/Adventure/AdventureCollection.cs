@@ -65,10 +65,43 @@ public sealed class AdventureCollection
                 choix = possedees.Where(j => string.Equals(spec.VersionDuContenu(j.ContentKey)?.Key, parDefaut, StringComparison.Ordinal)).ToList();
             }
 
-            affichees.AddRange(choix.Count > 0 ? choix : possedees);
+            // UN SEUL EXEMPLAIRE DE CHAQUE JEU (user, 27/11) : parmi les versions retenues, la default_version, sinon la revision la plus haute,
+            // sinon une version multilingue qui contient la langue, sinon la premiere par nom. Les autres restent jouables par invitation et reprise.
+            var retenues = choix.Count > 0 ? choix : possedees;
+            affichees.Add(retenues.Count == 1 ? retenues[0] : UnSeul(retenues, spec, langue));
         }
 
         return affichees;
+    }
+
+    private static readonly System.Text.RegularExpressions.Regex Revision = new(@"rev[\s_-]*(\d+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+
+    /// <summary>La revision d'une version (« france-rev1 » : 1 ; sans « rev » : 0), lue de sa cle puis de son nom.</summary>
+    internal static int RevisionDe(AdventureVersionDuJeu? version)
+        => version is null ? 0 : new[] { version.Key, version.Label, version.FileHint }.Select(t => Revision.Match(t ?? string.Empty)).FirstOrDefault(m => m.Success) is { } trouvee
+            && int.TryParse(trouvee.Groups[1].Value, out var n) ? n : 0;
+
+    internal static MultiplayerInstalledGame UnSeul(IReadOnlyList<MultiplayerInstalledGame> retenues, AdventureSpec spec, string? langue)
+    {
+        if (spec.DefaultVersion is { } parDefaut && retenues.FirstOrDefault(j => string.Equals(spec.VersionDuContenu(j.ContentKey)?.Key, parDefaut, StringComparison.Ordinal)) is { } defaut)
+        {
+            return defaut;
+        }
+
+        var revisions = retenues.Select(j => RevisionDe(spec.VersionDuContenu(j.ContentKey))).ToList();
+        var plusHaute = revisions.Max();
+        var candidates = retenues.Where((j, i) => revisions[i] == plusHaute).ToList();
+        if (candidates.Count == 1)
+        {
+            return candidates[0];
+        }
+
+        if (langue is not null && candidates.Where(j => spec.VersionDuContenu(j.ContentKey) is { Languages.Count: > 1 } v && v.Langues().Contains(langue, StringComparer.Ordinal)).ToList() is { Count: > 0 } multilingues)
+        {
+            candidates = multilingues;
+        }
+
+        return candidates.OrderBy(j => spec.VersionDuContenu(j.ContentKey)?.Key ?? j.ContentKey, StringComparer.Ordinal).First();
     }
 
     public AdventureCollection(MultiplayerCollectionSyncService service)

@@ -1067,6 +1067,42 @@ public class AdventureTests : IDisposable
     }
 
     [Fact]
+    public async Task Un_jeu_des_deux_catalogues_ouvre_le_panneau_de_la_collection_d_ou_on_le_voit()
+    {
+        PoserKirby();
+        var adventure = Collection(new NelfePlayOptions { ShowAdventureCollection = true }, new AdventureCatalogueStore(path: Catalogue([Kirby()])));
+        await adventure.SynchroniserAsync("test", CancellationToken.None);
+        var chemin = adventure.JeuxConnus().Single().Path;
+
+        var options = new FauxOptions(new ApiExposeOptions { NelfePlay = new NelfePlayOptions { ShowMultiplayerCollection = true, ShowAdventureCollection = true } });
+        var multiplayer = new MultiplayerCollectionSyncService(
+            options, new MultiplayerCatalogueStore(logger: null, path: Catalogue([new { id = "gba/kirby-multi", system = "gba", name = "Kirby", family = "adventure", players = 4, core = "mgba_splitscreen", content = new { md5 = new[] { "abc123" }, size = new[] { 11L } } }], "mp.json")),
+            new InstalledGameCatalog(new SansDefinition(), logger: null, romsRoot: Path.Combine(_racine, "roms"), ramRoot: Path.Combine(_racine, "ram")),
+            new EsCustomCollectionWriter(new FauxReglages(), logger: null, collectionsRoot: Path.Combine(_racine, "c2"), stateRoot: Path.Combine(_racine, "s2")),
+            new EsCollectionThemeAssets(logger: null, themesRoot: Path.Combine(_racine, "themes"), sourceRoot: Path.Combine(_racine, "assets"), stateRoot: Path.Combine(_racine, "s2")),
+            new MediaRuntimeState(), romsRoot: Path.Combine(_racine, "roms"), emulateurTourne: () => false, md5DuContenu: _ => "abc123", coeurPose: _ => true);
+        var statutMp = await multiplayer.SynchroniserAsync("test", CancellationToken.None);
+        Assert.True(statutMp.State == "ok", statutMp.State + " " + statutMp.LastError + " " + statutMp.CatalogueGames + "/" + statutMp.LocalGames);
+        Assert.Equal(chemin, multiplayer.JeuxConnus().Single().Path);   // le meme fichier est dans les deux collections
+        var client = new MultiplayerClient(new SansFabrique(), new NelfePlayDeviceStore(NullLogger<NelfePlayDeviceStore>.Instance), clientDeTest: () => null);
+        var session = new MultiplayerSessionService(client, multiplayer, options, relais: null, bus: null) { UnJeuTourne = () => false };
+        session.JeuxSupplementaires = () => adventure.JeuxConnus();
+        var carrousel = "nelfeplay-adventure";
+        session.CarrouselCourant = () => carrousel;
+
+        // Vu depuis la collection Adventure : le jeu d'Adventure (panneau ADVENTURE, logo Adventure).
+        Assert.True(session.EstUneAventure(session.JeuDe(chemin)!));
+        // Vu depuis MULTIPLAYER, ou depuis son systeme : le jeu de MULTIPLAYER.
+        carrousel = "nelfeplay-multiplayer";
+        Assert.False(session.EstUneAventure(session.JeuDe(chemin)!));
+        carrousel = "gba";
+        Assert.False(session.EstUneAventure(session.JeuDe(chemin)!));
+        // Carrousel inconnu : comme avant, MULTIPLAYER d'abord.
+        session.CarrouselCourant = null;
+        Assert.False(session.EstUneAventure(session.JeuDe(chemin)!));
+    }
+
+    [Fact]
     public async Task La_session_MULTIPLAYER_confie_l_appui_long_d_un_jeu_d_aventure_a_Adventure_et_laisse_MULTIPLAYER_tranquille()
     {
         PoserKirby();

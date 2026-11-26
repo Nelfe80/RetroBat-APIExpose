@@ -334,8 +334,9 @@ public sealed partial class LeaderboardOverlayService
 
             using var encre = new SolidBrush(Teinte(s.TitleColor));
             using var centre = new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-            g.DrawString("MULTIPLAYER", policeTitre, encre, new RectangleF(0, y, Width, hauteurTitre), centre);
-            return (Width - g.MeasureString("MULTIPLAYER", policeTitre, PointF.Empty, StringFormat.GenericTypographic).Width) / 2f;
+            var mot = fichier is not null && fichier.Contains("adventure", StringComparison.OrdinalIgnoreCase) ? "NELFEPLAY ADVENTURE" : "MULTIPLAYER";
+            g.DrawString(mot, policeTitre, encre, new RectangleF(0, y, Width, hauteurTitre), centre);
+            return (Width - g.MeasureString(mot, policeTitre, PointF.Empty, StringFormat.GenericTypographic).Width) / 2f;
         }
 
         /// <summary>

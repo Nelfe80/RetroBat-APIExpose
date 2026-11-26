@@ -506,18 +506,17 @@ public class AdventureLanguesTests : IDisposable
 
     [Theory]
     [InlineData("fr_FR", new[] { "usa", "eu" }, new[] { "eu" })]            // fr : l'Europe (language_starts fr), pas l'USA
-    [InlineData("de_DE", new[] { "usa", "eu", "de" }, new[] { "de", "eu" })] // de : Europe et Allemagne
-    [InlineData("en_US", new[] { "usa", "eu", "jp" }, new[] { "eu", "usa" })]
-    [InlineData("es_ES", new[] { "usa", "eu", "jp" }, new[] { "eu", "usa" })]  // pas de version espagnole : l'anglais
-    [InlineData("es_ES", new[] { "jp", "de" }, new[] { "jp" })]               // ni espagnole ni anglaise : la version par defaut ? absente ici
+    [InlineData("de_DE", new[] { "usa", "eu", "de" }, new[] { "eu" })]       // de : Europe et Allemagne, UN seul : la multilingue
+    [InlineData("en_US", new[] { "usa", "eu", "jp" }, new[] { "usa" })]      // en : USA et Europe, UN seul : la default_version
+    [InlineData("es_ES", new[] { "usa", "eu", "jp" }, new[] { "usa" })]      // pas de version espagnole : l'anglais, la default_version
+    [InlineData("es_ES", new[] { "jp", "de" }, new[] { "de" })]               // ni espagnole ni anglaise ni par defaut : toutes, UNE : la premiere par nom (germany)
     public void La_collection_ne_montre_que_les_versions_de_la_langue_de_la_borne(string langue, string[] roms, string[] attendu)
     {
         var (service, _, _) = UneCollection(roms, () => langue);
         service.SynchroniserAsync("test", CancellationToken.None).GetAwaiter().GetResult();
         var visibles = DansEs(service);
         // Le cas « ni la langue, ni l'anglais, ni la version par defaut » montre TOUTES les versions possedees (jp, de).
-        var voulu = langue == "es_ES" && roms.SequenceEqual(["jp", "de"]) ? new[] { "de", "jp" } : attendu;
-        Assert.Equal(voulu, visibles.Select(v => v.Replace(" ", "")).Select(Cle).Order().ToArray());
+        Assert.Equal(attendu, visibles.Select(v => v.Replace(" ", "")).Select(Cle).Order().ToArray());
     }
 
     private static string Cle(string nom) => nom switch { "usa" => "usa", "eu" => "eu", "jp" => "jp", "de" => "de", _ => nom };
@@ -534,10 +533,12 @@ public class AdventureLanguesTests : IDisposable
     [Fact]
     public void La_version_par_defaut_passe_avant_les_autres_quand_ni_la_langue_ni_l_anglais_ne_conviennent_pas()
     {
-        // Borne en francais, versions japonaise et allemande possedees : ni fr ni en, et la version par defaut (usa) n'est pas possedee : tout.
+        // Borne en francais, versions japonaise et allemande possedees : ni fr ni en, et la version par defaut (usa) n'est pas possedee : toutes
+        // sont retenues, UNE seule est montree (la premiere par nom de version : germany), l'autre reste possedee.
         var (service, _, _) = UneCollection(["jp", "de"], () => "fr_FR");
         service.SynchroniserAsync("test", CancellationToken.None).GetAwaiter().GetResult();
-        Assert.Equal(["de", "jp"], DansEs(service));
+        Assert.Equal(["de"], DansEs(service));
+        Assert.Equal(["m-de", "m-jp"], Montrees(service));
     }
 
     [Fact]
@@ -696,6 +697,72 @@ public class AdventureLanguesTests : IDisposable
     [InlineData("show_all", "", "en")]
     public void La_langue_des_jeux_de_la_borne_suit_le_profil_des_ROMs_puis_ES_puis_l_anglais(string? profil, string? es, string attendu)
         => Assert.Equal(attendu, CabinetLocale.LangueDesJeuxDe(profil, es));
+
+    [Fact]
+    public void Sur_la_borne_du_user_la_collection_montre_exactement_cinq_jeux_un_exemplaire_chacun()
+    {
+        var chemin = CatalogueDuDataPack();
+        if (chemin is null)
+        {
+            return;
+        }
+
+        var store = new AdventureCatalogueStore(path: chemin);
+        // La borne possede TOUTES les versions du catalogue (le pire cas : dix-neuf ROMs).
+        // (Lost Vikings SNES, mis de cote par le user, n'est plus au catalogue de la borne : on l'ecarte ici aussi.)
+        var possedees = store.Entrees(out _).Where(e => e.Jeu.Id != "snes/the-lost-vikings")
+            .SelectMany(e => e.Spec.Versions.Select(v => new MultiplayerInstalledGame(e.Jeu.PourLeContenu(v.Content.Md5.Single()), @"E:
+oms\" + v.Key + ".zip", null, v.Content.Md5.Single())))
+            .ToList();
+        var spec = store.Entrees(out _).Where(e => e.Jeu.Id != "snes/the-lost-vikings").ToDictionary(e => e.Jeu.Id, e => e.Spec);
+        var vues = AdventureCollection.VersionsAffichees(possedees, store, "fr_FR");
+
+        string Cle(MultiplayerInstalledGame j) => j.Game.Id + ":" + spec[j.Game.Id].VersionDuContenu(j.ContentKey)!.Key;
+        var attendues = new[]
+        {
+            "gba/kirby-amazing-mirror:europe", "gba/shining-soul-ii:europe", "gba/zelda-alttp-four-swords:europe",
+            "megadrive/the-lost-vikings:europe", "snes/secret-of-mana:france-rev1",
+        };
+        Assert.Equal(attendues.Order().ToArray(), vues.Select(Cle).Order().ToArray());
+        // Les autres restent possedees : l'invite qui a la ROM de l'hote la retrouve.
+        Assert.Equal(possedees.Count, possedees.Select(Cle).Distinct().Count());
+    }
+
+    [Fact]
+    public void L_onglet_NEW_ADVENTURE_dit_ce_qui_va_se_passer_et_ce_qui_existe_et_se_rend()
+    {
+        string Texte(string cle, string defaut) => defaut;
+        var maintenant = new DateTime(2026, 11, 26, 22, 54, 0, DateTimeKind.Utc);
+        var vide = RetroBat.Api.Multiplayer.MultiplayerPanelService.LesAventures(new AventuresDuJeu("Europe", 4, []), "Four Swords", 4, Texte);
+        Assert.Equal("HOLD A : START A NEW ADVENTURE (Europe, 4 seats)", vide.Haut);
+        var seule = Assert.Single(vide.Lignes);
+        Assert.Equal("NO ADVENTURE YET FOR THIS GAME", seule.Nom);
+
+        var avec = RetroBat.Api.Multiplayer.MultiplayerPanelService.LesAventures(new AventuresDuJeu("Europe", 4,
+            [new AventureLigne("a2", "Europe", 4, maintenant, true), new AventureLigne("a1", "USA", 2, maintenant.AddDays(-1), false)]), "Four Swords", 4, Texte);
+        Assert.Equal(2, avec.Lignes.Count);
+        Assert.Contains("4 players", avec.Lignes[0].Etat);
+        Assert.Contains("IN PROGRESS", avec.Lignes[0].Etat);
+        Assert.DoesNotContain("IN PROGRESS", avec.Lignes[1].Etat);
+        Assert.Equal("ADVENTURES UNAVAILABLE (OFFLINE)", RetroBat.Api.Multiplayer.MultiplayerPanelService.LesAventures(new AventuresDuJeu("", 4, null), "x", 4, Texte).Lignes[0].Nom);
+
+        // Le rendu : avant (l'onglet vide de la 1.9.223), apres (sans aventure, puis avec des aventures).
+        var dossier = Path.Combine("E:" + Path.DirectorySeparatorChar, "claude_travail", "temp", "adventure_panel");
+        Directory.CreateDirectory(dossier);
+        var style = RetroBat.Api.Leaderboard.EsMenuStyle.Lire(null);
+        var onglets = new[] { "INVITE", "ADVENTURE", "NEW ADVENTURE (HOLD A)" };
+        var aides = new List<RetroBat.Api.Leaderboard.LeaderboardOverlayService.Aide> { new("dpad_leftright", "TAB"), new("button_b", "BACK"), new("button_b", "HOLD: LEAVE") };
+        var socle = new RetroBat.Api.Leaderboard.LeaderboardOverlayService.ContenuMultiplayer(onglets, 2, true, "CLASSIC", "game menus · no ranking", "0/4", null, [], -1,
+            string.Empty, string.Empty, aides, Logo: AdventureCollection.Logo);
+        byte[] Rendre(RetroBat.Api.Leaderboard.LeaderboardOverlayService.ContenuMultiplayer c)
+            => RetroBat.Api.Leaderboard.LeaderboardOverlayService.ApercuMultiplayer(style, c, "", "", "", NullLogger<RetroBat.Api.Leaderboard.LeaderboardOverlayService>.Instance);
+        File.WriteAllBytes(Path.Combine(dossier, "1-avant-onglet-vide.png"), Rendre(socle));
+        var apres0 = Rendre(socle with { Badge = string.Empty, Info = vide.Haut, Compte = string.Empty, Lignes = vide.Lignes, Disposition = RetroBat.Api.Leaderboard.LeaderboardOverlayService.DispositionDesJoueurs.Liste });
+        File.WriteAllBytes(Path.Combine(dossier, "2-apres-aucune-aventure.png"), apres0);
+        var apres1 = Rendre(socle with { Badge = string.Empty, Info = avec.Haut, Compte = string.Empty, Lignes = avec.Lignes, Disposition = RetroBat.Api.Leaderboard.LeaderboardOverlayService.DispositionDesJoueurs.Liste });
+        File.WriteAllBytes(Path.Combine(dossier, "3-apres-avec-aventures.png"), apres1);
+        Assert.True(apres0.Length > 1000 && apres1.Length > 1000);
+    }
 
     private sealed class FauxCommandes : ICommandesRetroArch
     {
