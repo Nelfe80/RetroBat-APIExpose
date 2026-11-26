@@ -849,8 +849,6 @@ var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
     // sait trouver les jeux d'Adventure comme ceux de MULTIPLAYER.
     {
         var seance = app.Services.GetRequiredService<RetroBat.Api.Adventure.AdventureSeanceService>();
-        seance.DossierDesEtatsLocal = () => RetroBat.Api.Multiplayer.RetroArchConfigEdit.Lire(
-            Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.RetroBatRoot, "emulators", "retroarch", "retroarch.cfg"), "savestate_directory");
         app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerLaunchService>().Aventure = seance;
         var aventures = app.Services.GetRequiredService<RetroBat.Api.Adventure.AdventureCollection>();
         var lancement = new RetroBat.Api.Adventure.AdventureLancement(app.Services.GetRequiredService<RetroBat.Api.Adventure.IAdventureSite>(),

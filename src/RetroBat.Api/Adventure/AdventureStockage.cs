@@ -43,6 +43,13 @@ public sealed class AdventureStockage
     public string DossierDesSauvegardes(string aventure)
         => NomSur(aventure) ? Path.Combine(Racine, "saves", aventure) : throw new ArgumentException("identifiant d'aventure refuse", nameof(aventure));
 
+    /// <summary>
+    /// Le dossier des ETATS de RetroArch pour cette aventure (<c>savestate_directory</c> de la seance) : <c>SAVE_STATE</c> y ecrit
+    /// <c>&lt;rom&gt;.state</c>, l'autosave <c>&lt;rom&gt;.state.auto</c>, le depart pret <c>&lt;rom&gt;.state97</c> ; jamais les etats du joueur.
+    /// </summary>
+    public string DossierDesEtats(string aventure)
+        => NomSur(aventure) ? Path.Combine(Racine, "states", aventure) : throw new ArgumentException("identifiant d'aventure refuse", nameof(aventure));
+
     /// <summary>Range des octets sous leur empreinte (une fois) et la rend.</summary>
     public string PoserObjet(byte[] octets)
     {

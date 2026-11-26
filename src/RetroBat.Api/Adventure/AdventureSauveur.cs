@@ -24,12 +24,12 @@ public sealed record AdventureSauvegarde(
 /// jeu de la cartouche de l'aventure (le fichier du dossier de sauvegardes de l'aventure), une capture si RetroArch en rend une.
 /// Garde la version sur le disque, l'inscrit dans la file d'envoi, rien de plus : l'envoi est celui de <see cref="AdventureFileDEnvoi"/>.
 ///
-/// L'emplacement 96 est reserve a Adventure (le 97 l'est au depart pret de MULTIPLAYER) : jamais un etat du joueur.
+/// PROUVE AU BANC (26/11, RetroArch NelfePlay 1.22.2) : <c>SAVE_STATE_SLOT n</c> n'existe PAS (« Unrecognized command »). <c>SAVE_STATE</c> ecrit
+/// <c>&lt;rom&gt;.state</c> (emplacement courant, 0) dans le dossier des etats ET <c>&lt;rom&gt;.state.png</c>, la capture de cet instant : c'est la
+/// capture de la version. Le dossier des etats est celui de l'AVENTURE (reglage de la seance) : jamais un etat du joueur.
 /// </summary>
 public sealed class AdventureSauveur
 {
-    public const int Emplacement = 96;
-
     private readonly ICommandesRetroArch _commandes;
     private readonly AdventureStockage _stockage;
     private readonly AdventureFileDEnvoi _file;
@@ -131,17 +131,31 @@ public sealed class AdventureSauveur
             return null;
         }
 
-        var fichier = Path.Combine(dossier, _seance.NomDeLaRom + ".state" + Emplacement.ToString(CultureInfo.InvariantCulture));
+        var fichier = Path.Combine(dossier, _seance.NomDeLaRom + ".state");
         var avant = File.Exists(fichier) ? File.GetLastWriteTimeUtc(fichier) : DateTime.MinValue;
         var debutDeLaDemande = DateTime.UtcNow.AddSeconds(-1);
-        await _commandes.EnvoyerAsync("SAVE_STATE_SLOT " + Emplacement.ToString(CultureInfo.InvariantCulture), ct).ConfigureAwait(false);
+        await _commandes.EnvoyerAsync("SAVE_STATE", ct).ConfigureAwait(false);
         var etat = await AttendreUnFichierAsync(fichier, avant > debutDeLaDemande ? avant : debutDeLaDemande, ct).ConfigureAwait(false);
         if (etat is null)
         {
             return null;
         }
 
-        var capture = await PrendreUneCaptureAsync(ct).ConfigureAwait(false);
+        // La capture de RetroArch pour cet etat (<rom>.state.png), ecrite avec lui : facultative.
+        byte[]? capture = null;
+        try
+        {
+            var png = fichier + ".png";
+            if (File.Exists(png) && File.GetLastWriteTimeUtc(png) >= debutDeLaDemande)
+            {
+                capture = ReadShared(png);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Une capture qui manque n'empeche pas la version.
+        }
+
         return Garder(raison, etat, LireLaCartouche(), capture);
     }
 
@@ -219,42 +233,6 @@ public sealed class AdventureSauveur
             }
 
             await Task.Delay(150, ct).ConfigureAwait(false);
-        }
-
-        return null;
-    }
-
-    private async Task<byte[]?> PrendreUneCaptureAsync(CancellationToken ct)
-    {
-        try
-        {
-            var reponse = await _commandes.DemanderAsync("GET_CONFIG_PARAM screenshot_directory", ct).ConfigureAwait(false);
-            const string prefixe = "GET_CONFIG_PARAM screenshot_directory ";
-            if (reponse is null || !reponse.StartsWith(prefixe, StringComparison.Ordinal) || reponse.Length <= prefixe.Length)
-            {
-                return null;
-            }
-
-            var dossier = reponse[prefixe.Length..].Trim();
-            var avant = DateTime.UtcNow.AddSeconds(-1);
-            await _commandes.EnvoyerAsync("SCREENSHOT", ct).ConfigureAwait(false);
-            for (var i = 0; i < 10 && Directory.Exists(dossier); i++)
-            {
-                await Task.Delay(150, ct).ConfigureAwait(false);
-                var recent = new DirectoryInfo(dossier).EnumerateFiles("*.png").Where(f => f.LastWriteTimeUtc >= avant)
-                    .OrderByDescending(f => f.LastWriteTimeUtc).FirstOrDefault();
-                if (recent is not null)
-                {
-                    // La capture est un objet de la version, pas un fichier du joueur : la copie gardee, l'original rendu.
-                    var octets = ReadShared(recent.FullName);
-                    try { recent.Delete(); } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
-                    return octets;
-                }
-            }
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            // Une capture qui manque n'empeche pas la version.
         }
 
         return null;

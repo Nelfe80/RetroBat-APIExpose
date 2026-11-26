@@ -341,15 +341,12 @@ public class AdventureTests : IDisposable
         public Task EnvoyerAsync(string commande, CancellationToken ct)
         {
             Recues.Add(commande);
-            if (!NeEcritRien && commande.StartsWith("SAVE_STATE_SLOT ", StringComparison.Ordinal))
+            // Prouve au banc : SAVE_STATE_SLOT n'existe pas ; SAVE_STATE ecrit <rom>.state et sa capture <rom>.state.png.
+            if (!NeEcritRien && commande == "SAVE_STATE")
             {
                 Directory.CreateDirectory(etats);
-                File.WriteAllText(Path.Combine(etats, "kirby.state" + commande.Split(' ')[1]), Etat);
-            }
-            else if (!NeEcritRien && commande == "SCREENSHOT")
-            {
-                Directory.CreateDirectory(captures);
-                File.WriteAllBytes(Path.Combine(captures, "kirby-" + Guid.NewGuid().ToString("N")[..6] + ".png"), [0x89, 0x50, 0x4e, 0x47]);
+                File.WriteAllText(Path.Combine(etats, "kirby.state"), Etat);
+                File.WriteAllBytes(Path.Combine(etats, "kirby.state.png"), [0x89, 0x50, 0x4e, 0x47]);
             }
 
             return Task.CompletedTask;
@@ -380,7 +377,8 @@ public class AdventureTests : IDisposable
         var version = await sauveur.SauverAsync(AdventureRaisons.Reguliere, CancellationToken.None);
 
         Assert.NotNull(version);
-        Assert.Contains("SAVE_STATE_SLOT " + AdventureSauveur.Emplacement, retroarch.Recues);
+        Assert.Contains("SAVE_STATE", retroarch.Recues);
+        Assert.DoesNotContain(retroarch.Recues, c => c.StartsWith("SAVE_STATE_SLOT", StringComparison.Ordinal));   // la commande n'existe pas
         Assert.Equal(Encoding.UTF8.GetBytes("etat de la partie"), stockage.LireObjet(version!.StateSha256));
         Assert.Equal(Encoding.UTF8.GetBytes("progression du jeu"), stockage.LireObjet(version.SaveSha256));
         Assert.NotNull(stockage.LireObjet(version.CaptureSha256));
@@ -395,14 +393,13 @@ public class AdventureTests : IDisposable
     }
 
     [Fact]
-    public async Task L_emplacement_de_l_aventure_n_est_jamais_celui_du_depart_pret_ni_un_etat_du_joueur()
+    public async Task Sauver_ne_charge_jamais_un_etat_et_prend_la_capture_de_l_etat()
     {
-        Assert.NotEqual(MultiplayerDepartPret.Emplacement, AdventureSauveur.Emplacement);
-        Assert.True(AdventureSauveur.Emplacement >= 90);
-        var (sauveur, retroarch, _, _) = UnSauveur();
-        await sauveur.SauverAsync(AdventureRaisons.Fin, CancellationToken.None);
+        var (sauveur, retroarch, stockage, _) = UnSauveur();
+        var version = await sauveur.SauverAsync(AdventureRaisons.Fin, CancellationToken.None);
         Assert.DoesNotContain(retroarch.Recues, c => c.StartsWith("LOAD_STATE", StringComparison.Ordinal));
-        Assert.DoesNotContain(retroarch.Recues, c => c == "SAVE_STATE");
+        Assert.DoesNotContain(retroarch.Recues, c => c == "SCREENSHOT");   // la capture est le .state.png : GET_CONFIG_PARAM screenshot_directory n'est pas pris en charge
+        Assert.Equal([0x89, 0x50, 0x4e, 0x47], stockage.LireObjet(version!.CaptureSha256));
     }
 
     [Fact]
@@ -632,6 +629,9 @@ public class AdventureTests : IDisposable
         Assert.Equal("false", reglages["sort_savefiles_enable"]);
         Assert.Equal("false", reglages["sort_savefiles_by_content_enable"]);
         Assert.StartsWith(stockage.Racine, reglages["savefile_directory"]);
+        // Les ETATS aussi (SAVE_STATE, autosave, depart pret) : le dossier de l'aventure, emplacement 0, jamais les etats du joueur.
+        Assert.Equal(stockage.DossierDesEtats("av-1"), reglages["savestate_directory"]);
+        Assert.Equal("0", reglages["state_slot"]);
     }
 
     [Theory]
@@ -716,7 +716,7 @@ public class AdventureTests : IDisposable
         var fin = Assert.Single(stockage.Versions("av-1"));
         Assert.Equal(AdventureRaisons.Fin, fin.Reason);
         Assert.Equal("s-77", fin.SessionId);   // la version tardive designe sa seance
-        Assert.Contains("SAVE_STATE_SLOT " + AdventureSauveur.Emplacement, retroarch.Recues);
+        Assert.Contains("SAVE_STATE", retroarch.Recues);
 
         var site = (FauxSite)typeof(AdventureSeanceService).GetField("_site", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(service)!;
         await service.TermineeAsync(salle);
@@ -1281,21 +1281,20 @@ public class AdventureTests : IDisposable
     [Fact]
     public async Task Un_etat_de_sortie_d_une_seance_d_avant_est_efface_avant_le_lancement()
     {
-        var (service, _, _, _) = UneSeance();
-        var etats = Path.Combine(_racine, "etats-rom");
-        Directory.CreateDirectory(Path.Combine(etats, "mgba"));
+        var (service, _, stockage, _) = UneSeance();
+        var etats = stockage.DossierDesEtats("av-1");
+        Directory.CreateDirectory(etats);
         var vieux = Path.Combine(etats, "kirby.state.auto");
-        var vieuxDeCoeur = Path.Combine(etats, "mgba", "kirby.state.auto");
+        var vieuxPng = Path.Combine(etats, "kirby.state.auto.png");
         var autre = Path.Combine(etats, "autre.state.auto");
         File.WriteAllText(vieux, "x");
-        File.WriteAllText(vieuxDeCoeur, "x");
+        File.WriteAllText(vieuxPng, "x");
         File.WriteAllText(autre, "x");
-        service.DossierDesEtatsLocal = () => etats;
 
         await service.PreparerAsync(Salle(2), Jeu(Path.Combine(_racine, "kirby.gba")), CancellationToken.None);
 
         Assert.False(File.Exists(vieux));
-        Assert.False(File.Exists(vieuxDeCoeur));
+        Assert.False(File.Exists(vieuxPng));
         Assert.True(File.Exists(autre));   // celui d'une autre ROM n'est pas touche
     }
 
@@ -1377,6 +1376,134 @@ public class AdventureTests : IDisposable
 
         Assert.Equal(ModeDeReprise.Etat, service.De("r1")!.Decision.Mode);
         Assert.Empty(Directory.EnumerateFiles(stockage.DossierDesSauvegardes("av-1")));   // rien n'a ete pose
+    }
+
+    // ── la sauvegarde de la cartouche DANS l'etat (charger un etat restaure son SAVEDATA) ───────────
+
+    private const string EtatKirby2P = @"E:\claude_travail\worktrees\datapack-adventuredventure\states\gba\kirby-amazing-mirrorventure-2p-mgba-splitscreen.state";
+
+    [Fact]
+    public void Le_SAVEDATA_d_un_etat_mGBA_Splitscreen_se_lit_et_se_remplace_sans_toucher_au_reste()
+    {
+        if (!File.Exists(EtatKirby2P))
+        {
+            return;
+        }
+
+        var fichier = File.ReadAllBytes(EtatKirby2P);
+        var brut = AdventureEtat.Decompresser(fichier)!;
+        var (decalage, taille) = AdventureEtat.TrouverLaSauvegarde(brut)!.Value;
+        Assert.Equal(32768, taille);
+        Assert.Equal(32768, AdventureEtat.LireLaSauvegarde(fichier)!.Length);
+        Assert.Equal(32768, AdventureEtat.LireLaSauvegarde(fichier, console: 2)!.Length);
+
+        var marque = Enumerable.Repeat((byte)0xA5, 32768).ToArray();
+        var retouche = AdventureEtat.PoserLaSauvegarde(fichier, marque)!;
+        Assert.Equal(brut.Length, retouche.Length);
+        Assert.Equal(marque, AdventureEtat.LireLaSauvegarde(retouche));
+        // Rien d'autre ne bouge : la console 2 garde la sienne, et tout l'etat hors de cet emplacement est identique.
+        Assert.Equal(AdventureEtat.LireLaSauvegarde(fichier, console: 2), AdventureEtat.LireLaSauvegarde(retouche, console: 2));
+        for (var i = 0; i < brut.Length; i++)
+        {
+            if (i >= decalage && i < decalage + taille)
+            {
+                continue;
+            }
+
+            Assert.True(brut[i] == retouche[i], "octet " + i);
+        }
+    }
+
+    [Fact]
+    public void Une_sauvegarde_plus_petite_est_completee_de_FF_une_plus_grande_est_refusee_un_etat_illisible_aussi()
+    {
+        if (!File.Exists(EtatKirby2P))
+        {
+            return;
+        }
+
+        var fichier = File.ReadAllBytes(EtatKirby2P);
+        var petite = AdventureEtat.LireLaSauvegarde(AdventureEtat.PoserLaSauvegarde(fichier, [1, 2, 3])!)!;
+        Assert.Equal([1, 2, 3, 0xFF], petite.Take(4).ToArray());
+        Assert.All(petite.Skip(3), b => Assert.Equal(0xFF, b));
+        Assert.Null(AdventureEtat.PoserLaSauvegarde(fichier, new byte[40000]));
+        Assert.Null(AdventureEtat.PoserLaSauvegarde([1, 2, 3, 4], [1]));
+        Assert.Null(AdventureEtat.LireLaSauvegarde(Encoding.ASCII.GetBytes("#RZIPv-pas-un-etat-du-tout")));
+    }
+
+    [Fact]
+    public async Task Une_reprise_a_un_autre_nombre_de_joueurs_place_la_sauvegarde_de_l_aventure_DANS_le_depart_pret()
+    {
+        // Prouve au banc (26/11) : charger un etat restaure son SAVEDATA et ecrase le .srm pose. La sauvegarde est donc placee dans l'etat.
+        if (!File.Exists(EtatKirby2P))
+        {
+            return;
+        }
+
+        var dossier = Path.Combine(_racine, "resources", "adventure");
+        Directory.CreateDirectory(Path.Combine(dossier, "states"));
+        var original = File.ReadAllBytes(EtatKirby2P);
+        File.WriteAllBytes(Path.Combine(dossier, "states", "kirby-2p.state"), original);
+        var catalogue = new AdventureCatalogueStore(path: Catalogue([new
+        {
+            id = "gba/kirby", system = "gba", name = "Kirby", players = new { min = 2, max = 2 }, core = "mgba_splitscreen", level = "nelfeplay",
+            content = new { md5 = new[] { "md5kirby" } },
+            start = new { state = "states/kirby-2p.state", sha256 = AdventureStockage.Empreinte(original), players = 2, content = "md5kirby" },
+            adventure = new { cartridge_save = new { console = 1, file = "{rom}.srm", kind = "gba_srm_slots" } },
+        }]));
+        var stockage = Stockage();
+        var site = new FauxSite { Aventure = new AdventureInfo { Id = "av-1", Game = "gba/kirby", Content = "md5kirby", Seats = 4 } };
+        // La derniere version etait a 4 joueurs : un autre nombre, donc partie neuve + sauvegarde de la cartouche (le .srm : 4 emplacements).
+        var srm = Enumerable.Repeat((byte)0xFF, 131072).ToArray();
+        Array.Fill(srm, (byte)0xA5, 0, 32768);
+        var version = new AdventureVersion
+        {
+            Id = "v1", Adventure = "av-1", Players = 4, CoreSha256 = "coeur-sha", CreatedUtc = _heure.AddHours(-1),
+            StateSha256 = stockage.PoserObjet([1, 2, 3]), SaveSha256 = stockage.PoserObjet(srm),
+        };
+        site.Aventure = site.Aventure with { Latest = version };
+        var service = new AdventureSeanceService(site, stockage, new AdventureFileDEnvoi(stockage), () => new FauxRetroArch("e", "c"), _ => "coeur-sha", () => _heure, catalogue: catalogue);
+        var jeu = new MultiplayerInstalledGame(Assert.Single(catalogue.Entrees(out _)).Jeu, Path.Combine(_racine, "kirby.gba"), new MultiplayerCore { Core = "mgba_splitscreen" }, "md5kirby");
+        var salle = Salle(2);
+
+        Assert.True(await service.PreparerAsync(salle, jeu, CancellationToken.None));
+
+        Assert.Equal(ModeDeReprise.NeufAvecSauvegarde, service.De("r1")!.Decision.Mode);
+        var depart = service.DepartDe(salle)!;
+        Assert.NotEqual(EtatKirby2P, depart.State);
+        var retouche = File.ReadAllBytes(depart.State);
+        Assert.Equal(AdventureStockage.Empreinte(retouche), depart.Sha256, ignoreCase: true);   // sa propre empreinte : MultiplayerDepartPret la verifie
+        Assert.Equal(srm.AsSpan(0, 32768).ToArray(), AdventureEtat.LireLaSauvegarde(retouche));   // la console 1 a la sauvegarde de l'aventure
+        Assert.Equal(AdventureEtat.LireLaSauvegarde(original, console: 2), AdventureEtat.LireLaSauvegarde(retouche, console: 2));
+        // Le fichier de l'aventure est pose aussi : un depart a froid le relirait.
+        Assert.Equal(srm, File.ReadAllBytes(Path.Combine(stockage.DossierDesSauvegardes("av-1"), "kirby.srm")));
+    }
+
+    [Fact]
+    public async Task Une_sauvegarde_qui_ne_peut_pas_entrer_dans_l_etat_donne_un_depart_a_froid_jamais_un_depart_qui_l_ecrase()
+    {
+        var etat = Encoding.UTF8.GetBytes("pas un etat mGBA");
+        var dossier = Path.Combine(_racine, "resources", "adventure");
+        Directory.CreateDirectory(Path.Combine(dossier, "states"));
+        File.WriteAllBytes(Path.Combine(dossier, "states", "x.state"), etat);
+        var catalogue = new AdventureCatalogueStore(path: Catalogue([new
+        {
+            id = "gba/kirby", system = "gba", name = "Kirby", players = new { min = 2, max = 2 }, core = "mgba_splitscreen", level = "nelfeplay",
+            content = new { md5 = new[] { "md5kirby" } },
+            start = new { state = "states/x.state", sha256 = AdventureStockage.Empreinte(etat), players = 2, content = "md5kirby" },
+            adventure = new { cartridge_save = new { console = 1, file = "{rom}.srm", kind = "gba_srm_slots" } },
+        }]));
+        var stockage = Stockage();
+        var site = new FauxSite { Aventure = new AdventureInfo { Id = "av-1", Game = "gba/kirby", Content = "md5kirby", Seats = 4 } };
+        var version = new AdventureVersion { Id = "v1", Adventure = "av-1", Players = 4, CoreSha256 = "coeur-sha", CreatedUtc = _heure.AddHours(-1), StateSha256 = stockage.PoserObjet([1]), SaveSha256 = stockage.PoserObjet([9, 9]) };
+        site.Aventure = site.Aventure with { Latest = version };
+        var service = new AdventureSeanceService(site, stockage, new AdventureFileDEnvoi(stockage), () => new FauxRetroArch("e", "c"), _ => "coeur-sha", () => _heure, catalogue: catalogue);
+        var jeu = new MultiplayerInstalledGame(Assert.Single(catalogue.Entrees(out _)).Jeu, Path.Combine(_racine, "kirby.gba"), new MultiplayerCore { Core = "mgba_splitscreen" }, "md5kirby");
+
+        Assert.True(await service.PreparerAsync(Salle(2), jeu, CancellationToken.None));
+
+        Assert.Null(service.DepartDe(Salle(2)));   // le jeu part a froid et relit le .srm pose
+        Assert.Equal([9, 9], File.ReadAllBytes(Path.Combine(stockage.DossierDesSauvegardes("av-1"), "kirby.srm")));
     }
 
     // ── NEW ADVENTURE dans la session ───────────────────────────────────────────────────────────────

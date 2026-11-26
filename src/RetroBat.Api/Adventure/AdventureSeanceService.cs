@@ -178,7 +178,7 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
         var sansFichier = fichier.Length == 0;
         var cartouche = sansFichier ? string.Empty : Path.Combine(dossier, fichier);
         // L'etat de sortie d'une seance d'avant ne se charge jamais a ce depart (autosave du catalogue : RetroArch le rechargerait).
-        EffacerLEtatDeSortie(nomDeLaRom);
+        EffacerLEtatDeSortie(id, nomDeLaRom);
         MultiplayerStart? depart = null;
         switch (decision.Mode)
         {
@@ -220,6 +220,14 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
                 }
 
                 depart = DepartDuCatalogue(jeu, joueurs);
+                // CHARGER UN ETAT RESTAURE SON SAVEDATA (prouve au banc le 26/11 : la sauvegarde posee est ecrasee) : la sauvegarde de
+                // l'aventure est placee DANS le depart pret avant qu'on le charge. Impossible (autre cœur, format inconnu) : pas de depart
+                // pret, un depart a froid, et le jeu relit le .srm pose.
+                if (depart is not null && !sansFichier)
+                {
+                    depart = DepartAvecLaSauvegarde(depart, sauvegarde, id, specification);
+                }
+
                 break;
             }
             default:
@@ -314,23 +322,57 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
         return chemin.StartsWith(Path.GetFullPath(dossier), StringComparison.OrdinalIgnoreCase) ? depart with { State = chemin } : null;
     }
 
+    /// <summary>
+    /// Le depart pret dont le SAVEDATA de la console de la cartouche est celui de l'aventure : un fichier derive, range dans le dossier
+    /// d'Adventure (<c>departs\</c>), son empreinte a lui. Seulement pour le .srm de mGBA Splitscreen (<c>gba_srm_slots</c>) ; null sinon.
+    /// </summary>
+    private MultiplayerStart? DepartAvecLaSauvegarde(MultiplayerStart depart, byte[] sauvegarde, string aventure, AdventureSpec spec)
+    {
+        if (!string.Equals(spec.Cartridge?.Kind, "gba_srm_slots", StringComparison.OrdinalIgnoreCase))
+        {
+            _journal?.LogInformation("ADVENTURE : sauvegarde de {Aventure} non placee dans le depart (format {Format}) : depart a froid", aventure, spec.Cartridge?.Kind ?? "inconnu");
+            return null;
+        }
+
+        try
+        {
+            var retouche = AdventureEtat.PoserLaSauvegarde(File.ReadAllBytes(depart.State), sauvegarde, spec.Cartridge!.Console, tronquer: true);
+            if (retouche is null)
+            {
+                _journal?.LogWarning("ADVENTURE : sauvegarde de {Aventure} non placee dans l'etat de depart : depart a froid", aventure);
+                return null;
+            }
+
+            var sha = AdventureStockage.Empreinte(retouche);
+            var dossier = Path.Combine(_stockage.Racine, "departs");
+            Directory.CreateDirectory(dossier);
+            var chemin = Path.Combine(dossier, sha + ".state");
+            if (!File.Exists(chemin))
+            {
+                File.WriteAllBytes(chemin, retouche);
+            }
+
+            return depart with { State = chemin, Sha256 = sha };
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _journal?.LogWarning(ex, "ADVENTURE : depart de {Aventure} non retouche : depart a froid", aventure);
+            return null;
+        }
+    }
+
     /// <summary>Efface l'etat de sortie (<c>&lt;rom&gt;.state.auto</c>) d'une seance d'avant : dans le dossier des etats de RetroArch et ses sous-dossiers directs.</summary>
-    private void EffacerLEtatDeSortie(string nomDeLaRom)
+    private void EffacerLEtatDeSortie(string aventure, string nomDeLaRom)
     {
         try
         {
-            if (DossierDesEtatsLocal() is not { Length: > 0 } dossier || !Directory.Exists(dossier))
+            // Le dossier des etats est celui de l'AVENTURE (reglage de la seance) : RetroArch y ecrit l'etat de sortie a la fermeture (prouve au
+            // banc) et le RECHARGE tout seul au lancement suivant tant que l'autosave est allume : on l'efface avant chaque lancement.
+            var dossier = _stockage.DossierDesEtats(aventure);
+            Directory.CreateDirectory(dossier);
+            foreach (var auto in Directory.EnumerateFiles(dossier, nomDeLaRom + ".state.auto*"))
             {
-                return;
-            }
-
-            foreach (var chemin in new[] { dossier }.Concat(Directory.EnumerateDirectories(dossier)))
-            {
-                var auto = Path.Combine(chemin, nomDeLaRom + ".state.auto");
-                if (File.Exists(auto))
-                {
-                    File.Delete(auto);
-                }
+                File.Delete(auto);
             }
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -367,6 +409,12 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
             ? new Dictionary<string, string>(StringComparer.Ordinal)
             {
                 ["savefile_directory"] = seance.DossierDesSauvegardes,
+                // Les ETATS aussi : SAVE_STATE et l'autosave ecrivent dans le dossier de l'aventure, l'emplacement courant est le 0.
+                ["savestate_directory"] = EnsureDir(_stockage.DossierDesEtats(seance.Aventure.Id)),
+                ["state_slot"] = "0",
+                ["savestate_auto_index"] = "false",
+                ["sort_savestates_enable"] = "false",
+                ["sort_savestates_by_content_enable"] = "false",
                 ["sort_savefiles_enable"] = "false",
                 ["sort_savefiles_by_content_enable"] = "false",
                 ["autosave_interval"] = "10",
@@ -498,7 +546,7 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
         }
 
         seance.Suivi?.Cancel();
-        if (!seance.Fermee && DossierDesEtatsLocal() is { } dossier && seance.Sauveur.DepuisLEtatDeSortie(dossier) is { } sortie)
+        if (!seance.Fermee && seance.Sauveur.DepuisLEtatDeSortie(_stockage.DossierDesEtats(seance.Aventure.Id)) is { } sortie)
         {
             _journal?.LogInformation("ADVENTURE : version de sortie {Version} de {Aventure}", sortie.Id, seance.Aventure.Id);
         }
@@ -515,8 +563,6 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
         }
     }
 
-    /// <summary>Le dossier des etats de RetroArch, lu dans sa configuration (RetroArch est ferme : plus de commande reseau).</summary>
-    internal Func<string?> DossierDesEtatsLocal { get; set; } = () => null;
 
     // ── pour les routes locales ────────────────────────────────────────────────────────────────────
 
