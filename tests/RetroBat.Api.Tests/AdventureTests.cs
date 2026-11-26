@@ -631,6 +631,9 @@ public class AdventureTests : IDisposable
         Assert.Equal(stockage.DossierDesEtats("av-1"), reglages["retroarch.savestate_directory"]);
         Assert.Equal("false", reglages["retroarch.savestate_auto_index"]);
         Assert.Equal("0", reglages["retroarch.state_slot"]);
+        // L'etat de sortie s'ecrit a la fermeture et ne se recharge JAMAIS (le -autosave 1 du catalogue ne passait pas : le premier -autosave du lanceur gagne).
+        Assert.Equal("true", reglages["retroarch.savestate_auto_save"]);
+        Assert.Equal("false", reglages["retroarch.savestate_auto_load"]);
         Assert.Equal("false", reglages["retroarch.sort_savefiles_enable"]);
         Assert.StartsWith(stockage.Racine, reglages["retroarch.savefile_directory"]);
         Assert.All(reglages.Keys, k => Assert.StartsWith("retroarch.", k));

@@ -441,6 +441,10 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
             reglages["retroarch.savestate_directory"] = EnsureDir(_stockage.DossierDesEtats(id));
             reglages["retroarch.savestate_auto_index"] = "false";
             reglages["retroarch.state_slot"] = "0";
+            // L'ETAT DE SORTIE (fin quand le joueur ferme lui-meme) : ecrit a la fermeture, JAMAIS recharge au lancement (« -autosave 1 » du
+            // catalogue ne passait pas : le lanceur garde le premier -autosave, celui du temps partage, a 0).
+            reglages["retroarch.savestate_auto_save"] = "true";
+            reglages["retroarch.savestate_auto_load"] = "false";
             reglages["retroarch.sort_savestates_enable"] = "false";
             reglages["retroarch.sort_savestates_by_content_enable"] = "false";
         }

@@ -39,6 +39,14 @@ public sealed class MultiplayerSessionService : BackgroundService
     /// </summary>
     internal static readonly TimeSpan PeriodeAuRepos = TimeSpan.FromMinutes(5);
 
+    /// <summary>
+    /// AU REPOS, BORNE QUI N'A QUE NELFEPLAY ADVENTURE (26/11) : MULTIPLAYER cache, la collection d'aventures visible (par defaut) fait sonder
+    /// la borne comme avant. Une invitation d'aventure vaut 7 jours et une aventure se reprend a la demande : un sondage toutes les 15 minutes
+    /// au repos (96 par jour, trois fois moins que les 5 minutes de MULTIPLAYER) ; des qu'on est dans la collection, qu'un joueur est la ou
+    /// qu'une salle existe, les cadences sont les memes.
+    /// </summary>
+    internal static readonly TimeSpan PeriodeAuReposAdventure = TimeSpan.FromMinutes(15);
+
     /// <summary>Sans geste depuis ce temps, personne n'est devant la borne.</summary>
     internal static readonly TimeSpan AbsenceAvantLeRepos = TimeSpan.FromMinutes(5);
 
@@ -155,7 +163,7 @@ public sealed class MultiplayerSessionService : BackgroundService
     /// (<paramref name="alea"/> de 0 a 1) : les bornes ne repartent pas toutes ensemble apres une coupure du site.
     /// </summary>
     internal static TimeSpan Cadence(bool salle, bool invitation, bool enPartieSolo, bool dansLaCollection, bool joueurPresent,
-        TimeSpan? duSite, int echecs, double alea)
+        TimeSpan? duSite, int echecs, double alea, bool reposLent = false)
     {
         TimeSpan attente;
         if (enPartieSolo && !salle)
@@ -173,6 +181,7 @@ public sealed class MultiplayerSessionService : BackgroundService
             attente = salle ? PeriodeActive
                 : dansLaCollection || (invitation && joueurPresent) ? PeriodeDansLaCollection
                 : joueurPresent ? PeriodeJoueurPresent
+                : reposLent ? PeriodeAuReposAdventure
                 : PeriodeAuRepos;
         }
 
@@ -227,6 +236,9 @@ public sealed class MultiplayerSessionService : BackgroundService
     public Func<bool>? EnPartie { get; set; }
 
     /// <summary>Le sondage tourne des qu'une des deux collections (MULTIPLAYER, NelfePlay Adventure) est allumee : les gamerooms d'aventure passent par lui.</summary>
+    /// <summary>MULTIPLAYER cache et NelfePlay Adventure visible : la borne ne sonde que pour les aventures.</summary>
+    private bool SeulementAdventure => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: false, ShowAdventureCollection: true };
+
     private bool Active => _options.CurrentValue.NelfePlay is { Enabled: true } np && (np.ShowMultiplayerCollection || np.ShowAdventureCollection);
 
     /// <summary>Ce que la borne se donne pour dire son depart a la plateforme, l'arret de l'API n'attend pas plus.</summary>
@@ -262,7 +274,7 @@ public sealed class MultiplayerSessionService : BackgroundService
                 var etat = Etat;
                 var attente = !Active ? PeriodeJoueurPresent
                     : Cadence(etat.Rooms.Count > 0, etat.Invitations.Count > 0, solo, DansLaCollection?.Invoke() == true,
-                        JoueurPresent(DateTime.UtcNow), _cadenceDuSite, _echecs, Random.Shared.NextDouble());
+                        JoueurPresent(DateTime.UtcNow), _cadenceDuSite, _echecs, Random.Shared.NextDouble(), SeulementAdventure);
                 using var lie = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, _reveil.Token);
                 try
                 {
