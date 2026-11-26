@@ -222,7 +222,7 @@ public static class MultiplayerLaunchPlan
     /// decor qui porte les panneaux en jeu (<see cref="MultiplayerDecor"/>), ou null.
     /// </summary>
     public static string? Arguments(string manettes, string systeme, string coeur, string rom, MultiplayerGame jeu, int place, IEnumerable<string> netplay,
-        int joueurs = 2, string? decor = null)
+        int joueurs = 2, string? decor = null, IReadOnlyDictionary<string, string>? reglagesDuLanceur = null)
     {
         if (!CommandsController.NomDeLanceur(systeme) || !CommandsController.NomDeLanceur(coeur))
         {
@@ -234,6 +234,16 @@ public static class MultiplayerLaunchPlan
         morceaux.AddRange(RetroBat.Api.Infrastructure.NotificationsRetroArch.Arguments);
         morceaux.AddRange(ArgumentsDuTempsPartage);
         morceaux.AddRange(ArgumentsDuJeu(jeu));
+        if (reglagesDuLanceur is { Count: > 0 })
+        {
+            if (ReglagesRetroArch(reglagesDuLanceur) is not { } reglages)
+            {
+                return null;
+            }
+
+            morceaux.AddRange(reglages);
+        }
+
         if (ShaderDeLaPlace(jeu, place, joueurs) is { } shader)
         {
             // Un seul ecran, au format de la borne d'origine, sans habillage qui decalerait l'image. Une vue d'ecran partage
@@ -268,6 +278,47 @@ public static class MultiplayerLaunchPlan
     /// </summary>
     internal static readonly IReadOnlyList<string> ArgumentsDuTempsPartage =
         ["-rewind", "0", "-autosave", "0", "-runahead", "0", "-fastforward_ratio", "1.000000"];
+
+    /// <summary>
+    /// LES REGLAGES DE RETROARCH QUE LE LANCEUR N'ECRASE PAS (26/11, emulatorLauncher 1.0.0.3744 decompile) : il reecrit
+    /// <c>savefile_directory</c>, <c>savestate_directory</c> et <c>savestate_auto_index</c> dans retroarch.cfg a chaque lancement, mais copie
+    /// pour finir toute cle <c>retroarch.&lt;nom&gt;</c> de sa ligne de commande (lue en dernier) apres les siennes. Une paire
+    /// <c>-retroarch.&lt;nom&gt; "valeur"</c> par reglage. La cle est un nom de lanceur ; la valeur, un nom ou un CHEMIN ABSOLU (le lanceur
+    /// refuse « : » et « \ » dans un nom, pas dans un chemin entre guillemets) sans guillemet ni retour a la ligne ni « \ » final (il
+    /// echapperait le guillemet fermant). Null : une cle ou une valeur refusee, le lancement ne part pas.
+    /// </summary>
+    internal static IReadOnlyList<string>? ReglagesRetroArch(IReadOnlyDictionary<string, string> reglages)
+    {
+        var morceaux = new List<string>();
+        foreach (var (cle, valeur) in reglages.OrderBy(p => p.Key, StringComparer.Ordinal))
+        {
+            if (!cle.StartsWith("retroarch.", StringComparison.Ordinal) || !CommandsController.NomDeLanceur(cle))
+            {
+                return null;
+            }
+
+            if (CommandsController.NomDeLanceur(valeur))
+            {
+                morceaux.Add("-" + cle);
+                morceaux.Add(valeur);
+            }
+            else if (CheminPourLeLanceur(valeur))
+            {
+                morceaux.Add("-" + cle);
+                morceaux.Add('"' + valeur + '"');
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        return morceaux;
+    }
+
+    private static bool CheminPourLeLanceur(string valeur)
+        => valeur.Length is > 3 and <= 240 && char.IsAsciiLetter(valeur[0]) && valeur[1] == ':' && valeur[2] == '\\'
+           && valeur[^1] != '\\' && valeur[^1] != ' ' && !valeur.Any(c => c is '"' or '\r' or '\n' or '\0' or '%' or '<' or '>' or '|' or '*' or '?');
 
     /// <summary>
     /// Les reglages du jeu que le lanceur reecrirait sinon (<see cref="MultiplayerGame.LauncherOptions"/>), en paires
