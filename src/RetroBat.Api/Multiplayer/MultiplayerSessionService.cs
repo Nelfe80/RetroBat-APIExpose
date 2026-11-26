@@ -226,7 +226,8 @@ public sealed class MultiplayerSessionService : BackgroundService
     /// <summary>Le joueur est en partie (ou devant son ecran de fin) : le site met l'echeance de ses invitations en pause (30/10).</summary>
     public Func<bool>? EnPartie { get; set; }
 
-    private bool Active => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: true };
+    /// <summary>Le sondage tourne des qu'une des deux collections (MULTIPLAYER, NelfePlay Adventure) est allumee : les gamerooms d'aventure passent par lui.</summary>
+    private bool Active => _options.CurrentValue.NelfePlay is { Enabled: true } np && (np.ShowMultiplayerCollection || np.ShowAdventureCollection);
 
     /// <summary>Ce que la borne se donne pour dire son depart a la plateforme, l'arret de l'API n'attend pas plus.</summary>
     private static readonly TimeSpan DelaiDuDepart = TimeSpan.FromSeconds(3);
@@ -355,6 +356,29 @@ public sealed class MultiplayerSessionService : BackgroundService
         if (jeu is null)
         {
             return "not_multiplayer";
+        }
+
+        if (EstUneAventure(jeu))
+        {
+            // Pas de gameroom publique ni d'amis pour une aventure : sa seance est celle du site (de sorte « friends »).
+            if (sorte is not null)
+            {
+                return null;
+            }
+
+            if (RejoindreUneAventure is null)
+            {
+                return "adventure_unavailable";
+            }
+
+            _appui = true;
+            var refusAventure = await RejoindreUneAventure(jeu, ct).ConfigureAwait(false);
+            if (refusAventure is null)
+            {
+                await SonderAsync(ct).ConfigureAwait(false);
+            }
+
+            return refusAventure;
         }
 
         if (_relais is not null && _relais.MeilleurTempsMs is null)
@@ -543,8 +567,19 @@ public sealed class MultiplayerSessionService : BackgroundService
             return null;
         }
 
-        return _collection.JeuxConnus().FirstOrDefault(jeu => string.Equals(Path.GetFullPath(jeu.Path), cible, StringComparison.OrdinalIgnoreCase));
+        return _collection.JeuxConnus().Concat(JeuxSupplementaires?.Invoke() ?? [])
+            .FirstOrDefault(jeu => string.Equals(Path.GetFullPath(jeu.Path), cible, StringComparison.OrdinalIgnoreCase));
     }
+
+    /// <summary>Ce jeu est-il un jeu de la collection NelfePlay Adventure (et non de MULTIPLAYER) ?</summary>
+    public bool EstUneAventure(MultiplayerInstalledGame jeu) => (JeuxSupplementaires?.Invoke() ?? []).Any(j => ReferenceEquals(j, jeu))
+        && !_collection.JeuxConnus().Any(j => ReferenceEquals(j, jeu));
+
+    /// <summary>
+    /// L'APPUI LONG sur un jeu de la collection NelfePlay Adventure (26/11) : ouvre ou reprend l'aventure de ce jeu et place le
+    /// joueur dans la gameroom de la seance (voir <c>AdventureLancement</c>). Rend la raison d'un refus, ou null.
+    /// </summary>
+    public Func<MultiplayerInstalledGame, CancellationToken, Task<string?>>? RejoindreUneAventure { get; set; }
 
     /// <summary>
     /// Les jeux d'une autre collection que les gamerooms peuvent aussi porter (NelfePlay Adventure, 26/11) : meme calcul de

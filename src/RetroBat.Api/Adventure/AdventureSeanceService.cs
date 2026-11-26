@@ -208,7 +208,7 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
         }
 
         var sauveur = new AdventureSauveur(_commandes(), _stockage, _file,
-            new AdventureSauvegarde(id, nomDeLaRom, fichier, joueurs, coeur, version?.DurationS ?? 0, () => PlacesDe(room), version?.Seq),
+            new AdventureSauvegarde(id, nomDeLaRom, fichier, joueurs, coeur, version?.DurationS ?? 0, () => PlacesDe(room), version?.Seq, room.Adventure?.Session),
             _maintenant);
         sauveur.NoterLeDepart();
         _seances[room.Room] = new Seance

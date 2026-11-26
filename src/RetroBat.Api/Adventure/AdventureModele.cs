@@ -114,6 +114,14 @@ public sealed record AdventureVersion
     [JsonPropertyName("seq")]
     public int Seq { get; init; }
 
+    /// <summary>
+    /// La seance a laquelle appartient la version (CONTRAT.md §5, 26/11) : le site verifie alors l'hote de CETTE seance, meme si
+    /// une autre s'est ouverte depuis, et accepte la version jusqu'a 24 h apres sa fermeture. Une version tardive de la file
+    /// d'envoi en a besoin.
+    /// </summary>
+    [JsonPropertyName("session_id")]
+    public string? SessionId { get; init; }
+
     /// <summary>La version dont la seance est partie : le site la demande a chaque depot (CONTRAT.md §5).</summary>
     [JsonPropertyName("base_seq")]
     public int? BaseSeq { get; init; }

@@ -16,7 +16,8 @@ public sealed record AdventureSauvegarde(
     string? EmpreinteDuCoeur,
     long DureeDejaJouee,
     Func<IReadOnlyList<AdventurePlace>> Places,
-    int? BaseSeq = null);
+    int? BaseSeq = null,
+    string? SessionId = null);
 
 /// <summary>
 /// SAUVER, chez l'hote seul : l'etat lie (commande reseau de RetroArch dans l'emplacement reserve a l'aventure), la sauvegarde du
@@ -166,6 +167,7 @@ public sealed class AdventureSauveur
         {
             Id = AdventureStockage.NouvelIdentifiant(),
             BaseSeq = _seance.BaseSeq,
+            SessionId = _seance.SessionId,
             Adventure = _seance.Aventure,
             StateSha256 = _stockage.PoserObjet(etat),
             SaveSha256 = cartouche is { Length: > 0 } ? _stockage.PoserObjet(cartouche) : null,

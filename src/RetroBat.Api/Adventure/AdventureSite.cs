@@ -263,7 +263,8 @@ public sealed class AdventureSiteClient : IAdventureSite
 
     public async Task<AdventureSeance?> OuvrirSeanceAsync(string aventure, int joueurs, CancellationToken ct)
     {
-        var r = await AppelerAsync(HttpMethod.Post, aventure + "/session/open", new { players = joueurs, rtt_ms = (int?)null, panel = false }, ct).ConfigureAwait(false);
+        // Le site exige de 2 a « places » joueurs (une salle d'amis ne part jamais a moins de deux, CONTRAT.md §8).
+        var r = await AppelerAsync(HttpMethod.Post, aventure + "/session/open", new { players = Math.Max(2, joueurs), rtt_ms = (int?)null, panel = false }, ct).ConfigureAwait(false);
         if (r is null)
         {
             return null;
@@ -355,6 +356,8 @@ public sealed class AdventureSiteClient : IAdventureSite
         {
             // Le meme identifiant a chaque essai : l'appel est rejouable, jamais deux versions (CONTRAT.md §5).
             version_ref = version.Id,
+            // La seance d'origine : le site verifie l'hote de CETTE seance, meme apres une coupure de plus de 15 min (grace de 24 h).
+            session_id = version.SessionId,
             base_seq = version.BaseSeq,
             state_sha256 = version.StateSha256,
             save_sha256 = version.SaveSha256,

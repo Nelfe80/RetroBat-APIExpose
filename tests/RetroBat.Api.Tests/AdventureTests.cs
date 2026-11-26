@@ -143,13 +143,20 @@ public class AdventureTests : IDisposable
         public List<string> Journal { get; } = [];
         public AdventureInfo? Aventure { get; set; }
         public bool SeanceFermee { get; private set; }
+        public List<AdventureInfo> Mes { get; } = [];
+        public List<string> Creees { get; } = [];
+        public List<(string Aventure, int Joueurs)> Ouvertures { get; } = [];
+        public string? RefusDeSeance { get; set; }
         public string? RaisonDeFermeture { get; private set; }
 
         public Task<AdventureInfo?> CreerAsync(string jeu, string contenu, int places, string mode, string? titre, string? coeur, string? empreinteDuCoeur, CancellationToken ct)
-            => Task.FromResult<AdventureInfo?>(Injoignable ? null : new AdventureInfo { Id = "av-1", Game = jeu, Content = contenu, Seats = places, Mode = mode, Name = titre });
+        {
+            Creees.Add(jeu);
+            return Task.FromResult<AdventureInfo?>(Injoignable ? null : new AdventureInfo { Id = "av-neuve", Game = jeu, Content = contenu, Seats = places, Mode = mode, Name = titre });
+        }
 
         public Task<AdventureMesAventures?> MesAventuresAsync(CancellationToken ct)
-            => Task.FromResult<AdventureMesAventures?>(Injoignable ? null : new AdventureMesAventures([], []));
+            => Task.FromResult<AdventureMesAventures?>(Injoignable ? null : new AdventureMesAventures(Mes, []));
 
         public Task<IReadOnlyList<AdventureInfo>?> OuvertesAsync(string? jeu, CancellationToken ct)
             => Task.FromResult<IReadOnlyList<AdventureInfo>?>(Injoignable ? null : []);
@@ -161,7 +168,10 @@ public class AdventureTests : IDisposable
             => Task.FromResult<AdventureDerniere?>(Injoignable ? null : new AdventureDerniere(Aventure?.Latest, "state"));
 
         public Task<AdventureSeance?> OuvrirSeanceAsync(string aventure, int joueurs, CancellationToken ct)
-            => Task.FromResult<AdventureSeance?>(Injoignable ? null : new AdventureSeance { Ok = true, Room = "r1", Latest = Aventure?.Latest });
+        {
+            Ouvertures.Add((aventure, joueurs));
+            return Task.FromResult<AdventureSeance?>(Injoignable ? null : new AdventureSeance { Ok = RefusDeSeance is null, Reason = RefusDeSeance, Room = "r1", Latest = Aventure?.Latest });
+        }
 
         public Task<bool> FermerSeanceAsync(string aventure, string raison, long? dureeS, CancellationToken ct)
         {
@@ -351,7 +361,8 @@ public class AdventureTests : IDisposable
         var retroarch = new FauxRetroArch(Path.Combine(_racine, "etats"), Path.Combine(_racine, "captures"));
         var sauveur = new AdventureSauveur(retroarch, stockage, file,
             new AdventureSauvegarde("av-1", "kirby", "kirby.srm", joueurs, "coeur-sha", deja,
-                () => [new AdventurePlace { Seat = 1, Handle = "a" }, new AdventurePlace { Seat = 2, Handle = "b" }, new AdventurePlace { Seat = 3, Handle = "c" }]),
+                () => [new AdventurePlace { Seat = 1, Handle = "a" }, new AdventurePlace { Seat = 2, Handle = "b" }, new AdventurePlace { Seat = 3, Handle = "c" }],
+                SessionId: "s-42"),
             () => _heure, attenteDeLEtat: TimeSpan.FromSeconds(2));
         Directory.CreateDirectory(stockage.DossierDesSauvegardes("av-1"));
         return (sauveur, retroarch, stockage, file);
@@ -372,6 +383,7 @@ public class AdventureTests : IDisposable
         Assert.Equal(Encoding.UTF8.GetBytes("progression du jeu"), stockage.LireObjet(version.SaveSha256));
         Assert.NotNull(stockage.LireObjet(version.CaptureSha256));
         Assert.Equal(3, version.Players);
+        Assert.Equal("s-42", version.SessionId);
         Assert.Equal(["a", "b", "c"], version.Seats.Select(p => p.Handle).ToArray());
         Assert.Equal("coeur-sha", version.CoreSha256);
         Assert.Equal(600 + 12 * 60, version.DurationS);
@@ -453,7 +465,7 @@ public class AdventureTests : IDisposable
             Room = room,
             Game = "gba/kirby",
             Content = "md5kirby",
-            Adventure = new MultiplayerAventure { Id = "av-1" },
+            Adventure = new MultiplayerAventure { Id = "av-1", Session = "s-77" },
             State = "launching",
             Launch = new MultiplayerLancement { Role = "host", Seat = 1, Players = joueurs },
             Players = Enumerable.Range(1, joueurs).Select(i => new MultiplayerJoueur { Seat = i, Handle = "j" + i }).ToList(),
@@ -701,6 +713,7 @@ public class AdventureTests : IDisposable
 
         var fin = Assert.Single(stockage.Versions("av-1"));
         Assert.Equal(AdventureRaisons.Fin, fin.Reason);
+        Assert.Equal("s-77", fin.SessionId);   // la version tardive designe sa seance
         Assert.Contains("SAVE_STATE_SLOT " + AdventureSauveur.Emplacement, retroarch.Recues);
 
         var site = (FauxSite)typeof(AdventureSeanceService).GetField("_site", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(service)!;
@@ -937,6 +950,121 @@ public class AdventureTests : IDisposable
         public HttpClient CreateClient(string name) => throw new InvalidOperationException("pas de reseau");
     }
 
+    // ── l'appui long sur la collection Adventure ───────────────────────────────────────────────────
+
+    private static AdventureInfo UneAventure(string id, string jeu = "gba/kirby", string contenu = "md5kirby", string? room = null, int? joueurs = null, int places = 4)
+        => new() { Id = id, Game = jeu, Content = contenu, Seats = places, Room = room, Latest = joueurs is { } n ? new AdventureVersion { Players = n } : null };
+
+    [Fact]
+    public void L_appui_long_reprend_l_aventure_de_ce_jeu_et_de_ce_contenu_celle_dont_une_seance_est_ouverte_d_abord()
+    {
+        var miennes = new[]
+        {
+            UneAventure("autre-jeu", jeu: "gba/zelda"),
+            UneAventure("autre-contenu", contenu: "md5usa"),
+            UneAventure("derniere"),
+            UneAventure("ouverte", room: "r9"),
+        };
+        Assert.Equal("ouverte", AdventureChoix.Choisir(miennes, "gba/kirby", "md5kirby")!.Id);
+        Assert.Equal("derniere", AdventureChoix.Choisir(miennes.Where(a => a.Id != "ouverte"), "gba/kirby", "md5kirby")!.Id);
+        Assert.Null(AdventureChoix.Choisir(miennes, "gba/shining-soul-ii", "md5kirby"));
+    }
+
+    [Theory]
+    [InlineData(null, 4, 4)]    // pas de version : toutes les places
+    [InlineData(3, 4, 3)]       // celles de la derniere version
+    [InlineData(1, 4, 4)]       // une salle d'amis ne part jamais a moins de deux
+    [InlineData(4, 3, 3)]       // jamais plus que les places de l'aventure
+    public void Le_nombre_de_joueurs_demande_va_de_deux_aux_places_de_l_aventure(int? derniere, int places, int attendu)
+        => Assert.Equal(attendu, AdventureChoix.Joueurs(UneAventure("a", joueurs: derniere, places: places), 4));
+
+    private AdventureLancement UnLancement(FauxSite site) => new(site, coeur => "coeur-sha");
+
+    [Fact]
+    public async Task L_appui_long_sans_aventure_en_cree_une_puis_ouvre_la_seance()
+    {
+        var site = new FauxSite();
+        var refus = await UnLancement(site).RejoindreAsync(Jeu(Path.Combine(_racine, "kirby.gba")), CancellationToken.None);
+
+        Assert.Null(refus);
+        Assert.Equal(["gba/kirby"], site.Creees.ToArray());
+        Assert.Equal(("av-neuve", 4), Assert.Single(site.Ouvertures));
+    }
+
+    [Fact]
+    public async Task L_appui_long_avec_une_aventure_ne_en_cree_pas_une_autre()
+    {
+        var site = new FauxSite();
+        site.Mes.Add(UneAventure("av-1", joueurs: 3));
+        Assert.Null(await UnLancement(site).RejoindreAsync(Jeu(Path.Combine(_racine, "kirby.gba")), CancellationToken.None));
+        Assert.Empty(site.Creees);
+        Assert.Equal(("av-1", 3), Assert.Single(site.Ouvertures));
+    }
+
+    [Fact]
+    public async Task L_appui_long_dit_la_raison_du_site_ou_qu_il_est_injoignable()
+    {
+        var site = new FauxSite();
+        site.Mes.Add(UneAventure("av-1"));
+        site.RefusDeSeance = "not_member";
+        Assert.Equal("not_member", await UnLancement(site).RejoindreAsync(Jeu("x.gba"), CancellationToken.None));
+
+        site.Injoignable = true;
+        Assert.Equal("offline", await UnLancement(site).RejoindreAsync(Jeu("x.gba"), CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task La_session_MULTIPLAYER_confie_l_appui_long_d_un_jeu_d_aventure_a_Adventure_et_laisse_MULTIPLAYER_tranquille()
+    {
+        PoserKirby();
+        var adventure = Collection(new NelfePlayOptions { ShowAdventureCollection = true }, new AdventureCatalogueStore(path: Catalogue([Kirby()])));
+        await adventure.SynchroniserAsync("test", CancellationToken.None);
+        var chemin = adventure.JeuxConnus().Single().Path;
+
+        var vide = Path.Combine(_racine, "vide.json");
+        File.WriteAllText(vide, JsonSerializer.Serialize(new { schema_version = 1, games = Array.Empty<object>() }));
+        // MULTIPLAYER eteinte, Adventure allumee : le sondage et le panneau tournent pour Adventure seule.
+        var options = new FauxOptions(new ApiExposeOptions { NelfePlay = new NelfePlayOptions { ShowMultiplayerCollection = false, ShowAdventureCollection = true } });
+        var multiplayer = new MultiplayerCollectionSyncService(
+            options, new MultiplayerCatalogueStore(logger: null, path: vide),
+            new InstalledGameCatalog(new SansDefinition(), logger: null, romsRoot: Path.Combine(_racine, "roms"), ramRoot: Path.Combine(_racine, "ram")),
+            new EsCustomCollectionWriter(new FauxReglages(), logger: null, collectionsRoot: Path.Combine(_racine, "c2"), stateRoot: Path.Combine(_racine, "s2")),
+            new EsCollectionThemeAssets(logger: null, themesRoot: Path.Combine(_racine, "themes"), sourceRoot: Path.Combine(_racine, "assets"), stateRoot: Path.Combine(_racine, "s2")),
+            new MediaRuntimeState(), romsRoot: Path.Combine(_racine, "roms"), emulateurTourne: () => false);
+        var client = new MultiplayerClient(new SansFabrique(), new NelfePlayDeviceStore(NullLogger<NelfePlayDeviceStore>.Instance), clientDeTest: () => null);
+        var session = new MultiplayerSessionService(client, multiplayer, options, relais: null, bus: null) { UnJeuTourne = () => false };
+
+        // Sans branchement, une aventure ne passe pas pour un jeu MULTIPLAYER.
+        session.JeuxSupplementaires = () => adventure.JeuxConnus();
+        Assert.Equal("adventure_unavailable", await session.RejoindreAsync(chemin));
+
+        var appels = new List<string>();
+        session.RejoindreUneAventure = (jeu, ct) => { appels.Add(jeu.Game.Id); return Task.FromResult<string?>("not_member"); };
+        Assert.Equal("not_member", await session.RejoindreAsync(chemin));
+        Assert.Equal(["gba/kirby-amazing-mirror"], appels.ToArray());
+
+        // Pas de gameroom publique ni d'amis pour une aventure : la touche des onglets ne change rien.
+        Assert.Null(await session.RejoindreAsync(chemin, sorte: MultiplayerSortes.Amis));
+        Assert.Single(appels);
+        Assert.True(session.EstUneAventure(session.JeuDe(chemin)!));
+        Assert.Equal("not_multiplayer", await session.RejoindreAsync(Path.Combine(_racine, "inconnu.gba")));
+    }
+
+    [Fact]
+    public void Les_options_d_ES_de_la_collection_et_du_vocal_sont_dans_le_menu_du_Data_Pack()
+    {
+        var cfg = Path.Combine(Environment.GetEnvironmentVariable("NELFEPLAY_DATAPACK")!, "config-ESmenus", "apiexpose_es_features_blocks_to_add.cfg");
+        // Le Data Pack du poste peut etre en retard sur cette branche (l'entree y arrive avec sa publication) : le test ne juge que s'il l'a.
+        if (!File.Exists(cfg) || !File.ReadAllText(cfg).Contains("show_adventure_collection", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        var texte = File.ReadAllText(cfg);
+        Assert.Contains("global.apiexpose.nelfeplay.voice_chat", texte);
+        Assert.Equal(3, System.Text.RegularExpressions.Regex.Matches(texte, "show_adventure_collection").Count);   // feature, menu, defaut
+    }
+
     // ── le client du site ──────────────────────────────────────────────────────────────────────────
 
     private sealed class SiteEnBouteille(Func<HttpRequestMessage, (int Statut, string Corps)> reponse) : HttpMessageHandler
@@ -1001,6 +1129,17 @@ public class AdventureTests : IDisposable
     }
 
     [Fact]
+    public async Task L_ouverture_de_seance_demande_au_moins_deux_joueurs()
+    {
+        string? corps = null;
+        var bouteille = new SiteEnBouteille(r => { corps = r.Content!.ReadAsStringAsync().Result; return (200, """{"ok":true,"room":"r1","session":{"id":"s"}}"""); });
+        var client = new AdventureSiteClient(() => new HttpClient(bouteille) { BaseAddress = new Uri("https://nelfeplay.test") });
+        await client.OuvrirSeanceAsync("av-1", 1, CancellationToken.None);
+        using var doc = System.Text.Json.JsonDocument.Parse(corps!);
+        Assert.Equal(2, doc.RootElement.GetProperty("players").GetInt32());
+    }
+
+    [Fact]
     public async Task Le_depot_d_une_version_dit_son_sort_parti_a_plus_tard_ou_refuse_pour_toujours()
     {
         var corps = new List<string>();
@@ -1010,7 +1149,7 @@ public class AdventureTests : IDisposable
         var client = new AdventureSiteClient(() => new HttpClient(bouteille) { BaseAddress = new Uri("https://nelfeplay.test") });
         var version = new AdventureVersion
         {
-            Id = "abcd", Adventure = "av-1", StateSha256 = "e", SaveSha256 = "s", Players = 2, BaseSeq = 3, DurationS = 60, Reason = AdventureRaisons.Fin, CoreSha256 = "c",
+            Id = "abcd", Adventure = "av-1", SessionId = "s-9", StateSha256 = "e", SaveSha256 = "s", Players = 2, BaseSeq = 3, DurationS = 60, Reason = AdventureRaisons.Fin, CoreSha256 = "c",
             Seats = [new AdventurePlace { Seat = 1, Handle = "j1" }],
         };
 
@@ -1031,6 +1170,8 @@ public class AdventureTests : IDisposable
         Assert.Equal("end", racine.GetProperty("reason").GetString());
         Assert.Equal("j1", racine.GetProperty("seats")[0].GetProperty("handle").GetString());
         Assert.Equal("c", racine.GetProperty("core_version").GetString());
+        // Une version tardive de la file designe sa seance : le site verifie l'hote de CETTE seance (grace de 24 h).
+        Assert.Equal("s-9", racine.GetProperty("session_id").GetString());
     }
 
     [Fact]

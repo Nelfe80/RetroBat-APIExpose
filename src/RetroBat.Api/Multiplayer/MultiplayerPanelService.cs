@@ -445,7 +445,7 @@ public sealed partial class MultiplayerPanelService
     }
 
     /// <summary>MULTIPLAYER est-il en service sur cette borne ?</summary>
-    public bool Actif => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: true };
+    public bool Actif => _options.CurrentValue.NelfePlay is { Enabled: true } np && (np.ShowMultiplayerCollection || np.ShowAdventureCollection);
 
     /// <summary>
     /// Le carrousel montre-t-il la collection MULTIPLAYER ? C'est le carrousel qui compte, pas le systeme du
@@ -453,7 +453,8 @@ public sealed partial class MultiplayerPanelService
     /// (vu le 22/10 : l'appui long ouvrait le classement).
     /// </summary>
     public bool DansLaCollection
-        => string.Equals(_etatDesMedias?.CarouselSystemId, MultiplayerCollectionSyncService.CollectionName, StringComparison.OrdinalIgnoreCase);
+        => string.Equals(_etatDesMedias?.CarouselSystemId, MultiplayerCollectionSyncService.CollectionName, StringComparison.OrdinalIgnoreCase)
+           || string.Equals(_etatDesMedias?.CarouselSystemId, RetroBat.Api.Adventure.AdventureCollection.Nom, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Le carrousel tel que l'API le connait, pour le journal de l'appui long.</summary>
     public string Carrousel => _etatDesMedias?.CarouselSystemId ?? string.Empty;

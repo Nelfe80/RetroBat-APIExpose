@@ -91,7 +91,7 @@ public sealed class AdventureController : ControllerBase
             return BadRequest(new { ok = false, reason = "bad_id" });
         }
 
-        var seance = await _site.OuvrirSeanceAsync(demande.Adventure, Math.Max(1, demande.Players), ct);
+        var seance = await _site.OuvrirSeanceAsync(demande.Adventure, Math.Max(2, demande.Players), ct);
         return seance is null ? StatusCode(502, new { ok = false, reason = "offline" })
             : Ok(new { ok = seance.Ok, reason = seance.Reason, attached = seance.Attached, room = seance.Room, resume = seance.Resume, voice = seance.VoiceSupported });
     }
