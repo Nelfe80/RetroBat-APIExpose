@@ -175,6 +175,7 @@ public sealed partial class MultiplayerPanelService
         _etatDesMedias = etatDesMedias;
         _session.Change += SurChangement;
         _session.DansLaCollection = () => DansLaCollection && !EnJeu();
+        _session.CarrouselCourant = () => Carrousel;
         // En partie pour le site jusqu'a la fermeture de l'ecran de fin : l'echeance d'une invitation attend le retour (30/10).
         _session.EnPartie = () =>
         {

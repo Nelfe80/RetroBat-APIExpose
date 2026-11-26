@@ -579,9 +579,17 @@ public sealed class MultiplayerSessionService : BackgroundService
             return null;
         }
 
-        return _collection.JeuxConnus().Concat(JeuxSupplementaires?.Invoke() ?? [])
+        // UN JEU DES DEUX CATALOGUES (Lost Vikings Mega Drive, 26/11) : le fichier est le meme, c'est le CARROUSEL qui dit d'ou on le voit. Vu depuis la
+        // collection Adventure, c'est le jeu d'Adventure (panneau ADVENTURE) ; vu depuis MULTIPLAYER ou son systeme, celui de MULTIPLAYER.
+        var depuisAdventure = string.Equals(CarrouselCourant?.Invoke(), RetroBat.Api.Adventure.AdventureCollection.Nom, StringComparison.OrdinalIgnoreCase);
+        var multiplayer = _collection.JeuxConnus();
+        var adventure = JeuxSupplementaires?.Invoke() ?? [];
+        return (depuisAdventure ? adventure.Concat(multiplayer) : multiplayer.Concat(adventure))
             .FirstOrDefault(jeu => string.Equals(Path.GetFullPath(jeu.Path), cible, StringComparison.OrdinalIgnoreCase));
     }
+
+    /// <summary>Le carrousel d'ES vu par l'API (<c>nelfeplay-adventure</c>, <c>nelfeplay-multiplayer</c>, un systeme...), pour savoir de quelle collection on voit un jeu.</summary>
+    public Func<string?>? CarrouselCourant { get; set; }
 
     /// <summary>Ce jeu est-il un jeu de la collection NelfePlay Adventure (et non de MULTIPLAYER) ?</summary>
     public bool EstUneAventure(MultiplayerInstalledGame jeu) => (JeuxSupplementaires?.Invoke() ?? []).Any(j => ReferenceEquals(j, jeu))
