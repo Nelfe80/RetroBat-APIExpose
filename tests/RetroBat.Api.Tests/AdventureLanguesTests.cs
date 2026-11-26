@@ -121,10 +121,19 @@ public class AdventureLanguesTests : IDisposable
             Assert.Equal(n, choix.Depart.Players);
         }
 
-        // Un allemand qui accueille un francais : pas de langue commune, l'anglais (depart par defaut, sans suffixe de langue).
+        // Un allemand qui accueille un francais : le depart de la paire de-fr s'il est au catalogue (une langue par console, catalogue v4
+        // de la 1.9.223), sinon pas de langue commune, l'anglais (depart par defaut, sans suffixe de langue).
         var mixte = AdventureLangues.ChoisirLeDepart(europe, kirby.Jeu, 2, md5, CoeurGba, [J(1, "de_DE", hote: true), J(2, "fr_FR")], null);
-        Assert.Equal("en", mixte.Langue);
-        Assert.EndsWith("aventure-2p-mgba-splitscreen.state", mixte.Depart!.State);
+        if (europe.CombinationStarts?.Any(c => c.SeatLanguages.SequenceEqual(["de", "fr"])) == true)
+        {
+            Assert.Equal("de", mixte.Langue);
+            Assert.EndsWith("aventure-2p-mgba-splitscreen-de-fr.state", mixte.Depart!.State);
+        }
+        else
+        {
+            Assert.Equal("en", mixte.Langue);
+            Assert.EndsWith("aventure-2p-mgba-splitscreen.state", mixte.Depart!.State);
+        }
 
         // L'hote lit l'italien, l'invite inconnu (le site ne donne pas sa langue) : l'italien.
         var inconnu = AdventureLangues.ChoisirLeDepart(europe, kirby.Jeu, 2, md5, CoeurGba,
