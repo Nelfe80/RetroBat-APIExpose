@@ -64,7 +64,11 @@ public class AdventureLanguesTests : IDisposable
         var store = new AdventureCatalogueStore(path: chemin);
         var entrees = store.Entrees(out var erreur);
         Assert.Null(erreur);
-        Assert.Equal(6, entrees.Count);
+        // Tous les jeux du fichier sont lus, aucun ecarte (6 au catalogue .4 de 701d9f3d, 5 au v4 de la 1.9.223 sans Lost Vikings SNES).
+        using (var brut = System.Text.Json.JsonDocument.Parse(File.ReadAllBytes(chemin)))
+        {
+            Assert.Equal(brut.RootElement.GetProperty("games").GetArrayLength(), entrees.Count);
+        }
         var dossier = Path.GetDirectoryName(chemin)!;
         foreach (var x in entrees)
         {
