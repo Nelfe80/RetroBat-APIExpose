@@ -50,6 +50,8 @@ public class DataPackOptions
         "live",
         // Le catalogue NELFEPLAY MULTIPLAYER (21 octobre 2026) : jeux, coeurs imposes, niveaux.
         "multiplayer",
+        // Le catalogue NelfePlay Adventure (26 novembre 2026) : meme forme que celui de MULTIPLAYER, jeux d'aventure a plusieurs.
+        "adventure",
         // Les etats de depart des defis (1er novembre 2026), verifies par l'empreinte du reglement avant chaque pose.
         "challenges",
         // Les Player Decks (21 novembre 2026) : themes et cartes des niveaux, lus par le Deck EN PRIORITE sur tools\playerdeck\themes.

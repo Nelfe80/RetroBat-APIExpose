@@ -445,7 +445,7 @@ public sealed partial class MultiplayerPanelService
     }
 
     /// <summary>MULTIPLAYER est-il en service sur cette borne ?</summary>
-    public bool Actif => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: true };
+    public bool Actif => _options.CurrentValue.NelfePlay is { Enabled: true } np && (np.ShowMultiplayerCollection || np.ShowAdventureCollection);
 
     /// <summary>
     /// Le carrousel montre-t-il la collection MULTIPLAYER ? C'est le carrousel qui compte, pas le systeme du
@@ -453,7 +453,8 @@ public sealed partial class MultiplayerPanelService
     /// (vu le 22/10 : l'appui long ouvrait le classement).
     /// </summary>
     public bool DansLaCollection
-        => string.Equals(_etatDesMedias?.CarouselSystemId, MultiplayerCollectionSyncService.CollectionName, StringComparison.OrdinalIgnoreCase);
+        => string.Equals(_etatDesMedias?.CarouselSystemId, MultiplayerCollectionSyncService.CollectionName, StringComparison.OrdinalIgnoreCase)
+           || string.Equals(_etatDesMedias?.CarouselSystemId, RetroBat.Api.Adventure.AdventureCollection.Nom, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Le carrousel tel que l'API le connait, pour le journal de l'appui long.</summary>
     public string Carrousel => _etatDesMedias?.CarouselSystemId ?? string.Empty;
@@ -535,6 +536,12 @@ public sealed partial class MultiplayerPanelService
     /// </summary>
     private async Task ChangerDeGameroomAsync()
     {
+        // Une aventure n'a ni gameroom publique ni d'amis a choisir : un seul onglet de salle (l'autre commence une aventure, A maintenu).
+        if (_jeu is { } enAventure && _session.EstUneAventure(enAventure))
+        {
+            return;
+        }
+
         await _changementDeSalle.WaitAsync().ConfigureAwait(false);
         try
         {
@@ -571,6 +578,22 @@ public sealed partial class MultiplayerPanelService
         {
             _changementDeSalle.Release();
         }
+    }
+
+    private async Task NouvelleAventureAsync(MultiplayerInstalledGame jeu)
+    {
+        var refus = await _session.NouvelleAventureAsync(jeu, CancellationToken.None).ConfigureAwait(false);
+        _journal.LogInformation("ADVENTURE : nouvelle aventure de {Jeu} ({Statut})", jeu.Game.Id, refus ?? "ok");
+        lock (_verrou)
+        {
+            _refus = refus;
+            if (refus is null)
+            {
+                _modele.PlacerSurLOnglet(MultiplayerPanelModel.Onglet.WaitingForFriends);
+            }
+        }
+
+        Rafraichir();
     }
 
     /// <summary>
@@ -980,6 +1003,15 @@ public sealed partial class MultiplayerPanelService
                 return;
             }
 
+            // NELFEPLAY ADVENTURE : A maintenu sur l'onglet « nouvelle aventure » en commence une (jamais au simple passage : on ne cree pas
+            // une aventure en parcourant les onglets).
+            if (maintenu && _mode == Mode.Panneau && _jeu is { } pourAventure && _session.EstUneAventure(pourAventure)
+                && _modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers)
+            {
+                _ = Task.Run(() => NouvelleAventureAsync(pourAventure));
+                return;
+            }
+
             // Plusieurs choix par place (v1.0 §8.2) : A passe au choix suivant de l'equipe, ▲▼ change celui-la.
             if (!maintenu && _mode == Mode.Panneau && AuChoixDuPersonnage() is (_, { Choices: [{ Picks: > 1 }, ..] } jeuDeLEquipe)
                 && MesChoixDansLaSalle(jeuDeLEquipe) > 1)
@@ -1079,7 +1111,12 @@ public sealed partial class MultiplayerPanelService
         _cartes?.Cacher();
         _texteDuBandeau = "";
         _journal?.LogInformation("MULTIPLAYER : invitation de {Ami} pour {Jeu} acceptee", invitation.From?.Pseudo, invitation.Game);
-        var jeu = _session.JeuDeLaRoom(new MultiplayerRoom { Game = invitation.Game, Content = invitation.Content });
+        var jeu = _session.JeuDeLaRoom(new MultiplayerRoom
+        {
+            Game = invitation.Game,
+            Content = invitation.Content,
+            Adventure = invitation.Adventure is { Length: > 0 } aventure ? new MultiplayerAventure { Id = aventure } : null,
+        });
         if (jeu is null)
         {
             // Sans le meme contenu, la partie se desynchroniserait : on refuse plutot que de rejoindre.
@@ -1539,7 +1576,10 @@ public sealed partial class MultiplayerPanelService
         }
 
         return new LeaderboardOverlayService.ContenuMultiplayer(
-            MultiplayerPanelModel.Onglets.Select(MultiplayerPanelModel.Titre).ToList(),
+            jeu is not null && _session.EstUneAventure(jeu)
+                // ADVENTURE : « reprendre » est la salle de l'aventure, « nouvelle » en commence une autre (A maintenu).
+                ? [MultiplayerPanelModel.Titre(MultiplayerPanelModel.Onglet.InviteFriends), T("adventure.tab.resume"), T("adventure.tab.new")]
+                : MultiplayerPanelModel.Onglets.Select(MultiplayerPanelModel.Titre).ToList(),
             _modele.IndexOnglet,
             _modele.Etat == MultiplayerPanelModel.Foyer.Panneau,
             classique ? T("multiplayer.badge.classic") : string.Empty,

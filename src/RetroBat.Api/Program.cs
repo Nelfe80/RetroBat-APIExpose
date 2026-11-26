@@ -504,6 +504,19 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Speed
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerCollectionSyncService>();
 builder.Services.AddHostedService<RetroBat.Api.Multiplayer.MultiplayerCoeursService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerCollectionSyncService>());
+// NELFEPLAY ADVENTURE (26/11) : le catalogue du Data Pack, la collection d'ES (meme calcul que MULTIPLAYER), la copie locale des
+// versions, leur file d'envoi au site et la seance chez l'hote (reprise, sauvegardes, fin).
+builder.Services.AddSingleton<RetroBat.Api.Adventure.AdventureCatalogueStore>();
+builder.Services.AddSingleton<RetroBat.Api.Adventure.AdventureCollection>(sp => RetroBat.Api.Adventure.AdventureCollection.Creer(sp));
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Adventure.AdventureCollection>().Service);
+builder.Services.AddSingleton<RetroBat.Api.Adventure.AdventureStockage>(_ => new RetroBat.Api.Adventure.AdventureStockage());
+builder.Services.AddSingleton<RetroBat.Api.Adventure.AdventureFileDEnvoi>();
+builder.Services.AddSingleton<RetroBat.Api.Adventure.IAdventureSite, RetroBat.Api.Adventure.AdventureSiteClient>();
+builder.Services.AddSingleton<RetroBat.Api.Adventure.AdventureSeanceService>(sp => new RetroBat.Api.Adventure.AdventureSeanceService(
+    sp.GetRequiredService<RetroBat.Api.Adventure.IAdventureSite>(), sp.GetRequiredService<RetroBat.Api.Adventure.AdventureStockage>(),
+    sp.GetRequiredService<RetroBat.Api.Adventure.AdventureFileDEnvoi>(), journal: sp.GetService<ILogger<RetroBat.Api.Adventure.AdventureSeanceService>>(),
+    catalogue: sp.GetRequiredService<RetroBat.Api.Adventure.AdventureCatalogueStore>()));
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Adventure.AdventureSeanceService>());
 // Les gamerooms du joueur : le client de la plateforme et le sondage qui les tient a jour.
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerClient>();
 // La fin, le rapport et l'annulation d'une rencontre sont gardes sur le disque si le site ne repond pas, et renvoyes (MULTI-05).
@@ -831,6 +844,19 @@ var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
                 ? (def.DefinitionFile, def.Rom)
                 : (null, null);
         };
+    }
+    // NELFEPLAY ADVENTURE : le lancement MULTIPLAYER lui confie la reprise et les sauvegardes d'une gameroom d'aventure, et la session
+    // sait trouver les jeux d'Adventure comme ceux de MULTIPLAYER.
+    {
+        var seance = app.Services.GetRequiredService<RetroBat.Api.Adventure.AdventureSeanceService>();
+        app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerLaunchService>().Aventure = seance;
+        var aventures = app.Services.GetRequiredService<RetroBat.Api.Adventure.AdventureCollection>();
+        var lancement = new RetroBat.Api.Adventure.AdventureLancement(app.Services.GetRequiredService<RetroBat.Api.Adventure.IAdventureSite>(),
+            journal: app.Services.GetService<ILogger<RetroBat.Api.Adventure.AdventureLancement>>(),
+            catalogue: app.Services.GetRequiredService<RetroBat.Api.Adventure.AdventureCatalogueStore>());
+        app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>().JeuxSupplementaires = () => aventures.Games;
+        app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>().RejoindreUneAventure = lancement.RejoindreAsync;
+        app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>().NouvelleAventure = lancement.NouvelleAsync;
     }
     // Le Deck dans une room MULTIPLAYER (H-D17) : son decor remplace les panneaux des joueurs pour le joueur local.
     app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerLaunchService>().Deck =

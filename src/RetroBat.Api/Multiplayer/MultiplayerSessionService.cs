@@ -226,7 +226,8 @@ public sealed class MultiplayerSessionService : BackgroundService
     /// <summary>Le joueur est en partie (ou devant son ecran de fin) : le site met l'echeance de ses invitations en pause (30/10).</summary>
     public Func<bool>? EnPartie { get; set; }
 
-    private bool Active => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: true };
+    /// <summary>Le sondage tourne des qu'une des deux collections (MULTIPLAYER, NelfePlay Adventure) est allumee : les gamerooms d'aventure passent par lui.</summary>
+    private bool Active => _options.CurrentValue.NelfePlay is { Enabled: true } np && (np.ShowMultiplayerCollection || np.ShowAdventureCollection);
 
     /// <summary>Ce que la borne se donne pour dire son depart a la plateforme, l'arret de l'API n'attend pas plus.</summary>
     private static readonly TimeSpan DelaiDuDepart = TimeSpan.FromSeconds(3);
@@ -355,6 +356,29 @@ public sealed class MultiplayerSessionService : BackgroundService
         if (jeu is null)
         {
             return "not_multiplayer";
+        }
+
+        if (EstUneAventure(jeu))
+        {
+            // Pas de gameroom publique ni d'amis pour une aventure : sa seance est celle du site (de sorte « friends »).
+            if (sorte is not null)
+            {
+                return null;
+            }
+
+            if (RejoindreUneAventure is null)
+            {
+                return "adventure_unavailable";
+            }
+
+            _appui = true;
+            var refusAventure = await RejoindreUneAventure(jeu, ct).ConfigureAwait(false);
+            if (refusAventure is null)
+            {
+                await SonderAsync(ct).ConfigureAwait(false);
+            }
+
+            return refusAventure;
         }
 
         if (_relais is not null && _relais.MeilleurTempsMs is null)
@@ -543,25 +567,79 @@ public sealed class MultiplayerSessionService : BackgroundService
             return null;
         }
 
-        return _collection.JeuxConnus().FirstOrDefault(jeu => string.Equals(Path.GetFullPath(jeu.Path), cible, StringComparison.OrdinalIgnoreCase));
+        return _collection.JeuxConnus().Concat(JeuxSupplementaires?.Invoke() ?? [])
+            .FirstOrDefault(jeu => string.Equals(Path.GetFullPath(jeu.Path), cible, StringComparison.OrdinalIgnoreCase));
     }
+
+    /// <summary>Ce jeu est-il un jeu de la collection NelfePlay Adventure (et non de MULTIPLAYER) ?</summary>
+    public bool EstUneAventure(MultiplayerInstalledGame jeu) => (JeuxSupplementaires?.Invoke() ?? []).Any(j => ReferenceEquals(j, jeu))
+        && !_collection.JeuxConnus().Any(j => ReferenceEquals(j, jeu));
+
+    /// <summary>
+    /// L'APPUI LONG sur un jeu de la collection NelfePlay Adventure (26/11) : ouvre ou reprend l'aventure de ce jeu et place le
+    /// joueur dans la gameroom de la seance (voir <c>AdventureLancement</c>). Rend la raison d'un refus, ou null.
+    /// </summary>
+    public Func<MultiplayerInstalledGame, CancellationToken, Task<string?>>? RejoindreUneAventure { get; set; }
+
+    /// <summary>Commencer une aventure de PLUS pour ce jeu (le panneau, onglet NEW ADVENTURE) ; meme forme que <see cref="RejoindreUneAventure"/>.</summary>
+    public Func<MultiplayerInstalledGame, CancellationToken, Task<string?>>? NouvelleAventure { get; set; }
+
+    /// <summary>
+    /// NOUVELLE AVENTURE : le joueur quitte la gameroom de son aventure d'avant (celle de ce jeu), puis le site en ouvre une autre.
+    /// Rend la raison d'un refus, ou null.
+    /// </summary>
+    public async Task<string?> NouvelleAventureAsync(MultiplayerInstalledGame jeu, CancellationToken ct = default)
+    {
+        if (NouvelleAventure is null || !EstUneAventure(jeu))
+        {
+            return "adventure_unavailable";
+        }
+
+        foreach (var room in Etat.Rooms.Where(r => r.AdventureId is not null && r.Game == jeu.Game.Id && r.State is "waiting" or "countdown").ToList())
+        {
+            await QuitterAsync(room.Room, ct).ConfigureAwait(false);
+        }
+
+        _appui = true;
+        var refus = await NouvelleAventure(jeu, ct).ConfigureAwait(false);
+        if (refus is null)
+        {
+            await SonderAsync(ct).ConfigureAwait(false);
+        }
+
+        return refus;
+    }
+
+    /// <summary>
+    /// Les jeux d'une autre collection que les gamerooms peuvent aussi porter (NelfePlay Adventure, 26/11) : meme calcul de
+    /// jeu et de contenu, un autre catalogue. Les identifiants d'Adventure ne recoupent jamais ceux de MULTIPLAYER (prefixe
+    /// du jeu au catalogue Adventure, voir AdventureCatalogue).
+    /// </summary>
+    public Func<IReadOnlyList<MultiplayerInstalledGame>>? JeuxSupplementaires { get; set; }
+
+    /// <summary>Les jeux d'Adventure : seulement pour une gameroom d'aventure (leurs identifiants sont ceux du site, sans prefixe).</summary>
+    private IEnumerable<MultiplayerInstalledGame> Jeux(bool aventure)
+        => aventure ? JeuxSupplementaires?.Invoke() ?? [] : _collection.JeuxConnus();
+
+    private IEnumerable<MultiplayerInstalledGame> TousLesJeux()
+        => _collection.JeuxConnus().Concat(JeuxSupplementaires?.Invoke() ?? []);
 
     /// <summary>
     /// Le jeu d'une gameroom sur cette borne : meme jeu ET meme contenu (un autre dump se desynchroniserait).
     /// Null quand la borne ne l'a pas.
     /// </summary>
     public MultiplayerInstalledGame? JeuDeLaRoom(MultiplayerRoom room)
-        => _collection.JeuxConnus().FirstOrDefault(jeu => jeu.Game.Id == room.Game
+        => Jeux(room.AdventureId is not null).FirstOrDefault(jeu => jeu.Game.Id == room.Game
             && string.Equals(jeu.ContentKey, room.Content, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>Le jeu installe sur cette borne avec ce jeu ET ce contenu, ou null : rejoindre se desynchroniserait.</summary>
-    public MultiplayerInstalledGame? JeuCompatible(string jeu, string contenu)
-        => _collection.JeuxConnus().FirstOrDefault(installe => installe.Game.Id == jeu
+    public MultiplayerInstalledGame? JeuCompatible(string jeu, string contenu, bool aventure = false)
+        => Jeux(aventure).FirstOrDefault(installe => installe.Game.Id == jeu
             && string.Equals(installe.ContentKey, contenu, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>Le nom d'un jeu du catalogue, jamais traduit ; son identifiant s'il n'est pas sur cette borne.</summary>
     public string NomDuJeu(string id)
-        => _collection.JeuxConnus().FirstOrDefault(jeu => jeu.Game.Id == id)?.Game.Name ?? id;
+        => TousLesJeux().FirstOrDefault(jeu => jeu.Game.Id == id)?.Game.Name ?? id;
 
     /// <summary>Ce jeu concourt-il au 1CC MULTI (MultiplayerScoring.Concourt) ? Faux pour un jeu que la borne ne connait pas.</summary>
     public bool Concourt(string id)

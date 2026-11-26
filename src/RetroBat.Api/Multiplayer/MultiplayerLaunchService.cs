@@ -248,6 +248,15 @@ public sealed class MultiplayerLaunchService : IHostedService
                 return;
             }
 
+            // NELFEPLAY ADVENTURE : la derniere version, l'etat ou la sauvegarde de la cartouche prets AVANT le lancement ; sans eux, une
+            // reprise ne repart pas d'une partie neuve en faisant croire qu'elle reprend.
+            if (Aventure is { } aventure && aventure.EstUneAventure(room)
+                && !await aventure.PreparerAsync(room, jeu, CancellationToken.None).ConfigureAwait(false))
+            {
+                await _client.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
+                return;
+            }
+
             // Un jeu qui numerote ses joueurs dans l'ordre du netplay (l'hote d'abord) : ses places remises dans celles de la
             // plateforme, pour toute la partie (MultiplayerOrdreNetplay).
             jeu = MultiplayerOrdreNetplay.PourLaRoom(jeu, room);
@@ -272,6 +281,7 @@ public sealed class MultiplayerLaunchService : IHostedService
 
             // Une partie ouverte a d'autres joueurs n'entre pas au classement solo (charte de la partie certifiee).
             NetplayHostService.NoterOuverteAuxJoueurs();
+            Aventure?.Demarree(room, jeu);
             _ = Task.Run(() => PublierLaSessionAsync(room, jeu, jeton, motJoueur, motSpectateur, progression));
             RelayerLaManette(jeu.Game, room.Launch!.Seat, PlacesDe(room));
             var duree = await AttendreLaFinAsync(partie).ConfigureAwait(false);
@@ -326,6 +336,11 @@ public sealed class MultiplayerLaunchService : IHostedService
         {
             FinDuLancement(room.Room);
             await AttendreLaSortieAsync().ConfigureAwait(false);
+            if (Aventure is { } fin)
+            {
+                await fin.TermineeAsync(room).ConfigureAwait(false);
+            }
+
             NoterLaPartie(room, dureeJouee);
             // Le decor des panneaux en jeu s'efface une fois la partie finie : il n'apparait pas parmi les decors d'ES.
             MultiplayerDecor.Effacer();
@@ -548,6 +563,12 @@ public sealed class MultiplayerLaunchService : IHostedService
             await _attente.AttendreLeDepartDesInvitesAsync(MultiplayerAttenteDesInvites.CheminDuJournal, liens, TimeSpan.FromSeconds(1), jeton)
                 .ConfigureAwait(false);
             _journal.LogInformation("MULTIPLAYER : les invites de {Room} sont partis, la partie se ferme", room.Room);
+            // NELFEPLAY ADVENTURE : la version de fin de seance se prend AVANT de fermer le jeu.
+            if (Aventure is { } aventure)
+            {
+                await aventure.AvantDeFermerAsync(room).ConfigureAwait(false);
+            }
+
             await _panneau.FonduAuNoirAsync().ConfigureAwait(false);
             await RetroArchInvite.FermerPourDeBonAsync().ConfigureAwait(false);
         }
@@ -846,7 +867,14 @@ public sealed class MultiplayerLaunchService : IHostedService
     private static int JoueursDeLaRoom(MultiplayerRoom room) => Math.Max(2, room.Launch?.Players ?? 0);
 
     /// <summary>Le depart pret de cette partie (niveau NelfePlay, nombre de joueurs, contenu), ou null : partie classique.</summary>
-    private static MultiplayerStart? DepartDeLaRoom(MultiplayerRoom room, MultiplayerInstalledGame jeu) => jeu.DepartPour(JoueursDeLaRoom(room));
+    private MultiplayerStart? DepartDeLaRoom(MultiplayerRoom room, MultiplayerInstalledGame jeu)
+        => Aventure is { } aventure && aventure.EstUneAventure(room) ? aventure.DepartDe(room) : jeu.DepartPour(JoueursDeLaRoom(room));
+
+    /// <summary>
+    /// NELFEPLAY ADVENTURE (26/11) : la reprise, les sauvegardes et la fin d'une gameroom d'aventure. Pose par le demarrage de
+    /// l'API ; null (ou une gameroom qui n'est pas une aventure) : aucun effet, MULTIPLAYER se lance comme avant.
+    /// </summary>
+    public RetroBat.Api.Adventure.IAdventureHote? Aventure { get; set; }
 
     /// <summary>Charge l'etat, ecrit le choix de chaque place, relit. Faux quand le depart ne se verifie pas.</summary>
     private async Task<bool> PreparerLeDepartAsync(MultiplayerRoom room, MultiplayerInstalledGame jeu, MultiplayerStart depart)
@@ -1217,7 +1245,11 @@ public sealed class MultiplayerLaunchService : IHostedService
         progression?.Finir(ProgressionDuLancement.Panneaux);
         // Le depart par place, les reglages de la place, le lanceur : jusqu'au demarrage de RetroArch.
         progression?.Commencer(ProgressionDuLancement.Lanceur);
-        var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeu.Game, lancement.Seat, netplay, joueurs, decor);
+        // NELFEPLAY ADVENTURE : le jeu tel que cette place le lance (l'invite ne sauve jamais l'etat de sortie de l'hote).
+        var jeuLance = Aventure is { } enAventurePlace && enAventurePlace.EstUneAventure(room)
+            ? enAventurePlace.JeuPourLaPlace(room, jeu.Game, lancement.Role == "host")
+            : jeu.Game;
+        var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeuLance, lancement.Seat, netplay, joueurs, decor);
         if (arguments is null)
         {
             progression?.Echouer(ProgressionDuLancement.Lanceur);
@@ -1281,6 +1313,16 @@ public sealed class MultiplayerLaunchService : IHostedService
                      RetroBat.Api.Replay.Recording.ReplayRecorderService.RetroArchNelfePlayNetplay()))
         {
             reglagesDeLaPlace[cle] = valeur;
+        }
+
+        // NELFEPLAY ADVENTURE : les sauvegardes du jeu vont dans le dossier de l'aventure, jamais dans celles du joueur.
+        // L'INVITE AUSSI (26/11) : sa sauvegarde personnelle n'est jamais touchee, il ecrit dans le dossier de l'aventure comme l'hote.
+        if (Aventure is { } enAventure && enAventure.EstUneAventure(room))
+        {
+            foreach (var (cle, valeur) in lancement.Role == "host" ? enAventure.ReglagesDeLaPlace(room) : enAventure.ReglagesDeLInvite(room))
+            {
+                reglagesDeLaPlace[cle] = valeur;
+            }
         }
 
         if (vue is not null)

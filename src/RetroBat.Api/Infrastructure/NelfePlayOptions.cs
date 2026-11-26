@@ -32,6 +32,12 @@ public sealed class NelfePlayOptions
     /// </summary>
     public bool ShowMultiplayerCollection { get; set; } = true;
 
+    /// <summary>
+    /// Afficher la collection « NelfePlay Adventure » (26/11/2026) : les aventures a plusieurs qui se reprennent. Visible par
+    /// defaut comme MULTIPLAYER, dont elle suit les gamerooms ; hors <see cref="Enabled"/>, elle disparait.
+    /// </summary>
+    public bool ShowAdventureCollection { get; set; } = true;
+
     /// <summary>Afficher la collection NELFEPLAY CHALLENGES &amp; SPEEDRUNS : les jeux de la borne qui ont un defi ouvert.</summary>
     public bool ShowChallengesCollection { get; set; } = true;
 

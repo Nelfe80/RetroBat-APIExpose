@@ -375,6 +375,50 @@ public class VocalRoomTests
         Assert.Equal(0, b.Exe.Lancements);
     }
 
+    // ── NelfePlay Adventure (26/11) : le salon de l'aventure, regle par l'option du vocal de la borne ─────────────────
+
+    private static MultiplayerRoom SalleDAventure(string etat, MultiplayerVoix? voix = null)
+        => new() { Room = Room, Game = "gba/kirby-amazing-mirror", Adventure = new MultiplayerAventure { Id = "av-1" }, State = etat, Voice = voix };
+
+    [Fact]
+    public async Task Une_aventure_rejoint_le_salon_de_l_aventure_tout_seul_quand_le_vocal_est_allume()
+    {
+        await using var b = new Banc();
+        // L'option du vocal de la borne est celle qui existe deja (NelfePlay.Voice.Enabled, allumee par defaut) : pas une deuxieme.
+        Assert.True(b.Options.NelfePlay.Voice.Enabled);
+        b.Rooms.Add(SalleDAventure("playing", new MultiplayerVoix { Generation = 1, Status = "ready", LobbyId = Lobby, Join = "auto", MicMuted = true }));
+        await b.TourAsync();
+
+        Assert.Equal(1, b.Exe.Lancements);
+        var attache = b.Exe.Commandes.First(c => c.Commande == "session.attach").Charge;
+        Assert.Equal(Lobby, Messages.Str(attache, "lobby_id"));
+        Assert.True(Messages.Bool(attache, "auto_join"));
+    }
+
+    [Fact]
+    public async Task Une_aventure_ne_rejoint_pas_le_salon_quand_l_option_du_vocal_est_eteinte()
+    {
+        await using var b = new Banc();
+        b.Options.NelfePlay.Voice.Enabled = false;
+        b.Rooms.Add(SalleDAventure("playing", new MultiplayerVoix { Generation = 1, Status = "ready", LobbyId = Lobby, Join = "auto", MicMuted = true }));
+        await b.TourAsync();
+
+        // La partie continue normalement : rien n'est demande au site, aucun exe lance.
+        Assert.Empty(b.Site.Appels);
+        Assert.Equal(0, b.Exe.Lancements);
+        Assert.Null(b.Coordinateur.Affichage);
+    }
+
+    [Fact]
+    public async Task Une_aventure_dont_le_joueur_n_a_pas_consenti_reste_muette()
+    {
+        await using var b = new Banc();
+        b.Site.Profil["voice_consent"] = false;
+        b.Rooms.Add(SalleDAventure("playing", new MultiplayerVoix { Generation = 1, Status = "ready", LobbyId = Lobby, Join = "auto", MicMuted = true }));
+        await b.TourAsync();
+        Assert.Equal(0, b.Exe.Lancements);
+    }
+
     [Fact]
     public async Task Vocal_propose_rejoint_seulement_sur_Y()
     {
