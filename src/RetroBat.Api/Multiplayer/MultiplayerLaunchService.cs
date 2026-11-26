@@ -1171,7 +1171,8 @@ public sealed class MultiplayerLaunchService : IHostedService
             var mots = new RetroBat.Api.Leaderboard.PanneauxEnJeu.MotsDesPanneaux(
                 _panneau.Texte("multiplayer.panel.wins", "WINS"), _panneau.Texte("multiplayer.panel.streak", "STREAK"));
             using var image = RetroBat.Api.Leaderboard.PanneauxEnJeu.Dessiner(ecran.Width, ecran.Height, bandes, type, fanart, fiches, mots,
-                jeu.Game.Ecran?.Police, jeu.Game.Ecran?.RegardeAGauche == true);
+                jeu.Game.Ecran?.Police, jeu.Game.Ecran?.RegardeAGauche == true,
+                fichierDuLogo: Aventure is { } enAventure && enAventure.EstUneAventure(room) ? RetroBat.Api.Adventure.AdventureCollection.Logo : null);
             if (!MultiplayerDecor.Ecrire(systeme, jeu.Path, image, bandes))
             {
                 return null;

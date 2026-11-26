@@ -52,7 +52,7 @@ public static class PanneauxEnJeu
     /// <param name="police">Une police imposee par le catalogue a la place de celle du type.</param>
     /// <param name="regardeAGauche">Les personnages du jeu regardent a gauche : le portrait se retourne a gauche, pas a droite.</param>
     public static Bitmap Dessiner(int largeur, int hauteur, Bandes bandes, string type, string? fanart, IReadOnlyList<Joueur> joueurs,
-        MotsDesPanneaux? mots = null, string? police = null, bool regardeAGauche = false)
+        MotsDesPanneaux? mots = null, string? police = null, bool regardeAGauche = false, string? fichierDuLogo = null)
     {
         mots ??= MotsDesPanneaux.ParDefaut;
         var image = new Bitmap(largeur, hauteur, PixelFormat.Format32bppArgb);
@@ -69,7 +69,14 @@ public static class PanneauxEnJeu
         }
         var famille = Famille(style.Police, secours);
         using var fond = Charger(fanart);
-        using var logo = Charger(Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", "nelfeplay-multiplayer.png"));
+        // Le logo de la collection ADVENTURE pour une aventure, celui de MULTIPLAYER s'il manque ou sans collection.
+        var cheminDuLogo = Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", fichierDuLogo ?? "nelfeplay-multiplayer.png");
+        if (fichierDuLogo is not null && !File.Exists(cheminDuLogo))
+        {
+            cheminDuLogo = Path.Combine(RetroBatPaths.ThemeResourcesRoot, "images", "nelfeplay-multiplayer.png");
+        }
+
+        using var logo = Charger(cheminDuLogo);
         foreach (var (gaucheDeLaBande, largeurDeLaBande, cote) in new[] { (0, bandes.Gauche, 1), (largeur - bandes.Droite, bandes.Droite, 0) })
         {
             var ici = joueurs.Where(j => j.Place % 2 == cote).OrderBy(j => j.Place).ToList();
