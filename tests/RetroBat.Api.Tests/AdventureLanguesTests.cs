@@ -582,6 +582,93 @@ public class AdventureLanguesTests : IDisposable
         }
     }
 
+    [Fact]
+    public void Une_reprise_a_un_autre_nombre_de_joueurs_prend_un_depart_dont_la_place_1_a_la_langue_du_srm()
+    {
+        var jeu = new
+        {
+            id = "gba/jeu", system = "gba", name = "Jeu", family = "coop", players = new { min = 2, max = 2 }, core = "mgba_splitscreen", level = "nelfeplay",
+            default_version = "eu",
+            versions = new object[]
+            {
+                new
+                {
+                    key = "eu", languages = new[] { "en", "fr", "de" }, start_language = "en", content = new { md5 = new[] { "eu1" } },
+                    start = Depart("eu-en-2", 2, "eu1"),
+                    combination_starts = new[]
+                    {
+                        new { seat_languages = new[] { "fr", "de" }, start = Depart("c-fr-de", 2, "eu1") },
+                        new { seat_languages = new[] { "fr", "fr" }, start = Depart("c-fr-fr", 2, "eu1") },
+                    },
+                },
+            },
+        };
+        var entree = Assert.Single(new AdventureCatalogueStore(path: EcrireUnCatalogue(jeu, "srm.json")).Entrees(out _));
+        var version = entree.Spec.Versions.Single();
+        // Aventure en francais (le .srm de la console 1 est francais), joueur 2 allemand : fr + de.
+        var combo = AdventureLangues.ChoisirLeDepart(version, entree.Jeu, 2, "eu1", null, [J(1, "en_US", true), J(2, "de_DE")], "fr");
+        Assert.EndsWith("c-fr-de.state", combo.Depart!.State);
+        Assert.Equal("fr", combo.Langue);
+        // Joueur 2 de langue inconnue, ou sans depart pour sa langue : la langue de l'aventure partout.
+        var inconnu = AdventureLangues.ChoisirLeDepart(version, entree.Jeu, 2, "eu1", null, [J(1, "en_US", true), new AdventureJoueurLangue(2, false, [])], "fr");
+        Assert.EndsWith("c-fr-fr.state", inconnu.Depart!.State);
+        var italien = AdventureLangues.ChoisirLeDepart(version, entree.Jeu, 2, "eu1", null, [J(1, "en_US", true), J(2, "it_IT")], "fr");
+        Assert.EndsWith("c-fr-fr.state", italien.Depart!.State);
+        // Aucun depart dont la place 1 soit en allemand : a froid (jamais un depart d'une autre langue que le .srm).
+        Assert.Null(AdventureLangues.ChoisirLeDepart(version, entree.Jeu, 2, "eu1", null, [J(1, "fr_FR", true), J(2, "fr_FR")], "de").Depart);
+    }
+
+    [Fact]
+    public void Le_fragment_combination_starts_du_banc_lot_4_se_lit_tel_quel()
+    {
+        var fragment = Path.Combine("E:" + Path.DirectorySeparatorChar, "claude_travail", "temp", "adventure", "lot4", "combination_starts.json");
+        var chemin = CatalogueDuDataPack();
+        if (!File.Exists(fragment) || chemin is null)
+        {
+            return;
+        }
+
+        var racine = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(chemin))!;
+        var frag = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(fragment))!["games"]!.AsObject();
+        var attendu = 0;
+        foreach (var jeu in racine["games"]!.AsArray().OfType<System.Text.Json.Nodes.JsonObject>())
+        {
+            if (frag[jeu["id"]!.GetValue<string>()]?["versions"]?["europe"]?["combination_starts"] is not System.Text.Json.Nodes.JsonArray combos)
+            {
+                continue;
+            }
+
+            var europe = jeu["versions"]!.AsArray().OfType<System.Text.Json.Nodes.JsonObject>().Single(v => v["key"]!.GetValue<string>() == "europe");
+            europe["combination_starts"] = combos.DeepClone();
+            attendu += combos.Count;
+        }
+
+        var copie = Path.Combine(_racine, "resources", "adventure", "fusion.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(copie)!);
+        File.WriteAllText(copie, racine.ToJsonString());
+        var entrees = new AdventureCatalogueStore(path: copie).Entrees(out var erreur);
+        Assert.Null(erreur);
+        var lues = entrees.SelectMany(e => e.Spec.Versions).Where(v => v.Key == "europe").SelectMany(v => v.CombinationStarts ?? []).ToList();
+        Assert.True(attendu > 0);
+        Assert.Equal(attendu, lues.Count);
+        Assert.All(lues, c =>
+        {
+            Assert.Equal(2, c.SeatLanguages.Count);
+            Assert.Matches(@"^states/gba/[a-z0-9-]+/europe/aventure-2p-mgba-splitscreen-[a-z]{2}-[a-z]{2}\.state$", c.Start!.State);
+            Assert.EndsWith($"-{c.SeatLanguages[0]}-{c.SeatLanguages[1]}.state", c.Start.State);
+            Assert.Equal(2, c.Start.Players);
+            Assert.Equal(CoeurGba, c.Start.CoreSha256!.Single());
+        });
+        // Un depart de la paire est choisi pour deux joueurs de ces langues.
+        var fs = entrees.Single(e => e.Jeu.Id == "gba/zelda-alttp-four-swords");
+        var europe2 = fs.Spec.Versions.Single(v => v.Key == "europe");
+        var paire = europe2.CombinationStarts![0];
+        var md5 = europe2.Content.Md5.Single();
+        var choix = AdventureLangues.ChoisirLeDepart(europe2, fs.Jeu, 2, md5, CoeurGba,
+            [J(1, paire.SeatLanguages[0], true), J(2, paire.SeatLanguages[1])], null);
+        Assert.Equal(paire.Start!.State, choix.Depart!.State);
+    }
+
     private sealed class FauxCommandes : ICommandesRetroArch
     {
         public Task<string?> DemanderAsync(string commande, CancellationToken ct, int delaiMs = 500) => Task.FromResult<string?>(null);

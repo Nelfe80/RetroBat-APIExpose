@@ -103,17 +103,32 @@ public static class AdventureLangues
         var verrou = Normaliser(langueDeLAventure);
 
         // 1. Une langue par console, seulement avec un depart fait pour cette suite exacte (GBA, apres preuve au banc).
-        if (verrou is null && version.CombinationStarts is { Count: > 0 } combinaisons && joueurs >= 2)
+        //    Sans langue d'aventure : toutes les places doivent avoir une langue connue. AVEC une langue d'aventure (reprise a un autre nombre
+        //    de joueurs : le .srm de la console 1 porte SA langue, lot 4 : Four Swords et Kirby) : la place 1 est la langue de l'aventure, les
+        //    autres places celle de leur joueur (la langue de l'aventure quand elle est inconnue) ; sans depart pour cette suite, la meme langue
+        //    partout ; sans depart non plus, la regle de la langue de l'aventure plus bas (a froid au besoin).
+        if (version.CombinationStarts is { Count: > 0 } combinaisons && joueurs >= 2)
         {
-            var parPlace = Enumerable.Range(1, joueurs)
+            var langues = Enumerable.Range(1, joueurs)
                 .Select(place => lesJoueurs.FirstOrDefault(j => j.Place == place)?.Langues.FirstOrDefault()).ToList();
-            if (parPlace.All(l => l is not null))
+            var suites = new List<IReadOnlyList<string?>>();
+            if (verrou is null)
+            {
+                suites.Add(langues);
+            }
+            else
+            {
+                suites.Add(langues.Select((l, i) => i == 0 ? verrou : l ?? verrou).ToList());
+                suites.Add(Enumerable.Repeat<string?>(verrou, joueurs).ToList());
+            }
+
+            foreach (var suite in suites.Where(su => su.All(l => l is not null)))
             {
                 foreach (var combinaison in combinaisons)
                 {
-                    if (combinaison.Pour(parPlace, contenu, empreinteDuCoeur) is { } depart)
+                    if (combinaison.Pour(suite, contenu, empreinteDuCoeur) is { } depart)
                     {
-                        return new(depart, parPlace[0], "combinaison de langues " + string.Join("+", parPlace));
+                        return new(depart, suite[0], "combinaison de langues " + string.Join("+", suite));
                     }
                 }
             }
