@@ -581,6 +581,34 @@ public sealed partial class MultiplayerPanelService
         }
     }
 
+    /// <summary>L'onglet NEW ADVENTURE : les aventures de ce jeu et ce que A maintenu va faire, lus chez le site.</summary>
+    private AventuresDuJeuEtat? _aventures;
+
+    private sealed record AventuresDuJeuEtat(string Jeu, RetroBat.Api.Adventure.AventuresDuJeu Contenu);
+
+    private async Task ChargerLesAventuresAsync(MultiplayerInstalledGame jeu)
+    {
+        if (_session.AventuresDuJeu is not { } lire)
+        {
+            return;
+        }
+
+        try
+        {
+            var contenu = await lire(jeu, CancellationToken.None).ConfigureAwait(false);
+            lock (_verrou)
+            {
+                _aventures = new AventuresDuJeuEtat(jeu.Game.Id, contenu);
+            }
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            _journal.LogDebug(ex, "ADVENTURE : aventures du jeu non lues");
+        }
+
+        Rafraichir();
+    }
+
     private async Task NouvelleAventureAsync(MultiplayerInstalledGame jeu)
     {
         var refus = await _session.NouvelleAventureAsync(jeu, CancellationToken.None).ConfigureAwait(false);
@@ -591,9 +619,12 @@ public sealed partial class MultiplayerPanelService
             if (refus is null)
             {
                 _modele.PlacerSurLOnglet(MultiplayerPanelModel.Onglet.WaitingForFriends);
+                // Le joueur voit que ca a marche : la salle de la nouvelle aventure, et un mot.
+                _refus = "adventure_started";
             }
         }
 
+        _ = ChargerLesAventuresAsync(jeu);
         Rafraichir();
     }
 
@@ -1181,6 +1212,11 @@ public sealed partial class MultiplayerPanelService
                 _ = InviterAsync();
                 break;
             case MultiplayerPanelModel.Effet.ChargerLOnglet:
+                if (_modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers && _jeu is { } pourLesAventures && _session.EstUneAventure(pourLesAventures))
+                {
+                    _ = ChargerLesAventuresAsync(pourLesAventures);
+                }
+
                 // FOR PLAYERS… et FOR FRIENDS sont deux gamerooms : passer de l'un a l'autre en change (28/10).
                 _ = Task.Run(ChangerDeGameroomAsync);
                 if (_modele.OngletCourant == MultiplayerPanelModel.Onglet.InviteFriends)
@@ -1551,6 +1587,51 @@ public sealed partial class MultiplayerPanelService
         }
     }
 
+    /// <summary>
+    /// L'ONGLET NEW ADVENTURE : les aventures de ce jeu (la plus recente d'abord ; « en cours » quand une seance est ouverte) et, en haut, la ligne
+    /// « HOLD A : START A NEW ADVENTURE (version, places) ». Sans aventure : « NO ADVENTURE YET FOR THIS GAME ».
+    /// </summary>
+    private (List<LeaderboardOverlayService.JoueurMultiplayer>, string) LesAventures(MultiplayerInstalledGame jeu, Func<string, string> T)
+        => LesAventures(_aventures is { } lu && lu.Jeu == jeu.Game.Id ? lu.Contenu : null, jeu.Game.Name, Math.Max(2, jeu.Game.Players), Texte);
+
+    /// <summary>Pur : les lignes de l'onglet et sa ligne du haut, depuis ce que le site a rendu (null : pas encore lu).</summary>
+    internal static (List<LeaderboardOverlayService.JoueurMultiplayer> Lignes, string Haut) LesAventures(
+        RetroBat.Api.Adventure.AventuresDuJeu? etat, string nomDuJeu, int placesParDefaut, Func<string, string, string> texte)
+    {
+        var version = etat?.Version is { Length: > 0 } v ? v : string.Empty;
+        var places = etat?.Places ?? placesParDefaut;
+        var ligneDuHaut = texte("adventure.new.hold", "HOLD A : START A NEW ADVENTURE ({version}, {seats} seats)")
+            .Replace("{version}", version, StringComparison.Ordinal).Replace("{seats}", places.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
+            .Replace("(, ", "(", StringComparison.Ordinal);
+        var lignes = new List<LeaderboardOverlayService.JoueurMultiplayer>();
+        if (etat?.Lignes is null)
+        {
+            lignes.Add(new(etat is null ? texte("adventure.new.loading", "LOADING...") : texte("adventure.new.offline", "ADVENTURES UNAVAILABLE (OFFLINE)"),
+                string.Empty, string.Empty, false, false, false, null, string.Empty, Place: 1));
+            return (lignes, ligneDuHaut);
+        }
+
+        if (etat.Lignes.Count == 0)
+        {
+            lignes.Add(new(texte("adventure.new.none", "NO ADVENTURE YET FOR THIS GAME"), string.Empty, string.Empty, false, false, false, null, string.Empty, Place: 1));
+            return (lignes, ligneDuHaut);
+        }
+
+        var joueurs = texte("adventure.new.players", "{n} players");
+        var enCours = texte("adventure.new.in_progress", "IN PROGRESS");
+        var i = 0;
+        foreach (var a in etat.Lignes)
+        {
+            i++;
+            var date = a.Date is { } d ? d.ToLocalTime().ToString("dd/MM HH:mm", CultureInfo.InvariantCulture) : string.Empty;
+            var detail = string.Join(" · ", new[] { joueurs.Replace("{n}", a.Joueurs.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal), date, a.EnCours ? enCours : string.Empty }
+                .Where(t => t.Length > 0));
+            lignes.Add(new(a.Version.Length > 0 ? a.Version : nomDuJeu, string.Empty, CouleurDe(a.Id), false, false, a.EnCours, null, detail, Place: i));
+        }
+
+        return (lignes, ligneDuHaut);
+    }
+
     private LeaderboardOverlayService.ContenuMultiplayer ComposerLePanneau(Func<string, string> T)
     {
         var jeu = _jeu;
@@ -1570,7 +1651,17 @@ public sealed partial class MultiplayerPanelService
         _modele.PoserLesLignes(lignes.Count(ligne => !ligne.Libre));
         var (selection, selectionCourante) = surUneSalle ? LaBandeDesPersonnages() : (null, -1);
 
-        var message = _refus is { Length: > 0 } refus ? T("multiplayer.refused." + refus) : string.Empty;
+        // L'ONGLET NEW ADVENTURE (27/11) : jamais vide. Ce qui va se passer (A maintenu), puis les aventures de ce jeu, ou le dit.
+        var nouvelle = jeu is not null && _session.EstUneAventure(jeu) && _modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers;
+        string? infoDeLaNouvelle = null;
+        if (nouvelle)
+        {
+            (lignes, infoDeLaNouvelle) = LesAventures(jeu!, T);
+            _modele.PoserLesLignes(0);
+        }
+
+        var message = _refus is "adventure_started" ? Texte("adventure.new.started", "NEW ADVENTURE STARTED")
+            : _refus is { Length: > 0 } refus ? T("multiplayer.refused." + refus) : string.Empty;
         if (message.StartsWith("multiplayer.refused.", StringComparison.Ordinal))
         {
             message = T("multiplayer.refused.other");
@@ -1583,9 +1674,9 @@ public sealed partial class MultiplayerPanelService
                 : MultiplayerPanelModel.Onglets.Select(MultiplayerPanelModel.Titre).ToList(),
             _modele.IndexOnglet,
             _modele.Etat == MultiplayerPanelModel.Foyer.Panneau,
-            classique ? T("multiplayer.badge.classic") : string.Empty,
-            classique ? T(classe ? "multiplayer.info.classic_ranked" : "multiplayer.info.classic") : LeRoulement(jeu?.Game, DateTimeOffset.UtcNow, T),
-            presents + "/" + max,
+            nouvelle ? string.Empty : classique ? T("multiplayer.badge.classic") : string.Empty,
+            infoDeLaNouvelle ?? (classique ? T(classe ? "multiplayer.info.classic_ranked" : "multiplayer.info.classic") : LeRoulement(jeu?.Game, DateTimeOffset.UtcNow, T)),
+            nouvelle ? string.Empty : presents + "/" + max,
             room is { State: "countdown", CountdownMs: { } ms } ? DateTime.UtcNow.AddMilliseconds(ms) : null,
             lignes,
             _modele.Ligne,

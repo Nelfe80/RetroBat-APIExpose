@@ -30,6 +30,12 @@ public static class AdventureChoix
     }
 }
 
+/// <summary>Une aventure de ce jeu, pour l'onglet NEW ADVENTURE : sa version, ses joueurs, la date de sa derniere version, et si une seance est ouverte.</summary>
+public sealed record AventureLigne(string Id, string Version, int Joueurs, DateTime? Date, bool EnCours);
+
+/// <summary>Ce que montre l'onglet NEW ADVENTURE : la version et les places de la prochaine aventure, et les aventures qui existent (null : site injoignable).</summary>
+public sealed record AventuresDuJeu(string Version, int Places, IReadOnlyList<AventureLigne>? Lignes);
+
 /// <summary>
 /// L'APPUI LONG SUR UN JEU DE LA COLLECTION NELFEPLAY ADVENTURE : reprendre l'aventure de ce jeu (celle dont une seance est ouverte,
 /// sinon la derniere jouee), ou en commencer une, puis ouvrir la seance chez le site. Le site place le joueur dans la gameroom
@@ -76,6 +82,23 @@ public sealed class AdventureLancement
         }
 
         return await OuvrirAsync(aventure, jeu, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// L'ONGLET NEW ADVENTURE (27/11) : ce que A maintenu va faire (une aventure de plus, de CETTE version, a toutes les places du jeu) et les aventures
+    /// de CE jeu qui existent deja, les plus recentes d'abord. Rend <c>Lignes</c> null quand le site ne repond pas.
+    /// </summary>
+    public async Task<AventuresDuJeu> AventuresDuJeuAsync(MultiplayerInstalledGame jeu, CancellationToken ct)
+    {
+        var spec = _catalogue?.Entrees(out _).FirstOrDefault(e => e.Jeu.Id == jeu.Game.Id)?.Spec;
+        string Version(string? contenu) => spec?.VersionDuContenu(contenu) is { } v ? v.Label ?? v.Key : string.Empty;
+        var miennes = await _site.MesAventuresAsync(ct).ConfigureAwait(false);
+        var lignes = miennes?.Aventures.Where(a => string.Equals(a.Game, jeu.Game.Id, StringComparison.Ordinal))
+            .OrderByDescending(a => a.Latest?.CreatedUtc ?? DateTime.MinValue)
+            .Select(a => new AventureLigne(a.Id, Version(a.Content.Length > 0 ? a.Content : jeu.ContentKey),
+                a.Latest?.Players is { } n and > 0 ? n : Math.Max(2, a.Seats), a.Latest?.CreatedUtc is { } d && d > DateTime.MinValue ? d : null, a.Room is { Length: > 0 }))
+            .ToList();
+        return new AventuresDuJeu(Version(jeu.ContentKey), Math.Max(2, jeu.Game.Players), lignes);
     }
 
     /// <summary>
