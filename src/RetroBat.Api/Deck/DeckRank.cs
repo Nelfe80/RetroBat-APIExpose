@@ -147,7 +147,8 @@ public sealed class DeckRankService : IHostedService, IDisposable
         var groupe = GroupeDe(l);
         if (groupe.Length == 0) return null;
         var regles = _collection?.ReglesOuvertes(groupe) ?? [];
-        switch (l.Mode)
+        // le TRAINING montre le Deck normal : le rang du World Scoring du jeu
+        switch (l.Training ? DeckModes.WorldScoring : l.Mode)
         {
             case DeckModes.WorldScoring:
                 return DeckRankBoard.DuJeu(groupe, LeaderboardClient.ReglePrincipale(regles), regles);

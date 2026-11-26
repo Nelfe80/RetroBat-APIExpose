@@ -304,6 +304,39 @@ public sealed class DeckLancementTests : IDisposable
     }
 
     [Fact]
+    public void Le_TRAINING_pose_le_Deck_normal_avec_les_indicateurs_Training_et_Ghost_et_sans_couche_d_epreuve()
+    {
+        var bus = new SimpleEventBus();
+        var service = Service(bus, new ApiContext { PlayerPseudo = "nelfe" });
+        service.StartAsync(CancellationToken.None).GetAwaiter().GetResult();
+        var rom = @"E:\RetroBat\roms\fbneo\19xx.zip";
+
+        // un speedrun ordinaire : ni Training ni Ghost
+        var ordinaire = service.Preparer(DeckModes.Speedrun, "fbneo", rom);
+        Assert.Equal("posed", ordinaire.Status);
+        Assert.False(ordinaire.Training);
+        Assert.False(ordinaire.Ghost);
+
+        // le TRAINING : meme Deck, indicateurs publies dans deck.launch (Training, Ghost), jamais de plan d'epreuve
+        var training = service.Preparer(DeckModes.Speedrun, "fbneo", rom, entrainement: true);
+        Assert.Equal("posed", training.Status);
+        Assert.Equal(DeckModes.Speedrun, training.Mode);
+        Assert.Equal(ordinaire.DeckId, training.DeckId);
+        Assert.True(training.Training);
+        Assert.True(training.Ghost);
+        var json = System.Text.Json.JsonSerializer.Serialize(training);
+        Assert.Contains("\"Training\":true", json);
+        Assert.Contains("\"Ghost\":true", json);
+
+        // le Deck est celui du World Scoring : le choix du joueur dans ce mode le gouverne (ici « sans Deck »)
+        service.Choix.Poser("nelfe", training.Game, DeckModes.WorldScoring, DeckChoix.Off);
+        Assert.Equal("off", service.Preparer(DeckModes.Speedrun, "fbneo", rom, entrainement: true).Status);
+        // le choix d'un autre mode reste le repli d'un speedrun ordinaire (choice-other-mode)
+        Assert.Equal("off", service.Preparer(DeckModes.Speedrun, "fbneo", rom).Status);
+        service.StopAsync(CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    [Fact]
     public void Le_Deck_du_direct_part_avec_le_CHALLENGE_diffuse_et_s_arrete_avec_la_partie()
     {
         var bus = new SimpleEventBus();
