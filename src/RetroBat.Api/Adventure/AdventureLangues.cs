@@ -37,14 +37,31 @@ public static class AdventureLangues
         }
 
         var texte = langue.Trim().ToLowerInvariant();
+        if (NomEnClair(texte) is { } connu)
+        {
+            return connu;
+        }
+
         var coupe = texte.IndexOfAny(['_', '-', '.']);
         var code = coupe > 0 ? texte[..coupe] : texte;
-        return code.Length is 2 or 3 && code.All(char.IsAsciiLetter) ? code[..2] : NomEnClair(texte);
+        return code.Length == 2 && code.All(char.IsAsciiLetter) ? code : null;
     }
 
     private static string? NomEnClair(string texte) => texte switch
     {
-        "english" => "en",
+        "english" or "eng" => "en",
+        "fre" or "fra" => "fr",
+        "ger" or "deu" => "de",
+        "spa" => "es",
+        "ita" => "it",
+        "jpn" or "jp" => "ja",
+        "por" => "pt",
+        "korean" or "kor" or "kr" => "ko",
+        "chinese" or "chi" or "zho" or "cn" => "zh",
+        "russian" or "rus" => "ru",
+        "dutch" or "dut" or "nld" => "nl",
+        "swedish" or "swe" => "sv",
+        "polish" or "pol" => "pl",
         "french" or "francais" or "français" => "fr",
         "german" or "deutsch" => "de",
         "spanish" or "espanol" or "español" => "es",

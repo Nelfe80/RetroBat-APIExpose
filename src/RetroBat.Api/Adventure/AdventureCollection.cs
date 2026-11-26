@@ -97,7 +97,7 @@ public sealed class AdventureCollection
             gamelists: sp.GetService<GamelistUpdateService>(),
             dataPack: sp.GetService<DataPackSyncService>(),
             paquets: sp.GetService<MultiplayerContenusDesPaquets>(),
-            profil: ProfilDeLaBorne(sp.GetRequiredService<AdventureCatalogueStore>(), () => sp.GetService<CabinetLocale>()?.Langue));
+            profil: ProfilDeLaBorne(sp.GetRequiredService<AdventureCatalogueStore>(), () => sp.GetService<CabinetLocale>()?.LangueDesJeux));
         return new AdventureCollection(service);
     }
 }
