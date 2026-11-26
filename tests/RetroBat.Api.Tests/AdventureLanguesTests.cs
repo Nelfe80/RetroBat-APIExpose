@@ -682,6 +682,21 @@ public class AdventureLanguesTests : IDisposable
         Assert.Equal(paire.Start!.State, choix.Depart!.State);
     }
 
+    [Theory]
+    [InlineData("french", "en_US", "fr")]        // le profil des ROMs passe avant la langue d'ES
+    [InlineData("german", null, "de")]
+    [InlineData("deutsch", "fr_FR", "de")]
+    [InlineData("spanish", "", "es")]
+    [InlineData("italian", "", "it")]
+    [InlineData("japanese", "", "ja")]
+    [InlineData("english", "fr_FR", "en")]
+    [InlineData("show_all", "fr_FR", "fr")]      // show_all n'est pas un profil : la langue d'ES
+    [InlineData("", "de_DE", "de")]
+    [InlineData(null, null, "en")]               // ni profil ni ES : l'anglais
+    [InlineData("show_all", "", "en")]
+    public void La_langue_des_jeux_de_la_borne_suit_le_profil_des_ROMs_puis_ES_puis_l_anglais(string? profil, string? es, string attendu)
+        => Assert.Equal(attendu, CabinetLocale.LangueDesJeuxDe(profil, es));
+
     private sealed class FauxCommandes : ICommandesRetroArch
     {
         public Task<string?> DemanderAsync(string commande, CancellationToken ct, int delaiMs = 500) => Task.FromResult<string?>(null);

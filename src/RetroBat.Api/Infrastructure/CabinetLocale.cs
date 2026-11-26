@@ -23,6 +23,7 @@ public sealed class CabinetLocale
     private readonly object _verrou = new();
     private string _langue = "en";
     private CultureInfo _culture = CultureInfo.GetCultureInfo("en-US");
+    private string _langueDesJeux = "en";
     private DateTime _lue = DateTime.MinValue;
 
     public CabinetLocale(EmulationStationSettingsService reglages, InterfaceTextService textes)
@@ -36,6 +37,21 @@ public sealed class CabinetLocale
     {
         get { Rafraichir(); lock (_verrou) return _langue; }
     }
+
+    /// <summary>
+    /// LA LANGUE DES JEUX de la borne, en deux lettres (« fr ») : le profil de langue des ROMs que le joueur regle dans les options
+    /// d'APIExpose (<c>global.apiexpose.romset.language_profile</c>, ou <c>api.language_profile</c> : french, german, japanese...), sinon la
+    /// langue d'ES, sinon « en ». « show_all » ou un profil vide n'est pas un profil. C'est celle que NelfePlay Adventure suit
+    /// (collection, depart, langue declaree au site). Lue de <c>ContentLanguageProfile</c> : le calcul des gamelists localisees, rien de refait.
+    /// </summary>
+    public string LangueDesJeux
+    {
+        get { Rafraichir(); lock (_verrou) return _langueDesJeux; }
+    }
+
+    /// <summary>Le profil de langue des ROMs (ou la langue d'ES, ou « en ») en deux lettres. Pur.</summary>
+    public static string LangueDesJeuxDe(string? profil, string? langueDEs)
+        => RetroBat.Api.Adventure.AdventureLangues.Normaliser(profil) ?? RetroBat.Api.Adventure.AdventureLangues.Normaliser(langueDEs) ?? "en";
 
     /// <summary>La culture de la borne, pour les nombres et les dates.</summary>
     public CultureInfo Culture
@@ -54,7 +70,9 @@ public sealed class CabinetLocale
             _lue = DateTime.UtcNow;
             try
             {
-                var langue = _reglages.GetScrapingSettings().Language;
+                var reglages = _reglages.GetScrapingSettings();
+                _langueDesJeux = LangueDesJeuxDe(reglages.ContentLanguageProfile, reglages.Language);
+                var langue = reglages.Language;
                 if (string.IsNullOrWhiteSpace(langue)) return;
                 _langue = langue.Trim();
                 _culture = CultureDe(_langue);
