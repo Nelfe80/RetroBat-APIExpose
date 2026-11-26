@@ -508,7 +508,9 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multi
 // versions, leur file d'envoi au site et la seance chez l'hote (reprise, sauvegardes, fin).
 builder.Services.AddSingleton<RetroBat.Api.Adventure.AdventureCatalogueStore>();
 builder.Services.AddSingleton<RetroBat.Api.Adventure.AdventureCollection>(sp => RetroBat.Api.Adventure.AdventureCollection.Creer(sp));
-builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Adventure.AdventureCollection>().Service);
+// PAS AddHostedService : sa fabrique rend le meme TYPE que celle de MULTIPLAYER (MultiplayerCollectionSyncService), et AddHostedService passe par
+// TryAddEnumerable, qui ecarte EN SILENCE le second du meme type (la collection d'Adventure ne demarrait jamais, vu sur la borne le 26/11).
+builder.Services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(sp => sp.GetRequiredService<RetroBat.Api.Adventure.AdventureCollection>().Service);
 builder.Services.AddSingleton<RetroBat.Api.Adventure.AdventureStockage>(_ => new RetroBat.Api.Adventure.AdventureStockage());
 builder.Services.AddSingleton<RetroBat.Api.Adventure.AdventureFileDEnvoi>();
 builder.Services.AddSingleton<RetroBat.Api.Adventure.IAdventureSite, RetroBat.Api.Adventure.AdventureSiteClient>();
