@@ -868,7 +868,7 @@ public sealed class MultiplayerLaunchService : IHostedService
 
     /// <summary>Le depart pret de cette partie (niveau NelfePlay, nombre de joueurs, contenu), ou null : partie classique.</summary>
     private MultiplayerStart? DepartDeLaRoom(MultiplayerRoom room, MultiplayerInstalledGame jeu)
-        => jeu.DepartPour(JoueursDeLaRoom(room)) ?? Aventure?.DepartDe(room);
+        => Aventure is { } aventure && aventure.EstUneAventure(room) ? aventure.DepartDe(room) : jeu.DepartPour(JoueursDeLaRoom(room));
 
     /// <summary>
     /// NELFEPLAY ADVENTURE (26/11) : la reprise, les sauvegardes et la fin d'une gameroom d'aventure. Pose par le demarrage de
@@ -1245,7 +1245,11 @@ public sealed class MultiplayerLaunchService : IHostedService
         progression?.Finir(ProgressionDuLancement.Panneaux);
         // Le depart par place, les reglages de la place, le lanceur : jusqu'au demarrage de RetroArch.
         progression?.Commencer(ProgressionDuLancement.Lanceur);
-        var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeu.Game, lancement.Seat, netplay, joueurs, decor);
+        // NELFEPLAY ADVENTURE : le jeu tel que cette place le lance (l'invite ne sauve jamais l'etat de sortie de l'hote).
+        var jeuLance = Aventure is { } enAventurePlace && enAventurePlace.EstUneAventure(room)
+            ? enAventurePlace.JeuPourLaPlace(room, jeu.Game, lancement.Role == "host")
+            : jeu.Game;
+        var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeuLance, lancement.Seat, netplay, joueurs, decor);
         if (arguments is null)
         {
             progression?.Echouer(ProgressionDuLancement.Lanceur);
@@ -1312,9 +1316,10 @@ public sealed class MultiplayerLaunchService : IHostedService
         }
 
         // NELFEPLAY ADVENTURE : les sauvegardes du jeu vont dans le dossier de l'aventure, jamais dans celles du joueur.
-        if (lancement.Role == "host" && Aventure is { } enAventure && enAventure.EstUneAventure(room))
+        // L'INVITE AUSSI (26/11) : sa sauvegarde personnelle n'est jamais touchee, il ecrit dans le dossier de l'aventure comme l'hote.
+        if (Aventure is { } enAventure && enAventure.EstUneAventure(room))
         {
-            foreach (var (cle, valeur) in enAventure.ReglagesDeLaPlace(room))
+            foreach (var (cle, valeur) in lancement.Role == "host" ? enAventure.ReglagesDeLaPlace(room) : enAventure.ReglagesDeLInvite(room))
             {
                 reglagesDeLaPlace[cle] = valeur;
             }

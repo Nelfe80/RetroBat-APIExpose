@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Globalization;
 using RetroBat.Api.Multiplayer;
+using RetroBat.Domain.Paths;
 
 namespace RetroBat.Api.Adventure;
 
@@ -25,6 +26,18 @@ public interface IAdventureHote
 
     /// <summary>Les reglages de RetroArch propres a l'aventure (dossier de sauvegardes de l'aventure), rendus a la fin de la partie.</summary>
     IReadOnlyDictionary<string, string> ReglagesDeLaPlace(MultiplayerRoom room);
+
+    /// <summary>
+    /// Les reglages de RetroArch de l'INVITE : ses sauvegardes vont aussi dans le dossier de l'aventure (la sauvegarde personnelle du
+    /// joueur n'est jamais ecrasee), sans autosave d'intervalle. L'etat qu'il joue lui vient de l'hote par le netplay.
+    /// </summary>
+    IReadOnlyDictionary<string, string> ReglagesDeLInvite(MultiplayerRoom room);
+
+    /// <summary>
+    /// Le jeu tel que cette place le lance : l'invite ne garde jamais l'<c>autosave</c> du catalogue (il chargerait a son depart un etat
+    /// de sortie qui n'est pas celui de la partie) ; l'hote le garde, pour la fin de seance quand le joueur ferme lui-meme.
+    /// </summary>
+    MultiplayerGame JeuPourLaPlace(MultiplayerRoom room, MultiplayerGame jeu, bool hote);
 
     /// <summary>L'emulateur est la : le suivi demarre (toutes les 5 minutes, et quand le jeu ecrit sa sauvegarde).</summary>
     void Demarree(MultiplayerRoom room, MultiplayerInstalledGame jeu);
@@ -162,7 +175,10 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
         }
 
         Directory.CreateDirectory(dossier);
-        var cartouche = Path.Combine(dossier, fichier);
+        var sansFichier = fichier.Length == 0;
+        var cartouche = sansFichier ? string.Empty : Path.Combine(dossier, fichier);
+        // L'etat de sortie d'une seance d'avant ne se charge jamais a ce depart (autosave du catalogue : RetroArch le rechargerait).
+        EffacerLEtatDeSortie(nomDeLaRom);
         MultiplayerStart? depart = null;
         switch (decision.Mode)
         {
@@ -182,7 +198,7 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
                     Players = joueurs,
                 };
                 // L'etat porte la sauvegarde de chaque console : celle de la cartouche est posee aussi, pour la relecture du jeu.
-                if (await ObjetAsync(id, version.SaveSha256, ct).ConfigureAwait(false) is { } sauvegarde)
+                if (!sansFichier && await ObjetAsync(id, version.SaveSha256, ct).ConfigureAwait(false) is { } sauvegarde)
                 {
                     File.WriteAllBytes(cartouche, sauvegarde);
                 }
@@ -198,12 +214,22 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
                     return false;
                 }
 
-                File.WriteAllBytes(cartouche, sauvegarde);
+                if (!sansFichier)
+                {
+                    File.WriteAllBytes(cartouche, sauvegarde);
+                }
+
+                depart = DepartDuCatalogue(jeu, joueurs);
                 break;
             }
             default:
                 // Consoles vierges : aucune sauvegarde ne traine d'une seance d'avant.
-                SupprimerSiPresent(cartouche);
+                if (!sansFichier)
+                {
+                    SupprimerSiPresent(cartouche);
+                }
+
+                depart = DepartDuCatalogue(jeu, joueurs);
                 break;
         }
 
@@ -248,19 +274,69 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
         return telecharge;
     }
 
+    /// <summary>La part d'Adventure du jeu, pour CE contenu : sa version localisee peut surcharger la sauvegarde de la cartouche.</summary>
     private AdventureSpec Specification(MultiplayerInstalledGame jeu)
-        => _catalogue?.Entrees(out _).FirstOrDefault(e => e.Jeu.Id == jeu.Game.Id)?.Spec ?? SpecificationParDefaut;
+        => (_catalogue?.Entrees(out _).FirstOrDefault(e => e.Jeu.Id == jeu.Game.Id)?.Spec ?? SpecificationParDefaut).PourLeContenu(jeu.ContentKey);
 
     private static readonly AdventureSpec SpecificationParDefaut = new() { Cartridge = new AdventureCartridge() };
 
     /// <summary>Le nom du fichier de la cartouche : un nom seul, jamais un chemin (la valeur vient du Data Pack).</summary>
     internal static string? FichierDeLaCartouche(AdventureSpec spec, string nomDeLaRom)
     {
-        var modele = (spec.Cartridge ?? new AdventureCartridge()).File.Replace("{rom}", nomDeLaRom, StringComparison.Ordinal);
+        var cartouche = spec.Cartridge ?? new AdventureCartridge();
+        // Un jeu a mot de passe (Lost Vikings) n'a aucun fichier : la reprise se fait par l'etat, rien n'est pose ni relu.
+        if (cartouche.SansFichier)
+        {
+            return string.Empty;
+        }
+
+        var modele = cartouche.File!.Replace("{rom}", nomDeLaRom, StringComparison.Ordinal);
         return modele.Length > 0 && modele == Path.GetFileName(modele) && !modele.Contains("..", StringComparison.Ordinal)
                && modele.IndexOfAny(Path.GetInvalidFileNameChars()) < 0
             ? modele
             : null;
+    }
+
+    /// <summary>
+    /// LE DEPART PRET DU CATALOGUE pour ce nombre de joueurs ET ce contenu (la version localisee du jeu) : une partie neuve repart de
+    /// l'etat « en jeu » fabrique au banc, pas de l'ecran titre. Son chemin est rendu absolu (dossier du catalogue Adventure) : la
+    /// pose de MULTIPLAYER le lit tel quel et verifie son empreinte. Null : le jeu n'en a pas pour ce nombre, partie neuve a l'ecran titre.
+    /// </summary>
+    private MultiplayerStart? DepartDuCatalogue(MultiplayerInstalledGame jeu, int joueurs)
+    {
+        if (jeu.DepartPour(joueurs) is not { } depart || string.IsNullOrWhiteSpace(depart.State) || Path.IsPathRooted(depart.State))
+        {
+            return null;
+        }
+
+        var dossier = _catalogue is null ? Path.Combine(RetroBatPaths.PluginRoot, "resources", "adventure") : Path.GetDirectoryName(_catalogue.Path)!;
+        var chemin = Path.GetFullPath(Path.Combine(dossier, depart.State.Replace('/', Path.DirectorySeparatorChar)));
+        return chemin.StartsWith(Path.GetFullPath(dossier), StringComparison.OrdinalIgnoreCase) ? depart with { State = chemin } : null;
+    }
+
+    /// <summary>Efface l'etat de sortie (<c>&lt;rom&gt;.state.auto</c>) d'une seance d'avant : dans le dossier des etats de RetroArch et ses sous-dossiers directs.</summary>
+    private void EffacerLEtatDeSortie(string nomDeLaRom)
+    {
+        try
+        {
+            if (DossierDesEtatsLocal() is not { Length: > 0 } dossier || !Directory.Exists(dossier))
+            {
+                return;
+            }
+
+            foreach (var chemin in new[] { dossier }.Concat(Directory.EnumerateDirectories(dossier)))
+            {
+                var auto = Path.Combine(chemin, nomDeLaRom + ".state.auto");
+                if (File.Exists(auto))
+                {
+                    File.Delete(auto);
+                }
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _journal?.LogDebug(ex, "ADVENTURE : etat de sortie d'avant non efface");
+        }
     }
 
     private static void SupprimerSiPresent(string chemin)
@@ -296,6 +372,27 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
                 ["autosave_interval"] = "10",
             }
             : new Dictionary<string, string>(StringComparer.Ordinal);
+
+    public IReadOnlyDictionary<string, string> ReglagesDeLInvite(MultiplayerRoom room)
+        => room.AdventureId is { } id && AdventureStockage.NomSur(id)
+            ? new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["savefile_directory"] = EnsureDir(_stockage.DossierDesSauvegardes(id)),
+                ["sort_savefiles_enable"] = "false",
+                ["sort_savefiles_by_content_enable"] = "false",
+            }
+            : new Dictionary<string, string>(StringComparer.Ordinal);
+
+    private static string EnsureDir(string dossier)
+    {
+        Directory.CreateDirectory(dossier);
+        return dossier;
+    }
+
+    public MultiplayerGame JeuPourLaPlace(MultiplayerRoom room, MultiplayerGame jeu, bool hote)
+        => hote || jeu.LauncherOptions is not { } options || !options.ContainsKey("autosave")
+            ? jeu
+            : jeu with { LauncherOptions = options.Where(p => p.Key != "autosave").ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal) };
 
     // ── pendant ────────────────────────────────────────────────────────────────────────────────────
 

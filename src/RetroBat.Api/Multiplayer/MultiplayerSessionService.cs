@@ -581,6 +581,35 @@ public sealed class MultiplayerSessionService : BackgroundService
     /// </summary>
     public Func<MultiplayerInstalledGame, CancellationToken, Task<string?>>? RejoindreUneAventure { get; set; }
 
+    /// <summary>Commencer une aventure de PLUS pour ce jeu (le panneau, onglet NEW ADVENTURE) ; meme forme que <see cref="RejoindreUneAventure"/>.</summary>
+    public Func<MultiplayerInstalledGame, CancellationToken, Task<string?>>? NouvelleAventure { get; set; }
+
+    /// <summary>
+    /// NOUVELLE AVENTURE : le joueur quitte la gameroom de son aventure d'avant (celle de ce jeu), puis le site en ouvre une autre.
+    /// Rend la raison d'un refus, ou null.
+    /// </summary>
+    public async Task<string?> NouvelleAventureAsync(MultiplayerInstalledGame jeu, CancellationToken ct = default)
+    {
+        if (NouvelleAventure is null || !EstUneAventure(jeu))
+        {
+            return "adventure_unavailable";
+        }
+
+        foreach (var room in Etat.Rooms.Where(r => r.AdventureId is not null && r.Game == jeu.Game.Id && r.State is "waiting" or "countdown").ToList())
+        {
+            await QuitterAsync(room.Room, ct).ConfigureAwait(false);
+        }
+
+        _appui = true;
+        var refus = await NouvelleAventure(jeu, ct).ConfigureAwait(false);
+        if (refus is null)
+        {
+            await SonderAsync(ct).ConfigureAwait(false);
+        }
+
+        return refus;
+    }
+
     /// <summary>
     /// Les jeux d'une autre collection que les gamerooms peuvent aussi porter (NelfePlay Adventure, 26/11) : meme calcul de
     /// jeu et de contenu, un autre catalogue. Les identifiants d'Adventure ne recoupent jamais ceux de MULTIPLAYER (prefixe

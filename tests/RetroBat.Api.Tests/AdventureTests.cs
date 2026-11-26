@@ -145,13 +145,15 @@ public class AdventureTests : IDisposable
         public bool SeanceFermee { get; private set; }
         public List<AdventureInfo> Mes { get; } = [];
         public List<string> Creees { get; } = [];
+        public List<string?> Versions_ { get; } = [];
         public List<(string Aventure, int Joueurs)> Ouvertures { get; } = [];
         public string? RefusDeSeance { get; set; }
         public string? RaisonDeFermeture { get; private set; }
 
-        public Task<AdventureInfo?> CreerAsync(string jeu, string contenu, int places, string mode, string? titre, string? coeur, string? empreinteDuCoeur, CancellationToken ct)
+        public Task<AdventureInfo?> CreerAsync(string jeu, string contenu, int places, string mode, string? titre, string? coeur, string? empreinteDuCoeur, CancellationToken ct, string? version = null)
         {
             Creees.Add(jeu);
+            Versions_.Add(version);
             return Task.FromResult<AdventureInfo?>(Injoignable ? null : new AdventureInfo { Id = "av-neuve", Game = jeu, Content = contenu, Seats = places, Mode = mode, Name = titre });
         }
 
@@ -759,7 +761,6 @@ public class AdventureTests : IDisposable
     private static object Kirby(string id = "gba/kirby-amazing-mirror") => new
     {
         id, system = "gba", name = "Kirby & The Amazing Mirror", family = "adventure", players = new { min = 2, max = 4 }, core = "mgba_splitscreen",
-        starts = new[] { new { id = "pret", name = "depart pret", sha256 = "aa" } },
         content = new { md5 = new[] { "abc123" }, size = new[] { 11L } },
         adventure = new { cartridge_save = new { console = 1, file = "{rom}.srm" }, fresh_hint = "choisir MULTI PLAYER" },
     };
@@ -778,14 +779,14 @@ public class AdventureTests : IDisposable
     }
 
     [Fact]
-    public void La_forme_du_site_est_lue_players_en_min_max_et_les_departs_prets_du_site_sont_ignores()
+    public void La_forme_du_site_est_lue_players_en_min_max()
     {
         var store = new AdventureCatalogueStore(path: Catalogue([Kirby()]));
         var entree = Assert.Single(store.Entrees(out _));
         Assert.Equal(4, entree.Jeu.Players);          // le maximum
         Assert.Equal(2, entree.Spec.MinPlayers);      // le minimum passe a la part d'Adventure
-        Assert.Null(entree.Jeu.Starts);               // « starts » du site n'est pas un depart de MULTIPLAYER
-        Assert.Equal("mgba_splitscreen", entree.Jeu.Core);
+        // Le coeur du jeu est celui de son systeme : il en garde les options (splitscreen_players={players}).
+        Assert.Equal("{players}", store.Lire(out _)!.CoreOf(entree.Jeu)!.Options!["mgba_splitscreen_players"]);
     }
 
     [Fact]
@@ -839,7 +840,7 @@ public class AdventureTests : IDisposable
         public Task WaitForStableFileAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 
-    private MultiplayerCollectionSyncService Collection(NelfePlayOptions options, AdventureCatalogueStore store)
+    private MultiplayerCollectionSyncService Collection(NelfePlayOptions options, AdventureCatalogueStore store, Func<string, string?>? md5 = null)
     {
         var etat = Path.Combine(_racine, "state");
         var roms = Path.Combine(_racine, "roms");
@@ -852,7 +853,7 @@ public class AdventureTests : IDisposable
             new MediaRuntimeState(),
             romsRoot: roms,
             emulateurTourne: () => false,
-            md5DuContenu: _ => "abc123",
+            md5DuContenu: md5 ?? (_ => "abc123"),
             coeurPose: _ => true,
             profil: AdventureCollection.Profil);
     }
@@ -1064,6 +1065,321 @@ public class AdventureTests : IDisposable
         Assert.Contains("global.apiexpose.nelfeplay.voice_chat", texte);
         Assert.Equal(3, System.Text.RegularExpressions.Regex.Matches(texte, "show_adventure_collection").Count);   // feature, menu, defaut
     }
+
+    // ── plusieurs versions localisees d'un jeu (decision du user du 26/11) ─────────────────────────
+
+    private static object KirbyEnVersions() => new
+    {
+        id = "gba/kirby-amazing-mirror", system = "gba", name = "Kirby & The Amazing Mirror", family = "coop", players = new { min = 2, max = 4 },
+        core = "mgba_splitscreen", level = "nelfeplay",
+        content = new { md5 = new[] { "eu1" } },
+        default_version = "usa",
+        versions = new object[]
+        {
+            new
+            {
+                key = "eu", label = "Europe", region = "Europe", languages = new[] { "en", "fr", "de" }, content = new { md5 = new[] { "eu1" }, crc = new[] { "eeee0001" }, size = new[] { 11L } },
+                start = new { state = "states/gba/kirby/eu/aventure-2p.state", sha256 = new string('b', 64), players = 2, content = "eu1" },
+                starts = new[]
+                {
+                    new { state = "states/gba/kirby/eu/aventure-3p.state", sha256 = new string('d', 64), players = 3, content = "eu1" },
+                    new { state = "states/gba/kirby/eu/aventure-4p.state", sha256 = new string('e', 64), players = 4, content = "eu1" },
+                },
+                adventure_override = new { cartridge_save = new { file = "{rom}.sav" } },
+            },
+            new
+            {
+                key = "usa", label = "USA", region = "USA", languages = new[] { "en" }, content = new { md5 = new[] { "abc123" }, crc = new[] { "aaaa0001" }, size = new[] { 11L } },
+                start = new { state = "states/gba/kirby/usa/aventure-2p.state", sha256 = new string('a', 64), players = 2, content = "abc123" },
+                starts = new[]
+                {
+                    new { state = "states/gba/kirby/usa/aventure-3p.state", sha256 = new string('c', 64), players = 3, content = "abc123" },
+                    new { state = "states/gba/kirby/usa/aventure-4p.state", sha256 = new string('f', 64), players = 4, content = "abc123" },
+                },
+            },
+        },
+        adventure = new { cartridge_save = new { console = 1, file = "{rom}.srm", kind = "gba_srm_slots" } },
+    };
+
+    [Fact]
+    public void Les_versions_d_un_jeu_sont_fondues_la_version_par_defaut_d_abord_chaque_depart_garde_son_contenu()
+    {
+        var store = new AdventureCatalogueStore(path: Catalogue([KirbyEnVersions()]));
+        var entree = Assert.Single(store.Entrees(out var erreur));
+        Assert.Null(erreur);
+        Assert.Equal(["abc123", "eu1"], entree.Jeu.Content!.Md5.ToArray());   // la version par defaut d'abord : l'ordre de preference
+        Assert.Equal(["aaaa0001", "eeee0001"], entree.Jeu.Content.Crc.ToArray());
+
+        // Chaque depart ne sert QU'A sa version (un etat fait sur un contenu ne se charge jamais sur un autre).
+        Assert.Equal("states/gba/kirby/usa/aventure-2p.state", entree.Jeu.DepartPour(2, "abc123")!.State);
+        Assert.Equal("states/gba/kirby/eu/aventure-2p.state", entree.Jeu.DepartPour(2, "eu1")!.State);
+        Assert.Equal("states/gba/kirby/usa/aventure-3p.state", entree.Jeu.DepartPour(3, "abc123")!.State);
+        Assert.Equal("states/gba/kirby/eu/aventure-3p.state", entree.Jeu.DepartPour(3, "eu1")!.State);
+        Assert.Null(entree.Jeu.DepartPour(3, "inconnu"));
+    }
+
+    [Fact]
+    public void Chaque_version_porte_ses_langues_et_peut_surcharger_la_sauvegarde_de_la_cartouche()
+    {
+        var spec = Assert.Single(new AdventureCatalogueStore(path: Catalogue([KirbyEnVersions()])).Entrees(out _)).Spec;
+        Assert.Equal(["usa", "eu"], spec.Versions.Select(v => v.Key).OrderByDescending(k => k == "usa").ToArray());
+        Assert.Equal("usa", spec.DefaultVersion);
+        Assert.Equal(["en", "fr", "de"], spec.VersionDuContenu("eu1")!.Languages.ToArray());
+        Assert.Equal("USA", spec.VersionDuContenu("ABC123")!.Label);
+        Assert.Null(spec.VersionDuContenu("inconnu"));
+        Assert.Equal("{rom}.srm", spec.PourLeContenu("abc123").Cartridge!.File);
+        Assert.Equal("{rom}.sav", spec.PourLeContenu("eu1").Cartridge!.File);   // la surcharge de la version Europe
+    }
+
+    [Fact]
+    public async Task La_collection_Adventure_prend_chaque_version_que_la_borne_possede_et_une_seule_fois_un_contenu_identique()
+    {
+        Directory.CreateDirectory(Path.Combine(_racine, "roms", "gba"));
+        File.WriteAllText(Path.Combine(_racine, "roms", "gba", "Kirby (USA).gba"), "usa-usa-usa");           // 11 octets
+        File.WriteAllText(Path.Combine(_racine, "roms", "gba", "Kirby (Europe).gba"), "eur-eur-eur");
+        File.WriteAllText(Path.Combine(_racine, "roms", "gba", "Kirby (Europe) (1).gba"), "eur-eur-eur");     // le meme contenu sous un autre nom
+        var store = new AdventureCatalogueStore(path: Catalogue([KirbyEnVersions()]));
+        var collection = Collection(new NelfePlayOptions { ShowAdventureCollection = true }, store, md5: chemin =>
+            File.ReadAllText(chemin).StartsWith("usa", StringComparison.Ordinal) ? "abc123" : "eu1");
+
+        await collection.SynchroniserAsync("test", CancellationToken.None);
+        var jeux = collection.JeuxConnus();
+
+        Assert.Equal(["abc123", "eu1"], jeux.Select(j => j.ContentKey).ToArray());
+        Assert.All(jeux, j => Assert.Equal("gba/kirby-amazing-mirror", j.Game.Id));
+        // L'identite est le contenu, jamais le nom du fichier.
+        Assert.Equal(1, jeux.Count(j => j.ContentKey == "eu1"));
+    }
+
+    [Fact]
+    public async Task L_appui_long_suit_le_contenu_que_le_joueur_lance_et_cree_l_aventure_de_cette_version()
+    {
+        var catalogue = new AdventureCatalogueStore(path: Catalogue([KirbyEnVersions()]));
+        var site = new FauxSite();
+        site.Mes.Add(UneAventure("av-usa", jeu: "gba/kirby-amazing-mirror", contenu: "abc123"));
+        var lancement = new AdventureLancement(site, coeur => "coeur-sha", catalogue: catalogue);
+        MultiplayerInstalledGame Version(string md5) => new(new MultiplayerGame { Id = "gba/kirby-amazing-mirror", System = "gba", Name = "Kirby", Players = 4 },
+            Path.Combine(_racine, "kirby.gba"), new MultiplayerCore { Core = "mgba_splitscreen" }, md5);
+
+        // Celui qui lance la version USA reprend son aventure USA ...
+        Assert.Null(await lancement.RejoindreAsync(Version("abc123"), CancellationToken.None));
+        Assert.Equal("av-usa", site.Ouvertures.Single().Aventure);
+        Assert.Empty(site.Creees);
+
+        // ... celui qui lance la version Europe n'en a pas : une aventure Europe est creee, avec la cle de version.
+        Assert.Null(await lancement.RejoindreAsync(Version("eu1"), CancellationToken.None));
+        Assert.Equal(["gba/kirby-amazing-mirror"], site.Creees.ToArray());
+        Assert.Equal(["eu"], site.Versions_.ToArray());
+    }
+
+    [Fact]
+    public async Task Nouvelle_aventure_en_cree_une_de_plus_meme_quand_une_existe()
+    {
+        var site = new FauxSite();
+        site.Mes.Add(UneAventure("av-1"));
+        var refus = await UnLancement(site).NouvelleAsync(Jeu(Path.Combine(_racine, "kirby.gba")), CancellationToken.None);
+        Assert.Null(refus);
+        Assert.Single(site.Creees);
+        Assert.Equal("av-neuve", Assert.Single(site.Ouvertures).Aventure);
+    }
+
+    // ── le brouillon reel du lot 0 et le catalogue du Data Pack ────────────────────────────────────
+
+    private static void VerifierUnCatalogue(string chemin, bool departsSurDisque)
+    {
+        var store = new AdventureCatalogueStore(path: chemin);
+        var entrees = store.Entrees(out var erreur);
+        Assert.Null(erreur);
+        var ids = entrees.Select(e => e.Jeu.Id).ToArray();
+        Assert.Contains("gba/kirby-amazing-mirror", ids);
+        Assert.Contains("gba/shining-soul-ii", ids);
+        Assert.Contains("snes/secret-of-mana", ids);
+        Assert.Contains("snes/the-lost-vikings", ids);
+        Assert.Contains("megadrive/the-lost-vikings", ids);
+        // Four Swords n'a pas de depart (liaison GBA non etablie) : un jeu de niveau NelfePlay sans depart est ecarte, il n'entre pas.
+        Assert.DoesNotContain("gba/zelda-alttp-four-swords", ids);
+
+        var kirby = entrees.Single(e => e.Jeu.Id == "gba/kirby-amazing-mirror");
+        Assert.Equal(4, kirby.Jeu.Players);
+        Assert.Equal("mgba_splitscreen", store.Lire(out _)!.CoreOf(kirby.Jeu)!.Core);
+        Assert.Equal("{players}", store.Lire(out _)!.CoreOf(kirby.Jeu)!.Options!["splitscreen_players"]);
+        Assert.NotNull(kirby.Jeu.DepartPour(2, "df5efe075b35859529ebf82a4d824458"));
+        Assert.NotNull(kirby.Jeu.DepartPour(4, "df5efe075b35859529ebf82a4d824458"));
+        Assert.Equal("{rom}.srm", kirby.Spec.Cartridge!.File);
+        Assert.Equal("gba_srm_slots", kirby.Spec.Cartridge.Kind);
+
+        // Lost Vikings : un mot de passe, aucun fichier de sauvegarde.
+        Assert.True(entrees.Single(e => e.Jeu.Id == "snes/the-lost-vikings").Spec.Cartridge!.SansFichier);
+        Assert.False(kirby.Spec.Cartridge.SansFichier);
+        // Le Mega Drive garde ses deux md5 (USA et Europe), chacun avec son depart quand il en a un.
+        var md = entrees.Single(e => e.Jeu.Id == "megadrive/the-lost-vikings");
+        Assert.Equal(2, md.Jeu.Content!.Md5.Count);
+        Assert.NotNull(md.Jeu.DepartPour(2, "8335ca918a503047fc9cde6a0b082308"));
+
+        if (departsSurDisque)
+        {
+            var dossier = Path.GetDirectoryName(chemin)!;
+            foreach (var depart in entrees.SelectMany(e => (e.Jeu.Starts ?? []).Prepend(e.Jeu.Start!)))
+            {
+                var fichier = Path.Combine(dossier, depart.State.Replace('/', Path.DirectorySeparatorChar));
+                Assert.True(File.Exists(fichier), depart.State);
+                Assert.Equal(depart.Sha256, Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(fichier))), ignoreCase: true);
+            }
+        }
+    }
+
+    [Fact]
+    public void Le_brouillon_reel_du_lot_0_se_lit()
+    {
+        var chemin = @"E:\claude_travail\temp\adventure\lot0\brouillon\catalogue_adventure.json";
+        if (File.Exists(chemin))
+        {
+            VerifierUnCatalogue(chemin, departsSurDisque: true);
+        }
+    }
+
+    [Fact]
+    public void Le_catalogue_du_Data_Pack_de_la_branche_Adventure_se_lit_et_ses_departs_existent()
+    {
+        var chemin = @"E:\claude_travail\worktrees\datapack-adventure\adventure\catalogue.json";
+        if (File.Exists(chemin))
+        {
+            VerifierUnCatalogue(chemin, departsSurDisque: true);
+        }
+    }
+
+    // ── les sauvegardes de l'invite, et la seance d'une version localisee ──────────────────────────
+
+    [Fact]
+    public async Task L_invite_ecrit_ses_sauvegardes_dans_le_dossier_de_l_aventure_jamais_dans_les_siennes()
+    {
+        var (service, _, stockage, _) = UneSeance();
+        var salle = Salle(2) with { Launch = new MultiplayerLancement { Role = "guest", Seat = 2, Players = 2 } };
+        var reglages = service.ReglagesDeLInvite(salle);
+
+        Assert.Equal(stockage.DossierDesSauvegardes("av-1"), reglages["savefile_directory"]);
+        Assert.Equal("false", reglages["sort_savefiles_enable"]);
+        Assert.Equal("false", reglages["sort_savefiles_by_content_enable"]);
+        Assert.True(Directory.Exists(reglages["savefile_directory"]));
+        // Pas d'ecriture reguliere pour lui : l'etat qu'il joue lui vient de l'hote.
+        Assert.False(reglages.ContainsKey("autosave_interval"));
+        Assert.Empty(service.ReglagesDeLInvite(salle with { Adventure = null }));
+        await Task.CompletedTask;
+    }
+
+    [Fact]
+    public void Seul_l_hote_garde_l_autosave_du_catalogue()
+    {
+        var (service, _, _, _) = UneSeance();
+        var jeu = new MultiplayerGame { Id = "gba/kirby", System = "gba", Players = 4, LauncherOptions = new Dictionary<string, string> { ["autosave"] = "1", ["rewind"] = "0" } };
+        Assert.Equal("1", service.JeuPourLaPlace(Salle(2), jeu, hote: true).LauncherOptions!["autosave"]);
+        var invite = service.JeuPourLaPlace(Salle(2), jeu, hote: false);
+        Assert.False(invite.LauncherOptions!.ContainsKey("autosave"));
+        Assert.Equal("0", invite.LauncherOptions["rewind"]);
+    }
+
+    [Fact]
+    public async Task Un_etat_de_sortie_d_une_seance_d_avant_est_efface_avant_le_lancement()
+    {
+        var (service, _, _, _) = UneSeance();
+        var etats = Path.Combine(_racine, "etats-rom");
+        Directory.CreateDirectory(Path.Combine(etats, "mgba"));
+        var vieux = Path.Combine(etats, "kirby.state.auto");
+        var vieuxDeCoeur = Path.Combine(etats, "mgba", "kirby.state.auto");
+        var autre = Path.Combine(etats, "autre.state.auto");
+        File.WriteAllText(vieux, "x");
+        File.WriteAllText(vieuxDeCoeur, "x");
+        File.WriteAllText(autre, "x");
+        service.DossierDesEtatsLocal = () => etats;
+
+        await service.PreparerAsync(Salle(2), Jeu(Path.Combine(_racine, "kirby.gba")), CancellationToken.None);
+
+        Assert.False(File.Exists(vieux));
+        Assert.False(File.Exists(vieuxDeCoeur));
+        Assert.True(File.Exists(autre));   // celui d'une autre ROM n'est pas touche
+    }
+
+    [Fact]
+    public async Task Une_partie_neuve_repart_du_depart_pret_de_sa_version_avec_un_chemin_verifiable()
+    {
+        var etat = Encoding.UTF8.GetBytes("depart pret kirby usa 2p");
+        var dossier = Path.Combine(_racine, "resources", "adventure");
+        Directory.CreateDirectory(Path.Combine(dossier, "states"));
+        File.WriteAllBytes(Path.Combine(dossier, "states", "usa-2p.state"), etat);
+        var catalogue = new AdventureCatalogueStore(path: Catalogue([new
+        {
+            id = "gba/kirby", system = "gba", name = "Kirby", players = new { min = 2, max = 2 }, core = "mgba_splitscreen", level = "nelfeplay",
+            content = new { md5 = new[] { "md5kirby" } },
+            start = new { state = "states/usa-2p.state", sha256 = AdventureStockage.Empreinte(etat), players = 2, content = "md5kirby" },
+        }]));
+        var stockage = Stockage();
+        var site = new FauxSite { Aventure = new AdventureInfo { Id = "av-1", Game = "gba/kirby", Content = "md5kirby", Seats = 4 } };
+        var service = new AdventureSeanceService(site, stockage, new AdventureFileDEnvoi(stockage), () => new FauxRetroArch("e", "c"), _ => "coeur-sha", () => _heure, catalogue: catalogue);
+        var jeu = new MultiplayerInstalledGame(Assert.Single(catalogue.Entrees(out _)).Jeu, Path.Combine(_racine, "kirby.gba"), new MultiplayerCore { Core = "mgba_splitscreen" }, "md5kirby");
+        var salle = Salle(2);
+
+        Assert.True(await service.PreparerAsync(salle, jeu, CancellationToken.None));
+
+        Assert.Equal(ModeDeReprise.Neuf, service.De("r1")!.Decision.Mode);
+        var depart = service.DepartDe(salle)!;
+        Assert.True(Path.IsPathRooted(depart.State));
+        Assert.Equal(etat, File.ReadAllBytes(depart.State));
+        Assert.Equal(AdventureStockage.Empreinte(etat), depart.Sha256, ignoreCase: true);
+        // A 3 joueurs ce contenu n'a pas de depart : l'ecran titre, pas un etat d'un autre nombre de consoles.
+        var troisJoueurs = Salle(3, "r3");
+        await service.PreparerAsync(troisJoueurs, jeu, CancellationToken.None);
+        Assert.Null(service.DepartDe(troisJoueurs));
+    }
+
+    [Fact]
+    public async Task L_etat_de_l_aventure_passe_avant_le_depart_pret_du_catalogue()
+    {
+        var etatCatalogue = Encoding.UTF8.GetBytes("depart pret");
+        var dossier = Path.Combine(_racine, "resources", "adventure");
+        Directory.CreateDirectory(Path.Combine(dossier, "states"));
+        File.WriteAllBytes(Path.Combine(dossier, "states", "usa-2p.state"), etatCatalogue);
+        var catalogue = new AdventureCatalogueStore(path: Catalogue([new
+        {
+            id = "gba/kirby", system = "gba", name = "Kirby", players = new { min = 2, max = 2 }, core = "mgba_splitscreen", level = "nelfeplay",
+            content = new { md5 = new[] { "md5kirby" } },
+            start = new { state = "states/usa-2p.state", sha256 = AdventureStockage.Empreinte(etatCatalogue), players = 2, content = "md5kirby" },
+        }]));
+        var stockage = Stockage();
+        var site = new FauxSite { Aventure = new AdventureInfo { Id = "av-1", Game = "gba/kirby", Content = "md5kirby", Seats = 4 } };
+        PoserUneVersion(site, stockage, 2);
+        var service = new AdventureSeanceService(site, stockage, new AdventureFileDEnvoi(stockage), () => new FauxRetroArch("e", "c"), _ => "coeur-sha", () => _heure, catalogue: catalogue);
+        var jeu = new MultiplayerInstalledGame(Assert.Single(catalogue.Entrees(out _)).Jeu, Path.Combine(_racine, "kirby.gba"), new MultiplayerCore { Core = "mgba_splitscreen" }, "md5kirby");
+        var salle = Salle(2);
+
+        await service.PreparerAsync(salle, jeu, CancellationToken.None);
+
+        Assert.Equal(ModeDeReprise.Etat, service.De("r1")!.Decision.Mode);
+        Assert.Equal(Encoding.UTF8.GetBytes("etat a 2"), File.ReadAllBytes(service.DepartDe(salle)!.State));
+    }
+
+    [Fact]
+    public async Task Un_jeu_a_mot_de_passe_n_a_aucun_fichier_de_cartouche_et_reprend_par_l_etat()
+    {
+        var catalogue = new AdventureCatalogueStore(path: Catalogue([new
+        {
+            id = "snes/the-lost-vikings", system = "snes", name = "The Lost Vikings", players = new { min = 2, max = 2 }, core = "snes9x", level = "nelfeplay",
+            content = new { md5 = new[] { "md5kirby" } },
+            start = new { state = "states/x.state", sha256 = new string('a', 64), players = 2, content = "md5kirby" },
+            adventure = new { cartridge_save = new { console = 1, file = (string?)null, kind = "password", bytes = 0 } },
+        }]));
+        var stockage = Stockage();
+        var site = new FauxSite { Aventure = new AdventureInfo { Id = "av-1", Game = "snes/the-lost-vikings", Content = "md5kirby", Seats = 2 } };
+        PoserUneVersion(site, stockage, 2);
+        var service = new AdventureSeanceService(site, stockage, new AdventureFileDEnvoi(stockage), () => new FauxRetroArch("e", "c"), _ => "coeur-sha", () => _heure, catalogue: catalogue);
+        var jeu = new MultiplayerInstalledGame(Assert.Single(catalogue.Entrees(out _)).Jeu, Path.Combine(_racine, "vikings.sfc"), new MultiplayerCore { Core = "snes9x" }, "md5kirby");
+
+        Assert.True(await service.PreparerAsync(Salle(2), jeu, CancellationToken.None));
+
+        Assert.Equal(ModeDeReprise.Etat, service.De("r1")!.Decision.Mode);
+        Assert.Empty(Directory.EnumerateFiles(stockage.DossierDesSauvegardes("av-1")));   // rien n'a ete pose
+    }
+
+    // ── NEW ADVENTURE dans la session ───────────────────────────────────────────────────────────────
 
     // ── le client du site ──────────────────────────────────────────────────────────────────────────
 

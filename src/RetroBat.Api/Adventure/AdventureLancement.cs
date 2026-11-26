@@ -37,9 +37,12 @@ public sealed class AdventureLancement
     private readonly IAdventureSite _site;
     private readonly Func<string?, string?> _empreinteDuCoeur;
     private readonly ILogger<AdventureLancement>? _journal;
+    private readonly AdventureCatalogueStore? _catalogue;
 
-    public AdventureLancement(IAdventureSite site, Func<string?, string?>? empreinteDuCoeur = null, ILogger<AdventureLancement>? journal = null)
+    public AdventureLancement(IAdventureSite site, Func<string?, string?>? empreinteDuCoeur = null, ILogger<AdventureLancement>? journal = null,
+        AdventureCatalogueStore? catalogue = null)
     {
+        _catalogue = catalogue;
         _site = site;
         _empreinteDuCoeur = empreinteDuCoeur ?? (coeur => EtatsParCoeur.EmpreinteDuCoeurInstalle(coeur));
         _journal = journal;
@@ -57,17 +60,42 @@ public sealed class AdventureLancement
         var aventure = AdventureChoix.Choisir(miennes.Aventures, jeu.Game.Id, jeu.ContentKey);
         if (aventure is null)
         {
-            var coeur = jeu.Core?.Core;
-            aventure = await _site.CreerAsync(jeu.Game.Id, jeu.ContentKey, Math.Max(2, jeu.Game.Players), AdventureModes.Exclusive, null, coeur,
-                _empreinteDuCoeur(coeur), ct).ConfigureAwait(false);
+            aventure = await CreerAsync(jeu, ct).ConfigureAwait(false);
             if (aventure is null)
             {
                 return "unknown_game";
             }
-
-            _journal?.LogInformation("ADVENTURE : aventure {Aventure} creee pour {Jeu}", aventure.Id, jeu.Game.Id);
         }
 
+        return await OuvrirAsync(aventure, jeu, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// NOUVELLE AVENTURE (panneau, 26/11) : une aventure de plus pour ce jeu et CETTE version, meme quand une autre existe : sinon le
+    /// joueur ne pourrait jamais en recommencer une. Rend la raison d'un refus, ou null.
+    /// </summary>
+    public async Task<string?> NouvelleAsync(MultiplayerInstalledGame jeu, CancellationToken ct)
+    {
+        var aventure = await CreerAsync(jeu, ct).ConfigureAwait(false);
+        return aventure is null ? "unknown_game" : await OuvrirAsync(aventure, jeu, ct).ConfigureAwait(false);
+    }
+
+    private async Task<AdventureInfo?> CreerAsync(MultiplayerInstalledGame jeu, CancellationToken ct)
+    {
+        var coeur = jeu.Core?.Core;
+        var version = _catalogue?.Entrees(out _).FirstOrDefault(e => e.Jeu.Id == jeu.Game.Id)?.Spec.VersionDuContenu(jeu.ContentKey)?.Key;
+        var aventure = await _site.CreerAsync(jeu.Game.Id, jeu.ContentKey, Math.Max(2, jeu.Game.Players), AdventureModes.Exclusive, null, coeur,
+            _empreinteDuCoeur(coeur), ct, version).ConfigureAwait(false);
+        if (aventure is not null)
+        {
+            _journal?.LogInformation("ADVENTURE : aventure {Aventure} creee pour {Jeu} (version {Version})", aventure.Id, jeu.Game.Id, version ?? "unique");
+        }
+
+        return aventure;
+    }
+
+    private async Task<string?> OuvrirAsync(AdventureInfo aventure, MultiplayerInstalledGame jeu, CancellationToken ct)
+    {
         var seance = await _site.OuvrirSeanceAsync(aventure.Id, AdventureChoix.Joueurs(aventure, jeu.Game.Players), ct).ConfigureAwait(false);
         if (seance is null)
         {

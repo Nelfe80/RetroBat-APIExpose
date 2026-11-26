@@ -23,7 +23,7 @@ public static class AdventureObjets
 /// </summary>
 public interface IAdventureSite
 {
-    Task<AdventureInfo?> CreerAsync(string jeu, string contenu, int places, string mode, string? titre, string? coeur, string? empreinteDuCoeur, CancellationToken ct);
+    Task<AdventureInfo?> CreerAsync(string jeu, string contenu, int places, string mode, string? titre, string? coeur, string? empreinteDuCoeur, CancellationToken ct, string? version = null);
 
     Task<AdventureMesAventures?> MesAventuresAsync(CancellationToken ct);
 
@@ -208,7 +208,7 @@ public sealed class AdventureSiteClient : IAdventureSite
 
     // ── les routes ─────────────────────────────────────────────────────────────────────────────────
 
-    public async Task<AdventureInfo?> CreerAsync(string jeu, string contenu, int places, string mode, string? titre, string? coeur, string? empreinteDuCoeur, CancellationToken ct)
+    public async Task<AdventureInfo?> CreerAsync(string jeu, string contenu, int places, string mode, string? titre, string? coeur, string? empreinteDuCoeur, CancellationToken ct, string? version = null)
     {
         var r = await AppelerAsync(HttpMethod.Post, "create", new
         {
@@ -217,6 +217,8 @@ public sealed class AdventureSiteClient : IAdventureSite
             places,
             mode,
             title = titre,
+            // La version localisee (USA, Europe, France...) : informative, le contenu (md5) fait l'identite (CONTRAT.md, proposition du lot 0).
+            version,
             core = coeur,
             // Le « core_version » du site : la borne n'en connait pas d'autre que l'empreinte de la dll installee (CONTRAT.md, questions).
             core_version = empreinteDuCoeur,

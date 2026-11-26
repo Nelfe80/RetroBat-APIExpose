@@ -536,6 +536,12 @@ public sealed partial class MultiplayerPanelService
     /// </summary>
     private async Task ChangerDeGameroomAsync()
     {
+        // Une aventure n'a ni gameroom publique ni d'amis a choisir : un seul onglet de salle (l'autre commence une aventure, A maintenu).
+        if (_jeu is { } enAventure && _session.EstUneAventure(enAventure))
+        {
+            return;
+        }
+
         await _changementDeSalle.WaitAsync().ConfigureAwait(false);
         try
         {
@@ -572,6 +578,22 @@ public sealed partial class MultiplayerPanelService
         {
             _changementDeSalle.Release();
         }
+    }
+
+    private async Task NouvelleAventureAsync(MultiplayerInstalledGame jeu)
+    {
+        var refus = await _session.NouvelleAventureAsync(jeu, CancellationToken.None).ConfigureAwait(false);
+        _journal.LogInformation("ADVENTURE : nouvelle aventure de {Jeu} ({Statut})", jeu.Game.Id, refus ?? "ok");
+        lock (_verrou)
+        {
+            _refus = refus;
+            if (refus is null)
+            {
+                _modele.PlacerSurLOnglet(MultiplayerPanelModel.Onglet.WaitingForFriends);
+            }
+        }
+
+        Rafraichir();
     }
 
     /// <summary>
@@ -978,6 +1000,15 @@ public sealed partial class MultiplayerPanelService
             {
                 // Panneau ouvert, une invitation attend (sa carte est en haut a droite) : l'appui long la prend.
                 _ = AccepterInvitationAsync();
+                return;
+            }
+
+            // NELFEPLAY ADVENTURE : A maintenu sur l'onglet « nouvelle aventure » en commence une (jamais au simple passage : on ne cree pas
+            // une aventure en parcourant les onglets).
+            if (maintenu && _mode == Mode.Panneau && _jeu is { } pourAventure && _session.EstUneAventure(pourAventure)
+                && _modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForPlayers)
+            {
+                _ = Task.Run(() => NouvelleAventureAsync(pourAventure));
                 return;
             }
 
@@ -1545,7 +1576,10 @@ public sealed partial class MultiplayerPanelService
         }
 
         return new LeaderboardOverlayService.ContenuMultiplayer(
-            MultiplayerPanelModel.Onglets.Select(MultiplayerPanelModel.Titre).ToList(),
+            jeu is not null && _session.EstUneAventure(jeu)
+                // ADVENTURE : « reprendre » est la salle de l'aventure, « nouvelle » en commence une autre (A maintenu).
+                ? [MultiplayerPanelModel.Titre(MultiplayerPanelModel.Onglet.InviteFriends), T("adventure.tab.resume"), T("adventure.tab.new")]
+                : MultiplayerPanelModel.Onglets.Select(MultiplayerPanelModel.Titre).ToList(),
             _modele.IndexOnglet,
             _modele.Etat == MultiplayerPanelModel.Foyer.Panneau,
             classique ? T("multiplayer.badge.classic") : string.Empty,

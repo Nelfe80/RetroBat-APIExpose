@@ -60,6 +60,9 @@ public sealed class AdventureSauveur
     /// <summary>Le fichier de sauvegarde de la cartouche de l'aventure.</summary>
     public string CheminDeLaCartouche => Path.Combine(_stockage.DossierDesSauvegardes(_seance.Aventure), _seance.FichierDeLaCartouche);
 
+    /// <summary>Un jeu a mot de passe n'a pas de fichier de cartouche : la version n'en porte pas.</summary>
+    private bool SansCartouche => _seance.FichierDeLaCartouche.Length == 0;
+
     /// <summary>La duree jouee de l'aventure jusqu'ici : ce qu'elle avait deja et cette seance.</summary>
     public long DureeTotale() => _seance.DureeDejaJouee + (long)Math.Max(0, (_maintenant() - _debut).TotalSeconds);
 
@@ -74,6 +77,11 @@ public sealed class AdventureSauveur
     {
         try
         {
+            if (SansCartouche)
+            {
+                return null;
+            }
+
             var chemin = CheminDeLaCartouche;
             return File.Exists(chemin) ? ReadShared(chemin) : null;
         }

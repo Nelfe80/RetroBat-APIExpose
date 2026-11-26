@@ -23,7 +23,7 @@ public sealed class AdventureCollection
     public const string Logo = "nelfeplay-adventure.png";
 
     public static readonly MultiplayerCollectionSyncService.ProfilDeCollection Profil
-        = new(Nom, Logo, np => np.ShowAdventureCollection, "adventure-jeux.json");
+        = new(Nom, Logo, np => np.ShowAdventureCollection, "adventure-jeux.json", ToutesLesVersions: true);
 
     public AdventureCollection(MultiplayerCollectionSyncService service)
     {

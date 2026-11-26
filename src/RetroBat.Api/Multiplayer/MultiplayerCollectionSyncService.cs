@@ -89,7 +89,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     /// Ce qui distingue une collection d'une autre quand le meme calcul sert deux catalogues (NelfePlay Adventure, 26/11) : son
     /// nom d'ES, son logo, l'option qui l'allume et le fichier ou se garde sa derniere passe. Defaut : MULTIPLAYER.
     /// </summary>
-    public sealed record ProfilDeCollection(string Nom, string Logo, Func<RetroBat.Api.Infrastructure.NelfePlayOptions, bool> Visible, string Trace)
+    public sealed record ProfilDeCollection(string Nom, string Logo, Func<RetroBat.Api.Infrastructure.NelfePlayOptions, bool> Visible, string Trace, bool ToutesLesVersions = false)
     {
         public static ProfilDeCollection Multiplayer { get; } = new(CollectionName, LogoFile, np => np.ShowMultiplayerCollection, "multiplayer-jeux.json");
     }
@@ -541,6 +541,18 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
                     inventaires[jeu.System] = inventaire = _catalog.Enumerate(SystemesDuContenu(jeu.System), avecGroupe: false);
                 }
 
+                if (_profil.ToutesLesVersions)
+                {
+                    // NELFEPLAY ADVENTURE (26/11, decision du user : toutes les versions localisees) : chaque version du jeu que la borne
+                    // possede est une entree, dans l'ordre de preference du catalogue. Deux fichiers au meme contenu n'en font qu'une.
+                    foreach (var (cheminDeLaVersion, cleDeLaVersion) in TrouverTousLesContenus(jeu.Content!, inventaire))
+                    {
+                        retenus.Add(new MultiplayerInstalledGame(jeu.PourLeContenu(cleDeLaVersion), cheminDeLaVersion, coeur, cleDeLaVersion));
+                    }
+
+                    continue;
+                }
+
                 (chemin, cle) = TrouverContenu(jeu.Content!, inventaire);
             }
 
@@ -640,6 +652,27 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     /// </summary>
     private (string? Chemin, string? Md5) TrouverContenu(MultiplayerContent contenu, IReadOnlyList<InstalledGame> inventaire)
     {
+        var trouves = ContenusTrouves(contenu, inventaire);
+        foreach (var prefere in contenu.Md5)
+        {
+            if (trouves.TryGetValue(prefere, out var chemin))
+            {
+                return (chemin, prefere);
+            }
+        }
+
+        return (null, null);
+    }
+
+    /// <summary>Tous les contenus du catalogue que la borne possede, dans l'ordre de preference du catalogue (un fichier par contenu).</summary>
+    private IReadOnlyList<(string Chemin, string Md5)> TrouverTousLesContenus(MultiplayerContent contenu, IReadOnlyList<InstalledGame> inventaire)
+    {
+        var trouves = ContenusTrouves(contenu, inventaire);
+        return contenu.Md5.Distinct(StringComparer.OrdinalIgnoreCase).Where(trouves.ContainsKey).Select(md5 => (trouves[md5], md5)).ToList();
+    }
+
+    private Dictionary<string, string> ContenusTrouves(MultiplayerContent contenu, IReadOnlyList<InstalledGame> inventaire)
+    {
         var md5 = contenu.Md5.ToHashSet(StringComparer.OrdinalIgnoreCase);
         var trouves = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (var installe in inventaire)
@@ -674,15 +707,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
             }
         }
 
-        foreach (var prefere in contenu.Md5)
-        {
-            if (trouves.TryGetValue(prefere, out var chemin))
-            {
-                return (chemin, prefere);
-            }
-        }
-
-        return (null, null);
+        return trouves;
     }
 
     /// <summary>Un jeu sur cartouche : tous ses contenus connus tiennent sous le plafond d'une cartouche (64 Mo).</summary>
