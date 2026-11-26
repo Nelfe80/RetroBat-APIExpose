@@ -164,8 +164,10 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
         Multiplayer.SonDEmulationStation? sonDEs = null,
         Speedrun.IPrioritesDuJeu? priorites = null,
         WorldScoringEcransService? ecransWs = null,
-        Infrastructure.SuiviDuSite? suivi = null)
+        Infrastructure.SuiviDuSite? suivi = null,
+        Infrastructure.ControleBiosFbneo? biosFbneo = null)
     {
+        _biosFbneo = biosFbneo;
         _suivi = suivi;
         _ecransWs = ecransWs;
         _priorites = priorites;
@@ -963,6 +965,7 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
     /// <summary>La derniere ouverture visait-elle la collection MULTIPLAYER ?</summary>
     private bool _versMultiplayer;
     private readonly Infrastructure.PartieNelfePlayService? _partie;
+    private readonly Infrastructure.ControleBiosFbneo? _biosFbneo;
 
     /// <summary>Les conditions d'ouverture. Toutes doivent tenir : un panneau qui s'ouvre au mauvais moment se ferme mal.</summary>
     private bool PeutSOuvrir(out string systeme, out string nomDuJeu, out string cheminDuJeu)
@@ -1931,6 +1934,8 @@ public sealed class LeaderboardInputService : IHostedService, IDisposable
             // ES ne sait pas qu'un jeu tourne : sa musique se tait jusqu'a la fin du jeu (SonDEmulationStation la rend ensuite)
             _sonDEs?.Couper();
             _partie?.AnnoncerLancement("defi");
+            // Le BIOS que FBNeo exige et qui manque (Rainbow Islands : cchip.zip) : le joueur est prevenu, le lancement part quand meme.
+            _biosFbneo?.Verifier(chemin);
             var lanceur = Infrastructure.LancementDirect.Lancer(arguments, resolution.Systeme, chemin, _context, _bus, _logger);
             if (lanceur is null)
             {
