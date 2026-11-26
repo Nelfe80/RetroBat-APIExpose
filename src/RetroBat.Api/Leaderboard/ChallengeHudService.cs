@@ -59,10 +59,12 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
     private bool _affiche;
     private long _score;
     private EsMenuStyle _style = new();
+    private readonly IServiceProvider? _services;
 
     public ChallengeHudService(IEventBus bus, ILogger<ChallengeHudService> journal, RetroBat.Api.Infrastructure.CabinetLocale? locale = null,
-        RetroBat.Api.Deck.DeckSilence? silence = null)
+        RetroBat.Api.Deck.DeckSilence? silence = null, IServiceProvider? services = null)
     {
+        _services = services;
         _silence = silence;
         if (silence is not null) silence.Change += SurChangeDuDeck;
         _locale = locale;
@@ -160,6 +162,8 @@ public sealed class ChallengeHudService : IHostedService, IDisposable
                 case "score.live.changed":
                     var score = LireScore(e.Payload);
                     if (score is null) return;
+                    // Un score vu avant le depart de la partie (test memoire du BIOS) ou en demo ne gagne aucun rang (25/11).
+                    if (_services?.GetService(typeof(NelfePlayScoringReporter)) is NelfePlayScoringReporter rapporteur && rapporteur.ScoreHorsPartie()) return;
                     bool redessiner;
                     lock (_verrou)
                     {

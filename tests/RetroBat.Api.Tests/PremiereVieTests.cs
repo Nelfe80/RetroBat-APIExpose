@@ -179,10 +179,15 @@ public class PremiereVieTests
         (9114, 104300), (9115, 104600),
     ];
 
+    // Depuis le 26/11 SelectBestRun ne coupe plus a la baisse transitoire de 19XX (BaisseTransitoireTests) ; le garde-fou
+    // PerteSansPlace reste pour toute vraie chute qui ouvrirait un run au milieu de la partie : on garde ici le run
+    // que l'ancienne coupe retenait (a partir de l'image 7700).
+    private static List<(long frame, long total)> RunApresChute19xx() => Trajectoire19xx.Where(p => p.frame >= 7700).ToList();
+
     [Fact]
     public void Le_19XX_du_25_11_le_run_retenu_commence_apres_les_deux_premieres_vies_perdues()
     {
-        var run = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(Trajectoire19xx);
+        var run = RunApresChute19xx();
         Assert.Equal(104600, run[^1].total);
         Assert.True(run[0].frame > 5087, $"le run commence a l'image {run[0].frame}");
 
@@ -195,7 +200,7 @@ public class PremiereVieTests
     [Fact]
     public void Une_perte_d_avant_le_run_sans_partie_neuve_entre_les_deux_interdit_le_1LC()
     {
-        var run = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(Trajectoire19xx);
+        var run = RunApresChute19xx();
         // Un seul credit, consomme au depart (image 726) : rien ne montre une partie neuve apres la premiere perte.
         var sansPlace = PremiereVie.PerteSansPlace(run, [(2541L, 1), (5087L, 1)], Trajectoire19xx, [726L]);
         Assert.Equal(2541, sansPlace);
@@ -204,7 +209,7 @@ public class PremiereVieTests
     [Fact]
     public void Un_credit_une_fin_de_partie_ou_un_START_entre_la_perte_et_le_run_la_rend_a_l_autre_partie()
     {
-        var run = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(Trajectoire19xx);
+        var run = RunApresChute19xx();
         Assert.Null(PremiereVie.PerteSansPlace(run, [(2541L, 1)], Trajectoire19xx, [726L, 6000L]));   // credit consomme ensuite
         Assert.Null(PremiereVie.PerteSansPlace(run, [(2541L, 1)], Trajectoire19xx, [run[0].frame]));  // a l'image du depart du run
         // Un depart d'AVANT la perte ne dit rien sur elle.
@@ -214,7 +219,7 @@ public class PremiereVieTests
     [Fact]
     public void Une_perte_du_joueur_2_ou_posterieure_au_depart_du_run_ou_sans_point_marque_avant_elle_ne_gene_pas()
     {
-        var run = RetroBat.Api.Infrastructure.NelfePlayScoringReporter.SelectBestRun(Trajectoire19xx);
+        var run = RunApresChute19xx();
         Assert.Null(PremiereVie.PerteSansPlace(run, [(2541L, 2)], Trajectoire19xx, []));            // joueur 2
         Assert.Null(PremiereVie.PerteSansPlace(run, [(8500L, 1)], Trajectoire19xx, []));            // dans le run : Couper la place
         // Initialisation des vies d'un depart : aucune lecture positive avant elle.

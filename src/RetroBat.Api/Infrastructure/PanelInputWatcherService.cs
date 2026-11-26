@@ -327,6 +327,7 @@ public sealed class PanelInputWatcherService : IHostedService, IDisposable
     private void NumberPlayers(CabinetInputReader reader)
     {
         var devices = reader.Devices;
+        PanneauDeLaBorne.Appareils = devices;   // instantane pour le remappage de panneau (voir PanelRemapExportService.AjusterAuLancement)
         var players = PlayerNumbering.Assign(devices, PlayerNumbering.ReadPins(), _joueursDuLancement);
         _players = players;
         var key = PlayerNumbering.Describe(devices, players);

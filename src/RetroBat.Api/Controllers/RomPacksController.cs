@@ -13,12 +13,15 @@ public sealed class RomPacksController : ControllerBase
     private readonly RetroBat.Api.Replay.Video.EchelleDesFilms? _echelle;
     private readonly RetroBat.Api.Infrastructure.CertifiedSettingsService? _certifies;
     private readonly RetroBat.Api.Infrastructure.NotificationsDesLancementsEs? _notifications;
+    private readonly RetroBat.Api.Infrastructure.ControleBiosFbneo? _biosFbneo;
 
     public RomPacksController(RomPackInstallerService romPackInstaller,
         RetroBat.Api.Replay.Video.EchelleDesFilms? echelle = null,
         RetroBat.Api.Infrastructure.CertifiedSettingsService? certifies = null,
-        RetroBat.Api.Infrastructure.NotificationsDesLancementsEs? notifications = null)
+        RetroBat.Api.Infrastructure.NotificationsDesLancementsEs? notifications = null,
+        RetroBat.Api.Infrastructure.ControleBiosFbneo? biosFbneo = null)
     {
+        _biosFbneo = biosFbneo;
         _romPackInstaller = romPackInstaller;
         _echelle = echelle;
         _certifies = certifies;
@@ -47,6 +50,9 @@ public sealed class RomPacksController : ControllerBase
         }
         // Les notifications de RetroArch d'une partie NelfePlay lancee par ES : la cle par jeu, rendue des que l'emulateur parait (11/11)
         _notifications?.PoserAvantLeLancement(rawArguments);
+        // Le BIOS que FBNeo exige et qui manque (Rainbow Islands : cchip.zip) : le joueur est prevenu, le lancement n'est pas retenu.
+        if (_biosFbneo is not null)
+            _biosFbneo.Verifier(RetroBat.Api.Replay.Video.EchelleDesFilms.LancementDuScript(rawArguments).Chemin);
         var result = await _romPackInstaller.EnsureLaunchRomAsync(rawArguments, cancellationToken);
         return Ok(result);
     }

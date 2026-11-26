@@ -40,6 +40,7 @@ public sealed class DeckRankService : IHostedService, IDisposable
     private static readonly TimeSpan DureeDeLArmement = TimeSpan.FromMinutes(2);
 
     private readonly IEventBus _bus;
+    private readonly IServiceProvider? _services;
     private readonly ApiContext _contexte;
     private readonly LeaderboardClient? _classements;
     private readonly ClassementsDesDefis? _epreuves;
@@ -61,8 +62,9 @@ public sealed class DeckRankService : IHostedService, IDisposable
 
     public DeckRankService(IEventBus bus, ApiContext contexte, LeaderboardClient? classements = null, ClassementsDesDefis? epreuves = null,
         NelfePlayScoringCollectionSyncService? collection = null, NelfePlayScoringSessionService? session = null,
-        DeckStateService? etat = null, ILogger<DeckRankService>? journal = null)
+        DeckStateService? etat = null, ILogger<DeckRankService>? journal = null, IServiceProvider? services = null)
     {
+        _services = services;
         _bus = bus;
         _contexte = contexte;
         _classements = classements;
@@ -307,6 +309,9 @@ public sealed class DeckRankService : IHostedService, IDisposable
     {
         var joueur = (int)(DeckStateService.Entier(DeckStateService.Champ(payload, "Player")) ?? 1);
         if (DeckStateService.Entier(DeckStateService.Champ(payload, "Score")) is not { } score) return;
+        // Avant le depart de la partie (test memoire du BIOS, 25/11) ou en demo, le score n'est pas celui du joueur : pas de rang.
+        if (_services?.GetService(typeof(RetroBat.Api.Infrastructure.NelfePlayScoringReporter)) is RetroBat.Api.Infrastructure.NelfePlayScoringReporter rapporteur
+            && rapporteur.ScoreHorsPartie()) return;
         Armement? arme;
         lock (_verrou)
         {

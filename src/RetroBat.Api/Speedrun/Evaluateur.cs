@@ -130,6 +130,7 @@ public sealed class Evaluateur
         {
             if (EnCourse)
                 return _r.TempsDuJeu.Select(l => l.Adresse).Concat(_r.ValeursFinales.Select(v => v.Adresse))
+                    .Concat(_r.Officiel?.Arrivee.Quand.Select(q => q.Adresse) ?? [])
                     .Distinct().Where(a => !_valeurs.ContainsKey(a)).ToList();
             var quittees = _r.ValeursQuitteesAuDepart().Select(q => q.Adresse).ToHashSet();
             return _r.AdressesDeDepart().Distinct()
@@ -322,8 +323,8 @@ public sealed class Evaluateur
         // Le chrono secondaire peut partir apres l'officiel (Green Hill 1 : main au joueur 25 images apres le timer).
         if (_r.Cale is { } cale && _departCale is null && Borne(cale.Depart, s, precedente)) _departCale = s.Frame;
         if (_r.Independant is { } ind && _departIndependant is null && Borne(ind.Depart, s, precedente)) _departIndependant = s.Frame;
-        if (_r.Cale is { } c2 && _departCale is not null && c2.Arrivee.Evenements.Any(f => Correspond(f, s, precedente))) { _arriveeEvenementCale = s.Frame; _horlogeArriveeCale = s.HorlogeMs ?? _horlogeDeLImage; }
-        if (_r.Independant is { } i2 && _departIndependant is not null && i2.Arrivee.Evenements.Any(f => Correspond(f, s, precedente))) { _arriveeEvenementIndependant = s.Frame; _horlogeArriveeIndependant = s.HorlogeMs ?? _horlogeDeLImage; }
+        if (_r.Cale is { } c2 && _departCale is not null && Borne(c2.Arrivee, s, precedente)) { _arriveeEvenementCale = s.Frame; _horlogeArriveeCale = s.HorlogeMs ?? _horlogeDeLImage; }
+        if (_r.Independant is { } i2 && _departIndependant is not null && Borne(i2.Arrivee, s, precedente)) { _arriveeEvenementIndependant = s.Frame; _horlogeArriveeIndependant = s.HorlogeMs ?? _horlogeDeLImage; }
 
         if (Etat == EtatTentative.ArriveeProvisoire && _r.EffacePar.Any(c => Correspond(c, s, precedente)))
         {
@@ -331,7 +332,7 @@ public sealed class Evaluateur
             Etat = EtatTentative.EnCourse;
         }
 
-        if (_r.Arrivee.Any(c => Correspond(c, s, precedente)))
+        if (_r.Arrivee.Any(c => Correspond(c, s, precedente)) && ArriveeOfficielleVraie())
         {
             _arriveeProvisoire = s.Frame;
             Citer("finish", s);
@@ -351,9 +352,9 @@ public sealed class Evaluateur
     private bool Confirme(Signal s, int? precedente)
     {
         if (!_r.Confirmations.Any(c => Correspond(c, s, precedente))) return false;
-        if (_r.Independant is { } ind && _departIndependant is not null && ind.Arrivee.Evenements.Any(f => Correspond(f, s, precedente)))
+        if (_r.Independant is { } ind && _departIndependant is not null && Borne(ind.Arrivee, s, precedente))
             { _arriveeEvenementIndependant = s.Frame; _horlogeArriveeIndependant = s.HorlogeMs ?? _horlogeDeLImage; }
-        if (_r.Cale is { } cale && _departCale is not null && cale.Arrivee.Evenements.Any(f => Correspond(f, s, precedente)))
+        if (_r.Cale is { } cale && _departCale is not null && Borne(cale.Arrivee, s, precedente))
             { _arriveeEvenementCale = s.Frame; _horlogeArriveeCale = s.HorlogeMs ?? _horlogeDeLImage; }
         Citer("finish_confirm", s);
         _confirmation = s.Frame;
@@ -447,6 +448,13 @@ public sealed class Evaluateur
         var frames = (s.Frame - f0) * 1000.0 / _r.Cadence;
         return horloge - frames > _r.TolerancePauseMs && frames < horloge * PartMinimaleDesImages;
     }
+
+    /// <summary>
+    /// Les conditions « when » de l'ARRIVEE du chrono officiel (alignement sur les jeux complets de la communaute : Super Mario
+    /// Bros. Any% n'arrive qu'a la hache du monde 8, alors que 0x0770 = 2 tombe aussi a chaque chateau). Sans « when » : toujours vraie.
+    /// </summary>
+    private bool ArriveeOfficielleVraie()
+        => _r.Officiel is not { } o || o.Arrivee.Quand.All(q => _valeurs.TryGetValue(q.Adresse, out var v) && q.Vraie(v));
 
     private bool Borne(BorneDeChrono borne, Signal s, int? precedente)
         => borne.Evenements.Any(ev => Correspond(ev, s, precedente))

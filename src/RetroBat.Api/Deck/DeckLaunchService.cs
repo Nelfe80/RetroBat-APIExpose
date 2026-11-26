@@ -834,6 +834,23 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
                 case "panel.input.devices":
                     _geste.Oublier();
                     break;
+                case "ui.game.started":
+                {
+                    // Le decor que le lanceur a REELLEMENT pose (25/11 : le user et NeoGeoff ne voyaient pas le Deck, rien au journal)
+                    DeckLancement? posee;
+                    lock (_verrou) posee = _enCours is { Status: "posed" } p && DateTime.UtcNow - _preparation < TimeSpan.FromMinutes(2) ? p : null;
+                    if (posee is not null)
+                    {
+                        var jeu = posee.Game;
+                        _ = Task.Run(async () =>
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(12)).ConfigureAwait(false);
+                            _journal?.LogInformation("PlayerDeck : decor de {Jeu} vu par RetroArch : {Constat}", jeu,
+                                DeckDecor.Constat(RetroBatPaths.RetroArchConfigPath, Path.Combine(Path.GetDirectoryName(RetroBatPaths.RetroArchConfigPath) ?? "", "custom-overlay.cfg")));
+                        });
+                    }
+                    break;
+                }
                 case "ui.game.ended":
                 {
                     bool effacer;

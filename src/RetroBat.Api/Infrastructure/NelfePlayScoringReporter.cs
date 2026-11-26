@@ -287,6 +287,10 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// pour le depart, et vingt minutes d'Alex Kidd sans replay.
     /// </summary>
     private volatile bool _panelLu;
+    /// <summary>Un appui du joueur a ete vu (panel, ou wrapper) depuis que le .MEM du jeu est charge : l'appui du depart (25/11).</summary>
+    private bool _appuiDepuisLeChargement;
+    /// <summary>Le wrapper a deja envoye une seconde d'appuis (listener 0.340 et apres) : il sait voir un appui.</summary>
+    private volatile bool _pressesVues;
 
     /// <summary>Le systeme du jeu charge (attestation du pont) : mastersystem, arcade...</summary>
     private string _systemeDuJeu = "";
@@ -1073,6 +1077,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _startVu = false;
             _enJeu = false;
             _gameStartVu = false;
+            _appuiDepuisLeChargement = false;
             _departDuLabo = false;
             _dernierTotalVu = null;
             _scoreAuDepart = null;
@@ -1926,8 +1931,23 @@ public sealed class NelfePlayScoringReporter : BackgroundService
 
     public bool ScoreHorsPartie()
     {
-        lock (_sync) return _inDemo || (_startVu && !_enJeu);
+        lock (_sync)
+        {
+            return _inDemo || (_startVu && !_enJeu)
+                || !DepartVu(_startVu, _gameStartVu, _credits.Count > 0 || _departs.Count > 0, _enJeu || _departDuLabo, _appuiDepuisLeChargement,
+                    voitLesAppuis: _panelLu || _pressesVues || PanneauDeLaBorne.Appareils is { Count: > 0 });
+        }
     }
+
+    /// <summary>
+    /// LA PARTIE A-T-ELLE COMMENCE (25/11, Blazing Star sous FBNeo) ? Le test memoire du BIOS Neo Geo ecrit 0x5555 puis 0xAAAA dans le
+    /// mot du score : 55 555 555 « battait » le record du monde avant toute partie (rang du defi, capture, direct, plaque du Deck).
+    /// Le meme depart que le replay et la Partie NelfePlay : un START, un credit consomme, GAME_START, un etat de depart, ou un
+    /// appui du joueur une fois le jeu charge. Une borne dont l'API ne voit aucune manette ni aucun appui garde le
+    /// comportement d'avant : ne pas savoir ne doit pas faire perdre un record. Pur.
+    /// </summary>
+    internal static bool DepartVu(bool startVu, bool gameStartVu, bool creditOuDepart, bool etatDeDepart, bool appuiDepuisLeChargement, bool voitLesAppuis)
+        => startVu || gameStartVu || creditOuDepart || etatDeDepart || appuiDepuisLeChargement || !voitLesAppuis;
 
     /// <summary>Un appui du joueur, de quelque source que ce soit.</summary>
     private void NoterAppui()
@@ -1937,6 +1957,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         {
             var maintenant = DateTime.UtcNow;
             _dernierAppuiUtc = maintenant;
+            if (_definitionChargee is not null) _appuiDepuisLeChargement = true;
             if (_demoEnSuspens is { } s && DemoRefutee(s.Depuis, maintenant))
             {
                 _demoEnSuspens = null;
@@ -2303,6 +2324,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     private void CapturePorts(JsonElement root)
     {
         if (!root.TryGetProperty("Presses", out var p) || p.ValueKind != JsonValueKind.Array) return;
+        _pressesVues = true;
         var appuis = p.EnumerateArray().Select(v => v.TryGetInt32(out var n) ? n : 0).ToArray();
         if (appuis.Length > 0) _portLocal.SecondeDuWrapper(appuis);
         // Le wrapper voit les entrees que RetroArch donne au jeu : clavier compris, manette non lue
@@ -2792,6 +2814,60 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>Un creux de passage dure une image ; une demi-seconde laisse de la marge.</summary>
     private const long CreuxMaxImages = 30;
 
+    /// <summary>
+    /// LES BAISSES TRANSITOIRES (26/11, 19XX). Certains jeux reutilisent l'adresse du score pendant un ecran
+    /// (fin de stage, decompte de bonus) : 19XX y lit 183, puis 84 900 (le vrai score, bonus compris), puis 183
+    /// encore, sur plusieurs secondes, avant de reprendre a 85 000. Ce n'est pas un creux de passage (le retour
+    /// arrive des dizaines d'images plus tard) et le run etait coupe : le 1CC de 104 600 ne portait que la fin de
+    /// la partie. Une baisse est transitoire quand le score est tres inferieur a celui d'avant (au plus la moitie),
+    /// dure peu de lectures (au plus <see cref="BaisseMaxLectures"/>) et peu d'images, et que la lecture qui
+    /// suit RETROUVE d'un coup au moins le niveau d'avant. Une vraie nouvelle partie remonte lentement depuis zero :
+    /// elle ne peut pas revenir, en quelques lectures, au score de la partie precedente. Une lecture a ZERO est une
+    /// remise a zero : la baisse reste une nouvelle partie (hors creux de passage, voir SansCreux). Rien n'est retire sous
+    /// <see cref="BaisseNiveauMin"/> (une partie qui n'a presque rien marque n'a rien a perdre ici).
+    /// </summary>
+    internal static List<(long frame, long total)> SansBaisseTransitoire(List<(long frame, long total)> traj)
+    {
+        if (traj.Count < 3) return traj;
+        var sortie = new List<(long frame, long total)>(traj.Count);
+        var i = 0;
+        while (i < traj.Count)
+        {
+            if (sortie.Count > 0 && traj[i].total < sortie[^1].total && sortie[^1].total >= BaisseNiveauMin)
+            {
+                var niveau = sortie[^1].total;
+                var reprise = -1;
+                long hautDuCreux = 0;
+                var remiseAZero = false;
+                for (var j = i; j < traj.Count && j <= i + BaisseMaxLectures; j++)
+                {
+                    if (traj[j].total >= niveau)
+                    {
+                        var images = traj[j].frame - traj[i].frame;
+                        var courte = traj[i].frame <= 0 || traj[j].frame <= 0 || images <= BaisseMaxImages;
+                        if (j > i && courte && !remiseAZero && hautDuCreux * 2 <= niveau) reprise = j;
+                        break;
+                    }
+                    hautDuCreux = Math.Max(hautDuCreux, traj[j].total);
+                    remiseAZero |= traj[j].total == 0;
+                }
+                if (reprise > 0)
+                {
+                    i = reprise;
+                    continue;
+                }
+            }
+            sortie.Add(traj[i]);
+            i++;
+        }
+
+        return sortie;
+    }
+
+    private const int BaisseMaxLectures = 4;
+    private const long BaisseMaxImages = 900;
+    private const long BaisseNiveauMin = 1000;
+
     internal static List<(long frame, long total)> SelectBestRun(List<(long frame, long total)> traj)
         => SelectBestRun(traj, []);
 
@@ -2804,7 +2880,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         List<(long frame, long total)> traj, IReadOnlyList<long> finsDeRun)
     {
         if (traj.Count == 0) return traj;
-        traj = SansCreux(traj);
+        traj = SansBaisseTransitoire(SansCreux(traj));
         List<(long frame, long total)>? best = null;
         long bestPeak = long.MinValue;
         var cur = new List<(long frame, long total)>();
