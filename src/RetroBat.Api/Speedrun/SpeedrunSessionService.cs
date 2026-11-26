@@ -423,6 +423,12 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
         {
             _ = AfficherAsync(new MessageJoueur("speedrun.msg.training_no_ghost." + sansFantome, MessageSansFantomeParDefaut(sansFantome)));
         }
+        else if (preparationDuTraining is { Poses: > 0, MondialSansReplay.Count: > 0 })
+        {
+            // (27/11) le n°1 du classement n'a pas de replay : le meilleur record disponible court a sa place, avec son rang
+            _ = AfficherAsync(new MessageJoueur("speedrun.msg.training_wr_unavailable",
+                "WORLD RECORD GHOST UNAVAILABLE: the world record has no replay, the best available record runs instead."));
+        }
 
         return new(true, null);
     }
@@ -446,6 +452,7 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
     internal static string MessageSansFantomeParDefaut(string raison) => raison switch
     {
         "other_core" => "No ghost: the records were set on another FBNeo version than this one.",
+        "no_checkpoint" => "No ghost: the records were set on another FBNeo version and their replays cannot be checked.",
         "no_core" => "No ghost: the records do not say which FBNeo recorded them.",
         "other_game" => "No ghost: the records were set on another version of the game files.",
         "not_ready" => "Ghosts not ready: they will come with the next training.",

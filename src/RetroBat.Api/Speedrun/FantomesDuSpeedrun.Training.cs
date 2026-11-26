@@ -8,6 +8,9 @@ namespace RetroBat.Api.Speedrun;
 /// <summary>Ce que la preparation des fantomes du TRAINING a pose, et pourquoi le reste ne l'a pas ete (cles de message).</summary>
 public sealed record PreparationDuTraining(int Poses, IReadOnlyList<string> Refus, bool EnRetard = false)
 {
+    /// <summary>(27/11) Les regles (versions du jeu) dont le n°1 du classement n'a pas de replay : « WORLD RECORD GHOST UNAVAILABLE ».</summary>
+    public IReadOnlyList<string> MondialSansReplay { get; init; } = [];
+
     /// <summary>Aucun fantome n'a pu etre pose : la cle du message a dire au joueur (la raison la plus frequente).</summary>
     public string? MessageSansFantome
         => Poses > 0 ? null
@@ -75,9 +78,30 @@ public sealed partial class FantomesDuSpeedrun
         if (!System.Text.RegularExpressions.Regex.IsMatch(sha, "^[0-9a-f]{64}$")) return "no_core";
         if (manifeste.Runtime.CoreName is { Length: > 0 } nom && !nom.Contains("fbneo", StringComparison.OrdinalIgnoreCase)) return "other_core";
         if (OfficielsAdmis.Count > 0 && !OfficielsAdmis.Contains(sha)) return "other_core";
+        return ContenuRefuse(manifeste, crcDuJeu);
+    }
+
+    /// <summary>Le meme contenu d'arcade (crc de la liste triee des crc32 du .zip) ? null, sinon « other_game ». Pur.</summary>
+    private static string? ContenuRefuse(ReplayManifest manifeste, string crcDuJeu)
+    {
         if (manifeste.Runtime.RomFiles is not { Count: > 0 } fichiers) return "other_game";
         try { return string.Equals(CrcDArcade(fichiers.Select(f => f.Crc32)), crcDuJeu, StringComparison.OrdinalIgnoreCase) ? null : "other_game"; }
         catch (FormatException) { return "other_game"; }
+    }
+
+    /// <summary>
+    /// (27/11, decision du user : les fantomes des records remontent tout seuls chez tout le monde) ADMIS AU TRAINING : un
+    /// replay d'un autre FBNeo officiel (hors <see cref="OfficielsAdmis"/>) est admis quand son .nghost porte les points de
+    /// controle du replay : le coeur hote y compare la copie du fantome pendant la course et le retire s'il diverge (fichier
+    /// <c>&lt;fantome&gt;.diverge</c>). Sans points, rien ne le verifierait : « no_checkpoint ». Un coeur qui n'est pas un FBNeo
+    /// reste « other_core ». Pur.
+    /// </summary>
+    internal static string? ReplayRefuseAuTraining(ReplayManifest manifeste, string crcDuJeu, bool portePoints)
+    {
+        var raison = ReplayRefuse(manifeste, crcDuJeu);
+        if (raison != "other_core") return raison;
+        if (manifeste.Runtime.CoreName is { Length: > 0 } nom && !nom.Contains("fbneo", StringComparison.OrdinalIgnoreCase)) return raison;
+        return ContenuRefuse(manifeste, crcDuJeu) ?? (portePoints ? null : "no_checkpoint");
     }
 
     /// <summary>Un fantome voulu : la regle (la version du jeu), son role, le replay et le detenteur.</summary>
@@ -156,29 +180,59 @@ public sealed partial class FantomesDuSpeedrun
         var dossier = Directory.CreateDirectory(DossierDuTraining(t.Crc)).FullName;
         var refus = new List<string>();
         var poses = 0;
+        var essayes = new HashSet<string>(StringComparer.Ordinal);
+        // (27/11) les regles (versions) dont le n°1 n'a pas de replay : le TRAINING le dit (« WORLD RECORD GHOST UNAVAILABLE »)
+        var mondialSansReplay = Choix is ChoixDesFantomes.MonRecordEtMondial or ChoixDesFantomes.RecordMondial
+            ? classements.Where(c => c.Lignes.Count > 0 && c.Lignes[0].Replay is not { Length: > 0 }).Select(c => c.Regle).ToList()
+            : [];
         foreach (var v in voulus)
         {
-            var manifeste = await ManifesteAsync(v.Replay, ct).ConfigureAwait(false);
-            if (manifeste is null) { refus.Add("not_ready"); continue; }
-            if (ReplayRefuse(manifeste, t.Crc) is { } raison)
+            if (poses >= FantomesAuPlus) break;
+            var lignes = classements.First(c => c.Regle == v.Regle).Lignes.ToList();
+            // (27/11, comme les speedruns) la reference : ce replay puis, s'il ne se pose pas, le suivant du classement
+            List<string> candidats = v.Role == RoleMien ? [v.Replay]
+                : lignes.Where(l => l.Replay is { Length: > 0 }).Select(l => l.Replay!).SkipWhile(x => x != v.Replay).ToList();
+            foreach (var replay in candidats)
             {
-                _journal?.LogInformation("Fantomes : {Replay} ({Regle}) ecarte du TRAINING : {Raison}.", v.Replay, v.Regle, raison);
-                refus.Add(raison);
-                continue;
-            }
+                if (!essayes.Add(replay)) continue;
+                var manifeste = await ManifesteAsync(replay, ct).ConfigureAwait(false);
+                if (manifeste is null) { refus.Add("not_ready"); continue; }
+                var avant = ReplayRefuse(manifeste, t.Crc);
+                if (avant is not null and not "other_core")
+                {
+                    _journal?.LogInformation("Fantomes : {Replay} ({Regle}) ecarte du TRAINING : {Raison}.", replay, v.Regle, avant);
+                    refus.Add(avant);
+                    continue;
+                }
 
-            if (await FantomeAsync(v.Replay, ct).ConfigureAwait(false) is not { } fantome) { refus.Add("not_ready"); continue; }
-            var nom = (v.Role == RoleMien ? PrefixeDuMien : $"{poses + 1}-") + v.Replay;
-            await File.WriteAllBytesAsync(Path.Combine(dossier, nom + ".nghost"), AuCrcDuJeu(fantome, t.Crc), ct).ConfigureAwait(false);
-            await File.WriteAllTextAsync(Path.Combine(dossier, nom + ".coeur"), manifeste.Runtime.CoreSha256!.Trim().ToLowerInvariant(),
-                new System.Text.UTF8Encoding(false), ct).ConfigureAwait(false);
-            EcrireLEtiquette(dossier, nom, Etiquette(v.Joueur, v.Role == RoleMondial));
-            Poser(new FantomePose(nom, v.Replay, Etiquette(v.Joueur, v.Role == RoleMondial), v.Role, manifeste.Frames.ReplayEnd));
-            poses++;
+                // avec ses points de controle : le coeur hote verifie la copie pendant la course (et admet un autre FBNeo)
+                if (await FantomeAsync(replay, ct, avecPoints: true).ConfigureAwait(false) is not { } fantome) { refus.Add("not_ready"); continue; }
+                if (ReplayRefuseAuTraining(manifeste, t.Crc, ReplayVersFantome.PorteDesPoints(fantome)) is { } raison)
+                {
+                    _journal?.LogInformation("Fantomes : {Replay} ({Regle}) ecarte du TRAINING : {Raison}.", replay, v.Regle, raison);
+                    refus.Add(raison);
+                    continue;
+                }
+
+                var rang = lignes.FindIndex(x => x.Replay == replay) + 1;
+                var joueur = rang > 0 ? lignes[rang - 1].Joueur : v.Joueur;
+                // « (WR) » seulement pour le n°1 ; un autre record dit son rang : « OLD AF GAMER (#2) »
+                var role = v.Role == RoleMien ? RoleMien : rang == 1 ? RoleMondial : RoleReference;
+                var etiquette = v.Role == RoleMien ? Etiquette(v.Joueur, rang == 1)
+                    : rang == 1 || rang <= 0 ? Etiquette(joueur, true) : EtiquetteDuRang(joueur, rang);
+                var nom = (v.Role == RoleMien ? PrefixeDuMien : $"{poses + 1}-") + replay;
+                await File.WriteAllBytesAsync(Path.Combine(dossier, nom + ".nghost"), AuCrcDuJeu(fantome, t.Crc), ct).ConfigureAwait(false);
+                await File.WriteAllTextAsync(Path.Combine(dossier, nom + ".coeur"), manifeste.Runtime.CoreSha256!.Trim().ToLowerInvariant(),
+                    new System.Text.UTF8Encoding(false), ct).ConfigureAwait(false);
+                EcrireLEtiquette(dossier, nom, etiquette);
+                Poser(new FantomePose(nom, replay, etiquette, role, manifeste.Frames.ReplayEnd));
+                poses++;
+                break;
+            }
         }
 
         _journal?.LogInformation("Fantomes : TRAINING {Jeu}, {Poses} fantome(s) sur {Voulus} voulu(s).", t.Jeu, poses, voulus.Count);
-        return new(poses, refus);
+        return new(poses, refus) { MondialSansReplay = mondialSansReplay };
     }
 
     private async Task<ReplayManifest?> ManifesteAsync(string replay, CancellationToken ct)

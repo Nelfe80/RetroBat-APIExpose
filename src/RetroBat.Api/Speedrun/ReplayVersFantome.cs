@@ -15,7 +15,14 @@ public static class ReplayVersFantome
     private const uint MagicBsv = 0x42535632;
 
     /// <summary>Le .nghost d'un replay (gzip accepte). <paramref name="decalage"/> : voir docs/FORMAT.md.</summary>
-    public static byte[] Convertir(byte[] replay, int decalage = 0)
+    public static byte[] Convertir(byte[] replay, int decalage = 0) => Convertir(replay, decalage, avecPoints: false);
+
+    /// <summary>
+    /// (27/11) <paramref name="avecPoints"/> : les points de controle du replay (etats periodiques que RetroArch y range, tous les
+    /// 300 images a la borne) sont decodes et ajoutes en fin de .nghost (bloc « NGPOINT1 » : nombre, puis image, taille, etat
+    /// brut). Le coeur hote FBNeo y compare la copie du fantome pendant la course : c'est ce qui admet le replay d'un autre FBNeo.
+    /// </summary>
+    public static byte[] Convertir(byte[] replay, int decalage, bool avecPoints)
     {
         if (replay.Length > 2 && replay[0] == 0x1f && replay[1] == 0x8b)
         {
@@ -35,7 +42,10 @@ public static class ReplayVersFantome
         var blocsParSuperbloc = (int)r.U32();
         r.U32();   // configuration
         var debut = r.Position;
-        var etat = LireLEtat(r, octetsParBloc, blocsParSuperbloc);
+        // les blocs et superblocs du statestream sont partages par tout le fichier (de l'etat de depart aux points suivants)
+        var blocsPartages = new IndexDesBlocs(octetsParBloc, blocsParSuperbloc);
+        var etat = LireLEtat(r, blocsPartages);
+        var points = new List<(uint Image, byte[] Etat)>();
         if (r.Position - debut != tailleEtat) throw new InvalidDataException("etendue de l'etat de depart");
 
         using var images = new MemoryStream();
@@ -70,6 +80,7 @@ public static class ReplayVersFantome
             nombre++;
             var jeton = (char)r.U8();
             if (jeton == 'c') r.Sauter(checked((int)r.U64()));
+            else if (jeton == 'C' && avecPoints) points.Add((nombre, LireLEtat(r, blocsPartages)));
             else if (jeton == 'C') SauterLeCheckpoint(r);
             else if (jeton != 'f') throw new InvalidDataException("jeton d'image inconnu");
         }
@@ -84,8 +95,45 @@ public static class ReplayVersFantome
         w.Write(etat);
         w.Write(nombre);
         w.Write(images.GetBuffer(), 0, (int)images.Length);
+        if (points.Count > 0)
+        {
+            w.Write(Encoding.ASCII.GetBytes("NGPOINT1"));
+            w.Write((uint)points.Count);
+            foreach (var (image, e) in points)
+            {
+                w.Write(image);
+                w.Write((uint)e.Length);
+                w.Write(e);
+            }
+        }
+
         w.Flush();
         return sortie.ToArray();
+    }
+
+    /// <summary>Le .nghost porte-t-il des points de controle (bloc NGPOINT1 apres ses images) ? Pur.</summary>
+    public static bool PorteDesPoints(byte[] nghost)
+    {
+        try
+        {
+            if (nghost.Length < 24 || Encoding.ASCII.GetString(nghost, 0, 8) != "NGHOST1\0") return false;
+            long pos = 20 + BitConverter.ToUInt32(nghost, 16);
+            var images = BitConverter.ToUInt32(nghost, (int)pos);
+            pos += 4;
+            for (uint i = 0; i < images; i++) pos += 2 + 8L * BitConverter.ToUInt16(nghost, (int)pos);
+            return pos + 12 <= nghost.Length && Encoding.ASCII.GetString(nghost, (int)pos, 8) == "NGPOINT1"
+                && BitConverter.ToUInt32(nghost, (int)pos + 8) > 0;
+        }
+        catch (ArgumentException) { return false; }
+    }
+
+    private sealed class IndexDesBlocs(int octetsParBloc, int blocsParSuperbloc)
+    {
+        public int OctetsParBloc { get; } = octetsParBloc;
+        public int BlocsParSuperbloc { get; } = blocsParSuperbloc;
+        // Chaque index commence par un objet de zeros a l'index 0, jamais transmis.
+        public Dictionary<long, byte[]> Blocs { get; } = new() { [0] = new byte[octetsParBloc] };
+        public Dictionary<long, long[]> Superblocs { get; } = new() { [0] = new long[blocsParSuperbloc] };
     }
 
     private static void SauterLeCheckpoint(Lecteur r)
@@ -94,7 +142,7 @@ public static class ReplayVersFantome
         r.Sauter(checked((int)r.U32()));
     }
 
-    private static byte[] LireLEtat(Lecteur r, int octetsParBloc, int blocsParSuperbloc)
+    private static byte[] LireLEtat(Lecteur r, IndexDesBlocs index)
     {
         var compression = r.U8();
         var encodage = r.U8();
@@ -112,7 +160,7 @@ public static class ReplayVersFantome
         return encodage switch
         {
             0 => donnees.AsSpan(0, Math.Min(taille, donnees.Length)).ToArray(),
-            1 => Statestream(donnees, taille, octetsParBloc, blocsParSuperbloc),
+            1 => Statestream(donnees, taille, index),
             _ => throw new InvalidDataException("encodage inconnu"),
         };
     }
@@ -132,29 +180,29 @@ public static class ReplayVersFantome
     }
 
     /// <summary>L'etat « statestream » : les blocs, les superblocs, puis la sequence de superblocs qui le recompose.</summary>
-    private static byte[] Statestream(byte[] encode, int taille, int octetsParBloc, int blocsParSuperbloc)
+    private static byte[] Statestream(byte[] encode, int taille, IndexDesBlocs index)
     {
         var r = new Lecteur(encode);
         if (Msgpack(r) is not 0L) throw new InvalidDataException("jeton de debut statestream");
         Msgpack(r);   // compteur d'images
-        // Chaque index commence par un objet de zeros a l'index 0, jamais transmis.
-        var blocs = new Dictionary<long, byte[]> { [0] = new byte[octetsParBloc] };
-        var superblocs = new Dictionary<long, long[]> { [0] = new long[blocsParSuperbloc] };
+        var (octetsParBloc, blocsParSuperbloc) = (index.OctetsParBloc, index.BlocsParSuperbloc);
+        var blocs = index.Blocs;
+        var superblocs = index.Superblocs;
         var sortie = new byte[taille];
         while (!r.Fini)
         {
             var jeton = (long)Msgpack(r)!;
             if (jeton == 1)
             {
-                var index = (long)Msgpack(r)!;
+                var numero = (long)Msgpack(r)!;
                 var bloc = (byte[])Msgpack(r)!;
                 if (bloc.Length != octetsParBloc) throw new InvalidDataException("taille de bloc");
-                blocs[index] = bloc;
+                blocs[numero] = bloc;
             }
             else if (jeton == 2)
             {
-                var index = (long)Msgpack(r)!;
-                superblocs[index] = ((List<object?>)Msgpack(r)!).Select(v => (long)v!).ToArray();
+                var numero = (long)Msgpack(r)!;
+                superblocs[numero] = ((List<object?>)Msgpack(r)!).Select(v => (long)v!).ToArray();
             }
             else if (jeton == 3)
             {

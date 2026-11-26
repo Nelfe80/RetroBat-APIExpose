@@ -183,6 +183,41 @@ public class FantomesDuSpeedrunTests
     }
 
     [Fact]
+    public void Les_points_de_controle_suivent_les_images_du_nghost()
+    {
+        var sans = ReplayVersFantome.Convertir(Bsv());
+        var avec = ReplayVersFantome.Convertir(Bsv(), 0, avecPoints: true);
+        Assert.False(ReplayVersFantome.PorteDesPoints(sans));
+        Assert.True(ReplayVersFantome.PorteDesPoints(avec));
+        Assert.Equal(sans, avec[..40]);
+        Assert.Equal("NGPOINT1", Encoding.ASCII.GetString(avec, 40, 8));
+        Assert.Equal(1u, BitConverter.ToUInt32(avec, 48));   // un point
+        Assert.Equal(1u, BitConverter.ToUInt32(avec, 52));   // apres une image
+        Assert.Equal(4u, BitConverter.ToUInt32(avec, 56));   // son etat : 4 octets
+        Assert.Equal(new byte[4], avec[60..64]);
+        Assert.Equal(64, avec.Length);
+    }
+
+    [Fact]
+    public void Un_vrai_replay_donne_les_memes_points_que_l_outil()
+    {
+        // NELFEPLAY_FANTOME_POINTS = "<replay BSV2 (gz admis)>|<.nghost avec points ecrit par banc_hote.py --points>"
+        if (Environment.GetEnvironmentVariable("NELFEPLAY_FANTOME_POINTS") is not { Length: > 0 } essai) return;
+        var chemins = essai.Split('|');
+        var api = ReplayVersFantome.Convertir(File.ReadAllBytes(chemins[0]), 0, avecPoints: true);
+        var outil = File.ReadAllBytes(chemins[1]);
+        Assert.True(ReplayVersFantome.PorteDesPoints(api));
+        // les images different de forme (l'outil omet les entrees nulles) : on compare le bloc des points, octet pour octet
+        static byte[] Points(byte[] n)
+        {
+            var i = n.AsSpan().IndexOf(Encoding.ASCII.GetBytes("NGPOINT1"));
+            Assert.True(i > 0);
+            return n[i..];
+        }
+        Assert.Equal(Points(outil), Points(api));
+    }
+
+    [Fact]
     public void Un_fichier_qui_n_est_pas_un_replay_est_refuse()
         => Assert.Throws<InvalidDataException>(() => ReplayVersFantome.Convertir(new byte[64]));
 
