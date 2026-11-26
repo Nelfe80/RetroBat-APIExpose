@@ -348,7 +348,9 @@ public sealed class SpeedrunSessionService : IHostedService, IDisposable
             // est un reglage d'affichage : il ne touche ni au coeur, ni au .MEM, ni aux verrous, ni a l'empreinte des options.
             // Son rendu, hors cache, prend jusqu'a 5 s (4,1 s le 12/11 a 09:19).
             () => Etape(ProgressionDuLancement.Deck, () => _deck?.Preparer(RetroBat.Api.Deck.DeckModes.Speedrun, reglement.SystemId, rom, reglement.RomGroup,
-                RetroBat.Api.Deck.DeckRankBoard.DeLEpreuve(reglement), epreuve: RetroBat.Api.Deck.DeckTrialPlan.De(reglement),
+                // TRAINING : le Deck normal du jeu (rang du World Scoring, pas de couche d'epreuve), titre TRAINING et badge GHOST
+                training ? null : RetroBat.Api.Deck.DeckRankBoard.DeLEpreuve(reglement), epreuve: training ? null : RetroBat.Api.Deck.DeckTrialPlan.De(reglement),
+                entrainement: training,
                 // Lancee depuis le panneau, l'epreuve a ses pages de preparation et de bilan (interactives) : le Deck s'efface devant
                 // elles ; lancee par la route REST, sans page, le Deck pose ses propres ecrans
                 cartes: pages ? RetroBat.Api.Deck.DeckCartes.Api : RetroBat.Api.Deck.DeckCartes.Deck)),

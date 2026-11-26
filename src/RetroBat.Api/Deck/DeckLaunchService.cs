@@ -160,7 +160,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     /// la place du joueur local (MULTIPLAYER), dont le score se classe.
     /// </summary>
     public DeckLancement Preparer(string mode, string systeme, string cheminRom, string? romGroup = null, DeckRankBoard? classement = null, int place = 1,
-        DeckTrialPlan? epreuve = null, string cartes = DeckCartes.Deck)
+        DeckTrialPlan? epreuve = null, string cartes = DeckCartes.Deck, bool entrainement = false)
     {
         // Le Deck du direct d'une partie precedente ne survit pas a un nouveau lancement (H-D28)
         ArreterLeDeckDuDirect("new launch");
@@ -168,7 +168,8 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         try
         {
             _cartes = DeckCartes.Connu(cartes) ? cartes : DeckCartes.Deck;
-            lancement = PreparerLeDeck(mode, systeme, cheminRom, romGroup, classement, epreuve);
+            _entrainement = entrainement;
+            lancement = PreparerLeDeck(mode, systeme, cheminRom, romGroup, classement, epreuve, entrainement);
         }
         catch (Exception ex)
         {
@@ -204,7 +205,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         return lancement;
     }
 
-    private DeckLancement PreparerLeDeck(string mode, string systeme, string cheminRom, string? romGroup, DeckRankBoard? classement, DeckTrialPlan? epreuve)
+    private DeckLancement PreparerLeDeck(string mode, string systeme, string cheminRom, string? romGroup, DeckRankBoard? classement, DeckTrialPlan? epreuve, bool entrainement = false)
     {
         var rom = Path.GetFileNameWithoutExtension(cheminRom ?? string.Empty).Trim().ToLowerInvariant();
         var joueur = Joueur();
@@ -224,10 +225,13 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
             }
 
             var choix = installes.Select(e => e.Id).Append(DeckChoix.Off).ToList();
-            var decision = Choix.Resoudre(joueur, jeu, mode, installes);
+            // TRAINING (27/11) : le Deck NORMAL du jeu, celui du World Scoring (meme choix du joueur), sans couche d'epreuve
+            var decision = Choix.Resoudre(joueur, jeu, entrainement ? DeckModes.WorldScoring : mode, installes);
             var lancement = new DeckLancement(mode, systeme, rom, groupe, jeu, joueur, cheminRom!, "off", null, null, null, decision.Source, choix, null, null, DateTime.UtcNow)
             {
                 Board = classement,
+                Training = entrainement,
+                Ghost = entrainement,
             };
             if (decision.DeckId is null || catalogue.Trouver(decision.DeckId) is not { } entree)
             {
@@ -275,6 +279,9 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
 
     /// <summary>Qui montre les ecrans de depart et de bilan du lancement en preparation (<see cref="DeckCartes"/>).</summary>
     private string _cartes = DeckCartes.Deck;
+
+    /// <summary>Le lancement en preparation est un TRAINING : son decor porte le titre TRAINING et le badge GHOST (<c>--training</c>).</summary>
+    private bool _entrainement;
 
     private DeckLancement Retenir(DeckLancement lancement, bool publier)
     {
@@ -560,6 +567,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
     /// </summary>
     private DeckRendu? RendreParLeDeck(DeckCatalogue.Entree entree, int largeur, int hauteur, DeckTrialPlan? epreuve)
     {
+        var entrainement = _entrainement;
         var exe = Path.Combine(DossierDuDeck, NomDuHost + ".exe");
         if (!File.Exists(exe))
         {
@@ -569,7 +577,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
 
         var infoExe = new FileInfo(exe);
         var cle = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(
-            $"{entree.Sha256}|{infoExe.Length}|{infoExe.LastWriteTimeUtc.Ticks}|{largeur}x{hauteur}|{epreuve?.ToJson()}")))[..16].ToLowerInvariant();
+            $"{entree.Sha256}|{infoExe.Length}|{infoExe.LastWriteTimeUtc.Ticks}|{largeur}x{hauteur}|{epreuve?.ToJson()}{(entrainement ? "|training" : "")}")))[..16].ToLowerInvariant();
         var cache = Path.Combine(DossierEtat, "decors");
         var png = Path.Combine(cache, entree.Id + "-" + cle + ".png");
         // La couche epreuve (H-D23) est dans le decor : ses plaques font partie du fond pose par RetroArch
@@ -586,7 +594,7 @@ public sealed class DeckLaunchService : IHostedService, IDisposable
         using var processus = Process.Start(new ProcessStartInfo
         {
             FileName = exe,
-            Arguments = $"--render-decor \"{png}\" --theme {entree.Id} --render-size {largeur}x{hauteur}" + DeckCatalogue.OptionThemesDuDataPack() + (plan is null ? "" : $" --trial \"{plan}\""),
+            Arguments = $"--render-decor \"{png}\" --theme {entree.Id} --render-size {largeur}x{hauteur}" + DeckCatalogue.OptionThemesDuDataPack() + (plan is null ? "" : $" --trial \"{plan}\"") + (entrainement ? " --training" : ""),
             WorkingDirectory = DossierDuDeck,
             UseShellExecute = false,
             CreateNoWindow = true,
@@ -1009,6 +1017,16 @@ public sealed record DeckLancement(
 
     /// <summary>Le classement du rang en direct demande par le bouton (null : celui du mode, choisi par le rang).</summary>
     public DeckRankBoard? Board { get; init; }
+
+    /// <summary>
+    /// Le TRAINING des shmups d'arcade sous FBNeo (27/11, demande du user) : le Deck montre son decor NORMAL (celui du World
+    /// Scoring, sans couche d'epreuve ni chrono), avec « TRAINING » en titre et un badge « GHOST » a cote de « LIVE ». Affichage
+    /// seulement : rien n'est classe ni envoye.
+    /// </summary>
+    public bool Training { get; init; }
+
+    /// <summary>Le badge GHOST a cote de LIVE (les fantomes du TRAINING) ; vrai avec <see cref="Training"/>.</summary>
+    public bool Ghost { get; init; }
 
     /// <summary>La place du joueur local (1 ; en MULTIPLAYER, sa place dans la room) : son score se classe.</summary>
     public int Seat { get; init; } = 1;
