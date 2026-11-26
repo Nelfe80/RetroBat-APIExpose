@@ -34,6 +34,12 @@ public interface IAdventureHote
     IReadOnlyDictionary<string, string> ReglagesDeLInvite(MultiplayerRoom room);
 
     /// <summary>
+    /// Les reglages que le LANCEUR ne laisse pas passer par retroarch.cfg (il les reecrit) : des paires <c>retroarch.&lt;cle&gt;</c> pour sa ligne de
+    /// commande (<see cref="MultiplayerLaunchPlan.ReglagesRetroArch"/>). Hote : sauvegardes, etats, indexation des etats. Invite : ses sauvegardes.
+    /// </summary>
+    IReadOnlyDictionary<string, string> ReglagesDuLanceur(MultiplayerRoom room, bool hote);
+
+    /// <summary>
     /// Le jeu tel que cette place le lance : l'invite ne garde jamais l'<c>autosave</c> du catalogue (il chargerait a son depart un etat
     /// de sortie qui n'est pas celui de la partie) ; l'hote le garde, pour la fin de seance quand le joueur ferme lui-meme.
     /// </summary>
@@ -408,28 +414,43 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
         => De(room.Room) is { } seance
             ? new Dictionary<string, string>(StringComparer.Ordinal)
             {
-                ["savefile_directory"] = seance.DossierDesSauvegardes,
-                // Les ETATS aussi : SAVE_STATE et l'autosave ecrivent dans le dossier de l'aventure, l'emplacement courant est le 0.
-                ["savestate_directory"] = EnsureDir(_stockage.DossierDesEtats(seance.Aventure.Id)),
-                ["state_slot"] = "0",
-                ["savestate_auto_index"] = "false",
-                ["sort_savestates_enable"] = "false",
-                ["sort_savestates_by_content_enable"] = "false",
-                ["sort_savefiles_enable"] = "false",
-                ["sort_savefiles_by_content_enable"] = "false",
+                // Seul ce que le lanceur ne reecrit pas passe par retroarch.cfg ; les dossiers passent par sa ligne de commande (ReglagesDuLanceur).
                 ["autosave_interval"] = "10",
             }
             : new Dictionary<string, string>(StringComparer.Ordinal);
 
-    public IReadOnlyDictionary<string, string> ReglagesDeLInvite(MultiplayerRoom room)
-        => room.AdventureId is { } id && AdventureStockage.NomSur(id)
-            ? new Dictionary<string, string>(StringComparer.Ordinal)
-            {
-                ["savefile_directory"] = EnsureDir(_stockage.DossierDesSauvegardes(id)),
-                ["sort_savefiles_enable"] = "false",
-                ["sort_savefiles_by_content_enable"] = "false",
-            }
-            : new Dictionary<string, string>(StringComparer.Ordinal);
+    public IReadOnlyDictionary<string, string> ReglagesDeLInvite(MultiplayerRoom room) => new Dictionary<string, string>(StringComparer.Ordinal);
+
+    public IReadOnlyDictionary<string, string> ReglagesDuLanceur(MultiplayerRoom room, bool hote)
+    {
+        if (room.AdventureId is not { } id || !AdventureStockage.NomSur(id))
+        {
+            return new Dictionary<string, string>(StringComparer.Ordinal);
+        }
+
+        var reglages = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["retroarch.savefile_directory"] = EnsureDir(_stockage.DossierDesSauvegardes(id)),
+            ["retroarch.sort_savefiles_enable"] = "false",
+            ["retroarch.sort_savefiles_by_content_enable"] = "false",
+        };
+        if (hote)
+        {
+            // SAVE_STATE ecrit <rom>.state dans le dossier des etats de l'AVENTURE : l'emplacement courant est le 0 et ne s'indexe pas (le lanceur
+            // allume l'auto-index : RetroArch irait au plus haut emplacement existant).
+            reglages["retroarch.savestate_directory"] = EnsureDir(_stockage.DossierDesEtats(id));
+            reglages["retroarch.savestate_auto_index"] = "false";
+            reglages["retroarch.state_slot"] = "0";
+            // L'ETAT DE SORTIE (fin quand le joueur ferme lui-meme) : ecrit a la fermeture, JAMAIS recharge au lancement (« -autosave 1 » du
+            // catalogue ne passait pas : le lanceur garde le premier -autosave, celui du temps partage, a 0).
+            reglages["retroarch.savestate_auto_save"] = "true";
+            reglages["retroarch.savestate_auto_load"] = "false";
+            reglages["retroarch.sort_savestates_enable"] = "false";
+            reglages["retroarch.sort_savestates_by_content_enable"] = "false";
+        }
+
+        return reglages;
+    }
 
     private static string EnsureDir(string dossier)
     {

@@ -1249,7 +1249,10 @@ public sealed class MultiplayerLaunchService : IHostedService
         var jeuLance = Aventure is { } enAventurePlace && enAventurePlace.EstUneAventure(room)
             ? enAventurePlace.JeuPourLaPlace(room, jeu.Game, lancement.Role == "host")
             : jeu.Game;
-        var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeuLance, lancement.Seat, netplay, joueurs, decor);
+        var reglagesDuLanceur = Aventure is { } pourLeLanceur && pourLeLanceur.EstUneAventure(room)
+            ? pourLeLanceur.ReglagesDuLanceur(room, lancement.Role == "host")
+            : null;
+        var arguments = MultiplayerLaunchPlan.Arguments(manettes, systeme, coeur, jeu.Path, jeuLance, lancement.Seat, netplay, joueurs, decor, reglagesDuLanceur);
         if (arguments is null)
         {
             progression?.Echouer(ProgressionDuLancement.Lanceur);

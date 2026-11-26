@@ -618,21 +618,73 @@ public class AdventureTests : IDisposable
     }
 
     [Fact]
-    public async Task Les_reglages_de_la_seance_isolent_les_sauvegardes_du_joueur()
+    public async Task Les_reglages_du_lanceur_isolent_les_sauvegardes_et_les_etats_du_joueur_chez_l_hote()
     {
         var (service, _, stockage, _) = UneSeance();
         var salle = Salle(2);
         await service.PreparerAsync(salle, Jeu(Path.Combine(_racine, "kirby.gba")), CancellationToken.None);
 
-        var reglages = service.ReglagesDeLaPlace(salle);
-        Assert.Equal(stockage.DossierDesSauvegardes("av-1"), reglages["savefile_directory"]);
-        Assert.Equal("false", reglages["sort_savefiles_enable"]);
-        Assert.Equal("false", reglages["sort_savefiles_by_content_enable"]);
-        Assert.StartsWith(stockage.Racine, reglages["savefile_directory"]);
-        // Les ETATS aussi (SAVE_STATE, autosave, depart pret) : le dossier de l'aventure, emplacement 0, jamais les etats du joueur.
-        Assert.Equal(stockage.DossierDesEtats("av-1"), reglages["savestate_directory"]);
-        Assert.Equal("0", reglages["state_slot"]);
+        // emulatorLauncher reecrit savefile_directory, savestate_directory et savestate_auto_index dans retroarch.cfg : ils passent par SA ligne
+        // de commande (paires -retroarch.<cle>, copiees apres ses propres reglages).
+        var reglages = service.ReglagesDuLanceur(salle, hote: true);
+        Assert.Equal(stockage.DossierDesSauvegardes("av-1"), reglages["retroarch.savefile_directory"]);
+        Assert.Equal(stockage.DossierDesEtats("av-1"), reglages["retroarch.savestate_directory"]);
+        Assert.Equal("false", reglages["retroarch.savestate_auto_index"]);
+        Assert.Equal("0", reglages["retroarch.state_slot"]);
+        // L'etat de sortie s'ecrit a la fermeture et ne se recharge JAMAIS (le -autosave 1 du catalogue ne passait pas : le premier -autosave du lanceur gagne).
+        Assert.Equal("true", reglages["retroarch.savestate_auto_save"]);
+        Assert.Equal("false", reglages["retroarch.savestate_auto_load"]);
+        Assert.Equal("false", reglages["retroarch.sort_savefiles_enable"]);
+        Assert.StartsWith(stockage.Racine, reglages["retroarch.savefile_directory"]);
+        Assert.All(reglages.Keys, k => Assert.StartsWith("retroarch.", k));
+        Assert.True(Directory.Exists(reglages["retroarch.savestate_directory"]));
+        // Par retroarch.cfg ne reste que ce que le lanceur n'ecrit pas.
+        Assert.Equal(["autosave_interval"], service.ReglagesDeLaPlace(salle).Keys.ToArray());
+        Assert.Empty(service.ReglagesDuLanceur(salle with { Adventure = null }, hote: true));
     }
+
+    [Fact]
+    public void L_invite_n_a_que_ses_sauvegardes_dans_le_dossier_de_l_aventure()
+    {
+        var (service, _, stockage, _) = UneSeance();
+        var reglages = service.ReglagesDuLanceur(Salle(2), hote: false);
+        Assert.Equal(stockage.DossierDesSauvegardes("av-1"), reglages["retroarch.savefile_directory"]);
+        Assert.False(reglages.ContainsKey("retroarch.savestate_directory"));   // il ne sauve jamais d'etat : il joue celui de l'hote
+        Assert.Empty(service.ReglagesDeLInvite(Salle(2)));
+    }
+
+    // ── la ligne du lanceur ─────────────────────────────────────────────────────────────────────────
+
+    private static MultiplayerGame UnJeuGba => new() { Id = "gba/kirby", System = "gba", Name = "Kirby", Players = 4 };
+
+    [Fact]
+    public void La_ligne_du_lanceur_porte_les_reglages_de_RetroArch_avant_la_rom_chemins_entre_guillemets()
+    {
+        var chemin = @"E:\RetroBat\plugins\APIExpose\state\nelfeplay\adventure\saves\av-1";
+        var ligne = MultiplayerLaunchPlan.Arguments("", "gba", "mgba_splitscreen", @"E:\RetroBat\roms\gba\Kirby.zip", UnJeuGba, 1, [], 2, null, new Dictionary<string, string>
+        {
+            ["retroarch.savefile_directory"] = chemin,
+            ["retroarch.savestate_auto_index"] = "false",
+        })!;
+        Assert.Contains("-retroarch.savefile_directory \"" + chemin + "\"", ligne);
+        Assert.Contains("-retroarch.savestate_auto_index false", ligne);
+        Assert.True(ligne.IndexOf("-retroarch.savefile_directory", StringComparison.Ordinal) < ligne.IndexOf("-rom", StringComparison.Ordinal));
+        // Sans reglage, la ligne est celle d'avant.
+        Assert.DoesNotContain("-retroarch.", MultiplayerLaunchPlan.Arguments("", "gba", "mgba_splitscreen", @"E:\r\k.zip", UnJeuGba, 1, [])!);
+    }
+
+    [Theory]
+    [InlineData("retroarch.savefile_directory", @"E:\saves\", false)]          // antislash final : echapperait le guillemet
+    [InlineData("retroarch.savefile_directory", "E:\\a\"b", false)]            // guillemet
+    [InlineData("retroarch.savefile_directory", @"E:\a\%APPDATA%", false)]
+    [InlineData("retroarch.savefile_directory", @"saves\av", false)]           // pas un chemin absolu
+    [InlineData("retroarch.savefile_directory", @"E:\saves\av-1", true)]
+    [InlineData("savefile_directory", @"E:\saves\av-1", false)]                // pas une cle « retroarch. »
+    [InlineData("retroarch.x y", "false", false)]
+    [InlineData("retroarch.savestate_auto_index", "false", true)]
+    public void Les_reglages_du_lanceur_sont_valides_ou_le_lancement_ne_part_pas(string cle, string valeur, bool admis)
+        => Assert.Equal(admis, MultiplayerLaunchPlan.ReglagesRetroArch(new Dictionary<string, string> { [cle] = valeur }) is not null
+                                 && MultiplayerLaunchPlan.Arguments("", "gba", "mgba_splitscreen", @"E:\r\k.zip", UnJeuGba, 1, [], 2, null, new Dictionary<string, string> { [cle] = valeur }) is not null);
 
     [Theory]
     [InlineData("{rom}.srm", "kirby", "kirby.srm")]
@@ -1249,23 +1301,6 @@ public class AdventureTests : IDisposable
     }
 
     // ── les sauvegardes de l'invite, et la seance d'une version localisee ──────────────────────────
-
-    [Fact]
-    public async Task L_invite_ecrit_ses_sauvegardes_dans_le_dossier_de_l_aventure_jamais_dans_les_siennes()
-    {
-        var (service, _, stockage, _) = UneSeance();
-        var salle = Salle(2) with { Launch = new MultiplayerLancement { Role = "guest", Seat = 2, Players = 2 } };
-        var reglages = service.ReglagesDeLInvite(salle);
-
-        Assert.Equal(stockage.DossierDesSauvegardes("av-1"), reglages["savefile_directory"]);
-        Assert.Equal("false", reglages["sort_savefiles_enable"]);
-        Assert.Equal("false", reglages["sort_savefiles_by_content_enable"]);
-        Assert.True(Directory.Exists(reglages["savefile_directory"]));
-        // Pas d'ecriture reguliere pour lui : l'etat qu'il joue lui vient de l'hote.
-        Assert.False(reglages.ContainsKey("autosave_interval"));
-        Assert.Empty(service.ReglagesDeLInvite(salle with { Adventure = null }));
-        await Task.CompletedTask;
-    }
 
     [Fact]
     public void Seul_l_hote_garde_l_autosave_du_catalogue()
