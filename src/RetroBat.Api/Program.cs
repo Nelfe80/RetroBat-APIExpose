@@ -539,6 +539,7 @@ builder.Services.AddSingleton<RetroBat.Api.Infrastructure.PartieNelfePlayService
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.PartieNelfePlayService>());
 // Les notifications de RetroArch d'une partie NelfePlay lancee par ES (11/11) : cle par jeu au crochet game-start, rendue aussitot
 builder.Services.AddSingleton<RetroBat.Api.Infrastructure.NotificationsDesLancementsEs>();
+builder.Services.AddSingleton<RetroBat.Api.Infrastructure.ControleBiosFbneo>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Infrastructure.NotificationsDesLancementsEs>());
 // L'atelier de NelfeScoreLab, vu par ceux qui ne connaissent pas l'API : le hiscore local des consoles.
 builder.Services.AddSingleton<RetroBat.Domain.Interfaces.IAtelierDeLaPartie>(sp =>
