@@ -332,6 +332,17 @@ public sealed record MultiplayerRoom
     [JsonPropertyName("level")]
     public string Level { get; init; } = MultiplayerLevels.Classique;
 
+    /// <summary>
+    /// NELFEPLAY ADVENTURE (26/11, CONTRAT.md §8) : la vue de la salle porte <c>"adventure":{"id","session"}</c> quand elle est la
+    /// seance d'une aventure, sinon rien. Le jeu est alors celui du catalogue Adventure, pas de MULTIPLAYER.
+    /// </summary>
+    [JsonPropertyName("adventure")]
+    public MultiplayerAventure? Adventure { get; init; }
+
+    /// <summary>L'identifiant de l'aventure de cette gameroom, ou null : une gameroom MULTIPLAYER ordinaire.</summary>
+    [JsonIgnore]
+    public string? AdventureId => string.IsNullOrEmpty(Adventure?.Id) ? null : Adventure.Id;
+
     /// <summary>Le nombre de places : celui du jeu, ou, dans une gameroom d'amis, celui que son ouvreur attend.</summary>
     [JsonPropertyName("max")]
     public int Max { get; init; }
@@ -716,6 +727,20 @@ public sealed record MultiplayerInvitation
     /// <summary>Une invitation dans une gameroom d'amis vaut tant que celui qui invite y reste (28/10).</summary>
     [JsonPropertyName("kind")]
     public string Kind { get; init; } = MultiplayerSortes.Publique;
+
+    /// <summary>NELFEPLAY ADVENTURE (CONTRAT.md §8) : l'identifiant de l'aventure quand l'invitation est celle d'une seance, sinon null.</summary>
+    [JsonPropertyName("adventure")]
+    public string? Adventure { get; init; }
+}
+
+/// <summary>La part d'Adventure de la vue d'une gameroom : l'aventure et sa seance.</summary>
+public sealed record MultiplayerAventure
+{
+    [JsonPropertyName("id")]
+    public string Id { get; init; } = string.Empty;
+
+    [JsonPropertyName("session")]
+    public string? Session { get; init; }
 }
 
 /// <summary>Les deux sortes de gameroom (28/10) : publique (FOR PLAYERS…) et d'amis (FOR FRIENDS).</summary>

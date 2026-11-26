@@ -1729,9 +1729,17 @@ public sealed class MultiplayerCatalogueStore
     private readonly object _verrou = new();
     private (DateTime Ecrit, long Taille, MultiplayerCatalogue? Catalogue, string? Erreur) _cache;
 
-    public MultiplayerCatalogueStore(ILogger<MultiplayerCatalogueStore>? logger = null, string? path = null, Version? api = null)
+    /// <summary>
+    /// Un lecteur propre a un autre catalogue de meme forme (NelfePlay Adventure : le site y ecrit <c>players</c> en {min, max}) ;
+    /// absent, le fichier se lit comme celui de MULTIPLAYER.
+    /// </summary>
+    private readonly Func<Stream, MultiplayerCatalogue?>? _lecteur;
+
+    public MultiplayerCatalogueStore(ILogger<MultiplayerCatalogueStore>? logger = null, string? path = null, Version? api = null,
+        Func<Stream, MultiplayerCatalogue?>? lecteur = null)
     {
         _logger = logger;
+        _lecteur = lecteur;
         Path = path ?? System.IO.Path.Combine(RetroBatPaths.PluginRoot, "resources", "multiplayer", "catalogue.json");
         Api = api ?? (Version.TryParse(RetroBat.Api.Infrastructure.ApiExposeVersion.Current.Split('+')[0], out var version) ? version : new Version(0, 0));
     }
@@ -1768,7 +1776,7 @@ public sealed class MultiplayerCatalogueStore
             MultiplayerCatalogue? catalogue;
             using (var flux = File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
             {
-                catalogue = JsonSerializer.Deserialize<MultiplayerCatalogue>(flux, Lecture);
+                catalogue = _lecteur is null ? JsonSerializer.Deserialize<MultiplayerCatalogue>(flux, Lecture) : _lecteur(flux);
             }
 
             var sains = Retenir(catalogue, Api, out erreur, out var ecartes);

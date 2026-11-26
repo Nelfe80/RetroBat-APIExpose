@@ -85,6 +85,17 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     /// <summary>Les jeux restes dans les paquets du gestionnaire de ROM, reconnus a leur contenu (26/10).</summary>
     private readonly MultiplayerContenusDesPaquets? _paquets;
 
+    /// <summary>
+    /// Ce qui distingue une collection d'une autre quand le meme calcul sert deux catalogues (NelfePlay Adventure, 26/11) : son
+    /// nom d'ES, son logo, l'option qui l'allume et le fichier ou se garde sa derniere passe. Defaut : MULTIPLAYER.
+    /// </summary>
+    public sealed record ProfilDeCollection(string Nom, string Logo, Func<RetroBat.Api.Infrastructure.NelfePlayOptions, bool> Visible, string Trace)
+    {
+        public static ProfilDeCollection Multiplayer { get; } = new(CollectionName, LogoFile, np => np.ShowMultiplayerCollection, "multiplayer-jeux.json");
+    }
+
+    private readonly ProfilDeCollection _profil;
+
     public MultiplayerCollectionSyncService(
         IOptionsMonitor<ApiExposeOptions> options,
         MultiplayerCatalogueStore store,
@@ -101,8 +112,10 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         GamelistUpdateService? gamelists = null,
         Func<string?, bool>? coeurPose = null,
         DataPackSyncService? dataPack = null,
-        MultiplayerContenusDesPaquets? paquets = null)
+        MultiplayerContenusDesPaquets? paquets = null,
+        ProfilDeCollection? profil = null)
     {
+        _profil = profil ?? ProfilDeCollection.Multiplayer;
         _paquets = paquets;
         _dataPack = dataPack;
         _options = options;
@@ -115,7 +128,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
         _bus = bus;
         _logger = logger;
         _romsRoot = romsRoot ?? RetroBatPaths.RomsRoot;
-        FichierDesJeux = romsRoot is null ? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay", "multiplayer-jeux.json") : null;
+        FichierDesJeux = romsRoot is null ? Path.Combine(RetroBatPaths.PluginRoot, "state", "nelfeplay", _profil.Trace) : null;
         _emulateurTourne = emulateurTourne ?? EmulatorForeground.EmulateurTourne;
         _md5DuContenu = md5DuContenu ?? (chemin => NelfePlayScoringCollectionSyncService.Md5DuContenu(chemin, PlafondContenu));
         _coeurPose = coeurPose ?? (coeur => MultiplayerCoeursService.EstPose(coeur, _options.CurrentValue));
@@ -134,7 +147,7 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     /// </summary>
     public IReadOnlyList<MultiplayerInstalledGame> Games { get; private set; } = [];
 
-    private bool Visible => _options.CurrentValue.NelfePlay is { Enabled: true, ShowMultiplayerCollection: true };
+    private bool Visible => _options.CurrentValue.NelfePlay is { Enabled: true } np && _profil.Visible(np);
 
     /// <summary>
     /// Les jeux MULTIPLAYER de la borne, calcules tout de suite s'ils ne le sont pas encore : juste apres le
@@ -384,8 +397,8 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
 
             var jeux = Intersecter(catalogue);
             var chemins = jeux.Select(jeu => jeu.Path).ToList();
-            var resultat = _writer.Apply(CollectionName, chemins);
-            var visuel = chemins.Count > 0 ? _assets.Install(CollectionName, LogoFile, FondFile) : _assets.Remove(CollectionName);
+            var resultat = _writer.Apply(_profil.Nom, chemins);
+            var visuel = chemins.Count > 0 ? _assets.Install(_profil.Nom, _profil.Logo, FondFile) : _assets.Remove(_profil.Nom);
             if (visuel.Changed)
             {
                 PhysicalMediaWebSocketProjectionService.InvalidateThemeArt();
@@ -478,8 +491,8 @@ public sealed class MultiplayerCollectionSyncService : BackgroundService
     private MultiplayerCollectionStatus Desactiver()
     {
         Games = [];
-        var resultat = _writer.Remove(CollectionName);
-        if (_assets.Remove(CollectionName).Changed)
+        var resultat = _writer.Remove(_profil.Nom);
+        if (_assets.Remove(_profil.Nom).Changed)
         {
             PhysicalMediaWebSocketProjectionService.InvalidateThemeArt();
         }

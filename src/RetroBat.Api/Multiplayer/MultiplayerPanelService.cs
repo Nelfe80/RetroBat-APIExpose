@@ -1079,7 +1079,12 @@ public sealed partial class MultiplayerPanelService
         _cartes?.Cacher();
         _texteDuBandeau = "";
         _journal?.LogInformation("MULTIPLAYER : invitation de {Ami} pour {Jeu} acceptee", invitation.From?.Pseudo, invitation.Game);
-        var jeu = _session.JeuDeLaRoom(new MultiplayerRoom { Game = invitation.Game, Content = invitation.Content });
+        var jeu = _session.JeuDeLaRoom(new MultiplayerRoom
+        {
+            Game = invitation.Game,
+            Content = invitation.Content,
+            Adventure = invitation.Adventure is { Length: > 0 } aventure ? new MultiplayerAventure { Id = aventure } : null,
+        });
         if (jeu is null)
         {
             // Sans le meme contenu, la partie se desynchroniserait : on refuse plutot que de rejoindre.

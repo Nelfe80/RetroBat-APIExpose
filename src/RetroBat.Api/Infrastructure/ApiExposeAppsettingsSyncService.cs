@@ -174,6 +174,8 @@ public sealed class ApiExposeAppsettingsSyncService
             ["global.apiexpose.nelfeplay.show_scoring_collection"] = Bool("NelfePlay", "ShowScoringCollection"),
             // La collection « NELFEPLAY MULTIPLAYER », dans GAME EVENTS MANAGER ; visible par defaut (25/10).
             ["global.apiexpose.nelfeplay.show_multiplayer_collection"] = Bool("NelfePlay", "ShowMultiplayerCollection"),
+            // La collection « NelfePlay Adventure » (26/11) : visible par defaut.
+            ["global.apiexpose.nelfeplay.show_adventure_collection"] = Bool("NelfePlay", "ShowAdventureCollection"),
             // La collection « NELFEPLAY CHALLENGES & SPEEDRUNS », dans GAME EVENTS MANAGER ; visible par defaut.
             ["global.apiexpose.nelfeplay.show_challenges_collection"] = Bool("NelfePlay", "ShowChallengesCollection"),
             // Le vocal Discord des parties MULTIPLAYER (lot B, 12/11) : allume par defaut ; sans liaison ni consentement sur

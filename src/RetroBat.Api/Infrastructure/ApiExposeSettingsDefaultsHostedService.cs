@@ -315,6 +315,8 @@ public sealed class ApiExposeSettingsDefaultsHostedService : IHostedService
             // La collection « NELFEPLAY MULTIPLAYER » : visible par defaut elle aussi (25/10), posee seulement si
             // le joueur n'a jamais touche l'option.
             ("global.apiexpose.nelfeplay.show_multiplayer_collection", ToEsBool(options.NelfePlay.ShowMultiplayerCollection)),
+            // « NelfePlay Adventure » (26/11) : visible par defaut, posee seulement si le joueur n'a jamais touche l'option.
+            ("global.apiexpose.nelfeplay.show_adventure_collection", ToEsBool(options.NelfePlay.ShowAdventureCollection)),
             // Comme MULTIPLAYER : visible par defaut, posee seulement si le joueur n'a jamais touche l'option.
             ("global.apiexpose.nelfeplay.show_challenges_collection", ToEsBool(options.NelfePlay.ShowChallengesCollection))
         };

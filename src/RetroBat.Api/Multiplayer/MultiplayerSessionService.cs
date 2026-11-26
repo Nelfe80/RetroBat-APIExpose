@@ -547,21 +547,35 @@ public sealed class MultiplayerSessionService : BackgroundService
     }
 
     /// <summary>
+    /// Les jeux d'une autre collection que les gamerooms peuvent aussi porter (NelfePlay Adventure, 26/11) : meme calcul de
+    /// jeu et de contenu, un autre catalogue. Les identifiants d'Adventure ne recoupent jamais ceux de MULTIPLAYER (prefixe
+    /// du jeu au catalogue Adventure, voir AdventureCatalogue).
+    /// </summary>
+    public Func<IReadOnlyList<MultiplayerInstalledGame>>? JeuxSupplementaires { get; set; }
+
+    /// <summary>Les jeux d'Adventure : seulement pour une gameroom d'aventure (leurs identifiants sont ceux du site, sans prefixe).</summary>
+    private IEnumerable<MultiplayerInstalledGame> Jeux(bool aventure)
+        => aventure ? JeuxSupplementaires?.Invoke() ?? [] : _collection.JeuxConnus();
+
+    private IEnumerable<MultiplayerInstalledGame> TousLesJeux()
+        => _collection.JeuxConnus().Concat(JeuxSupplementaires?.Invoke() ?? []);
+
+    /// <summary>
     /// Le jeu d'une gameroom sur cette borne : meme jeu ET meme contenu (un autre dump se desynchroniserait).
     /// Null quand la borne ne l'a pas.
     /// </summary>
     public MultiplayerInstalledGame? JeuDeLaRoom(MultiplayerRoom room)
-        => _collection.JeuxConnus().FirstOrDefault(jeu => jeu.Game.Id == room.Game
+        => Jeux(room.AdventureId is not null).FirstOrDefault(jeu => jeu.Game.Id == room.Game
             && string.Equals(jeu.ContentKey, room.Content, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>Le jeu installe sur cette borne avec ce jeu ET ce contenu, ou null : rejoindre se desynchroniserait.</summary>
-    public MultiplayerInstalledGame? JeuCompatible(string jeu, string contenu)
-        => _collection.JeuxConnus().FirstOrDefault(installe => installe.Game.Id == jeu
+    public MultiplayerInstalledGame? JeuCompatible(string jeu, string contenu, bool aventure = false)
+        => Jeux(aventure).FirstOrDefault(installe => installe.Game.Id == jeu
             && string.Equals(installe.ContentKey, contenu, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>Le nom d'un jeu du catalogue, jamais traduit ; son identifiant s'il n'est pas sur cette borne.</summary>
     public string NomDuJeu(string id)
-        => _collection.JeuxConnus().FirstOrDefault(jeu => jeu.Game.Id == id)?.Game.Name ?? id;
+        => TousLesJeux().FirstOrDefault(jeu => jeu.Game.Id == id)?.Game.Name ?? id;
 
     /// <summary>Ce jeu concourt-il au 1CC MULTI (MultiplayerScoring.Concourt) ? Faux pour un jeu que la borne ne connait pas.</summary>
     public bool Concourt(string id)

@@ -187,6 +187,14 @@ public static class Desinstallation
             return (collection.Changed ? "retiree" : "absente") + ", images des themes " + (images.Changed ? "retirees" : "absentes");
         });
 
+        Etape(Dire, "collection NelfePlay Adventure", () =>
+        {
+            var nom = RetroBat.Api.Adventure.AdventureCollection.Nom;
+            var collection = new EsCustomCollectionWriter(new EsSettingsStore()).Remove(nom);
+            var images = new EsCollectionThemeAssets().Remove(nom);
+            return (collection.Changed ? "retiree" : "absente") + ", images des themes " + (images.Changed ? "retirees" : "absentes");
+        });
+
         // 3. Les reglages d'APIExpose dans es_settings.cfg.
         Etape(Dire, "reglages global.apiexpose.*", () =>
             new EsSettingsStore().Update(RetirerLesReglages) ? "retires d'es_settings.cfg" : "aucun");
