@@ -88,6 +88,21 @@ public class FantomesTrainingFbneoTests
     }
 
     [Fact]
+    public void Un_autre_fbneo_est_admis_au_training_sous_controle_de_ses_points()
+    {
+        var autre = "800f25e9f9f0ace6191321cff02b985663bf84568352b29ca68325e94fb3446e";
+        // un autre FBNeo officiel : admis si le .nghost porte ses points de controle (le coeur hote verifie en course)
+        Assert.Null(FantomesDuSpeedrun.ReplayRefuseAuTraining(Manifeste(autre, "fbneo", Ddpdojblka), "be7be29b", portePoints: true));
+        Assert.Equal("no_checkpoint", FantomesDuSpeedrun.ReplayRefuseAuTraining(Manifeste(autre, "fbneo", Ddpdojblka), "be7be29b", portePoints: false));
+        // le FBNeo de la borne, avec ou sans points
+        Assert.Null(FantomesDuSpeedrun.ReplayRefuseAuTraining(Manifeste(Abea, "fbneo", Ddpdojblka), "be7be29b", portePoints: false));
+        // pas un FBNeo, autre contenu, coeur inconnu : refuses comme avant
+        Assert.Equal("other_core", FantomesDuSpeedrun.ReplayRefuseAuTraining(Manifeste(autre, "mame2003", Ddpdojblka), "be7be29b", portePoints: true));
+        Assert.Equal("other_game", FantomesDuSpeedrun.ReplayRefuseAuTraining(Manifeste(autre, "fbneo", [new("autre.rom", "11111111")]), "be7be29b", portePoints: true));
+        Assert.Equal("no_core", FantomesDuSpeedrun.ReplayRefuseAuTraining(Manifeste(null, "fbneo", Ddpdojblka), "be7be29b", portePoints: true));
+    }
+
+    [Fact]
     public void Un_fbneo_non_admis_est_ecarte_quand_la_liste_est_donnee()
     {
         var avant = FantomesDuSpeedrun.OfficielsAdmis;

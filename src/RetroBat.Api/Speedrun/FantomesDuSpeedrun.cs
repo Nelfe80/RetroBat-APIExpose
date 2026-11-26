@@ -662,9 +662,10 @@ public sealed partial class FantomesDuSpeedrun
            && id.ValueKind == JsonValueKind.String && ReplayStore.IdentifiantSur(id.GetString()) ? id.GetString() : null;
 
     /// <summary>Le .nghost d'un replay : converti une fois, garde ensuite ; null si le replay n'est pas joignable.</summary>
-    private async Task<byte[]?> FantomeAsync(string replay, CancellationToken ct)
+    private async Task<byte[]?> FantomeAsync(string replay, CancellationToken ct, bool avecPoints = false)
     {
-        var cache = Path.Combine(RetroBatPaths.PluginRoot, "state", "speedrun", "fantomes", replay + ".nghost");
+        // (27/11) avec ses points de controle (TRAINING FBNeo) : un autre fichier du cache
+        var cache = Path.Combine(RetroBatPaths.PluginRoot, "state", "speedrun", "fantomes", replay + (avecPoints ? ".points" : "") + ".nghost");
         if (File.Exists(cache)) return await File.ReadAllBytesAsync(cache, ct).ConfigureAwait(false);
         var manifeste = _manifestes.GetManifest(replay);
         if (manifeste is null)
@@ -683,7 +684,7 @@ public sealed partial class FantomesDuSpeedrun
         if (await _objets.EnsureRawAsync(manifeste.Object.Sha256, ct).ConfigureAwait(false) is not { } brut) return null;
         try
         {
-            var fantome = ReplayVersFantome.Convertir(await File.ReadAllBytesAsync(brut, ct).ConfigureAwait(false));
+            var fantome = ReplayVersFantome.Convertir(await File.ReadAllBytesAsync(brut, ct).ConfigureAwait(false), 0, avecPoints);
             Directory.CreateDirectory(Path.GetDirectoryName(cache)!);
             await File.WriteAllBytesAsync(cache, fantome, ct).ConfigureAwait(false);
             return fantome;
