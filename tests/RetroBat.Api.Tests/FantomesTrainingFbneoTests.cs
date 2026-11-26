@@ -80,6 +80,14 @@ public class FantomesTrainingFbneoTests
     }
 
     [Fact]
+    public void Par_defaut_seul_le_fbneo_officiel_de_la_borne_est_admis()
+    {
+        Assert.Equal([Abea], FantomesDuSpeedrun.OfficielsAdmis.ToArray());
+        Assert.Null(FantomesDuSpeedrun.ReplayRefuse(Manifeste(Abea, "fbneo", Ddpdojblka), "be7be29b"));
+        Assert.Equal("other_core", FantomesDuSpeedrun.ReplayRefuse(Manifeste(new string('c', 64), "fbneo", Ddpdojblka), "be7be29b"));
+    }
+
+    [Fact]
     public void Un_fbneo_non_admis_est_ecarte_quand_la_liste_est_donnee()
     {
         var avant = FantomesDuSpeedrun.OfficielsAdmis;

@@ -45,9 +45,14 @@ public sealed partial class FantomesDuSpeedrun
 
     /// <summary>
     /// EMPREINTES DES FBNEO OFFICIELS dont le coeur hote est issu : vide, l'API ne filtre pas (le coeur hote ecarte lui-meme un
-    /// fantome d'un autre FBNeo, journal « fantome ... ecarte »).
+    /// fantome d'un autre FBNeo, journal « fantome ... ecarte »). (1.9.223) fbneo_ghosts 6518984f est construit sur le FBNeo
+    /// 543bb3c de la borne, dont la DLL officielle est abea9d81 (`retro_nelfe_fantome_officiel()` du coeur) : seuls les replays
+    /// enregistres par elle sont proposes. Un nouveau fbneo_ghosts sur un autre FBNeo ajoute l'empreinte de son officiel ici.
     /// </summary>
-    internal static IReadOnlySet<string> OfficielsAdmis { get; set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    internal static IReadOnlySet<string> OfficielsAdmis { get; set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "abea9d8195e1435f366aa0def3401edd546ffec85c5fc3e7e8725f600dcc6415",
+    };
 
     /// <summary>L'identite d'arcade d'un jeu : crc32 de la liste TRIEE des crc32 (petit-boutistes) des fichiers du .zip (DaiOuJou : be7be29b). Pur.</summary>
     public static string CrcDArcade(IEnumerable<string> crc32DesFichiers)
