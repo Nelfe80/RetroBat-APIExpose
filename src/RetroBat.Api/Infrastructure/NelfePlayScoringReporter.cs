@@ -2814,6 +2814,60 @@ public sealed class NelfePlayScoringReporter : BackgroundService
     /// <summary>Un creux de passage dure une image ; une demi-seconde laisse de la marge.</summary>
     private const long CreuxMaxImages = 30;
 
+    /// <summary>
+    /// LES BAISSES TRANSITOIRES (26/11, 19XX). Certains jeux reutilisent l'adresse du score pendant un ecran
+    /// (fin de stage, decompte de bonus) : 19XX y lit 183, puis 84 900 (le vrai score, bonus compris), puis 183
+    /// encore, sur plusieurs secondes, avant de reprendre a 85 000. Ce n'est pas un creux de passage (le retour
+    /// arrive des dizaines d'images plus tard) et le run etait coupe : le 1CC de 104 600 ne portait que la fin de
+    /// la partie. Une baisse est transitoire quand le score est tres inferieur a celui d'avant (au plus la moitie),
+    /// dure peu de lectures (au plus <see cref="BaisseMaxLectures"/>) et peu d'images, et que la lecture qui
+    /// suit RETROUVE d'un coup au moins le niveau d'avant. Une vraie nouvelle partie remonte lentement depuis zero :
+    /// elle ne peut pas revenir, en quelques lectures, au score de la partie precedente. Une lecture a ZERO est une
+    /// remise a zero : la baisse reste une nouvelle partie (hors creux de passage, voir SansCreux). Rien n'est retire sous
+    /// <see cref="BaisseNiveauMin"/> (une partie qui n'a presque rien marque n'a rien a perdre ici).
+    /// </summary>
+    internal static List<(long frame, long total)> SansBaisseTransitoire(List<(long frame, long total)> traj)
+    {
+        if (traj.Count < 3) return traj;
+        var sortie = new List<(long frame, long total)>(traj.Count);
+        var i = 0;
+        while (i < traj.Count)
+        {
+            if (sortie.Count > 0 && traj[i].total < sortie[^1].total && sortie[^1].total >= BaisseNiveauMin)
+            {
+                var niveau = sortie[^1].total;
+                var reprise = -1;
+                long hautDuCreux = 0;
+                var remiseAZero = false;
+                for (var j = i; j < traj.Count && j <= i + BaisseMaxLectures; j++)
+                {
+                    if (traj[j].total >= niveau)
+                    {
+                        var images = traj[j].frame - traj[i].frame;
+                        var courte = traj[i].frame <= 0 || traj[j].frame <= 0 || images <= BaisseMaxImages;
+                        if (j > i && courte && !remiseAZero && hautDuCreux * 2 <= niveau) reprise = j;
+                        break;
+                    }
+                    hautDuCreux = Math.Max(hautDuCreux, traj[j].total);
+                    remiseAZero |= traj[j].total == 0;
+                }
+                if (reprise > 0)
+                {
+                    i = reprise;
+                    continue;
+                }
+            }
+            sortie.Add(traj[i]);
+            i++;
+        }
+
+        return sortie;
+    }
+
+    private const int BaisseMaxLectures = 4;
+    private const long BaisseMaxImages = 900;
+    private const long BaisseNiveauMin = 1000;
+
     internal static List<(long frame, long total)> SelectBestRun(List<(long frame, long total)> traj)
         => SelectBestRun(traj, []);
 
@@ -2826,7 +2880,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
         List<(long frame, long total)> traj, IReadOnlyList<long> finsDeRun)
     {
         if (traj.Count == 0) return traj;
-        traj = SansCreux(traj);
+        traj = SansBaisseTransitoire(SansCreux(traj));
         List<(long frame, long total)>? best = null;
         long bestPeak = long.MinValue;
         var cur = new List<(long frame, long total)>();
