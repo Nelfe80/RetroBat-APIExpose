@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging.Abstractions;
 using RetroBat.Api.Adventure;
 using RetroBat.Api.Infrastructure;
+using RetroBat.Api.Media;
 using RetroBat.Api.Multiplayer;
 using Xunit;
 
@@ -413,6 +414,172 @@ public class AdventureLanguesTests : IDisposable
         Assert.True(await service.PreparerAsync(salle, jeu, CancellationToken.None));
         Assert.EndsWith("eu-en-2.state", service.DepartDe(salle)!.State);
         Assert.Equal("fr", stockage.Langue("av-1"));   // jamais remplacee
+    }
+
+    // ── la collection d'ES ne montre que la langue de la borne ─────────────────────────────────────
+
+    private sealed class SansDefinition : RetroBat.Api.Media.IScoreSlugResolver
+    {
+        public string? ResolveScoreSlug(string systemId, string? romFileName, string? md5, string? cheevosHash) => null;
+    }
+
+    private sealed class FauxOptions(ApiExposeOptions valeur) : Microsoft.Extensions.Options.IOptionsMonitor<ApiExposeOptions>
+    {
+        public ApiExposeOptions CurrentValue { get; } = valeur;
+        public ApiExposeOptions Get(string? name) => CurrentValue;
+        public IDisposable OnChange(Action<ApiExposeOptions, string?> listener) => new Rien();
+        private sealed class Rien : IDisposable { public void Dispose() { } }
+    }
+
+    private sealed class FauxReglages : RetroBat.Domain.Interfaces.IEsSettingsStore
+    {
+        private readonly System.Xml.Linq.XDocument _document = new(new System.Xml.Linq.XElement("config"));
+        public bool Update(Func<System.Xml.Linq.XDocument, bool> update, CancellationToken cancellationToken = default) => update(_document);
+        public IReadOnlyDictionary<string, string> ReadAllSettings() => new Dictionary<string, string>();
+        public RetroBat.Domain.Interfaces.EmulationStationSettingsSnapshot ReadSnapshot() => new(string.Empty, DateTime.UtcNow, ReadAllSettings());
+        public void Invalidate() { }
+        public Task WaitForStableFileAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+    }
+
+    private static object JeuAVersions() => new
+    {
+        id = "gba/jeu", system = "gba", name = "Jeu", family = "adventure", players = new { min = 2, max = 4 }, core = "mgba_splitscreen",
+        content = new { md5 = new[] { "m-usa" } },
+        default_version = "usa",
+        versions = new object[]
+        {
+            new { key = "usa", languages = new[] { "en" }, content = new { md5 = new[] { "m-usa" }, size = new[] { 8L } } },
+            new { key = "europe", languages = new[] { "en", "de" }, start_language = "en", content = new { md5 = new[] { "m-eu" }, size = new[] { 8L } },
+                  language_starts = new Dictionary<string, object> { ["fr"] = new { } } },
+            new { key = "japan", languages = new[] { "ja" }, content = new { md5 = new[] { "m-jp" }, size = new[] { 8L } } },
+            new { key = "germany", languages = new[] { "de" }, content = new { md5 = new[] { "m-de" }, size = new[] { 8L } } },
+        },
+    };
+
+    private (MultiplayerCollectionSyncService Service, AdventureCatalogueStore Store, string Langue) UneCollection(string[] roms, Func<string?> langue)
+    {
+        var dossier = Path.Combine(_racine, "roms", "gba");
+        Directory.CreateDirectory(dossier);
+        foreach (var rom in roms)
+        {
+            File.WriteAllText(Path.Combine(dossier, rom + ".gba"), rom.PadRight(8, '.'));   // 8 octets, comme le catalogue
+        }
+
+        var store = new AdventureCatalogueStore(path: EcrireUnCatalogue(JeuAVersions(), "langues.json"));
+        var etat = Path.Combine(_racine, "state");
+        var service = new MultiplayerCollectionSyncService(
+            new FauxOptions(new ApiExposeOptions { NelfePlay = new NelfePlayOptions { ShowAdventureCollection = true } }),
+            store.Interne,
+            new InstalledGameCatalog(new SansDefinition(), logger: null, romsRoot: Path.Combine(_racine, "roms"), ramRoot: Path.Combine(_racine, "ram")),
+            new EsCustomCollectionWriter(new FauxReglages(), logger: null, collectionsRoot: Path.Combine(_racine, "collections"), stateRoot: etat),
+            new EsCollectionThemeAssets(logger: null, themesRoot: Path.Combine(_racine, "themes"), sourceRoot: Path.Combine(_racine, "assets"), stateRoot: etat),
+            new RetroBat.Domain.Models.MediaRuntimeState(),
+            romsRoot: Path.Combine(_racine, "roms"),
+            emulateurTourne: () => false,
+            md5DuContenu: chemin => "m-" + File.ReadAllText(chemin).TrimEnd('.'),
+            coeurPose: _ => true,
+            profil: AdventureCollection.ProfilDeLaBorne(store, langue));
+        return (service, store, string.Empty);
+    }
+
+    private static string[] Montrees(MultiplayerCollectionSyncService s) => s.JeuxConnus().Select(j => j.ContentKey).Order().ToArray();
+
+    private string[] DansEs(MultiplayerCollectionSyncService s)
+    {
+        var fichier = Directory.GetFiles(Path.Combine(_racine, "collections"), "*adventure*", SearchOption.AllDirectories).FirstOrDefault();
+        return fichier is null ? [] : File.ReadAllLines(fichier).Where(l => l.Contains(".gba", StringComparison.Ordinal))
+            .Select(l => Path.GetFileNameWithoutExtension(l.Trim().Replace("</path>", "").Replace("<path>", ""))).Order().ToArray();
+    }
+
+    [Theory]
+    [InlineData("fr_FR", new[] { "usa", "eu" }, new[] { "eu" })]            // fr : l'Europe (language_starts fr), pas l'USA
+    [InlineData("de_DE", new[] { "usa", "eu", "de" }, new[] { "de", "eu" })] // de : Europe et Allemagne
+    [InlineData("en_US", new[] { "usa", "eu", "jp" }, new[] { "eu", "usa" })]
+    [InlineData("es_ES", new[] { "usa", "eu", "jp" }, new[] { "eu", "usa" })]  // pas de version espagnole : l'anglais
+    [InlineData("es_ES", new[] { "jp", "de" }, new[] { "jp" })]               // ni espagnole ni anglaise : la version par defaut ? absente ici
+    public void La_collection_ne_montre_que_les_versions_de_la_langue_de_la_borne(string langue, string[] roms, string[] attendu)
+    {
+        var (service, _, _) = UneCollection(roms, () => langue);
+        service.SynchroniserAsync("test", CancellationToken.None).GetAwaiter().GetResult();
+        var visibles = DansEs(service);
+        // Le cas « ni la langue, ni l'anglais, ni la version par defaut » montre TOUTES les versions possedees (jp, de).
+        var voulu = langue == "es_ES" && roms.SequenceEqual(["jp", "de"]) ? new[] { "de", "jp" } : attendu;
+        Assert.Equal(voulu, visibles.Select(v => v.Replace(" ", "")).Select(Cle).Order().ToArray());
+    }
+
+    private static string Cle(string nom) => nom switch { "usa" => "usa", "eu" => "eu", "jp" => "jp", "de" => "de", _ => nom };
+
+    [Fact]
+    public void Une_seule_rom_dans_une_autre_langue_s_affiche_quand_meme()
+    {
+        var (service, _, _) = UneCollection(["jp"], () => "fr_FR");
+        service.SynchroniserAsync("test", CancellationToken.None).GetAwaiter().GetResult();
+        Assert.Equal(["jp"], DansEs(service));
+        Assert.Equal(["m-jp"], Montrees(service));
+    }
+
+    [Fact]
+    public void La_version_par_defaut_passe_avant_les_autres_quand_ni_la_langue_ni_l_anglais_ne_conviennent_pas()
+    {
+        // Borne en francais, versions japonaise et allemande possedees : ni fr ni en, et la version par defaut (usa) n'est pas possedee : tout.
+        var (service, _, _) = UneCollection(["jp", "de"], () => "fr_FR");
+        service.SynchroniserAsync("test", CancellationToken.None).GetAwaiter().GetResult();
+        Assert.Equal(["de", "jp"], DansEs(service));
+    }
+
+    [Fact]
+    public void Une_version_cachee_reste_connue_de_la_borne_pour_une_invitation_un_join_ou_une_reprise()
+    {
+        var (service, store, _) = UneCollection(["usa", "eu"], () => "fr_FR");
+        service.SynchroniserAsync("test", CancellationToken.None).GetAwaiter().GetResult();
+        // La collection d'ES ne montre que l'Europe...
+        Assert.Equal(["eu"], DansEs(service));
+        // ...mais la borne possede toujours les deux : l'invite qui a la ROM USA de l'hote la retrouve par jeu ET contenu.
+        Assert.Equal(["m-eu", "m-usa"], Montrees(service));
+        var usa = service.JeuxConnus().Single(j => j.ContentKey == "m-usa");
+        Assert.Equal("gba/jeu", usa.Game.Id);
+        Assert.Contains(usa.Path, service.JeuxConnus().Select(j => j.Path));
+        // La reprise d'une aventure creee sur l'USA : la version est celle du contenu de l'aventure, pas celle de la collection.
+        Assert.Equal("usa", store.Entrees(out _).Single().Spec.VersionDuContenu(usa.ContentKey)?.Key);
+    }
+
+    [Fact]
+    public void Les_langues_d_une_version_sont_celles_du_catalogue_languages_start_language_et_language_starts()
+    {
+        var store = new AdventureCatalogueStore(path: EcrireUnCatalogue(JeuAVersions(), "l.json"));
+        var europe = store.Entrees(out _).Single().Spec.Versions.Single(v => v.Key == "europe");
+        Assert.Equal(["en", "de", "fr"], europe.Langues());
+    }
+
+    [Fact]
+    public void Une_aventure_creee_sur_une_version_cachee_par_le_filtre_de_langue_se_reprend_quand_la_borne_la_possede()
+    {
+        var miennes = new[]
+        {
+            new AdventureInfo { Id = "a-usa", Game = "gba/jeu", Content = "m-usa" },
+            new AdventureInfo { Id = "a-x", Game = "gba/autre", Content = "m-usa" },
+        };
+        // Sans filtre : aucune aventure sur la version montree (europe).
+        Assert.Null(AdventureChoix.Choisir(miennes, "gba/jeu", "m-eu"));
+        // Avec le contenu possede (version USA cachee) : on reprend l'aventure USA.
+        Assert.Equal("a-usa", AdventureChoix.Choisir(miennes, "gba/jeu", "m-eu", (jeu, contenu) => contenu == "m-usa")!.Id);
+        // Une aventure sur un contenu que la borne n'a pas : jamais reprise (le netplay se desynchroniserait).
+        Assert.Null(AdventureChoix.Choisir(miennes, "gba/jeu", "m-eu", (jeu, contenu) => false));
+        // La version montree avec sa propre aventure passe avant.
+        var deux = miennes.Append(new AdventureInfo { Id = "a-eu", Game = "gba/jeu", Content = "m-eu" }).ToList();
+        Assert.Equal("a-eu", AdventureChoix.Choisir(deux, "gba/jeu", "m-eu", (jeu, contenu) => true)!.Id);
+    }
+
+    [Fact]
+    public void Les_panneaux_en_jeu_prennent_le_logo_d_Adventure_et_se_replient_sur_celui_de_MULTIPLAYER_s_il_manque()
+    {
+        var bandes = RetroBat.Api.Leaderboard.PanneauxEnJeu.Calculer(1920, 1080, 4.0 / 3.0)!;
+        foreach (var logo in new string?[] { null, AdventureCollection.Logo, "absent.png" })
+        {
+            using var image = RetroBat.Api.Leaderboard.PanneauxEnJeu.Dessiner(1920, 1080, bandes, "coop", null,
+                [new RetroBat.Api.Leaderboard.PanneauxEnJeu.Joueur(1, "P1", "", null, "", "", null, null)], fichierDuLogo: logo);
+            Assert.Equal(1920, image.Width);
+        }
     }
 
     private sealed class FauxCommandes : ICommandesRetroArch

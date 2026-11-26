@@ -856,7 +856,10 @@ var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
         var aventures = app.Services.GetRequiredService<RetroBat.Api.Adventure.AdventureCollection>();
         var lancement = new RetroBat.Api.Adventure.AdventureLancement(app.Services.GetRequiredService<RetroBat.Api.Adventure.IAdventureSite>(),
             journal: app.Services.GetService<ILogger<RetroBat.Api.Adventure.AdventureLancement>>(),
-            catalogue: app.Services.GetRequiredService<RetroBat.Api.Adventure.AdventureCatalogueStore>());
+            catalogue: app.Services.GetRequiredService<RetroBat.Api.Adventure.AdventureCatalogueStore>())
+        {
+            PossedeLeContenu = (jeu, contenu) => aventures.Games.Any(g => g.Game.Id == jeu && string.Equals(g.ContentKey, contenu, StringComparison.OrdinalIgnoreCase)),
+        };
         app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>().JeuxSupplementaires = () => aventures.Games;
         app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>().RejoindreUneAventure = lancement.RejoindreAsync;
         app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>().NouvelleAventure = lancement.NouvelleAsync;

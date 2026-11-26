@@ -97,6 +97,11 @@ public sealed record AdventureVersionDuJeu
     [JsonPropertyName("combination_starts")]
     public IReadOnlyList<AdventureDepartDeCombinaison>? CombinationStarts { get; init; }
 
+    /// <summary>Toutes les langues du catalogue pour cette version : <c>languages</c>, <c>start_language</c> et les cles de <c>language_starts</c>.</summary>
+    public IReadOnlyList<string> Langues()
+        => Languages.Concat([StartLanguage ?? string.Empty]).Concat((LanguageStarts ?? new Dictionary<string, AdventureDepartsDeLangue>()).Keys)
+            .Select(AdventureLangues.Normaliser).OfType<string>().Distinct(StringComparer.Ordinal).ToList();
+
     /// <summary>La langue de la partie qui part du depart par defaut de la version, ou null (version multilingue sans <c>start_language</c>).</summary>
     public string? LangueParDefaut
         => AdventureLangues.Normaliser(StartLanguage) ?? (Languages.Count == 1 ? AdventureLangues.Normaliser(Languages[0]) : null);
