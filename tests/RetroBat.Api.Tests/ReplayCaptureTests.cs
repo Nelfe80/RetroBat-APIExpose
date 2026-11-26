@@ -323,21 +323,37 @@ public sealed class ReplayCaptureTests
     [Fact]
     public void La_sequence_du_record_part_de_90_pourcent_du_score_de_fin_de_run()
     {
-        // Le score atteint 900 (90 % de 1 000) a 100 s, mais le film montre au moins la minute avant la fin du run (09/11).
+        // Le score atteint 900 (90 % de 1 000) a 100 s : 90 s de jeu avant ce moment (26/11), plus tot que la minute avant la fin du run (09/11).
         double[][] courbe = [[10, 100], [20, 500], [100, 900], [110, 1000]];
-        Assert.Equal((55.0, 117.0), ReplayCaptureService.SequenceDuRecord(courbe, 115));
-        // 90 % atteints plus d'une minute avant la fin : 3 s d'elan avant ce moment, 2 s apres la fin du run.
+        Assert.Equal((10.0, 117.0), ReplayCaptureService.SequenceDuRecord(courbe, 115));
+        // 90 % atteints plus d'une minute avant la fin : 90 s de jeu avant ce moment, 2 s apres la fin du run.
         double[][] lente = [[10, 100], [100, 900], [200, 1000]];
-        Assert.Equal((97.0, 202.0), ReplayCaptureService.SequenceDuRecord(lente, 200));
+        Assert.Equal((20.0, 202.0), ReplayCaptureService.SequenceDuRecord(lente, 200));
         // 3 minutes au plus : les dernieres.
         double[][] longue = [[10, 100], [500, 9000], [1000, 10000]];
         Assert.Equal((820.0, 1002.0), ReplayCaptureService.SequenceDuRecord(longue, 1000));
         // Ce qui suit la fin du run (un continue) ne compte pas.
         double[][] apres = [[50, 100], [200, 5000]];
-        Assert.Equal((40.0, 102.0), ReplayCaptureService.SequenceDuRecord(apres, 100));
+        Assert.Equal((0.0, 102.0), ReplayCaptureService.SequenceDuRecord(apres, 100));
         // Sans courbe : les 3 dernieres minutes, jamais avant le debut du film.
         Assert.Equal((120.0, 302.0), ReplayCaptureService.SequenceDuRecord(null, 300));
         Assert.Equal((0.0, 62.0), ReplayCaptureService.SequenceDuRecord([], 60));
+    }
+
+    [Fact]
+    public void Le_film_d_un_record_dont_le_score_saute_a_la_fin_montre_la_partie_avant_le_bilan()
+    {
+        // Tetris Game Boy type B (signalement du 26/11) : le score monte doucement pendant la partie (jusqu'a 4 000 a 215 s),
+        // puis le bilan de fin le fait sauter (bonus de hauteur compte de 220 s a 240 s : 22 000), puis l'animation de fin et la
+        // saisie du nom (jusqu'a 275 s, fin du run). 90 % de 22 000 sont atteints a 240 s : sans jeu avant ce moment, le film
+        // (60 s avant la fin du run, soit des 215 s) ne montrait que le bilan et l'ecran de fin.
+        var courbe = new List<double[]> { new[] { 30.0, 400 }, new[] { 120.0, 2_000 }, new[] { 215.0, 4_000 } };
+        for (var i = 0; i <= 20; i++) courbe.Add([220.0 + i, 4_000 + i * 900.0]);
+        var (debut, fin) = ReplayCaptureService.SequenceDuRecord(courbe, 275);
+        Assert.Equal(277.0, fin);
+        Assert.Equal(148.0, debut);
+        Assert.True(220 - debut >= 60, "au moins une minute de jeu avant le bilan : debut " + debut);
+        Assert.True(fin - debut <= 180 + 2, "les 3 minutes du CDC");
     }
 
     [Fact]
