@@ -25,6 +25,23 @@ public interface IAdventureSite
 {
     Task<AdventureInfo?> CreerAsync(string jeu, string contenu, int places, string mode, string? titre, string? coeur, string? empreinteDuCoeur, CancellationToken ct, string? version = null);
 
+    /// <summary>
+    /// Comme <see cref="CreerAsync"/>, avec la raison du refus du site (<c>rate_limited</c>, <c>bad_players</c>, <c>unknown_game</c>...) ou <c>offline</c>
+    /// (27/11 : le site cree un BROUILLON, un seul par compte et par jeu ; l'aventure ne devient visible qu'a son activation).
+    /// </summary>
+    async Task<(AdventureInfo? Aventure, string? Raison)> CreerAvecRaisonAsync(string jeu, string contenu, int places, string mode, string? titre, string? coeur,
+        string? empreinteDuCoeur, CancellationToken ct, string? version = null)
+    {
+        var aventure = await CreerAsync(jeu, contenu, places, mode, titre, coeur, empreinteDuCoeur, ct, version).ConfigureAwait(false);
+        return (aventure, aventure is null ? "unknown_game" : null);
+    }
+
+    /// <summary>
+    /// ACTIVATION (27/11) : l'aventure vient d'etre lancee avec <paramref name="joueurs"/> joueurs (deux au moins) ; le site la rend active et lui
+    /// donne son nom. Idempotente. Rend la raison d'un refus (jamais bloquant pour la partie) ou null.
+    /// </summary>
+    Task<(bool Ok, string? Raison)> ActiverAsync(string aventure, int joueurs, CancellationToken ct) => Task.FromResult<(bool, string?)>((true, null));
+
     Task<AdventureMesAventures?> MesAventuresAsync(CancellationToken ct);
 
     /// <summary>Les aventures « open » (de ce jeu si precise).</summary>
@@ -180,6 +197,16 @@ public sealed class AdventureSiteClient : IAdventureSite
         };
     }
 
+    private static DateTime? Date(string? texte)
+        => DateTime.TryParse(texte, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var d) ? d : null;
+
+    /// <summary>
+    /// Les participants d'une LISTE du site (27/11) : <c>participants</c>, un tableau de poignees dans l'ordre des places (le detail d'un participant
+    /// aussi). <c>members</c> est un nombre dans les listes : le detail le rend en objets, lus ailleurs.
+    /// </summary>
+    internal static IReadOnlyList<string> LirePseudos(JsonObject a)
+        => (a["participants"] as JsonArray)?.Select(Texte).Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t!).ToList() ?? [];
+
     internal static AdventureInfo? LireAventure(JsonNode? n)
     {
         if (n is not JsonObject a)
@@ -203,6 +230,9 @@ public sealed class AdventureSiteClient : IAdventureSite
             Room = a["session"] is JsonObject s ? Texte(s["room"]) : null,
             LobbyId = a["voice"] is JsonObject voix ? Texte(voix["lobby_id"]) : null,
             Language = AdventureLangues.Normaliser(Texte(a["language"])),
+            State = Texte(a["state"]),
+            LastPlayedUtc = Date(Texte(a["last_played_at"]) ?? Texte(a["last_session_at"]) ?? Texte(a["last_played"])),
+            Pseudos = LirePseudos(a),
             Latest = LireVersion(a["latest_version"] ?? a["latest"], id),
         };
     }
@@ -210,6 +240,16 @@ public sealed class AdventureSiteClient : IAdventureSite
     // ── les routes ─────────────────────────────────────────────────────────────────────────────────
 
     public async Task<AdventureInfo?> CreerAsync(string jeu, string contenu, int places, string mode, string? titre, string? coeur, string? empreinteDuCoeur, CancellationToken ct, string? version = null)
+        => (await CreerAvecRaisonAsync(jeu, contenu, places, mode, titre, coeur, empreinteDuCoeur, ct, version).ConfigureAwait(false)).Aventure;
+
+    public async Task<(bool Ok, string? Raison)> ActiverAsync(string aventure, int joueurs, CancellationToken ct)
+    {
+        var r = await AppelerAsync(HttpMethod.Post, aventure + "/activate", new { players = joueurs }, ct).ConfigureAwait(false);
+        return (Reussi(r), r is null ? "offline" : Raison(r) ?? (Reussi(r) ? null : "other"));
+    }
+
+    public async Task<(AdventureInfo? Aventure, string? Raison)> CreerAvecRaisonAsync(string jeu, string contenu, int places, string mode, string? titre, string? coeur,
+        string? empreinteDuCoeur, CancellationToken ct, string? version = null)
     {
         var r = await AppelerAsync(HttpMethod.Post, "create", new
         {
@@ -227,7 +267,7 @@ public sealed class AdventureSiteClient : IAdventureSite
             start = new { kind = "fresh" },
             client_ref = Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant(),
         }, ct).ConfigureAwait(false);
-        return Reussi(r) ? LireAventure(r!.Value.Corps["adventure"]) : null;
+        return Reussi(r) ? (LireAventure(r!.Value.Corps["adventure"]), null) : (null, r is null ? "offline" : Raison(r) ?? "other");
     }
 
     public async Task<AdventureMesAventures?> MesAventuresAsync(CancellationToken ct)

@@ -604,6 +604,35 @@ public sealed class MultiplayerSessionService : BackgroundService
     /// <summary>Commencer une aventure de PLUS pour ce jeu (le panneau, onglet NEW ADVENTURE) ; meme forme que <see cref="RejoindreUneAventure"/>.</summary>
     public Func<MultiplayerInstalledGame, CancellationToken, Task<string?>>? NouvelleAventure { get; set; }
 
+    /// <summary>Prendre une aventure de la liste de l'onglet NEW ADVENTURE comme aventure courante (sa seance s'ouvre) ; rend la raison d'un refus, ou null.</summary>
+    public Func<MultiplayerInstalledGame, string, CancellationToken, Task<string?>>? ChoisirUneAventure { get; set; }
+
+    /// <summary>
+    /// Une aventure de la liste devient l'aventure courante : le joueur quitte la gameroom de son aventure d'avant (celle de ce jeu), puis la
+    /// seance de la choisie s'ouvre. Rend la raison d'un refus, ou null.
+    /// </summary>
+    public async Task<string?> ChoisirAventureAsync(MultiplayerInstalledGame jeu, string aventure, CancellationToken ct = default)
+    {
+        if (ChoisirUneAventure is null || !EstUneAventure(jeu))
+        {
+            return "adventure_unavailable";
+        }
+
+        foreach (var room in Etat.Rooms.Where(r => r.AdventureId is not null && r.Game == jeu.Game.Id && r.State is "waiting" or "countdown" && r.AdventureId != aventure).ToList())
+        {
+            await QuitterAsync(room.Room, ct).ConfigureAwait(false);
+        }
+
+        _appui = true;
+        var refus = await ChoisirUneAventure(jeu, aventure, ct).ConfigureAwait(false);
+        if (refus is null)
+        {
+            await SonderAsync(ct).ConfigureAwait(false);
+        }
+
+        return refus;
+    }
+
     /// <summary>Ce que l'onglet NEW ADVENTURE montre pour ce jeu (voir <c>AdventureLancement.AventuresDuJeuAsync</c>).</summary>
     public Func<MultiplayerInstalledGame, CancellationToken, Task<RetroBat.Api.Adventure.AventuresDuJeu>>? AventuresDuJeu { get; set; }
 

@@ -510,6 +510,38 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
         seance.Suivi = new CancellationTokenSource();
         var jeton = seance.Suivi.Token;
         _ = Task.Run(() => SuivreAsync(seance, jeton), jeton);
+
+        // ACTIVATION (27/11) : une aventure n'existe pour le joueur qu'une fois lancee avec les autres (deux joueurs au moins) ; le site la rend
+        // alors active et lui donne son nom. Lancee seul, le brouillon reste un brouillon.
+        var joueurs = room.Launch?.Players is > 0 and var n ? n : room.Players.Count(j => j.Seat is not null);
+        if (AdventureRefus.DoitEtreActivee(joueurs, seance.Aventure.State))
+        {
+            _ = Task.Run(() => ActiverAsync(seance.Aventure.Id, joueurs));
+        }
+    }
+
+    /// <summary>Demande au site de rendre l'aventure active. Idempotent chez lui ; un refus ou un site muet est journalise et ne bloque jamais la partie.</summary>
+    internal async Task<bool> ActiverAsync(string aventure, int joueurs)
+    {
+        try
+        {
+            var (ok, raison) = await _site.ActiverAsync(aventure, joueurs, CancellationToken.None).ConfigureAwait(false);
+            if (ok)
+            {
+                _journal?.LogInformation("ADVENTURE : aventure {Aventure} activee ({Joueurs} joueurs)", aventure, joueurs);
+            }
+            else
+            {
+                _journal?.LogWarning("ADVENTURE : activation de {Aventure} refusee ({Raison}), la partie continue", aventure, raison ?? "-");
+            }
+
+            return ok;
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            _journal?.LogWarning(ex, "ADVENTURE : activation de {Aventure} impossible, la partie continue", aventure);
+            return false;
+        }
     }
 
     private async Task SuivreAsync(Seance seance, CancellationToken ct)

@@ -84,6 +84,24 @@ public sealed record AdventureInfo
     /// </summary>
     [JsonPropertyName("language")]
     public string? Language { get; init; }
+
+    /// <summary>
+    /// L'ETAT CHEZ LE SITE (27/11) : <c>draft</c> = brouillon (cree, jamais lance a deux joueurs au moins : invisible des listes), <c>active</c> =
+    /// lancee au moins une fois avec les autres. Null : site d'avant (traitee comme active).
+    /// </summary>
+    [JsonPropertyName("state")]
+    public string? State { get; init; }
+
+    /// <summary>La date de la derniere partie (UTC), rendue par le site dans les listes ; null si le site ne la rend pas.</summary>
+    [JsonPropertyName("last_played_at")]
+    public DateTime? LastPlayedUtc { get; init; }
+
+    /// <summary>Les pseudos des participants, par place, tels que le site les rend dans les listes.</summary>
+    [JsonPropertyName("player_names")]
+    public IReadOnlyList<string> Pseudos { get; init; } = [];
+
+    /// <summary>Le brouillon n'est pas une aventure pour le joueur : il n'apparait dans aucune liste.</summary>
+    public bool EstUnBrouillon => string.Equals(State, "draft", StringComparison.OrdinalIgnoreCase);
 }
 
 public sealed record AdventurePlace

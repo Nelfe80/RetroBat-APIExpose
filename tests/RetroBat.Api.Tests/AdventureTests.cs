@@ -149,6 +149,15 @@ public class AdventureTests : IDisposable
         public List<(string Aventure, int Joueurs)> Ouvertures { get; } = [];
         public string? RefusDeSeance { get; set; }
         public string? RaisonDeFermeture { get; private set; }
+        public List<(string Aventure, int Joueurs)> Activations { get; } = [];
+        public string? RefusDActivation { get; set; }
+        public bool ActivationQuiPlante { get; set; }
+
+        public Task<(bool Ok, string? Raison)> ActiverAsync(string aventure, int joueurs, CancellationToken ct)
+        {
+            Activations.Add((aventure, joueurs));
+            return ActivationQuiPlante ? throw new HttpRequestException("site muet") : Task.FromResult((RefusDActivation is null, RefusDActivation));
+        }
 
         public Task<AdventureInfo?> CreerAsync(string jeu, string contenu, int places, string mode, string? titre, string? coeur, string? empreinteDuCoeur, CancellationToken ct, string? version = null)
         {
@@ -1575,6 +1584,74 @@ public class AdventureTests : IDisposable
 
         Assert.Null(service.DepartDe(Salle(2)));   // le jeu part a froid et relit le .srm pose
         Assert.Equal([9, 9], File.ReadAllBytes(Path.Combine(stockage.DossierDesSauvegardes("av-1"), "kirby.srm")));
+    }
+
+    // ── ACTIVATION (27/11) : une aventure devient active au lancement reel a deux joueurs au moins ─────────
+
+    [Theory]
+    [InlineData(2, null, true)]
+    [InlineData(4, "draft", true)]
+    [InlineData(1, "draft", false)]
+    [InlineData(0, null, false)]
+    [InlineData(3, "active", false)]
+    public void L_activation_demande_deux_joueurs_et_une_aventure_pas_encore_active(int joueurs, string? etat, bool attendu)
+        => Assert.Equal(attendu, AdventureRefus.DoitEtreActivee(joueurs, etat));
+
+    private static async Task Attendre(Func<bool> condition)
+    {
+        for (var i = 0; i < 100 && !condition(); i++)
+        {
+            await Task.Delay(20);
+        }
+    }
+
+    [Fact]
+    public async Task Une_partie_lancee_a_deux_joueurs_active_l_aventure_et_seule_elle_reste_un_brouillon()
+    {
+        var (service, site, stockage, _) = UneSeance();
+        site.Aventure = site.Aventure! with { State = "draft" };
+        PoserUneVersion(site, stockage, 2);
+        var jeu = Jeu(Path.Combine(_racine, "kirby.gba"));
+
+        var seul = Salle(1);
+        Assert.True(await service.PreparerAsync(seul, jeu, CancellationToken.None));
+        service.Demarree(seul, jeu);
+        await Task.Delay(150);
+        Assert.Empty(site.Activations);
+
+        var deux = Salle(2, "r2");
+        Assert.True(await service.PreparerAsync(deux, jeu, CancellationToken.None));
+        service.Demarree(deux, jeu);
+        await Attendre(() => site.Activations.Count > 0);
+        Assert.Equal([("av-1", 2)], site.Activations);
+    }
+
+    [Fact]
+    public async Task Une_aventure_deja_active_n_est_pas_redemandee()
+    {
+        var (service, site, stockage, _) = UneSeance();
+        site.Aventure = site.Aventure! with { State = "active" };
+        PoserUneVersion(site, stockage, 2);
+        var jeu = Jeu(Path.Combine(_racine, "kirby.gba"));
+        var salle = Salle(2);
+        Assert.True(await service.PreparerAsync(salle, jeu, CancellationToken.None));
+        service.Demarree(salle, jeu);
+        await Task.Delay(150);
+        Assert.Empty(site.Activations);
+    }
+
+    [Fact]
+    public async Task Un_refus_ou_un_site_muet_a_l_activation_ne_bloque_jamais_la_partie()
+    {
+        var (service, site, _, _) = UneSeance();
+        site.RefusDActivation = "rate_limited";
+        Assert.False(await service.ActiverAsync("av-1", 2));
+        site.RefusDActivation = null;
+        site.ActivationQuiPlante = true;
+        Assert.False(await service.ActiverAsync("av-1", 2));
+        site.ActivationQuiPlante = false;
+        Assert.True(await service.ActiverAsync("av-1", 2));
+        Assert.Equal(3, site.Activations.Count);
     }
 
     // ── NEW ADVENTURE dans la session ───────────────────────────────────────────────────────────────

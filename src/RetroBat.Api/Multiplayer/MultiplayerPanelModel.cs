@@ -124,13 +124,19 @@ public sealed class MultiplayerPanelModel
     public static int TailleSuivante(int actuelle, int presents, int maxDuJeu)
         => actuelle >= maxDuJeu ? Math.Min(maxDuJeu, Math.Max(2, presents)) : Math.Max(actuelle + 1, Math.Max(2, presents));
 
-    private bool LignesAChoisir => Etat == Foyer.Panneau && OngletCourant == Onglet.InviteFriends;
+    /// <summary>
+    /// ADVENTURE (27/11) : l'onglet NEW ADVENTURE est une LISTE d'aventures qu'on choisit (▲▼ puis A), comme INVITE l'est pour les amis. Posee par le
+    /// service pour un jeu de la collection Adventure ; faux partout ailleurs (FOR PLAYERS n'a pas de ligne a choisir).
+    /// </summary>
+    public bool ListeDAventures { get; set; }
+
+    private bool LignesAChoisir => Etat == Foyer.Panneau && (OngletCourant == Onglet.InviteFriends || (ListeDAventures && OngletCourant == Onglet.WaitingForPlayers));
 
     /// <summary>Le nombre de lignes de l'onglet courant, pour borner ▲▼.</summary>
     public void PoserLesLignes(int nombre)
     {
         _lignes = Math.Max(0, nombre);
-        _ligne = OngletCourant != Onglet.InviteFriends || _lignes == 0 ? -1 : Math.Clamp(_ligne, -1, _lignes - 1);
+        _ligne = !(OngletCourant == Onglet.InviteFriends || (ListeDAventures && OngletCourant == Onglet.WaitingForPlayers)) || _lignes == 0 ? -1 : Math.Clamp(_ligne, -1, _lignes - 1);
     }
 
     public Effet Gauche()
