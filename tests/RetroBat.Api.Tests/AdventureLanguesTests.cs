@@ -751,6 +751,75 @@ oms\" + v.Key + ".zip", null, v.Content.Md5.Single())))
         Assert.True(apres0.Length > 1000 && apres1.Length > 1000);
     }
 
+    private sealed class ReglagesDUnFichier(string chemin) : RetroBat.Domain.Interfaces.IEsSettingsStore
+    {
+        public IReadOnlyDictionary<string, string> ReadAllSettings()
+        {
+            var valeurs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var e in System.Xml.Linq.XDocument.Load(chemin).Descendants().Where(n => n.Attribute("name") != null))
+            {
+                valeurs.TryAdd(e.Attribute("name")!.Value, e.Attribute("value")?.Value ?? string.Empty);
+            }
+
+            return valeurs;
+        }
+
+        public RetroBat.Domain.Interfaces.EmulationStationSettingsSnapshot ReadSnapshot() => new(chemin, File.GetLastWriteTimeUtc(chemin), ReadAllSettings());
+        public bool Update(Func<System.Xml.Linq.XDocument, bool> update, CancellationToken cancellationToken = default) => false;
+        public void Invalidate() { }
+        public Task WaitForStableFileAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+    }
+
+    [Fact]
+    public void Avec_le_vrai_es_settings_de_la_borne_la_langue_des_jeux_est_fr_et_la_collection_a_cinq_entrees()
+    {
+        // Le vrai fichier de la borne : le profil de langue vaut french, la langue d'ES n'est pas reglee et la synchro des gamelists sur la langue du
+        // systeme est allumee (le calcul des gamelists ignore alors le profil).
+        var vrai = Path.Combine("E:" + Path.DirectorySeparatorChar, "RetroBat", "emulationstation", ".emulationstation", "es_settings.cfg");
+        var catalogue = CatalogueDuDataPack();
+        if (!File.Exists(vrai) || catalogue is null)
+        {
+            return;
+        }
+
+        var copie = Path.Combine(_racine, "es_settings.cfg");
+        Directory.CreateDirectory(_racine);
+        File.Copy(vrai, copie);
+        var reglages = new RetroBat.Domain.Services.EmulationStationSettingsService(new ReglagesDUnFichier(copie));
+        var brut = reglages.GetAllSettings();
+        Assert.Equal("french", brut["global.apiexpose.romset.language_profile"]);
+        Assert.Equal("fr", CabinetLocale.LangueDesJeuxDeReglages(brut));
+        // L'ancien chemin (ContentLanguageProfile) ne voyait pas le profil : la synchro sur la langue d'ES le remplace par « auto ».
+        if (brut.TryGetValue("global.apiexpose.api.sync_gamelists_with_system_language", out var synchro) && synchro == "1")
+        {
+            Assert.Equal("english", reglages.GetScrapingSettings().ContentLanguageProfile);
+        }
+
+        var store = new AdventureCatalogueStore(path: catalogue);
+        var entrees = store.Entrees(out _).Where(e => e.Jeu.Id != "snes/the-lost-vikings").ToList();
+        var spec = entrees.ToDictionary(e => e.Jeu.Id, e => e.Spec);
+        var possedees = entrees.SelectMany(e => e.Spec.Versions.Select(v => new MultiplayerInstalledGame(e.Jeu.PourLeContenu(v.Content.Md5.Single()), @"E:oms\" + v.Key + ".zip", null, v.Content.Md5.Single()))).ToList();
+        var vues = AdventureCollection.VersionsAffichees(possedees, store, CabinetLocale.LangueDesJeuxDeReglages(brut))
+            .Select(j => j.Game.Id + ":" + spec[j.Game.Id].VersionDuContenu(j.ContentKey)!.Key).Order().ToArray();
+        Assert.Equal(new[]
+        {
+            "gba/kirby-amazing-mirror:europe", "gba/shining-soul-ii:europe", "gba/zelda-alttp-four-swords:europe",
+            "megadrive/the-lost-vikings:europe", "snes/secret-of-mana:france-rev1",
+        }.Order().ToArray(), vues);
+    }
+
+    [Theory]
+    [InlineData("french", "english", "en_US", "fr")]
+    [InlineData("", "french", "", "fr")]
+    [InlineData("show_all", "", "de_DE", "de")]
+    [InlineData("", "", "", "en")]
+    [InlineData("auto", "auto", "fr_FR", "fr")]
+    public void La_langue_des_jeux_se_lit_des_reglages_bruts(string romset, string api, string es, string attendu)
+        => Assert.Equal(attendu, CabinetLocale.LangueDesJeuxDeReglages(new Dictionary<string, string>
+        {
+            ["global.apiexpose.romset.language_profile"] = romset, ["global.apiexpose.api.language_profile"] = api, ["Language"] = es,
+        }));
+
     private sealed class FauxCommandes : ICommandesRetroArch
     {
         public Task<string?> DemanderAsync(string commande, CancellationToken ct, int delaiMs = 500) => Task.FromResult<string?>(null);

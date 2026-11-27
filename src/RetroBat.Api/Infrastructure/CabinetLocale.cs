@@ -49,6 +49,19 @@ public sealed class CabinetLocale
         get { Rafraichir(); lock (_verrou) return _langueDesJeux; }
     }
 
+    /// <summary>
+    /// Depuis les REGLAGES BRUTS d'ES (es_settings.cfg) : <c>global.apiexpose.romset.language_profile</c>, puis <c>api.language_profile</c>, puis la langue
+    /// d'ES (<c>Language</c>), puis « en ». Le profil se lit BRUT : avec <c>sync_gamelists_with_system_language</c> allume, le calcul des gamelists
+    /// (<c>ContentLanguageProfile</c>) ignore le profil et suit la langue d'ES (« auto »), ce qui n'est pas ce que le joueur regle pour ses jeux.
+    /// « auto », « show_all » ou vide ne sont pas un profil. Pur.
+    /// </summary>
+    public static string LangueDesJeuxDeReglages(IReadOnlyDictionary<string, string> reglages)
+    {
+        string? Valeur(string cle) => reglages.TryGetValue(cle, out var v) ? v : null;
+        return RetroBat.Api.Adventure.AdventureLangues.Normaliser(Valeur("global.apiexpose.romset.language_profile"))
+            ?? LangueDesJeuxDe(Valeur("global.apiexpose.api.language_profile"), Valeur("Language"));
+    }
+
     /// <summary>Le profil de langue des ROMs (ou la langue d'ES, ou « en ») en deux lettres. Pur.</summary>
     public static string LangueDesJeuxDe(string? profil, string? langueDEs)
         => RetroBat.Api.Adventure.AdventureLangues.Normaliser(profil) ?? RetroBat.Api.Adventure.AdventureLangues.Normaliser(langueDEs) ?? "en";
@@ -71,7 +84,7 @@ public sealed class CabinetLocale
             try
             {
                 var reglages = _reglages.GetScrapingSettings();
-                _langueDesJeux = LangueDesJeuxDe(reglages.ContentLanguageProfile, reglages.Language);
+                _langueDesJeux = LangueDesJeuxDeReglages(_reglages.GetAllSettings());
                 var langue = reglages.Language;
                 if (string.IsNullOrWhiteSpace(langue)) return;
                 _langue = langue.Trim();
