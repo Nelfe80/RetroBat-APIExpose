@@ -255,7 +255,29 @@ public sealed class AdventureLancement
     public async Task<string?> NouvelleAsync(MultiplayerInstalledGame jeu, CancellationToken ct)
     {
         var (aventure, refus) = await CreerAsync(jeu, ct).ConfigureAwait(false);
-        return aventure is null ? refus ?? "unknown_game" : await OuvrirAsync(aventure, jeu, ct).ConfigureAwait(false);
+        if (aventure is null)
+        {
+            return refus ?? "unknown_game";
+        }
+
+        // Le site REUTILISE le brouillon du compte pour ce jeu (ses places sont remises a jour) mais son ancienne seance peut rester ouverte :
+        // l'ouvrir attachait a l'ancienne salle (ancien nombre de joueurs, ouvreur parfois l'autre). Une nouvelle aventure ferme l'ancienne
+        // seance puis en ouvre une neuve, au nombre de places du jeu.
+        var voulus = Math.Max(2, jeu.Game.Players);
+        if (aventure.Room is { Length: > 0 })
+        {
+            var fermee = await _site.FermerSeanceAsync(aventure.Id, "abandon", null, ct).ConfigureAwait(false);
+            _journal?.LogInformation("ADVENTURE : ancienne seance du brouillon {Aventure} fermee ({Statut})", aventure.Id, fermee ? "ok" : "refusee");
+        }
+
+        var refusOuverture = await OuvrirAsync(aventure, jeu, ct, voulus).ConfigureAwait(false);
+        if (refusOuverture is null && aventure.Room is { Length: > 0 })
+        {
+            // Si l'ancienne salle a du etre gardee (fermeture refusee : l'ouvreur est l'autre joueur), le nombre voulu est redemande (ouvreur seulement).
+            await _site.ReglerLaSeanceAsync(aventure.Id, voulus, ct).ConfigureAwait(false);
+        }
+
+        return refusOuverture;
     }
 
     private async Task<(AdventureInfo? Aventure, string? Raison)> CreerAsync(MultiplayerInstalledGame jeu, CancellationToken ct)
@@ -277,9 +299,9 @@ public sealed class AdventureLancement
         return (aventure, aventure is null ? raison ?? "unknown_game" : null);
     }
 
-    private async Task<string?> OuvrirAsync(AdventureInfo aventure, MultiplayerInstalledGame jeu, CancellationToken ct)
+    private async Task<string?> OuvrirAsync(AdventureInfo aventure, MultiplayerInstalledGame jeu, CancellationToken ct, int? joueurs = null)
     {
-        var seance = await _site.OuvrirSeanceAsync(aventure.Id, AdventureChoix.Joueurs(aventure, jeu.Game.Players), ct).ConfigureAwait(false);
+        var seance = await _site.OuvrirSeanceAsync(aventure.Id, joueurs ?? AdventureChoix.Joueurs(aventure, jeu.Game.Players), ct).ConfigureAwait(false);
         if (seance is null)
         {
             return "offline";

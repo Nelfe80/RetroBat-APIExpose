@@ -220,4 +220,23 @@ public sealed class AdventureRejoindreTests
         Assert.True(await service.ActiverAsync("a1", 2));
         Assert.Equal(["POST a1/activate", "GET mine", "POST invitation", "POST a1/activate"], b.Appels);
     }
+
+    [Fact]
+    public async Task Une_nouvelle_aventure_ferme_l_ancienne_seance_du_brouillon_et_part_des_places_du_jeu()
+    {
+        var b = new Bouteille(r =>
+        {
+            var chemin = r.RequestUri!.AbsolutePath;
+            return chemin.EndsWith("/create", StringComparison.Ordinal)
+                ? (200, """{"ok":true,"reused":true,"adventure":{"id":"d1","game":"gba/kirby","content":"c","places":4,"state":"draft","session":{"room":"vieille"}}}""")
+                : chemin.EndsWith("/session/open", StringComparison.Ordinal)
+                    ? (200, """{"ok":true,"attached":false,"room":"neuve","session":{"id":"s2","room":"neuve"}}""")
+                    : (200, """{"ok":true}""");
+        });
+        var jeu = new MultiplayerInstalledGame(new MultiplayerGame { Id = "gba/kirby", Players = 4 }, "k.gba", null, "c");
+        Assert.Null(await new AdventureLancement(Client(b)).NouvelleAsync(jeu, CancellationToken.None));
+        Assert.Equal(["POST create", "POST d1/session/close", "POST d1/session/open", "POST d1/session/size"], b.Appels);
+        Assert.Contains("\"players\":4", b.Corps[2], StringComparison.Ordinal);
+        Assert.Contains("\"places\":4", b.Corps[0], StringComparison.Ordinal);
+    }
 }
