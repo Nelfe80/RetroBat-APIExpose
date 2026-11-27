@@ -60,29 +60,48 @@ public sealed class ReplayTransitPublisher
     /// </summary>
     public async Task<VerdictMiroir> VerifierSurLeMiroirAsync(string sha256, CancellationToken ct)
     {
-        var template = _config["Replay:Share:MirrorUrlTemplate"];
-        if (string.IsNullOrWhiteSpace(template) || !template.Contains("{sha}", StringComparison.Ordinal)) return VerdictMiroir.Inconnu;
-        var statuts = new List<int?>();
-        try
+        var gabarits = MirrorPeerSource.Gabarits(_config);
+        if (gabarits.Count == 0) return VerdictMiroir.Inconnu;
+        var client = _httpFactory.CreateClient();
+        client.Timeout = Timeout.InfiniteTimeSpan;
+        async Task<int?> Head(string url)
         {
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            cts.CancelAfter(TimeSpan.FromSeconds(20));
-            var client = _httpFactory.CreateClient();
-            client.Timeout = Timeout.InfiniteTimeSpan;
-            // La forme compressée d'abord (les envois récents), puis la brute (les anciens).
-            var brute = template.Replace("{sha}", sha256, StringComparison.Ordinal);
-            foreach (var url in new[] { ReplayCompression.UrlCompressee(brute), brute })
+            try
             {
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+                cts.CancelAfter(TimeSpan.FromSeconds(20));
                 using var req = new HttpRequestMessage(HttpMethod.Head, url);
                 using var res = await client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cts.Token).ConfigureAwait(false);
-                if (res.IsSuccessStatusCode) return VerdictMiroir.Present;
-                statuts.Add((int)res.StatusCode);
+                return (int)res.StatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Replay : amorce injoignable pour la verification de {Sha}.", sha256[..8]);
+                return null;
             }
         }
-        catch (Exception ex)
+        return await VerifierSurLesSourcesAsync(gabarits, sha256, Head).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Coeur pur de la preuve de presence. GitHub d'abord (la forme compressee, puis la brute), puis GitLab SEULEMENT si
+    /// GitHub ne l'a pas : aucune requete en plus quand GitHub repond. Absent seulement si TOUTES les sources repondent
+    /// 404/410 ; une source muette (null, 408, 429, 5xx) donne Inconnu, jamais Absent ; la source suivante est quand meme
+    /// essayee, un 200 ailleurs suffit. <paramref name="head"/> rend le code HTTP, ou null si la source n'a pas repondu.
+    /// </summary>
+    public static async Task<VerdictMiroir> VerifierSurLesSourcesAsync(
+        IEnumerable<string> gabarits, string sha256, Func<string, Task<int?>> head)
+    {
+        var statuts = new List<int?>();
+        foreach (var gabarit in gabarits)
         {
-            _logger.LogDebug(ex, "Replay : amorce injoignable pour la verification de {Sha}.", sha256[..8]);
-            statuts.Add(null);
+            var brute = gabarit.Replace("{sha}", sha256, StringComparison.Ordinal);
+            foreach (var url in new[] { ReplayCompression.UrlCompressee(brute), brute })
+            {
+                var code = await head(url).ConfigureAwait(false);
+                if (code is >= 200 and < 300) return VerdictMiroir.Present;
+                statuts.Add(code);
+            }
         }
         return ReplayMiroirPreuve.Classer(statuts);
     }

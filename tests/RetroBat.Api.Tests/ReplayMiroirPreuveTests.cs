@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 using RetroBat.Api.Replay.Models;
 using RetroBat.Api.Replay.Sharing;
 using Xunit;
@@ -132,5 +133,78 @@ public class ReplayMiroirPreuveTests
         Assert.Equal(VerdictMiroir.Inconnu, ReplayMiroirPreuve.Classer(new int?[] { 429 }));
         Assert.Equal(VerdictMiroir.Inconnu, ReplayMiroirPreuve.Classer(new int?[] { 403, 404 }));
         Assert.Equal(VerdictMiroir.Inconnu, ReplayMiroirPreuve.Classer(Array.Empty<int?>()));
+    }
+
+    // ---- Preuve de presence sur GitHub OU GitLab (27/11/2026, soir) ----
+    private const string Sha = "abcdef0123456789";
+    private const string Gh = "https://github.com/x/objects/{sha}.replay";
+    private const string Gl = "https://gitlab.com/x/objects/{sha}.replay";
+
+    private static async Task<(VerdictMiroir v, List<string> appels)> Verifier(Func<string, int?> reponse)
+    {
+        var appels = new List<string>();
+        var v = await ReplayTransitPublisher.VerifierSurLesSourcesAsync(new[] { Gh, Gl }, Sha, u => { appels.Add(u); return Task.FromResult(reponse(u)); });
+        return (v, appels);
+    }
+
+    [Fact]
+    public async Task GitHub_repond_aucune_requete_GitLab()
+    {
+        var (v, appels) = await Verifier(u => u.Contains("github") ? 200 : 404);
+        Assert.Equal(VerdictMiroir.Present, v);
+        Assert.Single(appels);
+        Assert.EndsWith(".replay.gz", appels[0]);
+        Assert.DoesNotContain(appels, a => a.Contains("gitlab"));
+    }
+
+    [Fact]
+    public async Task Servi_par_GitLab_seulement_est_present_apres_les_404_de_GitHub()
+    {
+        var (v, appels) = await Verifier(u => u.Contains("gitlab") && u.EndsWith(".gz") ? 200 : 404);
+        Assert.Equal(VerdictMiroir.Present, v);
+        Assert.Equal(3, appels.Count);
+        Assert.StartsWith("https://github.com", appels[0]);
+        Assert.StartsWith("https://gitlab.com", appels[2]);
+    }
+
+    [Fact]
+    public async Task Forme_brute_de_GitLab_compte_aussi()
+    {
+        var (v, _) = await Verifier(u => u.Contains("gitlab") && !u.EndsWith(".gz") ? 200 : 404);
+        Assert.Equal(VerdictMiroir.Present, v);
+    }
+
+    [Fact]
+    public async Task Absent_seulement_si_toutes_les_sources_disent_404()
+    {
+        var (v, appels) = await Verifier(_ => 404);
+        Assert.Equal(VerdictMiroir.Absent, v);
+        Assert.Equal(4, appels.Count);
+    }
+
+    [Fact]
+    public async Task Une_source_muette_donne_inconnu_jamais_absent()
+    {
+        Assert.Equal(VerdictMiroir.Inconnu, (await Verifier(u => u.Contains("gitlab") ? null : 404)).v);
+        Assert.Equal(VerdictMiroir.Inconnu, (await Verifier(u => u.Contains("github") ? 503 : 404)).v);
+        Assert.Equal(VerdictMiroir.Inconnu, (await Verifier(u => u.Contains("gitlab") ? 429 : 404)).v);
+    }
+
+    [Fact]
+    public async Task GitHub_muet_mais_GitLab_present_est_present()
+    {
+        var (v, _) = await Verifier(u => u.Contains("github") ? null : 200);
+        Assert.Equal(VerdictMiroir.Present, v);
+    }
+
+    [Fact]
+    public void Les_gabarits_sont_GitHub_puis_GitLab_sans_doublon_et_se_coupent()
+    {
+        IConfiguration Cfg(params (string, string)[] kv) => new ConfigurationBuilder()
+            .AddInMemoryCollection(kv.Select(x => new KeyValuePair<string, string?>(x.Item1, x.Item2))).Build();
+        var g = MirrorPeerSource.Gabarits(Cfg(("Replay:Share:MirrorUrlTemplate", Gh)));
+        Assert.Equal(new[] { Gh, MirrorPeerSource.GitLabTemplate }, g);
+        Assert.Equal(new[] { Gh }, MirrorPeerSource.Gabarits(Cfg(("Replay:Share:MirrorUrlTemplate", Gh), ("Replay:Share:MirrorFallbackEnabled", "false"))));
+        Assert.Empty(MirrorPeerSource.Gabarits(Cfg(("Replay:Share:MirrorFallbackEnabled", "false"))));
     }
 }

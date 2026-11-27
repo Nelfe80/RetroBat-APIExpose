@@ -185,6 +185,24 @@ public sealed class MirrorPeerSource : IReplayPeerSource
     private readonly IConfiguration _config;
     public MirrorPeerSource(IConfiguration config) => _config = config;
 
+    /// <summary>
+    /// Les gabarits d'amorce, dans l'ordre d'essai : GitHub, puis GitLab (ou le secours configure). Partage avec la preuve
+    /// de presence du semis (<see cref="ReplayTransitPublisher.VerifierSurLeMiroirAsync"/>) : une seule liste, deux usages.
+    /// </summary>
+    public static IReadOnlyList<string> Gabarits(IConfiguration config)
+    {
+        var gabarits = new List<string>();
+        var principal = config["Replay:Share:MirrorUrlTemplate"];
+        if (!string.IsNullOrWhiteSpace(principal)) gabarits.Add(principal);
+        if (config.GetValue("Replay:Share:MirrorFallbackEnabled", true))
+        {
+            var secours = config.GetSection("Replay:Share:MirrorFallbackUrlTemplates").Get<string[]>();
+            gabarits.AddRange(secours is { Length: > 0 } ? secours : [GitLabTemplate]);
+        }
+        return gabarits.Where(t => !string.IsNullOrWhiteSpace(t) && t.Contains("{sha}", StringComparison.Ordinal))
+            .Distinct(StringComparer.Ordinal).ToList();
+    }
+
     public string Name => SourceTag;
 
     public Task<IReadOnlyList<ReplayPeer>> DiscoverAsync(CancellationToken ct)
@@ -195,14 +213,7 @@ public sealed class MirrorPeerSource : IReplayPeerSource
 
         // AUCUN repli sur la plateforme : elle n'est jamais une source d'objets. Sans gabarit
         // configure, il n'y a pas d'amorce, point. L'ordre est celui d'essai : GitHub, puis GitLab.
-        var gabarits = new List<string>();
-        var principal = _config["Replay:Share:MirrorUrlTemplate"];
-        if (!string.IsNullOrWhiteSpace(principal)) gabarits.Add(principal);
-        if (_config.GetValue("Replay:Share:MirrorFallbackEnabled", true))
-        {
-            var secours = _config.GetSection("Replay:Share:MirrorFallbackUrlTemplates").Get<string[]>();
-            gabarits.AddRange(secours is { Length: > 0 } ? secours : [GitLabTemplate]);
-        }
+        var gabarits = Gabarits(_config);
 
         var pairs = new List<ReplayPeer>();
         foreach (var template in gabarits.Distinct(StringComparer.Ordinal))
