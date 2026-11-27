@@ -31,8 +31,19 @@ public static class AdventureRefus
         ["busy"] = "NelfePlay is busy, try again",
         ["unavailable"] = "NelfePlay is busy, try again",
         ["draft_exists"] = "An adventure is already waiting for its first game with friends",
+        ["content_missing"] = "The creator's version of the game is not on this cabinet",
+        ["not_owner"] = "Only the player who opened this room can change the number of players",
+        ["not_host"] = "Only the player who opened this room can change the number of players",
+        ["not_in_room"] = "You are not in this room",
+        ["too_late"] = "The game is already starting",
+        ["locked"] = "The game is about to start",
+        ["size_refused"] = "This number of players is not possible",
+        ["session_running"] = "The game of this adventure is already running",
         ["other"] = "Could not start the adventure",
     };
+
+    /// <summary>La borne n'a pas le contenu exact (la version de la ROM) de l'aventure ou de l'invitation (28/11).</summary>
+    public const string ContenuAbsent = "content_missing";
 
     /// <summary>La raison que le panneau sait dire : une raison inconnue devient <c>other</c>.</summary>
     public static string Raison(string? raison) => raison is { Length: > 0 } r && Connus.ContainsKey(r) ? r : "other";

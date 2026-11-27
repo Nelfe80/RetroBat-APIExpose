@@ -56,6 +56,12 @@ public interface IAdventureSite
 
     Task<bool> FermerSeanceAsync(string aventure, string raison, long? dureeS, CancellationToken ct);
 
+    /// <summary>
+    /// LA TOUCHE X (28/11) : l'ouvreur de la seance change le nombre de joueurs attendus tant que la salle attend (<c>session/size</c> : met a
+    /// jour la seance ET la salle). Rend la raison du site (<c>not_host</c>, <c>no_session</c>, <c>bad_players</c>...) ou null si ok.
+    /// </summary>
+    Task<(bool Ok, string? Raison)> ReglerLaSeanceAsync(string aventure, int joueurs, CancellationToken ct) => Task.FromResult<(bool, string?)>((false, "unavailable"));
+
     /// <summary>Tout participant peut inviter (« qui invite decide »). Rend le code du site (<c>not_found</c>, <c>already_member</c>...) ou null si ok.</summary>
     Task<(bool Ok, string? Raison)> InviterAsync(string aventure, string poignee, CancellationToken ct);
 
@@ -207,6 +213,27 @@ public sealed class AdventureSiteClient : IAdventureSite
     internal static IReadOnlyList<string> LirePseudos(JsonObject a)
         => (a["participants"] as JsonArray)?.Select(Texte).Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t!).ToList() ?? [];
 
+    /// <summary>
+    /// Le pseudo d'affichage du createur (28/11) : le membre de role <c>creator</c> du detail (<c>members</c> en objets). Les listes du site
+    /// ne rendent que sa poignee (<c>creator</c>) : le champ <c>creator_pseudo</c> est a ajouter cote site, la borne lit le detail en attendant.
+    /// </summary>
+    private static string? PseudoDuCreateur(JsonObject a)
+        => (a["members"] as JsonArray)?.OfType<JsonObject>().FirstOrDefault(m => Texte(m["role"]) == "creator") is { } m && Texte(m["pseudo"]) is { Length: > 0 } p ? p : null;
+
+    /// <summary>
+    /// Les pseudos d'affichage des participants (28/11) : <c>participant_pseudos</c> d'une liste (meme ordre que <c>participants</c>), sinon
+    /// les <c>pseudo</c> des <c>members</c> du detail. Une poignee n'est jamais prise pour un pseudo.
+    /// </summary>
+    internal static IReadOnlyList<string> LireNomsDesJoueurs(JsonObject a)
+    {
+        if ((a["participants_names"] ?? a["participant_pseudos"]) is JsonArray liste)
+        {
+            return liste.Select(Texte).Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t!).ToList();
+        }
+
+        return (a["members"] as JsonArray)?.OfType<JsonObject>().Select(m => Texte(m["pseudo"])).Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t!).ToList() ?? [];
+    }
+
     internal static AdventureInfo? LireAventure(JsonNode? n)
     {
         if (n is not JsonObject a)
@@ -226,6 +253,8 @@ public sealed class AdventureSiteClient : IAdventureSite
             Seats = Entier(a["places"]) ?? 0,
             Mode = Texte(a["mode"]) ?? AdventureModes.Exclusive,
             Creator = a["creator"] is JsonObject c ? Texte(c["handle"]) : Texte(a["creator"]),
+            CreatorPseudo = Texte(a["creator_name"]) ?? Texte(a["creator_pseudo"]) ?? (a["creator"] is JsonObject cp ? Texte(cp["pseudo"]) : null) ?? PseudoDuCreateur(a),
+            NomsDesJoueurs = LireNomsDesJoueurs(a),
             Participants = (a["members"] as JsonArray)?.OfType<JsonObject>().Select(m => Texte(m["handle"])).OfType<string>().ToList() ?? [],
             Room = a["session"] is JsonObject s ? Texte(s["room"]) : null,
             LobbyId = a["voice"] is JsonObject voix ? Texte(voix["lobby_id"]) : null,
@@ -333,6 +362,12 @@ public sealed class AdventureSiteClient : IAdventureSite
 
     public async Task<bool> FermerSeanceAsync(string aventure, string raison, long? dureeS, CancellationToken ct)
         => Reussi(await AppelerAsync(HttpMethod.Post, aventure + "/session/close", new { reason = raison, duration_s = dureeS }, ct).ConfigureAwait(false));
+
+    public async Task<(bool Ok, string? Raison)> ReglerLaSeanceAsync(string aventure, int joueurs, CancellationToken ct)
+    {
+        var r = await AppelerAsync(HttpMethod.Post, aventure + "/session/size", new { players = joueurs }, ct).ConfigureAwait(false);
+        return (Reussi(r), r is null ? "offline" : Reussi(r) ? null : Raison(r) ?? "other");
+    }
 
     public async Task<(bool Ok, string? Raison)> InviterAsync(string aventure, string poignee, CancellationToken ct)
     {

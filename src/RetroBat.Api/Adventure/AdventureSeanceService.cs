@@ -499,11 +499,21 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
 
     // ── pendant ────────────────────────────────────────────────────────────────────────────────────
 
+    /// <summary>L'indice de depart (<c>start_hint</c> du catalogue), dit a la borne qui lance (couture : Program.cs).</summary>
+    public AdventureIndice? Indice { get; set; }
+
     public void Demarree(MultiplayerRoom room, MultiplayerInstalledGame jeu)
     {
         if (De(room.Room) is not { } seance)
         {
             return;
+        }
+
+        if (Specification(jeu).StartHint is { Length: > 0 } indice && Indice is { } dit)
+        {
+            var places = room.Launch?.Players is > 0 and var p ? p : room.Players.Count(j => j.Seat is not null);
+            // Le jeu charge pendant quelques secondes : l'indice vient quand le joueur regarde l'ecran.
+            _ = Task.Run(async () => { await Task.Delay(TimeSpan.FromSeconds(6)).ConfigureAwait(false); dit.Dire(indice, places); });
         }
 
         seance.Suivi?.Cancel();
@@ -526,6 +536,13 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
         try
         {
             var (ok, raison) = await _site.ActiverAsync(aventure, joueurs, CancellationToken.None).ConfigureAwait(false);
+            if (!ok && raison == "not_member" && await AccepterLInvitationAsync(aventure).ConfigureAwait(false))
+            {
+                // L'hote est arrive dans la salle par l'invitation de gameroom, sans etre participant de l'aventure (28/11) : son invitation du
+                // site, si elle existe, est acceptee, puis l'activation est redemandee une fois.
+                (ok, raison) = await _site.ActiverAsync(aventure, joueurs, CancellationToken.None).ConfigureAwait(false);
+            }
+
             if (ok)
             {
                 _journal?.LogInformation("ADVENTURE : aventure {Aventure} activee ({Joueurs} joueurs)", aventure, joueurs);
@@ -542,6 +559,13 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
             _journal?.LogWarning(ex, "ADVENTURE : activation de {Aventure} impossible, la partie continue", aventure);
             return false;
         }
+    }
+
+    private async Task<bool> AccepterLInvitationAsync(string aventure)
+    {
+        var miennes = await _site.MesAventuresAsync(CancellationToken.None).ConfigureAwait(false);
+        var invitation = miennes?.Invitations.FirstOrDefault(i => string.Equals(i.Adventure, aventure, StringComparison.Ordinal));
+        return invitation is not null && await _site.AccepterAsync(invitation.Invitation, true, CancellationToken.None).ConfigureAwait(false);
     }
 
     private async Task SuivreAsync(Seance seance, CancellationToken ct)

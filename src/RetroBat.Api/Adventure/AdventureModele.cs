@@ -63,6 +63,18 @@ public sealed record AdventureInfo
     [JsonPropertyName("creator")]
     public string? Creator { get; init; }
 
+    /// <summary>
+    /// LE PSEUDO D'AFFICHAGE DU CREATEUR (28/11) : <c>creator_pseudo</c> des listes du site (a ajouter, voir la carte) ou, a defaut, le
+    /// <c>pseudo</c> du membre « creator » du detail. <see cref="Creator"/> n'est que sa poignee (parfois un code hexadecimal).
+    /// </summary>
+    public string? CreatorPseudo { get; init; }
+
+    /// <summary>
+    /// Les pseudos d'affichage des participants, dans l'ordre de <see cref="Participants"/> et de <see cref="Pseudos"/> (28/11) :
+    /// <c>participant_pseudos</c> des listes du site, ou les <c>pseudo</c> des <c>members</c> du detail. Vide : le site ne les rend pas.
+    /// </summary>
+    public IReadOnlyList<string> NomsDesJoueurs { get; init; } = [];
+
     [JsonPropertyName("participants")]
     public IReadOnlyList<string> Participants { get; init; } = [];
 
