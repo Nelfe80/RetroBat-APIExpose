@@ -511,7 +511,13 @@ public sealed partial class MultiplayerPanelService
         _overlay.OuvrirMultiplayer(EsMenuStyle.Lire(_journal), Composer());
         _journal.LogInformation("MULTIPLAYER : panneau ouvert sur {Jeu}", jeu.Game.Id);
 
-        if (rejoindre)
+        // ADVENTURE (27/11) : regarder le panneau n'assoit plus le joueur dans une salle (trois salles en attente pour trois coups d'oeil). On
+        // y entre par une action : inviter un ami, choisir une aventure (A), appui long sur NEW ADVENTURE. Les salles de brouillon restees seules
+        // des autres jeux se ferment.
+        var enAventure = _session.EstUneAventure(jeu);
+        _ = Task.Run(() => QuitterLesSallesSeulesAsync(jeu.Game.Id));
+        if (enAventure) _ = ChargerLesAventuresAsync(jeu);
+        if (rejoindre && !enAventure)
         {
             var refus = await _session.RejoindreAsync(cheminDuJeu, ct).ConfigureAwait(false);
             lock (_verrou)
@@ -722,6 +728,98 @@ public sealed partial class MultiplayerPanelService
         _session.PanneauOuvert = false;
         _overlay.Fermer();
         MettreAJourLeBandeau();
+        _ = Task.Run(() => QuitterLesSallesSeulesAsync(null));
+    }
+
+    /// <summary>Ce qui peut asseoir le joueur dans une salle d'aventure depuis l'onglet ADVENTURE : l'invitation d'un ami, ou l'aventure dont la salle l'attend.</summary>
+    internal sealed record OffreDEntree(string Texte, string? Invitation, string? Aventure);
+
+    /// <summary>
+    /// ENTRER DANS UNE SALLE D'AVENTURE SANS L'AVOIR OUVERTE (27/11) : ouvrir le panneau n'assoit plus personne, mais une invitation recue, ou une
+    /// aventure dont je suis participant et dont la salle attend (un ami y est assis), se montre en tete de l'onglet ADVENTURE ; A y entre. L'invitation
+    /// passe avant. Rien quand le joueur est deja dans une salle. Pur.
+    /// </summary>
+    internal static OffreDEntree? OffreDEntreeAventure(IEnumerable<MultiplayerInvitation> invitations, string jeuId, RetroBat.Api.Adventure.AventuresDuJeu? aventures,
+        bool dejaDansUneSalle, Func<string, string, string> texte)
+    {
+        if (dejaDansUneSalle)
+        {
+            return null;
+        }
+
+        if (invitations.FirstOrDefault(i => i.Game == jeuId && i.Adventure is { Length: > 0 }) is { } invitation)
+        {
+            return new OffreDEntree(texte("adventure.offer.invite", "Invitation from {player}: A to join")
+                .Replace("{player}", invitation.From?.Pseudo ?? "?", StringComparison.Ordinal), invitation.Invitation, null);
+        }
+
+        if (aventures?.Lignes?.FirstOrDefault(l => l.EnCours) is { } attend)
+        {
+            var qui = attend.Pseudos is { Count: > 0 } p ? p[0] : "?";
+            return new OffreDEntree(texte("adventure.offer.waiting", "{player} is waiting for you: A to join")
+                .Replace("{player}", qui, StringComparison.Ordinal), null, attend.Id);
+        }
+
+        return null;
+    }
+
+    private OffreDEntree? OffreCourante()
+    {
+        lock (_verrou)
+        {
+            if (_jeu is not { } jeu || !_session.EstUneAventure(jeu)) return null;
+            return OffreDEntreeAventure(_session.Etat.Invitations, jeu.Game.Id, _aventures is { } lu && lu.Jeu == jeu.Game.Id ? lu.Contenu : null,
+                RoomDuJeu() is not null, Texte);
+        }
+    }
+
+    private async Task EntrerParLOffreAsync(OffreDEntree offre, MultiplayerInstalledGame jeu)
+    {
+        if (offre.Invitation is { } invitation)
+        {
+            lock (_verrou)
+            {
+                _invitation = _session.Etat.Invitations.FirstOrDefault(i => i.Invitation == invitation) ?? _invitation;
+            }
+
+            await AccepterInvitationAsync().ConfigureAwait(false);
+            return;
+        }
+
+        if (offre.Aventure is { } aventure)
+        {
+            var refus = await _session.ChoisirAventureAsync(jeu, aventure).ConfigureAwait(false);
+            lock (_verrou) _refus = refus;
+            Rafraichir();
+        }
+    }
+
+    /// <summary>
+    /// LES SALLES D'AVENTURE OU PERSONNE N'EST VENU (27/11) : en attente, le joueur seul dedans, jamais celle de <paramref name="sauf"/> (le jeu
+    /// du panneau qui s'ouvre). Pur.
+    /// </summary>
+    internal static IReadOnlyList<MultiplayerRoom> SallesSeules(IEnumerable<MultiplayerRoom> rooms, string? sauf)
+        => rooms.Where(r => r.AdventureId is not null && r.State == "waiting" && r.Game != sauf && r.Players.Count(j => j.Present) <= 1).ToList();
+
+    /// <summary>La selection d'un panneau : les salles d'aventure pour ADVENTURE, les autres pour MULTIPLAYER (en attente ou en decompte). Pur.</summary>
+    internal static IEnumerable<MultiplayerRoom> SelectionDuPanneau(IEnumerable<MultiplayerRoom> rooms, bool aventure)
+        => rooms.Where(r => r.State is "waiting" or "countdown" && (r.AdventureId is not null) == aventure);
+
+    private async Task QuitterLesSallesSeulesAsync(string? sauf)
+    {
+        try
+        {
+            if (_session.LancementEnCours is not null) return;
+            foreach (var room in SallesSeules(_session.Etat.Rooms, sauf))
+            {
+                _journal.LogInformation("ADVENTURE : salle {Room} de {Jeu} quittee, personne d'autre n'est venu", room.Room, room.Game);
+                await _session.QuitterAsync(room.Room, CancellationToken.None).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            _journal.LogDebug(ex, "ADVENTURE : fermeture des salles seules ignoree");
+        }
     }
 
     /// <summary>
@@ -1077,6 +1175,14 @@ public sealed partial class MultiplayerPanelService
                 return;
             }
 
+            // ADVENTURE : A sur l'onglet ADVENTURE sans salle, avec une offre (invitation, ami qui attend) en tete : il y entre.
+            if (!maintenu && _mode == Mode.Panneau && _jeu is { } pourOffre && _session.EstUneAventure(pourOffre)
+                && _modele.OngletCourant == MultiplayerPanelModel.Onglet.WaitingForFriends && OffreCourante() is { } offre)
+            {
+                _ = Task.Run(() => EntrerParLOffreAsync(offre, pourOffre));
+                return;
+            }
+
             // Plusieurs choix par place (v1.0 §8.2) : A passe au choix suivant de l'equipe, ▲▼ change celui-la.
             if (!maintenu && _mode == Mode.Panneau && AuChoixDuPersonnage() is (_, { Choices: [{ Picks: > 1 }, ..] } jeuDeLEquipe)
                 && MesChoixDansLaSalle(jeuDeLEquipe) > 1)
@@ -1321,6 +1427,20 @@ public sealed partial class MultiplayerPanelService
             ami = _modele.Ligne >= 0 && _modele.Ligne < invitables.Count ? invitables[_modele.Ligne] : null;
         }
 
+        // ADVENTURE (27/11) : sans salle, inviter en ouvre une (le brouillon et sa seance se creent a cet instant, pas a l'ouverture du panneau).
+        if (room is null && ami is not null && _jeu is { } pourInviter && _session.EstUneAventure(pourInviter))
+        {
+            var refusOuverture = await _session.RejoindreAsync(pourInviter.Path).ConfigureAwait(false);
+            if (refusOuverture is not null)
+            {
+                lock (_verrou) _refus = refusOuverture;
+                Rafraichir();
+                return;
+            }
+
+            room = RoomDuJeu();
+        }
+
         if (room is null || ami is null)
         {
             return;
@@ -1499,7 +1619,10 @@ public sealed partial class MultiplayerPanelService
                 }
 
                 // Un seul bloc « Votre selection », un jeu par ligne (retour du user du 22/10).
-                var lignes = _mode != Mode.Ferme || _classementOuvert || _selectionEndormie ? [] : _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3).Select(room =>
+                // UNE SELECTION PAR PANNEAU (27/11) : les salles MULTIPLAYER dans « YOUR SELECTION », celles d'aventure dans « YOUR ADVENTURES ».
+                foreach (var aventures in new[] { false, true })
+                {
+                var lignes = _mode != Mode.Ferme || _classementOuvert || _selectionEndormie ? [] : SelectionDuPanneau(_session.Etat.Rooms, aventures).Take(3).Select(room =>
                 {
                     var absent = room.Players.Any(j => j.You && !j.Present);
                     return new MultiplayerToastOverlay.Ligne(
@@ -1514,7 +1637,8 @@ public sealed partial class MultiplayerPanelService
                 }).ToList();
                 if (lignes.Count > 0)
                 {
-                    cartes.Add(new MultiplayerToastOverlay.Carte(T("multiplayer.selection"), string.Empty, string.Empty, Lignes: lignes));
+                    cartes.Add(new MultiplayerToastOverlay.Carte(aventures ? Texte("adventure.selection", "YOUR ADVENTURES") : T("multiplayer.selection"), string.Empty, string.Empty, Lignes: lignes));
+                }
                 }
             }
         }
@@ -1686,6 +1810,17 @@ public sealed partial class MultiplayerPanelService
         return message.StartsWith("multiplayer.refused.", StringComparison.Ordinal) ? T("multiplayer.refused.other") : message;
     }
 
+    /// <summary>
+    /// LA LIGNE DU HAUT D'UN PANNEAU ADVENTURE (27/11) : le jeu (et sa version) de la salle, puis « ADVENTURE · no ranking » (jamais le badge
+    /// ni le texte MULTIPLAYER classique : une aventure ne classe pas). Le user avait pris une salle de Four Swords (4 places) pour celle de
+    /// Secret of Mana, faute de nom. Pur.
+    /// </summary>
+    internal static string InfoDuJeuAventure(string nomDuJeu, string? version, Func<string, string, string> texte)
+    {
+        var nom = string.IsNullOrWhiteSpace(version) ? nomDuJeu : nomDuJeu + " (" + version + ")";
+        return nom + " · " + texte("adventure.info.no_ranking", "ADVENTURE · no ranking");
+    }
+
     private LeaderboardOverlayService.ContenuMultiplayer ComposerLePanneau(Func<string, string> T)
     {
         var jeu = _jeu;
@@ -1707,6 +1842,13 @@ public sealed partial class MultiplayerPanelService
         IReadOnlyList<LeaderboardOverlayService.JoueurMultiplayer> lignes = surUneSalle
             ? LesPlaces(room, max, T)
             : Invitables().Select(ami => Ami(ami, T)).ToList();
+        // L'offre d'entree (invitation, ami qui attend) en tete de l'onglet ADVENTURE, tant que le joueur n'est dans aucune salle.
+        if (estAventure && surUneSalle && !nouvelle && OffreCourante() is { } offreEnTete)
+        {
+            lignes = [new LeaderboardOverlayService.JoueurMultiplayer(offreEnTete.Texte, string.Empty, CouleurDe(offreEnTete.Invitation ?? offreEnTete.Aventure ?? "?"),
+                false, false, true, null, string.Empty), .. lignes];
+        }
+
         string? infoDeLaNouvelle = null;
         if (nouvelle)
         {
@@ -1732,8 +1874,10 @@ public sealed partial class MultiplayerPanelService
                 : MultiplayerPanelModel.Onglets.Select(MultiplayerPanelModel.Titre).ToList(),
             _modele.IndexOnglet,
             _modele.Etat == MultiplayerPanelModel.Foyer.Panneau,
-            nouvelle ? string.Empty : classique ? T("multiplayer.badge.classic") : string.Empty,
-            infoDeLaNouvelle ?? (classique ? T(classe ? "multiplayer.info.classic_ranked" : "multiplayer.info.classic") : LeRoulement(jeu?.Game, DateTimeOffset.UtcNow, T)),
+            nouvelle || estAventure ? string.Empty : classique ? T("multiplayer.badge.classic") : string.Empty,
+            infoDeLaNouvelle ?? (estAventure ? InfoDuJeuAventure(
+                room is not null ? NomDuJeu(room.Game) : jeu!.Game.Name,
+                _aventures is { } vues && vues.Jeu == (room?.Game ?? jeu!.Game.Id) ? vues.Contenu.Version : null, Texte) : classique ? T(classe ? "multiplayer.info.classic_ranked" : "multiplayer.info.classic") : LeRoulement(jeu?.Game, DateTimeOffset.UtcNow, T)),
             nouvelle ? string.Empty : presents + "/" + max,
             room is { State: "countdown", CountdownMs: { } ms } ? DateTime.UtcNow.AddMilliseconds(ms) : null,
             lignes,
@@ -1748,13 +1892,13 @@ public sealed partial class MultiplayerPanelService
                 : LeaderboardOverlayService.DispositionDesJoueurs.Liste,
             // « VOTRE SELECTION » en haut a gauche du panneau (demande du user du 26/10), les memes jeux que la carte d'ES.
             // Une gameroom d'amis s'y dit « [AMIS] » devant son compte (question du user du 28/10).
-            MaSelection: _session.Etat.Rooms.Where(r => r.State is "waiting" or "countdown").Take(3)
+            MaSelection: SelectionDuPanneau(_session.Etat.Rooms, estAventure).Take(3)
                 .Select(r => new LeaderboardOverlayService.JeuDeMaSelection(
                     NomDuJeu(r.Game), (r.EntreAmis ? "[" + Texte("multiplayer.selection.friends", "FRIENDS") + "]  " : string.Empty)
                         + r.Players.Count(j => j.Present) + "/" + r.Max,
                     RoomDuJeu() is { } courante && r.Room == courante.Room))
                 .ToList(),
-            TitreDeMaSelection: T("multiplayer.selection"),
+            TitreDeMaSelection: estAventure ? Texte("adventure.selection", "YOUR ADVENTURES") : T("multiplayer.selection"),
             // Un jeu vu depuis la collection ADVENTURE (ou la seance d'une aventure) porte le logo d'ADVENTURE, pas celui de MULTIPLAYER.
             Logo: jeu is not null && _session.EstUneAventure(jeu) ? RetroBat.Api.Adventure.AdventureCollection.Logo : null);
     }

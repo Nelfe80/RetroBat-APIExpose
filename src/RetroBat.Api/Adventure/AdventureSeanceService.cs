@@ -499,11 +499,21 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
 
     // ── pendant ────────────────────────────────────────────────────────────────────────────────────
 
+    /// <summary>L'indice de depart (<c>start_hint</c> du catalogue), dit a la borne qui lance (couture : Program.cs).</summary>
+    public AdventureIndice? Indice { get; set; }
+
     public void Demarree(MultiplayerRoom room, MultiplayerInstalledGame jeu)
     {
         if (De(room.Room) is not { } seance)
         {
             return;
+        }
+
+        if (Specification(jeu).StartHint is { Length: > 0 } indice && Indice is { } dit)
+        {
+            var places = room.Launch?.Players is > 0 and var p ? p : room.Players.Count(j => j.Seat is not null);
+            // Le jeu charge pendant quelques secondes : l'indice vient quand le joueur regarde l'ecran.
+            _ = Task.Run(async () => { await Task.Delay(TimeSpan.FromSeconds(6)).ConfigureAwait(false); dit.Dire(indice, places); });
         }
 
         seance.Suivi?.Cancel();

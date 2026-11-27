@@ -649,6 +649,34 @@ public sealed class VocalRoomCoordinator : BackgroundService
         return true;
     });
 
+    /// <summary>
+    /// LE GESTE EN JEU (HOTKEY + Y, 27/11) : seulement quand le joueur est dans le salon (jamais rejoindre une proposition en
+    /// pleine partie). Court, coupe ou rouvre le micro ; maintenu, coupe ou rend le son du vocal. Dit ce qui s'est passe,
+    /// pour que l'annonce soit juste.
+    /// </summary>
+    public Task<IssueDuGeste> GesteEnJeuAsync(bool maintenu) => SousLaPorteAsync(async ct =>
+    {
+        if (Session is not { Phase: Phase.Attachee })
+        {
+            return IssueDuGeste.Aucune;
+        }
+
+        if (maintenu)
+        {
+            bool casque;
+            lock (_verrou) casque = _casqueCoupe = !_casqueCoupe;
+            await _processus.CommanderAsync(Commands.VoiceDeafen, new JsonObject { ["deafened"] = casque }).ConfigureAwait(false);
+            Signaler();
+            return casque ? IssueDuGeste.SonCoupe : IssueDuGeste.SonRendu;
+        }
+
+        bool micro;
+        lock (_verrou) micro = _coupeParLeJoueur = _microCoupe = !_microCoupe;
+        await _processus.CommanderAsync(Commands.VoiceMute, new JsonObject { ["muted"] = micro }).ConfigureAwait(false);
+        Signaler();
+        return micro ? IssueDuGeste.MicroCoupe : IssueDuGeste.MicroOuvert;
+    });
+
     /// <summary>Micro et casque reglables aussi par l'API locale (diagnostic, panneau web).</summary>
     public Task<bool> ReglerAsync(bool? microCoupe, bool? casqueCoupe) => SousLaPorteAsync(async _ =>
     {

@@ -548,6 +548,9 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Vocal
 builder.Services.AddSingleton<RetroBat.Api.VocalRoom.VocalRoomSiteClient>();
 builder.Services.AddSingleton<RetroBat.Api.VocalRoom.VocalRoomCoordinator>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.VocalRoom.VocalRoomCoordinator>());
+builder.Services.AddSingleton<RetroBat.Api.Adventure.AdventureIndice>();
+builder.Services.AddSingleton<RetroBat.Api.VocalRoom.MicroEnJeuService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.VocalRoom.MicroEnJeuService>());
 // Rich Presence Discord (CDC §11 bis, lot H avance a la demande du user) : SQUELETTE DESACTIVE, RetroArch garde la presence.
 builder.Services.AddSingleton<RetroBat.Api.VocalRoom.DiscordPresenceCoordinator>();
 // Dans World Scoring, notre coeur fonctionnel ; dans le systeme du jeu, le choix de confort du joueur.
@@ -886,6 +889,10 @@ var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
 }
 // RetroArch muet pour une partie lancee par NelfePlay (11/11) : les messages de NelfePlay passent par ce bandeau.
 RetroBat.Api.Infrastructure.NotificationsRetroArch.Bandeau = app.Services.GetService<RetroBat.Api.Infrastructure.LiveContestOverlayService>();
+if (app.Services.GetService<RetroBat.Api.Adventure.AdventureSeanceService>() is { } seanceAdventure)
+{
+    seanceAdventure.Indice = app.Services.GetService<RetroBat.Api.Adventure.AdventureIndice>();
+}
 eventBus.Subscribe<EventEnvelope>(evt => 
 {
     _ = wsManager.BroadcastAsync(evt);

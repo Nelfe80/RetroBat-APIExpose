@@ -27,6 +27,13 @@ public sealed record AdventureSpec
     public string? FreshHint { get; init; }
 
     /// <summary>
+    /// Une CLE de texte du Data Pack (ex. <c>adventure.hint.press_start_to_join</c>) dite au depart de la partie, dans la langue de la borne
+    /// (Secret of Mana : les joueurs 2 et 3 appuient sur START quand leur personnage rejoint l'equipe). Jamais de texte ici.
+    /// </summary>
+    [JsonPropertyName("start_hint")]
+    public string? StartHint { get; init; }
+
+    /// <summary>
     /// LES VERSIONS LOCALISEES (decision du user du 26/11 : « en Adventure on exploite toutes les versions localisees possibles »).
     /// Une aventure est liee a UNE version (son contenu), tous ses joueurs l'ont a l'identique. Vide : le jeu n'a qu'une version.
     /// </summary>
@@ -43,7 +50,7 @@ public sealed record AdventureSpec
     /// <summary>La part d'Adventure qui vaut pour CE contenu : la version peut surcharger la sauvegarde de la cartouche (<c>adventure_override</c>).</summary>
     public AdventureSpec PourLeContenu(string? md5)
         => VersionDuContenu(md5)?.Override is { } surcharge
-            ? this with { Cartridge = surcharge.Cartridge ?? Cartridge, FreshHint = surcharge.FreshHint ?? FreshHint }
+            ? this with { Cartridge = surcharge.Cartridge ?? Cartridge, FreshHint = surcharge.FreshHint ?? FreshHint, StartHint = surcharge.StartHint ?? StartHint }
             : this;
 }
 
