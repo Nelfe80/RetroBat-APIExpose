@@ -632,6 +632,14 @@ public sealed partial class MultiplayerPanelService
             return;
         }
 
+        // Une ligne grisee (le contenu exact de l'aventure manque a cette borne) ne se choisit pas : la raison est dite, rien ne s'ouvre.
+        if (_aventures is { } vues && vues.Contenu.Lignes?.FirstOrDefault(l => l.Id == aventure) is { Jouable: false } grisee)
+        {
+            lock (_verrou) _refus = grisee.Raison ?? RetroBat.Api.Adventure.AdventureRefus.ContenuAbsent;
+            Rafraichir();
+            return;
+        }
+
         var refus = await _session.ChoisirAventureAsync(jeu, aventure, CancellationToken.None).ConfigureAwait(false);
         _journal.LogInformation("ADVENTURE : aventure {Aventure} choisie pour {Jeu} ({Statut})", aventure, jeu.Game.Id, refus ?? "ok");
         lock (_verrou)
@@ -684,6 +692,19 @@ public sealed partial class MultiplayerPanelService
             room = RoomDuJeu();
         }
 
+        // ADVENTURE (28/11) : X ne se tait plus pour un joueur qui n'a pas ouvert la salle (le site ne laisse regler qu'a celui qui l'a ouverte) :
+        // le panneau le dit. Les gamerooms MULTIPLAYER gardent leur silence d'avant.
+        if (room is { EntreAmis: true, AdventureId: not null, State: "waiting" or "countdown" } && (!room.Owner || room.GameMax <= 2))
+        {
+            lock (_verrou)
+            {
+                _refus = !room.Owner ? "not_owner" : "size_refused";
+            }
+
+            Rafraichir();
+            return;
+        }
+
         if (room is not { EntreAmis: true, Owner: true, State: "waiting" or "countdown" } || room.GameMax <= 2)
         {
             return;
@@ -732,7 +753,7 @@ public sealed partial class MultiplayerPanelService
     }
 
     /// <summary>Ce qui peut asseoir le joueur dans une salle d'aventure depuis l'onglet ADVENTURE : l'invitation d'un ami, ou l'aventure dont la salle l'attend.</summary>
-    internal sealed record OffreDEntree(string Texte, string? Invitation, string? Aventure);
+    internal sealed record OffreDEntree(string Texte, string? Invitation, string? Aventure, bool Jouable = true, string? Raison = null);
 
     /// <summary>
     /// ENTRER DANS UNE SALLE D'AVENTURE SANS L'AVOIR OUVERTE (27/11) : ouvrir le panneau n'assoit plus personne, mais une invitation recue, ou une
@@ -740,7 +761,7 @@ public sealed partial class MultiplayerPanelService
     /// passe avant. Rien quand le joueur est deja dans une salle. Pur.
     /// </summary>
     internal static OffreDEntree? OffreDEntreeAventure(IEnumerable<MultiplayerInvitation> invitations, string jeuId, RetroBat.Api.Adventure.AventuresDuJeu? aventures,
-        bool dejaDansUneSalle, Func<string, string, string> texte)
+        bool dejaDansUneSalle, Func<string, string, string> texte, Func<string, string, bool>? possede = null)
     {
         if (dejaDansUneSalle)
         {
@@ -750,18 +771,27 @@ public sealed partial class MultiplayerPanelService
         if (invitations.FirstOrDefault(i => i.Game == jeuId && i.Adventure is { Length: > 0 }) is { } invitation)
         {
             return new OffreDEntree(texte("adventure.offer.invite", "Invitation from {player}: A to join")
-                .Replace("{player}", invitation.From?.Pseudo ?? "?", StringComparison.Ordinal), invitation.Invitation, null);
+                .Replace("{player}", invitation.From?.Pseudo ?? "?", StringComparison.Ordinal), invitation.Invitation, null,
+                // Une invitation vers une version qu'on n'a pas : grisee, avec sa raison (28/11).
+                possede is null || invitation.Content.Length == 0 || possede(jeuId, invitation.Content), ContenuAbsentSi(possede, jeuId, invitation.Content));
         }
 
-        if (aventures?.Lignes?.FirstOrDefault(l => l.EnCours) is { } attend)
+        // Les aventures en cours dont la borne a le contenu passent avant celles qu'elle ne peut pas rejoindre (28/11).
+        if (aventures?.Lignes?.Where(l => l.EnCours).OrderByDescending(l => l.Jouable).FirstOrDefault() is { } attend)
         {
-            var qui = attend.Pseudos is { Count: > 0 } p ? p[0] : "?";
+            var qui = attend.Pseudos is { Count: > 0 } p ? p[0] : attend.Createur.Length > 0 ? attend.Createur : "?";
             return new OffreDEntree(texte("adventure.offer.waiting", "{player} is waiting for you: A to join")
-                .Replace("{player}", qui, StringComparison.Ordinal), null, attend.Id);
+                .Replace("{player}", qui, StringComparison.Ordinal), null, attend.Id, attend.Jouable, attend.Raison);
         }
 
         return null;
     }
+
+    private static string? ContenuAbsentSi(Func<string, string, bool>? possede, string jeu, string contenu)
+        => possede is null || contenu.Length == 0 || possede(jeu, contenu) ? null : RetroBat.Api.Adventure.AdventureRefus.ContenuAbsent;
+
+    /// <summary>Cette borne a-t-elle ce jeu sur ce contenu exact (version) ? Pour griser ce qu'elle ne peut pas rejoindre.</summary>
+    private bool PossedeLeContenu(string jeu, string contenu) => _session.JeuCompatible(jeu, contenu, aventure: true) is not null;
 
     private OffreDEntree? OffreCourante()
     {
@@ -769,12 +799,19 @@ public sealed partial class MultiplayerPanelService
         {
             if (_jeu is not { } jeu || !_session.EstUneAventure(jeu)) return null;
             return OffreDEntreeAventure(_session.Etat.Invitations, jeu.Game.Id, _aventures is { } lu && lu.Jeu == jeu.Game.Id ? lu.Contenu : null,
-                RoomDuJeu() is not null, Texte);
+                RoomDuJeu() is not null, Texte, PossedeLeContenu);
         }
     }
 
     private async Task EntrerParLOffreAsync(OffreDEntree offre, MultiplayerInstalledGame jeu)
     {
+        if (!offre.Jouable)
+        {
+            lock (_verrou) _refus = offre.Raison ?? RetroBat.Api.Adventure.AdventureRefus.ContenuAbsent;
+            Rafraichir();
+            return;
+        }
+
         if (offre.Invitation is { } invitation)
         {
             lock (_verrou)
@@ -1292,7 +1329,8 @@ public sealed partial class MultiplayerPanelService
         {
             // Sans le meme contenu, la partie se desynchroniserait : on refuse plutot que de rejoindre.
             await _session.RepondreAsync(invitation.Invitation, false, ct).ConfigureAwait(false);
-            Signaler(_textes.Text("multiplayer.refused.content_refused", Langue()));
+            Signaler(invitation.Adventure is { Length: > 0 } ? RetroBat.Api.Adventure.AdventureRefus.Texte(RetroBat.Api.Adventure.AdventureRefus.ContenuAbsent, Texte)
+                : _textes.Text("multiplayer.refused.content_refused", Langue()));
             return;
         }
 
@@ -1784,15 +1822,21 @@ public sealed partial class MultiplayerPanelService
 
         var joueurs = texte("adventure.new.players", "{n} players");
         var enCours = texte("adventure.new.in_progress", "IN PROGRESS");
+        var par = texte("adventure.new.by", "by {player}");
         // UNE LIGNE PAR AVENTURE (27/11, comme la liste d'amis de l'onglet INVITE) : son nom a gauche ; a droite la date de la derniere partie, les
         // pseudos des joueurs et « IN PROGRESS » si une seance est ouverte.
         foreach (var a in etat.Lignes)
         {
             var date = a.Date is { } d ? d.ToLocalTime().ToString("dd/MM HH:mm", CultureInfo.InvariantCulture) : string.Empty;
             var pseudos = a.Pseudos is { Count: > 0 } p ? string.Join(", ", p) : joueurs.Replace("{n}", a.Joueurs.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
-            var detail = string.Join(" · ", new[] { date, pseudos, a.EnCours ? enCours : string.Empty }.Where(t => t.Length > 0));
+            // LE CREATEUR PAR SON PSEUDO, puis les joueurs par leurs pseudos (28/11) : jamais le code d'une poignee quand le pseudo est connu.
+            var createur = a.Createur.Length > 0 ? par.Replace("{player}", a.Createur, StringComparison.Ordinal) : string.Empty;
+            var detail = string.Join(" · ", new[] { date, createur, pseudos, a.EnCours ? enCours : string.Empty }.Where(t => t.Length > 0));
             var nom = a.Titre.Length > 0 ? a.Titre : a.Version.Length > 0 ? nomDuJeu + " (" + a.Version + ")" : nomDuJeu;
-            lignes.Add(new(nom, string.Empty, CouleurDe(a.Id), false, false, true, null, detail));
+            // GRISEE quand la borne n'a pas le contenu exact : la raison est dite en dessous, a la place du detail.
+            lignes.Add(a.Jouable
+                ? new(nom, string.Empty, CouleurDe(a.Id), false, false, true, null, detail)
+                : new(nom, string.Empty, CouleurDe(a.Id), false, false, false, null, RetroBat.Api.Adventure.AdventureRefus.Texte(a.Raison, texte)));
         }
 
         return (lignes, ligneDuHaut);
@@ -1846,7 +1890,7 @@ public sealed partial class MultiplayerPanelService
         if (estAventure && surUneSalle && !nouvelle && OffreCourante() is { } offreEnTete)
         {
             lignes = [new LeaderboardOverlayService.JoueurMultiplayer(offreEnTete.Texte, string.Empty, CouleurDe(offreEnTete.Invitation ?? offreEnTete.Aventure ?? "?"),
-                false, false, true, null, string.Empty), .. lignes];
+                false, false, offreEnTete.Jouable, null, offreEnTete.Jouable ? string.Empty : RetroBat.Api.Adventure.AdventureRefus.Texte(offreEnTete.Raison, Texte)), .. lignes];
         }
 
         string? infoDeLaNouvelle = null;

@@ -536,6 +536,13 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
         try
         {
             var (ok, raison) = await _site.ActiverAsync(aventure, joueurs, CancellationToken.None).ConfigureAwait(false);
+            if (!ok && raison == "not_member" && await AccepterLInvitationAsync(aventure).ConfigureAwait(false))
+            {
+                // L'hote est arrive dans la salle par l'invitation de gameroom, sans etre participant de l'aventure (28/11) : son invitation du
+                // site, si elle existe, est acceptee, puis l'activation est redemandee une fois.
+                (ok, raison) = await _site.ActiverAsync(aventure, joueurs, CancellationToken.None).ConfigureAwait(false);
+            }
+
             if (ok)
             {
                 _journal?.LogInformation("ADVENTURE : aventure {Aventure} activee ({Joueurs} joueurs)", aventure, joueurs);
@@ -552,6 +559,13 @@ public sealed class AdventureSeanceService : BackgroundService, IAdventureHote
             _journal?.LogWarning(ex, "ADVENTURE : activation de {Aventure} impossible, la partie continue", aventure);
             return false;
         }
+    }
+
+    private async Task<bool> AccepterLInvitationAsync(string aventure)
+    {
+        var miennes = await _site.MesAventuresAsync(CancellationToken.None).ConfigureAwait(false);
+        var invitation = miennes?.Invitations.FirstOrDefault(i => string.Equals(i.Adventure, aventure, StringComparison.Ordinal));
+        return invitation is not null && await _site.AccepterAsync(invitation.Invitation, true, CancellationToken.None).ConfigureAwait(false);
     }
 
     private async Task SuivreAsync(Seance seance, CancellationToken ct)

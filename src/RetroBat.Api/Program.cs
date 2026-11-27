@@ -868,6 +868,9 @@ var wsManager = app.Services.GetRequiredService<WebSocketConnectionManager>();
         app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>().NouvelleAventure = lancement.NouvelleAsync;
         app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>().AventuresDuJeu = lancement.AventuresDuJeuAsync;
         app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>().ChoisirUneAventure = lancement.ChoisirAsync;
+        app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>().InviterALAventure = lancement.InviterALAventureAsync;
+        app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>().DevenirParticipantDeLAventure = lancement.DevenirParticipantAsync;
+        app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerSessionService>().ReglerUneSeance = lancement.ReglerLaSeanceAsync;
     }
     // Le Deck dans une room MULTIPLAYER (H-D17) : son decor remplace les panneaux des joueurs pour le joueur local.
     app.Services.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerLaunchService>().Deck =

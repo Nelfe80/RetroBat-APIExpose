@@ -426,10 +426,32 @@ public sealed class MultiplayerSessionService : BackgroundService
         return reponse?.Ok == true;
     }
 
+    /// <summary>
+    /// ADVENTURE (28/11) : l'ami invite dans la salle d'une aventure est aussi invite a l'aventure (voir <c>AdventureLancement.InviterALAventureAsync</c>) :
+    /// sans cela il entrait dans la salle sans etre participant, et le site refusait l'activation de l'aventure.
+    /// </summary>
+    public Func<string, string, CancellationToken, Task<string?>>? InviterALAventure { get; set; }
+
+    /// <summary>ADVENTURE (28/11) : celui qui entre dans la salle d'une aventure en devient participant (rend vrai s'il l'est apres l'appel).</summary>
+    public Func<string, CancellationToken, Task<bool>>? DevenirParticipantDeLAventure { get; set; }
+
+    /// <summary>ADVENTURE (28/11) : la touche X d'une salle d'aventure passe par le site d'Adventure (la seance ET la salle) ; rend (ok, raison).</summary>
+    public Func<string, int, CancellationToken, Task<(bool Ok, string? Raison)>>? ReglerUneSeance { get; set; }
+
+    private MultiplayerRoom? RoomParId(string room) => Etat.Rooms.FirstOrDefault(r => r.Room == room);
+
     /// <summary>FOR FRIENDS, touche X (28/10) : le nombre de joueurs que l'ouvreur attend. Rend la raison d'un refus, ou null.</summary>
     public async Task<string?> ReglerAsync(string room, int joueurs, CancellationToken ct = default)
     {
         _appui = true;
+        if (RoomParId(room)?.AdventureId is { } aventure && ReglerUneSeance is { } regler)
+        {
+            // Une salle d'aventure : le site tient la seance (« players ») avec la salle, une seule route pour les deux.
+            var (ok, raison) = await regler(aventure, joueurs, ct).ConfigureAwait(false);
+            await SonderAsync(ct).ConfigureAwait(false);
+            return ok ? null : raison ?? "refused";
+        }
+
         var reponse = await _client.ReglerAsync(room, joueurs, ct).ConfigureAwait(false);
         await SonderAsync(ct).ConfigureAwait(false);
         return reponse is null ? "offline" : reponse.Ok ? null : reponse.Reason ?? "refused";
@@ -437,6 +459,19 @@ public sealed class MultiplayerSessionService : BackgroundService
 
     public async Task<string?> InviterAsync(string room, string poignee, CancellationToken ct = default)
     {
+        if (RoomParId(room)?.AdventureId is { } aventure && InviterALAventure is { } inviter)
+        {
+            // Jamais bloquant : l'invitation de la salle part quand meme (l'ami peut etre deja participant, ou le site muet).
+            try
+            {
+                await inviter(aventure, poignee, ct).ConfigureAwait(false);
+            }
+            catch (Exception ex) when (ex is not OutOfMemoryException and not OperationCanceledException)
+            {
+                _journal?.LogDebug(ex, "ADVENTURE : invitation a l'aventure non posee");
+            }
+        }
+
         var reponse = await _client.InviterAsync(room, poignee, ct).ConfigureAwait(false);
         return reponse is null ? "offline" : reponse.Ok ? null : reponse.Reason ?? "refused";
     }
@@ -444,8 +479,21 @@ public sealed class MultiplayerSessionService : BackgroundService
     public async Task<string?> RepondreAsync(string invitation, bool accepte, CancellationToken ct = default)
     {
         _appui = true;
+        var aventure = accepte ? Etat.Invitations.FirstOrDefault(i => i.Invitation == invitation)?.Adventure : null;
         var reponse = await _client.RepondreAsync(invitation, accepte, _relais?.MeilleurTempsMs, ct).ConfigureAwait(false);
         Reveiller();
+        if (reponse?.Ok == true && aventure is { Length: > 0 } && DevenirParticipantDeLAventure is { } devenir)
+        {
+            try
+            {
+                await devenir(aventure, ct).ConfigureAwait(false);
+            }
+            catch (Exception ex) when (ex is not OutOfMemoryException and not OperationCanceledException)
+            {
+                _journal?.LogDebug(ex, "ADVENTURE : participation a l'aventure non posee");
+            }
+        }
+
         return reponse is null ? "offline" : reponse.Ok ? null : reponse.Reason ?? "refused";
     }
 
