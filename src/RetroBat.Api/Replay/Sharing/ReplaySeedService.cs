@@ -1,4 +1,5 @@
 using RetroBat.Domain.Events;
+using RetroBat.Api.Replay.Storage;
 using RetroBat.Domain.Interfaces;
 
 namespace RetroBat.Api.Replay.Sharing;
@@ -39,8 +40,20 @@ public sealed class ReplaySeedService : BackgroundService
     private static readonly TimeSpan ApresLaPartie = TimeSpan.FromSeconds(30);
     private readonly SemaphoreSlim _reveil = new(0, 1);
 
+    /// <summary>
+    /// Revision du miroir (27/11/2026) : un passage par heure, 5 replays au plus, chacun une fois par jour. Le premier
+    /// passage a lieu 10 minutes apres le demarrage : les anciens « mirrored » se verifient au compte-gouttes, sans rafale.
+    /// </summary>
+    private static readonly TimeSpan CadenceRevision = TimeSpan.FromHours(1);
+    private static readonly TimeSpan PremiereRevision = TimeSpan.FromMinutes(10);
+    private static readonly TimeSpan PauseEntreVerifications = TimeSpan.FromSeconds(3);
+    private DateTime _prochaineRevision = DateTime.MinValue;
+
     private readonly ReplaySeedQueue _queue;
     private readonly ReplayTransitPublisher _publisher;
+    private readonly IReplayManifestStore _manifests;
+    private readonly IReplayObjectStore _objects;
+    private readonly IReplayMetadataStore _meta;
     private readonly IEventBus _bus;
     private readonly ILogger<ReplaySeedService> _logger;
 
@@ -48,9 +61,11 @@ public sealed class ReplaySeedService : BackgroundService
     private volatile bool _replayActive;
 
     public ReplaySeedService(ReplaySeedQueue queue, ReplayTransitPublisher publisher,
+        IReplayManifestStore manifests, IReplayObjectStore objects, IReplayMetadataStore meta,
         IEventBus bus, ILogger<ReplaySeedService> logger)
     {
-        _queue = queue; _publisher = publisher; _bus = bus; _logger = logger;
+        _queue = queue; _publisher = publisher; _manifests = manifests; _objects = objects; _meta = meta;
+        _bus = bus; _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -62,11 +77,23 @@ public sealed class ReplaySeedService : BackgroundService
         try { await Task.Delay(PremierEssai, stoppingToken).ConfigureAwait(false); }
         catch (OperationCanceledException) { return; }
 
+        _prochaineRevision = DateTime.UtcNow + PremiereRevision;
         while (!stoppingToken.IsCancellationRequested)
         {
             try { await DrainAsync(stoppingToken).ConfigureAwait(false); }
             catch (OperationCanceledException) { break; }
             catch (Exception ex) { _logger.LogDebug(ex, "Replay : passage de semis en erreur."); }
+
+            try
+            {
+                if (DateTime.UtcNow >= _prochaineRevision)
+                {
+                    _prochaineRevision = DateTime.UtcNow + CadenceRevision;
+                    await ReviserLeMiroirAsync(stoppingToken).ConfigureAwait(false);
+                }
+            }
+            catch (OperationCanceledException) { break; }
+            catch (Exception ex) { _logger.LogDebug(ex, "Replay : revision du miroir en erreur."); }
 
             // La cadence, ou plus tôt : une partie (ou une lecture) qui finit avec des replays en file.
             try
@@ -116,6 +143,8 @@ public sealed class ReplaySeedService : BackgroundService
             // 1. L'amorce l'a-t-elle déjà ? Question posée par le HASH, donc sans ambiguïté.
             if (await _publisher.IsOnSeedAsync(intent.ObjectSha256, ct).ConfigureAwait(false))
             {
+                // LA PREUVE : l'amorce sert l'objet. C'est ici, et seulement ici, qu'un replay devient « mirrored ».
+                MarquerProuve(intent.ReplayId);
                 _queue.Complete(intent.ReplayId);
                 continue;
             }
@@ -131,6 +160,52 @@ public sealed class ReplaySeedService : BackgroundService
                 _logger.LogInformation("Replay : semis de {ReplayId} non abouti ({Error}), nouvelle tentative plus tard.",
                     intent.ReplayId, result.Error);
         }
+    }
+
+    private void MarquerProuve(string replayId)
+    {
+        try
+        {
+            var meta = _meta.GetMeta(replayId);
+            if (meta is not null) _meta.SaveMeta(ReplayMiroirPreuve.Prouve(meta, DateTime.UtcNow));
+        }
+        catch (Exception ex) { _logger.LogDebug(ex, "Replay : etat miroir non ecrit pour {ReplayId}.", replayId); }
+    }
+
+    /// <summary>
+    /// Revoit au plus <see cref="ReplayMiroirPreuve.BudgetParPassage"/> replays dits « mirrored » (HEAD, jamais de GET), les moins
+    /// recemment verifies d'abord. Silencieuse pendant une partie ou une lecture. Un objet que l'amorce ne sert plus
+    /// repasse en file ("to_resend") seulement si le site le veut encore (<see cref="ReplayMiroirPreuve.LeSiteLeVeut"/>) ;
+    /// sinon "off_mirror". Une reponse inexploitable (reseau, 5xx) ne change rien.
+    /// </summary>
+    internal async Task<int> ReviserLeMiroirAsync(CancellationToken ct)
+    {
+        if (_gameActive || _replayActive) return 0;
+        var maintenant = DateTime.UtcNow;
+        var candidats = _manifests.ListManifests()
+            .Select(m => (m.ReplayId, Sha256: m.Object.Sha256, Meta: _meta.GetMeta(m.ReplayId)));
+        var aRevoir = ReplayMiroirPreuve.ChoisirARevoir(candidats, maintenant);
+        var renvoyes = 0;
+        foreach (var (replayId, sha) in aRevoir)
+        {
+            if (ct.IsCancellationRequested || _gameActive || _replayActive) break;
+            var verdict = await _publisher.VerifierSurLeMiroirAsync(sha, ct).ConfigureAwait(false);
+            var meta = _meta.GetMeta(replayId);
+            if (meta is null) continue;
+            var (apres, renvoyer) = ReplayMiroirPreuve.Appliquer(meta, verdict, _objects.HasObject(sha), DateTime.UtcNow);
+            if (!ReferenceEquals(apres, meta)) _meta.SaveMeta(apres);
+            if (renvoyer)
+            {
+                _queue.Enqueue(replayId, sha);
+                renvoyes++;
+                _logger.LogInformation("Replay : {ReplayId} n'est plus sur le miroir et le site le veut encore, renvoi en file.", replayId);
+            }
+            else if (verdict == VerdictMiroir.Absent)
+                _logger.LogInformation("Replay : {ReplayId} n'est plus sur le miroir, le site ne le garde pas ({Etat}).", replayId, apres.PublicationState);
+            try { await Task.Delay(PauseEntreVerifications, ct).ConfigureAwait(false); }
+            catch (OperationCanceledException) { break; }
+        }
+        return renvoyes;
     }
 
     private void OnBusEvent(EventEnvelope e)

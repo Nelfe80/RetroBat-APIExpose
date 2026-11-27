@@ -126,8 +126,10 @@ public sealed class ReplayNetworkStateService
         if (meta?.Pinned == true) return ReplayNetworkState.Pinned;
 
         // Publié au miroir : l'objet est offert au monde, que CETTE borne le serve ou non.
-        // C'est un fait constaté (on l'y a mis), pas une supposition sur le réseau.
-        if (string.Equals(meta?.PublicationState, "mirrored", StringComparison.OrdinalIgnoreCase))
+        // « mirrored » n'est posé que sur un HEAD réussi (27/11) ; un ancien meta sans date de vérification
+        // reste lu comme « mirrored » jusqu'à sa première revision. « queued », « to_resend » et « off_mirror »
+        // retombent sur la règle de visibilité ci-dessous : rien n'est prouvé.
+        if (string.Equals(meta?.PublicationState, ReplayMiroirPreuve.EtatMiroir, StringComparison.OrdinalIgnoreCase))
             return ReplayNetworkState.Announced;
 
         var visibility = meta?.Visibility ?? "private";

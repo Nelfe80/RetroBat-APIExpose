@@ -108,7 +108,11 @@ public sealed record ReplayLocalMetadata(
     int? Rank = null,
     // La categorie de la partie enregistree quand ce n'est pas le 1CC solo : « 1cc-multi » pour
     // la suite d'une partie qu'un joueur a rejointe (charte de la partie certifiee, 2026-09-30).
-    string? Categorie = null)
+    string? Categorie = null,
+    // Preuve du miroir (27/11/2026), voir ReplayMiroirPreuve. Absents des anciens meta : « non verifie ».
+    DateTime? MirroredAt = null,
+    DateTime? MirrorCheckedAt = null,
+    int? ResendCount = null)
 {
     public const string SchemaId = "nelfe.replay.local-meta.v1";
 

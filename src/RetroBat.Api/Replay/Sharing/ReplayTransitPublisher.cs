@@ -52,9 +52,17 @@ public sealed class ReplayTransitPublisher
     /// demande de conserver aucun état local.
     /// </summary>
     public async Task<bool> IsOnSeedAsync(string sha256, CancellationToken ct)
+        => await VerifierSurLeMiroirAsync(sha256, ct).ConfigureAwait(false) == VerdictMiroir.Present;
+
+    /// <summary>
+    /// Meme question, avec la nuance dont la revision a besoin : « absent » (404 partout, l'amorce a repondu) n'est pas
+    /// « inconnu » (reseau, 5xx, 429). Un HEAD par forme (compressee, brute), jamais de GET : aucun octet d'objet.
+    /// </summary>
+    public async Task<VerdictMiroir> VerifierSurLeMiroirAsync(string sha256, CancellationToken ct)
     {
         var template = _config["Replay:Share:MirrorUrlTemplate"];
-        if (string.IsNullOrWhiteSpace(template) || !template.Contains("{sha}", StringComparison.Ordinal)) return false;
+        if (string.IsNullOrWhiteSpace(template) || !template.Contains("{sha}", StringComparison.Ordinal)) return VerdictMiroir.Inconnu;
+        var statuts = new List<int?>();
         try
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
@@ -67,15 +75,16 @@ public sealed class ReplayTransitPublisher
             {
                 using var req = new HttpRequestMessage(HttpMethod.Head, url);
                 using var res = await client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cts.Token).ConfigureAwait(false);
-                if (res.IsSuccessStatusCode) return true;
+                if (res.IsSuccessStatusCode) return VerdictMiroir.Present;
+                statuts.Add((int)res.StatusCode);
             }
-            return false;
         }
         catch (Exception ex)
         {
             _logger.LogDebug(ex, "Replay : amorce injoignable pour la verification de {Sha}.", sha256[..8]);
-            return false;
+            statuts.Add(null);
         }
+        return ReplayMiroirPreuve.Classer(statuts);
     }
 
     public async Task<PublishResult> PublishAsync(string replayId, CancellationToken ct)

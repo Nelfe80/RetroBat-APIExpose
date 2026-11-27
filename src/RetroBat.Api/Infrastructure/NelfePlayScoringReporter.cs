@@ -6898,7 +6898,7 @@ public sealed class NelfePlayScoringReporter : BackgroundService
             _semis.Enqueue(replayId, sha256);
             var meta = _replayStore?.GetMeta(replayId);
             if (meta is not null)
-                _replayStore!.SaveMeta(meta with { Visibility = "public", PublicationState = "mirrored" });
+                _replayStore!.SaveMeta(RetroBat.Api.Replay.Sharing.ReplayMiroirPreuve.Annoncer(meta));
             Trace($"SEMIS inscrit pour {replayId} (score certifie public)");
             if (_semeur is not null)
                 _ = Task.Run(async () =>

@@ -172,7 +172,8 @@ public sealed class ReplaysController : ControllerBase
         queue.Enqueue(id, manifest.Object.Sha256);
 
         var meta = _store.GetMeta(id) ?? ReplayLocalMetadata.Fresh(id);
-        _store.SaveMeta(meta with { Visibility = "public", PublicationState = "mirrored" });
+        // « queued » : l'intention est inscrite, rien n'est prouve. « mirrored » viendra du HEAD reussi (ReplaySeedService).
+        _store.SaveMeta(ReplayMiroirPreuve.Annoncer(meta));
 
         // Puis on tente tout de suite, sans faire dependre la reponse de la reussite : la file
         // reprendra si le reseau manque, si le transit refuse, ou si la machine s'arrete.
