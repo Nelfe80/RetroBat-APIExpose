@@ -226,7 +226,7 @@ public sealed class AdventureSiteClient : IAdventureSite
     /// </summary>
     internal static IReadOnlyList<string> LireNomsDesJoueurs(JsonObject a)
     {
-        if (a["participant_pseudos"] is JsonArray liste)
+        if ((a["participants_names"] ?? a["participant_pseudos"]) is JsonArray liste)
         {
             return liste.Select(Texte).Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t!).ToList();
         }
@@ -253,7 +253,7 @@ public sealed class AdventureSiteClient : IAdventureSite
             Seats = Entier(a["places"]) ?? 0,
             Mode = Texte(a["mode"]) ?? AdventureModes.Exclusive,
             Creator = a["creator"] is JsonObject c ? Texte(c["handle"]) : Texte(a["creator"]),
-            CreatorPseudo = Texte(a["creator_pseudo"]) ?? (a["creator"] is JsonObject cp ? Texte(cp["pseudo"]) : null) ?? PseudoDuCreateur(a),
+            CreatorPseudo = Texte(a["creator_name"]) ?? Texte(a["creator_pseudo"]) ?? (a["creator"] is JsonObject cp ? Texte(cp["pseudo"]) : null) ?? PseudoDuCreateur(a),
             NomsDesJoueurs = LireNomsDesJoueurs(a),
             Participants = (a["members"] as JsonArray)?.OfType<JsonObject>().Select(m => Texte(m["handle"])).OfType<string>().ToList() ?? [],
             Room = a["session"] is JsonObject s ? Texte(s["room"]) : null,

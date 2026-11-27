@@ -239,4 +239,13 @@ public sealed class AdventureRejoindreTests
         Assert.Contains("\"players\":4", b.Corps[2], StringComparison.Ordinal);
         Assert.Contains("\"places\":4", b.Corps[0], StringComparison.Ordinal);
     }
+
+    [Fact]
+    public async Task Les_champs_du_site_creator_name_et_participants_names_sont_lus_en_premier()
+    {
+        var corps = """{"ok":true,"adventures":[{"id":"a1","game":"g","creator":"4fe5","creator_name":"RetroLife","participants":["4fe5","zz"],"participants_names":["RetroLife","Nelfe80"]}],"invitations":[]}""";
+        var a = Assert.Single((await Client(new Bouteille(_ => (200, corps))).MesAventuresAsync(CancellationToken.None))!.Aventures);
+        Assert.Equal("RetroLife", a.CreatorPseudo);
+        Assert.Equal(["RetroLife", "Nelfe80"], a.NomsDesJoueurs.ToArray());
+    }
 }
