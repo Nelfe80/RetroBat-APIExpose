@@ -46,6 +46,8 @@ public sealed class ReplayVideoPublisher
     private readonly NelfePlayDeviceStore _devices;
     private readonly IHttpClientFactory _httpFactory;
     private readonly ILogger<ReplayVideoPublisher> _logger;
+    // Les rendus interrompus ou en echec, comptes par replay : au bout de SuiviDesRendus.Seuil, le replay est abandonne (27/11).
+    private readonly SuiviDesRendus _suivi = new(Path.Combine(RetroBat.Domain.Paths.RetroBatPaths.PluginRoot, "state", "nelfeplay", "rendus-abandonnes.json"));
 
     public ReplayVideoPublisher(ReplayVideoRenderer rendu, IReplayManifestStore manifests, IReplayObjectStore objects,
         IReplayMetadataStore meta, ReplayManifestFetcher manifestFetcher, IReplaySourceResolver sources,
@@ -133,6 +135,11 @@ public sealed class ReplayVideoPublisher
                 details.Add(cible.ReplayId + " : capture en attente sur cette borne");
                 continue;
             }
+            if (_suivi.EstAbandonne(cible.ReplayId))
+            {
+                details.Add(cible.ReplayId + " : rendu abandonne (interrompu ou en echec " + SuiviDesRendus.Seuil + " fois)");
+                continue;
+            }
             var manifest = _manifests.GetManifest(cible.ReplayId);
             if (manifest is null || !_objects.HasObject(manifest.Object.Sha256))
             {
@@ -162,17 +169,31 @@ public sealed class ReplayVideoPublisher
             var dossier = Path.Combine(_objects.TempRoot, "video", cible.ReplayId);
             try
             {
-                var film = await _rendu.RendreAsync(cible.ReplayId, debut, fin, ct, cible.Controles, cible.Epreuves).ConfigureAwait(false);
+                ReplayVideoRenderer.RenduVideo film;
+                try
+                {
+                    film = await _rendu.RendreAsync(cible.ReplayId, debut, fin, ct, cible.Controles, cible.Epreuves).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (ct.IsCancellationRequested)
+                {
+                    // Interrompu (une partie commence, le joueur se sert de la borne) : c'est un essai sans film. Sans compte, le
+                    // meme replay revenait a chaque sortie de jeu, pour toujours (27/11).
+                    if (_suivi.NoterUnEchec(cible.ReplayId)) await AbandonnerAsync(credential, cible.ReplayId, "rendu_interrompu").ConfigureAwait(false);
+                    throw;
+                }
                 if (!film.Ok || film.Fichier is null)
                 {
                     var raison = film.Raison ?? "incomplet";
                     details.Add(cible.ReplayId + " : rendu " + raison);
+                    if (!RaisonsPassageres.Contains(raison) && _suivi.NoterUnEchec(cible.ReplayId))
+                        _logger.LogWarning("Video : {ReplayId} abandonne apres {Seuil} rendus sans film ({Raison}).", cible.ReplayId, SuiviDesRendus.Seuil, raison);
                     // Sinon le meme echec reviendrait en tete a chaque passage et bloquerait la file : le site
                     // le compte comme un essai, le repropose plus tard, puis l'abandonne.
                     if (!RaisonsPassageres.Contains(raison))
                         await SignalerEchecAsync(credential, cible.ReplayId, "rendu_" + raison, ct).ConfigureAwait(false);
                     continue;
                 }
+                _suivi.NoterUneReussite(cible.ReplayId);
                 // LE CONTROLE DE FIDELITE (09/11) : un replay qui ne rejoue pas la partie ne part jamais ; la station ne
                 // filme que ce qu'elle a verifie, la borne du joueur (meme ROM, meme coeur, memes reglages) envoie aussi un
                 // film qu'elle n'a pas pu verifier, en le disant.
@@ -235,6 +256,15 @@ public sealed class ReplayVideoPublisher
         _logger.LogInformation("Video : {Envoyees} film(s) envoye(s) sur {Cibles} cible(s). {Details}",
             envoyees, cibles.Count, string.Join(" | ", details));
         return new Rapport(cibles.Count, rendus, envoyees, details, refuse);
+    }
+
+    /// <summary>Le replay est abandonne : le journal le dit et le site le compte comme un essai (jamais bloquant).</summary>
+    private async Task AbandonnerAsync(string credential, string replayId, string raison)
+    {
+        _logger.LogWarning("Video : {ReplayId} abandonne apres {Seuil} rendus interrompus ({Raison}) ; repris dans {Heures} h au plus tot.",
+            replayId, SuiviDesRendus.Seuil, raison, SuiviDesRendus.Duree.TotalHours);
+        using var delai = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        await SignalerEchecAsync(credential, replayId, raison, delai.Token).ConfigureAwait(false);
     }
 
     /// <summary>

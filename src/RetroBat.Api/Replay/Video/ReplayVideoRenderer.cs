@@ -185,17 +185,31 @@ public sealed class ReplayVideoRenderer
         // Ce RetroArch n'est pas une partie : les panneaux d'ES restent ouvrables pendant le rendu (22/10).
         RetroBat.Api.Infrastructure.EmulatorForeground.NoterLeRendu(process.Id);
 
+        // LA FENETRE NE PARAIT JAMAIS (27/11) : elle n'etait ecartee qu'entre deux releves UDP, et RetroArch ne repond pas
+        // pendant le chargement du coeur et de la ROM : une fenetre blanche restait devant le joueur. Un guetteur dedie
+        // l'ecarte toutes les 50 ms des qu'elle existe, sans attendre le pilote.
+        using var finDuGuet = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        var guet = Task.Run(async () =>
+        {
+            try
+            {
+                while (!finDuGuet.IsCancellationRequested && !process.HasExited)
+                {
+                    if (RetroBat.Api.Infrastructure.EmulatorForeground.GarderHorsEcran(process))
+                        RetroBat.Api.Infrastructure.EmulatorForeground.RendreAEsSiLeRenduEstDevant(process);
+                    await Task.Delay(50, finDuGuet.Token).ConfigureAwait(false);
+                }
+            }
+            catch (Exception) { /* fin du rendu */ }
+        });
+
         try
         {
             while (!process.HasExited && !pilote.Termine)
             {
                 ct.ThrowIfCancellationRequested();
-                if (RetroBat.Api.Infrastructure.EmulatorForeground.GarderHorsEcran(process))
-                {
-                    // Lance « reduit », il s'active quand meme : ES perdait le premier plan et la manette.
-                    RetroBat.Api.Infrastructure.EmulatorForeground.RendreAEsSiLeRenduEstDevant(process);
-                }
-
+                // (la fenetre est gardee hors ecran par le guetteur ci-dessus ; lance « reduit », elle s'active quand meme :
+                // il rend alors le premier plan a ES)
                 PiloteDuRendu.Action action;
                 if (chrono.Elapsed > plafond) action = pilote.Abandonner();
                 else if (controleDEpreuve is not null)
@@ -237,6 +251,7 @@ public sealed class ReplayVideoRenderer
         }
         finally
         {
+            try { finDuGuet.Cancel(); await guet.ConfigureAwait(false); } catch (Exception) { /* fin du guet */ }
             RetroBat.Api.Infrastructure.EmulatorForeground.OublierLeRendu();
             if (!process.HasExited) { try { process.Kill(entireProcessTree: true); } catch { /* deja parti */ } }
             try { Directory.Delete(sauvegardes, recursive: true); } catch { /* zone de travail */ }
