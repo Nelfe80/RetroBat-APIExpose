@@ -91,6 +91,12 @@ public sealed class MultiplayerCoeursService : BackgroundService
         new("fbneo", "fbneo_ghosts", ["fbneo_ghosts_libretro.dll"], "fbneo_ghosts_libretro.info",
             "le coeur libretro fbneo_ghosts (fantomes du mode TRAINING des shmups d'arcade de NelfePlay), en dernier : fbneo reste "
             + "le coeur des parties"),
+        // GENESIS PLUS GX NELFELINK (28/11, Extend Mode) : Genesis Plus GX qui relie plusieurs Mega Drive dans un seul coeur
+        // (une vue par place), pour les ROMs derivees par un patch (Dune II Multiplayer). Un coeur a part : genesis_plus_gx reste
+        // celui des parties solo. La ROM qu'il joue n'est jamais livree : ExtendRomsService la derive de celle du joueur.
+        new("megadrive", "genesis_plus_gx_nelfelink", ["genesis_plus_gx_nelfelink_libretro.dll"], "genesis_plus_gx_nelfelink_libretro.info",
+            "le coeur libretro genesis_plus_gx_nelfelink (plusieurs Mega Drive reliees dans un seul coeur, pour les ROMs derivees "
+            + "de l'Extend Mode), en dernier : genesis_plus_gx reste le coeur des parties solo"),
     ];
 
     public const string FichierEs = "es_systems_nelfeplay.cfg";
@@ -244,7 +250,7 @@ public sealed class MultiplayerCoeursService : BackgroundService
         => Path.Combine(RetroBatPaths.PluginRoot, chemin.Replace('/', Path.DirectorySeparatorChar));
 
     /// <summary>RetroArch, ou le lanceur de RetroBat, qui vit toute la partie et la precede.</summary>
-    private static bool UnePartieTourne()
+    internal static bool UnePartieTourne()
     {
         if (EmulatorForeground.EmulateurTourne())
         {
