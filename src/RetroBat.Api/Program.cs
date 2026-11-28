@@ -720,6 +720,7 @@ builder.Services.AddSingleton<RetroBat.Api.Infrastructure.ScoreShotRegenerator>(
 builder.Services.AddSingleton<RetroBat.Api.Replay.Video.ReplayVideoRenderer>();
 builder.Services.AddSingleton<RetroBat.Api.Replay.Video.ReplayVideoPublisher>();
 // Les films se rendent quand la borne est au repos, et s'arretent des qu'un joueur revient.
+builder.Services.AddSingleton<RetroBat.Api.Replay.Video.ISessionsOuvertes, RetroBat.Api.Replay.Video.SessionsOuvertes>();
 builder.Services.AddHostedService<RetroBat.Api.Replay.Video.ReplayVideoScheduler>();
 // Chaque partie est filmee par RetroArch pendant le jeu ; le film ne part que si c'est un record.
 builder.Services.AddSingleton<RetroBat.Api.Replay.Video.ReplayCaptureService>();

@@ -28,6 +28,7 @@ public sealed class ReplayVideoScheduler : BackgroundService
     private readonly bool _actif;
     private readonly TimeSpan _repos;
     private readonly TimeSpan _calmeStation;
+    private readonly ISessionsOuvertes? _sessions;
     private readonly TimeSpan _intervalle;
     private readonly TimeSpan _rienAFilmer;
     private readonly TimeSpan _sansRole;
@@ -45,8 +46,9 @@ public sealed class ReplayVideoScheduler : BackgroundService
     private string? _role;
 
     public ReplayVideoScheduler(IEventBus bus, ReplayVideoPublisher publication, ReplayPlaybackService playback,
-        IConfiguration configuration, ILogger<ReplayVideoScheduler> logger)
+        IConfiguration configuration, ILogger<ReplayVideoScheduler> logger, ISessionsOuvertes? sessions = null)
     {
+        _sessions = sessions;
         _bus = bus; _publication = publication; _playback = playback; _logger = logger;
         _actif = configuration.GetValue("Video:Render:Enabled", true);
         // LA BORNE DU JOUEUR REND SES RECORDS AU REPOS (decision du user du 09/11) : elle s'eteint souvent peu apres la
@@ -221,6 +223,12 @@ public sealed class ReplayVideoScheduler : BackgroundService
     /// <summary>Un passage : filme un record si le role et l'etat de la borne le permettent. Rend le delai avant le suivant.</summary>
     private async Task<TimeSpan> PasserAsync(CancellationToken stoppingToken)
     {
+        // Une session ouverte (salle, vocal) est une activite a chaque passage : le calme repart de zero a sa fin.
+        if (_sessions?.Occupation() is { } occupee)
+        {
+            lock (_verrou) _derniereActivite = DateTime.UtcNow;
+            _logger.LogDebug("Video : session ouverte ({Raison}), pas de rendu de station.", occupee);
+        }
         bool partie; DateTime activiteDeLaBorne; string? role;
         lock (_verrou) { partie = _partieEnCours; activiteDeLaBorne = _derniereActivite; role = _role; }
         var maintenant = DateTime.UtcNow;
