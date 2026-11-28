@@ -503,6 +503,9 @@ builder.Services.AddSingleton<RetroBat.Api.Speedrun.DefisPanelService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Speedrun.DefisCollectionSyncService>());
 builder.Services.AddSingleton<RetroBat.Api.Multiplayer.MultiplayerCollectionSyncService>();
 builder.Services.AddHostedService<RetroBat.Api.Multiplayer.MultiplayerCoeursService>();
+// EXTEND MODE (28/11) : les ROMs derivees d'un patch (fiches extend/catalogue.json du Data Pack) a partir de la ROM du joueur.
+builder.Services.AddSingleton<RetroBat.Api.Extend.ExtendRomsService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Extend.ExtendRomsService>());
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetroBat.Api.Multiplayer.MultiplayerCollectionSyncService>());
 // NELFEPLAY ADVENTURE (26/11) : le catalogue du Data Pack, la collection d'ES (meme calcul que MULTIPLAYER), la copie locale des
 // versions, leur file d'envoi au site et la seance chez l'hote (reprise, sauvegardes, fin).

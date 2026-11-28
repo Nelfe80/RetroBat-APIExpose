@@ -57,5 +57,7 @@ public class DataPackOptions
         // Les Player Decks (21 novembre 2026) : themes et cartes des niveaux, lus par le Deck EN PRIORITE sur tools\playerdeck\themes.
         // Chemins bornes par DataPackPaths.Autorise (playerdeck/themes/*.json et playerdeck/themes/atlas/<deck>/*.json|png).
         "playerdeck",
+        // Les fiches de conversion de l'Extend Mode (28 novembre 2026) : extend/catalogue.json et les patchs (IPS, BPS) sous extend/patches/.
+        "extend",
     };
 }

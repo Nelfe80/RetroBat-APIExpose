@@ -8108,6 +8108,70 @@ public class GamelistUpdateService : IGamelistSelectionSyncService, IDisposable
     }
 
     /// <summary>
+    /// EXTEND MODE (28/11) : inscrit, ou met a jour, l'entree d'une ROM DERIVEE (chemin, nom, <c>emulator</c> libretro et
+    /// <c>core</c> de la fiche) dans la gamelist de son systeme. Une entree deja la garde ses autres champs (media, notes).
+    /// Un fichier hors du dossier du systeme n'est jamais inscrit. Vrai si la gamelist a change.
+    /// </summary>
+    public bool DeclarerJeuDerive(string frontendSystemId, string cheminAbsolu, string nom, string coeur, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(frontendSystemId) || string.IsNullOrWhiteSpace(cheminAbsolu))
+        {
+            return false;
+        }
+
+        var systemRoot = Path.Combine(RetroBatPaths.RomsRoot, frontendSystemId);
+        var relatif = "./" + Path.GetRelativePath(systemRoot, cheminAbsolu).Replace(Path.DirectorySeparatorChar, '/');
+        if (relatif.StartsWith("./..", StringComparison.Ordinal) || Path.IsPathRooted(relatif[2..]))
+        {
+            return false;
+        }
+
+        var gamelistPath = Path.Combine(systemRoot, "gamelist.xml");
+        lock (GetGamelistLock(gamelistPath))
+        {
+            var document = TryLoadOrCreateGamelistDocument(gamelistPath, cancellationToken, "ROM derivee de l'Extend Mode");
+            if (document?.Root == null)
+            {
+                return false;
+            }
+
+            var noeud = FindOrCreateGameNode(document.Root, relatif);
+            var avant = noeud.ToString(SaveOptions.DisableFormatting);
+            SetOrCreateElement(noeud, "path", relatif);
+            SetOrCreateElement(noeud, "name", string.IsNullOrWhiteSpace(nom) ? Path.GetFileNameWithoutExtension(cheminAbsolu) : nom.Trim());
+            SetOrCreateElement(noeud, "emulator", "libretro");
+            SetOrCreateElement(noeud, "core", coeur);
+            return noeud.ToString(SaveOptions.DisableFormatting) != avant && SaveGamelistDocument(document, gamelistPath, cancellationToken);
+        }
+    }
+
+    /// <summary>EXTEND MODE : retire l'entree d'une ROM derivee qu'on vient d'effacer. Vrai si la gamelist a change.</summary>
+    public bool RetirerJeuDerive(string frontendSystemId, string cheminAbsolu, CancellationToken cancellationToken = default)
+    {
+        var systemRoot = Path.Combine(RetroBatPaths.RomsRoot, frontendSystemId);
+        var gamelistPath = Path.Combine(systemRoot, "gamelist.xml");
+        if (!File.Exists(gamelistPath))
+        {
+            return false;
+        }
+
+        var relatif = "./" + Path.GetRelativePath(systemRoot, cheminAbsolu).Replace(Path.DirectorySeparatorChar, '/');
+        lock (GetGamelistLock(gamelistPath))
+        {
+            var document = TryLoadOrCreateGamelistDocument(gamelistPath, cancellationToken, "ROM derivee retiree de l'Extend Mode");
+            var cible = NormalizeForCompare(relatif);
+            var retirer = document?.Root?.Elements("game").Where(g => NormalizeForCompare(g.Element("path")?.Value) == cible).ToList();
+            if (document is null || retirer is null || retirer.Count == 0)
+            {
+                return false;
+            }
+
+            retirer.ForEach(g => g.Remove());
+            return SaveGamelistDocument(document, gamelistPath, cancellationToken);
+        }
+    }
+
+    /// <summary>
     /// Ajoute a la racine d'une gamelist une entree (chemin relatif + nom) pour chaque jeu qu'elle
     /// ne nomme pas encore. Un fichier hors du dossier du systeme n'est jamais inscrit.
     /// </summary>
