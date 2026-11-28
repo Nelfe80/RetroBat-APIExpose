@@ -521,4 +521,36 @@ public class ExtendTests : IDisposable
         Assert.Equal(2_097_152, resultat!.Length);
         Assert.Equal("b77b300192b23ccc66b90744cb38ed9135a370acc64a55378fc0a7ec9f2bb197", Sha(resultat));
     }
+
+    // ---- le Data Pack : chaque ROM derivee a son jeu au catalogue MULTIPLAYER, et ce jeu n'est pas ecarte a la lecture ----
+    // (essai du 28/11 : Dune II en niveau « nelfeplay » sans depart pret etait ecarte, la ROM deposee n'entrait pas dans la collection)
+
+    [Fact]
+    public void Chaque_rom_derivee_du_Data_Pack_a_un_jeu_MULTIPLAYER_retenu()
+    {
+        var pack = Environment.GetEnvironmentVariable("NELFEPLAY_DATAPACK");
+        var fiches = pack is null ? null : Path.Combine(pack, "extend", "catalogue.json");
+        if (fiches is null || !File.Exists(fiches))
+        {
+            return; // Data Pack sans Extend Mode
+        }
+
+        var api = new Version(99, 0, 0);
+        using var flux = File.OpenRead(fiches);
+        var extend = ExtendCatalogue.Lire(flux, api, out var erreur, out var ecartees);
+        Assert.True(extend is not null, erreur);
+        Assert.Empty(ecartees);
+        var lu = JsonSerializer.Deserialize<RetroBat.Api.Multiplayer.MultiplayerCatalogue>(
+            File.ReadAllText(Path.Combine(pack!, "multiplayer", "catalogue.json")),
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true, ReadCommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true })!;
+        var retenu = RetroBat.Api.Multiplayer.MultiplayerCatalogueStore.Retenir(lu, api, out var erreurMulti, out var ecartesMulti);
+        Assert.True(retenu is not null, erreurMulti);
+        foreach (var c in extend!.Conversions)
+        {
+            var jeu = retenu!.Games.FirstOrDefault(j => (j.Content?.Md5 ?? []).Contains(c.Result!.Md5!, StringComparer.OrdinalIgnoreCase));
+            Assert.True(jeu is not null, c.Id + " : aucun jeu MULTIPLAYER retenu pour la ROM derivee ; ecartes : " + string.Join(" | ", ecartesMulti));
+            Assert.Equal(c.System, jeu!.System);
+            Assert.Equal(c.Core!.Name, jeu.Core);
+        }
+    }
 }
